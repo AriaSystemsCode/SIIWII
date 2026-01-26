@@ -43,6 +43,7 @@ using onetouch.AppItems.Dtos;
 using System.Linq.Expressions;
 using Twilio.Rest.Messaging.V1.Service;
 using AuthorizeNet.Api.Contracts.V1;
+using AutoMapper.Internal.Mappers;
 
 namespace onetouch.Authorization.Users
 {
@@ -457,13 +458,16 @@ namespace onetouch.Authorization.Users
                     //contactDto.Code = input.Code;
                     //ContactDto savedContactDto = await _appAccountsAppService.CreateOrEditContact(contactDto);
                 CreateOrEditAccountInfoDto accountDto = new CreateOrEditAccountInfoDto();
+                accountDto = ObjectMapper.Map<CreateOrEditAccountInfoDto>(contact);
                 accountDto.Id = contact.Id;
-                accountDto.Code = input.Code;
+                //accountDto.Code = input.Code;
                 accountDto.Name = input.User.Name + " " + input.User.Surname;
                 accountDto.TradeName = "";
                 accountDto.EMailAddress = input.User.EmailAddress;
                 accountDto.ReturnId = true;
                 accountDto.AccountLevel = AccountLevelEnum.Manual;
+                //accountDto.SSIN = contact.SSIN;
+                //accountDto.TenantOwner = contact.EntityFk.TenantOwner;
                 accountDto.EntityExtraData = new List<AppEntityExtraDataDto>();
                 var entityObjectType = await _sycEntityObjectTypesAppService.GetAllWithExtraAttributesByCode("PERSONAL");
                 if (entityObjectType != null && entityObjectType.Count > 0)
