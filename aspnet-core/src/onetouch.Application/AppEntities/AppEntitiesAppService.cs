@@ -1402,7 +1402,7 @@ namespace onetouch.AppEntities
                                     att = await _appAttachmentRepository.InsertAsync(att);
                                     await CurrentUnitOfWork.SaveChangesAsync();
                                     //entity.EntityAttachments.Add(new AppEntityAttachment { AttachmentCategoryId = (int)item.AttachmentCategoryId, EntityId = entity.Id, AttachmentId = att.Id });
-                                    entity.EntityAttachments.Add(new AppEntityAttachment { AttachmentCategoryId = (int)item.AttachmentCategoryId, EntityId = entity.Id, AttachmentId = att.Id, IsDefault = item.IsDefault, Attributes = item.Attributes });
+                                    entity.EntityAttachments.Add(new AppEntityAttachment { AttachmentCategoryId = (int)item.AttachmentCategoryId, EntityId = entity.Id, AttachmentId = att.Id, IsDefault = item.IsDefault, Attributes = item.Attributes,IsPublic = item.IsPublic });
                                     //await CurrentUnitOfWork.SaveChangesAsync();
                                 }
                                 else
