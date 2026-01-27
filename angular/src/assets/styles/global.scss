@@ -857,3 +857,9 @@ th.sticky-header {
 searchicon {
     padding-top: 15%;
 }
+
+.is-disabled {
+    pointer-events: none;
+    cursor: not-allowed;
+    opacity: 1;
+  }
