@@ -1383,7 +1383,7 @@ namespace onetouch.AppEntities
                         {
                             var appEntityAttachment = _appEntityAttachmentRepository.GetAll().Where(r => r.Id == item.Id).FirstOrDefault();
 
-                            entity.EntityAttachments.Add(new AppEntityAttachment { AttachmentCategoryId = (int)item.AttachmentCategoryId, EntityId = entity.Id, AttachmentId = appEntityAttachment.AttachmentId, IsDefault = item.IsDefault, Attributes = item.Attributes });
+                            entity.EntityAttachments.Add(new AppEntityAttachment { AttachmentCategoryId = (int)item.AttachmentCategoryId, EntityId = entity.Id, AttachmentId = appEntityAttachment.AttachmentId, IsDefault = item.IsDefault, Attributes = item.Attributes, IsPublic = item.IsPublic });
                         }
                         else
                         {
