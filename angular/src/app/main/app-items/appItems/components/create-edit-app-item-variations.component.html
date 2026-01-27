@@ -796,16 +796,22 @@
                                                         {{ "Default Image" | localize }}
                                                     </a>  <a class="p-2"
                                                 style="position: absolute; bottom: -100px;">
-                                               <label class="text-purple d-flex align-items-center cursor-pointer">
-                                                 <input 
-                                                   type="checkbox" 
-                                                   class="mr-2 ml-2" 
-                                                   [checked]="activeAttachmentOption?.entityAttachments[i]?.isPublic || activeAttachmentOption.defaultImageIndex == i" 
-                                                   [disabled]="activeAttachmentOption.defaultImageIndex == i"
-                                                   (change)="setVisibleinMarketplaceImage(i)"
-                                                 />
-                                                 {{ 'Visible in Marketplace' | localize }}
-                                               </label>
+                                                <label
+                                                class="text-purple d-flex align-items-center cursor-pointer"
+                                                [class.is-disabled]="activeAttachmentOption.defaultImageIndex == i"
+                                              >
+                                                <input 
+                                                  type="checkbox" 
+                                                  class="mr-2 ml-2" 
+                                                  [checked]="
+                                                    activeAttachmentOption?.entityAttachments[i]?.isPublic ||
+                                                    activeAttachmentOption.defaultImageIndex == i
+                                                  "
+                                                  (change)="setVisibleinMarketplaceImage(i)"
+                                                />
+                                                {{ 'Visible in Marketplace' | localize }}
+                                              </label>
+                                              
                                              </a>
                                                 </a>
                                               
