@@ -3453,7 +3453,7 @@ namespace onetouch.Accounts
                             }
                             //I40[End]
 
-                            if (AbpSession.TenantId != null && AbpSession.TenantId != 0)
+                            if (AbpSession.TenantId != null && AbpSession.TenantId != 0 && adminUser.RelatedTenantId != 0)
                             {
                                 var presonEntityObjectTypeId = await _helper.SystemTables.GetEntityObjectTypePersonId();
                                 var account = _appContactRepository.GetAll().Include(z => z.EntityFk)
