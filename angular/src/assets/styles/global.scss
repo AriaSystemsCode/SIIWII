@@ -860,6 +860,6 @@ searchicon {
 
 .is-disabled {
     pointer-events: none;
-    cursor: not-allowed;
+    cursor: not-allowed !important; 
     opacity: 1;
   }
