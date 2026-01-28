@@ -85,7 +85,7 @@ font-weight: 700;
   .stars-outer {
     position: relative;
     display: inline-block;
-    font-size: 26px;
+    font-size: 22px;
     color: #ccc;
     line-height: 1;
   }
@@ -98,12 +98,19 @@ font-weight: 700;
     color: #F6851D;
     overflow: hidden;
   }
-
+.stars-inner-ar {
+  position: absolute;
+  top: 0;
+  right: 0;
+  white-space: nowrap;
+  color: #F6851D;
+  overflow: hidden;
+}
 
   .rateNum {
   
 
-  
+  white-space: nowrap;
   
     color: #1B101B;
   

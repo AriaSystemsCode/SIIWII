@@ -451,12 +451,7 @@
 
     }
 }
-@media only screen and (max-width: 600px) {
-    .mobile {
 
-        width: 85%;
-    }
-}
 
 label {
     color: #1B101B !important;
@@ -478,4 +473,13 @@ label {
 }
 
 
+}
+
+
+
+@media only screen and (max-width: 600px) {
+    .mobile {
+
+        width: 85%;
+    }
 }

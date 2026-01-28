@@ -864,6 +864,7 @@ h6 {
     padding: 8px 12px !important;
     color: #fff !important;
 }
+
 .pBtnCancel {
     color: #4A0D4A !important;
     border: 1px solid #eee !important;
@@ -878,7 +879,7 @@ p-dialog {
 }
 
 .rateTxt {
-    color:#1B101B;
+    color: #1B101B;
     font-weight: 700;
 }
 
@@ -888,10 +889,27 @@ p-dialog {
     font-weight: 500;
 }
 
-// .blur-text {
-//     filter: blur(5px);
-//     transition: filter 0.3s;
-//     user-select: none;      /* prevent copy/paste */
-//     pointer-events: none;   /* disable text selection/clicks */
-//   }
-  
+
+
+@media only screen and (min-width: 900px) {
+    .addPt {
+        margin-top: 50px !important;
+    }
+}
+
+
+@media only screen and (max-width: 520px) {
+    .addMtM {
+        margin-top: 60px !important;
+    }
+}
+
+.editPcAr {
+    position: absolute;
+    left: -8px;  z-index: 99;
+}
+
+.editPcEn {
+    position: absolute;
+    right: -8px;  z-index: 99;
+}

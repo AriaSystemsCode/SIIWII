@@ -15,7 +15,7 @@
         (input)="adjustTextareaHeight($event)"></textarea>
   
   
-      <div class="rating" style="position: absolute; right: 10px;top: 10px;">
+      <div class="rating"  [ngClass]="isArabic ? 'starsAr':'starsEn'">
         <ng-container *ngFor="let star of [1, 2, 3, 4, 5]; let i = index">
           <i class="fa" [ngClass]="{
                 'fa-star': i + 1 <= selectedRating,
@@ -101,7 +101,7 @@
               </a>
               <p class="txtby mb-0">by {{review?.messages?.senderName}}</p>
             </div>
-            <div class="mx-3  align-items-center d-md-flex d-none">
+            <div class="mx-3  align-items-center d-lg-flex d-none">
               <svg *ngIf="review?.isUserVerifiedPurchaser || review?.isAccountAdmin || review?.isProfileOwner" width="16"
                 height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path fill-rule="evenodd" clip-rule="evenodd"
@@ -145,7 +145,7 @@
   
   
         </div>
-        <div class="mx-3  align-items-center d-md-none d-flex">
+        <div class="mx-3  align-items-center d-lg-none d-flex">
           <svg *ngIf="review?.isUserVerifiedPurchaser || review?.isAccountAdmin || review?.isProfileOwner" width="16"
             height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path fill-rule="evenodd" clip-rule="evenodd"
@@ -174,7 +174,7 @@
             <span class="stars-container  " style="color: #D4D4D4;">★★★★★</span>
             <span [style]="
                     'width :' + review?.rating/5 * 100 + '%'
-                " class="stars-container  fill-s position-absolute top-0 left-0 inline-block ">★★★★★</span>
+                " class="stars-container   inline-block " [ngClass]="isArabic ? ' fill-s-ar':' fill-s'">★★★★★</span>
           </div>
         </div>
       </div>

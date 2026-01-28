@@ -344,4 +344,27 @@
     margin-right: 70px !important;
 }
 
+@media only screen and (min-width: 900px) {
+.addPt {
+    margin-top: 100px !important;
+}
 
+}
+@media only screen and (min-width: 575px) and (max-width: 900px)  {
+    .addPt {
+        margin-top: 15px !important;
+    }
+    
+    }
+
+@media only screen and (max-width: 520px) {
+    .addMtM {
+        margin-top: 60px !important;
+    }
+    }
+
+
+
+    .addngTop {
+        margin-top: -50px;
+    }

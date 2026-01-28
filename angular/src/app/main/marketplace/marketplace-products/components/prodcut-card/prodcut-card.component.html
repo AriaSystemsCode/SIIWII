@@ -35,7 +35,7 @@
               <div class="stars-outer">
                 ★★★★★
              
-                <div class="stars-inner" [style.width]="(productCard?.averageRating / 5) * 100 + '%'">
+                <div [ngClass]=" isArabic ? 'stars-inner-ar' :  'stars-inner'" [style.width]="(productCard?.averageRating / 5) * 100 + '%'">
                   ★★★★★
                 </div>
               </div>
