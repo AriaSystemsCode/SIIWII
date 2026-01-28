@@ -1490,7 +1490,7 @@ export class CreateOrEditAppItemComponent
         this.appItem.entityAttachments.map((item, i) => {
             item.isDefault = index == i ? true : false;
             if (item.isDefault) 
-                item.isPublish = true;
+                item.isPublic = true;
             
             return item;
         });
