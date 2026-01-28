@@ -836,8 +836,8 @@ html{
     overflow-y: auto !important;
 .p-checkbox .p-checkbox-box .p-icon {
     position: relative;
-    left: 40%;
-    right: 40%;
+    left: 10%;
+    right: 10%;
 }
 }
 
@@ -878,3 +878,9 @@ th.sticky-header {
 searchicon {
     padding-top: 15%;
 }
+
+.is-disabled {
+    pointer-events: none;
+    cursor: not-allowed !important; 
+    opacity: 1;
+  }

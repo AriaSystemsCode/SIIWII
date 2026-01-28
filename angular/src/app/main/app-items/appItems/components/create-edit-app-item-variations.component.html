@@ -787,23 +787,32 @@
 />
 
     
+<!-- [ngClass]="{'d-block' : activeAttachmentOption.defaultImageIndex == i}" -->
                                                     <a  *ngIf="isImageFile(activeAttachmentOption?.entityAttachments[i]?.fileName)"
-                                                    class="select-default-image p-2 col-12 text-center" [ngClass]="{'d-block' : activeAttachmentOption.defaultImageIndex == i}"  style="    color: #4A0D4A !important;
+                                                    class="select-default-image d-block p-2 col-12 text-center"   style="    color: #4A0D4A !important;
                                                     border: 1px solid #EEEEEEEE !important;
                                                     border-radius: 12px;" (click)="setDefaultImage(i)">
-                                                        <i class="fa fa-check-square" [ngClass]="activeAttachmentOption.defaultImageIndex == i? 'text-success':'text-grey' "></i>
+                                                        <i class="fa" [ngClass]="activeAttachmentOption.defaultImageIndex == i? 'fa-check-square text-success':'fa-square text-grey'"></i>
                                                         {{ "Default Image" | localize }}
                                                     </a>  <a class="p-2"
                                                 style="position: absolute; bottom: -100px;">
-                                               <label class="text-purple d-flex align-items-center cursor-pointer">
-                                                 <input 
-                                                   type="checkbox" 
-                                                   class="mr-2 ml-2" 
-                                                   [checked]="activeAttachmentOption?.entityAttachments[i]?.isPublic" 
-                                                   (change)="setVisibleinMarketplaceImage(i)"
-                                                 />
-                                                 {{ 'Visible in Marketplace' | localize }}
-                                               </label>
+                                                <label
+                                                [class.is-disabled]="activeAttachmentOption.defaultImageIndex == i"
+                                                class="text-purple d-flex align-items-center cursor-pointer"
+                                              >
+                                                <input 
+                                                [class.is-disabled]="activeAttachmentOption.defaultImageIndex == i"
+                                                  type="checkbox" 
+                                                  class="mr-2 ml-2" 
+                                                  [checked]="
+                                                    activeAttachmentOption?.entityAttachments[i]?.isPublic ||
+                                                    activeAttachmentOption.defaultImageIndex == i
+                                                  "
+                                                  (change)="setVisibleinMarketplaceImage(i)"
+                                                />
+                                                {{ 'Visible in Marketplace' | localize }}
+                                              </label>
+                                              
                                              </a>
                                                 </a>
                                               
