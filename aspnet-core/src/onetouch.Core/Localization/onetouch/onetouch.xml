@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <localizationDictionary culture="en">
-	<texts>	<text name="DefaultContactUsEmail">Default contact us email</text>
+	<texts>
+	<text name="DefaultContactUsEmail">Default contact us email</text>
 	<text name="Defaultcontactusemailtemplate">Default contact us email template</text>
 	<text name="MarketplacesellerSSIN">Marketplace seller SSIN</text>
 	<text name="Defaultlandingpageis">Default landing page is</text>
