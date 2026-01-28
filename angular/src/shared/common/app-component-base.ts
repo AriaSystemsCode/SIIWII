@@ -508,9 +508,15 @@ export abstract class AppComponentBase {
             window,
             "beforeunload"
         ).subscribe((e) => {
+            if (this.stopFormListening) {
+                this.emitDestroy();
+                this.removeAllUnusedTempAttachments();
+                return;
+            }
+
             e.preventDefault();
             e.returnValue = false;
-            if (this.stopFormListening || this.confirmDiscardChanges()) {
+            if (this.confirmDiscardChanges()) {
                 this.emitDestroy();
                 this.removeAllUnusedTempAttachments();
             }

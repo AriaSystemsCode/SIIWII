@@ -896,9 +896,9 @@ this.showMainSpinner();
         }
         this.activeAttachmentOption.defaultImageIndex = index;
         this.activeAttachmentOption.entityAttachments.map((item, i) => {
-            item.isDefault = index == i ? true : false;
+            item.isDefault = index == this.getAttachRealIndex(i)  ? true : false;
             if (item.isDefault) 
-                item.isPublish = true;
+                item.isPublic = true;
             return item;
         });
         this.updateVaritaionAttachments();
@@ -2469,6 +2469,16 @@ let index = this.activeAttachmentOption.attachmentSrcs?.length ? this.activeAtta
             }
         });
     }
+
+    getAttachRealIndex(i: number): number {
+        const src = this.activeAttachmentOption.attachmentSrcs[i];
+        let index = this.activeAttachmentOption.entityAttachments.findIndex(y => y?.url === src);
+      
+        if (index < 0) 
+          index = this.activeAttachmentOption.entityAttachments.findIndex(y => `${this.attachmentBaseUrl}/${y?.url}` === src);
+        
+        return index >= 0 ? index : i;
+      }
    
 }
 export interface ApplyVariationOutput {
