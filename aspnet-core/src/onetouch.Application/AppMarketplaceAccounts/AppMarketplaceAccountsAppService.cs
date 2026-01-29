@@ -635,7 +635,8 @@ namespace onetouch.AppMarketplaceAccounts
                              || (z.RecipientContactSSIN == account.SSIN)) && z.EntityObjectStatusId == activeRelationshipStatusId &&
                              (z.SharingLevel == 1));
 
-                    var relationshipQ = from b in _appMarketplaceContactRepository.GetAll().Where(z => z.SSIN != account.SSIN && z.IsDeleted == false && z.SharingLevel == 1)
+                    var relationshipQ = from b in _appMarketplaceContactRepository.GetAll()
+                                        .Where(z => z.SSIN != account.SSIN && z.IsDeleted == false && z.SharingLevel == 1 && z.TenantOwner != account.TenantOwner)
                                         from a in relationshipsQuery
                                         where (b.SSIN == a.RequesterContactSSIN || b.SSIN == a.RecipientContactSSIN) 
                                         select new { obj = b };
@@ -930,7 +931,8 @@ namespace onetouch.AppMarketplaceAccounts
                         || (z.RecipientContactSSIN == account.SSIN)) && z.EntityObjectStatusId == activeRelationshipStatusId &&
                         (z.SharingLevel == 1));
 
-                var relationshipQ1 = from b in _appMarketplaceContactRepository.GetAll().Where(z => z.SSIN != account.SSIN && z.IsDeleted == false && z.SharingLevel == 1)
+                var relationshipQ1 = from b in _appMarketplaceContactRepository.GetAll().Where(z => z.SSIN != account.SSIN && z.IsDeleted == false
+                                     && z.SharingLevel == 1 && z.TenantOwner!=account.TenantOwner)
                                     from a in relationshipsQuery1
                                     where (b.SSIN == a.RequesterContactSSIN || b.SSIN == a.RecipientContactSSIN)
                                     select new { obj = b };
