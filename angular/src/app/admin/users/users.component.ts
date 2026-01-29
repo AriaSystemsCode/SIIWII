@@ -278,6 +278,7 @@ export class UsersComponent extends AppComponentBase implements OnInit,AfterView
             if(result){
                 user.memberId=0;
                 this.notify.success("Disconnect The User "+ user.userName )
+                this.getUsers()
             }
         });
 
