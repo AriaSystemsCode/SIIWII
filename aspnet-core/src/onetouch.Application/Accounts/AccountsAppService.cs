@@ -96,6 +96,7 @@ using onetouch.AppSiiwiiTransaction.Dtos;
 using Newtonsoft.Json;
 using DocumentFormat.OpenXml.Spreadsheet;
 
+
 namespace onetouch.Accounts
 {
     [AbpAuthorize(AppPermissions.Pages_Accounts)]
@@ -1382,7 +1383,21 @@ namespace onetouch.Accounts
                 }
                 //I40[Start]
                 var presonEntityObjectTypeId = await _helper.SystemTables.GetEntityObjectTypePersonId();
-                
+                if (entity.EntityObjectTypeId == presonEntityObjectTypeId)
+                {
+                    var addressObj = account.AppContactAddresses.FirstOrDefault();
+                    if (addressObj != null)
+                    {
+                        accountDto.AddressLine1 = addressObj.AddressFk.AddressLine1;
+                        accountDto.AddressLine2 = addressObj.AddressFk.AddressLine2;
+                        accountDto.City = addressObj.AddressFk.City;
+                        accountDto.CountryId = addressObj.AddressFk.CountryId;
+                        accountDto.CountryName = addressObj.AddressFk.CountryFk.Name;
+                        accountDto.ZipCode = addressObj.AddressFk.PostalCode;
+                        accountDto.State = addressObj.AddressFk.State;
+                    }
+
+                }
                 //var branch = ObjectMapper.Map<BranchDto>(account);
                 var mainBranch = await _appContactRepository.GetAll()
                 .Include(x => x.AppContactAddresses).ThenInclude(x => x.AddressFk).ThenInclude(x => x.CountryFk)
@@ -1447,6 +1462,11 @@ namespace onetouch.Accounts
                             branches.Add(new TreeNode<BranchForViewDto>() { label = brnch.Name, Data = branchForViewDto });
                         }
                     }
+                }
+                if (account.EntityFk.EntityObjectTypeId == presonEntityObjectTypeId)
+                {
+                    BranchForViewDto branchForViewDto = new BranchForViewDto { Branch = new BranchDto { Name = "Main Address" ,Code= "Main Address" }, Id =0, SubTotal = 0 };
+                    branches.Add(new TreeNode<BranchForViewDto>() { label = "Main Address", Data = branchForViewDto });
                 }
                 //
                 //else
@@ -7404,7 +7424,79 @@ namespace onetouch.Accounts
         {
             return await _appContactAddressRepository.GetAll().CountAsync(x => x.AddressId == addressId && x.ContactId != currBranchId);
         }
+        //I40[Start]
+        [AbpAuthorize(AppPermissions.Pages_Accounts_Create)]
+        public async Task<bool> CreateOrEditContactAddress(AppContactAddressDto appContactAddressDto)
+        {
+            bool returnValue = false;
+            if (appContactAddressDto != null)
+            {
+                List<LookupLabelDto> countries = await _appEntitiesAppService.GetAllCountryForTableDropdown();
+                AppAddressDto addressDto = new AppAddressDto();
+                addressDto.Id = appContactAddressDto.AddressId;
+                addressDto.Name = appContactAddressDto.Name;
+                addressDto.TenantId = AbpSession.TenantId;
+                addressDto.AddressLine1 = appContactAddressDto.AddressLine1;
+                addressDto.AddressLine2 = appContactAddressDto.AddressLine2;
+                addressDto.Code = appContactAddressDto.Code;
+                addressDto.City = appContactAddressDto.City;
+                addressDto.State = appContactAddressDto.State;
+                addressDto.PostalCode = appContactAddressDto.PostalCode;
+                if (string.IsNullOrEmpty(appContactAddressDto.CountryIdName)) appContactAddressDto.CountryIdName = "USA";
+                var countryId = appContactAddressDto.CountryId;// GetTypeId(appContactAddressDto.CountryIdName, countries);
+                addressDto.CountryId = countryId == 0 ? null : countryId;
+                addressDto.AccountId = long.Parse(appContactAddressDto.AccountId.ToString()); ;
+                var appAddressDtoRet = await CreateOrEditAddress(addressDto);
+                var addressId = appAddressDtoRet.Id;
+               
 
+                var contactOriginal = await _appContactRepository.FirstOrDefaultAsync(x => x.Id == appContactAddressDto.AccountId);
+                if (appContactAddressDto.AddressId == 0 || appContactAddressDto.AddressId == null)
+                {
+                    
+                   // var addressId = await AddAddress(appContactAddressDto.AccountId, appContactAddressDto, countries);
+                    if (addressId != null && addressId > 0)
+                    {
+                        var addressObj = await _appAddressRepository.GetAll().Where(z => z.Id == addressId).FirstOrDefaultAsync();
+                        if (addressObj != null)
+                        {
+                            AppContactAddress newContactAddress = new AppContactAddress();
+                            newContactAddress.Id = 0;
+                            newContactAddress.AddressId = addressId;
+                            newContactAddress.ContactId = long.Parse(appContactAddressDto.AccountId.ToString()); 
+                            newContactAddress.AddressTypeId = appContactAddressDto.AddressTypeId;
+                            newContactAddress.AddressCode = addressObj.Code;
+                            newContactAddress.AddressTypeCode = appContactAddressDto.AddressTypeIdName;
+                            newContactAddress.ContactCode = contactOriginal.Code;
+                            await _appContactAddressRepository.InsertAsync(newContactAddress);
+                            await CurrentUnitOfWork.SaveChangesAsync();
+                            returnValue = true;
+                        }
+                    }
+                    
+                }
+                else
+                {
+                    var addressObj = await _appAddressRepository.GetAll().Where(z => z.Id == appContactAddressDto.AddressId).FirstOrDefaultAsync();
+                    if (addressObj != null)
+                    {
+                        AppContactAddress newContactAddress = new AppContactAddress();
+                        newContactAddress.Id = appContactAddressDto.Id;
+                        newContactAddress.AddressId = appContactAddressDto.AddressId;
+                        newContactAddress.ContactId = long.Parse(appContactAddressDto.AccountId.ToString()); ;
+                        newContactAddress.AddressTypeId = appContactAddressDto.AddressTypeId;
+                        newContactAddress.AddressCode = addressObj.Code;
+                        newContactAddress.AddressTypeCode = appContactAddressDto.AddressTypeIdName;
+                        newContactAddress.ContactCode = contactOriginal.Code;
+                        await _appContactAddressRepository.UpdateAsync(newContactAddress);
+                        await CurrentUnitOfWork.SaveChangesAsync();
+                        returnValue = true;
+                    }
+                }
+            }
+            return returnValue;
+        }
+        //I40[End]
         [AbpAuthorize(AppPermissions.Pages_Accounts_Create)]
         public async Task<BranchDto> CreateOrEditBranch(BranchDto input)
         {

@@ -459,30 +459,34 @@
                                         <img *ngIf="isPdfFile(appItem.entityAttachments[i]?.fileName)"
                                             src="../../../../../assets/Items/pdf-Icon.png" />
 
-                                            
-                                            <a class="select-default-image p-2"
+                                            <!-- [ngClass]="{'d-block' : defaultImageIndex == i}" -->
+
+                                            <a class="select-default-image p-2 d-block"
                                             *ngIf="isImageFile(appItem.entityAttachments[i]?.fileName)"
                                             style="    border: 1px solid #EEEEEEEE !important;
     border-radius: 12px;"
-                                                [ngClass]="{'d-block' : defaultImageIndex == i}"
                                                 (click)="setDefaultImage(i)">
-                                                <i class="fa fa-check-square mr-2"
-                                                    [ngClass]="defaultImageIndex == i? 'text-purple':'text-grey' "> </i>
+                                                <i class="fa  mr-2"
+                                                    [ngClass]="defaultImageIndex == i? 'fa-check-square text-purple':'fa-square text-grey' "> </i>
                                              <label class="text-purple">  {{ 'Default Image' | localize}}</label> 
                                             </a>
 
 
                                             <a class="p-2"
                                             style="position: absolute; bottom: -100px;">
-                                           <label class="text-purple d-flex align-items-center cursor-pointer">
-                                             <input 
-                                               type="checkbox" 
-                                               class="mr-2" 
-                                               [checked]="appItem?.entityAttachments[i]?.isPublic" 
-                                               (change)="setVisibleinMarketplaceImage(i)"
-                                             />
-                                             {{ 'Visible in Marketplace' | localize }}
-                                           </label>
+                                            <label 
+                                            [class.is-disabled]="defaultImageIndex == i"
+                                            class="text-purple d-flex align-items-center cursor-pointer"
+                                          >
+                                            <input 
+                                            [class.is-disabled]="defaultImageIndex == i"
+                                              type="checkbox"
+                                              class="mr-2"
+                                              [checked]="appItem?.entityAttachments[i]?.isPublic || defaultImageIndex == i"
+                                              (change)="setVisibleinMarketplaceImage(i)"
+                                            />
+                                            {{ 'Visible in Marketplace' | localize }}
+                                          </label>
                                          </a>
                                          
                                         </a>

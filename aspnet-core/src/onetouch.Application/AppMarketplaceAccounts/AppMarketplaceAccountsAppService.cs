@@ -693,12 +693,29 @@ namespace onetouch.AppMarketplaceAccounts
                             accountDto.Phone1Number = firstAddressBranch.Phone1Number;
                         }
                     }
+                    //I40[Start]
+                    var presonEntityObjectTypeId = await _helper.SystemTables.GetEntityObjectTypePersonId();
+                    if (entity.EntityObjectTypeId == presonEntityObjectTypeId)
+                    {
+                        var addressObj = account.ContactAddresses.FirstOrDefault();
+                        if (addressObj != null)
+                        {
+                            accountDto.AddressLine1 = addressObj.AddressFk.AddressLine1;
+                            accountDto.AddressLine2 = addressObj.AddressFk.AddressLine2;
+                            accountDto.City = addressObj.AddressFk.City;
+                            accountDto.CountryId = addressObj.AddressFk.CountryId;
+                            accountDto.CountryName = addressObj.AddressFk.CountryFk.Name;
+                            accountDto.ZipCode = addressObj.AddressFk.PostalCode;
+                            accountDto.State = addressObj.AddressFk.State;
+                        }
+
+                    }
                     if (account.TenantOwner != null)
                         accountDto.TenantId = ((int)account.TenantOwner);
 
                     var branch = ObjectMapper.Map<BranchDto>(account);
                     BranchForViewDto branchForViewDto = new BranchForViewDto { Branch = branch, Id = branch.Id, SubTotal = 0 };
-                    var presonEntityObjectTypeId = await _helper.SystemTables.GetEntityObjectTypePersonId();
+                    //var presonEntityObjectTypeId = await _helper.SystemTables.GetEntityObjectTypePersonId();
                     var mainBranchSubtotal = _appContactRepository.GetAll()
                                 .Include(e => e.ParentFk)
                                 .Include(e => e.ParentFkList)

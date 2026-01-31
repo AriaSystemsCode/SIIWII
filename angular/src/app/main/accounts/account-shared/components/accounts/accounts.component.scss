@@ -165,3 +165,27 @@ input[type="radio"]:checked+label {
   font-weight: 600;
   font-size: 14px;
 }
+@media (max-width: 540px) {
+.kt-portlet  {
+  margin-top: 10px !important;
+}
+}
+::ng-deep  {
+  @media (max-width: 786px) {
+    .modal.show .modal-dialog {
+      position: absolute !important;
+      right: 100px !important;
+      top: 40px !important;
+     
+  }
+    }
+
+    @media (max-width: 540px) {
+      .modal.show .modal-dialog {
+          position: absolute !important;
+          right: 25px !important;
+          top: 0px !important;
+          width: 350px;
+      }
+  }
+}

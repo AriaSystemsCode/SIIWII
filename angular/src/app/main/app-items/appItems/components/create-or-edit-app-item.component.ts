@@ -1489,6 +1489,9 @@ export class CreateOrEditAppItemComponent
         this.defaultImageIndex = index;
         this.appItem.entityAttachments.map((item, i) => {
             item.isDefault = index == i ? true : false;
+            if (item.isDefault) 
+                item.isPublic = true;
+            
             return item;
         });
     }
@@ -1588,6 +1591,7 @@ export class CreateOrEditAppItemComponent
                 this.l("Please,CompleteAllTheRequiredFields(*)")
             );
         }
+        this.stopFormListening=true;
         if (!this.appItem?.entityAttachments?.length) {
             return this.notify.error(
                 this.l("Please,UploadAtLeastOneImageToThisProduct")
@@ -1634,7 +1638,7 @@ export class CreateOrEditAppItemComponent
             )
             .subscribe((res) => {
                 this.appItem.id = res;
-                this.stopFormListening = true;
+                this.stopFormListening=true;
                 this.emitDestroy();
                 this.removeAllUnusedTempAttachments();
                 this.notify.info(this.l("SavedSuccessfully"));
@@ -2099,6 +2103,9 @@ export class CreateOrEditAppItemComponent
     }
 
     setVisibleinMarketplaceImage(index) {
+        if (this.defaultImageIndex == index) 
+            return;
+        
         this.formTouched = true;
         this.appItem.entityAttachments?.map((item, i) => {
             if (index == i) {

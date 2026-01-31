@@ -896,7 +896,9 @@ this.showMainSpinner();
         }
         this.activeAttachmentOption.defaultImageIndex = index;
         this.activeAttachmentOption.entityAttachments.map((item, i) => {
-            item.isDefault = index == i ? true : false;
+            item.isDefault = index == this.getAttachRealIndex(i)  ? true : false;
+            if (item.isDefault) 
+                item.isPublic = true;
             return item;
         });
         this.updateVaritaionAttachments();
@@ -1072,7 +1074,7 @@ this.showMainSpinner();
         let att: AppEntityAttachmentDto = new AppEntityAttachmentDto();
       //  att.index = index;
         att.fileName = file?.name;
-        att.isPublic=false;
+        //att.isPublic=false;
         let extraAttrId = this.defaultExtraAttrForAttachments?.attributeId;
        // let optionValue = this.activeAttachmentOption.lookupData.value;
        let optionValue;
@@ -2457,6 +2459,8 @@ let index = this.activeAttachmentOption.attachmentSrcs?.length ? this.activeAtta
         
     }
     setVisibleinMarketplaceImage(index) {
+        if (this.activeAttachmentOption.defaultImageIndex === index) 
+            return;
         this.formTouched = true;
         this.activeAttachmentOption?.entityAttachments?.map((item, i) => {
             if (index == i) {
@@ -2465,6 +2469,16 @@ let index = this.activeAttachmentOption.attachmentSrcs?.length ? this.activeAtta
             }
         });
     }
+
+    getAttachRealIndex(i: number): number {
+        const src = this.activeAttachmentOption.attachmentSrcs[i];
+        let index = this.activeAttachmentOption.entityAttachments.findIndex(y => y?.url === src);
+      
+        if (index < 0) 
+          index = this.activeAttachmentOption.entityAttachments.findIndex(y => `${this.attachmentBaseUrl}/${y?.url}` === src);
+        
+        return index >= 0 ? index : i;
+      }
    
 }
 export interface ApplyVariationOutput {

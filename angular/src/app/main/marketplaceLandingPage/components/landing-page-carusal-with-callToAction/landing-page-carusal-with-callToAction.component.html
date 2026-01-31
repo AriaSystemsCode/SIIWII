@@ -11,7 +11,7 @@
     <div class="ctaChildection pt-2 pl-3 ml-4 mr-4">
       <a
         (click)="ctaSection.title==='Products' ? handleStorageData() : null"
-        [routerLink]="['/app/main/' + ctaSection.link]"
+        [routerLink]="['/app/main/marketplace/' + ctaSection.link]"
       >
         <h3>{{ ctaSection.name }}</h3>
         <app-image-display
