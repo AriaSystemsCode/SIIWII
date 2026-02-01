@@ -8,7 +8,7 @@
             <span *ngIf="branch.id">{{ accountData?.accountTypeId != 21 ?   l("EditBranch") : l("EditAddress")}}</span>
             <span *ngIf="!branch.id">{{ accountData?.accountTypeId != 21 ?  l("AddnewBranchDetails") : l("AddnewAddressDetails")}}</span>
           </h4>
-          <p>{{ accountData?.accountTypeId != 21 ? l("PleaseFillTheNewBranchDetailsBelow") : l("PleaseFillTheNewAddressDetailsBelow")}}</p>
+          <p>{{ accountData?.accountTypeId != 21 ? l("PleaseFillTheNewBranchDetailsBelow") : l("Please Fill The New Address Details Below")}}</p>
           <button style="position: absolute;right: 0;top: 8px;" type="button" class="close" (click)="close()"
             aria-label="Close" [disabled]="saving">
             <span aria-hidden="true">&times;</span>
@@ -75,8 +75,9 @@
 
 
           </div>
+          <h5 *ngIf="accountData?.accountTypeId == 21 " class="text-black">{{l("Phones")}}</h5>
           <div class="row align-items-center">
-            <div class="col-md-5">
+            <div class="col-md-5" *ngIf="accountData?.accountTypeId != 21">
               <div class="form-group">
                 <label for="branch_TradeName">{{l("TradeName")}} *</label>
                 <input type="text" id="branch_TradeName" #tradeNameInput="ngModel"
@@ -85,7 +86,7 @@
                 <validation-messages [formCtrl]="tradeNameInput"></validation-messages>
               </div>
             </div>
-            <div class="col-md-7">
+            <div [ngClass]="accountData?.accountTypeId != 21 ? 'col-md-7' :'col-12'">
               <div class="row align-items-center">
                 <div class="col-md-3 phone-type mt-4">
                   <div class="form-group m-form__group">
@@ -97,7 +98,7 @@
                 </div>
                 <div class="col-md-9 phone-col-ext mt-4">
                   <div class="form-group m-form__group d-flex">
-                    <div class="phone-ng2-input-wrapper">
+                    <div class=""  [ngClass]="accountData?.accountTypeId != 21 ? 'phone-ng2-input-wrapper' : 'w-100'">
                       <input type="text" ng2TelInput [ng2TelInputOptions]="{initialCountry: 'us'}"
                         [(ngModel)]="branch.phone1Number" name="Phone1Number"
                         (ng2TelOutput)="getNumberphone1Number($event)"
@@ -126,7 +127,7 @@
             </div>
           </div>
           <div class="row align-items-center">
-            <div class="col-md-5">
+            <div class="col-md-5" *ngIf="accountData?.accountTypeId != 21">
               <div class="form-group ">
                 <label for="AppEntityName5">{{l("Language")}}</label>
                 <p-dropdown [options]="allLanguages" styleClass="form-control  aria-select aria-select-modal"
@@ -135,7 +136,7 @@
 
               </div>
             </div>
-            <div class="col-md-7">
+            <div [ngClass]=" accountData?.accountTypeId != 21 ? 'col-md-7' :'col-12'">
               <div class="row align-items-center">
                 <div class="col-md-3 phone-type mt-4">
                   <div class="form-group m-form__group">
@@ -147,7 +148,7 @@
                 </div>
                 <div class="col-md-9 phone-col-ext mt-4">
                   <div class="form-group m-form__group d-flex">
-                    <div class="phone-ng2-input-wrapper">
+                    <div class="" [ngClass]=" accountData?.accountTypeId != 21 ? 'phone-ng2-input-wrapper' : 'w-100'">
                       <input type="text"            class="form-control form-control-sm aria-input-text phone-input phnoeNum" name="Phone2Number"
                         ng2TelInput [ng2TelInputOptions]="{initialCountry: 'us'}"
                   (ng2TelOutput)="getNumberphone2Number($event)"
@@ -174,7 +175,7 @@
             
           </div>
           <div class="row align-items-center">
-            <div class="col-md-5">
+            <div class="col-md-5"  *ngIf="accountData?.accountTypeId != 21">
               <div class="form-group m-form__group">
                 <label for="AppEntityName4">{{l("Currency")}}</label>
                 <p-dropdown [options]="allCurrencies" styleClass="form-control aria-select aria-select-modal"
@@ -182,7 +183,7 @@
                   [placeholder]="'Please select' | localize"></p-dropdown>
               </div>
             </div>
-            <div class="col-md-7">
+            <div [ngClass]=" accountData?.accountTypeId != 21 ? 'col-md-7' :'col-12'">
               <div class="row align-items-center">
                 <div class="col-md-3 phone-type mt-4">
                   <div class="form-group m-form__group">
@@ -194,7 +195,7 @@
                 </div>
                 <div class="col-md-9 phone-col-ext mt-4">
                   <div class="form-group m-form__group d-flex">
-                    <div class="phone-ng2-input-wrapper">
+                    <div class="" [ngClass]=" accountData?.accountTypeId != 21 ? 'phone-ng2-input-wrapper' :'w-100'">
                       <input type="text" class="form-control form-control-sm aria-input-text phone-input phnoeNum" ng2TelInput
                         [ng2TelInputOptions]="{initialCountry: 'us'}" name="Phone3Number"
                         (ng2TelOutput)="getNumberphone3Number($event)"
@@ -220,7 +221,18 @@
 
             </div>
           </div>
+          <div class="row align-items-center">
+            <div class="col-12" *ngIf="accountData?.accountTypeId == 21">
+              <div class="form-group ">
+                <label for="AppEntityName5">{{l("Language")}}</label>
+                <p-dropdown [options]="allLanguages" styleClass="form-control  aria-select aria-select-modal"
+                  [filter]="false" name="branch.languageId" [(ngModel)]="branch.languageId" [style]="{'width':'100%'}"
+                  [placeholder]="'Please select' | localize"></p-dropdown>
 
+              </div>
+            </div>
+          
+          </div>
           <div class="form-group">
             <label for="branch_Website">{{l("Website")}}</label>
             <input type="url" id="branch_Website" #websiteInput="ngModel"

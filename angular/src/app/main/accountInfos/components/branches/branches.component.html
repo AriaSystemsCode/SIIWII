@@ -44,7 +44,7 @@
                     <ng-template pTemplate="body" let-rowNode let-rowData="rowData" let-i="rowIndex">
                         <tr [ttRow]="rowNode">
                             <td style="width:150px" class="td-tree">
-                                <p-treeTableToggler [rowNode]="rowNode" class="branch-name"></p-treeTableToggler>
+                                <p-treeTableToggler *ngIf="accountData?.accountTypeId != 21" [rowNode]="rowNode" class="branch-name"></p-treeTableToggler>
                                 {{rowData.branch.name}}
                             </td>
                             <td style="width:150px" class="td-tree">
@@ -73,7 +73,7 @@
                                                 Details') :l('Address
                                                 Details') }}</a>
                                         </li>
-                                        <li *ngIf="!viewMode">
+                                        <li *ngIf="!viewMode && accountData?.accountTypeId != 21">
                                             <a href="javascript:;"
                                                 (click)="askToConfirmDelete(rowData.branch,rowNode.parent)">{{l('Delete')}}</a>
                                         </li>
