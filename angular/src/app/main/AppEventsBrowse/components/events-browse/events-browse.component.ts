@@ -1,10 +1,9 @@
 import { Component, Injector, Input, OnChanges, OnInit, SimpleChanges, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
 import { CreateOrEditEventComponent } from '@app/main/AppEvent/Components/create-or-edit-event.component';
 import { ViewEventComponent } from '@app/main/AppEvent/Components/view-event.component';
 import { AppComponentBase } from '@shared/common/app-component-base';
-import { AccountDto, AppEntitiesServiceProxy, AppEntityAttachmentDto, AppEventsServiceProxy, AppPostDto, AppPostsServiceProxy, AttachmentsCategories, CreateOrEditAppPostDto, EventsFilterTypesEnum, GetAppEventForViewDto, GetAppPostForViewDto, PostType, ProfileServiceProxy } from '@shared/service-proxies/service-proxies';
+import { AccountDto, AppEntitiesServiceProxy, AppEntityAttachmentDto, AppEventsServiceProxy, AppPostDto, AppPostsServiceProxy, CreateOrEditAppPostDto, EventsFilterTypesEnum, GetAppEventForViewDto, GetAppPostForViewDto, PostType, ProfileServiceProxy } from '@shared/service-proxies/service-proxies';
 import { FileDownloadService } from '@shared/utils/file-download.service';
 import { debounceTime, finalize, tap } from 'rxjs/operators';
 import { EventsBrowseActionsEvents, EventsBrowseInputs } from '../../models/Events-browse-inputs';
@@ -18,7 +17,7 @@ import { Observable } from 'rxjs';
 import { SelectItem, LazyLoadEvent } from 'primeng/api';
 import { Paginator } from 'primeng/paginator';
 import { Table } from 'primeng/table';
-
+import { BreakpointObserver } from '@angular/cdk/layout';
 @Component({
   selector: 'app-events-browse',
   templateUrl: './events-browse.component.html',
@@ -71,6 +70,8 @@ export class EventsBrowseComponent extends AppComponentBase  implements OnInit,O
     @Input() fromOverviewMarketPlaceProfile :boolean =false;
     @Input() accountDataForView :AccountDto;
     
+    currentLang: string = 'en';
+    isArabic: boolean = false;
     constructor(
         injector: Injector,
         private _appEventsServiceProxy: AppEventsServiceProxy,
@@ -78,8 +79,8 @@ export class EventsBrowseComponent extends AppComponentBase  implements OnInit,O
         private _postService: AppPostsServiceProxy,
         private _entitiesService: AppEntitiesServiceProxy,
         private _profileService : ProfileServiceProxy,
-        private _router: Router,
-        private _fb : FormBuilder
+        private _fb : FormBuilder,
+        private breakpointObserver: BreakpointObserver
     ) {
         super(injector);
     }
@@ -130,15 +131,29 @@ export class EventsBrowseComponent extends AppComponentBase  implements OnInit,O
             const EventTypeControl = this._fb.control(undefined)
             this.filterForm.addControl("isOnline",EventTypeControl)
         }
+        if(flags.country){
+            const EventTypeControl = this._fb.control(undefined)
+            this.filterForm.addControl("country",EventTypeControl)
+        }
         // if(flags.startDate && flags.endDate){
         //     // this.filterForm.setAsyncValidators()
         // }
+        if (flags.startDate || flags.endDate) {
+            const dateRangeCtrl = this._fb.control(undefined); // [Date, Date]
+            this.filterForm.addControl('dateRange', dateRangeCtrl);
+          }
+          
     }
 
     ngOnInit(): void {
+        this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
+        this.currentLang == 'ar' || this.currentLang == 'ar-EG'  ? this.isArabic = true : this.isArabic = false
         this.getProfilePicture();
         this.getUserPreferenceForListView();
         this.initFilterForm()
+        const sub = this.breakpointObserver
+        .observe(['(max-width: 767.98px)'])
+        .subscribe(res => (this.isMobile = res.matches));
         this.userName =
             this.appSession.user.name + " " + this.appSession.user.surname;
     }
@@ -177,6 +192,9 @@ export class EventsBrowseComponent extends AppComponentBase  implements OnInit,O
         this.subscribeToFiltersChangeAndApplyFilteration();
         this.defineSortingOptions();
         this.fillFormFilters()
+        this.bindDateRangeToStartEnd();
+        this.bindDateRangeToStartEndForForm(this.filterForm);
+
         this.setMainPageFilter(this.defaultMainFilter)
         this.setDefaultSorting(this.sortingOptions[0].value)
     }
@@ -203,15 +221,25 @@ export class EventsBrowseComponent extends AppComponentBase  implements OnInit,O
                             this.items = [];
                             this.loading = true
                             this.lastFilterType = currentFilterType;
+                            const rangeCtrl = this.filterForm.get('dateRange');
 
-                            if(currentFilterType == EventsFilterTypesEnum.UpcommingEvents) {
-                                this.startDateCtrl.patchValue( this.today.format(moment.HTML5_FMT.DATETIME_LOCAL))
-                                this.endDateCtrl.patchValue( undefined )
-                            }
-                            else if(currentFilterType == EventsFilterTypesEnum.PriorEvents){
-                                this.startDateCtrl.patchValue( undefined)
-                                this.endDateCtrl.patchValue( this.yesterday.format(moment.HTML5_FMT.DATETIME_LOCAL) )
-                            } else {
+                            // if(currentFilterType == EventsFilterTypesEnum.UpcommingEvents) {
+                            //     this.startDateCtrl.patchValue( this.today.format(moment.HTML5_FMT.DATETIME_LOCAL))
+                            //     this.endDateCtrl.patchValue( undefined )
+                            // }
+                            
+                            // else if(currentFilterType == EventsFilterTypesEnum.PriorEvents){
+                            //     this.startDateCtrl.patchValue( undefined)
+                            //     this.endDateCtrl.patchValue( this.yesterday.format(moment.HTML5_FMT.DATETIME_LOCAL) )
+                            // } 
+                            
+  if (currentFilterType == EventsFilterTypesEnum.UpcommingEvents) {
+    rangeCtrl?.patchValue([this.today.toDate(), undefined], { emitEvent: true });
+  }
+  else if (currentFilterType == EventsFilterTypesEnum.PriorEvents) {
+    rangeCtrl?.patchValue([undefined, this.yesterday.toDate()], { emitEvent: true });
+  }
+                            else {
                                 if( lastFilterType == EventsFilterTypesEnum.UpcommingEvents && startDate && this.today.isSame(startDateAsMoment) ) this.startDateCtrl.patchValue( undefined)
                                 else if( lastFilterType == EventsFilterTypesEnum.PriorEvents && endDate && this.yesterday.isSame(endDateAsMoment) ) this.endDateCtrl.patchValue( undefined)
                             }
@@ -607,4 +635,86 @@ export class EventsBrowseComponent extends AppComponentBase  implements OnInit,O
         this.fromViewEvent=false;
         this.relatedEntityId=0;
     }
+
+    private bindDateRangeToStartEnd(): void {
+        const rangeCtrl = this.filterForm.get('dateRange');
+        if (!rangeCtrl) return;
+      
+        const sub = rangeCtrl.valueChanges.subscribe((range: Date[]) => {
+          const start = range?.[0] ?? undefined;
+          const end = range?.[1] ?? undefined;
+      
+          this.filterForm.patchValue(
+            {
+              startDate: start ? moment(start).format(moment.HTML5_FMT.DATETIME_LOCAL) : undefined,
+              endDate: end ? moment(end).format(moment.HTML5_FMT.DATETIME_LOCAL) : undefined,
+            },
+            { emitEvent: false } 
+          );
+        });
+      
+        this.subscriptions.push(sub);
+      }
+
+      mobileFiltersVisible = false;
+mobileFilterForm: FormGroup;
+isMobile = false; 
+
+
+closeMobileFilters(apply: boolean): void {
+  if (apply) {
+    // apply temp values to real form
+    this.filterForm.patchValue(this.mobileFilterForm.getRawValue(), { emitEvent: true });
+  }
+  this.mobileFiltersVisible = false;
+}
+
+resetMobileFilters(): void {
+  this.mobileFilterForm.reset();
+  
+  const selectedfilter = this.pageMainFilters?.find(x => x.value === this.defaultMainFilter);
+  if (selectedfilter) this.mobileFilterForm.get('filterType')?.setValue(selectedfilter);
+
+  if (this.sortingOptions?.length) {
+    this.mobileFilterForm.get('sorting')?.setValue(this.sortingOptions[0].value);
+  }
+}
+
+private bindDateRangeToStartEndForForm(form: FormGroup): void {
+    const rangeCtrl = form.get('dateRange');
+    if (!rangeCtrl) return;
+  
+    const sub = rangeCtrl.valueChanges.subscribe((range: Date[]) => {
+      const start = range?.[0] ?? undefined;
+      const end = range?.[1] ?? undefined;
+  
+      form.patchValue(
+        {
+          startDate: start ? moment(start).format(moment.HTML5_FMT.DATETIME_LOCAL) : undefined,
+          endDate: end ? moment(end).format(moment.HTML5_FMT.DATETIME_LOCAL) : undefined,
+        },
+        { emitEvent: false }
+      );
+    });
+  
+    this.subscriptions.push(sub);
+  }
+  
+  openMobileFilters(ev?: Event): void {
+    ev?.preventDefault();
+    ev?.stopPropagation();
+  
+    this.mobileFilterForm = this._fb.group({});
+    Object.keys(this.filterForm.controls).forEach((key) => {
+      this.mobileFilterForm.addControl(
+        key,
+        this._fb.control(this.filterForm.get(key)?.value)
+      );
+    });
+  
+    this.bindDateRangeToStartEndForForm(this.mobileFilterForm);
+  
+    this.mobileFiltersVisible = true;
+  }
+  
 }

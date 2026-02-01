@@ -12,3 +12,13 @@ h4 {
     font-weight: 600;
     font-size: 16px;
 }
+
+:host ::ng-deep .calendarRg {
+    .p-calendar {
+        display: flex !important;
+    }
+    .p-icon-wrapper {
+        color: white !important;
+        fill: white !important;
+    }
+}

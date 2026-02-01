@@ -12,6 +12,7 @@ export class EventsBrowseComponentFiltersDisplayFlags {
     postalCode: boolean;
     state: boolean;
     isOnline: boolean;
+    country:boolean
     showAll() {
         this.filterType = true;
         this.search = true;
@@ -25,6 +26,7 @@ export class EventsBrowseComponentFiltersDisplayFlags {
         this.postalCode = true;
         this.state = true;
         this.isOnline = true;
+        this.country = true;
     }
     allIsHidden: boolean;
 }

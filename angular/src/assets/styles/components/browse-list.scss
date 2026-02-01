@@ -1,7 +1,7 @@
 @mixin font($font-weight, $font-size, $line-height) {
     font-size : $font-size!important;
     line-height : $line-height!important;
-    font-weight : $font-weight!important;
+    font-weight : 700 !important;
 }
 $font-weight-normal :400;
 $font-weight-medium :500;
@@ -57,7 +57,7 @@ $font-weight-bold :600;
     .list-toolbar-divider {
         width:2px;
         height:38px;
-        @include dashed-border('left');
+        border-left: 1px solid #EEEEEE !important;
     }
     .list-toolbar-btn {
         @include font-2-normal();
