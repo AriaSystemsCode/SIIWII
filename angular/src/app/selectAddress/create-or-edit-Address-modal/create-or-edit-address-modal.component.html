@@ -16,16 +16,7 @@
           <div class="modal-body">
             <div class="form-group">
               <label for="address_Code">{{l("Code")}} *</label>
-              <!-- <app-codes *ngIf="!(address?.id>0)"
-                [objectType]="entityObjectType"
-                [editMode]=false
-                (getCodeValue)="getCodeValue($event)" ></app-codes>
 
-                <app-codes *ngIf="address?.id>0"
-                [objectType]="entityObjectType"
-                [editMode]=true
-                [code]="addressCode"
-                (getCodeValue)="getCodeValue($event)" ></app-codes>  -->
                 <input [disabled]="address?.id>0" type="text" id="address_Code" class="form-control form-control-sm aria-input-text" [(ngModel)]="addressCode" name="code" maxlength="6"/>
             </div>
 
@@ -75,10 +66,7 @@
                   [placeholder]="'PleaseSelect' | localize"
               >
               </p-dropdown>
-              <!-- <select [(ngModel)]="address.countryId" name="address.countryId"  class="form-control form-control-sm aria-input-text" required>
-                <option value="">{{l(PleaseSelect)}}</option>
-                <option *ngFor="let item of allCountries" value="{{item.value}}">{{item.label}}</option>
-              </select> -->
+      
             </div>
 
           </div>
