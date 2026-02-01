@@ -1148,6 +1148,41 @@ namespace onetouch.AppSiiwiiTransaction
 
 
                 }
+                //fix company code[start]
+                if (appTrans.AppTransactionContacts !=null && appTrans.AppTransactionContacts.Count > 0)
+                {
+                    foreach (var contact in appTrans.AppTransactionContacts)
+                    {
+                        if (!string.IsNullOrEmpty(contact.CompanySSIN) && string.IsNullOrEmpty(contact.CompanyCode))
+                        {
+                            var originalContact = await _appContactRepository.GetAll().Where(z => z.SSIN == contact.CompanySSIN).FirstOrDefaultAsync();
+                            if (originalContact != null)
+                            {
+                                contact.CompanyCode = originalContact.Code;
+                                contact.CompanyName = originalContact.Name;
+                            }
+                        }
+                        if (!string.IsNullOrEmpty(contact.BranchSSIN) && string.IsNullOrEmpty(contact.BranchCode))
+                        {
+                            var originalContact = await _appContactRepository.GetAll().Where(z => z.SSIN == contact.BranchSSIN).FirstOrDefaultAsync();
+                            if (originalContact != null)
+                            {
+                                contact.BranchCode = originalContact.Code;
+                                contact.BranchName = originalContact.Name;
+                            }
+                        }
+                        if (!string.IsNullOrEmpty(contact.ContactSSIN) && string.IsNullOrEmpty(contact.ContactCode))
+                        {
+                            var originalContact = await _appContactRepository.GetAll().Where(z => z.SSIN == contact.ContactSSIN).FirstOrDefaultAsync();
+                            if (originalContact != null)
+                            {
+                                contact.ContactCode= originalContact.Code;
+                                contact.ContactName = originalContact.Name;
+                            }
+                        }
+                    }
+                }
+                //fix company code[End]
                 appTrans.TotalQuantity = long.Parse(appTrans.AppTransactionDetails.Where(s => s.ParentId != null).Sum(s => s.Quantity).ToString());
                 appTrans.TotalAmount = double.Parse(appTrans.AppTransactionDetails.Where(s => s.ParentId != null).Sum(s => s.Amount).ToString());
                 if (string.IsNullOrEmpty(appTrans.SSIN))
@@ -1732,6 +1767,33 @@ namespace onetouch.AppSiiwiiTransaction
                 foreach (var con in appTrans.AppTransactionContacts)
                 {
                     if (con.ContactAddressCountryId == 0) con.ContactAddressCountryId = null;
+                    if (!string.IsNullOrEmpty(con.CompanySSIN) && string.IsNullOrEmpty(con.CompanyCode))
+                    {
+                        var originalContact = await _appContactRepository.GetAll().Where(z => z.SSIN == con.CompanySSIN).FirstOrDefaultAsync();
+                        if (originalContact != null)
+                        {
+                            con.CompanyCode = originalContact.Code;
+                            con.CompanyName = originalContact.Name;
+                        }
+                    }
+                    if (!string.IsNullOrEmpty(con.BranchSSIN) && string.IsNullOrEmpty(con.BranchCode))
+                    {
+                        var originalContact = await _appContactRepository.GetAll().Where(z => z.SSIN == con.BranchSSIN).FirstOrDefaultAsync();
+                        if (originalContact != null)
+                        {
+                            con.BranchCode = originalContact.Code;
+                            con.BranchName = originalContact.Name;
+                        }
+                    }
+                    if (!string.IsNullOrEmpty(con.ContactSSIN) && string.IsNullOrEmpty(con.ContactCode))
+                    {
+                        var originalContact = await _appContactRepository.GetAll().Where(z => z.SSIN == con.ContactSSIN).FirstOrDefaultAsync();
+                        if (originalContact != null)
+                        {
+                            con.ContactCode = originalContact.Code;
+                            con.ContactName = originalContact.Name;
+                        }
+                    }
                 }
                 if (string.IsNullOrEmpty(appTrans.SSIN))
                 {
