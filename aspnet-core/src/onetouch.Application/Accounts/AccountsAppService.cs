@@ -1385,15 +1385,23 @@ namespace onetouch.Accounts
                 .Include(z => z.CurrencyFk).FirstOrDefaultAsync(x => x.ParentId == id && x.EntityFk.EntityObjectTypeId == branchEntityObjectTypeId);
                 if (mainBranch == null
                     && (account.EntityFk.TenantOwner== AbpSession.TenantId || account.EntityFk.TenantOwner == 0 ||
-                    account.EntityFk.TenantOwner == null) && account.EntityFk.EntityObjectTypeId != presonEntityObjectTypeId)
+                    account.EntityFk.TenantOwner == null)) //&& account.EntityFk.EntityObjectTypeId != presonEntityObjectTypeId)
                 {
                     BranchDto branchDto = new BranchDto();
                     branchDto.AccountId = account.Id;
                     branchDto.ParentId = account.Id;
                     branchDto.TenantId = AbpSession.TenantId;
-
-                    branchDto.Code = account.Code.TrimEnd() + "-MAIN";
-                    branchDto.Name = account.Name.TrimEnd() + " Main Branch";
+                    if (account.EntityFk.EntityObjectTypeId == presonEntityObjectTypeId)
+                    {
+                        
+                        branchDto.Code = account.Code.TrimEnd() + "-MAINADDRESS";
+                        branchDto.Name = "Main Address";
+                    }
+                    else
+                    {
+                        branchDto.Code = account.Code.TrimEnd() + "-MAIN";
+                        branchDto.Name = account.Name.TrimEnd() + " Main Branch";
+                    }
                     branchDto.CurrencyId = account.CurrencyId;
                     branchDto.EMailAddress = account.EMailAddress;
                     branchDto.LanguageId = account.LanguageId;
@@ -1444,15 +1452,15 @@ namespace onetouch.Accounts
                         }
                     }
                 }
-                if (account.EntityFk.EntityObjectTypeId == presonEntityObjectTypeId)
-                {
-                    BranchForViewDto branchForViewDto = new BranchForViewDto { Branch = new BranchDto { Name = "Main Address" ,Code= "Main Address" }, Id =0, SubTotal = 0 };
-                    branches.Add(new TreeNode<BranchForViewDto>() { label = "Main Address", Data = branchForViewDto });
-                }
+                //if (account.EntityFk.EntityObjectTypeId == presonEntityObjectTypeId)
+                //{
+                //    BranchForViewDto branchForViewDto = new BranchForViewDto { Branch = new BranchDto { Name = "Main Address" ,Code= "Main Address" }, Id =0, SubTotal = 0 };
+                //    branches.Add(new TreeNode<BranchForViewDto>() { label = "Main Address", Data = branchForViewDto });
+                //}
                 //
                 //else
                // {
-                 //   branch = ObjectMapper.Map<BranchDto>(account);
+                //branch = ObjectMapper.Map<BranchDto>(account);
                 //}
 
                 
