@@ -72,7 +72,7 @@
         <button *ngIf="media.url " class="remove-media" (click)="removeMedia(i)">x</button>
       </div>
     </div>
-    <p *ngIf="onlyMsg" class="text-danger">Only one img or one video</p>
+    <p *ngIf="onlyMsg" class="text-danger">{{'Only one img or one video' | localize}}</p>
 
   </div>
   
@@ -80,7 +80,7 @@
   <p *ngIf="reviews?.length == 0" class="text-center my-5">
     <img src="../../assets/placeholders/fluent_alert.png" class="mr-2" alt="" srcset="">
   
-    <span class="noDataTxt">There is no data to show ...</span>
+    <span class="noDataTxt">{{'There is no data to show' | localize}} ...</span>
   </p>
   
   
@@ -115,12 +115,12 @@
                   fill="#E42B2B" />
               </svg>
               <p class="mb-0 mx-2" style="color: #2DC74F;white-space: nowrap;">
-                <span class="verfiedtxt" *ngIf="review?.isUserVerifiedPurchaser">Verified Purchaser</span>
-                <span class="verfiedtxt" *ngIf="review?.isAccountAdmin">Account Admin</span>
-                <span class="verfiedtxt" *ngIf="review?.isProfileOwner">Profile Owner</span>
+                <span class="verfiedtxt" *ngIf="review?.isUserVerifiedPurchaser">{{'Verified Purchaser' | localize}}</span>
+                <span class="verfiedtxt" *ngIf="review?.isAccountAdmin">{{'Account Admin' | localize}}</span>
+                <span class="verfiedtxt" *ngIf="review?.isProfileOwner">{{'Profile Owner' | localize}}</span>
                 <span class="notverfiedtxt"
-                  *ngIf="!review?.isUserVerifiedPurchaser &&  !review?.isAccountAdmin && !review?.isProfileOwner">Not
-                  Verified Purchaser</span>
+                  *ngIf="!review?.isUserVerifiedPurchaser &&  !review?.isAccountAdmin && !review?.isProfileOwner">{{'Not
+                  Verified Purchaser' | localize}}</span>
               </p>
             </div>
           </div>
@@ -159,12 +159,12 @@
               fill="#E42B2B" />
           </svg>
           <p class="mb-0 mx-2" style="color: #2DC74F;white-space: nowrap;">
-            <span class="verfiedtxt" *ngIf="review?.isUserVerifiedPurchaser">Verified Purchaser</span>
-            <span class="verfiedtxt" *ngIf="review?.isAccountAdmin">Account Admin</span>
-            <span class="verfiedtxt" *ngIf="review?.isProfileOwner">Profile Owner</span>
+            <span class="verfiedtxt" *ngIf="review?.isUserVerifiedPurchaser">{{'Verified Purchaser' | localize}}</span>
+            <span class="verfiedtxt" *ngIf="review?.isAccountAdmin">{{'Account Admin' | localize}}</span>
+            <span class="verfiedtxt" *ngIf="review?.isProfileOwner">{{'Profile Owner' | localize}}</span>
             <span class="notverfiedtxt"
-              *ngIf="!review?.isUserVerifiedPurchaser &&  !review?.isAccountAdmin && !review?.isProfileOwner">Not Verified
-              Purchaser</span>
+              *ngIf="!review?.isUserVerifiedPurchaser &&  !review?.isAccountAdmin && !review?.isProfileOwner">{{'Not Verified
+              Purchaser' | localize}}</span>
           </p>
         </div>
         <div class="d-flex mb-3 align-items-center">
@@ -207,8 +207,8 @@
       </div>
     </div>
   
-    <button *ngIf="reviews?.length < totalCount" (click)="loadMoreReviews()" class="viewAllBtn mb-2">View all
-      review</button>
+    <button *ngIf="reviews?.length < totalCount" (click)="loadMoreReviews()" class="viewAllBtn mb-2">{{'View all
+      review' | localize}}</button>
   </div>
   
   
@@ -228,6 +228,6 @@
       </p>
     </div>
     <div class="d-flex justify-content-center btns mb-3">
-      <button (click)="SuccessMsg = false;resetForm()" label="Ok" class="p-button-text">Ok</button>
+      <button (click)="SuccessMsg = false;resetForm()" label="Ok" class="p-button-text">{{'Ok' | localize}}</button>
     </div>
   </p-dialog>

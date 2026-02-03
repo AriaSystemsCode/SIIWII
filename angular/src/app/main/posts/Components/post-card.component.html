@@ -5,7 +5,7 @@ border-radius: 10px;box-shadow: 2px 2px 4px 0px rgba(0, 0, 0, 0.05);
         <div
             class="row pb-4"
         >
-            <div class="col-1 mr-4 mr-lg-0 mr-md-0 ">
+            <div class=" mr-4 mr-lg-0 mr-md-0 " [ngClass]="{'col-lg-1 col-2' :isArabic  , 'col-1' :!isArabic }">
                 <img
                     [src]="
                         profilePicture

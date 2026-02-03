@@ -24,7 +24,8 @@ export class ConnectionsCardComponent extends AppComponentBase {
     isRecordOwner: boolean
     attachmentBaseUrl: string = AppConsts.attachmentBaseUrl
 
-
+    currentLang:string
+    isArabic:boolean 
     constructor(
         injector: Injector,
         private router: Router,
@@ -33,6 +34,8 @@ export class ConnectionsCardComponent extends AppComponentBase {
         super(injector);
     }
     ngOnChanges(changes: SimpleChanges): void {
+      this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
+      this.currentLang == 'ar' || this.currentLang == 'ar-EG'  ? this.isArabic = true : this.isArabic = false
         this.isRecordOwner = this.account.account.partnerId == this.appSession.user.accountId
         this.singleItemPerRowMode = false;
 

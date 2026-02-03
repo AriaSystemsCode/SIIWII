@@ -7,7 +7,7 @@
           *ngIf="loading"
         >
           <div class="spinner-border" role="status">
-            <span class="sr-only">Loading...</span>
+            <span class="sr-only">{{'Loading' | localize}}...</span>
           </div>
         </div>
 
@@ -25,7 +25,7 @@
                                   class="btn btn-sm mx-1"
                                   [ngClass]="{ 'btPurble': connectionTypeId === 0, 'btn-outline-secondary': connectionTypeId !== 0 }"
                                   (click)="setConnectionType(0)">
-                                  All
+                                  {{'All' | localize}}
                                 </button>
                                 <span class="separator" *ngIf="accountsTypes.length > 0">|</span>
                               
@@ -136,7 +136,7 @@
                                             " class="col-12 px-0" [ngClass]="{
                                                 'col-md-12 single-item-per-row-layout':
                                                     singleItemPerRowMode || fromOverview,
-                                                'col-md-6': !singleItemPerRowMode && !fromOverview,
+                                                'col-md-6 ': !singleItemPerRowMode && !fromOverview,
                                                 ' pb-5':
                                                     singleItemPerRowMode && !last,
                                                     'mt-3':fromOverview,

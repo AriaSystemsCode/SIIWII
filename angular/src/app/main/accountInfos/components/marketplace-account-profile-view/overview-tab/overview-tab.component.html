@@ -1,7 +1,7 @@
 <div class="d-flex flex-lg-row flex-md-row flex-column" style="gap: 5px;">
   <div class="col-lg-3 col-md-5 co-12 p-0">
     <div class="sec-data mb-2 p-3">
-      <h4 class="mb-0">Profile information</h4>
+      <h4 class="mb-0">{{'Profile information' | localize}}</h4>
       <hr class="hr">
 
       <div class="sidebar-item-data">
@@ -12,7 +12,7 @@
                 d="M21.5 18.5L14.8571 12.5M9.14286 12.5L2.50003 18.5M2 7.5L10.1649 13.2154C10.8261 13.6783 11.1567 13.9097 11.5163 13.9993C11.8339 14.0785 12.1661 14.0785 12.4837 13.9993C12.8433 13.9097 13.1739 13.6783 13.8351 13.2154L22 7.5M6.8 20.5H17.2C18.8802 20.5 19.7202 20.5 20.362 20.173C20.9265 19.8854 21.3854 19.4265 21.673 18.862C22 18.2202 22 17.3802 22 15.7V9.3C22 7.61984 22 6.77976 21.673 6.13803C21.3854 5.57354 20.9265 5.1146 20.362 4.82698C19.7202 4.5 18.8802 4.5 17.2 4.5H6.8C5.11984 4.5 4.27976 4.5 3.63803 4.82698C3.07354 5.1146 2.6146 5.57354 2.32698 6.13803C2 6.77976 2 7.61984 2 9.3V15.7C2 17.3802 2 18.2202 2.32698 18.862C2.6146 19.4265 3.07354 19.8854 3.63803 20.173C4.27976 20.5 5.11984 20.5 6.8 20.5Z"
                 stroke="#777777" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
             </svg>
-            Email : </div>
+            {{'Email' | localize}} : </div>
           <div class="row-item-desc ml-2">
             <span style="    word-break: break-word;"> {{ accountDataForView?.eMailAddress || '-' }} </span>
           </div>
@@ -24,7 +24,7 @@
                 d="M5 4.5H9L11 9.5L8.5 11C9.57096 13.1715 11.3285 14.929 13.5 16L15 13.5L20 15.5V19.5C20 20.0304 19.7893 20.5391 19.4142 20.9142C19.0391 21.2893 18.5304 21.5 18 21.5C14.0993 21.263 10.4202 19.6065 7.65683 16.8432C4.8935 14.0798 3.23705 10.4007 3 6.5C3 5.96957 3.21071 5.46086 3.58579 5.08579C3.96086 4.71071 4.46957 4.5 5 4.5Z"
                 stroke="#777777" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
             </svg>
-            Phone : </div>
+            {{'Phone'| localize}} : </div>
           <div class="ml-2 row-item-desc ">
             <span> {{ accountDataForView?.phone1Number || '-' }}</span>
           </div>
@@ -42,7 +42,7 @@
                 d="M4 3.5C3.20435 3.5 2.44129 3.81607 1.87868 4.37868C1.31607 4.94129 1 5.70435 1 6.5V18.5C1 19.2956 1.31607 20.0587 1.87868 20.6213C2.44129 21.1839 3.20435 21.5 4 21.5H20C20.7956 21.5 21.5587 21.1839 22.1213 20.6213C22.6839 20.0587 23 19.2956 23 18.5V6.5C23 5.70435 22.6839 4.94129 22.1213 4.37868C21.5587 3.81607 20.7956 3.5 20 3.5H4ZM20 5.5H4C3.73478 5.5 3.48043 5.60536 3.29289 5.79289C3.10536 5.98043 3 6.23478 3 6.5V18.5C3 18.7652 3.10536 19.0196 3.29289 19.2071C3.48043 19.3946 3.73478 19.5 4 19.5H20C20.2652 19.5 20.5196 19.3946 20.7071 19.2071C20.8946 19.0196 21 18.7652 21 18.5V6.5C21 6.23478 20.8946 5.98043 20.7071 5.79289C20.5196 5.60536 20.2652 5.5 20 5.5Z"
                 fill="#777777" />
             </svg>
-            Website : </div>
+            {{'Website' | localize}} : </div>
           <div class="ml-2 row-item-desc">
             <span style="    word-break: break-word;"> {{ accountDataForView?.website || '-' }} </span>
           </div>
@@ -57,7 +57,7 @@
                 fill="#777777" />
             </svg>
 
-            Head Quarter :
+            {{'Head Quarter' | localize}} :
           </div>
           <div class="col-8 row-item-desc">
             <p class="title-account mb-0 ml-2">
@@ -104,7 +104,7 @@
             </svg>
 
 
-            Bussiness Classification :
+            {{'Bussiness Classification' | localize}} :
           </div>
           <div class="d-flex py-1 flex-wrap">
             <div *ngFor="let class of accountDataForView?.classfications">
@@ -128,7 +128,7 @@
 
 
 
-        Departments :
+        {{'Departments' | localize}} :
           </div>
           <div class="d-flex py-1 flex-wrap">
             <div *ngFor="let category of accountDataForView?.categories">
@@ -153,7 +153,7 @@
               </defs>
             </svg>
 
-            About</div>
+            {{'About' | localize}}</div>
           <div class="">
             <span> {{accountDataForView?.description || '-'}} </span>
           </div>
@@ -164,9 +164,9 @@
 
     <div class="sec-data mb-2 p-2">
       <div class="d-flex justify-content-between align-items-center">
-        <h4 class="mt-1 mb-0">Overall Rating</h4>
+        <h4 class="mt-1 mb-0">{{'Overall Rating' | localize}}</h4>
         <button class="all-btn d-flex">
-          <p class="m-auto" (click)=" goReviews() ">See All</p>
+          <p class="m-auto" (click)=" goReviews() ">{{'See All' | localize}}</p>
         </button>
 
       </div>
@@ -176,11 +176,11 @@
 
     <div class="sec-data mb-2 p-2">
       <div class="d-flex justify-content-between align-items-center">
-        <h4 class="mt-1 mb-0">Media</h4>
+        <h4 class="mt-1 mb-0">{{'Media' | localize}}</h4>
         <button
           (click)="accountDataForView?.accountType == 'BUSINESS'?  activeTabIndexBtn.emit(5) : activeTabIndexBtn.emit(4) "
           class="all-btn d-flex">
-          <p class="m-auto">See All</p>
+          <p class="m-auto">{{'See All' | localize}}</p>
         </button>
 
       </div>
@@ -193,7 +193,7 @@
           *ngIf="isLoading"
         >
           <div class="spinner-border" role="status">
-            <span class="sr-only">Loading...</span>
+            <span class="sr-only">{{'Loading' | localize}}...</span>
           </div>
         </div>
         <ng-container *ngFor="let item of mediaItems; let i = index">
@@ -221,7 +221,7 @@
 
       <p *ngIf="mediaItems?.length ==0" class="text-center">
         <img src="../../assets/placeholders/fluent_alert.png" class="mr-2" alt="" srcset="">
-        <span class="noDataTxt">There is no data to show ....</span>
+        <span class="noDataTxt">{{'There is no data to show' | localize}} ....</span>
       </p>
     </div>
     <p-dialog *ngIf="mediaItems?.length > 0" [(visible)]="isModalOpen" [modal]="true" [style]="{ width: '656px' }"
@@ -250,11 +250,11 @@
 
     <div class="sec-data mb-2 p-2">
       <div class="d-flex justify-content-between align-items-center">
-        <h4 class="mt-1 mb-0">Recent Events</h4>
+        <h4 class="mt-1 mb-0">{{'Recent Events' | localize}}</h4>
         <button
           (click)="accountDataForView?.accountType == 'BUSINESS'?  activeTabIndexBtn.emit(4) : activeTabIndexBtn.emit(3) "
           class="all-btn d-flex">
-          <p class="m-auto">See All</p>
+          <p class="m-auto">{{'See All' | localize}}</p>
         </button>
 
       </div>
@@ -271,11 +271,11 @@
 
     <div class="sec-data mb-2 p-2">
       <div class="d-flex justify-content-between align-items-center">
-        <h4 class="mt-1 mb-0">Connections</h4>
+        <h4 class="mt-1 mb-0">{{'Connections' | localize}}</h4>
         <button
           (click)="accountDataForView?.accountType == 'BUSINESS'?  activeTabIndexBtn.emit(2) : activeTabIndexBtn.emit(1) "
           class="all-btn d-flex">
-          <p class="m-auto">See All</p>
+          <p class="m-auto">{{'See All' | localize}}</p>
         </button>
 
       </div>
@@ -291,17 +291,17 @@
   <div class="col-lg-9 col-md-7 col-12 p-0 ">
     <div class="mb-2 right-sec p-2" *ngIf="accountDataForView?.accountType == 'BUSINESS'">
       <div class="d-flex justify-content-between">
-        <h4 class="">Products</h4>
+        <h4 class="">{{'Products' | localize}}</h4>
         <button (click)="activeTabIndexBtn.emit(1) " class="all-btn d-flex">
-          <p class="m-auto">See All</p>
+          <p class="m-auto">{{'See All' | localize}}</p>
         </button>
 
       </div>
       <hr class="hr">
       <div class="d-flex justify-content-between">
-        <h4 class="" style="font-size: 14px;">For full viewing of {{ "''"+ accountDataForView?.name + "''"}}</h4>
+        <h4 class="" style="font-size: 14px;">{{'For full viewing of' | localize}} {{ "''"+ accountDataForView?.name + "''"}}</h4>
         <button   (click)="goSvR($event)" class="vist-btn d-flex">
-          <p class="m-auto">Visit Virtual Showroom</p>
+          <p class="m-auto">{{'Visit Virtual Showroom' | localize}}</p>
         </button>
 
       </div>
@@ -324,7 +324,7 @@
         <!-- Show when there are no items -->
         <p *ngIf="items?.length === 0 " class="text-center mx-auto mt-5 py-5">
           <img src="../../../../../../assets/placeholders/fluent_alert.png" class="mr-2" alt="No Data">
-          <span class="noDataTxt">There is no data to show ....</span>
+          <span class="noDataTxt">{{'There is no data to show' | localize}} ....</span>
         </p>
     </div>
 
@@ -332,11 +332,11 @@
 
     <div class="mb-2 right-sec p-2">
       <div class="d-flex justify-content-between">
-        <h4 class="">Recent posts</h4>
+        <h4 class="">{{'Recent posts' | localize}}</h4>
         <button
           (click)="accountDataForView?.accountType == 'BUSINESS'?  activeTabIndexBtn.emit(3) : activeTabIndexBtn.emit(2) "
           class="all-btn d-flex">
-          <p class="m-auto">See All</p>
+          <p class="m-auto">{{'See All' | localize}}</p>
         </button>
 
       </div>
@@ -347,9 +347,9 @@
     </div>
     <div class="mb-2 right-sec p-2" #reviewsSection>
       <div class="d-flex justify-content-between">
-        <h4 class="">Reviews</h4>
+        <h4 class="">{{'Reviews' | localize}}</h4>
         <button class="all-btn d-flex">
-          <p class="m-auto">See All</p>
+          <p class="m-auto">{{'See All' | localize}}</p>
         </button>
 
       </div>

@@ -1,7 +1,7 @@
 <div class="sec-data  ">
 
     <div *ngIf="!fromOverview" class="d-flex justify-content-between align-items-center" >
-      <h4 class="mt-1 mb-0">Overall Rating</h4>
+      <h4 class="mt-1 mb-0">{{'Overall Rating' | localize}}</h4>
 
 
     </div>
@@ -20,7 +20,7 @@
       </div>
     </div>
 
-    <p class="rateTxt">Based on {{overRating?.totalNumberOfRating}} Ratings</p>
+    <p class="rateTxt">{{'Based on' | localize}} {{overRating?.totalNumberOfRating}} {{'Ratings' | localize}}</p>
     <div>
       <div class="d-flex justify-content-between align-items-center" style="gap: 5px;">
         <span style="white-space: nowrap;">5 <span class="star">★</span></span> <p-progressBar

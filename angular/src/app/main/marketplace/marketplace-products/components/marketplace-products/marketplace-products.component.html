@@ -11,7 +11,7 @@
     <div
 
     >
-        <div class="marketplace-products" [ngClass]="fromMarketAcoount ? 'marketplace-mg':''">
+        <div class="marketplace-products" [ngClass]="fromMarketAcoount && !isArabic ? 'marketplace-mg':''">
             <div   class="row" >
                 <div class="col-md-12 mb-4 app-seller" *ngIf="isSellerIdExists && isFromSellerRoom ">
                     <app-seller-data ></app-seller-data>
@@ -172,7 +172,7 @@
 
 <!-- mobile ui design -->
 <div class="mobile " [ngClass]="isArabic? 'addMtM':''">
-    <app-seller-data *ngIf="isSellerIdExists"></app-seller-data>
+    <app-seller-data *ngIf="isSellerIdExists && !fromMarketAcoount"></app-seller-data>
     <div class="container-fluid">
         <div class="quickFilters" >
         
