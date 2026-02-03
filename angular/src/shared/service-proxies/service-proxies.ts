@@ -109912,6 +109912,7 @@ export class CreateTenantInput implements ICreateTenantInput {
     inviterTenantId!: number | undefined;
     firstName!: string;
     lastName!: string;
+    adminName!: string;
 
     [key: string]: any;
 
@@ -109944,6 +109945,7 @@ export class CreateTenantInput implements ICreateTenantInput {
             this.inviterTenantId = _data["inviterTenantId"];
             this.firstName = _data["firstName"];
             this.lastName = _data["lastName"];
+            this.adminName = _data["adminName"];
         }
     }
 
@@ -109974,6 +109976,7 @@ export class CreateTenantInput implements ICreateTenantInput {
         data["inviterTenantId"] = this.inviterTenantId;
         data["firstName"] = this.firstName;
         data["lastName"] = this.lastName;
+        data["adminName"] = this.adminName;
         return data;
     }
 }
@@ -109993,6 +109996,7 @@ export interface ICreateTenantInput {
     inviterTenantId: number | undefined;
     firstName: string;
     lastName: string;
+    adminName: string;
 
     [key: string]: any;
 }
@@ -111010,6 +111014,7 @@ export class RegisterTenantInput implements IRegisterTenantInput {
     accountType!: string | undefined;
     accountTypeId!: string | undefined;
     relatedTenantId!: number;
+    adminName!: string;
 
     [key: string]: any;
 
@@ -111041,6 +111046,7 @@ export class RegisterTenantInput implements IRegisterTenantInput {
             this.accountType = _data["accountType"];
             this.accountTypeId = _data["accountTypeId"];
             this.relatedTenantId = _data["relatedTenantId"];
+            this.adminName = _data["adminName"];
         }
     }
 
@@ -111070,6 +111076,7 @@ export class RegisterTenantInput implements IRegisterTenantInput {
         data["accountType"] = this.accountType;
         data["accountTypeId"] = this.accountTypeId;
         data["relatedTenantId"] = this.relatedTenantId;
+        data["adminName"] = this.adminName;
         return data;
     }
 }
@@ -111088,6 +111095,7 @@ export interface IRegisterTenantInput {
     accountType: string | undefined;
     accountTypeId: string | undefined;
     relatedTenantId: number;
+    adminName: string;
 
     [key: string]: any;
 }
