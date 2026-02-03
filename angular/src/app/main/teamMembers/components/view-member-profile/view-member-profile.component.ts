@@ -13,6 +13,7 @@ import { CreateEditAppItemExtraAttribute } from '@app/main/app-items/app-item-sh
 import { EExtraAttributeUsage } from '@app/main/app-items/appItems/models/extra-attribute-usage.enum';
 import { ActivatedRoute } from '@node_modules/@angular/router';
 import Swal from 'sweetalert2';
+import { UpdateLogoService } from '@shared/utils/update-logo.service';
 
 @Component({
   selector: 'app-view-member-profile',
@@ -81,7 +82,7 @@ export class ViewMemberProfileComponent extends AppComponentBase implements OnIn
   memberIslink: boolean = false;
   showUserList: boolean = false;
 
-  constructor(injector: Injector, private _AccountsServiceProxy: AccountsServiceProxy, private _sycEntityObjectTypesServiceProxy: SycEntityObjectTypesServiceProxy, private _userService: UserServiceProxy,private route: ActivatedRoute) {
+  constructor(injector: Injector, private _AccountsServiceProxy: AccountsServiceProxy, private _sycEntityObjectTypesServiceProxy: SycEntityObjectTypesServiceProxy, private _userService: UserServiceProxy,private route: ActivatedRoute,  private updateLogoService: UpdateLogoService) {
     super(injector);
     this.accountInfoTemp = new CreateOrEditAccountInfoDto();
 
@@ -589,7 +590,7 @@ export class ViewMemberProfileComponent extends AppComponentBase implements OnIn
     if (user.memberId) {
       // User already linked
       this._AccountsServiceProxy.getAppContactForView(user.memberId)
-        .pipe(finalize(() => this.hideMainSpinner()))
+        .pipe(finalize(() => {this.hideMainSpinner();}))
         .subscribe(result => {
           Swal.fire({
             title: "",
@@ -628,7 +629,7 @@ export class ViewMemberProfileComponent extends AppComponentBase implements OnIn
       }))
       .subscribe({
         next: () => {
-       
+          this.updateLogoService.updateProfilePicture();
           this.refresh(true);
   
         },

@@ -92,6 +92,8 @@ export class TopBarComponent extends ThemesLayoutBaseComponent implements OnInit
     displaneBuy: boolean = false;
     currentLang: string
     isArabic: boolean
+
+    private profilePicSub: any;
     constructor(
         injector: Injector,
         private _abpSessionService: AbpSessionService,
@@ -266,11 +268,14 @@ export class TopBarComponent extends ThemesLayoutBaseComponent implements OnInit
     }
 
     getProfilePicture(): void {
-        this.updateLogoService.profilePictureUpdated$.subscribe((res) => {
-            this.profilePicture = res;
-        });
-
-    }
+        if (this.profilePicSub) return;
+      
+        this.profilePicSub = this.updateLogoService.profilePictureUpdated$
+          .subscribe((res) => {
+            this.profilePicture = res || (AppConsts.appBaseUrl + "/assets/common/images/default-profile-picture.png");
+          });
+      }
+      
 
     getRecentlyLinkedUsers(): void {
         this._userLinkServiceProxy
@@ -500,6 +505,12 @@ export class TopBarComponent extends ThemesLayoutBaseComponent implements OnInit
         })
     }
 
+    ngOnDestroy(): void {
+        if (this.profilePicSub) {
+          this.profilePicSub.unsubscribe();
+        }
+      }
+      
 }
 
 
