@@ -5,7 +5,7 @@
             <button (click)="backToResult()" class="backBtn"> <img class="mt-2 "
                     src="../../../../../assets/placeholders/go-back.png" style=" border-radius: 6px;" /> {{'Back to
                     results' | localize}} </button>
-            <h6 class="ml-2">Marketplace Product Detail View</h6> 
+            <h6 class="ml-2">{{'Marketplace Product Detail View' | localize}}</h6> 
 
         </div>
         <div class="d-md-block d-none">
@@ -612,8 +612,8 @@ top: 4px;">
                                     <tbody
                                         *ngIf="filteredColors?.length > 0 && filteredColors[currentIndex]?.sizes?.length > 0">
                                         <tr>
-                                            <td *ngIf="(productData?.showInOutStockFlag == 'ItemColorSizeLevel' || productData?.showInOutStockFlag == 'Bothlevels' ) &&  filteredColors[currentIndex]?.sizes[0]?.noOfAvailablePrepacks >0" class="text-success">In Stock</td>
-                                            <td *ngIf="(productData?.showInOutStockFlag == 'ItemColorSizeLevel' || productData?.showInOutStockFlag == 'Bothlevels' ) &&  filteredColors[currentIndex]?.sizes[0]?.noOfAvailablePrepacks ==0" class="text-danger">Out Of Stock</td>
+                                            <td *ngIf="(productData?.showInOutStockFlag == 'ItemColorSizeLevel' || productData?.showInOutStockFlag == 'Bothlevels' ) &&  filteredColors[currentIndex]?.sizes[0]?.noOfAvailablePrepacks >0" class="text-success">{{'In Stock' | localize}}</td>
+                                            <td *ngIf="(productData?.showInOutStockFlag == 'ItemColorSizeLevel' || productData?.showInOutStockFlag == 'Bothlevels' ) &&  filteredColors[currentIndex]?.sizes[0]?.noOfAvailablePrepacks ==0" class="text-danger">{{'Out Of Stock' | localize}}</td>
                                             <td *ngIf="(productData?.showInOutStockFlag != 'ItemColorSizeLevel' || productData?.showInOutStockFlag != 'Bothlevels' ) ">
                                                 {{
                                                 filteredColors[currentIndex]?.sizes[0]?.noOfAvailablePrepacks
@@ -1867,7 +1867,7 @@ top: 4px;">
 
 <p-confirmDialog #cd [style]="{ width: '25vw' }">
     <ng-template pTemplate="header">
-        <h3>Add to Shopping Cart</h3>
+        <h3>{{'Add to Shopping Cart' | localize}}</h3>
     </ng-template>
     <ng-template pTemplate="footer">
         <button type="button" pButton icon="pi pi-times" label="No" (click)="cd.reject()"></button>

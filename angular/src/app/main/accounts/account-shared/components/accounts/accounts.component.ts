@@ -80,7 +80,8 @@ export class AccountsComponent
     filterVisiblelg = true; // To toggle the filter visibility
     active: boolean = false;
     loading: boolean = false;
-
+    currentLang:string
+    isArabic:boolean 
     constructor(
         injector: Injector,
         private _accountsServiceProxy: AccountsServiceProxy,
@@ -96,6 +97,8 @@ export class AccountsComponent
     }
     ngOnInit() {
         this.isHost = !this._abpSessionService.tenantId;
+        this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
+        this.currentLang == 'ar' || this.currentLang == 'ar-EG'  ? this.isArabic = true : this.isArabic = false
         this.defineSortingOptions();
         this.getUserPreferenceForListView();
         this.initFilterForm();

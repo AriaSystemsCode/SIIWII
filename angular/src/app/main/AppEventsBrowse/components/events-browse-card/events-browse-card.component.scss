@@ -47,7 +47,7 @@
   }
   
   .fit-contain {
-    object-fit: contain;
+    object-fit: cover;
     background: #fff; /* for transparent png */
   }
   
@@ -237,7 +237,7 @@
   .actions-right {
     display: flex;
     justify-content: flex-end;
-    margin-top: 12px;
+    // margin-top: 12px;
   }
   
   .btn-details {
@@ -254,20 +254,34 @@
   /* ====== OVERVIEW widget ====== */
   .mode-overview .event-card__inner {
     // padding: 10px;
-    gap: 10px;
+    gap: 4px;
   }
   
   .overview-title {
     font-size: 13px;
     margin-bottom: 6px;
   }
-  
+  @media (min-width: 1024px){
   .overview-lines {
     display: grid;
     gap: 4px;
     font-size: 11px;
   }
-  
+}
+@media only screen and (max-width: 1024px) and (min-width: 520px){
+  .overview-lines {
+    display: grid;
+    gap: 2px;
+    font-size: 9px;
+  }
+}
+@media (max-width: 520px){
+  .overview-lines {
+    display: grid;
+    gap: 2px;
+    font-size: 11px;
+  }
+}
   .ov-line {
     display: flex;
     gap: 6px;
@@ -279,14 +293,42 @@
     color: #111;
     white-space: nowrap;
   }
-  
+  .ov-line-pf{
+    
+   
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: 6px 10px;
+    gap: 4px;
+    
+    border: 1px solid #EEEEEE;
+    filter: drop-shadow(1px 1px 4px rgba(22, 22, 22, 0.05));
+    border-radius: 4px;
+    
+    
+    
+}
   .ov-value {
     color: #777;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+
   }
-  
+  .ov-value-pf {
+    color: #4a0d4a;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-weight: 700;
+
+  }
+  .cv-img {
+    width: 14px;
+    height: 14px;
+    border-radius: 14px;
+  }
   /* ====== RESPONSIVE ====== */
   @media (max-width: 991.98px) {
     .media--grid { aspect-ratio: 4 / 3; }

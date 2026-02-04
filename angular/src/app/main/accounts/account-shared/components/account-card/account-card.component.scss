@@ -86,11 +86,13 @@ a.btn {
     font-weight: $default-font-weight + 200
 }
 
-.dropdown {
-    position: absolute;
-    right: 1rem;
-}
+// .dropdown {
+//     position: absolute;
+//     right: 1rem;
+// }
 
+/* do NOT force absolute for all dropdowns */
+.dropdown { position: relative; }
 
 .single-row-mode-status {
     position: absolute;
@@ -208,5 +210,271 @@ a.btn {
     width: 320px;
     text-align: right;
     background-color: #fff;
+  }
+  
+
+ 
+    @media (min-width: 1024px) {
+        .singlRw {
+            width: 200px;
+        }
+        .siglCd {
+            width: 100px;
+
+        }
+    }
+  
+
+    /* default */
+.single-row-mode {
+    display: flex;
+    // gap: 12px;
+  }
+  
+
+  @media (max-width: 1023px) {
+    .single-row-mode {
+      flex-direction: column;   /* stack */
+    }
+  
+    .single-row-mode .single-item-photo {
+      width: 100% !important;
+      height: 140px;            
+      border-radius: 10px;
+    }
+  
+    .single-row-mode .single-item-body {
+      width: 100% !important;
+    }
+  }
+  
+  /* ✅ Desktop: image يسار / body يمين */
+  @media (min-width: 1024px) {
+    .single-row-mode {
+      flex-direction: row;      /* side-by-side */
+      align-items: flex-start;
+    }
+  
+    .single-row-mode .single-item-photo {
+      width: 200px !important;
+      height: 120px;            /* أو 100px حسب تصميمك */
+      flex: 0 0 200px;
+    }
+  
+    .single-row-mode .single-item-body {
+      flex: 1;
+    }
+  }
+  
+  /* keep your existing card mode */
+  .single-card-mode {
+    /* grid/card view styles if needed */
+  }
+  
+
+  /* =========================
+   CARD LAYOUT BASE
+========================= */
+.single-item.memberCard_container {
+    display: flex;
+    // gap: 12px;
+    align-items: stretch;
+  }
+  
+  /* BODY becomes a column so we can push actions to the end */
+  .single-item-body {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+  
+  /* ✅ This pushes actions to the bottom/end of the card */
+  .card-actions {
+    margin-top: auto;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    // gap: 10px;
+    flex-wrap: wrap;
+    padding-top: 10px;
+  }
+  
+  /* make the relation blocks flow normally */
+  .relationWrap {
+    position: static !important;
+    white-space: nowrap;
+    text-align: end;
+  }
+  
+  /* ✅ RTL/LTR safe alignment without JS left/right */
+  :host-context([dir="rtl"]) .card-actions {
+    justify-content: flex-start;
+  }
+  
+  :host-context([dir="ltr"]) .card-actions {
+    justify-content: flex-end;
+  }
+  
+  /* =========================
+     ROW MODE (singleItemPerRowMode = true)
+  ========================= */
+  .single-row-mode {
+    flex-direction: row;
+  }
+  
+  /* Desktop row mode */
+  @media (min-width: 1024px) {
+    .single-row-mode .single-item-photo.singlRw {
+      width: 200px !important;
+      height: 120px !important;
+      flex: 0 0 200px;
+    }
+  }
+  
+  /* Tablet/Mobile row mode */
+  @media (max-width: 1023px) {
+    .single-row-mode {
+      flex-direction: column;
+    }
+  
+    .single-row-mode .single-item-photo {
+      width: 100% !important;
+      aspect-ratio: 16 / 9;
+      height: auto !important;
+      border-radius: 10px;
+    }
+  
+    .single-row-mode .single-item-body {
+      width: 100% !important;
+    }
+  
+    .card-actions {
+      justify-content: space-between;
+      width: 100%;
+    }
+  }
+  
+  /* =========================
+     CARD MODE (singleItemPerRowMode = false)
+  ========================= */
+  .single-card-mode {
+    flex-direction: row;
+    align-items: center;
+    min-height: 120px;
+  }
+  
+  /* Card mode fixed image sizes */
+  .single-card-mode .single-item-photo.siglCd {
+    width: 100px !important;
+    height: 100px !important;
+    flex: 0 0 100px;
+  }
+  
+  /* keep follow button aligned end */
+  .single-card-mode .card-actions {
+    justify-content: flex-end;
+  }
+  
+
+  /* =========================
+   BASE CARD
+========================= */
+.single-item.memberCard_container {
+    display: flex;
+    // gap: 12px;
+    align-items: stretch;
+  }
+  
+  /* ✅ row mode body must be column so actions can go bottom */
+  .row-body {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-width: 0;
+  }
+  
+
+  .card-actions {
+    margin-top: auto;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    padding-top: 12px;
+  }
+  
+  /* RTL/LTR align */
+  :host-context([dir="rtl"]) .card-actions { justify-content: flex-start; }
+  :host-context([dir="ltr"]) .card-actions { justify-content: flex-end; }
+  
+  /* =========================
+     ROW MODE (singleItemPerRowMode = true)
+  ========================= */
+  .single-row-mode {
+    display: flex;
+    // gap: 12px;
+  }
+  
+
+  @media (min-width: 1024px) {
+    .single-row-mode {
+      flex-direction: row;
+      align-items: stretch;
+    }
+  
+    .single-row-mode .single-item-photo.singlRw {
+      width: 260px !important;
+      flex: 0 0 260px;
+      height: auto !important;
+      border-radius: 10px;
+      background-position: center;
+      background-size: cover;
+      min-height: 170px;
+    }
+  }
+
+  @media (max-width: 1023px) {
+    .single-row-mode {
+      flex-direction: column;
+    }
+  
+    .single-row-mode .single-item-photo {
+      width: 100% !important;
+      aspect-ratio: 16 / 9;
+      height: auto !important;
+      border-radius: 10px;
+      background-position: center;
+      background-size: cover;
+    }
+  
+
+    .info-container > div {
+      flex-direction: column !important;
+      align-items: flex-start !important;
+      gap: 6px;
+    }
+  
+    .info-container > div p {
+      min-width: unset !important;
+    }
+  
+    .card-actions {
+      width: 100%;
+      justify-content: space-between;
+    }
+  }
+  
+
+  .single-card-mode {
+    flex-direction: row;
+    align-items: center;
+    min-height: 120px;
+  }
+  
+  .single-card-mode .single-item-photo.siglCd {
+    width: 100px !important;
+    height: 100px !important;
+    flex: 0 0 100px;
   }
   

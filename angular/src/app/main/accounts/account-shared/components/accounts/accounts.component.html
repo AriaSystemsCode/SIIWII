@@ -1,5 +1,5 @@
 ﻿<form [formGroup]="filterForm">
-    <div [@routerTransition] style="margin-top: -90px" class="wrapper">
+    <div [@routerTransition] class="wrapper" [ngClass]="isArabic ? 'addMgAr':'addMg'">
         <div class="kt-content kt-grid__item kt-grid__item--fluid kt-grid kt-grid--hor mt-md-4 marginMob">
             <div [class]="containerClass + ' kt-grid__item kt-grid__item--fluid'">
                 <div class="kt-portlet kt-portlet--mobile">
@@ -163,7 +163,7 @@
                             </div> 
                             <div class="col-12  " [ngClass]="filterVisiblelg ? 'col-lg-9 col-md-7':'col-lg-12 col-md-12'">
                                 <div class="d-flex justify-content-between align-items-center mb-4">
-                                    <div class="  list-toolbar-data-summary pl-5" *ngIf="active">
+                                    <div class="  list-toolbar-data-summary pl-2" *ngIf="active">
                                         {{
                                         paginator.getPage() *
                                         primengTableHelper.defaultRecordsCountPerPage
@@ -232,7 +232,7 @@
                                 </div>
                                 <div class="col d-flex flex-column justify-content-between">
                              
-                                    <div class="row  pl-5 pr-2">
+                                    <div class="row  pl-2 pr-2">
                                         <div *ngFor="
                                                 let account of accounts;
                                                 index as i;
@@ -243,7 +243,7 @@
                                                 'col-lg-6': !singleItemPerRowMode && filterVisiblelg,
                                                 'col-lg-4':!singleItemPerRowMode && !filterVisiblelg,
                                                 'col-md-6' : !singleItemPerRowMode && !filterVisiblelg,
-                                                ' pb-5':
+                                                ' pb-2':
                                                     singleItemPerRowMode && !last
                                             }">
                                             <app-account-card [account]="account" [fromMarketplace]="fromMarketplace"

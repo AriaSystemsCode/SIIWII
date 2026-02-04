@@ -247,11 +247,18 @@
                     </clipPath>
                     </defs>
                     </svg>
-                    <div class="ov-line">
-                        <span class="ov-label">{{ 'By:' | localize }}</span>
-                        <span class="ov-value">{{ item.appEvent.userName }}</span>
+                    <div class="ov-line-pf">
+                        <span class="ov-label">{{ 'By :' | localize }}</span>
+                        <span class="ov-value-pf"> <img [src]="profilePicture
+                          ? profilePicture
+                          : '../../../../../assets/placeholders/appitem-placeholder.png'" alt="" srcset="" class="cv-img mx-1"> {{ item.appEvent.userName }}</span>
                       </div>
                     
+            </div>
+            <div class="actions-right">
+              <button class="btn-details" (click)="_triggerEvent(EventsBrowseActionsEvents.View)">
+                {{ 'Details' | localize }}
+              </button>
             </div>
            
           </div>
