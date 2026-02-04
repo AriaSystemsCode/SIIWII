@@ -88,7 +88,7 @@ export class MarketplaceProductsComponent
 productCards!: QueryList<ProdcutCardComponent>; 
     brandIdFromUrl: number | null = null;
     catIdFromUrl: number | null = null;
-    
+    sellerSSinSetting:string
     constructor(
         injector: Injector,
         private _router: Router,
@@ -152,6 +152,7 @@ productCards!: QueryList<ProdcutCardComponent>;
         
     }
     ngOnInit() {
+      this.getSettingData()
         const state = (this._router.getCurrentNavigation()?.extras?.state ?? history.state) as any;
 
         if (state?.accountDataForView) {
@@ -184,40 +185,85 @@ productCards!: QueryList<ProdcutCardComponent>;
           this.maxResultCount = parsedFilters.maxResultCount || this.maxResultCount;
         }
       // 🔗 URL (by ID) takes priority if present
-      this.route.queryParamMap.subscribe((params) => {
-        const q = params.get('q');
-        if (q !== null) {
-          this.searchInput = q; // URL wins over local storage
-        }
+      // this.route.queryParamMap.subscribe((params) => {
+      //   const q = params.get('q');
+      //   if (q !== null) {
+      //     this.searchInput = q; // URL wins over local storage
+      //   }
     
-        // brand can be single or multiple: ?brand=1&brand=2
-        const brandParams = params.getAll('brand');
-        if (brandParams && brandParams.length) {
-          this.brands = brandParams.map(v => +v)
-        }
+      //   // brand can be single or multiple: ?brand=1&brand=2
+      //   const brandParams = params.getAll('brand');
+      //   if (brandParams && brandParams.length) {
+      //     this.brands = brandParams.map(v => +v)
+      //   }
     
-        const deptParam = params.get('dept');
-        if (deptParam) {
-          const id = +deptParam;
-          this.selectedDepartments = [id];
-          if (this.filters) this.filters.preselectDeptId = id;
-        }
+      //   const deptParam = params.get('dept');
+      //   if (deptParam) {
+      //     const id = +deptParam;
+      //     this.selectedDepartments = [id];
+      //     if (this.filters) this.filters.preselectDeptId = id;
+      //   }
     
-        const listParam = params.get('proList');
-        if (listParam) {
-          const id = +listParam;
-          this.appItemListId = id || null;
-          if (this.filters) this.filters.catalogId = id ?? null;
-        }
+      //   const listParam = params.get('proList');
+      //   if (listParam) {
+      //     const id = +listParam;
+      //     this.appItemListId = id || null;
+      //     if (this.filters) this.filters.catalogId = id ?? null;
+      //   }
     
-        const catParam = params.get('cat');
-        if (catParam) {
-          const id = +catParam;
-          this.selectedCategories = [id];
-          if (this.filters) this.filters.preselectCategoryId = id;
-        }
+      //   const catParam = params.get('cat');
+      //   if (catParam) {
+      //     const id = +catParam;
+      //     this.selectedCategories = [id];
+      //     if (this.filters) this.filters.preselectCategoryId = id;
+      //   }
     
-        this.getAllProducts(); // apply filters
+      //   this.getAllProducts(); // apply filters
+      // });
+
+      this.getSettingData().subscribe({
+        next: (res) => {
+          
+          this.sellerSSinSetting = (res as any)?.value ?? (res as any) ?? null;
+          // this.sellerSSinSetting = 'Business-000000005866';
+     
+          this.route.queryParamMap.subscribe((params) => {
+            const q = params.get('q');
+            if (q !== null) this.searchInput = q;
+    
+            const brandParams = params.getAll('brand');
+            if (brandParams?.length) this.brands = brandParams.map(v => +v);
+    
+            const deptParam = params.get('dept');
+            if (deptParam) {
+              const id = +deptParam;
+              this.selectedDepartments = [id];
+              if (this.filters) this.filters.preselectDeptId = id;
+            }
+    
+            const listParam = params.get('proList');
+            if (listParam) {
+              const id = +listParam;
+              this.appItemListId = id || null;
+              if (this.filters) this.filters.catalogId = id ?? null;
+            }
+    
+            const catParam = params.get('cat');
+            if (catParam) {
+              const id = +catParam;
+              this.selectedCategories = [id];
+              if (this.filters) this.filters.preselectCategoryId = id;
+            }
+    
+            this.getAllProducts(); 
+          });
+        },
+        error: () => {
+        
+          this.sellerSSinSetting = null;
+    
+          this.route.queryParamMap.subscribe(() => this.getAllProducts());
+        }
       });
     }
     
@@ -277,7 +323,7 @@ productCards!: QueryList<ProdcutCardComponent>;
 
     getAllProducts() {
         this.showMainSpinner();
-
+console.log(this.sellerSSinSetting,'sellerSSinSetting')
         const selectedCurrency =
             (this.fromMarketAcoount)
                 ? (this.marketplaceAccCurrency || 'USD')
@@ -310,10 +356,10 @@ productCards!: QueryList<ProdcutCardComponent>;
     
         this._AppMarketplaceItemsServiceProxy
             .getAll(
-                this.contactSSIN,
+                 this.contactSSIN,
                 this.fromMarketAcoount 
                 ? this.accountDataForView?.ssin
-                : sessionStorage.getItem("SellerSSIN"),
+                : this.sellerSSinSetting? this.sellerSSinSetting: sessionStorage.getItem("SellerSSIN"),
                 null,
                 requestParams.appItemListId ||  this.appItemListId,
                 false, // false
@@ -629,4 +675,9 @@ productCards!: QueryList<ProdcutCardComponent>;
       
         return 'USD';
       }
+
+      getSettingData() {
+        return this._AppEntitiesServiceProxy.getHostSettingValue(1316, null);
+      }
+      
 }
