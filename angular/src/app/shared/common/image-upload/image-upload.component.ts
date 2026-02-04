@@ -48,6 +48,7 @@ export class ImageUploadComponent extends AppComponentBase implements OnChanges 
   sycAttachmentCategoryBanner :SycAttachmentCategoryDto
   sycAttachmentCategoryImage :SycAttachmentCategoryDto
   @Input() attachmentTypeCode: 'LOGO' | 'BANNER' | 'IMAGE' = 'IMAGE';
+  @Input() customExtentionsImgs : boolean;
 
   constructor(injector: Injector) {
     super(injector);
@@ -222,6 +223,18 @@ export class ImageUploadComponent extends AppComponentBase implements OnChanges 
     this.acceptedExtensionsArr = [];
     this.acceptedExtensions = '';
   
+ 
+  
+    if(this.customExtentionsImgs){
+      this.acceptedExtensions = 'PNG - Jpeg - jpg'
+    }else{
+    //   this.sycAttachmentCategory.sycAttachmentTypeDto.forEach((item,index)=>{
+    //     const notFirst = index > 0
+    //     const itemsCount = this.sycAttachmentCategory.sycAttachmentTypeDto.length
+    //     if(notFirst && itemsCount > 1) this.acceptedExtensions +=   ','
+    //     this.acceptedExtensions +=  `.${item.extension}`
+    //     this.acceptedExtensionsArr.push(`.${item.extension}`)
+    // })
     this.sycAttachmentCategory.sycAttachmentTypeDto.forEach((item, index) => {
       const notFirst = index > 0;
       const itemsCount = this.sycAttachmentCategory.sycAttachmentTypeDto.length;
@@ -233,7 +246,7 @@ export class ImageUploadComponent extends AppComponentBase implements OnChanges 
       this.acceptedExtensions += `.${item.extension}`;
       this.acceptedExtensionsArr.push(`.${item.extension}`);
     });
-  
+    }
    
     if (!this.acceptedExtensionsArr.includes('.pdf')) {
       this.acceptedExtensionsArr.push('.pdf');
