@@ -386,6 +386,7 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
                 this.hideshowShare = false;
                 this.hideshowShare = true;
                 this.showShare = true;
+                this.publish.emit(true)
             }
             );
     }
