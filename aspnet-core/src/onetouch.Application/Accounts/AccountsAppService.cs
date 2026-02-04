@@ -7026,7 +7026,7 @@ namespace onetouch.Accounts
                             {
                                 var accountObj = await _appContactRepository.GetAll().Where(z => z.Id == accountDto.AccountId).FirstOrDefaultAsync();
                                 if (accountObj != null)
-                                {
+                                {                                    
                                     var publishedAccount = await _appMarketplaceContactRepository.GetAll().Where(z => z.TenantOwner == accountObj.TenantId && z.SSIN == accountObj.SSIN).FirstOrDefaultAsync();
                                     if (publishedAccount != null)
                                     {
@@ -7518,6 +7518,12 @@ namespace onetouch.Accounts
                   
             }
             var contactParent = _appContactRepository.FirstOrDefault((long)input.ParentId);
+            if (contactParent != null)
+            {
+                contactParent.LastModificationTime = DateTime.Now;
+                await _appContactRepository.UpdateAsync(contactParent);
+                await CurrentUnitOfWork.SaveChangesAsync();
+            }
             if (string.IsNullOrEmpty(branchObject.SSIN))
             {
                 AppEntity entity = new AppEntity();
