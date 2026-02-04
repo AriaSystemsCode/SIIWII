@@ -48,7 +48,7 @@
                 <div class="row details">
                     <div class="col-6">
                         <div class="row">
-                            <div
+                            <!-- <div
                                 *ngIf="
                                     appItemForViewDto?.variations.length == 0
                                 "
@@ -175,9 +175,117 @@
                                     ></video>
 
                                 </div>
-                            </div>
+                            </div> -->
+                            <div class="media-viewer" >
 
-                            <!-- [ngStyle]="{'left.px' : centerdiv.offsetLeft}" -->
+                                <!-- THUMBS -->
+                                <div class="thumbs" [class.thumbs-scroll]="activeAttachments.length > 7">
+                                  <ng-container *ngFor="let a of activeAttachments; let i = index">
+                              
+                                    <!-- IMAGE thumb -->
+                                    <img *ngIf="kindOf(a) === 'image'"
+                                         class="thumb"
+                                         [class.active]="i === currentIndex"
+                                         [src]="getUrl(a)"
+                                         (click)="setMain(i)"
+                                         (error)="onThumbError($event, a)" />
+                              
+                                    <!-- VIDEO thumb -->
+                                    <video *ngIf="kindOf(a) === 'video'"
+                                           class="thumb"
+                                           [class.active]="i === currentIndex"
+                                           muted playsinline preload="metadata"
+                                           (click)="setMain(i)">
+                                      <source [src]="getUrl(a)" />
+                                    </video>
+                              
+                                    <!-- PDF thumb (thumbnail else icon) -->
+                                    <div *ngIf="kindOf(a) === 'pdf'"
+                                         class="thumb pdf-thumb"
+                                         [class.active]="i === currentIndex"
+                                         (click)="setMain(i)">
+                              
+                                      <div *ngIf="pdfThumbLoadingMap[i]" class="thumb-loading">
+                                        <i class="fa fa-spinner fa-spin"></i>
+                                      </div>
+                              
+                                      <img *ngIf="!pdfThumbLoadingMap[i] && pdfThumbMap[i]"
+                                           [src]="pdfThumbMap[i]"
+                                           class="thumb-img" />
+                              
+                                      <div *ngIf="!pdfThumbLoadingMap[i] && !pdfThumbMap[i]"
+                                           class="pdf-fallback"></div>
+                                    </div>
+                              
+                                    <!-- OTHER -->
+                                    <div *ngIf="kindOf(a) === 'other'"
+                                         class="thumb other-thumb"
+                                         [class.active]="i === currentIndex"
+                                         (click)="setMain(i)">
+                                      <i class="fa fa-file-o"></i>
+                                    </div>
+                              
+                                  </ng-container>
+                                </div>
+                              
+                                <!-- MAIN VIEWER -->
+                                <div class="main">
+                              
+                                  <!-- MAIN IMAGE -->
+                                  <img *ngIf="kindOf(activeAttachments[currentIndex]) === 'image'"
+                                       class="main-media"
+                                       [src]="getUrl(activeAttachments[currentIndex])"
+                                       (error)="onMainError($event)"
+                                       (click)="openImagePreview(getUrl(activeAttachments[currentIndex]))"
+                                       style="cursor: zoom-in;" />
+                              
+                                  <!-- MAIN VIDEO -->
+                                  <video *ngIf="kindOf(activeAttachments[currentIndex]) === 'video'"
+                                         class="main-media"
+                                         controls playsinline preload="metadata">
+                                    <source [src]="getUrl(activeAttachments[currentIndex])" />
+                                  </video>
+                              
+                                  <!-- MAIN PDF (thumbnail كبير + click open tab) -->
+                                  <ng-container *ngIf="kindOf(activeAttachments[currentIndex]) === 'pdf'">
+                                    <div *ngIf="pdfThumbLoadingMap[currentIndex]" class="main-loading">
+                                      <i class="fa fa-spinner fa-spin fa-2x"></i>
+                                      <span class="mx-2">Loading preview...</span>
+                                    </div>
+                              
+                                    <img *ngIf="!pdfThumbLoadingMap[currentIndex] && pdfThumbMap[currentIndex]"
+                                         class="main-media"
+                                         [src]="pdfThumbMap[currentIndex]"
+                                         style="cursor:pointer;"
+                                         (click)="openNewTab(activeAttachments[currentIndex])" />
+                              
+                                    <div *ngIf="!pdfThumbLoadingMap[currentIndex] && !pdfThumbMap[currentIndex]"
+                                         class="main-fallback">
+                                      <div>Unable to generate PDF preview.</div>
+                                      <a (click)="openNewTab(activeAttachments[currentIndex])">Open PDF</a>
+                                    </div>
+                                  </ng-container>
+                              
+                                  <!-- IMAGE PREVIEW DIALOG -->
+                                  <p-dialog [(visible)]="showImagePreview"
+                                            [modal]="true"
+                                            [closable]="true"
+                                            [dismissableMask]="true"
+                                            [draggable]="false"
+                                            [resizable]="false"
+                                            [style]="{width: '70vw', maxWidth: '900px'}"
+                                            [contentStyle]="{padding: '0'}">
+                                    <div class="d-flex align-items-center justify-content-center p-3">
+                                      <img [src]="previewImageUrl"
+                                           style="max-width: 100%; max-height: 70vh; object-fit: contain;"
+                                           (error)="onMainError($event)" />
+                                    </div>
+                                  </p-dialog>
+                              
+                                </div>
+                              </div>
+                              
+                     
                             <div
                                 class="pt-4  mb-5 text-center position-relative"
                                 style="left: 50%; transform: translateX(-50%);"
