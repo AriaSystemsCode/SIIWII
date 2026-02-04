@@ -1645,7 +1645,7 @@ namespace onetouch.Accounts
                 if (tenant != null)
                 {
 
-                    var adminUser = await _userManager.FindByNameAsync("admin@" + tenant.TenancyName);
+                    var adminUser = await _userManager.FindByIdAsync(AbpSession.UserId.ToString());//.FindByNameAsync("admin@" + tenant.TenancyName);
                     if (adminUser != null && adminUser.Id != 0)
                     {
                         firstName = adminUser.Name;
