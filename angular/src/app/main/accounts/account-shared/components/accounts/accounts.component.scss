@@ -180,12 +180,30 @@ input[type="radio"]:checked+label {
   }
     }
 
-    @media (max-width: 540px) {
+    @media only screen and (min-width: 400px) and (max-width: 540px) {
       .modal.show .modal-dialog {
           position: absolute !important;
-          right: 25px !important;
+          right: 6% !important;
           top: 0px !important;
           width: 350px;
       }
   }
+
+  @media  only screen and (min-width: 365px) and (max-width: 400px) {
+    .modal.show .modal-dialog {
+        position: absolute !important;
+        right: 2% !important;
+        top: 0px !important;
+        width: 350px;
+    }
+}
+
+@media (max-width: 365px) {
+  .modal.show .modal-dialog {
+      position: absolute !important;
+      right: 0% !important;
+      top: 0px !important;
+      width: 350px;
+  }
+}
 }
