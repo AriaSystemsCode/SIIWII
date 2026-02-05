@@ -79,7 +79,7 @@
                                     </div>
                                 </div>
                                 <div class="row row-item row-item-main-data"
-                                    *ngIf="accountDataForView?.accountTypeId != 21">
+                                    *ngIf="accountInfoTemp?.accountType != 'People' && accountInfoTemp?.accountType != 'Personal'">
                                     <div class="col-md-4 row-item-title emailColor">
                                         {{l("Website")}}</div>
                                     <div class="col-md-8 row-item-desc text-right">
@@ -164,10 +164,10 @@
                                             *ngIf="currentTab == accountInfoPageTabsEnum.Branches"
                                             style="color: #F88011;"></i>
                                         <span *ngIf="accountLevel === accountLevelEnum.Profile && !viewMode">
-                                            {{ accountDataForView?.accountTypeId != 21 ? l("MyBranches/Addresses") : l("My Addresses") }}
+                                            {{ accountInfoTemp?.accountType != 'People' && accountInfoTemp?.accountType != 'Personal' ? l("MyBranches/Addresses") : l("My Addresses") }}
                                         </span>
                                         <span *ngIf="accountLevel !== accountLevelEnum.Profile || viewMode">
-                                            {{ accountDataForView?.accountTypeId != 21 ? l("MyBranches/Addresses") : l("My Addresses") }}
+                                            {{accountInfoTemp?.accountType != 'People' && accountInfoTemp?.accountType != 'Personal' ? l("MyBranches/Addresses") : l("My Addresses") }}
                                         </span>
                                     </a>
                                 </li>
@@ -268,31 +268,31 @@
                                     <div class="kt-portlet__body" *ngIf="accountInfoTemp">
                                         <div class="row">
                                             <div class="offset-md-2 col-md-9">
-                                                <p class="title-blue">{{l("CompanyInformation")}}</p>
+                                                <p class="title-blue">{{  accountInfoTemp?.accountType != 'People' && accountInfoTemp?.accountType != 'Personal' ?  l("CompanyInformation") : l("Profile Information ")}}</p>
                                             </div>
                                         </div>
 
                                         <div class="form-group row ">
                                             <label for="colFormLabelSm"
-                                                class="col-sm-2 col-form-label col-form-label-sm label-form">{{l("CompnayLogo")}}
+                                                class="col-sm-2 col-form-label col-form-label-sm label-form">{{  accountInfoTemp?.accountType != 'People' && accountInfoTemp?.accountType != 'Personal' ? l("CompnayLogo") : l("Profile picture ")}}
                                             </label>
                                             <app-image-upload [sycAttachmentCategory]="sycAttachmentCategoryLogo"
                                                 [isDisabled]="(accountDataForView?.isConnected && currentTab === accountInfoPageTabsEnum.ProfileCreateOrEdit && !isRecordOwner)"
                                                 [image]="companyLogo" [staticWidth]="170" [showGuidelines]="true"
                                                 (imageBrowseDone)="imageBrowseDone($event,sycAttachmentCategoryLogo)"
-                                                (removeImage)="removeImage($event,sycAttachmentCategoryLogo,-1)">
+                                                (removeImage)="removeImage($event,sycAttachmentCategoryLogo,-1)" [customExtentionsImgs]="true">
                                             </app-image-upload>
                                         </div>
 
                                         <div class="form-group row ">
                                             <label
-                                                class="col-sm-2 col-form-label col-form-label-sm label-form">{{l("CompnayImages")}}
+                                                class="col-sm-2 col-form-label col-form-label-sm label-form">{{ accountInfoTemp?.accountType != 'People' && accountInfoTemp?.accountType != 'Personal' ? l("CompnayImages") : l("Cover image")}}
                                             </label>
                                             <app-image-upload [sycAttachmentCategory]="sycAttachmentCategoryBanner"
                                                 [isDisabled]="(accountDataForView?.isConnected && currentTab === accountInfoPageTabsEnum.ProfileCreateOrEdit && !isRecordOwner)"
                                                 [image]="coverPhoto" [staticHeight]="120" [showGuidelines]="true"
                                                 (imageBrowseDone)="imageBrowseDone($event,sycAttachmentCategoryBanner)"
-                                                (removeImage)="removeImage($event,sycAttachmentCategoryBanner,-2)">
+                                                (removeImage)="removeImage($event,sycAttachmentCategoryBanner,-2)" [customExtentionsImgs]="true">
                                             </app-image-upload>
 
                                         </div>
@@ -307,7 +307,7 @@
                                                         [sycAttachmentCategory]="sycAttachmentCategoryImage"
                                                         [image]="OtherImages1" [staticHeight]="100"
                                                         (imageBrowseDone)="imageBrowseDone($event,sycAttachmentCategoryImage,1)"
-                                                        (removeImage)="removeImage($event,sycAttachmentCategoryImage,1)">
+                                                        (removeImage)="removeImage($event,sycAttachmentCategoryImage,1)"  [customExtentionsImgs]="true">
                                                     </app-image-upload>
                                                 </div>
 
@@ -318,7 +318,7 @@
                                                         [sycAttachmentCategory]="sycAttachmentCategoryImage"
                                                         [image]="OtherImages2" [staticHeight]="100"
                                                         (imageBrowseDone)="imageBrowseDone($event,sycAttachmentCategoryImage,2)"
-                                                        (removeImage)="removeImage($event,sycAttachmentCategoryImage,2)">
+                                                        (removeImage)="removeImage($event,sycAttachmentCategoryImage,2)"  [customExtentionsImgs]="true">
                                                     </app-image-upload>
                                                 </div>
 
@@ -329,7 +329,7 @@
                                                         [sycAttachmentCategory]="sycAttachmentCategoryImage"
                                                         [image]="OtherImages3" [staticHeight]="100"
                                                         (imageBrowseDone)="imageBrowseDone($event,sycAttachmentCategoryImage,3)"
-                                                        (removeImage)="removeImage($event,sycAttachmentCategoryImage,3)">
+                                                        (removeImage)="removeImage($event,sycAttachmentCategoryImage,3)"  [customExtentionsImgs]="true">
                                                     </app-image-upload>
                                                 </div>
                                                 <!--Other image 4-->
@@ -339,7 +339,7 @@
                                                         [sycAttachmentCategory]="sycAttachmentCategoryImage"
                                                         [image]="OtherImages4" [staticHeight]="100"
                                                         (imageBrowseDone)="imageBrowseDone($event,sycAttachmentCategoryImage,4)"
-                                                        (removeImage)="removeImage($event,sycAttachmentCategoryImage,4)">
+                                                        (removeImage)="removeImage($event,sycAttachmentCategoryImage,4)"  [customExtentionsImgs]="true">
                                                     </app-image-upload>
                                                 </div>
 
@@ -366,25 +366,14 @@
                                         </div>
 
 
-                                        <div class="form-group row">
+                                        <div class="form-group row" *ngIf="accountInfoTemp?.accountType != 'People' && accountInfoTemp?.accountType != 'Personal'">
                                             <label for="colFormLabelSm"
                                                 class="col-sm-2 col-form-label col-form-label-sm label-form">
                                                 <span class="text-danger font-weight-bold">*</span>
                                                 {{l("Code")}}
                                             </label>
                                             <div class="col-sm-8">
-                                                <!-- <app-codes *ngIf="!(accountInfoTemp?.id>0)"
-                                                    [objectType]="entityObjectType" [editMode]=false classes="bg-white"
-                                                    [code]="accountInfoTemp?.code"
-                                                    placeHolder="{{ 'Account Code' | localize}}"
-                                                    (getCodeValue)="getCodeValue($event)" [maxlength]="12">
-                                                </app-codes>
-                                                <app-codes *ngIf="accountInfoTemp?.id>0" [objectType]="entityObjectType"
-                                                    [readonly]="true" [editMode]=true classes="bg-white"
-                                                    [code]="accountInfoTemp?.code"
-                                                    placeHolder="{{ 'Account Code' | localize}}"
-                                                    (getCodeValue)="getCodeValue($event)" [maxlength]="12"></app-codes>
-                                                -->
+                                           
                                             <input type="text" id="AccountInfoTemp_Code" #codeInput="ngModel"
                                             class="form-control form-control-sm aria-input-text" maxlength="6"
                                             [disabled]="accountInfoTemp?.id>0"
@@ -416,7 +405,8 @@
                                                 <validation-messages [formCtrl]="nameInput"></validation-messages>
                                             </div>
                                         </div>
-                                        <div class="form-group row">
+                                        
+                                        <div class="form-group row" *ngIf="accountInfoTemp?.accountType != 'People' && accountInfoTemp?.accountType != 'Personal'">
                                             <label for="colFormLabelSm"
                                                 class="col-sm-2 col-form-label col-form-label-sm label-form">
                                                 <!-- <span class="text-danger font-weight-bold">*</span> -->
@@ -454,7 +444,7 @@
                                                     [formCtrl]="emailAddressInput"></validation-messages>
                                             </div>
                                         </div>
-                                        <div class="form-group row" *ngIf="accountDataForView?.accountTypeId != 21">
+                                        <div class="form-group row" *ngIf="accountInfoTemp?.accountType != 'People' && accountInfoTemp?.accountType != 'Personal'">
                                             <label for="colFormLabelSm"
                                                 class="col-sm-2 col-form-label col-form-label-sm label-form">
                                                 {{l("Website")}}</label>
@@ -601,7 +591,7 @@
 
                                         <div class="form-group row">
                                             <label for="colFormLabelSm"
-                                                class="col-sm-2 col-form-label col-form-label-sm label-form">{{l("AboutUs")}}
+                                                class="col-sm-2 col-form-label col-form-label-sm label-form">{{ accountInfoTemp?.accountType != 'People' && accountInfoTemp?.accountType != 'Personal' ?  l("AboutUs") : l("About")}}
                                             </label>
                                             <div class="col-sm-8">
                                                 <textarea class="form-control z-depth-1 aria-textarea-text"
@@ -610,7 +600,7 @@
                                                     (input)="changeTouchState()"
                                                     [disabled]="accountDataForView?.isConnected && currentTab === accountInfoPageTabsEnum.ProfileCreateOrEdit && !isRecordOwner"
                                                     [ngStyle]="{'cursor': accountDataForView?.isConnected && currentTab === accountInfoPageTabsEnum.ProfileCreateOrEdit ? 'not-allowed' : 'pointer'}"
-                                                    [placeholder]=" 'PleaseEnterAboutUs' | localize "></textarea>
+                                                    [placeholder]="  accountInfoTemp?.accountType != 'People' && accountInfoTemp?.accountType != 'Personal' ?'PleaseEnterAboutUs' : 'PleaseEnterAbout' | localize "></textarea>
                                             </div>
                                         </div>
 
@@ -619,7 +609,7 @@
                                     </div>
                                 </div>
 
-                                <div class="kt-portlet m-portlet--full-height"
+                                <div class=" m-portlet--full-height mt-0"
                                     *ngIf="accountInfoTemp?.accountType != 'People' && accountInfoTemp?.accountType != 'Personal'">
                                     <div class="kt-portlet__head aria-header-block header-no-mr-bt">
                                         <div class="col-md-10">
@@ -832,7 +822,7 @@
                             <app-view-profile [accountData]="accountDataForView" [contactData]="accountContactForView"
                                 [isPublished]="isPublished" [viewMode]="viewMode" [accountLevel]="accountLevel"
                                 (edit)="triggerProfile($event)" (editedData)="savePerData($event)"
-                                (delete)="askToConfirmDeleteAccount()" 
+                                (delete)="askToConfirmDeleteAccount()" (publish)="refreshPublish($event)"
                                 (editedContactData)="getCotactData($event)" [isSync]="isSync"
                                 [connectionCount]="connectionCount"
                                 [personalAccount]="accountDataForView?.accountTypeId == 21 ? true : false"></app-view-profile>

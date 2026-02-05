@@ -3826,6 +3826,63 @@ export class AccountsServiceProxy {
      * @param body (optional) 
      * @return Success
      */
+    createOrEditContactAddress(body: AppContactAddressDto | undefined): Observable<boolean> {
+        let url_ = this.baseUrl + "/api/services/app/Accounts/CreateOrEditContactAddress";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json-patch+json",
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processCreateOrEditContactAddress(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processCreateOrEditContactAddress(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<boolean>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<boolean>;
+        }));
+    }
+
+    protected processCreateOrEditContactAddress(response: HttpResponseBase): Observable<boolean> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+                result200 = resultData200 !== undefined ? resultData200 : <any>null;
+    
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return Success
+     */
     createOrEditBranch(body: BranchDto | undefined): Observable<BranchDto> {
         let url_ = this.baseUrl + "/api/services/app/Accounts/CreateOrEditBranch";
         url_ = url_.replace(/[?&]$/, "");
@@ -4235,9 +4292,10 @@ export class AccountsServiceProxy {
     /**
      * @param typeName (optional) 
      * @param lookupLabelDtos (optional) 
+     * @param matchName (optional) 
      * @return Success
      */
-    getTypeId(typeName: string | null | undefined, lookupLabelDtos: LookupLabelDto[] | null | undefined): Observable<number> {
+    getTypeId(typeName: string | null | undefined, lookupLabelDtos: LookupLabelDto[] | null | undefined, matchName: boolean | undefined): Observable<number> {
         let url_ = this.baseUrl + "/api/services/app/Accounts/GetTypeId?";
         if (typeName !== undefined && typeName !== null)
             url_ += "typeName=" + encodeURIComponent("" + typeName) + "&";
@@ -4248,6 +4306,10 @@ export class AccountsServiceProxy {
         				url_ += "lookupLabelDtos[" + index + "]." + attr + "=" + encodeURIComponent("" + (item as any)[attr]) + "&";
         			}
             });
+        if (matchName === null)
+            throw new Error("The parameter 'matchName' cannot be null.");
+        else if (matchName !== undefined)
+            url_ += "matchName=" + encodeURIComponent("" + matchName) + "&";
         url_ = url_.replace(/[?&]$/, "");
 
         let options_ : any = {
@@ -74245,7 +74307,7 @@ export class AppEntityUserReactionsDto implements IAppEntityUserReactionsDto {
     userImage!: string | undefined;
     jobTitle!: string | undefined;
     accountName!: string | undefined;
-    profilePictureId!: string;
+    profilePictureId!: string | undefined;
     profilePictureUrl!: string | undefined;
     firstName!: string | undefined;
     lastName!: string | undefined;
@@ -74326,7 +74388,7 @@ export interface IAppEntityUserReactionsDto {
     userImage: string | undefined;
     jobTitle: string | undefined;
     accountName: string | undefined;
-    profilePictureId: string;
+    profilePictureId: string | undefined;
     profilePictureUrl: string | undefined;
     firstName: string | undefined;
     lastName: string | undefined;

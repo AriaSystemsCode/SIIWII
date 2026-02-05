@@ -4729,8 +4729,8 @@ namespace onetouch.Migrations
                         .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("FeatureDescription")
-                        .HasMaxLength(250)
-                        .HasColumnType("nvarchar(250)");
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<int?>("FeatureLimit")
                         .HasColumnType("int");

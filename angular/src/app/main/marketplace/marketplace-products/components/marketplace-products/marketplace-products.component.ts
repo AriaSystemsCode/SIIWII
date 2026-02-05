@@ -75,6 +75,8 @@ export class MarketplaceProductsComponent
     onlyAvialbleStock: boolean;
     appItemListId: any;
     selectedDepartments: any;
+ 
+
     @Input() fromMarketAcoount: boolean;
     @Input() accountDataForView: any
     @Input() marketplaceAccCurrency: string

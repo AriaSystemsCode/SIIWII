@@ -787,6 +787,25 @@ html{
 
 
 
+.p-checkbox .p-checkbox-box .p-icon {
+    position: relative;
+    left: 0%;
+    right: 40%;
+}
+
+ .nav-tabs {
+    border-bottom: none !important;
+  }
+  
+   .tab-content {
+    border: none !important;
+  }
+  
+  .btn-outline-primary{
+    border: none !important;
+    background-color: #610061 !important;
+    color: white !important;
+  }
 .kt-scrolltop--on .kt-scrolltop:hover {
     background-color: #4A0D4A !important;
 }
@@ -820,6 +839,10 @@ html{
     right: 40%;
 }
 
+
+.progress-bar{
+background-color:  #4A0D4A !important;
+}
 
 .progress-bar{
 background-color:  #4A0D4A !important;

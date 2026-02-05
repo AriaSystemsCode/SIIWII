@@ -558,6 +558,8 @@ namespace onetouch.Migrations.Seed.Host
                 }
             }
             //MMT-EntityLog[End]
+
+            //MMT-EntityLog[End]
             //MMT40[Start]
             ObjectCode = "MARKETPLACECONTACTRELATIONSHIP";
             codes = "ACTIVE,INACTIVE,PENDING".ToUpper().Split(',');

@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8" ?>
+<?xml version="1.0" encoding="utf-8" ?>
 <localizationDictionary culture="en">
 	<texts>
 	<text name="InvitePartnerByType">Invite partner By Type</text>
@@ -2482,6 +2482,7 @@
 		<text name="MSRP">MSRP</text>
 		<text name="PleaseCheckThisBoxIfYouSellMultipleVariationsOfYourProduct">Please check this box if you sell multiple variations of your product</text>
 		<text name="AvailableQty">Available Qty</text>
+		<text name="StockAvailable">Stock Available</text>
 		<text name="ViewEvent">View Event</text>
 		<text name="FormIsInvalid">Form is invalid</text>
 		<text name="CurrenciesCannotBeDublicated">Currencies can't be dublicated</text>

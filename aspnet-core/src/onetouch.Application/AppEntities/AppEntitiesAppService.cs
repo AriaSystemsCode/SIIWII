@@ -2337,7 +2337,7 @@ namespace onetouch.AppEntities
             returnObject.Value = input.Id;
             returnObject.IsHostRecord = input.TenantId == null;
             returnObject.HexaCode = (input.EntityExtraData != null && input.EntityExtraData.Where(z => z.AttributeId == 39).FirstOrDefault() != null) ? input.EntityExtraData.Where(z => z.AttributeId == 39).FirstOrDefault().AttributeValue : "";
-            returnObject.Image = (input.EntityAttachments != null && input.EntityAttachments.FirstOrDefault() != null && input.EntityAttachments.FirstOrDefault().guid != null) ?
+            returnObject.Image = (input.EntityAttachments != null && input.EntityAttachments.FirstOrDefault() != null && input.EntityAttachments.FirstOrDefault().guid != null) && !string.IsNullOrEmpty(input.EntityAttachments.FirstOrDefault().FileName) ?
                           (imagesUrl + input.TenantId.ToString() + @"/" + input.EntityAttachments.FirstOrDefault().guid.ToString()+"."+ input.EntityAttachments.FirstOrDefault().FileName.Split('.')[1]) : "";
 
             return returnObject;
@@ -2355,6 +2355,7 @@ namespace onetouch.AppEntities
                 attach.FileName = Path.GetFileName(input.Image);
                 attach.Url = input.Image;
                 attach.guid =  Path.GetFileNameWithoutExtension(input.Image);
+                attach.AttachmentCategoryId = 3;
                 returnObject.EntityAttachments.Add(attach);
             }
             if (!string.IsNullOrEmpty(input.HexaCode))

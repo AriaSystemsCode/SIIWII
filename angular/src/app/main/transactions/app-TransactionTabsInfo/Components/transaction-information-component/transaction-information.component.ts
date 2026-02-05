@@ -133,6 +133,7 @@ export class TransactionInformationComponent
   totalOrderQTY: number = 0;
   totlaOrderPrices: number = 0;
   priceLevel:any
+  languageSettingName  =AppConsts.languageSettingName;
   currentLang:string
   isArabic:boolean 
   constructor(
@@ -153,7 +154,7 @@ export class TransactionInformationComponent
   }
   ngOnInit(): void {
     this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
-    this.currentLang == 'ar' ? this.isArabic = true : this.isArabic = false
+    this.currentLang == 'ar' || this.currentLang == 'ar-EG'  ? this.isArabic = true : this.isArabic = false
     this.defineExtraAttributes();
 
     this.initFilterForm()
@@ -327,7 +328,6 @@ export class TransactionInformationComponent
         this.displayedVariations = []
         this.filteredColors = []
         this.allVariations = [];
-        this.getSellerVariations(0, 10, '')
         this.hideMainSpinner();
         this.getLinesData();
         this.getShoppingCartData();
@@ -352,7 +352,6 @@ export class TransactionInformationComponent
     this.filterForm.reset()
     this.displayedVariations = []
     this.filteredColors = []
-    this.getSellerVariations(0, 10, '')
     this.hideMainSpinner();
     this.filterForm.controls['selectedVariation'].reset()
 
@@ -1386,7 +1385,7 @@ export class TransactionInformationComponent
         'USD',
         this.appTransactionsForViewDto?.buyer,
         this.appTransactionsForViewDto?.sellerCompanySSIN,
-       this.priceLevel,
+       this.appTransactionsForViewDto?.priceLevel,
         id,
         undefined,
         undefined,

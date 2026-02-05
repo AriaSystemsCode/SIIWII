@@ -23,8 +23,8 @@ import {
     TransactionType,
     AppEntitiesServiceProxy,
     CurrencyInfoDto,
-    AccountsServiceProxy,
     LanguageServiceProxy,
+    AccountsServiceProxy,
 } from "@shared/service-proxies/service-proxies";
 
 import { UrlHelper } from "@shared/helpers/UrlHelper";
@@ -35,10 +35,6 @@ import { MessageReadService } from "@shared/utils/message-read.service";
 import { UpdateLogoService } from "@shared/utils/update-logo.service";
 import * as signalR from "@microsoft/signalr";
 import { MenuItem } from "primeng/api";
-import {
-    FormBuilder,
-    FormGroup,
-} from "@angular/forms";
 import { DatePipe } from "@angular/common";
 import { TransactionInformationComponent } from "@app/main/transactions/app-TransactionTabsInfo/Components/transaction-information-component/transaction-information.component";
 import Swal from "sweetalert2";

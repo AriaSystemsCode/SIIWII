@@ -6,16 +6,6 @@ import * as moment from 'moment';
 import { ActivatedRoute, Router } from '@angular/router';
 import { appModuleAnimation } from '@shared/animations/routerTransition';
 import { ImageCropperComponent } from "@app/shared/common/image-cropper/image-cropper.component";
-import {Observable, config} from "@node_modules/rxjs";
-import { SelectAppItemTypeComponent } from '@app/app-item-type/select-app-item-type/select-app-item-type.component';
-import { AppEntityListDynamicModalComponent } from '@app/app-entity-dynamic-modal/app-entity-list-dynamic-modal/app-entity-list-dynamic-modal.component';
-
-//import { ImageCropperComponent } from 'ngx-image-cropper';
-//import { SelectAppItemTypeComponent } from '@app/app-item-type/select-app-item-type/select-app-item-type.component';
-
-
-
-
 
 @Component({
     templateUrl: './create-or-edit-appTenantInvoice.component.html',
@@ -158,10 +148,6 @@ export class CreateOrEditAppTenantInvoiceComponent extends AppComponentBase impl
             sycAttachmentCategoryName: "",
         });
 
-
-
-
-//I43
 
     tempUploadImage(
         event: Event,

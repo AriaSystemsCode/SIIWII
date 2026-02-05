@@ -58,6 +58,7 @@ export class PlansComponent extends AppComponentBase {
   }
 
 
+  
 
   getUniqueCategories() {
     const allDetails = this.plans.reduce((acc, plan) => {

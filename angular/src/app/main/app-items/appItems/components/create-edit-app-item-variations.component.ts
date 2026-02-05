@@ -251,9 +251,9 @@ export class CreateEditAppItemVariationsComponent
                 this.sizes = res;
             });
 
-          this.selectedAttrID = this.appItem?.sycIdentifierId?.toString()
-          this.selectedAttrID?null:this.editVariationsOpend=true;
-          this.getAspectatio();
+        this.selectedAttrID = this.appItem?.sycIdentifierId?.toString()
+        this.selectedAttrID ? null : this.editVariationsOpend = true;
+        this.getAspectatio();
     }
 
     async getSiwiiMarketPlaceColor() {
@@ -268,10 +268,10 @@ export class CreateEditAppItemVariationsComponent
     test: boolean = true;
 
     initPricingNeededData() {
-        let languageSettingName=AppConsts.languageSettingName;
+        let languageSettingName = AppConsts.languageSettingName;
         this.levels = [
             {
-                label: this._pricingHelpersService.defaultLevel=='MSRP' ?( languageSettingName!='en-GB' ? 'MSRP'  : 'RRP' ) : this._pricingHelpersService.defaultLevel,
+                label: this._pricingHelpersService.defaultLevel == 'MSRP' ? (languageSettingName != 'en-GB' ? 'MSRP' : 'RRP') : this._pricingHelpersService.defaultLevel,
                 value: this._pricingHelpersService.defaultLevel,
             },
             ...this._pricingHelpersService.levels.map((item) => {
@@ -953,32 +953,32 @@ export class CreateEditAppItemVariationsComponent
     onDragLeave(event: DragEvent) {
         event.preventDefault();
         event.stopPropagation();
-      }
+    }
 
-      onDragOver(event: DragEvent) {
+    onDragOver(event: DragEvent) {
         event.preventDefault(); // Required to allow dropping
         event.stopPropagation();
-      }
-      
+    }
+
     onDrop(event: DragEvent, index: number) {
         event.preventDefault();
         event.stopPropagation();
-      
+
         if (event.dataTransfer?.files.length) {
-          const file = event.dataTransfer.files[0];
-      
-          console.log("File dropped:", file);
-      
-          const mockEvent = {
-            target: { files: [file], value: file.name } // Mimicking an input event
-          };
-      
-          this.fileChange(
-            mockEvent as unknown as Event
-          );
+            const file = event.dataTransfer.files[0];
+
+            console.log("File dropped:", file);
+
+            const mockEvent = {
+                target: { files: [file], value: file.name } // Mimicking an input event
+            };
+
+            this.fileChange(
+                mockEvent as unknown as Event
+            );
         }
-      }
-      
+    }
+
     aspectRatio;
     getAspectatio() {
         let sycAttachmentCategoryImage;
@@ -998,8 +998,8 @@ export class CreateEditAppItemVariationsComponent
         if (event.target.value) {
             // there is a file
             // destructing operator => declare 2 variables from the returned object with the same keys names
-          
-                let aspectRatio=this.aspectRatio;
+
+            let aspectRatio = this.aspectRatio;
 
             let { onCropDone, data } = this.openImageCropper(
                 event,
@@ -1328,7 +1328,7 @@ export class CreateEditAppItemVariationsComponent
                 this.l("PleaseCompletePricingAllVariationsFirst")
             );
         }
-         let languageSettingName  =AppConsts.languageSettingName;
+        let languageSettingName = AppConsts.languageSettingName;
         /* this.variationMatrices?.forEach((variation) => {
             variation.appItemPriceInfos = variation.appItemPriceInfos.filter(
                 (priceDto) => priceDto.code == (languageSettingName!='en-GB' ? 'MSRP'  : 'RRP' ) || priceDto?.price > 0
@@ -1336,7 +1336,7 @@ export class CreateEditAppItemVariationsComponent
         }); */
         this.variationMatrices?.forEach((variation) => {
             variation.appItemPriceInfos = variation.appItemPriceInfos.filter(
-                (priceDto) => priceDto.code ==  'MSRP'   || priceDto?.price > 0
+                (priceDto) => priceDto.code == 'MSRP' || priceDto?.price > 0
             );
         });
         this.isListing ? this.selectedVaritaions : this.variationMatrices;
@@ -2237,8 +2237,8 @@ export class CreateEditAppItemVariationsComponent
         };
         let appEntity: AppEntityDto = new AppEntityDto()
 
-        if(item){
-            
+        if (item) {
+
             const isTempId = item.value > 1e10;
 
             if (!isTempId) {
@@ -2252,7 +2252,6 @@ export class CreateEditAppItemVariationsComponent
                         this.createOreEditAppEntityModal.show(entityObjectType, appEntity, true);
                     });
             }
-            
         }
 
         else

@@ -124,7 +124,7 @@ export class OrderInformationComponent extends AppComponentBase implements OnIni
     ? 'mm/dd/yy'
     : 'dd/mm/yy';
     this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
-    this.currentLang == 'ar' ? this.isArabic = true : this.isArabic = false
+    this.currentLang == 'ar' || this.currentLang == 'ar-EG'  ? this.isArabic = true : this.isArabic = false
     if (this.currentTab === TransactionCartoccordionTabs.orderInfo) {
       this.fullName = `${this.appSession.user.name}${this.appSession.user.surname}`;
       this.initDates();

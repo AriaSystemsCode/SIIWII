@@ -10908,10 +10908,15 @@ namespace onetouch.AppItems
             mappingExpression.ForMember(dest => dest.PriceB, act => act.MapFrom(src => src.PriceB.ToString().TrimEnd()));
             mappingExpression.ForMember(dest => dest.PriceC, act => act.MapFrom(src => src.PriceC.ToString().TrimEnd()));
             mappingExpression.ForMember(dest => dest.PriceD, act => act.MapFrom(src => src.PriceD.ToString().TrimEnd()));
+            mappingExpression.ForMember(dest => dest.SoldOutDate, act => 
+            act.MapFrom(src => ParseDateOnlyOrDefault(src.SoldOutDate)));
 
 
         }
-
+        public static DateOnly ParseDateOnlyOrDefault(string value)
+        {
+            return DateOnly.TryParse(value, out var result) ? result : DateOnly.MinValue;
+        }
     }
     public class BmiValueImportResolver : IValueResolver<ImportItemInputDto, AppItemExcelDto, List<AppItemImpExtrAttributes>>
     {

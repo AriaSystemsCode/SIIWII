@@ -1,11 +1,8 @@
 
 <div  [@routerTransition]>
-    <div>
-        <div>
+
             <div class="kt-portlet m-0">
-                <div>
-                    <div>
-                        
+
                         <div class="kt-pricing-1__items row FreeEdition_Container">
                         <div class=" FreeEdition_Purple_Logo-sm"   
                         > 
@@ -78,7 +75,7 @@
 
                                 </span>
 
-                                <div class="kt-pricing-1__btn" class="floatDiv">
+                                <div class="kt-pricing-1__btn" >
                                     <button
                                         class="_btn btn btn-warning btn-brand btn-wide btn-uppercase btn-bolder  btn  mt-4"
                                         (click)="upgrade(editionWithFeatures.edition, editionPaymentType.Upgrade)"
@@ -87,7 +84,7 @@
                                     </button>
 
                                     <button
-                                        class="_btn btn mt-4 startBtn"
+                                        class="_btn btn mt-4 startBtn w-100"
                                         [routerLink]="['/account/register-tenant']"
                                         [queryParams]="{editionId: editionWithFeatures.edition.id, subscriptionStartType: subscriptionStartType.Free,tenantid:tenantid,relatedTenantId:relatedTenantId}"
                                         href="#" *ngIf="!isUserLoggedIn && isFree(editionWithFeatures.edition)">
@@ -116,9 +113,6 @@
                             <div class="col-6 col-sm-6 FreeEdition_Desktop_Photo">  <img class="h-100  p-5 w-100" src="../../assets/accounts/SignUp_FreeEdition_Desktop_Photo.png"  >
                             </div>
                         </div>
-                    </div>
-                </div>
             </div>
-        </div>
-    </div>
+
 </div>

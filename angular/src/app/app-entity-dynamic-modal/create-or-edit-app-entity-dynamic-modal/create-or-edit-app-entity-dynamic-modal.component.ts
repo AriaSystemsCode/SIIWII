@@ -125,7 +125,9 @@ export class CreateOrEditAppEntityDynamicModalComponent
             if(this.appEntity?.code){
                 this.editMode = true;
                 if(!this.appEntity.tenantId)   this.appEntity.tenantId = -1;
-                this.appEntity.id=Math.floor((1 + Math.random()) * 0x10000);
+                //this.appEntity.id=Math.floor((1 + Math.random()) * 0x10000);
+                this.appEntity.id = Math.floor(1e10 + Math.random() * 1e6);
+
                 this.appEntity.nonlookup=true;
                 this.addToLookup=false;
                 this.adjustImageSrcsUrls();
@@ -273,7 +275,7 @@ export class CreateOrEditAppEntityDynamicModalComponent
             }
 
             this.appEntity.nonlookup=false;
-        this._appEntitiesServiceProxy
+            this._appEntitiesServiceProxy
             .saveEntity(this.appEntity)
             .pipe(
                 finalize(() => {
@@ -285,6 +287,7 @@ export class CreateOrEditAppEntityDynamicModalComponent
                 if(this.wantdisplaySaveSideBar)
                 this.displaySaveSideBar = true;
                 this.appEntity.value=  !this.appEntity.value ? result :this.appEntity.value ; 
+                this.appEntity.id=result;
                 this.addNonLookupValues.emit(this.appEntity);
                 this.saveDone.emit(true);
                 this.hide();

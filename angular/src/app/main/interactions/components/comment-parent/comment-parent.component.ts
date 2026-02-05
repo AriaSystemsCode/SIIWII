@@ -192,6 +192,4 @@ openReplyScreen(comment: any): void {
    
 }
 
-           }
-         
-
+}

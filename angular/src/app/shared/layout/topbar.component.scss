@@ -126,6 +126,16 @@
         position: absolute !important;
         // right: 5% !important;
     }
+
+    .leftList {
+        position: absolute;
+left: 30px;
+    }
+
+    .navbar-expand-lg .navbar-nav .dropdown-menu {
+        position: absolute !important;
+        right: -35% !important;
+    }
 }
 
 @media only screen and (max-width: 768px) {

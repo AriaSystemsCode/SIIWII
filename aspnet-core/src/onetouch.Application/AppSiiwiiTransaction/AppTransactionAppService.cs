@@ -76,6 +76,7 @@ using onetouch.AppSubScriptionPlan;
 using onetouch.SystemObjects.Dtos;
 using onetouch.AppMarketplaceContacts;
 using AuthorizeNet.APICore;
+using MimeKit;
 
 
 //using NUglify.Helpers;
@@ -216,6 +217,10 @@ namespace onetouch.AppSiiwiiTransaction
             //I46[Start]
             _appTenantActivitiesLogAppService = appTenantActivitiesLogAppService;
             _appMarketplaceContactRepository = appMarketplaceContactRepository;
+            //I46{End}
+            //E-SII-20250428.0080,1 MMT 04/29/2025 add Entity log table to SIIWII[Start]
+            _appEntityLogRepository= appEntityLogRepository;
+            //E-SII-20250428.0080,1 MMT 04/29/2025 add Entity log table to SIIWII[End]
             //I46{End}
             //I40[Start]
             _appContactRelationshipInfoRepository = appContactRelationshipInfoRepository;

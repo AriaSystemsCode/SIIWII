@@ -629,7 +629,19 @@ namespace onetouch.AppMarketplaceAccounts
                     var relationships = _appContactRelationshipInfoRepository.GetAll()
                                .Where(z => ((z.RequesterContactSSIN == account.SSIN)
                                || (z.RecipientContactSSIN == account.SSIN)) && z.EntityObjectStatusId == activeRelationshipStatusId &&
-                               (z.SharingLevel == 1 )).Count(); 
+                               (z.SharingLevel == 1 )).Count();
+                     var relationshipsQuery = _appContactRelationshipInfoRepository.GetAll()
+                             .Where(z => ((z.RequesterContactSSIN == account.SSIN)
+                             || (z.RecipientContactSSIN == account.SSIN)) && z.EntityObjectStatusId == activeRelationshipStatusId &&
+                             (z.SharingLevel == 1));
+
+                    var relationshipQ = from b in _appMarketplaceContactRepository.GetAll()
+                                        .Where(z => z.SSIN != account.SSIN && z.IsDeleted == false && z.SharingLevel == 1 && z.TenantOwner != account.TenantOwner)
+                                        from a in relationshipsQuery
+                                        where (b.SSIN == a.RequesterContactSSIN || b.SSIN == a.RecipientContactSSIN) 
+                                        select new { obj = b };
+
+                    relationships = await relationshipQ.CountAsync();
                     //.WhereIf(input.AccountTypeId != null && input.AccountTypeId > 0, x =>
                     //(x.RequesterContactSSIN == input.SSIN && x.RecipientContactTypeId == long.Parse(input.AccountTypeId.ToString())) ||
                     //(x.RecipientContactSSIN == input.SSIN && x.RequesterContactTypeId == long.Parse(input.AccountTypeId.ToString())));
@@ -903,13 +915,29 @@ namespace onetouch.AppMarketplaceAccounts
                    (x.RequesterContactSSIN == account.SSIN && x.RecipientContactTypeId == long.Parse(personId.ToString())) ||
                    (x.RecipientContactSSIN == account.SSIN && x.RequesterContactTypeId == long.Parse(personId.ToString()))).CountAsync();
 
-                var relationshipsConut = await _appContactRelationshipInfoRepository.GetAll()
+                /*var relationshipsConut = await _appContactRelationshipInfoRepository.GetAll()
                               .Where(z => ((z.RequesterContactSSIN == account.SSIN)
                               || (z.RecipientContactSSIN == account.SSIN)) &&
                               _appMarketplaceContactRepository.GetAll().Count(x => x.SSIN == z.RecipientContactSSIN) > 0 &&
                               _appMarketplaceContactRepository.GetAll().Count(x => x.SSIN == z.RequesterContactSSIN) > 0 &&
                               z.EntityObjectStatusId == activeRelationshipStatusId &&
-                              (z.SharingLevel == 1)).CountAsync();// || (z.SharingLevel==4 && input.SSIN == currentTenantAccountSSIN)))
+                              (z.SharingLevel == 1)).CountAsync();// || (z.SharingLevel==4 && input.SSIN == currentTenantAccountSSIN)))*/
+                var relationships1 = _appContactRelationshipInfoRepository.GetAll()
+                               .Where(z => ((z.RequesterContactSSIN == account.SSIN)
+                               || (z.RecipientContactSSIN == account.SSIN)) && z.EntityObjectStatusId == activeRelationshipStatusId &&
+                               (z.SharingLevel == 1)).Count();
+                var relationshipsQuery1 = _appContactRelationshipInfoRepository.GetAll()
+                        .Where(z => ((z.RequesterContactSSIN == account.SSIN)
+                        || (z.RecipientContactSSIN == account.SSIN)) && z.EntityObjectStatusId == activeRelationshipStatusId &&
+                        (z.SharingLevel == 1));
+
+                var relationshipQ1 = from b in _appMarketplaceContactRepository.GetAll().Where(z => z.SSIN != account.SSIN && z.IsDeleted == false
+                                     && z.SharingLevel == 1 && z.TenantOwner!=account.TenantOwner)
+                                    from a in relationshipsQuery1
+                                    where (b.SSIN == a.RequesterContactSSIN || b.SSIN == a.RecipientContactSSIN)
+                                    select new { obj = b };
+
+                var relationshipsConut = await relationshipQ1.CountAsync();
 
                 output.ConnectionCount = relationshipsConut;
                 //I40[End]
@@ -1048,7 +1076,7 @@ namespace onetouch.AppMarketplaceAccounts
                                                   .FirstOrDefaultAsync(x => x.TenantId == null
                                                   && x.IsProfileData == true
                                                   && x.TenantOwner == input.TenantId
-                                                  && x.SSIN == input.SSIN);
+                                                  && (x.SSIN == input.SSIN || (x.Name == input.Name && x.EntityObjectTypeId == input.AccountTypeId)));
 
                 #region if sync remove old data
                 if (FoundPublishContact != null)

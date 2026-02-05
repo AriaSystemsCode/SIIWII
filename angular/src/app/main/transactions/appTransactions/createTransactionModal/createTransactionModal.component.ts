@@ -1135,7 +1135,7 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit, 
         this.minDate.setMonth(prevMonth);
         this.minDate.setFullYear(prevYear);
         this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
-        this.currentLang == 'ar' ? this.isArabic = true : this.isArabic = false
+        this.currentLang == 'ar' || this.currentLang == 'ar-EG'  ? this.isArabic = true : this.isArabic = false
 
     }
 

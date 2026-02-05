@@ -63,7 +63,9 @@ namespace onetouch.Helpers
 
         public bool IsPhoneNumber(string number)
         {
-            return Regex.Match(number, @"^(\+\d{1,2}\s?)?1?\-?\.?\s?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}$").Success;
+            //return Regex.Match(number, @"^(\+\d{1,2}\s?)?1?\-?\.?\s?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}$").Success;
+            var xx = Regex.IsMatch(number, @"^1(?:\d{10}|0\d{9,10})$");
+            return xx;
         }
         //I46 [Start]
         public  void ExportJsonToExcel(string filePath, string jsonData)
