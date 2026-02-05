@@ -8353,13 +8353,13 @@ namespace onetouch.AppItems
                             });
                             //RenameFileToGuid(excelDto.image, Path.GetFileNameWithoutExtension(excelDto.image));
                             //string guid = System.Guid.NewGuid().ToString();
-                            thirdItemCopy.ExcelDto.Images.Add(new AppItemImage
-                            {
-                                ImageFileName = Path.GetFileName(excelDto.ExcelDto.ImagePreview),
-                                ImageGuid = Path.GetFileNameWithoutExtension(excelDto.image),
-                                IsDefault = excelDto.ExcelDto.ImageIsDefault,
-                                Attributes = "101=" + excelDto.ExcelDto.Code.Split('-')[1]
-                            });
+                            //thirdItemCopy.ExcelDto.Images.Add(new AppItemImage
+                            //{
+                            //    ImageFileName = Path.GetFileName(excelDto.ExcelDto.ImagePreview),
+                            //    ImageGuid = Path.GetFileNameWithoutExtension(excelDto.image),
+                            //    IsDefault = excelDto.ExcelDto.ImageIsDefault,
+                            //    Attributes = "101=" + excelDto.ExcelDto.Code.Split('-')[1]
+                            //});
                             //RenameFileToGuid(excelDto.image, Path.GetFileNameWithoutExtension(excelDto.image));
                             thirdItemCopy.ExcelDto.Actions = "";
                             childNo += 1;
