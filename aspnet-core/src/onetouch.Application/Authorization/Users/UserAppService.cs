@@ -359,7 +359,8 @@ namespace onetouch.Authorization.Users
 
             var user = await UserManager.GetUserByIdAsync(input.Id);
             //Mariam[Start]
-            await DeleteUserContact(user);
+            // stop contact deletion
+            //await DeleteUserContact(user);
             //Mariam[End]
             CheckErrors(await UserManager.DeleteAsync(user));
            
@@ -372,10 +373,12 @@ namespace onetouch.Authorization.Users
             if (contactEntityExtraData != null)
             {
                 var contact = _appContactRepository.GetAll().FirstOrDefault(x => x.TenantId == AbpSession.TenantId && x.EntityId == contactEntityExtraData.EntityId);
-              
-                EntityDto contactObj = new EntityDto();
-                contactObj.Id = int.Parse(contact.Id.ToString());
-                await _appAccountsAppService.DeleteContact(contactObj);
+                if (contact != null)
+                {
+                    EntityDto contactObj = new EntityDto();
+                    contactObj.Id = int.Parse(contact.Id.ToString());
+                    await _appAccountsAppService.DeleteContact(contactObj);
+                }
             }
             
         }
@@ -676,7 +679,7 @@ namespace onetouch.Authorization.Users
                 else
                 { 
                 var account = _appContactRepository.GetAll().FirstOrDefault(x => x.TenantId == AbpSession.TenantId && x.IsProfileData && x.ParentId == null && x.PartnerId == null && x.AccountId == null);
-                if (account != null)
+                if (account != null && false) // Stop creating contact
                     {
                         //I40 {Start}
                         //ContactDto contactDto = new ContactDto();
