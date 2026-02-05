@@ -139,6 +139,7 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit {
     imgCropperModalRef: BsModalRef
     accData: GetAccountForViewDto
     editedContactPerData: any
+    languageSettingName  =AppConsts.languageSettingName;
     constructor(
         injector: Injector,
         private _route: ActivatedRoute,
@@ -293,7 +294,7 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit {
         this._AppEntitiesServiceProxy.getAllPhoneTypeForTableDropdown().subscribe(result => {
             this.allPhoneTypes = result;
             this.phoneTypesLoaded = true;
-            // this.setDefaultPhoneTypes();
+            this.setDefaultPhoneTypes();
 
         });
     }
@@ -372,20 +373,21 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit {
 
     getAccountTypes() {
         this._AppEntitiesServiceProxy.getAllAccountTypesForTableDropdown()
-            .subscribe(result => {
-                const list = result ?? [];
-
-                const business = list.find(x => x.label === 'Business'); // x is scoped here
-                this.accountTypes = business ? [business] : [];
-
-
-
-            });
-        // pick the id field your DTO actually uses:
-        this.accountInfoTemp.accountTypeId = 19;
-        this.accountInfoTemp.accountType = 'Business';
-
-    }
+          .subscribe(result => {
+            const list = result ?? [];
+            this.accountTypes = list; 
+          });
+      
+        const isCreate =
+          this.isMyAccountCreate || this.isExternalAccountCreate || this.isManualAccountCreate;
+      
+      
+        if (isCreate && !this.accountInfoTemp?.id) {
+          this.accountInfoTemp.accountTypeId ??= 19;
+          this.accountInfoTemp.accountType   ??= 'Business';
+        }
+      }
+      
 
 
 
@@ -424,6 +426,9 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit {
             this.accountInfoTemp.shipViaId =
                 !result?.accountInfo?.id ? this.shipViaId :
                     result.accountInfo?.shipViaId ? result.accountInfo?.shipViaId : this.shipViaId;
+
+      
+
 
         }
     }
@@ -730,6 +735,7 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit {
     }
     getCotactData(event) {
         this.editedContactPerData = event
+        console.log(this.editedContactPerData,'dataaa')
    
 
 
@@ -796,11 +802,11 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit {
         if (this.editedContactPerData?.userId != null) {
             this.setStringValue(715, this.editedContactPerData?.userId);
         }
-        if (event?.phone1IsPublic != null) {
-            this.setBooleanValue(711, event.phone1IsPublic); // boolean
+        if (event?.phone2IsPublic != null) {
+            this.setBooleanValue(711, event.phone2IsPublic); // boolean
         }
-        if (this.editedContactPerData?.phone2IsPublic != null) {
-            this.setBooleanValue(712, this.editedContactPerData.phone2IsPublic); // boolean
+        if (this.editedContactPerData?.phone3IsPublic != null) {
+            this.setBooleanValue(712, this.editedContactPerData.phone3IsPublic); // boolean
         }
         if (event?.emailAddressIsPublic != null) {
             this.setBooleanValue(709, event.emailAddressIsPublic); // boolean
@@ -889,7 +895,7 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit {
 
     saveMyAccount() {
         this.accountInfoTemp.entityExtraData ??= [];
-
+    //     this.cleanPhones();
         if (!this.accountInfoTemp.id) {
             const mustHave = [701, 702, 703, 706, 707, 708, 709, 710, 711, 712, 713, 714, 715];
             mustHave.forEach(id => this.ensureAttribute(id));
@@ -898,7 +904,7 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit {
             this.setStringValue(701, this.accountInfoTemp.entityExtraData[0].attributeValue);
             this.setStringValue(702, this.accountInfoTemp.entityExtraData[1].attributeValue);
             this.setStringValue(707, '');     // instead of null
-            this.setStringValue(706, '');     // instead of null
+            this.setStringValue(706, this.jobTitle); 
             this.setBooleanValue(713, true);
             this.setBooleanValue(708, true);
             this.setBooleanValue(710, true);
@@ -913,6 +919,8 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit {
 
         this.accountInfoTemp.accountLevel = 0
 
+        console.log(this.accountInfoTemp,'this.accountInfoTemp.accountLevel')
+       
         this._AccountsServiceProxy.createOrEditMyAccount(this.accountInfoTemp)
         .pipe(finalize(() => {
             this.updateLogoService.updateLogo();
@@ -1031,17 +1039,17 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit {
 
 
 
-    // setDefaultPhoneTypes(): void {
+    setDefaultPhoneTypes(): void {
 
-    //     if (!this.accountInfoLoded || !this.phoneTypesLoaded) return;
+        if (!this.accountInfoLoded || !this.phoneTypesLoaded) return;
 
-    //     //set default phone types tobe displayed
-    //     if (this.accountInfoTemp.phone1TypeId == 0 || this.accountInfoTemp.phone1TypeId == null) {
-    //         this.accountInfoTemp.phone1TypeId = this.allPhoneTypes.length > 0 ? this.allPhoneTypes[0].value : this.accountInfoTemp.phone1TypeId;
-    //         this.accountInfoTemp.phone2TypeId = this.allPhoneTypes.length > 1 ? this.allPhoneTypes[1].value : this.accountInfoTemp.phone2TypeId;
-    //         this.accountInfoTemp.phone3TypeId = this.allPhoneTypes.length > 2 ? this.allPhoneTypes[2].value : this.accountInfoTemp.phone3TypeId;
-    //     }
-    // }
+        //set default phone types tobe displayed
+        if (this.accountInfoTemp.phone1TypeId == 0 || this.accountInfoTemp.phone1TypeId == null) {
+            this.accountInfoTemp.phone1TypeId = this.allPhoneTypes.length > 0 ? this.allPhoneTypes[0].value : this.accountInfoTemp.phone1TypeId;
+            this.accountInfoTemp.phone2TypeId = this.allPhoneTypes.length > 1 ? this.allPhoneTypes[1].value : this.accountInfoTemp.phone2TypeId;
+            this.accountInfoTemp.phone3TypeId = this.allPhoneTypes.length > 2 ? this.allPhoneTypes[2].value : this.accountInfoTemp.phone3TypeId;
+        }
+    }
 
 
     openImageCropper(event, aspectRatio?: number, noOptions?: boolean): { onCropDone: Observable<any>, data: ImageCropperComponent } {
@@ -1532,5 +1540,47 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit {
             this.getMyAccountDataForView() 
         }
     }
+
+    get jobTitle(): string {
+        return (
+          this.accountInfoTemp?.entityExtraData?.find(x => x.attributeId === 706)
+            ?.attributeValue || ''
+        );
+      }
+      
+      set jobTitle(value: string) {
+        this.ensureAttribute(706);
+        const attr = this.accountInfoTemp.entityExtraData.find(x => x.attributeId === 706);
+        attr.attributeValue = value;
+      }
+      private normalizePhone(v?: string): string | undefined {
+        if (!v) return undefined;
+        const trimmed = v.trim();
+        return trimmed.length ? trimmed : undefined;
+      }
+ 
+
+    //   private cleanPhones(): void {
+    //     const trimOrUndef = (v?: string) => {
+    //       const t = (v ?? '').trim();
+    //       return t.length ? t : undefined;
+    //     };
+      
+    //     this.accountInfoTemp.phone1Number = trimOrUndef(this.accountInfoTemp.phone1Number);
+    //     this.accountInfoTemp.phone1Ex     = trimOrUndef(this.accountInfoTemp.phone1Ex);
+      
+    //     this.accountInfoTemp.phone2Number = trimOrUndef(this.accountInfoTemp.phone2Number);
+    //     this.accountInfoTemp.phone2Ex     = trimOrUndef(this.accountInfoTemp.phone2Ex);
+      
+    //     this.accountInfoTemp.phone3Number = trimOrUndef(this.accountInfoTemp.phone3Number);
+    //     this.accountInfoTemp.phone3Ex     = trimOrUndef(this.accountInfoTemp.phone3Ex);
+      
+    //     // لو الرقم فاضي، خلي النوع undefined عشان مايتبعتش لوحده
+    //     if (!this.accountInfoTemp.phone1Number) this.accountInfoTemp.phone1TypeId = undefined;
+    //     if (!this.accountInfoTemp.phone2Number) this.accountInfoTemp.phone2TypeId = undefined;
+    //     if (!this.accountInfoTemp.phone3Number) this.accountInfoTemp.phone3TypeId = undefined;
+    //   }
+      
+            
     
 }

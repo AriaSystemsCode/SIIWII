@@ -19,13 +19,11 @@
                                 [class.hide]="editInfo" (click)="cancelPerAcc()">
                                 {{ "Cancel" | localize }}
                             </button>
-                            <button class="btn mb-3 mt-4 editAccount_butn Save_editPersonal text-white"
-                                type="submit"
-                                [class.hide]="editInfo"
-                                [disabled]="hasInvalidEmailOrPhone"
+                            <button class="btn mb-3 mt-4 editAccount_butn Save_editPersonal text-white" type="submit"
+                                [class.hide]="editInfo" [disabled]="hasInvalidEmailOrPhone"
                                 (click)="editPersonal=true; editAccount()">
-                        {{ "Save" | localize }}
-                        </button>
+                                {{ "Save" | localize }}
+                            </button>
 
                         </div>
                     </div>
@@ -43,54 +41,55 @@
                                             [sycAttachmentCategory]="sycAttachmentCategoryBanner"
                                             [staticWidth]="viewProfileCover?.offsetWidth">
                                         </app-image-display>
-                                        <div class="mr-3 "     [ngClass]="isArabic ? 'view-profile-action-buttons-ar':'view-profile-action-buttons-en'"
-                                        *ngIf="!viewMode&&isNotManualLevel()">
-                                        <button class="btn editAccount_butn" (click)="editAccount()"
-                                            [disabled]="Editting">
-                                            <img src="../../assets/img/input_icons/edit.png" class="">
-                                            {{ "Edit" | localize }}
-                                        </button>
-                                        <button class="btn transparent-button" (click)="UnShareAccount()"
-                                            *ngIf="isPublished&&connectionCount==0&&isNotManualLevel()"
-                                            [class.hide]="hidUshare">
-                                            <img src="../../assets/img/input_icons/privateAccount.png" class="">
-                                            {{ "Private" | localize }}
-                                        </button>
-                                        <button class="btn transparent-button" (click)="UnShareAccount()"
-                                            *ngIf="isPublished&&connectionCount!=0&&isNotManualLevel()"
-                                            [class.hide]="hidUshare">
-                                            <img src="../../assets/img/input_icons/hideAccount.png" class="">
-                                            {{ "Hide" | localize }}
-                                        </button>
-                                        <button class="btn transparent-button alaa" (click)="UnShareAccount()"
-                                            *ngIf="isNotManualLevel()" [ngClass]="{'hide':showPrivate}">
-                                            <img src="../../assets/img/input_icons/privateAccount.png" class="">
-                                            {{ "Private" | localize }}
-                                        </button>
-                                        <button class="btn transparent-button alaa" (click)="UnShareAccount()"
-                                            *ngIf="isNotManualLevel()" [class.hide]="showHide">
-                                            <img src="../../assets/img/input_icons/hideAccount.png">
-                                            {{ "Hide" | localize }}
-                                        </button>
+                                        <div class="mr-3 "
+                                            [ngClass]="isArabic ? 'view-profile-action-buttons-ar':'view-profile-action-buttons-en'"
+                                            *ngIf="!viewMode&&isNotManualLevel()">
+                                            <button class="btn editAccount_butn" (click)="editAccount()"
+                                                [disabled]="Editting">
+                                                <img src="../../assets/img/input_icons/edit.png" class="">
+                                                {{ "Edit" | localize }}
+                                            </button>
+                                            <button class="btn transparent-button" (click)="UnShareAccount()"
+                                                *ngIf="isPublished&&connectionCount==0&&isNotManualLevel()"
+                                                [class.hide]="hidUshare">
+                                                <img src="../../assets/img/input_icons/privateAccount.png" class="">
+                                                {{ "Private" | localize }}
+                                            </button>
+                                            <button class="btn transparent-button" (click)="UnShareAccount()"
+                                                *ngIf="isPublished&&connectionCount!=0&&isNotManualLevel()"
+                                                [class.hide]="hidUshare">
+                                                <img src="../../assets/img/input_icons/hideAccount.png" class="">
+                                                {{ "Hide" | localize }}
+                                            </button>
+                                            <button class="btn transparent-button alaa" (click)="UnShareAccount()"
+                                                *ngIf="isNotManualLevel()" [ngClass]="{'hide':showPrivate}">
+                                                <img src="../../assets/img/input_icons/privateAccount.png" class="">
+                                                {{ "Private" | localize }}
+                                            </button>
+                                            <button class="btn transparent-button alaa" (click)="UnShareAccount()"
+                                                *ngIf="isNotManualLevel()" [class.hide]="showHide">
+                                                <img src="../../assets/img/input_icons/hideAccount.png">
+                                                {{ "Hide" | localize }}
+                                            </button>
 
 
-                                        <button pButton pRipple label="Share"
-                                            class="share btn transparent-button alaa" icon="pi pi-share-alt"
-                                            (click)="openShareAccountsModal()"
-                                            *ngIf="!isPublished&&isNotManualLevel()"
-                                            [class.hide]="hideshowShare"></button>
+                                            <button pButton pRipple label="Share"
+                                                class="share btn transparent-button alaa" icon="pi pi-share-alt"
+                                                (click)="openShareAccountsModal()"
+                                                *ngIf="!isPublished&&isNotManualLevel()"
+                                                [class.hide]="hideshowShare"></button>
 
-                                        <button pButton pRipple label="Share"
-                                            class="share btn transparent-button lol" icon="pi pi-share-alt"
-                                            *ngIf="isNotManualLevel()" (click)="openShareAccountsModal()"
-                                            [ngClass]="{'hide':showShare}"></button>
+                                            <button pButton pRipple label="Share"
+                                                class="share btn transparent-button lol" icon="pi pi-share-alt"
+                                                *ngIf="isNotManualLevel()" (click)="openShareAccountsModal()"
+                                                [ngClass]="{'hide':showShare}"></button>
 
-                                        <button pButton pRipple label="Sync" *ngIf="isNotManualLevel()"
-                                            class="sync btn" icon="pi pi-sync" (click)="syncAccount()"
-                                            [loading]="btnLoader" [disabled]="isSync == false"></button>
+                                            <button pButton pRipple label="Sync" *ngIf="isNotManualLevel()"
+                                                class="sync btn" icon="pi pi-sync" (click)="syncAccount()"
+                                                [loading]="btnLoader" [disabled]="isSync == false"></button>
 
 
-                                    </div>
+                                        </div>
 
 
                                         <div class="d-flex"
@@ -146,7 +145,6 @@
                                     class="col-sm-2 col-form-label col-form-label-sm label-form">{{l("Account Logo")}}
                                 </label>
                                 <app-image-upload [sycAttachmentCategory]="sycAttachmentCategoryLogo"
-                                 
                                     [image]="companyLogo" [staticWidth]="170" [showGuidelines]="true"
                                     (imageBrowseDone)="imageBrowseDone($event, sycAttachmentCategoryLogo, -1)"
                                     (removeImage)="removeImage($event,sycAttachmentCategoryLogo,-1)">
@@ -154,11 +152,10 @@
                             </div>
 
                             <div class="form-group row " *ngIf='personalAccount && Editting'>
-                                <label
-                                    class="col-sm-2 col-form-label col-form-label-sm label-form">{{l("Account Cover")}}
+                                <label class="col-sm-2 col-form-label col-form-label-sm label-form">{{l("Account
+                                    Cover")}}
                                 </label>
                                 <app-image-upload [sycAttachmentCategory]="sycAttachmentCategoryBanner"
-                                  
                                     [image]="coverPhoto" [staticHeight]="120" [showGuidelines]="true"
                                     (imageBrowseDone)="imageBrowseDone($event, sycAttachmentCategoryBanner, -2)"
                                     (removeImage)="removeImage($event,sycAttachmentCategoryBanner,-2)">
@@ -166,7 +163,7 @@
 
                             </div>
 
-                            
+
                             <hr class="header" *ngIf="!personalAccount">
                             <div class="row mx-1" *ngIf="!personalAccount">
                                 <div class="col-md-12">
@@ -429,7 +426,7 @@
 
                             <div class="col-md-12 align-items-baseline pt-2 pb-2 pl-3">
                                 <h6 class=" font-weight-bold mr-3" [ngClass]="Editting ? 'addWidth':''"><img
-                                        src="../../assets/img/input_icons/user.png" class=""> {{ ( "First Name" |
+                                        src="../../assets/img/input_icons/user.png" class="" style="width: 25px;"> {{ ( "First Name" |
                                     localize ) + " :"}}</h6>
 
                                 <p *ngIf="!editFirstNameValue" class="text-left" style="color: #595959;"
@@ -448,8 +445,8 @@
                             <hr class="header">
                             <div class="col-md-12 align-items-baseline pt-2 pb-2 pl-3">
                                 <h6 class="text-right font-weight-bold mr-3 "><img
-                                        src="../../assets/img/input_icons/user.png" class=""> {{ ( "Sur Name" |
-                                    localize ) + " :" }}</h6>
+                                        src="../../assets/img/input_icons/user.png" class="" style="width: 25px;"> {{ (languageSettingName === 'en-GB' ? 'Sur Name' : 'Last Name') | localize }} :
+                                    </h6>
 
                                 <p *ngIf="!editLastNameValue" class="text-left" style="color: #595959;"
                                     [ngClass]="{'hide':NoteditInfo}">{{contactData?.lastName}}</p>
@@ -487,7 +484,7 @@
                             <hr class="header">
                             <div class="col-md-12  align-items-baseline pt-2 pb-2  pl-3 d-flex">
                                 <h6 class="font-weight-bold mr-3  " [ngClass]="Editting ? 'addWidth':''"><img
-                                        src="../../assets/img/input_icons/letter.png" class="">{{ ( "Email" |
+                                        src="../../assets/img/input_icons/letter.png" style="width: 30px;" class="">{{ ( "Email" |
                                     localize ) + " :" }}</h6>
 
                                 <p *ngIf="!editEMailAddressValue" class="text-left" style="color: #595959;"
@@ -519,7 +516,7 @@
                             <hr class="header">
                             <div class="col-md-12  align-items-baseline pt-2 pb-2 pl-3 d-flex">
                                 <h6 class="text-right font-weight-bold mr-3 "> <img
-                                        src="../../assets/img/input_icons/language.png" style="margin-right: 15px;"> {{
+                                        src="../../assets/img/input_icons/language.png" > {{
                                     ( "Language" |
                                     localize ) + " :" }}</h6>
 
@@ -536,12 +533,27 @@
                             </div>
 
                             <hr class="header">
-                            <div class="col-md-12  align-items-baseline pt-2 pb-2 pl-3 d-flex">
-                                <h6 class=" font-weight-bold mr-3 " [ngClass]="Editting ? 'addWidth':''">
+                            <div class="col-md-12  align-items-center pt-2 pb-2 pl-3 d-flex">
+                                <h6 class="font-weight-bold mr-3 d-flex align-items-center" [ngClass]="Editting ? 'addWidth':''">
                                     <img src="../../assets/img/input_icons/phone.png" class="">
-                                    {{ ( "Phone" |
-                                    localize ) + " :" }}
-                                </h6>
+                                  
+                                    <!-- VIEW -->
+                                    <span *ngIf="!Editting">
+                                      {{ (contactData?.phone1TypeName || l("Phone1")) + " :" }}
+                                    </span>
+                                  
+                                    <!-- EDIT -->
+                                    <p-dropdown *ngIf="Editting"
+                                        [options]="allPhoneTypes"
+                                        optionLabel="label"
+                                        optionValue="value"
+                                        name="phone1TypeId"
+                                        [(ngModel)]="editPhone1TypeId"
+                                        styleClass="form-control aria-select"
+                                        [placeholder]="'Select' | localize">
+                                    </p-dropdown>
+                                  </h6>
+                                  
 
                                 <p *ngIf="!editPhoneNumberValue" class="text-left" style="color: #595959;"
                                     [ngClass]="{'hide':NoteditInfo}">{{contactData?.phone1Number}}</p>
@@ -567,6 +579,108 @@
                                         [(ngModel)]="contactData.phone1IsPublic"></p-inputSwitch>
                                 </div>
                             </div>
+
+                            <hr class="header">
+
+                            <div class="col-md-12 align-items-center pt-2 pb-2 pl-3 d-flex">
+                                <h6 class="font-weight-bold mr-3  d-flex align-items-center" [ngClass]="Editting ? 'addWidth':''">
+                                    <img src="../../assets/img/input_icons/phone.png" class="">
+                                  
+                                    <span *ngIf="!Editting">
+                                      {{ (contactData?.phone2TypeName || l("Phone2")) + " :" }}
+                                    </span>
+                                  
+                                    <p-dropdown *ngIf="Editting"
+                                        [options]="allPhoneTypes"
+                                        optionLabel="label"
+                                        optionValue="value"
+                                        name="phone2TypeId"
+                                        [(ngModel)]="editPhone2TypeId"
+                                        styleClass="form-control aria-select"
+                                        [placeholder]="'Select' | localize">
+                                    </p-dropdown>
+                                  </h6>
+                                  
+
+                                <!-- view -->
+                                <p *ngIf="!editPhone2NumberValue" class="text-left" style="color:#595959;"
+                                    [ngClass]="{'hide':NoteditInfo}">{{contactData?.phone2Number}}</p>
+
+                                <p *ngIf="editPhone2NumberValue" class="text-left" style="color:#595959;"
+                                    [ngClass]="{'hide':NoteditInfo}">{{editPhone2NumberValue}}</p>
+
+                                <!-- edit -->
+                                <input style="color:#595959 !important;" type="text"
+                                    class="form-control form-control-sm aria-input-text" name="phone2Number"
+                                    #phone2NumberInput="ngModel" [(ngModel)]="editPhone2NumberValue"
+                                    [pattern]="phonePattern" [placeholder]="'Please Enter phone Number' | localize"
+                                    [class.hide]="editInfo">
+
+                                <!-- validation -->
+                                <div *ngIf="editPhone2NumberValue && phone2NumberInput.errors && (phone2NumberInput.touched || phone2NumberInput.dirty) && NoteditInfo"
+                                    class="text-danger">
+                                    <small>Invalid Phone</small>
+                                </div>
+
+                                <!-- is public -->
+                                <div class="d-flex align-items-center ml-3" *ngIf="contactData && Editting">
+                                    <span class="mr-3 isPublic">{{ "IsPublic" | localize }}</span>
+                                    <p-inputSwitch name="phone2IsPublic"
+                                        [(ngModel)]="contactData.phone2IsPublic"></p-inputSwitch>
+                                </div>
+                            </div>
+
+
+                            <hr class="header">
+
+                            <div class="col-md-12 align-items-center pt-2 pb-2 pl-3 d-flex">
+                                <h6 class="font-weight-bold mr-3  d-flex align-items-center" [ngClass]="Editting ? 'addWidth':''">
+                                    <img src="../../assets/img/input_icons/phone.png" class="">
+                                  
+                                    <span *ngIf="!Editting">
+                                      {{ (contactData?.phone3TypeName || l("Phone3")) + " :" }}
+                                    </span>
+                                  
+                                    <p-dropdown *ngIf="Editting"
+                                        [options]="allPhoneTypes"
+                                        optionLabel="label"
+                                        optionValue="value"
+                                        name="phone3TypeId"
+                                        [(ngModel)]="editPhone3TypeId"
+                                        styleClass="form-control aria-select"
+                                        [placeholder]="'Select' | localize">
+                                    </p-dropdown>
+                                  </h6>
+                                  
+
+                                <!-- view -->
+                                <p *ngIf="!editPhone3NumberValue" class="text-left" style="color:#595959;"
+                                    [ngClass]="{'hide':NoteditInfo}">{{contactData?.phone3Number}}</p>
+
+                                <p *ngIf="editPhone3NumberValue" class="text-left" style="color:#595959;"
+                                    [ngClass]="{'hide':NoteditInfo}">{{editPhone3NumberValue}}</p>
+
+                                <!-- edit -->
+                                <input style="color:#595959 !important;" type="text"
+                                    class="form-control form-control-sm aria-input-text" name="phone3Number"
+                                    #phone3NumberInput="ngModel" [(ngModel)]="editPhone3NumberValue"
+                                    [pattern]="phonePattern" [placeholder]="'Please Enter phone Number' | localize"
+                                    [class.hide]="editInfo">
+
+                                <!-- validation -->
+                                <div *ngIf="editPhone3NumberValue && phone3NumberInput.errors && (phone3NumberInput.touched || phone3NumberInput.dirty) && NoteditInfo"
+                                    class="text-danger">
+                                    <small>Invalid Phone</small>
+                                </div>
+
+                                <!-- is public -->
+                                <div class="d-flex align-items-center ml-3" *ngIf="contactData && Editting">
+                                    <span class="mr-3 isPublic">{{ "IsPublic" | localize }}</span>
+                                    <p-inputSwitch name="phone3IsPublic"
+                                        [(ngModel)]="contactData.phone3IsPublic"></p-inputSwitch>
+                                </div>
+                            </div>
+
 
                         </div>
 
