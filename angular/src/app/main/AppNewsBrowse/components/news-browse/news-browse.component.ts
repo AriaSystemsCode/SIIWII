@@ -98,6 +98,7 @@ export class NewsBrowseComponent extends AppComponentBase {
             search :[],
             filterType:[],
             sorting:[],
+            dateRange: [null]
         })
     }
 
@@ -225,6 +226,7 @@ export class NewsBrowseComponent extends AppComponentBase {
         this.subscribeToFiltersChangeAndApplyFilteration();
         this.defineSortingOptions();
         this.fillFormFilters()
+        this.bindDateRangeToStartEnd();
         this.setMainPageFilter(this.defaultMainFilter)
         this.setDefaultSorting(this.sortingOptions[0].value)
     }
@@ -647,4 +649,33 @@ export class NewsBrowseComponent extends AppComponentBase {
         this.fromViewEvent=false;
         this.relatedEntityId=0;
     }
+
+    private bindDateRangeToStartEnd() {
+        const dateRangeCtrl = this.filterForm.get('dateRange');
+        if (!dateRangeCtrl) return;
+      
+        const sub = dateRangeCtrl.valueChanges.subscribe((range: Date[]) => {
+          const start = range?.[0] ?? undefined;
+          const end = range?.[1] ?? undefined;
+      
+          if (this.filterForm.get('startDate')) {
+            this.filterForm.get('startDate')!.setValue(start, { emitEvent: false });
+          }
+          if (this.filterForm.get('endDate')) {
+            this.filterForm.get('endDate')!.setValue(end, { emitEvent: false });
+          }
+        });
+      
+        this.subscriptions.push(sub);
+      }
+
+      filtersDialogVisible = false;
+
+openFiltersDialog() {
+  this.filtersDialogVisible = true;
+}
+
+closeFiltersDialog() {
+  this.filtersDialogVisible = false;
+}
 }

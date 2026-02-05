@@ -7,7 +7,7 @@
           *ngIf="loading"
         >
           <div class="spinner-border" role="status">
-            <span class="sr-only">{{'Loading' | localize}}...</span>
+            <span class="sr-only">{{'LoadWithThreeDot' | localize}}...</span>
           </div>
         </div>
 
@@ -160,7 +160,7 @@
                                             *ngIf="showData && accounts.length == 0 && !loading">
                                             <img src="../../assets/placeholders/fluent_alert.png" class="mr-2" alt=""
                                                 srcset="">
-                                            {{ "There is no data to show......" | localize }}
+                                            {{ "NoDataFound | localize }}
                                         </div>
 
                                         <div class="  mt-5 p-5 text-center w-100"

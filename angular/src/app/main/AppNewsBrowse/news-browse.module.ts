@@ -17,10 +17,10 @@ import { NewsBrowseActionsMenuComponent } from './components/news-browse-actions
 import { FiltersSharedModule } from '@app/shared/filters-shared/filters-shared.module';
 import { eventsModule } from '../AppEvent/events.module';
 import { BsDatepickerModule } from 'ngx-bootstrap/datepicker';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { PostsModule } from '../posts/posts.module';
+import { CalendarModule } from 'primeng/calendar';
 
-
+import { DialogModule } from 'primeng/dialog';
 
 @NgModule({
     declarations: [
@@ -44,7 +44,9 @@ import { PostsModule } from '../posts/posts.module';
         FiltersSharedModule,
         eventsModule,
         BsDatepickerModule.forRoot(),
-        PostsModule
+        PostsModule,
+        CalendarModule,
+        DialogModule
     ],
     exports:[
         NewsBrowseComponent

@@ -6,7 +6,7 @@
                     <div class="containerClass d-flex justify-content-between w-100 px-4">
                         <div class="kt-subheader__main">
                             <h2 class="text-black">
-                                <span>{{l("My Account")}}</span>
+                                <span>{{l("MyAccount")}}</span>
                             </h2>
                             <span class="kt-subheader__separator kt-subheader__separator--v"></span>
 
@@ -143,7 +143,7 @@
 
                             <div class="form-group row mt-2" *ngIf='personalAccount && Editting'>
                                 <label for="colFormLabelSm"
-                                    class="col-sm-2 col-form-label col-form-label-sm label-form">{{l("Account Logo")}}
+                                    class="col-sm-2 col-form-label col-form-label-sm label-form">{{l("AccountLogo")}}
                                 </label>
                                 <app-image-upload [sycAttachmentCategory]="sycAttachmentCategoryLogo"
                                  
@@ -155,7 +155,7 @@
 
                             <div class="form-group row " *ngIf='personalAccount && Editting'>
                                 <label
-                                    class="col-sm-2 col-form-label col-form-label-sm label-form">{{l("Account Cover")}}
+                                    class="col-sm-2 col-form-label col-form-label-sm label-form">{{l("AccountCover")}}
                                 </label>
                                 <app-image-upload [sycAttachmentCategory]="sycAttachmentCategoryBanner"
                                   
@@ -250,7 +250,7 @@
                             </div>
 
                             <div class="col-4" *ngIf="accountData && accountData.code">
-                                <p class="title-dev-slider text-left">{{"Account Code" | localize}}</p>
+                                <p class="title-dev-slider text-left">{{"AccountCode" | localize}}</p>
                             </div>
                         </div>
 
@@ -308,11 +308,11 @@
 
                         <div class="row p-28">
                             <div class="col-4" *ngIf="accountData && accountData.shipViaName">
-                                <p class="title-dev-slider text-left pl-5">{{"Ship Via" | localize}}</p>
+                                <p class="title-dev-slider text-left pl-5">{{"ShipVia" | localize}}</p>
                             </div>
 
                             <div class="col-4" *ngIf="accountData && accountData.paymentTermsName">
-                                <p class="title-dev-slider text-left">{{"Payment Terms" | localize}}</p>
+                                <p class="title-dev-slider text-left">{{"PaymentTerms" | localize}}</p>
                             </div>
                         </div>
 
@@ -429,7 +429,7 @@
 
                             <div class="col-md-12 align-items-baseline pt-2 pb-2 pl-3">
                                 <h6 class=" font-weight-bold mr-3" [ngClass]="Editting ? 'addWidth':''"><img
-                                        src="../../assets/img/input_icons/user.png" class=""> {{ ( "First Name" |
+                                        src="../../assets/img/input_icons/user.png" class=""> {{ ( "FirstName" |
                                     localize ) + " :"}}</h6>
 
                                 <p *ngIf="!editFirstNameValue" class="text-left" style="color: #595959;"
@@ -448,7 +448,7 @@
                             <hr class="header">
                             <div class="col-md-12 align-items-baseline pt-2 pb-2 pl-3">
                                 <h6 class="text-right font-weight-bold mr-3 "><img
-                                        src="../../assets/img/input_icons/user.png" class=""> {{ ( "Sur Name" |
+                                        src="../../assets/img/input_icons/user.png" class=""> {{ ( "LastName" |
                                     localize ) + " :" }}</h6>
 
                                 <p *ngIf="!editLastNameValue" class="text-left" style="color: #595959;"

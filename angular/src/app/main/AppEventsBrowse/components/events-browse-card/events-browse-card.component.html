@@ -56,7 +56,7 @@
             <div class="stat">
               <div class="stat-head">
                 <i class="fas fa-users stat-ico"></i>
-                <span class="stat-title">{{ 'Attendees:' | localize }}</span>
+                <span class="stat-title">{{ 'Attendees' | localize }}:</span>
               </div>
               <div class="stat-sub">
                 {{ item.appEvent.guestsCount || 0 }} {{ 'attendees' | localize }}
@@ -69,16 +69,16 @@
             <div class="stat">
               <div class="stat-head">
                 <i class="fas fa-map-marker-alt stat-ico"></i>
-                <span class="stat-title">{{ 'Location:' | localize }}</span>
+                <span class="stat-title">{{ 'Location' | localize }}:</span>
               </div>
           
               <div class="stat-sub">
                 <ng-container *ngIf="item?.appEvent?.isOnLine; else inPersonLoc">
-                  {{ 'is OnLine' | localize }}
+                  {{ 'OnLine' | localize }}
                 </ng-container>
           
                 <ng-template #inPersonLoc>
-                  {{'In Person'| localize }}
+                  {{'InPerson'| localize }}
                 </ng-template>
               </div>
             </div>
@@ -138,7 +138,7 @@
           <div class="meta-item">
             <img src="../../../../../assets/events/tabler_calendar-stats.png" class="meta-img" />
             <div class="meta-text">
-              <div class="meta-label">{{ 'Start date :' | localize }}</div>
+              <div class="meta-label">{{ 'StartDate' | localize }}:</div>
               <div class="meta-value">
                 {{ item.appEvent.fromDate?.toString() | date:'dd MMMM, yyyy' }},
                 {{ item.appEvent.fromTime?.toString() | date:'h:mm a' }}
@@ -149,7 +149,7 @@
           <div class="meta-item">
             <div class="meta-sep"></div>
             <div class="meta-text">
-              <div class="meta-label">{{ 'End date :' | localize }}</div>
+              <div class="meta-label">{{ 'EndDate' | localize }}:</div>
               <div class="meta-value">
                 {{ item.appEvent.toDate?.toString() | date:'dd MMMM, yyyy' }},
                 {{ item.appEvent.toTime?.toString() | date:'h:mm a' }}
@@ -165,7 +165,7 @@
               class="meta-img"
             />
             <div class="meta-text">
-              <div class="meta-label">{{ 'Created by :' | localize }}</div>
+              <div class="meta-label">{{ 'CreatedBy' | localize }}:</div>
               <div class="creator-pill">
                 <img
                   class="creator-avatar"
@@ -181,13 +181,13 @@
         <div class="info-boxes">
           <div class="info-box">
             <img src="../../../../../assets/events/fluent_guest-add-24-filled.png" class="info-ico" />
-            <span class="info-label">{{ 'Attendees :' | localize }}</span>
+            <span class="info-label">{{ 'Attendees' | localize }}:</span>
             <span class="info-muted">{{ item.appEvent.guestsCount }} {{ 'attendees' | localize }}</span>
           </div>
 
           <div class="info-box">
             <img src="../../../../../assets/events/carbon_location-company.png" class="info-ico" />
-            <span class="info-label">{{ 'Location :' | localize }}</span>
+            <span class="info-label">{{ 'Location' | localize }}:</span>
             <span class="info-muted">
               <ng-container *ngIf="eventAddress?.includes('online'); else locShort">
                 {{ eventAddress }}
@@ -221,14 +221,14 @@
                     </svg>
                     <div>
                         <div class="ov-line">
-                            <span class="ov-label">{{ 'Start:' | localize }}</span>
+                            <span class="ov-label">{{ 'Start' | localize }}:</span>
                             <span class="ov-value">
                               {{ item.appEvent.fromDate?.toString() | date:'dd MMM, yyyy' }} {{ item.appEvent.fromTime?.toString() | date:'h:mm a' }}
                             </span>
                           </div>
               
                           <div class="ov-line">
-                            <span class="ov-label">{{ 'End:' | localize }}</span>
+                            <span class="ov-label">{{ 'End' | localize }}:</span>
                             <span class="ov-value">
                               {{ item.appEvent.toDate?.toString() | date:'dd MMM, yyyy' }} {{ item.appEvent.toTime?.toString() | date:'h:mm a' }}
                             </span>
@@ -248,7 +248,7 @@
                     </defs>
                     </svg>
                     <div class="ov-line-pf">
-                        <span class="ov-label">{{ 'By :' | localize }}</span>
+                        <span class="ov-label">{{ 'By' | localize }}:</span>
                         <span class="ov-value-pf"> <img [src]="profilePicture
                           ? profilePicture
                           : '../../../../../assets/placeholders/appitem-placeholder.png'" alt="" srcset="" class="cv-img mx-1"> {{ item.appEvent.userName }}</span>

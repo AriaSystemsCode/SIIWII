@@ -38,12 +38,29 @@ export class NewsBrowseFiltersComponent extends AppComponentBase implements OnIn
         super(injector)
     }
 
+    // ngOnInit(): void {
+    //     this.timeZonesFilterMetaData = new FilterMetaData<DisplayNameValueDto[]>({list : []})
+    //     this.publishStatusFilterMetaData = new FilterMetaData<SelectItem[]>({list : []})
+    //     this.eventTypeStatusFilterMetaData = new FilterMetaData<SelectItem[]>({list : []})
+    // }
     ngOnInit(): void {
-        this.timeZonesFilterMetaData = new FilterMetaData<DisplayNameValueDto[]>({list : []})
-        this.publishStatusFilterMetaData = new FilterMetaData<SelectItem[]>({list : []})
-        this.eventTypeStatusFilterMetaData = new FilterMetaData<SelectItem[]>({list : []})
-    }
-
+        this.timeZonesFilterMetaData = new FilterMetaData<DisplayNameValueDto[]>({ list: [] });
+        this.publishStatusFilterMetaData = new FilterMetaData<SelectItem[]>({ list: [] });
+        this.eventTypeStatusFilterMetaData = new FilterMetaData<SelectItem[]>({ list: [] });
+      
+   
+        if (this.filterForm?.get('dateRange')) {
+          const sub = this.filterForm.get('dateRange')!.valueChanges.subscribe((range: Date[]) => {
+            const start = range?.[0] ?? null;
+            const end = range?.[1] ?? null;
+ 
+            if (this.filterForm.get('startDate')) this.filterForm.get('startDate')!.setValue(start, { emitEvent: false });
+            if (this.filterForm.get('endDate')) this.filterForm.get('endDate')!.setValue(end, { emitEvent: false });
+          });
+      
+          this.subscriptions.push(sub);
+        }
+      }
     ngOnChanges(){
         if(this.mainFilterCtrl){
 

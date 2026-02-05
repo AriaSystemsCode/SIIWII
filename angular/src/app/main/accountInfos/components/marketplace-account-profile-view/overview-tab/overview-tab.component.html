@@ -1,7 +1,7 @@
 <div class="d-flex flex-lg-row flex-md-row flex-column" style="gap: 5px;">
   <div class="col-lg-3 col-md-5 co-12 p-0">
     <div class="sec-data mb-2 p-3">
-      <h4 class="mb-0">{{'Profile information' | localize}}</h4>
+      <h4 class="mb-0">{{'ProfileInformation' | localize}}</h4>
       <hr class="hr">
 
       <div class="sidebar-item-data">
@@ -57,7 +57,7 @@
                 fill="#777777" />
             </svg>
 
-            {{'Head Quarter' | localize}} :
+            {{'Headquarters' | localize}} :
           </div>
           <div class="col-8 row-item-desc">
             <p class="title-account mb-0 ml-2">
@@ -104,7 +104,7 @@
             </svg>
 
 
-            {{'Bussiness Classification' | localize}} :
+            {{'BussinessClassification' | localize}} :
           </div>
           <div class="d-flex py-1 flex-wrap">
             <div *ngFor="let class of accountDataForView?.classfications">
@@ -164,9 +164,9 @@
 
     <div class="sec-data mb-2 p-2">
       <div class="d-flex justify-content-between align-items-center">
-        <h4 class="mt-1 mb-0">{{'Overall Rating' | localize}}</h4>
+        <h4 class="mt-1 mb-0">{{'OverallRating' | localize}}</h4>
         <button class="all-btn d-flex">
-          <p class="m-auto" (click)=" goReviews() ">{{'See All' | localize}}</p>
+          <p class="m-auto" (click)=" goReviews() ">{{'Seeall' | localize}}</p>
         </button>
 
       </div>
@@ -180,7 +180,7 @@
         <button
           (click)="accountDataForView?.accountType == 'BUSINESS'?  activeTabIndexBtn.emit(5) : activeTabIndexBtn.emit(4) "
           class="all-btn d-flex">
-          <p class="m-auto">{{'See All' | localize}}</p>
+          <p class="m-auto">{{'Seeall' | localize}}</p>
         </button>
 
       </div>
@@ -193,7 +193,7 @@
           *ngIf="isLoading"
         >
           <div class="spinner-border" role="status">
-            <span class="sr-only">{{'Loading' | localize}}...</span>
+            <span class="sr-only">{{'LoadWithThreeDot' | localize}}</span>
           </div>
         </div>
         <ng-container *ngFor="let item of mediaItems; let i = index">
@@ -221,7 +221,7 @@
 
       <p *ngIf="mediaItems?.length ==0" class="text-center">
         <img src="../../assets/placeholders/fluent_alert.png" class="mr-2" alt="" srcset="">
-        <span class="noDataTxt">{{'There is no data to show' | localize}} ....</span>
+        <span class="noDataTxt">{{'NoDataFound...' | localize}} </span>
       </p>
     </div>
     <p-dialog *ngIf="mediaItems?.length > 0" [(visible)]="isModalOpen" [modal]="true" [style]="{ width: '656px' }"
@@ -250,11 +250,11 @@
 
     <div class="sec-data mb-2 p-2">
       <div class="d-flex justify-content-between align-items-center">
-        <h4 class="mt-1 mb-0">{{'Recent Events' | localize}}</h4>
+        <h4 class="mt-1 mb-0">{{'RecentEvents' | localize}}</h4>
         <button
           (click)="accountDataForView?.accountType == 'BUSINESS'?  activeTabIndexBtn.emit(4) : activeTabIndexBtn.emit(3) "
           class="all-btn d-flex">
-          <p class="m-auto">{{'See All' | localize}}</p>
+          <p class="m-auto">{{'Seeall' | localize}}</p>
         </button>
 
       </div>
@@ -275,7 +275,7 @@
         <button
           (click)="accountDataForView?.accountType == 'BUSINESS'?  activeTabIndexBtn.emit(2) : activeTabIndexBtn.emit(1) "
           class="all-btn d-flex">
-          <p class="m-auto">{{'See All' | localize}}</p>
+          <p class="m-auto">{{'Seeall' | localize}}</p>
         </button>
 
       </div>
@@ -293,15 +293,15 @@
       <div class="d-flex justify-content-between">
         <h4 class="">{{'Products' | localize}}</h4>
         <button (click)="activeTabIndexBtn.emit(1) " class="all-btn d-flex">
-          <p class="m-auto">{{'See All' | localize}}</p>
+          <p class="m-auto">{{'Seeall' | localize}}</p>
         </button>
 
       </div>
       <hr class="hr">
       <div class="d-flex justify-content-between">
-        <h4 class="" style="font-size: 14px;">{{'For full viewing of' | localize}} {{ "''"+ accountDataForView?.name + "''"}}</h4>
+        <h4 class="" style="font-size: 14px;">{{'ForFullViewingOf' | localize}} {{ "''"+ accountDataForView?.name + "''"}}</h4>
         <button   (click)="goSvR($event)" class="vist-btn d-flex">
-          <p class="m-auto">{{'Visit Virtual Showroom' | localize}}</p>
+          <p class="m-auto">{{'VisitVirtualShowroom' | localize}}</p>
         </button>
 
       </div>
@@ -324,7 +324,7 @@
         <!-- Show when there are no items -->
         <p *ngIf="items?.length === 0 " class="text-center mx-auto mt-5 py-5">
           <img src="../../../../../../assets/placeholders/fluent_alert.png" class="mr-2" alt="No Data">
-          <span class="noDataTxt">{{'There is no data to show' | localize}} ....</span>
+          <span class="noDataTxt">{{'NoDataFound...' | localize}}</span>
         </p>
     </div>
 
@@ -332,11 +332,11 @@
 
     <div class="mb-2 right-sec p-2">
       <div class="d-flex justify-content-between">
-        <h4 class="">{{'Recent posts' | localize}}</h4>
+        <h4 class="">{{'RecentPosts' | localize}}</h4>
         <button
           (click)="accountDataForView?.accountType == 'BUSINESS'?  activeTabIndexBtn.emit(3) : activeTabIndexBtn.emit(2) "
           class="all-btn d-flex">
-          <p class="m-auto">{{'See All' | localize}}</p>
+          <p class="m-auto">{{'Seeall' | localize}}</p>
         </button>
 
       </div>
@@ -349,7 +349,7 @@
       <div class="d-flex justify-content-between">
         <h4 class="">{{'Reviews' | localize}}</h4>
         <button class="all-btn d-flex">
-          <p class="m-auto">{{'See All' | localize}}</p>
+          <p class="m-auto">{{'Seeall' | localize}}</p>
         </button>
 
       </div>
