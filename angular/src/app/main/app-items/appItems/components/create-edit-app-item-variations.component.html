@@ -757,7 +757,7 @@
                                                         <div class="text-center mb-3">
                                                             <i class="fa-photo-video fas bg-transparent text-white fa-3x" ></i>
                                                         </div>
-                                                        <div class="text-center" *ngIf="isImageFile(activeAttachmentOption?.entityAttachments[i]?.fileName)">
+                                                        <div class="text-center" *ngIf="isImageFile(activeAttachmentOption?.entityAttachments[getAttachRealIndex(i)]?.fileName)">
                                                             <button type="button" class="btn btn-dark text-white border-lg border-white" (click)="openImageViewer(attachment)">
                                                                 {{ "ImagePreview" | localize }}
                                                             </button>
@@ -771,24 +771,24 @@
                                                     [ngClass]="{'imgBorder' : activeAttachmentOption.defaultImageIndex == i}"
     /> -->
 
-    <img *ngIf="isImageFile(activeAttachmentOption?.entityAttachments[i]?.fileName)"
+    <img *ngIf="isImageFile(activeAttachmentOption?.entityAttachments[getAttachRealIndex(i)]?.fileName)"
     [src]="attachment"  class="w-75" 
     [ngClass]="{'imgBorder' : activeAttachmentOption.defaultImageIndex == i}"
 />
 
-<img *ngIf="isVideoFile(activeAttachmentOption?.entityAttachments[i]?.fileName)"
+<img *ngIf="isVideoFile(activeAttachmentOption?.entityAttachments[getAttachRealIndex(i)]?.fileName)"
     src="../../../../../assets/Items/video-Icon.png"  class="w-75" 
     [ngClass]="{'imgBorder' : activeAttachmentOption.defaultImageIndex == i}"
 />
 
-<img *ngIf="isPdfFile(activeAttachmentOption?.entityAttachments[i]?.fileName)"
+<img *ngIf="isPdfFile(activeAttachmentOption?.entityAttachments[getAttachRealIndex(i)]?.fileName)"
     src="../../../../../assets/Items/pdf-Icon.png"  class="w-75" 
     [ngClass]="{'imgBorder' : activeAttachmentOption.defaultImageIndex == i}"
 />
 
     
 <!-- [ngClass]="{'d-block' : activeAttachmentOption.defaultImageIndex == i}" -->
-                                                    <a  *ngIf="isImageFile(activeAttachmentOption?.entityAttachments[i]?.fileName)"
+                                                    <a  *ngIf="isImageFile(activeAttachmentOption?.entityAttachments[getAttachRealIndex(i)]?.fileName)"
                                                     class="select-default-image d-block p-2 col-12 text-center"   style="    color: #4A0D4A !important;
                                                     border: 1px solid #EEEEEEEE !important;
                                                     border-radius: 12px;" (click)="setDefaultImage(i)">

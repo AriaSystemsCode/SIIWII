@@ -536,7 +536,7 @@ top: 4px;">
 
                                     <td *ngIf="((productData?.showInOutStockFlag == 'ItemColorSizeLevel' || productData?.showInOutStockFlag == 'Bothlevels') && size.stockAvailability >0 ) && productData?.showStockAvailability != 'No'" class="text-success">In Stock</td>
 
-                                    <td *ngIf="((productData?.showInOutStockFlag != 'ItemColorSizeLevel' && productData?.showInOutStockFlag != 'Bothlevels' &&  productData?.showInOutStockFlag != 'ItemColorlevel') ||  productData?.showInOutStockFlag == 'ItemColorlevel') && productData?.showStockAvailability != 'No'">{{  size.stockAvailability  }}</td>
+                                    <td *ngIf="((productData?.showInOutStockFlag != 'ItemColorSizeLevel' && productData?.showInOutStockFlag != 'Bothlevels' ) ) && productData?.showStockAvailability != 'No'">{{  size.stockAvailability  }}</td>
                                     <td>
                                         <p-inputNumber [(ngModel)]="size.orderedQty" mode="decimal" [showButtons]="true" [disabled]="!isAuthenticated"
                                             inputId="minmax-buttons" [min]="0" (ngModelChange)="
@@ -603,7 +603,7 @@ top: 4px;">
                                     class="table text-center table-bordered table-white">
                                     <thead>
                                         <tr>
-                                            <th scope="col">
+                                            <th scope="col" *ngIf="productData?.showStockAvailability != 'No'">
                                                 Available Prepacks
                                             </th>
                                             <th scope="col">Ordered</th>
@@ -612,9 +612,9 @@ top: 4px;">
                                     <tbody
                                         *ngIf="filteredColors?.length > 0 && filteredColors[currentIndex]?.sizes?.length > 0">
                                         <tr>
-                                            <td *ngIf="(productData?.showInOutStockFlag == 'ItemColorSizeLevel' || productData?.showInOutStockFlag == 'Bothlevels' ) &&  filteredColors[currentIndex]?.sizes[0]?.noOfAvailablePrepacks >0" class="text-success">In Stock</td>
-                                            <td *ngIf="(productData?.showInOutStockFlag == 'ItemColorSizeLevel' || productData?.showInOutStockFlag == 'Bothlevels' ) &&  filteredColors[currentIndex]?.sizes[0]?.noOfAvailablePrepacks ==0" class="text-danger">Out Of Stock</td>
-                                            <td *ngIf="(productData?.showInOutStockFlag != 'ItemColorSizeLevel' || productData?.showInOutStockFlag != 'Bothlevels' ) ">
+                                            <td *ngIf="(productData?.showInOutStockFlag == 'ItemColorSizeLevel' || productData?.showInOutStockFlag == 'Bothlevels' ) &&  filteredColors[currentIndex]?.sizes[0]?.noOfAvailablePrepacks >0 && productData?.showStockAvailability != 'No'" class="text-success">In Stock</td>
+                                            <td *ngIf="(productData?.showInOutStockFlag == 'ItemColorSizeLevel' || productData?.showInOutStockFlag == 'Bothlevels' ) &&  filteredColors[currentIndex]?.sizes[0]?.noOfAvailablePrepacks ==0 && productData?.showStockAvailability != 'No'" class="text-danger">Out Of Stock</td>
+                                            <td *ngIf="(productData?.showInOutStockFlag != 'ItemColorSizeLevel' && productData?.showInOutStockFlag != 'Bothlevels' ) && productData?.showStockAvailability != 'No'">
                                                 {{
                                                 filteredColors[currentIndex]?.sizes[0]?.noOfAvailablePrepacks
                                                 }}
@@ -662,7 +662,7 @@ top: 4px;">
 
                                             <td *ngIf="((productData?.showInOutStockFlag == 'ItemColorSizeLevel' || productData?.showInOutStockFlag == 'Bothlevels') && size.stockAvailability >0) && productData?.showStockAvailability != 'No'" class="text-success">In Stock</td>
 
-                                            <td *ngIf="((productData?.showInOutStockFlag != 'ItemColorSizeLevel' && productData?.showInOutStockFlag != 'Bothlevels' &&  productData?.showInOutStockFlag != 'ItemColorlevel') ||  productData?.showInOutStockFlag == 'ItemColorlevel') && productData?.showStockAvailability != 'No'">{{  size.stockAvailability  }}</td>
+                                            <td *ngIf="((productData?.showInOutStockFlag != 'ItemColorSizeLevel' && productData?.showInOutStockFlag != 'Bothlevels') ||  productData?.showInOutStockFlag == 'ItemColorlevel') && productData?.showStockAvailability != 'No'">{{  size.stockAvailability  }}</td>
                                             <td
                                                 *ngIf="filteredColors?.length > 0 && filteredColors[currentIndex]?.sizes?.length > 0">
 
@@ -1392,7 +1392,7 @@ top: 4px;">
 
                                             <td *ngIf="((productData?.showInOutStockFlag == 'ItemColorSizeLevel' || productData?.showInOutStockFlag == 'Bothlevels') && size.stockAvailability >0 ) && productData?.showStockAvailability != 'No'" class="text-success">In Stock</td>
 
-                                            <td *ngIf="((productData?.showInOutStockFlag != 'ItemColorSizeLevel' && productData?.showInOutStockFlag != 'Bothlevels' &&  productData?.showInOutStockFlag != 'ItemColorlevel') ||  productData?.showInOutStockFlag == 'ItemColorlevel') && productData?.showStockAvailability != 'No'">{{  size.stockAvailability  }}</td>
+                                            <td *ngIf="((productData?.showInOutStockFlag != 'ItemColorSizeLevel' && productData?.showInOutStockFlag != 'Bothlevels' ) ||  productData?.showInOutStockFlag == 'ItemColorlevel') && productData?.showStockAvailability != 'No'">{{  size.stockAvailability  }}</td>
                                             <td>
                                                 <p-inputNumber [(ngModel)]="size.orderedQty" mode="decimal" [disabled]="!isAuthenticated"
                                                     [showButtons]="true" inputId="minmax-buttons" [min]="0"
@@ -1459,7 +1459,7 @@ top: 4px;">
                                             class="table text-center table-bordered table-white">
                                             <thead>
                                                 <tr>
-                                                    <th scope="col">
+                                                    <th *ngIf="productData?.showStockAvailability != 'No'" scope="col">
                                                         Available Prepacks
                                                     </th>
                                                     <th scope="col">Ordered</th>
@@ -1467,9 +1467,9 @@ top: 4px;">
                                             </thead>
                                             <tbody>
                                                 <tr>
-                                                    <td *ngIf="(productData?.showInOutStockFlag == 'ItemColorSizeLevel' || productData?.showInOutStockFlag == 'Bothlevels' ) &&  filteredColors[currentIndex]?.sizes[0]?.noOfAvailablePrepacks >0" class="text-success">In Stock</td>
-                                                    <td *ngIf="(productData?.showInOutStockFlag == 'ItemColorSizeLevel' || productData?.showInOutStockFlag == 'Bothlevels' ) &&  filteredColors[currentIndex]?.sizes[0]?.noOfAvailablePrepacks ==0" class="text-danger">Out Of Stock</td>
-                                                    <td *ngIf="(productData?.showInOutStockFlag != 'ItemColorSizeLevel' || productData?.showInOutStockFlag != 'Bothlevels' ) ">
+                                                    <td *ngIf="(productData?.showInOutStockFlag == 'ItemColorSizeLevel' && productData?.showInOutStockFlag == 'Bothlevels' ) &&  filteredColors[currentIndex]?.sizes[0]?.noOfAvailablePrepacks >0 && productData?.showStockAvailability != 'No'" class="text-success">In Stock</td>
+                                                    <td *ngIf="(productData?.showInOutStockFlag == 'ItemColorSizeLevel' || productData?.showInOutStockFlag == 'Bothlevels' ) &&  filteredColors[currentIndex]?.sizes[0]?.noOfAvailablePrepacks ==0 && productData?.showStockAvailability != 'No'" class="text-danger">Out Of Stock</td>
+                                                    <td *ngIf="(productData?.showInOutStockFlag != 'ItemColorSizeLevel' || productData?.showInOutStockFlag != 'Bothlevels' ) && productData?.showStockAvailability != 'No'">
                                                         {{
                                                         filteredColors[currentIndex]?.sizes[0]?.noOfAvailablePrepacks
                                                         }}
@@ -1518,7 +1518,7 @@ top: 4px;">
                                                     <td *ngIf="((productData?.showInOutStockFlag == 'ItemColorSizeLevel' || productData?.showInOutStockFlag == 'Bothlevels') && size.stockAvailability ==0 ) && productData?.showStockAvailability != 'No'" class="text-danger">Out of stock</td>
 
                                                     <td *ngIf="((productData?.showInOutStockFlag == 'ItemColorSizeLevel' || productData?.showInOutStockFlag == 'Bothlevels') && size.stockAvailability >0 ) && productData?.showStockAvailability != 'No'" class="text-success">In Stock</td>
-                                                    <td *ngIf="((productData?.showInOutStockFlag != 'ItemColorSizeLevel' && productData?.showInOutStockFlag != 'Bothlevels' &&  productData?.showInOutStockFlag != 'ItemColorlevel') ||  productData?.showInOutStockFlag == 'ItemColorlevel') && productData?.showStockAvailability != 'No'">{{  size.stockAvailability  }}</td>
+                                                    <td *ngIf="((productData?.showInOutStockFlag != 'ItemColorSizeLevel') ) && productData?.showStockAvailability != 'No'">{{  size.stockAvailability  }}</td>
                                                     <td
                                                         *ngIf="filteredColors?.length > 0 && filteredColors[currentIndex]?.sizes?.length > 0">
 

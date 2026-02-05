@@ -9,6 +9,7 @@ import { FileUploader, FileUploaderOptions } from '@node_modules/ng2-file-upload
 import { AppConsts } from '@shared/AppConsts';
 import { IAjaxResponse, TokenService } from '@node_modules/abp-ng2-module';
 import { DynamicApiDispatcherService } from '@shared/dynamicApiDispatcherService ';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-dynamicInputs',
@@ -311,8 +312,13 @@ export class dynamicInputs extends AppComponentBase implements OnInit, OnChanges
       } */
       const allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
       if (!allowedTypes.includes(file.type)) {
-        alert('Only JPG, PNG, or GIF files are allowed.');
-        return;
+        //alert('Only JPG, PNG, or GIF files are allowed.');
+        Swal.fire(
+          " ",
+          "File format is not supported , Only JPG, PNG, or GIF files are allowed.",
+          "error"
+      );
+      return;
       }
       const dotIndex = file.name.lastIndexOf('.');
       const baseName = file.name.substring(0, dotIndex);

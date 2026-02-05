@@ -383,3 +383,96 @@
 .details h5 {
     padding-top: 3px;
 }
+
+.media-viewer {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+  }
+  
+  .thumbs {
+    width: 64px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-height: 520px;
+  }
+  
+  .thumbs-scroll {
+    overflow-y: auto;
+  }
+  
+  .thumb {
+    width: 60px;
+    height: 80px;
+    border-radius: 10px;
+    object-fit: cover;
+    cursor: pointer;
+    border: 1px solid rgba(0,0,0,.08);
+    background: #f5f5f5;
+  }
+  
+  .thumb.active {
+    border: 2px solid #0d6efd;
+  }
+  
+  .pdf-thumb {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+  
+  .thumb-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  
+  .pdf-fallback {
+    width: 100%;
+    height: 100%;
+    background: url('/assets/Items/pdf-Icon.png') center/contain no-repeat;
+  }
+  
+  .thumb-loading {
+    width: 100%;
+    height: 100%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+  
+  .other-thumb {
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size: 18px;
+  }
+  
+  .main {
+    flex: 1;
+    min-width: 0;
+  }
+  
+  .main-media {
+    width: 100%;
+    max-height: 70vh;
+    height: auto;
+    object-fit: contain;
+    border-radius: 14px;
+    background: #fafafa;
+  }
+  
+  .main-loading, .main-fallback {
+    width: 100%;
+    min-height: 220px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    flex-direction: column;
+    gap: 10px;
+    background: #fafafa;
+    border-radius: 14px;
+  }
+  
