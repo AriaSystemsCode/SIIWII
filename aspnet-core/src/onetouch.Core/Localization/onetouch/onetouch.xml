@@ -2572,5 +2572,6 @@
 	<text name="IsAddOn">Add-On</text>
 	<text name="Limited">Limited</text>
     <text name="UpdateAccountInformation">Update Account Information</text>
+    <text name="NEWWWWS">NEWWWWS</text>
 	</texts>  
 </localizationDictionary>
