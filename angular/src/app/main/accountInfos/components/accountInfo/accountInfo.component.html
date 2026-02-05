@@ -163,13 +163,13 @@
                                             *ngIf="currentTab == accountInfoPageTabsEnum.Branches"
                                             style="color: #F88011;"></i>
                                         <span *ngIf="accountLevel === accountLevelEnum.Profile && !viewMode">
-                                            {{ accountInfoTemp?.accountType != 'People' && accountInfoTemp?.accountType
-                                            != 'Personal' && accountDataForView?.accountTypeId != 21 ?
+                                            {{ accountInfoTemp?.accountType != 'People' && accountInfoTemp?.accountType?.toUpperCase()
+                                            != 'PERSONAL' && accountDataForView?.accountTypeId != 21 ?
                                             l("MyBranches/Addresses") : l("My Addresses") }}
                                         </span>
                                         <span *ngIf="accountLevel !== accountLevelEnum.Profile || viewMode">
-                                            {{accountInfoTemp?.accountType != 'People' && accountInfoTemp?.accountType
-                                            != 'Personal' && accountDataForView?.accountTypeId != 21 ?
+                                            {{accountInfoTemp?.accountType != 'People' && accountInfoTemp?.accountType?.toUpperCase()
+                                            != 'PERSONAL' && accountDataForView?.accountTypeId != 21 ?
                                             l("MyBranches/Addresses") : l("My Addresses") }}
                                         </span>
                                     </a>
