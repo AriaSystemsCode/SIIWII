@@ -72,7 +72,7 @@ namespace onetouch.Web.Startup
             //Aria.MASTER
             if (!string.IsNullOrWhiteSpace(origin))
             {
-                string AriaMasterConnection = "Server=WEBAPP-DEV\\SIIWII; Database=Aria.MASTER;TrustServerCertificate=True;User ID=sa;Password=Siiwii@2024;";
+                string AriaMasterConnection = "Server=ARIASQL\\ARIANEXUS; Database=Aria.MASTER;TrustServerCertificate=True;User ID=sa;Password=Aria@2021;";
                 using (var conn = new SqlConnection(AriaMasterConnection))
                 {
                     conn.Open();
