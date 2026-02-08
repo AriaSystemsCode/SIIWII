@@ -48,7 +48,7 @@
           </div>
         </div>
 
-        <div *ngIf="accountDataForView?.accountType == 'BUSINESS'"
+        <div *ngIf="accountDataForView?.accountType == 'BUSINESS' || accountDataForView?.accountType == 'PERSONAL'"
           class="row row-item row-item-main-data d-flex align-items-center mb-2">
           <div class="col-4 row-item-title emailColor">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">

@@ -118,6 +118,7 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
     editPhone3TypeId: number;
 
     languageSettingName  =AppConsts.languageSettingName;
+    editNotesValue: string = '';
     constructor(
         injector: Injector,
         private _appEntitiesServiceProxy: AppEntitiesServiceProxy,
@@ -252,10 +253,7 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
             this._removed
           );
       
-          // =====================================================
-          // ✅ IMPORTANT: Update UI models immediately (NO refresh)
-          // Template displays phone type name from contactData
-          // =====================================================
+    
       
           // Update contactData types
           this.contactData.phone1TypeId = this.editPhone1TypeId;
@@ -283,6 +281,11 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
           this.accountData.phone1Number = this.editedPersonalData.phone1Number;
           this.accountData.phone2Number = this.editedPersonalData.phone2Number;
           this.accountData.phone3Number = this.editedPersonalData.phone3Number;
+
+
+          this.editedPersonalData.notes = (this.editNotesValue || '').trim();
+            this.contactData.notes = this.editedPersonalData.notes;
+            (this.editedPersonalData as any).notesIsPublic = this.contactData?.notesIsPublic;
       
           // ---------- Emit ----------
           this.editedContactData.emit(this.contactData);
@@ -552,7 +555,7 @@ this.editPhone3NumberValue = this.contactData?.phone3Number;
         this.editPhone2TypeId = this.contactData?.phone2TypeId;
         this.editPhone3TypeId = this.contactData?.phone3TypeId;
 
-
+        this.editNotesValue = this.contactData?.notes || '';
     }
 
     cancelPerAcc() {

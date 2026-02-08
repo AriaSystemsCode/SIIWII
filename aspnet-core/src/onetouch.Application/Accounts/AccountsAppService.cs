@@ -2276,10 +2276,12 @@ namespace onetouch.Accounts
                     //MMT33-3
 
                     //Connect Current Account branches with the other account
-                    if (originalPublishContactFortCurrTenant.EntityObjectTypeId != presonEntityObjectTypeId && sync==false)
+                    //if (originalPublishContactFortCurrTenant.EntityObjectTypeId != presonEntityObjectTypeId && sync==false)
+                    if (sync == false)
                     await ConnectBranches(originalPublishContactFortCurrTenant.Id, id);
-
-                    if(originalContact.EntityObjectTypeId != presonEntityObjectTypeId && sync == false)
+                    //
+                    if (sync == false)
+                        //if (originalContact.EntityObjectTypeId != presonEntityObjectTypeId && sync == false)
                     await ConnectBranches(id, originalPublishContactFortCurrTenant.Id);
 
                     //Mariam[End]
@@ -2623,11 +2625,11 @@ namespace onetouch.Accounts
                         {
                             foreach (var contactAddress in branchesParentContact.ContactAddresses)
                             {
-                                var savedAddress = await _appAddressRepository.FirstOrDefaultAsync(x => x.Id == contactAddress.AddressId);
+                                var savedAddress = await _appMarketplaceAddressRepository.FirstOrDefaultAsync(x => x.Id == contactAddress.AddressId);
                                 AppAddress address = new AppAddress();
                                 if (savedAddress != null)
                                 {
-                                    var addressCon = await _appAddressRepository.GetAll().FirstOrDefaultAsync(z => z.Code == savedAddress.Code && z.TenantId == contactDto.TenantId && z.AccountId == contactDto.Id);
+                                    var addressCon = await _appAddressRepository.GetAll().FirstOrDefaultAsync(z => z.Code == savedAddress.Code && z.TenantId == contactDto.TenantId && z.AccountId == savedContactDto.AccountId);
                                     if (addressCon == null)
                                     {
                                         ObjectMapper.Map(savedAddress, address);
