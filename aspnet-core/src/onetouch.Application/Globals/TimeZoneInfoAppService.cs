@@ -1,4 +1,5 @@
-﻿using onetouch.Globals.Dtos;
+﻿using Abp.Authorization;
+using onetouch.Globals.Dtos;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -38,7 +39,7 @@ namespace onetouch.Globals
 
 
         }
-
+        [AbpAllowAnonymous]
         public async  Task<List<DisplayNameValueDto>> GetTimeZonesList()
         {
             IReadOnlyCollection<TimeZoneInfo> zones = TimeZoneInfo.GetSystemTimeZones();

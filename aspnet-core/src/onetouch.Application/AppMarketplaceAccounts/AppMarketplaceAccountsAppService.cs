@@ -109,8 +109,8 @@ namespace onetouch.AppMarketplaceAccounts
             _appMarketplaceAccountsPriceLevelsRepo = appMarketplaceAccountsPriceLevelsRepo;
             _sycEntityObjectTypeRepository = sycEntityObjectTypeRepository;
         }
-        
 
+        [AbpAllowAnonymous]
         public async Task<PagedResultDto<GetMarketplaceAccountForViewDto>> GetAll(GetAllAccountsInput input)
         {
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
@@ -555,7 +555,7 @@ namespace onetouch.AppMarketplaceAccounts
             }
         }
 
-
+        [AbpAllowAnonymous]
         public async Task<GetAccountForViewDto> GetAccountForView(long id, string ssin, int resultCount = 10)
         {
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))

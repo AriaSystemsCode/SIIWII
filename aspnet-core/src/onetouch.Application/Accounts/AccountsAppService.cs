@@ -253,6 +253,7 @@ namespace onetouch.Accounts
         }
 
         //X527[Start]
+        [AbpAllowAnonymous]
         public async Task<PagedResultDto<AppEntityAttachmentDto>> GetAllAccountMediaAttachment(GetAllMediaAttachmentInput input)
         {
             //MMT
@@ -976,6 +977,7 @@ namespace onetouch.Accounts
 
             }
         }
+        [AbpAllowAnonymous]
         public async Task<bool> GetSettingValue(string settingName, string ssin)
         {
             return true;

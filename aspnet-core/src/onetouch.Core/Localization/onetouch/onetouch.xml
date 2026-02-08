@@ -2646,7 +2646,7 @@
 	<text name="InStock">In Stock</text>
 	<text name="OutOfStock">Out Of Stock</text>
 	<text name="OrderBySize">Order By Size</text>
-	<text name="Size">Size</text>
+	
 	<text name="Ordered">Ordered</text>
 	<text name="PrepackDefinition">Prepack Definition</text>
 	<text name="TotalPcs">Total Pcs</text>
@@ -2665,7 +2665,7 @@
 	<text name="This variation is already added to the order">This variation is already added to
                 the order</text>
 				<text name="you need to connect to this seller account , to be able to proceed">you need to connect to this seller account , to be able to proceed</text>
-	<text name="ConnectProceed">Connect & Proceed</text>
+	<text name="ConnectProceed">Connect and Proceed</text>
 
 
   </texts>  

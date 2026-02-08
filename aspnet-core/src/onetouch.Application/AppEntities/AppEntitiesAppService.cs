@@ -912,13 +912,13 @@ namespace onetouch.AppEntities
         }
 
 
-
+        [AbpAllowAnonymous]
         public async Task<PagedResultDto<LookupLabelDto>> GetAllCurrencyForTableDropdownWithPaging(GetAllAppEntitiesInput input)
         {
             input.EntityObjectTypeId = await _helper.SystemTables.GetEntityObjectTypeCurrencyId();
             return await GetAllEntityTypeForTableDropdown(input);
         }
-
+        [AbpAllowAnonymous]
         public async Task<PagedResultDto<LookupLabelDto>> GetAllLanguageForTableDropdownWithPaging(GetAllAppEntitiesInput input)
         {
             input.EntityObjectTypeId = await _helper.SystemTables.GetEntityObjectTypeLanguageId();
@@ -930,7 +930,7 @@ namespace onetouch.AppEntities
             input.EntityObjectTypeId = await _helper.SystemTables.GetEntityObjectTypeCountryId();
             return await GetAllEntityTypeForTableDropdown(input);
         }
-
+        [AbpAllowAnonymous]
         public async Task<PagedResultDto<LookupLabelDto>> GetAllAccountTypesForTableDropdownWithPaging(GetAllAppEntitiesInput input, bool hasManual = true)
         {
             var objectContactId = await _helper.SystemTables.GetObjectContactId();
@@ -1006,7 +1006,7 @@ namespace onetouch.AppEntities
             );
         }
         #endregion get all with paging
-
+        [AbpAllowAnonymous]
         public async Task<List<CurrencyInfoDto>> GetAllCurrencyForTableDropdown()
         {
             var currencyId = await _helper.SystemTables.GetEntityObjectTypeCurrencyId();

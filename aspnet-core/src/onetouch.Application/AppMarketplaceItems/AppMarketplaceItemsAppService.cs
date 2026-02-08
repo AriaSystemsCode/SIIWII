@@ -358,6 +358,7 @@ namespace onetouch.AppMarketplaceItems
                 );
             }
         }
+        [AbpAllowAnonymous]
         public async Task<GetAccountImagesOutputDto> GetAccountImages(string accountSSIN)
         {
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
@@ -447,6 +448,7 @@ namespace onetouch.AppMarketplaceItems
             }
         }
         //xx
+        [AbpAllowAnonymous]
         public async Task<PagedResultDto<GetAllMarketplaceItemListsOutputDto>> GetSharedItemLists(GetAllInputItemList input,string accountSSIN)
         {
 
