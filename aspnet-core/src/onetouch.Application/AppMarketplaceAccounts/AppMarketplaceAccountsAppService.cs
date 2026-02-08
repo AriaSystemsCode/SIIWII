@@ -117,10 +117,15 @@ namespace onetouch.AppMarketplaceAccounts
             {
                 try
                 {
-                    var currentTenantAccountObj = _appContactRepository.GetAll().Include(e => e.EntityFk)
+                    string currentTenantAccountSSIN = "";
+                    long currentTenantAccountType = 0;
+                    if (AbpSession.TenantId != null)
+                    {
+                        var currentTenantAccountObj = _appContactRepository.GetAll().Include(e => e.EntityFk)
                         .FirstOrDefault(e => e.TenantId == AbpSession.TenantId && e.IsProfileData && e.ParentId == null);
-                    var currentTenantAccountSSIN = currentTenantAccountObj.SSIN;
-                    var currentTenantAccountType = currentTenantAccountObj.EntityFk.EntityObjectTypeId;
+                        currentTenantAccountSSIN = currentTenantAccountObj.SSIN;
+                        currentTenantAccountType = currentTenantAccountObj.EntityFk.EntityObjectTypeId;
+                    }
                     var contactObjectid = await _helper.SystemTables.GetObjectContactId();
                     var groupAccountEntityObjectTypeId =await _sycEntityObjectTypeRepository.GetAll()
                         .FirstOrDefaultAsync(z=> z.Code=="GROUP" && z.ObjectId==contactObjectid);
@@ -153,7 +158,7 @@ namespace onetouch.AppMarketplaceAccounts
 
                             .WhereIf(!string.IsNullOrEmpty(input.Name),
                                 x => x.Name.Contains(input.Name) || x.TradeName.Contains(input.Name))
-                            .WhereIf(input.Status != null && input.Status.Count(x => x == 1) > 0,
+                            .WhereIf(AbpSession.TenantId != null && input.Status != null && input.Status.Count(x => x == 1) > 0,
                                  //I49[Start]
                                  //x => _appContactRepository.GetAll().Count(c => c.TenantId == AbpSession.TenantId && c.SSIN == x.SSIN) > 0)
                                  x => _appContactRelationshipInfoRepository.GetAll().Count(
@@ -162,7 +167,7 @@ namespace onetouch.AppMarketplaceAccounts
                                     z.EntityObjectStatusId == activeRelationshipStatusId
                                     ) > 0)
                             //I49[End]
-                            .WhereIf(input.Status != null && input.Status.Count(x => x == 2) > 0,
+                            .WhereIf(AbpSession.TenantId != null && input.Status != null && input.Status.Count(x => x == 2) > 0,
                                // x => (//_appContactRepository.GetAll().Count(c => c.TenantId == AbpSession.TenantId && c.SSIN == x.SSIN) == 0)
                                 x => _appContactRelationshipInfoRepository.GetAll().Count(
                                     z => ((z.RecipientContactSSIN == x.SSIN && z.RequesterContactSSIN == currentTenantAccountSSIN)
