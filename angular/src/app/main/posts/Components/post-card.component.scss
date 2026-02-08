@@ -206,8 +206,75 @@
   /* ===== Mobile ===== */
   @media (max-width: 576px) {
     .fb-grid {
-      aspect-ratio: 3 / 4;
+      // aspect-ratio: 3 / 4;
       max-height: 620px;
       gap: 4px;
     }
   }
+
+ /* EVENT special layout (matches screenshot) */
+.event-wrap {
+  position: relative;
+  width: 100%;
+  max-width: 700px;
+  // height: 220px;         
+  border-radius: 10px;
+  // overflow: hidden;
+  background: #f3f3f3;    
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  // padding: 18px 24px;   
+  margin-bottom: 70px;
+}
+
+.event-cover {
+  width: 100%;
+  height: 200px;
+  // object-fit: cover;    
+  display: block;
+}
+
+/*  small image on the left-middle */
+.event-logo {
+  position: absolute;
+  left: 28px;
+  top: 100%;
+  transform: translateY(-50%);  
+  width: 130px;              
+  height: 135px;
+  object-fit: cover;
+  background: #fff;
+  border-radius: 4px;    
+  box-shadow: none;         
+}
+
+/* RTL support (moves it to right-middle) */
+:host-context([dir="rtl"]) .event-logo {
+  left: auto;
+  right: 28px;
+}
+
+.viewContainer {
+  position: relative;
+  // width: 873px !important;
+ // left: -11px;
+  top: 2px;
+  height: 75px;
+  border: 1px solid #e4e4e4;
+  box-shadow: 5px 10px #e4e4e4;
+}
+
+._Btn {
+  width: 114px;
+  height: 37px;
+  border-radius: 20px;
+  background-color: transparent !important;
+  color: black !important;
+  border: 1px solid #e4e4e4 !important;
+}
+
+._Btn:hover {
+  background-color: #700066 !important ;
+  color: white !important;
+}

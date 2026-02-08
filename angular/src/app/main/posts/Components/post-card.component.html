@@ -21,8 +21,10 @@
       </div>
 
       <div class="col-9">
+        <!-- account name -->
         <a
           class="pt-2 addFont"
+          style="color: #1b101b !important; font-weight: bold"
           *ngIf="post?.appPost?.accountId"
           [routerLink]="['/app/main/account/view/', post?.appPost?.accountId]"
         >
@@ -33,6 +35,7 @@
           {{ post.appPost.accountName }}
         </a>
 
+        <!-- date line -->
         <h6 class="userName" *ngIf="!fromMarketplaceProfile">
           {{ "PostBy" | localize }},<b>{{ post.appPost.userName }}</b> ,
           {{ post.appPost.creationDatetime?.toString() | date : "mediumDate" }}
@@ -54,7 +57,6 @@
             class="btn btn-secondary dropdown-toggle p-0"
             type="button"
             id="dropdownMenuButton"
-            data-toggle="dropdown"
             aria-haspopup="true"
             aria-expanded="false"
             dropdownToggle
@@ -62,11 +64,7 @@
             <div class="three-dots"></div>
           </button>
 
-          <div
-            class="dropdown-menu"
-            aria-labelledby="dropdownMenuButton"
-            *dropdownMenu
-          >
+          <div class="dropdown-menu" aria-labelledby="dropdownMenuButton" *dropdownMenu>
             <a class="dropdown-item" (click)="editPost()">
               <img
                 src="assets/posts/Edit_ic.svg"
@@ -104,28 +102,54 @@
 
       <!-- MEDIA -->
       <div class="pb-2 pl-4 pointer pr-4 pt-4 row justify-content-center">
-        <!-- IMAGES -->
+        <!--  IMAGES -->
         <div
           *ngIf="post.type === PostType.SINGLEIMAGE && post.attachmentsURLs?.length"
           class="media-wrap w-100"
         >
-          <div class="fb-grid" [ngClass]="'count-' + visibleImages.length">
-            <ng-container *ngFor="let img of visibleImages; let i = index">
-              <div class="cell" [ngClass]="'i' + (i + 1)">
-                <img
-                  class="fb-img"
-                  [src]="attachmentBaseUrl + '/' + img"
-                  loading="lazy"
-                  (error)="onImgError($event)"
-                />
+          <!--  EVENT special UI (same as old version) -->
+          <ng-container
+            *ngIf="isEventPost() && post.attachmentsURLs.length === 2; else normalGrid"
+          >
+            <div class="event-wrap">
+              <!-- cover -->
+              <img
+                class="event-cover"
+                [src]="attachmentBaseUrl + '/' + post.attachmentsURLs[1]"
+                loading="lazy"
+                (error)="onImgError($event)"
+              />
 
-                <!-- overlay if > 5 -->
-                <div class="more-overlay" *ngIf="i === 4 && remainingCount > 0">
-                  +{{ remainingCount }}
+              <!-- logo overlay -->
+              <img
+                class="event-logo"
+                [src]="attachmentBaseUrl + '/' + post.attachmentsURLs[0]"
+                loading="lazy"
+                (error)="onImgError($event, true)"
+              />
+            </div>
+          </ng-container>
+
+          <!--  NORMAL posts (new grid UI) -->
+          <ng-template #normalGrid>
+            <div class="fb-grid" [ngClass]="'count-' + visibleImages.length">
+              <ng-container *ngFor="let img of visibleImages; let i = index">
+                <div class="cell" [ngClass]="'i' + (i + 1)">
+                  <img
+                    class="fb-img"
+                    [src]="attachmentBaseUrl + '/' + img"
+                    loading="lazy"
+                    (error)="onImgError($event)"
+                  />
+
+                  <!-- overlay if > 5 -->
+                  <div class="more-overlay" *ngIf="i === 4 && remainingCount > 0">
+                    +{{ remainingCount }}
+                  </div>
                 </div>
-              </div>
-            </ng-container>
-          </div>
+              </ng-container>
+            </div>
+          </ng-template>
         </div>
 
         <!-- Video -->
@@ -137,7 +161,9 @@
             (playing)="playVideo(post.attachmentsURLs[0], $event)"
             (click)="playVideo(post.attachmentsURLs[0], $event)"
             controls
-            [attr.src]="attachmentBaseUrl + '/' + post.attachmentsURLs[0] | sanitizeurl"
+            [attr.src]="
+              attachmentBaseUrl + '/' + post.attachmentsURLs[0] | sanitizeurl
+            "
             class="w-100 h-100"
           ></video>
         </div>
@@ -159,21 +185,26 @@
   </div>
 
   <!-- Related Entity -->
-  <div *ngIf="getAppEntityForViewDto" class="row p-4 pointer viewContainer mb-5">
-    <div class="col-8 col-sm-9">
+  <div
+  *ngIf="getAppEntityForViewDto"
+  class="row  p-4 pointer viewContainer mb-5"
+>
+  <div class="col-8 col-sm-9">
       <h5>
-        {{ "LetsView" | localize }}
-        {{ getAppEntityForViewDto.relatedEntityTypeCode | titlecase }} !
+          {{"LetsView" | localize }}
+          {{ getAppEntityForViewDto.relatedEntityTypeCode | titlecase }} !
       </h5>
-    </div>
-
-    <div class="col-2">
-      <button class="btn btn-primary _Btn pointer" (click)="viewRelatedEntity()">
-        {{ "View" | localize }}
-        {{ getAppEntityForViewDto.relatedEntityTypeCode | titlecase }}
-      </button>
-    </div>
   </div>
+  <div class="col-2">
+      <button
+          class="btn  _Btn pointer"
+          (click)="viewRelatedEntity()"
+      >
+          {{"View" | localize }}
+          {{ getAppEntityForViewDto.relatedEntityTypeCode | titlecase }}
+      </button>
+  </div>
+</div>
 
   <!-- Interactions -->
   <app-interactions

@@ -270,8 +270,22 @@ import {
         return total > 5 ? total - 5 : 0;
       }
       
-      onImgError(e: Event) {
-        const img = e.target as HTMLImageElement;
-        img.src = "assets/placeholders/appitem-placeholder.png";
+      // onImgError(e: Event) {
+      //   const img = e.target as HTMLImageElement;
+      //   img.src = "assets/placeholders/appitem-placeholder.png";
+      // }
+
+      isEventPost(): boolean {
+        const code = this.getAppEntityForViewDto?.relatedEntityTypeCode;
+        const eventCode = this.appEntityTypes?.[this.appEntityTypes.EVENT]?.toString();
+        return !!code && !!eventCode && code.toUpperCase() === eventCode.toUpperCase();
+      }
+      
+      // optional: handle logo fallback separately
+      onImgError(e: Event, isLogo: boolean = false) {
+        const el = e.target as HTMLImageElement;
+        el.src = isLogo
+          ? 'assets/placeholders/appitem-placeholder.png'
+          : 'assets/placeholders/appitem-placeholder.png';
       }
   }
