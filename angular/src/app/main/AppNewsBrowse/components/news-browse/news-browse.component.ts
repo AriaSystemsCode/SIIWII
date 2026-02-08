@@ -21,9 +21,6 @@ import { ViewPostComponent } from "../../../posts/Components/view-post.component
 import * as moment from 'moment';
 import { appModuleAnimation } from '@shared/animations/routerTransition';
 import { CreateorEditPostComponent } from '@app/main/posts/Components/createor-edit-post.component';
-import { FileUploaderCustom } from '@shared/components/import-steps/models/FileUploaderCustom.model';
-import { AppConsts } from '@shared/AppConsts';
-import { FileUploaderOptions } from 'ng2-file-upload';
 import { Observable } from 'rxjs';
 import { DateFormValidations } from '@shared/utils/validation/date-form-validation.directive';
 import Swal from "sweetalert2/dist/sweetalert2.js";
@@ -80,6 +77,10 @@ export class NewsBrowseComponent extends AppComponentBase {
     get startDateCtrl () { return this.filterForm.get('startDate') }
     get endDateCtrl () { return this.filterForm.get('endDate') }
     totalCount:number
+    filterVisible:boolean =false
+
+    currentLang: string = 'en';
+    isArabic: boolean = false;
     constructor(
         injector: Injector,
         private _appEventsServiceProxy: AppEventsServiceProxy,
@@ -190,6 +191,8 @@ export class NewsBrowseComponent extends AppComponentBase {
     }
 
     ngOnInit(): void {
+        this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
+        this.currentLang == 'ar' || this.currentLang == 'ar-EG'  ? this.isArabic = true : this.isArabic = false
         this.getProfilePicture();
         this.getUserPreferenceForListView();
         this.initFilterForm()
@@ -677,5 +680,9 @@ openFiltersDialog() {
 
 closeFiltersDialog() {
   this.filtersDialogVisible = false;
+}
+toggleFilter(): void {
+    this.filterVisible = !this.filterVisible;
+
 }
 }

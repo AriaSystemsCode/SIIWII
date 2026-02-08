@@ -8,6 +8,7 @@
     font-size: unset;
     height: 3.5rem;
     cursor:pointer;
+    border-radius: 10px;
 }
 
 @media (min-width: 1399px) {
@@ -355,8 +356,9 @@ left: 30px;
 }
 
 .orderType {
-    border-radius: 5px;
-    padding: 5px;
+    border-radius: 10px;
+    padding: 9px;
+    margin-top: 3px;
     border: 1px solid #FFFFFF;
 }
 
@@ -514,7 +516,7 @@ left: 30px;
     border-radius: 5px;
     background-color: #f3f6f9;
     cursor: pointer;
-    right: 0px;
+    // right: 0px;
     background-color: #f88011;
     top: 0px;
 }
@@ -594,4 +596,13 @@ left: 30px;
     .notification-show{
         right: -210px !important;
     }
+}
+
+
+.search-en{
+    right: 0px;
+}
+
+.search-ar{
+    left: 0px;
 }

@@ -60,7 +60,7 @@ a.btn {
 
 .single-item {
     font-weight: $default-font-weight;
-
+  color: #9E9E9E;
     .single-item-body {
         h3 {
             font-weight: $default-font-weight + 100;
@@ -117,14 +117,14 @@ a.btn {
 
     .card-name {
         color: #1b101b;
-        font-size: 12px;
+        font-size: 14px;
         font-weight: 700 !important;
     }
 
     .accountType_label {
-        font-weight: 600;
+        font-weight: 700;
         font-size: 13px;
-        color: black;
+        color:  #343a40 !important;;
     }
 
     .accountType_value,
@@ -148,8 +148,8 @@ a.btn {
         background-color: #4a0d4a;
         color: white;
         border-radius: 6px;
-        padding: 5px 10px;
-        font-size: 12px;
+        padding: 5px ;
+        font-size: 11px;
     }
 
     .relation_Status_button {
@@ -477,4 +477,14 @@ a.btn {
     height: 100px !important;
     flex: 0 0 100px;
   }
-  
+  .singleCat {
+   
+padding: 5px;
+
+background: rgba(248, 248, 248, 0.972549);
+border: 1px solid #E6E6E6;
+border-radius: 4px;
+color: #1B101B;
+margin-right: 4px;
+
+  }

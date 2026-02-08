@@ -1,5 +1,5 @@
 <div class="single-item  row   memberCard_container shadowContainer"
-    [ngClass]="singleItemPerRowMode || fromOverview ?'p-0 no-padding-bottom mr-3' :'p-4 extra-padding-bottom mr-md-4'">
+    [ngClass]="singleItemPerRowMode || fromOverview ?'p-0 no-padding-bottom mx-1' :'p-4 extra-padding-bottom mr-md-4'">
     <div class="align-items-center bg-secondary d-flex fa-3x justify-content-around mr-1 single-item-photo" [ngStyle]="{
         'background-image':
         account.account.logoUrl ?
@@ -7,8 +7,10 @@
         '' , 
     'height': singleItemPerRowMode ? 'auto'  :  '100px', 
     'width':  singleItemPerRowMode  ? '200px' : '100px',
-    'border-top-right-radius': fromOverview   ? '0px' : '',
-    'border-bottom-right-radius': fromOverview   ? '0px' : '',
+    'border-top-right-radius': fromOverview && !isArabic  ? '0px' : '',
+    'border-top-left-radius': fromOverview && isArabic  ? '0px' : '',
+    'border-bottom-right-radius': fromOverview && !isArabic  ? '0px' : '',
+    'border-bottom-left-radius': fromOverview && isArabic  ? '0px' : '',
 }" (click)="clickCardHandler()">
         <i *ngIf="!account.account.logoUrl" class="fa-image fas text-black-50"></i>
     </div>
@@ -66,7 +68,7 @@
                     }" >
                         {{ "AccountType" | localize }}:
                     </b>
-                    <span class="accountType_value  mt-2 ml-2" [ngClass]="fromOverview ? 'p-2' :''">
+                    <span class="accountType_value  mt-2 ml-1" [ngClass]="fromOverview ? 'p-2' :''">
                         {{ account.account.accountType || ('NotSpecified' | localize) }}
                     </span>
                 </div>

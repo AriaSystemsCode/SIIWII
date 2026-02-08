@@ -72,6 +72,7 @@ export class EventsBrowseComponent extends AppComponentBase  implements OnInit,O
     
     currentLang: string = 'en';
     isArabic: boolean = false;
+    filterVisible :boolean=true
     constructor(
         injector: Injector,
         private _appEventsServiceProxy: AppEventsServiceProxy,
@@ -716,5 +717,10 @@ private bindDateRangeToStartEndForForm(form: FormGroup): void {
   
     this.mobileFiltersVisible = true;
   }
+
+  toggleFilter(): void {
+    this.filterVisible = !this.filterVisible;
+
+}
   
 }

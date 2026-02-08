@@ -122,3 +122,29 @@ border-radius: 10px;
 
 
 }
+.filterBtn {
+    color: #1B101B;
+    border-radius: 6px !important;
+    border: 1px solid #EBEBEB !important;
+    background: #FFF !important;
+    box-shadow: 1px 1px 6px 0px rgba(22, 22, 22, 0.05) !important;
+    color: #1B101B !important;
+    height: 43px;
+  
+  }
+
+  .mrAr {
+    margin-top: -40px;
+  }
+  .mrEn{
+    margin-top: -90px;
+  }
+  
+  ::ng-deep  {
+    @media only screen and (min-width: 575px) and (max-width: 1024x) {
+      .kt-container {
+        padding: 1px 0px 0px 15px !important;
+        
+      }
+  }
+  }
