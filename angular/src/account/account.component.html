@@ -5,7 +5,7 @@
             ? {'background-color': bgCol, 'background-image': 'none'}
             : ''">
                 <div class="kt-grid__item kt-grid__item--fluid kt-grid kt-grid--ver">
-                    <div class="kt-grid__item kt-grid__item--middle">
+                    <div class="kt-grid__item kt-grid__item--middle mx-auto">
                         <div class="align-items-center d-flex logos">
                             <a (click)="goToHome()" >
                                 <img class="main-logo-image" *ngIf="!appSession.tenant || !appSession.tenant.logoId" [src]="tenantLogo" alt="logo" height="38" />
@@ -25,7 +25,7 @@
                  src="../../assets/accounts/SignUp_TopBanner_Purple.png"  >
                 </div>
 
-            <div class="kt-grid__item kt-grid__item--fluid  kt-grid__item--order-tablet-and-mobile-1  kt-login__wrapper d-block  ">
+            <div class="kt-grid__item kt-grid__item--fluid  kt-grid__item--order-tablet-and-mobile-1  kt-login__wrapper d-block py-5 ">
                 <div class="kt-login__head  mt-3 mr-auto ml-auto text-right  d-flex flex-row-reverse">
                     <language-switch></language-switch>
                 </div>
