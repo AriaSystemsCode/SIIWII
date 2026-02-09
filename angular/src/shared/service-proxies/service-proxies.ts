@@ -15226,6 +15226,61 @@ export class AppItemsServiceProxy {
     }
 
     /**
+     * @param filePath (optional) 
+     * @param body (optional) 
+     * @return Success
+     */
+    updateCsvStatusFromErrorLog(filePath: string | null | undefined, body: AppItemtExcelRecordDTO[] | null | undefined): Observable<void> {
+        let url_ = this.baseUrl + "/api/services/app/AppItems/UpdateCsvStatusFromErrorLog?";
+        if (filePath !== undefined && filePath !== null)
+            url_ += "filePath=" + encodeURIComponent("" + filePath) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json-patch+json",
+            })
+        };
+
+        return this.http.request("put", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processUpdateCsvStatusFromErrorLog(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processUpdateCsvStatusFromErrorLog(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<void>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<void>;
+        }));
+    }
+
+    protected processUpdateCsvStatusFromErrorLog(response: HttpResponseBase): Observable<void> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return _observableOf(null as any);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
      * @param body (optional) 
      * @return Success
      */
@@ -94058,6 +94113,7 @@ export class AppItemPrices implements IAppItemPrices {
     price!: number;
     appItemId!: number;
     appItemCode!: string | undefined;
+    buyerSSIN!: string | undefined;
     currencyId!: number | undefined;
     currencyCode!: string | undefined;
     currencyFk!: AppEntity;
@@ -94095,6 +94151,7 @@ export class AppItemPrices implements IAppItemPrices {
             this.price = _data["price"];
             this.appItemId = _data["appItemId"];
             this.appItemCode = _data["appItemCode"];
+            this.buyerSSIN = _data["buyerSSIN"];
             this.currencyId = _data["currencyId"];
             this.currencyCode = _data["currencyCode"];
             this.currencyFk = _data["currencyFk"] ? AppEntity.fromJS(_data["currencyFk"]) : <any>undefined;
@@ -94130,6 +94187,7 @@ export class AppItemPrices implements IAppItemPrices {
         data["price"] = this.price;
         data["appItemId"] = this.appItemId;
         data["appItemCode"] = this.appItemCode;
+        data["buyerSSIN"] = this.buyerSSIN;
         data["currencyId"] = this.currencyId;
         data["currencyCode"] = this.currencyCode;
         data["currencyFk"] = this.currencyFk ? this.currencyFk.toJSON() : <any>undefined;
@@ -94154,6 +94212,7 @@ export interface IAppItemPrices {
     price: number;
     appItemId: number;
     appItemCode: string | undefined;
+    buyerSSIN: string | undefined;
     currencyId: number | undefined;
     currencyCode: string | undefined;
     currencyFk: AppEntity;
