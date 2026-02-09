@@ -15,6 +15,7 @@ using onetouch.SycIdentifierDefinitions;
 using onetouch.AppEntities;
 using Microsoft.EntityFrameworkCore;
 using onetouch.SycSegmentIdentifierDefinitions.Dtos;
+using Abp.Authorization;
 
 namespace onetouch.Helpers
 {
@@ -61,7 +62,7 @@ namespace onetouch.Helpers
             _iAppSycIdentifierDefinitionsService = iAppSycIdentifierDefinitionsService;
             //MMT40[End]
         }
-
+        [AbpAllowAnonymous]
         public async Task< long> GetObjectContactId()
         {
             var obj =  await _sydObjectRepository.FirstOrDefaultAsync(x => x.Code == "CONTACT");
@@ -84,7 +85,7 @@ namespace onetouch.Helpers
         //    var obj = await _sydObjectRepository.FirstOrDefaultAsync(x => x.Code == "PERSON");
         //    return obj.Id;
         //}
-
+        [AbpAllowAnonymous]
         public async Task<long> GetObjectEventId()
         {
             var obj = await _sydObjectRepository.FirstOrDefaultAsync(x => x.Code == "EVENT");
@@ -96,6 +97,7 @@ namespace onetouch.Helpers
             var obj = await _sydObjectRepository.FirstOrDefaultAsync(x => x.Code == "EVENTGUEST");
             return obj.Id;
         }
+        [AbpAllowAnonymous]
         public async Task<long> GetObjectPostId()
         {
             var obj = await _sydObjectRepository.FirstOrDefaultAsync(x => x.Code == "O001");
@@ -167,6 +169,7 @@ namespace onetouch.Helpers
             return obj;
         }
         //MMT -I43
+        [AbpAllowAnonymous]
         public async Task<long> GetObjectListingId()
         {
             var obj = await _sydObjectRepository.FirstOrDefaultAsync(x => x.Code == "LISTING");
@@ -337,13 +340,13 @@ namespace onetouch.Helpers
         //    var obj = await _sycAttachmentCategory.FirstOrDefaultAsync(x => x.Code == "1");
         //    return obj.Id;
         //}
-
+        [AbpAllowAnonymous]
         public async Task<long> GetAttachmentCategoryLogoId()
         {
             var obj = await _sycAttachmentCategory.FirstOrDefaultAsync(x => x.Code == "LOGO");
             return obj.Id;
         }
-
+        [AbpAllowAnonymous]
         public async Task<long> GetAttachmentCategoryId(string code)
         {   if (!string.IsNullOrEmpty(code))
             {
@@ -474,6 +477,7 @@ namespace onetouch.Helpers
             }
         }
         //MMT10
+        [AbpAllowAnonymous]
         public async Task<long> GetEntityObjectStatusContactCancelled()
         {
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
@@ -742,11 +746,13 @@ namespace onetouch.Helpers
                 return obj.Id;
             }
         }
+        [AbpAllowAnonymous]
         public async Task<long> GetEntityObjectTypeSalesOrder()
         {
             var obj = await _sycEntityObjectType.FirstOrDefaultAsync(x => x.Code == "SALESORDER");
             return obj.Id;
         }
+        [AbpAllowAnonymous]
         public async Task<long> GetEntityObjectTypePurchaseOrder()
         {
             var obj = await _sycEntityObjectType.FirstOrDefaultAsync(x => x.Code == "PURCHASEORDER");
@@ -777,6 +783,7 @@ namespace onetouch.Helpers
         }
         //MMT-Entity log [End]
         //MMT40[Start]
+        
         public async Task<long> GetEntityObjectTypeMarketplaceRelationship()
         {
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
@@ -793,6 +800,7 @@ namespace onetouch.Helpers
                 return obj.Id;
             }
         }
+        [AbpAllowAnonymous]
         public async Task<long> GetEntityObjectStatusRelationshipActive()
         {
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
