@@ -924,7 +924,7 @@ namespace onetouch.AppEntities
             input.EntityObjectTypeId = await _helper.SystemTables.GetEntityObjectTypeLanguageId();
             return await GetAllEntityTypeForTableDropdown(input);
         }
-
+        [AbpAllowAnonymous]
         public async Task<PagedResultDto<LookupLabelDto>> GetAllCountryForTableDropdowWithPaging(GetAllAppEntitiesInput input)
         {
             input.EntityObjectTypeId = await _helper.SystemTables.GetEntityObjectTypeCountryId();

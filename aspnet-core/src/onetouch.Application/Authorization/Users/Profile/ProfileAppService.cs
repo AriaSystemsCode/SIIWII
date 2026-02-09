@@ -258,6 +258,7 @@ namespace onetouch.Authorization.Users.Profile
         }
 
         [DisableAuditing]
+        [AbpAllowAnonymous]
         public async Task<GetProfilePictureOutput> GetProfilePicture()
         {
             var user = await UserManager.GetUserByIdAsync(AbpSession.GetUserId());
