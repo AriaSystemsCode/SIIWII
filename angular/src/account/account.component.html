@@ -22,12 +22,15 @@
                  src="../../assets/accounts/SignUp_TopBanner_Purple.png"  >
                 </div>
 
-            <div class="kt-grid__item kt-grid__item--fluid  kt-grid__item--order-tablet-and-mobile-1  kt-login__wrapper d-block py-5 ">
+            <div class="kt-grid__item kt-grid__item--fluid  kt-grid__item--order-tablet-and-mobile-1  kt-login__wrapper d-block">
                 <div class="kt-login__head  mt-3 mr-auto ml-auto text-right  d-flex flex-row-reverse">
                     <language-switch></language-switch>
                 </div>
 
-                <div class="kt-login__body d-block mt-3 mr-auto ml-auto">
+
+                <!-- merge -->
+
+                <div class="kt-login__body d-block mt-3 mr-auto ml-auto" style="height: auto;">
                     <div *ngIf="showTenantChange()" class="kt-login__signup-label tenant-change-box text-center">
                         <tenant-change class="d-none"></tenant-change>
                     </div>
