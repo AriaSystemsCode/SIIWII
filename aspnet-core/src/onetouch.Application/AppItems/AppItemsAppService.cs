@@ -5721,11 +5721,11 @@ namespace onetouch.AppItems
 
                 var headers = lines[0].Split(',').Select(h => h.Trim()).ToList();
 
-                if (!headers.Any(h => h.Equals("ssin", StringComparison.OrdinalIgnoreCase)) ||
+                if (!headers.Any(h => h.Equals("accountssin", StringComparison.OrdinalIgnoreCase)) ||
                     !headers.Any(h => h.Equals("discsplit", StringComparison.OrdinalIgnoreCase)) ||
                     !headers.Any(h => h.Equals("currcode", StringComparison.OrdinalIgnoreCase)))
                 {
-                    throw new UserFriendlyException("CSV must contain ssin, discsplit, and currcode columns.");
+                    throw new UserFriendlyException("CSV must contain accountssin, discsplit, and currcode columns.");
                 }
 
                 // Ensure Status & ErrorMessage columns
@@ -5770,7 +5770,7 @@ namespace onetouch.AppItems
                     var dto = new AppItemPriceCsvDto
                     {
                         Code = row.ContainsKey("stymajor") ? row["stymajor"]?.Trim() : "",
-                        SSIN = row["ssin"]?.Trim(),
+                        SSIN = row["accountssin"]?.Trim(),
                         Currency = row["currcode"]?.Trim(),
                         Price = row["discsplit"]?.Trim(),
                         RowNumber = rowNumber
