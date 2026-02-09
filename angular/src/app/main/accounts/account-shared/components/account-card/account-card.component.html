@@ -17,7 +17,7 @@
     >
         <div>
             <div [ngClass]="singleItemPerRowMode?'col-md-12 px-3' : 'col-md-12 px-0'" class="mb-2">
-                <h3 (click)="clickCardHandler()" class="card-name mt-1" [ngClass]="singleItemPerRowMode?'mb-2' : 'm-0'">
+                <h3 (click)="clickCardHandler()" class="card-name my-1" [ngClass]="singleItemPerRowMode?'mb-2' : 'm-0'">
                     {{account?.account?.name}}</h3>
                 <p class="text-primary m-0  product-name" [ngClass]="singleItemPerRowMode?'mb-1' : 'm-0'">
                     {{ account?.account.description | textSubstring : 60 }}
@@ -27,7 +27,7 @@
                     <div *ngIf="singleItemPerRowMode && account.account.categories"
                         class="d-flex align-items-center mb-1">
                         <p class=" m-0 product-name"
-                            style="font-weight: 600; font-size: 14px; min-width: 150px;">
+                            style="font-weight: 600; font-size: 13px; min-width: 150px;">
                             <b class="text-dark">{{"Categories" | localize}}</b> :  <span *ngIf="account.account.categories.length === 0" class="mt-2 " style="white-space: nowrap;">
                                 {{ "NotSpecified" | localize }}
                             </span>
@@ -44,7 +44,7 @@
                     <div *ngIf="singleItemPerRowMode && account.account.classfications"
                         class="d-flex align-items-start">
                         <p class=" m-0 product-name"
-                            style="font-weight: 600; font-size: 14px; min-width: 150px;">
+                            style="font-weight: 600; font-size: 13px; min-width: 150px;">
                             <b class="text-dark">{{ "Classifications" | localize }}</b> :    <span *ngIf="account.account.classfications.length === 0" class="mt-2"  style="white-space: nowrap;">
                                 {{ "NotSpecified" | localize }}
                             </span>
@@ -60,25 +60,29 @@
 
 
 
-                <div [ngClass]="singleItemPerRowMode?'pt-0 d-flex align-items-center mb-1' : ''" style="white-space: nowrap;">
-                    <!-- Account Type -->
+                <div [ngClass]="singleItemPerRowMode?'pt-0  mb-1' : ''" >
+               
                     <div *ngIf="singleItemPerRowMode" class="d-flex align-items-center mb-1">
                         <!-- Zipcode -->
-                        <b style="font-weight: 600; font-size: 14px; color: black; min-width: 115px;">
+                        <b style="font-weight: 600; font-size: 13px; color: black; min-width: 115px;">
                             {{ "Zipcode" | localize }}:
                         </b>
                         <span class="pl-2"  style="white-space: nowrap;">
                             {{ account.account.zipCode ? account.account.zipCode : ("NotSpecified" | localize) }}
                         </span>
                     </div>
-                    <b class="accountType_label" [ngStyle]="{
-                      'color': singleItemPerRowMode ? 'black' : '#595959'
-                    }" style="min-width: 115px;">
-                        {{ "AccountType" | localize }}:
-                    </b>
-                    <span class="accountType_value  mt-2"  style="white-space: nowrap;">
-                        {{ account.account.accountType || ('NotSpecified' | localize) }}
-                    </span>
+                        <!-- Account Type -->
+                    <div>
+                        <b class="accountType_label" [ngStyle]="{
+                            'color': singleItemPerRowMode ? 'black' : '#595959'
+                          }" style="min-width: 115px;">
+                              {{ "AccountType" | localize }}:
+                          </b>
+                          <span class="accountType_value  mt-2"  style="white-space: nowrap;">
+                              {{ account.account.accountType || ('NotSpecified' | localize) }}
+                          </span>
+                    </div>
+                
                 </div>
          
 
@@ -115,7 +119,7 @@
                             <img *ngIf="account?.visibility != 'Public' && !fromMarketplace" class="" style="width: 30px;   " src="../../assets/accounts/hidden.png"
                                 (click)="makeRelationPrivatePublic(account,true)" />
                              <div *ngIf="fromMarketplace"></div>
-                            <div class="btn relation_Status_button " [ngClass]="singleItemPerRowMode ? 'mb-3 mx-3':''"  style="    white-space: nowrap;
+                            <div *ngIf="isAuthenticated" class="btn relation_Status_button " [ngClass]="singleItemPerRowMode ? 'mb-3 mx-3':''"  style="    white-space: nowrap;
                               cursor: auto;  " dropdown>
 
                                 <button type="button" dropdownToggle style="  border: none !important;
@@ -143,8 +147,8 @@
                         </div>
 
                         <span style="width: 100%; " class="" [ngClass]="singleItemPerRowMode ? 'mb-3 mx-3':'mt-4'"
-                            *ngIf="(account?.availableConnections?.length > 0 && fromMarketplace && account?.avaliableConnectionName) || (!fromMarketplace
-                             && !account.connectionName && account.avaliableConnectionName)">
+                            *ngIf="((account?.availableConnections?.length > 0 && fromMarketplace && account?.avaliableConnectionName) || (!fromMarketplace
+                             && !account.connectionName && account.avaliableConnectionName)) && isAuthenticated">
 
                             <!-- Guard + alias once -->
                             <ng-container *ngIf="account?.availableConnections as options">

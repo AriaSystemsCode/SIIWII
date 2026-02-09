@@ -50,10 +50,13 @@ $font-weight-bold :600;
             }
         }
     }
-    .list-toolbar-search {
-        width: 300px;
-        @include font-1-normal()
+    @media only screen and (min-width: 1024px) {
+        .list-toolbar-search {
+            width: 300px;
+            @include font-1-normal()
+        }
     }
+  
     .list-toolbar-divider {
         width:2px;
         height:38px;
@@ -66,3 +69,4 @@ $font-weight-bold :600;
         @include font-3-medium();
     }
 }
+

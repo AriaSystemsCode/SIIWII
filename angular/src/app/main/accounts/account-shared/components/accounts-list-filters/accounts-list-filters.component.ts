@@ -230,17 +230,17 @@ export class AccountsListFiltersComponent extends AppComponentBase implements On
       
 
     getCountriesList(componentRef: { onListLoadCallback: Function }) {
-        // const subs = this._appEntitiesServiceProxy.getAllCountryForTableDropdowWithPaging(
-        //     this.countryFilter,   undefined,
-        //     undefined, undefined, undefined, undefined, undefined, undefined, undefined,
-        //     undefined,
-        //     this.sortBy,
-        //     this.countryFilterMetaData.listSkipCount,
-        //     this.countryFilterMetaData.listMaxResultCount,
-        // ).subscribe(result => {
-        //     componentRef.onListLoadCallback(result);
-        // });
-        // this.subscriptions.push(subs);
+        const subs = this._appEntitiesServiceProxy.getAllCountryForTableDropdowWithPaging(
+            this.countryFilter,   undefined,
+            undefined, undefined, undefined, undefined, undefined, undefined, undefined,
+            undefined,
+            this.sortBy,
+            this.countryFilterMetaData.listSkipCount,
+            this.countryFilterMetaData.listMaxResultCount,
+        ).subscribe(result => {
+            componentRef.onListLoadCallback(result);
+        });
+        this.subscriptions.push(subs);
       }
 
     getLanguagesList(componentRef:{  onListLoadCallback  : Function}){

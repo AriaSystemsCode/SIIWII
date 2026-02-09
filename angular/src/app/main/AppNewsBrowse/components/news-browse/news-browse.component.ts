@@ -81,6 +81,8 @@ export class NewsBrowseComponent extends AppComponentBase {
 
     currentLang: string = 'en';
     isArabic: boolean = false;
+  isAuthenticated: boolean = false;
+
     constructor(
         injector: Injector,
         private _appEventsServiceProxy: AppEventsServiceProxy,
@@ -191,6 +193,7 @@ export class NewsBrowseComponent extends AppComponentBase {
     }
 
     ngOnInit(): void {
+        this.isAuthenticated = !!this.appSession?.user;
         this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
         this.currentLang == 'ar' || this.currentLang == 'ar-EG'  ? this.isArabic = true : this.isArabic = false
         this.getProfilePicture();

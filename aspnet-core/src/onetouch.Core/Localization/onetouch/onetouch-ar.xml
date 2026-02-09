@@ -1069,5 +1069,82 @@
     <text name="ExpiresAt">تنتهي في {0}</text>
     <text name="ThereIsNoActiveUserDelegationBetweenYourUserAndCurrentUser">لا يوجد تفويض مستخدم نشط بينك وبين المستخدم الحالي!</text>
     <text name="CodeIsAlreadyExists">  الكود {0} موجود بالفعل</text>
+    <text name="FilesformatsSupportedareXLSX,JPGandPNG">صيغ الملفات المدعومة هي XLSX وJPG وPNG</text>
+<text name="Relatedproducts">منتجات ذات صلة</text>
+<text name="noproductsarelinked">لا توجد منتجات مرتبطة</text>
+<text name="BussinessClassification">التصنيف التجاري</text>
+<text name="OverallRating">التقييم العام</text>
+<text name="Media">الوسائط</text>
+<text name="RecentEvents">أحدث الفعاليات</text>
+<text name="Connections">الاتصالات</text>
+<text name="ForFullViewingOf">للعرض الكامل لـ</text>
+<text name="VisitVirtualShowroom">زيارة المعرض الافتراضي</text>
+<text name="RecentPosts">أحدث المنشورات</text>
+<text name="Reviews">المراجعات</text>
+<text name="Hide">إخفاء</text>
+<text name="AccountLogo">شعار الحساب</text>
+<text name="AccountCover">غلاف الحساب</text>
+<text name="Loading">جارٍ التحميل</text>
+<text name="Filters">الفلاتر</text>
+<text name="CreatedBy">تم الإنشاء بواسطة</text>
+<text name="Attendees">الحضور</text>
+<text name="End">النهاية</text>
+<text name="By">بواسطة</text>
+<text name="ChooseDate">اختر التاريخ</text>
+<text name="OnlyAvailableInStock">المتاح بالمخزون فقط</text>
+<text name="ClearFilter">مسح الفلتر</text>
+<text name="Filter">فلتر</text>
+<text name="ClearAllFilters">مسح كل الفلاتر</text>
+<text name="BackToResults">العودة إلى النتائج</text>
+<text name="MarketplaceProductDetailView">عرض تفاصيل المنتج في المتجر</text>
+<text name="OrderedSummary">ملخص الطلب</text>
+<text name="ProductOrderSummary">ملخص طلب المنتج</text>
+<text name="AddToShoppingCart">إضافة إلى سلة التسوق</text>
+<text name="BySize">حسب المقاس</text>
+<text name="ByPrepack">حسب البريباك</text>
+<text name="InStock">متوفر</text>
+<text name="OutOfStock">غير متوفر</text>
+<text name="OrderBySize">الطلب حسب المقاس</text>
+
+<text name="Ordered">تم طلبه</text>
+<text name="PrepackDefinition">تعريف البريباك</text>
+<text name="TotalPcs">إجمالي القطع</text>
+<text name="Prepack">بريباك</text>
+<text name="OrderByPrepack">الطلب حسب البريباك</text>
+<text name="AvailablePrepacks">البريباكات المتاحة</text>
+<text name="Department">القسم</text>
+<text name="Noitems ...">لا توجد عناصر ...</text>
+<text name="LoadingMoreRelatedProducts…">جارٍ تحميل المزيد من المنتجات ذات الصلة…</text>
+<text name="Colors">الألوان</text>
+<text name="Summary">ملخص</text>
+<text name="SoldOutDate">تاريخ نفاد الكمية</text>
+
+<text name="the price assigned to the ordered Items will be updated">سيتم تحديث السعر المخصص للعناصر المطلوبة</text>
+<text name="Okay">حسنًا</text>
+<text name="This variation is already added to the order">تمت إضافة هذا الخيار بالفعل إلى الطلب</text>
+
+<text name="you need to connect to this seller account , to be able to proceed">يجب الاتصال بحساب هذا البائع لتتمكن من المتابعة</text>
+<text name="ConnectProceed">اتصل وتابع</text>
+
+<text name="CustomersReviews">مراجعات العملاء</text>
+<text name="CustomerQuestions">أسئلة العملاء</text>
+<text name="VerifiedPurchaser">مشتري موثّق</text>
+<text name="OnlyOneImgOneVideo">مسموح بصورة واحدة أو فيديو واحد فقط</text>
+
+<text name="AccountAdmin">مسؤول الحساب</text>
+<text name="ProfileOwner">مالك الملف</text>
+<text name="NotVerifiedPurchaser">مشتري غير موثّق</text>
+
+<text name="ReadMore">اقرأ المزيد</text>
+<text name="ViewAllQuestions">عرض كل الأسئلة</text>
+<text name="OnlyOneReviewIsAllowed">مسموح بمراجعة واحدة فقط!</text>
+<text name="BasedOn">بناءً على</text>
+<text name="Ratings">التقييمات</text>
+<text name="ViewAllReviews">عرض كل المراجعات</text>
+
+<text name="InviteContact">دعوة جهة اتصال</text>
+<text name="CreateBusinessAccount">إنشاء حساب تجاري</text>
+<text name="CreateGroupAccount">إنشاء حساب مجموعة</text>
+<text name="BackToMyAccount">العودة إلى حسابي</text>
   </texts>
 </localizationDictionary>

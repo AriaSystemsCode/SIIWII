@@ -24,7 +24,7 @@
 
         <div class="d-flex name-price">
     
-             <h5 class="seller" *ngIf="!isSellerIdExists">Sold By {{ product?.sellerName }}</h5> 
+             <h5 class="seller" *ngIf="!isSellerIdExists">{{'SoldBy' | localize}} {{ product?.sellerName }}</h5> 
    
         </div>
 
@@ -40,7 +40,7 @@
                 </div>
               </div>
             </div>
-            <span class="mr-2 mt-2 rateNum">({{productCard?.numberOfReviews }}) reviews</span>
+            <span class="rateNum">({{productCard?.numberOfReviews }}) {{'reviews' | localize}}</span>
 
           </div>
     </div>

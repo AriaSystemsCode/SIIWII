@@ -44,7 +44,7 @@
           </div>
 
           <span style="width: 100%; " class="mt-3"
-          *ngIf="marketPlaceData?.availableConnections?.length > 0">
+          *ngIf="marketPlaceData?.availableConnections?.length > 0 && isAuthenticated">
 
           <!-- Guard + alias once -->
           <ng-container *ngIf="marketPlaceData?.availableConnections as options">
@@ -80,7 +80,7 @@
 
       </span>
      
-          <span style="width: 100%; " class="mt-3 d-flex"  *ngIf="marketPlaceData?.availableConnections?.length == 0 && marketPlaceData?.connectionName">
+          <span  style="width: 100%; " class="mt-3 d-flex"  *ngIf="marketPlaceData?.availableConnections?.length == 0 && marketPlaceData?.connectionName && isAuthenticated">
             <div  class="btn relation_Status_button " style="    white-space: nowrap;
                 position: absolute;
               cursor: auto;  "   [ngClass]="isArabic?'dropCnAr':'dropCnEn'" dropdown>

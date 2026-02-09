@@ -24,6 +24,8 @@ export class AccountCardComponent extends AppComponentBase implements OnChanges 
     attachmentBaseUrl :string = AppConsts.attachmentBaseUrl
     currentLang: string
     isArabic: boolean
+    isAuthenticated: boolean = false;
+
     constructor(
         injector:Injector,
         private router:Router,
@@ -35,9 +37,11 @@ export class AccountCardComponent extends AppComponentBase implements OnChanges 
     ngOnInit(){
       this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
       this.currentLang == 'ar' || this.currentLang == 'ar-EG'  ? this.isArabic = true : this.isArabic = false
+      this.isAuthenticated = !!this.appSession?.user;
+
     }
     ngOnChanges(changes: SimpleChanges): void {
-        this.isRecordOwner = this.account.account.partnerId == this.appSession.user.accountId
+        this.isRecordOwner = this.account.account.partnerId == this.appSession?.user?.accountId
     }
     
     get id () : number { return this.account.account.id }

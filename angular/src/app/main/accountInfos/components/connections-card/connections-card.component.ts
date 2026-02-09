@@ -26,14 +26,18 @@ export class ConnectionsCardComponent extends AppComponentBase {
 
     currentLang:string
     isArabic:boolean 
+
+    isAuthenticated: boolean = false;
+
     constructor(
         injector: Injector,
         private router: Router,
-          private _accountsServiceProxy: AccountsServiceProxy,
     ) {
         super(injector);
     }
     ngOnChanges(changes: SimpleChanges): void {
+      this.isAuthenticated = !!this.appSession?.user;
+
       this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
       this.currentLang == 'ar' || this.currentLang == 'ar-EG'  ? this.isArabic = true : this.isArabic = false
         this.isRecordOwner = this.account.account.partnerId == this.appSession.user.accountId

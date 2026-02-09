@@ -73,6 +73,9 @@ export class EventsBrowseComponent extends AppComponentBase  implements OnInit,O
     currentLang: string = 'en';
     isArabic: boolean = false;
     filterVisible :boolean=true
+
+  isAuthenticated: boolean = false;
+
     constructor(
         injector: Injector,
         private _appEventsServiceProxy: AppEventsServiceProxy,
@@ -147,6 +150,7 @@ export class EventsBrowseComponent extends AppComponentBase  implements OnInit,O
     }
 
     ngOnInit(): void {
+    this.isAuthenticated = !!this.appSession?.user;
         this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
         this.currentLang == 'ar' || this.currentLang == 'ar-EG'  ? this.isArabic = true : this.isArabic = false
         this.getProfilePicture();

@@ -119,12 +119,12 @@ fill: #fff;
 }
 
 
-.mrAr {
-  margin-top: -40px;
-}
-.mrEn{
-  margin-top: -90px;
-}
+// .mrAr {
+//   margin-top: -40px;
+// }
+// .mrEn{
+//   margin-top: -90px;
+// }
 
 ::ng-deep  {
   @media only screen and (min-width: 575px) and (max-width: 1024x) {
@@ -147,10 +147,27 @@ fill: #fff;
   background: #FFF !important;
   box-shadow: 1px 1px 6px 0px rgba(22, 22, 22, 0.05) !important;
   color: #1B101B !important;
-  height: 43px;
+  // height: 43px;
 
 }
 
 .iconsDiv {
   height: 46px;
 }
+
+
+.bodySec {
+  // padding: 14px;
+  background: #FFFFFF;
+  border: 1px solid #EEEEEE;
+  box-shadow: 4px 4px 10px rgba(22, 22, 22, 0.15);
+  border-radius: 20px;
+  
+  }
+
+  .sortByDd {
+    border: 1px solid #d9d9d9;
+    padding: 10px 30px !important;
+    border-radius: 10px;
+  }
+  
