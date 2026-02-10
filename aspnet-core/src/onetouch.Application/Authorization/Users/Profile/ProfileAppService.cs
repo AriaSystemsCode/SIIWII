@@ -303,7 +303,7 @@ namespace onetouch.Authorization.Users.Profile
                 input.LanguageName
             );
         }
-
+        [AbpAllowAnonymous]
         private async Task<byte[]> GetProfilePictureByIdOrNull(Guid profilePictureId)
         {
             var file = await _binaryObjectManager.GetOrNullAsync(profilePictureId);
@@ -314,7 +314,7 @@ namespace onetouch.Authorization.Users.Profile
 
             return file.Bytes;
         }
-
+        [AbpAllowAnonymous]
         private async Task<GetProfilePictureOutput> GetProfilePictureByIdInternal(Guid profilePictureId)
         {
             var bytes = await GetProfilePictureByIdOrNull(profilePictureId);

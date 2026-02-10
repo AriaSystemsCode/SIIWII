@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Text.RegularExpressions;
+using Abp.Authorization;
 using onetouch.Globals;
 
 namespace onetouch.Helpers
@@ -25,7 +26,7 @@ namespace onetouch.Helpers
             return timeZoneInfoAppService.GetUTCDatetimeValue(fromDateTime,  timeZone);
 
         }
-
+        [AbpAllowAnonymous]
         public DateTime GetDatetimeValueFromUTC(DateTime fromDateTime, string fromTimeZone)
         {
             TimeZoneInfoAppService timeZoneInfoAppService = new TimeZoneInfoAppService();

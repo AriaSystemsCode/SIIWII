@@ -194,7 +194,7 @@ namespace onetouch.AppEvents
             }
             return appEventDto;
         }
-
+         [AbpAllowAnonymous]
         public async Task<GetAppEventForViewDto> GetAppEventForView(long id,long entityId, string timeZone)
         {
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
