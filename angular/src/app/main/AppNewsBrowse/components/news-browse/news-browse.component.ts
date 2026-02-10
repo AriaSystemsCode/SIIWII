@@ -77,7 +77,7 @@ export class NewsBrowseComponent extends AppComponentBase {
     get startDateCtrl () { return this.filterForm.get('startDate') }
     get endDateCtrl () { return this.filterForm.get('endDate') }
     totalCount:number
-    filterVisible:boolean =false
+    filterVisible:boolean 
 
     currentLang: string = 'en';
     isArabic: boolean = false;
@@ -320,7 +320,7 @@ export class NewsBrowseComponent extends AppComponentBase {
     getEvents(event?: LazyLoadEvent) {
         if ( isNaN(this.defaultMainFilter) ) return
         if (this.primengTableHelper.shouldResetPaging(event)) {
-            this.paginator.totalRecords = 10;
+            this.paginator.totalRecords = 12;
             this.paginator.changePage(0);
             return;
         }
@@ -328,50 +328,6 @@ export class NewsBrowseComponent extends AppComponentBase {
         this.primengTableHelper.showLoadingIndicator();
         this.showMainSpinner()
         this.loading = true
-     /*   const subs = this._appEventsServiceProxy
-        .getAll(
-            filters?.filterType?.value,
-            filters?.search || undefined,
-            typeof filters?.isOnline == 'boolean'? filters?.isOnline : undefined,
-            undefined,
-            undefined,
-            undefined,
-            undefined,
-            undefined,
-            filters?.timeZone || undefined,
-            undefined,
-            filters?.startDate ? moment(filters.startDate,false) : undefined,
-            filters?.endDate ? moment(filters.endDate,false) : undefined,
-            undefined,
-            undefined,
-            filters?.startTime|| undefined,
-            undefined,
-            filters?.endTime|| undefined,
-            undefined,
-            undefined,
-            undefined,
-            undefined,
-            filters?.city || undefined,
-            filters?.state || undefined,
-            filters?.postalCode || undefined,
-            filters?.sorting.value ,
-            this.primengTableHelper.getSkipCount(this.paginator, event) || 0,
-            this.primengTableHelper.getMaxResultCount(this.paginator, event)
-        )
-        .pipe(
-            finalize(() => {
-                if (!this.active) this.active = true
-                this.loading = false
-                this.hideMainSpinner()
-                this.primengTableHelper.hideLoadingIndicator();
-            })
-        )
-        .subscribe((result) => {
-            this.items  = result.items
-            this.primengTableHelper.totalRecordsCount = result.totalCount;
-            this.primengTableHelper.records = result.items;
-        });
-        this.subscriptions.push(subs) */
 
         const subs = this._postService  .getAll(
             filters?.search || undefined,
@@ -608,13 +564,6 @@ export class NewsBrowseComponent extends AppComponentBase {
                 this.onshowCreateOrEdit(getAppPostForViewDto);
             });
     }
-    /*onshowCreateOrEdit($event) {
-        this.createOrEditModal.show(
-            $event,
-            this.typeFile,
-            this.relatedEntityId
-        );
-    }*/
 
     onTypeFile($event) {
         this.typeFile = $event;
@@ -688,4 +637,10 @@ toggleFilter(): void {
     this.filterVisible = !this.filterVisible;
 
 }
+
+get videosGridClass(): string {
+    if (this.singleItemPerRowMode) return 'v-list';
+
+    return this.filterVisible ? 'v-grid-with-filter' : 'v-grid-no-filter';
+  }
 }

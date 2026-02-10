@@ -47,6 +47,11 @@ export class ViewEventComponent extends AppComponentBase implements OnInit {
     logoPhoto : string
     coverPhoto : string
     // displayStatus:boolean=false;
+
+    currentLang: string
+    isArabic: boolean
+    isAuthenticated: boolean = false;
+
     public constructor(
         private _appEventsServiceProxy: AppEventsServiceProxy,
         private _appEventGuestsAppService: AppEventGuestsServiceProxy,
@@ -56,6 +61,10 @@ export class ViewEventComponent extends AppComponentBase implements OnInit {
     }
 
     ngOnInit(){
+        this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
+        this.currentLang == 'ar' || this.currentLang == 'ar-EG'  ? this.isArabic = true : this.isArabic = false
+        this.isAuthenticated = !!this.appSession?.user;
+  
         this.getAllAttachmentCategories()
     }
 

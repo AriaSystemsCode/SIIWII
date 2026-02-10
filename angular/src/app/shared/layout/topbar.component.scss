@@ -8,7 +8,7 @@
     font-size: unset;
     height: 3.5rem;
     cursor:pointer;
-    border-radius: 10px;
+    // border-radius: 10px;
 }
 
 @media (min-width: 1399px) {
@@ -213,17 +213,6 @@ left: 30px;
         margin-right: 0px !important;
     }
 
-    .navbar-brand-sm {
-        position: absolute;
-        left: 0px;
-        padding-left: 25px;
-    }
-
-    .navbar-brand-sm {
-        position: absolute;
-        right: 0px;
-        padding-right: 25px;
-    }
 }
 
 .Create-New {
@@ -271,10 +260,7 @@ left: 30px;
         display: none !important;
     }
 
-    // .p-dialog .p-dialog-header {
-    //     background-color: #fff !important;
-    //     color: #f6851d !important ;
-    // }
+
     .p-dialog .p-dialog-content {
         text-align: left !important;
     }
@@ -606,3 +592,78 @@ left: 30px;
 .search-ar{
     left: 0px;
 }
+
+
+
+/*  Mobile bottom navbar - sizes & appearance only */
+@media (max-width: 575.98px) {
+    .topbar.fixed-bottom {
+      height: 64px !important;
+      padding: 6px 10px !important;
+      border-radius: 16px 16px 0 0 !important;
+      box-shadow: 0 -6px 18px rgba(22, 22, 22, 0.12) !important;
+    }
+  
+    /* layout */
+    .bottom-navbar {
+      width: 100%;
+      display: flex !important;
+      flex-direction: row !important;
+      align-items: center !important;
+      justify-content: space-between !important;
+      margin: 0 !important;
+      padding: 0 6px !important;
+      gap: 8px !important;
+    }
+  
+    .bottom-navbar .nav-item {
+      flex: 1 1 0;
+      padding-top: 0 !important;
+      display: flex !important;
+      justify-content: center !important;
+    }
+  
+    /* make each item a nice touch target */
+    .bottom-navbar .nav-link,
+    .bottom-navbar .navbar-brand {
+      width: 46px;
+      height: 46px;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      border-radius: 14px;
+      padding: 0 !important;
+      margin: 0 !important;
+    }
+  
+    /* icons/images sizing */
+    .bottom-navbar ._navbar-brand {
+      width: 24px !important;
+      height: 24px !important;
+    }
+  
+    /* profile picture */
+    .bottom-navbar img.header-profile-picture {
+      width: 28px !important;
+      height: 28px !important;
+    }
+  
+    /* badge position for cart/messages */
+    .bottom-navbar .unread-notification-count {
+      min-width: 18px;
+      height: 18px;
+      font-size: 11px;
+      line-height: 18px;
+      border-radius: 999px;
+      right: -8px !important;
+      top: -6px !important;
+    }
+  
+    /*  optional: active/hover state  */
+    .bottom-navbar .header-link-active,
+    .bottom-navbar .nav-link:active {
+      background: rgba(255, 255, 255, 0.18);
+    }
+  
+
+  }

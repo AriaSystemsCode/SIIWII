@@ -49,8 +49,8 @@
                 </div>
             </div>
 
-            <div class="row m-4">
-                <div class="col-6">
+            <div class="row m-4" *ngIf="isAuthenticated">
+                <div class="col-6" >
                     <button class="btn btn-primary _Btn pointer" [disabled]="!event?.appEvent?.isPublished" [ngClass]="{
                             disabled: !event?.appEvent?.isPublished
                         }" (click)="createPost()">
@@ -141,7 +141,7 @@
                 </div>
             </div>
 
-            <div class="row ml-4 mr-4">
+            <div class="row ml-4 mr-4" [ngClass]="!isAuthenticated ? 'mt-3':''">
                 <div class="col-9">
                     <div class="eventDetails">
                         <h6>{{ event?.appEvent?.name }} <br /></h6>

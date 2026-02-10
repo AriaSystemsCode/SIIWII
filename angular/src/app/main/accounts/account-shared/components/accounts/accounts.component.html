@@ -2,8 +2,8 @@
     <div [@routerTransition] class="wrapper" [ngClass]="!isArabic ? 'addMg':  isAuthenticated && isArabic ? 'mt-lg-5' : 'addMg'">
         <div class="kt-grid__item kt-grid__item--fluid kt-grid kt-grid--hor  marginMob">
             <div [class]="containerClass + ' kt-grid__item kt-grid__item--fluid'">
-                <div class="bodySec kt-portlet--mobile " [ngClass]="!isAuthenticated ? 'm-4': isAuthenticated && isArabic ? 'mt-lg-4 mt-md-3 mt-5':''">
-                    <div class="kt-portlet__body">
+                <div class="bodySec kt-portlet--mobile " [ngClass]="!isAuthenticated ? 'm-4': isAuthenticated && isArabic ? 'mt-lg-4 mt-md-3 mt-5':'mt-lg-0 mt-3'">
+                    <div class="kt-portlet__body ml-3">
                         <div class="row">
                             <div class="col-12 list-toolbar">
                                 <div class="row mb-3 justify-content-between mt-3">
@@ -137,8 +137,7 @@
                                             border: 1px solid #EEEEEEEE !important;
                                             color: #4A0D4A !important;
                                             padding: 10px;
-                                            border-radius: 6px;
-                                            margin-left: 10px;"
+                                            border-radius: 6px;"
                                             (click)="resetList()"> <img src="../../assets/img/input_icons/repeat.png"
                                                 class="alarmInfo">
                                      

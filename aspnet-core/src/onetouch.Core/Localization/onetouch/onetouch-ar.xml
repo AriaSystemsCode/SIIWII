@@ -1145,6 +1145,7 @@
 <text name="InviteContact">دعوة جهة اتصال</text>
 <text name="CreateBusinessAccount">إنشاء حساب تجاري</text>
 <text name="CreateGroupAccount">إنشاء حساب مجموعة</text>
-<text name="BackToMyAccount">العودة إلى حسابي</text>
+		<text name="Products">Products</text>
+
   </texts>
 </localizationDictionary>

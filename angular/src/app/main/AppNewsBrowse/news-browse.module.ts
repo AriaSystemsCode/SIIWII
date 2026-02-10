@@ -21,13 +21,15 @@ import { PostsModule } from '../posts/posts.module';
 import { CalendarModule } from 'primeng/calendar';
 
 import { DialogModule } from 'primeng/dialog';
+import { NewsVideoTileComponent } from './components/news-video-tile/news-video-tile.component';
 
 @NgModule({
     declarations: [
         NewsBrowseFiltersComponent,
         NewsBrowseCardComponent ,
         NewsBrowseComponent,
-        NewsBrowseActionsMenuComponent
+        NewsBrowseActionsMenuComponent,
+        NewsVideoTileComponent
     ],
     imports: [
         CommonModule,
@@ -49,7 +51,7 @@ import { DialogModule } from 'primeng/dialog';
         DialogModule
     ],
     exports:[
-        NewsBrowseComponent
+        NewsBrowseComponent , NewsVideoTileComponent
     ]
 })
 export class NewsBrowseModule { }

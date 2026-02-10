@@ -1,16 +1,16 @@
 <form [formGroup]="filterForm">
-    <div [@routerTransition]  [ngClass]="isArabic && isAuthenticated ? 'mrAr ktcnt': !isArabic && isAuthenticated ? 'mrEn':''">
+    <div [@routerTransition]  [ngClass]="isArabic && isAuthenticated && (!fromMarketPlaceProfile && !fromOverviewMarketPlaceProfile) ? 'mrAr ktcnt': !isArabic && isAuthenticated ? 'mrEn':''">
       <div
-        class=" kt-grid__item kt-grid__item--fluid kt-grid kt-grid--hor   {{ !fromOverviewMarketPlaceProfile ? 'bodySec p-lg-4 mx-lg-4 mx-md-2' : '' }} "  [ngClass]="!isAuthenticated ? 'm-4':isAuthenticated && isArabic ? 'mt-lg-4 mt-md-3 mt-5':''"
+        class=" kt-grid__item kt-grid__item--fluid kt-grid kt-grid--hor   {{ !fromOverviewMarketPlaceProfile ? 'bodySec p-lg-2 mx-lg-4 mx-md-2' : '' }} "  [ngClass]="!isAuthenticated ? 'm-4': isAuthenticated && isArabic ? '':''"
      
       >
         <div
-          [class]="containerClass + ' kt-grid__item kt-grid__item--fluid'"
+    
           [ngClass]="fromOverviewMarketPlaceProfile ? 'p-0' : ''"
         >
           <div class="kt-portlet--mobile">
             <div [ngClass]="fromOverviewMarketPlaceProfile ? '' : 'kt-portlet__body'">
-              <div class="row pt-4 mx-1" *ngIf="active && items?.length > 0" [ngClass]="fromOverviewMarketPlaceProfile ? ' mt-lg-0 pt-lg-0  mt-5 pt-5':''">
+              <div class="row  mx-1" *ngIf="active && items?.length > 0" [ngClass]="fromOverviewMarketPlaceProfile ? 'mx-md-0 mx-1':!fromMarketPlaceProfile && !fromOverviewMarketPlaceProfile ? 'pt-4 px-lg-4 px-2':''">
                 <div class="col-12 list-toolbar">
   
                   <div class="row mb-3 justify-content-between" *ngIf="!fromMarketPlaceProfile">
@@ -67,7 +67,7 @@
                       </div>
                     </div>
   
-                    <div class="list-toolbar-divider d-lg-block d-none" *ngIf="canAdd"></div>
+                    <div class="list-toolbar-divider d-lg-block d-none" *ngIf="canAdd && isAuthenticated"></div>
   
                     <div class="mb-4 mb-md-0 text-center" *ngIf="canAdd && isAuthenticated">
                       <a class="btn font-weight-normal pl-2 pr-2 text-center list-toolbar-btn" (click)="createNewEvents()">
@@ -89,11 +89,11 @@
                     <div class="text-center d-flex iconsDiv">
                       <button
                         type="button"
-                        class="btn font-weight-normal text-center toolbar-btn d-md-none d-block" style="border: 1px solid #EEEEEE;"
+                        class="btn font-weight-normal text-center toolbar-btn d-md-none d-block mx-1" style="border: 1px solid #EEEEEE;"
                         [title]="'Filters' | localize"
                         (click)="openMobileFilters($event)"
                       >
-                        <i class="d-inline-block w-100 pi pi-filter"></i>
+                        <i class="d-inline-block w-100 pi pi-filter p-0"></i>
                       </button>
                     
                       <button
@@ -115,7 +115,7 @@
                         class="btn font-weight-normal text-center resetBtn toolbar-btn"
                         (click)="resetList()"
                       >
-                        <i class="d-inline-block w-100 flaticon2-reload icon-center p-0" [ngClass]="isArabic?'mrRst':''"></i>
+                        <i class="d-inline-block w-100 flaticon2-reload icon-center p-0" ></i>
                       </a>
   
                       <a
@@ -152,12 +152,12 @@
                 <div
                   class="justify-content-between app-items-container thin-scroll"
                   [ngClass]="
-                    fromOverviewMarketPlaceProfile
+                    fromOverviewMarketPlaceProfile || fromMarketPlaceProfile
                       ? 'col-12 p-0'
                          : (singleItemPerRowMode && filterVisible ? 'col-lg-9 col-md-7 col-12' : singleItemPerRowMode && !filterVisible ? 'col-12' : !singleItemPerRowMode && filterVisible ? 'col-lg-9 col-md-6 col-12' : !singleItemPerRowMode && !filterVisible ? ' col-12': 'col-12') 
                   "
                 >
-                  <div class="d-flex justify-content-between" *ngIf="!fromOverviewMarketPlaceProfile && items?.length > 0">
+                  <div class="d-flex justify-content-between align-items-center" *ngIf="!fromOverviewMarketPlaceProfile && items?.length > 0" [ngClass]="fromMarketPlaceProfile ?'mt-3':''">
                     <div class="font-weight-normal list-toolbar-data-summary" *ngIf="active">
                       {{ (paginator.getPage()) * primengTableHelper.defaultRecordsCountPerPage }}-{{
                         (paginator.getPage()) * primengTableHelper.defaultRecordsCountPerPage + items.length
@@ -201,7 +201,7 @@
                       class="col-12"
                       [ngClass]="
                         singleItemPerRowMode || fromMarketPlaceProfile
-                          ? 'col-md-12 single-item-per-row-layout mb-2 px-0 pl-2'
+                          ? 'col-md-12 single-item-per-row-layout mb-2 px-1'
                           : !singleItemPerRowMode && !filterVisible ? 'col-lg-3 col-md-6 col-12' : 'col-lg-4 col-12 mb-5'
                       "
                     >
