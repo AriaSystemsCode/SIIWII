@@ -45,5 +45,7 @@ namespace onetouch.MultiTenancy.Dto
         //I40[Start]
         public int RelatedTenantId {  get; set; }
         //I40[End]
+        [Required]
+        public string AdminName { get; set; } = "admin";
     }
 }

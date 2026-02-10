@@ -1410,7 +1410,7 @@ namespace onetouch.AppMarketplaceAccounts
                            x.AccountId == mainAccountID
                            && x.TenantId == AbpSession.TenantId
                            && x.ParentId == mainAccountID
-                           && x.EntityFk.EntityObjectTypeId != personEntityObjectTypeId).ToList();
+                           ).ToList();
                 // First level of branches
                 foreach (var branchObj in branchInfo)
                 {

@@ -2576,5 +2576,6 @@
 		<text name="Pleasemakesuretheimagessize5MB">Please make sure the images size 5MB</text>
 		<text name="FilesformatsSupportedareXLSX,JPGandPNG">Files formats Supported are XLSX,JPG and PNG</text>
 
+    <text name="NEWWWWS">NEWWWWS</text>
 	</texts>  
 </localizationDictionary>
