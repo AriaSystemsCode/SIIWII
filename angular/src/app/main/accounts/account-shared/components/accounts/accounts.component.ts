@@ -82,6 +82,8 @@ export class AccountsComponent
     loading: boolean = false;
     currentLang:string
     isArabic:boolean 
+    isAuthenticated: boolean = false;
+
     constructor(
         injector: Injector,
         private _accountsServiceProxy: AccountsServiceProxy,
@@ -96,6 +98,7 @@ export class AccountsComponent
         this.overridePrimeTableSetting();
     }
     ngOnInit() {
+        this.isAuthenticated = !!this.appSession?.user;
         this.isHost = !this._abpSessionService.tenantId;
         this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
         this.currentLang == 'ar' || this.currentLang == 'ar-EG'  ? this.isArabic = true : this.isArabic = false

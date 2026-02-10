@@ -211,7 +211,7 @@ export class TopBarComponent extends ThemesLayoutBaseComponent implements OnInit
             this._abpSessionService.impersonatorUserId > 0;
             if(this.isAuthenticated != undefined) {
                 this.setCurrentLoginInformations();
-                // this.getProfilePicture();
+                this.getProfilePicture();
                 this.getRecentlyLinkedUsers();
                 this.appSession?.user?.memberId;
                 this.appSession?.user?.id;
@@ -234,7 +234,7 @@ export class TopBarComponent extends ThemesLayoutBaseComponent implements OnInit
 
     registerToEvents() {
         abp.event.on("profilePictureChanged", () => {
-            // this.getProfilePicture();
+            this.getProfilePicture();
         });
 
         abp.event.on("app.chat.unreadMessageCountChanged", (messageCount) => {

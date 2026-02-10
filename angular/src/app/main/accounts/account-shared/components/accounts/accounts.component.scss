@@ -167,23 +167,33 @@ input[type="radio"]:checked+label {
   font-size: 14px;
 }
 @media (min-width: 1024px) {
-.addMg {
-  margin-top: -90px
-}
-}
+// .addMg {
+//   margin-top: -90px
+// }
+// }
 
- .addMgAr {
-  @media (max-width: 1024px) {
+//  .addMgAr {
+//   @media (max-width: 1024px) {
   
-        margin-left: 10px !important;
+//         margin-left: 10px !important;
    
-}
+// }
 }
 
 ::ng-deep {
+ 
   @media (max-width: 1024px) {
     .kt-portlet {
         margin-top: 0px !important;
     }
 }
+}
+
+.bodySec {
+padding: 14px;
+background: #FFFFFF;
+border: 1px solid #EEEEEE;
+box-shadow: 4px 4px 10px rgba(22, 22, 22, 0.15);
+border-radius: 20px;
+
 }

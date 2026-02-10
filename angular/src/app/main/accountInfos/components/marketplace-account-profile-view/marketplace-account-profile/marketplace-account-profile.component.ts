@@ -23,6 +23,8 @@ export class MarketplaceAccountProfileComponent extends AppComponentBase impleme
 
   currentLang:string
   isArabic:boolean 
+  isAuthenticated: boolean = false;
+
   constructor(
     injector: Injector,
     private route: ActivatedRoute,
@@ -34,6 +36,7 @@ export class MarketplaceAccountProfileComponent extends AppComponentBase impleme
   }
 
   ngOnInit(): void {
+    this.isAuthenticated = !!this.appSession?.user;
     this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
     this.currentLang == 'ar' || this.currentLang == 'ar-EG'  ? this.isArabic = true : this.isArabic = false
    }

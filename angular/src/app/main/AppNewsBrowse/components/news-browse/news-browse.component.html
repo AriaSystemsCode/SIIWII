@@ -1,13 +1,13 @@
 <form [formGroup]="filterForm">
     <div [@routerTransition] [ngClass]="isArabic ? 'mrAr ktcnt':'mrEn'">
-        <div class="kt-content kt-grid__item kt-grid__item--fluid kt-grid kt-grid--hor">
+        <div class="kt-grid__item kt-grid__item--fluid kt-grid kt-grid--hor">
             <div [class]="containerClass + ' kt-grid__item kt-grid__item--fluid'">
-                <div class="kt-portlet kt-portlet--mobile">
+                <div class="bodySec kt-portlet--mobile"  [ngClass]="!isAuthenticated ? 'm-4':isAuthenticated && isArabic ? 'mt-lg-4 mt-md-3 mt-5':''">
                     <div class="kt-portlet__body">
                         <div class="row " *ngIf="active">
                             <div class="col-12 list-toolbar">
                                 <div class="row mb-3 justify-content-between">
-                                    <div class="col-12 col-md-3 col-sm-6 list-toolbar-filter mb-0 mb-4 mb-md-0">
+                                    <div class="col-12 col-md-3 col-sm-6 list-toolbar-filter mb-0">
                                         <div class="btn-group dropdown list-toolbar-dropdown" dropdown  *ngIf="showMainFiltersOptions">
                                             <button class=" btn btn-sm font-weight-normal p-0"
                                             type="button"
@@ -22,7 +22,7 @@
                                         <div class="list-toolbar-dropdown-filter-selectedItem font-weight-normal text-dark" *ngIf="!showMainFiltersOptions">{{ mainFilterCtrl?.value?.label }}</div>
 
                                     </div>
-                                    <div class="mb-4 mb-md-0 list-toolbar-search">
+                                    <div class="mb-md-0 list-toolbar-search">
                                         <div class="kt-input-icon kt-input-icon--left">
                                             <input type="text"  (input)="handleSearchInput($event)" class="form-control" [placeholder]="'SearchWithThreeDot' | localize" id="generalSearch">
                                             <span class="kt-input-icon__icon kt-input-icon__icon--left">
@@ -40,7 +40,7 @@
                                         <a  [title]="'ResetData' | localize" class="btn  font-weight-normal text-center toolbar-btn resetBtn mx-2" (click)="resetList()">
                                             <i  class="d-inline-block w-100 flaticon2-reload icon-center p-0"></i>
                                         </a>
-                                        <a style="padding-left: 10px;" [title]="'ToggleView' | localize" (click)="triggerListView()" class="btn  font-weight-normal pr-1 text-center toggleBtn toolbar-btn">
+                                        <a [title]="'ToggleView' | localize" (click)="triggerListView()" class="btn  font-weight-normal pr-1 text-center toggleBtn toolbar-btn">
                                             <i  class="d-inline-block w-100 " [ngClass]="singleItemPerRowMode ? 'flaticon2-menu' : 'fa-bars fas'"></i>
                                         </a>
 
@@ -62,7 +62,7 @@
                                         <button
                                         type="button"
                                         class="btn toolbar-btn d-inline-flex d-md-none align-items-center"
-                                        (click)="openFiltersDialog()"
+                                        (click)="openFiltersDialog()" style="border: 1px solid #EEEEEE;"
                                         >
                                         <i class="fa fa-sliders-h mr-2"></i>
                                       
@@ -86,7 +86,7 @@
                                     </div>
                                     <div class="sortBy">
                                         <div class="btn-group dropdown list-toolbar-dropdown" dropdown >
-                                            <button class="dropdown-toggle btn btn-sm font-weight-normal p-0 "
+                                            <button class="dropdown-toggle btn btn-sm font-weight-normal p-0 sortByDd "
                                             type="button"
                                                 dropdownToggle>
                                                 <span class="list-toolbar-dropdown-sort-label">

@@ -2616,7 +2616,7 @@
 	<text name="BussinessClassification">Bussiness Classification</text>
 	<text name="OverallRating">Overall Rating</text>
 	<text name="Media">Media</text>
-	<text name="RecentEvents">RecentEvents</text>
+	<text name="RecentEvents">Recent Events</text>
 	<text name="Connections">Connections</text>
 	<text name="ForFullViewingOf">For full viewing of</text>
 	<text name="VisitVirtualShowroom">Visit Virtual Showroom</text>
@@ -2666,6 +2666,25 @@
                 the order</text>
 				<text name="you need to connect to this seller account , to be able to proceed">you need to connect to this seller account , to be able to proceed</text>
 	<text name="ConnectProceed">Connect and Proceed</text>
+	<text name="CustomersReviews">Customers Reviews</text>
+	<text name="CustomerQuestions">Customer Questions</text>
+	<text name="VerifiedPurchaser">Verified Purchaser</text>
+	<text name="OnlyOneImgOneVideo">Only one img or one video</text>
+	<text name="AccountAdmin">Account Admin</text>
+	<text name="ProfileOwner">Profile Owner</text>
+	<text name="NotVerifiedPurchaser">Not Verified Purchaser</text>
+	<text name="ReadMore">Read more</text>
+	<text name="ViewAllQuestions">View all questions</text>
+	<text name="OnlyOneReviewIsAllowed">Only one review is allowed!</text>
+	<text name="BasedOn">Based on</text>
+	<text name="Ratings">Ratings</text>
+	<text name="ViewAllReviews">View all reviews</text>
+	<text name="InviteContact">Invite Contact</text>
+	<text name="CreateBusinessAccount">Create Business Account</text>
+	<text name="CreateGroupAccount">Create Group Account</text>
+	<text name="BackToMyAccount">Back To My Account</text>
+
+
 
 
   </texts>  

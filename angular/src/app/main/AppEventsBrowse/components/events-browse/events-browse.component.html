@@ -1,15 +1,15 @@
 <form [formGroup]="filterForm">
-    <div [@routerTransition]  class="" [ngClass]="isArabic ? 'mrAr ktcnt':'mrEn'">
+    <div [@routerTransition]  [ngClass]="isArabic && isAuthenticated ? 'mrAr ktcnt': !isArabic && isAuthenticated ? 'mrEn':''">
       <div
-        class="kt-content kt-grid__item kt-grid__item--fluid kt-grid kt-grid--hor"
-        [ngClass]="fromOverviewMarketPlaceProfile ? 'p-0' : ''"
+        class=" kt-grid__item kt-grid__item--fluid kt-grid kt-grid--hor   {{ !fromOverviewMarketPlaceProfile ? 'bodySec p-lg-4 mx-lg-4 mx-md-2' : '' }} "  [ngClass]="!isAuthenticated ? 'm-4':isAuthenticated && isArabic ? 'mt-lg-4 mt-md-3 mt-5':''"
+     
       >
         <div
           [class]="containerClass + ' kt-grid__item kt-grid__item--fluid'"
           [ngClass]="fromOverviewMarketPlaceProfile ? 'p-0' : ''"
         >
-          <div class="kt-portlet kt-portlet--mobile">
-            <div class="" [ngClass]="fromOverviewMarketPlaceProfile ? '' : 'kt-portlet__body'">
+          <div class="kt-portlet--mobile">
+            <div [ngClass]="fromOverviewMarketPlaceProfile ? '' : 'kt-portlet__body'">
               <div class="row pt-4 mx-1" *ngIf="active && items?.length > 0" [ngClass]="fromOverviewMarketPlaceProfile ? ' mt-lg-0 pt-lg-0  mt-5 pt-5':''">
                 <div class="col-12 list-toolbar">
   
@@ -69,14 +69,14 @@
   
                     <div class="list-toolbar-divider d-lg-block d-none" *ngIf="canAdd"></div>
   
-                    <div class="mb-4 mb-md-0 text-center" *ngIf="canAdd">
+                    <div class="mb-4 mb-md-0 text-center" *ngIf="canAdd && isAuthenticated">
                       <a class="btn font-weight-normal pl-2 pr-2 text-center list-toolbar-btn" (click)="createNewEvents()">
                         {{ "CreateNewEvent" | localize }}
                         <i class="fa-plus fa-plus-circle fas ml-1"></i>
                       </a>
   
                       <a
-                        style="padding-right: 3px; padding-left: 9px;"
+                       
                         [title]="'Import(Coming Soon)' | localize"
                         class="btn importBtn font-weight-normal toolbar-btn pr-0 mx-1"
                       >
@@ -89,7 +89,7 @@
                     <div class="text-center d-flex iconsDiv">
                       <button
                         type="button"
-                        class="btn font-weight-normal text-center toolbar-btn d-md-none d-block"
+                        class="btn font-weight-normal text-center toolbar-btn d-md-none d-block" style="border: 1px solid #EEEEEE;"
                         [title]="'Filters' | localize"
                         (click)="openMobileFilters($event)"
                       >
@@ -110,22 +110,22 @@
                   </button>
   
                       <a
-                        style="padding-right: 4px; padding-left: 10px;"
+                    
                         [title]="'ResetData' | localize"
                         class="btn font-weight-normal text-center resetBtn toolbar-btn"
                         (click)="resetList()"
                       >
-                        <i class="d-inline-block w-100 flaticon2-reload icon-center" [ngClass]="isArabic?'mrRst':''"></i>
+                        <i class="d-inline-block w-100 flaticon2-reload icon-center p-0" [ngClass]="isArabic?'mrRst':''"></i>
                       </a>
   
                       <a
-                        style="padding-left: 10px;"
+                 
                         [title]="'ToggleView' | localize"
                         (click)="triggerListView()"
-                        class="btn font-weight-normal pr-1 text-center toggleBtn toolbar-btn"
+                        class="btn font-weight-normal mx-1 text-center toggleBtn toolbar-btn"
                       >
                         <i
-                          class="d-inline-block w-100"
+                          class="d-inline-block w-100 p-0"
                           [ngClass]="singleItemPerRowMode || fromMarketPlaceProfile ? 'flaticon2-menu' : 'fa-bars fas'"
                         ></i>
                       </a>
@@ -169,7 +169,7 @@
   
                     <div>
                       <div class="btn-group dropdown list-toolbar-dropdown" dropdown>
-                        <button class="dropdown-toggle btn btn-sm font-weight-normal p-0" type="button" dropdownToggle>
+                        <button class="dropdown-toggle btn btn-sm font-weight-normal p-0 sortByDd" type="button" dropdownToggle>
                           <span class="list-toolbar-dropdown-sort-label">{{ "SortBy" | localize }}</span>
                           <span class="list-toolbar-dropdown-sort-selectedItem">
                             {{ sortingCtrl?.value?.label ? ":   " + (sortingCtrl?.value?.label | localize) : "" }}
@@ -201,7 +201,7 @@
                       class="col-12"
                       [ngClass]="
                         singleItemPerRowMode || fromMarketPlaceProfile
-                          ? 'col-md-12 single-item-per-row-layout mb-2 px-0'
+                          ? 'col-md-12 single-item-per-row-layout mb-2 px-0 pl-2'
                           : !singleItemPerRowMode && !filterVisible ? 'col-lg-3 col-md-6 col-12' : 'col-lg-4 col-12 mb-5'
                       "
                     >

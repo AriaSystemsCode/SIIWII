@@ -1,8 +1,8 @@
 ﻿<form [formGroup]="filterForm">
-    <div [@routerTransition] class="wrapper" [ngClass]="isArabic ? 'addMgAr':'addMg'">
-        <div class="kt-content kt-grid__item kt-grid__item--fluid kt-grid kt-grid--hor mt-md-4 marginMob">
+    <div [@routerTransition] class="wrapper" [ngClass]="!isArabic ? 'addMg':  isAuthenticated && isArabic ? 'mt-lg-5' : 'addMg'">
+        <div class="kt-grid__item kt-grid__item--fluid kt-grid kt-grid--hor  marginMob">
             <div [class]="containerClass + ' kt-grid__item kt-grid__item--fluid'">
-                <div class="kt-portlet kt-portlet--mobile">
+                <div class="bodySec kt-portlet--mobile " [ngClass]="!isAuthenticated ? 'm-4': isAuthenticated && isArabic ? 'mt-lg-4 mt-md-3 mt-5':''">
                     <div class="kt-portlet__body">
                         <div class="row">
                             <div class="col-12 list-toolbar">
@@ -69,11 +69,11 @@
                                     </div>
                                     <div class="" *ngIf="showAddButton"></div>
                                     <div class="mb-lg-4 mb-0 text-center mt-lg-0 ">
-                                        <a class="btn   toolbar-btn btn_Primary SendMail"
+                                        <a *ngIf="isAuthenticated" class="btn   toolbar-btn btn_Primary SendMail"
                                
                                             (click)="showSendMail()">
                                             <img src="../../assets/img/input_icons/user-plus.png" class="alarmInfo mr-2" style="width: 16px;">
-                                            {{ "Invite Contact" | localize }}
+                                            {{ "InviteContact" | localize }}
                                          
                                         </a>
                                         <ng-container *ngIf="showAddButton">
@@ -105,7 +105,7 @@
                                                     padding-left: 9px;
                                                     
                                                 " [title]="
-                                                    'Import Accounts' | localize
+                                                    'ImportAccounts' | localize
                                                 " class="btn   toolbar-btn pr-0 transparent-button">
                                                 <i class="d-inline-block w-100 fa-file-import fas icon-center"
                                                     style="color: #4a0d4a !important;"></i>
@@ -115,7 +115,7 @@
                                     </div>
                                     <div class=""></div>
 
-                                    <div class="text-center d-flex mt-lg-0 mt-3" style="height: 40px; width: 160px;">
+                                    <div class="text-center d-flex mt-lg-0" style="height: 40px; width: 160px;">
 
                                         <button
                                       
