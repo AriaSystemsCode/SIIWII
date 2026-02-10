@@ -94119,7 +94119,6 @@ export class AppItemPrices implements IAppItemPrices {
     currencyFk!: AppEntity;
     appItemFk!: AppItem;
     isDefault!: boolean;
-    buyerSSIN!: string | undefined;
     isDeleted!: boolean;
     deleterUserId!: number | undefined;
     deletionTime!: moment.Moment | undefined;
@@ -94157,7 +94156,6 @@ export class AppItemPrices implements IAppItemPrices {
             this.currencyFk = _data["currencyFk"] ? AppEntity.fromJS(_data["currencyFk"]) : <any>undefined;
             this.appItemFk = _data["appItemFk"] ? AppItem.fromJS(_data["appItemFk"]) : <any>undefined;
             this.isDefault = _data["isDefault"];
-            this.buyerSSIN = _data["buyerSSIN"];
             this.isDeleted = _data["isDeleted"];
             this.deleterUserId = _data["deleterUserId"];
             this.deletionTime = _data["deletionTime"] ? moment(_data["deletionTime"].toString()) : <any>undefined;
@@ -94193,7 +94191,6 @@ export class AppItemPrices implements IAppItemPrices {
         data["currencyFk"] = this.currencyFk ? this.currencyFk.toJSON() : <any>undefined;
         data["appItemFk"] = this.appItemFk ? this.appItemFk.toJSON() : <any>undefined;
         data["isDefault"] = this.isDefault;
-        data["buyerSSIN"] = this.buyerSSIN;
         data["isDeleted"] = this.isDeleted;
         data["deleterUserId"] = this.deleterUserId;
         data["deletionTime"] = this.deletionTime ? this.deletionTime.toISOString() : <any>undefined;
@@ -94218,7 +94215,6 @@ export interface IAppItemPrices {
     currencyFk: AppEntity;
     appItemFk: AppItem;
     isDefault: boolean;
-    buyerSSIN: string | undefined;
     isDeleted: boolean;
     deleterUserId: number | undefined;
     deletionTime: moment.Moment | undefined;
