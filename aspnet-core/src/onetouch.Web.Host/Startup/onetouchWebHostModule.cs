@@ -72,7 +72,9 @@ namespace onetouch.Web.Startup
             //Aria.MASTER
             if (!string.IsNullOrWhiteSpace(origin))
             {
-                string AriaMasterConnection = "Server=ARIASQL\\ARIANEXUS; Database=Aria.MASTER;TrustServerCertificate=True;User ID=sa;Password=Aria@2021;";
+                //string AriaMasterConnection = "Server=WEBAPP-DEV\\SIIWII; Database=Aria.MASTER;TrustServerCertificate=True;User ID=sa;Password=Siiwii@2024;";
+                var _appConfiguration = _configurationAccessor.Configuration;
+                string AriaMasterConnection = _appConfiguration["ConnectionStrings:AriaMaster"]?.ToString();
                 using (var conn = new SqlConnection(AriaMasterConnection))
                 {
                     conn.Open();
@@ -93,7 +95,7 @@ namespace onetouch.Web.Startup
 
                                 if (!string.IsNullOrEmpty(connectionString))
                                 {
-                                    var _appConfiguration = _configurationAccessor.Configuration;
+                                     _appConfiguration = _configurationAccessor.Configuration;
                                     _appConfiguration["App:ClientRootAddress"] = url;
                                     _appConfiguration["Attachment:Path"] = @path;   // <-- set from DB
                                     _appConfiguration["Attachment:PathTemp"] = @pathTemp;   // <-- set from DB
