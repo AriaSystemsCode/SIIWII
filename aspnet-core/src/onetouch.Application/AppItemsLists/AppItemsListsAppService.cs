@@ -31,6 +31,8 @@ using onetouch.SystemObjects.Dtos;
 using onetouch.AppMarketplaceItemLists;
 using onetouch.AppMarketplaceItems;
 using Abp.AspNetZeroCore.Timing;
+using Microsoft.Extensions.Configuration;
+using onetouch.Configuration;
 
 namespace onetouch.AppItemsLists
 {
@@ -62,6 +64,7 @@ namespace onetouch.AppItemsLists
         private readonly ISycEntityObjectTypesAppService _sycEntityObjectTypesAppService;
         private readonly IRepository<SydObject, long> _sydObjectRepository;
         //I45
+        private readonly IConfigurationRoot _appConfiguration;
         public AppItemsListsAppService(IRepository<AppItemsList, long> appItemsListRepository, IAppItemsListsExcelExporter appItemsListsExcelExporter, Helper helper
             , IAppEntitiesAppService appEntitiesAppService
             , IRepository<AppItem, long> appItemRepository
@@ -73,8 +76,10 @@ namespace onetouch.AppItemsLists
             , ISycEntityObjectStatusesAppService sycEntityObjectStatusesAppService
             , IRepository<AppItemSelector, long> appItemSelectorRepository, IRepository<AppMarketplaceItemLists.AppMarketplaceItemLists, long> appMarketplaceItemListRepository,
              IRepository<AppMarketplaceItemsListDetails, long> appMarketplaceItemsListDetailRepository,
-             IRepository<AppMarketplaceItemSharings, long> appMarketplaceItemSharing, IRepository<AppMarketplaceItems.AppMarketplaceItems, long> appMarketplaceItem, IAppItemsAppService appItemsAppService, ISycEntityObjectTypesAppService sycEntityObjectTypesAppService, IRepository<SydObject, long> sydObjectRepository)
+             IRepository<AppMarketplaceItemSharings, long> appMarketplaceItemSharing, IRepository<AppMarketplaceItems.AppMarketplaceItems, long> appMarketplaceItem, IAppItemsAppService appItemsAppService, ISycEntityObjectTypesAppService sycEntityObjectTypesAppService, IRepository<SydObject, long> sydObjectRepository,
+              IAppConfigurationAccessor appConfigurationAccessor)
         {
+            _appConfiguration = appConfigurationAccessor.Configuration;
             //I45
             _sydObjectRepository = sydObjectRepository;
             _appItemsAppService = appItemsAppService;
@@ -435,7 +440,7 @@ namespace onetouch.AppItemsLists
                 var itemslistItemsIDsAndState = _appMarketplaceItemsListDetailRepository.GetAll().Where(x => x.AppMarketplaceItemsListId == input.ItemListId).Select(x => new { ItemId = x.AppMarketplaceItemId, x.State }).ToArray();
 
                 var filteredAppItemsListItems = _appMarketplaceItemsListDetailRepository.GetAll()
-                            .Include(x => x.ItemFK).ThenInclude(x => x.EntityAttachments)
+                            .Include(x => x.ItemFK).ThenInclude(x => x.EntityAttachments).ThenInclude(z=>z.AttachmentFk)
                             .Include(x => x.ItemFK).ThenInclude(x => x.ParentFkList).ThenInclude(x => x.EntityExtraData).ThenInclude(x => x.AttributeValueFk)
                             .Include(x => x.ItemFK).ThenInclude(x => x.ParentFkList).ThenInclude(x => x.EntityExtraData).ThenInclude(x => x.EntityObjectTypeFk)
                             .WhereIf(input.ItemId > 0, x => x.AppMarketplaceItemId == input.ItemId)
@@ -453,8 +458,11 @@ namespace onetouch.AppItemsLists
                 foreach (var item in appItemsLists)
                 {
                     item.AppItemsListItemVariations = await GetMarketplaceItemsListVariations(item.ItemId, input.ItemListId);
-                    item.ImageURL = imageQuery.FirstOrDefault(x => x.ItemFK.EntityAttachments.Count > 0) != null
-                                                ? "attachments/" + "-1" + "/" + imageQuery.FirstOrDefault(x => x.ItemFK.EntityAttachments.Count > 0).ItemFK.EntityAttachments.FirstOrDefault().AttachmentFk.Attachment
+                    //item.ImageURL = imageQuery.FirstOrDefault(x => x.it == item.ItemSSIN && x.ItemFK.EntityAttachments.Count > 0) != null
+                    //                            ? "attachments/" + "-1" + "/" + imageQuery.FirstOrDefault(x => x.AppMarketplaceItemSSIN == item.ItemSSIN && x.ItemFK.EntityAttachments.Count > 0).ItemFK.EntityAttachments.FirstOrDefault().AttachmentFk.Attachment
+                    //                                : "";
+                    item.ImageURL = pagedAndFilteredAppItemsListItems.FirstOrDefault(x => x.Id == item.Id && x.ItemFK.EntityAttachments.Count > 0) != null
+                                                ? "attachments/" + "-1" + "/" + pagedAndFilteredAppItemsListItems.FirstOrDefault(x => x.Id == item.Id && x.ItemFK.EntityAttachments.Count > 0).ItemFK.EntityAttachments.FirstOrDefault().AttachmentFk.Attachment
                                                     : "";
                     //var maketItem = await _appMarketplaceItem.GetAll().Where(z => z.Id == item.ItemId).FirstOrDefaultAsync();
                     //if (maketItem!=null)
@@ -1366,7 +1374,7 @@ namespace onetouch.AppItemsLists
 
                     if (publishChild == null)
                     {
-                        var marketplaceItem = await _appMarketplaceItem.GetAll().FirstOrDefaultAsync(x => x.Code == child.ItemSSIN);
+                        var marketplaceItem = await _appMarketplaceItem.GetAll().FirstOrDefaultAsync(x => x.SSIN == child.ItemSSIN);
                         //T-SII-20231205.0004,1 MMT 01/01/2024 -Products List - internal error while sharing the products list[Start]
                         if (marketplaceItem == null)
                             continue;
@@ -1521,9 +1529,10 @@ namespace onetouch.AppItemsLists
                                 var variationList = await _appItemsAppService.GetVariationsCodes(long.Parse(identifier.ToString()), nextCode, variationListOrg, marketItem.EntityObjectTypeId, AbpSession.TenantId);
                                 itemC.SycIdentifierId = identifier;
 
-                                foreach (var att in itemC.EntityAttachments)
+                                foreach (var parentAttach in itemC.EntityAttachments)
                                 {
-                                    att.Id = 0;
+                                    parentAttach.Id = 0;
+                                    MoveFile(parentAttach.FileName,-1, AbpSession.TenantId);
                                 }
                                 foreach (var ext in itemC.EntityExtraData)
                                 {
@@ -1547,6 +1556,7 @@ namespace onetouch.AppItemsLists
                                     foreach (var att in vari.EntityAttachments)
                                     {
                                         att.Id = 0;
+                                        MoveFile(att.FileName, -1, AbpSession.TenantId);
                                     }
                                     foreach (var ext in vari.EntityExtraData)
                                     {
@@ -1567,6 +1577,36 @@ namespace onetouch.AppItemsLists
                     }
                 }
                 return retutnval;
+            }
+        }
+        private void MoveFile(string fileName, int? sourceTenantId, int? distinationTenantId)
+        {
+            if (sourceTenantId == null) sourceTenantId = -1;
+            if (distinationTenantId == null) distinationTenantId = -1;
+
+            var tmpPath = _appConfiguration[$"Attachment:PathTemp"] + @"\" + sourceTenantId + @"\" + fileName;
+            var pathSource = _appConfiguration[$"Attachment:Path"] + @"\" + sourceTenantId + @"\" + fileName;
+            var path = _appConfiguration[$"Attachment:Path"] + @"\" + distinationTenantId + @"\" + fileName;
+
+            if (!System.IO.Directory.Exists(_appConfiguration[$"Attachment:Path"] + @"\" + distinationTenantId))
+            {
+                System.IO.Directory.CreateDirectory(_appConfiguration[$"Attachment:Path"] + @"\" + distinationTenantId);
+            }
+
+            try
+            {
+                System.IO.File.Copy(tmpPath.Replace(@"\", @"\"), path.Replace(@"\", @"\"), true);
+            }
+            catch (Exception ex)
+            {
+                try
+                {
+                    System.IO.File.Copy(pathSource.Replace(@"\", @"\"), path.Replace(@"\", @"\"), true);
+                }
+                catch (Exception ex1)
+                {
+
+                }
             }
         }
         private async Task<long?> GetProductTypeIdentifier(int productTypeId, long? tenantId)
