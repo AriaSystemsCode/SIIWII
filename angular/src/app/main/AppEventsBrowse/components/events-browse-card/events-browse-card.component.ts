@@ -28,7 +28,7 @@ export class EventsBrowseCardComponent extends AppComponentBase implements OnCha
     eventAddress="";
     profilePicture:string ="";
 
-    get mainFilterCtrl() { return this.filterForm.get('filterType') }
+    get mainFilterCtrl() { return this.filterForm?.get('filterType') }
     constructor(
         injector: Injector,
         private _postService:AppPostsServiceProxy
@@ -47,7 +47,7 @@ export class EventsBrowseCardComponent extends AppComponentBase implements OnCha
             .subscribe((data) => {
                 if (data.profilePicture) {
                     this.profilePicture =
-                        "data:image/jpeg;base64," + data.profilePicture;
+                        "data:image/jpeg;base64," + data?.profilePicture;
                 }
             });
     }
@@ -59,7 +59,7 @@ export class EventsBrowseCardComponent extends AppComponentBase implements OnCha
 
     getAddressDetails() :string {
         this.eventAddress="";
-        this.eventAddress += this.item.appEvent?.address1
+        this.eventAddress += this.item?.appEvent?.address1
             ? this.eventAddress != ""
                 ? " - " + this.item.appEvent?.address1
                 : this.item.appEvent?.address1

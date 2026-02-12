@@ -1,0 +1,86 @@
+<div class="mp-event" [attr.dir]="dir" *ngIf="ev">
+    <div class="mp-event__media">
+      <img
+        [src]="posterUrl"
+        alt="event"
+        (error)="onImgErr($event)"
+    
+      />
+    </div>
+  
+    <div class="mp-event__body">
+      <div class="mp-event__title" >
+        {{ ev?.name }}
+      </div>
+  
+      <div class="mp-event__row">
+        <div class="mp-ico"><svg width="17" height="17" viewBox="0 0 17 17" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M7.64932 15.3286H1.98091C1.53842 15.3286 1.11405 15.1528 0.801165 14.8399C0.488278 14.527 0.3125 14.1027 0.3125 13.6602V3.64973C0.3125 3.20724 0.488278 2.78287 0.801165 2.46999C1.11405 2.1571 1.53842 1.98132 1.98091 1.98132H11.9913C12.4338 1.98132 12.8582 2.1571 13.1711 2.46999C13.484 2.78287 13.6597 3.20724 13.6597 3.64973V6.98654M12.8255 9.48915V12.826H16.1624" stroke="#4A0D4A" stroke-width="0.625652" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M10.3229 0.312866V3.64968M3.64931 0.312866V3.64968M0.3125 6.98649H13.6597M9.48873 12.8259C9.48873 13.7109 9.84029 14.5596 10.4661 15.1854C11.0918 15.8112 11.9406 16.1627 12.8255 16.1627C13.7105 16.1627 14.5593 15.8112 15.185 15.1854C15.8108 14.5596 16.1624 13.7109 16.1624 12.8259C16.1624 11.9409 15.8108 11.0922 15.185 10.4664C14.5593 9.84065 13.7105 9.4891 12.8255 9.4891C11.9406 9.4891 11.0918 9.84065 10.4661 10.4664C9.84029 11.0922 9.48873 11.9409 9.48873 12.8259Z" stroke="#4A0D4A" stroke-width="0.625652" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            </div>
+        <div class="mp-text">
+          <div class="mp-label">{{'StartDate' | localize}}:</div>
+          <div class="mp-value">
+            {{ ev?.fromDate?.toString() | date:'dd MMM, yyyy' }}
+            <span class="mp-muted" *ngIf="ev?.fromTime">
+              , {{ ev?.fromTime?.toString() | date:'h:mm a' }}
+            </span>
+          </div>
+        </div>
+      </div>
+  
+      <div class="mp-event__row">
+        <div class="mp-ico"><svg width="17" height="17" viewBox="0 0 17 17" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M7.64931 15.3284H1.98091C1.53842 15.3284 1.11405 15.1527 0.801165 14.8398C0.488278 14.5269 0.3125 14.1025 0.3125 13.66V3.64961C0.3125 3.20712 0.488278 2.78275 0.801165 2.46987C1.11405 2.15698 1.53842 1.9812 1.98091 1.9812H11.9913C12.4338 1.9812 12.8582 2.15698 13.1711 2.46987C13.484 2.78275 13.6597 3.20712 13.6597 3.64961V6.98642M12.8255 9.48903V12.8258H16.1624" stroke="#F6851D" stroke-width="0.625652" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M10.3229 0.312866V3.64968M3.64931 0.312866V3.64968M0.3125 6.98649H13.6597M9.48873 12.8259C9.48873 13.7109 9.84029 14.5596 10.4661 15.1854C11.0918 15.8112 11.9406 16.1627 12.8255 16.1627C13.7105 16.1627 14.5593 15.8112 15.185 15.1854C15.8108 14.5596 16.1624 13.7109 16.1624 12.8259C16.1624 11.9409 15.8108 11.0922 15.185 10.4664C14.5593 9.84065 13.7105 9.4891 12.8255 9.4891C11.9406 9.4891 11.0918 9.84065 10.4661 10.4664C9.84029 11.0922 9.48873 11.9409 9.48873 12.8259Z" stroke="#F6851D" stroke-width="0.625652" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            </div>
+        <div class="mp-text">
+          <div class="mp-label">{{'EndDate' | localize}}:</div>
+          <div class="mp-value">
+            {{ ev?.toDate?.toString() | date:'dd MMM, yyyy' }}
+            <span class="mp-muted" *ngIf="ev?.toTime">
+              , {{ ev?.toTime?.toString() | date:'h:mm a' }}
+            </span>
+          </div>
+        </div>
+      </div>
+  
+      <div class="mp-event__grid">
+        <!-- <div class="mp-chip">
+          <span class="mp-chip__ico">👥</span>
+          <span class="mp-chip__lbl">Attendees:</span>
+          <span class="mp-chip__val">{{ ev?.guestsCount || 0 }}</span>
+        </div> -->
+  
+        <div class="mp-chip">
+          <span class="mp-chip__ico"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 22.5L5.67301 15.0382C5.58509 14.9262 5.49809 14.8135 5.41201 14.7C4.33179 13.276 3.74799 11.5373 3.75001 9.75C3.75001 7.56196 4.6192 5.46354 6.16637 3.91637C7.71355 2.36919 9.81197 1.5 12 1.5C14.188 1.5 16.2865 2.36919 17.8336 3.91637C19.3808 5.46354 20.25 7.56196 20.25 9.75C20.2517 11.5365 19.6682 13.2743 18.5888 14.6978L18.588 14.7C18.588 14.7 18.363 14.9955 18.3293 15.0353L12 22.5ZM6.60976 13.7963C6.60976 13.7963 6.78451 14.0272 6.82426 14.0767L12 20.181L17.1825 14.0685C17.2155 14.0272 17.391 13.7948 17.3918 13.794C18.2747 12.6309 18.7518 11.2103 18.75 9.75C18.75 7.95979 18.0388 6.2429 16.773 4.97703C15.5071 3.71116 13.7902 3 12 3C10.2098 3 8.49291 3.71116 7.22703 4.97703C5.96116 6.2429 5.25001 7.95979 5.25001 9.75C5.24815 11.2112 5.72584 12.6327 6.60976 13.7963Z" fill="#777777"/>
+            <path d="M15.75 13.5H14.25V7.5H9.75V13.5H8.25V7.5C8.25 7.10218 8.40804 6.72064 8.68934 6.43934C8.97064 6.15804 9.35218 6 9.75 6H14.25C14.6478 6 15.0294 6.15804 15.3107 6.43934C15.592 6.72064 15.75 7.10218 15.75 7.5V13.5Z" fill="#777777"/>
+            <path d="M11.25 12H12.75V13.5H11.25V12ZM11.25 9H12.75V10.5H11.25V9Z" fill="#777777"/>
+            </svg>
+            </span>
+          <span class="mp-chip__lbl">{{'Location' | localize}}:</span>
+          <span class="mp-chip__val">{{ ev?.isOnLine ? ('Online') : ('In Person') }}</span>
+        </div>
+      </div>
+  
+      <button class="mp-btn" type="button" (click)="openEventDetails(ev?.id)">
+        {{'Details' | localize}}
+      </button>
+    </div>
+  </div>
+  
+  <!-- fallback if event is missing -->
+  <div class="mp-event mp-event--empty" *ngIf="!ev">
+    No event data found in this block.
+  </div>
+
+
+
+
+  <app-view-event
+  #viewEventModal
+
+></app-view-event>

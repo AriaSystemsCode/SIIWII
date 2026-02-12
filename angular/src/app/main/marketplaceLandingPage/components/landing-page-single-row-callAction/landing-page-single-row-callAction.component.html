@@ -58,16 +58,12 @@
         </div>
 
         <!-- BRAND -->
- 
 
     <img  *ngSwitchCase="'BRAND'"  class="card-media" [src]="item?.image ?  attachmentBaseUrl + '/' + item?.image: attachmentBaseUrl + '/' + item?.getAppEntityForViewDto?.appEntity?.entityAttachments[0]?.url 
            " title="Brand {{item?.getAppEntityForViewDto?.appEntity?.name}}" alt="Brand" (click)="goToBrand(item)"
   (error)="onImgErr($event)" />
 
- 
-      
-  
-    
+
         <!-- CATEGORY -->
         <img *ngSwitchCase="'CATEGORY'" class="card-media" [src]="item?.image
             ? attachmentBaseUrl + '/' + item?.image
@@ -91,6 +87,23 @@
         </ng-container>
 
 
+        <!-- EVENT -->
+        <div *ngSwitchCase="'EVENT'">
+          <app-marketplace-event-card
+            [block]="itemEv"
+          ></app-marketplace-event-card>
+        </div>
+
+        <!-- ACCOUNT -->
+        <div *ngSwitchCase="'ACCOUNT'">
+          <app-marketplace-account-card
+            [account]="account"
+      
+            [compact]="true"
+            [showConnectButton]="true"
+    
+          ></app-marketplace-account-card>
+        </div>
       </div>
     </div>
   </ng-template>

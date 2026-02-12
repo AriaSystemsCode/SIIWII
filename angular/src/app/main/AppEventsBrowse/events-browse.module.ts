@@ -47,7 +47,7 @@ import { DialogModule } from 'primeng/dialog';
         DialogModule 
     ],
     exports:[
-        EventsBrowseComponent
+        EventsBrowseComponent,EventsBrowseCardComponent
     ]
 })
 export class EventsBrowseModule { }

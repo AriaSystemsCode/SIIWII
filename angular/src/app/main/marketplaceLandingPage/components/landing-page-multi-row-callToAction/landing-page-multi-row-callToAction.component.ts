@@ -24,6 +24,8 @@ export class LandingPageMultiRowCallToActionComponent extends AppComponentBase i
   currencyCode: string; 
   languageSettingName:string  =AppConsts.languageSettingName
   showMsrP:boolean
+
+  itemEv 
   constructor(
     injector: Injector,
     private sydObjectsService: SydObjectsServiceProxy,
@@ -33,6 +35,45 @@ export class LandingPageMultiRowCallToActionComponent extends AppComponentBase i
   ) { super(injector); }
 
   ngOnInit(): void {
+    this.itemEv ={
+      "appEvent": {
+          "entityId": 501760,
+          "userName": "Lindsey Lohan",
+          "userId": 30719,
+          "isOnLine": true,
+          "isPublished": true,
+          "logoURL": "attachments/2486/400e9a92-76f2-5a45-d599-ce247adc507f.jpg",
+          "banarURL": "attachments/2486/365c5c65-cef4-d23c-e5ef-891f7c159df4.jpg",
+          "status": "Started",
+          "guestsCount": 0,
+          "address1": null,
+          "address2": null,
+          "city": null,
+          "state": null,
+          "postal": null,
+          "country": null,
+          "fromDate": "2026-02-11T18:03:53",
+          "utcFromDateTime": "2026-02-12T03:03:00",
+          "utcToDateTime": "2026-02-12T03:03:00",
+          "toDate": "2026-12-12T18:03:53",
+          "fromTime": "2026-02-11T18:03:00",
+          "toTime": "2026-02-11T18:03:00",
+          "privacy": false,
+          "guestCanInviteFriends": false,
+          "name": "event good to goooo",
+          "code": "Event2486Wed,Feb-11,2026-18:03 PM",
+          "description": "font-weight-normal mt-5 p-5 text-center w-100 ng-tns-c442-14 ng-star-inserted",
+          "timeZone": "Alaskan Standard Time",
+          "registrationLink": "https://app-testing.siiwii.net/",
+          "attachments": null,
+          "address": null,
+          "profilePictureId": "c912cde9-30c1-4fcd-cde9-3a128bcbef83",
+          "id": 10481
+      },
+      "currentUserResponce": 0,
+      "currentFromDateTime": "0001-01-01T00:00:00",
+      "currentToDateTime": "0001-01-01T00:00:00"
+  }
     this.initCurrencyCode();  
     this.getSettingData()
 

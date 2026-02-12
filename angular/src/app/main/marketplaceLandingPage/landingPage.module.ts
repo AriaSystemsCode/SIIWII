@@ -21,6 +21,8 @@ import { MarketplaceLandingPageComponent } from "./components/marketplace-landin
 import { LandingPageRoutingModule } from "./landingPage-routing.module";
 import { LandingPageMultiRowCallToActionComponent } from "./components/landing-page-multi-row-callToAction/landing-page-multi-row-callToAction.component";
 import { ContactUsModalComponent } from "./components/contact-us-modal/contact-us-modal.component";
+import { MarketplaceEventCardComponent } from "./components/marketplace-event-card/marketplace-event-card.component";
+import { MarketplaceAccountCardComponent } from "./components/marketplace-account-card/marketplace-account-card.component";
 
 
 
@@ -35,7 +37,9 @@ import { ContactUsModalComponent } from "./components/contact-us-modal/contact-u
         LandingPageSliderWithoutCallToActionComponent,
         LandingPageCarusalWithCallToActionComponent,
         LandingPageMultiRowCallToActionComponent,
-        ContactUsModalComponent
+        ContactUsModalComponent,
+        MarketplaceEventCardComponent,
+        MarketplaceAccountCardComponent
 
     ],
     imports: [
@@ -51,7 +55,8 @@ import { ContactUsModalComponent } from "./components/contact-us-modal/contact-u
         CarouselModule,
         eventsModule,
         InteractionsModule,
-        MarketplaceProductsModule
+        MarketplaceProductsModule,
+        
     ],
     exports: [MarketplaceLandingPageComponent, LandingPageSliderWithCallToActionComponent,FooterPageLinkComponent,FooterSocialMediaComponent,LandingPageSinglrRowCallActionComponent,LandingPageSliderWithoutCallToActionComponent,LandingPageCarusalWithCallToActionComponent,LandingPageMultiRowCallToActionComponent,ContactUsModalComponent],
 })

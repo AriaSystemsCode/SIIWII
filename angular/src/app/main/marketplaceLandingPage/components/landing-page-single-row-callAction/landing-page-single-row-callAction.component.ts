@@ -2,8 +2,9 @@ import { Component, Injector, Input, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { AppComponentBase } from '@shared/common/app-component-base';
-import { PageSettingDto, SydObjectsServiceProxy, AppItemsServiceProxy, AppEntitiesServiceProxy } from '@shared/service-proxies/service-proxies';
+import { PageSettingDto, SydObjectsServiceProxy, AppItemsServiceProxy, AppEntitiesServiceProxy, AccountDto, AccountsServiceProxy } from '@shared/service-proxies/service-proxies';
 import { AppConsts } from '@shared/AppConsts';
+import {  finalize, } from 'rxjs';
 
 type MediaKind = 'image' | 'video' | 'pdf' | 'other';
 
@@ -52,14 +53,123 @@ export class LandingPageSinglrRowCallActionComponent extends AppComponentBase im
   currencyCode: string; 
   languageSettingName:string  =AppConsts.languageSettingName;
   showMsrP:boolean
+
+  itemEv
+  account
   constructor(
     injector: Injector,
     private syd: SydObjectsServiceProxy,
     private router: Router,
        private _AppEntitiesServiceProxy: AppEntitiesServiceProxy,
+           private _accountsServiceProxy: AccountsServiceProxy,
   ) { super(injector); }
 
   ngOnInit() {
+    this.itemEv ={
+      "appEvent": {
+          "entityId": 501760,
+          "userName": "Lindsey Lohan",
+          "userId": 30719,
+          "isOnLine": true,
+          "isPublished": true,
+          "logoURL": "attachments/2486/400e9a92-76f2-5a45-d599-ce247adc507f.jpg",
+          "banarURL": "attachments/2486/365c5c65-cef4-d23c-e5ef-891f7c159df4.jpg",
+          "status": "Started",
+          "guestsCount": 0,
+          "address1": null,
+          "address2": null,
+          "city": null,
+          "state": null,
+          "postal": null,
+          "country": null,
+          "fromDate": "2026-02-11T18:03:53",
+          "utcFromDateTime": "2026-02-12T03:03:00",
+          "utcToDateTime": "2026-02-12T03:03:00",
+          "toDate": "2026-12-12T18:03:53",
+          "fromTime": "2026-02-11T18:03:00",
+          "toTime": "2026-02-11T18:03:00",
+          "privacy": false,
+          "guestCanInviteFriends": false,
+          "name": "event good to goooo",
+          "code": "Event2486Wed,Feb-11,2026-18:03 PM",
+          "description": "font-weight-normal mt-5 p-5 text-center w-100 ng-tns-c442-14 ng-star-inserted",
+          "timeZone": "Alaskan Standard Time",
+          "registrationLink": "https://app-testing.siiwii.net/",
+          "attachments": null,
+          "address": null,
+          "profilePictureId": "c912cde9-30c1-4fcd-cde9-3a128bcbef83",
+          "id": 10481
+      },
+      "currentUserResponce": 0,
+      "currentFromDateTime": "0001-01-01T00:00:00",
+      "currentToDateTime": "0001-01-01T00:00:00"
+  }
+
+  this.account= {
+    "account": {
+        "name": "aminaBussiness",
+        "showSync": false,
+        "tenantId": 2548,
+        "description": null,
+        "connections": 0,
+        "website": null,
+        "eMailAddress": null,
+        "city": "Alexandria",
+        "state": "po",
+        "zipCode": "65",
+        "addressLine1": "add1",
+        "addressLine2": null,
+        "countryId": 0,
+        "countryName": "Åland Islands",
+        "priceLevel": "",
+        "ssin": "Business-000000005753",
+        "accountTypeId": 19,
+        "accountType": "BUSINESS",
+        "accountTypeString": "BUSINESS",
+        "status": true,
+        "classfications": [
+            " 3rd Party Logistics Provider",
+            " Marketplace Platform",
+            " General Service Provider",
+            "Apparel Distributor ",
+            "Apparel Importer"
+        ],
+        "categories": [
+            "Accessories",
+            "Apparel",
+            "Bags",
+            "Costumes & Accessories",
+            "Fabrics"
+        ],
+        "logoUrl": "attachments/-1/bb359bdd-3435-e270-ede6-bd58a4fb71ac.jpg",
+        "coverUrl": null,
+        "imagesUrls": null,
+        "phone1Number": null,
+        "isManual": false,
+        "isConnected": false,
+        "branches": null,
+        "partnerId": null,
+        "entityId": null,
+        "classificationsTotalCount": null,
+        "categoriesTotalCount": null,
+        "shipViaName": null,
+        "paymentTermsName": null,
+        "shipViaId": null,
+        "paymentTermsId": null,
+        "code": null,
+        "currencyId": null,
+        "currencyCode": null,
+        "currencyName": null,
+        "id": 482303
+    },
+    "appEntityName": null,
+    "isPublished": false,
+    "allowedAction": null,
+    "avaliableConnectionName": "Follow",
+    "connectionName": "MPActionConnected",
+    "disConnectLabel": "MPActionDisconnect",
+    "availableConnections": []
+}
     this.initCurrencyCode();  
   
 
@@ -117,42 +227,6 @@ export class LandingPageSinglrRowCallActionComponent extends AppComponentBase im
     (evt.target as HTMLImageElement).src = '/assets/placeholders/_logo-placeholder.png';
   }
 
-  // ---------- PDF handling via Base64 API -> blob -> SafeResourceUrl ----------
-  // private async ensurePdfSafeUrl(b: PageSettingDto) {
-  //   if (!b?.id || !this.isPdf(b.image)) return;
-
-  //   // already prepared
-  //   if (this.attachmentSafeMap[b.id]) return;
-
-  //   const url = this.fullUrl(b.image);
-
-  //   try {
-  //     // Ask your backend to fetch and return base64 string from URL (same API you already use)
-  //     const base64 = await this.appItems.getFile64FromUrl(url).toPromise();
-
-  //     // normalize possible "data:...;base64,..." format
-  //     const raw = (base64 && base64.includes(',')) ? base64.split(',')[1] : base64;
-  //     const bytes = atob(raw);
-  //     const arr = new Uint8Array(bytes.length);
-  //     for (let i = 0; i < bytes.length; i++) arr[i] = bytes.charCodeAt(i);
-
-  //     const blob = new Blob([arr], { type: 'application/pdf' });
-
-  //     // revoke old URL if any
-  //     const old = this.objectUrlById[b.id];
-  //     if (old) { try { URL.revokeObjectURL(old); } catch {} }
-
-  //     const objUrl = URL.createObjectURL(blob);
-  //     this.objectUrlById[b.id] = objUrl;
-
-  //     this.attachmentSafeMap[b.id] = this.sanitizer.bypassSecurityTrustResourceUrl(objUrl);
-  //   } catch {
-  //     // Final fallback: direct URL (requires server to allow frame-ancestors)
-  //     this.attachmentSafeMap[b.id] = this.sanitizer.bypassSecurityTrustResourceUrl(url);
-  //   }
-  // }
-
-  // ---------- navigation ----------
   goToBrand(brand) {
    
     this.router.navigate(
@@ -331,4 +405,69 @@ getSettingData(){
   });
 
 }
+
+connect(account: AccountDto): void {
+  this.showMainSpinner();
+  this._accountsServiceProxy
+      .connectContactsProfiles(account.id,null,null)
+      .pipe(
+          finalize(() => {
+              this.hideMainSpinner();
+          })
+      )
+      .subscribe(() => {
+          this.notify.success(this.l("SuccessfullyConnected"));
+          account.status = true;
+      });
+}
+
+
+
+  createRelation(account, status: boolean = false) {
+        this.showMainSpinner();
+        this._accountsServiceProxy
+          .applyRelationOnProfile(
+            account.account.account.id,
+            undefined,
+            account.relation.defaultVisibility === 'Public',
+            account.relation.connectionEntityId
+          )
+          .pipe(finalize(() => this.hideMainSpinner()))
+          .subscribe((result: any) => {
+          
+            const raw = typeof result === 'string' ? result : result?.result ?? '';
+            // const { connectionName, disConnectLabel } = this.splitLabels(raw);
+      
+            // const i = this.accounts.findIndex(x => x.account.id === account.account.account.id);
+            // if (i >= 0) {
+              
+            //   this.accounts[i] = account.account;
+      
+            //   this.accounts[i].availableConnections = [];
+            //   this.accounts[i].avaliableConnectionName = '';
+      
+            //   this.accounts[i].connectionName   = this.l(connectionName);
+            //   this.accounts[i].disConnectLabel  = this.l(disConnectLabel);
+            // }
+          });
+      }
+
+      disconnect(account: AccountDto): void {
+
+        this.showMainSpinner();
+        this._accountsServiceProxy
+            .disconnect(account.account.id)
+            .pipe(
+                finalize(() => {
+                    this.hideMainSpinner();
+                })
+            )
+            .subscribe((res) => {
+                this.notify.success(this.l("SuccessfullyDisconnected"));
+                account.status = false;
+                account.connectionName = "";
+                account.avaliableConnectionName = res[0].connectLabel
+                account.availableConnections = res
+            });
+    }
 }
