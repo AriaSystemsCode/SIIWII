@@ -106,6 +106,8 @@ export class ProductCatalogueReportParams implements ProductCatalogueReportParam
         else
         bccUsers += this.bccUsers[i].value;
     }
+        // this.itemsListId = 246;
+        // this.tenantId = 2154;
        url += this.reportTemplateName + "?"
        url += 'itemsListId=' + this.itemsListId
        url += '&reportTitle=' + this.reportTitle

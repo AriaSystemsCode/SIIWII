@@ -61,6 +61,9 @@ export class CatalogueReportDataSelectionStepComponent extends AppComponentBase 
     this._appItemsListsServiceProxy
       .getAppItemsListForView(this.printInfoParam.itemsListId)
         .subscribe((res) => {
+          this.printInfoParam.itemsListId = res.appItemsList.id
+          this.printInfoParam.tenantId = res.tenantId
+          
           this.myProducts = res.appItemsList.appItemsListItems.items;
           this.numberofselectedproducts = res.appItemsList.appItemsListItems.totalCount;
           this.setmyProductsName(false);
@@ -68,6 +71,8 @@ export class CatalogueReportDataSelectionStepComponent extends AppComponentBase 
           if(!this.appItemsLists?.length){
             this.appItemsLists = [new AppItemsListDto(res.appItemsList as any)]
             this.selectedAppItemList = this.appItemsLists[0]
+
+
             if(!this.printInfoParam.reportTitle)
             this.printInfoParam.reportTitle=this.appItemsLists[0]?.name
           }
