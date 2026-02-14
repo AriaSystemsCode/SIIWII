@@ -64,6 +64,7 @@ export class CatalogueReportDataSelectionStepComponent extends AppComponentBase 
           this.printInfoParam.itemsListId = res.appItemsList.id
           this.printInfoParam.tenantId = res.tenantId
           
+
           this.myProducts = res.appItemsList.appItemsListItems.items;
           this.numberofselectedproducts = res.appItemsList.appItemsListItems.totalCount;
           this.setmyProductsName(false);
