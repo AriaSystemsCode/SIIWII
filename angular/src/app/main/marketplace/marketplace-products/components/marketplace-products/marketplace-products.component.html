@@ -51,10 +51,8 @@
                             [options]="currencies"
                             [(ngModel)]="selectedCurrrency"
                             optionLabel="code"
-                            optionValue="code" 
-                            class="cur "
-                            (onChange)="handleCurrencyChange($event)"
-                        ></p-dropdown>
+                            (onChange)="handleCurrencyChange($event)">
+                          </p-dropdown>
                         <p-dropdown
                         [options]="sortingData"
                         [(ngModel)]="selectedSort"
@@ -197,7 +195,7 @@
                 (click)="openFiltersDialog('Select Currency')"
                 class="filter-btn w-25"
             >
-                {{ selectedCurrrency.code }}
+                {{ selectedCurrrency?.code }}
             </button>
             <button
             class="filter-btn w-50"
