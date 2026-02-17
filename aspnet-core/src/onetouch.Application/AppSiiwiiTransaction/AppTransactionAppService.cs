@@ -4700,15 +4700,17 @@ namespace onetouch.AppSiiwiiTransaction
 
                                                 foreach (var user in contactsUserIds)
                                                 {
+                                                    if (!string.IsNullOrEmpty(user))
+                                                    {
+                                                        var userObject = UserManager.GetUserById(long.Parse(user.ToString()));
 
-                                                    var userObject = UserManager.GetUserById(long.Parse(user.ToString()));
-
-                                                    AppEntitySharings shareWith = new AppEntitySharings();
-                                                    shareWith.SharedUserId = userObject.Id;
-                                                    shareWith.SharedTenantId = userObject.TenantId;
-                                                    shareWith.EntityId = viewTrans.Id;
-                                                    shareWith.SharedUserEMail = userObject.EmailAddress;
-                                                    await _appEntitySharingsRepository.InsertAsync(shareWith);
+                                                        AppEntitySharings shareWith = new AppEntitySharings();
+                                                        shareWith.SharedUserId = userObject.Id;
+                                                        shareWith.SharedTenantId = userObject.TenantId;
+                                                        shareWith.EntityId = viewTrans.Id;
+                                                        shareWith.SharedUserEMail = userObject.EmailAddress;
+                                                        await _appEntitySharingsRepository.InsertAsync(shareWith);
+                                                    }
                                                 }
                                             }
                                         }
