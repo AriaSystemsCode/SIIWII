@@ -7594,6 +7594,9 @@ namespace onetouch.Accounts
                     branchObject.Phone1TypeName = input.Phone1TypeName;
                     branchObject.Phone2TypeName = input.Phone2TypeName;
                     branchObject.Phone3TypeName = input.Phone3TypeName;
+                    branchObject.Phone1CountryKey = input.Phone1CountryKey;
+                    branchObject.Phone2CountryKey = input.Phone2CountryKey;
+                    branchObject.Phone3CountryKey = input.Phone3CountryKey;
                     branchObject.TradeName = input.TradeName;
                     branchObject.Name=input.Name;
                     branchObject.UseDTOTenant = true;
@@ -7622,6 +7625,27 @@ namespace onetouch.Accounts
                     _helper.SystemTables.GenerateSSIN(contactObjectId, ObjectMapper.Map<AppEntityDto>(entity));
 
             }
+            branchObject.CurrencyId = input.CurrencyId;
+            branchObject.LanguageId = input.LanguageId;
+            branchObject.LanguageName = input.LanguageName;
+            branchObject.Phone1Number = input.Phone1Number;
+            branchObject.Phone2Number = input.Phone2Number;
+            branchObject.Phone3Number = input.Phone3Number;
+            branchObject.Phone1Ex = input.Phone1Ext;
+            branchObject.Phone2Ex = input.Phone2Ext;
+            branchObject.Phone3Ex = input.Phone3Ext;
+            branchObject.Phone1TypeId = input.Phone1TypeId;
+            branchObject.Phone2TypeId = input.Phone2TypeId;
+            branchObject.Phone3TypeId = input.Phone3TypeId;
+            branchObject.Phone1TypeName = input.Phone1TypeName;
+            branchObject.Phone2TypeName = input.Phone2TypeName;
+            branchObject.Phone3TypeName = input.Phone3TypeName;
+            branchObject.Phone1CountryKey = input.Phone1CountryKey;
+            branchObject.Phone2CountryKey = input.Phone2CountryKey;
+            branchObject.Phone3CountryKey = input.Phone3CountryKey;
+            branchObject.TradeName = input.TradeName;
+            branchObject.Name = input.Name;
+            branchObject.UseDTOTenant = true;
             branchObject.ContactRecordType = "B";
             if (branchObject.AccountId ==null)
                 branchObject.AccountId = contactParent.AccountId == null ? input.ParentId : contactParent.AccountId;
