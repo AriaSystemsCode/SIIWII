@@ -283,6 +283,7 @@
                                                 accountInfoTemp?.accountType != 'People' && accountInfoTemp?.accountType
                                                 != 'Personal' ? l("CompnayLogo") : l("Profile picture ")}}
                                             </label>
+                                            <!-- merge -->
                                             <app-image-upload [sycAttachmentCategory]="sycAttachmentCategoryLogo"
                                                 [isDisabled]="(accountDataForView?.isConnected && currentTab === accountInfoPageTabsEnum.ProfileCreateOrEdit && !isRecordOwner)"
                                                 [image]="companyLogo" [staticWidth]="170" [showGuidelines]="true"
@@ -297,6 +298,7 @@
                                                 accountInfoTemp?.accountType != 'People' && accountInfoTemp?.accountType
                                                 != 'Personal' ? l("CompnayImages") : l("Cover image")}}
                                             </label>
+                                            <!-- merge -->
                                             <app-image-upload [sycAttachmentCategory]="sycAttachmentCategoryBanner"
                                                 [isDisabled]="(accountDataForView?.isConnected && currentTab === accountInfoPageTabsEnum.ProfileCreateOrEdit && !isRecordOwner)"
                                                 [image]="coverPhoto" [staticHeight]="120" [showGuidelines]="true"
