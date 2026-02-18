@@ -19,14 +19,14 @@
       <HierarchyPrintOptions Ref="17" Indent="50.8" />
       <Scripts Ref="18" OnBeforePrint="Detail_BeforePrint_1" />
       <Controls>
-        <Item1 Ref="19" ControlType="XRLabel" Name="xrLabel1" Multiline="true" Text="xrLabel1" TextAlignment="MiddleCenter" SizeF="100.413124,84.23249" LocationFloat="0,1.335144E-05" Dpi="254" Font="Arial, 6pt" Padding="5,5,0,0,254">
+        <Item1 Ref="19" ControlType="XRLabel" Name="xrLabel1" Multiline="true" Text="xrLabel1" TextAlignment="MiddleCenter" SizeF="95,80" LocationFloat="0,1.335144E-05" Dpi="254" Font="Arial, 6pt" Padding="5,5,0,0,254">
           <ExpressionBindings>
             <Item1 Ref="20" EventName="BeforePrint" PropertyName="Text" Expression="[Attachment]" />
             <Item2 Ref="21" EventName="BeforePrint" PropertyName="Visible" Expression="[DataSource.CurrentRowIndex] =0&#xA;" />
           </ExpressionBindings>
           <StylePriority Ref="22" UseFont="false" UseTextAlignment="false" />
         </Item1>
-        <Item2 Ref="23" ControlType="XRPictureBox" Name="xrPictureBox1" Sizing="ZoomImage" SizeF="100.413124,84.23249" LocationFloat="0,0" Dpi="254">
+        <Item2 Ref="23" ControlType="XRPictureBox" Name="xrPictureBox1" Sizing="ZoomImage" SizeF="95,80" LocationFloat="0,0" Dpi="254">
           <ExpressionBindings>
             <Item1 Ref="24" EventName="BeforePrint" PropertyName="Visible" Expression="[DataSource.CurrentRowIndex] &gt;0 and [DataSource.CurrentRowIndex] &lt;20&#xA;" />
             <Item2 Ref="25" EventName="BeforePrint" PropertyName="BackColor" Expression="iif(Contains(upper([Attachment]), 'HTTP'), '',[Attachment])&#xA;" />

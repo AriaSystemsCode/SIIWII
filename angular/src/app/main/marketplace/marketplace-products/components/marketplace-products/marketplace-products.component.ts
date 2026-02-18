@@ -323,7 +323,6 @@ productCards!: QueryList<ProdcutCardComponent>;
 
     getAllProducts() {
         this.showMainSpinner();
-console.log(this.sellerSSinSetting,'sellerSSinSetting')
         const selectedCurrency =
             (this.fromMarketAcoount)
                 ? (this.marketplaceAccCurrency || 'USD')
@@ -453,6 +452,7 @@ console.log(this.sellerSSinSetting,'sellerSSinSetting')
             }, 1500);
 
     }
+
 
     handleSortingChange(data: any) {
         this.getAllProducts();
