@@ -37,6 +37,10 @@ using Org.BouncyCastle.Crypto;
 using onetouch.Migrations;
 using Abp.Net.Mail;
 using System.Net.Mail;
+using onetouch.AppEvents.Dtos;
+using onetouch.AppEvents;
+using onetouch.AppMarketplaceAccounts;
+using onetouch.AppMarketplaceContacts;
 
 namespace onetouch.SystemObjects
 {
@@ -65,14 +69,20 @@ namespace onetouch.SystemObjects
         private readonly IRepository<SycEntityObjectCategory, long> _sycEntityObjectCategoryRepository;
         private readonly IEmailSender _emailSender;
         //I49[End]
+        //I50[Start]
+        private readonly IAppEventsAppService _appEventsAppService;
+        private readonly IRepository<AppEvents.AppMarketplaceContacts, long> _appEventRepository;
+        private readonly IMarketplaceAccountsAppService _MarketplaceAccountsAppService;
+        private readonly IRepository<AppMarketplaceContact, long> _appMarketplaceContactRepository;
+        //I50[End]
         public SydObjectsAppService(
             IRepository<SydObject, long> sydObjectRepository,
-            ISydObjectsExcelExporter sydObjectsExcelExporter ,
-            IRepository<SysObjectType, long> lookup_sysObjectTypeRepository, 
-            IRepository<SydObject, long> lookup_sydObjectRepository, 
-            IRepository<SycEntityObjectType, long> sycEntityObjectType, 
-            Helper helper, 
-            IRepository<AppEntity, long> appEntityRepository, 
+            ISydObjectsExcelExporter sydObjectsExcelExporter,
+            IRepository<SysObjectType, long> lookup_sysObjectTypeRepository,
+            IRepository<SydObject, long> lookup_sydObjectRepository,
+            IRepository<SycEntityObjectType, long> sycEntityObjectType,
+            Helper helper,
+            IRepository<AppEntity, long> appEntityRepository,
             IRepository<AppEntityExtraData, long> appEntityExtraDataRepository,
             IAppConfigurationAccessor appConfigurationAccessor,
             IAppAdvertisementsAppService appAdvertisementsAppService,
@@ -81,7 +91,9 @@ namespace onetouch.SystemObjects
             IRepository<onetouch.SycCurrencyExchangeRates.SycCurrencyExchangeRates, long> sycCurrencyExchangeRateRepository,
             IMessageAppService messageAppService, ISycEntityObjectCategoriesAppService sycEntityObjectCategoriesAppService,
             IAccountsAppService accountsAppService, IRepository<AppContact, long> appContactRepository,
-            IRepository<SycEntityObjectCategory, long> sycEntityObjectCategoryRepository, IEmailSender emailSender) 
+            IRepository<SycEntityObjectCategory, long> sycEntityObjectCategoryRepository, IEmailSender emailSender, IAppEventsAppService appEventsAppService,
+            IRepository<AppEvents.AppMarketplaceContacts, long> appEventRepository, IMarketplaceAccountsAppService marketplaceAccountsAppService,
+            IRepository<AppMarketplaceContact, long> appMarketplaceContactRepository) 
 		  {
 			_sydObjectRepository = sydObjectRepository;
 			_sydObjectsExcelExporter = sydObjectsExcelExporter;
@@ -105,6 +117,12 @@ namespace onetouch.SystemObjects
             _appContactRepository = appContactRepository;
             _emailSender = emailSender;
             //I49[End]
+            //I50[start]
+            _appEventsAppService= appEventsAppService;
+            _appEventRepository = appEventRepository;
+            _MarketplaceAccountsAppService = marketplaceAccountsAppService;
+            _appMarketplaceContactRepository = appMarketplaceContactRepository;
+            //I50[End]
         }
 
         public async Task<PagedResultDto<TreeNode<GetSydObjectForViewDto>>> GetAll(GetAllSydObjectsInput input)
@@ -502,7 +520,7 @@ namespace onetouch.SystemObjects
         }
         //I49[Start]
         [AbpAllowAnonymous]
-        public async Task<List<PageSettingDto>> GetAllSectionBlocks(long sectionId)
+        public async Task<List<PageSettingDto>> GetAllSectionBlocks(long sectionId, string? timeZone)
         {
             string imagesUrl = _appConfiguration[$"Attachment:Path"].Replace(_appConfiguration[$"Attachment:Omitt"], "") + @"/";
             List<PageSettingDto> result = new List<PageSettingDto>();
@@ -588,6 +606,13 @@ namespace onetouch.SystemObjects
 
                                     switch (item.BlockType.ToUpper())
                                     {
+                                        //I50[Start]
+                                        case "EVENT":
+                                            var eventObj = await _appEventRepository.GetAll().Where(z => z.Code == blockValueExtraDate.AttributeValue).FirstOrDefaultAsync();
+                                            if (eventObj!=null)
+                                              item.GetAppEventForViewDto =await _appEventsAppService.GetAppEventForView(eventObj.Id, long.Parse(eventObj.EntityId.ToString()), timeZone);
+                                            break;
+                                        //I50[End]
                                         case "PRODUCT":
                                             item.GetAppMarketItemForViewDto = await _appMarketplaceItemsAppService.GetAppMarketplaceViewData(blockValueExtraDate.AttributeValue, null);
                                             break;
@@ -635,10 +660,10 @@ namespace onetouch.SystemObjects
                                                 item.GetSycEntityObjectCategoryForViewDto =await _sycEntityObjectCategoriesAppService.GetSycEntityObjectCategoryForView(int.Parse(category.Id.ToString()));
                                             break;
                                         case "CONTACT":
-                                            var contact = await _appContactRepository.GetAll().Where(z => z.SSIN == blockValueExtraDate.AttributeValue.TrimEnd()).FirstOrDefaultAsync();
+                                            var contact = await _appMarketplaceContactRepository.GetAll().Where(z => z.SSIN == blockValueExtraDate.AttributeValue.TrimEnd()).FirstOrDefaultAsync();
                                             if (contact!=null)
                                             {
-                                                item.GetAccountForViewDto = await _accountsAppService.GetAccountForView(int.Parse(contact.Id.ToString()), 1);
+                                                item.GetAccountForViewDto = await _MarketplaceAccountsAppService.GetAccountForView(int.Parse(contact.Id.ToString()), blockValueExtraDate.AttributeValue.TrimEnd(), 1);
                                             }
                                             break;
                                     }

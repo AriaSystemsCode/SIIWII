@@ -1,5 +1,6 @@
 ﻿using onetouch.Accounts.Dtos;
 using onetouch.AppEntities.Dtos;
+using onetouch.AppEvents.Dtos;
 using onetouch.AppMarketplaceItems.Dtos;
 using System;
 using System.Collections.Generic;
@@ -30,5 +31,9 @@ namespace onetouch.SystemObjects.Dtos
         public string TitleAlignment { set; get; }
         public List<AppEntityAttachmentDto> EntityAttachments { get; set; }
         //I49[End]
+        //I50[Start]
+        public GetAppEventForViewDto? GetAppEventForViewDto { set; get; }
+       
+        //I50[End]
     }
 }
