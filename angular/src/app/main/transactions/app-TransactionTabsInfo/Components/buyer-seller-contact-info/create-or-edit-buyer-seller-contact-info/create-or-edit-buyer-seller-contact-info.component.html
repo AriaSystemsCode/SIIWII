@@ -29,15 +29,10 @@
 
             </div>
 
-            <button
-            type="button"
-            [disabled]="!isContactsValid"
-            *ngIf="!showSaveBtn"
-            class="continuebtn text-center"
-            (click)="save(true)">
-            Continue
-          </button>
-          
+            <button [disabled]="!(isContactsValid)" *ngIf="!showSaveBtn " type="button"
+                class="continuebtn text-center"  (click)="save(true)">
+                Continue
+            </button>
         </div>
         <div *ngIf="showSaveBtn" class="d-flex justify-content-end mr-2 pr-3">
 
@@ -45,7 +40,7 @@
             <button *ngIf="showSaveBtn" (click)="cancel()" class="cancelbtn text-center btn ">
                 Cancel
             </button>
-            <button *ngIf="showSaveBtn" [disabled]="!(isContactsValid)" (click)="save()"
+            <button *ngIf="showSaveBtn" [disabled]="!(isContactsValid)" (click)="save()" type="button"
                 class="previewbtn text-center ">
                 Save
             </button>

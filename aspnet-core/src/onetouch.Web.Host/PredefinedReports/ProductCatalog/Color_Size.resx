@@ -145,7 +145,7 @@ private void Detail_BeforePrint_1(object sender, System.ComponentModel.CancelEve
 }
 
 private void table2_BeforePrint(object sender, System.ComponentModel.CancelEventArgs e) {
-    table2.WidthF=1200;
+    table2.WidthF=1100;
     
 }
 </value>
