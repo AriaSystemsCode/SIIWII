@@ -911,6 +911,8 @@ namespace onetouch.AppItems
                 {
                     output.AppItem.ManufacturerCode = appItem.Code;
                 }
+                if (appItem.EntityFk.TenantOwner != AbpSession.TenantId && appItem.EntityFk.TenantOwner != null && appItem.EntityFk.TenantOwner != 0)
+                       output.TenantOwner = appItem.EntityFk.TenantOwner;
                 //
                 output.AppItem.AppItemSizesScaleInfo
                     .ForEach(a => a.AppSizeScalesDetails = a.AppSizeScalesDetails.OrderBy(d => Convert.ToInt32(d.D1Position))
