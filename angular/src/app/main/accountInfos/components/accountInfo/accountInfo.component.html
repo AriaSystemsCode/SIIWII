@@ -283,6 +283,7 @@
                                                 accountInfoTemp?.accountType != 'People' && accountInfoTemp?.accountType
                                                 != 'Personal' ? l("CompnayLogo") : l("Profile picture ")}}
                                             </label>
+                                            <!-- merge -->
                                             <app-image-upload [sycAttachmentCategory]="sycAttachmentCategoryLogo"
                                                 [isDisabled]="(accountDataForView?.isConnected && currentTab === accountInfoPageTabsEnum.ProfileCreateOrEdit && !isRecordOwner)"
                                                 [image]="companyLogo" [staticWidth]="170" [showGuidelines]="true"
@@ -297,6 +298,7 @@
                                                 accountInfoTemp?.accountType != 'People' && accountInfoTemp?.accountType
                                                 != 'Personal' ? l("CompnayImages") : l("Cover image")}}
                                             </label>
+                                            <!-- merge -->
                                             <app-image-upload [sycAttachmentCategory]="sycAttachmentCategoryBanner"
                                                 [isDisabled]="(accountDataForView?.isConnected && currentTab === accountInfoPageTabsEnum.ProfileCreateOrEdit && !isRecordOwner)"
                                                 [image]="coverPhoto" [staticHeight]="120" [showGuidelines]="true"
@@ -817,7 +819,7 @@
 
                                 <div class=" m-portlet--full-height mt-0"
                                     *ngIf="accountInfoTemp?.accountType != 'People' && accountInfoTemp?.accountType != 'Personal'">
-                                    <div class="kt-portlet__head aria-header-block header-no-mr-bt">
+                                    <div class="kt-portlet__head aria-header-block header-no-mr-bt d-flex justify-content-between align-items-center bg-white">
                                         <div class="col-md-10">
                                             <div class="kt-portlet__head-label aria-header">
 
@@ -828,7 +830,7 @@
 
                                             </div>
                                         </div>
-                                        <div class="col-md-2  header-block-buttons">
+                                        <div class="col-md-2">
 
 
                                             <button class="btn  btn-save"
@@ -962,8 +964,8 @@
 
                                                         </tr>
                                                     </ng-template>
-                                                    <ng-template pTemplate="body" let-record="$implicit"
-                                                        let-index="rowIndex">
+                                                    <ng-template pTemplate="body"  let-index let-record="$implicit"
+                                                      >
                                                         <tr>
                                                             <td style="width:150px">
                                                                 {{record.entityObjectCategoryCode}}
@@ -976,7 +978,7 @@
                                                                     container="body">
                                                                     <img src="assets/profile/Remove-item-from-list.svg">
                                                                     <button class="btn btn-sm btn-remove"
-                                                                        (click)="removeCategory(index)">
+                                                                        (click)="removeCategory(record)">
                                                                         {{l("Delete")}}
                                                                     </button>
                                                                 </div>
