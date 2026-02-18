@@ -18,7 +18,7 @@
       </div>
 
       <div>
-        <div  *ngIf="account?.account?.accountType" class="d-flex">
+        <div  *ngIf="account?.account?.accountType" class="d-flex  align-items-center">
          <span class="accTyp"> {{'AccountType' | localize}}</span> <span class="mp-acc-badge"> {{ account?.account?.accountType }}</span>
         </div>
       </div>
@@ -52,11 +52,11 @@
           {{ 'Details' | localize }}
         </button> -->
       
-        <span class="mt-3 d-flex w-100" *ngIf="((account?.availableConnections?.length == 0 && account?.connectionName ) || (account?.connectionName)) && isAuthenticated">
+        <span class="mt-3 d-flex w-100 justify-content-end" *ngIf="((account?.availableConnections?.length == 0 && account?.connectionName ) || (account?.connectionName)) && isAuthenticated">
                            
             <div class="btn relation_button-ac mt-4"  style="    white-space: nowrap; font-size: 12px;
             
-               cursor: auto;  " dropdown>
+               cursor: auto;position: relative;  " dropdown container="body" >
 
                 <button type="button" dropdownToggle style="  border: none !important;
                 background: white;padding: 0;">
@@ -70,7 +70,7 @@
 
                 <ul *dropdownMenu class="dropdown-menu" role="menu">
                     <li role="menuitem">
-                        <button class="dropdown-item" type="button" (click)="disconnect(account)">
+                        <button class="dropdown-item" type="button" (click)="disconnect()">
                             {{ getFormattedConnectionName('disConnectLabel') }}
                         </button>
                     </li>
@@ -80,15 +80,15 @@
 
 
         </span>
-
+<!-- Apply relation -->
         <span class="mt-3 w-100"
             *ngIf="(account?.availableConnections?.length > 0 ) && isAuthenticated ">
 
             <!-- Guard + alias once -->
             <ng-container *ngIf="account?.availableConnections as options">
                 <div
-               
-                    style="white-space: nowrap;  right: 5px;" dropdown>
+                class="d-flex justify-content-end"
+                    style="white-space: nowrap;" dropdown>
                     <!-- Main button = first option -->
                     <button type="button " class="relation_button" [ngClass]="isArabic ? 'relation-ar' :'relation-en'" dropdownToggle 
                        >

@@ -1,4 +1,4 @@
-<div class="contacts d-flex flex-column" style="margin-top: 40px;">
+<div class="contacts d-flex flex-column">
   <ng-container *ngFor="let s of sectionsFlat; ">
     <ng-container [ngSwitch]="s.type">
 
@@ -25,7 +25,7 @@
 
 
       <!--single row Call to Action  (can be brands or products)-->
-      <div *ngSwitchCase="'SRCTA'" class="rounded p-lg-4 mb-lg-4 ml-lg-4 mr-lg-4 addMg">
+      <div *ngSwitchCase="'SRCTA'" class="rounded addMg">
         <h4 class="px-2"  [style.text-align]="
         s?.inputs?.titleAlignment === 'Center'
           ? 'center'
@@ -37,7 +37,7 @@
 
 
       <!--multi row Call to Action  (can be brands or products)-->
-      <div *ngSwitchCase="'MRCTA'" class=" rounded p-lg-4 mb-lg-4 ml-lg-4 mr-lg-4 addMg" >
+      <div *ngSwitchCase="'MRCTA'" class=" rounded addMg" >
         <h4  class="px-2" [style.text-align]=" 
         s?.inputs?.titleAlignment === 'Center'
           ? 'center'

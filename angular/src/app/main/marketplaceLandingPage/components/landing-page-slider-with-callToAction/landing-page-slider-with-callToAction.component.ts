@@ -42,7 +42,7 @@ export class LandingPageSliderWithCallToActionComponent extends AppComponentBase
   }
 
   getBlocksData() {
-    this.SydObjectsServiceProxy.getAllSectionBlocks(this.sectionId).subscribe((res) => {
+    this.SydObjectsServiceProxy.getAllSectionBlocks(this.sectionId,Intl.DateTimeFormat().resolvedOptions().timeZone).subscribe((res) => {
       this.sliderItems = (res ?? []) as any;
     });
   }

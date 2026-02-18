@@ -223,20 +223,20 @@ this.accountsTypes=result.items;
                   }
   });
 }
-connect(account: AccountDto): void {
-  this.showMainSpinner();
-  this._accountsServiceProxy
-      .connectContactsProfiles(account.id,null,null)
-      .pipe(
-          finalize(() => {
-              this.hideMainSpinner();
-          })
-      )
-      .subscribe(() => {
-          this.notify.success(this.l("SuccessfullyConnected"));
-          account.status = true;
-      });
-}
+// connect(account: AccountDto): void {
+//   this.showMainSpinner();
+//   this._accountsServiceProxy
+//       .connectContactsProfiles(account.id,null,null)
+//       .pipe(
+//           finalize(() => {
+//               this.hideMainSpinner();
+//           })
+//       )
+//       .subscribe(() => {
+//           this.notify.success(this.l("SuccessfullyConnected"));
+//           account.status = true;
+//       });
+// }
 
 
 

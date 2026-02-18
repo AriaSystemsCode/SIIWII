@@ -1,5 +1,4 @@
-<p-carousel [value]="blocksSorted"   [numVisible]="numVisible"
-[numScroll]="1" [circular]="false" [showIndicators]="false"
+<p-carousel [value]="blocksSorted" [numVisible]="numVisible" [numScroll]="1" [circular]="false" [showIndicators]="false"
   [showNavigators]="true" [responsiveOptions]="responsiveOptions" class="p-4 m-2 rounded">
   <ng-template pTemplate="item" let-item>
 
@@ -7,61 +6,17 @@
       <div class="carousel-card-body" [ngSwitch]="item?.blockType?.toUpperCase()">
 
         <!-- PRODUCT -->
-        <div *ngSwitchCase="'PRODUCT'" class="product-card-horizontal">
-          <div class="product-image-wrapper">
-            <img class="product-image" (error)="onImgErr($event)" [src]="item?.getAppMarketItemForViewDto?.appItem?.imageUrl
-                      ? attachmentBaseUrl + '/' + item?.getAppMarketItemForViewDto?.appItem.imageUrl
-                      : 'assets/placeholders/appitem-placeholder.png'" alt="Product Image"
-              (click)="viewProduct(item?.getAppMarketItemForViewDto)" />
-          </div>
-
-          <div class="product-info">
-            <div class="top-row">
-              <span class="code">
-                {{ item?.getAppMarketItemForViewDto?.appItem?.manufacturerCode }}
-              </span>
-           
-                <span class="price" *ngIf="showMsrP">
-                  {{ languageSettingName !== 'en-GB' ? 'MSRP' : 'RRP' }}:
-                  {{ item?.getAppMarketItemForViewDto?.appItem?.price | currency: currencyCode:true }}
-                </span>
-         
-            </div>
-
-            <div class="name" (click)="viewProduct(item?.getAppMarketItemForViewDto)">
-              {{ item?.getAppMarketItemForViewDto?.appItem?.name }}
-            </div>
-
-            <div class="seller">
-              Sold By
-              <span class="seller-name">
-                {{ item?.getAppMarketItemForViewDto?.appItem?.sellerName }}
-              </span>
-            </div>
-
-            <div class="bottom-row">
-              <div class="star-rating">
-                <div class="stars-outer">
-                  ★★★★★
-                  <div class="stars-inner" [style.width]="
-                      (item?.getAppMarketItemForViewDto?.averageRating / 5) * 100 + '%'
-                    ">
-                    ★★★★★
-                  </div>
-                </div>
-              </div>
-              <span class="rateNum">
-                ({{ item?.getAppMarketItemForViewDto?.numberOfReviews }}) reviews
-              </span>
-            </div>
-          </div>
+        <div *ngSwitchCase="'PRODUCT'">
+          <app-marketplace-product-card [item]="item" [attachmentBaseUrl]="attachmentBaseUrl"
+            [languageSettingName]="languageSettingName" (view)="viewProduct($event)"
+            (imgError)="onImgErr($event)"></app-marketplace-product-card>
         </div>
 
         <!-- BRAND -->
 
-    <img  *ngSwitchCase="'BRAND'"  class="card-media" [src]="item?.image ?  attachmentBaseUrl + '/' + item?.image: attachmentBaseUrl + '/' + item?.getAppEntityForViewDto?.appEntity?.entityAttachments[0]?.url 
+        <img *ngSwitchCase="'BRAND'" class="card-media" [src]="item?.image ?  attachmentBaseUrl + '/' + item?.image: attachmentBaseUrl + '/' + item?.getAppEntityForViewDto?.appEntity?.entityAttachments[0]?.url 
            " title="Brand {{item?.getAppEntityForViewDto?.appEntity?.name}}" alt="Brand" (click)="goToBrand(item)"
-  (error)="onImgErr($event)" />
+          (error)="onImgErr($event)" />
 
 
         <!-- CATEGORY -->
@@ -89,20 +44,13 @@
 
         <!-- EVENT -->
         <div *ngSwitchCase="'EVENT'">
-          <app-marketplace-event-card
-            [block]="itemEv"
-          ></app-marketplace-event-card>
+          <app-marketplace-event-card [block]="item?.getAppEventForViewDto?.appEvent"></app-marketplace-event-card>
         </div>
 
         <!-- ACCOUNT -->
-        <div *ngSwitchCase="'ACCOUNT'">
-          <app-marketplace-account-card
-            [account]="account"
-      
-            [compact]="true"
-            [showConnectButton]="true"
-    
-          ></app-marketplace-account-card>
+        <div *ngSwitchCase="'CONTACT'">
+          <app-marketplace-account-card [account]="item?.getAccountForViewDto" [compact]="true"
+            [showConnectButton]="true"></app-marketplace-account-card>
         </div>
       </div>
     </div>

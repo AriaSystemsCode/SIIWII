@@ -1,4 +1,4 @@
-<div class="mp-event" [attr.dir]="dir" *ngIf="ev">
+<div class="mp-event" [attr.dir]="dir" *ngIf="block">
     <div class="mp-event__media">
       <img
         [src]="posterUrl"
@@ -10,7 +10,7 @@
   
     <div class="mp-event__body">
       <div class="mp-event__title" >
-        {{ ev?.name }}
+        {{ block?.name }}
       </div>
   
       <div class="mp-event__row">
@@ -22,9 +22,9 @@
         <div class="mp-text">
           <div class="mp-label">{{'StartDate' | localize}}:</div>
           <div class="mp-value">
-            {{ ev?.fromDate?.toString() | date:'dd MMM, yyyy' }}
-            <span class="mp-muted" *ngIf="ev?.fromTime">
-              , {{ ev?.fromTime?.toString() | date:'h:mm a' }}
+            {{ block?.fromDate?.toString() | date:'dd MMM, yyyy' }}
+            <span class="mp-muted" *ngIf="block?.fromTime">
+              , {{ block?.fromTime?.toString() | date:'h:mm a' }}
             </span>
           </div>
         </div>
@@ -39,20 +39,15 @@
         <div class="mp-text">
           <div class="mp-label">{{'EndDate' | localize}}:</div>
           <div class="mp-value">
-            {{ ev?.toDate?.toString() | date:'dd MMM, yyyy' }}
-            <span class="mp-muted" *ngIf="ev?.toTime">
-              , {{ ev?.toTime?.toString() | date:'h:mm a' }}
+            {{ block?.toDate?.toString() | date:'dd MMM, yyyy' }}
+            <span class="mp-muted" *ngIf="block?.toTime">
+              , {{ block?.toTime?.toString() | date:'h:mm a' }}
             </span>
           </div>
         </div>
       </div>
   
       <div class="mp-event__grid">
-        <!-- <div class="mp-chip">
-          <span class="mp-chip__ico">👥</span>
-          <span class="mp-chip__lbl">Attendees:</span>
-          <span class="mp-chip__val">{{ ev?.guestsCount || 0 }}</span>
-        </div> -->
   
         <div class="mp-chip">
           <span class="mp-chip__ico"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -62,18 +57,18 @@
             </svg>
             </span>
           <span class="mp-chip__lbl">{{'Location' | localize}}:</span>
-          <span class="mp-chip__val">{{ ev?.isOnLine ? ('Online') : ('In Person') }}</span>
+          <span class="mp-chip__val">{{ block?.isOnLine ? ('Online') : ('In Person') | localize}}</span>
         </div>
       </div>
   
-      <button class="mp-btn" type="button" (click)="openEventDetails(ev?.id)">
-        {{'Details' | localize}}
+      <button class="mp-btn" type="button" (click)="openEventDetails(block?.id)">
+        {{'Details' | localize }}
       </button>
     </div>
   </div>
   
   <!-- fallback if event is missing -->
-  <div class="mp-event mp-event--empty" *ngIf="!ev">
+  <div class="mp-event mp-event--empty" *ngIf="!block">
     No event data found in this block.
   </div>
 

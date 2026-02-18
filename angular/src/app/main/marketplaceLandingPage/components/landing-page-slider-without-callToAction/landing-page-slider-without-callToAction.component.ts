@@ -29,7 +29,7 @@ export class LandingPageSliderWithoutCallToActionComponent extends AppComponentB
     }
 
     getBlocksData() {
-        this.SydObjectsServiceProxy.getAllSectionBlocks(this.sectionId).subscribe(res => {
+        this.SydObjectsServiceProxy.getAllSectionBlocks(this.sectionId,Intl.DateTimeFormat().resolvedOptions().timeZone).subscribe(res => {
           this.advSliderItems = res ?? [];
           
         });

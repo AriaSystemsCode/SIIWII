@@ -155,9 +155,9 @@
                     </ul>
                 </div>
                 <div>
-                    <div>
+                
 
-                        <span style="width: 100%; " class="mt-3 d-flex" *ngIf="((account?.availableConnections?.length == 0 && account?.connectionName ) || (account?.connectionName)) && isAuthenticated">
+                        <span class="mt-3 d-flex w-100" *ngIf="((account?.availableConnections?.length == 0 && account?.connectionName ) || (account?.connectionName)) && isAuthenticated">
                            
                             <div class="btn relation_Status_button mt-4" [ngStyle]="{
                                 'bottom':  singleItemPerRowMode  ? '5px' : '1px' ,'right' : !isArabic ?'5px':'' ,'left' : isArabic ?'5px':''
@@ -188,7 +188,7 @@
 
                         </span>
 
-                        <span style="width: 100%; " class="mt-3"
+                        <span class="mt-3 w-100"
                             *ngIf="(account?.availableConnections?.length > 0 ) && isAuthenticated ">
 
                             <!-- Guard + alias once -->
@@ -227,9 +227,6 @@
 
                         </span>
 
-            
-                
-                    </div>
                 </div>
             </div>
         </div>

@@ -5,51 +5,9 @@
 
 
         <div *ngSwitchCase="'PRODUCT'" class="product-card-horizontal">
-          <div class="product-image-wrapper">
-            <img class="product-image" (error)="onImgErr($event)" [src]="block?.getAppMarketItemForViewDto?.appItem?.imageUrl
-                      ? attachmentBaseUrl + '/' + block?.getAppMarketItemForViewDto?.appItem.imageUrl
-                      : 'assets/placeholders/appitem-placeholder.png'" alt="Product Image"
-              (click)="viewProduct(block?.getAppMarketItemForViewDto)" />
-          </div>
-
-          <div class="product-info">
-            <div class="top-row">
-              <span class="code">
-                {{ block?.getAppMarketItemForViewDto?.appItem?.manufacturerCode }}
-              </span>
-              <span class="price" *ngIf="showMsrP">
-                {{ languageSettingName !== 'en-GB' ? 'MSRP' : 'RRP' }}:
-                {{ block?.getAppMarketItemForViewDto?.appItem?.price | currency: currencyCode:true }}
-              </span>
-            </div>
-
-            <div class="name" (click)="viewProduct(block?.getAppMarketItemForViewDto?.appItem?.id)">
-              {{ block?.getAppMarketItemForViewDto?.appItem?.name }}
-            </div>
-
-            <div class="seller">
-              Sold By
-              <span class="seller-name">
-                {{ block?.getAppMarketItemForViewDto?.appItem?.sellerName }}
-              </span>
-            </div>
-            <div class="d-flex mb-3 justify-content-between align-items-center">
-              <!-- Dynamic Rating Stars -->
-              <div class="star-rating">
-                <!-- Outer gray stars -->
-                <div class="stars-outer">
-                  ★★★★★
-                  <!-- Inner gold stars with dynamic width -->
-                  <div class="stars-inner"
-                    [style.width]="(block?.getAppMarketItemForViewDto?.averageRating / 5) * 100 + '%'">
-                    ★★★★★
-                  </div>
-                </div>
-              </div>
-              <span class="mr-2 mt-2 rateNum">({{block?.getAppMarketItemForViewDto?.numberOfReviews }}) reviews</span>
-
-            </div>
-          </div>
+          <app-marketplace-product-card [item]="block" [attachmentBaseUrl]="attachmentBaseUrl"
+          [languageSettingName]="languageSettingName" (view)="viewProduct($event)"
+          (imgError)="onImgErr($event)"></app-marketplace-product-card>
         </div>
 
         <img *ngSwitchCase="'BRAND'" class="card-media only-media"
@@ -81,13 +39,16 @@
         </ng-container>
 
 
+        <!-- EVENT -->
+        <div *ngSwitchCase="'EVENT'">
+          <app-marketplace-event-card [block]="block?.getAppEventForViewDto?.appEvent"></app-marketplace-event-card>
+        </div>
 
-                <!-- EVENT -->
-                <div *ngSwitchCase="'EVENT'">
-                  <app-marketplace-event-card
-                    [block]="itemEv"
-                  ></app-marketplace-event-card>
-                </div>
+        <!-- ACCOUNT -->
+        <div *ngSwitchCase="'CONTACT'">
+          <app-marketplace-account-card [account]="block?.getAccountForViewDto" [compact]="true"
+            [showConnectButton]="true"></app-marketplace-account-card>
+        </div>
              
       </ng-container>
     </div>

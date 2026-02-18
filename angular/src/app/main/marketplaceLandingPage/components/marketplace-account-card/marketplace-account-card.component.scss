@@ -1,13 +1,13 @@
 .mp-acc-card {
     display: grid;
-    grid-template-columns: 160px 1fr;
-    gap: 14px;
+    grid-template-columns: 135px 1fr;
+    gap: 5px;
     padding: 12px;
     border: 1px solid #ebedf2;
     border-radius: 14px;
     background: #fff;
     height: 240px;
-    overflow: hidden;
+    // overflow: hidden;
   
     &.rtl {
       direction: rtl;
@@ -16,8 +16,8 @@
     }
   
     &.compact {
-      height: 220px;
-      grid-template-columns: 150px 1fr;
+      height: 240px;
+      grid-template-columns: 136px 1fr;
     }
   }
   
@@ -28,6 +28,7 @@
     cursor: pointer;
     height: 100%;
     display: flex;
+    width: 135px;
   }
   
   .mp-acc-img {
@@ -105,9 +106,9 @@
   }
   
   .truncate {
-    overflow: hidden;
+    // overflow: hidden;
     text-overflow: ellipsis;
-    white-space: nowrap;
+    word-break: break-word;
     min-width: 0;
   }
   
@@ -141,10 +142,22 @@
   }
   
   /* ✅ Tablet */
-  @media (max-width: 991.98px) {
+  @media only screen and (min-width: 575px) and (max-width: 900px)  {
     .mp-acc-card {
-      grid-template-columns: 140px 1fr;
+      grid-template-columns: 120px 1fr !important;
       height: 220px;
+    }
+    .mp-acc-media {
+      width: 120px;
+    }
+    .mp-acc-title {
+font-size: 14px;
+    }
+    .accTyp {
+font-size: 11px;
+    }
+    .mp-acc-badge {
+      font-size: 10px;
     }
   }
   
@@ -155,7 +168,7 @@
       height: auto;
     }
     .mp-acc-media {
-      height: 160px;
+      // height: 160px;
     }
     .mp-acc-actions {
       justify-content: space-between;
@@ -165,8 +178,33 @@
   .accTyp {
     font-size: 12px;
     color: #1b101b;
+    white-space: nowrap;
   }
 
   .relation_button-ac {
     border: 1px solid #ebedf2;
   }
+
+  :host ::ng-deep .dropdown-menu {
+    z-index: 99999 !important;
+    max-height: 260px;
+    overflow: auto;
+  }
+
+  .relation_button {
+    background-color: #4a0d4a;
+    color: white;
+    border-radius: 6px;
+    padding: 5px 8px;
+    font-weight: 700;
+}
+
+.relation-en {
+  right: 5px;
+
+}
+
+.relation-ar {
+  left: 4px;
+
+}

@@ -34,7 +34,7 @@ export class FooterSocialMediaComponent extends AppComponentBase   {
         getBlocksData(){
                 this.SydObjectsServiceProxy
                 .getAllSectionBlocks(
-                  this.sectionId,        
+                  this.sectionId,     Intl.DateTimeFormat().resolvedOptions().timeZone   
                 )
                 .subscribe((res) => {
                     this.links = res

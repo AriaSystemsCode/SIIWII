@@ -51562,14 +51562,17 @@ export class SydObjectsServiceProxy {
 
     /**
      * @param sectionId (optional) 
+     * @param timeZone (optional) 
      * @return Success
      */
-    getAllSectionBlocks(sectionId: number | undefined): Observable<PageSettingDto[]> {
+    getAllSectionBlocks(sectionId: number | undefined, timeZone: string | null | undefined): Observable<PageSettingDto[]> {
         let url_ = this.baseUrl + "/api/services/app/SydObjects/GetAllSectionBlocks?";
         if (sectionId === null)
             throw new Error("The parameter 'sectionId' cannot be null.");
         else if (sectionId !== undefined)
             url_ += "sectionId=" + encodeURIComponent("" + sectionId) + "&";
+        if (timeZone !== undefined && timeZone !== null)
+            url_ += "timeZone=" + encodeURIComponent("" + timeZone) + "&";
         url_ = url_.replace(/[?&]$/, "");
 
         let options_ : any = {
@@ -112834,6 +112837,7 @@ export class PageSettingDto implements IPageSettingDto {
     buttonText!: string | undefined;
     titleAlignment!: string | undefined;
     entityAttachments!: AppEntityAttachmentDto[] | undefined;
+    getAppEventForViewDto!: GetAppEventForViewDto;
 
     [key: string]: any;
 
@@ -112875,6 +112879,7 @@ export class PageSettingDto implements IPageSettingDto {
                 for (let item of _data["entityAttachments"])
                     this.entityAttachments!.push(AppEntityAttachmentDto.fromJS(item));
             }
+            this.getAppEventForViewDto = _data["getAppEventForViewDto"] ? GetAppEventForViewDto.fromJS(_data["getAppEventForViewDto"]) : <any>undefined;
         }
     }
 
@@ -112914,6 +112919,7 @@ export class PageSettingDto implements IPageSettingDto {
             for (let item of this.entityAttachments)
                 data["entityAttachments"].push(item.toJSON());
         }
+        data["getAppEventForViewDto"] = this.getAppEventForViewDto ? this.getAppEventForViewDto.toJSON() : <any>undefined;
         return data;
     }
 }
@@ -112938,6 +112944,7 @@ export interface IPageSettingDto {
     buttonText: string | undefined;
     titleAlignment: string | undefined;
     entityAttachments: AppEntityAttachmentDto[] | undefined;
+    getAppEventForViewDto: GetAppEventForViewDto;
 
     [key: string]: any;
 }

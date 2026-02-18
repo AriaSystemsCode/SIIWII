@@ -137,7 +137,7 @@ import { InputSwitchModule } from 'primeng/inputswitch';
         { provide: BsLocaleService, useFactory: NgxBootstrapDatePickerConfigService.getDatepickerLocale },PublishService
     ],
     exports:[
-        MarketplaceProductsModule,
+        ConnectionsCardComponent
     ]
 })
 export class AccountInfosModule { }

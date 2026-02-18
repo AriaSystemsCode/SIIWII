@@ -17,7 +17,7 @@ export class ConnectionsCardComponent extends AppComponentBase {
     @Input('fromOverview') fromOverview: boolean = false
 
     @Output() deleteMe: EventEmitter<boolean> = new EventEmitter<boolean>()
-    @Output() connectMe: EventEmitter<boolean> = new EventEmitter<boolean>()
+    // @Output() connectMe: EventEmitter<boolean> = new EventEmitter<boolean>()
     @Output() disconnectMe: EventEmitter<boolean> = new EventEmitter<boolean>()
     @Output() _createRelation: EventEmitter<any> = new EventEmitter<any>()
 
