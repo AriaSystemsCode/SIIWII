@@ -71,7 +71,7 @@ namespace onetouch.SystemObjects
         //I49[End]
         //I50[Start]
         private readonly IAppEventsAppService _appEventsAppService;
-        private readonly IRepository<AppEvents.AppMarketplaceContacts, long> _appEventRepository;
+        private readonly IRepository<AppEvent, long> _appEventRepository;
         private readonly IMarketplaceAccountsAppService _MarketplaceAccountsAppService;
         private readonly IRepository<AppMarketplaceContact, long> _appMarketplaceContactRepository;
         //I50[End]
@@ -92,7 +92,7 @@ namespace onetouch.SystemObjects
             IMessageAppService messageAppService, ISycEntityObjectCategoriesAppService sycEntityObjectCategoriesAppService,
             IAccountsAppService accountsAppService, IRepository<AppContact, long> appContactRepository,
             IRepository<SycEntityObjectCategory, long> sycEntityObjectCategoryRepository, IEmailSender emailSender, IAppEventsAppService appEventsAppService,
-            IRepository<AppEvents.AppMarketplaceContacts, long> appEventRepository, IMarketplaceAccountsAppService marketplaceAccountsAppService,
+            IRepository<AppEvent, long> appEventRepository, IMarketplaceAccountsAppService marketplaceAccountsAppService,
             IRepository<AppMarketplaceContact, long> appMarketplaceContactRepository) 
 		  {
 			_sydObjectRepository = sydObjectRepository;
