@@ -761,21 +761,23 @@ height: 100px !important;
 
 // merge
 @media only screen and (min-width: 1100px) {
-.fixScrollS {
-    position: fixed;
-    max-width: 26%;
-    right: 10%;
-}
-}
-// merge
-
-@media only screen and (max-width: 1100px) {
     .fixScrollS {
         position: fixed;
-        max-width: 26%;
-        right: 13%;
+        max-width: 28%;
+        right: 4%;
     }
     }
+    // merge
+    
+    @media only screen and (max-width: 1100px) {
+        .fixScrollS {
+                
+            position: fixed;
+            max-width: 26%;
+            right: 5%;
+        }
+        }
+    
 
     .syncBtn{
 
