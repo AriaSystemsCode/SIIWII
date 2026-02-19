@@ -1,50 +1,126 @@
-import { Component, Output, EventEmitter, Injector, ViewChild } from '@angular/core';
-import { AppComponentBase } from '@shared/common/app-component-base';
-import { WidgetOutput } from '@shared/service-proxies/service-proxies';
+// import { Component, Output, EventEmitter, Injector, ViewChild } from '@angular/core';
+// import { AppComponentBase } from '@shared/common/app-component-base';
+// import { WidgetOutput } from '@shared/service-proxies/service-proxies';
+// import { ModalDirective } from 'ngx-bootstrap/modal';
+
+// @Component({
+//   selector: 'add-widget-modal',
+//   templateUrl: './add-widget-modal.component.html',
+//   styleUrls: ['./add-widget-modal.component.css']
+// })
+// export class AddWidgetModalComponent extends AppComponentBase {
+
+//   @Output() onClose = new EventEmitter();
+//   @ViewChild('addWidgetModal', { static: true }) modal: ModalDirective;
+
+//   widgets: WidgetOutput[];
+//   saving = false;
+//   selectedWidgetId: string;
+
+//   constructor(
+//     injector: Injector) {
+//     super(injector);
+//   }
+
+//   close(): void {
+//     this.onClose.emit();
+//     this.hide();
+//   }
+
+//   save(): void {
+//     this.onClose.emit(this.selectedWidgetId);
+//     this.hide();
+//   }
+
+//   show(widgets: WidgetOutput[]): void {
+//     this.widgets = widgets;
+
+//     if (this.widgets && this.widgets.length) {
+//       this.selectedWidgetId = this.widgets[0].id;
+//     } else {
+//       this.selectedWidgetId = null;
+//     }
+
+//     this.modal.show();
+//   }
+
+//   hide(): void {
+//     this.modal.hide();
+//   }
+// }
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Output, ViewChild } from '@angular/core';
 import { ModalDirective } from 'ngx-bootstrap/modal';
+import { WidgetOutput } from '@shared/service-proxies/service-proxies';
+import { WidgetCard } from '../definitions';
+
+interface Card {
+  id: string;
+  label: string;
+  description: string;
+  icon: string;
+  kind: string;
+}
 
 @Component({
   selector: 'add-widget-modal',
   templateUrl: './add-widget-modal.component.html',
-  styleUrls: ['./add-widget-modal.component.css']
+  styleUrls: ['./add-widget-modal.component.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class AddWidgetModalComponent extends AppComponentBase {
+export class AddWidgetModalComponent {
+  @ViewChild('picker', { static: true }) picker!: ModalDirective;
+  @Output() onClose = new EventEmitter<string>();
 
-  @Output() onClose = new EventEmitter();
-  @ViewChild('addWidgetModal', { static: true }) modal: ModalDirective;
+  cards: Card[] = [];
+  search = '';
 
-  widgets: WidgetOutput[];
-  saving = false;
-  selectedWidgetId: string;
+  /** Parent calls: this.addWidgetModal.show(widgets) */
+  // show(widgets: WidgetOutput[]): void {
+  //   // 1) Defensive: ensure array
+  //   const list = Array.isArray(widgets) ? widgets : [];
+  //   // 2) Map to cards the template expects
+  //   this.cards = list.map(w => ({
+  //     id: w.id,
+  //     label: w.name || 'Widget',
+  //     description: w.description || 'Custom widget',
+  //     kind: (w.name || '').toLowerCase(),
+  //     icon: this.iconFor(w.name)
+  //   }));
+  //   this.search = '';
 
-  constructor(
-    injector: Injector) {
-    super(injector);
-  }
+  //   // 3) Open modal
+  //   this.picker.show();
 
-  close(): void {
-    this.onClose.emit();
-    this.hide();
-  }
-
-  save(): void {
-    this.onClose.emit(this.selectedWidgetId);
-    this.hide();
-  }
-
-  show(widgets: WidgetOutput[]): void {
-    this.widgets = widgets;
-
-    if (this.widgets && this.widgets.length) {
-      this.selectedWidgetId = this.widgets[0].id;
-    } else {
-      this.selectedWidgetId = null;
-    }
-
-    this.modal.show();
-  }
+  //   // 4) If OnPush, mark for check
+  //   this.cdr.markForCheck();
+  // }
+// add-widget-modal.component.ts
+show(cards: WidgetCard[]): void {
+  this.cards = Array.isArray(cards) ? cards : [];
+  this.search = '';
+  this.picker.show();
+  this.cdr.markForCheck();
+}
 
   hide(): void {
-    this.modal.hide();
+    this.picker.hide();
   }
+
+  pick(widgetId: string): void {
+    this.onClose.emit(widgetId);
+    this.hide();
+  }
+
+  filtered(): Card[] {
+    const q = this.search?.trim().toLowerCase();
+    if (!q) return this.cards;
+    return this.cards.filter(c =>
+      c.label.toLowerCase().includes(q) ||
+      c.description.toLowerCase().includes(q) ||
+      c.kind.includes(q)
+    );
+  }
+
+  constructor(private cdr: ChangeDetectorRef) {}
+
 }

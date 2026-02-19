@@ -74,7 +74,16 @@ import { AppTransactionSideBarComponent } from "@app/admin/sideBarComponents/app
 import { SendMessageModalComponent } from "@app/main/Messages/SendMessage-Modal.Component";
 import { EditorModule } from 'primeng/editor';
 import { AppAddOnsSideBarComponent } from "@app/admin/sideBarComponents/app-add-ons-side-bar/app-add-ons-side-bar.component";
-
+import { ChartWidgetCardComponent } from "./customizable-dashboard/widgets/widgit-card/chart-widget-card.component";
+import { ChartModule } from 'primeng/chart';
+import { CardModule } from 'primeng/card';
+import { WidgetOutletComponent } from "./customizable-dashboard/widgets/widget-outlet/widget-outlet.component";
+import { WidgetConfigModalComponent } from "./customizable-dashboard/widgets/widget-config-modal/widget-config-modal.component";
+import { FilterBuilderComponent } from "./customizable-dashboard/filters/filter-builder/filter-builder.component";
+import { MultiSelectModule } from "primeng/multiselect";
+import { DropdownModule } from "primeng/dropdown";
+import { InputSwitchModule } from "primeng/inputswitch";
+import { NgxEchartsModule } from 'ngx-echarts';
 @NgModule({
     imports: [
         CommonModule,
@@ -99,7 +108,14 @@ import { AppAddOnsSideBarComponent } from "@app/admin/sideBarComponents/app-add-
         ImageCropperModule,
         ScrollingModule,
         CheckboxModule,
-        EditorModule
+        EditorModule,
+        CardModule ,
+        ChartModule,
+        MultiSelectModule,   // <-- REQUIRED for <p-multiSelect>
+        DropdownModule,      // <-- you also use <p-dropdown>
+        InputSwitchModule,   // <-- you used <p-inputSwitch>
+        NgxEchartsModule.forRoot({ echarts: () => import('echarts') }),
+
     ],
     declarations: [
         TimeZoneComboComponent,
@@ -142,7 +158,12 @@ import { AppAddOnsSideBarComponent } from "@app/admin/sideBarComponents/app-add-
         SelectionModalComponent,
         AppSideBarComponent,AppTransactionSideBarComponent,
         SendMessageModalComponent,
-        AppAddOnsSideBarComponent
+        AppAddOnsSideBarComponent,
+        ChartWidgetCardComponent,
+        WidgetOutletComponent ,
+        WidgetConfigModalComponent,
+        FilterBuilderComponent
+        
 
     ],
     exports: [
@@ -165,7 +186,8 @@ import { AppAddOnsSideBarComponent } from "@app/admin/sideBarComponents/app-add-
         MatrixGridComponent,
         GenericFormModalComponent,
         SelectionModalComponent,AppSideBarComponent,
-        SendMessageModalComponent
+        SendMessageModalComponent,
+        ChartWidgetCardComponent
     ],
     providers: [
         DateTimeService,

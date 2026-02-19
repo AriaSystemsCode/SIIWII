@@ -1,0 +1,34 @@
+<div class="space-y-3" [formGroup]="form">
+    <div formArrayName="filters" *ngFor="let g of filters.controls; let i = index">
+      <div [formGroupName]="i" class="row">
+        <div class="col-5">
+          <label class="form-label">Field</label>
+          <p-dropdown [options]="fields" optionLabel="label" optionValue="name"
+                      formControlName="field" (onChange)="onFieldChange(i)"></p-dropdown>
+        </div>
+        <div class="col-2">
+          <label class="form-label">Operator</label>
+          <p-dropdown [options]="operatorOptions(i)" optionLabel="label" optionValue="value"
+                      formControlName="op"></p-dropdown>
+        </div>
+        <input  type="number" class="form-control col-5 mt-4" formControlName="value" />
+
+        <div>
+          <label class="form-label">Value</label>
+          <!-- pick widget by chosen field type -->
+          <ng-container [ngSwitch]="fieldTypeAt(i)">
+            <app-filter-date-range-picker></app-filter-date-range-picker>
+            <!-- <input *ngSwitchCase="'number'" type="number" class="form-control" formControlName="value" /> -->
+            <!-- <p-calendar *ngSwitchCase="'date'" formControlName="value" dateFormat="yy-mm-dd"></p-calendar> -->
+            <!-- <input *ngSwitchDefault type="text" class="form-control" formControlName="value" /> -->
+          </ng-container>
+        </div>
+      </div>
+      <div class="text-end mt-1">
+        <button type="button" class="btn btn-link p-0" (click)="remove(i)">Remove</button>
+      </div>
+      <hr />
+    </div>
+
+    <button class="btn btn-sm btn-outline-primary" type="button" (click)="add()">+ Add filter</button>
+  </div>

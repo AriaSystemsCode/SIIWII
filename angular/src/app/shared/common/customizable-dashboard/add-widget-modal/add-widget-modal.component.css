@@ -1,0 +1,10 @@
+.chart-card{
+    display:grid; gap:.75rem; padding:1rem; border:1px solid #e5e7eb;
+    border-radius:14px; background:#fff; text-align:left; cursor:pointer;
+    transition:transform .12s ease, box-shadow .12s ease, border-color .12s ease;
+  }
+  .chart-card:hover{ transform:translateY(-2px); box-shadow:0 6px 18px rgba(0,0,0,.06); border-color:#3b82f6; }
+  .thumb{ height:150px; border-radius:10px; background:#f3f4f6; display:grid; place-items:center; font-size:2rem; }
+  .meta .title{ font-weight:700; }
+  .meta .desc{ font-size:.92rem; }
+  

@@ -14,6 +14,7 @@ import { WidgetSubscriptionExpiringTenantsComponent } from './widgets/widget-sub
 import { WidgetHostTopStatsComponent } from './widgets/widget-host-top-stats/widget-host-top-stats.component';
 import { FilterDateRangePickerComponent } from './filters/filter-date-range-picker/filter-date-range-picker.component';
 import { WidgetTopStatsComponent } from './widgets/widget-top-stats/widget-top-stats.component';
+import { ChartWidgetCardComponent } from './widgets/widgit-card/chart-widget-card.component';
 
 @Injectable({
   providedIn: 'root'
@@ -99,17 +100,32 @@ export class DashboardViewConfigurationService {
     );
    //add your host side widgets here
 
-    this.WidgetViewDefinitions.push(generalStats);
-    this.WidgetViewDefinitions.push(dailySales);
-    this.WidgetViewDefinitions.push(profitShare);
-    this.WidgetViewDefinitions.push(memberActivity);
-    this.WidgetViewDefinitions.push(regionalStats);
-    this.WidgetViewDefinitions.push(salesSummary);
-    this.WidgetViewDefinitions.push(topStats);
-    this.WidgetViewDefinitions.push(incomeStatistics);
-    this.WidgetViewDefinitions.push(editionStatistics);
-    this.WidgetViewDefinitions.push(recentTenants);
-    this.WidgetViewDefinitions.push(subscriptionExpiringTenants);
-    this.WidgetViewDefinitions.push(hostTopStats);
+    // this.WidgetViewDefinitions.push(generalStats);
+    // this.WidgetViewDefinitions.push(dailySales);
+    // this.WidgetViewDefinitions.push(profitShare);
+    // this.WidgetViewDefinitions.push(memberActivity);
+    // this.WidgetViewDefinitions.push(regionalStats);
+    // this.WidgetViewDefinitions.push(salesSummary);
+    // this.WidgetViewDefinitions.push(topStats);
+    // this.WidgetViewDefinitions.push(incomeStatistics);
+    // this.WidgetViewDefinitions.push(editionStatistics);
+    // this.WidgetViewDefinitions.push(recentTenants);
+    // this.WidgetViewDefinitions.push(subscriptionExpiringTenants);
+    // this.WidgetViewDefinitions.push(hostTopStats);
+    this.WidgetViewDefinitions = [
+      // generic chart cards
+      { id: 'Custom_LineChart',      component: ChartWidgetCardComponent, defaultWidth: 16, defaultHeight: 10 },
+      { id: 'Custom_BarChart',       component: ChartWidgetCardComponent, defaultWidth: 16, defaultHeight: 10 },
+      { id: 'Custom_PieChart',       component: ChartWidgetCardComponent, defaultWidth: 12, defaultHeight: 10 },
+      { id: 'Custom_DoughnutChart',  component: ChartWidgetCardComponent, defaultWidth: 12, defaultHeight: 10 },
+      { id: 'Custom_PolarAreaChart', component: ChartWidgetCardComponent, defaultWidth: 12, defaultHeight: 10 },
+      { id: 'Custom_RadarChart',     component: ChartWidgetCardComponent, defaultWidth: 16, defaultHeight: 10 },
+      { id: 'Custom_ScatterChart',   component: ChartWidgetCardComponent, defaultWidth: 16, defaultHeight: 10 },
+      // { id: 'Custom_KPI',            component: KpiWidgetCardComponent,   defaultWidth: 8,  defaultHeight: 6  },
+    
+      // (keep your existing widget defs too)
+    ];
   }
+
+  
 }
