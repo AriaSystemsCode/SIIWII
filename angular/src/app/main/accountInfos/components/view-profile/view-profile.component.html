@@ -332,42 +332,7 @@
                 </div>
             </div>
         </div>
-        <div *ngIf="!personalAccount" [class]="
-            containerClass + ' kt-grid__item kt-grid__item--fluid mt-5'
-        ">
-            <div class="p-4 seeMoreContainer">
-                <div class="row pl-3">
-                    <div>
-                        <h6 class="header emailColor">{{ "Departments" | localize }}:</h6>
-                    </div>
-                </div>
-                <div class="row details pt-4" [ngClass]="{ 'thin-scroll': scrollDepartment }" [ngStyle]="{
-                    'overflow-y': scrollDepartment ? 'scroll' : 'hidden',
-                    height: scrollDepartment
-                        ? maxContainerHeight + 'px'
-                        : 'auto'
-                }" *ngIf="accountData?.classfications?.length > 0;else noDepartment">
-                    <div class="col-md-12 pb-3 pt-2">
-                        <div class="seeMoreData" *ngFor="let department of accountData?.categories; index as i  ">
-                            <p class="title-tag">{{ department }}</p>
-                        </div>
-                    </div>
-                    <button *ngIf="showLessDepartment" (click)="showDepartment()" class="btn btn-dark ml-5">
-                        {{ "Showless" | localize }}
-                    </button>
-                    <button *ngIf="showMoreDepartment" (click)="showDepartment()" class="btn btn-dark ml-5">
-                        {{ "showmore" | localize }}
-                    </button>
-                </div>
-                <ng-template #noDepartment>
-                    <div class="col-md-12 pb-3 pt-2 text-center">
-                        <p>
-                            {{ "NoDepartmentstodisplay" | localize }}
-                        </p>
-                    </div>
-                </ng-template>
-            </div>
-        </div>
+    
         <div *ngIf="!personalAccount" [class]="
                 containerClass + ' kt-grid__item kt-grid__item--fluid mt-5'
             ">
@@ -411,7 +376,42 @@
             </div>
         </div>
 
-
+        <div *ngIf="!personalAccount" [class]="
+        containerClass + ' kt-grid__item kt-grid__item--fluid mt-5'
+    ">
+        <div class="p-4 seeMoreContainer">
+            <div class="row pl-3">
+                <div>
+                    <h6 class="header emailColor">{{ "Departments" | localize }}:</h6>
+                </div>
+            </div>
+            <div class="row details pt-4" [ngClass]="{ 'thin-scroll': scrollDepartment }" [ngStyle]="{
+                'overflow-y': scrollDepartment ? 'scroll' : 'hidden',
+                height: scrollDepartment
+                    ? maxContainerHeight + 'px'
+                    : 'auto'
+            }" *ngIf="accountData?.categories?.length > 0;else noDepartment">
+                <div class="col-md-12 pb-3 pt-2">
+                    <div class="seeMoreData" *ngFor="let department of accountData?.categories; index as i  ">
+                        <p class="title-tag">{{ department }}</p>
+                    </div>
+                </div>
+                <button *ngIf="showLessDepartment" (click)="showDepartment()" class="btn btn-dark ml-5">
+                    {{ "Showless" | localize }}
+                </button>
+                <button *ngIf="showMoreDepartment" (click)="showDepartment()" class="btn btn-dark ml-5">
+                    {{ "showmore" | localize }}
+                </button>
+            </div>
+            <ng-template #noDepartment>
+                <div class="col-md-12 pb-3 pt-2 text-center">
+                    <p>
+                        {{ "NoDepartmentstodisplay" | localize }}
+                    </p>
+                </div>
+            </ng-template>
+        </div>
+    </div>
 
         <div *ngIf="personalAccount">
             <div [class]="containerClass + ' kt-grid__item kt-grid__item--fluid'">
