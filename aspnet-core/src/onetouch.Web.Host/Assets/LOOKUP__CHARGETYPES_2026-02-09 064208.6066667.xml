@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-16"?>
+<ItemExtraAttributes
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+	<ExtraAttributes>
+		<ExtraAttribute>
+			<AttributeId>900</AttributeId>
+			<Code>CALCULATIONMETHOD</Code>
+			<Name>CALCULATIONMETHOD</Name>
+			<Description>CALCULATIONMETHOD</Description>
+			<DataType>dropDownList</DataType>
+			<Width>50</Width>
+			<Decimals>0</Decimals>
+			<DefaultValue></DefaultValue>
+			<Usage></Usage>
+			<IsLookup>false</IsLookup>
+			<EntityObjectTypeCode></EntityObjectTypeCode>
+			<AllowAddNew>false</AllowAddNew>
+			<AcceptMultipleValues>false</AcceptMultipleValues>
+			<ValidEntries>Freight-Method|Taxes-Method|None</ValidEntries>			
+			<IsVariation>false</IsVariation>
+			<IsAdvancedSearch>false</IsAdvancedSearch>
+		</ExtraAttribute>
+	</ExtraAttributes>
+</ItemExtraAttributes>   

@@ -1,6 +1,13 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <localizationDictionary culture="en">
 	<texts>
+	<text name="CALCULATIONMETHOD">Calculation Method</text>
+	<text name="CHARGETYPE">Charge Type</text>
+	<text name="ITEMSSIN">Item SSIN</text>
+	<text name="ISEDITABLE">Is Editable</text>
+	<text name="SHIPPINGCHARGE">Shipping Charge</text>
+	<text name="SHIPPINGMINIMUMAMOUNT">Shipping Minimum Amount</text>		
+		
 	<text name="Portalimage">Portal image</text>
 	<text name="Portalslogan">Portal slogan</text>
 	<text name="Shownewsfeed">Show news feed</text>
