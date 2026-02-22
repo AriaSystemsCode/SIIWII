@@ -157,7 +157,7 @@ export class MarketplaceProductsComponent
         if (savedFilters) {
             const parsedFilters = JSON.parse(savedFilters);
             this.onlyAvialbleStock = parsedFilters.onlyAvailableStock ?? undefined;
-            this.selectedCurrrency = parsedFilters.selectedCurrency || this.selectedCurrrency;
+            this.selectedCurrrency = parsedFilters.selectedCurrency ?? this.selectedCurrrency;
             this.selectedSort = this.sortingData.find(s => s.value === parsedFilters.selectedSort) ?? this.selectedSort;
 
             this.appItemListId = parsedFilters.appItemListId || this.appItemListId;
@@ -232,7 +232,6 @@ export class MarketplaceProductsComponent
 
     getAllProducts() {
         this.showMainSpinner();
-
         const selectedCurrency =
             (this.fromMarketAcoount)
                 ? (this.marketplaceAccCurrency || 'USD')
@@ -255,7 +254,7 @@ export class MarketplaceProductsComponent
             endShipData: this.endShipData,
 
             brands: this.brands || [],
-            selectedCurrency,
+            selectedCurrency: selectedCurrency,
             selectedSort: this.selectedSort?.value || 'name',
             skipCount: this.skipCount,
             maxResultCount: this.maxResultCount
@@ -263,7 +262,7 @@ export class MarketplaceProductsComponent
 
 
         localStorage.setItem("productFilters", JSON.stringify(requestParams));
-
+        const currencyCode = this.getCurrencyCodeForRequest();
         this._AppMarketplaceItemsServiceProxy
             .getAll(
                 this.contactSSIN,
@@ -287,7 +286,7 @@ export class MarketplaceProductsComponent
                 requestParams.startShipData,
                 requestParams.endShipData,
                 requestParams.brands,
-                requestParams.selectedCurrency,
+                currencyCode,
                 requestParams.selectedSort,
                 requestParams.skipCount,
                 requestParams.maxResultCount
@@ -321,14 +320,19 @@ export class MarketplaceProductsComponent
 
 
     setCurrency() {
-        // read string code from localStorage
-        const saved = localStorage.getItem('currencyCode');
-        const code = saved && saved !== 'null' && saved !== 'undefined' ? saved : (this.tenantDefaultCurrency?.code ?? 'USD');
-
-        this.selectedCurrrency = code;
-        this.currency = code;
-    }
-
+        const raw = localStorage.getItem("currencyCode");
+        let code = this.tenantDefaultCurrency?.code || 'USD';
+      
+        if (raw && raw !== 'undefined' && raw !== 'null') {
+          try {
+            const parsed = JSON.parse(raw);
+            code = parsed?.code ?? parsed ?? code;
+          } catch { code = raw; }
+        }
+      
+        this.selectedCurrrency = this.currencies?.find(c => c.code === code) || this.currencies?.[0] || null;
+        this.currency = this.selectedCurrrency?.code || code;
+      }
 
 
     onPageChange(value: any) {
@@ -350,15 +354,16 @@ export class MarketplaceProductsComponent
         this.getAllProducts();
     }
 
-    handleCurrencyChange(event: any) {
-        this.selectedCurrrency = event.value;
-        this.currency = event.value;
+    handleCurrencyChange(data: any) {
+        setTimeout(
+            () => {
+                this.currency = this.selectedCurrrency?.code ? this.selectedCurrrency?.code : this.selectedCurrrency;
+                localStorage.setItem("currencyCode", this.currency);
+                this.getAllProducts();
+            }, 1500);
 
-        localStorage.setItem("currencyCode", this.currency);
-
-
-        this.getAllProducts();
     }
+
 
     handleSortingChange(data: any) {
         this.getAllProducts();
@@ -490,4 +495,42 @@ export class MarketplaceProductsComponent
         }
 
     }
+    private getCurrencyCodeForRequest(): string {
+   
+        if (this.selectedCurrrency && typeof this.selectedCurrrency === 'object' && this.selectedCurrrency.code) {
+          return this.selectedCurrrency.code;
+        }
+    
+        if (typeof this.selectedCurrrency === 'string' && this.selectedCurrrency.trim()) {
+          return this.selectedCurrrency.trim();
+        }
+    
+        const stored = localStorage.getItem('currencyCode');
+        if (stored && stored !== 'undefined' && stored !== 'null') {
+          try {
+            const parsed = JSON.parse(stored);
+    
+            if (typeof parsed === 'string' && parsed.trim()) {
+              return parsed.trim();
+            }
+    
+            if (parsed && typeof parsed === 'object' && parsed.code) {
+              return parsed.code;
+            }
+          } catch {
+    
+            if (stored.trim()) {
+              return stored.trim();
+            }
+          }
+        }
+    
+        if ((this as any).tenantDefaultCurrency?.code) {
+          return (this as any).tenantDefaultCurrency.code;
+        }
+      
+        return 'USD';
+      }
+
+
 }

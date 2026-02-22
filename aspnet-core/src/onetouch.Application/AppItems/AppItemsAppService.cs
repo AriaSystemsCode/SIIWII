@@ -85,6 +85,7 @@ using onetouch.MultiTenancy;
 using NPOI.HSSF.Util;
 using DocumentFormat.OpenXml.Presentation;
 using DocumentFormat.OpenXml.Wordprocessing;
+using DocumentFormat.OpenXml.Spreadsheet;
 
 namespace onetouch.AppItems
 {
@@ -914,6 +915,8 @@ namespace onetouch.AppItems
                 {
                     output.AppItem.ManufacturerCode = appItem.Code;
                 }
+                if (appItem.EntityFk.TenantOwner != AbpSession.TenantId && appItem.EntityFk.TenantOwner != null && appItem.EntityFk.TenantOwner != 0)
+                       output.TenantOwner = appItem.EntityFk.TenantOwner;
                 //
                 output.AppItem.AppItemSizesScaleInfo
                     .ForEach(a => a.AppSizeScalesDetails = a.AppSizeScalesDetails.OrderBy(d => Convert.ToInt32(d.D1Position))
@@ -4729,11 +4732,11 @@ namespace onetouch.AppItems
                 Spreadsheet document = new Spreadsheet();
                 document.LoadFromFile(newFilePath);
                 //Validation Rules
-                Worksheet ValidRuleSheet = document.Workbook.Worksheets.ByName("Validation Rules");
+                Bytescout.Spreadsheet.Worksheet ValidRuleSheet = document.Workbook.Worksheets.ByName("Validation Rules");
                 ValidRuleSheet.Cell("C2").Value = itemExcelTemplateDto.ExcelTemplateVersion;
                 #region fill accounts valid entries
                 // Get worksheet by name [Products]
-                Worksheet Sheet = document.Workbook.Worksheets.ByName("Products");
+                Bytescout.Spreadsheet.Worksheet Sheet = document.Workbook.Worksheets.ByName("Products");
                 // Set currecy "A"
                 if (entityObjectExtraAttribute != null && entityObjectExtraAttribute.ExtraAttributes != null &&
                     entityObjectExtraAttribute.ExtraAttributes.ExtraAttributes != null && entityObjectExtraAttribute.ExtraAttributes.ExtraAttributes.Count > 0)
@@ -4840,7 +4843,7 @@ namespace onetouch.AppItems
 
                 #region fill valid entries sheet
                 // Get worksheet by name [Accounts]
-                Worksheet Sheetvalid = document.Workbook.Worksheets.ByName("Valid Entries");
+                Bytescout.Spreadsheet.Worksheet Sheetvalid = document.Workbook.Worksheets.ByName("Valid Entries");
 
                 string column = "B";
                 int row = 2;
@@ -5237,6 +5240,33 @@ namespace onetouch.AppItems
                     List<string> RecordsParentCodes = result.Select(r => r.ParentCode).ToList();
 
                     List<ImportItemInputDto> x = new List<ImportItemInputDto>();
+                    //var existingItemsDict = _appItemRepository.GetAll()
+                    //    .Where(x => x.ItemType == 0)
+                    //    .Select(x => new {
+                    //        Code = x.Code.Replace(" ", "").ToUpper(),
+                    //        x.Id
+                    //    })
+                    //    .ToDictionary(x => x.Code, x => x.Id);
+                    var existingItemsDict = _appItemRepository.GetAll()
+                    .Where(x => x.ItemType == 0 && !string.IsNullOrEmpty(x.Code))
+                    .Select(x => new
+                    {
+                        Code = x.Code.Replace(" ", "").ToUpper(),
+                        x.Id
+                    })
+                    .GroupBy(x => x.Code)
+                    .ToDictionary(g => g.Key, g => g.First().Id);
+
+                    //var excelMapper = new MapperConfiguration(cfg =>
+                    //{
+                    //    cfg.AddProfile(new AppItemExcelDtoProfile(entityExtraAttributes));
+                    //}).CreateMapper();
+
+                    var importMapper = new MapperConfiguration(cfg =>
+                    {
+                        cfg.AddProfile(new AppItemExcelImportDtoProfile(entityExtraAttributes));
+                    }).CreateMapper();
+
 
                     foreach (AppItemExcelDto itemExcelDto in result)
                     {
@@ -5250,14 +5280,16 @@ namespace onetouch.AppItems
 
 
 
-                            MapperConfiguration configurationMap;
-                            configurationMap = new MapperConfiguration(a => { a.AddProfile(new AppItemExcelImportDtoProfile(entityExtraAttributes)); });
-                            IMapper mapperc;
-                            mapperc = configurationMap.CreateMapper();
+                            //MapperConfiguration configurationMap;
+                            //configurationMap = new MapperConfiguration(a => { a.AddProfile(new AppItemExcelImportDtoProfile(entityExtraAttributes)); });
+                            //IMapper mapperc;
+                            //mapperc = configurationMap.CreateMapper();
                             ImportItemInputDto importItemInputDto;
                             try
-                            {
-                                importItemInputDto = mapperc.Map<DataRow, ImportItemInputDto>(ds.Tables[0].Rows[rowNumber]);
+                            { 
+                                importItemInputDto = importMapper.Map<DataRow, ImportItemInputDto>(ds.Tables[0].Rows[rowNumber]);
+
+                                //importItemInputDto = mapperc.Map<DataRow, ImportItemInputDto>(ds.Tables[0].Rows[rowNumber]);
                             }
                             catch (Exception exObj)
                             {
@@ -5266,7 +5298,7 @@ namespace onetouch.AppItems
                             x.Add(importItemInputDto);
 
                             //importList = ObjectMapper.Map<ImportItemInputDto>(itemExcelDto);
-                            validationList = await ValidateImportItemData(importItemInputDto);
+                            validationList = await ValidateImportItemData(importItemInputDto, existingItemsDict, currencyIds);
                         }
                         ////if (rowNumber > 2)
                         ////{ itemExcelResultsDTO.ToList.Add(rowNumber - 1); }
@@ -5291,21 +5323,34 @@ namespace onetouch.AppItems
 
                         //T-SII-20230330.0001,1 MMT 04/05/2023 -Delete an item , then import it again[Start]
                         //var itemExists = _appItemRepository.GetAll().FirstOrDefault(x => x.Code == itemExcelDto.Code);
-                        var itemExists = _appItemRepository.GetAll().FirstOrDefault(x => x.Code.Replace(" ", string.Empty) == itemExcelDto.Code.Replace(" ", string.Empty) && x.ItemType == 0);
-                        //T-SII-20230330.0001,1 MMT 04/05/2023 -Delete an item , then import it again[End]
-                        if (itemExists != null)
-                        {
-                            itemExcelDto.Id = itemExists.Id;
-                            //T-SII-20231127.0003,1 MMT 01/01/2024 -Import products program-Validation Step-need to adjust the text appear on the validation step of import program - ( Code is already existing ) to (Code already exists)[Start]
-                            //itemExcelRecordErrorDTO.FieldsErrors.Add("Code :" + itemExcelDto.Code + " is already existing!");
-                            //recordErrorMEssage = "Code :" + itemExcelDto.Code + " is already existing!";
-                            //  itemExcelRecordErrorDTO.FieldsErrors.Add("Code :" + itemExcelDto.Code + " already exists!");
-                            recordErrorMEssage = "Code :" + itemExcelDto.Code + " already exists!";
-                            //T-SII-20231127.0003,1 MMT 01/01/2024 -Import products program-Validation Step-need to adjust the text appear on the validation step of import program - ( Code is already existing ) to (Code already exists)[End]
-                            itemExcelResultsDTO.HasDuplication = true;
-                            hasWarning = true;
-                        }
 
+                        //P-SII-20251121.0001 [start]
+                        //var itemExists = _appItemRepository.GetAll().FirstOrDefault(x => x.Code.Replace(" ", string.Empty) == itemExcelDto.Code.Replace(" ", string.Empty) && x.ItemType == 0);
+                        var codeKey = itemExcelDto.Code.Replace(" ", "").ToUpper();
+
+
+                        ////T-SII-20230330.0001,1 MMT 04/05/2023 -Delete an item , then import it again[End]
+                        //if (itemExists != null)
+                        //{
+                        //    itemExcelDto.Id = itemExists.Id;
+                        //    //T-SII-20231127.0003,1 MMT 01/01/2024 -Import products program-Validation Step-need to adjust the text appear on the validation step of import program - ( Code is already existing ) to (Code already exists)[Start]
+                        //    //itemExcelRecordErrorDTO.FieldsErrors.Add("Code :" + itemExcelDto.Code + " is already existing!");
+                        //    //recordErrorMEssage = "Code :" + itemExcelDto.Code + " is already existing!";
+                        //    //  itemExcelRecordErrorDTO.FieldsErrors.Add("Code :" + itemExcelDto.Code + " already exists!");
+                        //    recordErrorMEssage = "Code :" + itemExcelDto.Code + " already exists!";
+                        //    //T-SII-20231127.0003,1 MMT 01/01/2024 -Import products program-Validation Step-need to adjust the text appear on the validation step of import program - ( Code is already existing ) to (Code already exists)[End]
+                        //    itemExcelResultsDTO.HasDuplication = true;
+                        //    hasWarning = true;
+                        //}
+
+                        if (existingItemsDict.TryGetValue(codeKey, out var existingId))
+                        {
+                            itemExcelDto.Id = existingId;
+                            hasWarning = true;
+                            itemExcelResultsDTO.HasDuplication = true;
+                            recordErrorMEssage = $"Code :{itemExcelDto.Code} already exists!";
+                        }
+                        //P-SII-20251121.0001 [end]
 
                         itemExcelRecordErrorDTO.ExcelDto = itemExcelDto;
                         //var ValidateResults = new List<ValidationResult>();
@@ -5525,7 +5570,7 @@ namespace onetouch.AppItems
                     document.LoadFromFile(itemExcelResultsDTO.FilePath);
 
                     // Get worksheet by name
-                    Worksheet Sheet = document.Workbook.Worksheets[0];
+                    Bytescout.Spreadsheet.Worksheet Sheet = document.Workbook.Worksheets[0];
                     // Set current cell
                     //T-SII-20230407.0006,1 MMT 05/02/2023 Adjust the error log columns in the Excel log file[Start]
                     //Sheet.Cell("AA1").Value = "Processing Status";
@@ -5773,41 +5818,47 @@ namespace onetouch.AppItems
 
         public async Task<List<ImportItemReturnDto>> ImportItem(List<ImportItemInputDto> itemExcelDtoList, string repeatHandler)
         {
+            AppItemExcelResultsDTO saveExcelinput = new AppItemExcelResultsDTO();
+            saveExcelinput.CodesFromList = new List<string>();
+            saveExcelinput.ToList = new List<int>();
+            saveExcelinput.FromList = new List<int>();
+            saveExcelinput.ErrorMessage = "";
+            saveExcelinput.ExcelRecords = new List<AppItemtExcelRecordDTO>();
+            saveExcelinput.RepreateHandler = (ExcelRecordRepeateHandler)Enum.Parse(typeof(ExcelRecordRepeateHandler), repeatHandler.ToString());
+            saveExcelinput.To = 0;
+            saveExcelinput.From = 0;
             List<ImportItemReturnDto> returnList = new List<ImportItemReturnDto>();
-            var hasErrors = false;
-            try
+            var existingItemsDict = _appItemRepository.GetAll()
+                   .Where(x => x.ItemType == 0 && !string.IsNullOrEmpty(x.Code))
+                   .Select(x => new
+                   {
+                       Code = x.Code.Replace(" ", "").ToUpper(),
+                       x.Id
+                   })
+                   .GroupBy(x => x.Code)
+                   .ToDictionary(g => g.Key, g => g.First().Id);
+            List<CurrencyInfoDto> currencyIds = await _appEntitiesAppService.GetAllCurrencyForTableDropdown();
+            foreach (var excelDto in itemExcelDtoList)
             {
-                AppItemExcelResultsDTO saveExcelinput = new AppItemExcelResultsDTO();
-                saveExcelinput.CodesFromList = new List<string>();
-                saveExcelinput.ToList = new List<int>();
-                saveExcelinput.FromList = new List<int>();
-                saveExcelinput.ErrorMessage = "";
-                saveExcelinput.ExcelRecords = new List<AppItemtExcelRecordDTO>();
-                saveExcelinput.RepreateHandler = (ExcelRecordRepeateHandler)Enum.Parse(typeof(ExcelRecordRepeateHandler), repeatHandler.ToString());
-                saveExcelinput.To = 0;
-                saveExcelinput.From = 0;
-
-                foreach (var excelDto in itemExcelDtoList)
+                if (!string.IsNullOrEmpty(excelDto.ParentCode))
+                    continue;
+                long id = 0;
+                bool canBeSaved = true;
+                var list = await ValidateImportItemData(excelDto, existingItemsDict, currencyIds);
+                if (list != null && list.Count > 0)
                 {
-                    if (!string.IsNullOrEmpty(excelDto.ParentCode))
-                        continue;
-                    long id = 0;
-                    bool canBeSaved = true;
-                    var list = await ValidateImportItemData(excelDto);
-                    if (list != null && list.Count > 0)
+                    foreach (var err in list)
                     {
-                        foreach (var err in list)
-                        {
-                            returnList.Add(err);
-                            canBeSaved = err.ErrorType != "Stopper" ? canBeSaved : false;
-                            if (err.ErrorType == "Duplication")
-                                id = long.Parse(err.Id.ToString());
-                        }
+                        returnList.Add(err);
+                        canBeSaved = err.ErrorType != "Stopper" ? canBeSaved : false;
+                        if (err.ErrorType == "Duplication")
+                            id = long.Parse(err.Id.ToString());
                     }
-                    if (canBeSaved == true)
-                    {
-                        var pdtyp = await _SycEntityObjectTypesAppService.GetAllWithExtraAttributesByCode(excelDto.ProductType);
-                        var prdObj = pdtyp.FirstOrDefault();
+                }
+                if (canBeSaved == true)
+                {
+                    var pdtyp = await _SycEntityObjectTypesAppService.GetAllWithExtraAttributesByCode(excelDto.ProductType);
+                    var prdObj = pdtyp.FirstOrDefault();
 
                         var entityObjectExtraAttribute = await _SycEntityObjectTypesAppService.GetAllWithExtraAttributes(long.Parse(prdObj.Id.ToString()));
                         var entityextr = entityObjectExtraAttribute.FirstOrDefault();
@@ -5939,13 +5990,28 @@ namespace onetouch.AppItems
             //I46, MMT 07/08/2025 Save Result to Excel[End]
             return returnList;
         }
-        public async Task<List<ImportItemReturnDto>> ValidateImportItemData(ImportItemInputDto itemExcelDto)
+        public async Task<List<ImportItemReturnDto>> ValidateImportItemData(ImportItemInputDto itemExcelDto,
+            Dictionary<string,long> existingItems =null, List<CurrencyInfoDto> currencyIds=null)
         {
             if (itemExcelDto.RecordType == "Image") { itemExcelDto.RecordType = "Item"; }
             //HIA HIA as per Sam
             if (itemExcelDto.NoOfDimensions == null) { itemExcelDto.NoOfDimensions = "1"; }
 
-            List<CurrencyInfoDto> currencyIds = await _appEntitiesAppService.GetAllCurrencyForTableDropdown();
+            //List<CurrencyInfoDto> currencyIds = await _appEntitiesAppService.GetAllCurrencyForTableDropdown();
+            if(currencyIds==null)
+            { currencyIds = await _appEntitiesAppService.GetAllCurrencyForTableDropdown(); }
+            if(existingItems == null)
+            {
+                existingItems = _appItemRepository.GetAll()
+                    .Where(x => x.ItemType == 0 && !string.IsNullOrEmpty(x.Code))
+                    .Select(x => new
+                    {
+                        Code = x.Code.Replace(" ", "").ToUpper(),
+                        x.Id
+                    })
+                    .GroupBy(x => x.Code)
+                    .ToDictionary(g => g.Key, g => g.First().Id);
+            }
             List<ImportItemReturnDto> returnList = new List<ImportItemReturnDto>();
             //foreach (var itemExcelDto in input) 
             {
@@ -6004,19 +6070,30 @@ namespace onetouch.AppItems
                         });
 
                 }
-                var itemExists = _appItemRepository.GetAll().FirstOrDefault(x => x.Code.Replace(" ", string.Empty) == itemExcelDto.Code.Replace(" ", string.Empty) && x.ItemType == 0);
+                //var itemExists = _appItemRepository.GetAll().FirstOrDefault(x => x.Code.Replace(" ", string.Empty) == itemExcelDto.Code.Replace(" ", string.Empty) && x.ItemType == 0);
+                var normalizedCode = itemExcelDto.Code.Replace(" ", "");
 
-                if (itemExists != null)
+                if (existingItems.TryGetValue(normalizedCode, out var existingId))
                 {
                     returnList.Add(new ImportItemReturnDto
                     {
                         RecordKey = itemExcelDto.Code,
-                        ErrorMessage = "Code :" + itemExcelDto.Code + " already exists!",
+                        ErrorMessage = $"Code :{itemExcelDto.Code} already exists!",
                         ErrorType = "Duplication",
-                        Id = itemExists.Id
+                        Id = existingId
                     });
-
                 }
+                //if (itemExists != null)
+                //{
+                //    returnList.Add(new ImportItemReturnDto
+                //    {
+                //        RecordKey = itemExcelDto.Code,
+                //        ErrorMessage = "Code :" + itemExcelDto.Code + " already exists!",
+                //        ErrorType = "Duplication",
+                //        Id = itemExists.Id
+                //    });
+
+                //}
                 if (!string.IsNullOrEmpty(itemExcelDto.ImageType))
                 {
                     var attCoverId = await _helper.SystemTables.GetAttachmentCategoryId(itemExcelDto.ImageType.ToUpper().TrimEnd());
@@ -8342,13 +8419,13 @@ namespace onetouch.AppItems
                             });
                             //RenameFileToGuid(excelDto.image, Path.GetFileNameWithoutExtension(excelDto.image));
                             //string guid = System.Guid.NewGuid().ToString();
-                            thirdItemCopy.ExcelDto.Images.Add(new AppItemImage
-                            {
-                                ImageFileName = Path.GetFileName(excelDto.ExcelDto.ImagePreview),
-                                ImageGuid = Path.GetFileNameWithoutExtension(excelDto.image),
-                                IsDefault = excelDto.ExcelDto.ImageIsDefault,
-                                Attributes = "101=" + excelDto.ExcelDto.Code.Split('-')[1]
-                            });
+                            //thirdItemCopy.ExcelDto.Images.Add(new AppItemImage
+                            //{
+                            //    ImageFileName = Path.GetFileName(excelDto.ExcelDto.ImagePreview),
+                            //    ImageGuid = Path.GetFileNameWithoutExtension(excelDto.image),
+                            //    IsDefault = excelDto.ExcelDto.ImageIsDefault,
+                            //    Attributes = "101=" + excelDto.ExcelDto.Code.Split('-')[1]
+                            //});
                             //RenameFileToGuid(excelDto.image, Path.GetFileNameWithoutExtension(excelDto.image));
                             thirdItemCopy.ExcelDto.Actions = "";
                             childNo += 1;
