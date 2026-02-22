@@ -7954,10 +7954,15 @@ namespace onetouch.AppItems
                         importItemInputDto = mapper.Map<ImportItemInputDto, AppItemExcelDto>(excelDto);
                         importItemInputDto.Id = id;
                     }
-                    // catch (Exception exObj)
-                    //  {
-                    //      throw new UserFriendlyException("This Excel file format is invalid");
-                    // }
+                    var itemExists = await _appItemRepository.GetAll().Where(z => z.ItemType == 0 && z.Code == importItemInputDto.Code).FirstOrDefaultAsync();
+                    if (itemExists != null)
+                    {
+                        importItemInputDto.Id = itemExists.Id;
+                    }
+                        // catch (Exception exObj)
+                        //  {
+                        //      throw new UserFriendlyException("This Excel file format is invalid");
+                        // }
 
                     saveExcelinput.ExcelRecords.Add(new AppItemtExcelRecordDTO
                     {
