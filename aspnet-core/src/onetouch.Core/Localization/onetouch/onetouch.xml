@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <localizationDictionary culture="en">
 	<texts>
-	<text name="CALCULATIONMETHOD">Calculation Method</text>
+	<text name="CALCULATIONAPI">Calculation API</text>
 	<text name="CHARGETYPE">Charge Type</text>
 	<text name="ITEMSSIN">Item SSIN</text>
 	<text name="ISEDITABLE">Is Editable</text>
