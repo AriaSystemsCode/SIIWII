@@ -78515,6 +78515,7 @@ export class AppItemVariationsDto implements IAppItemVariationsDto {
     entityId!: number;
     description!: string | undefined;
     price!: number;
+    taxRate!: number;
     stockAvailability!: number;
     status!: string | undefined;
     entityObjectTypeId!: number;
@@ -78577,6 +78578,7 @@ export class AppItemVariationsDto implements IAppItemVariationsDto {
             this.entityId = _data["entityId"];
             this.description = _data["description"];
             this.price = _data["price"];
+            this.taxRate = _data["taxRate"];
             this.stockAvailability = _data["stockAvailability"];
             this.status = _data["status"];
             this.entityObjectTypeId = _data["entityObjectTypeId"];
@@ -78709,6 +78711,7 @@ export class AppItemVariationsDto implements IAppItemVariationsDto {
         data["entityId"] = this.entityId;
         data["description"] = this.description;
         data["price"] = this.price;
+        data["taxRate"] = this.taxRate;
         data["stockAvailability"] = this.stockAvailability;
         data["status"] = this.status;
         data["entityObjectTypeId"] = this.entityObjectTypeId;
@@ -78826,6 +78829,7 @@ export interface IAppItemVariationsDto {
     entityId: number;
     description: string | undefined;
     price: number;
+    taxRate: number;
     stockAvailability: number;
     status: string | undefined;
     entityObjectTypeId: number;
@@ -79064,6 +79068,7 @@ export class AppItemForViewDto implements IAppItemForViewDto {
     entityId!: number;
     description!: string | undefined;
     price!: number;
+    taxRate!: number;
     stockAvailability!: number;
     status!: string | undefined;
     entityObjectTypeId!: number;
@@ -79142,6 +79147,7 @@ export class AppItemForViewDto implements IAppItemForViewDto {
             this.entityId = _data["entityId"];
             this.description = _data["description"];
             this.price = _data["price"];
+            this.taxRate = _data["taxRate"];
             this.stockAvailability = _data["stockAvailability"];
             this.status = _data["status"];
             this.entityObjectTypeId = _data["entityObjectTypeId"];
@@ -79294,6 +79300,7 @@ export class AppItemForViewDto implements IAppItemForViewDto {
         data["entityId"] = this.entityId;
         data["description"] = this.description;
         data["price"] = this.price;
+        data["taxRate"] = this.taxRate;
         data["stockAvailability"] = this.stockAvailability;
         data["status"] = this.status;
         data["entityObjectTypeId"] = this.entityObjectTypeId;
@@ -79431,6 +79438,7 @@ export interface IAppItemForViewDto {
     entityId: number;
     description: string | undefined;
     price: number;
+    taxRate: number;
     stockAvailability: number;
     status: string | undefined;
     entityObjectTypeId: number;
@@ -79596,6 +79604,7 @@ export class AppItemForEditDto implements IAppItemForEditDto {
     entityId!: number;
     description!: string | undefined;
     price!: number;
+    taxRate!: number;
     stockAvailability!: number;
     status!: string | undefined;
     entityObjectTypeId!: number;
@@ -79654,6 +79663,7 @@ export class AppItemForEditDto implements IAppItemForEditDto {
             this.entityId = _data["entityId"];
             this.description = _data["description"];
             this.price = _data["price"];
+            this.taxRate = _data["taxRate"];
             this.stockAvailability = _data["stockAvailability"];
             this.status = _data["status"];
             this.entityObjectTypeId = _data["entityObjectTypeId"];
@@ -79786,6 +79796,7 @@ export class AppItemForEditDto implements IAppItemForEditDto {
         data["entityId"] = this.entityId;
         data["description"] = this.description;
         data["price"] = this.price;
+        data["taxRate"] = this.taxRate;
         data["stockAvailability"] = this.stockAvailability;
         data["status"] = this.status;
         data["entityObjectTypeId"] = this.entityObjectTypeId;
@@ -79907,6 +79918,7 @@ export interface IAppItemForEditDto {
     entityId: number;
     description: string | undefined;
     price: number;
+    taxRate: number;
     stockAvailability: number;
     status: string | undefined;
     entityObjectTypeId: number;
@@ -80015,6 +80027,7 @@ export class CreateOrEditAppItemDto implements ICreateOrEditAppItemDto {
     entityId!: number;
     description!: string | undefined;
     price!: number;
+    taxRate!: number;
     stockAvailability!: number;
     status!: string | undefined;
     entityObjectTypeId!: number;
@@ -80081,6 +80094,7 @@ export class CreateOrEditAppItemDto implements ICreateOrEditAppItemDto {
             this.entityId = _data["entityId"];
             this.description = _data["description"];
             this.price = _data["price"];
+            this.taxRate = _data["taxRate"];
             this.stockAvailability = _data["stockAvailability"];
             this.status = _data["status"];
             this.entityObjectTypeId = _data["entityObjectTypeId"];
@@ -80237,6 +80251,7 @@ export class CreateOrEditAppItemDto implements ICreateOrEditAppItemDto {
         data["entityId"] = this.entityId;
         data["description"] = this.description;
         data["price"] = this.price;
+        data["taxRate"] = this.taxRate;
         data["stockAvailability"] = this.stockAvailability;
         data["status"] = this.status;
         data["entityObjectTypeId"] = this.entityObjectTypeId;
@@ -80382,6 +80397,7 @@ export interface ICreateOrEditAppItemDto {
     entityId: number;
     description: string | undefined;
     price: number;
+    taxRate: number;
     stockAvailability: number;
     status: string | undefined;
     entityObjectTypeId: number;
@@ -81710,6 +81726,7 @@ export class AppItemValidationInputDTO implements IAppItemValidationInputDTO {
     entityId!: number;
     description!: string | undefined;
     price!: number;
+    taxRate!: number;
     stockAvailability!: number;
     status!: string | undefined;
     entityObjectTypeId!: number;
@@ -81781,6 +81798,7 @@ export class AppItemValidationInputDTO implements IAppItemValidationInputDTO {
             this.entityId = _data["entityId"];
             this.description = _data["description"];
             this.price = _data["price"];
+            this.taxRate = _data["taxRate"];
             this.stockAvailability = _data["stockAvailability"];
             this.status = _data["status"];
             this.entityObjectTypeId = _data["entityObjectTypeId"];
@@ -81942,6 +81960,7 @@ export class AppItemValidationInputDTO implements IAppItemValidationInputDTO {
         data["entityId"] = this.entityId;
         data["description"] = this.description;
         data["price"] = this.price;
+        data["taxRate"] = this.taxRate;
         data["stockAvailability"] = this.stockAvailability;
         data["status"] = this.status;
         data["entityObjectTypeId"] = this.entityObjectTypeId;
@@ -82088,6 +82107,7 @@ export interface IAppItemValidationInputDTO {
     entityId: number;
     description: string | undefined;
     price: number;
+    taxRate: number;
     stockAvailability: number;
     status: string | undefined;
     entityObjectTypeId: number;
@@ -94523,6 +94543,7 @@ export class AppItem implements IAppItem {
     variations!: string | undefined;
     entityId!: number;
     price!: number;
+    taxRate!: number;
     stockAvailability!: number;
     parentId!: number | undefined;
     entityFk!: AppEntity;
@@ -94580,6 +94601,7 @@ export class AppItem implements IAppItem {
             this.variations = _data["variations"];
             this.entityId = _data["entityId"];
             this.price = _data["price"];
+            this.taxRate = _data["taxRate"];
             this.stockAvailability = _data["stockAvailability"];
             this.parentId = _data["parentId"];
             this.entityFk = _data["entityFk"] ? AppEntity.fromJS(_data["entityFk"]) : <any>undefined;
@@ -94659,6 +94681,7 @@ export class AppItem implements IAppItem {
         data["variations"] = this.variations;
         data["entityId"] = this.entityId;
         data["price"] = this.price;
+        data["taxRate"] = this.taxRate;
         data["stockAvailability"] = this.stockAvailability;
         data["parentId"] = this.parentId;
         data["entityFk"] = this.entityFk ? this.entityFk.toJSON() : <any>undefined;
@@ -94727,6 +94750,7 @@ export interface IAppItem {
     variations: string | undefined;
     entityId: number;
     price: number;
+    taxRate: number;
     stockAvailability: number;
     parentId: number | undefined;
     entityFk: AppEntity;

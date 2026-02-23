@@ -45,6 +45,7 @@ using Abp.EntityFrameworkCore.Uow;
 using NUglify.Helpers;
 using Microsoft.PowerShell.Commands;
 using onetouch.AppItems.Dtos;
+using ClosedXML.Excel;
 
 namespace onetouch.AppMarketplaceAccounts
 {
@@ -1565,11 +1566,102 @@ namespace onetouch.AppMarketplaceAccounts
                     }
 
                     relation.ObjectId = await _helper.SystemTables.GetObjectMarketplaceContactRelationshipId();
-                    relation.Code = await _helper.SystemTables.GetNextSequence("MARKETPLACECONTACTRELATIONSHIP"); 
+                    relation.Code = await _helper.SystemTables.GetNextSequence("MARKETPLACECONTACTRELATIONSHIP");
+
+                    #region iteration49-charges 
+                    // get defaults from shipvia from current tenant else from host 
+                    // get defaults from payment terms from current tenant else from host 
+                    // update extra data of relationship with default payment terms, shipvia, taxable and price level values
+
+                    relation.EntityExtraData = new List<AppEntityExtraData>();
+
+                    var shipViaType = await _sycEntityObjectTypeRepository.GetAll().Where(z => z.Code=="SHIPVIA" && z.ObjectCode=="LOOKUP").FirstOrDefaultAsync();
+                    var defaultShipVia = await _appEntityRepository.GetAll().Where(z => z.TenantId == AbpSession.TenantId && z.EntityObjectTypeId == shipViaType.Id && z.IsDefault).Include(e=> e.EntityExtraData).FirstOrDefaultAsync();
+                    if (defaultShipVia == null)
+                    {   //get Host defaults if tenant defaults not found
+                        defaultShipVia = await _appEntityRepository.GetAll().Where(z => z.TenantId == null && z.EntityObjectTypeId == shipViaType.Id && z.IsDefault).Include(e => e.EntityExtraData).FirstOrDefaultAsync();
+                    }
+
+                    var paymentType = await _sycEntityObjectTypeRepository.GetAll().Where(z => z.Code == "PAYMENT-TERMS" && z.ObjectCode == "LOOKUP").FirstOrDefaultAsync();
+                    var defaultPaymentType = await _appEntityRepository.GetAll().Where(z => z.TenantId == AbpSession.TenantId && z.EntityObjectTypeId == paymentType.Id && z.IsDefault).Include(e => e.EntityExtraData).FirstOrDefaultAsync();
+                    if (defaultPaymentType == null)
+                    {
+                        //get Host defaults if tenant defaults not found
+                        defaultPaymentType = await _appEntityRepository.GetAll().Where(z => z.TenantId == null && z.EntityObjectTypeId == paymentType.Id && z.IsDefault).Include(e => e.EntityExtraData).FirstOrDefaultAsync();
+                    }
+
+                    relation.EntityExtraData.Add(new AppEntityExtraData
+                    {
+                        EntityId = relation.Id,
+                        EntityObjectTypeCode = paymentType.Code,
+                        EntityObjectTypeName = paymentType.Name,
+                        EntityObjectTypeId = paymentType.Id,
+
+                        AttributeId = 910,
+                        AttributeCode = "PAYMENT-TERMS",
+                        AttributeValueId = defaultPaymentType != null? defaultPaymentType.Id: null,
+                        AttributeValue = defaultPaymentType != null ? defaultPaymentType.Name : null // need to read default from default tenant payment terms
+                    });
+
+                    relation.EntityExtraData.Add(new AppEntityExtraData
+                    {
+                        EntityId = relation.Id,
+                        AttributeId = 911,
+                        AttributeValue = "false", // need to read default from default tenant shipvai
+                        AttributeCode = "ISTAXABLE"
+                    });
+
+                    relation.EntityExtraData.Add(new AppEntityExtraData
+                    {
+                        AttributeCode = "PRICELEVEL",
+                        AttributeId = 908,
+                        EntityId = relation.Id,
+                        AttributeValue = "MSRP" // need to read default from default tenant shipvai
+                    });
+                    
+                    var shippingMinimumAmount = "0";
+                    var shippingCharge = "0";
+                    if (defaultShipVia != null)
+                    {
+                        var defaultShippingMinimumAmount = defaultShipVia.EntityExtraData.Where(z => z.AttributeId == 905).FirstOrDefault();
+                        shippingMinimumAmount = defaultShippingMinimumAmount != null ? defaultShippingMinimumAmount.AttributeValue : "0";
+
+                        var defaultShippingCharge = defaultShipVia.EntityExtraData.Where(z => z.AttributeId == 904).FirstOrDefault();
+                        shippingCharge = defaultShippingCharge != null ? defaultShippingCharge.AttributeValue : "0";
+                    }
+
+                    relation.EntityExtraData.Add(new AppEntityExtraData
+                    {
+                        EntityId = relation.Id,
+                        EntityObjectTypeCode = shipViaType.Code,
+                        EntityObjectTypeName = shipViaType.Name,
+                        EntityObjectTypeId = shipViaType.Id,
+
+                        AttributeId = 909,
+                        AttributeCode = "SHIPVIA",
+                        AttributeValueId = defaultShipVia != null ? defaultShipVia.Id : null,
+                        AttributeValue = defaultShipVia != null ? defaultShipVia.Name : null // need to read default from default tenant payment terms
+                    });
+
+                    relation.EntityExtraData.Add(new AppEntityExtraData
+                    {
+                        AttributeCode = "SHIPPINGMINIMUMAMOUNT",
+                        AttributeId = 907,
+                        EntityId = relation.Id,
+                        AttributeValue = shippingMinimumAmount // need to read default from default tenant shipvai
+                    });
+
+                    relation.EntityExtraData.Add(new AppEntityExtraData
+                    {
+                        AttributeCode = "SHIPPINGCHARGE",
+                        AttributeId = 906,
+                        EntityId = relation.Id,
+                        AttributeValue = shippingCharge // need to read default from default tenant shipvai
+                    });
+                    #endregion iteration49-charges 
+
                     await _appContactRelationshipInfoRepository.InsertAsync(relation);
                     await CurrentUnitOfWork.SaveChangesAsync();
-
-
 
                 }
             }
