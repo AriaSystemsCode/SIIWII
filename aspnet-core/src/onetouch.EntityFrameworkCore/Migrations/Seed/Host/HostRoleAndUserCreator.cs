@@ -944,7 +944,76 @@ namespace onetouch.Migrations.Seed.Host
                 _context.SaveChanges();
             }
             #endregion SycEntityObjectTypes
+            #region Add SycEntityObjectClassifications
+            var sycEntityObjectClassifications = _context.SycEntityObjectTypes.IgnoreQueryFilters()
+                .Where(e => !keyList.Contains(("SYCENTITYOBJECTCLASSIFICATIONS-NAME-" + e.Id.ToString() + "-" + e.Name).Trim().ToUpper())).ToList();
+            if (sycEntityObjectClassifications == null || sycEntityObjectClassifications.Count > 0)
+            {
+                var languagesList = _context.Languages.IgnoreQueryFilters().ToList();
+                if (languagesList != null)
+                {
+                    foreach (var sycEntityObjectClassification in sycEntityObjectClassifications)
+                    {
 
+                        foreach (var lang in languagesList)
+                        {
+                            var sycEntityObjectTypeExist = _context.LanguageTexts
+                                .FirstOrDefaultAsync(x => x.Key == ("SYCENTITYOBJECTCLASSIFICATIONS-NAME-" + sycEntityObjectClassification.Id.ToString() + "-" + sycEntityObjectClassification.Name).Trim().ToUpper() && x.LanguageName == lang.Name).Result;
+                            if (sycEntityObjectTypeExist == null ||
+                                (sycEntityObjectTypeExist != null && sycEntityObjectTypeExist.Id == 0))
+                            {
+                                ApplicationLanguageText entity = new ApplicationLanguageText();
+
+                                entity.Key = ("SYCENTITYOBJECTCLASSIFICATIONS-NAME-" + sycEntityObjectClassification.Id.ToString() + "-" + sycEntityObjectClassification.Name).Trim().ToUpper();
+                                entity.Source = "onetouch";
+                                entity.Value = sycEntityObjectClassification.Name;
+                                entity.LanguageName = lang.Name;
+                                entity.TenantId = sycEntityObjectClassification.TenantId;
+                                _context.LanguageTexts.Add(entity);
+
+                            }
+                        }
+
+                    }
+                }
+                _context.SaveChanges();
+            }
+            #endregion
+            #region Add SycEntityObjectCategories
+            var sycEntityObjectCategories = _context.SycEntityObjectTypes.IgnoreQueryFilters()
+                .Where(e => !keyList.Contains(("SYCENTITYOBJECTCATEGORIES-NAME-" + e.Id.ToString() + "-" + e.Name).Trim().ToUpper())).ToList();
+            if (sycEntityObjectCategories == null || sycEntityObjectCategories.Count > 0)
+            {
+                var languagesList = _context.Languages.IgnoreQueryFilters().ToList();
+                if (languagesList != null)
+                {
+                    foreach (var sycEntityObjectCategory in sycEntityObjectCategories)
+                    {
+
+                        foreach (var lang in languagesList)
+                        {
+                            var sycEntityObjectTypeExist = _context.LanguageTexts
+                                .FirstOrDefaultAsync(x => x.Key == ("SYCENTITYOBJECTCATEGORIES-NAME-" + sycEntityObjectCategory.Id.ToString() + "-" + sycEntityObjectCategory.Name).Trim().ToUpper() && x.LanguageName == lang.Name).Result;
+                            if (sycEntityObjectTypeExist == null ||
+                                (sycEntityObjectTypeExist != null && sycEntityObjectTypeExist.Id == 0))
+                            {
+                                ApplicationLanguageText entity = new ApplicationLanguageText();
+
+                                entity.Key = ("SYCENTITYOBJECTCATEGORIES-NAME-" + sycEntityObjectCategory.Id.ToString() + "-" + sycEntityObjectCategory.Name).Trim().ToUpper();
+                                entity.Source = "onetouch";
+                                entity.Value = sycEntityObjectCategory.Name;
+                                entity.LanguageName = lang.Name;
+                                entity.TenantId = sycEntityObjectCategory.TenantId;
+                                _context.LanguageTexts.Add(entity);
+
+                            }
+                        }
+
+                    }
+                }
+                _context.SaveChanges();
+            }
+            #endregion
         }
 
         private void CreateHostReportSystemData()

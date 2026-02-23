@@ -26,6 +26,9 @@ using Org.BouncyCastle.X509;
 using System.Security.Cryptography;
 using Abp.EntityFrameworkCore;
 using onetouch.EntityFrameworkCore;
+using Abp.Localization;
+using Microsoft.CodeAnalysis;
+using DocumentFormat.OpenXml.Office2010.Excel;
 
 namespace onetouch.SystemObjects
 {
@@ -42,11 +45,21 @@ namespace onetouch.SystemObjects
         private readonly Helper _helper;
         private readonly SycEntityLocalizationAppService _sycEntityLocalizeAppService;
         private IRepository<AppContact, long> _appContactRepository;
+        //i50
+        private readonly IRepository<ApplicationLanguageText, long> _lookup_ApplicationLanguageText;
+        private readonly IApplicationLanguageManager _lookup_ApplicationLanguages;
+        //I50
         public SycEntityObjectCategoriesAppService(IRepository<SycEntityObjectCategory, long> sycEntityObjectCategoryRepository,
             ISycEntityObjectCategoriesExcelExporter sycEntityObjectCategoriesExcelExporter, IRepository<SydObject, long> lookup_sydObjectRepository, 
             IRepository<SycEntityObjectCategory, long> lookup_sycEntityObjectCategoryRepository, Helper helper, IAppEntitiesAppService appEntitiesAppService,
-            SycEntityLocalizationAppService sycEntityLocalizationAppService, IRepository<AppContact, long> appContactRepository, IDbContextProvider<onetouchDbContext> dbContextProvider)
+            SycEntityLocalizationAppService sycEntityLocalizationAppService, IRepository<AppContact, long> appContactRepository,
+            IDbContextProvider<onetouchDbContext> dbContextProvider, IRepository<ApplicationLanguageText, long> lookup_ApplicationLanguageText
+            , IApplicationLanguageManager lookup_ApplicationLanguages)
         {
+            //I50
+            _lookup_ApplicationLanguageText = lookup_ApplicationLanguageText;
+            _lookup_ApplicationLanguages = lookup_ApplicationLanguages;
+            //I50
             _sycEntityObjectCategoryRepository = sycEntityObjectCategoryRepository;
             _sycEntityObjectCategoriesExcelExporter = sycEntityObjectCategoriesExcelExporter;
             _lookup_sydObjectRepository = lookup_sydObjectRepository;
@@ -63,6 +76,7 @@ namespace onetouch.SystemObjects
         {
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
             {
+                var defaultLang = GetDefaultLanguage().Result;
                 var filteredSycEntityObjectCategories = _sycEntityObjectCategoryRepository.GetAll()
                         .Include(e => e.ObjectFk)
                         .Include(e => e.ParentFk)
@@ -105,7 +119,14 @@ namespace onetouch.SystemObjects
 
                                                 join s5 in _context.SycEntityLocalizations.Where(z => z.Language.ToUpper() == tenantLanguage.ToUpper() && z.ObjectTypeId == cat.Id) on s2.Id equals s5.ObjectId  into j3
                                                 from s3 in j3.DefaultIfEmpty()
+                                                
+                                                join o3 in _lookup_ApplicationLanguageText.GetAll() on ("SYCENTITYOBJECTCATEGORIES-NAME-" + o.Id.ToString() + "-" + o.Name).Trim().ToUpper() equals o3.Key into j5
+                                                from s6 in j5.DefaultIfEmpty()
 
+                                                join o4 in _lookup_ApplicationLanguageText.GetAll() on (s2 != null ? "SYCENTITYOBJECTCATEGORIES-NAME-" + s2.Id.ToString() + "-" + s2.Name : "XXX").Trim().ToUpper() equals o4.Key into j4
+                                                from s4 in j4.DefaultIfEmpty()
+
+                                                where s6.LanguageName == defaultLang && ((s2 != null && s4.LanguageName == defaultLang) || (s2 == null))
                                                 select new TreeNode<GetSycEntityObjectCategoryForViewDto>()
                                                 {
                                                     Data = new GetSycEntityObjectCategoryForViewDto
@@ -117,11 +138,13 @@ namespace onetouch.SystemObjects
                                                             Id = o.Id
                                                         },
                                                         SydObjectName = s3.String== null ? (s1 == null ? "" : s1.Name.ToString()): s3.String ,
-                                                        SycEntityObjectCategoryName = s2 == null ? "" : s2.Name.ToString()
+                                                        //SycEntityObjectCategoryName = s2 == null ? "" : s2.Name.ToString()
+                                                        SycEntityObjectCategoryName = s2 == null ? "" : s4 == null ? s2.Name.ToString() : s4.Value,
                                                     },
                                                     Leaf = o.SycEntityObjectCategories.Count() == 0,
                                                     totalChildrenCount = o.SycEntityObjectCategories.Count(),
-                                                    label = o.Name
+                                                    //label = o.Name
+                                                    label = s6 == null ? o.Name : s6.Value.Trim()
                                                 };
 
 
@@ -342,12 +365,19 @@ namespace onetouch.SystemObjects
                 }
             }
         }
-
+        public async Task<string> GetDefaultLanguage()
+        {
+            string name = "en";
+            var defaultLanguage = await _lookup_ApplicationLanguages.GetDefaultLanguageOrNullAsync(AbpSession.TenantId);
+            if (defaultLanguage != null) { name = defaultLanguage.Name; }
+            return name;
+        }
 
         public async Task<PagedResultDto<TreeNode<GetSycEntityObjectCategoryForViewDto>>> GetAllChildsWithPaging(GetAllSycEntityObjectCategoriesInput input)
         {
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
             {
+                var defaultLang = GetDefaultLanguage().Result;
                 if (input.EntityId != 0)
                 {
                     input.ExcludeIds = new List<long>();
@@ -389,6 +419,16 @@ namespace onetouch.SystemObjects
 
                                                 join o2 in _lookup_sycEntityObjectCategoryRepository.GetAll() on o.ParentId equals o2.Id into j2
                                                 from s2 in j2.DefaultIfEmpty()
+                                                    //I50
+                                                join o3 in _lookup_ApplicationLanguageText.GetAll() on ("SYCENTITYOBJECTCATEGORIES-NAME-" + o.Id.ToString() + "-" + o.Name).Trim().ToUpper() equals o3.Key into j3
+                                                from s3 in j3.DefaultIfEmpty()
+
+                                                join o4 in _lookup_ApplicationLanguageText.GetAll() on (s2 != null ? "SYCENTITYOBJECTCATEGORIES-NAME-" + s2.Id.ToString() + "-" + s2.Name : "XXX").Trim().ToUpper() equals o4.Key into j4
+                                                from s4 in j4.DefaultIfEmpty()
+
+                                                where s3.LanguageName == defaultLang && ((s2 != null && s4.LanguageName == defaultLang) || (s2 == null))
+
+                                                //I50
 
                                                 select new TreeNode<GetSycEntityObjectCategoryForViewDto>()
                                                 {
@@ -402,7 +442,8 @@ namespace onetouch.SystemObjects
                                                             ParentId = o.ParentId
                                                         },
                                                         SydObjectName = s1 == null ? "" : s1.Name.ToString(),
-                                                        SycEntityObjectCategoryName = s2 == null ? "" : s2.Name.ToString()
+                                                        //SycEntityObjectCategoryName = s2 == null ? "" : s2.Name.ToString()
+                                                        SycEntityObjectCategoryName = s2 == null ? "" : s4 == null ? s2.Name.ToString() : s4.Value,
                                                     },
                                                     Leaf = o.SycEntityObjectCategories.Count() == 0,
                                                     totalChildrenCount = o.SycEntityObjectCategories.Count(),
@@ -427,6 +468,7 @@ namespace onetouch.SystemObjects
         {
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
             {
+                var defaultLang = GetDefaultLanguage().Result;
                 var filteredSycEntityObjectCategories = _sycEntityObjectCategoryRepository.GetAll()
                         .Include(e => e.ObjectFk)
                         .Include(e => e.ParentFk)
@@ -438,10 +480,13 @@ namespace onetouch.SystemObjects
                 var sycEntityObjectCategories = from o in filteredSycEntityObjectCategories
                                                 join o1 in _lookup_sydObjectRepository.GetAll() on o.ObjectId equals o1.Id into j1
                                                 from s1 in j1.DefaultIfEmpty()
-
+                                                join o3 in _lookup_ApplicationLanguageText.GetAll() on("SYCENTITYOBJECTCATEGORIES-NAME-" + o.Id.ToString() + "-" + o.Name).Trim().ToUpper() equals o3.Key into j3
+                                                from s3 in j3.DefaultIfEmpty()
                                                 join o2 in _lookup_sycEntityObjectCategoryRepository.GetAll() on o.ParentId equals o2.Id into j2
                                                 from s2 in j2.DefaultIfEmpty()
-
+                                                join o4 in _lookup_ApplicationLanguageText.GetAll() on(s2 != null ? "SYCENTITYOBJECTCATEGORIES-NAME-" + s2.Id.ToString() + "-" + s2.Name : "XXX").Trim().ToUpper() equals o4.Key into j4
+                                                from s4 in j4.DefaultIfEmpty()
+                                                where s3.LanguageName == defaultLang && ((s2 != null && s4.LanguageName == defaultLang) || (s2 == null))
                                                 select new TreeNode<GetSycEntityObjectCategoryForViewDto>()
                                                 {
                                                     Data = new GetSycEntityObjectCategoryForViewDto
@@ -453,7 +498,8 @@ namespace onetouch.SystemObjects
                                                             Id = o.Id
                                                         },
                                                         SydObjectName = s1 == null ? "" : s1.Name.ToString(),
-                                                        SycEntityObjectCategoryName = s2 == null ? "" : s2.Name.ToString()
+                                                        //SycEntityObjectCategoryName = s2 == null ? "" : s2.Name.ToString()
+                                                        SycEntityObjectCategoryName = s2 == null ? "" : s4 == null ? s2.Name.ToString() : s4.Value.Trim(),
                                                     },
                                                     Leaf = o.SycEntityObjectCategories.Count() == 0,
                                                     totalChildrenCount = o.SycEntityObjectCategories.Count(),
@@ -488,6 +534,14 @@ namespace onetouch.SystemObjects
                     var _lookupSycEntityObjectCategory = await _lookup_sycEntityObjectCategoryRepository.FirstOrDefaultAsync((int)output.SycEntityObjectCategory.ParentId);
                     output.SycEntityObjectCategoryName = _lookupSycEntityObjectCategory.Name.ToString();
                 }
+                //I50
+                if (output.SycEntityObjectCategory != null)
+                {
+
+                    var Key = ("SYCENTITYOBJECTCATEGORIES-NAME-" + output.SycEntityObjectCategory.Id.ToString() + "-" + output.SycEntityObjectCategory.Name).Trim().ToUpper();
+                    output.SycEntityObjectCategoryName = L(Key);
+                }
+                //I50
 
                 return output;
             }
@@ -511,7 +565,14 @@ namespace onetouch.SystemObjects
                 var _lookupSycEntityObjectCategory = await _lookup_sycEntityObjectCategoryRepository.FirstOrDefaultAsync((int)output.SycEntityObjectCategory.ParentId);
                 output.SycEntityObjectCategoryName = _lookupSycEntityObjectCategory.Name.ToString();
             }
+            //I50
+            if (output.SycEntityObjectCategory != null)
+            {
 
+                var Key = ("SYCENTITYOBJECTCATEGORIES-NAME-" + output.SycEntityObjectCategory.Id.ToString() + "-" + output.SycEntityObjectCategory.Name).Trim().ToUpper();
+                output.SycEntityObjectCategoryName = L(Key);
+            }
+            //I50
             return output;
         }
 
@@ -546,7 +607,7 @@ namespace onetouch.SystemObjects
             if (string.IsNullOrEmpty(input.Code))
             { input.Code = Guid.NewGuid().ToString(); }
 
-            await _sycEntityObjectCategoryRepository.InsertAsync(sycEntityObjectCategory);
+            var id = await _sycEntityObjectCategoryRepository.InsertAsync(sycEntityObjectCategory);
             try
             {
                 await CurrentUnitOfWork.SaveChangesAsync();
@@ -562,6 +623,25 @@ namespace onetouch.SystemObjects
             if (cat != null)
                 _sycEntityLocalizeAppService.CreateOrUpdateLocalization(cat.Id, sycEntityObjectCategory.Id, "ENG", "Name", input.Name);
             //xx
+            #region add to translation
+            string word = input.Name;
+            var languagesList = _lookup_ApplicationLanguages.GetLanguages(AbpSession.TenantId).ToList();
+            if (languagesList != null)
+            {
+                foreach (var lang in languagesList.Select(e => e.Name).ToList())
+                {
+                    ApplicationLanguageText entity = new ApplicationLanguageText();
+                    entity.Key = ("SYCENTITYOBJECTCATEGORIES-NAME-" + id.ToString() + "-" + input.Name).Trim().ToUpper();
+                    entity.Source = "onetouch";
+                    entity.Value = word;
+                    entity.LanguageName = lang;
+                    entity.TenantId = AbpSession.TenantId;
+                    await _lookup_ApplicationLanguageText.InsertAsync(entity);
+                }
+            }
+            //string ArString = TranslateText(word, "en", "ar");
+
+            #endregion add to translation
         }
 
         [AbpAuthorize(AppPermissions.Pages_SycEntityObjectCategories_Edit, AppPermissions.Pages_AppItems_Create, AppPermissions.Pages_AppItems_Edit)]
@@ -570,12 +650,47 @@ namespace onetouch.SystemObjects
             await CheckParentAllowed((int)input.Id, input.ParentId);
 
             var sycEntityObjectCategory = await _sycEntityObjectCategoryRepository.FirstOrDefaultAsync(x => x.Id == input.Id && (x.TenantId == AbpSession.TenantId || x.TenantId == null));
+            string oldWord = sycEntityObjectCategory.Name;
             ObjectMapper.Map(input, sycEntityObjectCategory);
             //xx
             var cat = await _lookup_sydObjectRepository.FirstOrDefaultAsync(a => a.Code == "CATEGORY");
             if (cat != null)
                 _sycEntityLocalizeAppService.CreateOrUpdateLocalization(cat.Id, sycEntityObjectCategory.Id, "ENG", "Name", input.Name);
             //xx
+            #region add to translation
+            string word = input.Name;
+
+            ApplicationLanguageText entity = new ApplicationLanguageText();
+            string oldKey = ("SYCENTITYOBJECTCATEGORIES-NAME-" + sycEntityObjectCategory.Id.ToString() + "-" + oldWord).Trim().ToUpper();
+
+            var languagesList = _lookup_ApplicationLanguages.GetLanguages(AbpSession.TenantId).ToList();
+            if (languagesList != null)
+            {
+                foreach (var lang in languagesList.Select(e => e.Name).ToList())
+                {
+                    var oldRecord = _lookup_ApplicationLanguageText.FirstOrDefaultAsync(e => e.Key == oldKey && e.LanguageName == lang).Result;
+                    if (oldRecord != null && oldRecord.Id > 0)
+                    {
+                        oldRecord.Key = ("SYCENTITYOBJECTCATEGORIES-NAME-" + sycEntityObjectCategory.Id.ToString() + "-" + input.Name).Trim().ToUpper();
+                        oldRecord.Value = word;
+                        oldRecord.TenantId = AbpSession.TenantId;
+                        await _lookup_ApplicationLanguageText.UpdateAsync(oldRecord);
+                    }
+                    else
+                    {
+                        ApplicationLanguageText newRecord = new ApplicationLanguageText();
+                        newRecord.Key = ("SYCENTITYOBJECTCATEGORIES-NAME-" + sycEntityObjectCategory.Id.ToString() + "-" + input.Name).Trim().ToUpper();
+                        newRecord.Source = "onetouch";
+                        newRecord.Value = word;
+                        newRecord.LanguageName = lang;
+                        newRecord.TenantId = AbpSession.TenantId;
+                        await _lookup_ApplicationLanguageText.InsertAsync(newRecord);
+                    }
+                }
+            }
+            //string ArString = TranslateText(word, "en", "ar");
+
+            #endregion add to translation
         }
         //Iteration#42 08/20/2024 MMT Add new APIs to create transaction categories[Start]
         public async Task CreateOrEditForObjectTransaction(CreateOrEditSycEntityObjectCategoryDto input)
