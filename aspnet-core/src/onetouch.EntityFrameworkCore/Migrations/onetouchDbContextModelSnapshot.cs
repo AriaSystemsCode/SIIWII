@@ -2448,6 +2448,9 @@ namespace onetouch.Migrations
                     b.Property<bool>("IsDefault")
                         .HasColumnType("bit");
 
+                    b.Property<bool>("IsPublic")
+                        .HasColumnType("bit");
+
                     b.HasKey("Id");
 
                     b.HasIndex("AttachmentCategoryId");
@@ -3237,6 +3240,9 @@ namespace onetouch.Migrations
                     b.Property<long>("AppItemId")
                         .HasColumnType("bigint");
 
+                    b.Property<string>("BuyerSSIN")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Code")
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
@@ -3953,6 +3959,9 @@ namespace onetouch.Migrations
 
                     b.Property<long>("AppMarketplaceItemId")
                         .HasColumnType("bigint");
+
+                    b.Property<string>("BuyerSSIN")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Code")
                         .HasMaxLength(50)

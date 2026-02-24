@@ -1,4 +1,4 @@
-<a *ngIf="!fromOverview" (mouseenter)="showReactionsPopup = true" (mouseleave)="showReactionsPopup = false" (click)="triggerReaction()" class="position-relative" >
+<a *ngIf="!fromOverview && isAuthenticated" (mouseenter)="showReactionsPopup = true" (mouseleave)="showReactionsPopup = false" (click)="triggerReaction()" class="position-relative" >
 
     <span class="align-items-center d-flex" style="gap: 7px;">
         <img class="icon-reaction" [src]="'assets/reactions/' + ( currentUserReaction ? Reactions[currentUserReaction] : (Reactions[defaultReactionType] + '-black') ) + '.png'" />
@@ -20,7 +20,7 @@
 
 
 
-<p *ngIf="fromOverview">
+<p *ngIf="fromOverview && isAuthenticated">
     
 
        

@@ -40,6 +40,7 @@ export class CommentParentComponent extends AppComponentBase implements AfterVie
     showRegularComment:boolean=true;
     @Input() fromOverview:boolean=false;
   addReplyScreen: boolean ;
+ 
     currentComment: any;
 
     constructor(
@@ -192,4 +193,6 @@ openReplyScreen(comment: any): void {
    
 }
 
-}
+           }
+         
+

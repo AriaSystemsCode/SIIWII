@@ -8,8 +8,15 @@
     aria-hidden="true"
 >
     <div
-        class="modal-dialog right-modal"
-        [ngClass]="active ? 'slide-right-in' : 'slide-right-out'"
+       
+    [ngClass]="{
+        'left-modal': isArabic,
+        'right-modal': !isArabic,
+        'slide-left-in':  active && isArabic,
+        'slide-right-in': active && !isArabic,
+        'slide-left-out': !active && isArabic,
+        'slide-right-out': !active && !isArabic
+      }"
         role="document"
     >
         <div class="modal-content">

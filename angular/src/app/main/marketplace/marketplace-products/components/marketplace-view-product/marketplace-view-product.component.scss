@@ -45,7 +45,7 @@
 }
 
 td {
-    color: black !important;
+    // color: black !important;
     font-weight: bold;
     vertical-align: initial !important
 }
@@ -887,3 +887,11 @@ p-dialog {
     color: #9E9E9E;
     font-weight: 500;
 }
+
+// .blur-text {
+//     filter: blur(5px);
+//     transition: filter 0.3s;
+//     user-select: none;      /* prevent copy/paste */
+//     pointer-events: none;   /* disable text selection/clicks */
+//   }
+  

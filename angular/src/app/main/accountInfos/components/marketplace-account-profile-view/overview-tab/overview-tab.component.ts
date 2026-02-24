@@ -148,6 +148,8 @@ export class OverviewTabComponent extends AppComponentBase implements OnInit, On
 
         undefined,
         selectedCurrency,
+        undefined,
+        undefined,
         'name',
         0,
         4
@@ -167,6 +169,7 @@ export class OverviewTabComponent extends AppComponentBase implements OnInit, On
 
       });
   }
+
 
 
   ngOnDestroy() {

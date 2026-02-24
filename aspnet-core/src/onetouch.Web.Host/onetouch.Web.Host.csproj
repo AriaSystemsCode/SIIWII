@@ -33,6 +33,12 @@
     <None Remove="App_Data\**" />
   </ItemGroup>
   <ItemGroup>
+  <None Update="Assets\**\*">
+    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+  </None>
+</ItemGroup>
+
+  <ItemGroup>
     <Content Remove="wwwroot\swagger\ui\index.html" />
   </ItemGroup>
   <ItemGroup>
@@ -123,7 +129,6 @@
     <EmbeddedResource Include="wwwroot\swagger\ui\index.html" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Assets\" />
     <Folder Include="wwwroot\Plugins\" />
   </ItemGroup>
   <ItemGroup>

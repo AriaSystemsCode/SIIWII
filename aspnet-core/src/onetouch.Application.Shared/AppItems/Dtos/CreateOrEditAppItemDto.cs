@@ -17,8 +17,6 @@ namespace onetouch.AppItems.Dtos
         public DateOnly SoldOutDate { get; set; }
         public String MaterialContent { get; set; }
 
-
-
         [StringLength(AppItemConsts.MaxNameLength, MinimumLength = AppItemConsts.MinNameLength)]
         public string Name { get; set; }
 
@@ -52,6 +50,10 @@ namespace onetouch.AppItems.Dtos
         public virtual IList<AppEntityCategoryDto> EntityCategories { get; set; }
         public virtual IList<AppEntityCategoryDto> EntityCategoriesAdded { get; set; }
         public virtual IList<AppEntityCategoryDto> EntityCategoriesRemoved { get; set; }
+
+        public virtual IList<AppEntityCategoryDto> entityRelatedItems { get; set; }
+        public virtual IList<AppEntityCategoryDto> entityRelatedItemAdded { get; set; }
+        public virtual IList<AppEntityCategoryDto> entityRelatedItemsRemoved { get; set; }
         
         public virtual IList<AppEntityCategoryDto> EntityDepartments { get; set; }
         public virtual IList<AppEntityCategoryDto> EntityDepartmentsAdded { get; set; }
@@ -98,6 +100,7 @@ namespace onetouch.AppItems.Dtos
         public virtual string CurrencySymbol { get; set; }
         public virtual string CurrencyName { get; set; }
         public virtual bool IsDefault { set; get; }
+        public virtual string BuyerSSIN { set; get; }
     }
     public class AppItemSizesScaleInfo : AppSizeScaleDto
     {
@@ -168,6 +171,9 @@ namespace onetouch.AppItems.Dtos
 
         public virtual PagedResultDto<AppEntityCategoryDto> EntityCategories { get; set; }
         public virtual IList<AppEntityCategoryDto> EntityCategoriesAdded { get; set; }
+        public virtual IList<AppEntitiesRelationshipDto> EntitiesRelationships { get; set; }
+        public virtual IList<AppEntitiesRelationshipDto> RelatedEntitiesRelationships { get; set; }
+        public virtual PagedResultDto<AppItemLookupDto> RelatedAppItems { get; set; }
         public virtual IList<AppEntityCategoryDto> EntityCategoriesRemoved { get; set; }
 
         public virtual PagedResultDto<AppEntityCategoryDto> EntityDepartments { get; set; }
@@ -188,6 +194,7 @@ namespace onetouch.AppItems.Dtos
         public List<ExtraDataAttrDto> ExtraDataAttr { get; set; }
         public List<ExtraDataAttrDto> Recommended { get; set; }
         public List<ExtraDataAttrDto> Additional { get; set; }
+        public List<ExtraDataAttrDto> Charges { get; set; }
         public List<ExtraDataAttrDto> variations { get; set; }
         //MMT
         public List<AppItemPriceInfo> AppItemPriceInfos { get; set; }
@@ -430,4 +437,20 @@ namespace onetouch.AppItems.Dtos
         public IList<VariationItemDto> VariationCanBeDeleted { get; set; }
     }
     //MMT-41
+
+    public class AppItemLookupDto : EntityDto<long>
+    {
+        public virtual long AppItemId { get; set; }
+
+        public virtual string AppItemCode { get; set; }
+
+        public virtual string AppItemName { get; set; }
+        public virtual string AppItemDescription { get; set; }
+        public virtual string AppItemImageUrl { get; set; }
+        public virtual string AppItemImageName { get; set; }
+        
+
+
+
+    }
 }

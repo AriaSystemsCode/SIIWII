@@ -148,11 +148,12 @@ export class ProductCatalogueReportParams implements ProductCatalogueReportParam
        url += "&onlyInStockColors=" + this.onlyInStockColors
        url += "&mimimumInStockQty=" + this.mimimumInStockQty
        // url += "&muserCountry="+this.userCountry
+       
        const date = new Date();
        const pad = (v: number) => v.toString().padStart(2, '0');
        const dateStr = `${pad(date.getMonth() + 1)}/${pad(date.getDate())}/${date.getFullYear()}`;
        const timeStr = `${pad(date.getHours())}:${pad(date.getMinutes())}`;
-
+      
        url += "&PrintDate=" + dateStr;
        url += "&PrintTime=" + timeStr;
        url += "&languageName="+this.languageName

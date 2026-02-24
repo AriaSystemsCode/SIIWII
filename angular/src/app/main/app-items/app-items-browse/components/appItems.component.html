@@ -120,7 +120,7 @@ transform: translateY(-50%);">
                                 </div>
 
 
-                                <div class="d-flex justify-content-center align-items-center mb-4 mb-md-0 list-toolbar-search" style="margin-left: -145px;">
+                                <div class="d-flex justify-content-center align-items-center mb-4 mb-md-0 list-toolbar-search" style="margin-left: -120px;">
                                     <div class="kt-input-icon kt-input-icon--left">
                                         <input type="text" formControlName="search" class="form-control" [placeholder]="'SearchWithThreeDot' | localize" id="generalSearch" style="border: 1px solid #D9D9D9 !important;
                                         background-color: white !important;">
@@ -135,9 +135,9 @@ transform: translateY(-50%);">
 
                                 <div class="d-flex justify-content-center align-items-center mb-4 mb-md-0" *ngIf="canAdd">
                                    
-                                    <a  class="btn btn-primary font-weight-normal pl-2 pr-2 text-center list-toolbar-btn selection-btns" (click)="eventHandler({event:AppItemBrowseEvents.Create})"  style="background-color: #4A0D4A !important;
+                                    <a  class="btn btn-primary font-weight-normal pl-2 pr-2 text-center list-toolbar-btn selection-btns mx-2" (click)="eventHandler({event:AppItemBrowseEvents.Create})"  style="background-color: #4A0D4A !important;
                                     border: none !important; color: white !important;">
-                                       <i  class="fa-plus  fas ml-1"></i>  {{ "CreateNewProduct" | localize }}
+                                       <i  class="fa-plus  fas mx-1"></i>  {{ "CreateNewProduct" | localize }}
                                     </a>
 
                                         <a  style="padding-right: 3px;padding-left: 9px;" [title]="'ImportProducts' | localize"   class="btn  font-weight-normal toolbar-btn pr-0 icon-box"
@@ -157,17 +157,23 @@ transform: translateY(-50%);">
                                             src='../../../../../assets/Items/Upload Inventory icon.png'
                                         />
                                         </a>
+
+                                        
+                                        <a  style="padding-right: 3px;padding-left: 9px;" [title]="'ImportCustomprices' | localize"   class="btn  font-weight-normal toolbar-btn pr-0 icon-box"
+                                        (click)="showImportCustomprices()"
+                                        >
+                                            <!-- <i class='d-inline-block w-100  fa-file-import fas  icon-center'></i> -->
+                                            <img
+                                            style="width: 24px;height: 24px;"
+                                            src='../../../../../assets/Items/Upload Custom price.png'
+                                        />
+                                        </a>
                                     </div>
                                     <!-- <div class="list-toolbar-divider"></div> -->
 
                                 <div class="d-flex justify-content-center align-items-center mb-4 mb-md-0" style="margin-right: 15px;" >
-                                    <a style="padding-right: 4px !important;
-                                    padding-left: 10px !important;
-                                    display: flex
-                                ;
-                                    justify-content: center;
-                                    align-items: center;" [title]="'ResetData' | localize" class="btn icon-box  font-weight-normal text-center text-primary toolbar-btn" (click)="resetList()">
-                                        <i  class="flaticon2-reload" style="color: #4A0D4A !important;width: 24px !important;
+                                    <a style="padding-right: 4px;padding-left: 10px;" [title]="'ResetData' | localize" class="btn icon-box  font-weight-normal text-center text-primary toolbar-btn" (click)="resetList()">
+                                        <i  class="flaticon2-reload p-0" style="color: #4A0D4A !important;width: 24px !important;
                                         height: 24px !important;
                                         align-content: center;"></i>
                                     </a>

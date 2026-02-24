@@ -1,0 +1,97 @@
+<p-carousel [value]="blocksSorted"   [numVisible]="numVisible"
+[numScroll]="1" [circular]="false" [showIndicators]="false"
+  [showNavigators]="true" [responsiveOptions]="responsiveOptions" class="p-4 m-2 rounded">
+  <ng-template pTemplate="item" let-item>
+
+    <div class="carousel-card">
+      <div class="carousel-card-body" [ngSwitch]="item?.blockType?.toUpperCase()">
+
+        <!-- PRODUCT -->
+        <div *ngSwitchCase="'PRODUCT'" class="product-card-horizontal">
+          <div class="product-image-wrapper">
+            <img class="product-image" (error)="onImgErr($event)" [src]="item?.getAppMarketItemForViewDto?.appItem?.imageUrl
+                      ? attachmentBaseUrl + '/' + item?.getAppMarketItemForViewDto?.appItem.imageUrl
+                      : 'assets/placeholders/appitem-placeholder.png'" alt="Product Image"
+              (click)="viewProduct(item?.getAppMarketItemForViewDto)" />
+          </div>
+
+          <div class="product-info">
+            <div class="top-row">
+              <span class="code">
+                {{ item?.getAppMarketItemForViewDto?.appItem?.manufacturerCode }}
+              </span>
+           
+                <span class="price" *ngIf="showMsrP">
+                  {{ languageSettingName !== 'en-GB' ? 'MSRP' : 'RRP' }}:
+                  {{ item?.getAppMarketItemForViewDto?.appItem?.price | currency: currencyCode:true }}
+                </span>
+         
+            </div>
+
+            <div class="name" (click)="viewProduct(item?.getAppMarketItemForViewDto)">
+              {{ item?.getAppMarketItemForViewDto?.appItem?.name }}
+            </div>
+
+            <div class="seller">
+              Sold By
+              <span class="seller-name">
+                {{ item?.getAppMarketItemForViewDto?.appItem?.sellerName }}
+              </span>
+            </div>
+
+            <div class="bottom-row">
+              <div class="star-rating">
+                <div class="stars-outer">
+                  ★★★★★
+                  <div class="stars-inner" [style.width]="
+                      (item?.getAppMarketItemForViewDto?.averageRating / 5) * 100 + '%'
+                    ">
+                    ★★★★★
+                  </div>
+                </div>
+              </div>
+              <span class="rateNum">
+                ({{ item?.getAppMarketItemForViewDto?.numberOfReviews }}) reviews
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- BRAND -->
+ 
+
+    <img  *ngSwitchCase="'BRAND'"  class="card-media" [src]="item?.image ?  attachmentBaseUrl + '/' + item?.image: attachmentBaseUrl + '/' + item?.getAppEntityForViewDto?.appEntity?.entityAttachments[0]?.url 
+           " title="Brand {{item?.getAppEntityForViewDto?.appEntity?.name}}" alt="Brand" (click)="goToBrand(item)"
+  (error)="onImgErr($event)" />
+
+ 
+      
+  
+    
+        <!-- CATEGORY -->
+        <img *ngSwitchCase="'CATEGORY'" class="card-media" [src]="item?.image
+            ? attachmentBaseUrl + '/' + item?.image
+            : '../../../../assets/placeholders/_logo-placeholder.png'" alt="category" (click)="goToCategory(item)"
+          (error)="onImgErr($event)" />
+        <!-- ATTACHMENT -->
+        <ng-container *ngSwitchCase="'ATTACHMENT'">
+          <!-- Prefer an image attachment if available -->
+          <img *ngIf="getAttachmentImage(item) as imgSrc" class="card-media" [src]="imgSrc"
+            [alt]="item?.name || 'Attachment'" (click)="onAttachmentClick(item)" (error)="onImgErr($event)" />
+
+          <!-- If no image but there is a PDF, show PDF icon -->
+          <img *ngIf="!getAttachmentImage(item) && hasPdfAttachment(item)" class="card-media pdf-icon"
+            src="assets/Items/pdf-Icon.png" alt="PDF" (click)="onAttachmentClick(item)" />
+
+          <!-- Fallback: generic link if neither image nor pdf is detected -->
+          <a *ngIf="!getAttachmentImage(item) && !hasPdfAttachment(item)" class="card-media other-file"
+            [href]="getAttachmentClickUrl(item)" target="_blank" rel="noopener">
+            Open file
+          </a>
+        </ng-container>
+
+
+      </div>
+    </div>
+  </ng-template>
+</p-carousel>

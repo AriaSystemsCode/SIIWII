@@ -1,5 +1,5 @@
  <!-- <hr *ngIf="!parentId" [ngClass]="{'visibility-hidden': !usersReactionsStats?.reactionsCount && !usersReactionsStats?.commentsCount}"> -->
- <div *ngIf="!parentId && !fromOverview" class="d-flex justify-content-between mt-4" [ngClass]="{'visibility-hidden' : !usersReactionsStats?.reactionsCount && !usersReactionsStats?.commentsCount }">
+<div *ngIf="!parentId && !fromOverview" class="d-flex justify-content-between" [ngClass]="{'visibility-hidden' : !usersReactionsStats?.reactionsCount && !usersReactionsStats?.commentsCount }">
     <app-reactions-stats
         [entityId]="entityId"
         [usersReactionsStats]="usersReactionsStats"
@@ -67,7 +67,7 @@
                     >
                     </app-reactions-stats>
                 </div>
-                <a *ngIf="!fromOverview" (click)="showAddComment()" [ngClass]="{'border-left pl-3': parentId}">
+                <a *ngIf="!fromOverview && isAuthenticated" (click)="showAddComment()" [ngClass]="{'border-left pl-3': parentId}">
                     <span>
                         <!-- <i class="far fa-comments"></i> -->
                          <img src="../../../../assets/reactions/commentIcon.png"/>

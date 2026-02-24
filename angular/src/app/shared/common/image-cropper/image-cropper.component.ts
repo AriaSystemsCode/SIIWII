@@ -1,4 +1,4 @@
-import { Component,  ElementRef,  Injector,  OnDestroy,  OnInit, ViewChild } from '@angular/core';
+import { Component,  ElementRef,  Injector,  Input,  OnDestroy,  OnInit, ViewChild } from '@angular/core';
 import { AppComponentBase } from '@shared/common/app-component-base';
 import { BsModalRef } from 'ngx-bootstrap/modal';
 import * as _  from 'ngx-image-cropper';
@@ -9,6 +9,7 @@ import * as _  from 'ngx-image-cropper';
 })
 export class ImageCropperComponent implements OnInit  {
     @ViewChild('imageCropper') imageCropper : _.ImageCropperComponent
+    @Input() resizeToWidth: number = 0;
     noOptions:boolean = true
     originalFileChangeEvent:Event
     title:string
@@ -23,9 +24,13 @@ export class ImageCropperComponent implements OnInit  {
     showCropper:boolean = false
     canvasRotation:number
     isCropDone:boolean = false
+    currentLang: string
+    isArabic: boolean
     constructor(public bsModalRef: BsModalRef) { }
     imgFile : File
     ngOnInit(){
+        this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
+        this.currentLang == 'ar' || this.currentLang == 'ar-EG'  ? this.isArabic = true : this.isArabic = false
         this.resetImage()
         const eventTarget  = (this.originalFileChangeEvent.target as HTMLInputElement)
         const file:File = eventTarget.files[0]

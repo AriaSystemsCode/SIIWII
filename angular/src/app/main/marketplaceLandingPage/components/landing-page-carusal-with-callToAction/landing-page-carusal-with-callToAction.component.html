@@ -1,0 +1,26 @@
+<p-carousel
+  [value]="blocksSorted"
+  [numVisible]="numVisible"
+  [numScroll]="1"
+  [responsiveOptions]="ctaResponsiveOptions"
+  [circular]="false"
+  [showIndicators]="false"
+  [showNavigators]="true"
+>
+  <ng-template pTemplate="item" let-ctaSection>
+    <div class="ctaChildection pt-2 pl-3 ml-4 mr-4">
+      <a
+        (click)="ctaSection.title==='Products' ? handleStorageData() : null"
+        [routerLink]="['/app/main/marketplace/' + ctaSection.link]"
+      >
+        <h3>{{ ctaSection.name }}</h3>
+        <app-image-display
+          [image]="ctaSection.image ? (attachmentBaseUrl + '/' + ctaSection.image) : '../../../../assets/placeholders/_logo-placeholder.png'"
+          [sycAttachmentCategory]="sycAttachmentCategoryCTASlider"
+          [staticHeight]="100"
+        ></app-image-display>
+        <h5 class="ctaDescribtion">{{ ctaSection.description }}</h5>
+      </a>
+    </div>
+  </ng-template>
+</p-carousel>

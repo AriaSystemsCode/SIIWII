@@ -48,7 +48,7 @@
                 <div class="row details">
                     <div class="col-6">
                         <div class="row">
-                            <div
+                            <!-- <div
                                 *ngIf="
                                     appItemForViewDto?.variations.length == 0
                                 "
@@ -130,8 +130,10 @@
 
                             <div class="p-2 ml-2 center-dev" #centerdiv>
                                 <div class="centerContatiner"  #centerContatiner>
+                                   
+                                   
                                     <img
-                                        *ngIf="centerImage"
+                                        *ngIf="centerImage && centerImage.isImageFile"
                                         [src]="
                                             attachmentBaseUrl +
                                             '/' +
@@ -139,13 +141,151 @@
                                         "
                                         alt="defaultImage"
                                         (error)="handleFailedImage($event)"
-                                        class="imageContainer w-100"
+                                        class="w-100 imageContainer"
                                         [ngStyle]="{'height.px':  (centerContatiner.clientWidth / acceptedAspectRatio )}"
                                     />
-                                </div>
-                            </div>
 
-                            <!-- [ngStyle]="{'left.px' : centerdiv.offsetLeft}" -->
+                                    
+                                    <iframe id="pdfViewer" *ngIf="centerImage  && centerImage.isPdfFile"
+                                       
+                                        class="w-100 imageContainer" [ngStyle]="{
+  'height.px': centerImage.loadingError ? 0 : (centerContatiner.clientWidth / acceptedAspectRatio)
+}" frameborder="0" (error)="centerImage.loadingError = true"></iframe>
+
+<div *ngIf="centerImage  && centerImage.isPdfFile && centerImage.loadingError">
+    <h6>
+        Unable to display the PDF file here.
+        <span *ngIf="centerImage.url">
+          <a [href]="attachmentBaseUrl + '/' + centerImage.url" target="_blank">Open</a> instead.
+        </span>
+      </h6>
+</div>
+                                <video
+                                        *ngIf="centerImage  && centerImage.isVideoFile"
+                                        [src]="
+                                            attachmentBaseUrl +
+                                            '/' +
+                                            centerImage.url
+                                        "
+                                        controls
+                                        alt="defaultImage"
+                                        style="margin-top: 0px !important;"
+                                        class="w-100 imageContainer"
+                                        [ngStyle]="{'height.px':  (centerContatiner.clientWidth / acceptedAspectRatio )}"
+                                    ></video>
+
+                                </div>
+                            </div> -->
+                            <div class="media-viewer" >
+
+                                <!-- THUMBS -->
+                                <div class="thumbs" [class.thumbs-scroll]="activeAttachments.length > 7">
+                                  <ng-container *ngFor="let a of activeAttachments; let i = index">
+                              
+                                    <!-- IMAGE thumb -->
+                                    <img *ngIf="kindOf(a) === 'image'"
+                                         class="thumb"
+                                         [class.active]="i === currentIndex"
+                                         [src]="getUrl(a)"
+                                         (click)="setMain(i)"
+                                         (error)="onThumbError($event, a)" />
+                              
+                                    <!-- VIDEO thumb -->
+                                    <video *ngIf="kindOf(a) === 'video'"
+                                           class="thumb"
+                                           [class.active]="i === currentIndex"
+                                           muted playsinline preload="metadata"
+                                           (click)="setMain(i)">
+                                      <source [src]="getUrl(a)" />
+                                    </video>
+                              
+                                    <!-- PDF thumb (thumbnail else icon) -->
+                                    <div *ngIf="kindOf(a) === 'pdf'"
+                                         class="thumb pdf-thumb"
+                                         [class.active]="i === currentIndex"
+                                         (click)="setMain(i)">
+                              
+                                      <div *ngIf="pdfThumbLoadingMap[i]" class="thumb-loading">
+                                        <i class="fa fa-spinner fa-spin"></i>
+                                      </div>
+                              
+                                      <img *ngIf="!pdfThumbLoadingMap[i] && pdfThumbMap[i]"
+                                           [src]="pdfThumbMap[i]"
+                                           class="thumb-img" />
+                              
+                                      <div *ngIf="!pdfThumbLoadingMap[i] && !pdfThumbMap[i]"
+                                           class="pdf-fallback"></div>
+                                    </div>
+                              
+                                    <!-- OTHER -->
+                                    <div *ngIf="kindOf(a) === 'other'"
+                                         class="thumb other-thumb"
+                                         [class.active]="i === currentIndex"
+                                         (click)="setMain(i)">
+                                      <i class="fa fa-file-o"></i>
+                                    </div>
+                              
+                                  </ng-container>
+                                </div>
+                              
+                                <!-- MAIN VIEWER -->
+                                <div class="main">
+                              
+                                  <!-- MAIN IMAGE -->
+                                  <img *ngIf="kindOf(activeAttachments[currentIndex]) === 'image'"
+                                       class="main-media"
+                                       [src]="getUrl(activeAttachments[currentIndex])"
+                                       (error)="onMainError($event)"
+                                       (click)="openImagePreview(getUrl(activeAttachments[currentIndex]))"
+                                       style="cursor: zoom-in;" />
+                              
+                                  <!-- MAIN VIDEO -->
+                                  <video *ngIf="kindOf(activeAttachments[currentIndex]) === 'video'"
+                                         class="main-media"
+                                         controls playsinline preload="metadata">
+                                    <source [src]="getUrl(activeAttachments[currentIndex])" />
+                                  </video>
+                              
+                                  <!-- MAIN PDF (thumbnail كبير + click open tab) -->
+                                  <ng-container *ngIf="kindOf(activeAttachments[currentIndex]) === 'pdf'">
+                                    <div *ngIf="pdfThumbLoadingMap[currentIndex]" class="main-loading">
+                                      <i class="fa fa-spinner fa-spin fa-2x"></i>
+                                      <span class="mx-2">Loading preview...</span>
+                                    </div>
+                              
+                                    <img *ngIf="!pdfThumbLoadingMap[currentIndex] && pdfThumbMap[currentIndex]"
+                                         class="main-media"
+                                         [src]="pdfThumbMap[currentIndex]"
+                                         style="cursor:pointer;"
+                                         (click)="openNewTab(activeAttachments[currentIndex])" />
+                              
+                                    <div *ngIf="!pdfThumbLoadingMap[currentIndex] && !pdfThumbMap[currentIndex]"
+                                         class="main-fallback">
+                                      <div>Unable to generate PDF preview.</div>
+                                      <a (click)="openNewTab(activeAttachments[currentIndex])">Open PDF</a>
+                                    </div>
+                                  </ng-container>
+                              
+                                  <!-- IMAGE PREVIEW DIALOG -->
+                                  <p-dialog [(visible)]="showImagePreview"
+                                            [modal]="true"
+                                            [closable]="true"
+                                            [dismissableMask]="true"
+                                            [draggable]="false"
+                                            [resizable]="false"
+                                            [style]="{width: '70vw', maxWidth: '900px'}"
+                                            [contentStyle]="{padding: '0'}">
+                                    <div class="d-flex align-items-center justify-content-center p-3">
+                                      <img [src]="previewImageUrl"
+                                           style="max-width: 100%; max-height: 70vh; object-fit: contain;"
+                                           (error)="onMainError($event)" />
+                                    </div>
+                                  </p-dialog>
+                              
+                                </div>
+                              </div>
+                              
+                     
                             <div
                                 class="pt-4  mb-5 text-center position-relative"
                                 style="left: 50%; transform: translateX(-50%);"
@@ -1006,6 +1146,81 @@
                 </ng-template>
             </div>
         </div>
+
+        <div
+        *ngIf="appItemForViewDto?.relatedAppItems?.items
+            .length > 0; "
+        [class]="
+            containerClass + ' kt-grid__item kt-grid__item--fluid mt-5'
+        "
+    >
+        <div class="p-4 seeMoreContainer">
+            <div class="row pl-3">
+                <div>
+                    <h6 class="header">
+                        {{ "Relatedproducts" | localize }}:
+                    </h6>
+                </div>
+                <div class="col text-right">
+                    <a
+                        *ngIf="showLessRelatedItems"
+                        (click)="showRelatedItems()"
+                        class="seeMore upArrow"
+                    >
+                        {{ "Showless" | localize }}</a
+                    >
+                    <a
+                        *ngIf="showMoreRelatedItems"
+                        (click)="showRelatedItems()"
+                        class="seeMore downArrow"
+                    >
+                        {{ "showmore" | localize }}
+                    </a>
+                </div>
+            </div>
+            <div
+                class="row details pt-4"
+                [ngClass]="{ 'thin-scroll': scrollRelatedItems}"
+                [ngStyle]="{
+                    'overflow-y': scrollRelatedItems
+                        ? 'scroll'
+                        : 'hidden',
+                    height: scrollRelatedItems
+                        ? maxContainerHeight + 'px'
+                        : 'auto'
+                }"
+                *ngIf="
+                    appItemForViewDto?.relatedAppItems?.items
+                        .length > 0;
+                    else noRelatedItems
+                "
+            >
+                <div class="col-md-12 pb-3 pt-2">
+                    <div
+                        class="seeMoreData"
+                        *ngFor="
+                            let relatedItem of appItemForViewDto
+                                ?.relatedAppItems?.items;
+                            index as i
+                        "
+                    >
+                        <p class="title-tag">{{ relatedItem?.appItemCode }}</p>
+                    </div>
+                </div>
+            </div>
+            <ng-template #noRelatedItems>
+                <div class="col-md-12 pb-3 pt-2 text-center">
+                    <p>
+                        {{
+                            "No Related Items" | localize
+                        }}
+                    </p>
+                </div>
+            </ng-template>
+        </div>
+    </div>
+
+
         <div
             [class]="
                 containerClass + ' kt-grid__item kt-grid__item--fluid mt-5'
@@ -1251,6 +1466,135 @@
                     </ng-template>
                 </div>
             </div>
+
+            <div
+            [class]="
+                containerClass + ' kt-grid__item kt-grid__item--fluid mt-5'
+            "
+        >
+            <div class="p-4 recomendedandAdditionalContainer">
+                <div class="row">
+                    <div>
+                        <h6 class="header">
+                            {{ "Additional" | localize }}:
+                        </h6>
+                    </div>
+                    <div class="col text-right">
+                        <a
+                            *ngIf="showLessAdditional"
+                            (click)="showAdditional()"
+                            class="seeMore upArrow"
+                        >
+                            {{ "Showless" | localize }}</a
+                        >
+                        <a
+                            *ngIf="showMoreAdditional"
+                            (click)="showAdditional()"
+                            class="seeMore downArrow"
+                        >
+                            {{ "showmore" | localize }}</a
+                        >
+                    </div>
+                </div>
+                <div
+                    class="recomendedandAdditionalData details pt-4"
+                    [ngClass]="{ 'thin-scroll': scrollAdditional }"
+                    [ngStyle]="{
+                        'overflow-y': scrollAdditional
+                            ? 'scroll'
+                            : 'hidden',
+                        height: scrollAdditional
+                            ? maxContainerHeight + 'px'
+                            : 'auto'
+                    }"
+                    *ngIf="
+                        appItemForViewDto?.additional.length > 0;
+                        else noAdditional
+                    "
+                >
+                    <div
+                        class="row details pl-3"
+                        *ngFor="
+                            let _additional of appItemForViewDto?.additional
+                        "
+                    >
+                        <h5>{{ _additional.extraAttrName }}:&nbsp;</h5>
+                        <div
+                            *ngFor="
+                                let selectedValue of _additional.selectedValues;
+                                index as i
+                            "
+                            class="row"
+                        >
+                            <span [ngClass]="i == 0 ? 'pl-3' : 'pl-4'">
+                                <div
+                                    *ngIf="
+                                        _additional.extraAttrDataType.toUpperCase() ==
+                                            'STRING' ||
+                                        _additional.extraAttrDataType.toUpperCase() ==
+                                            'NUMERIC'
+                                    "
+                                >
+                                    {{ selectedValue.value }}
+                                </div>
+                                <div
+                                    *ngIf="
+                                        _additional.extraAttrDataType.toUpperCase() ==
+                                            'BOOLEAN' ||
+                                        _additional.extraAttrDataType.toUpperCase() ==
+                                            'BIT'
+                                    "
+                                >
+                                    <div
+                                        *ngIf="
+                                            selectedValue.value.toUpperCase() ==
+                                            'TRUE'
+                                        "
+                                    >
+                                        <i class="fa fa-1x fa-check"></i>
+                                    </div>
+                                    <div
+                                        *ngIf="
+                                            selectedValue.value.toUpperCase() ==
+                                            'FALSE'
+                                        "
+                                    >
+                                        <i class="fa fa-1x fa-times"></i>
+                                    </div>
+                                </div>
+                                <div
+                                    *ngIf="
+                                        _additional.extraAttrDataType.toUpperCase() ==
+                                        'DATETIME'
+                                    "
+                                >
+                                    {{ selectedValue.value | date }}
+                                </div>
+                            </span>
+                            <span
+                                *ngIf="
+                                    i !=
+                                    _additional.selectedValues.length - 1
+                                "
+                                class="details"
+                            >
+                                ,&nbsp;</span
+                            >
+                        </div>
+                        <br />
+                    </div>
+                </div>
+                <ng-template #noAdditional>
+                    <div class="col-md-12 pb-3 pt-2 text-center">
+                        <p>
+                            {{
+                                "NoAdditionalAtrributesSelected" | localize
+                            }}
+                        </p>
+                    </div>
+                </ng-template>
+            </div>
+        </div>
         </div>
     </div>
 </div>

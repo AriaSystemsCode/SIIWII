@@ -92,6 +92,7 @@ using Abp.MultiTenancy;
 using System.Drawing;
 using SixLabors.Fonts;
 using System.Management.Automation;
+using onetouch.AppSiiwiiTransaction.Dtos;
 using Newtonsoft.Json;
 using DocumentFormat.OpenXml.Spreadsheet;
 
@@ -1303,6 +1304,7 @@ namespace onetouch.Accounts
             return bReturn;
         }
 
+        [AbpAllowAnonymous]
         public async Task<GetAccountForViewDto> GetAccountForView(long id, int resultCount = 10)
         {
             await CreateAdminContact();
@@ -2394,11 +2396,11 @@ namespace onetouch.Accounts
                             {
                                 createOrEditAccountInfoDto.EntityExtraData.ForEach(x => x.Id = 0);
                                 createOrEditAccountInfoDto.EntityExtraData.ForEach(x => x.EntityId = 0);
-                                var userIdExtraData = createOrEditAccountInfoDto.EntityExtraData.Where(z => z.AttributeId == 715).FirstOrDefault();
-                                if (userIdExtraData != null)
-                                {
-                                    userIdExtraData.AttributeValue = "";
-                                }
+                                //var userIdExtraData = createOrEditAccountInfoDto.EntityExtraData.Where(z => z.AttributeId == 715).FirstOrDefault();
+                                //if (userIdExtraData != null)
+                                //{
+                                //    userIdExtraData.AttributeValue = "";
+                                //}
 
                             }
                             if (createOrEditAccountInfoDto.EntityAttachments != null)
@@ -2472,11 +2474,11 @@ namespace onetouch.Accounts
                             {
                                 createOrEditAccountInfoDto.EntityExtraData.ForEach(x => x.Id = 0);
                                 createOrEditAccountInfoDto.EntityExtraData.ForEach(x => x.EntityId = 0);
-                                var userIdExtraData = createOrEditAccountInfoDto.EntityExtraData.Where(z => z.AttributeId == 715).FirstOrDefault();
-                                if (userIdExtraData != null)
-                                {
-                                    userIdExtraData.AttributeValue = "";
-                                }
+                                //var userIdExtraData = createOrEditAccountInfoDto.EntityExtraData.Where(z => z.AttributeId == 715).FirstOrDefault();
+                                //if (userIdExtraData != null)
+                                //{
+                                //    userIdExtraData.AttributeValue = "";
+                                //}
                             }
                             if (createOrEditAccountInfoDto.EntityAttachments != null)
                             {
@@ -5955,6 +5957,7 @@ namespace onetouch.Accounts
         }
 
         #endregion
+        
         [AbpAuthorize(AppPermissions.Pages_Accounts_Create)]
         public async Task<AppContactPaymentMethodDto> CreateOrEditPaymentMethod(AppContactPaymentMethodDto input)
         {
@@ -7038,6 +7041,7 @@ namespace onetouch.Accounts
         {
             ContactDto returnObject = new ContactDto();
             var presonEntityObjectTypeId = await _helper.SystemTables.GetEntityObjectTypePersonId();
+            string accountTypeCode = await _helper.SystemTables.GetEntityObjectTypePersonCode();
             if (string.IsNullOrEmpty(accountDto.SSIN))
             {
                 AppEntity entity = new AppEntity();
@@ -7046,7 +7050,7 @@ namespace onetouch.Accounts
                 //entity.EntityObjectTypeCode = "";//entityParent.EntityObjectTypeCode"";
                 var contactObjectId = await _helper.SystemTables.GetObjectContactId();
                 entity.ObjectId = contactObjectId;
-                entity.EntityObjectTypeCode = await _helper.SystemTables.GetEntityObjectTypePersonCode();
+                entity.EntityObjectTypeCode = accountTypeCode;
                 accountDto.SSIN = await
                     _helper.SystemTables.GenerateSSIN(contactObjectId, ObjectMapper.Map<AppEntityDto>(entity));
             }
@@ -7056,6 +7060,8 @@ namespace onetouch.Accounts
             accountDto.UseDTOTenant = true;
             accountDto.AccountLevel = AccountLevelEnum.Manual;
             accountDto.ContactRecordType = "C";
+            accountDto.AccountTypeId = presonEntityObjectTypeId;
+            accountDto.AccountType = accountTypeCode;
             var output = await CreateOrEditAccount(accountDto);
             //T-SII-20220922.0002,1 MMT 11/10/2022 Update user's profile image from contact image[Start]
             if (accountDto.EntityAttachments != null && accountDto.EntityAttachments.Count > 0)
@@ -7156,7 +7162,7 @@ namespace onetouch.Accounts
             if (accountDto.EntityExtraData != null && accountDto.EntityExtraData.Count > 0)
             {
                 var userObj = accountDto.EntityExtraData.Where(z => z.AttributeId == 715).FirstOrDefault();
-                if (userObj != null && !string.IsNullOrEmpty(userObj.AttributeValue) && int.Parse(userObj.AttributeValue)>0)
+                if (userObj != null && !string.IsNullOrEmpty(userObj.AttributeValue) && int.Parse(userObj.AttributeValue) > 0)
                 {
                     string firstName = "";
                     string lastName = "";
@@ -7173,10 +7179,9 @@ namespace onetouch.Accounts
                         user.Name = firstName;
                         await UserManager.UpdateAsync(user);
                     }
-                }            
-            }            
+                }
+            }
             return returnObject;
-
             
         }
         //public async Task<bool> CreateOrEditMarketplaceContactRelationship(string requesterSSIN, string recipientSSIN,bool? disconnect)
@@ -8631,7 +8636,7 @@ namespace onetouch.Accounts
                         //if (!string.IsNullOrEmpty(accountExcelDto.EmailAddress) && !_helper.ExcelHelper.IsValidEmail(accountExcelDto.EmailAddress))
                         //{ accountExcelRecordErrorDTO.FieldsErrors.Add("Email Address: Not Valid Email Value."); hasError = true; }
 
-                        //#endregion code, name, email and website validation
+                        #endregion code, name, email and website validation
 
                         //#region check record type
                         //if (string.IsNullOrEmpty(accountExcelDto.RecordType) && Enum.TryParse<AccountExcelRecordType>(accountExcelDto.RecordType, out accountExcelRecordType))
@@ -8663,6 +8668,14 @@ namespace onetouch.Accounts
                             }
                         }
                         //I46 [End]
+                        #region phone validation
+                        if (!string.IsNullOrEmpty(accountExcelDto.Phone1Number))
+                        { accountExcelDto.Phone1Number = accountExcelDto.Phone1Number.Replace("'", ""); }
+
+                        if (!string.IsNullOrEmpty(accountExcelDto.Phone1Code) &&
+                            !string.IsNullOrEmpty(accountExcelDto.Phone1Number) &&
+                            !_helper.ExcelHelper.IsPhoneNumber(accountExcelDto.Phone1Code + accountExcelDto.Phone1Number))
+                        { accountExcelRecordErrorDTO.FieldsErrors.Add("Phone 1: Phone 1 Is Filled With a InValid Phone# and Code."); hasError = true; }
 
                         //#region phone validation
                         //if (!string.IsNullOrEmpty(accountExcelDto.Phone1Code) &&
@@ -8672,8 +8685,6 @@ namespace onetouch.Accounts
 
                         //if (!string.IsNullOrEmpty(accountExcelDto.Phone1Type) && GetTypeId(accountExcelDto.Phone1Type, phoneTypes) == 0)
                         //{ accountExcelRecordErrorDTO.FieldsErrors.Add("Phone 1: Phone 1 Type is InValid."); hasError = true; }
-                        if (!string.IsNullOrEmpty(accountExcelDto.Phone1Number))
-                        { accountExcelDto.Phone1Number = accountExcelDto.Phone1Number.Replace("'", ""); }
 
                         if (!string.IsNullOrEmpty(accountExcelDto.Phone2Number))
                         { accountExcelDto.Phone2Number = accountExcelDto.Phone2Number.Replace("'", ""); }

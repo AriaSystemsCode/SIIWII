@@ -4,8 +4,8 @@
             class="d-flex justify-content-start pageHeader mt-lg-4 mt-5 pt-2 ml-md-5 ml-2 pl-lg-4 mb-2 align-items-center">
             <button (click)="backToResult()" class="backBtn"> <img class="mt-2 "
                     src="../../../../../assets/placeholders/go-back.png" style=" border-radius: 6px;" />Back to
-                result</button>
-            <h6 class="ml-2">Marketplace Product Detail View</h6>
+                results</button>
+            <h6 class="ml-2">Marketplace Product Detail View</h6> 
 
         </div>
         <div class="d-md-block d-none">
@@ -220,7 +220,7 @@
                             </div>
                             <div class="p-3">
 
-                                <button [disabled]="orderSummary.length == 0" (click)="addToShoppingCart()"
+                                <button [disabled]="orderSummary.length == 0 || !isAuthenticated" (click)="addToShoppingCart()"
                                     class="btn m-0 add-btn">
                                     Add To Shopping Cart
                                 </button>
@@ -272,9 +272,10 @@
                             </div>
                             <div class="price mb-4">
                                 <!-- show msrp price and range in this product has no special pricing -->
-                                <div class="msrp d-flex ">
+                                <div class="msrp d-flex " *ngIf="productData?.showMSRP == 'Yes'">
+                             
                                     <h5 class="mr-2" style="color: black !important;font-size: 16px;">{{languageSettingName!='en-GB' ? "MSRP"  :  "RRP"  }}: </h5>
-                                    <h5>
+                                    <h5 >
 
                                         {{
                                         currencySymbol
@@ -290,7 +291,7 @@
                                     <h5 *ngIf="
                                         productDetails?.minMSRP !==
                                         productDetails?.maxMSRP
-                                    ">
+                                    "  >
 
                                         {{
                                         currencySymbol
@@ -299,7 +300,7 @@
                                     </h5>
                                     <h5> /EAC </h5>
                                 </div>
-                                <div class="msrp d-flex justify-content-between align-items-center">
+                                <div class="msrp d-flex justify-content-between align-items-center" >
                                     <div>
                                         <div class="msrp d-flex align-items-center ">
                                             <h5 class="mr-2" *ngIf="productDetails?.maxSpecialPrice"
@@ -308,7 +309,7 @@
 
 
 
-                                            <h5 *ngIf="productDetails?.maxSpecialPrice && showEditSpecialPrice">
+                                            <h5 *ngIf="productDetails?.maxSpecialPrice && showEditSpecialPrice" >
                                                 {{ currencySymbol }} {{ (productDetails?.maxSpecialPrice || 0) | number:'1.2-2' }}
                                             </h5>
 
@@ -371,8 +372,13 @@ top: 4px;">
                                         </button>
                                     </div>
                                 </div>
+                    
+                                <h6 *ngIf="productDetails?.stockAvailability ==0 && productData?.showWarningLabelMajorOutStockFlag == 'True'" class="text-danger">{{Warningmessage}}</h6>
+
                             </div>
                         </div>
+
+                
                     </div>
 
                     <hr style="
@@ -413,11 +419,18 @@ top: 4px;">
 
                         </div>
                         <!-- color selections -->
+                         
                         <div *ngIf="filteredColors?.length <= handleSCreenSelect"
                             class="d-flex flex-wrap align-items-center justify-content-lg-start">
                             <div class="mr-3" *ngFor="let color of filteredColors; let i = index"
-                                [title]="color.colorName" position="top" class="imagAndHexaCode"
+                                [title]="color.colorName" position="top" class="imagAndHexaCode d-flex flex-column "
                                 tooltipPositionStyleClass="custom-tooltip">
+                                <h6 *ngIf="productData?.showInOutStockFlag == 'ItemColorlevel' ||  productData?.showInOutStockFlag == 'Bothlevels'"
+                                class="mb-1" style="margin-right: 10px;"
+                                [ngClass]="hasColorStock(color) ? 'text-success' : 'text-danger'"
+                              >
+                                {{ hasColorStock(color) ? 'In stock' : 'Out of stock' }}
+                    </h6>
 
                                 <div style=" margin-right :10px;    border-top-right-radius: 6px;    border-top-left-radius: 6px;"
                                     [ngClass]="
@@ -508,7 +521,7 @@ top: 4px;">
                             <thead>
                                 <tr>
                                     <th scope="col">Size</th>
-                                    <th scope="col">Available QTY</th>
+                                    <th scope="col" *ngIf="productData?.showStockAvailability != 'No'">Available QTY</th>
                                     <th scope="col">Ordered</th>
                                 </tr>
                             </thead>
@@ -519,9 +532,13 @@ top: 4px;">
                                         let i = index
                                     ">
                                     <td>{{ size.label }}</td>
-                                    <td>{{ size.stockAvailability }}</td>
+                                    <td *ngIf="((productData?.showInOutStockFlag == 'ItemColorSizeLevel' || productData?.showInOutStockFlag == 'Bothlevels') && size.stockAvailability ==0 ) && productData?.showStockAvailability != 'No'" class="text-danger">Out of stock</td>
+
+                                    <td *ngIf="((productData?.showInOutStockFlag == 'ItemColorSizeLevel' || productData?.showInOutStockFlag == 'Bothlevels') && size.stockAvailability >0 ) && productData?.showStockAvailability != 'No'" class="text-success">In Stock</td>
+
+                                    <td *ngIf="((productData?.showInOutStockFlag != 'ItemColorSizeLevel' && productData?.showInOutStockFlag != 'Bothlevels' ) ) && productData?.showStockAvailability != 'No'">{{  size.stockAvailability  }}</td>
                                     <td>
-                                        <p-inputNumber [(ngModel)]="size.orderedQty" mode="decimal" [showButtons]="true"
+                                        <p-inputNumber [(ngModel)]="size.orderedQty" mode="decimal" [showButtons]="true" [disabled]="!isAuthenticated"
                                             inputId="minmax-buttons" [min]="0" (ngModelChange)="
                                                 onNumberChange(
                                                     $event,
@@ -586,7 +603,7 @@ top: 4px;">
                                     class="table text-center table-bordered table-white">
                                     <thead>
                                         <tr>
-                                            <th scope="col">
+                                            <th scope="col" *ngIf="productData?.showStockAvailability != 'No'">
                                                 Available Prepacks
                                             </th>
                                             <th scope="col">Ordered</th>
@@ -595,14 +612,16 @@ top: 4px;">
                                     <tbody
                                         *ngIf="filteredColors?.length > 0 && filteredColors[currentIndex]?.sizes?.length > 0">
                                         <tr>
-                                            <td>
+                                            <td *ngIf="(productData?.showInOutStockFlag == 'ItemColorSizeLevel' || productData?.showInOutStockFlag == 'Bothlevels' ) &&  filteredColors[currentIndex]?.sizes[0]?.noOfAvailablePrepacks >0 && productData?.showStockAvailability != 'No'" class="text-success">In Stock</td>
+                                            <td *ngIf="(productData?.showInOutStockFlag == 'ItemColorSizeLevel' || productData?.showInOutStockFlag == 'Bothlevels' ) &&  filteredColors[currentIndex]?.sizes[0]?.noOfAvailablePrepacks ==0 && productData?.showStockAvailability != 'No'" class="text-danger">Out Of Stock</td>
+                                            <td *ngIf="(productData?.showInOutStockFlag != 'ItemColorSizeLevel' && productData?.showInOutStockFlag != 'Bothlevels' ) && productData?.showStockAvailability != 'No'">
                                                 {{
                                                 filteredColors[currentIndex]?.sizes[0]?.noOfAvailablePrepacks
                                                 }}
                                             </td>
                                             <td>
                                                 <p-inputNumber
-                                                    [disabled]="(orderType == 'SO' &&  !chk_Order_by_prepack[currentIndex])"
+                                                    [disabled]="(orderType == 'SO' &&  !chk_Order_by_prepack[currentIndex]) || !isAuthenticated"
                                                     [(ngModel)]="
                                                         filteredColors[currentIndex]?.sizes[0].orderedPrePacks
                                                     " mode="decimal" [showButtons]="true" inputId="minmax-buttons"
@@ -627,7 +646,7 @@ top: 4px;">
                                     <thead>
                                         <tr>
                                             <th scope="col">Size</th>
-                                            <th scope="col">Available QTY</th>
+                                            <th scope="col" *ngIf="productData?.showStockAvailability != 'No'">Available QTY</th>
                                             <th scope="col">Ordered</th>
                                         </tr>
                                     </thead>
@@ -639,9 +658,11 @@ top: 4px;">
                                                 let i = index
                                             ">
                                             <td>{{ size.label }}</td>
-                                            <td>
-                                                {{ size.stockAvailability }}
-                                            </td>
+                                            <td *ngIf="((productData?.showInOutStockFlag == 'ItemColorSizeLevel' || productData?.showInOutStockFlag == 'Bothlevels') && size.stockAvailability ==0 ) && productData?.showStockAvailability != 'No'" class="text-danger">Out of stock</td>
+
+                                            <td *ngIf="((productData?.showInOutStockFlag == 'ItemColorSizeLevel' || productData?.showInOutStockFlag == 'Bothlevels') && size.stockAvailability >0) && productData?.showStockAvailability != 'No'" class="text-success">In Stock</td>
+
+                                            <td *ngIf="((productData?.showInOutStockFlag != 'ItemColorSizeLevel' && productData?.showInOutStockFlag != 'Bothlevels') ||  productData?.showInOutStockFlag == 'ItemColorlevel') && productData?.showStockAvailability != 'No'">{{  size.stockAvailability  }}</td>
                                             <td
                                                 *ngIf="filteredColors?.length > 0 && filteredColors[currentIndex]?.sizes?.length > 0">
 
@@ -649,7 +670,7 @@ top: 4px;">
                                                     [(ngModel)]="!(orderType == 'SO'  &&  productDetails?.orderByPrePack && !chk_Order_by_prepack[currentIndex] ) ? (size.sizeRatio * filteredColors[currentIndex]?.sizes[0]?.orderedPrePacks) : filteredColors[currentIndex]?.sizes[i].orderedPrePacks"
                                                     mode="decimal" [showButtons]="true" inputId="minmax-buttons"
                                                     [min]="0"
-                                                    [disabled]="orderType != 'SO' || (orderType == 'SO' &&  chk_Order_by_prepack[currentIndex])"
+                                                    [disabled]="orderType != 'SO' || (orderType == 'SO' &&  chk_Order_by_prepack[currentIndex]) || !isAuthenticated"
                                                     (ngModelChange)="
                                                         onNumberChange(
                                                             $event,
@@ -703,9 +724,25 @@ top: 4px;">
                                             style="gap: 5px">
 
                                             <div class="d-flex" style="height: 36px;">
-                                                <img class="mt-2" [src]="attachmentBaseUrl + '/' + order.color.colorImg"
+                                                <!-- <img class="mt-2" [src]="attachmentBaseUrl + '/' + order.color.colorImg"
                                                     style="width: 24px; height: 24px; border-radius: 6px;"
-                                                    onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'" />
+                                                    onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'" /> -->
+                                                    <ng-container *ngIf="(order?.color?.colorCode || order?.color?.colorHexaCode); else showThumb">
+                                                        <div
+                                                          style="width:24px;height:24px;border-radius:6px;"
+                                                          [ngStyle]="{ 'background-color': (order?.color?.colorCode || order?.color?.colorHexaCode) }">
+                                                        </div>
+                                                      </ng-container>
+                                                      
+                                                      <ng-template #showThumb>
+                                                        <img
+                                                        [src]="attachmentBaseUrl + '/' + order.color.colorImg"
+                                                          class="mt-2"
+                                                         
+                                                          style="width: 24px; height: 24px; border-radius: 6px;"
+                                                        />
+                                                      </ng-template>
+                                                      
                                                 <div>
                                                     <p class="ml-2 mb-0" style="
                                     font-style: normal;
@@ -896,7 +933,7 @@ top: 4px;">
                             </div>
                         </div>
                         <div class="p-3">
-                            <button [disabled]="orderSummary.length == 0" (click)="addToShoppingCart()"
+                            <button [disabled]="orderSummary.length == 0 || !isAuthenticated" (click)="addToShoppingCart()"
                                 class="btn m-0 add-btn">
                                 Add To Shopping Cart
                             </button>
@@ -931,15 +968,20 @@ top: 4px;">
                         <div class="col-md-8">
                             <p>{{ productDetails?.entityObjectTypeName }}</p>
                             <p>{{ productDetails?.code }}</p>
-                            <p>
+                            <p *ngIf="productDetails
+                            ?.entityDepartmentsNames.items.length >0">
                                 <span class="mr-2 p-2 border" *ngFor="
                                         let item of productDetails
                                             ?.entityDepartmentsNames.items
                                     ">{{ item }}</span>
                             </p>
-                            <p>{{ productDetails?.brand }}</p>
-                            <p>{{ productDetails?.soldOutDate }}</p>
-                            <p>{{ productDetails?.startShipDate }}</p>
+                            <p *ngIf="productDetails
+                            ?.entityDepartmentsNames.items.length  ==0">
+                              -
+                            </p>
+                            <p>{{ productDetails?.brand ? productDetails?.brand : '-' }} <img *ngIf="productDetails?.brandAttchment" style="width: 60px;height: 60px;" [src]="attachmentBaseUrl + '/' + productDetails?.brandAttchment" alt="" srcset=""></p>
+                            <p>{{ productDetails?.soldOutDate ? productDetails?.soldOutDate : '-' }}</p>
+                            <p>{{ productDetails?.startShipDate ? productDetails?.startShipDate : '-' }}</p>
                         </div>
                     </div>
                 </div>
@@ -947,6 +989,68 @@ top: 4px;">
 
 
             <div></div>
+            
+            <div class="bg-white rounded p-4 m-2 mb-4">
+                <h4>Related products</h4>
+              
+                <!-- ≤ 4 → grid -->
+                <ng-container *ngIf="(relatedTotal || 0) <= 4; else relatedCarousel">
+                  <div class="row gx-3">
+                    <div class="col-6 col-md-4 col-lg-3" *ngFor="let product of relatedItems">
+                      <div class="px-2 my-2">
+                        <app-prodcut-card
+                          [product]="product.appItem"
+                          [productCard]="product"
+                          (prodcutId)="openRelatedProduct($event)"
+                        ></app-prodcut-card>
+                      </div>
+                    </div>
+                    <h6 *ngIf="relatedItems.length ==0" class="mx-auto">No items ...</h6>
+                  </div>
+                </ng-container>
+              
+                <!-- > 4 → carousel, lazy-load next 4 on arrow -->
+                <ng-template #relatedCarousel>
+                    <p-carousel
+                      [value]="relatedItemsUi"
+                      [numVisible]="4"
+                      [numScroll]="4"
+                      [circular]="false"
+                      [showIndicators]="false"
+                      [showNavigators]="true"
+                      [responsiveOptions]="[
+                        { breakpoint: '1199px', numVisible: 3, numScroll: 3 },
+                        { breakpoint: '991px',  numVisible: 2, numScroll: 2 },
+                        { breakpoint: '575px',  numVisible: 1, numScroll: 1 }
+                      ]"
+                      (onPage)="onRelatedPage($event)"
+                      class="p-4 m-2 rounded"
+                    >
+                      <ng-template pTemplate="item" let-product>
+                        <!-- Ghost page (loading placeholder) -->
+                        <div *ngIf="product?.__ghost" class="px-2 my-2">
+                          <div class="card p-4 text-center">
+                            <p class="mb-2">Loading more related products…</p>
+                            <div
+                              class="w-100"
+                              style="height: 150px; border-radius: 8px; background: #f5f5f5;"
+                            ></div>
+                          </div>
+                        </div>
+                  
+                        <!-- Real product -->
+                        <div *ngIf="!product?.__ghost" class="px-2 my-2">
+                          <app-prodcut-card
+                            [product]="product.appItem"
+                            [productCard]="product"
+                          ></app-prodcut-card>
+                        </div>
+                      </ng-template>
+                    </p-carousel>
+                  </ng-template>
+                  
+              </div>
+              
             <div class="mb-2 p-2 m-2 bg-white rounded row">
              <div class="col-lg-4 col-6">
             <app-overallRating [overRating]="overRating"  ></app-overallRating>
@@ -1023,7 +1127,7 @@ top: 4px;">
 
                                     <div class="price mb-4" style="font-size: 12px !important;white-space: nowrap;">
                                         <!-- show msrp price and range in this product has no special pricing -->
-                                        <div class="msrp d-flex mb-2">
+                                        <div class="msrp d-flex mb-2"  *ngIf="productData?.showMSRP == 'Yes'">
                                             <h5 class="mr-2" style="color: black !important;font-size: 12px;">{{languageSettingName!='en-GB' ? "MSRP"  :  "RRP"  }}:
                                             </h5>
                                             <h5>
@@ -1042,7 +1146,7 @@ top: 4px;">
                                             <h5 *ngIf="
                                                     productDetails?.minMSRP !==
                                                     productDetails?.maxMSRP
-                                                ">
+                                                " >
 
                                                 {{
                                                 currencySymbol
@@ -1059,7 +1163,7 @@ top: 4px;">
 
 
 
-                                                    <h5 *ngIf="productDetails?.maxSpecialPrice && showEditSpecialPrice">
+                                                    <h5 *ngIf="productDetails?.maxSpecialPrice && showEditSpecialPrice" >
 
                                                         {{ currencySymbol }} {{ (productDetails?.maxSpecialPrice || 0) | number:'1.2-2' }}
                                                     </h5>
@@ -1127,9 +1231,12 @@ top: 4px;">
                                             </div>
                                         </div>
 
+                                        <h6 *ngIf="productDetails?.stockAvailability ==0 && productData?.showWarningLabelMajorOutStockFlag == 'True'" class="text-danger">{{Warningmessage}}</h6>
 
                                     </div>
                                 </div>
+
+
                             </div>
 
                             <hr style="
@@ -1175,7 +1282,12 @@ top: 4px;">
                                         [title]="color.colorName" position="top" class="imagAndHexaCode"
                                         tooltipPositionStyleClass="custom-tooltip">
 
-
+                                        <h6 *ngIf="productData?.showInOutStockFlag == 'ItemColorlevel' ||  productData?.showInOutStockFlag == 'Bothlevels'"
+                                        class="mb-1" style="margin-right: 10px;"
+                                        [ngClass]="hasColorStock(color) ? 'text-success' : 'text-danger'"
+                                      >
+                                        {{ hasColorStock(color) ? 'In stock' : 'Out of stock' }}
+                            </h6>
                                         <div style=" margin-right :10px;    border-top-right-radius: 6px;    border-top-left-radius: 6px;"
                                             [ngClass]="
                                         i === currentIndex
@@ -1265,7 +1377,7 @@ top: 4px;">
                                     <thead>
                                         <tr>
                                             <th scope="col">Size</th>
-                                            <th scope="col">Available QTY</th>
+                                            <th scope="col" *ngIf="productData?.showStockAvailability != 'No'">Available QTY</th>
                                             <th scope="col">Ordered</th>
                                         </tr>
                                     </thead>
@@ -1276,9 +1388,13 @@ top: 4px;">
                                                     let i = index
                                                 ">
                                             <td>{{ size.label }}</td>
-                                            <td>{{ size.stockAvailability }}</td>
+                                            <td *ngIf="((productData?.showInOutStockFlag == 'ItemColorSizeLevel' || productData?.showInOutStockFlag == 'Bothlevels') && size.stockAvailability ==0 ) && productData?.showStockAvailability != 'No'" class="text-danger">Out of stock</td>
+
+                                            <td *ngIf="((productData?.showInOutStockFlag == 'ItemColorSizeLevel' || productData?.showInOutStockFlag == 'Bothlevels') && size.stockAvailability >0 ) && productData?.showStockAvailability != 'No'" class="text-success">In Stock</td>
+
+                                            <td *ngIf="((productData?.showInOutStockFlag != 'ItemColorSizeLevel' && productData?.showInOutStockFlag != 'Bothlevels' ) ||  productData?.showInOutStockFlag == 'ItemColorlevel') && productData?.showStockAvailability != 'No'">{{  size.stockAvailability  }}</td>
                                             <td>
-                                                <p-inputNumber [(ngModel)]="size.orderedQty" mode="decimal"
+                                                <p-inputNumber [(ngModel)]="size.orderedQty" mode="decimal" [disabled]="!isAuthenticated"
                                                     [showButtons]="true" inputId="minmax-buttons" [min]="0"
                                                     (ngModelChange)="
                                                             onNumberChange(
@@ -1343,7 +1459,7 @@ top: 4px;">
                                             class="table text-center table-bordered table-white">
                                             <thead>
                                                 <tr>
-                                                    <th scope="col">
+                                                    <th *ngIf="productData?.showStockAvailability != 'No'" scope="col">
                                                         Available Prepacks
                                                     </th>
                                                     <th scope="col">Ordered</th>
@@ -1351,7 +1467,9 @@ top: 4px;">
                                             </thead>
                                             <tbody>
                                                 <tr>
-                                                    <td>
+                                                    <td *ngIf="(productData?.showInOutStockFlag == 'ItemColorSizeLevel' && productData?.showInOutStockFlag == 'Bothlevels' ) &&  filteredColors[currentIndex]?.sizes[0]?.noOfAvailablePrepacks >0 && productData?.showStockAvailability != 'No'" class="text-success">In Stock</td>
+                                                    <td *ngIf="(productData?.showInOutStockFlag == 'ItemColorSizeLevel' || productData?.showInOutStockFlag == 'Bothlevels' ) &&  filteredColors[currentIndex]?.sizes[0]?.noOfAvailablePrepacks ==0 && productData?.showStockAvailability != 'No'" class="text-danger">Out Of Stock</td>
+                                                    <td *ngIf="(productData?.showInOutStockFlag != 'ItemColorSizeLevel' || productData?.showInOutStockFlag != 'Bothlevels' ) && productData?.showStockAvailability != 'No'">
                                                         {{
                                                         filteredColors[currentIndex]?.sizes[0]?.noOfAvailablePrepacks
                                                         }}
@@ -1359,7 +1477,7 @@ top: 4px;">
                                                     <td
                                                         *ngIf="filteredColors?.length > 0 && filteredColors[currentIndex]?.sizes?.length > 0">
                                                         <p-inputNumber
-                                                            [disabled]="(orderType == 'SO' &&  !chk_Order_by_prepack[currentIndex])"
+                                                            [disabled]="(orderType == 'SO' &&  !chk_Order_by_prepack[currentIndex]) || !isAuthenticated"
                                                             [(ngModel)]="
                                                                     filteredColors[currentIndex]?.sizes[0]
                                                                         .orderedPrePacks
@@ -1385,7 +1503,7 @@ top: 4px;">
                                             <thead>
                                                 <tr>
                                                     <th scope="col">Size</th>
-                                                    <th scope="col">Available QTY</th>
+                                                    <th scope="col" *ngIf="productData?.showStockAvailability != 'No'">Available QTY</th>
                                                     <th scope="col">Ordered</th>
                                                 </tr>
                                             </thead>
@@ -1397,9 +1515,10 @@ top: 4px;">
                                                             let i = index
                                                         ">
                                                     <td>{{ size.label }}</td>
-                                                    <td>
-                                                        {{ size.stockAvailability }}
-                                                    </td>
+                                                    <td *ngIf="((productData?.showInOutStockFlag == 'ItemColorSizeLevel' || productData?.showInOutStockFlag == 'Bothlevels') && size.stockAvailability ==0 ) && productData?.showStockAvailability != 'No'" class="text-danger">Out of stock</td>
+
+                                                    <td *ngIf="((productData?.showInOutStockFlag == 'ItemColorSizeLevel' || productData?.showInOutStockFlag == 'Bothlevels') && size.stockAvailability >0 ) && productData?.showStockAvailability != 'No'" class="text-success">In Stock</td>
+                                                    <td *ngIf="((productData?.showInOutStockFlag != 'ItemColorSizeLevel') ) && productData?.showStockAvailability != 'No'">{{  size.stockAvailability  }}</td>
                                                     <td
                                                         *ngIf="filteredColors?.length > 0 && filteredColors[currentIndex]?.sizes?.length > 0">
 
@@ -1407,7 +1526,7 @@ top: 4px;">
                                                             [(ngModel)]="!(orderType == 'SO'  &&  productDetails?.orderByPrePack && !chk_Order_by_prepack[currentIndex] ) ? (size.sizeRatio * filteredColors[currentIndex]?.sizes[0]?.orderedPrePacks) : filteredColors[currentIndex]?.sizes[i].orderedPrePacks"
                                                             class="input-custom" mode="decimal" [showButtons]="true"
                                                             inputId="minmax-buttons" [min]="0"
-                                                            [disabled]="orderType != 'SO' || (orderType == 'SO' &&  chk_Order_by_prepack[currentIndex])"
+                                                            [disabled]="orderType != 'SO' || (orderType == 'SO' &&  chk_Order_by_prepack[currentIndex]) || !isAuthenticated"
                                                             (ngModelChange)="
                                                                     onNumberChange(
                                                                         $event,
@@ -1476,10 +1595,26 @@ top: 4px;">
                                         ">
                                             <div class="orderHeader  d-flex align-items-center justify-content-between">
                                                 <div class="d-flex" style="height: 36px;">
-                                                    <img class="mt-2"
+                                                    <!-- <img class="mt-2"
                                                         [src]="attachmentBaseUrl + '/' + order.color.colorImg"
                                                         style="width: 24px; height: 24px; border-radius: 6px;"
-                                                        onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'" />
+                                                        onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'" /> -->
+                                                        <ng-container *ngIf="(order?.color?.colorCode || order?.color?.colorHexaCode); else showThumb">
+                                                            <div
+                                                              style="width:24px;height:24px;border-radius:6px;"
+                                                              [ngStyle]="{ 'background-color': (order?.color?.colorCode || order?.color?.colorHexaCode) }">
+                                                            </div>
+                                                          </ng-container>
+                                                          
+                                                          <ng-template #showThumb>
+                                                            <img
+                                                            [src]="attachmentBaseUrl + '/' + order.color.colorImg"
+                                                              class="mt-2"
+                                                             
+                                                              style="width: 24px; height: 24px; border-radius: 6px;"
+                                                            />
+                                                          </ng-template>
+                                                          
                                                     <div>
                                                         <p class="ml-2 mb-0" style="
                                             font-style: normal;
@@ -1657,7 +1792,7 @@ top: 4px;">
                                 </div>
                                 <div class="p-3">
 
-                                    <button [disabled]="orderSummary.length == 0" (click)="addToShoppingCart()"
+                                    <button [disabled]="orderSummary.length == 0 || !isAuthenticated" (click)="addToShoppingCart()"
                                         class="btn m-0 add-btn">
                                         Add To Shopping Cart
                                     </button>
@@ -1693,7 +1828,7 @@ top: 4px;">
                                                     ?.entityDepartmentsNames.items
                                             ">{{ item }}</span>
                                         </p>
-                                        <p>{{ productDetails?.brand }}</p>
+                                        <p>{{ productDetails?.brand }} <img *ngIf="productDetails?.brandAttchment" style="width: 60px;height: 60px;" [src]="attachmentBaseUrl + '/' + productDetails?.brandAttchment" alt="" srcset=""></p>
                                         <p>{{ productDetails?.soldOutDate }}</p>
                                         <p>{{ productDetails?.startShipDate }}</p>
                                     </div>
@@ -1712,7 +1847,7 @@ top: 4px;">
                         </div>
                        </div>
                        <div class=" p-4 m-2 bg-white rounded">
-                           <app-questions [entityID]="productBodyData?.id" ></app-questions>
+                           <app-questions *ngIf="isAuthenticated" [entityID]="productBodyData?.id" ></app-questions>
                        </div>
 
 

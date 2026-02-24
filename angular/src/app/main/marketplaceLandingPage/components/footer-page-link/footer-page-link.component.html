@@ -1,0 +1,27 @@
+  <!-- <div class=" row mx-4" > -->
+    <div class="col-4">
+      <h5 class="text-white">{{sectionData?.title}}</h5>
+    <div *ngFor="let s of pageLiksData" class=" text-white">
+      <a
+      
+      [attr.target]="s?.name === 'Contact Us' ? null : '/app/main/Home'"
+      (click)="onMenuClick($event, s)"
+      class="text-white"
+      [ngClass]="{ 'hover-blue': true }"
+    >
+      {{ s?.name }}
+    </a>
+    
+     
+     </div>
+     <!-- <button *ngIf="s.name == 'contactus'" class="btn btn-sm btn-light mt-3"
+     (click)="contactUsModal.show()">
+Contact us
+</button> -->
+
+    </div>
+
+
+    <app-contact-us-modal #contactUsModal></app-contact-us-modal>
+
+<!-- </div>    -->
