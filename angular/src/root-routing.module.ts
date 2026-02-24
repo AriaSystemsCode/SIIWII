@@ -8,8 +8,8 @@ const routes: Routes = [
         loadChildren: () => import('account/account.module').then(m => m.AccountModule), //Lazy load account module
         data: { preload: true }
     },
-    { path: '', redirectTo: '/app/main/dashboard', pathMatch: 'full' },
-    { path: '**', redirectTo: '/app/main/dashboard' }
+    { path: '', redirectTo: '/app/main/dashboards/my-dashboards', pathMatch: 'full' },
+    { path: '**', redirectTo: '/app/main/dashboards/my-dashboards' }
 ];
 
 @NgModule({

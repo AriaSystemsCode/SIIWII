@@ -1,0 +1,200 @@
+.mainDiv{
+
+padding: 14px;
+min-height: 70vh;
+
+background: #FFFFFF;
+border: 1px solid #EEEEEE;
+box-shadow: 4px 4px 10px rgba(22, 22, 22, 0.15);
+border-radius: 20px;
+
+}
+
+.my-dashboards-page {
+    padding-top: 10px;
+  }
+  
+  .page-title {
+    font-weight: 700;
+    font-size: 26px;
+    color: #1b101b;
+  }
+  
+  .create-btn {
+    background: #4a0d4a;
+    border: none;
+    border-radius: 10px;
+    padding: 12px 18px;
+    font-weight: 600;
+    box-shadow: 0 8px 18px rgba(74, 13, 74, 0.18);
+    color: #FFFFFF;
+  }
+  .create-btn:hover {
+    background: #4a0d4a;
+  }
+  
+  .main-card {
+    border-radius: 14px;
+    border: 1px solid #ebedf2;
+  }
+  
+  :host ::ng-deep .dashboards-table .p-datatable-thead > tr > th {
+    font-weight: 700;
+    color: #1b101b;
+    background: #fff;
+    border-bottom: 1px solid #ebedf2;
+    padding: 14px 16px;
+    white-space: nowrap;
+  }
+  
+  :host ::ng-deep .dashboards-table .p-datatable-tbody > tr > td {
+    padding: 14px 16px;
+    border-bottom: 1px solid #f0f1f5;
+    vertical-align: middle;
+  }
+  
+  .dash-link {
+    color: #1b101b;
+    font-weight: 700;
+    text-decoration: none;
+  }
+  .dash-link:hover {
+    color: #4a0d4a;
+    text-decoration: underline;
+  }
+  
+  .owner-cell .owner-name {
+    font-weight: 600;
+    color: #595959;
+  }
+  
+  /* Avatars */
+  .avatar {
+    border-radius: 50%;
+    object-fit: cover;
+    background: #f3f6f9;
+    border: 2px solid #fff;
+  }
+  .avatar-md {
+    width: 34px;
+    height: 34px;
+  }
+  .avatar-sm {
+    width: 28px;
+    height: 28px;
+  }
+  
+  /* Sharing stack */
+  .avatar-stack {
+    display: inline-flex;
+    align-items: center;
+    position: relative;
+    padding-left: 6px;
+  }
+  
+  .stacked {
+    margin-left: -10px;
+    box-shadow: 0 0 0 1px rgba(0,0,0,0.05);
+  }
+  
+  .more {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 12px;
+    color: #4a0d4a;
+    background: #f2e9f2;
+  }
+  
+  /* Overlay panel */
+//   :host ::ng-deep .share-panel.p-overlaypanel {
+//     border-radius: 12px;
+//     border: 1px solid #ebedf2;
+//     box-shadow: 0 14px 30px rgba(22, 22, 22, 0.18);
+//     padding: 10px;
+//     min-width: 240px;
+//   }
+  
+//   .share-panel-title {
+//     font-weight: 800;
+//     color: #1b101b;
+//   }
+  
+//   .share-user {
+//     padding: 8px 6px;
+//     border-radius: 10px;
+//   }
+//   .share-user:hover {
+//     background: #f7f7fb;
+//   }
+  
+  /* Responsive small tweaks */
+  @media (max-width: 575.98px) {
+    .page-title {
+      font-size: 20px;
+    }
+    .create-btn {
+      padding: 10px 14px;
+      border-radius: 10px;
+    }
+  }
+
+
+
+  .page-header {
+    gap: 20px;
+  }
+  
+  .search-box input {
+    width: 320px;
+    border-radius: 12px;
+    height: 44px;
+    padding-left: 38px;
+  }
+  
+  .search-box .pi {
+    left: 12px;
+    font-size: 14px;
+    color: #777;
+  }
+  
+  .create-btn {
+    background: #4a0d4a;
+    border: none;
+    border-radius: 12px;
+    padding: 12px 20px;
+    font-weight: 600;
+    box-shadow: 0 8px 18px rgba(74, 13, 74, 0.18);
+  }
+
+  @media (max-width: 991.98px) {
+    .search-box input {
+      width: 200px;
+    }
+  }
+  
+  @media (max-width: 575.98px) {
+    .page-header {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 12px;
+    }
+  
+    .flex-grow-1 {
+      justify-content: flex-start !important;
+    }
+  
+    .search-box input {
+      width: 100%;
+    }
+  
+    .create-btn {
+      width: 100%;
+    }
+  }
+th{
+        background-color: #f4f4f4 !important;
+      
+    
+}

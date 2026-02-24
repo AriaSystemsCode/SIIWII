@@ -173,10 +173,15 @@ import { DashboardComponent } from "./dashboard/dashboard.component";
                     // { path: 'systemObjects/sycEntityObjectTypes', component: SycEntityObjectTypesComponent, data: { permission: 'Pages.SycEntityObjectTypes' }  },
                     // { path: 'systemObjects/sydObjects', component: SydObjectsComponent, data: { permission: 'Pages.SydObjects' }  },
                     // { path: 'systemObjects/sysObjectTypes', component: SysObjectTypesComponent, data: { permission: 'Pages.SysObjectTypes' }  },
+                    // {
+                    //     path: "dashboard",
+                    //     component: DashboardComponent,
+                    //     data: { permission: "Pages.Tenant.Dashboard" },
+                    // },
                     {
-                        path: "dashboard",
-                        component: DashboardComponent,
-                        data: { permission: "Pages.Tenant.Dashboard" },
+                        path: 'dashboards',
+                        loadChildren: () => import('./dashboard/dashboard.module').then(m => m.DashboardModule),
+                        data: { preload: true }
                     },
                     //Esraa [Start]
                     // { path: 'Messages', component: MessagesComponent },
@@ -207,7 +212,7 @@ import { DashboardComponent } from "./dashboard/dashboard.component";
                         },
                     },
                     // { path: '**', redirectTo: '/app/main/dashboard'}
-                    { path: "**", redirectTo: "dashboard" },
+                    { path: "**", redirectTo: "/app/main/dashboards/my-dashboards" },
                 ],
             },
         ]),

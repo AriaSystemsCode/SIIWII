@@ -24,7 +24,7 @@ export class DashboardComponent extends AppComponentBase {
     }
 
     async redirectTo() {
-        debugger;
+  
       this.router.navigate(['/app/main/Home'])
         
         if (this.appSession.tenantId && !this.appSession.user.accountId)

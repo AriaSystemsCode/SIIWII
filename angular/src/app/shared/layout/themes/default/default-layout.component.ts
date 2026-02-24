@@ -64,6 +64,7 @@ export class DefaultLayoutComponent extends ThemesLayoutBaseComponent implements
         this.installationMode = UrlHelper.isInstallUrl(location.href);
         this.getSidebarInfo();
         this.menu = this._appNavigationService.getMenu();
+        console.log(this.menu,'menue')
    
         this.currentRouteUrl = this._router.url.split(/[?#]/)[0];
    
