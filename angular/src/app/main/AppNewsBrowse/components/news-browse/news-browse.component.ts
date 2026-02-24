@@ -77,7 +77,7 @@ export class NewsBrowseComponent extends AppComponentBase {
     get startDateCtrl () { return this.filterForm.get('startDate') }
     get endDateCtrl () { return this.filterForm.get('endDate') }
     totalCount:number
-    filterVisible:boolean 
+    filterVisible:boolean  = true
 
     currentLang: string = 'en';
     isArabic: boolean = false;
@@ -96,14 +96,17 @@ export class NewsBrowseComponent extends AppComponentBase {
         super(injector);
     }
 
-    initFilterForm(){
+    initFilterForm() {
         this.filterForm = this._fb.group({
-            search :[],
-            filterType:[],
-            sorting:[],
-            dateRange: [null]
-        })
-    }
+          search: [],
+          filterType: [],
+          sorting: [],
+          dateRange: [null],
+
+          startDate: [undefined],
+          endDate: [undefined],
+        });
+      }
 
         onshowViewPost($event) {
         this.viewPostModal.show($event);
@@ -155,18 +158,18 @@ export class NewsBrowseComponent extends AppComponentBase {
             const timeZoneControl = this._fb.control(undefined)
             this.filterForm.addControl("timeZone",timeZoneControl)
         }
-        if(flags.startDate){
-            const StartDateControl = this._fb.control(undefined)
-            this.filterForm.addControl("startDate",StartDateControl)
-        }
+        // if(flags.startDate){
+        //     const StartDateControl = this._fb.control(undefined)
+        //     this.filterForm.addControl("startDate",StartDateControl)
+        // }
         if(flags.startTime){
             const StartTimeControl = this._fb.control(undefined)
             this.filterForm.addControl("startTime",StartTimeControl)
         }
-        if(flags.endDate){
-            const EndtDateControl = this._fb.control(undefined)
-            this.filterForm.addControl("endDate",EndtDateControl)
-        }
+        // if(flags.endDate){
+        //     const EndtDateControl = this._fb.control(undefined)
+        //     this.filterForm.addControl("endDate",EndtDateControl)
+        // }
         if(flags.endTime){
             const EndTimeControl = this._fb.control(undefined)
             this.filterForm.addControl("endTime",EndTimeControl)
@@ -190,6 +193,12 @@ export class NewsBrowseComponent extends AppComponentBase {
         // if(flags.startDate && flags.endDate){
         //     // this.filterForm.setAsyncValidators()
         // }
+        if (flags.startDate && !this.filterForm.get('startDate')) {
+            this.filterForm.addControl('startDate', this._fb.control(undefined));
+          }
+          if (flags.endDate && !this.filterForm.get('endDate')) {
+            this.filterForm.addControl('endDate', this._fb.control(undefined));
+          }
     }
 
     ngOnInit(): void {
@@ -232,7 +241,7 @@ export class NewsBrowseComponent extends AppComponentBase {
         this.subscribeToFiltersChangeAndApplyFilteration();
         this.defineSortingOptions();
         this.fillFormFilters()
-        this.bindDateRangeToStartEnd();
+        // this.bindDateRangeToStartEnd();
         this.setMainPageFilter(this.defaultMainFilter)
         this.setDefaultSorting(this.sortingOptions[0].value)
     }
@@ -605,25 +614,52 @@ export class NewsBrowseComponent extends AppComponentBase {
         this.relatedEntityId=0;
     }
 
+    // private bindDateRangeToStartEnd() {
+    //     const dateRangeCtrl = this.filterForm.get('dateRange');
+    //     if (!dateRangeCtrl) return;
+      
+    //     const sub = dateRangeCtrl.valueChanges.subscribe((range: Date[]) => {
+    //       const start = range?.[0] ?? undefined;
+    //       const end = range?.[1] ?? undefined;
+      
+    //       if (this.filterForm.get('startDate')) {
+    //         this.filterForm.get('startDate')!.setValue(start, { emitEvent: false });
+    //       }
+    //       if (this.filterForm.get('endDate')) {
+    //         this.filterForm.get('endDate')!.setValue(end, { emitEvent: false });
+    //       }
+    //     });
+      
+    //     this.subscriptions.push(sub);
+    //   }
+
     private bindDateRangeToStartEnd() {
         const dateRangeCtrl = this.filterForm.get('dateRange');
         if (!dateRangeCtrl) return;
       
-        const sub = dateRangeCtrl.valueChanges.subscribe((range: Date[]) => {
-          const start = range?.[0] ?? undefined;
-          const end = range?.[1] ?? undefined;
+        const sub = dateRangeCtrl.valueChanges
+          .pipe(debounceTime(300)) 
+          .subscribe((range: Date[]) => {
+            const start = range?.[0] ?? undefined;
+            const end = range?.[1] ?? undefined;
+    
+            this.filterForm.get('startDate')?.setValue(start, { emitEvent: false });
+            this.filterForm.get('endDate')?.setValue(end, { emitEvent: false });
       
-          if (this.filterForm.get('startDate')) {
-            this.filterForm.get('startDate')!.setValue(start, { emitEvent: false });
-          }
-          if (this.filterForm.get('endDate')) {
-            this.filterForm.get('endDate')!.setValue(end, { emitEvent: false });
-          }
-        });
+       
+            if (start && end && moment(start).isAfter(moment(end))) {
+              this.dateErrorMessage = this.l('InvalidDateRangeError');
+              return;
+            }
+            this.dateErrorMessage = '';
+
+            if (start && end && !this.isConfirming) {
+              this.getFreshData();
+            }
+          });
       
         this.subscriptions.push(sub);
       }
-
       filtersDialogVisible = false;
 
 openFiltersDialog() {
@@ -643,4 +679,7 @@ get videosGridClass(): string {
 
     return this.filterVisible ? 'v-grid-with-filter' : 'v-grid-no-filter';
   }
+
+
 }
+

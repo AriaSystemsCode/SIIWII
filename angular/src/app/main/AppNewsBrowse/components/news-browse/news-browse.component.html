@@ -37,12 +37,12 @@
                                     <div class="list-toolbar-divider"></div> -->
 
                                     <div class="text-center d-flex" >
-                                        <a  [title]="'ResetData' | localize" class="btn  font-weight-normal text-center toolbar-btn resetBtn" (click)="resetList()">
+                                        <a  [title]="'ResetData' | localize" class="btn  font-weight-normal text-center toolbar-btn resetBtn mx-1" (click)="resetList()">
                                             <i  class="d-inline-block w-100 flaticon2-reload icon-center p-0"></i>
                                         </a>
-                                        <a [title]="'ToggleView' | localize" (click)="triggerListView()" class="btn  font-weight-normal  text-center toggleBtn toolbar-btn mx-2">
+                                        <!-- <a [title]="'ToggleView' | localize" (click)="triggerListView()" class="btn  font-weight-normal  text-center toggleBtn toolbar-btn mx-2">
                                             <i  class="d-inline-block w-100 p-0 " [ngClass]="singleItemPerRowMode ? 'flaticon2-menu' : 'fa-bars fas'"></i>
-                                        </a>
+                                        </a> -->
 
                                         <button
                                       
@@ -77,6 +77,7 @@
                                         [filterForm]="filterForm"
                                         [filtersFlags]="filtersFlags"
                                         [dateErrorMessage]="dateErrorMessage"
+                                        (applyFilters)="getFreshData()"
                                     ></app-news-browse-filters>
                             </div>
                             <div  class="col d-flex flex-column justify-content-between app-items-container thin-scroll " >
