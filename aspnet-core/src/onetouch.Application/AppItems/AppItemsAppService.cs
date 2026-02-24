@@ -5941,11 +5941,25 @@ namespace onetouch.AppItems
             return returnList;
         }
         public async Task<List<ImportItemReturnDto>> ValidateImportItemData(ImportItemInputDto itemExcelDto,
-            Dictionary<string,long> existingItems , List<CurrencyInfoDto> currencyIds)
+            Dictionary<string,long> existingItems =null, List<CurrencyInfoDto> currencyIds=null)
         {
             if (itemExcelDto.NoOfDimensions == null) { itemExcelDto.NoOfDimensions = "1"; }
 
             //List<CurrencyInfoDto> currencyIds = await _appEntitiesAppService.GetAllCurrencyForTableDropdown();
+            if(currencyIds==null)
+            { currencyIds = await _appEntitiesAppService.GetAllCurrencyForTableDropdown(); }
+            if(existingItems == null)
+            {
+                existingItems = _appItemRepository.GetAll()
+                    .Where(x => x.ItemType == 0 && !string.IsNullOrEmpty(x.Code))
+                    .Select(x => new
+                    {
+                        Code = x.Code.Replace(" ", "").ToUpper(),
+                        x.Id
+                    })
+                    .GroupBy(x => x.Code)
+                    .ToDictionary(g => g.Key, g => g.First().Id);
+            }
             List<ImportItemReturnDto> returnList = new List<ImportItemReturnDto>();
             //foreach (var itemExcelDto in input) 
             {
@@ -8353,13 +8367,13 @@ namespace onetouch.AppItems
                             });
                             //RenameFileToGuid(excelDto.image, Path.GetFileNameWithoutExtension(excelDto.image));
                             //string guid = System.Guid.NewGuid().ToString();
-                            thirdItemCopy.ExcelDto.Images.Add(new AppItemImage
-                            {
-                                ImageFileName = Path.GetFileName(excelDto.ExcelDto.ImagePreview),
-                                ImageGuid = Path.GetFileNameWithoutExtension(excelDto.image),
-                                IsDefault = excelDto.ExcelDto.ImageIsDefault,
-                                Attributes = "101=" + excelDto.ExcelDto.Code.Split('-')[1]
-                            });
+                            //thirdItemCopy.ExcelDto.Images.Add(new AppItemImage
+                            //{
+                            //    ImageFileName = Path.GetFileName(excelDto.ExcelDto.ImagePreview),
+                            //    ImageGuid = Path.GetFileNameWithoutExtension(excelDto.image),
+                            //    IsDefault = excelDto.ExcelDto.ImageIsDefault,
+                            //    Attributes = "101=" + excelDto.ExcelDto.Code.Split('-')[1]
+                            //});
                             //RenameFileToGuid(excelDto.image, Path.GetFileNameWithoutExtension(excelDto.image));
                             thirdItemCopy.ExcelDto.Actions = "";
                             childNo += 1;
