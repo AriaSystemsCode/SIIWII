@@ -718,6 +718,16 @@ namespace onetouch.Helpers
                 return obj.Id;
             }
         }
+
+        public async Task<long> GetEntityObjectCharges()
+        {
+            using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
+            {
+                var obj = await _sycEntityObjectStatus.FirstOrDefaultAsync(x => x.Code == "CHARGES" && x.ObjectCode == "ITEM");
+                return obj.Id;
+            }
+        }
+
         public async Task<long> GetEntityObjectStatusActiveTransaction()
         {
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))

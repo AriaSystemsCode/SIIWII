@@ -1304,7 +1304,7 @@ namespace onetouch.Accounts
                 //I40
                 .FirstOrDefaultAsync(x => x.Id == id);
                 var currentAccount = await _appContactRepository.GetAll().Where(z => z.TenantId == AbpSession.TenantId && z.IsProfileData == true && z.ParentId == null).FirstOrDefaultAsync();
-
+                 
                 var entity = await _appEntityRepository.GetAll()
                     .Include(x => x.EntityClassifications).ThenInclude(x => x.EntityObjectClassificationFk)
                     .Include(x => x.EntityCategories).ThenInclude(x => x.EntityObjectCategoryFk)
@@ -1589,7 +1589,8 @@ namespace onetouch.Accounts
                                 || (z.RecipientContactSSIN == currentAccount.SSIN && z.RequesterContactSSIN == account.SSIN))
                                ).OrderByDescending(z => z.CreationTime).FirstOrDefaultAsync();
                 if (relationship != null)
-                {
+                {   output.RelationId = relationship.Id;
+
                     var relationshipCode = await _appEntityRepository.GetAll().Include(z => z.EntityExtraData).Where(z => z.Code == relationship.EntityObjectTypeCode).FirstOrDefaultAsync();
                     if (relationshipCode != null)
                     {

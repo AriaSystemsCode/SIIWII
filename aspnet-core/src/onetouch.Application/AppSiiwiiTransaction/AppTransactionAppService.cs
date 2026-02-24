@@ -1857,6 +1857,9 @@ namespace onetouch.AppSiiwiiTransaction
                 return obj.Id;
             }
 
+            #region calculate charges
+            AddTransactionCharges(input.Id);
+            #endregion
         }
 
         public async Task<GetAppTransactionsForViewDto> __GetAppTransactionsForView(long transactionId, GetAllAppTransactionsInputDto? input, TransactionPosition? position)
@@ -7607,6 +7610,102 @@ namespace onetouch.AppSiiwiiTransaction
                     _appEntityLogRepository.Insert(logExist);
                     CurrentUnitOfWork.SaveChanges();
                 }
+            }
+        }
+        public async Task AddTransactionCharges(long pTransactionID)
+        {
+            // Delete all AppTransactionDetails where TransactionId = pTransactionID and Code = "CHARGES"
+            await _appTransactionDetails.DeleteAsync(x => x.TransactionId == pTransactionID && x.Code == "CHARGES");
+            var entityObjectStatusId = await _helper.SystemTables.GetEntityObjectStatusDraftTransaction();
+            var entityObjectChargesId = await _helper.SystemTables.GetEntityObjectCharges();
+            
+            // Get all entities from AppEntity repository
+            var transactionChargeEntities = await _appEntity
+                .GetAll()
+                .Include(e => e.EntityExtraData)
+                .Where(e => e.ObjectCode == "lookup" && e.EntityObjectTypeCode == "TRANSACTIONCHARGES")
+                .ToListAsync();
+
+            // Loop through each transactionChargeEntity
+            foreach (var transactionChargeEntity in transactionChargeEntities)
+            {
+                    // Initialize variables before processing extraData
+                    var ItemSSIN = string.Empty;
+                    var IsEditable = string.Empty;
+                    //var ChargeType = 0;
+                    var CalculationAPI = string.Empty;
+                    var ChargeName = transactionChargeEntity.Name;
+
+                // Loop through the EntityExtraData list for each entity
+                foreach (var extraData in transactionChargeEntity.EntityExtraData)
+                {
+
+                    // Switch case to handle AttributeId
+                    switch (extraData.AttributeId)
+                    {
+                        case 901:
+                            {
+                                var ChargeType1 = extraData.AttributeValueId;
+                                if (ChargeType1 > 0)
+                                {
+                                    // Declare and initialize ChargeTypeLookup properly
+                                    var ChargeTypeLookup = await _appEntity
+                                        .GetAll()
+                                        .Include(e => e.EntityExtraData)
+                                        .FirstOrDefaultAsync(e => e.Id == ChargeType1);
+
+                                    // Ensure ChargeTypeLookup is not null before using it
+                                    if (ChargeTypeLookup != null)
+                                    {
+                                        ChargeTypeLookup.EntityExtraData.ForEach(ed =>
+                                        {
+                                            if (ed.AttributeId == 900) // Assuming 904 is the AttributeId for CalculationAPI
+                                            {
+                                                CalculationAPI = ed.AttributeValue;
+                                            }
+                                        });
+                                    }
+                                }
+                            }
+                            break;
+                        case 902:
+                            ItemSSIN = extraData.AttributeValue;
+                            break;
+                        case 903:
+                            IsEditable = extraData.AttributeValue;
+                            break;
+                        default:
+                            // Handle other AttributeIds if needed
+                            break;
+                    }
+
+                    // Perform additional logic if necessary
+                    Console.WriteLine($"Processed AttributeId: {extraData.AttributeId}, IsEditable: {IsEditable}, ItemSSIN: {ItemSSIN}");
+                }
+            
+                if(!string.IsNullOrEmpty(ItemSSIN) && !string.IsNullOrEmpty(CalculationAPI))
+                {
+                    var newTransactionDetail = new AppTransactionDetails
+                    {
+                        TransactionId = pTransactionID,
+                        ItemSSIN = ItemSSIN,
+                        Code = "CHARGES",
+                        //Note = CalculationAPI, // Storing CalculationAPI in Note for reference
+                        Quantity = 1, // Default quantity, can be modified as needed
+                        NetPrice = 0, // Default price, can be modified as needed
+                        GrossPrice = 0, // Default price, can be modified as needed
+                        Discount = 0, // Default discount, can be modified as needed
+                        Name = ChargeName,
+                        Note = IsEditable,  // Assuming IsEditable is stored as "true" or "false"
+
+                        Amount = 0, // call calculation Method based on CalculationAPI
+                        EntityObjectStatusId = entityObjectStatusId // Assuming 12 is the status for calculated charges, modify as needed
+                        
+                        //ObjectId = entityObjectChargesId, // need to be modified with product type charges
+                    };
+                    await _appTransactionDetails.InsertAsync(newTransactionDetail);
+                }
+
             }
         }
         //T-SII-20250606.0001,1 MMT 07/03/2025 Update appEntity log when Transaction line is edited Qty or Price[End]
