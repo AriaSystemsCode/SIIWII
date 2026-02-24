@@ -505,7 +505,7 @@ export class CreateEditAppItemVariationsComponent
             // let responses = this._extraAttributeDataService.getExtraAttributesLookupDataAsync(extraAttributesCodes)
             let requests: Promise<LookupLabelDto[]>[] = [];
             extraAttributesCodes.forEach((code) => {
-                if (code != null) {
+                if (code != null) {  
                     let req = this._appEntitiesServiceProxy
                     .getAllEntitiesByTypeCode(code)
                     .toPromise();
