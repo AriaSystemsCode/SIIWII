@@ -239,6 +239,8 @@ export class CreateOrEditAppItemComponent
         this.languageSettingName = AppConsts.languageSettingName;
         //this._pricingHelperService.defaultLevel= this.languageSettingName!='en-GB' ? "MSRP"  :  "RRP"
 
+        if (!this.appItem?.taxRate)
+            this.appItem.taxRate=0;
     }
     languageSettingName;
     aspectRatio;
@@ -2110,5 +2112,9 @@ export class CreateOrEditAppItemComponent
                 return item;
             }
         });
+    }
+    fixNegative() {
+        if (this.appItem.taxRate < 0) 
+          this.appItem.taxRate = 0;
     }
 }
