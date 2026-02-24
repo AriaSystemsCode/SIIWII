@@ -1583,7 +1583,15 @@ namespace onetouch.AppEntities
 
             int oldReaction = 0;
             var userId = long.Parse(AbpSession.UserId.ToString());
-
+            var myTenantObjectName = "host";
+            if (AbpSession.TenantId != null)
+            {
+                var myTenantObject = await TenantManager.GetByIdAsync(int.Parse(AbpSession.TenantId.ToString()));
+                if (myTenantObject != null)
+                {
+                    myTenantObjectName = myTenantObject.TenancyName;
+                }
+            }
             #region user reaction part
             AppEntityUserReactions appEntityUserReaction = await _appEntityUserReactions.GetAll().FirstOrDefaultAsync(x => x.UserId == userId && x.EntityId == entitlyId && x.InteractionType == 'R');
 
@@ -1617,20 +1625,20 @@ namespace onetouch.AppEntities
                                     var notifyUser = await UserManager.FindByIdAsync(entityObject.CreatorUserId.ToString());
                                     if (notifyUser != null)
                                     {
-                                        var myTenantObject = await TenantManager.GetByIdAsync(int.Parse(AbpSession.TenantId.ToString()));
+                                        //var myTenantObject = await TenantManager.GetByIdAsync(int.Parse(AbpSession.TenantId.ToString()));
                                         //T-SII-20220413.0001,1 MMT 05/15/2023 -The notification message Enhachment[Start]
                                         var post = _appPostRepository.GetAll ().Where(x=>x.AppEntityId == entitlyId  ).FirstOrDefault ();
                                         if (post != null)
                                         {
                                             await _appNotifier.SendMessageAsync(new Abp.UserIdentifier(entityObject.TenantId, long.Parse(notifyUser.Id.ToString())),
-                                                "User " + myUser.FullName + "@" + myTenantObject.Name + " reacted to your <a> post </a>" +(post.Description.Length > 30 ? post.Description.Substring (0,30): post.Description), Abp.Notifications.NotificationSeverity.Info,
+                                                "User " + myUser.FullName + "@" + myTenantObjectName + " reacted to your <a> post </a>" +(post.Description.Length > 30 ? post.Description.Substring (0,30): post.Description), Abp.Notifications.NotificationSeverity.Info,
                                                 new Abp.Domain.Entities.EntityIdentifier(typeof(AppPost), post.Id ));
                                         }
                                         else
                                         {
                                             //T-SII-20220413.0001,1 MMT 05/15/2023 -The notification message Enhachment[End]
                                             await _appNotifier.SendMessageAsync(new Abp.UserIdentifier(entityObject.TenantId, long.Parse(notifyUser.Id.ToString())),
-                                                "User " + myUser.FullName + "@" + myTenantObject.Name + " reacted to your post" + entityObject.Name, Abp.Notifications.NotificationSeverity.Info);
+                                                "User " + myUser.FullName + "@" + myTenantObjectName + " reacted to your post" + entityObject.Name, Abp.Notifications.NotificationSeverity.Info);
                                         }
                                     }
                                 }
