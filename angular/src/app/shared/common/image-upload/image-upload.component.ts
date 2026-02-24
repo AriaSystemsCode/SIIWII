@@ -115,6 +115,7 @@ export class ImageUploadComponent extends AppComponentBase implements OnChanges 
     detectSupportedExtensions(){
         this.acceptedExtensionsArr = []
         this.acceptedExtensions = ""
+        // merge
         if(this.customExtentionsImgs) {
             this.acceptedExtensions = 'PNG - Jpeg - jpg'
         }else {
