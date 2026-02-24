@@ -367,6 +367,17 @@ namespace onetouch.AppItemsLists
             {
 
                 var appItemsList = await _appItemsListRepository.GetAll().Where(x => x.Id == id).Include(x => x.EntityFk).Include(x => x.ItemSharingFkList).ThenInclude(x => x.UserFk).FirstOrDefaultAsync();
+                //T-SII-20260212.0001 [Begin]
+                if (appItemsList == null)
+                {
+                    id = await GetMainItemListID(id);
+                    if (id != 0)
+                    {
+                        appItemsList = await _appItemsListRepository.GetAll().Where(x => x.Id == id).Include(x => x.EntityFk).Include(x => x.ItemSharingFkList).ThenInclude(x => x.UserFk).FirstOrDefaultAsync();
+                    }
+                    else
+                    { return null; }
+                }
 
                 var output = new GetAppItemsListForEditOutput { AppItemsList = ObjectMapper.Map<CreateOrEditAppItemsListDto>(appItemsList), TenantId = appItemsList.TenantId };
                 output.AppItemsList.AppItemsListItems = await GetDetails(new GetDetailsInput { ItemListId = id, SkipCount = 0, MaxResultCount = 10 });
@@ -1264,6 +1275,23 @@ namespace onetouch.AppItemsLists
             input.SyncProductList = true;
             await ShareItemList(input);
 
+        }
+        //T-SII-20260212.0001
+        public async Task<long> GetMainItemListID(long sharedItemListId)
+        {
+            if(sharedItemListId>0)
+            {
+                var mainItemListEntity =  await _appEntitiesRelationshipRepository.GetAll().Where(e => e.RelatedEntityId == sharedItemListId)
+                                            .FirstOrDefaultAsync();
+                if(mainItemListEntity != null)
+                {
+                    var MainItemList = await _appItemsListRepository.GetAll().Where(e => e.EntityId == mainItemListEntity.EntityId  )
+                                            .FirstOrDefaultAsync();
+                    if(MainItemList != null) { return MainItemList.Id; }
+                }
+            }
+
+            return 0;
         }
         [AbpAuthorize(AppPermissions.Pages_AppItemsLists_Publish)]
         public async Task ShareItemList(ShareItemListOptions input)
