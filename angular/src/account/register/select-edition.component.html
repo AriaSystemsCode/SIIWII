@@ -33,7 +33,7 @@
                                 </h2> -->
 
                                 <h2 class="kt-pricing-1__subtitle pl-4 editionName" *ngIf="isFree(editionWithFeatures.edition)">
-                                    {{"FREE EDITION" | localize}}
+                                    {{accountType.toUpperCase()}} {{"EDITION" | localize}} 
                                 </h2>
 
                                 <h2 class="kt-pricing-1__subtitle pl-4" *ngIf="!isFree(editionWithFeatures.edition)">
@@ -76,12 +76,12 @@
                                 </span>
 
                                 <div class="kt-pricing-1__btn" >
-                                    <button
+                                    <!-- <button
                                         class="_btn btn btn-warning btn-brand btn-wide btn-uppercase btn-bolder  btn  mt-4"
                                         (click)="upgrade(editionWithFeatures.edition, editionPaymentType.Upgrade)"
                                         *ngIf="isUserLoggedIn">
                                         {{"Upgrade" | localize}}
-                                    </button>
+                                    </button> -->
 
                                     <button
                                         class="_btn btn mt-4 startBtn w-100"

@@ -1674,7 +1674,7 @@ namespace onetouch.Accounts
                 if (tenant != null)
                 {
 
-                    var adminUser = await _userManager.FindByNameAsync("admin@" + tenant.TenancyName);
+                    var adminUser = await _userManager.FindByIdAsync(AbpSession.UserId.ToString());//.FindByNameAsync("admin@" + tenant.TenancyName);
                     if (adminUser != null && adminUser.Id != 0)
                     {
                         firstName = adminUser.Name;
@@ -2304,10 +2304,12 @@ namespace onetouch.Accounts
                     //MMT33-3
 
                     //Connect Current Account branches with the other account
-                    if (originalPublishContactFortCurrTenant.EntityObjectTypeId != presonEntityObjectTypeId && sync==false)
+                    //if (originalPublishContactFortCurrTenant.EntityObjectTypeId != presonEntityObjectTypeId && sync==false)
+                    if (sync == false)
                     await ConnectBranches(originalPublishContactFortCurrTenant.Id, id);
-
-                    if(originalContact.EntityObjectTypeId != presonEntityObjectTypeId && sync == false)
+                    //
+                    if (sync == false)
+                        //if (originalContact.EntityObjectTypeId != presonEntityObjectTypeId && sync == false)
                     await ConnectBranches(id, originalPublishContactFortCurrTenant.Id);
 
                     //Mariam[End]
@@ -2651,11 +2653,11 @@ namespace onetouch.Accounts
                         {
                             foreach (var contactAddress in branchesParentContact.ContactAddresses)
                             {
-                                var savedAddress = await _appAddressRepository.FirstOrDefaultAsync(x => x.Id == contactAddress.AddressId);
+                                var savedAddress = await _appMarketplaceAddressRepository.FirstOrDefaultAsync(x => x.Id == contactAddress.AddressId);
                                 AppAddress address = new AppAddress();
                                 if (savedAddress != null)
                                 {
-                                    var addressCon = await _appAddressRepository.GetAll().FirstOrDefaultAsync(z => z.Code == savedAddress.Code && z.TenantId == contactDto.TenantId && z.AccountId == contactDto.Id);
+                                    var addressCon = await _appAddressRepository.GetAll().FirstOrDefaultAsync(z => z.Code == savedAddress.Code && z.TenantId == contactDto.TenantId && z.AccountId == savedContactDto.AccountId);
                                     if (addressCon == null)
                                     {
                                         ObjectMapper.Map(savedAddress, address);
@@ -7115,7 +7117,7 @@ namespace onetouch.Accounts
                             {
                                 var accountObj = await _appContactRepository.GetAll().Where(z => z.Id == accountDto.AccountId).FirstOrDefaultAsync();
                                 if (accountObj != null)
-                                {
+                                {                                    
                                     var publishedAccount = await _appMarketplaceContactRepository.GetAll().Where(z => z.TenantOwner == accountObj.TenantId && z.SSIN == accountObj.SSIN).FirstOrDefaultAsync();
                                     if (publishedAccount != null)
                                     {
@@ -7617,6 +7619,9 @@ namespace onetouch.Accounts
                     branchObject.Phone1TypeName = input.Phone1TypeName;
                     branchObject.Phone2TypeName = input.Phone2TypeName;
                     branchObject.Phone3TypeName = input.Phone3TypeName;
+                    branchObject.Phone1CountryKey = input.Phone1CountryKey;
+                    branchObject.Phone2CountryKey = input.Phone2CountryKey;
+                    branchObject.Phone3CountryKey = input.Phone3CountryKey;
                     branchObject.TradeName = input.TradeName;
                     branchObject.Name=input.Name;
                     branchObject.UseDTOTenant = true;
@@ -7629,6 +7634,12 @@ namespace onetouch.Accounts
                   
             }
             var contactParent = _appContactRepository.FirstOrDefault((long)input.ParentId);
+            if (contactParent != null)
+            {
+                contactParent.LastModificationTime = DateTime.Now;
+                await _appContactRepository.UpdateAsync(contactParent);
+                await CurrentUnitOfWork.SaveChangesAsync();
+            }
             if (string.IsNullOrEmpty(branchObject.SSIN))
             {
                 AppEntity entity = new AppEntity();
@@ -7639,6 +7650,27 @@ namespace onetouch.Accounts
                     _helper.SystemTables.GenerateSSIN(contactObjectId, ObjectMapper.Map<AppEntityDto>(entity));
 
             }
+            branchObject.CurrencyId = input.CurrencyId;
+            branchObject.LanguageId = input.LanguageId;
+            branchObject.LanguageName = input.LanguageName;
+            branchObject.Phone1Number = input.Phone1Number;
+            branchObject.Phone2Number = input.Phone2Number;
+            branchObject.Phone3Number = input.Phone3Number;
+            branchObject.Phone1Ex = input.Phone1Ext;
+            branchObject.Phone2Ex = input.Phone2Ext;
+            branchObject.Phone3Ex = input.Phone3Ext;
+            branchObject.Phone1TypeId = input.Phone1TypeId;
+            branchObject.Phone2TypeId = input.Phone2TypeId;
+            branchObject.Phone3TypeId = input.Phone3TypeId;
+            branchObject.Phone1TypeName = input.Phone1TypeName;
+            branchObject.Phone2TypeName = input.Phone2TypeName;
+            branchObject.Phone3TypeName = input.Phone3TypeName;
+            branchObject.Phone1CountryKey = input.Phone1CountryKey;
+            branchObject.Phone2CountryKey = input.Phone2CountryKey;
+            branchObject.Phone3CountryKey = input.Phone3CountryKey;
+            branchObject.TradeName = input.TradeName;
+            branchObject.Name = input.Name;
+            branchObject.UseDTOTenant = true;
             branchObject.ContactRecordType = "B";
             if (branchObject.AccountId ==null)
                 branchObject.AccountId = contactParent.AccountId == null ? input.ParentId : contactParent.AccountId;
