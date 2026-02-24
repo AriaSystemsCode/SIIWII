@@ -1583,6 +1583,7 @@ namespace onetouch.AppEntities
 
             int oldReaction = 0;
             var userId = long.Parse(AbpSession.UserId.ToString());
+            
             var myTenantObjectName = "host";
             if (AbpSession.TenantId != null)
             {
@@ -1592,6 +1593,7 @@ namespace onetouch.AppEntities
                     myTenantObjectName = myTenantObject.TenancyName;
                 }
             }
+
             #region user reaction part
             AppEntityUserReactions appEntityUserReaction = await _appEntityUserReactions.GetAll().FirstOrDefaultAsync(x => x.UserId == userId && x.EntityId == entitlyId && x.InteractionType == 'R');
 
@@ -1604,6 +1606,7 @@ namespace onetouch.AppEntities
                     appEntityUserReaction.ReactionSelected = reaction;
                     appEntityUserReaction.ActionTime = DateTime.Now;
                     appEntityUserReaction.InteractionType = 'R';
+                   
                     if (AbpSession.TenantId != null)
                         appEntityUserReaction.TenantId = int.Parse(AbpSession.TenantId.ToString());
 
@@ -1671,10 +1674,10 @@ namespace onetouch.AppEntities
                                     var myUser = await UserManager.FindByIdAsync(AbpSession.UserId.ToString());
                                     if (notifyUser != null)
                                     {
-                                        var myTenantObject = await TenantManager.GetByIdAsync(int.Parse(AbpSession.TenantId.ToString()));
+                                        //var myTenantObject = await TenantManager.GetByIdAsync(int.Parse(AbpSession.TenantId.ToString()));
 
                                         await _appNotifier.SendMessageAsync(new Abp.UserIdentifier(entityObject.TenantId, long.Parse(notifyUser.Id.ToString())),
-                                            "User " + myUser.FullName + "@" + myTenantObject.Name + " re-reacted to your post" + entityObject.Name, Abp.Notifications.NotificationSeverity.Info);
+                                            "User " + myUser.FullName + "@" + myTenantObjectName + " re-reacted to your post" + entityObject.Name, Abp.Notifications.NotificationSeverity.Info);
                                     }
                                 }
                             }
