@@ -65,9 +65,9 @@ export class CreateOrAddShippingInformationComponent extends AppComponentBase im
     if (this.currentTab == TransactionCartoccordionTabs.ShippingInfo) {
       this.contactIdShipFrom = this.shipFromData?.compId;
       this.contactIdShipTo = this.shipToData?.compId;
-      const addressComponents = this.addressComponentRefs.toArray();
-      addressComponents.find(c => c.shipInfoIndex === 1)?.getAddressList(this.shipFromData?.compssin, this.shipFromData?.branchSsin);
-      addressComponents.find(c => c.shipInfoIndex === 2)?.getAddressList(this.shipToData?.compssin, this.shipToData?.branchSsin);
+      const addressComponents = this.addressComponentRefs?.toArray();
+      addressComponents?.find(c => c.shipInfoIndex === 1)?.getAddressList(this.shipFromData?.compssin, this.shipFromData?.branchSsin);
+      addressComponents?.find(c => c.shipInfoIndex === 2)?.getAddressList(this.shipToData?.compssin, this.shipToData?.branchSsin);
 
     }
 
@@ -276,7 +276,7 @@ export class CreateOrAddShippingInformationComponent extends AppComponentBase im
 
 
   selectShipVia($event) {
-    var index = this.shipViaList.findIndex(x => x.value == $event?.value)
+    var index = this.shipViaList?.findIndex(x => x.value == $event?.value)
     if (index >= 0) {
       this.appTransactionsForViewDto.shipViaId = this.shipViaList[index]?.value;
       this.appTransactionsForViewDto.shipViaCode = this.shipViaList[index]?.code;
@@ -333,8 +333,8 @@ export class CreateOrAddShippingInformationComponent extends AppComponentBase im
     this.shipFromData = data;
     if (this.currentTab == TransactionCartoccordionTabs.ShippingInfo) {
       this.contactIdShipFrom = this.shipFromData?.compId;
-      const addressComponents = this.addressComponentRefs.toArray();
-      addressComponents.find(c => c.shipInfoIndex === 1)?.getAddressList(this.shipFromData?.compssin, this.shipFromData?.branchSsin);
+      const addressComponents = this.addressComponentRefs?.toArray();
+      addressComponents?.find(c => c.shipInfoIndex === 1)?.getAddressList(this.shipFromData?.compssin, this.shipFromData?.branchSsin);
     }
     this.validateShippingTab();
 
@@ -347,8 +347,8 @@ export class CreateOrAddShippingInformationComponent extends AppComponentBase im
     if (this.currentTab == TransactionCartoccordionTabs.ShippingInfo) {
       this.contactIdShipTo = this.shipToData?.compId;
 
-      const addressComponents = this.addressComponentRefs.toArray();
-      addressComponents.find(c => c.shipInfoIndex === 2)?.getAddressList(this.shipToData?.compssin, this.shipToData?.branchSsin);
+      const addressComponents = this.addressComponentRefs?.toArray();
+      addressComponents?.find(c => c.shipInfoIndex === 2)?.getAddressList(this.shipToData?.compssin, this.shipToData?.branchSsin);
     }
     this.validateShippingTab();
 

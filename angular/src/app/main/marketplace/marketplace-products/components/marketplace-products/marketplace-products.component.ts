@@ -157,7 +157,7 @@ export class MarketplaceProductsComponent
         if (savedFilters) {
             const parsedFilters = JSON.parse(savedFilters);
             this.onlyAvialbleStock = parsedFilters.onlyAvailableStock ?? undefined;
-            this.selectedCurrrency = parsedFilters.selectedCurrency || this.selectedCurrrency;
+            this.selectedCurrrency = parsedFilters.selectedCurrency ?? this.selectedCurrrency;
             this.selectedSort = this.sortingData.find(s => s.value === parsedFilters.selectedSort) ?? this.selectedSort;
 
             this.appItemListId = parsedFilters.appItemListId || this.appItemListId;
@@ -233,9 +233,9 @@ export class MarketplaceProductsComponent
     getAllProducts() {
         this.showMainSpinner();
         const selectedCurrency =
-        (this.fromMarketAcoount)
-            ? (this.marketplaceAccCurrency || 'USD')
-            : (this.selectedCurrrency || 'USD');
+            (this.fromMarketAcoount)
+                ? (this.marketplaceAccCurrency || 'USD')
+                : (this.selectedCurrrency || 'USD');
 
         const requestParams = {
             contactSSIN: this.contactSSIN,
@@ -254,7 +254,7 @@ export class MarketplaceProductsComponent
             endShipData: this.endShipData,
 
             brands: this.brands || [],
-            selectedCurrency,
+            selectedCurrency: selectedCurrency,
             selectedSort: this.selectedSort?.value || 'name',
             skipCount: this.skipCount,
             maxResultCount: this.maxResultCount
@@ -495,7 +495,6 @@ export class MarketplaceProductsComponent
         }
 
     }
-
     private getCurrencyCodeForRequest(): string {
    
         if (this.selectedCurrrency && typeof this.selectedCurrrency === 'object' && this.selectedCurrrency.code) {
@@ -532,5 +531,6 @@ export class MarketplaceProductsComponent
       
         return 'USD';
       }
+
 
 }
