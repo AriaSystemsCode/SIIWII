@@ -29,6 +29,7 @@ using onetouch.EntityFrameworkCore;
 using Abp.Localization;
 using Microsoft.CodeAnalysis;
 using DocumentFormat.OpenXml.Office2010.Excel;
+using System.Globalization;
 
 namespace onetouch.SystemObjects
 {
@@ -367,6 +368,7 @@ namespace onetouch.SystemObjects
         }
         public async Task<string> GetDefaultLanguage()
         {
+            return CultureInfo.CurrentUICulture.Name;
             string name = "en";
             var defaultLanguage = await _lookup_ApplicationLanguages.GetDefaultLanguageOrNullAsync(AbpSession.TenantId);
             if (defaultLanguage != null) { name = defaultLanguage.Name; }

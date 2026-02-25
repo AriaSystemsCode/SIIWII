@@ -28,6 +28,7 @@ using onetouch.EntityFrameworkCore;
 using onetouch.AppContacts;
 using Abp.Localization;
 using DocumentFormat.OpenXml.Office2010.Excel;
+using System.Globalization;
 
 namespace onetouch.SystemObjects
 {
@@ -157,6 +158,7 @@ namespace onetouch.SystemObjects
         //T-SII-20220919.0001,1 MMT 12/20/2022 Add an API to validate if the entered name is already entered before or not[End]
         public async Task<string> GetDefaultLanguage()
         {
+            return CultureInfo.CurrentUICulture.Name;
             string name = "en";
             var defaultLanguage = await _lookup_ApplicationLanguages.GetDefaultLanguageOrNullAsync(AbpSession.TenantId);
             if (defaultLanguage != null) { name = defaultLanguage.Name; }
