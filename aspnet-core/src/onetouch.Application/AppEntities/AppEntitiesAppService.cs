@@ -741,48 +741,48 @@ namespace onetouch.AppEntities
                 //})
                 //.ToListAsync();
                 return await _appEntityRepository
-    .GetAll()
-    .Include(x => x.EntityAttachments)
-        .ThenInclude(z => z.AttachmentFk)
-    .Include(x => x.EntityExtraData)
-    .Include(x => x.EntityObjectStatusFk)
-    .Where(x =>
-        x.EntityObjectTypeCode == code &&
-        (x.TenantId == AbpSession.TenantId || x.TenantId == null))
-    .OrderBy(x => x.Name)
-    .Select(appEntity => new LookupLabelDto
-    {
-        Value = appEntity.Id,
+                        .GetAll()
+                        .Include(x => x.EntityAttachments)
+                            .ThenInclude(z => z.AttachmentFk)
+                        .Include(x => x.EntityExtraData)
+                        .Include(x => x.EntityObjectStatusFk)
+                        .Where(x =>
+                            x.EntityObjectTypeCode == code &&
+                            (x.TenantId == AbpSession.TenantId || x.TenantId == null))
+                        .OrderBy(x => x.Name)
+                        .Select(appEntity => new LookupLabelDto
+                        {
+                            Value = appEntity.Id,
 
-        // I49
-        EntityObjectStatusId = appEntity.EntityObjectStatusId,
-        Status = appEntity.EntityObjectStatusFk != null
-            ? appEntity.EntityObjectStatusFk.Name
-            : string.Empty,
+                            // I49
+                            EntityObjectStatusId = appEntity.EntityObjectStatusId,
+                            Status = appEntity.EntityObjectStatusFk != null
+                                ? appEntity.EntityObjectStatusFk.Name
+                                : string.Empty,
 
-        Label = appEntity.Name,
-        Code = appEntity.Code,
-        IsHostRecord = appEntity.TenantId == null,
+                            Label = appEntity.Name,
+                            Code = appEntity.Code,
+                            IsHostRecord = appEntity.TenantId == null,
 
-        // Hexa code (same logic, cleaner)
-        HexaCode = appEntity.EntityExtraData
-            .Where(z => z.AttributeId == 39)
-            .Select(z => z.AttributeValue)
-            .FirstOrDefault(),
+                            // Hexa code (same logic, cleaner)
+                            HexaCode = appEntity.EntityExtraData
+                                .Where(z => z.AttributeId == 39)
+                                .Select(z => z.AttributeValue)
+                                .FirstOrDefault(),
 
-        // Image (same logic, no repeated FirstOrDefault)
-        Image = appEntity.EntityAttachments
-            .Where(a => a.AttachmentFk != null)
-            .Select(a =>
-                imagesUrl +
-                (a.AttachmentFk.TenantId == null
-                    ? "-1"
-                    : a.AttachmentFk.TenantId.ToString()) +
-                "/" +
-                a.AttachmentFk.Attachment)
-            .FirstOrDefault()
-    })
-    .ToListAsync();
+                            // Image (same logic, no repeated FirstOrDefault)
+                            Image = appEntity.EntityAttachments
+                                .Where(a => a.AttachmentFk != null)
+                                .Select(a =>
+                                    imagesUrl +
+                                    (a.AttachmentFk.TenantId == null
+                                        ? "-1"
+                                        : a.AttachmentFk.TenantId.ToString()) +
+                                    "/" +
+                                    a.AttachmentFk.Attachment)
+                                .FirstOrDefault()
+                        })
+                        .ToListAsync();
 
             }
         }
