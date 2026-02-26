@@ -13,7 +13,7 @@ namespace onetouch.Accounts.Dtos
 	{
 		public string Code { get; set; }
         //public string Relation { get; set; }
-
+        public Decimal? TaxRate { get; set; }
         public string EntityObjectType { get; set; }
 
 		public string Name { get; set; }

@@ -29633,6 +29633,58 @@ export class AppTransactionServiceProxy {
         }
         return _observableOf(null as any);
     }
+
+    /**
+     * @param pTransactionID (optional) 
+     * @return Success
+     */
+    addTransactionCharges(pTransactionID: number | undefined): Observable<void> {
+        let url_ = this.baseUrl + "/api/services/app/AppTransaction/AddTransactionCharges?";
+        if (pTransactionID === null)
+            throw new Error("The parameter 'pTransactionID' cannot be null.");
+        else if (pTransactionID !== undefined)
+            url_ += "pTransactionID=" + encodeURIComponent("" + pTransactionID) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processAddTransactionCharges(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processAddTransactionCharges(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<void>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<void>;
+        }));
+    }
+
+    protected processAddTransactionCharges(response: HttpResponseBase): Observable<void> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return _observableOf(null as any);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
 }
 
 @Injectable()
@@ -46880,12 +46932,15 @@ export class SycEntityObjectTypesServiceProxy {
 
     /**
      * @param code (optional) 
+     * @param objectCode (optional) 
      * @return Success
      */
-    getAllWithExtraAttributesByCode(code: string | null | undefined): Observable<GetAllEntityObjectTypeOutput[]> {
+    getAllWithExtraAttributesByCode(code: string | null | undefined, objectCode: string | null | undefined=""): Observable<GetAllEntityObjectTypeOutput[]> {
         let url_ = this.baseUrl + "/api/services/app/SycEntityObjectTypes/GetAllWithExtraAttributesByCode?";
         if (code !== undefined && code !== null)
             url_ += "code=" + encodeURIComponent("" + code) + "&";
+        if (objectCode !== undefined && objectCode !== null)
+            url_ += "objectCode=" + encodeURIComponent("" + objectCode) + "&";
         url_ = url_.replace(/[?&]$/, "");
 
         let options_ : any = {
@@ -56218,6 +56273,58 @@ export class SystemTablesServiceProxy {
     /**
      * @return Success
      */
+    getEntityObjectCharges(): Observable<number> {
+        let url_ = this.baseUrl + "/api/services/app/SystemTables/GetEntityObjectCharges";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetEntityObjectCharges(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetEntityObjectCharges(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<number>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<number>;
+        }));
+    }
+
+    protected processGetEntityObjectCharges(response: HttpResponseBase): Observable<number> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+                result200 = resultData200 !== undefined ? resultData200 : <any>null;
+    
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @return Success
+     */
     getEntityObjectStatusActiveTransaction(): Observable<number> {
         let url_ = this.baseUrl + "/api/services/app/SystemTables/GetEntityObjectStatusActiveTransaction";
         url_ = url_.replace(/[?&]$/, "");
@@ -65306,6 +65413,7 @@ export interface IExtraDataAttrDto {
 
 export class CreateOrEditAccountInfoDto implements ICreateOrEditAccountInfoDto {
     fileToken!: string | undefined;
+    taxRate!: number | undefined;
     tradeName!: string | undefined;
     timeStamp!: moment.Moment | undefined;
     accountType!: string | undefined;
@@ -65381,6 +65489,7 @@ export class CreateOrEditAccountInfoDto implements ICreateOrEditAccountInfoDto {
                     this[property] = _data[property];
             }
             this.fileToken = _data["fileToken"];
+            this.taxRate = _data["taxRate"];
             this.tradeName = _data["tradeName"];
             this.timeStamp = _data["timeStamp"] ? moment(_data["timeStamp"].toString()) : <any>undefined;
             this.accountType = _data["accountType"];
@@ -65486,6 +65595,7 @@ export class CreateOrEditAccountInfoDto implements ICreateOrEditAccountInfoDto {
                 data[property] = this[property];
         }
         data["fileToken"] = this.fileToken;
+        data["taxRate"] = this.taxRate;
         data["tradeName"] = this.tradeName;
         data["timeStamp"] = this.timeStamp ? this.timeStamp.toISOString() : <any>undefined;
         data["accountType"] = this.accountType;
@@ -65580,6 +65690,7 @@ export class CreateOrEditAccountInfoDto implements ICreateOrEditAccountInfoDto {
 
 export interface ICreateOrEditAccountInfoDto {
     fileToken: string | undefined;
+    taxRate: number | undefined;
     tradeName: string | undefined;
     timeStamp: moment.Moment | undefined;
     accountType: string | undefined;
@@ -66070,6 +66181,7 @@ export interface IAccountDto {
 
 export class ContactDto implements IContactDto {
     code!: string | undefined;
+    taxRate!: number | undefined;
     entityObjectType!: string | undefined;
     name!: string | undefined;
     firstName!: string | undefined;
@@ -66137,6 +66249,7 @@ export class ContactDto implements IContactDto {
                     this[property] = _data[property];
             }
             this.code = _data["code"];
+            this.taxRate = _data["taxRate"];
             this.entityObjectType = _data["entityObjectType"];
             this.name = _data["name"];
             this.firstName = _data["firstName"];
@@ -66210,6 +66323,7 @@ export class ContactDto implements IContactDto {
                 data[property] = this[property];
         }
         data["code"] = this.code;
+        data["taxRate"] = this.taxRate;
         data["entityObjectType"] = this.entityObjectType;
         data["name"] = this.name;
         data["firstName"] = this.firstName;
@@ -66272,6 +66386,7 @@ export class ContactDto implements IContactDto {
 
 export interface IContactDto {
     code: string | undefined;
+    taxRate: number | undefined;
     entityObjectType: string | undefined;
     name: string | undefined;
     firstName: string | undefined;
@@ -66395,6 +66510,7 @@ export class GetAccountForViewDto implements IGetAccountForViewDto {
     availableGroupConnections!: number;
     availableBusinessConnections!: number;
     availablePeopleConnections!: number;
+    relationId!: number;
 
     [key: string]: any;
 
@@ -66431,6 +66547,7 @@ export class GetAccountForViewDto implements IGetAccountForViewDto {
             this.availableGroupConnections = _data["availableGroupConnections"];
             this.availableBusinessConnections = _data["availableBusinessConnections"];
             this.availablePeopleConnections = _data["availablePeopleConnections"];
+            this.relationId = _data["relationId"];
         }
     }
 
@@ -66465,6 +66582,7 @@ export class GetAccountForViewDto implements IGetAccountForViewDto {
         data["availableGroupConnections"] = this.availableGroupConnections;
         data["availableBusinessConnections"] = this.availableBusinessConnections;
         data["availablePeopleConnections"] = this.availablePeopleConnections;
+        data["relationId"] = this.relationId;
         return data;
     }
 }
@@ -66484,6 +66602,7 @@ export interface IGetAccountForViewDto {
     availableGroupConnections: number;
     availableBusinessConnections: number;
     availablePeopleConnections: number;
+    relationId: number;
 
     [key: string]: any;
 }
@@ -66863,6 +66982,7 @@ export interface IValidationResult {
 export class AppContactValidationInputDTO implements IAppContactValidationInputDTO {
     errorMessages!: string[] | undefined;
     fileToken!: string | undefined;
+    taxRate!: number | undefined;
     tradeName!: string | undefined;
     timeStamp!: moment.Moment | undefined;
     accountType!: string | undefined;
@@ -66943,6 +67063,7 @@ export class AppContactValidationInputDTO implements IAppContactValidationInputD
                     this.errorMessages!.push(item);
             }
             this.fileToken = _data["fileToken"];
+            this.taxRate = _data["taxRate"];
             this.tradeName = _data["tradeName"];
             this.timeStamp = _data["timeStamp"] ? moment(_data["timeStamp"].toString()) : <any>undefined;
             this.accountType = _data["accountType"];
@@ -67053,6 +67174,7 @@ export class AppContactValidationInputDTO implements IAppContactValidationInputD
                 data["errorMessages"].push(item);
         }
         data["fileToken"] = this.fileToken;
+        data["taxRate"] = this.taxRate;
         data["tradeName"] = this.tradeName;
         data["timeStamp"] = this.timeStamp ? this.timeStamp.toISOString() : <any>undefined;
         data["accountType"] = this.accountType;
@@ -67148,6 +67270,7 @@ export class AppContactValidationInputDTO implements IAppContactValidationInputD
 export interface IAppContactValidationInputDTO {
     errorMessages: string[] | undefined;
     fileToken: string | undefined;
+    taxRate: number | undefined;
     tradeName: string | undefined;
     timeStamp: moment.Moment | undefined;
     accountType: string | undefined;
@@ -69694,6 +69817,7 @@ export interface IAppContactPaymentMethod {
 
 export class AppContact implements IAppContact {
     tenantId!: number | undefined;
+    taxRate!: number | undefined;
     name!: string;
     tradeName!: string;
     code!: string | undefined;
@@ -69789,6 +69913,7 @@ export class AppContact implements IAppContact {
                     this[property] = _data[property];
             }
             this.tenantId = _data["tenantId"];
+            this.taxRate = _data["taxRate"];
             this.name = _data["name"];
             this.tradeName = _data["tradeName"];
             this.code = _data["code"];
@@ -69898,6 +70023,7 @@ export class AppContact implements IAppContact {
                 data[property] = this[property];
         }
         data["tenantId"] = this.tenantId;
+        data["taxRate"] = this.taxRate;
         data["name"] = this.name;
         data["tradeName"] = this.tradeName;
         data["code"] = this.code;
@@ -69996,6 +70122,7 @@ export class AppContact implements IAppContact {
 
 export interface IAppContact {
     tenantId: number | undefined;
+    taxRate: number | undefined;
     name: string;
     tradeName: string;
     code: string | undefined;
@@ -89168,6 +89295,62 @@ export interface ITenantInformation {
     [key: string]: any;
 }
 
+export class ChargesDto implements IChargesDto {
+    name!: string | undefined;
+    isEditable!: boolean;
+    chargeAmount!: number;
+
+    [key: string]: any;
+
+    constructor(data?: IChargesDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.name = _data["name"];
+            this.isEditable = _data["isEditable"];
+            this.chargeAmount = _data["chargeAmount"];
+        }
+    }
+
+    static fromJS(data: any): ChargesDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new ChargesDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["name"] = this.name;
+        data["isEditable"] = this.isEditable;
+        data["chargeAmount"] = this.chargeAmount;
+        return data;
+    }
+}
+
+export interface IChargesDto {
+    name: string | undefined;
+    isEditable: boolean;
+    chargeAmount: number;
+
+    [key: string]: any;
+}
+
 export enum TransactionType {
     SalesOrder = 0,
     PurchaseOrder = 1,
@@ -89862,6 +90045,7 @@ export interface IAppTransactionContactDto {
 }
 
 export class GetAppTransactionsForViewDto implements IGetAppTransactionsForViewDto {
+    charges!: ChargesDto[] | undefined;
     lastRecord!: boolean;
     firstRecord!: boolean;
     creatorUserId!: number;
@@ -89971,6 +90155,11 @@ export class GetAppTransactionsForViewDto implements IGetAppTransactionsForViewD
             for (var property in _data) {
                 if (_data.hasOwnProperty(property))
                     this[property] = _data[property];
+            }
+            if (Array.isArray(_data["charges"])) {
+                this.charges = [] as any;
+                for (let item of _data["charges"])
+                    this.charges!.push(ChargesDto.fromJS(item));
             }
             this.lastRecord = _data["lastRecord"];
             this.firstRecord = _data["firstRecord"];
@@ -90132,6 +90321,11 @@ export class GetAppTransactionsForViewDto implements IGetAppTransactionsForViewD
             if (this.hasOwnProperty(property))
                 data[property] = this[property];
         }
+        if (Array.isArray(this.charges)) {
+            data["charges"] = [];
+            for (let item of this.charges)
+                data["charges"].push(item.toJSON());
+        }
         data["lastRecord"] = this.lastRecord;
         data["firstRecord"] = this.firstRecord;
         data["creatorUserId"] = this.creatorUserId;
@@ -90281,6 +90475,7 @@ export class GetAppTransactionsForViewDto implements IGetAppTransactionsForViewD
 }
 
 export interface IGetAppTransactionsForViewDto {
+    charges: ChargesDto[] | undefined;
     lastRecord: boolean;
     firstRecord: boolean;
     creatorUserId: number;
@@ -90999,6 +91194,7 @@ export class GetAllAppTransactionsForViewDto implements IGetAllAppTransactionsFo
     eomDays!: number;
     eom!: boolean;
     netDueDays!: number;
+    charges!: ChargesDto[] | undefined;
     lastRecord!: boolean;
     firstRecord!: boolean;
     creatorUserId!: number;
@@ -91118,6 +91314,11 @@ export class GetAllAppTransactionsForViewDto implements IGetAllAppTransactionsFo
             this.eomDays = _data["eomDays"];
             this.eom = _data["eom"];
             this.netDueDays = _data["netDueDays"];
+            if (Array.isArray(_data["charges"])) {
+                this.charges = [] as any;
+                for (let item of _data["charges"])
+                    this.charges!.push(ChargesDto.fromJS(item));
+            }
             this.lastRecord = _data["lastRecord"];
             this.firstRecord = _data["firstRecord"];
             this.creatorUserId = _data["creatorUserId"];
@@ -91287,6 +91488,11 @@ export class GetAllAppTransactionsForViewDto implements IGetAllAppTransactionsFo
         data["eomDays"] = this.eomDays;
         data["eom"] = this.eom;
         data["netDueDays"] = this.netDueDays;
+        if (Array.isArray(this.charges)) {
+            data["charges"] = [];
+            for (let item of this.charges)
+                data["charges"].push(item.toJSON());
+        }
         data["lastRecord"] = this.lastRecord;
         data["firstRecord"] = this.firstRecord;
         data["creatorUserId"] = this.creatorUserId;
@@ -91445,6 +91651,7 @@ export interface IGetAllAppTransactionsForViewDto {
     eomDays: number;
     eom: boolean;
     netDueDays: number;
+    charges: ChargesDto[] | undefined;
     lastRecord: boolean;
     firstRecord: boolean;
     creatorUserId: number;

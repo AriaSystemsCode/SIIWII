@@ -19,10 +19,11 @@ namespace onetouch.AppContacts
     [Audited]
     public class AppContact : FullAuditedEntity<long> , IMayHaveTenant
     {
-			public int? TenantId { get; set; }
-			
+		public int? TenantId { get; set; }
 
-		[Required]
+        public decimal? TaxRate { get; set; }
+
+        [Required]
 		[StringLength(AppContactConsts.MaxNameLength, MinimumLength = AppContactConsts.MinNameLength)]
 		public virtual string Name { get; set; }
 
