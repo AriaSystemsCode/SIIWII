@@ -583,6 +583,32 @@
                                     </button>
                                 </div>
                             </div>
+
+                                                
+<div class="col-12 pl-4 ml-4 mt-3 mb-3">
+    <div class="d-flex flex-row justify-content-between">
+                <div class="row mr-5 pr-5">
+                    <h6 class="font-weight-bold pt-3 pr-2">
+                        {{ "Tax Rate" | localize}}
+                    </h6>
+                    <div class="d-flex align-items-baseline">
+
+                        <input
+                        type="number"
+                        step="any"
+                        name="taxRate"
+                        class="form-control"
+                        #taxRate="ngModel"
+                        [(ngModel)]="appItem.taxRate"
+                        (blur)="fixNegative()"
+                        style="background-color: #EEEEEE !important"
+                      />
+                      
+                    </div>
+                </div>
+  
+    </div>
+  </div>
                             <div class="col-10 pl-4 ml-4 mt-4">
                                 <span>
                                     <input type="checkbox" [(ngModel)]="sellVariationChecked" name="showVariationsBtn"
@@ -597,27 +623,7 @@
                             </div>
                         </div>
 
-                        
-<div class="col-12 pl-4 ml-4 mt-3 mb-3">
-    <div class="d-flex flex-row justify-content-between">
-                <!-- //i49-F5 bind right texable fields if fildes or will be extra data like recommended & additional  -->
-      <div class="col-md-3" *ngIf="appItem.taxRate">
-        <label class="col-form-label-sm font-weight-bold mb-1">
-          {{ 'Tax Rate' | localize }}
-        </label>
-        <input
-          type="number"
-          step="any"
-          class="form-control form-control-sm"
-          [(ngModel)]="appItem.taxRate"
-          name="taxRate"
-        />
-      </div>
-  
-    </div>
-  </div>
-  <!-- ✅ End Taxable Section -->
-
+    
                     </div>
                 </div>
             </div>
