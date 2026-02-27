@@ -74,16 +74,13 @@ import { AppTransactionSideBarComponent } from "@app/admin/sideBarComponents/app
 import { SendMessageModalComponent } from "@app/main/Messages/SendMessage-Modal.Component";
 import { EditorModule } from 'primeng/editor';
 import { AppAddOnsSideBarComponent } from "@app/admin/sideBarComponents/app-add-ons-side-bar/app-add-ons-side-bar.component";
-import { ChartWidgetCardComponent } from "./customizable-dashboard/widgets/widgit-card/chart-widget-card.component";
 import { ChartModule } from 'primeng/chart';
 import { CardModule } from 'primeng/card';
-import { WidgetOutletComponent } from "./customizable-dashboard/widgets/widget-outlet/widget-outlet.component";
-import { WidgetConfigModalComponent } from "./customizable-dashboard/widgets/widget-config-modal/widget-config-modal.component";
-import { FilterBuilderComponent } from "./customizable-dashboard/filters/filter-builder/filter-builder.component";
 import { MultiSelectModule } from "primeng/multiselect";
 import { DropdownModule } from "primeng/dropdown";
 import { InputSwitchModule } from "primeng/inputswitch";
 import { NgxEchartsModule } from 'ngx-echarts';
+
 @NgModule({
     imports: [
         CommonModule,
@@ -159,10 +156,7 @@ import { NgxEchartsModule } from 'ngx-echarts';
         AppSideBarComponent,AppTransactionSideBarComponent,
         SendMessageModalComponent,
         AppAddOnsSideBarComponent,
-        ChartWidgetCardComponent,
-        WidgetOutletComponent ,
-        WidgetConfigModalComponent,
-        FilterBuilderComponent
+
         
 
     ],
@@ -187,7 +181,7 @@ import { NgxEchartsModule } from 'ngx-echarts';
         GenericFormModalComponent,
         SelectionModalComponent,AppSideBarComponent,
         SendMessageModalComponent,
-        ChartWidgetCardComponent
+        
     ],
     providers: [
         DateTimeService,

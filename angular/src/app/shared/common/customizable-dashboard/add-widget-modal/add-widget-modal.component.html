@@ -1,4 +1,4 @@
-<!-- <div appBsModal #addWidgetModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true"
+<div appBsModal #addWidgetModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true"
     [config]="{backdrop: 'static'}">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
@@ -30,48 +30,4 @@
             </form>
         </div>
     </div>
-</div> -->
-
-
-
-
-<div appBsModal #picker="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
-    <div class="modal-dialog modal-xl modal-dialog-scrollable">
-      <div class="modal-content">
-        <div class="modal-header align-items-center">
-          <h5 class="modal-title">Custom</h5>
-  
-          <div class="input-group w-auto ms-auto">
-            <span class="input-group-text"><i class="fa fa-search"></i></span>
-            <input class="form-control" [(ngModel)]="search" placeholder="Search..." />
-          </div>
-  
-          <button type="button" class="btn-close ms-2" aria-label="Close" (click)="hide()"></button>
-        </div>
-  
-        <div class="modal-body">
-          <!-- EMPTY STATE -->
-          <div *ngIf="cards?.length === 0" class="text-muted p-4">No widgets available to add.</div>
-  
-          <!-- GALLERY -->
-          <div class="row g-3" *ngIf="cards?.length">
-            <div class="col-12 col-md-6 col-lg-4" *ngFor="let c of filtered()">
-              <button type="button" class="chart-card w-100 mb-2" (click)="pick(c.id)">
-                <div class="thumb"             [style.background-image]="'url(' + c?.image + ')'"
-                [style.background-size]="'cover'" ></div>
-                <div class="meta">
-                  <div class="title">{{ c.label }}</div>
-                  <!-- <div class="desc text-muted">{{ c.description }}</div> -->
-                </div>
-              </button>
-            </div>
-          </div>
-        </div>
-  
-        <div class="modal-footer">
-          <button class="btn btn-secondary" (click)="hide()">Close</button>
-        </div>
-      </div>
-    </div>
-  </div>
-  
+</div>

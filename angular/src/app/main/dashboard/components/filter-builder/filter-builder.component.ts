@@ -1,7 +1,7 @@
 // filter-builder.component.ts
 import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup } from '@angular/forms';
-import { EntityField, FilterDef } from '../../widget-types';
+import { EntityField, FilterDef } from '../../../../shared/common/customizable-dashboard/widget-types';
 
 
 @Component({

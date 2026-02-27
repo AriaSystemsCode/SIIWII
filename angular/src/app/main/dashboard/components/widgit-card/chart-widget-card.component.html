@@ -1,0 +1,28 @@
+<ng-container [ngSwitch]="chartType">
+
+  <div 
+  *ngSwitchCase="'calculation'"
+  class="calc-wrap d-flex flex-column justify-content-center align-items-center text-center"
+  [style.height.px]="350">
+
+  <div class="text-muted">Result</div>
+  <h4 class="display-6 fw-bold">
+    {{ (calcValue ?? 0) }} {{ config?.calculation?.label }}
+  </h4>
+
+</div>
+
+  <ng-container *ngSwitchDefault>
+    <div class="chart-host">
+      <div
+        echarts
+        [options]="options"
+        class="chart"
+        [autoResize]="previewMode"
+        (chartInit)="onChartInit($event)"
+        [style.height.px]="chartHeightPx">
+      </div>
+    </div>
+  </ng-container>
+
+</ng-container>

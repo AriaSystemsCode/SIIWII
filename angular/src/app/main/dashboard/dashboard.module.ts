@@ -20,11 +20,35 @@ import { TreeModule } from 'primeng/tree';
 import { TreeTableModule } from 'primeng/treetable';
 import { DashboardBrowseComponent } from './components/DashboardBrowse/dashboard-browse.component';
 import { DashboardRoutingModule } from './dashboard-routing.module';
-
+import { ToastModule } from 'primeng/toast';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { ButtonModule } from 'primeng/button';
+import { MenuModule } from 'primeng/menu';
+import { DialogModule } from 'primeng/dialog';
+import { InputTextModule } from 'primeng/inputtext';
+import { TooltipModule } from 'primeng/tooltip';
+import { InputTextareaModule } from 'primeng/inputtextarea';
+import { DashboardDetailComponent } from './components/dashboard-deatail/dashboard-detail.component';
+import { OverlayPanelModule } from 'primeng/overlaypanel';
+import { ChartWidgetCardComponent } from './components/widgit-card/chart-widget-card.component';
+import { WidgetOutletComponent } from './components/widget-outlet/widget-outlet.component';
+import { WidgetConfigModalComponent } from './components/widget-config-modal/widget-config-modal.component';
+import { FilterBuilderComponent } from './components/filter-builder/filter-builder.component';
+import { CardModule } from 'primeng/card';
+import { InputSwitchModule } from "primeng/inputswitch";
+import { NgxEchartsModule } from 'ngx-echarts';
+import { GridsterModule } from 'angular-gridster2';
+import { AddWidgetPickerComponent } from './components/add-widget-picker/add-widget-picker.component';
 
 @NgModule({
     declarations: [
-        DashboardBrowseComponent
+        DashboardBrowseComponent,
+        DashboardDetailComponent,
+        ChartWidgetCardComponent,
+        WidgetOutletComponent ,
+        WidgetConfigModalComponent,
+        FilterBuilderComponent,
+        AddWidgetPickerComponent
     ],
     imports: [
         CommonModule,
@@ -46,7 +70,21 @@ import { DashboardRoutingModule } from './dashboard-routing.module';
         TreeModule,
         CheckboxModule,
         DashboardRoutingModule,
-        
+        ToastModule, 
+        ConfirmDialogModule,
+        ButtonModule,
+        MenuModule,
+        DialogModule,
+        InputTextModule,
+        InputTextareaModule,
+        DropdownModule,
+        CheckboxModule,
+        TooltipModule,
+        OverlayPanelModule,
+        CardModule,
+                InputSwitchModule,   // <-- you used <p-inputSwitch>
+                NgxEchartsModule.forRoot({ echarts: () => import('echarts') }),
+                GridsterModule
 
     ],
     providers: [
@@ -56,7 +94,10 @@ import { DashboardRoutingModule } from './dashboard-routing.module';
         EmailingTemplateServiceProxy
     ],
     exports: [
-  
+        ChartWidgetCardComponent,
+        WidgetOutletComponent ,
+        WidgetConfigModalComponent,
+        FilterBuilderComponent
     ]
 })
 export class DashboardModule { }

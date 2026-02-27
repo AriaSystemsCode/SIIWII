@@ -1,7 +1,7 @@
 <div class="  mainDiv mx-lg-5">
     <div class="my-dashboards-page container-fluid">
 
-        <!-- Title row (like your Transactions page header row) -->
+        <!-- Title row  -->
         <div class="page-header d-flex align-items-center justify-content-between mb-3">
 
             <!-- Left: Title -->
@@ -16,7 +16,7 @@
                 <i class="pi pi-search"></i>
                 <input
                   #globalSearch
-                  type="text"
+                  type="text" class="searchIn"
                   pInputText
                   placeholder="Search..."
                   (input)="onGlobalSearch($event)"
@@ -37,14 +37,15 @@
         <div class=" shadow-sm main-card">
           <div class="card-body p-0">
       
-            <p-table
-              [value]="dashboards"
-            
-          
-              [responsiveLayout]="'scroll'"
-          
-              styleClass="p-datatable-sm dashboards-table"
-            >
+            <p-table   #dataTable
+            [value]="primengTableHelper.records"
+            [lazy]="true"
+            (onLazyLoad)="getDashboards($event)"
+            [paginator]="false"
+            [rows]="primengTableHelper.defaultRecordsCountPerPage"
+            [totalRecords]="primengTableHelper.totalRecordsCount"
+            styleClass="p-datatable-sm dashboards-table"
+          >
               <!-- Table header -->
               <ng-template pTemplate="header">
                 <tr>
@@ -154,7 +155,7 @@
             </p-table>
       
             <!-- Hover panel (avatar + name list) -->
-            <!-- <p-overlayPanel #sharePanel [showCloseIcon]="false" styleClass="share-panel">
+            <p-overlayPanel #sharePanel [showCloseIcon]="false" styleClass="share-panel">
               <div class="share-panel-title mb-2">Shared with</div>
       
               <div *ngIf="shareUsers?.length; else emptyShare">
@@ -172,9 +173,36 @@
               <ng-template #emptyShare>
                 <div class="text-muted">Not shared</div>
               </ng-template>
-            </p-overlayPanel> -->
+            </p-overlayPanel>
       
           </div>
         </div>
+
+
+
+
+        <div class="row">
+          <div class="left-aside-filters">
+          </div>
+          <div class="col d-flex flex-column justify-content-between">
+              <div class="primeng-paging-container custom-paginator">
+                <p-paginator   #paginator
+                [rows]="primengTableHelper.defaultRecordsCountPerPage"
+                (onPageChange)="getDashboards($event)"
+                [totalRecords]="primengTableHelper.totalRecordsCount"
+                [rowsPerPageOptions]="primengTableHelper.predefinedRecordsCountPerPage"
+              >
+              </p-paginator>
+
+                  <div class="total-records-count text-right mr-3">
+                      {{l('TotalRecordsCount', primengTableHelper.totalRecordsCount)}}
+                  </div>
+              </div>
+          </div>
       </div>
+      </div>
+
+
+
+
 </div>

@@ -9,14 +9,12 @@ import {
 } from '@shared/service-proxies/service-proxies';
 import { TabsetComponent } from 'ngx-bootstrap/tabs';
 import { BsDropdownDirective } from 'ngx-bootstrap/dropdown';
-import { WidgetViewDefinition, WidgetFilterViewDefinition, WidgetCard, DEFAULT_CHART_CARDS } from './definitions';
+import { WidgetViewDefinition, WidgetFilterViewDefinition } from './definitions';
 import { AddWidgetModalComponent } from './add-widget-modal/add-widget-modal.component';
 import { DashboardCustomizationConst } from './DashboardCustomizationConsts';
 import { ModalDirective } from 'ngx-bootstrap/modal';
 import * as rtlDetect from 'rtl-detect';
 import { Observable } from 'rxjs';
-import { ChartConfig } from './widget-types';
-import { WidgetConfigModalComponent } from './widgets/widget-config-modal/widget-config-modal.component';
 
 @Component({
   selector: 'customizable-dashboard',
@@ -33,7 +31,6 @@ export class CustomizableDashboardComponent extends AppComponentBase implements 
   @ViewChild('filterModal', { static: true }) modal: ModalDirective;
   @ViewChild('dropdownRenamePage') dropdownRenamePage: BsDropdownDirective;
   @ViewChild('dropdownAddPage') dropdownAddPage: BsDropdownDirective;
-  @ViewChild('configModal') configModal!: WidgetConfigModalComponent;  
 
   loading = true;
   busy = true;
@@ -65,7 +62,7 @@ export class CustomizableDashboardComponent extends AppComponentBase implements 
     this.loading = true;
     this._dashboardCustomizationServiceProxy.getDashboardDefinition(this.dashboardName, DashboardCustomizationConst.Applications.Angular)
     .subscribe((dashboardDefinitionResult: DashboardOutput) => {
-        // debugger;
+        debugger;
         this.dashboardDefinition = dashboardDefinitionResult;
         if (!this.dashboardDefinition.widgets || this.dashboardDefinition.widgets.length === 0) {
             this.loading = false;
@@ -159,90 +156,51 @@ export class CustomizableDashboardComponent extends AppComponentBase implements 
     );
   }
 
-  // addWidget(widgetId: any): void {
-  //   if (!widgetId) {
-  //     return;
-  //   }
+  addWidget(widgetId: any): void {
+    if (!widgetId) {
+      return;
+    }
 
-  //   let widgetViewConfiguration = this._dashboardViewConfiguration.WidgetViewDefinitions.find(w => w.id === widgetId);
-  //   if (!widgetViewConfiguration) {
-  //     abp.notify.error(this.l('ThereIsNoViewConfigurationForX', widgetId));
-  //     return;
-  //   }
+    let widgetViewConfiguration = this._dashboardViewConfiguration.WidgetViewDefinitions.find(w => w.id === widgetId);
+    if (!widgetViewConfiguration) {
+      abp.notify.error(this.l('ThereIsNoViewConfigurationForX', widgetId));
+      return;
+    }
 
-  //   let page = this.userDashboard.pages.find(page => page.id === this.selectedPage.id);
-  //   if (page.widgets.find(w => w.id === widgetId)) {
-  //     return;
-  //   }
+    let page = this.userDashboard.pages.find(page => page.id === this.selectedPage.id);
+    if (page.widgets.find(w => w.id === widgetId)) {
+      return;
+    }
 
-  //   this.busy = true;
+    this.busy = true;
 
-  //   this._dashboardCustomizationServiceProxy.addWidget(new AddWidgetInput({
-  //     widgetId: widgetId,
-  //     pageId: this.selectedPage.id,
-  //     dashboardName: this.dashboardName,
-  //     width: widgetViewConfiguration.defaultWidth,
-  //     height: widgetViewConfiguration.defaultHeight,
-  //     application: DashboardCustomizationConst.Applications.Angular
-  //   })).subscribe((addedWidget) => {
-  //     this.userDashboard.pages.find(page => page.id === this.selectedPage.id).widgets.push({
-  //       id: widgetId,
-  //       component: widgetViewConfiguration.component,
-  //       gridInformation: {
-  //         id: widgetId,
-  //         cols: addedWidget.width,
-  //         rows: addedWidget.height,
-  //         x: addedWidget.positionX,
-  //         y: addedWidget.positionY,
-  //       }
-  //     });
+    this._dashboardCustomizationServiceProxy.addWidget(new AddWidgetInput({
+      widgetId: widgetId,
+      pageId: this.selectedPage.id,
+      dashboardName: this.dashboardName,
+      width: widgetViewConfiguration.defaultWidth,
+      height: widgetViewConfiguration.defaultHeight,
+      application: DashboardCustomizationConst.Applications.Angular
+    })).subscribe((addedWidget) => {
+      this.userDashboard.pages.find(page => page.id === this.selectedPage.id).widgets.push({
+        id: widgetId,
+        component: widgetViewConfiguration.component,
+        gridInformation: {
+          id: widgetId,
+          cols: addedWidget.width,
+          rows: addedWidget.height,
+          x: addedWidget.positionX,
+          y: addedWidget.positionY,
+        }
+      });
 
-  //     this.initializeUserDashboardFilters();
+      this.initializeUserDashboardFilters();
 
-  //     this.busy = false;
-  //     this.notify.success(this.l('SavedSuccessfully'));
-  //   });
-  // }
-
-
-  addWidget(widgetId: string): void {
-    if (!widgetId) return;
-  
-    const page = this.userDashboard.pages.find(p => p.id === this.selectedPage.id);
-    if (!page) return;
-  
-   
-    if (page.widgets.some(w => w.id === widgetId)) return;
-  
-    const view = this._dashboardViewConfiguration.WidgetViewDefinitions.find(w => w.id === widgetId);
-    if (!view) { this.notify.error(this.l('ThereIsNoViewConfigurationForX', widgetId)); return; }
-  
-    const chartType = this.pickTypeFromId(widgetId) || 'line';
-  
-    page.widgets.push({
-      id: widgetId, // keep identical for "one instance per type"
-      component: view.component,
-      gridInformation: { id: widgetId, cols: view.defaultWidth, rows: view.defaultHeight, x: 0, y: 0 },
-      chartType
+      this.busy = false;
+      this.notify.success(this.l('SavedSuccessfully'));
     });
-  
-    this.refreshAllGrids();
   }
-  
 
-  
-  private pickTypeFromId(id: string): any {
-    const t = id.toLowerCase();
-    if (t.includes('line')) return 'line';
-    if (t.includes('bar')) return 'bar';
-    if (t.includes('pie')) return 'pie';
-    if (t.includes('doughnut')) return 'doughnut';
-    if (t.includes('polar')) return 'polarArea';
-    if (t.includes('radar')) return 'radar';
-    if (t.includes('scatter')) return 'scatter';
-    return 'line';
-  }
-  
   private getUserDashboards(): any[] {
     let settings = this.s('App.DashboardCustomization.Configuration' + '.' + DashboardCustomizationConst.Applications.Angular);
     let obj = JSON.parse(settings);
@@ -277,22 +235,13 @@ export class CustomizableDashboardComponent extends AppComponentBase implements 
     }
   }
 
-  // openAddWidgetModal(): void {
-  //   let page = this.userDashboard.pages.find(page => page.id === this.selectedPage.id);
-  //   if (page) {
-  //     let widgets = this.dashboardDefinition.widgets.filter((widgetDef: WidgetOutput) => !page.widgets.find(widgetOnPage => widgetOnPage.id === widgetDef.id));
-  //     this.addWidgetModal.show(widgets);
-  //   }
-  // }
-
-
-  // customizable-dashboard.component.ts
-
-
-openAddWidgetModal(): void {
-  // just open the picker with our static cards
-  this.addWidgetModal.show(DEFAULT_CHART_CARDS);
-}
+  openAddWidgetModal(): void {
+    let page = this.userDashboard.pages.find(page => page.id === this.selectedPage.id);
+    if (page) {
+      let widgets = this.dashboardDefinition.widgets.filter((widgetDef: WidgetOutput) => !page.widgets.find(widgetOnPage => widgetOnPage.id === widgetDef.id));
+      this.addWidgetModal.show(widgets);
+    }
+  }
 
   addNewPage(pageName: string): void {
     if (!pageName || pageName.trim() === '') {
@@ -533,39 +482,4 @@ openAddWidgetModal(): void {
   onMenuToggle = () => {
     this.refreshAllGrids();
   }
-
-
-
-  // customizable-dashboard.component.ts (add handlers)
-onShapePicked(widgetTypeId: string) {
-  const chartType = this.pickTypeFromId(widgetTypeId) || 'line';
-  this.configModal.chartType = chartType;
-  this.configModal.show();
-}
-
-onCreateFromConfig(cfg: ChartConfig) {
-  const view = this._dashboardViewConfiguration.WidgetViewDefinitions.find(w => w.id === 'Widgets_Generic_Chart')
-           ?? this._dashboardViewConfiguration.WidgetViewDefinitions[0];
-
-  const page = this.userDashboard.pages.find(p => p.id === this.selectedPage.id);
-  if (!page || !view) return;
-
-  const instanceId = `${cfg.id}-${Date.now()}`;
-
-  page.widgets.push({
-    id: instanceId,
-    component: view.component,      // e.g. ChartWidgetCardComponent or a wrapper
-    gridInformation: {
-      id: instanceId, cols: view.defaultWidth, rows: view.defaultHeight, x: 0, y: 0
-    },
-    chartType: cfg.chartType,
-    config: cfg                     // keep full config for reload/persist
-  });
-
-  this.refreshAllGrids();
-
-  // OPTIONAL: persist to backend (map cfg → AddWidgetInput + your metadata)
-  // this._dashboardCustomizationServiceProxy.addWidget(...)
-}
-
 }

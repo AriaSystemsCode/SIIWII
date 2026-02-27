@@ -1,0 +1,56 @@
+:host ::ng-deep .add-widget-picker .p-dialog-content {
+    padding-top: 0.75rem;
+  }
+  
+  .title { font-weight: 700; font-size: 16px; }
+  .subtitle { font-size: 12px; }
+  
+  .widget-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+    padding: 10px 0;
+  }
+  
+  @media (max-width: 768px) {
+    .widget-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  
+  .widget-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+  }
+  
+  .widget-card {
+    border: 1px solid #e5e7eb;
+    border-radius: 16px;
+    // padding: 20px 15px;
+    background: #ffffff;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-align: center;
+  }
+  
+  .widget-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
+    border-color: #157af8;
+  }
+  
+  .widget-image {
+    width: 100%;
+    height: 120px;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    margin-bottom: 12px;
+  }
+  
+  .widget-title {
+    font-weight: 600;
+    font-size: 14px;
+    color: #1f2937;
+  }

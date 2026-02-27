@@ -43,15 +43,35 @@ export class EntityMetaService {
   }
 
   // 👇 mock a query using the config (swap for your real backend later)
-  runQuery(cfg: ChartConfig): QueryResult {
+  runQuery(cfg: any): any {
+    // CALCULATION
+    if (cfg.chartType === 'calculation' && cfg.calculation) {
+      const { agg, field } = cfg.calculation;
+  
+      // mock result
+      const base = field === 'amount' ? 1200 : field === 'quantity' ? 220 : 50;
+      const wiggle = (cfg.filters?.length || 0) * 7;
+  
+      const value =
+        agg === 'count' ? 42 - wiggle :
+        agg === 'sum'   ? base * 3 - wiggle :
+        agg === 'avg'   ? base - wiggle :
+        agg === 'min'   ? Math.max(1, base - 40 - wiggle) :
+        agg === 'max'   ? base + 90 - wiggle :
+        base;
+  
+      return { value };
+    }
+  
+    // EXISTING CHART LOGIC
     const labels = cfg.dimension ? ['A','B','C','D','E'] : ['Total'];
-    const base = cfg.measure === 'amount'  ? 120
-               : cfg.measure === 'number of rows' ? 300
-               : cfg.measure === 'quantity'? 40  : 80;
-    // pretend filters alter numbers slightly
+    const base = cfg.measure === 'amount' ? 120
+      : cfg.measure === 'number of rows' ? 300
+      : cfg.measure === 'quantity' ? 40 : 80;
+  
     const wiggle = (cfg.filters?.length || 0) * 6;
-    const data = labels.map((_, i) => base + i * 12 - wiggle);
-
+    const data = labels.map((_: any, i: number) => base + i * 12 - wiggle);
+  
     return {
       labels,
       datasets: [{ label: `${cfg.entity}.${cfg.measure}`, data }]

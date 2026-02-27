@@ -14,7 +14,7 @@ import { WidgetSubscriptionExpiringTenantsComponent } from './widgets/widget-sub
 import { WidgetHostTopStatsComponent } from './widgets/widget-host-top-stats/widget-host-top-stats.component';
 import { FilterDateRangePickerComponent } from './filters/filter-date-range-picker/filter-date-range-picker.component';
 import { WidgetTopStatsComponent } from './widgets/widget-top-stats/widget-top-stats.component';
-import { ChartWidgetCardComponent } from './widgets/widgit-card/chart-widget-card.component';
+import { ChartWidgetCardComponent } from '../../../main/dashboard/components/widgit-card/chart-widget-card.component';
 
 @Injectable({
   providedIn: 'root'

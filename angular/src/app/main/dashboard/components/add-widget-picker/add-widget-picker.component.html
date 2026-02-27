@@ -1,0 +1,38 @@
+<p-dialog
+  [(visible)]="visible"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [style]="{ width: '820px', maxWidth: '95vw' }"
+  styleClass="add-widget-picker"
+  (onHide)="hide()"
+>
+  <ng-template pTemplate="header">
+    <div class="d-flex align-items-center justify-content-between w-100">
+      <div class="title">Add widget</div>
+      <div class="subtitle text-muted">Choose a widget type</div>
+    </div>
+  </ng-template>
+
+  <div class="widget-grid">
+    <button
+      type="button"
+      class="widget-card p-0"
+      *ngFor="let c of cards"
+      (click)="pick(c.kind)"
+    >
+      <div
+        class="widget-image"
+        [ngStyle]="{ 'background-image': 'url(' + c.img + ')' }"
+      ></div>
+  
+      <div class="widget-title mb-2">
+        {{ c.title }}
+      </div>
+    </button>
+  </div>
+
+  <ng-template pTemplate="footer">
+    <button pButton type="button" class="p-button-text" label="Close" (click)="hide()"></button>
+  </ng-template>
+</p-dialog>

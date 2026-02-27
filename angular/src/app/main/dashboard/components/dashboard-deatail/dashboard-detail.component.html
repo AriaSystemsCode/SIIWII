@@ -1,0 +1,181 @@
+<p-toast></p-toast>
+<p-confirmDialog></p-confirmDialog>
+
+<div class="dashboard-detail-page container-fluid px-0">
+
+  <!--  bar -->
+  <div class="dash-topbar shadow-sm">
+    <div class="d-flex align-items-center justify-content-between">
+
+      <!-- Left: title + meta -->
+      <div class="d-flex align-items-center gap-3 min-w-0">
+        <div class="dash-icon">
+          <i class="pi pi-chart-bar"></i>
+        </div>
+
+        <div class="min-w-0">
+          <div class="d-flex align-items-center gap-2 min-w-0">
+            <h2 class="dash-title text-truncate m-0" [title]="dashboard.title">
+              {{ dashboard.title }}
+            </h2>
+
+            <!-- <span class="mode-pill" [ngClass]="mode === 'edit' ? 'edit' : 'view'">
+              {{ mode === 'edit' ? 'Edit mode' : 'View mode' }}
+            </span> -->
+
+            <span *ngIf="hasUnsavedChanges && mode === 'edit'" class="dirty-dot" pTooltip="Unsaved changes"></span>
+          </div>
+
+          <div class="dash-meta text-muted">
+            <span class="mr-3">
+              Updated: <b>{{ dashboard.updatedAt | date:'dd/MM/yyyy, HH:mm' }}</b>
+            </span>
+
+            <span>
+              Last viewed:
+              <b *ngIf="dashboard.lastViewedAt; else notViewed">
+                {{ dashboard.lastViewedAt | date:'dd/MM/yyyy, HH:mm' }}
+              </b>
+              <ng-template #notViewed>—</ng-template>
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: actions -->
+      <div class="d-flex align-items-center gap-2">
+
+        <!-- Refresh All (View+) -->
+        <button pButton type="button" class="" icon="pi pi-refresh" label="Refresh" [loading]="refreshing"
+          (click)="refreshAll()" [disabled]="!canView"></button>
+
+
+
+        <!-- View/Edit toggle -->
+        <ng-container *ngIf="mode === 'view'">
+          <button pButton type="button" icon="pi pi-pencil" label="Edit" class="editBtn" (click)="enterEditMode()"
+            [disabled]="!canEdit"></button>
+        </ng-container>
+
+        <ng-container *ngIf="mode === 'edit'">
+          <!-- <button
+            pButton
+            type="button"
+            icon="pi pi-undo"
+            class="p-button-outlined"
+            pTooltip="Undo"
+            (click)="undo()"
+            [disabled]="!canUndo"
+          ></button> -->
+
+
+
+          <!-- <button
+            pButton
+            type="button"
+            icon="pi pi-times"
+            label="Cancel"
+            class="p-button-outlined"
+            (click)="cancelEditMode()"
+          ></button> -->
+
+          <button pButton type="button" icon="pi pi-check" label="Save" class="editBtn" (click)="saveDashboard()"
+            [disabled]="!canEdit"></button>
+          <button pButton type="button" label="Add widget" icon="pi pi-plus" class="p-button-sm"
+            (click)="openWidgetPicker()">
+          </button>
+
+        </ng-container>
+
+        <!-- More actions -->
+        <p-menu #menu [popup]="true" [model]="actionsMenuItems"></p-menu>
+        <button pButton type="button" icon="pi pi-ellipsis-h" class="p-button-rounded p-button-text"
+          (click)="menu.toggle($event)" aria-label="More actions"></button>
+      </div>
+    </div>
+
+    <!-- Owner + sharing strip -->
+    <div class="dash-people d-flex align-items-center justify-content-between mt-3">
+      <!-- Owner -->
+      <div class="d-flex align-items-center gap-2">
+        <span class="text-muted">Owner</span>
+        <div class="d-flex align-items-center owner-chip">
+          <img class="avatar avatar-sm" [src]="dashboard.owner.avatarUrl || defaultAvatar"
+            (error)="onAvatarErr($event)" />
+          <span class="ml-2">{{ dashboard.owner.displayName }}</span>
+        </div>
+      </div>
+
+      <!-- Sharing quick avatars -->
+      <div class="d-flex align-items-center gap-2">
+        <span class="text-muted">Sharing</span>
+
+        <div class="avatar-stack" pTooltip="Open Share" [class.clickable]="canShare">
+          <ng-container *ngFor="let s of dashboard.shares | slice:0:3; let i = index">
+            <img class="avatar avatar-sm stacked" [style.zIndex]="10 - i" [src]="s.user.avatarUrl || defaultAvatar"
+              (error)="onAvatarErr($event)" [alt]="s.user.displayName" />
+          </ng-container>
+
+          <div *ngIf="dashboard.shares?.length > 3" class="avatar avatar-sm stacked more">
+            +{{ dashboard.shares.length - 3 }}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!--  Content area -->
+  <div class="">
+
+
+    <gridster [options]="options" [ngClass]="{ 'no-tab': !moreThanOnePage() }">
+
+      <gridster-item *ngFor="let widget of page.widgets" [item]="widget.gridInformation">
+
+        <div class="widget-shell" [class.editing]="mode==='edit'">
+          <div class="widget-head d-flex justify-content-between align-items-center">
+            <div class="d-flex align-items-center gap-2 min-w-0">
+        
+              <span class="drag-handle" *ngIf="mode==='edit'" title="Drag">
+                <i class="pi pi-bars"></i>
+              </span>
+        
+              <div class="fw-600 text-truncate">{{ widget.title }}</div>
+            </div>
+        
+            <div class="widget-actions d-flex align-items-center gap-1">
+              <!-- menu / refresh / delete -->
+              <button class="icon-btn" title="Refresh">
+                <i class="pi pi-refresh"></i>
+              </button>
+        
+              <button class="icon-btn danger" *ngIf="mode==='edit'" title="Delete"
+                      (click)="removeItem(widget.gridInformation)">
+                <i class="pi pi-times"></i>
+              </button>
+            </div>
+          </div>
+        
+          <div class="widget-body">
+            <div class="widget-body">
+              <app-chart-widget-card
+                [chartType]="widget.kind"
+                [externalData]="widget.data"
+                [grid]="widget.gridInformation">
+              </app-chart-widget-card>
+            </div>
+          </div>
+        </div>
+      </gridster-item>
+    </gridster>
+
+
+    <!-- Picker -->
+    <app-add-widget-picker #widgetPicker (selectKind)="onWidgetKindPicked($event)">
+    </app-add-widget-picker>
+
+    <!-- Config Modal -->
+    <widget-config-modal #widgetModal (create)="onWidgetCreate($event)" (cancel)="null">
+    </widget-config-modal>
+  </div>
+</div>

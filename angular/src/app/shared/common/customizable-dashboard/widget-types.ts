@@ -1,10 +1,10 @@
 // widget-types.ts
 export type ChartKind =
-  | 'line' | 'bar' | 'pie' | 'doughnut' | 'polarArea' | 'radar' | 'scatter';
+  | 'line' | 'bar' | 'pie' | 'doughnut' | 'polarArea' | 'radar' | 'scatter' | 'calculation' |'calc';
 
 export type EntityName = 'transactions' | 'items' | 'accounts';
 
-export type FieldRole = 'measure' | 'dimension' | 'datetime';
+export type FieldRole = 'measure' | 'dimension' | 'datetime' | 'time';
 
 export interface EntityField {
   name: string;                // e.g. "amount"
@@ -25,17 +25,50 @@ export interface FilterDef {
 }
 
 export interface ChartConfig {
-  id: string;                  // widget type id or your generic id
+  id: string;
   chartType: ChartKind;
   entity: EntityName;
-  measure: string;             // required numeric
-  dimension?: string;          // optional group-by
-  dateFrom?: Date | null;
+
+  // chart fields
+  measure?: string;               // optional now (not for calculation)
+  dimension?: string;
+  dateFrom?: Date | string | null;
   dateTo?: Date | null;
   filters?: Array<{ field: string; op: Operator; value: any }>;
-}
 
+  // calculation fields
+  calculation?: CalculationConfig;
+
+  time?: TimeConfig;
+}
+export type CalcAgg = 'count' | 'sum' | 'avg' | 'min' | 'max';
+
+export interface CalculationConfig {
+  agg: CalcAgg;            // count / sum / avg / ...
+  field?: string | null;   // needed for sum/avg/min/max, not needed for count
+  label?: string | null;   // optional display label
+  format?: 'number' | 'currency' | 'percent'; // optional formatting
+}
 export interface QueryResult {
   labels: string[];
   datasets: { label: string; data: number[] }[];
 }
+
+
+export type TimeBucket = 'hour'|'day'|'week'|'month'|'quarter'|'year';
+export type TimePreset = 'last7Days'|'last30Days'|'last90Days'|'thisMonth'|'custom';
+
+export interface TimeRange {
+  preset?: TimePreset;              // quick presets
+  from?: string | Date | null;      // for custom
+  to?: string | Date | null;        // for custom
+}
+
+export interface TimeConfig {
+  timezone?: string;                // Africa/Cairo
+  bucket?: TimeBucket;              // day / month ...
+  range?: TimeRange;                // preset or custom
+}
+
+
+

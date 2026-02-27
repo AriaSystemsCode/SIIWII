@@ -1,0 +1,8 @@
+.preview-box{
+    height: 350px !important;        /* أو 350 حسب ما تحبي */
+    min-height: 350px;
+  }
+  .preview-box app-chart-widget-card{
+    display:block;
+    height:100%;
+  }
