@@ -723,7 +723,7 @@ namespace onetouch.Helpers
         {
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
             {
-                var obj = await _sycEntityObjectStatus.FirstOrDefaultAsync(x => x.Code == "CHARGES" && x.ObjectCode == "ITEM");
+                var obj = await _sycEntityObjectType.FirstOrDefaultAsync(x => x.Code == "CHARGES" && x.ObjectCode == "ITEM");
                 return obj.Id;
             }
         }

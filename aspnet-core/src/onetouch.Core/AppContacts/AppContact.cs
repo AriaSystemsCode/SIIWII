@@ -21,8 +21,6 @@ namespace onetouch.AppContacts
     {
 		public int? TenantId { get; set; }
 
-        public decimal? TaxRate { get; set; }
-
         [Required]
 		[StringLength(AppContactConsts.MaxNameLength, MinimumLength = AppContactConsts.MinNameLength)]
 		public virtual string Name { get; set; }

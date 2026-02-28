@@ -1853,7 +1853,7 @@ namespace onetouch.AppSiiwiiTransaction
                 //log[End]
 
                 #region calculate charges
-                AddTransactionCharges(input.Id);
+                await AddTransactionCharges(input.Id);
                 #endregion
 
                 appTrans.EnteredDate = input.EnteredDate;
@@ -4588,7 +4588,7 @@ namespace onetouch.AppSiiwiiTransaction
         {
 
             //XX
-
+            var entityObjectChargesId = await _helper.SystemTables.GetEntityObjectCharges();
             if (input != null && position != null)
             {
                 var transOrg = await _appTransactionsHeaderRepository.GetAll().Include(a => a.AppTransactionContacts)
@@ -4720,7 +4720,8 @@ namespace onetouch.AppSiiwiiTransaction
                                                             shareWith.SharedUserEMail = userObject.EmailAddress;
                                                             await _appEntitySharingsRepository.InsertAsync(shareWith);
                                                         }
-                                                    }catch(Exception ex) { }
+                                                    }
+                                                    catch (Exception ex) { }
                                                 }
                                             }
                                         }
@@ -4899,6 +4900,27 @@ namespace onetouch.AppSiiwiiTransaction
                         //var additional= GetAppTransactionExtraDataWithPaging(transactionId, viewTrans.EntityObjectTypeId, RecommandedOrAdditional.ADDITIONAL).Result.Items.ToList();
                         viewTrans.ExtraDataAttributes = _appEntitiesAppService.GetAppEntityExtraDataWithPaging(transactionId, viewTrans.EntityObjectTypeId).Result.Items.ToList();
                         //I46[End]
+
+                        #region fill charges
+                        var transCharges = await _appTransactionDetails.GetAll()
+                            .Where(a => a.TransactionId == transactionId && a.EntityObjectTypeId == entityObjectChargesId).ToListAsync();
+                        viewTrans.Charges = new List<ChargesDto>();
+                        if (transCharges != null)
+                        {
+                            foreach (var charge in transCharges)
+                            {
+
+                                viewTrans.Charges.Add(
+                                    new ChargesDto()
+                                    {
+                                        Name = charge.Name,
+                                        ChargeAmount = charge.Amount,
+                                        IsEditable = charge.Note == "true" ? true : false
+                                    });
+                            }
+                        }
+                        #endregion fill charges
+
                         return viewTrans;
                     }
 
@@ -4906,7 +4928,6 @@ namespace onetouch.AppSiiwiiTransaction
 
             }
 
-            var entityObjectChargesId = await _helper.SystemTables.GetEntityObjectCharges();
             var trans = await _appTransactionsHeaderRepository.GetAll().Include(a => a.AppTransactionContacts)
                 .Include(a => a.AppTransactionDetails.Where(d => d.EntityObjectTypeId != entityObjectChargesId)).Where(a => a.Id == transactionId).FirstOrDefaultAsync();
             if (trans != null)
@@ -7646,6 +7667,9 @@ namespace onetouch.AppSiiwiiTransaction
             // Delete all AppTransactionDetails where TransactionId = pTransactionID and Code = "CHARGES"
             var entityObjectStatusId = await _helper.SystemTables.GetEntityObjectStatusDraftTransaction();
             var entityObjectChargesId = await _helper.SystemTables.GetEntityObjectCharges();
+
+            var entityObjectId = await _helper.SystemTables.GetObjectItemId();
+
             await _appTransactionDetails.DeleteAsync(x => x.TransactionId == pTransactionID && x.EntityObjectTypeId == entityObjectChargesId);
 
             // Get all entities from AppEntity repository
@@ -7654,24 +7678,45 @@ namespace onetouch.AppSiiwiiTransaction
                 .Include(e => e.EntityExtraData)
                 .Where(e => e.ObjectCode == "LOOKUP" && e.EntityObjectTypeCode == "TRANSACTIONCHARGES")
                 .ToListAsync();
+
             var buyerContact = await _appTransactionContactsRepository.GetAll().Where(e => e.ContactRole == "Buyer" && e.TransactionId == pTransactionID).FirstOrDefaultAsync();
+            var sellerContact = await _appTransactionContactsRepository.GetAll().Where(e => e.ContactRole == "Seller" && e.TransactionId == pTransactionID).FirstOrDefaultAsync();
+            
+            if (buyerContact == null || sellerContact == null) return;
+
             var activeRealtionshipStatusId = await _helper.SystemTables.GetEntityObjectStatusRelationshipActive();
-            var relation = await _appContactRelationshipInfoRepository.GetAll().Include(e => e.EntityExtraData)
-                       .Where(e => e.RecipientContactSSIN == buyerContact.CompanySSIN 
-                       && e.TenantId == AbpSession.TenantId 
-                       && e.EntityObjectStatusId == activeRealtionshipStatusId 
+
+            var relationList = await _appContactRelationshipInfoRepository.GetAll().Include(e => e.EntityExtraData)
+                       .Where(e => e.RecipientContactSSIN == buyerContact.CompanySSIN
+                       && e.RequesterContactSSIN == sellerContact.CompanySSIN
+                       //&& e.TenantId == AbpSession.TenantId
+                       && e.EntityObjectStatusId == activeRealtionshipStatusId
                        && e.ConsiderAsTeamMember == false)
-                       .FirstOrDefaultAsync();
+                       .ToListAsync();
+                       
+            var relation = relationList.FirstOrDefault();
+            
+            if (relation == null)
+            {
+                var fallbackRelationList = await _appContactRelationshipInfoRepository.GetAll().Include(e => e.EntityExtraData)
+                       .Where(e => e.RecipientContactSSIN == sellerContact.CompanySSIN
+                       && e.RequesterContactSSIN == buyerContact.CompanySSIN
+                       //&& e.TenantId == AbpSession.TenantId
+                       && e.EntityObjectStatusId == activeRealtionshipStatusId
+                       && e.ConsiderAsTeamMember == false)
+                       .ToListAsync();
+                relation = fallbackRelationList.FirstOrDefault();
+            }
 
             // Loop through each transactionChargeEntity
             foreach (var transactionChargeEntity in transactionChargeEntities)
             {
                 // Initialize variables before processing extraData
-                var ItemSSIN = string.Empty;
-                var IsEditable = string.Empty;
+                var itemSsin = string.Empty;
+                var isEditable = string.Empty;
                 //var ChargeType = 0;
-                var CalculationAPI = string.Empty;
-                var ChargeName = transactionChargeEntity.Name;
+                var calculationApi = string.Empty;
+                var chargeName = transactionChargeEntity.Name;
 
                 // Loop through the EntityExtraData list for each entity
                 foreach (var extraData in transactionChargeEntity.EntityExtraData)
@@ -7682,23 +7727,23 @@ namespace onetouch.AppSiiwiiTransaction
                     {
                         case 901:
                             {
-                                var ChargeType1 = extraData.AttributeValueId;
-                                if (ChargeType1 > 0)
+                                var chargeType1 = extraData.AttributeValueId;
+                                if (chargeType1 > 0)
                                 {
                                     // Declare and initialize ChargeTypeLookup properly
-                                    var ChargeTypeLookup = await _appEntity
+                                    var chargeTypeLookup = await _appEntity
                                         .GetAll()
                                         .Include(e => e.EntityExtraData)
-                                        .FirstOrDefaultAsync(e => e.Id == ChargeType1);
+                                        .FirstOrDefaultAsync(e => e.Id == chargeType1);
 
                                     // Ensure ChargeTypeLookup is not null before using it
-                                    if (ChargeTypeLookup != null)
+                                    if (chargeTypeLookup != null)
                                     {
-                                        ChargeTypeLookup.EntityExtraData.ForEach(ed =>
+                                        chargeTypeLookup.EntityExtraData.ForEach(ed =>
                                         {
-                                            if (ed.AttributeId == 900) // Assuming 904 is the AttributeId for CalculationAPI
+                                            if (ed.AttributeId == 900) // Assuming 900 is the AttributeId for CalculationAPI
                                             {
-                                                CalculationAPI = ed.AttributeValue;
+                                                calculationApi = ed.AttributeValue;
                                             }
                                         });
                                     }
@@ -7706,10 +7751,10 @@ namespace onetouch.AppSiiwiiTransaction
                             }
                             break;
                         case 902:
-                            ItemSSIN = extraData.AttributeValue;
+                            itemSsin = extraData.AttributeValue;
                             break;
                         case 903:
-                            IsEditable = extraData.AttributeValue;
+                            isEditable = extraData.AttributeValue;
                             break;
                         default:
                             // Handle other AttributeIds if needed
@@ -7717,14 +7762,14 @@ namespace onetouch.AppSiiwiiTransaction
                     }
 
                     // Perform additional logic if necessary
-                    Console.WriteLine($"Processed AttributeId: {extraData.AttributeId}, IsEditable: {IsEditable}, ItemSSIN: {ItemSSIN}");
+                    Console.WriteLine($"Processed AttributeId: {extraData.AttributeId}, IsEditable: {isEditable}, ItemSSIN: {itemSsin}");
                 }
 
-                if (!string.IsNullOrEmpty(ItemSSIN) && !string.IsNullOrEmpty(CalculationAPI))
+                if (!string.IsNullOrEmpty(itemSsin) && !string.IsNullOrEmpty(calculationApi))
                 {
                     decimal amount = 0;
 
-                    switch (CalculationAPI)
+                    switch (calculationApi)
                     {
                         case "Freight-Method":
                             // Call your CalculateShipping method here and assign the result to amount
@@ -7741,20 +7786,20 @@ namespace onetouch.AppSiiwiiTransaction
                     var newTransactionDetail = new AppTransactionDetails
                     {
                         TransactionId = pTransactionID,
-                        ItemSSIN = ItemSSIN,
-                        Code = "CHARGES",
-                        //Note = CalculationAPI, // Storing CalculationAPI in Note for reference
+                        ItemSSIN = itemSsin,
+                        Code = itemSsin,
+                        //Note = calculationApi, // Storing CalculationAPI in Note for reference
                         Quantity = 1, // Default quantity, can be modified as needed
                         NetPrice = 0, // Default price, can be modified as needed
                         GrossPrice = 0, // Default price, can be modified as needed
                         Discount = 0, // Default discount, can be modified as needed
-                        Name = ChargeName,
-                        Note = IsEditable,  // Assuming IsEditable is stored as "true" or "false"
-
+                        Name = chargeName,
+                        Note = isEditable,  // Assuming IsEditable is stored as "true" or "false"
+                        TenantId = AbpSession.TenantId,
                         Amount = amount, // call calculation Method based on CalculationAPI
                         EntityObjectStatusId = entityObjectStatusId, // Assuming 12 is the status for calculated charges, modify as needed
-                        EntityObjectTypeId = entityObjectChargesId
-                        //ObjectId = entityObjectChargesId, // need to be modified with product type charges
+                        EntityObjectTypeId = entityObjectChargesId,
+                        ObjectId = entityObjectId, // need to be modified with product type charges
                     };
                     await _appTransactionDetails.InsertAsync(newTransactionDetail);
                 }
@@ -7765,90 +7810,91 @@ namespace onetouch.AppSiiwiiTransaction
         private async Task<decimal> CalculateTaxes(long pTransactionID, long entityObjectChargesId, AppContactRelationshipInfo relation)
         {
             decimal taxes = 0;
-            string accountSSIN = "";
             try
             {
-                var buyerContact = await _appTransactionContactsRepository.GetAll().Where(e => e.ContactRole == "Buyer" && e.TransactionId == pTransactionID).FirstOrDefaultAsync();
-                if (buyerContact != null && !string.IsNullOrEmpty(buyerContact.ContactSSIN))
+                if (relation != null && relation.EntityExtraData != null && relation.EntityExtraData.Count > 0)
                 {
-                    var account = await _appContactRepository.GetAll().Include(e => e.SSIN)
-                        .Where(e => e.EntityFk.SSIN == accountSSIN && e.TenantId == AbpSession.TenantId).FirstOrDefaultAsync();
-
                     var isTaxable = relation.EntityExtraData.FirstOrDefault(e => e.AttributeId == 911);
 
-                    if (account != null && isTaxable!=null && isTaxable.AttributeValue == "true")
+                    if (isTaxable != null && isTaxable.AttributeValue.ToUpper() == "TRUE")
                     {
                         var transItems = await _appTransactionDetails.GetAll().Where(e => e.TransactionId == pTransactionID && e.EntityObjectTypeId != entityObjectChargesId)
                             .ToListAsync();
+                            
+                        var transItemSsins = transItems.Select(i => i.ItemSSIN).ToList();
+                        var products = await _appItems.GetAll().Where(e => transItemSsins.Contains(e.SSIN)).ToListAsync();
+
                         foreach (var item in transItems)
                         {
-                            var product = await _appItems.GetAll().Where(e => e.SSIN == item.ItemSSIN).FirstOrDefaultAsync();
+                            var product = products.FirstOrDefault(e => e.SSIN == item.ItemSSIN);
                             if (product != null && product.TaxRate > 0)
                             {
                                 // Call tax calculation API based on item.TaxCode and calculate tax amount
                                 // Add the calculated tax amount to the total tax amount for the transaction
-                                taxes = taxes + item.Amount * ((decimal)(product.TaxRate / 100));
+                                taxes += item.Amount * ((decimal)product.TaxRate / 100M);
                             }
                         }
                     }
                 }
             }
-            catch (Exception ex) { }
+            catch (Exception ex) 
+            {
+                Logger.Error("Error calculating taxes for transaction " + pTransactionID, ex);
+            }
             return taxes;
         }
 
         private async Task<decimal> CalculateShipping(long pTransactionID, long entityObjectChargesId, AppContactRelationshipInfo relation)
         {
-            var shipping = 0;
-            string accountSSIN = "";
+            decimal shipping = 0M;
             try
             {
-                var buyerContact = await _appTransactionContactsRepository.GetAll().Where(e => e.ContactRole == "Buyer" && e.TransactionId == pTransactionID).FirstOrDefaultAsync();
-                var activeRealtionshipStatusId = await _helper.SystemTables.GetEntityObjectStatusRelationshipActive();
-                if (buyerContact != null && !string.IsNullOrEmpty(buyerContact.CompanySSIN))
+
+                if (relation != null && relation.EntityExtraData != null && relation.EntityExtraData.Count > 0)
                 {
-                    if (relation != null && relation.EntityExtraData != null && relation.EntityExtraData.Count > 0)
+
+                    foreach (var extra in relation.EntityExtraData)
                     {
-
-                        foreach (var extra in relation.EntityExtraData)
+                        if (extra.AttributeId == 909 && extra.AttributeValueId > 0)
                         {
-                            if (extra.AttributeId == 909 && extra.AttributeValueId > 0)
+
+                            var entity = await _appEntity.GetAll().Include(e => e.EntityExtraData).Where(e => e.Id == extra.AttributeValueId).FirstOrDefaultAsync();
+                            if (entity != null)
                             {
+                                decimal chargeAmount = 0M;
+                                decimal minAmount = 0M;
 
-                                var entity = await _appEntity.GetAll().Include(e => e.EntityExtraData).Where(e => e.Id == extra.AttributeValueId).FirstOrDefaultAsync();
-                                if (entity != null)
+                                var apiExtraData = entity.EntityExtraData.FirstOrDefault(e => e.AttributeId == 905); // Assuming 905 is the AttributeId for minAmount
+                                if (apiExtraData != null && !string.IsNullOrEmpty(apiExtraData.AttributeValue))
                                 {
-                                    var chargeAmount = 0;
-                                    var minAmount = 0;
-
-                                    var apiExtraData = entity.EntityExtraData.FirstOrDefault(e => e.AttributeId == 905); // Assuming 904 is the AttributeId for CalculationAPI
-                                    if (apiExtraData != null && !string.IsNullOrEmpty(apiExtraData.AttributeValue))
-                                    {
-                                        minAmount = int.Parse(apiExtraData.AttributeValue);
-                                    }
-                                    var apiExtraDataAmount = entity.EntityExtraData.FirstOrDefault(e => e.AttributeId == 904); // Assuming 904 is the AttributeId for CalculationAPI
-                                    if (apiExtraDataAmount != null && !string.IsNullOrEmpty(apiExtraDataAmount.AttributeValue))
-                                    {
-                                        chargeAmount = int.Parse(apiExtraDataAmount.AttributeValue);
-                                    }
-
-                                    if (chargeAmount > 0)
-                                    {
-                                        Decimal OrderAmount = _appTransactionDetails.GetAll().Where(e => e.TransactionId == pTransactionID && e.EntityObjectTypeId == entityObjectChargesId)
-                                            .Sum(e => e.Amount);
-
-                                        shipping = OrderAmount < minAmount ? chargeAmount : 0;
-                                    }
-
+                                    decimal.TryParse(apiExtraData.AttributeValue, out minAmount);
                                 }
+                                var apiExtraDataAmount = entity.EntityExtraData.FirstOrDefault(e => e.AttributeId == 904); // Assuming 904 is the AttributeId for chargeAmount
+                                if (apiExtraDataAmount != null && !string.IsNullOrEmpty(apiExtraDataAmount.AttributeValue))
+                                {
+                                    decimal.TryParse(apiExtraDataAmount.AttributeValue, out chargeAmount);
+                                }
+
+                                if (chargeAmount > 0)
+                                {
+                                    decimal orderAmount = await _appTransactionDetails.GetAll().Where(e => e.TransactionId == pTransactionID && e.EntityObjectTypeId != entityObjectChargesId)
+                                        .SumAsync(e => e.Amount);
+
+                                    shipping = orderAmount < minAmount ? chargeAmount : 0M;
+                                }
+
                             }
-
                         }
-                    }
-                }
 
+                    }
+
+
+                }
             }
-            catch (Exception ex) { }
+            catch (Exception ex) 
+            {
+                Logger.Error("Error calculating shipping for transaction " + pTransactionID, ex);
+            }
             return shipping;
         }
         //T-SII-20250606.0001,1 MMT 07/03/2025 Update appEntity log when Transaction line is edited Qty or Price[End]
