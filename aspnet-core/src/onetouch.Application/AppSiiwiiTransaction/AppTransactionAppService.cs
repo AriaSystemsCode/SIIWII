@@ -7665,7 +7665,8 @@ namespace onetouch.AppSiiwiiTransaction
         public async Task AddTransactionCharges(long pTransactionID)
         {
             // Delete all AppTransactionDetails where TransactionId = pTransactionID and Code = "CHARGES"
-            var entityObjectStatusId = await _helper.SystemTables.GetEntityObjectStatusDraftTransaction();
+            //var entityObjectStatusId = await _helper.SystemTables.GetEntityObjectStatusDraftTransaction();
+            var entityObjectStatusId = await _helper.SystemTables.GetEntityObjectStatusOpenTransaction();
             var entityObjectChargesId = await _helper.SystemTables.GetEntityObjectCharges();
 
             var entityObjectId = await _helper.SystemTables.GetObjectItemId();
