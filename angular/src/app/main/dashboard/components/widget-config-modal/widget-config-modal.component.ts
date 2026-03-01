@@ -24,6 +24,8 @@ export class WidgetConfigModalComponent {
   fields: EntityField[] = [];
   measures: EntityField[] = [];
   dimensions: EntityField[] = [];
+  timeFields : EntityField[] = [];
+  
   filterDefs = [];
 
   dimensionValueOptions: string[] = [];
@@ -68,6 +70,16 @@ previewCalcValue: number | null = null;
       dateTo: [null],
       filters: [[]],
 
+      lineTimeField: [null],
+      timePreset: ['thisMonth'], // ClickUp-like default
+      bucket: ['week'],
+      lineAgg: ['count'],
+      lineField: [null],
+      lineSeriesField: [null],
+      smooth: [true],
+      stackedArea: [false],
+      showLegend: [true],
+
       // bar config
       barX: [null],
       barY: [[]],
@@ -85,7 +97,13 @@ previewCalcValue: number | null = null;
 
     // default validators based on initial chartType (if set later, setKind handles it)
   }
-
+  timePresetOptions = [
+    { label: 'Last 7 days', value: 'last7Days' },
+    { label: 'Last 30 days', value: 'last30Days' },
+    { label: 'Last 90 days', value: 'last90Days' },
+    { label: 'This month', value: 'thisMonth' },
+    { label: 'Custom', value: 'custom' },
+  ];
   // ngOnChanges(){
   //   this.form.valueChanges.subscribe(() => {
   //     this.updatePreview();
@@ -149,6 +167,7 @@ previewCalcValue: number | null = null;
     this.fields = this.meta.getFields(ent);
     this.measures = this.fields.filter(f => f.role === 'measure');
     this.dimensions = this.fields.filter(f => f.role !== 'measure');
+    this.timeFields = this.fields.filter(f => f.role === 'datetime');
     this.filterDefs = this.meta.getFilters(ent);
 
     // reset dependent controls
@@ -260,12 +279,24 @@ previewCalcValue: number | null = null;
     if (!v.entity) return false;
 
     if (this.chartType === 'bar') {
-      return !!v.barX && Array.isArray(v.barY) && v.barY.length > 0;
+      return true
+      // return !!v.barX && Array.isArray(v.barY) && v.barY.length > 0;
     }
 
     if (this.chartType === 'calculation') {
       if (!v.calcAgg) return false;
       if (this.requiresCalcField(v.calcAgg)) return !!v.calcField;
+      return true;
+    }
+
+    if (this.chartType === 'line') {
+      if (!v.lineTimeField) return false;
+      if (!v.lineAgg) return false;
+      if (v.lineAgg !== 'count' && !v.lineField) return false;
+    
+      // preset custom needs dates
+      if (v.timePreset === 'custom' && (!v.dateFrom || !v.dateTo)) return false;
+    
       return true;
     }
 
@@ -395,4 +426,25 @@ previewCalcValue: number | null = null;
   
     this.cdr.markForCheck();
   }
+
+  onLineAggChange(): void {
+    const agg = this.form.value.lineAgg;
+    if (agg === 'count') {
+      this.form.patchValue({ lineField: null }, { emitEvent: false });
+      this.form.get('lineField')?.clearValidators();
+    } else {
+      this.form.get('lineField')?.setValidators([Validators.required]);
+    }
+    this.form.get('lineField')?.updateValueAndValidity({ emitEvent: false });
+    this.updatePreview();
+  }
+
+  bucketOptions = [
+    { label: 'Hour', value: 'hour' },
+    { label: 'Day', value: 'day' },
+    { label: 'Week', value: 'week' },
+    { label: 'Month', value: 'month' },
+    { label: 'Quarter', value: 'quarter' },
+    { label: 'Year', value: 'year' },
+  ];
 }

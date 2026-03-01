@@ -39,6 +39,7 @@ import { InputSwitchModule } from "primeng/inputswitch";
 import { NgxEchartsModule } from 'ngx-echarts';
 import { GridsterModule } from 'angular-gridster2';
 import { AddWidgetPickerComponent } from './components/add-widget-picker/add-widget-picker.component';
+import { CalendarModule } from 'primeng/calendar';
 
 @NgModule({
     declarations: [
@@ -84,7 +85,8 @@ import { AddWidgetPickerComponent } from './components/add-widget-picker/add-wid
         CardModule,
                 InputSwitchModule,   // <-- you used <p-inputSwitch>
                 NgxEchartsModule.forRoot({ echarts: () => import('echarts') }),
-                GridsterModule
+                GridsterModule,
+                CalendarModule
 
     ],
     providers: [

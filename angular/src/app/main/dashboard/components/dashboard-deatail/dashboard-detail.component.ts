@@ -479,7 +479,7 @@ removeItem(gridInfo: GridsterItem): void {
 }
 
 openWidgetPicker(): void {
-  if (!this.canEdit || this.mode !== 'edit') return;
+  // if (!this.canEdit || this.mode !== 'edit') return;
   this.widgetPicker.show();
 }
 

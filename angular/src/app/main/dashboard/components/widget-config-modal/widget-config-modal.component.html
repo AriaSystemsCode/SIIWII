@@ -87,21 +87,128 @@
                   (onChange)="onBarXChange()">
                 </p-dropdown>
 
-                <label class="form-label mt-2">Y series (one or more)</label>
-                <p-multiSelect
+                <label class="form-label mt-2">Y series </label>
+                <p-dropdown
                   [options]="measures"
                   optionLabel="label"
                   optionValue="name"
                   formControlName="barY"
                   defaultLabel="Select measures">
-                </p-multiSelect>
+                </p-dropdown>
               </div>
             </ng-container>
 
             <!-- ========================= -->
             <!-- NORMAL CHART FIELDS -->
             <!-- ========================= -->
-            <ng-container *ngIf="chartType !== 'bar' && chartType !== 'calculation'">
+            <ng-container *ngIf="chartType === 'line'">
+
+              <!-- X-axis -->
+              <div class="mt-3">
+                <label class="form-label">X-axis</label>
+            
+                <div class="mb-2">
+                  <small class="text-muted d-block">Measure</small>
+                  <p-dropdown
+                    [options]="timeFields"
+                    optionLabel="label"
+                    optionValue="name"
+                    formControlName="lineTimeField"
+                    placeholder="Select date field">
+                  </p-dropdown>
+                </div>
+            
+                <div class="mb-2">
+                  <small class="text-muted d-block">Time range</small>
+                  <p-dropdown
+                    [options]="timePresetOptions"
+                    optionLabel="label"
+                    optionValue="value"
+                    formControlName="timePreset"
+                    placeholder="Select range">
+                  </p-dropdown>
+                </div>
+            
+                <div class="mb-2">
+                  <small class="text-muted d-block">Group by</small>
+                  <p-dropdown
+                    [options]="bucketOptions"
+                    optionLabel="label"
+                    optionValue="value"
+                    formControlName="bucket"
+                    placeholder="Select bucket">
+                  </p-dropdown>
+                </div>
+            
+                <!-- Custom range -->
+                <div *ngIf="form.value.timePreset === 'custom'" class="d-flex gap-2">
+                  <div class="flex-grow-1">
+                    <small class="text-muted d-block">From</small>
+                    <p-calendar formControlName="dateFrom" ></p-calendar>
+                  </div>
+                  <div class="flex-grow-1">
+                    <small class="text-muted d-block">To</small>
+                    <p-calendar formControlName="dateTo"></p-calendar>
+                  </div>
+                </div>
+              </div>
+            
+              <!-- Y-axis -->
+              <div class="mt-3">
+                <label class="form-label">Y-axis</label>
+            
+                <div class="mb-2">
+                  <small class="text-muted d-block">Measure</small>
+                  <p-dropdown
+                    [options]="calcAggOptions"
+                    optionLabel="label"
+                    optionValue="value"
+                    formControlName="lineAgg"
+                    (onChange)="onLineAggChange()"
+                    placeholder="Count / Sum / Avg">
+                  </p-dropdown>
+                </div>
+            
+                <div class="mb-2" *ngIf="form.value.lineAgg !== 'count'">
+                  <small class="text-muted d-block">Field</small>
+                  <p-dropdown
+                    [options]="measures"
+                    optionLabel="label"
+                    optionValue="name"
+                    formControlName="lineField"
+                    placeholder="Select numeric field">
+                  </p-dropdown>
+                </div>
+            
+                <div class="mb-2">
+                  <small class="text-muted d-block">Group by (Series)</small>
+                  <p-dropdown
+                    [options]="dimensions"
+                    optionLabel="label"
+                    optionValue="name"
+                    formControlName="lineSeriesField"
+                    placeholder="Optional (e.g. Status)">
+                  </p-dropdown>
+                </div>
+            
+                <!-- <div class="d-flex align-items-center gap-2">
+                  <p-inputSwitch formControlName="smooth"></p-inputSwitch>
+                  <span class="text-muted">Smooth line</span>
+                </div>
+            
+                <div class="d-flex align-items-center gap-2 mt-2">
+                  <p-inputSwitch formControlName="stackedArea"></p-inputSwitch>
+                  <span class="text-muted">Display as stacked area</span>
+                </div>
+            
+                <div class="d-flex align-items-center gap-2 mt-2">
+                  <p-inputSwitch formControlName="showLegend"></p-inputSwitch>
+                  <span class="text-muted">Show legend</span>
+                </div> -->
+              </div>
+            
+            </ng-container>
+            <ng-container *ngIf="chartType !== 'bar' && chartType !== 'calculation' && chartType !== 'line'">
               <div class="mt-3">
                 <label class="form-label">Measure</label>
                 <p-dropdown
