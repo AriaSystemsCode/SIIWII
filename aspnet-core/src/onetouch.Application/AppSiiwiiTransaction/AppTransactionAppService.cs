@@ -7809,6 +7809,8 @@ namespace onetouch.AppSiiwiiTransaction
                 }
 
             }
+
+            await RecalculateTransactionTotalAmount(pTransactionID);
         }
 
         private async Task<decimal> CalculateTaxes(long pTransactionID, long entityObjectChargesId, AppContactRelationshipInfo relation)
@@ -7917,7 +7919,7 @@ namespace onetouch.AppSiiwiiTransaction
                     var chargeDetail = transCharges.FirstOrDefault(c => c.Id == chargeDto.TransactionDetailID);
                     if (chargeDetail != null)
                     {
-                        if (chargeDetail.Note == "true" || chargeDetail.Note == "True") 
+                        //if (chargeDetail.Note == "true" || chargeDetail.Note == "True") 
                         {
                             chargeDetail.Amount = chargeDto.ChargeAmount;
                             chargeDetail.NetPrice = chargeDto.ChargeAmount;
@@ -7930,7 +7932,14 @@ namespace onetouch.AppSiiwiiTransaction
             }
 
             // Calculate total amount
-            totalAmount = await _appTransactionDetails.GetAll()
+            totalAmount = await RecalculateTransactionTotalAmount(transactionId);
+            
+            return totalAmount;
+        }
+
+        public async Task<decimal> RecalculateTransactionTotalAmount(long transactionId)
+        {
+            decimal totalAmount = await _appTransactionDetails.GetAll()
                 .Where(a => a.TransactionId == transactionId)
                 .SumAsync(a => a.Amount);
                 
