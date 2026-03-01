@@ -1853,7 +1853,10 @@ namespace onetouch.AppSiiwiiTransaction
                 //log[End]
 
                 #region calculate charges
-                await AddTransactionCharges(input.Id);
+                if (input.lFromPlaceOrder)
+                {
+                    await AddTransactionCharges(input.Id);
+                }
                 #endregion
 
                 appTrans.EnteredDate = input.EnteredDate;
@@ -7898,6 +7901,50 @@ namespace onetouch.AppSiiwiiTransaction
             }
             return shipping;
         }
+        
+        public async Task<decimal> UpdateCharges(List<ChargesDto> charges, long transactionId)
+        {
+            decimal totalAmount = 0m;
+            var entityObjectChargesId = await _helper.SystemTables.GetEntityObjectCharges();
+            
+            if (charges != null && charges.Any())
+            {
+                var transCharges = await _appTransactionDetails.GetAll()
+                    .Where(a => a.TransactionId == transactionId && a.EntityObjectTypeId == entityObjectChargesId).ToListAsync();
+
+                foreach (var chargeDto in charges)
+                {
+                    var chargeDetail = transCharges.FirstOrDefault(c => c.Id == chargeDto.TransactionDetailID);
+                    if (chargeDetail != null)
+                    {
+                        if (chargeDetail.Note == "true" || chargeDetail.Note == "True") 
+                        {
+                            chargeDetail.Amount = chargeDto.ChargeAmount;
+                            chargeDetail.NetPrice = chargeDto.ChargeAmount;
+                            chargeDetail.GrossPrice = chargeDto.ChargeAmount;
+                            await _appTransactionDetails.UpdateAsync(chargeDetail);
+                        }
+                    }
+                }
+                await CurrentUnitOfWork.SaveChangesAsync();
+            }
+
+            // Calculate total amount
+            totalAmount = await _appTransactionDetails.GetAll()
+                .Where(a => a.TransactionId == transactionId)
+                .SumAsync(a => a.Amount);
+                
+            var header = await _appTransactionsHeaderRepository.GetAsync(transactionId);
+            if (header != null)
+            {
+                header.TotalAmount = (double)totalAmount;
+                await _appTransactionsHeaderRepository.UpdateAsync(header);
+                await CurrentUnitOfWork.SaveChangesAsync();
+            }
+            
+            return totalAmount;
+        }
+
         //T-SII-20250606.0001,1 MMT 07/03/2025 Update appEntity log when Transaction line is edited Qty or Price[End]
         //I46{End}
     }

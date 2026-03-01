@@ -22,6 +22,8 @@ namespace onetouch.AppSiiwiiTransaction.Dtos
         public string Name { get; set; }
         public Boolean IsEditable { get; set; }
         public decimal ChargeAmount { get; set; }
+        public long TransactionDetailID { get; set; }
+
     }
     public class GetAppTransactionsForViewDto : CreateOrEditAppTransactionsDto
     {
