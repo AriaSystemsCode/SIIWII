@@ -9631,6 +9631,7 @@ namespace onetouch.Accounts
                             case ExcelRecordRepeateHandler.ReplaceDuplicatedRecords: // replace
                                 createOrEditAccountInfoDto.Id = account.Id;
                                 entId = account.EntityId;
+                                createOrEditAccountInfoDto.SSIN = account.SSIN;
                                 break;
                             case ExcelRecordRepeateHandler.CreateACopy: // override
                                 createOrEditAccountInfoDto.Code = GetAccountCopyCode(code, partnerEntityObjectTypeId);
@@ -9658,6 +9659,7 @@ namespace onetouch.Accounts
                     {
                         accountContact.AccountId = long.Parse(createOrEditAccountInfoDto.Id.ToString());
                         accountContact.Id = long.Parse(createOrEditAccountInfoDto.Id.ToString());
+                        accountContact.SSIN = createOrEditAccountInfoDto.SSIN;
                     }
                     accountContact.ParentId = null;
                     accountContact.AccountType = createOrEditAccountInfoDto.AccountType;
