@@ -43,55 +43,7 @@
       </div>
 
       <!-- Right: actions -->
-      <div class="d-flex align-items-center gap-2">
-
-        <!-- Refresh All (View+) -->
-        <button pButton type="button" class="" icon="pi pi-refresh" label="Refresh" [loading]="refreshing"
-          (click)="refreshAll()" [disabled]="!canView"></button>
-
-
-
-        <!-- View/Edit toggle -->
-        <ng-container *ngIf="mode === 'view'">
-          <button pButton type="button" icon="pi pi-pencil" label="Edit" class="editBtn" (click)="enterEditMode()"
-            [disabled]="!canEdit"></button>
-        </ng-container>
-
-        <ng-container *ngIf="mode === 'edit'">
-          <!-- <button
-            pButton
-            type="button"
-            icon="pi pi-undo"
-            class="p-button-outlined"
-            pTooltip="Undo"
-            (click)="undo()"
-            [disabled]="!canUndo"
-          ></button> -->
-
-
-
-          <!-- <button
-            pButton
-            type="button"
-            icon="pi pi-times"
-            label="Cancel"
-            class="p-button-outlined"
-            (click)="cancelEditMode()"
-          ></button> -->
-
-          <button pButton type="button" icon="pi pi-check" label="Save" class="editBtn" (click)="saveDashboard()"
-            [disabled]="!canEdit"></button>
-          <button pButton type="button" label="Add widget" icon="pi pi-plus" class="p-button-sm"
-            (click)="openWidgetPicker()">
-          </button>
-
-        </ng-container>
-
-        <!-- More actions -->
-        <p-menu #menu [popup]="true" [model]="actionsMenuItems"></p-menu>
-        <button pButton type="button" icon="pi pi-ellipsis-h" class="p-button-rounded p-button-text"
-          (click)="menu.toggle($event)" aria-label="More actions"></button>
-      </div>
+    
     </div>
 
     <!-- Owner + sharing strip -->
@@ -122,7 +74,54 @@
         </div>
       </div>
     </div>
+
+    <div class="dash-people d-flex justify-content-between align-items-center gap-2">
+
+      <!-- Refresh All (View+) -->
+  
+
+
+
+      <!-- View/Edit toggle -->
+      <div>
+        <!-- <button pButton type="button" icon="pi pi-pencil" label="Edit" class="editBtn" (click)="enterEditMode()"
+          [disabled]="!canEdit"></button> -->
+
+
+          <div class="edit-mode-row d-flex align-items-center" >
+            <p-inputSwitch
+              [ngModel]="mode === 'edit'"
+              (onChange)="enterEditMode()"
+              [disabled]="!canEdit"
+              styleClass="edit-switch"
+            ></p-inputSwitch>
+          
+            <span class="edit-mode-text mx-2">Edit mode</span>
+          </div>
+      </div>
+
+      <div class="d-flex gap-2 align-items-center">
+        <button pButton type="button" class="saveBtn" icon="pi pi-refresh"  [loading]="refreshing"
+        (click)="refreshAll()" [disabled]="!canView"></button>
+        <button *ngIf="mode === 'edit'" pButton type="button" icon="pi pi-check" label="Save" class="editBtn" (click)="saveDashboard()"
+          [disabled]="!canEdit"></button>
+        <button  type="button" label="widget" icon="pi pi-plus" class="editBtn"
+          (click)="openWidgetPicker()">+ Widget
+        </button>
+        <p-menu #menu [popup]="true" [model]="actionsMenuItems"></p-menu>
+        <button pButton type="button" icon="pi pi-ellipsis-h" class="p-button-rounded p-button-text"
+          (click)="menu.toggle($event)" aria-label="More actions"></button>
+   
+      </div>
+
+
   </div>
+
+
+</div>
+
+
+
 
   <!--  Content area -->
   <div class="">
@@ -178,4 +177,3 @@
     <widget-config-modal #widgetModal (create)="onWidgetCreate($event)" (cancel)="null">
     </widget-config-modal>
   </div>
-</div>

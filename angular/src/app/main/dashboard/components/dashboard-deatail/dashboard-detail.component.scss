@@ -7,6 +7,7 @@
     background: #fff;
     padding: 18px 22px;
     border-bottom: 1px solid rgba(0,0,0,.06);
+    border-radius: 12px;
   }
   
   .gap-2 { gap: 10px; }
@@ -63,7 +64,7 @@
   
   .dash-people {
     padding-top: 10px;
-    border-top: 1px dashed rgba(0,0,0,.08);
+    border-top: 1px solid rgba(0,0,0,.08);
   }
   
   .owner-chip {
@@ -273,32 +274,16 @@ border-radius: 4px;
   
     .gap-2 { gap: .5rem; }
   }
-/* dashboard-detail.component.scss */
+   
+
+
 gridster {
   height: calc(100vh - 220px);
-  min-height: 520px; /* safe fallback */
+  min-height: 520px;
   display: block;
 }
   
 
-  .widget-shell {
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    background: #fff;
-    border-radius: 12px;
-  }
-  
-  .widget-head {
-    padding: 8px 10px;
-    border-bottom: 1px solid #eee;
-  }
-  
-  .widget-body {
-    flex: 1;
-    min-height: 0;         
-    padding: 8px;
-  }
   ::ng-deep{
     gridster {
       background: inherit !important;
@@ -319,18 +304,7 @@ gridster {
       font-size: 16px !important;
     }
   }
-  .deleteWidgetButton {
-    background: #fff !important;
-    color: #595959 !important;
 
-    i {
-      fill: #595959 !important;
-      color: #595959 !important;
-    }
-
-    
- 
-  }
 
 
   .deleteWidgetButton:hover {
@@ -364,19 +338,19 @@ gridster {
   background: #fff;
   border: 1px solid rgba(0,0,0,.06);
   box-shadow: 0 6px 18px rgba(16,24,40,.06);
-  transition: box-shadow .15s ease, transform .15s ease, border-color .15s ease;
+  // transition: box-shadow .15s ease, transform .15s ease, border-color .15s ease;
   min-height: 0;
 }
 
 .widget-shell:hover {
   border-color: rgba(0,0,0,.12);
   box-shadow: 0 10px 24px rgba(16,24,40,.10);
-  transform: translateY(-1px);
+  // transform: translateY(-1px);
 }
 
 .widget-head {
   padding: 10px 12px;
-  border-bottom: 1px solid rgba(0,0,0,.06);
+  border-bottom: 1px solid #eee;
   flex: 0 0 auto;
   min-height: 44px;
 }
@@ -456,6 +430,6 @@ gridster-item { overflow: hidden; }
 
 .widget-body{
   flex: 1 1 auto;
-  min-height: 0;     /* VERY important */
+  min-height: 0;     
   overflow: hidden;
 }
