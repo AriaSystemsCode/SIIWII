@@ -95,6 +95,7 @@ using System.Management.Automation;
 using Newtonsoft.Json;
 using DocumentFormat.OpenXml.Spreadsheet;
 
+
 namespace onetouch.Accounts
 {
     [AbpAuthorize(AppPermissions.Pages_Accounts)]
@@ -391,6 +392,7 @@ namespace onetouch.Accounts
                     var activeRelationshipStatusId = await _helper.SystemTables.GetEntityObjectStatusRelationshipActive();
                     //T-SII-20221004.0002, MMT 10.26.2022 Add unpublish option to Account Profile page[Start]
                     long cancelledStatusId = await _helper.SystemTables.GetEntityObjectStatusContactCancelled();
+                    var branchEntityObjectTypeId = await _helper.SystemTables.GetEntityObjectTypeBranchId();
                     //T-SII-20221004.0002, MMT 10.26.2022 Add unpublish option to Account Profile page[End]
                     //var currPublishContact = _appContactRepository.GetAll().Include(x => x.PartnerFkList).FirstOrDefault(x => x.TenantId == AbpSession.TenantId && x.IsProfileData);
                     var filteredAccounts = _appContactRepository.GetAll()
@@ -415,13 +417,21 @@ namespace onetouch.Accounts
                              //    && _appMarketplaceContactRepository.GetAll().Count(z=>z.SSIN == x.SSIN && z.SharingLevel==1) > 0))// x.PartnerId != null)
                              //    //&& (_appContactRepository.GetAll().Count(c => c.TenantId == null && c.Id == x.PartnerId) > 0))
                              .WhereIf(input.FilterType == 2 && input.FilterType != 6,
-                                  x => (x.TenantId == AbpSession.TenantId && !x.IsProfileData && x.ParentId == null
-                                  && (x.EntityFk.TenantOwner != AbpSession.TenantId && x.EntityFk.TenantOwner != 0)
+                                  x => (x.TenantId == AbpSession.TenantId && !x.IsProfileData && x.EntityFk.EntityObjectTypeId!= branchEntityObjectTypeId  //&& x.ParentId == null
+                                  //&& (x.EntityFk.TenantOwner != AbpSession.TenantId && x.EntityFk.TenantOwner != 0)
+                                  && (_appMarketplaceContactRepository.GetAll().Count(z => z.SSIN == x.SSIN && z.TenantOwner != x.TenantId && z.SharingLevel == 1) > 0)
+                                   && 
+                                _appContactRelationshipInfoRepository.GetAll().Count(
+                                    z => ((z.RecipientContactSSIN == x.SSIN && z.RequesterContactSSIN == currentAccount.SSIN)
+                                    || (z.RequesterContactSSIN == x.SSIN && z.RecipientContactSSIN == currentAccount.SSIN)) &&
+                                    z.EntityObjectStatusId == activeRelationshipStatusId
+                                    ) > 0
                                   ))
 
                             .WhereIf(input.FilterType >= 3 && input.FilterType != 6,
                               x => (x.TenantId == AbpSession.TenantId && !x.IsProfileData && x.ParentId == null &&
-                               (x.EntityFk.TenantOwner == AbpSession.TenantId || x.EntityFk.TenantOwner == 0)
+                               //(x.EntityFk.TenantOwner == AbpSession.TenantId || x.EntityFk.TenantOwner == 0) &&
+                               _appMarketplaceContactRepository.GetAll().Count(z => z.SSIN == x.SSIN && z.TenantOwner == x.TenantId) > 0
                                //_appMarketplaceContactRepository.GetAll().Count(z => z.SSIN == x.SSIN && z.SharingLevel == 1) == 0))//x.PartnerId == null))
                                ))
                             //    x => (x.TenantId == AbpSession.TenantId && !x.IsProfileData && x.ParentId == null &&
@@ -429,11 +439,12 @@ namespace onetouch.Accounts
 
 
                              .WhereIf(input.FilterType == 6,
-                                x => (x.TenantId == AbpSession.TenantId && !x.IsProfileData && x.ParentId == null &&
+                                x => (x.TenantId == AbpSession.TenantId && !x.IsProfileData && //x.ParentId == null &&
+                                x.EntityFk.EntityObjectTypeId != branchEntityObjectTypeId &&
                                 _appMarketplaceContactRepository.GetAll().Count(z => z.SSIN == x.SSIN && z.TenantOwner== x.TenantId) > 0)//x.PartnerId == null) //&& z.SharingLevel == 1
                                 || 
-                                (x.TenantId == AbpSession.TenantId && x.ParentId == null && !x.IsProfileData &&
-                                _appMarketplaceContactRepository.GetAll().Count(z => z.SSIN == x.SSIN ) > 0 && //&& z.SharingLevel == 1
+                                (x.TenantId == AbpSession.TenantId  && !x.IsProfileData && x.EntityFk.EntityObjectTypeId != branchEntityObjectTypeId &&
+                                _appMarketplaceContactRepository.GetAll().Count(z => z.SSIN == x.SSIN && z.SharingLevel == 1) > 0 && //&& z.SharingLevel == 1
                                 _appContactRelationshipInfoRepository.GetAll().Count(
                                     z=>((z.RecipientContactSSIN==x.SSIN && z.RequesterContactSSIN== currentAccount.SSIN)
                                     ||(z.RequesterContactSSIN==x.SSIN && z.RecipientContactSSIN==currentAccount.SSIN)) &&
@@ -531,13 +542,13 @@ namespace onetouch.Accounts
                                             Status = input.FilterType != 1 ? (_appMarketplaceContactRepository.GetAll().Count(z=>z.SSIN == o.SSIN && z.SharingLevel == 1) > 0 || (o.TenantId != null && o.ParentId == null && _appMarketplaceContactRepository.GetAll().Count(z => z.SSIN == o.SSIN && z.SharingLevel == 1) == 0)) :
                                             (_appContactRepository.GetAll().Count(x => x.TenantId == AbpSession.TenantId && _appMarketplaceContactRepository.GetAll().Count(z => z.SSIN == o.SSIN && z.SharingLevel == 1) > 0) > 0 || (o.TenantId != null && o.ParentId == null && _appMarketplaceContactRepository.GetAll().Count(z => z.SSIN == o.SSIN && z.SharingLevel == 1) == 0)),
                                             Id = o.Id,
-                                            IsManual = o.TenantId == AbpSession.TenantId && o.ParentId == null && _appMarketplaceContactRepository.GetAll().Count(z => z.SSIN == o.SSIN && z.SharingLevel == 1) == 0,
+                                            IsManual = o.TenantId == AbpSession.TenantId && o.ParentId == null && _appMarketplaceContactRepository.GetAll().Count(z => z.SSIN == o.SSIN && z.SharingLevel == 1 && z.TenantOwner != AbpSession.TenantId) == 0,
                                             LogoUrl = string.IsNullOrEmpty(o.EntityFk.EntityAttachments.FirstOrDefault().AttachmentFk.Attachment) ?
                                              ""
                                              : "attachments/" + (o.EntityFk.TenantId == null ? "-1" : o.EntityFk.TenantId.ToString()) + "/" + o.EntityFk.EntityAttachments.FirstOrDefault(x => x.AttachmentCategoryId == logoCategory).AttachmentFk.Attachment,
                                             Classfications = o.EntityFk.EntityClassifications.Select(x => x.EntityObjectClassificationFk.Name).Take(5).ToArray(),
                                             Categories = o.EntityFk.EntityCategories.Select(x => x.EntityObjectCategoryFk.Name).Take(5).ToArray(),
-                                            PartnerId = _appMarketplaceContactRepository.GetAll().Count(z => z.SSIN == o.SSIN && z.SharingLevel == 1) >0? _appMarketplaceContactRepository.GetAll().FirstOrDefault(z => z.SSIN == o.SSIN && z.SharingLevel == 1).Id : null//o.PartnerId
+                                            PartnerId = _appMarketplaceContactRepository.GetAll().Count(z => z.SSIN == o.SSIN && z.SharingLevel == 1 && z.TenantOwner != AbpSession.TenantId) >0? _appMarketplaceContactRepository.GetAll().FirstOrDefault(z => z.SSIN == o.SSIN && z.SharingLevel == 1 && z.TenantOwner != AbpSession.TenantId).Id : null//o.PartnerId
                                         },
                                         //AppEntityName = s1 == null || s1.Name == null ? "" : s1.Name.ToString()
                                     };
@@ -554,7 +565,7 @@ namespace onetouch.Accounts
                     {
                         var accountConnection = _appContactRepository.GetAll()
                         .FirstOrDefault(e => e.TenantId == AbpSession.TenantId && e.SSIN == account.Account.SSIN);
-                        if (accountConnection != null && accountConnection.Id > 0)
+                        if (accountConnection != null && accountConnection.Id > 0 && !account.Account.IsManual)
                         {
                             // account.ConnectionName = GetAction(account.Account.AccountType, currentTenantAccount, false);
                             var relationship = await _appContactRelationshipInfoRepository.GetAll()
@@ -698,7 +709,7 @@ namespace onetouch.Accounts
                                (x.RequesterContactSSIN == input.SSIN && x.RecipientContactTypeId == long.Parse(input.AccountTypeId.ToString())) ||
                                (x.RecipientContactSSIN == input.SSIN && x.RequesterContactTypeId == long.Parse(input.AccountTypeId.ToString())));
                     //.ToListAsync();
-                   
+                    var inputAccount =await _appMarketplaceContactRepository.GetAll().Where(z => z.SSIN == input.SSIN).FirstOrDefaultAsync();
                    
                     //I40
                     /*var filteredAccounts = _appContactRepository.GetAll()
@@ -719,7 +730,8 @@ namespace onetouch.Accounts
                                            .Include(enca => enca.EntityCategories)
                                            .Include(ena => ena.EntityAttachments).ThenInclude(x => x.AttachmentFk)
                                            .WhereIf(excludeGroupAccount, z => z.EntityObjectTypeId != groupAccountEntityObjectTypeId)
-                                           .Where(z=>z.SSIN!= input.SSIN && z.SharingLevel == 1) //&& z.SSIN!= currentTenantAccount.SSIN
+                                           .Where(z=>z.SSIN!= input.SSIN && z.SharingLevel == 1 && z.IsDeleted == false && z.TenantOwner != inputAccount.TenantOwner
+                                           ) //&& z.SSIN!= currentTenantAccount.SSIN
                                            from b in relationships 
                                            where (a.SSIN == b.RequesterContactSSIN || a.SSIN== b.RecipientContactSSIN)
                                            select new GetAccountForViewDto()
@@ -951,7 +963,8 @@ namespace onetouch.Accounts
                                 || (z.RecipientContactSSIN == account.Account.SSIN)) && z.EntityObjectStatusId == activeRelationshipStatusId &&
                                 (z.SharingLevel == 1));
 
-                        var relationshipQ = from b in _appMarketplaceContactRepository.GetAll().Where(z => z.SSIN != account.Account.SSIN && z.IsDeleted == false && z.SharingLevel == 1)
+                        var relationshipQ = from b in _appMarketplaceContactRepository.GetAll()
+                                            .Where(z => z.SSIN != account.Account.SSIN && z.IsDeleted == false && z.SharingLevel == 1 && z.TenantOwner!= inputAccount.TenantOwner)
                                             from a in relationshipsQuery1
                                             where (b.SSIN == a.RequesterContactSSIN || b.SSIN == a.RecipientContactSSIN)
                                             select new { obj = b };
@@ -1380,22 +1393,44 @@ namespace onetouch.Accounts
                 }
                 //I40[Start]
                 var presonEntityObjectTypeId = await _helper.SystemTables.GetEntityObjectTypePersonId();
-                
+                if (entity.EntityObjectTypeId == presonEntityObjectTypeId)
+                {
+                    var addressObj = account.AppContactAddresses.FirstOrDefault();
+                    if (addressObj != null)
+                    {
+                        accountDto.AddressLine1 = addressObj.AddressFk.AddressLine1;
+                        accountDto.AddressLine2 = addressObj.AddressFk.AddressLine2;
+                        accountDto.City = addressObj.AddressFk.City;
+                        accountDto.CountryId = addressObj.AddressFk.CountryId;
+                        accountDto.CountryName = addressObj.AddressFk.CountryFk.Name;
+                        accountDto.ZipCode = addressObj.AddressFk.PostalCode;
+                        accountDto.State = addressObj.AddressFk.State;
+                    }
+
+                }
                 //var branch = ObjectMapper.Map<BranchDto>(account);
                 var mainBranch = await _appContactRepository.GetAll()
                 .Include(x => x.AppContactAddresses).ThenInclude(x => x.AddressFk).ThenInclude(x => x.CountryFk)
                 .Include(z => z.CurrencyFk).FirstOrDefaultAsync(x => x.ParentId == id && x.EntityFk.EntityObjectTypeId == branchEntityObjectTypeId);
                 if (mainBranch == null
                     && (account.EntityFk.TenantOwner== AbpSession.TenantId || account.EntityFk.TenantOwner == 0 ||
-                    account.EntityFk.TenantOwner == null) && account.EntityFk.EntityObjectTypeId != presonEntityObjectTypeId)
+                    account.EntityFk.TenantOwner == null)) //&& account.EntityFk.EntityObjectTypeId != presonEntityObjectTypeId)
                 {
                     BranchDto branchDto = new BranchDto();
                     branchDto.AccountId = account.Id;
                     branchDto.ParentId = account.Id;
                     branchDto.TenantId = AbpSession.TenantId;
-
-                    branchDto.Code = account.Code.TrimEnd() + "-MAIN";
-                    branchDto.Name = account.Name.TrimEnd() + " Main Branch";
+                    if (account.EntityFk.EntityObjectTypeId == presonEntityObjectTypeId)
+                    {
+                        
+                        branchDto.Code = account.Code.TrimEnd() + "-MAINADDRESS";
+                        branchDto.Name = "Main Address";
+                    }
+                    else
+                    {
+                        branchDto.Code = account.Code.TrimEnd() + "-MAIN";
+                        branchDto.Name = account.Name.TrimEnd() + " Main Branch";
+                    }
                     branchDto.CurrencyId = account.CurrencyId;
                     branchDto.EMailAddress = account.EMailAddress;
                     branchDto.LanguageId = account.LanguageId;
@@ -1446,10 +1481,15 @@ namespace onetouch.Accounts
                         }
                     }
                 }
+                //if (account.EntityFk.EntityObjectTypeId == presonEntityObjectTypeId)
+                //{
+                //    BranchForViewDto branchForViewDto = new BranchForViewDto { Branch = new BranchDto { Name = "Main Address" ,Code= "Main Address" }, Id =0, SubTotal = 0 };
+                //    branches.Add(new TreeNode<BranchForViewDto>() { label = "Main Address", Data = branchForViewDto });
+                //}
                 //
                 //else
                // {
-                 //   branch = ObjectMapper.Map<BranchDto>(account);
+                //branch = ObjectMapper.Map<BranchDto>(account);
                 //}
 
                 
@@ -1634,7 +1674,7 @@ namespace onetouch.Accounts
                 if (tenant != null)
                 {
 
-                    var adminUser = await _userManager.FindByNameAsync("admin@" + tenant.TenancyName);
+                    var adminUser = await _userManager.FindByIdAsync(AbpSession.UserId.ToString());//.FindByNameAsync("admin@" + tenant.TenancyName);
                     if (adminUser != null && adminUser.Id != 0)
                     {
                         firstName = adminUser.Name;
@@ -1907,8 +1947,17 @@ namespace onetouch.Accounts
                             var tenantObj = await TenantManager.GetByIdAsync(int.Parse(originalContact.TenantOwner.ToString()));
                             if (tenantObj != null)
                             {
-                                string sequance = await _iAppSycIdentifierDefinitionsService.GetNextEntityCode("BUSINESS", originalContact.TenantOwner);
-                                createOrEditAccountInfoDto.Code =  "M" + sequance;//tenantObj.TenancyName.Trim() 
+                                if (originalPublishContactFortCurrTenant.EntityObjectTypeCode == "BUSINESS")
+                                {
+                                    string sequance = await _iAppSycIdentifierDefinitionsService.GetNextEntityCode("BUSINESS", originalContact.TenantOwner);
+                                    createOrEditAccountInfoDto.Code = "M" + sequance;//tenantObj.TenancyName.Trim() 
+                                    createOrEditAccountInfoDto.ContactRecordType = "M";
+                                }
+                                else {
+                                    string sequance = await _iAppSycIdentifierDefinitionsService.GetNextEntityCode("PERSONAL", originalContact.TenantOwner);
+                                    createOrEditAccountInfoDto.Code = "C" + sequance;//tenantObj.TenancyName.Trim() 
+                                    createOrEditAccountInfoDto.ContactRecordType = "C";
+                                }
                             }
                             createOrEditAccountInfoDto.AccountLevel = AccountLevelEnum.Manual;
                             //createOrEditAccountInfoDto.PartnerId = originalPublishContactFortCurrTenant.Id;
@@ -1929,7 +1978,7 @@ namespace onetouch.Accounts
                                 }
                             }
                             //if (originalPublishContactFortCurrTenant.EntityObjectTypeId == presonEntityObjectTypeId)
-                            createOrEditAccountInfoDto.ContactRecordType = "C";
+                            
                             saveAccountDest = await CreateOrEditAccount(createOrEditAccountInfoDto);
                             var accountSaved = saveAccountDest;
                             if (accountSaved != null && accountSaved.AccountInfo.Id > 0)
@@ -2011,8 +2060,17 @@ namespace onetouch.Accounts
                         var tenantObj = await TenantManager.GetByIdAsync(int.Parse(tenantId.ToString()));
                         if (tenantObj != null)
                         {
-                            string sequance = await _iAppSycIdentifierDefinitionsService.GetNextEntityCode("BUSINESS", tenantId);
-                            createOrEditAccountInfoDto.Code =  "M" + sequance;//tenantObj.TenancyName.Trim() +
+                            if (originalContact.EntityObjectTypeCode == "BUSINESS")
+                            {
+                                string sequance = await _iAppSycIdentifierDefinitionsService.GetNextEntityCode("BUSINESS", tenantId);
+                                createOrEditAccountInfoDto.Code = "M" + sequance;//tenantObj.TenancyName.Trim() +
+                                createOrEditAccountInfoDto.ContactRecordType = "M";
+                            }
+                            else {
+                                string sequance = await _iAppSycIdentifierDefinitionsService.GetNextEntityCode("PERSONAL", tenantId);
+                                createOrEditAccountInfoDto.Code = "C" + sequance;//tenantObj.TenancyName.Trim() +
+                                createOrEditAccountInfoDto.ContactRecordType = "C";
+                            }
                         }
                         createOrEditAccountInfoDto.AccountLevel = AccountLevelEnum.Manual;
                         //createOrEditAccountInfoDto.AccountLevel = AccountLevelEnum.Connected;
@@ -2038,7 +2096,7 @@ namespace onetouch.Accounts
                             if(accountMainObject!=null)
                                 createOrEditAccountInfoDto.AccountId = accountMainObject.Id;
                         }
-                        createOrEditAccountInfoDto.ContactRecordType = "C";
+                        
                         savedAccountSrc = await CreateOrEditAccount(createOrEditAccountInfoDto);
                         var accountSaved = savedAccountSrc;
                         if (accountSaved != null && accountSaved.AccountInfo.Id > 0)
@@ -2246,10 +2304,12 @@ namespace onetouch.Accounts
                     //MMT33-3
 
                     //Connect Current Account branches with the other account
-                    if (originalPublishContactFortCurrTenant.EntityObjectTypeId != presonEntityObjectTypeId && sync==false)
+                    //if (originalPublishContactFortCurrTenant.EntityObjectTypeId != presonEntityObjectTypeId && sync==false)
+                    if (sync == false)
                     await ConnectBranches(originalPublishContactFortCurrTenant.Id, id);
-
-                    if(originalContact.EntityObjectTypeId != presonEntityObjectTypeId && sync == false)
+                    //
+                    if (sync == false)
+                        //if (originalContact.EntityObjectTypeId != presonEntityObjectTypeId && sync == false)
                     await ConnectBranches(id, originalPublishContactFortCurrTenant.Id);
 
                     //Mariam[End]
@@ -2593,11 +2653,11 @@ namespace onetouch.Accounts
                         {
                             foreach (var contactAddress in branchesParentContact.ContactAddresses)
                             {
-                                var savedAddress = await _appAddressRepository.FirstOrDefaultAsync(x => x.Id == contactAddress.AddressId);
+                                var savedAddress = await _appMarketplaceAddressRepository.FirstOrDefaultAsync(x => x.Id == contactAddress.AddressId);
                                 AppAddress address = new AppAddress();
                                 if (savedAddress != null)
                                 {
-                                    var addressCon = await _appAddressRepository.GetAll().FirstOrDefaultAsync(z => z.Code == savedAddress.Code && z.TenantId == contactDto.TenantId && z.AccountId == contactDto.Id);
+                                    var addressCon = await _appAddressRepository.GetAll().FirstOrDefaultAsync(z => z.Code == savedAddress.Code && z.TenantId == contactDto.TenantId && z.AccountId == savedContactDto.AccountId);
                                     if (addressCon == null)
                                     {
                                         ObjectMapper.Map(savedAddress, address);
@@ -3415,7 +3475,7 @@ namespace onetouch.Accounts
                             }
                             //I40[End]
 
-                            if (AbpSession.TenantId != null && AbpSession.TenantId != 0)
+                            if (AbpSession.TenantId != null && AbpSession.TenantId != 0 && adminUser.RelatedTenantId != 0)
                             {
                                 var presonEntityObjectTypeId = await _helper.SystemTables.GetEntityObjectTypePersonId();
                                 var account = _appContactRepository.GetAll().Include(z => z.EntityFk)
@@ -6998,7 +7058,7 @@ namespace onetouch.Accounts
             accountDto.ContactRecordType = "C";
             var output = await CreateOrEditAccount(accountDto);
             //T-SII-20220922.0002,1 MMT 11/10/2022 Update user's profile image from contact image[Start]
-            if (accountDto.EntityAttachments.Count > 0)
+            if (accountDto.EntityAttachments != null && accountDto.EntityAttachments.Count > 0)
             {
                 var userId = accountDto.EntityExtraData.FirstOrDefault(x => x.AttributeId == 715) == null ||
                     accountDto.EntityExtraData.FirstOrDefault(x => x.AttributeId == 715).AttributeValue == null ||
@@ -7057,7 +7117,7 @@ namespace onetouch.Accounts
                             {
                                 var accountObj = await _appContactRepository.GetAll().Where(z => z.Id == accountDto.AccountId).FirstOrDefaultAsync();
                                 if (accountObj != null)
-                                {
+                                {                                    
                                     var publishedAccount = await _appMarketplaceContactRepository.GetAll().Where(z => z.TenantOwner == accountObj.TenantId && z.SSIN == accountObj.SSIN).FirstOrDefaultAsync();
                                     if (publishedAccount != null)
                                     {
@@ -7093,8 +7153,30 @@ namespace onetouch.Accounts
                     }
                 }
             }
-            
+            if (accountDto.EntityExtraData != null && accountDto.EntityExtraData.Count > 0)
+            {
+                var userObj = accountDto.EntityExtraData.Where(z => z.AttributeId == 715).FirstOrDefault();
+                if (userObj != null && !string.IsNullOrEmpty(userObj.AttributeValue) && int.Parse(userObj.AttributeValue)>0)
+                {
+                    string firstName = "";
+                    string lastName = "";
+                    var userFirstNameObj = accountDto.EntityExtraData.Where(z => z.AttributeId == 701).FirstOrDefault();
+                    if (userFirstNameObj != null)
+                        firstName = userFirstNameObj.AttributeValue;
+                    var userLastNameObj = accountDto.EntityExtraData.Where(z => z.AttributeId == 702).FirstOrDefault();
+                    if (userLastNameObj != null)
+                        lastName = userLastNameObj.AttributeValue;
+                    var user = await UserManager.FindByIdAsync(userObj.AttributeValue);
+                    if (user != null)
+                    {
+                        user.Surname = lastName;
+                        user.Name = firstName;
+                        await UserManager.UpdateAsync(user);
+                    }
+                }            
+            }            
             return returnObject;
+
             
         }
         //public async Task<bool> CreateOrEditMarketplaceContactRelationship(string requesterSSIN, string recipientSSIN,bool? disconnect)
@@ -7377,7 +7459,79 @@ namespace onetouch.Accounts
         {
             return await _appContactAddressRepository.GetAll().CountAsync(x => x.AddressId == addressId && x.ContactId != currBranchId);
         }
+        //I40[Start]
+        [AbpAuthorize(AppPermissions.Pages_Accounts_Create)]
+        public async Task<bool> CreateOrEditContactAddress(AppContactAddressDto appContactAddressDto)
+        {
+            bool returnValue = false;
+            if (appContactAddressDto != null)
+            {
+                List<LookupLabelDto> countries = await _appEntitiesAppService.GetAllCountryForTableDropdown();
+                AppAddressDto addressDto = new AppAddressDto();
+                addressDto.Id = appContactAddressDto.AddressId;
+                addressDto.Name = appContactAddressDto.Name;
+                addressDto.TenantId = AbpSession.TenantId;
+                addressDto.AddressLine1 = appContactAddressDto.AddressLine1;
+                addressDto.AddressLine2 = appContactAddressDto.AddressLine2;
+                addressDto.Code = appContactAddressDto.Code;
+                addressDto.City = appContactAddressDto.City;
+                addressDto.State = appContactAddressDto.State;
+                addressDto.PostalCode = appContactAddressDto.PostalCode;
+                if (string.IsNullOrEmpty(appContactAddressDto.CountryIdName)) appContactAddressDto.CountryIdName = "USA";
+                var countryId = appContactAddressDto.CountryId;// GetTypeId(appContactAddressDto.CountryIdName, countries);
+                addressDto.CountryId = countryId == 0 ? null : countryId;
+                addressDto.AccountId = long.Parse(appContactAddressDto.AccountId.ToString()); ;
+                var appAddressDtoRet = await CreateOrEditAddress(addressDto);
+                var addressId = appAddressDtoRet.Id;
+               
 
+                var contactOriginal = await _appContactRepository.FirstOrDefaultAsync(x => x.Id == appContactAddressDto.AccountId);
+                if (appContactAddressDto.AddressId == 0 || appContactAddressDto.AddressId == null)
+                {
+                    
+                   // var addressId = await AddAddress(appContactAddressDto.AccountId, appContactAddressDto, countries);
+                    if (addressId != null && addressId > 0)
+                    {
+                        var addressObj = await _appAddressRepository.GetAll().Where(z => z.Id == addressId).FirstOrDefaultAsync();
+                        if (addressObj != null)
+                        {
+                            AppContactAddress newContactAddress = new AppContactAddress();
+                            newContactAddress.Id = 0;
+                            newContactAddress.AddressId = addressId;
+                            newContactAddress.ContactId = long.Parse(appContactAddressDto.AccountId.ToString()); 
+                            newContactAddress.AddressTypeId = appContactAddressDto.AddressTypeId;
+                            newContactAddress.AddressCode = addressObj.Code;
+                            newContactAddress.AddressTypeCode = appContactAddressDto.AddressTypeIdName;
+                            newContactAddress.ContactCode = contactOriginal.Code;
+                            await _appContactAddressRepository.InsertAsync(newContactAddress);
+                            await CurrentUnitOfWork.SaveChangesAsync();
+                            returnValue = true;
+                        }
+                    }
+                    
+                }
+                else
+                {
+                    var addressObj = await _appAddressRepository.GetAll().Where(z => z.Id == appContactAddressDto.AddressId).FirstOrDefaultAsync();
+                    if (addressObj != null)
+                    {
+                        AppContactAddress newContactAddress = new AppContactAddress();
+                        newContactAddress.Id = appContactAddressDto.Id;
+                        newContactAddress.AddressId = appContactAddressDto.AddressId;
+                        newContactAddress.ContactId = long.Parse(appContactAddressDto.AccountId.ToString()); ;
+                        newContactAddress.AddressTypeId = appContactAddressDto.AddressTypeId;
+                        newContactAddress.AddressCode = addressObj.Code;
+                        newContactAddress.AddressTypeCode = appContactAddressDto.AddressTypeIdName;
+                        newContactAddress.ContactCode = contactOriginal.Code;
+                        await _appContactAddressRepository.UpdateAsync(newContactAddress);
+                        await CurrentUnitOfWork.SaveChangesAsync();
+                        returnValue = true;
+                    }
+                }
+            }
+            return returnValue;
+        }
+        //I40[End]
         [AbpAuthorize(AppPermissions.Pages_Accounts_Create)]
         public async Task<BranchDto> CreateOrEditBranch(BranchDto input)
         {
@@ -7465,6 +7619,9 @@ namespace onetouch.Accounts
                     branchObject.Phone1TypeName = input.Phone1TypeName;
                     branchObject.Phone2TypeName = input.Phone2TypeName;
                     branchObject.Phone3TypeName = input.Phone3TypeName;
+                    branchObject.Phone1CountryKey = input.Phone1CountryKey;
+                    branchObject.Phone2CountryKey = input.Phone2CountryKey;
+                    branchObject.Phone3CountryKey = input.Phone3CountryKey;
                     branchObject.TradeName = input.TradeName;
                     branchObject.Name=input.Name;
                     branchObject.UseDTOTenant = true;
@@ -7477,6 +7634,12 @@ namespace onetouch.Accounts
                   
             }
             var contactParent = _appContactRepository.FirstOrDefault((long)input.ParentId);
+            if (contactParent != null)
+            {
+                contactParent.LastModificationTime = DateTime.Now;
+                await _appContactRepository.UpdateAsync(contactParent);
+                await CurrentUnitOfWork.SaveChangesAsync();
+            }
             if (string.IsNullOrEmpty(branchObject.SSIN))
             {
                 AppEntity entity = new AppEntity();
@@ -7487,6 +7650,27 @@ namespace onetouch.Accounts
                     _helper.SystemTables.GenerateSSIN(contactObjectId, ObjectMapper.Map<AppEntityDto>(entity));
 
             }
+            branchObject.CurrencyId = input.CurrencyId;
+            branchObject.LanguageId = input.LanguageId;
+            branchObject.LanguageName = input.LanguageName;
+            branchObject.Phone1Number = input.Phone1Number;
+            branchObject.Phone2Number = input.Phone2Number;
+            branchObject.Phone3Number = input.Phone3Number;
+            branchObject.Phone1Ex = input.Phone1Ext;
+            branchObject.Phone2Ex = input.Phone2Ext;
+            branchObject.Phone3Ex = input.Phone3Ext;
+            branchObject.Phone1TypeId = input.Phone1TypeId;
+            branchObject.Phone2TypeId = input.Phone2TypeId;
+            branchObject.Phone3TypeId = input.Phone3TypeId;
+            branchObject.Phone1TypeName = input.Phone1TypeName;
+            branchObject.Phone2TypeName = input.Phone2TypeName;
+            branchObject.Phone3TypeName = input.Phone3TypeName;
+            branchObject.Phone1CountryKey = input.Phone1CountryKey;
+            branchObject.Phone2CountryKey = input.Phone2CountryKey;
+            branchObject.Phone3CountryKey = input.Phone3CountryKey;
+            branchObject.TradeName = input.TradeName;
+            branchObject.Name = input.Name;
+            branchObject.UseDTOTenant = true;
             branchObject.ContactRecordType = "B";
             if (branchObject.AccountId ==null)
                 branchObject.AccountId = contactParent.AccountId == null ? input.ParentId : contactParent.AccountId;

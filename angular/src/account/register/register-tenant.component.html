@@ -1,8 +1,8 @@
-<h3 class="register_label_margin titleLog ml-5 pl-4 Login_container">
+<h3 class="register_label_margin titleLog ml-md-5 ml-3 pl-2">
     {{ "AccountSignUp" | localize }}
 </h3>
 
-<h4 *ngIf="model.edition" class="text-left edition_label register_label_margin ml-5 pl-4 mb-4">
+<h4 *ngIf="model.edition" class="text-left edition_label register_label_margin ml-5 pl-2 mb-4">
     {{ "Edition" | localize }}: {{ model.editionId == 5 ? 'Personal' : model.editionId ==1 ? 'Business' : 'Group' }} {{ "Edition" | localize }}
 </h4>
  
@@ -15,7 +15,7 @@
         </h5>
 
         <div class="form-group row">
-            <div class="col-9 col-lg-12 pl-0 p-0 MB20">
+            <div class="col-12 pl-0 p-0 MB20">
                 <label class="sub_titleLog m-0 p-0 font-weight-bold text-black"> {{"Work Space Name"| localize}} <span class="StarInfo"  style="color: #F6851D;">*</span></label>
                 <div class="user_p_relative">
                 <img src="../../assets/img/input_icons/workSpaceIcon.png" class=" icon-width" [ngClass]="isArabic ? 'ar-user_icon':'user_icon'">
@@ -33,7 +33,7 @@
         </div>
 
 
-        <div *ngIf="model.edition" class="form-group col-9 col-lg-12 MB20">
+        <div *ngIf=" model.editionId != 5 " class="form-group col-9 col-lg-12 MB20">
             <label class="sub_titleLog m-0 p-0 font-weight-bold text-black"> {{"AccountName"| localize}} <span class="StarInfo"  style="color: #F6851D;">*</span></label>
             <div class="user_p_relative">
             <img src="../../assets/img/input_icons/user.png" class=" icon-width"  [ngClass]="isArabic ? 'ar-user_icon':'user_icon'">
@@ -46,8 +46,8 @@
 
 
         <div class="row mt-5 ml-0 PR2L10">
-            <label  *ngIf="!accountTypeLabel?.includes('PERSONAL')" class="Personal_Info co-lg-12"> {{"AdminInformation" | localize}} </label>
-            <div class="form-group col-5 col-lg-6 col-md-6 col-sm-6 pr-2">
+            <label  *ngIf="!accountTypeLabel?.includes('PERSONAL')" class="Personal_Info co-lg-12"> {{  model.editionId != 5 ? "AdminInformation" : "Personal Information"  | localize}} </label>
+            <div class="form-group col-12 col-lg-6 col-md-6 col-sm-6 pr-2">
                 <label class="sub_titleLog m-0 p-0" style="color: #9E9E9E;"> {{"FirstName" | localize}} <span class="StarInfo"  style="color: #F6851D;">*</span></label>
                 <div class="user_p_relative">
                 <img src="../../assets/img/input_icons/user.png" class=" icon-width SmallUser_icon" [ngClass]="isArabic ? 'ar-user_icon':'user_icon'">
@@ -60,7 +60,7 @@
                     <validation-messages [formCtrl]="firstNameInput"></validation-messages>
                 </span>
             </div>
-            <div class="form-group col-5 col-lg-6 col-md-6 col-sm-6">
+            <div class="form-group col-12 col-lg-6 col-md-6 col-sm-6">
                 <label class="sub_titleLog m-0 p-0" style="color: #9E9E9E;"> {{ "last Name" | localize }} <span class="StarInfo"  style="color: #F6851D;">*</span></label>
                 <div class="user_p_relative">
                 <img src="../../assets/img/input_icons/user.png" class=" icon-width SmallUser_icon" [ngClass]="isArabic ? 'ar-user_icon':'user_icon'">
@@ -89,6 +89,23 @@
                 <validation-messages [formCtrl]="adminEmailAddressInput"></validation-messages>
             </span>
         </div>
+
+        <div class="row MB20 ml-1 mb-2">
+            <div class="form-group col-6">
+                <label for="adminName" class="font-weight-bold text-black">{{"UserName" | localize}} <span class="StarInfo"  style="color: #F6851D;">*</span></label>
+                <input  id="adminName" #adminNameInput="ngModel" type="text"  name="adminName" class="form-control m-0" [(ngModel)]="model.adminName" required maxlength="256">
+              
+                <validation-messages [formCtrl]="adminNameInput"></validation-messages>
+            </div>
+            <label style="padding-top: 2.5rem !important;" class="text-center col-1"> @ </label>
+            <div class="form-group col-5">
+                <label for="Domain" class="font-weight-bold text-black">{{"Workspace Name" | localize}} <span class="StarInfo"  style="color: #F6851D;">*</span></label>
+                <input   id="Domain" #domainInput="ngModel" type="text"  name="Domain" class="form-control m-0" [(ngModel)]="model.tenancyName" readonly>
+    
+            </div>
+        </div>
+
+
         <div class="row MB20 PR2L10 ng-tns-c369-1 ml-1">
             <div class="form-group MB20 col-lg-6 pr-2">
                 <label class="sub_titleLog m-0 p-0 font-weight-bold text-black" *ngIf="accountTypeLabel && accountTypeLabel?.includes('PERSONAL')">{{"Password" | localize}} <span class="StarInfo"  style="color: #F6851D;">*</span></label>

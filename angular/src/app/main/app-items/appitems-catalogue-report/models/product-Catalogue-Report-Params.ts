@@ -106,6 +106,8 @@ export class ProductCatalogueReportParams implements ProductCatalogueReportParam
         else
         bccUsers += this.bccUsers[i].value;
     }
+        // this.itemsListId = 246;
+        // this.tenantId = 2154;
        url += this.reportTemplateName + "?"
        url += 'itemsListId=' + this.itemsListId
        url += '&reportTitle=' + this.reportTitle
@@ -123,7 +125,10 @@ export class ProductCatalogueReportParams implements ProductCatalogueReportParam
        url += '&specialPriceLevel=' + this.specialPriceLevel
        url += '&EmailLinesheet=' + this.EmailLinesheet
        url += '&PrintLinesheet=' + this.PrintLinesheet
-       url += '&selectedKey=' + this.selectedKey
+       if(this.itemsListId && this.itemsListId >0)
+       {url += '&selectedKey=' }
+        else 
+       {url += '&selectedKey=' + this.selectedKey}
        url += '&to=' + toUsers
        url += '&cc=' + ccUsers
        url += '&bcc=' + bccUsers

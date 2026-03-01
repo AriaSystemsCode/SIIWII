@@ -3826,6 +3826,63 @@ export class AccountsServiceProxy {
      * @param body (optional) 
      * @return Success
      */
+    createOrEditContactAddress(body: AppContactAddressDto | undefined): Observable<boolean> {
+        let url_ = this.baseUrl + "/api/services/app/Accounts/CreateOrEditContactAddress";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json-patch+json",
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processCreateOrEditContactAddress(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processCreateOrEditContactAddress(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<boolean>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<boolean>;
+        }));
+    }
+
+    protected processCreateOrEditContactAddress(response: HttpResponseBase): Observable<boolean> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+                result200 = resultData200 !== undefined ? resultData200 : <any>null;
+    
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return Success
+     */
     createOrEditBranch(body: BranchDto | undefined): Observable<BranchDto> {
         let url_ = this.baseUrl + "/api/services/app/Accounts/CreateOrEditBranch";
         url_ = url_.replace(/[?&]$/, "");
@@ -14987,6 +15044,62 @@ export class AppItemsServiceProxy {
         if (status === 200) {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
             return _observableOf(null as any);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return Success
+     */
+    addExtraAttrs(body: AppItemtExcelRecordDTO | undefined): Observable<AppItemtExcelRecordDTO> {
+        let url_ = this.baseUrl + "/api/services/app/AppItems/AddExtraAttrs";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json-patch+json",
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processAddExtraAttrs(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processAddExtraAttrs(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<AppItemtExcelRecordDTO>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<AppItemtExcelRecordDTO>;
+        }));
+    }
+
+    protected processAddExtraAttrs(response: HttpResponseBase): Observable<AppItemtExcelRecordDTO> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = AppItemtExcelRecordDTO.fromJS(resultData200);
+            return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
@@ -111584,6 +111697,7 @@ export class CreateTenantInput implements ICreateTenantInput {
     inviterTenantId!: number | undefined;
     firstName!: string;
     lastName!: string;
+    adminName!: string;
 
     [key: string]: any;
 
@@ -111616,6 +111730,7 @@ export class CreateTenantInput implements ICreateTenantInput {
             this.inviterTenantId = _data["inviterTenantId"];
             this.firstName = _data["firstName"];
             this.lastName = _data["lastName"];
+            this.adminName = _data["adminName"];
         }
     }
 
@@ -111646,6 +111761,7 @@ export class CreateTenantInput implements ICreateTenantInput {
         data["inviterTenantId"] = this.inviterTenantId;
         data["firstName"] = this.firstName;
         data["lastName"] = this.lastName;
+        data["adminName"] = this.adminName;
         return data;
     }
 }
@@ -111665,6 +111781,7 @@ export interface ICreateTenantInput {
     inviterTenantId: number | undefined;
     firstName: string;
     lastName: string;
+    adminName: string;
 
     [key: string]: any;
 }
@@ -112682,6 +112799,7 @@ export class RegisterTenantInput implements IRegisterTenantInput {
     accountType!: string | undefined;
     accountTypeId!: string | undefined;
     relatedTenantId!: number;
+    adminName!: string;
 
     [key: string]: any;
 
@@ -112713,6 +112831,7 @@ export class RegisterTenantInput implements IRegisterTenantInput {
             this.accountType = _data["accountType"];
             this.accountTypeId = _data["accountTypeId"];
             this.relatedTenantId = _data["relatedTenantId"];
+            this.adminName = _data["adminName"];
         }
     }
 
@@ -112742,6 +112861,7 @@ export class RegisterTenantInput implements IRegisterTenantInput {
         data["accountType"] = this.accountType;
         data["accountTypeId"] = this.accountTypeId;
         data["relatedTenantId"] = this.relatedTenantId;
+        data["adminName"] = this.adminName;
         return data;
     }
 }
@@ -112760,6 +112880,7 @@ export interface IRegisterTenantInput {
     accountType: string | undefined;
     accountTypeId: string | undefined;
     relatedTenantId: number;
+    adminName: string;
 
     [key: string]: any;
 }

@@ -25,6 +25,7 @@ import * as moment from "moment";
 import {  ConfirmationService } from "primeng/api";
 import { finalize } from "rxjs/operators";
 import Swal from "sweetalert2";
+import { Location } from '@angular/common';
 
 
 @Component({
@@ -97,6 +98,7 @@ export class MarketplaceViewProductComponent
         private AccountsServiceProxy: AccountsServiceProxy,
         private appItemsAppservice: AppItemsServiceProxy,
          private messageServiceProxy: MessageServiceProxy,
+         private location: Location,
         injector: Injector
     ) {
         super(injector);
@@ -703,7 +705,7 @@ export class MarketplaceViewProductComponent
                             .pipe(finalize(() => {
                                 Swal.fire({
                                     title: "",
-                                    text: `Quantities is added to the cart and purchase order # ${this.orderNo} is created?`,
+                                    text: `Do you want to add quantities to the cart and create purchase order # ${this.orderNo} ?`,
                                     icon: "info",
                                     showCancelButton: true,
                                     confirmButtonText:
@@ -868,7 +870,9 @@ export class MarketplaceViewProductComponent
 
     backToResult() {
 
-        this.router.navigateByUrl("app/main/marketplace/products");
+        // this.router.navigateByUrl("app/main/marketplace/products");
+        this.location.back();
+
     }
 
     onEditpecialPrice(updatedSpecialPrice) {

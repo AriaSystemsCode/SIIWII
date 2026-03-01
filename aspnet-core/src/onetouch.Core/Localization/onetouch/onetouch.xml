@@ -2573,6 +2573,7 @@
 	<text name="IsAddOn">Add-On</text>
 	<text name="Limited">Limited</text>
     <text name="UpdateAccountInformation">Update Account Information</text>
+    <text name="NEWWWWS">NEWWWWS</text>
 		<text name="Pleasemakesuretheimagessize5MB">Please make sure the images size 5MB</text>
 		<text name="FilesformatsSupportedareXLSX,JPGandPNG">Files formats Supported are XLSX,JPG and PNG</text>
 

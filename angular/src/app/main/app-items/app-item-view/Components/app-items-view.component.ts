@@ -74,6 +74,7 @@ export class AppItemsViewComponent
 
     @Input() productId: number = 0;
     @Input() appItemViewInput: AppItemViewInput;
+    @Input() tenantOwner
     appItemForViewDto: AppItemForViewDto;
     actionsMenuFlags: AppItemsBrowseComponentActionsMenuFlags =
         new AppItemsBrowseComponentActionsMenuFlags();

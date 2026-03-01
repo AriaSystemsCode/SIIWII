@@ -109,7 +109,16 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
     private _originalLogoUrl?: string;
     private _originalCoverUrl?: string;
 
+    editPhone2NumberValue: string = '';
+    editPhone3NumberValue: string = '';
 
+    allPhoneTypes: LookupLabelDto[] = [];
+    editPhone1TypeId: number;
+    editPhone2TypeId: number;
+    editPhone3TypeId: number;
+
+    languageSettingName  =AppConsts.languageSettingName;
+    editNotesValue: string = '';
     constructor(
         injector: Injector,
         private _appEntitiesServiceProxy: AppEntitiesServiceProxy,
@@ -132,11 +141,12 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
     }
     ngOnInit() {
         this.getAllForAccountInfo()
+        this.getPhoneTypes();
         this.allPriceLevel = this.getPriceLevel();
         this.allPriceLevel.push({ label: 'MSRP', value: 'MSRP' });
 
         this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
-        this.currentLang == 'ar' || this.currentLang == 'ar-EG'  ? this.isArabic = true : this.isArabic = false
+        this.currentLang == 'ar' || this.currentLang == 'ar-EG' ? this.isArabic = true : this.isArabic = false
         this.initUploaders();
 
     }
@@ -177,58 +187,126 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
         this.accountType = this.allAccountTypes.find(x => x.value == this.accountData.accountType)
     }
     editAccount() {
-
+        // 1) Enter edit mode (Personal Account)
         if (this.personalAccount && !this.editPersonal) {
-            this.Editting = true;
-            this.editInfo = false;
-            this.NoteditInfo = true;
-            this.setPersonalData()
-
-
-
-        } else if (this.personalAccount && this.editPersonal) {
-            if (!this.editedPersonalData) {
-                this.editedPersonalData = { ...this.accountData }; // ensure it's initialized
-            }
-            this.editedPersonalData.firstName = this.editFirstNameValue
-            this.editedPersonalData.lastName = this.editLastNameValue
-            this.editedPersonalData.eMailAddress = this.editEMailAddressValue;
-            this.editedPersonalData.languageId = this.contactData.languageId;
-            this.editedPersonalData.languageName = this.allLanguages.find(l => l.value == this.contactData.languageId)?.label;
-            this.editedPersonalData.phone1Number = this.editPhoneNumberValue;
-            this.editedPersonalData.jobTitle = this.editJobTitleValue;
-            this.editedPersonalData.emailAddressIsPublic = this.contactData?.emailAddressIsPublic;
-            this.editedPersonalData.phone1IsPublic = this.contactData?.phone1IsPublic;
-            this.contactData.entityAttachments = this.mergeAttachmentsForSave(
-                this.contactData.entityAttachments,
-                this.accountData.entityAttachments,
-                this.sycAttachmentCategoryLogo?.id,
-                this.sycAttachmentCategoryBanner?.id,
-                this._removed
-            );
-
-
-            this.contactData.languageName = this.editedPersonalData.languageName;
-
-            this.editedContactData.emit(this.contactData)
-            this.editedData.emit(this.editedPersonalData);
-            this.editInfo = true;
-            this.NoteditInfo = false;
-            this.Editting = false;
-            this.editPersonal = false;
-
-
+          this.Editting = true;
+          this.editInfo = false;
+          this.NoteditInfo = true;
+      
+          this.setPersonalData(); // fill edit* values from current data
+          return;
         }
+      
+        // 2) Save (Personal Account)
+        if (this.personalAccount && this.editPersonal) {
+      
+          // Ensure editedPersonalData exists
+          if (!this.editedPersonalData) {
+            this.editedPersonalData = { ...this.accountData };
+          }
+      
+          // ---------- Basic fields ----------
+          this.editedPersonalData.firstName = this.editFirstNameValue;
+          this.editedPersonalData.lastName = this.editLastNameValue;
+          this.editedPersonalData.eMailAddress = (this.editEMailAddressValue || '').trim();
+      
+          this.editedPersonalData.languageId = this.contactData.languageId;
+          this.editedPersonalData.languageName =
+            this.allLanguages?.find(l => l.value == this.contactData.languageId)?.label;
+      
+          this.editedPersonalData.jobTitle = this.editJobTitleValue;
+      
+          // Public flags
+          this.editedPersonalData.emailAddressIsPublic = this.contactData?.emailAddressIsPublic;
+      
+          // ---------- Phones (same style as phone 1) ----------
+          // Numbers
+          this.editedPersonalData.phone1Number = (this.editPhoneNumberValue || '').trim();
+          this.editedPersonalData.phone2Number = (this.editPhone2NumberValue || '').trim();
+          this.editedPersonalData.phone3Number = (this.editPhone3NumberValue || '').trim();
+      
+          // IsPublic flags
+          this.editedPersonalData.phone1IsPublic = this.contactData?.phone1IsPublic;
+          this.editedPersonalData.phone2IsPublic = this.contactData?.phone2IsPublic;
+          this.editedPersonalData.phone3IsPublic = this.contactData?.phone3IsPublic;
+      
+          // Type IDs + Names (send to backend)
+          (this.editedPersonalData as any).phone1TypeId = this.editPhone1TypeId;
+          (this.editedPersonalData as any).phone2TypeId = this.editPhone2TypeId;
+          (this.editedPersonalData as any).phone3TypeId = this.editPhone3TypeId;
+      
+          (this.editedPersonalData as any).phone1TypeName =
+            this.allPhoneTypes?.find(x => x.value === this.editPhone1TypeId)?.label;
+      
+          (this.editedPersonalData as any).phone2TypeName =
+            this.allPhoneTypes?.find(x => x.value === this.editPhone2TypeId)?.label;
+      
+          (this.editedPersonalData as any).phone3TypeName =
+            this.allPhoneTypes?.find(x => x.value === this.editPhone3TypeId)?.label;
+      
+          // ---------- Attachments merge (logo/cover) ----------
+          this.contactData.entityAttachments = this.mergeAttachmentsForSave(
+            this.contactData.entityAttachments,
+            this.accountData.entityAttachments,
+            this.sycAttachmentCategoryLogo?.id,
+            this.sycAttachmentCategoryBanner?.id,
+            this._removed
+          );
+      
+    
+      
+          // Update contactData types
+          this.contactData.phone1TypeId = this.editPhone1TypeId;
+          this.contactData.phone2TypeId = this.editPhone2TypeId;
+          this.contactData.phone3TypeId = this.editPhone3TypeId;
+      
+          this.contactData.phone1TypeName =
+            this.allPhoneTypes?.find(x => x.value === this.editPhone1TypeId)?.label;
+      
+          this.contactData.phone2TypeName =
+            this.allPhoneTypes?.find(x => x.value === this.editPhone2TypeId)?.label;
+      
+          this.contactData.phone3TypeName =
+            this.allPhoneTypes?.find(x => x.value === this.editPhone3TypeId)?.label;
+      
+          // Update contactData numbers (in case view reads from it)
+          this.contactData.phone1Number = this.editedPersonalData.phone1Number;
+          this.contactData.phone2Number = this.editedPersonalData.phone2Number;
+          this.contactData.phone3Number = this.editedPersonalData.phone3Number;
+      
+          // Keep language name in sync
+          this.contactData.languageName = this.editedPersonalData.languageName;
+      
+          // Update accountData numbers too (some parts of your code read from accountData)
+          this.accountData.phone1Number = this.editedPersonalData.phone1Number;
+          this.accountData.phone2Number = this.editedPersonalData.phone2Number;
+          this.accountData.phone3Number = this.editedPersonalData.phone3Number;
 
-        else {
 
-
-            this.editInfo = true;
-            this.NoteditInfo = false;
-            this.Editting = false;
-            this.edit.emit();
+          this.editedPersonalData.notes = (this.editNotesValue || '').trim();
+            this.contactData.notes = this.editedPersonalData.notes;
+            (this.editedPersonalData as any).notesIsPublic = this.contactData?.notesIsPublic;
+      
+          // ---------- Emit ----------
+          this.editedContactData.emit(this.contactData);
+          this.editedData.emit(this.editedPersonalData);
+      
+          // ---------- Exit edit mode ----------
+          this.editInfo = true;
+          this.NoteditInfo = false;
+          this.Editting = false;
+          this.editPersonal = false;
+      
+          return;
         }
-    }
+      
+        // 3) Non-personal or other edit mode
+        this.editInfo = true;
+        this.NoteditInfo = false;
+        this.Editting = false;
+        this.edit.emit();
+      }
+      
 
     deleteAccount() {
         this.delete.emit()
@@ -386,6 +464,7 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
                 this.hideshowShare = false;
                 this.hideshowShare = true;
                 this.showShare = true;
+                this.publish.emit(true)
             }
             );
     }
@@ -411,10 +490,10 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
             finalize(() => this.hideMainSpinner()
             )).subscribe(
                 (response) => {
-                    if ((this.connectionCount == 0 )) {
+                    if ((this.connectionCount == 0)) {
                         this.notify.success(this.l('Profile Set To Private Successfully'));
 
-                    } else if ( this.connectionCount != 0 ) {
+                    } else if (this.connectionCount != 0) {
                         this.notify.success(this.l('Profile Set To Heddin Successfully'));
                     }
 
@@ -468,7 +547,15 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
         this.editLastNameValue = this.contactData?.lastName;
         this.editJobTitleValue = this.contactData?.jobTitle;
         this.editEMailAddressValue = this.accountData.eMailAddress;
-        this.editPhoneNumberValue = this.accountData.phone1Number;
+        this.editPhoneNumberValue = this.contactData?.phone1Number;
+this.editPhone2NumberValue = this.contactData?.phone2Number;
+this.editPhone3NumberValue = this.contactData?.phone3Number;
+
+        this.editPhone1TypeId = this.contactData?.phone1TypeId;
+        this.editPhone2TypeId = this.contactData?.phone2TypeId;
+        this.editPhone3TypeId = this.contactData?.phone3TypeId;
+
+        this.editNotesValue = this.contactData?.notes || '';
     }
 
     cancelPerAcc() {
@@ -647,14 +734,25 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
     }
 
     get hasInvalidEmailOrPhone(): boolean {
-        // Only consider invalid if the user typed something AND it doesn't match the pattern
         const email = (this.editEMailAddressValue || '').trim();
-        const phone = (this.editPhoneNumberValue || '').trim();
+
+        const p1 = (this.editPhoneNumberValue || '').trim();
+        const p2 = (this.editPhone2NumberValue || '').trim();
+        const p3 = (this.editPhone3NumberValue || '').trim();
 
         const emailBad = !!email && !(new RegExp(this.emailPattern).test(email));
-        const phoneBad = !!phone && !(new RegExp(this.phonePattern).test(phone));
+        const phoneBad = (v: string) => !!v && !(new RegExp(this.phonePattern).test(v));
 
-        return emailBad || phoneBad;
+        return emailBad || phoneBad(p1) || phoneBad(p2) || phoneBad(p3);
     }
+
+
+
+    getPhoneTypes() {
+        this._appEntitiesServiceProxy.getAllPhoneTypeForTableDropdown()
+            .subscribe(res => this.allPhoneTypes = res || []);
+    }
+
+
 
 }
