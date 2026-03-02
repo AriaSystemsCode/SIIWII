@@ -209,11 +209,11 @@ namespace onetouch.AppEvents
                 }
                 if (appEvent != null && appEvent.AppEvent != null && appEvent.AppEvent.UTCFromDateTime != null)
                 {
-                    appEvent.currentFromDateTime = _helper.GetDatetimeValueFromUTC(appEvent.AppEvent.UTCFromDateTime, timeZone);
+                    appEvent.currentFromDateTime = appEvent.AppEvent.UTCFromDateTime;
                 }
                 if (appEvent != null && appEvent.AppEvent != null && appEvent.AppEvent.UTCToDateTime != null)
                 {
-                    appEvent.currentToDateTime = _helper.GetDatetimeValueFromUTC(appEvent.AppEvent.UTCToDateTime, timeZone);
+                    appEvent.currentToDateTime = appEvent.AppEvent.UTCToDateTime;
                 }
 
                 return appEvent;
@@ -316,23 +316,8 @@ namespace onetouch.AppEvents
             //appEvent.UTCFromDateTime = _helper.GetUTCDatetimeValueFromDateAndTime(appEvent.FromDate, appEvent.FromTime, appEvent.TimeZone);
             //appEvent.UTCToDateTime = _helper.GetUTCDatetimeValueFromDateAndTime(appEvent.ToDate, appEvent.ToTime, appEvent.TimeZone);
 
-            var localTime = DateTime.SpecifyKind(
-                    input.FromTime,
-                    DateTimeKind.Unspecified
-                        );
-            var timeZone = TimeZoneInfo.FindSystemTimeZoneById(input.TimeZone);
-
-            var utcTime = TimeZoneInfo.ConvertTimeToUtc(localTime, timeZone);
-            appEvent.UTCFromDateTime = DateTime.SpecifyKind(utcTime, DateTimeKind.Utc);
-
-            var localTimeTo = DateTime.SpecifyKind(
-            input.ToTime,
-            DateTimeKind.Unspecified
-               );
-            var timeZoneTo = TimeZoneInfo.FindSystemTimeZoneById(input.TimeZone);
-
-            var utcTimeTo = TimeZoneInfo.ConvertTimeToUtc(localTimeTo, timeZone);
-            appEvent.UTCToDateTime = DateTime.SpecifyKind(utcTimeTo, DateTimeKind.Utc);
+            appEvent.UTCFromDateTime = input.FromTime;
+            appEvent.UTCToDateTime = input.ToTime;
 
 
 
