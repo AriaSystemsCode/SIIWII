@@ -65,6 +65,8 @@ import { MediaTabComponent } from './components/marketplace-account-profile-view
 import { AccountBillingComponent } from './components/accountBilling/accountBilling/accountbilling.component';
 import { OverALLRatingReviewsModule } from '../overallRating-reviews/overallRating-reviews.module';
 import { InputSwitchModule } from 'primeng/inputswitch';
+import { RelationshipSettingsComponent } from './components/relationship-settings/relationship-settings.component';
+import { SharedDynamicInputsModule } from '@shared/shared-module';
 
 @NgModule({
     declarations: [
@@ -86,6 +88,7 @@ import { InputSwitchModule } from 'primeng/inputswitch';
         MarketplaceAccountProfileComponent,
         OverviewTabComponent,EventsTabComponent,ConnectionsTabComponent, PostsTabComponent, ConnectionsCardComponent,
         MediaTabComponent,
+        RelationshipSettingsComponent,
     ],
     imports: [
         CommonModule,
@@ -127,7 +130,8 @@ import { InputSwitchModule } from 'primeng/inputswitch';
         PostsModule,
         InteractionsModule,EventsBrowseModule,AccountSharedModule,
         MarketplaceProductsModule,
-        OverALLRatingReviewsModule,InputSwitchModule
+        OverALLRatingReviewsModule,InputSwitchModule,
+        SharedDynamicInputsModule
         
         
     ],

@@ -255,6 +255,27 @@
                                             src="assets/profile/My-Settings-Default.svg">{{l("MySettings")}}
                                     </a>
                                 </li>
+
+                                <li class="nav-item ml-2">
+                                    <a class="nav-link" (click)="changeTab(accountInfoPageTabsEnum.RelationshipSettings)"
+                                        [ngClass]="currentTab == accountInfoPageTabsEnum.RelationshipSettings?'active':''">
+
+                                        <i *ngIf="currentTab != accountInfoPageTabsEnum.RelationshipSettings"
+           class="fa fa-user-cog"
+           style="color: #84818A">
+        </i>
+
+        <i *ngIf="currentTab == accountInfoPageTabsEnum.RelationshipSettings"
+           class="fa fa-user-cog"
+           style="color: #F88011">
+        </i>
+
+        <span class="ml-2">
+            {{ l("RelationshipSettings") }}
+        </span>
+    </a>
+
+                                </li>
                             </ul>
                         </div>
                     </div>
@@ -552,7 +573,7 @@
                                         </div>
 
 
-                                        <div class="form-group row" *ngIf="accountInfoTemp?.accountType != 'People' && accountInfoTemp?.accountType != 'Personal'">
+                                      <!--   <div class="form-group row" *ngIf="accountInfoTemp?.accountType != 'People' && accountInfoTemp?.accountType != 'Personal'">
                                             <label for="colFormLabelSm"
                                                 class="col-sm-2 col-form-label col-form-label-sm label-form">
 
@@ -584,7 +605,7 @@
                                                     optionValue="value" (onChange)="changeTouchState()">
                                                 </p-dropdown>
                                             </div>
-                                        </div>
+                                        </div> -->
 
                                         <div class="form-group row">
                                             <label for="colFormLabelSm"
@@ -850,6 +871,11 @@
                         </div>
                         <div class="tab8" *ngIf="currentTab == accountInfoPageTabsEnum.AccountBilling">
                             <app-accountbilling></app-accountbilling>
+                        </div>
+                        <div class="tab9" *ngIf="currentTab == accountInfoPageTabsEnum.RelationshipSettings">
+                            <app-relationship-settings 
+                                [accountId]="accountId">
+                            </app-relationship-settings>
                         </div>
 
                     </div>

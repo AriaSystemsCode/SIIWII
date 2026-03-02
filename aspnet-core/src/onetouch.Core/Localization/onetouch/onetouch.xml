@@ -2620,5 +2620,6 @@
 	<text name="FilesformatsSupportedareXLSX,JPGandPNG">Files formats Supported are XLSX,JPG and PNG</text>
 	<text name="Relatedproducts">Related products</text>
 	<text name="noproductsarelinked">no products are linked</text>
+	<text name="RelationshipSettings">Relationship Settings</text>
   </texts>  
 </localizationDictionary>

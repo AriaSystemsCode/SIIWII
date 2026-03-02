@@ -46935,7 +46935,7 @@ export class SycEntityObjectTypesServiceProxy {
      * @param objectCode (optional) 
      * @return Success
      */
-    getAllWithExtraAttributesByCode(code: string | null | undefined, objectCode: string | null | undefined=""): Observable<GetAllEntityObjectTypeOutput[]> {
+    getAllWithExtraAttributesByCode(code: string | null | undefined, objectCode: string | null | undefined): Observable<GetAllEntityObjectTypeOutput[]> {
         let url_ = this.baseUrl + "/api/services/app/SycEntityObjectTypes/GetAllWithExtraAttributesByCode?";
         if (code !== undefined && code !== null)
             url_ += "code=" + encodeURIComponent("" + code) + "&";
@@ -65413,7 +65413,6 @@ export interface IExtraDataAttrDto {
 
 export class CreateOrEditAccountInfoDto implements ICreateOrEditAccountInfoDto {
     fileToken!: string | undefined;
-    taxRate!: number | undefined;
     tradeName!: string | undefined;
     timeStamp!: moment.Moment | undefined;
     accountType!: string | undefined;
@@ -65489,7 +65488,6 @@ export class CreateOrEditAccountInfoDto implements ICreateOrEditAccountInfoDto {
                     this[property] = _data[property];
             }
             this.fileToken = _data["fileToken"];
-            this.taxRate = _data["taxRate"];
             this.tradeName = _data["tradeName"];
             this.timeStamp = _data["timeStamp"] ? moment(_data["timeStamp"].toString()) : <any>undefined;
             this.accountType = _data["accountType"];
@@ -65595,7 +65593,6 @@ export class CreateOrEditAccountInfoDto implements ICreateOrEditAccountInfoDto {
                 data[property] = this[property];
         }
         data["fileToken"] = this.fileToken;
-        data["taxRate"] = this.taxRate;
         data["tradeName"] = this.tradeName;
         data["timeStamp"] = this.timeStamp ? this.timeStamp.toISOString() : <any>undefined;
         data["accountType"] = this.accountType;
@@ -65690,7 +65687,6 @@ export class CreateOrEditAccountInfoDto implements ICreateOrEditAccountInfoDto {
 
 export interface ICreateOrEditAccountInfoDto {
     fileToken: string | undefined;
-    taxRate: number | undefined;
     tradeName: string | undefined;
     timeStamp: moment.Moment | undefined;
     accountType: string | undefined;
@@ -66181,7 +66177,6 @@ export interface IAccountDto {
 
 export class ContactDto implements IContactDto {
     code!: string | undefined;
-    taxRate!: number | undefined;
     entityObjectType!: string | undefined;
     name!: string | undefined;
     firstName!: string | undefined;
@@ -66249,7 +66244,6 @@ export class ContactDto implements IContactDto {
                     this[property] = _data[property];
             }
             this.code = _data["code"];
-            this.taxRate = _data["taxRate"];
             this.entityObjectType = _data["entityObjectType"];
             this.name = _data["name"];
             this.firstName = _data["firstName"];
@@ -66323,7 +66317,6 @@ export class ContactDto implements IContactDto {
                 data[property] = this[property];
         }
         data["code"] = this.code;
-        data["taxRate"] = this.taxRate;
         data["entityObjectType"] = this.entityObjectType;
         data["name"] = this.name;
         data["firstName"] = this.firstName;
@@ -66386,7 +66379,6 @@ export class ContactDto implements IContactDto {
 
 export interface IContactDto {
     code: string | undefined;
-    taxRate: number | undefined;
     entityObjectType: string | undefined;
     name: string | undefined;
     firstName: string | undefined;
@@ -66982,7 +66974,6 @@ export interface IValidationResult {
 export class AppContactValidationInputDTO implements IAppContactValidationInputDTO {
     errorMessages!: string[] | undefined;
     fileToken!: string | undefined;
-    taxRate!: number | undefined;
     tradeName!: string | undefined;
     timeStamp!: moment.Moment | undefined;
     accountType!: string | undefined;
@@ -67063,7 +67054,6 @@ export class AppContactValidationInputDTO implements IAppContactValidationInputD
                     this.errorMessages!.push(item);
             }
             this.fileToken = _data["fileToken"];
-            this.taxRate = _data["taxRate"];
             this.tradeName = _data["tradeName"];
             this.timeStamp = _data["timeStamp"] ? moment(_data["timeStamp"].toString()) : <any>undefined;
             this.accountType = _data["accountType"];
@@ -67174,7 +67164,6 @@ export class AppContactValidationInputDTO implements IAppContactValidationInputD
                 data["errorMessages"].push(item);
         }
         data["fileToken"] = this.fileToken;
-        data["taxRate"] = this.taxRate;
         data["tradeName"] = this.tradeName;
         data["timeStamp"] = this.timeStamp ? this.timeStamp.toISOString() : <any>undefined;
         data["accountType"] = this.accountType;
@@ -67270,7 +67259,6 @@ export class AppContactValidationInputDTO implements IAppContactValidationInputD
 export interface IAppContactValidationInputDTO {
     errorMessages: string[] | undefined;
     fileToken: string | undefined;
-    taxRate: number | undefined;
     tradeName: string | undefined;
     timeStamp: moment.Moment | undefined;
     accountType: string | undefined;
@@ -69817,7 +69805,6 @@ export interface IAppContactPaymentMethod {
 
 export class AppContact implements IAppContact {
     tenantId!: number | undefined;
-    taxRate!: number | undefined;
     name!: string;
     tradeName!: string;
     code!: string | undefined;
@@ -69913,7 +69900,6 @@ export class AppContact implements IAppContact {
                     this[property] = _data[property];
             }
             this.tenantId = _data["tenantId"];
-            this.taxRate = _data["taxRate"];
             this.name = _data["name"];
             this.tradeName = _data["tradeName"];
             this.code = _data["code"];
@@ -70023,7 +70009,6 @@ export class AppContact implements IAppContact {
                 data[property] = this[property];
         }
         data["tenantId"] = this.tenantId;
-        data["taxRate"] = this.taxRate;
         data["name"] = this.name;
         data["tradeName"] = this.tradeName;
         data["code"] = this.code;
@@ -70122,7 +70107,6 @@ export class AppContact implements IAppContact {
 
 export interface IAppContact {
     tenantId: number | undefined;
-    taxRate: number | undefined;
     name: string;
     tradeName: string;
     code: string | undefined;

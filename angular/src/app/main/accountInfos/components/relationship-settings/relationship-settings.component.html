@@ -1,1 +1,21 @@
-<p>relationship-settings works!</p>
+<div *ngFor="let usage of usageList; let i = index" 
+     class="usage-section mb-4"
+     [attr.id]="'usage_' + usage">
+
+    <div class="usage-header">
+        <h5>{{ usage }}</h5>
+    </div>
+
+    <div class="usage-body">
+        <app-dynamicInputs
+            [extraAttributeObject]="{ value: { filteredExtraAttributes: groupedByUsage[usage], extraAttributes: allAttributes } }"
+            [entityObjectTypeId]="entityObjectTypeTenantId"
+            [entityType]="'RelationShipSettings'"
+            [dynamicInputsForViewDto]="dynamicInputsForViewDto"
+            (extraDataCleared)="onExtraAttributeCleared($event)"
+            (extraDataChanged)="onExtraAttributesChanged($event)"
+            [fromSetting]="true">
+        </app-dynamicInputs>
+    </div>
+
+</div>
