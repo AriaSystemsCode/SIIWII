@@ -43,9 +43,11 @@ export class RelationshipSettingsComponent extends AppComponentBase implements O
   }
 
   getRelationshipSettingsData() {
+    if(this.relationId){
       this._appEntitiesServiceProxy.getAppEntityForEdit(this.relationId).subscribe(result => {
         this.dynamicInputsForViewDto = result;
       });
+    }
   }
 
   getAppItemTypeExtraAttributesById() {
@@ -331,5 +333,6 @@ return the extra data SHIPPINGCHARGE and SHIPPINGMINIMUMAMOUNT
 -----------
 Esraa
  1. UpdateCharges(Charges [], TransactionID) >> return total order amount
+ 2. check saving 
 */
 }
