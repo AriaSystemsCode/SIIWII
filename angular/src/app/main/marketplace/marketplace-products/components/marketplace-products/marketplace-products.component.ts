@@ -153,6 +153,7 @@ productCards!: QueryList<ProdcutCardComponent>;
         
     }
     ngOnInit() {
+      this.getSettingDataMsrp()
       this.getSettingData()
         const state = (this._router.getCurrentNavigation()?.extras?.state ?? history.state) as any;
 
@@ -680,5 +681,16 @@ console.log(this.sellerSSinSetting,'sellerSSinSetting')
       getSettingData() {
         return this._AppEntitiesServiceProxy.getHostSettingValue(1316, null);
       }
+
+      showMsrP:boolean
+      getSettingDataMsrp(){
+        this._AppEntitiesServiceProxy.getHostSettingValue(1214, null)
+        .subscribe((result) => {
+          this.showMsrP = result?.toString().toLowerCase() =='yes' ? true : false;
+      
+        });
+    
+    }
+      
       
 }
