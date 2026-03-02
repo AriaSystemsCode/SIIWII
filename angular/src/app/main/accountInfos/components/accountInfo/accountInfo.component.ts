@@ -139,6 +139,7 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit {
     imgCropperModalRef: BsModalRef
     accData: GetAccountForViewDto
     editedContactPerData: any
+    relationId:number = 0 ;
     constructor(
         injector: Injector,
         private _route: ActivatedRoute,
@@ -487,6 +488,7 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit {
         this.isSync = result ? result.isSync : false;
         this.connectionCount = result ? result.connectionCount : 0;
         this.accountDataForView = result ? result.account : undefined
+        this.relationId = result.relationId ? result.relationId : 0
         this.accountContactForView = result ? result.contact : undefined
         this.isRecordOwner = this.accountDataForView?.id == this.appSession.user?.accountId ? true : false
         if (this.accountDataForView.logoUrl) this.companyLogo = `${this.attachmentBaseUrl}/${this.accountDataForView.logoUrl}`;

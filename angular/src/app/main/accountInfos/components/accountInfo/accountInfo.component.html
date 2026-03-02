@@ -271,7 +271,7 @@
         </i>
 
         <span class="ml-2">
-            {{ l("RelationshipSettings") }}
+            {{ "RelationshipSettings"| localize }}
         </span>
     </a>
 
@@ -874,7 +874,7 @@
                         </div>
                         <div class="tab9" *ngIf="currentTab == accountInfoPageTabsEnum.RelationshipSettings">
                             <app-relationship-settings 
-                                [accountId]="accountId">
+                                [accountId]="accountId" [relationId]="relationId">
                             </app-relationship-settings>
                         </div>
 

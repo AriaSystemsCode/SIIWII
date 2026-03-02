@@ -6,7 +6,7 @@ import { EExtraAttributeUsage } from '@app/main/app-items/appItems/models/extra-
 import { SelectItem } from '@node_modules/primeng/api';
 import { finalize } from 'rxjs/operators';
 import { AppComponentBase } from '@shared/common/app-component-base';
-import { AppEntityExtraDataDto, GetAppEntityForEditOutput, LookupLabelDto, SycEntityObjectTypesServiceProxy } from '@shared/service-proxies/service-proxies';
+import { AppEntitiesServiceProxy, AppEntityDto, AppEntityExtraDataDto, GetAppEntityForEditOutput, LookupLabelDto, SycEntityObjectTypesServiceProxy } from '@shared/service-proxies/service-proxies';
 @Component({
   selector: 'app-relationship-settings',
   templateUrl: './relationship-settings.component.html',
@@ -15,9 +15,9 @@ import { AppEntityExtraDataDto, GetAppEntityForEditOutput, LookupLabelDto, SycEn
 
 export class RelationshipSettingsComponent extends AppComponentBase implements OnInit {
   @Input() accountId!: number;
+  @Input() relationId!: number;
   dynamicInputsForViewDto: GetAppEntityForEditOutput;
   entityObjectTypeId: number = 747;
-  tenantEntityId: number;
   allAttributes = []; // flat list from API
   groupedByUsage = {}; // { RECOMMENDED: [], ADDITIONAL: [] }
   usageList: string[] = []; // for sidebar
@@ -32,12 +32,20 @@ export class RelationshipSettingsComponent extends AppComponentBase implements O
     injector: Injector,
     private _sycEntityObjectTypesServiceProxy: SycEntityObjectTypesServiceProxy,
     private _extraAttributeDataService: ExtraAttributeDataService,
+    private _appEntitiesServiceProxy : AppEntitiesServiceProxy
   ) {
     super(injector);
   }
 
   ngOnInit(): void {
-    this.getAppItemTypeExtraAttributesById();
+    this.getRelationshipSettingsData()
+    this.getAppItemTypeExtraAttributesById()
+  }
+
+  getRelationshipSettingsData() {
+      this._appEntitiesServiceProxy.getAppEntityForEdit(this.relationId).subscribe(result => {
+        this.dynamicInputsForViewDto = result;
+      });
   }
 
   getAppItemTypeExtraAttributesById() {
@@ -45,7 +53,6 @@ export class RelationshipSettingsComponent extends AppComponentBase implements O
       this._sycEntityObjectTypesServiceProxy.getAllWithExtraAttributes(
         this.entityObjectTypeId)
         .subscribe((res) => {
-    //i49-BE not return data !!
           if (res?.length > 0) {
             this.allAttributes = res[0]?.extraAttributes.extraAttributes;
 
@@ -70,7 +77,7 @@ export class RelationshipSettingsComponent extends AppComponentBase implements O
 
   groupAttributesByUsage(attrs: any[]): any {
     return attrs.reduce((acc, attr) => {
-      const usage = attr.usage || 'UNSPECIFIED';
+      const usage = attr.usage || this.l("RelationshipSettings");
       if (!acc[usage]) acc[usage] = [];
       acc[usage].push(attr);
       return acc;
@@ -118,11 +125,6 @@ export class RelationshipSettingsComponent extends AppComponentBase implements O
   }
 
   loadRelationshipSettings() {
-  /*  //i49- GetAccountForView()  
-        we aleardy we use now I added in its responSe relationID
-       to get extra data values 
-       xEntity = AppEntities.GetAppEntityForEdit?id=relationID */
-
     if (!this.extraAttributes || typeof this.extraAttributes !== 'object') {
       return;
     }
@@ -227,7 +229,7 @@ export class RelationshipSettingsComponent extends AppComponentBase implements O
           const d = new AppEntityExtraDataDto();
           d.attributeId = attr.attributeId;
           d.entityObjectTypeId = this.entityObjectTypeId;
-          d.entityid = this.tenantEntityId;
+          d.entityid = this.relationId;
           d.attributeValueId = v;
           return d;
         });
@@ -235,7 +237,7 @@ export class RelationshipSettingsComponent extends AppComponentBase implements O
         const dto = new AppEntityExtraDataDto();
         dto.attributeId = attr.attributeId;
         dto.entityObjectTypeId = this.entityObjectTypeId;
-        dto.entityid = this.tenantEntityId;
+        dto.entityid = this.relationId;
         if (attr.isLookup) {
           dto.attributeValueId = attr.value;
         } else {
@@ -272,20 +274,62 @@ export class RelationshipSettingsComponent extends AppComponentBase implements O
     }
   }
   
-  saveAll(){
-   //i49  for save: AppEntities.SaveEntity  Pass xEntity
-  }
+ saveAll(): void {
+     let success = false;
+     this.showMainSpinner();
+ 
+     let appEntityDto : AppEntityDto =new AppEntityDto();
+     appEntityDto.entityExtraData =  this.dynamicInputsForViewDto?.entityExtraData || [];
+     appEntityDto.id= this.relationId;
+     appEntityDto.entityObjectTypeId=this.entityObjectTypeId;
+     appEntityDto.objectId= 2;
+     appEntityDto.tenantId=this.appSession.tenantId;
+     appEntityDto.code= this.dynamicInputsForViewDto.appEntity.code;
+     appEntityDto.name=this.dynamicInputsForViewDto.appEntity.name;
+ 
+     appEntityDto.extraDataFileTypeIndex = appEntityDto.entityExtraData
+     .map((item, index) => item.attributeValue && item.attributeValue.includes('|') ? index : -1)
+     .filter(index => index !== -1);
+     
+    
+       this._appEntitiesServiceProxy.saveEntity(appEntityDto)
+       .pipe(
+         finalize(() => {
+           this.formTouched = false;
+           this.hideMainSpinner();
+         })
+       )
+       .subscribe({
+         next: (results) => {
+           this.notify.success(this.l('Saved Successfully'));
+         },
+         error: (err) => {
+           this.notify.error(this.l('Save Failed'));
+         }
+       });
+   }
 
 
 
-  /* //i49 FE don't know that this input was shipvia or what , as we use dynamic extra attributes , from where I know that  ??
-   //i49 if user select ship via  should get its related SHIPPINGCHARGE and SHIPPINGMINIMUMAMOUNT
+  /* //i49 
+Mr-Hassan
+1. relationId alwayes = 0 from ''getAccountForView" 
+So when call 'GetAppEntityForEdit?Id=0" it return internal server error 
+
+2. In settings we use 'Dropdownlist' , You send dynamic service API inside validEntries attributes 
+So we need to discuss how handle the standard  dropdown values
+-------------
+Mariam
+ 1. Warningmessage condition should be dynamic
+ 2. shipvia dropdown conition should be dynamic
+
+ if user select ship via  should get its related SHIPPINGCHARGE and SHIPPINGMINIMUMAMOUNT
 and update the extra data of the relation with the same name
-
 *** GetAppEntityForEdit?Id=Shipvia ID
 return the extra data SHIPPINGCHARGE and SHIPPINGMINIMUMAMOUNT
 *** then set the values at dynamic component for SHIPPINGCHARGE and SHIPPINGMINIMUMAMOUNT
-
-//i49 UpdateCharges(Charges [], TransactionID) >> return total order amount
+-----------
+Esraa
+ 1. UpdateCharges(Charges [], TransactionID) >> return total order amount
 */
 }
