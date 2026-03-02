@@ -2620,10 +2620,11 @@
 	<text name="FilesformatsSupportedareXLSX,JPGandPNG">Files formats Supported are XLSX,JPG and PNG</text>
 	<text name="Relatedproducts">Related products</text>
 	<text name="noproductsarelinked">no products are linked</text>
-	<text name="RelationshipSettings">Relationship Settings</text>
 	<text name="ContactUs">Contact Us</text>
 	<text name="YourRequestHasBeenSubmitted">Your request has been submitted</text>
 	<text name="Telephone">Telephone</text>
 	<text name="PleaseEnterPhoneNumber">Please Enter Phone Number</text>
+	<text name="RelationshipSettings">Relationship Settings</text>
+	<text name="RelationshipSettingsHeaderInfo">Show and change relationship settings.</text>
   </texts>  
 </localizationDictionary>

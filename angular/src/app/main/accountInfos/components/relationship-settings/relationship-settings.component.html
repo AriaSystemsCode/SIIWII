@@ -4,7 +4,7 @@
             <div [class]="containerClass">
                 <div class="kt-subheader__main">
                     <h3 class="kt-subheader__title">
-                        <span>{{"RelationshipSettings" | localize}}</span>
+                        <span>{{"RelationshipSettingsHeaderInfo" | localize}}</span>
                     </h3>
                     <span class="kt-subheader__separator kt-subheader__separator--v"></span>
                     <span class="kt-subheader__desc">
@@ -25,10 +25,8 @@
                     <div class="row">
 
                         <div class="col-12">
-                            <div *ngFor="let usage of usageList; let i = index" [attr.id]="'usage_' + usage"
-                                class="usage-block">
-                                <h3>{{ usage }}</h3>
-
+                            <div *ngFor="let usage of usageList; let i = index" [attr.id]="'usage_' + usage">
+                                <h5 class="usage-block">{{ usage }}</h5>
 
                                 <app-dynamicInputs
                                     [extraAttributeObject]="{ value: { filteredExtraAttributes: groupedByUsage[usage], extraAttributes: allAttributes } }"
