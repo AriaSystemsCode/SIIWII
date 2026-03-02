@@ -67,6 +67,7 @@ import { OverALLRatingReviewsModule } from '../overallRating-reviews/overallRati
 import { InputSwitchModule } from 'primeng/inputswitch';
 import { RelationshipSettingsComponent } from './components/relationship-settings/relationship-settings.component';
 import { SharedDynamicInputsModule } from '@shared/shared-module';
+import { AccordionModule } from "primeng/accordion";
 
 @NgModule({
     declarations: [
@@ -131,7 +132,8 @@ import { SharedDynamicInputsModule } from '@shared/shared-module';
         InteractionsModule,EventsBrowseModule,AccountSharedModule,
         MarketplaceProductsModule,
         OverALLRatingReviewsModule,InputSwitchModule,
-        SharedDynamicInputsModule
+        SharedDynamicInputsModule,
+        AccordionModule
         
         
     ],

@@ -1627,7 +1627,6 @@ export class CreateOrEditAppItemComponent
 
         this.appItem.entityRelatedItems =_entityRelatedItems;
 
-          //i49-F5 set texable data if fildes or will be extra data like recommended & additional  
         this._appItemsServiceProxy
             .createOrEdit(this.appItem)
             .pipe(

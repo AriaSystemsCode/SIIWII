@@ -1,18 +1,23 @@
-.usage-section {
-    border: 1px solid #e5e5e5;
+@import '../../../../admin/settings/settings.component.scss';
+.usage-block {
+    border: 1px solid #dcdcdc;
     border-radius: 8px;
     padding: 16px;
-    background: #fff;
-  }
+    margin-bottom: 16px;
+    background-color: #f9f9f9;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    transition: transform 0.2s, box-shadow 0.2s;
   
-  .usage-header {
-    border-bottom: 1px solid #eee;
-    margin-bottom: 15px;
-    padding-bottom: 8px;
-  }
+    h3 {
+      margin-top: 0;
+      margin-bottom: 12px;
+      font-size: 1.1rem;
+      color: #333;
+    }
   
-  .usage-header h5 {
-    margin: 0;
-    font-weight: 600;
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
   }
   

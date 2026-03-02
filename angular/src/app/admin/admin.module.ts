@@ -185,12 +185,13 @@ import { WebhookEventDetailComponent } from "./webhook-subscription/webhook-even
 import { AppBsModalModule } from "@shared/common/appBsModal/app-bs-modal.module";
 import { CdkStepperModule } from "@angular/cdk/stepper";
 import { StepperComponent } from "./appAdvertisements/stepper/stepper.component";
-import { EmailingTemplateServiceProxy } from "@shared/service-proxies/service-proxies";
+import { AccountsServiceProxy, AppItemsServiceProxy, EmailingTemplateServiceProxy, MarketplaceAccountsServiceProxy } from "@shared/service-proxies/service-proxies";
 import { MenuModule } from "primeng/menu";
 import { DialogModule } from "primeng/dialog";
 import { CheckboxModule } from "primeng/checkbox";
 import { SharedDynamicInputsModule } from '@shared/shared-module';
 import { AccordionModule } from "primeng/accordion";
+import { DynamicApiDispatcherService } from '@shared/dynamicApiDispatcherService ';
 
 
 const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
@@ -382,6 +383,10 @@ const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
     ],
     exports: [AddMemberModalComponent, AddRoleModalComponent,CreateOrEditUserModalComponent],
     providers: [
+            DynamicApiDispatcherService,
+            AccountsServiceProxy,
+            AppItemsServiceProxy,
+            MarketplaceAccountsServiceProxy ,
         ImpersonationService,
         TreeDragDropService,
         {
