@@ -132,6 +132,7 @@ export class dynamicInputs extends AppComponentBase implements OnInit, OnChanges
 
 
   onRadioChange(extraAttr) {
+    //i49- make this part dynamic
     if (extraAttr?.attributeId === 1217 ||
       extraAttr?.name?.includes("ShowwarningmessagewhenmajorItemisoutofStockinmarketplace")) {
 
