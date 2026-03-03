@@ -555,11 +555,16 @@ namespace onetouch.SystemObjects
                             GetAllAppMarketItemsInput inputDto = new GetAllAppMarketItemsInput();
                             inputDto.MaxResultCount = 10;
                             inputDto.FilterCondition = entityFilterCondition;
-                            inputDto.SharingLevel = SharingLevels.PublicAndSharedWithMe;
+                            
+                            if (AbpSession.TenantId== null)
+                              inputDto.SharingLevel = SharingLevels.Public;
+                            else
+                                inputDto.SharingLevel = SharingLevels.PublicAndSharedWithMe;
+
                             inputDto.Brands = null;
                             inputDto.departmentFilters = null;
                             inputDto.CategoryFilters = null;
-                            inputDto.CurrencyCode = "USD";
+                            //inputDto.CurrencyCode = "USD";
                             inputDto.SelectorOnly = false;
                             var products = await _appMarketplaceItemsAppService.GetAll(inputDto);
                             if (products != null && products.TotalCount > 0)
@@ -568,6 +573,7 @@ namespace onetouch.SystemObjects
                                 foreach (var pr in products.Items)
                                 {
                                     var item = new PageSettingDto();
+                                    item.BlockType = "PRODUCT";
                                     item.GetAppMarketItemForViewDto = pr;// await _appMarketplaceItemsAppService.GetAppMarketplaceViewData(pr.AppItem.SSIN, null);
                                     result.Add(item);
                                 }
