@@ -38,7 +38,11 @@ using onetouch.AppItems;
 using DocumentFormat.OpenXml.Office2010.Excel;
 using onetouch.AppItemsLists;
 using onetouch.AppMarketplaceContacts;
-
+using System.Text.Json;
+using DocumentFormat.OpenXml.InkML;
+using Abp.EntityFrameworkCore.Uow;
+using onetouch.EntityFrameworkCore;
+using System.Linq.Expressions;
 namespace onetouch.AppMarketplaceItems
 {
     public class AppMarketplaceItemsAppService : onetouchAppServiceBase, IAppMarketplaceItemsAppService
@@ -102,7 +106,35 @@ namespace onetouch.AppMarketplaceItems
 
             var stopwatch = new System.Diagnostics.Stopwatch();
             stopwatch.Start();
-           
+
+            //I50[Start]
+            
+            List<AppMarketplaceItems> filteredItems = null;
+            if (!string.IsNullOrEmpty(input.FilterCondition))
+            {
+                var x = UnitOfWorkManager.Current.GetDbContext<onetouchDbContext>(null, null);
+                string jsonFilter = input.FilterCondition;
+                    // "[" +
+//"{ \"Field\": \"EntityObjectStatusCode\", \"Operator\": \"eq\", \"Value\": \"ACTIVE\" }," +
+//"{ \"Field\": \"ObjectCode\", \"Operator\": \"eq\", \"Value\": \"LISTING\" }," +
+//"{ \"Field\": \"Code\", \"Operator\": \"eq\", \"Value\": \"00002477-000000000083\"}" +
+//"]";
+               
+                var filterCondition = Helper.ApplyJsonFilter<AppMarketplaceItems>(jsonFilter);//.ToList();
+                if (filterCondition != null)
+                    filteredItems =await  x.AppMarketplaceItems.Where(filterCondition).OrderBy(input.Sorting ?? "id").Take(input.MaxResultCount).ToListAsync();
+
+
+
+                //var filters = JsonSerializer.Deserialize<dynamic>(input.FilterCondition);
+                //foreach (var f in filters)
+                //{
+                //    filteredAppItems = filteredAppItems.Where(e => EF..Property(e, f.Field) == f.Value);
+                //}
+            }
+            //.WhereIf(!string.IsNullOrEmpty(input.FilterCondition),z=>z.input.FilterCondition)
+            
+            //I50[End]
             #region prepare parameters
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
             {
@@ -250,6 +282,7 @@ namespace onetouch.AppMarketplaceItems
                 .WhereIf(!string.IsNullOrEmpty(input.ItemSSIN) , e => e.SSIN == input.ItemSSIN)
                 .WhereIf(input.CategoryFilters!= null && input.CategoryFilters.Count() >0 , e => e.EntityCategories.Where(r => r.EntityObjectCategoryFk.TenantId != null && categoriesListFilter.Contains(r.EntityObjectCategoryId)).Count()>0)
                 //I49[End]
+                
                 // .WhereIf(input.ClassificationFilters != null && input.ClassificationFilters.Count() > 0, e => e.EntityFk.EntityClassifications.Where(r => input.ClassificationFilters.Contains(r.EntityObjectClassificationId)).Count() > 0)
                 .WhereIf(!string.IsNullOrWhiteSpace(input.Filter),
                 e => false || e.Name.Contains(input.Filter) || e.Code.Contains(input.Filter) || e.ManufacturerCode.Contains(input.Filter) || e.Description.Contains(input.Filter) ||
@@ -260,6 +293,10 @@ namespace onetouch.AppMarketplaceItems
                 (input.SharingLevel == SharingLevels.PublicAndSharedWithMe && (x.SharingLevel == 1 ||
                 (x.SharingLevel == 2 && x.ItemSharingFkList.Count(c => c.SharedUserId == AbpSession.UserId) > 0))) ||
                 (userId != null && x.ItemSharingFkList.Count(c => c.SharedUserId == userId) > 0) || (input.AccountSSIN == null ? x.TenantOwner == AbpSession.TenantId : false)));
+
+                //I50[Start]
+               // filteredAppItems = filteredAppItems.Where(filterCondition);
+                //I50[End]
                 /*     )
                || ((input.FilterType == ItemsFilterTypesEnum.SharedWithMe)
                      && (x.SharingLevel == 2 || x.SharingLevel == 1)  
@@ -269,9 +306,24 @@ namespace onetouch.AppMarketplaceItems
                            ||(x.SharingLevel == 1)))));*/
                 var presonEntityObjectTypeId = await _helper.SystemTables.GetEntityObjectTypePersonId();
                 input.Sorting ="AppItem." +input.Sorting;
-               var filteredOrderedAppItems = filteredAppItems;//.OrderBy(input.Sorting ?? "id asc")
+                var filteredOrderedAppItems = filteredAppItems;//.OrderBy(input.Sorting ?? "id asc")
+                //List<AppMarketplaceItem> filteredOrderedAppItems = null;
+                //I50[Start]
+                /*if (filteredItems != null)
+                {
+                    // filteredOrderedAppItems = filteredAppItems.Where(z => filteredItems.Contains(z.Id));
+                    filteredOrderedAppItems = filteredAppItems.Join(filteredItems, x => x.Id, z => z.Id, (s, sa) => new { s, sa });
+
+                }
+                else
+                {
+                    filteredOrderedAppItems = filteredAppItems;//.OrderBy(input.Sorting ?? "id asc")
+                }*/
+                //I50[End]
+                
                   //.PageBy(input);
                 var appItems = from o in filteredOrderedAppItems
+                               join i in filteredAppItems on o.Id equals i.Id
                                join  s in   _sycCurrencyExchangeRateRepository.GetAll()
                                on o.defaultMsrp.CurrencyCode equals s.CurrencyCode into j
                                join c in  _appContactRepository.GetAll().Where(a=>a.TenantId!= null && a.ParentId == null 
