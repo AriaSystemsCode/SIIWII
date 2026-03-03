@@ -177,6 +177,7 @@ this.accountsTypes=result.items;
         undefined,
         undefined,
         undefined,
+        undefined,
         filters?.sorting?.value || undefined,
         this.primengTableHelper.getSkipCount(this.paginator, event),
         this.primengTableHelper.getMaxResultCount(this.paginator, event)

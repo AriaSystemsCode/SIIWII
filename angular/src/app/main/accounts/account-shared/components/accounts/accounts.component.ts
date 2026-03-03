@@ -239,6 +239,7 @@ export class AccountsComponent
                 filters.classifications || undefined,
                 filters.categories || undefined,
                 filters.currencies || undefined,
+                undefined,
                 filters?.sorting?.value || undefined,
                 this.primengTableHelper.getSkipCount(this.paginator, event),
                 this.primengTableHelper.getMaxResultCount(this.paginator, event)
@@ -262,6 +263,7 @@ export class AccountsComponent
                 filters.classifications || undefined,
                 filters.categories || undefined,
                 filters.currencies || undefined,
+                undefined,
                 filters?.sorting?.value || undefined,
                 this.primengTableHelper.getSkipCount(this.paginator, event),
                 this.primengTableHelper.getMaxResultCount(this.paginator, event)

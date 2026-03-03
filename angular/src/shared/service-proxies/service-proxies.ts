@@ -1065,12 +1065,13 @@ export class AccountsServiceProxy {
      * @param classifications (optional) 
      * @param categories (optional) 
      * @param curruncies (optional) 
+     * @param filterCondition (optional) 
      * @param sorting (optional) 
      * @param skipCount (optional) 
      * @param maxResultCount (optional) 
      * @return Success
      */
-    getAll(filter: string | null | undefined, filterType: number | undefined, name: string | null | undefined, address: string | null | undefined, city: string | null | undefined, state: string | null | undefined, postal: string | null | undefined, sSIN: string | null | undefined, accountTypeId: number | undefined, accountType: string | null | undefined, accountTypes: number[] | null | undefined, status: number[] | null | undefined, languages: number[] | null | undefined, countries: number[] | null | undefined, classifications: number[] | null | undefined, categories: number[] | null | undefined, curruncies: number[] | null | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<PagedResultDtoOfGetAccountForViewDto> {
+    getAll(filter: string | null | undefined, filterType: number | undefined, name: string | null | undefined, address: string | null | undefined, city: string | null | undefined, state: string | null | undefined, postal: string | null | undefined, sSIN: string | null | undefined, accountTypeId: number | undefined, accountType: string | null | undefined, accountTypes: number[] | null | undefined, status: number[] | null | undefined, languages: number[] | null | undefined, countries: number[] | null | undefined, classifications: number[] | null | undefined, categories: number[] | null | undefined, curruncies: number[] | null | undefined, filterCondition: string | null | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<PagedResultDtoOfGetAccountForViewDto> {
         let url_ = this.baseUrl + "/api/services/app/Accounts/GetAll?";
         if (filter !== undefined && filter !== null)
             url_ += "Filter=" + encodeURIComponent("" + filter) + "&";
@@ -1110,6 +1111,8 @@ export class AccountsServiceProxy {
             categories && categories.forEach(item => { url_ += "Categories=" + encodeURIComponent("" + item) + "&"; });
         if (curruncies !== undefined && curruncies !== null)
             curruncies && curruncies.forEach(item => { url_ += "Curruncies=" + encodeURIComponent("" + item) + "&"; });
+        if (filterCondition !== undefined && filterCondition !== null)
+            url_ += "FilterCondition=" + encodeURIComponent("" + filterCondition) + "&";
         if (sorting !== undefined && sorting !== null)
             url_ += "Sorting=" + encodeURIComponent("" + sorting) + "&";
         if (skipCount === null)
@@ -1184,12 +1187,13 @@ export class AccountsServiceProxy {
      * @param classifications (optional) 
      * @param categories (optional) 
      * @param curruncies (optional) 
+     * @param filterCondition (optional) 
      * @param sorting (optional) 
      * @param skipCount (optional) 
      * @param maxResultCount (optional) 
      * @return Success
      */
-    getAllMyConnections(filter: string | null | undefined, filterType: number | undefined, name: string | null | undefined, address: string | null | undefined, city: string | null | undefined, state: string | null | undefined, postal: string | null | undefined, sSIN: string | null | undefined, accountTypeId: number | undefined, accountType: string | null | undefined, accountTypes: number[] | null | undefined, status: number[] | null | undefined, languages: number[] | null | undefined, countries: number[] | null | undefined, classifications: number[] | null | undefined, categories: number[] | null | undefined, curruncies: number[] | null | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<PagedResultDtoOfGetAccountForViewDto> {
+    getAllMyConnections(filter: string | null | undefined, filterType: number | undefined, name: string | null | undefined, address: string | null | undefined, city: string | null | undefined, state: string | null | undefined, postal: string | null | undefined, sSIN: string | null | undefined, accountTypeId: number | undefined, accountType: string | null | undefined, accountTypes: number[] | null | undefined, status: number[] | null | undefined, languages: number[] | null | undefined, countries: number[] | null | undefined, classifications: number[] | null | undefined, categories: number[] | null | undefined, curruncies: number[] | null | undefined, filterCondition: string | null | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<PagedResultDtoOfGetAccountForViewDto> {
         let url_ = this.baseUrl + "/api/services/app/Accounts/GetAllMyConnections?";
         if (filter !== undefined && filter !== null)
             url_ += "Filter=" + encodeURIComponent("" + filter) + "&";
@@ -1229,6 +1233,8 @@ export class AccountsServiceProxy {
             categories && categories.forEach(item => { url_ += "Categories=" + encodeURIComponent("" + item) + "&"; });
         if (curruncies !== undefined && curruncies !== null)
             curruncies && curruncies.forEach(item => { url_ += "Curruncies=" + encodeURIComponent("" + item) + "&"; });
+        if (filterCondition !== undefined && filterCondition !== null)
+            url_ += "FilterCondition=" + encodeURIComponent("" + filterCondition) + "&";
         if (sorting !== undefined && sorting !== null)
             url_ += "Sorting=" + encodeURIComponent("" + sorting) + "&";
         if (skipCount === null)
@@ -26676,6 +26682,7 @@ export class AppTransactionServiceProxy {
      * @param classifications (optional) 
      * @param categories (optional) 
      * @param curruncies (optional) 
+     * @param filterCondition (optional) 
      * @param sorting (optional) 
      * @param skipCount (optional) 
      * @param maxResultCount (optional) 
@@ -26683,7 +26690,7 @@ export class AppTransactionServiceProxy {
      * @param transactionType (optional) 
      * @return Success
      */
-    getRelatedAccounts(filter: string | null | undefined, filterType: number | undefined, name: string | null | undefined, address: string | null | undefined, city: string | null | undefined, state: string | null | undefined, postal: string | null | undefined, sSIN: string | null | undefined, accountTypeId: number | undefined, accountType: string | null | undefined, accountTypes: number[] | null | undefined, status: number[] | null | undefined, languages: number[] | null | undefined, countries: number[] | null | undefined, classifications: number[] | null | undefined, categories: number[] | null | undefined, curruncies: number[] | null | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined, lExclueMyAcc: boolean | null | undefined, transactionType: string | null | undefined): Observable<PagedResultDtoOfGetAccountInformationOutputDto> {
+    getRelatedAccounts(filter: string | null | undefined, filterType: number | undefined, name: string | null | undefined, address: string | null | undefined, city: string | null | undefined, state: string | null | undefined, postal: string | null | undefined, sSIN: string | null | undefined, accountTypeId: number | undefined, accountType: string | null | undefined, accountTypes: number[] | null | undefined, status: number[] | null | undefined, languages: number[] | null | undefined, countries: number[] | null | undefined, classifications: number[] | null | undefined, categories: number[] | null | undefined, curruncies: number[] | null | undefined, filterCondition: string | null | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined, lExclueMyAcc: boolean | null | undefined, transactionType: string | null | undefined): Observable<PagedResultDtoOfGetAccountInformationOutputDto> {
         let url_ = this.baseUrl + "/api/services/app/AppTransaction/GetRelatedAccounts?";
         if (filter !== undefined && filter !== null)
             url_ += "Filter=" + encodeURIComponent("" + filter) + "&";
@@ -26723,6 +26730,8 @@ export class AppTransactionServiceProxy {
             categories && categories.forEach(item => { url_ += "Categories=" + encodeURIComponent("" + item) + "&"; });
         if (curruncies !== undefined && curruncies !== null)
             curruncies && curruncies.forEach(item => { url_ += "Curruncies=" + encodeURIComponent("" + item) + "&"; });
+        if (filterCondition !== undefined && filterCondition !== null)
+            url_ += "FilterCondition=" + encodeURIComponent("" + filterCondition) + "&";
         if (sorting !== undefined && sorting !== null)
             url_ += "Sorting=" + encodeURIComponent("" + sorting) + "&";
         if (skipCount === null)
@@ -35317,12 +35326,13 @@ export class MarketplaceAccountsServiceProxy {
      * @param classifications (optional) 
      * @param categories (optional) 
      * @param curruncies (optional) 
+     * @param filterCondition (optional) 
      * @param sorting (optional) 
      * @param skipCount (optional) 
      * @param maxResultCount (optional) 
      * @return Success
      */
-    getAll(filter: string | null | undefined, filterType: number | undefined, name: string | null | undefined, address: string | null | undefined, city: string | null | undefined, state: string | null | undefined, postal: string | null | undefined, sSIN: string | null | undefined, accountTypeId: number | undefined, accountType: string | null | undefined, accountTypes: number[] | null | undefined, status: number[] | null | undefined, languages: number[] | null | undefined, countries: number[] | null | undefined, classifications: number[] | null | undefined, categories: number[] | null | undefined, curruncies: number[] | null | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<PagedResultDtoOfGetMarketplaceAccountForViewDto> {
+    getAll(filter: string | null | undefined, filterType: number | undefined, name: string | null | undefined, address: string | null | undefined, city: string | null | undefined, state: string | null | undefined, postal: string | null | undefined, sSIN: string | null | undefined, accountTypeId: number | undefined, accountType: string | null | undefined, accountTypes: number[] | null | undefined, status: number[] | null | undefined, languages: number[] | null | undefined, countries: number[] | null | undefined, classifications: number[] | null | undefined, categories: number[] | null | undefined, curruncies: number[] | null | undefined, filterCondition: string | null | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<PagedResultDtoOfGetMarketplaceAccountForViewDto> {
         let url_ = this.baseUrl + "/api/services/app/MarketplaceAccounts/GetAll?";
         if (filter !== undefined && filter !== null)
             url_ += "Filter=" + encodeURIComponent("" + filter) + "&";
@@ -35362,6 +35372,8 @@ export class MarketplaceAccountsServiceProxy {
             categories && categories.forEach(item => { url_ += "Categories=" + encodeURIComponent("" + item) + "&"; });
         if (curruncies !== undefined && curruncies !== null)
             curruncies && curruncies.forEach(item => { url_ += "Curruncies=" + encodeURIComponent("" + item) + "&"; });
+        if (filterCondition !== undefined && filterCondition !== null)
+            url_ += "FilterCondition=" + encodeURIComponent("" + filterCondition) + "&";
         if (sorting !== undefined && sorting !== null)
             url_ += "Sorting=" + encodeURIComponent("" + sorting) + "&";
         if (skipCount === null)
