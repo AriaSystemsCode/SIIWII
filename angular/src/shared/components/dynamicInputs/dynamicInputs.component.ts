@@ -33,6 +33,7 @@ export class dynamicInputs extends AppComponentBase implements OnInit, OnChanges
   sycAttachmentCategoryImage: SycAttachmentCategoryDto;
   @Input() defaultBooleanValue: boolean | string = 'true'; // parent can override
   warningMsg: string = "";
+  isInitializing = true;
 
   public constructor(
     private _tokenService: TokenService,
@@ -47,10 +48,12 @@ export class dynamicInputs extends AppComponentBase implements OnInit, OnChanges
   }
   ngOnChanges() {
     this.fillSelectedValuesFromDto();
-    this.onAnyInputChange();
   }
 
   onAnyInputChange() {
+    if (this.isInitializing) return;
+    this.formTouched = true;
+
     const updatedDataMap = new Map<number, any>();
 
     // Preserve existing values
@@ -305,8 +308,9 @@ export class dynamicInputs extends AppComponentBase implements OnInit, OnChanges
       } as unknown as SycAttachmentCategoryDto;
     }
   
-    setTimeout(() => this.onAnyInputChange(), 0);
-  }
+    setTimeout(() => {
+      this.isInitializing = false;
+    }, 0);  }
 
   isArray(val: any): boolean {
     return Array.isArray(val);

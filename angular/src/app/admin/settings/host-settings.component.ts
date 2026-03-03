@@ -215,17 +215,19 @@ export class HostSettingsComponent extends AppComponentBase implements OnInit {
               this._appEntitiesServiceProxy.saveEntity(appEntityDto)
               .pipe(
                 finalize(() => {
-                  this.formTouched = false;
                   this.hideMainSpinner();
                 })
               )
               .subscribe({
-                next: (results) => {
-                  this.notify.success(this.l('Saved Successfully'));
-                },
-                error: (err) => {
-                  this.notify.error(this.l('Save Failed'));
-                }
+                next: () => {
+                    this.formTouched = false;
+                    this.savedChanges = true;
+                    this.formsaved();
+                    this.notify.success(this.l('Saved Successfully'));
+                  },
+                  error: () => {
+                    this.notify.error(this.l('Save Failed'));
+                  }
               });
 
         if (

@@ -201,15 +201,17 @@ export class TenantSettingsComponent extends AppComponentBase implements OnInit 
       this._appEntitiesServiceProxy.saveEntity(appEntityDto)
       .pipe(
         finalize(() => {
-          this.formTouched = false;
           this.hideMainSpinner();
         })
       )
       .subscribe({
-        next: (results) => {
+        next: () => {
+          this.formTouched = false;
+          this.savedChanges = true;
+          this.formsaved();
           this.notify.success(this.l('Saved Successfully'));
         },
-        error: (err) => {
+        error: () => {
           this.notify.error(this.l('Save Failed'));
         }
       });

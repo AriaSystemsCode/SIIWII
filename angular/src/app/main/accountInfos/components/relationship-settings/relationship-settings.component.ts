@@ -26,8 +26,6 @@ export class RelationshipSettingsComponent extends AppComponentBase implements O
   extraAttributes: any;
   activeAccordionIndexes: number[] = [0]; // open first tab by default
 
-
-
   constructor(
     injector: Injector,
     private _sycEntityObjectTypesServiceProxy: SycEntityObjectTypesServiceProxy,
@@ -276,40 +274,43 @@ export class RelationshipSettingsComponent extends AppComponentBase implements O
     }
   }
   
- saveAll(): void {
-     let success = false;
-     this.showMainSpinner();
- 
-     let appEntityDto : AppEntityDto =new AppEntityDto();
-     appEntityDto.entityExtraData =  this.dynamicInputsForViewDto?.entityExtraData || [];
-     appEntityDto.id= this.relationId;
-     appEntityDto.entityObjectTypeId=this.entityObjectTypeId;
-     appEntityDto.objectId= 2;
-     appEntityDto.tenantId=this.appSession.tenantId;
-     appEntityDto.code= this.dynamicInputsForViewDto.appEntity.code;
-     appEntityDto.name=this.dynamicInputsForViewDto.appEntity.name;
- 
-     appEntityDto.extraDataFileTypeIndex = appEntityDto.entityExtraData
-     .map((item, index) => item.attributeValue && item.attributeValue.includes('|') ? index : -1)
-     .filter(index => index !== -1);
-     
-    
-       this._appEntitiesServiceProxy.saveEntity(appEntityDto)
-       .pipe(
-         finalize(() => {
-           this.formTouched = false;
-           this.hideMainSpinner();
-         })
-       )
-       .subscribe({
-         next: (results) => {
-           this.notify.success(this.l('Saved Successfully'));
-         },
-         error: (err) => {
-           this.notify.error(this.l('Save Failed'));
-         }
-       });
-   }
+  saveAll(): void {
+    this.showMainSpinner();
+  
+    let appEntityDto: AppEntityDto = new AppEntityDto();
+    appEntityDto.entityExtraData = this.dynamicInputsForViewDto?.entityExtraData || [];
+    appEntityDto.id = this.relationId;
+    appEntityDto.entityObjectTypeId = this.entityObjectTypeId;
+    appEntityDto.objectId = 2;
+    appEntityDto.tenantId = this.appSession.tenantId;
+    appEntityDto.code = this.dynamicInputsForViewDto.appEntity.code;
+    appEntityDto.name = this.dynamicInputsForViewDto.appEntity.name;
+  
+    appEntityDto.extraDataFileTypeIndex = appEntityDto.entityExtraData
+      .map((item, index) =>
+        item.attributeValue && item.attributeValue.includes('|') ? index : -1
+      )
+      .filter(index => index !== -1);
+  
+    this._appEntitiesServiceProxy.saveEntity(appEntityDto)
+      .pipe(
+        finalize(() => {
+          this.hideMainSpinner();
+        })
+      )
+      .subscribe({
+        next: () => {
+          this.formTouched = false;
+          this.savedChanges = true;
+          this.formsaved();
+          this.notify.success(this.l('Saved Successfully'));
+        },
+        error: () => {
+          this.notify.error(this.l('Save Failed'));
+        }
+      });
+  }
+  
 
 
 
