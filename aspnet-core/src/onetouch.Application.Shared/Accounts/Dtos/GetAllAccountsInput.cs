@@ -36,7 +36,9 @@ namespace onetouch.Accounts.Dtos
         public long[] Categories { get; set; }
 
         public long[] Curruncies { get; set; }
-
+        //I50[Start]
+        public string FilterCondition { set; get; }
+        //I50[End]
     }
     public class GetAllMediaAttachmentInput : PagedAndSortedResultRequestDto
     {

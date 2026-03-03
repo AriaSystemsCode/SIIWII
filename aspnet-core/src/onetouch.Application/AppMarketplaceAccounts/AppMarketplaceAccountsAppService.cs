@@ -45,6 +45,8 @@ using Abp.EntityFrameworkCore.Uow;
 using NUglify.Helpers;
 using Microsoft.PowerShell.Commands;
 using onetouch.AppItems.Dtos;
+using onetouch.AppMarketplaceItems.Dtos;
+using Microsoft.Identity.Client;
 
 namespace onetouch.AppMarketplaceAccounts
 {
@@ -115,9 +117,28 @@ namespace onetouch.AppMarketplaceAccounts
         {
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
             {
-               // try
-                //{
-                    
+                //I50[Start]
+                IQueryable<AppMarketplaceContact> filteredContacts = null;
+                if (!string.IsNullOrEmpty(input.FilterCondition))
+                {
+                    var contxt = UnitOfWorkManager.Current.GetDbContext<onetouchDbContext>(null, null);
+                    string jsonFilter = input.FilterCondition;
+
+                    var filterCondition = Helper.ApplyJsonFilter<AppMarketplaceContact>(jsonFilter);//.ToList();
+                    if (filterCondition != null)
+                        filteredContacts = contxt.AppMarketplaceContacts.Where(filterCondition).Where(z => z.ParentId == null).Take(input.MaxResultCount);//.ToListAsync();
+
+                }
+
+                    //var filters = JsonSerializer.Deserialize<dynamic>(input.FilterCondition);
+                    //foreach (var f in filters)
+                    //{
+                    //    filteredAppItems = filteredAppItems.Where(e => EF..Property(e, f.Field) == f.Value);
+
+                    //I50[End]
+                    // try
+                    //{
+
                     string currentTenantAccountSSIN = "";
                     long currentTenantAccountType = 0;
                     bool excludeGroupAccount = false;
@@ -217,23 +238,71 @@ namespace onetouch.AppMarketplaceAccounts
                     .PageBy(input);
 
                     var logoCategory = await _helper.SystemTables.GetAttachmentCategoryLogoId();
-
-                    var _accounts = from o in pagedAndFilteredAccounts
-                                    //join o1 in _appContactRepository.GetAll() on o.SSIN equals o1.SSIN into j1
+                IQueryable<GetMarketplaceAccountForViewDto>  _accounts = null;
+                if (filteredContacts != null)
+                {
+                    _accounts = from o in pagedAndFilteredAccounts
+                                join o1 in filteredContacts on o.Id equals o1.Id 
                                     //from s1 in j1.DefaultIfEmpty()
                                     //where s1.TenantId == AbpSession.TenantId
                                     //join o1 in _appEntityRepository.GetAll() on o.AppContactAddresses.FirstOrDefault().AddressFk.CountryId equals o1.Id into j1
                                     //from s1 in j1.DefaultIfEmpty()
 
+                                select new GetMarketplaceAccountForViewDto()
+                                {
+                                    IsPublished = (o.TenantOwner == AbpSession.TenantId ? true : false),
+                                    //AvaliableConnectionName = GetAction(o.EntityObjectTypeCode),
+                                    AvaliableConnectionName = "Follow",
+                                    //ConnectionName = s1 != null && !s1.IsDeleted && s1.Id > 0 ? "Follow" : "",
+                                    ConnectionName = "Follow",
+                                    Account = new AccountDto
+                                    {
+                                        AccountTypeString = o.EntityObjectTypeCode,
+                                        TenantId = o.TenantOwner,
+                                        AccountTypeId = o.EntityObjectTypeId,
+                                        AccountType = o.EntityObjectTypeCode,
+                                        SSIN = o.SSIN,
+                                        //PriceLevel = o.PriceLevel,
+                                        PriceLevel = "",
+                                        Name = o.Name,
+                                        City = o.ContactAddresses.FirstOrDefault().AddressFk.City,
+                                        State = o.ContactAddresses.FirstOrDefault().AddressFk.State,
+                                        ZipCode = o.ContactAddresses.FirstOrDefault().AddressFk.PostalCode,
+                                        AddressLine1 = o.ContactAddresses.FirstOrDefault().AddressFk.AddressLine1,
+                                        CountryName = o.ContactAddresses.FirstOrDefault().AddressFk.CountryFk.Name,
+                                        Status = input.FilterType != 1 ? (_appMarketplaceContactRepository.GetAll().Count(x => x.TenantId == null && x.SSIN == o.SSIN) > 0 || (o.TenantId != null && o.ParentId == null && o.SSIN == null)) :
+                                        (_appMarketplaceContactRepository.GetAll().Count(x => x.TenantId == AbpSession.TenantId && x.SSIN == o.SSIN) > 0 || (o.TenantId != null && o.ParentId == null && o.SSIN == null)),
+                                        Id = o.Id,
+                                        IsManual = o.TenantId == AbpSession.TenantId && o.ParentId == null && o.SSIN == null,
+                                        LogoUrl = string.IsNullOrEmpty(o.EntityAttachments.FirstOrDefault().AttachmentFk.Attachment) ?
+                                         ""
+                                         : "attachments/" + (o.TenantId == null ? "-1" : o.TenantId.ToString()) + "/" + o.EntityAttachments.FirstOrDefault(x => x.AttachmentCategoryId == logoCategory).AttachmentFk.Attachment,
+                                        Classfications = o.EntityClassifications.Select(x => x.EntityObjectClassificationFk.Name).Take(5).ToArray(),
+                                        Categories = o.EntityCategories.Select(x => x.EntityObjectCategoryFk.Name).Take(5).ToArray()
+                                        //,
+                                        //PartnerId = o.SSIN
+                                    },
+                                    //AppEntityName = s1 == null || s1.Name == null ? "" : s1.Name.ToString()
+                                };
+                }
+                else
+                {
+                     _accounts = from o in pagedAndFilteredAccounts
+                                        //join o1 in _appContactRepository.GetAll() on o.SSIN equals o1.SSIN into j1
+                                        //from s1 in j1.DefaultIfEmpty()
+                                        //where s1.TenantId == AbpSession.TenantId
+                                        //join o1 in _appEntityRepository.GetAll() on o.AppContactAddresses.FirstOrDefault().AddressFk.CountryId equals o1.Id into j1
+                                        //from s1 in j1.DefaultIfEmpty()
+
                                     select new GetMarketplaceAccountForViewDto()
                                     {
-                                        IsPublished = (o.TenantOwner == AbpSession.TenantId? true: false),
+                                        IsPublished = (o.TenantOwner == AbpSession.TenantId ? true : false),
                                         //AvaliableConnectionName = GetAction(o.EntityObjectTypeCode),
                                         AvaliableConnectionName = "Follow",
                                         //ConnectionName = s1 != null && !s1.IsDeleted && s1.Id > 0 ? "Follow" : "",
                                         ConnectionName = "Follow",
                                         Account = new AccountDto
-                                        { 
+                                        {
                                             AccountTypeString = o.EntityObjectTypeCode,
                                             TenantId = o.TenantOwner,
                                             AccountTypeId = o.EntityObjectTypeId,
@@ -261,6 +330,7 @@ namespace onetouch.AppMarketplaceAccounts
                                         },
                                         //AppEntityName = s1 == null || s1.Name == null ? "" : s1.Name.ToString()
                                     };
+                }
                     long marketplaceRelationshipSycEntityObjId=0, pendingRelationshipStatusId=0, inActiveRelationshipStatusId=0;
                     if (AbpSession.TenantId != null)
                     {

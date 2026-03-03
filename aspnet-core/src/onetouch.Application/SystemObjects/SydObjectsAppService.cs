@@ -567,7 +567,7 @@ namespace onetouch.SystemObjects
                             //inputDto.CurrencyCode = "USD";
                             inputDto.SelectorOnly = false;
                             var products = await _appMarketplaceItemsAppService.GetAll(inputDto);
-                            if (products != null && products.TotalCount > 0)
+                            if (products != null && products.Items!=null && products.Items.Count > 0)
                             {
                                
                                 foreach (var pr in products.Items)
@@ -581,6 +581,22 @@ namespace onetouch.SystemObjects
                             
                             break;
                         case "CONTACT":
+                            GetAllAccountsInput inputContactDto = new GetAllAccountsInput();
+                            inputContactDto.MaxResultCount = 10;
+                            inputContactDto.FilterCondition = entityFilterCondition;
+                            var contacts = await _MarketplaceAccountsAppService.GetAll(inputContactDto);
+                            if (contacts != null && contacts.Items!=null & contacts.Items.Count > 0)
+                            {
+
+                                foreach (var pr in contacts.Items)
+                                {
+                                    var item = new PageSettingDto();
+                                    item.BlockType = "CONTACT";
+                                    item.GetAccountForViewDto = await _MarketplaceAccountsAppService.GetAccountForView(int.Parse(pr.Account.Id.ToString()), pr.Account.SSIN, 1);
+                                    //ObjectMapper.Map<GetAccountForViewDto>( pr);// await _appMarketplaceItemsAppService.GetAppMarketplaceViewData(pr.AppItem.SSIN, null);
+                                    result.Add(item);
+                                }
+                            }
                             break;
                     }
 
