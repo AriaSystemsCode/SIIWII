@@ -150,6 +150,7 @@ export class OverviewTabComponent extends AppComponentBase implements OnInit, On
         selectedCurrency,
         undefined,
         undefined,
+        undefined,
         'name',
         0,
         4

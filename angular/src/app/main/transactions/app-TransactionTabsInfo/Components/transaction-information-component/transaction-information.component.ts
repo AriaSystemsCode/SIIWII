@@ -233,6 +233,7 @@ export class TransactionInformationComponent
         'USD',
         undefined,
         undefined,
+        undefined,
         'name',
         skipCount,
         maxResultCount
