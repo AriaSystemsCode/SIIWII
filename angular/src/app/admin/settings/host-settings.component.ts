@@ -221,8 +221,6 @@ export class HostSettingsComponent extends AppComponentBase implements OnInit {
               .subscribe({
                 next: () => {
                     this.formTouched = false;
-                    this.savedChanges = true;
-                    this.formsaved();
                     this.notify.success(this.l('Saved Successfully'));
                   },
                   error: () => {
