@@ -5,6 +5,7 @@ import { PrimengTableHelper } from '@shared/helpers/PrimengTableHelper';
 import { LazyLoadEvent } from 'primeng/api';
 import { Paginator } from 'primeng/paginator';
 import { Table } from 'primeng/table';
+import { CreateDashboardModalComponent, CreatedDashboardResult } from '../create-dashboard-modal/create-dashboard-modal.component';
 
 
 @Component({
@@ -43,7 +44,7 @@ export class DashboardBrowseComponent  extends AppComponentBase {
         sharedWith: [{ id: 5, displayName: 'Anue Miami', avatarUrl: null }],
       },
     ];
-  
+    @ViewChild('createDashboardModal') createDashboardModal!: CreateDashboardModalComponent;
     constructor( injector: Injector, private router: Router) {
       super(injector);
     }
@@ -53,8 +54,7 @@ export class DashboardBrowseComponent  extends AppComponentBase {
     }
   
     createNew() {
-
-      this.router.navigate(['/app/main/dashboard/create']);
+      this.createDashboardModal.show();
     }
   
     showShare(event: MouseEvent, row: any) {
@@ -98,5 +98,12 @@ export class DashboardBrowseComponent  extends AppComponentBase {
         this.primengTableHelper.hideLoadingIndicator();
       }
   
+      onDashboardCreated(res: CreatedDashboardResult): void {
+        // Option A: reload the list
+        this.getDashboards(); // or getDashboards(this.primengTableHelper.getLazyLoadEvent())...
+    
+        // Option B: navigate to detail page if you have route
+        // this.router.navigate(['/app/main/dashboard/detail', res.id]);
+      }
     
 }

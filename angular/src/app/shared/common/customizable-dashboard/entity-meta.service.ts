@@ -45,38 +45,72 @@ export class EntityMetaService {
   }
 
   // 👇 mock a query using the config (swap for your real backend later)
-  runQuery(cfg: any): any {
-    // CALCULATION
-    if (cfg.chartType === 'calculation' && cfg.calculation) {
-      const { agg, field } = cfg.calculation;
+  // runQuery(cfg: any): any {
+  //   // CALCULATION
+  //   if (cfg.chartType === 'calculation' && cfg.calculation) {
+  //     const { agg, field } = cfg.calculation;
   
-      // mock result
-      const base = field === 'amount' ? 1200 : field === 'quantity' ? 220 : 50;
-      const wiggle = (cfg.filters?.length || 0) * 7;
+  //     // mock result
+  //     const base = field === 'amount' ? 1200 : field === 'quantity' ? 220 : 50;
+  //     const wiggle = (cfg.filters?.length || 0) * 7;
   
-      const value =
-        agg === 'count' ? 42 - wiggle :
-        agg === 'sum'   ? base * 3 - wiggle :
-        agg === 'avg'   ? base - wiggle :
-        agg === 'min'   ? Math.max(1, base - 40 - wiggle) :
-        agg === 'max'   ? base + 90 - wiggle :
-        base;
+  //     const value =
+  //       agg === 'count' ? 42 - wiggle :
+  //       agg === 'sum'   ? base * 3 - wiggle :
+  //       agg === 'avg'   ? base - wiggle :
+  //       agg === 'min'   ? Math.max(1, base - 40 - wiggle) :
+  //       agg === 'max'   ? base + 90 - wiggle :
+  //       base;
   
-      return { value };
+  //     return { value };
+  //   }
+  
+  //   // EXISTING CHART LOGIC
+  //   const labels = cfg.dimension ? ['A','B','C','D','E'] : ['Total'];
+  //   const base = cfg.measure === 'amount' ? 120
+  //     : cfg.measure === 'number of rows' ? 300
+  //     : cfg.measure === 'quantity' ? 40 : 80;
+  
+  //   const wiggle = (cfg.filters?.length || 0) * 6;
+  //   const data = labels.map((_: any, i: number) => base + i * 12 - wiggle);
+  
+  //   return {
+  //     labels,
+  //     datasets: [{ label: `${cfg.entity}.${cfg.measure}`, data }]
+  //   };
+  // }
+  runQuery(cfg: ChartConfig): any {
+    // CALC
+    if (cfg.chartType === 'calculation') {
+      return { value: 123 }; // mock
     }
   
-    // EXISTING CHART LOGIC
-    const labels = cfg.dimension ? ['A','B','C','D','E'] : ['Total'];
-    const base = cfg.measure === 'amount' ? 120
-      : cfg.measure === 'number of rows' ? 300
-      : cfg.measure === 'quantity' ? 40 : 80;
+    // BAR
+    if (cfg.chartType === 'bar') {
+      const labels = ['A','B','C'];
+      return {
+        labels,
+        datasets: [{ label: 'Count', data: [2, 3, 1] }]
+      };
+    }
   
-    const wiggle = (cfg.filters?.length || 0) * 6;
-    const data = labels.map((_: any, i: number) => base + i * 12 - wiggle);
+    // LINE
+    if (cfg.chartType === 'line') {
+      const labels = ['W1','W2','W3','W4'];
+      return {
+        labels,
+        datasets: [
+          { label: 'Open', data: [3,2,4,1] },
+          { label: 'Closed', data: [1,3,2,4] }
+        ]
+      };
+    }
   
+    // PIE/DOUGHNUT/DEFAULT
+    const labels = cfg.dimension ? ['A','B','C'] : ['Total'];
     return {
       labels,
-      datasets: [{ label: `${cfg.entity}.${cfg.measure}`, data }]
+      datasets: [{ label: `${cfg.entity}.${cfg.measure}`, data: [12, 19, 3] }]
     };
   }
 }

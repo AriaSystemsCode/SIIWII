@@ -1,0 +1,76 @@
+<div class="data-preview-card">
+
+    <!-- header -->
+    <!-- <div class="d-flex justify-content-between align-items-center mb-3">
+  
+      <div class="d-flex align-items-center gap-2">
+        <span class="fw-semibold">{{ title }}</span>
+  
+        <span class="badge bg-light text-dark" *ngIf="rows?.length">
+          {{ rows.length }}
+        </span>
+      </div>
+  
+      <div class="d-flex align-items-center gap-2">
+  
+        <input
+          type="text"
+          pInputText
+          placeholder="Search..."
+          (input)="table.filterGlobal($any($event.target).value, 'contains')"
+          style="width:200px"
+        />
+  
+        <button
+          pButton
+          icon="pi pi-refresh"
+          class="p-button-sm p-button-text"
+          (click)="refresh.emit()"
+        ></button>
+  
+      </div>
+  
+    </div> -->
+  
+    <!-- table -->
+    <p-table
+    #table
+    [value]="rows"
+    [paginator]="true"
+    [rows]="10"
+    [loading]="loading"
+    responsiveLayout="scroll"
+    [rowsPerPageOptions]="[10,20,50]"
+    styleClass="p-datatable-sm p-datatable-gridlines">
+  
+    <!-- header -->
+    <ng-template pTemplate="header">
+      <tr>
+        <th *ngFor="let col of columnsFinal">
+          {{ col.label }}
+          <!-- <p-sortIcon field="{{col.key}}"></p-sortIcon> -->
+        </th>
+      </tr>
+    </ng-template>
+  
+    <!-- body -->
+    <ng-template pTemplate="body" let-row>
+      <tr>
+        <td *ngFor="let col of columnsFinal">
+          {{ formatValue(row[col.key]) }}
+        </td>
+      </tr>
+    </ng-template>
+  
+    <!-- empty -->
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td [attr.colspan]="columnsFinal.length" class="text-center text-muted p-4">
+          No data available
+        </td>
+      </tr>
+    </ng-template>
+  
+  </p-table>
+  
+  </div>

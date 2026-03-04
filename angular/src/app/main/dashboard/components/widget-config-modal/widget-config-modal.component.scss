@@ -6,3 +6,125 @@
     display:block;
     height:100%;
   }
+  /* ClickUp-like right panel */
+.cu-panel {
+  background: #fff;
+}
+
+/* Tabs header row */
+.cu-tabs-head {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: #fff;
+
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: end;
+
+  /* ClickUp spacing */
+  padding: 10px 10px 0;
+  border-bottom: 1px solid #eef0f4;
+
+  /* for the indicator */
+  position: relative;
+}
+
+/* Tab button */
+.cu-tab {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+
+  padding: 12px 10px 14px;
+  border-radius: 10px 10px 0 0;
+
+  color: #7a808a; /* gray like clickup */
+  font-weight: 600;
+  font-size: 14px;
+  letter-spacing: .1px;
+
+  transition: background .15s ease, color .15s ease;
+
+  &:hover {
+    background: #f6f7fb;
+    color: #4b5563;
+  }
+
+  &.active {
+    color: #4A0D4A; /* clickup-ish purple */
+    background: #fff;
+  }
+}
+
+/* Icon bubble */
+.cu-ico {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+
+  background: #f4f5f9;
+  color: #6b7280;
+
+  transition: background .15s ease, color .15s ease;
+
+  i {
+    font-size: 14px;
+    line-height: 1;
+  }
+}
+
+.cu-tab.active .cu-ico {
+  background: rgba(59, 130, 246, 0.10); /* blue tint */
+  color: #4A0D4A;
+}
+
+/* Label */
+.cu-label {
+  line-height: 1;
+  transform: translateY(1px);
+}
+
+/* ✅ The long blue line (like ClickUp) */
+.cu-indicator {
+  position: absolute;
+  left: 10px;
+  right: 50%;
+  bottom: -1px;
+  height: 2px;
+  background: #4A0D4A; /* clickup blue */
+  border-radius: 2px;
+
+  transition: left .2s ease, right .2s ease;
+}
+
+/* Move indicator under Data */
+.cu-indicator.to-data {
+  left: 50%;
+  right: 10px;
+}
+
+/* Body area */
+.cu-tabs-body {
+  padding: 14px 10px 10px;
+}
+
+/* Pane */
+.cu-tabpane {
+  animation: cuFade .12s ease;
+}
+
+@keyframes cuFade {
+  from { opacity: .6; transform: translateY(2px); }
+  to   { opacity: 1;  transform: translateY(0);  }
+}

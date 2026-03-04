@@ -1,284 +1,304 @@
 <!-- widget-config-modal.component.html -->
-<div bsModal #dlg="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+<div bsModal #dlg="bs-modal" class="modal fade" tabindex="-1" role="dialog">
   <div class="modal-dialog modal-xl modal-dialog-scrollable">
     <div class="modal-content">
 
+      <!-- HEADER -->
       <div class="modal-header align-items-center">
         <h5 class="modal-title">
-          New {{ chartType | titlecase }} Widget
+          {{ mode === 'create' ? 'New' : (mode === 'edit' ? 'Edit' : 'View') }}
+          {{ chartType | titlecase }} Widget
         </h5>
-        <button type="button" class="btn-close ms-2" aria-label="Close" (click)="hide()"></button>
+
+        <button type="button" class="close" (click)="hide()">
+          <span>&times;</span>
+        </button>
       </div>
 
+      <!-- BODY -->
       <div class="modal-body" [formGroup]="form">
         <div class="row">
+
+          <!-- LEFT SIDE : PREVIEW -->
+          <div class="col-7">
+            <div class="preview-box">
+              <app-chart-widget-card
+                [previewMode]="true"
+                [chartType]="chartType"
+                [externalData]="previewChartData"
+                [calcValue]="previewCalcValue"
+                [config]="previewConfig">
+              </app-chart-widget-card>
+            </div>
+
+            <small class="text-muted d-block mt-2">
+              Preview updates automatically.
+            </small>
+          </div>
+
+
+          <!-- RIGHT SIDE -->
           <div class="col-5">
 
-            <!-- Entity -->
-            <div>
-              <label class="form-label">Entity</label>
+            <!-- ===================== -->
+            <!-- EDIT MODE (TABS) -->
+            <!-- ===================== -->
+
+        <!-- ✅ EDIT MODE: ClickUp-like tabs -->
+<ng-container *ngIf="isEditMode; else noTabsMode">
+
+  <div class="cu-panel">
+
+    <!-- Tabs head -->
+    <div class="cu-tabs-head">
+      <button
+        type="button"
+        class="cu-tab"
+        [class.active]="activeTab === 'settings'"
+        (click)="activeTab = 'settings'">
+
+        <span class="cu-ico">
+          <i class="pi pi-cog"></i>
+        </span>
+        <span class="cu-label">Settings</span>
+      </button>
+
+      <button
+        type="button"
+        class="cu-tab"
+        [class.active]="activeTab === 'data'"
+        (click)="activeTab = 'data'">
+
+        <span class="cu-ico">
+          <i class="pi pi-table"></i>
+        </span>
+        <span class="cu-label">Data</span>
+      </button>
+
+      <!-- ✅ Blue indicator line (moves under active tab) -->
+      <span
+        class="cu-indicator"
+        [class.to-data]="activeTab === 'data'">
+      </span>
+    </div>
+
+    <!-- Tabs body -->
+    <div class="cu-tabs-body">
+      <div class="cu-tabpane" *ngIf="activeTab === 'settings'">
+        <ng-container *ngTemplateOutlet="settingsTpl"></ng-container>
+      </div>
+
+      <div class="cu-tabpane" *ngIf="activeTab === 'data'">
+        <ng-container *ngTemplateOutlet="dataTpl"></ng-container>
+      </div>
+    </div>
+
+  </div>
+
+</ng-container>
+
+
+            <!-- ===================== -->
+            <!-- CREATE / VIEW MODE -->
+            <!-- ===================== -->
+
+            <ng-template #noTabsMode>
+
+              <!-- CREATE -->
+              <ng-container *ngIf="isCreateMode">
+                <ng-container *ngTemplateOutlet="settingsTpl"></ng-container>
+              </ng-container>
+
+              <!-- VIEW -->
+              <ng-container *ngIf="isViewMode">
+                <ng-container *ngTemplateOutlet="dataTpl"></ng-container>
+              </ng-container>
+
+            </ng-template>
+
+          </div>
+
+        </div>
+
+
+        <!-- ===================== -->
+        <!-- SETTINGS TEMPLATE -->
+        <!-- ===================== -->
+
+        <ng-template #settingsTpl>
+
+          <!-- ENTITY -->
+          <div class="mt-3">
+            <label class="form-label">Entity</label>
+
+            <p-dropdown
+              [options]="entities"
+              formControlName="entity"
+              placeholder="Select entity"
+              (onChange)="onEntityChange()">
+            </p-dropdown>
+          </div>
+
+
+          <!-- CALCULATION -->
+          <ng-container *ngIf="chartType === 'calculation'">
+
+            <div class="mt-3">
+              <label class="form-label">Aggregation</label>
+
               <p-dropdown
-                [options]="entities"
-                formControlName="entity"
-                placeholder="Select entity"
-                (onChange)="onEntityChange()">
+                [options]="calcAggOptions"
+                optionLabel="label"
+                optionValue="value"
+                formControlName="calcAgg"
+                (onChange)="onCalcAggChange()">
               </p-dropdown>
             </div>
 
-            <!-- ========================= -->
-            <!-- CALCULATION WIDGET FIELDS -->
-            <!-- ========================= -->
-            <ng-container *ngIf="chartType === 'calculation'">
-              <div class="mt-3">
-                <label class="form-label">Aggregation</label>
-                <p-dropdown
-                  [options]="calcAggOptions"
-                  optionLabel="label"
-                  optionValue="value"
-                  formControlName="calcAgg"
-                  placeholder="Select aggregation"
-                  (onChange)="onCalcAggChange()">
-                </p-dropdown>
-              </div>
+            <div class="mt-2" *ngIf="requiresCalcField(form.value.calcAgg)">
+              <label class="form-label">Field</label>
 
-              <!-- Only show Field when agg requires it -->
-              <div class="mt-2" *ngIf="requiresCalcField(form.value.calcAgg)">
-                <label class="form-label">Field</label>
-                <p-dropdown
-                  [options]="measures"
-                  optionLabel="label"
-                  optionValue="name"
-                  formControlName="calcField"
-                  placeholder="Select field">
-                </p-dropdown>
-              </div>
+              <p-dropdown
+                [options]="measures"
+                optionLabel="label"
+                optionValue="name"
+                formControlName="calcField">
+              </p-dropdown>
+            </div>
 
-              <div class="mt-2">
-                <label class="form-label">Label (optional)</label>
-                <input class="form-control" type="text" formControlName="calcLabel" placeholder="e.g. Total Sales" />
-              </div>
+            <div class="mt-2">
+              <label class="form-label">Label</label>
+              <input class="form-control" formControlName="calcLabel" />
+            </div>
 
-              <div class="mt-2">
-                <label class="form-label">Format (optional)</label>
-                <p-dropdown
-                  [options]="calcFormatOptions"
-                  optionLabel="label"
-                  optionValue="value"
-                  formControlName="calcFormat"
-                  placeholder="Select format">
-                </p-dropdown>
-              </div>
-            </ng-container>
+          </ng-container>
 
-            <!-- ========================= -->
-            <!-- BAR WIDGET FIELDS -->
-            <!-- ========================= -->
-            <ng-container *ngIf="chartType === 'bar'">
-              <div class="mt-3">
-                <h6 class="mb-2">Bar options</h6>
 
-                <label class="form-label">X axis (Category)</label>
-                <p-dropdown
-                  [options]="dimensions"
-                  optionLabel="label"
-                  optionValue="name"
-                  formControlName="barX"
-                  placeholder="Select X axis"
-                  (onChange)="onBarXChange()">
-                </p-dropdown>
+          <!-- BAR -->
+          <ng-container *ngIf="chartType === 'bar'">
 
-                <label class="form-label mt-2">Y series </label>
-                <p-dropdown
-                  [options]="measures"
-                  optionLabel="label"
-                  optionValue="name"
-                  formControlName="barY"
-                  defaultLabel="Select measures">
-                </p-dropdown>
-              </div>
-            </ng-container>
-
-            <!-- ========================= -->
-            <!-- NORMAL CHART FIELDS -->
-            <!-- ========================= -->
-            <ng-container *ngIf="chartType === 'line'">
-
-              <!-- X-axis -->
-              <div class="mt-3">
-                <label class="form-label">X-axis</label>
-            
-                <div class="mb-2">
-                  <small class="text-muted d-block">Measure</small>
-                  <p-dropdown
-                    [options]="timeFields"
-                    optionLabel="label"
-                    optionValue="name"
-                    formControlName="lineTimeField"
-                    placeholder="Select date field">
-                  </p-dropdown>
-                </div>
-            
-                <div class="mb-2">
-                  <small class="text-muted d-block">Time range</small>
-                  <p-dropdown
-                    [options]="timePresetOptions"
-                    optionLabel="label"
-                    optionValue="value"
-                    formControlName="timePreset"
-                    placeholder="Select range">
-                  </p-dropdown>
-                </div>
-            
-                <div class="mb-2">
-                  <small class="text-muted d-block">Group by</small>
-                  <p-dropdown
-                    [options]="bucketOptions"
-                    optionLabel="label"
-                    optionValue="value"
-                    formControlName="bucket"
-                    placeholder="Select bucket">
-                  </p-dropdown>
-                </div>
-            
-                <!-- Custom range -->
-                <div *ngIf="form.value.timePreset === 'custom'" class="d-flex gap-2">
-                  <div class="flex-grow-1">
-                    <small class="text-muted d-block">From</small>
-                    <p-calendar formControlName="dateFrom" ></p-calendar>
-                  </div>
-                  <div class="flex-grow-1">
-                    <small class="text-muted d-block">To</small>
-                    <p-calendar formControlName="dateTo"></p-calendar>
-                  </div>
-                </div>
-              </div>
-            
-              <!-- Y-axis -->
-              <div class="mt-3">
-                <label class="form-label">Y-axis</label>
-            
-                <div class="mb-2">
-                  <small class="text-muted d-block">Measure</small>
-                  <p-dropdown
-                    [options]="calcAggOptions"
-                    optionLabel="label"
-                    optionValue="value"
-                    formControlName="lineAgg"
-                    (onChange)="onLineAggChange()"
-                    placeholder="Count / Sum / Avg">
-                  </p-dropdown>
-                </div>
-            
-                <div class="mb-2" *ngIf="form.value.lineAgg !== 'count'">
-                  <small class="text-muted d-block">Field</small>
-                  <p-dropdown
-                    [options]="measures"
-                    optionLabel="label"
-                    optionValue="name"
-                    formControlName="lineField"
-                    placeholder="Select numeric field">
-                  </p-dropdown>
-                </div>
-            
-                <div class="mb-2">
-                  <small class="text-muted d-block">Group by (Series)</small>
-                  <p-dropdown
-                    [options]="dimensions"
-                    optionLabel="label"
-                    optionValue="name"
-                    formControlName="lineSeriesField"
-                    placeholder="Optional (e.g. Status)">
-                  </p-dropdown>
-                </div>
-            
-                <!-- <div class="d-flex align-items-center gap-2">
-                  <p-inputSwitch formControlName="smooth"></p-inputSwitch>
-                  <span class="text-muted">Smooth line</span>
-                </div>
-            
-                <div class="d-flex align-items-center gap-2 mt-2">
-                  <p-inputSwitch formControlName="stackedArea"></p-inputSwitch>
-                  <span class="text-muted">Display as stacked area</span>
-                </div>
-            
-                <div class="d-flex align-items-center gap-2 mt-2">
-                  <p-inputSwitch formControlName="showLegend"></p-inputSwitch>
-                  <span class="text-muted">Show legend</span>
-                </div> -->
-              </div>
-            
-            </ng-container>
-            <ng-container *ngIf="chartType !== 'bar' && chartType !== 'calculation' && chartType !== 'line'">
-              <div class="mt-3">
-                <label class="form-label">Measure</label>
-                <p-dropdown
-                  [options]="measures"
-                  optionLabel="label"
-                  optionValue="name"
-                  formControlName="measure"
-                  placeholder="Select measure">
-                </p-dropdown>
-              </div>
-
-              <div class="mt-2">
-                <label class="form-label">Grouping</label>
-                <p-dropdown
-                  [options]="dimensions"
-                  optionLabel="label"
-                  optionValue="name"
-                  formControlName="dimension"
-                  placeholder="Dimension"
-                  (onChange)="onDimensionChange()">
-                </p-dropdown>
-
-                <div *ngIf="form.value.dimension" class="mt-2">
-                  <label class="form-label">by</label>
-                  <p-multiSelect
-                    [options]="dimensionValueOptions"
-                    formControlName="dimensionValues"
-                    defaultLabel="Select categories"
-                    [display]="'chip'">
-                  </p-multiSelect>
-                </div>
-              </div>
-            </ng-container>
-
-            <!-- Filters -->
             <div class="mt-3">
-              <app-filter-builder
-                [fields]="fields"
-                [filterDefs]="filterDefs"
-                (changed)="onFiltersChanged($event)">
-              </app-filter-builder>
+
+              <label class="form-label">X axis</label>
+
+              <p-dropdown
+                [options]="dimensions"
+                optionLabel="label"
+                optionValue="name"
+                formControlName="barX"
+                (onChange)="onBarXChange()">
+              </p-dropdown>
+
+              <label class="form-label mt-2">Y axis</label>
+
+              <p-dropdown
+                [options]="measures"
+                optionLabel="label"
+                optionValue="name"
+                formControlName="barY">
+              </p-dropdown>
+
             </div>
+
+          </ng-container>
+
+
+          <!-- LINE -->
+          <ng-container *ngIf="chartType === 'line'">
+
+            <div class="mt-3">
+
+              <label class="form-label">Date field</label>
+
+              <p-dropdown
+                [options]="timeFields"
+                optionLabel="label"
+                optionValue="name"
+                formControlName="lineTimeField">
+              </p-dropdown>
+
+            </div>
+
+            <div class="mt-2">
+
+              <label class="form-label">Time range</label>
+
+              <p-dropdown
+                [options]="timePresetOptions"
+                optionLabel="label"
+                optionValue="value"
+                formControlName="timePreset">
+              </p-dropdown>
+
+            </div>
+
+            <div class="mt-2">
+
+              <label class="form-label">Bucket</label>
+
+              <p-dropdown
+                [options]="bucketOptions"
+                optionLabel="label"
+                optionValue="value"
+                formControlName="bucket">
+              </p-dropdown>
+
+            </div>
+
+          </ng-container>
+          <ng-container *ngIf="chartType !== 'bar' && chartType !== 'calculation' && chartType !== 'line'"> <div class="mt-3"> <label class="form-label">Measure</label> <p-dropdown [options]="measures" optionLabel="label" optionValue="name" formControlName="measure" placeholder="Select measure"> </p-dropdown> </div> <div class="mt-2"> <label class="form-label">Grouping</label> <p-dropdown [options]="dimensions" optionLabel="label" optionValue="name" formControlName="dimension" placeholder="Dimension" (onChange)="onDimensionChange()"> </p-dropdown> <div *ngIf="form.value.dimension" class="mt-2"> <label class="form-label">by</label> <p-multiSelect [options]="dimensionValueOptions" formControlName="dimensionValues" defaultLabel="Select categories" [display]="'chip'"> </p-multiSelect> </div> </div> </ng-container>
+
+          <!-- FILTERS -->
+          <div class="mt-3">
+
+            <app-filter-builder
+              [fields]="fields"
+              [filterDefs]="filterDefs"
+              (changed)="onFiltersChanged($event)">
+            </app-filter-builder>
 
           </div>
 
-          <!-- Right side: NO preview -->
-          <div class="col-7">
-          
-      
-              <div class="preview-box">
-                <app-chart-widget-card
-                  [previewMode]="true"
-                  [chartType]="chartType"
-                  [externalData]="previewChartData"
-                  [calcValue]="previewCalcValue"
-                  [config]="previewConfig">
-                </app-chart-widget-card>
-         
-            </div>
-          
-            <small class="text-muted d-block mt-2">
-              Preview updates automatically based on your selections.
-            </small>
-          </div>
-        </div>
+        </ng-template>
+
+
+
+        <!-- ===================== -->
+        <!-- DATA TEMPLATE -->
+        <!-- ===================== -->
+
+        <ng-template #dataTpl>
+
+          <app-data-preview
+          [title]="'Data preview'"
+          [rows]="rawRows"
+        
+          (refresh)="refreshPreview()">
+        </app-data-preview>
+
+        </ng-template>
+
       </div>
 
+
+      <!-- FOOTER -->
+
       <div class="modal-footer">
-        <button class="btn btn-secondary" (click)="hide()">Cancel</button>
-        <button class="btn btn-success" [disabled]="!canCreate()" (click)="submit()">Create</button>
+
+        <button class="btn btn-secondary" (click)="hide()">
+          Cancel
+        </button>
+
+        <button
+          *ngIf="!isViewMode"
+          class="btn btn-success"
+          [disabled]="!canCreate()"
+          (click)="submit()">
+
+          {{ isCreateMode ? 'Create' : 'Save' }}
+
+        </button>
+
       </div>
 
     </div>

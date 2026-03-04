@@ -9,6 +9,7 @@ type SelectOption<T = any> = { label: string; value: T };
 
 @Component({
   selector: 'widget-config-modal',
+  styleUrls: ['widget-config-modal.component.scss'],
   templateUrl: './widget-config-modal.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
@@ -46,7 +47,7 @@ export class WidgetConfigModalComponent {
     { label: 'Percent',  value: 'percent' },
   ];
 
-
+activeTab: 'settings' | 'data' = 'settings';
   previewData: any = null;
 previewConfig: any = null;
 previewChartData: { labels: any[]; datasets: { label?: string; data: number[] }[] } | null = null;
@@ -115,39 +116,145 @@ previewCalcValue: number | null = null;
     });
   }
 
-  show(kind?: ChartKind): void {
-    this.entities = this.meta.getEntities();
-    if (kind) this.setKind(kind);
+  // show(kind?: ChartKind): void {
+  //   this.entities = this.meta.getEntities();
+  //   if (kind) this.setKind(kind);
 
-    this.form.reset({
-      entity: null,
-      measure: null,
-      dimension: null,
-      dimensionValues: [],
-      dateFrom: null,
-      dateTo: null,
-      filters: [],
+  //   this.form.reset({
+  //     entity: null,
+  //     measure: null,
+  //     dimension: null,
+  //     dimensionValues: [],
+  //     dateFrom: null,
+  //     dateTo: null,
+  //     filters: [],
 
-      barX: null,
-      barY: [],
-      barXValues: [],
-      barStacked: true,
-      axisTickColor: '#9aa0a6',
-      gridColor: '#e0e0e0',
+  //     barX: null,
+  //     barY: [],
+  //     barXValues: [],
+  //     barStacked: true,
+  //     axisTickColor: '#9aa0a6',
+  //     gridColor: '#e0e0e0',
 
-      calcAgg: 'count',
-      calcField: null,
-      calcLabel: null,
-      calcFormat: 'number',
-    }, { emitEvent: false });
+  //     calcAgg: 'count',
+  //     calcField: null,
+  //     calcLabel: null,
+  //     calcFormat: 'number',
+  //   }, { emitEvent: false });
 
-    this.dlg.show();
-    setTimeout(() => {
-      window.dispatchEvent(new Event('resize')); // ✅ يخلي echarts يرسم
-    }, 0);
+  //   this.dlg.show();
+  //   setTimeout(() => {
+  //     window.dispatchEvent(new Event('resize')); // ✅ يخلي echarts يرسم
+  //   }, 0);
+  //   this.updatePreview();
+  //   this.cdr.markForCheck();
+  // }
+
+
+editMode = true;
+@Input() mode: 'create' | 'edit' | 'view' = 'create';
+
+get isEditMode(): boolean { return this.mode === 'edit'; }
+get isCreateMode(): boolean { return this.mode === 'create'; }
+get isViewMode(): boolean { return this.mode === 'view'; }
+show(existingConfig?: ChartConfig,mode: 'create' | 'edit' | 'view' = 'create') : void {
+  this.mode = mode;
+  this.entities = this.meta.getEntities();
+
+ 
+
+  // لو Edit existing widget
+  if (existingConfig) {
+    this.chartType = existingConfig.chartType;
+    this.form.patchValue(this.mapConfigToForm(existingConfig), { emitEvent: false });
+    this.onEntityChange();
     this.updatePreview();
-    this.cdr.markForCheck();
+  } else {
+    this.resetFormDefaults();
   }
+
+  this.dlg.show();
+  setTimeout(() => window.dispatchEvent(new Event('resize')), 0);
+  this.cdr.markForCheck();
+}
+
+private resetFormDefaults() {
+  this.form.reset({
+    entity: null,
+    measure: null,
+    dimension: null,
+    dimensionValues: [],
+    filters: [],
+    dateFrom: null,
+    dateTo: null,
+
+    // line
+    lineTimeField: null,
+    timePreset: 'thisMonth',
+    bucket: 'week',
+    lineAgg: 'count',
+    lineField: null,
+    lineSeriesField: null,
+
+    // bar
+    barX: null,
+    barY: null,
+    barStacked: true,
+
+    // calc
+    calcAgg: 'count',
+    calcField: null,
+    calcLabel: null,
+    calcFormat: 'number',
+  }, { emitEvent: false });
+}
+
+private mapConfigToForm(cfg: ChartConfig): any {
+  const base: any = {
+    entity: cfg.entity,
+    filters: cfg.filters ?? [],
+    dateFrom: cfg.time?.range?.from ?? null,
+    dateTo: cfg.time?.range?.to ?? null,
+  };
+
+  if (cfg.chartType === 'calculation') {
+    return {
+      ...base,
+      calcAgg: cfg.calculation?.agg ?? 'count',
+      calcField: cfg.calculation?.field ?? null,
+      calcLabel: cfg.calculation?.label ?? null,
+      calcFormat: cfg.calculation?.format ?? 'number',
+    };
+  }
+
+  if (cfg.chartType === 'bar') {
+    return {
+      ...base,
+      barX: cfg.bar?.x ?? null,
+      barY: cfg.bar?.y ?? null,
+      barStacked: !!cfg.bar?.stacked
+    };
+  }
+
+  if (cfg.chartType === 'line') {
+    return {
+      ...base,
+      lineTimeField: cfg.line?.timeField ?? null,
+      lineAgg: cfg.line?.agg ?? 'count',
+      lineField: cfg.line?.field ?? null,
+      lineSeriesField: cfg.line?.seriesField ?? null,
+      bucket: cfg.line?.bucket ?? 'week',
+      timePreset: cfg.time?.range?.preset ?? 'thisMonth'
+    };
+  }
+
+  return {
+    ...base,
+    measure: cfg.measure ?? null,
+    dimension: cfg.dimension ?? null,
+    dimensionValues: cfg.dimensionValues ?? []
+  };
+}
 
   hide(): void {
     this.dlg.hide();
@@ -447,4 +554,18 @@ previewCalcValue: number | null = null;
     { label: 'Quarter', value: 'quarter' },
     { label: 'Year', value: 'year' },
   ];
+
+
+  get activeTabIndex(): number {
+    return this.activeTab === 'data' ? 1 : 0;
+  }
+  set activeTabIndex(i: number) {
+    this.activeTab = i === 1 ? 'data' : 'settings';
+  }
+
+  rawRows: any[] = [];
+
+refreshPreview(): void {
+  this.updatePreview();
+}
 }

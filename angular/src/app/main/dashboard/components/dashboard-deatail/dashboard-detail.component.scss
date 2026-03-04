@@ -433,3 +433,52 @@ gridster-item { overflow: hidden; }
   min-height: 0;     
   overflow: hidden;
 }
+
+.widget-menu-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.widget-dropdown {
+  position: absolute;
+  right: 0;
+  top: 32px;
+  width: 160px;
+
+  background: #fff;
+  border-radius: 8px;
+  border: 1px solid #eee;
+
+  box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+  padding: 6px 0;
+  z-index: 100;
+}
+
+.dropdown-item {
+  width: 100%;
+  background: none;
+  border: none;
+
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  padding: 8px 12px;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.dropdown-item:hover {
+  background: #f5f6fa;
+}
+
+.refreshBtn{
+  background: white;
+  color:#4A0D4A;
+  border: 1px solid #4A0D4A;
+}
+::ng-deep{
+  .p-inputswitch.p-inputswitch-checked .p-inputswitch-slider {
+    background: #4A0D4A !important;
+  }
+}

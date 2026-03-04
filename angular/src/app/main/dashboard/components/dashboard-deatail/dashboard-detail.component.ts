@@ -8,12 +8,11 @@ import { WidgetConfigModalComponent } from '@app/main/dashboard/components/widge
 import {
   GridsterConfig,
   GridsterItem,
-  GridsterItemComponentInterface,
   GridType,
-  DisplayGrid,
+
 } from 'angular-gridster2';
 import { AddWidgetPickerComponent } from '../add-widget-picker/add-widget-picker.component';
-/** ✅ Permission flags (bitwise) */
+
 export enum DashboardPermissionFlags {
   None = 0,
   View = 1 << 0,     // 1
@@ -156,7 +155,7 @@ export class DashboardDetailComponent extends AppComponentBase implements OnInit
   }
 
   // ---------------------------
-  // ✅ Permissions
+  //  Permissions
   // ---------------------------
   hasPermission(flag: DashboardPermissionFlags): boolean {
     return (this.dashboard.permissionFlags & flag) === flag;
@@ -213,7 +212,7 @@ export class DashboardDetailComponent extends AppComponentBase implements OnInit
   
     this.mode = 'edit';
     this.toggleGridsterEditing(true);  
-    this.messageService.add({ severity: 'info', summary: 'Edit mode', detail: 'You are now editing the dashboard.' });
+    // this.messageService.add({ severity: 'info', summary: 'Edit mode', detail: 'You are now editing the dashboard.' });
   }
   
 
@@ -437,17 +436,7 @@ private getLayoutForApi() {
     }
   }));
 }
-//  gridInfo: GridsterItem = {
-//   cols: 6,
-//   rows: 4,
-//   x: 0,
-//   y: 9999,
 
-//   minItemCols: 3,  // min width (in grid columns)
-//   minItemRows: 2,  // min height (in grid rows)
-//   maxItemCols: 12,
-//   maxItemRows: 10
-// };
 
 gridInfo: GridsterItem = {
   cols: 6,
@@ -490,37 +479,6 @@ onWidgetKindPicked(kind: any): void {
   this.widgetModal.show();
 }
 
-// onWidgetCreate(cfg: any): void {
-//   const id = Date.now();
-
-//   const gridInfo: GridsterItem = {
-//     cols: 6,
-//     rows: 4,
-//     x: 0,
-//     y: 9999,
-//     minItemCols: 3,
-//     minItemRows: 2
-//   };
-
-//   this.page.widgets = [
-//     ...this.page.widgets,
-//     {
-//       id,
-//       title: cfg.chartType === 'calculation' ? 'New KPI' : `New ${cfg.chartType} chart`,
-//       kind: cfg.chartType,
-//       config: cfg,
-//       gridInformation: gridInfo,
-//     }
-//   ];
-
-//   this.markDirty();
-//   this.options.api?.optionsChanged?.();
-//   setTimeout(() => this.triggerChartsResize(), 0);
-// }
-
-
-// demo seed
-
 
 onWidgetCreate(cfg: any): void {
   const id = Date.now();
@@ -529,12 +487,12 @@ onWidgetCreate(cfg: any): void {
     cols: 6,
     rows: 4,
     x: 0,
-    y: 0,                 // ✅ start from top
+    y: 0,                
     minItemCols: 3,
     minItemRows: 2
   };
 
-  // ✅ pushItems must be false in options for this to not disturb others
+
   this.page.widgets = [
     ...this.page.widgets,
     {
@@ -582,59 +540,18 @@ moreThanOnePage(): boolean {
 }
 
 private buildGridsterOptions(): void {
-  // this.options = {
-  //   gridType: GridType.Fit,
-  //   displayGrid: DisplayGrid.OnDragAndResize,
-  //   pushItems: true,
-  //   disableScrollHorizontal: true,
-  //   disableScrollVertical: true,
-  
-  //   // ✅ root (NOT inside draggable)
-  //   dragHandleClass: 'drag-handle',
-  
-  //   draggable: {
-  //     enabled: false,
-  //   },
-  
-  //   resizable: {
-  //     enabled: false,
-  //   },
-  
-  //   resizableHandles: {
-  //     s: true, e: true, n: true, w: true,
-  //     se: true, ne: true, sw: true, nw: true
-  //   },
-  
-  //   minCols: 12,
-  //   maxCols: 12,
-  //   minRows: 6,
-  //   margin: 12,
-  //   outerMargin: true,
-  
-  //   itemResizeCallback: () => {
-  //     this.triggerChartsResize();
-  //     this.markDirty();
-  //     this.logLayout();
-  //   },
-  //   itemChangeCallback: () => {
-  //     this.triggerChartsResize();
-  //     this.markDirty();
-  //     this.logLayout();
-  //   },
-  // };
-
 
   this.options = {
-    gridType: GridType.ScrollVertical,   // ✅ NOT Fit
-    fixedRowHeight: 110,                 // ✅ pick your row height
-    fixedColWidth: 90,                   // optional (or let it auto)
+    gridType: GridType.ScrollVertical,  
+    fixedRowHeight: 110,             
+    fixedColWidth: 90,                
     minCols: 12,
     maxCols: 12,
     margin: 12,
     outerMargin: true,
   
-    pushItems: false,                    // ✅ important (see fix 2)
-    swap: false,                         // optional
+    pushItems: false,                
+    swap: false,                      
   
     draggable: { enabled: false },
     resizable: { enabled: false },
@@ -644,5 +561,31 @@ private buildGridsterOptions(): void {
   };
 
 }
-  
+openWidgetSettings(widget: any, tab: 'settings'|'data') {
+  this.widgetModal.setKind(widget.kind);               // bar/line/...
+  this.widgetModal.show(widget.config,this.mode);
+}
+
+refreshWidget(widget: any) {
+  // TODO call API
+  this.triggerChartsResize();
+}
+
+duplicateWidget(widget: any) {
+ 
+}
+openMenuId: string | null = null;
+
+toggleMenu(widgetId: string, event: MouseEvent) {
+  event.stopPropagation();
+
+  if (this.openMenuId === widgetId) {
+    this.openMenuId = null;
+  } else {
+    this.openMenuId = widgetId;
+  }
+}
+
+
+
 }

@@ -24,7 +24,7 @@ export class AddWidgetPickerComponent {
     { kind: 'calculation', title: 'Calculation', desc: 'Single KPI value', img: 'assets/charts/calculation.png' },
     { kind: 'bar',         title: 'Bar Chart',   desc: 'Compare categories', img: 'assets/charts/bar-chart.png' },
     { kind: 'line',        title: 'Line Chart',  desc: 'Trends over time', img: 'assets/charts/line-chart.png' },
-    { kind: 'doughnut',    title: 'Doughnut',    desc: 'Share of total', img: 'assets/charts/donught-chart.png' },
+    // { kind: 'doughnut',    title: 'Doughnut',    desc: 'Share of total', img: 'assets/charts/donught-chart.png' },
     { kind: 'pie',         title: 'Pie Chart',   desc: 'Distribution', img: 'assets/charts/pie-chart.png' },
   ];
 

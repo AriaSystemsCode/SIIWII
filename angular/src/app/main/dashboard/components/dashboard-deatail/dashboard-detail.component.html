@@ -101,10 +101,10 @@
       </div>
 
       <div class="d-flex gap-2 align-items-center">
-        <button pButton type="button" class="saveBtn" icon="pi pi-refresh"  [loading]="refreshing"
+        <button pButton type="button" class="refreshBtn" icon="pi pi-refresh"  [loading]="refreshing"
         (click)="refreshAll()" [disabled]="!canView"></button>
-        <button *ngIf="mode === 'edit'" pButton type="button" icon="pi pi-check" label="Save" class="editBtn" (click)="saveDashboard()"
-          [disabled]="!canEdit"></button>
+        <!-- <button *ngIf="mode === 'edit'" pButton type="button" icon="pi pi-check" label="Save" class="editBtn" (click)="saveDashboard()"
+          [disabled]="!canEdit"></button> -->
         <button  type="button" label="widget" icon="pi pi-plus" class="editBtn"
           (click)="openWidgetPicker()">+ Widget
         </button>
@@ -135,23 +135,61 @@
           <div class="widget-head d-flex justify-content-between align-items-center">
             <div class="d-flex align-items-center gap-2 min-w-0">
         
-              <span class="drag-handle" *ngIf="mode==='edit'" title="Drag">
+              <!-- <span class="drag-handle" *ngIf="mode==='edit'" title="Drag">
                 <i class="pi pi-bars"></i>
               </span>
-        
+         -->
               <div class="fw-600 text-truncate">{{ widget.title }}</div>
             </div>
         
-            <div class="widget-actions d-flex align-items-center gap-1">
-              <!-- menu / refresh / delete -->
-              <button class="icon-btn" title="Refresh">
+            <div class="widget-actions d-flex align-items-center gap-2">
+
+              <button          *ngIf="mode==='edit'" class="icon-btn" title="Filters" >     <i class="pi pi-bars"></i></button>
+              <button class="icon-btn" title="Refresh" (click)="refreshWidget(widget)">
                 <i class="pi pi-refresh"></i>
               </button>
-        
-              <button class="icon-btn danger" *ngIf="mode==='edit'" title="Delete"
-                      (click)="removeItem(widget.gridInformation)">
-                <i class="pi pi-times"></i>
+            
+           
+              <button
+                class="icon-btn"
+           
+                title="Settings"
+                (click)="openWidgetSettings(widget, 'settings')">
+                <i class="pi pi-cog"></i>
               </button>
+            
+              <!-- Options -->
+              <div class="widget-menu-wrapper"          *ngIf="mode==='edit'">
+
+                <button
+                  class="icon-btn"
+                  title="Options"
+                  (click)="toggleMenu(widget.id, $event)">
+                  <i class="pi pi-ellipsis-h"></i>
+                </button>
+              
+                <!-- Dropdown -->
+                <div
+                  class="widget-dropdown"
+                  *ngIf="openMenuId === widget.id">
+              
+                  <button class="dropdown-item"
+                    (click)="duplicateWidget(widget)">
+                    <i class="pi pi-copy"></i>
+                    Duplicate
+                  </button>
+              
+                  <button class="dropdown-item "
+                    (click)="removeItem(widget.gridInformation)">
+                    <i class="pi pi-trash"></i>
+                    Delete
+                  </button>
+              
+                </div>
+              
+              </div>
+            
+           
             </div>
           </div>
         

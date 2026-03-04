@@ -40,6 +40,9 @@ import { NgxEchartsModule } from 'ngx-echarts';
 import { GridsterModule } from 'angular-gridster2';
 import { AddWidgetPickerComponent } from './components/add-widget-picker/add-widget-picker.component';
 import { CalendarModule } from 'primeng/calendar';
+import { CreateDashboardModalComponent } from './components/create-dashboard-modal/create-dashboard-modal.component';
+import { TabViewModule } from 'primeng/tabview';
+import { DataPreviewComponent } from './components/data-preview/data-preview.component';
 
 @NgModule({
     declarations: [
@@ -49,7 +52,9 @@ import { CalendarModule } from 'primeng/calendar';
         WidgetOutletComponent ,
         WidgetConfigModalComponent,
         FilterBuilderComponent,
-        AddWidgetPickerComponent
+        AddWidgetPickerComponent,
+        CreateDashboardModalComponent,
+        DataPreviewComponent
     ],
     imports: [
         CommonModule,
@@ -86,8 +91,9 @@ import { CalendarModule } from 'primeng/calendar';
                 InputSwitchModule,   // <-- you used <p-inputSwitch>
                 NgxEchartsModule.forRoot({ echarts: () => import('echarts') }),
                 GridsterModule,
-                CalendarModule
-
+                CalendarModule,
+                TabViewModule,
+         
     ],
     providers: [
         { provide: BsDatepickerConfig, useFactory: NgxBootstrapDatePickerConfigService.getDatepickerConfig },

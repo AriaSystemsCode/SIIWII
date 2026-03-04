@@ -21,7 +21,6 @@ export class AppNavigationService {
 
                 new AppMenuItem('Dashboard', 'Pages.Administration.Host.Dashboard', 'flaticon-line-graph', '/app/admin/hostDashboard'),
                 // new AppMenuItem('Dashboard', 'Pages.Tenant.Dashboard', 'flaticon-line-graph', '/app/main/dashboard'),
-                new AppMenuItem('Dashboards', 'Pages.Tenant.Dashboard', 'flaticon-more', '/app/main/dashboards/my-dashboards'),
 
                new AppMenuItem('My Transactions', 'Pages.AppSiiwiiTransactions', 'flaticon-more', '/app/main/transactions/appTransactions/MyTransactions'),
               //  new AppMenuItem('My Transactions', '', 'flaticon-more', '/app/admin/appTransactions/MyTransactions'),
@@ -60,6 +59,8 @@ export class AppNavigationService {
 
             new AppMenuItem('ProductsList', 'Pages.AppItemsLists', 'flaticon-more', '/app/main/productslists'),
             new AppMenuItem('Linesheet', 'Pages.AppItems', 'flaticon-more', '/app/main/linesheet/print'),
+            new AppMenuItem('Dashboards', 'Pages.Tenant.Dashboard', 'flaticon-line-graph', '/app/main/dashboards/my-dashboards'),
+
             // new AppMenuItem('Product Selector Test Page', 'Pages.AppItems', 'flaticon-more', '/app/demo/AppItemsMultiSelection'),
             // new AppMenuItem('DemoUiComponents', 'Pages.DemoUiComponents', 'flaticon-shapes', '/app/admin/demo-ui-components')
         )
