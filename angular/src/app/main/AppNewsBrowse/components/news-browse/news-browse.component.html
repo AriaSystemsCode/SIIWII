@@ -40,9 +40,6 @@
                                         <a  [title]="'ResetData' | localize" class="btn  font-weight-normal text-center toolbar-btn resetBtn mx-1" (click)="resetList()">
                                             <i  class="d-inline-block w-100 flaticon2-reload icon-center p-0"></i>
                                         </a>
-                                        <!-- <a [title]="'ToggleView' | localize" (click)="triggerListView()" class="btn  font-weight-normal  text-center toggleBtn toolbar-btn mx-2">
-                                            <i  class="d-inline-block w-100 p-0 " [ngClass]="singleItemPerRowMode ? 'flaticon2-menu' : 'fa-bars fas'"></i>
-                                        </a> -->
 
                                         <button
                                       
@@ -115,16 +112,6 @@
                                     </div>
                                 </div>
                                 <div class="row pt-3 pl-3 pr-2">
-                                    <!-- <div *ngFor="let item of items;index as i" class="col-12 mb-5 " [ngClass]="singleItemPerRowMode?'col-md-12 single-item-per-row-layout' : 'col-md-6'">
-                                        <app-post-card
-                                        [post]="item"
-                                        (showViewPost)="onshowViewPost($event)"
-                                        (_deletePost)="ondeletePost($event, i)"
-                                        (_editPost)="onshowCreateOrEdit($event)">
-                                        </app-post-card>
-                                    </div>
-                                    <div class="font-weight-normal mt-5 p-5 text-center w-100" *ngIf="items.length == 0 && !loading">{{'NoDataFound' | localize}}</div>
-                                    <div class="font-weight-normal mt-5 p-5 text-center w-100" *ngIf="loading">{{'Loading' | localize}}...</div> -->
                                     <div *ngFor="let item of items; index as i" class="mb-2" [ngClass]="singleItemPerRowMode?  'col-12' : !singleItemPerRowMode && filterVisible ?  'col-lg-4 col-md-6 col-12' : 'col-lg-3 col-md-4 col-6'">
                                         <!-- <ng-container > -->
                                             <app-news-video-tile
@@ -146,15 +133,15 @@
                             </div>
                         </div>
                         <div class="row">
-                            <div class="left-aside-filters">
+                            <div class="">
                             </div>
                             <div class="col d-flex flex-column justify-content-between">
                                 <div class="primeng-paging-container custom-paginator">
-                                    <p-paginator [rows]="primengTableHelper.defaultRecordsCountPerPage"
+                                    <p-paginator   [rows]="12"
                                                 #paginator
                                                 (onPageChange)="getEvents($event)"
                                                 [totalRecords]="primengTableHelper.totalRecordsCount"
-                                                [rowsPerPageOptions]="primengTableHelper.predefinedRecordsCountPerPage">
+                                                [rowsPerPageOptions]="[12, 24, 36, 48]">
                                     </p-paginator>
 
                                     <div class="total-records-count text-right mr-3">

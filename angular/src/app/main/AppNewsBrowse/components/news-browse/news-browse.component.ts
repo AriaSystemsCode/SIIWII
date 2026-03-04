@@ -614,52 +614,6 @@ export class NewsBrowseComponent extends AppComponentBase {
         this.relatedEntityId=0;
     }
 
-    // private bindDateRangeToStartEnd() {
-    //     const dateRangeCtrl = this.filterForm.get('dateRange');
-    //     if (!dateRangeCtrl) return;
-      
-    //     const sub = dateRangeCtrl.valueChanges.subscribe((range: Date[]) => {
-    //       const start = range?.[0] ?? undefined;
-    //       const end = range?.[1] ?? undefined;
-      
-    //       if (this.filterForm.get('startDate')) {
-    //         this.filterForm.get('startDate')!.setValue(start, { emitEvent: false });
-    //       }
-    //       if (this.filterForm.get('endDate')) {
-    //         this.filterForm.get('endDate')!.setValue(end, { emitEvent: false });
-    //       }
-    //     });
-      
-    //     this.subscriptions.push(sub);
-    //   }
-
-    private bindDateRangeToStartEnd() {
-        const dateRangeCtrl = this.filterForm.get('dateRange');
-        if (!dateRangeCtrl) return;
-      
-        const sub = dateRangeCtrl.valueChanges
-          .pipe(debounceTime(300)) 
-          .subscribe((range: Date[]) => {
-            const start = range?.[0] ?? undefined;
-            const end = range?.[1] ?? undefined;
-    
-            this.filterForm.get('startDate')?.setValue(start, { emitEvent: false });
-            this.filterForm.get('endDate')?.setValue(end, { emitEvent: false });
-      
-       
-            if (start && end && moment(start).isAfter(moment(end))) {
-              this.dateErrorMessage = this.l('InvalidDateRangeError');
-              return;
-            }
-            this.dateErrorMessage = '';
-
-            if (start && end && !this.isConfirming) {
-              this.getFreshData();
-            }
-          });
-      
-        this.subscriptions.push(sub);
-      }
       filtersDialogVisible = false;
 
 openFiltersDialog() {

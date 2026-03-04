@@ -13,7 +13,7 @@ export class NewsVideoTileComponent {
 
   @Output() open = new EventEmitter<GetAppPostForViewDto>();
 
-  attachmentBaseUrl = AppConsts.remoteServiceBaseUrl + '/Attachments';
+  attachmentBaseUrl = AppConsts.remoteServiceBaseUrl ;
 
   get videoSrc(): string {
     const url = this.post?.attachmentsURLs?.[0];
