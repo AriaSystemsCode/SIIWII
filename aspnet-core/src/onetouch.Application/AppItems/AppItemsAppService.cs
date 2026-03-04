@@ -1846,6 +1846,7 @@ namespace onetouch.AppItems
         //I46-POC
         public async Task<long> CreateOrEdit(CreateOrEditAppItemDto input)
         {
+            var swCE = System.Diagnostics.Stopwatch.StartNew();
             List<AppItemValidationInputDTO> validateInput = new List<AppItemValidationInputDTO>();
             validateInput.Add(ObjectMapper.Map<AppItemValidationInputDTO>(input));
             var returnList = await ValidateItemData(validateInput);
@@ -1905,6 +1906,8 @@ namespace onetouch.AppItems
                 //}
                 // else
                 // {
+                Logger.Info($"[PERF] CreateOrEdit - Initial checks & ValidateItemData took {swCE.ElapsedMilliseconds}ms for {input.Code}");
+                swCE.Restart();
                 if (input.TenantId == null)
                     input.TenantId = AbpSession.TenantId;
                 var appItemExisting = await _appItemRepository.GetAll().Where(r => r.TenantId == input.TenantId && r.Code == input.Code && r.ItemType == input.ItemType).FirstOrDefaultAsync();
@@ -1915,11 +1918,15 @@ namespace onetouch.AppItems
                 }
                 // }
 
-                return await Create(input);
+                var createRes = await Create(input);
+                Logger.Info($"[PERF] CreateOrEdit - Create executed in {swCE.ElapsedMilliseconds}ms for {input.Code}");
+                return createRes;
             }
             else
             {
-                return await Update(input);
+                var updateRes = await Update(input);
+                Logger.Info($"[PERF] CreateOrEdit - Update executed in {swCE.ElapsedMilliseconds}ms for {input.Code}");
+                return updateRes;
             }
         }
         //MMT
@@ -8264,6 +8271,8 @@ namespace onetouch.AppItems
 
         public async Task<ExcelLogDto> SaveFromExcel(AppItemExcelResultsDTO excelResultsDTO)
         {
+            var swTotal = System.Diagnostics.Stopwatch.StartNew();
+            Logger.Info($"[PERF] SaveFromExcel started for {excelResultsDTO.ExcelRecords.Count} records");
             List<AppItemExcelDto> result = excelResultsDTO.ExcelRecords.Where(r => r.Status !=
             ExcelRecordStatus.Failed.ToString()).Select(r => r.ExcelDto).ToList<AppItemExcelDto>();
 
@@ -8478,6 +8487,8 @@ namespace onetouch.AppItems
             }
             #endregion
 
+            Logger.Info($"[PERF] SaveFromExcel - pre-processing took {swTotal.ElapsedMilliseconds}ms");
+            var swPreLoop = System.Diagnostics.Stopwatch.StartNew();
 
             //MARIAM
             await AddClassifications(result.ToList<AppItemExcelDto>());
@@ -8583,8 +8594,10 @@ namespace onetouch.AppItems
             List<AppEntityExtraData> appEntityExtraDataDeleteList = new List<AppEntityExtraData>();
             var x = UnitOfWorkManager.Current.GetDbContext<onetouchDbContext>(null, null);
             List<string> sizeScaleNames = new List<string>();
+            Logger.Info($"[PERF] SaveFromExcel - Setup before loop took {swTotal.ElapsedMilliseconds}ms in total, {swPreLoop.ElapsedMilliseconds}ms in part 2");
             foreach (AppItemExcelDto excelDto in result)
             {
+                var swLoop = System.Diagnostics.Stopwatch.StartNew();
                 if (!string.IsNullOrEmpty(excelDto.ParentCode))
                     continue;
                 AppItem itemOrg = new AppItem();
@@ -10169,7 +10182,9 @@ namespace onetouch.AppItems
                     appItemModifyList.Add(appItem);*/
                 CreateOrEditAppItemDto createOrEditAppItemDto = ObjectMapper.Map<CreateOrEditAppItemDto>(appItem);
                 createOrEditAppItemDto.NonLookupValues = new List<LookupLabelDto>();
+                var swCreate = System.Diagnostics.Stopwatch.StartNew();
                 await CreateOrEdit(createOrEditAppItemDto);
+                Logger.Info($"[PERF] SaveFromExcel loop body for {excelDto.Code} took {swLoop.ElapsedMilliseconds}ms (CreateOrEdit took {swCreate.ElapsedMilliseconds}ms)");
                 //MMT46
             }
 
