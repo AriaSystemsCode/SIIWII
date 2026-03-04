@@ -219,19 +219,19 @@ namespace onetouch.AppEvents
         [AbpAuthorize(AppPermissions.Pages_AppEvents_Create)]
         protected virtual async Task<long> DoCreateOrEdit(CreateOrEditAppEventDto input)
         {
+            Logger.Info($"EventsAppService DoCreateOrEdit Input: Id={input.Id}, EntityId={input.EntityId}, Code={input.Code}, Name={input.Name}, FromTime={input.FromTime}, ToTime={input.ToTime}");
             AppEvent appEvent;
 
-            if (input.FromHour > 0 && input.FromMinute > 0)
-            { //input.FromDate = new DateTime(input.FromDate.Year, input.FromDate.Month, input.FromDate.Day, input.FromHour, input.FromMinute,0);
-                input.FromTime = new DateTime(input.FromTime.Year, input.FromTime.Month, input.FromTime.Day, input.FromHour, input.FromMinute, 0);
-            
+            if (input.FromHour > 0 || input.FromMinute > 0)
+            { 
+                input.FromTime = new DateTime(input.FromTime.Year, input.FromTime.Month, input.FromTime.Day, input.FromHour, input.FromMinute, 0, DateTimeKind.Unspecified);
             }
 
-            if (input.ToHour > 0 && input.ToMinute > 0)
-            { //input.ToDate = new DateTime(input.ToDate.Year, input.ToDate.Month, input.ToDate.Day, input.ToHour, input.ToMinute, 0);
-                input.ToTime = new DateTime(input.ToTime.Year, input.ToTime.Month, input.ToTime.Day, input.ToHour, input.ToMinute, 0);
+            if (input.ToHour > 0 || input.ToMinute > 0)
+            { 
+                input.ToTime = new DateTime(input.ToTime.Year, input.ToTime.Month, input.ToTime.Day, input.ToHour, input.ToMinute, 0, DateTimeKind.Unspecified);
             }
-
+            Logger.Info($"EventsAppService DoCreateOrEdit Converted Times after calculation: UTCFromDateTime={input.FromTime}, UTCToDateTime={input.ToTime}");
             if (input.Id == 0)
             {
 
@@ -299,9 +299,17 @@ namespace onetouch.AppEvents
 
             //appEvent.UTCFromDateTime = _helper.GetUTCDatetimeValueFromDateAndTime(appEvent.FromDate, appEvent.FromTime, appEvent.TimeZone);
             //appEvent.UTCToDateTime = _helper.GetUTCDatetimeValueFromDateAndTime(appEvent.ToDate, appEvent.ToTime, appEvent.TimeZone);
+            Logger.Info($"EventsAppService DoCreateOrEdit Converted Times: UTCFromDateTime={appEvent.UTCFromDateTime}, UTCToDateTime={appEvent.UTCToDateTime}");
+            appEvent.UTCFromDateTime = DateTime.SpecifyKind(input.FromTime, DateTimeKind.Unspecified);
+            appEvent.UTCToDateTime = DateTime.SpecifyKind(input.ToTime, DateTimeKind.Unspecified);
+            
+            appEvent.FromTime = DateTime.SpecifyKind(input.FromTime, DateTimeKind.Unspecified);
+            appEvent.ToTime = DateTime.SpecifyKind(input.ToTime, DateTimeKind.Unspecified);
 
-            appEvent.UTCFromDateTime = input.FromTime;
-            appEvent.UTCToDateTime = input.ToTime;
+            appEvent.FromDate = DateTime.SpecifyKind(input.FromDate, DateTimeKind.Unspecified);
+            appEvent.ToDate = DateTime.SpecifyKind(input.ToDate, DateTimeKind.Unspecified);
+
+            Logger.Info($"EventsAppService DoCreateOrEdit Converted Times: UTCFromDateTime={appEvent.UTCFromDateTime}, UTCToDateTime={appEvent.UTCToDateTime}");
 
 
 
