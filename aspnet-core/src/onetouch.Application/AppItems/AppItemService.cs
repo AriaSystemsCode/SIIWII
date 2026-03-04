@@ -615,14 +615,14 @@ namespace onetouch.AppItems
         {
             string tempId = colorEntityId;
             long saveEntity = 0;
-            
+            var tenantId = AbpSession.TenantId == null ? -1 : AbpSession.TenantId;
             #region create color lookup
             if ((string.IsNullOrEmpty(colorEntityId) || colorEntityId == "0" || colorEntityId == "-") &&
                 (string.IsNullOrEmpty(appItemtExcelRecordDTO.ExcelDto.Actions) || appItemtExcelRecordDTO.ExcelDto.Actions == "7" || appItemtExcelRecordDTO.ExcelDto.Actions == "10"))
             {
                 var codeExist = _appEntityRepository.GetAll().FirstOrDefaultAsync(x =>
                 x.Code == appItemtExcelRecordDTO.ExcelDto.ColorCode && x.EntityObjectTypeId == 16
-                && (x.TenantId == null || x.TenantId == AbpSession.TenantId)).Result;
+                && (x.TenantId == null || x.TenantId == -1 || x.TenantId == AbpSession.TenantId)).Result;
 
                 if (codeExist == null)
                 {
@@ -632,7 +632,7 @@ namespace onetouch.AppItems
                     colorEntity.EntityObjectTypeId = 16;
                     var itemObjectId = _helper.SystemTables.GetObjectLookupId().Result;
                     colorEntity.ObjectId = itemObjectId;
-
+                    colorEntity.TenantId = tenantId;
                     var returnColorEntityCreation = _appEntitiesAppService.SaveEntity(colorEntity).Result;
                     tempId = returnColorEntityCreation.ToString();
                 }
@@ -651,7 +651,7 @@ namespace onetouch.AppItems
                 appEntity.Code = color.AppEntity.Code;
                 var appEntityDto = ObjectMapper.Map<AppEntityDto>(appEntity);
 
-                var tenantId = AbpSession.TenantId == null ? -1 : AbpSession.TenantId;
+                
                 var path = _appConfiguration[$"Attachment:PathTemp"] + @"\" + tenantId.ToString();
 
                 if (appEntityDto.EntityAttachments.Count == 0) { appEntityDto.EntityAttachments = new List<AppEntityAttachmentDto>(); }
