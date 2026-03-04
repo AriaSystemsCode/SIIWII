@@ -45,6 +45,7 @@ using Abp.EntityFrameworkCore.Uow;
 using NUglify.Helpers;
 using Microsoft.PowerShell.Commands;
 using onetouch.AppItems.Dtos;
+using Abp.Domain.Entities;
 
 namespace onetouch.AppMarketplaceAccounts
 {
@@ -1404,7 +1405,7 @@ namespace onetouch.AppMarketplaceAccounts
 
                 //HIA - share Account related branches [Start]
 
-                var branchInfo = _appContactRepository.GetAll()
+                var branchInfo = _appContactRepository.GetAll().AsNoTracking()
                     .Where(x => //x.IsProfileData
                            //&&
                            x.AccountId == mainAccountID
@@ -1704,21 +1705,35 @@ namespace onetouch.AppMarketplaceAccounts
         {
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
             {
-                var input = await _appContactRepository.GetAll().AsNoTracking()
+                var input = await _appContactRepository.GetAll()//.AsNoTracking()
                     .Include(x => x.AppContactAddresses)
                     .ThenInclude(x => x.AddressFk).AsNoTracking()
                     .FirstOrDefaultAsync(x => x.TenantId == AbpSession.TenantId
                     //x.IsProfileData == true
                     && x.Id == branchId);
 
-                var foundEntity = await _appEntityRepository.GetAll().AsNoTracking()
+                var foundEntity = await _appEntityRepository.GetAll()//.AsNoTracking()
                                    .FirstOrDefaultAsync(x => x.TenantId == AbpSession.TenantId
                                    && x.Id == input.EntityId);
-
-
+                //I40[Start]
+                if (string.IsNullOrEmpty(input.SSIN))
+                {
+                    //AppEntity entity = new AppEntity();
+                    //var entityParent = _appEntityRepository.FirstOrDefault(contactParent.EntityId);
+                    foundEntity.EntityObjectTypeCode = await _helper.SystemTables.GetEntityObjectTypeBranchCode();
+                    foundEntity.EntityObjectTypeId = await _helper.SystemTables.GetEntityObjectTypeBranchId();
+                    var contactObjectId = await _helper.SystemTables.GetObjectContactId();
+                    input.SSIN = await
+                        _helper.SystemTables.GenerateSSIN(contactObjectId, ObjectMapper.Map<AppEntityDto>(foundEntity));
+                    foundEntity.SSIN = input.SSIN;
+                    await _appContactRepository.UpdateAsync(input);
+                    await _appEntityRepository.UpdateAsync(foundEntity);
+                    await UnitOfWorkManager.Current.SaveChangesAsync();
+                }
+                //I40{End}
                 AppMarketplaceContact appMarketplaceContact = new AppMarketplaceContact();
                 ObjectMapper.Map(input, appMarketplaceContact);
-                appMarketplaceContact.Id = 0;
+                //appMarketplaceContact.Id = 0;
 
                 appMarketplaceContact.IsProfileData = true;
                 appMarketplaceContact.ObjectId = foundEntity.ObjectId;
@@ -1733,10 +1748,12 @@ namespace onetouch.AppMarketplaceAccounts
                 appMarketplaceContact.SSIN = input.SSIN;
                 appMarketplaceContact.AccountId = newAccountID;
                 appMarketplaceContact.SharingLevel = 1;
+                appMarketplaceContact.ParentFk = null;
                 foreach (var contactAddress in appMarketplaceContact.ContactAddresses)
                 {
                     contactAddress.Id = 0;
                     contactAddress.AddressFk.Id = 0;
+                    contactAddress.AddressId = 0;
                 }
 
                 long newId = 0;
@@ -1757,7 +1774,7 @@ namespace onetouch.AppMarketplaceAccounts
                 }*/
 
                 //publish sub branches
-                var branchInfo = _appContactRepository.GetAll()
+                var branchInfo = _appContactRepository.GetAll().AsNoTracking()
                 .Where(x => x.IsProfileData
                            && x.AccountId == mainAccountID
                            && x.TenantId == AbpSession.TenantId
@@ -1775,16 +1792,32 @@ namespace onetouch.AppMarketplaceAccounts
 
         public async Task<bool> PublishMember(long contactId, long parentId, long personEntityObjectTypeId, long? mainAccountID, long newAccountID)
         {
-            var input = await _appContactRepository.GetAll().AsNoTracking()
+            var input = await _appContactRepository.GetAll()//.AsNoTracking()
                 .FirstOrDefaultAsync(x => x.TenantId == AbpSession.TenantId
                                        // && x.AccountId == mainAccountID
                                         && x.Id == contactId );//&& x.IsProfileData == true
-            var foundEntity = await _appEntityRepository.GetAll().AsNoTracking()
+            var foundEntity = await _appEntityRepository.GetAll()//.AsNoTracking()
                                 .Include(x => x.EntityAttachments).ThenInclude(x => x.AttachmentFk)
                                 .Include(x => x.EntityExtraData)
                                 .AsNoTracking()
                                 .FirstOrDefaultAsync(x => x.TenantId == AbpSession.TenantId
                                 && x.Id == input.EntityId);
+            //I40[Start]
+            if (string.IsNullOrEmpty(input.SSIN))
+            {
+                //AppEntity entity = new AppEntity();
+                //var entityParent = _appEntityRepository.FirstOrDefault(contactParent.EntityId);
+                foundEntity.EntityObjectTypeCode = await _helper.SystemTables.GetEntityObjectTypePersonCode();
+                foundEntity.EntityObjectTypeId = await _helper.SystemTables.GetEntityObjectTypePersonId();
+                var contactObjectId = await _helper.SystemTables.GetObjectContactId();
+                input.SSIN = await
+                    _helper.SystemTables.GenerateSSIN(contactObjectId, ObjectMapper.Map<AppEntityDto>(foundEntity));
+                foundEntity.SSIN = input.SSIN;
+                await _appContactRepository.UpdateAsync(input);
+                await _appEntityRepository.UpdateAsync(foundEntity);
+                await UnitOfWorkManager.Current.SaveChangesAsync();
+            }
+            //I40{End}
 
             AppMarketplaceContact appMarketplaceContact = new AppMarketplaceContact();
             ObjectMapper.Map(input, appMarketplaceContact);
