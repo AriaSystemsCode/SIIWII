@@ -2224,31 +2224,45 @@ namespace onetouch.Accounts
                                     var savedAddress = await _appMarketplaceAddressRepository.FirstOrDefaultAsync(x => x.Id == mcontactAddress.AddressId);
                                     if (savedAddress != null)
                                     {
-                                        var addressCon = await _appAddressRepository.FirstOrDefaultAsync(z => z.TenantId == originalContact.TenantOwner &&
-                                         z.AccountId == accountSaved.AccountInfo.Id && z.Code == savedAddress.Code);
-                                        if (addressCon == null)
+                                        using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
                                         {
-                                            ObjectMapper.Map(savedAddress, address);
-                                            address.Id = 0;
-                                            address.AccountId = long.Parse(accountSaved.AccountInfo.Id.ToString());
-                                            address.TenantId = tenantId;
-                                            address = await _appAddressRepository.InsertAsync(address);
+                                            var varAccId = accountSaved.AccountInfo.Id;
+                                            var addCode = savedAddress.Code;
+                                            var addressQuery = _appAddressRepository.GetAll()
+                                            .Where(z => z.TenantId == tenantId &&
+                                             z.AccountId == varAccId
+                                             && z.Code == addCode);
+                                            var addressCon = await addressQuery.IgnoreQueryFilters().FirstOrDefaultAsync();
+                                            if (addressCon != null && addressCon.IsDeleted== true)
+                                            {
+                                                await CurrentUnitOfWork.SaveChangesAsync();
+                                                addressCon = await addressQuery.FirstOrDefaultAsync();
+                                            }
+                                            if (addressCon == null )
+                                            {
+                                                ObjectMapper.Map(savedAddress, address);
+                                                address.Id = 0;
+                                                address.Code = addCode;
+                                                address.AccountId = long.Parse(varAccId.ToString());
+                                                address.TenantId = tenantId;
+                                                address = await _appAddressRepository.InsertAsync(address);
+                                                await CurrentUnitOfWork.SaveChangesAsync();
+                                            }
+                                            else
+                                            {
+                                                address = addressCon;
+                                            }
+                                            AppContactAddress newContactAddress = new AppContactAddress();
+                                            newContactAddress.Id = 0;
+                                            newContactAddress.AddressId = address.Id;
+                                            newContactAddress.ContactId = long.Parse(accountSaved.AccountInfo.Id.ToString()); ;
+                                            newContactAddress.AddressTypeId = mcontactAddress.AddressTypeId;
+                                            newContactAddress.AddressCode = mcontactAddress.AddressCode;
+                                            newContactAddress.AddressTypeCode = mcontactAddress.AddressTypeCode;
+                                            newContactAddress.ContactCode = accountSaved.AccountInfo.Code;
+                                            await _appContactAddressRepository.InsertAsync(newContactAddress);
                                             await CurrentUnitOfWork.SaveChangesAsync();
                                         }
-                                        else
-                                        {
-                                            address = addressCon;
-                                        }
-                                        AppContactAddress newContactAddress = new AppContactAddress();
-                                        newContactAddress.Id = 0;
-                                        newContactAddress.AddressId = address.Id;
-                                        newContactAddress.ContactId = long.Parse(accountSaved.AccountInfo.Id.ToString()); ;
-                                        newContactAddress.AddressTypeId = mcontactAddress.AddressTypeId;
-                                        newContactAddress.AddressCode = mcontactAddress.AddressCode;
-                                        newContactAddress.AddressTypeCode = mcontactAddress.AddressTypeCode;
-                                        newContactAddress.ContactCode = accountSaved.AccountInfo.Code;
-                                        await _appContactAddressRepository.InsertAsync(newContactAddress);
-                                        await CurrentUnitOfWork.SaveChangesAsync();
                                     }
                                 }
                             }
@@ -3824,7 +3838,7 @@ namespace onetouch.Accounts
                     var appMarketplaceContact = await _iCreateMarketplaceAccount.CreateOrEditMarketplaceAccount(createOrEditAccountInfoDto, sync);
                     //I40[Start]
                     var personEntityObjectTypeId = await _helper.SystemTables.GetEntityObjectTypePersonId();
-                    if (sync && contact.EntityFk.EntityObjectTypeId== personEntityObjectTypeId)
+                    if (sync )//&& contact.EntityFk.EntityObjectTypeId== personEntityObjectTypeId)
                     {
                         
                         var connectedList = await _appContactRepository.GetAll().Where(z => z.TenantId != AbpSession.TenantId && z.SSIN == createOrEditAccountInfoDto.SSIN).ToListAsync();

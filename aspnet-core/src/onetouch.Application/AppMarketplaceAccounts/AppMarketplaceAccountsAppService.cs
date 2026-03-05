@@ -1096,7 +1096,8 @@ namespace onetouch.AppMarketplaceAccounts
                             Include(e => e.EntityExtraData)
                             .Include(e => e.EntityAttachments).ThenInclude(z=>z.AttachmentFk)
                         .Where(x => x.IsProfileData
-                               && x.SSIN == FoundPublishContact.SSIN
+                               //&& x.SSIN == FoundPublishContact.SSIN
+                               && (x.AccountId == FoundPublishContact.Id || x.AccountId== mainAccountID)
                                && x.TenantId == null
                                && x.EntityObjectTypeId == personEntityObjectTypeId).ToList();
 
@@ -1404,13 +1405,14 @@ namespace onetouch.AppMarketplaceAccounts
 
 
                 //HIA - share Account related branches [Start]
-
+                var branchEntityObjectTypeId = await _helper.SystemTables.GetEntityObjectTypeBranchId();
                 var branchInfo = _appContactRepository.GetAll().AsNoTracking()
                     .Where(x => //x.IsProfileData
                            //&&
                            x.AccountId == mainAccountID
                            && x.TenantId == AbpSession.TenantId
                            && x.ParentId == mainAccountID
+                           && x.EntityFk.EntityObjectTypeId == branchEntityObjectTypeId
                            ).ToList();
                 // First level of branches
                 foreach (var branchObj in branchInfo)
@@ -1819,7 +1821,7 @@ namespace onetouch.AppMarketplaceAccounts
             }
             //I40{End}
 
-            AppMarketplaceContact appMarketplaceContact = new AppMarketplaceContact();
+                AppMarketplaceContact appMarketplaceContact = new AppMarketplaceContact();
             ObjectMapper.Map(input, appMarketplaceContact);
             appMarketplaceContact.Id = 0;
             appMarketplaceContact.EntityExtraData = foundEntity.EntityExtraData;
