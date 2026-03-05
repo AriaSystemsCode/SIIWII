@@ -268,7 +268,16 @@
         <!-- ===================== -->
 
         <ng-template #dataTpl>
-
+          <div *ngIf="extraFilter" class=" mb-2">
+          
+            <p>entity : {{ existingConfig.entity }}</p>
+            
+            <p>category :{{ extraFilter.category }}  has {{ extraFilter.value  }} values</p>
+          
+            <!-- <button type="button" class="btn btn-link btn-sm ms-2" (click)="clearChartFilter()">
+              Clear
+            </button> -->
+          </div>
           <app-data-preview
           [title]="'Data preview'"
           [rows]="rawRows"

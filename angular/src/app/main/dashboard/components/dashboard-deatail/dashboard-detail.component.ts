@@ -1,4 +1,4 @@
-import { Component, Injector, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Component, Injector, NgZone, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MenuItem, MessageService, ConfirmationService } from 'primeng/api';
 import { finalize } from 'rxjs/operators';
@@ -126,6 +126,7 @@ export class DashboardDetailComponent extends AppComponentBase implements OnInit
     private fb: FormBuilder,
     private messageService: MessageService,
     private confirmService: ConfirmationService,
+     private zone: NgZone
   ) {
     super(injector);
 
@@ -504,7 +505,7 @@ onWidgetCreate(cfg: any): void {
     }
   ];
 
-  // ✅ place it in first empty position
+  //  place it in first empty position
   setTimeout(() => {
     this.options.api?.getNextPossiblePosition?.(gridInfo);
     this.options.api?.optionsChanged?.();
@@ -561,9 +562,38 @@ private buildGridsterOptions(): void {
   };
 
 }
-openWidgetSettings(widget: any, tab: 'settings'|'data') {
-  this.widgetModal.setKind(widget.kind);               // bar/line/...
-  this.widgetModal.show(widget.config,this.mode);
+openWidgetSettings(
+  widget: any,
+  tab: 'settings' | 'data' = 'settings',
+  extraFilter?: any
+) {
+  // مهم: widgetModal لازم يكون موجود
+  if (!this.widgetModal) return;
+
+  this.widgetModal.setKind(widget.kind);
+  this.widgetModal.activeTab = tab;
+
+  // ✅ لو مفيش config (null) اعملي واحد minimal
+  const baseConfig = widget.config ?? {
+    chartType: widget.kind,
+    entity: 'transactions',   // حطي default مناسب عندك
+    filters: []
+  };
+
+  // ✅ تأكدي chartType موجود
+  const safeConfig = {
+    ...baseConfig,
+    chartType: baseConfig.chartType ?? widget.kind,
+    filters: Array.isArray(baseConfig.filters) ? baseConfig.filters : []
+  };
+
+  // ✅ add clicked filter
+  const finalConfig = extraFilter
+    ? { ...safeConfig, filters: [...safeConfig.filters, extraFilter] }
+    : safeConfig;
+
+  // افتحي المودال
+  this.widgetModal.show(finalConfig, this.mode,extraFilter);
 }
 
 refreshWidget(widget: any) {
@@ -585,7 +615,52 @@ toggleMenu(widgetId: string, event: MouseEvent) {
     this.openMenuId = widgetId;
   }
 }
+private humanizeField(key: string): string {
+  return String(key)
+    .replace(/_/g, ' ')
+    .replace(/([a-z])([A-Z])/g, '$1 $2')
+    .replace(/\b\w/g, c => c.toUpperCase());
+}
+onWidgetChartClick(widget: any, e: any): void {
+  console.log(widget, e, 'hhhh');
 
+  // const categoryField = this.getWidgetCategoryField(widget);
+
+  // if (!categoryField) {
+  //   setTimeout(() => this.openWidgetSettings(widget, 'data'), 0);
+  //   return;
+  // }
+
+  const filter = {
+   
+    op: 'eq',
+    value: e.category,
+    __fromChartClick: true,
+    label:e.category
+  };
+
+  setTimeout(() => this.openWidgetSettings(widget, 'data', e), 0);
+}
+private getWidgetCategoryField(widget: any): string | null {
+
+  const cfg = widget.config;
+
+  if (!cfg) return null;
+
+  if (cfg.chartType === 'bar')
+    return cfg.bar?.x;
+
+  if (cfg.chartType === 'pie')
+    return cfg.dimension;
+
+  if (cfg.chartType === 'doughnut')
+    return cfg.dimension;
+
+  if (cfg.chartType === 'line')
+    return cfg.dimension;
+
+  return cfg.dimension || null;
+}
 
 
 }

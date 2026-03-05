@@ -1,4 +1,4 @@
-import { Component, ElementRef, Input, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, ElementRef, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
 import type { EChartsOption, SeriesOption } from 'echarts';
 import { GridsterItem } from 'angular-gridster2';
 @Component({ selector:'app-chart-widget-card', templateUrl:'./chart-widget-card.component.html' })
@@ -29,6 +29,7 @@ export class ChartWidgetCardComponent implements OnChanges {
     private chartInstance: any;
     @Input() grid?: GridsterItem;
   
+    @Output() chartClick = new EventEmitter<any>();
   constructor(private host: ElementRef<HTMLElement>) {}
 
   // ngAfterViewInit(): void {
@@ -62,8 +63,21 @@ export class ChartWidgetCardComponent implements OnChanges {
 
   onChartInit(ec: any): void {
     this.chartInstance = ec;
-    // when chart first mounts, force correct size
+  
     queueMicrotask(() => this.recalcHeight());
+  
+    // ✅ listen for clicks
+    ec.on('click', (params: any) => {
+  
+      const payload = {
+        category: params.name,      // Draft / Approved
+        value: params.value,
+        series: params.seriesName,
+        chartType: this.chartType
+      };
+  
+      this.chartClick.emit(payload);
+    });
   }
 
   // private recalcHeight(): void {
@@ -166,6 +180,8 @@ export class ChartWidgetCardComponent implements OnChanges {
       tooltip: { trigger: t === 'pie' || t === 'doughnut' ? 'item' : 'axis' },
       legend: { top: 0 },
       grid: { left: 40, right: 20, top: 40, bottom: 30 },
+
+  triggerEvent: true 
     };
 
     if (t === 'pie' || t === 'doughnut') {

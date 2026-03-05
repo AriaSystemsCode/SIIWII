@@ -157,17 +157,42 @@ editMode = true;
 get isEditMode(): boolean { return this.mode === 'edit'; }
 get isCreateMode(): boolean { return this.mode === 'create'; }
 get isViewMode(): boolean { return this.mode === 'view'; }
-show(existingConfig?: ChartConfig,mode: 'create' | 'edit' | 'view' = 'create') : void {
+activeChartFilter: any = null;
+existingConfig: any = null;
+extraFilter: any = null;
+show(
+  existingConfig?: ChartConfig,
+  mode: 'create' | 'edit' | 'view' = 'create',
+  extraFilter?: any
+): void {
+  console.log(existingConfig,'existingConfig')
+  console.log(extraFilter,'extraFilter')
+  this.existingConfig = existingConfig
+  this.extraFilter = extraFilter
   this.mode = mode;
   this.entities = this.meta.getEntities();
 
- 
+  // reset header each open
+  this.activeChartFilter = null;
 
-  // لو Edit existing widget
   if (existingConfig) {
     this.chartType = existingConfig.chartType;
+
+    // ✅ 1) patch config to form
     this.form.patchValue(this.mapConfigToForm(existingConfig), { emitEvent: false });
+
+    // ✅ 2) build entity fields (THIS DOES NOT RESET filters anymore - see step 3)
     this.onEntityChange();
+
+    // ✅ 3) apply extraFilter after entity init
+    if (extraFilter?.field) {
+      this.activeChartFilter = extraFilter;
+
+      // add it to filters WITHOUT breaking existing ones
+      const current = this.form.value.filters || [];
+      this.form.patchValue({ filters: [...current, extraFilter] }, { emitEvent: false });
+    }
+
     this.updatePreview();
   } else {
     this.resetFormDefaults();
@@ -177,7 +202,6 @@ show(existingConfig?: ChartConfig,mode: 'create' | 'edit' | 'view' = 'create') :
   setTimeout(() => window.dispatchEvent(new Event('resize')), 0);
   this.cdr.markForCheck();
 }
-
 private resetFormDefaults() {
   this.form.reset({
     entity: null,
@@ -266,7 +290,18 @@ private mapConfigToForm(cfg: ChartConfig): any {
     this.applyValidatorsForKind();
     this.cdr.markForCheck();
   }
-
+  humanizeField(key: string): string {
+    return String(key)
+      .replace(/_/g, ' ')
+      .replace(/([a-z])([A-Z])/g, '$1 $2')
+      .replace(/\b\w/g, c => c.toUpperCase());
+  }
+  
+  clearChartFilter(): void {
+    this.activeChartFilter = null;
+    const cleaned = (this.form.value.filters || []).filter((f: any) => !(f?.__fromChartClick));
+    this.form.patchValue({ filters: cleaned }, { emitEvent: true });
+  }
   onEntityChange(): void {
     const ent = this.form.value.entity as EntityName;
     if (!ent) return;
@@ -282,7 +317,7 @@ private mapConfigToForm(cfg: ChartConfig): any {
       measure: null,
       dimension: null,
       dimensionValues: [],
-      filters: [],
+      // filters: [],
       barX: null,
       barY: [],
       barXValues: [],
@@ -528,10 +563,20 @@ private mapConfigToForm(cfg: ChartConfig): any {
     baseCfg.dimension = v.dimension || undefined;
   
     const res = this.meta.runQuery(baseCfg);
+    this.rawRows = this.applyChartFilter(res.rows || []);
     this.previewChartData = { labels: res.labels, datasets: res.datasets };
     this.previewConfig = baseCfg;
   
     this.cdr.markForCheck();
+  }
+
+  private applyChartFilter(rows: any[]): any[] {
+
+    if (!this.activeChartFilter) return rows;
+  
+    return rows.filter(r =>
+      r[this.activeChartFilter.field] === this.activeChartFilter.value
+    );
   }
 
   onLineAggChange(): void {

@@ -194,13 +194,15 @@
           </div>
         
           <div class="widget-body">
-            <div class="widget-body">
+      
               <app-chart-widget-card
                 [chartType]="widget.kind"
                 [externalData]="widget.data"
-                [grid]="widget.gridInformation">
+                [grid]="widget.gridInformation"
+                (chartClick)="onWidgetChartClick(widget, $event)"
+                >
               </app-chart-widget-card>
-            </div>
+      
           </div>
         </div>
       </gridster-item>

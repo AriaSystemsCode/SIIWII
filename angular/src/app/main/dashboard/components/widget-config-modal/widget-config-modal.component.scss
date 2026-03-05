@@ -128,3 +128,38 @@
   from { opacity: .6; transform: translateY(2px); }
   to   { opacity: 1;  transform: translateY(0);  }
 }
+
+
+
+
+.chart-filter-line{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  padding:10px 12px;
+  border:1px solid #e5e7eb;
+  border-radius:10px;
+  background:#f8fafc;
+  margin-bottom:10px;
+}
+
+.chart-filter-line .dot{
+  width:8px;height:8px;border-radius:50%;
+  background:#157af8;
+  flex:0 0 auto;
+}
+
+.chart-filter-line .text{
+  // flex:1;
+  color:#334155;
+  font-size:13px;
+}
+
+.chart-filter-line .clear-btn{
+  border:none;
+  background:transparent;
+  color:#157af8;
+  font-weight:600;
+  cursor:pointer;
+}
