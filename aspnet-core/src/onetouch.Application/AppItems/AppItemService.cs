@@ -632,9 +632,10 @@ namespace onetouch.AppItems
                     colorEntity.EntityObjectTypeId = 16;
                     var itemObjectId = _helper.SystemTables.GetObjectLookupId().Result;
                     colorEntity.ObjectId = itemObjectId;
-                    colorEntity.TenantId = tenantId;
+                    colorEntity.TenantId = AbpSession.TenantId;
                     var returnColorEntityCreation = _appEntitiesAppService.SaveEntity(colorEntity).Result;
                     tempId = returnColorEntityCreation.ToString();
+                    saveEntity = returnColorEntityCreation;
                 }
                 else { tempId = codeExist.Id.ToString(); 
                    
@@ -709,7 +710,7 @@ namespace onetouch.AppItems
 
                     }
                 }
-                appEntityDto.TenantId = tenantId;
+                appEntityDto.TenantId = AbpSession.TenantId;
                 appEntityDto.EntityAttachments.Add(appEntityAttachmentDto);
                 appEntityDto.TimeStamp = DateTime.Now;
 

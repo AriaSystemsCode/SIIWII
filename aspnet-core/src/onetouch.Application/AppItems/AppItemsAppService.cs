@@ -8264,6 +8264,9 @@ namespace onetouch.AppItems
 
         public async Task<ExcelLogDto> SaveFromExcel(AppItemExcelResultsDTO excelResultsDTO)
         {
+            var swTotal = System.Diagnostics.Stopwatch.StartNew();
+            Logger.Info($"[PERF] SaveFromExcel started for {excelResultsDTO.ExcelRecords.Count} records");
+
             List<AppItemExcelDto> result = excelResultsDTO.ExcelRecords.Where(r => r.Status !=
             ExcelRecordStatus.Failed.ToString()).Select(r => r.ExcelDto).ToList<AppItemExcelDto>();
 
@@ -8286,7 +8289,7 @@ namespace onetouch.AppItems
 
             // temp end
             List<AppItemtExcelRecordDTO> result123 = excelResultsDTO.ExcelRecords
-                .Where(r => r.Status.ToUpper() == "PASSED" && (r.ExcelDto.Actions == "7" || r.ExcelDto.Actions == "2" || r.ExcelDto.Actions == "3"
+                .Where(r => (r.Status.ToUpper() == "PASSED" || r.Status.ToUpper() == "WARNING") && (r.ExcelDto.Actions == "7" || r.ExcelDto.Actions == "2" || r.ExcelDto.Actions == "3"
                 || r.ExcelDto.Actions == "4" || r.ExcelDto.Actions == "5" || r.ExcelDto.Actions == "6"
                 || r.ExcelDto.Actions == "8"
                 || r.ExcelDto.Actions == "9"
@@ -8303,7 +8306,11 @@ namespace onetouch.AppItems
                     {
                         if (number == 10) { excelDto.ExcelDto.Code = "-"; }
                         foreach (var id in excelDto.ExcelDto.Code.Split(","))
-                        { var ret1 = SaveImageToColor(id, excelDto).Result; }
+                        { 
+                            var swImg = System.Diagnostics.Stopwatch.StartNew();
+                            var ret1 = await SaveImageToColor(id, excelDto); 
+                            Logger.Info($"[PERF] SaveImageToColor for {id} took {swImg.ElapsedMilliseconds}ms");
+                        }
                     }
                 if (number == 5)
                     if (number == 5)
@@ -8325,7 +8332,10 @@ namespace onetouch.AppItems
                         if (excelDto.ExcelDto.NoOfDim == null) { excelDto.ExcelDto.NoOfDim = "1"; }
                         if (string.IsNullOrEmpty(excelDto.ExcelDto.ImageType)) { excelDto.ExcelDto.ImageType = "Image"; }
 
-                        var xexcelDto = AddExtraAttrs(excelDto).Result;
+                        var swExtra = System.Diagnostics.Stopwatch.StartNew();
+                        var xexcelDto = await AddExtraAttrs(excelDto);
+                        Logger.Info($"[PERF] Early AddExtraAttrs took {swExtra.ElapsedMilliseconds}ms");
+
                         excelDto.ExcelDto.ExtraAttributes = xexcelDto.ExcelDto.ExtraAttributes;
                         excelDto.ExcelDto.ExtraAttributesValues = xexcelDto.ExcelDto.ExtraAttributesValues;
 
@@ -8386,7 +8396,7 @@ namespace onetouch.AppItems
                             childNo += 1;
                             thirdItemCopy.ExcelDto.D1Pos = childNo.ToString();
 
-                            var xexcelDto = AddExtraAttrs(thirdItemCopy).Result;
+                            var xexcelDto = await AddExtraAttrs(thirdItemCopy);
                             thirdItemCopy.ExcelDto.ExtraAttributes = xexcelDto.ExcelDto.ExtraAttributes;
                             thirdItemCopy.ExcelDto.ExtraAttributesValues = xexcelDto.ExcelDto.ExtraAttributesValues;
                             thirdItemCopy.ExcelDto.ParentCode = thirdItemCopy.ParentCode;
@@ -8478,6 +8488,8 @@ namespace onetouch.AppItems
             }
             #endregion
 
+            Logger.Info($"[PERF] SaveFromExcel - pre-processing took {swTotal.ElapsedMilliseconds}ms");
+            var swPreLoop = System.Diagnostics.Stopwatch.StartNew();
 
             //MARIAM
             await AddClassifications(result.ToList<AppItemExcelDto>());
@@ -8583,6 +8595,48 @@ namespace onetouch.AppItems
             List<AppEntityExtraData> appEntityExtraDataDeleteList = new List<AppEntityExtraData>();
             var x = UnitOfWorkManager.Current.GetDbContext<onetouchDbContext>(null, null);
             List<string> sizeScaleNames = new List<string>();
+            Logger.Info($"[PERF] SaveFromExcel - Setup before loop took {swTotal.ElapsedMilliseconds}ms in total, {swPreLoop.ElapsedMilliseconds}ms in part 2");
+
+            // T-PERF: Pre-fetch all referenced items to prevent N+1 queries in the loop
+            var swPrefetch = System.Diagnostics.Stopwatch.StartNew();
+            var excelRecordIds = result.Where(r => r.Id != 0 && string.IsNullOrEmpty(r.ParentCode)).Select(r => r.Id).Distinct().ToList();
+            var existingItemsDict = new Dictionary<long, AppItem>();
+            if (excelRecordIds.Any())
+            {
+                var existingItems = await _appItemRepository.GetAll()
+                    .Where(c => excelRecordIds.Contains(c.Id) && c.ListingItemId == null)
+                    .Include(x => x.EntityFk)
+                    .Include(x => x.EntityFk).ThenInclude(x => x.EntityCategories)
+                    .Include(x => x.EntityFk).ThenInclude(x => x.EntityClassifications)
+                    .Include(x => x.EntityFk).ThenInclude(x => x.EntityAttachments).ThenInclude(x => x.AttachmentFk)
+                    .Include(x => x.EntityFk).ThenInclude(x => x.EntityExtraData)
+                    .AsNoTracking()
+                    .ToListAsync();
+                
+                var itemPrices = await _appItemPricesRepository.GetAll()
+                    .Where(z => excelRecordIds.Contains(z.AppItemId))
+                    .AsNoTracking()
+                    .ToListAsync();
+
+                var parentFks = await _appItemRepository.GetAll()
+                    .Where(z => z.ParentId != null && excelRecordIds.Contains(z.ParentId.Value))
+                    .Include(x => x.EntityFk).ThenInclude(x => x.EntityExtraData)
+                    .Include(x => x.EntityFk).ThenInclude(x => x.EntityCategories)
+                    .Include(x => x.EntityFk).ThenInclude(x => x.EntityClassifications)
+                    .Include(x => x.EntityFk).ThenInclude(x => x.EntityAttachments).ThenInclude(x => x.AttachmentFk)
+                    .Include(z => z.ItemPricesFkList)
+                    .AsNoTracking()
+                    .ToListAsync();
+
+                foreach (var item in existingItems)
+                {
+                    item.ItemPricesFkList = itemPrices.Where(p => p.AppItemId == item.Id).ToList();
+                    item.ParentFkList = parentFks.Where(p => p.ParentId == item.Id).ToList();
+                    existingItemsDict[item.Id] = item;
+                }
+            }
+            Logger.Info($"[PERF] SaveFromExcel - Pre-fetched {existingItemsDict.Count} items in {swPrefetch.ElapsedMilliseconds}ms");
+
             foreach (AppItemExcelDto excelDto in result)
             {
                 if (!string.IsNullOrEmpty(excelDto.ParentCode))
@@ -8602,33 +8656,9 @@ namespace onetouch.AppItems
                             //T-SII-20231127.0001,1 MMT 02/05/2024 Import product does not import new variations of an existing item[Start]
                             if (lNewVariation == true)
                             {
-                                // itemOrg = _appItemRepository.GetAll().Where(c => c.Id == excelDto.Id && c.ListingItemId == null).Include(z => z.ItemPricesFkList)
-                                //.Include(x => x.EntityFk).ThenInclude(x => x.EntityCategories)
-                                //.Include(x => x.EntityFk).ThenInclude(x => x.EntityClassifications)
-                                //.Include(x => x.EntityFk).ThenInclude(x => x.EntityAttachments)
-                                //.Include(x => x.EntityFk).ThenInclude(x => x.EntityExtraData)
-                                //.Include(x => x.ParentFkList).ThenInclude(x => x.EntityFk).ThenInclude(x => x.EntityExtraData)
-                                //.Include(x => x.ParentFkList).ThenInclude(x => x.EntityFk).ThenInclude(x => x.EntityCategories)
-                                //.Include(x => x.ParentFkList).ThenInclude(x => x.EntityFk).ThenInclude(x => x.EntityClassifications)
-                                //.Include(x => x.ParentFkList).ThenInclude(x => x.EntityFk).ThenInclude(x => x.EntityAttachments).ThenInclude(x => x.AttachmentFk)
-                                //.Include(x => x.ParentFkList).ThenInclude(z => z.ItemPricesFkList)
-                                //.FirstOrDefault();
-                                itemOrg = _appItemRepository.GetAll().Where(c => c.Id == excelDto.Id && c.ListingItemId == null)//.Include(z=>z.ItemPricesFkList)
-                                .Include(x => x.EntityFk).AsNoTracking()
-                                .Include(x => x.EntityFk).ThenInclude(x => x.EntityCategories)
-                                .Include(x => x.EntityFk).ThenInclude(x => x.EntityClassifications)
-                                .Include(x => x.EntityFk).ThenInclude(x => x.EntityAttachments).ThenInclude(x => x.AttachmentFk)
-                                .Include(x => x.EntityFk).ThenInclude(x => x.EntityExtraData)
-                                .FirstOrDefault();
-                                if (itemOrg != null)
+                                if (existingItemsDict.TryGetValue(excelDto.Id, out var existingItemForIgnore))
                                 {
-                                    itemOrg.ItemPricesFkList = _appItemPricesRepository.GetAll().AsNoTracking().Where(z => z.AppItemId == excelDto.Id).ToList();
-                                    itemOrg.ParentFkList = _appItemRepository.GetAll()
-                                   .Include(x => x.EntityFk).ThenInclude(x => x.EntityExtraData)
-                                   .Include(x => x.EntityFk).ThenInclude(x => x.EntityCategories)
-                                   .Include(x => x.EntityFk).ThenInclude(x => x.EntityClassifications)
-                                   .Include(x => x.EntityFk).ThenInclude(x => x.EntityAttachments).ThenInclude(x => x.AttachmentFk)
-                                   .Include(z => z.ItemPricesFkList).AsNoTracking().Where(z => z.ParentId == excelDto.Id).ToList();
+                                    itemOrg = existingItemForIgnore;
                                 }
                                 break;
                             }
@@ -8638,27 +8668,9 @@ namespace onetouch.AppItems
                         case ExcelRecordRepeateHandler.ReplaceDuplicatedRecords: // replace
                                                                                  //createOrEditAccountInfoDto.Id = account.Id
 
-                            itemOrg = _appItemRepository.GetAll().Where(c => c.Id == excelDto.Id && c.ListingItemId == null)//.Include(z=>z.ItemPricesFkList)
-                               .Include(x => x.EntityFk).AsNoTracking()
-                               .Include(x => x.EntityFk).ThenInclude(x => x.EntityCategories)
-                               .Include(x => x.EntityFk).ThenInclude(x => x.EntityClassifications)
-                               .Include(x => x.EntityFk).ThenInclude(x => x.EntityAttachments).ThenInclude(x => x.AttachmentFk)
-                               .Include(x => x.EntityFk).ThenInclude(x => x.EntityExtraData)
-                               //.Include(x => x.ParentFkList).ThenInclude(x => x.EntityFk).ThenInclude(x => x.EntityExtraData)
-                               //.Include(x => x.ParentFkList).ThenInclude(x => x.EntityFk).ThenInclude(x => x.EntityCategories)
-                               //.Include(x => x.ParentFkList).ThenInclude(x => x.EntityFk).ThenInclude(x => x.EntityClassifications)
-                               //.Include(x => x.ParentFkList).ThenInclude(x => x.EntityFk).ThenInclude(x => x.EntityAttachments).ThenInclude(x => x.AttachmentFk)
-                               //.Include(x => x.ParentFkList).ThenInclude(z => z.ItemPricesFkList)
-                               .FirstOrDefault();
-                            if (itemOrg != null)
+                            if (existingItemsDict.TryGetValue(excelDto.Id, out var existingItemForReplace))
                             {
-                                itemOrg.ItemPricesFkList = _appItemPricesRepository.GetAll().AsNoTracking().Where(z => z.AppItemId == excelDto.Id).ToList();
-                                itemOrg.ParentFkList = _appItemRepository.GetAll()
-                               .Include(x => x.EntityFk).ThenInclude(x => x.EntityExtraData)
-                               .Include(x => x.EntityFk).ThenInclude(x => x.EntityCategories)
-                               .Include(x => x.EntityFk).ThenInclude(x => x.EntityClassifications)
-                               .Include(x => x.EntityFk).ThenInclude(x => x.EntityAttachments).ThenInclude(x => x.AttachmentFk)
-                               .Include(z => z.ItemPricesFkList).AsNoTracking().Where(z => z.ParentId == excelDto.Id).ToList();
+                                itemOrg = existingItemForReplace;
                             }
                             //itemOrg.ParentFkList.Clear();
                             //appItemDeleteList.Add(itemOrg);
