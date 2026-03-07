@@ -139,6 +139,8 @@ namespace onetouch.Migrations.Seed.Host
                         if (file.FileTime > dbUpdateTime)
                         {
                             item.ExtraAttributes = xml;
+                            item.LastModificationTime = file.FileTime;
+
                         }
                     }
                 }
