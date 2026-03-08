@@ -44,7 +44,7 @@
                                 <p-accordionTab
                                   *ngFor="let usage of usageList; let i = index"
                                   [header]="usage "
-                                  [attr.id]="'usage_' + usage">
+                                  [attr.id]="'usage_' + usage" (click)="onActiveIndexChange(usage)">
                                   
                                   <app-dynamicInputs
                                   [extraAttributeObject]="{ value: { filteredExtraAttributes: groupedByUsage[usage], extraAttributes: allAttributes } }"

@@ -488,4 +488,8 @@ export class HostSettingsComponent extends AppComponentBase implements OnInit {
         }
     }
 
+onActiveIndexChange(usage){
+        this.selectedUsage = usage; 
+}
+      
 }

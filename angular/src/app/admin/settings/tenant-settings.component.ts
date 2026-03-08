@@ -437,4 +437,9 @@ export class TenantSettingsComponent extends AppComponentBase implements OnInit 
     }
   }
 
+  
+ onActiveIndexChange(usage){
+        this.selectedUsage = usage;
+}
+
 }
