@@ -451,7 +451,7 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit {
                     }
                 )
             this.accData = JSON.parse(JSON.stringify(result));
-
+        this.relationId = result.relationId ? result.relationId : 0
         }
 
         else {

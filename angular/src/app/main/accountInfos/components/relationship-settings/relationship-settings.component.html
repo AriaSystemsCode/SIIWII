@@ -29,6 +29,7 @@
                                 <h5 class="usage-block">{{ usage  }}</h5>
 
                                 <app-dynamicInputs
+                                    #appdynamicInputs
                                     [extraAttributeObject]="{ value: { filteredExtraAttributes: groupedByUsage[usage], extraAttributes: allAttributes } }"
                                     [entityObjectTypeId]="entityObjectTypeId"
                                     [entityType]="'MARKETPLACECONTACTRELATIONSHIP'"

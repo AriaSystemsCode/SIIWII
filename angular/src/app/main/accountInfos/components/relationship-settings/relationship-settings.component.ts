@@ -1,4 +1,4 @@
-import { Component, Injector, Input, OnInit } from '@angular/core';
+import { Component, Injector, Input, OnInit, QueryList, ViewChildren } from '@angular/core';
 import { CreateEditAppItemExtraAttribute } from '@app/main/app-items/app-item-shared/models/create-edit-app-item-extra-attribute';
 import { FilteredExtraAttribute } from '@app/main/app-items/app-item-shared/models/filtered-extra-attribute';
 import { ExtraAttributeDataService } from '@app/main/app-items/app-item-shared/services/extra-attribute-data.service';
@@ -7,6 +7,7 @@ import { SelectItem } from '@node_modules/primeng/api';
 import { finalize } from 'rxjs/operators';
 import { AppComponentBase } from '@shared/common/app-component-base';
 import { AppEntitiesServiceProxy, AppEntityDto, AppEntityExtraDataDto, GetAppEntityForEditOutput, LookupLabelDto, SycEntityObjectTypesServiceProxy } from '@shared/service-proxies/service-proxies';
+import { dynamicInputs } from '@shared/components/dynamicInputs/dynamicInputs.component';
 @Component({
   selector: 'app-relationship-settings',
   templateUrl: './relationship-settings.component.html',
@@ -25,6 +26,9 @@ export class RelationshipSettingsComponent extends AppComponentBase implements O
   selectedTransTypeData: any;
   extraAttributes: any;
   activeAccordionIndexes: number[] = [0]; // open first tab by default
+
+@ViewChildren('appdynamicInputs')
+dynamicInputsComponents!: QueryList<dynamicInputs>;
 
   constructor(
     injector: Injector,
@@ -286,27 +290,8 @@ export class RelationshipSettingsComponent extends AppComponentBase implements O
     appEntityDto.code = this.dynamicInputsForViewDto.appEntity.code;
     appEntityDto.name = this.dynamicInputsForViewDto.appEntity.name;
   
-    appEntityDto.extraDataFileTypeIndex = appEntityDto.entityExtraData
-      .map((item, index) =>
-        item.attributeValue && item.attributeValue.includes('|') ? index : -1
-      )
-      .filter(index => index !== -1);
-  
-    this._appEntitiesServiceProxy.saveEntity(appEntityDto)
-      .pipe(
-        finalize(() => {
-          this.hideMainSpinner();
-        })
-      )
-      .subscribe({
-        next: () => {
-          this.formTouched = false;
-          this.notify.success(this.l('Saved Successfully'));
-        },
-        error: () => {
-          this.notify.error(this.l('Save Failed'));
-        }
-      });
+         this.dynamicInputsComponents.first.saveAll(appEntityDto);
+
   }
   
 

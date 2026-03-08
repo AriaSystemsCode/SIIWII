@@ -47,6 +47,7 @@
                                   [attr.id]="'usage_' + usage" (click)="onActiveIndexChange(usage)">
                                   
                                   <app-dynamicInputs
+                                    #appdynamicInputs
                                   [extraAttributeObject]="{ value: { filteredExtraAttributes: groupedByUsage[usage], extraAttributes: allAttributes } }"
                                     [entityObjectTypeId]="entityObjectTypeHostId"
                                     [entityType]="'Settings'"

@@ -3,13 +3,15 @@ import { Component, EventEmitter, Injector, Input, OnChanges, OnDestroy, OnInit,
 import { ImageUploadComponentOutput } from '@app/shared/common/image-upload/image-upload.component';
 import { appModuleAnimation } from '@shared/animations/routerTransition';
 import { AppComponentBase } from '@shared/common/app-component-base';
-import { AppAdvertisementsServiceProxy, ExtraAttribute, GetAppAdvertisementForViewDto, SycAttachmentCategoryDto } from '@shared/service-proxies/service-proxies';
+import { AppAdvertisementsServiceProxy, AppEntitiesServiceProxy, AppEntityDto, ExtraAttribute, GetAppAdvertisementForViewDto, SycAttachmentCategoryDto } from '@shared/service-proxies/service-proxies';
 import { FileUploaderCustom } from '../import-steps/models/FileUploaderCustom.model';
 import { FileUploader, FileUploaderOptions } from '@node_modules/ng2-file-upload';
 import { AppConsts } from '@shared/AppConsts';
 import { IAjaxResponse, TokenService } from '@node_modules/abp-ng2-module';
 import { DynamicApiDispatcherService } from '@shared/dynamicApiDispatcherService ';
 import Swal from 'sweetalert2';
+import { finalize } from 'rxjs/operators';
+
 
 @Component({
   selector: 'app-dynamicInputs',
@@ -38,6 +40,7 @@ export class dynamicInputs extends AppComponentBase implements OnInit, OnChanges
   public constructor(
     private _tokenService: TokenService,
     private dynamicApi: DynamicApiDispatcherService,
+    private _appEntitiesServiceProxy: AppEntitiesServiceProxy,
     injector: Injector
   ) {
     super(injector);
@@ -230,11 +233,11 @@ export class dynamicInputs extends AppComponentBase implements OnInit, OnChanges
         }
         this.originalValuesMap.set(attr.attributeId, attr.selectedValues);
       }
-  //     else {
-  //         if ((attr.dataType === 'boolean' || attr.dataType === 'bit') && (attr.selectedValues == null || attr.selectedValues === '')) {
-  //   attr.selectedValues = this.defaultBooleanValue;
-  // }
-  //     }
+      //     else {
+      //         if ((attr.dataType === 'boolean' || attr.dataType === 'bit') && (attr.selectedValues == null || attr.selectedValues === '')) {
+      //   attr.selectedValues = this.defaultBooleanValue;
+      // }
+      //     }
     }
 
   }
@@ -279,16 +282,16 @@ export class dynamicInputs extends AppComponentBase implements OnInit, OnChanges
     attr.selectedValues = event.image;
     this.onAnyInputChange(); // emit change
   }
-  
+
   onImageRemoved(attr: any) {
     attr.selectedValues = '';
     this.onAnyInputChange(); // emit change
   }
-  
+
 
   ngOnInit(): void {
     this.fillSelectedValuesFromDto();
-  
+
     // ✅ Provide fallback/mock image category
     if (!this.sycAttachmentCategoryImage) {
       this.sycAttachmentCategoryImage = {
@@ -307,10 +310,11 @@ export class dynamicInputs extends AppComponentBase implements OnInit, OnChanges
         tenantId: 1
       } as unknown as SycAttachmentCategoryDto;
     }
-  
+
     setTimeout(() => {
       this.isInitializing = false;
-    }, 0);  }
+    }, 0);
+  }
 
   isArray(val: any): boolean {
     return Array.isArray(val);
@@ -343,8 +347,8 @@ export class dynamicInputs extends AppComponentBase implements OnInit, OnChanges
           " ",
           "File format is not supported , Only JPG, PNG, or GIF files are allowed.",
           "error"
-      );
-      return;
+        );
+        return;
       }
       const dotIndex = file.name.lastIndexOf('.');
       const baseName = file.name.substring(0, dotIndex);
@@ -419,64 +423,64 @@ export class dynamicInputs extends AppComponentBase implements OnInit, OnChanges
     let items = [...data.items];
 
     if (items.length > 0 && items.length < data.totalCount) {
-        items.push({ label: 'Load More...', value: null, isLoadMore: true });
+      items.push({ label: 'Load More...', value: null, isLoadMore: true });
     }
 
     return items;
-}
-  
+  }
+
   onDropdownClick(extraAttr: any) {
     const data = this.extraAttrOptions.get(extraAttr.id);
     if (!data || data.items.length === 0) {
-        this.loadNextItems(extraAttr);
+      this.loadNextItems(extraAttr);
     }
-}
-
-onLoadMoreClick(event: Event, extraAttr: any) {
-  event.stopPropagation(); 
-  this.loadNextItems(extraAttr);
-}
-  loadNextItems(extraAttr: any) {
-      let data = this.extraAttrOptions.get(extraAttr.id);
-      if (!data) {
-          data = { items: [], totalCount: 0, isLoading: false };
-          this.extraAttrOptions.set(extraAttr.id, data);
-      }
-  
-      if (data.isLoading) return;
-  
-      const skipCount = data.items.length;
-      const maxResultCount = 10;
-  
-      data.isLoading = true;
-  
-      this.callDynamicAPI(extraAttr, skipCount, maxResultCount);
   }
-  
+
+  onLoadMoreClick(event: Event, extraAttr: any) {
+    event.stopPropagation();
+    this.loadNextItems(extraAttr);
+  }
+  loadNextItems(extraAttr: any) {
+    let data = this.extraAttrOptions.get(extraAttr.id);
+    if (!data) {
+      data = { items: [], totalCount: 0, isLoading: false };
+      this.extraAttrOptions.set(extraAttr.id, data);
+    }
+
+    if (data.isLoading) return;
+
+    const skipCount = data.items.length;
+    const maxResultCount = 10;
+
+    data.isLoading = true;
+
+    this.callDynamicAPI(extraAttr, skipCount, maxResultCount);
+  }
+
   callDynamicAPI(extraAttr: any, skipCount: number = 0, maxResultCount: number = 10) {
-      if (!extraAttr?.validEntries) return;
-  
-      let [serviceName, methodName, resultField] = extraAttr.validEntries.split('|');
-      serviceName += "ServiceProxy";
-  
-      this.dynamicApi.dispatch(serviceName, methodName, {
-          skipCount: skipCount,
-          maxResultCount: maxResultCount
-      }).subscribe(result => {
-          const dropdownItems = result.items.map(item => ({
-              label: this.getByPath(item, resultField.trim()),
-              value: item.account.id
-          }));
-  
-          const existing = this.extraAttrOptions.get(extraAttr.id)?.items || [];
-          const combinedItems = skipCount > 0 ? [...existing, ...dropdownItems] : dropdownItems;
-  
-          this.extraAttrOptions.set(extraAttr.id, {
-              items: combinedItems,
-              totalCount: result.totalCount,
-              isLoading: false
-          });
+    if (!extraAttr?.validEntries) return;
+
+    let [serviceName, methodName, resultField] = extraAttr.validEntries.split('|');
+    serviceName += "ServiceProxy";
+
+    this.dynamicApi.dispatch(serviceName, methodName, {
+      skipCount: skipCount,
+      maxResultCount: maxResultCount
+    }).subscribe(result => {
+      const dropdownItems = result.items.map(item => ({
+        label: this.getByPath(item, resultField.trim()),
+        value: item.account.id
+      }));
+
+      const existing = this.extraAttrOptions.get(extraAttr.id)?.items || [];
+      const combinedItems = skipCount > 0 ? [...existing, ...dropdownItems] : dropdownItems;
+
+      this.extraAttrOptions.set(extraAttr.id, {
+        items: combinedItems,
+        totalCount: result.totalCount,
+        isLoading: false
       });
+    });
   }
 
   getByPath(obj: any, path: string) {
@@ -488,5 +492,36 @@ onLoadMoreClick(event: Event, extraAttr: any) {
       .find(x => x?.attributeId === attributeId || x?.name?.includes(nameIncludes));
   }
 
+
+
+  saveAll(appEntityDto: AppEntityDto): void {
+    let success = false;
+    this.showMainSpinner();
+
+    appEntityDto.extraDataFileTypeIndex = appEntityDto.entityExtraData
+      .map((item, index) => {
+        const value = item?.attributeValue;
+        return value != null && String(value)?.includes('|') ? index : -1;
+      })
+      .filter(i => i !== -1);
+
+    this._appEntitiesServiceProxy.saveEntity(appEntityDto)
+      .pipe(
+        finalize(() => {
+          this.hideMainSpinner();
+        })
+      )
+      .subscribe({
+        next: () => {
+          this.formTouched = false;
+          this.notify.success(this.l('Saved Successfully'));
+        },
+        error: () => {
+          this.notify.error(this.l('Save Failed'));
+        }
+      });
+
+    
+  }
 
 }
