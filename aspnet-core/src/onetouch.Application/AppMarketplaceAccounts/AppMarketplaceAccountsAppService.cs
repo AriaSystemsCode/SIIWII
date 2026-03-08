@@ -126,7 +126,9 @@ namespace onetouch.AppMarketplaceAccounts
 
                     var filterCondition = Helper.ApplyJsonFilter<AppMarketplaceContact>(jsonFilter);//.ToList();
                     if (filterCondition != null)
-                        filteredContacts = contxt.AppMarketplaceContacts.Where(filterCondition).Where(z => z.ParentId == null).Take(input.MaxResultCount);//.ToListAsync();
+                        filteredContacts = contxt.AppMarketplaceContacts.Where(filterCondition).Where(z => z.ParentId == null)
+                            .OrderBy(input.Sorting ?? "name asc")
+                            .Take(input.MaxResultCount);//.ToListAsync();
 
                 }
 
@@ -135,7 +137,7 @@ namespace onetouch.AppMarketplaceAccounts
                     //{
                     //    filteredAppItems = filteredAppItems.Where(e => EF..Property(e, f.Field) == f.Value);
 
-                    //I50[End]
+               //I50[End]
                     // try
                     //{
 

@@ -45,5 +45,8 @@ namespace onetouch.AppEvents.Dtos
         public long? TenantId { get; set; }
         public int? NoOfEventsToReturn { get; set; }
         //I40-X527[End]
+        //I50[Start]
+        public virtual string FilterCondition { set; get; }
+        //I50[End]
     }
 }

@@ -534,6 +534,7 @@ namespace onetouch.SystemObjects
                 z.EntityObjectTypeId == sectionObjectId && z.EntityObjectStatusId == sectionActiveStatusId).FirstOrDefaultAsync();
                 string entityType = "";
                 string entityFilterCondition = "";
+                string entitySortBy = null;
                 if (sectionObject != null)
                 {
                     var extradataEntity = sectionObject.EntityExtraData.Where(z => z.AttributeId == 1006).FirstOrDefault();
@@ -545,9 +546,14 @@ namespace onetouch.SystemObjects
                         {
                             entityFilterCondition = extradataEntityCondition.AttributeValue;
                         }
+                        var extradataEntitySort = sectionObject.EntityExtraData.Where(z => z.AttributeId == 1008).FirstOrDefault();
+                        if (extradataEntitySort != null && !string.IsNullOrEmpty(extradataEntitySort.AttributeValue))
+                        {
+                            entitySortBy = extradataEntitySort.AttributeValue;
+                        }
                     }
                 }
-                if (!string.IsNullOrEmpty(entityFilterCondition))
+                if (!string.IsNullOrEmpty(entityType))
                 {
                     switch (entityType)
                     {
@@ -555,9 +561,9 @@ namespace onetouch.SystemObjects
                             GetAllAppMarketItemsInput inputDto = new GetAllAppMarketItemsInput();
                             inputDto.MaxResultCount = 10;
                             inputDto.FilterCondition = entityFilterCondition;
-                            
-                            if (AbpSession.TenantId== null)
-                              inputDto.SharingLevel = SharingLevels.Public;
+                            inputDto.Sorting = entitySortBy;
+                            if (AbpSession.TenantId == null)
+                                inputDto.SharingLevel = SharingLevels.Public;
                             else
                                 inputDto.SharingLevel = SharingLevels.PublicAndSharedWithMe;
 
@@ -567,9 +573,9 @@ namespace onetouch.SystemObjects
                             //inputDto.CurrencyCode = "USD";
                             inputDto.SelectorOnly = false;
                             var products = await _appMarketplaceItemsAppService.GetAll(inputDto);
-                            if (products != null && products.Items!=null && products.Items.Count > 0)
+                            if (products != null && products.Items != null && products.Items.Count > 0)
                             {
-                               
+
                                 foreach (var pr in products.Items)
                                 {
                                     var item = new PageSettingDto();
@@ -578,14 +584,15 @@ namespace onetouch.SystemObjects
                                     result.Add(item);
                                 }
                             }
-                            
+
                             break;
                         case "CONTACT":
                             GetAllAccountsInput inputContactDto = new GetAllAccountsInput();
                             inputContactDto.MaxResultCount = 10;
                             inputContactDto.FilterCondition = entityFilterCondition;
+                            inputContactDto.Sorting = entitySortBy;
                             var contacts = await _MarketplaceAccountsAppService.GetAll(inputContactDto);
-                            if (contacts != null && contacts.Items!=null & contacts.Items.Count > 0)
+                            if (contacts != null && contacts.Items != null & contacts.Items.Count > 0)
                             {
 
                                 foreach (var pr in contacts.Items)
@@ -597,6 +604,45 @@ namespace onetouch.SystemObjects
                                     result.Add(item);
                                 }
                             }
+                            break;
+                        case "EVENT":
+                            GetAllAppEventsInput inputEventDto = new GetAllAppEventsInput();
+                            inputEventDto.MaxResultCount = 10;
+                            inputEventDto.FilterCondition = entityFilterCondition;
+                            inputEventDto.Sorting = entitySortBy;
+                            var Events = await _appEventsAppService.GetAll(inputEventDto);
+                            if (Events != null && Events.Items != null && Events.Items.Count > 0)
+                            {
+
+                                foreach (var pr in Events.Items)
+                                {
+                                    var item = new PageSettingDto();
+                                    item.BlockType = "EVENT";
+                                    item.GetAppEventForViewDto = pr;// await _appMarketplaceItemsAppService.GetAppMarketplaceViewData(pr.AppItem.SSIN, null);
+                                    result.Add(item);
+                                }
+                            }
+                            break;
+                        case "CATEGORY":
+                            GetAllSycEntityObjectCategoriesInput inputCategoryDto = new GetAllSycEntityObjectCategoriesInput();
+                            inputCategoryDto.MaxResultCount = 10;
+                            inputCategoryDto.FilterCondition = entityFilterCondition;
+                            inputCategoryDto.Sorting = entitySortBy;
+                            var categories = await _sycEntityObjectCategoriesAppService.GetAll(inputCategoryDto);
+                            //var category = await _sycEntityObjectCategoryRepository.GetAll().Where(z => z.Code == blockValueExtraDate.AttributeValue).FirstOrDefaultAsync();
+
+                            if (categories != null)
+                            {
+                                foreach (var cat in categories.Items)
+                                {
+                                    var item = new PageSettingDto();
+                                    item.BlockType = "CATEGORY";
+                                    item.GetSycEntityObjectCategoryForViewDto = cat.Data;// await _appMarketplaceItemsAppService.GetAppMarketplaceViewData(pr.AppItem.SSIN, null);
+                                    result.Add(item);
+                                    //item.GetSycEntityObjectCategoryForViewDto = await _sycEntityObjectCategoriesAppService.GetSycEntityObjectCategoryForView(int.Parse(category.Id.ToString()));
+                                }
+                            }
+                    
                             break;
                     }
 
