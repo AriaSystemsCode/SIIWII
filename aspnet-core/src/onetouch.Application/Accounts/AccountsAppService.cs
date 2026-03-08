@@ -1306,13 +1306,13 @@ namespace onetouch.Accounts
         public async Task<GetAccountForViewDto> GetAccountForView(long id, int resultCount = 10)
         {
             await CreateAdminContact();
-            
+
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
             {
                 var account = await _appContactRepository.GetAll()
                 .Include(x => x.AppContactAddresses).ThenInclude(x => x.AddressFk).ThenInclude(x => x.CountryFk)
                 //I40
-                .Include(z=>z.CurrencyFk)
+                .Include(z => z.CurrencyFk)
                 //I40
                 .FirstOrDefaultAsync(x => x.Id == id);
                 var currentAccount = await _appContactRepository.GetAll().Where(z => z.TenantId == AbpSession.TenantId && z.IsProfileData == true && z.ParentId == null).FirstOrDefaultAsync();
@@ -1322,7 +1322,7 @@ namespace onetouch.Accounts
                     .Include(x => x.EntityCategories).ThenInclude(x => x.EntityObjectCategoryFk)
                     .Include(x => x.EntityAttachments).ThenInclude(x => x.AttachmentFk)
                     .FirstOrDefaultAsync(x => x.Id == account.EntityId);
-                if (string.IsNullOrEmpty(account.Code) && !string.IsNullOrEmpty(entity.Code) && entity.TenantOwner== AbpSession.TenantId)
+                if (string.IsNullOrEmpty(account.Code) && !string.IsNullOrEmpty(entity.Code) && (entity.TenantOwner == 0|| entity.TenantOwner == null|| entity.TenantOwner== AbpSession.TenantId))
                 {
                     account.Code = entity.Code;
                     _appContactRepository.UpdateAsync(account);
