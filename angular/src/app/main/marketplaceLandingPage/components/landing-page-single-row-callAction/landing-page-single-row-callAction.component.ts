@@ -1,10 +1,10 @@
 import { Component, Injector, Input, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import {  SafeResourceUrl } from '@angular/platform-browser';
 import { AppComponentBase } from '@shared/common/app-component-base';
 import { PageSettingDto, SydObjectsServiceProxy, AppItemsServiceProxy, AppEntitiesServiceProxy, AccountDto, AccountsServiceProxy } from '@shared/service-proxies/service-proxies';
 import { AppConsts } from '@shared/AppConsts';
-import {  finalize, } from 'rxjs';
+
 
 type MediaKind = 'image' | 'video' | 'pdf' | 'other';
 
@@ -57,8 +57,6 @@ export class LandingPageSinglrRowCallActionComponent extends AppComponentBase im
     injector: Injector,
     private syd: SydObjectsServiceProxy,
     private router: Router,
-       private _AppEntitiesServiceProxy: AppEntitiesServiceProxy,
-           private _accountsServiceProxy: AccountsServiceProxy,
   ) { super(injector); }
 
   ngOnInit() {
