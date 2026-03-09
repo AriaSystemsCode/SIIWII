@@ -20,6 +20,18 @@
 			<ValidEntries></ValidEntries>
 			<IsVariation>false</IsVariation>
 			<IsAdvancedSearch>false</IsAdvancedSearch>
+			<RelatedWhen>
+				<Relation>
+					<TargetName>SHIPPINGCHARGE</TargetName>
+					<SourceField>SelectedValues</SourceField>
+					<TargetField>SelectedValues</TargetField>
+				</Relation>
+				<Relation>
+					<TargetName>SHIPPINGMINIMUMAMOUNT</TargetName>
+					<SourceField>SelectedValues</SourceField>
+					<TargetField>SelectedValues</TargetField>
+				</Relation>
+			</RelatedWhen>
 		</ExtraAttribute>
 		<ExtraAttribute>
 			<AttributeId>905</AttributeId>
@@ -38,6 +50,18 @@
 			<ValidEntries></ValidEntries>
 			<IsVariation>false</IsVariation>
 			<IsAdvancedSearch>false</IsAdvancedSearch>
+			<RelatedWhen>
+				<Relation>
+					<TargetName>SHIPPINGCHARGE</TargetName>
+					<SourceField>SelectedValues</SourceField>
+					<TargetField>SelectedValues</TargetField>
+				</Relation>
+				<Relation>
+					<TargetName>SHIPPINGMINIMUMAMOUNT</TargetName>
+					<SourceField>SelectedValues</SourceField>
+					<TargetField>SelectedValues</TargetField>
+				</Relation>
+			</RelatedWhen>
 		</ExtraAttribute>
 	</ExtraAttributes>
 </ItemExtraAttributes>
