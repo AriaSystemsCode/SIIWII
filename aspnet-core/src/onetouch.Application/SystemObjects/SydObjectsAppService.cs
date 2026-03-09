@@ -628,6 +628,9 @@ namespace onetouch.SystemObjects
                             inputCategoryDto.MaxResultCount = 10;
                             inputCategoryDto.FilterCondition = entityFilterCondition;
                             inputCategoryDto.Sorting = entitySortBy;
+                            inputCategoryDto.DepartmentFlag = false;
+                            var itemId = await _helper.SystemTables.GetObjectItemId();
+                            inputCategoryDto.ObjectId = itemId;
                             var categories = await _sycEntityObjectCategoriesAppService.GetAll(inputCategoryDto);
                             //var category = await _sycEntityObjectCategoryRepository.GetAll().Where(z => z.Code == blockValueExtraDate.AttributeValue).FirstOrDefaultAsync();
 
@@ -637,6 +640,7 @@ namespace onetouch.SystemObjects
                                 {
                                     var item = new PageSettingDto();
                                     item.BlockType = "CATEGORY";
+                                    
                                     item.GetSycEntityObjectCategoryForViewDto = cat.Data;// await _appMarketplaceItemsAppService.GetAppMarketplaceViewData(pr.AppItem.SSIN, null);
                                     result.Add(item);
                                     //item.GetSycEntityObjectCategoryForViewDto = await _sycEntityObjectCategoriesAppService.GetSycEntityObjectCategoryForView(int.Parse(category.Id.ToString()));
