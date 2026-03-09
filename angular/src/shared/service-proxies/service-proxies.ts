@@ -20007,6 +20007,63 @@ export class AppItemsListsServiceProxy {
     }
 
     /**
+     * @param sharedItemListId (optional) 
+     * @return Success
+     */
+    getMainItemListID(sharedItemListId: number | undefined): Observable<number> {
+        let url_ = this.baseUrl + "/api/services/app/AppItemsLists/GetMainItemListID?";
+        if (sharedItemListId === null)
+            throw new Error("The parameter 'sharedItemListId' cannot be null.");
+        else if (sharedItemListId !== undefined)
+            url_ += "sharedItemListId=" + encodeURIComponent("" + sharedItemListId) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetMainItemListID(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetMainItemListID(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<number>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<number>;
+        }));
+    }
+
+    protected processGetMainItemListID(response: HttpResponseBase): Observable<number> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+                result200 = resultData200 !== undefined ? resultData200 : <any>null;
+    
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
      * @param body (optional) 
      * @return Success
      */
@@ -65819,6 +65876,9 @@ export class CreateOrEditAccountInfoDto implements ICreateOrEditAccountInfoDto {
     shipViaId!: number | undefined;
     paymentTermsId!: number | undefined;
     extraDataAttributes!: ExtraDataAttrDto[] | undefined;
+    phone1CountryKey!: string | undefined;
+    phone2CountryKey!: string | undefined;
+    phone3CountryKey!: string | undefined;
     id!: number | undefined;
 
     [key: string]: any;
@@ -65926,6 +65986,9 @@ export class CreateOrEditAccountInfoDto implements ICreateOrEditAccountInfoDto {
                 for (let item of _data["extraDataAttributes"])
                     this.extraDataAttributes!.push(ExtraDataAttrDto.fromJS(item));
             }
+            this.phone1CountryKey = _data["phone1CountryKey"];
+            this.phone2CountryKey = _data["phone2CountryKey"];
+            this.phone3CountryKey = _data["phone3CountryKey"];
             this.id = _data["id"];
         }
     }
@@ -66031,6 +66094,9 @@ export class CreateOrEditAccountInfoDto implements ICreateOrEditAccountInfoDto {
             for (let item of this.extraDataAttributes)
                 data["extraDataAttributes"].push(item.toJSON());
         }
+        data["phone1CountryKey"] = this.phone1CountryKey;
+        data["phone2CountryKey"] = this.phone2CountryKey;
+        data["phone3CountryKey"] = this.phone3CountryKey;
         data["id"] = this.id;
         return data;
     }
@@ -66093,6 +66159,9 @@ export interface ICreateOrEditAccountInfoDto {
     shipViaId: number | undefined;
     paymentTermsId: number | undefined;
     extraDataAttributes: ExtraDataAttrDto[] | undefined;
+    phone1CountryKey: string | undefined;
+    phone2CountryKey: string | undefined;
+    phone3CountryKey: string | undefined;
     id: number | undefined;
 
     [key: string]: any;
@@ -67380,6 +67449,9 @@ export class AppContactValidationInputDTO implements IAppContactValidationInputD
     shipViaId!: number | undefined;
     paymentTermsId!: number | undefined;
     extraDataAttributes!: ExtraDataAttrDto[] | undefined;
+    phone1CountryKey!: string | undefined;
+    phone2CountryKey!: string | undefined;
+    phone3CountryKey!: string | undefined;
     id!: number | undefined;
 
     [key: string]: any;
@@ -67492,6 +67564,9 @@ export class AppContactValidationInputDTO implements IAppContactValidationInputD
                 for (let item of _data["extraDataAttributes"])
                     this.extraDataAttributes!.push(ExtraDataAttrDto.fromJS(item));
             }
+            this.phone1CountryKey = _data["phone1CountryKey"];
+            this.phone2CountryKey = _data["phone2CountryKey"];
+            this.phone3CountryKey = _data["phone3CountryKey"];
             this.id = _data["id"];
         }
     }
@@ -67602,6 +67677,9 @@ export class AppContactValidationInputDTO implements IAppContactValidationInputD
             for (let item of this.extraDataAttributes)
                 data["extraDataAttributes"].push(item.toJSON());
         }
+        data["phone1CountryKey"] = this.phone1CountryKey;
+        data["phone2CountryKey"] = this.phone2CountryKey;
+        data["phone3CountryKey"] = this.phone3CountryKey;
         data["id"] = this.id;
         return data;
     }
@@ -67665,6 +67743,9 @@ export interface IAppContactValidationInputDTO {
     shipViaId: number | undefined;
     paymentTermsId: number | undefined;
     extraDataAttributes: ExtraDataAttrDto[] | undefined;
+    phone1CountryKey: string | undefined;
+    phone2CountryKey: string | undefined;
+    phone3CountryKey: string | undefined;
     id: number | undefined;
 
     [key: string]: any;
@@ -75552,6 +75633,9 @@ export class AppContactDto implements IAppContactDto {
     paymentTermsEndOfMonth!: boolean;
     paymentTermsEndOfMonthDays!: number;
     paymentTermsNetDueDays!: number;
+    phone1CountryKey!: string | undefined;
+    phone2CountryKey!: string | undefined;
+    phone3CountryKey!: string | undefined;
     id!: number;
 
     [key: string]: any;
@@ -75627,6 +75711,9 @@ export class AppContactDto implements IAppContactDto {
             this.paymentTermsEndOfMonth = _data["paymentTermsEndOfMonth"];
             this.paymentTermsEndOfMonthDays = _data["paymentTermsEndOfMonthDays"];
             this.paymentTermsNetDueDays = _data["paymentTermsNetDueDays"];
+            this.phone1CountryKey = _data["phone1CountryKey"];
+            this.phone2CountryKey = _data["phone2CountryKey"];
+            this.phone3CountryKey = _data["phone3CountryKey"];
             this.id = _data["id"];
         }
     }
@@ -75700,6 +75787,9 @@ export class AppContactDto implements IAppContactDto {
         data["paymentTermsEndOfMonth"] = this.paymentTermsEndOfMonth;
         data["paymentTermsEndOfMonthDays"] = this.paymentTermsEndOfMonthDays;
         data["paymentTermsNetDueDays"] = this.paymentTermsNetDueDays;
+        data["phone1CountryKey"] = this.phone1CountryKey;
+        data["phone2CountryKey"] = this.phone2CountryKey;
+        data["phone3CountryKey"] = this.phone3CountryKey;
         data["id"] = this.id;
         return data;
     }
@@ -75758,6 +75848,9 @@ export interface IAppContactDto {
     paymentTermsEndOfMonth: boolean;
     paymentTermsEndOfMonthDays: number;
     paymentTermsNetDueDays: number;
+    phone1CountryKey: string | undefined;
+    phone2CountryKey: string | undefined;
+    phone3CountryKey: string | undefined;
     id: number;
 
     [key: string]: any;
@@ -79400,6 +79493,230 @@ export enum RecommandedOrAdditional {
     CHARGES = 2,
 }
 
+export class VisibleWhen implements IVisibleWhen {
+    extraAttributeId!: string | undefined;
+    operatorValue!: string | undefined;
+    value!: string | undefined;
+
+    [key: string]: any;
+
+    constructor(data?: IVisibleWhen) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.extraAttributeId = _data["extraAttributeId"];
+            this.operatorValue = _data["operatorValue"];
+            this.value = _data["value"];
+        }
+    }
+
+    static fromJS(data: any): VisibleWhen {
+        data = typeof data === 'object' ? data : {};
+        let result = new VisibleWhen();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["extraAttributeId"] = this.extraAttributeId;
+        data["operatorValue"] = this.operatorValue;
+        data["value"] = this.value;
+        return data;
+    }
+}
+
+export interface IVisibleWhen {
+    extraAttributeId: string | undefined;
+    operatorValue: string | undefined;
+    value: string | undefined;
+
+    [key: string]: any;
+}
+
+export class Relation implements IRelation {
+    targetName!: string | undefined;
+    sourceField!: string | undefined;
+    targetField!: string | undefined;
+
+    [key: string]: any;
+
+    constructor(data?: IRelation) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.targetName = _data["targetName"];
+            this.sourceField = _data["sourceField"];
+            this.targetField = _data["targetField"];
+        }
+    }
+
+    static fromJS(data: any): Relation {
+        data = typeof data === 'object' ? data : {};
+        let result = new Relation();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["targetName"] = this.targetName;
+        data["sourceField"] = this.sourceField;
+        data["targetField"] = this.targetField;
+        return data;
+    }
+}
+
+export interface IRelation {
+    targetName: string | undefined;
+    sourceField: string | undefined;
+    targetField: string | undefined;
+
+    [key: string]: any;
+}
+
+export class RelatedWhen implements IRelatedWhen {
+    relation!: Relation[] | undefined;
+
+    [key: string]: any;
+
+    constructor(data?: IRelatedWhen) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            if (Array.isArray(_data["relation"])) {
+                this.relation = [] as any;
+                for (let item of _data["relation"])
+                    this.relation!.push(Relation.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): RelatedWhen {
+        data = typeof data === 'object' ? data : {};
+        let result = new RelatedWhen();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        if (Array.isArray(this.relation)) {
+            data["relation"] = [];
+            for (let item of this.relation)
+                data["relation"].push(item.toJSON());
+        }
+        return data;
+    }
+}
+
+export interface IRelatedWhen {
+    relation: Relation[] | undefined;
+
+    [key: string]: any;
+}
+
+export class DataSource implements IDataSource {
+    service!: string | undefined;
+    api!: string | undefined;
+    parameter!: string | undefined;
+
+    [key: string]: any;
+
+    constructor(data?: IDataSource) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.service = _data["service"];
+            this.api = _data["api"];
+            this.parameter = _data["parameter"];
+        }
+    }
+
+    static fromJS(data: any): DataSource {
+        data = typeof data === 'object' ? data : {};
+        let result = new DataSource();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["service"] = this.service;
+        data["api"] = this.api;
+        data["parameter"] = this.parameter;
+        return data;
+    }
+}
+
+export interface IDataSource {
+    service: string | undefined;
+    api: string | undefined;
+    parameter: string | undefined;
+
+    [key: string]: any;
+}
+
 export class ExtraAttribute implements IExtraAttribute {
     attributeId!: number;
     code!: string | undefined;
@@ -79417,6 +79734,9 @@ export class ExtraAttribute implements IExtraAttribute {
     isVariation!: boolean;
     isAdvancedSearch!: boolean;
     allowAddNew!: boolean;
+    visibleWhen!: VisibleWhen;
+    relatedWhen!: RelatedWhen;
+    dataSource!: DataSource;
 
     [key: string]: any;
 
@@ -79451,6 +79771,9 @@ export class ExtraAttribute implements IExtraAttribute {
             this.isVariation = _data["isVariation"];
             this.isAdvancedSearch = _data["isAdvancedSearch"];
             this.allowAddNew = _data["allowAddNew"];
+            this.visibleWhen = _data["visibleWhen"] ? VisibleWhen.fromJS(_data["visibleWhen"]) : <any>undefined;
+            this.relatedWhen = _data["relatedWhen"] ? RelatedWhen.fromJS(_data["relatedWhen"]) : <any>undefined;
+            this.dataSource = _data["dataSource"] ? DataSource.fromJS(_data["dataSource"]) : <any>undefined;
         }
     }
 
@@ -79483,6 +79806,9 @@ export class ExtraAttribute implements IExtraAttribute {
         data["isVariation"] = this.isVariation;
         data["isAdvancedSearch"] = this.isAdvancedSearch;
         data["allowAddNew"] = this.allowAddNew;
+        data["visibleWhen"] = this.visibleWhen ? this.visibleWhen.toJSON() : <any>undefined;
+        data["relatedWhen"] = this.relatedWhen ? this.relatedWhen.toJSON() : <any>undefined;
+        data["dataSource"] = this.dataSource ? this.dataSource.toJSON() : <any>undefined;
         return data;
     }
 }
@@ -79504,6 +79830,9 @@ export interface IExtraAttribute {
     isVariation: boolean;
     isAdvancedSearch: boolean;
     allowAddNew: boolean;
+    visibleWhen: VisibleWhen;
+    relatedWhen: RelatedWhen;
+    dataSource: DataSource;
 
     [key: string]: any;
 }
@@ -79943,6 +80272,7 @@ export interface IAppItemForViewDto {
 export class GetAppItemDetailForViewDto implements IGetAppItemDetailForViewDto {
     appItem!: AppItemForViewDto;
     nonLookupValues!: LookupLabelDto[] | undefined;
+    tenantOwner!: number | undefined;
 
     [key: string]: any;
 
@@ -79967,6 +80297,7 @@ export class GetAppItemDetailForViewDto implements IGetAppItemDetailForViewDto {
                 for (let item of _data["nonLookupValues"])
                     this.nonLookupValues!.push(LookupLabelDto.fromJS(item));
             }
+            this.tenantOwner = _data["tenantOwner"];
         }
     }
 
@@ -79989,6 +80320,7 @@ export class GetAppItemDetailForViewDto implements IGetAppItemDetailForViewDto {
             for (let item of this.nonLookupValues)
                 data["nonLookupValues"].push(item.toJSON());
         }
+        data["tenantOwner"] = this.tenantOwner;
         return data;
     }
 }
@@ -79996,6 +80328,7 @@ export class GetAppItemDetailForViewDto implements IGetAppItemDetailForViewDto {
 export interface IGetAppItemDetailForViewDto {
     appItem: AppItemForViewDto;
     nonLookupValues: LookupLabelDto[] | undefined;
+    tenantOwner: number | undefined;
 
     [key: string]: any;
 }
