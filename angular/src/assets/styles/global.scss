@@ -863,3 +863,7 @@ searchicon {
     cursor: not-allowed !important; 
     opacity: 1;
   }
+
+.searchableDropdown searchicon {
+    padding: 0px;
+}

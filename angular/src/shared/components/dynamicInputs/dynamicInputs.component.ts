@@ -53,105 +53,108 @@ export class dynamicInputs extends AppComponentBase implements OnInit, OnChanges
     this.fillSelectedValuesFromDto();
   }
 
-  onAnyInputChange() {
-    if (this.isInitializing) return;
-    this.formTouched = true;
+ onAnyInputChange() {
+  if (this.isInitializing) return;
+  this.formTouched = true;
 
-    const updatedDataMap = new Map<number, any>();
+  const updatedDataMap = new Map<number, any>();
 
-    // Preserve existing values
-    for (const item of this.selectedExtraData) {
-      updatedDataMap.set(item.attributeId, item);
-    }
+  // Preserve existing values
+  for (const item of this.selectedExtraData) {
+    updatedDataMap.set(item.attributeId, item);
+  }
 
-    if (this.extraAttributeObject?.value?.filteredExtraAttributes) {
-      for (const attr of this.extraAttributeObject.value.filteredExtraAttributes) {
+  if (this.extraAttributeObject?.value?.filteredExtraAttributes) {
+    for (const attr of this.extraAttributeObject.value.filteredExtraAttributes) {
 
-        if (attr.dataType === 'pills')
-          attr.themes = this.getThemes(attr);
+      if (attr.dataType === 'pills') 
+        attr.themes = this.getThemes(attr);
+      
+      if (attr.isSelectedOnVariation || attr.isVariation) {
+        continue;
+      }
 
-        if (attr.isSelectedOnVariation || attr.isVariation) {
-          continue;
-        }
-
-        let formattedValue = attr.selectedValues;
+      let formattedValue = attr.selectedValues;
 
         // ✅ Handle Datetime
-        if (attr.dataType === 'Datetime') {
-          const dateValue = new Date(formattedValue);
+      if (attr.dataType === 'Datetime') {
+        const dateValue = new Date(formattedValue);
 
-          if (!formattedValue || formattedValue === 'Invalid Date' || isNaN(dateValue.getTime())) {
-            formattedValue = '';
-          } else {
-            formattedValue = dateValue.toISOString();
-            if (formattedValue === '1970-01-01T00:00:00.000Z') {
-              const originalValue = this.originalValuesMap.get(attr.attributeId);
-              formattedValue = originalValue || '';
-            }
+        if (!formattedValue || formattedValue === 'Invalid Date' || isNaN(dateValue.getTime())) {
+          formattedValue = '';
+        } else {
+          formattedValue = dateValue.toISOString();
+          if (formattedValue === '1970-01-01T00:00:00.000Z') {
+            const originalValue = this.originalValuesMap.get(attr.attributeId);
+            formattedValue = originalValue || '';
           }
         }
+      }
 
         // ✅ Handle String input
-        if (attr.dataType === 'string' && !attr.isLookup) {
-          if (!formattedValue || formattedValue === null || formattedValue === undefined || formattedValue.toString().trim() === '') {
-            formattedValue = '';
+      if (attr.dataType === 'string' && !attr.isLookup) {
+        if (!formattedValue || formattedValue === null || formattedValue === undefined || formattedValue.toString().trim() === '') {
+          formattedValue = '';
+        }
+      }
+
+    // ✅ Handle Numeric / Boolean / Color
+      if (['Numeric', 'boolean', 'Boolean', 'bit', 'color'].includes(attr.dataType)) {
+        if (formattedValue === null || formattedValue === undefined || formattedValue === '') {
+          formattedValue = '';
+        }
+      }
+
+      const originalValue = this.originalValuesMap.get(attr.attributeId);
+      const isSame = JSON.stringify(originalValue) === JSON.stringify(formattedValue);
+
+      let finalValue;
+
+      if (attr.acceptMultipleValues && Array.isArray(formattedValue)) {
+        finalValue = formattedValue.length ? formattedValue : [];
+      } else if (!attr.acceptMultipleValues && (formattedValue === undefined || formattedValue === null || formattedValue === '')) {
+        finalValue = '';
+      } else if (!isSame) {
+        finalValue = formattedValue;
+      } else {
+        finalValue = formattedValue || '';
+      }
+
+      const updatedValue = {
+        attributeId: attr.attributeId,
+        value: finalValue,
+        isLookup: attr.isLookup === true,
+        acceptMultipleValues: attr.acceptMultipleValues === true
+      };
+
+      updatedDataMap.set(attr.attributeId, updatedValue);
+
+      // ✅ Apply relatedWhen dynamically
+      if (attr.relatedWhen?.length) {
+        for (const relation of attr.relatedWhen) {
+          const targetAttr = this.extraAttributeObject.value.extraAttributes
+            .find(x => x.name === relation.targetName || x.code === relation.targetName);
+
+          if (targetAttr) {
+            targetAttr[relation.targetField] = attr[relation.sourceField];
+            // Update the map as well to reflect changes in selectedExtraData
+            updatedDataMap.set(targetAttr.attributeId, {
+              attributeId: targetAttr.attributeId,
+              value: targetAttr[relation.targetField],
+              isLookup: targetAttr.isLookup === true,
+              acceptMultipleValues: targetAttr.acceptMultipleValues === true
+            });
           }
         }
-
-        // ✅ Handle Numeric input
-        if (attr.dataType === 'Numeric' || attr.dataType === 'boolean' || attr.dataType === 'Boolean' || attr.dataType === 'bit' || attr.dataType === 'color') {
-          if (formattedValue === null || formattedValue === undefined || formattedValue === '') {
-            formattedValue = '';
-          }
-        }
-
-        const originalValue = this.originalValuesMap.get(attr.attributeId);
-        const isSame = JSON.stringify(originalValue) === JSON.stringify(formattedValue);
-
-        let finalValue;
-
-        if (attr.acceptMultipleValues && Array.isArray(formattedValue)) {
-          finalValue = formattedValue.length ? formattedValue : [];
-        } else if (!attr.acceptMultipleValues && (formattedValue === undefined || formattedValue === null || formattedValue === '')) {
-          finalValue = ''; // ✅ always send empty string
-        } else if (!isSame) {
-          finalValue = formattedValue;
-        } else {
-          finalValue = formattedValue || '';
-        }
-
-        const updatedValue = {
-          attributeId: attr.attributeId,
-          value: finalValue,
-          isLookup: attr.isLookup === true,
-          acceptMultipleValues: attr.acceptMultipleValues === true
-        };
-
-        updatedDataMap.set(attr.attributeId, updatedValue);
       }
-    }
 
-    this.selectedExtraData = Array.from(updatedDataMap.values());
-
-    this.extraDataChanged.emit(this.selectedExtraData);
-  }
-
-
-  onRadioChange(extraAttr) {
-    //i49- make this part dynamic
-    if (extraAttr?.attributeId === 1217 ||
-      extraAttr?.name?.includes("ShowwarningmessagewhenmajorItemisoutofStockinmarketplace")) {
-
-      const extraAttrWaningMsg = this.extraAttributeObject.value.extraAttributes
-        .find(x => x.attributeId === 1218 || x.name?.includes("Warningmessage"));
-
-      if (extraAttrWaningMsg && extraAttr.selectedValues?.toString().toLowerCase() !== 'true') {
-        extraAttrWaningMsg.showMsgTxt = false;
-      } else if (extraAttrWaningMsg && extraAttr.selectedValues?.toString().toLowerCase() === 'true') {
-        extraAttrWaningMsg.showMsgTxt = true;
-      }
     }
   }
+
+  this.selectedExtraData = Array.from(updatedDataMap.values());
+  
+  this.extraDataChanged.emit(this.selectedExtraData);
+}
 
 
   reset(extraAttr: any) {
@@ -417,23 +420,26 @@ export class dynamicInputs extends AppComponentBase implements OnInit, OnChanges
   extraAttrOptions = new Map<string, { items: any[], totalCount: number, isLoading: boolean }>();
 
   getDropdownOptions(extraAttr: any) {
-    const data = this.extraAttrOptions.get(extraAttr.id);
-    if (!data) return [];
+    if (extraAttr?.validEntries && !extraAttr?.dataSource) {
+    return extraAttr.validEntries.split('|').map(v => ({
+      label: v.trim(),
+      value: v.trim()
+    }));
 
-    let items = [...data.items];
-
-    if (items.length > 0 && items.length < data.totalCount) {
-      items.push({ label: 'Load More...', value: null, isLoadMore: true });
-    }
-
-    return items;
   }
-
+  
+  return this.extraAttrOptions.get(extraAttr.id)?.items || [];
+  }
+  
   onDropdownClick(extraAttr: any) {
-    const data = this.extraAttrOptions.get(extraAttr.id);
-    if (!data || data.items.length === 0) {
-      this.loadNextItems(extraAttr);
-    }
+    if (extraAttr?.validEntries && !extraAttr?.dataSource) 
+    return;
+
+  const data = this.extraAttrOptions.get(extraAttr.id);
+
+  if (!data || data.items.length === 0) 
+    this.loadNextItems(extraAttr);
+
   }
 
   onLoadMoreClick(event: Event, extraAttr: any) {
@@ -457,13 +463,27 @@ export class dynamicInputs extends AppComponentBase implements OnInit, OnChanges
     this.callDynamicAPI(extraAttr, skipCount, maxResultCount);
   }
 
-  callDynamicAPI(extraAttr: any, skipCount: number = 0, maxResultCount: number = 10) {
-    if (!extraAttr?.validEntries) return;
+ callDynamicAPI(extraAttr: any, skipCount: number = 0, maxResultCount: number = 10) {
+  if (extraAttr?.validEntries && extraAttr.validEntries.includes('|')) {
+    const items = extraAttr.validEntries.split('|').map(val => ({
+      label: val.trim(),
+      value: val.trim()
+    }));
 
-    let [serviceName, methodName, resultField] = extraAttr.validEntries.split('|');
-    serviceName += "ServiceProxy";
+    this.extraAttrOptions.set(extraAttr.id, {
+      items: items,
+      totalCount: items.length,
+      isLoading: false
+    });
+    return;
+  }
 
-    this.dynamicApi.dispatch(serviceName, methodName, {
+  if (extraAttr?.dataSource) {
+    const serviceName = extraAttr.dataSource.service + "ServiceProxy";
+    const apiMethod = extraAttr.dataSource.api;
+    const resultField = extraAttr.dataSource.parameter;
+
+    this.dynamicApi.dispatch(serviceName, apiMethod, {
       skipCount: skipCount,
       maxResultCount: maxResultCount
     }).subscribe(result => {
@@ -482,6 +502,8 @@ export class dynamicInputs extends AppComponentBase implements OnInit, OnChanges
       });
     });
   }
+}
+
 
   getByPath(obj: any, path: string) {
     return path.split('.').reduce((o, p) => o?.[p], obj);
@@ -523,5 +545,19 @@ export class dynamicInputs extends AppComponentBase implements OnInit, OnChanges
 
     
   }
+
+  isVisible(extraAttr: any): boolean {
+
+  if (!extraAttr.visibleWhen) return true;
+
+  const parentAttr = this.extraAttributeObject.value.extraAttributes
+    .find(x => x.attributeId === extraAttr.visibleWhen.extraAttributeId);
+
+  if (!parentAttr) return false;
+
+  return parentAttr.selectedValues?.toString().toLowerCase() ===
+         extraAttr.visibleWhen.value?.toString().toLowerCase();
+}
+
 
 }
