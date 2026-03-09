@@ -125,8 +125,13 @@
                     [ngStyle]="{'right.px': !singleItemPerRowMode ? 50 : 0}"></p-inputSwitch>
             </div>
 
-            <div class="actions-menu m-2"
-                [ngClass]="{'d-none':actionsMenuFlags?.allIsHidden || (browseMode != BrowseModeEnum.Actions && browseMode != BrowseModeEnum.ActionsAndSelections) }">
+            <div class="actions-menu m-2"   [ngClass]="{
+                'ar-menu': isArabic,
+                'en-menu': !isArabic,
+                'd-none': actionsMenuFlags?.allIsHidden 
+                          || (browseMode != BrowseModeEnum.Actions 
+                              && browseMode != BrowseModeEnum.ActionsAndSelections)
+              }">
                 <app-appitems-actions-menu #AppitemsActionsMenuComponent [item]="item.appItem"
                     [appItemType]="mainFilterCtrl?.value?.value" [actionsMenuFlags]="actionsMenuFlags"
                     (eventTriggered)="eventHandler($event)">

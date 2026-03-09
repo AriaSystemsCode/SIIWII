@@ -221,6 +221,57 @@ namespace onetouch.AppEntities
             );
         }
 
+        //public async Task<PagedResultDto<ExtraDataAttrDto>> GetAppEntityExtraDataWithPaging(long entityId, long entityObjectTypeId)
+        //{
+        //    using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
+        //    {
+        //        GetAllEntityObjectTypeOutput entityObjectExtraAttribute = null;
+        //        var entityObjectExtraAttributeReturn = await _SycEntityObjectTypesAppService.GetAllWithExtraAttributes(entityObjectTypeId);
+        //        if (entityObjectExtraAttributeReturn != null)
+        //        {
+        //            entityObjectExtraAttribute = entityObjectExtraAttributeReturn.FirstOrDefault();
+        //        }
+
+
+
+        //        if (entityId != 0 && entityObjectExtraAttribute != null && entityObjectExtraAttribute.ExtraAttributes != null && entityObjectExtraAttribute.ExtraAttributes.ExtraAttributes != null)
+        //        {
+        //            var extraAttributedefintion = entityObjectExtraAttribute.ExtraAttributes.ExtraAttributes;
+        //            // *Abdo End
+        //            //get all extra data type, AttributeId
+        //            //var attributesIds = extraAttributedefintion.Where(r => r.Usage.ToUpper().Trim() == recommandedOrAdditional.ToString().ToUpper()).Select(r => r.AttributeId).ToList();
+        //            var attributesIds = extraAttributedefintion.OrderBy(r => r.Usage.ToUpper().Trim()).Select(r => r.AttributeId).ToList();
+        //            var usedExtraDataPagedPerAttribute = GetAppEntityAttrDistinctWithPaging(new GetAppEntityAttributesWithAttributeIdsInput { MaxResultCount = 10000, SkipCount = 0, Sorting = null, AttributeIds = attributesIds, EntityId = entityId }).Result.Items.ToList();
+
+        //            List<ExtraDataAttrDto> returnedList = new List<ExtraDataAttrDto>();
+
+        //            foreach (var EntityExtraData in extraAttributedefintion)
+        //            {
+        //                if (usedExtraDataPagedPerAttribute.Contains(EntityExtraData.AttributeId))
+        //                {
+        //                    var extraDataAttrDtoPagedlocal = GetAppEntityExtraWithPaging(new GetAppEntityAttributesWithAttributeIdsInput { MaxResultCount = 10000, SkipCount = 0, AttributeIds = new List<long>() { EntityExtraData.AttributeId }, EntityId = entityId }).Result.Items.ToList();
+        //                    var extraDataSelectedValues = extraDataAttrDtoPagedlocal.Select(r => new ExtraDataSelectedValues { value = (r.AttributeValueFkName != null ? r.AttributeValueFkName : r.AttributeValue) });
+
+        //                    if (extraDataSelectedValues.ToList().Count > 0)
+        //                    {
+        //                        var extraDataAttrDto = new ExtraDataAttrDto();
+        //                        extraDataAttrDto.extraAttrUsage = EntityExtraData.Usage;
+        //                        extraDataAttrDto.extraAttrName = EntityExtraData.Name;
+        //                        extraDataAttrDto.extraAttrDataType = EntityExtraData.DataType; // Abdo added this 
+        //                        extraDataAttrDto.selectedValues = extraDataSelectedValues.ToList();
+        //                        extraDataAttrDto.extraAttributeId = EntityExtraData.AttributeId;
+        //                        //if (!string.IsNullOrEmpty(EntityExtraData.Usage)) //&& EntityExtraData.Usage.ToUpper().Trim() == recommandedOrAdditional.ToString().ToUpper())
+        //                        { returnedList.Add(extraDataAttrDto); }
+        //                    }
+        //                }
+
+        //            }
+        //            return new PagedResultDto<ExtraDataAttrDto>(usedExtraDataPagedPerAttribute.Count, returnedList);
+        //        }
+        //        return new PagedResultDto<ExtraDataAttrDto>(0, new List<ExtraDataAttrDto>());
+        //    }
+        //}
+
         public async Task<PagedResultDto<ExtraDataAttrDto>> GetAppEntityExtraDataWithPaging(long entityId, long entityObjectTypeId)
         {
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
@@ -271,7 +322,6 @@ namespace onetouch.AppEntities
                 return new PagedResultDto<ExtraDataAttrDto>(0, new List<ExtraDataAttrDto>());
             }
         }
-         
 
         public bool checkArray(long[] ids, string names)
         {
@@ -1933,6 +1983,16 @@ namespace onetouch.AppEntities
 
             int oldReaction = 0;
             var userId = long.Parse(AbpSession.UserId.ToString());
+            
+            var myTenantObjectName = "host";
+            if (AbpSession.TenantId != null)
+            {
+                var myTenantObject = await TenantManager.GetByIdAsync(int.Parse(AbpSession.TenantId.ToString()));
+                if (myTenantObject != null)
+                {
+                    myTenantObjectName = myTenantObject.TenancyName;
+                }
+            }
 
             #region user reaction part
             AppEntityUserReactions appEntityUserReaction = await _appEntityUserReactions.GetAll().FirstOrDefaultAsync(x => x.UserId == userId && x.EntityId == entitlyId && x.InteractionType == 'R');
@@ -1946,6 +2006,7 @@ namespace onetouch.AppEntities
                     appEntityUserReaction.ReactionSelected = reaction;
                     appEntityUserReaction.ActionTime = DateTime.Now;
                     appEntityUserReaction.InteractionType = 'R';
+                   
                     if (AbpSession.TenantId != null)
                         appEntityUserReaction.TenantId = int.Parse(AbpSession.TenantId.ToString());
 
@@ -1967,20 +2028,20 @@ namespace onetouch.AppEntities
                                     var notifyUser = await UserManager.FindByIdAsync(entityObject.CreatorUserId.ToString());
                                     if (notifyUser != null)
                                     {
-                                        var myTenantObject = await TenantManager.GetByIdAsync(int.Parse(AbpSession.TenantId.ToString()));
+                                        //var myTenantObject = await TenantManager.GetByIdAsync(int.Parse(AbpSession.TenantId.ToString()));
                                         //T-SII-20220413.0001,1 MMT 05/15/2023 -The notification message Enhachment[Start]
                                         var post = _appPostRepository.GetAll ().Where(x=>x.AppEntityId == entitlyId  ).FirstOrDefault ();
                                         if (post != null)
                                         {
                                             await _appNotifier.SendMessageAsync(new Abp.UserIdentifier(entityObject.TenantId, long.Parse(notifyUser.Id.ToString())),
-                                                "User " + myUser.FullName + "@" + myTenantObject.Name + " reacted to your <a> post </a>" +(post.Description.Length > 30 ? post.Description.Substring (0,30): post.Description), Abp.Notifications.NotificationSeverity.Info,
+                                                "User " + myUser.FullName + "@" + myTenantObjectName + " reacted to your <a> post </a>" +(post.Description.Length > 30 ? post.Description.Substring (0,30): post.Description), Abp.Notifications.NotificationSeverity.Info,
                                                 new Abp.Domain.Entities.EntityIdentifier(typeof(AppPost), post.Id ));
                                         }
                                         else
                                         {
                                             //T-SII-20220413.0001,1 MMT 05/15/2023 -The notification message Enhachment[End]
                                             await _appNotifier.SendMessageAsync(new Abp.UserIdentifier(entityObject.TenantId, long.Parse(notifyUser.Id.ToString())),
-                                                "User " + myUser.FullName + "@" + myTenantObject.Name + " reacted to your post" + entityObject.Name, Abp.Notifications.NotificationSeverity.Info);
+                                                "User " + myUser.FullName + "@" + myTenantObjectName + " reacted to your post" + entityObject.Name, Abp.Notifications.NotificationSeverity.Info);
                                         }
                                     }
                                 }
@@ -2013,10 +2074,10 @@ namespace onetouch.AppEntities
                                     var myUser = await UserManager.FindByIdAsync(AbpSession.UserId.ToString());
                                     if (notifyUser != null)
                                     {
-                                        var myTenantObject = await TenantManager.GetByIdAsync(int.Parse(AbpSession.TenantId.ToString()));
+                                        //var myTenantObject = await TenantManager.GetByIdAsync(int.Parse(AbpSession.TenantId.ToString()));
 
                                         await _appNotifier.SendMessageAsync(new Abp.UserIdentifier(entityObject.TenantId, long.Parse(notifyUser.Id.ToString())),
-                                            "User " + myUser.FullName + "@" + myTenantObject.Name + " re-reacted to your post" + entityObject.Name, Abp.Notifications.NotificationSeverity.Info);
+                                            "User " + myUser.FullName + "@" + myTenantObjectName + " re-reacted to your post" + entityObject.Name, Abp.Notifications.NotificationSeverity.Info);
                                     }
                                 }
                             }

@@ -3826,6 +3826,63 @@ export class AccountsServiceProxy {
      * @param body (optional) 
      * @return Success
      */
+    createOrEditContactAddress(body: AppContactAddressDto | undefined): Observable<boolean> {
+        let url_ = this.baseUrl + "/api/services/app/Accounts/CreateOrEditContactAddress";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json-patch+json",
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processCreateOrEditContactAddress(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processCreateOrEditContactAddress(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<boolean>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<boolean>;
+        }));
+    }
+
+    protected processCreateOrEditContactAddress(response: HttpResponseBase): Observable<boolean> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+                result200 = resultData200 !== undefined ? resultData200 : <any>null;
+    
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return Success
+     */
     createOrEditBranch(body: BranchDto | undefined): Observable<BranchDto> {
         let url_ = this.baseUrl + "/api/services/app/Accounts/CreateOrEditBranch";
         url_ = url_.replace(/[?&]$/, "");
@@ -15110,6 +15167,176 @@ export class AppItemsServiceProxy {
     }
 
     /**
+     * @param guidFile (optional) 
+     * @param body (optional) 
+     * @return Success
+     */
+    validatePriceCSV(guidFile: string | null | undefined, body: string[] | null | undefined): Observable<AppItemExcelResultsDTO> {
+        let url_ = this.baseUrl + "/api/services/app/AppItems/ValidatePriceCSV?";
+        if (guidFile !== undefined && guidFile !== null)
+            url_ += "guidFile=" + encodeURIComponent("" + guidFile) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json-patch+json",
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processValidatePriceCSV(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processValidatePriceCSV(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<AppItemExcelResultsDTO>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<AppItemExcelResultsDTO>;
+        }));
+    }
+
+    protected processValidatePriceCSV(response: HttpResponseBase): Observable<AppItemExcelResultsDTO> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = AppItemExcelResultsDTO.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param filePath (optional) 
+     * @param body (optional) 
+     * @return Success
+     */
+    updateCsvStatusFromErrorLog(filePath: string | null | undefined, body: AppItemtExcelRecordDTO[] | null | undefined): Observable<void> {
+        let url_ = this.baseUrl + "/api/services/app/AppItems/UpdateCsvStatusFromErrorLog?";
+        if (filePath !== undefined && filePath !== null)
+            url_ += "filePath=" + encodeURIComponent("" + filePath) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json-patch+json",
+            })
+        };
+
+        return this.http.request("put", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processUpdateCsvStatusFromErrorLog(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processUpdateCsvStatusFromErrorLog(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<void>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<void>;
+        }));
+    }
+
+    protected processUpdateCsvStatusFromErrorLog(response: HttpResponseBase): Observable<void> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return _observableOf(null as any);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return Success
+     */
+    savePriceFromCSV(body: AppItemExcelResultsDTO | undefined): Observable<ExcelLogDto> {
+        let url_ = this.baseUrl + "/api/services/app/AppItems/SavePriceFromCSV";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json-patch+json",
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processSavePriceFromCSV(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processSavePriceFromCSV(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<ExcelLogDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<ExcelLogDto>;
+        }));
+    }
+
+    protected processSavePriceFromCSV(response: HttpResponseBase): Observable<ExcelLogDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = ExcelLogDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
      * @param repeatHandler (optional) 
      * @param body (optional) 
      * @return Success
@@ -15176,11 +15403,16 @@ export class AppItemsServiceProxy {
     }
 
     /**
+     * @param index (optional) 
      * @param body (optional) 
      * @return Success
      */
-    validateImportItemData(body: ImportItemInputDto | undefined): Observable<ImportItemReturnDto[]> {
-        let url_ = this.baseUrl + "/api/services/app/AppItems/ValidateImportItemData";
+    validateImportItemData(index: number | undefined, body: ImportItemInputDto | undefined): Observable<ImportItemReturnDto[]> {
+        let url_ = this.baseUrl + "/api/services/app/AppItems/ValidateImportItemData?";
+        if (index === null)
+            throw new Error("The parameter 'index' cannot be null.");
+        else if (index !== undefined)
+            url_ += "index=" + encodeURIComponent("" + index) + "&";
         url_ = url_.replace(/[?&]$/, "");
 
         const content_ = JSON.stringify(body);
@@ -94215,12 +94447,12 @@ export class AppItemPrices implements IAppItemPrices {
     price!: number;
     appItemId!: number;
     appItemCode!: string | undefined;
+    buyerSSIN!: string | undefined;
     currencyId!: number | undefined;
     currencyCode!: string | undefined;
     currencyFk!: AppEntity;
     appItemFk!: AppItem;
     isDefault!: boolean;
-    buyerSSIN!: string | undefined;
     isDeleted!: boolean;
     deleterUserId!: number | undefined;
     deletionTime!: moment.Moment | undefined;
@@ -94252,12 +94484,12 @@ export class AppItemPrices implements IAppItemPrices {
             this.price = _data["price"];
             this.appItemId = _data["appItemId"];
             this.appItemCode = _data["appItemCode"];
+            this.buyerSSIN = _data["buyerSSIN"];
             this.currencyId = _data["currencyId"];
             this.currencyCode = _data["currencyCode"];
             this.currencyFk = _data["currencyFk"] ? AppEntity.fromJS(_data["currencyFk"]) : <any>undefined;
             this.appItemFk = _data["appItemFk"] ? AppItem.fromJS(_data["appItemFk"]) : <any>undefined;
             this.isDefault = _data["isDefault"];
-            this.buyerSSIN = _data["buyerSSIN"];
             this.isDeleted = _data["isDeleted"];
             this.deleterUserId = _data["deleterUserId"];
             this.deletionTime = _data["deletionTime"] ? moment(_data["deletionTime"].toString()) : <any>undefined;
@@ -94287,12 +94519,12 @@ export class AppItemPrices implements IAppItemPrices {
         data["price"] = this.price;
         data["appItemId"] = this.appItemId;
         data["appItemCode"] = this.appItemCode;
+        data["buyerSSIN"] = this.buyerSSIN;
         data["currencyId"] = this.currencyId;
         data["currencyCode"] = this.currencyCode;
         data["currencyFk"] = this.currencyFk ? this.currencyFk.toJSON() : <any>undefined;
         data["appItemFk"] = this.appItemFk ? this.appItemFk.toJSON() : <any>undefined;
         data["isDefault"] = this.isDefault;
-        data["buyerSSIN"] = this.buyerSSIN;
         data["isDeleted"] = this.isDeleted;
         data["deleterUserId"] = this.deleterUserId;
         data["deletionTime"] = this.deletionTime ? this.deletionTime.toISOString() : <any>undefined;
@@ -94311,12 +94543,12 @@ export interface IAppItemPrices {
     price: number;
     appItemId: number;
     appItemCode: string | undefined;
+    buyerSSIN: string | undefined;
     currencyId: number | undefined;
     currencyCode: string | undefined;
     currencyFk: AppEntity;
     appItemFk: AppItem;
     isDefault: boolean;
-    buyerSSIN: string | undefined;
     isDeleted: boolean;
     deleterUserId: number | undefined;
     deletionTime: moment.Moment | undefined;
@@ -113851,6 +114083,7 @@ export class CreateTenantInput implements ICreateTenantInput {
     inviterTenantId!: number | undefined;
     firstName!: string;
     lastName!: string;
+    adminName!: string;
 
     [key: string]: any;
 
@@ -113883,6 +114116,7 @@ export class CreateTenantInput implements ICreateTenantInput {
             this.inviterTenantId = _data["inviterTenantId"];
             this.firstName = _data["firstName"];
             this.lastName = _data["lastName"];
+            this.adminName = _data["adminName"];
         }
     }
 
@@ -113913,6 +114147,7 @@ export class CreateTenantInput implements ICreateTenantInput {
         data["inviterTenantId"] = this.inviterTenantId;
         data["firstName"] = this.firstName;
         data["lastName"] = this.lastName;
+        data["adminName"] = this.adminName;
         return data;
     }
 }
@@ -113932,6 +114167,7 @@ export interface ICreateTenantInput {
     inviterTenantId: number | undefined;
     firstName: string;
     lastName: string;
+    adminName: string;
 
     [key: string]: any;
 }
@@ -114949,6 +115185,7 @@ export class RegisterTenantInput implements IRegisterTenantInput {
     accountType!: string | undefined;
     accountTypeId!: string | undefined;
     relatedTenantId!: number;
+    adminName!: string;
 
     [key: string]: any;
 
@@ -114980,6 +115217,7 @@ export class RegisterTenantInput implements IRegisterTenantInput {
             this.accountType = _data["accountType"];
             this.accountTypeId = _data["accountTypeId"];
             this.relatedTenantId = _data["relatedTenantId"];
+            this.adminName = _data["adminName"];
         }
     }
 
@@ -115009,6 +115247,7 @@ export class RegisterTenantInput implements IRegisterTenantInput {
         data["accountType"] = this.accountType;
         data["accountTypeId"] = this.accountTypeId;
         data["relatedTenantId"] = this.relatedTenantId;
+        data["adminName"] = this.adminName;
         return data;
     }
 }
@@ -115027,6 +115266,7 @@ export interface IRegisterTenantInput {
     accountType: string | undefined;
     accountTypeId: string | undefined;
     relatedTenantId: number;
+    adminName: string;
 
     [key: string]: any;
 }

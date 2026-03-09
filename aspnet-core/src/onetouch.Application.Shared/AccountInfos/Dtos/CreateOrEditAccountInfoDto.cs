@@ -144,5 +144,10 @@ namespace onetouch.AccountInfos.Dtos
         public virtual long? PaymentTermsId { set; get; }
         public List<ExtraDataAttrDto> ExtraDataAttributes { get; set; }
         //I46[End]
+        //I40[start]
+        public virtual string Phone1CountryKey { get; set; }
+        public virtual string Phone2CountryKey { get; set; }
+        public virtual string Phone3CountryKey { get; set; }
+        //I40[End]
     }
 }

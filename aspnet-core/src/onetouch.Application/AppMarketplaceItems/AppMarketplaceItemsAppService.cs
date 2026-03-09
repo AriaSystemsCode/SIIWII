@@ -63,7 +63,7 @@ namespace onetouch.AppMarketplaceItems
         private readonly IMessageAppService _messageAppService;
         //I48[End]
         //I40[Start]
-        IRepository<AppMarketplaceContact, long> _appMarketplaceContactRepository;
+        IRepository<AppMarketplaceContacts.AppMarketplaceContact, long> _appMarketplaceContactRepository;
         //I40[End]
         public AppMarketplaceItemsAppService(IRepository<AppMarketplaceItemLists.AppMarketplaceItemLists, long> appMarketplaceItemList,
             IRepository<AppMarketplaceItemsListDetails, long> appMarketplaceItemsListDetail, IRepository<AppMarketplaceItemSelectors, long> appMarketplaceItemsSelector,
@@ -73,8 +73,9 @@ namespace onetouch.AppMarketplaceItems
             IRepository<onetouch.AppMarketplaceAccountsPriceLevels.AppMarketplaceAccountsPriceLevels, long> appMarketplaceAccountsPriceLevels,
             IRepository<SycEntityObjectCategory, long> sycEntityObjectCategory, IRepository<AppTransactionDetails, long> appTransactionDetailsRepository,
             IRepository<AppTransactionHeaders, long> appTransactionHeadersRepository,
-        IAppEntitiesAppService appEntitiesAppService, IMessageAppService messageAppService, IRepository<AppEntitiesRelationship, long> appEntitiesRelationship,
-        IRepository<AppMarketplaceContact, long> appMarketplaceContactRepository)
+        IAppEntitiesAppService appEntitiesAppService, IMessageAppService messageAppService,
+        IRepository<AppMarketplaceContacts.AppMarketplaceContact, long> appMarketplaceContactRepository,
+        IRepository<AppEntitiesRelationship, long> appEntitiesRelationship)
         {
             _messageAppService = messageAppService;
             _appTransactionHeadersRepository = appTransactionHeadersRepository;
@@ -92,6 +93,7 @@ namespace onetouch.AppMarketplaceItems
             _appConfiguration = appConfigurationAccessor.Configuration;
             _appEntitiesAppService = appEntitiesAppService;
             _appMarketplaceAccountsPriceLevels = appMarketplaceAccountsPriceLevels;
+            _appEntitiesRelationship = appEntitiesRelationship;
             _appMarketplaceContactRepository = appMarketplaceContactRepository;
             _appEntitiesRelationship = appEntitiesRelationship;
         }

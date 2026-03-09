@@ -294,29 +294,6 @@ export class dynamicInputs extends AppComponentBase implements OnInit, OnChanges
 
   ngOnInit(): void {
     this.fillSelectedValuesFromDto();
-
-    // ✅ Provide fallback/mock image category
-    if (!this.sycAttachmentCategoryImage) {
-      this.sycAttachmentCategoryImage = {
-        id: 1,
-        code: 'IMAGE',
-        name: 'Mock Image Category',
-        description: 'Fake for testing',
-        entityObjectTypeCode: 'MOCK',
-        isStatic: false,
-        maxFileSize: 1048576, // 1 MB
-        acceptMultipleAttachments: true,
-        isSystem: false,
-        displayName: 'Test Category',
-        icon: '',
-        iconPath: '',
-        tenantId: 1
-      } as unknown as SycAttachmentCategoryDto;
-    }
-
-    setTimeout(() => {
-      this.isInitializing = false;
-    }, 0);
   }
 
   isArray(val: any): boolean {

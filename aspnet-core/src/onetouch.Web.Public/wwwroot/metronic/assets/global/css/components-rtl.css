@@ -1841,7 +1841,7 @@ li [class*=" icon-"].icon-large {
   .btn.blue-hoki:not(.btn-outline):focus, .btn.blue-hoki:not(.btn-outline).focus {
     color: #FFFFFF;
     background-color: #526781;
-    border-color: #344263; }
+    border-color: #344200; }
   .btn.blue-hoki:not(.btn-outline):hover {
     color: #FFFFFF;
     background-color: #526781;
@@ -1857,7 +1857,7 @@ li [class*=" icon-"].icon-large {
     .open > .btn.blue-hoki:not(.btn-outline).dropdown-toggle.focus {
       color: #FFFFFF;
       background-color: #44566b;
-      border-color: #344263; }
+      border-color: #344200; }
   .btn.blue-hoki:not(.btn-outline):active, .btn.blue-hoki:not(.btn-outline).active,
   .open > .btn.blue-hoki:not(.btn-outline).dropdown-toggle {
     background-image: none; }

@@ -165,3 +165,45 @@ input[type="radio"]:checked+label {
   font-weight: 600;
   font-size: 14px;
 }
+@media (max-width: 540px) {
+.kt-portlet  {
+  margin-top: 10px !important;
+}
+}
+::ng-deep  {
+  @media (max-width: 786px) {
+    .modal.show .modal-dialog {
+      position: absolute !important;
+      right: 100px !important;
+      top: 40px !important;
+     
+  }
+    }
+
+    @media only screen and (min-width: 400px) and (max-width: 540px) {
+      .modal.show .modal-dialog {
+          position: absolute !important;
+          right: 6% !important;
+          top: 0px !important;
+          width: 350px;
+      }
+  }
+
+  @media  only screen and (min-width: 365px) and (max-width: 400px) {
+    .modal.show .modal-dialog {
+        position: absolute !important;
+        right: 2% !important;
+        top: 0px !important;
+        width: 350px;
+    }
+}
+
+@media (max-width: 365px) {
+  .modal.show .modal-dialog {
+      position: absolute !important;
+      right: 0% !important;
+      top: 0px !important;
+      width: 350px;
+  }
+}
+}

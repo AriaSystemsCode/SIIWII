@@ -107,15 +107,6 @@ export class MessagesComponent extends AppComponentBase implements OnInit {
             });
         // this.scrollToBottom();
     }
-    /*  ngAfterViewChecked() {
-        this.scrollToBottom();
-    }
-    scrollToBottom(): void {
-        try {
-            this.containerdetails.nativeElement.scrollTop =
-                this.containerdetails.nativeElement.scrollHeight;
-        } catch (err) {}
-    } */
 
         expandedMessageId: number | null = null;
         maxChars = 410; // Max characters before truncation

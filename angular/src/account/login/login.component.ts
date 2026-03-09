@@ -27,10 +27,12 @@ export class LoginComponent extends AppComponentBase implements OnInit {
     submitting = false;
     isMultiTenancyEnabled: boolean = this.multiTenancy.isEnabled;
     recaptchaSiteKey: string = AppConsts.recaptchaSiteKey;
-    oldUserName:string;
+    oldUserName: string;
+
     currentLang:string
     isArabic:boolean 
     
+
 
     isHost:boolean
     constructor(

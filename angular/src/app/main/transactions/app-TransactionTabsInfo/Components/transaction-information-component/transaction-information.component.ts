@@ -134,10 +134,11 @@ export class TransactionInformationComponent
   totlaOrderPrices: number = 0;
   priceLevel:any
   languageSettingName  =AppConsts.languageSettingName;
-  currentLang:string
-  isArabic:boolean 
   transactionSharing:string="";
   isAuthenticated = this.appSession?.user
+  currentLang:string
+  isArabic:boolean 
+
   constructor(
     injector: Injector,
     private _AppTransactionServiceProxy: AppTransactionServiceProxy,
@@ -1808,6 +1809,7 @@ loadRecommendedAndAdditionalExtraDataLookupLists() {
     this.appTransactionsForViewDto.completeDate = moment.utc(moment(completeDate).format('YYYY-MM-DD'));
   }
 
+  
 
 
   automaticShare() {

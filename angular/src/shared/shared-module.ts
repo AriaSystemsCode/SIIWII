@@ -24,8 +24,9 @@ import { dynamicInputs } from '@shared/components/dynamicInputs/dynamicInputs.co
 import { BsDatepickerModule } from '@node_modules/ngx-bootstrap/datepicker';
 import { CalendarModule } from 'primeng/calendar';
 import { dynamicInputsView } from '@shared/components/dynamic-inputs-view/dynamic-inputs-view.component';
-import { InputSwitchModule } from 'primeng/inputswitch';
 import { relatedItemModule } from '@app/relatedItems/relatedItem.module';
+import { InputSwitchModule } from 'primeng/inputswitch';
+
 
 @NgModule({
   imports: [

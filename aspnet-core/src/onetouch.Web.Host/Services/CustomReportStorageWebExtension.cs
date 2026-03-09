@@ -177,7 +177,9 @@ namespace onetouch.Web.Services
                                         attachmentPath = attachmentPath.Replace(_appConfiguration[$"Attachment:Omitt"].ToString(),"");
                                         attachmentPath = attachmentPath.Replace(@"\", @"/");
 
-                                        report.Parameters["attachmentClientUrl"].Value = attachmentPath;
+                                        if (report.Parameters.ToDynamicList<DevExpress.XtraReports.Parameters.Parameter>().Find(x => x.Name == "attachmentClientUrl") != null)
+                                        { report.Parameters["attachmentClientUrl"].Value = attachmentPath; }
+
                                         report.Parameters["attachmentBaseUrl"].Value = parameters.Get("attachmentBaseUrl");
                                         break;
 

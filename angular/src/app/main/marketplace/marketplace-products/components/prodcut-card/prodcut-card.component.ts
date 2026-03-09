@@ -28,6 +28,8 @@ export class ProdcutCardComponent   extends AppComponentBase  {
     constructor(private router: Router ,  injector: Injector,  private _AppEntitiesServiceProxy: AppEntitiesServiceProxy,) {
         super(injector);
     }
+
+
     ngOnInit(){
         // this.getSettingData()
         this.product?.price % 1 ==0?this.product.price=Math.round(this.product?.price * 100 / 100).toFixed(2):null; 
