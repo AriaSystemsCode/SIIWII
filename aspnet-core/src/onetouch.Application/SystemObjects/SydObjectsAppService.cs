@@ -42,6 +42,9 @@ using onetouch.AppEvents;
 using onetouch.AppMarketplaceAccounts;
 using onetouch.AppMarketplaceContacts;
 using onetouch.AppMarketplaceItems.Dtos;
+using Abp.EntityFrameworkCore.Uow;
+using onetouch.EntityFrameworkCore;
+using DocumentFormat.OpenXml.Spreadsheet;
 
 namespace onetouch.SystemObjects
 {
@@ -648,6 +651,55 @@ namespace onetouch.SystemObjects
                             }
                     
                             break;
+                        //I50,Brand[start]
+                        case "BRAND":
+                            var brandObjectId = await _helper.SystemTables.GetObjectBrandId();
+                            var contxt = UnitOfWorkManager.Current.GetDbContext<onetouchDbContext>(null, null);
+                            List<AppEntity> filteredBrands = null;
+                            if (!string.IsNullOrEmpty(entityFilterCondition))
+                            {
+                                var filterCondition = Helper.ApplyJsonFilter<AppEntit`y>(entityFilterCondition);
+                                if (filterCondition != null)
+                                    filteredBrands = await contxt.AppEntities.Where(filterCondition)
+                                        .Where(z => z.EntityObjectTypeId == brandObjectId).OrderBy(entitySortBy ?? "id asc")
+                                        .Take(10).ToListAsync();
+
+                            }
+                            else
+                            {
+                                filteredBrands = await contxt.AppEntities
+                                .Where(z => z.EntityObjectTypeId == brandObjectId).OrderBy(entitySortBy ?? "id asc")
+                                .Take(10).ToListAsync();
+                            }
+                            if (filteredBrands != null && filteredBrands.Count() > 0)
+                            {
+                                foreach (var br in filteredBrands)
+                                {
+                                    var brandObject = await _appEntityRepository.GetAll().Include(x => x.EntityAttachments).ThenInclude(x => x.AttachmentFk)
+                                        .Where(z => z.Id == br.Id).FirstOrDefaultAsync();
+                                    if (brandObject != null)
+                                    {
+                                        var item = new PageSettingDto();
+                                        item.BlockType = "BRAND";
+                                        item.GetAppEntityForViewDto = await _appEntitiesAppService.GetAppEntityForView(brandObject.Id);
+                                        {
+                                            if (brandObject.EntityAttachments != null && brandObject.EntityAttachments.Count > 0)
+                                            {
+
+                                                item.GetAppEntityForViewDto.AppEntity.EntityAttachments = ObjectMapper.Map<List<AppEntityAttachmentDto>>(brandObject.EntityAttachments);
+                                                foreach (var attDto in item.GetAppEntityForViewDto.AppEntity.EntityAttachments)
+                                                {
+                                                    attDto.FileName = imagesUrl + (brandObject.TenantId == null ? "-1" : brandObject.TenantId.ToString()) + @"/" + attDto.FileName;
+                                                    attDto.Url = attDto.FileName;
+                                                }
+                                            }
+                                        }
+                                        result.Add(item);
+                                    }
+                                }
+                            }
+                            break;
+                            //I50,Brand[End]
                     }
 
                 }

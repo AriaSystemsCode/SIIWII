@@ -112,13 +112,13 @@ namespace onetouch.SystemObjects
 
                                                  join s5 in _context.SycEntityLocalizations.Where(z => z.Language.ToUpper() == tenantLanguage.ToUpper() && z.ObjectTypeId == cat.Id) on s2.Id equals s5.ObjectId into j3
                                                  from s3 in j3.DefaultIfEmpty()
-                                                 join o3 in _lookup_ApplicationLanguageText.GetAll() on ("SYCENTITYOBJECTCLASSIFICATIONS-NAME-" + o.Id.ToString() + "-" + o.Name).Trim().ToUpper() equals o3.Key into j5
+                                                 join o3 in _lookup_ApplicationLanguageText.GetAll().Where(z => z.LanguageName == defaultLang) on ("SYCENTITYOBJECTCLASSIFICATIONS-NAME-" + o.Id.ToString() + "-" + o.Name).Trim().ToUpper() equals o3.Key into j5
                                                  from s6 in j5.DefaultIfEmpty()
 
-                                                 join o4 in _lookup_ApplicationLanguageText.GetAll() on (s2 != null ? "SYCENTITYOBJECTCLASSIFICATIONS-NAME-" + s2.Id.ToString() + "-" + s2.Name : "XXX").Trim().ToUpper() equals o4.Key into j4
+                                                 join o4 in _lookup_ApplicationLanguageText.GetAll().Where(z => z.LanguageName == defaultLang) on (s2 != null ? "SYCENTITYOBJECTCLASSIFICATIONS-NAME-" + s2.Id.ToString() + "-" + s2.Name : "XXX").Trim().ToUpper() equals o4.Key into j4
                                                  from s4 in j4.DefaultIfEmpty()
 
-                                                 where s6.LanguageName == defaultLang && ((s2 != null && s4.LanguageName == defaultLang) || (s2 == null))
+                                                 //where s6.LanguageName == defaultLang && ((s2 != null && s4.LanguageName == defaultLang) || (s2 == null))
                                                  select new TreeNode<GetSycEntityObjectClassificationForViewDto>()
                                                  {
                                                      Data = new GetSycEntityObjectClassificationForViewDto

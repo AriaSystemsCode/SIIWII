@@ -943,5 +943,12 @@ namespace onetouch.Helpers
             }
         }
         //I49[End]
+        //I50[Start]
+        public async Task<long> GetObjectBrandId()
+        {
+            var obj = await _sycEntityObjectType.FirstOrDefaultAsync(x => x.Code == "BRAND" && x.ObjectCode == "LOOKUP");
+            return obj.Id;
+        }
+        //I50[End]
     }
 }
