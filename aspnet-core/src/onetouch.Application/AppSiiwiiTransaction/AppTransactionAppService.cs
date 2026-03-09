@@ -117,7 +117,7 @@ namespace onetouch.AppSiiwiiTransaction
         private readonly IMessageAppService _messageAppService;
         private readonly IRepository<AppEntityAttachment, long> _appEntityAttachment;
         private readonly IRepository<AppEntityExtraData, long> _appEntityExtraData;
-        
+
         private readonly IEmailSender _emailSender;
         private readonly IAppItemsAppService _appItemsAppService;
         private readonly ISycEntityObjectTypesAppService _SycEntityObjectTypesAppService;
@@ -4691,7 +4691,7 @@ namespace onetouch.AppSiiwiiTransaction
 
                                     if (contacts != null && contacts.Count > 0)
                                     {
-                                        var contactsSSIN = contacts.Select(e => e.ContactSSIN).Where(e=> !string.IsNullOrEmpty(e)).Distinct().ToList();
+                                        var contactsSSIN = contacts.Select(e => e.ContactSSIN).Where(e => !string.IsNullOrEmpty(e)).Distinct().ToList();
                                         var contactsRows = _appContactRepository.GetAll()
                                               .Where(e => contactsSSIN.Contains(e.SSIN)
                                               && e.IsDeleted == false && e.TenantId != viewTrans.TenantId)
@@ -5062,58 +5062,38 @@ namespace onetouch.AppSiiwiiTransaction
 
             if (contacts != null && contacts.Count() > 0)
             {
-
-                //  .Where(z => z.TransactionId == tansactionId);
-                var presonEntityObjectTypeId = await _helper.SystemTables.GetEntityObjectTypePersonId();
-                //var contact = //from t in transactionContacts
-                //join c in
-                //      _appContactRepository.GetAll().Where(z => z.TenantId == AbpSession.TenantId && z.ParentId != null && z.PartnerId != null)
-                //   on t.CompanySSIN equals c.SSIN into j
-                //    from e in j.DefaultIfEmpty()
-                //  select new { TenantId = e.Id }; Tenants.Contains(long.Parse(z.PartnerId.ToString())) && 
-
-
-                // var Tenants = (await contact.ToListAsync()).Where(z => z.TenantId != null).Select(z => z.TenantId).ToList();
-                var contacts = await _appContactRepository.GetAll().Include(z => z.EntityFk).ThenInclude(z => z.EntityExtraData.Where(s => s.AttributeId == 715))
-                      .WhereIf(!string.IsNullOrEmpty(filter), z => z.Name.Contains(filter))
-                     .Where(z =>
-                     //z.TenantId == AbpSession.TenantId && 
-                     z.EntityFk.EntityObjectTypeId == presonEntityObjectTypeId).ToListAsync();
-
-                if (contacts != null && contacts.Count() > 0)
+                foreach (var con in contacts)
                 {
-                    foreach (var con in contacts)
+                    if (con.EntityFk.EntityExtraData != null && con.EntityFk.EntityExtraData.FirstOrDefault() != null && con.EntityFk.EntityExtraData.FirstOrDefault().AttributeValue != null)
                     {
-                        if (con.EntityFk.EntityExtraData != null && con.EntityFk.EntityExtraData.FirstOrDefault() != null && con.EntityFk.EntityExtraData.FirstOrDefault().AttributeValue != null)
+                        try
                         {
-                            try
+                            var user = UserManager.GetUserById(long.Parse(con.EntityFk.EntityExtraData.FirstOrDefault().AttributeValue));
+                            if (user != null)
                             {
-                                var user = UserManager.GetUserById(long.Parse(con.EntityFk.EntityExtraData.FirstOrDefault().AttributeValue));
-                                if (user != null)
+                                var tenantObj = TenantManager.GetById(int.Parse(user.TenantId.ToString()));
+                                output.Add(new ContactInformationOutputDto
                                 {
-                                    var tenantObj = TenantManager.GetById(int.Parse(user.TenantId.ToString()));
-                                    output.Add(new ContactInformationOutputDto
-                                    {
-                                        Id = con.Id,
-                                        Email = con.EMailAddress,
-                                        Name = con.Name,
-                                        UserId = long.Parse(con.EntityFk.EntityExtraData.FirstOrDefault().AttributeValue),
-                                        UserImage = user != null && user.ProfilePictureId != null ? Guid.Parse(user.ProfilePictureId.ToString()) : null,
-                                        UserName = user.UserName,
-                                        TenantId = int.Parse(user.TenantId.ToString()),
-                                        TenantName = tenantObj != null ? tenantObj.TenancyName : "SIIWII",
-                                        Code = con.Code
-                                    });
-                                }
-
+                                    Id = con.Id,
+                                    Email = con.EMailAddress,
+                                    Name = con.Name,
+                                    UserId = long.Parse(con.EntityFk.EntityExtraData.FirstOrDefault().AttributeValue),
+                                    UserImage = user != null && user.ProfilePictureId != null ? Guid.Parse(user.ProfilePictureId.ToString()) : null,
+                                    UserName = user.UserName,
+                                    TenantId = int.Parse(user.TenantId.ToString()),
+                                    TenantName = tenantObj != null ? tenantObj.TenancyName : "SIIWII",
+                                    Code = con.Code
+                                });
                             }
-                            catch (Exception ex)
-                            { }
-                        }
-                    }
 
+                        }
+                        catch (Exception ex)
+                        { }
+                    }
                 }
+
             }
+       
             return output;
         }
         //public async Task ShareTransaction(long TransactionId, List<> ShareWithUsers)
