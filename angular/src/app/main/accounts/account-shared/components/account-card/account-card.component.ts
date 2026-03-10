@@ -12,7 +12,7 @@ import {  AccountsServiceProxy, GetAccountForViewDto } from '@shared/service-pro
 })
 export class AccountCardComponent extends AppComponentBase implements OnChanges {
     @Input('account') account : GetAccountForViewDto
-    @Input('singleItemPerRowMode') singleItemPerRowMode : boolean
+    @Input('cardsViewMode') cardsViewMode : boolean
     @Input('isHost') isHost : boolean
     @Output() deleteMe : EventEmitter<boolean> = new EventEmitter<boolean>()
     @Output() disconnectMe : EventEmitter<GetAccountForViewDto> = new EventEmitter<GetAccountForViewDto>()

@@ -13,6 +13,7 @@ type MediaKind = 'image' | 'video' | 'pdf' | 'other';
 })
 export class LandingPageMultiRowCallToActionComponent extends AppComponentBase implements OnInit {
   @Input() sectionId!: number;
+   @Input()  blockTypeIsSingleOrMixed :string
 
   sliderItems: PageSettingDto[] = [];
   pageGroups: PageSettingDto[][] = [];

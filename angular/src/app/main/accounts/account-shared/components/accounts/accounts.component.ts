@@ -65,7 +65,7 @@ export class AccountsComponent
     mailbody: string;
     filterForm: FormGroup;
     isHost: boolean;
-    singleItemPerRowMode: boolean = false;
+    cardsViewMode: boolean = false;
 
     showConfirm: boolean = false;
     selectedItemId: number;
@@ -160,16 +160,16 @@ export class AccountsComponent
 
     saveUserPreferenceForListView() {
         const key = "account-list-view-mode";
-        const value = String(Number(this.singleItemPerRowMode));
+        const value = String(Number(this.cardsViewMode));
         localStorage.setItem(key, value);
     }
     getUserPreferenceForListView() {
         const key = "account-list-view-mode";
         const value = localStorage.getItem(key);
-        if (value) this.singleItemPerRowMode = Boolean(Number(value));
+        if (value) this.cardsViewMode = Boolean(Number(value));
     }
     triggerListView() {
-        this.singleItemPerRowMode = !this.singleItemPerRowMode;
+        this.cardsViewMode = !this.cardsViewMode;
         this.saveUserPreferenceForListView();
     }
 

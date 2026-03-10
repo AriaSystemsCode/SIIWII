@@ -24,6 +24,8 @@ import { ContactUsModalComponent } from "./components/contact-us-modal/contact-u
 import { MarketplaceEventCardComponent } from "./components/marketplace-event-card/marketplace-event-card.component";
 import { MarketplaceAccountCardComponent } from "./components/marketplace-account-card/marketplace-account-card.component";
 import { MarketplaceProductCardComponent } from "./components/marketplace-product-card/marketplace-product-card.component";
+import { AccountSharedModule } from "../accounts/account-shared/account-shared.module";
+import { EventsBrowseModule } from "../AppEventsBrowse/events-browse.module";
 
 
 
@@ -58,6 +60,8 @@ import { MarketplaceProductCardComponent } from "./components/marketplace-produc
         eventsModule,
         InteractionsModule,
         MarketplaceProductsModule,
+        AccountSharedModule,
+        EventsBrowseModule
         
     ],
     exports: [MarketplaceLandingPageComponent, LandingPageSliderWithCallToActionComponent,FooterPageLinkComponent,FooterSocialMediaComponent,LandingPageSinglrRowCallActionComponent,LandingPageSliderWithoutCallToActionComponent,LandingPageCarusalWithCallToActionComponent,LandingPageMultiRowCallToActionComponent,ContactUsModalComponent],

@@ -1,9 +1,13 @@
 .product-card-horizontal {
     display: flex;
     width: 100%;
+    
+  border: 1px solid #ebedf2;
+  border-radius: 12px;
+  background: #ffffff;
     height: 100%;
     gap: 12px;
-    padding: 10px 12px;
+    padding: 12px;
     box-sizing: border-box;
     cursor: pointer;
   }

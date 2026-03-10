@@ -8,22 +8,14 @@ import { AppConsts } from '@shared/AppConsts';
   styleUrls: ['./marketplace-event-card.component.scss'],
 })
 export class MarketplaceEventCardComponent {
-  @Input() block: any;                 // PageSettingDto (EVENT block)
-  @Input() dir: 'rtl' | 'ltr' = 'ltr'; // for RTL/LTR only
+  @Input() block: any;                
+  @Input() dir: 'rtl' | 'ltr' = 'ltr'; 
 
   @Output() details = new EventEmitter<any>();
   @ViewChild("viewEventModal", { static: true }) viewEventModal: ViewEventComponent;
   attachmentBaseUrl = AppConsts.attachmentBaseUrl;
 
-  /** Normalize: block may contain event in different shapes */
-  // get ev(): any {
-  //   return (
-  //     this.block?.appEvent ||                               // if block itself is GetAppEventForViewDto
-  //     this.block?.getAppEventForViewDto?.appEvent ||        // if block wraps dto
-  //     this.block?.getAppEventForViewDto ||                  // if dto already appEvent-like
-  //     null
-  //   );
-  // }
+
 
   get posterUrl(): string {
     const logo = this.block?.logoURL || this.block?.banarURL;
@@ -31,18 +23,7 @@ export class MarketplaceEventCardComponent {
     return `${this.attachmentBaseUrl}/${logo}`;
   }
 
-  // get startText(): string {
-  //   return this.ev?.fromDate ? new Date(this.ev.fromDate).toDateString() : '';
-  // }
 
-  // get endText(): string {
-  //   return this.ev?.toDate ? new Date(this.ev.toDate).toDateString() : '';
-  // }
-
-  // onDetailsClick() {
-  //   // emit normalized event object
-  //   this.details.emit(this.ev);
-  // }
 
   onImgErr(e: Event) {
     (e.target as HTMLImageElement).src = 'assets/placeholders/appitem-placeholder.png';

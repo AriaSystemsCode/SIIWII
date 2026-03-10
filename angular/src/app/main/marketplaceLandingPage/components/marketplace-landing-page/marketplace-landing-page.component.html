@@ -31,7 +31,7 @@
           ? 'center'
           : (s?.inputs?.titleAlignment === 'Right' ? 'right' : 'left')
       ">{{ s.inputs?.title }}</h4>
-        <app-single-row-callAction [sectionId]="s.sectionId"></app-single-row-callAction>
+        <app-single-row-callAction [sectionId]="s.sectionId" [blockTypeIsSingleOrMixed]="s.blockTypeIsSingleOrMixed"></app-single-row-callAction>
       </div>
 
 
@@ -43,7 +43,7 @@
           ? 'center'
           : (s?.inputs?.titleAlignment === 'Right' ? 'right' : 'left')
       " class="mx-2 mt-4 mb-2 ">{{ s.inputs?.title }}</h4>
-        <app-multi-row-callAction [sectionId]="s.sectionId"></app-multi-row-callAction>
+        <app-multi-row-callAction [sectionId]="s.sectionId" [blockTypeIsSingleOrMixed]="s.blockTypeIsSingleOrMixed"></app-multi-row-callAction>
       </div>
 
 

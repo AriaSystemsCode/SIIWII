@@ -23,6 +23,7 @@ export interface ApiRow {
   externalUrl?: string | null;
   name?:string
   titleAlignment:string
+  blockTypeIsSingleOrMixed:string
 }
 
 export interface SectionItem {
@@ -31,5 +32,5 @@ export interface SectionItem {
   inputs: any;
   sectionId?: number;   // ← add this
   rowIds?: number[];    // ← optional: all row ids in the group
-  
+
 }

@@ -121,7 +121,26 @@ a.btn {
         font-weight: 700 !important;
     }
 
-    .accountType_label {
+ 
+
+    .relation_button {
+        background-color: #4a0d4a;
+        color: white;
+        border-radius: 6px;
+        padding: 5px 8px;
+        font-size: 12px;
+    }
+
+    .relation_Status_button {
+        background-color: #FBFBFBFB;
+        color: #4A0D4A;
+        border-radius: 6px;
+        border: 1px solid #EEEEEEEE;
+        font-weight: 700;
+        font-size: 12px;
+    }
+}
+   .accountType_label {
         font-weight: 700;
         font-size: 13px;
         color:  #343a40 !important;;
@@ -143,25 +162,6 @@ a.btn {
         color: #4a0d4a !important;
 
     }
-
-    .relation_button {
-        background-color: #4a0d4a;
-        color: white;
-        border-radius: 6px;
-        padding: 5px 8px;
-        font-size: 12px;
-    }
-
-    .relation_Status_button {
-        background-color: #FBFBFBFB;
-        color: #4A0D4A;
-        border-radius: 6px;
-        border: 1px solid #EEEEEEEE;
-        font-weight: 700;
-        font-size: 12px;
-    }
-}
-
 .shadow,
 .shadowContainer {
     box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
@@ -248,16 +248,16 @@ a.btn {
     }
   }
   
-  /* ✅ Desktop: image يسار / body يمين */
+ 
   @media (min-width: 1024px) {
     .single-row-mode {
-      flex-direction: row;      /* side-by-side */
+      flex-direction: row;  
       align-items: flex-start;
     }
   
     .single-row-mode .single-item-photo {
       width: 200px !important;
-      height: 120px;            /* أو 100px حسب تصميمك */
+      height: 120px;         
       flex: 0 0 200px;
     }
   
@@ -266,11 +266,7 @@ a.btn {
     }
   }
   
-  /* keep your existing card mode */
-  .single-card-mode {
-    /* grid/card view styles if needed */
-  }
-  
+
 
   /* =========================
    CARD LAYOUT BASE
@@ -288,7 +284,7 @@ a.btn {
     min-width: 0;
   }
   
-  /* ✅ This pushes actions to the bottom/end of the card */
+  /* This pushes actions to the bottom/end of the card */
   .card-actions {
     margin-top: auto;
     display: flex;
@@ -296,17 +292,17 @@ a.btn {
     align-items: center;
     // gap: 10px;
     flex-wrap: wrap;
-    padding-top: 10px;
+    // padding-top: 10px;
   }
   
   /* make the relation blocks flow normally */
   .relationWrap {
     position: static !important;
     white-space: nowrap;
-    text-align: end;
+    // text-align: center;
   }
   
-  /* ✅ RTL/LTR safe alignment without JS left/right */
+  /*  RTL/LTR safe alignment without JS left/right */
   :host-context([dir="rtl"]) .card-actions {
     justify-content: flex-start;
   }
@@ -385,7 +381,7 @@ a.btn {
     align-items: stretch;
   }
   
-  /* ✅ row mode body must be column so actions can go bottom */
+  /*  row mode body must be column so actions can go bottom */
   .row-body {
     display: flex;
     flex-direction: column;
@@ -401,7 +397,7 @@ a.btn {
     align-items: center;
     gap: 10px;
     flex-wrap: wrap;
-    padding-top: 12px;
+    // padding-top: 12px;
   }
   
   /* RTL/LTR align */
@@ -488,3 +484,122 @@ color: #1B101B;
 margin-right: 4px;
 
   }
+
+
+
+  /* =========================
+NEW CARD VIEW
+========================= */
+.market-card {
+  background: #fff;
+  border: 1px solid #EDEDED;
+  border-radius: 12px;
+  overflow: hidden;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  box-shadow: rgba(0, 0, 0, 0.06) 0px 2px 8px;
+}
+
+.market-card__image {
+  width: 100%;
+  height: 210px;
+  background-color: #f8f8f8;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.market-card__body {
+  padding: 14px 16px 16px;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.market-card__title {
+  color: #1b101b;
+  font-size: 16px;
+  font-weight: 800 !important;
+  line-height: 1.35;
+  margin: 0 0 6px 0;
+  cursor: pointer;
+  // min-height: 42px;
+}
+
+.market-card__followers {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #9b9b9b;
+  font-size: 13px;
+  font-weight: 700;
+  // margin-bottom: 18px;
+}
+
+.market-card__followers-icon {
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
+}
+
+.market-card__actions {
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.market-follow-btn {
+  // min-height: 44px;
+  border-radius: 8px !important;
+  background: #5A0B5E !important;
+  color: #fff !important;
+  border: 0 !important;
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 14px;
+  padding: 10px 16px !important;
+}
+
+.market-status-btn {
+  background: #FBFBFB !important;
+  border: 1px solid #EEEEEE !important;
+  border-radius: 8px !important;
+  // width: 100%;
+  max-width: 180px;
+  color: #4A0D4A !important;
+}
+
+.market-status-btn__inner {
+  border: none !important;
+  background: transparent !important;
+  width: 100%;
+  min-height: 42px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: inherit;
+  font-weight: 700;
+}
+
+@media (max-width: 1023px) {
+  .market-card__image {
+    height: 180px;
+  }
+
+  .market-card__title {
+    font-size: 15px;
+  }
+}
+
+.accountType-sec {
+  white-space: nowrap;
+}

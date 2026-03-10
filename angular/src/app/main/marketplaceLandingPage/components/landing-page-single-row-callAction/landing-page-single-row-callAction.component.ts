@@ -1,10 +1,11 @@
-import { Component, Injector, Input, OnInit } from '@angular/core';
+import { Component, Injector, Input, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import {  SafeResourceUrl } from '@angular/platform-browser';
 import { AppComponentBase } from '@shared/common/app-component-base';
-import { PageSettingDto, SydObjectsServiceProxy, AppItemsServiceProxy, AppEntitiesServiceProxy, AccountDto, AccountsServiceProxy } from '@shared/service-proxies/service-proxies';
+import { AccountsServiceProxy, PageSettingDto, SydObjectsServiceProxy} from '@shared/service-proxies/service-proxies';
 import { AppConsts } from '@shared/AppConsts';
-
+import { ViewEventComponent } from '@app/main/AppEvent/Components/view-event.component';
+import {  finalize } from 'rxjs';
 
 type MediaKind = 'image' | 'video' | 'pdf' | 'other';
 
@@ -15,12 +16,17 @@ type MediaKind = 'image' | 'video' | 'pdf' | 'other';
 })
 export class LandingPageSinglrRowCallActionComponent extends AppComponentBase implements OnInit {
   @Input() sectionId!: number;
+   @Input()  blockTypeIsSingleOrMixed :string
+  @ViewChild("viewEventModal", { static: true }) viewEventModal: ViewEventComponent;
+
   items: PageSettingDto[] = [];
 
   attachmentBaseUrl = AppConsts.attachmentBaseUrl;
 
   attachmentSafeMap: Record<number, SafeResourceUrl | null> = {};
   numVisible: number = 4;
+  numVisibleSingle: number = 6;
+  
   private objectUrlById: Record<number, string> = {};
   acceptedAspectRatio;
   responsiveOptions = [
@@ -51,12 +57,41 @@ export class LandingPageSinglrRowCallActionComponent extends AppComponentBase im
     }
   ];
 
+    responsiveOptionsSingle = [
+    {
+      breakpoint: '1400px',
+      numVisible: 6,
+      numScroll: 6
+    },
+    {
+      breakpoint: '1199px',
+      numVisible: 6,
+      numScroll: 6
+    },
+    {
+      breakpoint: '991px',
+      numVisible: 3,
+      numScroll: 3
+    },
+    {
+      breakpoint: '767px',
+      numVisible: 2,
+      numScroll: 2
+    },
+    {
+      breakpoint: '575px',
+      numVisible: 1,
+      numScroll: 1
+    }
+  ];
+
   languageSettingName:string  =AppConsts.languageSettingName;
 
   constructor(
     injector: Injector,
     private syd: SydObjectsServiceProxy,
     private router: Router,
+    private _accountsServiceProxy: AccountsServiceProxy,
   ) { super(injector); }
 
   ngOnInit() {
@@ -252,7 +287,65 @@ onAttachmentClick(b: PageSettingDto): void {
 }
 
 
+  openEventDetails(id: any) {
+  
+        this.viewEventModal.show(id,0);
+
+  }
+
+createRelation(account,option: { connectLabel: string; connectionEntityId: number; defaultVisibility: string }) {
+  if (!option?.connectionEntityId) return;
+
+  this.showMainSpinner();
+
+  this._accountsServiceProxy
+    .applyRelationOnProfile(
+      account?.account?.id,
+      undefined,
+      (option.defaultVisibility || '').toLowerCase() === 'public',
+      option.connectionEntityId
+    )
+    .pipe(finalize(() => this.hideMainSpinner()))
+    .subscribe((result: any) => {
+
+      const raw = (typeof result === 'string' ? result : result?.result) || '';
+      const parsed = this.parseRelationResult(raw);
+
+      account.availableConnections = [];
+      account.avaliableConnectionName = '';
+     account.connectionName = parsed.connectionName;  
+      account.disConnectLabel = parsed.disconnectLabel;    
+    });
+}
+
+disconnect(account): void {
+  const id = account?.account?.id;
+  if (!id) return;
+
+  this.showMainSpinner();
+
+  this._accountsServiceProxy
+    .disconnect(id)
+    .pipe(finalize(() => this.hideMainSpinner()))
+    .subscribe((res: any[]) => {
+      this.notify.success(this.l('SuccessfullyDisconnected'));
 
 
+      const options = Array.isArray(res) ? res : [];
+      account.connectionName = '';
+      account.disConnectLabel = '';
+      account.availableConnections = options;
+      account.avaliableConnectionName = options?.[0]?.connectLabel || '';
+    });
+}
+private parseRelationResult(raw: string): { connectionName: string; disconnectLabel: string } {
+  const text = (raw || '').trim();
+
+  const idx = text.indexOf('-');
+  const connectionName = idx > -1 ? text.slice(0, idx).trim() : text;
+  const disconnectLabel = idx > -1 ? text.slice(idx + 1).trim() : 'MPActionDisconnect';
+
+  return { connectionName, disconnectLabel };
+}
 
 }

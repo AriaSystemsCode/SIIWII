@@ -147,7 +147,7 @@
                                             class="btn   pr-1 text-center text-primary toolbar-btn btn_Primary ToggleView">
 
                                             <i class="d-inline-block w-100" [ngClass]="
-                                                    singleItemPerRowMode
+                                                    cardsViewMode
                                                         ? 'flaticon2-menu'
                                                         : 'fa fa-bars'
                                                 "></i>
@@ -232,22 +232,20 @@
                                 <div class="col d-flex flex-column justify-content-between">
                              
                                     <div class="row  pl-2 pr-2">
-                                        <div *ngFor="
-                                                let account of accounts;
-                                                index as i;
-                                                let last = last
-                                            " class="col-12 mb-4" [ngClass]="{
-                                                'col-md-12 single-item-per-row-layout':
-                                                    singleItemPerRowMode,
-                                                'col-lg-6': !singleItemPerRowMode && filterVisiblelg,
-                                                'col-lg-4':!singleItemPerRowMode && !filterVisiblelg,
-                                                'col-md-6' : !singleItemPerRowMode && !filterVisiblelg,
-                                                ' pb-2':
-                                                    singleItemPerRowMode && !last
-                                            }">
+                                    <div
+  *ngFor="let account of accounts; index as i; let last = last"
+  class="mb-4"
+  [ngClass]="{
+    'col-12 col-md-6 col-lg-3 cards-mode-with-filter': cardsViewMode && filterVisiblelg,
+    'col-12 col-md-6 col-lg-2 cards-mode-no-filter': cardsViewMode && !filterVisiblelg,
+
+    'col-12 col-md-6 col-lg-6 row-mode-with-filter': !cardsViewMode && filterVisiblelg,
+    'col-12 col-md-6 col-lg-4 row-mode-no-filter': !cardsViewMode && !filterVisiblelg
+  }"
+>
                                             <app-account-card [account]="account" [fromMarketplace]="fromMarketplace"
-                                                [singleItemPerRowMode]="
-                                                    singleItemPerRowMode
+                                                [cardsViewMode]="
+                                                    cardsViewMode
                                                 " (deleteMe)="
                                                     askToConfirmDelete(
                                                         $event,
