@@ -293,30 +293,5 @@ dynamicInputsComponents!: QueryList<dynamicInputs>;
          this.dynamicInputsComponents.first.saveAll(appEntityDto);
 
   }
-  
 
-
-
-  /* //i49 
-Mr-Hassan
-1. relationId alwayes = 0 from ''getAccountForView" 
-So when call 'GetAppEntityForEdit?Id=0" it return internal server error 
-
-2. In settings we use 'Dropdownlist' , You send dynamic service API inside validEntries attributes 
-So we need to discuss how handle the standard  dropdown values
--------------
-Mariam
- 1. Warningmessage condition should be dynamic
- 2. shipvia dropdown conition should be dynamic
-
- if user select ship via  should get its related SHIPPINGCHARGE and SHIPPINGMINIMUMAMOUNT
-and update the extra data of the relation with the same name
-*** GetAppEntityForEdit?Id=Shipvia ID
-return the extra data SHIPPINGCHARGE and SHIPPINGMINIMUMAMOUNT
-*** then set the values at dynamic component for SHIPPINGCHARGE and SHIPPINGMINIMUMAMOUNT
------------
-Esraa
- 1. UpdateCharges(Charges [], TransactionID) >> return total order amount
- 2. check saving 
-*/
 }
