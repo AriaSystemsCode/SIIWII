@@ -494,16 +494,7 @@ export class dynamicInputs extends AppComponentBase implements OnInit, OnChanges
 
 
   saveAll(appEntityDto: AppEntityDto): void {
-    let success = false;
     this.showMainSpinner();
-
-    appEntityDto.extraDataFileTypeIndex = appEntityDto.entityExtraData
-      .map((item, index) => {
-        const value = item?.attributeValue;
-        return value != null && String(value)?.includes('|') ? index : -1;
-      })
-      .filter(i => i !== -1);
-
     this._appEntitiesServiceProxy.saveEntity(appEntityDto)
       .pipe(
         finalize(() => {

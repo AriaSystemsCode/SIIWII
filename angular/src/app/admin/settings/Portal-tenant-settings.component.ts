@@ -187,6 +187,8 @@ dynamicInputsComponents!: QueryList<dynamicInputs>;
   saveAll(): void {
     let success = false;
 
+        const extraDataList = this.dynamicInputsForViewDto?.entityExtraData || [];
+
     let appEntityDto : AppEntityDto =new AppEntityDto();
     appEntityDto.entityExtraData =  this.dynamicInputsForViewDto?.entityExtraData || [];
     appEntityDto.id= this.tenantEntityId;
@@ -196,7 +198,9 @@ dynamicInputsComponents!: QueryList<dynamicInputs>;
     appEntityDto.code= this.dynamicInputsForViewDto.appEntity.code;
     appEntityDto.name=this.dynamicInputsForViewDto.appEntity.name;
 
-   
+    appEntityDto.extraDataFileTypeIndex = appEntityDto.entityExtraData
+            .map((item, index) => item.attributeValue && item.attributeValue.includes('|') ? index : -1)
+            .filter(index => index !== -1);
      
             this.dynamicInputsComponents.first.saveAll(appEntityDto);
 
@@ -359,6 +363,7 @@ dynamicInputsComponents!: QueryList<dynamicInputs>;
     }
   }
 
+    
   onExtraAttributesChanged(dataFromChild: any[]) {
     this.formTouched = true;
     if (!this.dynamicInputsForViewDto) {
