@@ -33,6 +33,10 @@ using System.Runtime.CompilerServices;
 using onetouch.Accounts.Dtos;
 using onetouch.Accounts;
 using onetouch.AppContacts;
+using Org.BouncyCastle.Crypto;
+using onetouch.Migrations;
+using Abp.Net.Mail;
+using System.Net.Mail;
 
 namespace onetouch.SystemObjects
 {
@@ -59,6 +63,7 @@ namespace onetouch.SystemObjects
         private readonly IAccountsAppService _accountsAppService;
         private readonly IRepository<AppContact, long> _appContactRepository;
         private readonly IRepository<SycEntityObjectCategory, long> _sycEntityObjectCategoryRepository;
+        private readonly IEmailSender _emailSender;
         //I49[End]
         public SydObjectsAppService(
             IRepository<SydObject, long> sydObjectRepository,
@@ -76,7 +81,7 @@ namespace onetouch.SystemObjects
             IRepository<onetouch.SycCurrencyExchangeRates.SycCurrencyExchangeRates, long> sycCurrencyExchangeRateRepository,
             IMessageAppService messageAppService, ISycEntityObjectCategoriesAppService sycEntityObjectCategoriesAppService,
             IAccountsAppService accountsAppService, IRepository<AppContact, long> appContactRepository,
-            IRepository<SycEntityObjectCategory, long> sycEntityObjectCategoryRepository) 
+            IRepository<SycEntityObjectCategory, long> sycEntityObjectCategoryRepository, IEmailSender emailSender) 
 		  {
 			_sydObjectRepository = sydObjectRepository;
 			_sydObjectsExcelExporter = sydObjectsExcelExporter;
@@ -98,6 +103,7 @@ namespace onetouch.SystemObjects
             _sycEntityObjectCategoriesAppService = sycEntityObjectCategoriesAppService;
             _accountsAppService = accountsAppService;
             _appContactRepository = appContactRepository;
+            _emailSender = emailSender;
             //I49[End]
         }
 
@@ -517,9 +523,13 @@ namespace onetouch.SystemObjects
                     {
                         foreach (var block in extraDataBlocks)
                         {
-                            var blockDetail = await _appEntityRepository.GetAll().Include(z=>z.EntityExtraData)
-                                .Include(z=>z.EntityAttachments).ThenInclude(z=>z.AttachmentFk)
+                            var blockDetail = await _appEntityRepository.GetAll().Include(z => z.EntityExtraData)
+                                .Include(z => z.EntityAttachments).ThenInclude(z => z.AttachmentFk)
                                 .Where(z => z.Id == block.EntityId).FirstOrDefaultAsync();
+                            if (blockDetail == null)
+                                continue;
+                            if(blockDetail.EntityObjectStatusId != sectionActiveStatusId)
+                                continue;
                             var item = new PageSettingDto();
                             var sectionOrderExtraDate = blockDetail.EntityExtraData.FirstOrDefault(z => z.AttributeId == 2002);
                             if (sectionOrderExtraDate != null)
@@ -528,20 +538,27 @@ namespace onetouch.SystemObjects
                             var linkExtraData = block.EntityFk.EntityExtraData.FirstOrDefault(z => z.AttributeId == 2004);
                             if (linkExtraData != null)
                                 item.LinkPageUrl = linkExtraData.AttributeValue;
-                            
-                            item.Type = SliderEnum.SM; 
+
+                            item.Type = SliderEnum.SM;
                             item.Name = blockDetail.Name;
                             //item.Description = block.EntityFk.Name;
                             item.Code = blockDetail.Code;
                             item.Description = blockDetail.Notes;
 
                             if (blockDetail.EntityAttachments != null && blockDetail.EntityAttachments.Count > 0)
+                            {
                                 item.Image = (blockDetail.EntityAttachments.FirstOrDefault(x => x.IsDefault == true) == null ?
                                            (blockDetail.EntityAttachments.FirstOrDefault() != null ? "attachments/" + (blockDetail.TenantId.HasValue ? block.EntityFk.TenantId : -1) + "/" +
                                            blockDetail.EntityAttachments.FirstOrDefault().AttachmentFk.Attachment : "")
                                            : "attachments/" + (blockDetail.TenantId.HasValue ? blockDetail.TenantId : -1) + "/" +
                                            blockDetail.EntityAttachments.FirstOrDefault(x => x.IsDefault == true).AttachmentFk.Attachment);
-
+                                item.EntityAttachments = ObjectMapper.Map<List<AppEntityAttachmentDto>>(blockDetail.EntityAttachments);
+                                foreach (var attDto in item.EntityAttachments)
+                                {
+                                    attDto.FileName = imagesUrl + (blockDetail.TenantId == null ? "-1" : blockDetail.TenantId.ToString()) + @"/" + attDto.FileName;
+                                    attDto.Url = attDto.FileName;
+                                }
+                            }
                             item.id = blockDetail.Id;
 
                             var blockTypeExtraDate = blockDetail.EntityExtraData.FirstOrDefault(z => z.AttributeId == 2001);
@@ -584,9 +601,31 @@ namespace onetouch.SystemObjects
                                                     a.TenantId != null && a.PartnerId == null && a.ParentId == null).FirstOrDefaultAsync();
                                                 if (account != null)
                                                 {
-                                                    var brandObject = await _appEntityRepository.GetAll().Where(z => z.Code == blockValueExtraDate.AttributeValue.TrimEnd() && z.TenantId== account.TenantId).FirstOrDefaultAsync();
-                                                    if (brandObject!=null)
-                                                    item.GetAppEntityForViewDto = await _appEntitiesAppService.GetAppEntityForView(brandObject.Id);
+                                                    var brandObject = await _appEntityRepository.GetAll().Include(x=>x.EntityAttachments).ThenInclude(x=>x.AttachmentFk)
+                                                        .Where(z => z.Code == blockValueExtraDate.AttributeValue.TrimEnd() && z.TenantId== account.TenantId).FirstOrDefaultAsync();
+                                                    if (brandObject != null)
+                                                    {
+                                                        item.GetAppEntityForViewDto = await _appEntitiesAppService.GetAppEntityForView(brandObject.Id);
+                                                        //if (brandObject.EntityAttachments.Count > 0)
+                                                        {
+                                                            if (brandObject.EntityAttachments!= null && brandObject.EntityAttachments.Count > 0)
+                                                            {
+                                                                
+                                                                item.GetAppEntityForViewDto.AppEntity.EntityAttachments = ObjectMapper.Map<List<AppEntityAttachmentDto>>(brandObject.EntityAttachments);
+                                                                foreach (var attDto in item.GetAppEntityForViewDto.AppEntity.EntityAttachments)
+                                                                {
+                                                                    attDto.FileName = imagesUrl + (brandObject.TenantId == null ? "-1" : brandObject.TenantId.ToString()) + @"/" + attDto.FileName;
+                                                                    attDto.Url = attDto.FileName;
+                                                                }
+                                                            }
+                                                            /*var imageAttch = brandObject.EntityAttachments.Where(z=>z.AttachmentCategoryCode.ToUpper()=="IMAGE" ||
+                                                            z.AttachmentCategoryCode.ToUpper() == "BANNER" ||
+                                                            z.AttachmentCategoryCode.ToUpper() == "LOGO").FirstOrDefault();
+                                                            if (imageAttch!= null)
+                                                            item.Image = "attachments/" + (blockDetail.TenantId.HasValue ? blockDetail.TenantId : -1) 
+                                                                    + "/" + imageAttch .AttachmentFk.Attachment;*/
+                                                        }
+                                                    }
                                                 }
                                             }
                                             break;
@@ -617,6 +656,38 @@ namespace onetouch.SystemObjects
             }
             return result;
         }
-                //I49[End]
+
+        [AbpAllowAnonymous]
+        public async Task SendContactUsInfo(string firstName, string lastName, string email,string phone,string message)
+        {
+            string salesEmail = await _appEntitiesAppService.GetHostSettingValue(1219);
+            string contactUsEmailTemplate = await _appEntitiesAppService.GetHostSettingValue(1220);
+            
+            //string salesEmail = "customercare@ariasystems.biz";
+            string contactUsData = "First Name:" + firstName + "\r\n" +
+                        "Last Name:" + lastName + "\r\n" +
+                        "Email:" + email + "\r\n" +
+                        "Phone :" + phone + "\r\n" +
+                        "Message:" + message + "\r\n" ;
+            string body = contactUsEmailTemplate.Replace("CONTACTUSINFO", contactUsData);
+            body = body.Replace("\r\n", "<br><br>");
+            body = body.Replace("\n", "<br><br>");
+            await _emailSender.SendAsync(new MailMessage
+            {
+                To = { salesEmail },
+                Subject = "Registration Request",
+                Body = "<!DOCTYPE html><html><head/><body><p>"+body+ "<br><br></body></html>",
+                /*Body = "<!DOCTYPE html><html><head/><body><p>Dear Support, " + "<br><br>" +
+                        "A new enquiry has been made on the Orbit website,\r\nDetails are as follows:" + "<br><br>" +
+                        "First Name:"+ firstName + "<br><br>"+
+                        "Last Name:" + lastName + "<br><br>" +
+                        "Email:" + email + "<br><br>" +
+                        "Phone :" + phone + "<br><br>" +
+                        "Message:" + message + "<br><br></body></html>",*/
+                IsBodyHtml = true
+            });
+
+        }
+        //I49[End]
     }
 }

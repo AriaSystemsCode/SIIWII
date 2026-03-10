@@ -1,4 +1,4 @@
-<div class="container-s ">
+<div class="container-s mb-lg-5 pb-lg-5">
   <section>
     <div class="position-relative">
       <img class=" p-0 w-100 cover-img" [src]="attachmentBaseUrl + '/' + accountDataForView?.coverUrl"
@@ -131,12 +131,12 @@
   </section>
 
   <div class="card marketplaceAccountProfile">
-    <p-tabView styleClass="tabview-custom" [(activeIndex)]="activeTabIndex" *ngIf="accountDataForView">
+    <p-tabView styleClass="tabview-custom" [(activeIndex)]="activeTabIndex" *ngIf="accountDataForView"   (activeIndexChange)="onActiveIndexChange($event)">
       <p-tabPanel header="Overview">
         <app-overview-tab [accountDataForView]="accountDataForView" [marketPlaceData]="marketPlaceData" 
           (activeTabIndexBtn)="navigateToTab($event)"></app-overview-tab>
       </p-tabPanel>
-      <p-tabPanel *ngIf="accountDataForView?.accountType == 'BUSINESS'" header="Products">
+      <p-tabPanel *ngIf="accountDataForView?.accountType == 'BUSINESS'" header="Products" >
         <app-marketplace-products [fromMarketAcoount]="true" 
           [accountDataForView]="accountDataForView" [marketplaceAccCurrency]="accountDataForView.currencyName"></app-marketplace-products>
       </p-tabPanel>

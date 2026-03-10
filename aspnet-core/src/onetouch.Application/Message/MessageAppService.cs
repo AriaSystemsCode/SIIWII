@@ -237,11 +237,11 @@ namespace onetouch.Message
                                        ReceiveDate = o.CreationTime,
                                        EntityCode = o.EntityCode,
                                        Id = o.Id,
-                                       SenderName = UserManager.Users.Where(x => x.Id == (long)o.SenderId).Select(x => x.Name).FirstOrDefault().ToString()
+                                       SenderName = UserManager.Users.Where(x => x.Id == (long)o.SenderId).FirstOrDefault() != null? UserManager.Users.Where(x => x.Id == (long)o.SenderId).Select(x => x.Name).FirstOrDefault().ToString()
                                        + "." + UserManager.Users.Where(x => x.Id == (long)o.SenderId).Select(x => x.Surname).FirstOrDefault().ToString()
                                         + " @ "+
-                                       (UserManager.Users.Where(x => x.Id == (long)o.SenderId).Select(x => x.TenantId).FirstOrDefault().Value  == null ?
-                                       L("Onetouch") : TenantManager.Tenants.Where(x => x.Id ==(UserManager.Users.Where(x => x.Id == (long)o.SenderId).Select(x => x.TenantId).FirstOrDefault())).Select(x => x.TenancyName).FirstOrDefault().ToString()),
+                                       (UserManager.Users.Where(x => x.Id == (long)o.SenderId).FirstOrDefault() == null || UserManager.Users.Where(x => x.Id == (long)o.SenderId).Select(x => x.TenantId).FirstOrDefault().Value  == null ?
+                                       L("Onetouch") : TenantManager.Tenants.Where(x => x.Id ==(UserManager.Users.Where(x => x.Id == (long)o.SenderId).Select(x => x.TenantId).FirstOrDefault())).Select(x => x.TenancyName).FirstOrDefault().ToString()):"",
                                        ThreadId = o.ThreadId,
                                        ParentId = o.ParentId,
                                        //xxx
@@ -296,10 +296,14 @@ namespace onetouch.Message
                 foreach (var message in listmessages)
                 {
                     message.Messages.RecipientsName = GetUsersNamesByID(message.Messages.To).ToString();
-                    var profilePictureId = UserManager.Users.FirstOrDefault(y => y.Id == message.Messages.SenderId).ProfilePictureId;
-                    if (profilePictureId != null)
-                    { 
-                        message.Messages.ProfilePictureId = (Guid)profilePictureId;
+                    var user = UserManager.Users.FirstOrDefault(y => y.Id == message.Messages.SenderId);
+                    if (user != null)
+                    {
+                        var profilePictureId = user.ProfilePictureId;
+                        if (profilePictureId != null)
+                        {
+                            message.Messages.ProfilePictureId = (Guid)profilePictureId;
+                        }
                     }
                     message.Messages.RelatedEntityObjectTypeCode = (message.Messages.RelatedEntityObjectTypeCode == "SALESORDER" || message.Messages.RelatedEntityObjectTypeCode == "PURCHASEORDER") ? "transaction": message.Messages.RelatedEntityObjectTypeCode;
                     if (message.Messages.EntityObjectTypeCode == "COMMENT")
@@ -324,22 +328,30 @@ namespace onetouch.Message
                                 {
                                     message.Messages.RelatedEntityObjectTypeCode = "Post";
                                     message.Messages.RelatedEntityObjectTypeDescription = post.Description;
-                                    message.Messages.RelatedEntityCreatorName = UserManager.Users.Where(x => x.Id == (long)post.CreatorUserId).Select(x => x.Name).FirstOrDefault().ToString()
-                                       + "." + UserManager.Users.Where(x => x.Id == (long)post.CreatorUserId).Select(x => x.Surname).FirstOrDefault().ToString()
-                                        + " @ " +
-                                       (UserManager.Users.Where(x => x.Id == (long)post.CreatorUserId).Select(x => x.TenantId).FirstOrDefault().Value == null ?
-                                       L("Onetouch") : TenantManager.Tenants.Where(x => x.Id == (UserManager.Users.Where(x => x.Id == (long)post.CreatorUserId).Select(x => x.TenantId).FirstOrDefault())).Select(x => x.TenancyName).FirstOrDefault().ToString());
+                                    var userObj = UserManager.Users.Where(x => x.Id == (long)post.CreatorUserId).FirstOrDefault();
+                                    if (userObj != null)
+                                    {
+                                        message.Messages.RelatedEntityCreatorName = UserManager.Users.Where(x => x.Id == (long)post.CreatorUserId).Select(x => x.Name).FirstOrDefault().ToString()
+                                           + "." + UserManager.Users.Where(x => x.Id == (long)post.CreatorUserId).Select(x => x.Surname).FirstOrDefault().ToString()
+                                            + " @ " +
+                                           (UserManager.Users.Where(x => x.Id == (long)post.CreatorUserId).Select(x => x.TenantId).FirstOrDefault().Value == null ?
+                                           L("Onetouch") : TenantManager.Tenants.Where(x => x.Id == (UserManager.Users.Where(x => x.Id == (long)post.CreatorUserId).Select(x => x.TenantId).FirstOrDefault())).Select(x => x.TenancyName).FirstOrDefault().ToString());
+                                    }
                                 }
                             }
                             else {
                                 if (ent.EntityObjectTypeCode.ToUpper() == "SALESORDER" || ent.EntityObjectTypeCode.ToUpper() == "PURCHASEORDER")
                                 {
                                     message.Messages.RelatedEntityObjectTypeDescription = ent.Name;
-                                    message.Messages.RelatedEntityCreatorName = UserManager.Users.Where(x => x.Id == (long)ent.CreatorUserId).Select(x => x.Name).FirstOrDefault().ToString()
+                                    var userObj = UserManager.Users.Where(x => x.Id == (long)ent.CreatorUserId).FirstOrDefault();
+                                    if (userObj != null)
+                                    {
+                                        message.Messages.RelatedEntityCreatorName = UserManager.Users.Where(x => x.Id == (long)ent.CreatorUserId).Select(x => x.Name).FirstOrDefault().ToString()
                                        + "." + UserManager.Users.Where(x => x.Id == (long)ent.CreatorUserId).Select(x => x.Surname).FirstOrDefault().ToString()
                                         + " @ " +
                                        (UserManager.Users.Where(x => x.Id == (long)ent.CreatorUserId).Select(x => x.TenantId).FirstOrDefault().Value == null ?
                                        L("Onetouch") : TenantManager.Tenants.Where(x => x.Id == (UserManager.Users.Where(x => x.Id == (long)ent.CreatorUserId).Select(x => x.TenantId).FirstOrDefault())).Select(x => x.TenancyName).FirstOrDefault().ToString());
+                                    }
                                 }
                             }
                         }
@@ -356,6 +368,8 @@ namespace onetouch.Message
         [AbpAllowAnonymous]
         public async Task<MessagePagedResultDto> GetAllComments(GetAllMessagesInput input)
         {
+            // return new MessagePagedResultDto(0, 0, new List<GetMessagesForViewDto>());
+
             var entityObjectTypeComment = await _helper.SystemTables.GetEntityObjectTypeComment();
             var entityObjectTypeMessage = await _helper.SystemTables.GetEntityObjectTypeMessageID();
             var orgComponentId = input.MainComponentEntitlyId;
@@ -741,10 +755,14 @@ namespace onetouch.Message
                     {
                         item.Url = @"attachments\" + AbpSession.TenantId + @"\" + item.FileName;
                     }
-                    var profilePictureId = UserManager.Users.FirstOrDefault(y => y.Id == message.Messages.SenderId).ProfilePictureId;
-                    if (profilePictureId != null)
+                    var user = UserManager.Users.FirstOrDefault(y => y.Id == message.Messages.SenderId);
+                    if (user != null)
                     {
-                        message.Messages.ProfilePictureId = (Guid)profilePictureId;
+                        var profilePictureId = UserManager.Users.FirstOrDefault(y => y.Id == message.Messages.SenderId).ProfilePictureId;
+                        if (profilePictureId != null)
+                        {
+                            message.Messages.ProfilePictureId = (Guid)profilePictureId;
+                        }
                     }
                     //abc
                    
@@ -1262,7 +1280,8 @@ namespace onetouch.Message
                 message.ThreadId = input.ThreadId;
                 await _MessagesRepository.InsertAsync(message);
                 //I49[Start]
-                if ((appEntity.Name == "Message" || appEntity.Name == "COMMENT") && !string.IsNullOrEmpty(recipientEmail))
+                string notificationSetting = await _appEntitiesAppService.GetTenantSettingValue(1232);
+                if (notificationSetting.TrimEnd().ToLower()=="true" && (appEntity.Name == "Message" || appEntity.Name == "COMMENT") && !string.IsNullOrEmpty(recipientEmail))
                 {
                     await _emailSender.SendAsync(new MailMessage
                     {
@@ -2089,7 +2108,7 @@ namespace onetouch.Message
                         }
                     }
                     AppEntityRating rating = new AppEntityRating();
-                    var contactEntityExtraData = _appEntityExtraDataRepository.GetAll().Include(z => z.EntityFk).FirstOrDefault(x => x.EntityFk.TenantId == AbpSession.TenantId &&
+                    var contactEntityExtraData = _appEntityExtraDataRepository.GetAll().Include(z => z.EntityFk).FirstOrDefault(x => //x.EntityFk.TenantId == AbpSession.TenantId &&
                              x.AttributeId == 715 && x.AttributeValue == AbpSession.UserId.ToString());
                     if (contactEntityExtraData != null)
                     {

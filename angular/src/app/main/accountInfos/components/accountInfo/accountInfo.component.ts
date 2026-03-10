@@ -125,7 +125,7 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit {
     connectionCount: number;
     firstLoad: boolean = true
 
-    entityObjectType: string = "TENANTCONTACT";
+    entityObjectType: string = "";
     accountInfoOldCurrencyId = 0;
     changeCurrency: boolean = false;
 
@@ -139,6 +139,7 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit {
     imgCropperModalRef: BsModalRef
     accData: GetAccountForViewDto
     editedContactPerData: any
+    relationId:number = 0 ;
     constructor(
         injector: Injector,
         private _route: ActivatedRoute,
@@ -163,14 +164,21 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit {
     }
 
 
-    async ngOnInit() {
-        await this.handleComponentMode()
 
-        this.isHost = !this._abpSessionService.tenantId;
-        this.handleRoutingChange()
-        this.initUploaders();
-        this.GetContactDefaults();
+    async ngOnInit() {
+
+      if (this.accountLevel == null) {
+        this.accountLevel = AccountLevelEnum.Profile;
+      }
+    
+      await this.handleComponentMode();
+    
+      this.isHost = !this._abpSessionService.tenantId;
+      this.handleRoutingChange();
+      this.initUploaders();
+      this.GetContactDefaults();
     }
+    
     get isExternalAccount(): boolean { return this.accountLevel == AccountLevelEnum.External && !this.viewMode }
     get isExternalAccountCreate(): boolean { return this.isExternalAccount && !Boolean(this.accountId) }
     get isExternalAccountEdit(): boolean { return this.isExternalAccount && Boolean(this.accountId) }
@@ -228,7 +236,7 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit {
                     break;
                 case this.accountInfoPageTabsEnum[AccountInfoPageTabs.ProfileCreateOrEdit]:
                     if (this.isMyAccount) this.getMyAccountDataForEdit()
-                    else if (this.isManualAccountEdit || this.isExternalAccountEdit || this.accountDataForView.isConnected) this.getAccountDataForEdit()
+                    else if (this.isManualAccountEdit || this.isExternalAccountEdit || this.accountDataForView?.isConnected) this.getAccountDataForEdit()
                     break;
                 default:
                     break;
@@ -344,8 +352,8 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit {
         this.getCurrencies();
         this.getPhoneTypes();
         this.allPriceLevel = this.getPriceLevel();
-        this.getShipVia();
-        this.getPaymentTerms();
+       // this.getShipVia();
+       // this.getPaymentTerms();
         this.getAccountTypes();
     }
 
@@ -443,7 +451,7 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit {
                     }
                 )
             this.accData = JSON.parse(JSON.stringify(result));
-
+        this.relationId = result.relationId ? result.relationId : 0
         }
 
         else {
@@ -480,13 +488,14 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit {
         this.isSync = result ? result.isSync : false;
         this.connectionCount = result ? result.connectionCount : 0;
         this.accountDataForView = result ? result.account : undefined
+        this.relationId = result.relationId ? result.relationId : 0
         this.accountContactForView = result ? result.contact : undefined
         this.isRecordOwner = this.accountDataForView?.id == this.appSession.user?.accountId ? true : false
         if (this.accountDataForView.logoUrl) this.companyLogo = `${this.attachmentBaseUrl}/${this.accountDataForView.logoUrl}`;
         if (this.accountDataForView.coverUrl) this.coverPhoto = `${this.attachmentBaseUrl}/${this.accountDataForView.coverUrl}`;
     }
 
-
+    private hasRequestedCode = false;
     setProfileData(result: GetAccountInfoForEditOutput = undefined) {
         if (result) {
             this.accountInfoTemp = CreateOrEditAccountInfoDto.fromJS(result.accountInfo);
@@ -497,78 +506,104 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit {
             this.currencyIdName = result.currencyName;
             this.languageIdName = result.languageName;
         }
+        if(this.isManualAccountCreate){
+            this.setManualAccCode()
+        }
+     
+        if (!this.accountInfoTemp.entityAttachments) this.accountInfoTemp.entityAttachments = [];
+        if (!this.accountInfoTemp.entityCategories) this.accountInfoTemp.entityCategories = [];
+        if (!this.accountInfoTemp.entityClassifications) this.accountInfoTemp.entityClassifications = [];
+        if (!this.accountInfoTemp.accountType) this.accountInfoTemp.accountType = '';
+        if (!this.accountInfoTemp.accountTypeId) this.accountInfoTemp.accountTypeId = 0;
+    
+        if (!this.accountInfoTemp.contactAddresses) this.accountInfoTemp.contactAddresses = [];
+        if (!this.accountInfoTemp.contactPaymentMethods) this.accountInfoTemp.contactPaymentMethods = [];
+        if (!this.accountInfoTemp.branches) this.accountInfoTemp.branches = [];
+    
 
-        if (!this.accountInfoTemp.entityAttachments) this.accountInfoTemp.entityAttachments = []
-        if (!this.accountInfoTemp.entityCategories) this.accountInfoTemp.entityCategories = []
-        if (!this.accountInfoTemp.entityClassifications) this.accountInfoTemp.entityClassifications = []
-        if (!this.accountInfoTemp.accountType) this.accountInfoTemp.accountType = ""
-        if (!this.accountInfoTemp.accountTypeId) this.accountInfoTemp.accountTypeId = 0
-
-        if (!this.accountInfoTemp.contactAddresses) this.accountInfoTemp.contactAddresses = []
-        if (!this.accountInfoTemp.contactPaymentMethods) this.accountInfoTemp.contactPaymentMethods = []
-        if (!this.accountInfoTemp.branches) this.accountInfoTemp.branches = []
-
-        if (!this.accountInfoTemp.id) {
-          
-            if (!this.accountInfoTemp.languageId) {
-
-                this._AccountsServiceProxy.getMyAccountForEdit().subscribe(async result => {
-                    if (result) {
-                        if (!this.accountInfoTemp.code) {
-                            let sequance = "";
-
-
-                            const getNextEntityCodeRes = await this._sycIdentifierDefinitionsServiceProxy.getNextEntityCode(this.entityObjectType, this.appSession.tenantId).toPromise()
-                            if (getNextEntityCodeRes)
-                                sequance = getNextEntityCodeRes;
-
-                            this.accountInfoTemp.code = "M" + sequance;
-                        }
-
-                        this.languageIdName = result.languageName;
-                        this.accountInfoTemp.languageId = result.accountInfo.languageId;
-
-
-                        this.accountInfoTemp.paymentTermsId = !result?.accountInfo?.id ? this.paymentTermsId :
-                            result.accountInfo?.paymentTermsId ? result.accountInfo?.paymentTermsId : this.paymentTermsId;
-                        this.accountInfoTemp.shipViaId =
-                            !result?.accountInfo?.id ? this.shipViaId :
-                                result.accountInfo?.shipViaId ? result.accountInfo?.shipViaId : this.shipViaId;
+        if (!this.accountInfoTemp.id && this.isMyAccount) {
+    
+      
+            if (!this.accountInfoTemp.languageId && !this.hasRequestedCode) {
+                this.hasRequestedCode = true;
+    
+                this._AccountsServiceProxy.getMyAccountForEdit().subscribe(async myResult => {
+                    if (!myResult) {
+                        return;
                     }
-
-                })
+    
+             
+                    if (!this.accountInfoTemp.code) {
+                        let sequance = '';
+    
+                        const typeCode =
+                            myResult?.accountInfo?.accountTypeId == 19
+                                ? 'BUSINESS'
+                                : myResult?.accountInfo?.accountTypeId == 21
+                                    ? 'PERSONAL'
+                                    : 'GROUP';
+                                    this.entityObjectType =typeCode
+                        const getNextEntityCodeRes = await this._sycIdentifierDefinitionsServiceProxy
+                            .getNextEntityCode(typeCode, this.appSession.tenantId)
+                            .toPromise();
+    
+                        if (getNextEntityCodeRes) {
+                            
+                            sequance = getNextEntityCodeRes;
+                            this.accountInfoTemp.code = 'M' + sequance;
+                        }
+                    }
+    
+                    // Default language
+                    if (!this.accountInfoTemp.languageId) {
+                        this.languageIdName = myResult.languageName;
+                        this.accountInfoTemp.languageId = myResult.accountInfo.languageId;
+                    }
+    
+                    // Default payment terms / ship via
+                    this.accountInfoTemp.paymentTermsId = !myResult?.accountInfo?.id
+                        ? this.paymentTermsId
+                        : (myResult.accountInfo?.paymentTermsId ?? this.paymentTermsId);
+    
+                    this.accountInfoTemp.shipViaId = !myResult?.accountInfo?.id
+                        ? this.shipViaId
+                        : (myResult.accountInfo?.shipViaId ?? this.shipViaId);
+                });
             }
+    
+        } else {
+       
+            this.accountInfoTemp.paymentTermsId = !this.accountInfoTemp?.id
+                ? this.paymentTermsId
+                : (result?.accountInfo?.paymentTermsId ?? this.paymentTermsId);
+    
+            this.accountInfoTemp.shipViaId = !this.accountInfoTemp?.id
+                ? this.shipViaId
+                : (result?.accountInfo?.shipViaId ?? this.shipViaId);
         }
-
-        else {
-            this.accountInfoTemp.paymentTermsId = !this.accountInfoTemp?.id ? this.paymentTermsId :
-                result.accountInfo?.paymentTermsId ? result.accountInfo?.paymentTermsId : this.paymentTermsId;
-            this.accountInfoTemp.shipViaId =
-                !this.accountInfoTemp?.id ? this.shipViaId :
-                    result.accountInfo?.shipViaId ? result.accountInfo?.shipViaId : this.shipViaId;
-
-        }
-
+    
 
         this.getAllForAccountInfo();
         this.accountInfoLoded = true;
-        // this.setDefaultPhoneTypes();
-
+    
+    
         this.categoriesIds = [];
         this.accountInfoTemp.entityCategories.forEach(element => {
-            this.categoriesIds.push(element.entityObjectCategoryId)
+            this.categoriesIds.push(element.entityObjectCategoryId);
         });
-
+    
         this.classificationsIds = [];
         this.accountInfoTemp.entityClassifications.forEach(element => {
-            this.classificationsIds.push(element.entityObjectClassificationId)
+            this.classificationsIds.push(element.entityObjectClassificationId);
         });
+    
         setTimeout(() => {
             this.getCategories(undefined);
             this.getClassifications(undefined);
-        }, 1000);
-
+        }, 500);
     }
+    
+    
 
     getAllForAccountInfo() {
         this.getSycAttachmentCategoriesByCodes(['LOGO', "BANNER", "IMAGE"]).subscribe((result) => {
@@ -878,7 +913,7 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit {
 
         }
 
-
+        this.accountInfoTemp.accountLevel = 0
         this._AccountsServiceProxy.createOrEditMyAccount(this.accountInfoTemp)
         .pipe(finalize(() => {
             this.updateLogoService.updateLogo();
@@ -921,16 +956,7 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit {
 
 
     async saveExternalOrManualAccount() {
-        if (!this.accountInfoTemp.code) {
-            let sequance = "";
-
-
-            const getNextEntityCodeRes = await this._sycIdentifierDefinitionsServiceProxy.getNextEntityCode(this.entityObjectType, this.appSession.tenantId).toPromise()
-            if (getNextEntityCodeRes)
-                sequance = getNextEntityCodeRes;
-
-            this.accountInfoTemp.code = "M" + sequance;
-        }
+   
 
         this._AccountsServiceProxy.createOrEditAccount(this.accountInfoTemp)
             .pipe(finalize(() => {
@@ -962,7 +988,7 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit {
             return
         }
         this.saving = true;
-        if (this.accountLevel === AccountLevelEnum.Profile && !this.accountDataForView?.isConnected) {
+        if (this.accountLevel === AccountLevelEnum.Profile &&  (this.isRecordOwner || !this.accountInfoTemp.id ))  {
 
             if (this.accountInfoOldCurrencyId && this.accountInfoTemp.currencyId != this.accountInfoOldCurrencyId) {
                 this.message.confirm(
@@ -981,11 +1007,13 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit {
                     }
                 );
             }
-            else
+            else {
                 this.saveMyAccount()
 
+            }
+
         } else {
-            this.accountInfoTemp.accountLevel = !this.accountDataForView?.isConnected ? this.accountLevel : 2;
+      
             this.saveExternalOrManualAccount()
         }
     }
@@ -1482,4 +1510,22 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit {
         }
         return null;
     }
+
+
+    setManualAccCode(): void {
+        this.entityObjectType = 'BUSINESS';
+    
+        if (this.accountInfoTemp.code) {
+            return;
+        }
+    
+        this._sycIdentifierDefinitionsServiceProxy
+            .getNextEntityCode(this.entityObjectType, this.appSession.tenantId)
+            .subscribe(code => {
+                if (code) {
+                    this.accountInfoTemp.code = 'M' + code;
+                }
+            });
+    }
+    
 }

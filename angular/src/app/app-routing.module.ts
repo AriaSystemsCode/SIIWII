@@ -17,8 +17,9 @@ import { NgxSpinnerService } from 'ngx-spinner';
                     {
                         path: '',
                         children: [
+                            { path: '', redirectTo: '/app/main/home', pathMatch: 'full' },
                             { path: 'notifications', component: NotificationsComponent },
-                            { path: '', redirectTo: '/app/main/dashboard', pathMatch: 'full' }
+
                         ]
                     },
                     {

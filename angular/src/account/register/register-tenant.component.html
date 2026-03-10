@@ -77,7 +77,7 @@
 
 
         <div class="form-group MB20">
-            <label class="sub_titleLog m-0 p-0 font-weight-bold text-black" *ngIf="!accountTypeLabel?.includes('PERSONAL')"> {{"Admin Email Address" | localize}}<span class="StarInfo"  style="color: #F6851D;">*</span></label>
+            <label class="sub_titleLog m-0 p-0 font-weight-bold text-black" *ngIf="!accountTypeLabel?.includes('PERSONAL')"> {{"Email Address" | localize}}<span class="StarInfo"  style="color: #F6851D;">*</span></label>
             <label class="sub_titleLog m-0 p-0 font-weight-bold text-black" *ngIf="accountTypeLabel && accountTypeLabel?.includes('PERSONAL')"> {{"PersonalEmailAddressL" | localize}}<span class="StarInfo"  style="color: #F6851D;">*</span></label>
             <div class="user_p_relative">
             <img src="../../assets/img/input_icons/letter.png" class=" icon-width" [ngClass]="isArabic ? 'ar-user_icon':'user_icon'">
@@ -92,7 +92,7 @@
         <div class="row MB20 PR2L10 ng-tns-c369-1 ml-1">
             <div class="form-group MB20 col-lg-6 pr-2">
                 <label class="sub_titleLog m-0 p-0 font-weight-bold text-black" *ngIf="accountTypeLabel && accountTypeLabel?.includes('PERSONAL')">{{"Password" | localize}} <span class="StarInfo"  style="color: #F6851D;">*</span></label>
-                <label class="sub_titleLog m-0 p-0 font-weight-bold text-black" *ngIf="!accountTypeLabel?.includes('PERSONAL')">{{"AdminPassword" | localize}} <span class="StarInfo"  style="color: #F6851D;">*</span></label>
+                <label class="sub_titleLog m-0 p-0 font-weight-bold text-black" *ngIf="!accountTypeLabel?.includes('PERSONAL')">{{"Password" | localize}} <span class="StarInfo"  style="color: #F6851D;">*</span></label>
                 <div class="user_p_relative">
                 <img src="../../assets/img/input_icons/lock.png" class=" icon-width SmallUser_icon" [ngClass]="isArabic ? 'ar-user_icon':'user_icon'">
                 <input type="password" name="Password" class="mb-3 form-control" [(ngModel)]="model.adminPassword"

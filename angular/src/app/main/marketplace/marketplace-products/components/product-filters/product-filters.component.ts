@@ -11,6 +11,7 @@ import {
 } from "@angular/core";
 import { AppComponentBase } from "@shared/common/app-component-base";
 import {
+  AppEntitiesServiceProxy,
   AppMarketplaceItemsServiceProxy,
   GetAllMarketplaceItemListsOutputDto,
   PagedResultDtoOfGetAllMarketplaceItemListsOutputDto,
@@ -70,11 +71,12 @@ export class ProductFiltersComponent extends AppComponentBase implements OnInit,
   @Input() preselectDeptId?: number;
   categories:any
   @Input() preselectCategoryId?: number;
-
+  sellerSSin:string
   constructor(
     private _AppMarketplaceItemsServiceProxy: AppMarketplaceItemsServiceProxy,
     private _sycEntityObjectCategoriesServiceProxy: SycEntityObjectCategoriesServiceProxy,
     private _appMarketplaceItemsServiceProxy: AppMarketplaceItemsServiceProxy,
+            private _AppEntitiesServiceProxy: AppEntitiesServiceProxy,
     injector: Injector
 
   ) {
@@ -115,12 +117,7 @@ export class ProductFiltersComponent extends AppComponentBase implements OnInit,
     
     this.getAllProductCAtalogs();
     this.getParentDepartments();
-    if(this.isAuthenticated){
     this.getAllBrands();
-
-    }
-
-
 
   }
 
@@ -149,7 +146,7 @@ export class ProductFiltersComponent extends AppComponentBase implements OnInit,
       .getAllBrandsWithPaging(
         null, null, null, null, null,
         false, 'BRAND', null, null,
-        86, 'name', 0, 200, this.accountSSIN
+        86, 'name', 0, 200, this.sellerSSin ? this.sellerSSin: this.accountSSIN
       )
       .subscribe(res => {
         this.brands = (res.items || []).map((b: any) => ({
@@ -394,7 +391,7 @@ export class ProductFiltersComponent extends AppComponentBase implements OnInit,
         10
       ).subscribe((res: any) => {
         this.files = res.items;
-        resolve(); // ✅ Important!
+        resolve(); 
       });
     });
   }
@@ -467,7 +464,7 @@ export class ProductFiltersComponent extends AppComponentBase implements OnInit,
           .getAllChildsWithPaging(
             undefined, undefined, undefined, undefined, undefined, undefined, undefined,
             currentId,
-            /* forDepartments? */ false, // ✅ categories
+            /* forDepartments? */ false,
             undefined, undefined, 'name', 0, 10
           )
           .toPromise();
@@ -514,6 +511,7 @@ export class ProductFiltersComponent extends AppComponentBase implements OnInit,
   }
   
   ngOnInit(): void {
+    this.getSettingData()
     this.savedFilters = localStorage.getItem('productFilters');
   
     const init = async () => {
@@ -553,7 +551,7 @@ export class ProductFiltersComponent extends AppComponentBase implements OnInit,
     for (let node of nodes) {
       if (node.data.sycEntityObjectCategory.id === targetId) {
         if (parentNode) {
-          parentNode.expanded = true; // ✅ expand parent
+          parentNode.expanded = true; 
         }
         node.expanded = true;
         this.selectedFile = node;
@@ -686,7 +684,18 @@ export class ProductFiltersComponent extends AppComponentBase implements OnInit,
     }
     return null;
   }
+
+  getSettingData(){
+    
+    this._AppEntitiesServiceProxy.getHostSettingValue(1316, null).subscribe({
+        next: (res) => {
+            this.sellerSSin = res
+        },
+     
+      });
+  }
   selectionKeys: { [key: string]: boolean } = {}; 
+
   ngAfterViewInit() {
     // wait until deptTree is populated (if it's async, call this after you set it)
     queueMicrotask(() => {

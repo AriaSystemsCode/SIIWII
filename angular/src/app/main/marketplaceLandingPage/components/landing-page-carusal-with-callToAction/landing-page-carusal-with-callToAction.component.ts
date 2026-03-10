@@ -12,9 +12,15 @@ export class LandingPageCarusalWithCallToActionComponent extends AppComponentBas
     sycLangingPageSetting: PageSettingDto[];
     @Input() sectionId:number;
     numVisible: number = 4;
-    numScroll: number = 4;
+    // numScroll: number = 4;
     appBaseUrl: string=AppConsts.appBaseUrl;
 
+    ctaResponsiveOptions = [
+      { breakpoint: '1400px', numVisible: 4, numScroll: 1 },
+      { breakpoint: '1200px', numVisible: 3, numScroll: 1 },
+      { breakpoint: '992px',  numVisible: 2, numScroll: 1 },
+      { breakpoint: '576px',  numVisible: 1, numScroll: 1 }
+    ];
     constructor(injector: Injector,private SydObjectsServiceProxy:SydObjectsServiceProxy) {
         super(injector);
 
@@ -30,10 +36,10 @@ export class LandingPageCarusalWithCallToActionComponent extends AppComponentBas
             this.getBlocksData()
 
         }
-        console.log(this.sycLangingPageSetting,'sycLangingPageSetting')
+   
     }
 
-    ctaSeeMore(){}
+   
     handleStorageData(){
     localStorage.setItem("fromSellerRoom",JSON.stringify(false));
     localStorage.setItem("fromMarketPlace",JSON.stringify(true));

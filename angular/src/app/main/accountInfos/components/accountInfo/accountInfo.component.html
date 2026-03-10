@@ -7,11 +7,11 @@
                         <h3 class="kt-subheader__title">
                             <span class="pageTitle">
                                 <span
-                                    *ngIf="isRecordOwner || (!accountDataForView?.isConnected && accountLevel != accountLevelEnum.Manual)">{{l("MyAccount")}}</span>
-                                <span *ngIf="(accountDataForView?.isConnected) && !isRecordOwner">{{l("Connected
+                                    *ngIf="isRecordOwner && ( accountLevel == accountLevelEnum.Profile )">{{l("MyAccount")}}</span>
+                                <span *ngIf="(accountDataForView?.isConnected) && !isRecordOwner  ">{{l("Connected
                                     Account")}}</span>
                                 <span
-                                    *ngIf="(accountDataForView?.isManual) && !isRecordOwner">{{l("ManualAccount")}}</span>
+                                    *ngIf="(accountDataForView?.isManual) && !isRecordOwner && accountLevel == accountLevelEnum.Manual">{{l("ManualAccount")}}</span>
                             </span>
                         </h3>
                         <span class="kt-subheader__separator kt-subheader__separator--v"></span>
@@ -154,7 +154,7 @@
 
                                 </li>
                                 <li class="nav-item"
-                                    *ngIf=" accountDataForView?.accountTypeId != 21 && (accountInfoTemp?.accountType != 'People' && accountInfoTemp?.accountType != 'Personal')">
+                                 >
                                     <a class="nav-link" (click)="changeTab(accountInfoPageTabsEnum.Branches)"
                                         [ngClass]="currentTab==accountInfoPageTabsEnum.Branches?'active':''">
                                         <img class="sidebar-menu-item-img"
@@ -254,6 +254,27 @@
                                         <img class="sidebar-menu-item-img"
                                             src="assets/profile/My-Settings-Default.svg">{{l("MySettings")}}
                                     </a>
+                                </li>
+
+                                <li class="nav-item ml-2" *ngIf="relationId && relationId>0">
+                                    <a class="nav-link" (click)="changeTab(accountInfoPageTabsEnum.RelationshipSettings)"
+                                        [ngClass]="currentTab == accountInfoPageTabsEnum.RelationshipSettings?'active':''">
+
+                                        <i *ngIf="currentTab != accountInfoPageTabsEnum.RelationshipSettings"
+           class="fa fa-user-cog"
+           style="color: #84818A">
+        </i>
+
+        <i *ngIf="currentTab == accountInfoPageTabsEnum.RelationshipSettings"
+           class="fa fa-user-cog"
+           style="color: #F88011">
+        </i>
+
+        <span class="ml-2">
+            {{ "RelationshipSettings"| localize }}
+        </span>
+    </a>
+
                                 </li>
                             </ul>
                         </div>
@@ -373,7 +394,7 @@
                                                 {{l("Code")}}
                                             </label>
                                             <div class="col-sm-8">
-                                                <app-codes *ngIf="!(accountInfoTemp?.id>0)"
+                                                <!-- <app-codes *ngIf="!(accountInfoTemp?.id>0)"
                                                     [objectType]="entityObjectType" [editMode]=false classes="bg-white"
                                                     [code]="accountInfoTemp?.code"
                                                     placeHolder="{{ 'Account Code' | localize}}"
@@ -384,7 +405,17 @@
                                                     [code]="accountInfoTemp?.code"
                                                     placeHolder="{{ 'Account Code' | localize}}"
                                                     (getCodeValue)="getCodeValue($event)" [maxlength]="12"></app-codes>
-                                            </div>
+                                                -->
+                                            <input type="text" id="AccountInfoTemp_Code" #codeInput="ngModel"
+                                            class="form-control form-control-sm aria-input-text" maxlength="6"
+                                            [disabled]="accountInfoTemp?.id>0"
+                               
+                                            id="colFormLabelSm" [(ngModel)]="accountInfoTemp.code" name="code"
+                                            required (input)="changeTouchState()"
+                                            [placeholder]=" 'PleaseEnterCompanyCode...' | localize ">
+                                        </div> 
+
+
                                         </div>
 
                                         <div class="form-group row">
@@ -527,7 +558,7 @@
                                         </div>
 
                                         <div class="form-group row"
-                                            *ngIf="accountLevel == accountLevelEnum.Manual || (accountDataForView?.isConnected && currentTab === accountInfoPageTabsEnum.ProfileCreateOrEdit) ">
+                                            *ngIf="(accountLevel == accountLevelEnum.Manual || (accountDataForView?.isConnected && currentTab === accountInfoPageTabsEnum.ProfileCreateOrEdit)) && !isRecordOwner">
                                             <label for="colFormLabelSm"
                                                 class="col-sm-2 col-form-label col-form-label-sm label-form">{{l("PriceLevel")}}</label>
                                             <div class="col-sm-8">
@@ -535,13 +566,14 @@
                                                     styleClass="form-control aria-select" [filter]="false"
                                                     name="PriceLevelId" [(ngModel)]="accountInfoTemp.priceLevel"
                                                     (onChange)="changeTouchState()"
-                                                    [placeholder]="'PleaseSelect' | localize"></p-dropdown>
+                                                    [placeholder]="'PleaseSelect' | localize"></p-dropdown> 
 
                                             </div>
+                                            <span  *ngIf="accountInfoTemp?.priceLevel" class="mt-2"><a class="reset-link" (click)="accountInfoTemp.priceLevel =null; changeTouchState()">Reset</a></span>
                                         </div>
 
 
-                                        <div class="form-group row" *ngIf="accountInfoTemp?.accountType != 'People' && accountInfoTemp?.accountType != 'Personal'">
+                                      <!--   <div class="form-group row" *ngIf="accountInfoTemp?.accountType != 'People' && accountInfoTemp?.accountType != 'Personal'">
                                             <label for="colFormLabelSm"
                                                 class="col-sm-2 col-form-label col-form-label-sm label-form">
 
@@ -573,7 +605,7 @@
                                                     optionValue="value" (onChange)="changeTouchState()">
                                                 </p-dropdown>
                                             </div>
-                                        </div>
+                                        </div> -->
 
                                         <div class="form-group row">
                                             <label for="colFormLabelSm"
@@ -839,6 +871,11 @@
                         </div>
                         <div class="tab8" *ngIf="currentTab == accountInfoPageTabsEnum.AccountBilling">
                             <app-accountbilling></app-accountbilling>
+                        </div>
+                        <div class="tab9" *ngIf="currentTab == accountInfoPageTabsEnum.RelationshipSettings">
+                            <app-relationship-settings 
+                                [accountId]="accountId" [relationId]="relationId">
+                            </app-relationship-settings>
                         </div>
 
                     </div>

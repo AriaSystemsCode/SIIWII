@@ -132,10 +132,9 @@ export class CreateOrEditAppItemComponent
     showAdvancedPricing: boolean = false;
     PriceValidMsg: string = "";
     oldnonLookupValues;
-     taxCodes;
      appEntities;
-     _isTexable:boolean=false;
-
+     currentLang: string
+     isArabic: boolean
     constructor(
         injector: Injector,
         _location: Location,
@@ -211,7 +210,8 @@ export class CreateOrEditAppItemComponent
 
     
     ngOnInit(): void {
-        this.isTexable();
+        this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
+        this.currentLang == 'ar' || this.currentLang == 'ar-EG'  ? this.isArabic = true : this.isArabic = false
         this.defineExtraAttributes();
         this.initUploaders();
         this.id = this.detectComponentMode();
@@ -239,6 +239,8 @@ export class CreateOrEditAppItemComponent
         this.languageSettingName = AppConsts.languageSettingName;
         //this._pricingHelperService.defaultLevel= this.languageSettingName!='en-GB' ? "MSRP"  :  "RRP"
 
+        if (!this.appItem?.taxRate)
+            this.appItem.taxRate=0;
     }
     languageSettingName;
     aspectRatio;
@@ -695,7 +697,7 @@ export class CreateOrEditAppItemComponent
 
     openSelectAppItemTypeModal() {
         let config: ModalOptions = new ModalOptions();
-        config.class = "right-modal slide-right-in";
+          !this.isArabic ?  config.class = "right-modal slide-right-in" : config.class = "left-modal slide-left-in ngLeft"
         let modalDefaultData: Partial<SelectAppItemTypeComponent> = {
             savedId: this.appItem.entityObjectTypeId,
         };
@@ -747,7 +749,7 @@ export class CreateOrEditAppItemComponent
     // Categories
     openSelectCategoriesModal() {
         let config: ModalOptions = new ModalOptions();
-        config.class = "right-modal slide-right-in";
+         !this.isArabic ?  config.class = "right-modal slide-right-in" : config.class = "left-modal slide-left-in ngLeft"
         let modalDefaultData: Partial<SelectCategoriesDynamicModalComponent> = {
             savedIds: this.selectedCategoriesIds,
             showAddAction: true,
@@ -898,7 +900,7 @@ export class CreateOrEditAppItemComponent
     openSelectDepartmentsModal() {
         this.formTouched = true;
         let config: ModalOptions = new ModalOptions();
-        config.class = "right-modal slide-right-in";
+         !this.isArabic ?  config.class = "right-modal slide-right-in" : config.class = "left-modal slide-left-in ngLeft"
         let modalDefaultData: Partial<SelectCategoriesDynamicModalComponent> = {
             savedIds: this.selectedDepartmentsIds,
             showAddAction: false,
@@ -920,7 +922,7 @@ export class CreateOrEditAppItemComponent
     openSelectRelatedItemsModal() {
         this.formTouched = true;
         let config: ModalOptions = new ModalOptions();
-        config.class = "right-modal slide-right-in";
+          !this.isArabic ?  config.class = "right-modal slide-right-in" : config.class = "left-modal slide-left-in ngLeft"
         let modalDefaultData: Partial<SelectRelatedItemDynamicModalComponent> = {
             savedIds: this.selectedRelatedItemsIds,
             showAddAction: false,
@@ -1119,7 +1121,7 @@ export class CreateOrEditAppItemComponent
     openSelectClassificationsModal() {
         this.formTouched = true;
         let config: ModalOptions = new ModalOptions();
-        config.class = "right-modal slide-right-in";
+         !this.isArabic ?  config.class = "right-modal slide-right-in" : config.class = "left-modal slide-left-in ngLeft"
         let modalDefaultData: Partial<SelectClassificationDynamicModalComponent> =
         {
             savedIds: this.selectedClassificationsIds,
@@ -1486,6 +1488,9 @@ export class CreateOrEditAppItemComponent
         this.defaultImageIndex = index;
         this.appItem.entityAttachments.map((item, i) => {
             item.isDefault = index == i ? true : false;
+            if (item.isDefault) 
+                item.isPublic = true;
+            
             return item;
         });
     }
@@ -1585,6 +1590,7 @@ export class CreateOrEditAppItemComponent
                 this.l("Please,CompleteAllTheRequiredFields(*)")
             );
         }
+        this.stopFormListening=true;
         if (!this.appItem?.entityAttachments?.length) {
             return this.notify.error(
                 this.l("Please,UploadAtLeastOneImageToThisProduct")
@@ -1621,7 +1627,6 @@ export class CreateOrEditAppItemComponent
 
         this.appItem.entityRelatedItems =_entityRelatedItems;
 
-          //i49-F5 set texable data if fildes or will be extra data like recommended & additional  
         this._appItemsServiceProxy
             .createOrEdit(this.appItem)
             .pipe(
@@ -1631,7 +1636,7 @@ export class CreateOrEditAppItemComponent
             )
             .subscribe((res) => {
                 this.appItem.id = res;
-                this.stopFormListening = true;
+                this.stopFormListening=true;
                 this.emitDestroy();
                 this.removeAllUnusedTempAttachments();
                 this.notify.info(this.l("SavedSuccessfully"));
@@ -1642,7 +1647,7 @@ export class CreateOrEditAppItemComponent
                     return this.askToPublish();
                 this.goBack("app/main/products");
             });
-}
+    }
     extraSelectedValuesExtraData() {
         const recentlyExtraAttributes: FilteredExtraAttribute<any>[] = [
             ...this.extraAttributes.ADDITIONAL.extraAttributes,
@@ -1885,7 +1890,7 @@ export class CreateOrEditAppItemComponent
     openCreateNewAppEntityModal(extraAttr: FilteredExtraAttribute) {
         this.formTouched = true;
         let config: ModalOptions = new ModalOptions();
-        config.class = "right-modal slide-right-in";
+           !this.isArabic ?  config.class = "right-modal slide-right-in" : config.class = "left-modal slide-left-in ngLeft"
         let modalDefaultData: Partial<AppEntityListDynamicModalComponent> = {
             entityObjectType: {
                 name: extraAttr.name,
@@ -2096,6 +2101,9 @@ export class CreateOrEditAppItemComponent
     }
 
     setVisibleinMarketplaceImage(index) {
+        if (this.defaultImageIndex == index) 
+            return;
+        
         this.formTouched = true;
         this.appItem.entityAttachments?.map((item, i) => {
             if (index == i) {
@@ -2104,58 +2112,8 @@ export class CreateOrEditAppItemComponent
             }
         });
     }
-
-    onTaxCodeChange(value: number) {
-        this.appItem.taxPercent = value;
-    }
-
-    isTexable(){
-        //i49-F5 texable setting id 
-        this._appEntitiesServiceProxy
-            .getTenantSettingValue(1121,null)
-            .subscribe((res: any) => {
-                this._isTexable= res?.toString().toLowerCase() =='true' ? true : false;
-
-                if(this._isTexable)
-                    this.getTaxesData();
-            });
-    }
-
-    getTaxesData() {
-        this._sydObjectsServiceProxy.getAllLookups(
-        ).subscribe(result => {
-           let  indx= result?.findIndex(x=>x.code.toString().toUpperCase() == "CHARGES");  
-           if(indx>=0){   
-//i49-F5 xxxxx need return only tax     
-            this._appEntitiesServiceProxy.getAll(
-                undefined,
-                undefined,
-                undefined,
-                undefined,
-                "485823",
-                true,
-                undefined,
-                undefined,
-                undefined,
-                result[indx]?.id,
-                undefined,
-                0,
-                this.maxResultCount
-            ).subscribe(result => {
-              this.appEntities = result?.items?.map(item => item.appEntity) || [];
-              this.taxCodes = this.appEntities
-              .filter(entity => !!entity?.code)
-              .map(entity => {
-                const attr = entity?.entityExtraData?.find(a => a.attributeId === 1203);
-                return {
-                  label: entity.code,
-                  value: attr?.attributeValue || null
-                };
-              })
-              .filter(item => !!item.value);
-                        });
-        }
-
-        });
+    fixNegative() {
+        if (this.appItem.taxRate < 0) 
+          this.appItem.taxRate = 0;
     }
 }

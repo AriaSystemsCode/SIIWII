@@ -1,24 +1,35 @@
 <p-carousel
-  [value]="blocksSorted"      
+  [value]="blocksSorted"
   [numVisible]="numVisible"
   [numScroll]="numScroll"
   [circular]="false"
   [autoplayInterval]="interval"
- 
+  [showIndicators]="false"
 >
   <ng-template pTemplate="item" let-slide>
     <div class="pt-2" #imgContainer>
       <div class="d-block position-relative">
-        <a *ngIf="slide?.buttonText"  (click)="onMenuClick(slide?.link)" class="txtBtn">{{ slide?.buttonText  }}</a>
-        <app-image-display
-          [image]="slide?.image ? (attachmentBaseUrl + '/' + slide.image) : '../../../../assets/placeholders/_logo-placeholder.png'"
-          [sycAttachmentCategory]="sycAttachmentCategoryAutoSlider"
-          [staticWidth]="imgContainer.offsetWidth"
-          [staticHeight]="350">
-        </app-image-display>
+
+        <!-- optional text button (still shown) -->
+        <a
+          *ngIf="slide?.buttonText"
+          class="txtBtn text-white"
+          (click)="onSlideClick(slide, $event)"
+        >
+          {{ slide?.buttonText }}
+        </a>
+
+        <!-- IMAGE clickable area -->
+        <div class="cursor-pointer" (click)="onSlideClick(slide, $event)">
+          <app-image-display
+            [image]="getSlideImage(slide)"
+            [sycAttachmentCategory]="sycAttachmentCategoryAutoSlider"
+            [staticWidth]="imgContainer.offsetWidth"
+
+          ></app-image-display>
+        </div>
+
       </div>
     </div>
   </ng-template>
 </p-carousel>
-
-<!-- <div *ngIf="!blocksSorted?.length" class="text-center py-4">No data</div> -->

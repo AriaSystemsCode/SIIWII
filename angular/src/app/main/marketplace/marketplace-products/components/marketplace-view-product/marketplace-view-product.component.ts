@@ -90,6 +90,7 @@ export class MarketplaceViewProductComponent
     overRating: OverAllRatingDto
     isAuthenticated = this.appSession?.user
     relatedItems:any
+    Warningmessage:string
     public constructor(
         private _AppMarketplaceItemsServiceProxy: AppMarketplaceItemsServiceProxy,
         private _AppTransactionServiceProxy: AppTransactionServiceProxy,
@@ -109,10 +110,10 @@ export class MarketplaceViewProductComponent
         this.priceLevel = localStorage.getItem("tempPriceLevel");
         // this.getProductDetailsForView();
         this.filteredColors = this.colorsData;
-      
+       
     }
     ngOnInit(): void {
-        // 🔁 Re-run when /view/:id changes
+   
         this.route.paramMap.subscribe(params => {
           const idParam = params.get('id');          // adjust if your route param name is different
           const id = idParam ? +idParam : null;
@@ -196,7 +197,7 @@ export class MarketplaceViewProductComponent
             const handleItemDetails = (res: GetAppMarketplaceItemDetailForViewDto) => {
               this.productDetails = res?.appItem;
               this.productData = res;
-          
+          this.getSettingData()
               this.productDetails.maxSpecialPrice = this.productDetails?.maxSpecialPrice ?? 0;
               this.updatedSpecialPrice = this.productDetails.maxSpecialPrice;
           
@@ -272,6 +273,7 @@ export class MarketplaceViewProductComponent
                     this.getOverAllRatings();
                     this.getRelatedProducts(true)
                     this.hideMainSpinner();
+                  
                   })
                 )
                 .subscribe(handleItemDetails);
@@ -287,7 +289,7 @@ export class MarketplaceViewProductComponent
                 if (res?.buyerSSIN) this.productBodyData.buyerSSIN = res.buyerSSIN;
                 if (res?.sellerSSIN) this.productBodyData.sellerSSIN = res.sellerSSIN;
                 if (res?.currencyCode) this.productBodyData.currencyCode = res.currencyCode;
-          
+             
                 fetchDetails();
                 this.GetCurrencyInfo();
               });
@@ -314,7 +316,8 @@ export class MarketplaceViewProductComponent
         // this.productImages = this.productVarImages[0]?.selectedValues[this.currentIndex]?.entityAttachments;
         let originalIndex = this.colorsData.findIndex(color => color?.colorCodeSelectedValues?.toLowerCase()?.trim() === this.filteredColors[index].colorCodeSelectedValues?.toLowerCase()?.trim());
         this.colorAttachmentForMainIamge = this.filteredColors[index]?.colorImg
-        this.productImages = this.productVarImages[0]?.selectedValues[originalIndex]?.entityAttachments
+        this.productImages = this.productVarImages[0]?.selectedValues[originalIndex]?.entityAttachments ?   this.productVarImages[0]?.selectedValues[originalIndex]?.entityAttachments : 
+                                  [  this.productData?.appItem?.entityAttachments?.find(x=>x.isDefault) ]; 
     }
     setColorView(value: boolean) {
         this.isColorView = value
@@ -737,7 +740,7 @@ export class MarketplaceViewProductComponent
                             .pipe(finalize(() => {
                                 Swal.fire({
                                     title: "",
-                                    text: `Quantities is added to the cart and purchase order # ${this.orderNo} is created?`,
+                                    text: `Quantities have been added to the cart and purchase order # ${this.orderNo} has been created?`,
                                     icon: "info",
                                     showCancelButton: true,
                                     confirmButtonText:
@@ -860,6 +863,7 @@ export class MarketplaceViewProductComponent
             
                                                 localStorage.setItem("fromSellerRoom", JSON.stringify(true));
                                                 localStorage.setItem("fromMarketPlace", JSON.stringify(false));
+                                                sessionStorage.setItem("SellerSSIN", JSON.stringify(this.productData?.sellerSSIN));
                                                 localStorage.setItem("transNO", this.orderNo);
                                                this.goToShowroom()
                                             });
@@ -956,7 +960,7 @@ export class MarketplaceViewProductComponent
     connect(): void {
         this.showMainSpinner();
         this.AccountsServiceProxy
-            .connectContactsProfiles(this.productData.sellerMarketPlaceAccountId,null,null)
+            .applyRelationOnProfile(this.productData.sellerMarketPlaceAccountId,undefined,true,undefined)
             .pipe(
                 finalize(() => {
                     this.hideMainSpinner();
@@ -1113,7 +1117,15 @@ get relatedItemsUi(): any[] {
   openRelatedProduct(id: number) {
     this.router.navigate(['/app/main/marketplace/products/view', id]);
   }
+  getSettingData(){
     
+    this._AppEntitiesServiceProxy.getHostSettingValue(1218, null).subscribe({
+        next: (res) => {
+            this.Warningmessage = res
+        },
+     
+      });
+  }
     ngOnDestroy() {
         this.unsubscribeToAllSubscriptions();
         localStorage.removeItem("productData");

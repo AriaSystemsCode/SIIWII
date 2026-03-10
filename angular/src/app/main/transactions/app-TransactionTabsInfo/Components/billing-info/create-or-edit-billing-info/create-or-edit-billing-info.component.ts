@@ -59,9 +59,9 @@ export class CreateOrEditBillingInfoComponent extends AppComponentBase implement
     if (this.currentTab == TransactionCartoccordionTabs.BillingInfo) {
       this.contactIdApContact = this.apContactdata?.compId;
       this.contactIdARContact = this.arContactdata?.compId;
-      const addressComponents = this.addressComponentRefs.toArray();
-      addressComponents.find(c => c.billingIndexInfo === 1)?.getAddressList(this.apContactdata?.compssin,  this.apContactdata?.branchSsin);
-      addressComponents.find(c => c.billingIndexInfo === 2)?.getAddressList(this.arContactdata?.compssin,  this.arContactdata?.branchSsin);
+      const addressComponents = this.addressComponentRefs?.toArray();
+      addressComponents?.find(c => c.billingIndexInfo === 1)?.getAddressList(this.apContactdata?.compssin,  this.apContactdata?.branchSsin);
+      addressComponents?.find(c => c.billingIndexInfo === 2)?.getAddressList(this.arContactdata?.compssin,  this.arContactdata?.branchSsin);
     }
 
   }
@@ -207,8 +207,8 @@ export class CreateOrEditBillingInfoComponent extends AppComponentBase implement
 
     if (this.currentTab == TransactionCartoccordionTabs.BillingInfo) {
       this.contactIdApContact = this.apContactdata?.compId;
-      const addressComponents = this.addressComponentRefs.toArray();
-      addressComponents.find(c => c.billingIndexInfo === 1)?.getAddressList(this.apContactdata?.compssin, this.apContactdata?.branchSsin);
+      const addressComponents = this.addressComponentRefs?.toArray();
+      addressComponents?.find(c => c.billingIndexInfo === 1)?.getAddressList(this.apContactdata?.compssin, this.apContactdata?.branchSsin);
     }
 
 
@@ -219,8 +219,8 @@ export class CreateOrEditBillingInfoComponent extends AppComponentBase implement
     this.arContactdata = data;
     if (this.currentTab == TransactionCartoccordionTabs.BillingInfo) {
       this.contactIdARContact = this.arContactdata?.compId;
-      const addressComponents = this.addressComponentRefs.toArray();
-      addressComponents.find(c => c.billingIndexInfo === 2)?.getAddressList(this.arContactdata?.compssin,  this.arContactdata?.branchSsin);
+      const addressComponents = this.addressComponentRefs?.toArray();
+      addressComponents?.find(c => c.billingIndexInfo === 2)?.getAddressList(this.arContactdata?.compssin,  this.arContactdata?.branchSsin);
     }
 
 

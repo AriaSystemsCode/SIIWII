@@ -23,6 +23,7 @@ import {
     TransactionType,
     AppEntitiesServiceProxy,
     CurrencyInfoDto,
+    LanguageServiceProxy,
     AccountsServiceProxy,
 } from "@shared/service-proxies/service-proxies";
 
@@ -34,10 +35,6 @@ import { MessageReadService } from "@shared/utils/message-read.service";
 import { UpdateLogoService } from "@shared/utils/update-logo.service";
 import * as signalR from "@microsoft/signalr";
 import { MenuItem } from "primeng/api";
-import {
-    FormBuilder,
-    FormGroup,
-} from "@angular/forms";
 import { DatePipe } from "@angular/common";
 import { TransactionInformationComponent } from "@app/main/transactions/app-TransactionTabsInfo/Components/transaction-information-component/transaction-information.component";
 import Swal from "sweetalert2";
@@ -93,12 +90,17 @@ export class TopBarComponent extends ThemesLayoutBaseComponent implements OnInit
     visible:boolean =false;
     displaneSel :boolean =false;
     displaneBuy :boolean =false;
-    isAuthenticated = this.appSession?.user
+   
     searchInput:string
-    bgCol:string 
+    bgCol?: string;
+    bgColLoaded = false;
     tenantLogo:string
-    currentLang: string
-    isArabic: boolean
+    isAuthenticated: boolean = false;
+    currentLang: string = 'en';
+    isArabic: boolean = false;
+    allowFeeds:string
+    defaultHomeUrl = '/app/main/Home'; // fallback
+   
     constructor(
         injector: Injector,
         private _abpSessionService: AbpSessionService,
@@ -120,7 +122,7 @@ export class TopBarComponent extends ThemesLayoutBaseComponent implements OnInit
         private _accountsServiceProxy: AccountsServiceProxy,
     ) {
         super(injector);
-
+        this.getTenantData()
         this.items = [
             {
                 items: [
@@ -173,13 +175,15 @@ export class TopBarComponent extends ThemesLayoutBaseComponent implements OnInit
     }
 
     ngOnInit() {
-        console.log(this.isAuthenticated,'this.isAuthenticated');
+        this.isAuthenticated = !!this.appSession?.user;
+       this.loadDefaultPage()
         this.getTenantData()
         this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
-        this.currentLang == 'ar' ? this.isArabic = true : this.isArabic = false
+        this.currentLang == 'ar' || this.currentLang == 'ar-EG'  ? this.isArabic = true : this.isArabic = false
         this.defaultSellerLogo = '../../../assets/shoppingCart/Order-Details-Seller-logo.svg';
         this.defaultBuyerLogo = '../../../assets/shoppingCart/Order-Details-Byer-logo.svg';
-
+        this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
+        this.currentLang == 'ar' || this.currentLang == 'ar-EG'  ? this.isArabic = true : this.isArabic = false
         const subs = this.userClickService.clickSubject$.subscribe((res) => {
             if (res == "refreshShoppingInfoInTopbar") {
                 this.getShoppingCartInfo();
@@ -210,8 +214,8 @@ export class TopBarComponent extends ThemesLayoutBaseComponent implements OnInit
                 this.setCurrentLoginInformations();
                 // this.getProfilePicture();
                 this.getRecentlyLinkedUsers();
-                this.appSession.user.memberId;
-                this.appSession.user.id;
+                this.appSession?.user?.memberId;
+                this.appSession?.user?.id;
                 this.registerToEvents();
                 this.getUnreadMessageCount();
                 if(!this.isHost)
@@ -226,6 +230,8 @@ export class TopBarComponent extends ThemesLayoutBaseComponent implements OnInit
             }
        
     }
+
+
 
     registerToEvents() {
         abp.event.on("profilePictureChanged", () => {
@@ -251,13 +257,13 @@ export class TopBarComponent extends ThemesLayoutBaseComponent implements OnInit
 
     fullName: string = "";
     setCurrentLoginInformations(): void {
-        this.shownLoginName = this.appSession.getShownLoginName();
-        this.tenancyName = this.appSession.tenancyName;
-        this.userName = this.appSession.user.userName;
-        this.name = this.appSession.user.name;
+        this.shownLoginName = this.appSession?.getShownLoginName();
+        this.tenancyName = this.appSession?.tenancyName;
+        this.userName = this.appSession?.user?.userName;
+        this.name = this.appSession?.user?.name;
         this.fullName =
-            this.appSession.user.name + ' ' + this.appSession.user.surname;
-        console.log(">>", this.appSession.user);
+            this.appSession?.user?.name + ' ' + this.appSession?.user?.surname;
+       
     }
     closeModal(value: boolean) {
         this.display = false;
@@ -265,13 +271,13 @@ export class TopBarComponent extends ThemesLayoutBaseComponent implements OnInit
 
     getShownUserName(linkedUser: LinkedUserDto): string {
         if (!this._abpMultiTenancyService.isEnabled) {
-            return linkedUser.username;
+            return linkedUser?.username;
         }
 
         return (
             (linkedUser.tenantId ? linkedUser.tenancyName : ".") +
             "\\" +
-            linkedUser.username
+            linkedUser?.username
         );
     }
 
@@ -525,22 +531,44 @@ export class TopBarComponent extends ThemesLayoutBaseComponent implements OnInit
       }
       
       getTenantData() {
-       
-        this._AppEntitiesServiceProxy.getHostSettingValue(1208,null)
+        this._AppEntitiesServiceProxy.getHostSettingValue(1208, null)
         .subscribe((result) => {
-            // result = '#456'
-            result ? this.bgCol = result : this.bgCol = '#4A0D4A'
+          this.bgCol = result;
+          this.bgColLoaded = true; 
+        });
     
-        });
-        this._AppEntitiesServiceProxy.getHostSettingValue(1206,"file")
+      this._AppEntitiesServiceProxy.getHostSettingValue(1204, "file")
         .subscribe((result) => {
-            // const str = result
-            // const after = str.split("|")[1];
-           this.tenantLogo = result
-           console.log(this.tenantLogo,'logo')
+          this.tenantLogo = result;
         });
+
+            
+      this._AppEntitiesServiceProxy.getHostSettingValue(1207, null)
+      .subscribe((result) => {
+        this.allowFeeds = result;
+      });
     }
 
+    loadDefaultPage(): void {
+        this.getTenantData()
+        this._AppEntitiesServiceProxy.getHostSettingValue(1203, null)
+          .subscribe({
+            next: (res2: string) => {
+              if (res2 === 'Marketplace' && this.allowFeeds != 'true') {
+                this.defaultHomeUrl = '/app/main/marketplace';
+              } else {
+                this.defaultHomeUrl = '/app/main/Home';
+              }
+            },
+            error: err2 => {
+              console.error('Failed to load host setting 1203', err2);
+              this.defaultHomeUrl = '/app/main/Home'; // or dashboard if you want
+            }
+          });
+      }
+      onImgErr(evt: Event) {
+        (evt.target as HTMLImageElement).src = '/assets/placeholders/_logo-placeholder.png';
+      }
 }
 
 

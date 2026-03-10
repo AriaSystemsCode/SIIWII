@@ -1,16 +1,13 @@
 .topbar {
-    background-color: #4a0d4a;
+ 
     height: 70px;
-    // margin-right: 13px !important;
-}
-
-.navbar {
-    background: #4A0D4A;
+  
 }
 
 .navbar-brand {
     font-size: unset;
     height: 3.5rem;
+    cursor:pointer;
 }
 
 @media (min-width: 1399px) {
@@ -21,19 +18,18 @@
 
 @media (min-width: 1024px) {
 
-    .rightList {
-        position: absolute;
-        right: 0%;
-        top: 0;
+.rightList {
+    position: absolute;
+    right: 0%;
+    top: 0;
 
-    }
+}
+.leftList {
+    position: absolute;
+    left: 0%;
+    top: 0;
 
-    .leftList {
-        position: absolute;
-        left: 0%;
-        top: 0;
-
-    }
+}
 
 }
 
@@ -89,8 +85,8 @@
 
 .navbar {
     border-radius: 0px 0px 20px 20px !important;
-    background: #4A0D4A;
-    box-shadow: 4px 4px 10px 0px rgba(74, 13, 74, 0.15);
+
+box-shadow: 4px 4px 10px 0px rgba(74, 13, 74, 0.15);
 }
 
 @media (min-width: 1024px) {
@@ -125,6 +121,11 @@
     .navbar-expand-lg .navbar-nav .dropdown-menu {
         position: absolute !important;
         // right: 5% !important;
+    }
+
+    .leftList {
+        position: absolute;
+left: 30px;
     }
 
     .navbar-expand-lg .navbar-nav .dropdown-menu {
@@ -173,6 +174,11 @@
     .leftList {
         position: absolute;
         left: 30px;
+    }
+
+    .leftList {
+        position: absolute;
+left: 30px;
     }
 
     .navbar-nav {
@@ -369,6 +375,18 @@
     .rtl-navbar {
         margin-right: 75px !important;
 
+    @media (min-width: 567px) {
+
+        .ltr-navbar {
+            margin-left: 75px !important;
+          
+        }
+
+        .rtl-navbar {
+            margin-right: 75px !important;
+          
+        }
+        }
     }
 }
 
@@ -423,7 +441,11 @@
     // opacity: 1;
 }
 
-
+.regBtn {
+    background-color: #EBEBEB;
+    color: #4A0D4A;
+    border-radius: 6px;
+}
 
 #businessAccount {
     margin-bottom: 10px;
@@ -489,4 +511,81 @@
     right: 0px;
     background-color: #f88011;
     top: 0px;
+}
+        ._divider span {
+            width: 1px;
+            height: 15px;
+            background-color: #c8c8c8;
+        }
+        .kt-header__topbar-item {
+            border-bottom: 2px solid transparent;
+            cursor: pointer;
+            transition: all 0.3s ease-in-out;
+        }
+        .kt-header__topbar-item.header-link-active,
+        .kt-header__topbar-item:hover {
+            color: #2061eb !important;
+            transition: all 0.3s ease-in-out;
+        }
+        .kt-header__topbar-item i {
+            font-size: 15px !important;
+        }
+        img.header-profile-picture {
+            max-width: 30px;
+            max-height: 30px;
+            border-radius: 50%;
+        }
+        .kt-header__topbar .kt-header__topbar-item .kt-header__topbar-icon {
+            width: 22px;
+            height: 22px;
+        }
+
+        .addMl {
+            margin-left: 100px;
+        }
+
+        .login-btn {
+            background: #ffffff;
+            color: #4a0d4a;               // matches your brand purple
+            border-radius: 99px;         // pill shape
+            border: none;
+            padding: 6px 22px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.3);
+            transition: all 0.2s ease-in-out;
+          }
+          
+          .login-btn i {
+            font-size: 1rem;
+          }
+          
+          .login-btn:hover {
+            background: #f6851d;          // your orange color
+            color: #ffffff;
+            box-shadow: 0 6px 14px rgba(0, 0, 0, 0.35);
+            transform: translateY(-1px);
+          }
+          
+          .login-btn:active {
+            transform: translateY(0);
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3);
+          }
+          
+          .login-btn:focus {
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(246, 133, 29, 0.7);
+          }
+          
+
+
+
+          .rounded-c {
+            border-radius: 8px;
+          }
+
+::ng-deep .addRT{
+    .notification-show{
+        right: -210px !important;
+    }
 }

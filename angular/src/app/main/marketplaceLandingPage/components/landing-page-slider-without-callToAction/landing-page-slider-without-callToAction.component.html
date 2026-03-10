@@ -6,6 +6,7 @@
   [circular]="false"
   [autoplayInterval]="interval"
   class="sliderImages hiddenIndicator "
+  [showIndicators]="false"
 >
   <ng-template pTemplate="item" let-slide>
     <div class="pt-2" #ads>
@@ -13,7 +14,7 @@
         <app-image-display
           [image]="slide?.image ? (attachmentBaseUrl + '/' + slide.image) : '../../../../assets/placeholders/_logo-placeholder.png'"
           [sycAttachmentCategory]="sycAttachmentCategoryBanner"
-          [staticWidth]="ads.offsetWidth"    [staticHeight]="350">
+          [staticWidth]="ads.offsetWidth" >
         </app-image-display>
       </div>
     </div>

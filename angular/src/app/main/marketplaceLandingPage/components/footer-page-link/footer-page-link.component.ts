@@ -1,6 +1,7 @@
 import { Component, Input, ViewChild } from "@angular/core";
 import { ModalDirective } from "ngx-bootstrap/modal";
 import { PageSettingDto, SydObjectsServiceProxy } from "@shared/service-proxies/service-proxies";
+import { AppConsts } from "@shared/AppConsts";
 
 
 
@@ -16,6 +17,7 @@ export class FooterPageLinkComponent {
    @ViewChild('contactUsModal', { static: false })
    contactUsModal: ModalDirective;
 
+    attachmentBaseUrl: string = AppConsts.attachmentBaseUrl;
    constructor(private SydObjectsServiceProxy:SydObjectsServiceProxy) {
    
 
@@ -28,18 +30,7 @@ export class FooterPageLinkComponent {
 
         }
 
-        // this.pageLiksData = [
-        //     { name: 'Apple',        img: 'assets/placeholders/_logo-placeholder.png' },
-        //     { name: 'Samsung',      img: 'assets/placeholders/_logo-placeholder.png' },
-        //     { name: 'Nike',         img: 'assets/placeholders/_logo-placeholder.png' },
-        //     { name: 'Adidas',       img: 'assets/placeholders/_logo-placeholder.png' },
-        //     { name: 'Sony',         img: 'assets/placeholders/_logo-placeholder.png' },
-        //     { name: 'LG',           img: 'assets/placeholders/_logo-placeholder.png' },
-        //     { name: 'Microsoft',    img: 'assets/placeholders/_logo-placeholder.png' },
-        //     { name: 'Huawei',       img: 'assets/placeholders/_logo-placeholder.png' },
-        //     { name: 'Xiaomi',       img: 'assets/brands/xiaomi.svg' },
-        //     { name: 'Lenovo',       img: 'assets/brands/lenovo.svg' },
-        //   ];
+  
       
     }
 
@@ -69,7 +60,10 @@ export class FooterPageLinkComponent {
             if (s?.name === 'Contact Us') {
               event.preventDefault();   // don't follow link
               this.contactUsModal.show();
+            }else {
+              s?.image ? window.open(this.attachmentBaseUrl + '/' +s?.image) :  window.open(s?.link)
             }
+
           }
           
   }

@@ -8,6 +8,7 @@ using Abp.AspNetZeroCore.Web.Authentication.External.OpenIdConnect;
 using Abp.AspNetZeroCore.Web.Authentication.External.WsFederation;
 using Abp.Configuration.Startup;
 using Abp.Dependency;
+using Abp.Domain.Uow;
 using Abp.Modules;
 using Abp.Reflection.Extensions;
 using Abp.Threading.BackgroundWorkers;
@@ -20,9 +21,108 @@ using onetouch.Configuration;
 using onetouch.EntityFrameworkCore;
 using onetouch.MultiTenancy;
 using onetouch.Web.Controllers;
+using Abp.Configuration.Startup;
+using Abp.Domain.Uow;
+using Abp.MultiTenancy;
+using Abp.Runtime.Session;
+using Microsoft.AspNetCore.Http;
+using System;
+using System.Linq;
+using System.Data.SqlClient;
+using onetouch.Accounts;
+using onetouch.Web.Configuration;
 
 namespace onetouch.Web.Startup
 {
+
+
+
+    public class OriginBasedConnectionStringResolver : DefaultConnectionStringResolver
+    {
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly AppConfigurationAccessor _configurationAccessor;
+
+        public OriginBasedConnectionStringResolver(
+            IAbpStartupConfiguration configuration,
+            IHttpContextAccessor httpContextAccessor,
+             AppConfigurationAccessor appConfiguration
+        ) : base(configuration)
+        {
+            _httpContextAccessor = httpContextAccessor;
+            _configurationAccessor = appConfiguration;
+        }
+
+        private void ConfigureXtraReportConnectionStrings()
+        {
+            var _appConfiguration = _configurationAccessor.Configuration;
+            var globalConnectionStrings = _appConfiguration
+                .GetSection("ConnectionStrings")
+                .AsEnumerable(true)
+                .Where(x => x.Key == "Reports")
+                .ToDictionary(x => x.Key, x => x.Value);
+            DevExpress.DataAccess.DefaultConnectionStringProvider.AssignConnectionStrings(globalConnectionStrings);
+        }
+
+
+        public override string GetNameOrConnectionString(ConnectionStringResolveArgs args)
+        {
+
+            var origin = _httpContextAccessor.HttpContext?.Items["XXXRequestOrigin"]?.ToString();
+            //return "Server=AriaSQL\\AriaNexus; Database=onetouchDevDb3;TrustServerCertificate=True; User=sa; Password=Aria@2021;";
+            //Aria.MASTER
+            if (!string.IsNullOrWhiteSpace(origin))
+            {
+                string AriaMasterConnection = "Server=WEBAPP-DEV\\SIIWII; Database=Aria.MASTER;TrustServerCertificate=True;User ID=sa;Password=Siiwii@2024;";
+                using (var conn = new SqlConnection(AriaMasterConnection))
+                {
+                    conn.Open();
+
+                    using (var cmd = new SqlCommand("SELECT TOP 1 * FROM Clients WHERE Url = @Url", conn))
+                    {
+                        cmd.Parameters.AddWithValue("@Url", origin);
+                        using (var reader = cmd.ExecuteReader())
+                        {
+                            if (reader.Read()) // only first row
+                            {
+                                var connectionString = reader["ConnectionString"]?.ToString();
+                                var reportsConnectionString = reader["ReportsConnectionString"]?.ToString();
+                                var url = reader["Url"]?.ToString();
+                                var path = reader["Path"]?.ToString();   // <-- Path column
+                                var pathTemp = reader["TempPath"]?.ToString();   // <-- Path Temp column
+                                var omitt = reader["Omitt"]?.ToString();   // <-- Omitt column
+
+                                if (!string.IsNullOrEmpty(connectionString))
+                                {
+                                    var _appConfiguration = _configurationAccessor.Configuration;
+                                    _appConfiguration["App:ClientRootAddress"] = url;
+                                    _appConfiguration["Attachment:Path"] = @path;   // <-- set from DB
+                                    _appConfiguration["Attachment:PathTemp"] = @pathTemp;   // <-- set from DB
+                                    _appConfiguration["Attachment:Omitt"] = @omitt;   // <-- set from DB
+                                    _appConfiguration["ConnectionStrings:Reports"] = @reportsConnectionString;   // <-- set from DB
+                                    ConfigureXtraReportConnectionStrings();
+
+                                    return connectionString;
+                                }
+                            }
+
+                            // fallback if no row or no valid connection string
+                            return base.GetNameOrConnectionString(args);
+                        }
+                    }
+
+                }
+            }
+
+            return base.GetNameOrConnectionString(args);
+        }
+  
+    
+   
+    
+    
+    }
+
+
     [DependsOn(
         typeof(onetouchWebCoreModule)
     )]
@@ -42,6 +142,11 @@ namespace onetouch.Web.Startup
         {
             Configuration.Modules.AbpWebCommon().MultiTenancy.DomainFormat = _appConfiguration["App:ServerRootAddress"] ?? "https://localhost:44333/";
             Configuration.Modules.AspNetZero().LicenseCode = _appConfiguration["AbpZeroLicenseCode"];
+
+
+            IocManager.Register<IConnectionStringResolver, OriginBasedConnectionStringResolver>(Abp.Dependency.DependencyLifeStyle.Transient);
+
+
         }
 
         public override void Initialize()

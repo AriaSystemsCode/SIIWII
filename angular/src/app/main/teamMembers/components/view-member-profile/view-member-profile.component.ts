@@ -92,32 +92,62 @@ export class ViewMemberProfileComponent extends AppComponentBase implements OnIn
     this.getAllAttachmentCategories()
 
   }
-
+  private buildBranchDisplay(member: CreateOrEditAccountInfoDto | undefined): string {
+    if (!member) {
+      return '';
+    }
+  
+    const parts: string[] = [];
+  
+    if (member.branchName) {
+      // Branch name followed by " - "
+      parts.push(member.branchName + ' -');
+    }
+  
+    if (member.addressLine1) {
+      parts.push(member.addressLine1);
+    }
+    if (member.addressLine2) {
+      parts.push(member.addressLine2);
+    }
+    if (member.city) {
+      parts.push(member.city);
+    }
+    if (member.state) {
+      parts.push(member.state);
+    }
+    if (member.zipCode) {
+      parts.push(member.zipCode);
+    }
+    if (member.countryName) {
+      parts.push(member.countryName);
+    }
+  
+   
+    return parts.join(', ');
+  }
+  
   editMember() {
     this.Editting = true;
-    this.userAdminId =  Number(this.route.snapshot.queryParamMap.get('userId')) 
-    this.userAdminId != 0 ? this.adminContact = true : this.adminContact = false
-    
+    this.userAdminId = Number(this.route.snapshot.queryParamMap.get('userId'));
+    this.userAdminId != 0 ? this.adminContact = true : this.adminContact = false;
+  
     if (!this.fromManualAcc) {
       this.editInfo = false;
       this.NoteditInfo = true;
-      this.editjobTitleValue = this.jobTitleAttr?.selectedValues[this.jobTitleAttr.selectedValues.length - 1].value;
-      this.editBranchValue =
-          (this.memberData?.branchName ? (this.memberData?.branchName + ' ' + " - ") : '') +
-          (this.memberData?.addressLine1 ? (this.memberData?.addressLine1 + ', ') : '') +
-          (this.memberData?.addressLine2 ? this.memberData?.addressLine2 + ', ' : '') +
-          (this.memberData?.city ? (this.memberData?.city + ', ') : '') +
-          (this.memberData?.state ? (this.memberData?.state + ', ') : '') +
-          (this.memberData?.zipCode ? (this.memberData?.zipCode + ', ') : '') +
-          (this.memberData?.countryName ? (this.memberData?.countryName) : '');
-
-          this.oldEditBranchValue =this.editBranchValue;
+  
+    
+      this.editjobTitleValue = this.getStringValue(706);
+  
+      this.editBranchValue = this.buildBranchDisplay(this.memberData);
+    this.oldEditBranchValue = this.editBranchValue;
     } else {
       const memberId: number = this.memberData?.id;
-      if (isNaN(memberId)) return
+      if (isNaN(memberId)) return;
       this.edit.emit(memberId);
     }
   }
+  
   deleteMember() {
     const memberId: number = this.memberData?.id;
     if (isNaN(memberId)) return
@@ -132,70 +162,88 @@ export class ViewMemberProfileComponent extends AppComponentBase implements OnIn
     );
   }
   private lastInputId: number;
+
   show(input: ViewMemberProfileComponentInputsI, isManualOrExternalContact?: boolean) {
     this.lastInputId = input.id;
     this.isManualOrExternalContact = isManualOrExternalContact;
-
-    this.canDelete = input.canDelete
-    this.canEdit = input.canEdit
-    this.title = input.title
+  
+    this.canDelete = input.canDelete;
+    this.canEdit = input.canEdit;
+    this.title = input.title;
+  
     this.editInfo = true;
     this.NoteditInfo = false;
     this.Editting = false;
-    this.showMainSpinner()
-
-    this._AccountsServiceProxy.getAppContactForView(input.id)
-      .pipe(finalize(() => {
-        this.hideMainSpinner()
-        this.active = true
-        this.getAppItemTypeExtraAttributesById()
-
-
-      }))
-      .subscribe((result) => {
-
+  
+    this.showMainSpinner();
+  
+    this._AccountsServiceProxy
+      .getAppContactForView(input.id)
+      .pipe(
+        finalize(() => {
+          this.hideMainSpinner();
+          this.active = true;
+          this.getAppItemTypeExtraAttributesById();
+        })
+      )
+      .subscribe(result => {
         this.memberData = result;
-        this.memberData.accountId = this.memberData.accountId
+        this.memberData.accountId = this.memberData.accountId; // keeps current behavior
+  
 
         this.showUserList = false;
         this.userSearchQuery = '';
-
-        this._userService.getUsers('', undefined, undefined, undefined, undefined, undefined, 0)
+  
+        this._userService
+          .getUsers('', undefined, undefined, undefined, undefined, undefined, 0)
           .subscribe(users => {
-            const indx = result.entityExtraData.findIndex(x => x.attributeId === 715);
-
+            const entityExtraData = this.memberData?.entityExtraData || [];
+            const indx = entityExtraData.findIndex(x => x.attributeId === 715);
+  
             if (indx >= 0) {
               this.memberIslink = true;
-              const linkedUserId = result.entityExtraData[indx].attributeValue;
-              this.filteredUsers = users.items.filter(user => user.id.toString() !== linkedUserId && !user.memberId);
+              const linkedUserId = entityExtraData[indx].attributeValue;
+              this.filteredUsers = users.items.filter(
+                user => user.id.toString() !== linkedUserId && !user.memberId
+              );
             } else {
               this.memberIslink = false;
               this.filteredUsers = users.items.filter(user => !user.memberId);
             }
-
+  
             this.originalFilteredUsers = [...this.filteredUsers];
           });
-
-        this.userAdminId != 0 ? this.adminContact = true : this.adminContact = false
-        const firstName = this.memberData?.extraDataAttributes[0]?.selectedValues?.[this.memberData.extraDataAttributes[0].selectedValues.length - 1]?.value
-        const lastName = this.memberData?.extraDataAttributes[1]?.selectedValues?.[this.memberData.extraDataAttributes[1].selectedValues.length - 1]?.value
-        this.contactDisplayName = firstName ? firstName : ""
-        this.contactDisplayName += lastName ? " " + lastName : ""
-        const logoAttachment = this.memberData?.entityAttachments?.find(att => att.attachmentCategoryId === 1 && att.url);
-
-        if (logoAttachment) {
-          this.logoPhoto = this.attachmentBaseUrl + '/' + logoAttachment.url;
+  
+          const firstName = this.getAttributeStringFromDto(result, 701);
+          const lastName  = this.getAttributeStringFromDto(result, 702);
+  
+        this.contactDisplayName = firstName ? firstName : '';
+        this.contactDisplayName += lastName ? ' ' + lastName : '';
+  
+     
+        const attachments = this.memberData?.entityAttachments || [];
+  
+        const logoAttachment = attachments.find(
+          att => att.attachmentCategoryId === 1 && !!att.url
+        );
+        if (logoAttachment?.url) {
+          this.logoPhoto = `${this.attachmentBaseUrl}/${logoAttachment.url}`;
+        } else {
+          this.logoPhoto = undefined;
         }
+  
+        const coverAttachment = attachments.find(
+          att => att.attachmentCategoryId === 2 && !!att.url
+        );
 
-        const coverAttachment = this.memberData?.entityAttachments?.find(att => att.attachmentCategoryId === 2 && att.url);
-
-        if (logoAttachment) {
-          this.coverPhoto = this.attachmentBaseUrl + '/' + coverAttachment.url;
+        if (coverAttachment?.url) {
+          this.coverPhoto = `${this.attachmentBaseUrl}/${coverAttachment.url}`;
+        } else {
+          this.coverPhoto = undefined;
         }
-
       });
   }
-
+  
   hide() {
     this.active = false
     this.memberData = undefined
@@ -223,35 +271,44 @@ export class ViewMemberProfileComponent extends AppComponentBase implements OnIn
   }
 
   EditUserName() {
+  
+    const rawId = this.getUserIdValue();
+
+    if (!rawId) {
+      this.message.warn(this.l('ThisMemberIsNotLinkedToUser')); // or your preferred message
+      return;
+    }
+
+    const userId = Number(rawId);
+
+    if (Number.isNaN(userId) || userId <= 0) {
+      this.message.error('Invalid linked user id: ' + rawId);
+      return;
+    }
 
     this.createOrEditUserModal.user = new UserEditDto();
-    this.createOrEditUserModal.user.id = Number(this.userId?.selectedValues[this.userId.selectedValues.length - 1]?.value);
-    this._userService.getUserForEdit(this.createOrEditUserModal.user.id).subscribe(userResult => {
-      if (userResult) {
-        // this.createOrEditUserModal.user.name= this.memberData?.extraDataAttributes[0]?.selectedValues?.[this.memberData.extraDataAttributes[0].selectedValues.length - 1]?.value
-        // this.createOrEditUserModal.user.surname=this.memberData?.extraDataAttributes[1]?.selectedValues?.[this.memberData.extraDataAttributes[1].selectedValues.length - 1]?.value
-        // this.createOrEditUserModal.user.userName=this.memberData?.extraDataAttributes[12]?.selectedValues?.[this.memberData.extraDataAttributes[12].selectedValues.length - 1]?.value
-        // this.createOrEditUserModal.user.emailAddress=this.memberData?.eMailAddress
-        // this.createOrEditUserModal.user.phoneNumber=this.memberData?.phone1Number
-        this.createOrEditUserModal.teamMemberId = this.memberData?.id
-        this.createOrEditUserModal.user.name = userResult?.user?.name
-        this.createOrEditUserModal.user.surname = userResult?.user?.surname
-        this.createOrEditUserModal.user.userName = userResult?.user?.userName
-        this.createOrEditUserModal.user.emailAddress = userResult?.user?.emailAddress
-        this.createOrEditUserModal.user.phoneNumber = userResult?.user?.phoneNumber
-        this.createOrEditUserModal.fromTeamMember = true;
-      }
-
-
-      // this.createOrEditUserModal.fromTeamMember=true;
-      this.createOrEditUserModal.show(this.createOrEditUserModal.user.id)
-
-
-
-    });
-
+    this.createOrEditUserModal.user.id = userId;
+    this.createOrEditUserModal.teamMemberId = this.memberData?.id;
+    this.createOrEditUserModal.fromTeamMember = true;
+  
+    this.showMainSpinner();
+  
+    this._userService
+      .getUserForEdit(userId)
+      .pipe(finalize(() => this.hideMainSpinner()))
+      .subscribe(userResult => {
+        if (userResult) {
+          this.createOrEditUserModal.user.name        = userResult.user?.name;
+          this.createOrEditUserModal.user.surname     = userResult.user?.surname;
+          this.createOrEditUserModal.user.userName    = userResult.user?.userName;
+          this.createOrEditUserModal.user.emailAddress= userResult.user?.emailAddress;
+          this.createOrEditUserModal.user.phoneNumber = userResult.user?.phoneNumber;
+        }
+  
+        this.createOrEditUserModal.show(userId);
+      });
   }
-
+  
   editjobTitleValue: string = '';
   editBranchValue: string = '';
   oldEditBranchValue: string = "";
@@ -422,10 +479,26 @@ export class ViewMemberProfileComponent extends AppComponentBase implements OnIn
   }
 
   getUserIdValue(): string | null {
-    const userIdAttr = this.memberData?.extraDataAttributes?.find(attr => attr.extraAttributeId === 715);
-    const val = userIdAttr?.selectedValues?.[userIdAttr.selectedValues.length - 1]?.value;
-    return val && val.trim() !== '' ? val : null;
+
+    const userAttr = this.memberData?.extraDataAttributes
+      ?.find(attr => attr.extraAttributeId === 715);
+  
+    const extraVal = userAttr?.selectedValues?.length
+      ? userAttr.selectedValues[userAttr.selectedValues.length - 1].value
+      : null;
+  
+    let val = extraVal;
+  
+
+    if (!val || !val.toString().trim()) {
+      const entityAttr = this.memberData?.entityExtraData
+        ?.find(e => e.attributeId === 715);
+      val = entityAttr?.attributeValue ?? null;
+    }
+  
+    return val && val.toString().trim() !== '' ? val.toString() : null;
   }
+  
 
   get jobTitleAttr() {
     return this.memberData?.extraDataAttributes?.find(attr => attr.extraAttributeId === 706);
@@ -468,9 +541,9 @@ export class ViewMemberProfileComponent extends AppComponentBase implements OnIn
 
 
   getStringValue(attrId: number): string {
-    const attr = this.memberData?.extraDataAttributes?.find(a => a.extraAttributeId === attrId);
-    return attr?.selectedValues?.[attr.selectedValues.length - 1]?.value ?? '';
+    return this.getAttributeStringFromDto(this.memberData, attrId);
   }
+  
 
 
   // setBooleanValue(attrId: number, checked: boolean): void {
@@ -555,5 +628,36 @@ export class ViewMemberProfileComponent extends AppComponentBase implements OnIn
       }))
       .subscribe();
   }
+  private getAttributeStringFromDto(
+    dto: CreateOrEditAccountInfoDto | undefined,
+    attrId: number
+  ): string {
+    if (!dto) {
+      return '';
+    }
+  
+    
+    const extraAttr = dto.extraDataAttributes
+      ?.find(a => a.extraAttributeId === attrId);
+  
+    const extraVal = extraAttr?.selectedValues?.length
+      ? extraAttr.selectedValues[extraAttr.selectedValues.length - 1].value
+      : null;
+  
+    if (extraVal && extraVal.toString().trim() !== '') {
+      return extraVal.toString();
+    }
+  
+
+    const entityAttr = dto.entityExtraData
+      ?.find(e => e.attributeId === attrId);
+  
+    const entityVal = entityAttr?.attributeValue;
+  
+    return entityVal && entityVal.toString().trim() !== ''
+      ? entityVal.toString()
+      : '';
+  }
+  
   
 }

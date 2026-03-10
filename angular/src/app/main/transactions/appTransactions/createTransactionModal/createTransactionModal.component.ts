@@ -27,6 +27,7 @@ import {
     CurrencyInfoDto,
     AppEntitiesServiceProxy,
     CreateOrEditAccountInfoDto,
+
 } from "@shared/service-proxies/service-proxies";
 import { Router } from "@angular/router";
 import Swal from "sweetalert2";
@@ -133,6 +134,8 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit, 
 
     primeDateFormat = 'mm/dd/yy'; // default
     languageSettingName  =AppConsts.languageSettingName;
+    currentLang:string
+    isArabic:boolean = true
     constructor(
         injector: Injector,
         private fb: FormBuilder,
@@ -141,6 +144,7 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit, 
         private userClickService: UserClickService,
         private router: Router,
         private _AppEntitiesServiceProxy: AppEntitiesServiceProxy,
+
     ) {
         super(injector);
         this.initForm()
@@ -378,62 +382,73 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit, 
 
 
     }
+
     handleBuyerCompanySearch(event: any) {
+        const filter = typeof event === 'string' ? event : (event?.filter ?? '');
+      
         this._AppTransactionServiceProxy
-            .getRelatedAccounts(
-                event.filter,
-                undefined,
-                undefined,
-                undefined,
-                undefined,
-                undefined,
-                undefined,
-                undefined,
-                undefined,
-                undefined,
-                undefined,
-                undefined,
-                undefined,
-                undefined,
-                undefined,
-                undefined,
-                undefined,
-                undefined,
-                undefined,
-                undefined, true, this.role == "I'm an Independent buying office." ? 'SO' : this.formType?.toUpperCase()
-            )
-            .subscribe((res: any) => {
-                this.buyerCompanies = [...res.items];
-            });
-    }
+          .getRelatedAccounts(
+            filter,
+            undefined, undefined, undefined, undefined,
+            undefined, undefined, undefined, undefined, undefined,
+            undefined, undefined, undefined, undefined, undefined,
+            undefined, undefined, undefined, undefined, undefined,
+            true,
+            this.role == "I'm an Independent buying office." ? 'SO' : this.formType?.toUpperCase()
+          )
+          .subscribe((res: any) => {
+            this.buyerCompanies = [...(res.items || [])];
+
+            // if (this.buyerCompanies.length === 1) {
+            //   const only = this.buyerCompanies[0];
+      
+            //   this.buyerComapnyId = only.id;
+            //   this.buyerCompanySSIN = only.accountSSIN;
+            //   this.currencyCode = only.currencyCode;
+
+            //   this.orderForm.get("buyerCompanyName")?.setValue(only, { emitEvent: false });
+
+            //   this.orderForm.get("buyerContactPhoneNumber")?.setValue(only.phone);
+            //   this.orderForm.get("buyerContactEMailAddress")?.setValue(only.email);
+
+            //   this.handleBuyerCompanyChange({ value: only });
+            // }
+          });
+      }
+      
     handleSellerCompanySearch(event: any) {
+        const filter = typeof event === 'string' ? event : (event?.filter ?? '');
+      
         this._AppTransactionServiceProxy
-            .getRelatedAccounts(
-                event.filter,
-                undefined,
-                undefined,
-                undefined,
-                undefined,
-                undefined,
-                undefined,
-                undefined,
-                undefined,
-                undefined,
-                undefined,
-                undefined,
-                undefined,
-                undefined,
-                undefined,
-                undefined,
-                undefined,
-                undefined,
-                undefined,
-                undefined, true, this.role == "I'm an Independent Sales Rep." ? 'PO' : this.formType?.toUpperCase()
-            )
-            .subscribe((res: any) => {
-                this.sellerCompanies = [...res.items];
-            });
-    }
+          .getRelatedAccounts(
+            filter,
+            undefined, undefined, undefined, undefined,
+            undefined, undefined, undefined, undefined, undefined,
+            undefined, undefined, undefined, undefined, undefined,
+            undefined, undefined, undefined, undefined, undefined,
+            true,
+            this.role == "I'm an Independent Sales Rep." ? 'PO' : this.formType?.toUpperCase()
+          )
+          .subscribe((res: any) => {
+            this.sellerCompanies = [...(res.items || [])];
+   
+            if (this.sellerCompanies.length === 1) {
+              const only = this.sellerCompanies[0];
+      
+              this.sellerCompanyId = only.id;
+              this.sellerCompanySSIN = only.accountSSIN;
+              this.sellerCurrencyCode = only.currencyCode;
+
+              this.orderForm.get("sellerCompanyName")?.setValue(only, { emitEvent: false });
+      
+              this.orderForm.get("sellerContactPhoneNumber")?.setValue(only.phone);
+              this.orderForm.get("sellerContactEMailAddress")?.setValue(only.email);
+
+              this.handleSellerCompanyChange({ value: only });
+            }
+          });
+      }
+      
 
     handleBuyerCompanyChange(event: any) {
         this.searchTerm = ''
@@ -1130,7 +1145,8 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit, 
         this.minDate = new Date();
         this.minDate.setMonth(prevMonth);
         this.minDate.setFullYear(prevYear);
-
+        this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
+        this.currentLang == 'ar' || this.currentLang == 'ar-EG'  ? this.isArabic = true : this.isArabic = false
 
     }
 

@@ -25,6 +25,8 @@ namespace onetouch.AppItems.Dtos
         public string Description { get; set; }
 
         public decimal Price { get; set; }
+        public decimal TaxRate { get; set; }
+
         public long StockAvailability { get; set; }
 
         public string Status { get; set; }
@@ -100,6 +102,7 @@ namespace onetouch.AppItems.Dtos
         public virtual string CurrencySymbol { get; set; }
         public virtual string CurrencyName { get; set; }
         public virtual bool IsDefault { set; get; }
+        public virtual string BuyerSSIN { set; get; }
     }
     public class AppItemSizesScaleInfo : AppSizeScaleDto
     {
@@ -147,6 +150,7 @@ namespace onetouch.AppItems.Dtos
         public string Description { get; set; }
 
         public decimal Price { get; set; }
+        public decimal TaxRate { get; set; }
         public long StockAvailability { get; set; }
 
         public string Status { get; set; }

@@ -101,11 +101,11 @@ namespace onetouch.AppEntities
             IRepository<AppEntityUserReactions, long> appEntityUserReactions,
             IRepository<AppPost, long> appPostRepository, IProfileAppService iProfileAppService, IAppNotifier appNotifier
             , IRepository<AppEntityState, long> appEntityStateRepository, IRepository<AppMarketplaceTransactionContacts, long> appMarketplaceTransactionContactsRepository
-            , IRepository<AppTransactionContacts, long> appTransactionContactsRepository,
-            ISycEntityObjectTypesAppService sycEntityObjectTypesAppService
+            , IRepository<AppTransactionContacts, long> appTransactionContactsRepository
+            , ISycEntityObjectTypesAppService sycEntityObjectTypesAppService
             )
         {
-            _SycEntityObjectTypesAppService= sycEntityObjectTypesAppService;
+            _SycEntityObjectTypesAppService = sycEntityObjectTypesAppService;
             _iProfileAppService = iProfileAppService;
             _appEntityRepository = appEntityRepository;
             _appEntityAddressRepository = appEntityAddressRepository;
@@ -324,6 +324,8 @@ namespace onetouch.AppEntities
                 var appEntity = _appEntityRepository.GetAll().Where(x => x.Id == id)
                     .Include(x => x.RelatedEntitiesRelationships).ThenInclude(x => x.RelatedEntityFk)
                     .Include(x => x.EntitiesRelationships).FirstOrDefault();
+                if (appEntity == null)
+                    return new GetAppEntityForViewDto();
 
                 var output = new GetAppEntityForViewDto { AppEntity = ObjectMapper.Map<AppEntityDto>(appEntity) };
 
@@ -683,6 +685,35 @@ namespace onetouch.AppEntities
                 })
                 .ToListAsync();
         }
+        //T-SII-20251105.0001
+        //public async Task<List<LookupLabelDto>> GetAllEntitiesByTypeCode(string code)
+        //{
+        //    string imagesUrl = _appConfiguration[$"Attachment:Path"].Replace(_appConfiguration[$"Attachment:Omitt"], "") + @"/";
+        //    var languageId = await _helper.SystemTables.GetEntityObjectTypeLanguageId();
+        //    using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
+        //    {
+        //        return await _appEntityRepository.GetAll().Include(x => x.EntityAttachments).ThenInclude(z => z.AttachmentFk).Include(z => z.EntityExtraData)
+        //        .Include(z=>z.EntityObjectStatusFk)
+        //        .Where(x => x.EntityObjectTypeCode == code && (x.TenantId == AbpSession.TenantId || x.TenantId == null))
+        //        .OrderBy("Name asc")
+        //        .Select(appEntity => new LookupLabelDto
+        //        {
+        //            Value = appEntity.Id,
+        //            //I49[Start]
+        //            EntityObjectStatusId = appEntity.EntityObjectStatusId,
+        //            Status = (appEntity.EntityObjectStatusFk != null ? appEntity.EntityObjectStatusFk.Name : ""),
+        //            //I49[End]
+        //            Label = appEntity.Name.ToString(),
+        //            Code = appEntity.Code,
+        //            IsHostRecord = appEntity.TenantId == null,
+        //            HexaCode = (appEntity.EntityExtraData != null && appEntity.EntityExtraData.Where(z => z.AttributeId == 39).FirstOrDefault() != null) ? appEntity.EntityExtraData.Where(z => z.AttributeId == 39).FirstOrDefault().AttributeValue : "",
+        //            Image = (appEntity.EntityAttachments != null && appEntity.EntityAttachments.FirstOrDefault() != null && appEntity.EntityAttachments.FirstOrDefault().AttachmentFk != null) ?
+        //                          (imagesUrl + (appEntity.EntityAttachments.FirstOrDefault().AttachmentFk.TenantId == null ? "-1" : appEntity.EntityAttachments.FirstOrDefault().AttachmentFk.TenantId.ToString()) + @"/" + appEntity.EntityAttachments.FirstOrDefault().AttachmentFk.Attachment.ToString()) : ""
+        //        })
+        //        .ToListAsync();
+        //    }
+        //}
+        //MMT30
 
         public async Task<List<LookupLabelDto>> GetAllEntitiesByTypeCode(string code)
         {
@@ -690,25 +721,69 @@ namespace onetouch.AppEntities
             var languageId = await _helper.SystemTables.GetEntityObjectTypeLanguageId();
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
             {
-                return await _appEntityRepository.GetAll().Include(x => x.EntityAttachments).ThenInclude(z => z.AttachmentFk).Include(z => z.EntityExtraData)
-                .Include(z=>z.EntityObjectStatusFk)
-                .Where(x => x.EntityObjectTypeCode == code && (x.TenantId == AbpSession.TenantId || x.TenantId == null))
-                .OrderBy("Name asc")
-                .Select(appEntity => new LookupLabelDto
-                {
-                    Value = appEntity.Id,
-                    //I49[Start]
-                    EntityObjectStatusId = appEntity.EntityObjectStatusId,
-                    Status = (appEntity.EntityObjectStatusFk != null ? appEntity.EntityObjectStatusFk.Name : ""),
-                    //I49[End]
-                    Label = appEntity.Name.ToString(),
-                    Code = appEntity.Code,
-                    IsHostRecord = appEntity.TenantId == null,
-                    HexaCode = (appEntity.EntityExtraData != null && appEntity.EntityExtraData.Where(z => z.AttributeId == 39).FirstOrDefault() != null) ? appEntity.EntityExtraData.Where(z => z.AttributeId == 39).FirstOrDefault().AttributeValue : "",
-                    Image = (appEntity.EntityAttachments != null && appEntity.EntityAttachments.FirstOrDefault() != null && appEntity.EntityAttachments.FirstOrDefault().AttachmentFk != null) ?
-                                  (imagesUrl + (appEntity.EntityAttachments.FirstOrDefault().AttachmentFk.TenantId == null ? "-1" : appEntity.EntityAttachments.FirstOrDefault().AttachmentFk.TenantId.ToString()) + @"/" + appEntity.EntityAttachments.FirstOrDefault().AttachmentFk.Attachment.ToString()) : ""
-                })
-                .ToListAsync();
+                //return await _appEntityRepository.GetAll().Include(x => x.EntityAttachments).ThenInclude(z => z.AttachmentFk).Include(z => z.EntityExtraData)
+                //.Include(z=>z.EntityObjectStatusFk)
+                //.Where(x => x.EntityObjectTypeCode == code && (x.TenantId == AbpSession.TenantId || x.TenantId == null))
+                //.OrderBy("Name asc")
+                //.Select(appEntity => new LookupLabelDto
+                //{
+                //    Value = appEntity.Id,
+                //    //I49[Start]
+                //    EntityObjectStatusId = appEntity.EntityObjectStatusId,
+                //    Status = (appEntity.EntityObjectStatusFk != null ? appEntity.EntityObjectStatusFk.Name : ""),
+                //    //I49[End]
+                //    Label = appEntity.Name.ToString(),
+                //    Code = appEntity.Code,
+                //    IsHostRecord = appEntity.TenantId == null,
+                //    HexaCode = (appEntity.EntityExtraData != null && appEntity.EntityExtraData.Where(z => z.AttributeId == 39).FirstOrDefault() != null) ? appEntity.EntityExtraData.Where(z => z.AttributeId == 39).FirstOrDefault().AttributeValue : "",
+                //    Image = (appEntity.EntityAttachments != null && appEntity.EntityAttachments.FirstOrDefault() != null && appEntity.EntityAttachments.FirstOrDefault().AttachmentFk != null) ?
+                //                  (imagesUrl + (appEntity.EntityAttachments.FirstOrDefault().AttachmentFk.TenantId == null ? "-1" : appEntity.EntityAttachments.FirstOrDefault().AttachmentFk.TenantId.ToString()) + @"/" + appEntity.EntityAttachments.FirstOrDefault().AttachmentFk.Attachment.ToString()) : ""
+                //})
+                //.ToListAsync();
+                return await _appEntityRepository
+                        .GetAll()
+                        .Include(x => x.EntityAttachments)
+                            .ThenInclude(z => z.AttachmentFk)
+                        .Include(x => x.EntityExtraData)
+                        .Include(x => x.EntityObjectStatusFk)
+                        .Where(x =>
+                            x.EntityObjectTypeCode == code &&
+                            (x.TenantId == AbpSession.TenantId || x.TenantId == null))
+                        .OrderBy(x => x.Name)
+                        .Select(appEntity => new LookupLabelDto
+                        {
+                            Value = appEntity.Id,
+
+                            // I49
+                            EntityObjectStatusId = appEntity.EntityObjectStatusId,
+                            Status = appEntity.EntityObjectStatusFk != null
+                                ? appEntity.EntityObjectStatusFk.Name
+                                : string.Empty,
+
+                            Label = appEntity.Name,
+                            Code = appEntity.Code,
+                            IsHostRecord = appEntity.TenantId == null,
+
+                            // Hexa code (same logic, cleaner)
+                            HexaCode = appEntity.EntityExtraData
+                                .Where(z => z.AttributeId == 39)
+                                .Select(z => z.AttributeValue)
+                                .FirstOrDefault(),
+
+                            // Image (same logic, no repeated FirstOrDefault)
+                            Image = appEntity.EntityAttachments
+                                .Where(a => a.AttachmentFk != null)
+                                .Select(a =>
+                                    imagesUrl +
+                                    (a.AttachmentFk.TenantId == null
+                                        ? "-1"
+                                        : a.AttachmentFk.TenantId.ToString()) +
+                                    "/" +
+                                    a.AttachmentFk.Attachment)
+                                .FirstOrDefault()
+                        })
+                        .ToListAsync();
+
             }
         }
         //MMT30
@@ -1308,7 +1383,7 @@ namespace onetouch.AppEntities
                         {
                             var appEntityAttachment = _appEntityAttachmentRepository.GetAll().Where(r => r.Id == item.Id).FirstOrDefault();
 
-                            entity.EntityAttachments.Add(new AppEntityAttachment { AttachmentCategoryId = (int)item.AttachmentCategoryId, EntityId = entity.Id, AttachmentId = appEntityAttachment.AttachmentId, IsDefault = item.IsDefault, Attributes = item.Attributes });
+                            entity.EntityAttachments.Add(new AppEntityAttachment { AttachmentCategoryId = (int)item.AttachmentCategoryId, EntityId = entity.Id, AttachmentId = appEntityAttachment.AttachmentId, IsDefault = item.IsDefault, Attributes = item.Attributes, IsPublic = item.IsPublic });
                         }
                         else
                         {
@@ -1327,7 +1402,7 @@ namespace onetouch.AppEntities
                                     att = await _appAttachmentRepository.InsertAsync(att);
                                     await CurrentUnitOfWork.SaveChangesAsync();
                                     //entity.EntityAttachments.Add(new AppEntityAttachment { AttachmentCategoryId = (int)item.AttachmentCategoryId, EntityId = entity.Id, AttachmentId = att.Id });
-                                    entity.EntityAttachments.Add(new AppEntityAttachment { AttachmentCategoryId = (int)item.AttachmentCategoryId, EntityId = entity.Id, AttachmentId = att.Id, IsDefault = item.IsDefault, Attributes = item.Attributes });
+                                    entity.EntityAttachments.Add(new AppEntityAttachment { AttachmentCategoryId = (int)item.AttachmentCategoryId, EntityId = entity.Id, AttachmentId = att.Id, IsDefault = item.IsDefault, Attributes = item.Attributes,IsPublic = item.IsPublic });
                                     //await CurrentUnitOfWork.SaveChangesAsync();
                                 }
                                 else
@@ -1692,7 +1767,8 @@ namespace onetouch.AppEntities
             return 0;
         }
 
-        [AllowAnonymous]
+        //[AllowAnonymous]
+        [AbpAllowAnonymous]
         public async Task<string> GetHostSettingValue(long settingId, string type = "")
         {
             var hostId = await GetCurrentHostEntityId();
@@ -1702,12 +1778,22 @@ namespace onetouch.AppEntities
                 if (extraDataList != null && extraDataList.Items != null && extraDataList.Items.Count > 0)
                 {
                     var attributeValue = extraDataList.Items[0].AttributeValue;
-                    if (type.ToUpper() =="FILE" && !string.IsNullOrEmpty(attributeValue) && attributeValue.Contains('|') )
+                    if (type.ToUpper() == "FILE" && !string.IsNullOrEmpty(attributeValue) && attributeValue.Contains('|'))
                     {
-                        string imagesUrl = _appConfiguration[$"Attachment:Path"].Replace(_appConfiguration[$"Attachment:Omitt"], "") + @"/";
-                        attributeValue = imagesUrl +  "-1" + @"/" + attributeValue.Split('|')[1];
+                        // Get the base path and remove omitted part
+                        string imagesUrl = _appConfiguration["Attachment:Path"]
+                                            .Replace(_appConfiguration["Attachment:Omitt"], "");
 
+                        // Split the attribute value
+                        string filePart = attributeValue.Split('|')[1];
+
+                        // Combine safely
+                        string fullPath = Path.Combine(imagesUrl, "-1", filePart);
+
+                        // If you need it as URL for browser/API, convert backslashes to forward slashes
+                        attributeValue = fullPath.Replace("\\", "/");
                     }
+
                     return attributeValue;
                 }
             }
@@ -1724,12 +1810,28 @@ namespace onetouch.AppEntities
                 if (extraDataList != null && extraDataList.Items != null && extraDataList.Items.Count > 0)
                 {
                     var attributeValue = extraDataList.Items[0].AttributeValue;
+                    //if (type.ToUpper() == "FILE" && !string.IsNullOrEmpty(attributeValue) && attributeValue.Contains('|'))
+                    //{
+                    //    string imagesUrl = _appConfiguration[$"Attachment:Path"].Replace(_appConfiguration[$"Attachment:Omitt"], "") + @"\";
+                    //    attributeValue = imagesUrl + (AbpSession.TenantId == null ? "-1" : AbpSession.TenantId.ToString()) + @"\" + attributeValue.Split('|')[1];
+
+                    //}
                     if (type.ToUpper() == "FILE" && !string.IsNullOrEmpty(attributeValue) && attributeValue.Contains('|'))
                     {
-                        string imagesUrl = _appConfiguration[$"Attachment:Path"].Replace(_appConfiguration[$"Attachment:Omitt"], "") + @"/";
-                        attributeValue = imagesUrl + (AbpSession.TenantId == null ? "-1" : AbpSession.TenantId.ToString()) + @"/" + attributeValue.Split('|')[1];
+                        // Get base path and remove omitted part
+                        string imagesUrl = _appConfiguration["Attachment:Path"]
+                                            .Replace(_appConfiguration["Attachment:Omitt"], "");
 
+                        // Combine paths safely using Path.Combine (avoids double slashes)
+                        string tenantPart = AbpSession.TenantId?.ToString() ?? "-1";
+                        string filePart = attributeValue.Split('|')[1];
+
+                        string fullPath = Path.Combine(imagesUrl, tenantPart, filePart);
+
+                        // If you need URL format (for browser), replace backslashes with forward slashes
+                        attributeValue = fullPath.Replace("\\", "/");
                     }
+
                     return attributeValue;
                 }
             }
@@ -2585,7 +2687,7 @@ namespace onetouch.AppEntities
             returnObject.Value = input.Id;
             returnObject.IsHostRecord = input.TenantId == null;
             returnObject.HexaCode = (input.EntityExtraData != null && input.EntityExtraData.Where(z => z.AttributeId == 39).FirstOrDefault() != null) ? input.EntityExtraData.Where(z => z.AttributeId == 39).FirstOrDefault().AttributeValue : "";
-            returnObject.Image = (input.EntityAttachments != null && input.EntityAttachments.FirstOrDefault() != null && input.EntityAttachments.FirstOrDefault().guid != null) ?
+            returnObject.Image = (input.EntityAttachments != null && input.EntityAttachments.FirstOrDefault() != null && input.EntityAttachments.FirstOrDefault().guid != null) && !string.IsNullOrEmpty(input.EntityAttachments.FirstOrDefault().FileName) ?
                           (imagesUrl + input.TenantId.ToString() + @"/" + input.EntityAttachments.FirstOrDefault().guid.ToString()+"."+ input.EntityAttachments.FirstOrDefault().FileName.Split('.')[1]) : "";
 
             return returnObject;
@@ -2603,6 +2705,7 @@ namespace onetouch.AppEntities
                 attach.FileName = Path.GetFileName(input.Image);
                 attach.Url = input.Image;
                 attach.guid =  Path.GetFileNameWithoutExtension(input.Image);
+                attach.AttachmentCategoryId = 3;
                 returnObject.EntityAttachments.Add(attach);
             }
             if (!string.IsNullOrEmpty(input.HexaCode))
@@ -2617,55 +2720,55 @@ namespace onetouch.AppEntities
             return returnObject;
         }
         //I40[Start]
-        public async Task<PagedResultDto<ExtraDataAttrDto>> GetAppEntityExtraDataWithPaging(long entityId, long entityObjectTypeId)
-        {
-            using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
-            {
-                GetAllEntityObjectTypeOutput entityObjectExtraAttribute = null;
-                var entityObjectExtraAttributeReturn = await _SycEntityObjectTypesAppService.GetAllWithExtraAttributes(entityObjectTypeId);
-                if (entityObjectExtraAttributeReturn != null)
-                {
-                    entityObjectExtraAttribute = entityObjectExtraAttributeReturn.FirstOrDefault();
-                }
+        //public async Task<PagedResultDto<ExtraDataAttrDto>> GetAppEntityExtraDataWithPaging(long entityId, long entityObjectTypeId)
+        //{
+        //    using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
+        //    {
+        //        GetAllEntityObjectTypeOutput entityObjectExtraAttribute = null;
+        //        var entityObjectExtraAttributeReturn = await _SycEntityObjectTypesAppService.GetAllWithExtraAttributes(entityObjectTypeId);
+        //        if (entityObjectExtraAttributeReturn != null)
+        //        {
+        //            entityObjectExtraAttribute = entityObjectExtraAttributeReturn.FirstOrDefault();
+        //        }
 
 
 
-                if (entityId != 0 && entityObjectExtraAttribute != null && entityObjectExtraAttribute.ExtraAttributes != null && entityObjectExtraAttribute.ExtraAttributes.ExtraAttributes != null)
-                {
-                    var extraAttributedefintion = entityObjectExtraAttribute.ExtraAttributes.ExtraAttributes;
-                    // *Abdo End
-                    //get all extra data type, AttributeId
-                    //var attributesIds = extraAttributedefintion.Where(r => r.Usage.ToUpper().Trim() == recommandedOrAdditional.ToString().ToUpper()).Select(r => r.AttributeId).ToList();
-                    var attributesIds = extraAttributedefintion.OrderBy(r => r.Usage.ToUpper().Trim()).Select(r => r.AttributeId).ToList();
-                    var usedExtraDataPagedPerAttribute = GetAppEntityAttrDistinctWithPaging(new GetAppEntityAttributesWithAttributeIdsInput { MaxResultCount = 10000, SkipCount = 0, Sorting = null, AttributeIds = attributesIds, EntityId = entityId }).Result.Items.ToList();
+        //        if (entityId != 0 && entityObjectExtraAttribute != null && entityObjectExtraAttribute.ExtraAttributes != null && entityObjectExtraAttribute.ExtraAttributes.ExtraAttributes != null)
+        //        {
+        //            var extraAttributedefintion = entityObjectExtraAttribute.ExtraAttributes.ExtraAttributes;
+        //            // *Abdo End
+        //            //get all extra data type, AttributeId
+        //            //var attributesIds = extraAttributedefintion.Where(r => r.Usage.ToUpper().Trim() == recommandedOrAdditional.ToString().ToUpper()).Select(r => r.AttributeId).ToList();
+        //            var attributesIds = extraAttributedefintion.OrderBy(r => r.Usage.ToUpper().Trim()).Select(r => r.AttributeId).ToList();
+        //            var usedExtraDataPagedPerAttribute = GetAppEntityAttrDistinctWithPaging(new GetAppEntityAttributesWithAttributeIdsInput { MaxResultCount = 10000, SkipCount = 0, Sorting = null, AttributeIds = attributesIds, EntityId = entityId }).Result.Items.ToList();
 
-                    List<ExtraDataAttrDto> returnedList = new List<ExtraDataAttrDto>();
+        //            List<ExtraDataAttrDto> returnedList = new List<ExtraDataAttrDto>();
 
-                    foreach (var EntityExtraData in extraAttributedefintion)
-                    {
-                        if (usedExtraDataPagedPerAttribute.Contains(EntityExtraData.AttributeId))
-                        {
-                            var extraDataAttrDtoPagedlocal = GetAppEntityExtraWithPaging(new GetAppEntityAttributesWithAttributeIdsInput { MaxResultCount = 10000, SkipCount = 0, AttributeIds = new List<long>() { EntityExtraData.AttributeId }, EntityId = entityId }).Result.Items.ToList();
-                            var extraDataSelectedValues = extraDataAttrDtoPagedlocal.Select(r => new ExtraDataSelectedValues { value = (r.AttributeValueFkName != null ? r.AttributeValueFkName : r.AttributeValue) });
+        //            foreach (var EntityExtraData in extraAttributedefintion)
+        //            {
+        //                if (usedExtraDataPagedPerAttribute.Contains(EntityExtraData.AttributeId))
+        //                {
+        //                    var extraDataAttrDtoPagedlocal = GetAppEntityExtraWithPaging(new GetAppEntityAttributesWithAttributeIdsInput { MaxResultCount = 10000, SkipCount = 0, AttributeIds = new List<long>() { EntityExtraData.AttributeId }, EntityId = entityId }).Result.Items.ToList();
+        //                    var extraDataSelectedValues = extraDataAttrDtoPagedlocal.Select(r => new ExtraDataSelectedValues { value = (r.AttributeValueFkName != null ? r.AttributeValueFkName : r.AttributeValue) });
 
-                            if (extraDataSelectedValues.ToList().Count > 0)
-                            {
-                                var extraDataAttrDto = new ExtraDataAttrDto();
-                                extraDataAttrDto.extraAttrUsage = EntityExtraData.Usage;
-                                extraDataAttrDto.extraAttrName = EntityExtraData.Name;
-                                extraDataAttrDto.extraAttrDataType = EntityExtraData.DataType; // Abdo added this 
-                                extraDataAttrDto.selectedValues = extraDataSelectedValues.ToList();
-                                extraDataAttrDto.extraAttributeId = EntityExtraData.AttributeId;
-                                { returnedList.Add(extraDataAttrDto); }
-                            }
-                        }
+        //                    if (extraDataSelectedValues.ToList().Count > 0)
+        //                    {
+        //                        var extraDataAttrDto = new ExtraDataAttrDto();
+        //                        extraDataAttrDto.extraAttrUsage = EntityExtraData.Usage;
+        //                        extraDataAttrDto.extraAttrName = EntityExtraData.Name;
+        //                        extraDataAttrDto.extraAttrDataType = EntityExtraData.DataType; // Abdo added this 
+        //                        extraDataAttrDto.selectedValues = extraDataSelectedValues.ToList();
+        //                        extraDataAttrDto.extraAttributeId = EntityExtraData.AttributeId;
+        //                        { returnedList.Add(extraDataAttrDto); }
+        //                    }
+        //                }
 
-                    }
-                    return new PagedResultDto<ExtraDataAttrDto>(usedExtraDataPagedPerAttribute.Count, returnedList);
-                }
-                return new PagedResultDto<ExtraDataAttrDto>(0, new List<ExtraDataAttrDto>());
-            }
-        }
+        //            }
+        //            return new PagedResultDto<ExtraDataAttrDto>(usedExtraDataPagedPerAttribute.Count, returnedList);
+        //        }
+        //        return new PagedResultDto<ExtraDataAttrDto>(0, new List<ExtraDataAttrDto>());
+        //    }
+        //}
         //I40[End]
     }
 }

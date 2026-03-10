@@ -1,8 +1,8 @@
 import { Component, ElementRef, EventEmitter, Injector, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
-import { Router } from '@node_modules/@angular/router';
+import { Router } from '@angular/router';
 import { AppConsts } from '@shared/AppConsts';
 import { AppComponentBase } from '@shared/common/app-component-base';
-import { AccountDto, AccountsServiceProxy, AppEntityAttachmentDto, CreateMessageInput, MessageServiceProxy, OverAllRatingDto } from '@shared/service-proxies/service-proxies';
+import { AccountDto, AccountsServiceProxy, AppEntityAttachmentDto, AppMarketplaceItemsServiceProxy, CreateMessageInput, MessageServiceProxy, OverAllRatingDto } from '@shared/service-proxies/service-proxies';
 import { finalize } from 'rxjs';
 
 @Component({
@@ -17,7 +17,7 @@ export class OverviewTabComponent extends AppComponentBase implements OnInit, On
   @Input('marketPlaceData') marketPlaceData: AccountDto;
   @Output("activeTabIndexBtn") activeTabIndexBtn: EventEmitter<number> = new EventEmitter<number>()
   @ViewChild('reviewsSection') reviewsSection!: ElementRef;
-  
+
   baseUrl: string = AppConsts.attachmentBaseUrl;
   overRating: OverAllRatingDto
   mediaItems: AppEntityAttachmentDto[]
@@ -27,9 +27,10 @@ export class OverviewTabComponent extends AppComponentBase implements OnInit, On
   isModalOpen: boolean = false;
   selectedIndex: number = 0;
   totalImgs: number = 0
-  accountReviewMsg =  "Your review for this account has already been recorded."
-  isLoading:boolean = false
-  constructor(injector: Injector, private messageServiceProxy: MessageServiceProxy, private _AccountsServiceProxy: AccountsServiceProxy,
+  accountReviewMsg = "Your review for this account has already been recorded."
+  isLoading: boolean = false
+  items: any[]
+  constructor(injector: Injector, private messageServiceProxy: MessageServiceProxy, private _AccountsServiceProxy: AccountsServiceProxy, private _AppMarketplaceItemsServiceProxy: AppMarketplaceItemsServiceProxy,
     private _router: Router,
 
   ) {
@@ -42,7 +43,7 @@ export class OverviewTabComponent extends AppComponentBase implements OnInit, On
     this.getOverAllRatings()
     this.getAllMedia()
 
-
+    this.getAllProducts()
   }
 
 
@@ -108,8 +109,10 @@ export class OverviewTabComponent extends AppComponentBase implements OnInit, On
     }
   }
 
-  goSvR() {
-    this._router.navigate(['/app/main/marketplace/products'], {
+  goSvR(event: MouseEvent) {
+    
+    sessionStorage.setItem('SellerSSIN', JSON.stringify(this.accountDataForView?.ssin));
+       this._router.navigate(['/app/main/marketplace/products'], {
       state: {
         fromMarketAcoount: true,
         accountDataForView: this.accountDataForView,
@@ -118,6 +121,56 @@ export class OverviewTabComponent extends AppComponentBase implements OnInit, On
     });
   }
   
+  getAllProducts() {
+
+    const selectedCurrency = (this.accountDataForView.currencyName || 'USD')
+
+    this._AppMarketplaceItemsServiceProxy
+      .getAll(
+        this.accountDataForView?.ssin,
+        this.accountDataForView?.ssin,
+        undefined,
+        undefined,
+        false,
+        '',
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        2,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+
+        undefined,
+        selectedCurrency,
+        undefined,
+        undefined,
+        'name',
+        0,
+        4
+      )
+
+      .pipe(
+        finalize(() => {
+
+        })
+      )
+      .subscribe((result) => {
+        this.items = result.items;
+
+    
+
+
+
+      });
+  }
+
+
 
   ngOnDestroy() {
     this.unsubscribeToAllSubscriptions();

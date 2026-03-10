@@ -20,7 +20,8 @@ using PayPalCheckoutSdk.Orders;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 using Abp.Runtime.Session;
 using onetouch.Configuration;
- 
+using System.IO;
+
 
 namespace onetouch.Migrations.Seed.Host
 {
@@ -46,6 +47,138 @@ namespace onetouch.Migrations.Seed.Host
             //MMT-Iteration37[Start]
             //CreateMessagesCategories();
             //MMT-Iteration37[End]
+            SeedExtraAttributes();
+        }
+
+        public void SeedExtraAttributes()
+        {
+            var assetsPath = Path.Combine(Directory.GetCurrentDirectory(), "Assets");
+
+            if (!Directory.Exists(assetsPath))
+                return;
+
+            // 1. Read all XML files and extract ObjectCode and ParentCode
+            var xmlFiles = Directory.GetFiles(assetsPath, "*.xml")
+                .Select(file =>
+                {
+                    var fileInfo = new FileInfo(file);
+
+                    string name = Path.GetFileNameWithoutExtension(file);
+
+                    // Split by double underscore "__"
+                    string objectCode = null;
+                    string parentCode = null;
+                    string code = null;
+                    string remainder = null;
+
+                    var parts = name.Split(new string[] { "_" }, StringSplitOptions.None);
+
+                    if (parts.Length == 4)
+                    {
+                        objectCode = string.IsNullOrWhiteSpace(parts[0]) ? null : parts[0].ToUpper();
+                        parentCode = string.IsNullOrWhiteSpace(parts[1]) ? null : parts[1].ToUpper();
+                        code = string.IsNullOrWhiteSpace(parts[2]) ? null : parts[2].ToUpper();
+                        remainder = parts[3];
+                    }
+                    else
+                    {
+                        return null; // invalid file
+                    }
+
+                    // Extract ParentCode (everything before the last underscore)
+                    //int lastUnderscore = remainder.LastIndexOf('_');
+                    //if (lastUnderscore < 0) return null;
+
+                    //string parentCode = remainder.Substring(0, lastUnderscore).ToUpper();
+
+                    // Determine the effective file time
+                    DateTime? fileTime = TryParseDateTimeFromFileName(name);
+
+                    return new
+                    {
+                        ObjectCode = objectCode,
+                        ParentCode = parentCode,
+                        Code = code,
+                        Path = file,
+                        FileTime = fileTime
+                    };
+                })
+                .Where(x => x != null)
+                // 2. Group by ObjectCode + ParentCode
+                .GroupBy(x => new { x.ObjectCode, x.ParentCode , x.Code})
+                // 3. Pick the file with the latest FileTime in each group
+                .ToDictionary(
+                    g => g.Key,
+                    g => g.OrderByDescending(x => x.FileTime).First()
+                );
+
+            if (!xmlFiles.Any()) return;
+
+            // 2. Load matching DB records
+            var items = _context.SycEntityObjectTypes.ToList();
+
+            // 3. Update ExtraAttributes
+            foreach (var item in items)
+            {
+                var key = new
+                {
+                    ObjectCode = (item.ObjectCode ?? "").ToUpper(),
+                    ParentCode = (item.ParentCode ?? "").ToUpper(),
+                    Code = (item.Code ?? "").ToUpper()
+                };
+
+                if (xmlFiles.TryGetValue(key, out var file))
+                {
+                    string xml = File.ReadAllText(file.Path);
+
+                    if (!string.IsNullOrWhiteSpace(xml))
+                    {
+                        // Compare file time with DB record update time
+                        DateTime dbUpdateTime = item.LastModificationTime ?? item.CreationTime;
+
+                        if (file.FileTime > dbUpdateTime)
+                        {
+                            item.ExtraAttributes = xml;
+                            item.LastModificationTime = file.FileTime;
+
+                        }
+                    }
+                }
+            }
+
+            _context.SaveChanges();
+        }
+
+
+        // Custom parser for filenames like "HOST-2021-05-05 064208.6066667"
+        private DateTime? TryParseDateTimeFromFileName(string fileName)
+        {
+            var parts = fileName.Split('_');
+            if (parts.Length < 2)
+                return null;
+
+            string dateTimeStr = string.Join("_", parts.Skip(3)); // "2021-05-05 064208.6066667"
+
+            // Split date and time
+            var dtParts = dateTimeStr.Split(' ');
+            if (dtParts.Length != 2)
+                return null;
+
+            string datePart = dtParts[0]; // "2021-05-05"
+            string timePart = dtParts[1]; // "064208.6066667"
+
+            // Parse as "yyyy-MM-ddHHmmss.fffffff"
+            if (DateTime.TryParseExact(
+                datePart + timePart,
+                "yyyy-MM-ddHHmmss.fffffff",
+                System.Globalization.CultureInfo.InvariantCulture,
+                System.Globalization.DateTimeStyles.None,
+                out DateTime result))
+            {
+                return result;
+            }
+
+            return null;
         }
 
         private void CreateHostRoleAndUsers()
@@ -362,11 +495,11 @@ namespace onetouch.Migrations.Seed.Host
             #endregion Add missing SydObjects
 
             #region Add missing sycEntityObjectTypes
-            var parents = "LOOKUP,ITEM,ITEM,ITEM,LISTING,CATEGORY,DEPARTMENT,CLASSIFICATION,CONTACT,CONTACT,CONTACT,CONTACT,,SCALE,TRANSACTION,TRANSACTION,LOOKUP,STANDARDFEATURE,STANDARDSUBSCRIPTIONPLAN,TENANTACTIVITYLOG,LOOKUP,TRANSACTION,MESSAGE-DATA,MESSAGE-DATA,MESSAGE-DATA,MESSAGE-DATA,LOOKUP,LOOKUP,LOOKUP,LOOKUP,MARKETPLACECONTACTRELATIONSHIP,MARKETPLACECONTACTRELATIONSHIP,MARKETPLACECONTACTRELATIONSHIP,MARKETPLACECONTACTRELATIONSHIP,MARKETPLACECONTACTRELATIONSHIP,MARKETPLACECONTACTRELATIONSHIP,MARKETPLACECONTACTRELATIONSHIP,MARKETPLACECONTACTRELATIONSHIP,LOOKUP".ToUpper().Split(',');
+            var parents = "LOOKUP,LOOKUP,LOOKUP,ITEM,ITEM,ITEM,LISTING,CATEGORY,DEPARTMENT,CLASSIFICATION,CONTACT,CONTACT,CONTACT,CONTACT,SCALE,TRANSACTION,TRANSACTION,LOOKUP,STANDARDFEATURE,STANDARDSUBSCRIPTIONPLAN,TENANTACTIVITYLOG,LOOKUP,TRANSACTION,MESSAGE-DATA,MESSAGE-DATA,MESSAGE-DATA,MESSAGE-DATA,LOOKUP,LOOKUP,LOOKUP,LOOKUP,MARKETPLACECONTACTRELATIONSHIP,MARKETPLACECONTACTRELATIONSHIP,MARKETPLACECONTACTRELATIONSHIP,MARKETPLACECONTACTRELATIONSHIP,MARKETPLACECONTACTRELATIONSHIP,MARKETPLACECONTACTRELATIONSHIP,MARKETPLACECONTACTRELATIONSHIP,MARKETPLACECONTACTRELATIONSHIP,LOOKUP".ToUpper().Split(',');
+            var codes = "TRANSACTIONCHARGES,CHARGETYPES,BACKGROUND,PRODUCTVARIATION,PRODUCT,LISTINGVARIATION,LISTING,CATEGORY,DEPARTMENT,CLASSIFICATION,BRANCH,BUSINESS,GROUP,PERSONAL,SIZESCALE,SALESORDER,PURCHASEORDER,SHIPVIA,STANDARDFEATURE,STANDARDSUBSCRIPTIONPLAN,TENANTACTIVITYLOG,UOM,ARINVOICE,MESSAGE,COMMENT,REVIEW,QUESTION,MARKETPLACESECTIONTYPE,MARKETPLACESECTION,MARKETPLACEBLOCKTYPE,MARKETPLACESECTIONBLOCK,PTB,PTG,PTP,BTP,BTG,BTB,GTP,GTB,MARKETPLACECONTACTRELATIONSHIP".ToUpper().Split(',');
+            var names = "Transaction Charges,Charge Types,Background,Product Variation,Product,Listing Variation,Listing,Category,Department,Classification,Branch,BUSINESS,Group,Personal,Size Scale,Sales Order,Purchase Order,Ship Via,Standard Feature,Standard Subscription Plan,Tenant Activity Log,Unit Of Measurement,AR Invoice,Message,Comment,Review,Question,Marketplace Section Type,Marketplace Section,Marketplace Block Type,Marketplace Section Block,Person relation with Business,Person relation with Group,Person relation with Person,Business relation with Person,Business relation with Group,Business relation with Business,Group relation with Person,Group relation with Business,Marketplace Contact Relationship".Split(',');
             //var parents = "LOOKUP,ITEM,ITEM,ITEM,LISTING,CATEGORY,DEPARTMENT,CLASSIFICATION,CONTACT,CONTACT,CONTACT,CONTACT,SCALE,TRANSACTION,TRANSACTION,LOOKUP,STANDARDFEATURE,STANDARDSUBSCRIPTIONPLAN,TENANTACTIVITYLOG,LOOKUP,TRANSACTION,MESSAGE-DATA,MESSAGE-DATA,MESSAGE-DATA,MESSAGE-DATA,MARKETPLACECONTACTRELATIONSHIP,MARKETPLACECONTACTRELATIONSHIP,MARKETPLACECONTACTRELATIONSHIP,MARKETPLACECONTACTRELATIONSHIP,MARKETPLACECONTACTRELATIONSHIP,MARKETPLACECONTACTRELATIONSHIP,MARKETPLACECONTACTRELATIONSHIP,MARKETPLACECONTACTRELATIONSHIP,LOOKUP".ToUpper().Split(',');
-            var codes = "BACKGROUND,PRODUCTVARIATION,PRODUCT,LISTINGVARIATION,LISTING,CATEGORY,DEPARTMENT,CLASSIFICATION,BRANCH,BUSINESS,GROUP,PERSONAL,SIZESCALE,SALESORDER,PURCHASEORDER,SHIPVIA,STANDARDFEATURE,STANDARDSUBSCRIPTIONPLAN,TENANTACTIVITYLOG,UOM,ARINVOICE,MESSAGE,COMMENT,REVIEW,QUESTION,MARKETPLACESECTIONTYPE,MARKETPLACESECTION,MARKETPLACEBLOCKTYPE,MARKETPLACESECTIONBLOCK,PTB,PTG,PTP,BTP,BTG,BTB,GTP,GTB,MARKETPLACECONTACTRELATIONSHIP".ToUpper().Split(',');
             //var codes = "BACKGROUND,PRODUCTVARIATION,PRODUCT,LISTINGVARIATION,LISTING,CATEGORY,DEPARTMENT,CLASSIFICATION,BRANCH,BUSINESS,GROUP,PERSONAL,SIZESCALE,SALESORDER,PURCHASEORDER,SHIPVIA,STANDARDFEATURE,STANDARDSUBSCRIPTIONPLAN,TENANTACTIVITYLOG,UOM,ARINVOICE,MESSAGE,COMMENT,REVIEW,QUESTION,PTB,PTG,PTP,BTP,BTG,BTB,GTP,GTB,MARKETPLACECONTACTRELATIONSHIP".ToUpper().Split(',');
-            var names = "Background,Product Variation,Product,Listing Variation,Listing,Category,Department,Classification,Branch,BUSINESS,Group,Personal,Size Scale,Sales Order,Purchase Order,Ship Via,Standard Feature,Standard Subscription Plan,Tenant Activity Log,Unit Of Measurement,AR Invoice,Message,Comment,Review,Question,Marketplace Section Type,Marketplace Section,Marketplace Block Type,Marketplace Section Block,Person relation with Business,Person relation with Group,Person relation with Person,Business relation with Person,Business relation with Group,Business relation with Business,Group relation with Person,Group relation with Business,Marketplace Contact Relationship".Split(',');
             //var names = "Background,Product Variation,Product,Listing Variation,Listing,Category,Department,Classification,Branch,BUSINESS,Group,Personal,Size Scale,Sales Order,Purchase Order,Ship Via,Standard Feature,Standard Subscription Plan,Tenant Activity Log,Unit Of Measurement,AR Invoice,Message,Comment,Review,Question,Person relation with Business,Person relation with Group,Person relation with Person,Business relation with Person,Business relation with Group,Business relation with Business,Group relation with Person,Group relation with Business,Marketplace Contact Relationship".Split(',');
 
             for (int i = 0; i < codes.Length; i++)
@@ -584,6 +717,38 @@ namespace onetouch.Migrations.Seed.Host
                             ObjectId = sydObjects.Id,
                             ObjectCode = sydObjects.Code,
                             IsDefault = codes[i] == "ACTIVE" ? true : false
+                        };
+                        _context.SycEntityObjectStatuses.Add(SycEntityObjectStatuses);
+                        _context.SaveChanges();
+                    }
+                    
+                }
+            }
+            
+            //MMT-EntityLog[End]
+            //MMT40[Start]
+            ObjectCode = "MARKETPLACECONTACTRELATIONSHIP";
+            codes = "ACTIVE,INACTIVE,PENDING".ToUpper().Split(',');
+            names = "Active,InActive,Pending".Split(',');
+            for (int i = 0; i < codes.Length; i++)
+            {
+                var sydObjects = _context.SydObjects.IgnoreQueryFilters().FirstOrDefault(
+                    r => r.Code == ObjectCode);
+                if (sydObjects != null && sydObjects.Id > 0)
+                {
+                    var SycEntityObjectStatuses = _context.SycEntityObjectStatuses.IgnoreQueryFilters().FirstOrDefault(
+                        r => r.TenantId == null && r.Code == codes[i] && r.ObjectId == sydObjects.Id);
+
+                    if (sydObjects != null && sydObjects.Id > 0 &&
+                        SycEntityObjectStatuses == null)
+                    {
+                        SycEntityObjectStatuses = new SystemObjects.SycEntityObjectStatus()
+                        {
+                            Code = codes[i],
+                            Name = names[i],
+                            ObjectId = sydObjects.Id,
+                            ObjectCode = sydObjects.Code,
+                            IsDefault = codes[i] == "ACTIVE" ? true : false
 
                         };
                         _context.SycEntityObjectStatuses.Add(SycEntityObjectStatuses);
@@ -591,6 +756,12 @@ namespace onetouch.Migrations.Seed.Host
                     }
                 }
             }
+            //MMT40[End]
+                      
+                      
+                    
+                
+            
             //I49-[End]
         }
 
@@ -710,9 +881,9 @@ namespace onetouch.Migrations.Seed.Host
 
 
             #region Add missing SycAttachmentCategories
-            var extType = "4,4,1,1,1,1".ToUpper().Split(',');
-            var extension = "png,jpg,png,jpg,jpeg,webp".ToUpper().Split(',');
-            var extNames = "PNG,JPG,PNG,JPG,JPEG,WEBP".Split(',');
+            var extType = "1,1,1,1,1,1,1,1".ToUpper().Split(',');
+            var extension = "png,jpg,jpeg,webp,pdf,mp4,mwv,avi".ToUpper().Split(',');
+            var extNames = "PNG,JPG,JPEG,WEBP,PDF,MP4,WMV,AVI".Split(',');
 
             for (int i = 0; i < extNames.Length; i++)
             {

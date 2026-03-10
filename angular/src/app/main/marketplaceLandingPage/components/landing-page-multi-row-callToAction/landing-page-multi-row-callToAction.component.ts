@@ -1,8 +1,9 @@
 import { Component, Injector, Input, OnInit, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { Router } from '@angular/router';
-import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import {  SafeResourceUrl } from '@angular/platform-browser';
 import { AppComponentBase } from '@shared/common/app-component-base';
-import { AppItemsServiceProxy, PageSettingDto, SydObjectsServiceProxy } from '@shared/service-proxies/service-proxies';
+import { AppEntitiesServiceProxy, PageSettingDto, SydObjectsServiceProxy } from '@shared/service-proxies/service-proxies';
+import { AppConsts } from '@shared/AppConsts';
 type MediaKind = 'image' | 'video' | 'pdf' | 'other';
 @Component({
   selector: 'app-multi-row-callAction',
@@ -18,18 +19,26 @@ export class LandingPageMultiRowCallToActionComponent extends AppComponentBase i
   attachmentSafeMap: Record<number, SafeResourceUrl | null> = {};
 
   private objectUrlById: Record<number, string> = {};
-  
+  acceptedAspectRatio;
+
+  currencyCode: string; 
+  languageSettingName:string  =AppConsts.languageSettingName
+  showMsrP:boolean
   constructor(
     injector: Injector,
     private sydObjectsService: SydObjectsServiceProxy,
     private router: Router,
-       private sanitizer: DomSanitizer,
-        private appItems: AppItemsServiceProxy,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+      private _AppEntitiesServiceProxy: AppEntitiesServiceProxy,
   ) { super(injector); }
 
   ngOnInit(): void {
-    if (this.sectionId) this.getBlocksData();
+    this.initCurrencyCode();  
+    this.getSettingData()
+
+    if (this.sectionId) {
+      this.getBlocksData();
+    }
   }
 
   private compareByOrder = (a: PageSettingDto, b: PageSettingDto) => {
@@ -40,7 +49,7 @@ export class LandingPageMultiRowCallToActionComponent extends AppComponentBase i
 
   private getBlocksData(): void {
     this.sydObjectsService.getAllSectionBlocks(this.sectionId).subscribe({
-      next: (res) =>{ this.applyData(res ?? []);console.log(res,'multiii')},
+      next: (res) =>{ this.applyData(res ?? []);},
       error: () => this.applyData([])
     });
     
@@ -51,9 +60,6 @@ export class LandingPageMultiRowCallToActionComponent extends AppComponentBase i
     // this.sliderItems.filter(b => b.blockType === 'Attachment' && this.isPdf(b?.image)).forEach(b => this.ensurePdfSafeUrl(b));
 
     this.pageGroups = this.chunk(this.sliderItems, 12); // 3x3 per slide
-  
-    // prepare only the first slide initially
-    // this.prepareGroupPdfs(0);
   
     this.cdr.markForCheck();
   }
@@ -79,22 +85,37 @@ export class LandingPageMultiRowCallToActionComponent extends AppComponentBase i
   goToProduct(ssin?: string) {
     if (ssin) this.router.navigate(['/app/main/app-items/view', ssin]);
   }
-  goToBrand(brand: { name: string; id: number | string }) {
+  goToBrand(brand) {
    
     this.router.navigate(
         ['/app/main/marketplace/products'],
-        { queryParams: { brand: brand.name } }
+        { queryParams: { brand: brand?.getAppEntityForViewDto?.appEntity?.id } } 
     );
 }
 goToCategory(cat: { name: string; id: number | string }) {
    
   this.router.navigate(
       ['/app/main/marketplace/products'],
-      { queryParams: { cat: cat.name } }
+      { queryParams: { cat: cat.id } }  
   );
 }
 
+getAspectatio(): void {
+  this.getSycAttachmentCategoriesByCodes(['LOGO', 'BANNER', 'IMAGE'])
+    .subscribe(result => {
 
+      const imgCat = result.find(x => x.code === 'IMAGE');
+
+      if (imgCat?.aspectRatio) {
+      
+        const [w, h] = imgCat.aspectRatio.split(':').map(Number);
+
+        if (w && h) {
+          this.acceptedAspectRatio = h / w; 
+        }
+      }
+    });
+}
 
   fullUrl(path?: string): string {
     const p = (path ?? '').trim();
@@ -192,7 +213,133 @@ goToCategory(cat: { name: string; id: number | string }) {
     window.open(path)
   }
 
-  
+  viewProduct(prod: any) {
+    const productBodyRequestForView = {
+        id: prod?.appItem?.id,
+        // currencyCode: this.currency,
+        sellerSSIN: prod?.sellerSSIN,
+        // buyerSSIN : this.buyerSSIN
+    };
+    localStorage.setItem("productData", JSON.stringify(productBodyRequestForView))
+    this.router.navigate(["/app/main/marketplace/products/view", prod?.appItem?.id]);
+ 
+    // this.router.navigateByUrl(`/view/${id}`)
+}
+
+getAttachmentImage(b: PageSettingDto): string | null {
+  if (!b) return null;
+
+  // 1) block.image itself is an image path
+  if (this.isImg(b.image)) {
+    return this.fullUrl(b.image);
+  }
+
+  // 2) try entityAttachments: find first image attachment
+  const imgAtt = b.entityAttachments?.find(att =>
+    this.isImg(att?.url || att?.fileName)
+  );
+
+  if (imgAtt) {
+    return this.fullUrl(imgAtt.url || imgAtt.fileName);
+  }
+
+  return null;
+}
+
+
+hasPdfAttachment(b: PageSettingDto): boolean {
+  if (!b?.entityAttachments) return false;
+  return b.entityAttachments.some(att =>
+    this.isPdf(att?.url || att?.fileName)
+  );
+}
+
+
+getAttachmentPdfUrl(b: PageSettingDto): string | null {
+  if (!b?.entityAttachments) return null;
+
+  const pdfAtt = b.entityAttachments.find(att =>
+    this.isPdf(att?.url || att?.fileName)
+  );
+  if (!pdfAtt) return null;
+
+  return this.fullUrl(pdfAtt.url || pdfAtt.fileName);
+}
+
+
+getAttachmentClickUrl(b: PageSettingDto): string | null {
+  if (!b) return null;
+
+ 
+  const pdfUrl = this.getAttachmentPdfUrl(b);
+  if (pdfUrl) {
+    return pdfUrl;
+  }
+
+  if ((b as any).link)        return (b as any).link;
+  if (b.externalUrl)          return b.externalUrl;
+  if (b.linkPageUrl)          return b.linkPageUrl;
+
+
+  if (b.image) return this.fullUrl(b.image);
+
+  return null;
+}
+
+
+onAttachmentClick(b: PageSettingDto): void {
+  const url = this.getAttachmentClickUrl(b);
+  if (!url) { return; }
+
+  const finalUrl = /^https?:\/\//i.test(url) ? url : this.fullUrl(url);
+  window.open(finalUrl, '_blank');
+}
+
+private initCurrencyCode(): void {
+  // 1) try localStorage("currencyCode")
+  const stored = localStorage.getItem('currencyCode');
+
+  if (stored && stored !== 'undefined' && stored !== 'null') {
+    try {
+      const parsed = JSON.parse(stored);
+
+      // stored as "GBP"
+      if (typeof parsed === 'string' && parsed.trim()) {
+        this.currencyCode = parsed.trim();
+        return;
+      }
+
+      // stored as { code: "GBP", ... }
+      if (parsed && typeof parsed === 'object' && parsed.code) {
+        this.currencyCode = parsed.code;
+        return;
+      }
+    } catch {
+      // not JSON, maybe raw 'GBP'
+      if (stored.trim()) {
+        this.currencyCode = stored.trim();
+        return;
+      }
+    }
+  }
+
+  // 2) fallback to tenant default currency from AppComponentBase
+  if ((this as any).tenantDefaultCurrency?.code) {
+    this.currencyCode = (this as any).tenantDefaultCurrency.code;
+    return;
+  }
+
+  // 3) last fallback
+  this.currencyCode = 'USD';
+}
+getSettingData(){
+  this._AppEntitiesServiceProxy.getHostSettingValue(1214, null)
+  .subscribe((result) => {
+    this.showMsrP = result?.toString().toLowerCase() =='yes' ? true : false;
+
+  });
+
+}
 ngOnDestroy() {
   Object.values(this.objectUrlById).forEach(u => { try { URL.revokeObjectURL(u); } catch {} });
   this.objectUrlById = {};

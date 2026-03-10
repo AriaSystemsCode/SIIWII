@@ -7,7 +7,7 @@
                 {{ l(entityObjectDisplayName) }}
             </p>
         </h4>
-        <button style="position: absolute; right: 0; top: 8px" type="button" class="close" (click)="close()"
+        <button style="position: absolute;  top: 8px;width: 80px;" [ngClass]="isArabic ? 'icon-ar':'icon-en'" type="button" class="close" (click)="close()"
             aria-label="Close">
             <span aria-hidden="true">&times;</span>
         </button>

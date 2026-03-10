@@ -27,11 +27,12 @@ export class LoginComponent extends AppComponentBase implements OnInit {
     submitting = false;
     isMultiTenancyEnabled: boolean = this.multiTenancy.isEnabled;
     recaptchaSiteKey: string = AppConsts.recaptchaSiteKey;
-    oldUserName: string;
-
+    oldUserName:string;
     currentLang:string
     isArabic:boolean 
     
+
+    isHost:boolean
     constructor(
         injector: Injector,
         public loginService: LoginService,
@@ -68,7 +69,7 @@ export class LoginComponent extends AppComponentBase implements OnInit {
 
     ngOnInit(): void {
         this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
-        this.currentLang == 'ar' ? this.isArabic = true : this.isArabic = false
+        this.currentLang == 'ar' || this.currentLang == 'ar-EG'  ? this.isArabic = true : this.isArabic = false
         if (
             this._sessionService.userId > 0 &&
             UrlHelper.getReturnUrl() &&
@@ -179,29 +180,31 @@ export class LoginComponent extends AppComponentBase implements OnInit {
             });
     }
 
-    /**
-     * Decide the default page from host setting 1203,
-     * then return it via callback so login() can pass it to authenticate().
-     */
+ 
     chooseDefaultPage(callback: (url: string) => void): void {
-        this._appEntitiesServiceProxy.getHostSettingValue(1203,null).subscribe({
-            next: res2 => {
-                let defaultUrl = '/app/main/Home';
-
-                if (res2) {
-                    // const userNavigation = res2;
-                    defaultUrl = res2 == 'Marketplace Landing page'
-                        ? '/app/main/marketplace'
-                        : '/app/main/Home';
-                }
-
-                callback(defaultUrl);
-            },
-            error: err2 => {
-                console.error('Failed to load host setting 1203', err2);
-
-                callback('/app/main/dashboard');
-            }
+      
+        const tenantIdCookie = abp.multiTenancy.getTenantIdCookie(); 
+        const isHost = tenantIdCookie === null || tenantIdCookie === undefined;
+      
+        if (isHost) {
+          callback('/app/admin/hostDashboard');
+          return; 
+        }
+   
+        this._appEntitiesServiceProxy.getHostSettingValue(1203, null).subscribe({
+          next: (res2) => {
+            const url = (res2 === 'Marketplace')
+              ? '/app/main/marketplace'
+              : '/app/main/Home';
+      
+            callback(url);
+          },
+          error: (err) => {
+            console.error('Failed to load host setting 1203', err);
+            callback('/app/main/Home'); 
+          }
         });
-    }
+      }
+      
+      
 }

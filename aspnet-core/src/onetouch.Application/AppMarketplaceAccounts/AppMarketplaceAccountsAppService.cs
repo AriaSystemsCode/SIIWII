@@ -45,6 +45,7 @@ using Abp.EntityFrameworkCore.Uow;
 using NUglify.Helpers;
 using Microsoft.PowerShell.Commands;
 using onetouch.AppItems.Dtos;
+using ClosedXML.Excel;
 
 namespace onetouch.AppMarketplaceAccounts
 {
@@ -629,7 +630,18 @@ namespace onetouch.AppMarketplaceAccounts
                     var relationships = _appContactRelationshipInfoRepository.GetAll()
                                .Where(z => ((z.RequesterContactSSIN == account.SSIN)
                                || (z.RecipientContactSSIN == account.SSIN)) && z.EntityObjectStatusId == activeRelationshipStatusId &&
-                               (z.SharingLevel == 1 )).Count(); 
+                               (z.SharingLevel == 1 )).Count();
+                     var relationshipsQuery = _appContactRelationshipInfoRepository.GetAll()
+                             .Where(z => ((z.RequesterContactSSIN == account.SSIN)
+                             || (z.RecipientContactSSIN == account.SSIN)) && z.EntityObjectStatusId == activeRelationshipStatusId &&
+                             (z.SharingLevel == 1));
+
+                    var relationshipQ = from b in _appMarketplaceContactRepository.GetAll().Where(z => z.SSIN != account.SSIN && z.IsDeleted == false && z.SharingLevel == 1)
+                                        from a in relationshipsQuery
+                                        where (b.SSIN == a.RequesterContactSSIN || b.SSIN == a.RecipientContactSSIN) 
+                                        select new { obj = b };
+
+                    relationships = await relationshipQ.CountAsync();
                     //.WhereIf(input.AccountTypeId != null && input.AccountTypeId > 0, x =>
                     //(x.RequesterContactSSIN == input.SSIN && x.RecipientContactTypeId == long.Parse(input.AccountTypeId.ToString())) ||
                     //(x.RecipientContactSSIN == input.SSIN && x.RequesterContactTypeId == long.Parse(input.AccountTypeId.ToString())));
@@ -886,13 +898,28 @@ namespace onetouch.AppMarketplaceAccounts
                    (x.RequesterContactSSIN == account.SSIN && x.RecipientContactTypeId == long.Parse(personId.ToString())) ||
                    (x.RecipientContactSSIN == account.SSIN && x.RequesterContactTypeId == long.Parse(personId.ToString()))).CountAsync();
 
-                var relationshipsConut = await _appContactRelationshipInfoRepository.GetAll()
+                /*var relationshipsConut = await _appContactRelationshipInfoRepository.GetAll()
                               .Where(z => ((z.RequesterContactSSIN == account.SSIN)
                               || (z.RecipientContactSSIN == account.SSIN)) &&
                               _appMarketplaceContactRepository.GetAll().Count(x => x.SSIN == z.RecipientContactSSIN) > 0 &&
                               _appMarketplaceContactRepository.GetAll().Count(x => x.SSIN == z.RequesterContactSSIN) > 0 &&
                               z.EntityObjectStatusId == activeRelationshipStatusId &&
-                              (z.SharingLevel == 1)).CountAsync();// || (z.SharingLevel==4 && input.SSIN == currentTenantAccountSSIN)))
+                              (z.SharingLevel == 1)).CountAsync();// || (z.SharingLevel==4 && input.SSIN == currentTenantAccountSSIN)))*/
+                var relationships1 = _appContactRelationshipInfoRepository.GetAll()
+                               .Where(z => ((z.RequesterContactSSIN == account.SSIN)
+                               || (z.RecipientContactSSIN == account.SSIN)) && z.EntityObjectStatusId == activeRelationshipStatusId &&
+                               (z.SharingLevel == 1)).Count();
+                var relationshipsQuery1 = _appContactRelationshipInfoRepository.GetAll()
+                        .Where(z => ((z.RequesterContactSSIN == account.SSIN)
+                        || (z.RecipientContactSSIN == account.SSIN)) && z.EntityObjectStatusId == activeRelationshipStatusId &&
+                        (z.SharingLevel == 1));
+
+                var relationshipQ1 = from b in _appMarketplaceContactRepository.GetAll().Where(z => z.SSIN != account.SSIN && z.IsDeleted == false && z.SharingLevel == 1)
+                                    from a in relationshipsQuery1
+                                    where (b.SSIN == a.RequesterContactSSIN || b.SSIN == a.RecipientContactSSIN)
+                                    select new { obj = b };
+
+                var relationshipsConut = await relationshipQ1.CountAsync();
 
                 output.ConnectionCount = relationshipsConut;
                 //I40[End]
@@ -1031,7 +1058,7 @@ namespace onetouch.AppMarketplaceAccounts
                                                   .FirstOrDefaultAsync(x => x.TenantId == null
                                                   && x.IsProfileData == true
                                                   && x.TenantOwner == input.TenantId
-                                                  && x.SSIN == input.SSIN);
+                                                  && (x.SSIN == input.SSIN || (x.Name == input.Name && x.EntityObjectTypeId == input.AccountTypeId)));
 
                 #region if sync remove old data
                 if (FoundPublishContact != null)
@@ -1439,10 +1466,11 @@ namespace onetouch.AppMarketplaceAccounts
                     if (isPublic != null)
                     {
                         relation.SharingLevel = isPublic == true ? 1 : 4;
-                        await _appContactRelationshipInfoRepository.UpdateAsync(relation);
-                        await CurrentUnitOfWork.SaveChangesAsync();
+                       
                     }
-
+                    relation.EntityObjectStatusId = activeRealtionshipStatusId;
+                    await _appContactRelationshipInfoRepository.UpdateAsync(relation);
+                    await CurrentUnitOfWork.SaveChangesAsync();
                 }
             }
             else
@@ -1538,10 +1566,102 @@ namespace onetouch.AppMarketplaceAccounts
                     }
 
                     relation.ObjectId = await _helper.SystemTables.GetObjectMarketplaceContactRelationshipId();
-                    relation.Code = await _helper.SystemTables.GetNextSequence("MARKETPLACECONTACTRELATIONSHIP"); 
+                    relation.Code = await _helper.SystemTables.GetNextSequence("MARKETPLACECONTACTRELATIONSHIP");
+
+                    #region iteration49-charges 
+                    // get defaults from shipvia from current tenant else from host 
+                    // get defaults from payment terms from current tenant else from host 
+                    // update extra data of relationship with default payment terms, shipvia, taxable and price level values
+
+                    relation.EntityExtraData = new List<AppEntityExtraData>();
+
+                    var shipViaType = await _sycEntityObjectTypeRepository.GetAll().Where(z => z.Code=="SHIPVIA" && z.ObjectCode=="LOOKUP").FirstOrDefaultAsync();
+                    var defaultShipVia = await _appEntityRepository.GetAll().Where(z => z.TenantId == AbpSession.TenantId && z.EntityObjectTypeId == shipViaType.Id && z.IsDefault).Include(e=> e.EntityExtraData).FirstOrDefaultAsync();
+                    if (defaultShipVia == null)
+                    {   //get Host defaults if tenant defaults not found
+                        defaultShipVia = await _appEntityRepository.GetAll().Where(z => z.TenantId == null && z.EntityObjectTypeId == shipViaType.Id && z.IsDefault).Include(e => e.EntityExtraData).FirstOrDefaultAsync();
+                    }
+
+                    var paymentType = await _sycEntityObjectTypeRepository.GetAll().Where(z => z.Code == "PAYMENT-TERMS" && z.ObjectCode == "LOOKUP").FirstOrDefaultAsync();
+                    var defaultPaymentType = await _appEntityRepository.GetAll().Where(z => z.TenantId == AbpSession.TenantId && z.EntityObjectTypeId == paymentType.Id && z.IsDefault).Include(e => e.EntityExtraData).FirstOrDefaultAsync();
+                    if (defaultPaymentType == null)
+                    {
+                        //get Host defaults if tenant defaults not found
+                        defaultPaymentType = await _appEntityRepository.GetAll().Where(z => z.TenantId == null && z.EntityObjectTypeId == paymentType.Id && z.IsDefault).Include(e => e.EntityExtraData).FirstOrDefaultAsync();
+                    }
+
+                    relation.EntityExtraData.Add(new AppEntityExtraData
+                    {
+                        EntityId = relation.Id,
+                        EntityObjectTypeCode = paymentType.Code,
+                        EntityObjectTypeName = paymentType.Name,
+                        EntityObjectTypeId = paymentType.Id,
+
+                        AttributeId = 910,
+                        AttributeCode = "PAYMENT-TERMS",
+                        AttributeValueId = defaultPaymentType != null? defaultPaymentType.Id: null,
+                        AttributeValue = defaultPaymentType != null ? defaultPaymentType.Name : null // need to read default from default tenant payment terms
+                    });
+
+                    relation.EntityExtraData.Add(new AppEntityExtraData
+                    {
+                        EntityId = relation.Id,
+                        AttributeId = 911,
+                        AttributeValue = "false", // need to read default from default tenant shipvai
+                        AttributeCode = "ISTAXABLE"
+                    });
+
+                    relation.EntityExtraData.Add(new AppEntityExtraData
+                    {
+                        AttributeCode = "PRICELEVEL",
+                        AttributeId = 908,
+                        EntityId = relation.Id,
+                        AttributeValue = "MSRP" // need to read default from default tenant shipvai
+                    });
+                    
+                    var shippingMinimumAmount = "0";
+                    var shippingCharge = "0";
+                    if (defaultShipVia != null)
+                    {
+                        var defaultShippingMinimumAmount = defaultShipVia.EntityExtraData.Where(z => z.AttributeId == 905).FirstOrDefault();
+                        shippingMinimumAmount = defaultShippingMinimumAmount != null ? defaultShippingMinimumAmount.AttributeValue : "0";
+
+                        var defaultShippingCharge = defaultShipVia.EntityExtraData.Where(z => z.AttributeId == 904).FirstOrDefault();
+                        shippingCharge = defaultShippingCharge != null ? defaultShippingCharge.AttributeValue : "0";
+                    }
+
+                    relation.EntityExtraData.Add(new AppEntityExtraData
+                    {
+                        EntityId = relation.Id,
+                        EntityObjectTypeCode = shipViaType.Code,
+                        EntityObjectTypeName = shipViaType.Name,
+                        EntityObjectTypeId = shipViaType.Id,
+
+                        AttributeId = 909,
+                        AttributeCode = "SHIPVIA",
+                        AttributeValueId = defaultShipVia != null ? defaultShipVia.Id : null,
+                        AttributeValue = defaultShipVia != null ? defaultShipVia.Name : null // need to read default from default tenant payment terms
+                    });
+
+                    relation.EntityExtraData.Add(new AppEntityExtraData
+                    {
+                        AttributeCode = "SHIPPINGMINIMUMAMOUNT",
+                        AttributeId = 907,
+                        EntityId = relation.Id,
+                        AttributeValue = shippingMinimumAmount // need to read default from default tenant shipvai
+                    });
+
+                    relation.EntityExtraData.Add(new AppEntityExtraData
+                    {
+                        AttributeCode = "SHIPPINGCHARGE",
+                        AttributeId = 906,
+                        EntityId = relation.Id,
+                        AttributeValue = shippingCharge // need to read default from default tenant shipvai
+                    });
+                    #endregion iteration49-charges 
+
                     await _appContactRelationshipInfoRepository.InsertAsync(relation);
                     await CurrentUnitOfWork.SaveChangesAsync();
-
 
 
                 }

@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<XtraReportsLayoutSerializer SerializerVersion="22.2.4.0" Ref="1" ControlType="DevExpress.XtraReports.UI.XtraReport, DevExpress.XtraReports.v22.2, Version=22.2.4.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a" Name="Colors" ScriptsSource="&#xD;&#xA;private void GroupHeader1_BeforePrint(object sender, System.ComponentModel.CancelEventArgs e) {&#xD;&#xA;}&#xD;&#xA;&#xD;&#xA;private void Colors_BeforePrint(object sender, System.ComponentModel.CancelEventArgs e) {&#xD;&#xA;  &#xD;&#xA;&#xD;&#xA;}&#xD;&#xA;&#xD;&#xA;private void Colors_DataSourceDemanded(object sender, System.EventArgs e) {&#xD;&#xA;        if(this.ColorPageSort.Value.ToString().ToUpper() == &quot;MATERIALCONTENT&quot;)&#xD;&#xA;   {GroupField groupField = new GroupField(&quot;MeterialContent&quot;);&#xD;&#xA;    GroupHeader1.GroupFields.Add(groupField);}&#xD;&#xA;&#xD;&#xA;}&#xD;&#xA;" Margins="0, 0, 0, 0.3151576" PaperKind="A4" PageWidth="827" PageHeight="1169" Version="22.2" DataMember="LineSheet_ColorsData" DataSource="#Ref-0" Font="Arial, 9.75pt">
+<XtraReportsLayoutSerializer SerializerVersion="22.2.3.0" Ref="1" ControlType="DevExpress.XtraReports.UI.XtraReport, DevExpress.XtraReports.v22.2, Version=22.2.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a" Name="Colors" ScriptsSource="&#xD;&#xA;private void GroupHeader1_BeforePrint(object sender, System.ComponentModel.CancelEventArgs e) {&#xD;&#xA;}&#xD;&#xA;&#xD;&#xA;private void Colors_BeforePrint(object sender, System.ComponentModel.CancelEventArgs e) {&#xD;&#xA;  &#xD;&#xA;&#xD;&#xA;}&#xD;&#xA;&#xD;&#xA;private void Colors_DataSourceDemanded(object sender, System.EventArgs e) {&#xD;&#xA;        if(this.ColorPageSort.Value.ToString().ToUpper() == &quot;MATERIALCONTENT&quot;)&#xD;&#xA;   {GroupField groupField = new GroupField(&quot;MeterialContent&quot;);&#xD;&#xA;    GroupHeader1.GroupFields.Add(groupField);}&#xD;&#xA;&#xD;&#xA;}&#xD;&#xA;" Margins="0, 0, 0, 0.3151576" PaperKind="A4" PageWidth="827" PageHeight="1169" Version="22.2" DataMember="LineSheet_ColorsData" DataSource="#Ref-0" Font="Arial, 9.75pt">
   <Extensions>
     <Item1 Ref="2" Key="VSReportExtInfo" Value=".repx" />
   </Extensions>
@@ -64,42 +64,43 @@
           <Controls>
             <Item1 Ref="41" ControlType="XRPictureBox" Name="pictureBox1" Sizing="ZoomImage" KeepTogether="false" SizeF="90.21,87.8" LocationFloat="11.91817,5.538086" BackColor="Transparent" Borders="None">
               <ExpressionBindings>
-                <Item1 Ref="42" EventName="BeforePrint" PropertyName="ImageUrl" Expression="[Attachment]" />
+                <Item1 Ref="42" EventName="BeforePrint" PropertyName="BackColor" Expression="iif(Contains(upper([Attachment]), 'HTTP'), '',[Attachment])&#xA;" />
+                <Item2 Ref="43" EventName="BeforePrint" PropertyName="ImageUrl" Expression="iif(Contains(upper([Attachment]), 'HTTP'), [Attachment],'')&#xA;" />
               </ExpressionBindings>
-              <StylePriority Ref="43" UseBackColor="false" UseBorders="false" />
+              <StylePriority Ref="44" UseBackColor="false" UseBorders="false" />
             </Item1>
-            <Item2 Ref="44" ControlType="XRLabel" Name="label3" CanShrink="true" TextAlignment="MiddleCenter" SizeF="130,36.66191" LocationFloat="0.9999998,93.33809" Font="Arial, 9pt" ForeColor="Black" Padding="6,6,0,0,100" BorderColor="Transparent" Borders="Left" BorderWidth="2">
+            <Item2 Ref="45" ControlType="XRLabel" Name="label3" CanShrink="true" TextAlignment="MiddleCenter" SizeF="130,36.66191" LocationFloat="0.9999998,93.33809" Font="Arial, 9pt" ForeColor="Black" Padding="6,6,0,0,100" BorderColor="Transparent" Borders="Left" BorderWidth="2">
               <ExpressionBindings>
-                <Item1 Ref="45" EventName="BeforePrint" PropertyName="Text" Expression="[Code]+'-'+[Name]" />
+                <Item1 Ref="46" EventName="BeforePrint" PropertyName="Text" Expression="[Code]+'-'+[Name]" />
               </ExpressionBindings>
-              <StylePriority Ref="46" UseFont="false" UseForeColor="false" UsePadding="false" UseBorderColor="false" UseBorders="false" UseBorderWidth="false" UseTextAlignment="false" />
+              <StylePriority Ref="47" UseFont="false" UseForeColor="false" UsePadding="false" UseBorderColor="false" UseBorders="false" UseBorderWidth="false" UseTextAlignment="false" />
             </Item2>
           </Controls>
         </Item1>
       </Controls>
     </Item5>
-    <Item6 Ref="47" ControlType="PageFooterBand" Name="PageFooter" HeightF="0" />
-    <Item7 Ref="48" ControlType="GroupFooterBand" Name="GroupFooter1" Level="1" HeightF="1.768112" KeepTogether="true" />
+    <Item6 Ref="48" ControlType="PageFooterBand" Name="PageFooter" HeightF="0" />
+    <Item7 Ref="49" ControlType="GroupFooterBand" Name="GroupFooter1" Level="1" HeightF="1.768112" KeepTogether="true" />
   </Bands>
-  <Scripts Ref="49" OnDataSourceDemanded="Colors_DataSourceDemanded" />
+  <Scripts Ref="50" OnDataSourceDemanded="Colors_DataSourceDemanded" />
   <StyleSheet>
-    <Item1 Ref="50" Name="Title" BorderStyle="Inset" Padding="6,6,0,0,100" Font="Arial, 14.25pt" ForeColor="255,64,70,80" BackColor="Transparent" BorderColor="Black" Sides="None" StringFormat="Near;Near;0;None;Character;GenericDefault" BorderWidthSerializable="1" />
-    <Item2 Ref="51" Name="DetailCaption1" BorderStyle="Inset" Padding="6,6,0,0,100" Font="Arial, 8.25pt, style=Bold" ForeColor="255,64,70,80" BackColor="White" BorderColor="White" Sides="Left" StringFormat="Near;Center;0;None;Character;GenericDefault" TextAlignment="MiddleLeft" BorderWidthSerializable="2" />
-    <Item3 Ref="52" Name="DetailData1" BorderStyle="Inset" Padding="6,6,0,0,100" Font="Arial, 8.25pt" ForeColor="Black" BorderColor="Transparent" Sides="Left" StringFormat="Near;Center;0;None;Character;GenericDefault" TextAlignment="MiddleLeft" BorderWidthSerializable="2" />
-    <Item4 Ref="53" Name="DetailData3_Odd" BorderStyle="Inset" Padding="6,6,0,0,100" Font="Arial, 8.25pt" ForeColor="Black" BackColor="255,243,245,248" BorderColor="Transparent" Sides="None" StringFormat="Near;Center;0;None;Character;GenericDefault" TextAlignment="MiddleLeft" BorderWidthSerializable="1" />
-    <Item5 Ref="54" Name="PageInfo" BorderStyle="Inset" Padding="6,6,0,0,100" Font="Arial, 8.25pt, style=Bold" ForeColor="255,64,70,80" StringFormat="Near;Near;0;None;Character;GenericDefault" />
+    <Item1 Ref="51" Name="Title" BorderStyle="Inset" Padding="6,6,0,0,100" Font="Arial, 14.25pt" ForeColor="255,64,70,80" BackColor="Transparent" BorderColor="Black" Sides="None" StringFormat="Near;Near;0;None;Character;GenericDefault" BorderWidthSerializable="1" />
+    <Item2 Ref="52" Name="DetailCaption1" BorderStyle="Inset" Padding="6,6,0,0,100" Font="Arial, 8.25pt, style=Bold" ForeColor="255,64,70,80" BackColor="White" BorderColor="White" Sides="Left" StringFormat="Near;Center;0;None;Character;GenericDefault" TextAlignment="MiddleLeft" BorderWidthSerializable="2" />
+    <Item3 Ref="53" Name="DetailData1" BorderStyle="Inset" Padding="6,6,0,0,100" Font="Arial, 8.25pt" ForeColor="Black" BorderColor="Transparent" Sides="Left" StringFormat="Near;Center;0;None;Character;GenericDefault" TextAlignment="MiddleLeft" BorderWidthSerializable="2" />
+    <Item4 Ref="54" Name="DetailData3_Odd" BorderStyle="Inset" Padding="6,6,0,0,100" Font="Arial, 8.25pt" ForeColor="Black" BackColor="255,243,245,248" BorderColor="Transparent" Sides="None" StringFormat="Near;Center;0;None;Character;GenericDefault" TextAlignment="MiddleLeft" BorderWidthSerializable="1" />
+    <Item5 Ref="55" Name="PageInfo" BorderStyle="Inset" Padding="6,6,0,0,100" Font="Arial, 8.25pt, style=Bold" ForeColor="255,64,70,80" StringFormat="Near;Near;0;None;Character;GenericDefault" />
   </StyleSheet>
   <ParameterPanelLayoutItems>
-    <Item1 Ref="55" LayoutItemType="Parameter" Parameter="#Ref-4" />
-    <Item2 Ref="56" LayoutItemType="Parameter" Parameter="#Ref-5" />
-    <Item3 Ref="57" LayoutItemType="Parameter" Parameter="#Ref-7" />
-    <Item4 Ref="58" LayoutItemType="Parameter" Parameter="#Ref-8" />
-    <Item5 Ref="59" LayoutItemType="Parameter" Parameter="#Ref-9" />
-    <Item6 Ref="60" LayoutItemType="Parameter" Parameter="#Ref-10" />
-    <Item7 Ref="61" LayoutItemType="Parameter" Parameter="#Ref-12" />
-    <Item8 Ref="62" LayoutItemType="Parameter" Parameter="#Ref-13" />
-    <Item9 Ref="63" LayoutItemType="Parameter" Parameter="#Ref-14" />
-    <Item10 Ref="64" LayoutItemType="Parameter" Parameter="#Ref-15" />
+    <Item1 Ref="56" LayoutItemType="Parameter" Parameter="#Ref-4" />
+    <Item2 Ref="57" LayoutItemType="Parameter" Parameter="#Ref-5" />
+    <Item3 Ref="58" LayoutItemType="Parameter" Parameter="#Ref-7" />
+    <Item4 Ref="59" LayoutItemType="Parameter" Parameter="#Ref-8" />
+    <Item5 Ref="60" LayoutItemType="Parameter" Parameter="#Ref-9" />
+    <Item6 Ref="61" LayoutItemType="Parameter" Parameter="#Ref-10" />
+    <Item7 Ref="62" LayoutItemType="Parameter" Parameter="#Ref-12" />
+    <Item8 Ref="63" LayoutItemType="Parameter" Parameter="#Ref-13" />
+    <Item9 Ref="64" LayoutItemType="Parameter" Parameter="#Ref-14" />
+    <Item10 Ref="65" LayoutItemType="Parameter" Parameter="#Ref-15" />
   </ParameterPanelLayoutItems>
   <ComponentStorage>
     <Item1 Ref="0" ObjectType="DevExpress.DataAccess.Sql.SqlDataSource,DevExpress.DataAccess.v22.2" Name="sqlDataSource1" Base64="PFNxbERhdGFTb3VyY2UgTmFtZT0ic3FsRGF0YVNvdXJjZTEiPjxDb25uZWN0aW9uIE5hbWU9IlJlcG9ydHMiIEZyb21BcHBDb25maWc9InRydWUiIC8+PFF1ZXJ5IFR5cGU9IlN0b3JlZFByb2NRdWVyeSIgTmFtZT0iTGluZVNoZWV0X0NvbG9yc0RhdGEiPjxQYXJhbWV0ZXIgTmFtZT0iQFNlbGVjdGVkS2V5IiBUeXBlPSJEZXZFeHByZXNzLkRhdGFBY2Nlc3MuRXhwcmVzc2lvbiI+KFN5c3RlbS5TdHJpbmcpKD9zZWxlY3RlZEtleSk8L1BhcmFtZXRlcj48UGFyYW1ldGVyIE5hbWU9IkBBdHRyaWJ1dGVUeXBlSWQiIFR5cGU9IkRldkV4cHJlc3MuRGF0YUFjY2Vzcy5FeHByZXNzaW9uIj4oU3lzdGVtLkludDY0KSg/YXR0cmlidXRlVHlwZUlkKTwvUGFyYW1ldGVyPjxQYXJhbWV0ZXIgTmFtZT0iQFByb2R1Y3RMaXN0SWQiIFR5cGU9IkRldkV4cHJlc3MuRGF0YUFjY2Vzcy5FeHByZXNzaW9uIj4oU3lzdGVtLkludDY0KSg/cHJvZHVjdExpc3RJZCk8L1BhcmFtZXRlcj48UGFyYW1ldGVyIE5hbWU9IkBhdHRhY2htZW50QmFzZVVybCIgVHlwZT0iRGV2RXhwcmVzcy5EYXRhQWNjZXNzLkV4cHJlc3Npb24iPihTeXN0ZW0uU3RyaW5nKSg/YXR0YWNobWVudEJhc2VVcmwpPC9QYXJhbWV0ZXI+PFBhcmFtZXRlciBOYW1lPSJAdGVuYW50SWQiIFR5cGU9IkRldkV4cHJlc3MuRGF0YUFjY2Vzcy5FeHByZXNzaW9uIj4oU3lzdGVtLkludDY0KSg/dGVuYW50SWQpPC9QYXJhbWV0ZXI+PFBhcmFtZXRlciBOYW1lPSJAT3JkZXJCeSIgVHlwZT0iRGV2RXhwcmVzcy5EYXRhQWNjZXNzLkV4cHJlc3Npb24iPihTeXN0ZW0uU3RyaW5nKSg/Q29sb3JQYWdlU29ydCk8L1BhcmFtZXRlcj48UHJvY05hbWU+TGluZVNoZWV0X0NvbG9yc0RhdGE8L1Byb2NOYW1lPjwvUXVlcnk+PFJlc3VsdFNjaGVtYT48RGF0YVNldCBOYW1lPSJzcWxEYXRhU291cmNlMSI+PERhdGFTZXQgTmFtZT0iTGluZVNoZWV0X0NvbG9yc0RhdGEiPjxWaWV3IE5hbWU9IlJlc3VsdDEiPjxGaWVsZCBOYW1lPSJBdHRyaWJ1dGVJZCIgVHlwZT0iSW50NjQiIC8+PEZpZWxkIE5hbWU9IkF0dHJpYnV0ZVZhbHVlSWQiIFR5cGU9IkludDY0IiAvPjxGaWVsZCBOYW1lPSJOYW1lIiBUeXBlPSJTdHJpbmciIC8+PEZpZWxkIE5hbWU9IkNvZGUiIFR5cGU9IlN0cmluZyIgLz48RmllbGQgTmFtZT0iQXR0YWNobWVudCIgVHlwZT0iU3RyaW5nIiAvPjxGaWVsZCBOYW1lPSJNZXRlcmlhbENvbnRlbnQiIFR5cGU9IlN0cmluZyIgLz48L1ZpZXc+PFZpZXcgTmFtZT0iUmVzdWx0MiI+PEZpZWxkIE5hbWU9IkF0dHJpYnV0ZUlkIiBUeXBlPSJJbnQ2NCIgLz48RmllbGQgTmFtZT0iQXR0cmlidXRlVmFsdWVJZCIgVHlwZT0iSW50NjQiIC8+PEZpZWxkIE5hbWU9Ik5hbWUiIFR5cGU9IlN0cmluZyIgLz48RmllbGQgTmFtZT0iQ29kZSIgVHlwZT0iU3RyaW5nIiAvPjxGaWVsZCBOYW1lPSJBdHRhY2htZW50IiBUeXBlPSJTdHJpbmciIC8+PEZpZWxkIE5hbWU9Ik1ldGVyaWFsQ29udGVudCIgVHlwZT0iU3RyaW5nIiAvPjwvVmlldz48L0RhdGFTZXQ+PC9EYXRhU2V0PjwvUmVzdWx0U2NoZW1hPjxDb25uZWN0aW9uT3B0aW9ucyBDbG9zZUNvbm5lY3Rpb249InRydWUiIC8+PC9TcWxEYXRhU291cmNlPg==" />

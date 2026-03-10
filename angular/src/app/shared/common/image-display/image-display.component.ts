@@ -19,8 +19,16 @@ export class ImageDisplayComponent {
 
     ngOnChanges(changes: SimpleChanges): void {
         if(this.sycAttachmentCategory){
-            let [width,height,border] = this.sycAttachmentCategory.aspectRatio.split(':')
-            let acceptedAspectRatio = Number(width) / Number(height)
+            // let [width,height,border] = this.sycAttachmentCategory.aspectRatio.split(':')
+            // let acceptedAspectRatio = Number(width) / Number(height)
+            const aspect = String(this.sycAttachmentCategory.aspectRatio);
+            const [width, height] = aspect.split(':');
+          
+            if (!width || !height || isNaN(+width) || isNaN(+height)) {
+              return;
+            }
+          
+            const acceptedAspectRatio = Number(width) / Number(height);
             if(this.staticWidth){
                 this.staticHeight =  this.staticWidth / acceptedAspectRatio
             } else if( this.staticHeight ) {

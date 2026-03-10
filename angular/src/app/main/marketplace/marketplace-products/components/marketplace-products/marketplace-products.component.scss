@@ -80,6 +80,9 @@
 }
 
 ::ng-deep {
+    .p-paginator .p-dropdown {
+        height: auto !important;
+    }
     .filterBtn .p-button.p-button-secondary.p-button-outlined {
         height: 46px;
         white-space: nowrap;
