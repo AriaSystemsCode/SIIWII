@@ -373,6 +373,7 @@ export class EventsBrowseComponent extends AppComponentBase  implements OnInit,O
             filters?.postalCode || undefined,
             this.accountDataForView?.tenantId ? this.accountDataForView?.tenantId : undefined,
                 undefined,
+                undefined,
             filters?.sorting.value ,
            
             this.primengTableHelper.getSkipCount(this.paginator, event) || 0,
