@@ -658,7 +658,7 @@ namespace onetouch.SystemObjects
                             List<AppEntity> filteredBrands = null;
                             if (!string.IsNullOrEmpty(entityFilterCondition))
                             {
-                                var filterCondition = Helper.ApplyJsonFilter<AppEntit`y>(entityFilterCondition);
+                                var filterCondition = Helper.ApplyJsonFilter<AppEntity>(entityFilterCondition);
                                 if (filterCondition != null)
                                     filteredBrands = await contxt.AppEntities.Where(filterCondition)
                                         .Where(z => z.EntityObjectTypeId == brandObjectId).OrderBy(entitySortBy ?? "id asc")
