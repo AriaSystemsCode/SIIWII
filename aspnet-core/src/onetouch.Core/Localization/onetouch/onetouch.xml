@@ -67,7 +67,7 @@
 	<text name="NotifyUsersByEmail">Notify Users by Email</text>
 	<text name="TransactionSharingIs">Transaction Sharing is</text>
 	<text name="InvitePartnerByType">Invite partner By Type</text>
-    <text name="ValidationRules">Validation rules</text>
+    
     <text name="ValidationRule">Validation rule</text>
     <text name="onetouch.ValidationRules.ValidationRule">ValidationRule</text>
     <text name="FieldName">Field name</text>
@@ -2637,7 +2637,6 @@
 	<text name="Absolute">Absolute</text>
 	<text name="IsAddOn">Add-On</text>
 	<text name="Limited">Limited</text>
-    <text name="UpdateAccountInformation">Update Account Information</text>
     <text name="UpdateAccountInformation">Update Account Information</text>
     <text name="Pleasemakesuretheimagessize5MB">Please make sure the images size 5MB</text>
 	<text name="FilesformatsSupportedareXLSX,JPGandPNG">Files formats Supported are XLSX,JPG and PNG</text>
