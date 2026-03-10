@@ -54,7 +54,7 @@ export class dynamicInputs extends AppComponentBase implements OnInit, OnChanges
   }
 
  onAnyInputChange() {
-  if (this.isInitializing) return;
+  //if (this.isInitializing) return;
   this.formTouched = true;
 
   const updatedDataMap = new Map<number, any>();
@@ -528,7 +528,7 @@ export class dynamicInputs extends AppComponentBase implements OnInit, OnChanges
   if (!extraAttr.visibleWhen) return true;
 
   const parentAttr = this.extraAttributeObject.value.extraAttributes
-    .find(x => x.attributeId === extraAttr.visibleWhen.extraAttributeId);
+    .find(x => x.attributeId == extraAttr.visibleWhen.extraAttributeId);
 
   if (!parentAttr) return false;
 
