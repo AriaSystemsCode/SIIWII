@@ -79168,6 +79168,230 @@ export enum RecommandedOrAdditional {
     CHARGES = 2,
 }
 
+export class VisibleWhen implements IVisibleWhen {
+    extraAttributeId!: string | undefined;
+    operatorValue!: string | undefined;
+    value!: string | undefined;
+
+    [key: string]: any;
+
+    constructor(data?: IVisibleWhen) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.extraAttributeId = _data["extraAttributeId"];
+            this.operatorValue = _data["operatorValue"];
+            this.value = _data["value"];
+        }
+    }
+
+    static fromJS(data: any): VisibleWhen {
+        data = typeof data === 'object' ? data : {};
+        let result = new VisibleWhen();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["extraAttributeId"] = this.extraAttributeId;
+        data["operatorValue"] = this.operatorValue;
+        data["value"] = this.value;
+        return data;
+    }
+}
+
+export interface IVisibleWhen {
+    extraAttributeId: string | undefined;
+    operatorValue: string | undefined;
+    value: string | undefined;
+
+    [key: string]: any;
+}
+
+export class Relation implements IRelation {
+    targetName!: string | undefined;
+    sourceField!: string | undefined;
+    targetField!: string | undefined;
+
+    [key: string]: any;
+
+    constructor(data?: IRelation) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.targetName = _data["targetName"];
+            this.sourceField = _data["sourceField"];
+            this.targetField = _data["targetField"];
+        }
+    }
+
+    static fromJS(data: any): Relation {
+        data = typeof data === 'object' ? data : {};
+        let result = new Relation();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["targetName"] = this.targetName;
+        data["sourceField"] = this.sourceField;
+        data["targetField"] = this.targetField;
+        return data;
+    }
+}
+
+export interface IRelation {
+    targetName: string | undefined;
+    sourceField: string | undefined;
+    targetField: string | undefined;
+
+    [key: string]: any;
+}
+
+export class RelatedWhen implements IRelatedWhen {
+    relation!: Relation[] | undefined;
+
+    [key: string]: any;
+
+    constructor(data?: IRelatedWhen) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            if (Array.isArray(_data["relation"])) {
+                this.relation = [] as any;
+                for (let item of _data["relation"])
+                    this.relation!.push(Relation.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): RelatedWhen {
+        data = typeof data === 'object' ? data : {};
+        let result = new RelatedWhen();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        if (Array.isArray(this.relation)) {
+            data["relation"] = [];
+            for (let item of this.relation)
+                data["relation"].push(item.toJSON());
+        }
+        return data;
+    }
+}
+
+export interface IRelatedWhen {
+    relation: Relation[] | undefined;
+
+    [key: string]: any;
+}
+
+export class DataSource implements IDataSource {
+    service!: string | undefined;
+    api!: string | undefined;
+    parameter!: string | undefined;
+
+    [key: string]: any;
+
+    constructor(data?: IDataSource) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.service = _data["service"];
+            this.api = _data["api"];
+            this.parameter = _data["parameter"];
+        }
+    }
+
+    static fromJS(data: any): DataSource {
+        data = typeof data === 'object' ? data : {};
+        let result = new DataSource();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["service"] = this.service;
+        data["api"] = this.api;
+        data["parameter"] = this.parameter;
+        return data;
+    }
+}
+
+export interface IDataSource {
+    service: string | undefined;
+    api: string | undefined;
+    parameter: string | undefined;
+
+    [key: string]: any;
+}
+
 export class ExtraAttribute implements IExtraAttribute {
     attributeId!: number;
     code!: string | undefined;
@@ -79185,6 +79409,9 @@ export class ExtraAttribute implements IExtraAttribute {
     isVariation!: boolean;
     isAdvancedSearch!: boolean;
     allowAddNew!: boolean;
+    visibleWhen!: VisibleWhen;
+    relatedWhen!: RelatedWhen;
+    dataSource!: DataSource;
 
     [key: string]: any;
 
@@ -79219,6 +79446,9 @@ export class ExtraAttribute implements IExtraAttribute {
             this.isVariation = _data["isVariation"];
             this.isAdvancedSearch = _data["isAdvancedSearch"];
             this.allowAddNew = _data["allowAddNew"];
+            this.visibleWhen = _data["visibleWhen"] ? VisibleWhen.fromJS(_data["visibleWhen"]) : <any>undefined;
+            this.relatedWhen = _data["relatedWhen"] ? RelatedWhen.fromJS(_data["relatedWhen"]) : <any>undefined;
+            this.dataSource = _data["dataSource"] ? DataSource.fromJS(_data["dataSource"]) : <any>undefined;
         }
     }
 
@@ -79251,6 +79481,9 @@ export class ExtraAttribute implements IExtraAttribute {
         data["isVariation"] = this.isVariation;
         data["isAdvancedSearch"] = this.isAdvancedSearch;
         data["allowAddNew"] = this.allowAddNew;
+        data["visibleWhen"] = this.visibleWhen ? this.visibleWhen.toJSON() : <any>undefined;
+        data["relatedWhen"] = this.relatedWhen ? this.relatedWhen.toJSON() : <any>undefined;
+        data["dataSource"] = this.dataSource ? this.dataSource.toJSON() : <any>undefined;
         return data;
     }
 }
@@ -79272,6 +79505,9 @@ export interface IExtraAttribute {
     isVariation: boolean;
     isAdvancedSearch: boolean;
     allowAddNew: boolean;
+    visibleWhen: VisibleWhen;
+    relatedWhen: RelatedWhen;
+    dataSource: DataSource;
 
     [key: string]: any;
 }

@@ -54,7 +54,7 @@ export class dynamicInputs extends AppComponentBase implements OnInit, OnChanges
   }
 
  onAnyInputChange() {
-  if (this.isInitializing) return;
+  //if (this.isInitializing) return;
   this.formTouched = true;
 
   const updatedDataMap = new Map<number, any>();
@@ -294,29 +294,6 @@ export class dynamicInputs extends AppComponentBase implements OnInit, OnChanges
 
   ngOnInit(): void {
     this.fillSelectedValuesFromDto();
-
-    // ✅ Provide fallback/mock image category
-    if (!this.sycAttachmentCategoryImage) {
-      this.sycAttachmentCategoryImage = {
-        id: 1,
-        code: 'IMAGE',
-        name: 'Mock Image Category',
-        description: 'Fake for testing',
-        entityObjectTypeCode: 'MOCK',
-        isStatic: false,
-        maxFileSize: 1048576, // 1 MB
-        acceptMultipleAttachments: true,
-        isSystem: false,
-        displayName: 'Test Category',
-        icon: '',
-        iconPath: '',
-        tenantId: 1
-      } as unknown as SycAttachmentCategoryDto;
-    }
-
-    setTimeout(() => {
-      this.isInitializing = false;
-    }, 0);
   }
 
   isArray(val: any): boolean {
@@ -551,7 +528,7 @@ export class dynamicInputs extends AppComponentBase implements OnInit, OnChanges
   if (!extraAttr.visibleWhen) return true;
 
   const parentAttr = this.extraAttributeObject.value.extraAttributes
-    .find(x => x.attributeId === extraAttr.visibleWhen.extraAttributeId);
+    .find(x => x.attributeId == extraAttr.visibleWhen.extraAttributeId);
 
   if (!parentAttr) return false;
 
