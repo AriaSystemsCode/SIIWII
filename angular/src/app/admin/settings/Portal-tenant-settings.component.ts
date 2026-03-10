@@ -374,7 +374,7 @@ export class PortalTenantSettingsComponent extends AppComponentBase implements O
   }
 
   onExtraAttributesChanged(dataFromChild: any[]) {
-   // this.formTouched = true;
+    this.formTouched = true;
     if (!this.dynamicInputsForViewDto) {
       this.dynamicInputsForViewDto = new GetAppEntityForEditOutput();
     }
