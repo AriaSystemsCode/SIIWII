@@ -497,6 +497,12 @@ namespace onetouch.SystemObjects
                                 
                             }
                         }
+                        item.BlockTypeIsSingleOrMixed = null;
+                        var sectionBlockTypeExtraDate = section.EntityExtraData.FirstOrDefault(z => z.AttributeId == 1009);
+                        if (sectionBlockTypeExtraDate != null && !string.IsNullOrEmpty(sectionBlockTypeExtraDate.AttributeValue))   
+                        {
+                            item.BlockTypeIsSingleOrMixed = sectionBlockTypeExtraDate.AttributeValue;
+                        }
                         item.Name = section.Name;
                         item.Description = section.Name;
                         item.Code = section.Code;

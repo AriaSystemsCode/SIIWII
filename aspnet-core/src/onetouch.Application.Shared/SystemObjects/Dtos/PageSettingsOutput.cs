@@ -33,7 +33,7 @@ namespace onetouch.SystemObjects.Dtos
         //I49[End]
         //I50[Start]
         public GetAppEventForViewDto? GetAppEventForViewDto { set; get; }
-       
+        public string? BlockTypeIsSingleOrMixed { get; set; }
         //I50[End]
     }
 }
