@@ -2643,9 +2643,7 @@
 	<text name="FilesformatsSupportedareXLSX,JPGandPNG">Files formats Supported are XLSX,JPG and PNG</text>
 	<text name="Relatedproducts">Related products</text>
 	<text name="noproductsarelinked">no products are linked</text>
-
-
-	</texts>  
+ 
 	<text name="ContactUs">Contact Us</text>
 	<text name="YourRequestHasBeenSubmitted">Your request has been submitted</text>
 	<text name="Telephone">Telephone</text>
