@@ -3,11 +3,15 @@ import { Component, EventEmitter, Injector, Input, OnChanges, OnDestroy, OnInit,
 import { ImageUploadComponentOutput } from '@app/shared/common/image-upload/image-upload.component';
 import { appModuleAnimation } from '@shared/animations/routerTransition';
 import { AppComponentBase } from '@shared/common/app-component-base';
-import { AppAdvertisementsServiceProxy, GetAppAdvertisementForViewDto, SycAttachmentCategoryDto } from '@shared/service-proxies/service-proxies';
+import { AppAdvertisementsServiceProxy, AppEntitiesServiceProxy, AppEntityDto, ExtraAttribute, GetAppAdvertisementForViewDto, SycAttachmentCategoryDto } from '@shared/service-proxies/service-proxies';
 import { FileUploaderCustom } from '../import-steps/models/FileUploaderCustom.model';
 import { FileUploader, FileUploaderOptions } from '@node_modules/ng2-file-upload';
 import { AppConsts } from '@shared/AppConsts';
 import { IAjaxResponse, TokenService } from '@node_modules/abp-ng2-module';
+import { DynamicApiDispatcherService } from '@shared/dynamicApiDispatcherService ';
+import Swal from 'sweetalert2';
+import { finalize } from 'rxjs/operators';
+
 
 @Component({
   selector: 'app-dynamicInputs',
@@ -15,113 +19,143 @@ import { IAjaxResponse, TokenService } from '@node_modules/abp-ng2-module';
   styleUrls: ['./dynamicInputs.component.scss'],
   animations: [appModuleAnimation()]
 })
-export class dynamicInputs extends AppComponentBase implements OnInit, OnChanges  {
+export class dynamicInputs extends AppComponentBase implements OnInit, OnChanges {
   @Input("extraAttributeObject") extraAttributeObject;
   @Input("entityType") entityType;
   @Input("entityObjectTypeId") entityObjectTypeId;
   @Output() extraDataChanged = new EventEmitter<any[]>();
   @Output() extraDataCleared = new EventEmitter<number>(); // send attributeId
   selectedExtraData: any[] = [];
+  @Input() appTransactionsForViewDto: any;
+  @Input() fromSetting: boolean = false;
   @Input() dynamicInputsForViewDto: any;
   originalValuesMap = new Map<number, any>();
-  @Input() fromSetting:boolean =false;
 
 
-  
-      public constructor(
-         private _tokenService: TokenService,
-          injector: Injector
-      ) {
-          super(injector);
-      }
+  sycAttachmentCategoryImage: SycAttachmentCategoryDto;
+  @Input() defaultBooleanValue: boolean | string = 'true'; // parent can override
+  warningMsg: string = "";
+  isInitializing = true;
+
+  public constructor(
+    private _tokenService: TokenService,
+    private dynamicApi: DynamicApiDispatcherService,
+    private _appEntitiesServiceProxy: AppEntitiesServiceProxy,
+    injector: Injector
+  ) {
+    super(injector);
+  }
 
   openCalendar(calendar: any) {
     calendar.overlayVisible = true;
   }
   ngOnChanges() {
-      this.fillSelectedValuesFromDto();
-      this.onAnyInputChange();
+    this.fillSelectedValuesFromDto();
   }
-  
-  onAnyInputChange() {
-    const updatedDataMap = new Map<number, any>();
 
-    // Preserve existing values
-    for (const item of this.selectedExtraData) {
-      updatedDataMap.set(item.attributeId, item);
-    }
+ onAnyInputChange() {
+  //if (this.isInitializing) return;
+  this.formTouched = true;
 
-    if (this.extraAttributeObject?.value?.filteredExtraAttributes) {
-      for (const attr of this.extraAttributeObject.value.filteredExtraAttributes) {
+  const updatedDataMap = new Map<number, any>();
 
-        if (attr.dataType === 'pills') 
-          attr.themes = this.getThemes(attr);
+  // Preserve existing values
+  for (const item of this.selectedExtraData) {
+    updatedDataMap.set(item.attributeId, item);
+  }
 
-        if (attr.isSelectedOnVariation || attr.isVariation) {
-          continue;
-        }
+  if (this.extraAttributeObject?.value?.filteredExtraAttributes) {
+    for (const attr of this.extraAttributeObject.value.filteredExtraAttributes) {
 
-        let formattedValue = attr.selectedValues;
+      if (attr.dataType === 'pills') 
+        attr.themes = this.getThemes(attr);
+      
+      if (attr.isSelectedOnVariation || attr.isVariation) {
+        continue;
+      }
+
+      let formattedValue = attr.selectedValues;
 
         // ✅ Handle Datetime
-        if (attr.dataType === 'Datetime') {
-          const dateValue = new Date(formattedValue);
+      if (attr.dataType === 'Datetime') {
+        const dateValue = new Date(formattedValue);
 
-          if (!formattedValue || formattedValue === 'Invalid Date' || isNaN(dateValue.getTime())) {
-            formattedValue = '';
-          } else {
-            formattedValue = dateValue.toISOString();
-            if (formattedValue === '1970-01-01T00:00:00.000Z') {
-              const originalValue = this.originalValuesMap.get(attr.attributeId);
-              formattedValue = originalValue || '';
-            }
+        if (!formattedValue || formattedValue === 'Invalid Date' || isNaN(dateValue.getTime())) {
+          formattedValue = '';
+        } else {
+          formattedValue = dateValue.toISOString();
+          if (formattedValue === '1970-01-01T00:00:00.000Z') {
+            const originalValue = this.originalValuesMap.get(attr.attributeId);
+            formattedValue = originalValue || '';
           }
         }
+      }
 
         // ✅ Handle String input
-        if (attr.dataType === 'string' && !attr.isLookup) {
-          if (!formattedValue || formattedValue === null || formattedValue === undefined || formattedValue.toString().trim() === '') {
-            formattedValue = '';
-          }
+      if (attr.dataType === 'string' && !attr.isLookup) {
+        if (!formattedValue || formattedValue === null || formattedValue === undefined || formattedValue.toString().trim() === '') {
+          formattedValue = '';
         }
-
-        // ✅ Handle Numeric input
-        if (attr.dataType === 'Numeric' || attr.dataType === 'boolean' || attr.dataType === 'Boolean'|| attr.dataType === 'bit' || attr.dataType === 'color') {
-          if (formattedValue === null || formattedValue === undefined || formattedValue === '') {
-            formattedValue = '';
-          }
-        }
-
-        const originalValue = this.originalValuesMap.get(attr.attributeId);
-        const isSame = JSON.stringify(originalValue) === JSON.stringify(formattedValue);
-
-        let finalValue;
-
-        if (attr.acceptMultipleValues && Array.isArray(formattedValue)) {
-          finalValue = formattedValue.length ? formattedValue : [];
-        } else if (!attr.acceptMultipleValues && (formattedValue === undefined || formattedValue === null || formattedValue === '')) {
-          finalValue = ''; // ✅ always send empty string
-        } else if (!isSame) {
-          finalValue = formattedValue;
-        } else {
-          finalValue = formattedValue || '';
-        }
-
-        const updatedValue = {
-          attributeId: attr.attributeId,
-          value: finalValue,
-          isLookup: attr.isLookup === true,
-          acceptMultipleValues: attr.acceptMultipleValues === true
-        };
-
-        updatedDataMap.set(attr.attributeId, updatedValue);
       }
+
+    // ✅ Handle Numeric / Boolean / Color
+      if (['Numeric', 'boolean', 'Boolean', 'bit', 'color'].includes(attr.dataType)) {
+        if (formattedValue === null || formattedValue === undefined || formattedValue === '') {
+          formattedValue = '';
+        }
+      }
+
+      const originalValue = this.originalValuesMap.get(attr.attributeId);
+      const isSame = JSON.stringify(originalValue) === JSON.stringify(formattedValue);
+
+      let finalValue;
+
+      if (attr.acceptMultipleValues && Array.isArray(formattedValue)) {
+        finalValue = formattedValue.length ? formattedValue : [];
+      } else if (!attr.acceptMultipleValues && (formattedValue === undefined || formattedValue === null || formattedValue === '')) {
+        finalValue = '';
+      } else if (!isSame) {
+        finalValue = formattedValue;
+      } else {
+        finalValue = formattedValue || '';
+      }
+
+      const updatedValue = {
+        attributeId: attr.attributeId,
+        value: finalValue,
+        isLookup: attr.isLookup === true,
+        acceptMultipleValues: attr.acceptMultipleValues === true
+      };
+
+      updatedDataMap.set(attr.attributeId, updatedValue);
+
+      // ✅ Apply relatedWhen dynamically
+      if (attr.relatedWhen?.length) {
+        for (const relation of attr.relatedWhen) {
+          const targetAttr = this.extraAttributeObject.value.extraAttributes
+            .find(x => x.name === relation.targetName || x.code === relation.targetName);
+
+          if (targetAttr) {
+            targetAttr[relation.targetField] = attr[relation.sourceField];
+            // Update the map as well to reflect changes in selectedExtraData
+            updatedDataMap.set(targetAttr.attributeId, {
+              attributeId: targetAttr.attributeId,
+              value: targetAttr[relation.targetField],
+              isLookup: targetAttr.isLookup === true,
+              acceptMultipleValues: targetAttr.acceptMultipleValues === true
+            });
+          }
+        }
+      }
+
     }
-
-    this.selectedExtraData = Array.from(updatedDataMap.values());
-
-    this.extraDataChanged.emit(this.selectedExtraData);
   }
+
+  this.selectedExtraData = Array.from(updatedDataMap.values());
+  
+  this.extraDataChanged.emit(this.selectedExtraData);
+}
+
 
   reset(extraAttr: any) {
     if (extraAttr.acceptMultipleValues) {
@@ -129,31 +163,31 @@ export class dynamicInputs extends AppComponentBase implements OnInit, OnChanges
     } else {
       extraAttr.selectedValues = '';
     }
-  
+
     this.onAnyInputChange();
   }
-  
-  
 
-  themes =[] ; 
-    selectedTheme: any ;
 
-      // set thems  ?
-      getThemes(extraAttr: any) {
-       return this.themes =  
-        [
-         { name: 'Default', image: 'assets/themes/default.png' },
-         { name: 'Theme 2', image: 'assets/themes/theme2.png' },
-         { name: 'Theme 3', image: 'assets/themes/theme3.png' },
-         { name: 'Theme 4', image: 'assets/themes/theme4.png' },
-         { name: 'Theme 5', image: 'assets/themes/theme5.png' },
-       ];      
-      }
+
+  themes = [];
+  selectedTheme: any;
+
+  // set thems  ?
+  getThemes(extraAttr: any) {
+    return this.themes =
+      [
+        { name: 'Default', image: 'assets/themes/default.png' },
+        { name: 'Theme 2', image: 'assets/themes/theme2.png' },
+        { name: 'Theme 3', image: 'assets/themes/theme3.png' },
+        { name: 'Theme 4', image: 'assets/themes/theme4.png' },
+        { name: 'Theme 5', image: 'assets/themes/theme5.png' },
+      ];
+  }
 
   selectTheme(theme: any) {
     this.selectedTheme = theme;
   }
-  
+
 
 
   fillSelectedValuesFromDto() {
@@ -202,11 +236,11 @@ export class dynamicInputs extends AppComponentBase implements OnInit, OnChanges
         }
         this.originalValuesMap.set(attr.attributeId, attr.selectedValues);
       }
-  //     else {
-  //         if ((attr.dataType === 'boolean' || attr.dataType === 'bit') && (attr.selectedValues == null || attr.selectedValues === '')) {
-  //   attr.selectedValues = this.defaultBooleanValue;
-  // }
-  //     }
+      //     else {
+      //         if ((attr.dataType === 'boolean' || attr.dataType === 'bit') && (attr.selectedValues == null || attr.selectedValues === '')) {
+      //   attr.selectedValues = this.defaultBooleanValue;
+      // }
+      //     }
     }
 
   }
@@ -251,12 +285,12 @@ export class dynamicInputs extends AppComponentBase implements OnInit, OnChanges
     attr.selectedValues = event.image;
     this.onAnyInputChange(); // emit change
   }
-  
+
   onImageRemoved(attr: any) {
     attr.selectedValues = '';
     this.onAnyInputChange(); // emit change
   }
-  
+
 
   ngOnInit(): void {
     this.fillSelectedValuesFromDto();
@@ -288,72 +322,219 @@ export class dynamicInputs extends AppComponentBase implements OnInit, OnChanges
       } */
       const allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
       if (!allowedTypes.includes(file.type)) {
-        alert('Only JPG, PNG, or GIF files are allowed.');
+        //alert('Only JPG, PNG, or GIF files are allowed.');
+        Swal.fire(
+          " ",
+          "File format is not supported , Only JPG, PNG, or GIF files are allowed.",
+          "error"
+        );
         return;
       }
       const dotIndex = file.name.lastIndexOf('.');
-      const baseName = file.name.substring(0, dotIndex); 
-      const extension = file.name.substring(dotIndex);   
+      const baseName = file.name.substring(0, dotIndex);
+      const extension = file.name.substring(dotIndex);
       const guid = this.guid();
-  
+
       const newFileName = `${baseName}${extension}|${guid}${extension}`;
-       const newFile = new File([file], newFileName , { type: file.type });
-       extraAttr.selectedValues = newFile;    
-       extraAttr.showUploadBtn =true;   
+      const newFile = new File([file], newFileName, { type: file.type });
+      extraAttr.selectedValues = newFile;
+      extraAttr.showUploadBtn = true;
       this.onAnyInputChange();
     }
   }
 
-  attachmentsUploader:FileUploader;
-  onUploadFile(file){
-        this.attachmentsUploader = this.createUploader(
-          '/Attachment/UploadFiles',
-          result => {
-          }
-      );
+  attachmentsUploader: FileUploader;
+  onUploadFile(file) {
+    this.attachmentsUploader = this.createUploader(
+      '/Attachment/UploadFiles',
+      result => {
+      }
+    );
 
     const blob = new Blob([file], { type: file.type });
-     const originalName = file.name.split('|')[0];
-     const  guid = file.name.split('|')[1].split('.')[0]
-      const newFile = new File([blob], originalName, { type: file.type });
-        
-      this.attachmentsUploader.addToQueue([newFile]);
-    
-        this.attachmentsUploader.onErrorItem = (item, response, status) => {
-            this.notify.error(this.l("UploadFailed"));
-        };
-        this.attachmentsUploader.onBuildItemForm = (fileItem: any, form: any) => {
-          form.append("guid", guid);     
-         };
+    const originalName = file.name.split('|')[0];
+    const guid = file.name.split('|')[1].split('.')[0]
+    const newFile = new File([blob], originalName, { type: file.type });
 
-      this.attachmentsUploader.uploadAll()
+    this.attachmentsUploader.addToQueue([newFile]);
+
+    this.attachmentsUploader.onErrorItem = (item, response, status) => {
+      this.notify.error(this.l("UploadFailed"));
+    };
+    this.attachmentsUploader.onBuildItemForm = (fileItem: any, form: any) => {
+      form.append("guid", guid);
+    };
+
+    this.attachmentsUploader.uploadAll()
   }
 
-    createUploader(url: string, success?: (result: any) => void): FileUploader {
-          const uploader = new FileUploader({ url: AppConsts.remoteServiceBaseUrl + url });
-  
-          uploader.onAfterAddingFile = (file) => {
-              file.withCredentials = false;
-          };
-  
-          uploader.onSuccessItem = (item, response, status) => {
-              const ajaxResponse = <IAjaxResponse>JSON.parse(response);
-              if (ajaxResponse?.success) {
-                  this.notify.info(this.l('UploadSuccessfully'));
-                  if (success) {
-                      success(ajaxResponse.result);
-                  }
-              } else {
-                  this.message.error(ajaxResponse.error.message);
-              }
-          };
-  
-          const uploaderOptions: Partial<FileUploaderOptions> = {};
-          uploaderOptions.authToken = 'Bearer ' + this._tokenService.getToken();
-          uploaderOptions.removeAfterUpload = true;
-          uploader.setOptions(uploaderOptions as FileUploaderOptions);
-          return uploader;
+  createUploader(url: string, success?: (result: any) => void): FileUploader {
+    const uploader = new FileUploader({ url: AppConsts.remoteServiceBaseUrl + url });
+
+    uploader.onAfterAddingFile = (file) => {
+      file.withCredentials = false;
+    };
+
+    uploader.onSuccessItem = (item, response, status) => {
+      const ajaxResponse = <IAjaxResponse>JSON.parse(response);
+      if (ajaxResponse?.success) {
+        this.notify.info(this.l('UploadSuccessfully'));
+        if (success) {
+          success(ajaxResponse.result);
+        }
+      } else {
+        this.message.error(ajaxResponse.error.message);
       }
-      getSafeString = (str: string) => str.replace(/\s+/g, '_');
+    };
+
+    const uploaderOptions: Partial<FileUploaderOptions> = {};
+    uploaderOptions.authToken = 'Bearer ' + this._tokenService.getToken();
+    uploaderOptions.removeAfterUpload = true;
+    uploader.setOptions(uploaderOptions as FileUploaderOptions);
+    return uploader;
+  }
+  getSafeString = (str: string) => str.replace(/\s+/g, '_');
+  extraAttrOptions = new Map<string, { items: any[], totalCount: number, isLoading: boolean }>();
+
+  getDropdownOptions(extraAttr: any) {
+    if (extraAttr?.validEntries && !extraAttr?.dataSource) {
+    return extraAttr.validEntries.split('|').map(v => ({
+      label: v.trim(),
+      value: v.trim()
+    }));
+
+  }
+  
+  return this.extraAttrOptions.get(extraAttr.id)?.items || [];
+  }
+  
+  onDropdownClick(extraAttr: any) {
+    if (extraAttr?.validEntries && !extraAttr?.dataSource) 
+    return;
+
+  const data = this.extraAttrOptions.get(extraAttr.id);
+
+  if (!data || data.items.length === 0) 
+    this.loadNextItems(extraAttr);
+
+  }
+
+  onLoadMoreClick(event: Event, extraAttr: any) {
+    event.stopPropagation();
+    this.loadNextItems(extraAttr);
+  }
+  loadNextItems(extraAttr: any) {
+    let data = this.extraAttrOptions.get(extraAttr.id);
+    if (!data) {
+      data = { items: [], totalCount: 0, isLoading: false };
+      this.extraAttrOptions.set(extraAttr.id, data);
+    }
+
+    if (data.isLoading) return;
+
+    const skipCount = data.items.length;
+    const maxResultCount = 10;
+
+    data.isLoading = true;
+
+    this.callDynamicAPI(extraAttr, skipCount, maxResultCount);
+  }
+
+ callDynamicAPI(extraAttr: any, skipCount: number = 0, maxResultCount: number = 10) {
+  if (extraAttr?.validEntries && extraAttr.validEntries.includes('|')) {
+    const items = extraAttr.validEntries.split('|').map(val => ({
+      label: val.trim(),
+      value: val.trim()
+    }));
+
+    this.extraAttrOptions.set(extraAttr.id, {
+      items: items,
+      totalCount: items.length,
+      isLoading: false
+    });
+    return;
+  }
+
+  if (extraAttr?.dataSource) {
+    const serviceName = extraAttr.dataSource.service + "ServiceProxy";
+    const apiMethod = extraAttr.dataSource.api;
+    const resultField = extraAttr.dataSource.parameter;
+
+    this.dynamicApi.dispatch(serviceName, apiMethod, {
+      skipCount: skipCount,
+      maxResultCount: maxResultCount
+    }).subscribe(result => {
+      const dropdownItems = result.items.map(item => ({
+        label: this.getByPath(item, resultField.trim()),
+        value: item.account.id
+      }));
+
+      const existing = this.extraAttrOptions.get(extraAttr.id)?.items || [];
+      const combinedItems = skipCount > 0 ? [...existing, ...dropdownItems] : dropdownItems;
+
+      this.extraAttrOptions.set(extraAttr.id, {
+        items: combinedItems,
+        totalCount: result.totalCount,
+        isLoading: false
+      });
+    });
+  }
+}
+
+
+  getByPath(obj: any, path: string) {
+    return path.split('.').reduce((o, p) => o?.[p], obj);
+  }
+
+  getExtraAttr(attributeId: number, nameIncludes: string) {
+    return this.extraAttributeObject.value.extraAttributes
+      .find(x => x?.attributeId === attributeId || x?.name?.includes(nameIncludes));
+  }
+
+
+
+  saveAll(appEntityDto: AppEntityDto): void {
+    let success = false;
+    this.showMainSpinner();
+
+    appEntityDto.extraDataFileTypeIndex = appEntityDto.entityExtraData
+      .map((item, index) => {
+        const value = item?.attributeValue;
+        return value != null && String(value)?.includes('|') ? index : -1;
+      })
+      .filter(i => i !== -1);
+
+    this._appEntitiesServiceProxy.saveEntity(appEntityDto)
+      .pipe(
+        finalize(() => {
+          this.hideMainSpinner();
+        })
+      )
+      .subscribe({
+        next: () => {
+          this.formTouched = false;
+          this.notify.success(this.l('Saved Successfully'));
+        },
+        error: () => {
+          this.notify.error(this.l('Save Failed'));
+        }
+      });
+
+    
+  }
+
+  isVisible(extraAttr: any): boolean {
+
+  if (!extraAttr.visibleWhen) return true;
+
+  const parentAttr = this.extraAttributeObject.value.extraAttributes
+    .find(x => x.attributeId == extraAttr.visibleWhen.extraAttributeId);
+
+  if (!parentAttr) return false;
+
+  return parentAttr.selectedValues?.toString().toLowerCase() ===
+         extraAttr.visibleWhen.value?.toString().toLowerCase();
+}
+
 
 }

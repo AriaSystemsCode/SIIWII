@@ -1,5 +1,5 @@
 import { IAjaxResponse, TokenService } from 'abp-ng2-module';
-import { Component, Injector, OnInit } from '@angular/core';
+import { Component, Injector, OnInit, QueryList, ViewChildren } from '@angular/core';
 import { AppConsts } from '@shared/AppConsts';
 import { appModuleAnimation } from '@shared/animations/routerTransition';
 import { AppComponentBase } from '@shared/common/app-component-base';
@@ -12,6 +12,7 @@ import { SelectItem } from "primeng/api";
 import { CreateEditAppItemExtraAttribute } from '@app/main/app-items/app-item-shared/models/create-edit-app-item-extra-attribute';
 import { EExtraAttributeUsage } from '@app/main/app-items/appItems/models/extra-attribute-usage.enum';
 import { forkJoin, Observable } from 'rxjs';
+import { dynamicInputs } from '@shared/components/dynamicInputs/dynamicInputs.component';
 @Component({
   templateUrl: './portal-tenant-settings.component.html',
   styleUrls: ['./settings.component.scss',
@@ -56,6 +57,9 @@ export class PortalTenantSettingsComponent extends AppComponentBase implements O
   entityObjectTypeTenantId: number=771;
   tenantEntityId: number;
 
+
+@ViewChildren('appdynamicInputs')
+dynamicInputsComponents!: QueryList<dynamicInputs>;
 
   constructor(
     injector: Injector,
@@ -182,7 +186,6 @@ export class PortalTenantSettingsComponent extends AppComponentBase implements O
 
   saveAll(): void {
     let success = false;
-    this.showMainSpinner();
 
     let appEntityDto : AppEntityDto =new AppEntityDto();
     appEntityDto.entityExtraData =  this.dynamicInputsForViewDto?.entityExtraData || [];
@@ -193,26 +196,9 @@ export class PortalTenantSettingsComponent extends AppComponentBase implements O
     appEntityDto.code= this.dynamicInputsForViewDto.appEntity.code;
     appEntityDto.name=this.dynamicInputsForViewDto.appEntity.name;
 
-    appEntityDto.extraDataFileTypeIndex = appEntityDto.entityExtraData
-    .map((item, index) => item.attributeValue && item.attributeValue.includes('|') ? index : -1)
-    .filter(index => index !== -1);
-    
    
-      this._appEntitiesServiceProxy.saveEntity(appEntityDto)
-      .pipe(
-        finalize(() => {
-          //this.formTouched = false;
-          this.hideMainSpinner();
-        })
-      )
-      .subscribe({
-        next: (results) => {
-          this.notify.success(this.l('Saved Successfully'));
-        },
-        error: (err) => {
-          this.notify.error(this.l('Save Failed'));
-        }
-      });
+     
+            this.dynamicInputsComponents.first.saveAll(appEntityDto);
 
     if (abp.clock.provider.supportsMultipleTimezone &&
       this.usingDefaultTimeZone &&
@@ -436,5 +422,10 @@ export class PortalTenantSettingsComponent extends AppComponentBase implements O
 
     }
   }
+
+  
+ onActiveIndexChange(usage){
+        this.selectedUsage = usage; 
+}
 
 }
