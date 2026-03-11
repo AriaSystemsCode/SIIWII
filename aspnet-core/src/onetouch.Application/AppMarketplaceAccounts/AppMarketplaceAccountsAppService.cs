@@ -47,6 +47,8 @@ using Microsoft.PowerShell.Commands;
 using onetouch.AppItems.Dtos;
 using onetouch.AppMarketplaceItems.Dtos;
 using Microsoft.Identity.Client;
+using Abp.Extensions;
+using DocumentFormat.OpenXml.Drawing.Diagrams;
 
 namespace onetouch.AppMarketplaceAccounts
 {
@@ -357,7 +359,20 @@ namespace onetouch.AppMarketplaceAccounts
                                 .Where(z => z.EntityObjectTypeId == marketplaceRelationshipSycEntityObjId).ToListAsync();
                         foreach (var account in accountsList)
                         {
-                            account.AvailableConnections = new List<ConnectionType>();
+                        //I50[Start]
+                        var relationshipsQuery = _appContactRelationshipInfoRepository.GetAll()
+                        .Where(z => ((z.RequesterContactSSIN == account.Account.SSIN)
+                         || (z.RecipientContactSSIN == account.Account.SSIN)) && z.EntityObjectStatusId == activeRelationshipStatusId &&
+                        (z.SharingLevel == 1));
+
+                        var relationshipQ = from b in _appMarketplaceContactRepository.GetAll().Where(z => z.SSIN != account.Account.SSIN && z.IsDeleted == false && z.SharingLevel == 1)
+                                            from a in relationshipsQuery
+                                            where (b.SSIN == a.RequesterContactSSIN || b.SSIN == a.RecipientContactSSIN)
+                        select new { obj = b };
+                       
+                        account.Account.Connections = await relationshipQ.CountAsync();
+                        //I50[End]
+                        account.AvailableConnections = new List<ConnectionType>();
                             account.ConnectionName = "";
                             var accountConnection = _appContactRepository.GetAll()
                             .FirstOrDefault(e => e.TenantId == AbpSession.TenantId && e.SSIN == account.Account.SSIN);
