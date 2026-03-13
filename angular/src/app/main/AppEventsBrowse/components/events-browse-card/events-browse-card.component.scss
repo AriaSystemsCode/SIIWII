@@ -363,6 +363,9 @@
   }
   
   .stat{
+        display: flex;
+    gap: 5px;
+    align-items: center;
     flex: 1;
     min-width: 0; 
   }

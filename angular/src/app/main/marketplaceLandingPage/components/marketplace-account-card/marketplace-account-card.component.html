@@ -5,26 +5,6 @@
     <div class="mp-acc-media" (click)="openDetails()">
       <img class="mp-acc-img" [src]="logoUrl" (error)="onImgErr($event)" alt="account" />
     </div>
-
-    <div class="mp-acc-left-extra">
-            <div class="meta-item" >
-        <i class="fas fa-map-marker-alt meta-ico"></i>
-        <span class="meta-label">{{ 'Country' | localize }}:</span>
-        <span class="meta-value">{{ account?.account?.countryName }}</span>
-      </div>
-
-         <div class="meta-item" *ngIf="account?.account?.description">
-        <i class="fas fa-info-circle meta-ico"></i>
-        <span class="meta-value truncate2">
-          {{ account?.account?.description | textSubstring : 90 }} 
-        </span>
-      </div>
-<!-- 
-      <div class="left-extra-box">
-        <span class="left-extra-label">{{ 'Connections' | localize }}</span>
-        <span class="left-extra-value">{{ account?.connectionCount || 0 }}</span>
-      </div> -->
-    </div>
   </div>
 
   <!-- Right column -->
@@ -32,36 +12,44 @@
 
     <div class="mp-acc-title-row">
       <h4 class="mp-acc-title" (click)="openDetails()">
-        {{ account?.account?.name }}
+        {{ account?.account?.name  }}
       </h4>
     </div>
 
- 
-
     <div class="mp-acc-meta">
-      <div class="meta-item">
+
+      <!-- Connections -->
+      <div class="meta-item"  [pTooltip]="'Connections' | localize" tooltipPosition="bottom" >
         <i class="fas fa-users meta-ico"></i>
-        <span class="meta-label">{{ 'Connections' | localize }}:</span>
         <span class="meta-value">{{ account?.connectionCount || 0 }}</span>
       </div>
 
-
-      <div class="meta-item" *ngIf="account?.account?.description">
-        <i class="fas fa-info-circle meta-ico"></i>
-        <span class="meta-value truncate2">
-          {{ account?.account?.description | textSubstring : 90 }}
-        </span>
+      <!-- Country -->
+      <div class="meta-item" *ngIf="account?.account?.countryName"  [pTooltip]="'Country' | localize" tooltipPosition="bottom">
+        <i class="fas fa-map-marker-alt meta-ico"></i>
+        <span class="meta-value">{{ account?.account?.countryName }}</span>
       </div>
+
+      <!-- Account type as icon -->
+      <div
+       
+        *ngIf="account?.account?.accountType"
+        [pTooltip]="'AccountType' | localize" tooltipPosition="bottom"
+      >
+        <i class="fas fa-tag meta-ico"></i> <span  class="meta-item acc-type-item mx-1 p-2"> {{account?.account?.accountType}} </span>
+         <!-- <i
+          class="meta-ico"
+          [ngClass]="getAccountTypeIcon(account?.account?.accountType)"
+        ></i> -->
+      </div>
+
     </div>
-   <div class="mp-acc-topline" *ngIf="account?.account?.accountType">
-      <span class="accTyp">{{ 'AccountType' | localize }}</span>
-      <span class="mp-acc-badge">{{ account?.account?.accountType }}</span>
-    </div>
+
     <div class="mp-acc-actions">
 
       <!-- Connected -->
       <span
-        class="mt-3 d-flex w-100 justify-content-end"
+        class="d-flex w-100 justify-content-end"
         *ngIf="((account?.availableConnections?.length == 0 && account?.connectionName ) || (account?.connectionName)) && isAuthenticated"
       >
         <div

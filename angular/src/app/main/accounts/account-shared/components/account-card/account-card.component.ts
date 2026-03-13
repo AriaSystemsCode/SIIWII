@@ -152,4 +152,15 @@ export class AccountCardComponent extends AppComponentBase implements OnChanges 
                     });
       }
 
+
+  getRemainingCategoriesList(categories: string[]): string {
+  if (!categories || categories.length <= 3) {
+    return '';
+  }
+
+  return categories
+    .slice(3)
+    .map(category => `• ${category}`)
+    .join('\n');
+}
 }

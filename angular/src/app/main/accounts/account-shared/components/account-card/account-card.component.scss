@@ -475,7 +475,7 @@ a.btn {
   }
   .singleCat {
    
-padding: 5px;
+padding: 2px 4px;
 
 background: rgba(248, 248, 248, 0.972549);
 border: 1px solid #E6E6E6;
@@ -602,4 +602,134 @@ NEW CARD VIEW
 
 .accountType-sec {
   white-space: nowrap;
+}
+
+.meta-ico {
+  font-size: 15px;
+  color: #4A0D4A;
+  width: 18px;
+  text-align: center;
+}
+
+.more-cat {
+  cursor: pointer;
+  font-weight: 700;
+  color: #4A0D4A;
+}
+
+.more-cat {
+  cursor: pointer;
+  font-weight: 700;
+  color: #4A0D4A;
+  position: relative;
+}
+
+.more-cat-wrap {
+  position: relative;
+}
+
+.more-cat-tooltip {
+  position: absolute;
+    top: calc(100% + 2px);
+    left: -45px;
+  min-width: 180px;
+  max-width: 260px;
+  background: #fff;
+  border: 1px solid #ececec;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  padding: 10px 12px;
+  z-index: 1000;
+
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(6px);
+  transition: all 0.18s ease;
+}
+
+.more-cat-wrap:hover .more-cat-tooltip {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.more-cat-tooltip-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: #4A0D4A;
+  margin-bottom: 8px;
+}
+
+.more-cat-tooltip-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: 180px;
+  overflow: auto;
+}
+
+.more-cat-tooltip-item {
+  font-size: 12px;
+  color: #333;
+  padding: 6px 8px;
+  background: #fafafa;
+  border: 1px solid #f0f0f0;
+  border-radius: 8px;
+  line-height: 1.3;
+}
+
+.more-class-wrap {
+  cursor: pointer;
+  font-weight: 700;
+  color: #4A0D4A;
+  position: relative;
+}
+
+.more-class-tooltip {
+  position: absolute;
+    top: calc(100% + 2px);
+    left: -45px;
+  min-width: 200px;
+  max-width: 280px;
+  background: #fff;
+  border: 1px solid #ececec;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+  padding: 10px 12px;
+  z-index: 1000;
+
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(6px);
+  transition: all .18s ease;
+}
+
+.more-class-wrap:hover .more-class-tooltip{
+  opacity:1;
+  visibility:visible;
+  transform:translateY(0);
+}
+
+.more-class-title{
+  font-size:12px;
+  font-weight:700;
+  color:#4A0D4A;
+  margin-bottom:8px;
+}
+
+.more-class-list{
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+  max-height:180px;
+  overflow:auto;
+}
+
+.more-class-item{
+  font-size:12px;
+  color:#333;
+  padding:6px 8px;
+  background:#fafafa;
+  border:1px solid #f0f0f0;
+  border-radius:8px;
 }

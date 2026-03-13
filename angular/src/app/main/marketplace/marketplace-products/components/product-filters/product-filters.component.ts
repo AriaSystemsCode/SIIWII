@@ -387,8 +387,8 @@ export class ProductFiltersComponent extends AppComponentBase implements OnInit,
         undefined,
         true,
         undefined,
-        [],
-        "name",
+        undefined,
+        undefined,
         0,
         10
       ).subscribe((res: any) => {
@@ -401,6 +401,7 @@ export class ProductFiltersComponent extends AppComponentBase implements OnInit,
 
   getParentCategories(): Promise<void> {
     return new Promise((resolve) => {
+      
       const apiMethod = 'getAllWithChildsForProductWithPaging';
       this._sycEntityObjectCategoriesServiceProxy[apiMethod](
         undefined, undefined, undefined, undefined, undefined, undefined, undefined,
@@ -409,7 +410,7 @@ export class ProductFiltersComponent extends AppComponentBase implements OnInit,
         undefined,
         [],
          undefined,
-        'name',
+        undefined,
         0,
         10
       ).subscribe((res: any) => {

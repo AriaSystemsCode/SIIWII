@@ -157,4 +157,5 @@ getFormattedConnectionName(type: 'connectionName' | 'avaliableConnectionName' | 
     return 'assets/accounts/CONNECT.png'; // fallback
   }
 
+ 
 }

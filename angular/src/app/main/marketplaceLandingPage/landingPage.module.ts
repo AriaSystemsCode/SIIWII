@@ -26,7 +26,7 @@ import { MarketplaceAccountCardComponent } from "./components/marketplace-accoun
 import { MarketplaceProductCardComponent } from "./components/marketplace-product-card/marketplace-product-card.component";
 import { AccountSharedModule } from "../accounts/account-shared/account-shared.module";
 import { EventsBrowseModule } from "../AppEventsBrowse/events-browse.module";
-
+import { TooltipModule } from 'primeng/tooltip';
 
 
 @NgModule({
@@ -61,7 +61,8 @@ import { EventsBrowseModule } from "../AppEventsBrowse/events-browse.module";
         InteractionsModule,
         MarketplaceProductsModule,
         AccountSharedModule,
-        EventsBrowseModule
+        EventsBrowseModule,
+        TooltipModule
         
     ],
     exports: [MarketplaceLandingPageComponent, LandingPageSliderWithCallToActionComponent,FooterPageLinkComponent,FooterSocialMediaComponent,LandingPageSinglrRowCallActionComponent,LandingPageSliderWithoutCallToActionComponent,LandingPageCarusalWithCallToActionComponent,LandingPageMultiRowCallToActionComponent,ContactUsModalComponent],

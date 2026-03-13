@@ -1,7 +1,7 @@
 .product-card-horizontal {
     display: flex;
     width: 100%;
-    
+    min-height: 200px;
   border: 1px solid #ebedf2;
   border-radius: 12px;
   background: #ffffff;
@@ -13,7 +13,7 @@
   }
   
   .product-image-wrapper {
-    flex: 0 0 50%;
+    flex: 0 0 43%;
     margin: auto 0;
     border-radius: 10px;
     overflow: hidden;

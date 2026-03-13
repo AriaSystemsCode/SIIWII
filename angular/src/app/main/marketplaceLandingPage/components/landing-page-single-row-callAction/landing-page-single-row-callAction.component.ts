@@ -6,6 +6,9 @@ import { AccountsServiceProxy, PageSettingDto, SydObjectsServiceProxy} from '@sh
 import { AppConsts } from '@shared/AppConsts';
 import { ViewEventComponent } from '@app/main/AppEvent/Components/view-event.component';
 import {  finalize } from 'rxjs';
+import { EventsBrowseComponentActionsMenuFlags } from '@app/main/AppEventsBrowse/models/EventsBrowseComponentActionsMenuFlags';
+import { EventsBrowseComponentStatusesFlags } from '@app/main/AppEventsBrowse/models/EventsBrowseComponentStatusesFlags';
+import { EventsBrowseActionsEvents } from '@app/main/AppEventsBrowse/models/Events-browse-inputs';
 
 type MediaKind = 'image' | 'video' | 'pdf' | 'other';
 
@@ -27,6 +30,8 @@ export class LandingPageSinglrRowCallActionComponent extends AppComponentBase im
   numVisible: number = 4;
   numVisibleSingle: number = 6;
   
+      actionsMenuFlags :   EventsBrowseComponentActionsMenuFlags
+      statusesFlags :  EventsBrowseComponentStatusesFlags
   private objectUrlById: Record<number, string> = {};
   acceptedAspectRatio;
   responsiveOptions = [
@@ -70,8 +75,8 @@ export class LandingPageSinglrRowCallActionComponent extends AppComponentBase im
     },
     {
       breakpoint: '991px',
-      numVisible: 3,
-      numScroll: 3
+      numVisible: 2,
+      numScroll: 2
     },
     {
       breakpoint: '767px',
@@ -287,11 +292,17 @@ onAttachmentClick(b: PageSettingDto): void {
 }
 
 
-  openEventDetails(id: any) {
-  
-        this.viewEventModal.show(id,0);
+  eventHandler(event:EventsBrowseActionsEvents,id:number){
+        if(event == EventsBrowseActionsEvents.View) this.openViewEvent(id)
+        // else if(event == EventsBrowseActionsEvents.Edit) this.openCreateOrEditEventModal(id)
+        // else if(event == EventsBrowseActionsEvents.Publish) this.publishEvent(id)
+        // else if(event == EventsBrowseActionsEvents.UnPublish) this.unPublishEvent(id)
+        // else if(event == EventsBrowseActionsEvents.Delete) this.deleteEvent(id)
+    }
 
-  }
+    openViewEvent($event: number) {
+        this.viewEventModal.show($event, 0);
+    }
 
 createRelation(account,option: { connectLabel: string; connectionEntityId: number; defaultVisibility: string }) {
   if (!option?.connectionEntityId) return;

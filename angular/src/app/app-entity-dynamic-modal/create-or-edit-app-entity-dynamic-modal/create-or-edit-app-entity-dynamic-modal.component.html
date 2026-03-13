@@ -374,6 +374,7 @@
                                                         [(ngModel)]="extraAttr.selectedValues"
                                                         name="extraAttr_{{extraAttr.name}}"
                                                         [placeholder]="l('Select') + ' ' + extraAttr.name"
+                                                         [disabled]="isBlockTypeLocked(extraAttr)"
                                                         (onChange)="notLookupExtraAttributeOnChange($event.value,extraAttr)">
                                                     </p-dropdown>
 

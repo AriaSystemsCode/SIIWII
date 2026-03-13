@@ -1,10 +1,10 @@
 .mp-acc-card {
-  display: grid;
-  grid-template-columns: 135px 1fr;
-  gap: 12px;
-  padding: 14px;
+  display: flex;
+  // grid-template-columns: 135px 1fr;
+  gap: 8px;
+  padding: 11px;
   border-radius: 14px;
-  height: 240px;
+  // height: 240px;
   background: #fff;
   border: 1px solid #ececec;
   box-shadow: rgba(0, 0, 0, 0.05) 0px 2px 8px;
@@ -22,17 +22,21 @@
   }
 
   &.compact {
-    height: 240px;
+    height: 200px;
     grid-template-columns: 135px 1fr;
   }
 }
 
 /* left column */
 .mp-acc-left {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  min-width: 0;
+  // display: flex;
+  // flex-direction: column;
+  // height: 100%;
+  // min-width: 0;
+   overflow: hidden;
+        // margin: 10px;
+            flex: 0 0 54%;
+    margin: auto 0;
 }
 
 .mp-acc-media {
@@ -40,7 +44,7 @@
   overflow: hidden;
   background: #f3f6f9;
   cursor: pointer;
-  width: 135px;
+  // width: 135px;
   aspect-ratio: 1 / 1;
   flex: 0 0 auto;
   display: flex;
@@ -121,22 +125,16 @@
 .mp-acc-topline {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 2px;
   margin-top: 8px;
-  flex-wrap: wrap;
-  white-space: nowrap;
-}
-
-.accTyp {
-  font-size: 12px;
-  color: #1b101b;
-  white-space: nowrap;
+  flex-wrap: nowrap;
+  // white-space: nowrap;
 }
 
 .mp-acc-badge {
   flex: 0 0 auto;
-  font-size: 11px;
-  padding: 6px 10px;
+  font-size: 10px;
+  padding: 6px;
   border-radius: 999px;
   background: rgba(74, 13, 74, 0.08);
   color: #4a0d4a;
@@ -146,13 +144,13 @@
 .mp-acc-meta {
   margin-top: 12px;
   display: grid;
-  gap: 8px;
+  // gap: 8px;
 }
 
 .meta-item {
   display: flex;
   align-items: flex-start;
-  gap: 8px;
+  gap: 2px;
   min-width: 0;
   color: #595959;
   font-size: 13px;
@@ -218,7 +216,12 @@
 .relation-ar {
   left: 4px;
 }
-
+ .accTyp {
+    font-size: 10px;
+    color: #777;
+    font-weight: 700;
+    white-space: nowrap;
+  }
 :host ::ng-deep .dropdown-menu {
   z-index: 99999 !important;
   max-height: 260px;
@@ -234,15 +237,22 @@
   }
 
   .mp-acc-media {
-    width: 120px;
+    // width: 120px;
   }
-
+.mp-acc-left{
+    overflow: hidden;
+    flex: 0 0 50%;
+    margin: auto 0;
+}
   .mp-acc-title {
     font-size: 14px;
   }
 
   .accTyp {
-    font-size: 11px;
+    font-size: 10px;
+    color: #777;
+    font-weight: 700;
+    white-space: nowrap;
   }
 
   .mp-acc-badge {
@@ -291,5 +301,55 @@
 
   .mp-acc-actions {
     justify-content: space-between;
+  }
+}
+
+
+
+
+.mp-acc-meta {
+  margin-top: 12px;
+  display: flex;
+  align-items: start;
+  gap: 5px;
+  flex-direction: column;
+  // flex-wrap: wrap;
+}
+
+.meta-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  color: #595959;
+  font-size: 13px;
+}
+
+.meta-ico {
+  font-size: 15px;
+  color: #777;
+  width: 18px;
+  text-align: center;
+}
+
+.meta-value {
+  color: #1b101b;
+  font-weight: 600;
+  min-width: 0;
+}
+
+.acc-type-item {
+  // width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  background: rgba(74, 13, 74, 0.08);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  .meta-ico {
+    width: auto;
+    color: #4a0d4a;
+    font-size: 14px;
   }
 }

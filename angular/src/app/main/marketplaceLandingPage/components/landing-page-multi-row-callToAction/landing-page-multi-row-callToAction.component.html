@@ -1,6 +1,6 @@
-<div class="products-grid px-md-1 px-3"> {{blockTypeIsSingleOrMixed}}
+<div class="products-grid px-md-1 px-3" [ngClass]=" blockTypeIsSingleOrMixed !='Single Type Blocks'?  'products-grid-mixed':'products-grid-single'">
   <div *ngFor="let block of sliderItems" class="product-col">
-    <div class="block-card" [style.aspect-ratio]="acceptedAspectRatio">
+    <div class="block-card" [ngClass]=" blockTypeIsSingleOrMixed !='Single Type Blocks'?  'block-card-mixed':''" [style.aspect-ratio]="acceptedAspectRatio">
       <ng-container [ngSwitch]="block?.blockType?.toUpperCase()">
 
 
@@ -50,9 +50,9 @@
 
           <app-events-browse-card *ngIf="blockTypeIsSingleOrMixed =='Single Type Blocks'"
             [item]="block?.getAppEventForViewDto" [singleItemPerRowMode]="false" [fromMarketPlaceProfile]="false"
-            [fromOverviewMarketPlaceProfile]="false"
+            [fromOverviewMarketPlaceProfile]="false" (triggerEvent)="openEventDetails(block?.getAppEventForViewDto?.appEvent?.id)"
  ></app-events-browse-card>          
-   <!-- (triggerEvent)="openEventDetails(block.getAppEventForViewDto.appEvent.id)" -->
+
         </div>
 
         <!-- ACCOUNT -->
@@ -61,13 +61,20 @@
             [showConnectButton]="true"></app-marketplace-account-card>
             
           <app-account-card *ngIf="blockTypeIsSingleOrMixed =='Single Type Blocks'"
-            [account]="block?.getAccountForViewDto" [fromMarketplace]="true" [cardsViewMode]="true" ></app-account-card>
-            <!-- (disconnectMe)="
+            [account]="block?.getAccountForViewDto" [fromMarketplace]="true" [cardsViewMode]="true"  (disconnectMe)="
                                                     disconnect(block?.getAccountForViewDto)" 
-                                                (_createRelation)="createRelation(block?.getAccountForViewDto,$event)" -->
+                                                (_createRelation)="createRelation(block?.getAccountForViewDto,$event)"></app-account-card>
+          
         </div>
              
       </ng-container>
     </div>
   </div>
 </div>
+
+
+
+  <app-view-event
+  #viewEventModal
+
+></app-view-event>
