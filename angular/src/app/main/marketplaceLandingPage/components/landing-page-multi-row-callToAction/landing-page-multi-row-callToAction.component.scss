@@ -208,3 +208,35 @@
 
 }
 
+.block-card{
+  position: relative;
+}
+
+/* TYPE BADGE */
+
+.block-type-badge{
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 10;
+
+  display: flex;
+  align-items: center;
+  gap: 6px;
+
+  padding: 5px;
+
+  background: rgba(0,0,0,0.65);   /* works on any image */
+  color: #fff;
+
+  font-size: 12px;
+  font-weight: 600;
+
+  border-radius: 6px;
+
+  backdrop-filter: blur(4px);
+}
+
+.block-type-badge i{
+  font-size: 12px;
+}

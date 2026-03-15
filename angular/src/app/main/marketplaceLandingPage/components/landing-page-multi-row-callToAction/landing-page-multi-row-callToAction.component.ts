@@ -97,11 +97,11 @@ export class LandingPageMultiRowCallToActionComponent extends AppComponentBase i
       { queryParams: { brand: brand?.getAppEntityForViewDto?.appEntity?.id } }
     );
   }
-  goToCategory(cat: { name: string; id: number | string }) {
+  goToCategory(id) {
 
     this.router.navigate(
       ['/app/main/marketplace/products'],
-      { queryParams: { cat: cat.id } }
+      { queryParams: { cat: id } }
     );
   }
 
@@ -302,8 +302,8 @@ export class LandingPageMultiRowCallToActionComponent extends AppComponentBase i
 
 
   openEventDetails(id: any) {
-
-    this.viewEventModal.show(id, null);
+   
+    this.viewEventModal.show(id, 0);
 
   }
 
@@ -362,7 +362,47 @@ export class LandingPageMultiRowCallToActionComponent extends AppComponentBase i
     return { connectionName, disconnectLabel };
   }
 
+getBlockTypeLabel(type: string): string {
+  const t = (type || '').toUpperCase();
 
+  switch (t) {
+    case 'EVENT':
+      return 'Event';
+    case 'CONTACT':
+      return 'Account';
+    case 'PRODUCT':
+      return 'Product';
+    case 'ATTACHMENT':
+      return 'Attachment';
+    case 'BRAND':
+      return 'Brand';
+    case 'CATEGORY':
+      return 'Category';
+    default:
+      return 'Block';
+  }
+}
+
+getBlockTypeIcon(type: string): string {
+  const t = (type || '').toUpperCase();
+
+  switch (t) {
+    case 'EVENT':
+      return 'fas fa-calendar-alt';
+    case 'CONTACT':
+      return 'fas fa-user';
+    case 'PRODUCT':
+      return 'fas fa-shopping-bag';
+    case 'ATTACHMENT':
+      return 'fas fa-paperclip';
+    case 'BRAND':
+      return 'fas fa-tag';
+    case 'CATEGORY':
+      return 'fas fa-th-large';
+    default:
+      return 'fas fa-square';
+  }
+}
   ngOnDestroy() {
     Object.values(this.objectUrlById).forEach(u => { try { URL.revokeObjectURL(u); } catch { } });
     this.objectUrlById = {};

@@ -9,7 +9,7 @@ import {  finalize } from 'rxjs';
 import { EventsBrowseComponentActionsMenuFlags } from '@app/main/AppEventsBrowse/models/EventsBrowseComponentActionsMenuFlags';
 import { EventsBrowseComponentStatusesFlags } from '@app/main/AppEventsBrowse/models/EventsBrowseComponentStatusesFlags';
 import { EventsBrowseActionsEvents } from '@app/main/AppEventsBrowse/models/Events-browse-inputs';
-
+import { BsModalRef, BsModalService, ModalOptions } from 'ngx-bootstrap/modal';
 type MediaKind = 'image' | 'video' | 'pdf' | 'other';
 
 @Component({
@@ -21,7 +21,7 @@ export class LandingPageSinglrRowCallActionComponent extends AppComponentBase im
   @Input() sectionId!: number;
    @Input()  blockTypeIsSingleOrMixed :string
   @ViewChild("viewEventModal", { static: true }) viewEventModal: ViewEventComponent;
-
+bsModalRef: BsModalRef;
   items: PageSettingDto[] = [];
 
   attachmentBaseUrl = AppConsts.attachmentBaseUrl;
@@ -97,6 +97,7 @@ export class LandingPageSinglrRowCallActionComponent extends AppComponentBase im
     private syd: SydObjectsServiceProxy,
     private router: Router,
     private _accountsServiceProxy: AccountsServiceProxy,
+      private _bsModalService: BsModalService
   ) { super(injector); }
 
   ngOnInit() {
@@ -177,11 +178,11 @@ export class LandingPageSinglrRowCallActionComponent extends AppComponentBase im
         { queryParams: { brand: brand?.getAppEntityForViewDto?.appEntity?.id } } 
     );
 }
-goToCategory(cat: { name: string; id: number | string }) {
+goToCategory(id) {
    
   this.router.navigate(
       ['/app/main/marketplace/products'],
-      { queryParams: { cat: cat.id } }  
+      { queryParams: { cat: id } }  
   );
 }
 
@@ -291,19 +292,6 @@ onAttachmentClick(b: PageSettingDto): void {
   window.open(finalUrl, '_blank');
 }
 
-
-  eventHandler(event:EventsBrowseActionsEvents,id:number){
-        if(event == EventsBrowseActionsEvents.View) this.openViewEvent(id)
-        // else if(event == EventsBrowseActionsEvents.Edit) this.openCreateOrEditEventModal(id)
-        // else if(event == EventsBrowseActionsEvents.Publish) this.publishEvent(id)
-        // else if(event == EventsBrowseActionsEvents.UnPublish) this.unPublishEvent(id)
-        // else if(event == EventsBrowseActionsEvents.Delete) this.deleteEvent(id)
-    }
-
-    openViewEvent($event: number) {
-        this.viewEventModal.show($event, 0);
-    }
-
 createRelation(account,option: { connectLabel: string; connectionEntityId: number; defaultVisibility: string }) {
   if (!option?.connectionEntityId) return;
 
@@ -358,5 +346,51 @@ private parseRelationResult(raw: string): { connectionName: string; disconnectLa
 
   return { connectionName, disconnectLabel };
 }
+  openEventDetails(id: any) {
+  
+        this.viewEventModal.show(id,0);
 
+  }
+
+  getBlockTypeLabel(type: string): string {
+  const t = (type || '').toUpperCase();
+
+  switch (t) {
+    case 'EVENT':
+      return 'Event';
+    case 'PRODUCT':
+      return 'Product';
+    case 'CONTACT':
+      return 'Account';
+    case 'ATTACHMENT':
+      return 'Attachment';
+    case 'BRAND':
+      return 'Brand';
+    case 'CATEGORY':
+      return 'Category';
+    default:
+      return 'Block';
+  }
+}
+
+getBlockTypeIcon(type: string): string {
+  const t = (type || '').toUpperCase();
+
+  switch (t) {
+    case 'EVENT':
+      return 'fas fa-calendar-alt';
+    case 'PRODUCT':
+      return 'fas fa-shopping-bag';
+    case 'CONTACT':
+      return 'fas fa-user';
+    case 'ATTACHMENT':
+      return 'fas fa-paperclip';
+    case 'BRAND':
+      return 'fas fa-tag';
+    case 'CATEGORY':
+      return 'fas fa-th-large';
+    default:
+      return 'fas fa-square';
+  }
+}
 }

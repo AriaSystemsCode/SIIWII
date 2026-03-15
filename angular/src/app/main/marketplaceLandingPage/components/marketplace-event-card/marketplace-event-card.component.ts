@@ -29,8 +29,9 @@ export class MarketplaceEventCardComponent {
     (e.target as HTMLImageElement).src = 'assets/placeholders/appitem-placeholder.png';
   }
   openEventDetails(id: any) {
-  
-        this.viewEventModal.show(id,0);
+
+  this.details.emit(id)
+        // this.viewEventModal.show(id,0);
 
   }
 }

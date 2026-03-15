@@ -3,9 +3,10 @@
   // display: flex;
   justify-content: center;
 }
-:host ::ng-deep .p-carousel-items-container{
- transform: none !important;
-}
+// :host ::ng-deep .p-carousel-items-container{
+//  transform: initial !important;
+// }
+
 
 .carousel-card-mixed {
   max-width: 340px;    
@@ -200,3 +201,38 @@
   }
 }
 
+
+
+.carousel-card {
+  position: relative;
+}
+
+.one-style-badge {
+  position: absolute;
+  top: 20px;
+  left: 10px;
+  z-index: 20;
+
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+
+  padding: 6px 10px;
+  border-radius: 6px;
+
+  background: rgba(0, 0, 0, 0.65);
+  color: #fff;
+
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1;
+
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+}
+
+.one-style-badge i {
+  font-size: 12px;
+}

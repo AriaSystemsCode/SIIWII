@@ -47,18 +47,10 @@
         </div>
       </div>
   
-      <div class="mp-event__grid ">
-  
-        <!-- <div class="mp-chip"> -->
-          <!-- <span class="mp-chip__ico"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M12 22.5L5.67301 15.0382C5.58509 14.9262 5.49809 14.8135 5.41201 14.7C4.33179 13.276 3.74799 11.5373 3.75001 9.75C3.75001 7.56196 4.6192 5.46354 6.16637 3.91637C7.71355 2.36919 9.81197 1.5 12 1.5C14.188 1.5 16.2865 2.36919 17.8336 3.91637C19.3808 5.46354 20.25 7.56196 20.25 9.75C20.2517 11.5365 19.6682 13.2743 18.5888 14.6978L18.588 14.7C18.588 14.7 18.363 14.9955 18.3293 15.0353L12 22.5ZM6.60976 13.7963C6.60976 13.7963 6.78451 14.0272 6.82426 14.0767L12 20.181L17.1825 14.0685C17.2155 14.0272 17.391 13.7948 17.3918 13.794C18.2747 12.6309 18.7518 11.2103 18.75 9.75C18.75 7.95979 18.0388 6.2429 16.773 4.97703C15.5071 3.71116 13.7902 3 12 3C10.2098 3 8.49291 3.71116 7.22703 4.97703C5.96116 6.2429 5.25001 7.95979 5.25001 9.75C5.24815 11.2112 5.72584 12.6327 6.60976 13.7963Z" fill="#777777"/>
-            <path d="M15.75 13.5H14.25V7.5H9.75V13.5H8.25V7.5C8.25 7.10218 8.40804 6.72064 8.68934 6.43934C8.97064 6.15804 9.35218 6 9.75 6H14.25C14.6478 6 15.0294 6.15804 15.3107 6.43934C15.592 6.72064 15.75 7.10218 15.75 7.5V13.5Z" fill="#777777"/>
-            <path d="M11.25 12H12.75V13.5H11.25V12ZM11.25 9H12.75V10.5H11.25V9Z" fill="#777777"/>
-            </svg>
-            </span> -->
-          <!-- <span class="mp-chip__lbl">{{'Location' | localize}}:</span> -->
-                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" role="img" aria-labelledby="eventTypeTitle">
-          <title id="eventTypeTitle"  [pTooltip]="'EventType' | localize" tooltipPosition="bottom"></title>
+      <div class="mp-event__grid " [pTooltip]="'EventType' | localize" tooltipPosition="bottom">
+
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" role="img" aria-labelledby="eventTypeTitle"  >
+        <!--   <title id="eventTypeTitle"  [pTooltip]="'EventType' | localize" tooltipPosition="bottom"></title> -->
          
           <path d="M3.5 7.5v6c0 1.1.9 2 2 2h7.586c.53 0 1.039-.21 1.414-.586l5.414-5.414a2 2 0 0 0 0-2.828l-4.172-4.172A2 2 0 0 0 15.086 2H5.5c-1.1 0-2 .9-2 2z"
                 fill="none" stroke="#222" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
@@ -91,7 +83,3 @@
 
 
 
-  <app-view-event
-  #viewEventModal
-
-></app-view-event>

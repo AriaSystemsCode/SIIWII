@@ -1,3 +1,7 @@
+  <app-view-event
+  #viewEventModal
+
+></app-view-event>
 <p-carousel [value]="blocksSorted"
   [numVisible]="blockTypeIsSingleOrMixed !='Single Type Blocks'? numVisible : numVisibleSingle" [numScroll]="1"
   [circular]="false" [showIndicators]="false" [showNavigators]="true"
@@ -6,16 +10,20 @@
   <ng-template pTemplate="item" let-item>
 
     <div class="carousel-card" [ngClass]="blockTypeIsSingleOrMixed !='Single Type Blocks' ? 'carousel-card-mixed' : ''">
+        <div class="block-type-badge one-style-badge" *ngIf="blockTypeIsSingleOrMixed =='Mixed Types Blocks'">
+    <i [ngClass]="getBlockTypeIcon(item?.blockType)"  [pTooltip]="getBlockTypeLabel(item?.blockType) | localize" tooltipPosition="bottom"></i>
+    <!-- <span>{{ getBlockTypeLabel(item?.blockType) }}</span> -->
+  </div>
       <div class="carousel-card-body" [ngClass]="blockTypeIsSingleOrMixed !='Single Type Blocks' ? '' : 'maxW'"
         [ngSwitch]="item?.blockType?.toUpperCase()">
 
         <!-- PRODUCT -->
         <div *ngSwitchCase="'PRODUCT'">
-          <app-marketplace-product-card *ngIf="blockTypeIsSingleOrMixed !='Single Type Blocks'" [item]="item"
+          <app-marketplace-product-card *ngIf="blockTypeIsSingleOrMixed =='Mixed Types Blocks'" [item]="item"
             [attachmentBaseUrl]="attachmentBaseUrl" [languageSettingName]="languageSettingName"
             (view)="viewProduct($event)" (imgError)="onImgErr($event)"></app-marketplace-product-card>
 
-          <app-prodcut-card *ngIf="blockTypeIsSingleOrMixed =='Single Type Blocks'"
+          <app-prodcut-card *ngIf="blockTypeIsSingleOrMixed !='Mixed Types Blocks'"
             [product]="item.getAppMarketItemForViewDto.appItem" [productCard]="item.getAppMarketItemForViewDto"
             [acceptedAspectRatio]="acceptedAspectRatio"></app-prodcut-card>
         </div>
@@ -23,14 +31,14 @@
         <!-- BRAND -->
 
         <img *ngSwitchCase="'BRAND'" class="card-media" [src]="item?.image ?  attachmentBaseUrl + '/' + item?.image: attachmentBaseUrl + '/' + item?.getAppEntityForViewDto?.appEntity?.entityAttachments[0]?.url 
-           " title="Brand {{item?.getAppEntityForViewDto?.appEntity?.name}}" alt="Brand" (click)="goToBrand(item)"
+           " title="Brand {{item?.getSycEntityObjectCategoryForViewDto?.sycEntityObjectCategory?.name}}" alt="Brand" (click)="goToBrand(item)"
           (error)="onImgErr($event)" />
 
 
         <!-- CATEGORY -->
         <img *ngSwitchCase="'CATEGORY'" class="card-media" [src]="item?.image
             ? attachmentBaseUrl + '/' + item?.image
-            : '../../../../assets/placeholders/_logo-placeholder.png'" alt="category" (click)="goToCategory(item)"
+            : '../../../../assets/placeholders/_logo-placeholder.png'" alt="category" (click)="goToCategory(item?.getSycEntityObjectCategoryForViewDto?.sycEntityObjectCategory?.id)"
           (error)="onImgErr($event)" />
         <!-- ATTACHMENT -->
         <ng-container *ngSwitchCase="'ATTACHMENT'">
@@ -53,23 +61,23 @@
         <!-- EVENT -->
         <div *ngSwitchCase="'EVENT'">
      
-          <app-marketplace-event-card *ngIf="blockTypeIsSingleOrMixed !='Single Type Blocks'"
-            [block]="item?.getAppEventForViewDto?.appEvent"></app-marketplace-event-card>
-          <app-events-browse-card *ngIf="blockTypeIsSingleOrMixed =='Single Type Blocks'"
+          <app-marketplace-event-card *ngIf="blockTypeIsSingleOrMixed =='Mixed Types Blocks'"
+            [block]="item?.getAppEventForViewDto?.appEvent" (details)="openEventDetails($event)"></app-marketplace-event-card>
+          <app-events-browse-card *ngIf="blockTypeIsSingleOrMixed !='Mixed Types Blocks'"
             [item]="item?.getAppEventForViewDto" [singleItemPerRowMode]="false" [fromMarketPlaceProfile]="false"
-            [fromOverviewMarketPlaceProfile]="false"    [actionsMenuFlags]="actionsMenuFlags"
+            [fromOverviewMarketPlaceProfile]="false"    [actionsMenuFlags]="actionsMenuFlags" [fromLandingPage]="true"
                         [statusesFlags]="statusesFlags"
-            (triggerEvent)="eventHandler($event,item?.getAppEventForViewDto?.appEvent?.id)"></app-events-browse-card>
+        ></app-events-browse-card>
   
         </div>
 
         <!-- ACCOUNT -->
         <div *ngSwitchCase="'CONTACT'">
-          <app-marketplace-account-card *ngIf="blockTypeIsSingleOrMixed !='Single Type Blocks'"
+          <app-marketplace-account-card *ngIf="blockTypeIsSingleOrMixed =='Mixed Types Blocks'"
             [account]="item?.getAccountForViewDto" [compact]="true"
             [showConnectButton]="true"></app-marketplace-account-card>
 
-          <app-account-card *ngIf="blockTypeIsSingleOrMixed =='Single Type Blocks'"
+          <app-account-card *ngIf="blockTypeIsSingleOrMixed !='Mixed Types Blocks'"
             [account]="item?.getAccountForViewDto" [fromMarketplace]="true" [cardsViewMode]="true" (disconnectMe)="
                                                     disconnect(item?.getAccountForViewDto)" 
                                                 (_createRelation)="createRelation(item?.getAccountForViewDto,$event)"></app-account-card>
@@ -82,8 +90,3 @@
 
 
 
-
-  <app-view-event
-  #viewEventModal
-
-></app-view-event>

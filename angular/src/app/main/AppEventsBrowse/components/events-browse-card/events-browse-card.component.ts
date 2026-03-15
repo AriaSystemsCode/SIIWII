@@ -6,6 +6,7 @@ import { EventsBrowseActionsEvents } from '../../models/Events-browse-inputs';
 import { EventsBrowseComponentActionsMenuFlags } from "../../models/EventsBrowseComponentActionsMenuFlags";
 import { EventsBrowseComponentStatusesFlags } from "../../models/EventsBrowseComponentStatusesFlags";
 import { EventsBrowseActionsMenuComponent } from '../events-browse-actions-menu/events-browse-actions-menu.component';
+import { ViewEventComponent } from '@app/main/AppEvent/Components/view-event.component';
 
 @Component({
   selector: 'app-events-browse-card',
@@ -25,9 +26,10 @@ export class EventsBrowseCardComponent extends AppComponentBase implements OnCha
     EventsBrowseActionsEvents = EventsBrowseActionsEvents
     @Input() fromMarketPlaceProfile :boolean =false;
     @Input() fromOverviewMarketPlaceProfile :boolean =false;
+    @Input() fromLandingPage :boolean =false;
     eventAddress="";
     profilePicture:string ="";
-
+  @ViewChild("viewEventModal", { static: true }) viewEventModal: ViewEventComponent;
     get mainFilterCtrl() { return this.filterForm?.get('filterType') }
     constructor(
         injector: Injector,
@@ -91,5 +93,9 @@ export class EventsBrowseCardComponent extends AppComponentBase implements OnCha
             : "";
 
             return  this.eventAddress =  this.eventAddress ? this.eventAddress : "online ask for the link";
+    }
+
+      openViewEvent($event: number) {
+        this.viewEventModal.show($event, 0);
     }
 }

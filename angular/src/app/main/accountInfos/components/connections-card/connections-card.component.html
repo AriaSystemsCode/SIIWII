@@ -63,19 +63,18 @@
 
                 <div [ngClass]="singleItemPerRowMode?'pt-0 pt-3' : ''" class="accTpye">
                     <!-- Account Type -->
-                    <b class="accountType_label" [ngStyle]="{
+                    <!-- <b class="accountType_label" [ngStyle]="{
                       'color': singleItemPerRowMode ? 'black' : '#595959','font-size': fromOverview ? '10px':''
                     }" >
                         {{ "AccountType" | localize }}:
-                    </b>
-                    <span class="accountType_value  mt-2 ml-1" [ngClass]="fromOverview ? 'p-2' :''">
+                    </b> -->
+                       <i class="fas fa-tag meta-ico"    [pTooltip]="'AccountType' | localize" tooltipPosition="bottom"></i>
+                    <span class="accountType_value  mt-2 mx-1" [ngClass]="fromOverview ? 'p-2' :''">
                         {{ account.account.accountType || ('NotSpecified' | localize) }}
                     </span>
                 </div>
 
 
-
-                <div>
                     <div [ngClass]="singleItemPerRowMode?'pt-0' : 'pt-3'" class="mb-1" *ngIf="account.account?.website">
                         <img src="../../../../../assets/accounts/Ceo.png" />
                         <span class="spanGreyColor">
@@ -88,19 +87,18 @@
                                 account?.account?.website | textSubstring : 30 }} </div>
                         </span>
                     </div>
-                </div>
+          
 
 
                 <div>
                     <div [ngClass]="singleItemPerRowMode?'pt-0' : 'pt-1'" class="mb-1" [ngStyle]="{
                     'font-size': fromOverview ? '11px' : ''
                   }">
-                        <img src="../../../../../assets/accounts/followers.png" [ngStyle]="{
+                        <img src="../../../../../assets/accounts/followers.png"    [pTooltip]="'Connections' | localize" tooltipPosition="bottom" [ngStyle]="{
                     'width': fromOverview ? '15px' : ''
                   }" />
-                        <span class="spanGreyColor">
-                            {{ account?.connectionCount ? account?.connectionCount : '0' }} {{ '
-                            Connections' }}
+                        <span class="spanGreyColor" >
+                            {{ account?.connectionCount ? account?.connectionCount : '0' }} 
                         </span>
                     </div>
 

@@ -48,7 +48,7 @@ import { TooltipModule } from 'primeng/tooltip';
         TooltipModule
     ],
     exports:[
-        EventsBrowseComponent,EventsBrowseCardComponent
+        EventsBrowseComponent,EventsBrowseCardComponent,EventsBrowseActionsMenuComponent
     ]
 })
 export class EventsBrowseModule { }
