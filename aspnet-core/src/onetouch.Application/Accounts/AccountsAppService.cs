@@ -6964,7 +6964,12 @@ namespace onetouch.Accounts
                     user.Surname = input.LastName;
                     user.Name = input.FirstName;
                     user.EmailAddress = input.EMailAddress;
-                    await UserManager.UpdateAsync(user);
+                    try
+                    {
+                        await UserManager.UpdateAsync(user);
+                    }
+                    catch
+                    { }
                 }
             }
             //MMT37
