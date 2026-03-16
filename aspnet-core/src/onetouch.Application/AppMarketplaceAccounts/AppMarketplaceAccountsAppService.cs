@@ -1077,7 +1077,8 @@ namespace onetouch.AppMarketplaceAccounts
                                                   .FirstOrDefaultAsync(x => x.TenantId == null
                                                   && x.IsProfileData == true
                                                   && x.TenantOwner == input.TenantId
-                                                  && (x.SSIN == input.SSIN || (x.Name == input.Name && x.EntityObjectTypeId == input.AccountTypeId)));
+                                                  && (x.SSIN == input.SSIN ));
+                //|| (x.Name == input.Name && x.EntityObjectTypeId == input.AccountTypeId)
 
                 #region if sync remove old data
                 if (FoundPublishContact != null)
