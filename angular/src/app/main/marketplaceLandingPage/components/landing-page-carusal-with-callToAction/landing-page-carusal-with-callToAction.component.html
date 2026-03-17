@@ -6,21 +6,37 @@
   [circular]="false"
   [showIndicators]="false"
   [showNavigators]="true"
+  styleClass="cta-carousel"
 >
-  <ng-template pTemplate="item" let-ctaSection>
-    <div class="ctaChildection pt-2 pl-3 ml-4 mr-4">
-      <a
-        (click)="ctaSection.title==='Products' ? handleStorageData() : null"
-        [routerLink]="['/app/main/marketplace' + ctaSection.link]"
-      >
-        <h3>{{ ctaSection.name }}</h3>
-        <app-image-display
-          [image]="ctaSection.image ? (attachmentBaseUrl + '/' + ctaSection.image) : '../../../../assets/placeholders/_logo-placeholder.png'"
-          [sycAttachmentCategory]="sycAttachmentCategoryCTASlider"
-          [staticHeight]="100"
-        ></app-image-display>
-        <h5 class="ctaDescribtion">{{ ctaSection.description }}</h5>
-      </a>
-    </div>
-  </ng-template>
+<ng-template pTemplate="item" let-ctaSection>
+  <div class="ctaChildection">
+    <a
+      class="ctaLink"
+      (click)="ctaSection.title === 'Products' ? handleStorageData() : null"
+      [routerLink]="['/app/main/marketplace/' + ctaSection.link]"
+    >
+      <!-- Title -->
+      <h3 class="ctaTitle">{{ ctaSection.name }}</h3>
+
+      <!-- Body: image left + description right -->
+      <div class="ctaBody">
+        <div class="ctaImgWrap">
+          <app-image-display
+            [image]="
+              ctaSection.image
+                ? (attachmentBaseUrl + '/' + ctaSection.image)
+                : '../../../../assets/placeholders/_logo-placeholder.png'
+            "
+            [sycAttachmentCategory]="sycAttachmentCategoryCTASlider"
+     
+          ></app-image-display>
+        </div>
+
+        <p class="ctaDesc">
+          {{ ctaSection.description }}
+        </p>
+      </div>
+    </a>
+  </div>
+</ng-template>
 </p-carousel>

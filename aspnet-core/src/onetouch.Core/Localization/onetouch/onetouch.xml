@@ -2682,6 +2682,14 @@
 	<text name="InviteContact">Invite Contact</text>
 	<text name="CreateBusinessAccount">Create Business Account</text>
 	<text name="CreateGroupAccount">Create Group Account</text>
+	<text name="BUSINESSAccount">Business Account</text>
+	<text name="PERSONALAccount">Personal Account</text>
+	<text name="GROUPAccount">Group Account</text>
+	<text name="OnlineEvent">Online Event</text>
+	<text name="InPersonEvent">InPerson Event</text>
+	<text name="BUSINESS">Business</text>
+	<text name="PERSONAL">Personal</text>
+	<text name="GROUP">Group</text>
 
 
 
