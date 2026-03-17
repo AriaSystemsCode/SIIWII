@@ -9,7 +9,7 @@
 
     <div class="card-body">
         <div class="d-flex justify-content-between">
-            <div class="ssin  font-weight-bold text-black">
+            <div class="ssin  font-weight-bold prdTxt">
                 {{ product?.manufacturerCode }}
             </div>
             <div class="d-flex name-price" *ngIf="showMsrP">
@@ -19,12 +19,12 @@
         </div>
 
         <p class="card-text desc fw-bold" [title]="product?.name">
-            {{ product?.name  | textSubstring: 20 }}
+            {{ product?.name  | textSubstring: 15 }}
         </p>
 
         <div class="d-flex name-price">
     
-             <h5 class="seller" *ngIf="!isSellerIdExists">Sold By {{ product?.sellerName }}</h5> 
+             <h5 class="seller" *ngIf="!isSellerIdExists">{{'SoldBy' | localize}} {{ product?.sellerName }}</h5> 
    
         </div>
 
@@ -35,12 +35,12 @@
               <div class="stars-outer">
                 ★★★★★
              
-                <div class="stars-inner" [style.width]="(productCard?.averageRating / 5) * 100 + '%'">
+                <div [ngClass]=" isArabic ? 'stars-inner-ar' :  'stars-inner'" [style.width]="(productCard?.averageRating / 5) * 100 + '%'">
                   ★★★★★
                 </div>
               </div>
             </div>
-            <span class="mr-2 mt-2 rateNum">({{productCard?.numberOfReviews }}) reviews</span>
+            <span class="rateNum">({{productCard?.numberOfReviews }}) {{'reviews' | localize}}</span>
 
           </div>
     </div>

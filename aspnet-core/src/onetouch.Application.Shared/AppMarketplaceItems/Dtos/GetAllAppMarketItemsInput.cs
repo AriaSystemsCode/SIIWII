@@ -44,6 +44,9 @@ namespace onetouch.AppMarketplaceItems.Dtos
         public virtual string ItemSSIN { set; get; }
         public virtual long[] CategoryFilters { set; get; }
         //I49[End]
+        //I50[Start]
+        public virtual string FilterCondition { set; get; }
+        //I50[End]
     }
     public class GetAccountImagesOutputDto
     { 

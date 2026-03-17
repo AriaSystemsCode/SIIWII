@@ -78,6 +78,7 @@ export class SelectRelatedItemDynamicModalComponent extends AppComponentBase imp
             undefined,
             this.entityId,
             undefined,
+            undefined,
             this.sortBy,
             this.skipCount,
             this.maxResultCount
@@ -253,6 +254,7 @@ export class SelectRelatedItemDynamicModalComponent extends AppComponentBase imp
                 undefined,
                 undefined,
                 this.entityId,
+                undefined,
                 undefined,
                 this.sortBy,
                 this.skipCount,

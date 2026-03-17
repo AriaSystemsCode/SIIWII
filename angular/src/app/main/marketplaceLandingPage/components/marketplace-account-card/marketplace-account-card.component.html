@@ -1,0 +1,147 @@
+<div class="mp-acc-card" [class.rtl]="isArabic" [class.compact]="compact">
+
+  <!-- Left column -->
+  <div class="mp-acc-left">
+    <div class="mp-acc-media" (click)="openDetails()">
+      <img class="mp-acc-img" [src]="logoUrl" (error)="onImgErr($event)" alt="account" />
+    </div>
+  </div>
+
+  <!-- Right column -->
+  <div class="mp-acc-body mt-2">
+
+    <div class="mp-acc-title-row">
+      <h4 class="mp-acc-title" (click)="openDetails()">
+        {{ account?.account?.name  }}
+      </h4>
+    </div>
+
+    <div class="mp-acc-meta">
+
+      <!-- Connections -->
+      <div class="meta-item"  [pTooltip]="'Connections' | localize" tooltipPosition="bottom" >
+        <i class="fas fa-users meta-ico"></i>
+        <span class="meta-value">{{ account?.connectionCount || 0 }}</span>
+      </div>
+
+      <!-- Country -->
+      <div class="meta-item" *ngIf="account?.account?.countryName"  [pTooltip]="'Country' | localize" tooltipPosition="bottom">
+        <i class="fas fa-map-marker-alt meta-ico"></i>
+        <span class="meta-value">{{ account?.account?.countryName }}</span>
+      </div>
+
+      <!-- Account type as icon -->
+      <!-- <div
+       
+        *ngIf="account?.account?.accountType"
+        [pTooltip]="'AccountType' | localize" tooltipPosition="bottom"
+      >
+        <i class="fas fa-tag meta-ico"></i> <span  class="meta-item acc-type-item mx-1 p-2"> {{account?.account?.accountType}} </span>
+ 
+      </div> -->
+
+    </div>
+
+    <div class="mp-acc-actions">
+
+      <!-- Connected -->
+      <span
+        class="d-flex w-100 justify-content-end"
+        *ngIf="((account?.availableConnections?.length == 0 && account?.connectionName ) || (account?.connectionName)) && isAuthenticated"
+      >
+        <div
+          class="btn relation_button-ac mt-2"
+          style="white-space: nowrap; font-size: 12px; cursor: auto; position: relative;"
+          dropdown
+          container="body"
+        >
+          <button
+            type="button"
+            dropdownToggle
+            style="border: none !important; background: white; padding: 0;"
+          >
+            <img
+              class="pb-1"
+              style="width: 15px;"
+              src="../../assets/accounts/ph_check-bold.png"
+            />
+            <span
+              *ngIf="getFormattedConnectionName('connectionName') as connName"
+              [title]="connName"
+            >
+              {{ connName.length > 10 ? (connName | slice:0:10) + '...' : connName | localize }}
+            </span>
+            <i class="fas fa-lg ml-1 fa-angle-down" style="color: #777777 !important;"></i>
+          </button>
+
+          <ul *dropdownMenu class="dropdown-menu" role="menu">
+            <li role="menuitem">
+              <button class="dropdown-item" type="button" (click)="disconnect()">
+                {{ getFormattedConnectionName('disConnectLabel') }}
+              </button>
+            </li>
+          </ul>
+        </div>
+      </span>
+
+      <!-- Available relations -->
+      <span
+        class="mt-3 w-100"
+        *ngIf="(account?.availableConnections?.length > 0 ) && isAuthenticated"
+      >
+        <ng-container *ngIf="account?.availableConnections as options">
+          <div class="d-flex justify-content-end" style="white-space: nowrap;" dropdown>
+            <button
+              type="button"
+              class="relation_button"
+              [ngClass]="isArabic ? 'relation-ar' : 'relation-en'"
+              dropdownToggle
+            >
+              <img
+                class="pb-1"
+                style="width: 15px;"
+                (click)="createRelation(options[0])"
+                [src]="getConnectionIcon(options[0]?.connectLabel)"
+                alt=""
+              />
+              <span
+                (click)="createRelation(options[0])"
+                class="ml-1"
+                [title]="options[0]?.connectLabel"
+              >
+                {{
+                  options[0]?.connectLabel?.length > 10
+                    ? (options[0].connectLabel | slice: 0:10) + '...'
+                    : options[0]?.connectLabel
+                }}
+              </span>
+
+              <i
+                *ngIf="options.length > 1"
+                class="fas fa-lg ml-4 fa-angle-down"
+                style="color: #fff !important;"
+              ></i>
+            </button>
+
+            <ng-container *ngIf="options.length > 1">
+              <ul *dropdownMenu class="dropdown-menu" role="menu">
+                <li role="menuitem" *ngFor="let option of options | slice:1" class="py-2">
+                  <button class="dropdown-item" type="button" (click)="createRelation(option)">
+                    <img
+                      class="pb-1 mr-2"
+                      style="width: 15px;"
+                      [src]="getConnectionIcon(option?.connectLabel)"
+                      alt=""
+                    />
+                    {{ option?.connectLabel }}
+                  </button>
+                </li>
+              </ul>
+            </ng-container>
+          </div>
+        </ng-container>
+      </span>
+
+    </div>
+  </div>
+</div>

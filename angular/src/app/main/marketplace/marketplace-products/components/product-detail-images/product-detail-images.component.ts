@@ -54,7 +54,7 @@ export class ProductDetailImagesComponent implements OnDestroy {
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['productImages'] && this.productImages?.length) {
-      this.setInitialPublicIndex();
+    
       this.preloadVisiblePdfThumbs();
     }
   }
@@ -361,36 +361,6 @@ openImagePreview(url: string) {
   if (!url) return;
   this.previewImageUrl = url;
   this.showImagePreview = true;
-}
-
-private setInitialPublicIndex(): void {
-  if (!this.productImages?.length) return;
-
-
-  const preferredIndex =
-    this.productImages.findIndex(x => this.kindOf(x) === 'image' && x?.isPublic) ??
-    -1;
-
-  const anyPublicIndex =
-    this.productImages.findIndex(x => !!x?.isPublic) ??
-    -1;
-
-  const idx = preferredIndex >= 0 ? preferredIndex : anyPublicIndex;
-
-  if (idx >= 0) {
-    this.currentIndex = idx;
-
-
-    if (this.kindOf(this.productImages[idx]) !== 'pdf') {
-      this.setColorView.emit(false);
-      this.colorView = false;
-    }
-
-    this.preparePdfIfNeeded(idx);
-  } else {
-
-    this.currentIndex = 0;
-  }
 }
 
 }

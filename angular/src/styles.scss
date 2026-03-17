@@ -292,7 +292,7 @@ body.kt-demo-panel--left .p-multiselect .p-multiselect-trigger {
     width: 98%;
 }
 body.kt-demo-panel--left .p-dropdown .p-dropdown-trigger{
-    width: 98%;
+    // width: 98%;
 }
 body.kt-demo-panel--left .p-dropdown-panel .p-dropdown-item{
     text-align: right;
@@ -554,7 +554,7 @@ div.cropper span.resize-bar {
 .p-dropdown {
     border-radius: 8px !important;
     border: 1px solid #D9D9D9 !important ;
-    
+    height: 46px !important;
     background: #FFF !important;
 
 }

@@ -2,19 +2,19 @@
 <div
     [@routerTransition]
   
-    style="margin-top: -50px;"
+ 
     class="wrapper kt-container web pl-lg-3 p-md-2 pl-0 pr-lg-2 pr-md-4 pr-0"
-    [ngClass]="[
-    fromMarketAcoount ? 'addPadding' : ''
-]"
+    [ngClass]="{
+      'addPadding'  : fromMarketAcoount && !isArabic , 'addPt': isArabic , 'addARPadding'  : fromMarketAcoount && isArabic 
+    }"
 >
     <div
 
     >
-        <div class="marketplace-products" [ngClass]="fromMarketAcoount ? 'marketplace-mg':''">
+        <div class="marketplace-products" [ngClass]="fromMarketAcoount && !isArabic ? 'marketplace-mg':''">
             <div   class="row" >
-                <div class="col-md-12 mb-4 app-seller" >
-                    <app-seller-data *ngIf="isSellerIdExists && isFromSellerRoom "></app-seller-data>
+                <div class="col-md-12 mb-4 app-seller" *ngIf="isSellerIdExists && isFromSellerRoom ">
+                    <app-seller-data ></app-seller-data>
                 </div>
                 <div  class="col-md-12">
                     <div
@@ -145,7 +145,7 @@
 
                     <p *ngIf="items?.length === 0 && (fromMarketAcoount)" class="text-center mx-auto mt-5 pt-5" style="margin-top: 150px !important;">
                         <img src="../../../../../../assets/placeholders/fluent_alert.png" class="mr-2" alt="No Data">
-                        <span class="noDataTxt">There is no data to show ....</span>
+                        <span class="noDataTxt">{{'NoDataFound...' | localize}} </span>
                       </p>
                 </div>
                 <div  class="col-md-12" >
@@ -171,8 +171,8 @@
 </div>
 
 <!-- mobile ui design -->
-<div class="mobile">
-    <app-seller-data *ngIf="isSellerIdExists"></app-seller-data>
+<div class="mobile " [ngClass]="isArabic? 'addMtM':''">
+    <app-seller-data *ngIf="isSellerIdExists && !fromMarketAcoount"></app-seller-data>
     <div class="container-fluid">
         <div class="quickFilters" >
         
@@ -191,7 +191,7 @@
             (click)="openFiltersDialog('Shared With Me and Public')"
             class="filter-btn"
         >
-            Shared With Me and Public
+          {{'SharedWithMeAndPublic' | localize}}  
         </button>
         </div>
         <div class="btn-filters">
@@ -205,7 +205,7 @@
             class="filter-btn w-50"
             (click)="openFiltersDialog('Sort By')"
         >
-            Sort By
+          {{'SortBy' | localize}}  
         </button>
         <p-button
         icon="pi pi-sliders-h"

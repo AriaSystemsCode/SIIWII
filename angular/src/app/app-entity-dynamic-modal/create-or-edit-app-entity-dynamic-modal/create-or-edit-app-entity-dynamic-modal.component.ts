@@ -642,10 +642,22 @@ isArabic: boolean = false;
         extraAttrDefinition: FilteredExtraAttribute
     ) {
 
-
         if (!this.appEntity.entityExtraData)
             this.appEntity.entityExtraData = [];
+      
+         if (
+    this.entityObjectType.code === 'MARKETPLACESECTION' &&
+    extraAttrDefinition.attributeId === 1006 &&
+    value !== ''
+  ) {
+    this.setStringValue(1009, 'Single Type Blocks');
 
+    const blockTypeAttr = this.extraAttributes?.find(x => x.attributeId === 1009);
+    if (blockTypeAttr) {
+      blockTypeAttr.selectedValues = 'Single Type Blocks';
+    }
+  }
+    
         this.appEntity.entityExtraData = this.appEntity.entityExtraData.filter(
             (elem) => elem.attributeId !== extraAttrDefinition.attributeId
         );
@@ -979,6 +991,14 @@ isArabic: boolean = false;
         return Array.from({ length: max }, (_, i) => i);
     }
 
+
+    isBlockTypeLocked(extraAttr: FilteredExtraAttribute): boolean {
+  if (this.entityObjectType.code !== 'MARKETPLACESECTION') return false;
+  if (extraAttr?.attributeId !== 1009) return false;
+
+  const triggerAttr = this.extraAttributes?.find(x => x.attributeId === 1006);
+  return !!triggerAttr?.selectedValues;
+}
 
 }
 

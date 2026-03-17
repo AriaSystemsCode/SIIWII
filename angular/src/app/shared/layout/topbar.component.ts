@@ -182,8 +182,7 @@ export class TopBarComponent extends ThemesLayoutBaseComponent implements OnInit
         this.currentLang == 'ar' || this.currentLang == 'ar-EG'  ? this.isArabic = true : this.isArabic = false
         this.defaultSellerLogo = '../../../assets/shoppingCart/Order-Details-Seller-logo.svg';
         this.defaultBuyerLogo = '../../../assets/shoppingCart/Order-Details-Byer-logo.svg';
-        this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
-        this.currentLang == 'ar' || this.currentLang == 'ar-EG'  ? this.isArabic = true : this.isArabic = false
+
         const subs = this.userClickService.clickSubject$.subscribe((res) => {
             if (res == "refreshShoppingInfoInTopbar") {
                 this.getShoppingCartInfo();
@@ -212,7 +211,7 @@ export class TopBarComponent extends ThemesLayoutBaseComponent implements OnInit
             this._abpSessionService.impersonatorUserId > 0;
             if(this.isAuthenticated != undefined) {
                 this.setCurrentLoginInformations();
-                // this.getProfilePicture();
+                this.getProfilePicture();
                 this.getRecentlyLinkedUsers();
                 this.appSession?.user?.memberId;
                 this.appSession?.user?.id;
@@ -235,7 +234,7 @@ export class TopBarComponent extends ThemesLayoutBaseComponent implements OnInit
 
     registerToEvents() {
         abp.event.on("profilePictureChanged", () => {
-            // this.getProfilePicture();
+            this.getProfilePicture();
         });
 
         abp.event.on("app.chat.unreadMessageCountChanged", (messageCount) => {

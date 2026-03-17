@@ -451,20 +451,9 @@
 
     }
 }
-@media only screen and (max-width: 600px) {
-    .mobile {
 
-        width: 85%;
-    }
-}
 
-label {
-    color: #1B101B !important;
-    font-size: 16px;
-    font-style: normal;
-    font-weight: 600;
-    line-height: normal;
-}
+
 
 .price-sec {
     gap: 10px;
@@ -478,4 +467,22 @@ label {
 }
 
 
+}
+
+
+
+@media only screen and (max-width: 600px) {
+    .mobile {
+
+        width: 85%;
+    }
+}
+
+
+label {
+    color: #1B101B !important;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: normal;
 }

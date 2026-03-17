@@ -379,6 +379,7 @@ productCards!: QueryList<ProdcutCardComponent>;
                 currencyCode,
                 undefined,
                 requestParams.selectedCategory || this.selectedCategories,  //category
+                undefined,
                 requestParams.selectedSort || this.selectedSort.value,
                 requestParams.skipCount || this.skipCount,
                 requestParams.maxResultCount ||  this.maxResultCount

@@ -1,5 +1,5 @@
-<div class="single-item mr-1 row   memberCard_container shadowContainer"
-    [ngClass]="singleItemPerRowMode || fromOverview ?'p-0 no-padding-bottom' :'p-4 extra-padding-bottom mr-4'">
+<div class="single-item  row   memberCard_container shadowContainer"
+    [ngClass]="singleItemPerRowMode || fromOverview ?'p-0 no-padding-bottom mx-1' :'p-4 extra-padding-bottom mr-md-4'">
     <div class="align-items-center bg-secondary d-flex fa-3x justify-content-around mr-1 single-item-photo" [ngStyle]="{
         'background-image':
         account.account.logoUrl ?
@@ -7,8 +7,10 @@
         '' , 
     'height': singleItemPerRowMode ? 'auto'  :  '100px', 
     'width':  singleItemPerRowMode  ? '200px' : '100px',
-    'border-top-right-radius': fromOverview   ? '0px' : '',
-    'border-bottom-right-radius': fromOverview   ? '0px' : '',
+    'border-top-right-radius': fromOverview && !isArabic  ? '0px' : '',
+    'border-top-left-radius': fromOverview && isArabic  ? '0px' : '',
+    'border-bottom-right-radius': fromOverview && !isArabic  ? '0px' : '',
+    'border-bottom-left-radius': fromOverview && isArabic  ? '0px' : '',
 }" (click)="clickCardHandler()">
         <i *ngIf="!account.account.logoUrl" class="fa-image fas text-black-50"></i>
     </div>
@@ -61,44 +63,42 @@
 
                 <div [ngClass]="singleItemPerRowMode?'pt-0 pt-3' : ''" class="accTpye">
                     <!-- Account Type -->
-                    <b class="accountType_label" [ngStyle]="{
+                    <!-- <b class="accountType_label" [ngStyle]="{
                       'color': singleItemPerRowMode ? 'black' : '#595959','font-size': fromOverview ? '10px':''
                     }" >
                         {{ "AccountType" | localize }}:
-                    </b>
-                    <span class="accountType_value  mt-2 ml-2" [ngClass]="fromOverview ? 'p-2' :''">
+                    </b> -->
+                       <i class="fas fa-tag meta-ico"    [pTooltip]="'AccountType' | localize" tooltipPosition="bottom"></i>
+                    <span class="accountType_value  mt-2 mx-1" [ngClass]="fromOverview ? 'p-2' :''">
                         {{ account.account.accountType || ('NotSpecified' | localize) }}
                     </span>
                 </div>
 
 
-
-                <div>
                     <div [ngClass]="singleItemPerRowMode?'pt-0' : 'pt-3'" class="mb-1" *ngIf="account.account?.website">
                         <img src="../../../../../assets/accounts/Ceo.png" />
                         <span class="spanGreyColor">
                             <b class="accountType_label pt-4" [ngStyle]="{
                               'color': singleItemPerRowMode ? 'black' : '#595959'
                             }" style="min-width: 115px;">
-                                {{ "Ceo :" | localize }}
+                                {{ "Ceo" | localize }}:
                             </b>
                             <div class="domain-text ml-2" [title]="account?.account?.website"> {{
                                 account?.account?.website | textSubstring : 30 }} </div>
                         </span>
                     </div>
-                </div>
+          
 
 
                 <div>
                     <div [ngClass]="singleItemPerRowMode?'pt-0' : 'pt-1'" class="mb-1" [ngStyle]="{
                     'font-size': fromOverview ? '11px' : ''
                   }">
-                        <img src="../../../../../assets/accounts/followers.png" [ngStyle]="{
+                        <img src="../../../../../assets/accounts/followers.png"    [pTooltip]="'Connections' | localize" tooltipPosition="bottom" [ngStyle]="{
                     'width': fromOverview ? '15px' : ''
                   }" />
-                        <span class="spanGreyColor">
-                            {{ account?.connectionCount ? account?.connectionCount : '0' }} {{ '
-                            Connections' }}
+                        <span class="spanGreyColor" >
+                            {{ account?.connectionCount ? account?.connectionCount : '0' }} 
                         </span>
                     </div>
 
@@ -109,7 +109,7 @@
                             <b class="accountType_label pt-4" [ngStyle]="{
                             'color': singleItemPerRowMode ? 'black' : '#595959'
                           }" style="min-width: 115px;">
-                                {{ "About :" | localize }}
+                                {{ "About" | localize }} :
                             </b>
                             <div> {{ account?.account?.description | textSubstring : 40 }} </div>
                         </span>
@@ -153,15 +153,15 @@
                     </ul>
                 </div>
                 <div>
-                    <div>
+                
 
-                        <span style="width: 100%; " class="mt-3 d-flex" *ngIf="(account?.availableConnections?.length == 0 && account?.connectionName ) || (account?.connectionName)">
+                        <span class="mt-3 d-flex w-100" *ngIf="((account?.availableConnections?.length == 0 && account?.connectionName ) || (account?.connectionName)) && isAuthenticated">
                            
                             <div class="btn relation_Status_button mt-4" [ngStyle]="{
-                                'bottom':  singleItemPerRowMode  ? '5px' : '1px'
+                                'bottom':  singleItemPerRowMode  ? '5px' : '1px' ,'right' : !isArabic ?'5px':'' ,'left' : isArabic ?'5px':''
                             }" style="    white-space: nowrap; font-size: 12px;
                             
-                                right: 0px;cursor: auto;  " dropdown>
+                               cursor: auto;  " dropdown>
 
                                 <button type="button" dropdownToggle style="  border: none !important;
                                 background: white;padding: 0;">
@@ -186,8 +186,8 @@
 
                         </span>
 
-                        <span style="width: 100%; " class="mt-3"
-                            *ngIf="(account?.availableConnections?.length > 0 ) ">
+                        <span class="mt-3 w-100"
+                            *ngIf="(account?.availableConnections?.length > 0 ) && isAuthenticated ">
 
                             <!-- Guard + alias once -->
                             <ng-container *ngIf="account?.availableConnections as options">
@@ -195,7 +195,7 @@
                                     [ngStyle]="{ bottom: singleItemPerRowMode ? '5px' : '1px' }"
                                     style="white-space: nowrap;  right: 5px;" dropdown>
                                     <!-- Main button = first option -->
-                                    <button type="button" class="relation_button" dropdownToggle
+                                    <button type="button " class="relation_button" [ngClass]="isArabic ? 'relation-ar' :'relation-en'" dropdownToggle 
                                        >
                                         <img class="pb-1" style="width: 15px;" (click)="createRelation(options[0])"
                                             [src]="getConnectionIcon(options[0]?.connectLabel)" alt="" />
@@ -225,9 +225,6 @@
 
                         </span>
 
-            
-                
-                    </div>
                 </div>
             </div>
         </div>

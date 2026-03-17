@@ -392,7 +392,7 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit, 
             undefined, undefined, undefined, undefined,
             undefined, undefined, undefined, undefined, undefined,
             undefined, undefined, undefined, undefined, undefined,
-            undefined, undefined, undefined, undefined, undefined,
+            undefined, undefined, undefined, undefined, undefined,undefined,
             true,
             this.role == "I'm an Independent buying office." ? 'SO' : this.formType?.toUpperCase()
           )
@@ -425,7 +425,7 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit, 
             undefined, undefined, undefined, undefined,
             undefined, undefined, undefined, undefined, undefined,
             undefined, undefined, undefined, undefined, undefined,
-            undefined, undefined, undefined, undefined, undefined,
+            undefined, undefined, undefined, undefined, undefined,undefined,
             true,
             this.role == "I'm an Independent Sales Rep." ? 'PO' : this.formType?.toUpperCase()
           )

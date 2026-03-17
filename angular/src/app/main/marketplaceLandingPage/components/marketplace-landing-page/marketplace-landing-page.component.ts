@@ -52,7 +52,7 @@ export class MarketplaceLandingPageComponent
           ...r,
           _type: this.TYPE_TO_SECTION[r.type] ?? 'ASSB',
           _order: r.order ?? 0,
-          _idx: idx, // preserve API order
+          _idx: idx, 
         }));
 
         const flat: SectionItem[] = normalized.map(r => {
@@ -62,27 +62,29 @@ export class MarketplaceLandingPageComponent
                 type: 'ASSB',
                 order: r._order,
                 sectionId: r.id,
-                // rowIds: [r.id],
                 inputs: {
                   images: r.image ? [r.image] : [], // one row = one slide set (single image)
                   title: r.title ?? null, name: r.name ?? null, titleAlignment: r.titleAlignment
-                }
+                },
+                blockTypeIsSingleOrMixed:r.blockTypeIsSingleOrMixed
               };
             case 'ASMB':
               return {
                 type: 'ASMB',
                 order: r._order,
                 sectionId: r.id,
-                // rowIds: [r.id],
-                inputs: { images: r.image ? [r.image] : [], title: r.title ?? null, name: r.name ?? null, titleAlignment: r.titleAlignment }
+                inputs: { images: r.image ? [r.image] : [], title: r.title ?? null, name: r.name ?? null, titleAlignment: r.titleAlignment },
+                blockTypeIsSingleOrMixed:r.blockTypeIsSingleOrMixed
+
               };
             case 'CSMP':
               return {
                 type: 'CSMP',
                 order: r._order,
                 sectionId: r.id,
-                // rowIds: [r.id],
-                inputs: { title: r.title ?? null, name: r.name ?? null, titleAlignment: r.titleAlignment }
+                inputs: { title: r.title ?? null, name: r.name ?? null, titleAlignment: r.titleAlignment },
+                blockTypeIsSingleOrMixed:r.blockTypeIsSingleOrMixed
+
               };
 
             case 'SRCTA':
@@ -90,8 +92,8 @@ export class MarketplaceLandingPageComponent
                 type: 'SRCTA',
                 order: r._order,
                 sectionId: r.id,
-                // rowIds: [r.id],
-                inputs: { title: r.title, name: r.name ?? null, titleAlignment: r.titleAlignment }
+                inputs: { title: r.title, name: r.name ?? null, titleAlignment: r.titleAlignment },
+                blockTypeIsSingleOrMixed:r.blockTypeIsSingleOrMixed
               };
 
             case 'MRCTA':
@@ -99,15 +101,15 @@ export class MarketplaceLandingPageComponent
                 type: 'MRCTA',
                 order: r._order,
                 sectionId: r.id,
-                // rowIds: [r.id],
-                inputs: { title: r.title ?? null, name: r.name ?? null, titleAlignment: r.titleAlignment }
+                inputs: { title: r.title ?? null, name: r.name ?? null, titleAlignment: r.titleAlignment },
+                blockTypeIsSingleOrMixed:r.blockTypeIsSingleOrMixed
+
               };
             default:
               return {
                 type: 'PF',
                 order: r._order,
                 sectionId: r.id,
-                // rowIds: [r.id],
                 inputs: { images: r.image ? [r.image] : [], name: r.name ?? null, titleAlignment: r.titleAlignment }
               };
           }

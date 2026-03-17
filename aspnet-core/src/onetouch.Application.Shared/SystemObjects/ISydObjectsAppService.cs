@@ -30,7 +30,7 @@ namespace onetouch.SystemObjects
 		Task<List<SydObjectSydObjectLookupTableDto>> GetAllSydObjectForTableDropdown();
 		Task<List<PageSettingDto>> GetAllSliderSettings(SliderEnum sliderType, string sliderCode);
 		//I49[Start]
-		Task<List<PageSettingDto>> GetAllSectionBlocks(long sectionId);
+		Task<List<PageSettingDto>> GetAllSectionBlocks(long sectionId, string? timeZone);
         //I49[End]
     }
 }

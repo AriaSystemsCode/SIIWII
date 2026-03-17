@@ -17,22 +17,29 @@ export class ConnectionsCardComponent extends AppComponentBase {
     @Input('fromOverview') fromOverview: boolean = false
 
     @Output() deleteMe: EventEmitter<boolean> = new EventEmitter<boolean>()
-    @Output() connectMe: EventEmitter<boolean> = new EventEmitter<boolean>()
+    // @Output() connectMe: EventEmitter<boolean> = new EventEmitter<boolean>()
     @Output() disconnectMe: EventEmitter<boolean> = new EventEmitter<boolean>()
     @Output() _createRelation: EventEmitter<any> = new EventEmitter<any>()
 
     isRecordOwner: boolean
     attachmentBaseUrl: string = AppConsts.attachmentBaseUrl
 
+    currentLang:string
+    isArabic:boolean 
+
+    isAuthenticated: boolean = false;
 
     constructor(
         injector: Injector,
         private router: Router,
-          private _accountsServiceProxy: AccountsServiceProxy,
     ) {
         super(injector);
     }
     ngOnChanges(changes: SimpleChanges): void {
+      this.isAuthenticated = !!this.appSession?.user;
+
+      this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
+      this.currentLang == 'ar' || this.currentLang == 'ar-EG'  ? this.isArabic = true : this.isArabic = false
         this.isRecordOwner = this.account.account.partnerId == this.appSession.user.accountId
         this.singleItemPerRowMode = false;
 

@@ -1059,6 +1059,8 @@ getRelatedProducts(initial = false) {
         /* currencyCode */ this.productBodyData?.currencyCode ?? null,
         /* itemSSIN */ this.productDetails?.code ?? this.productBodyData?.code ?? null,
         /* categoryFilters */ null,
+        undefined,
+
         /* sorting */ null,
         /* skipCount */ skipCount,
         /* maxResultCount */ maxResultCount

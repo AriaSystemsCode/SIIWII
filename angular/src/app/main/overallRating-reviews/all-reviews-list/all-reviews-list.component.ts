@@ -46,7 +46,8 @@ export class AllReviewsListComponent extends AppComponentBase implements OnInit 
   onlyMsg = false
   sycAttachmentCategoryImage: SycAttachmentCategoryDto;
   isAuthenticated = this.appSession?.user
-
+  currentLang:string
+  isArabic:boolean = true
   constructor(injector: Injector, private messageServiceProxy: MessageServiceProxy
 
   ) {
@@ -59,6 +60,8 @@ export class AllReviewsListComponent extends AppComponentBase implements OnInit 
     this.onlyMsg = true
   }
   ngOnInit() {
+    this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
+    this.currentLang == 'ar' || this.currentLang == 'ar-EG'  ? this.isArabic = true : this.isArabic = false
     this.getAllReviws()
   
         if (!this.sycAttachmentCategoryImage) {

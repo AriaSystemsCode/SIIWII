@@ -1,81 +1,182 @@
+/* ========================================
+   CTA CONTAINER
+======================================== */
+
 .ctaContainer {
-
-
     padding: 15px;
     margin: 30px;
-
-}
-
-.ctaParentSection {
-    /*  padding-left: 2%; */
+  }
+  
+  .ctaParentSection {
     top: -80px;
     width: 100%;
+    display: flex;
     justify-content: center;
-}
-
-.ctaContainer a:hover {
-    color: black;
-}
-
-.ctaChildection {
+  }
+  
+  /* ========================================
+     CARD
+  ======================================== */
+  
+  .ctaChildection {
     height: 245px;
     background-color: #eeeeee;
-    overflow: hidden auto;
-    cursor: pointer;
     border: 1px solid #e4e4e4;
-    box-shadow: 3px 3px white;
-    border-radius: 10px;
-}
-
-.ctaImage {
-
-    float: left;
-}
-
-.ctaDescribtion {
-    line-height: 1.5;
-}
-
-a {
-    color: black;
-}
-
-
-.cta-sm {
-    background-color: #EFEFEF;
-    border-radius: 10px;
-
-}
-
-.flexContainer {
-    flex-wrap: wrap;
-}
-
-.flexContainerSection {
-    flex: 50%;
-}
-
-.btnSeeMore {
-    color: #700066 !important;
-    background-color: #dedada !important;
-    border: none !important;
-    border-radius: 5px !important;
-    font-weight: bold;
-    font-size: 21pt;
-}
-
-// @media (min-width: 961px) {
-//     .ctaChildection { width: 50%; }
-//   }
+    border-radius: 12px;
+    padding: 16px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    transition: all .25s ease;
+    overflow: hidden;
+    cursor: pointer;
+  }
   
-
-//   @media (max-width: 960px) {
- 
-//     .ctaChildection { width: 50%; } 
-//   }
-
-
+  .ctaChildection:hover {
+    background: #f6f6f6;
+    transform: translateY(-3px);
+  }
+  
+  /* clickable area */
+  .ctaLink {
+    text-decoration: none;
+    color: black;
+    display: block;
+    height: 100%;
+  }
+  
+  /* ========================================
+     TITLE
+  ======================================== */
+  
+  .ctaTitle {
+    font-weight: 800;
+    font-size: 26px;
+    margin: 0 0 12px 0;
+  }
+  
+  /* ========================================
+     BODY LAYOUT (IMAGE LEFT - TEXT RIGHT)
+  ======================================== */
+  
+  .ctaBody {
+    display: flex;
+    align-items: flex-start;
+    gap: 18px;
+  }
+  
+  /* image column */
+  .ctaImgWrap {
+    flex: 0 0 120px;
+    height: 120px;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+  }
+  
+  .ctaImgWrap ::ng-deep img {
+    width: 110px;
+    height: 110px;
+    // object-fit: contain;
+  }
+  
+  /* ========================================
+     DESCRIPTION
+  ======================================== */
+  
+  .ctaDesc {
+    margin: 0;
+    font-size: 20px;
+    line-height: 1.4;
+    font-weight: 500;
+    color: #000;
+  
+    /* clamp text so card height stays equal */
+    display: -webkit-box;
+    -webkit-line-clamp: 6;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  
+  /* ========================================
+     CAROUSEL FIXES
+  ======================================== */
+  
+  /* prevent carousel cutting shadows */
+  :host ::ng-deep .p-carousel-item {
+    padding: 8px;
+  }
+  
+  :host ::ng-deep .p-carousel-content {
+    overflow: visible;
+  }
+  
+  /* arrows */
+  :host ::ng-deep .p-carousel-prev,
+  :host ::ng-deep .p-carousel-next {
+    background: white;
+    border-radius: 50%;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    width: 42px;
+    height: 42px;
+  }
+  
+  /* ========================================
+     RESPONSIVE
+  ======================================== */
+  
+  /* tablet */
+  @media (max-width: 992px) {
+  
+    .ctaTitle {
+      font-size: 24px;
+    }
+  
+    .ctaDesc {
+      font-size: 18px;
+      -webkit-line-clamp: 7;
+    }
+  
+    .ctaImgWrap {
+      flex: 0 0 100px;
+    }
+  }
+  
+  /* mobile */
   @media (max-width: 540px) {
- 
-    .ctaChildection { width: 100%; }  
+  
+    .ctaChildection {
+      height: auto;
+      padding: 18px;
+    }
+  
+    .ctaBody {
+    //   flex-direction: column;
+    //   align-items: center;
+    //   text-align: left;
+    }
+  
+    .ctaImgWrap {
+    //   flex: none;
+      height: auto;
+    }
+  
+    .ctaImgWrap ::ng-deep img {
+      width: 140px;
+      height: 140px;
+    }
+  
+    .ctaTitle {
+      font-size: 22px;
+      margin-bottom: 10px;
+    }
+  
+    .ctaDesc {
+      font-size: 18px;
+      -webkit-line-clamp: unset;
+    }
+  }
+  
+  /* very small phones */
+  @media (max-width: 380px) {
+    .ctaTitle { font-size: 20px; }
+    .ctaDesc { font-size: 16px; }
   }

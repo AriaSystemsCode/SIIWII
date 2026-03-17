@@ -1,0 +1,115 @@
+.product-card-horizontal {
+    display: flex;
+    width: 100%;
+    min-height: 200px;
+  border: 1px solid #ebedf2;
+  border-radius: 12px;
+  background: #ffffff;
+    height: 100%;
+    gap: 12px;
+    padding: 12px;
+    box-sizing: border-box;
+    cursor: pointer;
+  }
+  
+  .product-image-wrapper {
+    flex: 0 0 43%;
+    margin: auto 0;
+    border-radius: 10px;
+    overflow: hidden;
+    background: #f5f5f5;
+  }
+  
+  .product-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  
+  .product-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+  
+  .top-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 4px;
+  
+    .code {
+      font-size: 13px;
+      font-weight: 600;
+      color: #444;
+    }
+  
+    .price {
+      font-size: 12px;
+      color: #999;
+    }
+  }
+  
+  .name {
+    font-size: 15px;
+    font-weight: 600;
+    color: #4a0d4a;
+    margin-bottom: 4px;
+    line-height: 1.3;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  
+  .seller {
+    font-size: 13px;
+    color: #ababab;
+    margin-bottom: 6px;
+  
+    .seller-name {
+      color: #333;
+      text-decoration: underline;
+    }
+  }
+  
+  .bottom-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    white-space: nowrap;
+  }
+  
+  .stars-outer {
+    position: relative;
+    display: inline-block;
+    font-size: 14px;
+    color: #ccc;
+    line-height: 1;
+  }
+  
+  .stars-inner {
+    position: absolute;
+    top: 0;
+    left: 0;
+    white-space: nowrap;
+    color: #f6851d;
+    overflow: hidden;
+  }
+  
+  .rateNum {
+    font-size: 12px;
+    color: #1b101b;
+  }
+  
+  @media (max-width: 575px) {
+    .product-card-horizontal {
+    //   flex-direction: column;
+    }
+  
+    .product-image-wrapper {
+      max-width: 100%;
+    //   height: 55%;
+    }
+  }

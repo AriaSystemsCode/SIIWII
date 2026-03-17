@@ -1,4 +1,4 @@
-<div class="contacts d-flex flex-column" style="margin-top: 40px;">
+<div class="contacts d-flex flex-column">
   <ng-container *ngFor="let s of sectionsFlat; ">
     <ng-container [ngSwitch]="s.type">
 
@@ -26,25 +26,25 @@
 
 
       <!--single row Call to Action  (can be brands or products)-->
-      <div *ngSwitchCase="'SRCTA'" class="rounded p-lg-4 mb-lg-4 ml-lg-4 mr-lg-4 addMg">
+      <div *ngSwitchCase="'SRCTA'" class="rounded addMg">
         <h4 class="px-2"  [style.text-align]="
         s?.inputs?.titleAlignment === 'Center'
           ? 'center'
           : (s?.inputs?.titleAlignment === 'Right' ? 'right' : 'left')
       ">{{ s.inputs?.title }}</h4>
-        <app-single-row-callAction [sectionId]="s.sectionId"></app-single-row-callAction>
+        <app-single-row-callAction [sectionId]="s.sectionId" [blockTypeIsSingleOrMixed]="s.blockTypeIsSingleOrMixed"></app-single-row-callAction>
       </div>
 
 
 
       <!--multi row Call to Action  (can be brands or products)-->
-      <div *ngSwitchCase="'MRCTA'" class=" rounded p-lg-4 mb-lg-4 ml-lg-4 mr-lg-4 addMg" >
+      <div *ngSwitchCase="'MRCTA'" class=" rounded addMg" >
         <h4  class="px-2" [style.text-align]=" 
         s?.inputs?.titleAlignment === 'Center'
           ? 'center'
           : (s?.inputs?.titleAlignment === 'Right' ? 'right' : 'left')
       " class="mx-2 mt-4 mb-2 ">{{ s.inputs?.title }}</h4>
-        <app-multi-row-callAction [sectionId]="s.sectionId"></app-multi-row-callAction>
+        <app-multi-row-callAction [sectionId]="s.sectionId" [blockTypeIsSingleOrMixed]="s.blockTypeIsSingleOrMixed"></app-multi-row-callAction>
       </div>
 
 
@@ -54,3 +54,11 @@
 </div>
 
 <app-landing-page-footer></app-landing-page-footer>
+
+
+
+
+  <app-view-event
+  #viewEventModal
+
+></app-view-event>

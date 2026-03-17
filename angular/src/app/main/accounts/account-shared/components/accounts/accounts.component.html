@@ -1,12 +1,12 @@
 ﻿<form [formGroup]="filterForm">
-    <div [@routerTransition] style="margin-top: -90px" class="wrapper">
-        <div class="kt-content kt-grid__item kt-grid__item--fluid kt-grid kt-grid--hor mt-md-4 marginMob">
+    <div [@routerTransition] class="wrapper" [ngClass]="!isArabic ? 'addMg':  isAuthenticated && isArabic ? 'mt-lg-5' : 'addMg'">
+        <div class="kt-grid__item kt-grid__item--fluid kt-grid kt-grid--hor  marginMob">
             <div [class]="containerClass + ' kt-grid__item kt-grid__item--fluid'">
-                <div class="kt-portlet kt-portlet--mobile">
-                    <div class="kt-portlet__body">
+                <div class="bodySec kt-portlet--mobile " [ngClass]="!isAuthenticated ? 'm-4': isAuthenticated && isArabic ? 'mt-lg-4 mt-md-3 mt-5':'mt-lg-0 mt-3'">
+                    <div class="kt-portlet__body ml-3">
                         <div class="row">
-                            <div class="col-12 list-toolbar pb-md-4">
-                                <div class="row mb-3 justify-content-between mt-3 px-lg-0 px-2">
+                            <div class="col-12 list-toolbar">
+                                <div class="row mb-3 justify-content-between mt-3">
                                     <div class="col-6 col-md-3 col-sm-3 list-toolbar-filter mb-0 mb-4 mb-md-0">
                                         <div class="btn-group dropdown list-toolbar-dropdown" dropdown
                                             *ngIf="showMainFiltersOptions">
@@ -68,12 +68,12 @@
                                         </div>
                                     </div>
                                     <div class="" *ngIf="showAddButton"></div>
-                                    <div class="mb-lg-4 mb-0 text-center ">
-                                        <a class="btn   toolbar-btn btn_Primary SendMail"
+                                    <div class="mb-lg-4 mb-0 text-center mt-lg-0 ">
+                                        <a *ngIf="isAuthenticated" class="btn   toolbar-btn btn_Primary SendMail"
                                
                                             (click)="showSendMail()">
                                             <img src="../../assets/img/input_icons/user-plus.png" class="alarmInfo mr-2" style="width: 16px;">
-                                            {{ "Invite Contact" | localize }}
+                                            {{ "InviteContact" | localize }}
                                          
                                         </a>
                                         <ng-container *ngIf="showAddButton">
@@ -105,7 +105,7 @@
                                                     padding-left: 9px;
                                                     
                                                 " [title]="
-                                                    'Import Accounts' | localize
+                                                    'ImportAccounts' | localize
                                                 " class="btn   toolbar-btn pr-0 transparent-button">
                                                 <i class="d-inline-block w-100 fa-file-import fas icon-center"
                                                     style="color: #4a0d4a !important;"></i>
@@ -115,7 +115,7 @@
                                     </div>
                                     <div class=""></div>
 
-                                    <div class="text-center d-flex mt-lg-0 mt-3" style="height: 40px;">
+                                    <div class="text-center d-flex mt-lg-0" style="height: 40px; width: 160px;">
 
                                         <button
                                       
@@ -137,8 +137,7 @@
                                             border: 1px solid #EEEEEEEE !important;
                                             color: #4A0D4A !important;
                                             padding: 10px;
-                                            border-radius: 6px;
-                                            margin-left: 10px;"
+                                            border-radius: 6px;"
                                             (click)="resetList()"> <img src="../../assets/img/input_icons/repeat.png"
                                                 class="alarmInfo">
                                      
@@ -148,7 +147,7 @@
                                             class="btn   pr-1 text-center text-primary toolbar-btn btn_Primary ToggleView">
 
                                             <i class="d-inline-block w-100" [ngClass]="
-                                                    singleItemPerRowMode
+                                                    cardsViewMode
                                                         ? 'flaticon2-menu'
                                                         : 'fa fa-bars'
                                                 "></i>
@@ -161,9 +160,9 @@
                             <div *ngIf=" filterVisiblelg"   class="d-md-block d-none col-11 col-md-5 col-lg-3 col-sm-4 left-aside-filters pt-4 mt-2 filters_container">
                                 <app-accounts-list-filters [filterForm]="filterForm" [fromMarketplace]="fromMarketplace"></app-accounts-list-filters>
                             </div> 
-                            <div class="col-12  p-0" [ngClass]="filterVisiblelg ? 'col-lg-9 col-md-7':'col-lg-12 col-md-12'">
-                                <div class="d-flex justify-content-between align-items-center mb-4 px-lg-0 px-3">
-                                    <div class="  list-toolbar-data-summary pl-lg-5 pl-1" *ngIf="active">
+                            <div class="col-12  " [ngClass]="filterVisiblelg ? 'col-lg-9 col-md-7 p-0':'col-lg-12 col-md-12'">
+                                <div class="d-flex justify-content-between align-items-center mb-4">
+                                    <div class="  list-toolbar-data-summary pl-2" *ngIf="active">
                                         {{
                                         paginator.getPage() *
                                         primengTableHelper.defaultRecordsCountPerPage
@@ -232,23 +231,21 @@
                                 </div>
                                 <div class="col d-flex flex-column justify-content-between px-0">
                              
-                                    <div class="row  pl-lg-5 pl-3 pr-2">
-                                        <div *ngFor="
-                                                let account of accounts;
-                                                index as i;
-                                                let last = last
-                                            " class="col-12 mb-4" [ngClass]="{
-                                                'col-md-12 single-item-per-row-layout':
-                                                    singleItemPerRowMode,
-                                                'col-lg-6': !singleItemPerRowMode && filterVisiblelg,
-                                                'col-lg-4':!singleItemPerRowMode && !filterVisiblelg,
-                                                'col-md-6' : !singleItemPerRowMode && !filterVisiblelg,
-                                                ' pb-5':
-                                                    singleItemPerRowMode && !last
-                                            }">
+                                    <div class="row  pl-2 pr-2">
+                                    <div
+  *ngFor="let account of accounts; index as i; let last = last"
+  class="mb-4"
+  [ngClass]="{
+    'col-12 col-md-6 col-lg-3 cards-mode-with-filter': cardsViewMode && filterVisiblelg,
+    'col-12 col-md-6 col-lg-2 cards-mode-no-filter': cardsViewMode && !filterVisiblelg,
+
+    'col-12 col-md-6 col-lg-6 row-mode-with-filter': !cardsViewMode && filterVisiblelg,
+    'col-12 col-md-6 col-lg-4 row-mode-no-filter': !cardsViewMode && !filterVisiblelg
+  }"
+>
                                             <app-account-card [account]="account" [fromMarketplace]="fromMarketplace"
-                                                [singleItemPerRowMode]="
-                                                    singleItemPerRowMode
+                                                [cardsViewMode]="
+                                                    cardsViewMode
                                                 " (deleteMe)="
                                                     askToConfirmDelete(
                                                         $event,

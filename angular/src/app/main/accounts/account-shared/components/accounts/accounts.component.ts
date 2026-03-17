@@ -65,7 +65,7 @@ export class AccountsComponent
     mailbody: string;
     filterForm: FormGroup;
     isHost: boolean;
-    singleItemPerRowMode: boolean = false;
+    cardsViewMode: boolean = false;
 
     showConfirm: boolean = false;
     selectedItemId: number;
@@ -80,6 +80,9 @@ export class AccountsComponent
     filterVisiblelg = true; // To toggle the filter visibility
     active: boolean = false;
     loading: boolean = false;
+    currentLang:string
+    isArabic:boolean 
+    isAuthenticated: boolean = false;
 
     constructor(
         injector: Injector,
@@ -95,7 +98,10 @@ export class AccountsComponent
         this.overridePrimeTableSetting();
     }
     ngOnInit() {
+        this.isAuthenticated = !!this.appSession?.user;
         this.isHost = !this._abpSessionService.tenantId;
+        this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
+        this.currentLang == 'ar' || this.currentLang == 'ar-EG'  ? this.isArabic = true : this.isArabic = false
         this.defineSortingOptions();
         this.getUserPreferenceForListView();
         this.initFilterForm();
@@ -154,16 +160,16 @@ export class AccountsComponent
 
     saveUserPreferenceForListView() {
         const key = "account-list-view-mode";
-        const value = String(Number(this.singleItemPerRowMode));
+        const value = String(Number(this.cardsViewMode));
         localStorage.setItem(key, value);
     }
     getUserPreferenceForListView() {
         const key = "account-list-view-mode";
         const value = localStorage.getItem(key);
-        if (value) this.singleItemPerRowMode = Boolean(Number(value));
+        if (value) this.cardsViewMode = Boolean(Number(value));
     }
     triggerListView() {
-        this.singleItemPerRowMode = !this.singleItemPerRowMode;
+        this.cardsViewMode = !this.cardsViewMode;
         this.saveUserPreferenceForListView();
     }
 
@@ -233,6 +239,7 @@ export class AccountsComponent
                 filters.classifications || undefined,
                 filters.categories || undefined,
                 filters.currencies || undefined,
+                undefined,
                 filters?.sorting?.value || undefined,
                 this.primengTableHelper.getSkipCount(this.paginator, event),
                 this.primengTableHelper.getMaxResultCount(this.paginator, event)
@@ -256,6 +263,7 @@ export class AccountsComponent
                 filters.classifications || undefined,
                 filters.categories || undefined,
                 filters.currencies || undefined,
+                undefined,
                 filters?.sorting?.value || undefined,
                 this.primengTableHelper.getSkipCount(this.paginator, event),
                 this.primengTableHelper.getMaxResultCount(this.paginator, event)

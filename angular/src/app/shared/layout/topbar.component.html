@@ -1,4 +1,4 @@
-...<!-- Navbar -->
+<!-- Navbar -->
 <nav class="navbar navbar-expand-lg topbar fixed-top pl-lg-5  ml-0"
     [ngStyle]="{ top: _belowBar ? 25 + 'px' : 0 + 'px' }" 
     [ngClass]="{
@@ -24,7 +24,7 @@
         <img
           [src]=" attachmentBaseUrl + '/' + tenantLogo"
           class="navbar-brand"
-          [ngClass]="tenantLogo ? '':'rounded-c'"
+          [ngClass]="!tenantLogo ? 'rounded-c': !isAuthenticated ? 'mx-5':'' "
           (error)="onImgErr($event)"
         />
       </a>
@@ -32,10 +32,10 @@
         <button
             type="button"
             (click)="menu.toggle($event)"
-            class="btn Create-New"
+            class="btn Create-New mx-2"
             *ngIf="!isHost && isAuthenticated"
         >
-            <span class="">Create New</span>
+            <span class="">{{'CreateNew' | localize}}</span>
             <i class="pi pi-plus"></i>
         </button>
 
@@ -124,7 +124,7 @@
                             }}</span>
                     </a>
                 </li>
-                <li class="border-left ml-2 nav-item text-white pt-3 pl-3 d-lg-block d-none"
+                <li class="border-left ml-2 nav-item text-white pt-2 pl-3 d-lg-block d-none"
                     *ngIf="shoppingCartSummary?.shoppingCartId >0 && transactionType">
                     <div class="orderType"> {{transactionType}}</div>
                 </li>
@@ -234,12 +234,12 @@
                                         <button id="businessAccount" class="pt-2 border-0 createButtons"
                                             (click)="CreateBusiness_GroupAccount('BUSINESS','Business')"> <img
                                                 src="../../assets/img/input_icons/user-plus.png"
-                                                class="alarmInfo mr-2"><span>{{"Create Business Account" |
+                                                class="alarmInfo mr-2"><span>{{"CreateBusinessAccount" |
                                                 localize}}</span></button>
                                         <button id="groupAccount" class="pt-2 border-0 createButtons"
                                             (click)="CreateBusiness_GroupAccount('GROUP','Group')"> <img
                                                 src="../../assets/img/input_icons/user-plus.png"
-                                                class="alarmInfo mr-2"><span>{{"Create Group Account" |
+                                                class="alarmInfo mr-2"><span>{{"CreateGroupAccount" |
                                                 localize}}</span></button>
 
                                     </li>
@@ -416,14 +416,14 @@
 
         </div>
 
-        <div class=" ml-4 ml-lg-0 navbar-collapse d-sm-block d-none" [ngClass]="isArabic ?'leftList':'rightList'" *ngIf="!isAuthenticated">
+        <div class=" ml-4 ml-lg-0 navbar-collapse " [ngClass]="isArabic ?'leftList':'rightList'" *ngIf="!isAuthenticated">
                                 <button
-                    class="btn login-btn d-flex align-items-center m-2 mr-4 mt-4"
+                    class="btn login-btn d-flex align-items-center mt-lg-4 mx-lg-5 mt-2"
                     type="button"
                     [routerLink]="['/app/main/account/login']"
                     >
                     <i class="fas fa-user-circle mr-2"></i>
-                    <span>Login</span>
+                    <span>{{'Login' | localize}}</span>
                     </button>
 
             <!-- <button class=" p-2 m-2 mr-4 mt-4 regBtn"      [routerLink]="['/app/main/account/login']">Login</button> -->
@@ -437,7 +437,7 @@
             <!-- Left links -->
             <ul class="navbar-nav bottom-navbar ms-auto my-2 mb-lg-0">
                 <li class="nav-item pt-2">
-                    <a class="navbar-brand pt-0 navbar-brand-sm" [routerLink]="['/app/main/Home']"
+                    <a class="navbar-brand pt-0 "  [routerLink]="['/app/main/Home']"
                         routerLinkActive="header-link-active" (click)="userClick('Home')">
                         <img src="../../../assets/landingPage/Home_Footer_Btn.svg" class="navbar-brand _navbar-brand" />
                     </a>
@@ -457,7 +457,7 @@
                     </a>
                 </li>
                 <li *ngIf="shoppingCartSummary?.shoppingCartId >0" class="nav-item pt-1">
-                    <div class="position-relative pt-3" (click)="getShoppingCartInfo(true)">
+                    <div class="position-relative " (click)="getShoppingCartInfo(true)">
                         <span class="kt-header__topbar-icon kt-header__topbar-icon--primary">
                             <img src="../../../assets/shoppingCart/Icon-awesome-shopping-cart.svg"
                                 style="width: 20px; height: 20px; cursor: pointer;" class="m-auto" />
@@ -547,13 +547,13 @@
             <button id="businessAccount" class="pt-2 border-0 createButtons"
                     (click)="CreateBusiness_GroupAccount('BUSINESS','Business'); close?.()">
               <img src="../../assets/img/input_icons/user-plus.png" class="alarmInfo mr-2">
-              <span>{{ "Create Business Account" | localize }}</span>
+              <span>{{ "CreateBusinessAccount" | localize }}</span>
             </button>
       
             <button id="groupAccount" class="pt-2 border-0 createButtons"
                     (click)="CreateBusiness_GroupAccount('GROUP','Group'); close?.()">
               <img src="../../assets/img/input_icons/user-plus.png" class="alarmInfo mr-2">
-              <span>{{ "Create Group Account" | localize }}</span>
+              <span>{{ "CreateGroupAccount" | localize }}</span>
             </button>
           </li>
       

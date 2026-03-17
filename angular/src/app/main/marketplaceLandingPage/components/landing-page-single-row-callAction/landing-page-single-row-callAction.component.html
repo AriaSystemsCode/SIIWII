@@ -1,77 +1,44 @@
-<p-carousel [value]="blocksSorted"   [numVisible]="numVisible"
-[numScroll]="1" [circular]="false" [showIndicators]="false"
-  [showNavigators]="true" [responsiveOptions]="responsiveOptions" class="p-4 m-2 rounded">
+  <app-view-event
+  #viewEventModal
+
+></app-view-event>
+<p-carousel [value]="blocksSorted"
+  [numVisible]="blockTypeIsSingleOrMixed !='Single Type Blocks'? numVisible : numVisibleSingle" [numScroll]="1"
+  [circular]="false" [showIndicators]="false" [showNavigators]="true"
+  [responsiveOptions]="blockTypeIsSingleOrMixed !='Single Type Blocks'? responsiveOptions : responsiveOptionsSingle  "
+  class="p-4 m-2 rounded">
   <ng-template pTemplate="item" let-item>
 
-    <div class="carousel-card">
-      <div class="carousel-card-body" [ngSwitch]="item?.blockType?.toUpperCase()">
+    <div class="carousel-card" [ngClass]="blockTypeIsSingleOrMixed !='Single Type Blocks' ? 'carousel-card-mixed' : ''">
+        <div class="block-type-badge one-style-badge" [ngClass]="isArabic ? 'arPos':'enPos'" >
+    <i [ngClass]="getBlockTypeIcon(item)"  [pTooltip]="getBlockTypeLabel(item) | localize" tooltipPosition="bottom"></i>
+    <!-- <span>{{ getBlockTypeLabel(item) }}</span> -->
+  </div>
+      <div class="carousel-card-body" [ngClass]="blockTypeIsSingleOrMixed !='Single Type Blocks' ? '' : 'maxW'"
+        [ngSwitch]="item?.blockType?.toUpperCase()">
 
         <!-- PRODUCT -->
-        <div *ngSwitchCase="'PRODUCT'" class="product-card-horizontal">
-          <div class="product-image-wrapper">
-            <img class="product-image" (error)="onImgErr($event)" [src]="item?.getAppMarketItemForViewDto?.appItem?.imageUrl
-                      ? attachmentBaseUrl + '/' + item?.getAppMarketItemForViewDto?.appItem.imageUrl
-                      : 'assets/placeholders/appitem-placeholder.png'" alt="Product Image"
-              (click)="viewProduct(item?.getAppMarketItemForViewDto)" />
-          </div>
+        <div *ngSwitchCase="'PRODUCT'">
+          <app-marketplace-product-card *ngIf="blockTypeIsSingleOrMixed =='Mixed Types Blocks'" [item]="item"
+            [attachmentBaseUrl]="attachmentBaseUrl" [languageSettingName]="languageSettingName"
+            (view)="viewProduct($event)" (imgError)="onImgErr($event)"></app-marketplace-product-card>
 
-          <div class="product-info">
-            <div class="top-row">
-              <span class="code">
-                {{ item?.getAppMarketItemForViewDto?.appItem?.manufacturerCode }}
-              </span>
-           
-                <span class="price" *ngIf="showMsrP">
-                  {{ languageSettingName !== 'en-GB' ? 'MSRP' : 'RRP' }}:
-                  {{ item?.getAppMarketItemForViewDto?.appItem?.price | currency: currencyCode:true }}
-                </span>
-         
-            </div>
-
-            <div class="name" (click)="viewProduct(item?.getAppMarketItemForViewDto)">
-              {{ item?.getAppMarketItemForViewDto?.appItem?.name }}
-            </div>
-
-            <div class="seller">
-              Sold By
-              <span class="seller-name">
-                {{ item?.getAppMarketItemForViewDto?.appItem?.sellerName }}
-              </span>
-            </div>
-
-            <div class="bottom-row">
-              <div class="star-rating">
-                <div class="stars-outer">
-                  ★★★★★
-                  <div class="stars-inner" [style.width]="
-                      (item?.getAppMarketItemForViewDto?.averageRating / 5) * 100 + '%'
-                    ">
-                    ★★★★★
-                  </div>
-                </div>
-              </div>
-              <span class="rateNum">
-                ({{ item?.getAppMarketItemForViewDto?.numberOfReviews }}) reviews
-              </span>
-            </div>
-          </div>
+          <app-prodcut-card *ngIf="blockTypeIsSingleOrMixed !='Mixed Types Blocks' || blockTypeIsSingleOrMixed ==null "
+            [product]="item.getAppMarketItemForViewDto.appItem" [productCard]="item.getAppMarketItemForViewDto"
+            [acceptedAspectRatio]="acceptedAspectRatio"></app-prodcut-card>
         </div>
 
         <!-- BRAND -->
- 
 
-    <img  *ngSwitchCase="'BRAND'"  class="card-media" [src]="item?.image ?  attachmentBaseUrl + '/' + item?.image: attachmentBaseUrl + '/' + item?.getAppEntityForViewDto?.appEntity?.entityAttachments[0]?.url 
-           " title="Brand {{item?.getAppEntityForViewDto?.appEntity?.name}}" alt="Brand" (click)="goToBrand(item)"
-  (error)="onImgErr($event)" />
+        <img *ngSwitchCase="'BRAND'" class="card-media" [src]="item?.image ?  attachmentBaseUrl + '/' + item?.image: attachmentBaseUrl + '/' + item?.getAppEntityForViewDto?.appEntity?.entityAttachments[0]?.url 
+           " title="Brand {{item?.getSycEntityObjectCategoryForViewDto?.sycEntityObjectCategory?.name}}" alt="Brand" (click)="goToBrand(item)"
+          (error)="onImgErr($event)" />
 
- 
-      
-  
-    
+
         <!-- CATEGORY -->
         <img *ngSwitchCase="'CATEGORY'" class="card-media" [src]="item?.image
             ? attachmentBaseUrl + '/' + item?.image
-            : '../../../../assets/placeholders/_logo-placeholder.png'" alt="category" (click)="goToCategory(item)"
+            : '../../../../assets/placeholders/_logo-placeholder.png'" alt="category" (click)="goToCategory(item?.getSycEntityObjectCategoryForViewDto?.sycEntityObjectCategory?.id)"
           (error)="onImgErr($event)" />
         <!-- ATTACHMENT -->
         <ng-container *ngSwitchCase="'ATTACHMENT'">
@@ -91,7 +58,35 @@
         </ng-container>
 
 
+        <!-- EVENT -->
+        <div *ngSwitchCase="'EVENT'">
+     
+          <app-marketplace-event-card *ngIf="blockTypeIsSingleOrMixed =='Mixed Types Blocks'"
+            [block]="item?.getAppEventForViewDto?.appEvent" (details)="openEventDetails($event)"></app-marketplace-event-card>
+          <app-events-browse-card *ngIf="blockTypeIsSingleOrMixed !='Mixed Types Blocks' || blockTypeIsSingleOrMixed ==null"
+            [item]="item?.getAppEventForViewDto" [singleItemPerRowMode]="false" [fromMarketPlaceProfile]="false"
+            [fromOverviewMarketPlaceProfile]="false"  [FromLandingPage]="true"  [actionsMenuFlags]="actionsMenuFlags" [fromLandingPage]="true"
+                        [statusesFlags]="statusesFlags"
+        ></app-events-browse-card>
+  
+        </div>
+
+        <!-- ACCOUNT -->
+        <div *ngSwitchCase="'CONTACT'">
+          <app-marketplace-account-card *ngIf="blockTypeIsSingleOrMixed =='Mixed Types Blocks' "
+            [account]="item?.getAccountForViewDto" [compact]="true"
+            [showConnectButton]="true"></app-marketplace-account-card>
+
+          <app-account-card *ngIf="blockTypeIsSingleOrMixed !='Mixed Types Blocks' || blockTypeIsSingleOrMixed ==null"
+            [account]="item?.getAccountForViewDto" [FromLandingPage]="true" [fromMarketplace]="true" [cardsViewMode]="true" (disconnectMe)="
+                                                    disconnect(item?.getAccountForViewDto)" 
+                                                (_createRelation)="createRelation(item?.getAccountForViewDto,$event)"></app-account-card>
+        </div>
       </div>
     </div>
   </ng-template>
 </p-carousel>
+
+
+
+

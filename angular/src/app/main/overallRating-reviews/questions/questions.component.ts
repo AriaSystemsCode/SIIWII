@@ -41,7 +41,8 @@ export class QuestionsComponent extends AppComponentBase implements OnInit {
   ];
   onlyMsg:boolean = false
   isAuthenticated = this.appSession?.user
-
+  currentLang:string
+  isArabic:boolean = true
   constructor(injector: Injector, private messageServiceProxy: MessageServiceProxy
 
   ) {

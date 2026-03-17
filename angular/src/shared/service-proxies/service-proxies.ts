@@ -1065,12 +1065,13 @@ export class AccountsServiceProxy {
      * @param classifications (optional) 
      * @param categories (optional) 
      * @param curruncies (optional) 
+     * @param filterCondition (optional) 
      * @param sorting (optional) 
      * @param skipCount (optional) 
      * @param maxResultCount (optional) 
      * @return Success
      */
-    getAll(filter: string | null | undefined, filterType: number | undefined, name: string | null | undefined, address: string | null | undefined, city: string | null | undefined, state: string | null | undefined, postal: string | null | undefined, sSIN: string | null | undefined, accountTypeId: number | undefined, accountType: string | null | undefined, accountTypes: number[] | null | undefined, status: number[] | null | undefined, languages: number[] | null | undefined, countries: number[] | null | undefined, classifications: number[] | null | undefined, categories: number[] | null | undefined, curruncies: number[] | null | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<PagedResultDtoOfGetAccountForViewDto> {
+    getAll(filter: string | null | undefined, filterType: number | undefined, name: string | null | undefined, address: string | null | undefined, city: string | null | undefined, state: string | null | undefined, postal: string | null | undefined, sSIN: string | null | undefined, accountTypeId: number | undefined, accountType: string | null | undefined, accountTypes: number[] | null | undefined, status: number[] | null | undefined, languages: number[] | null | undefined, countries: number[] | null | undefined, classifications: number[] | null | undefined, categories: number[] | null | undefined, curruncies: number[] | null | undefined, filterCondition: string | null | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<PagedResultDtoOfGetAccountForViewDto> {
         let url_ = this.baseUrl + "/api/services/app/Accounts/GetAll?";
         if (filter !== undefined && filter !== null)
             url_ += "Filter=" + encodeURIComponent("" + filter) + "&";
@@ -1110,6 +1111,8 @@ export class AccountsServiceProxy {
             categories && categories.forEach(item => { url_ += "Categories=" + encodeURIComponent("" + item) + "&"; });
         if (curruncies !== undefined && curruncies !== null)
             curruncies && curruncies.forEach(item => { url_ += "Curruncies=" + encodeURIComponent("" + item) + "&"; });
+        if (filterCondition !== undefined && filterCondition !== null)
+            url_ += "FilterCondition=" + encodeURIComponent("" + filterCondition) + "&";
         if (sorting !== undefined && sorting !== null)
             url_ += "Sorting=" + encodeURIComponent("" + sorting) + "&";
         if (skipCount === null)
@@ -1184,12 +1187,13 @@ export class AccountsServiceProxy {
      * @param classifications (optional) 
      * @param categories (optional) 
      * @param curruncies (optional) 
+     * @param filterCondition (optional) 
      * @param sorting (optional) 
      * @param skipCount (optional) 
      * @param maxResultCount (optional) 
      * @return Success
      */
-    getAllMyConnections(filter: string | null | undefined, filterType: number | undefined, name: string | null | undefined, address: string | null | undefined, city: string | null | undefined, state: string | null | undefined, postal: string | null | undefined, sSIN: string | null | undefined, accountTypeId: number | undefined, accountType: string | null | undefined, accountTypes: number[] | null | undefined, status: number[] | null | undefined, languages: number[] | null | undefined, countries: number[] | null | undefined, classifications: number[] | null | undefined, categories: number[] | null | undefined, curruncies: number[] | null | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<PagedResultDtoOfGetAccountForViewDto> {
+    getAllMyConnections(filter: string | null | undefined, filterType: number | undefined, name: string | null | undefined, address: string | null | undefined, city: string | null | undefined, state: string | null | undefined, postal: string | null | undefined, sSIN: string | null | undefined, accountTypeId: number | undefined, accountType: string | null | undefined, accountTypes: number[] | null | undefined, status: number[] | null | undefined, languages: number[] | null | undefined, countries: number[] | null | undefined, classifications: number[] | null | undefined, categories: number[] | null | undefined, curruncies: number[] | null | undefined, filterCondition: string | null | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<PagedResultDtoOfGetAccountForViewDto> {
         let url_ = this.baseUrl + "/api/services/app/Accounts/GetAllMyConnections?";
         if (filter !== undefined && filter !== null)
             url_ += "Filter=" + encodeURIComponent("" + filter) + "&";
@@ -1229,6 +1233,8 @@ export class AccountsServiceProxy {
             categories && categories.forEach(item => { url_ += "Categories=" + encodeURIComponent("" + item) + "&"; });
         if (curruncies !== undefined && curruncies !== null)
             curruncies && curruncies.forEach(item => { url_ += "Curruncies=" + encodeURIComponent("" + item) + "&"; });
+        if (filterCondition !== undefined && filterCondition !== null)
+            url_ += "FilterCondition=" + encodeURIComponent("" + filterCondition) + "&";
         if (sorting !== undefined && sorting !== null)
             url_ += "Sorting=" + encodeURIComponent("" + sorting) + "&";
         if (skipCount === null)
@@ -11319,12 +11325,13 @@ export class AppEventsServiceProxy {
      * @param postalFilter (optional) 
      * @param tenantId (optional) 
      * @param noOfEventsToReturn (optional) 
+     * @param filterCondition (optional) 
      * @param sorting (optional) 
      * @param skipCount (optional) 
      * @param maxResultCount (optional) 
      * @return Success
      */
-    getAll(filterType: EventsFilterTypesEnum, filter: string | null | undefined, isOnLineFilter: boolean | null | undefined, isPublishedFilter: boolean | null | undefined, creatorUserIdFilter: number | null | undefined, idFilter: number | null | undefined, entityIdFilter: number | null | undefined, includeAttachments: boolean | undefined, timeZoneFilter: string | null | undefined, maxFromDateFilter: moment.Moment | null | undefined, minFromDateFilter: moment.Moment | null | undefined, maxToDateFilter: moment.Moment | null | undefined, minToDateFilter: moment.Moment | null | undefined, maxFromTimeFilter: moment.Moment | null | undefined, minFromTimeFilter: moment.Moment | null | undefined, maxToTimeFilter: moment.Moment | null | undefined, minToTimeFilter: moment.Moment | null | undefined, privacyFilter: boolean | null | undefined, guestCanInviteFriendsFilter: boolean | null | undefined, locationFilter: string | null | undefined, appEntityNameFilter: string | null | undefined, cityFilter: string | null | undefined, stateFilter: string | null | undefined, postalFilter: string | null | undefined, tenantId: number | null | undefined, noOfEventsToReturn: number | null | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<PagedResultDtoOfGetAppEventForViewDto> {
+    getAll(filterType: EventsFilterTypesEnum, filter: string | null | undefined, isOnLineFilter: boolean | null | undefined, isPublishedFilter: boolean | null | undefined, creatorUserIdFilter: number | null | undefined, idFilter: number | null | undefined, entityIdFilter: number | null | undefined, includeAttachments: boolean | undefined, timeZoneFilter: string | null | undefined, maxFromDateFilter: moment.Moment | null | undefined, minFromDateFilter: moment.Moment | null | undefined, maxToDateFilter: moment.Moment | null | undefined, minToDateFilter: moment.Moment | null | undefined, maxFromTimeFilter: moment.Moment | null | undefined, minFromTimeFilter: moment.Moment | null | undefined, maxToTimeFilter: moment.Moment | null | undefined, minToTimeFilter: moment.Moment | null | undefined, privacyFilter: boolean | null | undefined, guestCanInviteFriendsFilter: boolean | null | undefined, locationFilter: string | null | undefined, appEntityNameFilter: string | null | undefined, cityFilter: string | null | undefined, stateFilter: string | null | undefined, postalFilter: string | null | undefined, tenantId: number | null | undefined, noOfEventsToReturn: number | null | undefined, filterCondition: string | null | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<PagedResultDtoOfGetAppEventForViewDto> {
         let url_ = this.baseUrl + "/api/services/app/AppEvents/GetAll?";
         if (filterType === undefined || filterType === null)
             throw new Error("The parameter 'filterType' must be defined and cannot be null.");
@@ -11382,6 +11389,8 @@ export class AppEventsServiceProxy {
             url_ += "TenantId=" + encodeURIComponent("" + tenantId) + "&";
         if (noOfEventsToReturn !== undefined && noOfEventsToReturn !== null)
             url_ += "NoOfEventsToReturn=" + encodeURIComponent("" + noOfEventsToReturn) + "&";
+        if (filterCondition !== undefined && filterCondition !== null)
+            url_ += "FilterCondition=" + encodeURIComponent("" + filterCondition) + "&";
         if (sorting !== undefined && sorting !== null)
             url_ += "Sorting=" + encodeURIComponent("" + sorting) + "&";
         if (skipCount === null)
@@ -13797,12 +13806,13 @@ export class AppItemsServiceProxy {
      * @param departmentFlag (optional) 
      * @param entityId (optional) 
      * @param excludeIds (optional) 
+     * @param filterCondition (optional) 
      * @param sorting (optional) 
      * @param skipCount (optional) 
      * @param maxResultCount (optional) 
      * @return Success
      */
-    getAllWithChildsExceptSelectedForProductWithPaging(filter: string | null | undefined, codeFilter: string | null | undefined, nameFilter: string | null | undefined, sydObjectNameFilter: string | null | undefined, sycEntityObjectCategoryNameFilter: string | null | undefined, eagger: boolean | undefined, objectId: number | undefined, parentId: number | undefined, departmentFlag: boolean | undefined, entityId: number | undefined, excludeIds: number[] | null | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<PagedResultDtoOfTreeNodeOfGetSycEntityObjectCategoryForViewDto> {
+    getAllWithChildsExceptSelectedForProductWithPaging(filter: string | null | undefined, codeFilter: string | null | undefined, nameFilter: string | null | undefined, sydObjectNameFilter: string | null | undefined, sycEntityObjectCategoryNameFilter: string | null | undefined, eagger: boolean | undefined, objectId: number | undefined, parentId: number | undefined, departmentFlag: boolean | undefined, entityId: number | undefined, excludeIds: number[] | null | undefined, filterCondition: string | null | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<PagedResultDtoOfTreeNodeOfGetSycEntityObjectCategoryForViewDto> {
         let url_ = this.baseUrl + "/api/services/app/AppItems/GetAllWithChildsExceptSelectedForProductWithPaging?";
         if (filter !== undefined && filter !== null)
             url_ += "Filter=" + encodeURIComponent("" + filter) + "&";
@@ -13836,6 +13846,8 @@ export class AppItemsServiceProxy {
             url_ += "EntityId=" + encodeURIComponent("" + entityId) + "&";
         if (excludeIds !== undefined && excludeIds !== null)
             excludeIds && excludeIds.forEach(item => { url_ += "ExcludeIds=" + encodeURIComponent("" + item) + "&"; });
+        if (filterCondition !== undefined && filterCondition !== null)
+            url_ += "FilterCondition=" + encodeURIComponent("" + filterCondition) + "&";
         if (sorting !== undefined && sorting !== null)
             url_ += "Sorting=" + encodeURIComponent("" + sorting) + "&";
         if (skipCount === null)
@@ -13904,12 +13916,13 @@ export class AppItemsServiceProxy {
      * @param departmentFlag (optional) 
      * @param entityId (optional) 
      * @param excludeIds (optional) 
+     * @param filterCondition (optional) 
      * @param sorting (optional) 
      * @param skipCount (optional) 
      * @param maxResultCount (optional) 
      * @return Success
      */
-    getAppItemRelatedProductsWithPaging(filter: string | null | undefined, codeFilter: string | null | undefined, nameFilter: string | null | undefined, sydObjectNameFilter: string | null | undefined, sycEntityObjectCategoryNameFilter: string | null | undefined, eagger: boolean | undefined, objectId: number | undefined, parentId: number | undefined, departmentFlag: boolean | undefined, entityId: number | undefined, excludeIds: number[] | null | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<PagedResultDtoOfAppItemLookupDto> {
+    getAppItemRelatedProductsWithPaging(filter: string | null | undefined, codeFilter: string | null | undefined, nameFilter: string | null | undefined, sydObjectNameFilter: string | null | undefined, sycEntityObjectCategoryNameFilter: string | null | undefined, eagger: boolean | undefined, objectId: number | undefined, parentId: number | undefined, departmentFlag: boolean | undefined, entityId: number | undefined, excludeIds: number[] | null | undefined, filterCondition: string | null | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<PagedResultDtoOfAppItemLookupDto> {
         let url_ = this.baseUrl + "/api/services/app/AppItems/GetAppItemRelatedProductsWithPaging?";
         if (filter !== undefined && filter !== null)
             url_ += "Filter=" + encodeURIComponent("" + filter) + "&";
@@ -13943,6 +13956,8 @@ export class AppItemsServiceProxy {
             url_ += "EntityId=" + encodeURIComponent("" + entityId) + "&";
         if (excludeIds !== undefined && excludeIds !== null)
             excludeIds && excludeIds.forEach(item => { url_ += "ExcludeIds=" + encodeURIComponent("" + item) + "&"; });
+        if (filterCondition !== undefined && filterCondition !== null)
+            url_ += "FilterCondition=" + encodeURIComponent("" + filterCondition) + "&";
         if (sorting !== undefined && sorting !== null)
             url_ += "Sorting=" + encodeURIComponent("" + sorting) + "&";
         if (skipCount === null)
@@ -20445,12 +20460,13 @@ export class AppMarketplaceItemsServiceProxy {
      * @param currencyCode (optional) 
      * @param itemSSIN (optional) 
      * @param categoryFilters (optional) 
+     * @param filterCondition (optional) 
      * @param sorting (optional) 
      * @param skipCount (optional) 
      * @param maxResultCount (optional) 
      * @return Success
      */
-    getAll(contactSSIN: string | null | undefined, accountSSIN: string | null | undefined, tenantId: number | null | undefined, appItemListId: number | null | undefined, selectorOnly: boolean | null | undefined, filter: string | null | undefined, lastKey: string | null | undefined, selectorKey: string | null | undefined, arrtibuteFilters: ArrtibuteFilter[] | null | undefined, departmentFilters: number[] | null | undefined, minimumPrice: number | null | undefined, maximumPrice: number | null | undefined, sharingLevel: SharingLevels, onlyAvialbleStock: boolean | undefined, soldOutFromDate: moment.Moment | undefined, soldOutToDate: moment.Moment | undefined, startShipFromDate: moment.Moment | undefined, startShipToDate: moment.Moment | undefined, brands: number[] | null | undefined, currencyCode: string | null | undefined, itemSSIN: string | null | undefined, categoryFilters: number[] | null | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<PagedResultDtoOfGetAppMarketItemForViewDto> {
+    getAll(contactSSIN: string | null | undefined, accountSSIN: string | null | undefined, tenantId: number | null | undefined, appItemListId: number | null | undefined, selectorOnly: boolean | null | undefined, filter: string | null | undefined, lastKey: string | null | undefined, selectorKey: string | null | undefined, arrtibuteFilters: ArrtibuteFilter[] | null | undefined, departmentFilters: number[] | null | undefined, minimumPrice: number | null | undefined, maximumPrice: number | null | undefined, sharingLevel: SharingLevels, onlyAvialbleStock: boolean | undefined, soldOutFromDate: moment.Moment | undefined, soldOutToDate: moment.Moment | undefined, startShipFromDate: moment.Moment | undefined, startShipToDate: moment.Moment | undefined, brands: number[] | null | undefined, currencyCode: string | null | undefined, itemSSIN: string | null | undefined, categoryFilters: number[] | null | undefined, filterCondition: string | null | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<PagedResultDtoOfGetAppMarketItemForViewDto> {
         let url_ = this.baseUrl + "/api/services/app/AppMarketplaceItems/GetAll?";
         if (contactSSIN !== undefined && contactSSIN !== null)
             url_ += "ContactSSIN=" + encodeURIComponent("" + contactSSIN) + "&";
@@ -20513,6 +20529,8 @@ export class AppMarketplaceItemsServiceProxy {
             url_ += "ItemSSIN=" + encodeURIComponent("" + itemSSIN) + "&";
         if (categoryFilters !== undefined && categoryFilters !== null)
             categoryFilters && categoryFilters.forEach(item => { url_ += "CategoryFilters=" + encodeURIComponent("" + item) + "&"; });
+        if (filterCondition !== undefined && filterCondition !== null)
+            url_ += "FilterCondition=" + encodeURIComponent("" + filterCondition) + "&";
         if (sorting !== undefined && sorting !== null)
             url_ += "Sorting=" + encodeURIComponent("" + sorting) + "&";
         if (skipCount === null)
@@ -20984,12 +21002,13 @@ export class AppMarketplaceItemsServiceProxy {
      * @param currencyCode (optional) 
      * @param itemSSIN (optional) 
      * @param categoryFilters (optional) 
+     * @param filterCondition (optional) 
      * @param sorting (optional) 
      * @param skipCount (optional) 
      * @param maxResultCount (optional) 
      * @return Success
      */
-    getAppItemRelatedItems(contactSSIN: string | null | undefined, accountSSIN: string | null | undefined, tenantId: number | null | undefined, appItemListId: number | null | undefined, selectorOnly: boolean | null | undefined, filter: string | null | undefined, lastKey: string | null | undefined, selectorKey: string | null | undefined, arrtibuteFilters: ArrtibuteFilter[] | null | undefined, departmentFilters: number[] | null | undefined, minimumPrice: number | null | undefined, maximumPrice: number | null | undefined, sharingLevel: SharingLevels, onlyAvialbleStock: boolean | undefined, soldOutFromDate: moment.Moment | undefined, soldOutToDate: moment.Moment | undefined, startShipFromDate: moment.Moment | undefined, startShipToDate: moment.Moment | undefined, brands: number[] | null | undefined, currencyCode: string | null | undefined, itemSSIN: string | null | undefined, categoryFilters: number[] | null | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<PagedResultDtoOfGetAppMarketItemForViewDto> {
+    getAppItemRelatedItems(contactSSIN: string | null | undefined, accountSSIN: string | null | undefined, tenantId: number | null | undefined, appItemListId: number | null | undefined, selectorOnly: boolean | null | undefined, filter: string | null | undefined, lastKey: string | null | undefined, selectorKey: string | null | undefined, arrtibuteFilters: ArrtibuteFilter[] | null | undefined, departmentFilters: number[] | null | undefined, minimumPrice: number | null | undefined, maximumPrice: number | null | undefined, sharingLevel: SharingLevels, onlyAvialbleStock: boolean | undefined, soldOutFromDate: moment.Moment | undefined, soldOutToDate: moment.Moment | undefined, startShipFromDate: moment.Moment | undefined, startShipToDate: moment.Moment | undefined, brands: number[] | null | undefined, currencyCode: string | null | undefined, itemSSIN: string | null | undefined, categoryFilters: number[] | null | undefined, filterCondition: string | null | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<PagedResultDtoOfGetAppMarketItemForViewDto> {
         let url_ = this.baseUrl + "/api/services/app/AppMarketplaceItems/GetAppItemRelatedItems?";
         if (contactSSIN !== undefined && contactSSIN !== null)
             url_ += "ContactSSIN=" + encodeURIComponent("" + contactSSIN) + "&";
@@ -21052,6 +21071,8 @@ export class AppMarketplaceItemsServiceProxy {
             url_ += "ItemSSIN=" + encodeURIComponent("" + itemSSIN) + "&";
         if (categoryFilters !== undefined && categoryFilters !== null)
             categoryFilters && categoryFilters.forEach(item => { url_ += "CategoryFilters=" + encodeURIComponent("" + item) + "&"; });
+        if (filterCondition !== undefined && filterCondition !== null)
+            url_ += "FilterCondition=" + encodeURIComponent("" + filterCondition) + "&";
         if (sorting !== undefined && sorting !== null)
             url_ += "Sorting=" + encodeURIComponent("" + sorting) + "&";
         if (skipCount === null)
@@ -26902,6 +26923,7 @@ export class AppTransactionServiceProxy {
      * @param classifications (optional) 
      * @param categories (optional) 
      * @param curruncies (optional) 
+     * @param filterCondition (optional) 
      * @param sorting (optional) 
      * @param skipCount (optional) 
      * @param maxResultCount (optional) 
@@ -26909,7 +26931,7 @@ export class AppTransactionServiceProxy {
      * @param transactionType (optional) 
      * @return Success
      */
-    getRelatedAccounts(filter: string | null | undefined, filterType: number | undefined, name: string | null | undefined, address: string | null | undefined, city: string | null | undefined, state: string | null | undefined, postal: string | null | undefined, sSIN: string | null | undefined, accountTypeId: number | undefined, accountType: string | null | undefined, accountTypes: number[] | null | undefined, status: number[] | null | undefined, languages: number[] | null | undefined, countries: number[] | null | undefined, classifications: number[] | null | undefined, categories: number[] | null | undefined, curruncies: number[] | null | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined, lExclueMyAcc: boolean | null | undefined, transactionType: string | null | undefined): Observable<PagedResultDtoOfGetAccountInformationOutputDto> {
+    getRelatedAccounts(filter: string | null | undefined, filterType: number | undefined, name: string | null | undefined, address: string | null | undefined, city: string | null | undefined, state: string | null | undefined, postal: string | null | undefined, sSIN: string | null | undefined, accountTypeId: number | undefined, accountType: string | null | undefined, accountTypes: number[] | null | undefined, status: number[] | null | undefined, languages: number[] | null | undefined, countries: number[] | null | undefined, classifications: number[] | null | undefined, categories: number[] | null | undefined, curruncies: number[] | null | undefined, filterCondition: string | null | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined, lExclueMyAcc: boolean | null | undefined, transactionType: string | null | undefined): Observable<PagedResultDtoOfGetAccountInformationOutputDto> {
         let url_ = this.baseUrl + "/api/services/app/AppTransaction/GetRelatedAccounts?";
         if (filter !== undefined && filter !== null)
             url_ += "Filter=" + encodeURIComponent("" + filter) + "&";
@@ -26949,6 +26971,8 @@ export class AppTransactionServiceProxy {
             categories && categories.forEach(item => { url_ += "Categories=" + encodeURIComponent("" + item) + "&"; });
         if (curruncies !== undefined && curruncies !== null)
             curruncies && curruncies.forEach(item => { url_ += "Curruncies=" + encodeURIComponent("" + item) + "&"; });
+        if (filterCondition !== undefined && filterCondition !== null)
+            url_ += "FilterCondition=" + encodeURIComponent("" + filterCondition) + "&";
         if (sorting !== undefined && sorting !== null)
             url_ += "Sorting=" + encodeURIComponent("" + sorting) + "&";
         if (skipCount === null)
@@ -35543,12 +35567,13 @@ export class MarketplaceAccountsServiceProxy {
      * @param classifications (optional) 
      * @param categories (optional) 
      * @param curruncies (optional) 
+     * @param filterCondition (optional) 
      * @param sorting (optional) 
      * @param skipCount (optional) 
      * @param maxResultCount (optional) 
      * @return Success
      */
-    getAll(filter: string | null | undefined, filterType: number | undefined, name: string | null | undefined, address: string | null | undefined, city: string | null | undefined, state: string | null | undefined, postal: string | null | undefined, sSIN: string | null | undefined, accountTypeId: number | undefined, accountType: string | null | undefined, accountTypes: number[] | null | undefined, status: number[] | null | undefined, languages: number[] | null | undefined, countries: number[] | null | undefined, classifications: number[] | null | undefined, categories: number[] | null | undefined, curruncies: number[] | null | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<PagedResultDtoOfGetMarketplaceAccountForViewDto> {
+    getAll(filter: string | null | undefined, filterType: number | undefined, name: string | null | undefined, address: string | null | undefined, city: string | null | undefined, state: string | null | undefined, postal: string | null | undefined, sSIN: string | null | undefined, accountTypeId: number | undefined, accountType: string | null | undefined, accountTypes: number[] | null | undefined, status: number[] | null | undefined, languages: number[] | null | undefined, countries: number[] | null | undefined, classifications: number[] | null | undefined, categories: number[] | null | undefined, curruncies: number[] | null | undefined, filterCondition: string | null | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<PagedResultDtoOfGetMarketplaceAccountForViewDto> {
         let url_ = this.baseUrl + "/api/services/app/MarketplaceAccounts/GetAll?";
         if (filter !== undefined && filter !== null)
             url_ += "Filter=" + encodeURIComponent("" + filter) + "&";
@@ -35588,6 +35613,8 @@ export class MarketplaceAccountsServiceProxy {
             categories && categories.forEach(item => { url_ += "Categories=" + encodeURIComponent("" + item) + "&"; });
         if (curruncies !== undefined && curruncies !== null)
             curruncies && curruncies.forEach(item => { url_ += "Curruncies=" + encodeURIComponent("" + item) + "&"; });
+        if (filterCondition !== undefined && filterCondition !== null)
+            url_ += "FilterCondition=" + encodeURIComponent("" + filterCondition) + "&";
         if (sorting !== undefined && sorting !== null)
             url_ += "Sorting=" + encodeURIComponent("" + sorting) + "&";
         if (skipCount === null)
@@ -43508,12 +43535,13 @@ export class SycEntityObjectCategoriesServiceProxy {
      * @param departmentFlag (optional) 
      * @param entityId (optional) 
      * @param excludeIds (optional) 
+     * @param filterCondition (optional) 
      * @param sorting (optional) 
      * @param skipCount (optional) 
      * @param maxResultCount (optional) 
      * @return Success
      */
-    getAll(filter: string | null | undefined, codeFilter: string | null | undefined, nameFilter: string | null | undefined, sydObjectNameFilter: string | null | undefined, sycEntityObjectCategoryNameFilter: string | null | undefined, eagger: boolean | undefined, objectId: number | undefined, parentId: number | undefined, departmentFlag: boolean | undefined, entityId: number | undefined, excludeIds: number[] | null | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<PagedResultDtoOfTreeNodeOfGetSycEntityObjectCategoryForViewDto> {
+    getAll(filter: string | null | undefined, codeFilter: string | null | undefined, nameFilter: string | null | undefined, sydObjectNameFilter: string | null | undefined, sycEntityObjectCategoryNameFilter: string | null | undefined, eagger: boolean | undefined, objectId: number | undefined, parentId: number | undefined, departmentFlag: boolean | undefined, entityId: number | undefined, excludeIds: number[] | null | undefined, filterCondition: string | null | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<PagedResultDtoOfTreeNodeOfGetSycEntityObjectCategoryForViewDto> {
         let url_ = this.baseUrl + "/api/services/app/SycEntityObjectCategories/GetAll?";
         if (filter !== undefined && filter !== null)
             url_ += "Filter=" + encodeURIComponent("" + filter) + "&";
@@ -43547,6 +43575,8 @@ export class SycEntityObjectCategoriesServiceProxy {
             url_ += "EntityId=" + encodeURIComponent("" + entityId) + "&";
         if (excludeIds !== undefined && excludeIds !== null)
             excludeIds && excludeIds.forEach(item => { url_ += "ExcludeIds=" + encodeURIComponent("" + item) + "&"; });
+        if (filterCondition !== undefined && filterCondition !== null)
+            url_ += "FilterCondition=" + encodeURIComponent("" + filterCondition) + "&";
         if (sorting !== undefined && sorting !== null)
             url_ += "Sorting=" + encodeURIComponent("" + sorting) + "&";
         if (skipCount === null)
@@ -43615,12 +43645,13 @@ export class SycEntityObjectCategoriesServiceProxy {
      * @param departmentFlag (optional) 
      * @param entityId (optional) 
      * @param excludeIds (optional) 
+     * @param filterCondition (optional) 
      * @param sorting (optional) 
      * @param skipCount (optional) 
      * @param maxResultCount (optional) 
      * @return Success
      */
-    getAllWithChildsForContactAsTreeViewWithPaging(filter: string | null | undefined, codeFilter: string | null | undefined, nameFilter: string | null | undefined, sydObjectNameFilter: string | null | undefined, sycEntityObjectCategoryNameFilter: string | null | undefined, eagger: boolean | undefined, objectId: number | undefined, parentId: number | undefined, departmentFlag: boolean | undefined, entityId: number | undefined, excludeIds: number[] | null | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<PagedResultDtoOfTreeviewItem> {
+    getAllWithChildsForContactAsTreeViewWithPaging(filter: string | null | undefined, codeFilter: string | null | undefined, nameFilter: string | null | undefined, sydObjectNameFilter: string | null | undefined, sycEntityObjectCategoryNameFilter: string | null | undefined, eagger: boolean | undefined, objectId: number | undefined, parentId: number | undefined, departmentFlag: boolean | undefined, entityId: number | undefined, excludeIds: number[] | null | undefined, filterCondition: string | null | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<PagedResultDtoOfTreeviewItem> {
         let url_ = this.baseUrl + "/api/services/app/SycEntityObjectCategories/GetAllWithChildsForContactAsTreeViewWithPaging?";
         if (filter !== undefined && filter !== null)
             url_ += "Filter=" + encodeURIComponent("" + filter) + "&";
@@ -43654,6 +43685,8 @@ export class SycEntityObjectCategoriesServiceProxy {
             url_ += "EntityId=" + encodeURIComponent("" + entityId) + "&";
         if (excludeIds !== undefined && excludeIds !== null)
             excludeIds && excludeIds.forEach(item => { url_ += "ExcludeIds=" + encodeURIComponent("" + item) + "&"; });
+        if (filterCondition !== undefined && filterCondition !== null)
+            url_ += "FilterCondition=" + encodeURIComponent("" + filterCondition) + "&";
         if (sorting !== undefined && sorting !== null)
             url_ += "Sorting=" + encodeURIComponent("" + sorting) + "&";
         if (skipCount === null)
@@ -43824,12 +43857,13 @@ export class SycEntityObjectCategoriesServiceProxy {
      * @param departmentFlag (optional) 
      * @param entityId (optional) 
      * @param excludeIds (optional) 
+     * @param filterCondition (optional) 
      * @param sorting (optional) 
      * @param skipCount (optional) 
      * @param maxResultCount (optional) 
      * @return Success
      */
-    getAllWithChildsForContactWithPaging(filter: string | null | undefined, codeFilter: string | null | undefined, nameFilter: string | null | undefined, sydObjectNameFilter: string | null | undefined, sycEntityObjectCategoryNameFilter: string | null | undefined, eagger: boolean | undefined, objectId: number | undefined, parentId: number | undefined, departmentFlag: boolean | undefined, entityId: number | undefined, excludeIds: number[] | null | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<PagedResultDtoOfTreeNodeOfGetSycEntityObjectCategoryForViewDto> {
+    getAllWithChildsForContactWithPaging(filter: string | null | undefined, codeFilter: string | null | undefined, nameFilter: string | null | undefined, sydObjectNameFilter: string | null | undefined, sycEntityObjectCategoryNameFilter: string | null | undefined, eagger: boolean | undefined, objectId: number | undefined, parentId: number | undefined, departmentFlag: boolean | undefined, entityId: number | undefined, excludeIds: number[] | null | undefined, filterCondition: string | null | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<PagedResultDtoOfTreeNodeOfGetSycEntityObjectCategoryForViewDto> {
         let url_ = this.baseUrl + "/api/services/app/SycEntityObjectCategories/GetAllWithChildsForContactWithPaging?";
         if (filter !== undefined && filter !== null)
             url_ += "Filter=" + encodeURIComponent("" + filter) + "&";
@@ -43863,6 +43897,8 @@ export class SycEntityObjectCategoriesServiceProxy {
             url_ += "EntityId=" + encodeURIComponent("" + entityId) + "&";
         if (excludeIds !== undefined && excludeIds !== null)
             excludeIds && excludeIds.forEach(item => { url_ += "ExcludeIds=" + encodeURIComponent("" + item) + "&"; });
+        if (filterCondition !== undefined && filterCondition !== null)
+            url_ += "FilterCondition=" + encodeURIComponent("" + filterCondition) + "&";
         if (sorting !== undefined && sorting !== null)
             url_ += "Sorting=" + encodeURIComponent("" + sorting) + "&";
         if (skipCount === null)
@@ -44038,12 +44074,13 @@ export class SycEntityObjectCategoriesServiceProxy {
      * @param departmentFlag (optional) 
      * @param entityId (optional) 
      * @param excludeIds (optional) 
+     * @param filterCondition (optional) 
      * @param sorting (optional) 
      * @param skipCount (optional) 
      * @param maxResultCount (optional) 
      * @return Success
      */
-    getAllWithChildsForProductWithPaging(filter: string | null | undefined, codeFilter: string | null | undefined, nameFilter: string | null | undefined, sydObjectNameFilter: string | null | undefined, sycEntityObjectCategoryNameFilter: string | null | undefined, eagger: boolean | undefined, objectId: number | undefined, parentId: number | undefined, departmentFlag: boolean | undefined, entityId: number | undefined, excludeIds: number[] | null | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<PagedResultDtoOfTreeNodeOfGetSycEntityObjectCategoryForViewDto> {
+    getAllWithChildsForProductWithPaging(filter: string | null | undefined, codeFilter: string | null | undefined, nameFilter: string | null | undefined, sydObjectNameFilter: string | null | undefined, sycEntityObjectCategoryNameFilter: string | null | undefined, eagger: boolean | undefined, objectId: number | undefined, parentId: number | undefined, departmentFlag: boolean | undefined, entityId: number | undefined, excludeIds: number[] | null | undefined, filterCondition: string | null | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<PagedResultDtoOfTreeNodeOfGetSycEntityObjectCategoryForViewDto> {
         let url_ = this.baseUrl + "/api/services/app/SycEntityObjectCategories/GetAllWithChildsForProductWithPaging?";
         if (filter !== undefined && filter !== null)
             url_ += "Filter=" + encodeURIComponent("" + filter) + "&";
@@ -44077,6 +44114,8 @@ export class SycEntityObjectCategoriesServiceProxy {
             url_ += "EntityId=" + encodeURIComponent("" + entityId) + "&";
         if (excludeIds !== undefined && excludeIds !== null)
             excludeIds && excludeIds.forEach(item => { url_ += "ExcludeIds=" + encodeURIComponent("" + item) + "&"; });
+        if (filterCondition !== undefined && filterCondition !== null)
+            url_ += "FilterCondition=" + encodeURIComponent("" + filterCondition) + "&";
         if (sorting !== undefined && sorting !== null)
             url_ += "Sorting=" + encodeURIComponent("" + sorting) + "&";
         if (skipCount === null)
@@ -44185,6 +44224,58 @@ export class SycEntityObjectCategoriesServiceProxy {
     }
 
     /**
+     * @return Success
+     */
+    getDefaultLanguage(): Observable<string> {
+        let url_ = this.baseUrl + "/api/services/app/SycEntityObjectCategories/GetDefaultLanguage";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetDefaultLanguage(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetDefaultLanguage(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<string>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<string>;
+        }));
+    }
+
+    protected processGetDefaultLanguage(response: HttpResponseBase): Observable<string> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+                result200 = resultData200 !== undefined ? resultData200 : <any>null;
+    
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
      * @param filter (optional) 
      * @param codeFilter (optional) 
      * @param nameFilter (optional) 
@@ -44196,12 +44287,13 @@ export class SycEntityObjectCategoriesServiceProxy {
      * @param departmentFlag (optional) 
      * @param entityId (optional) 
      * @param excludeIds (optional) 
+     * @param filterCondition (optional) 
      * @param sorting (optional) 
      * @param skipCount (optional) 
      * @param maxResultCount (optional) 
      * @return Success
      */
-    getAllChildsWithPaging(filter: string | null | undefined, codeFilter: string | null | undefined, nameFilter: string | null | undefined, sydObjectNameFilter: string | null | undefined, sycEntityObjectCategoryNameFilter: string | null | undefined, eagger: boolean | undefined, objectId: number | undefined, parentId: number | undefined, departmentFlag: boolean | undefined, entityId: number | undefined, excludeIds: number[] | null | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<PagedResultDtoOfTreeNodeOfGetSycEntityObjectCategoryForViewDto> {
+    getAllChildsWithPaging(filter: string | null | undefined, codeFilter: string | null | undefined, nameFilter: string | null | undefined, sydObjectNameFilter: string | null | undefined, sycEntityObjectCategoryNameFilter: string | null | undefined, eagger: boolean | undefined, objectId: number | undefined, parentId: number | undefined, departmentFlag: boolean | undefined, entityId: number | undefined, excludeIds: number[] | null | undefined, filterCondition: string | null | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<PagedResultDtoOfTreeNodeOfGetSycEntityObjectCategoryForViewDto> {
         let url_ = this.baseUrl + "/api/services/app/SycEntityObjectCategories/GetAllChildsWithPaging?";
         if (filter !== undefined && filter !== null)
             url_ += "Filter=" + encodeURIComponent("" + filter) + "&";
@@ -44235,6 +44327,8 @@ export class SycEntityObjectCategoriesServiceProxy {
             url_ += "EntityId=" + encodeURIComponent("" + entityId) + "&";
         if (excludeIds !== undefined && excludeIds !== null)
             excludeIds && excludeIds.forEach(item => { url_ += "ExcludeIds=" + encodeURIComponent("" + item) + "&"; });
+        if (filterCondition !== undefined && filterCondition !== null)
+            url_ += "FilterCondition=" + encodeURIComponent("" + filterCondition) + "&";
         if (sorting !== undefined && sorting !== null)
             url_ += "Sorting=" + encodeURIComponent("" + sorting) + "&";
         if (skipCount === null)
@@ -44923,12 +45017,13 @@ export class SycEntityObjectCategoriesServiceProxy {
      * @param departmentFlag (optional) 
      * @param entityId (optional) 
      * @param excludeIds (optional) 
+     * @param filterCondition (optional) 
      * @param sorting (optional) 
      * @param skipCount (optional) 
      * @param maxResultCount (optional) 
      * @return Success
      */
-    getAllWithChildsForTransactionWithPaging(filter: string | null | undefined, codeFilter: string | null | undefined, nameFilter: string | null | undefined, sydObjectNameFilter: string | null | undefined, sycEntityObjectCategoryNameFilter: string | null | undefined, eagger: boolean | undefined, objectId: number | undefined, parentId: number | undefined, departmentFlag: boolean | undefined, entityId: number | undefined, excludeIds: number[] | null | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<PagedResultDtoOfTreeNodeOfGetSycEntityObjectCategoryForViewDto> {
+    getAllWithChildsForTransactionWithPaging(filter: string | null | undefined, codeFilter: string | null | undefined, nameFilter: string | null | undefined, sydObjectNameFilter: string | null | undefined, sycEntityObjectCategoryNameFilter: string | null | undefined, eagger: boolean | undefined, objectId: number | undefined, parentId: number | undefined, departmentFlag: boolean | undefined, entityId: number | undefined, excludeIds: number[] | null | undefined, filterCondition: string | null | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<PagedResultDtoOfTreeNodeOfGetSycEntityObjectCategoryForViewDto> {
         let url_ = this.baseUrl + "/api/services/app/SycEntityObjectCategories/GetAllWithChildsForTransactionWithPaging?";
         if (filter !== undefined && filter !== null)
             url_ += "Filter=" + encodeURIComponent("" + filter) + "&";
@@ -44962,6 +45057,8 @@ export class SycEntityObjectCategoriesServiceProxy {
             url_ += "EntityId=" + encodeURIComponent("" + entityId) + "&";
         if (excludeIds !== undefined && excludeIds !== null)
             excludeIds && excludeIds.forEach(item => { url_ += "ExcludeIds=" + encodeURIComponent("" + item) + "&"; });
+        if (filterCondition !== undefined && filterCondition !== null)
+            url_ += "FilterCondition=" + encodeURIComponent("" + filterCondition) + "&";
         if (sorting !== undefined && sorting !== null)
             url_ += "Sorting=" + encodeURIComponent("" + sorting) + "&";
         if (skipCount === null)
@@ -45160,6 +45257,58 @@ export class SycEntityObjectClassificationsServiceProxy {
     }
 
     protected processClassificationNameIsExisting(response: HttpResponseBase): Observable<boolean> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+                result200 = resultData200 !== undefined ? resultData200 : <any>null;
+    
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @return Success
+     */
+    getDefaultLanguage(): Observable<string> {
+        let url_ = this.baseUrl + "/api/services/app/SycEntityObjectClassifications/GetDefaultLanguage";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetDefaultLanguage(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetDefaultLanguage(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<string>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<string>;
+        }));
+    }
+
+    protected processGetDefaultLanguage(response: HttpResponseBase): Observable<string> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -51794,14 +51943,17 @@ export class SydObjectsServiceProxy {
 
     /**
      * @param sectionId (optional) 
+     * @param timeZone (optional) 
      * @return Success
      */
-    getAllSectionBlocks(sectionId: number | undefined): Observable<PageSettingDto[]> {
+    getAllSectionBlocks(sectionId: number | undefined, timeZone: string | null | undefined): Observable<PageSettingDto[]> {
         let url_ = this.baseUrl + "/api/services/app/SydObjects/GetAllSectionBlocks?";
         if (sectionId === null)
             throw new Error("The parameter 'sectionId' cannot be null.");
         else if (sectionId !== undefined)
             url_ += "sectionId=" + encodeURIComponent("" + sectionId) + "&";
+        if (timeZone !== undefined && timeZone !== null)
+            url_ += "timeZone=" + encodeURIComponent("" + timeZone) + "&";
         url_ = url_.replace(/[?&]$/, "");
 
         let options_ : any = {
@@ -57632,6 +57784,58 @@ export class SystemTablesServiceProxy {
     }
 
     protected processGetEntityObjectStatusActiveLookup(response: HttpResponseBase): Observable<number> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+                result200 = resultData200 !== undefined ? resultData200 : <any>null;
+    
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @return Success
+     */
+    getObjectBrandId(): Observable<number> {
+        let url_ = this.baseUrl + "/api/services/app/SystemTables/GetObjectBrandId";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetObjectBrandId(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetObjectBrandId(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<number>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<number>;
+        }));
+    }
+
+    protected processGetObjectBrandId(response: HttpResponseBase): Observable<number> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -113066,6 +113270,8 @@ export class PageSettingDto implements IPageSettingDto {
     buttonText!: string | undefined;
     titleAlignment!: string | undefined;
     entityAttachments!: AppEntityAttachmentDto[] | undefined;
+    getAppEventForViewDto!: GetAppEventForViewDto;
+    blockTypeIsSingleOrMixed!: string | undefined;
 
     [key: string]: any;
 
@@ -113107,6 +113313,8 @@ export class PageSettingDto implements IPageSettingDto {
                 for (let item of _data["entityAttachments"])
                     this.entityAttachments!.push(AppEntityAttachmentDto.fromJS(item));
             }
+            this.getAppEventForViewDto = _data["getAppEventForViewDto"] ? GetAppEventForViewDto.fromJS(_data["getAppEventForViewDto"]) : <any>undefined;
+            this.blockTypeIsSingleOrMixed = _data["blockTypeIsSingleOrMixed"];
         }
     }
 
@@ -113146,6 +113354,8 @@ export class PageSettingDto implements IPageSettingDto {
             for (let item of this.entityAttachments)
                 data["entityAttachments"].push(item.toJSON());
         }
+        data["getAppEventForViewDto"] = this.getAppEventForViewDto ? this.getAppEventForViewDto.toJSON() : <any>undefined;
+        data["blockTypeIsSingleOrMixed"] = this.blockTypeIsSingleOrMixed;
         return data;
     }
 }
@@ -113170,6 +113380,8 @@ export interface IPageSettingDto {
     buttonText: string | undefined;
     titleAlignment: string | undefined;
     entityAttachments: AppEntityAttachmentDto[] | undefined;
+    getAppEventForViewDto: GetAppEventForViewDto;
+    blockTypeIsSingleOrMixed: string | undefined;
 
     [key: string]: any;
 }

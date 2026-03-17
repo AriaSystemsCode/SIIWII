@@ -177,6 +177,7 @@ this.accountsTypes=result.items;
         undefined,
         undefined,
         undefined,
+        undefined,
         filters?.sorting?.value || undefined,
         this.primengTableHelper.getSkipCount(this.paginator, event),
         this.primengTableHelper.getMaxResultCount(this.paginator, event)
@@ -223,20 +224,20 @@ this.accountsTypes=result.items;
                   }
   });
 }
-connect(account: AccountDto): void {
-  this.showMainSpinner();
-  this._accountsServiceProxy
-      .connectContactsProfiles(account.id,null,null)
-      .pipe(
-          finalize(() => {
-              this.hideMainSpinner();
-          })
-      )
-      .subscribe(() => {
-          this.notify.success(this.l("SuccessfullyConnected"));
-          account.status = true;
-      });
-}
+// connect(account: AccountDto): void {
+//   this.showMainSpinner();
+//   this._accountsServiceProxy
+//       .connectContactsProfiles(account.id,null,null)
+//       .pipe(
+//           finalize(() => {
+//               this.hideMainSpinner();
+//           })
+//       )
+//       .subscribe(() => {
+//           this.notify.success(this.l("SuccessfullyConnected"));
+//           account.status = true;
+//       });
+// }
 
 
 

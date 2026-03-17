@@ -17,9 +17,9 @@ import { PostsModule } from '../posts/posts.module';
 import { AccordionModule } from 'primeng/accordion';
 import { PaginatorModule } from 'primeng/paginator';
 import { TableModule } from 'primeng/table';
-
-
-
+import { CalendarModule } from 'primeng/calendar';
+import { DialogModule } from 'primeng/dialog';
+import { TooltipModule } from 'primeng/tooltip';
 @NgModule({
     declarations: [
         EventsBrowseFiltersComponent,
@@ -42,10 +42,13 @@ import { TableModule } from 'primeng/table';
         FiltersSharedModule,
         eventsModule,
         BsDatepickerModule.forRoot(),
-        PostsModule
+        PostsModule,
+        CalendarModule,
+        DialogModule ,
+        TooltipModule
     ],
     exports:[
-        EventsBrowseComponent
+        EventsBrowseComponent,EventsBrowseCardComponent,EventsBrowseActionsMenuComponent
     ]
 })
 export class EventsBrowseModule { }

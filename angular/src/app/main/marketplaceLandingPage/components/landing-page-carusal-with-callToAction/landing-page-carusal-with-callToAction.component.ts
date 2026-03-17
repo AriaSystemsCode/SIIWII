@@ -50,7 +50,7 @@ export class LandingPageCarusalWithCallToActionComponent extends AppComponentBas
     getBlocksData(){
         this.SydObjectsServiceProxy
         .getAllSectionBlocks(
-          this.sectionId,        
+          this.sectionId, Intl.DateTimeFormat().resolvedOptions().timeZone       
         )
         .subscribe((res) => {
             this.sycLangingPageSetting = res

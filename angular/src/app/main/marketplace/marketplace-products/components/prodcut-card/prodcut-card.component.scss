@@ -20,7 +20,7 @@
         min-height: 104px;
 
         .ssin {
-            color: #B8B8B8;
+            color: #4A0D4A;
             font-size: 13px;
         }
     
@@ -85,7 +85,7 @@ font-weight: 700;
   .stars-outer {
     position: relative;
     display: inline-block;
-    font-size: 26px;
+    font-size: 16px;
     color: #ccc;
     line-height: 1;
   }
@@ -98,13 +98,20 @@ font-weight: 700;
     color: #F6851D;
     overflow: hidden;
   }
-
+.stars-inner-ar {
+  position: absolute;
+  top: 0;
+  right: 0;
+  white-space: nowrap;
+  color: #F6851D;
+  overflow: hidden;
+}
 
   .rateNum {
   
 
-  
-  
+  white-space: nowrap;
+  font-size: 12px;
     color: #1B101B;
   
   }

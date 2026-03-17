@@ -21,6 +21,10 @@ export class MarketplaceAccountProfileComponent extends AppComponentBase impleme
   loginAccoutType: string = "";
   paramsSubscription;
 
+  currentLang:string
+  isArabic:boolean 
+  isAuthenticated: boolean = false;
+
   constructor(
     injector: Injector,
     private route: ActivatedRoute,
@@ -31,7 +35,11 @@ export class MarketplaceAccountProfileComponent extends AppComponentBase impleme
     super(injector);
   }
 
-  ngOnInit(): void { }
+  ngOnInit(): void {
+    this.isAuthenticated = !!this.appSession?.user;
+    this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
+    this.currentLang == 'ar' || this.currentLang == 'ar-EG'  ? this.isArabic = true : this.isArabic = false
+   }
 
   ngAfterViewInit(): void {
     this.paramsSubscription = this.route.params.subscribe((params) => {

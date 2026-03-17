@@ -2622,6 +2622,87 @@
     <text name="ImportCustomprices">Import Custom prices</text>
 	<text name="Totalpassedprice">Total passed price </text>
 	<text name="Totalfailedprice">Total failed price</text>
-    <text name="NEWWWWS">NEWWWWS</text>
-	</texts>  
+	<text name="BussinessClassification">Bussiness Classification</text>
+	<text name="OverallRating">Overall Rating</text>
+	<text name="Media">Media</text>
+	<text name="RecentEvents">Recent Events</text>
+	<text name="Connections">Connections</text>
+	<text name="ForFullViewingOf">For full viewing of</text>
+	<text name="VisitVirtualShowroom">Visit Virtual Showroom</text>
+	<text name="RecentPosts">Recent Posts</text>
+	<text name="Reviews">Reviews</text>
+	<text name="Hide">Hide</text>
+	<text name="AccountLogo">Account Logo</text>
+	<text name="AccountCover">Account Cover</text>
+	<text name="Loading">Loading</text>
+	<text name="Filters">Filters</text>
+	<text name="CreatedBy">Created By</text>
+	<text name="Attendees">Attendees</text>
+	<text name="End">End</text>
+	<text name="By">By</text>
+	<text name="ChooseDate">Choose Date</text>
+	<text name="OnlyAvailableInStock">Only Available In Stock</text>
+	<text name="ClearFilter">Clear Filter</text>
+	<text name="Filter">Filter</text>
+	<text name="ClearAllFilters">Clear All Filters</text>
+	<text name="BackToResults">Back To Results</text>
+	<text name="MarketplaceProductDetailView">Marketplace Product Detail View</text>
+	<text name="OrderedSummary">Ordered Summary</text>
+	<text name="ProductOrderSummary">Product Order Summary</text>
+	<text name="AddToShoppingCart">Add To Shopping Cart</text>
+	<text name="BySize">By Size</text>
+	<text name="ByPrepack">By Prepack</text>
+	<text name="InStock">In Stock</text>
+	<text name="OutOfStock">Out Of Stock</text>
+	<text name="OrderBySize">Order By Size</text>
+	
+	<text name="Ordered">Ordered</text>
+	<text name="PrepackDefinition">Prepack Definition</text>
+	<text name="TotalPcs">Total Pcs</text>
+	<text name="Prepack">Prepack</text>
+	<text name="OrderByPrepack">Order by prepack</text>
+	<text name="AvailablePrepacks">Available Prepacks</text>
+	<text name="Department">Department</text>
+	<text name="Noitems ...">No items ...</text>
+	<text name="LoadingMoreRelatedProducts…">Loading more relatedproducts…</text>
+	<text name="Colors">Colors</text>
+	<text name="Summary">Summary</text>
+	<text name="SoldOutDate">SoldOut Date</text>
+	<text name="the price assigned to the ordered Items will be updated">the price assigned to the ordered
+                Items will be updated</text>
+	<text name="Okay">Okay</text>
+	<text name="This variation is already added to the order">This variation is already added to
+                the order</text>
+				<text name="you need to connect to this seller account , to be able to proceed">you need to connect to this seller account , to be able to proceed</text>
+	<text name="ConnectProceed">Connect and Proceed</text>
+	<text name="CustomersReviews">Customers Reviews</text>
+	<text name="CustomerQuestions">Customer Questions</text>
+	<text name="VerifiedPurchaser">Verified Purchaser</text>
+	<text name="OnlyOneImgOneVideo">Only one img or one video</text>
+	<text name="AccountAdmin">Account Admin</text>
+	<text name="ProfileOwner">Profile Owner</text>
+	<text name="NotVerifiedPurchaser">Not Verified Purchaser</text>
+	<text name="ReadMore">Read more</text>
+	<text name="ViewAllQuestions">View all questions</text>
+	<text name="OnlyOneReviewIsAllowed">Only one review is allowed!</text>
+	<text name="BasedOn">Based on</text>
+	<text name="Ratings">Ratings</text>
+	<text name="ViewAllReviews">View all reviews</text>
+	<text name="InviteContact">Invite Contact</text>
+	<text name="CreateBusinessAccount">Create Business Account</text>
+	<text name="CreateGroupAccount">Create Group Account</text>
+	<text name="BUSINESSAccount">Business Account</text>
+	<text name="PERSONALAccount">Personal Account</text>
+	<text name="GROUPAccount">Group Account</text>
+	<text name="OnlineEvent">Online Event</text>
+	<text name="InPersonEvent">InPerson Event</text>
+	<text name="BUSINESS">Business</text>
+	<text name="PERSONAL">Personal</text>
+	<text name="GROUP">Group</text>
+
+
+
+
+
+  </texts>  
 </localizationDictionary>

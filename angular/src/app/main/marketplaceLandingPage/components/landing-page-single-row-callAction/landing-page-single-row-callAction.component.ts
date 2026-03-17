@@ -1,10 +1,15 @@
-import { Component, Injector, Input, OnInit } from '@angular/core';
+import { Component, Injector, Input, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
-import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import {  SafeResourceUrl } from '@angular/platform-browser';
 import { AppComponentBase } from '@shared/common/app-component-base';
-import { PageSettingDto, SydObjectsServiceProxy, AppItemsServiceProxy, AppEntitiesServiceProxy } from '@shared/service-proxies/service-proxies';
+import { AccountsServiceProxy, PageSettingDto, SydObjectsServiceProxy} from '@shared/service-proxies/service-proxies';
 import { AppConsts } from '@shared/AppConsts';
-
+import { ViewEventComponent } from '@app/main/AppEvent/Components/view-event.component';
+import {  finalize } from 'rxjs';
+import { EventsBrowseComponentActionsMenuFlags } from '@app/main/AppEventsBrowse/models/EventsBrowseComponentActionsMenuFlags';
+import { EventsBrowseComponentStatusesFlags } from '@app/main/AppEventsBrowse/models/EventsBrowseComponentStatusesFlags';
+import { EventsBrowseActionsEvents } from '@app/main/AppEventsBrowse/models/Events-browse-inputs';
+import { BsModalRef, BsModalService, ModalOptions } from 'ngx-bootstrap/modal';
 type MediaKind = 'image' | 'video' | 'pdf' | 'other';
 
 @Component({
@@ -14,14 +19,23 @@ type MediaKind = 'image' | 'video' | 'pdf' | 'other';
 })
 export class LandingPageSinglrRowCallActionComponent extends AppComponentBase implements OnInit {
   @Input() sectionId!: number;
+   @Input()  blockTypeIsSingleOrMixed :string
+  @ViewChild("viewEventModal", { static: true }) viewEventModal: ViewEventComponent;
+bsModalRef: BsModalRef;
   items: PageSettingDto[] = [];
 
   attachmentBaseUrl = AppConsts.attachmentBaseUrl;
 
   attachmentSafeMap: Record<number, SafeResourceUrl | null> = {};
-  numVisible: number = 5;
+  numVisible: number = 4;
+  numVisibleSingle: number = 6;
+  
+      actionsMenuFlags :   EventsBrowseComponentActionsMenuFlags
+      statusesFlags :  EventsBrowseComponentStatusesFlags
   private objectUrlById: Record<number, string> = {};
   acceptedAspectRatio;
+      currentLang:string
+    isArabic:boolean 
   responsiveOptions = [
     {
       breakpoint: '1400px',
@@ -49,25 +63,68 @@ export class LandingPageSinglrRowCallActionComponent extends AppComponentBase im
       numScroll: 1
     }
   ];
-  currencyCode: string; 
+
+    responsiveOptionsSingle = [
+    {
+      breakpoint: '1400px',
+      numVisible: 6,
+      numScroll: 6
+    },
+    {
+      breakpoint: '1199px',
+      numVisible: 6,
+      numScroll: 6
+    },
+    {
+      breakpoint: '991px',
+      numVisible: 2,
+      numScroll: 2
+    },
+    {
+      breakpoint: '767px',
+      numVisible: 2,
+      numScroll: 2
+    },
+    {
+      breakpoint: '575px',
+      numVisible: 1,
+      numScroll: 1
+    }
+  ];
+
   languageSettingName:string  =AppConsts.languageSettingName;
-  showMsrP:boolean
+
   constructor(
     injector: Injector,
     private syd: SydObjectsServiceProxy,
     private router: Router,
-       private _AppEntitiesServiceProxy: AppEntitiesServiceProxy,
+    private _accountsServiceProxy: AccountsServiceProxy,
+      private _bsModalService: BsModalService
   ) { super(injector); }
 
   ngOnInit() {
-    this.initCurrencyCode();  
-  
+
+         this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
+        this.currentLang == 'ar' || this.currentLang == 'ar-EG'  ? this.isArabic = true : this.isArabic = false
 
     if (this.sectionId) {
       this.getBlocksData();
     }
   }
 
+  viewProduct(prod: any) {
+    const productBodyRequestForView = {
+        id: prod?.appItem?.id,
+        // currencyCode: this.currency,
+        sellerSSIN: prod?.sellerSSIN,
+        // buyerSSIN : this.buyerSSIN
+    };
+    localStorage.setItem("productData", JSON.stringify(productBodyRequestForView))
+    this.router.navigate(["/app/main/marketplace/products/view", prod?.appItem?.id]);
+  
+    // this.router.navigateByUrl(`/view/${id}`)
+  }
+  
   ngOnDestroy() {
     Object.values(this.objectUrlById).forEach(url => { try { URL.revokeObjectURL(url); } catch {} });
     this.objectUrlById = {};
@@ -83,7 +140,7 @@ export class LandingPageSinglrRowCallActionComponent extends AppComponentBase im
   }
 
   getBlocksData() {
-    this.syd.getAllSectionBlocks(this.sectionId).subscribe(res => {
+    this.syd.getAllSectionBlocks(this.sectionId,Intl.DateTimeFormat().resolvedOptions().timeZone).subscribe(res => {
       this.items = res ?? [];
 
 
@@ -117,42 +174,6 @@ export class LandingPageSinglrRowCallActionComponent extends AppComponentBase im
     (evt.target as HTMLImageElement).src = '/assets/placeholders/_logo-placeholder.png';
   }
 
-  // ---------- PDF handling via Base64 API -> blob -> SafeResourceUrl ----------
-  // private async ensurePdfSafeUrl(b: PageSettingDto) {
-  //   if (!b?.id || !this.isPdf(b.image)) return;
-
-  //   // already prepared
-  //   if (this.attachmentSafeMap[b.id]) return;
-
-  //   const url = this.fullUrl(b.image);
-
-  //   try {
-  //     // Ask your backend to fetch and return base64 string from URL (same API you already use)
-  //     const base64 = await this.appItems.getFile64FromUrl(url).toPromise();
-
-  //     // normalize possible "data:...;base64,..." format
-  //     const raw = (base64 && base64.includes(',')) ? base64.split(',')[1] : base64;
-  //     const bytes = atob(raw);
-  //     const arr = new Uint8Array(bytes.length);
-  //     for (let i = 0; i < bytes.length; i++) arr[i] = bytes.charCodeAt(i);
-
-  //     const blob = new Blob([arr], { type: 'application/pdf' });
-
-  //     // revoke old URL if any
-  //     const old = this.objectUrlById[b.id];
-  //     if (old) { try { URL.revokeObjectURL(old); } catch {} }
-
-  //     const objUrl = URL.createObjectURL(blob);
-  //     this.objectUrlById[b.id] = objUrl;
-
-  //     this.attachmentSafeMap[b.id] = this.sanitizer.bypassSecurityTrustResourceUrl(objUrl);
-  //   } catch {
-  //     // Final fallback: direct URL (requires server to allow frame-ancestors)
-  //     this.attachmentSafeMap[b.id] = this.sanitizer.bypassSecurityTrustResourceUrl(url);
-  //   }
-  // }
-
-  // ---------- navigation ----------
   goToBrand(brand) {
    
     this.router.navigate(
@@ -160,11 +181,11 @@ export class LandingPageSinglrRowCallActionComponent extends AppComponentBase im
         { queryParams: { brand: brand?.getAppEntityForViewDto?.appEntity?.id } } 
     );
 }
-goToCategory(cat: { name: string; id: number | string }) {
+goToCategory(id) {
    
   this.router.navigate(
       ['/app/main/marketplace/products'],
-      { queryParams: { cat: cat.id } }  
+      { queryParams: { cat: id } }  
   );
 }
 
@@ -201,18 +222,6 @@ goToCategory(cat: { name: string; id: number | string }) {
       });
   }
 
-viewProduct(prod: any) {
-  const productBodyRequestForView = {
-      id: prod?.appItem?.id,
-      // currencyCode: this.currency,
-      sellerSSIN: prod?.sellerSSIN,
-      // buyerSSIN : this.buyerSSIN
-  };
-  localStorage.setItem("productData", JSON.stringify(productBodyRequestForView))
-  this.router.navigate(["/app/main/marketplace/products/view", prod?.appItem?.id]);
-
-  // this.router.navigateByUrl(`/view/${id}`)
-}
 
 
 getAttachmentImage(b: PageSettingDto): string | null {
@@ -286,49 +295,132 @@ onAttachmentClick(b: PageSettingDto): void {
   window.open(finalUrl, '_blank');
 }
 
-private initCurrencyCode(): void {
-  // 1) try localStorage("currencyCode")
-  const stored = localStorage.getItem('currencyCode');
+createRelation(account,option: { connectLabel: string; connectionEntityId: number; defaultVisibility: string }) {
+  if (!option?.connectionEntityId) return;
 
-  if (stored && stored !== 'undefined' && stored !== 'null') {
-    try {
-      const parsed = JSON.parse(stored);
+  this.showMainSpinner();
 
-      // stored as "GBP"
-      if (typeof parsed === 'string' && parsed.trim()) {
-        this.currencyCode = parsed.trim();
-        return;
-      }
+  this._accountsServiceProxy
+    .applyRelationOnProfile(
+      account?.account?.id,
+      undefined,
+      (option.defaultVisibility || '').toLowerCase() === 'public',
+      option.connectionEntityId
+    )
+    .pipe(finalize(() => this.hideMainSpinner()))
+    .subscribe((result: any) => {
 
-      // stored as { code: "GBP", ... }
-      if (parsed && typeof parsed === 'object' && parsed.code) {
-        this.currencyCode = parsed.code;
-        return;
-      }
-    } catch {
-      // not JSON, maybe raw 'GBP'
-      if (stored.trim()) {
-        this.currencyCode = stored.trim();
-        return;
-      }
-    }
-  }
+      const raw = (typeof result === 'string' ? result : result?.result) || '';
+      const parsed = this.parseRelationResult(raw);
 
-  // 2) fallback to tenant default currency from AppComponentBase
-  if ((this as any).tenantDefaultCurrency?.code) {
-    this.currencyCode = (this as any).tenantDefaultCurrency.code;
-    return;
-  }
-
-  // 3) last fallback
-  this.currencyCode = 'USD';
+      account.availableConnections = [];
+      account.avaliableConnectionName = '';
+     account.connectionName = parsed.connectionName;  
+      account.disConnectLabel = parsed.disconnectLabel;    
+    });
 }
-getSettingData(){
-  this._AppEntitiesServiceProxy.getHostSettingValue(1214, null)
-  .subscribe((result) => {
-    this.showMsrP = result?.toString().toLowerCase() =='yes' ? true : false;
 
-  });
+disconnect(account): void {
+  const id = account?.account?.id;
+  if (!id) return;
 
+  this.showMainSpinner();
+
+  this._accountsServiceProxy
+    .disconnect(id)
+    .pipe(finalize(() => this.hideMainSpinner()))
+    .subscribe((res: any[]) => {
+      this.notify.success(this.l('SuccessfullyDisconnected'));
+
+
+      const options = Array.isArray(res) ? res : [];
+      account.connectionName = '';
+      account.disConnectLabel = '';
+      account.availableConnections = options;
+      account.avaliableConnectionName = options?.[0]?.connectLabel || '';
+    });
+}
+private parseRelationResult(raw: string): { connectionName: string; disconnectLabel: string } {
+  const text = (raw || '').trim();
+
+  const idx = text.indexOf('-');
+  const connectionName = idx > -1 ? text.slice(0, idx).trim() : text;
+  const disconnectLabel = idx > -1 ? text.slice(idx + 1).trim() : 'MPActionDisconnect';
+
+  return { connectionName, disconnectLabel };
+}
+  openEventDetails(id: any) {
+  
+        this.viewEventModal.show(id,0);
+
+  }
+
+getBlockTypeLabel(block) {
+  let t  = (block.blockType).toUpperCase();
+
+  switch (t) {
+    case 'EVENT':
+     if(block?.getAppEventForViewDto?.appEvent?.isOnLine){
+      return 'Online Event' 
+      }else{
+         return 'In person Event' 
+        
+      }
+    case 'CONTACT':
+        if(block?.getAccountForViewDto?.account?.accountType == 'BUSINESS'){
+        return 'Business Account'
+      } else  if(block?.getAccountForViewDto?.account?.accountType == 'PERSONAL'){
+           return 'Personal Account'
+
+      }else {
+    return 'Group Account'
+
+      }
+   
+    case 'PRODUCT':
+      return 'Product';
+    case 'ATTACHMENT':
+      return 'Link';
+    case 'BRAND':
+      return 'Brand';
+    case 'CATEGORY':
+      return 'Category';
+    default:
+      return 'Block';
+  }
+}
+
+getBlockTypeIcon(block) {
+  const t = (block.blockType).toUpperCase();
+
+  switch (t) {
+    case 'EVENT':
+      if(block?.getAppEventForViewDto?.appEvent?.isOnLine == true){
+      return 'fas fa-video' 
+      }else{
+      return 'fas fa-map-marker-alt';
+        
+      }
+    case 'CONTACT':
+      if(block?.getAccountForViewDto?.account?.accountType == 'BUSINESS'){
+        return 'fas fa-building'
+      } else  if(block?.getAccountForViewDto?.account?.accountType == 'PERSONAL'){
+      return 'fas fa-user';
+
+      }else {
+      return 'fas fa-users';
+
+      }
+    case 'PRODUCT':
+      return 'fas fa-shopping-bag';
+    case 'ATTACHMENT':
+      return 'fas fa-paperclip';
+    case 'BRAND':
+      return 'fas fa-tag';
+    case 'CATEGORY':
+      return 'fas fa-th-large';
+    default:
+      return 'fas fa-square';
+  }
 }
 }

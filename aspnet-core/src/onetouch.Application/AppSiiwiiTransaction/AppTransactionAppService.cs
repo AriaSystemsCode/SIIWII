@@ -2620,7 +2620,7 @@ namespace onetouch.AppSiiwiiTransaction
                         var appContactSeller = _appContactRepository.GetAll().Include(e => e.EntityFk).ThenInclude(e => e.EntityAttachments)
                                 .ThenInclude(x => x.AttachmentFk)
                          .Where(e => e.SSIN == TransactionIdFk.SellerCompanySSIN).FirstOrDefault();
-                        objReturn.SellerId = appContactSeller.Id;
+                        //item?.appEvent?.nameobjReturn.SellerId = appContactSeller.Id;
                         var entitySeller = appContactSeller.EntityFk;
                         if (entitySeller.EntityAttachments.Count() > 0)
                         {

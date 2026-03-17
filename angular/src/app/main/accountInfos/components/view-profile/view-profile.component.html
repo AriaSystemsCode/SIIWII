@@ -142,7 +142,7 @@
 
                             <div class="form-group row mt-2" *ngIf='personalAccount && Editting'>
                                 <label for="colFormLabelSm"
-                                    class="col-sm-2 col-form-label col-form-label-sm label-form">{{l("Account Logo")}}
+                                    class="col-sm-2 col-form-label col-form-label-sm label-form">{{l("AccountLogo")}}
                                 </label>
                                 <app-image-upload [sycAttachmentCategory]="sycAttachmentCategoryLogo"
                                     [image]="companyLogo" [staticWidth]="170" [showGuidelines]="true"
@@ -247,7 +247,7 @@
                             </div>
 
                             <div class="col-4" *ngIf="accountData && accountData.code">
-                                <p class="title-dev-slider text-left">{{"Account Code" | localize}}</p>
+                                <p class="title-dev-slider text-left">{{"AccountCode" | localize}}</p>
                             </div>
                         </div>
 
@@ -305,11 +305,11 @@
 
                         <div class="row p-28">
                             <div class="col-4" *ngIf="accountData && accountData.shipViaName">
-                                <p class="title-dev-slider text-left pl-5">{{"Ship Via" | localize}}</p>
+                                <p class="title-dev-slider text-left pl-5">{{"ShipVia" | localize}}</p>
                             </div>
 
                             <div class="col-4" *ngIf="accountData && accountData.paymentTermsName">
-                                <p class="title-dev-slider text-left">{{"Payment Terms" | localize}}</p>
+                                <p class="title-dev-slider text-left">{{"PaymentTerms" | localize}}</p>
                             </div>
                         </div>
 

@@ -585,7 +585,7 @@ span.p-tabview-title {
     border-radius: 8px !important;
     margin-right: -11px;
     border-right: none;
-    padding-right: 0 !important;
+    // padding-right: 0 !important;
     
 }
 
@@ -654,6 +654,15 @@ border: 1px solid #D9D9D9 !important;
 border: 1px solid #D9D9D9 !important;
 }
 ::ng-deep {
+    .p-paginator .p-dropdown .p-dropdown-label {
+        padding-right:  auto !important;
+    }
+    .p-paginator .p-dropdown {
+  
+        height: 2.357rem !important;
+    }
+    
+    b
     .primeng-datatable-container .primeng-paging-container .p-paginator .p-paginator-rpp-options {
         margin-left: 0 !important;
     }
@@ -793,8 +802,8 @@ html{
   }
 .p-checkbox .p-checkbox-box .p-icon {
     position: relative;
-    left: 0%;
-    right: 40%;
+    // left: 0%;
+    // right: 40%;
 }
 
  .nav-tabs {
@@ -838,8 +847,8 @@ html{
     overflow-y: auto !important;
 .p-checkbox .p-checkbox-box .p-icon {
     position: relative;
-    left: 10%;
-    right: 10%;
+    // left: 40%;
+    // right: 40%;
 }
 }
 
@@ -880,9 +889,3 @@ th.sticky-header {
 searchicon {
     padding-top: 15%;
 }
-
-.is-disabled {
-    pointer-events: none;
-    cursor: not-allowed !important; 
-    opacity: 1;
-  }

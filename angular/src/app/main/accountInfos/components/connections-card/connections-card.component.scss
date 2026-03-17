@@ -51,7 +51,8 @@
 .relation_Status_button{
   white-space: nowrap;
   position: absolute;
-  right: 5px;cursor: auto;
+  // right: 5px;
+  cursor: auto;
   bottom: 5px !important;
   padding: 8px !important;
     img {
@@ -62,13 +63,21 @@
 .relation_button {
   white-space: nowrap;
   position: absolute;
-  right: 5px;
   bottom: 5px;
     img {
       width: 20px;
     }
 }
 
+.relation-en {
+  right: 5px;
+
+}
+
+.relation-ar {
+  left: 4px;
+
+}
 .accountType_label {
   min-width: 115px;
 }
@@ -89,5 +98,5 @@
 }
 
 .accTpye {
-  white-space: pre-wrap !important;
+  white-space: nowrap !important;
 }

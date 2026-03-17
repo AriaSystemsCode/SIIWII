@@ -37,6 +37,14 @@ using Org.BouncyCastle.Crypto;
 using onetouch.Migrations;
 using Abp.Net.Mail;
 using System.Net.Mail;
+using onetouch.AppEvents.Dtos;
+using onetouch.AppEvents;
+using onetouch.AppMarketplaceAccounts;
+using onetouch.AppMarketplaceContacts;
+using onetouch.AppMarketplaceItems.Dtos;
+using Abp.EntityFrameworkCore.Uow;
+using onetouch.EntityFrameworkCore;
+using DocumentFormat.OpenXml.Spreadsheet;
 
 namespace onetouch.SystemObjects
 {
@@ -65,14 +73,20 @@ namespace onetouch.SystemObjects
         private readonly IRepository<SycEntityObjectCategory, long> _sycEntityObjectCategoryRepository;
         private readonly IEmailSender _emailSender;
         //I49[End]
+        //I50[Start]
+        private readonly IAppEventsAppService _appEventsAppService;
+        private readonly IRepository<AppEvent, long> _appEventRepository;
+        private readonly IMarketplaceAccountsAppService _MarketplaceAccountsAppService;
+        private readonly IRepository<AppMarketplaceContact, long> _appMarketplaceContactRepository;
+        //I50[End]
         public SydObjectsAppService(
             IRepository<SydObject, long> sydObjectRepository,
-            ISydObjectsExcelExporter sydObjectsExcelExporter ,
-            IRepository<SysObjectType, long> lookup_sysObjectTypeRepository, 
-            IRepository<SydObject, long> lookup_sydObjectRepository, 
-            IRepository<SycEntityObjectType, long> sycEntityObjectType, 
-            Helper helper, 
-            IRepository<AppEntity, long> appEntityRepository, 
+            ISydObjectsExcelExporter sydObjectsExcelExporter,
+            IRepository<SysObjectType, long> lookup_sysObjectTypeRepository,
+            IRepository<SydObject, long> lookup_sydObjectRepository,
+            IRepository<SycEntityObjectType, long> sycEntityObjectType,
+            Helper helper,
+            IRepository<AppEntity, long> appEntityRepository,
             IRepository<AppEntityExtraData, long> appEntityExtraDataRepository,
             IAppConfigurationAccessor appConfigurationAccessor,
             IAppAdvertisementsAppService appAdvertisementsAppService,
@@ -81,7 +95,9 @@ namespace onetouch.SystemObjects
             IRepository<onetouch.SycCurrencyExchangeRates.SycCurrencyExchangeRates, long> sycCurrencyExchangeRateRepository,
             IMessageAppService messageAppService, ISycEntityObjectCategoriesAppService sycEntityObjectCategoriesAppService,
             IAccountsAppService accountsAppService, IRepository<AppContact, long> appContactRepository,
-            IRepository<SycEntityObjectCategory, long> sycEntityObjectCategoryRepository, IEmailSender emailSender) 
+            IRepository<SycEntityObjectCategory, long> sycEntityObjectCategoryRepository, IEmailSender emailSender, IAppEventsAppService appEventsAppService,
+            IRepository<AppEvent, long> appEventRepository, IMarketplaceAccountsAppService marketplaceAccountsAppService,
+            IRepository<AppMarketplaceContact, long> appMarketplaceContactRepository) 
 		  {
 			_sydObjectRepository = sydObjectRepository;
 			_sydObjectsExcelExporter = sydObjectsExcelExporter;
@@ -105,6 +121,12 @@ namespace onetouch.SystemObjects
             _appContactRepository = appContactRepository;
             _emailSender = emailSender;
             //I49[End]
+            //I50[start]
+            _appEventsAppService= appEventsAppService;
+            _appEventRepository = appEventRepository;
+            _MarketplaceAccountsAppService = marketplaceAccountsAppService;
+            _appMarketplaceContactRepository = appMarketplaceContactRepository;
+            //I50[End]
         }
 
         public async Task<PagedResultDto<TreeNode<GetSydObjectForViewDto>>> GetAll(GetAllSydObjectsInput input)
@@ -475,6 +497,12 @@ namespace onetouch.SystemObjects
                                 
                             }
                         }
+                        item.BlockTypeIsSingleOrMixed = null;
+                        var sectionBlockTypeExtraDate = section.EntityExtraData.FirstOrDefault(z => z.AttributeId == 1009);
+                        if (sectionBlockTypeExtraDate != null && !string.IsNullOrEmpty(sectionBlockTypeExtraDate.AttributeValue))   
+                        {
+                            item.BlockTypeIsSingleOrMixed = sectionBlockTypeExtraDate.AttributeValue;
+                        }
                         item.Name = section.Name;
                         item.Description = section.Name;
                         item.Code = section.Code;
@@ -502,13 +530,189 @@ namespace onetouch.SystemObjects
         }
         //I49[Start]
         [AbpAllowAnonymous]
-        public async Task<List<PageSettingDto>> GetAllSectionBlocks(long sectionId)
+        public async Task<List<PageSettingDto>> GetAllSectionBlocks(long sectionId, string? timeZone)
         {
             string imagesUrl = _appConfiguration[$"Attachment:Path"].Replace(_appConfiguration[$"Attachment:Omitt"], "") + @"/";
             List<PageSettingDto> result = new List<PageSettingDto>();
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
             {
+                //I50[Start]
                 var sectionActiveStatusId = await _helper.SystemTables.GetEntityObjectStatusActiveLookup();
+                var sectionObjectId = await _helper.SystemTables.GetObjectSectionId();
+                var sectionObject = await _appEntityRepository.GetAll().Include(z=>z.EntityExtraData).Where(z => z.Id == sectionId &&
+                z.EntityObjectTypeId == sectionObjectId && z.EntityObjectStatusId == sectionActiveStatusId).FirstOrDefaultAsync();
+                string entityType = "";
+                string entityFilterCondition = "";
+                string entitySortBy = null;
+                if (sectionObject != null)
+                {
+                    var extradataEntity = sectionObject.EntityExtraData.Where(z => z.AttributeId == 1006).FirstOrDefault();
+                    if (extradataEntity != null && !string.IsNullOrEmpty(extradataEntity.AttributeValue))
+                    {
+                        entityType = extradataEntity.AttributeValue;
+                        var extradataEntityCondition = sectionObject.EntityExtraData.Where(z => z.AttributeId == 1007).FirstOrDefault();
+                        if (extradataEntityCondition != null && !string.IsNullOrEmpty(extradataEntityCondition.AttributeValue))
+                        {
+                            entityFilterCondition = extradataEntityCondition.AttributeValue;
+                        }
+                        var extradataEntitySort = sectionObject.EntityExtraData.Where(z => z.AttributeId == 1008).FirstOrDefault();
+                        if (extradataEntitySort != null && !string.IsNullOrEmpty(extradataEntitySort.AttributeValue))
+                        {
+                            entitySortBy = extradataEntitySort.AttributeValue;
+                        }
+                    }
+                }
+                if (!string.IsNullOrEmpty(entityType))
+                {
+                    switch (entityType)
+                    {
+                        case "PRODUCT":
+                            GetAllAppMarketItemsInput inputDto = new GetAllAppMarketItemsInput();
+                            inputDto.MaxResultCount = 10;
+                            inputDto.FilterCondition = entityFilterCondition;
+                            inputDto.Sorting = entitySortBy;
+                            if (AbpSession.TenantId == null)
+                                inputDto.SharingLevel = SharingLevels.Public;
+                            else
+                                inputDto.SharingLevel = SharingLevels.PublicAndSharedWithMe;
+
+                            inputDto.Brands = null;
+                            inputDto.departmentFilters = null;
+                            inputDto.CategoryFilters = null;
+                            //inputDto.CurrencyCode = "USD";
+                            inputDto.SelectorOnly = false;
+                            var products = await _appMarketplaceItemsAppService.GetAll(inputDto);
+                            if (products != null && products.Items != null && products.Items.Count > 0)
+                            {
+
+                                foreach (var pr in products.Items)
+                                {
+                                    var item = new PageSettingDto();
+                                    item.BlockType = "PRODUCT";
+                                    item.GetAppMarketItemForViewDto = pr;// await _appMarketplaceItemsAppService.GetAppMarketplaceViewData(pr.AppItem.SSIN, null);
+                                    result.Add(item);
+                                }
+                            }
+
+                            break;
+                        case "CONTACT":
+                            GetAllAccountsInput inputContactDto = new GetAllAccountsInput();
+                            inputContactDto.MaxResultCount = 10;
+                            inputContactDto.FilterCondition = entityFilterCondition;
+                            inputContactDto.Sorting = entitySortBy;
+                            var contacts = await _MarketplaceAccountsAppService.GetAll(inputContactDto);
+                            if (contacts != null && contacts.Items != null & contacts.Items.Count > 0)
+                            {
+
+                                foreach (var pr in contacts.Items)
+                                {
+                                    var item = new PageSettingDto();
+                                    item.BlockType = "CONTACT";
+                                    item.GetAccountForViewDto = await _MarketplaceAccountsAppService.GetAccountForView(int.Parse(pr.Account.Id.ToString()), pr.Account.SSIN, 1);
+                                    //ObjectMapper.Map<GetAccountForViewDto>( pr);// await _appMarketplaceItemsAppService.GetAppMarketplaceViewData(pr.AppItem.SSIN, null);
+                                    result.Add(item);
+                                }
+                            }
+                            break;
+                        case "EVENT":
+                            GetAllAppEventsInput inputEventDto = new GetAllAppEventsInput();
+                            inputEventDto.MaxResultCount = 10;
+                            inputEventDto.FilterCondition = entityFilterCondition;
+                            inputEventDto.Sorting = entitySortBy;
+                            var Events = await _appEventsAppService.GetAll(inputEventDto);
+                            if (Events != null && Events.Items != null && Events.Items.Count > 0)
+                            {
+
+                                foreach (var pr in Events.Items)
+                                {
+                                    var item = new PageSettingDto();
+                                    item.BlockType = "EVENT";
+                                    item.GetAppEventForViewDto = pr;// await _appMarketplaceItemsAppService.GetAppMarketplaceViewData(pr.AppItem.SSIN, null);
+                                    result.Add(item);
+                                }
+                            }
+                            break;
+                        case "CATEGORY":
+                            GetAllSycEntityObjectCategoriesInput inputCategoryDto = new GetAllSycEntityObjectCategoriesInput();
+                            inputCategoryDto.MaxResultCount = 10;
+                            inputCategoryDto.FilterCondition = entityFilterCondition;
+                            inputCategoryDto.Sorting = entitySortBy;
+                            inputCategoryDto.DepartmentFlag = false;
+                            var itemId = await _helper.SystemTables.GetObjectItemId();
+                            inputCategoryDto.ObjectId = itemId;
+                            var categories = await _sycEntityObjectCategoriesAppService.GetAll(inputCategoryDto);
+                            //var category = await _sycEntityObjectCategoryRepository.GetAll().Where(z => z.Code == blockValueExtraDate.AttributeValue).FirstOrDefaultAsync();
+
+                            if (categories != null)
+                            {
+                                foreach (var cat in categories.Items)
+                                {
+                                    var item = new PageSettingDto();
+                                    item.BlockType = "CATEGORY";
+                                    
+                                    item.GetSycEntityObjectCategoryForViewDto = cat.Data;// await _appMarketplaceItemsAppService.GetAppMarketplaceViewData(pr.AppItem.SSIN, null);
+                                    result.Add(item);
+                                    //item.GetSycEntityObjectCategoryForViewDto = await _sycEntityObjectCategoriesAppService.GetSycEntityObjectCategoryForView(int.Parse(category.Id.ToString()));
+                                }
+                            }
+                    
+                            break;
+                        //I50,Brand[start]
+                        case "BRAND":
+                            var brandObjectId = await _helper.SystemTables.GetObjectBrandId();
+                            var contxt = UnitOfWorkManager.Current.GetDbContext<onetouchDbContext>(null, null);
+                            List<AppEntity> filteredBrands = null;
+                            if (!string.IsNullOrEmpty(entityFilterCondition))
+                            {
+                                var filterCondition = Helper.ApplyJsonFilter<AppEntity>(entityFilterCondition);
+                                if (filterCondition != null)
+                                    filteredBrands = await contxt.AppEntities.Where(filterCondition)
+                                        .Where(z => z.EntityObjectTypeId == brandObjectId).OrderBy(entitySortBy ?? "id asc")
+                                        .Take(10).ToListAsync();
+
+                            }
+                            else
+                            {
+                                filteredBrands = await contxt.AppEntities
+                                .Where(z => z.EntityObjectTypeId == brandObjectId).OrderBy(entitySortBy ?? "id asc")
+                                .Take(10).ToListAsync();
+                            }
+                            if (filteredBrands != null && filteredBrands.Count() > 0)
+                            {
+                                foreach (var br in filteredBrands)
+                                {
+                                    var brandObject = await _appEntityRepository.GetAll().Include(x => x.EntityAttachments).ThenInclude(x => x.AttachmentFk)
+                                        .Where(z => z.Id == br.Id).FirstOrDefaultAsync();
+                                    if (brandObject != null)
+                                    {
+                                        var item = new PageSettingDto();
+                                        item.BlockType = "BRAND";
+                                        item.GetAppEntityForViewDto = await _appEntitiesAppService.GetAppEntityForView(brandObject.Id);
+                                        {
+                                            if (brandObject.EntityAttachments != null && brandObject.EntityAttachments.Count > 0)
+                                            {
+
+                                                item.GetAppEntityForViewDto.AppEntity.EntityAttachments = ObjectMapper.Map<List<AppEntityAttachmentDto>>(brandObject.EntityAttachments);
+                                                foreach (var attDto in item.GetAppEntityForViewDto.AppEntity.EntityAttachments)
+                                                {
+                                                    attDto.FileName = imagesUrl + (brandObject.TenantId == null ? "-1" : brandObject.TenantId.ToString()) + @"/" + attDto.FileName;
+                                                    attDto.Url = attDto.FileName;
+                                                }
+                                            }
+                                        }
+                                        result.Add(item);
+                                    }
+                                }
+                            }
+                            break;
+                            //I50,Brand[End]
+                    }
+
+                }
+                else
+                { 
+                //I50[End]
+                //var sectionActiveStatusId = await _helper.SystemTables.GetEntityObjectStatusActiveLookup();
                 var sectionBlockId = await _helper.SystemTables.GetObjectBlockId();
                 var extraDataBlocks = await _appEntityExtraDataRepository.GetAll()
                      //Include(x => x.EntityFk).ThenInclude(z=>z.EntityExtraData)
@@ -521,135 +725,144 @@ namespace onetouch.SystemObjects
                     
                     //if (allSections != null && allSections.Count > 0)
                     {
-                        foreach (var block in extraDataBlocks)
-                        {
-                            var blockDetail = await _appEntityRepository.GetAll().Include(z => z.EntityExtraData)
-                                .Include(z => z.EntityAttachments).ThenInclude(z => z.AttachmentFk)
-                                .Where(z => z.Id == block.EntityId).FirstOrDefaultAsync();
-                            if (blockDetail == null)
-                                continue;
-                            if(blockDetail.EntityObjectStatusId != sectionActiveStatusId)
-                                continue;
-                            var item = new PageSettingDto();
-                            var sectionOrderExtraDate = blockDetail.EntityExtraData.FirstOrDefault(z => z.AttributeId == 2002);
-                            if (sectionOrderExtraDate != null)
-                                item.Order = int.Parse(sectionOrderExtraDate.AttributeValue);
-
-                            var linkExtraData = block.EntityFk.EntityExtraData.FirstOrDefault(z => z.AttributeId == 2004);
-                            if (linkExtraData != null)
-                                item.LinkPageUrl = linkExtraData.AttributeValue;
-
-                            item.Type = SliderEnum.SM;
-                            item.Name = blockDetail.Name;
-                            //item.Description = block.EntityFk.Name;
-                            item.Code = blockDetail.Code;
-                            item.Description = blockDetail.Notes;
-
-                            if (blockDetail.EntityAttachments != null && blockDetail.EntityAttachments.Count > 0)
+                            foreach (var block in extraDataBlocks)
                             {
-                                item.Image = (blockDetail.EntityAttachments.FirstOrDefault(x => x.IsDefault == true) == null ?
-                                           (blockDetail.EntityAttachments.FirstOrDefault() != null ? "attachments/" + (blockDetail.TenantId.HasValue ? block.EntityFk.TenantId : -1) + "/" +
-                                           blockDetail.EntityAttachments.FirstOrDefault().AttachmentFk.Attachment : "")
-                                           : "attachments/" + (blockDetail.TenantId.HasValue ? blockDetail.TenantId : -1) + "/" +
-                                           blockDetail.EntityAttachments.FirstOrDefault(x => x.IsDefault == true).AttachmentFk.Attachment);
-                                item.EntityAttachments = ObjectMapper.Map<List<AppEntityAttachmentDto>>(blockDetail.EntityAttachments);
-                                foreach (var attDto in item.EntityAttachments)
+                                var blockDetail = await _appEntityRepository.GetAll().Include(z => z.EntityExtraData)
+                                    .Include(z => z.EntityAttachments).ThenInclude(z => z.AttachmentFk)
+                                    .Where(z => z.Id == block.EntityId).FirstOrDefaultAsync();
+                                if (blockDetail == null)
+                                    continue;
+                                if (blockDetail.EntityObjectStatusId != sectionActiveStatusId)
+                                    continue;
+                                var item = new PageSettingDto();
+                                var sectionOrderExtraDate = blockDetail.EntityExtraData.FirstOrDefault(z => z.AttributeId == 2002);
+                                if (sectionOrderExtraDate != null)
+                                    item.Order = int.Parse(sectionOrderExtraDate.AttributeValue);
+
+                                var linkExtraData = block.EntityFk.EntityExtraData.FirstOrDefault(z => z.AttributeId == 2004);
+                                if (linkExtraData != null)
+                                    item.LinkPageUrl = linkExtraData.AttributeValue;
+
+                                item.Type = SliderEnum.SM;
+                                item.Name = blockDetail.Name;
+                                //item.Description = block.EntityFk.Name;
+                                item.Code = blockDetail.Code;
+                                item.Description = blockDetail.Notes;
+
+                                if (blockDetail.EntityAttachments != null && blockDetail.EntityAttachments.Count > 0)
                                 {
-                                    attDto.FileName = imagesUrl + (blockDetail.TenantId == null ? "-1" : blockDetail.TenantId.ToString()) + @"/" + attDto.FileName;
-                                    attDto.Url = attDto.FileName;
-                                }
-                            }
-                            item.id = blockDetail.Id;
-
-                            var blockTypeExtraDate = blockDetail.EntityExtraData.FirstOrDefault(z => z.AttributeId == 2001);
-                            if (blockTypeExtraDate != null)
-                            {
-                                var blockType=  await _appEntityRepository.GetAll().Where(z => z.Id == blockTypeExtraDate.AttributeValueId).FirstOrDefaultAsync();
-                                if (blockType != null) {
-                                    item.BlockType = blockType.Name;
-                                }
-                            }
-                            var linkExtraDate = blockDetail.EntityExtraData.FirstOrDefault(z => z.AttributeId == 2004);
-                            if (linkExtraDate != null)
-                            {
-                              item.Link= linkExtraDate.AttributeValue;
-                            }
-                            var buttonTxtExtraDate = blockDetail.EntityExtraData.FirstOrDefault(z => z.AttributeId == 2006);
-                            if (buttonTxtExtraDate != null)
-                            {
-                                item.ButtonText = buttonTxtExtraDate.AttributeValue;
-                            }
-                            
-                            var blockValueExtraDate = blockDetail.EntityExtraData.FirstOrDefault(z => z.AttributeId == 2003);
-                            if (blockValueExtraDate != null)
-                            {
-                                if (!string.IsNullOrEmpty(blockValueExtraDate.AttributeValue)) // Block value 
-                                {
-
-                                    switch (item.BlockType.ToUpper())
+                                    item.Image = (blockDetail.EntityAttachments.FirstOrDefault(x => x.IsDefault == true) == null ?
+                                               (blockDetail.EntityAttachments.FirstOrDefault() != null ? "attachments/" + (blockDetail.TenantId.HasValue ? block.EntityFk.TenantId : -1) + "/" +
+                                               blockDetail.EntityAttachments.FirstOrDefault().AttachmentFk.Attachment : "")
+                                               : "attachments/" + (blockDetail.TenantId.HasValue ? blockDetail.TenantId : -1) + "/" +
+                                               blockDetail.EntityAttachments.FirstOrDefault(x => x.IsDefault == true).AttachmentFk.Attachment);
+                                    item.EntityAttachments = ObjectMapper.Map<List<AppEntityAttachmentDto>>(blockDetail.EntityAttachments);
+                                    foreach (var attDto in item.EntityAttachments)
                                     {
-                                        case "PRODUCT":
-                                            item.GetAppMarketItemForViewDto = await _appMarketplaceItemsAppService.GetAppMarketplaceViewData(blockValueExtraDate.AttributeValue, null);
-                                            break;
-                                        case "BRAND":
-                                            var contactSSINExtraData = blockDetail.EntityExtraData.FirstOrDefault(z => z.AttributeId == 2007);
-                                            if (contactSSINExtraData != null)
-                                            {
-                                                var contactSSIN = contactSSINExtraData.AttributeValue;
-                                                var account = await _appContactRepository.GetAll().AsNoTracking()
-                                                    .Where(a => a.SSIN == contactSSIN.TrimEnd() && a.IsProfileData == true &&
-                                                    a.TenantId != null && a.PartnerId == null && a.ParentId == null).FirstOrDefaultAsync();
-                                                if (account != null)
+                                        attDto.FileName = imagesUrl + (blockDetail.TenantId == null ? "-1" : blockDetail.TenantId.ToString()) + @"/" + attDto.FileName;
+                                        attDto.Url = attDto.FileName;
+                                    }
+                                }
+                                item.id = blockDetail.Id;
+
+                                var blockTypeExtraDate = blockDetail.EntityExtraData.FirstOrDefault(z => z.AttributeId == 2001);
+                                if (blockTypeExtraDate != null)
+                                {
+                                    var blockType = await _appEntityRepository.GetAll().Where(z => z.Id == blockTypeExtraDate.AttributeValueId).FirstOrDefaultAsync();
+                                    if (blockType != null)
+                                    {
+                                        item.BlockType = blockType.Name;
+                                    }
+                                }
+                                var linkExtraDate = blockDetail.EntityExtraData.FirstOrDefault(z => z.AttributeId == 2004);
+                                if (linkExtraDate != null)
+                                {
+                                    item.Link = linkExtraDate.AttributeValue;
+                                }
+                                var buttonTxtExtraDate = blockDetail.EntityExtraData.FirstOrDefault(z => z.AttributeId == 2006);
+                                if (buttonTxtExtraDate != null)
+                                {
+                                    item.ButtonText = buttonTxtExtraDate.AttributeValue;
+                                }
+
+                                var blockValueExtraDate = blockDetail.EntityExtraData.FirstOrDefault(z => z.AttributeId == 2003);
+                                if (blockValueExtraDate != null)
+                                {
+                                    if (!string.IsNullOrEmpty(blockValueExtraDate.AttributeValue)) // Block value 
+                                    {
+
+                                        switch (item.BlockType.ToUpper())
+                                        {
+                                            //I50[Start]
+                                            case "EVENT":
+                                                var eventObj = await _appEventRepository.GetAll().Where(z => z.Code == blockValueExtraDate.AttributeValue).FirstOrDefaultAsync();
+                                                if (eventObj != null)
+                                                    item.GetAppEventForViewDto = await _appEventsAppService.GetAppEventForView(eventObj.Id, long.Parse(eventObj.EntityId.ToString()), timeZone);
+                                                break;
+                                            //I50[End]
+                                            case "PRODUCT":
+                                                item.GetAppMarketItemForViewDto = await _appMarketplaceItemsAppService.GetAppMarketplaceViewData(blockValueExtraDate.AttributeValue, null);
+                                                break;
+                                            case "BRAND":
+                                                var contactSSINExtraData = blockDetail.EntityExtraData.FirstOrDefault(z => z.AttributeId == 2007);
+                                                if (contactSSINExtraData != null)
                                                 {
-                                                    var brandObject = await _appEntityRepository.GetAll().Include(x=>x.EntityAttachments).ThenInclude(x=>x.AttachmentFk)
-                                                        .Where(z => z.Code == blockValueExtraDate.AttributeValue.TrimEnd() && z.TenantId== account.TenantId).FirstOrDefaultAsync();
-                                                    if (brandObject != null)
+                                                    var contactSSIN = contactSSINExtraData.AttributeValue;
+                                                    var account = await _appContactRepository.GetAll().AsNoTracking()
+                                                        .Where(a => a.SSIN == contactSSIN.TrimEnd() && a.IsProfileData == true &&
+                                                        a.TenantId != null && a.PartnerId == null && a.ParentId == null).FirstOrDefaultAsync();
+                                                    if (account != null)
                                                     {
-                                                        item.GetAppEntityForViewDto = await _appEntitiesAppService.GetAppEntityForView(brandObject.Id);
-                                                        //if (brandObject.EntityAttachments.Count > 0)
+                                                        var brandObject = await _appEntityRepository.GetAll().Include(x => x.EntityAttachments).ThenInclude(x => x.AttachmentFk)
+                                                            .Where(z => z.Code == blockValueExtraDate.AttributeValue.TrimEnd() && z.TenantId == account.TenantId).FirstOrDefaultAsync();
+                                                        if (brandObject != null)
                                                         {
-                                                            if (brandObject.EntityAttachments!= null && brandObject.EntityAttachments.Count > 0)
+                                                            item.GetAppEntityForViewDto = await _appEntitiesAppService.GetAppEntityForView(brandObject.Id);
+                                                            //if (brandObject.EntityAttachments.Count > 0)
                                                             {
-                                                                
-                                                                item.GetAppEntityForViewDto.AppEntity.EntityAttachments = ObjectMapper.Map<List<AppEntityAttachmentDto>>(brandObject.EntityAttachments);
-                                                                foreach (var attDto in item.GetAppEntityForViewDto.AppEntity.EntityAttachments)
+                                                                if (brandObject.EntityAttachments != null && brandObject.EntityAttachments.Count > 0)
                                                                 {
-                                                                    attDto.FileName = imagesUrl + (brandObject.TenantId == null ? "-1" : brandObject.TenantId.ToString()) + @"/" + attDto.FileName;
-                                                                    attDto.Url = attDto.FileName;
+
+                                                                    item.GetAppEntityForViewDto.AppEntity.EntityAttachments = ObjectMapper.Map<List<AppEntityAttachmentDto>>(brandObject.EntityAttachments);
+                                                                    foreach (var attDto in item.GetAppEntityForViewDto.AppEntity.EntityAttachments)
+                                                                    {
+                                                                        attDto.FileName = imagesUrl + (brandObject.TenantId == null ? "-1" : brandObject.TenantId.ToString()) + @"/" + attDto.FileName;
+                                                                        attDto.Url = attDto.FileName;
+                                                                    }
                                                                 }
+                                                                /*var imageAttch = brandObject.EntityAttachments.Where(z=>z.AttachmentCategoryCode.ToUpper()=="IMAGE" ||
+                                                                z.AttachmentCategoryCode.ToUpper() == "BANNER" ||
+                                                                z.AttachmentCategoryCode.ToUpper() == "LOGO").FirstOrDefault();
+                                                                if (imageAttch!= null)
+                                                                item.Image = "attachments/" + (blockDetail.TenantId.HasValue ? blockDetail.TenantId : -1) 
+                                                                        + "/" + imageAttch .AttachmentFk.Attachment;*/
                                                             }
-                                                            /*var imageAttch = brandObject.EntityAttachments.Where(z=>z.AttachmentCategoryCode.ToUpper()=="IMAGE" ||
-                                                            z.AttachmentCategoryCode.ToUpper() == "BANNER" ||
-                                                            z.AttachmentCategoryCode.ToUpper() == "LOGO").FirstOrDefault();
-                                                            if (imageAttch!= null)
-                                                            item.Image = "attachments/" + (blockDetail.TenantId.HasValue ? blockDetail.TenantId : -1) 
-                                                                    + "/" + imageAttch .AttachmentFk.Attachment;*/
                                                         }
                                                     }
                                                 }
-                                            }
-                                            break;
-                                        case "CATEGORY":
-                                            var category = await _sycEntityObjectCategoryRepository.GetAll().Where(z=>z.Code== blockValueExtraDate.AttributeValue).FirstOrDefaultAsync();
-                                            if (category!=null)
-                                                item.GetSycEntityObjectCategoryForViewDto =await _sycEntityObjectCategoriesAppService.GetSycEntityObjectCategoryForView(int.Parse(category.Id.ToString()));
-                                            break;
-                                        case "CONTACT":
-                                            var contact = await _appContactRepository.GetAll().Where(z => z.SSIN == blockValueExtraDate.AttributeValue.TrimEnd()).FirstOrDefaultAsync();
-                                            if (contact!=null)
-                                            {
-                                                item.GetAccountForViewDto = await _accountsAppService.GetAccountForView(int.Parse(contact.Id.ToString()), 1);
-                                            }
-                                            break;
+                                                break;
+                                            case "CATEGORY":
+                                                var category = await _sycEntityObjectCategoryRepository.GetAll().Where(z => z.Code == blockValueExtraDate.AttributeValue).FirstOrDefaultAsync();
+                                                if (category != null)
+                                                    item.GetSycEntityObjectCategoryForViewDto = await _sycEntityObjectCategoriesAppService.GetSycEntityObjectCategoryForView(int.Parse(category.Id.ToString()));
+                                                break;
+                                            case "CONTACT":
+                                                var contact = await _appMarketplaceContactRepository.GetAll().Where(z => z.SSIN == blockValueExtraDate.AttributeValue.TrimEnd()).FirstOrDefaultAsync();
+                                                if (contact != null)
+                                                {
+                                                    item.GetAccountForViewDto = await _MarketplaceAccountsAppService.GetAccountForView(int.Parse(contact.Id.ToString()), blockValueExtraDate.AttributeValue.TrimEnd(), 1);
+                                                }
+                                                break;
+                                        }
                                     }
-                                }
 
+                                }
+                                //var blockValueExtraDate = block.EntityFk.EntityExtraData.FirstOrDefault(z => z.AttributeId == 2003);
+                                //if (sectionTitleExtraDate != null)
+                                //    item.Description= 
+                                //item.GetAppMarketItemForViewDto = 
+                                result.Add(item);
                             }
-                            //var blockValueExtraDate = block.EntityFk.EntityExtraData.FirstOrDefault(z => z.AttributeId == 2003);
-                            //if (sectionTitleExtraDate != null)
-                            //    item.Description= 
-                            //item.GetAppMarketItemForViewDto = 
-                            result.Add(item);
                         }
                     }
                 }

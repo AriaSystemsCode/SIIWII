@@ -803,6 +803,7 @@ previewImageUrl = '';
                     this.appItemForViewDto.entityId,
                     undefined,
                     undefined,
+                    undefined,
                     this.skipClassificationCount,
                     this.maxClassificationCount
                 )

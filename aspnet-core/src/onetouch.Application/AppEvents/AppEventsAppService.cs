@@ -25,6 +25,10 @@ using Abp.Domain.Uow;
 using Microsoft.Extensions.Configuration;
 using onetouch.Configuration;
 using onetouch.AppEventGuests.Dtos;
+using Abp.EntityFrameworkCore.Uow;
+using onetouch.AppMarketplaceContacts;
+using onetouch.EntityFrameworkCore;
+using OfficeOpenXml.Drawing.Slicer.Style;
 
 namespace onetouch.AppEvents
 {
@@ -71,6 +75,22 @@ namespace onetouch.AppEvents
         {
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
             {
+                //I50[Start]
+                IQueryable<AppEvent> filteredEvents = null;
+                if (!string.IsNullOrEmpty(input.FilterCondition))
+                {
+                    var contxt = UnitOfWorkManager.Current.GetDbContext<onetouchDbContext>(null, null);
+                    string jsonFilter = input.FilterCondition;
+
+                    var filterCondition = Helper.ApplyJsonFilter<AppEvent>(jsonFilter);//.ToList();
+                    if (filterCondition != null)
+                        filteredEvents = contxt.AppEvents.Where(filterCondition)
+                            .OrderBy(input.Sorting ?? "UTCFromDateTime asc")
+                            .Take(input.MaxResultCount);//.ToListAsync();
+
+                }
+                //I50[End]
+
                 if (input.FilterType == null) input.FilterType = EventsFilterTypesEnum.AllEvents;
                 string imagesUrl = _appConfiguration[$"Attachment:Path"].Replace(_appConfiguration[$"Attachment:Omitt"], "") + @"/";
                 
@@ -109,9 +129,11 @@ namespace onetouch.AppEvents
                             .Where(e => ( input.FilterType == EventsFilterTypesEnum.MyEvents && e.TenantId == AbpSession.TenantId) || 
                                         ( input.FilterType == EventsFilterTypesEnum.AllEvents || input.FilterType == EventsFilterTypesEnum.UpcommingEvents || input.FilterType == EventsFilterTypesEnum.PriorEvents ) );
 
-                var pagedAndFilteredAppEvents = filteredAppEvents
-                    .OrderBy(input.Sorting ?? "UTCFromDateTime asc")
-                    .PageBy(input);
+               
+               var pagedAndFilteredAppEvents = filteredAppEvents
+                        .OrderBy(input.Sorting ?? "UTCFromDateTime asc")
+                        .PageBy(input);
+                
                 //I40[Start]
                 if (input.TenantId != null)
                 {
@@ -120,10 +142,15 @@ namespace onetouch.AppEvents
                     .PageBy(input);
                 }
                 //I40[end]
-                var appEvents = from o in pagedAndFilteredAppEvents
-                                select new
-                                {
-                                    res = new GetAppEventForViewDto()
+                IQueryable<GetAppEventForViewDto> appEvents = null;
+                if (filteredEvents!=null)
+                {
+                    appEvents = from o in pagedAndFilteredAppEvents
+                                join o1 in filteredEvents on o.Id equals o1.Id
+                                //select new
+                                //{
+                                // res = new GetAppEventForViewDto()
+                                    select new GetAppEventForViewDto()
                                     {
                                         //   AppEvent = ObjectMapper.Map<AppEventDto>(o)
 
@@ -161,8 +188,56 @@ namespace onetouch.AppEvents
                                             Id = o.Id,
                                             Address = o.EntityFk.EntityAddresses.Count > 0 ? ObjectMapper.Map<AppEntityAddressDto>(o.EntityFk.EntityAddresses.FirstOrDefault()) : null,
                                         }
-                                    }
+                                   // }
                                 };
+                }
+                else
+                {
+                    appEvents = from o in pagedAndFilteredAppEvents
+                                    //select new
+                                    //{
+                                    //res = new GetAppEventForViewDto()
+                                         select new GetAppEventForViewDto()
+                                         {
+                                            //   AppEvent = ObjectMapper.Map<AppEventDto>(o)
+
+                                            AppEvent = new AppEventDto
+                                            {
+                                                EntityId = o.EntityId,
+                                                IsOnLine = o.IsOnLine,
+                                                IsPublished = o.IsPublished,
+                                                UserId = (long)o.CreatorUserId,
+                                                UserName = UserManager.Users.FirstOrDefault(x => x.Id == o.CreatorUserId && x.TenantId == o.TenantId).FullName,
+                                                ProfilePictureId = (Guid)UserManager.Users.FirstOrDefault(x => x.Id == o.CreatorUserId && x.TenantId == o.TenantId).ProfilePictureId,
+                                                Attachments = input.IncludeAttachments == true ? ObjectMapper.Map<List<AppEntityAttachmentDto>>(o.EntityFk.EntityAttachments) : null,
+                                                Status = o.EntityFk.EntityObjectStatusFk.Name,
+                                                BanarURL = imagesUrl + (o.TenantId == null ? "-1" : o.TenantId.ToString()) + @"/" + o.EntityFk.EntityAttachments.Where(e => e.AttachmentCategoryId == BannerAttachmentCategoryId).FirstOrDefault().AttachmentFk.Attachment,
+                                                LogoURL = imagesUrl + (o.TenantId == null ? "-1" : o.TenantId.ToString()) + @"/" + o.EntityFk.EntityAttachments.Where(e => e.AttachmentCategoryId == LogoAttachmentCategoryId).FirstOrDefault().AttachmentFk.Attachment,
+                                                Address1 = o.EntityFk.EntityAddresses.FirstOrDefault().AddressFk.AddressLine1,
+                                                Address2 = o.EntityFk.EntityAddresses.FirstOrDefault().AddressFk.AddressLine2,
+                                                City = o.EntityFk.EntityAddresses.FirstOrDefault().AddressFk.City,
+                                                State = o.EntityFk.EntityAddresses.FirstOrDefault().AddressFk.State,
+                                                Postal = o.EntityFk.EntityAddresses.FirstOrDefault().AddressFk.PostalCode,
+                                                Country = o.EntityFk.EntityAddresses.FirstOrDefault().AddressFk.CountryFk.Name,
+                                                GuestsCount = o.AppEventGuests.Where(r => r.UserResponce == (int)ResponceType.GOING).Count(),
+                                                FromDate = o.FromDate,
+                                                ToDate = o.ToDate,
+                                                FromTime = o.FromTime,
+                                                ToTime = o.ToTime,
+                                                UTCFromDateTime = o.UTCFromDateTime,
+                                                UTCToDateTime = o.UTCToDateTime,
+                                                GuestCanInviteFriends = o.GuestCanInviteFriends,
+                                                Name = o.Name,
+                                                Code = o.Code,
+                                                Description = o.Description,
+                                                TimeZone = o.TimeZone,
+                                                RegistrationLink = o.RegistrationLink,
+                                                Id = o.Id,
+                                                Address = o.EntityFk.EntityAddresses.Count > 0 ? ObjectMapper.Map<AppEntityAddressDto>(o.EntityFk.EntityAddresses.FirstOrDefault()) : null,
+                                            }
+                                       // }
+                                    };
+                }
                 //X527
                 if (input.NoOfEventsToReturn != null && input.NoOfEventsToReturn!=0)
                 {
@@ -171,8 +246,8 @@ namespace onetouch.AppEvents
                 //X527
                 var totalCount = await filteredAppEvents.CountAsync();
 
-                var results = await appEvents.Select(r => r.res).ToListAsync();
-
+                //var results = await appEvents.Select(r => r.res).ToListAsync();
+                var results = await appEvents.ToListAsync();
                 return new PagedResultDto<GetAppEventForViewDto>(
                     totalCount,
                     results
@@ -194,7 +269,7 @@ namespace onetouch.AppEvents
             }
             return appEventDto;
         }
-
+         [AbpAllowAnonymous]
         public async Task<GetAppEventForViewDto> GetAppEventForView(long id,long entityId, string timeZone)
         {
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))

@@ -1,0 +1,29 @@
+<div class="video-tile" [ngClass]="singleItemPerRowMode ? 'list' : 'grid'">
+
+    <div class="video-wrapper" (click)="open.emit(post)">
+
+        <video
+        [ngClass]="singleItemPerRowMode ? 'listHght' : ''"
+        controls
+        [src]="videoSrc"
+        class="w-100 " 
+        style="height: 225px;"
+      ></video>
+      <!-- <video
+        class="video-player"
+        [src]="videoSrc"
+        muted
+        playsinline
+        preload="metadata"
+        loop
+        (mouseenter)="play($event)"
+        (mouseleave)="pause($event)"
+        (touchstart)="play($event)"
+      ></video> -->
+  
+      <!-- <div class="play-overlay">
+        <i class="fa fa-play"></i>
+      </div> -->
+    </div>
+  
+  </div>

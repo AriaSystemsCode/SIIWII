@@ -2,7 +2,9 @@
 @import '../../../assets/styles/base/mixins';
 @import '../../../assets/styles/base/placeholders';
 
-
+.modal-body {
+    padding: 2rem 1.25rem 4rem 1.25rem !important;
+}
 .form-control , .custom-dropdown {
     background-color: #F8F8F8 !important;
 }

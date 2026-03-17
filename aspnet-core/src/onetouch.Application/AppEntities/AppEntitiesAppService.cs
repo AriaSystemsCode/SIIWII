@@ -962,25 +962,25 @@ namespace onetouch.AppEntities
         }
 
 
-
+        [AbpAllowAnonymous]
         public async Task<PagedResultDto<LookupLabelDto>> GetAllCurrencyForTableDropdownWithPaging(GetAllAppEntitiesInput input)
         {
             input.EntityObjectTypeId = await _helper.SystemTables.GetEntityObjectTypeCurrencyId();
             return await GetAllEntityTypeForTableDropdown(input);
         }
-
+        [AbpAllowAnonymous]
         public async Task<PagedResultDto<LookupLabelDto>> GetAllLanguageForTableDropdownWithPaging(GetAllAppEntitiesInput input)
         {
             input.EntityObjectTypeId = await _helper.SystemTables.GetEntityObjectTypeLanguageId();
             return await GetAllEntityTypeForTableDropdown(input);
         }
-
+        [AbpAllowAnonymous]
         public async Task<PagedResultDto<LookupLabelDto>> GetAllCountryForTableDropdowWithPaging(GetAllAppEntitiesInput input)
         {
             input.EntityObjectTypeId = await _helper.SystemTables.GetEntityObjectTypeCountryId();
             return await GetAllEntityTypeForTableDropdown(input);
         }
-
+        [AbpAllowAnonymous]
         public async Task<PagedResultDto<LookupLabelDto>> GetAllAccountTypesForTableDropdownWithPaging(GetAllAppEntitiesInput input, bool hasManual = true)
         {
             var objectContactId = await _helper.SystemTables.GetObjectContactId();
@@ -1056,7 +1056,7 @@ namespace onetouch.AppEntities
             );
         }
         #endregion get all with paging
-
+        [AbpAllowAnonymous]
         public async Task<List<CurrencyInfoDto>> GetAllCurrencyForTableDropdown()
         {
             var currencyId = await _helper.SystemTables.GetEntityObjectTypeCurrencyId();
@@ -1433,7 +1433,7 @@ namespace onetouch.AppEntities
                         {
                             var appEntityAttachment = _appEntityAttachmentRepository.GetAll().Where(r => r.Id == item.Id).FirstOrDefault();
 
-                            entity.EntityAttachments.Add(new AppEntityAttachment { AttachmentCategoryId = (int)item.AttachmentCategoryId, EntityId = entity.Id, AttachmentId = appEntityAttachment.AttachmentId, IsDefault = item.IsDefault, Attributes = item.Attributes, IsPublic = item.IsPublic });
+                            entity.EntityAttachments.Add(new AppEntityAttachment { AttachmentCategoryId = (int)item.AttachmentCategoryId, EntityId = entity.Id, AttachmentId = appEntityAttachment.AttachmentId, IsDefault = item.IsDefault, Attributes = item.Attributes });
                         }
                         else
                         {
@@ -1452,7 +1452,7 @@ namespace onetouch.AppEntities
                                     att = await _appAttachmentRepository.InsertAsync(att);
                                     await CurrentUnitOfWork.SaveChangesAsync();
                                     //entity.EntityAttachments.Add(new AppEntityAttachment { AttachmentCategoryId = (int)item.AttachmentCategoryId, EntityId = entity.Id, AttachmentId = att.Id });
-                                    entity.EntityAttachments.Add(new AppEntityAttachment { AttachmentCategoryId = (int)item.AttachmentCategoryId, EntityId = entity.Id, AttachmentId = att.Id, IsDefault = item.IsDefault, Attributes = item.Attributes,IsPublic = item.IsPublic });
+                                    entity.EntityAttachments.Add(new AppEntityAttachment { AttachmentCategoryId = (int)item.AttachmentCategoryId, EntityId = entity.Id, AttachmentId = att.Id, IsDefault = item.IsDefault, Attributes = item.Attributes });
                                     //await CurrentUnitOfWork.SaveChangesAsync();
                                 }
                                 else

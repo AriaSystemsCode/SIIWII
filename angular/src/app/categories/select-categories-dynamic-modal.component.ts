@@ -393,6 +393,7 @@ export class SelectCategoriesDynamicModalComponent
                     this.isDepartment,
                     this.entityId,
                     undefined,
+                    undefined,
                     this.sortBy,
                     0,
                     $event.node.totalChildrenCount

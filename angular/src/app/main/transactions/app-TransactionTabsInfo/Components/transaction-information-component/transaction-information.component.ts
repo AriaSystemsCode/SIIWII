@@ -234,6 +234,7 @@ export class TransactionInformationComponent
         'USD',
         undefined,
         undefined,
+        undefined,
         'name',
         skipCount,
         maxResultCount
@@ -440,6 +441,7 @@ export class TransactionInformationComponent
       this._AppTransactionServiceProxy
         .getRelatedAccounts(
           "",
+          undefined,
           undefined,
           undefined,
           undefined,
