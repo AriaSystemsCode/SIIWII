@@ -257,7 +257,7 @@
                                     </li>
                                     <hr />
                                     <!--Sara start-->
-                                    <li class="kt-nav__item" *ngIf="((appSession.tenant.edition.displayName === 'Business Edition') || (appSession.tenant.edition.displayName === 'Group Edition') && appSession.user.memberId != 0) || (appSession.tenant.edition.displayName === 'Personal Edition') ">
+                                    <li class="kt-nav__item" *ngIf="((appSession?.tenant?.edition?.displayName === 'Business Edition') || (appSession?.tenant?.edition?.displayName === 'Group Edition') && appSession?.user?.memberId != 0) || (appSession?.tenant?.edition?.displayName === 'Personal Edition') ">
                                         <!--  <a class="kt-nav__link" [routerLink]="['/app/main/account']" routerLinkActive="router-link-active"  > -->
                                         <!--  'ViewMemberProfile/:id' -->
                                         <a
@@ -265,7 +265,7 @@
                                         class="kt-nav__link"
                                         [routerLink]="['/app/main/account']"
                                         [queryParams]="{
-                                          tab: ((appSession.tenant.edition.displayName === 'Business Edition') || (appSession.tenant.edition.displayName === 'Group Edition') && appSession.user.memberId != 0)
+                                          tab: ((appSession?.tenant?.edition?.displayName === 'Business Edition') || (appSession?.tenant?.edition?.displayName === 'Group Edition') && appSession?.user?.memberId != 0)
                                             ? 'ViewMember'
                                             : 'ProfileView',
                                           memberId: appSession.user.memberId,
@@ -545,11 +545,11 @@
           <hr />
       
           <li class="kt-nav__item"
-              *ngIf="((appSession.tenant.edition.displayName === 'Business Edition') || (appSession.tenant.edition.displayName === 'Group Edition') && appSession.user.memberId != 0) || (appSession.tenant.edition.displayName === 'Personal Edition')">
+              *ngIf="((appSession?.tenant?.edition?.displayName === 'Business Edition') || (appSession?.tenant?.edition?.displayName === 'Group Edition') && appSession?.user?.memberId != 0) || (appSession?.tenant?.edition?.displayName === 'Personal Edition')">
             <a class="kt-nav__link"
                [routerLink]="['/app/main/account']"
                [queryParams]="{
-                 tab: ((appSession.tenant.edition.displayName === 'Business Edition') || (appSession.tenant.edition.displayName === 'Group Edition') && appSession.user.memberId != 0)
+                 tab: ((appSession?.tenant?.edition?.displayName === 'Business Edition') || (appSession?.tenant?.edition?.displayName === 'Group Edition') && appSession?.user?.memberId != 0)
                    ? 'ViewMember'
                    : 'ProfileView',
                  memberId: appSession.user.memberId,
