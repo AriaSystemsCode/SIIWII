@@ -24,3 +24,8 @@
 }
 
 .cursor-pointer { cursor: pointer; }
+  @media (max-width: 992px) {
+.txtBtn {
+  padding: 5px 8px;
+}
+  }
