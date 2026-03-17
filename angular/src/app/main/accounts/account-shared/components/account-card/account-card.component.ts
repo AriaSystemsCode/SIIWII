@@ -14,6 +14,7 @@ export class AccountCardComponent extends AppComponentBase implements OnChanges 
     @Input('account') account : GetAccountForViewDto
     @Input('cardsViewMode') cardsViewMode : boolean
     @Input('isHost') isHost : boolean
+    @Input('FromLandingPage') FromLandingPage : boolean
     @Output() deleteMe : EventEmitter<boolean> = new EventEmitter<boolean>()
     @Output() disconnectMe : EventEmitter<GetAccountForViewDto> = new EventEmitter<GetAccountForViewDto>()
     @Input() fromMarketplace;
@@ -25,6 +26,8 @@ export class AccountCardComponent extends AppComponentBase implements OnChanges 
     currentLang: string
     isArabic: boolean
     isAuthenticated: boolean = false;
+
+    isSmallScreen = false;
 
     constructor(
         injector:Injector,
@@ -39,7 +42,13 @@ export class AccountCardComponent extends AppComponentBase implements OnChanges 
       this.currentLang == 'ar' || this.currentLang == 'ar-EG'  ? this.isArabic = true : this.isArabic = false
       this.isAuthenticated = !!this.appSession?.user;
 
+        this.checkScreenSize();
+  window.addEventListener('resize', this.checkScreenSize.bind(this));
+
     }
+    checkScreenSize(): void {
+  this.isSmallScreen = window.innerWidth <= 1023;
+}
     ngOnChanges(changes: SimpleChanges): void {
         this.isRecordOwner = this.account.account.partnerId == this.appSession?.user?.accountId
     }
@@ -162,5 +171,23 @@ export class AccountCardComponent extends AppComponentBase implements OnChanges 
     .slice(3)
     .map(category => `• ${category}`)
     .join('\n');
+}
+
+getAccountTypeIcon(type: string): string {
+  const accountType = (type || '').toLowerCase();
+
+  if (accountType.includes('business')) {
+    return 'fas fa-building';
+  }
+
+  if (accountType.includes('group')) {
+    return 'fas fa-users';
+  }
+
+  if (accountType.includes('personal')) {
+    return 'fas fa-user';
+  }
+
+  return 'fas fa-tag';
 }
 }

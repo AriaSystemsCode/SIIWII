@@ -30,7 +30,8 @@ export class LandingPageMultiRowCallToActionComponent extends AppComponentBase i
 
   languageSettingName: string = AppConsts.languageSettingName
   showMsrP: boolean
-
+    currentLang:string
+    isArabic:boolean 
   constructor(
     injector: Injector,
     private sydObjectsService: SydObjectsServiceProxy,
@@ -41,6 +42,8 @@ export class LandingPageMultiRowCallToActionComponent extends AppComponentBase i
   ) { super(injector); }
 
   ngOnInit(): void {
+        this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
+        this.currentLang == 'ar' || this.currentLang == 'ar-EG'  ? this.isArabic = true : this.isArabic = false
     if (this.sectionId) {
       this.getBlocksData();
     }
@@ -362,18 +365,32 @@ export class LandingPageMultiRowCallToActionComponent extends AppComponentBase i
     return { connectionName, disconnectLabel };
   }
 
-getBlockTypeLabel(type: string): string {
-  const t = (type || '').toUpperCase();
+getBlockTypeLabel(block) {
+  let t  = (block.blockType).toUpperCase();
 
   switch (t) {
     case 'EVENT':
-      return 'Event';
+     if(block?.getAppEventForViewDto?.appEvent?.isOnLine){
+      return 'Online Event' 
+      }else{
+         return 'In person Event' 
+        
+      }
     case 'CONTACT':
-      return 'Account';
+        if(block?.getAccountForViewDto?.account?.accountType == 'BUSINESS'){
+        return 'Business Account'
+      } else  if(block?.getAccountForViewDto?.account?.accountType == 'PERSONAL'){
+           return 'Personal Account'
+
+      }else {
+    return 'Group Account'
+
+      }
+   
     case 'PRODUCT':
       return 'Product';
     case 'ATTACHMENT':
-      return 'Attachment';
+      return 'Link';
     case 'BRAND':
       return 'Brand';
     case 'CATEGORY':
@@ -383,14 +400,27 @@ getBlockTypeLabel(type: string): string {
   }
 }
 
-getBlockTypeIcon(type: string): string {
-  const t = (type || '').toUpperCase();
+getBlockTypeIcon(block) {
+  const t = (block.blockType).toUpperCase();
 
   switch (t) {
     case 'EVENT':
-      return 'fas fa-calendar-alt';
+      if(block?.getAppEventForViewDto?.appEvent?.isOnLine == true){
+      return 'fas fa-video' 
+      }else{
+      return 'fas fa-map-marker-alt';
+        
+      }
     case 'CONTACT':
+      if(block?.getAccountForViewDto?.account?.accountType == 'BUSINESS'){
+        return 'fas fa-building'
+      } else  if(block?.getAccountForViewDto?.account?.accountType == 'PERSONAL'){
       return 'fas fa-user';
+
+      }else {
+      return 'fas fa-users';
+
+      }
     case 'PRODUCT':
       return 'fas fa-shopping-bag';
     case 'ATTACHMENT':

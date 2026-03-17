@@ -86,10 +86,7 @@ a.btn {
     font-weight: $default-font-weight + 200
 }
 
-// .dropdown {
-//     position: absolute;
-//     right: 1rem;
-// }
+
 
 /* do NOT force absolute for all dropdowns */
 .dropdown { position: relative; }
@@ -138,6 +135,7 @@ a.btn {
         border: 1px solid #EEEEEEEE;
         font-weight: 700;
         font-size: 12px;
+          padding: 4px 2px;
     }
 }
    .accountType_label {
@@ -446,9 +444,9 @@ a.btn {
   
 
     .info-container > div {
-      flex-direction: column !important;
+      // flex-direction: column !important;
       align-items: flex-start !important;
-      gap: 6px;
+      gap: 2px;
     }
   
     .info-container > div p {
@@ -475,13 +473,14 @@ a.btn {
   }
   .singleCat {
    
-padding: 2px 4px;
+padding: 1px 4px;
 
 background: rgba(248, 248, 248, 0.972549);
 border: 1px solid #E6E6E6;
 border-radius: 4px;
 color: #1B101B;
-margin-right: 4px;
+margin-right: 2px;
+font-size: 11.5px;
 
   }
 
@@ -607,7 +606,7 @@ NEW CARD VIEW
 .meta-ico {
   font-size: 15px;
   color: #4A0D4A;
-  width: 18px;
+  // width: 18px;
   text-align: center;
 }
 
@@ -732,4 +731,86 @@ NEW CARD VIEW
   background:#fafafa;
   border:1px solid #f0f0f0;
   border-radius:8px;
+}
+
+
+
+.market-card__image,
+.single-item-photo {
+  position: relative;
+}
+.enIcon {
+    left: 5px;
+
+}
+
+.arIcon {
+    right: 5px;
+
+}
+
+.type-overlay-badge {
+    position: absolute;
+    top: 5px;
+    z-index: 5;
+    width: 25px;
+    height: 25px;
+    border-radius: 6px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: rgba(0, 0, 0, 0.65);
+  color: #fff;
+
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
+}
+
+.type-overlay-badge i {
+  font-size: 14px;
+}
+
+
+@media (max-width: 1023px) {
+  .section-mini-label,
+  .section-mini-label b,
+  .singleCat,
+  .more-cat,
+  .more-class-wrap,
+  .more-cat-tooltip-item,
+  .more-class-item,
+  .accountType_value,
+  .market-card__followers,
+  .product-name,
+  .card-name,
+  .relation_button,
+  .relation_Status_button,
+  .mx-2,
+  .ml-1,
+  .meta-ico {
+    font-size: 11.5px !important;
+            white-space: nowrap;
+  }
+
+  .relationList {
+    font-size: 10px !important;
+    img {
+      width: 11px !important;
+    }
+  }
+
+  .singleCat {
+    padding: 1px 4px;
+    line-height: 1.4;
+  }
+
+  .more-cat-tooltip,
+  .more-class-tooltip {
+    min-width: 160px;
+    max-width: 220px;
+  }
 }

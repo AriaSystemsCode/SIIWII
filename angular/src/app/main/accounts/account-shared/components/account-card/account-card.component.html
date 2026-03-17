@@ -3,18 +3,27 @@ CARDS VIEW MODE
 ========================= -->
 <div *ngIf="cardsViewMode" class="market-card shadowContainer">
 
+<div
+  class="market-card__image"
+  [ngStyle]="{
+    'background-image':
+      account?.account?.logoUrl
+        ? 'url(' + attachmentBaseUrl + '/' + account?.account?.logoUrl + ')'
+        : '../../assets/common/images/default-profile-picture.png'
+  }"
+  (click)="clickCardHandler()"
+>
   <div
-    class="market-card__image"
-    [ngStyle]="{
-      'background-image':
-        account?.account?.logoUrl
-          ? 'url(' + attachmentBaseUrl + '/' + account?.account?.logoUrl + ')'
-          : '../../assets/common/images/default-profile-picture.png'
-    }"
-    (click)="clickCardHandler()"
+    class="type-overlay-badge" [ngClass]="isArabic ? 'arIcon':'enIcon'"
+    *ngIf="!FromLandingPage"
+    [pTooltip]="(account?.account?.accountType | localize) + ('Account' | localize)"
+    tooltipPosition="bottom"
   >
-    <i *ngIf="!account?.account?.logoUrl" class="fa-image fas text-black-50"></i>
+    <i [ngClass]="getAccountTypeIcon(account?.account?.accountType)"></i>
   </div>
+
+  <i *ngIf="!account?.account?.logoUrl" class="fa-image fas text-black-50"></i>
+</div>
 
   <div class="market-card__body">
     <h3 class="market-card__title" (click)="clickCardHandler()">
@@ -30,15 +39,13 @@ CARDS VIEW MODE
        <span class="mx-2">{{account?.account?.connections}} </span> 
 
     </div>
-      <div class="accountType-sec">
-            <!-- <b class="accountType_label" style="min-width: 115px;">
-              {{ "AccountType" | localize }}:
-            </b> -->
+      <!-- <div class="accountType-sec">
+       
                             <i class="fas fa-tag meta-ico"  [pTooltip]="'AccountType' | localize" tooltipPosition="bottom"></i>
             <span class="accountType_value mt-2 mx-1" style="white-space: nowrap;"  >
               {{ account.account.accountType || ('NotSpecified' | localize) }}
             </span>
-          </div>
+          </div> -->
     <div class="market-card__actions mt-3">
       <div
         *ngIf="(account?.availableConnections?.length == 0 && account?.connectionName && fromMarketplace) || (!fromMarketplace && account?.connectionName)"
@@ -48,8 +55,8 @@ CARDS VIEW MODE
              class="btn relation_Status_button market-status-btn p-0"
              dropdown>
           <button type="button" dropdownToggle class="market-status-btn__inner">
-            <img class="pb-1 mr-1"
-                 style="width: 17px;"
+            <img class="pb-1 mx-1"
+                 style="width: 15px;"
                  src="../../assets/accounts/ph_check-bold.png" />
             <span *ngIf="getFormattedConnectionName('connectionName') as connName"
                   [title]="connName">
@@ -77,7 +84,7 @@ CARDS VIEW MODE
           <div class="relationWrap w-100 text-center" dropdown>
             <button type="button" class="relation_button market-follow-btn" dropdownToggle>
               <img class="pb-1"
-                   style="width: 20px;"
+                   style="width: 14px;"
                    (click)="createRelation(options[0])"
                    [src]="getConnectionIcon(options[0]?.connectLabel)"
                    alt="" />
@@ -101,7 +108,7 @@ CARDS VIEW MODE
                 <li role="menuitem" *ngFor="let option of options | slice:1" class="py-2">
                   <button class="dropdown-item" type="button" (click)="createRelation(option)">
                     <img class="pb-1 mr-2"
-                         style="width: 18px;"
+                         style="width: 14px;"
                          [src]="getConnectionIcon(option?.connectLabel)"
                          alt="" />
                     {{ option?.connectLabel }}
@@ -123,19 +130,28 @@ NOT CARDS VIEW MODE
   *ngIf="!cardsViewMode"
   class="single-item memberCard_container shadowContainer single-card-mode p-4 extra-padding-bottom"
 >
+<div
+  class="align-items-center bg-secondary d-flex fa-3x justify-content-around single-item-photo siglCd"
+  [ngStyle]="{
+    'background-image':
+      account.account.logoUrl
+        ? 'url(' + attachmentBaseUrl + '/' + account?.account?.logoUrl + ')'
+        : '',
+    'height': '100px'
+  }"
+  (click)="clickCardHandler()"
+>
   <div
-    class="align-items-center bg-secondary d-flex fa-3x justify-content-around single-item-photo siglCd"
-    [ngStyle]="{
-      'background-image':
-        account.account.logoUrl
-          ? 'url(' + attachmentBaseUrl + '/' + account?.account?.logoUrl + ')'
-          : '',
-      'height': '100px'
-    }"
-    (click)="clickCardHandler()"
+    class="type-overlay-badge"  [ngClass]="isArabic ? 'arIcon':'enIcon'"
+    *ngIf="account?.account?.accountType"
+    [pTooltip]="account?.account?.accountType | localize"
+    tooltipPosition="bottom"
   >
-    <i *ngIf="!account.account.logoUrl" class="fa-image fas text-black-50"></i>
+    <i [ngClass]="getAccountTypeIcon(account?.account?.accountType)"></i>
   </div>
+
+  <i *ngIf="!account.account.logoUrl" class="fa-image fas text-black-50"></i>
+</div>
 
   <div class="single-item-body pr-0 col-md-8 col-lg-9 col-8">
     <div>
@@ -145,59 +161,42 @@ NOT CARDS VIEW MODE
           {{account?.account?.name}}
         </h3>
 
-               <div   >
-            <!-- <b class="accountType_label" style="min-width: 115px;">
-              {{ "AccountType" | localize }}:
-            </b> -->
+               <!-- <div   >
+        
                <i class="fas fa-tag meta-ico mx-1"  [pTooltip]="'AccountType' | localize" tooltipPosition="bottom"></i>
             <span class="accountType_value mt-2" style="white-space: nowrap;" >
               {{ account.account.accountType || ('NotSpecified' | localize) }}
             </span>
-          </div>
+          </div> -->
         </div>
 
-        <!-- <p class="text-primary m-0 product-name">
-          {{ account?.account.description | textSubstring : 60 }}
-        </p> -->
-     <div *ngIf="account?.account?.countryName" class="d-flex align-items-center "  >
-            <!-- <b class="accountType_label">
-              {{ "Country" | localize }}:
-            </b> -->
-                    <i class="fas fa-map-marker-alt meta-ico " [pTooltip]="'Country' | localize" tooltipPosition="bottom" ></i>
-            <span class=" mx-2" style="white-space: nowrap;color: #1b101b;">
-              {{ account?.account?.countryName }}
-            </span>
-          </div>
+   
         <div class="info-container d-flex flex-column">
           <!-- Categories Section -->
 <div *ngIf="!cardsViewMode && account.account.categories.length !=0"
-     class="d-flex align-items-center flex-wrap categories-wrap">
+     class="d-flex align-items-center flex-nowrap categories-wrap">
 
-  <p class="m-0 product-name mr-1"
-     style="font-weight: 600; font-size: 13px;">
+  <p class="m-0 product-name mr-1 section-mini-label">
     <b class="text-dark">{{ "Categories" | localize }}</b> :
   </p>
 
-  <span class="d-flex flex-wrap align-items-center">
+  <span class="d-flex flex-nowrap align-items-center">
 
-    <!-- first 3 -->
-    <span *ngFor="let category of account.account.categories | slice:0:3"
-          class=" singleCat"
-          [pTooltip]="category" tooltipPosition="bottom">
+    <span *ngFor="let category of account.account.categories | slice:0:(isSmallScreen ? 1 : 3)"
+          class="singleCat"
+          [pTooltip]="category"
+          tooltipPosition="bottom">
       {{ category?.length > 8 ? (category | slice:0:8) + '..' : category }}
     </span>
 
-    <!-- +N with nice hover list -->
-    <span *ngIf="account.account.categories.length > 3"
-          class=" singleCat more-cat more-cat-wrap">
-      +{{ account.account.categories.length - 3 }}
+    <span *ngIf="account.account.categories.length > (isSmallScreen ? 1 : 3)"
+          class="singleCat more-cat more-cat-wrap">
+      +{{ account.account.categories.length - (isSmallScreen ? 1 : 3) }}
 
       <div class="more-cat-tooltip">
-      
-
         <div class="more-cat-tooltip-list">
           <div class="more-cat-tooltip-item"
-               *ngFor="let category of account.account.categories | slice:3">
+               *ngFor="let category of account.account.categories | slice:(isSmallScreen ? 1 : 3)">
             {{ category }}
           </div>
         </div>
@@ -208,64 +207,57 @@ NOT CARDS VIEW MODE
 </div>
 
           <!-- Classifications Section -->
-    <div *ngIf="!cardsViewMode && account.account.classfications.length != 0"
-     class="d-flex align-items-center flex-wrap classifications-wrap mt-1">
+   <div *ngIf="!cardsViewMode && account.account.classfications.length != 0"
+     class="d-flex align-items-center flex-nowrap classifications-wrap mt-1">
 
-  <p class="m-0 product-name mr-1"
-     style="font-weight: 600; font-size: 13px; ">
+  <p class="m-0 product-name mr-1 section-mini-label">
     <b class="text-dark">{{ "Classifications" | localize }}</b> :
   </p>
 
-  <span class="d-flex flex-wrap align-items-center"
+  <span class="d-flex flex-nowrap align-items-center"
         *ngIf="account.account.classfications.length > 0">
 
-    <!-- first 3 -->
-    <span *ngFor="let class of account.account.classfications | slice:0:2"
-          class=" singleCat"
-        [pTooltip]="class" tooltipPosition="bottom">
+    <span *ngFor="let class of account.account.classfications | slice:0:(isSmallScreen ? 1 : 2)"
+          class="singleCat"
+          [pTooltip]="class"
+          tooltipPosition="bottom">
       {{ class?.length > 11 ? (class | slice:0:11) + '..' : class }}
     </span>
 
-    <!-- +N -->
-    <span *ngIf="account.account.classfications.length > 2"
-          class=" singleCat more-class-wrap">
-
-      +{{ account.account.classfications.length - 2 }}
+    <span *ngIf="account.account.classfications.length > (isSmallScreen ? 1 : 2)"
+          class="singleCat more-class-wrap">
+      +{{ account.account.classfications.length - (isSmallScreen ? 1 : 2) }}
 
       <div class="more-class-tooltip">
-
-        <!-- <div class="more-class-title">
-          {{ "MoreClassifications" | localize }}
-        </div> -->
-
         <div class="more-class-list">
           <div class="more-class-item"
-               *ngFor="let class of account.account.classfications | slice:2">
+               *ngFor="let class of account.account.classfications | slice:(isSmallScreen ? 1 : 2)">
             {{ class }}
           </div>
         </div>
-
       </div>
-
     </span>
 
   </span>
 
-  <span *ngIf="account.account.classfications.length === 0"
-        class="mt-2">
+  <span *ngIf="account.account.classfications.length === 0" class="mt-2">
     {{ "NotSpecified" | localize }}
   </span>
-
 </div>
         </div>
-
-  
-     
-
-   
-      </div>
-
-      <div>
+<div class="d-flex justify-content-between align-items-center " [ngClass]="account.account.categories.length ==0 && account.account.classfications.length == 0 ? 'mt-5' : account.account.categories.length !=0 && account.account.classfications.length != 0  ? 'mt-1' : 'mt-3'">
+ <div *ngIf="account?.account?.countryName" class="d-flex align-items-center "  >
+            <!-- <b class="accountType_label">
+              {{ "Country" | localize }}:
+            </b> -->
+                    <i class="fas fa-map-marker-alt meta-ico " [pTooltip]="'Country' | localize" tooltipPosition="bottom" ></i>
+                    <!-- [pTooltip]="account?.account?.countryName" tooltipPosition="bottom" -->
+            <span class=" mx-2" style="white-space: nowrap;color: #1b101b;" >
+              {{ account?.account?.countryName | textSubstring : 17 }}
+            </span>
+          </div>
+<div  *ngIf="!account?.account?.countryName"></div>
+     <div>
         <div class="btn-group dropdown" dropdown *ngIf="false">
           <button class="dropdown-toggle btn btn-sm btn-action" dropdownToggle></button>
           <ul class="dropdown-menu actions-dropdown-menu" *dropdownMenu>
@@ -292,12 +284,12 @@ NOT CARDS VIEW MODE
               *ngIf="(account?.availableConnections?.length == 0 && account?.connectionName && fromMarketplace) || (!fromMarketplace && account?.connectionName)"
             >
               <img *ngIf="account?.visibility == 'Public' && !fromMarketplace"
-                   style="width: 30px;"
+                   style="width: 30px;" class="mx-2"
                    src="../../assets/accounts/views.png"
                    (click)="makeRelationPrivatePublic(account,false)" />
 
               <img *ngIf="account?.visibility != 'Public' && !fromMarketplace"
-                   style="width: 30px;"
+                   style="width: 30px;" class="mx-2"
                    src="../../assets/accounts/hidden.png"
                    (click)="makeRelationPrivatePublic(account,true)" />
 
@@ -307,15 +299,15 @@ NOT CARDS VIEW MODE
                    class="btn relation_Status_button"
                    style="white-space: nowrap; cursor: auto;"
                    dropdown>
-                <button type="button" dropdownToggle
+                <button type="button" dropdownToggle class="relationList"
                         style="border: none !important; background: white;padding: 0;">
-                  <img class="pb-1 mr-1" style="width: 17px;"
+                  <img class="pb-1 mx-1" style="width: 15px;"
                        src="../../assets/accounts/ph_check-bold.png" />
                   <span *ngIf="getFormattedConnectionName('connectionName') as connName"
                         [title]="connName">
                     {{ connName.length > 10 ? (connName | slice:0:10) + '...' : connName | localize }}
                   </span>
-                  <i class="fas fa-lg ml-4 fa-angle-down" style="color: #777777 !important;"></i>
+                  <i class="fas fa-lg ml-2 fa-angle-down" style="color: #777777 !important;"></i>
                 </button>
 
                 <ul *dropdownMenu class="dropdown-menu" role="menu"
@@ -337,7 +329,7 @@ NOT CARDS VIEW MODE
                 <div class="relationWrap " style="text-align: end;" dropdown>
                   <button type="button" class="relation_button" dropdownToggle>
                     <img class="pb-1"
-                         style="width: 20px;"
+                         style="width: 14px;"
                          (click)="createRelation(options[0])"
                          [src]="getConnectionIcon(options[0]?.connectLabel)"
                          alt="" />
@@ -361,7 +353,7 @@ NOT CARDS VIEW MODE
                       <li role="menuitem" *ngFor="let option of options | slice:1" class="py-2">
                         <button class="dropdown-item" type="button" (click)="createRelation(option)">
                           <img class="pb-1 mr-2"
-                               style="width: 18px;"
+                               style="width: 15px;"
                                [src]="getConnectionIcon(option?.connectLabel)"
                                alt="" />
                           {{ option?.connectLabel }}
@@ -375,6 +367,14 @@ NOT CARDS VIEW MODE
           </div>
     
       </div>
+</div>
+  
+      
+
+   
+      </div>
+
+   
     </div>
   </div>
 </div>

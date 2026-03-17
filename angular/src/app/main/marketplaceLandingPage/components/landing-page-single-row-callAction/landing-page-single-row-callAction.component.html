@@ -10,9 +10,9 @@
   <ng-template pTemplate="item" let-item>
 
     <div class="carousel-card" [ngClass]="blockTypeIsSingleOrMixed !='Single Type Blocks' ? 'carousel-card-mixed' : ''">
-        <div class="block-type-badge one-style-badge" *ngIf="blockTypeIsSingleOrMixed =='Mixed Types Blocks'">
-    <i [ngClass]="getBlockTypeIcon(item?.blockType)"  [pTooltip]="getBlockTypeLabel(item?.blockType) | localize" tooltipPosition="bottom"></i>
-    <!-- <span>{{ getBlockTypeLabel(item?.blockType) }}</span> -->
+        <div class="block-type-badge one-style-badge" [ngClass]="isArabic ? 'arPos':'enPos'" >
+    <i [ngClass]="getBlockTypeIcon(item)"  [pTooltip]="getBlockTypeLabel(item) | localize" tooltipPosition="bottom"></i>
+    <!-- <span>{{ getBlockTypeLabel(item) }}</span> -->
   </div>
       <div class="carousel-card-body" [ngClass]="blockTypeIsSingleOrMixed !='Single Type Blocks' ? '' : 'maxW'"
         [ngSwitch]="item?.blockType?.toUpperCase()">
@@ -23,7 +23,7 @@
             [attachmentBaseUrl]="attachmentBaseUrl" [languageSettingName]="languageSettingName"
             (view)="viewProduct($event)" (imgError)="onImgErr($event)"></app-marketplace-product-card>
 
-          <app-prodcut-card *ngIf="blockTypeIsSingleOrMixed !='Mixed Types Blocks'"
+          <app-prodcut-card *ngIf="blockTypeIsSingleOrMixed !='Mixed Types Blocks' || blockTypeIsSingleOrMixed ==null "
             [product]="item.getAppMarketItemForViewDto.appItem" [productCard]="item.getAppMarketItemForViewDto"
             [acceptedAspectRatio]="acceptedAspectRatio"></app-prodcut-card>
         </div>
@@ -63,9 +63,9 @@
      
           <app-marketplace-event-card *ngIf="blockTypeIsSingleOrMixed =='Mixed Types Blocks'"
             [block]="item?.getAppEventForViewDto?.appEvent" (details)="openEventDetails($event)"></app-marketplace-event-card>
-          <app-events-browse-card *ngIf="blockTypeIsSingleOrMixed !='Mixed Types Blocks'"
+          <app-events-browse-card *ngIf="blockTypeIsSingleOrMixed !='Mixed Types Blocks' || blockTypeIsSingleOrMixed ==null"
             [item]="item?.getAppEventForViewDto" [singleItemPerRowMode]="false" [fromMarketPlaceProfile]="false"
-            [fromOverviewMarketPlaceProfile]="false"    [actionsMenuFlags]="actionsMenuFlags" [fromLandingPage]="true"
+            [fromOverviewMarketPlaceProfile]="false"  [FromLandingPage]="true"  [actionsMenuFlags]="actionsMenuFlags" [fromLandingPage]="true"
                         [statusesFlags]="statusesFlags"
         ></app-events-browse-card>
   
@@ -73,12 +73,12 @@
 
         <!-- ACCOUNT -->
         <div *ngSwitchCase="'CONTACT'">
-          <app-marketplace-account-card *ngIf="blockTypeIsSingleOrMixed =='Mixed Types Blocks'"
+          <app-marketplace-account-card *ngIf="blockTypeIsSingleOrMixed =='Mixed Types Blocks' "
             [account]="item?.getAccountForViewDto" [compact]="true"
             [showConnectButton]="true"></app-marketplace-account-card>
 
-          <app-account-card *ngIf="blockTypeIsSingleOrMixed !='Mixed Types Blocks'"
-            [account]="item?.getAccountForViewDto" [fromMarketplace]="true" [cardsViewMode]="true" (disconnectMe)="
+          <app-account-card *ngIf="blockTypeIsSingleOrMixed !='Mixed Types Blocks' || blockTypeIsSingleOrMixed ==null"
+            [account]="item?.getAccountForViewDto" [FromLandingPage]="true" [fromMarketplace]="true" [cardsViewMode]="true" (disconnectMe)="
                                                     disconnect(item?.getAccountForViewDto)" 
                                                 (_createRelation)="createRelation(item?.getAccountForViewDto,$event)"></app-account-card>
         </div>

@@ -31,6 +31,10 @@ export class EventsBrowseCardComponent extends AppComponentBase implements OnCha
     profilePicture:string ="";
   @ViewChild("viewEventModal", { static: true }) viewEventModal: ViewEventComponent;
     get mainFilterCtrl() { return this.filterForm?.get('filterType') }
+    @Input('FromLandingPage') FromLandingPage : boolean
+
+        currentLang: string
+    isArabic: boolean
     constructor(
         injector: Injector,
         private _postService:AppPostsServiceProxy
@@ -38,6 +42,10 @@ export class EventsBrowseCardComponent extends AppComponentBase implements OnCha
         super(injector);
     }
 
+    ngOnInit(){
+              this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
+      this.currentLang == 'ar' || this.currentLang == 'ar-EG'  ? this.isArabic = true : this.isArabic = false
+    }
     ngOnChanges(changes: SimpleChanges) {
         this.getAddressDetails();
         this.getProfilePictureById(this.item?.appEvent?.profilePictureId);
@@ -98,4 +106,8 @@ export class EventsBrowseCardComponent extends AppComponentBase implements OnCha
       openViewEvent($event: number) {
         this.viewEventModal.show($event, 0);
     }
+
+    getEventTypeIcon(isOnline: boolean): string {
+  return isOnline ? 'fas fa-video' : 'fas fa-map-marker-alt';
+}
 }

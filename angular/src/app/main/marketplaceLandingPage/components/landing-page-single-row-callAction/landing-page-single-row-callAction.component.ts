@@ -34,6 +34,8 @@ bsModalRef: BsModalRef;
       statusesFlags :  EventsBrowseComponentStatusesFlags
   private objectUrlById: Record<number, string> = {};
   acceptedAspectRatio;
+      currentLang:string
+    isArabic:boolean 
   responsiveOptions = [
     {
       breakpoint: '1400px',
@@ -102,7 +104,8 @@ bsModalRef: BsModalRef;
 
   ngOnInit() {
 
- 
+         this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
+        this.currentLang == 'ar' || this.currentLang == 'ar-EG'  ? this.isArabic = true : this.isArabic = false
 
     if (this.sectionId) {
       this.getBlocksData();
@@ -352,18 +355,32 @@ private parseRelationResult(raw: string): { connectionName: string; disconnectLa
 
   }
 
-  getBlockTypeLabel(type: string): string {
-  const t = (type || '').toUpperCase();
+getBlockTypeLabel(block) {
+  let t  = (block.blockType).toUpperCase();
 
   switch (t) {
     case 'EVENT':
-      return 'Event';
+     if(block?.getAppEventForViewDto?.appEvent?.isOnLine){
+      return 'Online Event' 
+      }else{
+         return 'In person Event' 
+        
+      }
+    case 'CONTACT':
+        if(block?.getAccountForViewDto?.account?.accountType == 'BUSINESS'){
+        return 'Business Account'
+      } else  if(block?.getAccountForViewDto?.account?.accountType == 'PERSONAL'){
+           return 'Personal Account'
+
+      }else {
+    return 'Group Account'
+
+      }
+   
     case 'PRODUCT':
       return 'Product';
-    case 'CONTACT':
-      return 'Account';
     case 'ATTACHMENT':
-      return 'Attachment';
+      return 'Link';
     case 'BRAND':
       return 'Brand';
     case 'CATEGORY':
@@ -373,16 +390,29 @@ private parseRelationResult(raw: string): { connectionName: string; disconnectLa
   }
 }
 
-getBlockTypeIcon(type: string): string {
-  const t = (type || '').toUpperCase();
+getBlockTypeIcon(block) {
+  const t = (block.blockType).toUpperCase();
 
   switch (t) {
     case 'EVENT':
-      return 'fas fa-calendar-alt';
+      if(block?.getAppEventForViewDto?.appEvent?.isOnLine == true){
+      return 'fas fa-video' 
+      }else{
+      return 'fas fa-map-marker-alt';
+        
+      }
+    case 'CONTACT':
+      if(block?.getAccountForViewDto?.account?.accountType == 'BUSINESS'){
+        return 'fas fa-building'
+      } else  if(block?.getAccountForViewDto?.account?.accountType == 'PERSONAL'){
+      return 'fas fa-user';
+
+      }else {
+      return 'fas fa-users';
+
+      }
     case 'PRODUCT':
       return 'fas fa-shopping-bag';
-    case 'CONTACT':
-      return 'fas fa-user';
     case 'ATTACHMENT':
       return 'fas fa-paperclip';
     case 'BRAND':
