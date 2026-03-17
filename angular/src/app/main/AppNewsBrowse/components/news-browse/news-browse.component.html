@@ -112,11 +112,11 @@
                                     </div>
                                 </div>
                                 <div class="row pt-3 pl-3 pr-2">
-                                    <div *ngFor="let item of items; index as i" class="mb-2" [ngClass]="singleItemPerRowMode?  'col-12' : !singleItemPerRowMode && filterVisible ?  'col-lg-4 col-md-6 col-12' : 'col-lg-3 col-md-4 col-6'">
+                                    <div *ngFor="let item of items; index as i" class="mb-2" [ngClass]=" filterVisible ?  'col-lg-4 col-md-6 col-12' : 'col-lg-3 col-md-4 col-6'">
                                         <!-- <ng-container > -->
                                             <app-news-video-tile
                                               [post]="item"
-                                              [singleItemPerRowMode]="singleItemPerRowMode"
+                                       
                                               (open)="onshowViewPost($event)"
                                             ></app-news-video-tile>
                                         <!-- </ng-container> -->

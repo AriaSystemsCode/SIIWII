@@ -9,7 +9,7 @@
     </div>
     <div
         class="single-item-body col"
-        [ngClass]="{ singleItemPerRowMode: 'd-flex flex-row' }"
+    
     >
         <div class="row">
             <div
@@ -40,7 +40,7 @@
                 </p>
                 <p
                     class="text-dark mb-2"
-                    [ngClass]="{ 'd-none': !singleItemPerRowMode }"
+             
                 >
                     {{ item?.appEvent?.description | textSubstring: 230 }}
                 </p>
