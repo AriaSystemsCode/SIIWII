@@ -5231,15 +5231,27 @@ namespace onetouch.AppItems
                     //        x.Id
                     //    })
                     //    .ToDictionary(x => x.Code, x => x.Id);
+                    //var existingItemsDict = _appItemRepository.GetAll()
+                    //.Where(x => x.ItemType == 0 && !string.IsNullOrEmpty(x.Code))
+                    //.Select(x => new
+                    //{
+                    //    Code = x.Code.Replace(" ", "").ToUpper(),
+                    //    x.Id
+                    //})
+                    //.GroupBy(x => x.Code)
+                    //.ToDictionary(g => g.Key, g => g.First().Id);
+
                     var existingItemsDict = _appItemRepository.GetAll()
-                    .Where(x => x.ItemType == 0 && !string.IsNullOrEmpty(x.Code))
-                    .Select(x => new
-                    {
-                        Code = x.Code.Replace(" ", "").ToUpper(),
-                        x.Id
-                    })
-                    .GroupBy(x => x.Code)
-                    .ToDictionary(g => g.Key, g => g.First().Id);
+    .Where(x => x.ItemType == 0 && !string.IsNullOrEmpty(x.Code))
+    .Select(x => new { x.Code, x.Id })
+    .AsEnumerable()   // switch from SQL to memory
+    .Select(x => new
+    {
+        Code = x.Code.Replace(" ", "").ToUpper(),
+        x.Id
+    })
+    .GroupBy(x => x.Code)
+    .ToDictionary(g => g.Key, g => g.First().Id);
 
                     //var excelMapper = new MapperConfiguration(cfg =>
                     //{
@@ -5811,15 +5823,26 @@ namespace onetouch.AppItems
             saveExcelinput.To = 0;
             saveExcelinput.From = 0;
             List<ImportItemReturnDto> returnList = new List<ImportItemReturnDto>();
+            //var existingItemsDict = _appItemRepository.GetAll()
+            //       .Where(x => x.ItemType == 0 && !string.IsNullOrEmpty(x.Code))
+            //       .Select(x => new
+            //       {
+            //           Code = x.Code.Replace(" ", "").ToUpper(),
+            //           x.Id
+            //       })
+            //       .GroupBy(x => x.Code)
+            //       .ToDictionary(g => g.Key, g => g.First().Id);
             var existingItemsDict = _appItemRepository.GetAll()
-                   .Where(x => x.ItemType == 0 && !string.IsNullOrEmpty(x.Code))
-                   .Select(x => new
-                   {
-                       Code = x.Code.Replace(" ", "").ToUpper(),
-                       x.Id
-                   })
-                   .GroupBy(x => x.Code)
-                   .ToDictionary(g => g.Key, g => g.First().Id);
+    .Where(x => x.ItemType == 0 && !string.IsNullOrEmpty(x.Code))
+    .Select(x => new { x.Code, x.Id })
+    .AsEnumerable()   // switch from SQL to memory
+    .Select(x => new
+    {
+        Code = x.Code.Replace(" ", "").ToUpper(),
+        x.Id
+    })
+    .GroupBy(x => x.Code)
+    .ToDictionary(g => g.Key, g => g.First().Id);
             List<CurrencyInfoDto> currencyIds = await _appEntitiesAppService.GetAllCurrencyForTableDropdown();
             foreach (var excelDto in itemExcelDtoList)
             {
