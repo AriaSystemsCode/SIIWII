@@ -10,7 +10,7 @@
         >
           <div class="kt-portlet--mobile">
             <div [ngClass]="fromOverviewMarketPlaceProfile ? '' : 'kt-portlet__body'">
-              <div class="row  mx-1" *ngIf="active && items?.length > 0" [ngClass]="fromOverviewMarketPlaceProfile ? 'mx-md-0 mx-1':!fromMarketPlaceProfile && !fromOverviewMarketPlaceProfile ? 'pt-4 px-lg-4 px-2':''">
+              <div class="row  mx-1" *ngIf="active " [ngClass]="fromOverviewMarketPlaceProfile ? 'mx-md-0 mx-1':!fromMarketPlaceProfile && !fromOverviewMarketPlaceProfile ? 'pt-4 px-lg-4 px-2':''">
                 <div class="col-12 list-toolbar">
   
                   <div class="row mb-3 justify-content-between" *ngIf="!fromMarketPlaceProfile">
@@ -217,14 +217,17 @@
                       ></app-events-browse-card>
                     </div>
   
-                    <div class="font-weight-normal m-auto p-5 text-center w-100" *ngIf="items?.length == 0 && !loading" style="min-height: 70vh;">
-                      <img src="../../assets/placeholders/fluent_alert.png" class="mr-2" alt="" />
+                    <div class="font-weight-normal m-auto p-5 text-center w-100" *ngIf="items?.length == 0 && !loading" style="min-height: 40vh;">
+                      <div class="my-5 pt-5">
+  <img src="../../assets/placeholders/fluent_alert.png" class="mr-2" alt="" />
                       {{ "NoDataFound..." | localize }}
+                      </div>
+                    
                     </div>
-  
+<!--   
                     <div class="font-weight-normal mt-5 p-5 text-center w-100" *ngIf="loading">
                       {{ "Loading" | localize }}...
-                    </div>
+                    </div> -->
                   </div>
                 </div>
               </div>
@@ -251,10 +254,10 @@
                 </div>
               </div>
   
-              <div class="font-weight-normal mt-5 p-5 text-center w-100" *ngIf="items?.length == 0 && !loading">
+              <!-- <div class="font-weight-normal mt-5 p-5 text-center w-100" *ngIf="items?.length == 0 && !loading">
                 <img src="../../assets/placeholders/fluent_alert.png" class="mr-2" alt="" />
                 {{ "NoDataFound..." | localize }}
-              </div>
+              </div> -->
             </div>
           </div>
         </div>
