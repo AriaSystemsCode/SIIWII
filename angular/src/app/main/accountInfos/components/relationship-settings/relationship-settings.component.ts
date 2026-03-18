@@ -40,6 +40,7 @@ dynamicInputsComponents!: QueryList<dynamicInputs>;
   }
 
   ngOnInit(): void {
+      this.stopFormListening = true;
     this.getRelationshipSettingsData()
     this.getAppItemTypeExtraAttributesById()
   }
@@ -53,7 +54,7 @@ dynamicInputsComponents!: QueryList<dynamicInputs>;
   }
 
   getAppItemTypeExtraAttributesById() {
-    this._sycEntityObjectTypesServiceProxy.getAllWithExtraAttributesByCode('BTB', 'MARKETPLACECONTACTRELATIONSHIP').pipe(finalize(() => {
+   this._sycEntityObjectTypesServiceProxy.getAllWithExtraAttributesByCode('BTB', 'MARKETPLACECONTACTRELATIONSHIP').pipe(finalize(() => {
       this._sycEntityObjectTypesServiceProxy.getAllWithExtraAttributes(
         this.entityObjectTypeId)
         .subscribe((res) => {
