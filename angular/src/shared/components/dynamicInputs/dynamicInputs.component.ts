@@ -10,7 +10,10 @@ import { AppConsts } from '@shared/AppConsts';
 import { IAjaxResponse, TokenService } from '@node_modules/abp-ng2-module';
 import { DynamicApiDispatcherService } from '@shared/dynamicApiDispatcherService ';
 import Swal from 'sweetalert2';
-import { finalize } from 'rxjs/operators';
+import { finalize, map  } from 'rxjs/operators';
+import { forkJoin ,of} from 'rxjs';
+
+
 
 
 @Component({
@@ -131,33 +134,82 @@ export class dynamicInputs extends AppComponentBase implements OnInit, OnChanges
 
       updatedDataMap.set(attr.attributeId, updatedValue);
 
-      // ✅ Apply relatedWhen dynamically
-     if (attr.relatedWhen?.relation?.length) {
-  for (const relation of attr.relatedWhen.relation) {
+    this.selectedExtraData = Array.from(updatedDataMap.values());
+    this.extraDataChanged.emit(this.selectedExtraData);
 
-    const targetAttr = this.extraAttributeObject.value.extraAttributes
-      .find(x => x.name === relation.targetName || x.code === relation.targetName);
-
-    if (targetAttr) {
-      targetAttr[relation.targetField] = attr[relation.sourceField];
-
-      updatedDataMap.set(targetAttr.attributeId, {
-        attributeId: targetAttr.attributeId,
-        value: targetAttr[relation.targetField],
-        isLookup: targetAttr.isLookup === true,
-        acceptMultipleValues: targetAttr.acceptMultipleValues === true
-      });
+  
     }
   }
 }
 
+onDropdownChange(extraAttr: any) {
 
+  this.onAnyInputChange(); // update normal data
+
+  const updatedDataMap = new Map<number, any>();
+
+  const finalValue = extraAttr.selectedValues;
+
+  this.handleRelatedWhen(extraAttr, finalValue, updatedDataMap);
+}
+
+
+handleRelatedWhen(attr: any, finalValue: any, updatedDataMap: Map<number, any>) {
+
+  if (!attr.relatedWhen?.relation?.length) return;
+
+  const calls = attr.relatedWhen.relation.map(relation => {
+
+    const targetAttr = this.extraAttributeObject.value.extraAttributes
+      .find(x => x.name === relation.targetName || x.code === relation.targetName);
+
+    if (!targetAttr) return null;
+
+    if (isNaN(Number(finalValue))) {
+      return of({
+        targetAttr,
+        relation,
+        newValue: 0
+      });
     }
-  }
 
-  this.selectedExtraData = Array.from(updatedDataMap.values());
-  
-  this.extraDataChanged.emit(this.selectedExtraData);
+    return this._appEntitiesServiceProxy.getAppEntityForEdit(Number(finalValue))
+      .pipe(
+        map((result: any) => {
+          const newValue = result.extraDataAttributes
+            .find(x => x.extraAttrName === relation.targetName)
+            ?.selectedValues?.[0]?.value || 0;
+
+          return { targetAttr, relation, newValue };
+        })
+      );
+
+  }).filter(x => x !== null);
+
+  if (calls.length) {
+    forkJoin(calls).subscribe((results: any[]) => {
+
+      results.forEach(res => {
+
+        res.targetAttr[res.relation.targetField] = res.newValue;
+            res.targetAttr.selectedValues = res.newValue;
+
+
+         updatedDataMap.set(res.targetAttr.attributeId, {
+      attributeId: res.targetAttr.attributeId,
+      value: res.newValue,
+      isLookup: res.targetAttr.isLookup === true,
+      acceptMultipleValues: res.targetAttr.acceptMultipleValues === true
+    });
+
+
+      });
+
+      this.selectedExtraData = Array.from(updatedDataMap.values());
+      this.extraDataChanged.emit(this.selectedExtraData);
+
+    });
+  }
 }
 
 
