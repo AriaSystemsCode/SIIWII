@@ -2,9 +2,9 @@
     <div class="kt-content kt-grid__item kt-grid__item--fluid kt-grid kt-grid--hor">
     
     
-                  <div class="kt-subheader kt-grid__item">
+                  <div class=" kt-grid__item">
                     <div [class]="containerClass">
-                      <div class="kt-subheader__main">
+                      <!-- <div class="kt-subheader__main">
                           <h3 class="kt-subheader__title">
                               <span>{{l("AppTenantActivitiesLog")}}</span>
                           </h3>
@@ -12,10 +12,10 @@
                           <span class="kt-subheader__desc">
                               {{l("AppTenantActivitiesLogHeaderInfo")}}
                           </span>
-                      </div>
+                      </div> -->
                       <div class="kt-subheader__toolbar">
                           <div class="kt-subheader__wrapper">
-                              <button (click)="exportToExcel()" class="btn btn-outline-success"><i class="fa fa-file-excel"></i> {{l("ExportToExcel")}}</button>
+                              <!-- <button (click)="exportToExcel()" class="btn btn-outline-success"><i class="fa fa-file-excel"></i> {{l("ExportToExcel")}}</button> -->
   
   
                 <div class="kt-subheader kt-grid__item">
@@ -39,8 +39,8 @@
                 </div>
             
     
-    <div [class]="containerClass + ' kt-grid__item kt-grid__item--fluid'">
-        <div class="kt-portlet kt-portlet--mobile">
+    <div [class]="containerClass + ' kt-grid__item kt-grid__item--fluid'" class="px-0">
+        <div class="kt-portlet kt-portlet--mobile " [ngClass]="fromBilling ? 'mt-0':''">
             <div class="kt-portlet__body">
                 <form class="kt-form" autocomplete="off">
                     <div>
