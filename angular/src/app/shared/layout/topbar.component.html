@@ -268,8 +268,8 @@
                                           tab: ((appSession?.tenant?.edition?.displayName === 'Business Edition') || (appSession?.tenant?.edition?.displayName === 'Group Edition') && appSession?.user?.memberId != 0)
                                             ? 'ViewMember'
                                             : 'ProfileView',
-                                          memberId: appSession.user.memberId,
-                                          userId: appSession.user.id
+                                          memberId: appSession?.user?.memberId,
+                                          userId: appSession?.user?.id
                                         }"
                                         queryParamsHandling="merge"
                                         routerLinkActive="router-link-active"
@@ -552,8 +552,8 @@
                  tab: ((appSession?.tenant?.edition?.displayName === 'Business Edition') || (appSession?.tenant?.edition?.displayName === 'Group Edition') && appSession?.user?.memberId != 0)
                    ? 'ViewMember'
                    : 'ProfileView',
-                 memberId: appSession.user.memberId,
-                 userId: appSession.user.id
+                 memberId: appSession?.user?.memberId,
+                 userId: appSession?.user?.id
                }"
                queryParamsHandling="merge"
                routerLinkActive="router-link-active"
