@@ -13,9 +13,32 @@
                 <div class="modal-body">
 
                   <div class="input-group">
-                      <img src="assets/profile/mail.svg" class="mail-icon" />
-                   
-                    <input type="email" id="to" class="form-control input-mail" [(ngModel)]="mail.to" name="to"   minlength="1" placeholder='{{l("EnterAnEmail")}}'  maxlength="100" required/>
+                    <img src="assets/profile/mail.svg" class="mail-icon" />
+                  
+                    <input
+                      type="email"
+                      id="to"
+                      class="form-control input-mail"
+                      [(ngModel)]="mail.to"
+                      name="to"
+                      #emailModel="ngModel"
+                      minlength="5"
+                      maxlength="100"
+                      placeholder="{{ l('EnterAnEmail') }}"
+                      required
+                      email
+                      pattern="^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
+                    />
+              
+                  </div>
+
+                  <div class="text-danger mt-1 mx-2" *ngIf="emailModel.invalid && emailModel.touched">
+                    <small *ngIf="emailModel.errors?.['email']">
+                      {{'PleaseEnteraValidEmailAddress' | localize}}
+                     
+                    </small>
+                  
+                  
                   </div>
 
 					

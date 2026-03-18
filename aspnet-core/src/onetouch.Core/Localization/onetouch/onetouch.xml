@@ -2700,6 +2700,8 @@
 	<text name="PERSONAL">Personal</text>
 	<text name="GROUP">Group</text>
 
+	<text name="PleaseEnteraValidEmailAddress"> Please enter a valid email address</text>
+
 
 
 
