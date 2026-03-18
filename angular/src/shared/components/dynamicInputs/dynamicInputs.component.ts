@@ -79,8 +79,16 @@ export class dynamicInputs extends AppComponentBase implements OnInit, OnChanges
         continue;
       }
 
-      let formattedValue = attr.selectedValues;
+    let formattedValue =
+  attr.selectedValues == null ||
+  attr.selectedValues === '' ||
+  (Array.isArray(attr.selectedValues) && attr.selectedValues.length === 0)
+    ? attr.defaultValue
+    : attr.selectedValues;
 
+attr.selectedValues = formattedValue;
+
+  
         // ✅ Handle Datetime
       if (attr.dataType === 'Datetime') {
         const dateValue = new Date(formattedValue);

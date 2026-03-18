@@ -243,8 +243,11 @@ dynamicInputsComponents!: QueryList<dynamicInputs>;
         dto.attributeId = attr.attributeId;
         dto.entityObjectTypeId = this.entityObjectTypeId;
         dto.entityid = this.relationId;
+
         if (attr.isLookup) {
-          dto.attributeValueId = attr.value;
+          const parsedValue = Number(attr.value);
+
+          dto.attributeValueId = !isNaN(parsedValue) ? parsedValue : null;
         } else {
           dto.attributeValue = attr.value;
         }
