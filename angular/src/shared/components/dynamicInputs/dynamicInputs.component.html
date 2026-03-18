@@ -71,7 +71,8 @@
                             optionValue="value"
                             name="extraAttr_{{extraAttr.name}}"
                             (onClick)="onDropdownClick(extraAttr)"
-                            class="w-100 searchableDropdown">
+                            class="w-100 searchableDropdown"
+                            (onChange)="onAnyInputChange()">
                   <ng-template let-item pTemplate="item">
                     <div *ngIf="item.isLoadMore; else normalItem"
                          class="load-more-item"
@@ -96,7 +97,8 @@
                             filterBy="label"
                             [showClear]="true"
                             (onClick)="onDropdownClick(extraAttr)"
-                            class="w-100 searchableDropdown">
+                            class="w-100 searchableDropdown"
+                            (onChange)="onAnyInputChange()">
                   <ng-template let-item pTemplate="item">
                     <div *ngIf="item.isLoadMore; else normalItem"
                          class="load-more-item"

@@ -74,6 +74,7 @@ dynamicInputsComponents!: QueryList<dynamicInputs>;
   }
 
   ngOnInit(): void {
+    this.stopFormListening=true;
     this.getSettingData()
     this.getAppItemTypeExtraAttributesById()
   }
@@ -187,7 +188,8 @@ dynamicInputsComponents!: QueryList<dynamicInputs>;
   saveAll(): void {
     let success = false;
 
-        const extraDataList = this.dynamicInputsForViewDto?.entityExtraData || [];
+          const extraDataList = this.dynamicInputsForViewDto?.entityExtraData || [];
+
 
     let appEntityDto : AppEntityDto =new AppEntityDto();
     appEntityDto.entityExtraData =  this.dynamicInputsForViewDto?.entityExtraData || [];
@@ -199,7 +201,9 @@ dynamicInputsComponents!: QueryList<dynamicInputs>;
     appEntityDto.name=this.dynamicInputsForViewDto.appEntity.name;
 
     appEntityDto.extraDataFileTypeIndex = appEntityDto.entityExtraData
-            .map((item, index) => item.attributeValue && item.attributeValue.includes('|') ? index : -1)
+            .map((item, index) =>
+                typeof item.attributeValue === 'string' && item.attributeValue.includes('|') ? index : -1
+            )
             .filter(index => index !== -1);
      
             this.dynamicInputsComponents.first.saveAll(appEntityDto);

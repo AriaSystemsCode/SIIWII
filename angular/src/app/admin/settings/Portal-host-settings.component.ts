@@ -60,10 +60,10 @@ export class PortalHostSettingsComponent extends AppComponentBase implements OnI
     entityObjectTypeHostId: number = 764;
     hostEntityId: number;
     attachmentsUploader;
-    attachmets=[];
-    AttachmentInfoDto=[];
-@ViewChildren('appdynamicInputs')
-dynamicInputsComponents!: QueryList<dynamicInputs>;
+    attachmets = [];
+    AttachmentInfoDto = [];
+    @ViewChildren('appdynamicInputs')
+    dynamicInputsComponents!: QueryList<dynamicInputs>;
 
     constructor(
         injector: Injector,
@@ -105,11 +105,12 @@ dynamicInputsComponents!: QueryList<dynamicInputs>;
         const self = this;
         self.testEmailAddress = self.appSession.user.emailAddress;
         self.showTimezoneSelection = abp.clock.provider.supportsMultipleTimezone;
-      //  self.loadHostSettings();
-       // self.loadEditions();
+        //  self.loadHostSettings();
+        // self.loadEditions();
     }
 
     ngOnInit(): void {
+        this.stopFormListening=true;
         const self = this;
         self.init();
         this.getSettingData()
@@ -192,27 +193,29 @@ dynamicInputsComponents!: QueryList<dynamicInputs>;
     }
 
 
-    
+
 
     saveAll(): void {
         const self = this;
-            let success = false;
+        let success = false;
 
-        const extraDataList = this.dynamicInputsForViewDto?.entityExtraData || [];
-      
-            let appEntityDto : AppEntityDto=new AppEntityDto();
-            appEntityDto.entityExtraData =  this.dynamicInputsForViewDto?.entityExtraData || [];
-            appEntityDto.id= this.hostEntityId;
-            appEntityDto.entityObjectTypeId=this.entityObjectTypeHostId;
-            appEntityDto.objectId= 2;
-            appEntityDto.code= this.dynamicInputsForViewDto.appEntity.code;
-            appEntityDto.name=this.dynamicInputsForViewDto.appEntity.name;
+      const extraDataList = this.dynamicInputsForViewDto?.entityExtraData || [];
 
-             appEntityDto.extraDataFileTypeIndex = appEntityDto.entityExtraData
-            .map((item, index) => item.attributeValue && item.attributeValue.includes('|') ? index : -1)
+        let appEntityDto: AppEntityDto = new AppEntityDto();
+        appEntityDto.entityExtraData = this.dynamicInputsForViewDto?.entityExtraData || [];
+        appEntityDto.id = this.hostEntityId;
+        appEntityDto.entityObjectTypeId = this.entityObjectTypeHostId;
+        appEntityDto.objectId = 2;
+        appEntityDto.code = this.dynamicInputsForViewDto.appEntity.code;
+        appEntityDto.name = this.dynamicInputsForViewDto.appEntity.name;
+
+        appEntityDto.extraDataFileTypeIndex = appEntityDto.entityExtraData
+            .map((item, index) =>
+                typeof item.attributeValue === 'string' && item.attributeValue.includes('|') ? index : -1
+            )
             .filter(index => index !== -1);
 
-            this.dynamicInputsComponents.first.saveAll(appEntityDto);
+        this.dynamicInputsComponents.first.saveAll(appEntityDto);
 
         if (
             abp.clock.provider.supportsMultipleTimezone &&
@@ -224,7 +227,7 @@ dynamicInputsComponents!: QueryList<dynamicInputs>;
             });
 
             if (self.hostSettings.tenantManagement.defaultEditionId.toString() === 'null') {
-               self.hostSettings.tenantManagement.defaultEditionId = null;
+                self.hostSettings.tenantManagement.defaultEditionId = null;
             }
 
             self._hostSettingService.updateAllSettings(self.hostSettings).subscribe(result => {
@@ -406,7 +409,7 @@ dynamicInputsComponents!: QueryList<dynamicInputs>;
     }
 
     onExtraAttributesChanged(dataFromChild: any[]) {
-       this.formTouched = true;
+       // this.formTouched = true;
         if (!this.dynamicInputsForViewDto) {
             this.dynamicInputsForViewDto = new GetAppEntityForEditOutput();
         }
@@ -439,7 +442,7 @@ dynamicInputsComponents!: QueryList<dynamicInputs>;
                 } else {
                     if (attr.value && attr.value.type?.startsWith('image/'))
                         dto.attributeValue = attr.value.name;
-                      else 
+                    else
                         dto.attributeValue = attr.value;
                 }
                 return dto;
@@ -474,8 +477,8 @@ dynamicInputsComponents!: QueryList<dynamicInputs>;
         }
     }
 
-onActiveIndexChange(usage){
-        this.selectedUsage = usage; 
-}
-      
+    onActiveIndexChange(usage) {
+        this.selectedUsage = usage;
+    }
+
 }

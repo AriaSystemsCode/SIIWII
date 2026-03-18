@@ -51,11 +51,13 @@ export class dynamicInputs extends AppComponentBase implements OnInit, OnChanges
   }
   ngOnChanges() {
     this.fillSelectedValuesFromDto();
+        this.onAnyInputChange();
+
   }
 
  onAnyInputChange() {
   //if (this.isInitializing) return;
-  this.formTouched = true;
+  //this.formTouched = true;
 
   const updatedDataMap = new Map<number, any>();
 
@@ -130,24 +132,25 @@ export class dynamicInputs extends AppComponentBase implements OnInit, OnChanges
       updatedDataMap.set(attr.attributeId, updatedValue);
 
       // ✅ Apply relatedWhen dynamically
-      //i49
-      if (attr.relatedWhen?.length) {
-        for (const relation of attr.relatedWhen) {
-          const targetAttr = this.extraAttributeObject.value.extraAttributes
-            .find(x => x.name === relation.targetName || x.code === relation.targetName);
+     if (attr.relatedWhen?.relation?.length) {
+  for (const relation of attr.relatedWhen.relation) {
 
-          if (targetAttr) {
-            targetAttr[relation.targetField] = attr[relation.sourceField];
-            // Update the map as well to reflect changes in selectedExtraData
-            updatedDataMap.set(targetAttr.attributeId, {
-              attributeId: targetAttr.attributeId,
-              value: targetAttr[relation.targetField],
-              isLookup: targetAttr.isLookup === true,
-              acceptMultipleValues: targetAttr.acceptMultipleValues === true
-            });
-          }
-        }
-      }
+    const targetAttr = this.extraAttributeObject.value.extraAttributes
+      .find(x => x.name === relation.targetName || x.code === relation.targetName);
+
+    if (targetAttr) {
+      targetAttr[relation.targetField] = attr[relation.sourceField];
+
+      updatedDataMap.set(targetAttr.attributeId, {
+        attributeId: targetAttr.attributeId,
+        value: targetAttr[relation.targetField],
+        isLookup: targetAttr.isLookup === true,
+        acceptMultipleValues: targetAttr.acceptMultipleValues === true
+      });
+    }
+  }
+}
+
 
     }
   }
@@ -295,6 +298,7 @@ export class dynamicInputs extends AppComponentBase implements OnInit, OnChanges
 
   ngOnInit(): void {
     this.fillSelectedValuesFromDto();
+    this.onAnyInputChange();
   }
 
   isArray(val: any): boolean {
