@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Injector, Input, Output } from '@angular/core';
+import { ChangeDetectorRef, Component, EventEmitter, Injector, Input, Output } from '@angular/core';
 import { AppComponentBase } from '@shared/common/app-component-base';
 import { AppEntitiesServiceProxy } from '@shared/service-proxies/service-proxies';
 
@@ -21,6 +21,7 @@ export class MarketplaceProductCardComponent extends AppComponentBase {
     constructor(
       injector: Injector,
          private _AppEntitiesServiceProxy: AppEntitiesServiceProxy,
+           private cdr: ChangeDetectorRef
 
     ) { super(injector); }
 
@@ -103,7 +104,7 @@ export class MarketplaceProductCardComponent extends AppComponentBase {
     this._AppEntitiesServiceProxy.getHostSettingValue(1214, null)
     .subscribe((result) => {
       this.showMsrP = result?.toString().toLowerCase() =='yes' ? true : false;
-  
+   this.cdr.markForCheck();
     });
   
   }
