@@ -3870,7 +3870,7 @@ namespace onetouch.Accounts
                     if (sync )//&& contact.EntityFk.EntityObjectTypeId== personEntityObjectTypeId)
                     {
                         
-                        var connectedList = await _appContactRepository.GetAll().Where(z => z.TenantId != AbpSession.TenantId && z.SSIN == createOrEditAccountInfoDto.SSIN).ToListAsync();
+                        var connectedList = await _appContactRepository.GetAll().Where(z => z.TenantId != null && z.TenantId != AbpSession.TenantId && z.SSIN == createOrEditAccountInfoDto.SSIN).ToListAsync();
                         if (connectedList != null && connectedList.Count > 0)
                         {
                             foreach (var connectedAcc in connectedList)
