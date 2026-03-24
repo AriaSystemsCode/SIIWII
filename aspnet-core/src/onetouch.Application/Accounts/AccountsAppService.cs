@@ -94,6 +94,7 @@ using SixLabors.Fonts;
 using System.Management.Automation;
 using Newtonsoft.Json;
 using DocumentFormat.OpenXml.Spreadsheet;
+using DocumentFormat.OpenXml.InkML;
 
 
 namespace onetouch.Accounts
@@ -3850,8 +3851,11 @@ namespace onetouch.Accounts
                         profileSSIN = await _helper.SystemTables.GenerateSSIN(contactObjectId, accountInfoEntity);
                         if (!string.IsNullOrEmpty(profileSSIN))
                         {
+                            var con = UnitOfWorkManager.Current.GetDbContext<onetouchDbContext>();
+                            con.ChangeTracker.Clear();
                             contact.EntityFk.SSIN = profileSSIN;
                             await _appEntityRepository.UpdateAsync(contact.EntityFk);
+                            await con.Entry(contact).ReloadAsync();
                             contact.SSIN = profileSSIN;
                             await _appContactRepository.UpdateAsync(contact);
                             await CurrentUnitOfWork.SaveChangesAsync();
