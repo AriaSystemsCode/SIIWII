@@ -175,7 +175,7 @@ NOT CARDS VIEW MODE
         <div class="info-container d-flex flex-column">
           <!-- Categories Section -->
 <div *ngIf="!cardsViewMode && account.account.categories.length !=0"
-     class="d-flex align-items-center flex-nowrap categories-wrap">
+     class="d-flex align-items-center flex-nowrap categories-wrap" style="white-space: nowrap;">
 
   <p class="m-0 product-name mr-1 section-mini-label">
     <b class="text-dark">{{ "Categories" | localize }}</b> :
@@ -209,7 +209,7 @@ NOT CARDS VIEW MODE
 
           <!-- Classifications Section -->
    <div *ngIf="!cardsViewMode && account.account.classfications.length != 0"
-     class="d-flex align-items-center flex-nowrap classifications-wrap mt-1">
+     class="d-flex align-items-center flex-nowrap classifications-wrap mt-1"  style="white-space: nowrap;">
 
   <p class="m-0 product-name mr-1 section-mini-label">
     <b class="text-dark">{{ "Classifications" | localize }}</b> :
