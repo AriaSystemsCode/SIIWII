@@ -137,7 +137,7 @@ export class AccountsComponent
         if (!selectedfilter) return;
         this.mainFilterCtrl.setValue(selectedfilter);
     }
-    overridePrimeTableSetting(countPerPage: number = 30) {
+    overridePrimeTableSetting(countPerPage: number = 32) {
         this.primengTableHelper.defaultRecordsCountPerPage = countPerPage;
         this.primengTableHelper.predefinedRecordsCountPerPage = [
             countPerPage,

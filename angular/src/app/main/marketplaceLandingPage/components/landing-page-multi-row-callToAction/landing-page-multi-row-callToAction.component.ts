@@ -221,8 +221,7 @@ export class LandingPageMultiRowCallToActionComponent extends AppComponentBase i
 
   }
 
-  createRelation(account, option: { connectLabel: string; connectionEntityId: number; defaultVisibility: string }) {
-    if (!option?.connectionEntityId) return;
+  createRelation(account, option) {
 
     this.showMainSpinner();
 
@@ -230,8 +229,8 @@ export class LandingPageMultiRowCallToActionComponent extends AppComponentBase i
       .applyRelationOnProfile(
         account?.account?.id,
         undefined,
-        (option.defaultVisibility || '').toLowerCase() === 'public',
-        option.connectionEntityId
+        (option?.relation?.defaultVisibility || '').toLowerCase() === 'public',
+        option?.relation?.connectionEntityId
       )
       .pipe(finalize(() => this.hideMainSpinner()))
       .subscribe((result: any) => {

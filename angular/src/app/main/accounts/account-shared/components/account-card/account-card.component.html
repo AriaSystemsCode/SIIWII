@@ -77,7 +77,7 @@ CARDS VIEW MODE
       </div>
 
       <div
-        *ngIf="((account?.availableConnections?.length > 0 && fromMarketplace && account?.avaliableConnectionName) || (!fromMarketplace && !account.connectionName && account.avaliableConnectionName)) && isAuthenticated"
+        *ngIf="((account?.availableConnections?.length > 0 && fromMarketplace ) || (!fromMarketplace && !account.connectionName )) && isAuthenticated"
         class="w-100"
       >
         <ng-container *ngIf="account?.availableConnections as options">
@@ -157,8 +157,9 @@ NOT CARDS VIEW MODE
     <div>
       <div class="col-md-12 px-0 mb-2">
         <div class="d-flex justify-content-between">
-        <h3 (click)="clickCardHandler()" class="card-name my-1 m-0">
-          {{account?.account?.name}}
+        <h3 (click)="clickCardHandler()" class="card-name my-1 m-0" [pTooltip]="account?.account?.name"
+          tooltipPosition="bottom">
+          {{account?.account?.name  | textSubstring : 20 }}
         </h3>
 
                <!-- <div   >
@@ -174,7 +175,7 @@ NOT CARDS VIEW MODE
         <div class="info-container d-flex flex-column">
           <!-- Categories Section -->
 <div *ngIf="!cardsViewMode && account.account.categories.length !=0"
-     class="d-flex align-items-center flex-nowrap categories-wrap">
+     class="d-flex align-items-center flex-nowrap categories-wrap" style="white-space: nowrap;">
 
   <p class="m-0 product-name mr-1 section-mini-label">
     <b class="text-dark">{{ "Categories" | localize }}</b> :
@@ -208,7 +209,7 @@ NOT CARDS VIEW MODE
 
           <!-- Classifications Section -->
    <div *ngIf="!cardsViewMode && account.account.classfications.length != 0"
-     class="d-flex align-items-center flex-nowrap classifications-wrap mt-1">
+     class="d-flex align-items-center flex-nowrap classifications-wrap mt-1"  style="white-space: nowrap;">
 
   <p class="m-0 product-name mr-1 section-mini-label">
     <b class="text-dark">{{ "Classifications" | localize }}</b> :
@@ -323,7 +324,7 @@ NOT CARDS VIEW MODE
 
             <span
               style="width: 100%;"
-              *ngIf="((account?.availableConnections?.length > 0 && fromMarketplace && account?.avaliableConnectionName) || (!fromMarketplace && !account.connectionName && account.avaliableConnectionName)) && isAuthenticated"
+              *ngIf="((account?.availableConnections?.length > 0 && fromMarketplace ) || (!fromMarketplace && !account.connectionName )) && isAuthenticated"
             >
               <ng-container *ngIf="account?.availableConnections as options">
                 <div class="relationWrap " style="text-align: end;" dropdown>
