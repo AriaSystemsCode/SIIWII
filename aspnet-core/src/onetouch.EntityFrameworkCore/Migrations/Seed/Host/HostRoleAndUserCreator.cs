@@ -359,12 +359,43 @@ namespace onetouch.Migrations.Seed.Host
                 _context.SaveChanges();
             }
             //MMT33[End]
+            //I52[Start]
+            var sydObjects_Dashboard = _context.SydObjects.IgnoreQueryFilters().FirstOrDefault(
+                                                r => r.Code == "DASHBOARD");
+            if (sydObjects_Dashboard == null && ObjectTypeCodeEntity != null && ObjectTypeCodeEntity.Id > 0)
+            {
+                sydObjects_Dashboard = new SystemObjects.SydObject
+                {
+                    Code = "DASHBOARD",
+                    Name = "Dashboard",
+                    ObjectTypeCode = ObjectTypeCodeEntity.Code,
+                    ObjectTypeId = ObjectTypeCodeEntity.Id
+                };
+                _context.SydObjects.Add(sydObjects_Dashboard);
+                _context.SaveChanges();
+            }
+            var sydObjects_DashboardCard = _context.SydObjects.IgnoreQueryFilters().FirstOrDefault(
+                                                r => r.Code == "DASHBOARDCARD");
+            if (sydObjects_DashboardCard == null && ObjectTypeCodeEntity != null && ObjectTypeCodeEntity.Id > 0)
+            {
+                sydObjects_DashboardCard = new SystemObjects.SydObject
+                {
+                    Code = "DASHBOARDCARD",
+                    Name = "Dashboard Card",
+                    ObjectTypeCode = ObjectTypeCodeEntity.Code,
+                    ObjectTypeId = ObjectTypeCodeEntity.Id
+                };
+                _context.SydObjects.Add(sydObjects_DashboardCard);
+                _context.SaveChanges();
+            }
+            
+            //I52[End]
             #endregion Add missing SydObjects
 
             #region Add missing sycEntityObjectTypes
-            var parents = "LOOKUP,ITEM,ITEM,ITEM,LISTING,CATEGORY,DEPARTMENT,CLASSIFICATION,CONTACT,CONTACT,CONTACT,CONTACT,SCALE,TRANSACTION,TRANSACTION,LOOKUP,STANDARDFEATURE,STANDARDSUBSCRIPTIONPLAN,TENANTACTIVITYLOG,LOOKUP,TRANSACTION,MESSAGE-DATA,MESSAGE-DATA,MESSAGE-DATA,MESSAGE-DATA,MARKETPLACECONTACTRELATIONSHIP,MARKETPLACECONTACTRELATIONSHIP,MARKETPLACECONTACTRELATIONSHIP,MARKETPLACECONTACTRELATIONSHIP,MARKETPLACECONTACTRELATIONSHIP,MARKETPLACECONTACTRELATIONSHIP,MARKETPLACECONTACTRELATIONSHIP,MARKETPLACECONTACTRELATIONSHIP,LOOKUP".ToUpper().Split(',');
-            var codes = "BACKGROUND,PRODUCTVARIATION,PRODUCT,LISTINGVARIATION,LISTING,CATEGORY,DEPARTMENT,CLASSIFICATION,BRANCH,BUSINESS,GROUP,PERSONAL,SIZESCALE,SALESORDER,PURCHASEORDER,SHIPVIA,STANDARDFEATURE,STANDARDSUBSCRIPTIONPLAN,TENANTACTIVITYLOG,UOM,ARINVOICE,MESSAGE,COMMENT,REVIEW,QUESTION,PTB,PTG,PTP,BTP,BTG,BTB,GTP,GTB,MARKETPLACECONTACTRELATIONSHIP".ToUpper().Split(',');
-            var names = "Background,Product Variation,Product,Listing Variation,Listing,Category,Department,Classification,Branch,BUSINESS,Group,Personal,Size Scale,Sales Order,Purchase Order,Ship Via,Standard Feature,Standard Subscription Plan,Tenant Activity Log,Unit Of Measurement,AR Invoice,Message,Comment,Review,Question,Person relation with Business,Person relation with Group,Person relation with Person,Business relation with Person,Business relation with Group,Business relation with Business,Group relation with Person,Group relation with Business,Marketplace Contact Relationship".Split(',');
+            var parents = "LOOKUP,ITEM,ITEM,ITEM,LISTING,CATEGORY,DEPARTMENT,CLASSIFICATION,CONTACT,CONTACT,CONTACT,CONTACT,SCALE,TRANSACTION,TRANSACTION,LOOKUP,STANDARDFEATURE,STANDARDSUBSCRIPTIONPLAN,TENANTACTIVITYLOG,LOOKUP,TRANSACTION,MESSAGE-DATA,MESSAGE-DATA,MESSAGE-DATA,MESSAGE-DATA,MARKETPLACECONTACTRELATIONSHIP,MARKETPLACECONTACTRELATIONSHIP,MARKETPLACECONTACTRELATIONSHIP,MARKETPLACECONTACTRELATIONSHIP,MARKETPLACECONTACTRELATIONSHIP,MARKETPLACECONTACTRELATIONSHIP,MARKETPLACECONTACTRELATIONSHIP,MARKETPLACECONTACTRELATIONSHIP,LOOKUP,DASHBOARD,DASHBOARDCARD,DASHBOARDCARD,DASHBOARDCARD,DASHBOARDCARD".ToUpper().Split(',');
+            var codes = "BACKGROUND,PRODUCTVARIATION,PRODUCT,LISTINGVARIATION,LISTING,CATEGORY,DEPARTMENT,CLASSIFICATION,BRANCH,BUSINESS,GROUP,PERSONAL,SIZESCALE,SALESORDER,PURCHASEORDER,SHIPVIA,STANDARDFEATURE,STANDARDSUBSCRIPTIONPLAN,TENANTACTIVITYLOG,UOM,ARINVOICE,MESSAGE,COMMENT,REVIEW,QUESTION,PTB,PTG,PTP,BTP,BTG,BTB,GTP,GTB,MARKETPLACECONTACTRELATIONSHIP,DASHBOARD,BARWIDGET,PIEWIDGET,LINEWIDGET,CALCULATIONWIDGET".ToUpper().Split(',');
+            var names = "Background,Product Variation,Product,Listing Variation,Listing,Category,Department,Classification,Branch,BUSINESS,Group,Personal,Size Scale,Sales Order,Purchase Order,Ship Via,Standard Feature,Standard Subscription Plan,Tenant Activity Log,Unit Of Measurement,AR Invoice,Message,Comment,Review,Question,Person relation with Business,Person relation with Group,Person relation with Person,Business relation with Person,Business relation with Group,Business relation with Business,Group relation with Person,Group relation with Business,Marketplace Contact Relationship,Dashboard,Bar Widget,Pie Widget,Line Widget,Calculation7 Widget".Split(',');
 
             for (int i = 0; i < codes.Length; i++)
             {

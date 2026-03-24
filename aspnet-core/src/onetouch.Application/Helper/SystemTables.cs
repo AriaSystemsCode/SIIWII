@@ -903,5 +903,37 @@ namespace onetouch.Helpers
             return obj;
         }
         //MMT40[End]
+        //I52[Start]
+        public async Task<long> GetObjectDashboardId()
+        {
+            var obj = await _sydObjectRepository.FirstOrDefaultAsync(x => x.Code == "DASHBOARD");
+            return obj.Id;
+        }
+        public async Task<long> GetObjectDashboardCardId()
+        {
+            var obj = await _sydObjectRepository.FirstOrDefaultAsync(x => x.Code == "DASHBOARDCARD");
+            return obj.Id;
+        }
+        public async Task<long> GetEntityObjectTypeDashboardId()
+        {
+            var obj = await _sycEntityObjectType.FirstOrDefaultAsync(x => x.Code == "DASHBOARD");
+            return obj.Id;
+        }
+        public async Task<string> GetEntityObjectTypeDashboardCode()
+        {
+            var obj = await _sycEntityObjectType.FirstOrDefaultAsync(x => x.Code == "DASHBOARD");
+            return obj.Code;
+        }
+        public async Task<long> GetEntityObjectTypeDashboardCardId()
+        {
+            var obj = await _sycEntityObjectType.FirstOrDefaultAsync(x => x.Code == "DASHBOARDCARD");
+            return obj.Id;
+        }
+        public async Task<string> GetEntityObjectTypeDashboardCardCode()
+        {
+            var obj = await _sycEntityObjectType.FirstOrDefaultAsync(x => x.Code == "DASHBOARDCARD");
+            return obj.Code;
+        }
+        //I52[End]
     }
 }
