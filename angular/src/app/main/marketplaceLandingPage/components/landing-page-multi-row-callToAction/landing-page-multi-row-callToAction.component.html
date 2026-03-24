@@ -9,11 +9,11 @@
 
 
         <div *ngSwitchCase="'PRODUCT'" class="product-card-horizontal">
-          <app-marketplace-product-card *ngIf="blockTypeIsSingleOrMixed =='Mixed Types Blocks' || blockTypeIsSingleOrMixed ==null" [item]="block" [attachmentBaseUrl]="attachmentBaseUrl"
+          <app-marketplace-product-card *ngIf="blockTypeIsSingleOrMixed =='Mixed Types Blocks' " [item]="block" [attachmentBaseUrl]="attachmentBaseUrl"
           [languageSettingName]="languageSettingName" (view)="viewProduct($event)"
           (imgError)="onImgErr($event)"></app-marketplace-product-card>
 
-              <app-prodcut-card *ngIf="blockTypeIsSingleOrMixed !='Mixed Types Blocks'"
+              <app-prodcut-card *ngIf="blockTypeIsSingleOrMixed !='Mixed Types Blocks' || blockTypeIsSingleOrMixed ==null"
             [product]="block.getAppMarketItemForViewDto.appItem" [productCard]="block.getAppMarketItemForViewDto"
             [acceptedAspectRatio]="acceptedAspectRatio"></app-prodcut-card>
         </div>
@@ -48,7 +48,7 @@
 
 
         <!-- EVENT -->
-        <div *ngSwitchCase="'EVENT'">
+        <div *ngSwitchCase="'EVENT'" class="mr-2">
           <app-marketplace-event-card *ngIf="blockTypeIsSingleOrMixed =='Mixed Types Blocks'" [block]="block?.getAppEventForViewDto?.appEvent"  (details)="openEventDetails($event)"></app-marketplace-event-card>
           
 

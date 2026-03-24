@@ -6,7 +6,7 @@
 
 .products-grid-single {
   display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(252px, 0fr));
+      grid-template-columns: repeat(auto-fit, minmax(310px, 0fr));
   gap: 0.75rem;
 }
 
@@ -17,7 +17,7 @@
 
 
 .block-card {
-  background: #ffffff;
+  // background: #ffffff;
   border-radius: 12px;
   border: 1px solid #ebedf2;
   box-sizing: border-box;
