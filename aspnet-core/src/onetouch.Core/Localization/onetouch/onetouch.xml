@@ -2683,8 +2683,11 @@
 	<text name="CreateBusinessAccount">Create Business Account</text>
 	<text name="CreateGroupAccount">Create Group Account</text>
 	<text name="BUSINESSAccount">Business Account</text>
+	<text name="BusinessAccount">Business Account</text>
 	<text name="PERSONALAccount">Personal Account</text>
+	<text name="PersonalAccount">Personal Account</text>
 	<text name="GROUPAccount">Group Account</text>
+	<text name="GroupAccount">Group Account</text>
 	<text name="OnlineEvent">Online Event</text>
 	<text name="InPersonEvent">InPerson Event</text>
 	<text name="BUSINESS">Business</text>
