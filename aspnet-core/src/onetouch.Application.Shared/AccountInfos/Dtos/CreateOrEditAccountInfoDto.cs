@@ -34,6 +34,7 @@ namespace onetouch.AccountInfos.Dtos
         private AccountLevelEnum accountLevel= AccountLevelEnum.Profile;
 
         public string FileToken { get; set; }
+        
 
         //[Required]
         [StringLength(AccountInfoTempConsts.MaxTradeNameLength, MinimumLength = AccountInfoTempConsts.MinTradeNameLength)]

@@ -1,4 +1,4 @@
-import { Component, Injector, OnInit } from '@angular/core';
+import { Component, Injector, OnInit, QueryList, ViewChildren } from '@angular/core';
 import { CreateEditAppItemExtraAttribute } from '@app/main/app-items/app-item-shared/models/create-edit-app-item-extra-attribute';
 import { FilteredExtraAttribute } from '@app/main/app-items/app-item-shared/models/filtered-extra-attribute';
 import { ExtraAttributeDataService } from '@app/main/app-items/app-item-shared/services/extra-attribute-data.service';
@@ -12,6 +12,7 @@ import { AppComponentBase } from '@shared/common/app-component-base';
 import { ComboboxItemDto, CommonLookupServiceProxy, SettingScopes, HostSettingsEditDto, HostSettingsServiceProxy, SendTestEmailInput, GetAllEntityObjectTypeOutput, LookupLabelDto, AppEntityExtraDataDto, SycEntityObjectTypesServiceProxy, SystemTablesServiceProxy, AppEntitiesServiceProxy, GetAppEntityForEditOutput, AppEntityAttachmentDto, AttachmentsCategories, AppEntityDto } from '@shared/service-proxies/service-proxies';
 import { finalize } from 'rxjs/operators';
 import { forkJoin, Observable } from 'rxjs';
+import { dynamicInputs } from '@shared/components/dynamicInputs/dynamicInputs.component';
 
 @Component({
     templateUrl: './portal-host-settings.component.html',
@@ -59,9 +60,10 @@ export class PortalHostSettingsComponent extends AppComponentBase implements OnI
     entityObjectTypeHostId: number = 764;
     hostEntityId: number;
     attachmentsUploader;
-    attachmets=[];
-    AttachmentInfoDto=[];
-
+    attachmets = [];
+    AttachmentInfoDto = [];
+    @ViewChildren('appdynamicInputs')
+    dynamicInputsComponents!: QueryList<dynamicInputs>;
 
     constructor(
         injector: Injector,
@@ -103,11 +105,12 @@ export class PortalHostSettingsComponent extends AppComponentBase implements OnI
         const self = this;
         self.testEmailAddress = self.appSession.user.emailAddress;
         self.showTimezoneSelection = abp.clock.provider.supportsMultipleTimezone;
-      //  self.loadHostSettings();
-       // self.loadEditions();
+        //  self.loadHostSettings();
+        // self.loadEditions();
     }
 
     ngOnInit(): void {
+        this.stopFormListening=true;
         const self = this;
         self.init();
         this.getSettingData()
@@ -190,43 +193,29 @@ export class PortalHostSettingsComponent extends AppComponentBase implements OnI
     }
 
 
-    
+
 
     saveAll(): void {
         const self = this;
         let success = false;
-        this.showMainSpinner();
 
-        const extraDataList = this.dynamicInputsForViewDto?.entityExtraData || [];
-      
-         
-            let appEntityDto : AppEntityDto=new AppEntityDto();
-            appEntityDto.entityExtraData =  this.dynamicInputsForViewDto?.entityExtraData || [];
-            appEntityDto.id= this.hostEntityId;
-            appEntityDto.entityObjectTypeId=this.entityObjectTypeHostId;
-            appEntityDto.objectId= 2;
-            appEntityDto.code= this.dynamicInputsForViewDto.appEntity.code;
-            appEntityDto.name=this.dynamicInputsForViewDto.appEntity.name;
+      const extraDataList = this.dynamicInputsForViewDto?.entityExtraData || [];
 
-            appEntityDto.extraDataFileTypeIndex = appEntityDto.entityExtraData
-            .map((item, index) => item.attributeValue && item.attributeValue.includes('|') ? index : -1)
+        let appEntityDto: AppEntityDto = new AppEntityDto();
+        appEntityDto.entityExtraData = this.dynamicInputsForViewDto?.entityExtraData || [];
+        appEntityDto.id = this.hostEntityId;
+        appEntityDto.entityObjectTypeId = this.entityObjectTypeHostId;
+        appEntityDto.objectId = 2;
+        appEntityDto.code = this.dynamicInputsForViewDto.appEntity.code;
+        appEntityDto.name = this.dynamicInputsForViewDto.appEntity.name;
+
+        appEntityDto.extraDataFileTypeIndex = appEntityDto.entityExtraData
+            .map((item, index) =>
+                typeof item.attributeValue === 'string' && item.attributeValue.includes('|') ? index : -1
+            )
             .filter(index => index !== -1);
-            
-              this._appEntitiesServiceProxy.saveEntity(appEntityDto)
-              .pipe(
-                finalize(() => {
-                 // this.formTouched = false;
-                  this.hideMainSpinner();
-                })
-              )
-              .subscribe({
-                next: (results) => {
-                  this.notify.success(this.l('Saved Successfully'));
-                },
-                error: (err) => {
-                  this.notify.error(this.l('Save Failed'));
-                }
-              });
+
+        this.dynamicInputsComponents.first.saveAll(appEntityDto);
 
         if (
             abp.clock.provider.supportsMultipleTimezone &&
@@ -420,7 +409,7 @@ export class PortalHostSettingsComponent extends AppComponentBase implements OnI
     }
 
     onExtraAttributesChanged(dataFromChild: any[]) {
-      //  this.formTouched = true;
+       // this.formTouched = true;
         if (!this.dynamicInputsForViewDto) {
             this.dynamicInputsForViewDto = new GetAppEntityForEditOutput();
         }
@@ -453,7 +442,7 @@ export class PortalHostSettingsComponent extends AppComponentBase implements OnI
                 } else {
                     if (attr.value && attr.value.type?.startsWith('image/'))
                         dto.attributeValue = attr.value.name;
-                      else 
+                    else
                         dto.attributeValue = attr.value;
                 }
                 return dto;
@@ -486,6 +475,10 @@ export class PortalHostSettingsComponent extends AppComponentBase implements OnI
             }
 
         }
+    }
+
+    onActiveIndexChange(usage) {
+        this.selectedUsage = usage;
     }
 
 }

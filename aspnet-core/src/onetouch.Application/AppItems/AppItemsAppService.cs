@@ -82,11 +82,6 @@ using Newtonsoft.Json;
 using System.Drawing;
 using DocumentFormat.OpenXml.Office2010.ExcelAc;
 using onetouch.MultiTenancy;
-using Abp.Timing;
-using ClosedXML.Excel;
-using NPOI.POIFS.Properties;
-using OfficeOpenXml;
-using System.Diagnostics;
 using Org.BouncyCastle.Crypto.Agreement.JPake;
 
 namespace onetouch.AppItems
@@ -7017,12 +7012,12 @@ namespace onetouch.AppItems
 
                     itemExcelResultsDTO.ExcelLogDTO = new ExcelLogDto();
 
-                    itemExcelResultsDTO.ExcelLogDTO.ExcelLogPath = itemExcelResultsDTO.FilePath.Replace(_appConfiguration[$"Attachment:Omitt"].ToString(), "");
-                    // accountExcelResultsDTO.AccountExcelLogDTO.AccountExcelLogPath = @"https://localhost:44308/" + accountExcelResultsDTO.FilePath.Replace(_appConfiguration[$"Attachment:Omitt"].ToString().ToUpper(), "");
-                    itemExcelResultsDTO.ExcelLogDTO.ExcelLogPath = itemExcelResultsDTO.ExcelLogDTO.ExcelLogPath.ToLower();
-                    itemExcelResultsDTO.ExcelLogDTO.ExcelLogFileName = _appConfiguration[$"ItemTemplates:ItemExcelLogFileName"];
-                    #endregion
-                    ////I46 test
+                itemExcelResultsDTO.ExcelLogDTO.ExcelLogPath = itemExcelResultsDTO.FilePath.Replace(_appConfiguration[$"Attachment:Omitt"].ToString(), "");
+                // accountExcelResultsDTO.AccountExcelLogDTO.AccountExcelLogPath = @"https://localhost:44340/" + accountExcelResultsDTO.FilePath.Replace(_appConfiguration[$"Attachment:Omitt"].ToString().ToUpper(), "");
+                itemExcelResultsDTO.ExcelLogDTO.ExcelLogPath = itemExcelResultsDTO.ExcelLogDTO.ExcelLogPath.ToLower();
+                itemExcelResultsDTO.ExcelLogDTO.ExcelLogFileName = _appConfiguration[$"ItemTemplates:ItemExcelLogFileName"];
+                #endregion
+                ////I46 test
 
 
                     //// x = ObjectMapper.Map<List<ImportItemInputDto>>(itemExcelResultsDTO.ExcelRecords);
@@ -7884,63 +7879,48 @@ namespace onetouch.AppItems
 
         public async Task<List<ImportItemReturnDto>> ImportItem(List<ImportItemInputDto> itemExcelDtoList, string repeatHandler)
         {
-            
+            AppItemExcelResultsDTO saveExcelinput = new AppItemExcelResultsDTO();
+            saveExcelinput.CodesFromList = new List<string>();
+            saveExcelinput.ToList = new List<int>();
+            saveExcelinput.FromList = new List<int>();
+            saveExcelinput.ErrorMessage = "";
+            saveExcelinput.ExcelRecords = new List<AppItemtExcelRecordDTO>();
+            saveExcelinput.RepreateHandler = (ExcelRecordRepeateHandler)Enum.Parse(typeof(ExcelRecordRepeateHandler), repeatHandler.ToString());
+            saveExcelinput.To = 0;
+            saveExcelinput.From = 0;
             List<ImportItemReturnDto> returnList = new List<ImportItemReturnDto>();
             var hasErrors = false;
             try
             {
-                AppItemExcelResultsDTO saveExcelinput = new AppItemExcelResultsDTO();
-                saveExcelinput.CodesFromList = new List<string>();
-                saveExcelinput.ToList = new List<int>();
-                saveExcelinput.FromList = new List<int>();
-                saveExcelinput.ErrorMessage = "";
-                saveExcelinput.ExcelRecords = new List<AppItemtExcelRecordDTO>();
-                saveExcelinput.RepreateHandler = (ExcelRecordRepeateHandler)Enum.Parse(typeof(ExcelRecordRepeateHandler), repeatHandler.ToString());
-                saveExcelinput.To = 0;
-                saveExcelinput.From = 0;
-
-                #region Preload Existing Items for Duplication Check
-                var existingItemsDict = _appItemRepository.GetAll()
-                    .Where(x => x.ItemType == 0)
-                    .Select(x => new { Code = x.Code.Replace(" ", "").ToUpper(), x.Id })
-                    .ToDictionary(x => x.Code, x => x.Id);
-
-                #endregion
-
-                List<CurrencyInfoDto> currencyIds =
-                    await _appEntitiesAppService.GetAllCurrencyForTableDropdown();
-
-                foreach (var excelDto in itemExcelDtoList)
+                if (!string.IsNullOrEmpty(excelDto.ParentCode))
+                    continue;
+                long id = 0;
+                bool canBeSaved = true;
+                var list = await ValidateImportItemData(excelDto);
+                if (list != null && list.Count > 0)
                 {
-                    if (!string.IsNullOrEmpty(excelDto.ParentCode))
-                        continue;
-                    long id = 0;
-                    bool canBeSaved = true;
-                    var list = await ValidateImportItemData(excelDto,0, existingItemsDict, currencyIds);
-                    if (list != null && list.Count > 0)
+                    foreach (var err in list)
                     {
-                        foreach (var err in list)
-                        {
-                            returnList.Add(err);
-                            canBeSaved = err.ErrorType != "Stopper" ? canBeSaved : false;
-                            if (err.ErrorType == "Duplication")
-                                id = long.Parse(err.Id.ToString());
-                        }
+                        returnList.Add(err);
+                        canBeSaved = err.ErrorType != "Stopper" ? canBeSaved : false;
+                        if (err.ErrorType == "Duplication")
+                            id = long.Parse(err.Id.ToString());
                     }
-                    if (canBeSaved == true)
-                    {
-                        var pdtyp = await _SycEntityObjectTypesAppService.GetAllWithExtraAttributesByCode(excelDto.ProductType);
-                        var prdObj = pdtyp.FirstOrDefault();
+                }
+                if (canBeSaved == true)
+                {
+                    var pdtyp = await _SycEntityObjectTypesAppService.GetAllWithExtraAttributesByCode(excelDto.ProductType);
+                    var prdObj = pdtyp.FirstOrDefault();
 
-                        var entityObjectExtraAttribute = await _SycEntityObjectTypesAppService.GetAllWithExtraAttributes(long.Parse(prdObj.Id.ToString()));
-                        var entityextr = entityObjectExtraAttribute.FirstOrDefault();
-                        List<ExtraAttribute> entityExtraAttributes = null;
-                        if (entityextr != null && entityextr.ExtraAttributes != null)
-                            entityExtraAttributes = entityextr.ExtraAttributes.ExtraAttributes;
-                        MapperConfiguration configuration;
-                        configuration = new MapperConfiguration(a => { a.AddProfile(new AppItemExcelImpDtoProfile(entityExtraAttributes)); });
-                        IMapper mapper;
-                        mapper = configuration.CreateMapper();
+                    var entityObjectExtraAttribute = await _SycEntityObjectTypesAppService.GetAllWithExtraAttributes(long.Parse(prdObj.Id.ToString()));
+                    var entityextr = entityObjectExtraAttribute.FirstOrDefault();
+                    List<ExtraAttribute> entityExtraAttributes = null;
+                    if (entityextr != null && entityextr.ExtraAttributes != null)
+                        entityExtraAttributes = entityextr.ExtraAttributes.ExtraAttributes;
+                    MapperConfiguration configuration;
+                    configuration = new MapperConfiguration(a => { a.AddProfile(new AppItemExcelImpDtoProfile(entityExtraAttributes)); });
+                    IMapper mapper;
+                    mapper = configuration.CreateMapper();
 
 
                     //MapperConfiguration configurationMap;
@@ -7991,76 +7971,45 @@ namespace onetouch.AppItems
                         }
                     }
 
-                    }
                 }
-                if (saveExcelinput.ExcelRecords.Count > 0)
-                {
-                    try
-                    {
-                        await SaveFromExcel(saveExcelinput);
-                        var myTenantObject = await TenantManager.GetByIdAsync(int.Parse(AbpSession.TenantId.ToString()));
-                        string tenancyName = myTenantObject.TenancyName;
-                        var adminUser = await UserManager.FindByNameAsync("admin@" + tenancyName);
-                        if (adminUser != null)
-                        {
-                            await _appNotifier.SendMessageAsync(new Abp.UserIdentifier(AbpSession.TenantId, adminUser.Id),
-                                "Items imported successfully.",
-                                Abp.Notifications.NotificationSeverity.Info, null);//new Abp.Domain.Entities.EntityIdentifier(typeof(AppContact), originalPublishContactFortCurrTenant.Id));
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        hasErrors = true;
-                        var myTenantObject = await TenantManager.GetByIdAsync(int.Parse(AbpSession.TenantId.ToString()));
-                        string tenancyName = myTenantObject.TenancyName;
-                        var adminUser = await UserManager.FindByNameAsync("admin@" + tenancyName);
-                        if (adminUser != null)
-                        {
-                            await _appNotifier.SendMessageAsync(new Abp.UserIdentifier(AbpSession.TenantId, adminUser.Id),
-                                "Items import has errors: " + ex.Message,
-                                Abp.Notifications.NotificationSeverity.Info, null);//new Abp.Domain.Entities.EntityIdentifier(typeof(AppContact), originalPublishContactFortCurrTenant.Id));
-                        }
-                    }
-                }
-                //I46, MMT 07/08/2025 Save Result to Excel[Start]
-                if (returnList.Count > 0)
-                {
-                    string attachmentFolder = _appConfiguration[$"APP:ServerRootAddress"] + @"/" +
-                        _appConfiguration[$"Attachment:Path"].Replace(_appConfiguration[$"Attachment:Omitt"], "") + @"/" + AbpSession.TenantId.ToString();
-                    System.IO.DirectoryInfo dire = new DirectoryInfo(attachmentFolder);
-                    //if (!dire.Exists)
-                    //    dire.Create();
-                    string fileName = "ImportItemResult-" + DateTime.Now.ToString("yyyy-dd-M--HH-mm-ss") + ".xlsx";
-                    string outFile = attachmentFolder + "//" + fileName;
-
-                    string jsonData = JsonConvert.SerializeObject(returnList);
-                    string fileToExport = _appConfiguration[$"Attachment:Path"] + @"\" + AbpSession.TenantId.ToString() + @"\" + fileName;
-                    _helper.ExcelHelper.ExportJsonToExcel(fileToExport, jsonData);
-                    if (!hasErrors)
-                    {
-                        var myTenantObject = await TenantManager.GetByIdAsync(int.Parse(AbpSession.TenantId.ToString()));
-                        string tenancyName = myTenantObject.TenancyName;
-                        var adminUser = await UserManager.FindByNameAsync("admin@" + tenancyName);
-                        if (adminUser != null)
-                        {
-                            await _appNotifier.SendMessageAsync(new Abp.UserIdentifier(AbpSession.TenantId, adminUser.Id),
-                                "Importing Item result can be downloaded from <a href=\"" + outFile + "\" download>" + "here" + "</a>",
-                                Abp.Notifications.NotificationSeverity.Info, null);//new Abp.Domain.Entities.EntityIdentifier(typeof(AppContact), originalPublishContactFortCurrTenant.Id));
-                        }
-                    }
-                }
-
             }
-            catch (Exception ex)
+            if (saveExcelinput.ExcelRecords.Count > 0)
             {
+                await SaveFromExcel(saveExcelinput);
                 var myTenantObject = await TenantManager.GetByIdAsync(int.Parse(AbpSession.TenantId.ToString()));
                 string tenancyName = myTenantObject.TenancyName;
                 var adminUser = await UserManager.FindByNameAsync("admin@" + tenancyName);
                 if (adminUser != null)
                 {
                     await _appNotifier.SendMessageAsync(new Abp.UserIdentifier(AbpSession.TenantId, adminUser.Id),
-                        "Items import has errors: " + ex.Message,
+                        "Items imported successfully.",
                         Abp.Notifications.NotificationSeverity.Info, null);//new Abp.Domain.Entities.EntityIdentifier(typeof(AppContact), originalPublishContactFortCurrTenant.Id));
+                }
+            }
+            //I46, MMT 07/08/2025 Save Result to Excel[Start]
+            if (returnList.Count > 0)
+            {
+                string attachmentFolder = _appConfiguration[$"APP:ServerRootAddress"] + @"/" +
+                    _appConfiguration[$"Attachment:Path"].Replace(_appConfiguration[$"Attachment:Omitt"], "") + @"/" + AbpSession.TenantId.ToString();
+                System.IO.DirectoryInfo dire = new DirectoryInfo(attachmentFolder);
+                //if (!dire.Exists)
+                //    dire.Create();
+                string fileName = "ImportItemResult-" + DateTime.Now.ToString("yyyy-dd-M--HH-mm-ss") + ".xlsx";
+                string outFile = attachmentFolder + "//" + fileName;
+
+                string jsonData = JsonConvert.SerializeObject(returnList);
+                string fileToExport = _appConfiguration[$"Attachment:Path"] + @"\" + AbpSession.TenantId.ToString() + @"\" + fileName;
+                _helper.ExcelHelper.ExportJsonToExcel(fileToExport, jsonData);
+                {
+                    var myTenantObject = await TenantManager.GetByIdAsync(int.Parse(AbpSession.TenantId.ToString()));
+                    string tenancyName = myTenantObject.TenancyName;
+                    var adminUser = await UserManager.FindByNameAsync("admin@" + tenancyName);
+                    if (adminUser != null)
+                    {
+                        await _appNotifier.SendMessageAsync(new Abp.UserIdentifier(AbpSession.TenantId, adminUser.Id),
+                            "Importing Item result can be downloaded from <a href=\"" + outFile + "\" download>" + "here" + "</a>",
+                            Abp.Notifications.NotificationSeverity.Info, null);//new Abp.Domain.Entities.EntityIdentifier(typeof(AppContact), originalPublishContactFortCurrTenant.Id));
+                    }
                 }
             }
             //ExportJsonToExcel

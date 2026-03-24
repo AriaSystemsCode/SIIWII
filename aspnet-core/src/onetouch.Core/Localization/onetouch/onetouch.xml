@@ -1,6 +1,13 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <localizationDictionary culture="en">
 	<texts>
+	<text name="CALCULATIONAPI">Calculation API</text>
+	<text name="CHARGETYPE">Charge Type</text>
+	<text name="ITEMSSIN">Item SSIN</text>
+	<text name="ISEDITABLE">Is Editable</text>
+	<text name="SHIPPINGCHARGE">Shipping Charge</text>
+	<text name="SHIPPINGMINIMUMAMOUNT">Shipping Minimum Amount</text>		
+		
 	<text name="DefaultContactUsEmail">Default contact us email</text>
 	<text name="Defaultcontactusemailtemplate">Default contact us email template</text>
 	<text name="MarketplacesellerSSIN">Marketplace seller SSIN</text>
@@ -45,6 +52,28 @@
 	<text name="Inquire">Inquire</text>
 
 	<text name="ValidationRules">Validation rules</text>
+	<text name="PortalImage">Portal Image</text>
+	<text name="PortalSlogan">Portal Slogan</text>
+	<text name="PortalHomepageIs">Portal Homepage Is</text>
+	<text name="PortalLogo">Portal Logo</text>
+	<text name="PortalToolbarColor">Portal Toolbar Color</text>
+	<text name="PortalFooterText">Portal Footer Text</text>
+	<text name="AllowTenantsToRegisterToThePortal">Allow tenants to register to the portal.</text>
+	<text name="NewRegisteredTenantsAreActiveByDefault">New registered tenants are active by default</text>
+	<text name="TenantTeamMembersAre">Tenant Team members are</text>
+	<text name="MarketplaceOwnerTenantIs">Marketplace Owner Tenant is</text>
+	<text name="PortalMarketplaceAnonymousBrowsing">Portal Marketplace Anonymous Browsing</text>
+	<text name="ProductMSRPVisibilityInMarketplace">Product MSRP Visiblity in Marketplace</text>
+	<text name="ProductInventoryQtyVisibilityInMarketplace">Product Inventory Qty Visiblity in Marketplace</text>
+	<text name="ShowInStockOutOfStockFlagsOn">Show (In Stock / Out of Stock ) flags on</text>
+	<text name="ShowWarningLabelWhenMajorItemIsOutOfStockInMarketplace">
+		Show Warning Label when Major Item is Out of Stock in Marketplace
+	</text>
+	<text name="ApplyTaxRules">Apply Tax Rules</text>
+	<text name="NotifyUsersByEmail">Notify Users by Email</text>
+	<text name="TransactionSharingIs">Transaction Sharing is</text>
+	<text name="InvitePartnerByType">Invite partner By Type</text>
+    
     <text name="ValidationRule">Validation rule</text>
     <text name="onetouch.ValidationRules.ValidationRule">ValidationRule</text>
     <text name="FieldName">Field name</text>
@@ -2706,5 +2735,17 @@
 
 
 
+  </texts>  
+    <text name="Pleasemakesuretheimagessize5MB">Please make sure the images size 5MB</text>
+	<text name="FilesformatsSupportedareXLSX,JPGandPNG">Files formats Supported are XLSX,JPG and PNG</text>
+	<text name="Relatedproducts">Related products</text>
+	<text name="noproductsarelinked">no products are linked</text>
+ 
+	<text name="ContactUs">Contact Us</text>
+	<text name="YourRequestHasBeenSubmitted">Your request has been submitted</text>
+	<text name="Telephone">Telephone</text>
+	<text name="PleaseEnterPhoneNumber">Please Enter Phone Number</text>
+	<text name="RelationshipSettings">Relationship Settings</text>
+	<text name="RelationshipSettingsHeaderInfo">Show and change relationship settings.</text>
   </texts>  
 </localizationDictionary>

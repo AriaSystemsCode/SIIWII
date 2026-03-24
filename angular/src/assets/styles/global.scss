@@ -782,7 +782,6 @@ html{
 
 
 
-
 .p-checkbox .p-checkbox-box {
     display: flex;
     align-items: center;  
@@ -814,6 +813,11 @@ html{
     border: none !important;
   }
   
+
+  .p-accordion-header-text {
+    color: #1B101B !important;
+    font-weight: 700 !important;
+    padding: 10px;
   .btn-outline-primary{
     border: none !important;
     background-color: #610061 !important;
@@ -889,3 +893,15 @@ th.sticky-header {
 searchicon {
     padding-top: 15%;
 }
+
+.is-disabled {
+    pointer-events: none;
+    cursor: not-allowed !important; 
+    opacity: 1;
+  }
+
+.searchableDropdown searchicon {
+    padding: 0px;
+}
+
+  }

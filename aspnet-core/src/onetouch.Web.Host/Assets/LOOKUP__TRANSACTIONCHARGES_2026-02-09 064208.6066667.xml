@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-16"?>
+<ItemExtraAttributes
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+	<ExtraAttributes>
+		<ExtraAttribute>
+			<AttributeId>901</AttributeId>
+			<Code>CHARGETYPES</Code>
+			<Name>Charge Types</Name>
+			<Description>Charge Types</Description>
+			<DataType>string</DataType>
+			<Width>50</Width>
+			<Decimals>0</Decimals>
+			<DefaultValue></DefaultValue>
+			<Usage></Usage>
+			<IsLookup>true</IsLookup>
+			<EntityObjectTypeCode>CHARGETYPES</EntityObjectTypeCode>
+			<AllowAddNew>true</AllowAddNew>
+			<AcceptMultipleValues>false</AcceptMultipleValues>
+			<ValidEntries></ValidEntries>
+			<IsVariation>true</IsVariation>
+			<IsAdvancedSearch>true</IsAdvancedSearch>
+		</ExtraAttribute>
+		<ExtraAttribute>
+			<AttributeId>902</AttributeId>
+			<Code>ITEMSSIN</Code>
+			<Name>ITEMSSIN</Name>
+			<Description>ITEMSSIN</Description>
+			<DataType>string</DataType>
+			<Width>50</Width>
+			<Decimals>0</Decimals>
+			<DefaultValue></DefaultValue>
+			<Usage></Usage>
+			<IsLookup>false</IsLookup>
+			<EntityObjectTypeCode></EntityObjectTypeCode>
+			<AllowAddNew>false</AllowAddNew>
+			<AcceptMultipleValues>false</AcceptMultipleValues>
+			<ValidEntries></ValidEntries>
+			<IsVariation>false</IsVariation>
+			<IsAdvancedSearch>false</IsAdvancedSearch>
+		</ExtraAttribute>
+		<ExtraAttribute>
+			<AttributeId>903</AttributeId>
+			<Code>ISEDITABLE</Code>
+			<Name>ISEDITABLE</Name>
+			<Description>ISEDITABLE</Description>
+			<DataType>boolean</DataType>
+			<Width>50</Width>
+			<Decimals>0</Decimals>
+			<DefaultValue></DefaultValue>
+			<Usage></Usage>
+			<IsLookup>false</IsLookup>
+			<EntityObjectTypeCode></EntityObjectTypeCode>
+			<AllowAddNew>false</AllowAddNew>
+			<AcceptMultipleValues>false</AcceptMultipleValues>
+			<ValidEntries></ValidEntries>
+			<IsVariation>false</IsVariation>
+			<IsAdvancedSearch>false</IsAdvancedSearch>
+		</ExtraAttribute>	
+	</ExtraAttributes>
+</ItemExtraAttributes>   
