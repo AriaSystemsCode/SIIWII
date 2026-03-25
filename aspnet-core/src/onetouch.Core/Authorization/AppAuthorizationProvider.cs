@@ -365,7 +365,12 @@ namespace onetouch.Authorization
 
             // var homePage = pages.CreateChildPermission(AppPermissions.Pages_HomePage, L("HomePage"));
             // homePage.CreateChildPermission(AppPermissions.Pages_HomePage_View, L("HomePageView"));
-
+            //I52[Start]
+            var dashboards = pages.CreateChildPermission(AppPermissions.Pages_Dashboards, L("Dashboards"));
+            accounts.CreateChildPermission(AppPermissions.Pages_Dashboards_Create, L("CreateNewDashboard"));
+            accounts.CreateChildPermission(AppPermissions.Pages_Dashboards_Edit, L("EditDashboard"));
+            accounts.CreateChildPermission(AppPermissions.Pages_Dashboards_Delete, L("DeleteDashboard"));
+            //I52[End]
         }
 
         private static ILocalizableString L(string name)

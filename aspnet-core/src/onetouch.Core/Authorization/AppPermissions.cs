@@ -345,6 +345,11 @@
 
         public const string Pages_HomePage = "Pages.HomePage";
         public const string Pages_HomePage_View = "Pages.HomePage.View";
-
+        //I52[Start]
+        public const string Pages_Dashboards = "Pages.Dashboards";
+        public const string Pages_Dashboards_Create = "Pages.Dashboards.Create";
+        public const string Pages_Dashboards_Edit = "Pages.Dashboards.Edit";
+        public const string Pages_Dashboards_Delete = "Pages.Dashboards.Delete";
+        //I52[End]
     }
 }

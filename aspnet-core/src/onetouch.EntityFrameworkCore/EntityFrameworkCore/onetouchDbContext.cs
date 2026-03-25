@@ -55,11 +55,16 @@ using onetouch.AppMarketplaceAccountsPriceLevels;
 using onetouch.AppMarketplaceTransactions;
 using onetouch.AppMarketplaceMessages;
 using onetouch.AppMarketplaceContacts;
+using onetouch.AppDashboard;
 
 namespace onetouch.EntityFrameworkCore
 {
     public class onetouchDbContext : AbpZeroDbContext<Tenant, Role, User, onetouchDbContext>, IAbpPersistedGrantDbContext
     {
+        //I52[Start]
+        public virtual DbSet<onetouch.AppDashboard.AppDashboard> AppDashboards { get; set; }
+        public virtual DbSet<AppDashboardCard> AppDashboardCards { get; set; }
+        //I52[End]
         //I40[Start]
         public virtual DbSet<AppContactRelationshipInfo> AppContactRelationshipInfo { get; set; }
         //I40[End]
