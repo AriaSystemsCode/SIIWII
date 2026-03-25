@@ -180,24 +180,51 @@
             <div class="mt-3">
 
               <label class="form-label">X axis</label>
-
-              <p-dropdown
+<div class="d-flex align-items-center mb-2">
+   <span class="w-50 ">Measure</span>  <p-dropdown
                 [options]="dimensions"
                 optionLabel="label"
                 optionValue="name"
                 formControlName="barX"
+                class="w-50"
                 (onChange)="onBarXChange()">
               </p-dropdown>
+</div>
+
+<div class="d-flex align-items-center">
+   <span class="w-50">Sort By</span>  <p-dropdown
+                [options]="dimensions"
+                optionLabel="label"
+                optionValue="name"
+                formControlName="barX"
+                class="w-50"
+                (onChange)="onBarXChange()">
+              </p-dropdown>
+</div>
+         
 
               <label class="form-label mt-2">Y axis</label>
-
+<div class="d-flex align-items-center mb-2">
+   <span class="w-50 ">Measure</span> 
               <p-dropdown
                 [options]="measures"
                 optionLabel="label"
                 optionValue="name"
+                class="w-50"
                 formControlName="barY">
               </p-dropdown>
+</div>
 
+<div class="d-flex align-items-center">
+   <span class="w-50">Group By</span> 
+              <p-dropdown
+                [options]="measures"
+                optionLabel="label"
+                optionValue="name"
+                class="w-50"
+                formControlName="barY">
+              </p-dropdown>
+</div>
             </div>
 
           </ng-container>
@@ -205,45 +232,83 @@
 
           <!-- LINE -->
           <ng-container *ngIf="chartType === 'line'">
+              <label class="form-label my-2">X axis</label>
 
-            <div class="mt-3">
+            <div class="mb-2 d-flex align-items-center">
 
-              <label class="form-label">Date field</label>
+              <label class="form-label w-50">Measure</label>
 
               <p-dropdown
                 [options]="timeFields"
                 optionLabel="label"
                 optionValue="name"
+                class="w-50"
                 formControlName="lineTimeField">
               </p-dropdown>
 
             </div>
 
-            <div class="mt-2">
+            <div class="mb-2 d-flex align-items-center">
 
-              <label class="form-label">Time range</label>
+              <label class="form-label w-50">Time range</label>
 
               <p-dropdown
                 [options]="timePresetOptions"
                 optionLabel="label"
                 optionValue="value"
+                class="w-50"
                 formControlName="timePreset">
               </p-dropdown>
 
             </div>
 
-            <div class="mt-2">
+            <div class="mb-2 d-flex align-items-center">
 
-              <label class="form-label">Bucket</label>
+              <label class="form-label w-50">Group By</label>
 
               <p-dropdown
                 [options]="bucketOptions"
                 optionLabel="label"
                 optionValue="value"
+                class="w-50"
                 formControlName="bucket">
               </p-dropdown>
 
             </div>
+
+
+                   <label class="form-label my-2">Y axis</label>
+
+            <div class="mb-2 d-flex align-items-center">
+
+              <label class="form-label w-50">Measure</label>
+
+              <p-dropdown
+                [options]="timeFields"
+                optionLabel="label"
+                optionValue="name"
+                class="w-50"
+                formControlName="lineTimeField">
+              </p-dropdown>
+
+            </div>
+
+
+            <div class="mb-2 d-flex align-items-center">
+
+              <label class="form-label w-50">Group By</label>
+
+              <p-dropdown
+                [options]="bucketOptions"
+                optionLabel="label"
+                optionValue="value"
+                class="w-50"
+                formControlName="bucket">
+              </p-dropdown>
+
+            </div>
+
+
 
           </ng-container>
           <ng-container *ngIf="chartType !== 'bar' && chartType !== 'calculation' && chartType !== 'line'"> <div class="mt-3"> <label class="form-label">Measure</label> <p-dropdown [options]="measures" optionLabel="label" optionValue="name" formControlName="measure" placeholder="Select measure"> </p-dropdown> </div> <div class="mt-2"> <label class="form-label">Grouping</label> <p-dropdown [options]="dimensions" optionLabel="label" optionValue="name" formControlName="dimension" placeholder="Dimension" (onChange)="onDimensionChange()"> </p-dropdown> <div *ngIf="form.value.dimension" class="mt-2"> <label class="form-label">by</label> <p-multiSelect [options]="dimensionValueOptions" formControlName="dimensionValues" defaultLabel="Select categories" [display]="'chip'"> </p-multiSelect> </div> </div> </ng-container>
