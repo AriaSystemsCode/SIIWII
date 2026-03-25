@@ -6391,6 +6391,310 @@ export class AppAdvertisementsServiceProxy {
 }
 
 @Injectable()
+export class AppDashboardsServiceProxy {
+    private http: HttpClient;
+    private baseUrl: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+    constructor(@Inject(HttpClient) http: HttpClient, @Optional() @Inject(API_BASE_URL) baseUrl?: string) {
+        this.http = http;
+        this.baseUrl = baseUrl !== undefined && baseUrl !== null ? baseUrl : "";
+    }
+
+    /**
+     * @param id (optional) 
+     * @return Success
+     */
+    deleteDashboard(id: number | undefined): Observable<void> {
+        let url_ = this.baseUrl + "/api/services/app/AppDashboards/DeleteDashboard?";
+        if (id === null)
+            throw new Error("The parameter 'id' cannot be null.");
+        else if (id !== undefined)
+            url_ += "Id=" + encodeURIComponent("" + id) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+            })
+        };
+
+        return this.http.request("delete", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processDeleteDashboard(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processDeleteDashboard(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<void>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<void>;
+        }));
+    }
+
+    protected processDeleteDashboard(response: HttpResponseBase): Observable<void> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return _observableOf(null as any);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param name (optional) 
+     * @param sorting (optional) 
+     * @param skipCount (optional) 
+     * @param maxResultCount (optional) 
+     * @return Success
+     */
+    getAll(name: string | null | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<PagedResultDtoOfGetDashboardForViewDto> {
+        let url_ = this.baseUrl + "/api/services/app/AppDashboards/GetAll?";
+        if (name !== undefined && name !== null)
+            url_ += "Name=" + encodeURIComponent("" + name) + "&";
+        if (sorting !== undefined && sorting !== null)
+            url_ += "Sorting=" + encodeURIComponent("" + sorting) + "&";
+        if (skipCount === null)
+            throw new Error("The parameter 'skipCount' cannot be null.");
+        else if (skipCount !== undefined)
+            url_ += "SkipCount=" + encodeURIComponent("" + skipCount) + "&";
+        if (maxResultCount === null)
+            throw new Error("The parameter 'maxResultCount' cannot be null.");
+        else if (maxResultCount !== undefined)
+            url_ += "MaxResultCount=" + encodeURIComponent("" + maxResultCount) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetAll(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetAll(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<PagedResultDtoOfGetDashboardForViewDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<PagedResultDtoOfGetDashboardForViewDto>;
+        }));
+    }
+
+    protected processGetAll(response: HttpResponseBase): Observable<PagedResultDtoOfGetDashboardForViewDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = PagedResultDtoOfGetDashboardForViewDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return Success
+     */
+    createOrEditDashboard(body: CreateOrEditDashboardInfoDto | undefined): Observable<GetDashboardForViewDto> {
+        let url_ = this.baseUrl + "/api/services/app/AppDashboards/CreateOrEditDashboard";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json-patch+json",
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processCreateOrEditDashboard(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processCreateOrEditDashboard(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<GetDashboardForViewDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<GetDashboardForViewDto>;
+        }));
+    }
+
+    protected processCreateOrEditDashboard(response: HttpResponseBase): Observable<GetDashboardForViewDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = GetDashboardForViewDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param id (optional) 
+     * @return Success
+     */
+    getDashboardForEdit(id: number | undefined): Observable<GetDashboardForViewDto> {
+        let url_ = this.baseUrl + "/api/services/app/AppDashboards/GetDashboardForEdit?";
+        if (id === null)
+            throw new Error("The parameter 'id' cannot be null.");
+        else if (id !== undefined)
+            url_ += "Id=" + encodeURIComponent("" + id) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetDashboardForEdit(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetDashboardForEdit(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<GetDashboardForViewDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<GetDashboardForViewDto>;
+        }));
+    }
+
+    protected processGetDashboardForEdit(response: HttpResponseBase): Observable<GetDashboardForViewDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = GetDashboardForViewDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param id (optional) 
+     * @param resultCount (optional) 
+     * @return Success
+     */
+    getDashboardForView(id: number | undefined, resultCount: number | undefined): Observable<GetDashboardForViewDto> {
+        let url_ = this.baseUrl + "/api/services/app/AppDashboards/GetDashboardForView?";
+        if (id === null)
+            throw new Error("The parameter 'id' cannot be null.");
+        else if (id !== undefined)
+            url_ += "id=" + encodeURIComponent("" + id) + "&";
+        if (resultCount === null)
+            throw new Error("The parameter 'resultCount' cannot be null.");
+        else if (resultCount !== undefined)
+            url_ += "resultCount=" + encodeURIComponent("" + resultCount) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetDashboardForView(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetDashboardForView(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<GetDashboardForViewDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<GetDashboardForViewDto>;
+        }));
+    }
+
+    protected processGetDashboardForView(response: HttpResponseBase): Observable<GetDashboardForViewDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = GetDashboardForViewDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+}
+
+@Injectable()
 export class AppEntitiesServiceProxy {
     private http: HttpClient;
     private baseUrl: string;
@@ -19154,6 +19458,63 @@ export class AppItemsListsServiceProxy {
         if (status === 200) {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
             return _observableOf(null as any);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param sharedItemListId (optional) 
+     * @return Success
+     */
+    getMainItemListID(sharedItemListId: number | undefined): Observable<number> {
+        let url_ = this.baseUrl + "/api/services/app/AppItemsLists/GetMainItemListID?";
+        if (sharedItemListId === null)
+            throw new Error("The parameter 'sharedItemListId' cannot be null.");
+        else if (sharedItemListId !== undefined)
+            url_ += "sharedItemListId=" + encodeURIComponent("" + sharedItemListId) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetMainItemListID(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetMainItemListID(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<number>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<number>;
+        }));
+    }
+
+    protected processGetMainItemListID(response: HttpResponseBase): Observable<number> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+                result200 = resultData200 !== undefined ? resultData200 : <any>null;
+    
+            return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
@@ -56195,6 +56556,318 @@ export class SystemTablesServiceProxy {
         }
         return _observableOf(null as any);
     }
+
+    /**
+     * @return Success
+     */
+    getObjectDashboardId(): Observable<number> {
+        let url_ = this.baseUrl + "/api/services/app/SystemTables/GetObjectDashboardId";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetObjectDashboardId(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetObjectDashboardId(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<number>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<number>;
+        }));
+    }
+
+    protected processGetObjectDashboardId(response: HttpResponseBase): Observable<number> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+                result200 = resultData200 !== undefined ? resultData200 : <any>null;
+    
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @return Success
+     */
+    getObjectDashboardCardId(): Observable<number> {
+        let url_ = this.baseUrl + "/api/services/app/SystemTables/GetObjectDashboardCardId";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetObjectDashboardCardId(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetObjectDashboardCardId(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<number>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<number>;
+        }));
+    }
+
+    protected processGetObjectDashboardCardId(response: HttpResponseBase): Observable<number> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+                result200 = resultData200 !== undefined ? resultData200 : <any>null;
+    
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @return Success
+     */
+    getEntityObjectTypeDashboardId(): Observable<number> {
+        let url_ = this.baseUrl + "/api/services/app/SystemTables/GetEntityObjectTypeDashboardId";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetEntityObjectTypeDashboardId(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetEntityObjectTypeDashboardId(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<number>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<number>;
+        }));
+    }
+
+    protected processGetEntityObjectTypeDashboardId(response: HttpResponseBase): Observable<number> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+                result200 = resultData200 !== undefined ? resultData200 : <any>null;
+    
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @return Success
+     */
+    getEntityObjectTypeDashboardCode(): Observable<string> {
+        let url_ = this.baseUrl + "/api/services/app/SystemTables/GetEntityObjectTypeDashboardCode";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetEntityObjectTypeDashboardCode(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetEntityObjectTypeDashboardCode(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<string>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<string>;
+        }));
+    }
+
+    protected processGetEntityObjectTypeDashboardCode(response: HttpResponseBase): Observable<string> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+                result200 = resultData200 !== undefined ? resultData200 : <any>null;
+    
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @return Success
+     */
+    getEntityObjectTypeDashboardCardId(): Observable<number> {
+        let url_ = this.baseUrl + "/api/services/app/SystemTables/GetEntityObjectTypeDashboardCardId";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetEntityObjectTypeDashboardCardId(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetEntityObjectTypeDashboardCardId(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<number>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<number>;
+        }));
+    }
+
+    protected processGetEntityObjectTypeDashboardCardId(response: HttpResponseBase): Observable<number> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+                result200 = resultData200 !== undefined ? resultData200 : <any>null;
+    
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @return Success
+     */
+    getEntityObjectTypeDashboardCardCode(): Observable<string> {
+        let url_ = this.baseUrl + "/api/services/app/SystemTables/GetEntityObjectTypeDashboardCardCode";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetEntityObjectTypeDashboardCardCode(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetEntityObjectTypeDashboardCardCode(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<string>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<string>;
+        }));
+    }
+
+    protected processGetEntityObjectTypeDashboardCardCode(response: HttpResponseBase): Observable<string> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+                result200 = resultData200 !== undefined ? resultData200 : <any>null;
+    
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
 }
 
 @Injectable()
@@ -72482,6 +73155,82 @@ export interface ISelectItemDto {
     [key: string]: any;
 }
 
+export class AppEntitySharingDto implements IAppEntitySharingDto {
+    sharedTenantId!: number | undefined;
+    sharedUserId!: number | undefined;
+    sharedUserEMail!: string | undefined;
+    sharedUserName!: string | undefined;
+    sharedUserSureName!: string | undefined;
+    sharedUserTenantName!: string | undefined;
+    lastViewDate!: moment.Moment;
+    id!: number;
+
+    [key: string]: any;
+
+    constructor(data?: IAppEntitySharingDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.sharedTenantId = _data["sharedTenantId"];
+            this.sharedUserId = _data["sharedUserId"];
+            this.sharedUserEMail = _data["sharedUserEMail"];
+            this.sharedUserName = _data["sharedUserName"];
+            this.sharedUserSureName = _data["sharedUserSureName"];
+            this.sharedUserTenantName = _data["sharedUserTenantName"];
+            this.lastViewDate = _data["lastViewDate"] ? moment(_data["lastViewDate"].toString()) : <any>undefined;
+            this.id = _data["id"];
+        }
+    }
+
+    static fromJS(data: any): AppEntitySharingDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new AppEntitySharingDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["sharedTenantId"] = this.sharedTenantId;
+        data["sharedUserId"] = this.sharedUserId;
+        data["sharedUserEMail"] = this.sharedUserEMail;
+        data["sharedUserName"] = this.sharedUserName;
+        data["sharedUserSureName"] = this.sharedUserSureName;
+        data["sharedUserTenantName"] = this.sharedUserTenantName;
+        data["lastViewDate"] = this.lastViewDate ? this.lastViewDate.toISOString() : <any>undefined;
+        data["id"] = this.id;
+        return data;
+    }
+}
+
+export interface IAppEntitySharingDto {
+    sharedTenantId: number | undefined;
+    sharedUserId: number | undefined;
+    sharedUserEMail: string | undefined;
+    sharedUserName: string | undefined;
+    sharedUserSureName: string | undefined;
+    sharedUserTenantName: string | undefined;
+    lastViewDate: moment.Moment;
+    id: number;
+
+    [key: string]: any;
+}
+
 export class AppEntityAddressDto implements IAppEntityAddressDto {
     entitytId!: number;
     addressTypeId!: number;
@@ -72681,6 +73430,426 @@ export interface IAppEntitiesRelationshipDto {
 export enum AppEntityTypes {
     EVENT = 0,
     POST = 1,
+}
+
+export class GetDashboardCardForViewDto implements IGetDashboardCardForViewDto {
+    entityType!: string | undefined;
+    filter!: string | undefined;
+    height!: number;
+    width!: number;
+    xPosition!: number;
+    yPosition!: number;
+    tenantId!: number | undefined;
+    attachmentSourceTenantId!: number | undefined;
+    name!: string | undefined;
+    code!: string | undefined;
+    notes!: string | undefined;
+    isHostRecord!: boolean;
+    addFromAttachments!: boolean;
+    relatedEntityId!: number | undefined;
+    entityObjectTypeId!: number;
+    entityObjectTypeCode!: string | undefined;
+    entityObjectStatusId!: number | undefined;
+    objectId!: number;
+    entityAddresses!: AppEntityAddressDto[] | undefined;
+    entityCategories!: AppEntityCategoryDto[] | undefined;
+    entityClassifications!: AppEntityClassificationDto[] | undefined;
+    entityAttachments!: AppEntityAttachmentDto[] | undefined;
+    entityExtraData!: AppEntityExtraDataDto[] | undefined;
+    entitiesRelationships!: AppEntitiesRelationshipDto[] | undefined;
+    relatedEntitiesRelationships!: AppEntitiesRelationshipDto[] | undefined;
+    appEntityTypes!: AppEntityTypes;
+    ssin!: string | undefined;
+    tenantOwner!: number;
+    timeStamp!: moment.Moment;
+    isDefault!: boolean;
+    id!: number;
+
+    [key: string]: any;
+
+    constructor(data?: IGetDashboardCardForViewDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.entityType = _data["entityType"];
+            this.filter = _data["filter"];
+            this.height = _data["height"];
+            this.width = _data["width"];
+            this.xPosition = _data["xPosition"];
+            this.yPosition = _data["yPosition"];
+            this.tenantId = _data["tenantId"];
+            this.attachmentSourceTenantId = _data["attachmentSourceTenantId"];
+            this.name = _data["name"];
+            this.code = _data["code"];
+            this.notes = _data["notes"];
+            this.isHostRecord = _data["isHostRecord"];
+            this.addFromAttachments = _data["addFromAttachments"];
+            this.relatedEntityId = _data["relatedEntityId"];
+            this.entityObjectTypeId = _data["entityObjectTypeId"];
+            this.entityObjectTypeCode = _data["entityObjectTypeCode"];
+            this.entityObjectStatusId = _data["entityObjectStatusId"];
+            this.objectId = _data["objectId"];
+            if (Array.isArray(_data["entityAddresses"])) {
+                this.entityAddresses = [] as any;
+                for (let item of _data["entityAddresses"])
+                    this.entityAddresses!.push(AppEntityAddressDto.fromJS(item));
+            }
+            if (Array.isArray(_data["entityCategories"])) {
+                this.entityCategories = [] as any;
+                for (let item of _data["entityCategories"])
+                    this.entityCategories!.push(AppEntityCategoryDto.fromJS(item));
+            }
+            if (Array.isArray(_data["entityClassifications"])) {
+                this.entityClassifications = [] as any;
+                for (let item of _data["entityClassifications"])
+                    this.entityClassifications!.push(AppEntityClassificationDto.fromJS(item));
+            }
+            if (Array.isArray(_data["entityAttachments"])) {
+                this.entityAttachments = [] as any;
+                for (let item of _data["entityAttachments"])
+                    this.entityAttachments!.push(AppEntityAttachmentDto.fromJS(item));
+            }
+            if (Array.isArray(_data["entityExtraData"])) {
+                this.entityExtraData = [] as any;
+                for (let item of _data["entityExtraData"])
+                    this.entityExtraData!.push(AppEntityExtraDataDto.fromJS(item));
+            }
+            if (Array.isArray(_data["entitiesRelationships"])) {
+                this.entitiesRelationships = [] as any;
+                for (let item of _data["entitiesRelationships"])
+                    this.entitiesRelationships!.push(AppEntitiesRelationshipDto.fromJS(item));
+            }
+            if (Array.isArray(_data["relatedEntitiesRelationships"])) {
+                this.relatedEntitiesRelationships = [] as any;
+                for (let item of _data["relatedEntitiesRelationships"])
+                    this.relatedEntitiesRelationships!.push(AppEntitiesRelationshipDto.fromJS(item));
+            }
+            this.appEntityTypes = _data["appEntityTypes"];
+            this.ssin = _data["ssin"];
+            this.tenantOwner = _data["tenantOwner"];
+            this.timeStamp = _data["timeStamp"] ? moment(_data["timeStamp"].toString()) : <any>undefined;
+            this.isDefault = _data["isDefault"];
+            this.id = _data["id"];
+        }
+    }
+
+    static fromJS(data: any): GetDashboardCardForViewDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new GetDashboardCardForViewDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["entityType"] = this.entityType;
+        data["filter"] = this.filter;
+        data["height"] = this.height;
+        data["width"] = this.width;
+        data["xPosition"] = this.xPosition;
+        data["yPosition"] = this.yPosition;
+        data["tenantId"] = this.tenantId;
+        data["attachmentSourceTenantId"] = this.attachmentSourceTenantId;
+        data["name"] = this.name;
+        data["code"] = this.code;
+        data["notes"] = this.notes;
+        data["isHostRecord"] = this.isHostRecord;
+        data["addFromAttachments"] = this.addFromAttachments;
+        data["relatedEntityId"] = this.relatedEntityId;
+        data["entityObjectTypeId"] = this.entityObjectTypeId;
+        data["entityObjectTypeCode"] = this.entityObjectTypeCode;
+        data["entityObjectStatusId"] = this.entityObjectStatusId;
+        data["objectId"] = this.objectId;
+        if (Array.isArray(this.entityAddresses)) {
+            data["entityAddresses"] = [];
+            for (let item of this.entityAddresses)
+                data["entityAddresses"].push(item.toJSON());
+        }
+        if (Array.isArray(this.entityCategories)) {
+            data["entityCategories"] = [];
+            for (let item of this.entityCategories)
+                data["entityCategories"].push(item.toJSON());
+        }
+        if (Array.isArray(this.entityClassifications)) {
+            data["entityClassifications"] = [];
+            for (let item of this.entityClassifications)
+                data["entityClassifications"].push(item.toJSON());
+        }
+        if (Array.isArray(this.entityAttachments)) {
+            data["entityAttachments"] = [];
+            for (let item of this.entityAttachments)
+                data["entityAttachments"].push(item.toJSON());
+        }
+        if (Array.isArray(this.entityExtraData)) {
+            data["entityExtraData"] = [];
+            for (let item of this.entityExtraData)
+                data["entityExtraData"].push(item.toJSON());
+        }
+        if (Array.isArray(this.entitiesRelationships)) {
+            data["entitiesRelationships"] = [];
+            for (let item of this.entitiesRelationships)
+                data["entitiesRelationships"].push(item.toJSON());
+        }
+        if (Array.isArray(this.relatedEntitiesRelationships)) {
+            data["relatedEntitiesRelationships"] = [];
+            for (let item of this.relatedEntitiesRelationships)
+                data["relatedEntitiesRelationships"].push(item.toJSON());
+        }
+        data["appEntityTypes"] = this.appEntityTypes;
+        data["ssin"] = this.ssin;
+        data["tenantOwner"] = this.tenantOwner;
+        data["timeStamp"] = this.timeStamp ? this.timeStamp.toISOString() : <any>undefined;
+        data["isDefault"] = this.isDefault;
+        data["id"] = this.id;
+        return data;
+    }
+}
+
+export interface IGetDashboardCardForViewDto {
+    entityType: string | undefined;
+    filter: string | undefined;
+    height: number;
+    width: number;
+    xPosition: number;
+    yPosition: number;
+    tenantId: number | undefined;
+    attachmentSourceTenantId: number | undefined;
+    name: string | undefined;
+    code: string | undefined;
+    notes: string | undefined;
+    isHostRecord: boolean;
+    addFromAttachments: boolean;
+    relatedEntityId: number | undefined;
+    entityObjectTypeId: number;
+    entityObjectTypeCode: string | undefined;
+    entityObjectStatusId: number | undefined;
+    objectId: number;
+    entityAddresses: AppEntityAddressDto[] | undefined;
+    entityCategories: AppEntityCategoryDto[] | undefined;
+    entityClassifications: AppEntityClassificationDto[] | undefined;
+    entityAttachments: AppEntityAttachmentDto[] | undefined;
+    entityExtraData: AppEntityExtraDataDto[] | undefined;
+    entitiesRelationships: AppEntitiesRelationshipDto[] | undefined;
+    relatedEntitiesRelationships: AppEntitiesRelationshipDto[] | undefined;
+    appEntityTypes: AppEntityTypes;
+    ssin: string | undefined;
+    tenantOwner: number;
+    timeStamp: moment.Moment;
+    isDefault: boolean;
+    id: number;
+
+    [key: string]: any;
+}
+
+export class GetDashboardForViewDto implements IGetDashboardForViewDto {
+    id!: number;
+    name!: string | undefined;
+    isTemplate!: boolean;
+    appEntitySharings!: AppEntitySharingDto[] | undefined;
+    appDashboardCards!: GetDashboardCardForViewDto[] | undefined;
+
+    [key: string]: any;
+
+    constructor(data?: IGetDashboardForViewDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.id = _data["id"];
+            this.name = _data["name"];
+            this.isTemplate = _data["isTemplate"];
+            if (Array.isArray(_data["appEntitySharings"])) {
+                this.appEntitySharings = [] as any;
+                for (let item of _data["appEntitySharings"])
+                    this.appEntitySharings!.push(AppEntitySharingDto.fromJS(item));
+            }
+            if (Array.isArray(_data["appDashboardCards"])) {
+                this.appDashboardCards = [] as any;
+                for (let item of _data["appDashboardCards"])
+                    this.appDashboardCards!.push(GetDashboardCardForViewDto.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): GetDashboardForViewDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new GetDashboardForViewDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["id"] = this.id;
+        data["name"] = this.name;
+        data["isTemplate"] = this.isTemplate;
+        if (Array.isArray(this.appEntitySharings)) {
+            data["appEntitySharings"] = [];
+            for (let item of this.appEntitySharings)
+                data["appEntitySharings"].push(item.toJSON());
+        }
+        if (Array.isArray(this.appDashboardCards)) {
+            data["appDashboardCards"] = [];
+            for (let item of this.appDashboardCards)
+                data["appDashboardCards"].push(item.toJSON());
+        }
+        return data;
+    }
+}
+
+export interface IGetDashboardForViewDto {
+    id: number;
+    name: string | undefined;
+    isTemplate: boolean;
+    appEntitySharings: AppEntitySharingDto[] | undefined;
+    appDashboardCards: GetDashboardCardForViewDto[] | undefined;
+
+    [key: string]: any;
+}
+
+export class PagedResultDtoOfGetDashboardForViewDto implements IPagedResultDtoOfGetDashboardForViewDto {
+    totalCount!: number;
+    items!: GetDashboardForViewDto[] | undefined;
+
+    [key: string]: any;
+
+    constructor(data?: IPagedResultDtoOfGetDashboardForViewDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.totalCount = _data["totalCount"];
+            if (Array.isArray(_data["items"])) {
+                this.items = [] as any;
+                for (let item of _data["items"])
+                    this.items!.push(GetDashboardForViewDto.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): PagedResultDtoOfGetDashboardForViewDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new PagedResultDtoOfGetDashboardForViewDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["totalCount"] = this.totalCount;
+        if (Array.isArray(this.items)) {
+            data["items"] = [];
+            for (let item of this.items)
+                data["items"].push(item.toJSON());
+        }
+        return data;
+    }
+}
+
+export interface IPagedResultDtoOfGetDashboardForViewDto {
+    totalCount: number;
+    items: GetDashboardForViewDto[] | undefined;
+
+    [key: string]: any;
+}
+
+export class CreateOrEditDashboardInfoDto implements ICreateOrEditDashboardInfoDto {
+    id!: number;
+    name!: string | undefined;
+    isTemplate!: boolean;
+
+    [key: string]: any;
+
+    constructor(data?: ICreateOrEditDashboardInfoDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.id = _data["id"];
+            this.name = _data["name"];
+            this.isTemplate = _data["isTemplate"];
+        }
+    }
+
+    static fromJS(data: any): CreateOrEditDashboardInfoDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new CreateOrEditDashboardInfoDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["id"] = this.id;
+        data["name"] = this.name;
+        data["isTemplate"] = this.isTemplate;
+        return data;
+    }
+}
+
+export interface ICreateOrEditDashboardInfoDto {
+    id: number;
+    name: string | undefined;
+    isTemplate: boolean;
+
+    [key: string]: any;
 }
 
 export class AppEntityDto implements IAppEntityDto {
@@ -77938,6 +79107,7 @@ export interface IAppItemForViewDto {
 export class GetAppItemDetailForViewDto implements IGetAppItemDetailForViewDto {
     appItem!: AppItemForViewDto;
     nonLookupValues!: LookupLabelDto[] | undefined;
+    tenantOwner!: number | undefined;
 
     [key: string]: any;
 
@@ -77962,6 +79132,7 @@ export class GetAppItemDetailForViewDto implements IGetAppItemDetailForViewDto {
                 for (let item of _data["nonLookupValues"])
                     this.nonLookupValues!.push(LookupLabelDto.fromJS(item));
             }
+            this.tenantOwner = _data["tenantOwner"];
         }
     }
 
@@ -77984,6 +79155,7 @@ export class GetAppItemDetailForViewDto implements IGetAppItemDetailForViewDto {
             for (let item of this.nonLookupValues)
                 data["nonLookupValues"].push(item.toJSON());
         }
+        data["tenantOwner"] = this.tenantOwner;
         return data;
     }
 }
@@ -77991,6 +79163,7 @@ export class GetAppItemDetailForViewDto implements IGetAppItemDetailForViewDto {
 export interface IGetAppItemDetailForViewDto {
     appItem: AppItemForViewDto;
     nonLookupValues: LookupLabelDto[] | undefined;
+    tenantOwner: number | undefined;
 
     [key: string]: any;
 }

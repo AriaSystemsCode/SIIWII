@@ -18,6 +18,7 @@
                   #globalSearch
                   type="text" class="searchIn"
                   pInputText
+                  
                   placeholder="Search..."
                   (input)="onGlobalSearch($event)"
                 />
@@ -37,15 +38,15 @@
         <div class=" shadow-sm main-card">
           <div class="card-body p-0">
       
-            <p-table   #dataTable
-            [value]="primengTableHelper.records"
-            [lazy]="true"
-            (onLazyLoad)="getDashboards($event)"
-            [paginator]="false"
-            [rows]="primengTableHelper.defaultRecordsCountPerPage"
-            [totalRecords]="primengTableHelper.totalRecordsCount"
-            styleClass="p-datatable-sm dashboards-table"
-          >
+         <p-table
+  #dataTable
+  [value]="primengTableHelper.records"
+  [lazy]="false"
+  [paginator]="false"
+  [rows]="primengTableHelper.defaultRecordsCountPerPage"
+  [totalRecords]="primengTableHelper.totalRecordsCount"
+  styleClass="p-datatable-sm dashboards-table"
+>
               <!-- Table header -->
               <ng-template pTemplate="header">
                 <tr>
@@ -81,14 +82,14 @@
                   <!-- Dashboard Name (clickable link) -->
                   <td>
                     <a class="dash-link" href="javascript:;" (click)="openDashboard(row)">
-                      {{ row.name }}
+                      {{ row?.name }}
                     </a>
                   </td>
       
                   <!-- Date viewed (nullable) -->
                   <td>
                     <span *ngIf="row.dateViewed; else notViewed">
-                      {{ row.dateViewed | date:'dd/MM/yyyy' }}
+                      {{ row?.dateViewed | date:'dd/MM/yyyy' }}
                     </span>
                     <ng-template #notViewed>
                       <span class="text-muted">—</span>
@@ -97,7 +98,7 @@
       
                   <!-- Date updated -->
                   <td>
-                    {{ row.dateUpdated | date:'dd/MM/yyyy' }}
+                    {{ row?.dateUpdated | date:'dd/MM/yyyy' }}
                   </td>
       
                   <!-- Owner -->
@@ -105,12 +106,12 @@
                     <div class="owner-cell d-flex align-items-center">
                       <img
                         class="avatar avatar-md"
-                        [src]="row.owner.avatarUrl || defaultAvatar"
+                        [src]="row?.owner?.avatarUrl || defaultAvatar"
                         (error)="onAvatarErr($event)"
                         alt="Owner"
                       />
                       <span class="owner-name ml-2">
-                        {{ row.owner.displayName }}
+                        {{ row?.owner?.displayName }}
                       </span>
                     </div>
                   </td>
@@ -124,19 +125,19 @@
                         (mouseleave)="hideShare()"
                       >
                         <!-- show up to 3 -->
-                        <ng-container *ngFor="let u of row.sharedWith | slice:0:3; let i = index">
+                        <ng-container *ngFor="let u of row?.sharedWith | slice:0:3; let i = index">
                           <img
                             class="avatar avatar-sm stacked"
                             [style.zIndex]="10 - i"
-                            [src]="u.avatarUrl || defaultAvatar"
+                            [src]="u?.avatarUrl || defaultAvatar"
                             (error)="onAvatarErr($event)"
                             [alt]="u.displayName"
                           />
                         </ng-container>
       
                         <!-- overflow +N -->
-                        <div *ngIf="row.sharedWith?.length > 3" class="avatar avatar-sm stacked more">
-                          +{{ row.sharedWith.length - 3 }}
+                        <div *ngIf="row?.sharedWith?.length > 3" class="avatar avatar-sm stacked more">
+                          +{{ row?.sharedWith?.length - 3 }}
                         </div>
                       </div>
                     </div>
@@ -162,11 +163,11 @@
                 <div class="share-user d-flex align-items-center" *ngFor="let u of shareUsers">
                   <img
                     class="avatar avatar-sm"
-                    [src]="u.avatarUrl || defaultAvatar"
+                    [src]="u?.avatarUrl || defaultAvatar"
                     (error)="onAvatarErr($event)"
                     alt="User"
                   />
-                  <span class="ml-2">{{ u.displayName }}</span>
+                  <span class="ml-2">{{ u?.displayName }}</span>
                 </div>
               </div>
       
@@ -186,13 +187,13 @@
           </div>
           <div class="col d-flex flex-column justify-content-between">
               <div class="primeng-paging-container custom-paginator">
-                <p-paginator   #paginator
-                [rows]="primengTableHelper.defaultRecordsCountPerPage"
-                (onPageChange)="getDashboards($event)"
-                [totalRecords]="primengTableHelper.totalRecordsCount"
-                [rowsPerPageOptions]="primengTableHelper.predefinedRecordsCountPerPage"
-              >
-              </p-paginator>
+              <p-paginator
+  #paginator
+  [rows]="primengTableHelper.defaultRecordsCountPerPage"
+  [totalRecords]="primengTableHelper.totalRecordsCount"
+  [rowsPerPageOptions]="primengTableHelper.predefinedRecordsCountPerPage"
+  (onPageChange)="onPageChange($event)">
+</p-paginator>
 
                   <div class="total-records-count text-right mr-3">
                       {{l('TotalRecordsCount', primengTableHelper.totalRecordsCount)}}

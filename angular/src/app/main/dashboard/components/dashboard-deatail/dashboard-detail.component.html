@@ -19,9 +19,6 @@
               {{ dashboard.title }}
             </h2>
 
-            <!-- <span class="mode-pill" [ngClass]="mode === 'edit' ? 'edit' : 'view'">
-              {{ mode === 'edit' ? 'Edit mode' : 'View mode' }}
-            </span> -->
 
             <span *ngIf="hasUnsavedChanges && mode === 'edit'" class="dirty-dot" pTooltip="Unsaved changes"></span>
           </div>

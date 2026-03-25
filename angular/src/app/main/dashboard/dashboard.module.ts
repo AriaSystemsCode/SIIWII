@@ -9,7 +9,7 @@ import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
 import { ModalModule } from 'ngx-bootstrap/modal';
 import { TabsModule } from 'ngx-bootstrap/tabs';
 import { NgxBootstrapDatePickerConfigService } from 'assets/ngx-bootstrap/ngx-bootstrap-datepicker-config.service';
-import { EmailingTemplateServiceProxy } from '@shared/service-proxies/service-proxies';
+import { AppDashboardsServiceProxy  } from '@shared/service-proxies/service-proxies';
 import { CheckboxModule } from 'primeng/checkbox';
 import { DropdownModule } from 'primeng/dropdown';
 import { MultiSelectModule } from 'primeng/multiselect';
@@ -99,7 +99,7 @@ import { DataPreviewComponent } from './components/data-preview/data-preview.com
         { provide: BsDatepickerConfig, useFactory: NgxBootstrapDatePickerConfigService.getDatepickerConfig },
         { provide: BsDaterangepickerConfig, useFactory: NgxBootstrapDatePickerConfigService.getDaterangepickerConfig },
         { provide: BsLocaleService, useFactory: NgxBootstrapDatePickerConfigService.getDatepickerLocale },
-        EmailingTemplateServiceProxy
+        AppDashboardsServiceProxy 
     ],
     exports: [
         ChartWidgetCardComponent,

@@ -1,109 +1,133 @@
-import { Component, ElementRef, EventEmitter, Injector, Input, OnChanges, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
+import { Component, Injector, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@node_modules/@angular/router';
 import { AppComponentBase } from '@shared/common/app-component-base';
 import { PrimengTableHelper } from '@shared/helpers/PrimengTableHelper';
-import { LazyLoadEvent } from 'primeng/api';
 import { Paginator } from 'primeng/paginator';
 import { Table } from 'primeng/table';
 import { CreateDashboardModalComponent, CreatedDashboardResult } from '../create-dashboard-modal/create-dashboard-modal.component';
-
+import { AppDashboardsServiceProxy, GetDashboardForViewDto, } from '@shared/service-proxies/service-proxies';
+import { finalize } from 'rxjs/operators';
 
 @Component({
-    selector: 'app-dashboard-browse.component',
-    templateUrl: './dashboard-browse.component.html',
-    styleUrls: ['./dashboard-browse.component.scss']
+  selector: 'app-dashboard-browse.component',
+  templateUrl: './dashboard-browse.component.html',
+  styleUrls: ['./dashboard-browse.component.scss']
 })
-export class DashboardBrowseComponent  extends AppComponentBase {
-    @ViewChild('sharePanel') sharePanel;
+export class DashboardBrowseComponent extends AppComponentBase implements OnInit {
+  @ViewChild('sharePanel') sharePanel;
+  @ViewChild('paginator', { static: true }) paginator: Paginator;
+  @ViewChild('dataTable', { static: true }) dataTable: Table;
+  @ViewChild('createDashboardModal') createDashboardModal!: CreateDashboardModalComponent;
 
-    defaultAvatar = 'assets/common/images/default-profile-picture.png';
-    shareUsers: any[] = [];
-    primengTableHelper = new PrimengTableHelper();
-    @ViewChild('paginator', { static: true }) paginator: Paginator;
-@ViewChild('dataTable', { static: true }) dataTable: Table;
-    dashboards: any[] = [
-      {
-        id: 1,
-        name: 'Sales Performance Dashboard',
-        dateViewed: new Date('2025-01-10'),
-        dateUpdated: new Date('2025-01-24'),
-        owner: { id: 101, displayName: 'Menna', avatarUrl: null },
-        sharedWith: [
-          { id: 1, displayName: 'Amr', avatarUrl: null },
-          { id: 2, displayName: 'Mary', avatarUrl: null },
-          { id: 3, displayName: 'Ali', avatarUrl: null },
-          { id: 4, displayName: 'Sarah', avatarUrl: null },
-        ],
-      },
-      {
-        id: 2,
-        name: 'Marketplace KPIs',
-        dateViewed: null,
-        dateUpdated: new Date('2025-01-13'),
-        owner: { id: 102, displayName: 'SIMMI', avatarUrl: null },
-        sharedWith: [{ id: 5, displayName: 'Anue Miami', avatarUrl: null }],
-      },
-    ];
-    @ViewChild('createDashboardModal') createDashboardModal!: CreateDashboardModalComponent;
-    constructor( injector: Injector, private router: Router) {
-      super(injector);
-    }
-  
-    openDashboard(row: any) {
-      this.router.navigate(['/app/main/dashboards/dashboard-details', row.id]);
-    }
-  
-    createNew() {
-      this.createDashboardModal.show();
-    }
-  
-    showShare(event: MouseEvent, row: any) {
-      this.shareUsers = row?.sharedWith ?? [];
-      this.sharePanel.show(event);
-    }
-  
-    hideShare() {
-      this.sharePanel.hide();
-    }
-  
-    onAvatarErr(evt: Event) {
-      (evt.target as HTMLImageElement).src = this.defaultAvatar;
-    }
+  defaultAvatar = 'assets/common/images/default-profile-picture.png';
+  shareUsers: any[] = [];
+  dashboards: GetDashboardForViewDto[] = [];
+  primengTableHelper = new PrimengTableHelper();
 
+  filterText = '';
+  sorting = '';
+  skipCount = 0;
+  maxResultCount = 10;
 
-    onGlobalSearch(event: Event) {
-        const value = (event.target as HTMLInputElement).value;
-        // this.loadDashboards(value); // call API with search param
-      }
+  constructor(
+    injector: Injector,
+    private router: Router,
+    public appDashboardsAppService: AppDashboardsServiceProxy
+  ) {
+    super(injector);
+  }
 
-      getDashboards(event?: LazyLoadEvent) {
+  ngOnInit(): void {
+    this.maxResultCount = this.primengTableHelper.defaultRecordsCountPerPage || 10;
+    this.getDashboards();
+  }
 
-        if (this.primengTableHelper.shouldResetPaging(event)) {
-          this.paginator.changePage(0);
-          return;
+  openDashboard(row: any): void {
+    this.router.navigate(['/app/main/dashboards/dashboard-details', row.id]);
+  }
+
+  createNew(): void {
+    this.createDashboardModal.show();
+  }
+
+  showShare(event: MouseEvent, row: any): void {
+    this.shareUsers = row?.sharedWith ?? [];
+    this.sharePanel.show(event);
+  }
+
+  hideShare(): void {
+    this.sharePanel.hide();
+  }
+
+  onAvatarErr(evt: Event): void {
+    (evt.target as HTMLImageElement).src = this.defaultAvatar;
+  }
+
+onGlobalSearch(event: Event): void {
+  this.filterText = (event.target as HTMLInputElement).value?.trim() || '';
+  this.skipCount = 0;
+  this.reloadFromFirstPage();
+}
+
+reloadFromFirstPage(): void {
+  if (this.paginator) {
+    if (this.paginator.getPage() !== 0) {
+      this.paginator.changePage(0);
+    } else {
+      this.getDashboards();
+    }
+  } else {
+    this.getDashboards();
+  }
+}
+
+  onPageChange(event: any): void {
+    this.skipCount = event?.first ?? 0;
+    this.maxResultCount = event?.rows ?? this.primengTableHelper.defaultRecordsCountPerPage ?? 10;
+    this.getDashboards();
+  }
+
+  getDashboards(): void {
+    const validMaxResultCount =
+      this.maxResultCount && this.maxResultCount > 0
+        ? this.maxResultCount
+        : (this.primengTableHelper.defaultRecordsCountPerPage || 10);
+
+   this.showMainSpinner()
+    const subs = this.appDashboardsAppService
+      .getAll(
+        this.filterText || null,
+        this.sorting || null,
+        this.skipCount || 0,
+        validMaxResultCount
+      )
+      .pipe(
+        finalize(() => {
+         this.hideMainSpinner()
+        })
+      )
+      .subscribe({
+        next: (result) => {
+          this.dashboards = result?.items || [];
+          this.primengTableHelper.records = result?.items || [];
+          this.primengTableHelper.totalRecordsCount = result?.totalCount || 0;
+        },
+        error: (err) => {
+          console.error('Get dashboards error:', err);
         }
-      
-        this.primengTableHelper.showLoadingIndicator();
-      
-        const skipCount = this.primengTableHelper.getSkipCount(this.paginator, event);
-        const maxResultCount = this.primengTableHelper.getMaxResultCount(this.paginator, event);
-      
-        // Temporary local pagination (replace with API later)
-        const allDashboards = this.dashboards;
-        const paged = allDashboards.slice(skipCount, skipCount + maxResultCount);
-      
-        this.primengTableHelper.records = paged;
-        this.primengTableHelper.totalRecordsCount = allDashboards.length;
-      
-        this.primengTableHelper.hideLoadingIndicator();
-      }
-  
-      onDashboardCreated(res: CreatedDashboardResult): void {
-        // Option A: reload the list
-        this.getDashboards(); // or getDashboards(this.primengTableHelper.getLazyLoadEvent())...
-    
-        // Option B: navigate to detail page if you have route
-        // this.router.navigate(['/app/main/dashboard/detail', res.id]);
-      }
-    
+      });
+
+    this.subscriptions.push(subs);
+  }
+
+  onDashboardCreated(res: CreatedDashboardResult): void {
+    this.skipCount = 0;
+
+    if (this.paginator) {
+      this.paginator.changePage(0);
+      return;
+    }
+
+    this.getDashboards();
+  }
 }
