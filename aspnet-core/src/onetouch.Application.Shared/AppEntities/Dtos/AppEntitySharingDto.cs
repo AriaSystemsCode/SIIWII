@@ -23,7 +23,7 @@ namespace onetouch.AppEntities.Dtos
         public virtual string SharedUserTenantName { get; set; }
 
         public virtual DateTime LastViewDate { get; set; }
-
+        public Guid? UserProfilePictureId { get; set; }
 
     }
 }

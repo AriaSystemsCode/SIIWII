@@ -22,6 +22,8 @@ using System.Linq.Dynamic.Core;
 using onetouch.AccountInfos.Dtos;
 using onetouch.Helpers;
 using DocumentFormat.OpenXml.Vml.Office;
+using System.Security.Policy;
+using onetouch.AppEntities.Dtos;
 namespace onetouch.AppDashboard
 {
     [AbpAuthorize(AppPermissions.Pages_Dashboards)]
@@ -56,13 +58,48 @@ namespace onetouch.AppDashboard
                                  select new GetDashboardForViewDto()
                                  {
                                      Id = dash.Id,
-                                     Name =dash.Name,
+                                     Name = dash.Name,
+                                     CreatorUserId = long.Parse(dash.CreatorUserId.ToString()),
+                                     LastUpdatedDate = dash.LastModificationTime!=null?
+                                     DateTime.Parse(dash.LastModificationTime.ToString()).Date: DateTime.Parse(dash.CreationTime.ToString()).Date,
+
                                  };
 
+            
 
             var dashboardsList = await dashboradQuery.ToListAsync();
             var totalCount = await dashboard.CountAsync();
-            
+            if (dashboardsList != null && dashboardsList.Count() >0)
+            {
+                foreach (var dashb in dashboardsList)
+                {
+                    var creatorUser = UserManager.GetUserById(dashb.CreatorUserId);
+                    if (creatorUser != null)
+                    {
+                        dashb.CreatorUserName = creatorUser.UserName;
+                        var profilePictureId = creatorUser.ProfilePictureId;
+                        if (profilePictureId != null)
+                        { dashb.CreatorUserProfilePictureId = (Guid)profilePictureId; }
+                    }
+                    var sharingObj = await _appEntitySharingRepository.GetAll().Where(z => z.EntityId == dashb.Id && z.SharedUserId == AbpSession.UserId).FirstOrDefaultAsync();
+                    if (sharingObj != null)
+                        dashb.ViewDate = sharingObj.LastViewDate != null ? sharingObj.LastViewDate.Date : dashb.LastUpdatedDate.Date;
+                    else
+                        dashb.ViewDate = dashb.LastUpdatedDate;
+
+                    var sharingObjs = await _appEntitySharingRepository.GetAll().Where(z => z.EntityId == dashb.Id && z.SharedUserId != AbpSession.UserId).ToListAsync();
+                    if (sharingObjs!=null && sharingObjs.Count > 0)
+                    {
+                        dashb.AppEntitySharings = ObjectMapper.Map<List<AppEntitySharingDto>>(sharingObjs);
+                        foreach (var sh in dashb.AppEntitySharings)
+                        {
+                            var userObj= UserManager.GetUserById(long.Parse(sh.SharedUserId.ToString()));
+                            if (userObj != null && userObj.ProfilePictureId!=null)
+                                sh.UserProfilePictureId =userObj.ProfilePictureId;
+                        }
+                    }
+                }
+            }
             var x = new PagedResultDto<GetDashboardForViewDto>(
                         totalCount,
                         dashboardsList
@@ -88,14 +125,59 @@ namespace onetouch.AppDashboard
             }
             return new GetDashboardForViewDto();
         }
+        public async Task<bool> UpdateViewDate(long dashboardId)
+        {
+            var sharingObj = await _appEntitySharingRepository.GetAll().Where(z => z.EntityId == dashboardId && z.SharedUserId == AbpSession.UserId).FirstOrDefaultAsync();
+            if (sharingObj != null)
+            {
+                sharingObj.LastViewDate = DateTime.Now;
+                _appEntitySharingRepository.UpdateAsync(sharingObj);
+            }
+            else
+            {
+                AppEntitySharings entitySharing = new AppEntitySharings();
+                entitySharing.EntityId = dashboardId;
+                entitySharing.SharedTenantId = AbpSession.TenantId;
+                entitySharing.SharedUserId = AbpSession.UserId;
+                entitySharing.LastViewDate = DateTime.Now;
+                _appEntitySharingRepository.InsertAsync(sharingObj);
+
+            }
+            await UnitOfWorkManager.Current.SaveChangesAsync();
+            return true;
+        }
         public Task<GetDashboardForViewDto> GetDashboardForEdit(EntityDto<long> input)
         {
             throw new NotImplementedException();
         }
 
-        public Task<GetDashboardForViewDto> GetDashboardForView(long id, int resultCount)
+        public async Task<GetDashboardForViewDto> GetDashboardForView(long id, int resultCount)
         {
+            await UpdateViewDate(id);
             throw new NotImplementedException();
+        }
+        public async Task<bool> ShareDashboard(long dashboardId, List<long> users)
+        {
+            foreach (var user in users)
+            {
+                var sharingObj = await _appEntitySharingRepository.GetAll().Where(z => z.EntityId == dashboardId && z.SharedUserId == user).FirstOrDefaultAsync();
+                if (sharingObj == null)
+                {
+                    var userObj = UserManager.GetUserById(user);
+                    AppEntitySharings entitySharing = new AppEntitySharings();
+                    entitySharing.EntityId = dashboardId;
+                    entitySharing.SharedUserId = user;
+                    if (userObj != null)
+                    { 
+                      entitySharing.SharedTenantId = userObj.TenantId;
+                      entitySharing.SharedUserEMail = userObj.EmailAddress;
+                    }
+                    _appEntitySharingRepository.InsertAsync(sharingObj);
+                }
+               
+            }
+            await UnitOfWorkManager.Current.SaveChangesAsync();
+            return true;
         }
     }
 }
