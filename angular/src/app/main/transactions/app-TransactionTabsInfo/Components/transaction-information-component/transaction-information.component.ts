@@ -138,6 +138,8 @@ export class TransactionInformationComponent
   isArabic: boolean
   transactionSharing: string = "";
   isAuthenticated = this.appSession?.user
+  orderAmount:number =0;
+  totalCharges:number =0;
   constructor(
     injector: Injector,
     private _AppTransactionServiceProxy: AppTransactionServiceProxy,
@@ -550,6 +552,9 @@ export class TransactionInformationComponent
         (this.appTransactionsForViewDto?.charges || []).forEach(c => {
           c.originalAmount = c.chargeAmount;
         });
+
+        this.totalCharges=this.getTotalCharges();
+        this.orderAmount = this.appTransactionsForViewDto.totalAmount - this.totalCharges;
         this.getAppItemTypeExtraAttributesById();
 
 
@@ -1849,7 +1854,6 @@ Kindly check attached`,
     }
   }
 
-  //i49 
   getTotalCharges() {
     return this.appTransactionsForViewDto?.charges?.reduce(
       (acc, charge) => acc + (charge.chargeAmount || 0),
@@ -1860,23 +1864,24 @@ Kindly check attached`,
 
   onEditCharge(charge) {
     charge.isEditing = true;
-    charge.originalAmount = charge.chargeAmount;
+    charge.originalAmount= charge.chargeAmount;
   }
 
   onSaveCharge(charge) {
-    charge.isEditing = false;
-    charge.originalAmount = charge.chargeAmount;
     this.showMainSpinner();
-    //i49 
     this._AppTransactionServiceProxy
-      .recalculateTransactionTotalAmount(this.orderId)
+      .updateCharges(this.orderId,this.appTransactionsForViewDto.charges)
       .pipe(
         finalize(() => {
           this.hideMainSpinner()
         })
       )
       .subscribe((res) => {
-        this.appTransactionsForViewDto.totalAmount = res;
+     this.appTransactionsForViewDto.totalAmount = res;
+    charge.isEditing = false;
+    charge.originalAmount = charge.chargeAmount;
+    this.totalCharges= this.getTotalCharges();
+    this.orderAmount = this.appTransactionsForViewDto.totalAmount - this.totalCharges;
       });
 
   }
