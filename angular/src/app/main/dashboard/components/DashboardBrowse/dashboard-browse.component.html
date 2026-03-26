@@ -1,207 +1,199 @@
 <div class="  mainDiv mx-lg-5">
-    <div class="my-dashboards-page container-fluid">
+  <div class="my-dashboards-page container-fluid">
 
-        <!-- Title row  -->
-        <div class="page-header d-flex align-items-center justify-content-between mb-3">
+    <!-- Title row  -->
+    <div class="page-header d-flex align-items-center justify-content-between mb-3">
 
-            <!-- Left: Title -->
-            <div class="d-flex align-items-center">
-              <h2 class="page-title m-0 mr-3">My Dashboards</h2>
-              <i class="fas fa-angle-down text-muted"></i>
-            </div>
-          
-            <!-- Center: Search -->
-            <div class="flex-grow-1 d-flex justify-content-center">
-              <span class="p-input-icon-left search-box">
-                <i class="pi pi-search"></i>
-                <input
-                  #globalSearch
-                  type="text" class="searchIn"
-                  pInputText
-                  
-                  placeholder="Search..."
-                  (input)="onGlobalSearch($event)"
-                />
-              </span>
-            </div>
-          
-            <!-- Right: Create button -->
-            <div>
-              <button class="btn create-btn" type="button" (click)="createNew()">
-                Create new <i class="fas fa-plus ml-2"></i>
-              </button>
-            </div>
-          
-          </div>
-      
-        <!-- Card container -->
-        <div class=" shadow-sm main-card">
-          <div class="card-body p-0">
-      
-         <p-table
-  #dataTable
-  [value]="primengTableHelper.records"
-  [lazy]="false"
-  [paginator]="false"
-  [rows]="primengTableHelper.defaultRecordsCountPerPage"
-  [totalRecords]="primengTableHelper.totalRecordsCount"
-  styleClass="p-datatable-sm dashboards-table"
->
-              <!-- Table header -->
-              <ng-template pTemplate="header">
-                <tr>
-                  <th pSortableColumn="name">
-                    Dashboard Name
-                    <!-- <p-sortIcon field="name"></p-sortIcon> -->
-                  </th>
-      
-                  <th pSortableColumn="dateViewed">
-                    Date viewed
-                    <!-- <p-sortIcon field="dateViewed"></p-sortIcon> -->
-                  </th>
-      
-                  <th pSortableColumn="dateUpdated">
-                    Date updated
-                    <!-- <p-sortIcon field="dateUpdated"></p-sortIcon> -->
-                  </th>
-      
-                  <th pSortableColumn="owner.displayName">
-                    Owner
-                    <!-- <p-sortIcon field="owner.displayName"></p-sortIcon> -->
-                  </th>
-      
-                  <th>
-                    Sharing
-                  </th>
-                </tr>
-              </ng-template>
-      
-              <!-- Table body -->
-              <ng-template pTemplate="body" let-row>
-                <tr>
-                  <!-- Dashboard Name (clickable link) -->
-                  <td>
-                    <a class="dash-link" href="javascript:;" (click)="openDashboard(row)">
-                      {{ row?.name }}
-                    </a>
-                  </td>
-      
-                  <!-- Date viewed (nullable) -->
-                  <td>
-                    <span *ngIf="row.dateViewed; else notViewed">
-                      {{ row?.dateViewed | date:'dd/MM/yyyy' }}
-                    </span>
-                    <ng-template #notViewed>
-                      <span class="text-muted">—</span>
-                    </ng-template>
-                  </td>
-      
-                  <!-- Date updated -->
-                  <td>
-                    {{ row?.dateUpdated | date:'dd/MM/yyyy' }}
-                  </td>
-      
-                  <!-- Owner -->
-                  <td>
-                    <div class="owner-cell d-flex align-items-center">
-                      <img
-                        class="avatar avatar-md"
-                        [src]="row?.owner?.avatarUrl || defaultAvatar"
-                        (error)="onAvatarErr($event)"
-                        alt="Owner"
-                      />
-                      <span class="owner-name ml-2">
-                        {{ row?.owner?.displayName }}
-                      </span>
-                    </div>
-                  </td>
-      
-                  <!-- Sharing -->
-                  <td>
-                    <div class="sharing-wrap d-flex align-items-center">
-                      <div
-                        class="avatar-stack"
-                        (mouseenter)="showShare($event, row)"
-                        (mouseleave)="hideShare()"
-                      >
-                        <!-- show up to 3 -->
-                        <ng-container *ngFor="let u of row?.sharedWith | slice:0:3; let i = index">
-                          <img
-                            class="avatar avatar-sm stacked"
-                            [style.zIndex]="10 - i"
-                            [src]="u?.avatarUrl || defaultAvatar"
-                            (error)="onAvatarErr($event)"
-                            [alt]="u.displayName"
-                          />
-                        </ng-container>
-      
-                        <!-- overflow +N -->
-                        <div *ngIf="row?.sharedWith?.length > 3" class="avatar avatar-sm stacked more">
-                          +{{ row?.sharedWith?.length - 3 }}
-                        </div>
-                      </div>
-                    </div>
-                  </td>
-                </tr>
-              </ng-template>
-      
-              <!-- Empty -->
-              <ng-template pTemplate="emptymessage">
-                <tr>
-                  <td colspan="5" class="p-4 text-center text-muted">
-                    No dashboards found.
-                  </td>
-                </tr>
-              </ng-template>
-            </p-table>
-      
-            <!-- Hover panel (avatar + name list) -->
-            <p-overlayPanel #sharePanel [showCloseIcon]="false" styleClass="share-panel">
-              <div class="share-panel-title mb-2">Shared with</div>
-      
-              <div *ngIf="shareUsers?.length; else emptyShare">
-                <div class="share-user d-flex align-items-center" *ngFor="let u of shareUsers">
-                  <img
-                    class="avatar avatar-sm"
-                    [src]="u?.avatarUrl || defaultAvatar"
-                    (error)="onAvatarErr($event)"
-                    alt="User"
-                  />
-                  <span class="ml-2">{{ u?.displayName }}</span>
+      <!-- Left: Title -->
+ <div class="d-flex align-items-center" dropdown container="body" >
+
+  <button
+    class="dropdown-toggle btn btn-sm p-0 d-flex align-items-center"
+    dropdownToggle
+    type="button"
+  >
+    <h2 class="page-title m-0 mr-2">
+      {{ selectedDashboardFilter.label }}
+    </h2>
+    <!-- <i class="fas fa-angle-down text-muted"></i> -->
+  </button>
+
+  <ul *dropdownMenu class="dropdown-menu">
+    <li *ngFor="let opt of dashboardFilterOptions">
+      <button
+        class="dropdown-item"
+        type="button"
+        (click)="selectFilter(opt)"
+      >
+        {{ opt.label }}
+      </button>
+    </li>
+  </ul>
+
+</div>
+
+      <!-- Center: Search -->
+      <div class="flex-grow-1 d-flex justify-content-center">
+        <span class="p-input-icon-left search-box">
+          <i class="pi pi-search"></i>
+          <input #globalSearch type="text" class="searchIn" pInputText placeholder="Search..."
+            (input)="onGlobalSearch($event)" />
+        </span>
+      </div>
+
+      <!-- Right: Create button -->
+      <div>
+        <button class="btn create-btn" type="button" (click)="createNew()">
+          Create new <i class="fas fa-plus ml-2"></i>
+        </button>
+      </div>
+
+    </div>
+
+    <!-- Card container -->
+    <div class=" shadow-sm main-card">
+      <div class="card-body p-0">
+
+        <p-table #dataTable [value]="primengTableHelper.records" [lazy]="false" [paginator]="false"
+          [rows]="primengTableHelper.defaultRecordsCountPerPage" [totalRecords]="primengTableHelper.totalRecordsCount"
+          styleClass="p-datatable-sm dashboards-table">
+          <!-- Table header -->
+          <ng-template pTemplate="header">
+            <tr>
+              <th pSortableColumn="name">
+                Dashboard Name
+                <!-- <p-sortIcon field="name"></p-sortIcon> -->
+              </th>
+
+              <th pSortableColumn="dateViewed">
+                Date viewed
+                <!-- <p-sortIcon field="dateViewed"></p-sortIcon> -->
+              </th>
+
+              <th pSortableColumn="dateUpdated">
+                Date updated
+                <!-- <p-sortIcon field="dateUpdated"></p-sortIcon> -->
+              </th>
+
+              <th pSortableColumn="owner.displayName">
+                Owner
+                <!-- <p-sortIcon field="owner.displayName"></p-sortIcon> -->
+              </th>
+
+              <th>
+                Sharing
+              </th>
+            </tr>
+          </ng-template>
+
+          <!-- Table body -->
+          <ng-template pTemplate="body" let-row>
+            <tr>
+              <!-- Dashboard Name (clickable link) -->
+              <td>
+                <a class="dash-link" href="javascript:;" (click)="openDashboard(row)">
+                  {{ row?.name }}
+                </a>
+              </td>
+
+              <!-- Date viewed (nullable) -->
+              <td>
+                <span *ngIf="row.viewDate; else notViewed">
+                  {{ row?.viewDate | momentFormat:'L' }}
+                </span>
+                <ng-template #notViewed>
+                  <span class="text-muted">—</span>
+                </ng-template>
+              </td>
+
+              <!-- Date updated -->
+              <td>
+                {{ row?.lastUpdatedDate | momentFormat:'L' }}
+              </td>
+
+              <!-- Owner -->
+              <td>
+                <div class="owner-cell d-flex align-items-center">
+                  <img class="avatar avatar-md" [src]="getUserImage(row?.creatorUserProfilePictureId)"
+                    (error)="onAvatarErr($event)" alt="Owner" />
+                  <span class="owner-name ml-2">
+                    {{ row?.creatorUserName }}
+                  </span>
                 </div>
-              </div>
-      
-              <ng-template #emptyShare>
-                <div class="text-muted">Not shared</div>
-              </ng-template>
-            </p-overlayPanel>
-      
+              </td>
+
+              <!-- Sharing -->
+              <td>
+                <div class="sharing-wrap d-flex align-items-center">
+                  <div class="avatar-stack" (mouseenter)="showShare($event, row)" (mouseleave)="hideShare()">
+                    <!-- show up to 3 -->
+                    <ng-container *ngFor="let u of row?.appEntitySharings | slice:0:3; let i = index">
+                      <img class="avatar avatar-sm stacked" [style.zIndex]="10 - i"
+                         [src]="getUserImage(u?.userProfilePictureId)" (error)="onAvatarErr($event)"
+                        [alt]="u?.sharedUserName" />
+                    </ng-container>
+
+                    <!-- overflow +N -->
+                    <div *ngIf="row?.appEntitySharings?.length > 3" class="avatar avatar-sm stacked more">
+                      +{{ row?.appEntitySharings?.length - 3 }}
+                    </div>
+                  </div>
+                </div>
+              </td>
+            </tr>
+          </ng-template>
+
+          <!-- Empty -->
+          <ng-template pTemplate="emptymessage">
+            <tr>
+              <td colspan="5" class="p-4 text-center text-muted">
+                No dashboards found.
+              </td>
+            </tr>
+          </ng-template>
+        </p-table>
+
+        <!-- Hover panel (avatar + name list) -->
+        <p-overlayPanel #sharePanel [showCloseIcon]="false" styleClass="share-panel">
+          <div class="share-panel-title mb-2">Shared with</div>
+
+          <div *ngIf="shareUsers?.length; else emptyShare">
+            <div class="share-user d-flex align-items-center" *ngFor="let u of shareUsers">
+              <img class="avatar avatar-sm"   [src]="getUserImage(u?.userProfilePictureId)"
+                (error)="onAvatarErr($event)" alt="User" />
+              <span class="ml-2">{{ u?.sharedUserName || '—' }}</span>
+            </div>
+          </div>
+
+          <ng-template #emptyShare>
+            <div class="text-muted">Not shared</div>
+          </ng-template>
+        </p-overlayPanel>
+
+      </div>
+    </div>
+
+
+
+
+    <div class="row">
+      <div class="left-aside-filters">
+      </div>
+      <div class="col d-flex flex-column justify-content-between">
+        <div class="primeng-paging-container custom-paginator">
+          <p-paginator #paginator [rows]="primengTableHelper.defaultRecordsCountPerPage"
+            [totalRecords]="primengTableHelper.totalRecordsCount"
+            [rowsPerPageOptions]="primengTableHelper.predefinedRecordsCountPerPage"
+            (onPageChange)="onPageChange($event)">
+          </p-paginator>
+
+          <div class="total-records-count text-right mr-3">
+            {{l('TotalRecordsCount', primengTableHelper.totalRecordsCount)}}
           </div>
         </div>
-
-
-
-
-        <div class="row">
-          <div class="left-aside-filters">
-          </div>
-          <div class="col d-flex flex-column justify-content-between">
-              <div class="primeng-paging-container custom-paginator">
-              <p-paginator
-  #paginator
-  [rows]="primengTableHelper.defaultRecordsCountPerPage"
-  [totalRecords]="primengTableHelper.totalRecordsCount"
-  [rowsPerPageOptions]="primengTableHelper.predefinedRecordsCountPerPage"
-  (onPageChange)="onPageChange($event)">
-</p-paginator>
-
-                  <div class="total-records-count text-right mr-3">
-                      {{l('TotalRecordsCount', primengTableHelper.totalRecordsCount)}}
-                  </div>
-              </div>
-          </div>
       </div>
-      </div>
+    </div>
+  </div>
 
 
 
@@ -210,7 +202,5 @@
 
 
 <!-- Create Dashboard Modal -->
-<app-create-dashboard-modal
-  #createDashboardModal
-  (created)="onDashboardCreated($event)">
+<app-create-dashboard-modal #createDashboardModal (created)="onDashboardCreated($event)">
 </app-create-dashboard-modal>

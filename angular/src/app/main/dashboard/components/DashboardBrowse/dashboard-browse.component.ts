@@ -4,9 +4,16 @@ import { AppComponentBase } from '@shared/common/app-component-base';
 import { PrimengTableHelper } from '@shared/helpers/PrimengTableHelper';
 import { Paginator } from 'primeng/paginator';
 import { Table } from 'primeng/table';
-import { CreateDashboardModalComponent, CreatedDashboardResult } from '../create-dashboard-modal/create-dashboard-modal.component';
-import { AppDashboardsServiceProxy, GetDashboardForViewDto, } from '@shared/service-proxies/service-proxies';
+import {
+  CreateDashboardModalComponent,
+  CreatedDashboardResult
+} from '../create-dashboard-modal/create-dashboard-modal.component';
+import {
+  AppDashboardsServiceProxy,
+  GetDashboardForViewDto
+} from '@shared/service-proxies/service-proxies';
 import { finalize } from 'rxjs/operators';
+import { AppConsts } from '@shared/AppConsts';
 
 @Component({
   selector: 'app-dashboard-browse.component',
@@ -14,7 +21,7 @@ import { finalize } from 'rxjs/operators';
   styleUrls: ['./dashboard-browse.component.scss']
 })
 export class DashboardBrowseComponent extends AppComponentBase implements OnInit {
-  @ViewChild('sharePanel') sharePanel;
+  @ViewChild('sharePanel') sharePanel: any;
   @ViewChild('paginator', { static: true }) paginator: Paginator;
   @ViewChild('dataTable', { static: true }) dataTable: Table;
   @ViewChild('createDashboardModal') createDashboardModal!: CreateDashboardModalComponent;
@@ -29,6 +36,16 @@ export class DashboardBrowseComponent extends AppComponentBase implements OnInit
   skipCount = 0;
   maxResultCount = 10;
 
+
+
+  dashboardFilterOptions = [
+  { label: 'My Dashboards', value: 'my' },
+  { label: 'Private', value: 'private' },
+  { label: 'Shared', value: 'shared' }
+];
+
+selectedDashboardFilter = this.dashboardFilterOptions[0]; // default
+
   constructor(
     injector: Injector,
     private router: Router,
@@ -42,7 +59,40 @@ export class DashboardBrowseComponent extends AppComponentBase implements OnInit
     this.getDashboards();
   }
 
+
+selectFilter(option: any) {
+  this.selectedDashboardFilter = option;
+
+  this.onDashboardFilterChange(option.value);
+}
+
+onDashboardFilterChange(value: string): void {
+  // reset paging
+  this.skipCount = 0;
+
+  switch (value) {
+    case 'my':
+    
+      break;
+
+    case 'private':
+    
+      break;
+
+    case 'shared':
+   
+      break;
+  }
+
+  this.reloadFromFirstPage();
+}
+
+
   openDashboard(row: any): void {
+    if (!row?.id) {
+      return;
+    }
+
     this.router.navigate(['/app/main/dashboards/dashboard-details', row.id]);
   }
 
@@ -51,7 +101,7 @@ export class DashboardBrowseComponent extends AppComponentBase implements OnInit
   }
 
   showShare(event: MouseEvent, row: any): void {
-    this.shareUsers = row?.sharedWith ?? [];
+    this.shareUsers = row?.appEntitySharings ?? [];
     this.sharePanel.show(event);
   }
 
@@ -63,27 +113,31 @@ export class DashboardBrowseComponent extends AppComponentBase implements OnInit
     (evt.target as HTMLImageElement).src = this.defaultAvatar;
   }
 
-onGlobalSearch(event: Event): void {
-  this.filterText = (event.target as HTMLInputElement).value?.trim() || '';
-  this.skipCount = 0;
-  this.reloadFromFirstPage();
-}
+  onGlobalSearch(event: Event): void {
+    this.filterText = (event.target as HTMLInputElement).value?.trim() || '';
+    this.skipCount = 0;
+    this.reloadFromFirstPage();
+  }
 
-reloadFromFirstPage(): void {
-  if (this.paginator) {
-    if (this.paginator.getPage() !== 0) {
-      this.paginator.changePage(0);
+  reloadFromFirstPage(): void {
+    if (this.paginator) {
+      const currentPage = this.paginator.getPage ? this.paginator.getPage() : 0;
+
+      if (currentPage !== 0) {
+        this.paginator.changePage(0);
+      } else {
+        this.getDashboards();
+      }
     } else {
       this.getDashboards();
     }
-  } else {
-    this.getDashboards();
   }
-}
 
   onPageChange(event: any): void {
     this.skipCount = event?.first ?? 0;
-    this.maxResultCount = event?.rows ?? this.primengTableHelper.defaultRecordsCountPerPage ?? 10;
+    this.maxResultCount =
+      event?.rows ?? this.primengTableHelper.defaultRecordsCountPerPage ?? 10;
+
     this.getDashboards();
   }
 
@@ -91,9 +145,10 @@ reloadFromFirstPage(): void {
     const validMaxResultCount =
       this.maxResultCount && this.maxResultCount > 0
         ? this.maxResultCount
-        : (this.primengTableHelper.defaultRecordsCountPerPage || 10);
+        : this.primengTableHelper.defaultRecordsCountPerPage || 10;
 
-   this.showMainSpinner()
+    this.showMainSpinner();
+
     const subs = this.appDashboardsAppService
       .getAll(
         this.filterText || null,
@@ -103,7 +158,7 @@ reloadFromFirstPage(): void {
       )
       .pipe(
         finalize(() => {
-         this.hideMainSpinner()
+          this.hideMainSpinner();
         })
       )
       .subscribe({
@@ -124,10 +179,41 @@ reloadFromFirstPage(): void {
     this.skipCount = 0;
 
     if (this.paginator) {
-      this.paginator.changePage(0);
+      const currentPage = this.paginator.getPage ? this.paginator.getPage() : 0;
+
+      if (currentPage !== 0) {
+        this.paginator.changePage(0);
+      } else {
+        this.getDashboards();
+      }
+
       return;
     }
 
     this.getDashboards();
+  }
+
+  getUserImage(profilePictureId?: string | null): string {
+    if (!profilePictureId) {
+      return this.defaultAvatar;
+    }
+
+    /**
+     * Replace this endpoint if your backend uses another URL.
+     * Example only:
+     */
+    return (
+      AppConsts.remoteServiceBaseUrl +
+      '/Profile/GetProfilePictureById?id=' +
+      encodeURIComponent(profilePictureId)
+    );
+  }
+
+  getSharedUsers(row: any): any[] {
+    return row?.appEntitySharings ?? [];
+  }
+
+  getSharedUsersCount(row: any): number {
+    return row?.appEntitySharings?.length ?? 0;
   }
 }

@@ -107,29 +107,7 @@ border-radius: 20px;
     background: #f2e9f2;
   }
   
-  /* Overlay panel */
-//   :host ::ng-deep .share-panel.p-overlaypanel {
-//     border-radius: 12px;
-//     border: 1px solid #ebedf2;
-//     box-shadow: 0 14px 30px rgba(22, 22, 22, 0.18);
-//     padding: 10px;
-//     min-width: 240px;
-//   }
-  
-//   .share-panel-title {
-//     font-weight: 800;
-//     color: #1b101b;
-//   }
-  
-//   .share-user {
-//     padding: 8px 6px;
-//     border-radius: 10px;
-//   }
-//   .share-user:hover {
-//     background: #f7f7fb;
-//   }
-  
-  /* Responsive small tweaks */
+
   @media (max-width: 575.98px) {
     .page-title {
       font-size: 20px;
@@ -205,3 +183,12 @@ border-radius: 10px;
 
 }
  
+
+
+:host ::ng-deep .dropdown-item.active, .dropdown-item:active {
+    color: #ffffff;
+    text-decoration: none;
+    background-color: #4a0d4a;
+    font-size: 15px;
+    font-weight: 600;
+}
