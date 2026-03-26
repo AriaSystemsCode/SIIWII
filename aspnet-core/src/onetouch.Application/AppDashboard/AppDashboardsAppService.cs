@@ -90,12 +90,21 @@ namespace onetouch.AppDashboard
                     var sharingObjs = await _appEntitySharingRepository.GetAll().Where(z => z.EntityId == dashb.Id && z.SharedUserId != AbpSession.UserId).ToListAsync();
                     if (sharingObjs!=null && sharingObjs.Count > 0)
                     {
-                        dashb.AppEntitySharings = ObjectMapper.Map<List<AppEntitySharingDto>>(sharingObjs);
-                        foreach (var sh in dashb.AppEntitySharings)
+                        dashb.AppEntitySharings = new List<AppEntitySharingDto>(); ;
+                        foreach (var sh in sharingObjs)
                         {
+                            AppEntitySharingDto share = new AppEntitySharingDto();
+                            share.Id = sh.Id;
+                            share.SharedUserId= sh.SharedUserId;
+                            
                             var userObj= UserManager.GetUserById(long.Parse(sh.SharedUserId.ToString()));
-                            if (userObj != null && userObj.ProfilePictureId!=null)
-                                sh.UserProfilePictureId =userObj.ProfilePictureId;
+                            if (userObj != null )
+                            {
+                                share.SharedUserName = userObj.FullName;
+                                if (userObj.ProfilePictureId != null)
+                                    share.UserProfilePictureId = userObj.ProfilePictureId;
+                            }
+                            dashb.AppEntitySharings.Add(share);
                         }
                     }
                 }
@@ -172,7 +181,7 @@ namespace onetouch.AppDashboard
                       entitySharing.SharedTenantId = userObj.TenantId;
                       entitySharing.SharedUserEMail = userObj.EmailAddress;
                     }
-                    _appEntitySharingRepository.InsertAsync(sharingObj);
+                    _appEntitySharingRepository.InsertAsync(entitySharing);
                 }
                
             }
