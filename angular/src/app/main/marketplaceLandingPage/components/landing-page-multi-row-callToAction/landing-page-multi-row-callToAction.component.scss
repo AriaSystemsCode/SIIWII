@@ -6,7 +6,7 @@
 
 .products-grid-single {
   display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(310px, 0fr));
+      grid-template-columns: repeat(auto-fit, minmax(310px, 1fr));
   gap: 0.75rem;
 }
 

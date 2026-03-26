@@ -600,6 +600,12 @@ isArabic: boolean = false;
             const shouldBeTrue = selectedCode === 'PF' || selectedCode === 'SM';
     
             this.setStringValue(1005, shouldBeTrue ? 'true' : 'false');
+
+
+           const isSingleOrMulti = selectedCode === 'SRCTA' || selectedCode === 'MRCTA';
+
+  this.toggleLastFields(isSingleOrMulti);
+
         }
     
         if (!this.appEntity.entityExtraData)
@@ -998,6 +1004,21 @@ isArabic: boolean = false;
 
   const triggerAttr = this.extraAttributes?.find(x => x.attributeId === 1006);
   return !!triggerAttr?.selectedValues;
+}
+
+toggleLastFields(enable: boolean): void {
+  const targetIds = [1006, 1007, 1008, 1009];
+
+  this.extraAttributes?.forEach(attr => {
+    if (targetIds.includes(attr.attributeId)) {
+      attr.disabled = !enable;
+
+      if (!enable) {
+        attr.selectedValues = '';
+        this.setStringValue(attr.attributeId, '');
+      }
+    }
+  });
 }
 
 }
