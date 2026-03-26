@@ -6577,6 +6577,63 @@ export class AppDashboardsServiceProxy {
     }
 
     /**
+     * @param dashboardId (optional) 
+     * @return Success
+     */
+    updateViewDate(dashboardId: number | undefined): Observable<boolean> {
+        let url_ = this.baseUrl + "/api/services/app/AppDashboards/UpdateViewDate?";
+        if (dashboardId === null)
+            throw new Error("The parameter 'dashboardId' cannot be null.");
+        else if (dashboardId !== undefined)
+            url_ += "dashboardId=" + encodeURIComponent("" + dashboardId) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("put", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processUpdateViewDate(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processUpdateViewDate(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<boolean>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<boolean>;
+        }));
+    }
+
+    protected processUpdateViewDate(response: HttpResponseBase): Observable<boolean> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+                result200 = resultData200 !== undefined ? resultData200 : <any>null;
+    
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
      * @param id (optional) 
      * @return Success
      */
@@ -6683,6 +6740,68 @@ export class AppDashboardsServiceProxy {
             let result200: any = null;
             let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
             result200 = GetDashboardForViewDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param dashboardId (optional) 
+     * @param body (optional) 
+     * @return Success
+     */
+    shareDashboard(dashboardId: number | undefined, body: number[] | null | undefined): Observable<boolean> {
+        let url_ = this.baseUrl + "/api/services/app/AppDashboards/ShareDashboard?";
+        if (dashboardId === null)
+            throw new Error("The parameter 'dashboardId' cannot be null.");
+        else if (dashboardId !== undefined)
+            url_ += "dashboardId=" + encodeURIComponent("" + dashboardId) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json-patch+json",
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processShareDashboard(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processShareDashboard(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<boolean>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<boolean>;
+        }));
+    }
+
+    protected processShareDashboard(response: HttpResponseBase): Observable<boolean> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+                result200 = resultData200 !== undefined ? resultData200 : <any>null;
+    
             return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
@@ -73163,6 +73282,7 @@ export class AppEntitySharingDto implements IAppEntitySharingDto {
     sharedUserSureName!: string | undefined;
     sharedUserTenantName!: string | undefined;
     lastViewDate!: moment.Moment;
+    userProfilePictureId!: string | undefined;
     id!: number;
 
     [key: string]: any;
@@ -73189,6 +73309,7 @@ export class AppEntitySharingDto implements IAppEntitySharingDto {
             this.sharedUserSureName = _data["sharedUserSureName"];
             this.sharedUserTenantName = _data["sharedUserTenantName"];
             this.lastViewDate = _data["lastViewDate"] ? moment(_data["lastViewDate"].toString()) : <any>undefined;
+            this.userProfilePictureId = _data["userProfilePictureId"];
             this.id = _data["id"];
         }
     }
@@ -73213,6 +73334,7 @@ export class AppEntitySharingDto implements IAppEntitySharingDto {
         data["sharedUserSureName"] = this.sharedUserSureName;
         data["sharedUserTenantName"] = this.sharedUserTenantName;
         data["lastViewDate"] = this.lastViewDate ? this.lastViewDate.toISOString() : <any>undefined;
+        data["userProfilePictureId"] = this.userProfilePictureId;
         data["id"] = this.id;
         return data;
     }
@@ -73226,6 +73348,7 @@ export interface IAppEntitySharingDto {
     sharedUserSureName: string | undefined;
     sharedUserTenantName: string | undefined;
     lastViewDate: moment.Moment;
+    userProfilePictureId: string | undefined;
     id: number;
 
     [key: string]: any;
@@ -73660,6 +73783,11 @@ export class GetDashboardForViewDto implements IGetDashboardForViewDto {
     id!: number;
     name!: string | undefined;
     isTemplate!: boolean;
+    creatorUserName!: string | undefined;
+    creatorUserId!: number;
+    lastUpdatedDate!: moment.Moment;
+    viewDate!: moment.Moment;
+    creatorUserProfilePictureId!: string;
     appEntitySharings!: AppEntitySharingDto[] | undefined;
     appDashboardCards!: GetDashboardCardForViewDto[] | undefined;
 
@@ -73683,6 +73811,11 @@ export class GetDashboardForViewDto implements IGetDashboardForViewDto {
             this.id = _data["id"];
             this.name = _data["name"];
             this.isTemplate = _data["isTemplate"];
+            this.creatorUserName = _data["creatorUserName"];
+            this.creatorUserId = _data["creatorUserId"];
+            this.lastUpdatedDate = _data["lastUpdatedDate"] ? moment(_data["lastUpdatedDate"].toString()) : <any>undefined;
+            this.viewDate = _data["viewDate"] ? moment(_data["viewDate"].toString()) : <any>undefined;
+            this.creatorUserProfilePictureId = _data["creatorUserProfilePictureId"];
             if (Array.isArray(_data["appEntitySharings"])) {
                 this.appEntitySharings = [] as any;
                 for (let item of _data["appEntitySharings"])
@@ -73712,6 +73845,11 @@ export class GetDashboardForViewDto implements IGetDashboardForViewDto {
         data["id"] = this.id;
         data["name"] = this.name;
         data["isTemplate"] = this.isTemplate;
+        data["creatorUserName"] = this.creatorUserName;
+        data["creatorUserId"] = this.creatorUserId;
+        data["lastUpdatedDate"] = this.lastUpdatedDate ? this.lastUpdatedDate.toISOString() : <any>undefined;
+        data["viewDate"] = this.viewDate ? this.viewDate.toISOString() : <any>undefined;
+        data["creatorUserProfilePictureId"] = this.creatorUserProfilePictureId;
         if (Array.isArray(this.appEntitySharings)) {
             data["appEntitySharings"] = [];
             for (let item of this.appEntitySharings)
@@ -73730,6 +73868,11 @@ export interface IGetDashboardForViewDto {
     id: number;
     name: string | undefined;
     isTemplate: boolean;
+    creatorUserName: string | undefined;
+    creatorUserId: number;
+    lastUpdatedDate: moment.Moment;
+    viewDate: moment.Moment;
+    creatorUserProfilePictureId: string;
     appEntitySharings: AppEntitySharingDto[] | undefined;
     appDashboardCards: GetDashboardCardForViewDto[] | undefined;
 
