@@ -4923,7 +4923,8 @@ namespace onetouch.AppSiiwiiTransaction
                                     {
                                         Name = charge.Name,
                                         ChargeAmount = charge.Amount,
-                                        IsEditable = charge.Note == "true" ? true : false
+                                        IsEditable = charge.Note == "true" ? true : false,
+                                        TransactionDetailID = charge.Id
                                     });
                             }
                         }
