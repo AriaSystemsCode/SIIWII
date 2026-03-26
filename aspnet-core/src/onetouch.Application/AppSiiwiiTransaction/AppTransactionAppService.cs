@@ -1751,12 +1751,15 @@ namespace onetouch.AppSiiwiiTransaction
                         appTrans.Name, appTrans.Id, appTrans.EntityObjectTypeId, appTrans.EntityObjectTypeCode,
                         "Seller:" + appTrans.SellerCompanyName.Trim() + ",Buyer:" + appTrans.BuyerCompanyName.Trim(), 1);
                     //I46{End}
+                    var entityObjectChargesId = await _helper.SystemTables.GetEntityObjectCharges();
                     //   if (buyerTenantId != null)
                     {
-                        appTrans.AppTransactionDetails = _appTransactionDetails.GetAll().AsNoTracking().Where(z => z.TransactionId == appTrans.Id && z.ParentId == null).ToList();
+                        appTrans.AppTransactionDetails = _appTransactionDetails.GetAll().AsNoTracking()
+                            .Where(z => z.TransactionId == appTrans.Id && z.ParentId == null && z.EntityObjectTypeId != entityObjectChargesId).ToList();
                         foreach (var det in appTrans.AppTransactionDetails.Where(z => z.ParentId == null))
                         {
-                            await GetProductFromMarketplace(det.SSIN, int.Parse(AbpSession.TenantId.ToString()));
+                            
+                              await GetProductFromMarketplace(det.SSIN, int.Parse(AbpSession.TenantId.ToString()));
                             //I46[Start]
                             await _appTenantActivitiesLogAppService.AddUsageActivityLog("PLACE-ORDER-LINE",
                             appTrans.Name.Trim() + ", Line#" + det.LineNo.ToString().Trim(), det.Id, appTrans.EntityObjectTypeId, appTrans.EntityObjectTypeCode,
@@ -1852,17 +1855,19 @@ namespace onetouch.AppSiiwiiTransaction
                 //}
                 //log[End]
 
-                #region calculate charges
-                if (input.lFromPlaceOrder)
-                {
-                    await AddTransactionCharges(input.Id);
-                }
-                #endregion
+               
 
                 appTrans.EnteredDate = input.EnteredDate;
                 var obj = await _appTransactionsHeaderRepository.UpdateAsync(appTrans);
                 await CurrentUnitOfWork.SaveChangesAsync();
                 UpdateAppEntityLog(obj.Id);
+
+                #region calculate charges
+                if (input.lFromPlaceOrder)
+                {
+                    await AddTransactionCharges(obj.Id);
+                }
+                #endregion
                 return obj.Id;
             }
 
@@ -7933,7 +7938,7 @@ namespace onetouch.AppSiiwiiTransaction
 
             // Calculate total amount
             totalAmount = await RecalculateTransactionTotalAmount(transactionId);
-            
+           
             return totalAmount;
         }
 
