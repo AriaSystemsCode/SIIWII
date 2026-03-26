@@ -1188,3 +1188,30 @@ input:checked + .slider:before {
     font-weight: 600;
     font-size: 16px;
 }
+
+
+.custom-input {
+  height: 40px;
+  border-radius: 8px;
+  border: 2px solid #4A0D4A;
+  padding-right: 60px;
+}
+
+.save-btn {
+  right: 35px;
+  top: 5px;
+  background-color: #4A0D4A;
+  color: white;
+  height: 30px;
+  width: 30px;
+  padding: 0;
+}
+
+.cancel-btn {
+  right: 5px;
+  top: 5px;
+  color: #777;
+  height: 30px;
+  width: 30px;
+  padding: 0;
+}
