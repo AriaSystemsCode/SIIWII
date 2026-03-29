@@ -1,7 +1,7 @@
 <!-- =========================
 CARDS VIEW MODE
 ========================= -->
-<div *ngIf="cardsViewMode" class="market-card shadowContainer">
+<div *ngIf="cardsViewMode" class="market-card shadowContainer" [ngClass]="isAuthenticated ? 'market-card-h':''">
 
 <div
   class="market-card__image"
