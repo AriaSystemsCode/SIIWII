@@ -114,7 +114,7 @@
               <!-- Owner -->
               <td>
                 <div class="owner-cell d-flex align-items-center">
-                  <img class="avatar avatar-md" [src]="getUserImage(row?.creatorUserProfilePictureId)"
+                  <img class="avatar avatar-md" [src]="getProfilePicture(row?.creatorUserProfilePictureId)"
                     (error)="onAvatarErr($event)" alt="Owner" />
                   <span class="owner-name ml-2">
                     {{ row?.creatorUserName }}
@@ -129,7 +129,7 @@
                     <!-- show up to 3 -->
                     <ng-container *ngFor="let u of row?.appEntitySharings | slice:0:3; let i = index">
                       <img class="avatar avatar-sm stacked" [style.zIndex]="10 - i"
-                         [src]="getUserImage(u?.userProfilePictureId)" (error)="onAvatarErr($event)"
+                         [src]="getProfilePicture(u?.userProfilePictureId)" (error)="onAvatarErr($event)"
                         [alt]="u?.sharedUserName" />
                     </ng-container>
 
@@ -159,7 +159,7 @@
 
           <div *ngIf="shareUsers?.length; else emptyShare">
             <div class="share-user d-flex align-items-center" *ngFor="let u of shareUsers">
-              <img class="avatar avatar-sm"   [src]="getUserImage(u?.userProfilePictureId)"
+              <img class="avatar avatar-sm"   [src]="getProfilePicture(u?.userProfilePictureId)"
                 (error)="onAvatarErr($event)" alt="User" />
               <span class="ml-2">{{ u?.sharedUserName || '—' }}</span>
             </div>

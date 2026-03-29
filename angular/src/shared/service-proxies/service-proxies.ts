@@ -6455,15 +6455,20 @@ export class AppDashboardsServiceProxy {
 
     /**
      * @param name (optional) 
+     * @param sharingLevel (optional) 
      * @param sorting (optional) 
      * @param skipCount (optional) 
      * @param maxResultCount (optional) 
      * @return Success
      */
-    getAll(name: string | null | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<PagedResultDtoOfGetDashboardForViewDto> {
+    getAll(name: string | null | undefined, sharingLevel: number | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<PagedResultDtoOfGetDashboardForViewDto> {
         let url_ = this.baseUrl + "/api/services/app/AppDashboards/GetAll?";
         if (name !== undefined && name !== null)
             url_ += "Name=" + encodeURIComponent("" + name) + "&";
+        if (sharingLevel === null)
+            throw new Error("The parameter 'sharingLevel' cannot be null.");
+        else if (sharingLevel !== undefined)
+            url_ += "SharingLevel=" + encodeURIComponent("" + sharingLevel) + "&";
         if (sorting !== undefined && sorting !== null)
             url_ += "Sorting=" + encodeURIComponent("" + sorting) + "&";
         if (skipCount === null)

@@ -10,6 +10,7 @@ import {
 } from '../create-dashboard-modal/create-dashboard-modal.component';
 import {
   AppDashboardsServiceProxy,
+  AppPostsServiceProxy,
   GetDashboardForViewDto
 } from '@shared/service-proxies/service-proxies';
 import { finalize } from 'rxjs/operators';
@@ -39,17 +40,20 @@ export class DashboardBrowseComponent extends AppComponentBase implements OnInit
 
 
   dashboardFilterOptions = [
-  { label: 'My Dashboards', value: 'my' },
-  { label: 'Private', value: 'private' },
-  { label: 'Shared', value: 'shared' }
-];
+    { label: 'All Dashboards', value: 0 },
+    { label: 'My Dashboards', value: 1 },
+    { label: 'Shared With Me', value: 2 }
+  ];
 
-selectedDashboardFilter = this.dashboardFilterOptions[0]; // default
+  selectedDashboardFilter = this.dashboardFilterOptions[0];
+  profilePicture: string
+  profilePictureMap: { [key: string]: string } = {};
 
   constructor(
     injector: Injector,
     private router: Router,
-    public appDashboardsAppService: AppDashboardsServiceProxy
+    public appDashboardsAppService: AppDashboardsServiceProxy,
+    private _postService: AppPostsServiceProxy,
   ) {
     super(injector);
   }
@@ -60,32 +64,32 @@ selectedDashboardFilter = this.dashboardFilterOptions[0]; // default
   }
 
 
-selectFilter(option: any) {
-  this.selectedDashboardFilter = option;
+  selectFilter(option: any) {
+    this.selectedDashboardFilter = option;
 
-  this.onDashboardFilterChange(option.value);
-}
-
-onDashboardFilterChange(value: string): void {
-  // reset paging
-  this.skipCount = 0;
-
-  switch (value) {
-    case 'my':
-    
-      break;
-
-    case 'private':
-    
-      break;
-
-    case 'shared':
-   
-      break;
+    this.onDashboardFilterChange(option.value);
   }
 
-  this.reloadFromFirstPage();
-}
+  onDashboardFilterChange(value: string): void {
+    // reset paging
+    this.skipCount = 0;
+
+    switch (value) {
+      case 'my':
+
+        break;
+
+      case 'private':
+
+        break;
+
+      case 'shared':
+
+        break;
+    }
+
+    this.reloadFromFirstPage();
+  }
 
 
   openDashboard(row: any): void {
@@ -152,6 +156,7 @@ onDashboardFilterChange(value: string): void {
     const subs = this.appDashboardsAppService
       .getAll(
         this.filterText || null,
+        this.selectedDashboardFilter.value,
         this.sorting || null,
         this.skipCount || 0,
         validMaxResultCount
@@ -166,9 +171,15 @@ onDashboardFilterChange(value: string): void {
           this.dashboards = result?.items || [];
           this.primengTableHelper.records = result?.items || [];
           this.primengTableHelper.totalRecordsCount = result?.totalCount || 0;
-        },
-        error: (err) => {
-          console.error('Get dashboards error:', err);
+
+
+          this.dashboards.forEach((row) => {
+            this.loadProfilePicture(row?.creatorUserProfilePictureId);
+
+            row?.appEntitySharings?.forEach((u) => {
+              this.loadProfilePicture(u?.userProfilePictureId);
+            });
+          });
         }
       });
 
@@ -193,20 +204,27 @@ onDashboardFilterChange(value: string): void {
     this.getDashboards();
   }
 
-  getUserImage(profilePictureId?: string | null): string {
-    if (!profilePictureId) {
-      return this.defaultAvatar;
-    }
+  loadProfilePicture(id?: string | null): void {
+    if (!id || this.profilePictureMap[id]) return;
 
-    /**
-     * Replace this endpoint if your backend uses another URL.
-     * Example only:
-     */
-    return (
-      AppConsts.remoteServiceBaseUrl +
-      '/Profile/GetProfilePictureById?id=' +
-      encodeURIComponent(profilePictureId)
-    );
+    const subs = this._postService
+      .getProfilePictureAllByID(id)
+      .subscribe((data) => {
+        if (data?.profilePicture) {
+          this.profilePictureMap[id] =
+            'data:image/jpeg;base64,' + data.profilePicture;
+        } else {
+          this.profilePictureMap[id] = this.defaultAvatar;
+        }
+      });
+
+    this.subscriptions.push(subs);
+  }
+
+  getProfilePicture(id?: string | null): string {
+    if (!id) return this.defaultAvatar;
+
+    return this.profilePictureMap[id] || this.defaultAvatar;
   }
 
   getSharedUsers(row: any): any[] {
