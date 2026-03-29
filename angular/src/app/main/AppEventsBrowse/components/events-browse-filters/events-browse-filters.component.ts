@@ -103,7 +103,7 @@ export class EventsBrowseFiltersComponent extends AppComponentBase implements On
 
   getEventTypeOptionsList(componentRef: { onListLoadCallback: Function }) {
     const items = [
-      { label: this.l('Both'), value: undefined },
+      { label: this.l('All'), value: undefined },
       { label: this.l('Online'), value: true },
       { label: this.l('InPerson'), value: false },
     ];
@@ -118,7 +118,7 @@ export class EventsBrowseFiltersComponent extends AppComponentBase implements On
 
   getPublishOptionsList(componentRef: { onListLoadCallback: Function }) {
     const items = [
-      { label: this.l('Both'), value: 0 },
+      { label: this.l('All'), value: 0 },
       { label: this.l('Published'), value: 1 },
       { label: this.l('NotPublished'), value: 2 },
     ];

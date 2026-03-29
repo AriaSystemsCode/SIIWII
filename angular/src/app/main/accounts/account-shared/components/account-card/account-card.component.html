@@ -27,7 +27,7 @@ CARDS VIEW MODE
 
   <div class="market-card__body">
     <h3 class="market-card__title" (click)="clickCardHandler()">
-      {{ account?.account?.name }}
+      {{ account?.account?.name  | textSubstring : 16  }}
     </h3>
 
     <div class="market-card__followers">
@@ -159,7 +159,7 @@ NOT CARDS VIEW MODE
         <div class="d-flex justify-content-between">
         <h3 (click)="clickCardHandler()" class="card-name my-1 m-0" [pTooltip]="account?.account?.name"
           tooltipPosition="bottom">
-          {{account?.account?.name  | textSubstring : 20 }}
+          {{account?.account?.name  | textSubstring : 25 }}
         </h3>
 
                <!-- <div   >
