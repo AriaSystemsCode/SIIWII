@@ -11,7 +11,7 @@ import { TreeNode } from 'primeng/api';
 import { Router } from '@angular/router';
 import {  TransactionCartMode } from "../../../enums/TransactionCartMode";
 import { UserClickService } from '@shared/utils/user-click.service';
-import { finalize } from 'rxjs';
+import { filter, finalize, Observable, switchMap, take, timeout, timer } from 'rxjs';
 import { CommentParentComponent } from '@app/main/interactions/components/comment-parent/comment-parent.component';
 import { ProductCatalogueReportParams } from '@app/main/app-items/appitems-catalogue-report/models/product-Catalogue-Report-Params';
 import { ReportViewerComponent } from '@app/main/dev-express-demo/reportviewer/report-viewer.component';
@@ -1225,35 +1225,73 @@ export class TransactionInformationComponent
     }
   }
 
-  printTransaction() {
+async printTransaction(): Promise<void> {
+  const printWindow = window.open('', '_blank');
 
-    this._AppTransactionServiceProxy.isOrderConfirmationNeedsReprint(this.orderId)
-      .subscribe((res) => {
-        if (res == true) {
-
-          this.showMainSpinner()
-          this.onGeneratOrderReport(true, undefined, true, false, true)
-
-
-        } else {
-          this._AppTransactionServiceProxy.getTransactionOrderConfirmationUrl(this.orderId)
-            .pipe(
-              finalize(() => {
-
-              })
-            )
-            .subscribe((res) => {
-              var page = window.open(res);
-              page.print();
-            }
-
-            );
-
-        }
-      });
-
+  if (!printWindow) {
+    console.error('Popup blocked.');
+    return;
   }
 
+  printWindow.document.write('<p>Preparing print preview...</p>');
+  printWindow.document.close();
+
+  this.showMainSpinner();
+
+  try {
+    //  wait for report generation
+    await this.onGeneratOrderReport(true, undefined, true, false);
+
+    //  wait for URL
+    const url = await this.waitForOrderConfirmationUrlPromise();
+
+    //  load into opened tab
+    printWindow.location.href = url;
+
+    printWindow.onload = () => {
+      setTimeout(() => {
+        printWindow.focus();
+        printWindow.print();
+      }, 1000);
+    };
+
+  } catch (err) {
+    console.error('Print error:', err);
+    printWindow.close();
+  } finally {
+    this.hideMainSpinner();
+  }
+}
+waitForOrderConfirmationUrlPromise(): Promise<string> {
+  return new Promise((resolve, reject) => {
+    let attempts = 0;
+
+    const interval = setInterval(() => {
+      this._AppTransactionServiceProxy
+        .getTransactionOrderConfirmationUrl(this.orderId)
+        .subscribe({
+          next: (url) => {
+            if (url) {
+              clearInterval(interval);
+              resolve(url);
+            }
+          },
+          error: (err) => {
+            clearInterval(interval);
+            reject(err);
+          }
+        });
+
+      attempts++;
+
+      if (attempts > 30) {
+        clearInterval(interval);
+        reject('Timeout waiting for report');
+      }
+
+    }, 2000);
+  });
+}
   onShareTransaction() {
     this.onshare = true;
   }
@@ -1629,7 +1667,7 @@ defineExtraAttributes() {
       });
     }
 
-    // ✅ Add this if missing
+    //  Add this if missing
     if (!attr.paginationSetting) {
       attr.paginationSetting = {
         skipCount: 0,
