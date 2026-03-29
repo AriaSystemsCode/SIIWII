@@ -10,5 +10,6 @@ namespace onetouch.AppDashboards.Dtos
     public class GetAllDashboardsInput : PagedAndSortedResultRequestDto
     {
         public string Name { get; set; }
+        public int SharingLevel { set; get; }
     }
 }

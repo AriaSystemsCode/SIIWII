@@ -47,8 +47,10 @@ namespace onetouch.AppDashboard
 
         public async Task<PagedResultDto<GetDashboardForViewDto>> GetAll(GetAllDashboardsInput input)
         {
-            var dashboard = _appDashboardRepository.GetAll().Include(z=>z.EntityExtraData).Where(z => z.TenantId == AbpSession.TenantId &&
-            (z.CreatorUserId == AbpSession.UserId || _appEntitySharingRepository.GetAll().Where(x => x.EntityId == z.Id && x.SharedUserId == AbpSession.UserId).Count() > 0))
+            var dashboard = _appDashboardRepository.GetAll().Include(z=>z.EntityExtraData).Where(z => z.TenantId == AbpSession.TenantId)
+                .WhereIf(input.SharingLevel==0,z=>z.CreatorUserId == AbpSession.UserId || (z.CreatorUserId != AbpSession.UserId && _appEntitySharingRepository.GetAll().Where(x => x.EntityId == z.Id && x.SharedUserId == AbpSession.UserId).Count() > 0))
+                .WhereIf(input.SharingLevel == 1, z => z.CreatorUserId == AbpSession.UserId)
+                .WhereIf(input.SharingLevel == 2, z => z.CreatorUserId != AbpSession.UserId && _appEntitySharingRepository.GetAll().Where(x => x.EntityId == z.Id && x.SharedUserId == AbpSession.UserId).Count() > 0)
                 .WhereIf(!string.IsNullOrEmpty(input.Name),x=>x.Name.ToUpper().Contains(input.Name.ToUpper()));
 
             var pagedAndFilteredDashboards = dashboard
