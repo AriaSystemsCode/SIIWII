@@ -1114,120 +1114,136 @@
 
                         <div class="summarySection p-3 w-100" style="background:#f7f7f7; border-radius:8px;">
 
-                            <!-- Total Quantity -->
-                            <div class="d-flex justify-content-between mb-3">
-                                <div class="font-weight-bold">{{l("TotalQuantity")}}</div>
-                                <div class="font-weight-bold">
-                                    {{appTransactionsForViewDto?.totalQuantity || 0}}
-                                </div>
-                            </div>
+    <!-- Total Quantity -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div class="font-weight-bold">{{l("TotalQuantity")}}</div>
+        <div class="font-weight-bold text-right" style="min-width:120px;">
+            {{appTransactionsForViewDto?.totalQuantity || 0}}
+        </div>
+    </div>
 
-                            <!-- Order Amount -->
-                            <div class="d-flex justify-content-between mb-3 pb-2">
-                                <div class="font-weight-bold">{{l("Order Amount")}}</div>
-                                <div class="font-weight-bold">
-                                    {{currencySymbol}}
-                                    {{orderAmount ? (orderAmount |
-                                    number:'1.2-2') : '0.00'}}
-                                </div>
-                            </div>
+    <!-- Order Amount -->
+    <div class="d-flex justify-content-between align-items-center mb-3 pb-2">
+        <div class="font-weight-bold">{{l("Order Amount")}}</div>
+        <div class="font-weight-bold text-right" style="min-width:120px;">
+            {{currencySymbol}} {{orderAmount ? (orderAmount | number:'1.2-2') : '0.00'}}
+        </div>
+    </div>
 
-                            <!-- Additional Charges -->
-                            <div *ngIf="appTransactionsForViewDto?.charges?.length > 0"
-                                style="border-top:1px solid #4a0d4a;">
+    <!-- Additional Charges -->
+    <div *ngIf="appTransactionsForViewDto?.charges?.length > 0"
+        style="border-top:1px solid #4a0d4a;">
 
-                                <div class="mb-2 font-weight-bold pt-3" style="color:#ff7a00;">
-                                    Additional Charges
-                                </div>
+        <div class="mb-2 font-weight-bold pt-3" style="color:#ff7a00;">
+            Additional Charges
+        </div>
 
+       <div *ngFor="let charge of appTransactionsForViewDto?.charges"
+    class="d-flex justify-content-between align-items-center mb-2">
 
-                                <div *ngFor="let charge of appTransactionsForViewDto?.charges"
-                                    class="d-flex justify-content-between align-items-center mb-2">
+    <div>
+        • {{ charge.name }}
+    </div>
 
-                                    <!-- Name -->
-                                    <div>
-                                        • {{ charge.name }}
-                                    </div>
+    <div class="d-flex align-items-center justify-content-end" style="min-width:170px;">
 
-                                    <!-- Editable Area -->
-                                    <div
-                                        style="width:150px; display:flex; justify-content:flex-end; align-items:center; gap:0.5rem;">
+        <!-- Display mode -->
+        <ng-container *ngIf="!charge.isEditing">
+ <div class="d-flex align-items-center ml-2">
+                <button *ngIf="charge.isEditable" class="btn btn-sm p-1"
+                    (click)="charge.isEditing = true">
+                    <i class="fa fa-edit"></i>
+                </button>
 
-                                        <!-- Display mode -->
-                                        <ng-container *ngIf="!charge.isEditing">
-                                            <span>{{ currencySymbol }} {{ charge.chargeAmount | number:'1.2-2' }}</span>
+                <button *ngIf="!charge.isEditable" class="btn btn-sm p-1">
+                    <i class="fa fa-zhihu"></i>
+                </button>
+            </div>
+            <span class="text-right font-weight-bold" style="min-width: 45px;">
+                {{ currencySymbol }} {{ charge.chargeAmount | number:'1.2-2' }}
+            </span>
 
-                                            <button *ngIf="charge.isEditable" class="btn btn-sm p-1"
-                                                (click)="charge.isEditing = true">
-                                                <i class="fa fa-edit"></i>
-                                            </button>
+           
 
-                                             <button *ngIf="!charge.isEditable" class="btn btn-sm p-1">
-                                                <i class="fa fa-zhihu"></i>
-                                            </button>
-                                        </ng-container>
+        </ng-container>
 
-                                        <!-- Edit mode -->
-                                        <ng-container *ngIf="charge.isEditing">
-                                            <input type="number" [(ngModel)]="charge.chargeAmount"
-                                                class="form-control text-right" style="width:70px;" />
+        <!-- Edit mode -->
+        <ng-container *ngIf="charge.isEditing">
 
-                                            <button class="btn btn-sm  p-1 pl-2"  style="background-color: #4a0d4a; color: white;"  (click)="onSaveCharge(charge)">
-                                                <i class="fa fa-check"></i>
-                                            </button>
+            <input type="number"
+                [(ngModel)]="charge.chargeAmount"
+                class="form-control text-right"
+                style="width:90px;" />
 
-                                            <button class="btn btn-sm p-1 pl-2" style="background-color: #ff7a00; color: white;" (click)="onCancelCharge(charge)">
-                                                <i class="fa fa-times"></i>
-                                            </button>
-                                        </ng-container>
+            <div class="d-flex align-items-center ml-2">
+                <button class="btn btn-sm p-1 pl-2"
+                    [disabled]="!canConfirm(charge)"
+                    [ngStyle]="{
+                        'cursor': !canConfirm(charge) ? 'not-allowed' : 'pointer',
+                        'opacity': !canConfirm(charge) ? '0.5' : '1'
+                    }"
+                    style="background-color:#4a0d4a; color:white;"
+                    (click)="onSaveCharge(charge)">
+                    <i class="fa fa-check"></i>
+                </button>
 
-                                    </div>
+                <button class="btn btn-sm p-1 pl-2"
+                    style="background-color:#ff7a00; color:white;"
+                    (click)="onCancelCharge(charge)">
+                    <i class="fa fa-times"></i>
+                </button>
+            </div>
 
-                                </div>
+        </ng-container>
 
-                                <!-- Total Charges -->
-                                <div class="d-flex justify-content-between mt-2 pt-2">
-                                    <div class="font-weight-bold">Total Charges</div>
-                                    <div class="font-weight-bold">
-                                        {{ currencySymbol }} {{ totalCharges | number:'1.2-2' }}
-                                    </div>
-                                </div>
-
-                                <!-- Total Amount -->
-                                <div class="d-flex justify-content-between mt-3 pt-3"
-                                    style="border-top:1px solid #4a0d4a;">
-                                    <div class="font-weight-bold" style="color:#ff7a00;">
-                                        Total Amount
-                                    </div>
-                                    <div class="font-weight-bold">
-                                        {{ currencySymbol }} {{ appTransactionsForViewDto?.totalAmount | number:'1.2-2'
-                                        }}
-                                    </div>
-                                </div>
-                            </div>
+    </div>
+</div>
 
 
+        <!-- Total Charges -->
+        <div class="d-flex justify-content-between align-items-center mt-2 pt-2">
+            <div class="font-weight-bold">Total Charges</div>
+            <div class="font-weight-bold text-right" style="min-width:120px;">
+                {{ currencySymbol }} {{ totalCharges | number:'1.2-2' }}
+            </div>
+        </div>
 
+        <!-- Total Amount -->
+        <div class="d-flex justify-content-between align-items-center mt-3 pt-3"
+            style="border-top:1px solid #4a0d4a;">
+            <div class="font-weight-bold" style="color:#ff7a00;">
+                Total Amount
+            </div>
+            <div class="font-weight-bold text-right" style="min-width:120px;">
+                {{ currencySymbol }} {{ appTransactionsForViewDto?.totalAmount | number:'1.2-2' }}
+            </div>
+        </div>
+    </div>
 
+    <!-- Buttons -->
+    <div class="row w-100 mt-4 ml-1 position-relative"
+        style="height: 50px;"
+        *ngIf="!showTabs || (showTabs && appTransactionsForViewDto?.entityStatusCode?.toUpperCase()=='DRAFT')">
 
-                            <div class=" row w-100 mt-4 ml-1 position-relative " style="height: 50px;"
-                                *ngIf="!showTabs || (showTabs && appTransactionsForViewDto?.entityStatusCode?.toUpperCase()=='DRAFT')">
-                                >
-                                <button type="button"
-                                    class="btn btn-primary bgPurple border-0 w-100 pointer Proceedtocheckout"
-                                    style="height: 37px;" *ngIf="!showTabs" (click)="onProceedToCheckout()">
-                                    {{l("Proceedtocheckout")}}
-                                </button>
+        <button type="button"
+            class="btn btn-primary bgPurple border-0 w-100"
+            style="height: 37px;"
+            *ngIf="!showTabs"
+            (click)="onProceedToCheckout()">
+            {{l("Proceedtocheckout")}}
+        </button>
 
-                                <button type="button" class="btn  bgPurple border-0  pointer w-100"
-                                    *ngIf="showTabs && appTransactionsForViewDto?.entityStatusCode?.toUpperCase()=='DRAFT'"
-                                    [disabled]="!(orderInfoValid && buyerContactInfoValid && SellerContactInfoValid &&  SalesRepInfoValid && shippingInfOValid  && BillingInfoValid)"
-                                    [ngClass]="{ disabled:!(orderInfoValid && buyerContactInfoValid && SellerContactInfoValid &&  SalesRepInfoValid && shippingInfOValid  && BillingInfoValid)}"
-                                    (click)="visible = true">
-                                    {{l("Placeyourorder")}}
-                                </button>
-                            </div>
-                        </div>
+        <button type="button"
+            class="btn bgPurple border-0 w-100"
+            *ngIf="showTabs && appTransactionsForViewDto?.entityStatusCode?.toUpperCase()=='DRAFT'"
+            [disabled]="!(orderInfoValid && buyerContactInfoValid && SellerContactInfoValid &&  SalesRepInfoValid && shippingInfOValid  && BillingInfoValid)"
+            (click)="visible = true">
+            {{l("Placeyourorder")}}
+        </button>
+    </div>
+
+</div>
+
                     </div>
 
                     <ng-container *ngIf="loadNotesComp;">
@@ -2373,114 +2389,135 @@ height: 48px;" class="btn   border-0" data-toggle="dropdown" aria-haspopup="true
                                     <h4 class="purpleColor font-weight-bold col-12" style="margin-top: 15px;">
                                         {{l("Order Summary")}} </h4>
                                     <div class="row summarySection w-100 p-4 ml-2 mt-3 purpleColor order-summary">
-                                        <!-- Total Quantity -->
-                            <div class="d-flex justify-content-between mb-3 row w-100">
-                                <div class="font-weight-bold">{{l("TotalQuantity")}}</div>
-                                <div class="font-weight-bold">
-                                    {{appTransactionsForViewDto?.totalQuantity || 0}}
-                                </div>
-                            </div>
 
-                            <!-- Order Amount -->
-                            <div class="d-flex justify-content-between mb-3 pb-2 row w-100">
-                                <div class="font-weight-bold">{{l("Order Amount")}}</div>
-                                <div class="font-weight-bold">
-                                    {{currencySymbol}}
-                                    {{orderAmount ? (orderAmount |
-                                    number:'1.2-2') : '0.00'}}
-                                </div>
-                            </div>
+    <!-- Total Quantity -->
+    <div class="d-flex justify-content-between align-items-center mb-3 w-100">
+        <div class="font-weight-bold">{{l("TotalQuantity")}}</div>
+        <div class="font-weight-bold text-right" style="min-width:120px;">
+            {{appTransactionsForViewDto?.totalQuantity || 0}}
+        </div>
+    </div>
 
-                            <!-- Additional Charges -->
-                            <div *ngIf="appTransactionsForViewDto?.charges?.length > 0"
-                                style="border-top:1px solid #4a0d4a;">
+    <!-- Order Amount -->
+    <div class="d-flex justify-content-between align-items-center mb-3 pb-2 w-100">
+        <div class="font-weight-bold">{{l("Order Amount")}}</div>
+        <div class="font-weight-bold text-right" style="min-width:120px;">
+            {{currencySymbol}} {{orderAmount ? (orderAmount | number:'1.2-2') : '0.00'}}
+        </div>
+    </div>
 
-                                <div class="mb-2 font-weight-bold pt-3" style="color:#ff7a00;">
-                                    Additional Charges
-                                </div>
+    <!-- Additional Charges -->
+    <div *ngIf="appTransactionsForViewDto?.charges?.length > 0"
+        class="w-100"
+        style="border-top:1px solid #4a0d4a;">
+
+        <div class="mb-2 font-weight-bold pt-3" style="color:#ff7a00;">
+            Additional Charges
+        </div>
+
+       <div *ngFor="let charge of appTransactionsForViewDto?.charges"
+    class="d-flex justify-content-between align-items-center mb-2">
+
+    <div>
+        • {{ charge.name }}
+    </div>
+
+    <div class="d-flex align-items-center justify-content-end" style="min-width:170px;">
+
+        <!-- Display mode -->
+        <ng-container *ngIf="!charge.isEditing">
+
+              <div class="d-flex align-items-center ml-2">
+                <button *ngIf="charge.isEditable" class="btn btn-sm p-1"
+                    (click)="charge.isEditing = true">
+                    <i class="fa fa-edit"></i>
+                </button>
+
+                <button *ngIf="!charge.isEditable" class="btn btn-sm p-1">
+                    <i class="fa fa-zhihu"></i>
+                </button>
+            </div>
+            <span class="text-right font-weight-bold" style="min-width: 45px;">
+                {{ currencySymbol }} {{ charge.chargeAmount | number:'1.2-2' }}
+            </span>
+        </ng-container>
+
+        <!-- Edit mode -->
+        <ng-container *ngIf="charge.isEditing">
+
+            <input type="number"
+                [(ngModel)]="charge.chargeAmount"
+                class="form-control text-right"
+                style="width:90px;" />
+
+            <div class="d-flex align-items-center ml-2">
+                <button class="btn btn-sm p-1 pl-2"
+                    [disabled]="!canConfirm(charge)"
+                    [ngStyle]="{
+                        'cursor': !canConfirm(charge) ? 'not-allowed' : 'pointer',
+                        'opacity': !canConfirm(charge) ? '0.5' : '1'
+                    }"
+                    style="background-color:#4a0d4a; color:white;"
+                    (click)="onSaveCharge(charge)">
+                    <i class="fa fa-check"></i>
+                </button>
+
+                <button class="btn btn-sm p-1 pl-2"
+                    style="background-color:#ff7a00; color:white;"
+                    (click)="onCancelCharge(charge)">
+                    <i class="fa fa-times"></i>
+                </button>
+            </div>
+
+        </ng-container>
+
+    </div>
+</div>
 
 
-                                <div *ngFor="let charge of appTransactionsForViewDto?.charges"
-                                    class="d-flex justify-content-between align-items-center mb-2">
+        <!-- Total Charges -->
+        <div class="d-flex justify-content-between align-items-center mt-2 pt-2 w-100">
+            <div class="font-weight-bold">Total Charges</div>
+            <div class="font-weight-bold text-right" style="min-width:120px;">
+                {{ currencySymbol }} {{ totalCharges | number:'1.2-2' }}
+            </div>
+        </div>
 
-                                    <!-- Name -->
-                                    <div>
-                                        • {{ charge.name }}
-                                    </div>
+        <!-- Total Amount -->
+        <div class="d-flex justify-content-between align-items-center mt-3 pt-3 w-100"
+            style="border-top:1px solid #4a0d4a;">
+            <div class="font-weight-bold" style="color:#ff7a00;">
+                Total Amount
+            </div>
+            <div class="font-weight-bold text-right" style="min-width:120px;">
+                {{ currencySymbol }} {{ appTransactionsForViewDto?.totalAmount | number:'1.2-2' }}
+            </div>
+        </div>
 
-                                    <!-- Editable Area -->
-                                    <div
-                                        style="width:150px; display:flex; justify-content:flex-end; align-items:center; gap:0.5rem;">
+    </div>
 
-                                        <!-- Display mode -->
-                                        <ng-container *ngIf="!charge.isEditing">
-                                            <span>{{ currencySymbol }} {{ charge.chargeAmount | number:'1.2-2' }}</span>
+    <!-- Buttons -->
+    <div class="row w-100 mt-4 ml-1">
+        <button type="button"
+            class="btn bgPurple border-0 w-100"
+            style="height: 37px;"
+            *ngIf="!showTabs"
+            (click)="onProceedToCheckout()">
+            {{l("Proceedtocheckout")}}
+        </button>
 
-                                            <button *ngIf="charge.isEditable" class="btn btn-sm p-1"
-                                                (click)="charge.isEditing = true">
-                                                <i class="fa fa-edit"></i>
-                                            </button>
+        <button type="button"
+            class="btn bgPurple border-0 w-100"
+            style="height: 37px;"
+            *ngIf="showTabs && appTransactionsForViewDto?.entityStatusCode?.toUpperCase()=='DRAFT'"
+            [disabled]="!(orderInfoValid && buyerContactInfoValid && SellerContactInfoValid && SalesRepInfoValid && shippingInfOValid && BillingInfoValid)"
+            (click)="visible = true">
+            {{l("Placeyourorder")}}
+        </button>
+    </div>
 
-                                             <button *ngIf="!charge.isEditable" class="btn btn-sm p-1">
-                                                <i class="fa fa-zhihu"></i>
-                                            </button>
-                                        </ng-container>
+</div>
 
-                                        <!-- Edit mode -->
-                                        <ng-container *ngIf="charge.isEditing">
-                                            <input type="number" [(ngModel)]="charge.chargeAmount"
-                                                class="form-control text-right" style="width:70px;" />
-
-                                            <button class="btn btn-sm  p-1 pl-2"  style="background-color: #4a0d4a; color: white;"  (click)="onSaveCharge(charge)">
-                                                <i class="fa fa-check"></i>
-                                            </button>
-
-                                            <button class="btn btn-sm p-1 pl-2" style="background-color: #ff7a00; color: white;" (click)="onCancelCharge(charge)">
-                                                <i class="fa fa-times"></i>
-                                            </button>
-                                        </ng-container>
-
-                                    </div>
-
-                                </div>
-
-                                <!-- Total Charges -->
-                                <div class="d-flex justify-content-between mt-2 pt-2">
-                                    <div class="font-weight-bold">Total Charges</div>
-                                    <div class="font-weight-bold">
-                                        {{ currencySymbol }} {{ totalCharges | number:'1.2-2' }}
-                                    </div>
-                                </div>
-
-                                <!-- Total Amount -->
-                                <div class="d-flex justify-content-between mt-3 pt-3"
-                                    style="border-top:1px solid #4a0d4a;">
-                                    <div class="font-weight-bold" style="color:#ff7a00;">
-                                        Total Amount
-                                    </div>
-                                    <div class="font-weight-bold">
-                                        {{ currencySymbol }} {{ appTransactionsForViewDto?.totalAmount | number:'1.2-2'
-                                        }}
-                                    </div>
-                                </div>
-                            </div>
-                                        <div class=" row w-100 mt-4 ml-1">
-                                            <button type="button"
-                                                class="btn  bgPurple border-0 w-100 pointer Proceedtocheckout"
-                                                style="height: 37px;" *ngIf="!showTabs" (click)="onProceedToCheckout()">
-                                                {{l("Proceedtocheckout")}}
-                                            </button>
-
-                                            <button type="button" class="btn  bgPurple border-0 w-100 pointer"
-                                                style="height: 37px;"
-                                                *ngIf="showTabs && appTransactionsForViewDto?.entityStatusCode?.toUpperCase()=='DRAFT'"
-                                                [disabled]="!(orderInfoValid && buyerContactInfoValid && SellerContactInfoValid &&  SalesRepInfoValid && shippingInfOValid  && BillingInfoValid)"
-                                                [ngClass]="{ disabled:!(orderInfoValid && buyerContactInfoValid && SellerContactInfoValid &&  SalesRepInfoValid && shippingInfOValid  && BillingInfoValid)}"
-                                                (click)="visible = true">
-                                                {{l("Placeyourorder")}}
-                                            </button>
-                                        </div>
-                                    </div>
                                 </div>
                                 <div class="col-md-6 col-12">
                                     <ng-container *ngIf="loadNotesComp;">
