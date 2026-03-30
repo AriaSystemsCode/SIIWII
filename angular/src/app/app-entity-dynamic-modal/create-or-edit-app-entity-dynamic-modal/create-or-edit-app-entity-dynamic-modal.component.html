@@ -186,7 +186,7 @@
         </div>
       </div>
   
-      <!-- 👇 PDF icon that opens PDF in new tab -->
+      <!--  PDF icon that opens PDF in new tab -->
       <a
         [href]="pdfSafeMap[i]"
         target="_blank"
@@ -352,7 +352,7 @@
                                                 <input type="number"
                                                     (keyup)="notLookupExtraAttributeOnChange($event.target.value,extraAttr)"
                                                     name="{{extraAttr.name}}" placeholder="{{extraAttr.name}}"
-                                                    class="form-control" id="extraAttr{{extraAttr.name}}"
+                                                    class="form-control" id="extraAttr{{extraAttr.name}}"  [disabled]="extraAttr?.disabled"
                                                     [(ngModel)]="extraAttr.selectedValues">
                                             </div>
                                             <div class="flex-grow-1 mx-2"
@@ -364,13 +364,13 @@
                                                     <input type="text"
                                                         (keyup)="notLookupExtraAttributeOnChange($event.target.value,extraAttr)"
                                                         name="{{extraAttr.name}}" placeholder="{{extraAttr.name}}"
-                                                        class="form-control" id="extraAttr{{extraAttr.name}}"
+                                                        class="form-control" id="extraAttr{{extraAttr.name}}"  [disabled]="extraAttr?.disabled"
                                                         [(ngModel)]="extraAttr.selectedValues">
                                                     <div class="border rounded" class="w-25 "
                                                         *ngIf="extraAttr.dataType === 'string' && !extraAttr.isLookup  ">
                                                         <input (colorPickerChange)="onColorChange($event, extraAttr)"
                                                             *ngIf="extraAttr.name === 'Color HEXA Code' || extraAttr.name === 'Color HEX Code'"
-                                                            class="picker" [(colorPicker)]="extraAttr.selectedValues"
+                                                            class="picker" [(colorPicker)]="extraAttr.selectedValues"  [disabled]="extraAttr?.disabled"
                                                             [style.background]="extraAttr.selectedValues || '#09c' " />
                                                     </div>
                                                 </div>
@@ -388,7 +388,7 @@
                                                         [(ngModel)]="extraAttr.selectedValues"
                                                         name="extraAttr_{{extraAttr.name}}"
                                                         [placeholder]="l('Select') + ' ' + extraAttr.name"
-                                                         [disabled]="isBlockTypeLocked(extraAttr)"
+                                                         [disabled]="isBlockTypeLocked(extraAttr) || extraAttr?.disabled"
                                                         (onChange)="notLookupExtraAttributeOnChange($event.value,extraAttr)">
                                                     </p-dropdown>
 
