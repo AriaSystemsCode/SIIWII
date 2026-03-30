@@ -10,7 +10,7 @@ using onetouch.EntityFrameworkCore;
 namespace onetouch.Migrations
 {
     [DbContext(typeof(onetouchDbContext))]
-    [Migration("20190501074214_Changed_Billing_Setting_Names")]
+    [Migration("20190501074240_Changed_Billing_Setting_Names")]
     partial class Changed_Billing_Setting_Names
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

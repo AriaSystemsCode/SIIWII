@@ -2,7 +2,7 @@ import { Component, Injector, ViewChild } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { ModalDirective } from 'ngx-bootstrap/modal';
 import { AppComponentBase } from '@shared/common/app-component-base';
-import { SydObjectsServiceProxy } from '@shared/service-proxies/service-proxies';
+import { AppEntitiesServiceProxy, SydObjectsServiceProxy } from '@shared/service-proxies/service-proxies';
 import { finalize } from 'rxjs';
 @Component({
   selector: 'app-contact-us-modal',
@@ -17,7 +17,7 @@ export class ContactUsModalComponent extends AppComponentBase {
 
   active = false;
   saving = false;
-
+  isContactUsFound :boolean
   model = {
     subject: 'Registration request',
     firstName: '',
@@ -27,8 +27,12 @@ export class ContactUsModalComponent extends AppComponentBase {
     message: ''
   };
 
-  constructor(injector: Injector, private SydObjectsServiceProxy:SydObjectsServiceProxy) {
+  constructor(injector: Injector, private SydObjectsServiceProxy:SydObjectsServiceProxy, private _appEntitiesServiceProxy: AppEntitiesServiceProxy) {
     super(injector);
+  }
+
+  ngOnInit(){
+    this.getTenantData()
   }
 
   show(): void {
@@ -53,7 +57,7 @@ export class ContactUsModalComponent extends AppComponentBase {
     this.SydObjectsServiceProxy.sendContactUsInfo(this.model.firstName,this.model.lastName,this.model.email,this.model.telephone,this.model.message)
       .pipe(finalize(() => {
         this.saving = false;
-        this.notify.info(this.l('YourMessageHasBeenSent'));
+        this.notify.info(this.l('YourRequestHasBeenSubmitted'));
         this.close();
       }))
       .subscribe(() => { });
@@ -73,5 +77,13 @@ export class ContactUsModalComponent extends AppComponentBase {
     if (this.contactForm) {
       this.contactForm.resetForm(this.model);
     }
+  }
+
+  getTenantData() {
+
+    this._appEntitiesServiceProxy.getHostSettingValue(1219, null)
+      .subscribe((result) => {
+        this.isContactUsFound = !!result && result.trim().length > 0;
+      });
   }
 }

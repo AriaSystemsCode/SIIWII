@@ -40,7 +40,6 @@ export class CommentParentComponent extends AppComponentBase implements AfterVie
     showRegularComment:boolean=true;
     @Input() fromOverview:boolean=false;
   addReplyScreen: boolean ;
- 
     currentComment: any;
 
     constructor(
@@ -121,7 +120,7 @@ export class CommentParentComponent extends AppComponentBase implements AfterVie
             this.showDirectMessageComp=true;
         }
     }
-    getAllComments(){
+    getAllComments() {
         this.showMainSpinner()
         this._messageServiceProxy.getAllComments(
             undefined,
@@ -187,12 +186,10 @@ export class CommentParentComponent extends AppComponentBase implements AfterVie
 
 
 
-openReplyScreen(comment: any): void {
+    openReplyScreen(comment: any): void {
 
-                    this.currentComment = comment
-   
+        this.currentComment = comment
+
+    }
+
 }
-
-           }
-         
-

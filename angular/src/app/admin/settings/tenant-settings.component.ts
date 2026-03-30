@@ -1,5 +1,5 @@
 import { IAjaxResponse, TokenService } from 'abp-ng2-module';
-import { Component, Injector, OnInit } from '@angular/core';
+import { Component, Injector, OnInit, QueryList, ViewChildren } from '@angular/core';
 import { AppConsts } from '@shared/AppConsts';
 import { appModuleAnimation } from '@shared/animations/routerTransition';
 import { AppComponentBase } from '@shared/common/app-component-base';

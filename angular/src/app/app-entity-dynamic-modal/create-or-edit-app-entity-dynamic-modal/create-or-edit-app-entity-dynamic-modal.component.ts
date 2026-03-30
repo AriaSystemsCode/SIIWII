@@ -397,7 +397,7 @@ isArabic: boolean = false;
 
     getExtrAttributes() {
         this._sycEntityObjectTypesServiceProxy
-            .getAllWithExtraAttributesByCode(this.entityObjectType.code)
+            .getAllWithExtraAttributesByCode(this.entityObjectType.code,"")
             .subscribe(async (result) => {
 
                 this.entityObjectType.code === "SIZE";

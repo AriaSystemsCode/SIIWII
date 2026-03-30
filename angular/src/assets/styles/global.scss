@@ -782,7 +782,6 @@ html{
 
 
 
-
 .p-checkbox .p-checkbox-box {
     display: flex;
     align-items: center;  
@@ -889,3 +888,14 @@ th.sticky-header {
 searchicon {
     padding-top: 15%;
 }
+
+.is-disabled {
+    pointer-events: none;
+    cursor: not-allowed !important; 
+    opacity: 1;
+  }
+
+.searchableDropdown searchicon {
+    padding: 0px;
+}
+

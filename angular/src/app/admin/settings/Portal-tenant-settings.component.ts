@@ -1,5 +1,5 @@
 import { IAjaxResponse, TokenService } from 'abp-ng2-module';
-import { Component, Injector, OnInit } from '@angular/core';
+import { Component, Injector, OnInit, QueryList, ViewChildren } from '@angular/core';
 import { AppConsts } from '@shared/AppConsts';
 import { appModuleAnimation } from '@shared/animations/routerTransition';
 import { AppComponentBase } from '@shared/common/app-component-base';
@@ -12,6 +12,7 @@ import { SelectItem } from "primeng/api";
 import { CreateEditAppItemExtraAttribute } from '@app/main/app-items/app-item-shared/models/create-edit-app-item-extra-attribute';
 import { EExtraAttributeUsage } from '@app/main/app-items/appItems/models/extra-attribute-usage.enum';
 import { forkJoin, Observable } from 'rxjs';
+import { dynamicInputs } from '@shared/components/dynamicInputs/dynamicInputs.component';
 @Component({
   templateUrl: './portal-tenant-settings.component.html',
   styleUrls: ['./settings.component.scss',
@@ -57,6 +58,9 @@ export class PortalTenantSettingsComponent extends AppComponentBase implements O
   tenantEntityId: number;
 
 
+@ViewChildren('appdynamicInputs')
+dynamicInputsComponents!: QueryList<dynamicInputs>;
+
   constructor(
     injector: Injector,
     private _tenantSettingsService: TenantSettingsServiceProxy,
@@ -70,6 +74,7 @@ export class PortalTenantSettingsComponent extends AppComponentBase implements O
   }
 
   ngOnInit(): void {
+    this.stopFormListening=true;
     this.getSettingData()
     this.getAppItemTypeExtraAttributesById()
   }
@@ -182,7 +187,9 @@ export class PortalTenantSettingsComponent extends AppComponentBase implements O
 
   saveAll(): void {
     let success = false;
-    this.showMainSpinner();
+
+          const extraDataList = this.dynamicInputsForViewDto?.entityExtraData || [];
+
 
     let appEntityDto : AppEntityDto =new AppEntityDto();
     appEntityDto.entityExtraData =  this.dynamicInputsForViewDto?.entityExtraData || [];
@@ -194,25 +201,12 @@ export class PortalTenantSettingsComponent extends AppComponentBase implements O
     appEntityDto.name=this.dynamicInputsForViewDto.appEntity.name;
 
     appEntityDto.extraDataFileTypeIndex = appEntityDto.entityExtraData
-    .map((item, index) => item.attributeValue && item.attributeValue.includes('|') ? index : -1)
-    .filter(index => index !== -1);
-    
-   
-      this._appEntitiesServiceProxy.saveEntity(appEntityDto)
-      .pipe(
-        finalize(() => {
-          //this.formTouched = false;
-          this.hideMainSpinner();
-        })
-      )
-      .subscribe({
-        next: (results) => {
-          this.notify.success(this.l('Saved Successfully'));
-        },
-        error: (err) => {
-          this.notify.error(this.l('Save Failed'));
-        }
-      });
+            .map((item, index) =>
+                typeof item.attributeValue === 'string' && item.attributeValue.includes('|') ? index : -1
+            )
+            .filter(index => index !== -1);
+     
+            this.dynamicInputsComponents.first.saveAll(appEntityDto);
 
     if (abp.clock.provider.supportsMultipleTimezone &&
       this.usingDefaultTimeZone &&
@@ -373,8 +367,9 @@ export class PortalTenantSettingsComponent extends AppComponentBase implements O
     }
   }
 
+    
   onExtraAttributesChanged(dataFromChild: any[]) {
-   // this.formTouched = true;
+    this.formTouched = true;
     if (!this.dynamicInputsForViewDto) {
       this.dynamicInputsForViewDto = new GetAppEntityForEditOutput();
     }
@@ -436,5 +431,10 @@ export class PortalTenantSettingsComponent extends AppComponentBase implements O
 
     }
   }
+
+  
+ onActiveIndexChange(usage){
+        this.selectedUsage = usage; 
+}
 
 }

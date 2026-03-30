@@ -14,11 +14,13 @@ export class LandingPageCarusalWithCallToActionComponent extends AppComponentBas
     numVisible: number = 4;
     // numScroll: number = 4;
     appBaseUrl: string=AppConsts.appBaseUrl;
+
     ctaResponsiveOptions = [
-        { breakpoint: '960px', numVisible: 2, numScroll: 1 },  // tablet
-        { breakpoint: '640px', numVisible: 1, numScroll: 1 },  // mobile
-      ];
-      
+      { breakpoint: '1400px', numVisible: 4, numScroll: 1 },
+      { breakpoint: '1200px', numVisible: 3, numScroll: 1 },
+      { breakpoint: '992px',  numVisible: 2, numScroll: 1 },
+      { breakpoint: '576px',  numVisible: 1, numScroll: 1 }
+    ];
     constructor(injector: Injector,private SydObjectsServiceProxy:SydObjectsServiceProxy) {
         super(injector);
 

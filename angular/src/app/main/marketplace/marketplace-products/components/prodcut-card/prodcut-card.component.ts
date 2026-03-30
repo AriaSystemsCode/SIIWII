@@ -24,14 +24,12 @@ export class ProdcutCardComponent   extends AppComponentBase  {
     @Input() acceptedAspectRatio;
 
       @Output() prodcutId = new EventEmitter<number>();
-      showMsrP:boolean
+      @Input() showMsrP:boolean
     constructor(private router: Router ,  injector: Injector,  private _AppEntitiesServiceProxy: AppEntitiesServiceProxy,) {
         super(injector);
     }
-
-
     ngOnInit(){
-        this.getSettingData()
+        // this.getSettingData()
         this.product?.price % 1 ==0?this.product.price=Math.round(this.product?.price * 100 / 100).toFixed(2):null; 
     }
 

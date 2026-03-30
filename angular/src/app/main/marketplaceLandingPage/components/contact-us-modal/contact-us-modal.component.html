@@ -18,7 +18,7 @@
 
         <div class="modal-header border-0 pb-0">
           <h4 class="modal-title font-weight-bold">
-            Contact Us
+            {{'ContactUs' | localize}}
           </h4>
           <button type="button"
                   class="close"
@@ -34,7 +34,7 @@
           <div class="row">
             <!-- Subject -->
             <div class="col-md-4 mb-3">
-              <label class="font-weight-bold">Subject: *</label>
+              <label class="font-weight-bold">{{'Subject' | localize}} * : </label>
               <input type="text"
               class="form-control form-control-sm"
               name="subject"
@@ -49,7 +49,7 @@
 
             <!-- First Name -->
             <div class="col-md-4 mb-3">
-              <label class="font-weight-bold">First Name: *</label>
+              <label class="font-weight-bold">{{'FirstName' | localize}}* : </label>
               <input type="text"
                      class="form-control form-control-sm"
                      name="firstName"
@@ -59,13 +59,13 @@
                      maxlength="100" />
               <small class="text-danger"
                      *ngIf="contactForm.submitted && !contactForm.controls.firstName?.valid">
-                First name is required
+                     {{'FirstName' | localize}} {{'Required' | localize}}
               </small>
             </div>
 
             <!-- Last Name -->
             <div class="col-md-4 mb-3">
-              <label class="font-weight-bold">Last Name: *</label>
+              <label class="font-weight-bold">{{'LastName' | localize}}* : </label>
               <input type="text"
                      class="form-control form-control-sm"
                      name="lastName"
@@ -75,7 +75,7 @@
                      maxlength="100" />
               <small class="text-danger"
                      *ngIf="contactForm.submitted && !contactForm.controls.lastName?.valid">
-                Last name is required
+                     {{'LastName' | localize}}   {{'Required' | localize}}
               </small>
             </div>
           </div>
@@ -83,7 +83,7 @@
           <div class="row">
             <!-- Email -->
             <div class="col-md-6 mb-3">
-              <label class="font-weight-bold">Email Address: *</label>
+              <label class="font-weight-bold">{{'EMailAddress' | localize}}* : </label>
               <input type="email"
                      class="form-control form-control-sm"
                      name="email"
@@ -93,13 +93,13 @@
                      maxlength="150" />
               <small class="text-danger"
                      *ngIf="emailInput.touched && emailInput.invalid">
-                Enter a valid email
+               {{'PleaseEnterAValidEmail' | localize}}
               </small>
             </div>
 
             <!-- Telephone -->
             <div class="col-md-6 mb-3">
-              <label class="font-weight-bold">Telephone:</label>
+              <label class="font-weight-bold">{{'Telephone' | localize}}:</label>
               <input type="text"
                      class="form-control form-control-sm"
                      name="telephone"
@@ -109,14 +109,14 @@
                      maxlength="20" />
               <small class="text-danger"
                      *ngIf="phoneInput.invalid && phoneInput?.touched">
-                Inter valid phone
+                     {{'PleaseEnterPhoneNumber' | localize}}
               </small>
             </div>
           </div>
 
           <!-- Message -->
           <div class="form-group">
-            <label class="font-weight-bold">Message: *</label>
+            <label class="font-weight-bold">{{'Message' | localize}} * : </label>
             <textarea class="form-control"
                       rows="4"
                       name="message"
@@ -137,16 +137,16 @@
                   class="btn btn-light"
                   (click)="close()"
                   [disabled]="saving">
-            Cancel
+            {{'Cancel' | localize}}
           </button>
 
           <button type="submit"
                   class="btn text-white"
                   [ngClass]="'bgPurple'"
-                  [disabled]="saving || !contactForm.form.valid"
+                  [disabled]="(saving || !contactForm.form.valid) && isContactUsFound" 
                   [buttonBusy]="saving"
                   [busyText]="l('SavingWithThreeDot')">
-            Submit
+            {{'Submit' | localize}}
           </button>
         </div>
 
