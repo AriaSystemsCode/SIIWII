@@ -2644,7 +2644,7 @@
 	<text name="IsAddOn">Add-On</text>
 	<text name="Limited">Limited</text>
     <text name="UpdateAccountInformation">Update Account Information</text>
-    <text name="Pleasemakesuretheimagessize5MB">Please make sure the images size 5MB</text>
+    
 	<text name="FilesformatsSupportedareXLSX,JPGandPNG">Files formats Supported are XLSX,JPG and PNG</text>
 	<text name="Relatedproducts">Related products</text>
 	<text name="noproductsarelinked">no products are linked</text>
@@ -2731,18 +2731,10 @@
 	<text name="BUSINESS">Business</text>
 	<text name="PERSONAL">Personal</text>
 	<text name="GROUP">Group</text>
-
 	<text name="PleaseEnteraValidEmailAddress"> Please enter a valid email address</text>
-
-
-
-
-
-  </texts>  
-    <text name="Pleasemakesuretheimagessize5MB">Please make sure the images size 5MB</text>
-	<text name="FilesformatsSupportedareXLSX,JPGandPNG">Files formats Supported are XLSX,JPG and PNG</text>
-	<text name="Relatedproducts">Related products</text>
-	<text name="noproductsarelinked">no products are linked</text>
+    
+	
+	
  
 	<text name="ContactUs">Contact Us</text>
 	<text name="YourRequestHasBeenSubmitted">Your request has been submitted</text>
