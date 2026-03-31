@@ -1839,6 +1839,7 @@ namespace onetouch.AppMarketplaceAccounts
             appMarketplaceContact.SSIN = input.SSIN;
             appMarketplaceContact.AccountId = newAccountID;
             appMarketplaceContact.SharingLevel = 1;
+            appMarketplaceContact.ParentFk = null;
             foreach (var contactAddress in appMarketplaceContact.ContactAddresses)
             {
                 contactAddress.Id = 0;
