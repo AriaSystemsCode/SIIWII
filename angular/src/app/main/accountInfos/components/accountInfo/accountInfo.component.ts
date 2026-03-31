@@ -441,7 +441,7 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit {
         this.accountInfoForm.form.patchValue(this.accountInfoTemp.toJSON())
         this.companyLogo = this.accountDataForView?.logoUrl ? `${this.attachmentBaseUrl}/${this.accountDataForView?.logoUrl}` : undefined;
         this.coverPhoto = this.accountDataForView?.coverUrl ? `${this.attachmentBaseUrl}/${this.accountDataForView?.coverUrl}` : undefined;
-        !this.accountInfoTemp?.id && !this.accountId ? window.history.go(-2) :   this.changeTab(this.accountInfoPageTabsEnum.ProfileView)
+        !this.accountInfoTemp?.id && !this.accountId ? this._router.navigate(['/app/main/accounts']) :   this.changeTab(this.accountInfoPageTabsEnum.ProfileView)
     
     }
     async getAccountDataForView() {
