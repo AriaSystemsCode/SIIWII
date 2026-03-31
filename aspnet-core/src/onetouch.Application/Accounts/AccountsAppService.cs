@@ -255,6 +255,7 @@ namespace onetouch.Accounts
         }
 
         //X527[Start]
+       [AbpAllowAnonymous]
         public async Task<PagedResultDto<AppEntityAttachmentDto>> GetAllAccountMediaAttachment(GetAllMediaAttachmentInput input)
         {
             //MMT
