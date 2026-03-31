@@ -25,7 +25,7 @@ import { ViewMemberProfileComponentInputsI } from '@app/main/teamMembers/models/
 import { MembersListComponent } from '@app/main/members-list/components/members-list/members-list.component';
 import { ImageUploadComponentOutput } from '@app/shared/common/image-upload/image-upload.component';
 import { Paginator } from 'primeng/paginator';
-
+import { Location } from '@angular/common';
 @Component({
     selector: 'app-account-info',
     templateUrl: './accountInfo.component.html',
@@ -153,7 +153,8 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit {
         private _activatedRoute: ActivatedRoute,
         private _sycIdentifierDefinitionsServiceProxy: SycIdentifierDefinitionsServiceProxy,
         private _marketplaceAccountsServiceProxy: MarketplaceAccountsServiceProxy,
-        private cdr: ChangeDetectorRef
+        private cdr: ChangeDetectorRef,
+         private location: Location,
     ) {
         super(injector);
 
@@ -440,7 +441,8 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit {
         this.accountInfoForm.form.patchValue(this.accountInfoTemp.toJSON())
         this.companyLogo = this.accountDataForView?.logoUrl ? `${this.attachmentBaseUrl}/${this.accountDataForView?.logoUrl}` : undefined;
         this.coverPhoto = this.accountDataForView?.coverUrl ? `${this.attachmentBaseUrl}/${this.accountDataForView?.coverUrl}` : undefined;
-        this.changeTab(!this.accountInfoTemp?.id && !this.accountId ? this.accountInfoPageTabsEnum.ProfileCreateOrEdit : this.accountInfoPageTabsEnum.ProfileView)
+        !this.accountInfoTemp?.id && !this.accountId ? window.history.go(-2) :   this.changeTab(this.accountInfoPageTabsEnum.ProfileView)
+    
     }
     async getAccountDataForView() {
 
