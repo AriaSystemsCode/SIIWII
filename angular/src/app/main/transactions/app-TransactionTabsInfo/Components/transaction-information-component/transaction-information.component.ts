@@ -1891,5 +1891,12 @@ Kindly check attached`,
     charge.isEditing = false;
   }
 
+canConfirm(charge): boolean {
+  return (
+    charge.chargeAmount !=null &&
+    charge.chargeAmount !== charge.originalAmount &&
+    charge.chargeAmount >= 0
+  );
+}
 
 }

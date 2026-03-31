@@ -27,13 +27,6 @@ import { dynamicInputsView } from '@shared/components/dynamic-inputs-view/dynami
 import { InputSwitchModule } from 'primeng/inputswitch';
 import { relatedItemModule } from '@app/relatedItems/relatedItem.module';
 
-@NgModule({
-  imports: [
-    // other modules
-    InputSwitchModule
-  ]
-})
-export class YourModuleName {}
 
 @NgModule({
   declarations: [
@@ -69,7 +62,7 @@ export class YourModuleName {}
     AppEntityDynamicModalModule,
     CalendarModule,
     InputNumberModule,
-    InputSwitchModule
+    InputSwitchModule,
     
   ],
 
