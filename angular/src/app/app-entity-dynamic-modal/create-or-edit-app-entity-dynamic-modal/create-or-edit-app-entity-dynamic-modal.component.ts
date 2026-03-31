@@ -817,9 +817,10 @@ isArabic: boolean = false;
     }
       displayVisualTypes(): boolean {
         //i49- what else ? 
-        const hiddenTypes = ['CHARGES', 'TRANSACTIONCHARGES','SHIPVIA', 'CHARGETYPES'];
+       // const hiddenTypes = ['CHARGES', 'TRANSACTIONCHARGES','SHIPVIA', 'CHARGETYPES'];
+        const showenTypes = ['COLOR', 'MARKETPLACESECTIONBLOCK','MARKETPLACESECTION'];
 
-        this._displayVisualTypes = !hiddenTypes.includes(
+        this._displayVisualTypes = showenTypes.includes(
     this.entityObjectType.code.toString().toUpperCase()
 );
         return this._displayVisualTypes;
