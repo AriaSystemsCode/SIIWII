@@ -815,7 +815,7 @@ isArabic: boolean = false;
     dropdownOptions(validEntries) {
         return validEntries.split('|');
     }
-    displayVisualTypes(): boolean {
+      displayVisualTypes(): boolean {
         //i49- what else ? 
         const hiddenTypes = ['CHARGES', 'TRANSACTIONCHARGES','SHIPVIA', 'CHARGETYPES'];
 

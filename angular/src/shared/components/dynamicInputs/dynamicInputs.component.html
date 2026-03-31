@@ -232,6 +232,15 @@
                  *ngIf="extraAttr.selectedValues" (click)="clearExtraAttr(extraAttr)"></i>
             </div>
 
+            <!-- text eitor -->
+            <div class="flex-grow-1 w-100"
+                *ngIf="extraAttr.dataType === 'html'">
+              <p-editor
+                [(ngModel)]="extraAttr.selectedValues"
+                [style]="{ height: '220px' }"
+                (ngModelChange)="onAnyInputChange()">
+              </p-editor>
+            </div>
             <!-- Add new lookup button -->
             <a class="border rounded text-primary add-new-lookup-btn ml-3"
                *ngIf="extraAttr.isLookup && extraAttr.allowAddNew">
