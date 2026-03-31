@@ -205,7 +205,10 @@ export class NewsBrowseComponent extends AppComponentBase {
         this.isAuthenticated = !!this.appSession?.user;
         this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
         this.currentLang == 'ar' || this.currentLang == 'ar-EG'  ? this.isArabic = true : this.isArabic = false
+        if(this.isAuthenticated){
         this.getProfilePicture();
+
+        }
         this.getUserPreferenceForListView();
         this.initFilterForm()
         this.userName =

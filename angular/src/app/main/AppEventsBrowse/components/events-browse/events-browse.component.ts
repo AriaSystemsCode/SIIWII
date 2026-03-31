@@ -153,7 +153,10 @@ export class EventsBrowseComponent extends AppComponentBase  implements OnInit,O
     this.isAuthenticated = !!this.appSession?.user;
         this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
         this.currentLang == 'ar' || this.currentLang == 'ar-EG'  ? this.isArabic = true : this.isArabic = false
+        if(this.isAuthenticated){
         this.getProfilePicture();
+
+        }
         this.getUserPreferenceForListView();
         this.initFilterForm()
         const sub = this.breakpointObserver

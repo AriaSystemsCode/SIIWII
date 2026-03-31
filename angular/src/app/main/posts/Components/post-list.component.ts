@@ -87,6 +87,8 @@ export class PostListComponent
     @Input() fromOverviewTab: boolean = false;
     @Input() accountDataForView :AccountDto;
 
+    isAuthenticated:any
+
     public constructor(
         private _profileService: ProfileServiceProxy,
         private _postService: AppPostsServiceProxy,
@@ -98,7 +100,11 @@ export class PostListComponent
     }
 
     ngOnInit(): void {
+        this.isAuthenticated = !!this.appSession?.user;
+        if(this.isAuthenticated){
         this.getProfilePicture();
+
+        }
         this.userName =
             this.appSession.user.name + " " + this.appSession.user.surname;
             if(!this.fromMarketplaceProfile && !this.fromOverviewTab){
