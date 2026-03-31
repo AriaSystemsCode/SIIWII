@@ -140,6 +140,8 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit {
     accData: GetAccountForViewDto
     editedContactPerData: any
     relationId:number = 0 ;
+    roles:any
+            selectedRoles!: any[];
     constructor(
         injector: Injector,
         private _route: ActivatedRoute,
@@ -166,6 +168,13 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit {
 
 
     async ngOnInit() {
+        this.roles = [
+            { name: 'Buyer', code: 'NY' },
+            { name: 'Seller', code: 'RM' },
+            { name: 'Sales Rep', code: 'LDN' },
+            { name: 'Buying Office', code: 'IST' },
+         
+        ];
 
       if (this.accountLevel == null) {
         this.accountLevel = AccountLevelEnum.Profile;

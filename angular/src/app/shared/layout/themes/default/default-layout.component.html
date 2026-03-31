@@ -319,53 +319,7 @@
                 </ul>
               </div>
               
-            <!-- END: Left Aside -->
-            <div class="kt-grid__item kt-grid__item--fluid kt-grid kt-grid--hor " [ngClass]="isAuthenticated ?'kt-wrapper':'' " id="kt_wrapper">
-                <!-- BEGIN: Header -->
-                <div *ngIf="!hideTopbar" class="kt-header kt-grid__item kt-header--{{currentTheme.baseSettings.header.desktopFixedHeader ? 'fixed':'static'}} kt-head--skin-{{currentTheme.baseSettings.header.headerSkin}}" id="kt_header">
-
-            
-                    <div class="kt-header-menu-wrapper" id="kt_header_menu_wrapper"></div>
-              
-                    <topbar [displayMarketPlace]="displayMarketPlace"></topbar>
-
-                </div>
-                <div class="bg-white p-3 align-items-center justify-content-center market-place-bar mb-5 w-100" *ngIf="false" [ngClass]=" displayMarketPlace ? 'd-flex' : 'd-none' ">
-                    <div class="d-flex">
-                        <a *ngIf="('Pages.Marketplace.Accounts' | permission)" class="align-items-center d-flex justify-content-center btn btn-grey mr-2" [routerLink]="['/app/main/marketplace/accounts']" routerLinkActive="header-link-active" >
-                            <i class="fas fa-briefcase"></i>
-                            <div>{{ "Accounts" | localize }}</div>
-                        </a>
-                        <a *ngIf="('Pages.Marketplace.Products' | permission)" class="align-items-center d-flex justify-content-center btn btn-grey mr-2" [routerLink]="['/app/main/marketplace/products']" routerLinkActive="header-link-active">
-                            <i class="fas fa-cart-arrow-down"></i>
-                            <div>{{ "Products" | localize }}</div>
-                        </a>
-                        <a *ngIf="('Pages.Marketplace.Contacts' | permission)" class="align-items-center d-flex justify-content-center btn btn-grey" [routerLink]="['/app/main/marketplace/contacts']" routerLinkActive="header-link-active">
-                            <i class="far fa-user-circle"></i>
-                            <div>{{ "Contacts" | localize }}</div>
-                        </a>
-                    </div>
-                </div>
-                <!-- END: Header -->
-                <div class="d-lg-none p-3 mobile-subscription-warning" *ngIf="subscriptionStatusBarVisible()">
-                    <div 
-                         [ngClass]="{'hidden': !subscriptionStatusBarVisible()}" class="d-inline-block d-sm-none mt-3 ml-3">
-                        <span *ngIf="appSession.tenant.isInTrialPeriod && !subscriptionIsExpiringSoon()" [innerHTML]="getTrialSubscriptionNotification()"></span>
-                        <a *ngIf="subscriptionIsExpiringSoon()" routerLink="/app/admin/subscription-management">
-                            <span *ngIf="subscriptionIsExpiringSoon() && appSession.tenant.isInTrialPeriod"><i class="fa fa-exclamation-circle"></i> {{getExpireNotification("TrialExpireNotification")}}</span>
-                            <span *ngIf="subscriptionIsExpiringSoon() && !appSession.tenant.isInTrialPeriod"><i class="fa fa-exclamation-circle"></i> {{getExpireNotification("SubscriptionExpireNotification")}}</span>
-                        </a>
-                    </div>
-                </div>
-
-
-                <div class="kt-grid__item kt-grid__item--fluid kt-grid kt-grid--hor " [ngClass]="{'rout-c':!hideTopbar && !isArabic && isAuthenticated,'rout-c-ar':!hideTopbar && isArabic && isAuthenticated , 'addMGtop':!isAuthenticated}">
-
-                    <router-outlet></router-outlet>
-                </div>
-                <footer-bar></footer-bar>
-            </div>
-            
+      
           <!-- END: Left Aside -->
           <div class="kt-grid__item kt-grid__item--fluid kt-grid kt-grid--hor " [ngClass]="isAuthenticated ?'kt-wrapper':'' " id="kt_wrapper">
               <!-- BEGIN: Header -->

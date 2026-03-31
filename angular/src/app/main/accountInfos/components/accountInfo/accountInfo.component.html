@@ -526,6 +526,18 @@
                                             </div>
                                         </div>
 
+
+                                                  <div class="form-group row" *ngIf="accountInfoTemp?.accountType?.toUpperCase() == 'BUSINESS'">
+                                            <label for="colFormLabelSm"
+                                                class="col-sm-2 col-form-label col-form-label-sm label-form">{{l("MarketplaceRole")}}</label>
+                                            <div class="col-sm-8">
+                                        
+
+                                                          <p-multiSelect [options]="roles" [(ngModel)]="selectedRoles" optionLabel="name" placeholder="Select Roles" [maxSelectedLabels]="3" class="w-100 md:w-80"  display="chip"></p-multiSelect>
+
+                                            </div>
+                                        </div>
+
                                         <div class="form-group row" *ngIf="accountInfoTemp?.accountType != 'People' && accountInfoTemp?.accountType != 'Personal'">
 
                                             <label for="colFormLabelSm"
