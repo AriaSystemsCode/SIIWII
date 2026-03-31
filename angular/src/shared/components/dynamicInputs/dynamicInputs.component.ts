@@ -3,12 +3,18 @@ import { Component, EventEmitter, Injector, Input, OnChanges, OnDestroy, OnInit,
 import { ImageUploadComponentOutput } from '@app/shared/common/image-upload/image-upload.component';
 import { appModuleAnimation } from '@shared/animations/routerTransition';
 import { AppComponentBase } from '@shared/common/app-component-base';
-import { AppAdvertisementsServiceProxy, ExtraAttribute, GetAppAdvertisementForViewDto, SycAttachmentCategoryDto } from '@shared/service-proxies/service-proxies';
+import { AppAdvertisementsServiceProxy, AppEntitiesServiceProxy, AppEntityDto, ExtraAttribute, GetAppAdvertisementForViewDto, SycAttachmentCategoryDto } from '@shared/service-proxies/service-proxies';
 import { FileUploaderCustom } from '../import-steps/models/FileUploaderCustom.model';
 import { FileUploader, FileUploaderOptions } from '@node_modules/ng2-file-upload';
 import { AppConsts } from '@shared/AppConsts';
 import { IAjaxResponse, TokenService } from '@node_modules/abp-ng2-module';
 import { DynamicApiDispatcherService } from '@shared/dynamicApiDispatcherService ';
+import Swal from 'sweetalert2';
+import { finalize, map  } from 'rxjs/operators';
+import { forkJoin ,of} from 'rxjs';
+
+
+
 
 @Component({
   selector: 'app-dynamicInputs',
@@ -32,10 +38,12 @@ export class dynamicInputs extends AppComponentBase implements OnInit, OnChanges
   sycAttachmentCategoryImage: SycAttachmentCategoryDto;
   @Input() defaultBooleanValue: boolean | string = 'true'; // parent can override
   warningMsg: string = "";
+  isInitializing = true;
 
   public constructor(
     private _tokenService: TokenService,
     private dynamicApi: DynamicApiDispatcherService,
+    private _appEntitiesServiceProxy: AppEntitiesServiceProxy,
     injector: Injector
   ) {
     super(injector);
@@ -46,104 +54,171 @@ export class dynamicInputs extends AppComponentBase implements OnInit, OnChanges
   }
   ngOnChanges() {
     this.fillSelectedValuesFromDto();
-    this.onAnyInputChange();
+        this.onAnyInputChange();
+
   }
 
-  onAnyInputChange() {
-    const updatedDataMap = new Map<number, any>();
+ onAnyInputChange() {
+  //if (this.isInitializing) return;
+  //this.formTouched = true;
 
-    // Preserve existing values
-    for (const item of this.selectedExtraData) {
-      updatedDataMap.set(item.attributeId, item);
-    }
+  const updatedDataMap = new Map<number, any>();
 
-    if (this.extraAttributeObject?.value?.filteredExtraAttributes) {
-      for (const attr of this.extraAttributeObject.value.filteredExtraAttributes) {
+  // Preserve existing values
+  for (const item of this.selectedExtraData) {
+    updatedDataMap.set(item.attributeId, item);
+  }
 
-        if (attr.dataType === 'pills')
-          attr.themes = this.getThemes(attr);
+  if (this.extraAttributeObject?.value?.filteredExtraAttributes) {
+    for (const attr of this.extraAttributeObject.value.filteredExtraAttributes) {
 
-        if (attr.isSelectedOnVariation || attr.isVariation) {
-          continue;
-        }
+      if (attr.dataType === 'pills') 
+        attr.themes = this.getThemes(attr);
+      
+      if (attr.isSelectedOnVariation || attr.isVariation) {
+        continue;
+      }
 
-        let formattedValue = attr.selectedValues;
+    let formattedValue =
+  attr.selectedValues == null ||
+  attr.selectedValues === '' ||
+  (Array.isArray(attr.selectedValues) && attr.selectedValues.length === 0)
+    ? attr.defaultValue
+    : attr.selectedValues;
 
+attr.selectedValues = formattedValue;
+
+  
         // ✅ Handle Datetime
-        if (attr.dataType === 'Datetime') {
-          const dateValue = new Date(formattedValue);
+      if (attr.dataType === 'Datetime') {
+        const dateValue = new Date(formattedValue);
 
-          if (!formattedValue || formattedValue === 'Invalid Date' || isNaN(dateValue.getTime())) {
-            formattedValue = '';
-          } else {
-            formattedValue = dateValue.toISOString();
-            if (formattedValue === '1970-01-01T00:00:00.000Z') {
-              const originalValue = this.originalValuesMap.get(attr.attributeId);
-              formattedValue = originalValue || '';
-            }
+        if (!formattedValue || formattedValue === 'Invalid Date' || isNaN(dateValue.getTime())) {
+          formattedValue = '';
+        } else {
+          formattedValue = dateValue.toISOString();
+          if (formattedValue === '1970-01-01T00:00:00.000Z') {
+            const originalValue = this.originalValuesMap.get(attr.attributeId);
+            formattedValue = originalValue || '';
           }
         }
+      }
 
         // ✅ Handle String input
-        if (attr.dataType === 'string' && !attr.isLookup) {
-          if (!formattedValue || formattedValue === null || formattedValue === undefined || formattedValue.toString().trim() === '') {
-            formattedValue = '';
-          }
+      if (attr.dataType === 'string' && !attr.isLookup) {
+        if (!formattedValue || formattedValue === null || formattedValue === undefined || formattedValue.toString().trim() === '') {
+          formattedValue = '';
         }
-
-        // ✅ Handle Numeric input
-        if (attr.dataType === 'Numeric' || attr.dataType === 'boolean' || attr.dataType === 'Boolean' || attr.dataType === 'bit' || attr.dataType === 'color') {
-          if (formattedValue === null || formattedValue === undefined || formattedValue === '') {
-            formattedValue = '';
-          }
-        }
-
-        const originalValue = this.originalValuesMap.get(attr.attributeId);
-        const isSame = JSON.stringify(originalValue) === JSON.stringify(formattedValue);
-
-        let finalValue;
-
-        if (attr.acceptMultipleValues && Array.isArray(formattedValue)) {
-          finalValue = formattedValue.length ? formattedValue : [];
-        } else if (!attr.acceptMultipleValues && (formattedValue === undefined || formattedValue === null || formattedValue === '')) {
-          finalValue = ''; // ✅ always send empty string
-        } else if (!isSame) {
-          finalValue = formattedValue;
-        } else {
-          finalValue = formattedValue || '';
-        }
-
-        const updatedValue = {
-          attributeId: attr.attributeId,
-          value: finalValue,
-          isLookup: attr.isLookup === true,
-          acceptMultipleValues: attr.acceptMultipleValues === true
-        };
-
-        updatedDataMap.set(attr.attributeId, updatedValue);
       }
-    }
+
+    // ✅ Handle Numeric / Boolean / Color
+      if (['Numeric', 'boolean', 'Boolean', 'bit', 'color'].includes(attr.dataType)) {
+        if (formattedValue === null || formattedValue === undefined || formattedValue === '') {
+          formattedValue = '';
+        }
+      }
+
+      const originalValue = this.originalValuesMap.get(attr.attributeId);
+      const isSame = JSON.stringify(originalValue) === JSON.stringify(formattedValue);
+
+      let finalValue;
+
+      if (attr.acceptMultipleValues && Array.isArray(formattedValue)) {
+        finalValue = formattedValue.length ? formattedValue : [];
+      } else if (!attr.acceptMultipleValues && (formattedValue === undefined || formattedValue === null || formattedValue === '')) {
+        finalValue = '';
+      } else if (!isSame) {
+        finalValue = formattedValue;
+      } else {
+        finalValue = formattedValue || '';
+      }
+
+      const updatedValue = {
+        attributeId: attr.attributeId,
+        value: finalValue,
+        isLookup: attr.isLookup === true,
+        acceptMultipleValues: attr.acceptMultipleValues === true
+      };
+
+      updatedDataMap.set(attr.attributeId, updatedValue);
 
     this.selectedExtraData = Array.from(updatedDataMap.values());
-
     this.extraDataChanged.emit(this.selectedExtraData);
-  }
 
-
-  onRadioChange(extraAttr) {
-    if (extraAttr?.attributeId === 1217 ||
-      extraAttr?.name?.includes("ShowwarningmessagewhenmajorItemisoutofStockinmarketplace")) {
-
-      const extraAttrWaningMsg = this.extraAttributeObject.value.extraAttributes
-        .find(x => x.attributeId === 1218 || x.name?.includes("Warningmessage"));
-
-      if (extraAttrWaningMsg && extraAttr.selectedValues?.toString().toLowerCase() !== 'true') {
-        extraAttrWaningMsg.showMsgTxt = false;
-      } else if (extraAttrWaningMsg && extraAttr.selectedValues?.toString().toLowerCase() === 'true') {
-        extraAttrWaningMsg.showMsgTxt = true;
-      }
+  
     }
   }
+}
+
+onDropdownChange(extraAttr: any) {
+
+  this.onAnyInputChange(); // update normal data
+
+  const updatedDataMap = new Map<number, any>();
+
+  const finalValue = extraAttr.selectedValues;
+
+  this.handleRelatedWhen(extraAttr, finalValue, updatedDataMap);
+}
+
+
+handleRelatedWhen(attr: any, finalValue: any, updatedDataMap: Map<number, any>) {
+
+  if (!attr.relatedWhen?.relation?.length) return;
+
+  const calls = attr.relatedWhen.relation.map(relation => {
+
+    const targetAttr = this.extraAttributeObject.value.extraAttributes
+      .find(x => x.name === relation.targetName || x.code === relation.targetName);
+
+    if (!targetAttr) return null;
+
+    if (isNaN(Number(finalValue))) {
+      return of({
+        targetAttr,
+        relation,
+        newValue: 0
+      });
+    }
+
+    return this._appEntitiesServiceProxy.getAppEntityForEdit(Number(finalValue))
+      .pipe(
+        map((result: any) => {
+          const newValue = result.extraDataAttributes
+            .find(x => x.extraAttrName === relation.targetName)
+            ?.selectedValues?.[0]?.value || 0;
+
+          return { targetAttr, relation, newValue };
+        })
+      );
+
+  }).filter(x => x !== null);
+
+  if (calls.length) {
+    forkJoin(calls).subscribe((results: any[]) => {
+
+      results.forEach(res => {
+
+        res.targetAttr[res.relation.targetField] = res.newValue;
+            res.targetAttr.selectedValues = res.newValue;
+
+
+         updatedDataMap.set(res.targetAttr.attributeId, {
+      attributeId: res.targetAttr.attributeId,
+      value: res.newValue,
+      isLookup: res.targetAttr.isLookup === true,
+      acceptMultipleValues: res.targetAttr.acceptMultipleValues === true
+    });
+
+
+      });
+
+      this.selectedExtraData = Array.from(updatedDataMap.values());
+      this.extraDataChanged.emit(this.selectedExtraData);
+
+    });
+  }
+}
 
 
   reset(extraAttr: any) {
@@ -225,11 +300,11 @@ export class dynamicInputs extends AppComponentBase implements OnInit, OnChanges
         }
         this.originalValuesMap.set(attr.attributeId, attr.selectedValues);
       }
-  //     else {
-  //         if ((attr.dataType === 'boolean' || attr.dataType === 'bit') && (attr.selectedValues == null || attr.selectedValues === '')) {
-  //   attr.selectedValues = this.defaultBooleanValue;
-  // }
-  //     }
+      //     else {
+      //         if ((attr.dataType === 'boolean' || attr.dataType === 'bit') && (attr.selectedValues == null || attr.selectedValues === '')) {
+      //   attr.selectedValues = this.defaultBooleanValue;
+      // }
+      //     }
     }
 
   }
@@ -274,36 +349,16 @@ export class dynamicInputs extends AppComponentBase implements OnInit, OnChanges
     attr.selectedValues = event.image;
     this.onAnyInputChange(); // emit change
   }
-  
+
   onImageRemoved(attr: any) {
     attr.selectedValues = '';
     this.onAnyInputChange(); // emit change
   }
-  
+
 
   ngOnInit(): void {
     this.fillSelectedValuesFromDto();
-  
-    // ✅ Provide fallback/mock image category
-    if (!this.sycAttachmentCategoryImage) {
-      this.sycAttachmentCategoryImage = {
-        id: 1,
-        code: 'IMAGE',
-        name: 'Mock Image Category',
-        description: 'Fake for testing',
-        entityObjectTypeCode: 'MOCK',
-        isStatic: false,
-        maxFileSize: 1048576, // 1 MB
-        acceptMultipleAttachments: true,
-        isSystem: false,
-        displayName: 'Test Category',
-        icon: '',
-        iconPath: '',
-        tenantId: 1
-      } as unknown as SycAttachmentCategoryDto;
-    }
-  
-    setTimeout(() => this.onAnyInputChange(), 0);
+    this.onAnyInputChange();
   }
 
   isArray(val: any): boolean {
@@ -332,7 +387,12 @@ export class dynamicInputs extends AppComponentBase implements OnInit, OnChanges
       } */
       const allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
       if (!allowedTypes.includes(file.type)) {
-        alert('Only JPG, PNG, or GIF files are allowed.');
+        //alert('Only JPG, PNG, or GIF files are allowed.');
+        Swal.fire(
+          " ",
+          "File format is not supported , Only JPG, PNG, or GIF files are allowed.",
+          "error"
+        );
         return;
       }
       const dotIndex = file.name.lastIndexOf('.');
@@ -402,71 +462,90 @@ export class dynamicInputs extends AppComponentBase implements OnInit, OnChanges
   extraAttrOptions = new Map<string, { items: any[], totalCount: number, isLoading: boolean }>();
 
   getDropdownOptions(extraAttr: any) {
-    const data = this.extraAttrOptions.get(extraAttr.id);
-    if (!data) return [];
+    if (extraAttr?.validEntries && !extraAttr?.dataSource) {
+    return extraAttr.validEntries.split('|').map(v => ({
+      label: v.trim(),
+      value: v.trim()
+    }));
 
-    let items = [...data.items];
-
-    if (items.length > 0 && items.length < data.totalCount) {
-        items.push({ label: 'Load More...', value: null, isLoadMore: true });
-    }
-
-    return items;
-}
+  }
+  
+  return this.extraAttrOptions.get(extraAttr.id)?.items || [];
+  }
   
   onDropdownClick(extraAttr: any) {
-    const data = this.extraAttrOptions.get(extraAttr.id);
-    if (!data || data.items.length === 0) {
-        this.loadNextItems(extraAttr);
+    if (extraAttr?.validEntries && !extraAttr?.dataSource) 
+    return;
+
+  const data = this.extraAttrOptions.get(extraAttr.id);
+
+  if (!data || data.items.length === 0) 
+    this.loadNextItems(extraAttr);
+
+  }
+
+  onLoadMoreClick(event: Event, extraAttr: any) {
+    event.stopPropagation();
+    this.loadNextItems(extraAttr);
+  }
+  loadNextItems(extraAttr: any) {
+    let data = this.extraAttrOptions.get(extraAttr.id);
+    if (!data) {
+      data = { items: [], totalCount: 0, isLoading: false };
+      this.extraAttrOptions.set(extraAttr.id, data);
     }
+
+    if (data.isLoading) return;
+
+    const skipCount = data.items.length;
+    const maxResultCount = 10;
+
+    data.isLoading = true;
+
+    this.callDynamicAPI(extraAttr, skipCount, maxResultCount);
+  }
+
+ callDynamicAPI(extraAttr: any, skipCount: number = 0, maxResultCount: number = 10) {
+  if (extraAttr?.validEntries && extraAttr.validEntries.includes('|')) {
+    const items = extraAttr.validEntries.split('|').map(val => ({
+      label: val.trim(),
+      value: val.trim()
+    }));
+
+    this.extraAttrOptions.set(extraAttr.id, {
+      items: items,
+      totalCount: items.length,
+      isLoading: false
+    });
+    return;
+  }
+
+  if (extraAttr?.dataSource) {
+    const serviceName = extraAttr.dataSource.service + "ServiceProxy";
+    const apiMethod = extraAttr.dataSource.api;
+    const resultField = extraAttr.dataSource.parameter;
+
+    this.dynamicApi.dispatch(serviceName, apiMethod, {
+      skipCount: skipCount,
+      maxResultCount: maxResultCount
+    }).subscribe(result => {
+      const dropdownItems = result.items.map(item => ({
+        label: this.getByPath(item, resultField.trim()),
+        value: item.account.id
+      }));
+
+      const existing = this.extraAttrOptions.get(extraAttr.id)?.items || [];
+      const combinedItems = skipCount > 0 ? [...existing, ...dropdownItems] : dropdownItems;
+
+      this.extraAttrOptions.set(extraAttr.id, {
+        items: combinedItems,
+        totalCount: result.totalCount,
+        isLoading: false
+      });
+    });
+  }
 }
 
-onLoadMoreClick(event: Event, extraAttr: any) {
-  event.stopPropagation(); 
-  this.loadNextItems(extraAttr);
-}
-  loadNextItems(extraAttr: any) {
-      let data = this.extraAttrOptions.get(extraAttr.id);
-      if (!data) {
-          data = { items: [], totalCount: 0, isLoading: false };
-          this.extraAttrOptions.set(extraAttr.id, data);
-      }
-  
-      if (data.isLoading) return;
-  
-      const skipCount = data.items.length;
-      const maxResultCount = 10;
-  
-      data.isLoading = true;
-  
-      this.callDynamicAPI(extraAttr, skipCount, maxResultCount);
-  }
-  
-  callDynamicAPI(extraAttr: any, skipCount: number = 0, maxResultCount: number = 10) {
-      if (!extraAttr?.validEntries) return;
-  
-      let [serviceName, methodName, resultField] = extraAttr.validEntries.split('|');
-      serviceName += "ServiceProxy";
-  
-      this.dynamicApi.dispatch(serviceName, methodName, {
-          skipCount: skipCount,
-          maxResultCount: maxResultCount
-      }).subscribe(result => {
-          const dropdownItems = result.items.map(item => ({
-              label: this.getByPath(item, resultField.trim()),
-              value: item.account.id
-          }));
-  
-          const existing = this.extraAttrOptions.get(extraAttr.id)?.items || [];
-          const combinedItems = skipCount > 0 ? [...existing, ...dropdownItems] : dropdownItems;
-  
-          this.extraAttrOptions.set(extraAttr.id, {
-              items: combinedItems,
-              totalCount: result.totalCount,
-              isLoading: false
-          });
-      });
-  }
 
   getByPath(obj: any, path: string) {
     return path.split('.').reduce((o, p) => o?.[p], obj);
@@ -476,6 +555,42 @@ onLoadMoreClick(event: Event, extraAttr: any) {
     return this.extraAttributeObject.value.extraAttributes
       .find(x => x?.attributeId === attributeId || x?.name?.includes(nameIncludes));
   }
+
+
+
+  saveAll(appEntityDto: AppEntityDto): void {
+    this.showMainSpinner();
+    this._appEntitiesServiceProxy.saveEntity(appEntityDto)
+      .pipe(
+        finalize(() => {
+          this.hideMainSpinner();
+        })
+      )
+      .subscribe({
+        next: () => {
+          this.formTouched = false;
+          this.notify.success(this.l('Saved Successfully'));
+        },
+        error: () => {
+          this.notify.error(this.l('Save Failed'));
+        }
+      });
+
+    
+  }
+
+  isVisible(extraAttr: any): boolean {
+
+  if (!extraAttr.visibleWhen) return true;
+
+  const parentAttr = this.extraAttributeObject.value.extraAttributes
+    .find(x => x.attributeId == extraAttr.visibleWhen.extraAttributeId);
+
+  if (!parentAttr) return false;
+
+  return parentAttr.selectedValues?.toString().toLowerCase() ===
+         extraAttr.visibleWhen.value?.toString().toLowerCase();
+}
 
 
 }

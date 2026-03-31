@@ -394,12 +394,12 @@
                             <h6 class="font-weight-bold p-4" style="background-color: #FAFAFAFA;
                             border-radius: 5px;">{{ "Attributes" | localize }} </h6>
                                     <button [disabled]="shouldDisableCreateVarButton()"
-                                        class="btn btn-primary btn-sm text-capitalize mr-2" type="button" (click)="saveExtraAtrributeSelection()" style="right: 0px;
+                                        class="btn btn-primary btn-sm text-capitalize mr-2" type="button" (click)="saveExtraAtrributeSelection()" style="
                                         position: absolute;
                                         border-radius: 5px;
                                         background-color: #4A0D4A !important;
                                         border: #4A0D4A !important;
-                                        color: white !important;">
+                                        color: white !important;" [ngClass]="isArabic ? 'rtlPos':'ltrPos'">
                                        {{ "Create" | localize }}
                                        {{ variationPossibilities > 0 ? variationPossibilities : ' '  }}
                                        {{ "Variations" | localize }}
@@ -527,14 +527,14 @@
                                         {{selectedExtraAttributes[activeExtraAttributeIndex].name | localize }} {{ "Options" | localize }} /
                                     </span> -->
                                     <span> 
-                                        {{ "Selected " | localize }} {{toTitleCase(selectedExtraAttributes[activeExtraAttributeIndex].name) }}{{"s : "}} 
-                                        <span style="color: #9E9E9E;" *ngIf="selectedExtraAttributes[activeExtraAttributeIndex]?.selectedValues?.length>0"> {{"You have been selected "}} {{selectedExtraAttributes[activeExtraAttributeIndex]?.selectedValues?.length }} {{selectedExtraAttributes[activeExtraAttributeIndex].name | localize | lowercase }} </span>
+                                        {{ "Selected " | localize }} {{selectedExtraAttributes[activeExtraAttributeIndex].name | localize }}{{"S: "}} 
+                                        <span style="color: #9E9E9E;" *ngIf="selectedExtraAttributes[activeExtraAttributeIndex]?.selectedValues?.length>0"> {{"You have been select "}} {{selectedExtraAttributes[activeExtraAttributeIndex]?.selectedValues?.length }} {{selectedExtraAttributes[activeExtraAttributeIndex].name | localize | lowercase }} </span>
                                     </span>
-                                    <input type="text" class="bg-white form-control ml-2" style="width:200px" [placeholder]="('Search' | localize) + ' ' + toTitleCase(selectedExtraAttributes[activeExtraAttributeIndex].name)"  (input)="filterLookup($event)" name="search" >
+                                    <input type="text" class="bg-white form-control ml-2" style="width:200px" [placeholder]="('Search' | localize) + ' ' + selectedExtraAttributes[activeExtraAttributeIndex].name" (input)="filterLookup($event)" name="search" >
                                     <button style="border-radius: 5px;
                                     background-color: white !important;
                                     border: 1px solid #EEEEEEEE !important;color: #4A0D4A !important;" class="ml-3 p-3 btn btn-outline-primary font-weight-normal p-2" (click)="openCreateNewAppEntityModal()" *ngIf="selectedExtraAttributes[activeExtraAttributeIndex].allowAddNew" >
-                                        <span class="mr-1">+</span> {{ "Add " | localize }} {{ toTitleCase(selectedExtraAttributes[activeExtraAttributeIndex].name)}}
+                                        <span class="mr-1">+</span> {{ "Add " | localize }} {{selectedExtraAttributes[activeExtraAttributeIndex].name}}
                                     </button>
                                 </h6>
                                 
@@ -686,7 +686,7 @@
                                                 </div>
                                             </div>
                                             <div>
-                                           <button  type="button" class="bg-white btn  p-1 text-center" (click)="removeAllAttachments()" >
+                                           <button  type="button" class="bg-white btn btn-hover-primary p-1 text-center" (click)="removeAllAttachments()" >
                                                     <i class="flaticon-delete m-0 p-0"></i>
                                                 </button>
                                             </div>
@@ -757,7 +757,7 @@
                                                         <div class="text-center mb-3">
                                                             <i class="fa-photo-video fas bg-transparent text-white fa-3x" ></i>
                                                         </div>
-                                                        <div class="text-center" *ngIf="isImageFile(activeAttachmentOption?.entityAttachments[i]?.fileName)">
+                                                        <div class="text-center" *ngIf="isImageFile(activeAttachmentOption?.entityAttachments[getAttachRealIndex(i)]?.fileName)">
                                                             <button type="button" class="btn btn-dark text-white border-lg border-white" (click)="openImageViewer(attachment)">
                                                                 {{ "ImagePreview" | localize }}
                                                             </button>
@@ -771,39 +771,48 @@
                                                     [ngClass]="{'imgBorder' : activeAttachmentOption.defaultImageIndex == i}"
     /> -->
 
-    <img *ngIf="isImageFile(activeAttachmentOption?.entityAttachments[i]?.fileName)"
+    <img *ngIf="isImageFile(activeAttachmentOption?.entityAttachments[getAttachRealIndex(i)]?.fileName)"
     [src]="attachment"  class="w-75" 
     [ngClass]="{'imgBorder' : activeAttachmentOption.defaultImageIndex == i}"
 />
 
-<img *ngIf="isVideoFile(activeAttachmentOption?.entityAttachments[i]?.fileName)"
+<img *ngIf="isVideoFile(activeAttachmentOption?.entityAttachments[getAttachRealIndex(i)]?.fileName)"
     src="../../../../../assets/Items/video-Icon.png"  class="w-75" 
     [ngClass]="{'imgBorder' : activeAttachmentOption.defaultImageIndex == i}"
 />
 
-<img *ngIf="isPdfFile(activeAttachmentOption?.entityAttachments[i]?.fileName)"
+<img *ngIf="isPdfFile(activeAttachmentOption?.entityAttachments[getAttachRealIndex(i)]?.fileName)"
     src="../../../../../assets/Items/pdf-Icon.png"  class="w-75" 
     [ngClass]="{'imgBorder' : activeAttachmentOption.defaultImageIndex == i}"
 />
 
     
-                                                    <a  *ngIf="isImageFile(activeAttachmentOption?.entityAttachments[i]?.fileName)"
-                                                    class="select-default-image p-2 col-12 text-center" [ngClass]="{'d-block' : activeAttachmentOption.defaultImageIndex == i}"  style="    color: #4A0D4A !important;
+<!-- [ngClass]="{'d-block' : activeAttachmentOption.defaultImageIndex == i}" -->
+                                                    <a  *ngIf="isImageFile(activeAttachmentOption?.entityAttachments[getAttachRealIndex(i)]?.fileName)"
+                                                    class="select-default-image d-block p-2 col-12 text-center"   style="    color: #4A0D4A !important;
                                                     border: 1px solid #EEEEEEEE !important;
                                                     border-radius: 12px;" (click)="setDefaultImage(i)">
-                                                        <i class="fa fa-check-square" [ngClass]="activeAttachmentOption.defaultImageIndex == i? 'text-success':'text-grey' "></i>
+                                                        <i class="fa" [ngClass]="activeAttachmentOption.defaultImageIndex == i? 'fa-check-square text-success':'fa-square text-grey'"></i>
                                                         {{ "Default Image" | localize }}
                                                     </a>  <a class="p-2"
                                                 style="position: absolute; bottom: -100px;">
-                                               <label class="text-purple d-flex align-items-center cursor-pointer">
-                                                 <input 
-                                                   type="checkbox" 
-                                                   class="mr-2 ml-2" 
-                                                   [checked]="activeAttachmentOption?.entityAttachments[i]?.isPublic" 
-                                                   (change)="setVisibleinMarketplaceImage(i)"
-                                                 />
-                                                 {{ 'Visible in Marketplace' | localize }}
-                                               </label>
+                                                <label
+                                                [class.is-disabled]="activeAttachmentOption.defaultImageIndex == i"
+                                                class="text-purple d-flex align-items-center cursor-pointer"
+                                              >
+                                                <input 
+                                                [class.is-disabled]="activeAttachmentOption.defaultImageIndex == i"
+                                                  type="checkbox" 
+                                                  class="mr-2 ml-2" 
+                                                  [checked]="
+                                                    activeAttachmentOption?.entityAttachments[getAttachRealIndex(i)]?.isPublic ||
+                                                    activeAttachmentOption.defaultImageIndex == i
+                                                  "
+                                                  (change)="setVisibleinMarketplaceImage(getAttachRealIndex(i))"
+                                                />
+                                                {{ 'Visible in Marketplace' | localize }}
+                                              </label>
+                                              
                                              </a>
                                                 </a>
                                               

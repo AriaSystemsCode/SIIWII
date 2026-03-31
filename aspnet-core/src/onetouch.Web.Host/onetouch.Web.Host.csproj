@@ -129,7 +129,6 @@
     <EmbeddedResource Include="wwwroot\swagger\ui\index.html" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Assets\" />
     <Folder Include="wwwroot\Plugins\" />
   </ItemGroup>
   <ItemGroup>

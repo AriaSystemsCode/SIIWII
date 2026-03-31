@@ -579,6 +579,32 @@
                                     </button>
                                 </div>
                             </div>
+
+                                                
+<div class="col-12 pl-4 ml-4 mt-3 mb-3">
+    <div class="d-flex flex-row justify-content-between">
+                <div class="row mr-5 pr-5">
+                    <h6 class="font-weight-bold pt-3 pr-2">
+                        {{ "Tax Rate" | localize}}
+                    </h6>
+                    <div class="d-flex align-items-baseline">
+
+                        <input
+                        type="number"
+                        step="any"
+                        name="taxRate"
+                        class="form-control"
+                        #taxRate="ngModel"
+                        [(ngModel)]="appItem.taxRate"
+                        (blur)="fixNegative()"
+                        style="background-color: #EEEEEE !important"
+                      />
+                      
+                    </div>
+                </div>
+  
+    </div>
+  </div>
                             <div class="col-10 pl-4 ml-4 mt-4">
                                 <span>
                                     <input type="checkbox" [(ngModel)]="sellVariationChecked" name="showVariationsBtn"
@@ -593,69 +619,7 @@
                             </div>
                         </div>
 
-                        
-                   <!-- ✅ Taxable Section -->
-<div class="col-12 pl-4 ml-4 mt-3 mb-3" *ngIf="_isTexable">
-    <div class="d-flex flex-row justify-content-between">
-  
-
-      <!-- ✅ Taxable Checkbox -->
-      <div class="col-md-2 d-flex align-items-center">
-        <input
-          type="checkbox"
-          id="taxable"
-          name="taxable"
-          [(ngModel)]="appItem.taxable"
-          class="form-check-input mr-2"
-        />
-        <h6 for="taxable" class="form-check-label mb-0 font-weight-bold pt-1 pl-1">
-          {{ 'Taxable' | localize }}
-        </h6>
-      </div>
-  
-      <!-- ✅ Tax Code Dropdown -->
-      <div class="col-md-4" *ngIf="appItem.taxable">
-        <label class="col-form-label-sm font-weight-bold mb-1">
-          {{ 'Tax Code' | localize }}
-        </label>
-
-              
-                <!-- //i49-F5 bind right texable fields if fildes or will be extra data like recommended & additional  -->
-        <select
-          class="form-control form-control-sm"
-          [(ngModel)]="appItem.taxCode"
-          name="taxCode"
-          [disabled]="!appItem.taxable"
-          (ngModelChange)="onTaxCodeChange($event)" 
-        >
-           <option *ngFor="let code of taxCodes" [value]="code.value">
-            {{ code.label }}
-          </option> 
-        </select>
-      </div>
-  
-                <!-- //i49-F5 bind right texable fields if fildes or will be extra data like recommended & additional  -->
-      <!-- ✅ Tax % Input -->
-      <div class="col-md-3" *ngIf="appItem.taxable">
-        <label class="col-form-label-sm font-weight-bold mb-1">
-          {{ 'Tax %' | localize }}
-        </label>
-        <input
-          type="number"
-          step="any"
-          class="form-control form-control-sm"
-          [(ngModel)]="appItem.taxPercent"
-          name="taxPercent"
-          [readonly]="true"
-        />
-      </div>
-  
-    </div>
-  </div>
-  <!-- ✅ End Taxable Section -->
-
-  
-
+    
                     </div>
                 </div>
             </div>

@@ -132,9 +132,7 @@ export class CreateOrEditAppItemComponent
     showAdvancedPricing: boolean = false;
     PriceValidMsg: string = "";
     oldnonLookupValues;
-     taxCodes;
      appEntities;
-     _isTexable:boolean=false;
      currentLang: string
      isArabic: boolean
     constructor(
@@ -212,7 +210,6 @@ export class CreateOrEditAppItemComponent
 
     
     ngOnInit(): void {
-        this.isTexable();
         this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
         this.currentLang == 'ar' || this.currentLang == 'ar-EG'  ? this.isArabic = true : this.isArabic = false
         this.defineExtraAttributes();
@@ -242,6 +239,8 @@ export class CreateOrEditAppItemComponent
         this.languageSettingName = AppConsts.languageSettingName;
         //this._pricingHelperService.defaultLevel= this.languageSettingName!='en-GB' ? "MSRP"  :  "RRP"
 
+        if (!this.appItem?.taxRate)
+            this.appItem.taxRate=0;
     }
     languageSettingName;
     aspectRatio;
@@ -1625,7 +1624,6 @@ export class CreateOrEditAppItemComponent
 
         this.appItem.entityRelatedItems =_entityRelatedItems;
 
-          //i49-F5 set texable data if fildes or will be extra data like recommended & additional  
         this._appItemsServiceProxy
             .createOrEdit(this.appItem)
             .pipe(
@@ -2108,58 +2106,8 @@ export class CreateOrEditAppItemComponent
             }
         });
     }
-
-    onTaxCodeChange(value: number) {
-        this.appItem.taxPercent = value;
-    }
-
-    isTexable(){
-        //i49-F5 texable setting id 
-        this._appEntitiesServiceProxy
-            .getTenantSettingValue(1121,null)
-            .subscribe((res: any) => {
-                this._isTexable= res?.toString().toLowerCase() =='true' ? true : false;
-
-                if(this._isTexable)
-                    this.getTaxesData();
-            });
-    }
-
-    getTaxesData() {
-        this._sydObjectsServiceProxy.getAllLookups(
-        ).subscribe(result => {
-           let  indx= result?.findIndex(x=>x.code.toString().toUpperCase() == "CHARGES");  
-           if(indx>=0){   
-//i49-F5 xxxxx need return only tax     
-            this._appEntitiesServiceProxy.getAll(
-                undefined,
-                undefined,
-                undefined,
-                undefined,
-                "485823",
-                true,
-                undefined,
-                undefined,
-                undefined,
-                result[indx]?.id,
-                undefined,
-                0,
-                this.maxResultCount
-            ).subscribe(result => {
-              this.appEntities = result?.items?.map(item => item.appEntity) || [];
-              this.taxCodes = this.appEntities
-              .filter(entity => !!entity?.code)
-              .map(entity => {
-                const attr = entity?.entityExtraData?.find(a => a.attributeId === 1203);
-                return {
-                  label: entity.code,
-                  value: attr?.attributeValue || null
-                };
-              })
-              .filter(item => !!item.value);
-                        });
-        }
-
-        });
+    fixNegative() {
+        if (this.appItem.taxRate < 0) 
+          this.appItem.taxRate = 0;
     }
 }

@@ -25,6 +25,8 @@ namespace onetouch.AppItems.Dtos
         public string Description { get; set; }
 
         public decimal Price { get; set; }
+        public decimal TaxRate { get; set; }
+
         public long StockAvailability { get; set; }
 
         public string Status { get; set; }
@@ -148,6 +150,7 @@ namespace onetouch.AppItems.Dtos
         public string Description { get; set; }
 
         public decimal Price { get; set; }
+        public decimal TaxRate { get; set; }
         public long StockAvailability { get; set; }
 
         public string Status { get; set; }

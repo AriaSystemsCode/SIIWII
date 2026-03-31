@@ -692,9 +692,9 @@ export class ProductFiltersComponent extends AppComponentBase implements OnInit,
 
   getSettingData(){
     
-    this._AppEntitiesServiceProxy.getHostSettingValue(1216, null).subscribe({
+    this._AppEntitiesServiceProxy.getHostSettingValue(1316, null).subscribe({
         next: (res) => {
-            this.sellerSSin = 'PERSONAL-000000000039'
+            this.sellerSSin = res
         },
      
       });

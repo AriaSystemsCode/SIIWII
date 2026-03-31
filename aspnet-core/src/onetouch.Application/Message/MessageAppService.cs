@@ -84,7 +84,8 @@ namespace onetouch.Message
             IRepository<AppEntity, long> appEntityRepository,
             IAppConfigurationAccessor appConfigurationAccessor,
             Helper helper, IAppEntitiesAppService appEntitiesAppService,
-            IRepository<AppEntityClassification, long> appEntityClassificationRepository, IRepository<AppMarketplaceTransactionHeaders, long> appMarketplaceTransactionHeaders,
+            IRepository<AppEntityClassification, long> appEntityClassificationRepository,
+            IRepository<AppMarketplaceTransactionHeaders, long> appMarketplaceTransactionHeaders,
             IRepository<AppEntityReactionsCount, long> appEntityReactionsCount, IRepository<SycEntityObjectCategory, long> sycEntityObjectCategory,
             IRepository<AppMarketplaceMessage, long> appMarketplaceMessagesRepository, IRepository<AppPost, long> appPostRepo,
             IRepository<AppEntityExtraData, long> appEntityExtraDataRepository,
@@ -367,6 +368,8 @@ namespace onetouch.Message
         [AbpAllowAnonymous]
         public async Task<MessagePagedResultDto> GetAllComments(GetAllMessagesInput input)
         {
+            return new MessagePagedResultDto(0, 0, new List<GetMessagesForViewDto>());
+
             var entityObjectTypeComment = await _helper.SystemTables.GetEntityObjectTypeComment();
             var entityObjectTypeMessage = await _helper.SystemTables.GetEntityObjectTypeMessageID();
             var orgComponentId = input.MainComponentEntitlyId;

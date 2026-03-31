@@ -535,7 +535,7 @@ top: 4px;">
 
                                     <td *ngIf="((productData?.showInOutStockFlag == 'ItemColorSizeLevel' || productData?.showInOutStockFlag == 'Bothlevels') && size.stockAvailability >0 ) && productData?.showStockAvailability != 'No'" class="text-success">{{'InStock' | localize}}</td>
 
-                                    <td *ngIf="((productData?.showInOutStockFlag != 'ItemColorSizeLevel' && productData?.showInOutStockFlag != 'Bothlevels' &&  productData?.showInOutStockFlag != 'ItemColorlevel') ||  productData?.showInOutStockFlag == 'ItemColorlevel') && productData?.showStockAvailability != 'No'">{{  size.stockAvailability  }}</td>
+                                    <td *ngIf="((productData?.showInOutStockFlag != 'ItemColorSizeLevel' && productData?.showInOutStockFlag != 'Bothlevels' ) ) && productData?.showStockAvailability != 'No'">{{  size.stockAvailability  }}</td>
                                     <td>
                                         <p-inputNumber [(ngModel)]="size.orderedQty" mode="decimal" [showButtons]="true" [disabled]="!isAuthenticated"
                                             inputId="minmax-buttons" [min]="0" (ngModelChange)="
@@ -1389,7 +1389,7 @@ top: 4px;">
 
                                             <td *ngIf="((productData?.showInOutStockFlag == 'ItemColorSizeLevel' || productData?.showInOutStockFlag == 'Bothlevels') && size.stockAvailability >0 ) && productData?.showStockAvailability != 'No'" class="text-success">{{'InStock' | localize}}</td>
 
-                                            <td *ngIf="((productData?.showInOutStockFlag != 'ItemColorSizeLevel' && productData?.showInOutStockFlag != 'Bothlevels' &&  productData?.showInOutStockFlag != 'ItemColorlevel') ||  productData?.showInOutStockFlag == 'ItemColorlevel') && productData?.showStockAvailability != 'No'">{{  size.stockAvailability  }}</td>
+                                            <td *ngIf="((productData?.showInOutStockFlag != 'ItemColorSizeLevel' && productData?.showInOutStockFlag != 'Bothlevels' ) ||  productData?.showInOutStockFlag == 'ItemColorlevel') && productData?.showStockAvailability != 'No'">{{  size.stockAvailability  }}</td>
                                             <td>
                                                 <p-inputNumber [(ngModel)]="size.orderedQty" mode="decimal" [disabled]="!isAuthenticated"
                                                     [showButtons]="true" inputId="minmax-buttons" [min]="0"

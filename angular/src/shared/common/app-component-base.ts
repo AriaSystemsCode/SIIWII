@@ -93,6 +93,7 @@ export abstract class AppComponentBase {
     public transactionReportTemplateName:"OrderConfirmationForm1";
     currentLang: string
     isArabic: boolean
+
     constructor(injector: Injector, private _location?: Location) {
         this.localization = injector.get(LocalizationService);
         this.permission = injector.get(PermissionCheckerService);
@@ -495,6 +496,7 @@ export abstract class AppComponentBase {
     }
 
     confirmDiscardChanges(): boolean {
+        if (!this.formTouched) return true;
         return window.confirm(
             this.l("YouAreAboutToLoseAllTheChangesYouHaveDone,AreYouSure?")
         );

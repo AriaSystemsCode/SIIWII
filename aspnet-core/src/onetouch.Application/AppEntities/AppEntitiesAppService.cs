@@ -221,6 +221,57 @@ namespace onetouch.AppEntities
             );
         }
 
+        //public async Task<PagedResultDto<ExtraDataAttrDto>> GetAppEntityExtraDataWithPaging(long entityId, long entityObjectTypeId)
+        //{
+        //    using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
+        //    {
+        //        GetAllEntityObjectTypeOutput entityObjectExtraAttribute = null;
+        //        var entityObjectExtraAttributeReturn = await _SycEntityObjectTypesAppService.GetAllWithExtraAttributes(entityObjectTypeId);
+        //        if (entityObjectExtraAttributeReturn != null)
+        //        {
+        //            entityObjectExtraAttribute = entityObjectExtraAttributeReturn.FirstOrDefault();
+        //        }
+
+
+
+        //        if (entityId != 0 && entityObjectExtraAttribute != null && entityObjectExtraAttribute.ExtraAttributes != null && entityObjectExtraAttribute.ExtraAttributes.ExtraAttributes != null)
+        //        {
+        //            var extraAttributedefintion = entityObjectExtraAttribute.ExtraAttributes.ExtraAttributes;
+        //            // *Abdo End
+        //            //get all extra data type, AttributeId
+        //            //var attributesIds = extraAttributedefintion.Where(r => r.Usage.ToUpper().Trim() == recommandedOrAdditional.ToString().ToUpper()).Select(r => r.AttributeId).ToList();
+        //            var attributesIds = extraAttributedefintion.OrderBy(r => r.Usage.ToUpper().Trim()).Select(r => r.AttributeId).ToList();
+        //            var usedExtraDataPagedPerAttribute = GetAppEntityAttrDistinctWithPaging(new GetAppEntityAttributesWithAttributeIdsInput { MaxResultCount = 10000, SkipCount = 0, Sorting = null, AttributeIds = attributesIds, EntityId = entityId }).Result.Items.ToList();
+
+        //            List<ExtraDataAttrDto> returnedList = new List<ExtraDataAttrDto>();
+
+        //            foreach (var EntityExtraData in extraAttributedefintion)
+        //            {
+        //                if (usedExtraDataPagedPerAttribute.Contains(EntityExtraData.AttributeId))
+        //                {
+        //                    var extraDataAttrDtoPagedlocal = GetAppEntityExtraWithPaging(new GetAppEntityAttributesWithAttributeIdsInput { MaxResultCount = 10000, SkipCount = 0, AttributeIds = new List<long>() { EntityExtraData.AttributeId }, EntityId = entityId }).Result.Items.ToList();
+        //                    var extraDataSelectedValues = extraDataAttrDtoPagedlocal.Select(r => new ExtraDataSelectedValues { value = (r.AttributeValueFkName != null ? r.AttributeValueFkName : r.AttributeValue) });
+
+        //                    if (extraDataSelectedValues.ToList().Count > 0)
+        //                    {
+        //                        var extraDataAttrDto = new ExtraDataAttrDto();
+        //                        extraDataAttrDto.extraAttrUsage = EntityExtraData.Usage;
+        //                        extraDataAttrDto.extraAttrName = EntityExtraData.Name;
+        //                        extraDataAttrDto.extraAttrDataType = EntityExtraData.DataType; // Abdo added this 
+        //                        extraDataAttrDto.selectedValues = extraDataSelectedValues.ToList();
+        //                        extraDataAttrDto.extraAttributeId = EntityExtraData.AttributeId;
+        //                        //if (!string.IsNullOrEmpty(EntityExtraData.Usage)) //&& EntityExtraData.Usage.ToUpper().Trim() == recommandedOrAdditional.ToString().ToUpper())
+        //                        { returnedList.Add(extraDataAttrDto); }
+        //                    }
+        //                }
+
+        //            }
+        //            return new PagedResultDto<ExtraDataAttrDto>(usedExtraDataPagedPerAttribute.Count, returnedList);
+        //        }
+        //        return new PagedResultDto<ExtraDataAttrDto>(0, new List<ExtraDataAttrDto>());
+        //    }
+        //}
+
         public async Task<PagedResultDto<ExtraDataAttrDto>> GetAppEntityExtraDataWithPaging(long entityId, long entityObjectTypeId)
         {
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
@@ -271,7 +322,7 @@ namespace onetouch.AppEntities
                 return new PagedResultDto<ExtraDataAttrDto>(0, new List<ExtraDataAttrDto>());
             }
         }
-         
+
 
         public bool checkArray(long[] ids, string names)
         {
@@ -741,48 +792,48 @@ namespace onetouch.AppEntities
                 //})
                 //.ToListAsync();
                 return await _appEntityRepository
-    .GetAll()
-    .Include(x => x.EntityAttachments)
-        .ThenInclude(z => z.AttachmentFk)
-    .Include(x => x.EntityExtraData)
-    .Include(x => x.EntityObjectStatusFk)
-    .Where(x =>
-        x.EntityObjectTypeCode == code &&
-        (x.TenantId == AbpSession.TenantId || x.TenantId == null))
-    .OrderBy(x => x.Name)
-    .Select(appEntity => new LookupLabelDto
-    {
-        Value = appEntity.Id,
+                        .GetAll()
+                        .Include(x => x.EntityAttachments)
+                            .ThenInclude(z => z.AttachmentFk)
+                        .Include(x => x.EntityExtraData)
+                        .Include(x => x.EntityObjectStatusFk)
+                        .Where(x =>
+                            x.EntityObjectTypeCode == code &&
+                            (x.TenantId == AbpSession.TenantId || x.TenantId == null))
+                        .OrderBy(x => x.Name)
+                        .Select(appEntity => new LookupLabelDto
+                        {
+                            Value = appEntity.Id,
 
-        // I49
-        EntityObjectStatusId = appEntity.EntityObjectStatusId,
-        Status = appEntity.EntityObjectStatusFk != null
-            ? appEntity.EntityObjectStatusFk.Name
-            : string.Empty,
+                            // I49
+                            EntityObjectStatusId = appEntity.EntityObjectStatusId,
+                            Status = appEntity.EntityObjectStatusFk != null
+                                ? appEntity.EntityObjectStatusFk.Name
+                                : string.Empty,
 
-        Label = appEntity.Name,
-        Code = appEntity.Code,
-        IsHostRecord = appEntity.TenantId == null,
+                            Label = appEntity.Name,
+                            Code = appEntity.Code,
+                            IsHostRecord = appEntity.TenantId == null,
 
-        // Hexa code (same logic, cleaner)
-        HexaCode = appEntity.EntityExtraData
-            .Where(z => z.AttributeId == 39)
-            .Select(z => z.AttributeValue)
-            .FirstOrDefault(),
+                            // Hexa code (same logic, cleaner)
+                            HexaCode = appEntity.EntityExtraData
+                                .Where(z => z.AttributeId == 39)
+                                .Select(z => z.AttributeValue)
+                                .FirstOrDefault(),
 
-        // Image (same logic, no repeated FirstOrDefault)
-        Image = appEntity.EntityAttachments
-            .Where(a => a.AttachmentFk != null)
-            .Select(a =>
-                imagesUrl +
-                (a.AttachmentFk.TenantId == null
-                    ? "-1"
-                    : a.AttachmentFk.TenantId.ToString()) +
-                "/" +
-                a.AttachmentFk.Attachment)
-            .FirstOrDefault()
-    })
-    .ToListAsync();
+                            // Image (same logic, no repeated FirstOrDefault)
+                            Image = appEntity.EntityAttachments
+                                .Where(a => a.AttachmentFk != null)
+                                .Select(a =>
+                                    imagesUrl +
+                                    (a.AttachmentFk.TenantId == null
+                                        ? "-1"
+                                        : a.AttachmentFk.TenantId.ToString()) +
+                                    "/" +
+                                    a.AttachmentFk.Attachment)
+                                .FirstOrDefault()
+                        })
+                        .ToListAsync();
 
             }
         }
@@ -2719,56 +2770,56 @@ namespace onetouch.AppEntities
             }
             return returnObject;
         }
-        //I40[Start]
-        //public async Task<PagedResultDto<ExtraDataAttrDto>> GetAppEntityExtraDataWithPaging(long entityId, long entityObjectTypeId)
-        //{
-        //    using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
-        //    {
-        //        GetAllEntityObjectTypeOutput entityObjectExtraAttribute = null;
-        //        var entityObjectExtraAttributeReturn = await _SycEntityObjectTypesAppService.GetAllWithExtraAttributes(entityObjectTypeId);
-        //        if (entityObjectExtraAttributeReturn != null)
-        //        {
-        //            entityObjectExtraAttribute = entityObjectExtraAttributeReturn.FirstOrDefault();
-        //        }
+        ////I40[Start]
+        ////public async Task<PagedResultDto<ExtraDataAttrDto>> GetAppEntityExtraDataWithPaging(long entityId, long entityObjectTypeId)
+        ////{
+        ////    using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
+        ////    {
+        ////        GetAllEntityObjectTypeOutput entityObjectExtraAttribute = null;
+        ////        var entityObjectExtraAttributeReturn = await _SycEntityObjectTypesAppService.GetAllWithExtraAttributes(entityObjectTypeId);
+        ////        if (entityObjectExtraAttributeReturn != null)
+        ////        {
+        ////            entityObjectExtraAttribute = entityObjectExtraAttributeReturn.FirstOrDefault();
+        ////        }
 
 
 
-        //        if (entityId != 0 && entityObjectExtraAttribute != null && entityObjectExtraAttribute.ExtraAttributes != null && entityObjectExtraAttribute.ExtraAttributes.ExtraAttributes != null)
-        //        {
-        //            var extraAttributedefintion = entityObjectExtraAttribute.ExtraAttributes.ExtraAttributes;
-        //            // *Abdo End
-        //            //get all extra data type, AttributeId
-        //            //var attributesIds = extraAttributedefintion.Where(r => r.Usage.ToUpper().Trim() == recommandedOrAdditional.ToString().ToUpper()).Select(r => r.AttributeId).ToList();
-        //            var attributesIds = extraAttributedefintion.OrderBy(r => r.Usage.ToUpper().Trim()).Select(r => r.AttributeId).ToList();
-        //            var usedExtraDataPagedPerAttribute = GetAppEntityAttrDistinctWithPaging(new GetAppEntityAttributesWithAttributeIdsInput { MaxResultCount = 10000, SkipCount = 0, Sorting = null, AttributeIds = attributesIds, EntityId = entityId }).Result.Items.ToList();
+        ////        if (entityId != 0 && entityObjectExtraAttribute != null && entityObjectExtraAttribute.ExtraAttributes != null && entityObjectExtraAttribute.ExtraAttributes.ExtraAttributes != null)
+        ////        {
+        ////            var extraAttributedefintion = entityObjectExtraAttribute.ExtraAttributes.ExtraAttributes;
+        ////            *Abdo End
+        ////           get all extra data type, AttributeId
+        ////            var attributesIds = extraAttributedefintion.Where(r => r.Usage.ToUpper().Trim() == recommandedOrAdditional.ToString().ToUpper()).Select(r => r.AttributeId).ToList();
+        ////            var attributesIds = extraAttributedefintion.OrderBy(r => r.Usage.ToUpper().Trim()).Select(r => r.AttributeId).ToList();
+        ////            var usedExtraDataPagedPerAttribute = GetAppEntityAttrDistinctWithPaging(new GetAppEntityAttributesWithAttributeIdsInput { MaxResultCount = 10000, SkipCount = 0, Sorting = null, AttributeIds = attributesIds, EntityId = entityId }).Result.Items.ToList();
 
-        //            List<ExtraDataAttrDto> returnedList = new List<ExtraDataAttrDto>();
+        ////            List<ExtraDataAttrDto> returnedList = new List<ExtraDataAttrDto>();
 
-        //            foreach (var EntityExtraData in extraAttributedefintion)
-        //            {
-        //                if (usedExtraDataPagedPerAttribute.Contains(EntityExtraData.AttributeId))
-        //                {
-        //                    var extraDataAttrDtoPagedlocal = GetAppEntityExtraWithPaging(new GetAppEntityAttributesWithAttributeIdsInput { MaxResultCount = 10000, SkipCount = 0, AttributeIds = new List<long>() { EntityExtraData.AttributeId }, EntityId = entityId }).Result.Items.ToList();
-        //                    var extraDataSelectedValues = extraDataAttrDtoPagedlocal.Select(r => new ExtraDataSelectedValues { value = (r.AttributeValueFkName != null ? r.AttributeValueFkName : r.AttributeValue) });
+        ////            foreach (var EntityExtraData in extraAttributedefintion)
+        ////            {
+        ////                if (usedExtraDataPagedPerAttribute.Contains(EntityExtraData.AttributeId))
+        ////                {
+        ////                    var extraDataAttrDtoPagedlocal = GetAppEntityExtraWithPaging(new GetAppEntityAttributesWithAttributeIdsInput { MaxResultCount = 10000, SkipCount = 0, AttributeIds = new List<long>() { EntityExtraData.AttributeId }, EntityId = entityId }).Result.Items.ToList();
+        ////                    var extraDataSelectedValues = extraDataAttrDtoPagedlocal.Select(r => new ExtraDataSelectedValues { value = (r.AttributeValueFkName != null ? r.AttributeValueFkName : r.AttributeValue) });
 
-        //                    if (extraDataSelectedValues.ToList().Count > 0)
-        //                    {
-        //                        var extraDataAttrDto = new ExtraDataAttrDto();
-        //                        extraDataAttrDto.extraAttrUsage = EntityExtraData.Usage;
-        //                        extraDataAttrDto.extraAttrName = EntityExtraData.Name;
-        //                        extraDataAttrDto.extraAttrDataType = EntityExtraData.DataType; // Abdo added this 
-        //                        extraDataAttrDto.selectedValues = extraDataSelectedValues.ToList();
-        //                        extraDataAttrDto.extraAttributeId = EntityExtraData.AttributeId;
-        //                        { returnedList.Add(extraDataAttrDto); }
-        //                    }
-        //                }
+        ////                    if (extraDataSelectedValues.ToList().Count > 0)
+        ////                    {
+        ////                        var extraDataAttrDto = new ExtraDataAttrDto();
+        ////                        extraDataAttrDto.extraAttrUsage = EntityExtraData.Usage;
+        ////                        extraDataAttrDto.extraAttrName = EntityExtraData.Name;
+        ////                        extraDataAttrDto.extraAttrDataType = EntityExtraData.DataType; // Abdo added this 
+        ////                        extraDataAttrDto.selectedValues = extraDataSelectedValues.ToList();
+        ////                        extraDataAttrDto.extraAttributeId = EntityExtraData.AttributeId;
+        ////                        { returnedList.Add(extraDataAttrDto); }
+        ////                    }
+        ////                }
 
-        //            }
-        //            return new PagedResultDto<ExtraDataAttrDto>(usedExtraDataPagedPerAttribute.Count, returnedList);
-        //        }
-        //        return new PagedResultDto<ExtraDataAttrDto>(0, new List<ExtraDataAttrDto>());
-        //    }
-        //}
-        //I40[End]
+        ////            }
+        ////            return new PagedResultDto<ExtraDataAttrDto>(usedExtraDataPagedPerAttribute.Count, returnedList);
+        ////        }
+        ////        return new PagedResultDto<ExtraDataAttrDto>(0, new List<ExtraDataAttrDto>());
+        ////    }
+        ////}
+        ////I40[End]
     }
 }

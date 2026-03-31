@@ -108,14 +108,17 @@ namespace onetouch.SystemObjects
             return newList;
         }
 
-        public async Task<List<GetAllEntityObjectTypeOutput>> GetAllWithExtraAttributesByCode(string code)
+        public async Task<List<GetAllEntityObjectTypeOutput>> GetAllWithExtraAttributesByCode(string code, string objectCode="")
         {
             var type = await _sycEntityObjectTypeRepository.FirstOrDefaultAsync(x => x.Code == code && (x.TenantId == null || x.TenantId == AbpSession.TenantId));
             //XX
             if (type ==null)
                 return new List<GetAllEntityObjectTypeOutput>();
             //XX
-            var list = await _lookup_sycEntityObjectTypeRepository.GetAll().Where(x => x.TenantId == null && (x.Code == code)).FirstOrDefaultAsync();
+            var list = await _lookup_sycEntityObjectTypeRepository.GetAll()
+                .Where(x => x.TenantId == null && (x.Code == code))
+                .WhereIf(!string.IsNullOrEmpty(objectCode), x => x.ObjectCode == objectCode)
+                .FirstOrDefaultAsync();
             if (list != null)
                 return await GetAllWithExtraAttributes(list.Id);
             else

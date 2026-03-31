@@ -29657,6 +29657,177 @@ export class AppTransactionServiceProxy {
         }
         return _observableOf(null as any);
     }
+
+    /**
+     * @param pTransactionID (optional) 
+     * @return Success
+     */
+    addTransactionCharges(pTransactionID: number | undefined): Observable<void> {
+        let url_ = this.baseUrl + "/api/services/app/AppTransaction/AddTransactionCharges?";
+        if (pTransactionID === null)
+            throw new Error("The parameter 'pTransactionID' cannot be null.");
+        else if (pTransactionID !== undefined)
+            url_ += "pTransactionID=" + encodeURIComponent("" + pTransactionID) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processAddTransactionCharges(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processAddTransactionCharges(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<void>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<void>;
+        }));
+    }
+
+    protected processAddTransactionCharges(response: HttpResponseBase): Observable<void> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return _observableOf(null as any);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param transactionId (optional) 
+     * @param body (optional) 
+     * @return Success
+     */
+    updateCharges(transactionId: number | undefined, body: ChargesDto[] | null | undefined): Observable<number> {
+        let url_ = this.baseUrl + "/api/services/app/AppTransaction/UpdateCharges?";
+        if (transactionId === null)
+            throw new Error("The parameter 'transactionId' cannot be null.");
+        else if (transactionId !== undefined)
+            url_ += "transactionId=" + encodeURIComponent("" + transactionId) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json-patch+json",
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("put", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processUpdateCharges(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processUpdateCharges(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<number>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<number>;
+        }));
+    }
+
+    protected processUpdateCharges(response: HttpResponseBase): Observable<number> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+                result200 = resultData200 !== undefined ? resultData200 : <any>null;
+    
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param transactionId (optional) 
+     * @return Success
+     */
+    recalculateTransactionTotalAmount(transactionId: number | undefined): Observable<number> {
+        let url_ = this.baseUrl + "/api/services/app/AppTransaction/RecalculateTransactionTotalAmount?";
+        if (transactionId === null)
+            throw new Error("The parameter 'transactionId' cannot be null.");
+        else if (transactionId !== undefined)
+            url_ += "transactionId=" + encodeURIComponent("" + transactionId) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processRecalculateTransactionTotalAmount(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processRecalculateTransactionTotalAmount(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<number>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<number>;
+        }));
+    }
+
+    protected processRecalculateTransactionTotalAmount(response: HttpResponseBase): Observable<number> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+                result200 = resultData200 !== undefined ? resultData200 : <any>null;
+    
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
 }
 
 @Injectable()
@@ -47029,12 +47200,15 @@ export class SycEntityObjectTypesServiceProxy {
 
     /**
      * @param code (optional) 
+     * @param objectCode (optional) 
      * @return Success
      */
-    getAllWithExtraAttributesByCode(code: string | null | undefined): Observable<GetAllEntityObjectTypeOutput[]> {
+    getAllWithExtraAttributesByCode(code: string | null | undefined, objectCode: string | null | undefined): Observable<GetAllEntityObjectTypeOutput[]> {
         let url_ = this.baseUrl + "/api/services/app/SycEntityObjectTypes/GetAllWithExtraAttributesByCode?";
         if (code !== undefined && code !== null)
             url_ += "code=" + encodeURIComponent("" + code) + "&";
+        if (objectCode !== undefined && objectCode !== null)
+            url_ += "objectCode=" + encodeURIComponent("" + objectCode) + "&";
         url_ = url_.replace(/[?&]$/, "");
 
         let options_ : any = {
@@ -56345,6 +56519,58 @@ export class SystemTablesServiceProxy {
     }
 
     protected processGetEntityObjectStatusDraftTransaction(response: HttpResponseBase): Observable<number> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+                result200 = resultData200 !== undefined ? resultData200 : <any>null;
+    
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @return Success
+     */
+    getEntityObjectCharges(): Observable<number> {
+        let url_ = this.baseUrl + "/api/services/app/SystemTables/GetEntityObjectCharges";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetEntityObjectCharges(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetEntityObjectCharges(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<number>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<number>;
+        }));
+    }
+
+    protected processGetEntityObjectCharges(response: HttpResponseBase): Observable<number> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -66599,6 +66825,7 @@ export class GetAccountForViewDto implements IGetAccountForViewDto {
     availableGroupConnections!: number;
     availableBusinessConnections!: number;
     availablePeopleConnections!: number;
+    relationId!: number;
 
     [key: string]: any;
 
@@ -66635,6 +66862,7 @@ export class GetAccountForViewDto implements IGetAccountForViewDto {
             this.availableGroupConnections = _data["availableGroupConnections"];
             this.availableBusinessConnections = _data["availableBusinessConnections"];
             this.availablePeopleConnections = _data["availablePeopleConnections"];
+            this.relationId = _data["relationId"];
         }
     }
 
@@ -66669,6 +66897,7 @@ export class GetAccountForViewDto implements IGetAccountForViewDto {
         data["availableGroupConnections"] = this.availableGroupConnections;
         data["availableBusinessConnections"] = this.availableBusinessConnections;
         data["availablePeopleConnections"] = this.availablePeopleConnections;
+        data["relationId"] = this.relationId;
         return data;
     }
 }
@@ -66688,6 +66917,7 @@ export interface IGetAccountForViewDto {
     availableGroupConnections: number;
     availableBusinessConnections: number;
     availablePeopleConnections: number;
+    relationId: number;
 
     [key: string]: any;
 }
@@ -78719,6 +78949,7 @@ export class AppItemVariationsDto implements IAppItemVariationsDto {
     entityId!: number;
     description!: string | undefined;
     price!: number;
+    taxRate!: number;
     stockAvailability!: number;
     status!: string | undefined;
     entityObjectTypeId!: number;
@@ -78781,6 +79012,7 @@ export class AppItemVariationsDto implements IAppItemVariationsDto {
             this.entityId = _data["entityId"];
             this.description = _data["description"];
             this.price = _data["price"];
+            this.taxRate = _data["taxRate"];
             this.stockAvailability = _data["stockAvailability"];
             this.status = _data["status"];
             this.entityObjectTypeId = _data["entityObjectTypeId"];
@@ -78913,6 +79145,7 @@ export class AppItemVariationsDto implements IAppItemVariationsDto {
         data["entityId"] = this.entityId;
         data["description"] = this.description;
         data["price"] = this.price;
+        data["taxRate"] = this.taxRate;
         data["stockAvailability"] = this.stockAvailability;
         data["status"] = this.status;
         data["entityObjectTypeId"] = this.entityObjectTypeId;
@@ -79030,6 +79263,7 @@ export interface IAppItemVariationsDto {
     entityId: number;
     description: string | undefined;
     price: number;
+    taxRate: number;
     stockAvailability: number;
     status: string | undefined;
     entityObjectTypeId: number;
@@ -79138,6 +79372,230 @@ export enum RecommandedOrAdditional {
     CHARGES = 2,
 }
 
+export class VisibleWhen implements IVisibleWhen {
+    extraAttributeId!: string | undefined;
+    operatorValue!: string | undefined;
+    value!: string | undefined;
+
+    [key: string]: any;
+
+    constructor(data?: IVisibleWhen) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.extraAttributeId = _data["extraAttributeId"];
+            this.operatorValue = _data["operatorValue"];
+            this.value = _data["value"];
+        }
+    }
+
+    static fromJS(data: any): VisibleWhen {
+        data = typeof data === 'object' ? data : {};
+        let result = new VisibleWhen();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["extraAttributeId"] = this.extraAttributeId;
+        data["operatorValue"] = this.operatorValue;
+        data["value"] = this.value;
+        return data;
+    }
+}
+
+export interface IVisibleWhen {
+    extraAttributeId: string | undefined;
+    operatorValue: string | undefined;
+    value: string | undefined;
+
+    [key: string]: any;
+}
+
+export class Relation implements IRelation {
+    targetName!: string | undefined;
+    sourceField!: string | undefined;
+    targetField!: string | undefined;
+
+    [key: string]: any;
+
+    constructor(data?: IRelation) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.targetName = _data["targetName"];
+            this.sourceField = _data["sourceField"];
+            this.targetField = _data["targetField"];
+        }
+    }
+
+    static fromJS(data: any): Relation {
+        data = typeof data === 'object' ? data : {};
+        let result = new Relation();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["targetName"] = this.targetName;
+        data["sourceField"] = this.sourceField;
+        data["targetField"] = this.targetField;
+        return data;
+    }
+}
+
+export interface IRelation {
+    targetName: string | undefined;
+    sourceField: string | undefined;
+    targetField: string | undefined;
+
+    [key: string]: any;
+}
+
+export class RelatedWhen implements IRelatedWhen {
+    relation!: Relation[] | undefined;
+
+    [key: string]: any;
+
+    constructor(data?: IRelatedWhen) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            if (Array.isArray(_data["relation"])) {
+                this.relation = [] as any;
+                for (let item of _data["relation"])
+                    this.relation!.push(Relation.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): RelatedWhen {
+        data = typeof data === 'object' ? data : {};
+        let result = new RelatedWhen();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        if (Array.isArray(this.relation)) {
+            data["relation"] = [];
+            for (let item of this.relation)
+                data["relation"].push(item.toJSON());
+        }
+        return data;
+    }
+}
+
+export interface IRelatedWhen {
+    relation: Relation[] | undefined;
+
+    [key: string]: any;
+}
+
+export class DataSource implements IDataSource {
+    service!: string | undefined;
+    api!: string | undefined;
+    parameter!: string | undefined;
+
+    [key: string]: any;
+
+    constructor(data?: IDataSource) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.service = _data["service"];
+            this.api = _data["api"];
+            this.parameter = _data["parameter"];
+        }
+    }
+
+    static fromJS(data: any): DataSource {
+        data = typeof data === 'object' ? data : {};
+        let result = new DataSource();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["service"] = this.service;
+        data["api"] = this.api;
+        data["parameter"] = this.parameter;
+        return data;
+    }
+}
+
+export interface IDataSource {
+    service: string | undefined;
+    api: string | undefined;
+    parameter: string | undefined;
+
+    [key: string]: any;
+}
+
 export class ExtraAttribute implements IExtraAttribute {
     attributeId!: number;
     code!: string | undefined;
@@ -79155,6 +79613,9 @@ export class ExtraAttribute implements IExtraAttribute {
     isVariation!: boolean;
     isAdvancedSearch!: boolean;
     allowAddNew!: boolean;
+    visibleWhen!: VisibleWhen;
+    relatedWhen!: RelatedWhen;
+    dataSource!: DataSource;
 
     [key: string]: any;
 
@@ -79189,6 +79650,9 @@ export class ExtraAttribute implements IExtraAttribute {
             this.isVariation = _data["isVariation"];
             this.isAdvancedSearch = _data["isAdvancedSearch"];
             this.allowAddNew = _data["allowAddNew"];
+            this.visibleWhen = _data["visibleWhen"] ? VisibleWhen.fromJS(_data["visibleWhen"]) : <any>undefined;
+            this.relatedWhen = _data["relatedWhen"] ? RelatedWhen.fromJS(_data["relatedWhen"]) : <any>undefined;
+            this.dataSource = _data["dataSource"] ? DataSource.fromJS(_data["dataSource"]) : <any>undefined;
         }
     }
 
@@ -79221,6 +79685,9 @@ export class ExtraAttribute implements IExtraAttribute {
         data["isVariation"] = this.isVariation;
         data["isAdvancedSearch"] = this.isAdvancedSearch;
         data["allowAddNew"] = this.allowAddNew;
+        data["visibleWhen"] = this.visibleWhen ? this.visibleWhen.toJSON() : <any>undefined;
+        data["relatedWhen"] = this.relatedWhen ? this.relatedWhen.toJSON() : <any>undefined;
+        data["dataSource"] = this.dataSource ? this.dataSource.toJSON() : <any>undefined;
         return data;
     }
 }
@@ -79242,6 +79709,9 @@ export interface IExtraAttribute {
     isVariation: boolean;
     isAdvancedSearch: boolean;
     allowAddNew: boolean;
+    visibleWhen: VisibleWhen;
+    relatedWhen: RelatedWhen;
+    dataSource: DataSource;
 
     [key: string]: any;
 }
@@ -79268,6 +79738,7 @@ export class AppItemForViewDto implements IAppItemForViewDto {
     entityId!: number;
     description!: string | undefined;
     price!: number;
+    taxRate!: number;
     stockAvailability!: number;
     status!: string | undefined;
     entityObjectTypeId!: number;
@@ -79346,6 +79817,7 @@ export class AppItemForViewDto implements IAppItemForViewDto {
             this.entityId = _data["entityId"];
             this.description = _data["description"];
             this.price = _data["price"];
+            this.taxRate = _data["taxRate"];
             this.stockAvailability = _data["stockAvailability"];
             this.status = _data["status"];
             this.entityObjectTypeId = _data["entityObjectTypeId"];
@@ -79498,6 +79970,7 @@ export class AppItemForViewDto implements IAppItemForViewDto {
         data["entityId"] = this.entityId;
         data["description"] = this.description;
         data["price"] = this.price;
+        data["taxRate"] = this.taxRate;
         data["stockAvailability"] = this.stockAvailability;
         data["status"] = this.status;
         data["entityObjectTypeId"] = this.entityObjectTypeId;
@@ -79635,6 +80108,7 @@ export interface IAppItemForViewDto {
     entityId: number;
     description: string | undefined;
     price: number;
+    taxRate: number;
     stockAvailability: number;
     status: string | undefined;
     entityObjectTypeId: number;
@@ -79800,6 +80274,7 @@ export class AppItemForEditDto implements IAppItemForEditDto {
     entityId!: number;
     description!: string | undefined;
     price!: number;
+    taxRate!: number;
     stockAvailability!: number;
     status!: string | undefined;
     entityObjectTypeId!: number;
@@ -79858,6 +80333,7 @@ export class AppItemForEditDto implements IAppItemForEditDto {
             this.entityId = _data["entityId"];
             this.description = _data["description"];
             this.price = _data["price"];
+            this.taxRate = _data["taxRate"];
             this.stockAvailability = _data["stockAvailability"];
             this.status = _data["status"];
             this.entityObjectTypeId = _data["entityObjectTypeId"];
@@ -79990,6 +80466,7 @@ export class AppItemForEditDto implements IAppItemForEditDto {
         data["entityId"] = this.entityId;
         data["description"] = this.description;
         data["price"] = this.price;
+        data["taxRate"] = this.taxRate;
         data["stockAvailability"] = this.stockAvailability;
         data["status"] = this.status;
         data["entityObjectTypeId"] = this.entityObjectTypeId;
@@ -80111,6 +80588,7 @@ export interface IAppItemForEditDto {
     entityId: number;
     description: string | undefined;
     price: number;
+    taxRate: number;
     stockAvailability: number;
     status: string | undefined;
     entityObjectTypeId: number;
@@ -80219,6 +80697,7 @@ export class CreateOrEditAppItemDto implements ICreateOrEditAppItemDto {
     entityId!: number;
     description!: string | undefined;
     price!: number;
+    taxRate!: number;
     stockAvailability!: number;
     status!: string | undefined;
     entityObjectTypeId!: number;
@@ -80285,6 +80764,7 @@ export class CreateOrEditAppItemDto implements ICreateOrEditAppItemDto {
             this.entityId = _data["entityId"];
             this.description = _data["description"];
             this.price = _data["price"];
+            this.taxRate = _data["taxRate"];
             this.stockAvailability = _data["stockAvailability"];
             this.status = _data["status"];
             this.entityObjectTypeId = _data["entityObjectTypeId"];
@@ -80441,6 +80921,7 @@ export class CreateOrEditAppItemDto implements ICreateOrEditAppItemDto {
         data["entityId"] = this.entityId;
         data["description"] = this.description;
         data["price"] = this.price;
+        data["taxRate"] = this.taxRate;
         data["stockAvailability"] = this.stockAvailability;
         data["status"] = this.status;
         data["entityObjectTypeId"] = this.entityObjectTypeId;
@@ -80586,6 +81067,7 @@ export interface ICreateOrEditAppItemDto {
     entityId: number;
     description: string | undefined;
     price: number;
+    taxRate: number;
     stockAvailability: number;
     status: string | undefined;
     entityObjectTypeId: number;
@@ -81914,6 +82396,7 @@ export class AppItemValidationInputDTO implements IAppItemValidationInputDTO {
     entityId!: number;
     description!: string | undefined;
     price!: number;
+    taxRate!: number;
     stockAvailability!: number;
     status!: string | undefined;
     entityObjectTypeId!: number;
@@ -81985,6 +82468,7 @@ export class AppItemValidationInputDTO implements IAppItemValidationInputDTO {
             this.entityId = _data["entityId"];
             this.description = _data["description"];
             this.price = _data["price"];
+            this.taxRate = _data["taxRate"];
             this.stockAvailability = _data["stockAvailability"];
             this.status = _data["status"];
             this.entityObjectTypeId = _data["entityObjectTypeId"];
@@ -82146,6 +82630,7 @@ export class AppItemValidationInputDTO implements IAppItemValidationInputDTO {
         data["entityId"] = this.entityId;
         data["description"] = this.description;
         data["price"] = this.price;
+        data["taxRate"] = this.taxRate;
         data["stockAvailability"] = this.stockAvailability;
         data["status"] = this.status;
         data["entityObjectTypeId"] = this.entityObjectTypeId;
@@ -82292,6 +82777,7 @@ export interface IAppItemValidationInputDTO {
     entityId: number;
     description: string | undefined;
     price: number;
+    taxRate: number;
     stockAvailability: number;
     status: string | undefined;
     entityObjectTypeId: number;
@@ -89352,6 +89838,66 @@ export interface ITenantInformation {
     [key: string]: any;
 }
 
+export class ChargesDto implements IChargesDto {
+    name!: string | undefined;
+    isEditable!: boolean;
+    chargeAmount!: number;
+    transactionDetailID!: number;
+
+    [key: string]: any;
+
+    constructor(data?: IChargesDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.name = _data["name"];
+            this.isEditable = _data["isEditable"];
+            this.chargeAmount = _data["chargeAmount"];
+            this.transactionDetailID = _data["transactionDetailID"];
+        }
+    }
+
+    static fromJS(data: any): ChargesDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new ChargesDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["name"] = this.name;
+        data["isEditable"] = this.isEditable;
+        data["chargeAmount"] = this.chargeAmount;
+        data["transactionDetailID"] = this.transactionDetailID;
+        return data;
+    }
+}
+
+export interface IChargesDto {
+    name: string | undefined;
+    isEditable: boolean;
+    chargeAmount: number;
+    transactionDetailID: number;
+
+    [key: string]: any;
+}
+
 export enum TransactionType {
     SalesOrder = 0,
     PurchaseOrder = 1,
@@ -90046,6 +90592,7 @@ export interface IAppTransactionContactDto {
 }
 
 export class GetAppTransactionsForViewDto implements IGetAppTransactionsForViewDto {
+    charges!: ChargesDto[] | undefined;
     lastRecord!: boolean;
     firstRecord!: boolean;
     creatorUserId!: number;
@@ -90155,6 +90702,11 @@ export class GetAppTransactionsForViewDto implements IGetAppTransactionsForViewD
             for (var property in _data) {
                 if (_data.hasOwnProperty(property))
                     this[property] = _data[property];
+            }
+            if (Array.isArray(_data["charges"])) {
+                this.charges = [] as any;
+                for (let item of _data["charges"])
+                    this.charges!.push(ChargesDto.fromJS(item));
             }
             this.lastRecord = _data["lastRecord"];
             this.firstRecord = _data["firstRecord"];
@@ -90316,6 +90868,11 @@ export class GetAppTransactionsForViewDto implements IGetAppTransactionsForViewD
             if (this.hasOwnProperty(property))
                 data[property] = this[property];
         }
+        if (Array.isArray(this.charges)) {
+            data["charges"] = [];
+            for (let item of this.charges)
+                data["charges"].push(item.toJSON());
+        }
         data["lastRecord"] = this.lastRecord;
         data["firstRecord"] = this.firstRecord;
         data["creatorUserId"] = this.creatorUserId;
@@ -90465,6 +91022,7 @@ export class GetAppTransactionsForViewDto implements IGetAppTransactionsForViewD
 }
 
 export interface IGetAppTransactionsForViewDto {
+    charges: ChargesDto[] | undefined;
     lastRecord: boolean;
     firstRecord: boolean;
     creatorUserId: number;
@@ -91183,6 +91741,7 @@ export class GetAllAppTransactionsForViewDto implements IGetAllAppTransactionsFo
     eomDays!: number;
     eom!: boolean;
     netDueDays!: number;
+    charges!: ChargesDto[] | undefined;
     lastRecord!: boolean;
     firstRecord!: boolean;
     creatorUserId!: number;
@@ -91302,6 +91861,11 @@ export class GetAllAppTransactionsForViewDto implements IGetAllAppTransactionsFo
             this.eomDays = _data["eomDays"];
             this.eom = _data["eom"];
             this.netDueDays = _data["netDueDays"];
+            if (Array.isArray(_data["charges"])) {
+                this.charges = [] as any;
+                for (let item of _data["charges"])
+                    this.charges!.push(ChargesDto.fromJS(item));
+            }
             this.lastRecord = _data["lastRecord"];
             this.firstRecord = _data["firstRecord"];
             this.creatorUserId = _data["creatorUserId"];
@@ -91471,6 +92035,11 @@ export class GetAllAppTransactionsForViewDto implements IGetAllAppTransactionsFo
         data["eomDays"] = this.eomDays;
         data["eom"] = this.eom;
         data["netDueDays"] = this.netDueDays;
+        if (Array.isArray(this.charges)) {
+            data["charges"] = [];
+            for (let item of this.charges)
+                data["charges"].push(item.toJSON());
+        }
         data["lastRecord"] = this.lastRecord;
         data["firstRecord"] = this.firstRecord;
         data["creatorUserId"] = this.creatorUserId;
@@ -91629,6 +92198,7 @@ export interface IGetAllAppTransactionsForViewDto {
     eomDays: number;
     eom: boolean;
     netDueDays: number;
+    charges: ChargesDto[] | undefined;
     lastRecord: boolean;
     firstRecord: boolean;
     creatorUserId: number;
@@ -94727,6 +95297,7 @@ export class AppItem implements IAppItem {
     variations!: string | undefined;
     entityId!: number;
     price!: number;
+    taxRate!: number;
     stockAvailability!: number;
     parentId!: number | undefined;
     entityFk!: AppEntity;
@@ -94784,6 +95355,7 @@ export class AppItem implements IAppItem {
             this.variations = _data["variations"];
             this.entityId = _data["entityId"];
             this.price = _data["price"];
+            this.taxRate = _data["taxRate"];
             this.stockAvailability = _data["stockAvailability"];
             this.parentId = _data["parentId"];
             this.entityFk = _data["entityFk"] ? AppEntity.fromJS(_data["entityFk"]) : <any>undefined;
@@ -94863,6 +95435,7 @@ export class AppItem implements IAppItem {
         data["variations"] = this.variations;
         data["entityId"] = this.entityId;
         data["price"] = this.price;
+        data["taxRate"] = this.taxRate;
         data["stockAvailability"] = this.stockAvailability;
         data["parentId"] = this.parentId;
         data["entityFk"] = this.entityFk ? this.entityFk.toJSON() : <any>undefined;
@@ -94931,6 +95504,7 @@ export interface IAppItem {
     variations: string | undefined;
     entityId: number;
     price: number;
+    taxRate: number;
     stockAvailability: number;
     parentId: number | undefined;
     entityFk: AppEntity;
