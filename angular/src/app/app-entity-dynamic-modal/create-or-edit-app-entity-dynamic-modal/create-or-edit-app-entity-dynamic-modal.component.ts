@@ -797,14 +797,13 @@ isArabic: boolean = false;
     dropdownOptions(validEntries) {
         return validEntries.split('|');
     }
-    displayVisualTypes(): boolean {
+      displayVisualTypes(): boolean {
         //i49- what else ? 
-        if (this.entityObjectType.code.toString().toUpperCase() == "CHARGES")
-            this._displayVisualTypes = false;
-        else
-            this._displayVisualTypes = true;
+        const hiddenTypes = ['CHARGES', 'TRANSACTIONCHARGES','SHIPVIA', 'CHARGETYPES'];
 
-
+        this._displayVisualTypes = !hiddenTypes.includes(
+    this.entityObjectType.code.toString().toUpperCase()
+);
         return this._displayVisualTypes;
     }
 
