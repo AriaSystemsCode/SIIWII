@@ -34,6 +34,7 @@ export class ConnectionsTabComponent extends AppComponentBase {
   showData:boolean =true;
 
   private connectionsLoaded = false;
+      isAuthenticate= this.appSession?.user
   constructor(
     injector: Injector,
     private _abpSessionService: AbpSessionService,
@@ -67,7 +68,10 @@ ngOnChanges(changes: SimpleChanges) {
     this.isActive &&
     !this.connectionsLoaded
   ) {
+    if(this.isAuthenticate){
     this.GetSettingValue();
+
+    }
   }
 }
 
