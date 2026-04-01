@@ -797,7 +797,7 @@ isArabic: boolean = false;
     dropdownOptions(validEntries) {
         return validEntries.split('|');
     }
-     displayVisualTypes(): boolean {
+      displayVisualTypes(): boolean {
         //i49- what else ? 
        // const hiddenTypes = ['CHARGES', 'TRANSACTIONCHARGES','SHIPVIA', 'CHARGETYPES'];
         const showenTypes = ['COLOR', 'MARKETPLACESECTIONBLOCK','MARKETPLACESECTION'];
@@ -805,6 +805,12 @@ isArabic: boolean = false;
         this._displayVisualTypes = showenTypes.includes(
     this.entityObjectType.code.toString().toUpperCase()
 );
+
+if(!this._displayVisualTypes)
+      this.visual = {
+        solid: true,
+        image: false
+    };
         return this._displayVisualTypes;
     }
 
