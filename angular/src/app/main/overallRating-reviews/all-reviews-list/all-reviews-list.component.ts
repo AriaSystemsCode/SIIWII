@@ -3,6 +3,7 @@ import { finalize } from 'rxjs';
 import { AppComponentBase } from '@shared/common/app-component-base';
 import { FileUploaderCustom } from '@shared/components/import-steps/models/FileUploaderCustom.model';
 import { AppEntityAttachmentDto, CreateMessageInput, MesasgeObjectType, MessageServiceProxy, SycAttachmentCategoryDto } from '@shared/service-proxies/service-proxies';
+import { UpdateLogoService } from '@shared/utils/update-logo.service';
 
 @Component({
   selector: 'app-all-reviews-list',
@@ -48,7 +49,9 @@ export class AllReviewsListComponent extends AppComponentBase implements OnInit 
   isAuthenticated = this.appSession?.user
   currentLang:string
   isArabic:boolean = true
-  constructor(injector: Injector, private messageServiceProxy: MessageServiceProxy
+
+  profilePicture:string
+  constructor(injector: Injector, private messageServiceProxy: MessageServiceProxy,  private updateLogoService: UpdateLogoService,
 
   ) {
     super(injector);
@@ -62,6 +65,9 @@ export class AllReviewsListComponent extends AppComponentBase implements OnInit 
   ngOnInit() {
     this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
     this.currentLang == 'ar' || this.currentLang == 'ar-EG'  ? this.isArabic = true : this.isArabic = false
+    if(this.isAuthenticated){
+      this.getProfilePicture()
+    }
     this.getAllReviws()
   
         if (!this.sycAttachmentCategoryImage) {
@@ -330,5 +336,13 @@ export class AllReviewsListComponent extends AppComponentBase implements OnInit 
   
     }, 1000);
   }
+
+      getProfilePicture(): void {
+        this.updateLogoService.profilePictureUpdated$.subscribe((res) => {
+            this.profilePicture = res;
+        });
+
+    }
+
   
 }

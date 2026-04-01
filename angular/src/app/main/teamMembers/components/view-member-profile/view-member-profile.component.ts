@@ -446,7 +446,7 @@ export class ViewMemberProfileComponent extends AppComponentBase implements OnIn
           this.usageList = Object.keys(this.groupedByUsage);
           this.selectedUsage = this.usageList[0];
 
-          // ✅ Initialize extraAttributes before using it
+          //  Initialize extraAttributes before using it
           this.selectedTransTypeData = res[0]; // ensure defineExtraAttributes uses correct data
           this.defineExtraAttributes();
 

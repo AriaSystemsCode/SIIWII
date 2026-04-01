@@ -108,30 +108,28 @@ export class MarketplaceViewProductComponent
         this.ismarketPLace = JSON.parse(localStorage.getItem("fromMarketPlace"));
         this.productBodyData = JSON.parse(localStorage.getItem("productData"));
         this.priceLevel = localStorage.getItem("tempPriceLevel");
-        // this.getProductDetailsForView();
         this.filteredColors = this.colorsData;
        
     }
     ngOnInit(): void {
    
         this.route.paramMap.subscribe(params => {
-          const idParam = params.get('id');          // adjust if your route param name is different
+          const idParam = params.get('id');        
           const id = idParam ? +idParam : null;
-      
-          // Reset local state for new product
+
           this.resetProductViewState();
       
-          // Ensure productBodyData exists
+       
           if (!this.productBodyData) {
             this.productBodyData = {};
           }
-          this.productBodyData.id = id;              // use route id as main source
+          this.productBodyData.id = id;        
       
-          // Load details + related products
+     
           this.getProductDetailsForView();
         });
       
-        // Your existing screen-size logic can stay:
+     
         const screenWidth = window.innerWidth;
         if (screenWidth >= 992) {
           this.handleSCreenSelect = 5;
@@ -296,7 +294,7 @@ export class MarketplaceViewProductComponent
             } else {
               // Not authenticated: skip active-transaction call
               fetchDetails();
-            //   this.GetCurrencyInfo();
+        
             }
           }
           
@@ -309,11 +307,8 @@ export class MarketplaceViewProductComponent
     }
 
     setSizes(index: number) {
-        console.log(index,'indexxx')
         this.currentIndex = index;
         this.isColorView = false
-       // this.colorAttachmentForMainIamge = this.colorsData[index]?.colorImg;
-        // this.productImages = this.productVarImages[0]?.selectedValues[this.currentIndex]?.entityAttachments;
         let originalIndex = this.colorsData.findIndex(color => color?.colorCodeSelectedValues?.toLowerCase()?.trim() === this.filteredColors[index].colorCodeSelectedValues?.toLowerCase()?.trim());
         this.colorAttachmentForMainIamge = this.filteredColors[index]?.colorImg
         this.productImages = this.productVarImages[0]?.selectedValues[originalIndex]?.entityAttachments ?   this.productVarImages[0]?.selectedValues[originalIndex]?.entityAttachments : 
@@ -702,7 +697,7 @@ export class MarketplaceViewProductComponent
                             });
                         }
                     }
-                    /////
+
 
                     let bodyRequest: any = {
                         appItem: this.productDetails,
@@ -927,7 +922,7 @@ export class MarketplaceViewProductComponent
             this.calculateTotalOrderPriceAndQty(this.orderSummary);
         });
 
-        // this.productDetails.minSpecialPrice = updatedSpecialPrice;
+    
         this.productDetails.maxSpecialPrice = updatedSpecialPrice;
         this.showEditSpecialPrice = true
     }
@@ -1019,7 +1014,7 @@ hasColorStock(color: any): boolean {
   }
   
 
-relatedTotal = 0;                 // from API totalCount
+relatedTotal = 0;             
 pageSize = 11;
 loadingMore = false;
 

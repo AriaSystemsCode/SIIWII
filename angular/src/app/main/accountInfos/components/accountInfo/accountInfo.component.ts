@@ -155,7 +155,8 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit {
         private _activatedRoute: ActivatedRoute,
         private _sycIdentifierDefinitionsServiceProxy: SycIdentifierDefinitionsServiceProxy,
         private _marketplaceAccountsServiceProxy: MarketplaceAccountsServiceProxy,
-        private cdr: ChangeDetectorRef
+        private cdr: ChangeDetectorRef,
+        
     ) {
         super(injector);
 
@@ -168,6 +169,7 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit {
 
 
     async ngOnInit() {
+        this.getExtraAttributeLookupDataWithPaging()
         this.roles = [
             { name: 'Buyer', code: 'NY' },
             { name: 'Seller', code: 'RM' },
@@ -1536,5 +1538,32 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit {
                 }
             });
     }
+
+
+      getExtraAttributeLookupDataWithPaging() {
+         this._AppEntitiesServiceProxy.getAllEntitiesByTypeCodeWithPaging(
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            undefined,false,
+            'MARKETPLACE-ROLE',
+            undefined,
+            undefined,
+            undefined,
+            'name',
+            0,
+            10
+        )  .pipe(
+            finalize(()=>{
+            
+            })
+        )
+        .subscribe((result)=>{
+        //    this.roles = result
+
+        })
+     }
+
     
 }
