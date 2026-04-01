@@ -251,6 +251,7 @@
                                     <div>
                                         <div *ngIf="isSize && !isHost">
                                             <label>{{extraAttr.name | localize}}</label>
+                                            
                                         </div>
                                         <div class="d-flex align-items-center">
 
@@ -293,7 +294,7 @@
                                                 *ngIf="extraAttr.dataType === 'boolean' || extraAttr.dataType === 'bit' ">
                                                 <div class="radio-inline mt-2">
                                                     <label class="pr-2">
-                                                        {{extraAttr.name}}
+                                                        {{extraAttr.name| localize}}
                                                     </label>
                                                     <label class="radio radio-accent radio-primary mr-4"
                                                         for="extraAttr{{extraAttr.name}}_1">
@@ -304,6 +305,7 @@
                                                             id="extraAttr{{extraAttr.name}}_1" [value]="'true'"
                                                             [(ngModel)]="extraAttr.selectedValues" />
                                                         {{l("Yes")}}
+                                                        
                                                     </label>
                                                     <label class="radio radio-accent radio-primary"
                                                         for="extraAttr{{extraAttr.name}}_0">
@@ -314,6 +316,7 @@
                                                             id="extraAttr{{extraAttr.name}}_0" [value]="'false'"
                                                             [(ngModel)]="extraAttr.selectedValues">
                                                         {{l("No")}}
+                                                        
                                                     </label>
                                                     <a *ngIf="extraAttr.selectedValues && entityObjectType.code !='MARKETPLACESECTION'"
                                                         class="ml-5 text-underline text-black-50"
@@ -322,22 +325,23 @@
                                             </div>
                                             <div class="flex-grow-1" *ngIf="extraAttr.dataType === 'Datetime' ">
                                                 <label>
-                                                    {{extraAttr.name}}
+                                                    {{extraAttr.name| localize}}
                                                 </label>
                                                 <input type="text"
                                                     (keyup)="notLookupExtraAttributeOnChange($event.target.value,extraAttr)"
                                                     name="{{extraAttr.name}}" autocomplete="off"
-                                                    placeholder="{{extraAttr.name}}" class="form-control" bsDatepicker
+                                                    placeholder="{{extraAttr.name| localize}}" class="form-control" bsDatepicker
                                                     id="extraAttr{{extraAttr.name}}"
                                                     [(ngModel)]="extraAttr.selectedValues">
                                             </div>
                                             <div class="flex-grow-1 mx-1" *ngIf="extraAttr.dataType === 'Numeric' ">
                                                 <label>
-                                                    {{extraAttr.name}}
+                                                    {{extraAttr.name| localize}}
+                                                    
                                                 </label>
                                                 <input type="number"
                                                     (keyup)="notLookupExtraAttributeOnChange($event.target.value,extraAttr)"
-                                                    name="{{extraAttr.name}}" placeholder="{{extraAttr.name}}"
+                                                    name="{{extraAttr.name}}" placeholder="{{extraAttr.name| localize}}"
                                                     class="form-control" id="extraAttr{{extraAttr.name}}"
                                                     [(ngModel)]="extraAttr.selectedValues">
                                             </div>
@@ -345,11 +349,11 @@
                                                 *ngIf="extraAttr.dataType === 'string' && !extraAttr.isLookup ">
                                                 <div class="row d-flex align-items-baseline justify-content-start ">
                                                     <label>
-                                                        {{extraAttr.name}}
+                                                        {{extraAttr.name| localize}}
                                                     </label>
                                                     <input type="text"
                                                         (keyup)="notLookupExtraAttributeOnChange($event.target.value,extraAttr)"
-                                                        name="{{extraAttr.name}}" placeholder="{{extraAttr.name}}"
+                                                        name="{{extraAttr.name}}" placeholder="{{extraAttr.name| localize}}"
                                                         class="form-control" id="extraAttr{{extraAttr.name}}"
                                                         [(ngModel)]="extraAttr.selectedValues">
                                                     <div class="border rounded" class="w-25 "
@@ -367,7 +371,7 @@
                                                 *ngIf="extraAttr.validEntries && extraAttr.dataType === 'dropDownList'">
                                                 <div class="row d-flex align-items-baseline justify-content-start ">
                                                     <label class="pr-2">
-                                                        {{extraAttr.name}}
+                                                        {{extraAttr.name| localize}}
                                                     </label>
                                                     <p-dropdown [options]="dropdownOptions(extraAttr.validEntries)"
                                                         [styleClass]="'w-100 custom-dropdown'"
