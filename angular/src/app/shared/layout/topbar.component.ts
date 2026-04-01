@@ -90,13 +90,13 @@ export class TopBarComponent extends ThemesLayoutBaseComponent implements OnInit
     visible: boolean = false;
     displaneSel: boolean = false;
     displaneBuy: boolean = false;
-    currentLang: string
-    isArabic: boolean
+    
+   
 
     private profilePicSub: any;
-    visible:boolean =false;
-    displaneSel :boolean =false;
-    displaneBuy :boolean =false;
+    
+   
+    
    
     searchInput:string
     bgCol?: string;
