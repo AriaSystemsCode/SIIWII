@@ -823,6 +823,12 @@ isArabic: boolean = false;
         this._displayVisualTypes = showenTypes.includes(
     this.entityObjectType.code.toString().toUpperCase()
 );
+
+if(!this._displayVisualTypes)
+      this.visual = {
+        solid: true,
+        image: false
+    };
         return this._displayVisualTypes;
     }
 
