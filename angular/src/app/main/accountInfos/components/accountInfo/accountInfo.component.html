@@ -634,7 +634,7 @@
                                             </div>
                                         </div>
 
-                                        <div class="form-group row"
+                                        <!-- <div class="form-group row"
                                             *ngIf="(accountLevel == accountLevelEnum.Manual || (accountDataForView?.isConnected && currentTab === accountInfoPageTabsEnum.ProfileCreateOrEdit)) && !isRecordOwner">
                                             <label for="colFormLabelSm"
                                                 class="col-sm-2 col-form-label col-form-label-sm label-form">{{l("PriceLevel")}}</label>
@@ -648,11 +648,11 @@
                                             </div>
                                             <span *ngIf="accountInfoTemp?.priceLevel" class="mt-2"><a class="reset-link"
                                                     (click)="accountInfoTemp.priceLevel =null; changeTouchState()">Reset</a></span>
-                                        </div>
+                                        </div> -->
 
 
                                         <div class="form-group row"
-                                            *ngIf="accountInfoTemp?.accountType != 'People' && accountInfoTemp?.accountType != 'Personal'">
+                                             *ngIf="isRecordOwner && accountLevel == accountLevelEnum.Profile && accountInfoTemp?.accountType != 'People' && accountInfoTemp?.accountType != 'Personal'">
                                             <label for="colFormLabelSm"
                                                 class="col-sm-2 col-form-label col-form-label-sm label-form">
 
@@ -670,8 +670,7 @@
                                             </div>
                                         </div>
 
-                                        <div class="form-group row"
-                                            *ngIf="accountInfoTemp?.accountType != 'People' && accountInfoTemp?.accountType != 'Personal'">
+                                            <div class="form-group row" *ngIf="isRecordOwner && accountLevel == accountLevelEnum.Profile && accountInfoTemp?.accountType != 'People' && accountInfoTemp?.accountType != 'Personal'">
                                             <label for="colFormLabelSm"
                                                 class="col-sm-2 col-form-label col-form-label-sm label-form">
 
@@ -685,7 +684,7 @@
                                                     optionValue="value" (onChange)="changeTouchState()">
                                                 </p-dropdown>
                                             </div>
-                                        </div> -->
+                                        </div> 
 
                                         <!-- Phone 1 -->
                                         <div class="form-group row">
