@@ -7891,7 +7891,7 @@ namespace onetouch.AppSiiwiiTransaction
 
                                 if (chargeAmount > 0)
                                 {
-                                    decimal orderAmount = await _appTransactionDetails.GetAll().Where(e => e.TransactionId == pTransactionID && e.EntityObjectTypeId != entityObjectChargesId)
+                                    decimal orderAmount = await _appTransactionDetails.GetAll().Where(e => e.TransactionId == pTransactionID && e.EntityObjectTypeId != entityObjectChargesId && (e.ParentId == null || e.ParentId == 0))
                                         .SumAsync(e => e.Amount);
 
                                     shipping = orderAmount < minAmount ? chargeAmount : 0M;
@@ -7948,7 +7948,7 @@ namespace onetouch.AppSiiwiiTransaction
         public async Task<decimal> RecalculateTransactionTotalAmount(long transactionId)
         {
             decimal totalAmount = await _appTransactionDetails.GetAll()
-                .Where(a => a.TransactionId == transactionId)
+                .Where(a => a.TransactionId == transactionId && (a.ParentId == null || a.ParentId == 0) )
                 .SumAsync(a => a.Amount);
                 
             var header = await _appTransactionsHeaderRepository.GetAsync(transactionId);
