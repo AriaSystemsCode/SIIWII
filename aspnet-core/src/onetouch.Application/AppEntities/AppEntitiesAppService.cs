@@ -301,8 +301,10 @@ namespace onetouch.AppEntities
                         if (usedExtraDataPagedPerAttribute.Contains(EntityExtraData.AttributeId))
                         {
                             var extraDataAttrDtoPagedlocal = GetAppEntityExtraWithPaging(new GetAppEntityAttributesWithAttributeIdsInput { MaxResultCount = 10000, SkipCount = 0, AttributeIds = new List<long>() { EntityExtraData.AttributeId }, EntityId = entityId }).Result.Items.ToList();
-                            var extraDataSelectedValues = extraDataAttrDtoPagedlocal.Select(r => new ExtraDataSelectedValues { value = (r.AttributeValueFkName != null ? r.AttributeValueFkName : r.AttributeValue) });
-
+                            //I49-Charges new dycnamic lookups- need id not value [Begin]
+                            //var extraDataSelectedValues = extraDataAttrDtoPagedlocal.Select(r => new ExtraDataSelectedValues { value = (r.AttributeValueFkName != null ? r.AttributeValueFkName : r.AttributeValue) });
+                            var extraDataSelectedValues = extraDataAttrDtoPagedlocal.Select(r => new ExtraDataSelectedValues { value = (r.AttributeValueId>0? r.AttributeValueId.ToString():(r.AttributeValueFkName != null ? r.AttributeValueFkName : r.AttributeValue)) });
+                            //I49-Charges new dycnamic lookups- need id not value [End]
                             if (extraDataSelectedValues.ToList().Count > 0)
                             {
                                 var extraDataAttrDto = new ExtraDataAttrDto();
