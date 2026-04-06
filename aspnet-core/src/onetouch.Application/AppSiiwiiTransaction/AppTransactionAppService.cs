@@ -8141,7 +8141,7 @@ namespace onetouch.AppSiiwiiTransaction
         public async Task<decimal> RecalculateTransactionTotalAmount(long transactionId)
         {
             decimal totalAmount = await _appTransactionDetails.GetAll()
-                .Where(a => a.TransactionId == transactionId && (a.ParentId ==null || a.ParentId==0))
+                .Where(a => a.TransactionId == transactionId && (a.ParentId == null || a.ParentId == 0) )
                 .SumAsync(a => a.Amount);
                 
             var header = await _appTransactionsHeaderRepository.GetAsync(transactionId);
