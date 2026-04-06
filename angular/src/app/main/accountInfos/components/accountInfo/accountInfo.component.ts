@@ -155,7 +155,7 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit {
         private _activatedRoute: ActivatedRoute,
         private _sycIdentifierDefinitionsServiceProxy: SycIdentifierDefinitionsServiceProxy,
         private _marketplaceAccountsServiceProxy: MarketplaceAccountsServiceProxy,
-        private cdr: ChangeDetectorRef,
+    
         
     ) {
         super(injector);
@@ -169,12 +169,12 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit {
 
 
     async ngOnInit() {
-        this.getExtraAttributeLookupDataWithPaging()
+     
         this.roles = [
-            { name: 'Buyer', code: 'NY' },
-            { name: 'Seller', code: 'RM' },
-            { name: 'Sales Rep', code: 'LDN' },
-            { name: 'Buying Office', code: 'IST' },
+            { name: 'Buyer' },
+            { name: 'Seller' },
+            { name: 'Sales Rep' },
+            { name: 'Buying Office' },
          
         ];
 
@@ -923,7 +923,7 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit {
             this.setBooleanValue(714, true);
 
         }
-
+  this.updateMarketplaceRolesExtraData();
         this.accountInfoTemp.accountLevel = 0
         this._AccountsServiceProxy.createOrEditMyAccount(this.accountInfoTemp)
         .pipe(finalize(() => {
@@ -1540,30 +1540,40 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit {
     }
 
 
-      getExtraAttributeLookupDataWithPaging() {
-         this._AppEntitiesServiceProxy.getAllEntitiesByTypeCodeWithPaging(
-            undefined,
-            undefined,
-            undefined,
-            undefined,
-            undefined,false,
-            'MARKETPLACE-ROLE',
-            undefined,
-            undefined,
-            undefined,
-            'name',
-            0,
-            10
-        )  .pipe(
-            finalize(()=>{
-            
-            })
-        )
-        .subscribe((result)=>{
-        //    this.roles = result
+buildMarketplaceRolesExtraData(): AppEntityExtraDataDto[] {
+  if (!this.selectedRoles?.length) {
+    return [];
+  }
 
-        })
-     }
+  return this.selectedRoles.map(roleName => {
+    const dto = new AppEntityExtraDataDto();
 
+    dto.entityId = this.accountInfoTemp?.id || 0;
+    dto.entityObjectTypeId = 610;
+    dto.entityObjectTypeCode = 'MARKETPLACE-ROLE';
+    dto.entityObjectTypeName = 'Marketplace Role';
+    dto.attributeValueId = 0;
+    dto.attributeValue = roleName;
+    dto.attributeId = 0;
+    dto.attributeValueFkName = roleName;
+    dto.attributeValueFkCode = roleName;
+    dto.attributeCode = 'MARKETPLACE-ROLE';
+    dto.id = 0;
+
+    return dto;
+  });
+}
+updateMarketplaceRolesExtraData(): void {
+  const otherExtraData = (this.accountInfoTemp?.entityExtraData || []).filter(
+    item => item.entityObjectTypeCode !== 'MARKETPLACE-ROLE'
+  );
+
+  const marketplaceRoles = this.buildMarketplaceRolesExtraData();
+
+  this.accountInfoTemp.entityExtraData = [
+    ...otherExtraData,
+    ...marketplaceRoles
+  ];
+}
     
 }

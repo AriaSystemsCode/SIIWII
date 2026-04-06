@@ -2735,5 +2735,8 @@
 	<text name="PleaseEnterPhoneNumber">Please Enter Phone Number</text>
 	<text name="RelationshipSettings">Relationship Settings</text>
 	<text name="RelationshipSettingsHeaderInfo">Show and change relationship settings.</text>
+	<text name="MarketplaceRole">Marketplace Role</text>
+
+	
   </texts>  
 </localizationDictionary>

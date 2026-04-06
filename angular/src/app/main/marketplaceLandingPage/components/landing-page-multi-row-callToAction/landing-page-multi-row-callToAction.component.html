@@ -48,7 +48,7 @@
 
 
         <!-- EVENT -->
-        <div *ngSwitchCase="'EVENT'" class="mr-2">
+        <div *ngSwitchCase="'EVENT'" class="">
           <app-marketplace-event-card *ngIf="blockTypeIsSingleOrMixed =='Mixed Types Blocks'" [block]="block?.getAppEventForViewDto?.appEvent"  (details)="openEventDetails($event)"></app-marketplace-event-card>
           
 

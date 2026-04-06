@@ -78,33 +78,6 @@ export class QuestionsComponent extends AppComponentBase implements OnInit {
 
 
 
-
-  isUserReviewedEntityBefore() {
-    // this.showMainSpinner()
-    // const subs = this.messageServiceProxy
-    //   .isUserReviewedEntityBefore(
-    //     this.entityID
-
-    //   )
-    //   .pipe(
-    //     finalize(() => {
-    //       this.hideMainSpinner()
-    //     })
-    //   )
-    //   .subscribe((result) => {
-    //     if (result) {
-    //       this.SuccessMsg = true
-
-    //     } else {
-          this.postQuestion()
-    //     }
-    //   });
-
-    // this.subscriptions.push(subs);
-  }
-
-
-
   getAllQuestions() {
  
     this.showMainSpinner();

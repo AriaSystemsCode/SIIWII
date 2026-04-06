@@ -91,6 +91,12 @@ export class MarketplaceViewProductComponent
     isAuthenticated = this.appSession?.user
     relatedItems:any
     Warningmessage:string
+    refreshRatingFlag = false;
+    relatedTotal = 0;             
+    pageSize = 11;
+    loadingMore = false;
+
+
     public constructor(
         private _AppMarketplaceItemsServiceProxy: AppMarketplaceItemsServiceProxy,
         private _AppTransactionServiceProxy: AppTransactionServiceProxy,
@@ -990,139 +996,129 @@ export class MarketplaceViewProductComponent
         this.subscriptions.push(subs);
       }
 
-      refreshRatingFlag = false;
 
-handleRefreshRating(event: boolean) {
-  if (event === true) {
-
-
-  this.getProductDetailsForView()
-  this.getOverAllRatings()
-  }
-}
-
-
-hasColorStock(color: any): boolean {
-    if (!color || !color.sizes || !color.sizes.length) {
-      return false;
+    handleRefreshRating(event: boolean) {
+    if (event === true) {
+    this.getProductDetailsForView()
+    this.getOverAllRatings()
     }
-  
- 
-    return color.sizes.some((s: any) =>
-      (s.stockAvailability ?? 0) > 0 || (s.noOfAvailablePrepacks ?? 0) > 0
-    );
-  }
-  
-
-relatedTotal = 0;             
-pageSize = 11;
-loadingMore = false;
-
-
-
-getRelatedProducts(initial = false) {
-    const skipCount = initial ? 0 : this.relatedItems.length;
-    const maxResultCount = this.pageSize;
-  
-    this.loadingMore = true;
-  
-    this._AppMarketplaceItemsServiceProxy
-      .getAppItemRelatedItems(
-        /* contactSSIN */ undefined,
-        /* accountSSIN */ undefined,
-        /* tenantId */ null,
-        /* appItemListId */ null,
-        /* selectorOnly */ null,
-        /* filter */ null,
-        /* lastKey */ null,
-        /* selectorKey */ null,
-        /* arrtibuteFilters */ null,
-        /* departmentFilters */ null,
-        /* minimumPrice */ null,
-        /* maximumPrice */ null,
-        /* sharingLevel */ SharingLevels.Public,
-        /* onlyAvailableStock */ undefined,
-        /* soldOutFromDate */ undefined,
-        /* soldOutToDate */ undefined,
-        /* startShipFromDate */ undefined,
-        /* startShipToDate */ undefined,
-        /* brands */ null,
-        /* currencyCode */ this.productBodyData?.currencyCode ?? null,
-        /* itemSSIN */ this.productDetails?.code ?? this.productBodyData?.code ?? null,
-        /* categoryFilters */ null,
-        undefined,
-
-        /* sorting */ null,
-        /* skipCount */ skipCount,
-        /* maxResultCount */ maxResultCount
-      )
-      .pipe(finalize(() => (this.loadingMore = false)))
-      .subscribe(res => {
-        this.relatedTotal = res?.totalCount ?? this.relatedTotal;
-        const next = res?.items ?? [];
-  
-        // accumulate pages in order
-        this.relatedItems = initial ? next : [...this.relatedItems, ...next];
-      });
-  }
-  
-get relatedItemsUi(): any[] {
-    const loaded = this.relatedItems || [];
-    const hasMore = loaded.length < (this.relatedTotal || 0);
-  
-    if (!hasMore) {
-      // all items loaded; no ghost needed
-      return loaded;
     }
-  
-    // add one full ghost page
-    const ghostPage = Array.from({ length: this.pageSize }, () => ({ __ghost: true }));
-    return [...loaded, ...ghostPage];
-  }
-  
 
-  onRelatedPage(e: { first: number; rows: number }) {
-    const startIndex = e.first;
-    const pageSize   = e.rows;          // == this.pageSize
-    const ui         = this.relatedItemsUi;
-    const current    = ui[startIndex];
-    const hasMore    = this.relatedItems.length < this.relatedTotal;
-  
-    // If current page starts with a ghost, load the next page
-    if (current?.__ghost && hasMore && !this.loadingMore) {
-      this.getRelatedProducts(false);
-    }
-  }
-  
-  private resetProductViewState(): void {
-    this.productDetails = null;
-    this.productImages = [];
-    this.productVarImages = [];
-    this.colorsData = [];
-    this.filteredColors = [];
-    this.orderSummary = [];
-    this.totalOrderQTY = 0;
-    this.totlaOrderPrices = 0;
-    this.currentIndex = 0;
-    this.isColorView = false;
-  
-    // related products reset
-    this.relatedItems = [];
-    this.relatedTotal = 0;
-  }
-  
-  openRelatedProduct(id: number) {
-    this.router.navigate(['/app/main/marketplace/products/view', id]);
-  }
-  getSettingData(){
+
+    hasColorStock(color: any): boolean {
+        if (!color || !color.sizes || !color.sizes.length) {
+        return false;
+        }
     
-    this._AppEntitiesServiceProxy.getHostSettingValue(1218, null).subscribe({
-        next: (res) => {
-            this.Warningmessage = res
-        },
-     
-      });
-  }
+    
+        return color.sizes.some((s: any) =>
+        (s.stockAvailability ?? 0) > 0 || (s.noOfAvailablePrepacks ?? 0) > 0
+        );
+    }
+
+    getRelatedProducts(initial = false) {
+        const skipCount = initial ? 0 : this.relatedItems.length;
+        const maxResultCount = this.pageSize;
+    
+        this.loadingMore = true;
+    
+        this._AppMarketplaceItemsServiceProxy
+        .getAppItemRelatedItems(
+            /* contactSSIN */ undefined,
+            /* accountSSIN */ undefined,
+            /* tenantId */ null,
+            /* appItemListId */ null,
+            /* selectorOnly */ null,
+            /* filter */ null,
+            /* lastKey */ null,
+            /* selectorKey */ null,
+            /* arrtibuteFilters */ null,
+            /* departmentFilters */ null,
+            /* minimumPrice */ null,
+            /* maximumPrice */ null,
+            /* sharingLevel */ SharingLevels.Public,
+            /* onlyAvailableStock */ undefined,
+            /* soldOutFromDate */ undefined,
+            /* soldOutToDate */ undefined,
+            /* startShipFromDate */ undefined,
+            /* startShipToDate */ undefined,
+            /* brands */ null,
+            /* currencyCode */ this.productBodyData?.currencyCode ?? null,
+            /* itemSSIN */ this.productDetails?.code ?? this.productBodyData?.code ?? null,
+            /* categoryFilters */ null,
+            undefined,
+
+            /* sorting */ null,
+            /* skipCount */ skipCount,
+            /* maxResultCount */ maxResultCount
+        )
+        .pipe(finalize(() => (this.loadingMore = false)))
+        .subscribe(res => {
+            this.relatedTotal = res?.totalCount ?? this.relatedTotal;
+            const next = res?.items ?? [];
+    
+            // accumulate pages in order
+            this.relatedItems = initial ? next : [...this.relatedItems, ...next];
+        });
+    }
+    
+    get relatedItemsUi(): any[] {
+        const loaded = this.relatedItems || [];
+        const hasMore = loaded.length < (this.relatedTotal || 0);
+    
+        if (!hasMore) {
+        // all items loaded; no ghost needed
+        return loaded;
+        }
+    
+        // add one full ghost page
+        const ghostPage = Array.from({ length: this.pageSize }, () => ({ __ghost: true }));
+        return [...loaded, ...ghostPage];
+    }
+    
+
+    onRelatedPage(e: { first: number; rows: number }) {
+        const startIndex = e.first;
+        const pageSize   = e.rows;          // == this.pageSize
+        const ui         = this.relatedItemsUi;
+        const current    = ui[startIndex];
+        const hasMore    = this.relatedItems.length < this.relatedTotal;
+    
+        // If current page starts with a ghost, load the next page
+        if (current?.__ghost && hasMore && !this.loadingMore) {
+        this.getRelatedProducts(false);
+        }
+    }
+    
+    private resetProductViewState(): void {
+        this.productDetails = null;
+        this.productImages = [];
+        this.productVarImages = [];
+        this.colorsData = [];
+        this.filteredColors = [];
+        this.orderSummary = [];
+        this.totalOrderQTY = 0;
+        this.totlaOrderPrices = 0;
+        this.currentIndex = 0;
+        this.isColorView = false;
+    
+        // related products reset
+        this.relatedItems = [];
+        this.relatedTotal = 0;
+    }
+    
+    openRelatedProduct(id: number) {
+        this.router.navigate(['/app/main/marketplace/products/view', id]);
+    }
+    getSettingData(){
+        
+        this._AppEntitiesServiceProxy.getHostSettingValue(1218, null).subscribe({
+            next: (res) => {
+                this.Warningmessage = res
+            },
+        
+        });
+    }
     ngOnDestroy() {
         this.unsubscribeToAllSubscriptions();
         localStorage.removeItem("productData");

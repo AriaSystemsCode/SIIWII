@@ -103,13 +103,10 @@ export class ProductFiltersComponent extends AppComponentBase implements OnInit,
       this.startShipDate = parsedFilters.startShipData ? new Date(parsedFilters.startShipData) : null;
       this.endShipDate = parsedFilters.endShipData ? new Date(parsedFilters.endShipData) : null;
 
-      // this.selctedBradns = parsedFilters.brands;
 
 
     }
 
-
-   //this.accountSSIN = localStorage.getItem("SellerSSIN");
    this.accountSSIN = 
    (sessionStorage.getItem("SellerSSIN") && sessionStorage.getItem("SellerSSIN") != "undefined") ?
     JSON.parse(sessionStorage.getItem("SellerSSIN")) : localStorage.getItem("SellerSSIN") ;

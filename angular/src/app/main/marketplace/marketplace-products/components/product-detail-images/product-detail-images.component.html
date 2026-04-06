@@ -15,36 +15,26 @@
           <source [src]="getUrl(a)" />
         </video>
 
-        <!-- PDF thumb (icon box) -->
-        <!-- <div *ngIf="kindOf(a) === 'pdf'" (click)="setMainImage(i)"
-          class="imageSlides d-flex align-items-center justify-content-center bg-light position-relative"
-          [ngClass]="i === currentIndex ? 'border border-primary ' : ''"
-          style="height:70px;width:50px;cursor:pointer;background:url('assets/Items/pdf-Icon.png');background-position: center;background-size: contain;background-repeat: no-repeat !important;">
-          <i class="fa fa-file-pdf-o" aria-hidden="true"></i>
-        </div> -->
 
-    <!-- PDF thumb (thumbnail if ready, else icon) -->
-<div *ngIf="kindOf(a) === 'pdf'" (click)="setMainImage(i)"
-class="imageSlides d-flex align-items-center justify-content-center bg-light position-relative overflow-hidden"
-[ngClass]="i === currentIndex ? 'border border-primary ' : ''"
-style="height:70px;width:50px;cursor:pointer;">
+        <!-- PDF thumb (thumbnail if ready, else icon) -->
+        <div *ngIf="kindOf(a) === 'pdf'" (click)="setMainImage(i)"
+          class="imageSlides d-flex align-items-center justify-content-center bg-light position-relative overflow-hidden"
+          [ngClass]="i === currentIndex ? 'border border-primary ' : ''" style="height:70px;width:50px;cursor:pointer;">
 
-<!-- loading spinner -->
-<div *ngIf="pdfThumbLoadingMap[i]" class="w-100 h-100 d-flex align-items-center justify-content-center">
-  <i class="fa fa-spinner fa-spin"></i>
-</div>
+          <!-- loading spinner -->
+          <div *ngIf="pdfThumbLoadingMap[i]" class="w-100 h-100 d-flex align-items-center justify-content-center">
+            <i class="fa fa-spinner fa-spin"></i>
+          </div>
 
-<!-- thumbnail -->
-<img *ngIf="!pdfThumbLoadingMap[i] && pdfThumbMap[i]"
-     [src]="pdfThumbMap[i]"
-     style="width:100%;height:100%;object-fit:cover;" />
+          <!-- thumbnail -->
+          <img *ngIf="!pdfThumbLoadingMap[i] && pdfThumbMap[i]" [src]="pdfThumbMap[i]"
+            style="width:100%;height:100%;object-fit:cover;" />
 
-<!-- fallback icon -->
-<div *ngIf="!pdfThumbLoadingMap[i] && !pdfThumbMap[i]"
-     class="w-100 h-100"
-     style="background:url('assets/Items/pdf-Icon.png');background-position:center;background-size:contain;background-repeat:no-repeat;">
-</div>
-</div>
+          <!-- fallback icon -->
+          <div *ngIf="!pdfThumbLoadingMap[i] && !pdfThumbMap[i]" class="w-100 h-100"
+            style="background:url('assets/Items/pdf-Icon.png');background-position:center;background-size:contain;background-repeat:no-repeat;">
+          </div>
+        </div>
 
 
         <!-- OTHER -->
@@ -65,7 +55,7 @@ style="height:70px;width:50px;cursor:pointer;">
               (click)="setMainImage(i)" onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'"
               [ngClass]="i === currentIndex ? 'border border-primary ' : ''" />
             <!-- VIDEO thumb -->
-            <video *ngIf="kindOf(a) === 'video'" class="imageSlides mb-2" muted playsinline preload="metadata" 
+            <video *ngIf="kindOf(a) === 'video'" class="imageSlides mb-2" muted playsinline preload="metadata"
               (click)="setMainImage(i)" [ngClass]="i === currentIndex ? 'border border-primary ' : ''">
               <source [src]="getUrl(a)" />
             </video>
@@ -94,32 +84,21 @@ style="height:70px;width:50px;cursor:pointer;">
 
     <!-- Main viewer -->
     <div class="main-image">
-      <!-- IMAGE (keeps your colorView override) -->
-      <!-- <img *ngIf="kindOf(productImages[currentIndex]) === 'image' && !colorView"
-        [src]="getUrl(productImages[currentIndex])" alt="main image" class="main"
+
+
+      <!-- MAIN IMAGE -->
+      <img *ngIf="kindOf(productImages[currentIndex]) === 'image' && !colorView"
+        [src]="getUrl(productImages[currentIndex])" class="main" style="cursor: zoom-in;"
+        (click)="openImagePreview(getUrl(productImages[currentIndex]))"
         onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'" />
 
       <img *ngIf="kindOf(productImages[currentIndex]) === 'image' && colorView"
-        [src]="attachmentBaseUrl + '/' + colorAttachmentForMainIamge" alt="main image" class="main"
-        onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'" /> -->
-
-
-<!-- MAIN IMAGE -->
-<img *ngIf="kindOf(productImages[currentIndex]) === 'image' && !colorView"
-     [src]="getUrl(productImages[currentIndex])"
-     class="main"
-     style="cursor: zoom-in;"
-     (click)="openImagePreview(getUrl(productImages[currentIndex]))"
-     onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'" />
-
-<img *ngIf="kindOf(productImages[currentIndex]) === 'image' && colorView"
-     [src]="attachmentBaseUrl + '/' + colorAttachmentForMainIamge"
-     class="main"
-     style="cursor: zoom-in;"
-     (click)="openImagePreview(attachmentBaseUrl + '/' + colorAttachmentForMainIamge)"
-     onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'" />
-        <!-- VIDEO -->
-      <video *ngIf="kindOf(productImages[currentIndex]) === 'video'" class="main" controls playsinline style="min-height: 40vh !important;">
+        [src]="attachmentBaseUrl + '/' + colorAttachmentForMainIamge" class="main" style="cursor: zoom-in;"
+        (click)="openImagePreview(attachmentBaseUrl + '/' + colorAttachmentForMainIamge)"
+        onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'" />
+      <!-- VIDEO -->
+      <video *ngIf="kindOf(productImages[currentIndex]) === 'video'" class="main" controls playsinline
+        style="min-height: 40vh !important;">
         <source [src]="getUrl(productImages[currentIndex])" />
         Your browser does not support the video tag.
       </video>
@@ -127,70 +106,41 @@ style="height:70px;width:50px;cursor:pointer;">
 
 
 
-      <!-- MAIN PDF -->
-      <!-- <ng-container *ngIf="kindOf(productImages[currentIndex]) === 'pdf'">
-        <div class="position-relative w-100">
-          <iframe class="w-100 imageContainer" [src]="pdfSafeMap[currentIndex]" 
-            [ngStyle]="{ height: loadingError ? '0px' : '48vh' }" frameborder="0" (error)="loadingError = true">
-          </iframe>
+      <!-- MAIN PDF (thumbnail image + click opens PDF) -->
+      <ng-container *ngIf="kindOf(productImages[currentIndex]) === 'pdf'">
 
-          <div *ngIf="loadingError" class="p-2">
-            Unable to display this PDF here.
-            <a [href]="getUrl(productImages[currentIndex])" target="_blank" rel="noopener">Open in new tab</a>
-          </div>
-          <button type="button" class="btn text-white  p-0 m-0" (click)="openNewTab(productImages[currentIndex])"
-            style="position:absolute; top:17px; left:10px; font-size: 13px;">
-           <i class="fa fa-eye"></i>
-          </button>
+        <!--  Loading -->
+        <div *ngIf="pdfThumbLoading" class="d-flex align-items-center justify-content-center"
+          style="min-width: 200px;height: 150px;">
+          <i class="fa fa-spinner fa-spin fa-2x text-primary"></i>
+          <span class="mx-3">Loading preview...</span>
         </div>
-      </ng-container> -->
 
-<!-- MAIN PDF (thumbnail image + click opens PDF) -->
-<ng-container *ngIf="kindOf(productImages[currentIndex]) === 'pdf'">
+        <!-- 🖼 Thumbnail -->
+        <img *ngIf="!pdfThumbLoading && pdfThumbMap[currentIndex]" class="w-100 imageContainer main"
+          [src]="pdfThumbMap[currentIndex]" style="cursor:pointer; object-fit:contain;"
+          (click)="openNewTab(productImages[currentIndex])" />
 
-  <!-- 🔄 Loading -->
-  <div *ngIf="pdfThumbLoading" 
-       class="d-flex align-items-center justify-content-center"
-       style="min-width: 200px;height: 150px;">
-    <i class="fa fa-spinner fa-spin fa-2x text-primary"></i>
-    <span class="mx-3">Loading preview...</span>
-  </div>
 
-  <!-- 🖼 Thumbnail -->
-  <img *ngIf="!pdfThumbLoading && pdfThumbMap[currentIndex]"
-       class="w-100 imageContainer main"
-       [src]="pdfThumbMap[currentIndex]"
-       style="cursor:pointer; object-fit:contain;"
-       (click)="openNewTab(productImages[currentIndex])" />
+        <div *ngIf="!pdfThumbLoading && loadingError" class="p-2 text-danger">
+          Unable to generate PDF preview.
+          <a [href]="getUrl(productImages[currentIndex])" target="_blank" rel="noopener">
+            Open in new tab
+          </a>
+        </div>
 
- 
-  <div *ngIf="!pdfThumbLoading && loadingError" class="p-2 text-danger">
-    Unable to generate PDF preview.
-    <a [href]="getUrl(productImages[currentIndex])"
-       target="_blank"
-       rel="noopener">
-       Open in new tab
-    </a>
-  </div>
+      </ng-container>
 
-</ng-container>
+      <p-dialog [(visible)]="showImagePreview" [modal]="true" [closable]="true" [dismissableMask]="true"
+        [draggable]="false" [resizable]="false" [style]="{width: '70vw', maxWidth: '900px'}"
+        [contentStyle]="{padding: '0'}">
 
-<p-dialog [(visible)]="showImagePreview"
-          [modal]="true"
-          [closable]="true"
-          [dismissableMask]="true"
-          [draggable]="false"
-          [resizable]="false"
-          [style]="{width: '70vw', maxWidth: '900px'}"
-          [contentStyle]="{padding: '0'}">
+        <div class="d-flex align-items-center justify-content-center p-3">
+          <img [src]="previewImageUrl" style="max-width: 100%; max-height: 70vh; object-fit: contain;"
+            onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'" />
+        </div>
 
-  <div class="d-flex align-items-center justify-content-center p-3">
-    <img [src]="previewImageUrl"
-         style="max-width: 100%; max-height: 70vh; object-fit: contain;"
-         onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'" />
-  </div>
-
-</p-dialog>
+      </p-dialog>
 
     </div>
   </div>

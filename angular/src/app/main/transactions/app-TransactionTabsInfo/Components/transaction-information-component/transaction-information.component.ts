@@ -1694,7 +1694,7 @@ export class TransactionInformationComponent
         });
       }
 
-      // ✅ Add this if missing
+      //  Add this if missing
       if (!attr.paginationSetting) {
         attr.paginationSetting = {
           skipCount: 0,
