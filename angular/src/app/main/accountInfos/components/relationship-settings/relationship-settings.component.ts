@@ -165,7 +165,7 @@ dynamicInputsComponents!: QueryList<dynamicInputs>;
 
           const tempAtt = new LookupLabelDto({
             code: extraAttr.code,
-            label: extraAttr.selectedValues,
+            label: result.items.find(x=>x.value ==extraAttr.selectedValues).label ?? extraAttr.selectedValues,
             stockAvailability: undefined,
             value: extraAttr.selectedValues,
             isHostRecord: false,
