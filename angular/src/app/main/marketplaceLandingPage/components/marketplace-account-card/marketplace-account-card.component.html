@@ -19,26 +19,19 @@
     <div class="mp-acc-meta">
 
       <!-- Connections -->
-      <div class="meta-item"  [pTooltip]="'Connections' | localize" tooltipPosition="bottom" >
+      <div class="meta-item"  [pTooltip]="'Connections' | localize" tooltipPosition="bottom"   [tooltipEvent]="isSmallScreen ? 'focus' : 'hover'" [autoHide]="true" [showDelay]="100" [hideDelay]="100"
+                [tabindex]="isSmallScreen ? 0 : null">
         <i class="fas fa-users meta-ico"></i>
         <span class="meta-value">{{ account?.connectionCount || 0 }}</span>
       </div>
 
       <!-- Country -->
-      <div class="meta-item" *ngIf="account?.account?.countryName"  [pTooltip]="'Country' | localize" tooltipPosition="bottom">
+      <div class="meta-item" *ngIf="account?.account?.countryName"  [pTooltip]="'Country' | localize" tooltipPosition="bottom"   [tooltipEvent]="isSmallScreen ? 'focus' : 'hover'" [autoHide]="true" [showDelay]="100" [hideDelay]="100"
+                [tabindex]="isSmallScreen ? 0 : null">
         <i class="fas fa-map-marker-alt meta-ico"></i>
         <span class="meta-value">{{ account?.account?.countryName }}</span>
       </div>
 
-      <!-- Account type as icon -->
-      <!-- <div
-       
-        *ngIf="account?.account?.accountType"
-        [pTooltip]="'AccountType' | localize" tooltipPosition="bottom"
-      >
-        <i class="fas fa-tag meta-ico"></i> <span  class="meta-item acc-type-item mx-1 p-2"> {{account?.account?.accountType}} </span>
- 
-      </div> -->
 
     </div>
 

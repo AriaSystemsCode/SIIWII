@@ -189,100 +189,109 @@ export class AccountsComponent
     }
 
     getAccounts(event?: LazyLoadEvent) {
+    if (this.primengTableHelper.shouldResetPaging(event)) {
+        this.paginator.totalRecords = 10;
+        this.paginator.changePage(0);
+        return;
+    }
 
-        if (this.primengTableHelper.shouldResetPaging(event)) {
-            this.paginator.totalRecords = 10;
-            this.paginator.changePage(0);
-            return;
-        }
-        const filters = this.filterForm.value;
-        const classificationsFilters: TreeNodeOfGetSycEntityObjectClassificationForViewDto[] =
-            filters.classifications;
-        const categoriesFilters: TreeNodeOfGetSycEntityObjectCategoryForViewDto[] =
-            filters.categories;
-        if (Array.isArray(classificationsFilters)) {
-            filters.classifications = [];
-            classificationsFilters.forEach((item) => {
-                const id = item.data.sycEntityObjectClassification.id;
-                filters.classifications.push(id);
-            });
-        }
-        if (Array.isArray(categoriesFilters)) {
-            filters.categories = [];
-            categoriesFilters.forEach((item) => {
-                const id = item.data.sycEntityObjectCategory.id;
-                filters.categories.push(id);
-            });
-        }
+    const filters = this.filterForm.value;
 
-        this.primengTableHelper.showLoadingIndicator();
-        this.showMainSpinner();
-        this.loading = true;
-        let apiCall;
+    const classificationsFilters: TreeNodeOfGetSycEntityObjectClassificationForViewDto[] =
+        filters.classifications;
+    const categoriesFilters: TreeNodeOfGetSycEntityObjectCategoryForViewDto[] =
+        filters.categories;
 
-        if (!this.fromMarketplace) {
-            apiCall = this._accountsServiceProxy.getAll(
-                filters.search || undefined,
-                filters?.mainFilterType?.value || undefined,
-                undefined,
-                undefined,
-                filters.city || undefined,
-                filters.state || undefined,
-                filters.postalCode || undefined,
-                filters?.ssin || undefined,
-                filters?.accountTypeId || undefined,
-                filters?.accountType || undefined,
-                filters.accountTypes || undefined,
-                filters.statuses || undefined,
-                filters.languages || undefined,
-                filters.countries || undefined,
-                filters.classifications || undefined,
-                filters.categories || undefined,
-                filters.currencies || undefined,
-                undefined,
-                filters?.sorting?.value || undefined,
-                this.primengTableHelper.getSkipCount(this.paginator, event),
-                this.primengTableHelper.getMaxResultCount(this.paginator, event)
-            );
-        } else {
-            apiCall = this._marketplaceAccountsServiceProxy.getAll(
-                filters.search || undefined,
-                undefined,
-                undefined,
-                undefined,
-                filters.city || undefined,
-                filters.state || undefined,
-                filters.postalCode || undefined,
-                filters?.ssin || undefined,
-                filters?.accountTypeId || undefined,
-                filters?.accountType || undefined,
-                filters.accountTypes || undefined,
-                filters.statuses || undefined,
-                filters.languages || undefined,
-                filters.countries || undefined,
-                filters.classifications || undefined,
-                filters.categories || undefined,
-                filters.currencies || undefined,
-                undefined,
-                filters?.sorting?.value || undefined,
-                this.primengTableHelper.getSkipCount(this.paginator, event),
-                this.primengTableHelper.getMaxResultCount(this.paginator, event)
-            );
-        }
-
-        apiCall.pipe(
-            finalize(() => {
-                this.primengTableHelper.hideLoadingIndicator();
-                if (!this.active) this.active = true;
-                this.loading = false;
-                this.hideMainSpinner();
-            })
-        ).subscribe((result) => {
-            this.accounts = result.items;
-            this.primengTableHelper.totalRecordsCount = result.totalCount;
-            this.primengTableHelper.records = result.items;
+    if (Array.isArray(classificationsFilters)) {
+        filters.classifications = [];
+        classificationsFilters.forEach((item) => {
+            const id = item.data.sycEntityObjectClassification.id;
+            filters.classifications.push(id);
         });
     }
+
+    if (Array.isArray(categoriesFilters)) {
+        filters.categories = [];
+        categoriesFilters.forEach((item) => {
+            const id = item.data.sycEntityObjectCategory.id;
+            filters.categories.push(id);
+        });
+    }
+
+    const accountTypesFilter =
+        filters.accountTypes === null || filters.accountTypes === undefined || filters.accountTypes === ''
+            ? undefined
+            : [filters.accountTypes];
+
+    this.primengTableHelper.showLoadingIndicator();
+    this.showMainSpinner();
+    this.loading = true;
+
+    let apiCall;
+
+    if (!this.fromMarketplace) {
+        apiCall = this._accountsServiceProxy.getAll(
+            filters.search || undefined,
+            filters?.mainFilterType?.value || undefined,
+            undefined,
+            undefined,
+            filters.city || undefined,
+            filters.state || undefined,
+            filters.postalCode || undefined,
+            filters?.ssin || undefined,
+            filters?.accountTypeId || undefined,
+            filters?.accountType || undefined,
+            accountTypesFilter,
+            filters.statuses || undefined,
+            filters.languages || undefined,
+            filters.countries || undefined,
+            filters.classifications || undefined,
+            filters.categories || undefined,
+            filters.currencies || undefined,
+            undefined,
+            filters?.sorting?.value || undefined,
+            this.primengTableHelper.getSkipCount(this.paginator, event),
+            this.primengTableHelper.getMaxResultCount(this.paginator, event)
+        );
+    } else {
+        apiCall = this._marketplaceAccountsServiceProxy.getAll(
+            filters.search || undefined,
+            undefined,
+            undefined,
+            undefined,
+            filters.city || undefined,
+            filters.state || undefined,
+            filters.postalCode || undefined,
+            filters?.ssin || undefined,
+            filters?.accountTypeId || undefined,
+            filters?.accountType || undefined,
+            accountTypesFilter,
+            filters.statuses || undefined,
+            filters.languages || undefined,
+            filters.countries || undefined,
+            filters.classifications || undefined,
+            filters.categories || undefined,
+            filters.currencies || undefined,
+            undefined,
+            filters?.sorting?.value || undefined,
+            this.primengTableHelper.getSkipCount(this.paginator, event),
+            this.primengTableHelper.getMaxResultCount(this.paginator, event)
+        );
+    }
+
+    apiCall.pipe(
+        finalize(() => {
+            this.primengTableHelper.hideLoadingIndicator();
+            if (!this.active) this.active = true;
+            this.loading = false;
+            this.hideMainSpinner();
+        })
+    ).subscribe((result) => {
+        this.accounts = result.items;
+        this.primengTableHelper.totalRecordsCount = result.totalCount;
+        this.primengTableHelper.records = result.items;
+    });
+}
 
     reloadPage(): void {
         this.paginator.changePage(this.paginator.getPage());

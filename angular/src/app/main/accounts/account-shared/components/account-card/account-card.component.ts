@@ -28,7 +28,21 @@ export class AccountCardComponent extends AppComponentBase implements OnChanges 
     isAuthenticated: boolean = false;
 
     isSmallScreen = false;
+// availableRelationOptions = [
+//   { label: 'Employ', value: 'Employ' },
+//   { label: 'Freelancer', value: 'Freelancer' },
+//   { label: 'Connect', value: 'Connect' }
+// ];
 
+// // selected values (for dropdown)
+// selectedRelationValues: string[] = ['Employ'];
+
+// // chips (displayed)
+selectedRelations = [
+  { label: 'Employ', value: 'Employ' }
+];
+
+isTouchDevice = false;
     constructor(
         injector:Injector,
         private router:Router,
@@ -36,6 +50,14 @@ export class AccountCardComponent extends AppComponentBase implements OnChanges 
     ){
         super(injector);
     }
+onRelationsChanged(): void {
+  // this.selectedRelations = this.availableRelationOptions.filter(x =>
+  //   this.selectedRelationValues.includes(x.value)
+  // );
+}
+
+
+
 
     ngOnInit(){
       this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
@@ -190,4 +212,8 @@ getAccountTypeIcon(type: string): string {
 
   return 'fas fa-tag';
 }
+
+    stopPropagation($event) {
+        $event.stopPropagation() // stop click event bubbling
+    }
 }

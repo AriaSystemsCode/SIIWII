@@ -2,7 +2,8 @@
   <div *ngFor="let block of sliderItems" class="product-col">
     <div class="block-card" [ngClass]=" blockTypeIsSingleOrMixed !='Single Type Blocks'?  'block-card-mixed':''" [style.aspect-ratio]="acceptedAspectRatio">
       <div class="block-type-badge"  [ngClass]="isArabic ? 'arPos':'enPos'">
-    <i [ngClass]="getBlockTypeIcon(block)" [pTooltip]="getBlockTypeLabel(block) | localize" tooltipPosition="bottom"></i>
+    <i [ngClass]="getBlockTypeIcon(block)" [pTooltip]="getBlockTypeLabel(block) | localize" tooltipPosition="bottom"   [tooltipEvent]="isSmallScreen ? 'focus' : 'hover'" [autoHide]="true" [showDelay]="100" [hideDelay]="100"
+                [tabindex]="isSmallScreen ? 0 : null"></i>
     <!-- <span>{{ getBlockTypeLabel(block?.blockType) }}</span> -->
   </div>
       <ng-container [ngSwitch]="block?.blockType?.toUpperCase()">
