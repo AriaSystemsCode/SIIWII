@@ -657,9 +657,13 @@ export abstract class AppComponentBase {
     poRolesOptions=[];
 
     getTenantRoles() {
+          debugger;
         //i49-getTenantRole
         this.tenantRoles.push("seller");
-         this.tenantRoles.push("buyer");
+       // this.tenantRoles.push("sales rep");
+        this.tenantRoles.push("buyer");
+          this.tenantRoles.push("buying office");
+
         const _tenantRoles = this.tenantRoles.map(r => r.toLowerCase());
 
         this.tenantRoleFlags = {
