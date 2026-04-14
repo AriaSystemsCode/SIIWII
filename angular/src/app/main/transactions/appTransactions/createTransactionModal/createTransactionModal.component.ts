@@ -216,18 +216,22 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit, 
     getUserDefultRole() {
         this._AppTransactionServiceProxy.getUserDefaultRole(this.formType?.toUpperCase()).subscribe(result => {
             if (this.formType?.toUpperCase() == "SO") {
-                if (result?.toLowerCase().includes('seller') && this.roles.map(x=>x.name.toLowerCase()).includes('seller')) {
-                    this.roleDdval = this.roles.filter(role => role.code == 1)[0];
+                if (result?.toLowerCase().includes('seller') && this.soRolesOptions
+  .map(x => x.name.toLowerCase())
+  .some(x => x.includes('seller'))) {
+                    this.roleDdval = this.soRolesOptions.filter(role => role.code == 1)[0];
 
                 } else {
-                    this.roleDdval = this.roles.filter(role => role.code !== 1)[0];
+                    this.roleDdval = this.soRolesOptions.filter(role => role.code !== 1)[0];
                 }
             } else if (this.formType?.toUpperCase() == "PO") {
-                if (result?.toLowerCase().includes('buyer')&&  this.roles.map(x=>x.name.toLowerCase()).includes('buyer')) {
-                    this.roleDdval = this.roles.filter(role => role.code == 2)[0];
+                if (result?.toLowerCase().includes('buyer')&&  this.poRolesOptions
+  .map(x => x.name.toLowerCase())
+  .some(x => x.includes('buyer'))) {
+                    this.roleDdval = this.poRolesOptions.filter(role => role.code == 2)[0];
 
                 } else {
-                    this.roleDdval = this.roles.filter(role => role.code !== 2)[0];
+                    this.roleDdval = this.poRolesOptions.filter(role => role.code !== 2)[0];
                 }
             }
             this.handleRoleChange({ value: this.roleDdval });
