@@ -136,6 +136,10 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit, 
     languageSettingName  =AppConsts.languageSettingName;
     currentLang:string
     isArabic:boolean = true
+    showSellerRelationshipIcon:boolean=false;
+    showBuyerRelationshipIcon:boolean=false;
+    buyerRelationshipName:string="";
+    sellerRelationshipName:string="";
     constructor(
         injector: Injector,
         private fb: FormBuilder,
@@ -462,6 +466,10 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit, 
         this.handleBuyerNameSearch("");
         this.buyerBranches = [];
         this.getBranches(this.buyerCompanySSIN, 'buyer')
+
+          this.showBuyerRelationshipIcon = true;
+          //i49-get buyerRelationshipName
+        this.buyerRelationshipName = event.value?.relationshipName || '';
     }
 
     handleSellerCompanyChange(event: any) {
@@ -476,6 +484,10 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit, 
         this.handleSellerNameSearch("");
         this.sellerBranches = [];
         this.getBranches(this.sellerCompanySSIN, 'seller')
+
+         this.showSellerRelationshipIcon = true;
+          //i49-get sellerRelationshipName
+        this.sellerRelationshipName = event.value?.relationshipName || '';
     }
     loadInitialContacts() {
         this._AppTransactionServiceProxy
@@ -1106,7 +1118,10 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit, 
         this.invalidBuyerPhoneNumber = "";
         this.invalidBuyerContactEMailAddress = "";
         this.invalidSellerContactEMailAddress = "";
-
+        this.showBuyerRelationshipIcon = false;
+        this.showSellerRelationshipIcon = false;
+        this.buyerRelationshipName = '';
+        this.sellerRelationshipName = '';
     }
 
 
@@ -1174,8 +1189,9 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit, 
         this.invalidBuyerPhoneNumber = "";
         this.invalidBuyerContactEMailAddress = "";
         this.invalidSellerContactEMailAddress = "";
-
-
-
+        this.showBuyerRelationshipIcon = false;
+        this.showSellerRelationshipIcon = false;
+        this.buyerRelationshipName = '';
+        this.sellerRelationshipName = '';
 }
 }

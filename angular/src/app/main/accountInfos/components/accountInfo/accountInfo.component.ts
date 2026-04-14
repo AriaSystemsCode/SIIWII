@@ -142,6 +142,7 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit {
     relationId:number = 0 ;
     roles:any
             selectedRoles!: any[];
+            roleSeller:boolean = false;
     constructor(
         injector: Injector,
         private _route: ActivatedRoute,
@@ -180,6 +181,9 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit {
 
       if (this.accountLevel == null) {
         this.accountLevel = AccountLevelEnum.Profile;
+
+        //i49-getRelationshipRoles
+         // this.roleSeller =this.getRelationshipRoles();
       }
     
       await this.handleComponentMode();
