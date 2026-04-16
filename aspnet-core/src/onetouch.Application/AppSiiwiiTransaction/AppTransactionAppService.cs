@@ -1,4 +1,4 @@
-﻿using AuthorizeNet.Api.Contracts.V1;
+using AuthorizeNet.Api.Contracts.V1;
 using onetouch.AppSiiwiiTransaction.Dtos;
 using onetouch.AppTransactions.Dtos;
 using onetouch.Authorization;
@@ -2279,6 +2279,7 @@ namespace onetouch.AppSiiwiiTransaction
             return accounts;
 
         }
+        /*
         public async Task<PagedResultDto<GetAccountInformationOutputDto>> GetRelatedAccounts(GetAllAccountsInput accountFilter, bool? lExclueMyAcc = false, string? transactionType = null)
         {
 
@@ -2348,6 +2349,72 @@ namespace onetouch.AppSiiwiiTransaction
 
             return x;
 
+        }
+        */
+
+        public async Task<PagedResultDto<GetAccountInformationOutputDto>> GetRelatedAccounts(GetAllAccountsInput accountFilter, bool? lExclueMyAcc = false, string? transactionType = null)
+        {
+            var currentAccount = await _appContactRepository.GetAll().Include(z => z.EntityFk)
+                .Where(z => z.TenantId == AbpSession.TenantId 
+                && z.IsProfileData == true 
+                && z.ParentId == null && z.ParentId == null)
+                .FirstOrDefaultAsync();
+            
+            var ssin = currentAccount?.SSIN ?? "";
+
+            var relationships = _appContactRelationshipInfoRepository.GetAll()
+                .Where(r => r.RelationshipEndDate != null && 
+                ((r.RequesterContactSSIN == ssin 
+                //&& (r.RecipientMarketplaceRole == transactionType || r.RecipientMarketplaceRole == null)
+                )
+                  ||
+                 (r.RecipientContactSSIN == ssin 
+                 //&& r.RequesterMarketplaceRole == transactionType || r.RequesterMarketplaceRole == null)
+                 )
+                  );
+
+            var relatedAccountsQuery = _appContactRepository.GetAll()
+                .Include(z => z.EntityFk)
+                .Include(a => a.CurrencyFk).ThenInclude(z => z.EntityExtraData)
+                .Where(z => z.TenantId == AbpSession.TenantId && z.EntityFk.TenantOwner != AbpSession.TenantId)
+                .Where(z => relationships.Any(r =>
+                    (r.RequesterContactSSIN == ssin && r.RecipientContactSSIN == z.SSIN) ||
+                    (r.RecipientContactSSIN == ssin && r.RequesterContactSSIN == z.SSIN)
+                ));
+
+            var results = await (from z in relatedAccountsQuery
+                                 from r in relationships
+                                 where (r.RequesterContactSSIN == ssin && r.RecipientContactSSIN == z.SSIN) ||
+                                       (r.RecipientContactSSIN == ssin && r.RequesterContactSSIN == z.SSIN)
+                                 select new GetAccountInformationOutputDto
+                                 {
+                                     Id = z.Id,
+                                     Name = z.Name.TrimEnd(),
+                                     AccountSSIN = z.SSIN,
+                                     Code = z.Code,
+                                     Role = (r.RequesterContactSSIN == ssin ? r.RecipientContactTypeCode : r.RequesterContactTypeCode),
+                                     CurrencyCode = new CurrencyInfoDto
+                                     {
+                                         Code = z.CurrencyId != null ? z.CurrencyFk.Code : "",
+                                         Value = z.CurrencyId != null ? (long)z.CurrencyId : 0,
+                                         Label = z.CurrencyFk == null ? "" : z.CurrencyFk.Name,
+                                         Symbol = (z.CurrencyFk != null && z.CurrencyFk.EntityExtraData != null) &&
+                                                  z.CurrencyFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 41) != null ?
+                                                  z.CurrencyFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 41).AttributeValue : ""
+                                     },
+                                     Email = z.EMailAddress,
+                                     Phone = !string.IsNullOrEmpty(z.Phone1Number) ? z.Phone1Number :
+                                             (!string.IsNullOrEmpty(z.Phone2Number) ? z.Phone2Number :
+                                             (!string.IsNullOrEmpty(z.Phone3Number) ? z.Phone3Number : null)),
+                                     PhoneTypeId = !string.IsNullOrEmpty(z.Phone1Number) ? z.Phone1TypeId :
+                                                  (!string.IsNullOrEmpty(z.Phone2Number) ? z.Phone2TypeId :
+                                                  (!string.IsNullOrEmpty(z.Phone3Number) ? z.Phone3TypeId : null)),
+                                     PhoneTypeName = !string.IsNullOrEmpty(z.Phone1Number) ? z.Phone1TypeName :
+                                                    (!string.IsNullOrEmpty(z.Phone2Number) ? z.Phone2TypeName :
+                                                    (!string.IsNullOrEmpty(z.Phone3Number) ? z.Phone3TypeName : null))
+                                 }).ToListAsync();
+
+            return new PagedResultDto<GetAccountInformationOutputDto>(results.Count, results);
         }
 
         //tenantCurrencyInfoDto.Code = account.CurrencyFk.Code;

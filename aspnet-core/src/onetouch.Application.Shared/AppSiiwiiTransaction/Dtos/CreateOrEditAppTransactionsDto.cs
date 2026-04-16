@@ -1,4 +1,4 @@
-﻿using onetouch.SystemObjects;
+using onetouch.SystemObjects;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -117,6 +117,8 @@ namespace onetouch.AppSiiwiiTransaction.Dtos
         public long? PhoneTypeId { get; set; }
         public string PhoneTypeName { set; get; }
         public string Code { set; get; }
+        public string Role { set; get; }
+        public string RoleName { set; get; }
     }
     public class GetContactInformationDto
     {
