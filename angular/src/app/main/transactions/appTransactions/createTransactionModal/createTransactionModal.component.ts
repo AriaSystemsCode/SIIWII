@@ -136,6 +136,10 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit, 
     languageSettingName  =AppConsts.languageSettingName;
     currentLang:string
     isArabic:boolean = true
+    showSellerRelationshipIcon:boolean=false;
+    showBuyerRelationshipIcon:boolean=false;
+    buyerRelationshipName:string="";
+    sellerRelationshipName:string="";
     constructor(
         injector: Injector,
         private fb: FormBuilder,
@@ -212,18 +216,22 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit, 
     getUserDefultRole() {
         this._AppTransactionServiceProxy.getUserDefaultRole(this.formType?.toUpperCase()).subscribe(result => {
             if (this.formType?.toUpperCase() == "SO") {
-                if (result?.toLowerCase().includes('seller')) {
-                    this.roleDdval = this.roles.filter(role => role.code == 1)[0];
+                if (result?.toLowerCase().includes('seller') && this.soRolesOptions
+  .map(x => x.name.toLowerCase())
+  .some(x => x.includes('seller'))) {
+                    this.roleDdval = this.soRolesOptions.filter(role => role.code == 1)[0];
 
                 } else {
-                    this.roleDdval = this.roles.filter(role => role.code !== 1)[0];
+                    this.roleDdval = this.soRolesOptions.filter(role => role.code !== 1)[0];
                 }
             } else if (this.formType?.toUpperCase() == "PO") {
-                if (result?.toLowerCase().includes('buyer')) {
-                    this.roleDdval = this.roles.filter(role => role.code == 2)[0];
+                if (result?.toLowerCase().includes('buyer')&&  this.poRolesOptions
+  .map(x => x.name.toLowerCase())
+  .some(x => x.includes('buyer'))) {
+                    this.roleDdval = this.poRolesOptions.filter(role => role.code == 2)[0];
 
                 } else {
-                    this.roleDdval = this.roles.filter(role => role.code !== 2)[0];
+                    this.roleDdval = this.poRolesOptions.filter(role => role.code !== 2)[0];
                 }
             }
             this.handleRoleChange({ value: this.roleDdval });
@@ -462,6 +470,10 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit, 
         this.handleBuyerNameSearch("");
         this.buyerBranches = [];
         this.getBranches(this.buyerCompanySSIN, 'buyer')
+
+          this.showBuyerRelationshipIcon = true;
+          //i49-get buyerRelationshipName
+        this.buyerRelationshipName = event.value?.relationshipName || '';
     }
 
     handleSellerCompanyChange(event: any) {
@@ -476,6 +488,10 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit, 
         this.handleSellerNameSearch("");
         this.sellerBranches = [];
         this.getBranches(this.sellerCompanySSIN, 'seller')
+
+         this.showSellerRelationshipIcon = true;
+          //i49-get sellerRelationshipName
+        this.sellerRelationshipName = event.value?.relationshipName || '';
     }
     loadInitialContacts() {
         this._AppTransactionServiceProxy
@@ -1106,7 +1122,10 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit, 
         this.invalidBuyerPhoneNumber = "";
         this.invalidBuyerContactEMailAddress = "";
         this.invalidSellerContactEMailAddress = "";
-
+        this.showBuyerRelationshipIcon = false;
+        this.showSellerRelationshipIcon = false;
+        this.buyerRelationshipName = '';
+        this.sellerRelationshipName = '';
     }
 
 
@@ -1174,8 +1193,9 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit, 
         this.invalidBuyerPhoneNumber = "";
         this.invalidBuyerContactEMailAddress = "";
         this.invalidSellerContactEMailAddress = "";
-
-
-
+        this.showBuyerRelationshipIcon = false;
+        this.showSellerRelationshipIcon = false;
+        this.buyerRelationshipName = '';
+        this.sellerRelationshipName = '';
 }
 }

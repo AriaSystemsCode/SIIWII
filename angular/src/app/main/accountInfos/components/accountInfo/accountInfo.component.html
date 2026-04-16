@@ -256,7 +256,7 @@
                                     </a>
                                 </li>
 
-                                <li class="nav-item ml-2" *ngIf="relationId && relationId>0">
+                                <li class="nav-item ml-2" *ngIf="relationId && relationId>0 && roleSeller">
                                     <a class="nav-link" (click)="changeTab(accountInfoPageTabsEnum.RelationshipSettings)"
                                         [ngClass]="currentTab == accountInfoPageTabsEnum.RelationshipSettings?'active':''">
 
@@ -284,7 +284,7 @@
                             [ngClass]="{'d-none' : currentTab != accountInfoPageTabsEnum.ProfileCreateOrEdit}">
                             <div [class]="containerClass + ' kt-grid__item kt-grid__item--fluid'">
 
-                                <div class="kt-portlet m-portlet--full-height">
+                                <div class=" m-portlet--full-height bg-white p-4">
 
                                     <div class="kt-portlet__body" *ngIf="accountInfoTemp">
                                         <div class="row">
@@ -394,18 +394,7 @@
                                                 {{l("Code")}}
                                             </label>
                                             <div class="col-sm-8">
-                                                <!-- <app-codes *ngIf="!(accountInfoTemp?.id>0)"
-                                                    [objectType]="entityObjectType" [editMode]=false classes="bg-white"
-                                                    [code]="accountInfoTemp?.code"
-                                                    placeHolder="{{ 'Account Code' | localize}}"
-                                                    (getCodeValue)="getCodeValue($event)" [maxlength]="12">
-                                                </app-codes>
-                                                <app-codes *ngIf="accountInfoTemp?.id>0" [objectType]="entityObjectType"
-                                                    [readonly]="true" [editMode]=true classes="bg-white"
-                                                    [code]="accountInfoTemp?.code"
-                                                    placeHolder="{{ 'Account Code' | localize}}"
-                                                    (getCodeValue)="getCodeValue($event)" [maxlength]="12"></app-codes>
-                                                -->
+                                         
                                             <input type="text" id="AccountInfoTemp_Code" #codeInput="ngModel"
                                             class="form-control form-control-sm aria-input-text" maxlength="6"
                                             [disabled]="accountInfoTemp?.id>0"
@@ -529,11 +518,22 @@
 
                                                   <div class="form-group row" *ngIf="accountInfoTemp?.accountType?.toUpperCase() == 'BUSINESS'">
                                             <label for="colFormLabelSm"
-                                                class="col-sm-2 col-form-label col-form-label-sm label-form">{{l("MarketplaceRole")}}</label>
+                                                class="col-sm-2 col-form-label col-form-label-sm label-form" style="white-space: nowrap;">   <span class="text-danger font-weight-bold">*</span> {{l("MarketplaceRole")}}</label>  
                                             <div class="col-sm-8">
                                         
 
-                                                          <p-multiSelect [options]="roles" [(ngModel)]="selectedRoles" optionLabel="name" placeholder="Select Roles" [maxSelectedLabels]="3" class="w-100 md:w-80"  display="chip"></p-multiSelect>
+                                         <p-multiSelect
+                                            [options]="roles"
+                                            [(ngModel)]="selectedRoles"
+                                            [ngModelOptions]="{ standalone: true }"
+                                            optionLabel="name"
+                                            optionValue="name"
+                                            placeholder="Select Roles"
+                                            [maxSelectedLabels]="3"
+                                            class="w-100 md:w-80"
+                                                (onChange)="changeTouchState()"
+                                            display="chip">
+                                            </p-multiSelect>
 
                                             </div>
                                         </div>
@@ -569,7 +569,7 @@
                                             </div>
                                         </div>
 
-                                        <div class="form-group row"
+                                       <!--  <div class="form-group row"
                                             *ngIf="(accountLevel == accountLevelEnum.Manual || (accountDataForView?.isConnected && currentTab === accountInfoPageTabsEnum.ProfileCreateOrEdit)) && !isRecordOwner">
                                             <label for="colFormLabelSm"
                                                 class="col-sm-2 col-form-label col-form-label-sm label-form">{{l("PriceLevel")}}</label>
@@ -582,10 +582,11 @@
 
                                             </div>
                                             <span  *ngIf="accountInfoTemp?.priceLevel" class="mt-2"><a class="reset-link" (click)="accountInfoTemp.priceLevel =null; changeTouchState()">Reset</a></span>
-                                        </div>
+                                        </div> -->
 
 
-                                      <!--   <div class="form-group row" *ngIf="accountInfoTemp?.accountType != 'People' && accountInfoTemp?.accountType != 'Personal'">
+                                        <div class="form-group row" 
+                                        *ngIf="isRecordOwner && accountLevel == accountLevelEnum.Profile && accountInfoTemp?.accountType != 'People' && accountInfoTemp?.accountType != 'Personal'">
                                             <label for="colFormLabelSm"
                                                 class="col-sm-2 col-form-label col-form-label-sm label-form">
 
@@ -603,7 +604,7 @@
                                             </div>
                                         </div>
 
-                                        <div class="form-group row" *ngIf="accountInfoTemp?.accountType != 'People' && accountInfoTemp?.accountType != 'Personal'">
+                                        <div class="form-group row" *ngIf="isRecordOwner && accountLevel == accountLevelEnum.Profile && accountInfoTemp?.accountType != 'People' && accountInfoTemp?.accountType != 'Personal'">
                                             <label for="colFormLabelSm"
                                                 class="col-sm-2 col-form-label col-form-label-sm label-form">
 
@@ -617,7 +618,7 @@
                                                     optionValue="value" (onChange)="changeTouchState()">
                                                 </p-dropdown>
                                             </div>
-                                        </div> -->
+                                        </div> 
 
                                         <div class="form-group row">
                                             <label for="colFormLabelSm"

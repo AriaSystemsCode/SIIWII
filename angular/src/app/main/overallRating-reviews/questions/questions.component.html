@@ -42,7 +42,7 @@
           </div>
       
       
-          <button class="btnPost" (click)="isUserReviewedEntityBefore()" [disabled]="questionText === ''">{{'Post' | localize}}</button>
+          <button class="btnPost" (click)="postQuestion()" [disabled]="questionText === ''">{{'Post' | localize}}</button>
         </div>
       </div>
     </div>
@@ -75,7 +75,7 @@
       </div>
   
   
-      <button class="btnPost" (click)="isUserReviewedEntityBefore()"  [disabled]="questionText === ''">{{'Post' | localize}}</button>
+      <button class="btnPost" (click)="postQuestion()"  [disabled]="questionText === ''">{{'Post' | localize}}</button>
     </div>
   
     <!-- Media Preview -->

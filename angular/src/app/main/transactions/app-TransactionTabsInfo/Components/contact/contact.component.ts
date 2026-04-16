@@ -169,7 +169,7 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
           localStorage.setItem('comNew', JSON.stringify(checked));
           this.appTransactionsForViewDto.createManualAccount = checked;
       
-          // 🔒 coerce company & branch to objects (they may be strings if user typed free-text)
+          //  coerce company & branch to objects (they may be strings if user typed free-text)
           if (!row.selectedCompany || typeof row.selectedCompany !== 'object') {
             const obj = new GetAccountInformationOutputDto();
             obj.name = typeof row.selectedCompany === 'string' ? row.selectedCompany : (row.companyName || '');
@@ -191,7 +191,7 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
           localStorage.setItem('conNew', JSON.stringify(checked));
           this.appTransactionsForViewDto.createManualContact = checked;
       
-          // 🔒 coerce contact to object
+          //  coerce contact to object
           if (!row.selectedContact || typeof row.selectedContact !== 'object') {
             const obj = new GetContactInformationDto();
             obj.name = typeof row.selectedContact === 'string' ? row.selectedContact : (row.contactName || '');

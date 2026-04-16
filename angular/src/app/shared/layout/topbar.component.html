@@ -107,7 +107,7 @@
             [ngClass]="isArabic ? 'rt-sec-section':'sec-section'">
             <!-- Left links -->
             <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
-                <li class="nav-item" *ngIf="isAuthenticated && allowFeeds =='true'">
+                <li class="nav-item" *ngIf="isAuthenticated && allowFeeds =='Yes'">
                     <a
                         *ngIf="('Pages.Marketplace' | permission) || !isAuthenticated"
                         class="nav-link active d-flex flex-column text-center"
@@ -124,19 +124,19 @@
                             }}</span>
                     </a>
                 </li>
-                <li class="border-left ml-2 nav-item text-white pt-2 pl-3 d-lg-block d-none"
+                <li class="border-left ml-2 nav-item text-white pt-1 pl-3 d-lg-block d-none"
                     *ngIf="shoppingCartSummary?.shoppingCartId >0 && transactionType">
                     <div class="orderType"> {{transactionType}}</div>
                 </li>
 
-                <li class="ml-2 nav-item pt-2 d-lg-block d-none" *ngIf="shoppingCartSummary?.shoppingCartId >0">
+                <li class="ml-2 nav-item pt-1 d-lg-block d-none" *ngIf="shoppingCartSummary?.shoppingCartId >0">
                     <img [src]="shoppingCartSummary?.sellerLogo ? attachmentBaseUrl + '/' + shoppingCartSummary?.sellerLogo : defaultSellerLogo"
                         (error)="onImageError($event, 'seller')" class="navbar-brand" (mouseover)="displaneSel = true"
                         (mouseleave)="displaneSel = false" />
 
                     <span *ngIf="displaneSel" class="tooltip-text">{{shoppingCartSummary?.sellerName}}</span>
                 </li>
-                <li class="nav-item pt-2 d-lg-block d-none" *ngIf="shoppingCartSummary?.shoppingCartId >0">
+                <li class="nav-item pt-1 d-lg-block d-none" *ngIf="shoppingCartSummary?.shoppingCartId >0">
                     <img [src]="shoppingCartSummary?.buyerLogo ? attachmentBaseUrl + '/' + shoppingCartSummary?.buyerLogo : defaultBuyerLogo"
                         (error)="onImageError($event, 'buyer')" class="navbar-brand" (mouseover)="displaneBuy = true"
                         (mouseleave)="displaneBuy = false" />

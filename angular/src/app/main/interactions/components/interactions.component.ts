@@ -31,7 +31,6 @@ export class InteractionsComponent extends AppComponentBase implements OnInit, O
     @Input() fromTrans:boolean = false;
 
 
-    showReactionsPopup: boolean = false
     defaultReactionType: Reactions = this._reactionService.defaultReactionType
     currentUserReaction: AppEntityUserReactionDto = new AppEntityUserReactionDto()
     userId: number
@@ -43,7 +42,6 @@ export class InteractionsComponent extends AppComponentBase implements OnInit, O
     getCurrentUserReactionSubs:Subscription
     showComments:boolean = false
     @ViewChild('commentParentComponent',{ static:true }) commentParentComponent : CommentParentComponent
-    isFlipped = false;
     isAuthenticated = this.appSession?.user
 
     constructor(
@@ -184,11 +182,8 @@ export class InteractionsComponent extends AppComponentBase implements OnInit, O
     }
 
     openReplyScreen(comment: any): void {
-        // Trigger the method in the commentParent component
-        this.showAddComment('replies')
-        // this.triggerCommentsList()
 
-        // this.isFlipped = !this.isFlipped;
+        this.showAddComment('replies')
          this.reply.emit(true)
          this.mycom.emit(comment)
         this.commentParentComponent.openReplyScreen(comment);

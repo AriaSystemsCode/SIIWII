@@ -14,8 +14,17 @@ export class MarketplaceEventCardComponent {
   @Output() details = new EventEmitter<any>();
   @ViewChild("viewEventModal", { static: true }) viewEventModal: ViewEventComponent;
   attachmentBaseUrl = AppConsts.attachmentBaseUrl;
+    isSmallScreen = false;
 
+  ngOnInit(){
 
+      this.checkScreenSize();
+  window.addEventListener('resize', this.checkScreenSize.bind(this));
+
+    }
+    checkScreenSize(): void {
+  this.isSmallScreen = window.innerWidth <= 1023;
+}
 
   get posterUrl(): string {
     const logo = this.block?.logoURL || this.block?.banarURL;

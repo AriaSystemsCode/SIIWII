@@ -1,17 +1,30 @@
 <form [formGroup]="filterForm" >
 
     <div class="mb-4 pb-5 pt-1 border-bottom removeScroll " >
-        <app-multi-selection-filter
+        <!-- <app-multi-selection-filter
             #AccountTypeFilter
             [filterMetaData]="accountTypeFilterMetaData"
             [formContol]="filterForm.controls.accountTypes"
             [title]="'AccountTypes' | localize"
             (onLoadData)="getAccountTypesList(AccountTypeFilter)"
         >
-        </app-multi-selection-filter>
+        </app-multi-selection-filter> -->
+  <h4 class="text-captitalize mb-3">{{ 'AccountTypes' | localize }}</h4>
+
+  <div class="pl-5 pr-4">
+    <p-dropdown
+      [options]="accountTypeOptions"
+      formControlName="accountTypes"
+      optionLabel="label"
+      optionValue="value"
+      [placeholder]="'All Account Types' | localize"
+      [showClear]="false"
+      class="w-100">
+    </p-dropdown>
+  </div>
     </div>
 
-    <div class="mt-4 mb-4 pb-5 pt-3 border-bottom">
+    <div class="mt-4 mb-4 pb-5 pt-3 border-bottom" *ngIf="showBusinessOnlyFilters">
         <app-tree-multi-selection-filter
             #ClassificationFilter
             [filterMetaData]="classificationsFilterMetaData"
@@ -24,7 +37,7 @@
     </div>
 
 
-    <div class="mt-4 mb-4 pb-5 pt-3 border-bottom" >
+    <div class="mt-4 mb-4 pb-5 pt-3 border-bottom" *ngIf="showBusinessOnlyFilters">
         <app-tree-multi-selection-filter
             #CategoryFilter
             [filterMetaData]="categoriesFilterMetaData"

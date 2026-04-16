@@ -47,7 +47,7 @@ import {
 import { debounceTime, filter, takeUntil } from "rxjs/operators";
 import { Location } from "@angular/common";
 import { FileUploaderCustom } from "@shared/components/import-steps/models/FileUploaderCustom.model";
-import { SweetAlertOptions } from "sweetalert2";
+import Swal, { SweetAlertOptions } from "sweetalert2";
 import { ajax } from "rxjs/ajax";
 import { ToastService } from "./toast/toast.service";
 
@@ -117,6 +117,7 @@ export abstract class AppComponentBase {
         this.transactionReportTemplateName="OrderConfirmationForm1";
         this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
         this.currentLang == 'ar' || this.currentLang == 'ar-EG'  ? this.isArabic = true : this.isArabic = false
+         this.getTenantRoles();
     }
 
 
@@ -644,4 +645,96 @@ export abstract class AppComponentBase {
         return ext === 'pdf';
       }
       
+    tenantRoles = [];
+    tenantRoleFlags = {
+        isSeller: false,
+        isSalesRep: false,
+        isBuyer: false,
+        isBuyingOffice: false
+    };
+
+    soRolesOptions=[];
+    poRolesOptions=[];
+
+    getTenantRoles() {
+          debugger;
+        //i49-getTenantRole
+        this.tenantRoles.push("seller");
+       // this.tenantRoles.push("sales rep");
+        this.tenantRoles.push("buyer");
+          this.tenantRoles.push("buying office");
+
+        const _tenantRoles = this.tenantRoles.map(r => r.toLowerCase());
+
+        this.tenantRoleFlags = {
+            isSeller: _tenantRoles.includes('seller'),
+            isSalesRep: _tenantRoles.includes('sales rep'),
+            isBuyer: _tenantRoles.includes('buyer'),
+            isBuyingOffice: _tenantRoles.includes('buying office')
+        };
+
+        // SO Roles
+        this.soRolesOptions = [
+            ...(this.tenantRoleFlags.isSeller
+                ? [{ name: "I'm a Seller", code: 1 }]
+                : []),
+
+            ...(this.tenantRoleFlags.isSalesRep
+                ? [{ name: "I'm an Independent Sales Rep.", code: 3 }]
+                : [])
+        ];
+
+
+        // PO Roles
+        this.poRolesOptions = [
+            ...(this.tenantRoleFlags.isBuyer
+                ? [{ name: "I'm a Buyer", code: 2 }]
+                : []),
+
+            ...(this.tenantRoleFlags.isBuyingOffice
+                ? [{ name: "I'm an Independent Buying Office.", code: 4 }]
+                : [])
+        ];
+    }
+
+
+     canCreateSO(): boolean {
+        const roles = this.tenantRoles.map(r => r.toLowerCase());
+        return roles.includes("seller") || roles.includes("sales rep");
+    }
+
+
+    canCreatePO(): boolean {
+        const roles = this.tenantRoles.map(r => r.toLowerCase());
+        return roles.includes("buyer") || roles.includes("buying office");
+    }
+
+
+    showNoCreatePermissionAlert() {
+        Swal.fire({
+            title: '',
+            html:
+                "You cannot create a transaction of this type. Please check the marketplace role assigned to your account.",
+            showCancelButton: false,
+            confirmButtonText: "ok",
+            allowOutsideClick: false,
+            allowEscapeKey: false,
+            backdrop: true,
+             customClass: {
+                        popup: "popup-class",
+                        icon: "icon-class",
+                        content: "content-class",
+                        actions: "actions-class",
+                        confirmButton: "confirm-button-class2",
+                    },
+        })
+    }
+
+    //i49-getRelationshipRoles
+    getRelationshipRoles() {
+        let relationshipRoles = [];
+        relationshipRoles.push("seller");
+        return relationshipRoles;
+    }
+
 }

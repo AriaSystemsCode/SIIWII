@@ -92,6 +92,7 @@ export class LandingPageSinglrRowCallActionComponent extends AppComponentBase im
   ];
 
   languageSettingName: string = AppConsts.languageSettingName;
+    isSmallScreen = false;
 
   constructor(
     injector: Injector,
@@ -108,8 +109,13 @@ export class LandingPageSinglrRowCallActionComponent extends AppComponentBase im
     if (this.sectionId) {
       this.getBlocksData();
     }
-  }
+       this.checkScreenSize();
+  window.addEventListener('resize', this.checkScreenSize.bind(this));
 
+    }
+    checkScreenSize(): void {
+  this.isSmallScreen = window.innerWidth <= 1023;
+}
   viewProduct(prod: any) {
     const productBodyRequestForView = {
       id: prod?.appItem?.id,

@@ -35,6 +35,8 @@ export class EventsBrowseCardComponent extends AppComponentBase implements OnCha
 
         currentLang: string
     isArabic: boolean
+
+      isSmallScreen = false;
     constructor(
         injector: Injector,
         private _postService:AppPostsServiceProxy
@@ -45,7 +47,15 @@ export class EventsBrowseCardComponent extends AppComponentBase implements OnCha
     ngOnInit(){
               this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
       this.currentLang == 'ar' || this.currentLang == 'ar-EG'  ? this.isArabic = true : this.isArabic = false
+
+              this.checkScreenSize();
+  window.addEventListener('resize', this.checkScreenSize.bind(this));
     }
+
+        checkScreenSize(): void {
+  this.isSmallScreen = window.innerWidth <= 1023;
+}
+
     ngOnChanges(changes: SimpleChanges) {
         this.getAddressDetails();
         this.getProfilePictureById(this.item?.appEvent?.profilePictureId);

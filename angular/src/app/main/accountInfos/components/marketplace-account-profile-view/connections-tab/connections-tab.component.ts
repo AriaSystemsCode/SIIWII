@@ -34,7 +34,9 @@ export class ConnectionsTabComponent extends AppComponentBase {
   showData:boolean =true;
 
   private connectionsLoaded = false;
-    isAuthenticate= this.appSession?.user
+  isAuthenticate= this.appSession?.user
+
+
   constructor(
     injector: Injector,
     private _abpSessionService: AbpSessionService,
@@ -228,21 +230,6 @@ this.accountsTypes=result.items;
                   }
   });
 }
-// connect(account: AccountDto): void {
-//   this.showMainSpinner();
-//   this._accountsServiceProxy
-//       .connectContactsProfiles(account.id,null,null)
-//       .pipe(
-//           finalize(() => {
-//               this.hideMainSpinner();
-//           })
-//       )
-//       .subscribe(() => {
-//           this.notify.success(this.l("SuccessfullyConnected"));
-//           account.status = true;
-//       });
-// }
-
 
 
   createRelation(account, status: boolean = false) {

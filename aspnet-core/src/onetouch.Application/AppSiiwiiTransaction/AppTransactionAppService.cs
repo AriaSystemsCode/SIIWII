@@ -77,6 +77,7 @@ using onetouch.SystemObjects.Dtos;
 using onetouch.AppMarketplaceContacts;
 using AuthorizeNet.APICore;
 using MimeKit;
+using DocumentFormat.OpenXml.Office2021.Drawing.SketchyShapes;
 
 
 //using NUglify.Helpers;
@@ -7673,6 +7674,7 @@ namespace onetouch.AppSiiwiiTransaction
         }
         public async Task AddTransactionCharges(long pTransactionID)
         {
+            Int32 lineNo = 10000;
             // Delete all AppTransactionDetails where TransactionId = pTransactionID and Code = "CHARGES"
             //var entityObjectStatusId = await _helper.SystemTables.GetEntityObjectStatusDraftTransaction();
             var entityObjectStatusId = await _helper.SystemTables.GetEntityObjectStatusOpenTransaction();
@@ -7792,12 +7794,12 @@ namespace onetouch.AppSiiwiiTransaction
                         default:
                             break;
                     }
-
+                    lineNo = lineNo + 1;
                     var newTransactionDetail = new AppTransactionDetails
                     {
                         TransactionId = pTransactionID,
                         ItemSSIN = itemSsin,
-                        Code = itemSsin,
+                        Code = pTransactionID.ToString() + '-' + lineNo.ToString() + '-' + itemSsin,
                         //Note = calculationApi, // Storing CalculationAPI in Note for reference
                         Quantity = 1, // Default quantity, can be modified as needed
                         NetPrice = 0, // Default price, can be modified as needed
@@ -7889,7 +7891,7 @@ namespace onetouch.AppSiiwiiTransaction
 
                                 if (chargeAmount > 0)
                                 {
-                                    decimal orderAmount = await _appTransactionDetails.GetAll().Where(e => e.TransactionId == pTransactionID && e.EntityObjectTypeId != entityObjectChargesId)
+                                    decimal orderAmount = await _appTransactionDetails.GetAll().Where(e => e.TransactionId == pTransactionID && e.EntityObjectTypeId != entityObjectChargesId && (e.ParentId == null || e.ParentId == 0))
                                         .SumAsync(e => e.Amount);
 
                                     shipping = orderAmount < minAmount ? chargeAmount : 0M;
@@ -7946,7 +7948,7 @@ namespace onetouch.AppSiiwiiTransaction
         public async Task<decimal> RecalculateTransactionTotalAmount(long transactionId)
         {
             decimal totalAmount = await _appTransactionDetails.GetAll()
-                .Where(a => a.TransactionId == transactionId)
+                .Where(a => a.TransactionId == transactionId && (a.ParentId == null || a.ParentId == 0) )
                 .SumAsync(a => a.Amount);
 
             var header = await _appTransactionsHeaderRepository.GetAsync(transactionId);

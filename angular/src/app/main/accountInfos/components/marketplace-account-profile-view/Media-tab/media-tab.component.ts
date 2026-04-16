@@ -14,13 +14,11 @@ export class MediaTabComponent extends AppComponentBase implements OnInit, OnCha
 
   @Input('accountDataForView') accountDataForView: AccountDto;
   @Input('fromOverviewTab') fromOverviewTab: boolean = false;
-
-
   @Input() isActive: boolean = false;
 
   attachmentBaseUrl: string = AppConsts.attachmentBaseUrl;
   mediaItems: AppEntityAttachmentDto[] = [];
-  itemsPerPage: number = 10;
+  itemsPerPage: number = 12;
   currentPage: number = 1;
   totalItems: number = 0;
   isModalOpen: boolean = false;

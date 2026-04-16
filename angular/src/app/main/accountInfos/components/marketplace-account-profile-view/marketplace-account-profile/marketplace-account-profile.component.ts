@@ -13,12 +13,10 @@ import { finalize } from 'rxjs';
 })
 export class MarketplaceAccountProfileComponent extends AppComponentBase implements OnInit, AfterViewInit {
   accountId: number;
-  accountType: string = "";
   attachmentBaseUrl: string = AppConsts.attachmentBaseUrl;
   accountDataForView: AccountDto
   marketPlaceData: GetAccountForViewDto
   activeTabIndex: number = 0;
-  loginAccoutType: string = "";
   paramsSubscription;
 
   currentLang:string
@@ -30,7 +28,6 @@ export class MarketplaceAccountProfileComponent extends AppComponentBase impleme
     private route: ActivatedRoute,
     private _AccountsServiceProxy: AccountsServiceProxy,
     private _marketplaceAccountsServiceProxy: MarketplaceAccountsServiceProxy,
-     private _router: Router,
   ) {
     super(injector);
   }

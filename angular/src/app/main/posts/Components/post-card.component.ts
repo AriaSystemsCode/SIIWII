@@ -69,7 +69,6 @@ import {
       private _postService: AppPostsServiceProxy,
       private _entitiesService: AppEntitiesServiceProxy,
       private _postlist: PostListService,
-      private _appEntitiesServiceProxy: AppEntitiesServiceProxy,
       injector: Injector
     ) {
       super(injector);

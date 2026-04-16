@@ -25,6 +25,7 @@ export class MarketplaceAccountCardComponent extends AppComponentBase {
   isArabic: boolean
   isAuthenticated: boolean = false;
 
+    isSmallScreen = false;
 
     constructor(
         injector:Injector,
@@ -40,7 +41,13 @@ export class MarketplaceAccountCardComponent extends AppComponentBase {
     this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
     this.currentLang == 'ar' || this.currentLang == 'ar-EG'  ? this.isArabic = true : this.isArabic = false
     this.isAuthenticated = !!this.appSession?.user;
-  }
+      this.checkScreenSize();
+  window.addEventListener('resize', this.checkScreenSize.bind(this));
+
+    }
+    checkScreenSize(): void {
+  this.isSmallScreen = window.innerWidth <= 1023;
+}
   get logoUrl(): string {
     const url = this.account?.account?.logoUrl;
     return url ? `${this.attachmentBaseUrl}/${url}` : 'assets/placeholders/_logo-placeholder.png';
