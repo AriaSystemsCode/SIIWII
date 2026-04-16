@@ -1758,8 +1758,8 @@ namespace onetouch.AppSiiwiiTransaction
                             .Where(z => z.TransactionId == appTrans.Id && z.ParentId == null && z.EntityObjectTypeId != entityObjectChargesId).ToList();
                         foreach (var det in appTrans.AppTransactionDetails.Where(z => z.ParentId == null))
                         {
-                            
-                              await GetProductFromMarketplace(det.SSIN, int.Parse(AbpSession.TenantId.ToString()));
+
+                            await GetProductFromMarketplace(det.SSIN, int.Parse(AbpSession.TenantId.ToString()));
                             //I46[Start]
                             await _appTenantActivitiesLogAppService.AddUsageActivityLog("PLACE-ORDER-LINE",
                             appTrans.Name.Trim() + ", Line#" + det.LineNo.ToString().Trim(), det.Id, appTrans.EntityObjectTypeId, appTrans.EntityObjectTypeCode,
@@ -1855,7 +1855,7 @@ namespace onetouch.AppSiiwiiTransaction
                 //}
                 //log[End]
 
-               
+
 
                 appTrans.EnteredDate = input.EnteredDate;
                 var obj = await _appTransactionsHeaderRepository.UpdateAsync(appTrans);
@@ -7691,7 +7691,7 @@ namespace onetouch.AppSiiwiiTransaction
 
             var buyerContact = await _appTransactionContactsRepository.GetAll().Where(e => e.ContactRole == "Buyer" && e.TransactionId == pTransactionID).FirstOrDefaultAsync();
             var sellerContact = await _appTransactionContactsRepository.GetAll().Where(e => e.ContactRole == "Seller" && e.TransactionId == pTransactionID).FirstOrDefaultAsync();
-            
+
             if (buyerContact == null || sellerContact == null) return;
 
             var activeRealtionshipStatusId = await _helper.SystemTables.GetEntityObjectStatusRelationshipActive();
@@ -7703,9 +7703,9 @@ namespace onetouch.AppSiiwiiTransaction
                        && e.EntityObjectStatusId == activeRealtionshipStatusId
                        && e.ConsiderAsTeamMember == false)
                        .ToListAsync();
-                       
+
             var relation = relationList.FirstOrDefault();
-            
+
             if (relation == null)
             {
                 var fallbackRelationList = await _appContactRelationshipInfoRepository.GetAll().Include(e => e.EntityExtraData)
@@ -7832,7 +7832,7 @@ namespace onetouch.AppSiiwiiTransaction
                     {
                         var transItems = await _appTransactionDetails.GetAll().Where(e => e.TransactionId == pTransactionID && e.EntityObjectTypeId != entityObjectChargesId)
                             .ToListAsync();
-                            
+
                         var transItemSsins = transItems.Select(i => i.ItemSSIN).ToList();
                         var products = await _appItems.GetAll().Where(e => transItemSsins.Contains(e.SSIN)).ToListAsync();
 
@@ -7849,7 +7849,7 @@ namespace onetouch.AppSiiwiiTransaction
                     }
                 }
             }
-            catch (Exception ex) 
+            catch (Exception ex)
             {
                 Logger.Error("Error calculating taxes for transaction " + pTransactionID, ex);
             }
@@ -7903,18 +7903,18 @@ namespace onetouch.AppSiiwiiTransaction
 
                 }
             }
-            catch (Exception ex) 
+            catch (Exception ex)
             {
                 Logger.Error("Error calculating shipping for transaction " + pTransactionID, ex);
             }
             return shipping;
         }
-        
+
         public async Task<decimal> UpdateCharges(List<ChargesDto> charges, long transactionId)
         {
             decimal totalAmount = 0m;
             var entityObjectChargesId = await _helper.SystemTables.GetEntityObjectCharges();
-            
+
             if (charges != null && charges.Any())
             {
                 var transCharges = await _appTransactionDetails.GetAll()
@@ -7939,7 +7939,7 @@ namespace onetouch.AppSiiwiiTransaction
 
             // Calculate total amount
             totalAmount = await RecalculateTransactionTotalAmount(transactionId);
-           
+
             return totalAmount;
         }
 
@@ -7948,7 +7948,7 @@ namespace onetouch.AppSiiwiiTransaction
             decimal totalAmount = await _appTransactionDetails.GetAll()
                 .Where(a => a.TransactionId == transactionId)
                 .SumAsync(a => a.Amount);
-                
+
             var header = await _appTransactionsHeaderRepository.GetAsync(transactionId);
             if (header != null)
             {
@@ -7956,12 +7956,81 @@ namespace onetouch.AppSiiwiiTransaction
                 await _appTransactionsHeaderRepository.UpdateAsync(header);
                 await CurrentUnitOfWork.SaveChangesAsync();
             }
-            
+
             return totalAmount;
         }
 
         //T-SII-20250606.0001,1 MMT 07/03/2025 Update appEntity log when Transaction line is edited Qty or Price[End]
         //I46{End}
+        //I49[Start]
+        public async Task<List<string>> GetLoggedInTenantRoles()
+        {
+            var activeRealtionshipStatusId = await _helper.SystemTables.GetEntityObjectStatusRelationshipActive();
+            List<string> returnRoles = new List<string>();
+            var contact = await _appContactRepository.GetAll()
+                .Where(z => z.IsProfileData == true &&
+            z.TenantId == AbpSession.TenantId && z.ParentId == null).FirstOrDefaultAsync();
+            if (contact != null)
+            {
+               var relations = await _appContactRelationshipInfoRepository.GetAll().Where(z => (z.RecipientContactSSIN == contact.SSIN ||
+                z.RequesterContactSSIN == contact.SSIN) && z.EntityObjectStatusId==activeRealtionshipStatusId && z.SharingLevel==1).ToListAsync();
+                if (relations != null && relations.Count > 0)
+                {
+                    foreach (var relation in relations)
+                    {
+                        if (relation.RecipientContactSSIN == contact.SSIN)
+                        {
+                            if (!string.IsNullOrEmpty(relation.RecipientMarketplaceRole) &&
+                                returnRoles.FirstOrDefault(z => z == relation.RecipientMarketplaceRole) == null)
+                                returnRoles.Add(relation.RecipientMarketplaceRole);
+
+
+                        }
+                        else
+                        {
+                            if (relation.RequesterContactSSIN== contact.SSIN)
+                            {
+                                if (!string.IsNullOrEmpty(relation.RequesterMarketplaceRole) &&
+                                returnRoles.FirstOrDefault(z => z == relation.RequesterMarketplaceRole) == null)
+                                    returnRoles.Add(relation.RequesterMarketplaceRole);
+                            }
+                        }
+
+                    }
+                }
+            }
+            return returnRoles;
+
+
+        }
+        public async Task<List<AppContactRelationshipInfoDto>> GetTenantAccountRelationships(long tenantId, string accountSSIN)
+        {
+            var activeRealtionshipStatusId = await _helper.SystemTables.GetEntityObjectStatusRelationshipActive();
+            List<AppContactRelationshipInfoDto> returList = new List<AppContactRelationshipInfoDto>();
+            var contact = await _appMarketplaceContactRepository.GetAll()
+                .Where(z => z.IsProfileData == true &&
+            z.TenantOwner == tenantId && z.ParentId == null).FirstOrDefaultAsync();
+            if (contact != null)
+            {
+                var relations = await _appContactRelationshipInfoRepository.GetAll()
+                    .Where(z => ((z.RecipientContactSSIN == contact.SSIN
+                    && z.RequesterContactSSIN == accountSSIN) ||
+                    (z.RequesterContactSSIN == contact.SSIN
+                    && z.RecipientContactSSIN == accountSSIN)) 
+                    && z.EntityObjectStatusId == activeRealtionshipStatusId && z.SharingLevel == 1).ToListAsync();
+                if (relations != null && relations.Count > 0)
+                {
+                    foreach (var relation in relations)
+                    {
+                        var relationDto = ObjectMapper.Map<AppContactRelationshipInfoDto>(relation);
+                        returList.Add(relationDto);
+                    }
+
+                }
+            }
+            return returList;
+        }
+        //I49[End]
     }
 
 }

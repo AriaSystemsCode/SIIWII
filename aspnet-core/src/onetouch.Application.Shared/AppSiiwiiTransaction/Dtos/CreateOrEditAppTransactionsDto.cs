@@ -172,4 +172,19 @@ namespace onetouch.AppSiiwiiTransaction.Dtos
 
     }
     //Iteration45
+    //I49[Start]
+    public class AppContactRelationshipInfoDto
+    {
+        public string RequesterContactSSIN { set; get; }
+        public string RequesterContactName { set; get; }
+        public string RecipientContactSSIN { set; get; }
+        public string RecipientContactName { set; get; }
+              
+        
+        public string RequesterContactTypeCode { set; get; }
+        public string RecipientContactTypeCode { set; get; }
+        public string RequesterMarketplaceRole { set; get; }
+        public string RecipientMarketplaceRole { set; get; }
+    }
+    //I49[End]
 }
