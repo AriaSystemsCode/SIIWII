@@ -2363,14 +2363,19 @@ namespace onetouch.AppSiiwiiTransaction
             var ssin = currentAccount?.SSIN ?? "";
 
             var relationships = _appContactRelationshipInfoRepository.GetAll()
-                .Where(r => r.RelationshipEndDate != null && 
-                ((r.RequesterContactSSIN == ssin 
-                //&& (r.RecipientMarketplaceRole == transactionType || r.RecipientMarketplaceRole == null)
+                .Where(r => (r.RelationshipEndDate == null || r.RelationshipEndDate < DateTime.Now )&& 
+                (
+                (r.RequesterContactSSIN == ssin 
+                && 
+                (r.RecipientMarketplaceRole == transactionType || string.IsNullOrEmpty(r.RecipientMarketplaceRole)
+                )
                 )
                   ||
                  (r.RecipientContactSSIN == ssin 
-                 //&& r.RequesterMarketplaceRole == transactionType || r.RequesterMarketplaceRole == null)
+                 && 
+                 (r.RequesterMarketplaceRole == transactionType || string.IsNullOrEmpty(r.RequesterMarketplaceRole)
                  )
+                 ))
                   );
 
             var relatedAccountsQuery = _appContactRepository.GetAll()
