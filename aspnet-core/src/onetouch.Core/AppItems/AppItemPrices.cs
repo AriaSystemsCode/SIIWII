@@ -33,5 +33,8 @@ namespace onetouch.AppItems
         public virtual AppItem AppItemFk { get; set; }
         public virtual bool IsDefault { set; get; }
         public virtual string BuyerSSIN { get; set; }
+        //MMT-I49 Change Request[Start]
+        public virtual string SellerSSIN { get; set; }
+        //MMT-I49 Change Request[End]
     }
 }

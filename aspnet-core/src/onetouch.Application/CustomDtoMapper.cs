@@ -1191,6 +1191,10 @@ namespace onetouch
               .ForMember(a => a.EntityExtraData, b => b.MapFrom(ent => ent.EntityExtraData))
               .ForMember(a => a.EntityAttachments, b => b.MapFrom(ent => ent.EntityAttachments));
             //I40[End]
+            //I49{Start}
+            configuration.CreateMap<AppContactRelationshipInfo, AppContactRelationshipInfoDto>();
+            
+            //I49[End]
         }
     }
 }
