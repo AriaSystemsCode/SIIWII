@@ -1549,24 +1549,24 @@ buildMarketplaceRolesExtraData(): AppEntityExtraDataDto[] {
     return [];
   }
 
-  return this.selectedRoles.map(roleName => {
-    const dto = new AppEntityExtraDataDto();
+  const joinedRoles = this.selectedRoles.join('-');
 
-    dto.entityId = this.accountInfoTemp?.id || 0;
-    dto.entityObjectTypeId = 610;
-    dto.entityObjectTypeCode = 'MARKETPLACE-ROLE';
-    dto.entityObjectTypeName = 'Marketplace Role';
-    dto.attributeValueId = 0;
-    dto.attributeValue = roleName;
-    dto.attributeId = 0;
-    dto.attributeValueFkName = roleName;
-    dto.attributeValueFkCode = roleName;
-    dto.attributeCode = 'MARKETPLACE-ROLE';
-    dto.id = 0;
+  const dto = new AppEntityExtraDataDto();
+  dto.entityId = this.accountInfoTemp?.id || 0;
+  dto.entityObjectTypeId = 610;
+  dto.entityObjectTypeCode = 'MARKETPLACE-ROLE';
+  dto.entityObjectTypeName = 'Marketplace Role';
+  dto.attributeValueId = 0;
+  dto.attributeValue = joinedRoles;
+  dto.attributeId = 0;
+  dto.attributeValueFkName = joinedRoles;
+  dto.attributeValueFkCode = joinedRoles;
+  dto.attributeCode = 'MARKETPLACE-ROLE';
+  dto.id = 0;
 
-    return dto;
-  });
+  return [dto];
 }
+
 updateMarketplaceRolesExtraData(): void {
   const otherExtraData = (this.accountInfoTemp?.entityExtraData || []).filter(
     item => item.entityObjectTypeCode !== 'MARKETPLACE-ROLE'

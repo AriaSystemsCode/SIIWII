@@ -29828,6 +29828,130 @@ export class AppTransactionServiceProxy {
         }
         return _observableOf(null as any);
     }
+
+    /**
+     * @return Success
+     */
+    getLoggedInTenantRoles(): Observable<string[]> {
+        let url_ = this.baseUrl + "/api/services/app/AppTransaction/GetLoggedInTenantRoles";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetLoggedInTenantRoles(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetLoggedInTenantRoles(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<string[]>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<string[]>;
+        }));
+    }
+
+    protected processGetLoggedInTenantRoles(response: HttpResponseBase): Observable<string[]> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            if (Array.isArray(resultData200)) {
+                result200 = [] as any;
+                for (let item of resultData200)
+                    result200!.push(item);
+            }
+            else {
+                result200 = <any>null;
+            }
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param tenantId (optional) 
+     * @param accountSSIN (optional) 
+     * @return Success
+     */
+    getTenantAccountRelationships(tenantId: number | undefined, accountSSIN: string | null | undefined): Observable<AppContactRelationshipInfoDto[]> {
+        let url_ = this.baseUrl + "/api/services/app/AppTransaction/GetTenantAccountRelationships?";
+        if (tenantId === null)
+            throw new Error("The parameter 'tenantId' cannot be null.");
+        else if (tenantId !== undefined)
+            url_ += "tenantId=" + encodeURIComponent("" + tenantId) + "&";
+        if (accountSSIN !== undefined && accountSSIN !== null)
+            url_ += "accountSSIN=" + encodeURIComponent("" + accountSSIN) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetTenantAccountRelationships(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetTenantAccountRelationships(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<AppContactRelationshipInfoDto[]>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<AppContactRelationshipInfoDto[]>;
+        }));
+    }
+
+    protected processGetTenantAccountRelationships(response: HttpResponseBase): Observable<AppContactRelationshipInfoDto[]> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            if (Array.isArray(resultData200)) {
+                result200 = [] as any;
+                for (let item of resultData200)
+                    result200!.push(AppContactRelationshipInfoDto.fromJS(item));
+            }
+            else {
+                result200 = <any>null;
+            }
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
 }
 
 @Injectable()
@@ -90133,6 +90257,8 @@ export class GetAccountInformationOutputDto implements IGetAccountInformationOut
     phoneTypeId!: number | undefined;
     phoneTypeName!: string | undefined;
     code!: string | undefined;
+    role!: string | undefined;
+    roleName!: string | undefined;
 
     [key: string]: any;
 
@@ -90160,6 +90286,8 @@ export class GetAccountInformationOutputDto implements IGetAccountInformationOut
             this.phoneTypeId = _data["phoneTypeId"];
             this.phoneTypeName = _data["phoneTypeName"];
             this.code = _data["code"];
+            this.role = _data["role"];
+            this.roleName = _data["roleName"];
         }
     }
 
@@ -90185,6 +90313,8 @@ export class GetAccountInformationOutputDto implements IGetAccountInformationOut
         data["phoneTypeId"] = this.phoneTypeId;
         data["phoneTypeName"] = this.phoneTypeName;
         data["code"] = this.code;
+        data["role"] = this.role;
+        data["roleName"] = this.roleName;
         return data;
     }
 }
@@ -90199,6 +90329,8 @@ export interface IGetAccountInformationOutputDto {
     phoneTypeId: number | undefined;
     phoneTypeName: string | undefined;
     code: string | undefined;
+    role: string | undefined;
+    roleName: string | undefined;
 
     [key: string]: any;
 }
@@ -93857,6 +93989,82 @@ export interface IAccountDefaultAddressDto {
     [key: string]: any;
 }
 
+export class AppContactRelationshipInfoDto implements IAppContactRelationshipInfoDto {
+    requesterContactSSIN!: string | undefined;
+    requesterContactName!: string | undefined;
+    recipientContactSSIN!: string | undefined;
+    recipientContactName!: string | undefined;
+    requesterContactTypeCode!: string | undefined;
+    recipientContactTypeCode!: string | undefined;
+    requesterMarketplaceRole!: string | undefined;
+    recipientMarketplaceRole!: string | undefined;
+
+    [key: string]: any;
+
+    constructor(data?: IAppContactRelationshipInfoDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.requesterContactSSIN = _data["requesterContactSSIN"];
+            this.requesterContactName = _data["requesterContactName"];
+            this.recipientContactSSIN = _data["recipientContactSSIN"];
+            this.recipientContactName = _data["recipientContactName"];
+            this.requesterContactTypeCode = _data["requesterContactTypeCode"];
+            this.recipientContactTypeCode = _data["recipientContactTypeCode"];
+            this.requesterMarketplaceRole = _data["requesterMarketplaceRole"];
+            this.recipientMarketplaceRole = _data["recipientMarketplaceRole"];
+        }
+    }
+
+    static fromJS(data: any): AppContactRelationshipInfoDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new AppContactRelationshipInfoDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["requesterContactSSIN"] = this.requesterContactSSIN;
+        data["requesterContactName"] = this.requesterContactName;
+        data["recipientContactSSIN"] = this.recipientContactSSIN;
+        data["recipientContactName"] = this.recipientContactName;
+        data["requesterContactTypeCode"] = this.requesterContactTypeCode;
+        data["recipientContactTypeCode"] = this.recipientContactTypeCode;
+        data["requesterMarketplaceRole"] = this.requesterMarketplaceRole;
+        data["recipientMarketplaceRole"] = this.recipientMarketplaceRole;
+        return data;
+    }
+}
+
+export interface IAppContactRelationshipInfoDto {
+    requesterContactSSIN: string | undefined;
+    requesterContactName: string | undefined;
+    recipientContactSSIN: string | undefined;
+    recipientContactName: string | undefined;
+    requesterContactTypeCode: string | undefined;
+    recipientContactTypeCode: string | undefined;
+    requesterMarketplaceRole: string | undefined;
+    recipientMarketplaceRole: string | undefined;
+
+    [key: string]: any;
+}
+
 export class AppTransactionDto implements IAppTransactionDto {
     code!: string | undefined;
     date!: moment.Moment;
@@ -94661,6 +94869,7 @@ export class AppItemPrices implements IAppItemPrices {
     appItemFk!: AppItem;
     isDefault!: boolean;
     buyerSSIN!: string | undefined;
+    sellerSSIN!: string | undefined;
     isDeleted!: boolean;
     deleterUserId!: number | undefined;
     deletionTime!: moment.Moment | undefined;
@@ -94698,6 +94907,7 @@ export class AppItemPrices implements IAppItemPrices {
             this.appItemFk = _data["appItemFk"] ? AppItem.fromJS(_data["appItemFk"]) : <any>undefined;
             this.isDefault = _data["isDefault"];
             this.buyerSSIN = _data["buyerSSIN"];
+            this.sellerSSIN = _data["sellerSSIN"];
             this.isDeleted = _data["isDeleted"];
             this.deleterUserId = _data["deleterUserId"];
             this.deletionTime = _data["deletionTime"] ? moment(_data["deletionTime"].toString()) : <any>undefined;
@@ -94733,6 +94943,7 @@ export class AppItemPrices implements IAppItemPrices {
         data["appItemFk"] = this.appItemFk ? this.appItemFk.toJSON() : <any>undefined;
         data["isDefault"] = this.isDefault;
         data["buyerSSIN"] = this.buyerSSIN;
+        data["sellerSSIN"] = this.sellerSSIN;
         data["isDeleted"] = this.isDeleted;
         data["deleterUserId"] = this.deleterUserId;
         data["deletionTime"] = this.deletionTime ? this.deletionTime.toISOString() : <any>undefined;
@@ -94757,6 +94968,7 @@ export interface IAppItemPrices {
     appItemFk: AppItem;
     isDefault: boolean;
     buyerSSIN: string | undefined;
+    sellerSSIN: string | undefined;
     isDeleted: boolean;
     deleterUserId: number | undefined;
     deletionTime: moment.Moment | undefined;
