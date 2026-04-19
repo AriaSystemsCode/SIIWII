@@ -1321,6 +1321,7 @@ namespace onetouch.Accounts
                     .Include(x => x.EntityClassifications).ThenInclude(x => x.EntityObjectClassificationFk)
                     .Include(x => x.EntityCategories).ThenInclude(x => x.EntityObjectCategoryFk)
                     .Include(x => x.EntityAttachments).ThenInclude(x => x.AttachmentFk)
+                    .Include(x => x.EntityExtraData)
                     .FirstOrDefaultAsync(x => x.Id == account.EntityId);
 
                 var accountDto = ObjectMapper.Map<AccountDto>(account);
@@ -1347,9 +1348,8 @@ namespace onetouch.Accounts
                 //&& (_appMarketplaceContactRepository.GetAll().Count(z => z.SSIN == account.SSIN && z.SharingLevel == 1) == 0));//account.PartnerId == null);
                 //accountDto.IsConnected = _appMarketplaceContactRepository.GetAll().Count(z => z.SSIN == account.SSIN && z.TenantOwner != AbpSession.TenantId && z.SharingLevel == 1) > 0;//(account.TenantId == null && !account.IsProfileData && account.ParentId == null);
                 accountDto.IsConnected = (account.EntityFk.TenantOwner != AbpSession.TenantId && account.EntityFk.TenantOwner != 0);
-                 
-                #endregion I31 fill account type from entity type in AppEntities 
 
+                #endregion I31 fill account type from entity type in AppEntities 
 
                 accountDto.Description = entity.Notes;
 
@@ -1504,6 +1504,9 @@ namespace onetouch.Accounts
 
                 var output = new GetAccountForViewDto { Account = accountDto, Contact = contactPersonalDto, ConnectionCount = ConnectionCount };
 
+                //I49[Start]
+                output.EntityExtraData = ObjectMapper.Map<IList<AppEntityExtraDataDto>>(entity.EntityExtraData);
+                //I49[End]
                 if (output.Account.CountryId != null && output.Account.CountryId != 0)
                 {
                     var _lookupAppEntity = await _appEntityRepository.FirstOrDefaultAsync((long)output.Account.CountryId);

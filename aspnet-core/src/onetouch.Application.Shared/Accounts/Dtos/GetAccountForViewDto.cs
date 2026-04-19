@@ -1,10 +1,14 @@
-﻿using onetouch.AppMarketplaceContacts.Dtos;
+﻿using onetouch.AppItems.Dtos;
+using onetouch.AppMarketplaceContacts.Dtos;
 using System.Collections.Generic;
 
 namespace onetouch.Accounts.Dtos
 {
     public class GetAccountForViewDto
     {
+        //I49[Start]
+        public virtual IList<AppEntityExtraDataDto> EntityExtraData { get; set; }
+        //I49[End]
         public AccountDto Account { get; set; }
         public ContactDto Contact { get; set; }
         public string ConnectionName { get; set; }
