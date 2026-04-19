@@ -1748,11 +1748,13 @@ namespace onetouch.Accounts
                 .Include(x => x.EntityCategories).ThenInclude(x => x.EntityObjectCategoryFk)
                 .Include(x => x.EntityClassifications).ThenInclude(x => x.EntityObjectClassificationFk)
                 .Include(x => x.EntityAttachments).ThenInclude(x => x.AttachmentFk)
+                .Include(x=> x.EntityExtraData)
                 .FirstOrDefaultAsync(x => x.Id == accountInfo.EntityId);
 
             output.AccountInfo.EntityCategories = ObjectMapper.Map<IList<AppEntityCategoryDto>>(entity.EntityCategories);
             output.AccountInfo.EntityClassifications = ObjectMapper.Map<IList<AppEntityClassificationDto>>(entity.EntityClassifications);
             output.AccountInfo.EntityAttachments = ObjectMapper.Map<IList<AppEntityAttachmentDto>>(entity.EntityAttachments);
+            output.AccountInfo.EntityExtraData = ObjectMapper.Map<IList<AppEntityExtraDataDto>>(entity.EntityExtraData);
             output.AccountInfo.EntityId = entity.Id;
 
             #region I31 fill account type from entity type in AppEntities 
