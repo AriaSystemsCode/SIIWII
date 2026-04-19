@@ -21,6 +21,7 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
     @ViewChild('nav') slider: NgImageSliderComponent;
     @Input('accountData') accountData: AccountDto;
     @Input('contactData') contactData: AccountDto;
+    @Input('entityExtraData') entityExtraData: any;
 
     @Input('isPublished') isPublished: boolean;
     @Input('isSync') isSync: boolean;
@@ -124,7 +125,7 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
             this.handleAccountData()
             this.initDepartmentVariables(true);
             this.initClassificationVariables(true);
-            this.getContactSync();
+            // this.getContactSync();
             this.getLanguages()
             this.isRecordOwner = this.accountData?.id == this.appSession.user?.accountId ? true : false
         }
@@ -656,5 +657,16 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
 
         return emailBad || phoneBad;
     }
+
+
+ get marketplaceRolesList(): string[] {
+    const roleItem = this.entityExtraData?.find(
+        x => x.attributeCode === 'MARKETPLACE-ROLE'
+    );
+
+    return roleItem?.attributeValue
+        ? roleItem.attributeValue.split('-').filter(Boolean)
+        : [];
+}
 
 }

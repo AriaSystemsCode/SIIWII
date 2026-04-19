@@ -120,6 +120,7 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit {
 
     accountDataForView: AccountDto
     accountContactForView: any
+    entityExtraData:any
     isPublished: boolean;
     isSync: boolean;
     connectionCount: number;
@@ -429,6 +430,7 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit {
             this.getForEditResult = result
             this.accountInfoOldCurrencyId = this.getForEditResult?.accountInfo?.currencyId;
             this.setProfileData(result)
+              this.setSelectedMarketplaceRoles();
             if (!result.accountInfo.id) {
                 this.accountInfoTemp.name = this.appSession?.tenant?.name
                 this.accountInfoTemp.tradeName = this.appSession?.tenant?.name
@@ -503,6 +505,7 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit {
         this.isSync = result ? result.isSync : false;
         this.connectionCount = result ? result.connectionCount : 0;
         this.accountDataForView = result ? result.account : undefined
+        this.entityExtraData = result ? result.entityExtraData : undefined
         this.relationId = result.relationId ? result.relationId : 0
         this.accountContactForView = result ? result.contact : undefined
         this.isRecordOwner = this.accountDataForView?.id == this.appSession.user?.accountId ? true : false
@@ -905,69 +908,67 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit {
 
 
     saveMyAccount() {
-        this.accountInfoTemp.entityExtraData ??= [];
+    this.accountInfoTemp.entityExtraData ??= [];
 
-        if (!this.accountInfoTemp.id) {
-            const mustHave = [701, 702, 703, 706, 707, 708, 709, 710, 711, 712, 713, 714, 715];
-            mustHave.forEach(id => this.ensureAttribute(id));
+    if (!this.accountInfoTemp.id) {
+        const mustHave = [701, 702, 703, 706, 707, 708, 709, 710, 711, 712, 713, 714, 715];
+        mustHave.forEach(id => this.ensureAttribute(id));
 
-            // now it's safe to set values
-            this.setStringValue(701, this.accountInfoTemp.entityExtraData[0].attributeValue);
-            this.setStringValue(702, this.accountInfoTemp.entityExtraData[1].attributeValue);
-            this.setStringValue(707, '');     // instead of null
-            this.setStringValue(706, '');     // instead of null
-            this.setBooleanValue(713, true);
-            this.setBooleanValue(708, true);
-            this.setBooleanValue(710, true);
-            this.setStringValue(715, '');     // instead of null
-            this.setBooleanValue(711, true);
-            this.setBooleanValue(712, true);
-            this.setBooleanValue(709, true);
-            this.setStringValue(703, '');     // instead of null
-            this.setBooleanValue(714, true);
+        this.setStringValue(701, this.accountInfoTemp.entityExtraData[0].attributeValue);
+        this.setStringValue(702, this.accountInfoTemp.entityExtraData[1].attributeValue);
+        this.setStringValue(707, '');
+        this.setStringValue(706, '');
+        this.setBooleanValue(713, true);
+        this.setBooleanValue(708, true);
+        this.setBooleanValue(710, true);
+        this.setStringValue(715, '');
+        this.setBooleanValue(711, true);
+        this.setBooleanValue(712, true);
+        this.setBooleanValue(709, true);
+        this.setStringValue(703, '');
+        this.setBooleanValue(714, true);
+    }
 
-        }
-  this.updateMarketplaceRolesExtraData();
-        this.accountInfoTemp.accountLevel = 0
-        this._AccountsServiceProxy.createOrEditMyAccount(this.accountInfoTemp)
+    this.updateMarketplaceRolesExtraData();
+    this.accountInfoTemp.accountLevel = 0;
+    this.saving = true;
+
+    this._AccountsServiceProxy.createOrEditMyAccount(this.accountInfoTemp)
         .pipe(finalize(() => {
-            this.updateLogoService.updateLogo();
-            this.getAccountDataForView()
-          this.saving = false;          // ✅ flags only
+            this.saving = false;
         }))
-        .subscribe(result => {
-          if (!result) return;
-      
-      
-          this.accountId = result?.accountInfo?.id;
-          if (this.appSession?.user) {
-            this.appSession.user.accountId = this.accountId;  // keep session in sync
-          }
-      
-       
-          this.touched = false;
-          this.notify.success(this.l('SavedSuccessfully'));
-          this.appSession.tenant.currencyInfoDto =
-            this.allCurrencies.find(e => e.value == this.accountInfoTemp.currencyId);
-          this.tenantDefaultCurrency = this.appSession.tenant.currencyInfoDto;
-          this.displaySaveAccount = true;
-          this.canPublish = true;
-          this.getForEditResult.lastChangesIsPublished = false;
-          this.updateLogoService.updateLogo();
-      
-    
-          this.getAccountDataForView().then(() => {
+        .subscribe(async result => {
+            if (!result) return;
+
+            this.accountId = result?.accountInfo?.id;
+
+            if (this.appSession?.user) {
+                this.appSession.user.accountId = this.accountId;
+            }
+
+            this.touched = false;
+            this.notify.success(this.l('SavedSuccessfully'));
+
+            this.appSession.tenant.currencyInfoDto =
+                this.allCurrencies.find(e => e.value == this.accountInfoTemp.currencyId);
+            this.tenantDefaultCurrency = this.appSession.tenant.currencyInfoDto;
+            this.displaySaveAccount = true;
+            this.canPublish = true;
+            this.getForEditResult.lastChangesIsPublished = false;
+
+            this.updateLogoService.updateLogo();
+
+            await this.getMyAccountDataForView(); // one refresh only
 
             this._router.navigate(['/app/main/account'], {
-              queryParams: { tab: 'ProfileView' }
+                queryParams: { tab: 'ProfileView' }
             });
+
             this.changeTab(this.accountInfoPageTabsEnum.ProfileView);
-          });
         }, _ => {
-          this.touched = true;
+            this.touched = true;
         });
-      
-    }
+}
 
 
     async saveExternalOrManualAccount() {
@@ -1549,18 +1550,19 @@ buildMarketplaceRolesExtraData(): AppEntityExtraDataDto[] {
     return [];
   }
 
-  const joinedRoles = this.selectedRoles.join('-');
+  const uniqueRoles = [...new Set(this.selectedRoles)].filter(Boolean);
+  const joinedRoles = uniqueRoles.join('-');
 
   const dto = new AppEntityExtraDataDto();
   dto.entityId = this.accountInfoTemp?.id || 0;
   dto.entityObjectTypeId = 610;
-  dto.entityObjectTypeCode = 'MARKETPLACE-ROLE';
+  dto.entityObjectTypeCode = 'PROD-RAWM-TRIM-POMP'; // keep your actual backend value
   dto.entityObjectTypeName = 'Marketplace Role';
-  dto.attributeValueId = 0;
+  dto.attributeValueId = null;
   dto.attributeValue = joinedRoles;
   dto.attributeId = 0;
-  dto.attributeValueFkName = joinedRoles;
-  dto.attributeValueFkCode = joinedRoles;
+  dto.attributeValueFkName = null;
+  dto.attributeValueFkCode = null;
   dto.attributeCode = 'MARKETPLACE-ROLE';
   dto.id = 0;
 
@@ -1568,16 +1570,27 @@ buildMarketplaceRolesExtraData(): AppEntityExtraDataDto[] {
 }
 
 updateMarketplaceRolesExtraData(): void {
-  const otherExtraData = (this.accountInfoTemp?.entityExtraData || []).filter(
-    item => item.entityObjectTypeCode !== 'MARKETPLACE-ROLE'
-  );
-
-  const marketplaceRoles = this.buildMarketplaceRolesExtraData();
+  if (!this.accountInfoTemp) {
+    return;
+  }
 
   this.accountInfoTemp.entityExtraData = [
-    ...otherExtraData,
-    ...marketplaceRoles
+    ...(this.accountInfoTemp.entityExtraData || []).filter(
+      item => item.attributeCode !== 'MARKETPLACE-ROLE'
+    ),
+    ...this.buildMarketplaceRolesExtraData()
   ];
+}
+
+
+setSelectedMarketplaceRoles(): void {
+  const marketplaceRole = this.accountInfoTemp?.entityExtraData?.find(
+    x => x.attributeCode === 'MARKETPLACE-ROLE'
+  );
+
+  this.selectedRoles = marketplaceRole?.attributeValue
+    ? marketplaceRole.attributeValue.split('-').filter(x => x)
+    : [];
 }
     
 }

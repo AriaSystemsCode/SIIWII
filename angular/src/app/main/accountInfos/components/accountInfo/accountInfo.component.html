@@ -531,7 +531,7 @@
                                             placeholder="Select Roles"
                                             [maxSelectedLabels]="3"
                                             class="w-100 md:w-80"
-                                                (onChange)="changeTouchState()"
+                                            (onChange)="changeTouchState()"
                                             display="chip">
                                             </p-multiSelect>
 
@@ -863,7 +863,7 @@
                             </app-members-list>
                         </div>
                         <div class="tab5" *ngIf="currentTab == accountInfoPageTabsEnum.ProfileView">
-                            <app-view-profile [accountData]="accountDataForView" [contactData]="accountContactForView"
+                            <app-view-profile [accountData]="accountDataForView" [contactData]="accountContactForView" [entityExtraData]="entityExtraData"
                                 [isPublished]="isPublished" [viewMode]="viewMode" [accountLevel]="accountLevel"
                                 (edit)="triggerProfile($event)" (editedData)="savePerData($event)"
                                 (delete)="askToConfirmDeleteAccount()" 
