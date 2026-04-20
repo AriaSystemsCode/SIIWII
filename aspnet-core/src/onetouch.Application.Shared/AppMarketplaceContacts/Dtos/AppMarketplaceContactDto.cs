@@ -99,14 +99,29 @@ namespace onetouch.AppMarketplaceContacts.Dtos
         public string ConnectionName { get; set; }
 		public string DisConnectLabel { get; set; }
 		public List<ConnectionType> AvailableConnections { get; set; }
+        public List<ConnectionInfo> ConnectionsInfo { get; set; }
         //MMT10
     }
 	//I40[Start]
 	public class ConnectionType
 	{ 
+		public string ConnectionName { set; get; }
 		public string ConnectLabel { set; get; }
 		public long ConnectionEntityId { get; set; }
 		public string DefaultVisibility { get; set; }
 	}
 	//I40[End]
+	//I49[Start]
+	public class ConnectionInfo
+	{
+
+		public string ConnectionStatus { set; get; }
+		public string DisconnectLabel { set; get; }
+		public long RelationEntityId { set; get; }
+        public string PendingLabel { set; get; }
+        public string ConnectedLabel { set; get; }
+        public string Visibility { set; get; }
+
+    }
+        //I49{End}
 }

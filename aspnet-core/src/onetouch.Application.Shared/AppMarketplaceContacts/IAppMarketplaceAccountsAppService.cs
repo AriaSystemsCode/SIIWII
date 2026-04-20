@@ -26,7 +26,7 @@ namespace onetouch.AppMarketplaceAccounts
         Task<long> CreateOrEditMarketplaceAccount(CreateOrEditMarketplaceAccountInfoDto input, bool sync);
          
         Task<bool> HideAccount(string SSIN);
-        Task<string> CreateOrEditMarketplaceContactRelationship(string requesterSSIN, string recipientSSIN, bool? disconnect,bool? isPublic, long? connectionTypeId);
+        Task<string> CreateOrEditMarketplaceContactRelationship(string requesterSSIN, string recipientSSIN, bool? disconnect,bool? isPublic, long? connectionTypeId,long? disconnectRelationId);
         Task<bool> PublishMember(long contactId, long parentId, long personEntityObjectTypeId, long? mainAccountID, long newAccountID);
 
     }
