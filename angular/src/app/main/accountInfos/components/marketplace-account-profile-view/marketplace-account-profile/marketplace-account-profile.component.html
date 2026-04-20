@@ -54,12 +54,12 @@
                   <!-- Main button = first option -->
                   <button type="button" class="relation_button" dropdownToggle
                      >
-                      <img class="pb-1" style="width: 20px;" (click)="createRelation(options[0])"
-                          [src]="getConnectionIcon(options[0]?.connectLabel)" alt="" />
-                      <span  (click)="createRelation(options[0])" class="ml-1">{{ options[0]?.connectLabel }}</span>
+                      <img class="pb-1" style="width: 14px;" (click)="createRelation(options[0])"
+                          [src]="getConnectionIcon(options[0]?.connectionName)" alt="" />
+                      <span  (click)="createRelation(options[0])" class="ml-1">{{ options[0]?.connectionName }}</span>
 
                       <!-- caret only if there are more -->
-                      <i *ngIf="options.length > 1" class="fas fa-lg ml-4 fa-angle-down"
+                      <i *ngIf="options.length > 1" class="fas fa-lg ml-2 fa-angle-down"
                           style="color: #fff !important;"></i>
                   </button>
 
@@ -68,8 +68,8 @@
                       <ul *dropdownMenu class="dropdown-menu" role="menu">
                         <li role="menuitem" *ngFor="let option of options | slice:1" class="py-2">
                           <button class="dropdown-item" type="button" (click)="createRelation(option)">
-                            <img class="pb-1 mr-2" style="width: 18px;" [src]="getConnectionIcon(option?.connectLabel)" alt="" />
-                            {{ option?.connectLabel }}
+                            <!-- <img class="pb-1 mr-2" style="width: 18px;" [src]="getConnectionIcon(option?.connectionName)" alt="" /> -->
+                            {{ option?.connectionName }}
                           </button>
                         </li>
                       </ul>
@@ -80,14 +80,14 @@
 
       </span>
      
-          <span  style="width: 100%; " class="mt-3 d-flex"  *ngIf="marketPlaceData?.availableConnections?.length == 0 && marketPlaceData?.connectionName && isAuthenticated">
+          <!-- <span  style="width: 100%; " class="mt-3 d-flex"  *ngIf="marketPlaceData?.availableConnections?.length == 0 && marketPlaceData?.connectionName && isAuthenticated">
             <div  class="btn relation_Status_button " style="    white-space: nowrap;
                 position: absolute;
               cursor: auto;  "   [ngClass]="isArabic?'dropCnAr':'dropCnEn'" dropdown>
                 
                 <button type="button"  dropdownToggle style="  border: 1px solid #EEEEEEEE !important;
                 background: white;border-radius: 6px;">
-                       <img class="pb-1" style="width: 20px;" src="../../assets/accounts/ph_check-bold.png" /> <span>{{ getFormattedConnectionName('connectionName') | localize }}</span> <i class="fas fa-lg ml-4 fa-angle-down" style="color: #777777 !important;"></i>
+                       <img class="pb-1" style="width: 20px;" src="../../assets/accounts/ph_check-bold.png" /> <span>{{ getFormattedConnectionName('connectionName') | localize }}</span> <i class="fas fa-lg ml-2 fa-angle-down" style="color: #777777 !important;"></i>
                 </button>
               
                 <ul *dropdownMenu class="dropdown-menu" role="menu">
@@ -100,8 +100,17 @@
               </div>
               
 
-        </span>
-
+        </span> -->
+     <div *ngIf="marketPlaceData?.connectionsInfo?.length > 0 && isAuthenticated">
+                   <ng-container *ngFor="let relation of marketPlaceData?.connectionsInfo">
+                    <button type="button" class="relation-chip mr-1" style="white-space: nowrap;">
+                    <span>{{ getFormattedConnectionName(relation.connectedLabel) }}</span>
+                      <i class="pi pi-times ml-1 removI"
+                        (click)="disconnect(relation)">
+                      </i>
+                    </button>
+                  </ng-container>
+                  </div>
         </div>
       </div>
 

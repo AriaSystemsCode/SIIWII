@@ -17,8 +17,7 @@ export class ConnectionsCardComponent extends AppComponentBase {
     @Input('fromOverview') fromOverview: boolean = false
 
     @Output() deleteMe: EventEmitter<boolean> = new EventEmitter<boolean>()
-    // @Output() connectMe: EventEmitter<boolean> = new EventEmitter<boolean>()
-    @Output() disconnectMe: EventEmitter<boolean> = new EventEmitter<boolean>()
+    @Output() disconnectMe: EventEmitter<{ account: GetAccountForViewDto; relation: any }>  = new EventEmitter();
     @Output() _createRelation: EventEmitter<any> = new EventEmitter<any>()
 
     isRecordOwner: boolean
@@ -52,8 +51,8 @@ export class ConnectionsCardComponent extends AppComponentBase {
     }
 
 
-    disconnect(account): void {
-        this.disconnectMe.emit(account)
+    disconnect(account,relation): void {
+     this.disconnectMe.emit({ account, relation });
     }
 
     edit(): void {
@@ -83,35 +82,20 @@ export class ConnectionsCardComponent extends AppComponentBase {
     }
 
 
-    getFormattedConnectionName(connection: string): string | null {
-        let raw: string | undefined;
-      
-        if (connection === 'connectionName') {
-          raw = this.account?.connectionName?.trim();
-        } else if (connection === 'avaliableConnectionName') {
-          raw = this.account?.avaliableConnectionName?.trim();
-        }else{
-          raw = this.account?.disConnectLabel?.trim();
-        }
-      
-        if (!raw) return null;
-      
-        // If it's 'Follow', return as-is
-        if (raw === 'Follow') return 'Follow';
-        if (raw === 'Connect') return 'Connect';
-        if (raw === 'Join') return 'Join';
-        if (raw === 'Employ') return 'Employ';
-      
-        // Format only if starts with 'MPAction'
-        if (raw.startsWith('MPAction')) {
-          const label = raw.replace('MPAction', '');
-          return label.charAt(0).toUpperCase() + label.slice(1).toLowerCase();
-        }
-      
-        // For anything else, return null (or raw if you prefer)
-        return null;
-      }
+getFormattedConnectionName(label: string): string {
+  if (!label) return '';
 
+  if (label === 'Follow' || label === 'Connect' || label === 'Join' || label === 'Employ') {
+    return label;
+  }
+
+  if (label.startsWith('MPAction')) {
+    const clean = label.replace('MPAction', '');
+    return clean.charAt(0).toUpperCase() + clean.slice(1).toLowerCase();
+  }
+
+  return label;
+}
 
       private readonly ICONS: Record<string, string> = {
         FOLLOW: 'assets/accounts/FOLLOW.png',

@@ -152,10 +152,10 @@
 
                     </ul>
                 </div>
-                <div>
+                <div class="d-flex justify-content-between">
                 
 
-                        <span class="mt-3 d-flex w-100" *ngIf="((account?.availableConnections?.length == 0 && account?.connectionName ) || (account?.connectionName)) && isAuthenticated">
+                        <!-- <span class="mt-3 d-flex w-100" *ngIf=" isAuthenticated">
                            
                             <div class="btn relation_Status_button mt-4" [ngStyle]="{
                                 'bottom':  singleItemPerRowMode  ? '5px' : '1px' ,'right' : !isArabic ?'5px':'' ,'left' : isArabic ?'5px':''
@@ -184,8 +184,17 @@
 
 
 
-                        </span>
-
+                        </span> -->
+    <div *ngIf="account?.connectionsInfo?.length > 0 && isAuthenticated">
+                   <ng-container *ngFor="let relation of account?.connectionsInfo">
+                    <button type="button" class="relation-chip mr-1" style="white-space: nowrap;">
+                    <span>{{ getFormattedConnectionName(relation.connectedLabel) }}</span>
+                      <i class="pi pi-times ml-1 removI"
+                        (click)="disconnect(account,relation)">
+                      </i>
+                    </button>
+                  </ng-container>
+                  </div>
                         <span class="mt-3 w-100"
                             *ngIf="(account?.availableConnections?.length > 0 ) && isAuthenticated ">
 
@@ -197,14 +206,14 @@
                                     <!-- Main button = first option -->
                                     <button type="button " class="relation_button" [ngClass]="isArabic ? 'relation-ar' :'relation-en'" dropdownToggle 
                                        >
-                                        <img class="pb-1" style="width: 15px;" (click)="createRelation(options[0])"
-                                            [src]="getConnectionIcon(options[0]?.connectLabel)" alt="" />
-                                        <span  (click)="createRelation(options[0])" class="ml-1" [title]="options[0]?.connectLabel">{{     options[0]?.connectLabel?.length > 10
-                                            ? (options[0].connectLabel | slice: 0:10) + '...'
-                                            : options[0]?.connectLabel }}</span>
+                                        <img class="pb-1" style="width: 14px;" (click)="createRelation(options[0])"
+                                            [src]="getConnectionIcon(options[0]?.connectionName)" alt="" />
+                                        <span  (click)="createRelation(options[0])" class="ml-1" [title]="options[0]?.connectionName">{{     options[0]?.connectionName?.length > 10
+                                            ? (options[0].connectionName | slice: 0:10) + '...'
+                                            : options[0]?.connectionName }}</span>
 
                                         <!-- caret only if there are more -->
-                                        <i *ngIf="options.length > 1" class="fas fa-lg ml-4 fa-angle-down"
+                                        <i *ngIf="options.length > 1" class="fas fa-lg ml-2 fa-angle-down"
                                             style="color: #fff !important;"></i>
                                     </button>
 
@@ -213,8 +222,8 @@
                                         <ul *dropdownMenu class="dropdown-menu" role="menu">
                                           <li role="menuitem" *ngFor="let option of options | slice:1" class="py-2">
                                             <button class="dropdown-item" type="button" (click)="createRelation(option)">
-                                              <img class="pb-1 mr-2" style="width: 15px;" [src]="getConnectionIcon(option?.connectLabel)" alt="" />
-                                              {{ option?.connectLabel }}
+                                              <img class="pb-1 mr-2" style="width: 15px;" [src]="getConnectionIcon(option?.connectionName)" alt="" />
+                                              {{ option?.connectionName }}
                                             </button>
                                           </li>
                                         </ul>

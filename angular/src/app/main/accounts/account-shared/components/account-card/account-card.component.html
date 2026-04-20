@@ -54,11 +54,12 @@ CARDS VIEW MODE
       <div
         *ngIf="(account?.availableConnections?.length == 0 && account?.connectionName && fromMarketplace) || (!fromMarketplace && account?.connectionName)"
         class="w-100 d-flex justify-content-center">
-        <div *ngIf="isAuthenticated" class="btn relation_Status_button market-status-btn p-0" dropdown>
+        <div *ngIf="isAuthenticated" class="btn relation_Status_button market-status-btn p-0" dropdown      container="body">
           <button type="button" dropdownToggle class="market-status-btn__inner">
             <!-- <img class="pb-1 mx-1" style="width: 15px;" src="../../assets/accounts/ph_check-bold.png" /> -->
             <span *ngIf="getFormattedConnectionName('connectionName') as connName" [title]="connName">
               {{ connName.length > 10 ? (connName | slice:0:10) + '...' : connName | localize }}
+              <!-- {{ connName.length > 10 ? (connName | slice:0:10) + '...' : connName | localize }} -->
             </span>
             <i class="fas fa-angle-down ml-2"></i>
           </button>
@@ -66,9 +67,9 @@ CARDS VIEW MODE
           <ul *dropdownMenu class="dropdown-menu" role="menu"
             [ngClass]="isArabic ? 'dropdown-menu-ar' : 'dropdown-menu-en'">
             <li role="menuitem">
-              <button class="dropdown-item" type="button" (click)="removeRelation(account)">
+              <!-- <button class="dropdown-item" type="button" (click)="removeRelation(account)">
                 {{ getFormattedConnectionName('disConnectLabel') }}
-              </button>
+              </button> -->
             </li>
           </ul>
         </div>
@@ -78,15 +79,13 @@ CARDS VIEW MODE
         *ngIf="((account?.availableConnections?.length > 0 && fromMarketplace ) || (!fromMarketplace && !account.connectionName )) && isAuthenticated"
         class="w-100">
         <ng-container *ngIf="account?.availableConnections as options">
-          <div class="relationWrap w-100 text-center" dropdown>
+          <div class="relationWrap w-100 text-center" dropdown      container="body">
             <button type="button" class="relation_button market-follow-btn" dropdownToggle>
               <img class="pb-1" style="width: 13px;" (click)="createRelation(options[0])"
-                [src]="getConnectionIcon(options[0]?.connectLabel)" alt="" />
-              <span (click)="createRelation(options[0])" class="ml-1" [title]="options[0]?.connectLabel">
+                [src]="getConnectionIcon(options[0]?.connectionName)" alt="" />
+              <span (click)="createRelation(options[0])" class="ml-1" [title]="options[0]?.connectionName">
                 {{
-                options[0]?.connectLabel?.length > 10
-                ? (options[0].connectLabel | slice: 0:10) + '...'
-                : options[0]?.connectLabel
+                options[0]?.connectionName
                 }}
               </span>
 
@@ -99,7 +98,7 @@ CARDS VIEW MODE
                   <button class="dropdown-item" type="button" (click)="createRelation(option)">
                     <!-- <img class="pb-1 mr-2" style="width: 14px;" [src]="getConnectionIcon(option?.connectLabel)"
                       alt="" /> -->
-                    {{ option?.connectLabel }}
+                    {{ option?.connectionName }}
                   </button>
                 </li>
               </ul>
@@ -231,7 +230,7 @@ NOT CARDS VIEW MODE
 
           <!-- <div ></div> -->
           <div>
-            <div class="btn-group dropdown" dropdown *ngIf="false">
+            <div class="btn-group dropdown" dropdown      container="body" *ngIf="false">
               <button class="dropdown-toggle btn btn-sm btn-action" dropdownToggle></button>
               <ul class="dropdown-menu actions-dropdown-menu" *dropdownMenu>
                 <li>
@@ -265,25 +264,27 @@ NOT CARDS VIEW MODE
               </div>
 
               <div style="width: 100%;" class="d-flex justify-content-between"
-                *ngIf="((account?.availableConnections?.length > 0 && fromMarketplace ) || (!fromMarketplace && !account.connectionName )) && isAuthenticated">
-                   <ng-container *ngFor="let relation of selectedRelations">
-                    <button type="button" class="relation-chip" style="white-space: nowrap;">
-                      <span>{{ relation.label }}</span>
+                *ngIf="isAuthenticated">
+                <div *ngIf="account?.connectionsInfo?.length > 0">
+                   <ng-container *ngFor="let relation of account?.connectionsInfo">
+                    <button type="button" class="relation-chip mr-1" style="white-space: nowrap;">
+                    <span>{{ getFormattedConnectionName(relation.connectedLabel) }}</span>
                       <i class="pi pi-times ml-1 removI"
-                        (click)="removeRelation(account)">
+                        (click)="removeRelation(account,relation)">
                       </i>
                     </button>
                   </ng-container>
-                <ng-container *ngIf="account?.availableConnections as options">
-                  <div class="relationWrap " style="text-align: end;" dropdown>
+                  </div>
+                    <div *ngIf="account?.connectionsInfo == null"></div>
+                    <div *ngIf="account?.availableConnections?.length > 0"> 
+                <ng-container *ngIf="   account?.availableConnections as options">
+                  <div class="relationWrap " style="text-align: end;" dropdown      container="body">
                     <button type="button" class="relation_button" dropdownToggle>
                       <img class="pb-1" style="width: 13px;" (click)="createRelation(options[0])"
-                        [src]="getConnectionIcon(options[0]?.connectLabel)" alt="" />
-                      <span (click)="createRelation(options[0])" class="ml-1" [title]="options[0]?.connectLabel">
+                        [src]="getConnectionIcon(options[0]?.connectionName)" alt="" />
+                      <span (click)="createRelation(options[0])" class="ml-1" [title]="options[0]?.connectionName">
                         {{
-                        options[0]?.connectLabel?.length > 10
-                        ? (options[0].connectLabel | slice: 0:10) + '...'
-                        : options[0]?.connectLabel
+                        options[0]?.connectionName
                         }}
                       </span>
 
@@ -295,15 +296,16 @@ NOT CARDS VIEW MODE
                       <ul *dropdownMenu class="dropdown-menu" role="menu">
                         <li role="menuitem" *ngFor="let option of options | slice:1" class="py-2">
                           <button class="dropdown-item" type="button" (click)="createRelation(option)">
-                            <img class="pb-1 mr-2" style="width: 15px;" [src]="getConnectionIcon(option?.connectLabel)"
-                              alt="" />
-                            {{ option?.connectLabel }}
+                            <!-- <img class="pb-1 mr-2" style="width: 15px;" [src]="getConnectionIcon(option?.connectionName)"
+                              alt="" /> -->
+                            {{ option?.connectionName }}
                           </button>
                         </li>
                       </ul>
                     </ng-container>
                   </div>
                 </ng-container>
+                </div>
                     <!-- <div *ngIf="isAuthenticated" class="btn relation_Status_button"
                   style="white-space: nowrap; cursor: auto;" dropdown>
                    <button type="button" dropdownToggle class="relationList"
@@ -332,39 +334,6 @@ NOT CARDS VIEW MODE
 
           </div>
         </div>
-
-
-
-
-        <!-- <div class="relation-bar d-flex flex-wrap align-items-center gap-2 justify-content-between mt-1">
-
-
-   <div class="d-flex gap-2 relationList">
-  <ng-container *ngFor="let relation of selectedRelations">
-    <button type="button" class="relation-chip">
-      <span>{{ relation.label }}</span>
-      <i class="pi pi-times ml-2 removI"
-         (click)="removeRelation(account)">
-      </i>
-    </button>
-  </ng-container>
-   </div>
-
-  <p-multiSelect
-    [options]="availableRelationOptions"
-    [(ngModel)]="selectedRelationValues"
-    optionLabel="label"
-    optionValue="value"
-    defaultLabel="+ Add Relation"
-    [showToggleAll]="false"
-     [selectedItemsLabel]="'+ Relation'"
-    [maxSelectedLabels]="0"
-    styleClass="relation-multiselect"
-    (onChange)="onRelationsChanged()">
-  </p-multiSelect>
-
-</div> -->
-
 
 
       </div>

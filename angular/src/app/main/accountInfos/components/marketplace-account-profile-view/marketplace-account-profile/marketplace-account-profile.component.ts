@@ -1,4 +1,4 @@
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { AfterViewInit, Component, Injector, OnInit } from '@angular/core';
 import { AppConsts } from '@shared/AppConsts';
 import { AppComponentBase } from '@shared/common/app-component-base';
@@ -97,54 +97,40 @@ export class MarketplaceAccountProfileComponent extends AppComponentBase impleme
         })
       )
       .subscribe((result:any) => {
-        const raw = typeof result === 'string' ? result : result?.result ?? '';
-        const { connectionName, disConnectLabel } = this.splitLabels(raw);
+        // const raw = typeof result === 'string' ? result : result?.result ?? '';
+        // const { connectionName, disConnectLabel } = this.splitLabels(raw);
 
         
-        this.marketPlaceData.availableConnections = [];
-        this.marketPlaceData.avaliableConnectionName = '';
+        // this.marketPlaceData.availableConnections = [];
+        // this.marketPlaceData.avaliableConnectionName = '';
 
-        this.marketPlaceData.connectionName   = this.l(connectionName);
-        this.marketPlaceData.disConnectLabel  = this.l(disConnectLabel);
+        // this.marketPlaceData.connectionName   = this.l(connectionName);
+        // this.marketPlaceData.disConnectLabel  = this.l(disConnectLabel);
 
       });
   }
 
 
 
-  getFormattedConnectionName(connection: string): string | null {
-    let raw: string | undefined;
+getFormattedConnectionName(label: string): string {
+  if (!label) return '';
 
-    if (connection === 'connectionName') {
-      raw = this.marketPlaceData?.connectionName?.trim();
-    } else if (connection === 'avaliableConnectionName') {
-      raw = this.marketPlaceData?.avaliableConnectionName?.trim();
-    } else {
-      raw = this.marketPlaceData?.disConnectLabel?.trim();
-    }
-
-    if (!raw) return null;
-
-    // If it's 'Follow', return as-is
-    if (raw === 'Follow') return 'Follow';
-    if (raw === 'Connect') return 'Connect';
-    if (raw === 'Join') return 'Join';
-    if (raw === 'Employ') return 'Employ';
-
-    // Format only if starts with 'MPAction'
-    if (raw.startsWith('MPAction')) {
-      const label = raw.replace('MPAction', '');
-      return label.charAt(0).toUpperCase() + label.slice(1).toLowerCase();
-    }
-
-    // For anything else, return null (or raw if you prefer)
-    return null;
+  if (label === 'Follow' || label === 'Connect' || label === 'Join' || label === 'Employ') {
+    return label;
   }
-  disconnect(): void {
+
+  if (label.startsWith('MPAction')) {
+    const clean = label.replace('MPAction', '');
+    return clean.charAt(0).toUpperCase() + clean.slice(1).toLowerCase();
+  }
+
+  return label;
+}
+  disconnect(relation): void {
 
     this.showMainSpinner();
     this._AccountsServiceProxy
-      .disconnect(this.marketPlaceData.account.id)
+      .disconnect(this.marketPlaceData.account.id,relation.relationEntityId)
       .pipe(
         finalize(() => {
           this.hideMainSpinner();
@@ -153,10 +139,10 @@ export class MarketplaceAccountProfileComponent extends AppComponentBase impleme
       )
       .subscribe((res) => {
         this.notify.success(this.l("SuccessfullyDisconnected"));
-        this.marketPlaceData.status = false;
-        this.marketPlaceData.connectionName = "";
-        this.marketPlaceData.avaliableConnectionName = res[0].connectLabel
-        this.marketPlaceData.availableConnections = res
+        // this.marketPlaceData.status = false;
+        // this.marketPlaceData.connectionName = "";
+        // this.marketPlaceData.avaliableConnectionName = res[0].connectionName
+        // this.marketPlaceData.availableConnections = res
       });
   }
   private readonly ICONS: Record<string, string> = {
@@ -174,13 +160,13 @@ export class MarketplaceAccountProfileComponent extends AppComponentBase impleme
     return 'assets/accounts/CONNECT.png'; // fallback
   }
 
-  private splitLabels(raw: string) {
-    // split at the first '-' that precedes the second "MPAction..."
-    const m = /^(.*?)-(MPAction.+)$/.exec(raw || '');
-    return m
-      ? { connectionName: m[1], disConnectLabel: m[2] }
-      : { connectionName: raw || '', disConnectLabel: '' };
-  }
+  // private splitLabels(raw: string) {
+  //   // split at the first '-' that precedes the second "MPAction..."
+  //   const m = /^(.*?)-(MPAction.+)$/.exec(raw || '');
+  //   return m
+  //     ? { connectionName: m[1], disConnectLabel: m[2] }
+  //     : { connectionName: raw || '', disConnectLabel: '' };
+  // }
 
   
 

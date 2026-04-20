@@ -1281,7 +1281,7 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit {
     }
 
     disConnect(): void {
-        this._AccountsServiceProxy.disconnect(this.accountDataForView.id)
+        this._AccountsServiceProxy.disconnect(this.accountDataForView.id,undefined)
             .subscribe(() => {
                 this.notify.success(this.l('SuccessfullyDisconnected'));
                 this.accountDataForView.status = false
