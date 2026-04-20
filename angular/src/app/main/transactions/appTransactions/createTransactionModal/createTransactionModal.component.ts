@@ -472,8 +472,7 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit, 
         this.getBranches(this.buyerCompanySSIN, 'buyer')
 
           this.showBuyerRelationshipIcon = true;
-          //i49-get buyerRelationshipName
-        this.buyerRelationshipName = event.value?.relationshipName || '';
+       this.getBuyerRelationshipName ();
     }
 
     handleSellerCompanyChange(event: any) {
@@ -490,9 +489,48 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit, 
         this.getBranches(this.sellerCompanySSIN, 'seller')
 
          this.showSellerRelationshipIcon = true;
-          //i49-get sellerRelationshipName
-        this.sellerRelationshipName = event.value?.relationshipName || '';
+        this.getSellerRelationshipName();
     }
+
+              //i49-get getBuyerRelationshipName
+    getBuyerRelationshipName() {
+        const lowerRole = this.role.toLowerCase();
+
+        if (lowerRole.includes('seller')) {
+            this.buyerRelationshipName = "Selling to this buyer - As Seller";
+
+        } else if (lowerRole.includes('sales rep')) {
+            this.buyerRelationshipName = "Connected to this buyer - As Sales Rep";
+
+        } else if (lowerRole.includes('buying office')) {
+            this.buyerRelationshipName = "Buying on behalf this Buyer - As Buying Office";
+
+        } else {
+            this.buyerRelationshipName = '';
+        }
+    }
+
+    
+    //i49-get getSellerRelationshipName
+    getSellerRelationshipName() {
+        const lowerRole = this.role.toLowerCase();
+
+        if (lowerRole.includes('sales rep')) {
+            this.sellerRelationshipName = "Selling on behalf of this Seller - As Sales Rep";
+
+        } else if (lowerRole.includes('buyer')) {
+            this.sellerRelationshipName = "Buying from this Seller - As Buyer";
+
+        } else if (lowerRole.includes('buying office')) {
+            this.sellerRelationshipName = "Connected to this Seller - As Buying Office";
+
+        } else {
+            this.sellerRelationshipName = '';
+        }
+    }
+
+
+
     loadInitialContacts() {
         this._AppTransactionServiceProxy
             .getAccountRelatedContacts(this.buyerComapnyId, '')
