@@ -66935,6 +66935,7 @@ export interface IConnectionType {
 }
 
 export class GetAccountForViewDto implements IGetAccountForViewDto {
+    entityExtraData!: AppEntityExtraDataDto[] | undefined;
     account!: AccountDto;
     contact!: ContactDto;
     connectionName!: string | undefined;
@@ -66967,6 +66968,11 @@ export class GetAccountForViewDto implements IGetAccountForViewDto {
             for (var property in _data) {
                 if (_data.hasOwnProperty(property))
                     this[property] = _data[property];
+            }
+            if (Array.isArray(_data["entityExtraData"])) {
+                this.entityExtraData = [] as any;
+                for (let item of _data["entityExtraData"])
+                    this.entityExtraData!.push(AppEntityExtraDataDto.fromJS(item));
             }
             this.account = _data["account"] ? AccountDto.fromJS(_data["account"]) : <any>undefined;
             this.contact = _data["contact"] ? ContactDto.fromJS(_data["contact"]) : <any>undefined;
@@ -67003,6 +67009,11 @@ export class GetAccountForViewDto implements IGetAccountForViewDto {
             if (this.hasOwnProperty(property))
                 data[property] = this[property];
         }
+        if (Array.isArray(this.entityExtraData)) {
+            data["entityExtraData"] = [];
+            for (let item of this.entityExtraData)
+                data["entityExtraData"].push(item.toJSON());
+        }
         data["account"] = this.account ? this.account.toJSON() : <any>undefined;
         data["contact"] = this.contact ? this.contact.toJSON() : <any>undefined;
         data["connectionName"] = this.connectionName;
@@ -67027,6 +67038,7 @@ export class GetAccountForViewDto implements IGetAccountForViewDto {
 }
 
 export interface IGetAccountForViewDto {
+    entityExtraData: AppEntityExtraDataDto[] | undefined;
     account: AccountDto;
     contact: ContactDto;
     connectionName: string | undefined;

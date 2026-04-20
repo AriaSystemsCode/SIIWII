@@ -29,7 +29,7 @@
                             </a>
                             <button type="submit" class="btn bgPurple btn-1bc5bd w-auto " [buttonBusy]="saving"
                                 [busyText]="l('SavingWithThreeDot')" (click)="save()"
-                                [disabled]="!accountInfoForm.form.valid || !touched">
+                                [disabled]="!accountInfoForm.form.valid || !touched || !selectedRoles?.length">
                                 <span>{{l("Save")}}</span>
                             </button>
 
