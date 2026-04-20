@@ -144,7 +144,7 @@ export class MarketplaceAccountProfileComponent extends AppComponentBase impleme
 
     this.showMainSpinner();
     this._AccountsServiceProxy
-      .disconnect(this.marketPlaceData.account.id)
+      .disconnect(this.marketPlaceData.account.id,undefined)
       .pipe(
         finalize(() => {
           this.hideMainSpinner();

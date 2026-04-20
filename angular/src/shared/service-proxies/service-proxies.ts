@@ -2030,14 +2030,19 @@ export class AccountsServiceProxy {
 
     /**
      * @param id (optional) 
+     * @param relationshipId (optional) 
      * @return Success
      */
-    disconnect(id: number | undefined): Observable<ConnectionType[]> {
+    disconnect(id: number | undefined, relationshipId: number | undefined): Observable<ConnectionType[]> {
         let url_ = this.baseUrl + "/api/services/app/Accounts/Disconnect?";
         if (id === null)
             throw new Error("The parameter 'id' cannot be null.");
         else if (id !== undefined)
             url_ += "id=" + encodeURIComponent("" + id) + "&";
+        if (relationshipId === null)
+            throw new Error("The parameter 'relationshipId' cannot be null.");
+        else if (relationshipId !== undefined)
+            url_ += "relationshipId=" + encodeURIComponent("" + relationshipId) + "&";
         url_ = url_.replace(/[?&]$/, "");
 
         let options_ : any = {
@@ -32075,9 +32080,10 @@ export class CreateMarketplaceAccountServiceProxy {
      * @param disconnect (optional) 
      * @param isPublic (optional) 
      * @param connectionTypeId (optional) 
+     * @param disconnectRelationId (optional) 
      * @return Success
      */
-    createOrEditMarketplaceContactRelationship(requesterSSIN: string | null | undefined, recipientSSIN: string | null | undefined, disconnect: boolean | null | undefined, isPublic: boolean | null | undefined, connectionTypeId: number | null | undefined): Observable<string> {
+    createOrEditMarketplaceContactRelationship(requesterSSIN: string | null | undefined, recipientSSIN: string | null | undefined, disconnect: boolean | null | undefined, isPublic: boolean | null | undefined, connectionTypeId: number | null | undefined, disconnectRelationId: number | null | undefined): Observable<string> {
         let url_ = this.baseUrl + "/api/services/app/CreateMarketplaceAccount/CreateOrEditMarketplaceContactRelationship?";
         if (requesterSSIN !== undefined && requesterSSIN !== null)
             url_ += "requesterSSIN=" + encodeURIComponent("" + requesterSSIN) + "&";
@@ -32089,6 +32095,8 @@ export class CreateMarketplaceAccountServiceProxy {
             url_ += "isPublic=" + encodeURIComponent("" + isPublic) + "&";
         if (connectionTypeId !== undefined && connectionTypeId !== null)
             url_ += "connectionTypeId=" + encodeURIComponent("" + connectionTypeId) + "&";
+        if (disconnectRelationId !== undefined && disconnectRelationId !== null)
+            url_ += "disconnectRelationId=" + encodeURIComponent("" + disconnectRelationId) + "&";
         url_ = url_.replace(/[?&]$/, "");
 
         let options_ : any = {
@@ -66420,6 +66428,7 @@ export class AccountDto implements IAccountDto {
     currencyId!: number | undefined;
     currencyCode!: string | undefined;
     currencyName!: string | undefined;
+    marketplaceAccountRole!: string | undefined;
     id!: number;
 
     [key: string]: any;
@@ -66496,6 +66505,7 @@ export class AccountDto implements IAccountDto {
             this.currencyId = _data["currencyId"];
             this.currencyCode = _data["currencyCode"];
             this.currencyName = _data["currencyName"];
+            this.marketplaceAccountRole = _data["marketplaceAccountRole"];
             this.id = _data["id"];
         }
     }
@@ -66570,6 +66580,7 @@ export class AccountDto implements IAccountDto {
         data["currencyId"] = this.currencyId;
         data["currencyCode"] = this.currencyCode;
         data["currencyName"] = this.currencyName;
+        data["marketplaceAccountRole"] = this.marketplaceAccountRole;
         data["id"] = this.id;
         return data;
     }
@@ -66617,6 +66628,7 @@ export interface IAccountDto {
     currencyId: number | undefined;
     currencyCode: string | undefined;
     currencyName: string | undefined;
+    marketplaceAccountRole: string | undefined;
     id: number;
 
     [key: string]: any;
@@ -66878,7 +66890,76 @@ export interface IContactDto {
     [key: string]: any;
 }
 
+export class ConnectionInfo implements IConnectionInfo {
+    connectionStatus!: string | undefined;
+    disconnectLabel!: string | undefined;
+    relationEntityId!: number;
+    pendingLabel!: string | undefined;
+    connectedLabel!: string | undefined;
+    visibility!: string | undefined;
+
+    [key: string]: any;
+
+    constructor(data?: IConnectionInfo) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.connectionStatus = _data["connectionStatus"];
+            this.disconnectLabel = _data["disconnectLabel"];
+            this.relationEntityId = _data["relationEntityId"];
+            this.pendingLabel = _data["pendingLabel"];
+            this.connectedLabel = _data["connectedLabel"];
+            this.visibility = _data["visibility"];
+        }
+    }
+
+    static fromJS(data: any): ConnectionInfo {
+        data = typeof data === 'object' ? data : {};
+        let result = new ConnectionInfo();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["connectionStatus"] = this.connectionStatus;
+        data["disconnectLabel"] = this.disconnectLabel;
+        data["relationEntityId"] = this.relationEntityId;
+        data["pendingLabel"] = this.pendingLabel;
+        data["connectedLabel"] = this.connectedLabel;
+        data["visibility"] = this.visibility;
+        return data;
+    }
+}
+
+export interface IConnectionInfo {
+    connectionStatus: string | undefined;
+    disconnectLabel: string | undefined;
+    relationEntityId: number;
+    pendingLabel: string | undefined;
+    connectedLabel: string | undefined;
+    visibility: string | undefined;
+
+    [key: string]: any;
+}
+
 export class ConnectionType implements IConnectionType {
+    connectionName!: string | undefined;
     connectLabel!: string | undefined;
     connectionEntityId!: number;
     defaultVisibility!: string | undefined;
@@ -66900,6 +66981,7 @@ export class ConnectionType implements IConnectionType {
                 if (_data.hasOwnProperty(property))
                     this[property] = _data[property];
             }
+            this.connectionName = _data["connectionName"];
             this.connectLabel = _data["connectLabel"];
             this.connectionEntityId = _data["connectionEntityId"];
             this.defaultVisibility = _data["defaultVisibility"];
@@ -66919,6 +67001,7 @@ export class ConnectionType implements IConnectionType {
             if (this.hasOwnProperty(property))
                 data[property] = this[property];
         }
+        data["connectionName"] = this.connectionName;
         data["connectLabel"] = this.connectLabel;
         data["connectionEntityId"] = this.connectionEntityId;
         data["defaultVisibility"] = this.defaultVisibility;
@@ -66927,6 +67010,7 @@ export class ConnectionType implements IConnectionType {
 }
 
 export interface IConnectionType {
+    connectionName: string | undefined;
     connectLabel: string | undefined;
     connectionEntityId: number;
     defaultVisibility: string | undefined;
@@ -66939,12 +67023,13 @@ export class GetAccountForViewDto implements IGetAccountForViewDto {
     account!: AccountDto;
     contact!: ContactDto;
     connectionName!: string | undefined;
+    disConnectLabel!: string | undefined;
     connectionCount!: number;
     avaliableConnectionName!: string | undefined;
     appEntityName!: string | undefined;
     isSync!: boolean;
     isPublished!: boolean;
-    disConnectLabel!: string | undefined;
+    connectionsInfo!: ConnectionInfo[] | undefined;
     availableConnections!: ConnectionType[] | undefined;
     visibility!: string | undefined;
     availableGroupConnections!: number;
@@ -66977,12 +67062,17 @@ export class GetAccountForViewDto implements IGetAccountForViewDto {
             this.account = _data["account"] ? AccountDto.fromJS(_data["account"]) : <any>undefined;
             this.contact = _data["contact"] ? ContactDto.fromJS(_data["contact"]) : <any>undefined;
             this.connectionName = _data["connectionName"];
+            this.disConnectLabel = _data["disConnectLabel"];
             this.connectionCount = _data["connectionCount"];
             this.avaliableConnectionName = _data["avaliableConnectionName"];
             this.appEntityName = _data["appEntityName"];
             this.isSync = _data["isSync"];
             this.isPublished = _data["isPublished"];
-            this.disConnectLabel = _data["disConnectLabel"];
+            if (Array.isArray(_data["connectionsInfo"])) {
+                this.connectionsInfo = [] as any;
+                for (let item of _data["connectionsInfo"])
+                    this.connectionsInfo!.push(ConnectionInfo.fromJS(item));
+            }
             if (Array.isArray(_data["availableConnections"])) {
                 this.availableConnections = [] as any;
                 for (let item of _data["availableConnections"])
@@ -67017,12 +67107,17 @@ export class GetAccountForViewDto implements IGetAccountForViewDto {
         data["account"] = this.account ? this.account.toJSON() : <any>undefined;
         data["contact"] = this.contact ? this.contact.toJSON() : <any>undefined;
         data["connectionName"] = this.connectionName;
+        data["disConnectLabel"] = this.disConnectLabel;
         data["connectionCount"] = this.connectionCount;
         data["avaliableConnectionName"] = this.avaliableConnectionName;
         data["appEntityName"] = this.appEntityName;
         data["isSync"] = this.isSync;
         data["isPublished"] = this.isPublished;
-        data["disConnectLabel"] = this.disConnectLabel;
+        if (Array.isArray(this.connectionsInfo)) {
+            data["connectionsInfo"] = [];
+            for (let item of this.connectionsInfo)
+                data["connectionsInfo"].push(item.toJSON());
+        }
         if (Array.isArray(this.availableConnections)) {
             data["availableConnections"] = [];
             for (let item of this.availableConnections)
@@ -67042,12 +67137,13 @@ export interface IGetAccountForViewDto {
     account: AccountDto;
     contact: ContactDto;
     connectionName: string | undefined;
+    disConnectLabel: string | undefined;
     connectionCount: number;
     avaliableConnectionName: string | undefined;
     appEntityName: string | undefined;
     isSync: boolean;
     isPublished: boolean;
-    disConnectLabel: string | undefined;
+    connectionsInfo: ConnectionInfo[] | undefined;
     availableConnections: ConnectionType[] | undefined;
     visibility: string | undefined;
     availableGroupConnections: number;
@@ -102477,6 +102573,7 @@ export class GetMarketplaceAccountForViewDto implements IGetMarketplaceAccountFo
     connectionName!: string | undefined;
     disConnectLabel!: string | undefined;
     availableConnections!: ConnectionType[] | undefined;
+    connectionsInfo!: ConnectionInfo[] | undefined;
 
     [key: string]: any;
 
@@ -102507,6 +102604,11 @@ export class GetMarketplaceAccountForViewDto implements IGetMarketplaceAccountFo
                 for (let item of _data["availableConnections"])
                     this.availableConnections!.push(ConnectionType.fromJS(item));
             }
+            if (Array.isArray(_data["connectionsInfo"])) {
+                this.connectionsInfo = [] as any;
+                for (let item of _data["connectionsInfo"])
+                    this.connectionsInfo!.push(ConnectionInfo.fromJS(item));
+            }
         }
     }
 
@@ -102535,6 +102637,11 @@ export class GetMarketplaceAccountForViewDto implements IGetMarketplaceAccountFo
             for (let item of this.availableConnections)
                 data["availableConnections"].push(item.toJSON());
         }
+        if (Array.isArray(this.connectionsInfo)) {
+            data["connectionsInfo"] = [];
+            for (let item of this.connectionsInfo)
+                data["connectionsInfo"].push(item.toJSON());
+        }
         return data;
     }
 }
@@ -102548,6 +102655,7 @@ export interface IGetMarketplaceAccountForViewDto {
     connectionName: string | undefined;
     disConnectLabel: string | undefined;
     availableConnections: ConnectionType[] | undefined;
+    connectionsInfo: ConnectionInfo[] | undefined;
 
     [key: string]: any;
 }

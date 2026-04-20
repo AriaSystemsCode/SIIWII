@@ -350,7 +350,7 @@ export class AccountsComponent
 
         this.showMainSpinner();
         this._accountsServiceProxy
-            .disconnect(account.account.id)
+            .disconnect(account.account.id,undefined)
             .pipe(
                 finalize(() => {
                     this.hideMainSpinner();
