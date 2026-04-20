@@ -1560,7 +1560,7 @@ buildMarketplaceRolesExtraData(): AppEntityExtraDataDto[] {
   dto.entityObjectTypeName = 'Marketplace Role';
   dto.attributeValueId = null;
   dto.attributeValue = joinedRoles;
-  dto.attributeId = 0;
+  dto.attributeId = 610;
   dto.attributeValueFkName = null;
   dto.attributeValueFkCode = null;
   dto.attributeCode = 'MARKETPLACE-ROLE';
