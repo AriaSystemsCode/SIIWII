@@ -22,6 +22,7 @@ import {
     SycAttachmentCategoriesServiceProxy,
     SycAttachmentCategoryDto,
     UiCustomizationSettingsDto,
+    AppTransactionServiceProxy,
 } from "@shared/service-proxies/service-proxies";
 import { NgxSpinnerService } from "ngx-spinner";
 import { NgxSpinnerTextService } from "@app/shared/ngx-spinner-text.service";
@@ -44,7 +45,7 @@ import {
     NavigationStart,
     Event as NavigationEvent,
 } from "@angular/router";
-import { debounceTime, filter, takeUntil } from "rxjs/operators";
+import { debounceTime, filter, finalize, map, takeUntil } from "rxjs/operators";
 import { Location } from "@angular/common";
 import { FileUploaderCustom } from "@shared/components/import-steps/models/FileUploaderCustom.model";
 import Swal, { SweetAlertOptions } from "sweetalert2";
@@ -93,6 +94,7 @@ export abstract class AppComponentBase {
     public transactionReportTemplateName:"OrderConfirmationForm1";
     currentLang: string
     isArabic: boolean
+    appTransaction:AppTransactionServiceProxy
 
     constructor(injector: Injector, private _location?: Location) {
         this.localization = injector.get(LocalizationService);
@@ -117,7 +119,9 @@ export abstract class AppComponentBase {
         this.transactionReportTemplateName="OrderConfirmationForm1";
         this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
         this.currentLang == 'ar' || this.currentLang == 'ar-EG'  ? this.isArabic = true : this.isArabic = false
-         this.getTenantRoles();
+        this.appTransaction = injector.get(AppTransactionServiceProxy);
+        if(!this.tenantRoles || this.tenantRoles?.length==0)
+          this.getTenantRoles();
     }
 
 
@@ -658,43 +662,52 @@ export abstract class AppComponentBase {
 
     getTenantRoles() {
           debugger;
-        //i49-getTenantRole
-        this.tenantRoles.push("seller");
-       // this.tenantRoles.push("sales rep");
-        this.tenantRoles.push("buyer");
-          this.tenantRoles.push("buying office");
+        this.appTransaction.getLoggedInTenantRoles().pipe(
+            finalize(
+                () => {
+                    //i49-getTenantRole
+                    // this.tenantRoles.push("sales rep");
+                    //  this.tenantRoles.push("buyer");
+                    //  this.tenantRoles.push("buying office");
+                    this.tenantRoles.push("seller");
 
-        const _tenantRoles = this.tenantRoles.map(r => r.toLowerCase());
+                    const _tenantRoles = this.tenantRoles?.map(r => r.toLowerCase());
 
-        this.tenantRoleFlags = {
-            isSeller: _tenantRoles.includes('seller'),
-            isSalesRep: _tenantRoles.includes('sales rep'),
-            isBuyer: _tenantRoles.includes('buyer'),
-            isBuyingOffice: _tenantRoles.includes('buying office')
-        };
+                    this.tenantRoleFlags = {
+                        isSeller: _tenantRoles?.includes('seller'),
+                        isSalesRep: _tenantRoles?.includes('sales rep'),
+                        isBuyer: _tenantRoles?.includes('buyer'),
+                        isBuyingOffice: _tenantRoles?.includes('buying office')
+                    };
 
-        // SO Roles
-        this.soRolesOptions = [
-            ...(this.tenantRoleFlags.isSeller
-                ? [{ name: "I'm a Seller", code: 1 }]
-                : []),
+                    // SO Roles
+                    this.soRolesOptions = [
+                        ...(this.tenantRoleFlags.isSeller
+                            ? [{ name: "I'm a Seller", code: 1 }]
+                            : []),
 
-            ...(this.tenantRoleFlags.isSalesRep
-                ? [{ name: "I'm an Independent Sales Rep.", code: 3 }]
-                : [])
-        ];
+                        ...(this.tenantRoleFlags.isSalesRep
+                            ? [{ name: "I'm an Independent Sales Rep.", code: 3 }]
+                            : [])
+                    ];
 
 
-        // PO Roles
-        this.poRolesOptions = [
-            ...(this.tenantRoleFlags.isBuyer
-                ? [{ name: "I'm a Buyer", code: 2 }]
-                : []),
+                    // PO Roles
+                    this.poRolesOptions = [
+                        ...(this.tenantRoleFlags.isBuyer
+                            ? [{ name: "I'm a Buyer", code: 2 }]
+                            : []),
 
-            ...(this.tenantRoleFlags.isBuyingOffice
-                ? [{ name: "I'm an Independent Buying Office.", code: 4 }]
-                : [])
-        ];
+                        ...(this.tenantRoleFlags.isBuyingOffice
+                            ? [{ name: "I'm an Independent Buying Office.", code: 4 }]
+                            : [])
+                    ];
+                }
+            )
+        )
+            .subscribe((res: any) => {
+                this.tenantRoles = res;
+            });  
     }
 
 
@@ -730,11 +743,15 @@ export abstract class AppComponentBase {
         })
     }
 
-    //i49-getRelationshipRoles
-    getRelationshipRoles() {
-        let relationshipRoles = [];
-        relationshipRoles.push("seller");
-        return relationshipRoles;
-    }
+   getRelationshipRoles(tenantId: number | undefined, accountSSIN: string) {
+  return this.appTransaction.getTenantAccountRelationships(tenantId, accountSSIN).pipe(
+    map((res: any) => {
+      let relationshipRoles = res || [];
+      relationshipRoles.push("seller");
+      return relationshipRoles;
+    })
+  );
+}
+
 
 }
