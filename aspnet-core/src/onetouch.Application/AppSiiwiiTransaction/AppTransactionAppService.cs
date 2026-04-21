@@ -78,6 +78,7 @@ using onetouch.AppMarketplaceContacts;
 using AuthorizeNet.APICore;
 using MimeKit;
 using DocumentFormat.OpenXml.Office2021.Drawing.SketchyShapes;
+using DocumentFormat.OpenXml.Vml.Office;
 
 
 //using NUglify.Helpers;
@@ -8041,37 +8042,55 @@ namespace onetouch.AppSiiwiiTransaction
         {
             var activeRealtionshipStatusId = await _helper.SystemTables.GetEntityObjectStatusRelationshipActive();
             List<string> returnRoles = new List<string>();
-            var contact = await _appContactRepository.GetAll()
+            var contact = await _appContactRepository.GetAll().Include(z=>z.EntityFk)
+                .ThenInclude(z=>z.EntityExtraData)
                 .Where(z => z.IsProfileData == true &&
             z.TenantId == AbpSession.TenantId && z.ParentId == null).FirstOrDefaultAsync();
             if (contact != null)
             {
-               var relations = await _appContactRelationshipInfoRepository.GetAll().Where(z => (z.RecipientContactSSIN == contact.SSIN ||
-                z.RequesterContactSSIN == contact.SSIN) && z.EntityObjectStatusId==activeRealtionshipStatusId && z.SharingLevel==1).ToListAsync();
-                if (relations != null && relations.Count > 0)
+                var extraRole = contact.EntityFk.EntityExtraData.Where(z => z.AttributeId == 610).FirstOrDefault();
+                if (extraRole != null)
                 {
-                    foreach (var relation in relations)
+                    string rolesString = extraRole.AttributeValue;
+                    if (!string.IsNullOrEmpty(rolesString))
                     {
-                        if (relation.RecipientContactSSIN == contact.SSIN)
+                        var roles = rolesString.Split('-');
+                        if (roles.Count() > 0)
                         {
-                            if (!string.IsNullOrEmpty(relation.RecipientMarketplaceRole) &&
-                                returnRoles.FirstOrDefault(z => z == relation.RecipientMarketplaceRole) == null)
-                                returnRoles.Add(relation.RecipientMarketplaceRole);
-
-
-                        }
-                        else
-                        {
-                            if (relation.RequesterContactSSIN== contact.SSIN)
+                            foreach (var role in roles)
                             {
-                                if (!string.IsNullOrEmpty(relation.RequesterMarketplaceRole) &&
-                                returnRoles.FirstOrDefault(z => z == relation.RequesterMarketplaceRole) == null)
-                                    returnRoles.Add(relation.RequesterMarketplaceRole);
+                                returnRoles.Add(role);
                             }
                         }
 
                     }
                 }
+               //var relations = await _appContactRelationshipInfoRepository.GetAll().Where(z => (z.RecipientContactSSIN == contact.SSIN ||
+               // z.RequesterContactSSIN == contact.SSIN) && z.EntityObjectStatusId==activeRealtionshipStatusId && z.SharingLevel==1).ToListAsync();
+               // if (relations != null && relations.Count > 0)
+               // {
+               //     foreach (var relation in relations)
+               //     {
+               //         if (relation.RecipientContactSSIN == contact.SSIN)
+               //         {
+               //             if (!string.IsNullOrEmpty(relation.RecipientMarketplaceRole) &&
+               //                 returnRoles.FirstOrDefault(z => z == relation.RecipientMarketplaceRole) == null)
+               //                 returnRoles.Add(relation.RecipientMarketplaceRole);
+
+
+                //         }
+                //         else
+                //         {
+                //             if (relation.RequesterContactSSIN== contact.SSIN)
+                //             {
+                //                 if (!string.IsNullOrEmpty(relation.RequesterMarketplaceRole) &&
+                //                 returnRoles.FirstOrDefault(z => z == relation.RequesterMarketplaceRole) == null)
+                //                     returnRoles.Add(relation.RequesterMarketplaceRole);
+                //             }
+                //         }
+
+                //    }
+                //}
             }
             return returnRoles;
 
