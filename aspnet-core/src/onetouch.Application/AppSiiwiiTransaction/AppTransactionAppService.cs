@@ -8100,9 +8100,9 @@ namespace onetouch.AppSiiwiiTransaction
         {
             var activeRealtionshipStatusId = await _helper.SystemTables.GetEntityObjectStatusRelationshipActive();
             List<AppContactRelationshipInfoDto> returList = new List<AppContactRelationshipInfoDto>();
-            var contact = await _appMarketplaceContactRepository.GetAll()
+            var contact = await _appContactRepository.GetAll()
                 .Where(z => z.IsProfileData == true &&
-            z.TenantOwner == tenantId && z.ParentId == null).FirstOrDefaultAsync();
+            z.TenantId == tenantId && z.ParentId == null).FirstOrDefaultAsync();
             if (contact != null)
             {
                 var relations = await _appContactRelationshipInfoRepository.GetAll()
