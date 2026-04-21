@@ -181,10 +181,7 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit {
         ];
 
       if (this.accountLevel == null) {
-        this.accountLevel = AccountLevelEnum.Profile;
-
-        //i49-getRelationshipRoles
-         // this.roleSeller =this.getRelationshipRoles();
+        this.accountLevel = AccountLevelEnum.Profile
       }
     
       await this.handleComponentMode();
@@ -193,6 +190,11 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit {
       this.handleRoutingChange();
       this.initUploaders();
       this.GetContactDefaults();
+      //i49-getRelationshipRoles
+          this.getRelationshipRoles(this._abpSessionService.tenantId, this.accountDataForView.ssin).subscribe(roles => {
+              const _tenantRoles = roles.map(r => r.toLowerCase());
+              this.roleSeller = _tenantRoles.includes('seller');
+          });
     }
     
     get isExternalAccount(): boolean { return this.accountLevel == AccountLevelEnum.External && !this.viewMode }
@@ -1281,7 +1283,7 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit {
     }
 
     disConnect(): void {
-        this._AccountsServiceProxy.disconnect(this.accountDataForView.id)
+        this._AccountsServiceProxy.disconnect(this.accountDataForView.id,undefined)
             .subscribe(() => {
                 this.notify.success(this.l('SuccessfullyDisconnected'));
                 this.accountDataForView.status = false

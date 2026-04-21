@@ -133,10 +133,8 @@ export class TopBarComponent extends ThemesLayoutBaseComponent implements OnInit
             this.showNoCreatePermissionAlert();
             return;
           }
-debugger;
          this.roles = this.soRolesOptions;
           this.getOderNumber("SO", "Sales Order");
-
         },
       },
 

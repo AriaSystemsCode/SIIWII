@@ -101,7 +101,7 @@ disconnect(): void {
   this.showMainSpinner();
 
   this._accountsServiceProxy
-    .disconnect(id)
+    .disconnect(id,undefined)
     .pipe(finalize(() => this.hideMainSpinner()))
     .subscribe((res: any[]) => {
       this.notify.success(this.l('SuccessfullyDisconnected'));

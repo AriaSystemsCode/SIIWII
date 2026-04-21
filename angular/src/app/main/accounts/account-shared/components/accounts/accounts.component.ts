@@ -346,24 +346,29 @@ export class AccountsComponent
             });
     }
 
-    disconnect(account: AccountDto): void {
+  disconnect(event): void {
+   
 
-        this.showMainSpinner();
-        this._accountsServiceProxy
-            .disconnect(account.account.id)
-            .pipe(
-                finalize(() => {
-                    this.hideMainSpinner();
-                })
-            )
-            .subscribe((res) => {
-                this.notify.success(this.l("SuccessfullyDisconnected"));
-                account.status = false;
-                account.connectionName = "";
-                account.avaliableConnectionName = res[0].connectLabel
-                account.availableConnections = res
-            });
-    }
+    this.showMainSpinner();
+    this._accountsServiceProxy
+        .disconnect(event.account.account.id, event.relation.relationEntityId)
+        .pipe(
+            finalize(() => {
+                this.hideMainSpinner();
+            })
+        )
+        .subscribe((res) => {
+            this.notify.success(this.l("SuccessfullyDisconnected"));
+
+            event.account.connectionsInfo = (event.account.connectionsInfo || []).filter(
+                x => x.relationEntityId !== event.relation.relationEntityId
+            );
+            event.account.availableConnections = res || [];
+            event.account.status = event.account.connectionsInfo.length > 0;
+            event.account.connectionName = '';
+            event.account.avaliableConnectionName = res?.length ? res[0].connectLabel : '';
+        });
+}
 
     initFilterForm() {
         if (this.filterForm) return;
