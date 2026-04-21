@@ -431,36 +431,53 @@ export class AccountsComponent
     }
 
 
-    createRelation(account, status: boolean = false) {
-        this.showMainSpinner();
-        this._accountsServiceProxy
-          .applyRelationOnProfile(
-            account.account.account.id,
-            undefined,
-            account.relation.defaultVisibility === 'Public',
-            account.relation.connectionEntityId
-          )
-          .pipe(finalize(() => this.hideMainSpinner()))
-          .subscribe((result: any) => {
-            // ABP might send string or { result: string }
-            const raw = typeof result === 'string' ? result : result?.result ?? '';
-            const { connectionName, disConnectLabel } = this.splitLabels(raw);
-      
-            const i = this.accounts.findIndex(x => x.account.id === account.account.account.id);
-            if (i >= 0) {
-              // keep your existing replacement
-              this.accounts[i] = account.account;
-      
-              // clear old options
-              this.accounts[i].availableConnections = [];
-              this.accounts[i].avaliableConnectionName = '';
-      
-              // assign localized labels separately
-              this.accounts[i].connectionName   = this.l(connectionName);
-              this.accounts[i].disConnectLabel  = this.l(disConnectLabel);
-            }
-          });
-      }
+  createRelation(account, status: boolean = false) {
+  this.showMainSpinner();
+
+  this._accountsServiceProxy
+    .applyRelationOnProfile(
+      account.account.account.id,
+      undefined,
+      account.relation.defaultVisibility === 'Public',
+      account.relation.connectionEntityId
+    )
+    .pipe(finalize(() => this.hideMainSpinner()))
+    .subscribe((result: any) => {
+      const raw = typeof result === 'string' ? result : result?.result ?? '';
+      const { connectionName, disConnectLabel } = this.splitLabels(raw);
+
+      const i = this.accounts.findIndex(x => x.account.id === account.account.account.id);
+      if (i < 0) return;
+
+      const currentAccount = this.accounts[i];
+
+
+      currentAccount.availableConnections = (currentAccount.availableConnections || []).filter(
+        x => x.connectionEntityId !== account.relation.connectionEntityId
+      );
+
+   
+      currentAccount.connectionName = this.l(connectionName);
+      currentAccount.disConnectLabel = this.l(disConnectLabel);
+
+
+      currentAccount.avaliableConnectionName =
+        currentAccount.availableConnections?.length > 0
+          ? currentAccount.availableConnections[0].connectLabel
+          : '';
+
+
+      currentAccount.connectionsInfo = currentAccount.connectionsInfo || [];
+      currentAccount.connectionsInfo.push({
+        ...account.relation,
+        connectedLabel: disConnectLabel,
+        relationEntityId: account.relation.connectionEntityId
+      });
+
+
+      this.accounts = [...this.accounts];
+    });
+}
       
 
         private splitLabels(raw: string) {

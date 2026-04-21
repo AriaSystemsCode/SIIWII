@@ -854,3 +854,20 @@ NEW CARD VIEW
 .fa-layer-group , .fa-sitemap ,.fa-map-marker-alt , .useIc {
   color: #4A0D4A;
 }
+
+
+.relation-popup-item {
+  border-bottom: 1px solid #f3f3f3;
+  padding-bottom: 8px;
+}
+
+.relation-popup-item:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+
+
+.removI {
+  cursor: pointer;
+}

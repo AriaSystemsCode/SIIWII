@@ -80,7 +80,7 @@ CARDS VIEW MODE
         class="w-100">
         <ng-container *ngIf="account?.availableConnections as options">
           <div class="relationWrap w-100 text-center" dropdown      container="body">
-            <button type="button" class="relation_button market-follow-btn" dropdownToggle>
+            <button type="button" class="relation_button market-follow-btn" dropdownToggle style="font-size: 12px;">
               <img class="pb-1" style="width: 13px;" (click)="createRelation(options[0])"
                 [src]="getConnectionIcon(options[0]?.connectionName)" alt="" />
               <span (click)="createRelation(options[0])" class="ml-1" [title]="options[0]?.connectionName">
@@ -265,16 +265,25 @@ NOT CARDS VIEW MODE
 
               <div style="width: 100%;" class="d-flex justify-content-between"
                 *ngIf="isAuthenticated">
-                <div *ngIf="account?.connectionsInfo?.length > 0">
-                   <ng-container *ngFor="let relation of account?.connectionsInfo">
-                    <button type="button" class="relation-chip mr-1" style="white-space: nowrap;">
-                    <span>{{ getFormattedConnectionName(relation.connectedLabel) }}</span>
-                      <i class="pi pi-times ml-1 removI"
-                        (click)="removeRelation(account,relation)">
-                      </i>
-                    </button>
-                  </ng-container>
-                  </div>
+             <div *ngIf="account?.connectionsInfo?.length > 0" class="d-flex align-items-center flex-wrap">
+  <!-- first relation -->
+  <button type="button" class="relation-chip mr-1" style="white-space: nowrap;">
+    <span>{{ getFormattedConnectionName(account.connectionsInfo[0]?.connectedLabel) }}</span>
+    <i
+      class="pi pi-times ml-1 removI"
+      (click)="removeRelation(account, account.connectionsInfo[0]); $event.stopPropagation()">
+    </i>
+  </button>
+
+  <!-- more relations -->
+  <button
+    *ngIf="account.connectionsInfo.length > 1"
+    type="button"
+    class="relation-chip mr-1"
+    (click)="openRelationsDialog(account)">
+    +{{ account.connectionsInfo.length - 1 }}
+  </button>
+</div>
                     <div *ngIf="account?.connectionsInfo == null"></div>
                     <div *ngIf="account?.availableConnections?.length > 0"> 
                 <ng-container *ngIf="   account?.availableConnections as options">
@@ -342,3 +351,32 @@ NOT CARDS VIEW MODE
     </div>
   </div>
 </div>
+
+
+
+<p-dialog
+  [(visible)]="showRelationsDialog"
+  [modal]="true"
+  [closable]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [dismissableMask]="true"
+  [style]="{ width: '420px' }"
+  header="Relations">
+
+  <div *ngIf="selectedAccountForRelations?.connectionsInfo?.length > 0" class="d-flex flex-column">
+    <div
+      *ngFor="let relation of selectedAccountForRelations.connectionsInfo; let i = index"
+      class="d-flex align-items-center justify-content-between relation-popup-item mb-2">
+
+      <button type="button" class="relation-chip" style="white-space: nowrap;">
+        <span>{{ getFormattedConnectionName(relation.connectedLabel) }}</span>
+        <i
+          class="pi pi-times ml-1 removI"
+          (click)="removeRelationFromDialog(selectedAccountForRelations, relation, i)">
+        </i>
+      </button>
+    </div>
+  </div>
+
+</p-dialog>

@@ -30,6 +30,8 @@ export class AccountCardComponent extends AppComponentBase implements OnChanges 
   isSmallScreen = false;
   isTouchDevice = false;
 
+  showRelationsDialog = false;
+selectedAccountForRelations: any = null;
   constructor(
     injector: Injector,
     private router: Router,
@@ -182,4 +184,21 @@ getFormattedConnectionName(label: string): string {
   stopPropagation($event) {
     $event.stopPropagation() // stop click event bubbling
   }
+
+  openRelationsDialog(account: any): void {
+  this.selectedAccountForRelations = account;
+  this.showRelationsDialog = true;
+}
+
+removeRelationFromDialog(account: any, relation: any, index: number): void {
+  this.removeRelation(account, relation);
+
+  // optional: close dialog if no relations left after UI update
+  setTimeout(() => {
+    if (!account?.connectionsInfo?.length) {
+      this.showRelationsDialog = false;
+    }
+  });
+}
+
 }

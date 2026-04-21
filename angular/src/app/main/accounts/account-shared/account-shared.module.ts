@@ -24,6 +24,7 @@ import { TableModule } from 'primeng/table';
 import { TabMenuModule } from 'primeng/tabmenu';
 import { TreeModule } from 'primeng/tree';
 import { TreeTableModule } from 'primeng/treetable';
+import { DialogModule } from 'primeng/dialog';
 
 
 @NgModule({
@@ -53,7 +54,8 @@ import { TreeTableModule } from 'primeng/treetable';
         TreeModule,
         CheckboxModule,
        BulkImportModule,
-        FiltersSharedModule
+        FiltersSharedModule,
+        DialogModule
     ],
     providers: [
         { provide: BsDatepickerConfig, useFactory: NgxBootstrapDatePickerConfigService.getDatepickerConfig },
