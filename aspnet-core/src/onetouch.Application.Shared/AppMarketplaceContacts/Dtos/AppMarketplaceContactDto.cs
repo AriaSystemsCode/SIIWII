@@ -109,6 +109,7 @@ namespace onetouch.AppMarketplaceContacts.Dtos
 		public string ConnectLabel { set; get; }
 		public long ConnectionEntityId { get; set; }
 		public string DefaultVisibility { get; set; }
+		public string RelationshipCode { get; set; }
 	}
 	//I40[End]
 	//I49[Start]
@@ -121,6 +122,7 @@ namespace onetouch.AppMarketplaceContacts.Dtos
         public string PendingLabel { set; get; }
         public string ConnectedLabel { set; get; }
         public string Visibility { set; get; }
+		public string RelationshipCode { set; get; }
 
     }
         //I49{End}

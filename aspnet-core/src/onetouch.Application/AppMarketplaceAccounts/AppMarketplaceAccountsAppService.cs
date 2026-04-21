@@ -418,7 +418,7 @@ namespace onetouch.AppMarketplaceAccounts
                                     connInfo.RelationEntityId = relationship.Id;
                                     connInfo.Visibility = relationship.SharingLevel == 1 ? "Public" : "Private";
                                     connInfo.ConnectionStatus = relationship.EntityObjectStatusCode;                                                         //account.Account.AccountType.Substring(0, 1);
-                                                                                                                                                             //xx
+                                    connInfo.RelationshipCode = relationship.EntityObjectTypeCode;                                                                                                            //xx
                                     var relationType = await _appEntityRepository.GetAll().Include(z => z.EntityExtraData).Where(z => z.Code == relationshipCode).FirstOrDefaultAsync();
                                     if (relationType != null)
                                     {
@@ -471,11 +471,17 @@ namespace onetouch.AppMarketplaceAccounts
                                 }
                             }
                             //I40[Start]
-                            else
+                            //else
                             {
                                 account.ConnectionName = "";
                                 foreach (var relationshipCodeLookup in relationShipLookups)
                                 {
+                                    if (account.ConnectionsInfo != null)
+                                    {
+                                        var existInconn = account.ConnectionsInfo.Where(z => z.RelationshipCode == relationshipCodeLookup.Code).FirstOrDefault();
+                                        if (existInconn != null)
+                                            continue;
+                                    }
                                     var requestorType = relationshipCodeLookup.EntityExtraData.Where(z => z.AttributeId == 606).FirstOrDefault();
                                     var requestorRole = relationshipCodeLookup.EntityExtraData.Where(z => z.AttributeId == 610).FirstOrDefault();
                                     var recepientRole = relationshipCodeLookup.EntityExtraData.Where(z => z.AttributeId == 611).FirstOrDefault();
@@ -536,11 +542,17 @@ namespace onetouch.AppMarketplaceAccounts
                             //account.ConnectionName = GetAction(account.Account.AccountType, currentTenantAccount, false);
                             //account.AvaliableConnectionName = "";
                         }
-                        else
+                        //else
                         {
                             account.ConnectionName = "";
                             foreach (var relationshipCodeLookup in relationShipLookups)
                             {
+                                if (account.ConnectionsInfo != null)
+                                {
+                                    var existInconn = account.ConnectionsInfo.Where(z => z.RelationshipCode == relationshipCodeLookup.Code).FirstOrDefault();
+                                    if (existInconn != null)
+                                        continue;
+                                }
                                 var requestorType = relationshipCodeLookup.EntityExtraData.Where(z => z.AttributeId == 606).FirstOrDefault();
                                 var requestorRole = relationshipCodeLookup.EntityExtraData.Where(z => z.AttributeId == 610).FirstOrDefault();
                                 var recepientRole = relationshipCodeLookup.EntityExtraData.Where(z => z.AttributeId == 611).FirstOrDefault();
@@ -986,6 +998,7 @@ namespace onetouch.AppMarketplaceAccounts
                                     connInfo.RelationEntityId = relationship.Id;
                                     connInfo.Visibility = relationship.SharingLevel == 1 ? "Public" : "Private";
                                     connInfo.ConnectionStatus = relationship.EntityObjectStatusCode;
+                                    connInfo.RelationshipCode = relationship.EntityObjectTypeCode;
                                     var relationshipCode = await _appEntityRepository.GetAll().Include(z => z.EntityExtraData).Where(z => z.Code == relationship.EntityObjectTypeCode).FirstOrDefaultAsync();
                                     if (relationshipCode != null)
                                     {
@@ -1011,7 +1024,7 @@ namespace onetouch.AppMarketplaceAccounts
                             //output.ConnectionName = GetAction(output.Account.AccountType, currentTenantAccount, false);
                             output.AvaliableConnectionName = "";
                         }
-                        else
+                        //else
                         {
                             //account.ConnectionName = account.ConnectionName == "Follow" ? GetAction(account.Account.AccountType) : "";
                             //output.AvaliableConnectionName = GetAction(output.Account.AccountType, currentTenantAccount, true);
@@ -1021,6 +1034,12 @@ namespace onetouch.AppMarketplaceAccounts
                                     .Where(z => z.EntityObjectTypeId == marketplaceRelationshipSycEntityObjId).ToListAsync();
                             foreach (var relationshipCodeLookup in relationShipLookups)
                             {
+                                if (output.ConnectionsInfo != null)
+                                {
+                                    var existInconn = output.ConnectionsInfo.Where(z => z.RelationshipCode == relationshipCodeLookup.Code).FirstOrDefault();
+                                    if (existInconn != null)
+                                        continue;
+                                }
                                 var requestorRole = relationshipCodeLookup.EntityExtraData.Where(z => z.AttributeId == 610).FirstOrDefault();
                                 var recepientRole = relationshipCodeLookup.EntityExtraData.Where(z => z.AttributeId == 611).FirstOrDefault();
                                 var requestorType = relationshipCodeLookup.EntityExtraData.Where(z => z.AttributeId == 606).FirstOrDefault();

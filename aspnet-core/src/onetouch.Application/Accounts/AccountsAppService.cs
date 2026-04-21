@@ -856,7 +856,7 @@ namespace onetouch.Accounts
                                         connInfo.RelationEntityId = relationship.Id;
                                         connInfo.Visibility = relationship.SharingLevel == 1 ? "Public" : "Private";
                                         connInfo.ConnectionStatus = relationship.EntityObjectStatusCode;
-
+                                        connInfo.RelationshipCode = relationship.EntityObjectTypeCode;
                                         //account.Visibility = relationship.SharingLevel == 1 ? "Public" : "Private";
                                         var relationType = await _appEntityRepository.GetAll().Include(z => z.EntityExtraData).Where(z => z.Code == relationship.EntityObjectTypeCode).FirstOrDefaultAsync();
                                         if (relationType != null)
@@ -915,7 +915,7 @@ namespace onetouch.Accounts
                                 //account.DisConnectLabel
                                 //I40[End]
                             }
-                            else
+                            //else
                             {
 
                                 //string relationshipCode = currentTenantAccountTypeCode.Substring(0, 1) + "T" +
@@ -940,6 +940,12 @@ namespace onetouch.Accounts
                                             .Where(z => z.EntityObjectTypeId == marketplaceRelationshipSycEntityObjId).ToListAsync();
                                     foreach (var relationshipCodeLookup in relationShipLookups)
                                     {
+                                        if (account.ConnectionsInfo != null)
+                                        {
+                                            var existInconn = account.ConnectionsInfo.Where(z => z.RelationshipCode == relationshipCodeLookup.Code).FirstOrDefault();
+                                            if (existInconn != null)
+                                                continue;
+                                        }
                                         var requestorRole = relationshipCodeLookup.EntityExtraData.Where(z => z.AttributeId == 610).FirstOrDefault();
                                         var recepientRole = relationshipCodeLookup.EntityExtraData.Where(z => z.AttributeId == 611).FirstOrDefault();
                                         var requestorType = relationshipCodeLookup.EntityExtraData.Where(z => z.AttributeId == 606).FirstOrDefault();
@@ -2814,14 +2820,14 @@ namespace onetouch.Accounts
                     }
                 }
                 string currentTenatntAccountMarketplaceRole = "";
-                var currentaccount = await _appMarketplaceContactRepository
-                    .GetAll().Include(z=>z.EntityExtraData).Where(z => z.TenantOwner == AbpSession.TenantId 
+                var currentaccount = await _appContactRepository
+                    .GetAll().Include(z=>z.EntityFk).ThenInclude(z=>z.EntityExtraData).Where(z => z.TenantId == AbpSession.TenantId 
                      && z.IsProfileData && z.ParentId == null).FirstOrDefaultAsync();
                 if (currentaccount != null)
                 {
                     requesterSSIN = currentaccount.SSIN;
-                    RequestorEntityObjecttypeId = currentaccount.EntityObjectTypeCode;
-                    var extraDataRole = currentaccount.EntityExtraData
+                    RequestorEntityObjecttypeId = currentaccount.EntityFk.EntityObjectTypeCode;
+                    var extraDataRole = currentaccount.EntityFk.EntityExtraData
                             .Where(z => z.AttributeId == 610).FirstOrDefault();
                     if (extraDataRole != null)
                     {
@@ -2856,6 +2862,7 @@ namespace onetouch.Accounts
 
                                 AvailableConnections.Add(new ConnectionType
                                 {
+                                    RelationshipCode = relationshipCodeLookup.Code,
                                     ConnectionName = relationshipCodeLookup.Name,
                                     ConnectionEntityId = relationshipCodeLookup.Id,
                                     ConnectLabel = connectLabel.AttributeValue,
@@ -2965,6 +2972,23 @@ namespace onetouch.Accounts
                     }
                     //T-SII-20221013.0006,1 MMT 11/02/2022 Notify the destination tenant that another tenant connected to him[End]
                     await _iCreateMarketplaceAccount.CreateOrEditMarketplaceContactRelationship(requesterSSIN, recipientSSIN, true, null, null, relationshipId);
+                    //MMT
+                    var relationshipsList = await _appContactRelationshipInfoRepository.GetAll()
+                               .Where(z => currentaccount != null && ((z.RecipientContactSSIN == currentaccount.SSIN && z.RequesterContactSSIN == account.SSIN)
+                               || (z.RecipientContactSSIN == account.SSIN && z.RequesterContactSSIN == currentaccount.SSIN))
+                              ).OrderByDescending(z => z.CreationTime).ToListAsync();
+                    if (relationshipsList != null && relationshipsList.Count > 0)
+                    {
+                       foreach (var rel in relationshipsList)
+                       {
+                            var exist = AvailableConnections.Where(z => z.RelationshipCode == rel.EntityObjectTypeCode).FirstOrDefault();
+                            if (exist != null)
+                            {
+                                AvailableConnections.Remove(exist);
+                            }
+                       }
+                    }
+                    //MMT
                     return AvailableConnections;
                 }
 
