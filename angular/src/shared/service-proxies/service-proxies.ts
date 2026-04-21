@@ -66897,6 +66897,7 @@ export class ConnectionInfo implements IConnectionInfo {
     pendingLabel!: string | undefined;
     connectedLabel!: string | undefined;
     visibility!: string | undefined;
+    relationshipCode!: string | undefined;
 
     [key: string]: any;
 
@@ -66921,6 +66922,7 @@ export class ConnectionInfo implements IConnectionInfo {
             this.pendingLabel = _data["pendingLabel"];
             this.connectedLabel = _data["connectedLabel"];
             this.visibility = _data["visibility"];
+            this.relationshipCode = _data["relationshipCode"];
         }
     }
 
@@ -66943,6 +66945,7 @@ export class ConnectionInfo implements IConnectionInfo {
         data["pendingLabel"] = this.pendingLabel;
         data["connectedLabel"] = this.connectedLabel;
         data["visibility"] = this.visibility;
+        data["relationshipCode"] = this.relationshipCode;
         return data;
     }
 }
@@ -66954,6 +66957,7 @@ export interface IConnectionInfo {
     pendingLabel: string | undefined;
     connectedLabel: string | undefined;
     visibility: string | undefined;
+    relationshipCode: string | undefined;
 
     [key: string]: any;
 }
@@ -66963,6 +66967,7 @@ export class ConnectionType implements IConnectionType {
     connectLabel!: string | undefined;
     connectionEntityId!: number;
     defaultVisibility!: string | undefined;
+    relationshipCode!: string | undefined;
 
     [key: string]: any;
 
@@ -66985,6 +66990,7 @@ export class ConnectionType implements IConnectionType {
             this.connectLabel = _data["connectLabel"];
             this.connectionEntityId = _data["connectionEntityId"];
             this.defaultVisibility = _data["defaultVisibility"];
+            this.relationshipCode = _data["relationshipCode"];
         }
     }
 
@@ -67005,6 +67011,7 @@ export class ConnectionType implements IConnectionType {
         data["connectLabel"] = this.connectLabel;
         data["connectionEntityId"] = this.connectionEntityId;
         data["defaultVisibility"] = this.defaultVisibility;
+        data["relationshipCode"] = this.relationshipCode;
         return data;
     }
 }
@@ -67014,6 +67021,7 @@ export interface IConnectionType {
     connectLabel: string | undefined;
     connectionEntityId: number;
     defaultVisibility: string | undefined;
+    relationshipCode: string | undefined;
 
     [key: string]: any;
 }
