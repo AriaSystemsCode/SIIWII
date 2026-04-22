@@ -244,20 +244,49 @@ this.accountsTypes=result.items;
           .pipe(finalize(() => this.hideMainSpinner()))
           .subscribe((result: any) => {
           
-            const raw = typeof result === 'string' ? result : result?.result ?? '';
-            const { connectionName, disConnectLabel } = this.splitLabels(raw);
+            // const raw = typeof result === 'string' ? result : result?.result ?? '';
+            // const { connectionName, disConnectLabel } = this.splitLabels(raw);
       
-            const i = this.accounts.findIndex(x => x.account.id === account.account.account.id);
-            if (i >= 0) {
+            // const i = this.accounts.findIndex(x => x.account.id === account.account.account.id);
+            // if (i >= 0) {
               
-              this.accounts[i] = account.account;
+            //   this.accounts[i] = account.account;
       
-              this.accounts[i].availableConnections = [];
-              this.accounts[i].avaliableConnectionName = '';
+            //   this.accounts[i].availableConnections = [];
+            //   this.accounts[i].avaliableConnectionName = '';
       
-              this.accounts[i].connectionName   = this.l(connectionName);
-              this.accounts[i].disConnectLabel  = this.l(disConnectLabel);
-            }
+            //   this.accounts[i].connectionName   = this.l(connectionName);
+            //   this.accounts[i].disConnectLabel  = this.l(disConnectLabel);
+               const raw = typeof result === 'string' ? result : result?.result ?? '';
+      const { connectionName, disConnectLabel } = this.splitLabels(raw);
+
+      const i = this.accounts.findIndex(x => x.account.id === account.account.account.id);
+      if (i < 0) return;
+
+      const currentAccount = this.accounts[i];
+
+
+      currentAccount.availableConnections = (currentAccount.availableConnections || []).filter(
+        x => x.connectionEntityId !== account.relation.connectionEntityId
+      );
+
+   
+      currentAccount.connectionName = this.l(connectionName);
+      currentAccount.disConnectLabel = this.l(disConnectLabel);
+
+
+      currentAccount.avaliableConnectionName =
+        currentAccount.availableConnections?.length > 0
+          ? currentAccount.availableConnections[0].connectLabel
+          : '';
+
+
+      currentAccount.connectionsInfo = currentAccount.connectionsInfo || [];
+      currentAccount.connectionsInfo.push(result[0]);
+
+
+      this.accounts = [...this.accounts];
+            // }
           });
       }
 
@@ -300,15 +329,20 @@ this.accountsTypes=result.items;
             })
         )
         .subscribe((res) => {
-            this.notify.success(this.l("SuccessfullyDisconnected"));
+      
+       this.notify.success(this.l("SuccessfullyDisconnected"));
 
             event.account.connectionsInfo = (event.account.connectionsInfo || []).filter(
                 x => x.relationEntityId !== event.relation.relationEntityId
             );
-            event.account.availableConnections = res || [];
-            event.account.status = event.account.connectionsInfo.length > 0;
-            event.account.connectionName = '';
-            event.account.avaliableConnectionName = res?.length ? res[0].connectLabel : '';
+            event.account.availableConnections.push(res[0])
+            // event.account.connectionsInfo = (event.account.connectionsInfo || []).filter(
+            //     x => x.relationEntityId !== event.relation.relationEntityId
+            // );
+            // event.account.availableConnections = res || [];
+            // event.account.status = event.account.connectionsInfo.length > 0;
+            // event.account.connectionName = '';
+            // event.account.avaliableConnectionName = res?.length ? res[0].connectLabel : '';
         });
 }
 
