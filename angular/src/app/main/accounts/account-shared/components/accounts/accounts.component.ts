@@ -363,10 +363,11 @@ export class AccountsComponent
             event.account.connectionsInfo = (event.account.connectionsInfo || []).filter(
                 x => x.relationEntityId !== event.relation.relationEntityId
             );
-            event.account.availableConnections = res || [];
-            event.account.status = event.account.connectionsInfo.length > 0;
-            event.account.connectionName = '';
-            event.account.avaliableConnectionName = res?.length ? res[0].connectLabel : '';
+            event.account.availableConnections.push(res[0])
+            // event.account.availableConnections = res || [];
+            // event.account.status = event.account.connectionsInfo.length > 0;
+            // event.account.connectionName = '';
+            // event.account.avaliableConnectionName = res?.length ? res[0].connectLabel : '';
         });
 }
 
@@ -468,11 +469,7 @@ export class AccountsComponent
 
 
       currentAccount.connectionsInfo = currentAccount.connectionsInfo || [];
-      currentAccount.connectionsInfo.push({
-        ...account.relation,
-        connectedLabel: disConnectLabel,
-        relationEntityId: account.relation.connectionEntityId
-      });
+      currentAccount.connectionsInfo.push(result[0]);
 
 
       this.accounts = [...this.accounts];

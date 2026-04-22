@@ -1,23 +1,16 @@
 <form [formGroup]="filterForm" >
 
     <div class="mb-4 pb-5 pt-1 border-bottom removeScroll " >
-        <!-- <app-multi-selection-filter
-            #AccountTypeFilter
-            [filterMetaData]="accountTypeFilterMetaData"
-            [formContol]="filterForm.controls.accountTypes"
-            [title]="'AccountTypes' | localize"
-            (onLoadData)="getAccountTypesList(AccountTypeFilter)"
-        >
-        </app-multi-selection-filter> -->
+
   <h4 class="text-captitalize mb-3">{{ 'AccountTypes' | localize }}</h4>
 
-  <div class="pl-5 pr-4">
+  <div class="">
     <p-dropdown
       [options]="accountTypeOptions"
       formControlName="accountTypes"
       optionLabel="label"
       optionValue="value"
-      [placeholder]="'All Account Types' | localize"
+      [placeholder]="'All' | localize"
       [showClear]="false"
       class="w-100">
     </p-dropdown>
@@ -67,21 +60,21 @@
 
     <div class="mt-4 pt-4" >
         <h4 class="text-captitalize mb-3">{{"City" | localize}}</h4>
-        <div class="d-flex flex-column d-flex flex-wrap pl-5 pr-4">
+        <div class="d-flex flex-column d-flex flex-wrap">
             <input type="text" formControlName="city" name="city" class="form-control" placeholder="{{ 'EnterText' | localize }}" />
         </div>
     </div>
 
     <div class="mt-4" >
         <h4 class="text-captitalize mb-3">{{"PostalCode" | localize}}</h4>
-        <div class="d-flex flex-column d-flex flex-wrap  pl-5 pr-4">
+        <div class="d-flex flex-column d-flex flex-wrap">
             <input type="text" formControlName="postalCode" name="postalCode" class="form-control" placeholder="{{ 'EnterText' | localize }}" />
         </div>
     </div>
 
     <div class="mt-4 mb-4 pb-5 border-bottom" >
         <h4 class="text-captitalize mb-3">{{"State" | localize}}</h4>
-        <div class="d-flex flex-column d-flex flex-wrap pl-5 pr-4">
+        <div class="d-flex flex-column d-flex flex-wrap">
             <input type="text" formControlName="state" name="state" class="form-control" placeholder="{{ 'EnterText' | localize }}" />
         </div>
     </div>

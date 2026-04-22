@@ -28,6 +28,8 @@ export class ConnectionsCardComponent extends AppComponentBase {
 
     isAuthenticated: boolean = false;
 
+  showRelationsDialog = false;
+selectedAccountForRelations: any = null;
     constructor(
         injector: Injector,
         private router: Router,
@@ -51,9 +53,9 @@ export class ConnectionsCardComponent extends AppComponentBase {
     }
 
 
-    disconnect(account,relation): void {
-     this.disconnectMe.emit({ account, relation });
-    }
+    // disconnect(account,relation): void {
+    //  this.disconnectMe.emit({ account, relation });
+    // }
 
     edit(): void {
         if (!this.id) return
@@ -111,6 +113,50 @@ getFormattedConnectionName(label: string): string {
         }
         return 'assets/accounts/CONNECT.png'; // fallback
       }
+
+
+  stopPropagation($event) {
+    $event.stopPropagation() // stop click event bubbling
+  }
+
+  openRelationsDialog(account: any): void {
+  this.selectedAccountForRelations = account;
+  this.showRelationsDialog = true;
+}
+
+ disconnect(account, relation) {
+  this.disconnectMe.emit({ account, relation });
+}
+
+removeRelationFromDialog(account: any, relation: any, index: number): void {
+  this.disconnect(account, relation);
+
+  // optional: close dialog if no relations left after UI update
+  setTimeout(() => {
+    if (!account?.connectionsInfo?.length) {
+      this.showRelationsDialog = false;
+    }
+  });
+}
+
+
+      openedRelationMenuId: number | null = null;
+
+toggleRelationMenu(event: MouseEvent, account: any): void {
+  event.preventDefault();
+  event.stopPropagation();
+
+  const id = account?.account?.id;
+  this.openedRelationMenuId = this.openedRelationMenuId === id ? null : id;
+}
+
+onRelationOptionClick(event: MouseEvent, option: any): void {
+  event.preventDefault();
+  event.stopPropagation();
+
+  this.createRelation(option);
+  this.openedRelationMenuId = null;
+}
 
 }
 

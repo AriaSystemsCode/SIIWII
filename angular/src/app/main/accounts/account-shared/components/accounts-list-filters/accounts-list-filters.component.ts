@@ -321,7 +321,7 @@ getAccountTypesList(): void {
       });
 
       this.accountTypeOptions = [
-        { label: this.l('AllAccountTypes'), value: null },
+        { label: this.l('All'), value: null },
         ...filteredItems
       ];
     });

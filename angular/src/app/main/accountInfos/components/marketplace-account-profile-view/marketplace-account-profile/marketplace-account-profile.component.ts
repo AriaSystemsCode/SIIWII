@@ -188,6 +188,16 @@ getFormattedConnectionName(label: string): string {
     );
   }
   
+showConnectionsDialog = false;
 
-  
+openConnectionsDialog(): void {
+  this.showConnectionsDialog = true;
+}
+  onMainAvailableClick(event: Event): void {
+  const list = this.marketPlaceData?.availableConnections || [];
+
+  if (list.length === 1) {
+    this.createRelation(list[0]);
+  }
+}
 }

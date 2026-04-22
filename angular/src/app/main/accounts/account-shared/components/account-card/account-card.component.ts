@@ -144,7 +144,7 @@ getFormattedConnectionName(label: string): string {
           this.hideMainSpinner();
         })
       )
-      .subscribe((result: string) => {
+      .subscribe((result) => {
 
         account.visibility == 'Public' ? account.visibility = 'Private' : account.visibility = 'Public'
         account.visibility == 'Public' ? this.notify.success('Account is Shared') : this.notify.success('Account is Private')
@@ -201,4 +201,22 @@ removeRelationFromDialog(account: any, relation: any, index: number): void {
   });
 }
 
+
+openedRelationMenuId: number | null = null;
+
+toggleRelationMenu(event: MouseEvent, account: any): void {
+  event.preventDefault();
+  event.stopPropagation();
+
+  const id = account?.account?.id;
+  this.openedRelationMenuId = this.openedRelationMenuId === id ? null : id;
+}
+
+onRelationOptionClick(event: MouseEvent, option: any): void {
+  event.preventDefault();
+  event.stopPropagation();
+
+  this.createRelation(option);
+  this.openedRelationMenuId = null;
+}
 }

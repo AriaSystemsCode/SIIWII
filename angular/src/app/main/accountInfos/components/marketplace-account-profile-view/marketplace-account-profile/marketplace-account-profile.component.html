@@ -13,7 +13,77 @@
         <div class="d-flex justify-content-between align-items-center">
           <h4>{{accountDataForView?.name}}</h4>
 
-  
+    <div
+  *ngIf="isAuthenticated"
+  class="d-md-flex d-none align-items-center "
+  style="gap: 4px;"
+>
+  <!-- No current connections -->
+  <ng-container *ngIf="!marketPlaceData?.connectionsInfo?.length">
+    <div *ngIf="marketPlaceData?.availableConnections?.length > 0" dropdown class="position-relative">
+      <button type="button" class="relation_button" dropdownToggle>
+          <img src="assets/accounts/CONNECT.png" alt="" srcset="">
+        <span>{{ 'AvailableConnections' | localize }}</span>
+        <i class="fas fa-angle-down ml-2" style="color: #fff !important;"></i>
+      </button>
+
+      <ul *dropdownMenu class="dropdown-menu" role="menu">
+        <li
+          role="menuitem"
+          *ngFor="let option of marketPlaceData?.availableConnections"
+          class="py-2"
+        >
+          <button class="dropdown-item" type="button" (click)="createRelation(option)">
+            {{ option?.connectionName }}
+          </button>
+        </li>
+      </ul>
+    </div>
+  </ng-container>
+
+  <!-- Existing connections -->
+  <ng-container *ngIf="marketPlaceData?.connectionsInfo?.length > 0">
+    <!-- First connection only -->
+    <button type="button" class="relation-chip mr-1" style="white-space: nowrap;">
+      <span>
+        {{ getFormattedConnectionName(marketPlaceData?.connectionsInfo[0]?.connectedLabel) }}
+      </span>
+      <i
+        class="pi pi-times ml-1 removI"
+        (click)="disconnect(marketPlaceData?.connectionsInfo[0])"
+      ></i>
+    </button>
+
+    <!-- More count -->
+    <button
+      *ngIf="marketPlaceData?.connectionsInfo?.length > 1"
+      type="button"
+      class="relation-chip more-chip"
+      (click)="openConnectionsDialog()"
+    >
+      +{{ marketPlaceData?.connectionsInfo?.length - 1 }}
+    </button>
+
+    <!-- Add available connections -->
+    <div *ngIf="marketPlaceData?.availableConnections?.length > 0" dropdown class="position-relative">
+      <button type="button" class="relation-add-btn dots-btn" dropdownToggle>
+          <img src="assets/accounts/CONNECT.png" alt="" srcset="">
+      </button>
+
+      <ul *dropdownMenu class="dropdown-menu" role="menu">
+        <li
+          role="menuitem"
+          *ngFor="let option of marketPlaceData?.availableConnections"
+          class="py-2"
+        >
+          <button class="dropdown-item" type="button" (click)="createRelation(option)">
+            {{ option?.connectionName }}
+          </button>
+        </li>
+      </ul>
+    </div>
+  </ng-container>
+</div>
         </div>
         <div class="d-flex justify-content-between">
           <div class="d-md-flex d-none gap-3 justify-content-start align-items-center"
@@ -43,74 +113,8 @@
             </p>
           </div>
 
-          <span style="width: 100%; " class="mt-3"
-          *ngIf="marketPlaceData?.availableConnections?.length > 0 && isAuthenticated">
+  
 
-          <!-- Guard + alias once -->
-          <ng-container *ngIf="marketPlaceData?.availableConnections as options">
-              <div
-              [ngClass]="isArabic?'dropAr':'dropEn'"
-                  style="white-space: nowrap; position: absolute;  top: 5px;" dropdown>
-                  <!-- Main button = first option -->
-                  <button type="button" class="relation_button" dropdownToggle
-                     >
-                      <img class="pb-1" style="width: 14px;" (click)="createRelation(options[0])"
-                          [src]="getConnectionIcon(options[0]?.connectionName)" alt="" />
-                      <span  (click)="createRelation(options[0])" class="ml-1">{{ options[0]?.connectionName }}</span>
-
-                      <!-- caret only if there are more -->
-                      <i *ngIf="options.length > 1" class="fas fa-lg ml-2 fa-angle-down"
-                          style="color: #fff !important;"></i>
-                  </button>
-
-                  <!-- Dropdown only if > 1 -->
-                  <ng-container *ngIf="options?.length > 1">
-                      <ul *dropdownMenu class="dropdown-menu" role="menu">
-                        <li role="menuitem" *ngFor="let option of options | slice:1" class="py-2">
-                          <button class="dropdown-item" type="button" (click)="createRelation(option)">
-                            <!-- <img class="pb-1 mr-2" style="width: 18px;" [src]="getConnectionIcon(option?.connectionName)" alt="" /> -->
-                            {{ option?.connectionName }}
-                          </button>
-                        </li>
-                      </ul>
-                    </ng-container>
-                    
-              </div>
-          </ng-container>
-
-      </span>
-     
-          <!-- <span  style="width: 100%; " class="mt-3 d-flex"  *ngIf="marketPlaceData?.availableConnections?.length == 0 && marketPlaceData?.connectionName && isAuthenticated">
-            <div  class="btn relation_Status_button " style="    white-space: nowrap;
-                position: absolute;
-              cursor: auto;  "   [ngClass]="isArabic?'dropCnAr':'dropCnEn'" dropdown>
-                
-                <button type="button"  dropdownToggle style="  border: 1px solid #EEEEEEEE !important;
-                background: white;border-radius: 6px;">
-                       <img class="pb-1" style="width: 20px;" src="../../assets/accounts/ph_check-bold.png" /> <span>{{ getFormattedConnectionName('connectionName') | localize }}</span> <i class="fas fa-lg ml-2 fa-angle-down" style="color: #777777 !important;"></i>
-                </button>
-              
-                <ul *dropdownMenu class="dropdown-menu" role="menu">
-                  <li role="menuitem">
-                    <button class="dropdown-item" type="button" (click)="disconnect()">
-                      {{  getFormattedConnectionName('disConnectLabel') }}
-                    </button>
-                  </li>
-                </ul>
-              </div>
-              
-
-        </span> -->
-     <div *ngIf="marketPlaceData?.connectionsInfo?.length > 0 && isAuthenticated">
-                   <ng-container *ngFor="let relation of marketPlaceData?.connectionsInfo">
-                    <button type="button" class="relation-chip mr-1" style="white-space: nowrap;">
-                    <span>{{ getFormattedConnectionName(relation.connectedLabel) }}</span>
-                      <i class="pi pi-times ml-1 removI"
-                        (click)="disconnect(relation)">
-                      </i>
-                    </button>
-                  </ng-container>
-                  </div>
         </div>
       </div>
 
@@ -138,6 +142,149 @@
           </svg> <span class="connections">{{marketPlaceData?.connectionCount}} {{'Connections' | localize}}</span>
         </p>
       </div>
+
+       <div
+  *ngIf="isAuthenticated"
+  class="d-md-none d-flex align-items-center m-2"
+  style="width: 100%;"
+>
+  <!-- Case 1: No current connections, only available connections -->
+  <ng-container
+    *ngIf="!marketPlaceData?.connectionsInfo?.length && marketPlaceData?.availableConnections?.length > 0"
+  >
+    <div class="w-100 d-flex justify-content-center">
+      <div dropdown class="w-100 position-relative"          >
+        <button
+          type="button"
+          class="relation_button w-100 d-flex align-items-center justify-content-center"
+          dropdownToggle
+        >
+            <img src="assets/accounts/CONNECT.png" alt="" srcset="">
+          <span>{{ marketPlaceData?.availableConnections[0]?.connectionName }}</span>
+          <i
+            *ngIf="marketPlaceData?.availableConnections?.length > 1"
+            class="fas fa-angle-down ml-2"
+            style="color: #fff !important;"
+          ></i>
+        </button>
+
+        <ul
+          *dropdownMenu
+          class="dropdown-menu w-100"
+          role="menu"
+ container="body"
+       
+        >
+        
+          <li
+            role="menuitem"
+            *ngFor="let option of marketPlaceData?.availableConnections | slice:1"
+            class="py-2"
+          >
+            <button class="dropdown-item" type="button" (click)="createRelation(option)">
+              {{ option?.connectionName }}
+            </button>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </ng-container>
+
+  <!-- Case 2: Only current connections, no available -->
+  <ng-container
+    *ngIf="marketPlaceData?.connectionsInfo?.length > 0 && !marketPlaceData?.availableConnections?.length"
+  >
+    <div class="w-100 d-flex justify-content-center">
+      <div class="d-flex align-items-center justify-content-center w-100" style="gap: 6px;">
+        <button
+          type="button"
+          class="relation-chip"
+          style="white-space: nowrap; max-width: calc(100% - 70px);"
+        >
+          <span>
+            {{ getFormattedConnectionName(marketPlaceData?.connectionsInfo[0]?.connectedLabel) }}
+          </span>
+          <i
+            class="pi pi-times ml-1 removI"
+            (click)="disconnect(marketPlaceData?.connectionsInfo[0])"
+          ></i>
+        </button>
+
+        <button
+          *ngIf="marketPlaceData?.connectionsInfo?.length > 1"
+          type="button"
+          class="relation-chip more-chip"
+          (click)="openConnectionsDialog()"
+        >
+          +{{ marketPlaceData?.connectionsInfo?.length - 1 }}
+        </button>
+      </div>
+    </div>
+  </ng-container>
+
+  <!-- Case 3: Both current connections and available connections -->
+  <ng-container
+    *ngIf="marketPlaceData?.connectionsInfo?.length > 0 && marketPlaceData?.availableConnections?.length > 0"
+  >
+    <div class="w-100 d-flex align-items-center justify-content-between position-relative" style="gap: 8px;">
+      <!-- Left: current connection info -->
+      <div class="d-flex align-items-center" style="min-width: 0; gap: 6px;">
+        <button
+          type="button"
+          class="relation-chip"
+          style="white-space: nowrap; max-width: 140px; ; text-overflow: ellipsis;"
+        >
+          <span>
+            {{ getFormattedConnectionName(marketPlaceData?.connectionsInfo[0]?.connectedLabel) }}
+          </span>
+          <i
+            class="pi pi-times ml-1 removI"
+            (click)="disconnect(marketPlaceData?.connectionsInfo[0])"
+          ></i>
+        </button>
+
+        <button
+          *ngIf="marketPlaceData?.connectionsInfo?.length > 1"
+          type="button"
+          class="relation-chip more-chip"
+          (click)="openConnectionsDialog()"
+        >
+          +{{ marketPlaceData?.connectionsInfo?.length - 1 }}
+        </button>
+      </div>
+
+      <!-- Right: first available connection + dropdown for rest -->
+      <div dropdown class="d-flex align-items-center" style="min-width: 0;top: 0;" >
+        <button
+          type="button"
+          class="relation_button d-flex align-items-center"
+          dropdownToggle
+          (click)="marketPlaceData?.availableConnections?.length === 1 ? createRelation(marketPlaceData?.availableConnections[0]) : null"
+        >
+          <span>{{ marketPlaceData?.availableConnections[0]?.connectionName }}</span>
+          <i
+            *ngIf="marketPlaceData?.availableConnections?.length > 1"
+            class="fas fa-angle-down ml-2"
+            style="color: #fff !important;"
+          ></i>
+        </button>
+<ng-container *ngIf="marketPlaceData?.availableConnections?.length > 1">
+  <ul *dropdownMenu class="dropdown-menu" role="menu" >
+    <li
+      role="menuitem"
+      *ngFor="let option of marketPlaceData?.availableConnections | slice:1"
+      class="py-2"
+    >
+      <button class="dropdown-item" type="button" (click)="createRelation(option)">
+        {{ option?.connectionName }}
+      </button>
+    </li>
+  </ul>
+</ng-container>
+      </div>
+    </div>
+  </ng-container>
+</div>
     </div>
   </section>
 
@@ -177,3 +324,27 @@
     </p-tabView>
   </div>
 </div>
+
+
+
+<p-dialog
+  header="{{ 'Connections' | localize }}"
+  [(visible)]="showConnectionsDialog"
+  [modal]="true"
+  [style]="{ width: '450px' }"
+  [draggable]="false"
+  [resizable]="false"
+>
+  <div *ngIf="marketPlaceData?.connectionsInfo?.length > 0">
+    <div
+      *ngFor="let relation of marketPlaceData?.connectionsInfo"
+      class="d-flex justify-content-between align-items-center mb-2 relation-dialog-item"
+    >
+      <span>{{ getFormattedConnectionName(relation.connectedLabel) }}</span>
+      <i
+        class="pi pi-times removI"
+        (click)="disconnect(relation)"
+      ></i>
+    </div>
+  </div>
+</p-dialog>
