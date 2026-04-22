@@ -65,8 +65,11 @@
 
 					<div class="form-group">
 						<label for="SycEntityObjectType_ExtraAttributes">{{l("ExtraAttributes")}}</label>
-                        <div class="form-control" contentEditable="false"  [innerText]="sycEntityObjectType.extraAttributes" >
-                        </div>
+                     
+						<textarea type="text" id="SycEntityObjectType_extraAttributes" class="form-control" [(ngModel)]="sycEntityObjectType.extraAttributes" name="extraAttributes"   minlength="2" ></textarea>
+
+                        <!-- <div class="form-control" contentEditable="false"  [innerText]="sycEntityObjectType.extraAttributes" >
+                        </div> -->
 					</div>
 
 
