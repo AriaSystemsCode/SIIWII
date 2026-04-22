@@ -94,6 +94,7 @@ using SixLabors.Fonts;
 using System.Management.Automation;
 using Newtonsoft.Json;
 using DocumentFormat.OpenXml.Spreadsheet;
+//using Microsoft.AspNetCore.Http;
 
 namespace onetouch.Accounts
 {
@@ -827,7 +828,7 @@ namespace onetouch.Accounts
                         foreach (var account in accountsList)
                         {
                             IList<AppContactRelationshipInfo> relationshipsList = null;
-                            account.ConnectionsInfo = new List<ConnectionInfo>();
+                            account.ConnectionsInfo = new List<AppMarketplaceContacts.Dtos.ConnectionInfo>();
                             var accountConnection = _appContactRepository.GetAll()
                             .FirstOrDefault(e => e.TenantId == AbpSession.TenantId && e.SSIN == account.Account.SSIN);
                             if (accountConnection != null && accountConnection.Id > 0)
@@ -4330,8 +4331,9 @@ namespace onetouch.Accounts
             var retId = await _appEntityRelationShipRepository.InsertAndGetIdAsync(entity);
             return retId;
         }
-        public async Task<string> ApplyRelationOnProfile(long input, string ssin, bool? isPublic, long? connectionTypeId)
+        public async Task<List<AppMarketplaceContacts.Dtos.ConnectionInfo>> ApplyRelationOnProfile(long input, string ssin, bool? isPublic, long? connectionTypeId)
         {
+            List<AppMarketplaceContacts.Dtos.ConnectionInfo> connectionsInfo = new List<ConnectionInfo>();
             //I40{Start}
             AppMarketplaceContact account = new AppMarketplaceContact();
             if (ssin == null)
@@ -4375,8 +4377,53 @@ namespace onetouch.Accounts
                 .Where(z => z.RequesterContactSSIN == originalPublishContactFortCurrTenant.SSIN &&
                 z.RecipientContactSSIN == ssin && z.EntityObjectStatusId== activeRelationshipStatusId &&
                 z.ConsiderAsTeamMember== true).FirstOrDefaultAsync();
+            
             if (currentRelation == null)
-                return returnVal;
+            {
+                var accountConnection = _appContactRepository.GetAll().Include(z => z.EntityFk)
+                       .FirstOrDefault(e => e.TenantId == AbpSession.TenantId && e.EntityFk.TenantOwner != AbpSession.TenantId && e.EntityFk.TenantOwner != 0 && e.EntityFk.TenantOwner != null);
+                if (accountConnection != null && accountConnection.Id > 0)
+                {
+                    var relationshipsList = await _appContactRelationshipInfoRepository.GetAll()
+                            .Where(z => ((z.RecipientContactSSIN == originalPublishContactFortCurrTenant.SSIN && z.RequesterContactSSIN == ssin)
+                            || (z.RecipientContactSSIN == ssin && z.RequesterContactSSIN == originalPublishContactFortCurrTenant.SSIN))
+                           ).OrderByDescending(z => z.CreationTime).ToListAsync();
+                    if (relationshipsList != null && relationshipsList.Count > 0)
+                    {
+                        
+                        foreach (var relationship in relationshipsList)
+                        {
+                            AppMarketplaceContacts.Dtos.ConnectionInfo connInfo = new ConnectionInfo();
+                            connInfo.RelationEntityId = relationship.Id;
+                            connInfo.Visibility = relationship.SharingLevel == 1 ? "Public" : "Private";
+                            connInfo.ConnectionStatus = relationship.EntityObjectStatusCode;
+                            connInfo.RelationshipCode = relationship.EntityObjectTypeCode;
+                            var relationshipCode = await _appEntityRepository.GetAll().Include(z => z.EntityExtraData).Where(z => z.Code == relationship.EntityObjectTypeCode).FirstOrDefaultAsync();
+                            if (relationshipCode != null)
+                            {
+                                var extrDataDisconnect = relationshipCode.EntityExtraData.Where(z => z.AttributeId == 602).FirstOrDefault();
+                                if (extrDataDisconnect != null)
+                                {
+                                    //output.DisConnectLabel = "MPAction" + extrDataDisconnect.AttributeValue;
+                                    connInfo.DisconnectLabel = "MPAction" + extrDataDisconnect.AttributeValue;
+                                }
+                                if (relationship.EntityObjectStatusId == activeRelationshipStatusId)
+                                {
+                                    var extrDataSharing = relationshipCode.EntityExtraData.Where(z => z.AttributeId == 604).FirstOrDefault();
+                                    if (extrDataSharing != null)
+                                    {
+                                        //output.ConnectionName = "MPAction" + extrDataSharing.AttributeValue;
+                                        connInfo.ConnectedLabel = "MPAction" + extrDataSharing.AttributeValue;
+                                    }
+                                }
+                                    connectionsInfo.Add(connInfo);
+                            }
+                        }
+                    }
+                    
+                }
+            }
+            return connectionsInfo;
 
             //var businessEntityObjectTypeId = await _helper.SystemTables.GetEntityObjectTypeParetnerId();
             //var presonEntityObjectTypeId = await _helper.SystemTables.GetEntityObjectTypePersonId();
@@ -4461,7 +4508,7 @@ namespace onetouch.Accounts
                 }
             }
             //I40[End]
-            return returnVal;
+            return connectionsInfo;
             //I40[End]
             string ret = "";
             //var presonEntityObjectTypeId = await _helper.SystemTables.GetEntityObjectTypePersonId();
@@ -4481,7 +4528,7 @@ namespace onetouch.Accounts
                     {
                         input = marketPlaceAccount.Id;
                     }
-                    else { return ""; }
+                    else { return connectionsInfo; }
                 }
 
                 var marketplaceContact = await _appMarketplaceContactRepository.GetAll()
@@ -4789,7 +4836,7 @@ namespace onetouch.Accounts
                         //End
                     }
                 }
-                return ret;
+                return connectionsInfo;
             }
         }
      

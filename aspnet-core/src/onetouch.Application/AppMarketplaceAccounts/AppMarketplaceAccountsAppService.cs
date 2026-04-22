@@ -1713,13 +1713,21 @@ namespace onetouch.AppMarketplaceAccounts
             var recipientContact = await _appMarketplaceContactRepository.GetAll().Where(z => z.SSIN == recipientSSIN).FirstOrDefaultAsync();
             var recipientType = await _sycEntityObjectTypeRepository.GetAll().Where(z => z.Id == recipientContact.EntityObjectTypeId).FirstOrDefaultAsync();
             var requesterType = await _sycEntityObjectTypeRepository.GetAll().Where(z => z.Id == requestContact.EntityObjectTypeId).FirstOrDefaultAsync();
-            var relation = await _appContactRelationshipInfoRepository.GetAll().Where(z => ((z.RecipientContactSSIN == recipientSSIN && z.RequesterContactSSIN == requesterSSIN) 
-            //||
-                    //(z.RecipientContactSSIN == requesterSSIN && z.RequesterContactSSIN == recipientSSIN)
-                    ) && z.EntityObjectStatusId == activeRealtionshipStatusId).FirstOrDefaultAsync();
-            
-            //var relationshiplookup = await _appEntityRepository.GetAll().Include(z => z.EntityExtraData).Where(z => z.Code == relationshipCode).FirstOrDefaultAsync();
-            
+            //var relation = await _appContactRelationshipInfoRepository.GetAll().Where(z => ((z.RecipientContactSSIN == recipientSSIN && z.RequesterContactSSIN == requesterSSIN) 
+            ////||
+            //        //(z.RecipientContactSSIN == requesterSSIN && z.RequesterContactSSIN == recipientSSIN)
+            //        ) && z.EntityObjectStatusId == activeRealtionshipStatusId).FirstOrDefaultAsync();
+            AppEntity relationshipLookup = null;
+            if (connectionTypeId != null)
+                relationshipLookup = await _appEntityRepository.GetAll().Include(z => z.EntityExtraData).Where(z => z.Id == connectionTypeId).FirstOrDefaultAsync();
+            var relation = await _appContactRelationshipInfoRepository.GetAll()
+              .Where(z => ((z.RecipientContactSSIN == recipientSSIN &&
+              z.RequesterContactSSIN == requesterSSIN)
+                  //||
+                  //(z.RecipientContactSSIN == requesterSSIN && z.RequesterContactSSIN == recipientSSIN)
+                  ) && z.EntityObjectStatusId == activeRealtionshipStatusId)
+              .WhereIf(connectionTypeId != null && relationshipLookup!=null, z => z.EntityObjectTypeCode == relationshipLookup.Code)
+              .FirstOrDefaultAsync();
             if (relation != null)
             {
                 if (disconnect == true)
