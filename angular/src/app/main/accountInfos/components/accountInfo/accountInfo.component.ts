@@ -977,7 +977,7 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit {
 
     async saveExternalOrManualAccount() {
    
-
+    this.updateMarketplaceRolesExtraData();
         this._AccountsServiceProxy.createOrEditAccount(this.accountInfoTemp)
             .pipe(finalize(() => {
                 this.saving = false;
