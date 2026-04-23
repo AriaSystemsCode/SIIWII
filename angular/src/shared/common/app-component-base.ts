@@ -659,7 +659,6 @@ export abstract class AppComponentBase {
 
     soRolesOptions=[];
     poRolesOptions=[];
-    //i49
     getTenantRoles(): Promise<void> {
         return firstValueFrom(
             this.appTransaction.getLoggedInTenantRoles()
