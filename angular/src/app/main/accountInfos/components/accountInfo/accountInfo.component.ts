@@ -191,10 +191,12 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit {
       this.initUploaders();
       this.GetContactDefaults();
       //i49-getRelationshipRoles
-          this.getRelationshipRoles(this._abpSessionService.tenantId, this.accountDataForView.ssin).subscribe(roles => {
-              const _tenantRoles = roles.map(r => r.toLowerCase());
-              this.roleSeller = _tenantRoles.includes('seller');
-          });
+        this.getRelationshipRoles(this._abpSessionService.tenantId, this.accountDataForView.ssin).subscribe(roles => {
+            const normalizedRoles = (roles || []).map(r =>
+                (r.requesterMarketplaceRole || r.recipientMarketplaceRole || '').toLowerCase()
+            );
+            this.roleSeller = normalizedRoles.some(role => role.includes('seller'));
+        });
     }
     
     get isExternalAccount(): boolean { return this.accountLevel == AccountLevelEnum.External && !this.viewMode }

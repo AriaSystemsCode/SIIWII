@@ -122,7 +122,6 @@ export class TopBarComponent extends ThemesLayoutBaseComponent implements OnInit
         private _accountsServiceProxy: AccountsServiceProxy,
     ) {
         super(injector);
-         debugger;
     this.items = [
   {
     items: [
@@ -145,7 +144,6 @@ export class TopBarComponent extends ThemesLayoutBaseComponent implements OnInit
            this.showNoCreatePermissionAlert();
             return;
           }
-          debugger;
             this.roles = this.poRolesOptions;
           this.getOderNumber("PO", "Purchase Order");
 

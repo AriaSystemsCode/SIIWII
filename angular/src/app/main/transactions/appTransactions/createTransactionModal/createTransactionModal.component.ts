@@ -492,7 +492,6 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit, 
         this.getSellerRelationshipName();
     }
 
-              //i49-get getBuyerRelationshipName
     getBuyerRelationshipName() {
         const lowerRole = this.role.toLowerCase();
 
@@ -511,7 +510,6 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit, 
     }
 
     
-    //i49-get getSellerRelationshipName
     getSellerRelationshipName() {
         const lowerRole = this.role.toLowerCase();
 

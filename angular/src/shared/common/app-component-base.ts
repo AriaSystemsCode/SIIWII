@@ -9,7 +9,7 @@ import {
     IAjaxResponse,
     TokenService,
 } from "abp-ng2-module";
-import { Injector, TemplateRef } from "@angular/core";
+import { Injector,TemplateRef } from "@angular/core";
 import { AppConsts } from "@shared/AppConsts";
 import { AppUrlService } from "@shared/common/nav/app-url.service";
 import { AppSessionService } from "@shared/common/session/app-session.service";
@@ -45,12 +45,13 @@ import {
     NavigationStart,
     Event as NavigationEvent,
 } from "@angular/router";
-import { debounceTime, filter, finalize, map, takeUntil } from "rxjs/operators";
+import { debounceTime, filter, finalize, map, shareReplay, takeUntil } from "rxjs/operators";
 import { Location } from "@angular/common";
 import { FileUploaderCustom } from "@shared/components/import-steps/models/FileUploaderCustom.model";
 import Swal, { SweetAlertOptions } from "sweetalert2";
 import { ajax } from "rxjs/ajax";
 import { ToastService } from "./toast/toast.service";
+import { HttpClient } from "@node_modules/@angular/common/http";
 
 export abstract class AppComponentBase {
     patterns = Patterns;
@@ -120,8 +121,7 @@ export abstract class AppComponentBase {
         this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
         this.currentLang == 'ar' || this.currentLang == 'ar-EG'  ? this.isArabic = true : this.isArabic = false
         this.appTransaction = injector.get(AppTransactionServiceProxy);
-        if(!this.tenantRoles || this.tenantRoles?.length==0)
-          this.getTenantRoles();
+            this.getTenantRoles();
     }
 
 
@@ -659,55 +659,35 @@ export abstract class AppComponentBase {
 
     soRolesOptions=[];
     poRolesOptions=[];
-
+    //i49
     getTenantRoles() {
-          debugger;
-        this.appTransaction.getLoggedInTenantRoles().pipe(
-            finalize(
-                () => {
-                    //i49-getTenantRole
-                    // this.tenantRoles.push("sales rep");
-                    //  this.tenantRoles.push("buyer");
-                    //  this.tenantRoles.push("buying office");
-                    this.tenantRoles.push("seller");
-
-                    const _tenantRoles = this.tenantRoles?.map(r => r.toLowerCase());
-
-                    this.tenantRoleFlags = {
-                        isSeller: _tenantRoles?.includes('seller'),
-                        isSalesRep: _tenantRoles?.includes('sales rep'),
-                        isBuyer: _tenantRoles?.includes('buyer'),
-                        isBuyingOffice: _tenantRoles?.includes('buying office')
-                    };
-
-                    // SO Roles
-                    this.soRolesOptions = [
-                        ...(this.tenantRoleFlags.isSeller
-                            ? [{ name: "I'm a Seller", code: 1 }]
-                            : []),
-
-                        ...(this.tenantRoleFlags.isSalesRep
-                            ? [{ name: "I'm an Independent Sales Rep.", code: 3 }]
-                            : [])
-                    ];
-
-
-                    // PO Roles
-                    this.poRolesOptions = [
-                        ...(this.tenantRoleFlags.isBuyer
-                            ? [{ name: "I'm a Buyer", code: 2 }]
-                            : []),
-
-                        ...(this.tenantRoleFlags.isBuyingOffice
-                            ? [{ name: "I'm an Independent Buying Office.", code: 4 }]
-                            : [])
-                    ];
-                }
-            )
-        )
-            .subscribe((res: any) => {
+        this.appTransaction.getLoggedInTenantRoles()
+            .subscribe(res => {
                 this.tenantRoles = res;
-            });  
+                this.buildTenantRoles(res);
+            });
+    }
+
+
+    private buildTenantRoles(res: string[]) {
+        const roles = (res || []).map(r => r.toLowerCase());
+
+        this.tenantRoleFlags = {
+            isSeller: roles.includes('seller'),
+            isSalesRep: roles.includes('sales rep'),
+            isBuyer: roles.includes('buyer'),
+            isBuyingOffice: roles.includes('buying office')
+        };
+
+        this.soRolesOptions = [
+            ...(this.tenantRoleFlags.isSeller ? [{ name: "I'm a Seller", code: 1 }] : []),
+            ...(this.tenantRoleFlags.isSalesRep ? [{ name: "I'm an Independent Sales Rep.", code: 3 }] : [])
+        ];
+
+        this.poRolesOptions = [
+            ...(this.tenantRoleFlags.isBuyer ? [{ name: "I'm a Buyer", code: 2 }] : []),
+            ...(this.tenantRoleFlags.isBuyingOffice ? [{ name: "I'm an Independent Buying Office.", code: 4 }] : [])
+        ];
     }
 
 
@@ -747,7 +727,6 @@ export abstract class AppComponentBase {
   return this.appTransaction.getTenantAccountRelationships(tenantId, accountSSIN).pipe(
     map((res: any) => {
       let relationshipRoles = res || [];
-      relationshipRoles.push("seller");
       return relationshipRoles;
     })
   );
