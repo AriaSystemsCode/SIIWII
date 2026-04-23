@@ -431,7 +431,7 @@ namespace onetouch.AppMarketplaceAccounts
 
                                         if (relationship.EntityObjectStatusId == activeRelationshipStatusId)
                                         {
-                                            var extrDataSharing = relationType.EntityExtraData.Where(z => z.AttributeId == 604).FirstOrDefault();
+                                            var extrDataSharing = relationType.EntityExtraData.Where(z => z.AttributeId == (relationship.RequesterContactSSIN == currentTenantAccountObject.SSIN ? 604 : 612)).FirstOrDefault();
                                             if (extrDataSharing != null)
                                             {
                                                 connInfo.ConnectedLabel = "MPAction" + extrDataSharing.AttributeValue;
@@ -1010,7 +1010,7 @@ namespace onetouch.AppMarketplaceAccounts
                                         }
                                         if (relationship.EntityObjectStatusId == activeRelationshipStatusId)
                                         {
-                                            var extrDataSharing = relationshipCode.EntityExtraData.Where(z => z.AttributeId == 604).FirstOrDefault();
+                                            var extrDataSharing = relationshipCode.EntityExtraData.Where(z => z.AttributeId == (relationship.RequesterContactSSIN == currentTenantAccount.SSIN ? 604 : 612)).FirstOrDefault();
                                             if (extrDataSharing != null)
                                             {
                                                 //output.ConnectionName = "MPAction" + extrDataSharing.AttributeValue;
@@ -1809,7 +1809,7 @@ namespace onetouch.AppMarketplaceAccounts
                         
                         if (relationshiplookup != null)
                         {
-                            var extrDataConnect = relationshiplookup.EntityExtraData.Where(z => z.AttributeId == 604).FirstOrDefault();
+                            var extrDataConnect = relationshiplookup.EntityExtraData.Where(z => z.AttributeId == (relation.RequesterContactSSIN == requesterSSIN ? 604 : 612)).FirstOrDefault();
                             if (extrDataConnect != null)
                             {
                                 returnLabel = "MPAction" + extrDataConnect.AttributeValue;

@@ -602,7 +602,9 @@ namespace onetouch.Accounts
                                             }
                                             if (relationship.EntityObjectStatusId == activeRelationshipStatusId)
                                             {
-                                                var extrDataSharing = relationType.EntityExtraData.Where(z => z.AttributeId == 604).FirstOrDefault();
+                                                var extrDataSharing = relationType.EntityExtraData
+                                                    .Where(z => z.AttributeId == (relationship.RequesterContactSSIN == currentTenantAccount.SSIN? 604:612)).FirstOrDefault();
+
                                                 if (extrDataSharing != null)
                                                 {
                                                     connInfo.ConnectedLabel = "MPAction" + extrDataSharing.AttributeValue;
@@ -938,7 +940,7 @@ namespace onetouch.Accounts
                                             if (relationship.EntityObjectStatusId == activeRelationshipStatusId)
                                             {
 
-                                                var extrDataSharing = relationType.EntityExtraData.Where(z => z.AttributeId == 604).FirstOrDefault();
+                                                var extrDataSharing = relationType.EntityExtraData.Where(z => z.AttributeId == (relationship.RequesterContactSSIN == currentTenantAccount.SSIN ? 604 : 612)).FirstOrDefault();
                                                 if (extrDataSharing != null)
                                                 {
                                                     connInfo.ConnectedLabel = "MPAction" + extrDataSharing.AttributeValue;
@@ -1732,7 +1734,7 @@ namespace onetouch.Accounts
                         }
                         if (relationship.EntityObjectStatusId == activeRelationshipStatusId)
                         {
-                            var extrDataSharing = relationshipCode.EntityExtraData.Where(z => z.AttributeId == 604).FirstOrDefault();
+                            var extrDataSharing = relationshipCode.EntityExtraData.Where(z => z.AttributeId == (relationship.RequesterContactSSIN == currentAccount.SSIN ? 604 : 612)).FirstOrDefault();
                             if (extrDataSharing != null)
                             {
                                 output.ConnectionName = "MPAction" + extrDataSharing.AttributeValue;
@@ -4482,7 +4484,7 @@ namespace onetouch.Accounts
                                 }
                                 if (relationship.EntityObjectStatusId == activeRelationshipStatusId)
                                 {
-                                    var extrDataSharing = relationshipCode.EntityExtraData.Where(z => z.AttributeId == 604).FirstOrDefault();
+                                    var extrDataSharing = relationshipCode.EntityExtraData.Where(z => z.AttributeId == (relationship.RequesterContactSSIN == originalPublishContactFortCurrTenant.SSIN ? 604 : 612)).FirstOrDefault();
                                     if (extrDataSharing != null)
                                     {
                                         //output.ConnectionName = "MPAction" + extrDataSharing.AttributeValue;
