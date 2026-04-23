@@ -797,11 +797,22 @@ namespace onetouch.SystemObjects
                                             case "EVENT":
                                                 var eventObj = await _appEventRepository.GetAll().Where(z => z.Code == blockValueExtraDate.AttributeValue).FirstOrDefaultAsync();
                                                 if (eventObj != null)
-                                                    item.GetAppEventForViewDto = await _appEventsAppService.GetAppEventForView(eventObj.Id, long.Parse(eventObj.EntityId.ToString()), timeZone);
+                                                {
+                                                    try
+                                                    {
+                                                        item.GetAppEventForViewDto = await _appEventsAppService.GetAppEventForView(eventObj.Id, long.Parse(eventObj.EntityId.ToString()), timeZone);
+                                                    }
+                                                    catch (Exception ex) { }
+
+                                                }
                                                 break;
                                             //I50[End]
                                             case "PRODUCT":
-                                                item.GetAppMarketItemForViewDto = await _appMarketplaceItemsAppService.GetAppMarketplaceViewData(blockValueExtraDate.AttributeValue, null);
+                                                try
+                                                {
+                                                    item.GetAppMarketItemForViewDto = await _appMarketplaceItemsAppService.GetAppMarketplaceViewData(blockValueExtraDate.AttributeValue, null);
+                                                }
+                                                catch (Exception ex) { }
                                                 break;
                                             case "BRAND":
                                                 var contactSSINExtraData = blockDetail.EntityExtraData.FirstOrDefault(z => z.AttributeId == 2007);
@@ -817,7 +828,11 @@ namespace onetouch.SystemObjects
                                                             .Where(z => z.Code == blockValueExtraDate.AttributeValue.TrimEnd() && z.TenantId == account.TenantId).FirstOrDefaultAsync();
                                                         if (brandObject != null)
                                                         {
-                                                            item.GetAppEntityForViewDto = await _appEntitiesAppService.GetAppEntityForView(brandObject.Id);
+                                                            try
+                                                            {
+                                                                item.GetAppEntityForViewDto = await _appEntitiesAppService.GetAppEntityForView(brandObject.Id);
+                                                            }
+                                                            catch (Exception ex) { }
                                                             //if (brandObject.EntityAttachments.Count > 0)
                                                             {
                                                                 if (brandObject.EntityAttachments != null && brandObject.EntityAttachments.Count > 0)
@@ -844,13 +859,23 @@ namespace onetouch.SystemObjects
                                             case "CATEGORY":
                                                 var category = await _sycEntityObjectCategoryRepository.GetAll().Where(z => z.Code == blockValueExtraDate.AttributeValue).FirstOrDefaultAsync();
                                                 if (category != null)
-                                                    item.GetSycEntityObjectCategoryForViewDto = await _sycEntityObjectCategoriesAppService.GetSycEntityObjectCategoryForView(int.Parse(category.Id.ToString()));
+                                                {
+                                                    try
+                                                    {
+                                                        item.GetSycEntityObjectCategoryForViewDto = await _sycEntityObjectCategoriesAppService.GetSycEntityObjectCategoryForView(int.Parse(category.Id.ToString()));
+                                                    }
+                                                    catch (Exception ex) { }
+                                                }
                                                 break;
                                             case "CONTACT":
                                                 var contact = await _appMarketplaceContactRepository.GetAll().Where(z => z.SSIN == blockValueExtraDate.AttributeValue.TrimEnd()).FirstOrDefaultAsync();
                                                 if (contact != null)
                                                 {
-                                                    item.GetAccountForViewDto = await _MarketplaceAccountsAppService.GetAccountForView(int.Parse(contact.Id.ToString()), blockValueExtraDate.AttributeValue.TrimEnd(), 1);
+                                                    try
+                                                    {
+                                                        item.GetAccountForViewDto = await _MarketplaceAccountsAppService.GetAccountForView(int.Parse(contact.Id.ToString()), blockValueExtraDate.AttributeValue.TrimEnd(), 1);
+                                                    }
+                                                    catch (Exception ex) { }
                                                 }
                                                 break;
                                         }
