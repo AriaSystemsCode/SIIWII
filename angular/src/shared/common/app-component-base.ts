@@ -32,6 +32,7 @@ import { BsModalService, ModalOptions } from "ngx-bootstrap/modal";
 import { ImageViewerComponent } from "@app/shared/common/image-viewer/image-viewer.component";
 import {
     BehaviorSubject,
+    firstValueFrom,
     fromEvent,
     Observable,
     of,
@@ -121,7 +122,6 @@ export abstract class AppComponentBase {
         this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
         this.currentLang == 'ar' || this.currentLang == 'ar-EG'  ? this.isArabic = true : this.isArabic = false
         this.appTransaction = injector.get(AppTransactionServiceProxy);
-            this.getTenantRoles();
     }
 
 
@@ -660,12 +660,13 @@ export abstract class AppComponentBase {
     soRolesOptions=[];
     poRolesOptions=[];
     //i49
-    getTenantRoles() {
-        this.appTransaction.getLoggedInTenantRoles()
-            .subscribe(res => {
-                this.tenantRoles = res;
-                this.buildTenantRoles(res);
-            });
+    getTenantRoles(): Promise<void> {
+        return firstValueFrom(
+            this.appTransaction.getLoggedInTenantRoles()
+        ).then(res => {
+            this.tenantRoles = res;
+            this.buildTenantRoles(res);
+        });
     }
 
 

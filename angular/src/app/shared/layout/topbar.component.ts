@@ -122,36 +122,44 @@ export class TopBarComponent extends ThemesLayoutBaseComponent implements OnInit
         private _accountsServiceProxy: AccountsServiceProxy,
     ) {
         super(injector);
-    this.items = [
-  {
-    items: [
-      {
-        label: "Sales Order",
-        command: () => {
-          if (!this.canCreateSO()) {
-            this.showNoCreatePermissionAlert();
-            return;
-          }
-         this.roles = this.soRolesOptions;
-          this.getOderNumber("SO", "Sales Order");
-        },
-      },
+        this.showMainSpinner();
+        this.getTenantRoles().then(() => {
+            this.buildItems();
+            this.hideMainSpinner();
+        });
+    }
 
-      {
-        label: "Purchase Order",
-        command: () => {
-          if (!this.canCreatePO()) {
-           this.showNoCreatePermissionAlert();
-            return;
-          }
-            this.roles = this.poRolesOptions;
-          this.getOderNumber("PO", "Purchase Order");
+    buildItems() {
+        this.items = [
+            {
+                items: [
+                    {
+                        label: "Sales Order",
+                        command: () => {
+                            if (!this.canCreateSO()) {
+                                this.showNoCreatePermissionAlert();
+                                return;
+                            }
+                            this.roles = this.soRolesOptions;
+                            this.getOderNumber("SO", "Sales Order");
+                        },
+                    },
 
-        },
-      },
-    ],
-  },
-];
+                    {
+                        label: "Purchase Order",
+                        command: () => {
+                            if (!this.canCreatePO()) {
+                                this.showNoCreatePermissionAlert();
+                                return;
+                            }
+                            this.roles = this.poRolesOptions;
+                            this.getOderNumber("PO", "Purchase Order");
+
+                        },
+                    },
+                ],
+            },
+        ];
     }
 
     getOderNumber(tranType: string, tranName: string) {

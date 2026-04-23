@@ -82,6 +82,7 @@ export class AppTransactionsBrowseComponent extends AppComponentBase implements 
         private cdr: ChangeDetectorRef
     ) {
         super(injector);
+        this.getTenantRoles();
 
     }
     ngOnInit(): void {

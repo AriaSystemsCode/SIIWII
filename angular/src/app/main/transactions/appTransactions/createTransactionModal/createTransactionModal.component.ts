@@ -155,8 +155,7 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit, 
         this.orderForm.reset();
         this.getUserDefultRole();
         this.changeStartDate(this.orderForm.get('startDate'));
-
-
+        this.getTenantRoles();
     }
 
     initForm() {
