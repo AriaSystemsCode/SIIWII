@@ -21,16 +21,16 @@
   <!-- No current connections -->
   <ng-container *ngIf="!marketPlaceData?.connectionsInfo?.length">
     <div *ngIf="marketPlaceData?.availableConnections?.length > 0" dropdown class="position-relative">
-      <button type="button" class="relation_button" dropdownToggle>
+      <button type="button" class="relation_button" dropdownToggle  >
           <img src="assets/accounts/CONNECT.png" alt="" srcset="">
-        <span>{{ 'AvailableConnections' | localize }}</span>
+        <span (click)="createRelation(marketPlaceData?.availableConnections[0])"> {{ marketPlaceData?.availableConnections[0].connectionName }}</span>
         <i class="fas fa-angle-down ml-2" style="color: #fff !important;"></i>
       </button>
 
       <ul *dropdownMenu class="dropdown-menu" role="menu">
         <li
           role="menuitem"
-          *ngFor="let option of marketPlaceData?.availableConnections"
+          *ngFor="let option of marketPlaceData?.availableConnections | slice:1"
           class="py-2"
         >
           <button class="dropdown-item" type="button" (click)="createRelation(option)">

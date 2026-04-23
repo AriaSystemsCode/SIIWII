@@ -133,24 +133,27 @@ getFormattedConnectionName(label: string): string {
     return 'assets/accounts/CONNECT.png'; // fallback
   }
 
-  makeRelationPrivatePublic(account, status) {
-    this.showMainSpinner();
+makeRelationPrivatePublic(relation: any, status: boolean) {
+  const accountId = this.account?.account?.id;
+  if (!accountId || !relation) return;
 
-    this._accountsServiceProxy
-      .applyRelationOnProfile(account.account.id, undefined, status, undefined)
-      .pipe(
-        finalize(() => {
-          ;
-          this.hideMainSpinner();
-        })
-      )
-      .subscribe((result) => {
+  this.showMainSpinner();
 
-        account.visibility == 'Public' ? account.visibility = 'Private' : account.visibility = 'Public'
-        account.visibility == 'Public' ? this.notify.success('Account is Shared') : this.notify.success('Account is Private')
-      });
-  }
+  this._accountsServiceProxy
+    .applyRelationOnProfile(accountId, undefined, status, relation?.relationEntityId)
+    .pipe(
+      finalize(() => {
+        this.hideMainSpinner();
+      })
+    )
+    .subscribe(() => {
+      relation.visibility = relation.visibility === 'Public' ? 'Private' : 'Public';
 
+      relation.visibility === 'Public'
+        ? this.notify.success('Account is Shared')
+        : this.notify.success('Account is Private');
+    });
+}
 
   getRemainingCategoriesList(categories: string[]): string {
     if (!categories || categories.length <= 3) {

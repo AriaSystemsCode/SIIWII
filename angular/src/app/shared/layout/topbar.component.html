@@ -173,8 +173,8 @@
 
         <div  *ngIf="isAuthenticated" class=" ml-4 ml-lg-0 navbar-collapse d-sm-block d-none" [ngClass]="isArabic ? 'leftList':'rightList'">
             <ul class="navbar-nav ms-auto mb-2 mb-lg-0 pt-2 d-sm-flex d-none " style="justify-content: space-around;">
-                <div class="border-left text-white  d-md-block  mt-1" style="height: 55px;"></div>
-                <li class="nav-item pl-3 pt-2">
+                <div class="border-left text-white  d-md-block  mt-lg-1 mt-4" style="height: 55px;"></div>
+                <li class="nav-item pl-3 pt-2 mt-lg-0 mt-4">
                     <a class="nav-link active d-flex flex-column text-center" [routerLink]="['/app/main/Messages']"
                         routerLinkActive="header-link-active">
                         <div class="position-relative">
@@ -194,7 +194,7 @@
                         <span class="small">{{ "Messages" | localize }}</span>
                     </a>
                 </li>
-                <li class="nav-item pl-3 pt-2">
+                <li class="nav-item pl-3 pt-2 mt-lg-0 mt-4">
                     <a class="nav-link active d-flex flex-column text-center" routerLinkActive="header-link-active">
                         <div headerNotifications class="kt-header__topbar-item dropdown" dropdown [ngClass]="isArabic?'addRT':''"
                             id="header_notification_bar"></div>
@@ -204,7 +204,7 @@
                     </a>
                 </li>
 
-                <li class="nav-item pl-3 ">
+                <li class="nav-item pl-3 mt-lg-0 mt-4">
                     <a class="nav-link active d-flex flex-column text-center">
                         <div dropdown class="kt-header__topbar-item dropdown h-100 align-items-center pl-lg-3 pr-lg-3 "
                             style=" height: 40px; color: white">

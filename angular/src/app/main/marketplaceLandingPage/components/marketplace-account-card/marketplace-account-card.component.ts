@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Injector, Input, Output } from '@angular/core';
+import { ChangeDetectorRef, Component, EventEmitter, Injector, Input, Output } from '@angular/core';
 import { Router } from '@angular/router';
 import { AppConsts } from '@shared/AppConsts';
 import { AppComponentBase } from '@shared/common/app-component-base';
@@ -27,12 +27,13 @@ export class MarketplaceAccountCardComponent extends AppComponentBase {
 
     isSmallScreen = false;
 
+      showRelationsDialog = false;
+selectedAccountForRelations: any = null;
     constructor(
         injector:Injector,
         private router:Router,
             private _accountsServiceProxy: AccountsServiceProxy,
-            private _appEntitiesServiceProxy:AppEntitiesServiceProxy,
-
+            private cdr: ChangeDetectorRef
     ){
         super(injector);
     }
@@ -69,84 +70,132 @@ export class MarketplaceAccountCardComponent extends AppComponentBase {
 }
 
 
-createRelation(option: { connectLabel: string; connectionEntityId: number; defaultVisibility: string }) {
-  if (!option?.connectionEntityId) return;
+createRelation(option: {
+  connectLabel?: string;
+  connectionName?: string;
+  connectionEntityId: number;
+  defaultVisibility?: string;
+}) {
+  if (!option?.connectionEntityId || !this.account?.account?.id) return;
 
   this.showMainSpinner();
 
   this._accountsServiceProxy
     .applyRelationOnProfile(
-      this.account?.account?.id,
+      this.account.account.id,
       undefined,
       (option.defaultVisibility || '').toLowerCase() === 'public',
       option.connectionEntityId
     )
     .pipe(finalize(() => this.hideMainSpinner()))
     .subscribe((result: any) => {
+      const returnedRelation = Array.isArray(result) ? result[0] : result;
 
-      const raw = (typeof result === 'string' ? result : result?.result) || '';
-      const parsed = this.parseRelationResult(raw);
+      const updatedAvailableConnections = (this.account.availableConnections || []).filter(
+        x => x.connectionEntityId !== option.connectionEntityId
+      );
 
-      this.account.availableConnections = [];
-      this.account.avaliableConnectionName = '';
-      this.account.connectionName = parsed.connectionName;  
-      this.account.disConnectLabel = parsed.disconnectLabel;    
+      const updatedConnectionsInfo = returnedRelation
+        ? [...(this.account.connectionsInfo || []), returnedRelation]
+        : [...(this.account.connectionsInfo || [])];
+
+      const updatedAccount = Object.assign(new GetAccountForViewDto(), this.account);
+      updatedAccount.availableConnections = updatedAvailableConnections;
+      updatedAccount.connectionsInfo = updatedConnectionsInfo;
+      updatedAccount.avaliableConnectionName =
+        updatedAvailableConnections?.length > 0
+          ? (updatedAvailableConnections[0].connectLabel ||
+             updatedAvailableConnections[0].connectionName ||
+             '')
+          : '';
+      updatedAccount.connectionCount = (this.account.connectionCount || 0) + (returnedRelation ? 1 : 0);
+
+      this.account = updatedAccount;
+      this.cdr.detectChanges();
     });
 }
-
-disconnect(): void {
+disconnect(relation: any): void {
   const id = this.account?.account?.id;
-  if (!id) return;
+  if (!id || !relation) return;
 
   this.showMainSpinner();
 
   this._accountsServiceProxy
-    .disconnect(id,undefined)
+    .disconnect(id, relation?.relationEntityId)
     .pipe(finalize(() => this.hideMainSpinner()))
-    .subscribe((res: any[]) => {
+    .subscribe((res: any) => {
       this.notify.success(this.l('SuccessfullyDisconnected'));
 
+      const returnedAvailableRelation = Array.isArray(res) ? res[0] : res;
 
-      const options = Array.isArray(res) ? res : [];
+      const updatedConnectionsInfo = (this.account.connectionsInfo || []).filter(
+        x => x.relationEntityId !== relation.relationEntityId
+      );
 
-      this.account.connectionName = '';
-      this.account.disConnectLabel = '';
+      const currentAvailableConnections = this.account.availableConnections || [];
+      const exists = returnedAvailableRelation
+        ? currentAvailableConnections.some(
+            x => x.connectionEntityId === returnedAvailableRelation.connectionEntityId
+          )
+        : false;
 
-      this.account.availableConnections = options;
-      this.account.avaliableConnectionName = options?.[0]?.connectLabel || '';
+      const updatedAvailableConnections =
+        returnedAvailableRelation && !exists
+          ? [...currentAvailableConnections, returnedAvailableRelation]
+          : [...currentAvailableConnections];
+
+      const updatedAccount = Object.assign(new GetAccountForViewDto(), this.account);
+      updatedAccount.connectionsInfo = updatedConnectionsInfo;
+      updatedAccount.availableConnections = updatedAvailableConnections;
+      updatedAccount.avaliableConnectionName =
+        updatedAvailableConnections?.length > 0
+          ? (updatedAvailableConnections[0].connectLabel ||
+             updatedAvailableConnections[0].connectionName ||
+             '')
+          : '';
+      updatedAccount.connectionCount = Math.max((this.account.connectionCount || 0) - 1, 0);
+
+      this.account = updatedAccount;
+
+      if (this.selectedAccountForRelations?.account?.id === this.account?.account?.id) {
+        this.selectedAccountForRelations = Object.assign(
+          new GetAccountForViewDto(),
+          this.account
+        );
+      }
+
+      if (!updatedConnectionsInfo.length) {
+        this.showRelationsDialog = false;
+      }
+
+      this.cdr.detectChanges();
     });
 }
 
+// private parseRelationResult(raw: string): { connectionName: string; disconnectLabel: string } {
+//   const text = (raw || '').trim();
 
-private parseRelationResult(raw: string): { connectionName: string; disconnectLabel: string } {
-  const text = (raw || '').trim();
+//   const idx = text.indexOf('-');
+//   const connectionName = idx > -1 ? text.slice(0, idx).trim() : text;
+//   const disconnectLabel = idx > -1 ? text.slice(idx + 1).trim() : 'MPActionDisconnect';
 
-  const idx = text.indexOf('-');
-  const connectionName = idx > -1 ? text.slice(0, idx).trim() : text;
-  const disconnectLabel = idx > -1 ? text.slice(idx + 1).trim() : 'MPActionDisconnect';
-
-  return { connectionName, disconnectLabel };
-}
+//   return { connectionName, disconnectLabel };
+// }
 
 
-getFormattedConnectionName(type: 'connectionName' | 'avaliableConnectionName' | 'disConnectLabel'): string | null {
-  const raw =
-    type === 'connectionName'
-      ? this.account?.connectionName
-      : type === 'avaliableConnectionName'
-      ? this.account?.avaliableConnectionName
-      : this.account?.disConnectLabel;
+getFormattedConnectionName(label: string): string {
+  if (!label) return '';
 
-  const val = (raw || '').trim();
-  if (!val) return null;
-
- 
-  if (val.startsWith('MPAction')) {
-    const label = val.replace('MPAction', '');
-    return label.charAt(0).toUpperCase() + label.slice(1).toLowerCase();
+  if (label === 'Follow' || label === 'Connect' || label === 'Join' || label === 'Employ') {
+    return label;
   }
 
-  return val;
+  if (label.startsWith('MPAction')) {
+    const clean = label.replace('MPAction', '');
+    return clean.charAt(0).toUpperCase() + clean.slice(1).toLowerCase();
+  }
+
+  return label;
 }
 
   private readonly ICONS: Record<string, string> = {
@@ -164,5 +213,43 @@ getFormattedConnectionName(type: 'connectionName' | 'avaliableConnectionName' | 
     return 'assets/accounts/CONNECT.png'; // fallback
   }
 
- 
+
+  stopPropagation($event) {
+    $event.stopPropagation() // stop click event bubbling
+  }
+
+  openRelationsDialog(account: any): void {
+  this.selectedAccountForRelations = account;
+  this.showRelationsDialog = true;
+}
+
+removeRelationFromDialog(account: any, relation: any, index: number): void {
+  // this.disconnect();
+
+  // optional: close dialog if no relations left after UI update
+  setTimeout(() => {
+    if (!account?.connectionsInfo?.length) {
+      this.showRelationsDialog = false;
+    }
+  });
+}
+
+
+openedRelationMenuId: number | null = null;
+
+toggleRelationMenu(event: MouseEvent, account: any): void {
+  event.preventDefault();
+  event.stopPropagation();
+
+  const id = account?.account?.id;
+  this.openedRelationMenuId = this.openedRelationMenuId === id ? null : id;
+}
+
+onRelationOptionClick(event: MouseEvent, option: any): void {
+  event.preventDefault();
+  event.stopPropagation();
+
+  this.createRelation(option);
+  this.openedRelationMenuId = null;
+}
 }
