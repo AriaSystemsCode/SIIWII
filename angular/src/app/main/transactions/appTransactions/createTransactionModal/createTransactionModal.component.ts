@@ -1151,7 +1151,7 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit, 
         this.role = "";
         this.Role.value = {};
         this.submitted = false;
-        this.roles = [];
+       // this.roles = [];
         this.isSellerCompanyIdExist = false;
         this.invalidSellerPhoneNumber = "";
         this.invalidBuyerPhoneNumber = "";
@@ -1223,7 +1223,7 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit, 
         this.display = false;
         this.Role.value = {};
         this.submitted = false;
-        this.roles = [];
+       // this.roles = [];
         this.invalidSellerPhoneNumber = "";
         this.invalidBuyerPhoneNumber = "";
         this.invalidBuyerContactEMailAddress = "";
