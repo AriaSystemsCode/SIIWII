@@ -82,7 +82,7 @@ export class AppTransactionsBrowseComponent extends AppComponentBase implements 
         private cdr: ChangeDetectorRef
     ) {
         super(injector);
-        this.getTenantRoles();
+        this.tenantRoleService.loadRoles();
 
     }
     ngOnInit(): void {
@@ -246,23 +246,23 @@ export class AppTransactionsBrowseComponent extends AppComponentBase implements 
         this.mainFilterCtrl.setValue(selectedfilter);
     }
     createNewSalesOrder() {
-        if (!this.canCreateSO()) {
+        if (!this.tenantRoleService.canCreateSO()) {
             this.showNoCreatePermissionAlert();
             return;
         }
         else {
-            this.roles = this.soRolesOptions;
+            this.roles = this.tenantRoleService.soRolesOptions;
             this.getOderNumber("SO", "Sales Order");
         }
     }
 
     createNewPurchaseOrder() {
-        if (!this.canCreatePO()) {
+        if (!this.tenantRoleService.canCreatePO()) {
             this.showNoCreatePermissionAlert();
             return;
         }
         else {
-            this.roles = this.poRolesOptions;
+            this.roles = this.tenantRoleService.poRolesOptions;
             this.getOderNumber("PO", "Purchase Order");
         }
     }

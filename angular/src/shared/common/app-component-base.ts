@@ -53,6 +53,7 @@ import Swal, { SweetAlertOptions } from "sweetalert2";
 import { ajax } from "rxjs/ajax";
 import { ToastService } from "./toast/toast.service";
 import { HttpClient } from "@node_modules/@angular/common/http";
+import { TenantRoleService } from "./services/TenantRoleService";
 
 export abstract class AppComponentBase {
     patterns = Patterns;
@@ -97,8 +98,10 @@ export abstract class AppComponentBase {
     currentLang: string
     isArabic: boolean
     appTransaction:AppTransactionServiceProxy
+    tenantRoleService: TenantRoleService;
 
-    constructor(injector: Injector, private _location?: Location) {
+
+    constructor(injector: Injector , private _location?: Location) {
         this.localization = injector.get(LocalizationService);
         this.permission = injector.get(PermissionCheckerService);
         this.feature = injector.get(FeatureCheckerService);
@@ -122,8 +125,8 @@ export abstract class AppComponentBase {
         this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
         this.currentLang == 'ar' || this.currentLang == 'ar-EG'  ? this.isArabic = true : this.isArabic = false
         this.appTransaction = injector.get(AppTransactionServiceProxy);
-    }
-
+        this.tenantRoleService = injector.get(TenantRoleService);
+    } 
 
     setAppItemsFilterBody() {
         this.appItemsFilterBody.categoryFilters = undefined
@@ -649,58 +652,6 @@ export abstract class AppComponentBase {
         return ext === 'pdf';
       }
       
-    tenantRoles = [];
-    tenantRoleFlags = {
-        isSeller: false,
-        isSalesRep: false,
-        isBuyer: false,
-        isBuyingOffice: false
-    };
-
-    soRolesOptions=[];
-    poRolesOptions=[];
-    getTenantRoles(): Promise<void> {
-        return firstValueFrom(
-            this.appTransaction.getLoggedInTenantRoles()
-        ).then(res => {
-            this.tenantRoles = res;
-            this.buildTenantRoles(res);
-        });
-    }
-
-
-    private buildTenantRoles(res: string[]) {
-        const roles = (res || []).map(r => r.toLowerCase());
-
-        this.tenantRoleFlags = {
-            isSeller: roles.includes('seller'),
-            isSalesRep: roles.includes('sales rep'),
-            isBuyer: roles.includes('buyer'),
-            isBuyingOffice: roles.includes('buying office')
-        };
-
-        this.soRolesOptions = [
-            ...(this.tenantRoleFlags.isSeller ? [{ name: "I'm a Seller", code: 1 }] : []),
-            ...(this.tenantRoleFlags.isSalesRep ? [{ name: "I'm an Independent Sales Rep.", code: 3 }] : [])
-        ];
-
-        this.poRolesOptions = [
-            ...(this.tenantRoleFlags.isBuyer ? [{ name: "I'm a Buyer", code: 2 }] : []),
-            ...(this.tenantRoleFlags.isBuyingOffice ? [{ name: "I'm an Independent Buying Office.", code: 4 }] : [])
-        ];
-    }
-
-
-     canCreateSO(): boolean {
-        const roles = this.tenantRoles.map(r => r.toLowerCase());
-        return roles.includes("seller") || roles.includes("sales rep");
-    }
-
-
-    canCreatePO(): boolean {
-        const roles = this.tenantRoles.map(r => r.toLowerCase());
-        return roles.includes("buyer") || roles.includes("buying office");
-    }
 
 
     showNoCreatePermissionAlert() {
@@ -733,4 +684,4 @@ export abstract class AppComponentBase {
 }
 
 
-}
+}  

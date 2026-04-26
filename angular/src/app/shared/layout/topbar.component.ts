@@ -123,10 +123,11 @@ export class TopBarComponent extends ThemesLayoutBaseComponent implements OnInit
     ) {
         super(injector);
         this.showMainSpinner();
-        this.getTenantRoles().then(() => {
+        this.tenantRoleService.loadRoles().then(() => {
             this.buildItems();
             this.hideMainSpinner();
         });
+
     }
 
     buildItems() {
@@ -136,11 +137,11 @@ export class TopBarComponent extends ThemesLayoutBaseComponent implements OnInit
                     {
                         label: "Sales Order",
                         command: () => {
-                            if (!this.canCreateSO()) {
+                            if (!this.tenantRoleService.canCreateSO()) {
                                 this.showNoCreatePermissionAlert();
                                 return;
                             }
-                            this.roles = this.soRolesOptions;
+                            this.roles = this.tenantRoleService.soRolesOptions;
                             this.getOderNumber("SO", "Sales Order");
                         },
                     },
@@ -148,11 +149,11 @@ export class TopBarComponent extends ThemesLayoutBaseComponent implements OnInit
                     {
                         label: "Purchase Order",
                         command: () => {
-                            if (!this.canCreatePO()) {
+                            if (!this.tenantRoleService.canCreatePO()) {
                                 this.showNoCreatePermissionAlert();
                                 return;
                             }
-                            this.roles = this.poRolesOptions;
+                            this.roles = this.tenantRoleService.poRolesOptions;
                             this.getOderNumber("PO", "Purchase Order");
 
                         },

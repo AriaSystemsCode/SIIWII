@@ -372,8 +372,8 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit {
         this.getCurrencies();
         this.getPhoneTypes();
         this.allPriceLevel = this.getPriceLevel();
-       // this.getShipVia();
-       // this.getPaymentTerms();
+       this.getShipVia();
+       this.getPaymentTerms();
         this.getAccountTypes();
     }
 
@@ -943,7 +943,7 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit {
         }))
         .subscribe(async result => {
             if (!result) return;
-
+       await this.tenantRoleService.loadRoles();
             this.accountId = result?.accountInfo?.id;
 
             if (this.appSession?.user) {
