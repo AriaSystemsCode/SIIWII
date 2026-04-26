@@ -22,6 +22,10 @@ namespace onetouch.AppSiiwiiTransaction.Dtos
         [StringLength(AppTransactionConst.MaxBuyerNameLength, MinimumLength = AppTransactionConst.MinBuyerNameLength)]
         public virtual string? BuyerCompanyName { set; get; }
         public long? SellerId { set; get; }
+
+        public long? SellerRelationId { set; get; }
+        public long? BuyerRelationId { set; get; }
+
         [StringLength(AppTransactionConst.MaxSellerNameLength, MinimumLength = AppTransactionConst.MinSellerNameLength)]
         public virtual string? SellerCompanyName { set; get; }
 
