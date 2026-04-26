@@ -31,6 +31,9 @@ using onetouch.SystemObjects.Dtos;
 using onetouch.AppMarketplaceItemLists;
 using onetouch.AppMarketplaceItems;
 using Abp.AspNetZeroCore.Timing;
+using onetouch.AppMarketplaceContacts;
+using onetouch.AppSiiwiiTransaction.Dtos;
+using onetouch.AppContacts;
 
 namespace onetouch.AppItemsLists
 {
@@ -62,6 +65,10 @@ namespace onetouch.AppItemsLists
         private readonly ISycEntityObjectTypesAppService _sycEntityObjectTypesAppService;
         private readonly IRepository<SydObject, long> _sydObjectRepository;
         //I45
+        //I49[Start]
+        private readonly IRepository<AppMarketplaceContact, long> _appMarketplaceAccountsRepository;
+        private readonly IRepository<AppContactRelationshipInfo,long> _appContactRelationshipInfoRepository;
+        //I49[End]
         public AppItemsListsAppService(IRepository<AppItemsList, long> appItemsListRepository, IAppItemsListsExcelExporter appItemsListsExcelExporter, Helper helper
             , IAppEntitiesAppService appEntitiesAppService
             , IRepository<AppItem, long> appItemRepository
@@ -73,7 +80,12 @@ namespace onetouch.AppItemsLists
             , ISycEntityObjectStatusesAppService sycEntityObjectStatusesAppService
             , IRepository<AppItemSelector, long> appItemSelectorRepository, IRepository<AppMarketplaceItemLists.AppMarketplaceItemLists, long> appMarketplaceItemListRepository,
              IRepository<AppMarketplaceItemsListDetails, long> appMarketplaceItemsListDetailRepository,
-             IRepository<AppMarketplaceItemSharings, long> appMarketplaceItemSharing, IRepository<AppMarketplaceItems.AppMarketplaceItems, long> appMarketplaceItem, IAppItemsAppService appItemsAppService, ISycEntityObjectTypesAppService sycEntityObjectTypesAppService, IRepository<SydObject, long> sydObjectRepository)
+             IRepository<AppMarketplaceItemSharings, long> appMarketplaceItemSharing, 
+             IRepository<AppMarketplaceItems.AppMarketplaceItems, long> appMarketplaceItem,
+             IAppItemsAppService appItemsAppService,
+             ISycEntityObjectTypesAppService sycEntityObjectTypesAppService, 
+             IRepository<SydObject, long> sydObjectRepository, IRepository<AppMarketplaceContact, long> appMarketplaceAccountsRepository,
+             IRepository<AppContactRelationshipInfo, long> appContactRelationshipInfoRepository)
         {
             //I45
             _sydObjectRepository = sydObjectRepository;
@@ -98,6 +110,8 @@ namespace onetouch.AppItemsLists
             _iProfileAppService = iProfileAppService;
             _sycEntityObjectStatusesAppService = sycEntityObjectStatusesAppService;
             _appItemSelectorRepository = appItemSelectorRepository;
+            _appMarketplaceAccountsRepository = appMarketplaceAccountsRepository;
+            _appContactRelationshipInfoRepository = appContactRelationshipInfoRepository;
         }
 
         public async Task<PagedResultDto<GetAppItemsListForViewDto>> GetAll(GetAllAppItemsListsInput input)
@@ -1444,7 +1458,82 @@ namespace onetouch.AppItemsLists
                     return retutnval;
                 else
                 {
-
+                    //I49[Start]
+                    string accountSrcSSIN = "";
+                    string accountDestSSIN = "";
+                    string accDescMarketplaceRoles = "";
+                    string accSrcMarketplaceRoles = "";
+                    string priceLevel = "";
+                    var currentTenant = await _appMarketplaceAccountsRepository.GetAll().Include(z=>z.EntityExtraData)
+                        .Where(z => z.TenantOwner == AbpSession.TenantId && z.IsProfileData == true && z.ParentId == null).FirstOrDefaultAsync();
+                    if (currentTenant!=null)
+                    {
+                        accountDestSSIN = currentTenant.SSIN;
+                        var rolesEx = currentTenant.EntityExtraData.Where(z => z.AttributeId == 610).FirstOrDefault();
+                        if (rolesEx != null) 
+                        {
+                            accDescMarketplaceRoles = rolesEx.AttributeValue;
+                        }
+                    }
+                    var sourceTenant = await _appMarketplaceAccountsRepository.GetAll().Include(z => z.EntityExtraData)
+                        .Where(z => z.TenantOwner == itmList.TenantOwner && z.IsProfileData == true && z.ParentId == null).FirstOrDefaultAsync();
+                    if (sourceTenant != null)
+                    {
+                        accountSrcSSIN = sourceTenant.SSIN;
+                        var rolesEx = sourceTenant.EntityExtraData.Where(z => z.AttributeId == 610).FirstOrDefault();
+                        if (rolesEx != null)
+                        {
+                            accSrcMarketplaceRoles = rolesEx.AttributeValue;
+                        }
+                    }
+                    if (!string.IsNullOrEmpty(accountDestSSIN) && !string.IsNullOrEmpty(accountSrcSSIN))
+                    {
+                        if (accSrcMarketplaceRoles.ToUpper().Contains(ContactRoleEnum.Seller.ToString().ToUpper()))
+                        {
+                            if (accDescMarketplaceRoles.ToUpper().Contains(ContactRoleEnum.Buyer.ToString().ToUpper()))
+                            {
+                                var relationshipSellBuy = await _appContactRelationshipInfoRepository.GetAll()
+                                .Where(z => (z.RequesterContactSSIN == accountSrcSSIN &&
+                                z.RecipientContactSSIN == accountDestSSIN &&
+                                z.RequesterMarketplaceRole == ContactRoleEnum.Seller.ToString() &&
+                                z.RecipientMarketplaceRole == ContactRoleEnum.Buyer.ToString()) ||
+                                (z.RecipientContactSSIN == accountSrcSSIN &&
+                                z.RequesterContactSSIN == accountDestSSIN &&
+                                z.RecipientMarketplaceRole == ContactRoleEnum.Seller.ToString() &&
+                                z.RequesterMarketplaceRole == ContactRoleEnum.Buyer.ToString())
+                                ).Include(z => z.EntityExtraData).FirstOrDefaultAsync();
+                                if (relationshipSellBuy != null)
+                                {
+                                    var priceLevelExtradata = relationshipSellBuy.EntityExtraData.Where(z => z.AttributeId == 908).FirstOrDefault();
+                                    if (priceLevelExtradata != null && !string.IsNullOrEmpty(priceLevelExtradata.AttributeValue))
+                                        priceLevel = priceLevelExtradata.AttributeValue;
+                                }
+                            }
+                            else
+                            {
+                                if (accDescMarketplaceRoles.Replace(" ","").ToUpper().Contains(ContactRoleEnum.BuyingOffice.ToString().ToUpper()))
+                                {
+                                    var relationshipSellBuy = await _appContactRelationshipInfoRepository.GetAll()
+                                    .Where(z => (z.RequesterContactSSIN == accountSrcSSIN &&
+                                    z.RecipientContactSSIN == accountDestSSIN &&
+                                    z.RequesterMarketplaceRole == ContactRoleEnum.Seller.ToString() &&
+                                    z.RecipientMarketplaceRole == ContactRoleEnum.BuyingOffice.ToString()) ||
+                                    (z.RecipientContactSSIN == accountSrcSSIN &&
+                                    z.RequesterContactSSIN == accountDestSSIN &&
+                                    z.RecipientMarketplaceRole == ContactRoleEnum.Seller.ToString() &&
+                                    z.RequesterMarketplaceRole == ContactRoleEnum.BuyingOffice.ToString())
+                                    ).Include(z => z.EntityExtraData).FirstOrDefaultAsync();
+                                    if (relationshipSellBuy != null)
+                                    {
+                                        var priceLevelExtradata = relationshipSellBuy.EntityExtraData.Where(z => z.AttributeId == 908).FirstOrDefault();
+                                        if (priceLevelExtradata != null && !string.IsNullOrEmpty(priceLevelExtradata.AttributeValue))
+                                            priceLevel = priceLevelExtradata.AttributeValue;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    //I49[End]
                     if (itmList.AppItemsListDetails != null && itmList.AppItemsListDetails.Count > 0)
                     {
                         foreach (var det in itmList.AppItemsListDetails)
@@ -1472,7 +1561,50 @@ namespace onetouch.AppItemsLists
                                 foreach (var prc in itemC.AppItemPriceInfos)
                                 {
                                     prc.Id = 0;
+                                    if(prc.BuyerSSIN== accountDestSSIN)
+                                        prc.SellerSSIN= accountSrcSSIN;
                                 }
+                                var toDeletePrices = itemC.AppItemPriceInfos.Where(z => z.Code != "MSRP").ToList();
+                                if (toDeletePrices != null && toDeletePrices.Count > 0)
+                                {
+                                    var customPrice = toDeletePrices.Where(z => z.BuyerSSIN == accountDestSSIN).FirstOrDefault();
+                                    if (customPrice != null)
+                                    {
+                                        foreach (var price in toDeletePrices)
+                                        {
+                                            if (price.BuyerSSIN != accountDestSSIN
+                                                && price.Code != "MSRP")
+                                            {
+                                                itemC.AppItemPriceInfos.Remove(price);
+                                            }
+                                        }
+
+                                    }
+                                    else
+                                    {
+                                        if (!string.IsNullOrEmpty(priceLevel))
+                                        {
+                                            foreach (var price in toDeletePrices)
+                                            {
+                                                if (price.Code != priceLevel
+                                                    && price.Code != "MSRP")
+                                                {
+                                                    itemC.AppItemPriceInfos.Remove(price);
+                                                }
+                                            }
+                                        }
+                                        else {
+                                            foreach (var price in toDeletePrices)
+                                            {
+                                                if (price.Code != "MSRP")
+                                                {
+                                                    itemC.AppItemPriceInfos.Remove(price);
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+
                                 foreach (var scale in itemC.AppItemSizesScaleInfo)
                                 {
                                     scale.Id = 0;
@@ -1553,10 +1685,57 @@ namespace onetouch.AppItemsLists
                                         ext.Id = 0;
                                         ext.EntityId = 0;
                                     }
+                                    //I49[Start]
+                                    /*foreach (var prc in vari.AppItemPriceInfos)
+                                    {
+                                        prc.Id = 0;
+                                    }*/
                                     foreach (var prc in vari.AppItemPriceInfos)
                                     {
                                         prc.Id = 0;
+                                        if (prc.BuyerSSIN == accountDestSSIN)
+                                            prc.SellerSSIN = accountSrcSSIN;
                                     }
+                                    toDeletePrices = vari.AppItemPriceInfos.Where(z => z.Code != "MSRP").ToList();
+                                    if (toDeletePrices != null && toDeletePrices.Count > 0)
+                                    {
+                                        var customPrice = toDeletePrices.Where(z => z.BuyerSSIN == accountDestSSIN).FirstOrDefault();
+                                        if (customPrice != null)
+                                        {
+                                            foreach (var price in toDeletePrices)
+                                            {
+                                                if (price.BuyerSSIN != accountDestSSIN
+                                                    && price.Code != "MSRP")
+                                                {
+                                                    vari.AppItemPriceInfos.Remove(price);
+                                                }
+                                            }
+
+                                        }
+                                        else
+                                        {
+                                            if (!string.IsNullOrEmpty(priceLevel))
+                                            {
+                                                foreach (var price in toDeletePrices)
+                                                {
+                                                    if (price.Code != priceLevel
+                                                        && price.Code != "MSRP")
+                                                    {
+                                                        vari.AppItemPriceInfos.Remove(price);
+                                                    }
+                                                }
+                                            }
+                                            foreach (var price in toDeletePrices)
+                                            {
+                                                if (price.Code != priceLevel
+                                                    && price.Code != "MSRP")
+                                                {
+                                                    vari.AppItemPriceInfos.Remove(price);
+                                                }
+                                            }
+                                        }
+                                    }
+                                    //I49[End]
                                 }
                                 retutnval++;
                                 itemC.NonLookupValues = new List<LookupLabelDto>();

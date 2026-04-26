@@ -51,6 +51,7 @@ namespace onetouch.AppMarketplaceItems.Dtos
         public string BuyerAccountSSIN { set; get; }
         public string SellerAccountSSIN { set; get; }
         public string PriceLevel { set; get; }
+        public long TransactionId { set; get; }
 
     }
     public class AppMarketplaceItemForViewDto : GetAppMarketplaceItemDto

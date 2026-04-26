@@ -184,7 +184,8 @@ namespace onetouch.AppSiiwiiTransaction.Dtos
         ARContact,
         ShipToContact,
         ShipFromContact,
-        Creator
+        Creator,
+        BuyingOffice
     }
     public class ContactAddressDto : AppAddressDto
     {
