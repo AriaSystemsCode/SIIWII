@@ -20602,6 +20602,7 @@ export class AppMarketplaceItemsServiceProxy {
      * @param buyerAccountSSIN (optional) 
      * @param sellerAccountSSIN (optional) 
      * @param priceLevel (optional) 
+     * @param transactionId (optional) 
      * @param itemId (optional) 
      * @param getAppItemAttributesInputForCategories_Sorting (optional) 
      * @param getAppItemAttributesInputForCategories_SkipCount (optional) 
@@ -20621,7 +20622,7 @@ export class AppMarketplaceItemsServiceProxy {
      * @param maxResultCount (optional) 
      * @return Success
      */
-    getMarketplaceAppItemForView(getAppItemAttributesInputForExtraData_EntityObjectTypeId: number | undefined, getAppItemAttributesInputForExtraData_recommandedOrAdditional: RecommandedOrAdditional, getAppItemAttributesInputForExtraData_ItemId: number | undefined, getAppItemAttributesInputForExtraData_ItemEntityId: number | undefined, getAppItemAttributesInputForExtraData_Sorting: string | null | undefined, getAppItemAttributesInputForExtraData_SkipCount: number | undefined, getAppItemAttributesInputForExtraData_MaxResultCount: number | undefined, currencyCode: string | null | undefined, buyerAccountSSIN: string | null | undefined, sellerAccountSSIN: string | null | undefined, priceLevel: string | null | undefined, itemId: number | undefined, getAppItemAttributesInputForCategories_Sorting: string | null | undefined, getAppItemAttributesInputForCategories_SkipCount: number | undefined, getAppItemAttributesInputForCategories_MaxResultCount: number | undefined, getAppItemAttributesInputForClassifications_Sorting: string | null | undefined, getAppItemAttributesInputForClassifications_SkipCount: number | undefined, getAppItemAttributesInputForClassifications_MaxResultCount: number | undefined, getAppItemAttributesInputForDepartments_Sorting: string | null | undefined, getAppItemAttributesInputForDepartments_SkipCount: number | undefined, getAppItemAttributesInputForDepartments_MaxResultCount: number | undefined, getAppItemAttributesInputForRelatedItems_Sorting: string | null | undefined, getAppItemAttributesInputForRelatedItems_SkipCount: number | undefined, getAppItemAttributesInputForRelatedItems_MaxResultCount: number | undefined, itemSSIN: string | null | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<GetAppMarketplaceItemDetailForViewDto> {
+    getMarketplaceAppItemForView(getAppItemAttributesInputForExtraData_EntityObjectTypeId: number | undefined, getAppItemAttributesInputForExtraData_recommandedOrAdditional: RecommandedOrAdditional, getAppItemAttributesInputForExtraData_ItemId: number | undefined, getAppItemAttributesInputForExtraData_ItemEntityId: number | undefined, getAppItemAttributesInputForExtraData_Sorting: string | null | undefined, getAppItemAttributesInputForExtraData_SkipCount: number | undefined, getAppItemAttributesInputForExtraData_MaxResultCount: number | undefined, currencyCode: string | null | undefined, buyerAccountSSIN: string | null | undefined, sellerAccountSSIN: string | null | undefined, priceLevel: string | null | undefined, transactionId: number | undefined, itemId: number | undefined, getAppItemAttributesInputForCategories_Sorting: string | null | undefined, getAppItemAttributesInputForCategories_SkipCount: number | undefined, getAppItemAttributesInputForCategories_MaxResultCount: number | undefined, getAppItemAttributesInputForClassifications_Sorting: string | null | undefined, getAppItemAttributesInputForClassifications_SkipCount: number | undefined, getAppItemAttributesInputForClassifications_MaxResultCount: number | undefined, getAppItemAttributesInputForDepartments_Sorting: string | null | undefined, getAppItemAttributesInputForDepartments_SkipCount: number | undefined, getAppItemAttributesInputForDepartments_MaxResultCount: number | undefined, getAppItemAttributesInputForRelatedItems_Sorting: string | null | undefined, getAppItemAttributesInputForRelatedItems_SkipCount: number | undefined, getAppItemAttributesInputForRelatedItems_MaxResultCount: number | undefined, itemSSIN: string | null | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<GetAppMarketplaceItemDetailForViewDto> {
         let url_ = this.baseUrl + "/api/services/app/AppMarketplaceItems/GetMarketplaceAppItemForView?";
         if (getAppItemAttributesInputForExtraData_EntityObjectTypeId === null)
             throw new Error("The parameter 'getAppItemAttributesInputForExtraData_EntityObjectTypeId' cannot be null.");
@@ -20657,6 +20658,10 @@ export class AppMarketplaceItemsServiceProxy {
             url_ += "SellerAccountSSIN=" + encodeURIComponent("" + sellerAccountSSIN) + "&";
         if (priceLevel !== undefined && priceLevel !== null)
             url_ += "PriceLevel=" + encodeURIComponent("" + priceLevel) + "&";
+        if (transactionId === null)
+            throw new Error("The parameter 'transactionId' cannot be null.");
+        else if (transactionId !== undefined)
+            url_ += "TransactionId=" + encodeURIComponent("" + transactionId) + "&";
         if (itemId === null)
             throw new Error("The parameter 'itemId' cannot be null.");
         else if (itemId !== undefined)
@@ -28118,14 +28123,19 @@ export class AppTransactionServiceProxy {
     /**
      * @param productSSIN (optional) 
      * @param tenantId (optional) 
+     * @param transactionId (optional) 
      * @return Success
      */
-    getProductFromMarketplace(productSSIN: string | null | undefined, tenantId: number | null | undefined): Observable<void> {
+    getProductFromMarketplace(productSSIN: string | null | undefined, tenantId: number | null | undefined, transactionId: number | undefined): Observable<void> {
         let url_ = this.baseUrl + "/api/services/app/AppTransaction/GetProductFromMarketplace?";
         if (productSSIN !== undefined && productSSIN !== null)
             url_ += "productSSIN=" + encodeURIComponent("" + productSSIN) + "&";
         if (tenantId !== undefined && tenantId !== null)
             url_ += "tenantId=" + encodeURIComponent("" + tenantId) + "&";
+        if (transactionId === null)
+            throw new Error("The parameter 'transactionId' cannot be null.");
+        else if (transactionId !== undefined)
+            url_ += "transactionId=" + encodeURIComponent("" + transactionId) + "&";
         url_ = url_.replace(/[?&]$/, "");
 
         let options_ : any = {
@@ -29830,6 +29840,67 @@ export class AppTransactionServiceProxy {
             let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
                 result200 = resultData200 !== undefined ? resultData200 : <any>null;
     
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param accountSSIN (optional) 
+     * @return Success
+     */
+    getAccountMarketplaceRoles(accountSSIN: string | null | undefined): Observable<string[]> {
+        let url_ = this.baseUrl + "/api/services/app/AppTransaction/GetAccountMarketplaceRoles?";
+        if (accountSSIN !== undefined && accountSSIN !== null)
+            url_ += "accountSSIN=" + encodeURIComponent("" + accountSSIN) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetAccountMarketplaceRoles(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetAccountMarketplaceRoles(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<string[]>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<string[]>;
+        }));
+    }
+
+    protected processGetAccountMarketplaceRoles(response: HttpResponseBase): Observable<string[]> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            if (Array.isArray(resultData200)) {
+                result200 = [] as any;
+                for (let item of resultData200)
+                    result200!.push(item);
+            }
+            else {
+                result200 = <any>null;
+            }
             return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
@@ -78625,6 +78696,7 @@ export class AppItemPriceInfo implements IAppItemPriceInfo {
     currencyName!: string | undefined;
     isDefault!: boolean;
     buyerSSIN!: string | undefined;
+    sellerSSIN!: string | undefined;
     id!: number;
 
     [key: string]: any;
@@ -78652,6 +78724,7 @@ export class AppItemPriceInfo implements IAppItemPriceInfo {
             this.currencyName = _data["currencyName"];
             this.isDefault = _data["isDefault"];
             this.buyerSSIN = _data["buyerSSIN"];
+            this.sellerSSIN = _data["sellerSSIN"];
             this.id = _data["id"];
         }
     }
@@ -78677,6 +78750,7 @@ export class AppItemPriceInfo implements IAppItemPriceInfo {
         data["currencyName"] = this.currencyName;
         data["isDefault"] = this.isDefault;
         data["buyerSSIN"] = this.buyerSSIN;
+        data["sellerSSIN"] = this.sellerSSIN;
         data["id"] = this.id;
         return data;
     }
@@ -78691,6 +78765,7 @@ export interface IAppItemPriceInfo {
     currencyName: string | undefined;
     isDefault: boolean;
     buyerSSIN: string | undefined;
+    sellerSSIN: string | undefined;
     id: number;
 
     [key: string]: any;
@@ -90259,6 +90334,7 @@ export enum ContactRoleEnum {
     ShipToContact = 6,
     ShipFromContact = 7,
     Creator = 8,
+    BuyingOffice = 9,
 }
 
 export class ContactAppAddressDto implements IContactAppAddressDto {
