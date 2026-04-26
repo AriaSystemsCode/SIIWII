@@ -482,6 +482,14 @@ namespace onetouch.AppMarketplaceAccounts
                                         if (existInconn != null)
                                             continue;
                                     }
+                                    if (account.AvailableConnections != null && account.AvailableConnections.Count > 0)
+                                    {
+                                        var exitsAvial = account.AvailableConnections
+                                            .Where(z => z.ConnectionEntityId == relationshipCodeLookup.Id).FirstOrDefault();
+                                        if (exitsAvial != null)
+                                            continue;
+                                    }
+
                                     var requestorType = relationshipCodeLookup.EntityExtraData.Where(z => z.AttributeId == 606).FirstOrDefault();
                                     var requestorRole = relationshipCodeLookup.EntityExtraData.Where(z => z.AttributeId == 610).FirstOrDefault();
                                     var recepientRole = relationshipCodeLookup.EntityExtraData.Where(z => z.AttributeId == 611).FirstOrDefault();
@@ -553,6 +561,13 @@ namespace onetouch.AppMarketplaceAccounts
                                     if (existInconn != null)
                                         continue;
                                 }
+                                if (account.AvailableConnections != null && account.AvailableConnections.Count > 0)
+                                {
+                                    var exitsAvial = account.AvailableConnections
+                                        .Where(z => z.ConnectionEntityId == relationshipCodeLookup.Id).FirstOrDefault();
+                                    if (exitsAvial != null)
+                                        continue;
+                                }    
                                 var requestorType = relationshipCodeLookup.EntityExtraData.Where(z => z.AttributeId == 606).FirstOrDefault();
                                 var requestorRole = relationshipCodeLookup.EntityExtraData.Where(z => z.AttributeId == 610).FirstOrDefault();
                                 var recepientRole = relationshipCodeLookup.EntityExtraData.Where(z => z.AttributeId == 611).FirstOrDefault();
@@ -1706,6 +1721,27 @@ namespace onetouch.AppMarketplaceAccounts
                     return "";
                 }
             }
+            //
+            if (disconnect == false && disconnectRelationId != null)
+            {
+                var relationEnty = await _appEntityRepository.GetAll()
+                    .AsNoTracking().Where(z => z.Id == disconnectRelationId).FirstOrDefaultAsync();
+                if (relationEnty!=null)
+                {
+                    var relationshipEntityObjectTypeId = await _helper.SystemTables.GetEntityObjectTypeMarketplaceRelationship();
+
+                    var relationshipObject = await _appEntityRepository.GetAll()
+                        .Where(z => z.Code == relationEnty.EntityObjectTypeCode &&
+                        z.EntityObjectTypeId == relationshipEntityObjectTypeId)
+                        .FirstOrDefaultAsync();
+                    if (relationshipObject!= null)
+                    {
+                        connectionTypeId = relationshipObject.Id;
+                    }
+                }
+            
+            }
+                //
 
             string returnLabel = "";
             var activeRealtionshipStatusId = await _helper.SystemTables.GetEntityObjectStatusRelationshipActive();

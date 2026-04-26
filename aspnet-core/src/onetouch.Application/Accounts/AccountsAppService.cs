@@ -2235,6 +2235,7 @@ namespace onetouch.Accounts
                         {
                             _appAddressRepository.RemoveRange(existed.AppContactAddresses.Select(z => z.AddressFk));
                             _appContactAddressRepository.RemoveRange(existed.AppContactAddresses);
+                            await CurrentUnitOfWork.SaveChangesAsync();
                         }
                         CreateOrEditAccountInfoDto createOrEditAccountInfoDto = new CreateOrEditAccountInfoDto();
                         createOrEditAccountInfoDto = ObjectMapper.Map<CreateOrEditAccountInfoDto>(existed);//(originalContact);
@@ -2298,7 +2299,7 @@ namespace onetouch.Accounts
                                     var savedAddress = await _appMarketplaceAddressRepository.FirstOrDefaultAsync(x => x.Id == mcontactAddress.AddressId);
                                     if (savedAddress != null)
                                     {
-                                        var addressCon = await _appAddressRepository.FirstOrDefaultAsync(z => z.TenantId == originalContact.TenantOwner &&
+                                        var addressCon = await _appAddressRepository.FirstOrDefaultAsync(z => z.TenantId == tenantId &&
                                          z.AccountId == accountSaved.AccountInfo.Id && z.Code == savedAddress.Code);
                                         if (addressCon == null)
                                         {
