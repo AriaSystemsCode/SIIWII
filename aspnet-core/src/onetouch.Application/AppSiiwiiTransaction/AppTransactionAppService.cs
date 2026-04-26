@@ -79,6 +79,7 @@ using AuthorizeNet.APICore;
 using MimeKit;
 using DocumentFormat.OpenXml.Office2021.Drawing.SketchyShapes;
 using DocumentFormat.OpenXml.Vml.Office;
+using DocumentFormat.OpenXml.Drawing.Diagrams;
 
 
 //using NUglify.Helpers;
@@ -1204,7 +1205,7 @@ namespace onetouch.AppSiiwiiTransaction
                         if (buyerTenantId != null)
                         {
                             foreach (var det in header.AppTransactionDetails.Where(z => z.ParentId == null))
-                                await GetProductFromMarketplace(det.SSIN, int.Parse(AbpSession.TenantId.ToString()));
+                                await GetProductFromMarketplace(det.SSIN, int.Parse(AbpSession.TenantId.ToString()),header.Id);
                         }
 
                     }
@@ -1761,7 +1762,7 @@ namespace onetouch.AppSiiwiiTransaction
                         foreach (var det in appTrans.AppTransactionDetails.Where(z => z.ParentId == null))
                         {
 
-                            await GetProductFromMarketplace(det.SSIN, int.Parse(AbpSession.TenantId.ToString()));
+                            await GetProductFromMarketplace(det.SSIN, int.Parse(AbpSession.TenantId.ToString()), appTrans.Id);
                             //I46[Start]
                             await _appTenantActivitiesLogAppService.AddUsageActivityLog("PLACE-ORDER-LINE",
                             appTrans.Name.Trim() + ", Line#" + det.LineNo.ToString().Trim(), det.Id, appTrans.EntityObjectTypeId, appTrans.EntityObjectTypeCode,
@@ -3933,10 +3934,11 @@ namespace onetouch.AppSiiwiiTransaction
 
         }
         //xx
-        public async Task GetProductFromMarketplace(string productSSIN, int? tenantId)
+        public async Task GetProductFromMarketplace(string productSSIN, int? tenantId, long transactionId)
         {
             if (tenantId == null)
                 return;
+            
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
             {
                 var appItem = await _appItems.GetAll().FirstOrDefaultAsync(x => x.TenantId == tenantId && x.SSIN == productSSIN);
@@ -3953,9 +3955,70 @@ namespace onetouch.AppSiiwiiTransaction
                         .Include(z => z.ParentFkList).ThenInclude(z => z.EntityExtraData)
                         .Include(z => z.ParentFkList).ThenInclude(z => z.EntityAttachments).ThenInclude(s => s.AttachmentFk)
                         .FirstOrDefaultAsync(s => s.SSIN == productSSIN);
-
+                    //I49[Start]
+                    string destinationAccSSIN = "";
+                    string sourceAccSSIN = "";
+                    long destinationAccRelationId = 0;
+                    long sourceAccRelationId = 0;
+                    string destinationRoleInTrans = "";
+                    string sourceRoleInTrans = "";
+                    string relationshipPriceLevel="";
+                    if (marketplaceItem != null)
+                    {
+                        var destinationAccount = await _appMarketplaceContactRepository.GetAll()
+                        .Where(z => z.IsProfileData == true && z.TenantOwner == tenantId && z.SharingLevel == 1)
+                        .FirstOrDefaultAsync();
+                        if (destinationAccount != null)
+                        {
+                            destinationAccSSIN = destinationAccount.SSIN;
+                            
+                        }
+                        var sourceAccount = await _appMarketplaceContactRepository.GetAll()
+                            .Where(z => z.IsProfileData == true && z.TenantOwner == marketplaceItem.TenantOwner && z.SharingLevel == 1)
+                            .FirstOrDefaultAsync();
+                        if (sourceAccount!=null)
+                        {
+                            sourceAccSSIN = sourceAccount.SSIN;
+                        }
+                    }
+                    List<AppTransactionContacts> transactionContacts = null;
+                    if (!string.IsNullOrEmpty(destinationAccSSIN) && !string.IsNullOrEmpty(sourceAccSSIN))
+                    {
+                        transactionContacts = await _appTransactionContactsRepository.GetAll().Where(z => z.TransactionId == transactionId).ToListAsync();
+                        if (transactionContacts != null && transactionContacts.Count > 0)
+                        {
+                            var accRole = transactionContacts.Where(z => z.CompanySSIN == destinationAccSSIN).FirstOrDefault();
+                            if (accRole != null)
+                            {
+                                destinationAccRelationId = accRole.Id; //Should be RelationshipId not Id
+                                destinationRoleInTrans = accRole.ContactRole;
+                            }
+                            var accSrcRole = transactionContacts.Where(z => z.CompanySSIN == sourceAccSSIN).FirstOrDefault();
+                            if (accSrcRole != null)
+                            {
+                                sourceAccRelationId = accSrcRole.Id;//Should be RelationshipId not Id
+                                sourceRoleInTrans = accSrcRole.ContactRole;
+                            }
+                            var relationshipSellBuy = await _appContactRelationshipInfoRepository.GetAll()
+                                .Where(z => (z.RequesterContactSSIN == sourceAccSSIN && z.RecipientContactSSIN == destinationAccSSIN &&
+                                z.RequesterMarketplaceRole == sourceRoleInTrans &&
+                                z.RecipientMarketplaceRole == destinationRoleInTrans) ||
+                                (z.RecipientContactSSIN == sourceAccSSIN && z.RequesterContactSSIN == destinationAccSSIN &&
+                                z.RecipientMarketplaceRole == sourceRoleInTrans &&
+                                z.RequesterMarketplaceRole == destinationRoleInTrans)
+                                ).Include(z=>z.EntityExtraData).FirstOrDefaultAsync();
+                            if (relationshipSellBuy != null)
+                            {
+                                var priceLevelExtradata = relationshipSellBuy.EntityExtraData.Where(z => z.AttributeId == 908).FirstOrDefault();
+                                if (priceLevelExtradata != null && !string.IsNullOrEmpty(priceLevelExtradata.AttributeValue))
+                                    relationshipPriceLevel = priceLevelExtradata.AttributeValue;
+                            }
+                        }
+                    }
+                    //I49[End]
                     marketplaceItem.ItemPricesFkList = await _appMarketplaceItemPricesRepository.GetAll()
                         .Where(s => s.AppMarketplaceItemId == marketplaceItem.Id).ToListAsync();
+
                     marketplaceItem.ItemSizeScaleHeadersFkList = await _appMarketplaceItemSizeScaleHeadersRepository.GetAll()
                         .Include(s => s.AppItemSizeScalesDetails).Where(s => s.AppMarketplaceItemId == marketplaceItem.Id).ToListAsync();
                     // marketplaceItem.EntityAttachments = (await _appEntity.GetAll().
@@ -4078,7 +4141,8 @@ namespace onetouch.AppSiiwiiTransaction
                     var variationList = await _appItemsAppService.GetVariationsCodes(long.Parse(identifier.ToString()), nextCode, variationListOrg, marketplaceItem.EntityObjectTypeId, tenantId);
                     item.SycIdentifierId = identifier;
                     //}
-
+                    var customPrice = marketplaceItem.ItemPricesFkList.Where(z => z.BuyerSSIN == destinationAccSSIN).FirstOrDefault();
+                    bool hasCustomPrice = (customPrice != null);
                     item.EntityFk = entityMain;
                     foreach (var variation in marketplaceItem.ParentFkList)
                     {
@@ -4113,17 +4177,27 @@ namespace onetouch.AppSiiwiiTransaction
                         varItem.ItemPricesFkList = new List<AppItemPrices>();
                         foreach (var itemPrice in variation.ItemPricesFkList)
                         {
-                            var price = new AppItemPrices();
-                            price.Id = 0;
-                            price.AppItemCode = varItem.Code;
-                            price.AppItemId = varItem.Id;
-                            price.TenantId = tenantId;
-                            price.AppItemFk = varItem;
-                            price.Code = itemPrice.Code;
-                            price.CurrencyCode = itemPrice.CurrencyCode;
-                            price.CurrencyId = itemPrice.CurrencyId;
-                            price.Price = itemPrice.Price;
-                            varItem.ItemPricesFkList.Add(price);
+                            if (itemPrice.Code == "MSRP" ||
+                               (hasCustomPrice ? itemPrice.BuyerSSIN == destinationAccSSIN:(itemPrice.Code == relationshipPriceLevel)))
+                            { 
+                                var price = new AppItemPrices();
+                                price.Id = 0;
+                                price.AppItemCode = varItem.Code;
+                                price.AppItemId = varItem.Id;
+                                price.TenantId = tenantId;
+                                price.AppItemFk = varItem;
+                                price.Code = itemPrice.Code;
+                                price.CurrencyCode = itemPrice.CurrencyCode;
+                                price.CurrencyId = itemPrice.CurrencyId;
+                                price.Price = itemPrice.Price;
+                                if ((destinationRoleInTrans == ContactRoleEnum.Buyer.ToString() &&
+                                     itemPrice.Code != "MSRP"))
+                                {
+                                    price.BuyerSSIN = itemPrice.BuyerSSIN;
+                                    price.SellerSSIN = sourceAccSSIN;
+                                }
+                                varItem.ItemPricesFkList.Add(price);
+                            }
                         }
 
 
@@ -4140,19 +4214,34 @@ namespace onetouch.AppSiiwiiTransaction
 
                     // return;
                     item.ItemPricesFkList = new List<AppItemPrices>(); //ObjectMapper.Map<List<AppItemPrices>>(marketplaceItem.ItemPricesFkList);
+                    
+                   
                     foreach (var itemPrice in marketplaceItem.ItemPricesFkList)
                     {
-                        var price = new AppItemPrices();
-                        price.Id = 0;
-                        price.AppItemId = item.Id;
-                        price.AppItemCode = item.Code;
-                        price.TenantId = tenantId;
-                        price.AppItemFk = item;
-                        price.Code = itemPrice.Code;
-                        price.CurrencyCode = itemPrice.CurrencyCode;
-                        price.CurrencyId = itemPrice.CurrencyId;
-                        price.Price = itemPrice.Price;
-                        item.ItemPricesFkList.Add(price);
+                        if (itemPrice.Code == "MSRP" ||
+                            (hasCustomPrice ? 
+                            itemPrice.BuyerSSIN == destinationAccSSIN 
+                            : (itemPrice.Code == relationshipPriceLevel)))
+                        {
+                            var price = new AppItemPrices();
+                            price.Id = 0;
+                            price.AppItemId = item.Id;
+                            price.AppItemCode = item.Code;
+                            price.TenantId = tenantId;
+                            price.AppItemFk = item;
+                            price.Code = itemPrice.Code;
+                            price.CurrencyCode = itemPrice.CurrencyCode;
+                            price.CurrencyId = itemPrice.CurrencyId;
+                            price.Price = itemPrice.Price;
+                            
+                            if ((destinationRoleInTrans == ContactRoleEnum.Buyer.ToString() &&
+                                itemPrice.Code != "MSRP"))
+                            {
+                                price.BuyerSSIN = itemPrice.BuyerSSIN;
+                                price.SellerSSIN =sourceAccSSIN;
+                            }
+                            item.ItemPricesFkList.Add(price);
+                        }
                     }
 
 
@@ -5700,7 +5789,7 @@ namespace onetouch.AppSiiwiiTransaction
                                 if (det.ParentId != null)
                                     continue;
                                 //I45
-                                await GetProductFromMarketplace(det.SSIN, int.Parse(tenantId.ToString()));
+                                await GetProductFromMarketplace(det.SSIN, int.Parse(tenantId.ToString()), marketplaceTransaction.Id);
                                 //I45
                                 AppTransactionDetails detail = new AppTransactionDetails();
                                 detail = ObjectMapper.Map<AppTransactionDetails>(det);
@@ -5991,7 +6080,7 @@ namespace onetouch.AppSiiwiiTransaction
                                 if (det.ParentId != null)
                                     continue;
                                 //I45
-                                await GetProductFromMarketplace(det.SSIN, int.Parse(tenantId.ToString()));
+                                await GetProductFromMarketplace(det.SSIN, int.Parse(tenantId.ToString()), marketplaceTransaction.Id);
                                 //I45
                                 AppTransactionDetails detail = new AppTransactionDetails();
                                 detail = ObjectMapper.Map<AppTransactionDetails>(det);
@@ -8038,6 +8127,63 @@ namespace onetouch.AppSiiwiiTransaction
         //T-SII-20250606.0001,1 MMT 07/03/2025 Update appEntity log when Transaction line is edited Qty or Price[End]
         //I46{End}
         //I49[Start]
+        public async Task<List<string>> GetAccountMarketplaceRoles(string accountSSIN)
+        {
+            var activeRealtionshipStatusId = await _helper.SystemTables.GetEntityObjectStatusRelationshipActive();
+            List<string> returnRoles = new List<string>();
+            var contact = await _appMarketplaceContactRepository.GetAll()
+                .Include(z => z.EntityExtraData)
+                .Where(z => z.SSIN== accountSSIN).FirstOrDefaultAsync();
+            if (contact != null)
+            {
+                var extraRole = contact.EntityExtraData.Where(z => z.AttributeId == 610).FirstOrDefault();
+                if (extraRole != null)
+                {
+                    string rolesString = extraRole.AttributeValue;
+                    if (!string.IsNullOrEmpty(rolesString))
+                    {
+                        var roles = rolesString.Split('-');
+                        if (roles.Count() > 0)
+                        {
+                            foreach (var role in roles)
+                            {
+                                returnRoles.Add(role);
+                            }
+                        }
+
+                    }
+                }
+                //var relations = await _appContactRelationshipInfoRepository.GetAll().Where(z => (z.RecipientContactSSIN == contact.SSIN ||
+                // z.RequesterContactSSIN == contact.SSIN) && z.EntityObjectStatusId==activeRealtionshipStatusId && z.SharingLevel==1).ToListAsync();
+                // if (relations != null && relations.Count > 0)
+                // {
+                //     foreach (var relation in relations)
+                //     {
+                //         if (relation.RecipientContactSSIN == contact.SSIN)
+                //         {
+                //             if (!string.IsNullOrEmpty(relation.RecipientMarketplaceRole) &&
+                //                 returnRoles.FirstOrDefault(z => z == relation.RecipientMarketplaceRole) == null)
+                //                 returnRoles.Add(relation.RecipientMarketplaceRole);
+
+
+                //         }
+                //         else
+                //         {
+                //             if (relation.RequesterContactSSIN== contact.SSIN)
+                //             {
+                //                 if (!string.IsNullOrEmpty(relation.RequesterMarketplaceRole) &&
+                //                 returnRoles.FirstOrDefault(z => z == relation.RequesterMarketplaceRole) == null)
+                //                     returnRoles.Add(relation.RequesterMarketplaceRole);
+                //             }
+                //         }
+
+                //    }
+                //}
+            }
+            return returnRoles;
+
+
+        }
         public async Task<List<string>> GetLoggedInTenantRoles()
         {
             var activeRealtionshipStatusId = await _helper.SystemTables.GetEntityObjectStatusRelationshipActive();
