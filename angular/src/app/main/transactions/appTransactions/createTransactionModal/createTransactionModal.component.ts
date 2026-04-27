@@ -189,6 +189,8 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit, 
         this.orderForm.controls['startDate'].setValue(new Date());
         this.orderForm.controls['enteredDate'].setValue(new Date());
         this.buyerCompanySSIN = ''
+        this.sellerCompanyRelationId="";
+        this.buyerCompanyRelationId="";
     }
 
     updateControlState() {
@@ -1169,6 +1171,8 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit, 
         this.showSellerRelationshipIcon = false;
         this.buyerRelationshipName = '';
         this.sellerRelationshipName = '';
+        this.sellerCompanyRelationId = "";
+        this.buyerCompanyRelationId = "";
     }
 
 
@@ -1240,5 +1244,7 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit, 
         this.showSellerRelationshipIcon = false;
         this.buyerRelationshipName = '';
         this.sellerRelationshipName = '';
+        this.sellerCompanyRelationId = "";
+        this.buyerCompanyRelationId = "";
 }
 }
