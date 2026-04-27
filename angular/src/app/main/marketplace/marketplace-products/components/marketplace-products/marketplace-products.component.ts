@@ -379,7 +379,7 @@ export class MarketplaceProductsComponent
         } catch { code = raw; }
       }
     
-      this.selectedCurrrency = this.currencies?.find(c => c.code === code) || this.currencies?.[0] || null;
+      this.selectedCurrrency = this.currencies?.find(c => c.code === code) || 'USD';
       this.currency = this.selectedCurrrency?.code || code;
     }
 
@@ -599,42 +599,83 @@ export class MarketplaceProductsComponent
         }
 
     }
-    private getCurrencyCodeForRequest(): string {
+    // private getCurrencyCodeForRequest(): string {
    
-        if (this.selectedCurrrency && typeof this.selectedCurrrency === 'object' && this.selectedCurrrency.code) {
-          return this.selectedCurrrency.code;
-        }
+    //     if (this.selectedCurrrency && typeof this.selectedCurrrency === 'object' && this.selectedCurrrency.code) {
+    //       return this.selectedCurrrency.code;
+    //     }
     
-        if (typeof this.selectedCurrrency === 'string' && this.selectedCurrrency.trim()) {
-          return this.selectedCurrrency.trim();
-        }
+    //     if (typeof this.selectedCurrrency === 'string' && this.selectedCurrrency.trim()) {
+    //       return this.selectedCurrrency.trim();
+    //     }
     
-        const stored = localStorage.getItem('currencyCode');
-        if (stored && stored !== 'undefined' && stored !== 'null') {
-          try {
-            const parsed = JSON.parse(stored);
+    //     const stored = localStorage.getItem('currencyCode');
+    //     if (stored && stored !== 'undefined' && stored !== 'null') {
+    //       try {
+    //         const parsed = JSON.parse(stored);
     
-            if (typeof parsed === 'string' && parsed.trim()) {
-              return parsed.trim();
-            }
+    //         if (typeof parsed === 'string' && parsed.trim()) {
+    //           return parsed.trim();
+    //         }
     
-            if (parsed && typeof parsed === 'object' && parsed.code) {
-              return parsed.code;
-            }
-          } catch {
+    //         if (parsed && typeof parsed === 'object' && parsed.code) {
+    //           return parsed.code;
+    //         }
+    //       } catch {
     
-            if (stored.trim()) {
-              return stored.trim();
-            }
-          }
-        }
+    //         if (stored.trim()) {
+    //           return stored.trim();
+    //         }
+    //       }
+    //     }
     
-        if ((this as any).tenantDefaultCurrency?.code) {
-          return (this as any).tenantDefaultCurrency.code;
-        }
+    //     if ((this as any).tenantDefaultCurrency?.code) {
+    //       return (this as any).tenantDefaultCurrency.code;
+    //     }
       
-        return 'USD';
+    //     return 'USD';
+    //   }
+
+      private getCurrencyCodeForRequest(): string {
+
+  const clean = (val: any): string | null => {
+    if (!val) return null;
+
+    if (typeof val === 'string') {
+      const v = val.trim();
+      if (!v || v === 'undefined' || v === 'null') return null;
+      return v;
+    }
+
+    if (typeof val === 'object' && val.code) {
+      return val.code;
+    }
+
+    return null;
+  };
+
+  // 1. selected currency
+  let code = clean(this.selectedCurrrency);
+
+  // 2. localStorage
+  if (!code) {
+    const stored = localStorage.getItem('currencyCode');
+    if (stored) {
+      try {
+        code = clean(JSON.parse(stored)) || clean(stored);
+      } catch {
+        code = clean(stored);
       }
+    }
+  }
+
+  // 3. tenant default
+  if (!code && (this as any).tenantDefaultCurrency?.code) {
+    code = clean((this as any).tenantDefaultCurrency.code);
+  }
+
+  return code || 'USD';
+}
 
       getSettingData() {
         return this._AppEntitiesServiceProxy.getHostSettingValue(1316, null);
