@@ -140,6 +140,8 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit, 
     showBuyerRelationshipIcon:boolean=false;
     buyerRelationshipName:string="";
     sellerRelationshipName:string="";
+    buyerCompanyRelationId;
+    sellerCompanyRelationId;
     constructor(
         injector: Injector,
         private fb: FormBuilder,
@@ -462,6 +464,7 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit, 
         this.selectedBuyerContact = ''
         this.buyerComapnyId = event.value.id;
         this.buyerCompanySSIN = event.value.accountSSIN;
+        this.buyerCompanyRelationId=event.value.relationId;
         this.currencyCode = event.value.currencyCode;
         this.areSame = false
         this.orderForm.get('buyerContactPhoneNumber').setValue(event.value.phone)
@@ -479,6 +482,8 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit, 
 
         this.sellerCompanyId = event.value.id;
         this.sellerCompanySSIN = event.value.accountSSIN;
+        this.sellerCompanyRelationId=event.value.relationId;
+
         this.sellerCurrencyCode = event.value.currencyCode;
         this.areSame = false
         this.orderForm.get('sellerContactPhoneNumber').setValue(event.value.phone)
@@ -1014,6 +1019,9 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit, 
         if (this.addNew) {
             this.showMainSpinner();
             this.btnLoader = true;
+
+            this.body.buyerRelationId  = this.sellerCompanyRelationId;
+            this.body.sellerRelationId = this.buyerCompanyRelationId;
             this._AppTransactionServiceProxy
                 .createOrEdit(this.body)
                 .pipe(finalize(() => {
