@@ -3,7 +3,7 @@ import { Router } from '@angular/router';
 import { finalize } from 'rxjs/operators';
 import { AppConsts } from '@shared/AppConsts';
 import { AppComponentBase } from '@shared/common/app-component-base';
-import { AccountsServiceProxy, GetAccountForViewDto } from '@shared/service-proxies/service-proxies';
+import { CreateMarketplaceAccountServiceProxy, GetAccountForViewDto } from '@shared/service-proxies/service-proxies';
 
 @Component({
   selector: 'app-account-card',
@@ -16,8 +16,9 @@ export class AccountCardComponent extends AppComponentBase implements OnChanges 
   @Input('isHost') isHost: boolean
   @Input('FromLandingPage') FromLandingPage: boolean
   @Output() deleteMe: EventEmitter<boolean> = new EventEmitter<boolean>()
-  @Output() disconnectMe: EventEmitter<{ account: GetAccountForViewDto; relation: any }>  = new EventEmitter();
+  @Output() disconnectMe: EventEmitter<{ account: GetAccountForViewDto; relation: any }> = new EventEmitter();
   @Input() fromMarketplace;
+  @Input() loginTenaneSsin;
   @Output() _createRelation: EventEmitter<any> = new EventEmitter<any>()
 
 
@@ -31,11 +32,13 @@ export class AccountCardComponent extends AppComponentBase implements OnChanges 
   isTouchDevice = false;
 
   showRelationsDialog = false;
-selectedAccountForRelations: any = null;
+  selectedAccountForRelations: any = null;
+  openedRelationMenuId: number | null = null;
+
   constructor(
     injector: Injector,
     private router: Router,
-    private _accountsServiceProxy: AccountsServiceProxy,
+    private CreateMarketplaceAccountServiceProxy: CreateMarketplaceAccountServiceProxy,
   ) {
     super(injector);
   }
@@ -100,23 +103,23 @@ selectedAccountForRelations: any = null;
   createRelation(relationType) {
     this._createRelation.emit({ account: this.account, relation: relationType });
   }
-getFormattedConnectionName(label: string): string {
-  if (!label) return '';
+  getFormattedConnectionName(label: string): string {
+    if (!label) return '';
 
-  if (label === 'Follow' || label === 'Connect' || label === 'Join' || label === 'Employ') {
+    if (label === 'Follow' || label === 'Connect' || label === 'Join' || label === 'Employ') {
+      return label;
+    }
+
+    if (label.startsWith('MPAction')) {
+      const clean = label.replace('MPAction', '');
+      return clean.charAt(0).toUpperCase() + clean.slice(1).toLowerCase();
+    }
+
     return label;
   }
-
-  if (label.startsWith('MPAction')) {
-    const clean = label.replace('MPAction', '');
-    return clean.charAt(0).toUpperCase() + clean.slice(1).toLowerCase();
+  removeRelation(account, relation) {
+    this.disconnectMe.emit({ account, relation });
   }
-
-  return label;
-}
- removeRelation(account, relation) {
-  this.disconnectMe.emit({ account, relation });
-}
 
   private readonly ICONS: Record<string, string> = {
     FOLLOW: 'assets/accounts/FOLLOW.png',
@@ -133,27 +136,27 @@ getFormattedConnectionName(label: string): string {
     return 'assets/accounts/CONNECT.png'; // fallback
   }
 
-makeRelationPrivatePublic(relation: any, status: boolean) {
-  const accountId = this.account?.account?.id;
-  if (!accountId || !relation) return;
+  makeRelationPrivatePublic(relation: any, status: boolean) {
+    const accountId = this.account?.account?.ssin;
+    if (!accountId || !relation) return;
 
-  this.showMainSpinner();
+    this.showMainSpinner();
 
-  this._accountsServiceProxy
-    .applyRelationOnProfile(accountId, undefined, status, relation?.relationEntityId)
-    .pipe(
-      finalize(() => {
-        this.hideMainSpinner();
-      })
-    )
-    .subscribe(() => {
-      relation.visibility = relation.visibility === 'Public' ? 'Private' : 'Public';
+    this.CreateMarketplaceAccountServiceProxy
+      .createOrEditMarketplaceContactRelationship(this.loginTenaneSsin, accountId, false, status, null, relation?.relationEntityId)
+      .pipe(
+        finalize(() => {
+          this.hideMainSpinner();
+        })
+      )
+      .subscribe(() => {
+        relation.visibility = relation.visibility === 'Public' ? 'Private' : 'Public';
 
-      relation.visibility === 'Public'
-        ? this.notify.success('Account is Shared')
-        : this.notify.success('Account is Private');
-    });
-}
+        relation.visibility === 'Public'
+          ? this.notify.success('Account is Shared')
+          : this.notify.success('Account is Private');
+      });
+  }
 
   getRemainingCategoriesList(categories: string[]): string {
     if (!categories || categories.length <= 3) {
@@ -189,37 +192,36 @@ makeRelationPrivatePublic(relation: any, status: boolean) {
   }
 
   openRelationsDialog(account: any): void {
-  this.selectedAccountForRelations = account;
-  this.showRelationsDialog = true;
-}
+    this.selectedAccountForRelations = account;
+    this.showRelationsDialog = true;
+  }
 
-removeRelationFromDialog(account: any, relation: any, index: number): void {
-  this.removeRelation(account, relation);
+  removeRelationFromDialog(account: any, relation: any, index: number): void {
+    this.removeRelation(account, relation);
 
-  // optional: close dialog if no relations left after UI update
-  setTimeout(() => {
-    if (!account?.connectionsInfo?.length) {
-      this.showRelationsDialog = false;
-    }
-  });
-}
+    // optional: close dialog if no relations left after UI update
+    setTimeout(() => {
+      if (!account?.connectionsInfo?.length) {
+        this.showRelationsDialog = false;
+      }
+    });
+  }
 
 
-openedRelationMenuId: number | null = null;
 
-toggleRelationMenu(event: MouseEvent, account: any): void {
-  event.preventDefault();
-  event.stopPropagation();
+  toggleRelationMenu(event: MouseEvent, account: any): void {
+    event.preventDefault();
+    event.stopPropagation();
 
-  const id = account?.account?.id;
-  this.openedRelationMenuId = this.openedRelationMenuId === id ? null : id;
-}
+    const id = account?.account?.id;
+    this.openedRelationMenuId = this.openedRelationMenuId === id ? null : id;
+  }
 
-onRelationOptionClick(event: MouseEvent, option: any): void {
-  event.preventDefault();
-  event.stopPropagation();
+  onRelationOptionClick(event: MouseEvent, option: any): void {
+    event.preventDefault();
+    event.stopPropagation();
 
-  this.createRelation(option);
-  this.openedRelationMenuId = null;
-}
+    this.createRelation(option);
+    this.openedRelationMenuId = null;
+  }
 }
