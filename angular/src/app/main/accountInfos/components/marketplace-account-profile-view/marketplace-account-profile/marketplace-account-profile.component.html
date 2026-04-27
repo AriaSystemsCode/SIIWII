@@ -300,7 +300,7 @@
       </p-tabPanel>
 
       <p-tabPanel header="Connections" *ngIf="accountDataForView">
-        <app-connections-tab [accountDataForView]="accountDataForView" [marketPlaceData]="marketPlaceData" [isActive]="(activeTabIndex == 2 && accountDataForView?.accountType == 'BUSINESS') || (activeTabIndex == 1 && accountDataForView?.accountType != 'BUSINESS')"
+        <app-connections-tab [loginTenaneSsin]="loginTenaneSsin" [accountDataForView]="accountDataForView" [marketPlaceData]="marketPlaceData" [isActive]="(activeTabIndex == 2 && accountDataForView?.accountType == 'BUSINESS') || (activeTabIndex == 1 && accountDataForView?.accountType != 'BUSINESS')"
           ></app-connections-tab>
       </p-tabPanel>
 

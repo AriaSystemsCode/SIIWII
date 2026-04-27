@@ -17,6 +17,8 @@ import { finalize } from 'rxjs';
 export class LandingPageMultiRowCallToActionComponent extends AppComponentBase implements OnInit {
   @Input() sectionId!: number;
   @Input() blockTypeIsSingleOrMixed: string
+  @Input() loginTenaneSsin: string
+
   @ViewChild("viewEventModal", { static: true }) viewEventModal: ViewEventComponent;
 
   sliderItems: PageSettingDto[] = [];

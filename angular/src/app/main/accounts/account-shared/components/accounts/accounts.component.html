@@ -256,7 +256,7 @@
                                                 " (disconnectMe)="
                                                     disconnect($event)
                                                 " [isHost]="isHost"
-                                                (_createRelation)="createRelation($event)"></app-account-card>
+                                                (_createRelation)="createRelation($event)" [loginTenaneSsin]="loginTenaneSsin"></app-account-card>
                                         </div>
                                         <div class="  mt-5 p-5 text-center w-100"
                                             *ngIf="accounts.length == 0 && !loading">
