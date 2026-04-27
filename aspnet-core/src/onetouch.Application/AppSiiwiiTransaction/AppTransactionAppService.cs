@@ -1208,7 +1208,7 @@ namespace onetouch.AppSiiwiiTransaction
                         if (buyerTenantId != null)
                         {
                             foreach (var det in header.AppTransactionDetails.Where(z => z.ParentId == null))
-                                await GetProductFromMarketplace(det.SSIN, int.Parse(AbpSession.TenantId.ToString()),header.Id);
+                                await GetProductFromMarketplace(det.SSIN, int.Parse(AbpSession.TenantId.ToString()), header.Id);
                         }
 
                     }
@@ -2359,26 +2359,28 @@ namespace onetouch.AppSiiwiiTransaction
 
         public async Task<PagedResultDto<GetAccountInformationOutputDto>> GetRelatedAccounts(GetAllAccountsInput accountFilter, bool? lExclueMyAcc = false, string? transactionType = null)
         {
+            transactionType = (!string.IsNullOrEmpty(transactionType) && transactionType == "PO") ? "Seller" : "Buyer";
+
             var currentAccount = await _appContactRepository.GetAll().Include(z => z.EntityFk)
-                .Where(z => z.TenantId == AbpSession.TenantId 
-                && z.IsProfileData == true 
+                .Where(z => z.TenantId == AbpSession.TenantId
+                && z.IsProfileData == true
                 && z.ParentId == null && z.ParentId == null)
                 .FirstOrDefaultAsync();
-            
+
             var ssin = currentAccount?.SSIN ?? "";
 
             var relationships = _appContactRelationshipInfoRepository.GetAll()
-                .Where(r => (r.RelationshipEndDate == null || r.RelationshipEndDate < DateTime.Now )&& 
+                .Where(r => (r.RelationshipEndDate == null || r.RelationshipEndDate < DateTime.Now) &&
                 (
-                (r.RequesterContactSSIN == ssin 
-                && 
-                (r.RecipientMarketplaceRole == transactionType 
+                (r.RequesterContactSSIN == ssin
+                &&
+                (r.RecipientMarketplaceRole == transactionType || string.IsNullOrEmpty(r.RecipientMarketplaceRole)
                 )
                 )
                   ||
                  (r.RecipientContactSSIN == ssin 
                  && 
-                 (r.RequesterMarketplaceRole == transactionType  
+                 (r.RequesterMarketplaceRole == transactionType || string.IsNullOrEmpty(r.RequesterMarketplaceRole)
                  )
                  ))
                   );
@@ -2399,6 +2401,7 @@ namespace onetouch.AppSiiwiiTransaction
                                  select new GetAccountInformationOutputDto
                                  {
                                      Id = z.Id,
+                                     RelationId = r.Id,
                                      Name = z.Name.TrimEnd(),
                                      AccountSSIN = z.SSIN,
                                      Code = z.Code,

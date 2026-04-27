@@ -123,6 +123,7 @@ namespace onetouch.AppSiiwiiTransaction.Dtos
         public string Code { set; get; }
         public string Role { set; get; }
         public string RoleName { set; get; }
+        public long? RelationId { set; get; }
     }
     public class GetContactInformationDto
     {
