@@ -96,7 +96,7 @@ export class MarketplaceViewProductComponent
     pageSize = 11;
     loadingMore = false;
 
-
+    currentTransId:any
     public constructor(
         private _AppMarketplaceItemsServiceProxy: AppMarketplaceItemsServiceProxy,
         private _AppTransactionServiceProxy: AppTransactionServiceProxy,
@@ -114,6 +114,7 @@ export class MarketplaceViewProductComponent
         this.ismarketPLace = JSON.parse(localStorage.getItem("fromMarketPlace"));
         this.productBodyData = JSON.parse(localStorage.getItem("productData"));
         this.priceLevel = localStorage.getItem("tempPriceLevel");
+        this.currentTransId = localStorage.getItem("transId");
         this.filteredColors = this.colorsData;
        
     }
@@ -254,7 +255,7 @@ export class MarketplaceViewProductComponent
                   this.productBodyData.buyerSSIN,
                   this.productBodyData.sellerSSIN,
                   this.priceLevel,
-                  undefined,
+                  this.currentTransId,
                   this.productBodyData.id,
                   undefined,
                 //   undefined,
