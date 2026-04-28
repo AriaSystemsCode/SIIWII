@@ -164,7 +164,7 @@ loginTenaneSsin:string
 
 
     getLoginAccountDataForView() {
-        let id = this.appSession.user.accountId
+        let id = this.appSession?.user?.accountId
         if (!id) return
 
       this._AccountsServiceProxy.getAccountForView(id, 5).pipe(

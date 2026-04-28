@@ -43,6 +43,7 @@ using DocumentFormat.OpenXml.InkML;
 using Abp.EntityFrameworkCore.Uow;
 using onetouch.EntityFrameworkCore;
 using System.Linq.Expressions;
+using onetouch.AppSiiwiiTransaction.Dtos;
 namespace onetouch.AppMarketplaceItems
 {
     public class AppMarketplaceItemsAppService : onetouchAppServiceBase, IAppMarketplaceItemsAppService
@@ -69,6 +70,9 @@ namespace onetouch.AppMarketplaceItems
         //I40[Start]
         IRepository<AppMarketplaceContact, long> _appMarketplaceContactRepository;
         //I40[End]
+        //I49[Start]
+        private readonly IRepository<AppContactRelationshipInfo, long> _appContactRelationshipInfoRepository;
+        //I49[End]
         public AppMarketplaceItemsAppService(IRepository<AppMarketplaceItemLists.AppMarketplaceItemLists, long> appMarketplaceItemList,
             IRepository<AppMarketplaceItemsListDetails, long> appMarketplaceItemsListDetail, IRepository<AppMarketplaceItemSelectors, long> appMarketplaceItemsSelector,
             IRepository<AppMarketplaceItems, long> appMarketplaceItem, Helper helper, IRepository<SycEntityObjectType, long> sycEntityObjectTypeRepository,
@@ -78,7 +82,8 @@ namespace onetouch.AppMarketplaceItems
             IRepository<SycEntityObjectCategory, long> sycEntityObjectCategory, IRepository<AppTransactionDetails, long> appTransactionDetailsRepository,
             IRepository<AppTransactionHeaders, long> appTransactionHeadersRepository,
         IAppEntitiesAppService appEntitiesAppService, IMessageAppService messageAppService, IRepository<AppEntitiesRelationship, long> appEntitiesRelationship,
-        IRepository<AppMarketplaceContact, long> appMarketplaceContactRepository)
+        IRepository<AppMarketplaceContact, long> appMarketplaceContactRepository,
+        IRepository<AppContactRelationshipInfo, long> appContactRelationshipInfoRepository)
         {
             _messageAppService = messageAppService;
             _appTransactionHeadersRepository = appTransactionHeadersRepository;
@@ -98,6 +103,9 @@ namespace onetouch.AppMarketplaceItems
             _appMarketplaceAccountsPriceLevels = appMarketplaceAccountsPriceLevels;
             _appMarketplaceContactRepository = appMarketplaceContactRepository;
             _appEntitiesRelationship = appEntitiesRelationship;
+            //I49[Start]
+            _appContactRelationshipInfoRepository = appContactRelationshipInfoRepository;
+            //I49[End]
         }
         //Iteration#49,1 MMT 09/28/2025 Allow unauthenticated user to view the product marketplace browse page[Start]
         [AbpAllowAnonymous]
@@ -655,19 +663,53 @@ namespace onetouch.AppMarketplaceItems
                     string level = "MSRP";
                     if (input.BuyerAccountSSIN != null && input.SellerAccountSSIN != null)
                     {
-                        var priceLevel = await _appMarketplaceAccountsPriceLevels.GetAll().AsNoTracking().Where(a => a.AccountSSIN == input.SellerAccountSSIN.TrimEnd()
+                        /*var priceLevel = await _appMarketplaceAccountsPriceLevels.GetAll().AsNoTracking().Where(a => a.AccountSSIN == input.SellerAccountSSIN.TrimEnd()
                         && a.ConnectedAccountSSIN == input.BuyerAccountSSIN).FirstOrDefaultAsync();
-                        if (priceLevel != null) { level = priceLevel.PriceLevel; }
-                    }
-                    if (!string.IsNullOrEmpty(input.BuyerAccountSSIN))
-                    {
-                        var buyerAccount = await _appContactRepository.GetAll().FirstOrDefaultAsync(a => a.SSIN == input.BuyerAccountSSIN);
-                        if (buyerAccount != null)
+                        if (priceLevel != null) { level = priceLevel.PriceLevel; }*/
+                        if (input.TransactionId != null)
                         {
-                            level = (buyerAccount.PartnerId == null && !string.IsNullOrEmpty(buyerAccount.PriceLevel) ? buyerAccount.PriceLevel : level);
+                            var transContact = await _appTransactionHeadersRepository.GetAll()
+                                .Where(z => z.Id == input.TransactionId).Include(z => z.AppTransactionContacts)
+                                .FirstOrDefaultAsync();
+                            if (transContact != null)
+                            {
+                                var sellerRole = transContact.AppTransactionContacts.Where(z => z.CompanySSIN == input.SellerAccountSSIN).FirstOrDefault();
+                                if (sellerRole != null)
+                                {
+                                    var buyerRole = transContact.AppTransactionContacts.Where(z => z.CompanySSIN == input.BuyerAccountSSIN).FirstOrDefault();
+                                    if (buyerRole!=null)
+                                    {
 
+                                        var relationshipSellBuy = await _appContactRelationshipInfoRepository.GetAll()
+                                        .Where(z => (z.RequesterContactSSIN == input.SellerAccountSSIN &&
+                                        z.RecipientContactSSIN == input.BuyerAccountSSIN &&
+                                        z.RequesterMarketplaceRole == sellerRole.ToString() &&
+                                        z.RecipientMarketplaceRole == buyerRole.ToString()) ||
+                                        (z.RecipientContactSSIN == input.SellerAccountSSIN &&
+                                        z.RequesterContactSSIN == input.BuyerAccountSSIN &&
+                                        z.RecipientMarketplaceRole == sellerRole.ToString() &&
+                                        z.RequesterMarketplaceRole == buyerRole.ToString())
+                                        ).Include(z => z.EntityExtraData).FirstOrDefaultAsync();
+                                        if (relationshipSellBuy != null)
+                                        {
+                                            var priceLevelExtradata = relationshipSellBuy.EntityExtraData.Where(z => z.AttributeId == 908).FirstOrDefault();
+                                            if (priceLevelExtradata != null && !string.IsNullOrEmpty(priceLevelExtradata.AttributeValue))
+                                                level = priceLevelExtradata.AttributeValue;
+                                        }
+                                    }
+                                }
+                            }
                         }
                     }
+                    //if (!string.IsNullOrEmpty(input.BuyerAccountSSIN))
+                    //{
+                    //    var buyerAccount = await _appContactRepository.GetAll().FirstOrDefaultAsync(a => a.SSIN == input.BuyerAccountSSIN);
+                    //    if (buyerAccount != null)
+                    //    {
+                    //        level = (buyerAccount.PartnerId == null && !string.IsNullOrEmpty(buyerAccount.PriceLevel) ? buyerAccount.PriceLevel : level);
+
+                    //    }
+                    //}
                     if (!string.IsNullOrEmpty(input.PriceLevel))
                     {
                         level = input.PriceLevel;

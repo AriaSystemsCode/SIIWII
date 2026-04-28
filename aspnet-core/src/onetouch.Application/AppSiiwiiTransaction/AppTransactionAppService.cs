@@ -871,9 +871,7 @@ namespace onetouch.AppSiiwiiTransaction
                     CompanySSIN = input.SellerCompanySSIN,
                     CompanyName = input.SellerCompanyName,
                     BranchName = input.SellerBranchName,
-                    BranchSSIN = input.SellerBranchSSIN,
-                    RelationId = input.SellerRelationId
-
+                    BranchSSIN = input.SellerBranchSSIN
                 });
 
 
@@ -891,8 +889,7 @@ namespace onetouch.AppSiiwiiTransaction
                     CompanySSIN = input.BuyerCompanySSIN,
                     CompanyName = input.BuyerCompanyName,
                     BranchName = input.BuyerBranchName,
-                    BranchSSIN = input.BuyerBranchSSIN,
-                    RelationId = input.BuyerRelationId
+                    BranchSSIN = input.BuyerBranchSSIN
                 });
                 //
                 var accountSSINBranchBuyer = await _appContactRepository.GetAll().Include(z => z.AppContactAddresses)
@@ -7873,24 +7870,8 @@ namespace onetouch.AppSiiwiiTransaction
                        && e.EntityObjectStatusId == activeRealtionshipStatusId
                        && e.ConsiderAsTeamMember == false)
                        .ToListAsync();
+
             var relation = relationList.FirstOrDefault();
-
-            //gat appcontacts - seller role - !empty relationid 
-            var  contactRelationId =  _appTransactionContactsRepository.GetAll()
-                .Where(e => e.TransactionId == pTransactionID && e.RelationId != null 
-                && e.ContactRole == ContactRoleEnum.Seller.ToString()).FirstOrDefault();
-
-            if (contactRelationId != null )
-            {
-               var relationContact = await _appContactRelationshipInfoRepository.GetAll().Include(e => e.EntityExtraData)
-                       .Where(e => e.Id == contactRelationId.RelationId
-                       && e.EntityObjectStatusId == activeRealtionshipStatusId
-                       && e.ConsiderAsTeamMember == false)
-                       .FirstOrDefaultAsync();
-                if (relationContact != null) relation = relationContact;
-            }
-
-
 
             if (relation == null)
             {

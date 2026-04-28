@@ -697,6 +697,7 @@ export class TransactionInformationComponent
       localStorage.setItem("fromSellerRoom", JSON.stringify(true));
       localStorage.setItem("fromMarketPlace", JSON.stringify(false));
       // this.router.navigateByUrl("app/main/marketplace/products");
+                    localStorage.setItem("transId", JSON.stringify(this.appTransactionsForViewDto?.id));
 
       if (location.href.toString() == AppConsts.appBaseUrl + "/app/main/marketplace/products")
         location.reload();

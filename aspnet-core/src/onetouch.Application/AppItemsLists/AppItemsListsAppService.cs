@@ -1465,7 +1465,7 @@ namespace onetouch.AppItemsLists
                     string accSrcMarketplaceRoles = "";
                     string priceLevel = "";
                     var currentTenant = await _appMarketplaceAccountsRepository.GetAll().Include(z=>z.EntityExtraData)
-                        .Where(z => z.TenantOwner == AbpSession.TenantId && z.IsProfileData == true && z.ParentId == null).FirstOrDefaultAsync();
+                        .Where(z => z.TenantOwner == AbpSession.TenantId && z.IsProfileData == true && z.ParentId == null && z.SharingLevel==1).FirstOrDefaultAsync();
                     if (currentTenant!=null)
                     {
                         accountDestSSIN = currentTenant.SSIN;
@@ -1476,7 +1476,7 @@ namespace onetouch.AppItemsLists
                         }
                     }
                     var sourceTenant = await _appMarketplaceAccountsRepository.GetAll().Include(z => z.EntityExtraData)
-                        .Where(z => z.TenantOwner == itmList.TenantOwner && z.IsProfileData == true && z.ParentId == null).FirstOrDefaultAsync();
+                        .Where(z => z.TenantOwner == itmList.TenantOwner && z.IsProfileData == true && z.ParentId == null && z.SharingLevel == 1).FirstOrDefaultAsync();
                     if (sourceTenant != null)
                     {
                         accountSrcSSIN = sourceTenant.SSIN;

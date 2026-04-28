@@ -1033,6 +1033,9 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit, 
                     localStorage.removeItem("productFilters");
                 }))
                 .subscribe((response: any) => {
+                              
+                    localStorage.setItem("transId", JSON.stringify(response));
+
                     if (this.setCurrentUserActiveTransaction) {
                         this._AppTransactionServiceProxy
                             .setCurrentUserActiveTransaction(
