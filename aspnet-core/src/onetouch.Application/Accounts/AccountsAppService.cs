@@ -9627,7 +9627,7 @@ namespace onetouch.Accounts
                 List<AppContact> accountsList = new List<AppContact>();
                 List<AppContact> accountsListUpdated = new List<AppContact>();
                 //I40[Start]
-                var mainResultAccount = result.Where(r =>  r.RecordType == "Account" && string.IsNullOrEmpty(r.ParentCode)
+                var mainResultAccount = result.Where(r =>  (r.RecordType == "Account" || r.RecordType == "Vendor") && string.IsNullOrEmpty(r.ParentCode)
                 && r.rowNumber >= accountExcelResultsDTO.From && r.rowNumber <= accountExcelResultsDTO.To).ToList();
                 List<AccountExcelDto> mainBranchesList = new List<AccountExcelDto>();
                 
@@ -9659,11 +9659,13 @@ namespace onetouch.Accounts
                 var accountList = (from o in _appContactRepository.GetAll().AsNoTracking().Where(r => r.EntityFk.EntityObjectTypeId == partnerEntityObjectTypeId).ToList()
                                    join s in resultAccount on o.Code equals s.Code
                                    select o).ToList();
-                //xx
+                //xx//new { Account= o,RecordType=s.RecordType })
 
                 foreach (CreateOrEditAccountInfoDto createOrEditAccountInfoDto in resultAccount)
                 {
                     AppContact account = accountList.FirstOrDefault(a => a.Code == createOrEditAccountInfoDto.Code);
+                    //AppContact account = accountList.FirstOrDefault(a => a.Account.Code == createOrEditAccountInfoDto.Code).Select(z => z.Account);
+                    // string recordType = accountList.FirstOrDefault(a => a.Account.Code == createOrEditAccountInfoDto.Code).Select(z => z.RecordType);
                     //_appContactRepository.GetAll().AsNoTracking().Where(r => r.EntityFk.EntityObjectTypeId == partnerEntityObjectTypeId  && r.Code == createOrEditAccountInfoDto.Code).FirstOrDefault();
                     string code = createOrEditAccountInfoDto.Code;
                     string oldCode = createOrEditAccountInfoDto.Code;
@@ -9745,6 +9747,15 @@ namespace onetouch.Accounts
                     accountContact.EntityFk.EntityObjectTypeFk = partnerEntityObjectType;
                     accountContact.EntityFk.EntityCategories = ObjectMapper.Map<List<AppEntityCategory>>(createOrEditAccountInfoDto.EntityCategories);
                     accountContact.EntityFk.EntityAttachments = ObjectMapper.Map<List<AppEntityAttachment>>(createOrEditAccountInfoDto.EntityAttachments);
+                    //I49[Start]
+                    //accountContact.EntityFk.EntityExtraData = new List<AppEntityExtraData>();
+                    //accountContact.EntityFk.EntityExtraData.Add(new AppEntityExtraData
+                    //{ AttributeId=610,
+                    //  AttributeCode= "MARKETPLACE-ROLE",
+                    //  EntityCode = createOrEditAccountInfoDto.Code,
+                    //  AttributeValue = (recordType=="Vendor" ? ContactRoleEnum.Seller.ToString(): ContactRoleEnum.Buyer.ToString())
+                    //});
+                    ////I49[End]
                     //accountContact.EntityFk.EntityAddresses = createOrEditAccountInfoDto.ContactAddresses;
                     if (string.IsNullOrEmpty(createOrEditAccountInfoDto.SSIN))
                     {
