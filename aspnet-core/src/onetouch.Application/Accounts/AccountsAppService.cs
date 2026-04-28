@@ -1829,7 +1829,8 @@ namespace onetouch.Accounts
 
         private async Task<GetAccountInfoForEditOutput> DoGetAccountForEdit(EntityDto<long> input)
         {
-            var accountInfo = await _appContactRepository.GetAll().Include(z=>z.EntityFk)
+            var accountInfo = await _appContactRepository.GetAll()
+                .Include(z=>z.EntityFk).ThenInclude(z=>z.EntityExtraData)
                 //MyAccount case
                 .WhereIf(input == null || input.Id == 0,
                     x => x.IsProfileData && x.ParentId == null)
