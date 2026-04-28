@@ -76,7 +76,7 @@
         <div *ngSwitchCase="'CONTACT'">
           <app-marketplace-account-card *ngIf="blockTypeIsSingleOrMixed =='Mixed Types Blocks' "
             [account]="item?.getAccountForViewDto" [compact]="true"
-            [showConnectButton]="true"></app-marketplace-account-card>
+            [showConnectButton]="true" [loginTenaneSsin]="loginTenaneSsin"></app-marketplace-account-card>
 
           <app-account-card *ngIf="blockTypeIsSingleOrMixed !='Mixed Types Blocks' || blockTypeIsSingleOrMixed ==null"
             [account]="item?.getAccountForViewDto" [FromLandingPage]="true" [fromMarketplace]="true" [cardsViewMode]="true" (disconnectMe)="

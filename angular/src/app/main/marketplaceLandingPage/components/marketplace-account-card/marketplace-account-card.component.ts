@@ -2,9 +2,9 @@ import { ChangeDetectorRef, Component, EventEmitter, Injector, Input, Output } f
 import { Router } from '@angular/router';
 import { AppConsts } from '@shared/AppConsts';
 import { AppComponentBase } from '@shared/common/app-component-base';
-import { AccountDto, AccountsServiceProxy, AppEntitiesServiceProxy, GetAccountForViewDto } from '@shared/service-proxies/service-proxies';
+import { AccountDto, AccountsServiceProxy, AppEntitiesServiceProxy, AppTransactionServiceProxy, GetAccountForViewDto } from '@shared/service-proxies/service-proxies';
 import {  finalize } from 'rxjs';
-
+import { forkJoin } from 'rxjs';
 @Component({
   selector: 'app-marketplace-account-card',
   templateUrl: './marketplace-account-card.component.html',
@@ -14,9 +14,9 @@ export class MarketplaceAccountCardComponent extends AppComponentBase {
   @Input() account!: GetAccountForViewDto;
   @Input() compact = false;             // for carousel small cards if needed
   @Input() showConnectButton = true;
-  @Output() connect = new EventEmitter<GetAccountForViewDto>();
-  @Output() connectMe: EventEmitter<boolean> = new EventEmitter<boolean>()
-  @Output() disconnectMe: EventEmitter<boolean> = new EventEmitter<boolean>()
+  @Input() loginTenaneSsin;
+
+ 
   @Output() _createRelation: EventEmitter<any> = new EventEmitter<any>()
 
   attachmentBaseUrl = AppConsts.attachmentBaseUrl;
@@ -33,7 +33,8 @@ selectedAccountForRelations: any = null;
         injector:Injector,
         private router:Router,
             private _accountsServiceProxy: AccountsServiceProxy,
-            private cdr: ChangeDetectorRef
+            private cdr: ChangeDetectorRef,
+            private AppTransactionServiceProxy:AppTransactionServiceProxy
     ){
         super(injector);
     }
@@ -80,6 +81,37 @@ createRelation(option: {
 
   this.showMainSpinner();
 
+  forkJoin({
+    recipientRoles: this.AppTransactionServiceProxy.getAccountMarketplaceRoles(
+      this.account?.account?.ssin
+    ),
+    loggedTenantRoles: this.AppTransactionServiceProxy.getAccountMarketplaceRoles(
+      this.loginTenaneSsin
+    )
+  })
+    .pipe(finalize(() => this.hideMainSpinner()))
+    .subscribe(({ recipientRoles, loggedTenantRoles }: any) => {
+      const recipientHasRoles = this.hasMarketplaceRoles(recipientRoles);
+      const loggedTenantHasRoles = this.hasMarketplaceRoles(loggedTenantRoles);
+
+      if (!recipientHasRoles || !loggedTenantHasRoles) {
+        this.message.info(
+          'Cannot connect, you need to update the marketplace role of your account / the recipient account marketplace role in order to build relationship together',
+          ''
+        );
+        return;
+      }
+
+      this.applyRelation(option);
+    });
+}
+private hasMarketplaceRoles(response: any): boolean {
+  const roles = response?.result ?? response;
+  return Array.isArray(roles) && roles.length > 0;
+}
+private applyRelation(option: any): void {
+  this.showMainSpinner();
+
   this._accountsServiceProxy
     .applyRelationOnProfile(
       this.account.account.id,
@@ -100,6 +132,7 @@ createRelation(option: {
         : [...(this.account.connectionsInfo || [])];
 
       const updatedAccount = Object.assign(new GetAccountForViewDto(), this.account);
+
       updatedAccount.availableConnections = updatedAvailableConnections;
       updatedAccount.connectionsInfo = updatedConnectionsInfo;
       updatedAccount.avaliableConnectionName =
@@ -108,7 +141,9 @@ createRelation(option: {
              updatedAvailableConnections[0].connectionName ||
              '')
           : '';
-      updatedAccount.connectionCount = (this.account.connectionCount || 0) + (returnedRelation ? 1 : 0);
+
+      updatedAccount.connectionCount =
+        (this.account.connectionCount || 0) + (returnedRelation ? 1 : 0);
 
       this.account = updatedAccount;
       this.cdr.detectChanges();

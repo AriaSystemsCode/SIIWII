@@ -233,16 +233,16 @@
                              
                                     <div class="row  pl-2 pr-2">
                                     <div
-  *ngFor="let account of accounts; index as i; let last = last"
-  class="mb-4"
-  [ngClass]="{
-    'col-12 col-md-6 col-lg-3 cards-mode-with-filter': cardsViewMode && filterVisiblelg,
-    'col-12 col-md-6 col-lg-2 cards-mode-no-filter': cardsViewMode && !filterVisiblelg,
+                                    *ngFor="let account of accounts; index as i; let last = last"
+                                    class="mb-4"
+                                    [ngClass]="{
+                                        'col-12 col-md-6 col-lg-3 cards-mode-with-filter': cardsViewMode && filterVisiblelg,
+                                        'col-12 col-md-6 col-lg-2 cards-mode-no-filter': cardsViewMode && !filterVisiblelg,
 
-    'col-12 col-md-6 col-lg-6 row-mode-with-filter': !cardsViewMode && filterVisiblelg,
-    'col-12 col-md-6 col-lg-4 row-mode-no-filter': !cardsViewMode && !filterVisiblelg
-  }"
->
+                                        'col-12 col-md-6 col-lg-6 row-mode-with-filter': !cardsViewMode && filterVisiblelg,
+                                        'col-12 col-md-6 col-lg-4 row-mode-no-filter': !cardsViewMode && !filterVisiblelg
+                                    }"
+                                    >
                                             <app-account-card [account]="account" [fromMarketplace]="fromMarketplace"
                                                 [cardsViewMode]="
                                                     cardsViewMode
@@ -256,7 +256,7 @@
                                                 " (disconnectMe)="
                                                     disconnect($event)
                                                 " [isHost]="isHost"
-                                                (_createRelation)="createRelation($event)"></app-account-card>
+                                                (_createRelation)="createRelation($event)" [loginTenaneSsin]="loginTenaneSsin"></app-account-card>
                                         </div>
                                         <div class="  mt-5 p-5 text-center w-100"
                                             *ngIf="accounts.length == 0 && !loading">

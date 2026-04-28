@@ -15,6 +15,7 @@ import {
     TreeNodeOfGetSycEntityObjectCategoryForViewDto,
     TreeNodeOfGetSycEntityObjectClassificationForViewDto,
     EmailingTemplateServiceProxy,
+    AppTransactionServiceProxy,
 
 } from "@shared/service-proxies/service-proxies";
 import { AbpSessionService } from "abp-ng2-module";
@@ -30,7 +31,7 @@ import { MainImportComponent } from "../../../../../../shared/components/import-
 import { AccountMainFilterEnum } from "../../models/accounts-main-filter.enum";
 import { AbstractControl, FormBuilder, FormGroup } from "@angular/forms";
 import { AppConsts } from "@shared/AppConsts";
-import { Observable } from "rxjs";
+import { forkJoin, Observable } from "rxjs";
 import { ImportTypes } from "@shared/components/import-steps/models/ImportTypes";
 import { AccountsImport } from "@shared/components/import-steps/services/accountsImport.service";
 import { ImportStepInfo } from "@shared/components/import-steps/models/ImportStepInfo";
@@ -80,10 +81,10 @@ export class AccountsComponent
     filterVisiblelg = true; // To toggle the filter visibility
     active: boolean = false;
     loading: boolean = false;
-    currentLang:string
-    isArabic:boolean 
+    currentLang: string
+    isArabic: boolean
     isAuthenticated: boolean = false;
-
+    loginTenaneSsin:string
     constructor(
         injector: Injector,
         private _accountsServiceProxy: AccountsServiceProxy,
@@ -92,6 +93,7 @@ export class AccountsComponent
         private _abpSessionService: AbpSessionService,
         private _formBuilder: FormBuilder,
         private _emailingTemplateAppService: EmailingTemplateServiceProxy,
+        private AppTransactionServiceProxy:AppTransactionServiceProxy
         // MarketplaceAccountsModule  
     ) {
         super(injector);
@@ -101,10 +103,11 @@ export class AccountsComponent
         this.isAuthenticated = !!this.appSession?.user;
         this.isHost = !this._abpSessionService.tenantId;
         this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
-        this.currentLang == 'ar' || this.currentLang == 'ar-EG'  ? this.isArabic = true : this.isArabic = false
+        this.currentLang == 'ar' || this.currentLang == 'ar-EG' ? this.isArabic = true : this.isArabic = false
         this.defineSortingOptions();
         this.getUserPreferenceForListView();
         this.initFilterForm();
+        this.getLoginAccountDataForView()
     }
     ngOnChanges(changes: SimpleChanges) {
         if (changes?.defaultMainFilter?.firstChange) {
@@ -189,109 +192,109 @@ export class AccountsComponent
     }
 
     getAccounts(event?: LazyLoadEvent) {
-    if (this.primengTableHelper.shouldResetPaging(event)) {
-        this.paginator.totalRecords = 10;
-        this.paginator.changePage(0);
-        return;
-    }
+        if (this.primengTableHelper.shouldResetPaging(event)) {
+            this.paginator.totalRecords = 10;
+            this.paginator.changePage(0);
+            return;
+        }
 
-    const filters = this.filterForm.value;
+        const filters = this.filterForm.value;
 
-    const classificationsFilters: TreeNodeOfGetSycEntityObjectClassificationForViewDto[] =
-        filters.classifications;
-    const categoriesFilters: TreeNodeOfGetSycEntityObjectCategoryForViewDto[] =
-        filters.categories;
+        const classificationsFilters: TreeNodeOfGetSycEntityObjectClassificationForViewDto[] =
+            filters.classifications;
+        const categoriesFilters: TreeNodeOfGetSycEntityObjectCategoryForViewDto[] =
+            filters.categories;
 
-    if (Array.isArray(classificationsFilters)) {
-        filters.classifications = [];
-        classificationsFilters.forEach((item) => {
-            const id = item.data.sycEntityObjectClassification.id;
-            filters.classifications.push(id);
+        if (Array.isArray(classificationsFilters)) {
+            filters.classifications = [];
+            classificationsFilters.forEach((item) => {
+                const id = item.data.sycEntityObjectClassification.id;
+                filters.classifications.push(id);
+            });
+        }
+
+        if (Array.isArray(categoriesFilters)) {
+            filters.categories = [];
+            categoriesFilters.forEach((item) => {
+                const id = item.data.sycEntityObjectCategory.id;
+                filters.categories.push(id);
+            });
+        }
+
+        const accountTypesFilter =
+            filters.accountTypes === null || filters.accountTypes === undefined || filters.accountTypes === ''
+                ? undefined
+                : [filters.accountTypes];
+
+        this.primengTableHelper.showLoadingIndicator();
+        this.showMainSpinner();
+        this.loading = true;
+
+        let apiCall;
+
+        if (!this.fromMarketplace) {
+            apiCall = this._accountsServiceProxy.getAll(
+                filters.search || undefined,
+                filters?.mainFilterType?.value || undefined,
+                undefined,
+                undefined,
+                filters.city || undefined,
+                filters.state || undefined,
+                filters.postalCode || undefined,
+                filters?.ssin || undefined,
+                filters?.accountTypeId || undefined,
+                filters?.accountType || undefined,
+                accountTypesFilter,
+                filters.statuses || undefined,
+                filters.languages || undefined,
+                filters.countries || undefined,
+                filters.classifications || undefined,
+                filters.categories || undefined,
+                filters.currencies || undefined,
+                undefined,
+                filters?.sorting?.value || undefined,
+                this.primengTableHelper.getSkipCount(this.paginator, event),
+                this.primengTableHelper.getMaxResultCount(this.paginator, event)
+            );
+        } else {
+            apiCall = this._marketplaceAccountsServiceProxy.getAll(
+                filters.search || undefined,
+                undefined,
+                undefined,
+                undefined,
+                filters.city || undefined,
+                filters.state || undefined,
+                filters.postalCode || undefined,
+                filters?.ssin || undefined,
+                filters?.accountTypeId || undefined,
+                filters?.accountType || undefined,
+                accountTypesFilter,
+                filters.statuses || undefined,
+                filters.languages || undefined,
+                filters.countries || undefined,
+                filters.classifications || undefined,
+                filters.categories || undefined,
+                filters.currencies || undefined,
+                undefined,
+                filters?.sorting?.value || undefined,
+                this.primengTableHelper.getSkipCount(this.paginator, event),
+                this.primengTableHelper.getMaxResultCount(this.paginator, event)
+            );
+        }
+
+        apiCall.pipe(
+            finalize(() => {
+                this.primengTableHelper.hideLoadingIndicator();
+                if (!this.active) this.active = true;
+                this.loading = false;
+                this.hideMainSpinner();
+            })
+        ).subscribe((result) => {
+            this.accounts = result.items;
+            this.primengTableHelper.totalRecordsCount = result.totalCount;
+            this.primengTableHelper.records = result.items;
         });
     }
-
-    if (Array.isArray(categoriesFilters)) {
-        filters.categories = [];
-        categoriesFilters.forEach((item) => {
-            const id = item.data.sycEntityObjectCategory.id;
-            filters.categories.push(id);
-        });
-    }
-
-    const accountTypesFilter =
-        filters.accountTypes === null || filters.accountTypes === undefined || filters.accountTypes === ''
-            ? undefined
-            : [filters.accountTypes];
-
-    this.primengTableHelper.showLoadingIndicator();
-    this.showMainSpinner();
-    this.loading = true;
-
-    let apiCall;
-
-    if (!this.fromMarketplace) {
-        apiCall = this._accountsServiceProxy.getAll(
-            filters.search || undefined,
-            filters?.mainFilterType?.value || undefined,
-            undefined,
-            undefined,
-            filters.city || undefined,
-            filters.state || undefined,
-            filters.postalCode || undefined,
-            filters?.ssin || undefined,
-            filters?.accountTypeId || undefined,
-            filters?.accountType || undefined,
-            accountTypesFilter,
-            filters.statuses || undefined,
-            filters.languages || undefined,
-            filters.countries || undefined,
-            filters.classifications || undefined,
-            filters.categories || undefined,
-            filters.currencies || undefined,
-            undefined,
-            filters?.sorting?.value || undefined,
-            this.primengTableHelper.getSkipCount(this.paginator, event),
-            this.primengTableHelper.getMaxResultCount(this.paginator, event)
-        );
-    } else {
-        apiCall = this._marketplaceAccountsServiceProxy.getAll(
-            filters.search || undefined,
-            undefined,
-            undefined,
-            undefined,
-            filters.city || undefined,
-            filters.state || undefined,
-            filters.postalCode || undefined,
-            filters?.ssin || undefined,
-            filters?.accountTypeId || undefined,
-            filters?.accountType || undefined,
-            accountTypesFilter,
-            filters.statuses || undefined,
-            filters.languages || undefined,
-            filters.countries || undefined,
-            filters.classifications || undefined,
-            filters.categories || undefined,
-            filters.currencies || undefined,
-            undefined,
-            filters?.sorting?.value || undefined,
-            this.primengTableHelper.getSkipCount(this.paginator, event),
-            this.primengTableHelper.getMaxResultCount(this.paginator, event)
-        );
-    }
-
-    apiCall.pipe(
-        finalize(() => {
-            this.primengTableHelper.hideLoadingIndicator();
-            if (!this.active) this.active = true;
-            this.loading = false;
-            this.hideMainSpinner();
-        })
-    ).subscribe((result) => {
-        this.accounts = result.items;
-        this.primengTableHelper.totalRecordsCount = result.totalCount;
-        this.primengTableHelper.records = result.items;
-    });
-}
 
     reloadPage(): void {
         this.paginator.changePage(this.paginator.getPage());
@@ -334,7 +337,7 @@ export class AccountsComponent
     connect(account: AccountDto): void {
         this.showMainSpinner();
         this._accountsServiceProxy
-            .connectContactsProfiles(account.id, null,null)
+            .connectContactsProfiles(account.id, null, null)
             .pipe(
                 finalize(() => {
                     this.hideMainSpinner();
@@ -346,30 +349,30 @@ export class AccountsComponent
             });
     }
 
-  disconnect(event): void {
-   
+    disconnect(event): void {
 
-    this.showMainSpinner();
-    this._accountsServiceProxy
-        .disconnect(event.account.account.id, event.relation.relationEntityId)
-        .pipe(
-            finalize(() => {
-                this.hideMainSpinner();
-            })
-        )
-        .subscribe((res) => {
-            this.notify.success(this.l("SuccessfullyDisconnected"));
 
-            event.account.connectionsInfo = (event.account.connectionsInfo || []).filter(
-                x => x.relationEntityId !== event.relation.relationEntityId
-            );
-            event.account.availableConnections.push(res[0])
-            // event.account.availableConnections = res || [];
-            // event.account.status = event.account.connectionsInfo.length > 0;
-            // event.account.connectionName = '';
-            // event.account.avaliableConnectionName = res?.length ? res[0].connectLabel : '';
-        });
-}
+        this.showMainSpinner();
+        this._accountsServiceProxy
+            .disconnect(event.account.account.id, event.relation.relationEntityId)
+            .pipe(
+                finalize(() => {
+                    this.hideMainSpinner();
+                })
+            )
+            .subscribe((res) => {
+                this.notify.success(this.l("SuccessfullyDisconnected"));
+
+                event.account.connectionsInfo = (event.account.connectionsInfo || []).filter(
+                    x => x.relationEntityId !== event.relation.relationEntityId
+                );
+                event.account.availableConnections.push(res[0])
+                // event.account.availableConnections = res || [];
+                // event.account.status = event.account.connectionsInfo.length > 0;
+                // event.account.connectionName = '';
+                // event.account.avaliableConnectionName = res?.length ? res[0].connectLabel : '';
+            });
+    }
 
     initFilterForm() {
         if (this.filterForm) return;
@@ -432,7 +435,44 @@ export class AccountsComponent
     }
 
 
-  createRelation(account, status: boolean = false) {
+ createRelation(account) {
+  if (!account?.account?.account?.id || !account?.relation?.connectionEntityId) {
+    return;
+  }
+
+  this.showMainSpinner();
+
+  forkJoin({
+    recipientRoles: this.AppTransactionServiceProxy.getAccountMarketplaceRoles(
+      account.account.account.ssin
+    ),
+    loggedTenantRoles: this.AppTransactionServiceProxy.getAccountMarketplaceRoles(
+      this.loginTenaneSsin
+    )
+  })
+    .pipe(finalize(() => this.hideMainSpinner()))
+    .subscribe(({ recipientRoles, loggedTenantRoles }: any) => {
+      const recipientHasRoles = this.hasMarketplaceRoles(recipientRoles);
+      const loggedTenantHasRoles = this.hasMarketplaceRoles(loggedTenantRoles);
+
+      if (!recipientHasRoles || !loggedTenantHasRoles) {
+        this.message.info(
+          'Cannot connect, you need to update the marketplace role of your account / the recipient account marketplace role in order to build relationship together',
+          ''
+        );
+        return;
+      }
+
+      this.applyRelation(account);
+    });
+}
+private hasMarketplaceRoles(response: any): boolean {
+  const roles = response?.result ?? response;
+
+  return Array.isArray(roles) && roles.length > 0;
+}
+
+private applyRelation(account): void {
   this.showMainSpinner();
 
   this._accountsServiceProxy
@@ -444,46 +484,45 @@ export class AccountsComponent
     )
     .pipe(finalize(() => this.hideMainSpinner()))
     .subscribe((result: any) => {
-      const raw = typeof result === 'string' ? result : result?.result ?? '';
-      const { connectionName, disConnectLabel } = this.splitLabels(raw);
+      const i = this.accounts.findIndex(
+        x => x.account.id === account.account.account.id
+      );
 
-      const i = this.accounts.findIndex(x => x.account.id === account.account.account.id);
       if (i < 0) return;
 
       const currentAccount = this.accounts[i];
-
 
       currentAccount.availableConnections = (currentAccount.availableConnections || []).filter(
         x => x.connectionEntityId !== account.relation.connectionEntityId
       );
 
-   
-      currentAccount.connectionName = this.l(connectionName);
-      currentAccount.disConnectLabel = this.l(disConnectLabel);
+      currentAccount.connectionsInfo = currentAccount.connectionsInfo || [];
 
+      if (Array.isArray(result) && result.length > 0) {
+        currentAccount.connectionsInfo.push(result[0]);
+      }
 
       currentAccount.avaliableConnectionName =
         currentAccount.availableConnections?.length > 0
           ? currentAccount.availableConnections[0].connectLabel
           : '';
 
-
-      currentAccount.connectionsInfo = currentAccount.connectionsInfo || [];
-      currentAccount.connectionsInfo.push(result[0]);
-
-
       this.accounts = [...this.accounts];
     });
 }
-      
 
-        private splitLabels(raw: string) {
-            // split at the first '-' that precedes the second "MPAction..."
-            const m = /^(.*?)-(MPAction.+)$/.exec(raw || '');
-            return m
-              ? { connectionName: m[1], disConnectLabel: m[2] }
-              : { connectionName: raw || '', disConnectLabel: '' };
-          }
-          
+
+
+    getLoginAccountDataForView() {
+        let id = this.appSession.user.accountId
+        if (!id) return
+
+      this._accountsServiceProxy.getAccountForView(id, 5).pipe(
+  
+    ).subscribe((res) => {
+      this.loginTenaneSsin = res?.account?.ssin
+    })
+
+    }
 
 }

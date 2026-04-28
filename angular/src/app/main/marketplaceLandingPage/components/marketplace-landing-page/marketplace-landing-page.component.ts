@@ -1,6 +1,7 @@
 import { Component, Injector, OnInit } from "@angular/core";
 import { AppComponentBase } from "@shared/common/app-component-base";
 import {
+  AccountsServiceProxy,
   SliderEnum,
   SydObjectsServiceProxy,
 } from "@shared/service-proxies/service-proxies";
@@ -23,10 +24,11 @@ export class MarketplaceLandingPageComponent
   sections: any
   sectionsFlat: SectionItem[] = [];
 
-
+loginTenaneSsin:string
   constructor(
     injector: Injector,
     private _sydObjectsAppService: SydObjectsServiceProxy,
+     private _AccountsServiceProxy: AccountsServiceProxy,
 
   ) {
     super(injector);
@@ -34,7 +36,7 @@ export class MarketplaceLandingPageComponent
   }
 
   ngOnInit(): void {
-   
+   this.getLoginAccountDataForView()
     localStorage.removeItem("productFilters");
     this.addLocal()
     this.pages = this.chunk(this.items, 9); // each page has 9 products
@@ -158,6 +160,19 @@ export class MarketplaceLandingPageComponent
     localStorage.setItem("fromSellerRoom",JSON.stringify(false));
     localStorage.setItem("fromMarketPlace",JSON.stringify(true));
     localStorage.removeItem("productFilters");
+    }
+
+
+    getLoginAccountDataForView() {
+        let id = this.appSession.user.accountId
+        if (!id) return
+
+      this._AccountsServiceProxy.getAccountForView(id, 5).pipe(
+  
+    ).subscribe((res) => {
+      this.loginTenaneSsin = res?.account?.ssin
+    })
+
     }
 
   ngOnDestroy() {

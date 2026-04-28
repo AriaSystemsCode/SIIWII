@@ -90465,6 +90465,7 @@ export class GetAccountInformationOutputDto implements IGetAccountInformationOut
     code!: string | undefined;
     role!: string | undefined;
     roleName!: string | undefined;
+    relationId!: number | undefined;
 
     [key: string]: any;
 
@@ -90494,6 +90495,7 @@ export class GetAccountInformationOutputDto implements IGetAccountInformationOut
             this.code = _data["code"];
             this.role = _data["role"];
             this.roleName = _data["roleName"];
+            this.relationId = _data["relationId"];
         }
     }
 
@@ -90521,6 +90523,7 @@ export class GetAccountInformationOutputDto implements IGetAccountInformationOut
         data["code"] = this.code;
         data["role"] = this.role;
         data["roleName"] = this.roleName;
+        data["relationId"] = this.relationId;
         return data;
     }
 }
@@ -90537,6 +90540,7 @@ export interface IGetAccountInformationOutputDto {
     code: string | undefined;
     role: string | undefined;
     roleName: string | undefined;
+    relationId: number | undefined;
 
     [key: string]: any;
 }

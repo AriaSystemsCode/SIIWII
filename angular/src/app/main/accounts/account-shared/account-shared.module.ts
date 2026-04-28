@@ -15,7 +15,7 @@ import { AccountsListFiltersComponent } from './components/accounts-list-filters
 import { AccountsComponent } from './components/accounts/accounts.component';
 import { NgxBootstrapDatePickerConfigService } from 'assets/ngx-bootstrap/ngx-bootstrap-datepicker-config.service';
 import { FiltersSharedModule } from '@app/shared/filters-shared/filters-shared.module';
-import { EmailingTemplateServiceProxy } from '@shared/service-proxies/service-proxies';
+import { CreateMarketplaceAccountServiceProxy, EmailingTemplateServiceProxy } from '@shared/service-proxies/service-proxies';
 import { CheckboxModule } from 'primeng/checkbox';
 import { DropdownModule } from 'primeng/dropdown';
 import { MultiSelectModule } from 'primeng/multiselect';
@@ -61,7 +61,8 @@ import { DialogModule } from 'primeng/dialog';
         { provide: BsDatepickerConfig, useFactory: NgxBootstrapDatePickerConfigService.getDatepickerConfig },
         { provide: BsDaterangepickerConfig, useFactory: NgxBootstrapDatePickerConfigService.getDaterangepickerConfig },
         { provide: BsLocaleService, useFactory: NgxBootstrapDatePickerConfigService.getDatepickerLocale },
-        EmailingTemplateServiceProxy
+        EmailingTemplateServiceProxy,
+        CreateMarketplaceAccountServiceProxy
     ],
     exports: [
         AccountsComponent,

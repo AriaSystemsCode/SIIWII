@@ -82,7 +82,7 @@ CARDS VIEW MODE
 
         <!-- Available connections menu when both current + available exist -->
         <div *ngIf="account?.availableConnections?.length > 0 && account?.connectionsInfo?.length > 0"
-          class="relation-more-menu" dropdown>
+          class="relation-more-menu position-relative" dropdown container="body">
 
           <button type="button" class="dots-btn" dropdownToggle>
             <img src="assets/accounts/CONNECT.png" alt="" srcset="">
@@ -373,7 +373,7 @@ NOT CARDS VIEW MODE
 
                 <!-- Available connections menu when both current + available exist -->
                 <div *ngIf="account?.availableConnections?.length > 0 && account?.connectionsInfo?.length > 0"
-                  class="relation-more-menu" dropdown>
+                  class="relation-more-menu position-relative" dropdown container="body">
 
                   <button type="button" class="dots-btn" dropdownToggle>
                     <img src="assets/accounts/CONNECT.png" alt="" srcset="">

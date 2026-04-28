@@ -170,7 +170,7 @@
 
         <!-- Available connections menu when both current + available exist -->
         <div *ngIf="account?.availableConnections?.length > 0 && account?.connectionsInfo?.length > 0"
-          class="relation-more-menu" dropdown>
+          class="relation-more-menu position-relative" dropdown container="body">
 
           <button type="button" class="dots-btn" dropdownToggle>
             <!-- <i class="fas fa-ellipsis-v"></i> -->
@@ -180,7 +180,7 @@
           <ul *dropdownMenu class="dropdown-menu relation-dropdown" role="menu"
             [ngClass]="isArabic ? 'dropdown-menu-ar' : 'dropdown-menu-en'">
 
-            <li role="menuitem" *ngFor="let option of account.availableConnections" class="relation-item">
+            <li role="menuitem" *ngFor="let option of account.availableConnections " class="relation-item">
 
               <button class="dropdown-item relation-btn" type="button" (click)="createRelation(option)">
 
@@ -205,10 +205,10 @@
         <!-- No current relations, only available ones -->
         <div *ngIf="(!account?.connectionsInfo?.length) && account?.availableConnections?.length > 0" class="w-100">
           <ng-container *ngIf="account?.availableConnections as options">
-            <div class="relationWrap w-100 text-center" dropdown container="body">
-              <button type="button" class=" market-follow" dropdownToggle style="font-size: 12px;">
+            <div class="relationWrap w-100 text-center position-relative" dropdown container="body">
+              <button type="button" class=" market-follow" dropdownToggle style="font-size: 12px;" >
                 <img class="pb-1" style="width: 13px;" [src]="getConnectionIcon(options[0]?.connectionName)" alt="" />
-                <span class="ml-1" [title]="options[0]?.connectionName">
+                <span class="ml-1" [title]="options[0]?.connectionName"  (click)="createRelation(options[0])">
                   {{ options[0]?.connectionName | textSubstring : 10 }}
                 </span>
 
@@ -217,7 +217,7 @@
 
               <ng-container *ngIf="options.length > 0">
                 <ul *dropdownMenu class="dropdown-menu" role="menu">
-                  <li role="menuitem" *ngFor="let option of options" class="py-2">
+                  <li role="menuitem" *ngFor="let option of options | slice:1" class="py-2">
                     <button class="dropdown-item" type="button" (click)="createRelation(option)">
                       {{ option?.connectionName }}
                     </button>

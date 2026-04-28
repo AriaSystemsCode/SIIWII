@@ -2,8 +2,9 @@ import { ActivatedRoute } from '@angular/router';
 import { AfterViewInit, Component, Injector, OnInit } from '@angular/core';
 import { AppConsts } from '@shared/AppConsts';
 import { AppComponentBase } from '@shared/common/app-component-base';
-import { AccountDto, AccountsServiceProxy, AppMarketplaceItemsServiceProxy, GetAccountForViewDto, MarketplaceAccountsServiceProxy } from '@shared/service-proxies/service-proxies';
+import { AccountDto, AccountsServiceProxy, AppMarketplaceItemsServiceProxy, AppTransactionServiceProxy, GetAccountForViewDto, MarketplaceAccountsServiceProxy } from '@shared/service-proxies/service-proxies';
 import { finalize } from 'rxjs';
+import { forkJoin } from 'rxjs';
 
 @Component({
   selector: 'app-marketplace-account-profile',
@@ -22,12 +23,13 @@ export class MarketplaceAccountProfileComponent extends AppComponentBase impleme
   currentLang:string
   isArabic:boolean 
   isAuthenticated: boolean = false;
-
+loginTenaneSsin:string
   constructor(
     injector: Injector,
     private route: ActivatedRoute,
     private _AccountsServiceProxy: AccountsServiceProxy,
     private _marketplaceAccountsServiceProxy: MarketplaceAccountsServiceProxy,
+    private AppTransactionServiceProxy:AppTransactionServiceProxy
   ) {
     super(injector);
   }
@@ -36,6 +38,7 @@ export class MarketplaceAccountProfileComponent extends AppComponentBase impleme
     this.isAuthenticated = !!this.appSession?.user;
     this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
     this.currentLang == 'ar' || this.currentLang == 'ar-EG'  ? this.isArabic = true : this.isArabic = false
+    this.getLoginAccountDataForView()
    }
 
   ngAfterViewInit(): void {
@@ -85,32 +88,58 @@ export class MarketplaceAccountProfileComponent extends AppComponentBase impleme
   }
 
 
-  createRelation(relation, status: boolean = false) {
-    this.showMainSpinner()
-    this._AccountsServiceProxy
-      .applyRelationOnProfile(this.accountId, undefined, relation.defaultVisibility == 'Public' ? true : false, relation.connectionEntityId)
-      .pipe(
-        finalize(() => {
-        
-          this.hideMainSpinner();
-          this.getAccountDataForView();
-        })
-      )
-      .subscribe((result:any) => {
-        // const raw = typeof result === 'string' ? result : result?.result ?? '';
-        // const { connectionName, disConnectLabel } = this.splitLabels(raw);
+createRelation(relation: any): void {
+  if (!relation?.connectionEntityId || !this.accountId) return;
 
-        
-        // this.marketPlaceData.availableConnections = [];
-        // this.marketPlaceData.avaliableConnectionName = '';
+  this.showMainSpinner();
 
-        // this.marketPlaceData.connectionName   = this.l(connectionName);
-        // this.marketPlaceData.disConnectLabel  = this.l(disConnectLabel);
+  forkJoin({
+    recipientRoles: this.AppTransactionServiceProxy.getAccountMarketplaceRoles(
+      this.accountDataForView?.ssin // or recipient account ssin
+    ),
+    loggedTenantRoles: this.AppTransactionServiceProxy.getAccountMarketplaceRoles(
+      this.loginTenaneSsin
+    )
+  })
+    .pipe(finalize(() => this.hideMainSpinner()))
+    .subscribe(({ recipientRoles, loggedTenantRoles }: any) => {
+      const recipientHasRoles = this.hasMarketplaceRoles(recipientRoles);
+      const loggedTenantHasRoles = this.hasMarketplaceRoles(loggedTenantRoles);
 
-      });
-  }
+      if (!recipientHasRoles || !loggedTenantHasRoles) {
+        this.message.info(
+          'Cannot connect, you need to update the marketplace role of your account / the recipient account marketplace role in order to build relationship together',
+          ''
+        );
+        return;
+      }
 
+      this.applyRelation(relation);
+    });
+}
+private hasMarketplaceRoles(response: any): boolean {
+  const roles = response?.result ?? response;
+  return Array.isArray(roles) && roles.length > 0;
+}
 
+private applyRelation(relation: any): void {
+  this.showMainSpinner();
+
+  this._AccountsServiceProxy
+    .applyRelationOnProfile(
+      this.accountId,
+      undefined,
+      relation.defaultVisibility === 'Public',
+      relation.connectionEntityId
+    )
+    .pipe(
+      finalize(() => {
+        this.hideMainSpinner();
+        this.getAccountDataForView();
+      })
+    )
+    .subscribe();
+}
 
 getFormattedConnectionName(label: string): string {
   if (!label) return '';
@@ -200,4 +229,18 @@ openConnectionsDialog(): void {
     this.createRelation(list[0]);
   }
 }
+
+
+    getLoginAccountDataForView() {
+        let id = this.appSession.user.accountId
+        if (!id) return
+
+      this._AccountsServiceProxy.getAccountForView(id, 5).pipe(
+  
+    ).subscribe((res) => {
+      this.loginTenaneSsin = res?.account?.ssin
+    })
+
+    }
+
 }

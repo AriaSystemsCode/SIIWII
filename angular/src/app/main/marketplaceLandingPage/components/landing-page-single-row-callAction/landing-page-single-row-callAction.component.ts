@@ -19,6 +19,8 @@ import { BsModalRef, BsModalService, ModalOptions } from 'ngx-bootstrap/modal';
 export class LandingPageSinglrRowCallActionComponent extends AppComponentBase implements OnInit {
   @Input() sectionId!: number;
   @Input() blockTypeIsSingleOrMixed: string
+  @Input() loginTenaneSsin: string
+  
   @ViewChild("viewEventModal", { static: true }) viewEventModal: ViewEventComponent;
   bsModalRef: BsModalRef;
   items: PageSettingDto[] = [];
