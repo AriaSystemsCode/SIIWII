@@ -302,6 +302,29 @@
 
                         </div>
 
+                        
+                <div class="row p-28">
+  <div class="col-4"
+       *ngIf=" marketplaceRolesList.length ">
+    <p class="title-dev-slider text-left">{{ l("MarketplaceRole") }}</p>
+  </div>
+</div>
+
+<div class="row">
+  <div class="categories col-12 pb-3 pt-2"
+       *ngIf=" marketplaceRolesList.length ">
+
+    <div class="d-flex flex-wrap gap-2">
+
+      <span *ngFor="let role of marketplaceRolesList"
+            class="role-chip">
+        {{ role }}
+      </span>
+
+    </div>
+
+  </div>
+</div>
 
                         <div class="row p-28">
                             <div class="col-4" *ngIf="accountData && accountData.shipViaName">

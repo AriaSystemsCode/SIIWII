@@ -9,7 +9,7 @@ import {
     IAjaxResponse,
     TokenService,
 } from "abp-ng2-module";
-import { Injector, TemplateRef } from "@angular/core";
+import { Injector,TemplateRef } from "@angular/core";
 import { AppConsts } from "@shared/AppConsts";
 import { AppUrlService } from "@shared/common/nav/app-url.service";
 import { AppSessionService } from "@shared/common/session/app-session.service";
@@ -22,6 +22,7 @@ import {
     SycAttachmentCategoriesServiceProxy,
     SycAttachmentCategoryDto,
     UiCustomizationSettingsDto,
+    AppTransactionServiceProxy,
 } from "@shared/service-proxies/service-proxies";
 import { NgxSpinnerService } from "ngx-spinner";
 import { NgxSpinnerTextService } from "@app/shared/ngx-spinner-text.service";
@@ -31,6 +32,7 @@ import { BsModalService, ModalOptions } from "ngx-bootstrap/modal";
 import { ImageViewerComponent } from "@app/shared/common/image-viewer/image-viewer.component";
 import {
     BehaviorSubject,
+    firstValueFrom,
     fromEvent,
     Observable,
     of,
@@ -44,12 +46,14 @@ import {
     NavigationStart,
     Event as NavigationEvent,
 } from "@angular/router";
-import { debounceTime, filter, takeUntil } from "rxjs/operators";
+import { debounceTime, filter, finalize, map, shareReplay, takeUntil } from "rxjs/operators";
 import { Location } from "@angular/common";
 import { FileUploaderCustom } from "@shared/components/import-steps/models/FileUploaderCustom.model";
-import { SweetAlertOptions } from "sweetalert2";
+import Swal, { SweetAlertOptions } from "sweetalert2";
 import { ajax } from "rxjs/ajax";
 import { ToastService } from "./toast/toast.service";
+import { HttpClient } from "@node_modules/@angular/common/http";
+import { TenantRoleService } from "./services/TenantRoleService";
 
 export abstract class AppComponentBase {
     patterns = Patterns;
@@ -93,8 +97,11 @@ export abstract class AppComponentBase {
     public transactionReportTemplateName:"OrderConfirmationForm1";
     currentLang: string
     isArabic: boolean
-  
-    constructor(injector: Injector, private _location?: Location) {
+    appTransaction:AppTransactionServiceProxy
+    tenantRoleService: TenantRoleService;
+
+
+    constructor(injector: Injector , private _location?: Location) {
         this.localization = injector.get(LocalizationService);
         this.permission = injector.get(PermissionCheckerService);
         this.feature = injector.get(FeatureCheckerService);
@@ -117,8 +124,9 @@ export abstract class AppComponentBase {
         this.transactionReportTemplateName="OrderConfirmationForm1";
         this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
         this.currentLang == 'ar' || this.currentLang == 'ar-EG'  ? this.isArabic = true : this.isArabic = false
-    }
-
+        this.appTransaction = injector.get(AppTransactionServiceProxy);
+        this.tenantRoleService = injector.get(TenantRoleService);
+    } 
 
     setAppItemsFilterBody() {
         this.appItemsFilterBody.categoryFilters = undefined
@@ -645,4 +653,36 @@ export abstract class AppComponentBase {
         return ext === 'pdf';
       }
       
+
+
+    showNoCreatePermissionAlert() {
+        Swal.fire({
+            title: '',
+            html:
+                "You cannot create a transaction of this type. Please check the marketplace role assigned to your account.",
+            showCancelButton: false,
+            confirmButtonText: "ok",
+            allowOutsideClick: false,
+            allowEscapeKey: false,
+            backdrop: true,
+             customClass: {
+                        popup: "popup-class",
+                        icon: "icon-class",
+                        content: "content-class",
+                        actions: "actions-class",
+                        confirmButton: "confirm-button-class2",
+                    },
+        })
+    }
+
+   getRelationshipRoles(tenantId: number | undefined, accountSSIN: string) {
+  return this.appTransaction.getTenantAccountRelationships(tenantId, accountSSIN).pipe(
+    map((res: any) => {
+      let relationshipRoles = res || [];
+      return relationshipRoles;
+    })
+  );
 }
+
+
+}  

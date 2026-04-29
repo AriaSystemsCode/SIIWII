@@ -17,8 +17,7 @@ export class ConnectionsCardComponent extends AppComponentBase {
     @Input('fromOverview') fromOverview: boolean = false
 
     @Output() deleteMe: EventEmitter<boolean> = new EventEmitter<boolean>()
-    // @Output() connectMe: EventEmitter<boolean> = new EventEmitter<boolean>()
-    @Output() disconnectMe: EventEmitter<boolean> = new EventEmitter<boolean>()
+    @Output() disconnectMe: EventEmitter<{ account: GetAccountForViewDto; relation: any }>  = new EventEmitter();
     @Output() _createRelation: EventEmitter<any> = new EventEmitter<any>()
 
     isRecordOwner: boolean
@@ -29,6 +28,8 @@ export class ConnectionsCardComponent extends AppComponentBase {
 
     isAuthenticated: boolean = false;
 
+  showRelationsDialog = false;
+selectedAccountForRelations: any = null;
     constructor(
         injector: Injector,
         private router: Router,
@@ -52,9 +53,9 @@ export class ConnectionsCardComponent extends AppComponentBase {
     }
 
 
-    disconnect(account): void {
-        this.disconnectMe.emit(account)
-    }
+    // disconnect(account,relation): void {
+    //  this.disconnectMe.emit({ account, relation });
+    // }
 
     edit(): void {
         if (!this.id) return
@@ -83,35 +84,20 @@ export class ConnectionsCardComponent extends AppComponentBase {
     }
 
 
-    getFormattedConnectionName(connection: string): string | null {
-        let raw: string | undefined;
-      
-        if (connection === 'connectionName') {
-          raw = this.account?.connectionName?.trim();
-        } else if (connection === 'avaliableConnectionName') {
-          raw = this.account?.avaliableConnectionName?.trim();
-        }else{
-          raw = this.account?.disConnectLabel?.trim();
-        }
-      
-        if (!raw) return null;
-      
-        // If it's 'Follow', return as-is
-        if (raw === 'Follow') return 'Follow';
-        if (raw === 'Connect') return 'Connect';
-        if (raw === 'Join') return 'Join';
-        if (raw === 'Employ') return 'Employ';
-      
-        // Format only if starts with 'MPAction'
-        if (raw.startsWith('MPAction')) {
-          const label = raw.replace('MPAction', '');
-          return label.charAt(0).toUpperCase() + label.slice(1).toLowerCase();
-        }
-      
-        // For anything else, return null (or raw if you prefer)
-        return null;
-      }
+getFormattedConnectionName(label: string): string {
+  if (!label) return '';
 
+  if (label === 'Follow' || label === 'Connect' || label === 'Join' || label === 'Employ') {
+    return label;
+  }
+
+  if (label.startsWith('MPAction')) {
+    const clean = label.replace('MPAction', '');
+    return clean.charAt(0).toUpperCase() + clean.slice(1).toLowerCase();
+  }
+
+  return label;
+}
 
       private readonly ICONS: Record<string, string> = {
         FOLLOW: 'assets/accounts/FOLLOW.png',
@@ -127,6 +113,50 @@ export class ConnectionsCardComponent extends AppComponentBase {
         }
         return 'assets/accounts/CONNECT.png'; // fallback
       }
+
+
+  stopPropagation($event) {
+    $event.stopPropagation() // stop click event bubbling
+  }
+
+  openRelationsDialog(account: any): void {
+  this.selectedAccountForRelations = account;
+  this.showRelationsDialog = true;
+}
+
+ disconnect(account, relation) {
+  this.disconnectMe.emit({ account, relation });
+}
+
+removeRelationFromDialog(account: any, relation: any, index: number): void {
+  this.disconnect(account, relation);
+
+  // optional: close dialog if no relations left after UI update
+  setTimeout(() => {
+    if (!account?.connectionsInfo?.length) {
+      this.showRelationsDialog = false;
+    }
+  });
+}
+
+
+      openedRelationMenuId: number | null = null;
+
+toggleRelationMenu(event: MouseEvent, account: any): void {
+  event.preventDefault();
+  event.stopPropagation();
+
+  const id = account?.account?.id;
+  this.openedRelationMenuId = this.openedRelationMenuId === id ? null : id;
+}
+
+onRelationOptionClick(event: MouseEvent, option: any): void {
+  event.preventDefault();
+  event.stopPropagation();
+
+  this.createRelation(option);
+  this.openedRelationMenuId = null;
+}
 
 }
 

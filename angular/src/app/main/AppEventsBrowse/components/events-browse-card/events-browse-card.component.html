@@ -17,7 +17,8 @@
         <div *ngIf="!FromLandingPage"
     class="event-type-overlay-badge" [ngClass]="isArabic ? 'arIcon':'enIcon'"
   [pTooltip]="(item?.appEvent?.isOnLine ? 'OnlineEvent' : 'InPersonEvent') | localize"
-    tooltipPosition="bottom"
+    tooltipPosition="bottom"   [tooltipEvent]="isSmallScreen ? 'focus' : 'hover'" [autoHide]="true" [showDelay]="100" [hideDelay]="100"
+                [tabindex]="isSmallScreen ? 0 : null"
   >
     <i [ngClass]="getEventTypeIcon(item?.appEvent?.isOnLine)"></i>
   </div>
@@ -33,7 +34,8 @@
 
       <!-- ============ CASE 1: NORMAL LIST (NOT marketplace profile) ============ -->
       <ng-container *ngIf="!fromMarketPlaceProfile && !fromOverviewMarketPlaceProfile">
-        <h3 class="event-title cursor-pointer" (click)="_triggerEvent(EventsBrowseActionsEvents.View)" [pTooltip]="item?.appEvent?.name" tooltipPosition="bottom">
+        <h3 class="event-title cursor-pointer" (click)="_triggerEvent(EventsBrowseActionsEvents.View)" [pTooltip]="item?.appEvent?.name" tooltipPosition="bottom"   [tooltipEvent]="isSmallScreen ? 'focus' : 'hover'" [autoHide]="true" [showDelay]="100" [hideDelay]="100"
+                [tabindex]="isSmallScreen ? 0 : null">
           {{ item?.appEvent?.name | textSubstring: 28 }}
         </h3>
 
@@ -53,83 +55,19 @@
 
            <div class="stat">
             <div class="stat-head">
-              <i class="fas fa-users stat-ico" [pTooltip]="'Attendees' | localize" tooltipPosition="bottom"></i>
+              <i class="fas fa-users stat-ico" [pTooltip]="'Attendees' | localize" tooltipPosition="bottom"   [tooltipEvent]="isSmallScreen ? 'focus' : 'hover'" [autoHide]="true" [showDelay]="100" [hideDelay]="100"
+                [tabindex]="isSmallScreen ? 0 : null"></i>
         
             </div>
             <div class="stat-sub">
               {{ item?.appEvent?.guestsCount || 0 }}
             </div>
           </div>
-        <!-- <div class="stats-row">
-    
-          <div class="stat">
-            <div class="stat-head">
-              <i class="fas fa-users stat-ico" [pTooltip]="'Attendees' | localize" tooltipPosition="bottom"></i>
-        
-            </div>
-            <div class="stat-sub">
-              {{ item?.appEvent?.guestsCount || 0 }} {{ 'attendees' | localize }}
-            </div>
-          </div>
-
-          <div class="stat-divider"></div>
-
-         
-          <div class="stat">
-            <div class="stat-head"  [pTooltip]="'EventType' | localize"
-                tooltipPosition="bottom">
-      
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" role="img"
-                aria-labelledby="eventTypeTitle" class="pt-1" [pTooltip]="'EventType' | localize"
-                tooltipPosition="bottom">
-
-                <path
-                  d="M3.5 7.5v6c0 1.1.9 2 2 2h7.586c.53 0 1.039-.21 1.414-.586l5.414-5.414a2 2 0 0 0 0-2.828l-4.172-4.172A2 2 0 0 0 15.086 2H5.5c-1.1 0-2 .9-2 2z"
-                          fill="none" stroke="#222" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
-              
-                  
-                <circle cx="16.5" cy="6.5" r="0.9" fill="#222" />
-               
-                  
-                <circle cx="8.2" cy="11.8" r="0.7" fill="#222" />
-          
-                  
-                <path d="M10.8 10.6c0-1.1.9-2 2-2s2 .9 2 2c0 1.6-2 4.2-2 4.2s-2-2.6-2-4.2z" fill="none" stroke="#222"
-                  stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" />
-                  
-                <circle cx="12.8" cy="10.6" r="0.5" fill="#222" />
-           
-                  
-                <path d="M15.6 13.6h2.2a.6.6 0 0 0 .6-.6v-2.6a.6.6 0 0 0-.6-.6h-2.2v3.8z" fill="none" stroke="#222"
-                  stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" />
-                  
-                <path d="M13.6 12.2h-1.8a1 1 0 0 1-1-1v-1.2a1 1 0 0 1 1-1h1.8v3.2z" fill="none" stroke="#222"
-                  stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" />
-              </svg>
-            </div>
-
-            <div class="stat-sub">
-              <ng-container *ngIf="item?.appEvent?.isOnLine; else inPersonLoc">
-                {{ 'OnLine' | localize }}
-              </ng-container>
-
-              <ng-template #inPersonLoc>
-                {{'InPerson'| localize }}
-              </ng-template>
-            </div>
-          </div>
-        </div> -->
-
 
         <p class="event-desc" *ngIf="singleItemPerRowMode">
           {{ item?.appEvent?.description | textSubstring: 150 }}
         </p>
 
-        <!-- <p class="event-attendees" *ngIf="item?.appEvent?.guestsCount > 0">
-          <i class="fas fa-users"></i>
-          <span class="ml-2">{{ item?.appEvent?.guestsCount }}</span>
-          <span class="ml-1">{{ 'attendees' | localize }}</span>
-        </p> -->
 
         <p class="event-publish"
           *ngIf="mainFilterCtrl?.value?.value == EventsFilterTypesEnum.MyEvents && statusesFlags?.publicityStatus"

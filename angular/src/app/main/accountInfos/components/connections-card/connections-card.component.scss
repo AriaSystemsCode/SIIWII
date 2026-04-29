@@ -50,10 +50,10 @@
 }
 .relation_Status_button{
   white-space: nowrap;
-  position: absolute;
+  // position: absolute;
   // right: 5px;
   cursor: auto;
-  bottom: 5px !important;
+  // bottom: 5px !important;
   padding: 8px !important;
     img {
       width: 15px;
@@ -99,4 +99,16 @@
 
 .accTpye {
   white-space: nowrap !important;
+}
+
+.market-follow {
+      border-radius: 8px !important;
+    background: #5A0B5E !important;
+    color: #fff !important;
+    border: 0 !important;
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    // font-weight: 700;
+  padding: 6px;
 }

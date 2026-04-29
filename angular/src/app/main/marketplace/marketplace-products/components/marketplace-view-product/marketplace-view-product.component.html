@@ -1,5 +1,5 @@
 <div [@routerTransition] style="margin-top: -50px" class="wrapper kt-container web -5 pt-lg-2 pl-0 pr-lg-4 pr-0 " [ngClass]="isArabic && isAuthenticated ? 'addPt':''">
-    <div class=" pr-md-3">
+    <div class=" pr-md-3 addMtM">
         <div
             class="d-flex justify-content-start pageHeader mt-lg-4 mt-5 pt-2 ml-md-5 ml-2 pl-lg-4 mb-2 align-items-center">
             <button (click)="backToResult()" class="backBtn"> <img class="mt-2 "
@@ -312,7 +312,7 @@
                                                 {{ currencySymbol }} {{ (productDetails?.maxSpecialPrice || 0) | number:'1.2-2' }}
                                             </h5>
 
-                                            <img *ngIf="orderType == 'SO'  && showEditSpecialPrice && showSpecialPrice "
+                                            <img *ngIf="orderType == 'SO'  && showEditSpecialPrice && showSpecialPrice && productDetails?.maxSpecialPrice"
                                                 class="mx-1  poniter" style="cursor: pointer;"
                                                 src="../../../../../assets/Items//edit-svgrepo-com 1.png"
                                                 (click)="showEditSpecialPrice =false;updatedSpecialPrice=productDetails?.maxSpecialPrice" />
@@ -1064,7 +1064,7 @@ top: 4px;">
             </div>
         </div>
 
-        <div class="d-block d-md-none addMtM">
+        <div class="d-block d-md-none ">
 
             <p-tabView [(activeIndex)]="activeTabIndex">
                 <p-tabPanel>
@@ -1102,7 +1102,7 @@ top: 4px;">
                                                 [disabled]="!productBodyData?.sellerSSIN">
 
                                                 <a style="text-decoration: none" (click)="goToShowroom()"
-                                                    rel="noopener noreferrer">Visit the virtual showroom</a>
+                                                    rel="noopener noreferrer">{{'VisitVirtualShowroom' | localize}}</a>
                                             </button>
                                         </div>
                                     </div>
@@ -1167,7 +1167,7 @@ top: 4px;">
                                                         {{ currencySymbol }} {{ (productDetails?.maxSpecialPrice || 0) | number:'1.2-2' }}
                                                     </h5>
 
-                                                    <img *ngIf="orderType == 'SO'  && showEditSpecialPrice && showSpecialPrice"
+                                                    <img *ngIf="orderType == 'SO'  && showEditSpecialPrice && showSpecialPrice && productDetails?.maxSpecialPrice"
                                                         class="mx-2  poniter" style="cursor: pointer;"
                                                         src="../../../../../assets/Items//edit-svgrepo-com 1.png"
                                                         (click)="showEditSpecialPrice =false;updatedSpecialPrice=productDetails?.maxSpecialPrice" />

@@ -3283,6 +3283,9 @@ namespace onetouch.Migrations
                     b.Property<decimal>("Price")
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<string>("SellerSSIN")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int?>("TenantId")
                         .HasColumnType("int");
 
@@ -4670,6 +4673,9 @@ namespace onetouch.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<long?>("LastModifierUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long?>("RelationId")
                         .HasColumnType("bigint");
 
                     b.Property<long>("TransactionId")
@@ -7434,6 +7440,9 @@ namespace onetouch.Migrations
                     b.Property<long>("RecipientContactTypeId")
                         .HasColumnType("bigint");
 
+                    b.Property<string>("RecipientMarketplaceRole")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTime>("RelationshipCreationDate")
                         .HasColumnType("datetime2");
 
@@ -7454,6 +7463,9 @@ namespace onetouch.Migrations
 
                     b.Property<long>("RequesterContactTypeId")
                         .HasColumnType("bigint");
+
+                    b.Property<string>("RequesterMarketplaceRole")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("SharingLevel")
                         .HasColumnType("int");

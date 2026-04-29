@@ -129,34 +129,40 @@ export class TopBarComponent extends ThemesLayoutBaseComponent implements OnInit
         private _accountsServiceProxy: AccountsServiceProxy,
     ) {
         super(injector);
-        this.getTenantData()
+        this.showMainSpinner();
+        this.tenantRoleService.loadRoles().then(() => {
+            this.buildItems();
+            this.hideMainSpinner();
+        });
+
+    }
+
+    buildItems() {
         this.items = [
             {
                 items: [
                     {
                         label: "Sales Order",
                         command: () => {
+                            if (!this.tenantRoleService.canCreateSO()) {
+                                this.showNoCreatePermissionAlert();
+                                return;
+                            }
+                            this.roles = this.tenantRoleService.soRolesOptions;
                             this.getOderNumber("SO", "Sales Order");
-                            this.roles = [
-                                { name: "I'm a Seller", code: 1 },
-                                {
-                                    name: "I'm an Independent Sales Rep.",
-                                    code: 3,
-                                },
-                            ];
                         },
                     },
+
                     {
                         label: "Purchase Order",
                         command: () => {
+                            if (!this.tenantRoleService.canCreatePO()) {
+                                this.showNoCreatePermissionAlert();
+                                return;
+                            }
+                            this.roles = this.tenantRoleService.poRolesOptions;
                             this.getOderNumber("PO", "Purchase Order");
-                            this.roles = [
-                                { name: "I'm a Buyer", code: 2 },
-                                {
-                                    name: "I'm an Independent buying office.",
-                                    code: 3,
-                                },
-                            ];
+
                         },
                     },
                 ],
@@ -184,7 +190,6 @@ export class TopBarComponent extends ThemesLayoutBaseComponent implements OnInit
     ngOnInit() {
         this.isAuthenticated = !!this.appSession?.user;
        this.loadDefaultPage()
-        this.getTenantData()
         this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
         this.currentLang == 'ar' || this.currentLang == 'ar-EG'  ? this.isArabic = true : this.isArabic = false
         this.defaultSellerLogo = '../../../assets/shoppingCart/Order-Details-Seller-logo.svg';
@@ -526,7 +531,7 @@ export class TopBarComponent extends ThemesLayoutBaseComponent implements OnInit
     }
 
     onSearch(ev?: Event): void {
-        ev?.preventDefault(); // ✅ stop native form submit
+        ev?.preventDefault(); //  stop native form submit
         const q = (this.searchInput ?? '').trim();
       
         this.router.navigate(
@@ -563,7 +568,7 @@ export class TopBarComponent extends ThemesLayoutBaseComponent implements OnInit
         this._AppEntitiesServiceProxy.getHostSettingValue(1203, null)
           .subscribe({
             next: (res2: string) => {
-              if (res2 === 'Marketplace' && this.allowFeeds != 'true') {
+              if (res2 === 'Marketplace' && this.allowFeeds != 'Yes') {
                 this.defaultHomeUrl = '/app/main/marketplace';
               } else {
                 this.defaultHomeUrl = '/app/main/Home';

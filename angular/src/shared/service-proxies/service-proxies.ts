@@ -2030,14 +2030,19 @@ export class AccountsServiceProxy {
 
     /**
      * @param id (optional) 
+     * @param relationshipId (optional) 
      * @return Success
      */
-    disconnect(id: number | undefined): Observable<ConnectionType[]> {
+    disconnect(id: number | undefined, relationshipId: number | undefined): Observable<ConnectionType[]> {
         let url_ = this.baseUrl + "/api/services/app/Accounts/Disconnect?";
         if (id === null)
             throw new Error("The parameter 'id' cannot be null.");
         else if (id !== undefined)
             url_ += "id=" + encodeURIComponent("" + id) + "&";
+        if (relationshipId === null)
+            throw new Error("The parameter 'relationshipId' cannot be null.");
+        else if (relationshipId !== undefined)
+            url_ += "relationshipId=" + encodeURIComponent("" + relationshipId) + "&";
         url_ = url_.replace(/[?&]$/, "");
 
         let options_ : any = {
@@ -2616,7 +2621,7 @@ export class AccountsServiceProxy {
      * @param connectionTypeId (optional) 
      * @return Success
      */
-    applyRelationOnProfile(input: number | undefined, ssin: string | null | undefined, isPublic: boolean | null | undefined, connectionTypeId: number | null | undefined): Observable<string> {
+    applyRelationOnProfile(input: number | undefined, ssin: string | null | undefined, isPublic: boolean | null | undefined, connectionTypeId: number | null | undefined): Observable<ConnectionInfo[]> {
         let url_ = this.baseUrl + "/api/services/app/Accounts/ApplyRelationOnProfile?";
         if (input === null)
             throw new Error("The parameter 'input' cannot be null.");
@@ -2645,14 +2650,14 @@ export class AccountsServiceProxy {
                 try {
                     return this.processApplyRelationOnProfile(response_ as any);
                 } catch (e) {
-                    return _observableThrow(e) as any as Observable<string>;
+                    return _observableThrow(e) as any as Observable<ConnectionInfo[]>;
                 }
             } else
-                return _observableThrow(response_) as any as Observable<string>;
+                return _observableThrow(response_) as any as Observable<ConnectionInfo[]>;
         }));
     }
 
-    protected processApplyRelationOnProfile(response: HttpResponseBase): Observable<string> {
+    protected processApplyRelationOnProfile(response: HttpResponseBase): Observable<ConnectionInfo[]> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -2663,8 +2668,14 @@ export class AccountsServiceProxy {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
             let result200: any = null;
             let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-                result200 = resultData200 !== undefined ? resultData200 : <any>null;
-    
+            if (Array.isArray(resultData200)) {
+                result200 = [] as any;
+                for (let item of resultData200)
+                    result200!.push(ConnectionInfo.fromJS(item));
+            }
+            else {
+                result200 = <any>null;
+            }
             return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
@@ -20880,6 +20891,7 @@ export class AppMarketplaceItemsServiceProxy {
      * @param buyerAccountSSIN (optional) 
      * @param sellerAccountSSIN (optional) 
      * @param priceLevel (optional) 
+     * @param transactionId (optional) 
      * @param itemId (optional) 
      * @param getAppItemAttributesInputForCategories_Sorting (optional) 
      * @param getAppItemAttributesInputForCategories_SkipCount (optional) 
@@ -20899,7 +20911,7 @@ export class AppMarketplaceItemsServiceProxy {
      * @param maxResultCount (optional) 
      * @return Success
      */
-    getMarketplaceAppItemForView(getAppItemAttributesInputForExtraData_EntityObjectTypeId: number | undefined, getAppItemAttributesInputForExtraData_recommandedOrAdditional: RecommandedOrAdditional, getAppItemAttributesInputForExtraData_ItemId: number | undefined, getAppItemAttributesInputForExtraData_ItemEntityId: number | undefined, getAppItemAttributesInputForExtraData_Sorting: string | null | undefined, getAppItemAttributesInputForExtraData_SkipCount: number | undefined, getAppItemAttributesInputForExtraData_MaxResultCount: number | undefined, currencyCode: string | null | undefined, buyerAccountSSIN: string | null | undefined, sellerAccountSSIN: string | null | undefined, priceLevel: string | null | undefined, itemId: number | undefined, getAppItemAttributesInputForCategories_Sorting: string | null | undefined, getAppItemAttributesInputForCategories_SkipCount: number | undefined, getAppItemAttributesInputForCategories_MaxResultCount: number | undefined, getAppItemAttributesInputForClassifications_Sorting: string | null | undefined, getAppItemAttributesInputForClassifications_SkipCount: number | undefined, getAppItemAttributesInputForClassifications_MaxResultCount: number | undefined, getAppItemAttributesInputForDepartments_Sorting: string | null | undefined, getAppItemAttributesInputForDepartments_SkipCount: number | undefined, getAppItemAttributesInputForDepartments_MaxResultCount: number | undefined, getAppItemAttributesInputForRelatedItems_Sorting: string | null | undefined, getAppItemAttributesInputForRelatedItems_SkipCount: number | undefined, getAppItemAttributesInputForRelatedItems_MaxResultCount: number | undefined, itemSSIN: string | null | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<GetAppMarketplaceItemDetailForViewDto> {
+    getMarketplaceAppItemForView(getAppItemAttributesInputForExtraData_EntityObjectTypeId: number | undefined, getAppItemAttributesInputForExtraData_recommandedOrAdditional: RecommandedOrAdditional, getAppItemAttributesInputForExtraData_ItemId: number | undefined, getAppItemAttributesInputForExtraData_ItemEntityId: number | undefined, getAppItemAttributesInputForExtraData_Sorting: string | null | undefined, getAppItemAttributesInputForExtraData_SkipCount: number | undefined, getAppItemAttributesInputForExtraData_MaxResultCount: number | undefined, currencyCode: string | null | undefined, buyerAccountSSIN: string | null | undefined, sellerAccountSSIN: string | null | undefined, priceLevel: string | null | undefined, transactionId: number | undefined, itemId: number | undefined, getAppItemAttributesInputForCategories_Sorting: string | null | undefined, getAppItemAttributesInputForCategories_SkipCount: number | undefined, getAppItemAttributesInputForCategories_MaxResultCount: number | undefined, getAppItemAttributesInputForClassifications_Sorting: string | null | undefined, getAppItemAttributesInputForClassifications_SkipCount: number | undefined, getAppItemAttributesInputForClassifications_MaxResultCount: number | undefined, getAppItemAttributesInputForDepartments_Sorting: string | null | undefined, getAppItemAttributesInputForDepartments_SkipCount: number | undefined, getAppItemAttributesInputForDepartments_MaxResultCount: number | undefined, getAppItemAttributesInputForRelatedItems_Sorting: string | null | undefined, getAppItemAttributesInputForRelatedItems_SkipCount: number | undefined, getAppItemAttributesInputForRelatedItems_MaxResultCount: number | undefined, itemSSIN: string | null | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<GetAppMarketplaceItemDetailForViewDto> {
         let url_ = this.baseUrl + "/api/services/app/AppMarketplaceItems/GetMarketplaceAppItemForView?";
         if (getAppItemAttributesInputForExtraData_EntityObjectTypeId === null)
             throw new Error("The parameter 'getAppItemAttributesInputForExtraData_EntityObjectTypeId' cannot be null.");
@@ -20935,6 +20947,10 @@ export class AppMarketplaceItemsServiceProxy {
             url_ += "SellerAccountSSIN=" + encodeURIComponent("" + sellerAccountSSIN) + "&";
         if (priceLevel !== undefined && priceLevel !== null)
             url_ += "PriceLevel=" + encodeURIComponent("" + priceLevel) + "&";
+        if (transactionId === null)
+            throw new Error("The parameter 'transactionId' cannot be null.");
+        else if (transactionId !== undefined)
+            url_ += "TransactionId=" + encodeURIComponent("" + transactionId) + "&";
         if (itemId === null)
             throw new Error("The parameter 'itemId' cannot be null.");
         else if (itemId !== undefined)
@@ -28396,14 +28412,19 @@ export class AppTransactionServiceProxy {
     /**
      * @param productSSIN (optional) 
      * @param tenantId (optional) 
+     * @param transactionId (optional) 
      * @return Success
      */
-    getProductFromMarketplace(productSSIN: string | null | undefined, tenantId: number | null | undefined): Observable<void> {
+    getProductFromMarketplace(productSSIN: string | null | undefined, tenantId: number | null | undefined, transactionId: number | undefined): Observable<void> {
         let url_ = this.baseUrl + "/api/services/app/AppTransaction/GetProductFromMarketplace?";
         if (productSSIN !== undefined && productSSIN !== null)
             url_ += "productSSIN=" + encodeURIComponent("" + productSSIN) + "&";
         if (tenantId !== undefined && tenantId !== null)
             url_ += "tenantId=" + encodeURIComponent("" + tenantId) + "&";
+        if (transactionId === null)
+            throw new Error("The parameter 'transactionId' cannot be null.");
+        else if (transactionId !== undefined)
+            url_ += "transactionId=" + encodeURIComponent("" + transactionId) + "&";
         url_ = url_.replace(/[?&]$/, "");
 
         let options_ : any = {
@@ -30108,6 +30129,191 @@ export class AppTransactionServiceProxy {
             let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
                 result200 = resultData200 !== undefined ? resultData200 : <any>null;
     
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param accountSSIN (optional) 
+     * @return Success
+     */
+    getAccountMarketplaceRoles(accountSSIN: string | null | undefined): Observable<string[]> {
+        let url_ = this.baseUrl + "/api/services/app/AppTransaction/GetAccountMarketplaceRoles?";
+        if (accountSSIN !== undefined && accountSSIN !== null)
+            url_ += "accountSSIN=" + encodeURIComponent("" + accountSSIN) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetAccountMarketplaceRoles(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetAccountMarketplaceRoles(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<string[]>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<string[]>;
+        }));
+    }
+
+    protected processGetAccountMarketplaceRoles(response: HttpResponseBase): Observable<string[]> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            if (Array.isArray(resultData200)) {
+                result200 = [] as any;
+                for (let item of resultData200)
+                    result200!.push(item);
+            }
+            else {
+                result200 = <any>null;
+            }
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @return Success
+     */
+    getLoggedInTenantRoles(): Observable<string[]> {
+        let url_ = this.baseUrl + "/api/services/app/AppTransaction/GetLoggedInTenantRoles";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetLoggedInTenantRoles(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetLoggedInTenantRoles(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<string[]>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<string[]>;
+        }));
+    }
+
+    protected processGetLoggedInTenantRoles(response: HttpResponseBase): Observable<string[]> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            if (Array.isArray(resultData200)) {
+                result200 = [] as any;
+                for (let item of resultData200)
+                    result200!.push(item);
+            }
+            else {
+                result200 = <any>null;
+            }
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param tenantId (optional) 
+     * @param accountSSIN (optional) 
+     * @return Success
+     */
+    getTenantAccountRelationships(tenantId: number | undefined, accountSSIN: string | null | undefined): Observable<AppContactRelationshipInfoDto[]> {
+        let url_ = this.baseUrl + "/api/services/app/AppTransaction/GetTenantAccountRelationships?";
+        if (tenantId === null)
+            throw new Error("The parameter 'tenantId' cannot be null.");
+        else if (tenantId !== undefined)
+            url_ += "tenantId=" + encodeURIComponent("" + tenantId) + "&";
+        if (accountSSIN !== undefined && accountSSIN !== null)
+            url_ += "accountSSIN=" + encodeURIComponent("" + accountSSIN) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetTenantAccountRelationships(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetTenantAccountRelationships(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<AppContactRelationshipInfoDto[]>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<AppContactRelationshipInfoDto[]>;
+        }));
+    }
+
+    protected processGetTenantAccountRelationships(response: HttpResponseBase): Observable<AppContactRelationshipInfoDto[]> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            if (Array.isArray(resultData200)) {
+                result200 = [] as any;
+                for (let item of resultData200)
+                    result200!.push(AppContactRelationshipInfoDto.fromJS(item));
+            }
+            else {
+                result200 = <any>null;
+            }
             return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
@@ -32240,9 +32446,10 @@ export class CreateMarketplaceAccountServiceProxy {
      * @param disconnect (optional) 
      * @param isPublic (optional) 
      * @param connectionTypeId (optional) 
+     * @param disconnectRelationId (optional) 
      * @return Success
      */
-    createOrEditMarketplaceContactRelationship(requesterSSIN: string | null | undefined, recipientSSIN: string | null | undefined, disconnect: boolean | null | undefined, isPublic: boolean | null | undefined, connectionTypeId: number | null | undefined): Observable<string> {
+    createOrEditMarketplaceContactRelationship(requesterSSIN: string | null | undefined, recipientSSIN: string | null | undefined, disconnect: boolean | null | undefined, isPublic: boolean | null | undefined, connectionTypeId: number | null | undefined, disconnectRelationId: number | null | undefined): Observable<string> {
         let url_ = this.baseUrl + "/api/services/app/CreateMarketplaceAccount/CreateOrEditMarketplaceContactRelationship?";
         if (requesterSSIN !== undefined && requesterSSIN !== null)
             url_ += "requesterSSIN=" + encodeURIComponent("" + requesterSSIN) + "&";
@@ -32254,6 +32461,8 @@ export class CreateMarketplaceAccountServiceProxy {
             url_ += "isPublic=" + encodeURIComponent("" + isPublic) + "&";
         if (connectionTypeId !== undefined && connectionTypeId !== null)
             url_ += "connectionTypeId=" + encodeURIComponent("" + connectionTypeId) + "&";
+        if (disconnectRelationId !== undefined && disconnectRelationId !== null)
+            url_ += "disconnectRelationId=" + encodeURIComponent("" + disconnectRelationId) + "&";
         url_ = url_.replace(/[?&]$/, "");
 
         let options_ : any = {
@@ -66597,6 +66806,7 @@ export class AccountDto implements IAccountDto {
     currencyId!: number | undefined;
     currencyCode!: string | undefined;
     currencyName!: string | undefined;
+    marketplaceAccountRole!: string | undefined;
     id!: number;
 
     [key: string]: any;
@@ -66673,6 +66883,7 @@ export class AccountDto implements IAccountDto {
             this.currencyId = _data["currencyId"];
             this.currencyCode = _data["currencyCode"];
             this.currencyName = _data["currencyName"];
+            this.marketplaceAccountRole = _data["marketplaceAccountRole"];
             this.id = _data["id"];
         }
     }
@@ -66747,6 +66958,7 @@ export class AccountDto implements IAccountDto {
         data["currencyId"] = this.currencyId;
         data["currencyCode"] = this.currencyCode;
         data["currencyName"] = this.currencyName;
+        data["marketplaceAccountRole"] = this.marketplaceAccountRole;
         data["id"] = this.id;
         return data;
     }
@@ -66794,6 +67006,7 @@ export interface IAccountDto {
     currencyId: number | undefined;
     currencyCode: string | undefined;
     currencyName: string | undefined;
+    marketplaceAccountRole: string | undefined;
     id: number;
 
     [key: string]: any;
@@ -67055,10 +67268,84 @@ export interface IContactDto {
     [key: string]: any;
 }
 
+export class ConnectionInfo implements IConnectionInfo {
+    connectionStatus!: string | undefined;
+    disconnectLabel!: string | undefined;
+    relationEntityId!: number;
+    pendingLabel!: string | undefined;
+    connectedLabel!: string | undefined;
+    visibility!: string | undefined;
+    relationshipCode!: string | undefined;
+
+    [key: string]: any;
+
+    constructor(data?: IConnectionInfo) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.connectionStatus = _data["connectionStatus"];
+            this.disconnectLabel = _data["disconnectLabel"];
+            this.relationEntityId = _data["relationEntityId"];
+            this.pendingLabel = _data["pendingLabel"];
+            this.connectedLabel = _data["connectedLabel"];
+            this.visibility = _data["visibility"];
+            this.relationshipCode = _data["relationshipCode"];
+        }
+    }
+
+    static fromJS(data: any): ConnectionInfo {
+        data = typeof data === 'object' ? data : {};
+        let result = new ConnectionInfo();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["connectionStatus"] = this.connectionStatus;
+        data["disconnectLabel"] = this.disconnectLabel;
+        data["relationEntityId"] = this.relationEntityId;
+        data["pendingLabel"] = this.pendingLabel;
+        data["connectedLabel"] = this.connectedLabel;
+        data["visibility"] = this.visibility;
+        data["relationshipCode"] = this.relationshipCode;
+        return data;
+    }
+}
+
+export interface IConnectionInfo {
+    connectionStatus: string | undefined;
+    disconnectLabel: string | undefined;
+    relationEntityId: number;
+    pendingLabel: string | undefined;
+    connectedLabel: string | undefined;
+    visibility: string | undefined;
+    relationshipCode: string | undefined;
+
+    [key: string]: any;
+}
+
 export class ConnectionType implements IConnectionType {
+    connectionName!: string | undefined;
     connectLabel!: string | undefined;
     connectionEntityId!: number;
     defaultVisibility!: string | undefined;
+    relationshipCode!: string | undefined;
 
     [key: string]: any;
 
@@ -67077,9 +67364,11 @@ export class ConnectionType implements IConnectionType {
                 if (_data.hasOwnProperty(property))
                     this[property] = _data[property];
             }
+            this.connectionName = _data["connectionName"];
             this.connectLabel = _data["connectLabel"];
             this.connectionEntityId = _data["connectionEntityId"];
             this.defaultVisibility = _data["defaultVisibility"];
+            this.relationshipCode = _data["relationshipCode"];
         }
     }
 
@@ -67096,31 +67385,37 @@ export class ConnectionType implements IConnectionType {
             if (this.hasOwnProperty(property))
                 data[property] = this[property];
         }
+        data["connectionName"] = this.connectionName;
         data["connectLabel"] = this.connectLabel;
         data["connectionEntityId"] = this.connectionEntityId;
         data["defaultVisibility"] = this.defaultVisibility;
+        data["relationshipCode"] = this.relationshipCode;
         return data;
     }
 }
 
 export interface IConnectionType {
+    connectionName: string | undefined;
     connectLabel: string | undefined;
     connectionEntityId: number;
     defaultVisibility: string | undefined;
+    relationshipCode: string | undefined;
 
     [key: string]: any;
 }
 
 export class GetAccountForViewDto implements IGetAccountForViewDto {
+    entityExtraData!: AppEntityExtraDataDto[] | undefined;
     account!: AccountDto;
     contact!: ContactDto;
     connectionName!: string | undefined;
+    disConnectLabel!: string | undefined;
     connectionCount!: number;
     avaliableConnectionName!: string | undefined;
     appEntityName!: string | undefined;
     isSync!: boolean;
     isPublished!: boolean;
-    disConnectLabel!: string | undefined;
+    connectionsInfo!: ConnectionInfo[] | undefined;
     availableConnections!: ConnectionType[] | undefined;
     visibility!: string | undefined;
     availableGroupConnections!: number;
@@ -67145,15 +67440,25 @@ export class GetAccountForViewDto implements IGetAccountForViewDto {
                 if (_data.hasOwnProperty(property))
                     this[property] = _data[property];
             }
+            if (Array.isArray(_data["entityExtraData"])) {
+                this.entityExtraData = [] as any;
+                for (let item of _data["entityExtraData"])
+                    this.entityExtraData!.push(AppEntityExtraDataDto.fromJS(item));
+            }
             this.account = _data["account"] ? AccountDto.fromJS(_data["account"]) : <any>undefined;
             this.contact = _data["contact"] ? ContactDto.fromJS(_data["contact"]) : <any>undefined;
             this.connectionName = _data["connectionName"];
+            this.disConnectLabel = _data["disConnectLabel"];
             this.connectionCount = _data["connectionCount"];
             this.avaliableConnectionName = _data["avaliableConnectionName"];
             this.appEntityName = _data["appEntityName"];
             this.isSync = _data["isSync"];
             this.isPublished = _data["isPublished"];
-            this.disConnectLabel = _data["disConnectLabel"];
+            if (Array.isArray(_data["connectionsInfo"])) {
+                this.connectionsInfo = [] as any;
+                for (let item of _data["connectionsInfo"])
+                    this.connectionsInfo!.push(ConnectionInfo.fromJS(item));
+            }
             if (Array.isArray(_data["availableConnections"])) {
                 this.availableConnections = [] as any;
                 for (let item of _data["availableConnections"])
@@ -67180,15 +67485,25 @@ export class GetAccountForViewDto implements IGetAccountForViewDto {
             if (this.hasOwnProperty(property))
                 data[property] = this[property];
         }
+        if (Array.isArray(this.entityExtraData)) {
+            data["entityExtraData"] = [];
+            for (let item of this.entityExtraData)
+                data["entityExtraData"].push(item.toJSON());
+        }
         data["account"] = this.account ? this.account.toJSON() : <any>undefined;
         data["contact"] = this.contact ? this.contact.toJSON() : <any>undefined;
         data["connectionName"] = this.connectionName;
+        data["disConnectLabel"] = this.disConnectLabel;
         data["connectionCount"] = this.connectionCount;
         data["avaliableConnectionName"] = this.avaliableConnectionName;
         data["appEntityName"] = this.appEntityName;
         data["isSync"] = this.isSync;
         data["isPublished"] = this.isPublished;
-        data["disConnectLabel"] = this.disConnectLabel;
+        if (Array.isArray(this.connectionsInfo)) {
+            data["connectionsInfo"] = [];
+            for (let item of this.connectionsInfo)
+                data["connectionsInfo"].push(item.toJSON());
+        }
         if (Array.isArray(this.availableConnections)) {
             data["availableConnections"] = [];
             for (let item of this.availableConnections)
@@ -67204,15 +67519,17 @@ export class GetAccountForViewDto implements IGetAccountForViewDto {
 }
 
 export interface IGetAccountForViewDto {
+    entityExtraData: AppEntityExtraDataDto[] | undefined;
     account: AccountDto;
     contact: ContactDto;
     connectionName: string | undefined;
+    disConnectLabel: string | undefined;
     connectionCount: number;
     avaliableConnectionName: string | undefined;
     appEntityName: string | undefined;
     isSync: boolean;
     isPublished: boolean;
-    disConnectLabel: string | undefined;
+    connectionsInfo: ConnectionInfo[] | undefined;
     availableConnections: ConnectionType[] | undefined;
     visibility: string | undefined;
     availableGroupConnections: number;
@@ -78704,6 +79021,7 @@ export class AppItemPriceInfo implements IAppItemPriceInfo {
     currencyName!: string | undefined;
     isDefault!: boolean;
     buyerSSIN!: string | undefined;
+    sellerSSIN!: string | undefined;
     id!: number;
 
     [key: string]: any;
@@ -78731,6 +79049,7 @@ export class AppItemPriceInfo implements IAppItemPriceInfo {
             this.currencyName = _data["currencyName"];
             this.isDefault = _data["isDefault"];
             this.buyerSSIN = _data["buyerSSIN"];
+            this.sellerSSIN = _data["sellerSSIN"];
             this.id = _data["id"];
         }
     }
@@ -78756,6 +79075,7 @@ export class AppItemPriceInfo implements IAppItemPriceInfo {
         data["currencyName"] = this.currencyName;
         data["isDefault"] = this.isDefault;
         data["buyerSSIN"] = this.buyerSSIN;
+        data["sellerSSIN"] = this.sellerSSIN;
         data["id"] = this.id;
         return data;
     }
@@ -78770,6 +79090,7 @@ export interface IAppItemPriceInfo {
     currencyName: string | undefined;
     isDefault: boolean;
     buyerSSIN: string | undefined;
+    sellerSSIN: string | undefined;
     id: number;
 
     [key: string]: any;
@@ -90342,6 +90663,7 @@ export enum ContactRoleEnum {
     ShipToContact = 6,
     ShipFromContact = 7,
     Creator = 8,
+    BuyingOffice = 9,
 }
 
 export class ContactAppAddressDto implements IContactAppAddressDto {
@@ -90462,6 +90784,9 @@ export class GetAccountInformationOutputDto implements IGetAccountInformationOut
     phoneTypeId!: number | undefined;
     phoneTypeName!: string | undefined;
     code!: string | undefined;
+    role!: string | undefined;
+    roleName!: string | undefined;
+    relationId!: number | undefined;
 
     [key: string]: any;
 
@@ -90489,6 +90814,9 @@ export class GetAccountInformationOutputDto implements IGetAccountInformationOut
             this.phoneTypeId = _data["phoneTypeId"];
             this.phoneTypeName = _data["phoneTypeName"];
             this.code = _data["code"];
+            this.role = _data["role"];
+            this.roleName = _data["roleName"];
+            this.relationId = _data["relationId"];
         }
     }
 
@@ -90514,6 +90842,9 @@ export class GetAccountInformationOutputDto implements IGetAccountInformationOut
         data["phoneTypeId"] = this.phoneTypeId;
         data["phoneTypeName"] = this.phoneTypeName;
         data["code"] = this.code;
+        data["role"] = this.role;
+        data["roleName"] = this.roleName;
+        data["relationId"] = this.relationId;
         return data;
     }
 }
@@ -90528,6 +90859,9 @@ export interface IGetAccountInformationOutputDto {
     phoneTypeId: number | undefined;
     phoneTypeName: string | undefined;
     code: string | undefined;
+    role: string | undefined;
+    roleName: string | undefined;
+    relationId: number | undefined;
 
     [key: string]: any;
 }
@@ -90947,6 +91281,8 @@ export class GetAppTransactionsForViewDto implements IGetAppTransactionsForViewD
     buyerCompanySSIN!: string | undefined;
     buyerCompanyName!: string | undefined;
     sellerId!: number | undefined;
+    sellerRelationId!: number | undefined;
+    buyerRelationId!: number | undefined;
     sellerCompanyName!: string | undefined;
     buyerContactEMailAddress!: string | undefined;
     languageId!: number | undefined;
@@ -91070,6 +91406,8 @@ export class GetAppTransactionsForViewDto implements IGetAppTransactionsForViewD
             this.buyerCompanySSIN = _data["buyerCompanySSIN"];
             this.buyerCompanyName = _data["buyerCompanyName"];
             this.sellerId = _data["sellerId"];
+            this.sellerRelationId = _data["sellerRelationId"];
+            this.buyerRelationId = _data["buyerRelationId"];
             this.sellerCompanyName = _data["sellerCompanyName"];
             this.buyerContactEMailAddress = _data["buyerContactEMailAddress"];
             this.languageId = _data["languageId"];
@@ -91235,6 +91573,8 @@ export class GetAppTransactionsForViewDto implements IGetAppTransactionsForViewD
         data["buyerCompanySSIN"] = this.buyerCompanySSIN;
         data["buyerCompanyName"] = this.buyerCompanyName;
         data["sellerId"] = this.sellerId;
+        data["sellerRelationId"] = this.sellerRelationId;
+        data["buyerRelationId"] = this.buyerRelationId;
         data["sellerCompanyName"] = this.sellerCompanyName;
         data["buyerContactEMailAddress"] = this.buyerContactEMailAddress;
         data["languageId"] = this.languageId;
@@ -91377,6 +91717,8 @@ export interface IGetAppTransactionsForViewDto {
     buyerCompanySSIN: string | undefined;
     buyerCompanyName: string | undefined;
     sellerId: number | undefined;
+    sellerRelationId: number | undefined;
+    buyerRelationId: number | undefined;
     sellerCompanyName: string | undefined;
     buyerContactEMailAddress: string | undefined;
     languageId: number | undefined;
@@ -91453,6 +91795,8 @@ export class CreateOrEditAppTransactionsDto implements ICreateOrEditAppTransacti
     buyerCompanySSIN!: string | undefined;
     buyerCompanyName!: string | undefined;
     sellerId!: number | undefined;
+    sellerRelationId!: number | undefined;
+    buyerRelationId!: number | undefined;
     sellerCompanyName!: string | undefined;
     buyerContactEMailAddress!: string | undefined;
     languageId!: number | undefined;
@@ -91542,6 +91886,8 @@ export class CreateOrEditAppTransactionsDto implements ICreateOrEditAppTransacti
             this.buyerCompanySSIN = _data["buyerCompanySSIN"];
             this.buyerCompanyName = _data["buyerCompanyName"];
             this.sellerId = _data["sellerId"];
+            this.sellerRelationId = _data["sellerRelationId"];
+            this.buyerRelationId = _data["buyerRelationId"];
             this.sellerCompanyName = _data["sellerCompanyName"];
             this.buyerContactEMailAddress = _data["buyerContactEMailAddress"];
             this.languageId = _data["languageId"];
@@ -91673,6 +92019,8 @@ export class CreateOrEditAppTransactionsDto implements ICreateOrEditAppTransacti
         data["buyerCompanySSIN"] = this.buyerCompanySSIN;
         data["buyerCompanyName"] = this.buyerCompanyName;
         data["sellerId"] = this.sellerId;
+        data["sellerRelationId"] = this.sellerRelationId;
+        data["buyerRelationId"] = this.buyerRelationId;
         data["sellerCompanyName"] = this.sellerCompanyName;
         data["buyerContactEMailAddress"] = this.buyerContactEMailAddress;
         data["languageId"] = this.languageId;
@@ -91793,6 +92141,8 @@ export interface ICreateOrEditAppTransactionsDto {
     buyerCompanySSIN: string | undefined;
     buyerCompanyName: string | undefined;
     sellerId: number | undefined;
+    sellerRelationId: number | undefined;
+    buyerRelationId: number | undefined;
     sellerCompanyName: string | undefined;
     buyerContactEMailAddress: string | undefined;
     languageId: number | undefined;
@@ -92096,6 +92446,8 @@ export class GetAllAppTransactionsForViewDto implements IGetAllAppTransactionsFo
     buyerCompanySSIN!: string | undefined;
     buyerCompanyName!: string | undefined;
     sellerId!: number | undefined;
+    sellerRelationId!: number | undefined;
+    buyerRelationId!: number | undefined;
     sellerCompanyName!: string | undefined;
     buyerContactEMailAddress!: string | undefined;
     languageId!: number | undefined;
@@ -92228,6 +92580,8 @@ export class GetAllAppTransactionsForViewDto implements IGetAllAppTransactionsFo
             this.buyerCompanySSIN = _data["buyerCompanySSIN"];
             this.buyerCompanyName = _data["buyerCompanyName"];
             this.sellerId = _data["sellerId"];
+            this.sellerRelationId = _data["sellerRelationId"];
+            this.buyerRelationId = _data["buyerRelationId"];
             this.sellerCompanyName = _data["sellerCompanyName"];
             this.buyerContactEMailAddress = _data["buyerContactEMailAddress"];
             this.languageId = _data["languageId"];
@@ -92402,6 +92756,8 @@ export class GetAllAppTransactionsForViewDto implements IGetAllAppTransactionsFo
         data["buyerCompanySSIN"] = this.buyerCompanySSIN;
         data["buyerCompanyName"] = this.buyerCompanyName;
         data["sellerId"] = this.sellerId;
+        data["sellerRelationId"] = this.sellerRelationId;
+        data["buyerRelationId"] = this.buyerRelationId;
         data["sellerCompanyName"] = this.sellerCompanyName;
         data["buyerContactEMailAddress"] = this.buyerContactEMailAddress;
         data["languageId"] = this.languageId;
@@ -92553,6 +92909,8 @@ export interface IGetAllAppTransactionsForViewDto {
     buyerCompanySSIN: string | undefined;
     buyerCompanyName: string | undefined;
     sellerId: number | undefined;
+    sellerRelationId: number | undefined;
+    buyerRelationId: number | undefined;
     sellerCompanyName: string | undefined;
     buyerContactEMailAddress: string | undefined;
     languageId: number | undefined;
@@ -92974,6 +93332,8 @@ export class GetOrderDetailsForViewDto implements IGetOrderDetailsForViewDto {
     buyerCompanySSIN!: string | undefined;
     buyerCompanyName!: string | undefined;
     sellerId!: number | undefined;
+    sellerRelationId!: number | undefined;
+    buyerRelationId!: number | undefined;
     sellerCompanyName!: string | undefined;
     buyerContactEMailAddress!: string | undefined;
     languageId!: number | undefined;
@@ -93082,6 +93442,8 @@ export class GetOrderDetailsForViewDto implements IGetOrderDetailsForViewDto {
             this.buyerCompanySSIN = _data["buyerCompanySSIN"];
             this.buyerCompanyName = _data["buyerCompanyName"];
             this.sellerId = _data["sellerId"];
+            this.sellerRelationId = _data["sellerRelationId"];
+            this.buyerRelationId = _data["buyerRelationId"];
             this.sellerCompanyName = _data["sellerCompanyName"];
             this.buyerContactEMailAddress = _data["buyerContactEMailAddress"];
             this.languageId = _data["languageId"];
@@ -93232,6 +93594,8 @@ export class GetOrderDetailsForViewDto implements IGetOrderDetailsForViewDto {
         data["buyerCompanySSIN"] = this.buyerCompanySSIN;
         data["buyerCompanyName"] = this.buyerCompanyName;
         data["sellerId"] = this.sellerId;
+        data["sellerRelationId"] = this.sellerRelationId;
+        data["buyerRelationId"] = this.buyerRelationId;
         data["sellerCompanyName"] = this.sellerCompanyName;
         data["buyerContactEMailAddress"] = this.buyerContactEMailAddress;
         data["languageId"] = this.languageId;
@@ -93359,6 +93723,8 @@ export interface IGetOrderDetailsForViewDto {
     buyerCompanySSIN: string | undefined;
     buyerCompanyName: string | undefined;
     sellerId: number | undefined;
+    sellerRelationId: number | undefined;
+    buyerRelationId: number | undefined;
     sellerCompanyName: string | undefined;
     buyerContactEMailAddress: string | undefined;
     languageId: number | undefined;
@@ -94182,6 +94548,82 @@ export class AccountDefaultAddressDto implements IAccountDefaultAddressDto {
 export interface IAccountDefaultAddressDto {
     addressType: string | undefined;
     addressId: number;
+
+    [key: string]: any;
+}
+
+export class AppContactRelationshipInfoDto implements IAppContactRelationshipInfoDto {
+    requesterContactSSIN!: string | undefined;
+    requesterContactName!: string | undefined;
+    recipientContactSSIN!: string | undefined;
+    recipientContactName!: string | undefined;
+    requesterContactTypeCode!: string | undefined;
+    recipientContactTypeCode!: string | undefined;
+    requesterMarketplaceRole!: string | undefined;
+    recipientMarketplaceRole!: string | undefined;
+
+    [key: string]: any;
+
+    constructor(data?: IAppContactRelationshipInfoDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.requesterContactSSIN = _data["requesterContactSSIN"];
+            this.requesterContactName = _data["requesterContactName"];
+            this.recipientContactSSIN = _data["recipientContactSSIN"];
+            this.recipientContactName = _data["recipientContactName"];
+            this.requesterContactTypeCode = _data["requesterContactTypeCode"];
+            this.recipientContactTypeCode = _data["recipientContactTypeCode"];
+            this.requesterMarketplaceRole = _data["requesterMarketplaceRole"];
+            this.recipientMarketplaceRole = _data["recipientMarketplaceRole"];
+        }
+    }
+
+    static fromJS(data: any): AppContactRelationshipInfoDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new AppContactRelationshipInfoDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["requesterContactSSIN"] = this.requesterContactSSIN;
+        data["requesterContactName"] = this.requesterContactName;
+        data["recipientContactSSIN"] = this.recipientContactSSIN;
+        data["recipientContactName"] = this.recipientContactName;
+        data["requesterContactTypeCode"] = this.requesterContactTypeCode;
+        data["recipientContactTypeCode"] = this.recipientContactTypeCode;
+        data["requesterMarketplaceRole"] = this.requesterMarketplaceRole;
+        data["recipientMarketplaceRole"] = this.recipientMarketplaceRole;
+        return data;
+    }
+}
+
+export interface IAppContactRelationshipInfoDto {
+    requesterContactSSIN: string | undefined;
+    requesterContactName: string | undefined;
+    recipientContactSSIN: string | undefined;
+    recipientContactName: string | undefined;
+    requesterContactTypeCode: string | undefined;
+    recipientContactTypeCode: string | undefined;
+    requesterMarketplaceRole: string | undefined;
+    recipientMarketplaceRole: string | undefined;
 
     [key: string]: any;
 }
@@ -102582,6 +103024,7 @@ export class GetMarketplaceAccountForViewDto implements IGetMarketplaceAccountFo
     connectionName!: string | undefined;
     disConnectLabel!: string | undefined;
     availableConnections!: ConnectionType[] | undefined;
+    connectionsInfo!: ConnectionInfo[] | undefined;
 
     [key: string]: any;
 
@@ -102612,6 +103055,11 @@ export class GetMarketplaceAccountForViewDto implements IGetMarketplaceAccountFo
                 for (let item of _data["availableConnections"])
                     this.availableConnections!.push(ConnectionType.fromJS(item));
             }
+            if (Array.isArray(_data["connectionsInfo"])) {
+                this.connectionsInfo = [] as any;
+                for (let item of _data["connectionsInfo"])
+                    this.connectionsInfo!.push(ConnectionInfo.fromJS(item));
+            }
         }
     }
 
@@ -102640,6 +103088,11 @@ export class GetMarketplaceAccountForViewDto implements IGetMarketplaceAccountFo
             for (let item of this.availableConnections)
                 data["availableConnections"].push(item.toJSON());
         }
+        if (Array.isArray(this.connectionsInfo)) {
+            data["connectionsInfo"] = [];
+            for (let item of this.connectionsInfo)
+                data["connectionsInfo"].push(item.toJSON());
+        }
         return data;
     }
 }
@@ -102653,6 +103106,7 @@ export interface IGetMarketplaceAccountForViewDto {
     connectionName: string | undefined;
     disConnectLabel: string | undefined;
     availableConnections: ConnectionType[] | undefined;
+    connectionsInfo: ConnectionInfo[] | undefined;
 
     [key: string]: any;
 }

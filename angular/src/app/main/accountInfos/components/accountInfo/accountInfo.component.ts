@@ -120,6 +120,7 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit {
 
     accountDataForView: AccountDto
     accountContactForView: any
+    entityExtraData:any
     isPublished: boolean;
     isSync: boolean;
     connectionCount: number;
@@ -141,6 +142,9 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit {
     editedContactPerData: any
     languageSettingName  =AppConsts.languageSettingName;
     relationId:number = 0 ;
+    roles:any
+            selectedRoles!: any[];
+            roleSeller:boolean = false;
     constructor(
         injector: Injector,
         private _route: ActivatedRoute,
@@ -154,8 +158,8 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit {
         private _activatedRoute: ActivatedRoute,
         private _sycIdentifierDefinitionsServiceProxy: SycIdentifierDefinitionsServiceProxy,
         private _marketplaceAccountsServiceProxy: MarketplaceAccountsServiceProxy,
-        private cdr: ChangeDetectorRef,
-         private location: Location,
+    
+        
     ) {
         super(injector);
 
@@ -168,9 +172,17 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit {
 
 
     async ngOnInit() {
+     
+        this.roles = [
+            { name: 'Buyer' },
+            { name: 'Seller' },
+            { name: 'Sales Rep' },
+            { name: 'Buying Office' },
+         
+        ];
 
       if (this.accountLevel == null) {
-        this.accountLevel = AccountLevelEnum.Profile;
+        this.accountLevel = AccountLevelEnum.Profile
       }
     
       await this.handleComponentMode();
@@ -179,6 +191,13 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit {
       this.handleRoutingChange();
       this.initUploaders();
       this.GetContactDefaults();
+        this.getRelationshipRoles(this._abpSessionService.tenantId, this.accountDataForView.ssin).subscribe(roles => {
+            this.roleSeller = (roles || []).some(r =>
+                (r.requesterMarketplaceRole || '').toLowerCase().includes('seller') ||
+                (r.recipientMarketplaceRole || '').toLowerCase().includes('seller')
+            );
+
+        });
     }
     
     get isExternalAccount(): boolean { return this.accountLevel == AccountLevelEnum.External && !this.viewMode }
@@ -354,8 +373,8 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit {
         this.getCurrencies();
         this.getPhoneTypes();
         this.allPriceLevel = this.getPriceLevel();
-       // this.getShipVia();
-       // this.getPaymentTerms();
+       this.getShipVia();
+       this.getPaymentTerms();
         this.getAccountTypes();
     }
 
@@ -417,6 +436,7 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit {
             this.getForEditResult = result
             this.accountInfoOldCurrencyId = this.getForEditResult?.accountInfo?.currencyId;
             this.setProfileData(result)
+              this.setSelectedMarketplaceRoles();
             if (!result.accountInfo.id) {
                 this.accountInfoTemp.name = this.appSession?.tenant?.name
                 this.accountInfoTemp.tradeName = this.appSession?.tenant?.name
@@ -459,6 +479,8 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit {
                 )
             this.accData = JSON.parse(JSON.stringify(result));
         this.relationId = result.relationId ? result.relationId : 0
+        this.entityExtraData = result ? result.entityExtraData : undefined
+
         }
 
         else {
@@ -495,6 +517,7 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit {
         this.isSync = result ? result.isSync : false;
         this.connectionCount = result ? result.connectionCount : 0;
         this.accountDataForView = result ? result.account : undefined
+        this.entityExtraData = result ? result.entityExtraData : undefined
         this.relationId = result.relationId ? result.relationId : 0
         this.accountContactForView = result ? result.contact : undefined
         this.isRecordOwner = this.accountDataForView?.id == this.appSession.user?.accountId ? true : false
@@ -898,77 +921,72 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit {
 
 
     saveMyAccount() {
-        this.accountInfoTemp.entityExtraData ??= [];
-    //     this.cleanPhones();
-        if (!this.accountInfoTemp.id) {
-            const mustHave = [701, 702, 703, 706, 707, 708, 709, 710, 711, 712, 713, 714, 715];
-            mustHave.forEach(id => this.ensureAttribute(id));
+    this.accountInfoTemp.entityExtraData ??= [];
 
-            // now it's safe to set values
-            this.setStringValue(701, this.accountInfoTemp.entityExtraData[0].attributeValue);
-            this.setStringValue(702, this.accountInfoTemp.entityExtraData[1].attributeValue);
-            this.setStringValue(707, '');     // instead of null
-            this.setStringValue(706, this.jobTitle); 
-            this.setBooleanValue(713, true);
-            this.setBooleanValue(708, true);
-            this.setBooleanValue(710, true);
-            this.setStringValue(715, '');     // instead of null
-            this.setBooleanValue(711, true);
-            this.setBooleanValue(712, true);
-            this.setBooleanValue(709, true);
-            this.setStringValue(703, '');     // instead of null
-            this.setBooleanValue(714, true);
+    if (!this.accountInfoTemp.id) {
+        const mustHave = [701, 702, 703, 706, 707, 708, 709, 710, 711, 712, 713, 714, 715];
+        mustHave.forEach(id => this.ensureAttribute(id));
 
-        }
+        this.setStringValue(701, this.accountInfoTemp.entityExtraData[0].attributeValue);
+        this.setStringValue(702, this.accountInfoTemp.entityExtraData[1].attributeValue);
+        this.setStringValue(707, '');
+        this.setStringValue(706, '');
+        this.setBooleanValue(713, true);
+        this.setBooleanValue(708, true);
+        this.setBooleanValue(710, true);
+        this.setStringValue(715, '');
+        this.setBooleanValue(711, true);
+        this.setBooleanValue(712, true);
+        this.setBooleanValue(709, true);
+        this.setStringValue(703, '');
+        this.setBooleanValue(714, true);
+    }
 
-        this.accountInfoTemp.accountLevel = 0
+    this.updateMarketplaceRolesExtraData();
+    this.accountInfoTemp.accountLevel = 0;
+    this.saving = true;
 
-        console.log(this.accountInfoTemp,'this.accountInfoTemp.accountLevel')
-       
-        this._AccountsServiceProxy.createOrEditMyAccount(this.accountInfoTemp)
+    this._AccountsServiceProxy.createOrEditMyAccount(this.accountInfoTemp)
         .pipe(finalize(() => {
-            this.updateLogoService.updateLogo();
-         
-          this.saving = false;          
+            this.saving = false;
         }))
-        .subscribe(result => {
-          if (!result) return;
-      
-      
-          this.accountId = result?.accountInfo?.id;
-          if (this.appSession?.user) {
-            this.appSession.user.accountId = this.accountId;  // keep session in sync
-          }
-      
-       
-          this.touched = false;
-          this.notify.success(this.l('SavedSuccessfully'));
-          this.appSession.tenant.currencyInfoDto =
-            this.allCurrencies.find(e => e.value == this.accountInfoTemp.currencyId);
-          this.tenantDefaultCurrency = this.appSession.tenant.currencyInfoDto;
-          this.displaySaveAccount = true;
-          this.canPublish = true;
-          this.getForEditResult.lastChangesIsPublished = false;
-          this.updateLogoService.updateLogo();
-      
-    
-          this.getAccountDataForView().then(() => {
+        .subscribe(async result => {
+            if (!result) return;
+       await this.tenantRoleService.loadRoles();
+            this.accountId = result?.accountInfo?.id;
+
+            if (this.appSession?.user) {
+                this.appSession.user.accountId = this.accountId;
+            }
+
+            this.touched = false;
+            this.notify.success(this.l('SavedSuccessfully'));
+
+            this.appSession.tenant.currencyInfoDto =
+                this.allCurrencies.find(e => e.value == this.accountInfoTemp.currencyId);
+            this.tenantDefaultCurrency = this.appSession.tenant.currencyInfoDto;
+            this.displaySaveAccount = true;
+            this.canPublish = true;
+            this.getForEditResult.lastChangesIsPublished = false;
+
+            this.updateLogoService.updateLogo();
+
+            await this.getMyAccountDataForView(); // one refresh only
 
             this._router.navigate(['/app/main/account'], {
-              queryParams: { tab: 'ProfileView' }
+                queryParams: { tab: 'ProfileView' }
             });
+
             this.changeTab(this.accountInfoPageTabsEnum.ProfileView);
-          });
         }, _ => {
-          this.touched = true;
+            this.touched = true;
         });
-      
-    }
+}
 
 
     async saveExternalOrManualAccount() {
    
-
+    this.updateMarketplaceRolesExtraData();
         this._AccountsServiceProxy.createOrEditAccount(this.accountInfoTemp)
             .pipe(finalize(() => {
                 this.saving = false;
@@ -1276,7 +1294,7 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit {
     }
 
     disConnect(): void {
-        this._AccountsServiceProxy.disconnect(this.accountDataForView.id)
+        this._AccountsServiceProxy.disconnect(this.accountDataForView.id,undefined)
             .subscribe(() => {
                 this.notify.success(this.l('SuccessfullyDisconnected'));
                 this.accountDataForView.status = false
@@ -1564,27 +1582,52 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit {
       }
  
 
-    //   private cleanPhones(): void {
-    //     const trimOrUndef = (v?: string) => {
-    //       const t = (v ?? '').trim();
-    //       return t.length ? t : undefined;
-    //     };
-      
-    //     this.accountInfoTemp.phone1Number = trimOrUndef(this.accountInfoTemp.phone1Number);
-    //     this.accountInfoTemp.phone1Ex     = trimOrUndef(this.accountInfoTemp.phone1Ex);
-      
-    //     this.accountInfoTemp.phone2Number = trimOrUndef(this.accountInfoTemp.phone2Number);
-    //     this.accountInfoTemp.phone2Ex     = trimOrUndef(this.accountInfoTemp.phone2Ex);
-      
-    //     this.accountInfoTemp.phone3Number = trimOrUndef(this.accountInfoTemp.phone3Number);
-    //     this.accountInfoTemp.phone3Ex     = trimOrUndef(this.accountInfoTemp.phone3Ex);
-      
-    //     // لو الرقم فاضي، خلي النوع undefined عشان مايتبعتش لوحده
-    //     if (!this.accountInfoTemp.phone1Number) this.accountInfoTemp.phone1TypeId = undefined;
-    //     if (!this.accountInfoTemp.phone2Number) this.accountInfoTemp.phone2TypeId = undefined;
-    //     if (!this.accountInfoTemp.phone3Number) this.accountInfoTemp.phone3TypeId = undefined;
-    //   }
-      
-            
+buildMarketplaceRolesExtraData(): AppEntityExtraDataDto[] {
+  if (!this.selectedRoles?.length) {
+    return [];
+  }
+
+  const uniqueRoles = [...new Set(this.selectedRoles)].filter(Boolean);
+  const joinedRoles = uniqueRoles.join('-');
+
+  const dto = new AppEntityExtraDataDto();
+  dto.entityId = this.accountInfoTemp?.id || 0;
+  dto.entityObjectTypeId = 610;
+  dto.entityObjectTypeCode = 'PROD-RAWM-TRIM-POMP'; // keep your actual backend value
+  dto.entityObjectTypeName = 'Marketplace Role';
+  dto.attributeValueId = null;
+  dto.attributeValue = joinedRoles;
+  dto.attributeId = 610;
+  dto.attributeValueFkName = null;
+  dto.attributeValueFkCode = null;
+  dto.attributeCode = 'MARKETPLACE-ROLE';
+  dto.id = 0;
+
+  return [dto];
+}
+
+updateMarketplaceRolesExtraData(): void {
+  if (!this.accountInfoTemp) {
+    return;
+  }
+
+  this.accountInfoTemp.entityExtraData = [
+    ...(this.accountInfoTemp.entityExtraData || []).filter(
+      item => item.attributeCode !== 'MARKETPLACE-ROLE'
+    ),
+    ...this.buildMarketplaceRolesExtraData()
+  ];
+}
+
+
+setSelectedMarketplaceRoles(): void {
+  const marketplaceRole = this.accountInfoTemp?.entityExtraData?.find(
+    x => x.attributeCode === 'MARKETPLACE-ROLE'
+  );
+
+  this.selectedRoles = marketplaceRole?.attributeValue
+    ? marketplaceRole.attributeValue.split('-').filter(x => x)
+    : [];
+}
     
 }

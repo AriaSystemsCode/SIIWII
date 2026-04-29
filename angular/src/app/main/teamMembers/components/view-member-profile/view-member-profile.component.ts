@@ -1,5 +1,5 @@
 import { Component, ViewChild, Injector, Output, EventEmitter, OnInit, Input, ViewEncapsulation } from '@angular/core';
-import { AccountsServiceProxy, ContactDto, ContactForEditDto, SycAttachmentCategoryDto, CreateOrEditAccountInfoDto, TreeNodeOfBranchForViewDto, BranchForViewDto, UserEditDto, GetAllEntityObjectTypeOutput, SycEntityObjectTypesServiceProxy, UserServiceProxy, UserListDto, AppEntityExtraDataDto } from '@shared/service-proxies/service-proxies';
+import { AccountsServiceProxy, SycAttachmentCategoryDto, CreateOrEditAccountInfoDto, TreeNodeOfBranchForViewDto, BranchForViewDto, UserEditDto,  UserServiceProxy, UserListDto, AppEntityExtraDataDto } from '@shared/service-proxies/service-proxies';
 import { AppComponentBase } from '@shared/common/app-component-base';
 import { NgImageSliderComponent } from 'ng-image-slider';
 import { AppConsts } from '@shared/AppConsts';
@@ -9,8 +9,6 @@ import { appModuleAnimation } from '@shared/animations/routerTransition';
 import { Observable } from 'rxjs';
 import { SelectBranchModalComponent } from '@app/select-branch/select-branch-modal/select-branch-modal.component';
 import { CreateOrEditUserModalComponent } from '@app/admin/users/create-or-edit-user-modal.component';
-import { CreateEditAppItemExtraAttribute } from '@app/main/app-items/app-item-shared/models/create-edit-app-item-extra-attribute';
-import { EExtraAttributeUsage } from '@app/main/app-items/appItems/models/extra-attribute-usage.enum';
 import { ActivatedRoute } from '@node_modules/@angular/router';
 import Swal from 'sweetalert2';
 import { UpdateLogoService } from '@shared/utils/update-logo.service';
@@ -23,7 +21,7 @@ import { UpdateLogoService } from '@shared/utils/update-logo.service';
   animations: [appModuleAnimation()]
 })
 export class ViewMemberProfileComponent extends AppComponentBase implements OnInit {
-  @ViewChild('nav') slider: NgImageSliderComponent;
+
   @ViewChild('selectBranchModal', { static: true }) selectBranchModal: SelectBranchModalComponent;
   @ViewChild("createOrEditUserModal", { static: true }) createOrEditUserModal: CreateOrEditUserModalComponent;
 
@@ -58,21 +56,6 @@ export class ViewMemberProfileComponent extends AppComponentBase implements OnIn
   adminContact: boolean = false;
   isManualOrExternalContact: boolean = true
 
-  data: any
-  allAttributes = []; // flat list from API
-  groupedByUsage = {}; // { RECOMMENDED: [], ADDITIONAL: [] }
-  usageList: string[] = []; // for sidebar
-  selectedUsage: string;
-
-
-  selectedTransactionTypeData: GetAllEntityObjectTypeOutput =
-    new GetAllEntityObjectTypeOutput();
-  selectedTransTypeData: any
-  extraAttributes: any;
-
-  activeAccordionIndexes: number[] = [0]; // open first tab by default
-  appTransactionsForViewDto: any
-  hasUnsavedChanges = false;
   editInfo = true;
   NoteditInfo = false;
   userAdminId :number
@@ -82,7 +65,7 @@ export class ViewMemberProfileComponent extends AppComponentBase implements OnIn
   memberIslink: boolean = false;
   showUserList: boolean = false;
 
-  constructor(injector: Injector, private _AccountsServiceProxy: AccountsServiceProxy, private _sycEntityObjectTypesServiceProxy: SycEntityObjectTypesServiceProxy, private _userService: UserServiceProxy,private route: ActivatedRoute,  private updateLogoService: UpdateLogoService) {
+  constructor(injector: Injector, private _AccountsServiceProxy: AccountsServiceProxy,  private _userService: UserServiceProxy,private route: ActivatedRoute) {
     super(injector);
     this.accountInfoTemp = new CreateOrEditAccountInfoDto();
 
@@ -184,7 +167,6 @@ export class ViewMemberProfileComponent extends AppComponentBase implements OnIn
         finalize(() => {
           this.hideMainSpinner();
           this.active = true;
-          this.getAppItemTypeExtraAttributesById();
         })
       )
       .subscribe(result => {
@@ -320,7 +302,6 @@ export class ViewMemberProfileComponent extends AppComponentBase implements OnIn
       attr.attributeValue = this.editjobTitleValue
     }
     this.newEditMemberInfo = this.memberData;
-    // this.newEditMemberInfo.jobTitle = this.editjobTitleValue;
     this.newEditMemberInfo.branchName = this.editBranchValue;
     this.newEditMemberInfo.parentId = this.selectedBranchid;
 
@@ -399,85 +380,6 @@ export class ViewMemberProfileComponent extends AppComponentBase implements OnIn
   }
 
 
-  defineExtraAttributes() {
-    this.extraAttributes = {};
-
-    const allAttributes = this.selectedTransTypeData?.extraAttributes?.extraAttributes ?? [];
-
-    allAttributes.forEach(attr => {
-      const usageKey = attr.usage?.replace(/\s+/g, '_').toUpperCase() || 'DEFAULT';
-
-      if (!this.extraAttributes[usageKey]) {
-        this.extraAttributes[usageKey] = new CreateEditAppItemExtraAttribute({
-          header: this.l(attr.usage),
-          title: this.l(attr.usage),
-          usageEnum: usageKey as unknown as EExtraAttributeUsage,
-          orderOfDisplay: 1,
-          filteredExtraAttributes: [],
-          extraAttributes: []
-        });
-      }
-
-      // ✅ Add this if missing
-      if (!attr.paginationSetting) {
-        attr.paginationSetting = {
-          skipCount: 0,
-          maxResultCount: 10,
-          totalCount: 0,
-          list: []
-        };
-      }
-
-
-
-      this.extraAttributes[usageKey].filteredExtraAttributes.push(attr);
-    });
-
-  }
-
-  getAppItemTypeExtraAttributesById() {
-    this._sycEntityObjectTypesServiceProxy.getAllWithExtraAttributes(this.memberData?.accountTypeId)
-      .subscribe((res) => {
-        if (res?.length > 0) {
-          this.allAttributes = res[0]?.extraAttributes?.extraAttributes ?? [];
-
-
-          // Group attributes by `usage`
-          this.groupedByUsage = this.groupAttributesByUsage(this.allAttributes);
-          this.usageList = Object.keys(this.groupedByUsage);
-          this.selectedUsage = this.usageList[0];
-
-          // ✅ Initialize extraAttributes before using it
-          this.selectedTransTypeData = res[0]; // ensure defineExtraAttributes uses correct data
-          this.defineExtraAttributes();
-
-          //   this.loadRecommendedAndAdditionalExtraDataLookupLists();
-
-          //   setTimeout(() => this.scrollToUsage(this.selectedUsage), 200);
-        }
-      });
-  }
-
-
-
-
-
-
-
-
-
-  groupAttributesByUsage(attrs: any[]): any {
-    return attrs.reduce((acc, attr) => {
-      const usage = attr.usage || 'UNSPECIFIED';
-      if (!acc[usage]) acc[usage] = [];
-      acc[usage].push(attr);
-      return acc;
-    }, {});
-  }
-
-  selectUsage(usage: string): void {
-    this.selectedUsage = usage;
-  }
 
   getUserIdValue(): string | null {
 
@@ -501,11 +403,6 @@ export class ViewMemberProfileComponent extends AppComponentBase implements OnIn
   }
   
 
-  get jobTitleAttr() {
-    return this.memberData?.extraDataAttributes?.find(attr => attr.extraAttributeId === 706);
-  }
-
-
   getJoinDate(): string | null {
     const joinDateAttr = this.memberData?.extraDataAttributes?.find(attr => attr.extraAttributeId === 707);
     const val = joinDateAttr?.selectedValues?.[joinDateAttr.selectedValues.length - 1]?.value;
@@ -519,11 +416,6 @@ export class ViewMemberProfileComponent extends AppComponentBase implements OnIn
   }
 
 
-  get userId() {
-    return this.memberData?.extraDataAttributes?.find(attr => attr.extraAttributeId === 715);
-  }
-
-
   refresh(event: boolean) {
     if (event && this.lastInputId) {
       this.show({
@@ -534,11 +426,6 @@ export class ViewMemberProfileComponent extends AppComponentBase implements OnIn
       });
     }
   }
-  getBooleanValue(attrId: number): string {
-    const attr = this.memberData?.extraDataAttributes?.find(x => x.extraAttributeId === attrId);
-    const lastValue = attr?.selectedValues?.[attr.selectedValues.length - 1]?.value;
-    return lastValue;
-  }
 
 
   getStringValue(attrId: number): string {
@@ -546,17 +433,6 @@ export class ViewMemberProfileComponent extends AppComponentBase implements OnIn
   }
   
 
-
-  // setBooleanValue(attrId: number, checked: boolean): void {
-  //   const attr = this.memberDto?.extraDataAttributes?.find(x => x.extraAttributeId === attrId);
-  //   if (attr?.selectedValues?.length > 0) {
-  //     attr.selectedValues[0].value = checked.toString();
-  //   }
-  //   const attri = this.memberDto?.entityExtraData?.find(x => x.attributeId === attrId);
-  //   attri.attributeValue =  checked.toString()
-
-
-  // }
 
   toggleUserList() {
     this.showUserList = !this.showUserList;

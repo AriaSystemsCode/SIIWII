@@ -1,12 +1,9 @@
-
-
-
 import {
     Component,
     Injector,
     OnDestroy,
     ViewChild,
-    SimpleChanges, OnChanges, ViewChildren, ElementRef,
+    SimpleChanges, OnChanges, ViewChildren, 
     Input,
     QueryList
 } from "@angular/core";
@@ -15,7 +12,8 @@ import { AppItemsComponent } from "@app/main/app-items/app-items-browse/componen
 import {
     AppEntitiesServiceProxy,
     AppMarketplaceItemsServiceProxy,
-    SycEntityObjectCategoriesServiceProxy,
+    CurrencyInfoDto,
+    GetAppMarketItemForViewDto,
 } from "@shared/service-proxies/service-proxies";
 import { appModuleAnimation } from "@shared/animations/routerTransition";
 import { PricingHelpersService } from "@app/main/app-items/app-item-shared/services/pricing-helpers.service";
@@ -38,10 +36,18 @@ export class MarketplaceProductsComponent
     implements OnDestroy, OnChanges {
     @ViewChild("AppItemsBrowseComponent") appItemsBrowseComponent: AppItemsComponent;
     @ViewChildren(ProdcutCardComponent) ProdcutCardComponent: ProdcutCardComponent;
+    @ViewChild("p", { static: false }) paginator!: Paginator;
+    @ViewChild("filters", { static: false }) filters!: any;
+    @ViewChildren(ProdcutCardComponent) productCards!: QueryList<ProdcutCardComponent>; 
+
+    @Input() fromMarketAcoount: boolean;
+    @Input() accountDataForView: any
+    @Input() marketplaceAccCurrency: string
+
     isFilterHidden: boolean = false;
     sellerData: any;
     isSellerIdExists: boolean = false;
-    currencies: any[];
+    currencies: CurrencyInfoDto[];
     selectedCurrrency: any;
     searchInput: string;
     sortingData: any[];
@@ -50,26 +56,23 @@ export class MarketplaceProductsComponent
     seletedOption: any;
     sharingLevel: number;
     currency: string;
-    sortBy: number;
     appSession: AppSessionService;
     skipCount: number = 0;
     maxResultCount: number = 12;
     pagesNumber: number;
     displayFitlers: boolean = false;
     filterType: string;
-    tentantID: any;
+    tentantID: number;
     isMobile: boolean = false;
-    @ViewChild("p", { static: false })
-    paginator!: Paginator;
-    @ViewChild("filters", { static: false }) filters!: any;
-    sellerSSIN: any;
-    buyerSSIN: any;
-    contactSSIN: any;
+    
+    sellerSSIN: string;
+    buyerSSIN: string;
+    contactSSIN: string;
     acceptedAspectRatio;
 
     isFromSellerRoom: boolean
-    ismarketPLace: boolean
-    items: any[];
+
+    items: GetAppMarketItemForViewDto[];
     minimumPrice: number;
     maximumPrice: number;
     timeOut: any;
@@ -78,17 +81,14 @@ export class MarketplaceProductsComponent
     selectedDepartments: any;
 
     isAuthenticate= this.appSession?.user
-
     selectedCategories: number[] = []; 
 
-    @Input() fromMarketAcoount: boolean;
-    @Input() accountDataForView: any
-    @Input() marketplaceAccCurrency: string
-    @ViewChildren(ProdcutCardComponent)
-productCards!: QueryList<ProdcutCardComponent>; 
+     
     brandIdFromUrl: number | null = null;
     catIdFromUrl: number | null = null;
     sellerSSinSetting:string
+
+
     constructor(
         injector: Injector,
         private _router: Router,
@@ -98,11 +98,10 @@ productCards!: QueryList<ProdcutCardComponent>;
         public datepipe: DatePipe,
         public breakpointObserver: BreakpointObserver,
         private route: ActivatedRoute,   
-         private _sycEntityObjectCategoriesServiceProxy: SycEntityObjectCategoriesServiceProxy,
+
     ) {
         super(injector);
         this.isFromSellerRoom = JSON.parse(localStorage.getItem("fromSellerRoom"));
-        this.ismarketPLace = JSON.parse(localStorage.getItem("fromMarketPlace"));
 
 
         if (localStorage.getItem("contactSSIN") && localStorage.getItem("contactSSIN") != "undefined") {
@@ -185,49 +184,12 @@ productCards!: QueryList<ProdcutCardComponent>;
           this.skipCount = parsedFilters.skipCount || this.skipCount;
           this.maxResultCount = parsedFilters.maxResultCount || this.maxResultCount;
         }
-      // 🔗 URL (by ID) takes priority if present
-      // this.route.queryParamMap.subscribe((params) => {
-      //   const q = params.get('q');
-      //   if (q !== null) {
-      //     this.searchInput = q; // URL wins over local storage
-      //   }
-    
-      //   // brand can be single or multiple: ?brand=1&brand=2
-      //   const brandParams = params.getAll('brand');
-      //   if (brandParams && brandParams.length) {
-      //     this.brands = brandParams.map(v => +v)
-      //   }
-    
-      //   const deptParam = params.get('dept');
-      //   if (deptParam) {
-      //     const id = +deptParam;
-      //     this.selectedDepartments = [id];
-      //     if (this.filters) this.filters.preselectDeptId = id;
-      //   }
-    
-      //   const listParam = params.get('proList');
-      //   if (listParam) {
-      //     const id = +listParam;
-      //     this.appItemListId = id || null;
-      //     if (this.filters) this.filters.catalogId = id ?? null;
-      //   }
-    
-      //   const catParam = params.get('cat');
-      //   if (catParam) {
-      //     const id = +catParam;
-      //     this.selectedCategories = [id];
-      //     if (this.filters) this.filters.preselectCategoryId = id;
-      //   }
-    
-      //   this.getAllProducts(); // apply filters
-      // });
 
       this.getSettingData().subscribe({
         next: (res) => {
           
           this.sellerSSinSetting = (res as any)?.value ?? (res as any) ?? null;
-          // this.sellerSSinSetting = 'Business-000000005866';
-     
+
           this.route.queryParamMap.subscribe((params) => {
             const q = params.get('q');
             if (q !== null) this.searchInput = q;
@@ -362,11 +324,11 @@ productCards!: QueryList<ProdcutCardComponent>;
                 : this.sellerSSinSetting? this.sellerSSinSetting: sessionStorage.getItem("SellerSSIN"),
                 null,
                 requestParams.appItemListId ||  this.appItemListId,
-                false, // false
+                false, 
                 requestParams.searchText || this.searchInput,
-                null, //null
-                null, //null
-                null, // null
+                null, 
+                null,
+                null, 
                 requestParams.selectedDepartments ||     this.selectedDepartments,
                 requestParams.minimumPrice||     this.minimumPrice,
                 requestParams.maximumPrice || this.maximumPrice,
@@ -420,7 +382,7 @@ productCards!: QueryList<ProdcutCardComponent>;
         } catch { code = raw; }
       }
     
-      this.selectedCurrrency = this.currencies?.find(c => c.code === code) || this.currencies?.[0] || null;
+      this.selectedCurrrency = this.currencies?.find(c => c.code === code) || 'USD';
       this.currency = this.selectedCurrrency?.code || code;
     }
 
@@ -641,42 +603,83 @@ productCards!: QueryList<ProdcutCardComponent>;
         }
 
     }
-    private getCurrencyCodeForRequest(): string {
+    // private getCurrencyCodeForRequest(): string {
    
-        if (this.selectedCurrrency && typeof this.selectedCurrrency === 'object' && this.selectedCurrrency.code) {
-          return this.selectedCurrrency.code;
-        }
+    //     if (this.selectedCurrrency && typeof this.selectedCurrrency === 'object' && this.selectedCurrrency.code) {
+    //       return this.selectedCurrrency.code;
+    //     }
     
-        if (typeof this.selectedCurrrency === 'string' && this.selectedCurrrency.trim()) {
-          return this.selectedCurrrency.trim();
-        }
+    //     if (typeof this.selectedCurrrency === 'string' && this.selectedCurrrency.trim()) {
+    //       return this.selectedCurrrency.trim();
+    //     }
     
-        const stored = localStorage.getItem('currencyCode');
-        if (stored && stored !== 'undefined' && stored !== 'null') {
-          try {
-            const parsed = JSON.parse(stored);
+    //     const stored = localStorage.getItem('currencyCode');
+    //     if (stored && stored !== 'undefined' && stored !== 'null') {
+    //       try {
+    //         const parsed = JSON.parse(stored);
     
-            if (typeof parsed === 'string' && parsed.trim()) {
-              return parsed.trim();
-            }
+    //         if (typeof parsed === 'string' && parsed.trim()) {
+    //           return parsed.trim();
+    //         }
     
-            if (parsed && typeof parsed === 'object' && parsed.code) {
-              return parsed.code;
-            }
-          } catch {
+    //         if (parsed && typeof parsed === 'object' && parsed.code) {
+    //           return parsed.code;
+    //         }
+    //       } catch {
     
-            if (stored.trim()) {
-              return stored.trim();
-            }
-          }
-        }
+    //         if (stored.trim()) {
+    //           return stored.trim();
+    //         }
+    //       }
+    //     }
     
-        if ((this as any).tenantDefaultCurrency?.code) {
-          return (this as any).tenantDefaultCurrency.code;
-        }
+    //     if ((this as any).tenantDefaultCurrency?.code) {
+    //       return (this as any).tenantDefaultCurrency.code;
+    //     }
       
-        return 'USD';
+    //     return 'USD';
+    //   }
+
+      private getCurrencyCodeForRequest(): string {
+
+  const clean = (val: any): string | null => {
+    if (!val) return null;
+
+    if (typeof val === 'string') {
+      const v = val.trim();
+      if (!v || v === 'undefined' || v === 'null') return null;
+      return v;
+    }
+
+    if (typeof val === 'object' && val.code) {
+      return val.code;
+    }
+
+    return null;
+  };
+
+  // 1. selected currency
+  let code = clean(this.selectedCurrrency);
+
+  // 2. localStorage
+  if (!code) {
+    const stored = localStorage.getItem('currencyCode');
+    if (stored) {
+      try {
+        code = clean(JSON.parse(stored)) || clean(stored);
+      } catch {
+        code = clean(stored);
       }
+    }
+  }
+
+  // 3. tenant default
+  if (!code && (this as any).tenantDefaultCurrency?.code) {
+    code = clean((this as any).tenantDefaultCurrency.code);
+  }
+
+  return code || 'USD';
+}
 
       getSettingData() {
         return this._AppEntitiesServiceProxy.getHostSettingValue(1316, null);

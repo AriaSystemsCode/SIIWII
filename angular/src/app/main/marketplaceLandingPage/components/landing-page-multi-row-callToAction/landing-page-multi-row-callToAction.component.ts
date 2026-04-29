@@ -17,6 +17,8 @@ import { finalize } from 'rxjs';
 export class LandingPageMultiRowCallToActionComponent extends AppComponentBase implements OnInit {
   @Input() sectionId!: number;
   @Input() blockTypeIsSingleOrMixed: string
+  @Input() loginTenaneSsin: string
+
   @ViewChild("viewEventModal", { static: true }) viewEventModal: ViewEventComponent;
 
   sliderItems: PageSettingDto[] = [];
@@ -31,6 +33,8 @@ export class LandingPageMultiRowCallToActionComponent extends AppComponentBase i
   showMsrP: boolean
     currentLang:string
     isArabic:boolean 
+    isSmallScreen = false;
+
   constructor(
     injector: Injector,
     private sydObjectsService: SydObjectsServiceProxy,
@@ -46,8 +50,13 @@ export class LandingPageMultiRowCallToActionComponent extends AppComponentBase i
     if (this.sectionId) {
       this.getBlocksData();
     }
-  }
+        this.checkScreenSize();
+  window.addEventListener('resize', this.checkScreenSize.bind(this));
 
+    }
+    checkScreenSize(): void {
+  this.isSmallScreen = window.innerWidth <= 1023;
+}
   private compareByOrder = (a: PageSettingDto, b: PageSettingDto) => {
     const ao = Number.isFinite((a as any)?.order) ? (a as any).order as number : Number.MAX_SAFE_INTEGER;
     const bo = Number.isFinite((b as any)?.order) ? (b as any).order as number : Number.MAX_SAFE_INTEGER;
@@ -252,7 +261,7 @@ export class LandingPageMultiRowCallToActionComponent extends AppComponentBase i
     this.showMainSpinner();
 
     this._accountsServiceProxy
-      .disconnect(id)
+      .disconnect(id,undefined)
       .pipe(finalize(() => this.hideMainSpinner()))
       .subscribe((res: any[]) => {
         this.notify.success(this.l('SuccessfullyDisconnected'));

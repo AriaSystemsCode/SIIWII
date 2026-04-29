@@ -133,7 +133,7 @@ export class CreateOrEditExtraDataComponent extends AppComponentBase implements 
       }
     });
 
-    // ✅ Step 2: No filter — keep all values
+    //  Step 2: No filter — keep all values
     const cleanIncomingData = incomingData;
 
     // Step 3: Remove old entries for incoming attributeIds

@@ -1,11 +1,12 @@
 import { Component, Injector, Input, SimpleChanges, ViewChild } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup } from '@angular/forms';
 import { AppComponentBase } from '@shared/common/app-component-base';
-import { AccountDto, AccountsServiceProxy, AppEntitiesServiceProxy, GetAccountForViewDto, LookupLabelDto, MarketplaceAccountsServiceProxy } from '@shared/service-proxies/service-proxies';
+import { AccountDto, AccountsServiceProxy, AppEntitiesServiceProxy, AppTransactionServiceProxy, GetAccountForViewDto, LookupLabelDto, MarketplaceAccountsServiceProxy } from '@shared/service-proxies/service-proxies';
 import { AbpSessionService } from 'abp-ng2-module';
 import { LazyLoadEvent, SelectItem } from 'primeng/api';
 import { Paginator } from 'primeng/paginator';
 import {  finalize, Observable } from 'rxjs';
+import { forkJoin } from 'rxjs';
 
 @Component({
   selector: 'app-connections-tab',
@@ -18,6 +19,7 @@ export class ConnectionsTabComponent extends AppComponentBase {
   @Input() marketPlaceData :AccountDto;
   @Input() fromOverview:boolean = false;
   @Input() isActive: boolean = true;
+  @Input() loginTenaneSsin;
 
   @ViewChild("paginator", { static: true }) paginator: Paginator;
 
@@ -34,13 +36,15 @@ export class ConnectionsTabComponent extends AppComponentBase {
   showData:boolean =true;
 
   private connectionsLoaded = false;
-      isAuthenticate= this.appSession?.user
+  isAuthenticate= this.appSession?.user
+  
+
   constructor(
     injector: Injector,
     private _abpSessionService: AbpSessionService,
     private _accountsServiceProxy: AccountsServiceProxy,
     private _appEntitiesServiceProxy:AppEntitiesServiceProxy,
-    private _formBuilder: FormBuilder) {
+    private _formBuilder: FormBuilder,      private AppTransactionServiceProxy:AppTransactionServiceProxy) {
     super(injector);
 
   }
@@ -228,51 +232,86 @@ this.accountsTypes=result.items;
                   }
   });
 }
-// connect(account: AccountDto): void {
-//   this.showMainSpinner();
-//   this._accountsServiceProxy
-//       .connectContactsProfiles(account.id,null,null)
-//       .pipe(
-//           finalize(() => {
-//               this.hideMainSpinner();
-//           })
-//       )
-//       .subscribe(() => {
-//           this.notify.success(this.l("SuccessfullyConnected"));
-//           account.status = true;
-//       });
-// }
 
 
+createRelation(account) {
+  if (!account?.account?.account?.id || !account?.relation?.connectionEntityId) {
+    return;
+  }
 
-  createRelation(account, status: boolean = false) {
-        this.showMainSpinner();
-        this._accountsServiceProxy
-          .applyRelationOnProfile(
-            account.account.account.id,
-            undefined,
-            account.relation.defaultVisibility === 'Public',
-            account.relation.connectionEntityId
-          )
-          .pipe(finalize(() => this.hideMainSpinner()))
-          .subscribe((result: any) => {
-          
-            const raw = typeof result === 'string' ? result : result?.result ?? '';
-            const { connectionName, disConnectLabel } = this.splitLabels(raw);
-      
-            const i = this.accounts.findIndex(x => x.account.id === account.account.account.id);
-            if (i >= 0) {
-              
-              this.accounts[i] = account.account;
-      
-              this.accounts[i].availableConnections = [];
-              this.accounts[i].avaliableConnectionName = '';
-      
-              this.accounts[i].connectionName   = this.l(connectionName);
-              this.accounts[i].disConnectLabel  = this.l(disConnectLabel);
-            }
-          });
+  this.showMainSpinner();
+
+  forkJoin({
+    recipientRoles: this.AppTransactionServiceProxy.getAccountMarketplaceRoles(
+      account.account.account.ssin
+    ),
+    loggedTenantRoles: this.AppTransactionServiceProxy.getAccountMarketplaceRoles(
+      this.loginTenaneSsin
+    )
+  })
+    .pipe(finalize(() => this.hideMainSpinner()))
+    .subscribe(({ recipientRoles, loggedTenantRoles }: any) => {
+      const recipientHasRoles = this.hasMarketplaceRoles(recipientRoles);
+      const loggedTenantHasRoles = this.hasMarketplaceRoles(loggedTenantRoles);
+
+      if (!recipientHasRoles || !loggedTenantHasRoles) {
+        this.message.info(
+          'Cannot connect, you need to update the marketplace role of your account / the recipient account marketplace role in order to build relationship together',
+          ''
+        );
+        return;
       }
+
+      this.applyRelation(account);
+    });
+}
+
+private hasMarketplaceRoles(response: any): boolean {
+  const roles = response?.result ?? response;
+  return Array.isArray(roles) && roles.length > 0;
+}
+
+private applyRelation(account): void {
+  this.showMainSpinner();
+
+  this._accountsServiceProxy
+    .applyRelationOnProfile(
+      account.account.account.id,
+      undefined,
+      account.relation.defaultVisibility === 'Public',
+      account.relation.connectionEntityId
+    )
+    .pipe(finalize(() => this.hideMainSpinner()))
+    .subscribe((result: any) => {
+      const raw = typeof result === 'string' ? result : result?.result ?? '';
+      const { connectionName, disConnectLabel } = this.splitLabels(raw);
+
+      const i = this.accounts.findIndex(x => x.account.id === account.account.account.id);
+      if (i < 0) return;
+
+      const currentAccount = this.accounts[i];
+
+      currentAccount.availableConnections = (currentAccount.availableConnections || []).filter(
+        x => x.connectionEntityId !== account.relation.connectionEntityId
+      );
+
+      currentAccount.connectionName = this.l(connectionName);
+      currentAccount.disConnectLabel = this.l(disConnectLabel);
+
+      currentAccount.avaliableConnectionName =
+        currentAccount.availableConnections?.length > 0
+          ? currentAccount.availableConnections[0].connectLabel
+          : '';
+
+      currentAccount.connectionsInfo = currentAccount.connectionsInfo || [];
+
+      if (Array.isArray(result) && result.length > 0) {
+        currentAccount.connectionsInfo.push(result[0]);
+      }
+
+      this.accounts = [...this.accounts];
+    });
+}
 
     private splitLabels(raw: string) {
       // split at the first '-' that precedes the second "MPAction..."
@@ -282,24 +321,35 @@ this.accountsTypes=result.items;
         : { connectionName: raw || '', disConnectLabel: '' };
     }
 
-    disconnect(account: AccountDto): void {
 
-      this.showMainSpinner();
-      this._accountsServiceProxy
-          .disconnect(account.account.id)
-          .pipe(
-              finalize(() => {
-                  this.hideMainSpinner();
-              })
-          )
-          .subscribe((res) => {
-              this.notify.success(this.l("SuccessfullyDisconnected"));
-              account.status = false;
-              account.connectionName = "";
-              account.avaliableConnectionName = res[0].connectLabel
-              account.availableConnections = res
-          });
-  }
+    disconnect(event): void {
+   
+
+    this.showMainSpinner();
+    this._accountsServiceProxy
+        .disconnect(event.account.account.id, event.relation.relationEntityId)
+        .pipe(
+            finalize(() => {
+                this.hideMainSpinner();
+            })
+        )
+        .subscribe((res) => {
+      
+       this.notify.success(this.l("SuccessfullyDisconnected"));
+
+            event.account.connectionsInfo = (event.account.connectionsInfo || []).filter(
+                x => x.relationEntityId !== event.relation.relationEntityId
+            );
+            event.account.availableConnections.push(res[0])
+            // event.account.connectionsInfo = (event.account.connectionsInfo || []).filter(
+            //     x => x.relationEntityId !== event.relation.relationEntityId
+            // );
+            // event.account.availableConnections = res || [];
+            // event.account.status = event.account.connectionsInfo.length > 0;
+            // event.account.connectionName = '';
+            // event.account.avaliableConnectionName = res?.length ? res[0].connectLabel : '';
+        });
+}
 
   setConnectionType(code: number): void {
     this.connectionTypeId = code;

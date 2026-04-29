@@ -2,7 +2,8 @@
   <div *ngFor="let block of sliderItems" class="product-col">
     <div class="block-card" [ngClass]=" blockTypeIsSingleOrMixed !='Single Type Blocks'?  'block-card-mixed':''" [style.aspect-ratio]="acceptedAspectRatio">
       <div class="block-type-badge"  [ngClass]="isArabic ? 'arPos':'enPos'">
-    <i [ngClass]="getBlockTypeIcon(block)" [pTooltip]="getBlockTypeLabel(block) | localize" tooltipPosition="bottom"></i>
+    <i [ngClass]="getBlockTypeIcon(block)" [pTooltip]="getBlockTypeLabel(block) | localize" tooltipPosition="bottom"   [tooltipEvent]="isSmallScreen ? 'focus' : 'hover'" [autoHide]="true" [showDelay]="100" [hideDelay]="100"
+                [tabindex]="isSmallScreen ? 0 : null"></i>
     <!-- <span>{{ getBlockTypeLabel(block?.blockType) }}</span> -->
   </div>
       <ng-container [ngSwitch]="block?.blockType?.toUpperCase()">
@@ -48,7 +49,7 @@
 
 
         <!-- EVENT -->
-        <div *ngSwitchCase="'EVENT'" class="mr-2">
+        <div *ngSwitchCase="'EVENT'" class="">
           <app-marketplace-event-card *ngIf="blockTypeIsSingleOrMixed =='Mixed Types Blocks'" [block]="block?.getAppEventForViewDto?.appEvent"  (details)="openEventDetails($event)"></app-marketplace-event-card>
           
 
@@ -62,7 +63,7 @@
         <!-- ACCOUNT -->
         <div *ngSwitchCase="'CONTACT'">
           <app-marketplace-account-card  *ngIf="blockTypeIsSingleOrMixed =='Mixed Types Blocks'"  [account]="block?.getAccountForViewDto" [compact]="true"
-            [showConnectButton]="true"></app-marketplace-account-card>
+            [showConnectButton]="true" [loginTenaneSsin]="loginTenaneSsin"></app-marketplace-account-card>
             
           <app-account-card *ngIf="blockTypeIsSingleOrMixed !='Mixed Types Blocks' || blockTypeIsSingleOrMixed ==null"
             [account]="block?.getAccountForViewDto" [FromLandingPage]="true" [fromMarketplace]="true" [cardsViewMode]="true"  (disconnectMe)="

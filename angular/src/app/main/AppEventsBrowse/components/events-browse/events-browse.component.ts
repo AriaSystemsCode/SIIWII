@@ -230,23 +230,13 @@ export class EventsBrowseComponent extends AppComponentBase  implements OnInit,O
                             this.loading = true
                             this.lastFilterType = currentFilterType;
                             const rangeCtrl = this.filterForm.get('dateRange');
-
-                            // if(currentFilterType == EventsFilterTypesEnum.UpcommingEvents) {
-                            //     this.startDateCtrl.patchValue( this.today.format(moment.HTML5_FMT.DATETIME_LOCAL))
-                            //     this.endDateCtrl.patchValue( undefined )
-                            // }
                             
-                            // else if(currentFilterType == EventsFilterTypesEnum.PriorEvents){
-                            //     this.startDateCtrl.patchValue( undefined)
-                            //     this.endDateCtrl.patchValue( this.yesterday.format(moment.HTML5_FMT.DATETIME_LOCAL) )
-                            // } 
-                            
-  if (currentFilterType == EventsFilterTypesEnum.UpcommingEvents) {
-    rangeCtrl?.patchValue([this.today.toDate(), undefined], { emitEvent: true });
-  }
-  else if (currentFilterType == EventsFilterTypesEnum.PriorEvents) {
-    rangeCtrl?.patchValue([undefined, this.yesterday.toDate()], { emitEvent: true });
-  }
+                        if (currentFilterType == EventsFilterTypesEnum.UpcommingEvents) {
+                            rangeCtrl?.patchValue([this.today.toDate(), undefined], { emitEvent: true });
+                        }
+                        else if (currentFilterType == EventsFilterTypesEnum.PriorEvents) {
+                            rangeCtrl?.patchValue([undefined, this.yesterday.toDate()], { emitEvent: true });
+                        }
                             else {
                                 if( lastFilterType == EventsFilterTypesEnum.UpcommingEvents && startDate && this.today.isSame(startDateAsMoment) ) this.startDateCtrl.patchValue( undefined)
                                 else if( lastFilterType == EventsFilterTypesEnum.PriorEvents && endDate && this.yesterday.isSame(endDateAsMoment) ) this.endDateCtrl.patchValue( undefined)

@@ -124,8 +124,9 @@ a.btn {
         background-color: #4a0d4a;
         color: white;
         border-radius: 6px;
-        padding: 5px 8px;
+        padding: 5px 2px;
         font-size: 12px;
+        width: 155px;
     }
 
     .relation_Status_button {
@@ -271,7 +272,7 @@ a.btn {
 ========================= */
 .single-item.memberCard_container {
     display: flex;
-    // gap: 12px;
+    gap: 7px;
     align-items: stretch;
   }
   
@@ -501,7 +502,7 @@ NEW CARD VIEW
 }
 
 .market-card-h{
-      min-height: 350px;
+      min-height: 335px;
 
 }
 
@@ -519,7 +520,7 @@ NEW CARD VIEW
 }
 
 .market-card__body {
-  padding: 14px 16px 16px;
+padding: 15px 8px 8px;
   display: flex;
   flex-direction: column;
   flex: 1;
@@ -538,7 +539,7 @@ NEW CARD VIEW
 .market-card__followers {
   display: flex;
   align-items: center;
-  gap: 10px;
+  // gap: 10px;
   color: #9b9b9b;
   font-size: 13px;
   font-weight: 700;
@@ -818,4 +819,125 @@ NEW CARD VIEW
     min-width: 160px;
     max-width: 220px;
   }
+}
+
+
+
+.relation-bar {
+  gap: 12px;
+}
+
+.relation-chip {
+  border: 1px solid #d8d3df;
+  background: #f4f1f8;
+  color: #2f2940;
+  border-radius: 4px;
+ padding: 3px;
+  font-size: 12px;
+  height: 27px;
+ 
+}
+
+.relation-dropdown-wrap {
+  min-width: 220px;
+}
+
+
+.removI {
+  font-size: 8px !important;
+}
+
+
+.relationList {
+  gap: 4px;
+}
+
+.fa-layer-group , .fa-sitemap ,.fa-map-marker-alt , .useIc {
+  color: #4A0D4A;
+}
+
+
+.relation-popup-item {
+  border-bottom: 1px solid #f3f3f3;
+  padding-bottom: 8px;
+}
+
+.relation-popup-item:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+
+
+.removI {
+  cursor: pointer;
+}
+
+.dots-btn {
+  border: none;
+  background:#4A0D4A;
+  padding: 2px 8px;
+  cursor: pointer;
+  font-size: 16px;
+  border-radius: 6px;
+}
+
+.relation-more-menu {
+  display: inline-flex;
+  align-items: center;
+  border:  1px solid #f3f3f3;
+}
+
+.relation-popup-item {
+  border-bottom: 1px solid #f3f3f3;
+  padding-bottom: 8px;
+}
+
+.relation-popup-item:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.relation-dropdown {
+  min-width: 220px;
+  padding: 6px 0;
+  border-radius: 10px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
+  border: none;
+}
+
+.relation-item {
+  padding: 0;
+}
+
+.relation-btn {
+  padding: 10px 14px;
+  transition: all 0.2s ease;
+  border-radius: 6px;
+}
+
+.relation-btn:hover {
+  background-color: #f5f9ff;
+}
+
+.relation-icon {
+  width: 16px;
+  height: 16px;
+}
+
+.relation-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: #333;
+}
+
+.relation-arrow {
+  font-size: 11px;
+  color: #999;
+  transition: transform 0.2s ease;
+}
+
+.relation-btn:hover .relation-arrow {
+  transform: translateX(3px);
+  color: #157af8;
 }

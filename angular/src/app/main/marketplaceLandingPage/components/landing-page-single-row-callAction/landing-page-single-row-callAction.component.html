@@ -11,7 +11,8 @@
 
     <div class="carousel-card" [ngClass]="blockTypeIsSingleOrMixed !='Single Type Blocks' ? 'carousel-card-mixed' : ''">
         <div class="block-type-badge one-style-badge" [ngClass]="isArabic ? 'arPos':'enPos'" >
-    <i [ngClass]="getBlockTypeIcon(item)"  [pTooltip]="getBlockTypeLabel(item) | localize" tooltipPosition="bottom"></i>
+    <i [ngClass]="getBlockTypeIcon(item)"  [pTooltip]="getBlockTypeLabel(item) | localize" tooltipPosition="bottom"   [tooltipEvent]="isSmallScreen ? 'focus' : 'hover'" [autoHide]="true" [showDelay]="100" [hideDelay]="100"
+                [tabindex]="isSmallScreen ? 0 : null"></i>
     <!-- <span>{{ getBlockTypeLabel(item) }}</span> -->
   </div>
       <div class="carousel-card-body" [ngClass]="blockTypeIsSingleOrMixed !='Single Type Blocks' ? '' : 'maxW'"
@@ -75,7 +76,7 @@
         <div *ngSwitchCase="'CONTACT'">
           <app-marketplace-account-card *ngIf="blockTypeIsSingleOrMixed =='Mixed Types Blocks' "
             [account]="item?.getAccountForViewDto" [compact]="true"
-            [showConnectButton]="true"></app-marketplace-account-card>
+            [showConnectButton]="true" [loginTenaneSsin]="loginTenaneSsin"></app-marketplace-account-card>
 
           <app-account-card *ngIf="blockTypeIsSingleOrMixed !='Mixed Types Blocks' || blockTypeIsSingleOrMixed ==null"
             [account]="item?.getAccountForViewDto" [FromLandingPage]="true" [fromMarketplace]="true" [cardsViewMode]="true" (disconnectMe)="

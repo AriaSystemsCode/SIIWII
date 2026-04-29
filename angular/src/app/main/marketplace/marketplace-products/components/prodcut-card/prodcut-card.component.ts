@@ -17,19 +17,19 @@ export class ProdcutCardComponent   extends AppComponentBase  {
     @Input() buyerSSIN: string;
     @Input() sellerSSIN: string;
     @Input()  isSellerIdExists:boolean =false
+    @Input() acceptedAspectRatio;
+    @Input() showMsrP:boolean
+    @Output() prodcutId = new EventEmitter<number>();
+
     attachmentBaseUrl: string = AppConsts.attachmentBaseUrl;
     params: any;
     languageSettingName:string  =AppConsts.languageSettingName;
     isAuthenticated = this.appSession?.user
-    @Input() acceptedAspectRatio;
 
-      @Output() prodcutId = new EventEmitter<number>();
-      @Input() showMsrP:boolean
     constructor(private router: Router ,  injector: Injector,  private _AppEntitiesServiceProxy: AppEntitiesServiceProxy,) {
         super(injector);
     }
     ngOnInit(){
-        // this.getSettingData()
         this.product?.price % 1 ==0?this.product.price=Math.round(this.product?.price * 100 / 100).toFixed(2):null; 
     }
 
@@ -87,12 +87,4 @@ export class ProdcutCardComponent   extends AppComponentBase  {
      
     }
 
-    getSettingData(){
-        this._AppEntitiesServiceProxy.getHostSettingValue(1214, null)
-        .subscribe((result) => {
-          this.showMsrP = result?.toString().toLowerCase() =='yes' ? true : false;
-      
-        });
-    
-    }
 }

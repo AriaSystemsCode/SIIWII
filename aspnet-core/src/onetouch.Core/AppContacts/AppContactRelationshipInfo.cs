@@ -26,6 +26,9 @@ namespace onetouch.AppContacts
         public DateTime RelationshipStartDate { set; get; }
         public DateTime? RelationshipEndDate { set; get; }
         public bool ConsiderAsTeamMember { set; get; }
-
+        //I49[Start]
+        public string RequesterMarketplaceRole { set; get; }
+        public string RecipientMarketplaceRole { set; get; }
+        //I49[End]
     }
 }

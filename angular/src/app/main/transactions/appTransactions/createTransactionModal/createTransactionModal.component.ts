@@ -136,6 +136,12 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit, 
     languageSettingName  =AppConsts.languageSettingName;
     currentLang:string
     isArabic:boolean = true
+    showSellerRelationshipIcon:boolean=false;
+    showBuyerRelationshipIcon:boolean=false;
+    buyerRelationshipName:string="";
+    sellerRelationshipName:string="";
+    buyerCompanyRelationId;
+    sellerCompanyRelationId;
     constructor(
         injector: Injector,
         private fb: FormBuilder,
@@ -151,8 +157,7 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit, 
         this.orderForm.reset();
         this.getUserDefultRole();
         this.changeStartDate(this.orderForm.get('startDate'));
-
-
+        this.tenantRoleService.loadRoles();
     }
 
     initForm() {
@@ -184,6 +189,8 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit, 
         this.orderForm.controls['startDate'].setValue(new Date());
         this.orderForm.controls['enteredDate'].setValue(new Date());
         this.buyerCompanySSIN = ''
+        this.sellerCompanyRelationId="";
+        this.buyerCompanyRelationId="";
     }
 
     updateControlState() {
@@ -212,18 +219,22 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit, 
     getUserDefultRole() {
         this._AppTransactionServiceProxy.getUserDefaultRole(this.formType?.toUpperCase()).subscribe(result => {
             if (this.formType?.toUpperCase() == "SO") {
-                if (result?.toLowerCase().includes('seller')) {
-                    this.roleDdval = this.roles.filter(role => role.code == 1)[0];
+                if (result?.toLowerCase().includes('seller') && this.tenantRoleService.soRolesOptions
+  .map(x => x.name.toLowerCase())
+  .some(x => x.includes('seller'))) {
+                    this.roleDdval = this.tenantRoleService.soRolesOptions.filter(role => role.code == 1)[0];
 
                 } else {
-                    this.roleDdval = this.roles.filter(role => role.code !== 1)[0];
+                    this.roleDdval = this.tenantRoleService.soRolesOptions.filter(role => role.code !== 1)[0];
                 }
             } else if (this.formType?.toUpperCase() == "PO") {
-                if (result?.toLowerCase().includes('buyer')) {
-                    this.roleDdval = this.roles.filter(role => role.code == 2)[0];
+                if (result?.toLowerCase().includes('buyer')&&  this.tenantRoleService.poRolesOptions
+  .map(x => x.name.toLowerCase())
+  .some(x => x.includes('buyer'))) {
+                    this.roleDdval = this.tenantRoleService.poRolesOptions.filter(role => role.code == 2)[0];
 
                 } else {
-                    this.roleDdval = this.roles.filter(role => role.code !== 2)[0];
+                    this.roleDdval = this.tenantRoleService.poRolesOptions.filter(role => role.code !== 2)[0];
                 }
             }
             this.handleRoleChange({ value: this.roleDdval });
@@ -455,6 +466,7 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit, 
         this.selectedBuyerContact = ''
         this.buyerComapnyId = event.value.id;
         this.buyerCompanySSIN = event.value.accountSSIN;
+        this.buyerCompanyRelationId=event.value.relationId;
         this.currencyCode = event.value.currencyCode;
         this.areSame = false
         this.orderForm.get('buyerContactPhoneNumber').setValue(event.value.phone)
@@ -462,6 +474,9 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit, 
         this.handleBuyerNameSearch("");
         this.buyerBranches = [];
         this.getBranches(this.buyerCompanySSIN, 'buyer')
+
+          this.showBuyerRelationshipIcon = true;
+       this.getBuyerRelationshipName ();
     }
 
     handleSellerCompanyChange(event: any) {
@@ -469,6 +484,8 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit, 
 
         this.sellerCompanyId = event.value.id;
         this.sellerCompanySSIN = event.value.accountSSIN;
+        this.sellerCompanyRelationId=event.value.relationId;
+
         this.sellerCurrencyCode = event.value.currencyCode;
         this.areSame = false
         this.orderForm.get('sellerContactPhoneNumber').setValue(event.value.phone)
@@ -476,7 +493,48 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit, 
         this.handleSellerNameSearch("");
         this.sellerBranches = [];
         this.getBranches(this.sellerCompanySSIN, 'seller')
+
+         this.showSellerRelationshipIcon = true;
+        this.getSellerRelationshipName();
     }
+
+    getBuyerRelationshipName() {
+        const lowerRole = this.role.toLowerCase();
+
+        if (lowerRole.includes('seller')) {
+            this.buyerRelationshipName = "Selling to this buyer - As Seller";
+
+        } else if (lowerRole.includes('sales rep')) {
+            this.buyerRelationshipName = "Connected to this buyer - As Sales Rep";
+
+        } else if (lowerRole.includes('buying office')) {
+            this.buyerRelationshipName = "Buying on behalf this Buyer - As Buying Office";
+
+        } else {
+            this.buyerRelationshipName = '';
+        }
+    }
+
+    
+    getSellerRelationshipName() {
+        const lowerRole = this.role.toLowerCase();
+
+        if (lowerRole.includes('sales rep')) {
+            this.sellerRelationshipName = "Selling on behalf of this Seller - As Sales Rep";
+
+        } else if (lowerRole.includes('buyer')) {
+            this.sellerRelationshipName = "Buying from this Seller - As Buyer";
+
+        } else if (lowerRole.includes('buying office')) {
+            this.sellerRelationshipName = "Connected to this Seller - As Buying Office";
+
+        } else {
+            this.sellerRelationshipName = '';
+        }
+    }
+
+
+
     loadInitialContacts() {
         this._AppTransactionServiceProxy
             .getAccountRelatedContacts(this.buyerComapnyId, '')
@@ -963,6 +1021,9 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit, 
         if (this.addNew) {
             this.showMainSpinner();
             this.btnLoader = true;
+
+            this.body.buyerRelationId  = this.sellerCompanyRelationId;
+            this.body.sellerRelationId = this.buyerCompanyRelationId;
             this._AppTransactionServiceProxy
                 .createOrEdit(this.body)
                 .pipe(finalize(() => {
@@ -972,6 +1033,9 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit, 
                     localStorage.removeItem("productFilters");
                 }))
                 .subscribe((response: any) => {
+                              
+                    localStorage.setItem("transId", JSON.stringify(response));
+
                     if (this.setCurrentUserActiveTransaction) {
                         this._AppTransactionServiceProxy
                             .setCurrentUserActiveTransaction(
@@ -1100,13 +1164,18 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit, 
         this.role = "";
         this.Role.value = {};
         this.submitted = false;
-        this.roles = [];
+       // this.roles = [];
         this.isSellerCompanyIdExist = false;
         this.invalidSellerPhoneNumber = "";
         this.invalidBuyerPhoneNumber = "";
         this.invalidBuyerContactEMailAddress = "";
         this.invalidSellerContactEMailAddress = "";
-
+        this.showBuyerRelationshipIcon = false;
+        this.showSellerRelationshipIcon = false;
+        this.buyerRelationshipName = '';
+        this.sellerRelationshipName = '';
+        this.sellerCompanyRelationId = "";
+        this.buyerCompanyRelationId = "";
     }
 
 
@@ -1169,13 +1238,16 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit, 
         this.display = false;
         this.Role.value = {};
         this.submitted = false;
-        this.roles = [];
+       // this.roles = [];
         this.invalidSellerPhoneNumber = "";
         this.invalidBuyerPhoneNumber = "";
         this.invalidBuyerContactEMailAddress = "";
         this.invalidSellerContactEMailAddress = "";
-
-
-
+        this.showBuyerRelationshipIcon = false;
+        this.showSellerRelationshipIcon = false;
+        this.buyerRelationshipName = '';
+        this.sellerRelationshipName = '';
+        this.sellerCompanyRelationId = "";
+        this.buyerCompanyRelationId = "";
 }
 }

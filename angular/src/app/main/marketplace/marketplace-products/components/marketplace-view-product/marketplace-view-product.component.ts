@@ -64,7 +64,7 @@ export class MarketplaceViewProductComponent
     orderType: string = "";
     productVarImages: MarketplaceExtraDataAttrDto[];
     currencySymbol: string = "";
-    showEditSpecialPrice: boolean = true;
+    showEditSpecialPrice: boolean = false;
     updatedSpecialPrice: number = 0;
     filteredColors: any[] = [];
     handleSCreenSelect: number = 0
@@ -92,6 +92,12 @@ export class MarketplaceViewProductComponent
     isAuthenticated = this.appSession?.user
     relatedItems:any
     Warningmessage:string
+    refreshRatingFlag = false;
+    relatedTotal = 0;             
+    pageSize = 11;
+    loadingMore = false;
+
+    currentTransId:any
     public constructor(
         private _AppMarketplaceItemsServiceProxy: AppMarketplaceItemsServiceProxy,
         private _AppTransactionServiceProxy: AppTransactionServiceProxy,
@@ -110,30 +116,30 @@ export class MarketplaceViewProductComponent
         this.ismarketPLace = JSON.parse(localStorage.getItem("fromMarketPlace"));
         this.productBodyData = JSON.parse(localStorage.getItem("productData"));
         this.priceLevel = localStorage.getItem("tempPriceLevel");
-        // this.getProductDetailsForView();
+        this.currentTransId = localStorage.getItem("transId");
         this.filteredColors = this.colorsData;
        
     }
     ngOnInit(): void {
    
+            this.showSpecialPrice = this.productBodyData?.sellerSSIN ? true : false;
         this.route.paramMap.subscribe(params => {
-          const idParam = params.get('id');          // adjust if your route param name is different
+          const idParam = params.get('id');        
           const id = idParam ? +idParam : null;
-      
-          // Reset local state for new product
+
           this.resetProductViewState();
       
-          // Ensure productBodyData exists
+       
           if (!this.productBodyData) {
             this.productBodyData = {};
           }
-          this.productBodyData.id = id;              // use route id as main source
+          this.productBodyData.id = id;        
       
-          // Load details + related products
+     
           this.getProductDetailsForView();
         });
       
-        // Your existing screen-size logic can stay:
+     
         const screenWidth = window.innerWidth;
         if (screenWidth >= 992) {
           this.handleSCreenSelect = 5;
@@ -194,7 +200,7 @@ export class MarketplaceViewProductComponent
           }
           getProductDetailsForView() {
             this.showMainSpinner();
-            this.showEditSpecialPrice = true;
+             this.showEditSpecialPrice = true;
                     
             const handleItemDetails = (res: GetAppMarketplaceItemDetailForViewDto) => {
               this.productDetails = res?.appItem;
@@ -252,8 +258,10 @@ export class MarketplaceViewProductComponent
                   this.productBodyData.buyerSSIN,
                   this.productBodyData.sellerSSIN,
                   this.priceLevel,
+                  this.currentTransId,
                   this.productBodyData.id,
                   undefined,
+                //   undefined,
                   0,
                   10,
                   undefined,
@@ -298,7 +306,7 @@ export class MarketplaceViewProductComponent
             } else {
               // Not authenticated: skip active-transaction call
               fetchDetails();
-            //   this.GetCurrencyInfo();
+        
             }
           }
           
@@ -311,11 +319,8 @@ export class MarketplaceViewProductComponent
     }
 
     setSizes(index: number) {
-        console.log(index,'indexxx')
         this.currentIndex = index;
         this.isColorView = false
-       // this.colorAttachmentForMainIamge = this.colorsData[index]?.colorImg;
-        // this.productImages = this.productVarImages[0]?.selectedValues[this.currentIndex]?.entityAttachments;
         let originalIndex = this.colorsData.findIndex(color => color?.colorCodeSelectedValues?.toLowerCase()?.trim() === this.filteredColors[index].colorCodeSelectedValues?.toLowerCase()?.trim());
         this.colorAttachmentForMainIamge = this.filteredColors[index]?.colorImg
         this.productImages = this.productVarImages[0]?.selectedValues[originalIndex]?.entityAttachments ?   this.productVarImages[0]?.selectedValues[originalIndex]?.entityAttachments : 
@@ -704,7 +709,7 @@ export class MarketplaceViewProductComponent
                             });
                         }
                     }
-                    /////
+
 
                     let bodyRequest: any = {
                         appItem: this.productDetails,
@@ -931,7 +936,7 @@ export class MarketplaceViewProductComponent
             this.calculateTotalOrderPriceAndQty(this.orderSummary);
         });
 
-        // this.productDetails.minSpecialPrice = updatedSpecialPrice;
+    
         this.productDetails.maxSpecialPrice = updatedSpecialPrice;
         this.showEditSpecialPrice = true
     }
@@ -999,139 +1004,129 @@ export class MarketplaceViewProductComponent
         this.subscriptions.push(subs);
       }
 
-      refreshRatingFlag = false;
 
-handleRefreshRating(event: boolean) {
-  if (event === true) {
-
-
-  this.getProductDetailsForView()
-  this.getOverAllRatings()
-  }
-}
-
-
-hasColorStock(color: any): boolean {
-    if (!color || !color.sizes || !color.sizes.length) {
-      return false;
+    handleRefreshRating(event: boolean) {
+    if (event === true) {
+    this.getProductDetailsForView()
+    this.getOverAllRatings()
     }
-  
- 
-    return color.sizes.some((s: any) =>
-      (s.stockAvailability ?? 0) > 0 || (s.noOfAvailablePrepacks ?? 0) > 0
-    );
-  }
-  
-
-relatedTotal = 0;                 // from API totalCount
-pageSize = 11;
-loadingMore = false;
-
-
-
-getRelatedProducts(initial = false) {
-    const skipCount = initial ? 0 : this.relatedItems.length;
-    const maxResultCount = this.pageSize;
-  
-    this.loadingMore = true;
-  
-    this._AppMarketplaceItemsServiceProxy
-      .getAppItemRelatedItems(
-        /* contactSSIN */ undefined,
-        /* accountSSIN */ undefined,
-        /* tenantId */ null,
-        /* appItemListId */ null,
-        /* selectorOnly */ null,
-        /* filter */ null,
-        /* lastKey */ null,
-        /* selectorKey */ null,
-        /* arrtibuteFilters */ null,
-        /* departmentFilters */ null,
-        /* minimumPrice */ null,
-        /* maximumPrice */ null,
-        /* sharingLevel */ SharingLevels.Public,
-        /* onlyAvailableStock */ undefined,
-        /* soldOutFromDate */ undefined,
-        /* soldOutToDate */ undefined,
-        /* startShipFromDate */ undefined,
-        /* startShipToDate */ undefined,
-        /* brands */ null,
-        /* currencyCode */ this.productBodyData?.currencyCode ?? null,
-        /* itemSSIN */ this.productDetails?.code ?? this.productBodyData?.code ?? null,
-        /* categoryFilters */ null,
-        undefined,
-
-        /* sorting */ null,
-        /* skipCount */ skipCount,
-        /* maxResultCount */ maxResultCount
-      )
-      .pipe(finalize(() => (this.loadingMore = false)))
-      .subscribe(res => {
-        this.relatedTotal = res?.totalCount ?? this.relatedTotal;
-        const next = res?.items ?? [];
-  
-        // accumulate pages in order
-        this.relatedItems = initial ? next : [...this.relatedItems, ...next];
-      });
-  }
-  
-get relatedItemsUi(): any[] {
-    const loaded = this.relatedItems || [];
-    const hasMore = loaded.length < (this.relatedTotal || 0);
-  
-    if (!hasMore) {
-      // all items loaded; no ghost needed
-      return loaded;
     }
-  
-    // add one full ghost page
-    const ghostPage = Array.from({ length: this.pageSize }, () => ({ __ghost: true }));
-    return [...loaded, ...ghostPage];
-  }
-  
 
-  onRelatedPage(e: { first: number; rows: number }) {
-    const startIndex = e.first;
-    const pageSize   = e.rows;          // == this.pageSize
-    const ui         = this.relatedItemsUi;
-    const current    = ui[startIndex];
-    const hasMore    = this.relatedItems.length < this.relatedTotal;
-  
-    // If current page starts with a ghost, load the next page
-    if (current?.__ghost && hasMore && !this.loadingMore) {
-      this.getRelatedProducts(false);
-    }
-  }
-  
-  private resetProductViewState(): void {
-    this.productDetails = null;
-    this.productImages = [];
-    this.productVarImages = [];
-    this.colorsData = [];
-    this.filteredColors = [];
-    this.orderSummary = [];
-    this.totalOrderQTY = 0;
-    this.totlaOrderPrices = 0;
-    this.currentIndex = 0;
-    this.isColorView = false;
-  
-    // related products reset
-    this.relatedItems = [];
-    this.relatedTotal = 0;
-  }
-  
-  openRelatedProduct(id: number) {
-    this.router.navigate(['/app/main/marketplace/products/view', id]);
-  }
-  getSettingData(){
+
+    hasColorStock(color: any): boolean {
+        if (!color || !color.sizes || !color.sizes.length) {
+        return false;
+        }
     
-    this._AppEntitiesServiceProxy.getHostSettingValue(1218, null).subscribe({
-        next: (res) => {
-            this.Warningmessage = res
-        },
-     
-      });
-  }
+    
+        return color.sizes.some((s: any) =>
+        (s.stockAvailability ?? 0) > 0 || (s.noOfAvailablePrepacks ?? 0) > 0
+        );
+    }
+
+    getRelatedProducts(initial = false) {
+        const skipCount = initial ? 0 : this.relatedItems.length;
+        const maxResultCount = this.pageSize;
+    
+        this.loadingMore = true;
+    
+        this._AppMarketplaceItemsServiceProxy
+        .getAppItemRelatedItems(
+            /* contactSSIN */ undefined,
+            /* accountSSIN */ undefined,
+            /* tenantId */ null,
+            /* appItemListId */ null,
+            /* selectorOnly */ null,
+            /* filter */ null,
+            /* lastKey */ null,
+            /* selectorKey */ null,
+            /* arrtibuteFilters */ null,
+            /* departmentFilters */ null,
+            /* minimumPrice */ null,
+            /* maximumPrice */ null,
+            /* sharingLevel */ SharingLevels.Public,
+            /* onlyAvailableStock */ undefined,
+            /* soldOutFromDate */ undefined,
+            /* soldOutToDate */ undefined,
+            /* startShipFromDate */ undefined,
+            /* startShipToDate */ undefined,
+            /* brands */ null,
+            /* currencyCode */ this.productBodyData?.currencyCode ?? null,
+            /* itemSSIN */ this.productDetails?.code ?? this.productBodyData?.code ?? null,
+            /* categoryFilters */ null,
+            undefined,
+
+            /* sorting */ null,
+            /* skipCount */ skipCount,
+            /* maxResultCount */ maxResultCount
+        )
+        .pipe(finalize(() => (this.loadingMore = false)))
+        .subscribe(res => {
+            this.relatedTotal = res?.totalCount ?? this.relatedTotal;
+            const next = res?.items ?? [];
+    
+            // accumulate pages in order
+            this.relatedItems = initial ? next : [...this.relatedItems, ...next];
+        });
+    }
+    
+    get relatedItemsUi(): any[] {
+        const loaded = this.relatedItems || [];
+        const hasMore = loaded.length < (this.relatedTotal || 0);
+    
+        if (!hasMore) {
+        // all items loaded; no ghost needed
+        return loaded;
+        }
+    
+        // add one full ghost page
+        const ghostPage = Array.from({ length: this.pageSize }, () => ({ __ghost: true }));
+        return [...loaded, ...ghostPage];
+    }
+    
+
+    onRelatedPage(e: { first: number; rows: number }) {
+        const startIndex = e.first;
+        const pageSize   = e.rows;          // == this.pageSize
+        const ui         = this.relatedItemsUi;
+        const current    = ui[startIndex];
+        const hasMore    = this.relatedItems.length < this.relatedTotal;
+    
+        // If current page starts with a ghost, load the next page
+        if (current?.__ghost && hasMore && !this.loadingMore) {
+        this.getRelatedProducts(false);
+        }
+    }
+    
+    private resetProductViewState(): void {
+        this.productDetails = null;
+        this.productImages = [];
+        this.productVarImages = [];
+        this.colorsData = [];
+        this.filteredColors = [];
+        this.orderSummary = [];
+        this.totalOrderQTY = 0;
+        this.totlaOrderPrices = 0;
+        this.currentIndex = 0;
+        this.isColorView = false;
+    
+        // related products reset
+        this.relatedItems = [];
+        this.relatedTotal = 0;
+    }
+    
+    openRelatedProduct(id: number) {
+        this.router.navigate(['/app/main/marketplace/products/view', id]);
+    }
+    getSettingData(){
+        
+        this._AppEntitiesServiceProxy.getHostSettingValue(1218, null).subscribe({
+            next: (res) => {
+                this.Warningmessage = res
+            },
+        
+        });
+    }
     ngOnDestroy() {
         this.unsubscribeToAllSubscriptions();
         localStorage.removeItem("productData");

@@ -2,10 +2,7 @@ import { Component, EventEmitter, Injector, Output, ViewChild ,Input,AfterViewIn
 import { AppComponentBase } from '@shared/common/app-component-base';
 import { CreateMessageInput, GetMessagesForViewDto,   MesasgeObjectType,   MessageServiceProxy } from '@shared/service-proxies/service-proxies';
 import { AddCommentComponent } from '../../../comments/components/add-comment/add-comment.component';
-import { BlockList } from 'net';
 import { SendMessageModalComponent } from '@app/main/Messages/SendMessage-Modal.Component';
-import * as moment from "moment";
-import { finalize } from '@node_modules/rxjs/dist/types';
 
 @Component({
     selector: 'app-comment-parent',

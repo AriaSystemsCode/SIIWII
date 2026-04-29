@@ -19,6 +19,8 @@ import { BsModalRef, BsModalService, ModalOptions } from 'ngx-bootstrap/modal';
 export class LandingPageSinglrRowCallActionComponent extends AppComponentBase implements OnInit {
   @Input() sectionId!: number;
   @Input() blockTypeIsSingleOrMixed: string
+  @Input() loginTenaneSsin: string
+  
   @ViewChild("viewEventModal", { static: true }) viewEventModal: ViewEventComponent;
   bsModalRef: BsModalRef;
   items: PageSettingDto[] = [];
@@ -92,6 +94,7 @@ export class LandingPageSinglrRowCallActionComponent extends AppComponentBase im
   ];
 
   languageSettingName: string = AppConsts.languageSettingName;
+    isSmallScreen = false;
 
   constructor(
     injector: Injector,
@@ -108,8 +111,13 @@ export class LandingPageSinglrRowCallActionComponent extends AppComponentBase im
     if (this.sectionId) {
       this.getBlocksData();
     }
-  }
+       this.checkScreenSize();
+  window.addEventListener('resize', this.checkScreenSize.bind(this));
 
+    }
+    checkScreenSize(): void {
+  this.isSmallScreen = window.innerWidth <= 1023;
+}
   viewProduct(prod: any) {
     const productBodyRequestForView = {
       id: prod?.appItem?.id,
@@ -318,7 +326,7 @@ export class LandingPageSinglrRowCallActionComponent extends AppComponentBase im
     this.showMainSpinner();
 
     this._accountsServiceProxy
-      .disconnect(id)
+      .disconnect(id,undefined)
       .pipe(finalize(() => this.hideMainSpinner()))
       .subscribe((res: any[]) => {
         this.notify.success(this.l('SuccessfullyDisconnected'));

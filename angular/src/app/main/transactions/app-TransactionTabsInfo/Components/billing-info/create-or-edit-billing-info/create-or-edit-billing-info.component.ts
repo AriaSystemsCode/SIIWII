@@ -30,12 +30,9 @@ export class CreateOrEditBillingInfoComponent extends AppComponentBase implement
   transactionCartoccordionTabs = TransactionCartoccordionTabs;
   contactIdARContact: string = '';
   contactIdApContact: string = '';
-  addressSelected: boolean = false;
   payTermsListList: any = [];
-  isArContactsValid: boolean = false;
   enableSAveApcontact: boolean = false;
   oldappTransactionsForViewDto: any;
-  isApContactsValid: boolean = false;
   enableSAveArcontact: boolean = false;
   apContactSelectedAdd: any;
   arContactSelectedAdd: any

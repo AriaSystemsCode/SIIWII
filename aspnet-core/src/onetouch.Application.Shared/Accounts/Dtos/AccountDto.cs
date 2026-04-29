@@ -1,6 +1,8 @@
 ﻿using Abp.Application.Services.Dto;
 using onetouch.AccountInfos.Dtos;
+using onetouch.AppItems.Dtos;
 using onetouch.Common;
+using onetouch.SystemObjects.Dtos;
 using System;
 using System.Collections.Generic;
 
@@ -76,6 +78,8 @@ namespace onetouch.Accounts.Dtos
         public virtual long? CurrencyId { set; get; }
         public virtual string CurrencyCode { set; get; }
         public virtual string CurrencyName { set; get; }
+        //I49[Start]
+        public virtual string MarketplaceAccountRole{ get; set; }
         //I46[End]
     }
 }

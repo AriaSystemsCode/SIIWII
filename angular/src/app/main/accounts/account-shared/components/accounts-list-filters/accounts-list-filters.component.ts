@@ -45,6 +45,8 @@ export class AccountsListFiltersComponent extends AppComponentBase implements On
     currencyFilter: string | undefined;
     countryFilter: string | undefined;
 
+    accountTypeOptions: any[] = [];
+
     constructor(
         injector:Injector,
         private _appEntitiesServiceProxy: AppEntitiesServiceProxy,
@@ -56,8 +58,9 @@ export class AccountsListFiltersComponent extends AppComponentBase implements On
     }
 
     ngOnInit(): void {
-
-        this.accountTypeFilterMetaData = new FilterMetaData<LookupLabelDto[]>({list : this.accountTypes})
+        this.getAccountTypesList()
+        // this.accountTypeFilterMetaData = new FilterMetaData<LookupLabelDto[]>({list : this.accountTypes})
+          this.accountTypeFilterMetaData = new FilterMetaData<LookupLabelDto[]>({ list: this.accountTypes });
         this.languageFilterMetaData = new FilterMetaData<LookupLabelDto[]>({list : this.languages})
         this.countryFilterMetaData = new FilterMetaData<LookupLabelDto[]>({list : this.countries})
         this.currencyFilterMetaData = new FilterMetaData<LookupLabelDto[]>({list : this.currencies})
@@ -66,6 +69,16 @@ export class AccountsListFiltersComponent extends AppComponentBase implements On
         this.classificationsFilterMetaData = new FilterMetaData<TreeNodeOfGetSycEntityObjectClassificationForViewDto[]>({list : this.classifications})
 
         this.subscribeToCategoriesAndClassificationReset()
+
+        this.filterForm.get('accountTypes')?.valueChanges.subscribe((value) => {
+    const selectedItem = this.accountTypeOptions?.find(x => x.value === value);
+    const isBusiness = selectedItem?.code?.toUpperCase() === 'BUSINESS';
+
+    if (!isBusiness) {
+        this.filterForm.get('classifications')?.setValue(null);
+        this.filterForm.get('categories')?.setValue(null);
+    }
+});
     }
 
     ngOnDestroy() {
@@ -266,56 +279,55 @@ export class AccountsListFiltersComponent extends AppComponentBase implements On
         this.subscriptions.push(subs)
     }
 
-    getAccountTypesList(componentRef: { onListLoadCallback: Function }) {
-        const subs = this._appEntitiesServiceProxy
-          .getAllAccountTypesForTableDropdownWithPaging(
-            undefined,
-            undefined,
-            undefined,
-            undefined,
-            undefined,
-            false,
-            undefined,
-            undefined,
-            undefined,
-            undefined,
-            this.sortBy,
-            this.accountTypeFilterMetaData.listSkipCount,
-            10,
-            !this.fromMarketplace
-          )
-          .subscribe(result => {
-            const uniqueCodes = new Set();
-            const filteredItems = [];
-      
-            result.items.forEach(item => {
-              const code = item.code?.toUpperCase();
-      
-              if (['BUSINESS', 'GROUP'].includes(code) && !uniqueCodes.has(code)) {
-                uniqueCodes.add(code);
-                filteredItems.push(item);
-              }
-      
-              if (code === 'PERSONAL' && !uniqueCodes.has('PERSONAL')) {
-                uniqueCodes.add('PERSONAL');
-                // Always show it as "Personal" regardless of original label
-                filteredItems.push({ ...item, label: 'Personal' });
-              }
-      
-              if (item.label?.toUpperCase() === 'PEOPLE' && !uniqueCodes.has('PERSONAL')) {
-                uniqueCodes.add('PERSONAL'); // treat as PERSONAL
-                filteredItems.push({ ...item, label: 'Personal', code: 'PERSONAL' });
-              }
-            });
-      
-            componentRef.onListLoadCallback({
-              totalCount: filteredItems.length,
-              items: filteredItems
-            });
-          });
-      
-        this.subscriptions.push(subs);
-      }
+getAccountTypesList(): void {
+  const subs = this._appEntitiesServiceProxy
+    .getAllAccountTypesForTableDropdownWithPaging(
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      false,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      this.sortBy,
+      0,
+      10,
+      !this.fromMarketplace
+    )
+    .subscribe(result => {
+      const uniqueCodes = new Set();
+      const filteredItems = [];
+
+      result.items.forEach(item => {
+        const code = item.code?.toUpperCase();
+
+        if (['BUSINESS', 'GROUP'].includes(code) && !uniqueCodes.has(code)) {
+          uniqueCodes.add(code);
+          filteredItems.push(item);
+        }
+
+        if (code === 'PERSONAL' && !uniqueCodes.has('PERSONAL')) {
+          uniqueCodes.add('PERSONAL');
+          filteredItems.push({ ...item, label: 'Personal' });
+        }
+
+        if (item.label?.toUpperCase() === 'PEOPLE' && !uniqueCodes.has('PERSONAL')) {
+          uniqueCodes.add('PERSONAL');
+          filteredItems.push({ ...item, label: 'Personal', code: 'PERSONAL' });
+        }
+      });
+
+      this.accountTypeOptions = [
+        { label: this.l('All'), value: null },
+        ...filteredItems
+      ];
+    });
+
+  this.subscriptions.push(subs);
+}
       
       
       
@@ -352,5 +364,14 @@ export class AccountsListFiltersComponent extends AppComponentBase implements On
             }
         })
     }
+
+
+    get showBusinessOnlyFilters(): boolean {
+    const selectedValue = this.filterForm?.get('accountTypes')?.value;
+
+    const selectedItem = this.accountTypeOptions?.find(x => x.value === selectedValue);
+
+    return selectedItem?.code?.toUpperCase() === 'BUSINESS';
+}
 
 }

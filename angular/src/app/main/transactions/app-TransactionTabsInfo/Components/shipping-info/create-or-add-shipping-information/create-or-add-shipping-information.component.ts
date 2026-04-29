@@ -27,11 +27,8 @@ export class CreateOrAddShippingInformationComponent extends AppComponentBase im
   @ViewChildren(AddressComponent) addressComponentRefs: QueryList<AddressComponent>;
 
   transactionCartoccordionTabs = TransactionCartoccordionTabs;
-  isshipFromContactsValid: boolean = false;
-  isShipToContactsValid: boolean = false;
   contactIdShipTo: string = '';
   contactIdShipFrom: string = '';
-  addressSelected: boolean = false;
   enableSAveShipFrom: boolean = false;
   enableSAveShipTo: boolean = false;
   storeVal: any = null;
@@ -39,7 +36,6 @@ export class CreateOrAddShippingInformationComponent extends AppComponentBase im
   shipViaList: any = [];
   oldappTransactionsForViewDto;
   shippingTabValid: boolean = false;
-  addressSelectedShipTo: boolean = false;
   shipFromSelectedAdd: any;
   shipToSelectedAdd: any;
   isAccManual: boolean = false

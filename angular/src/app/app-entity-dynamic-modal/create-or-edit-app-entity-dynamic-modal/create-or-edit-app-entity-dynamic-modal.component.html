@@ -355,8 +355,8 @@
                                                 </label>
                                                 <input type="number"
                                                     (keyup)="notLookupExtraAttributeOnChange($event.target.value,extraAttr)"
-                                                    name="{{extraAttr.name}}" placeholder="{{extraAttr.name}}"
-                                                    class="form-control" id="extraAttr{{extraAttr.name| localize}}"  [disabled]="extraAttr?.disabled"
+                                                    name="{{extraAttr.name}}" placeholder="{{extraAttr.name| localize}}"
+                                                    class="form-control" id="extraAttr{{extraAttr.name}}"
                                                     [(ngModel)]="extraAttr.selectedValues">
                                             </div>
                                             <div class="flex-grow-1 mx-2"
@@ -367,8 +367,8 @@
                                                     </label>
                                                     <input type="text"
                                                         (keyup)="notLookupExtraAttributeOnChange($event.target.value,extraAttr)"
-                                                        name="{{extraAttr.name}}" placeholder="{{extraAttr.name}}"
-                                                        class="form-control" id="extraAttr{{extraAttr.name| localize}}"  [disabled]="extraAttr?.disabled"
+                                                        name="{{extraAttr.name}}" placeholder="{{extraAttr.name| localize}}"
+                                                        class="form-control" id="extraAttr{{extraAttr.name}}"
                                                         [(ngModel)]="extraAttr.selectedValues">
                                                     <div class="border rounded" class="w-25 "
                                                         *ngIf="extraAttr.dataType === 'string' && !extraAttr.isLookup  ">

@@ -93,6 +93,7 @@ namespace onetouch.Accounts.Dtos
         Account,
         Branch,
         Contact,
+        Vendor
     }
     public enum AccountExcelAccountType
     {

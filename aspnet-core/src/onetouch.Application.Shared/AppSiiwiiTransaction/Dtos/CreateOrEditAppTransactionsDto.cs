@@ -1,4 +1,4 @@
-﻿using onetouch.SystemObjects;
+using onetouch.SystemObjects;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -22,6 +22,10 @@ namespace onetouch.AppSiiwiiTransaction.Dtos
         [StringLength(AppTransactionConst.MaxBuyerNameLength, MinimumLength = AppTransactionConst.MinBuyerNameLength)]
         public virtual string? BuyerCompanyName { set; get; }
         public long? SellerId { set; get; }
+
+        public long? SellerRelationId { set; get; }
+        public long? BuyerRelationId { set; get; }
+
         [StringLength(AppTransactionConst.MaxSellerNameLength, MinimumLength = AppTransactionConst.MinSellerNameLength)]
         public virtual string? SellerCompanyName { set; get; }
 
@@ -117,6 +121,9 @@ namespace onetouch.AppSiiwiiTransaction.Dtos
         public long? PhoneTypeId { get; set; }
         public string PhoneTypeName { set; get; }
         public string Code { set; get; }
+        public string Role { set; get; }
+        public string RoleName { set; get; }
+        public long? RelationId { set; get; }
     }
     public class GetContactInformationDto
     {
@@ -172,4 +179,19 @@ namespace onetouch.AppSiiwiiTransaction.Dtos
 
     }
     //Iteration45
+    //I49[Start]
+    public class AppContactRelationshipInfoDto
+    {
+        public string RequesterContactSSIN { set; get; }
+        public string RequesterContactName { set; get; }
+        public string RecipientContactSSIN { set; get; }
+        public string RecipientContactName { set; get; }
+              
+        
+        public string RequesterContactTypeCode { set; get; }
+        public string RecipientContactTypeCode { set; get; }
+        public string RequesterMarketplaceRole { set; get; }
+        public string RecipientMarketplaceRole { set; get; }
+    }
+    //I49[End]
 }

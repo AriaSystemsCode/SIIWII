@@ -163,9 +163,25 @@ dynamicInputsComponents!: QueryList<dynamicInputs>;
         let isExist = result.items.filter((item) => { return item.value == extraAttr.attributeId });
         if ((isExist!.length == 0 || isExist == undefined) && extraAttr?.selectedValues?.length > 0) {
 
-          const tempAtt = new LookupLabelDto({
+        
+
+          const index = result.items.findIndex(item =>
+            item.value == extraAttr.selectedValues ||
+            (item.label || '').toLowerCase().trim() === (extraAttr.selectedValues || '').toString().toLowerCase().trim()
+          );
+
+          let finalLabel;
+
+          if (index > -1) {
+            finalLabel = result.items[index].label;
+            result.items.splice(index, 1);
+          } else 
+            finalLabel = extraAttr.selectedValues;
+          
+
+          const newItem = new LookupLabelDto({
             code: extraAttr.code,
-            label: result.items.find(x=>x.value ==extraAttr.selectedValues).label ?? extraAttr.selectedValues,
+            label: finalLabel,
             stockAvailability: undefined,
             value: extraAttr.selectedValues,
             isHostRecord: false,
@@ -173,9 +189,8 @@ dynamicInputsComponents!: QueryList<dynamicInputs>;
             image: undefined,
             status: undefined,
             entityObjectStatusId: undefined
-
-          })
-          result.items.push(tempAtt)
+          });
+          result.items.push(newItem);
         }
 
         extraAttr.paginationSetting.list.push(...result.items);
