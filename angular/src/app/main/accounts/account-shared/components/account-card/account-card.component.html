@@ -21,7 +21,9 @@ CARDS VIEW MODE
 
   <div class="market-card__body">
     <h3 class="market-card__title" (click)="clickCardHandler()">
-      {{ account?.account?.name | textSubstring : 16 }}
+      {{ account?.account?.name | textSubstring : 16 }}  <i *ngIf="account?.account?.isManual" class="pi pi-user-edit ml-2"  [pTooltip]="'ManualAccount' | localize" tooltipPosition="bottom"
+            [tooltipEvent]="isSmallScreen ? 'focus' : 'hover'" [autoHide]="true" [showDelay]="100" [hideDelay]="100"
+            [tabindex]="isSmallScreen ? 0 : null"></i>
     </h3>
 
     <div class="d-flex jw-100">
@@ -170,8 +172,10 @@ NOT CARDS VIEW MODE
             [pTooltip]="account?.account?.name?.length > 25 ? account?.account?.name : null" tooltipPosition="bottom"
             [tooltipEvent]="isSmallScreen ? 'focus' : 'hover'" [autoHide]="true" [showDelay]="100" [hideDelay]="100"
             [tabindex]="isSmallScreen ? 0 : null">
-            {{account?.account?.name | textSubstring : 25 }}
-          </h3>
+            {{account?.account?.name | textSubstring : 25 }}  <i *ngIf="account?.account?.isManual" class="pi pi-user-edit ml-2"  [pTooltip]="'ManualAccount' | localize" tooltipPosition="bottom"
+            [tooltipEvent]="isSmallScreen ? 'focus' : 'hover'" [autoHide]="true" [showDelay]="100" [hideDelay]="100"
+            [tabindex]="isSmallScreen ? 0 : null"></i>
+          </h3> 
         </div>
 
         <div class="info-container d-flex flex-column">
