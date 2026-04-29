@@ -318,9 +318,9 @@ namespace onetouch.AppSiiwiiTransaction
             {
                 using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
                 {
-                    var buyerAccountProfile = await _appContactRepository.GetAll().Where(z => z.TenantId != null && z.IsProfileData == true && z.SSIN == input.BuyerCompanySSIN && z.PartnerId == null).FirstOrDefaultAsync();
+                    var buyerAccountProfile = await _appMarketplaceContactRepository.GetAll().Where(z => z.TenantId == null && z.IsProfileData == true && z.SSIN == input.BuyerCompanySSIN).FirstOrDefaultAsync();
                     if (buyerAccountProfile != null)
-                        buyerTenantId = buyerAccountProfile.TenantId;
+                        buyerTenantId = buyerAccountProfile.TenantOwner;
                 }
             }
             if (input.lFromPlaceOrder)
