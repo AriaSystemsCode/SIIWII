@@ -65,7 +65,7 @@ export class ViewMemberProfileComponent extends AppComponentBase implements OnIn
   memberIslink: boolean = false;
   showUserList: boolean = false;
 
-  constructor(injector: Injector, private _AccountsServiceProxy: AccountsServiceProxy,  private _userService: UserServiceProxy,private route: ActivatedRoute) {
+  constructor(injector: Injector, private _AccountsServiceProxy: AccountsServiceProxy,  private _userService: UserServiceProxy,private route: ActivatedRoute,private  UpdateLogoService:UpdateLogoService) {
     super(injector);
     this.accountInfoTemp = new CreateOrEditAccountInfoDto();
 
@@ -505,7 +505,7 @@ export class ViewMemberProfileComponent extends AppComponentBase implements OnIn
       }))
       .subscribe({
         next: () => {
-          this.updateLogoService.updateProfilePicture();
+          this.UpdateLogoService.updateProfilePicture();
           this.refresh(true);
   
         },
