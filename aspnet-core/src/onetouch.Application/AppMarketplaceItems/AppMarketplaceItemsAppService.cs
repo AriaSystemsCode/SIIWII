@@ -683,12 +683,12 @@ namespace onetouch.AppMarketplaceItems
                                         var relationshipSellBuy = await _appContactRelationshipInfoRepository.GetAll()
                                         .Where(z => (z.RequesterContactSSIN == input.SellerAccountSSIN &&
                                         z.RecipientContactSSIN == input.BuyerAccountSSIN &&
-                                        z.RequesterMarketplaceRole == sellerRole.ToString() &&
-                                        z.RecipientMarketplaceRole == buyerRole.ToString()) ||
+                                        z.RequesterMarketplaceRole == sellerRole.ContactRole.ToString() &&
+                                        z.RecipientMarketplaceRole == buyerRole.ContactRole.ToString()) ||
                                         (z.RecipientContactSSIN == input.SellerAccountSSIN &&
                                         z.RequesterContactSSIN == input.BuyerAccountSSIN &&
-                                        z.RecipientMarketplaceRole == sellerRole.ToString() &&
-                                        z.RequesterMarketplaceRole == buyerRole.ToString())
+                                        z.RecipientMarketplaceRole == sellerRole.ContactRole.ToString() &&
+                                        z.RequesterMarketplaceRole == buyerRole.ContactRole.ToString())
                                         ).Include(z => z.EntityExtraData).FirstOrDefaultAsync();
                                         if (relationshipSellBuy != null)
                                         {
@@ -2204,24 +2204,25 @@ namespace onetouch.AppMarketplaceItems
                  (marketpaceItem.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.CurrencyCode == "USD").FirstOrDefault() != null ?
                  (marketpaceItem.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.CurrencyCode == "USD").Select(a => a.Price).FirstOrDefault() * exchangeRate) : 0)))),
                         Id = marketpaceItem.Id,
-                        ImageUrl =(((marketpaceItem.EntityAttachments!= null && (marketpaceItem.EntityAttachments.Count>0) ?((marketpaceItem.EntityAttachments.FirstOrDefault(x => x.IsDefault == true) == null ?
+                        ImageUrl = (((marketpaceItem.EntityAttachments != null && (marketpaceItem.EntityAttachments.Count > 0) ? ((marketpaceItem.EntityAttachments.FirstOrDefault(x => x.IsDefault == true) == null ?
         (marketpaceItem.EntityAttachments.FirstOrDefault() == null ||
         marketpaceItem.EntityAttachments.FirstOrDefault().AttachmentFk == null ? "attachments/" + (marketpaceItem.TenantId.HasValue ? marketpaceItem.TenantId : -1) +
         "/" + marketpaceItem.EntityAttachments.FirstOrDefault().AttachmentFk.Attachment : "")
         : "attachments/" + (marketpaceItem.TenantId.HasValue ? marketpaceItem.TenantId : -1) + "/" +
-       marketpaceItem.EntityAttachments.FirstOrDefault(x => x.IsDefault == true).AttachmentFk.Attachment)):"")))
+       marketpaceItem.EntityAttachments.FirstOrDefault(x => x.IsDefault == true).AttachmentFk.Attachment)) : "")))
 
                     };
                     getAppMarketItemForViewDto.NumberOfReviews = await _messageAppService.GetAllReviewsCount(getAppMarketItemForViewDto.AppItem.Id);
                     var rating = await _messageAppService.GetOverAllRatings(getAppMarketItemForViewDto.AppItem.Id);
                     getAppMarketItemForViewDto.AverageRating = rating.OverAllRating;
+
+                    var presonEntityObjectTypeId = await _helper.SystemTables.GetEntityObjectTypePersonId();
+                    var contact = await _appContactRepository.GetAll().Where(a => a.TenantId != null && a.ParentId == null
+                                   && a.PartnerId == null && a.IsProfileData == true && a.EntityFk.EntityObjectTypeId != presonEntityObjectTypeId &&
+                                   a.TenantId == marketpaceItem.TenantOwner).FirstOrDefaultAsync();
+                    if (contact != null)
+                        getAppMarketItemForViewDto.AppItem.SellerName = contact.Name;
                 }
-                var presonEntityObjectTypeId = await _helper.SystemTables.GetEntityObjectTypePersonId();
-                var contact = await _appContactRepository.GetAll().Where(a => a.TenantId != null && a.ParentId == null
-                               && a.PartnerId == null && a.IsProfileData == true && a.EntityFk.EntityObjectTypeId != presonEntityObjectTypeId &&
-                               a.TenantId == marketpaceItem.TenantOwner).FirstOrDefaultAsync();
-                if (contact != null)
-                    getAppMarketItemForViewDto.AppItem.SellerName = contact.Name;
                 return getAppMarketItemForViewDto;
             }
         }                                                   
