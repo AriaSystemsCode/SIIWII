@@ -2887,6 +2887,8 @@ namespace onetouch.Accounts
                         .ThenInclude(z=>z.EntityExtraData).Where(z => z.Id == id).FirstOrDefaultAsync();
                     if (releatedAccount != null)
                     {
+                        account = await _appMarketplaceContactRepository.GetAll()
+                            .Include(z => z.EntityExtraData).Where(z => z.SSIN== releatedAccount.SSIN).FirstOrDefaultAsync();
                         recipientSSIN = releatedAccount.SSIN;
                         recipientEntityObjecttypeId = releatedAccount.EntityFk.EntityObjectTypeCode;
                         var extraDataRole = releatedAccount.EntityFk.EntityExtraData
