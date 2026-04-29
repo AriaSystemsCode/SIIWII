@@ -66000,6 +66000,7 @@ export class CreateOrEditAccountInfoDto implements ICreateOrEditAccountInfoDto {
     shipViaId!: number | undefined;
     paymentTermsId!: number | undefined;
     extraDataAttributes!: ExtraDataAttrDto[] | undefined;
+    recordType!: string | undefined;
     id!: number | undefined;
 
     [key: string]: any;
@@ -66107,6 +66108,7 @@ export class CreateOrEditAccountInfoDto implements ICreateOrEditAccountInfoDto {
                 for (let item of _data["extraDataAttributes"])
                     this.extraDataAttributes!.push(ExtraDataAttrDto.fromJS(item));
             }
+            this.recordType = _data["recordType"];
             this.id = _data["id"];
         }
     }
@@ -66212,6 +66214,7 @@ export class CreateOrEditAccountInfoDto implements ICreateOrEditAccountInfoDto {
             for (let item of this.extraDataAttributes)
                 data["extraDataAttributes"].push(item.toJSON());
         }
+        data["recordType"] = this.recordType;
         data["id"] = this.id;
         return data;
     }
@@ -66274,6 +66277,7 @@ export interface ICreateOrEditAccountInfoDto {
     shipViaId: number | undefined;
     paymentTermsId: number | undefined;
     extraDataAttributes: ExtraDataAttrDto[] | undefined;
+    recordType: string | undefined;
     id: number | undefined;
 
     [key: string]: any;
@@ -67669,6 +67673,7 @@ export class AppContactValidationInputDTO implements IAppContactValidationInputD
     shipViaId!: number | undefined;
     paymentTermsId!: number | undefined;
     extraDataAttributes!: ExtraDataAttrDto[] | undefined;
+    recordType!: string | undefined;
     id!: number | undefined;
 
     [key: string]: any;
@@ -67781,6 +67786,7 @@ export class AppContactValidationInputDTO implements IAppContactValidationInputD
                 for (let item of _data["extraDataAttributes"])
                     this.extraDataAttributes!.push(ExtraDataAttrDto.fromJS(item));
             }
+            this.recordType = _data["recordType"];
             this.id = _data["id"];
         }
     }
@@ -67891,6 +67897,7 @@ export class AppContactValidationInputDTO implements IAppContactValidationInputD
             for (let item of this.extraDataAttributes)
                 data["extraDataAttributes"].push(item.toJSON());
         }
+        data["recordType"] = this.recordType;
         data["id"] = this.id;
         return data;
     }
@@ -67954,6 +67961,7 @@ export interface IAppContactValidationInputDTO {
     shipViaId: number | undefined;
     paymentTermsId: number | undefined;
     extraDataAttributes: ExtraDataAttrDto[] | undefined;
+    recordType: string | undefined;
     id: number | undefined;
 
     [key: string]: any;
