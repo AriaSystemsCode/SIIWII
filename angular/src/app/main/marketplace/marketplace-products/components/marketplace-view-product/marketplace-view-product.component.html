@@ -312,7 +312,7 @@
                                                 {{ currencySymbol }} {{ (productDetails?.maxSpecialPrice || 0) | number:'1.2-2' }}
                                             </h5>
 
-                                            <img *ngIf="orderType == 'SO'  && showEditSpecialPrice && showSpecialPrice && productDetails?.maxSpecialPrice"
+                                            <img *ngIf="orderType == 'SO'  && showEditSpecialPrice && showSpecialPrice "
                                                 class="mx-1  poniter" style="cursor: pointer;"
                                                 src="../../../../../assets/Items//edit-svgrepo-com 1.png"
                                                 (click)="showEditSpecialPrice =false;updatedSpecialPrice=productDetails?.maxSpecialPrice" />
@@ -1167,7 +1167,7 @@ top: 4px;">
                                                         {{ currencySymbol }} {{ (productDetails?.maxSpecialPrice || 0) | number:'1.2-2' }}
                                                     </h5>
 
-                                                    <img *ngIf="orderType == 'SO'  && showEditSpecialPrice && showSpecialPrice && productDetails?.maxSpecialPrice"
+                                                    <img *ngIf="orderType == 'SO'  && showEditSpecialPrice && showSpecialPrice"
                                                         class="mx-2  poniter" style="cursor: pointer;"
                                                         src="../../../../../assets/Items//edit-svgrepo-com 1.png"
                                                         (click)="showEditSpecialPrice =false;updatedSpecialPrice=productDetails?.maxSpecialPrice" />
