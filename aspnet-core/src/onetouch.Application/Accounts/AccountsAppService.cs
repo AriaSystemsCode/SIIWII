@@ -1386,7 +1386,7 @@ namespace onetouch.Accounts
                             account.ConnectionCount = relationshipsConut;
                             //I40[End]
                         }
-                    }
+                    
                     var x = new PagedResultDto<GetAccountForViewDto>(
                         totalCount,
                         accountsList
@@ -2656,7 +2656,7 @@ namespace onetouch.Accounts
                                             .Where(z => z.TenantId == tenantId &&
                                              z.AccountId == varAccId
                                              && z.Code == addCode);
-                                            var addressCon = await addressQuery.IgnoreQueryFilters().FirstOrDefaultAsync();
+                                            addressCon = await addressQuery.IgnoreQueryFilters().FirstOrDefaultAsync();
                                             if (addressCon != null && addressCon.IsDeleted== true)
                                             {
                                                 await CurrentUnitOfWork.SaveChangesAsync();
@@ -3884,7 +3884,7 @@ namespace onetouch.Accounts
                         if (contactFortCurrTenant != null)
                         {
                             var returnVal =
-                                await _iCreateMarketplaceAccount.CreateOrEditMarketplaceContactRelationship(contactFortCurrTenant.SSIN, contact.SSIN, false, false, null);
+                                await _iCreateMarketplaceAccount.CreateOrEditMarketplaceContactRelationship(contactFortCurrTenant.SSIN, contact.SSIN, false, false, null,null);
                         }
                         await _iCreateMarketplaceAccount.HideAccount(contact.SSIN);
 
@@ -10901,7 +10901,7 @@ namespace onetouch.Accounts
                                 //if (contactFortCurrTenant != null)
                                 {
                                     var returnVal =
-                                        await _iCreateMarketplaceAccount.CreateOrEditMarketplaceContactRelationship(contactFortCurrTenant.SSIN, acc.SSIN, false, false, null);
+                                        await _iCreateMarketplaceAccount.CreateOrEditMarketplaceContactRelationship(contactFortCurrTenant.SSIN, acc.SSIN, false, false, null,null);
                                 }
                                 await _iCreateMarketplaceAccount.HideAccount(acc.SSIN);
                             }
@@ -10953,7 +10953,7 @@ namespace onetouch.Accounts
                                 //if (contactFortCurrTenant != null)
                                 {
                                     var returnVal =
-                                        await _iCreateMarketplaceAccount.CreateOrEditMarketplaceContactRelationship(contactFortCurrTenant.SSIN, acc.SSIN, false, false, null);
+                                        await _iCreateMarketplaceAccount.CreateOrEditMarketplaceContactRelationship(contactFortCurrTenant.SSIN, acc.SSIN, false, false, null,null);
                                 }
                                 await _iCreateMarketplaceAccount.HideAccount(acc.SSIN);
                             }
@@ -11069,7 +11069,7 @@ namespace onetouch.Accounts
                                     //if (contactFortCurrTenant != null)
                                     {
                                         var returnVal =
-                                            await _iCreateMarketplaceAccount.CreateOrEditMarketplaceContactRelationship(contactFortCurrTenant.SSIN, acc.SSIN, false, false, null);
+                                            await _iCreateMarketplaceAccount.CreateOrEditMarketplaceContactRelationship(contactFortCurrTenant.SSIN, acc.SSIN, false, false, null,null);
                                     }
                                     await _iCreateMarketplaceAccount.HideAccount(acc.SSIN);
                                 }
@@ -11098,7 +11098,7 @@ namespace onetouch.Accounts
                                                     {
                                                         //var presonEntityObjectTypeId = await _helper.SystemTables.GetEntityObjectTypePersonId();
                                                         await _iCreateMarketplaceAccount.PublishMember(cont.Id, publishedAccount.Id, presonEntityObjectTypeId, publishedAccount.Id, publishedAccount.Id);
-                                                        await _iCreateMarketplaceAccount.CreateOrEditMarketplaceContactRelationship(publishedAccount.SSIN, cont.SSIN, false, null, null);
+                                                        await _iCreateMarketplaceAccount.CreateOrEditMarketplaceContactRelationship(publishedAccount.SSIN, cont.SSIN, false, null, null,null);
                                                         await _iCreateMarketplaceAccount.HideAccount(accountObj.SSIN);
 
                                                     }
@@ -11121,7 +11121,7 @@ namespace onetouch.Accounts
                                     //if (contactFortCurrTenant != null)
                                     {
                                         var returnVal =
-                                            await _iCreateMarketplaceAccount.CreateOrEditMarketplaceContactRelationship(contactFortCurrTenant.SSIN, acc.SSIN, false, false, null);
+                                            await _iCreateMarketplaceAccount.CreateOrEditMarketplaceContactRelationship(contactFortCurrTenant.SSIN, acc.SSIN, false, false, null,null);
                                     }
                                     await _iCreateMarketplaceAccount.HideAccount(acc.SSIN);
                                 }

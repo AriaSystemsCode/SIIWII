@@ -34,6 +34,8 @@ using Abp.AspNetZeroCore.Timing;
 using onetouch.AppMarketplaceContacts;
 using onetouch.AppSiiwiiTransaction.Dtos;
 using onetouch.AppContacts;
+using Microsoft.Extensions.Configuration;
+using onetouch.Configuration;
 
 namespace onetouch.AppItemsLists
 {
@@ -68,6 +70,7 @@ namespace onetouch.AppItemsLists
         //I49[Start]
         private readonly IRepository<AppMarketplaceContact, long> _appMarketplaceAccountsRepository;
         private readonly IRepository<AppContactRelationshipInfo,long> _appContactRelationshipInfoRepository;
+        private readonly IConfigurationRoot _appConfiguration;
         //I49[End]
         public AppItemsListsAppService(IRepository<AppItemsList, long> appItemsListRepository, IAppItemsListsExcelExporter appItemsListsExcelExporter, Helper helper
             , IAppEntitiesAppService appEntitiesAppService
@@ -85,7 +88,8 @@ namespace onetouch.AppItemsLists
              IAppItemsAppService appItemsAppService,
              ISycEntityObjectTypesAppService sycEntityObjectTypesAppService, 
              IRepository<SydObject, long> sydObjectRepository, IRepository<AppMarketplaceContact, long> appMarketplaceAccountsRepository,
-             IRepository<AppContactRelationshipInfo, long> appContactRelationshipInfoRepository)
+             IRepository<AppContactRelationshipInfo, long> appContactRelationshipInfoRepository,
+             IAppConfigurationAccessor appConfigurationAccessor)
         {
             _appConfiguration = appConfigurationAccessor.Configuration;
             //I45
