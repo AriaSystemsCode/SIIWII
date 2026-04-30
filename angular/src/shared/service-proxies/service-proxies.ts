@@ -66000,6 +66000,7 @@ export class CreateOrEditAccountInfoDto implements ICreateOrEditAccountInfoDto {
     shipViaId!: number | undefined;
     paymentTermsId!: number | undefined;
     extraDataAttributes!: ExtraDataAttrDto[] | undefined;
+    recordType!: string | undefined;
     id!: number | undefined;
 
     [key: string]: any;
@@ -66107,6 +66108,7 @@ export class CreateOrEditAccountInfoDto implements ICreateOrEditAccountInfoDto {
                 for (let item of _data["extraDataAttributes"])
                     this.extraDataAttributes!.push(ExtraDataAttrDto.fromJS(item));
             }
+            this.recordType = _data["recordType"];
             this.id = _data["id"];
         }
     }
@@ -66212,6 +66214,7 @@ export class CreateOrEditAccountInfoDto implements ICreateOrEditAccountInfoDto {
             for (let item of this.extraDataAttributes)
                 data["extraDataAttributes"].push(item.toJSON());
         }
+        data["recordType"] = this.recordType;
         data["id"] = this.id;
         return data;
     }
@@ -66274,6 +66277,7 @@ export interface ICreateOrEditAccountInfoDto {
     shipViaId: number | undefined;
     paymentTermsId: number | undefined;
     extraDataAttributes: ExtraDataAttrDto[] | undefined;
+    recordType: string | undefined;
     id: number | undefined;
 
     [key: string]: any;
@@ -67669,6 +67673,7 @@ export class AppContactValidationInputDTO implements IAppContactValidationInputD
     shipViaId!: number | undefined;
     paymentTermsId!: number | undefined;
     extraDataAttributes!: ExtraDataAttrDto[] | undefined;
+    recordType!: string | undefined;
     id!: number | undefined;
 
     [key: string]: any;
@@ -67781,6 +67786,7 @@ export class AppContactValidationInputDTO implements IAppContactValidationInputD
                 for (let item of _data["extraDataAttributes"])
                     this.extraDataAttributes!.push(ExtraDataAttrDto.fromJS(item));
             }
+            this.recordType = _data["recordType"];
             this.id = _data["id"];
         }
     }
@@ -67891,6 +67897,7 @@ export class AppContactValidationInputDTO implements IAppContactValidationInputD
             for (let item of this.extraDataAttributes)
                 data["extraDataAttributes"].push(item.toJSON());
         }
+        data["recordType"] = this.recordType;
         data["id"] = this.id;
         return data;
     }
@@ -67954,6 +67961,7 @@ export interface IAppContactValidationInputDTO {
     shipViaId: number | undefined;
     paymentTermsId: number | undefined;
     extraDataAttributes: ExtraDataAttrDto[] | undefined;
+    recordType: string | undefined;
     id: number | undefined;
 
     [key: string]: any;
@@ -90457,6 +90465,7 @@ export class GetAccountInformationOutputDto implements IGetAccountInformationOut
     code!: string | undefined;
     role!: string | undefined;
     roleName!: string | undefined;
+    relationId!: number | undefined;
 
     [key: string]: any;
 
@@ -90486,6 +90495,7 @@ export class GetAccountInformationOutputDto implements IGetAccountInformationOut
             this.code = _data["code"];
             this.role = _data["role"];
             this.roleName = _data["roleName"];
+            this.relationId = _data["relationId"];
         }
     }
 
@@ -90513,6 +90523,7 @@ export class GetAccountInformationOutputDto implements IGetAccountInformationOut
         data["code"] = this.code;
         data["role"] = this.role;
         data["roleName"] = this.roleName;
+        data["relationId"] = this.relationId;
         return data;
     }
 }
@@ -90529,6 +90540,7 @@ export interface IGetAccountInformationOutputDto {
     code: string | undefined;
     role: string | undefined;
     roleName: string | undefined;
+    relationId: number | undefined;
 
     [key: string]: any;
 }
@@ -90948,6 +90960,8 @@ export class GetAppTransactionsForViewDto implements IGetAppTransactionsForViewD
     buyerCompanySSIN!: string | undefined;
     buyerCompanyName!: string | undefined;
     sellerId!: number | undefined;
+    sellerRelationId!: number | undefined;
+    buyerRelationId!: number | undefined;
     sellerCompanyName!: string | undefined;
     buyerContactEMailAddress!: string | undefined;
     languageId!: number | undefined;
@@ -91071,6 +91085,8 @@ export class GetAppTransactionsForViewDto implements IGetAppTransactionsForViewD
             this.buyerCompanySSIN = _data["buyerCompanySSIN"];
             this.buyerCompanyName = _data["buyerCompanyName"];
             this.sellerId = _data["sellerId"];
+            this.sellerRelationId = _data["sellerRelationId"];
+            this.buyerRelationId = _data["buyerRelationId"];
             this.sellerCompanyName = _data["sellerCompanyName"];
             this.buyerContactEMailAddress = _data["buyerContactEMailAddress"];
             this.languageId = _data["languageId"];
@@ -91236,6 +91252,8 @@ export class GetAppTransactionsForViewDto implements IGetAppTransactionsForViewD
         data["buyerCompanySSIN"] = this.buyerCompanySSIN;
         data["buyerCompanyName"] = this.buyerCompanyName;
         data["sellerId"] = this.sellerId;
+        data["sellerRelationId"] = this.sellerRelationId;
+        data["buyerRelationId"] = this.buyerRelationId;
         data["sellerCompanyName"] = this.sellerCompanyName;
         data["buyerContactEMailAddress"] = this.buyerContactEMailAddress;
         data["languageId"] = this.languageId;
@@ -91378,6 +91396,8 @@ export interface IGetAppTransactionsForViewDto {
     buyerCompanySSIN: string | undefined;
     buyerCompanyName: string | undefined;
     sellerId: number | undefined;
+    sellerRelationId: number | undefined;
+    buyerRelationId: number | undefined;
     sellerCompanyName: string | undefined;
     buyerContactEMailAddress: string | undefined;
     languageId: number | undefined;
@@ -91454,6 +91474,8 @@ export class CreateOrEditAppTransactionsDto implements ICreateOrEditAppTransacti
     buyerCompanySSIN!: string | undefined;
     buyerCompanyName!: string | undefined;
     sellerId!: number | undefined;
+    sellerRelationId!: number | undefined;
+    buyerRelationId!: number | undefined;
     sellerCompanyName!: string | undefined;
     buyerContactEMailAddress!: string | undefined;
     languageId!: number | undefined;
@@ -91543,6 +91565,8 @@ export class CreateOrEditAppTransactionsDto implements ICreateOrEditAppTransacti
             this.buyerCompanySSIN = _data["buyerCompanySSIN"];
             this.buyerCompanyName = _data["buyerCompanyName"];
             this.sellerId = _data["sellerId"];
+            this.sellerRelationId = _data["sellerRelationId"];
+            this.buyerRelationId = _data["buyerRelationId"];
             this.sellerCompanyName = _data["sellerCompanyName"];
             this.buyerContactEMailAddress = _data["buyerContactEMailAddress"];
             this.languageId = _data["languageId"];
@@ -91674,6 +91698,8 @@ export class CreateOrEditAppTransactionsDto implements ICreateOrEditAppTransacti
         data["buyerCompanySSIN"] = this.buyerCompanySSIN;
         data["buyerCompanyName"] = this.buyerCompanyName;
         data["sellerId"] = this.sellerId;
+        data["sellerRelationId"] = this.sellerRelationId;
+        data["buyerRelationId"] = this.buyerRelationId;
         data["sellerCompanyName"] = this.sellerCompanyName;
         data["buyerContactEMailAddress"] = this.buyerContactEMailAddress;
         data["languageId"] = this.languageId;
@@ -91794,6 +91820,8 @@ export interface ICreateOrEditAppTransactionsDto {
     buyerCompanySSIN: string | undefined;
     buyerCompanyName: string | undefined;
     sellerId: number | undefined;
+    sellerRelationId: number | undefined;
+    buyerRelationId: number | undefined;
     sellerCompanyName: string | undefined;
     buyerContactEMailAddress: string | undefined;
     languageId: number | undefined;
@@ -92097,6 +92125,8 @@ export class GetAllAppTransactionsForViewDto implements IGetAllAppTransactionsFo
     buyerCompanySSIN!: string | undefined;
     buyerCompanyName!: string | undefined;
     sellerId!: number | undefined;
+    sellerRelationId!: number | undefined;
+    buyerRelationId!: number | undefined;
     sellerCompanyName!: string | undefined;
     buyerContactEMailAddress!: string | undefined;
     languageId!: number | undefined;
@@ -92229,6 +92259,8 @@ export class GetAllAppTransactionsForViewDto implements IGetAllAppTransactionsFo
             this.buyerCompanySSIN = _data["buyerCompanySSIN"];
             this.buyerCompanyName = _data["buyerCompanyName"];
             this.sellerId = _data["sellerId"];
+            this.sellerRelationId = _data["sellerRelationId"];
+            this.buyerRelationId = _data["buyerRelationId"];
             this.sellerCompanyName = _data["sellerCompanyName"];
             this.buyerContactEMailAddress = _data["buyerContactEMailAddress"];
             this.languageId = _data["languageId"];
@@ -92403,6 +92435,8 @@ export class GetAllAppTransactionsForViewDto implements IGetAllAppTransactionsFo
         data["buyerCompanySSIN"] = this.buyerCompanySSIN;
         data["buyerCompanyName"] = this.buyerCompanyName;
         data["sellerId"] = this.sellerId;
+        data["sellerRelationId"] = this.sellerRelationId;
+        data["buyerRelationId"] = this.buyerRelationId;
         data["sellerCompanyName"] = this.sellerCompanyName;
         data["buyerContactEMailAddress"] = this.buyerContactEMailAddress;
         data["languageId"] = this.languageId;
@@ -92554,6 +92588,8 @@ export interface IGetAllAppTransactionsForViewDto {
     buyerCompanySSIN: string | undefined;
     buyerCompanyName: string | undefined;
     sellerId: number | undefined;
+    sellerRelationId: number | undefined;
+    buyerRelationId: number | undefined;
     sellerCompanyName: string | undefined;
     buyerContactEMailAddress: string | undefined;
     languageId: number | undefined;
@@ -92975,6 +93011,8 @@ export class GetOrderDetailsForViewDto implements IGetOrderDetailsForViewDto {
     buyerCompanySSIN!: string | undefined;
     buyerCompanyName!: string | undefined;
     sellerId!: number | undefined;
+    sellerRelationId!: number | undefined;
+    buyerRelationId!: number | undefined;
     sellerCompanyName!: string | undefined;
     buyerContactEMailAddress!: string | undefined;
     languageId!: number | undefined;
@@ -93083,6 +93121,8 @@ export class GetOrderDetailsForViewDto implements IGetOrderDetailsForViewDto {
             this.buyerCompanySSIN = _data["buyerCompanySSIN"];
             this.buyerCompanyName = _data["buyerCompanyName"];
             this.sellerId = _data["sellerId"];
+            this.sellerRelationId = _data["sellerRelationId"];
+            this.buyerRelationId = _data["buyerRelationId"];
             this.sellerCompanyName = _data["sellerCompanyName"];
             this.buyerContactEMailAddress = _data["buyerContactEMailAddress"];
             this.languageId = _data["languageId"];
@@ -93233,6 +93273,8 @@ export class GetOrderDetailsForViewDto implements IGetOrderDetailsForViewDto {
         data["buyerCompanySSIN"] = this.buyerCompanySSIN;
         data["buyerCompanyName"] = this.buyerCompanyName;
         data["sellerId"] = this.sellerId;
+        data["sellerRelationId"] = this.sellerRelationId;
+        data["buyerRelationId"] = this.buyerRelationId;
         data["sellerCompanyName"] = this.sellerCompanyName;
         data["buyerContactEMailAddress"] = this.buyerContactEMailAddress;
         data["languageId"] = this.languageId;
@@ -93360,6 +93402,8 @@ export interface IGetOrderDetailsForViewDto {
     buyerCompanySSIN: string | undefined;
     buyerCompanyName: string | undefined;
     sellerId: number | undefined;
+    sellerRelationId: number | undefined;
+    buyerRelationId: number | undefined;
     sellerCompanyName: string | undefined;
     buyerContactEMailAddress: string | undefined;
     languageId: number | undefined;

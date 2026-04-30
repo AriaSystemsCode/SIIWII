@@ -63,7 +63,7 @@ export class MarketplaceViewProductComponent
     orderType: string = "";
     productVarImages: MarketplaceExtraDataAttrDto[];
     currencySymbol: string = "";
-    showEditSpecialPrice: boolean = true;
+    showEditSpecialPrice: boolean = false;
     updatedSpecialPrice: number = 0;
     filteredColors: any[] = [];
     handleSCreenSelect: number = 0
@@ -96,7 +96,7 @@ export class MarketplaceViewProductComponent
     pageSize = 11;
     loadingMore = false;
 
-
+    currentTransId:any
     public constructor(
         private _AppMarketplaceItemsServiceProxy: AppMarketplaceItemsServiceProxy,
         private _AppTransactionServiceProxy: AppTransactionServiceProxy,
@@ -114,11 +114,13 @@ export class MarketplaceViewProductComponent
         this.ismarketPLace = JSON.parse(localStorage.getItem("fromMarketPlace"));
         this.productBodyData = JSON.parse(localStorage.getItem("productData"));
         this.priceLevel = localStorage.getItem("tempPriceLevel");
+        this.currentTransId = localStorage.getItem("transId");
         this.filteredColors = this.colorsData;
        
     }
     ngOnInit(): void {
    
+            this.showSpecialPrice = this.productBodyData?.sellerSSIN ? true : false;
         this.route.paramMap.subscribe(params => {
           const idParam = params.get('id');        
           const id = idParam ? +idParam : null;
@@ -196,7 +198,7 @@ export class MarketplaceViewProductComponent
           }
           getProductDetailsForView() {
             this.showMainSpinner();
-            this.showEditSpecialPrice = true;
+             this.showEditSpecialPrice = true;
                     
             const handleItemDetails = (res: GetAppMarketplaceItemDetailForViewDto) => {
               this.productDetails = res?.appItem;
@@ -254,9 +256,10 @@ export class MarketplaceViewProductComponent
                   this.productBodyData.buyerSSIN,
                   this.productBodyData.sellerSSIN,
                   this.priceLevel,
+                  this.currentTransId,
                   this.productBodyData.id,
                   undefined,
-                  undefined,
+                //   undefined,
                   0,
                   10,
                   undefined,

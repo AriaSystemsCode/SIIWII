@@ -697,6 +697,7 @@ export class TransactionInformationComponent
       localStorage.setItem("fromSellerRoom", JSON.stringify(true));
       localStorage.setItem("fromMarketPlace", JSON.stringify(false));
       // this.router.navigateByUrl("app/main/marketplace/products");
+                    localStorage.setItem("transId", JSON.stringify(this.appTransactionsForViewDto?.id));
 
       if (location.href.toString() == AppConsts.appBaseUrl + "/app/main/marketplace/products")
         location.reload();
@@ -1449,6 +1450,7 @@ export class TransactionInformationComponent
         this.appTransactionsForViewDto?.buyer,
         this.appTransactionsForViewDto?.sellerCompanySSIN,
         this.appTransactionsForViewDto?.priceLevel,
+        this.appTransactionsForViewDto?.id,
         id,
         undefined,
         undefined,
@@ -1464,7 +1466,7 @@ export class TransactionInformationComponent
         undefined,
         undefined,
         undefined,
-        undefined,
+        // undefined,
         0,
         10
       )
