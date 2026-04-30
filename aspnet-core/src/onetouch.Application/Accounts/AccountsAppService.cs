@@ -8994,7 +8994,8 @@ namespace onetouch.Accounts
                     foreach (AccountExcelRecordDTO logRecord in accountExcelResultsDTO.ExcelRecords)
                     {
                         rowNumber++;
-                        if (Sheet.Cell("A" + rowNumber.ToString()).Value.ToString() == "Account")
+                        if ((Sheet.Cell("A" + rowNumber.ToString()).Value.ToString() == "Account") ||
+                                (Sheet.Cell("A" + rowNumber.ToString()).Value.ToString() == "Vendor"))
                         {
                             if (rowNumber > 2)
                             {
@@ -9655,20 +9656,21 @@ namespace onetouch.Accounts
                     
                 }
                 //I40[End]
-                List<AccountExcelDto> accountsResult = result.Where(r => r.RecordType == "Account" && string.IsNullOrEmpty(r.ParentCode)
+                List<AccountExcelDto> accountsResult = result.Where(r => (r.RecordType == "Account" || r.RecordType == "Vendor") && string.IsNullOrEmpty(r.ParentCode)
                 && r.rowNumber >= accountExcelResultsDTO.From && r.rowNumber <= accountExcelResultsDTO.To).ToList();
                 List<CreateOrEditAccountInfoDto> resultAccount = mapperAccount.Map<List<AccountExcelDto>, List<CreateOrEditAccountInfoDto>>(accountsResult);
                 //xx
-                var accountList = (from o in _appContactRepository.GetAll().AsNoTracking().Where(r => r.EntityFk.EntityObjectTypeId == partnerEntityObjectTypeId).ToList()
+                var accountList = (from o in _appContactRepository.GetAll().Include(z=>z.AppContactAddresses).AsNoTracking().Where(r => r.EntityFk.EntityObjectTypeId == partnerEntityObjectTypeId).ToList()
                                    join s in resultAccount on o.Code equals s.Code
                                    select o).ToList();
+                                  // select new { Account = o, RecordType = s.RecordType }).ToList();
                 //xx//new { Account= o,RecordType=s.RecordType })
 
                 foreach (CreateOrEditAccountInfoDto createOrEditAccountInfoDto in resultAccount)
                 {
-                    AppContact account = accountList.FirstOrDefault(a => a.Code == createOrEditAccountInfoDto.Code);
+                    AppContact account =  accountList.FirstOrDefault(a => a.Code == createOrEditAccountInfoDto.Code);
                     //AppContact account = accountList.FirstOrDefault(a => a.Account.Code == createOrEditAccountInfoDto.Code).Select(z => z.Account);
-                    // string recordType = accountList.FirstOrDefault(a => a.Account.Code == createOrEditAccountInfoDto.Code).Select(z => z.RecordType);
+                    
                     //_appContactRepository.GetAll().AsNoTracking().Where(r => r.EntityFk.EntityObjectTypeId == partnerEntityObjectTypeId  && r.Code == createOrEditAccountInfoDto.Code).FirstOrDefault();
                     string code = createOrEditAccountInfoDto.Code;
                     string oldCode = createOrEditAccountInfoDto.Code;
@@ -9751,14 +9753,15 @@ namespace onetouch.Accounts
                     accountContact.EntityFk.EntityCategories = ObjectMapper.Map<List<AppEntityCategory>>(createOrEditAccountInfoDto.EntityCategories);
                     accountContact.EntityFk.EntityAttachments = ObjectMapper.Map<List<AppEntityAttachment>>(createOrEditAccountInfoDto.EntityAttachments);
                     //I49[Start]
-                    //accountContact.EntityFk.EntityExtraData = new List<AppEntityExtraData>();
-                    //accountContact.EntityFk.EntityExtraData.Add(new AppEntityExtraData
-                    //{ AttributeId=610,
-                    //  AttributeCode= "MARKETPLACE-ROLE",
-                    //  EntityCode = createOrEditAccountInfoDto.Code,
-                    //  AttributeValue = (recordType=="Vendor" ? ContactRoleEnum.Seller.ToString(): ContactRoleEnum.Buyer.ToString())
-                    //});
-                    ////I49[End]
+                    accountContact.EntityFk.EntityExtraData = new List<AppEntityExtraData>();
+                    accountContact.EntityFk.EntityExtraData.Add(new AppEntityExtraData
+                    {
+                        AttributeId = 610,
+                        AttributeCode = "MARKETPLACE-ROLE",
+                        EntityCode = createOrEditAccountInfoDto.Code,
+                        AttributeValue = (createOrEditAccountInfoDto.RecordType == "Vendor" ? ContactRoleEnum.Seller.ToString() : ContactRoleEnum.Buyer.ToString())
+                    });
+                    //I49[End]
                     //accountContact.EntityFk.EntityAddresses = createOrEditAccountInfoDto.ContactAddresses;
                     if (string.IsNullOrEmpty(createOrEditAccountInfoDto.SSIN))
                     {
@@ -10246,36 +10249,41 @@ namespace onetouch.Accounts
 
                     foreach (var acc in accountsList)
                     {
-                        //xx
-                        foreach (var z in acc.AppContactAddresses)
-                        {
-                            if (z.AddressFk!=null)
-                            z.AddressFk.AccountId = acc.Id;
-                        }
-                        //xx
-                        foreach (var br in acc.ParentFkList)
-                        {
                             //xx
-                            foreach (var z in br.AppContactAddresses)
+                            if (acc.AppContactAddresses != null)
                             {
-                                if (z.AddressFk != null)
-                                    z.AddressFk.AccountId = acc.Id;
-                            }
-                            //xx
-                            br.AccountId = acc.Id;
-                            foreach (var cont in br.ParentFkList)
-                            {
-                                //xx
-                                foreach (var z in cont.AppContactAddresses)
+                                foreach (var z in acc.AppContactAddresses)
                                 {
                                     if (z.AddressFk != null)
                                         z.AddressFk.AccountId = acc.Id;
                                 }
-                                //xx
-                                cont.AccountId = acc.Id;
                             }
-                        }
-
+                            //xx
+                            if (acc.ParentFkList != null)
+                            {
+                                foreach (var br in acc.ParentFkList)
+                                {
+                                    //xx
+                                    foreach (var z in br.AppContactAddresses)
+                                    {
+                                        if (z.AddressFk != null)
+                                            z.AddressFk.AccountId = acc.Id;
+                                    }
+                                    //xx
+                                    br.AccountId = acc.Id;
+                                    foreach (var cont in br.ParentFkList)
+                                    {
+                                        //xx
+                                        foreach (var z in cont.AppContactAddresses)
+                                        {
+                                            if (z.AddressFk != null)
+                                                z.AddressFk.AccountId = acc.Id;
+                                        }
+                                        //xx
+                                        cont.AccountId = acc.Id;
+                                    }
+                                }
+                            }
                         }
                         con.AppContacts.UpdateRange(accountsList);
                         await con.SaveChangesAsync();
