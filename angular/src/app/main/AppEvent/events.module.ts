@@ -20,6 +20,7 @@ import {
 } from "@shared/service-proxies/service-proxies";
 import { CarouselModule} from "primeng/carousel";
 import { InputSwitchModule } from "primeng/inputswitch";
+import { DialogModule } from "primeng/dialog";
 
 @NgModule({
     declarations: [
@@ -40,7 +41,8 @@ import { InputSwitchModule } from "primeng/inputswitch";
         StepsModule,
         ModalModule.forRoot(),
         SelectAddressModule,
-        CarouselModule
+        CarouselModule,
+        DialogModule
     ],
 
     exports: [

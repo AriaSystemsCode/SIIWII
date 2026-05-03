@@ -118,3 +118,27 @@
     }
 
 }
+
+:host ::ng-deep .event-full-dialog {
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+:host ::ng-deep .event-full-dialog .p-dialog {
+  margin: 0 !important;
+  border-radius: 0 !important;
+}
+
+:host ::ng-deep .event-full-dialog .p-dialog-content {
+  padding: 0 !important;
+  margin: 0 !important;
+  height: 100%;
+}
+
+:host ::ng-deep .event-full-dialog .p-dialog-header {
+  padding: 0 !important;
+}
+
+:host ::ng-deep .event-full-dialog .p-dialog-footer {
+  padding: 0 !important;
+}

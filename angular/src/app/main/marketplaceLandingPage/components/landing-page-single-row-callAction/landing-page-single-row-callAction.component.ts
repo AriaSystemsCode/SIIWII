@@ -29,7 +29,7 @@ export class LandingPageSinglrRowCallActionComponent extends AppComponentBase im
 
   attachmentSafeMap: Record<number, SafeResourceUrl | null> = {};
   numVisible: number = 4;
-  numVisibleSingle: number = 6;
+  numVisibleSingle: number = 4;
 
   actionsMenuFlags: EventsBrowseComponentActionsMenuFlags
   statusesFlags: EventsBrowseComponentStatusesFlags
@@ -65,33 +65,33 @@ export class LandingPageSinglrRowCallActionComponent extends AppComponentBase im
     }
   ];
 
-  responsiveOptionsSingle = [
-    {
-      breakpoint: '1400px',
-      numVisible: 6,
-      numScroll: 6
-    },
-    {
-      breakpoint: '1199px',
-      numVisible: 6,
-      numScroll: 6
-    },
-    {
-      breakpoint: '991px',
-      numVisible: 2,
-      numScroll: 2
-    },
-    {
-      breakpoint: '767px',
-      numVisible: 2,
-      numScroll: 2
-    },
-    {
-      breakpoint: '575px',
-      numVisible: 1,
-      numScroll: 1
-    }
-  ];
+ responsiveOptionsSingle = [
+  {
+    breakpoint: '1400px',
+    numVisible: 4,
+    numScroll: 1
+  },
+  {
+    breakpoint: '1199px',
+    numVisible: 3,
+    numScroll: 1
+  },
+  {
+    breakpoint: '991px',
+    numVisible: 2,
+    numScroll: 1
+  },
+  {
+    breakpoint: '767px',
+    numVisible: 1,
+    numScroll: 1
+  },
+  {
+    breakpoint: '575px',
+    numVisible: 1,
+    numScroll: 1
+  }
+];
 
   languageSettingName: string = AppConsts.languageSettingName;
     isSmallScreen = false;

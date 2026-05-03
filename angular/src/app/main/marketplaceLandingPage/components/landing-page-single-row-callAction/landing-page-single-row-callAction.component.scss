@@ -121,3 +121,51 @@
 .one-style-badge i {
   font-size: 12px;
 }
+
+
+
+
+:host ::ng-deep .p-carousel,
+:host ::ng-deep .p-carousel-content,
+:host ::ng-deep .p-carousel-container,
+:host ::ng-deep .p-carousel-items-content {
+  overflow: hidden;
+}
+
+:host ::ng-deep .p-carousel .p-carousel-item {
+  display: flex;
+  justify-content: center;
+  overflow: visible;
+}
+
+.carousel-card {
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+.carousel-card-body.maxW {
+  max-width: 300px;
+  width: 100%;
+}
+
+:host ::ng-deep app-events-browse-card {
+  display: block;
+  width: 100%;
+  max-width: 300px;
+}
+
+
+:host ::ng-deep .few-items-carousel .p-carousel-items-container {
+  justify-content: center !important;
+  transform: none !important;
+}
+
+:host ::ng-deep .few-items-carousel .p-carousel-item {
+  flex: 0 0 auto !important;
+  width: auto !important;
+}
+
+:host ::ng-deep .few-items-carousel .carousel-card {
+  width: 300px;
+}
