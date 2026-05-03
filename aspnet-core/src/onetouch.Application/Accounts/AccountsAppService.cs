@@ -10324,6 +10324,57 @@ namespace onetouch.Accounts
                             }
                         }
                     }
+                    //Mariam49[Start]
+                    var contactFortCurrTenant = await _appContactRepository.GetAll()
+                          .AsNoTracking()
+                          .FirstOrDefaultAsync(x => x.TenantId == AbpSession.TenantId && x.IsProfileData == true && x.ParentId == null);
+
+                    if (contactFortCurrTenant != null)
+                    {
+                        var publishedMainAcc = await _appMarketplaceContactRepository.GetAll().Where(z => z.SSIN == contactFortCurrTenant.SSIN).FirstOrDefaultAsync();
+                        if (publishedMainAcc == null)
+                        {
+                            await PublishProfile();
+                            await _iCreateMarketplaceAccount.HideAccount(contactFortCurrTenant.SSIN);
+                        }
+
+                        foreach (var acc in accountsList)
+                        {
+                            var publishedAcc = await _appMarketplaceContactRepository.GetAll().Where(z => z.SSIN == acc.SSIN).FirstOrDefaultAsync();
+                            if (publishedAcc == null)
+                            {
+
+                                var tenant = AbpSession.TenantId;
+                                await PublishManualAccount(acc.SSIN, long.Parse(tenant.ToString()));
+
+                                //if (contactFortCurrTenant != null)
+                                {
+                                    var returnVal =
+                                        await _iCreateMarketplaceAccount.CreateOrEditMarketplaceContactRelationship(contactFortCurrTenant.SSIN, acc.SSIN, false, false, null,null);
+                                }
+                                await _iCreateMarketplaceAccount.HideAccount(acc.SSIN);
+                            }
+                        }
+
+                        foreach (var acc in accountsListUpdated)
+                        {
+                            var publishedAcc = await _appMarketplaceContactRepository.GetAll().Where(z => z.SSIN == acc.SSIN).FirstOrDefaultAsync();
+                            if (publishedAcc == null)
+                            {
+
+                                var tenant = AbpSession.TenantId;
+                                await PublishManualAccount(acc.SSIN, long.Parse(tenant.ToString()));
+
+                                //if (contactFortCurrTenant != null)
+                                {
+                                    var returnVal =
+                                        await _iCreateMarketplaceAccount.CreateOrEditMarketplaceContactRelationship(contactFortCurrTenant.SSIN, acc.SSIN, false, false, null,null);
+                                }
+                                await _iCreateMarketplaceAccount.HideAccount(acc.SSIN);
+                            }
+                        }
+                    }
+                    //Mariam49[End]
                     //I40[End]
                     // accountContact
 
