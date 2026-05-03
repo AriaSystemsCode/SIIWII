@@ -65,6 +65,7 @@ import { MediaTabComponent } from './components/marketplace-account-profile-view
 import { AccountBillingComponent } from './components/accountBilling/accountBilling/accountbilling.component';
 import { OverALLRatingReviewsModule } from '../overallRating-reviews/overallRating-reviews.module';
 import { InputSwitchModule } from 'primeng/inputswitch';
+import { AccountPartnerProfileModule } from './components/account-partner-profile/account-partner-profile.module';
 
 @NgModule({
     declarations: [
@@ -86,6 +87,7 @@ import { InputSwitchModule } from 'primeng/inputswitch';
         MarketplaceAccountProfileComponent,
         OverviewTabComponent,EventsTabComponent,ConnectionsTabComponent, PostsTabComponent, ConnectionsCardComponent,
         MediaTabComponent,
+        
     ],
     imports: [
         CommonModule,
@@ -127,7 +129,8 @@ import { InputSwitchModule } from 'primeng/inputswitch';
         PostsModule,
         InteractionsModule,EventsBrowseModule,AccountSharedModule,
         MarketplaceProductsModule,
-        OverALLRatingReviewsModule,InputSwitchModule
+        OverALLRatingReviewsModule,InputSwitchModule,
+        AccountPartnerProfileModule
         
         
     ],
@@ -137,7 +140,7 @@ import { InputSwitchModule } from 'primeng/inputswitch';
         { provide: BsLocaleService, useFactory: NgxBootstrapDatePickerConfigService.getDatepickerLocale },PublishService
     ],
     exports:[
-        MarketplaceProductsModule,
+        MarketplaceProductsModule
     ]
 })
 export class AccountInfosModule { }

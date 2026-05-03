@@ -24,6 +24,7 @@ import { TableModule } from 'primeng/table';
 import { TabMenuModule } from 'primeng/tabmenu';
 import { TreeModule } from 'primeng/tree';
 import { TreeTableModule } from 'primeng/treetable';
+import { AccountPartnerProfileModule } from '@app/main/accountInfos/components/account-partner-profile/account-partner-profile.module';
 
 
 @NgModule({
@@ -53,7 +54,9 @@ import { TreeTableModule } from 'primeng/treetable';
         TreeModule,
         CheckboxModule,
        BulkImportModule,
-        FiltersSharedModule
+        FiltersSharedModule,
+        AccountPartnerProfileModule
+        
     ],
     providers: [
         { provide: BsDatepickerConfig, useFactory: NgxBootstrapDatePickerConfigService.getDatepickerConfig },

@@ -12,3 +12,16 @@ export enum AccountInfoPageTabs {
     ViewContact,
     AccountBilling
 }
+
+
+
+export enum AccountPartnerType {
+  Manual = 'manual',
+  Connected = 'connected'
+}
+
+export enum AccountPartnerMode {
+  Create = 'create',
+  Edit = 'edit',
+  View = 'view'
+}

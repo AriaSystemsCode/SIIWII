@@ -1,0 +1,224 @@
+<form #accountPartnerForm="ngForm" novalidate autocomplete="off" class="partner-form">
+
+  <div class="partner-header">
+    <div>
+      <h5 class="m-0">
+        {{ mode === AccountPartnerMode.Create ? l('AddManualAccount') : l('EditAccount') }}
+      </h5>
+      <h3 class="mt-3 mb-0">
+        {{ accountInfoTemp?.name || l('NewManualAccount') }}
+      </h3>
+    </div>
+
+    <div class="partner-actions">
+      <button type="button" class="btn btn-cancel" (click)="cancel()">
+        {{ l('Cancel') }}
+      </button>
+
+      <button
+        type="button"
+        class="btn btn-save"
+     
+        [disabled]="!accountPartnerForm.form.valid || !touched"
+        (click)="save()">
+        {{ l('Save') }}
+      </button>
+    </div>
+  </div>
+
+  <div class="partner-body">
+
+    <!-- Images -->
+<div class="upload-section">
+  <div class="upload-top-row d-flex">
+    <div class="logo-upload mr-3">
+      <label>{{ l('CompanyLogo') }}</label>
+
+      <div class="mt-5 pt-3">
+        <app-image-upload
+          [image]="companyLogo"
+          [attachmentTypeCode]="'LOGO'"
+          [staticWidth]="165"
+          [staticHeight]="165"
+          [showGuidelines]="true"
+          [customExtentionsImgs]="true"
+          (imageBrowseDone)="imageBrowseDone($event, 'LOGO', -1)"
+          (removeImage)="removeImage('LOGO', -1)">
+        </app-image-upload>
+      </div>
+    </div>
+
+    <div class="cover-upload">
+      <label>{{ l('CompanyCoverPhoto') }}</label>
+
+      <app-image-upload
+        [image]="coverPhoto"
+        [attachmentTypeCode]="'BANNER'"
+        [staticWidth]="1014"
+        [staticHeight]="160"
+        [showGuidelines]="true"
+        [customExtentionsImgs]="true"
+        (imageBrowseDone)="imageBrowseDone($event, 'BANNER', -2)"
+        (removeImage)="removeImage('BANNER', -2)">
+      </app-image-upload>
+    </div>
+  </div>
+
+  <div class="other-images-row mt-3">
+    <app-image-upload
+      *ngFor="let img of otherImageSlots"
+      [image]="img.preview"
+      [attachmentTypeCode]="'IMAGE'"
+      [staticWidth]="200"
+      [showGuidelines]="true"
+      [customExtentionsImgs]="true"
+      (imageBrowseDone)="imageBrowseDone($event, 'IMAGE', img.index)"
+      (removeImage)="removeImage('IMAGE', img.index)">
+    </app-image-upload>
+  </div>
+</div>
+    <!-- Fields -->
+    <div class="form-grid">
+
+      <div class="field">
+        
+        <label> <span>*</span> {{ l('Code') }}</label>
+    <input type="text" id="AccountInfoTemp_Code" #codeInput="ngModel"
+                                                    class="form-control form-control-sm aria-input-text" maxlength="6"
+                                                    [disabled]="accountInfoTemp?.id>0" id="colFormLabelSm"
+                                                    [(ngModel)]="accountInfoTemp.code" name="code" required
+                                                    (input)="changeTouchState()"
+                                                    [placeholder]=" 'PleaseEnterCompanyCode...' | localize ">
+      </div>
+
+         <div class="field">
+        
+        <label> <span>*</span> {{ l('Name') }}</label>
+        <input
+          name="name"
+          required
+          class="form-control"
+          [(ngModel)]="accountInfoTemp.name"
+          (input)="changeTouchState()" />
+      </div>
+
+      <div class="field">
+        <label>{{ l('TradeName') }}</label>
+        <input
+          name="tradeName"
+          class="form-control"
+          [(ngModel)]="accountInfoTemp.tradeName"
+          (input)="changeTouchState()" />
+      </div>
+
+      <div class="field">
+        <label> <span>*</span>  {{ l('EmailAddress') }}</label>
+        <input
+          name="eMailAddress"
+          type="email"
+          class="form-control"
+          [(ngModel)]="accountInfoTemp.eMailAddress"
+          (input)="changeTouchState()" />
+     
+      </div>
+
+      <div class="field">
+        <label>{{ l('Website') }}</label>
+        <input
+          name="website"
+          class="form-control"
+          [(ngModel)]="accountInfoTemp.website"
+          (input)="changeTouchState()" />
+    
+      </div>
+
+   
+      <div class="field">
+        <label><span>*</span>  {{ l('Currency') }}</label>
+        <p-dropdown
+          name="currencyId"
+          [options]="allCurrencies"
+          optionLabel="label"
+          optionValue="value"
+          [(ngModel)]="accountInfoTemp.currencyId"
+          styleClass="w-100"
+          required
+          (onChange)="changeTouchState()">
+        </p-dropdown>
+      
+      </div>
+
+      <div class="field">
+        <label><span>*</span>  {{ l('AccountType') }}</label>
+        <p-dropdown
+          name="accountTypeId"
+          [options]="accountTypes"
+          [(ngModel)]="accountInfoTemp.accountTypeId"
+          styleClass="w-100"
+          required
+          (onChange)="changeTouchState()">
+        </p-dropdown>
+     
+      </div>
+
+      <div class="field">
+        <label><span>*</span>  {{ l('Language') }}</label>
+        <p-dropdown
+          name="languageId"
+          [options]="allLanguages"
+          optionLabel="label"
+          optionValue="value"
+          [(ngModel)]="accountInfoTemp.languageId"
+          styleClass="w-100"
+          (onChange)="changeTouchState()">
+        </p-dropdown>
+      </div>
+
+      <div class="field phone-field">
+        <label><span>*</span>  {{ l('Phone1') }}</label>
+
+        <div class="phone-row">
+          <p-dropdown
+            name="phone1TypeId"
+            [options]="allPhoneTypes"
+            optionLabel="label"
+            optionValue="value"
+            [(ngModel)]="accountInfoTemp.phone1TypeId"
+            styleClass="phone-type"
+            (onChange)="changeTouchState()">
+          </p-dropdown>
+
+          <input
+            name="phone1Number"
+            class="form-control"
+            [(ngModel)]="accountInfoTemp.phone1Number"
+            (input)="changeTouchState()" />
+
+         
+        </div>
+      </div>
+
+      <div class="field">
+        <label>{{ l('AccountSSIN') }}</label>
+        <input
+          name="ssin"
+          class="form-control disabled-input"
+          [(ngModel)]="accountInfoTemp.ssin"
+          readonly />
+      </div>
+
+      <div class="field full">
+        <label>{{ l('AboutUs') }}</label>
+        <textarea
+          name="aboutUs"
+          rows="5"
+          class="form-control"
+          [(ngModel)]="accountInfoTemp.description"
+          (input)="changeTouchState()"
+          [placeholder]="l('WriteSomethingForSummarizingYourCompany')">
+        </textarea>
+      </div>
+
+    </div>
+  </div>
+</form>

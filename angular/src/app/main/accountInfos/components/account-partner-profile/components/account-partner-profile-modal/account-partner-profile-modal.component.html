@@ -1,0 +1,27 @@
+<p-dialog
+  [(visible)]="visible"
+  [modal]="true"
+  [draggable]="false"
+  [appendTo]="'body'"
+  [style]="{ width: '85vw' }"
+  [contentStyle]="{ padding: '0' }"
+  styleClass="account-partner-dialog">
+
+  <app-account-partner-create-edit
+    *ngIf="mode === AccountPartnerMode.Create || mode === AccountPartnerMode.Edit"
+    [partnerType]="partnerType"
+    [mode]="mode"
+    [accountId]="accountId"
+    (saved)="onSaved()"
+    (cancelled)="close()">
+  </app-account-partner-create-edit>
+
+  <app-account-partner-view
+    *ngIf="mode === AccountPartnerMode.View"
+    [partnerType]="partnerType"
+    [accountId]="accountId"
+    (edit)="openEdit($event)"
+    (disconnected)="onDisconnected()">
+  </app-account-partner-view>
+
+</p-dialog>
