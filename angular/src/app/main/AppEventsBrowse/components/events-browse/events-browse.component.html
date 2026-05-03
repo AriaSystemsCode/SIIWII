@@ -27,7 +27,7 @@
                         </button>
   
                         <ul class="dropdown-menu actions-dropdown-menu" *dropdownMenu>
-                          <li *ngFor="let filter of pageMainFilters">
+                          <li *ngFor="let filter of pageMainFilters"  [ngClass]="{ 'd-none': filter?.label == 'MyEvents' && !isAuthenticated }">
                             <a
                               href="javascript:;"
                               (click)="mainFilterCtrl.setValue(filter)"
