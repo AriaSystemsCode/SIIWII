@@ -745,7 +745,7 @@ namespace onetouch.AppMarketplaceItems
                         {
                             //I49[End]
                             appItem = await _appMarketplaceItem.GetAll()
-                           .Include(x => x.ItemPricesFkList.Where(x => (x.Code == level || x.Code == "MSRP" || (x.Code=="" && x.BuyerSSIN != null)) && (x.CurrencyCode == currencyCode || x.CurrencyCode == "USD" || x.IsDefault)))
+                           .Include(x => x.ItemPricesFkList.Where(x => (x.Code == level || x.Code == "MSRP" || (x.BuyerSSIN != null)) && (x.CurrencyCode == currencyCode || x.CurrencyCode == "USD" || x.IsDefault)))
                            .ThenInclude(x => x.CurrencyFk).ThenInclude(x => x.EntityExtraData)
                            .Include(x => x.ItemSizeScaleHeadersFkList).ThenInclude(x => x.AppItemSizeScalesDetails)
                            .Include(x => x.EntityAttachments).ThenInclude(x => x.AttachmentFk)
@@ -762,7 +762,7 @@ namespace onetouch.AppMarketplaceItems
                         else
                         {
                           appItem = await _appMarketplaceItem.GetAll()
-                         .Include(x => x.ItemPricesFkList.Where(x => (x.Code == level || x.Code == "MSRP" || (x.Code == "" && x.BuyerSSIN != null)) && (x.CurrencyCode == currencyCode || x.CurrencyCode == "USD" || x.IsDefault)))
+                         .Include(x => x.ItemPricesFkList.Where(x => (x.Code == level || x.Code == "MSRP" || (x.BuyerSSIN != null)) && (x.CurrencyCode == currencyCode || x.CurrencyCode == "USD" || x.IsDefault)))
                          .ThenInclude(x => x.CurrencyFk).ThenInclude(x => x.EntityExtraData)
                          .Include(x => x.ItemSizeScaleHeadersFkList).ThenInclude(x => x.AppItemSizeScalesDetails)
                          .Include(x => x.EntityAttachments).ThenInclude(x => x.AttachmentFk)
@@ -776,7 +776,7 @@ namespace onetouch.AppMarketplaceItems
                         }
 
                         var varAppItems = await _appMarketplaceItem.GetAll()
-                            .Include(x => x.ItemPricesFkList.Where(x => (x.Code == level || x.Code == "MSRP" || (x.Code == "" && x.BuyerSSIN != null)) && (x.CurrencyCode == currencyCode || x.CurrencyCode == "USD" || x.IsDefault)))
+                            .Include(x => x.ItemPricesFkList.Where(x => (x.Code == level || x.Code == "MSRP" || (x.BuyerSSIN != null)) && (x.CurrencyCode == currencyCode || x.CurrencyCode == "USD" || x.IsDefault)))
                         .Include(x => x.EntityAttachments).ThenInclude(x => x.AttachmentFk)
                         .Include(x => x.EntityExtraData).ThenInclude(x => x.EntityObjectTypeFk)
                         .Include(x => x.EntityExtraData).ThenInclude(x => x.AttributeValueFk)
@@ -902,7 +902,7 @@ namespace onetouch.AppMarketplaceItems
                                 //I49[Start]
                                 if (!string.IsNullOrEmpty(input.BuyerAccountSSIN))
                                 {
-                                    var buyerPrice = appItem.ItemPricesFkList.Where(x => x.Code == "" && x.CurrencyCode == currencyCode &&
+                                    var buyerPrice = appItem.ItemPricesFkList.Where(x => x.CurrencyCode == currencyCode &&
                                     x.BuyerSSIN == input.BuyerAccountSSIN).FirstOrDefault();
                                     if (buyerPrice != null)
                                     {
@@ -911,7 +911,7 @@ namespace onetouch.AppMarketplaceItems
                                     }
                                     else
                                     {
-                                        var buyerPriceObjUsd = appItem.ItemPricesFkList.Where(x => x.Code == "" && x.CurrencyCode == "USD" &&
+                                        var buyerPriceObjUsd = appItem.ItemPricesFkList.Where(x => x.CurrencyCode == "USD" &&
                                             x.BuyerSSIN == input.BuyerAccountSSIN).FirstOrDefault();
                                         if (buyerPriceObjUsd != null)
                                         {
@@ -920,7 +920,7 @@ namespace onetouch.AppMarketplaceItems
                                         }
                                         else
                                         {
-                                            var buyerObjDef = appItem.ItemPricesFkList.Where(x => x.Code == "" && x.IsDefault &&
+                                            var buyerObjDef = appItem.ItemPricesFkList.Where(x => x.IsDefault &&
                                             x.BuyerSSIN == input.BuyerAccountSSIN).FirstOrDefault();
                                             if (buyerObjDef != null)
                                             {

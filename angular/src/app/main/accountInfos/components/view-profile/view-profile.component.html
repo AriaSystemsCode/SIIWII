@@ -489,6 +489,41 @@
 
                             </div>
                             <hr class="header">
+
+
+                          <div class="col-md-12 align-items-baseline pt-2 pb-2 pl-3 d-flex">
+  <h6 class="text-right font-weight-bold mr-3">
+    <img src="../../assets/img/input_icons/user.png" class="">
+   
+    {{ l("MarketplaceRole") }}
+  </h6>
+
+  <!-- View mode -->
+  <div *ngIf="!Editting" class="d-flex flex-wrap gap-2">
+    <span *ngFor="let role of marketplaceRolesList" class="role-chip">
+      {{ role }}
+    </span>
+
+    <span *ngIf="!marketplaceRolesList?.length">-</span>
+  </div>
+
+  <!-- Edit mode -->
+  <div class="col-sm-8" *ngIf="Editting">
+    <p-multiSelect
+      [options]="roles"
+      [(ngModel)]="selectedRoles"
+      [ngModelOptions]="{ standalone: true }"
+      optionLabel="name"
+      optionValue="name"
+      placeholder="Select Roles"
+      [maxSelectedLabels]="3"
+      class="w-100 md:w-80"
+      display="chip">
+    </p-multiSelect>
+  </div>
+</div>
+                            <hr class="header">
+
                             <div class="col-md-12  align-items-baseline pt-2 pb-2 pl-3">
                                 <h6 class=" font-weight-bold mr-3 " [ngClass]="Editting ? 'addWidth':''"> <img
                                         src="../../assets/img/input_icons/outline-work.png" class=""> {{ (

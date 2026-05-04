@@ -574,8 +574,8 @@ namespace onetouch.Accounts
                             {
                                 // account.ConnectionName = GetAction(account.Account.AccountType, currentTenantAccount, false);
                                 var relationshipsList = await _appContactRelationshipInfoRepository.GetAll()
-                                     .Where(z => ((z.RecipientContactSSIN == currentTenantAccount.SSIN && z.RequesterContactSSIN == account.Account.SSIN)
-                                     || (z.RecipientContactSSIN == account.Account.SSIN && z.RequesterContactSSIN == currentTenantAccount.SSIN))
+                                     .Where(z => (((z.RecipientContactSSIN == currentTenantAccount.SSIN && z.RequesterContactSSIN == account.Account.SSIN)
+                                     || (z.RecipientContactSSIN == account.Account.SSIN && z.RequesterContactSSIN == currentTenantAccount.SSIN)) && z.EntityObjectStatusId!= inActiveRelationshipStatusId)
                                     ).OrderByDescending(z => z.CreationTime).ToListAsync();
                                 if (relationshipsList != null && relationshipsList.Count > 0)
                                 {
@@ -2861,6 +2861,7 @@ namespace onetouch.Accounts
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
             {
                 //I40[Start]
+                var inActiveRealtionshipStatusId = await _helper.SystemTables.GetEntityObjectStatusRelationshipInActive();
                 var marketplaceRelationshipSycEntityObjId = await _helper.SystemTables.GetEntityObjectTypeMarketplaceRelationship();
                 var relationShipLookups = await _appEntityRepository.GetAll().Include(z => z.EntityExtraData)
                                 .Where(z => z.EntityObjectTypeId == marketplaceRelationshipSycEntityObjId).ToListAsync();
@@ -3054,8 +3055,8 @@ namespace onetouch.Accounts
                     await _iCreateMarketplaceAccount.CreateOrEditMarketplaceContactRelationship(requesterSSIN, recipientSSIN, true, null, null, relationshipId);
                     //MMT
                     var relationshipsList = await _appContactRelationshipInfoRepository.GetAll()
-                               .Where(z => currentaccount != null && ((z.RecipientContactSSIN == currentaccount.SSIN && z.RequesterContactSSIN == account.SSIN)
-                               || (z.RecipientContactSSIN == account.SSIN && z.RequesterContactSSIN == currentaccount.SSIN))
+                               .Where(z => currentaccount != null && (((z.RecipientContactSSIN == currentaccount.SSIN && z.RequesterContactSSIN == account.SSIN)
+                               || (z.RecipientContactSSIN == account.SSIN && z.RequesterContactSSIN == currentaccount.SSIN)) && z.EntityObjectStatusId!= inActiveRealtionshipStatusId)
                               ).OrderByDescending(z => z.CreationTime).ToListAsync();
                     if (relationshipsList != null && relationshipsList.Count > 0)
                     {
@@ -4463,9 +4464,10 @@ namespace onetouch.Accounts
                        .FirstOrDefault(e => e.TenantId == AbpSession.TenantId && e.EntityFk.TenantOwner != AbpSession.TenantId && e.EntityFk.TenantOwner != 0 && e.EntityFk.TenantOwner != null);
                 if (accountConnection != null && accountConnection.Id > 0)
                 {
+                    var inActiveRelationshipStatusId = await _helper.SystemTables.GetEntityObjectStatusRelationshipInActive();
                     var relationshipsList = await _appContactRelationshipInfoRepository.GetAll()
-                            .Where(z => ((z.RecipientContactSSIN == originalPublishContactFortCurrTenant.SSIN && z.RequesterContactSSIN == ssin)
-                            || (z.RecipientContactSSIN == ssin && z.RequesterContactSSIN == originalPublishContactFortCurrTenant.SSIN))
+                            .Where(z => (((z.RecipientContactSSIN == originalPublishContactFortCurrTenant.SSIN && z.RequesterContactSSIN == ssin)
+                            || (z.RecipientContactSSIN == ssin && z.RequesterContactSSIN == originalPublishContactFortCurrTenant.SSIN)) && z.EntityObjectStatusId != inActiveRelationshipStatusId)
                            ).OrderByDescending(z => z.CreationTime).ToListAsync();
                     if (relationshipsList != null && relationshipsList.Count > 0)
                     {
@@ -7350,7 +7352,11 @@ namespace onetouch.Accounts
                     {
                         user.Surname = lastName;
                         user.Name = firstName;
-                        await UserManager.UpdateAsync(user);
+                        try
+                        {
+                            await UserManager.UpdateAsync(user);
+                        }
+                        catch { }
                     }
                 }
             }
@@ -10324,6 +10330,57 @@ namespace onetouch.Accounts
                             }
                         }
                     }
+                    //Mariam49[Start]
+                    var contactFortCurrTenant = await _appContactRepository.GetAll()
+                          .AsNoTracking()
+                          .FirstOrDefaultAsync(x => x.TenantId == AbpSession.TenantId && x.IsProfileData == true && x.ParentId == null);
+
+                    if (contactFortCurrTenant != null)
+                    {
+                        var publishedMainAcc = await _appMarketplaceContactRepository.GetAll().Where(z => z.SSIN == contactFortCurrTenant.SSIN).FirstOrDefaultAsync();
+                        if (publishedMainAcc == null)
+                        {
+                            await PublishProfile();
+                            await _iCreateMarketplaceAccount.HideAccount(contactFortCurrTenant.SSIN);
+                        }
+
+                        foreach (var acc in accountsList)
+                        {
+                            var publishedAcc = await _appMarketplaceContactRepository.GetAll().Where(z => z.SSIN == acc.SSIN).FirstOrDefaultAsync();
+                            if (publishedAcc == null)
+                            {
+
+                                var tenant = AbpSession.TenantId;
+                                await PublishManualAccount(acc.SSIN, long.Parse(tenant.ToString()));
+
+                                //if (contactFortCurrTenant != null)
+                                {
+                                    var returnVal =
+                                        await _iCreateMarketplaceAccount.CreateOrEditMarketplaceContactRelationship(contactFortCurrTenant.SSIN, acc.SSIN, false, false, null,null);
+                                }
+                                await _iCreateMarketplaceAccount.HideAccount(acc.SSIN);
+                            }
+                        }
+
+                        foreach (var acc in accountsListUpdated)
+                        {
+                            var publishedAcc = await _appMarketplaceContactRepository.GetAll().Where(z => z.SSIN == acc.SSIN).FirstOrDefaultAsync();
+                            if (publishedAcc == null)
+                            {
+
+                                var tenant = AbpSession.TenantId;
+                                await PublishManualAccount(acc.SSIN, long.Parse(tenant.ToString()));
+
+                                //if (contactFortCurrTenant != null)
+                                {
+                                    var returnVal =
+                                        await _iCreateMarketplaceAccount.CreateOrEditMarketplaceContactRelationship(contactFortCurrTenant.SSIN, acc.SSIN, false, false, null,null);
+                                }
+                                await _iCreateMarketplaceAccount.HideAccount(acc.SSIN);
+                            }
+                        }
+                    }
+                    //Mariam49[End]
                     //I40[End]
                     // accountContact
 

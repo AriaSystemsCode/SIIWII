@@ -1,11 +1,15 @@
-  <app-view-event
-  #viewEventModal
 
-></app-view-event>
-<p-carousel [value]="blocksSorted"
-  [numVisible]="blockTypeIsSingleOrMixed !='Single Type Blocks'? numVisible : numVisibleSingle" [numScroll]="1"
-  [circular]="false" [showIndicators]="false" [showNavigators]="true"
-  [responsiveOptions]="blockTypeIsSingleOrMixed !='Single Type Blocks'? responsiveOptions : responsiveOptionsSingle  "
+<p-carousel
+  [value]="blocksSorted"
+  [numVisible]="blockTypeIsSingleOrMixed != 'Single Type Blocks' ? numVisible : numVisibleSingle"
+  [numScroll]="1"
+  [circular]="false"
+  [showIndicators]="false"
+  [showNavigators]="blocksSorted?.length > (blockTypeIsSingleOrMixed != 'Single Type Blocks' ? numVisible : numVisibleSingle)"
+  [responsiveOptions]="blockTypeIsSingleOrMixed != 'Single Type Blocks' ? responsiveOptions : responsiveOptionsSingle"
+  [ngClass]="{
+    'few-items-carousel': blocksSorted?.length < (blockTypeIsSingleOrMixed != 'Single Type Blocks' ? numVisible : numVisibleSingle)
+  }"
   class="p-4 m-2 rounded">
   <ng-template pTemplate="item" let-item>
 
@@ -90,4 +94,7 @@
 
 
 
+  <app-view-event
+  #viewEventModal
 
+></app-view-event>

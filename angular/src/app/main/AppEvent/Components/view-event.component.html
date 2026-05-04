@@ -1,6 +1,18 @@
-<div bsModal #viewEventModal="bs-modal" class="modal fade text-left" tabindex="-1" role="dialog" aria-labelledby="viewEventModal"
-    aria-hidden="true" [config]="{ backdrop: false , ignoreBackdropClick: true }"  style="overflow-y: scroll;">
-    <div class="modal-dialog modal-lg ">
+<p-dialog
+  [(visible)]="visible"
+  [modal]="true"
+  [appendTo]="'body'"
+  [baseZIndex]="10000"
+  [dismissableMask]="false"
+  [draggable]="false"
+  [resizable]="false"
+  [closable]="false"
+  [style]="{ width: '58vw', height: '80vh' }"
+  [contentStyle]="{ padding: '0', margin: '0' }"
+  styleClass="event-full-dialog"
+  style="padding: 0 !important;"
+>
+    <div class="modal-dialog modal-lg m-0">
         <div class="modal-content h-100">
             <div class="row  ml-3 mr-3 d-md-block d-none">
                 <div class="col-11"></div>
@@ -229,6 +241,6 @@
             </div> -->
         </div>
     </div>
-</div>
+</p-dialog>
 <!--
 <app-google-map #googleMapModal></app-google-map> -->

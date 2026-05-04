@@ -252,18 +252,19 @@ export class SelectCategoriesDynamicModalComponent
         this.loading = true;
         let apiMethod = `getAllWithChildsFor${this.entityObjectName}WithPaging`;
         const subs = this._sycEntityObjectCategoriesServiceProxy[apiMethod](
-            this.searchQuery,
-            undefined,
-            undefined,
-            undefined,
-            undefined,
-            undefined,
-            undefined,
-            undefined,
+            this.searchQuery, 
+            undefined,  
+            undefined,      
+            undefined,    
+            undefined,     
+            undefined,   
+            undefined,  
+            undefined,       
             this.isDepartment,
-            this.entityId,
-            [],
-            this.sortBy,
+            this.entityId,    
+            [],               
+            undefined,     
+            this.sortBy,     
             this.skipCount,
             this.maxResultCount
         )
