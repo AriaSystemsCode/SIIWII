@@ -673,7 +673,7 @@ namespace onetouch.AppSiiwiiTransaction
                             appTrans.PaymentTermsId = exrtaPayment !=null ? exrtaPayment.AttributeValueId : appTrans.PaymentTermsId;
 
                             var exrtaPrice = relationInfo.EntityExtraData.Where(e => e.AttributeId == 908).FirstOrDefault();
-                            appTrans.PriceLevel = exrtaPayment != null ? exrtaPayment.AttributeValue.ToString() : appTrans.PriceLevel;
+                            appTrans.PriceLevel = exrtaPayment != null ? exrtaPrice.AttributeValue.ToString() : appTrans.PriceLevel;
 
 
                         }
@@ -894,7 +894,9 @@ namespace onetouch.AppSiiwiiTransaction
                     CompanySSIN = input.SellerCompanySSIN,
                     CompanyName = input.SellerCompanyName,
                     BranchName = input.SellerBranchName,
-                    BranchSSIN = input.SellerBranchSSIN
+                    BranchSSIN = input.SellerBranchSSIN,
+                    RelationId = input.SellerRelationId
+
                 });
 
 
@@ -912,7 +914,8 @@ namespace onetouch.AppSiiwiiTransaction
                     CompanySSIN = input.BuyerCompanySSIN,
                     CompanyName = input.BuyerCompanyName,
                     BranchName = input.BuyerBranchName,
-                    BranchSSIN = input.BuyerBranchSSIN
+                    BranchSSIN = input.BuyerBranchSSIN,
+                    RelationId = input.BuyerRelationId
                 });
                 //
                 var accountSSINBranchBuyer = await _appContactRepository.GetAll().Include(z => z.AppContactAddresses)
@@ -2394,13 +2397,13 @@ namespace onetouch.AppSiiwiiTransaction
                 (
                 (r.RequesterContactSSIN == ssin
                 &&
-                (r.RecipientMarketplaceRole == transactionType || string.IsNullOrEmpty(r.RecipientMarketplaceRole)
+                (r.RecipientMarketplaceRole == transactionType  
                 )
                 )
                   ||
                  (r.RecipientContactSSIN == ssin 
                  && 
-                 (r.RequesterMarketplaceRole == transactionType || string.IsNullOrEmpty(r.RequesterMarketplaceRole)
+                 (r.RequesterMarketplaceRole == transactionType  
                  )
                  ))
                   );
