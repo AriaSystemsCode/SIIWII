@@ -1,5 +1,5 @@
 import { Component, ViewChild, Injector, Input, OnInit, OnChanges, SimpleChanges, Output, EventEmitter } from '@angular/core';
-import { AccountDto, AccountLevelEnum, AccountsServiceProxy, AppEntitiesServiceProxy, AppEntityAttachmentDto, LookupLabelDto, SycAttachmentCategoryDto } from '@shared/service-proxies/service-proxies';
+import { AccountDto, AccountLevelEnum, AccountsServiceProxy, AppEntitiesServiceProxy, AppEntityAttachmentDto, AppEntityExtraDataDto, LookupLabelDto, SycAttachmentCategoryDto } from '@shared/service-proxies/service-proxies';
 import { AppComponentBase } from '@shared/common/app-component-base';
 import { NgImageSliderComponent } from 'ng-image-slider';
 import { AppConsts } from '@shared/AppConsts';
@@ -109,7 +109,8 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
     // NEW: keep originals so Cancel can revert
     private _originalLogoUrl?: string;
     private _originalCoverUrl?: string;
-
+  roles:any
+            selectedRoles!: any[];
 
     constructor(
         injector: Injector,
@@ -127,11 +128,19 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
             this.initClassificationVariables(true);
             // this.getContactSync();
             this.getLanguages()
+            this.setSelectedMarketplaceRoles();
             this.isRecordOwner = this.accountData?.id == this.appSession.user?.accountId ? true : false
         }
 
     }
     ngOnInit() {
+                this.roles = [
+            { name: 'Buyer' },
+            { name: 'Seller' },
+            { name: 'Sales Rep' },
+            { name: 'Buying Office' },
+         
+        ];
         this.getAllForAccountInfo()
         this.allPriceLevel = this.getPriceLevel();
         this.allPriceLevel.push({ label: 'MSRP', value: 'MSRP' });
@@ -210,9 +219,11 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
 
 
             this.contactData.languageName = this.editedPersonalData.languageName;
-
+           this.updateMarketplaceRolesExtraData();
+this.editedPersonalData.entityExtraData = this.accountData.entityExtraData;
             this.editedContactData.emit(this.contactData)
             this.editedData.emit(this.editedPersonalData);
+            
             this.editInfo = true;
             this.NoteditInfo = false;
             this.Editting = false;
@@ -659,14 +670,59 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
     }
 
 
- get marketplaceRolesList(): string[] {
-    const roleItem = this.entityExtraData?.find(
-        x => x.attributeCode === 'MARKETPLACE-ROLE'
-    );
+get marketplaceRolesList(): string[] {
+  const roleItem = this.entityExtraData?.find(
+    x => x.attributeId === 610
+  );
 
-    return roleItem?.attributeValue
-        ? roleItem.attributeValue.split('-').filter(Boolean)
-        : [];
+  return roleItem?.attributeValue
+    ? roleItem.attributeValue.split('-').filter(Boolean)
+    : [];
+}
+
+
+
+buildMarketplaceRolesExtraData(): AppEntityExtraDataDto[] {
+  if (!this.selectedRoles?.length) return [];
+
+  const dto = new AppEntityExtraDataDto();
+
+  dto.entityId = this.accountData?.entityId;
+  dto.attributeId = 610;
+  dto.attributeCode = '';
+  dto.attributeValue = [...new Set(this.selectedRoles)].join('-');
+  dto.attributeValueId = null;
+  dto.attributeValueFkName = null;
+  dto.attributeValueFkCode = null;
+  dto.id = 0;
+
+  return [dto];
+}
+
+updateMarketplaceRolesExtraData(): void {
+  if (!this.accountData) return;
+
+  const existingExtraData = this.accountData.entityExtraData || this.entityExtraData || [];
+
+  const updated = [
+    ...existingExtraData.filter(x => x.attributeId !== 610),
+    ...this.buildMarketplaceRolesExtraData()
+  ];
+
+
+  this.accountData.entityExtraData = updated;
+  this.entityExtraData = updated;
+}
+
+
+setSelectedMarketplaceRoles(): void {
+  const marketplaceRole = this.entityExtraData?.find(
+    x => x.attributeId === 610
+  );
+
+  this.selectedRoles = marketplaceRole?.attributeValue
+    ? marketplaceRole.attributeValue.split('-').filter(Boolean)
+    : [];
 }
 
 }
