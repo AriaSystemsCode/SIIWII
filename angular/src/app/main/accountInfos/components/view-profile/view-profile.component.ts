@@ -1,5 +1,5 @@
 import { Component, ViewChild, Injector, Input, OnInit, OnChanges, SimpleChanges, Output, EventEmitter } from '@angular/core';
-import { AccountDto, AccountLevelEnum, AccountsServiceProxy, AppEntitiesServiceProxy, AppEntityAttachmentDto, LookupLabelDto, SycAttachmentCategoryDto } from '@shared/service-proxies/service-proxies';
+import { AccountDto, AccountLevelEnum, AccountsServiceProxy, AppEntitiesServiceProxy, AppEntityAttachmentDto, AppEntityExtraDataDto, LookupLabelDto, SycAttachmentCategoryDto } from '@shared/service-proxies/service-proxies';
 import { AppComponentBase } from '@shared/common/app-component-base';
 import { NgImageSliderComponent } from 'ng-image-slider';
 import { AppConsts } from '@shared/AppConsts';
@@ -109,17 +109,9 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
     // NEW: keep originals so Cancel can revert
     private _originalLogoUrl?: string;
     private _originalCoverUrl?: string;
+  roles:any
+            selectedRoles!: any[];
 
-    editPhone2NumberValue: string = '';
-    editPhone3NumberValue: string = '';
-
-    allPhoneTypes: LookupLabelDto[] = [];
-    editPhone1TypeId: number;
-    editPhone2TypeId: number;
-    editPhone3TypeId: number;
-
-    languageSettingName  =AppConsts.languageSettingName;
-    editNotesValue: string = '';
     constructor(
         injector: Injector,
         private _appEntitiesServiceProxy: AppEntitiesServiceProxy,
@@ -136,11 +128,19 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
             this.initClassificationVariables(true);
             // this.getContactSync();
             this.getLanguages()
+            this.setSelectedMarketplaceRoles();
             this.isRecordOwner = this.accountData?.id == this.appSession.user?.accountId ? true : false
         }
 
     }
     ngOnInit() {
+                this.roles = [
+            { name: 'Buyer' },
+            { name: 'Seller' },
+            { name: 'Sales Rep' },
+            { name: 'Buying Office' },
+         
+        ];
         this.getAllForAccountInfo()
         this.getPhoneTypes();
         this.allPriceLevel = this.getPriceLevel();
@@ -190,115 +190,47 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
     editAccount() {
         // 1) Enter edit mode (Personal Account)
         if (this.personalAccount && !this.editPersonal) {
-          this.Editting = true;
-          this.editInfo = false;
-          this.NoteditInfo = true;
-      
-          this.setPersonalData(); // fill edit* values from current data
-          return;
-        }
-      
-        // 2) Save (Personal Account)
-        if (this.personalAccount && this.editPersonal) {
-      
-          // Ensure editedPersonalData exists
-          if (!this.editedPersonalData) {
-            this.editedPersonalData = { ...this.accountData };
-          }
-      
-          // ---------- Basic fields ----------
-          this.editedPersonalData.firstName = this.editFirstNameValue;
-          this.editedPersonalData.lastName = this.editLastNameValue;
-          this.editedPersonalData.eMailAddress = (this.editEMailAddressValue || '').trim();
-      
-          this.editedPersonalData.languageId = this.contactData.languageId;
-          this.editedPersonalData.languageName =
-            this.allLanguages?.find(l => l.value == this.contactData.languageId)?.label;
-      
-          this.editedPersonalData.jobTitle = this.editJobTitleValue;
-      
-          // Public flags
-          this.editedPersonalData.emailAddressIsPublic = this.contactData?.emailAddressIsPublic;
-      
-          // ---------- Phones (same style as phone 1) ----------
-          // Numbers
-          this.editedPersonalData.phone1Number = (this.editPhoneNumberValue || '').trim();
-          this.editedPersonalData.phone2Number = (this.editPhone2NumberValue || '').trim();
-          this.editedPersonalData.phone3Number = (this.editPhone3NumberValue || '').trim();
-      
-          // IsPublic flags
-          this.editedPersonalData.phone1IsPublic = this.contactData?.phone1IsPublic;
-          this.editedPersonalData.phone2IsPublic = this.contactData?.phone2IsPublic;
-          this.editedPersonalData.phone3IsPublic = this.contactData?.phone3IsPublic;
-      
-          // Type IDs + Names (send to backend)
-          (this.editedPersonalData as any).phone1TypeId = this.editPhone1TypeId;
-          (this.editedPersonalData as any).phone2TypeId = this.editPhone2TypeId;
-          (this.editedPersonalData as any).phone3TypeId = this.editPhone3TypeId;
-      
-          (this.editedPersonalData as any).phone1TypeName =
-            this.allPhoneTypes?.find(x => x.value === this.editPhone1TypeId)?.label;
-      
-          (this.editedPersonalData as any).phone2TypeName =
-            this.allPhoneTypes?.find(x => x.value === this.editPhone2TypeId)?.label;
-      
-          (this.editedPersonalData as any).phone3TypeName =
-            this.allPhoneTypes?.find(x => x.value === this.editPhone3TypeId)?.label;
-      
-          // ---------- Attachments merge (logo/cover) ----------
-          this.contactData.entityAttachments = this.mergeAttachmentsForSave(
-            this.contactData.entityAttachments,
-            this.accountData.entityAttachments,
-            this.sycAttachmentCategoryLogo?.id,
-            this.sycAttachmentCategoryBanner?.id,
-            this._removed
-          );
-      
-    
-      
-          // Update contactData types
-          this.contactData.phone1TypeId = this.editPhone1TypeId;
-          this.contactData.phone2TypeId = this.editPhone2TypeId;
-          this.contactData.phone3TypeId = this.editPhone3TypeId;
-      
-          this.contactData.phone1TypeName =
-            this.allPhoneTypes?.find(x => x.value === this.editPhone1TypeId)?.label;
-      
-          this.contactData.phone2TypeName =
-            this.allPhoneTypes?.find(x => x.value === this.editPhone2TypeId)?.label;
-      
-          this.contactData.phone3TypeName =
-            this.allPhoneTypes?.find(x => x.value === this.editPhone3TypeId)?.label;
-      
-          // Update contactData numbers (in case view reads from it)
-          this.contactData.phone1Number = this.editedPersonalData.phone1Number;
-          this.contactData.phone2Number = this.editedPersonalData.phone2Number;
-          this.contactData.phone3Number = this.editedPersonalData.phone3Number;
-      
-          // Keep language name in sync
-          this.contactData.languageName = this.editedPersonalData.languageName;
-      
-          // Update accountData numbers too (some parts of your code read from accountData)
-          this.accountData.phone1Number = this.editedPersonalData.phone1Number;
-          this.accountData.phone2Number = this.editedPersonalData.phone2Number;
-          this.accountData.phone3Number = this.editedPersonalData.phone3Number;
+            this.Editting = true;
+            this.editInfo = false;
+            this.NoteditInfo = true;
+            this.setPersonalData()
 
 
-          this.editedPersonalData.notes = (this.editNotesValue || '').trim();
-            this.contactData.notes = this.editedPersonalData.notes;
-            (this.editedPersonalData as any).notesIsPublic = this.contactData?.notesIsPublic;
-      
-          // ---------- Emit ----------
-          this.editedContactData.emit(this.contactData);
-          this.editedData.emit(this.editedPersonalData);
-      
-          // ---------- Exit edit mode ----------
-          this.editInfo = true;
-          this.NoteditInfo = false;
-          this.Editting = false;
-          this.editPersonal = false;
-      
-          return;
+
+        } else if (this.personalAccount && this.editPersonal) {
+            if (!this.editedPersonalData) {
+                this.editedPersonalData = { ...this.accountData }; // ensure it's initialized
+            }
+            this.editedPersonalData.firstName = this.editFirstNameValue
+            this.editedPersonalData.lastName = this.editLastNameValue
+            this.editedPersonalData.eMailAddress = this.editEMailAddressValue;
+            this.editedPersonalData.languageId = this.contactData.languageId;
+            this.editedPersonalData.languageName = this.allLanguages.find(l => l.value == this.contactData.languageId)?.label;
+            this.editedPersonalData.phone1Number = this.editPhoneNumberValue;
+            this.editedPersonalData.jobTitle = this.editJobTitleValue;
+            this.editedPersonalData.emailAddressIsPublic = this.contactData?.emailAddressIsPublic;
+            this.editedPersonalData.phone1IsPublic = this.contactData?.phone1IsPublic;
+            this.contactData.entityAttachments = this.mergeAttachmentsForSave(
+                this.contactData.entityAttachments,
+                this.accountData.entityAttachments,
+                this.sycAttachmentCategoryLogo?.id,
+                this.sycAttachmentCategoryBanner?.id,
+                this._removed
+            );
+
+
+            this.contactData.languageName = this.editedPersonalData.languageName;
+           this.updateMarketplaceRolesExtraData();
+this.editedPersonalData.entityExtraData = this.accountData.entityExtraData;
+            this.editedContactData.emit(this.contactData)
+            this.editedData.emit(this.editedPersonalData);
+            
+            this.editInfo = true;
+            this.NoteditInfo = false;
+            this.Editting = false;
+            this.editPersonal = false;
+
+
         }
       
         // 3) Non-personal or other edit mode
@@ -755,14 +687,59 @@ this.editPhone3NumberValue = this.contactData?.phone3Number;
     }
 
 
- get marketplaceRolesList(): string[] {
-    const roleItem = this.entityExtraData?.find(
-        x => x.attributeCode === 'MARKETPLACE-ROLE'
-    );
+get marketplaceRolesList(): string[] {
+  const roleItem = this.entityExtraData?.find(
+    x => x.attributeId === 610
+  );
 
-    return roleItem?.attributeValue
-        ? roleItem.attributeValue.split('-').filter(Boolean)
-        : [];
+  return roleItem?.attributeValue
+    ? roleItem.attributeValue.split('-').filter(Boolean)
+    : [];
+}
+
+
+
+buildMarketplaceRolesExtraData(): AppEntityExtraDataDto[] {
+  if (!this.selectedRoles?.length) return [];
+
+  const dto = new AppEntityExtraDataDto();
+
+  dto.entityId = this.accountData?.entityId;
+  dto.attributeId = 610;
+  dto.attributeCode = '';
+  dto.attributeValue = [...new Set(this.selectedRoles)].join('-');
+  dto.attributeValueId = null;
+  dto.attributeValueFkName = null;
+  dto.attributeValueFkCode = null;
+  dto.id = 0;
+
+  return [dto];
+}
+
+updateMarketplaceRolesExtraData(): void {
+  if (!this.accountData) return;
+
+  const existingExtraData = this.accountData.entityExtraData || this.entityExtraData || [];
+
+  const updated = [
+    ...existingExtraData.filter(x => x.attributeId !== 610),
+    ...this.buildMarketplaceRolesExtraData()
+  ];
+
+
+  this.accountData.entityExtraData = updated;
+  this.entityExtraData = updated;
+}
+
+
+setSelectedMarketplaceRoles(): void {
+  const marketplaceRole = this.entityExtraData?.find(
+    x => x.attributeId === 610
+  );
+
+  this.selectedRoles = marketplaceRole?.attributeValue
+    ? marketplaceRole.attributeValue.split('-').filter(Boolean)
+    : [];
 }
 
 }

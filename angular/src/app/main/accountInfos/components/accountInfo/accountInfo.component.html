@@ -600,6 +600,7 @@
                                             [maxSelectedLabels]="3"
                                             class="w-100 md:w-80"
                                             (onChange)="changeTouchState()"
+                                             [disabled]="accountDataForView?.isConnected && currentTab === accountInfoPageTabsEnum.ProfileCreateOrEdit && !isRecordOwner"
                                             display="chip">
                                             </p-multiSelect>
 
