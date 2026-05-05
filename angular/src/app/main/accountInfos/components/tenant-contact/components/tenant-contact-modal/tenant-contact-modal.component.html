@@ -1,0 +1,18 @@
+<p-dialog
+  [(visible)]="visible"
+  [modal]="true"
+  [appendTo]="'body'"
+  [draggable]="false"
+  [style]="{ width: '90vw', maxWidth: '1350px' }"
+  [contentStyle]="{ padding: '0' }"
+  styleClass="tenant-contact-dialog">
+
+  <app-tenant-contact
+    [mode]="mode"
+    [contactType]="contactType"
+    [accountId]="accountId"
+    (close)="close()"
+    (saved)="onSaved()">
+  </app-tenant-contact>
+
+</p-dialog>

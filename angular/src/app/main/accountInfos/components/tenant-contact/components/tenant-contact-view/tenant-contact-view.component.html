@@ -1,0 +1,187 @@
+<div class="account-form view-mode ml-4">
+
+  <div class="form-section row">
+
+    <div class="account-body  col-lg-7">
+
+      <div class="profile-view-grid mt-2">
+        <div class="media-strip" *ngIf="accountData?.account?.imagesUrls?.length">
+          <button class="media-arrow left" type="button">
+            <i class="fa fa-chevron-left"></i>
+          </button>
+
+          <div class="media-thumb" *ngFor="let img of accountData?.account?.imagesUrls" [ngStyle]="{
+        'background-image': 'url(' + attachmentBaseUrl + '/' + img + ')'
+      }">
+          </div>
+
+          <button class="media-arrow right" type="button">
+            <i class="fa fa-chevron-right"></i>
+          </button>
+        </div>
+
+        <div class="summary-row d-flex justify-content-between">
+          <div class="summary-card">
+            <h6>{{ 'Code' | localize }}</h6>
+            <span>{{ accountData?.account?.code || '-' }}</span>
+          </div>
+
+          <div class="summary-card">
+            <h6>{{ 'Name' | localize }}</h6>
+            <span>{{ accountData?.account?.name || '-' }}</span>
+          </div>
+
+        </div>
+
+        <div class="summary-row d-flex justify-content-between">
+          <div class="summary-card">
+            <h6>{{ 'Email' | localize }}</h6>
+            <span>{{ accountData?.account?.eMailAddress || '-' }}</span>
+          </div>
+
+          <div class="summary-card">
+            <h6>{{ 'TradeName' | localize }}</h6>
+            <span>{{ accountData?.contact?.tradeName || '-' }}</span>
+          </div>
+
+        </div>
+
+        <div class="summary-row d-flex justify-content-between">
+          <div class="summary-card">
+            <h6>{{ 'Language' | localize }}</h6>
+            <span>{{ accountData?.contact?.languageName || '-' }}</span>
+          </div>
+
+          <div class="summary-card">
+            <h6>{{ 'Currency' | localize }}</h6>
+            <span>{{ accountData?.contact?.currencyName || '-' }}</span>
+          </div>
+
+        </div>
+
+        <div class="summary-row d-flex justify-content-between">
+          <div class="summary-card">
+            <h6>{{ 'MaeketplaceRole' | localize }}</h6>
+               <div class="tag-list" *ngIf="marketplaceRolesList?.length; else noRoles">
+            <span class="tag" *ngFor="let item of marketplaceRolesList">
+              {{ item }}
+            </span>
+          </div>
+
+          <ng-template #noRoles>
+            <span class="tag">-</span>
+          </ng-template>
+        </div>
+        
+
+          <div class="summary-card">
+            <h6>{{ 'Status' | localize }}</h6>
+            <span>active</span>
+          </div>
+
+        </div>
+        <div class="summary-row d-flex justify-content-between">
+          <div class="summary-card">
+            <h6>{{ 'AccountType' | localize }}</h6>
+            <span>{{ accountData?.account?.accountType || '-' }}</span>
+          </div>
+
+          <div class="summary-card">
+            <h6>{{ 'Website' | localize }}</h6>
+            <span>{{ accountData?.account?.website || '-' }}</span>
+          </div>
+
+        </div>
+
+
+     
+
+        <div class="summary-row ">
+          <div class="summary-card">
+            <h6>{{ 'Phone' | localize }}</h6>
+            <span *ngIf="accountData?.account?.phone1Number">{{ accountData?.account?.phone1TypeName }} {{
+              accountData?.account?.phone1Number }} {{ accountData?.account?.phone1Ext }}</span>
+            <span *ngIf="!accountData?.account?.phone1Number">-</span>
+          </div>
+
+
+
+        </div>
+
+
+         <div class="summary-row  "  *ngIf="accountData?.account?.phone2Number">
+          <div class="summary-card">
+            <h6>{{ 'Phone2' | localize }}</h6>
+            <span>{{ accountData?.account?.phone2TypeName }} {{
+              accountData?.account?.phone2Number }} {{ accountData?.account?.phone2Ext }}</span>
+        
+          </div>
+         </div>
+
+
+                   <div class="summary-row " *ngIf="accountData?.account?.phone3Number">
+          <div class="summary-card">
+            <h6>{{ 'Phone3' | localize }}</h6>
+            <span >{{ accountData?.account?.phone3TypeName }} {{
+              accountData?.account?.phone3Number }} {{ accountData?.account?.phone3Ext }}</span>
+        
+          </div>
+
+
+
+        </div>
+
+
+           <div class="summary-row ">
+          <div class="summary-card">
+            <h6>{{ 'AccountSSIN' | localize }}</h6>
+            <span>{{ accountData?.account?.ssin || '-' }}</span>
+          </div>
+
+        </div>
+
+        <div class="summary-row ">
+          <div class="summary-card">
+            <h6>{{ 'Notes' | localize }}</h6>
+            <span>{{ accountData?.account?.notes || '-' }}</span>
+          </div>
+
+        </div>
+
+        <div class="info-section">
+          <h6>{{ 'Departments' | localize }}</h6>
+
+          <div class="tag-list" *ngIf="accountData?.account?.categories?.length; else noDepartments">
+            <span class="tag" *ngFor="let item of accountData?.account?.categories">
+              {{ item }}
+            </span>
+          </div>
+
+          <ng-template #noDepartments>
+            <span class="tag">-</span>
+          </ng-template>
+        </div>
+
+        <div class="info-section">
+          <h6>{{ 'BusinessClassifications' | localize }}</h6>
+
+          <div class="tag-list" *ngIf="accountData?.account?.classfications?.length; else noClassifications">
+            <span class="tag" *ngFor="let item of accountData?.account?.classfications">
+              {{ item }}
+            </span>
+          </div>
+
+          <ng-template #noClassifications>
+            <span class="tag">-</span>
+          </ng-template>
+        </div>
+      </div>
+  
+    </div>
+    <div class="activity-section col-lg-5">
+      <app-tenant-contact-activity-panel></app-tenant-contact-activity-panel>
+
+    </div>
+
+  </div>
+</div>

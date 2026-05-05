@@ -1,0 +1,207 @@
+<form #tenantContactForm="ngForm" novalidate autocomplete="off" class="account-form">
+
+  <!-- <div class="account-header">
+    <div class="account-actions">
+      <button type="button" class="btn btn-cancel" (click)="cancel()">
+        {{ l('Cancel') }}
+      </button>
+
+      <button type="button" class="btn btn-save" [disabled]="!tenantContactForm.form.valid || !touched"
+        (click)="save()">
+        {{ l('Save') }}
+      </button>
+    </div>
+  </div> -->
+
+  <div class="account-body">
+
+    <!-- Images -->
+    <div class="upload-section">
+      <div class="upload-top-row d-flex">
+        <div class="logo-upload mr-3">
+          <label>{{ l('CompanyLogo') }}</label>
+
+          <div class="mt-5 pt-3">
+            <app-image-upload [image]="companyLogo" [attachmentTypeCode]="'LOGO'" [staticWidth]="165"
+              [staticHeight]="165" [showGuidelines]="true" [customExtentionsImgs]="true"
+              (imageBrowseDone)="imageBrowseDone($event, 'LOGO', -1)" (removeImage)="removeImage('LOGO', -1)">
+            </app-image-upload>
+          </div>
+        </div>
+
+        <div class="cover-upload">
+          <label>{{ l('CompanyCoverPhoto') }}</label>
+
+          <app-image-upload [image]="coverPhoto" [attachmentTypeCode]="'BANNER'" [staticWidth]="760"
+            [staticHeight]="160" [showGuidelines]="true" [customExtentionsImgs]="true"
+            (imageBrowseDone)="imageBrowseDone($event, 'BANNER', -2)" (removeImage)="removeImage('BANNER', -2)">
+          </app-image-upload>
+        </div>
+      </div>
+
+      <div class="other-images-row mt-3">
+        <app-image-upload *ngFor="let img of otherImageSlots" [image]="img.preview" [attachmentTypeCode]="'IMAGE'"
+          [staticWidth]="200" [showGuidelines]="true" [customExtentionsImgs]="true"
+          (imageBrowseDone)="imageBrowseDone($event, 'IMAGE', img.index)"
+          (removeImage)="removeImage('IMAGE', img.index)">
+        </app-image-upload>
+      </div>
+    </div>
+    <!-- Fields -->
+    <div class="form-grid">
+
+      <div class="field">
+
+        <label> <span>*</span> {{ l('Code') }}</label>
+        <input type="text" id="accountInfoData_Code" #codeInput="ngModel"
+          class="form-control form-control-sm " maxlength="6" [disabled]="accountInfoData?.id>0"
+          id="colFormLabelSm" [(ngModel)]="accountInfoData.code" name="code" required (input)="changeTouchState()"
+          [placeholder]=" 'PleaseEnterCompanyCode...' | localize ">
+      </div>
+
+      <div class="field">
+
+        <label> <span>*</span> {{ l('Name') }}</label>
+        <input name="name" required class="form-control" [(ngModel)]="accountInfoData.name"
+          (input)="changeTouchState()" />
+      </div>
+
+
+
+      <div class="field">
+        <label> <span>*</span> {{ l('EmailAddress') }}</label>
+        <input name="eMailAddress" type="email" class="form-control" [(ngModel)]="accountInfoData.eMailAddress"
+          (input)="changeTouchState()" />
+
+      </div>
+
+      <div class="field">
+        <label>{{ l('TradeName') }}</label>
+        <input name="tradeName" class="form-control" [(ngModel)]="accountInfoData.tradeName"
+          (input)="changeTouchState()" />
+      </div>
+
+
+
+      <div class="field">
+        <label><span>*</span> {{ l('Language') }}</label>
+        <p-dropdown name="languageId" [options]="allLanguages" optionLabel="label" optionValue="value"
+          [(ngModel)]="accountInfoData.languageId" styleClass="w-100" (onChange)="changeTouchState()">
+        </p-dropdown>
+      </div>
+      <div class="field">
+        <label><span>*</span> {{ l('Currency') }}</label>
+        <p-dropdown name="currencyId" [options]="allCurrencies" optionLabel="label" optionValue="value"
+          [(ngModel)]="accountInfoData.currencyId" styleClass="w-100" required (onChange)="changeTouchState()">
+        </p-dropdown>
+
+      </div>
+
+      <div class="field">
+        <label><span>*</span> {{ l('MarketplaceRole') }}</label>
+        <p-multiSelect [options]="roles" [(ngModel)]="selectedRoles" [ngModelOptions]="{ standalone: true }"
+          optionLabel="name" optionValue="name" placeholder="Select Roles" [maxSelectedLabels]="3" class="w-100"
+          display="chip">
+        </p-multiSelect>
+
+      </div>
+
+      <div class="field">
+        <label><span>*</span> {{ l('Status') }}</label>
+        <p-dropdown name="name" [options]="allStatus" optionLabel="label" optionValue="name"
+          [(ngModel)]="accountInfoData.status" styleClass="w-100" required (onChange)="changeTouchState()">
+        </p-dropdown>
+
+      </div>
+
+      <!-- Phone 1 -->
+      <div class="field full">
+        <label><span>*</span> {{ l('Phone1') }}</label>
+
+        <div class="phone-field-row">
+          <p-dropdown name="phone1TypeId" [options]="allPhoneTypes" optionLabel="label" optionValue="value"
+            [(ngModel)]="accountInfoData.phone1TypeId" styleClass="phone-type" (onChange)="changeTouchState()">
+          </p-dropdown>
+
+          <input type="text" name="phone1Number" class="form-control" required
+            [(ngModel)]="accountInfoData.phone1Number" [placeholder]="l('PhoneNumber')" (input)="changeTouchState()" />
+
+          <input type="text" name="phone1Ext" class="form-control phone-ext" [(ngModel)]="accountInfoData.phone1Ext"
+            [placeholder]="l('Ext')" (input)="changeTouchState()" />
+        </div>
+      </div>
+
+      <!-- Phone 2 -->
+      <div class="field full">
+        <label>{{ l('Phone2') }}</label>
+
+        <div class="phone-field-row">
+          <p-dropdown name="phone2TypeId" [options]="allPhoneTypes" optionLabel="label" optionValue="value"
+            [(ngModel)]="accountInfoData.phone2TypeId" styleClass="phone-type" (onChange)="changeTouchState()">
+          </p-dropdown>
+
+          <input type="text" name="phone2Number" class="form-control" [(ngModel)]="accountInfoData.phone2Number"
+            [placeholder]="l('PhoneNumber')" (input)="changeTouchState()" />
+
+          <input type="text" name="phone2Ext" class="form-control phone-ext" [(ngModel)]="accountInfoData.phone2Ext"
+            [placeholder]="l('Ext')" (input)="changeTouchState()" />
+        </div>
+      </div>
+
+      <!-- Phone 3 -->
+      <div class="field full">
+        <label>{{ l('Phone3') }}</label>
+
+        <div class="phone-field-row">
+          <p-dropdown name="phone3TypeId" [options]="allPhoneTypes" optionLabel="label" optionValue="value"
+            [(ngModel)]="accountInfoData.phone3TypeId" styleClass="phone-type" (onChange)="changeTouchState()">
+          </p-dropdown>
+
+          <input type="text" name="phone3Number" class="form-control" [(ngModel)]="accountInfoData.phone3Number"
+            [placeholder]="l('PhoneNumber')" (input)="changeTouchState()" />
+
+          <input type="text" name="phone3Ext" class="form-control phone-ext" [(ngModel)]="accountInfoData.phone3Ext"
+            [placeholder]="l('Ext')" (input)="changeTouchState()" />
+        </div>
+      </div>
+
+      
+      <div class="field">
+        <label><span>*</span> {{ l('AccountType') }}</label>
+           <p-dropdown name="accountType" [options]="accountTypes" optionLabel="label" optionValue="value"
+            [(ngModel)]="accountInfoData.accountTypeId" styleClass="account-type" (onChange)="changeTouchState()">
+          </p-dropdown>
+
+
+      </div>
+      
+      <div class="field">
+        <label>{{ l('Website') }}</label>
+        <input name="website" class="form-control" [(ngModel)]="accountInfoData.website" (input)="changeTouchState()" />
+
+      </div>
+
+
+
+      <div class="field full">
+        <label>{{ l('AccountSSIN') }}</label>
+        <input name="ssin" class="form-control disabled-input" [(ngModel)]="accountInfoData.ssin" readonly />
+      </div>
+
+      <div class="field full">
+        <label>{{ l('AboutUs') }}</label>
+        <textarea name="aboutUs" rows="5" class="form-control" [(ngModel)]="accountInfoData.description"
+          (input)="changeTouchState()" [placeholder]="l('WriteSomethingForSummarizingYourCompany')">
+        </textarea>
+      </div>
+
+    </div>
+  </div>
+</form>
+
+
+
+<div>
+      <app-tenant-contact-activity-panel></app-tenant-contact-activity-panel>
+
+</div>

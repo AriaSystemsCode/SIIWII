@@ -1,0 +1,75 @@
+:host ::ng-deep .activity-tabview .p-tabview-nav {
+  border: 0;
+  border-bottom: 4px solid #ddd;
+}
+
+:host ::ng-deep .activity-tabview .p-tabview-nav li {
+  flex: 1;
+}
+
+:host ::ng-deep .activity-tabview .p-tabview-nav li .p-tabview-nav-link {
+  border: 0;
+  background: transparent;
+  color: #aaa;
+  font-weight: 700;
+  justify-content: center;
+  padding: 0 0 12px;
+}
+
+:host ::ng-deep .activity-tabview .p-tabview-nav li.p-highlight .p-tabview-nav-link {
+  color: #4a0d4a;
+}
+
+:host ::ng-deep .activity-tabview .p-tabview-nav li.p-highlight .p-tabview-nav-link {
+  border-bottom: 4px solid #4a0d4a;
+  margin-bottom: -4px;
+}
+
+:host ::ng-deep .activity-tabview .p-tabview-panels {
+  padding: 14px 0 0;
+  border: 0;
+  background: transparent;
+}
+
+.activity-panel {
+  background: #fff;
+  border: 1px solid #eee;
+  border-radius: 10px;
+  padding: 14px;
+  min-height: 390px;
+}
+
+.activity-tabs {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  border-bottom: 4px solid #ddd;
+  gap: 0;
+}
+
+.activity-tabs button {
+  border: none;
+  background: transparent;
+  color: #aaa;
+  font-weight: 700;
+  padding: 0 0 12px;
+  position: relative;
+}
+
+.activity-tabs button.active {
+  color: #4a0d4a;
+}
+
+.activity-tabs button.active::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -4px;
+  height: 4px;
+  background: #4a0d4a;
+  border-radius: 4px;
+}
+
+.activity-content {
+  padding-top: 14px;
+}

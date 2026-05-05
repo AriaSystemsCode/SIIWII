@@ -1,0 +1,103 @@
+<div class="tenant-sec">
+ 
+ <div class="position-relative"     *ngIf="mode === TenantContactMode.View">
+      <img class=" p-0 w-100 cover-img" [src]="attachmentBaseUrl + '/' + accountData?.account?.coverUrl"
+        onerror="this.src='../../assets/placeholders/holder-cover.png'" />
+      <img class=" p-0 " [src]="attachmentBaseUrl + '/' + accountData?.account?.logoUrl"
+        onerror="this.src='../../assets/placeholders/_logo-placeholder.png'" [ngClass]="isArabic ? 'acc-img-ar':'acc-img'" />
+      <h5 class="acc-name"  [ngClass]="isArabic ? 'acc-name-ar':'acc-en'">{{accountData?.account?.name}}</h5>
+    </div>
+
+<div class="tenant-contact-shell mt-3">
+
+  <div class="tenant-contact-sidebar">
+    <div class="sidebar-card">
+      <h4>{{'BasicInfo' | localize}}</h4>
+
+<div class="sidebar-info">
+
+  <!-- Email -->
+  <div>
+    <span class="info-icon" pTooltip="{{'Email' | localize}}" tooltipPosition="top">
+      <i class="far fa-envelope"></i>
+    </span>
+
+    <b
+      class="clickable"
+      *ngIf="accountData?.account?.eMailAddress"
+      (click)="openEmail(accountData?.account?.eMailAddress)">
+      {{ accountData?.account?.eMailAddress }}
+    </b>
+
+    <b *ngIf="!accountData?.account?.eMailAddress">-</b>
+  </div>
+
+  <!-- Phone -->
+  <div>
+    <span class="info-icon" pTooltip="{{'Phone' | localize}}" tooltipPosition="top">
+      <i class="fas fa-phone-alt"></i>
+    </span>
+
+    <b>{{ accountData?.account?.phone1Number || '-' }}</b>
+  </div>
+
+  <!-- Website -->
+  <div>
+    <span class="info-icon" pTooltip="{{'Website' | localize}}" tooltipPosition="top">
+      <i class="fas fa-globe"></i>
+    </span>
+
+    <b
+      class="clickable"
+      *ngIf="accountData?.account?.website"
+      (click)="openWebsite(accountData?.account?.website)">
+      {{ accountData?.account?.website }}
+    </b>
+
+    <b *ngIf="!accountData?.account?.website">-</b>
+  </div>
+
+</div>
+
+      <ul class="sidebar-tabs">
+        <li class="active">
+          <i class="far fa-user"></i>
+          Account Profile
+        </li>
+
+        <li>
+          <i class="fa fa-map-marker-alt"></i>
+          Branches / Addresses
+        </li>
+
+        <li>
+          <i class="far fa-address-book"></i>
+          Contacts
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="tenant-contact-main">
+
+    <app-tenant-contact-create-edit
+      *ngIf="mode === TenantContactMode.Create || mode === TenantContactMode.Edit"
+      [mode]="mode"
+      [contactType]="contactType"
+      [accountId]="accountId"
+      (cancelled)="close.emit()"
+      (saved)="handleSaved($event)">
+    </app-tenant-contact-create-edit>
+
+    <app-tenant-contact-view
+      *ngIf="mode === TenantContactMode.View"
+      [accountData]="accountData"
+      [contactType]="contactType"
+      (edit)="openEdit()">
+    </app-tenant-contact-view>
+
+  </div>
+
+</div>
+
+</div> 

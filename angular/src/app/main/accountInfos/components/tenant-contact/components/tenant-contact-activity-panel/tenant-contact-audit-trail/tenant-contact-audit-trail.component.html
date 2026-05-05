@@ -1,0 +1,18 @@
+<div class="audit-list">
+  <div class="audit-item" *ngFor="let item of items">
+    <span class="dot"></span>
+
+    <div class="audit-text">
+      {{ item.text }}
+    </div>
+
+    <div class="audit-date">
+      {{ item.date }}
+    </div>
+  </div>
+
+  <button type="button" class="show-more">
+    {{ 'ShowMore' | localize }}
+    <i class="fa fa-chevron-right"></i>
+  </button>
+</div>

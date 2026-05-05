@@ -1,0 +1,190 @@
+/* ===============================
+   ROOT CONTAINER
+=================================*/
+.account-form {
+  background: #fff;
+  min-height: 75vh;
+}
+
+/* ===============================
+   LAYOUT (7 / 5)
+=================================*/
+.form-section.row {
+  margin: 0;
+}
+
+.account-body.col-lg-7 {
+  border: 1px solid #eeeeee;
+  border-radius: 14px;
+  background: #fff;
+  padding: 18px;
+}
+
+.activity-section.col-lg-5 {
+  padding-left: 16px;
+}
+
+/* ===============================
+   GRID STRUCTURE
+=================================*/
+.profile-view-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.summary-row {
+  display: flex;
+  gap: 14px;
+}
+
+.summary-row .summary-card {
+  flex: 1;
+  min-width: 0;
+}
+
+/* ===============================
+   MEDIA STRIP (IMAGES)
+=================================*/
+.media-strip {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+
+  border: 1px solid #eeeeee;
+  border-radius: 14px;
+  padding: 8px;
+  background: #fff;
+  overflow: hidden;
+}
+
+.media-thumb {
+  height: 88px;
+  border-radius: 10px;
+  background-size: cover;
+  background-position: center;
+}
+
+/* arrows */
+.media-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 2;
+
+  width: 26px;
+  height: 36px;
+  border: none;
+  border-radius: 6px;
+
+  background: #fff;
+  color: #4a0d4a;
+
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+}
+
+.media-arrow.left {
+  left: 4px;
+}
+
+.media-arrow.right {
+  right: 4px;
+  background: #4a0d4a;
+  color: #fff;
+}
+
+/* ===============================
+   CARDS (MAIN UI STYLE)
+=================================*/
+.summary-card,
+.info-section {
+  border: 1px solid #eeeeee;
+  border-radius: 14px;
+  background: #fff;
+
+  padding: 14px 16px;
+
+  box-shadow: 0 1px 4px rgba(25, 19, 38, 0.03);
+  transition: 0.2s ease;
+}
+
+.summary-card:hover,
+.info-section:hover {
+  box-shadow: 0 4px 14px rgba(25, 19, 38, 0.06);
+}
+
+/* ===============================
+   TITLES
+=================================*/
+.summary-card h6,
+.info-section h6 {
+  color: #191326;
+  font-weight: 800;
+  font-size: 15px;
+
+  margin: 0 0 12px;
+  padding-bottom: 10px;
+
+  border-bottom: 1px solid #eeeeee;
+}
+
+/* ===============================
+   VALUES / TAG STYLE
+=================================*/
+.summary-card span,
+.tag {
+  display: inline-flex;
+  align-items: center;
+
+  max-width: 100%;
+  min-height: 38px;
+
+  background: #f8f8fa;
+  border: 1px solid #eeeeee;
+  border-radius: 7px;
+
+  padding: 8px 12px;
+
+  font-size: 14px;
+  font-weight: 700;
+  color: #191326;
+
+  word-break: break-word;
+}
+
+/* ===============================
+   TAG LIST (Departments / Classifications)
+=================================*/
+.tag-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+/* ===============================
+   SINGLE FIELD ROW (Phones / Notes)
+=================================*/
+.summary-row:not(.d-flex) {
+  display: block;
+}
+
+/* ===============================
+   RESPONSIVE
+=================================*/
+@media (max-width: 991px) {
+  .account-body.col-lg-7,
+  .activity-section.col-lg-5 {
+    max-width: 100%;
+    flex: 0 0 100%;
+    padding: 15px;
+  }
+
+  .summary-row {
+    flex-direction: column;
+  }
+
+  .media-strip {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}

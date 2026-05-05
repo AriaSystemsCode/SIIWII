@@ -1,0 +1,402 @@
+.tenant-sec {
+
+padding: 10px 6px;
+overflow: hidden;
+
+background: #FFFFFF;
+border: 1px solid #EEEEEE;
+border-radius: 10px;
+
+}
+
+.tenant-contact-shell {
+  display: grid;
+  grid-template-columns: 285px 1fr;
+  // min-height: 75vh;
+  background: #fff;
+}
+
+// .tenant-contact-sidebar {
+//   border: 1px solid #EEEEEE;
+//   background: #fff;
+//   padding: 10px;
+//   border-radius: 10px;
+// }
+
+// .sidebar-card {
+//   position: sticky;
+//   top: 0;
+// }
+// .sidebar-card h4 {
+
+// font-weight: 700;
+// font-size: 18px;
+// line-height: 27px;
+// color: #1B101B;
+
+// }
+.logo-box {
+  width: 86px;
+  height: 86px;
+  border-radius: 50%;
+  // overflow: hidden;
+  margin: 0 auto 12px;
+  border: 1px solid #eee;
+}
+
+.logo-box img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.account-name {
+  text-align: center;
+  font-weight: 700;
+  margin-bottom: 20px;
+}
+
+
+@media (max-width: 991px) {
+  .tenant-contact-shell {
+    grid-template-columns: 1fr;
+  }
+
+  .tenant-contact-sidebar {
+    border-right: none;
+    border-bottom: 1px solid #eee;
+  }
+}
+
+@media(min-width:567px) {
+    .cover-img {
+        height: 250px;
+        width: 100%;
+        border-radius: 10px;
+        object-fit: cover;
+        object-position: center;
+    }
+
+    .acc-img {
+        position: absolute;
+        width: 164px;
+        height: 164px;
+        top: 30px;
+        left: 14px;
+        gap: 0px;
+        opacity: 0px;
+        border-radius: 50%;
+        border: 2px solid white;
+    }
+
+    .acc-img-ar {
+        position: absolute;
+        width: 164px;
+        height: 164px;
+        top: 30px;
+        right: 14px;
+        gap: 0px;
+        opacity: 0px;
+        border-radius: 50%;
+        border: 2px solid white;
+    }
+
+    .info-sec {
+        margin-left: 185px !important;
+        margin-top: 10px;
+    }
+    .info-sec-ar {
+        margin-right: 185px !important;
+        margin-top: 10px;
+    }
+
+    .acc-name {
+    
+font-weight: 700;
+font-size: 24px;
+line-height: 36px;
+
+color: #FFFFFF;
+    position: absolute;
+    bottom: 20px;
+
+    }
+    .acc-en {
+    left: 30px;
+
+    }
+    .acc-name-ar {
+      right: 30px;
+    }
+    
+}
+
+@media(max-width:567px) {
+
+    .container-s {
+        margin-left: 0px;
+        margin-right: 0px;
+        margin-top: 20px;
+    }
+
+    .cover-img {
+        height: 136px;
+        width: 100%;
+        border-radius: 10px;
+        object-fit: cover;
+        object-position: center;
+    }
+
+    .acc-img {
+        position: absolute;
+        width: 100px;
+        height: 100px;
+        top: 30px;
+        left: 14px;
+        gap: 0px;
+        opacity: 0px;
+        border-radius: 50%;
+        border: 2px solid white;
+
+    }
+    .acc-img-ar {
+        position: absolute;
+        width: 100px;
+        height: 100px;
+        top: 30px;
+        right: 14px;
+        gap: 0px;
+        opacity: 0px;
+        border-radius: 50%;
+        border: 2px solid white;
+
+    }
+
+    .info-sec {
+        margin-left: 124px !important;
+        margin-top: 10px;
+    }
+
+    .info-sec-ar {
+        margin-right: 124px !important;
+        margin-top: 10px;
+    }
+}
+
+.clickable {
+  cursor: pointer;
+  color: #4a0d4a !important;
+  // text-decoration: underline;
+}
+
+.clickable:hover {
+  opacity: 0.8;
+}
+
+
+/* ===============================
+   SIDEBAR CONTAINER
+=================================*/
+.tenant-contact-sidebar {
+  border: 1px solid #eeeeee;
+  background: #fff;
+  padding: 14px;
+  border-radius: 12px;
+}
+
+.sidebar-card {
+  position: sticky;
+  top: 0;
+}
+
+/* ===============================
+   HEADER (Basic Info + Actions)
+=================================*/
+.sidebar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+}
+
+.sidebar-header h4 {
+  font-weight: 800;
+  font-size: 16px;
+  margin: 0;
+  color: #191326;
+}
+
+/* action icons (edit / view) */
+.sidebar-actions {
+  display: flex;
+  gap: 6px;
+}
+
+.sidebar-icon-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  border: 1px solid #eee;
+  background: #fff;
+  color: #4a0d4a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.sidebar-icon-btn:hover {
+  background: #f8f8fa;
+}
+
+/* active state */
+.sidebar-icon-btn.active {
+  background: #F6F6F6;
+  // background: #4a0d4a;
+  color: #fff;
+}
+
+/* ===============================
+   BASIC INFO (Email / Phone / Website)
+=================================*/
+.sidebar-info {
+  background: #fafafa;
+  border: 1px solid #eeeeee;
+  border-radius: 10px;
+  padding: 10px;
+}
+
+.sidebar-info div {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 13px;
+  margin-bottom: 10px;
+}
+
+.sidebar-info div:last-child {
+  margin-bottom: 0;
+}
+
+.sidebar-info span {
+  color: #777;
+  font-weight: 500;
+}
+
+.sidebar-info b {
+  max-width: 150px;
+  text-align: right;
+  font-weight: 700;
+  color: #191326;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* clickable (email / website) */
+.clickable {
+  cursor: pointer;
+  color: #4a0d4a !important;
+  // text-decoration: underline;
+}
+
+.clickable:hover {
+  opacity: 0.8;
+}
+
+/* ===============================
+   TABS (Account / Branches / Contacts)
+=================================*/
+.sidebar-tabs {
+  list-style: none;
+  padding: 0;
+  margin: 18px 0 0;
+}
+
+.sidebar-tabs li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  padding: 10px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  margin-bottom: 6px;
+
+  font-weight: 600;
+  color: #595959;
+
+  transition: 0.2s;
+}
+
+.sidebar-tabs li i {
+  width: 18px;
+  text-align: center;
+}
+
+/* hover */
+.sidebar-tabs li:hover {
+  background: #f5f5f7;
+}
+
+/* active */
+.sidebar-tabs li.active {
+  // background: #FDF6FD;
+  background: #F6F6F6;
+
+  color: #191326;
+}
+
+.sidebar-info div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.info-icon {
+  width: 28px;
+  height: 28px;
+  min-width: 28px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 6px;
+  background: #f5f5f7;
+  color: #4a0d4a;
+
+  font-size: 13px;
+}
+
+.sidebar-info b {
+  flex: 1;
+  text-align: right;
+  font-weight: 700;
+  color: #191326;
+
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* clickable links */
+.clickable {
+  cursor: pointer;
+  color: #4a0d4a !important;
+  // text-decoration: underline;
+}
+
+.clickable:hover {
+  opacity: 0.8;
+}
+
+::ng-deep .tenant-sec{
+
+@media (max-width: 991px) {
+  .p-dialog{
+    padding: 0 !important;
+  }
+}
+}

@@ -1,0 +1,60 @@
+<!-- <p-tabView styleClass="activity-tabview d-lg-none">
+  <p-tabPanel header="{{ 'AuditTrail' | localize }}">
+    <app-tenant-contact-audit-trail
+    >
+    </app-tenant-contact-audit-trail>
+  </p-tabPanel>
+
+  <p-tabPanel header="{{ 'Message' | localize }}">
+    <app-tenant-contact-messages >
+    </app-tenant-contact-messages>
+  </p-tabPanel>
+
+  <p-tabPanel header="{{ 'Relations' | localize }}">
+    
+  </p-tabPanel>
+</p-tabView> -->
+
+<div class="activity-panel">
+  <div class="activity-tabs">
+    <button
+      type="button"
+      [class.active]="activeTab === 'audit'"
+      (click)="setTab('audit')">
+      {{ 'AuditTrail' | localize }}
+    </button>
+
+    <button
+      type="button"
+      [class.active]="activeTab === 'message'"
+      (click)="setTab('message')">
+      {{ 'Message' | localize }}
+    </button>
+
+    <button
+      type="button"
+      [class.active]="activeTab === 'relations'"
+      (click)="setTab('relations')">
+      {{ 'Relations' | localize }}
+    </button>
+  </div>
+
+  <div class="activity-content">
+    <app-tenant-contact-audit-trail
+      *ngIf="activeTab === 'audit'"
+  >
+    </app-tenant-contact-audit-trail>
+
+    <app-tenant-contact-messages
+      *ngIf="activeTab === 'message'"
+    >
+    </app-tenant-contact-messages>
+     <div   *ngIf="activeTab === 'relations'">
+        related
+     </div>
+    <!-- <app-tenant-contact-relations
+      *ngIf="activeTab === 'relations'"
+      [accountId]="accountId">
+    </app-tenant-contact-relations> -->
+  </div>
+</div>

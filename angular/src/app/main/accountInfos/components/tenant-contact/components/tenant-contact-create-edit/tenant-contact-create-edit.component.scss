@@ -1,0 +1,280 @@
+.account-form {
+  background: #fff;
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.account-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 18px 22px;
+  border-bottom: 1px solid #eee;
+}
+
+.account-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.btn-cancel {
+  background: #fff;
+  color: #4a0d4a;
+  font-weight: 700;
+}
+
+.btn-save {
+  background: #4a0d4a;
+  color: #fff;
+  font-weight: 700;
+  border-radius: 6px;
+}
+
+.account-body {
+  padding: 18px 22px 26px;
+}
+
+.upload-row {
+  display: grid;
+  grid-template-columns: 120px 1fr;
+  gap: 24px;
+  margin-bottom: 20px;
+}
+
+.logo-upload label,
+.cover-upload label {
+  font-weight: 700;
+  margin-bottom: 8px;
+  display: block;
+}
+
+.other-images-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 18px;
+  margin-bottom: 24px;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px 24px;
+}
+
+.field label {
+  font-weight: 700;
+  color: #191326;
+  margin-bottom: 6px;
+  display: block;
+}
+
+.field span {
+  color: #f88011;
+  font-size: 11px;
+}
+
+.field.full {
+  grid-column: 1 / -1;
+}
+
+.phone-row {
+  display: grid;
+  grid-template-columns: 150px 1fr auto;
+  gap: 10px;
+  align-items: center;
+}
+
+.public-toggle {
+  display: flex !important;
+  gap: 8px;
+  align-items: center;
+  margin: 0 !important;
+  white-space: nowrap;
+}
+
+.disabled-input {
+  background: #f2f2f5;
+}
+
+:host ::ng-deep .p-dropdown,
+:host ::ng-deep .p-inputtext {
+  width: 100%;
+}
+
+:host ::ng-deep .account-account-dialog .p-dialog-content {
+  padding: 0 !important;
+}
+
+@media (max-width: 991px) {
+
+  .upload-row,
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .other-images-row {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .phone-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+
+/*  Main container */
+:host ::ng-deep .image-upload-container {
+  border: 1.5px dashed #cfcfcf;
+  border-radius: 12px;
+  background: #fafafa;
+  transition: all 0.2s ease;
+}
+
+/*  Hover effect */
+:host ::ng-deep .image-upload-container:hover {
+  border-color: #f88011;
+  background: #fff;
+}
+
+/*  Inner drop area */
+:host ::ng-deep .uploadfilecontainer {
+  border: none !important;
+  background: transparent !important;
+  padding: 10px;
+}
+
+/*  Center content */
+:host ::ng-deep .uploadfilecontainer div {
+  text-align: center;
+  font-size: 12px;
+  color: #6c6c6c;
+}
+
+/*  Orange highlight text (Aspect ratio + max size) */
+:host ::ng-deep .uploadfilecontainer div:nth-child(2),
+:host ::ng-deep .uploadfilecontainer div:nth-child(3) {
+  color: #f88011;
+  font-weight: 600;
+  font-size: 11px;
+}
+
+/*  "+" button */
+:host ::ng-deep .image-upload-edit {
+  position: absolute;
+  bottom: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 18px;
+  height: 18px;
+  opacity: 0.9;
+}
+
+/*  Remove icon */
+:host ::ng-deep .image-upload-remove {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 16px;
+}
+
+/*  PDF thumb styling */
+:host ::ng-deep .pdf-thumb {
+  width: 40px;
+  opacity: 0.8;
+}
+
+/*  Fix text spacing */
+:host ::ng-deep .uploadfilecontainer div {
+  margin-bottom: 3px;
+}
+
+/*  Make everything centered vertically */
+:host ::ng-deep .align-items-center {
+  justify-content: center !important;
+}
+
+/*  LOGO CIRCLE FIX */
+:host ::ng-deep .logo-upload .image-upload-container {
+  width: 165px !important;
+  height: 165px !important;
+
+  border-radius: 50% !important;
+  overflow: hidden !important;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/*  make inner content centered nicely */
+:host ::ng-deep .logo-upload .uploadfilecontainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  text-align: center;
+  padding: 10px;
+}
+
+
+.upload-top-row {
+  gap: 20px;
+  align-items: flex-start;
+}
+
+.cover-upload {
+  flex: 1;
+}
+
+::ng-deep .account-form {
+  .p-multiselect {
+    width: 100% !important;
+    height: 47px !important;
+    background-color: #FFFFFF !important;
+    border-radius: 8px !important;
+    border: 1px solid #D9D9D9 !important;
+
+  }
+
+  .p-multiselect-label {
+    margin-top: 5px !important;
+    color: #595959 !important;
+  }
+
+  .p-multiselect-panel .p-multiselect-items .p-multiselect-item.p-highlight {
+    background-color: #FDF6FD !important;
+    color: #4A0D4A !important;
+  }
+
+  .p-multiselect.p-multiselect-chip .p-multiselect-token {
+    background: rgba(248, 248, 248, 0.97) !important;
+    color: #9E9E9E !important;
+    border: 1px solid #D9D9D9 !important;
+    margin: 0 2px !important;
+  }
+}
+
+
+
+
+.phone-field-row {
+  display: grid;
+  grid-template-columns: 130px 1fr 80px;
+  gap: 8px;
+  align-items: center;
+}
+
+:host ::ng-deep .phone-type {
+  width: 100%;
+}
+
+.phone-ext {
+  text-align: center;
+}
+
+@media (max-width: 768px) {
+  .phone-field-row {
+    grid-template-columns: 1fr;
+  }
+}

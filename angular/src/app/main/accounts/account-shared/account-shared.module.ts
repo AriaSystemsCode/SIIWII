@@ -25,6 +25,7 @@ import { TabMenuModule } from 'primeng/tabmenu';
 import { TreeModule } from 'primeng/tree';
 import { TreeTableModule } from 'primeng/treetable';
 import { DialogModule } from 'primeng/dialog';
+import { TenantContactModule } from '@app/main/accountInfos/components/tenant-contact/tenant-contact.module';
 
 
 @NgModule({
@@ -55,7 +56,8 @@ import { DialogModule } from 'primeng/dialog';
         CheckboxModule,
        BulkImportModule,
         FiltersSharedModule,
-        DialogModule
+        DialogModule,
+        TenantContactModule
     ],
     providers: [
         { provide: BsDatepickerConfig, useFactory: NgxBootstrapDatePickerConfigService.getDatepickerConfig },

@@ -13,3 +13,22 @@ export enum AccountInfoPageTabs {
     AccountBilling,
     RelationshipSettings   
 }
+
+
+export enum TenantContactType {
+  Manual = 'manual',
+  Connected = 'connected'
+}
+
+export enum TenantContactMode {
+  Create = 'create',
+  Edit = 'edit',
+  View = 'view'
+}
+
+
+export enum ContactViewTab {
+  Profile = 'profile',
+  Branches = 'branches',
+  Contacts = 'contacts'
+}

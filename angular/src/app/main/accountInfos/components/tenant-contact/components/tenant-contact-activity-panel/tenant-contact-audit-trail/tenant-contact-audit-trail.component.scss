@@ -1,0 +1,33 @@
+.audit-item {
+  display: grid;
+  grid-template-columns: 8px 1fr auto;
+  gap: 6px;
+  align-items: start;
+  color: #b3b3b3;
+  font-size: 12px;
+  margin-bottom: 16px;
+}
+
+.dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #cfcfcf;
+  margin-top: 6px;
+}
+
+.audit-date {
+  white-space: nowrap;
+}
+
+.show-more {
+  border: 0;
+  background: transparent;
+  color: #4a0d4a;
+  font-weight: 700;
+  padding: 0;
+  margin-top: 6px;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+}
