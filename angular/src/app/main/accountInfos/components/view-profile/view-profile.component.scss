@@ -290,7 +290,7 @@ input {
 
 ::ng-deep {
     .ng-image-slider .ng-image-slider-container .main .main-inner .img-div {
-        // max-width: 225px !important;
+        max-width: 225px !important;
     }
 
     .ng-image-slider .ng-image-slider-container .main .main-inner .img-div img,
@@ -323,7 +323,7 @@ input {
 }
 
 .addWidth {
-    // width: 135px;
+    width: 135px;
 }
 
 
@@ -364,28 +364,6 @@ small {
     font-size: 14px;
 }
 
-
-:host ::ng-deep .view-profile-wrapper{
-    .ng-image-slider{
-        height: 225px !important;
-    }
-    .ng-image-slider .ng-image-slider-container .main {
-        height: -webkit-fill-available !important;
-    }
-    .ng-image-slider .ng-image-slider-container .main .main-inner .img-div img, .ng-image-slider .ng-image-slider-container .main .main-inner .img-div video {
-        width: 100% !important;
-    }
-    .ng-image-slider .ng-image-slider-container .main .main-inner .img-div{
-        width: 200px !important;
-    }
-
-
-
-
- 
-
-    
-}
 
 .role-chip {
   background: #ECF0F3;

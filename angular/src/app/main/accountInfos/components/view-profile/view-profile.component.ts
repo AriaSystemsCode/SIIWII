@@ -142,12 +142,11 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
          
         ];
         this.getAllForAccountInfo()
-        this.getPhoneTypes();
         this.allPriceLevel = this.getPriceLevel();
         this.allPriceLevel.push({ label: 'MSRP', value: 'MSRP' });
 
         this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
-        this.currentLang == 'ar' || this.currentLang == 'ar-EG' ? this.isArabic = true : this.isArabic = false
+        this.currentLang == 'ar' || this.currentLang == 'ar-EG'  ? this.isArabic = true : this.isArabic = false
         this.initUploaders();
 
     }
@@ -188,7 +187,7 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
         this.accountType = this.allAccountTypes.find(x => x.value == this.accountData.accountType)
     }
     editAccount() {
-        // 1) Enter edit mode (Personal Account)
+
         if (this.personalAccount && !this.editPersonal) {
             this.Editting = true;
             this.editInfo = false;
@@ -232,14 +231,16 @@ this.editedPersonalData.entityExtraData = this.accountData.entityExtraData;
 
 
         }
-      
-        // 3) Non-personal or other edit mode
-        this.editInfo = true;
-        this.NoteditInfo = false;
-        this.Editting = false;
-        this.edit.emit();
-      }
-      
+
+        else {
+
+
+            this.editInfo = true;
+            this.NoteditInfo = false;
+            this.Editting = false;
+            this.edit.emit();
+        }
+    }
 
     deleteAccount() {
         this.delete.emit()
@@ -397,7 +398,6 @@ this.editedPersonalData.entityExtraData = this.accountData.entityExtraData;
                 this.hideshowShare = false;
                 this.hideshowShare = true;
                 this.showShare = true;
-                this.publish.emit(true)
             }
             );
     }
@@ -423,10 +423,10 @@ this.editedPersonalData.entityExtraData = this.accountData.entityExtraData;
             finalize(() => this.hideMainSpinner()
             )).subscribe(
                 (response) => {
-                    if ((this.connectionCount == 0)) {
+                    if ((this.connectionCount == 0 )) {
                         this.notify.success(this.l('Profile Set To Private Successfully'));
 
-                    } else if (this.connectionCount != 0) {
+                    } else if ( this.connectionCount != 0 ) {
                         this.notify.success(this.l('Profile Set To Heddin Successfully'));
                     }
 
@@ -480,15 +480,7 @@ this.editedPersonalData.entityExtraData = this.accountData.entityExtraData;
         this.editLastNameValue = this.contactData?.lastName;
         this.editJobTitleValue = this.contactData?.jobTitle;
         this.editEMailAddressValue = this.accountData.eMailAddress;
-        this.editPhoneNumberValue = this.contactData?.phone1Number;
-this.editPhone2NumberValue = this.contactData?.phone2Number;
-this.editPhone3NumberValue = this.contactData?.phone3Number;
-
-        this.editPhone1TypeId = this.contactData?.phone1TypeId;
-        this.editPhone2TypeId = this.contactData?.phone2TypeId;
-        this.editPhone3TypeId = this.contactData?.phone3TypeId;
-
-        this.editNotesValue = this.contactData?.notes || '';
+        this.editPhoneNumberValue = this.accountData.phone1Number;
     }
 
     cancelPerAcc() {
@@ -667,23 +659,14 @@ this.editPhone3NumberValue = this.contactData?.phone3Number;
     }
 
     get hasInvalidEmailOrPhone(): boolean {
+        // Only consider invalid if the user typed something AND it doesn't match the pattern
         const email = (this.editEMailAddressValue || '').trim();
-
-        const p1 = (this.editPhoneNumberValue || '').trim();
-        const p2 = (this.editPhone2NumberValue || '').trim();
-        const p3 = (this.editPhone3NumberValue || '').trim();
+        const phone = (this.editPhoneNumberValue || '').trim();
 
         const emailBad = !!email && !(new RegExp(this.emailPattern).test(email));
-        const phoneBad = (v: string) => !!v && !(new RegExp(this.phonePattern).test(v));
+        const phoneBad = !!phone && !(new RegExp(this.phonePattern).test(phone));
 
-        return emailBad || phoneBad(p1) || phoneBad(p2) || phoneBad(p3);
-    }
-
-
-
-    getPhoneTypes() {
-        this._appEntitiesServiceProxy.getAllPhoneTypeForTableDropdown()
-            .subscribe(res => this.allPhoneTypes = res || []);
+        return emailBad || phoneBad;
     }
 
 
