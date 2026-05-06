@@ -1,21 +1,24 @@
-import { Component, EventEmitter, Input, OnInit, Output, SimpleChanges } from '@angular/core';
+import { Component, EventEmitter, Injector, Input, OnInit, Output, SimpleChanges } from '@angular/core';
 import {
   TenantContactMode,
   TenantContactType
 } from '@app/main/accountInfos/models/Account-info-page-tabs.enum';
 import {
-  AccountDto,
+
   AccountsServiceProxy,
   GetAccountForViewDto
 } from '@shared/service-proxies/service-proxies';
 import { AppConsts } from '@shared/AppConsts';
+import { AppComponentBase } from '@shared/common/app-component-base';
+import { finalize } from 'rxjs';
+import { ImageObject } from '@app/main/accounts/account-shared/models/imageobject';
 
 @Component({
   selector: 'app-tenant-contact',
   templateUrl: './tenant-contact.component.html',
   styleUrls: ['./tenant-contact.component.scss']
 })
-export class TenantContactComponent implements OnInit {
+export class TenantContactComponent extends AppComponentBase implements OnInit {
   @Input() mode: TenantContactMode;
   @Input() contactType: TenantContactType;
   @Input() accountId?: number;
@@ -34,8 +37,12 @@ export class TenantContactComponent implements OnInit {
   attachmentBaseUrl = AppConsts.attachmentBaseUrl;
   currentLang: string
   isArabic: boolean
+  activeTabIndex = 0;
+  imageObject: ImageObject[] = [];
+  constructor(injector: Injector, private _accountsServiceProxy: AccountsServiceProxy) {
+    super(injector);
 
-  constructor(private _accountsServiceProxy: AccountsServiceProxy) { }
+  }
 
   ngOnInit(): void {
     this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName');
@@ -66,19 +73,47 @@ export class TenantContactComponent implements OnInit {
   }
 
   loadAccountViewData(): void {
-    this._accountsServiceProxy.getAccountForView(this.accountId, 5)
+    this.showMainSpinner();
+
+    this.imageObject = [];
+
+    this._accountsServiceProxy
+      .getAccountForView(this.accountId, 5)
+      .pipe(
+        finalize(() => {
+          this.hideMainSpinner();
+        })
+      )
       .subscribe((res) => {
+
         this.accountData = res;
-        this.companyLogo = this.accountData?.logoUrl
-          ? `${this.attachmentBaseUrl}/${this.accountData.logoUrl}`
+
+        this.companyLogo = this.accountData?.account?.logoUrl
+          ? `${this.attachmentBaseUrl}/${this.accountData?.account?.logoUrl}`
           : undefined;
 
-        this.coverPhoto = this.accountData?.coverUrl
-          ? `${this.attachmentBaseUrl}/${this.accountData.coverUrl}`
+        this.coverPhoto = this.accountData?.account?.coverUrl
+          ? `${this.attachmentBaseUrl}/${this.accountData?.account?.coverUrl}`
           : undefined;
+
+        /* images slider */
+        if (this.accountData?.account?.imagesUrls?.length) {
+
+          this.accountData.account.imagesUrls.forEach((img) => {
+
+            this.imageObject.push({
+              image: `${this.attachmentBaseUrl}/${img}`,
+              thumbImage: `${this.attachmentBaseUrl}/${img}`,
+              title: ''
+            });
+
+          });
+
+        }
+
+        console.log(this.imageObject, 'from parr');
       });
   }
-
   handleSaved(event: any): void {
     this.saved.emit(event);
   }
@@ -89,36 +124,21 @@ export class TenantContactComponent implements OnInit {
   }
 
   openEmail(email: string): void {
-  if (!email) return;
-  window.location.href = `mailto:${email}`;
-}
-
-openWebsite(url: string): void {
-  if (!url) return;
-
-  // ensure protocol
-  if (!/^https?:\/\//i.test(url)) {
-    url = 'https://' + url;
+    if (!email) return;
+    window.location.href = `mailto:${email}`;
   }
 
-  try {
-    const parsed = new URL(url);
+  openWebsite(url: string): void {
+    if (!url) return;
 
-    // keep only origin (domain)
-    const cleanUrl = parsed.origin;
-
-    window.open(cleanUrl, '_blank');
-  } catch (e) {
-    // fallback (in case invalid URL)
-    window.open(url, '_blank');
+    window.open(url);
   }
-}
 
-switchMode(type: 'view' | 'edit') {
-  if (type === 'view') {
-    this.mode = TenantContactMode.View;
-  } else {
-    this.mode = TenantContactMode.Edit;
+  switchMode(type: 'view' | 'edit') {
+    if (type === 'view') {
+      this.mode = TenantContactMode.View;
+    } else {
+      this.mode = TenantContactMode.Edit;
+    }
   }
-}
 }

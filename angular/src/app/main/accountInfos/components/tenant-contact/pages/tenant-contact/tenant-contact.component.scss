@@ -1,202 +1,147 @@
 .tenant-sec {
+  padding: 10px 6px;
+  overflow-x: hidden;
+  overflow-y: auto;
 
-padding: 10px 6px;
-overflow: hidden;
-
-background: #FFFFFF;
-border: 1px solid #EEEEEE;
-border-radius: 10px;
-
+  background: #ffffff;
+  border: 1px solid #eeeeee;
+  border-radius: 10px;
 }
+
+/* =========================================
+   MAIN LAYOUT
+========================================= */
 
 .tenant-contact-shell {
   display: grid;
-  grid-template-columns: 285px 1fr;
-  // min-height: 75vh;
+  grid-template-columns: minmax(240px, 285px) minmax(0, 1fr);
+  gap: 12px;
+
+  width: 100%;
+  max-width: 100%;
+
   background: #fff;
 }
 
-// .tenant-contact-sidebar {
-//   border: 1px solid #EEEEEE;
-//   background: #fff;
-//   padding: 10px;
-//   border-radius: 10px;
-// }
-
-// .sidebar-card {
-//   position: sticky;
-//   top: 0;
-// }
-// .sidebar-card h4 {
-
-// font-weight: 700;
-// font-size: 18px;
-// line-height: 27px;
-// color: #1B101B;
-
-// }
-.logo-box {
-  width: 86px;
-  height: 86px;
-  border-radius: 50%;
-  // overflow: hidden;
-  margin: 0 auto 12px;
-  border: 1px solid #eee;
+.tenant-contact-sidebar,
+.tenant-contact-main {
+  min-width: 0;
+  max-width: 100%;
 }
 
-.logo-box img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+.tenant-contact-main {
+  overflow-x: hidden;
 }
 
-.account-name {
-  text-align: center;
-  font-weight: 700;
-  margin-bottom: 20px;
-}
+/* =========================================
+   COVER + PROFILE
+========================================= */
 
-
-@media (max-width: 991px) {
-  .tenant-contact-shell {
-    grid-template-columns: 1fr;
+@media (min-width: 567px) {
+  .cover-img {
+    height: 250px;
+    width: 100%;
+    border-radius: 10px;
+    object-fit: cover;
+    object-position: center;
   }
 
-  .tenant-contact-sidebar {
-    border-right: none;
-    border-bottom: 1px solid #eee;
+  .acc-img {
+    position: absolute;
+    width: 164px;
+    height: 164px;
+    top: 30px;
+    left: 14px;
+    border-radius: 50%;
+    border: 2px solid white;
+    object-fit: cover;
   }
-}
 
-@media(min-width:567px) {
-    .cover-img {
-        height: 250px;
-        width: 100%;
-        border-radius: 10px;
-        object-fit: cover;
-        object-position: center;
-    }
+  .acc-img-ar {
+    position: absolute;
+    width: 164px;
+    height: 164px;
+    top: 30px;
+    right: 14px;
+    border-radius: 50%;
+    border: 2px solid white;
+    object-fit: cover;
+  }
 
-    .acc-img {
-        position: absolute;
-        width: 164px;
-        height: 164px;
-        top: 30px;
-        left: 14px;
-        gap: 0px;
-        opacity: 0px;
-        border-radius: 50%;
-        border: 2px solid white;
-    }
-
-    .acc-img-ar {
-        position: absolute;
-        width: 164px;
-        height: 164px;
-        top: 30px;
-        right: 14px;
-        gap: 0px;
-        opacity: 0px;
-        border-radius: 50%;
-        border: 2px solid white;
-    }
-
-    .info-sec {
-        margin-left: 185px !important;
-        margin-top: 10px;
-    }
-    .info-sec-ar {
-        margin-right: 185px !important;
-        margin-top: 10px;
-    }
-
-    .acc-name {
-    
-font-weight: 700;
-font-size: 24px;
-line-height: 36px;
-
-color: #FFFFFF;
+  .acc-name {
     position: absolute;
     bottom: 20px;
 
-    }
-    .acc-en {
+    font-weight: 700;
+    font-size: 24px;
+    line-height: 36px;
+
+    color: #ffffff;
+  }
+
+  .acc-en {
     left: 30px;
+  }
 
-    }
-    .acc-name-ar {
-      right: 30px;
-    }
-    
+  .acc-name-ar {
+    right: 30px;
+  }
 }
 
-@media(max-width:567px) {
+@media (max-width: 567px) {
+  .cover-img {
+    height: 136px;
+    width: 100%;
+    border-radius: 10px;
+    object-fit: cover;
+    object-position: center;
+  }
 
-    .container-s {
-        margin-left: 0px;
-        margin-right: 0px;
-        margin-top: 20px;
-    }
+  .acc-img {
+    position: absolute;
+    width: 100px;
+    height: 100px;
+    top: 10px;
+    left: 14px;
+    border-radius: 50%;
+    border: 2px solid white;
+    object-fit: cover;
+  }
 
-    .cover-img {
-        height: 136px;
-        width: 100%;
-        border-radius: 10px;
-        object-fit: cover;
-        object-position: center;
-    }
+  .acc-img-ar {
+    position: absolute;
+    width: 100px;
+    height: 100px;
+    top: 10px;
+    right: 14px;
+    border-radius: 50%;
+    border: 2px solid white;
+    object-fit: cover;
+  }
 
-    .acc-img {
-        position: absolute;
-        width: 100px;
-        height: 100px;
-        top: 30px;
-        left: 14px;
-        gap: 0px;
-        opacity: 0px;
-        border-radius: 50%;
-        border: 2px solid white;
+  .acc-name {
+    position: absolute;
+    bottom: 0px;
 
-    }
-    .acc-img-ar {
-        position: absolute;
-        width: 100px;
-        height: 100px;
-        top: 30px;
-        right: 14px;
-        gap: 0px;
-        opacity: 0px;
-        border-radius: 50%;
-        border: 2px solid white;
+    font-size: 18px;
+    font-weight: 700;
 
-    }
+    color: #fff;
+  }
 
-    .info-sec {
-        margin-left: 124px !important;
-        margin-top: 10px;
-    }
+  .acc-en {
+    left: 20px;
+  }
 
-    .info-sec-ar {
-        margin-right: 124px !important;
-        margin-top: 10px;
-    }
+  .acc-name-ar {
+    right: 20px;
+  }
 }
 
-.clickable {
-  cursor: pointer;
-  color: #4a0d4a !important;
-  // text-decoration: underline;
-}
+/* =========================================
+   SIDEBAR
+========================================= */
 
-.clickable:hover {
-  opacity: 0.8;
-}
-
-
-/* ===============================
-   SIDEBAR CONTAINER
-=================================*/
 .tenant-contact-sidebar {
   border: 1px solid #eeeeee;
   background: #fff;
@@ -209,57 +154,17 @@ color: #FFFFFF;
   top: 0;
 }
 
-/* ===============================
-   HEADER (Basic Info + Actions)
-=================================*/
-.sidebar-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 14px;
+.sidebar-card h4 {
+  font-weight: 700;
+  font-size: 18px;
+  line-height: 27px;
+  color: #1b101b;
 }
 
-.sidebar-header h4 {
-  font-weight: 800;
-  font-size: 16px;
-  margin: 0;
-  color: #191326;
-}
+/* =========================================
+   BASIC INFO
+========================================= */
 
-/* action icons (edit / view) */
-.sidebar-actions {
-  display: flex;
-  gap: 6px;
-}
-
-.sidebar-icon-btn {
-  width: 32px;
-  height: 32px;
-  border-radius: 6px;
-  border: 1px solid #eee;
-  background: #fff;
-  color: #4a0d4a;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: 0.2s;
-}
-
-.sidebar-icon-btn:hover {
-  background: #f8f8fa;
-}
-
-/* active state */
-.sidebar-icon-btn.active {
-  background: #F6F6F6;
-  // background: #4a0d4a;
-  color: #fff;
-}
-
-/* ===============================
-   BASIC INFO (Email / Phone / Website)
-=================================*/
 .sidebar-info {
   background: #fafafa;
   border: 1px solid #eeeeee;
@@ -269,89 +174,18 @@ color: #FFFFFF;
 
 .sidebar-info div {
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  justify-content: space-between;
+
+  gap: 10px;
+  min-width: 0;
+
   font-size: 13px;
   margin-bottom: 10px;
 }
 
 .sidebar-info div:last-child {
   margin-bottom: 0;
-}
-
-.sidebar-info span {
-  color: #777;
-  font-weight: 500;
-}
-
-.sidebar-info b {
-  max-width: 150px;
-  text-align: right;
-  font-weight: 700;
-  color: #191326;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-/* clickable (email / website) */
-.clickable {
-  cursor: pointer;
-  color: #4a0d4a !important;
-  // text-decoration: underline;
-}
-
-.clickable:hover {
-  opacity: 0.8;
-}
-
-/* ===============================
-   TABS (Account / Branches / Contacts)
-=================================*/
-.sidebar-tabs {
-  list-style: none;
-  padding: 0;
-  margin: 18px 0 0;
-}
-
-.sidebar-tabs li {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-
-  padding: 10px 12px;
-  border-radius: 8px;
-  cursor: pointer;
-  margin-bottom: 6px;
-
-  font-weight: 600;
-  color: #595959;
-
-  transition: 0.2s;
-}
-
-.sidebar-tabs li i {
-  width: 18px;
-  text-align: center;
-}
-
-/* hover */
-.sidebar-tabs li:hover {
-  background: #f5f5f7;
-}
-
-/* active */
-.sidebar-tabs li.active {
-  // background: #FDF6FD;
-  background: #F6F6F6;
-
-  color: #191326;
-}
-
-.sidebar-info div {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
 }
 
 .info-icon {
@@ -372,6 +206,9 @@ color: #FFFFFF;
 
 .sidebar-info b {
   flex: 1;
+  min-width: 0;
+  max-width: 100%;
+
   text-align: right;
   font-weight: 700;
   color: #191326;
@@ -381,22 +218,208 @@ color: #FFFFFF;
   white-space: nowrap;
 }
 
-/* clickable links */
+/* =========================================
+   LINKS
+========================================= */
+
 .clickable {
   cursor: pointer;
   color: #4a0d4a !important;
-  // text-decoration: underline;
 }
 
 .clickable:hover {
   opacity: 0.8;
 }
 
-::ng-deep .tenant-sec{
+/* =========================================
+   TABS
+========================================= */
 
-@media (max-width: 991px) {
-  .p-dialog{
-    padding: 0 !important;
+.sidebar-tabs {
+  list-style: none;
+  padding: 0;
+  margin: 18px 0 0;
+}
+
+.sidebar-tabs li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  padding: 10px 12px;
+  border-radius: 8px;
+  white-space: nowrap;
+
+  cursor: pointer;
+  margin-bottom: 6px;
+
+  font-weight: 600;
+  color: #595959;
+
+  transition: 0.2s;
+}
+
+.sidebar-tabs li i {
+  width: 18px;
+  text-align: center;
+}
+
+.sidebar-tabs li:hover {
+  background: #f5f5f7;
+}
+
+.sidebar-tabs li.active {
+  background: #f6f6f6;
+  color: #f88011;
+}
+
+/* =========================================
+   PRIME TABVIEW
+========================================= */
+
+.tenant-mobile-tabs {
+  width: 100%;
+  margin-bottom: 1rem;
+}
+
+
+
+
+
+/* =========================================
+   RESPONSIVE
+========================================= */
+
+@media (max-width: 991.98px) {
+  .tenant-contact-shell {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .tenant-contact-sidebar,
+  .tenant-contact-main {
+    width: 100%;
+    max-width: 100%;
+            border: 1px solid #eee;
+        padding: 8px 5px;
+        border-radius: 6px;
+  }
+
+  .tenant-contact-sidebar {
+    padding: 10px;
+  }
+
+  .sidebar-card {
+    position: static;
+  }
+
+  .sidebar-info {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .sidebar-info div {
+    margin-bottom: 0;
+  }
+
+:host ::ng-deep .tenant-mobile-tabs .p-tabview-nav {
+  display: flex;
+  overflow-x: auto;
+  overflow-y: hidden;
+
+  white-space: nowrap;
+  flex-wrap: nowrap;
+
+  scrollbar-width: none;
+}
+
+:host ::ng-deep .tenant-mobile-tabs .p-tabview-nav::-webkit-scrollbar {
+  display: none;
+}
+
+:host ::ng-deep .tenant-mobile-tabs .p-tabview-nav li {
+  flex: 0 0 auto;
+}
+
+:host ::ng-deep .tenant-mobile-tabs .p-tabview-panels {
+  padding: 0 !important;
+}
+
+
+:host ::ng-deep .tenant-mobile-tabs .p-tabview-panels {
+  border: 1px solid #eee !important;
+}
+
+:host ::ng-deep .tenant-mobile-tabs .p-tabview-nav {
+  margin-bottom: 10px;
+}
+
+:host ::ng-deep .tenant-mobile-tabs .p-tabview-nav li .p-tabview-nav-link {
+  border-radius: 6px !important;
+  margin: 0 20px !important;
+  border: none !important;
+  background-color: transparent !important;
+  width: auto !important;
+
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+
+  padding: 10px !important;
+}
+
+:host ::ng-deep .tenant-mobile-tabs .p-tabview-nav li.p-highlight .p-tabview-nav-link {
+  border-radius: 6px !important;
+  height: auto !important;
+
+  background-color: #4a0d4a !important;
+  color: #fff !important;
+
+  padding: 10px !important;
+
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+}
+
+}
+
+@media (max-width: 567px) {
+  .tenant-sec {
+    padding: 8px 4px;
+  }
+
+  .tenant-contact-sidebar {
+    padding: 8px;
+  }
+
+  .sidebar-card h4 {
+    font-size: 16px;
+  }
+
+  .sidebar-info {
+    padding: 8px;
+  }
+
+  .sidebar-info div {
+    font-size: 12px;
+  }
+
+  .sidebar-tabs li {
+    font-size: 13px;
+    padding: 8px 10px;
+  }
+
+  .info-icon {
+    width: 24px;
+    height: 24px;
+    min-width: 24px;
+
+    font-size: 11px;
   }
 }
-}
+
+
+

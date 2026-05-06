@@ -1,4 +1,4 @@
-<div class="tenant-sec">
+<div class="tenant-sec mr-2">
  
  <div class="position-relative"     *ngIf="mode === TenantContactMode.View">
       <img class=" p-0 w-100 cover-img" [src]="attachmentBaseUrl + '/' + accountData?.account?.coverUrl"
@@ -10,7 +10,7 @@
 
 <div class="tenant-contact-shell mt-3">
 
-  <div class="tenant-contact-sidebar">
+  <div class="tenant-contact-sidebar mb-2">
     <div class="sidebar-card">
       <h4>{{'BasicInfo' | localize}}</h4>
 
@@ -59,27 +59,65 @@
 
 </div>
 
-      <ul class="sidebar-tabs">
-        <li class="active">
-          <i class="far fa-user"></i>
-          Account Profile
-        </li>
+     <ul class="sidebar-tabs d-none d-lg-block">
+  <li
+    [class.active]="activeTabIndex === 0"
+    (click)="activeTabIndex = 0"
+  >
+    <i class="far fa-user"></i>
+    {{ 'AccountProfile' | localize }}
+  </li>
 
-        <li>
-          <i class="fa fa-map-marker-alt"></i>
-          Branches / Addresses
-        </li>
+  <li
+    [class.active]="activeTabIndex === 1"
+    (click)="activeTabIndex = 1"
+  >
+    <i class="fa fa-map-marker-alt"></i>
+    {{ 'Branches/Addresses' | localize }}
+  </li>
 
-        <li>
-          <i class="far fa-address-book"></i>
-          Contacts
-        </li>
-      </ul>
+  <li
+    [class.active]="activeTabIndex === 2"
+    (click)="activeTabIndex = 2"
+  >
+    <i class="far fa-address-book"></i>
+    {{ 'Contacts' | localize }}
+  </li>
+</ul>
     </div>
   </div>
 
-  <div class="tenant-contact-main">
+<div class="tenant-contact-main">
 
+  <!-- Tablet / Mobile PrimeNG tabs -->
+  <p-tabView
+    class="d-lg-none tenant-mobile-tabs"
+    [(activeIndex)]="activeTabIndex"
+  >
+    <p-tabPanel>
+      <ng-template pTemplate="header">
+        <i class="far fa-user mr-2"></i>
+        <span>{{ 'AccountProfile' | localize }}</span>
+      </ng-template>
+    </p-tabPanel>
+
+    <p-tabPanel>
+      <ng-template pTemplate="header">
+        <i class="fa fa-map-marker-alt mr-2"></i>
+        <span>{{ 'Branches/Addresses' | localize }}</span>
+      </ng-template>
+    </p-tabPanel>
+
+    <p-tabPanel>
+      <ng-template pTemplate="header">
+        <i class="far fa-address-book mr-2"></i>
+        <span>{{ 'Contacts' | localize }}</span>
+      </ng-template>
+    </p-tabPanel>
+  </p-tabView>
+
+  <!-- Account Profile tab content -->
+  <ng-container *ngIf="activeTabIndex === 0">
     <app-tenant-contact-create-edit
       *ngIf="mode === TenantContactMode.Create || mode === TenantContactMode.Edit"
       [mode]="mode"
@@ -93,10 +131,24 @@
       *ngIf="mode === TenantContactMode.View"
       [accountData]="accountData"
       [contactType]="contactType"
-      (edit)="openEdit()">
+      (edit)="openEdit()"
+      [imageObject]="imageObject"
+      >
+      
     </app-tenant-contact-view>
+  </ng-container>
 
-  </div>
+  <!-- Branches / Addresses tab content -->
+  <ng-container *ngIf="activeTabIndex === 1">
+    Branches
+  </ng-container>
+
+  <!-- Contacts tab content -->
+  <ng-container *ngIf="activeTabIndex === 2">
+   contacts
+  </ng-container>
+
+</div>
 
 </div>
 

@@ -13,7 +13,7 @@ export class ImageCropperComponent implements OnInit  {
     noOptions:boolean = true
     originalFileChangeEvent:Event
     title:string
-    aspectRatio:number
+    aspectRatio:number = 1
     imageChangedEvent: any = '';
     croppedImageAsBase64: string | ArrayBuffer
     croppedImage: Blob

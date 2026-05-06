@@ -21,7 +21,7 @@ export class AccountCardComponent extends AppComponentBase implements OnChanges 
   @Input() loginTenaneSsin;
   @Output() _createRelation: EventEmitter<any> = new EventEmitter<any>()
 
-
+  @Output() viewTenantContact = new EventEmitter<GetAccountForViewDto>();
   isRecordOwner: boolean
   attachmentBaseUrl: string = AppConsts.attachmentBaseUrl
   currentLang: string
@@ -75,30 +75,45 @@ export class AccountCardComponent extends AppComponentBase implements OnChanges 
     let editPrefix = this.isHost ? "external" : "manual"
     this.router.navigate([`/app/main/account/edit-${editPrefix}/${this.id}`])
   }
+  // viewProfile(): void {
+  //   if (!this.fromMarketplace) {
+  //     if (!this.id) return
+  //     this.router.navigate([`/app/main/account/view/${this.id}`], {
+  //       queryParams: { fromMarketplace: this.fromMarketplace }
+  //     });
+  //   } else {
+  //     if (!this.id) return
+  //     this.router.navigate([`/app/main/account/view-marketplace-acc/${this.id}`], {
+  //       state: {
+  //         accountType: this.account.account.accountType,
+  //         ssin: this.account.account.ssin
+  //       }
+  //     });
+  //   }
   viewProfile(): void {
-    if (!this.fromMarketplace) {
-      if (!this.id) return
-      this.router.navigate([`/app/main/account/view/${this.id}`], {
-        queryParams: { fromMarketplace: this.fromMarketplace }
-      });
-    } else {
-      if (!this.id) return
-      this.router.navigate([`/app/main/account/view-marketplace-acc/${this.id}`], {
-        state: {
-          accountType: this.account.account.accountType,
-          ssin: this.account.account.ssin
-        }
-      });
+  if (!this.id) return;
+
+
+
+  this.router.navigate([`/app/main/account/view-marketplace-acc/${this.id}`], {
+    state: {
+      accountType: this.account.account.accountType,
+      ssin: this.account.account.ssin
     }
+  });
+
 
   }
-  clickCardHandler() {
-    if (this.isManual) {
-      this.edit()
-    } else {
-      this.viewProfile()
-    }
+clickCardHandler() {
+  if (!this.id) return;
+
+  if (!this.fromMarketplace) {
+    this.viewTenantContact.emit(this.account);
+    return;
   }
+
+  this.viewProfile(); // keep marketplace route
+}
 
   createRelation(relationType) {
     this._createRelation.emit({ account: this.account, relation: relationType });

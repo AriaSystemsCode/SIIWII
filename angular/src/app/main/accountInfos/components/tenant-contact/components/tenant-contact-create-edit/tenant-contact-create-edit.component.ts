@@ -25,8 +25,8 @@ import {
     LookupLabelDto,
     SycIdentifierDefinitionsServiceProxy,
     AppEntityAttachmentDto,
-  SycAttachmentCategoryDto,
-  AppEntityExtraDataDto
+    SycAttachmentCategoryDto,
+    AppEntityExtraDataDto
 } from '@shared/service-proxies/service-proxies';
 
 import { ImageUploadComponentOutput } from '@app/shared/common/image-upload/image-upload.component';
@@ -34,6 +34,20 @@ import { ImageUploadComponentOutput } from '@app/shared/common/image-upload/imag
 import { FileUploader, FileUploaderOptions } from 'ng2-file-upload';
 import { IAjaxResponse, TokenService } from 'abp-ng2-module';
 import { TenantContactMode, TenantContactType } from '@app/main/accountInfos/models/Account-info-page-tabs.enum';
+import { BsModalRef, BsModalService, ModalOptions } from 'ngx-bootstrap/modal';
+import { Subscription, Observable } from 'rxjs';
+
+import { PrimengTableHelper } from '@shared/helpers/PrimengTableHelper';
+
+import { SelectCategoriesDynamicModalComponent } from '@app/categories/select-categories-dynamic-modal.component';
+import { SelectClassificationDynamicModalComponent } from '@app/classification/select-classification-dynamic-modal.component';
+
+import {
+  AppEntityCategoryDto,
+  AppEntityClassificationDto,
+  TreeNodeOfGetSycEntityObjectCategoryForViewDto,
+  TreeNodeOfGetSycEntityObjectClassificationForViewDto
+} from '@shared/service-proxies/service-proxies';
 @Component({
     selector: 'app-tenant-contact-create-edit',
     templateUrl: './tenant-contact-create-edit.component.html',
@@ -41,13 +55,13 @@ import { TenantContactMode, TenantContactType } from '@app/main/accountInfos/mod
 })
 export class TenantContactCreateEditComponent
     extends AppComponentBase
-    implements OnInit
-{
+    implements OnInit {
     @ViewChild('tenantContactForm', { static: true }) tenantContactForm: NgForm;
 
     @Input() accountId?: number;
     @Input() contactType: TenantContactType = TenantContactType.Manual;
     @Input() mode: TenantContactMode = TenantContactMode.Create;
+    @Input() accountData
 
     @Output() saved = new EventEmitter<AccountDto>();
     @Output() cancelled = new EventEmitter<void>();
@@ -58,7 +72,7 @@ export class TenantContactCreateEditComponent
 
     attachmentBaseUrl = AppConsts.attachmentBaseUrl;
 
-    accountInfoData: CreateOrEditAccountInfoDto =new CreateOrEditAccountInfoDto();
+    accountInfoData: CreateOrEditAccountInfoDto = new CreateOrEditAccountInfoDto();
 
     accountDataForView?: AccountDto;
     getForEditResult?: GetAccountInfoForEditOutput;
@@ -92,57 +106,63 @@ export class TenantContactCreateEditComponent
     private hasRequestedManualCode = false;
     public uploader: FileUploader;
 
-sycAttachmentCategoryLogo: SycAttachmentCategoryDto;
-sycAttachmentCategoryBanner: SycAttachmentCategoryDto;
-sycAttachmentCategoryImage: SycAttachmentCategoryDto;
+    sycAttachmentCategoryLogo: SycAttachmentCategoryDto;
+    sycAttachmentCategoryBanner: SycAttachmentCategoryDto;
+    sycAttachmentCategoryImage: SycAttachmentCategoryDto;
 
-otherImageSlots = [
-  { index: 1, preview: undefined },
-  { index: 2, preview: undefined },
-  { index: 3, preview: undefined },
-  { index: 4, preview: undefined }
-];
+    otherImageSlots = [
+        { index: 1, preview: undefined },
+        { index: 2, preview: undefined },
+        { index: 3, preview: undefined },
+        { index: 4, preview: undefined }
+    ];
 
-    roles:any
-            selectedRoles!: any[];
-allStatus:any
-           @Input()  accountData
+    roles: any
+    selectedRoles!: any[];
+    allStatus: any
+
+categoriesIds: number[] = [];
+classificationsIds: number[] = [];
+
+primengTableHelperCateg = new PrimengTableHelper();
+primengTableHelperClass = new PrimengTableHelper();
     constructor(
         injector: Injector,
         private _accountsServiceProxy: AccountsServiceProxy,
         private _appEntitiesServiceProxy: AppEntitiesServiceProxy,
         private _sycIdentifierDefinitionsServiceProxy: SycIdentifierDefinitionsServiceProxy,
-        private _tokenService: TokenService
+        private _tokenService: TokenService,
+         private _bsModalService: BsModalService
     ) {
         super(injector);
         this.initDto();
     }
 
     ngOnInit(): void {
-                this.roles = [
+        this.roles = [
             { name: 'Buyer' },
             { name: 'Seller' },
             { name: 'Sales Rep' },
             { name: 'Buying Office' },
-         
+
         ];
         this.allStatus = [
-                   { name: 'Active' },
+            { name: 'Active' },
             { name: 'Inactive' },
             { name: 'Hold' },
             { name: 'Cancelled' },
         ]
 
-  this.initUploaders();
-  this.loadAttachmentCategories();
-  this.loadInitData();
+        this.initUploaders();
+        this.loadAttachmentCategories();
+        this.loadInitData();
 
-  if (this.isEdit && this.accountId) {
-    this.getAccountDataForEdit();
-  } else {
-    this.prepareCreateMode();
-  }
-}
+        if (this.isEdit && this.accountId) {
+            this.getAccountDataForEdit();
+        } else {
+            this.prepareCreateMode();
+        }
+    }
 
     get isCreate(): boolean {
         return this.mode === TenantContactMode.Create;
@@ -193,6 +213,9 @@ allStatus:any
 
         this.setManualAccCode();
         this.ensureArrays();
+        this.initCategoryAndClassificationIds();
+this.refreshCategoriesTable();
+this.refreshClassificationsTable();
     }
 
 
@@ -225,6 +248,9 @@ allStatus:any
                 );
 
                 this.ensureArrays();
+                this.initCategoryAndClassificationIds();
+this.refreshCategoriesTable();
+this.refreshClassificationsTable();
                 this.setAttachmentPreviewImages();
 
 
@@ -310,8 +336,8 @@ allStatus:any
             this.accountInfoData.accountTypeId === 21
                 ? 'PERSONAL'
                 : this.accountInfoData.accountTypeId === 20
-                ? 'GROUP'
-                : 'BUSINESS';
+                    ? 'GROUP'
+                    : 'BUSINESS';
 
         const sequence =
             await this._sycIdentifierDefinitionsServiceProxy
@@ -357,35 +383,35 @@ allStatus:any
     }
 
     save(): void {
-  // if (!this.tenantContactForm?.form?.valid) return;
+        // if (!this.tenantContactForm?.form?.valid) return;
 
-  if (this.uploader?.isUploading) {
-    this.notify.info(this.l('WaitUntilUploadingImagesIsCompleted'));
-    return;
-  }
+        if (this.uploader?.isUploading) {
+            this.notify.info(this.l('WaitUntilUploadingImagesIsCompleted'));
+            return;
+        }
 
-  this.saving = true;
-  this.ensureArrays();
+        this.saving = true;
+        this.ensureArrays();
 
-  this.accountInfoData.accountLevel = this.isManual
-    ? AccountLevelEnum.Manual
-    : AccountLevelEnum.External;
+        this.accountInfoData.accountLevel = this.isManual
+            ? AccountLevelEnum.Manual
+            : AccountLevelEnum.External;
 
-  if (this.isConnected) {
-    this.applyConnectedLimitedEdit();
-  }
+        if (this.isConnected) {
+            this.applyConnectedLimitedEdit();
+        }
 
-  this._accountsServiceProxy
-    .createOrEditAccount(this.accountInfoData)
-    .pipe(finalize(() => (this.saving = false)))
-    .subscribe((result: any) => {
-      this.touched = false;
-      this.notify.success(this.l('SavedSuccessfully'));
-      this.saved.emit(result?.account || result?.accountInfo || result);
-    }, () => {
-      this.touched = true;
-    });
-}
+        this._accountsServiceProxy
+            .createOrEditAccount(this.accountInfoData)
+            .pipe(finalize(() => (this.saving = false)))
+            .subscribe((result: any) => {
+                this.touched = false;
+                this.notify.success(this.l('SavedSuccessfully'));
+                this.saved.emit(result?.account || result?.accountInfo || result);
+            }, () => {
+                this.touched = true;
+            });
+    }
 
     private applyConnectedLimitedEdit(): void {
         // Keep this method if connected edit uses same component.
@@ -408,11 +434,11 @@ allStatus:any
         });
     }
 
-  onLogoUpload(event: ImageUploadComponentOutput): void {
-  this.companyLogo = event.image;
-  // this.logoFile = event.file;
-  this.changeTouchState();
-}
+    onLogoUpload(event: ImageUploadComponentOutput): void {
+        this.companyLogo = event.image;
+        // this.logoFile = event.file;
+        this.changeTouchState();
+    }
 
     removeLogo(): void {
         this.companyLogo = undefined;
@@ -522,40 +548,40 @@ allStatus:any
             ) ?? [];
     }
 
-  private setAttachmentPreviewImages(): void {
-  const attachments: any[] = this.accountInfoData.entityAttachments ?? [];
+    private setAttachmentPreviewImages(): void {
+        const attachments: any[] = this.accountInfoData.entityAttachments ?? [];
 
-  const logo = attachments.find(x =>
-    x.attachmentCategoryCode === 'LOGO' ||
-    x.index === -1 ||
-    x.attachmentCategoryId === this.sycAttachmentCategoryLogo?.id
-  );
+        const logo = attachments.find(x =>
+            x.attachmentCategoryCode === 'LOGO' ||
+            x.index === -1 ||
+            x.attachmentCategoryId === this.sycAttachmentCategoryLogo?.id
+        );
 
-  const banner = attachments.find(x =>
-    x.attachmentCategoryCode === 'BANNER' ||
-    x.index === -2 ||
-    x.attachmentCategoryId === this.sycAttachmentCategoryBanner?.id
-  );
+        const banner = attachments.find(x =>
+            x.attachmentCategoryCode === 'BANNER' ||
+            x.index === -2 ||
+            x.attachmentCategoryId === this.sycAttachmentCategoryBanner?.id
+        );
 
-  const images = attachments.filter(x =>
-    x.attachmentCategoryCode === 'IMAGE' ||
-    x.attachmentCategoryId === this.sycAttachmentCategoryImage?.id ||
-    x.index > 0
-  );
+        const images = attachments.filter(x =>
+            x.attachmentCategoryCode === 'IMAGE' ||
+            x.attachmentCategoryId === this.sycAttachmentCategoryImage?.id ||
+            x.index > 0
+        );
 
-  this.companyLogo = logo?.url ? `${this.attachmentBaseUrl}/${logo.url}` : undefined;
-  this.coverPhoto = banner?.url ? `${this.attachmentBaseUrl}/${banner.url}` : undefined;
+        this.companyLogo = logo?.url ? `${this.attachmentBaseUrl}/${logo.url}` : undefined;
+        this.coverPhoto = banner?.url ? `${this.attachmentBaseUrl}/${banner.url}` : undefined;
 
-  this.otherImageSlots.forEach(slot => {
-    const found = images.find(x => x.index === slot.index) || images[slot.index - 1];
-    slot.preview = found?.url ? `${this.attachmentBaseUrl}/${found.url}` : undefined;
-  });
+        this.otherImageSlots.forEach(slot => {
+            const found = images.find(x => x.index === slot.index) || images[slot.index - 1];
+            slot.preview = found?.url ? `${this.attachmentBaseUrl}/${found.url}` : undefined;
+        });
 
-  this.OtherImages1 = this.otherImageSlots[0].preview;
-  this.OtherImages2 = this.otherImageSlots[1].preview;
-  this.OtherImages3 = this.otherImageSlots[2].preview;
-  this.OtherImages4 = this.otherImageSlots[3].preview;
-}
+        this.OtherImages1 = this.otherImageSlots[0].preview;
+        this.OtherImages2 = this.otherImageSlots[1].preview;
+        this.OtherImages3 = this.otherImageSlots[2].preview;
+        this.OtherImages4 = this.otherImageSlots[3].preview;
+    }
 
 
 
@@ -563,182 +589,386 @@ allStatus:any
 
 
     loadAttachmentCategories(): void {
-  this.getSycAttachmentCategoriesByCodes(['LOGO', 'BANNER', 'IMAGE'])
-    .subscribe((result) => {
-      this.sycAttachmentCategoryLogo = result.find(x => x.code === 'LOGO');
-      this.sycAttachmentCategoryBanner = result.find(x => x.code === 'BANNER');
-      this.sycAttachmentCategoryImage = result.find(x => x.code === 'IMAGE');
-    });
-}
+        this.getSycAttachmentCategoriesByCodes(['LOGO', 'BANNER', 'IMAGE'])
+            .subscribe((result) => {
+                this.sycAttachmentCategoryLogo = result.find(x => x.code === 'LOGO');
+                this.sycAttachmentCategoryBanner = result.find(x => x.code === 'BANNER');
+                this.sycAttachmentCategoryImage = result.find(x => x.code === 'IMAGE');
+            });
+    }
 
-initUploaders(): void {
-  this.uploader = this.createUploader('/Attachment/UploadFiles');
-}
+    initUploaders(): void {
+        this.uploader = this.createUploader('/Attachment/UploadFiles');
+    }
 
-createUploader(url: string): FileUploader {
-  const uploader = new FileUploader({
-    url: AppConsts.remoteServiceBaseUrl + url
-  });
+    createUploader(url: string): FileUploader {
+        const uploader = new FileUploader({
+            url: AppConsts.remoteServiceBaseUrl + url
+        });
 
-  uploader.onAfterAddingFile = (file) => {
-    file.withCredentials = false;
-  };
+        uploader.onAfterAddingFile = (file) => {
+            file.withCredentials = false;
+        };
 
-  const uploaderOptions: Partial<FileUploaderOptions> = {
-    authToken: 'Bearer ' + this._tokenService.getToken(),
-    removeAfterUpload: true
-  };
+        const uploaderOptions: Partial<FileUploaderOptions> = {
+            authToken: 'Bearer ' + this._tokenService.getToken(),
+            removeAfterUpload: true
+        };
 
-  uploader.setOptions(uploaderOptions as FileUploaderOptions);
+        uploader.setOptions(uploaderOptions as FileUploaderOptions);
 
-  return uploader;
-}
+        return uploader;
+    }
 
-imageBrowseDone(
-  event: ImageUploadComponentOutput,
-  type: 'LOGO' | 'BANNER' | 'IMAGE',
-  index: number
-): void {
-  if (!event?.file) return;
+    imageBrowseDone(
+        event: ImageUploadComponentOutput,
+        type: 'LOGO' | 'BANNER' | 'IMAGE',
+        index: number
+    ): void {
+        if (!event?.file) return;
 
+        this.ensureArrays();
+
+        const guid = this.guid();
+        const category = this.getCategoryByType(type);
+
+        if (!category?.id) {
+            this.message.warn(this.l('AttachmentCategoryNotLoaded'));
+            return;
+        }
+
+        this.setPreview(type, index, event.image);
+
+        this.upsertAttachment({
+            attachmentCategoryId: category.id,
+            attachmentCategoryCode: type,
+            fileName: event.file.name,
+            guid,
+            index
+        } as any);
+
+        this.uploader.addToQueue([event.file]);
+
+        this.uploader.onBuildItemForm = (_fileItem: any, form: any) => {
+            form.append('guid', guid);
+        };
+
+        this.uploader.onSuccessItem = (_item, response) => {
+            const ajaxResponse = JSON.parse(response || '{}') as IAjaxResponse;
+
+            if (!ajaxResponse?.success) {
+                this.message.error(ajaxResponse?.error?.message || this.l('UploadFailed'));
+                return;
+            }
+
+            const uploaded = ajaxResponse.result;
+            const current = this.accountInfoData.entityAttachments
+                .find((x: any) => x.guid === uploaded?.guid || x.guid === guid) as any;
+
+            if (current) {
+                current.id = uploaded?.id || current.id;
+                current.url = uploaded?.url || uploaded?.fileName || current.url;
+            }
+
+            this.notify.info(this.l('UploadSuccessfully'));
+        };
+
+        this.uploader.uploadAll();
+        this.changeTouchState();
+    }
+
+    removeImage(type: 'LOGO' | 'BANNER' | 'IMAGE', index: number): void {
+        this.setPreview(type, index, undefined);
+
+        this.accountInfoData.entityAttachments =
+            this.accountInfoData.entityAttachments?.filter((x: any) => {
+                if (type === 'IMAGE') return x.index !== index;
+                return x.attachmentCategoryCode !== type && x.index !== index;
+            }) ?? [];
+
+        this.changeTouchState();
+    }
+
+    private getCategoryByType(type: 'LOGO' | 'BANNER' | 'IMAGE'): SycAttachmentCategoryDto {
+        if (type === 'LOGO') return this.sycAttachmentCategoryLogo;
+        if (type === 'BANNER') return this.sycAttachmentCategoryBanner;
+        return this.sycAttachmentCategoryImage;
+    }
+
+    private setPreview(type: 'LOGO' | 'BANNER' | 'IMAGE', index: number, image: string): void {
+        if (type === 'LOGO') this.companyLogo = image;
+        if (type === 'BANNER') this.coverPhoto = image;
+
+        if (type === 'IMAGE') {
+            const slot = this.otherImageSlots.find(x => x.index === index);
+            if (slot) slot.preview = image;
+
+            if (index === 1) this.OtherImages1 = image;
+            if (index === 2) this.OtherImages2 = image;
+            if (index === 3) this.OtherImages3 = image;
+            if (index === 4) this.OtherImages4 = image;
+        }
+    }
+
+    private upsertAttachment(attachment: AppEntityAttachmentDto): void {
+        const index = (attachment as any).index;
+
+        this.accountInfoData.entityAttachments =
+            this.accountInfoData.entityAttachments?.filter((x: any) => x.index !== index) ?? [];
+
+        this.accountInfoData.entityAttachments.push(attachment);
+    }
+
+
+    buildMarketplaceRolesExtraData(): AppEntityExtraDataDto[] {
+        if (!this.selectedRoles?.length) {
+            return [];
+        }
+
+        const uniqueRoles = [...new Set(this.selectedRoles)].filter(Boolean);
+        const joinedRoles = uniqueRoles.join('-');
+
+        const dto = new AppEntityExtraDataDto();
+        dto.entityId = this.accountData?.id || 0;
+        dto.entityObjectTypeId = 610;
+        dto.entityObjectTypeCode = 'MARKETPLACE-ROLE'; // keep your actual backend value
+        dto.entityObjectTypeName = 'Marketplace Role';
+        dto.attributeValueId = null;
+        dto.attributeValue = joinedRoles;
+        dto.attributeId = 610;
+        dto.attributeValueFkName = null;
+        dto.attributeValueFkCode = null;
+        dto.attributeCode = 'MARKETPLACE-ROLE';
+        dto.id = 0;
+
+        return [dto];
+    }
+
+    updateMarketplaceRolesExtraData(): void {
+        if (!this.accountData) {
+            return;
+        }
+
+        this.accountData.entityExtraData = [
+            ...(this.accountData.entityExtraData || []).filter(
+                item => item.attributeCode !== 'MARKETPLACE-ROLE'
+            ),
+            ...this.buildMarketplaceRolesExtraData()
+        ];
+    }
+
+
+    setSelectedMarketplaceRoles(): void {
+        const marketplaceRole = this.accountData?.entityExtraData?.find(
+            x => x.attributeCode === 'MARKETPLACE-ROLE'
+        );
+
+        this.selectedRoles = marketplaceRole?.attributeValue
+            ? marketplaceRole.attributeValue.split('-').filter(x => x)
+            : [];
+    }
+
+    private initCategoryAndClassificationIds(): void {
   this.ensureArrays();
 
-  const guid = this.guid();
-  const category = this.getCategoryByType(type);
+  this.categoriesIds = this.accountInfoData.entityCategories
+    ?.map(x => x.entityObjectCategoryId)
+    ?.filter(x => !!x) ?? [];
 
-  if (!category?.id) {
-    this.message.warn(this.l('AttachmentCategoryNotLoaded'));
-    return;
-  }
-
-  this.setPreview(type, index, event.image);
-
-  this.upsertAttachment({
-    attachmentCategoryId: category.id,
-    attachmentCategoryCode: type,
-    fileName: event.file.name,
-    guid,
-    index
-  } as any);
-
-  this.uploader.addToQueue([event.file]);
-
-  this.uploader.onBuildItemForm = (_fileItem: any, form: any) => {
-    form.append('guid', guid);
-  };
-
-  this.uploader.onSuccessItem = (_item, response) => {
-    const ajaxResponse = JSON.parse(response || '{}') as IAjaxResponse;
-
-    if (!ajaxResponse?.success) {
-      this.message.error(ajaxResponse?.error?.message || this.l('UploadFailed'));
-      return;
-    }
-
-    const uploaded = ajaxResponse.result;
-    const current = this.accountInfoData.entityAttachments
-      .find((x: any) => x.guid === uploaded?.guid || x.guid === guid) as any;
-
-    if (current) {
-      current.id = uploaded?.id || current.id;
-      current.url = uploaded?.url || uploaded?.fileName || current.url;
-    }
-
-    this.notify.info(this.l('UploadSuccessfully'));
-  };
-
-  this.uploader.uploadAll();
-  this.changeTouchState();
+  this.classificationsIds = this.accountInfoData.entityClassifications
+    ?.map(x => x.entityObjectClassificationId)
+    ?.filter(x => !!x) ?? [];
 }
 
-removeImage(type: 'LOGO' | 'BANNER' | 'IMAGE', index: number): void {
-  this.setPreview(type, index, undefined);
+openSelectCategoriesModal(): void {
+  this.touched = true;
 
-  this.accountInfoData.entityAttachments =
-    this.accountInfoData.entityAttachments?.filter((x: any) => {
-      if (type === 'IMAGE') return x.index !== index;
-      return x.attachmentCategoryCode !== type && x.index !== index;
-    }) ?? [];
+  const config: ModalOptions = new ModalOptions();
+  config.class = 'right-modal slide-right-in tenant-selector-modal';
 
-  this.changeTouchState();
-}
+  config.initialState = {
+    savedIds: this.categoriesIds,
+    showAddAction: false,
+    showActions: false,
+    entityObjectName: 'Product',
+    entityObjectDisplayName: 'Departments',
+    isDepartment: true,
+    entityId: this.accountInfoData.entityId || undefined
+  } as Partial<SelectCategoriesDynamicModalComponent>;
 
-private getCategoryByType(type: 'LOGO' | 'BANNER' | 'IMAGE'): SycAttachmentCategoryDto {
-  if (type === 'LOGO') return this.sycAttachmentCategoryLogo;
-  if (type === 'BANNER') return this.sycAttachmentCategoryBanner;
-  return this.sycAttachmentCategoryImage;
-}
-
-private setPreview(type: 'LOGO' | 'BANNER' | 'IMAGE', index: number, image: string): void {
-  if (type === 'LOGO') this.companyLogo = image;
-  if (type === 'BANNER') this.coverPhoto = image;
-
-  if (type === 'IMAGE') {
-    const slot = this.otherImageSlots.find(x => x.index === index);
-    if (slot) slot.preview = image;
-
-    if (index === 1) this.OtherImages1 = image;
-    if (index === 2) this.OtherImages2 = image;
-    if (index === 3) this.OtherImages3 = image;
-    if (index === 4) this.OtherImages4 = image;
-  }
-}
-
-private upsertAttachment(attachment: AppEntityAttachmentDto): void {
-  const index = (attachment as any).index;
-
-  this.accountInfoData.entityAttachments =
-    this.accountInfoData.entityAttachments?.filter((x: any) => x.index !== index) ?? [];
-
-  this.accountInfoData.entityAttachments.push(attachment);
-}
-
-
-buildMarketplaceRolesExtraData(): AppEntityExtraDataDto[] {
-  if (!this.selectedRoles?.length) {
-    return [];
-  }
-
-  const uniqueRoles = [...new Set(this.selectedRoles)].filter(Boolean);
-  const joinedRoles = uniqueRoles.join('-');
-
-  const dto = new AppEntityExtraDataDto();
-  dto.entityId = this.accountData?.id || 0;
-  dto.entityObjectTypeId = 610;
-  dto.entityObjectTypeCode = 'MARKETPLACE-ROLE'; // keep your actual backend value
-  dto.entityObjectTypeName = 'Marketplace Role';
-  dto.attributeValueId = null;
-  dto.attributeValue = joinedRoles;
-  dto.attributeId = 610;
-  dto.attributeValueFkName = null;
-  dto.attributeValueFkCode = null;
-  dto.attributeCode = 'MARKETPLACE-ROLE';
-  dto.id = 0;
-
-  return [dto];
-}
-
-updateMarketplaceRolesExtraData(): void {
-  if (!this.accountData) {
-    return;
-  }
-
-  this.accountData.entityExtraData = [
-    ...(this.accountData.entityExtraData || []).filter(
-      item => item.attributeCode !== 'MARKETPLACE-ROLE'
-    ),
-    ...this.buildMarketplaceRolesExtraData()
-  ];
-}
-
-
-setSelectedMarketplaceRoles(): void {
-  const marketplaceRole = this.accountData?.entityExtraData?.find(
-    x => x.attributeCode === 'MARKETPLACE-ROLE'
+  const modalRef: BsModalRef = this._bsModalService.show(
+    SelectCategoriesDynamicModalComponent,
+    config
   );
 
-  this.selectedRoles = marketplaceRole?.attributeValue
-    ? marketplaceRole.attributeValue.split('-').filter(x => x)
-    : [];
+  const subs: Subscription = this._bsModalService.onHidden.subscribe(() => {
+    this.selectCategoriesHandler(modalRef);
+    subs.unsubscribe();
+  });
+}
+
+private selectCategoriesHandler(modalRef: BsModalRef): void {
+  const data = modalRef.content as SelectCategoriesDynamicModalComponent;
+
+  if (
+    data?.selectionDone &&
+    Array.isArray(data.selectedRecords) &&
+    data.selectedRecords.length
+  ) {
+    this.addSelectedCategories(data.selectedRecords);
+  }
+}
+
+private addSelectedCategories(
+  selected: TreeNodeOfGetSycEntityObjectCategoryForViewDto[]
+): void {
+  this.ensureArrays();
+
+  selected.forEach(element => {
+    const category = element?.data?.sycEntityObjectCategory;
+    if (!category?.id || this.categoriesIds.includes(category.id)) return;
+
+    const newCategory = new AppEntityCategoryDto({
+      id: 0,
+      entityObjectCategoryId: category.id,
+      entityObjectCategoryCode: category.code,
+      entityObjectCategoryName: category.name
+    });
+
+    this.accountInfoData.entityCategories.push(newCategory);
+    this.categoriesIds.push(category.id);
+  });
+
+  this.refreshCategoriesTable();
+  this.changeTouchState();
+}
+
+removeCategory(index: number): void {
+  const isConfirmed: Observable<boolean> = this.askToConfirm(
+    '',
+    'AreYouSureYouWantToRemoveThisDepartment?',
+    {
+      confirmButtonText: this.l('Yes,Remove'),
+      cancelButtonText: this.l('Cancel')
+    }
+  );
+
+  isConfirmed.subscribe((res) => {
+    if (!res) return;
+
+    this.accountInfoData.entityCategories.splice(index, 1);
+    this.initCategoryAndClassificationIds();
+    this.refreshCategoriesTable();
+    this.changeTouchState();
+  });
+}
+
+refreshCategoriesTable(event?: any): void {
+  const skipCount = event?.first ?? 0;
+  const maxResultCount =
+    event?.rows ?? this.primengTableHelperCateg.defaultRecordsCountPerPage;
+
+  const records = this.accountInfoData.entityCategories ?? [];
+
+  this.primengTableHelperCateg.totalRecordsCount = records.length;
+  this.primengTableHelperCateg.records = records.slice(
+    skipCount,
+    skipCount + maxResultCount
+  );
+}
+
+openSelectClassificationsModal(): void {
+  this.touched = true;
+
+  const config: ModalOptions = new ModalOptions();
+  config.class = 'right-modal slide-right-in tenant-selector-modal';
+
+  config.initialState = {
+    savedIds: this.classificationsIds,
+    showAddAction: false,
+    showActions: false,
+    entityObjectName: 'Contact',
+    entityObjectDisplayName: 'Business Classifications',
+    entityId: this.accountInfoData.entityId || undefined
+  } as Partial<SelectClassificationDynamicModalComponent>;
+
+  const modalRef: BsModalRef = this._bsModalService.show(
+    SelectClassificationDynamicModalComponent,
+    config
+  );
+
+  const subs: Subscription = this._bsModalService.onHidden.subscribe(() => {
+    this.selectClassificationsHandler(modalRef);
+    subs.unsubscribe();
+  });
+}
+
+private selectClassificationsHandler(modalRef: BsModalRef): void {
+  const data = modalRef.content as SelectClassificationDynamicModalComponent;
+
+  if (
+    data?.selectionDone &&
+    Array.isArray(data.selectedRecords) &&
+    data.selectedRecords.length
+  ) {
+    this.addSelectedClassifications(data.selectedRecords);
+  }
+}
+
+private addSelectedClassifications(
+  selected: TreeNodeOfGetSycEntityObjectClassificationForViewDto[]
+): void {
+  this.ensureArrays();
+
+  selected.forEach(element => {
+    const classification = element?.data?.sycEntityObjectClassification;
+    if (!classification?.id || this.classificationsIds.includes(classification.id)) return;
+
+    const newClassification = new AppEntityClassificationDto();
+    newClassification.id = 0;
+    newClassification.entityObjectClassificationId = classification.id;
+    newClassification.entityObjectClassificationCode = classification.code;
+    newClassification.entityObjectClassificationName = classification.name;
+
+    this.accountInfoData.entityClassifications.push(newClassification);
+    this.classificationsIds.push(classification.id);
+  });
+
+  this.refreshClassificationsTable();
+  this.changeTouchState();
+}
+
+removeClassification(index: number): void {
+  const isConfirmed: Observable<boolean> = this.askToConfirm(
+    '',
+    'AreYouSureTouWantToRemoveThisClassification?',
+    {
+      confirmButtonText: this.l('Yes,Remove'),
+      cancelButtonText: this.l('Cancel')
+    }
+  );
+
+  isConfirmed.subscribe((res) => {
+    if (!res) return;
+
+    this.accountInfoData.entityClassifications.splice(index, 1);
+    this.initCategoryAndClassificationIds();
+    this.refreshClassificationsTable();
+    this.changeTouchState();
+  });
+}
+
+refreshClassificationsTable(event?: any): void {
+  const skipCount = event?.first ?? 0;
+  const maxResultCount =
+    event?.rows ?? this.primengTableHelperClass.defaultRecordsCountPerPage;
+
+  const records = this.accountInfoData.entityClassifications ?? [];
+
+  this.primengTableHelperClass.totalRecordsCount = records.length;
+  this.primengTableHelperClass.records = records.slice(
+    skipCount,
+    skipCount + maxResultCount
+  );
 }
 }

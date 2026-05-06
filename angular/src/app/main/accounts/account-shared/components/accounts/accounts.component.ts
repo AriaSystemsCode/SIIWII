@@ -37,6 +37,8 @@ import { ImportTypes } from "@shared/components/import-steps/models/ImportTypes"
 import { AccountsImport } from "@shared/components/import-steps/services/accountsImport.service";
 import { ImportStepInfo } from "@shared/components/import-steps/models/ImportStepInfo";
 import { MainImportService } from "@shared/components/import-steps/services/mainImport.service";
+import { TenantContactModalComponent } from "@app/main/accountInfos/components/tenant-contact/components/tenant-contact-modal/tenant-contact-modal.component";
+import { TenantContactMode, TenantContactType } from "@app/main/accountInfos/models/Account-info-page-tabs.enum";
 
 @Component({
     selector: "app-accounts",
@@ -59,9 +61,9 @@ export class AccountsComponent
     @ViewChild("sendMailModal", { static: true }) sendMailModal: SendMailModalComponent;
     @ViewChild("dataTable", { static: true }) dataTable: Table;
     @ViewChild("paginator", { static: true }) paginator: Paginator;
-    @ViewChild("ImportAccountsModal", { static: true })
+    @ViewChild("ImportAccountsModal", { static: true }) ImportAccountsModal: MainImportComponent;
+    @ViewChild('tenantContactModal', { static: true }) tenantContactModal: TenantContactModalComponent;
 
-    ImportAccountsModal: MainImportComponent;
     mailHeader: string;
     mailsubject: string;
     mailbody: string;
@@ -547,5 +549,23 @@ private applyRelation(account): void {
     })
 
     }
+
+
+     openCreateManualAccount() {
+  this.tenantContactModal.open({
+    mode: TenantContactMode.Create,
+    accountType: TenantContactType.Manual
+  });
+}
+openViewTenantContact(account: GetAccountForViewDto): void {
+  
+  this.tenantContactModal.open({
+    mode: TenantContactMode.View,
+    accountType: account?.account?.isManual
+      ? TenantContactType.Manual
+      : TenantContactType.Connected,
+    accountId: account?.account?.id
+  });
+}
 
 }

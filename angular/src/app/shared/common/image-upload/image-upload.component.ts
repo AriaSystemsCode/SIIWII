@@ -38,7 +38,7 @@ export class ImageUploadComponent extends AppComponentBase implements OnChanges 
   acceptedExtensionsArr: string[] = [];
   imgFile: File;
 
-  acceptedAspectRatio: number;
+  acceptedAspectRatio: number = 1;
 
   // PDF state
   isPdf = false;
@@ -48,6 +48,7 @@ export class ImageUploadComponent extends AppComponentBase implements OnChanges 
   sycAttachmentCategoryBanner :SycAttachmentCategoryDto
   sycAttachmentCategoryImage :SycAttachmentCategoryDto
   @Input() attachmentTypeCode: 'LOGO' | 'BANNER' | 'IMAGE' = 'IMAGE';
+  @Input() customExtentionsImgs : boolean;
 
   constructor(injector: Injector) {
     super(injector);
@@ -141,12 +142,12 @@ export class ImageUploadComponent extends AppComponentBase implements OnChanges 
       this.acceptedAspectRatio - buffer < currentAspectRatio &&
       this.acceptedAspectRatio + buffer > currentAspectRatio
     ) {
-      // ✅ Aspect ratio is within tolerance
+     
       this.image = (renderedImage as any).src;
       this.imgFile = imgFile;
       this.imageBrowseDone.emit({ file: this.imgFile, image: this.image });
     } else {
-      // ❌ Aspect ratio off → open cropper
+
       const { onCropDone, data } = this.openImageCropper(
         $event as any,
         this.acceptedAspectRatio
@@ -198,11 +199,7 @@ export class ImageUploadComponent extends AppComponentBase implements OnChanges 
     this.removeImage.emit();
   }
 
-  checkImageSize(imgSize: number) {
-    const maxFileSize =
-      this.sycAttachmentCategory.maxFileSize * this.mbToByteConversionFactor;
-    return imgSize > maxFileSize;
-  }
+
 
   async renderImageAndGetDimensions(file: File): Promise<HTMLImageElement> {
     return new Promise((resolve) => {
@@ -222,30 +219,27 @@ export class ImageUploadComponent extends AppComponentBase implements OnChanges 
     this.acceptedExtensionsArr = [];
     this.acceptedExtensions = '';
   
-    this.sycAttachmentCategory.sycAttachmentTypeDto.forEach((item, index) => {
-      const notFirst = index > 0;
-      const itemsCount = this.sycAttachmentCategory.sycAttachmentTypeDto.length;
-  
-      if (notFirst && itemsCount > 1) {
-        this.acceptedExtensions += ',';
-      }
-  
-      this.acceptedExtensions += `.${item.extension}`;
-      this.acceptedExtensionsArr.push(`.${item.extension}`);
-    });
+
+    if (this.customExtentionsImgs) {
+      this.acceptedExtensionsArr = ['.png', '.jpg', '.jpeg'];
+      this.acceptedExtensions = 'PNG, JPG, JPEG';
+      return;
+    }
   
    
-    if (!this.acceptedExtensionsArr.includes('.pdf')) {
-      this.acceptedExtensionsArr.push('.pdf');
-      this.acceptedExtensions += (this.acceptedExtensions ? ',' : '') + '.pdf';
+    if (this.sycAttachmentCategory?.sycAttachmentTypeDto?.length) {
+      this.sycAttachmentCategory.sycAttachmentTypeDto.forEach((item, index) => {
+        const ext = `.${String(item.extension).toLowerCase()}`;
+        this.acceptedExtensionsArr.push(ext);
+        this.acceptedExtensions += (index ? ',' : '') + ext;
+      });
     }
   }
   
 
   hasValidExtension(fileName: string, exts: string[]) {
-    return new RegExp('(' + exts.join('|').replace(/\./g, '\\.') + ')$').test(
-      fileName
-    );
+    const lower = fileName.toLowerCase();
+    return exts.some(ext => lower.endsWith(ext));
   }
   private applyAspectFromCategory(cat: SycAttachmentCategoryDto): void {
     if (!cat || !cat.aspectRatio) {
@@ -303,5 +297,19 @@ export class ImageUploadComponent extends AppComponentBase implements OnChanges 
         }
       });
   }
+  
+    prevetFileBrowse($event){
+        $event.stopPropagation();
+        let labelElement = $event.target.parentElement
+        labelElement.onclick = (e)=> e.preventDefault()
+        setTimeout( ()=> labelElement.onclick = ()=>{} ,0)
+    }
+  
+    checkImageSize(imgSize:number){
+        const maxFileSize = this.sycAttachmentCategory.maxFileSize * this.mbToByteConversionFactor
+        return imgSize > maxFileSize
+    }
+  
+ 
   
 }

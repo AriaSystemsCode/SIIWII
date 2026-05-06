@@ -353,47 +353,52 @@ export abstract class AppComponentBase {
         };
         this.bsModalService.show(ImageViewerComponent, config);
     }
-    openImageCropper(
-        event: any,
-        aspectRatio?: number,
-        noOptions?: boolean,
-        resizeToWidth?: number      
-    ): { onCropDone: Observable<any>; data: ImageCropperComponent } {
-    
-        if (event.target.files.length === 0) return; 
-    
-        let config: ModalOptions = new ModalOptions();
+openImageCropper(
+  event: any,
+  aspectRatio?: number,
+  noOptions?: boolean,
+  resizeToWidth?: number
+): { onCropDone: Observable<any>; data: ImageCropperComponent } {
 
-        config.initialState = {
-            title: "Edit image:",
-            originalFileChangeEvent: event,
-        };
-    
-        if (noOptions != undefined) {
-            config.initialState["noOptions"] = noOptions; 
-        }
-    
-        if (!isNaN(aspectRatio)) {
-            config.initialState["aspectRatio"] = aspectRatio;
-        }
-    
-    
-        if (resizeToWidth && resizeToWidth > 0) {
-            config.initialState["resizeToWidth"] = resizeToWidth;
-        }
-    
-           !this.isArabic ?  config.class = "right-modal slide-right-in" : config.class = "left-modal slide-left-in ngLeft"
-    
-        let mgCropperModalRef = this.bsModalService.show(
-            ImageCropperComponent,
-            config
-        );
-    
-        return {
-            onCropDone: this.bsModalService.onHide,
-            data: mgCropperModalRef.content,
-        };
-    }
+  if (event.target.files.length === 0) return;
+
+  let config: ModalOptions = new ModalOptions();
+config.class = !this.isArabic
+  ? 'right-modal slide-right-in image-cropper-modal'
+  : 'left-modal slide-left-in ngLeft image-cropper-modal';
+  config.initialState = {
+    title: "Edit image:",
+    originalFileChangeEvent: event,
+  };
+
+  if (noOptions !== undefined) {
+    config.initialState["noOptions"] = noOptions;
+  }
+
+  if (aspectRatio && aspectRatio > 0 && !isNaN(aspectRatio)) {
+    config.initialState["aspectRatio"] = aspectRatio;
+  } else {
+    config.initialState["aspectRatio"] = 1;
+  }
+
+  if (resizeToWidth && resizeToWidth > 0) {
+    config.initialState["resizeToWidth"] = resizeToWidth;
+  }
+
+  config.class = !this.isArabic
+    ? "right-modal slide-right-in image-cropper-modal"
+    : "left-modal slide-left-in ngLeft image-cropper-modal";
+
+  let mgCropperModalRef = this.bsModalService.show(
+    ImageCropperComponent,
+    config
+  );
+
+  return {
+    onCropDone: this.bsModalService.onHide,
+    data: mgCropperModalRef.content,
+  };
+}
     
     guid(): string {
         function s4() {

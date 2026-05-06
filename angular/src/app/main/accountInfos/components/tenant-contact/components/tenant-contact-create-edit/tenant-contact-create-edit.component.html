@@ -13,15 +13,15 @@
     </div>
   </div> -->
 
-  <div class="account-body">
+  <div class="account-body px-lg-4">
 
     <!-- Images -->
-    <div class="upload-section">
-      <div class="upload-top-row d-flex">
+    <div class="upload-section mt-2">
+      <div class="upload-top-row d-flex flex-lg-row flex-column">
         <div class="logo-upload mr-3">
           <label>{{ l('CompanyLogo') }}</label>
 
-          <div class="mt-5 pt-3">
+          <div class="mt-2">
             <app-image-upload [image]="companyLogo" [attachmentTypeCode]="'LOGO'" [staticWidth]="165"
               [staticHeight]="165" [showGuidelines]="true" [customExtentionsImgs]="true"
               (imageBrowseDone)="imageBrowseDone($event, 'LOGO', -1)" (removeImage)="removeImage('LOGO', -1)">
@@ -32,7 +32,7 @@
         <div class="cover-upload">
           <label>{{ l('CompanyCoverPhoto') }}</label>
 
-          <app-image-upload [image]="coverPhoto" [attachmentTypeCode]="'BANNER'" [staticWidth]="760"
+          <app-image-upload [image]="coverPhoto" [attachmentTypeCode]="'BANNER'" 
             [staticHeight]="160" [showGuidelines]="true" [customExtentionsImgs]="true"
             (imageBrowseDone)="imageBrowseDone($event, 'BANNER', -2)" (removeImage)="removeImage('BANNER', -2)">
           </app-image-upload>
@@ -54,7 +54,7 @@
 
         <label> <span>*</span> {{ l('Code') }}</label>
         <input type="text" id="accountInfoData_Code" #codeInput="ngModel"
-          class="form-control form-control-sm " maxlength="6" [disabled]="accountInfoData?.id>0"
+          class="form-control " maxlength="6" [disabled]="accountInfoData?.id>0"
           id="colFormLabelSm" [(ngModel)]="accountInfoData.code" name="code" required (input)="changeTouchState()"
           [placeholder]=" 'PleaseEnterCompanyCode...' | localize ">
       </div>
@@ -195,13 +195,69 @@
         </textarea>
       </div>
 
+
+      <div class="field full">
+  <div class="selection-section">
+    <div class="selection-header">
+      <div>
+        <h5>{{ l('Departments') }}</h5>
+        <p>{{ l('SelectYourCompanyDepartments') }}</p>
+      </div>
+
+      <button type="button" class="btn btn-add-selection" (click)="openSelectCategoriesModal()">
+        <i class="fa fa-plus"></i>
+        {{ l('Add') }}
+      </button>
+    </div>
+
+    <div class="selected-tags" *ngIf="accountInfoData?.entityCategories?.length; else noDepartments">
+      <span class="selected-tag" *ngFor="let item of accountInfoData.entityCategories; let i = index">
+        {{ item.entityObjectCategoryName }}
+        <i class="fa fa-times" (click)="removeCategory(i)"></i>
+      </span>
+    </div>
+
+    <ng-template #noDepartments>
+      <div class="empty-selection">{{ l('NoData') }}</div>
+    </ng-template>
+  </div>
+</div>
+
+<div class="field full">
+  <div class="selection-section">
+    <div class="selection-header">
+      <div>
+        <h5>{{ l('BusinessClassifications') }}</h5>
+        <p>{{ l('SelectYourBusinessClassifications') }}</p>
+      </div>
+
+      <button type="button" class="btn btn-add-selection" (click)="openSelectClassificationsModal()">
+        <i class="fa fa-plus"></i>
+        {{ l('Add') }}
+      </button>
+    </div>
+
+    <div class="selected-tags" *ngIf="accountInfoData?.entityClassifications?.length; else noClassifications">
+      <span class="selected-tag" *ngFor="let item of accountInfoData.entityClassifications; let i = index">
+        {{ item.entityObjectClassificationName }}
+        <i class="fa fa-times" (click)="removeClassification(i)"></i>
+      </span>
+    </div>
+
+    <ng-template #noClassifications>
+      <div class="empty-selection">{{ l('NoData') }}</div>
+    </ng-template>
+  </div>
+</div>
+
     </div>
   </div>
+
+  <div class="mx-lg-4 mt-3">
+      <app-tenant-contact-activity-panel></app-tenant-contact-activity-panel>
+
+</div>
 </form>
 
 
 
-<div>
-      <app-tenant-contact-activity-panel></app-tenant-contact-activity-panel>
-
-</div>

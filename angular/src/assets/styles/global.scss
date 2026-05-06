@@ -888,3 +888,29 @@ searchicon {
 }
 
   }
+
+
+
+/* PrimeNG tenant dialog */
+.p-dialog-mask.p-component-overlay {
+  z-index: 1000 !important;
+}
+.tenant-contact-dialog.p-dialog {
+  z-index: 1001 !important;
+}
+
+/* ngx-bootstrap cropper */
+.modal.image-cropper-modal {
+  z-index: 3000 !important;
+  pointer-events: auto !important;
+}
+
+.modal.image-cropper-modal .modal-dialog,
+.modal.image-cropper-modal .modal-content {
+  pointer-events: auto !important;
+}
+
+/* IMPORTANT: cropper backdrop behind cropper but above tenant dialog */
+.modal-backdrop.show {
+
+}

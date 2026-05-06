@@ -3,8 +3,11 @@
   [modal]="true"
   [appendTo]="'body'"
   [draggable]="false"
-  [style]="{ width: '90vw', maxWidth: '1350px' }"
+  [style]="dialogStyle"
+  [baseZIndex]="1000"
+  [autoZIndex]="false"
   [contentStyle]="{ padding: '0' }"
+  
   styleClass="tenant-contact-dialog">
 
   <app-tenant-contact

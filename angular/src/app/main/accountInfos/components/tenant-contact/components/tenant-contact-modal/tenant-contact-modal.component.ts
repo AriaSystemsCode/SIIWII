@@ -18,6 +18,33 @@ export class TenantContactModalComponent {
   contactType: TenantContactType;
   accountId?: number;
 
+  dialogStyle: any = {};
+
+ngOnInit(): void {
+  this.setDialogStyle();
+  window.addEventListener('resize', () => this.setDialogStyle());
+}
+
+setDialogStyle(): void {
+  const isMobile = window.innerWidth < 576;
+  const isTab = window.innerWidth < 991;
+
+  this.dialogStyle = isMobile
+    ? {
+      
+        maxWidth: '95vw'
+      }
+    : this.dialogStyle = isTab? {
+      
+        maxWidth: '670px',
+        marginLeft: '80px'
+      }   : {
+    
+        maxWidth: '1350px',
+        marginLeft: '80px'
+      };
+}
+
   open(config: {
     mode: TenantContactMode;
     accountType?: TenantContactType;
