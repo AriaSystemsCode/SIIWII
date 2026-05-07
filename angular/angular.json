@@ -74,7 +74,7 @@
             "vendorChunk": true,
             "extractLicenses": false,
             "buildOptimizer": true,
-            "sourceMap": true,
+            "sourceMap": false,
             "optimization": false,
             "namedChunks": true
           },
@@ -102,7 +102,7 @@
               ],
               "optimization": false,
               "outputHashing": "all",
-              "sourceMap": true,
+              "sourceMap": false,
               "namedChunks": false,
               "extractLicenses": true,
               "vendorChunk": false,
@@ -208,7 +208,7 @@
           "options": {
             "protractorConfig": "./protractor.conf.js",
             "devServerTarget": "abp-zero-template:serve",
-            "port": 4236
+            "port": 4233
           }
         }
       }
