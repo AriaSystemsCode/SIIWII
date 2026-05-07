@@ -32,12 +32,15 @@ setDialogStyle(): void {
   this.dialogStyle = isMobile
     ? {
       
-        maxWidth: '95vw'
+        maxWidth: '95vw',
+        marginTop : '115px'
+
       }
     : this.dialogStyle = isTab? {
       
         maxWidth: '670px',
-        marginLeft: '80px'
+        marginLeft: '80px',
+        marginTop : '120px'
       }   : {
     
         maxWidth: '1350px',

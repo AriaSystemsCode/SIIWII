@@ -440,113 +440,113 @@ this.refreshClassificationsTable();
         this.changeTouchState();
     }
 
-    removeLogo(): void {
-        this.companyLogo = undefined;
-        this.removeAttachmentByCategoryCode('LOGO');
-        this.changeTouchState();
-    }
+    // removeLogo(): void {
+    //     this.companyLogo = undefined;
+    //     this.removeAttachmentByCategoryCode('LOGO');
+    //     this.changeTouchState();
+    // }
 
-    onCoverUpload(event: any): void {
-        this.coverPhoto = this.getImageUrlFromUploadEvent(event);
-        this.upsertAttachmentFromUpload(event, 'BANNER');
-        this.changeTouchState();
-    }
+    // onCoverUpload(event: any): void {
+    //     this.coverPhoto = this.getImageUrlFromUploadEvent(event);
+    //     this.upsertAttachmentFromUpload(event, 'BANNER');
+    //     this.changeTouchState();
+    // }
 
-    removeCover(): void {
-        this.coverPhoto = undefined;
-        this.removeAttachmentByCategoryCode('BANNER');
-        this.changeTouchState();
-    }
+    // removeCover(): void {
+    //     this.coverPhoto = undefined;
+    //     this.removeAttachmentByCategoryCode('BANNER');
+    //     this.changeTouchState();
+    // }
 
-    onOtherImageUpload(event: any, index: number): void {
-        const value = this.getImageUrlFromUploadEvent(event);
+    // onOtherImageUpload(event: any, index: number): void {
+    //     const value = this.getImageUrlFromUploadEvent(event);
 
-        if (index === 1) this.OtherImages1 = value;
-        if (index === 2) this.OtherImages2 = value;
-        if (index === 3) this.OtherImages3 = value;
-        if (index === 4) this.OtherImages4 = value;
+    //     if (index === 1) this.OtherImages1 = value;
+    //     if (index === 2) this.OtherImages2 = value;
+    //     if (index === 3) this.OtherImages3 = value;
+    //     if (index === 4) this.OtherImages4 = value;
 
-        this.upsertAttachmentFromUpload(event, 'IMAGE', index);
-        this.changeTouchState();
-    }
+    //     this.upsertAttachmentFromUpload(event, 'IMAGE', index);
+    //     this.changeTouchState();
+    // }
 
-    removeOtherImage(index: number): void {
-        if (index === 1) this.OtherImages1 = undefined;
-        if (index === 2) this.OtherImages2 = undefined;
-        if (index === 3) this.OtherImages3 = undefined;
-        if (index === 4) this.OtherImages4 = undefined;
+    // removeOtherImage(index: number): void {
+    //     if (index === 1) this.OtherImages1 = undefined;
+    //     if (index === 2) this.OtherImages2 = undefined;
+    //     if (index === 3) this.OtherImages3 = undefined;
+    //     if (index === 4) this.OtherImages4 = undefined;
 
-        this.accountInfoData.entityAttachments =
-            this.accountInfoData.entityAttachments?.filter(
-                (x: any) => x.index !== index
-            ) ?? [];
+    //     this.accountInfoData.entityAttachments =
+    //         this.accountInfoData.entityAttachments?.filter(
+    //             (x: any) => x.index !== index
+    //         ) ?? [];
 
-        this.changeTouchState();
-    }
+    //     this.changeTouchState();
+    // }
 
-    private getImageUrlFromUploadEvent(event: any): string {
-        const url =
-            event?.url ||
-            event?.fileUrl ||
-            event?.result?.url ||
-            event?.result?.fileName ||
-            event?.fileName ||
-            event;
+    // private getImageUrlFromUploadEvent(event: any): string {
+    //     const url =
+    //         event?.url ||
+    //         event?.fileUrl ||
+    //         event?.result?.url ||
+    //         event?.result?.fileName ||
+    //         event?.fileName ||
+    //         event;
 
-        if (!url) return undefined;
+    //     if (!url) return undefined;
 
-        if (typeof url === 'string' && url.startsWith('http')) {
-            return url;
-        }
+    //     if (typeof url === 'string' && url.startsWith('http')) {
+    //         return url;
+    //     }
 
-        return `${this.attachmentBaseUrl}/${url}`;
-    }
+    //     return `${this.attachmentBaseUrl}/${url}`;
+    // }
 
-    private upsertAttachmentFromUpload(
-        event: any,
-        categoryCode: 'LOGO' | 'BANNER' | 'IMAGE',
-        index?: number
-    ): void {
-        this.ensureArrays();
+    // private upsertAttachmentFromUpload(
+    //     event: any,
+    //     categoryCode: 'LOGO' | 'BANNER' | 'IMAGE',
+    //     index?: number
+    // ): void {
+    //     this.ensureArrays();
 
-        const url =
-            event?.url ||
-            event?.fileName ||
-            event?.result?.url ||
-            event?.result?.fileName ||
-            event;
+    //     const url =
+    //         event?.url ||
+    //         event?.fileName ||
+    //         event?.result?.url ||
+    //         event?.result?.fileName ||
+    //         event;
 
-        if (!url) return;
+    //     if (!url) return;
 
-        const attachment: any = {
-            url,
-            fileName: event?.fileName || event?.result?.fileName || url,
-            attachmentCategoryCode: categoryCode,
-            index,
-        };
+    //     const attachment: any = {
+    //         url,
+    //         fileName: event?.fileName || event?.result?.fileName || url,
+    //         attachmentCategoryCode: categoryCode,
+    //         index,
+    //     };
 
-        if (categoryCode === 'IMAGE' && index) {
-            this.accountInfoData.entityAttachments =
-                this.accountInfoData.entityAttachments.filter(
-                    (x: any) => x.index !== index
-                );
-        } else {
-            this.removeAttachmentByCategoryCode(categoryCode);
-        }
+    //     if (categoryCode === 'IMAGE' && index) {
+    //         this.accountInfoData.entityAttachments =
+    //             this.accountInfoData.entityAttachments.filter(
+    //                 (x: any) => x.index !== index
+    //             );
+    //     } else {
+    //         this.removeAttachmentByCategoryCode(categoryCode);
+    //     }
 
-        this.accountInfoData.entityAttachments.push(attachment);
-    }
+    //     this.accountInfoData.entityAttachments.push(attachment);
+    // }
 
-    private removeAttachmentByCategoryCode(
-        categoryCode: 'LOGO' | 'BANNER' | 'IMAGE'
-    ): void {
-        this.accountInfoData.entityAttachments =
-            this.accountInfoData.entityAttachments?.filter(
-                (x: any) =>
-                    x.attachmentCategoryCode !== categoryCode &&
-                    x.categoryCode !== categoryCode
-            ) ?? [];
-    }
+    // private removeAttachmentByCategoryCode(
+    //     categoryCode: 'LOGO' | 'BANNER' | 'IMAGE'
+    // ): void {
+    //     this.accountInfoData.entityAttachments =
+    //         this.accountInfoData.entityAttachments?.filter(
+    //             (x: any) =>
+    //                 x.attachmentCategoryCode !== categoryCode &&
+    //                 x.categoryCode !== categoryCode
+    //         ) ?? [];
+    // }
 
     private setAttachmentPreviewImages(): void {
         const attachments: any[] = this.accountInfoData.entityAttachments ?? [];
@@ -731,7 +731,7 @@ this.refreshClassificationsTable();
         const dto = new AppEntityExtraDataDto();
         dto.entityId = this.accountData?.id || 0;
         dto.entityObjectTypeId = 610;
-        dto.entityObjectTypeCode = 'MARKETPLACE-ROLE'; // keep your actual backend value
+        dto.entityObjectTypeCode = 'MARKETPLACE-ROLE'; 
         dto.entityObjectTypeName = 'Marketplace Role';
         dto.attributeValueId = null;
         dto.attributeValue = joinedRoles;

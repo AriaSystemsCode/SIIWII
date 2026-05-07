@@ -1,10 +1,10 @@
-<div class="account-form view-mode ml-lg-4">
+<div class="account-form view-mode">
 
-  <div class="form-section row">
+  <div class="form-section d-flex flex-wrap gap-3">
 
-    <div class="account-body  col-lg-7 col-12">
+    <div class="account-body flex-grow-1">
 
-      <div class="profile-view-grid mt-2">
+      <div class="profile-view-grid ">
         <div class="media-strip" *ngIf="accountData?.account?.imagesUrls?.length">
          <ng-image-slider #nav [images]="imageObject" [infinite]="false" [autoSlide]="3"
                                 [imageSize]="{width: 160, height: 300}" slideImage="3"></ng-image-slider>
@@ -44,7 +44,7 @@
 
           <div class="summary-card">
             <h6>{{ 'Currency' | localize }}</h6>
-            <span>{{ accountData?.contact?.currencyName || '-' }}</span>
+            <span>{{ accountData?.account?.currencyName || '-' }}</span>
           </div>
 
         </div>
@@ -168,7 +168,7 @@
       </div>
   
     </div>
-    <div class="activity-section col-lg-5 col-12 p-0 mb-lg-0 mb-3">
+    <div class="activity-section flex-grow-1 mb-lg-0 mb-3">
       <app-tenant-contact-activity-panel></app-tenant-contact-activity-panel>
 
     </div>
