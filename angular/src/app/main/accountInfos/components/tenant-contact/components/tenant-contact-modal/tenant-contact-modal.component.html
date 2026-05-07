@@ -3,13 +3,106 @@
   [modal]="true"
   [appendTo]="'body'"
   [draggable]="false"
+  [closable]="false"
+  [showHeader]="false"
   [style]="dialogStyle"
-
+  [baseZIndex]="1000"
+  [autoZIndex]="false"
   [contentStyle]="{ padding: '0' }"
-  
   styleClass="tenant-contact-dialog">
 
+  <!-- CUSTOM HEADER -->
+  <div class="tenant-dialog-header mb-2">
+
+    <!-- LEFT -->
+    <div class="dialog-title-section">
+
+      <!-- CREATE -->
+      <h4 *ngIf="mode === TenantContactMode.Create">
+        {{ 'CreateManualAccount' | localize }}
+      </h4>
+
+      <!-- EDIT -->
+      <h4 *ngIf="mode === TenantContactMode.Edit">
+        {{ 'EditManualAccount' | localize }}
+      </h4>
+
+      <!-- VIEW -->
+      <h4 *ngIf="mode === TenantContactMode.View">
+        {{ contactType == TenantContactType.Manual ?   ('ManualAccount' | localize) : ('ConnedtedAccount' | localize) }}
+      </h4>
+
+    </div>
+
+    <!-- RIGHT ACTIONS -->
+    <div class="dialog-actions">
+
+      <!-- VIEW MODE -->
+      <ng-container *ngIf="mode === TenantContactMode.View">
+     <!-- delete -->
+        <button  *ngIf="contactType == TenantContactType.Manual"
+          type="button"
+          class="header-icon-btn danger"
+          pTooltip="{{ 'Delete' | localize }}"
+          (click)="deleteAccount()">
+          <i class="far fa-trash-alt"></i>
+        </button>
+        <!-- edit -->
+        <button 
+          type="button"
+          class="header-icon-btn"
+          pTooltip="{{ 'Edit' | localize }}"
+          (click)="openEdit()">
+          <i class="far fa-edit"></i>
+        </button>
+
+        <!-- minimize -->
+        <button
+          type="button"
+          class="header-icon-btn"
+          pTooltip="{{ 'Minimize' | localize }}">
+          <i class="fas fa-window-minimize"></i>
+        </button>
+
+   
+
+        <!-- close -->
+        <button
+          type="button"
+          class="header-icon-btn"
+          pTooltip="{{ 'Close' | localize }}"
+          (click)="close()">
+          <i class="fas fa-times"></i>
+        </button>
+
+      </ng-container>
+
+      <!-- CREATE / EDIT -->
+      <ng-container *ngIf="mode !== TenantContactMode.View">
+
+        <button
+          type="button"
+          class="btn btn-cancel-dialog"
+          (click)="close()">
+          {{ 'Cancel' | localize }}
+        </button>
+
+        <button
+          type="button"
+          class="btn btn-save-dialog"
+          (click)="triggerSave()">
+          {{ 'SaveChanges' | localize }}
+        </button>
+
+      </ng-container>
+
+    </div>
+
+  </div>
+
+  <!-- BODY -->
   <app-tenant-contact
+    #tenantContactComponent
     [mode]="mode"
     [contactType]="contactType"
     [accountId]="accountId"

@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import {
   TenantContactMode,
   TenantContactType
@@ -10,6 +10,9 @@ import {
   styleUrls: ['./tenant-contact-modal.component.scss']
 })
 export class TenantContactModalComponent {
+
+  @ViewChild('tenantContactComponent') tenantContactComponent: any;
+
   TenantContactMode = TenantContactMode;
   TenantContactType = TenantContactType;
 
@@ -72,4 +75,14 @@ setDialogStyle(): void {
     this.mode = TenantContactMode.Edit;
     this.accountId = accountId ?? this.accountId;
   }
+
+
+
+triggerSave(): void {
+  this.tenantContactComponent?.submitForm();
+}
+
+deleteAccount(): void {
+  console.log('delete account');
+}
 }

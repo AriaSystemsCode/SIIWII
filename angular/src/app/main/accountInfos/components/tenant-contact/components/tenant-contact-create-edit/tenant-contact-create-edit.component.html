@@ -1,17 +1,5 @@
 <form #tenantContactForm="ngForm" novalidate autocomplete="off" class="account-form">
 
-  <!-- <div class="account-header">
-    <div class="account-actions">
-      <button type="button" class="btn btn-cancel" (click)="cancel()">
-        {{ l('Cancel') }}
-      </button>
-
-      <button type="button" class="btn btn-save" [disabled]="!tenantContactForm.form.valid || !touched"
-        (click)="save()">
-        {{ l('Save') }}
-      </button>
-    </div>
-  </div> -->
 
   <div class="account-body px-lg-4">
 
@@ -61,7 +49,7 @@
       <div class="field">
 
         <label> <span>*</span> {{ l('Name') }}</label>
-        <input name="name" required class="form-control" [(ngModel)]="accountInfoData.name"
+        <input name="name"  type="text" required class="form-control" [(ngModel)]="accountInfoData.name"
           (input)="changeTouchState()" />
       </div>
 
@@ -107,7 +95,7 @@
 
       <div class="field">
         <label><span>*</span> {{ l('Status') }}</label>
-        <p-dropdown name="name" [options]="allStatus" optionLabel="label" optionValue="name"
+        <p-dropdown name="status" [options]="allStatus" optionLabel="label" optionValue="name"
           [(ngModel)]="accountInfoData.status" styleClass="w-100" required (onChange)="changeTouchState()">
         </p-dropdown>
 
@@ -167,7 +155,7 @@
 
       <div class="field">
         <label><span>*</span> {{ l('AccountType') }}</label>
-        <p-dropdown name="accountType" [options]="accountTypes" optionLabel="label" optionValue="value"
+        <p-dropdown name="accountType" [options]="accountTypes" optionLabel="label" optionValue="value" [disabled]="accountInfoData?.id>0"
           [(ngModel)]="accountInfoData.accountTypeId" styleClass="account-type" (onChange)="changeTouchState()">
         </p-dropdown>
 

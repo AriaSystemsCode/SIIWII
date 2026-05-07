@@ -313,7 +313,9 @@ body .p-dialog-footer{text-align: center !important;padding: 21px 0 25px 0 !impo
 body  p.content1{color: #1BC5BD;font-size: 16px;text-align: center;}
 body  p.content1-del{color: #E83E8C;}
 body  p.content2{color: #464E5F;font-size: 14px;text-align: center;}
-body .p-dialog .p-dialog-content{text-align: center;padding: 25px 0 0 0 !important;}
+body .p-dialog .p-dialog-content{text-align: center;
+    // padding: 25px 0 0 0 !important;
+}
 body .btn-buttonNo{background-color: #EBEBEB; border: none; color: #464E5F; padding: 10px 25px; border-radius: 5px;}
 body .btn-buttonYes{background-color: #2786FB; border: none; color: #FFFFFF; padding: 10px 25px; border-radius: 5px;}
 .aria-select-modal{

@@ -383,7 +383,7 @@ this.refreshClassificationsTable();
     }
 
     save(): void {
-        // if (!this.tenantContactForm?.form?.valid) return;
+  
 
         if (this.uploader?.isUploading) {
             this.notify.info(this.l('WaitUntilUploadingImagesIsCompleted'));
@@ -395,11 +395,7 @@ this.refreshClassificationsTable();
 
         this.accountInfoData.accountLevel = this.isManual
             ? AccountLevelEnum.Manual
-            : AccountLevelEnum.External;
-
-        if (this.isConnected) {
-            this.applyConnectedLimitedEdit();
-        }
+            : AccountLevelEnum.Connected;
 
         this._accountsServiceProxy
             .createOrEditAccount(this.accountInfoData)
@@ -413,26 +409,7 @@ this.refreshClassificationsTable();
             });
     }
 
-    private applyConnectedLimitedEdit(): void {
-        // Keep this method if connected edit uses same component.
-        // For manual account it does nothing.
-        if (!this.isConnected) return;
 
-        const current = this.accountInfoData as any;
-
-        this.accountInfoData = CreateOrEditAccountInfoDto.fromJS({
-            id: current.id,
-            code: current.code,
-            website: current.website,
-            phone1TypeId: current.phone1TypeId,
-            phone1Number: current.phone1Number,
-            languageId: current.languageId,
-            entityAttachments: current.entityAttachments,
-            contactAddresses: current.contactAddresses,
-            branches: current.branches,
-            accountLevel: AccountLevelEnum.External,
-        });
-    }
 
     onLogoUpload(event: ImageUploadComponentOutput): void {
         this.companyLogo = event.image;
