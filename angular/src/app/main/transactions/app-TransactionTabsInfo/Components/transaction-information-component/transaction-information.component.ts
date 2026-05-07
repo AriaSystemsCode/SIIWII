@@ -1451,7 +1451,7 @@ export class TransactionInformationComponent
         this.appTransactionsForViewDto?.sellerCompanySSIN,
         this.appTransactionsForViewDto?.priceLevel,
         this.appTransactionsForViewDto?.id,
-        id,
+        undefined,
         undefined,
         undefined,
         undefined,
