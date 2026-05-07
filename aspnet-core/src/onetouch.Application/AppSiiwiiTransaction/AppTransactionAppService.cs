@@ -658,6 +658,29 @@ namespace onetouch.AppSiiwiiTransaction
                 var accountDefaults = await _accountAppService.GetContactDefaults();
                 //I46[End]
                 //Iteration#37 -MMT [Start]
+                #region read defaults for shipvia and payment terms from contact and account default
+                if(input.SellerRelationId != null)
+                {
+                    var relationInfo = await _appContactRelationshipInfoRepository.GetAll().Include(e=> e.EntityExtraData).Where(z => z.Id == input.SellerRelationId).FirstOrDefaultAsync();
+                    if (relationInfo != null)
+                    {
+                        if (relationInfo.EntityExtraData != null)
+                        {    
+                            var exrtaShipVia = relationInfo.EntityExtraData.Where(e=> e.AttributeId == 909).FirstOrDefault();
+                            appTrans.ShipViaId = exrtaShipVia != null ? exrtaShipVia.AttributeValueId: appTrans.ShipViaId;
+
+                            var exrtaPayment = relationInfo.EntityExtraData.Where(e => e.AttributeId == 910).FirstOrDefault();
+                            appTrans.PaymentTermsId = exrtaPayment !=null ? exrtaPayment.AttributeValueId : appTrans.PaymentTermsId;
+
+                            var exrtaPrice = relationInfo.EntityExtraData.Where(e => e.AttributeId == 908).FirstOrDefault();
+                            appTrans.PriceLevel = exrtaPayment != null ? exrtaPrice.AttributeValue.ToString() : appTrans.PriceLevel;
+
+
+                        }
+                    }
+                }   
+                #endregion
+
                 if (appTrans.ShipViaId != null)
                 {
                     var ent = await _appEntity.GetAll().Where(z => z.Id == appTrans.ShipViaId).FirstOrDefaultAsync();
@@ -871,7 +894,9 @@ namespace onetouch.AppSiiwiiTransaction
                     CompanySSIN = input.SellerCompanySSIN,
                     CompanyName = input.SellerCompanyName,
                     BranchName = input.SellerBranchName,
-                    BranchSSIN = input.SellerBranchSSIN
+                    BranchSSIN = input.SellerBranchSSIN,
+                    RelationId = input.SellerRelationId
+
                 });
 
 
@@ -889,7 +914,8 @@ namespace onetouch.AppSiiwiiTransaction
                     CompanySSIN = input.BuyerCompanySSIN,
                     CompanyName = input.BuyerCompanyName,
                     BranchName = input.BuyerBranchName,
-                    BranchSSIN = input.BuyerBranchSSIN
+                    BranchSSIN = input.BuyerBranchSSIN,
+                    RelationId = input.BuyerRelationId
                 });
                 //
                 var accountSSINBranchBuyer = await _appContactRepository.GetAll().Include(z => z.AppContactAddresses)
@@ -2390,13 +2416,13 @@ namespace onetouch.AppSiiwiiTransaction
                 (
                 (r.RequesterContactSSIN == ssin
                 &&
-                (r.RecipientMarketplaceRole == transactionType || string.IsNullOrEmpty(r.RecipientMarketplaceRole)
+                (r.RecipientMarketplaceRole == transactionType  
                 )
                 )
                   ||
                  (r.RecipientContactSSIN == ssin 
                  && 
-                 (r.RequesterMarketplaceRole == transactionType || string.IsNullOrEmpty(r.RequesterMarketplaceRole)
+                 (r.RequesterMarketplaceRole == transactionType  
                  )
                  ))
                   );
@@ -8042,7 +8068,7 @@ namespace onetouch.AppSiiwiiTransaction
             return taxes;
         }
 
-        private async Task<decimal> CalculateShipping(long pTransactionID, long entityObjectChargesId, AppContactRelationshipInfo relation)
+        private async Task<decimal> CalculateShippingFromRelation(long pTransactionID, long entityObjectChargesId, AppContactRelationshipInfo relation)
         {
             decimal shipping = 0M;
             try
@@ -8095,6 +8121,53 @@ namespace onetouch.AppSiiwiiTransaction
             }
             return shipping;
         }
+        private async Task<decimal> CalculateShipping(long pTransactionID, long entityObjectChargesId, AppContactRelationshipInfo relation)
+        {
+            decimal shipping = 0M;
+            try
+            {
+
+                var trans = await _appTransactionsHeaderRepository.GetAll().Where(e => e.Id == pTransactionID).FirstOrDefaultAsync();
+                if(trans!=null && trans.ShipViaId!=null  && trans.ShipViaId > 0)
+                { 
+
+                            var entity = await _appEntity.GetAll().Include(e => e.EntityExtraData).Where(e => e.Id == trans.ShipViaId).FirstOrDefaultAsync();
+                            if (entity != null)
+                            {
+                                decimal chargeAmount = 0M;
+                                decimal minAmount = 0M;
+
+                                var apiExtraData = entity.EntityExtraData.FirstOrDefault(e => e.AttributeId == 905); // Assuming 905 is the AttributeId for minAmount
+                                if (apiExtraData != null && !string.IsNullOrEmpty(apiExtraData.AttributeValue))
+                                {
+                                    decimal.TryParse(apiExtraData.AttributeValue, out minAmount);
+                                }
+                                var apiExtraDataAmount = entity.EntityExtraData.FirstOrDefault(e => e.AttributeId == 904); // Assuming 904 is the AttributeId for chargeAmount
+                                if (apiExtraDataAmount != null && !string.IsNullOrEmpty(apiExtraDataAmount.AttributeValue))
+                                {
+                                    decimal.TryParse(apiExtraDataAmount.AttributeValue, out chargeAmount);
+                                }
+
+                                if (chargeAmount > 0)
+                                {
+                                    decimal orderAmount = await _appTransactionDetails.GetAll().Where(e => e.TransactionId == pTransactionID && e.EntityObjectTypeId != entityObjectChargesId && (e.ParentId == null || e.ParentId == 0))
+                                        .SumAsync(e => e.Amount);
+
+                                    shipping = orderAmount < minAmount ? chargeAmount : 0M;
+                                }
+
+                            }
+                      
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Error("Error calculating shipping for transaction " + pTransactionID, ex);
+            }
+            return shipping;
+        }
+
+
 
         public async Task<decimal> UpdateCharges(List<ChargesDto> charges, long transactionId)
         {
