@@ -170,7 +170,7 @@ namespace onetouch.AppMarketplaceItems
                     if (accountContact != null)
                     {
                         var userObj = accountContact.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 715);
-                        if (userObj!=null)
+                        if (userObj!=null && !string.IsNullOrEmpty(userObj.AttributeValue))
                         userId = long.Parse(userObj.AttributeValue.ToString());
                            
                     }
