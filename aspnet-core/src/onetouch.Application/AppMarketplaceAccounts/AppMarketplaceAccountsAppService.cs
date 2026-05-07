@@ -403,8 +403,8 @@ namespace onetouch.AppMarketplaceAccounts
                                 || (z.RecipientContactSSIN == account.Account.SSIN && z.RequesterContactSSIN == currentTenantAccountObject.SSIN))
                                ).OrderByDescending(z => z.CreationTime).FirstOrDefaultAsync();*/
                             var relationshipsList = await _appContactRelationshipInfoRepository.GetAll()
-                                .Where(z => currentTenantAccountObject != null && ((z.RecipientContactSSIN == currentTenantAccountObject.SSIN && z.RequesterContactSSIN == account.Account.SSIN)
-                                || (z.RecipientContactSSIN == account.Account.SSIN && z.RequesterContactSSIN == currentTenantAccountObject.SSIN))
+                                .Where(z => currentTenantAccountObject != null && (((z.RecipientContactSSIN == currentTenantAccountObject.SSIN && z.RequesterContactSSIN == account.Account.SSIN)
+                                || (z.RecipientContactSSIN == account.Account.SSIN && z.RequesterContactSSIN == currentTenantAccountObject.SSIN)) && z.EntityObjectStatusId != inActiveRelationshipStatusId)
                                ).OrderByDescending(z => z.CreationTime).ToListAsync();
                             account.ConnectionsInfo = new List<ConnectionInfo>();
                             if (relationshipsList!=null && relationshipsList.Count>0)

@@ -121,8 +121,8 @@ namespace onetouch.Message
 
         public async Task<MessagePagedResultDto> GetAll(GetAllMessagesInput input)
         {
-
-           
+            if (string.IsNullOrEmpty(input.MessageCategoryFilter))
+                input.MessageCategoryFilter = "MESSAGE";
 
             if (input.messageTypeIndex == 0)
                 return null;
@@ -379,9 +379,9 @@ namespace onetouch.Message
                 //MMT
                 if (input.MainComponentEntitlyId != null && input.MainComponentEntitlyId != 0)
                 {
-                    var entity = await _appEntityRepository.GetAll().Where(z => z.Id == input.MainComponentEntitlyId).FirstOrDefaultAsync();
+                    var entity = await _appEntityRepository.GetAll().FirstOrDefaultAsync(z => z.Id == input.MainComponentEntitlyId);//.FirstOrDefaultAsync();
                     if (entity != null && (entity.EntityObjectTypeCode == "SALESORDER" || entity.EntityObjectTypeCode == "PURCHASEORDER"))
-                    {
+                                         {
                         var transactionSSIN = entity.SSIN;
                         if (!string.IsNullOrEmpty(transactionSSIN))
                         {
@@ -444,15 +444,15 @@ namespace onetouch.Message
                                           Id = o.Id,
                                           SenderName = UserManager.Users.Where(x => x.Id == (long)o.SenderId).Select(x => x.Name).FirstOrDefault().ToString()
                                        + "." + UserManager.Users.Where(x => x.Id == (long)o.SenderId).Select(x => x.Surname).FirstOrDefault().ToString()
-                                        + " @ " + TenantManager.Tenants.Where(x => x.Id == (UserManager.Users.Where(x => x.Id == (long)o.SenderId).Select(x => x.TenantId).FirstOrDefault())).Select(x => x.TenancyName).FirstOrDefault().ToString(),
+                                       + " @ " + TenantManager.Tenants.Where(x => x.Id == (UserManager.Users.Where(x => x.Id == (long)o.SenderId).Select(x => x.TenantId).FirstOrDefault())).Select(x => x.TenancyName).FirstOrDefault().ToString(),
                                           ThreadId = o.ThreadId,
                                           ParentId = o.ParentId,
                                           EntityId = (int)o.EntityId,
                                           ParentFKList = o.ParentFKList == null || o.ParentFKList.Count == 0 ? new List<MessagesDto>() : ObjectMapper.Map<List<MessagesDto>>(o.ParentFKList.ToList()),
                                           HasChildren = o.ParentFKList == null || o.ParentFKList.Count == 0 ? false : true,
                                           EntityObjectTypeCode = o.EntityFk.EntityObjectTypeCode,
-                                          RelatedEntityId = (o.EntityFk.EntitiesRelationships!=null && o.EntityFk.EntitiesRelationships.Count> 0) ? o.EntityFk.EntitiesRelationships.FirstOrDefault().RelatedEntityId :
-                                          ((o.EntityFk.RelatedEntitiesRelationships != null && o.EntityFk.RelatedEntitiesRelationships.Count > 0) ? o.EntityFk.RelatedEntitiesRelationships.FirstOrDefault().EntityId : 0)
+                                          //RelatedEntityId = (o.EntityFk.EntitiesRelationships!=null && o.EntityFk.EntitiesRelationships.Count> 0) ? o.EntityFk.EntitiesRelationships.FirstOrDefault().RelatedEntityId :
+                                         // ((o.EntityFk.RelatedEntitiesRelationships != null && o.EntityFk.RelatedEntitiesRelationships.Count > 0) ? o.EntityFk.RelatedEntitiesRelationships.FirstOrDefault().EntityId : 0)
                                         },
                                   }
                                 ;
@@ -517,8 +517,8 @@ namespace onetouch.Message
                                               ParentFKList = o.ParentFKList == null || o.ParentFKList.Count == 0 ? new List<MessagesDto>() : ObjectMapper.Map<List<MessagesDto>>(o.ParentFKList.ToList()),
                                               HasChildren = o.ParentFKList == null || o.ParentFKList.Count == 0 ? false : true,
                                               EntityObjectTypeCode = o.EntityFk.EntityObjectTypeCode,
-                                              RelatedEntityId = (o.EntityFk.EntitiesRelationships != null && o.EntityFk.EntitiesRelationships.Count > 0) ? o.EntityFk.EntitiesRelationships.FirstOrDefault().RelatedEntityId :
-                                              ((o.EntityFk.RelatedEntitiesRelationships != null && o.EntityFk.RelatedEntitiesRelationships.Count > 0) ? o.EntityFk.RelatedEntitiesRelationships.FirstOrDefault().EntityId : 0)
+                                              //RelatedEntityId = (o.EntityFk.EntitiesRelationships != null && o.EntityFk.EntitiesRelationships.Count > 0) ? o.EntityFk.EntitiesRelationships.FirstOrDefault().RelatedEntityId :
+                                              //`((o.EntityFk.RelatedEntitiesRelationships != null && o.EntityFk.RelatedEntitiesRelationships.Count > 0) ? o.EntityFk.RelatedEntitiesRelationships.FirstOrDefault().EntityId : 0)
                                           },
                                       }
                                     ;
@@ -1703,6 +1703,7 @@ namespace onetouch.Message
         [AbpAllowAnonymous]
         public async Task<MessagePagedResultDto> GetAllReviews(GetAllMessagesInput input)
         {
+           // return new MessagePagedResultDto(0, 0, new List<GetMessagesForViewDto>());
             var entityObjectTypeComment = await _helper.SystemTables.GetEntityObjectTypeReview();
             var entityObjectTypeMessage = await _helper.SystemTables.GetEntityObjectTypeMessageID();
             var orgComponentId = input.MainComponentEntitlyId;
@@ -1786,8 +1787,8 @@ namespace onetouch.Message
                                           ParentFKList = o.ParentFKList == null || o.ParentFKList.Count == 0 ? new List<MessagesDto>() : ObjectMapper.Map<List<MessagesDto>>(o.ParentFKList.ToList()),
                                           HasChildren = o.ParentFKList == null || o.ParentFKList.Count == 0 ? false : true,
                                           EntityObjectTypeCode = o.EntityFk.EntityObjectTypeCode,
-                                          RelatedEntityId = (o.EntityFk.EntitiesRelationships != null && o.EntityFk.EntitiesRelationships.Count > 0) ? o.EntityFk.EntitiesRelationships.FirstOrDefault().RelatedEntityId :
-                                          ((o.EntityFk.RelatedEntitiesRelationships != null && o.EntityFk.RelatedEntitiesRelationships.Count > 0) ? o.EntityFk.RelatedEntitiesRelationships.FirstOrDefault().EntityId : 0)
+                                          //RelatedEntityId = (o.EntityFk.EntitiesRelationships != null && o.EntityFk.EntitiesRelationships.Count > 0) ? o.EntityFk.EntitiesRelationships.FirstOrDefault().RelatedEntityId :
+                                          //((o.EntityFk.RelatedEntitiesRelationships != null && o.EntityFk.RelatedEntitiesRelationships.Count > 0) ? o.EntityFk.RelatedEntitiesRelationships.FirstOrDefault().EntityId : 0)
                                       },
                                   }
                                 ;
@@ -2184,6 +2185,7 @@ namespace onetouch.Message
         [AbpAllowAnonymous]
         public async Task<MessagePagedResultDto> GetAllQuestions(GetAllMessagesInput input)
         {
+           // return new MessagePagedResultDto(0, 0, new List<GetMessagesForViewDto>());
             var entityObjectTypeComment = await _helper.SystemTables.GetEntityObjectTypeQuestion();
             var entityObjectTypeMessage = await _helper.SystemTables.GetEntityObjectTypeMessageID();
             var orgComponentId = input.MainComponentEntitlyId;
@@ -2238,8 +2240,8 @@ namespace onetouch.Message
                                           ParentFKList = o.ParentFKList == null || o.ParentFKList.Count == 0 ? new List<MessagesDto>() : ObjectMapper.Map<List<MessagesDto>>(o.ParentFKList.ToList()),
                                           HasChildren = o.ParentFKList == null || o.ParentFKList.Count == 0 ? false : true,
                                           EntityObjectTypeCode = o.EntityFk.EntityObjectTypeCode,
-                                          RelatedEntityId = (o.EntityFk.EntitiesRelationships != null && o.EntityFk.EntitiesRelationships.Count > 0) ? o.EntityFk.EntitiesRelationships.FirstOrDefault().RelatedEntityId :
-                                          ((o.EntityFk.RelatedEntitiesRelationships != null && o.EntityFk.RelatedEntitiesRelationships.Count > 0) ? o.EntityFk.RelatedEntitiesRelationships.FirstOrDefault().EntityId : 0)
+                                          //RelatedEntityId = (o.EntityFk.EntitiesRelationships != null && o.EntityFk.EntitiesRelationships.Count > 0) ? o.EntityFk.EntitiesRelationships.FirstOrDefault().RelatedEntityId :
+                                          //((o.EntityFk.RelatedEntitiesRelationships != null && o.EntityFk.RelatedEntitiesRelationships.Count > 0) ? o.EntityFk.RelatedEntitiesRelationships.FirstOrDefault().EntityId : 0)
                                       },
                                   }
                                 ;

@@ -16,6 +16,7 @@ import {
     TreeNodeOfGetSycEntityObjectClassificationForViewDto,
     EmailingTemplateServiceProxy,
     AppTransactionServiceProxy,
+    CreateMarketplaceAccountServiceProxy,
 
 } from "@shared/service-proxies/service-proxies";
 import { AbpSessionService } from "abp-ng2-module";
@@ -93,7 +94,8 @@ export class AccountsComponent
         private _abpSessionService: AbpSessionService,
         private _formBuilder: FormBuilder,
         private _emailingTemplateAppService: EmailingTemplateServiceProxy,
-        private AppTransactionServiceProxy:AppTransactionServiceProxy
+        private AppTransactionServiceProxy:AppTransactionServiceProxy,
+         private CreateMarketplaceAccountServiceProxy: CreateMarketplaceAccountServiceProxy,
         // MarketplaceAccountsModule  
     ) {
         super(injector);
@@ -372,6 +374,27 @@ export class AccountsComponent
                 // event.account.connectionName = '';
                 // event.account.avaliableConnectionName = res?.length ? res[0].connectLabel : '';
             });
+
+        
+    // this.CreateMarketplaceAccountServiceProxy
+    //   .createOrEditMarketplaceContactRelationship(this.loginTenaneSsin, event.account.account.ssin, true, event.relation.visibility == 'Public' ?true:false , null, event.relation.relationEntityId)
+    //   .pipe(
+    //     finalize(() => {
+    //       this.hideMainSpinner();
+    //     })
+    //   )
+    //   .subscribe(() => {
+    //         this.notify.success(this.l("SuccessfullyDisconnected"));
+
+    //             event.account.connectionsInfo = (event.account.connectionsInfo || []).filter(
+    //                 x => x.relationEntityId !== event.relation.relationEntityId
+    //             );
+    //             // event.account.availableConnections.push(res[0])
+    //             // event.account.availableConnections = res || [];
+    //             // event.account.status = event.account.connectionsInfo.length > 0;
+    //             // event.account.connectionName = '';
+    //             // event.account.avaliableConnectionName = res?.length ? res[0].connectLabel : '';
+    //   });
     }
 
     initFilterForm() {

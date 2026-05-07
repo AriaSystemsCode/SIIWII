@@ -21,7 +21,9 @@ CARDS VIEW MODE
 
   <div class="market-card__body">
     <h3 class="market-card__title" (click)="clickCardHandler()">
-      {{ account?.account?.name | textSubstring : 16 }}
+      {{ account?.account?.name | textSubstring : 16 }}  <i *ngIf="account?.account?.isManual" class="pi pi-user-edit ml-2"  [pTooltip]="'ManualAccount' | localize" tooltipPosition="bottom"
+            [tooltipEvent]="isSmallScreen ? 'focus' : 'hover'" [autoHide]="true" [showDelay]="100" [hideDelay]="100"
+            [tabindex]="isSmallScreen ? 0 : null"></i>
     </h3>
 
     <div class="d-flex jw-100">
@@ -41,7 +43,9 @@ CARDS VIEW MODE
           [tooltipEvent]="isSmallScreen ? 'focus' : 'hover'" [autoHide]="true" [showDelay]="100" [hideDelay]="100"
           [tabindex]="isSmallScreen ? 0 : null"></i>
 
-        <span class=" " style="white-space: nowrap;color: #1b101b;">
+        <span class=" " style="white-space: nowrap;color: #1b101b;" [pTooltip]="account?.account?.countryName" tooltipPosition="bottom"
+          [tooltipEvent]="isSmallScreen ? 'focus' : 'hover'" [autoHide]="true" [showDelay]="100" [hideDelay]="100"
+          [tabindex]="isSmallScreen ? 0 : null">
           {{ account?.account?.countryName | textSubstring : 10 }}
         </span>
       </div>
@@ -54,7 +58,9 @@ CARDS VIEW MODE
         <ng-container *ngIf="account?.connectionsInfo?.length > 0">
           <div class="d-flex align-items-center">
             <!-- first relation chip -->
-            <button type="button" class="relation-chip mr-1" style="white-space: nowrap;">
+            <button type="button" class="relation-chip mr-1" style="white-space: nowrap;" [pTooltip]="getFormattedConnectionName(account.connectionsInfo[0]?.connectedLabel)" tooltipPosition="bottom"
+          [tooltipEvent]="isSmallScreen ? 'focus' : 'hover'" [autoHide]="true" [showDelay]="100" [hideDelay]="100"
+          [tabindex]="isSmallScreen ? 0 : null">
               <span>{{ getFormattedConnectionName(account.connectionsInfo[0]?.connectedLabel) | textSubstring : 20 }}</span>
               <i class="pi pi-times ml-1 removI"
                 (click)="removeRelation(account, account.connectionsInfo[0]); $event.stopPropagation()">
@@ -113,7 +119,7 @@ CARDS VIEW MODE
         <div *ngIf="(!account?.connectionsInfo?.length) && account?.availableConnections?.length > 0" class="w-100">
           <ng-container *ngIf="account?.availableConnections as options">
             <div class="relationWrap w-100 text-center position-relative" dropdown container="body">
-              <button type="button" class="relation_button market-follow-btn" dropdownToggle style="font-size: 12px;">
+              <button type="button" class="relation_button market-follow-btn w-100" dropdownToggle style="font-size: 12px;">
                 <img class="pb-1" style="width: 13px;" [src]="getConnectionIcon(options[0]?.connectionName)" alt="" />
                 <span class="ml-1" [title]="options[0]?.connectionName" (click)="createRelation(options[0])">
                   {{ options[0]?.connectionName | textSubstring : 22 }}
@@ -170,8 +176,10 @@ NOT CARDS VIEW MODE
             [pTooltip]="account?.account?.name?.length > 25 ? account?.account?.name : null" tooltipPosition="bottom"
             [tooltipEvent]="isSmallScreen ? 'focus' : 'hover'" [autoHide]="true" [showDelay]="100" [hideDelay]="100"
             [tabindex]="isSmallScreen ? 0 : null">
-            {{account?.account?.name | textSubstring : 25 }}
-          </h3>
+            {{account?.account?.name | textSubstring : 25 }}  <i *ngIf="account?.account?.isManual" class="pi pi-user-edit ml-2"  [pTooltip]="'ManualAccount' | localize" tooltipPosition="bottom"
+            [tooltipEvent]="isSmallScreen ? 'focus' : 'hover'" [autoHide]="true" [showDelay]="100" [hideDelay]="100"
+            [tabindex]="isSmallScreen ? 0 : null"></i>
+          </h3> 
         </div>
 
         <div class="info-container d-flex flex-column">
@@ -287,7 +295,9 @@ NOT CARDS VIEW MODE
 
               <div style="width: 100%;" class="d-lg-flex d-none justify-content-between" *ngIf="isAuthenticated">
                 <div *ngIf="account?.connectionsInfo?.length > 0" class="d-flex align-items-center flex-wrap">
-                  <button type="button" class="relation-chip mr-1" style="white-space: nowrap;">
+                  <button type="button" class="relation-chip mr-1" style="white-space: nowrap;" [pTooltip]="getFormattedConnectionName(account.connectionsInfo[0]?.connectedLabel)" tooltipPosition="bottom"
+          [tooltipEvent]="isSmallScreen ? 'focus' : 'hover'" [autoHide]="true" [showDelay]="100" [hideDelay]="100"
+          [tabindex]="isSmallScreen ? 0 : null">
                      <img
                     *ngIf="account?.connectionsInfo?.length === 1 && !fromMarketplace"
                     style="width: 15px; cursor: pointer;"
@@ -346,7 +356,9 @@ NOT CARDS VIEW MODE
                 <!-- Existing relations -->
                 <ng-container *ngIf="account?.connectionsInfo?.length > 0">
                   <div class="d-flex align-items-center flex-wrap">
-                    <button type="button" class="relation-chip mr-1" style="white-space: nowrap;">
+                    <button type="button" class="relation-chip mr-1" style="white-space: nowrap;" [pTooltip]="getFormattedConnectionName(account.connectionsInfo[0]?.connectedLabel)" tooltipPosition="bottom"
+          [tooltipEvent]="isSmallScreen ? 'focus' : 'hover'" [autoHide]="true" [showDelay]="100" [hideDelay]="100"
+          [tabindex]="isSmallScreen ? 0 : null"> 
                       <span>{{ getFormattedConnectionName(account.connectionsInfo[0]?.connectedLabel) | textSubstring : 20 }}</span>
                       <i class="pi pi-times ml-1 removI"
                         (click)="removeRelation(account, account.connectionsInfo[0]); $event.stopPropagation()">
@@ -401,7 +413,7 @@ NOT CARDS VIEW MODE
                 <div *ngIf="(!account?.connectionsInfo?.length) && account?.availableConnections?.length > 0" class="w-100">
                   <ng-container *ngIf="account?.availableConnections as options">
                     <div class="relationWrap w-100 text-center" dropdown container="body">
-                      <button type="button" class="relation_button market-follow-btn" dropdownToggle style="font-size: 12px;">
+                      <button type="button" class="relation_button market-follow-btn " dropdownToggle style="font-size: 12px;">
                         <img class="pb-1" style="width: 13px;" [src]="getConnectionIcon(options[0]?.connectionName)" alt="" />
                         <span class="ml-1" [title]="options[0]?.connectionName">
                           {{ options[0]?.connectionName | textSubstring : 18 }}

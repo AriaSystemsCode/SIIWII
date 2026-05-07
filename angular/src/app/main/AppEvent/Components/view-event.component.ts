@@ -51,7 +51,7 @@ export class ViewEventComponent extends AppComponentBase implements OnInit {
     currentLang: string
     isArabic: boolean
     isAuthenticated: boolean = false;
-
+visible = false;
     public constructor(
         private _appEventsServiceProxy: AppEventsServiceProxy,
         private _appEventGuestsAppService: AppEventGuestsServiceProxy,
@@ -73,7 +73,8 @@ export class ViewEventComponent extends AppComponentBase implements OnInit {
     }
 
     showModal() {
-        this.modal.show();
+          this.visible = true;
+        // this.modal.show();
     }
     show(idFilter: number, entityIdFilter: number ) {
         this.eventId = idFilter;
@@ -111,8 +112,10 @@ export class ViewEventComponent extends AppComponentBase implements OnInit {
         this.subscriptions.push(subs);
     }
     hide() {
-        this.showResponse=false;
-        this.modal.hide();
+        // this.showResponse=false;
+        // this.modal.hide();
+          this.showResponse = false;
+  this.visible = false;
     }
 
     getAddressDetails() {

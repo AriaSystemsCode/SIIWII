@@ -783,6 +783,7 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit {
         this.ensureAttribute(709); // emailAddressIsPublic
         this.ensureAttribute(703); // username
         this.ensureAttribute(714); // username is public > public
+        this.ensureAttribute(610); // username is public > public
 
 
 
@@ -838,6 +839,14 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit {
         if (this.editedContactPerData?.userNameIsPublic != null) {
             this.setBooleanValue(714, this.editedContactPerData.userNameIsPublic); // boolean
         }
+
+        if (event?.entityExtraData?.length) {
+    const marketplaceRole = event.entityExtraData.find(x => x.attributeId === 610);
+
+    if (marketplaceRole) {
+        this.setStringValue(610, marketplaceRole.attributeValue);
+    }
+}
 
         this.saveMyAccount();
 

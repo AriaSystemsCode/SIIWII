@@ -299,7 +299,7 @@ export class MarketplaceProductsComponent
             minimumPrice: this.minimumPrice || null,
             maximumPrice: this.maximumPrice || null,
             selectedOption: this.seletedOption?.value ?? 2,
-            onlyAvailableStock: this.onlyAvialbleStock ?? false,
+            onlyAvailableStock: this.onlyAvialbleStock ?? null,
             startSoldOutData: this.startSoldOutData || null,
             endSoldOutData: this.endSoldOutData || null,
             startShipData: this.startShipData || null,
@@ -636,30 +636,37 @@ export class MarketplaceProductsComponent
     //     return 'USD';
     //   }
 
-      private getCurrencyCodeForRequest(): string {
-
+     private getCurrencyCodeForRequest(): string {
   const clean = (val: any): string | null => {
     if (!val) return null;
 
     if (typeof val === 'string') {
       const v = val.trim();
-      if (!v || v === 'undefined' || v === 'null') return null;
+
+      if (
+        !v ||
+        v === 'undefined' ||
+        v === 'null' ||
+        v === 'XUA'
+      ) {
+        return null;
+      }
+
       return v;
     }
 
     if (typeof val === 'object' && val.code) {
-      return val.code;
+      return clean(val.code);
     }
 
     return null;
   };
 
-  // 1. selected currency
   let code = clean(this.selectedCurrrency);
 
-  // 2. localStorage
   if (!code) {
     const stored = localStorage.getItem('currencyCode');
+
     if (stored) {
       try {
         code = clean(JSON.parse(stored)) || clean(stored);
@@ -669,11 +676,7 @@ export class MarketplaceProductsComponent
     }
   }
 
-  // 3. tenant default
-  if (!code && (this as any).tenantDefaultCurrency?.code) {
-    code = clean((this as any).tenantDefaultCurrency.code);
-  }
-
+  // ✅ Do NOT fallback to tenantDefaultCurrency if it is XUA
   return code || 'USD';
 }
 

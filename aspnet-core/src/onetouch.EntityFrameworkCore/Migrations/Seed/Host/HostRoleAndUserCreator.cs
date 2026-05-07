@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Linq;
 using Abp;
 using Abp.Authorization;
@@ -21,6 +21,10 @@ using static System.Runtime.InteropServices.JavaScript.JSType;
 using Abp.Runtime.Session;
 using onetouch.Configuration;
 using System.IO;
+using System.Threading.Tasks;
+using Abp.Domain.Entities;
+using System.Collections.Generic;
+using Abp.Threading;
 
 
 namespace onetouch.Migrations.Seed.Host
@@ -28,11 +32,11 @@ namespace onetouch.Migrations.Seed.Host
     public class HostRoleAndUserCreator
     {
         private readonly onetouchDbContext _context;
-         
-        public HostRoleAndUserCreator(onetouchDbContext context )
+
+        public HostRoleAndUserCreator(onetouchDbContext context)
         {
             _context = context;
-           
+
         }
 
         public void Create()
@@ -41,15 +45,100 @@ namespace onetouch.Migrations.Seed.Host
             CreateHostObjectEntityTypes();
             CreateHostCodeStructures();
             CreateHostFileExt();
-            CreateHostSystemData();
+            //CreateHostSystemData();
+            
             CreateHostObjectEntityStatus();
             CreateHostReportSystemData();
             //MMT-Iteration37[Start]
             //CreateMessagesCategories();
             //MMT-Iteration37[End]
             SeedExtraAttributes();
+            AsyncHelper.RunSync(() => CreateHostSystemData());
+
         }
 
+        private async Task AddMissingTextsAsync<T>(
+    IQueryable<T> query,
+    string keyPrefix,
+    List<ApplicationLanguage> languages,
+    HashSet<string> existingKeys)
+    where T : class, IEntity<long>
+        {
+            var items = await query.IgnoreQueryFilters().ToListAsync();
+
+            if (!items.Any())
+                return;
+
+            foreach (var item in items)
+            {
+                var id = item.Id;
+                var name = item.GetType().GetProperty("Name")?.GetValue(item)?.ToString();
+
+                if (string.IsNullOrWhiteSpace(name))
+                    continue;
+
+                var baseKey = (keyPrefix + id + "-" + name).Trim().ToUpper();
+
+                foreach (var lang in languages)
+                {
+                    var compositeKey = baseKey + "_" + lang.Name;
+
+                    if (existingKeys.Contains(compositeKey))
+                        continue;
+
+                    _context.LanguageTexts.Add(new ApplicationLanguageText
+                    {
+                        Key = baseKey,
+                        Source = "onetouch",
+                        Value = name,
+                        LanguageName = lang.Name,
+                        TenantId = item.GetType().GetProperty("TenantId")?.GetValue(item) as int?
+                    });
+
+                    existingKeys.Add(compositeKey); // prevent duplicates in same run
+                }
+            }
+        }
+        private async Task CreateHostSystemData()
+        {
+            // ✅ Restrict supported languages
+            var languagesList = await _context.Languages
+                .IgnoreQueryFilters()
+                //.Where(l => l.Name == "en" || l.Name == "ar")
+                .ToListAsync();
+
+            if (!languagesList.Any())
+                return;
+
+            // ✅ Load existing keys once (FAST lookup)
+            var existingKeys = _context.LanguageTexts
+                .IgnoreQueryFilters()
+                .Select(x => x.Key + "_" + x.LanguageName)
+                .ToHashSet();
+
+            await AddMissingTextsAsync(
+                _context.SycEntityObjectTypes,
+                "SYCENTITYOBJECTTYPES-NAME-",
+                languagesList,
+                existingKeys
+            );
+
+            await AddMissingTextsAsync(
+                _context.SycEntityObjectClassifications,
+                "SYCENTITYOBJECTCLASSIFICATIONS-NAME-",
+                languagesList,
+                existingKeys
+            );
+
+            await AddMissingTextsAsync(
+                _context.SycEntityObjectCategories,
+                "SYCENTITYOBJECTCATEGORIES-NAME-",
+                languagesList,
+                existingKeys
+            );
+
+            await _context.SaveChangesAsync();
+        }
         public void SeedExtraAttributes()
         {
             var assetsPath = Path.Combine(Directory.GetCurrentDirectory(), "Assets");
@@ -105,7 +194,7 @@ namespace onetouch.Migrations.Seed.Host
                 })
                 .Where(x => x != null)
                 // 2. Group by ObjectCode + ParentCode
-                .GroupBy(x => new { x.ObjectCode, x.ParentCode , x.Code})
+                .GroupBy(x => new { x.ObjectCode, x.ParentCode, x.Code })
                 // 3. Pick the file with the latest FileTime in each group
                 .ToDictionary(
                     g => g.Key,
@@ -122,8 +211,8 @@ namespace onetouch.Migrations.Seed.Host
             {
                 var key = new
                 {
-                    ObjectCode = item.ObjectCode == null ? null: item.ObjectCode.ToUpper(),
-                    ParentCode = item.ParentCode ==null ? null: item.ParentCode.ToUpper(),
+                    ObjectCode = item.ObjectCode == null ? null : item.ObjectCode.ToUpper(),
+                    ParentCode = item.ParentCode == null ? null : item.ParentCode.ToUpper(),
                     Code = (item.Code ?? "").ToUpper()
                 };
 
@@ -433,20 +522,20 @@ namespace onetouch.Migrations.Seed.Host
                 _context.SydObjects.Add(sydObjects_MarketplaceRelationship);
                 _context.SaveChanges();
             }
-       //     var sydObjects_Address = _context.SydObjects.IgnoreQueryFilters().FirstOrDefault(
-       //r => r.Code == "ADDRESS");
-       //     if (sydObjects_Address == null && ObjectTypeCodeEntity != null && ObjectTypeCodeEntity.Id > 0)
-       //     {
-       //         sydObjects_Address = new SystemObjects.SydObject
-       //         {
-       //             Code = "ADDRESS",
-       //             Name = "Address",
-       //             ObjectTypeCode = ObjectTypeCodeEntity.Code,
-       //             ObjectTypeId = ObjectTypeCodeEntity.Id
-       //         };
-       //         _context.SydObjects.Add(sydObjects_Address);
-       //         _context.SaveChanges();
-       //     }
+            //     var sydObjects_Address = _context.SydObjects.IgnoreQueryFilters().FirstOrDefault(
+            //r => r.Code == "ADDRESS");
+            //     if (sydObjects_Address == null && ObjectTypeCodeEntity != null && ObjectTypeCodeEntity.Id > 0)
+            //     {
+            //         sydObjects_Address = new SystemObjects.SydObject
+            //         {
+            //             Code = "ADDRESS",
+            //             Name = "Address",
+            //             ObjectTypeCode = ObjectTypeCodeEntity.Code,
+            //             ObjectTypeId = ObjectTypeCodeEntity.Id
+            //         };
+            //         _context.SydObjects.Add(sydObjects_Address);
+            //         _context.SaveChanges();
+            //     }
             //MMT40[End]
             //STANDARDFEATURE,STANDARDSUBSCRIPTIONPLAN,TENANTACTIVITYLOG
             var sydObjects_StandardFeature = _context.SydObjects.IgnoreQueryFilters().FirstOrDefault(
@@ -721,10 +810,10 @@ namespace onetouch.Migrations.Seed.Host
                         _context.SycEntityObjectStatuses.Add(SycEntityObjectStatuses);
                         _context.SaveChanges();
                     }
-                    
+
                 }
             }
-            
+
             //MMT-EntityLog[End]
             //MMT40[Start]
             ObjectCode = "MARKETPLACECONTACTRELATIONSHIP";
@@ -757,11 +846,11 @@ namespace onetouch.Migrations.Seed.Host
                 }
             }
             //MMT40[End]
-                      
-                      
-                    
-                
-            
+
+
+
+
+
             //I49-[End]
         }
 
@@ -909,114 +998,122 @@ namespace onetouch.Migrations.Seed.Host
 
         }
 
-        private void CreateHostSystemData()
-        {
-            #region Add missing SycEntityObjectTypes
-            var keyList = _context.LanguageTexts.Select(e => e.Key).ToList();
+        //private void CreateHostSystemData()
+        //{
+        //    #region Add missing SycEntityObjectTypes
+        //    var keyList = _context.LanguageTexts.Where(z=>z.Key.Contains("SYCENTITYOBJECTTYPES-NAME-")).Select(e => e.Key).ToList();
 
-            var sycEntityObjectTypes = _context.SycEntityObjectTypes.IgnoreQueryFilters().Where(e => !keyList.Contains(("SYCENTITYOBJECTTYPES-NAME-" + e.Id.ToString() + "-" + e.Name).Trim().ToUpper())).ToList();
-            if (sycEntityObjectTypes == null || sycEntityObjectTypes.Count > 0)
-            {
-                var languagesList = _context.Languages.IgnoreQueryFilters().ToList();
-                if (languagesList != null)
-                {
-                    foreach (var sycEntityObjectType in sycEntityObjectTypes)
-                    {
+        //    var sycEntityObjectTypes = _context.SycEntityObjectTypes.IgnoreQueryFilters().Where(e => !keyList.Contains(("SYCENTITYOBJECTTYPES-NAME-" + e.Id.ToString() + "-" + e.Name).Trim().ToUpper())).ToList();
+        //    if (sycEntityObjectTypes == null || sycEntityObjectTypes.Count > 0)
+        //    {
+        //        var languagesList = _context.Languages.IgnoreQueryFilters().ToList();
+        //        if (languagesList != null)
+        //        {
+        //            foreach (var sycEntityObjectType in sycEntityObjectTypes)
+        //            {
 
-                        foreach (var lang in languagesList)
-                        {
-                            var sycEntityObjectTypeExist = _context.LanguageTexts.FirstOrDefaultAsync(x => x.Key == ("SYCENTITYOBJECTTYPES-NAME-" + sycEntityObjectType.Id.ToString() + "-" + sycEntityObjectType.Name).Trim().ToUpper() && x.LanguageName == lang.Name).Result;
-                            if (sycEntityObjectTypeExist == null ||
-                                (sycEntityObjectTypeExist != null && sycEntityObjectTypeExist.Id == 0))
-                            {
-                                ApplicationLanguageText entity = new ApplicationLanguageText();
+        //                foreach (var lang in languagesList)
+        //                {
+        //                    var sycEntityObjectTypeExist = _context.LanguageTexts.FirstOrDefaultAsync(x => x.Key == ("SYCENTITYOBJECTTYPES-NAME-" + sycEntityObjectType.Id.ToString() + "-" + sycEntityObjectType.Name).Trim().ToUpper() && x.LanguageName == lang.Name).Result;
+        //                    if (sycEntityObjectTypeExist == null ||
+        //                        (sycEntityObjectTypeExist != null && sycEntityObjectTypeExist.Id == 0))
+        //                    {
+        //                        ApplicationLanguageText entity = new ApplicationLanguageText();
 
-                                entity.Key = ("SYCENTITYOBJECTTYPES-NAME-" + sycEntityObjectType.Id.ToString() + "-" + sycEntityObjectType.Name).Trim().ToUpper();
-                                entity.Source = "onetouch";
-                                entity.Value = sycEntityObjectType.Name;
-                                entity.LanguageName = lang.Name;
-                                entity.TenantId = sycEntityObjectType.TenantId;
-                                _context.LanguageTexts.Add(entity);
+        //                        entity.Key = ("SYCENTITYOBJECTTYPES-NAME-" + sycEntityObjectType.Id.ToString() + "-" + sycEntityObjectType.Name).Trim().ToUpper();
+        //                        entity.Source = "onetouch";
+        //                        entity.Value = sycEntityObjectType.Name;
+        //                        entity.LanguageName = lang.Name;
+        //                        entity.TenantId = sycEntityObjectType.TenantId;
+        //                        _context.LanguageTexts.Add(entity);
 
-                            }
-                        }
+        //                    }
+        //                }
 
-                    }
-                }
-                _context.SaveChanges();
-            }
-            #endregion SycEntityObjectTypes
-            #region Add SycEntityObjectClassifications
-            var sycEntityObjectClassifications = _context.SycEntityObjectTypes.IgnoreQueryFilters()
-                .Where(e => !keyList.Contains(("SYCENTITYOBJECTCLASSIFICATIONS-NAME-" + e.Id.ToString() + "-" + e.Name).Trim().ToUpper())).ToList();
-            if (sycEntityObjectClassifications == null || sycEntityObjectClassifications.Count > 0)
-            {
-                var languagesList = _context.Languages.IgnoreQueryFilters().ToList();
-                if (languagesList != null)
-                {
-                    foreach (var sycEntityObjectClassification in sycEntityObjectClassifications)
-                    {
+        //            }
+        //        }
+        //        _context.SaveChanges();
+        //    }
+        //    #endregion SycEntityObjectTypes
+        //    #region Add SycEntityObjectClassifications
+        //    keyList = _context.LanguageTexts.Where(z => z.Key.Contains("SYCENTITYOBJECTCLASSIFICATIONS-NAME-")).Select(e => e.Key).ToList();
+        //    var sycEntityObjectClassifications = _context.SycEntityObjectClassifications.IgnoreQueryFilters()
+        //        .Where(e => !keyList.Contains(("SYCENTITYOBJECTCLASSIFICATIONS-NAME-" + e.Id.ToString() + "-" + e.Name).Trim().ToUpper())).ToList();
+        //    if (sycEntityObjectClassifications == null || sycEntityObjectClassifications.Count > 0)
+        //    {
+        //        bool newRecordAdded = false;
+        //        var languagesList = _context.Languages.IgnoreQueryFilters().ToList();
+        //        if (languagesList != null)
+        //        {
+        //            foreach (var sycEntityObjectClassification in sycEntityObjectClassifications)
+        //            {
 
-                        foreach (var lang in languagesList)
-                        {
-                            var sycEntityObjectTypeExist = _context.LanguageTexts
-                                .FirstOrDefaultAsync(x => x.Key == ("SYCENTITYOBJECTCLASSIFICATIONS-NAME-" + sycEntityObjectClassification.Id.ToString() + "-" + sycEntityObjectClassification.Name).Trim().ToUpper() && x.LanguageName == lang.Name).Result;
-                            if (sycEntityObjectTypeExist == null ||
-                                (sycEntityObjectTypeExist != null && sycEntityObjectTypeExist.Id == 0))
-                            {
-                                ApplicationLanguageText entity = new ApplicationLanguageText();
+        //                foreach (var lang in languagesList)
+        //                {
+        //                    var sycEntityObjectTypeExist = _context.LanguageTexts.IgnoreQueryFilters()
+        //                        .Where(x => x.Key == ("SYCENTITYOBJECTCLASSIFICATIONS-NAME-" + sycEntityObjectClassification.Id.ToString() + "-" + sycEntityObjectClassification.Name).Trim().ToUpper() && x.LanguageName == lang.Name)
+        //                        .FirstOrDefaultAsync().Result;
+        //                    if (sycEntityObjectTypeExist == null ||
+        //                        (sycEntityObjectTypeExist != null && sycEntityObjectTypeExist.Id == 0))
+        //                    {
+        //                        newRecordAdded = true;
+        //                        ApplicationLanguageText entity = new ApplicationLanguageText();
 
-                                entity.Key = ("SYCENTITYOBJECTCLASSIFICATIONS-NAME-" + sycEntityObjectClassification.Id.ToString() + "-" + sycEntityObjectClassification.Name).Trim().ToUpper();
-                                entity.Source = "onetouch";
-                                entity.Value = sycEntityObjectClassification.Name;
-                                entity.LanguageName = lang.Name;
-                                entity.TenantId = sycEntityObjectClassification.TenantId;
-                                _context.LanguageTexts.Add(entity);
+        //                        entity.Key = ("SYCENTITYOBJECTCLASSIFICATIONS-NAME-" + sycEntityObjectClassification.Id.ToString() + "-" + sycEntityObjectClassification.Name).Trim().ToUpper();
+        //                        entity.Source = "onetouch";
+        //                        entity.Value = sycEntityObjectClassification.Name;
+        //                        entity.LanguageName = lang.Name;
+        //                        entity.TenantId = sycEntityObjectClassification.TenantId;
+        //                        _context.LanguageTexts.Add(entity);
 
-                            }
-                        }
+        //                    }
+        //                }
 
-                    }
-                }
-                _context.SaveChanges();
-            }
-            #endregion
-            #region Add SycEntityObjectCategories
-            var sycEntityObjectCategories = _context.SycEntityObjectTypes.IgnoreQueryFilters()
-                .Where(e => !keyList.Contains(("SYCENTITYOBJECTCATEGORIES-NAME-" + e.Id.ToString() + "-" + e.Name).Trim().ToUpper())).ToList();
-            if (sycEntityObjectCategories == null || sycEntityObjectCategories.Count > 0)
-            {
-                var languagesList = _context.Languages.IgnoreQueryFilters().ToList();
-                if (languagesList != null)
-                {
-                    foreach (var sycEntityObjectCategory in sycEntityObjectCategories)
-                    {
+        //            }
+        //        }
+        //        if (newRecordAdded ==true)
+        //        _context.SaveChanges();
+        //    }
+        //    #endregion
+        //    #region Add SycEntityObjectCategories
+        //    keyList = _context.LanguageTexts.Where(z => z.Key.Contains("SYCENTITYOBJECTCATEGORIES-NAME-")).Select(e => e.Key).ToList();
+        //    var sycEntityObjectCategories = _context.SycEntityObjectCategories.IgnoreQueryFilters()
+        //        .Where(e => !keyList.Contains(("SYCENTITYOBJECTCATEGORIES-NAME-" + e.Id.ToString() + "-" + e.Name).Trim().ToUpper())).ToList();
+        //    if (sycEntityObjectCategories == null || sycEntityObjectCategories.Count > 0)
+        //    {
+        //        bool newRecordAdded = false;
+        //        var languagesList = _context.Languages.IgnoreQueryFilters().ToList();
+        //        if (languagesList != null)
+        //        {
+        //            foreach (var sycEntityObjectCategory in sycEntityObjectCategories)
+        //            {
 
-                        foreach (var lang in languagesList)
-                        {
-                            var sycEntityObjectTypeExist = _context.LanguageTexts
-                                .FirstOrDefaultAsync(x => x.Key == ("SYCENTITYOBJECTCATEGORIES-NAME-" + sycEntityObjectCategory.Id.ToString() + "-" + sycEntityObjectCategory.Name).Trim().ToUpper() && x.LanguageName == lang.Name).Result;
-                            if (sycEntityObjectTypeExist == null ||
-                                (sycEntityObjectTypeExist != null && sycEntityObjectTypeExist.Id == 0))
-                            {
-                                ApplicationLanguageText entity = new ApplicationLanguageText();
+        //                foreach (var lang in languagesList)
+        //                {
+        //                    var sycEntityObjectTypeExist = _context.LanguageTexts.IgnoreQueryFilters()
+        //                        .Where(x => x.Key == ("SYCENTITYOBJECTCATEGORIES-NAME-" + sycEntityObjectCategory.Id.ToString() + "-" + sycEntityObjectCategory.Name).Trim().ToUpper() && x.LanguageName == lang.Name).FirstOrDefaultAsync().Result;
+        //                    if (sycEntityObjectTypeExist == null ||
+        //                        (sycEntityObjectTypeExist != null && sycEntityObjectTypeExist.Id == 0))
+        //                    {
+        //                        ApplicationLanguageText entity = new ApplicationLanguageText();
+        //                        newRecordAdded = true;
+        //                        entity.Key = ("SYCENTITYOBJECTCATEGORIES-NAME-" + sycEntityObjectCategory.Id.ToString() + "-" + sycEntityObjectCategory.Name).Trim().ToUpper();
+        //                        entity.Source = "onetouch";
+        //                        entity.Value = sycEntityObjectCategory.Name;
+        //                        entity.LanguageName = lang.Name;
+        //                        entity.TenantId = sycEntityObjectCategory.TenantId;
+        //                        _context.LanguageTexts.Add(entity);
 
-                                entity.Key = ("SYCENTITYOBJECTCATEGORIES-NAME-" + sycEntityObjectCategory.Id.ToString() + "-" + sycEntityObjectCategory.Name).Trim().ToUpper();
-                                entity.Source = "onetouch";
-                                entity.Value = sycEntityObjectCategory.Name;
-                                entity.LanguageName = lang.Name;
-                                entity.TenantId = sycEntityObjectCategory.TenantId;
-                                _context.LanguageTexts.Add(entity);
+        //                    }
+        //                }
 
-                            }
-                        }
-
-                    }
-                }
-                _context.SaveChanges();
-            }
-            #endregion
-        }
+        //            }
+        //        }
+        //        if(newRecordAdded ==true)
+        //        _context.SaveChanges();
+        //    }
+        //    #endregion
+        //}
 
         private void CreateHostReportSystemData()
         {
@@ -1040,7 +1137,7 @@ namespace onetouch.Migrations.Seed.Host
 
             //    _context.SaveChanges();
             //}
-          
+
 
             var sycReports = _context.SycReports.IgnoreQueryFilters().Where(e => e.Name == "ProductsCatalogTemplate8").ToList();
             if (sycReports == null || sycReports.Count < 1)
@@ -1133,7 +1230,7 @@ namespace onetouch.Migrations.Seed.Host
             }
 
             var sycReports123 = _context.SycReports.IgnoreQueryFilters().Where(e => e.Name == "ProductsCatalogTemplate12").ToList();
-            if (sycReports123== null || sycReports123.Count < 1)
+            if (sycReports123 == null || sycReports123.Count < 1)
             {
                 SycReport sycReport = new SycReport();
                 sycReport.Name = "ProductsCatalogTemplate12";
@@ -1173,7 +1270,7 @@ namespace onetouch.Migrations.Seed.Host
         //MMT-Iteration37[Start]
         private void CreateMessagesCategories()
         {
-            var messageObject =  _context.SydObjects.Where(z => z.Code == "MESSAGE" && z.IsDeleted == false).FirstOrDefault();
+            var messageObject = _context.SydObjects.Where(z => z.Code == "MESSAGE" && z.IsDeleted == false).FirstOrDefault();
             if (messageObject != null)
             {
                 var primaryObject = _context.SycEntityObjectCategories.Where(z => z.Code == "PRIMARY-MESSAGE" && z.ObjectId == messageObject.Id).FirstOrDefault();

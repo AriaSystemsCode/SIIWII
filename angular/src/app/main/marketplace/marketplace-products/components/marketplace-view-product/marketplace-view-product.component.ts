@@ -63,7 +63,7 @@ export class MarketplaceViewProductComponent
     orderType: string = "";
     productVarImages: MarketplaceExtraDataAttrDto[];
     currencySymbol: string = "";
-    showEditSpecialPrice: boolean = true;
+    showEditSpecialPrice: boolean = false;
     updatedSpecialPrice: number = 0;
     filteredColors: any[] = [];
     handleSCreenSelect: number = 0
@@ -120,6 +120,7 @@ export class MarketplaceViewProductComponent
     }
     ngOnInit(): void {
    
+            this.showSpecialPrice = this.productBodyData?.sellerSSIN ? true : false;
         this.route.paramMap.subscribe(params => {
           const idParam = params.get('id');        
           const id = idParam ? +idParam : null;
@@ -197,7 +198,7 @@ export class MarketplaceViewProductComponent
           }
           getProductDetailsForView() {
             this.showMainSpinner();
-            this.showEditSpecialPrice = true;
+             this.showEditSpecialPrice = true;
                     
             const handleItemDetails = (res: GetAppMarketplaceItemDetailForViewDto) => {
               this.productDetails = res?.appItem;
