@@ -1489,7 +1489,7 @@ waitForOrderConfirmationUrlPromise(): Promise<string> {
         this.appTransactionsForViewDto?.sellerCompanySSIN,
         this.appTransactionsForViewDto?.priceLevel,
         this.appTransactionsForViewDto?.id,
-        id,
+        undefined,
         undefined,
         undefined,
         undefined,

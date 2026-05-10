@@ -258,7 +258,7 @@ export class MarketplaceViewProductComponent
                   this.productBodyData.buyerSSIN,
                   this.productBodyData.sellerSSIN,
                   this.priceLevel,
-                  this.currentTransId,
+                  this.currentTransId ? this.currentTransId : undefined,
                   this.productBodyData.id,
                   undefined,
                 //   undefined,
