@@ -251,6 +251,8 @@ namespace onetouch.AppSiiwiiTransaction.Dtos
         public virtual string SharedUserSureName { get; set; }
 
         public virtual string SharedUserTenantName { get; set; }
+        public virtual string ContactSSIN { get; set; }
+        public virtual string CompanySSIN { get; set; }
 
     }
     public class GetAppTransactionAttributesInput : PagedAndSortedResultRequestDto
@@ -285,4 +287,13 @@ namespace onetouch.AppSiiwiiTransaction.Dtos
         public string ContactName { set; get; }
     }
     //MMT-OC
+    //I49-ChReq[Start]
+    public class ContactInfoDto
+    { 
+        public string ContactSSIN { set; get; }
+        public string CompanySSIN { set; get; }
+        public string UserName { set; get; }
+        public long TenantId { set; get; }
+    }
+    //I49-ChReq[End]
 }
