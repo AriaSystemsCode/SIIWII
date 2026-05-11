@@ -1,1 +1,75 @@
-<p>tenant-contact-messages works!</p>
+<div class="message-panel">
+  <div class="message-tabs">
+    <button
+      type="button"
+      [class.active]="messageTab === 'direct'"
+      (click)="messageTab = 'direct'">
+      {{ 'DirectMessage' | localize }}
+    </button>
+
+    <button
+      type="button"
+      [class.active]="messageTab === 'threads'"
+      (click)="messageTab = 'threads'">
+      {{ 'Threads' | localize }}
+    </button>
+
+    <button
+      type="button"
+      [class.active]="messageTab === 'mentions'"
+      (click)="messageTab = 'mentions'">
+      {{ 'Mentions' | localize }}
+    </button>
+  </div>
+
+  <!-- <div class="message-card">
+    <div class="message-title-row">
+      <div>
+        <h5>Testing</h5>
+        <h6>T-SII-20220727.0017</h6>
+        <h5>multiple attachments</h5>
+      </div>
+
+      <button type="button" class="more-btn">
+        <i class="fa fa-ellipsis-v"></i>
+      </button>
+    </div>
+  </div>
+
+  <div class="message-detail-card">
+    <div class="sender-row">
+      <img
+        src="assets/common/images/default-profile-picture.png"
+        class="sender-img"
+        onerror="this.src='assets/common/images/default-profile-picture.png'" />
+
+      <div>
+        <h6>Nadia. Kajado</h6>
+        <p>09:30 Pm, 02/25/2024</p>
+      </div>
+    </div>
+
+    <div class="message-meta">
+      <p>From : Nadia. Kajado@BBC.10 To : Oscar.Ramdan@orbit-int_co_uk</p>
+      <p>cc : Fazza.US@Polo.10 Sam.Zara@clothes.20 , Aya.Defacto@Apperal.20</p>
+      <p>Subject: Transaction T-SII-727.0017</p>
+    </div>
+
+    <p class="message-body">
+      Lorem ipsum dolor sit amet consectetur. Pulvinar sagittis sit dictumst ut
+      tellus arcu enim. Amet viverra sed augue porta proin purus.
+    </p>
+
+    <div class="message-actions">
+      <button class="reply-btn" type="button">
+        <i class="fa fa-reply"></i>
+        {{ 'Reply' | localize }}
+      </button>
+
+      <button class="forward-btn" type="button">
+        <i class="fa fa-share"></i>
+        {{ 'Forward' | localize }}
+      </button>
+    </div>
+  </div> -->
+</div>

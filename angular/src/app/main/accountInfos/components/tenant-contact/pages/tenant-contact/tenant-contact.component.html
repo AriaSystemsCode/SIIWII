@@ -1,10 +1,10 @@
 <div class="tenant-sec mr-2">
  
  <div class="position-relative"     *ngIf="mode === TenantContactMode.View">
-      <img class=" p-0 w-100 cover-img" [src]="attachmentBaseUrl + '/' + accountData?.account?.coverUrl"
-        onerror="this.src='../../assets/placeholders/holder-cover.png'" />
+      <img class=" p-0 w-100 cover-img" [src]=" accountData?.account?.coverUrl ? attachmentBaseUrl + '/' + accountData?.account?.coverUrl   : 'assets/placeholders/_logo-placeholder.png'"
+        onerror="this.src='../../assets/placeholders/placeholders/_logo-placeholder.png'" />
       <img class=" p-0 " [src]="attachmentBaseUrl + '/' + accountData?.account?.logoUrl"
-        onerror="this.src='../../assets/placeholders/_logo-placeholder.png'" [ngClass]="isArabic ? 'acc-img-ar':'acc-img'" />
+        onerror="this.src='../../assets/common/images/default-profile-picture.png'" [ngClass]="isArabic ? 'acc-img-ar':'acc-img'" />
       <h5 class="acc-name"  [ngClass]="isArabic ? 'acc-name-ar':'acc-en'">{{accountData?.account?.name}}</h5>
     </div>
 
@@ -16,45 +16,50 @@
 
 <div class="sidebar-info">
 
-  <!-- Email -->
+  <!-- EMAIL -->
   <div>
-    <span class="info-icon" pTooltip="{{'Email' | localize}}" tooltipPosition="top">
+    <span class="info-icon"
+          pTooltip="{{'Email' | localize}}">
       <i class="far fa-envelope"></i>
     </span>
 
     <b
       class="clickable"
-      *ngIf="accountData?.account?.eMailAddress"
-      (click)="openEmail(accountData?.account?.eMailAddress)">
-      {{ accountData?.account?.eMailAddress }}
+      *ngIf="sidebarData?.eMailAddress"
+      (click)="openEmail(sidebarData?.eMailAddress)">
+      {{ sidebarData?.eMailAddress }}
     </b>
 
-    <b *ngIf="!accountData?.account?.eMailAddress">-</b>
+    <b *ngIf="!sidebarData?.eMailAddress">-</b>
   </div>
 
-  <!-- Phone -->
+  <!-- PHONE -->
   <div>
-    <span class="info-icon" pTooltip="{{'Phone' | localize}}" tooltipPosition="top">
+    <span class="info-icon"
+          pTooltip="{{'Phone' | localize}}">
       <i class="fas fa-phone-alt"></i>
     </span>
 
-    <b>{{ accountData?.account?.phone1Number || '-' }}</b>
+    <b>
+      {{ sidebarData?.phone1Number || '-' }}
+    </b>
   </div>
 
-  <!-- Website -->
+  <!-- WEBSITE -->
   <div>
-    <span class="info-icon" pTooltip="{{'Website' | localize}}" tooltipPosition="top">
+    <span class="info-icon"
+          pTooltip="{{'Website' | localize}}">
       <i class="fas fa-globe"></i>
     </span>
 
     <b
       class="clickable"
-      *ngIf="accountData?.account?.website"
-      (click)="openWebsite(accountData?.account?.website)">
-      {{ accountData?.account?.website }}
+      *ngIf="sidebarData?.website"
+      (click)="openWebsite(sidebarData?.website)">
+      {{ sidebarData?.website }}
     </b>
 
-    <b *ngIf="!accountData?.account?.website">-</b>
+    <b *ngIf="!sidebarData?.website">-</b>
   </div>
 
 </div>
@@ -118,14 +123,15 @@
 
   <!-- Account Profile tab content -->
   <ng-container *ngIf="activeTabIndex === 0">
-    <app-tenant-contact-create-edit
-      *ngIf="mode === TenantContactMode.Create || mode === TenantContactMode.Edit"
-      [mode]="mode"
-      [contactType]="contactType"
-      [accountId]="accountId"
-      (cancelled)="close.emit()"
-      (saved)="handleSaved($event)">
-    </app-tenant-contact-create-edit>
+<app-tenant-contact-create-edit
+  #tenantContactCreateEdit
+  *ngIf="mode === TenantContactMode.Create || mode === TenantContactMode.Edit"
+  [mode]="mode"
+  [contactType]="contactType"
+  [accountId]="accountId"
+  (cancelled)="close.emit()"
+  (saved)="handleSaved($event)">
+</app-tenant-contact-create-edit>
 
     <app-tenant-contact-view
       *ngIf="mode === TenantContactMode.View"

@@ -1,14 +1,14 @@
-.tenant-dialog-header {
-  height: 58px;
-  padding: 0 18px;
-  border-bottom: 1px solid #eeeeee;
+// .tenant-dialog-header {
+//   height: 58px;
+//   padding: 0 18px;
+//   border-bottom: 1px solid #eeeeee;
 
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+//   display: flex;
+//   align-items: center;
+//   justify-content: space-between;
 
-  background: #fff;
-}
+//   background: #fff;
+// }
 
 .dialog-title-section h4 {
   margin: 0;
@@ -84,3 +84,26 @@
   }
 }
 
+:host ::ng-deep .tenant-contact-dialog .p-dialog-content {
+  max-height: 85vh;
+  overflow: hidden;
+}
+
+.tenant-dialog-header {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  height: 58px;
+  padding: 0 18px;
+  border-bottom: 1px solid #eeeeee;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #fff;
+}
+
+:host ::ng-deep .tenant-contact-dialog app-tenant-contact {
+  display: block;
+  max-height: calc(85vh - 58px);
+  overflow-y: auto;
+}

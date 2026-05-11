@@ -48,7 +48,7 @@
           <i class="far fa-trash-alt"></i>
         </button>
         <!-- edit -->
-        <button 
+        <button *ngIf="contactType == TenantContactType.Manual"
           type="button"
           class="header-icon-btn"
           pTooltip="{{ 'Edit' | localize }}"
@@ -80,18 +80,18 @@
       <!-- CREATE / EDIT -->
       <ng-container *ngIf="mode !== TenantContactMode.View">
 
-        <button
-          type="button"
-          class="btn btn-cancel-dialog"
-          (click)="close()">
-          {{ 'Cancel' | localize }}
-        </button>
+      <button
+  type="button"
+  class="btn btn-cancel-dialog"
+  (click)="handleCancel()">
+  {{ 'Cancel' | localize }}
+</button>
 
         <button
           type="button"
           class="btn btn-save-dialog"
           (click)="triggerSave()">
-          {{ 'SaveChanges' | localize }}
+          {{ 'Save' | localize }}
         </button>
 
       </ng-container>
@@ -101,13 +101,13 @@
   </div>
 
   <!-- BODY -->
-  <app-tenant-contact
-    #tenantContactComponent
-    [mode]="mode"
-    [contactType]="contactType"
-    [accountId]="accountId"
-    (close)="close()"
-    (saved)="onSaved()">
-  </app-tenant-contact>
+<app-tenant-contact
+  #tenantContactComponent
+  [mode]="mode"
+  [contactType]="contactType"
+  [accountId]="accountId"
+  (close)="handleCancel()"
+  (saved)="onSaved($event)">
+</app-tenant-contact>
 
 </p-dialog>

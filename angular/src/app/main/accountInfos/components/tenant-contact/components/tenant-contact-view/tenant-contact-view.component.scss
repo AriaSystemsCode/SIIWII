@@ -7,39 +7,63 @@
 }
 
 /* ===============================
-   LAYOUT (7 / 5)
+   MAIN LAYOUT
 =================================*/
-
-
 .form-section {
-  gap: 10px;
+  display: flex;
+  flex-wrap: nowrap !important;
+  gap: 12px;
   margin: 0;
+  align-items: flex-start;
 }
 
-.account-body.col-lg-7 {
+/* LEFT SIDE */
+.account-body {
+  flex: 0 0 calc(64% - 6px) !important;
+  max-width: calc(64% - 6px);
+  min-width: 0;
+
   border: 1px solid #eeeeee;
   border-radius: 14px;
   background: #fff;
+
   padding: 10px;
 }
 
-.activity-section.col-lg-5 {
-  padding-left: 16px;
+/* RIGHT SIDE */
+.activity-section {
+  // flex: 0 0 calc(36% - 6px) !important;
+  // max-width: calc(36% - 6px);
+  // min-width: 320px;
+
+  // padding-left: 0;
+  width: 300px;
+}
+
+/* IMPORTANT */
+.activity-section,
+.activity-section * {
+  min-width: 0;
 }
 
 /* ===============================
-   GRID STRUCTURE
+   PROFILE GRID
 =================================*/
 .profile-view-grid {
   display: flex;
   flex-direction: column;
   gap: 14px;
-    border: 1px solid #eeeeee;
+
+  border: 1px solid #eeeeee;
   border-radius: 14px;
   background: #fff;
+
   padding: 10px;
 }
 
+/* ===============================
+   SUMMARY ROW
+=================================*/
 .summary-row {
   display: flex;
   gap: 14px;
@@ -50,70 +74,25 @@
   min-width: 0;
 }
 
-/* ===============================
-   MEDIA STRIP (IMAGES)
-=================================*/
-.media-strip {
-  position: relative;
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 8px;
 
-  border: 1px solid #eeeeee;
-  border-radius: 14px;
-  padding: 8px;
-  background: #fff;
-  overflow: hidden;
-}
-
-.media-thumb {
-  height: 88px;
-  border-radius: 10px;
-  background-size: cover;
-  background-position: center;
-}
-
-/* arrows */
-.media-arrow {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  z-index: 2;
-
-  width: 26px;
-  height: 36px;
-  border: none;
-  border-radius: 6px;
-
-  background: #fff;
-  color: #4a0d4a;
-
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
-}
-
-.media-arrow.left {
-  left: 4px;
-}
-
-.media-arrow.right {
-  right: 4px;
-  background: #4a0d4a;
-  color: #fff;
-}
 
 /* ===============================
-   CARDS (MAIN UI STYLE)
+   COMMON CARD STYLE
 =================================*/
 .summary-card,
 .info-section {
   border: 1px solid #eeeeee;
   border-radius: 14px;
+
   background: #fff;
 
   padding: 14px 16px;
 
   box-shadow: 0 1px 4px rgba(25, 19, 38, 0.03);
+
   transition: 0.2s ease;
+
+  overflow: hidden;
 }
 
 .summary-card:hover,
@@ -127,6 +106,7 @@
 .summary-card h6,
 .info-section h6 {
   color: #191326;
+
   font-weight: 800;
   font-size: 15px;
 
@@ -137,7 +117,7 @@
 }
 
 /* ===============================
-   VALUES / TAG STYLE
+   VALUES
 =================================*/
 .summary-card span,
 .tag {
@@ -161,7 +141,7 @@
 }
 
 /* ===============================
-   TAG LIST (Departments / Classifications)
+   TAG LIST
 =================================*/
 .tag-list {
   display: flex;
@@ -170,21 +150,61 @@
 }
 
 /* ===============================
-   SINGLE FIELD ROW (Phones / Notes)
+   NOTES / SINGLE ROWS
 =================================*/
 .summary-row:not(.d-flex) {
   display: block;
 }
 
 /* ===============================
+   IMAGE SLIDER FIXES
+=================================*/
+::ng-deep ng-image-slider {
+  width: 100% !important;
+}
+
+::ng-deep .ng-image-slider-container {
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+::ng-deep .ng-image-slider .ng-image-slider-container .main {
+  overflow: hidden !important;
+}
+
+/* ===============================
+   ACTIVITY PANEL FIX
+=================================*/
+.activity-section app-tenant-contact-activity-panel {
+  display: block;
+  width: 100%;
+}
+
+.activity-section .message-panel,
+.activity-section .audit-panel,
+.activity-section .relations-panel {
+  width: 100%;
+  overflow: hidden;
+}
+
+/* ===============================
    RESPONSIVE
 =================================*/
 @media (max-width: 991px) {
-  .account-body.col-lg-7,
-  .activity-section.col-lg-5 {
+
+  .form-section {
+    flex-wrap: wrap !important;
+  }
+
+  .account-body,
+  .activity-section {
+    flex: 0 0 100% !important;
     max-width: 100%;
-    flex: 0 0 100%;
-    padding: 15px;
+    min-width: 0;
+  }
+
+  .activity-section {
+    padding-left: 0;
   }
 
   .summary-row {
@@ -193,5 +213,35 @@
 
   .media-strip {
     grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* ===============================
+   MOBILE
+=================================*/
+@media (max-width: 576px) {
+
+  .account-body,
+  .profile-view-grid {
+    padding: 8px;
+  }
+
+  .summary-card,
+  .info-section {
+    padding: 12px;
+  }
+
+  .summary-card h6,
+  .info-section h6 {
+    font-size: 14px;
+  }
+
+  .summary-card span,
+  .tag {
+    font-size: 13px;
+  }
+
+  .media-thumb {
+    height: 72px;
   }
 }

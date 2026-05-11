@@ -34,15 +34,18 @@ export class TenantContactViewComponent implements OnInit {
   loading = false;
   attachmentBaseUrl = AppConsts.attachmentBaseUrl;
   imagesLoaded = false;
+
+
+
   constructor() { }
 
   ngOnInit(): void {
-    console.log(this.imageObject, 'imgsss')
+
   }
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['imageObject']) {
       this.imagesLoaded = !!this.imageObject?.length;
-      console.log(this.imageObject, 'imgsss after input update');
+   
     }
   }
   get marketplaceRolesList(): string[] {
@@ -54,4 +57,6 @@ export class TenantContactViewComponent implements OnInit {
       ? roleItem.attributeValue.split('-').filter(Boolean)
       : [];
   }
+
+
 }

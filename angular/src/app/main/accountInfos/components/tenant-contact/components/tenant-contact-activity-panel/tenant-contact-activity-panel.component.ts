@@ -1,6 +1,6 @@
 import { Component, Input } from '@angular/core';
 
-type ActivityTab = 'audit' | 'message' | 'relations';
+type ActivityTab = 'audit' | 'message' | 'related';
 
 @Component({
   selector: 'app-tenant-contact-activity-panel',

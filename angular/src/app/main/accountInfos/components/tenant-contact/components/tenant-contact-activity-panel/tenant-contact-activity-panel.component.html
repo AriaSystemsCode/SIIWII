@@ -1,44 +1,46 @@
-
 <div class="activity-panel">
   <div class="activity-tabs">
-    <button
-      type="button"
-      [class.active]="activeTab === 'audit'"
-      (click)="setTab('audit')">
+    <button type="button" [class.active]="activeTab === 'audit'" (click)="setTab('audit')">
       {{ 'AuditTrail' | localize }}
     </button>
 
-    <button
-      type="button"
-      [class.active]="activeTab === 'message'"
-      (click)="setTab('message')">
+    <button type="button" [class.active]="activeTab === 'message'" (click)="setTab('message')">
       {{ 'Message' | localize }}
     </button>
 
-    <button
-      type="button"
-      [class.active]="activeTab === 'relations'"
-      (click)="setTab('relations')">
-      {{ 'Relations' | localize }}
+    <button type="button" [class.active]="activeTab === 'related'" (click)="setTab('related')">
+      {{ 'Related' | localize }}
     </button>
   </div>
 
   <div class="activity-content">
-    <app-tenant-contact-audit-trail
-      *ngIf="activeTab === 'audit'"
-  >
+    <app-tenant-contact-audit-trail *ngIf="activeTab === 'audit'">
     </app-tenant-contact-audit-trail>
 
-    <app-tenant-contact-messages
-      *ngIf="activeTab === 'message'"
-    >
+    <app-tenant-contact-messages *ngIf="activeTab === 'message'">
     </app-tenant-contact-messages>
-     <div   *ngIf="activeTab === 'relations'">
-        related
-     </div>
+    <div *ngIf="activeTab === 'related'">
+      related
+    </div>
     <!-- <app-tenant-contact-relations
       *ngIf="activeTab === 'relations'"
       [accountId]="accountId">
     </app-tenant-contact-relations> -->
   </div>
+
+
+
+
+
+</div>
+
+
+
+<div class="row mt-4 m-1">
+  <div class="col-12">
+
+    <!-- app Notes shared component-->
+    <app-notes [entityId]="accountId"></app-notes>
+  </div>
+
 </div>

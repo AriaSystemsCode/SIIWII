@@ -6,8 +6,8 @@
 
       <div class="profile-view-grid ">
         <div class="media-strip" *ngIf="accountData?.account?.imagesUrls?.length">
-         <ng-image-slider #nav [images]="imageObject" [infinite]="false" [autoSlide]="3"
-                                [imageSize]="{width: 160, height: 300}" slideImage="3"></ng-image-slider>
+         <ng-image-slider #nav [images]="imageObject" [infinite]="false" [autoSlide]="1"
+                                [imageSize]="{width: 160}" slideImage="1"></ng-image-slider>
         </div>
 
         <div class="summary-row d-flex justify-content-between">
@@ -132,7 +132,7 @@
 
         <div class="summary-row ">
           <div class="summary-card">
-            <h6>{{ 'Notes' | localize }}</h6>
+            <h6>{{ 'AboutUs' | localize }}</h6>
             <span>{{ accountData?.account?.notes || '-' }}</span>
           </div>
 

@@ -33,6 +33,7 @@ import { TenantContactSidebarComponent } from './components/tenant-contact-sideb
 import { TenantContactActivityPanelComponent } from './components/tenant-contact-activity-panel/tenant-contact-activity-panel.component';
 import { TenantContactAuditTrailComponent } from './components/tenant-contact-activity-panel/tenant-contact-audit-trail/tenant-contact-audit-trail.component';
 import { TenantContactMessagesComponent } from './components/tenant-contact-activity-panel/tenant-contact-messages/tenant-contact-messages.component';
+import { NotesModule } from "@app/admin/shared/notes/notes.module";
 
 @NgModule({
   declarations: [
@@ -75,6 +76,7 @@ import { TenantContactMessagesComponent } from './components/tenant-contact-acti
         SelectAddressModule,
         TabViewModule,
         InputSwitchModule,
+        NotesModule
         
         
     // any needed PrimeNG/shared modules

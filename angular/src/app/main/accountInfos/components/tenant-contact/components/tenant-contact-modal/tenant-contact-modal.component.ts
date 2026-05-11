@@ -22,34 +22,35 @@ export class TenantContactModalComponent {
   accountId?: number;
 
   dialogStyle: any = {};
+  lastMode: TenantContactMode;
 
-ngOnInit(): void {
-  this.setDialogStyle();
-  window.addEventListener('resize', () => this.setDialogStyle());
-}
+  ngOnInit(): void {
+    this.setDialogStyle();
+    window.addEventListener('resize', () => this.setDialogStyle());
+  }
 
-setDialogStyle(): void {
-  const isMobile = window.innerWidth < 576;
-  const isTab = window.innerWidth < 991;
+  setDialogStyle(): void {
+    const isMobile = window.innerWidth < 576;
+    const isTab = window.innerWidth < 991;
 
-  this.dialogStyle = isMobile
-    ? {
-      
+    this.dialogStyle = isMobile
+      ? {
+
         maxWidth: '95vw',
-        marginTop : '115px'
+        marginTop: '115px'
 
       }
-    : this.dialogStyle = isTab? {
-      
+      : this.dialogStyle = isTab ? {
+
         maxWidth: '670px',
         marginLeft: '80px',
-        marginTop : '120px'
-      }   : {
-    
+        marginTop: '120px'
+      } : {
+
         maxWidth: '1350px',
         marginLeft: '80px'
       };
-}
+  }
 
   open(config: {
     mode: TenantContactMode;
@@ -58,18 +59,65 @@ setDialogStyle(): void {
     accountId?: number;
   }): void {
     this.mode = config.mode;
+    this.lastMode = config.mode;
+
     this.contactType = config.contactType ?? config.accountType;
     this.accountId = config.accountId;
     this.visible = true;
   }
 
+handleCancel(): void {
+
+  // CREATE
+  if (this.mode === TenantContactMode.Create) {
+
+    this.tenantContactComponent?.tenantContactCreateEdit?.resetFormData?.();
+
+    this.close();
+
+    return;
+  }
+
+  // EDIT
+  if (this.mode === TenantContactMode.Edit) {
+
+    this.tenantContactComponent?.tenantContactCreateEdit?.resetFormData?.();
+
+    this.mode = TenantContactMode.View;
+
+    setTimeout(() => {
+      this.tenantContactComponent?.reloadViewData?.();
+    });
+
+    return;
+  }
+
+  this.close();
+}
+
+
   close(): void {
     this.visible = false;
   }
 
-  onSaved(): void {
-    this.close();
+  onSaved(result?: any): void {
+    const newAccountId =
+      result?.accountInfo?.id ||
+      result?.account?.id ||
+      result?.id ||
+      this.accountId;
+
+    if (newAccountId) {
+      this.accountId = newAccountId;
+    }
+
+    this.mode = TenantContactMode.View;
+
+    setTimeout(() => {
+      this.tenantContactComponent?.reloadViewData?.();
+    });
   }
+
 
   openEdit(accountId?: number): void {
     this.mode = TenantContactMode.Edit;
@@ -78,11 +126,11 @@ setDialogStyle(): void {
 
 
 
-triggerSave(): void {
-  this.tenantContactComponent?.submitForm();
-}
+  triggerSave(): void {
+    this.tenantContactComponent?.submitForm();
+  }
 
-deleteAccount(): void {
-  console.log('delete account');
-}
+  deleteAccount(): void {
+    console.log('delete account');
+  }
 }

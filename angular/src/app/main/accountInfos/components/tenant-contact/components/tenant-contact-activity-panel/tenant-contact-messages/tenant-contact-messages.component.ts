@@ -6,5 +6,5 @@ import { Component } from '@angular/core';
   styleUrls: ['./tenant-contact-messages.component.scss']
 })
 export class TenantContactMessagesComponent {
-
+messageTab: 'direct' | 'threads' | 'mentions' = 'direct';
 }

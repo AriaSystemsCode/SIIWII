@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Injector, Input, OnInit, Output, SimpleChanges } from '@angular/core';
+import { Component, EventEmitter, Injector, Input, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
 import {
   TenantContactMode,
   TenantContactType
@@ -12,6 +12,7 @@ import { AppConsts } from '@shared/AppConsts';
 import { AppComponentBase } from '@shared/common/app-component-base';
 import { finalize } from 'rxjs';
 import { ImageObject } from '@app/main/accounts/account-shared/models/imageobject';
+import { TenantContactCreateEditComponent } from '../../components/tenant-contact-create-edit/tenant-contact-create-edit.component';
 
 @Component({
   selector: 'app-tenant-contact',
@@ -19,6 +20,8 @@ import { ImageObject } from '@app/main/accounts/account-shared/models/imageobjec
   styleUrls: ['./tenant-contact.component.scss']
 })
 export class TenantContactComponent extends AppComponentBase implements OnInit {
+  @ViewChild('tenantContactCreateEdit') tenantContactCreateEdit: TenantContactCreateEditComponent;
+
   @Input() mode: TenantContactMode;
   @Input() contactType: TenantContactType;
   @Input() accountId?: number;
@@ -59,6 +62,19 @@ export class TenantContactComponent extends AppComponentBase implements OnInit {
       }
     }
   }
+  get sidebarData(): any {
+
+  // CREATE / EDIT
+  if (
+    this.mode === TenantContactMode.Create ||
+    this.mode === TenantContactMode.Edit
+  ) {
+    return this.tenantContactCreateEdit?.accountInfoData;
+  }
+
+  // VIEW
+  return this.accountData?.account;
+}
 
   get isCreateMode(): boolean {
     return this.mode === TenantContactMode.Create;
@@ -111,7 +127,6 @@ export class TenantContactComponent extends AppComponentBase implements OnInit {
 
         }
 
-        console.log(this.imageObject, 'from parr');
       });
   }
   handleSaved(event: any): void {
@@ -141,4 +156,17 @@ export class TenantContactComponent extends AppComponentBase implements OnInit {
       this.mode = TenantContactMode.Edit;
     }
   }
+
+  reloadViewData(): void {
+    if (this.accountId) {
+      this.loadAccountViewData();
+    }
+  }
+
+  submitForm(): void {
+    if (this.mode === TenantContactMode.Create || this.mode === TenantContactMode.Edit) {
+      this.tenantContactCreateEdit?.save();
+    }
+  }
+
 }
