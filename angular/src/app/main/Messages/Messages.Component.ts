@@ -51,7 +51,7 @@ export class MessagesComponent extends AppComponentBase implements OnInit {
     lablesList: TreeNodeOfGetSycEntityObjectClassificationForViewDto[] = null;
     filter: string = "";
     messages: MessagesDto[] = [];
-    messagesDetails: GetMessagesForViewDto[] = null;
+    messagesDetails: GetMessagesForViewDto[] = [];
     selectedMessage: number = 0;
     selectedMessageIndx:number=0;
     filterText: string = "";
@@ -170,7 +170,7 @@ export class MessagesComponent extends AppComponentBase implements OnInit {
         this.skipCount = 0;
         this.maxResultCount = 5;
         this.noOfItemsToShowInitially = 5;
-        this.messagesDetails = null;
+        this.messagesDetails = [];
         this.selectedMessage = 0;
         this.selectedMessageIndx=0;
         this.getMesssage();
@@ -199,7 +199,7 @@ export class MessagesComponent extends AppComponentBase implements OnInit {
             .subscribe((result) => {
                 if (search == true) {
                     this.messages = [];
-                    this.messagesDetails = null;
+                    this.messagesDetails = [];
                     for (var i = 0; i < result.items.length; i++) {
                         const message = result.items[i].messages;
                         this.messages.push(message);
@@ -291,7 +291,7 @@ export class MessagesComponent extends AppComponentBase implements OnInit {
         event.target.closest('button').classList.add('active-tab');
         this.messageCategoryFilter = "MESSAGE";
         this.messages = [];
-        this.messagesDetails = null;
+        this.messagesDetails = [];
         this.getMesssage();
     }
 
@@ -302,7 +302,7 @@ export class MessagesComponent extends AppComponentBase implements OnInit {
         event.target.closest('button').classList.add('active-tab');
         this.messageCategoryFilter = messageType;
         this.messages = [];
-        this.messagesDetails = null;
+        this.messagesDetails = [];
         this.getMesssage();
     }
     
@@ -311,7 +311,7 @@ export class MessagesComponent extends AppComponentBase implements OnInit {
         event.target.closest('button').classList.add('active-tab');
         this.messageCategoryFilter = "MENTION";
         this.messages = [];
-        this.messagesDetails = null;
+        this.messagesDetails = [];
         this.getMesssage();
     }
     clearActiveTab() {
@@ -363,10 +363,10 @@ export class MessagesComponent extends AppComponentBase implements OnInit {
     focusAddComment(){
     if(this.addCommentComponent){
         this.addCommentComponent.focusCommentTextArea()
-        this.messagesDetails[0].messages.parentId=this.messagesDetails[0].messages.threadId
+        this.messagesDetails[0].messages.parentId=this.messagesDetails[0]?.messages?.threadId
         this.messagesDetails[0].messages.mesasgeObjectType=1;
 
-        this.addCommentComponent.show(this.messagesDetails[0].messages) 
+        this.addCommentComponent.show(this.messagesDetails[0]?.messages) 
     }
         
     }
@@ -388,7 +388,7 @@ export class MessagesComponent extends AppComponentBase implements OnInit {
                 this.messagesDetails = result;
                 // set message Subject [Start]
                 for (let i = 0; i < this.messagesDetails.length; i++) {
-                    let msgSubject = this.messagesDetails[i].messages.subject;
+                    let msgSubject = this.messagesDetails[i]?.messages?.subject;
                     if((this.messageCategoryFilter=='THREAD' || this.messageCategoryFilter=='MENTION') &&(message.entityObjectTypeCode=="COMMENT"))
                      msgSubject="Comment by "+ message.senderName+ " on "+ message.relatedEntityObjectTypeCode +" '" +
                     (message.relatedEntityObjectTypeCode=="transaction"? message.relatedEntityObjectTypeDescription : message.relatedEntityObjectTypeDescription.substring(0,30))
@@ -551,7 +551,7 @@ export class MessagesComponent extends AppComponentBase implements OnInit {
 
             // this.messageCategoryFilter = 'THREAD';
             this.messages = [];
-            this.messagesDetails = null;
+            this.messagesDetails = [];
             this.getMesssage();
         }
     }
