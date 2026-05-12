@@ -47,7 +47,7 @@ dynamicInputsComponents!: QueryList<dynamicInputs>;
 
   getRelationshipSettingsData() {
     if(this.relationId){
-      this._appEntitiesServiceProxy.getAppEntityForEdit(this.relationId).subscribe(result => {
+      this._appEntitiesServiceProxy.getAppEntityForEdit(this.relationId, true).subscribe(result => {
         this.dynamicInputsForViewDto = result;
       });
     }

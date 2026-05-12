@@ -6904,14 +6904,19 @@ export class AppEntitiesServiceProxy {
 
     /**
      * @param id (optional) 
+     * @param ignoreTenantId (optional) 
      * @return Success
      */
-    getAppEntityForEdit(id: number | undefined): Observable<GetAppEntityForEditOutput> {
+    getAppEntityForEdit(id: number | undefined, ignoreTenantId: boolean | undefined = false): Observable<GetAppEntityForEditOutput> {
         let url_ = this.baseUrl + "/api/services/app/AppEntities/GetAppEntityForEdit?";
         if (id === null)
             throw new Error("The parameter 'id' cannot be null.");
         else if (id !== undefined)
             url_ += "Id=" + encodeURIComponent("" + id) + "&";
+        if (ignoreTenantId === null)
+            throw new Error("The parameter 'ignoreTenantId' cannot be null.");
+        else if (ignoreTenantId !== undefined)
+            url_ += "ignoreTenantId=" + encodeURIComponent("" + ignoreTenantId) + "&";
         url_ = url_.replace(/[?&]$/, "");
 
         let options_ : any = {

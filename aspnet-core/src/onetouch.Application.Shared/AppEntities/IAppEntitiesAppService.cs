@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Threading.Tasks;
 using Abp.Application.Services;
 using Abp.Application.Services.Dto;
@@ -46,7 +46,7 @@ namespace onetouch.AppEntities
 		Task<string> GetAppEntityState(long id);
 		Task SetAppEntityState(long id, string jsonString);
 
-		Task<GetAppEntityForEditOutput> GetAppEntityForEdit(EntityDto<long> input);
+		Task<GetAppEntityForEditOutput> GetAppEntityForEdit(EntityDto<long> input, bool ignoreTenantId = false);
 
 		Task CreateOrEdit(CreateOrEditAppEntityDto input);
 
