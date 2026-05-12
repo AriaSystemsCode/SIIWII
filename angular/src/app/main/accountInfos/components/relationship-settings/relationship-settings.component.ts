@@ -29,7 +29,8 @@ export class RelationshipSettingsComponent extends AppComponentBase implements O
 
 @ViewChildren('appdynamicInputs')
 dynamicInputsComponents!: QueryList<dynamicInputs>;
-relations=[];
+  @Input() connnectionInfo=[];
+
   constructor(
     injector: Injector,
     private _sycEntityObjectTypesServiceProxy: SycEntityObjectTypesServiceProxy,
@@ -51,8 +52,7 @@ relations=[];
 
   getRelations() {
     //i49-get relations
-    this.relations = [{ name: 'x1', id: 1 }, { name: 'x2', id: 2 }];
-    const defaultId = this.relations?.[0]?.id ?? this.relationId;
+    const defaultId = this.connnectionInfo?.[0]?.id ?? this.relationId;
     this.onRelationshipOptionChange(defaultId);
   }
 
@@ -322,8 +322,8 @@ relations=[];
     appEntityDto.objectId = 2;
     appEntityDto.tenantId = this.appSession.tenantId;
     appEntityDto.code = this.dynamicInputsForViewDto.appEntity.code;
-    appEntityDto.name = this.dynamicInputsForViewDto.appEntity.name;
-      //i49-save relations values ??      appEntityDto.relationId= this.relationId
+    appEntityDto.name = this.dynamicInputsForViewDto.appEntity.name
+      //i49-save relations values ??      appEntityDto.entityObjectTypeId= this.relationId
 
          this.dynamicInputsComponents.first.saveAll(appEntityDto);
 

@@ -27,7 +27,7 @@
                         <div class="col-12">
                             <div *ngFor="let usage of usageList; let i = index" [attr.id]="'usage_' + usage">
                                 <h5 class="usage-block">{{ usage }}</h5>
-                                <p-dropdown *ngIf="relations?.length > 1" [options]="relations" optionLabel="name" optionValue="id"
+                                <p-dropdown *ngIf="connnectionInfo?.length > 1" [options]="connnectionInfo" optionLabel="name" optionValue="id"
                                     (onChange)="onRelationshipOptionChange($event.value)" name="relationship">
                                 </p-dropdown>
                                 <app-dynamicInputs #appdynamicInputs
