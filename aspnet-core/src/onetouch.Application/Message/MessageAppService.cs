@@ -108,7 +108,8 @@ namespace onetouch.Message
         public async Task<MessagePagedResultDto> GetAll(GetAllMessagesInput input)
         {
 
-           
+            if (string.IsNullOrEmpty(input.MessageCategoryFilter))
+                input.MessageCategoryFilter= "MESSAGE";
 
             if (input.messageTypeIndex == 0)
                 return null;
