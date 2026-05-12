@@ -443,20 +443,20 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit, 
           .subscribe((res: any) => {
             this.sellerCompanies = [...(res.items || [])];
    
-            if (this.sellerCompanies.length === 1) {
-              const only = this.sellerCompanies[0];
+            // if (this.sellerCompanies.length === 1) {
+            //   const only = this.sellerCompanies[0];
       
-              this.sellerCompanyId = only.id;
-              this.sellerCompanySSIN = only.accountSSIN;
-              this.sellerCurrencyCode = only.currencyCode;
+            //   this.sellerCompanyId = only.id;
+            //   this.sellerCompanySSIN = only.accountSSIN;
+            //   this.sellerCurrencyCode = only.currencyCode;
 
-              this.orderForm.get("sellerCompanyName")?.setValue(only, { emitEvent: false });
+            //   this.orderForm.get("sellerCompanyName")?.setValue(only, { emitEvent: false });
       
-              this.orderForm.get("sellerContactPhoneNumber")?.setValue(only.phone);
-              this.orderForm.get("sellerContactEMailAddress")?.setValue(only.email);
+            //   this.orderForm.get("sellerContactPhoneNumber")?.setValue(only.phone);
+            //   this.orderForm.get("sellerContactEMailAddress")?.setValue(only.email);
 
-              this.handleSellerCompanyChange({ value: only });
-            }
+            //   this.handleSellerCompanyChange({ value: only });
+            // }
           });
       }
       
