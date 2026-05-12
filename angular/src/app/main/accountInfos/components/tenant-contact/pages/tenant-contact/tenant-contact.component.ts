@@ -34,8 +34,8 @@ export class TenantContactComponent extends AppComponentBase implements OnInit {
   TenantContactType = TenantContactType;
 
   accountData?: GetAccountForViewDto;
-  companyLogo?: string;
-  coverPhoto?: string;
+  companyLogo: string | null = null;
+coverPhoto: string | null = null;
 
   attachmentBaseUrl = AppConsts.attachmentBaseUrl;
   currentLang: string
@@ -63,17 +63,14 @@ export class TenantContactComponent extends AppComponentBase implements OnInit {
     }
   }
   get sidebarData(): any {
-
-  // CREATE / EDIT
   if (
     this.mode === TenantContactMode.Create ||
     this.mode === TenantContactMode.Edit
   ) {
-    return this.tenantContactCreateEdit?.accountInfoData;
+    return this.tenantContactCreateEdit?.accountInfoData ?? null;
   }
 
-  // VIEW
-  return this.accountData?.account;
+  return this.accountData?.account ?? null;
 }
 
   get isCreateMode(): boolean {
@@ -105,12 +102,12 @@ export class TenantContactComponent extends AppComponentBase implements OnInit {
         this.accountData = res;
 
         this.companyLogo = this.accountData?.account?.logoUrl
-          ? `${this.attachmentBaseUrl}/${this.accountData?.account?.logoUrl}`
-          : undefined;
+  ? `${this.attachmentBaseUrl}/${this.accountData?.account?.logoUrl}`
+  : null;
 
-        this.coverPhoto = this.accountData?.account?.coverUrl
-          ? `${this.attachmentBaseUrl}/${this.accountData?.account?.coverUrl}`
-          : undefined;
+this.coverPhoto = this.accountData?.account?.coverUrl
+  ? `${this.attachmentBaseUrl}/${this.accountData?.account?.coverUrl}`
+  : null;
 
         /* images slider */
         if (this.accountData?.account?.imagesUrls?.length) {
@@ -143,11 +140,15 @@ export class TenantContactComponent extends AppComponentBase implements OnInit {
     window.location.href = `mailto:${email}`;
   }
 
-  openWebsite(url: string): void {
-    if (!url) return;
+openWebsite(url: string): void {
+  if (!url) return;
 
-    window.open(url);
+  if (!url.startsWith('http://') && !url.startsWith('https://')) {
+    url = 'https://' + url;
   }
+
+  window.open(url, '_blank', 'noopener,noreferrer');
+}
 
   switchMode(type: 'view' | 'edit') {
     if (type === 'view') {

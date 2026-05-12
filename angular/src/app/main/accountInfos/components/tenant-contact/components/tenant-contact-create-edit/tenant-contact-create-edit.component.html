@@ -177,8 +177,8 @@
 
       <div class="field full">
         <label>{{ l('AboutUs') }}</label>
-        <textarea name="aboutUs" rows="5" class="form-control" [(ngModel)]="accountInfoData.description"
-          (input)="changeTouchState()" [placeholder]="l('WriteSomethingForSummarizingYourCompany')">
+        <textarea name="aboutUs" rows="5" class="form-control" [(ngModel)]="accountInfoData.notes"
+          (input)="changeTouchState()" [placeholder]="l('PleaseEnterAboutUs')">
         </textarea>
       </div>
 
@@ -243,7 +243,7 @@
   </div>
 
   <div class="mx-lg-4 mt-3">
-    <app-tenant-contact-activity-panel></app-tenant-contact-activity-panel>
+    <app-tenant-contact-activity-panel [accountId]="accountId"></app-tenant-contact-activity-panel>
 
   </div>
 </form>

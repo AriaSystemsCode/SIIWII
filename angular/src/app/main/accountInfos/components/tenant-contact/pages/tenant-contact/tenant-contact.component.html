@@ -1,8 +1,16 @@
 <div class="tenant-sec mr-2">
  
  <div class="position-relative"     *ngIf="mode === TenantContactMode.View">
-      <img class=" p-0 w-100 cover-img" [src]=" accountData?.account?.coverUrl ? attachmentBaseUrl + '/' + accountData?.account?.coverUrl   : 'assets/placeholders/_logo-placeholder.png'"
-        onerror="this.src='../../assets/placeholders/placeholders/_logo-placeholder.png'" />
+      <!-- <img class=" p-0 w-100 cover-img" [src]=" accountData?.account?.coverUrl ? attachmentBaseUrl + '/' + accountData?.account?.coverUrl   : 'assets/placeholders/_logo-placeholder.png'"
+        onerror="this.src='../../assets/placeholders/placeholders/_logo-placeholder.png'" /> -->
+     <app-image-display
+  [image]="accountData?.account?.coverUrl 
+    ? attachmentBaseUrl + '/' + accountData?.account?.coverUrl
+    : 'assets/placeholders/_logo-placeholder.png'"
+    
+  [staticHeight]="250"
+  classList="w-100 object-fit-cover">
+</app-image-display>
       <img class=" p-0 " [src]="attachmentBaseUrl + '/' + accountData?.account?.logoUrl"
         onerror="this.src='../../assets/common/images/default-profile-picture.png'" [ngClass]="isArabic ? 'acc-img-ar':'acc-img'" />
       <h5 class="acc-name"  [ngClass]="isArabic ? 'acc-name-ar':'acc-en'">{{accountData?.account?.name}}</h5>
@@ -137,6 +145,7 @@
       *ngIf="mode === TenantContactMode.View"
       [accountData]="accountData"
       [contactType]="contactType"
+        [accountId]="accountId"
       (edit)="openEdit()"
       [imageObject]="imageObject"
       >

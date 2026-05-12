@@ -26,6 +26,7 @@ export class TenantContactViewComponent implements OnInit {
   @ViewChild('nav') slider: NgImageSliderComponent;
   @Input() accountData?: AccountDto;
   @Input() imageObject?: AccountDto;
+  @Input() accountId?: number;
 
   @Input() contactType: TenantContactType;
 

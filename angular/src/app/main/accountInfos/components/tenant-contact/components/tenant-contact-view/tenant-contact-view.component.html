@@ -133,7 +133,7 @@
         <div class="summary-row ">
           <div class="summary-card">
             <h6>{{ 'AboutUs' | localize }}</h6>
-            <span>{{ accountData?.account?.notes || '-' }}</span>
+            <span>{{ accountData?.account?.description || '-' }}</span>
           </div>
 
         </div>
@@ -169,7 +169,7 @@
   
     </div>
     <div class="activity-section flex-grow-1 mb-lg-0 mb-3">
-      <app-tenant-contact-activity-panel></app-tenant-contact-activity-panel>
+      <app-tenant-contact-activity-panel [accountId]="accountId"></app-tenant-contact-activity-panel>
 
     </div>
 
