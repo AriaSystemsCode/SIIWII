@@ -219,8 +219,8 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit, 
     getUserDefultRole() {
         this._AppTransactionServiceProxy.getUserDefaultRole(this.formType?.toUpperCase()).subscribe(result => {
             if (this.formType?.toUpperCase() == "SO") {
-                if (result?.toLowerCase().includes('seller') && this.tenantRoleService.soRolesOptions
-  .map(x => x.name.toLowerCase())
+                if (result?.toLowerCase()?.includes('seller') && this.tenantRoleService.soRolesOptions
+  .map(x => x.name?.toLowerCase())
   .some(x => x.includes('seller'))) {
                     this.roleDdval = this.tenantRoleService.soRolesOptions.filter(role => role.code == 1)[0];
 
@@ -228,8 +228,8 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit, 
                     this.roleDdval = this.tenantRoleService.soRolesOptions.filter(role => role.code !== 1)[0];
                 }
             } else if (this.formType?.toUpperCase() == "PO") {
-                if (result?.toLowerCase().includes('buyer')&&  this.tenantRoleService.poRolesOptions
-  .map(x => x.name.toLowerCase())
+                if (result?.toLowerCase()?.includes('buyer')&&  this.tenantRoleService.poRolesOptions
+  .map(x => x.name?.toLowerCase())
   .some(x => x.includes('buyer'))) {
                     this.roleDdval = this.tenantRoleService.poRolesOptions.filter(role => role.code == 2)[0];
 
@@ -409,21 +409,23 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit, 
           )
           .subscribe((res: any) => {
             this.buyerCompanies = [...(res.items || [])];
-
-            // if (this.buyerCompanies.length === 1) {
-            //   const only = this.buyerCompanies[0];
+            if(this.role == "I'm an Independent buying office."){
+   if (this.buyerCompanies.length === 1) {
+              const only = this.buyerCompanies[0];
       
-            //   this.buyerComapnyId = only.id;
-            //   this.buyerCompanySSIN = only.accountSSIN;
-            //   this.currencyCode = only.currencyCode;
+              this.buyerComapnyId = only.id;
+              this.buyerCompanySSIN = only.accountSSIN;
+              this.currencyCode = only.currencyCode;
 
-            //   this.orderForm.get("buyerCompanyName")?.setValue(only, { emitEvent: false });
+              this.orderForm.get("buyerCompanyName")?.setValue(only, { emitEvent: false });
 
-            //   this.orderForm.get("buyerContactPhoneNumber")?.setValue(only.phone);
-            //   this.orderForm.get("buyerContactEMailAddress")?.setValue(only.email);
+              this.orderForm.get("buyerContactPhoneNumber")?.setValue(only.phone);
+              this.orderForm.get("buyerContactEMailAddress")?.setValue(only.email);
 
-            //   this.handleBuyerCompanyChange({ value: only });
-            // }
+              this.handleBuyerCompanyChange({ value: only });
+            }
+            }
+         
           });
       }
       
@@ -442,8 +444,8 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit, 
           )
           .subscribe((res: any) => {
             this.sellerCompanies = [...(res.items || [])];
-   
-            if (this.sellerCompanies.length === 1) {
+            if( this.role == "I'm an Independent Sales Rep." ) {
+  if (this.sellerCompanies.length === 1) {
               const only = this.sellerCompanies[0];
       
               this.sellerCompanyId = only.id;
@@ -457,6 +459,9 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit, 
 
               this.handleSellerCompanyChange({ value: only });
             }
+            }
+   
+          
           });
       }
       
@@ -499,7 +504,7 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit, 
     }
 
     getBuyerRelationshipName() {
-        const lowerRole = this.role.toLowerCase();
+        const lowerRole = this.role?.toLowerCase();
 
         if (lowerRole.includes('seller')) {
             this.buyerRelationshipName = "Selling to this buyer - As Seller";
@@ -517,7 +522,7 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit, 
 
     
     getSellerRelationshipName() {
-        const lowerRole = this.role.toLowerCase();
+        const lowerRole = this.role?.toLowerCase();
 
         if (lowerRole.includes('sales rep')) {
             this.sellerRelationshipName = "Selling on behalf of this Seller - As Sales Rep";
