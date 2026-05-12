@@ -409,21 +409,23 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit, 
           )
           .subscribe((res: any) => {
             this.buyerCompanies = [...(res.items || [])];
-
-            // if (this.buyerCompanies.length === 1) {
-            //   const only = this.buyerCompanies[0];
+            if(this.role == "I'm an Independent buying office."){
+   if (this.buyerCompanies.length === 1) {
+              const only = this.buyerCompanies[0];
       
-            //   this.buyerComapnyId = only.id;
-            //   this.buyerCompanySSIN = only.accountSSIN;
-            //   this.currencyCode = only.currencyCode;
+              this.buyerComapnyId = only.id;
+              this.buyerCompanySSIN = only.accountSSIN;
+              this.currencyCode = only.currencyCode;
 
-            //   this.orderForm.get("buyerCompanyName")?.setValue(only, { emitEvent: false });
+              this.orderForm.get("buyerCompanyName")?.setValue(only, { emitEvent: false });
 
-            //   this.orderForm.get("buyerContactPhoneNumber")?.setValue(only.phone);
-            //   this.orderForm.get("buyerContactEMailAddress")?.setValue(only.email);
+              this.orderForm.get("buyerContactPhoneNumber")?.setValue(only.phone);
+              this.orderForm.get("buyerContactEMailAddress")?.setValue(only.email);
 
-            //   this.handleBuyerCompanyChange({ value: only });
-            // }
+              this.handleBuyerCompanyChange({ value: only });
+            }
+            }
+         
           });
       }
       
@@ -442,21 +444,24 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit, 
           )
           .subscribe((res: any) => {
             this.sellerCompanies = [...(res.items || [])];
+            if( this.role == "I'm an Independent Sales Rep." ) {
+  if (this.sellerCompanies.length === 1) {
+              const only = this.sellerCompanies[0];
+      
+              this.sellerCompanyId = only.id;
+              this.sellerCompanySSIN = only.accountSSIN;
+              this.sellerCurrencyCode = only.currencyCode;
+
+              this.orderForm.get("sellerCompanyName")?.setValue(only, { emitEvent: false });
+      
+              this.orderForm.get("sellerContactPhoneNumber")?.setValue(only.phone);
+              this.orderForm.get("sellerContactEMailAddress")?.setValue(only.email);
+
+              this.handleSellerCompanyChange({ value: only });
+            }
+            }
    
-            // if (this.sellerCompanies.length === 1) {
-            //   const only = this.sellerCompanies[0];
-      
-            //   this.sellerCompanyId = only.id;
-            //   this.sellerCompanySSIN = only.accountSSIN;
-            //   this.sellerCurrencyCode = only.currencyCode;
-
-            //   this.orderForm.get("sellerCompanyName")?.setValue(only, { emitEvent: false });
-      
-            //   this.orderForm.get("sellerContactPhoneNumber")?.setValue(only.phone);
-            //   this.orderForm.get("sellerContactEMailAddress")?.setValue(only.email);
-
-            //   this.handleSellerCompanyChange({ value: only });
-            // }
+          
           });
       }
       
