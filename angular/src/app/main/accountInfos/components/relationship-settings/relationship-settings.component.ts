@@ -29,6 +29,7 @@ export class RelationshipSettingsComponent extends AppComponentBase implements O
 
 @ViewChildren('appdynamicInputs')
 dynamicInputsComponents!: QueryList<dynamicInputs>;
+  @Input() connnectionInfo=[];
 
   constructor(
     injector: Injector,
@@ -40,11 +41,25 @@ dynamicInputsComponents!: QueryList<dynamicInputs>;
   }
 
   ngOnInit(): void {
-      this.stopFormListening = true;
+    this.stopFormListening = true;
+    this.getRelations();
+  }
+
+  getData() {
     this.getRelationshipSettingsData()
     this.getAppItemTypeExtraAttributesById()
   }
 
+  getRelations() {
+    //i49-get relations
+    const defaultId = this.connnectionInfo?.[0]?.id ?? this.relationId;
+    this.onRelationshipOptionChange(defaultId);
+  }
+
+  onRelationshipOptionChange(relationId: number) {
+    this.relationId = relationId;
+    this.getData();
+}
   getRelationshipSettingsData() {
     if(this.relationId){
       this._appEntitiesServiceProxy.getAppEntityForEdit(this.relationId, true).subscribe(result => {
@@ -307,8 +322,9 @@ dynamicInputsComponents!: QueryList<dynamicInputs>;
     appEntityDto.objectId = 2;
     appEntityDto.tenantId = this.appSession.tenantId;
     appEntityDto.code = this.dynamicInputsForViewDto.appEntity.code;
-    appEntityDto.name = this.dynamicInputsForViewDto.appEntity.name;
-  
+    appEntityDto.name = this.dynamicInputsForViewDto.appEntity.name
+      //i49-save relations values ??      appEntityDto.entityObjectTypeId= this.relationId
+
          this.dynamicInputsComponents.first.saveAll(appEntityDto);
 
   }
