@@ -1040,15 +1040,7 @@ margin-right: 6px;"></i>
                         <br /> -->
                     </div>
                     <div class="btns-replay"  *ngIf="messageCategoryFilter!=='MENTION'">
-                        <button (click)="
-                                    SendMessageModal.show(
-                                        messagesDetails[0].messages.id,
-                                        messagesDetails[0].messages.threadId,
-                                        false,
-                                        messagesDetails[0].messages
-                                            .mesasgeObjectType
-                                    )
-                                " class="ReplyBtn btn ">
+                        <button (click)="onReplyMessage($event)" class="ReplyBtn btn ">
                                 <i class="fa fa-reply"></i>
                             <span> {{ "Reply" | localize }}</span>
                         </button>
@@ -1242,15 +1234,7 @@ margin-right: 6px;"></i>
                     </div> -->
 
                     <div class="btns-replay"  *ngIf="messageCategoryFilter!=='MENTION'">
-                        <button (click)="
-                                    SendMessageModal.show(
-                                        messagesDetails[0].messages.id,
-                                        messagesDetails[0].messages.threadId,
-                                        false,
-                                        messagesDetails[0].messages
-                                            .mesasgeObjectType
-                                    )
-                                " class="ReplyBtn btn ">
+                        <button (click)="onReplyMessage($event)" class="ReplyBtn btn ">
                                 <i class="fa fa-reply"></i>
                             <span> {{ "Reply" | localize }}</span>
                         </button>
@@ -1543,15 +1527,7 @@ margin-right: 6px;"></i>
                    
 
                     <div class="btns-replay" *ngIf="messageCategoryFilter!=='MENTION'">
-                        <button (click)="
-                                    SendMessageModal.show(
-                                        messagesDetails[0].messages.id,
-                                        messagesDetails[0].messages.threadId,
-                                        false,
-                                        messagesDetails[0].messages
-                                            .mesasgeObjectType
-                                    )
-                                " class="ReplyBtn btn ">
+                        <button (click)="onReplyMessage($event)" class="ReplyBtn btn ">
                                 <i class="fa fa-reply"></i>
                             <span> {{ "Reply" | localize }}</span>
                         </button>
