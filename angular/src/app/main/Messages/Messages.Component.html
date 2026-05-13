@@ -1039,7 +1039,38 @@ margin-right: 6px;"></i>
                         <hr *ngIf="i != visibleMessages.length - 1" style="border: 1px solid #e7e8ef; opacity: 1" />
                         <br /> -->
                     </div>
-                
+                    <div class="btns-replay"  *ngIf="messageCategoryFilter!=='MENTION'">
+                        <button (click)="
+                                    SendMessageModal.show(
+                                        messagesDetails[0].messages.id,
+                                        messagesDetails[0].messages.threadId,
+                                        false,
+                                        messagesDetails[0].messages
+                                            .mesasgeObjectType
+                                    )
+                                " class="ReplyBtn btn ">
+                                <i class="fa fa-reply"></i>
+                            <span> {{ "Reply" | localize }}</span>
+                        </button>
+                        <button (click)="
+                                    SendMessageModal.show(
+                                        messagesDetails[0].messages.id,
+                                        messagesDetails[0].messages.threadId,
+                                        true
+                                    )
+                                " class="ForwardBtn btn ">
+                                <img src="assets/message/forward.svg" style="width: 25px" />
+                            <span style="padding-right: 5px">{{
+                                "Forward" | localize
+                                }}</span>
+                        </button>
+                    </div>
+                    <app-add-comment  [hidden]="messageCategoryFilter!=='MENTION'" 
+                    [cartStyle]="true"
+                    (saveDone)="newCommentAddedHandler($event)"
+                    [relatedEntityId]="messagesDetails[0]?.messages?.entityId"
+                    #AddCommentComponent>
+                </app-add-comment>
                     <!-- Expand & Collapse Buttons -->
                     <!-- <div *ngIf="messagesDetails.length > 2" class="d-flex justify-content-end">
                         <button class="btn expandBtn" (click)="toggleMessages()">
