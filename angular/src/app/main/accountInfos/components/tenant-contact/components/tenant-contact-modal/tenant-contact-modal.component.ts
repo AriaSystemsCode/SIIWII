@@ -1,4 +1,4 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, EventEmitter, Output, ViewChild } from '@angular/core';
 import {
   TenantContactMode,
   TenantContactType
@@ -13,6 +13,8 @@ export class TenantContactModalComponent {
 
   @ViewChild('tenantContactComponent') tenantContactComponent: any;
 
+      @Output("refreshAccounts") refreshAccounts: EventEmitter<boolean> = new EventEmitter<boolean>()
+  
   TenantContactMode = TenantContactMode;
   TenantContactType = TenantContactType;
 
@@ -23,6 +25,7 @@ export class TenantContactModalComponent {
 
   dialogStyle: any = {};
   lastMode: TenantContactMode;
+  
 
   ngOnInit(): void {
     this.setDialogStyle();
@@ -115,6 +118,8 @@ handleCancel(): void {
 
     setTimeout(() => {
       this.tenantContactComponent?.reloadViewData?.();
+      this.refreshAccounts.emit(true)
+
     });
   }
 

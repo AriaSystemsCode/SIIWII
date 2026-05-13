@@ -6,13 +6,19 @@ import {
 import {
 
   AccountsServiceProxy,
-  GetAccountForViewDto
+  GetAccountForViewDto,
+  MemberFilterTypeEnum
 } from '@shared/service-proxies/service-proxies';
 import { AppConsts } from '@shared/AppConsts';
 import { AppComponentBase } from '@shared/common/app-component-base';
 import { finalize } from 'rxjs';
 import { ImageObject } from '@app/main/accounts/account-shared/models/imageobject';
 import { TenantContactCreateEditComponent } from '../../components/tenant-contact-create-edit/tenant-contact-create-edit.component';
+import { MembersListComponent } from '@app/main/members-list/components/members-list/members-list.component';
+import { CreateOrEditMemberComponent } from '@app/main/teamMembers/components/create-or-edit-member/create-or-edit-member.component';
+import { ViewMemberProfileComponent } from '@app/main/teamMembers/components/view-member-profile/view-member-profile.component';
+import { ViewMemberProfileComponentInputsI } from '@app/main/teamMembers/models/view-member-profile-model';
+import { MembersListComponentInputsI } from '@app/main/members-list/models/member-list-component-interface';
 
 @Component({
   selector: 'app-tenant-contact',
@@ -21,6 +27,9 @@ import { TenantContactCreateEditComponent } from '../../components/tenant-contac
 })
 export class TenantContactComponent extends AppComponentBase implements OnInit {
   @ViewChild('tenantContactCreateEdit') tenantContactCreateEdit: TenantContactCreateEditComponent;
+@ViewChild('memberListComponent') memberListComponent: MembersListComponent;
+@ViewChild('createOrEditMember') createOrEditMember: CreateOrEditMemberComponent;
+@ViewChild('viewMemberProfile') viewMemberProfile: ViewMemberProfileComponent;
 
   @Input() mode: TenantContactMode;
   @Input() contactType: TenantContactType;
@@ -42,6 +51,9 @@ coverPhoto: string | null = null;
   isArabic: boolean
   activeTabIndex = 0;
   imageObject: ImageObject[] = [];
+      selectedMember: { memberId?: number; userId?: number } = {};
+
+
   constructor(injector: Injector, private _accountsServiceProxy: AccountsServiceProxy) {
     super(injector);
 
@@ -114,11 +126,16 @@ this.coverPhoto = this.accountData?.account?.coverUrl
 
           this.accountData.account.imagesUrls.forEach((img) => {
 
-            this.imageObject.push({
-              image: `${this.attachmentBaseUrl}/${img}`,
-              thumbImage: `${this.attachmentBaseUrl}/${img}`,
-              title: ''
-            });
+            // this.imageObject.push({
+            //   image: `${this.attachmentBaseUrl}/${img}`,
+            //   thumbImage: `${this.attachmentBaseUrl}/${img}`,
+            //   title: ''
+            // });
+            this.imageObject = (this.accountData?.account?.imagesUrls ?? []).map(img => ({
+  image: `${this.attachmentBaseUrl}/${img}`,
+  thumbImage: `${this.attachmentBaseUrl}/${img}`,
+  title: ''
+}));
 
           });
 
@@ -170,4 +187,86 @@ openWebsite(url: string): void {
     }
   }
 
+      // askToPublish(trueOrFalse) {
+      //     if (!trueOrFalse || this.accountLevel == AccountLevelEnum.Manual) return
+      //     this.canPublish = true;
+      //     this.displaySaveAccount = true
+      //     this.saving = false;
+      // }
+
+
+
+createOrEditMemberHandler(memberId?: number, userId?: number): void {
+  this.selectedMember = { memberId, userId };
+
+  const accountId = this.accountData?.account?.id || this.accountId;
+
+  // For tenant contact, this behaves like contact/manual style
+  const isManualOrExternalContact = true;
+
+  this.createOrEditMember?.show(
+    memberId,
+    accountId,
+    isManualOrExternalContact
+  );
+}
+
+viewMemberHandler(event: { memberId: number; userId?: number }): void {
+  const memberId = event?.memberId;
+  const userId = event?.userId;
+
+  if (!memberId) return;
+
+  const input: ViewMemberProfileComponentInputsI = {
+    id: memberId,
+    title: 'MemberProfile',
+    canDelete: true,
+    canEdit: true
+  };
+
+  const isManualOrExternalContact = !userId || userId == 0 as any;
+
+  this.viewMemberProfile?.show(input, isManualOrExternalContact);
+}
+
+reloadMembers(): void {
+  this.membersListLoaded = false;
+  this.loadMembersList(true);
+}
+
+private getMemberListInputs(): MembersListComponentInputsI {
+  return {
+    showMainFiltersOptions: true,
+    canAdd: true,
+    canView: true,
+    defaultMainFilter: MemberFilterTypeEnum.View,
+    pageMainFilters: [
+      { label: 'Contacts', value: MemberFilterTypeEnum.View }
+    ],
+    accountId: this.accountData?.account?.id || this.accountId,
+    title: 'Contacts'
+  };
+}
+membersListLoaded = false;
+
+openTab(index: number): void {
+  this.activeTabIndex = index;
+
+  if (index === 2) {
+    setTimeout(() => {
+      this.loadMembersList();
+    });
+  }
+}
+
+loadMembersList(forceReload: boolean = false): void {
+  if (!this.memberListComponent) return;
+
+  if (this.membersListLoaded && !forceReload) {
+    return;
+  }
+
+  this.memberListComponent.show(this.getMemberListInputs());
+  this.membersListLoaded = true;
+}
 }

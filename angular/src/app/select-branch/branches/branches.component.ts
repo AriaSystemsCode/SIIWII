@@ -10,6 +10,7 @@ import { Observable, Subscription } from 'rxjs';
 import { BranchDetailsDynamicModalComponent } from '../branch-details-dynamic-modal/branch-details-dynamic-modal.component';
 import { CreateOrEditBranchModalComponent } from '../create-or-edit-branch-modal/create-or-edit-branch-modal.component';
 
+
 @Component({
     selector: 'app-branches',
     templateUrl: './branches.component.html',

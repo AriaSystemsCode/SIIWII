@@ -72,29 +72,25 @@
 
 </div>
 
-     <ul class="sidebar-tabs d-none d-lg-block">
-  <li
-    [class.active]="activeTabIndex === 0"
-    (click)="activeTabIndex = 0"
-  >
+   <ul class="sidebar-tabs d-none d-lg-block">
+  <li [class.active]="activeTabIndex === 0" (click)="openTab(0)">
     <i class="far fa-user"></i>
     {{ 'AccountProfile' | localize }}
   </li>
 
-  <li
-    [class.active]="activeTabIndex === 1"
-    (click)="activeTabIndex = 1"
-  >
+<li [class.active]="activeTabIndex === 1" (click)="openTab(1)">
     <i class="fa fa-map-marker-alt"></i>
     {{ 'Branches/Addresses' | localize }}
   </li>
 
-  <li
-    [class.active]="activeTabIndex === 2"
-    (click)="activeTabIndex = 2"
-  >
-    <i class="far fa-address-book"></i>
-    {{ 'Contacts' | localize }}
+<li [class.active]="activeTabIndex === 2" (click)="openTab(2)">
+  <i class="far fa-address-book"></i>
+  {{ 'Contacts' | localize }}
+</li>
+
+  <li [class.active]="activeTabIndex === 3" (click)="openTab(3)">
+    <i class="fa fa-link"></i>
+    {{ 'RelationshipSettings' | localize }}
   </li>
 </ul>
     </div>
@@ -103,10 +99,11 @@
 <div class="tenant-contact-main">
 
   <!-- Tablet / Mobile PrimeNG tabs -->
-  <p-tabView
-    class="d-lg-none tenant-mobile-tabs"
-    [(activeIndex)]="activeTabIndex"
-  >
+<p-tabView
+  class="d-lg-none tenant-mobile-tabs"
+  [(activeIndex)]="activeTabIndex"
+  (onChange)="openTab($event.index)"
+>
     <p-tabPanel>
       <ng-template pTemplate="header">
         <i class="far fa-user mr-2"></i>
@@ -127,6 +124,13 @@
         <span>{{ 'Contacts' | localize }}</span>
       </ng-template>
     </p-tabPanel>
+
+    <p-tabPanel>
+  <ng-template pTemplate="header">
+    <i class="fa fa-link mr-2"></i>
+    <span>{{ 'RelationshipSettings' | localize }}</span>
+  </ng-template>
+</p-tabPanel>
   </p-tabView>
 
   <!-- Account Profile tab content -->
@@ -155,12 +159,36 @@
 
   <!-- Branches / Addresses tab content -->
   <ng-container *ngIf="activeTabIndex === 1">
-    Branches
+     <!-- (askToPublish)="askToPublish($event)" -->
+            <app-branches [branches]='accountData?.account?.branches' [accountId]='accountId'
+                                [viewMode]="mode === TenantContactMode.View"></app-branches>
   </ng-container>
 
   <!-- Contacts tab content -->
-  <ng-container *ngIf="activeTabIndex === 2">
-   contacts
+<ng-container *ngIf="activeTabIndex === 2">
+  <app-members-list
+    #memberListComponent
+    [accData]="accountData?.account"
+    (create)="createOrEditMemberHandler()"
+    (view)="viewMemberHandler($event)">
+  </app-members-list>
+
+  <app-create-or-edit-member
+    #createOrEditMember
+    (modalSave)="reloadMembers()">
+  </app-create-or-edit-member>
+
+  <app-view-member-profile
+    #viewMemberProfile
+    (edit)="createOrEditMemberHandler($event?.memberId, $event?.userId)">
+  </app-view-member-profile>
+</ng-container>
+
+
+    <ng-container *ngIf="activeTabIndex === 3">
+      <!-- <app-relationship-settings 
+                                [accountId]="accountId" >
+                            </app-relationship-settings> -->
   </ng-container>
 
 </div>

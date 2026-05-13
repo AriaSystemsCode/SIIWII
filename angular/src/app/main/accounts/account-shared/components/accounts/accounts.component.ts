@@ -545,5 +545,8 @@ openViewTenantContact(account: GetAccountForViewDto): void {
     accountId: account?.account?.id
   });
 }
-
+refresh(event){
+    if(event)
+        this.getAccounts()
+}
 }

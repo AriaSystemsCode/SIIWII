@@ -28,13 +28,11 @@ import { NgImageSliderModule } from 'ng-image-slider';
 import { TreeviewModule } from 'ngx-treeview';
 import { TreeModule } from 'primeng/tree';
 import { AccountInfosRoutingModule } from './accountInfos-routing.module';
-import { BranchDetailsDynamicModalComponent } from './components/branch-details-dynamic-modal/branch-details-dynamic-modal.component';
 import { AccountInfoComponent } from './components/accountInfo/accountInfo.component';
 import { AccountModule } from '@account/account.module';
-import { BranchesComponent } from './components/branches/branches.component';
 import { CreateEditExternalAccountComponent } from './components/create-edit-external-account/create-edit-external-account.component';
 import { CreateEditManualAccountComponent } from './components/create-edit-manual-account/create-edit-manual-account.component';
-import { CreateOrEditBranchModalComponent } from './components/create-or-edit-branch-modal/create-or-edit-branch-modal.component';
+// import { CreateOrEditBranchModalComponent } from '../../select-branch/create-or-edit-branch-modal/create-or-edit-branch-modal.component';
 import { CreateOrEditpaymentMethodComponent } from './components/create-or-edit-payment-method/create-or-edit-payment-method.component';
 import { PaymentMethodsListComponent } from './components/payment-methods-list/payment-methods-list.component';
 import { ViewOthersProfileComponent } from './components/view-others-profile/view-others-profile.component';
@@ -68,18 +66,17 @@ import { InputSwitchModule } from 'primeng/inputswitch';
 import { RelationshipSettingsComponent } from './components/relationship-settings/relationship-settings.component';
 import { SharedDynamicInputsModule } from '@shared/shared-module';
 import { AccordionModule } from "primeng/accordion";
-import { TenantContactModule } from './components/tenant-contact/tenant-contact.module';
+import { SelectBranchModule } from '@app/select-branch/select-branch.module';
+// import { TenantContactModule } from './components/tenant-contact/tenant-contact.module';
 
 @NgModule({
     declarations: [
         AccountInfoComponent,
-        CreateOrEditBranchModalComponent,
+        // CreateOrEditBranchModalComponent,
         PaymentMethodsListComponent,
         CreateOrEditpaymentMethodComponent,
         CreateEditExternalAccountComponent,
         CreateEditManualAccountComponent,
-        BranchesComponent,
-        BranchDetailsDynamicModalComponent,
         ViewOthersProfileComponent,
         ViewProfileComponent,
         AccountBillingComponent,
@@ -135,7 +132,8 @@ import { TenantContactModule } from './components/tenant-contact/tenant-contact.
         OverALLRatingReviewsModule,InputSwitchModule,
         SharedDynamicInputsModule,
         AccordionModule,
-        TenantContactModule
+        SelectBranchModule
+        
         
         
     ],

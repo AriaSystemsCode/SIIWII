@@ -58,6 +58,7 @@ import { TenantContactModule } from '@app/main/accountInfos/components/tenant-co
         FiltersSharedModule,
         DialogModule,
         TenantContactModule
+        
     ],
     providers: [
         { provide: BsDatepickerConfig, useFactory: NgxBootstrapDatePickerConfigService.getDatepickerConfig },

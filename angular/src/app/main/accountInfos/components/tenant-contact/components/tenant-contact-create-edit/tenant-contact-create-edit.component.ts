@@ -496,62 +496,137 @@ export class TenantContactCreateEditComponent
         return uploader;
     }
 
+    // imageBrowseDone(
+    //     event: ImageUploadComponentOutput,
+    //     type: 'LOGO' | 'BANNER' | 'IMAGE',
+    //     index: number
+    // ): void {
+    //     if (!event?.file) return;
+
+    //     this.ensureArrays();
+
+    //     const guid = this.guid();
+    //     const category = this.getCategoryByType(type);
+
+    //     if (!category?.id) {
+    //         this.message.warn(this.l('AttachmentCategoryNotLoaded'));
+    //         return;
+    //     }
+
+    //     this.setPreview(type, index, event.image);
+
+    //     this.upsertAttachment({
+    //         attachmentCategoryId: category.id,
+    //         attachmentCategoryCode: type,
+    //         fileName: event.file.name,
+    //         guid,
+    //         index
+    //     } as any);
+
+    //     this.uploader.addToQueue([event.file]);
+
+    //     this.uploader.onBuildItemForm = (_fileItem: any, form: any) => {
+    //         form.append('guid', guid);
+    //     };
+
+    //     this.uploader.onSuccessItem = (_item, response) => {
+    //         const ajaxResponse = JSON.parse(response || '{}') as IAjaxResponse;
+
+    //         if (!ajaxResponse?.success) {
+    //             this.message.error(ajaxResponse?.error?.message || this.l('UploadFailed'));
+    //             return;
+    //         }
+
+    //         const uploaded = ajaxResponse.result;
+    //         const current = this.accountInfoData.entityAttachments
+    //             .find((x: any) => x.guid === uploaded?.guid || x.guid === guid) as any;
+
+    //         if (current) {
+    //             current.id = uploaded?.id || current.id;
+    //             current.url = uploaded?.url || uploaded?.fileName || current.url;
+    //         }
+
+    //         this.notify.info(this.l('UploadSuccessfully'));
+    //     };
+
+    //     this.uploader.uploadAll();
+    //     this.changeTouchState();
+    // }
+
+
     imageBrowseDone(
-        event: ImageUploadComponentOutput,
-        type: 'LOGO' | 'BANNER' | 'IMAGE',
-        index: number
-    ): void {
-        if (!event?.file) return;
+  event: ImageUploadComponentOutput,
+  type: 'LOGO' | 'BANNER' | 'IMAGE',
+  index: number
+): void {
+  if (!event?.file) return;
 
-        this.ensureArrays();
+  this.ensureArrays();
 
-        const guid = this.guid();
-        const category = this.getCategoryByType(type);
+  const category = this.getCategoryByType(type);
 
-        if (!category?.id) {
-            this.message.warn(this.l('AttachmentCategoryNotLoaded'));
-            return;
-        }
+  if (!category?.id) {
+    this.message.warn(this.l('AttachmentCategoryNotLoaded'));
+    return;
+  }
 
-        this.setPreview(type, index, event.image);
+  const guid = this.guid();
 
-        this.upsertAttachment({
-            attachmentCategoryId: category.id,
-            attachmentCategoryCode: type,
-            fileName: event.file.name,
-            guid,
-            index
-        } as any);
+  this.setPreview(type, index, event.image);
 
-        this.uploader.addToQueue([event.file]);
+  const attachment: any = {
+    attachmentCategoryId: category.id,
+    attachmentCategoryCode: type,
+    fileName: event.file.name,
+    displayName: event.file.name,
+    guid,
+    index,
+    id: 0,
+    isDefault: false,
+    isPublic: false
+  };
 
-        this.uploader.onBuildItemForm = (_fileItem: any, form: any) => {
-            form.append('guid', guid);
-        };
+  this.upsertAttachment(attachment);
 
-        this.uploader.onSuccessItem = (_item, response) => {
-            const ajaxResponse = JSON.parse(response || '{}') as IAjaxResponse;
+  this.uploader.clearQueue();
+  this.uploader.addToQueue([event.file]);
 
-            if (!ajaxResponse?.success) {
-                this.message.error(ajaxResponse?.error?.message || this.l('UploadFailed'));
-                return;
-            }
+  this.uploader.onBuildItemForm = (_fileItem: any, form: any) => {
+    form.append('guid', guid);
+  };
 
-            const uploaded = ajaxResponse.result;
-            const current = this.accountInfoData.entityAttachments
-                .find((x: any) => x.guid === uploaded?.guid || x.guid === guid) as any;
+  this.uploader.onSuccessItem = (_item, response) => {
+    const ajaxResponse = JSON.parse(response || '{}') as IAjaxResponse;
 
-            if (current) {
-                current.id = uploaded?.id || current.id;
-                current.url = uploaded?.url || uploaded?.fileName || current.url;
-            }
-
-            this.notify.info(this.l('UploadSuccessfully'));
-        };
-
-        this.uploader.uploadAll();
-        this.changeTouchState();
+    if (!ajaxResponse?.success) {
+      this.message.error(ajaxResponse?.error?.message || this.l('UploadFailed'));
+      return;
     }
+
+    const uploaded = ajaxResponse.result;
+
+    const current = this.accountInfoData.entityAttachments.find(
+      (x: any) => x.guid === guid
+    ) as any;
+
+    if (current) {
+      current.id = uploaded?.id || current.id;
+      current.url = uploaded?.url || uploaded?.fileName || current.url;
+      current.fileName = uploaded?.fileName || current.fileName;
+      current.displayName = uploaded?.displayName || current.displayName;
+
+      current.attachmentCategoryId = category.id;
+      current.attachmentCategoryCode = type;
+      current.index = index;
+      current.guid = guid;
+    }
+
+    this.notify.info(this.l('UploadSuccessfully'));
+  };
+
+  this.uploader.uploadAll();
+  this.changeTouchState();
+}
 
     removeImage(type: 'LOGO' | 'BANNER' | 'IMAGE', index: number): void {
         this.setPreview(type, index, undefined);
@@ -588,22 +663,59 @@ export class TenantContactCreateEditComponent
         }
     }
 
+    // private upsertAttachment(attachment: any): void {
+    //     const index = attachment.index;
+
+    //     this.accountInfoData.entityAttachments =
+    //         this.accountInfoData.entityAttachments?.filter((x: any) => x.index !== index) ?? [];
+
+    //     const dto = AppEntityAttachmentDto.fromJS
+    //         ? AppEntityAttachmentDto.fromJS(attachment)
+    //         : new AppEntityAttachmentDto(attachment);
+
+    //     (dto as any).attachmentCategoryCode = attachment.attachmentCategoryCode;
+    //     (dto as any).index = attachment.index;
+    //     (dto as any).guid = attachment.guid;
+
+    //     this.accountInfoData.entityAttachments.push(dto);
+    // }
+
     private upsertAttachment(attachment: any): void {
-        const index = attachment.index;
+  this.accountInfoData.entityAttachments ??= [];
 
-        this.accountInfoData.entityAttachments =
-            this.accountInfoData.entityAttachments?.filter((x: any) => x.index !== index) ?? [];
+  const type = attachment.attachmentCategoryCode;
+  const index = attachment.index;
 
-        const dto = AppEntityAttachmentDto.fromJS
-            ? AppEntityAttachmentDto.fromJS(attachment)
-            : new AppEntityAttachmentDto(attachment);
+  this.accountInfoData.entityAttachments =
+    this.accountInfoData.entityAttachments.filter((x: any) => {
+      // replace old logo
+      if (type === 'LOGO') {
+        return x.attachmentCategoryCode !== 'LOGO'
+          && x.attachmentCategoryId !== this.sycAttachmentCategoryLogo?.id;
+      }
 
-        (dto as any).attachmentCategoryCode = attachment.attachmentCategoryCode;
-        (dto as any).index = attachment.index;
-        (dto as any).guid = attachment.guid;
+      // replace old cover/banner
+      if (type === 'BANNER') {
+        return x.attachmentCategoryCode !== 'BANNER'
+          && x.attachmentCategoryId !== this.sycAttachmentCategoryBanner?.id;
+      }
 
-        this.accountInfoData.entityAttachments.push(dto);
-    }
+      // replace only same image slot
+      if (type === 'IMAGE') {
+        return x.index !== index;
+      }
+
+      return true;
+    });
+
+  const dto = AppEntityAttachmentDto.fromJS(attachment);
+
+  (dto as any).attachmentCategoryCode = attachment.attachmentCategoryCode;
+  (dto as any).index = attachment.index;
+  (dto as any).guid = attachment.guid;
+
+  this.accountInfoData.entityAttachments.push(dto);
+}
 
     private normalizeDtoBeforeSave(): void {
         this.accountInfoData.entityAttachments =

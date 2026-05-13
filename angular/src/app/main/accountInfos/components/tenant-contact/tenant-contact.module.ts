@@ -34,6 +34,9 @@ import { TenantContactActivityPanelComponent } from './components/tenant-contact
 import { TenantContactAuditTrailComponent } from './components/tenant-contact-activity-panel/tenant-contact-audit-trail/tenant-contact-audit-trail.component';
 import { TenantContactMessagesComponent } from './components/tenant-contact-activity-panel/tenant-contact-messages/tenant-contact-messages.component';
 import { NotesModule } from "@app/admin/shared/notes/notes.module";
+import { SelectBranchModule } from "@app/select-branch/select-branch.module";
+import { MembersListSharedModule } from "@app/main/members-list/members-list-shared.module";
+import { MyMembersModule } from "@app/main/teamMembers/my-members.module";
 
 @NgModule({
   declarations: [
@@ -76,7 +79,11 @@ import { NotesModule } from "@app/admin/shared/notes/notes.module";
         SelectAddressModule,
         TabViewModule,
         InputSwitchModule,
-        NotesModule
+        NotesModule,
+        SelectBranchModule,
+        MembersListSharedModule,
+        MyMembersModule
+        
         
         
     // any needed PrimeNG/shared modules
