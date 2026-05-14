@@ -93,7 +93,7 @@ export class SendMessageModalComponent
     replyMessageId: number = 0;
     threadId: number = 0;
     attachmentsUploader: FileUploaderCustom;
-
+@Input() toUser: NameValueOfString;
     constructor(
         injector: Injector,
         private _tokenService: TokenService,
@@ -106,11 +106,13 @@ export class SendMessageModalComponent
     }
 
     ngOnInit(): void {
-        // const toNameArray: string[] = this.toName.split(',').map((name) => name.trim());
+     
         this.filterUsersFilterByEntity('')
     }
     ngOnChanges(changes: SimpleChanges): void {
-      
+       if (changes['toUser']?.currentValue) {
+    this.setToUser(changes['toUser'].currentValue);
+  }
     }
   
     mesasgeObjectType: MesasgeObjectType = MesasgeObjectType.Message
@@ -574,47 +576,106 @@ export class SendMessageModalComponent
     }
     
                // get Users related to entity
-               filterUsersFilterByEntity(event): void {
-                this._appEntitiesServiceProxy
-                    .getContactsToMention(this.entityId, event.query)
-                    .subscribe((users) => {
-                        this.filteredUsers = [];
-                        for (let i = 0; i < users.length; i++) {
-                            if (users[i]?.users?.value.toString() !== this.appSession.userId.toString()) {
-                                users[i].users = {
-                                    name: users[i].name + '@' + users[i].tenantName,
-                                    value: users[i].userId.toString()
-                                };
-                                this.filteredUsers.push(users[i].users);
-                            }
-                        }
+            //    filterUsersFilterByEntity(event): void {
+            //     this._appEntitiesServiceProxy
+            //         .getContactsToMention(this.entityId, event.query)
+            //         .subscribe((users) => {
+            //             this.filteredUsers = [];
+            //             for (let i = 0; i < users.length; i++) {
+            //                 if (users[i]?.users?.value.toString() !== this.appSession.userId.toString()) {
+            //                     users[i].users = {
+            //                         name: users[i].name + '@' + users[i].tenantName,
+            //                         value: users[i].userId.toString()
+            //                     };
+            //                     this.filteredUsers.push(users[i].users);
+            //                 }
+            //             }
             
-                        // Normalize names in toNameArray to match filteredUsers
-                        const toNameArray: string[] = this.toName
-                            .split(',')
-                            .map((name) => name.trim().replace(/\./g, ' ')); // Replace dots with spaces
+            //             // Normalize names in toNameArray to match filteredUsers
+            //             const toNameArray: string[] = this.toName
+            //                 .split(',')
+            //                 .map((name) => name.trim().replace(/\./g, ' ')); // Replace dots with spaces
             
-                        // // Set default selected users
-                        if(this.parentId){
-                            this.toUsers = this.filteredUsers.filter((user) =>
-                                toNameArray.some((name) => user.name.startsWith(name)) // Match name before '@'
+            //             // // Set default selected users
+            //             if(this.parentId){
+            //                 this.toUsers = this.filteredUsers.filter((user) =>
+            //                     toNameArray.some((name) => user.name.startsWith(name)) // Match name before '@'
 
-                            );
+            //                 );
 
 
-                            this._MessageServiceProxy
-                            .getMessagesForView(this.parentId)
-                            .subscribe((result) => {
+            //                 this._MessageServiceProxy
+            //                 .getMessagesForView(this.parentId)
+            //                 .subscribe((result) => {
                            
-                                this.subject = result[0].messages.subject;
-                            });
-                        }
+            //                     this.subject = result[0].messages.subject;
+            //                 });
+            //             }
                    
-            
-                        // Debugging logs
-                        // console.log('Filtered Users:', this.filteredUsers);
-                        // console.log('toNameArray:', toNameArray);
-                        // console.log('Default toUsers:', this.toUsers);
-                    });
-            }
+         
+            //         });
+            // }
+
+
+filterUsersFilterByEntity(event: any): void {
+  const query = typeof event === 'string' ? event : (event?.query || '');
+
+  this._appEntitiesServiceProxy
+    .getContactsToMention(this.entityId, query)
+    .subscribe((users) => {
+      this.filteredUsers = [];
+
+      for (let i = 0; i < users.length; i++) {
+        if (users[i]?.userId?.toString() !== this.appSession.userId.toString()) {
+          const user = new NameValueOfString();
+          user.name = users[i].name + '@' + users[i].tenantName;
+          user.value = users[i].userId.toString();
+
+          this.filteredUsers.push(user);
+        }
+      }
+
+      if (this.parentId && this.toUser?.value) {
+        const selectedSender = this.filteredUsers.find(
+          x => x.value === this.toUser.value.toString()
+        );
+
+        this.toUsers = selectedSender
+          ? [selectedSender]
+          : [this.toUser];
+      }
+
+      if (this.parentId) {
+        this._MessageServiceProxy
+          .getMessagesForView(this.parentId)
+          .subscribe((result) => {
+            this.subject = result?.[0]?.messages?.subject || '';
+          });
+      }
+
+      this.cdr.detectChanges();
+    });
+}
+    setToUser(user: any): void {
+  if (!user?.name || !user?.value) return;
+
+  const selectedUser = new NameValueOfString();
+  selectedUser.name = user.name;
+  selectedUser.value = user.value.toString();
+
+  this.toUsers = [selectedUser];
+
+  const exists = this.filteredUsers?.some(
+    x => x.value === selectedUser.value
+  );
+
+  if (!exists) {
+    this.filteredUsers = [
+      selectedUser,
+      ...(this.filteredUsers || [])
+    ];
+  }
+
+  this.cdr.detectChanges();
+}
 }

@@ -103,7 +103,10 @@
     [commentType]="commentType"
     [fromOverview]="true"
 
-    [toName]="comment?.messages?.toName"
+[toUser]="{
+  name: comment?.messages?.senderName,
+  value: comment?.messages?.senderId?.toString()
+}"
  
 
 >

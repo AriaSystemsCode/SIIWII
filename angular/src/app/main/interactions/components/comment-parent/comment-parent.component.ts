@@ -14,8 +14,8 @@ import { finalize } from '@node_modules/rxjs/dist/types';
 })
 export class CommentParentComponent extends AppComponentBase implements AfterViewInit{
     @ViewChild("AddCommentComponent") addCommentComponent: AddCommentComponent
-    @ViewChild("SendMessageModalComponent") SendMessageModalComponent: SendMessageModalComponent
-
+    // @ViewChild("SendMessageModalComponent") SendMessageModalComponent: SendMessageModalComponent
+@ViewChild("SendMessageModal") SendMessageModalComponent: SendMessageModalComponent;
     @Output() newCommentAdded : EventEmitter<any> = new EventEmitter<any>()
     @Output() refreshComments : EventEmitter<boolean> = new EventEmitter<boolean>()
     @Input() cartStyle: boolean;
@@ -23,7 +23,8 @@ export class CommentParentComponent extends AppComponentBase implements AfterVie
     @Input() commentType:any;
     @Input() fromTrans:boolean = false;
     
-    @Input() toName:string = '';
+    // @Input() toName:string = '';
+    @Input() toUser: any;
 
     active : boolean = true;
     showDirectMessageComp:boolean=false;
@@ -153,12 +154,21 @@ export class CommentParentComponent extends AppComponentBase implements AfterVie
         this.showDirectMessageComp=false;
 
     }
-    getName(event){
+//     getName(event){
       
- this.toName = event
- this.cdr.detectChanges();
-//  this.setToName(event)
-    }
+//  this.toName = event
+//  this.cdr.detectChanges();
+// //  this.setToName(event)
+//     }
+getName(event: any): void {
+  this.toUser = event;
+  this.cdr.detectChanges();
+
+  if (this.SendMessageModalComponent) {
+    this.SendMessageModalComponent.setToUser(event);
+  }
+}
+
     getReply(event){
         // this.addReplyScreen = event
         this.cdr.detectChanges();
