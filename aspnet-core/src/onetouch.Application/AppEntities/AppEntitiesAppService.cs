@@ -76,7 +76,10 @@ namespace onetouch.AppEntities
         private readonly IRepository<AppMarketplaceTransactionContacts, long> _appMarketplaceTransactionContactsRepository;
         private readonly IRepository<AppTransactionContacts, long> _appTransactionContactsRepository;
         //T-SII-20221013.0006,1 MMT 11/02/2022 Notify the destination tenant that another tenant connected to him[End]
-
+        //MMT 05-14-2026[Start]
+        private readonly IRepository<AppMarketplaceContacts.AppMarketplaceContact, long> _appMarketplaceContactsRepository;
+        private readonly IRepository<AppContactRelationshipInfo, long> _appContactRelationshipInfoRepository;
+        //MMT 05-14-2026[End]
         public AppEntitiesAppService(IRepository<AppEntity, long> appEntityRepository
             , IAppEntitiesExcelExporter appEntitiesExcelExporter
             , IRepository<SycEntityObjectType, long> lookup_sycEntityObjectTypeRepository
@@ -98,7 +101,9 @@ namespace onetouch.AppEntities
             IRepository<AppPost, long> appPostRepository, IProfileAppService iProfileAppService, IAppNotifier appNotifier
             , IRepository<AppEntityState, long> appEntityStateRepository, IRepository<AppMarketplaceTransactionContacts, long> appMarketplaceTransactionContactsRepository
             , IRepository<AppTransactionContacts, long> appTransactionContactsRepository,
-            ISycEntityObjectTypesAppService sycEntityObjectTypesAppService
+            ISycEntityObjectTypesAppService sycEntityObjectTypesAppService,
+            IRepository<AppMarketplaceContacts.AppMarketplaceContact, long> appMarketplaceContactsRepository,
+            IRepository<AppContactRelationshipInfo, long> appContactRelationshipInfoRepository
             )
         {
             _SycEntityObjectTypesAppService= sycEntityObjectTypesAppService;
@@ -129,6 +134,8 @@ namespace onetouch.AppEntities
             _appMarketplaceTransactionContactsRepository = appMarketplaceTransactionContactsRepository;
             _appTransactionContactsRepository = appTransactionContactsRepository;
             //T-SII-20221013.0006,1 MMT 11/02/2022 Notify the destination tenant that another tenant connected to him[End]
+            _appMarketplaceContactsRepository= appMarketplaceContactsRepository;
+            _appContactRelationshipInfoRepository = appContactRelationshipInfoRepository;
         }
 
         public async Task<PagedResultDto<GetAppEntityForViewDto>> GetAll(GetAllAppEntitiesInput input)
@@ -2216,70 +2223,135 @@ namespace onetouch.AppEntities
                         var presonEntityObjectTypeId = await _helper.SystemTables.GetEntityObjectTypePersonId();
 
                         var transactionContacts = _appTransactionContactsRepository.GetAll().Where(z => z.TransactionId == entityId && z.CompanySSIN != null && z.ContactSSIN!=null); //&& z.CompanySSIN !=null
+                        var transactionCompanies = transactionContacts.Select(z=>z.CompanySSIN).Distinct().ToList();
+                        //List<AppMarketplaceContacts.AppMarketplaceContact> members = new List<AppMarketplaceContacts.AppMarketplaceContact>();
+                        var activeRelationshipStatusId = await _helper.SystemTables.GetEntityObjectStatusRelationshipActive();
+                        var businessEntityObjectTypeId = await _helper.SystemTables.GetEntityObjectTypeParetnerId();
+                        if (transactionCompanies != null && transactionCompanies.Count > 0)
+                        {
+                            foreach (var company in transactionCompanies)
+                            { 
+                                var companyOnMarketplace = _appMarketplaceContactsRepository.GetAll()
+                                    .Where(z => z.SSIN == company && z.EntityObjectTypeId == businessEntityObjectTypeId)
+                                    .FirstOrDefault();
+                                if (companyOnMarketplace == null)
+                                    continue;
+
+                                var relatedMembers = 
+                                    _appContactRelationshipInfoRepository.GetAll()
+                                    .Where(s => s.RequesterContactSSIN == company && s.ConsiderAsTeamMember == true &&
+                                   s.RecipientContactTypeId== presonEntityObjectTypeId && s.EntityObjectStatusId == activeRelationshipStatusId)
+                                   .Select(s => s.RecipientContactSSIN).ToList();
+                                if (relatedMembers != null && relatedMembers.Count > 0)
+                                {
+                                    foreach (var member in relatedMembers)
+                                    {
+                                        //var marketplaceMember = _appMarketplaceContactsRepository.GetAll()
+                                          //  .Include(z => z.EntityExtraData.Where(z => z.AttributeId == 715)).Where(z => z.SSIN == member).FirstOrDefault();
+                                         var marketplaceMember = _appContactRepository.GetAll().Include(z=>z.EntityFk)
+                                                .ThenInclude(z => z.EntityExtraData.Where(z => z.AttributeId == 715)).Where(z =>z.TenantId==companyOnMarketplace.TenantOwner  && z.SSIN == member).FirstOrDefault();
+                                        if (marketplaceMember != null)
+                                        {
+                                            //members.Add(marketplaceMember);
+                                            if (marketplaceMember.EntityFk.EntityExtraData != null &&
+                                                marketplaceMember.EntityFk.EntityExtraData.Count > 0 &&
+                                                !string.IsNullOrEmpty(marketplaceMember.EntityFk.EntityExtraData.FirstOrDefault().AttributeValue) &&
+                                                long.Parse(marketplaceMember.EntityFk.EntityExtraData.FirstOrDefault().AttributeValue)!=0)
+                                            {
+                                                var user = UserManager.GetUserById(long.Parse(marketplaceMember.EntityFk.EntityExtraData.FirstOrDefault().AttributeValue));
+                                                if (user != null)
+                                                {
+                                                    //ContactRoleEnum role = (ContactRoleEnum)Enum.Parse(typeof(ContactRoleEnum), con.role);
+                                                    var tenantObj = TenantManager.GetById(int.Parse(user.TenantId.ToString()));
+                                                    if (outputList.FirstOrDefault(z => z.UserId == long.Parse(marketplaceMember.EntityFk.EntityExtraData.FirstOrDefault().AttributeValue)) == null)
+                                                    {
+                                                        outputList.Add(new ContactInformationOutputDto
+                                                        {
+                                                            Id = marketplaceMember.Id,
+                                                            Email = marketplaceMember.EMailAddress,
+                                                            Name = marketplaceMember.Name,
+                                                            UserId = long.Parse(marketplaceMember.EntityFk.EntityExtraData.FirstOrDefault().AttributeValue),
+                                                            UserImage = user != null && user.ProfilePictureId != null ? Guid.Parse(user.ProfilePictureId.ToString()) : null,
+                                                            UserName = user.UserName,
+                                                            TenantId = int.Parse(user.TenantId.ToString()),
+                                                            TenantName = tenantObj != null ? tenantObj.TenancyName : "SIIWII"
+                                                            // CanBeRemoved = (role == ContactRoleEnum.Creator || role == ContactRoleEnum.Seller || role == ContactRoleEnum.Buyer) ? false : true
+                                                        });
+                                                    }
+                                                }
+
+                                            }
+                                        }
+                                    }
+
+                                }
+                        }
+                            
+
 
                         /*var appEntities = _appEntityRepository.GetAll().Include(z => z.EntityExtraData.Where(s => s.AttributeId == 715))
                                   .Where(z => z.TenantId == null && z.EntityObjectTypeId == presonEntityObjectTypeId && z.TenantOwner != null);*/
 
-                        var contactsList = _appContactRepository.GetAll().Include(z => z.EntityFk).ThenInclude(z => z.EntityExtraData.Where(s => s.AttributeId == 715))
-                                  .Where(z => z.TenantId == AbpSession.TenantId && z.EntityFk.EntityObjectTypeId == presonEntityObjectTypeId);
+                        //var contactsList = _appContactRepository.GetAll().Include(z => z.EntityFk).ThenInclude(z => z.EntityExtraData.Where(s => s.AttributeId == 715))
+                                  //.Where(z => z.TenantId == AbpSession.TenantId && z.EntityFk.EntityObjectTypeId == presonEntityObjectTypeId);
 
 
-                        var contact = from t in transactionContacts
-                                      join
-                                      c in contactsList
-                                      on t.ContactSSIN equals c.SSIN into j
-                                      from e in j.DefaultIfEmpty()
-                                      select new { e.AccountId };
+                        //var contact = from t in transactionContacts
+                        //              join
+                        //              c in contactsList
+                        //              on t.ContactSSIN equals c.SSIN into j
+                        //              from e in j.DefaultIfEmpty()
+                        //              select new { e.AccountId };
 
-                        var transactionContactsList =await  contact.Distinct().ToListAsync();
+                        //var transactionContactsList =await  contact.Distinct().ToListAsync();
                         
                         /*var newContact = from x in contact
                                          join y in appEntities
                                          on x.contact.TenantOwner equals y.TenantOwner into j1
                                          from z in j1.DefaultIfEmpty()
                                          select new { contact = z };*/
-                        foreach (var acc in transactionContactsList)
-                        {
-                            var contacts = await _appContactRepository.GetAll().Include(z => z.EntityFk).ThenInclude(z => z.EntityExtraData.Where(s => s.AttributeId == 715))
-                                .Where(z => z.TenantId == AbpSession.TenantId &&  z.AccountId==acc.AccountId).ToListAsync();
+                        //foreach (var acc in transactionContactsList)
+                        //{
+                           // var contacts = await _appContactRepository.GetAll().Include(z => z.EntityFk).ThenInclude(z => z.EntityExtraData.Where(s => s.AttributeId == 715))
+                            //    .Where(z => z.TenantId == AbpSession.TenantId &&  z.AccountId==acc.AccountId).ToListAsync();
                             //await newContact.WhereIf(!string.IsNullOrEmpty(filter), z => z.contact.Name.Contains(filter)).OrderBy(z => z.contact.Id).ToListAsync();
 
-                            if (contacts != null && contacts.Count() > 0)
-                            {
+                           // if (contacts != null && contacts.Count() > 0)
+                           // {
 
-                                foreach (var con in contacts)
-                                {
-                                    if (con == null || con.EntityFk.EntityExtraData == null || con.EntityFk.EntityExtraData.Count == 0 || 
-                                        con.EntityFk.EntityExtraData.FirstOrDefault().AttributeValue == null)
+                               // foreach (var con in contacts)
+                               // {
+                                    //if (con == null || con.EntityFk.EntityExtraData == null || con.EntityFk.EntityExtraData.Count == 0 || 
+                                   //     con.EntityFk.EntityExtraData.FirstOrDefault().AttributeValue == null)
 
-                                        continue;
+                                     //   continue;
 
-                                    try
-                                    {
-                                        var user = UserManager.GetUserById(long.Parse(con.EntityFk.EntityExtraData.FirstOrDefault().AttributeValue));
-                                        if (user != null)
-                                        {
-                                            //ContactRoleEnum role = (ContactRoleEnum)Enum.Parse(typeof(ContactRoleEnum), con.role);
-                                            var tenantObj = TenantManager.GetById(int.Parse(user.TenantId.ToString()));
-                                            if (outputList.FirstOrDefault(z => z.UserId == long.Parse(con.EntityFk.EntityExtraData.FirstOrDefault().AttributeValue)) == null)
-                                                outputList.Add(new ContactInformationOutputDto
-                                                {
-                                                    Id = con.Id,
-                                                    Email = con.EMailAddress,
-                                                    Name = con.Name,
-                                                    UserId = long.Parse(con.EntityFk.EntityExtraData.FirstOrDefault().AttributeValue),
-                                                    UserImage = user != null && user.ProfilePictureId != null ? Guid.Parse(user.ProfilePictureId.ToString()) : null,
-                                                    UserName = user.UserName,
-                                                    TenantId = int.Parse(user.TenantId.ToString()),
-                                                    TenantName = tenantObj != null ? tenantObj.TenancyName : "SIIWII"
-                                                    // CanBeRemoved = (role == ContactRoleEnum.Creator || role == ContactRoleEnum.Seller || role == ContactRoleEnum.Buyer) ? false : true
-                                                });
+                                    //try
+                                    //{
+                                     //   var user = UserManager.GetUserById(long.Parse(con.EntityFk.EntityExtraData.FirstOrDefault().AttributeValue));
+                                        //if (user != null)
+                                        //{
+                                        //    //ContactRoleEnum role = (ContactRoleEnum)Enum.Parse(typeof(ContactRoleEnum), con.role);
+                                        //    var tenantObj = TenantManager.GetById(int.Parse(user.TenantId.ToString()));
+                                        //    if (outputList.FirstOrDefault(z => z.UserId == long.Parse(con.EntityFk.EntityExtraData.FirstOrDefault().AttributeValue)) == null)
+                                        //        outputList.Add(new ContactInformationOutputDto
+                                        //        {
+                                        //            Id = con.Id,
+                                        //            Email = con.EMailAddress,
+                                        //            Name = con.Name,
+                                        //            UserId = long.Parse(con.EntityFk.EntityExtraData.FirstOrDefault().AttributeValue),
+                                        //            UserImage = user != null && user.ProfilePictureId != null ? Guid.Parse(user.ProfilePictureId.ToString()) : null,
+                                        //            UserName = user.UserName,
+                                        //            TenantId = int.Parse(user.TenantId.ToString()),
+                                        //            TenantName = tenantObj != null ? tenantObj.TenancyName : "SIIWII"
+                                        //            // CanBeRemoved = (role == ContactRoleEnum.Creator || role == ContactRoleEnum.Seller || role == ContactRoleEnum.Buyer) ? false : true
+                                        //        });
 
-                                        }
-                                    }
-                                    catch { }
-                                }
-                            }
+                                        //}
+                                   // }
+                                   // catch { }
+                                //}
+                           // }
                         }
                     }
                 }
