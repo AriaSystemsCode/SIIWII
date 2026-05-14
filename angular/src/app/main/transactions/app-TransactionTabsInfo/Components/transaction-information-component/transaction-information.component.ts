@@ -1351,7 +1351,7 @@ waitForOrderConfirmationUrlPromise(): Promise<string> {
         reject('Timeout waiting for report');
       }
 
-    }, 2000);
+    }, 5000);
   });
 }
   onShareTransaction() {
