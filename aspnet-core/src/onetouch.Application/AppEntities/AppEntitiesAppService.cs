@@ -1,4 +1,4 @@
-﻿using onetouch.SystemObjects;
+using onetouch.SystemObjects;
 using System.Collections.Generic;
 using System;
 using System.Linq;
@@ -471,7 +471,7 @@ namespace onetouch.AppEntities
         }
 
         [AbpAuthorize(AppPermissions.Pages_AppEntities_Edit)]
-        public async Task<GetAppEntityForEditOutput> GetAppEntityForEdit(EntityDto<long> input)
+        public async Task<GetAppEntityForEditOutput> GetAppEntityForEdit(EntityDto<long> input, bool ignoreTenantId = false)
         {
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
             {
@@ -480,7 +480,7 @@ namespace onetouch.AppEntities
                 .Include(x => x.EntityAttachments)
                 .ThenInclude(x => x.AttachmentFk)
                 .Include(x => x.EntityAddresses).ThenInclude(x => x.AddressFk)
-                .FirstOrDefaultAsync(x => x.Id == input.Id && (x.TenantId == AbpSession.TenantId || x.TenantId == null));
+                .FirstOrDefaultAsync(x => x.Id == input.Id && (ignoreTenantId || x.TenantId == AbpSession.TenantId || x.TenantId == null));
 
                 var output = new GetAppEntityForEditOutput { AppEntity = ObjectMapper.Map<CreateOrEditAppEntityDto>(appEntity) };
                

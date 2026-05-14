@@ -6961,14 +6961,19 @@ export class AppEntitiesServiceProxy {
 
     /**
      * @param id (optional) 
+     * @param ignoreTenantId (optional) 
      * @return Success
      */
-    getAppEntityForEdit(id: number | undefined): Observable<GetAppEntityForEditOutput> {
+    getAppEntityForEdit(id: number | undefined, ignoreTenantId: boolean | undefined = false): Observable<GetAppEntityForEditOutput> {
         let url_ = this.baseUrl + "/api/services/app/AppEntities/GetAppEntityForEdit?";
         if (id === null)
             throw new Error("The parameter 'id' cannot be null.");
         else if (id !== undefined)
             url_ += "Id=" + encodeURIComponent("" + id) + "&";
+        if (ignoreTenantId === null)
+            throw new Error("The parameter 'ignoreTenantId' cannot be null.");
+        else if (ignoreTenantId !== undefined)
+            url_ += "ignoreTenantId=" + encodeURIComponent("" + ignoreTenantId) + "&";
         url_ = url_.replace(/[?&]$/, "");
 
         let options_ : any = {
@@ -30310,6 +30315,67 @@ export class AppTransactionServiceProxy {
                 result200 = [] as any;
                 for (let item of resultData200)
                     result200!.push(AppContactRelationshipInfoDto.fromJS(item));
+            }
+            else {
+                result200 = <any>null;
+            }
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param searchFilter (optional) 
+     * @return Success
+     */
+    getContactsList(searchFilter: string | null | undefined): Observable<ContactInfoDto[]> {
+        let url_ = this.baseUrl + "/api/services/app/AppTransaction/GetContactsList?";
+        if (searchFilter !== undefined && searchFilter !== null)
+            url_ += "searchFilter=" + encodeURIComponent("" + searchFilter) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetContactsList(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetContactsList(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<ContactInfoDto[]>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<ContactInfoDto[]>;
+        }));
+    }
+
+    protected processGetContactsList(response: HttpResponseBase): Observable<ContactInfoDto[]> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            if (Array.isArray(resultData200)) {
+                result200 = [] as any;
+                for (let item of resultData200)
+                    result200!.push(ContactInfoDto.fromJS(item));
             }
             else {
                 result200 = <any>null;
@@ -93991,6 +94057,8 @@ export class TransactionSharingDto implements ITransactionSharingDto {
     sharedUserName!: string | undefined;
     sharedUserSureName!: string | undefined;
     sharedUserTenantName!: string | undefined;
+    contactSSIN!: string | undefined;
+    companySSIN!: string | undefined;
     id!: number;
 
     [key: string]: any;
@@ -94016,6 +94084,8 @@ export class TransactionSharingDto implements ITransactionSharingDto {
             this.sharedUserName = _data["sharedUserName"];
             this.sharedUserSureName = _data["sharedUserSureName"];
             this.sharedUserTenantName = _data["sharedUserTenantName"];
+            this.contactSSIN = _data["contactSSIN"];
+            this.companySSIN = _data["companySSIN"];
             this.id = _data["id"];
         }
     }
@@ -94039,6 +94109,8 @@ export class TransactionSharingDto implements ITransactionSharingDto {
         data["sharedUserName"] = this.sharedUserName;
         data["sharedUserSureName"] = this.sharedUserSureName;
         data["sharedUserTenantName"] = this.sharedUserTenantName;
+        data["contactSSIN"] = this.contactSSIN;
+        data["companySSIN"] = this.companySSIN;
         data["id"] = this.id;
         return data;
     }
@@ -94051,6 +94123,8 @@ export interface ITransactionSharingDto {
     sharedUserName: string | undefined;
     sharedUserSureName: string | undefined;
     sharedUserTenantName: string | undefined;
+    contactSSIN: string | undefined;
+    companySSIN: string | undefined;
     id: number;
 
     [key: string]: any;
@@ -94632,6 +94706,66 @@ export interface IAppContactRelationshipInfoDto {
     recipientContactTypeCode: string | undefined;
     requesterMarketplaceRole: string | undefined;
     recipientMarketplaceRole: string | undefined;
+
+    [key: string]: any;
+}
+
+export class ContactInfoDto implements IContactInfoDto {
+    contactSSIN!: string | undefined;
+    companySSIN!: string | undefined;
+    userName!: string | undefined;
+    tenantId!: number;
+
+    [key: string]: any;
+
+    constructor(data?: IContactInfoDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.contactSSIN = _data["contactSSIN"];
+            this.companySSIN = _data["companySSIN"];
+            this.userName = _data["userName"];
+            this.tenantId = _data["tenantId"];
+        }
+    }
+
+    static fromJS(data: any): ContactInfoDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new ContactInfoDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["contactSSIN"] = this.contactSSIN;
+        data["companySSIN"] = this.companySSIN;
+        data["userName"] = this.userName;
+        data["tenantId"] = this.tenantId;
+        return data;
+    }
+}
+
+export interface IContactInfoDto {
+    contactSSIN: string | undefined;
+    companySSIN: string | undefined;
+    userName: string | undefined;
+    tenantId: number;
 
     [key: string]: any;
 }

@@ -145,6 +145,7 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit {
     roles:any
             selectedRoles!: any[];
             roleSeller:boolean = false;
+            connnectionInfo=[];
     constructor(
         injector: Injector,
         private _route: ActivatedRoute,
@@ -479,6 +480,7 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit {
                 )
             this.accData = JSON.parse(JSON.stringify(result));
         this.relationId = result.relationId ? result.relationId : 0
+        this.connnectionInfo=result.connnectionInfo ? result.connnectionInfo : []
         this.entityExtraData = result ? result.entityExtraData : undefined
 
         }
@@ -519,6 +521,7 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit {
         this.accountDataForView = result ? result.account : undefined
         this.entityExtraData = result ? result.entityExtraData : undefined
         this.relationId = result.relationId ? result.relationId : 0
+        this.connnectionInfo= result.connnectionInfo ? result.connnectionInfo : []
         this.accountContactForView = result ? result.contact : undefined
         this.isRecordOwner = this.accountDataForView?.id == this.appSession.user?.accountId ? true : false
         if (this.accountDataForView.logoUrl) this.companyLogo = `${this.attachmentBaseUrl}/${this.accountDataForView.logoUrl}`;

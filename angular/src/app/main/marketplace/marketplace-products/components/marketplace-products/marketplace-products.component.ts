@@ -165,7 +165,7 @@ export class MarketplaceProductsComponent
         const savedFilters = localStorage.getItem("productFilters");
         if (savedFilters) {
           const parsedFilters = JSON.parse(savedFilters);
-          this.onlyAvialbleStock = parsedFilters.onlyAvailableStock ?? null;
+          this.onlyAvialbleStock = parsedFilters.onlyAvailableStock ?? undefined;
           this.selectedCurrrency = parsedFilters.selectedCurrency ?? this.selectedCurrrency;
           this.selectedSort = this.sortingData.find(s => s.value === parsedFilters.selectedSort) ?? this.selectedSort;
       
@@ -302,7 +302,7 @@ export class MarketplaceProductsComponent
             minimumPrice: this.minimumPrice || null,
             maximumPrice: this.maximumPrice || null,
             selectedOption: this.seletedOption?.value ?? 2,
-            onlyAvailableStock: this.onlyAvialbleStock ?? null,
+            onlyAvailableStock: this.onlyAvialbleStock ?? undefined,
             startSoldOutData: this.startSoldOutData || null,
             endSoldOutData: this.endSoldOutData || null,
             startShipData: this.startShipData || null,
