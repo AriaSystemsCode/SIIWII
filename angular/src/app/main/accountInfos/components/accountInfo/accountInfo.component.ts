@@ -397,8 +397,12 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit {
             .subscribe(result => {
                 const list = result ?? [];
 
-                const business = list.find(x => x.label === 'Business'); // x is scoped here
-                this.accountTypes = business ? [business] : [];
+                // const business = list.find(x => x.label === 'Business'); // x is scoped here
+                // this.accountTypes = business ? [business] : [];
+
+      this.accountTypes = list.filter(x =>
+        x?.code === 'BUSINESS' || x?.code === 'PERSONAL'
+      );
 
 
 
