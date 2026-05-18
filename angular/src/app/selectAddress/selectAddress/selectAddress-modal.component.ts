@@ -1,5 +1,5 @@
 ﻿import { Component, ViewChild, Injector, Output, EventEmitter } from '@angular/core';
-import { ModalDirective } from 'ngx-bootstrap/modal';
+// import { ModalDirective } from 'ngx-bootstrap/modal';
 import {
     AccountsServiceProxy,
     AppEntitiesServiceProxy,
@@ -7,6 +7,7 @@ import {
 } from '@shared/service-proxies/service-proxies';
 import { AppComponentBase } from '@shared/common/app-component-base';
 import { HttpErrorResponse } from '@angular/common/http';
+import { BsModalRef } from 'ngx-bootstrap/modal';
 
 @Component({
     selector: 'selectAddressModal',
@@ -15,15 +16,15 @@ import { HttpErrorResponse } from '@angular/common/http';
 })
 export class SelectAddressModalComponent extends AppComponentBase {
 
-    @ViewChild('selectAddressModal', { static: true }) modal: ModalDirective;
+    // @ViewChild('selectAddressModal', { static: true }) modal: ModalDirective;
 
     @Output() addressSelected: EventEmitter<any> = new EventEmitter<any>();
     @Output() addNewAddress: EventEmitter<any> = new EventEmitter<any>();
     @Output() editAddress: EventEmitter<any> = new EventEmitter<any>();
     @Output() addressSelectionCanceled: EventEmitter<any> = new EventEmitter<any>();
 
-    addresses: AppAddressDto[];
-    filteredAddresses: AppAddressDto[];
+    addresses: AppAddressDto[] =[];
+    filteredAddresses: AppAddressDto[] =[];
     selectedAddress: AppAddressDto;
 
     active = false;
@@ -38,30 +39,63 @@ export class SelectAddressModalComponent extends AppComponentBase {
         edit: "fas fa-4x text-danger fa-pencil",
         delete: "assets/profile/DeleteAddress.svg"
     }
+   
+    branch: any;
+accountId: number;
     constructor(
         injector: Injector,
         private _accountsServiceProxy: AccountsServiceProxy,
+          public currentModalRef: BsModalRef,
     ) {
 
         super(injector);
         this.busy = true;
 
     }
+    ngOnInit(): void {
+  this.show(this.branch, this.accountId);
+}
 
-    show(branch: any, accountId: number): void {
-        this.branchId = branch?.node?.data?.branch?.id
-        this.spinnerService.show();
+    // show(branch: any, accountId: number): void {
+    //     this.branchId = branch?.node?.data?.branch?.id
+    //     this.spinnerService.show();
 
-        this._accountsServiceProxy.getAllAccountAddresses(accountId).subscribe(result => {
-            this.addresses = result;
-            this.filteredAddresses = this.addresses;
+    //     this._accountsServiceProxy.getAllAccountAddresses(accountId).subscribe(result => {
+    //         this.addresses = result;
+    //         this.filteredAddresses = this.addresses;
 
-            this.spinnerService.hide();
-            this.active = true;
-            this.modal.show();
-        });
+    //         this.spinnerService.hide();
+    //         // this.active = true;
+    //         // this.modal.show();
+    //         this.active = true;
+    //         this.visible = true;
+    //     });
 
-    }
+    // }
+//     show(branch: any, accountId: number): void {
+//   this.branchId = branch?.node?.data?.branch?.id;
+//   this.spinnerService.show();
+
+//   this._accountsServiceProxy.getAllAccountAddresses(accountId).subscribe(result => {
+//     this.addresses = result;
+//     this.filteredAddresses = this.addresses;
+
+//     this.spinnerService.hide();
+//     this.active = true;
+//   });
+// }
+show(branch: any, accountId: number): void {
+  this.branchId = branch?.node?.data?.branch?.id;
+  this.spinnerService.show();
+
+  this._accountsServiceProxy.getAllAccountAddresses(accountId).subscribe(result => {
+    this.addresses = result || [];
+    this.filteredAddresses = [...this.addresses];
+
+    this.spinnerService.hide();
+    this.active = true;
+  });
+}
 
     filterItems(arr, query) {
 
@@ -108,46 +142,74 @@ export class SelectAddressModalComponent extends AppComponentBase {
         this.editAddress.emit(addressId);
     }
 
-    addressAdded(address: AppAddressDto) {
+    // addressAdded(address: AppAddressDto) {
 
-        this.active = true;
-        this.modal.show();
+    //     // this.active = true;
+    //     // this.modal.show();
+    //     this.active = true;
 
-        let x: AppAddressDto = new AppAddressDto();
 
-        x.id = address.id;
-        x.code = address.code;
-        x.name = address.name;
-        x.addressLine1 = address.addressLine1;
-        x.addressLine2 = address.addressLine2;
-        x.city = address.city;
-        x.state = address.state;
-        x.postalCode = address.postalCode;
-        x.countryId = address.countryId;
-        x.countryIdName = address.countryIdName;
+    //     let x: AppAddressDto = new AppAddressDto();
 
-        this.addresses.push(x);
-    }
+    //     x.id = address.id;
+    //     x.code = address.code;
+    //     x.name = address.name;
+    //     x.addressLine1 = address.addressLine1;
+    //     x.addressLine2 = address.addressLine2;
+    //     x.city = address.city;
+    //     x.state = address.state;
+    //     x.postalCode = address.postalCode;
+    //     x.countryId = address.countryId;
+    //     x.countryIdName = address.countryIdName;
 
-    addressUpdated(address: AppAddressDto) {
+    //     this.addresses.push(x);
+    // }
+    addressAdded(address: AppAddressDto): void {
+  this.active = true;
 
-        this.active = true;
-        this.modal.show();
+  this.addresses = this.addresses || [];
+  this.filteredAddresses = this.filteredAddresses || [];
 
-        let x = this.addresses.find(x => x.id == address.id)
+  const x = Object.assign(new AppAddressDto(), address);
 
-        x.id = address.id;
-        x.code = address.code;
-        x.name = address.name;
-        x.addressLine1 = address.addressLine1;
-        x.addressLine2 = address.addressLine2;
-        x.city = address.city;
-        x.state = address.state;
-        x.postalCode = address.postalCode;
-        x.countryId = address.countryId;
-        x.countryIdName = address.countryIdName;
+  this.addresses.unshift(x);
+  this.filteredAddresses = [...this.addresses];
+}
 
-    }
+    // addressUpdated(address: AppAddressDto) {
+
+    //     this.active = true;
+    //     // this.modal.show();
+    //     // this.active = true;
+
+
+    //     let x = this.addresses.find(x => x.id == address.id)
+
+    //     x.id = address.id;
+    //     x.code = address.code;
+    //     x.name = address.name;
+    //     x.addressLine1 = address.addressLine1;
+    //     x.addressLine2 = address.addressLine2;
+    //     x.city = address.city;
+    //     x.state = address.state;
+    //     x.postalCode = address.postalCode;
+    //     x.countryId = address.countryId;
+    //     x.countryIdName = address.countryIdName;
+
+    // }
+    addressUpdated(address: AppAddressDto): void {
+  this.active = true;
+
+  this.addresses = this.addresses || [];
+
+  const index = this.addresses.findIndex(x => x.id === address.id);
+
+  if (index >= 0) {
+    this.addresses[index] = Object.assign(new AppAddressDto(), address);
+  }
+
+  this.filteredAddresses = [...this.addresses];
+}
 
     checkAddresUsageCount(address: AppAddressDto, branchId: number) {
         return new Promise((resolve, reject) => {
@@ -218,10 +280,16 @@ export class SelectAddressModalComponent extends AppComponentBase {
         this.displayConfirmModal = true;
     }
 
+    // close(): void {
+    //     this.active = false;
+    //     // this.modal.hide();
+    //     this.visible = false;
+    // }
     close(): void {
-        this.active = false;
-        this.modal.hide();
-    }
+  this.active = false;
+  this.currentModalRef.setClass('right-modal slide-right-out');
+  this.currentModalRef.hide();
+}
     cancel() {
         this.addressSelectionCanceled.emit()
         this.close()

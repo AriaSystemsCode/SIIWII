@@ -1,5 +1,5 @@
 ﻿import { Component, ViewChild, Injector, Output, EventEmitter } from '@angular/core';
-import { ModalDirective } from 'ngx-bootstrap/modal';
+// import { ModalDirective } from 'ngx-bootstrap/modal';
 import { finalize } from 'rxjs/operators';
 import {
     AccountsServiceProxy,
@@ -8,7 +8,7 @@ import {
     AppAddressDto
 } from '@shared/service-proxies/service-proxies';
 import { AppComponentBase } from '@shared/common/app-component-base';
-
+import { BsModalRef } from 'ngx-bootstrap/modal';
 
 @Component({
     selector: 'createOrEditAddressModal',
@@ -17,7 +17,7 @@ import { AppComponentBase } from '@shared/common/app-component-base';
 })
 export class CreateOrEditAddressModalComponent extends AppComponentBase {
 
-    @ViewChild('createOrEditModal', { static: true }) modal: ModalDirective;
+    // @ViewChild('createOrEditModal', { static: true }) modal: ModalDirective;
 
     @Output() addressAdded: EventEmitter<any> = new EventEmitter<any>();
     @Output() addressUpdated: EventEmitter<any> = new EventEmitter<any>();
@@ -33,14 +33,21 @@ export class CreateOrEditAddressModalComponent extends AppComponentBase {
     branchId: number
     entityObjectType: string = "ADDRESS";
     addressCode: string = "";
+    addressId?: number;
+branch?: any;
+accountId?: number;
     constructor(
         injector: Injector,
         private _accountsServiceProxy: AccountsServiceProxy,
         private _AppEntitiesServiceProxy: AppEntitiesServiceProxy,
+        public currentModalRef: BsModalRef,
     ) {
         super(injector);
 
     }
+    ngOnInit(): void {
+  this.show(this.addressId, this.branch, this.accountId);
+}
     show(addressId?: number, branch?: any, accountId?: number): void {
         this.branchId = branch?.node?.data?.branch?.id
 
@@ -48,7 +55,7 @@ export class CreateOrEditAddressModalComponent extends AppComponentBase {
             this.address = new AppAddressDto();
             this.address.accountId = accountId
             this.active = true;
-            this.modal.show();
+            // this.modal.show();
         } else {
             this._accountsServiceProxy.getAddressForEdit(addressId).subscribe(result => {
                 this.address = result;
@@ -58,7 +65,7 @@ export class CreateOrEditAddressModalComponent extends AppComponentBase {
                 else
                     this.addressCode = this.address.code
                 this.active = true;
-                this.modal.show();
+                // this.modal.show();
             });
         }
 
@@ -104,11 +111,15 @@ export class CreateOrEditAddressModalComponent extends AppComponentBase {
       }
       
 
-    close(): void {
-        this.active = false;
-        this.modal.hide();
-    }
-
+    // close(): void {
+    //     this.active = false;
+    //     this.modal.hide();
+    // }
+close(): void {
+  this.active = false;
+  this.currentModalRef.setClass('right-modal slide-right-out');
+  this.currentModalRef.hide();
+}
     cancel() {
         this.close()
         this.createOrEditaddressCanceled.emit()

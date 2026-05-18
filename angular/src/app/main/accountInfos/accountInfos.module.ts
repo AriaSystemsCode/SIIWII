@@ -63,7 +63,7 @@ import { MediaTabComponent } from './components/marketplace-account-profile-view
 import { AccountBillingComponent } from './components/accountBilling/accountBilling/accountbilling.component';
 import { OverALLRatingReviewsModule } from '../overallRating-reviews/overallRating-reviews.module';
 import { InputSwitchModule } from 'primeng/inputswitch';
-import { RelationshipSettingsComponent } from './components/relationship-settings/relationship-settings.component';
+// import { RelationshipSettingsComponent } from '../teamMembers/relationship-settings/relationship-settings.component';
 import { SharedDynamicInputsModule } from '@shared/shared-module';
 import { AccordionModule } from "primeng/accordion";
 import { SelectBranchModule } from '@app/select-branch/select-branch.module';
@@ -87,7 +87,7 @@ import { SelectBranchModule } from '@app/select-branch/select-branch.module';
         MarketplaceAccountProfileComponent,
         OverviewTabComponent,EventsTabComponent,ConnectionsTabComponent, PostsTabComponent, ConnectionsCardComponent,
         MediaTabComponent,
-        RelationshipSettingsComponent,
+        // RelationshipSettingsComponent,
     ],
     imports: [
         CommonModule,

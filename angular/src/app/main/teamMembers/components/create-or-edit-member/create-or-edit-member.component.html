@@ -1,8 +1,8 @@
 
 <div [@routerTransition] class="wrapper" >
     <div class="kt-content kt-grid__item kt-grid__item--fluid kt-grid kt-grid--hor pb-0">
-        <div class="kt-subheader kt-grid__item" *ngIf="active">
-            <div [class]="containerClass">
+        <div class="kt-subheader kt-grid__item" *ngIf="active && showHeader">
+            <div  [class]="containerClass">
                 <div class="kt-subheader__main">
                     <h6 class="kt-subheader__title">
                         <span>{{ isManualOrExternalContact ? l("ManualContact") : l("TeamMember")  }}</span>
@@ -328,11 +328,18 @@
               </p-accordion> -->
         </div>
 
+
+        <div *ngIf="!showHeader" class="d-flex justify-content-between m-2">
+    <button  type="submit" class="btn btn-save btn-1bc5bd w-auto ml-4" (click)="SaveMember()"
+                            [disabled]="!memberForm.form.valid && !memberDto?.parentId">
+                            <span>{{l("SaveChanges")}}</span>
+                        </button>
+        </div>
     </div>
 </div>
 
-<selectBranchModal
+<!-- <selectBranchModal
     #selectBranchModal
     (branchSelected)="branchSelected($event)"
     (branchSelectionCanceled)="branchSelectionCanceled()"
-></selectBranchModal>
+></selectBranchModal> -->

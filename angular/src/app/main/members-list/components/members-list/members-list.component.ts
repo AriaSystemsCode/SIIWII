@@ -18,6 +18,7 @@ export class MembersListComponent extends AppComponentBase {
     @Output() create: EventEmitter<number> = new EventEmitter<number>()
     @Output() view: EventEmitter<{ memberId: number, userId: number }> = new EventEmitter<{ memberId: number, userId: number }>()
     @Input() accData:  GetAccountForViewDto;
+    @Input() showHeader:  boolean = true;
 
     singleItemPerRowMode: boolean = false
     MemberFilterTypeEnum = MemberFilterTypeEnum
@@ -207,4 +208,21 @@ export class MembersListComponent extends AppComponentBase {
         this.filterForm.reset()
         this.members = []
     }
+
+    getFirstRecordNumber(): number {
+  if (!this.primengTableHelper.totalRecordsCount) {
+    return 0;
+  }
+
+  return (this.paginator?.getPage() || 0) *
+    (this.paginator?.rows || this.primengTableHelper.defaultRecordsCountPerPage) + 1;
+}
+
+getLastRecordNumber(): number {
+  const first =
+    (this.paginator?.getPage() || 0) *
+    (this.paginator?.rows || this.primengTableHelper.defaultRecordsCountPerPage);
+
+  return first + (this.members?.length || 0);
+}
 }

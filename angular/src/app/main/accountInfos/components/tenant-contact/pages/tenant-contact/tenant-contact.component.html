@@ -88,7 +88,7 @@
   {{ 'Contacts' | localize }}
 </li>
 
-  <li [class.active]="activeTabIndex === 3" (click)="openTab(3)">
+  <li [class.active]="activeTabIndex === 3" (click)="openTab(3)"  *ngIf="relationId && relationId>0 && roleSeller">
     <i class="fa fa-link"></i>
     {{ 'RelationshipSettings' | localize }}
   </li>
@@ -125,7 +125,7 @@
       </ng-template>
     </p-tabPanel>
 
-    <p-tabPanel>
+    <p-tabPanel  *ngIf="relationId && relationId>0 && roleSeller">
   <ng-template pTemplate="header">
     <i class="fa fa-link mr-2"></i>
     <span>{{ 'RelationshipSettings' | localize }}</span>
@@ -160,35 +160,44 @@
   <!-- Branches / Addresses tab content -->
   <ng-container *ngIf="activeTabIndex === 1">
      <!-- (askToPublish)="askToPublish($event)" -->
-            <app-branches [branches]='accountData?.account?.branches' [accountId]='accountId'
-                                [viewMode]="mode === TenantContactMode.View"></app-branches>
+            <app-branches [branches]='accountData?.account?.branches' [accountId]='accountId' [viewMode]="contactType == TenantContactType.Connected"
+                             ></app-branches>
   </ng-container>
 
   <!-- Contacts tab content -->
 <ng-container *ngIf="activeTabIndex === 2">
+
   <app-members-list
     #memberListComponent
+    *ngIf="contactsViewMode === 'list'"
     [accData]="accountData?.account"
+    [showHeader]="false"
     (create)="createOrEditMemberHandler()"
     (view)="viewMemberHandler($event)">
   </app-members-list>
 
   <app-create-or-edit-member
     #createOrEditMember
-    (modalSave)="reloadMembers()">
+    [showHeader]="false"
+    *ngIf="contactsViewMode === 'edit'"
+    (createOrEditDone)="memberSaved($event)">
   </app-create-or-edit-member>
 
   <app-view-member-profile
     #viewMemberProfile
-    (edit)="createOrEditMemberHandler($event?.memberId, $event?.userId)">
+    [showHeader]="false"
+    [fromManualAcc]="contactType == TenantContactType.Manual"
+    *ngIf="contactsViewMode === 'view'"
+ (edit)="handleMemberProfileEdit($event)">
   </app-view-member-profile>
+
 </ng-container>
 
 
     <ng-container *ngIf="activeTabIndex === 3">
-      <!-- <app-relationship-settings 
-                                [accountId]="accountId" >
-                            </app-relationship-settings> -->
+      <app-relationship-settings 
+                                [accountId]="accountId" [relationId]="relationId">
+                            </app-relationship-settings>
   </ng-container>
 
 </div>

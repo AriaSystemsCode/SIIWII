@@ -1,5 +1,5 @@
 ﻿import { Component, ViewChild, Injector, Output, EventEmitter, Input } from '@angular/core';
-import { ModalDirective } from 'ngx-bootstrap/modal';
+import { BsModalRef, ModalDirective } from 'ngx-bootstrap/modal';
 import { finalize } from 'rxjs/operators';
 import {
     BranchDto,
@@ -18,7 +18,7 @@ import { AppComponentBase } from '@shared/common/app-component-base';
 })
 export class CreateOrEditBranchModalComponent extends AppComponentBase {
 
-    @ViewChild('createOrEditModal', { static: true }) modal: ModalDirective;
+    // @ViewChild('createOrEditModal', { static: true }) modal: ModalDirective;
 
     @Input() billingAddressDef: LookupLabelDto
     @Input() directShippingAddressDef: LookupLabelDto
@@ -55,9 +55,12 @@ export class CreateOrEditBranchModalComponent extends AppComponentBase {
     branchCode: string = "";
 
     phonePattern = '^[0-9+()\\-\\s]*$'; 
-
+accountId?: number;
+branchId?: number;
+parentId?: number;
     constructor(
         injector: Injector,
+         public currentModalRef: BsModalRef,
         private _AccountsServiceProxy: AccountsServiceProxy,
         private _AppEntitiesServiceProxy: AppEntitiesServiceProxy
     ) {
@@ -71,38 +74,98 @@ export class CreateOrEditBranchModalComponent extends AppComponentBase {
             this.inputObj1.setNumber('+91987654321');
         }
     }
-
-    addressSelected(address) {
-        this.active = true;
-        this.modal.show();
-
-        let x: AppContactAddressDto;
-
-        if (this.currSelectAddress == 1) {
-            x = this.address1;
-        }
-        if (this.currSelectAddress == 2) {
-            x = this.address2;
-        }
-        if (this.currSelectAddress == 3) {
-            x = this.address3;
-        }
-        if (this.currSelectAddress == 4) {
-            x = this.address4;
-        }
-
-        x.addressId = address.id;
-        x.code = address.code;
-        x.name = address.name;
-        x.addressLine1 = address.addressLine1;
-        x.addressLine2 = address.addressLine2;
-        x.city = address.city;
-        x.state = address.state;
-        x.postalCode = address.postalCode;
-        x.countryId = address.countryId;
-        x.countryIdName = address.countryIdName;
-
+    ngOnInit(){
+          this.show(this.accountId, this.branchId, this.parentId);
     }
+
+    // addressSelected(address) {
+    //     this.active = true;
+    //     // this.modal.show();
+
+    //     let x: AppContactAddressDto;
+
+    //     if (this.currSelectAddress == 1) {
+    //         x = this.address1;
+    //     }
+    //     if (this.currSelectAddress == 2) {
+    //         x = this.address2;
+    //     }
+    //     if (this.currSelectAddress == 3) {
+    //         x = this.address3;
+    //     }
+    //     if (this.currSelectAddress == 4) {
+    //         x = this.address4;
+    //     }
+
+    //     x.addressId = address.id;
+    //     x.code = address.code;
+    //     x.name = address.name;
+    //     x.addressLine1 = address.addressLine1;
+    //     x.addressLine2 = address.addressLine2;
+    //     x.city = address.city;
+    //     x.state = address.state;
+    //     x.postalCode = address.postalCode;
+    //     x.countryId = address.countryId;
+    //     x.countryIdName = address.countryIdName;
+
+    // }
+    addressSelected(address: AppAddressDto): void {
+
+    this.active = true;
+
+    if (!this.currSelectAddress) {
+        this.currSelectAddress = 1;
+    }
+
+    let x: AppContactAddressDto;
+
+    switch (this.currSelectAddress) {
+
+        case 1:
+            if (!this.address1) {
+                this.address1 = this.clearAddress();
+            }
+            x = this.address1;
+            break;
+
+        case 2:
+            if (!this.address2) {
+                this.address2 = this.clearAddress();
+            }
+            x = this.address2;
+            break;
+
+        case 3:
+            if (!this.address3) {
+                this.address3 = this.clearAddress();
+            }
+            x = this.address3;
+            break;
+
+        case 4:
+            if (!this.address4) {
+                this.address4 = this.clearAddress();
+            }
+            x = this.address4;
+            break;
+
+        default:
+            this.address1 = this.clearAddress();
+            x = this.address1;
+            break;
+    }
+
+    x.addressId = address.id;
+    x.code = address.code;
+    x.name = address.name;
+    x.addressLine1 = address.addressLine1;
+    x.addressLine2 = address.addressLine2;
+    x.city = address.city;
+    x.state = address.state;
+    x.postalCode = address.postalCode;
+    x.countryId = address.countryId;
+    x.countryIdName = address.countryIdName;
+}
 
     show(accountId?: number, branchId?: number, parentId?: number): void {
         this.address1 = this.clearAddress();
@@ -119,7 +182,7 @@ export class CreateOrEditBranchModalComponent extends AppComponentBase {
             this.branch.id = branchId;
             this.branch.parentId = parentId;
             this.active = true;
-            this.modal.show();
+            // this.modal.show();
             this.hideMainSpinner();
         } else {
             this._AccountsServiceProxy.getBranchForEdit(branchId).subscribe(result => {
@@ -150,7 +213,7 @@ export class CreateOrEditBranchModalComponent extends AppComponentBase {
                 this.setDefaultPhoneTypes();
                 this.hideMainSpinner();
                 this.active = true;
-                this.modal.show();
+                // this.modal.show();
             });
         }
 
@@ -306,8 +369,10 @@ export class CreateOrEditBranchModalComponent extends AppComponentBase {
 
 
     close(): void {
-        this.active = false;
-        this.modal.hide();
+        // this.active = false;
+        // this.modal.hide();
+          this.currentModalRef.setClass('right-modal slide-right-out');
+  this.currentModalRef.hide();
     }
 
     getCodeValue(code: string) {

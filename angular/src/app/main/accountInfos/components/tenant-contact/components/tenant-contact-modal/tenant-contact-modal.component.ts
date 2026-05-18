@@ -32,42 +32,96 @@ export class TenantContactModalComponent {
     window.addEventListener('resize', () => this.setDialogStyle());
   }
 
+  // setDialogStyle(): void {
+  //   const isMobile = window.innerWidth < 576;
+  //   const isTab = window.innerWidth < 991;
+
+  //   this.dialogStyle = isMobile
+  //     ? {
+
+  //       maxWidth: '95vw',
+  //       marginTop: '115px'
+
+  //     }
+  //     : this.dialogStyle = isTab ? {
+
+  //       maxWidth: '670px',
+  //       marginLeft: '80px',
+  //       marginTop: '120px'
+  //     } : {
+
+  //       maxWidth: '1350px',
+  //       marginLeft: '80px'
+  //     };
+  // }
+
   setDialogStyle(): void {
-    const isMobile = window.innerWidth < 576;
-    const isTab = window.innerWidth < 991;
 
-    this.dialogStyle = isMobile
-      ? {
+  const width = window.innerWidth;
 
-        maxWidth: '95vw',
-        marginTop: '115px'
+  // MOBILE
+  if (width < 576) {
 
-      }
-      : this.dialogStyle = isTab ? {
+    this.dialogStyle = {
+      width: '100vw',
+      height: '100vh',
+      maxWidth: '100vw',
+      margin: '0',
+      top: '0'
+    };
 
-        maxWidth: '670px',
-        marginLeft: '80px',
-        marginTop: '120px'
-      } : {
-
-        maxWidth: '1350px',
-        marginLeft: '80px'
-      };
+    return;
   }
 
+  // TABLET
+  if (width < 991) {
+
+    this.dialogStyle = {
+      width: '92vw',
+      maxWidth: '92vw',
+      height: '92vh'
+    };
+
+    return;
+  }
+
+  // DESKTOP
+  this.dialogStyle = {
+    width: '1350px',
+    maxWidth: '1350px',
+    height: '92vh'
+  };
+}
+  // open(config: {
+  //   mode: TenantContactMode;
+  //   accountType?: TenantContactType;
+  //   contactType?: TenantContactType;
+  //   accountId?: number;
+  // }): void {
+  //   this.mode = config.mode;
+  //   this.lastMode = config.mode;
+
+  //   this.contactType = config.contactType ?? config.accountType;
+  //   this.accountId = config.accountId;
+  //   this.visible = true;
+  // }
   open(config: {
-    mode: TenantContactMode;
-    accountType?: TenantContactType;
-    contactType?: TenantContactType;
-    accountId?: number;
-  }): void {
-    this.mode = config.mode;
-    this.lastMode = config.mode;
+  mode: TenantContactMode;
+  accountType?: TenantContactType;
+  contactType?: TenantContactType;
+  accountId?: number;
+}): void {
+  this.mode = config.mode;
+  this.lastMode = config.mode;
+  this.contactType = config.contactType ?? config.accountType;
+  this.accountId = config.accountId;
 
-    this.contactType = config.contactType ?? config.accountType;
-    this.accountId = config.accountId;
-    this.visible = true;
-  }
+  this.visible = true;
+
+  setTimeout(() => {
+    this.tenantContactComponent?.resetToProfileTab?.();
+  });
+}
 
 handleCancel(): void {
 

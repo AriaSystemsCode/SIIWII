@@ -17,11 +17,13 @@ import { CalendarModule } from 'primeng/calendar';
 import { AdminModule } from '@app/admin/admin.module';
 import { SharedDynamicInputsModule } from '@shared/shared-module';
 import { AccordionModule } from 'primeng/accordion';
+import { RelationshipSettingsComponent } from './relationship-settings/relationship-settings.component';
 
 @NgModule({
     declarations: [
         CreateOrEditMemberComponent,
         ViewMemberProfileComponent,
+        RelationshipSettingsComponent
     ],
     imports: [
         CommonModule,
@@ -42,7 +44,8 @@ import { AccordionModule } from 'primeng/accordion';
     ],
     exports: [
         CreateOrEditMemberComponent,
-        ViewMemberProfileComponent
+        ViewMemberProfileComponent,
+        RelationshipSettingsComponent
     ]
 })
 export class MyMembersModule { }

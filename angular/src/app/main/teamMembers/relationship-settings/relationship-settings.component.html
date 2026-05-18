@@ -1,6 +1,6 @@
 <div [@routerTransition]>
     <div class="kt-content  kt-grid__item kt-grid__item--fluid kt-grid kt-grid--hor">
-        <div class="kt-subheader kt-grid__item">
+        <!-- <div class="kt-subheader kt-grid__item">
             <div [class]="containerClass">
                 <div class="kt-subheader__main">
                     <h3 class="kt-subheader__title">
@@ -18,7 +18,7 @@
                     </div>
                 </div>
             </div>
-        </div>
+        </div> -->
         <div [class]="containerClass + ' kt-grid__item kt-grid__item--fluid'">
             <div class="kt-portlet m-0">
                 <div class="kt-portlet__body">
@@ -49,6 +49,13 @@
                     </div>
 
                 </div>
+
+
+
+                      <div class="d-flex justify-content-end m-2">
+                        <button class="btn saveBtn" (click)="saveAll()">
+                            {{"SaveAll" | localize}}</button>
+                    </div>
             </div>
         </div>
     </div>

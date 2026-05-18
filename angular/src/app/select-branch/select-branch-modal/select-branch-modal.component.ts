@@ -6,6 +6,7 @@ import {
     AccountsServiceProxy,
     } from '@shared/service-proxies/service-proxies';
 import { TreeNodeOfBranchForViewDto } from '@shared/service-proxies/service-proxies';
+import { BsModalRef } from 'ngx-bootstrap/modal';
 @Component({
   selector: 'selectBranchModal',
   templateUrl: './select-branch-modal.component.html',
@@ -13,7 +14,7 @@ import { TreeNodeOfBranchForViewDto } from '@shared/service-proxies/service-prox
 })
 export class SelectBranchModalComponent extends AppComponentBase {
 
-    @ViewChild('selectBranchModal', { static: true }) modal: ModalDirective;
+    // @ViewChild('selectBranchModal', { static: true }) modal: ModalDirective;
     branches:TreeNodeOfBranchForViewDto[];
     filteredbranches:TreeNodeOfBranchForViewDto[];
     branch:TreeNodeOfBranchForViewDto;
@@ -28,12 +29,16 @@ export class SelectBranchModalComponent extends AppComponentBase {
     isCheckedBranch = 0;
     busy=true;
     loading=false
-    constructor(injector: Injector,private _accountsServiceProxy: AccountsServiceProxy,
+    branchesInput: TreeNodeOfBranchForViewDto[] = [];
+    constructor(injector: Injector,private _accountsServiceProxy: AccountsServiceProxy,public currentModalRef: BsModalRef,
 )  {
         super(injector);
         this.busy=true;
     }
 
+    ngOnInit(): void {
+  this.show(this.branchesInput);
+}
     show(branchs:TreeNodeOfBranchForViewDto[]): void {
         if (branchs !=undefined && branchs.length >0) {
             this.branchId = branchs[0].data.branch.id
@@ -44,7 +49,7 @@ export class SelectBranchModalComponent extends AppComponentBase {
                 this.spinnerService.hide();
                 this.filteredbranches=branchs
                 this.active = true;
-                this.modal.show();
+                // this.modal.show();
             });
         }
         else
@@ -73,10 +78,15 @@ export class SelectBranchModalComponent extends AppComponentBase {
 
 
 
-    close(){
-        this.active = false;
-        this.modal.hide();
-    }
+    // close(){
+    //     this.active = false;
+    //     this.modal.hide();
+    // }
+    close(): void {
+  this.active = false;
+  this.currentModalRef.setClass('right-modal slide-right-out');
+  this.currentModalRef.hide();
+}
     cancel(){
         this.BranchSelectionCanceled.emit()
         this.close()
@@ -110,7 +120,7 @@ export class SelectBranchModalComponent extends AppComponentBase {
         if(this.selectedBranch!=undefined){
             this.branchSelected.emit(this.selectedBranch.data.branch);
             this.spinnerService.hide();
-            this.modal.hide()
+            // this.modal.hide()
         }
         this.close()
         this.spinnerService.hide();

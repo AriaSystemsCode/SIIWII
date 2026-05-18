@@ -90,19 +90,31 @@ import { DashboardComponent } from "./dashboard/dashboard.component";
                     {
                         path: "marketplace",
                         children: [
+                            // {
+                            //     path: "",
+                            //     loadChildren: () =>
+                            //         import(
+                            //             "./marketplaceLandingPage/landingPage.module"
+                            //         ).then(
+                            //             (m) => m.LandingPageModule
+                            //         ),
+                            //     data: {
+                            //         preload: true,
+                            //         permission: "Pages.Marketplace",
+                            //     },
+                            // },
                             {
-                                path: "",
-                                loadChildren: () =>
-                                    import(
-                                        "./marketplaceLandingPage/landingPage.module"
-                                    ).then(
-                                        (m) => m.LandingPageModule
-                                    ),
-                                data: {
-                                    preload: true,
-                                    permission: "Pages.Marketplace",
-                                },
-                            },
+  path: "",
+  pathMatch: "full",
+  loadChildren: () =>
+    import("./marketplaceLandingPage/landingPage.module").then(
+      (m) => m.LandingPageModule
+    ),
+  data: {
+    preload: true,
+    permission: "Pages.Marketplace",
+  },
+},
                             {
                                 path: "accounts",
                                 loadChildren: () =>

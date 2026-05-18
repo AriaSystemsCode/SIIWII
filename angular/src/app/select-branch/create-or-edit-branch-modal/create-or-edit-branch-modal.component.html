@@ -1,7 +1,8 @@
-﻿<div bsModal #createOrEditModal="bs-modal" class="modal right fade" tabindex="-1" role="dialog"
+﻿<!-- <div bsModal #createOrEditModal="bs-modal" class="modal right fade" tabindex="-1" role="dialog"
   aria-labelledby="createOrEditModal" aria-hidden="true" [config]="{backdrop: 'static'}">
   <div class="modal-dialog modal-lg">
-    <div class="modal-content">
+    <div class="modal-content"> -->
+      <div class="modal-content-wrapper">
       <form *ngIf="active" #branchForm="ngForm" novalidate (ngSubmit)="save()" autocomplete="off">
         <div class="modal-header" style="display: block;">
           <h4 class="modal-title">
@@ -16,14 +17,14 @@
         </div>
         <div class="modal-body">
 
-          <div class="row">
+          <!-- <div class="row">
             <div class="col-md-6">
               <p class="branch-info">{{l("BranchInformation")}}</p>
             </div>
             <div class="col-md-6">
               <p class="contact-info">{{l("ContactInformation")}}</p>
             </div>
-          </div>
+          </div> -->
           <div class="row align-items-center">
             <div class="col-md-5">
               <div class="form-group">
@@ -311,9 +312,9 @@
           <button type="submit" class="btn bgPurple" [disabled]="!branchForm.form.valid"
             [buttonBusy]="saving" [busyText]="l('SavingWithThreeDot')"> <span>{{l("Save")}}</span></button>
         </div>
-        <selectAddressModal #selectAddressModal (addressSelected)="addressSelected($event)"></selectAddressModal>
+        <!-- <selectAddressModal #selectAddressModal (addressSelected)="addressSelected($event)"></selectAddressModal> -->
       </form>
-    </div>
-  </div>
+    <!-- </div>
+  </div> -->
 
 </div>

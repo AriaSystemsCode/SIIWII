@@ -271,8 +271,9 @@
     justify-content: end;
     background-color: #F4F4F4;
     width: 100%;
-    position: fixed;
+    position: fixed !important;
     bottom: 0;
+        width: stretch;
 }
 
 .modal-body {

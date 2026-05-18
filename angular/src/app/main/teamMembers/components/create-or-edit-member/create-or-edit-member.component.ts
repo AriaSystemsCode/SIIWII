@@ -14,7 +14,7 @@ import { CreateEditAppItemExtraAttribute } from '@app/main/app-items/app-item-sh
 import { EExtraAttributeUsage } from '@app/main/app-items/appItems/models/extra-attribute-usage.enum';
 import { FilteredExtraAttribute } from '@app/main/app-items/app-item-shared/models/filtered-extra-attribute';
 import { SelectItem } from '@node_modules/primeng/api';
-
+import { BsModalRef, BsModalService, ModalOptions } from 'ngx-bootstrap/modal';
 @Component({
   selector: 'app-create-or-edit-member',
   templateUrl: './create-or-edit-member.component.html',
@@ -23,11 +23,11 @@ import { SelectItem } from '@node_modules/primeng/api';
 })
 export class CreateOrEditMemberComponent extends AppComponentBase {
   @ViewChild('createOrEditModal', { static: true }) modal: ModalDirective;
-  @ViewChild('selectBranchModal', { static: true }) selectBranchModal: SelectBranchModalComponent;
+  // @ViewChild('selectBranchModal', { static: true }) selectBranchModal: SelectBranchModalComponent;
   @ViewChild('memberForm', { static: true }) memberForm: NgForm
   @Output() createOrEditDone = new EventEmitter<{ memberId: number, userId: number }>();
   @Input() accData:  GetAccountForViewDto;
-
+  @Input('showHeader') showHeader: boolean = true
   memberDto: CreateOrEditAccountInfoDto;
 
   branches: TreeNodeOfBranchForViewDto[];
@@ -73,7 +73,7 @@ export class CreateOrEditMemberComponent extends AppComponentBase {
   hasUnsavedChanges = false;
 
   joinDateModel: Date | null = null;
-
+selectBranchModalRef: BsModalRef;
   constructor(injector: Injector,
     private _AppEntitiesServiceProxy: AppEntitiesServiceProxy,
     private _SycAttachmentCategoriesServiceProxy: SycAttachmentCategoriesServiceProxy,
@@ -82,6 +82,7 @@ export class CreateOrEditMemberComponent extends AppComponentBase {
     private updateLogoService: UpdateLogoService,
     private _sycEntityObjectTypesServiceProxy: SycEntityObjectTypesServiceProxy,
     private _extraAttributeDataService: ExtraAttributeDataService,
+    private _bsModalService: BsModalService,
     private cdr: ChangeDetectorRef
   ) {
     super(injector);
@@ -105,9 +106,9 @@ export class CreateOrEditMemberComponent extends AppComponentBase {
       this.canEdit = this.permission.isGranted('Pages.Accounts.Member.Edit');
       if (!this.canEdit) return this.notify.error("You don't have permission to edit");
   
-      await this.getContactDataForView(memberId); // ✅ fills memberDto
+      await this.getContactDataForView(memberId); //  fills memberDto
      
-      // this.getAppItemTypeExtraAttributesById(); // ✅ call AFTER memberDto is filled
+      // this.getAppItemTypeExtraAttributesById(); //  call AFTER memberDto is filled
     } else { // create logic
       this.canCreate = this.permission.isGranted('Pages.Accounts.Member.Create');
       if (!this.canCreate) return this.notify.error("You don't have permission to create");
@@ -199,17 +200,33 @@ export class CreateOrEditMemberComponent extends AppComponentBase {
 
     // if (result?.coverUrl) this.coverPhoto = this.attachmentBaseUrl + '/' + result?.coverUrl
     // if (result?.imageUrl) this.ProfileImg = this.attachmentBaseUrl + '/' + result?.imageUrl
-    const logoAttachment = this.memberDto?.entityAttachments?.find(att => att.attachmentCategoryId === 1 && att.url);
+    // const logoAttachment = this.memberDto?.entityAttachments?.find(att => att.attachmentCategoryId === 1 && att.url);
 
-    if (logoAttachment) {
-    this.ProfileImg = this.attachmentBaseUrl + '/' + logoAttachment.url;
-    }
+    // if (logoAttachment) {
+    // this.ProfileImg = this.attachmentBaseUrl + '/' + logoAttachment.url;
+    // }
 
-    const coverAttachment = this.memberDto?.entityAttachments?.find(att => att.attachmentCategoryId === 2 && att.url);
+    // const coverAttachment = this.memberDto?.entityAttachments?.find(att => att.attachmentCategoryId === 2 && att.url);
 
-    if (logoAttachment) {
-    this.coverPhoto = this.attachmentBaseUrl + '/' + coverAttachment.url;
-    }
+    // if (logoAttachment) {
+    // this.coverPhoto = this.attachmentBaseUrl + '/' + coverAttachment.url;
+    // }
+
+    const logoAttachment = this.memberDto?.entityAttachments?.find(
+  att => att.attachmentCategoryId === 1 && !!att.url
+);
+
+this.ProfileImg = logoAttachment?.url
+  ? `${this.attachmentBaseUrl}/${logoAttachment.url}`
+  : undefined;
+
+const coverAttachment = this.memberDto?.entityAttachments?.find(
+  att => att.attachmentCategoryId === 2 && !!att.url
+);
+
+this.coverPhoto = coverAttachment?.url
+  ? `${this.attachmentBaseUrl}/${coverAttachment.url}`
+  : undefined;
     this.selectedBranchName = result?.branchName && result?.branchName != '' ? result?.branchName : '';
     this.selectedBranchName += result?.addressLine1 && result?.addressLine1 != '' ? (this.selectedBranchName != '' ? ' - ' + result?.addressLine1 : result?.addressLine1) : '';
     this.selectedBranchName += result?.addressLine2 && result?.addressLine2 != '' ? (this.selectedBranchName != '' ? ' , ' + result?.addressLine2 : result?.addressLine2) : '';
@@ -254,7 +271,8 @@ export class CreateOrEditMemberComponent extends AppComponentBase {
       rootBranch.data.id = rootBranchData.id
       this.branches = [rootBranch]
       if (this.branches?.length > 0) {
-        this.selectBranchModal.show(this.branches);
+        // this.selectBranchModal.show(this.branches);
+        this.openSelectBranchModal(this.branches);
       }
       else {
         this.message.info("No Branches Found");
@@ -368,10 +386,12 @@ export class CreateOrEditMemberComponent extends AppComponentBase {
     this.cdr.detectChanges();                    // ensure UI refresh in case modal runs outside Angular zone
   }
 
-  branchSelectionCanceled() {
-    this.selectBranchModal.close();
-  }
-
+  // branchSelectionCanceled() {
+  //   this.selectBranchModal.close();
+  // }
+branchSelectionCanceled() {
+  this.selectBranchModalRef?.hide();
+}
   //Branch Methods [End]
 
 
@@ -536,7 +556,7 @@ export class CreateOrEditMemberComponent extends AppComponentBase {
         });
       }
 
-      // ✅ Add this if missing
+      //  Add this if missing
       if (!attr.paginationSetting) {
         attr.paginationSetting = {
           skipCount: 0,
@@ -832,5 +852,27 @@ export class CreateOrEditMemberComponent extends AppComponentBase {
     }
   }
   
+
+  openSelectBranchModal(branches: TreeNodeOfBranchForViewDto[]): void {
+  const config: ModalOptions = new ModalOptions();
+
+  config.class = 'right-modal slide-right-in';
+  config.initialState = {
+    branchesInput: branches
+  };
+
+  const modalRef = this._bsModalService.show(SelectBranchModalComponent, config);
+  this.selectBranchModalRef = modalRef;
+
+  const content = modalRef.content as SelectBranchModalComponent;
+
+  content.branchSelected.subscribe((branch) => {
+    this.branchSelected(branch);
+  });
+
+  content.BranchSelectionCanceled.subscribe(() => {
+    this.branchSelectionCanceled();
+  });
+}
 
 }

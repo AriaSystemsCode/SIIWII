@@ -39,6 +39,7 @@ import { PublishService } from '@app/main/app-items/app-item-shared/services/pub
 import { TreeviewModule } from 'ngx-treeview';
 import { NgImageSliderModule } from 'ng-image-slider';
 import { BranchDetailsDynamicModalComponent } from './branch-details-dynamic-modal/branch-details-dynamic-modal.component';
+import { SidebarModule } from 'primeng/sidebar';
 
 @NgModule({
   declarations: [SelectBranchModalComponent,BranchesComponent,CreateOrEditBranchModalComponent,BranchDetailsDynamicModalComponent],
@@ -96,6 +97,7 @@ import { BranchDetailsDynamicModalComponent } from './branch-details-dynamic-mod
         // OverALLRatingReviewsModule,InputSwitchModule,
         // SharedDynamicInputsModule,
         AccordionModule,
+        SidebarModule
         
        
   ],

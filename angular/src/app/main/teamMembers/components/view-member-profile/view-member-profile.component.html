@@ -1,11 +1,11 @@
 <div [@routerTransition]>
-    <div class="kt-content  kt-grid__item kt-grid__item--fluid kt-grid kt-grid--hor">
+    <div class="kt-content  kt-grid__item kt-grid__item--fluid kt-grid kt-grid--hor pt-0">
             <div class="view-profile-wrapper" *ngIf="active">
-                <div>
+            
                     <div class="kt-content kt-grid__item kt-grid__item--fluid kt-grid kt-grid--hor pb-0">
 
 
-                        <div class="kt-subheader kt-grid__item d-flex justify-content-between">
+                        <div  *ngIf="showHeader" class="kt-subheader kt-grid__item d-flex justify-content-between">
                             <div [class]="containerClass">
                                 <div class="kt-subheader__main">
                                     <h6 class="kt-subheader__title">
@@ -50,7 +50,7 @@
 
                                             
                                                    <!-- Create User Button (if User Id is not present) -->
-                                                    <button *ngIf="canEdit && !isManualOrExternalContact && !getUserIdValue()" 
+                                                    <button *ngIf="canEdit && !isManualOrExternalContact && !getUserIdValue() && !fromManualAcc" 
                                                     class="btn mb-3 mt-4 transparent-button shadow mr-3"
                                                     style="color: #4A0D4A; border-radius: 6px;"
                                                     (click)="CreateUserName()" 
@@ -65,7 +65,7 @@
                                                     </button>
 
                                                     <!-- Edit User Button (if User Id is present) -->
-                                                    <button *ngIf="canEdit && !isManualOrExternalContact  && getUserIdValue()" 
+                                                    <button *ngIf="canEdit && !isManualOrExternalContact  && getUserIdValue() && !fromManualAcc" 
                                                     class="btn mb-3 mt-4 transparent-button shadow mr-3"
                                                     style="color: #4A0D4A; border-radius: 6px;"
                                                     (click)="EditUserName()" 
@@ -97,7 +97,7 @@
                                             <div class="dev-logo">
                                                 <app-image-display [image]="logoPhoto || logoDefaultImage"
                                                     [sycAttachmentCategory]="sycAttachmentCategoryLogo"
-                                                    [classList]="'logo-profile'" [staticHeight]="85">
+                                                    [classList]="'logo-profile'" [staticHeight]="115" [staticWidth]="115">
                                                 </app-image-display>
                                             </div>
                                         </div>
@@ -117,7 +117,7 @@
                         </div>
 
                     </div>
-                </div>
+            
 
                 <div [class]="containerClass + ' kt-grid__item kt-grid__item--fluid'">
                     <div class="kt-portlet kt-portlet--mobile profileInfo_container">
@@ -281,12 +281,25 @@
                 </div>
             </div>
 
+
+                  <div *ngIf="!showHeader" class=" m-2 d-flex align-items-end">
+                             
+                                <!-- [disabled]="!editjobTitleValue || (editjobTitleValue== memberData?.contact?.jobTitle || editBranchValue== oldEditBranchValue) " -->
+                                <button class="btn mb-3 mt-4 mr-3 canclBtn editAccount_butn Save_editMember" [class.hide]="editInfo" (click)="editInfo = true;NoteditInfo = false;Editting=false;cancel()">
+                                    {{ "Cancel" | localize }}
+                                </button>
+                                <button class="btn mb-3 mt-4 editAccount_butn Save_editMember mr-3" type="submit"
+                                style="color: white !important;"
+                                    [class.hide]="editInfo" (click)="Save_editMember()" >
+                                    {{ "Save" | localize }}
+                                </button>
+                            </div>
             <createOrEditUserModal #createOrEditUserModal [filteredUsers]="filteredUsers" (_filterUsers)="filterUsers($event)" (_linkToUser)="linkToUser($event.user, $event.index)" (refreshData)="refresh($event)"></createOrEditUserModal>
 
     </div>
 </div>
 
 
-
+<!-- 
 <selectBranchModal #selectBranchModal (branchSelected)="branchSelected($event)"
-    (branchSelectionCanceled)="branchSelectionCanceled()"></selectBranchModal>
+    (branchSelectionCanceled)="branchSelectionCanceled()"></selectBranchModal> -->

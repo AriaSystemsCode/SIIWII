@@ -1,6 +1,8 @@
-﻿<div bsModal #createOrEditModal="bs-modal" class="modal right fade" tabindex="-1" role="dialog" aria-labelledby="createOrEditModal" aria-hidden="true" [config]="{backdrop: 'static'}">
+﻿<!-- <div bsModal #createOrEditModal="bs-modal" class="modal right fade" tabindex="-1" role="dialog" aria-labelledby="createOrEditModal" aria-hidden="true" [config]="{backdrop: 'static'}">
   <div class="modal-dialog modal-lg">
-    <div class="modal-content">
+    <div class="modal-content"> -->
+      <div class="modal-content-wrapper">
+
       <form *ngIf="active" #addressForm="ngForm" novalidate (ngSubmit)="save()" autocomplete="off" class="h-100">
         <div class="modal-content-wrapper">
           <div class="modal-header" style="display: block;background-color: #ffffff !important;">
@@ -16,16 +18,7 @@
           <div class="modal-body">
             <div class="form-group">
               <label for="address_Code">{{l("Code")}} *</label>
-              <!-- <app-codes *ngIf="!(address?.id>0)"
-                [objectType]="entityObjectType"
-                [editMode]=false
-                (getCodeValue)="getCodeValue($event)" ></app-codes>
-
-                <app-codes *ngIf="address?.id>0"
-                [objectType]="entityObjectType"
-                [editMode]=true
-                [code]="addressCode"
-                (getCodeValue)="getCodeValue($event)" ></app-codes>  -->
+        
                 <input [disabled]="address?.id>0" type="text" id="address_Code" class="form-control form-control-sm aria-input-text" [(ngModel)]="addressCode" name="code" maxlength="6"/>
             </div>
 
@@ -75,10 +68,7 @@
                   [placeholder]="'PleaseSelect' | localize"
               >
               </p-dropdown>
-              <!-- <select [(ngModel)]="address.countryId" name="address.countryId"  class="form-control form-control-sm aria-input-text" required>
-                <option value="">{{l(PleaseSelect)}}</option>
-                <option *ngFor="let item of allCountries" value="{{item.value}}">{{item.label}}</option>
-              </select> -->
+       
             </div>
 
           </div>
@@ -88,7 +78,7 @@
           </div>
         </div>
       </form>
-    </div>
-  </div>
+    <!-- </div>
+  </div> -->
 </div>
 

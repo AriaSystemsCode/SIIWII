@@ -176,10 +176,18 @@ NOT CARDS VIEW MODE
             [pTooltip]="account?.account?.name?.length > 25 ? account?.account?.name : null" tooltipPosition="bottom"
             [tooltipEvent]="isSmallScreen ? 'focus' : 'hover'" [autoHide]="true" [showDelay]="100" [hideDelay]="100"
             [tabindex]="isSmallScreen ? 0 : null">
-            {{account?.account?.name | textSubstring : 25 }}  <i *ngIf="account?.account?.isManual" class="pi pi-user-edit ml-2"  [pTooltip]="'ManualAccount' | localize" tooltipPosition="bottom"
+            {{account?.account?.name | textSubstring : 25 }}  
+            <!-- <i *ngIf="account?.account?.isManual" class="pi pi-user-edit ml-2"  [pTooltip]="'ManualAccount' | localize" tooltipPosition="bottom"
             [tooltipEvent]="isSmallScreen ? 'focus' : 'hover'" [autoHide]="true" [showDelay]="100" [hideDelay]="100"
-            [tabindex]="isSmallScreen ? 0 : null"></i>
+            [tabindex]="isSmallScreen ? 0 : null"></i> -->
+         
           </h3> 
+             <img src="../../assets/accounts/manual-i.svg" *ngIf="account?.account?.isManual && !fromMarketplace"  [pTooltip]="'ManualAccount' | localize" tooltipPosition="bottom"
+            [tooltipEvent]="isSmallScreen ? 'focus' : 'hover'" [autoHide]="true" [showDelay]="100" [hideDelay]="100"
+            [tabindex]="isSmallScreen ? 0 : null" alt="" srcset="" style="width: 18px;">
+              <img src="../../assets/accounts/connected-i.svg" *ngIf="!account?.account?.isManual && !fromMarketplace"  [pTooltip]="'ConnectedAccount' | localize" tooltipPosition="bottom"
+            [tooltipEvent]="isSmallScreen ? 'focus' : 'hover'" [autoHide]="true" [showDelay]="100" [hideDelay]="100"
+            [tabindex]="isSmallScreen ? 0 : null" alt="" srcset="" style="width: 23px;">
         </div>
 
         <div class="info-container d-flex flex-column">

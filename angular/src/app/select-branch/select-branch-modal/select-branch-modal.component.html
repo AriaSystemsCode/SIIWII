@@ -1,4 +1,4 @@
-<div
+<!-- <div
     bsModal
     #selectBranchModal="bs-modal"
     class="modal right fade"
@@ -13,7 +13,7 @@
         [ngClass]="active ? 'slide-right-in' : 'slide-right-out'"
         role="document"
     >
-        <div class="modal-content">
+        <div class="modal-content"> -->
 
             <div class="modal-content-wrapper" *ngIf="active"  >
                 <div class="modal-header">
@@ -36,9 +36,9 @@
                     <button type="submit" (click)="selectBranch()" class="btn bgPurple" [disabled]="!selectedBranch" [buttonBusy]="saving" [busyText]="l('SavingWithThreeDot')"> <span>{{l("select")}}</span></button>
                 </div>
             </div>
-        </div>
+        <!-- </div>
     </div>
-</div>
+</div> -->
 
 
 

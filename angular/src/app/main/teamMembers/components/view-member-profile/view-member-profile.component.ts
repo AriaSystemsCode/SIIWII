@@ -11,7 +11,7 @@ import { SelectBranchModalComponent } from '@app/select-branch/select-branch-mod
 import { CreateOrEditUserModalComponent } from '@app/admin/users/create-or-edit-user-modal.component';
 import { ActivatedRoute } from '@node_modules/@angular/router';
 import Swal from 'sweetalert2';
-
+import { BsModalRef, BsModalService, ModalOptions } from 'ngx-bootstrap/modal';
 @Component({
   selector: 'app-view-member-profile',
   encapsulation: ViewEncapsulation.None,
@@ -21,11 +21,12 @@ import Swal from 'sweetalert2';
 })
 export class ViewMemberProfileComponent extends AppComponentBase implements OnInit {
 
-  @ViewChild('selectBranchModal', { static: true }) selectBranchModal: SelectBranchModalComponent;
+  // @ViewChild('selectBranchModal', { static: true }) selectBranchModal: SelectBranchModalComponent;
   @ViewChild("createOrEditUserModal", { static: true }) createOrEditUserModal: CreateOrEditUserModalComponent;
 
   @Input('accountInfoTemp') accountInfoTemp: CreateOrEditAccountInfoDto = new CreateOrEditAccountInfoDto()
   @Input('fromManualAcc') fromManualAcc: boolean
+  @Input('showHeader') showHeader: boolean = true
 
   @Output() edit: EventEmitter<number> = new EventEmitter<number>()
   @Output() delete: EventEmitter<number> = new EventEmitter<number>()
@@ -64,7 +65,9 @@ export class ViewMemberProfileComponent extends AppComponentBase implements OnIn
   memberIslink: boolean = false;
   showUserList: boolean = false;
 
-  constructor(injector: Injector, private _AccountsServiceProxy: AccountsServiceProxy,  private _userService: UserServiceProxy,private route: ActivatedRoute) {
+  selectBranchModalRef: BsModalRef;
+
+  constructor(injector: Injector, private _AccountsServiceProxy: AccountsServiceProxy,  private _userService: UserServiceProxy,private route: ActivatedRoute,private _bsModalService: BsModalService) {
     super(injector);
     this.accountInfoTemp = new CreateOrEditAccountInfoDto();
 
@@ -339,7 +342,8 @@ export class ViewMemberProfileComponent extends AppComponentBase implements OnIn
       rootBranch.data.id = rootBranchData.id
       this.branches = [rootBranch]
       if (this.branches?.length > 0) {
-        this.selectBranchModal.show(this.branches);
+        // this.selectBranchModal.show(this.branches);
+        this.openSelectBranchModal(this.branches);
       }
       else {
         this.message.info("No Branches Found");
@@ -349,7 +353,7 @@ export class ViewMemberProfileComponent extends AppComponentBase implements OnIn
 
 
   branchSelected(Branch) {
-    console.log(Branch, 'BranchBranchBranchBranchBranch')
+  
     this.editBranchValue = Branch?.name ? Branch?.name : '';
     this.editBranchValue += Branch?.contactAddresses[0]?.addressLine1 ? (this.editBranchValue != '' ? ' - ' + Branch?.contactAddresses[0]?.addressLine1 : Branch?.contactAddresses[0]?.addressLine1) : '';
     this.editBranchValue += Branch?.contactAddresses[0]?.addressLine2 ? (this.editBranchValue != '' ? ' , ' + Branch?.contactAddresses[0]?.addressLine2 : Branch?.contactAddresses[0]?.addressLine2) : '';
@@ -361,9 +365,12 @@ export class ViewMemberProfileComponent extends AppComponentBase implements OnIn
 
   }
 
-  branchSelectionCanceled() {
-    this.selectBranchModal.close();
-  }
+  // branchSelectionCanceled() {
+  //   this.selectBranchModal.close();
+  // }
+  branchSelectionCanceled(): void {
+  this.selectBranchModalRef?.hide();
+}
   cancel() {
     this.editjobTitleValue = this.memberData?.contact?.jobTitle;
     this.editBranchValue =
@@ -534,6 +541,26 @@ export class ViewMemberProfileComponent extends AppComponentBase implements OnIn
       ? entityVal.toString()
       : '';
   }
-  
+  openSelectBranchModal(branches: TreeNodeOfBranchForViewDto[]): void {
+  const config: ModalOptions = new ModalOptions();
+
+  config.class = 'right-modal slide-right-in';
+  config.initialState = {
+    branchesInput: branches
+  };
+
+  const modalRef = this._bsModalService.show(SelectBranchModalComponent, config);
+  this.selectBranchModalRef = modalRef;
+
+  const content = modalRef.content as SelectBranchModalComponent;
+
+  content.branchSelected.subscribe((branch) => {
+    this.branchSelected(branch);
+  });
+
+  content.BranchSelectionCanceled.subscribe(() => {
+    this.branchSelectionCanceled();
+  });
+}
   
 }

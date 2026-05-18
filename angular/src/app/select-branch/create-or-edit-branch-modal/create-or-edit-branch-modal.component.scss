@@ -73,18 +73,18 @@ font-weight: 500;
     }
 
 }
-.modal-footer{
-  display: flex;
-  justify-content: end;
-  gap: 5px;
-    background-color: #F4F4F4;
-    width: 100%;
-    position: fixed;
-    bottom: 0;
-}
-.modal-body{
-    margin-top: 35px;
-    }
+// .modal-footer{
+//   display: flex;
+//   justify-content: end;
+//   gap: 5px;
+//     background-color: #F4F4F4;
+//     width: 100%;
+//     position: fixed;
+//     bottom: 0;
+// }
+// .modal-body{
+//     margin-top: 35px;
+//     }
 .title-tree{
     font: SemiBold 15px/var(--unnamed-line-spacing-23) var(--unnamed-font-family-poppins);
     letter-spacing: var(--unnamed-character-spacing-0);
@@ -299,5 +299,22 @@ color: #fff;
     .p-inputswitch.p-inputswitch-checked .p-inputswitch-slider {
         background-color: #2DC74F !important;
     }
+}
+
+
+::ng-deep {
+    @media (min-width: 576px) {
+    .modal-dialog {
+        max-width: 50% !important;
+    }
+
+    .right-modal.modal-dialog { 
+        width: 50% !important;
+    }
+    // .modal-content-wrapper .modal-body {
+    //         max-height: fit-content !important;
+    // overflow-y: auto !important;
+    // }
+}
 }
 

@@ -87,7 +87,7 @@ export class AccountsComponent
     currentLang: string
     isArabic: boolean
     isAuthenticated: boolean = false;
-    loginTenaneSsin:string
+    loginTenaneSsin: string
     constructor(
         injector: Injector,
         private _accountsServiceProxy: AccountsServiceProxy,
@@ -96,8 +96,8 @@ export class AccountsComponent
         private _abpSessionService: AbpSessionService,
         private _formBuilder: FormBuilder,
         private _emailingTemplateAppService: EmailingTemplateServiceProxy,
-        private AppTransactionServiceProxy:AppTransactionServiceProxy,
-         private CreateMarketplaceAccountServiceProxy: CreateMarketplaceAccountServiceProxy,
+        private AppTransactionServiceProxy: AppTransactionServiceProxy,
+        private CreateMarketplaceAccountServiceProxy: CreateMarketplaceAccountServiceProxy,
         // MarketplaceAccountsModule  
     ) {
         super(injector);
@@ -374,7 +374,7 @@ export class AccountsComponent
 
             });
 
-   
+
     }
 
     initFilterForm() {
@@ -438,81 +438,81 @@ export class AccountsComponent
     }
 
 
- createRelation(account) {
-  if (!account?.account?.account?.id || !account?.relation?.connectionEntityId) {
-    return;
-  }
+    createRelation(account) {
+        if (!account?.account?.account?.id || !account?.relation?.connectionEntityId) {
+            return;
+        }
 
-  this.showMainSpinner();
+        this.showMainSpinner();
 
-  forkJoin({
-    recipientRoles: this.AppTransactionServiceProxy.getAccountMarketplaceRoles(
-      account.account.account.ssin
-    ),
-    loggedTenantRoles: this.AppTransactionServiceProxy.getAccountMarketplaceRoles(
-      this.loginTenaneSsin
-    )
-  })
-    .pipe(finalize(() => this.hideMainSpinner()))
-    .subscribe(({ recipientRoles, loggedTenantRoles }: any) => {
-      const recipientHasRoles = this.hasMarketplaceRoles(recipientRoles);
-      const loggedTenantHasRoles = this.hasMarketplaceRoles(loggedTenantRoles);
+        forkJoin({
+            recipientRoles: this.AppTransactionServiceProxy.getAccountMarketplaceRoles(
+                account.account.account.ssin
+            ),
+            loggedTenantRoles: this.AppTransactionServiceProxy.getAccountMarketplaceRoles(
+                this.loginTenaneSsin
+            )
+        })
+            .pipe(finalize(() => this.hideMainSpinner()))
+            .subscribe(({ recipientRoles, loggedTenantRoles }: any) => {
+                const recipientHasRoles = this.hasMarketplaceRoles(recipientRoles);
+                const loggedTenantHasRoles = this.hasMarketplaceRoles(loggedTenantRoles);
 
-      if (!recipientHasRoles || !loggedTenantHasRoles) {
-        this.message.info(
-          'Cannot connect, you need to update the marketplace role of your account / the recipient account marketplace role in order to build relationship together',
-          ''
-        );
-        return;
-      }
+                if (!recipientHasRoles || !loggedTenantHasRoles) {
+                    this.message.info(
+                        'Cannot connect, you need to update the marketplace role of your account / the recipient account marketplace role in order to build relationship together',
+                        ''
+                    );
+                    return;
+                }
 
-      this.applyRelation(account);
-    });
-}
-private hasMarketplaceRoles(response: any): boolean {
-  const roles = response?.result ?? response;
+                this.applyRelation(account);
+            });
+    }
+    private hasMarketplaceRoles(response: any): boolean {
+        const roles = response?.result ?? response;
 
-  return Array.isArray(roles) && roles.length > 0;
-}
+        return Array.isArray(roles) && roles.length > 0;
+    }
 
-private applyRelation(account): void {
-  this.showMainSpinner();
+    private applyRelation(account): void {
+        this.showMainSpinner();
 
-  this._accountsServiceProxy
-    .applyRelationOnProfile(
-      account.account.account.id,
-      undefined,
-      account.relation.defaultVisibility === 'Public',
-      account.relation.connectionEntityId
-    )
-    .pipe(finalize(() => this.hideMainSpinner()))
-    .subscribe((result: any) => {
-      const i = this.accounts.findIndex(
-        x => x.account.id === account.account.account.id
-      );
+        this._accountsServiceProxy
+            .applyRelationOnProfile(
+                account.account.account.id,
+                undefined,
+                account.relation.defaultVisibility === 'Public',
+                account.relation.connectionEntityId
+            )
+            .pipe(finalize(() => this.hideMainSpinner()))
+            .subscribe((result: any) => {
+                const i = this.accounts.findIndex(
+                    x => x.account.id === account.account.account.id
+                );
 
-      if (i < 0) return;
+                if (i < 0) return;
 
-      const currentAccount = this.accounts[i];
+                const currentAccount = this.accounts[i];
 
-      currentAccount.availableConnections = (currentAccount.availableConnections || []).filter(
-        x => x.connectionEntityId !== account.relation.connectionEntityId
-      );
+                currentAccount.availableConnections = (currentAccount.availableConnections || []).filter(
+                    x => x.connectionEntityId !== account.relation.connectionEntityId
+                );
 
-      currentAccount.connectionsInfo = currentAccount.connectionsInfo || [];
+                currentAccount.connectionsInfo = currentAccount.connectionsInfo || [];
 
-      if (Array.isArray(result) && result.length > 0) {
-        currentAccount.connectionsInfo.push(result[0]);
-      }
+                if (Array.isArray(result) && result.length > 0) {
+                    currentAccount.connectionsInfo.push(result[0]);
+                }
 
-      currentAccount.avaliableConnectionName =
-        currentAccount.availableConnections?.length > 0
-          ? currentAccount.availableConnections[0].connectLabel
-          : '';
+                currentAccount.avaliableConnectionName =
+                    currentAccount.availableConnections?.length > 0
+                        ? currentAccount.availableConnections[0].connectLabel
+                        : '';
 
-      this.accounts = [...this.accounts];
-    });
-}
+                this.accounts = [...this.accounts];
+            });
+    }
 
 
 
@@ -520,33 +520,61 @@ private applyRelation(account): void {
         let id = this.appSession.user.accountId
         if (!id) return
 
-      this._accountsServiceProxy.getAccountForView(id, 5).pipe(
-  
-    ).subscribe((res) => {
-      this.loginTenaneSsin = res?.account?.ssin
-    })
+        this._accountsServiceProxy.getAccountForView(id, 5).pipe(
+
+        ).subscribe((res) => {
+            this.loginTenaneSsin = res?.account?.ssin
+        })
 
     }
 
 
-     openCreateManualAccount() {
-  this.tenantContactModal.open({
-    mode: TenantContactMode.Create,
-    accountType: TenantContactType.Manual
-  });
-}
-openViewTenantContact(account: GetAccountForViewDto): void {
-  
-  this.tenantContactModal.open({
-    mode: TenantContactMode.View,
-    accountType: account?.account?.isManual
-      ? TenantContactType.Manual
-      : TenantContactType.Connected,
-    accountId: account?.account?.id
-  });
-}
-refresh(event){
-    if(event)
-        this.getAccounts()
-}
+    openCreateManualAccount() {
+        this.tenantContactModal.open({
+            mode: TenantContactMode.Create,
+            accountType: TenantContactType.Manual
+        });
+    }
+    openViewTenantContact(account: GetAccountForViewDto): void {
+
+        this.tenantContactModal.open({
+            mode: TenantContactMode.View,
+            accountType: account?.account?.isManual
+                ? TenantContactType.Manual
+                : TenantContactType.Connected,
+            accountId: account?.account?.id
+        });
+    }
+    refresh(event) {
+        if (event)
+            this.getAccounts()
+    }
+
+
+    getFirstRecordNumber(): number {
+
+        if (!this.primengTableHelper.totalRecordsCount) {
+            return 0;
+        }
+
+        return (
+            (this.paginator?.getPage() || 0) *
+            (this.paginator?.rows ||
+                this.primengTableHelper.defaultRecordsCountPerPage)
+        ) + 1;
+    }
+
+    getLastRecordNumber(): number {
+
+        if (!this.primengTableHelper.totalRecordsCount) {
+            return 0;
+        }
+
+        const first =
+            (this.paginator?.getPage() || 0) *
+            (this.paginator?.rows ||
+                this.primengTableHelper.defaultRecordsCountPerPage);
+
+        return first + (this.accounts?.length || 0);
+    }
 }

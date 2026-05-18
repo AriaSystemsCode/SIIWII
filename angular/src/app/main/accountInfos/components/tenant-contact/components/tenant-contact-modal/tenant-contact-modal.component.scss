@@ -107,3 +107,53 @@
   max-height: calc(85vh - 58px);
   overflow-y: auto;
 }
+
+
+
+::ng-deep .tenant-contact-dialog.p-dialog {
+  // overflow: hidden !important;
+}
+
+::ng-deep .tenant-contact-dialog .p-dialog-content {
+  height: calc(92vh - 58px);
+  // overflow: hidden !important;
+  padding: 0 !important;
+}
+
+::ng-deep .tenant-contact-dialog .p-dialog-content > app-tenant-contact {
+  display: block;
+  height: 100%;
+}
+
+/* prevent content from resizing dialog */
+.tenant-contact-main {
+  width: 100%;
+  min-width: 0;
+  // overflow: hidden;
+}
+
+.tenant-contact-shell {
+  height: 100%;
+  // overflow: hidden;
+}
+
+/* main content scroll */
+.tenant-contact-main {
+  overflow-y: auto;
+}
+
+/* desktop fixed layout */
+@media (min-width: 992px) {
+
+  .tenant-contact-shell {
+    display: grid;
+    grid-template-columns: 285px minmax(0, 1fr);
+    gap: 14px;
+  }
+
+  .tenant-contact-sidebar {
+    width: 285px;
+    min-width: 285px;
+    max-width: 285px;
+  }
+}

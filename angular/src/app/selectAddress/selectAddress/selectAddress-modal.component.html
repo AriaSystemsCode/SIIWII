@@ -1,8 +1,8 @@
-﻿<div bsModal   #selectAddressModal="bs-modal" class="modal right fade" tabindex="-1" role="dialog"
+﻿<!-- <div bsModal   #selectAddressModal="bs-modal" class="modal right fade" tabindex="-1" role="dialog"
     aria-labelledby="createOrEditModal" aria-hidden="true" [config]="{backdrop: 'static'}">
     <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-
+        <div class="modal-content"> -->
+<div class="modal-content-wrapper select-address-wrapper">
             <form *ngIf="active" #selectAddressForm="ngForm" novalidate (ngSubmit)="selectAddress()" autocomplete="off">
                 <div class="modal-header" style="display: block;background-color: #ffffff !important;">
                     <h4 class="modal-title">
@@ -20,7 +20,7 @@
                     </button>
 
                 </div>
-                <div class="modal-body">
+                <div class="mx-3">
 
 
 
@@ -68,8 +68,8 @@
 
                 </div>
             </form>
-        </div>
-    </div>
+        <!-- </div>
+    </div> -->
 
 
 </div>

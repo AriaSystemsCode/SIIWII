@@ -3,8 +3,9 @@
   [ngClass]="classList"
   class="img-thumbnail p-0"
   [ngStyle]="{
-    'width': '100%',
-    'height.px': staticHeight
+    width: staticWidth ? staticWidth + 'px' : '100%',
+    height: staticHeight ? staticHeight + 'px' : 'auto',
+    'border-radius': staticeRadius ? staticeRadius + 'px' : null
   }"
   [src]="image"
   [alt]="alt"
