@@ -2561,6 +2561,7 @@
 		<text name="DefaultCurrencyMustExist">Default currency must exist</text>
 		<text name="EnterProductList">Enter Product List</text>
 		<text name="ConnectedAccounts">Connected Accounts</text>
+		<text name="ConnectedAccount">Connected Account</text>
 	    <text name="PersonalEmailAddress">personal email</text>
 		<text name="PriceLevel">Price Level</text>
 		<text name="AccountSSIN">Account SSIN</text>
