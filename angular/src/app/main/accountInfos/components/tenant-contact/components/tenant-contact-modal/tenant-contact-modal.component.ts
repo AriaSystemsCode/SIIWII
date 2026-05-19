@@ -3,12 +3,19 @@ import {
   TenantContactMode,
   TenantContactType
 } from '@app/main/accountInfos/models/Account-info-page-tabs.enum';
-
+interface MinimizedTenantContactItem {
+  mode: TenantContactMode;
+  contactType: TenantContactType;
+  accountId?: number;
+  title: string;
+}
 @Component({
   selector: 'app-tenant-contact-modal',
   templateUrl: './tenant-contact-modal.component.html',
   styleUrls: ['./tenant-contact-modal.component.scss']
 })
+
+
 export class TenantContactModalComponent {
 
   @ViewChild('tenantContactComponent') tenantContactComponent: any;
@@ -25,7 +32,7 @@ export class TenantContactModalComponent {
 
   dialogStyle: any = {};
   lastMode: TenantContactMode;
-  
+  minimizedItems: MinimizedTenantContactItem[] = [];
 
   ngOnInit(): void {
     this.setDialogStyle();
@@ -192,4 +199,48 @@ handleCancel(): void {
   deleteAccount(): void {
     console.log('delete account');
   }
+
+  minimize(): void {
+  if (this.minimizedItems.length >= 5) {
+    abp.message.warn('You can minimize maximum 5 accounts');
+    return;
+  }
+
+  const title =
+    this.tenantContactComponent?.accountData?.account?.name ||
+    (this.contactType === TenantContactType.Manual ? 'Manual Account' : 'Connected Account');
+
+  const alreadyExists = this.minimizedItems.some(x =>
+    x.accountId === this.accountId &&
+    x.contactType === this.contactType
+  );
+
+  if (!alreadyExists) {
+    this.minimizedItems.push({
+      mode: this.mode,
+      contactType: this.contactType,
+      accountId: this.accountId,
+      title
+    });
+  }
+
+  this.visible = false;
+}
+
+restoreMinimized(index: number): void {
+  const item = this.minimizedItems[index];
+
+  this.minimizedItems.splice(index, 1);
+
+  this.open({
+    mode: item.mode,
+    contactType: item.contactType,
+    accountId: item.accountId
+  });
+}
+
+closeMinimized(index: number, event: MouseEvent): void {
+  event.stopPropagation();
+  this.minimizedItems.splice(index, 1);
+}
 }

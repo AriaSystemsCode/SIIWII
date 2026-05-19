@@ -57,12 +57,13 @@
         </button>
 
         <!-- minimize -->
-        <button
-          type="button"
-          class="header-icon-btn"
-          pTooltip="{{ 'Minimize' | localize }}">
-          <i class="fas fa-window-minimize"></i>
-        </button>
+    <button
+  type="button"
+  class="header-icon-btn"
+  pTooltip="{{ 'Minimize' | localize }}"
+  (click)="minimize()">
+  <i class="fas fa-window-minimize"></i>
+</button>
 
    
 
@@ -111,3 +112,25 @@
 </app-tenant-contact>
 
 </p-dialog>
+
+
+
+
+
+
+<div class="tenant-minimized-tray" *ngIf="minimizedItems.length">
+  <button
+    *ngFor="let item of minimizedItems; let i = index"
+    type="button"
+    class="tenant-tray-item"
+    (click)="restoreMinimized(i)">
+<img src="assets/shoppingCart/MinimizedTrans.png" class="mr-2" alt="" srcset="">
+    <!-- <i class="far fa-window-restore mr-2"></i> -->
+    <span>{{ item.title }}</span>
+
+    <i
+      class="fas fa-times tray-close"
+      (click)="closeMinimized(i, $event)">
+    </i>
+  </button>
+</div>
