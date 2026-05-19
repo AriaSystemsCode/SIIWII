@@ -1224,6 +1224,19 @@ export class TransactionInformationComponent
 
     }
   }
+// private addCacheBuster(url: string): string {
+//   const separator = url.includes('?') ? '&' : '?';
+//   return `${url}${separator}v=${Date.now()}`;
+// }
+private preparePrintUrl(url: string): string {
+  // convert \ to /
+  const cleanUrl = url.replace(/\\/g, '/');
+
+  // force latest file (avoid cached old PDF)
+  const separator = cleanUrl.includes('?') ? '&' : '?';
+
+  return `${cleanUrl}${separator}v=${Date.now()}`;
+}
 
 async printTransaction(): Promise<void> {
   const printWindow = window.open('', '_blank');
@@ -1238,60 +1251,88 @@ async printTransaction(): Promise<void> {
 
   this.showMainSpinner();
 
-  try {
-    //  wait for report generation
-    await this.onGeneratOrderReport(true, undefined, true, false);
+  // start generate report
+  this.onGeneratOrderReport(true, undefined, true, false, false);
 
-    //  wait for URL
-    const url = await this.waitForOrderConfirmationUrlPromise();
+  // wait for backend generation
+  setTimeout(() => {
 
-    //  load into opened tab
-    printWindow.location.href = url;
+    this._AppTransactionServiceProxy
+      .getTransactionOrderConfirmationUrl(this.orderId)
+      .pipe(finalize(() => this.hideMainSpinner()))
+      .subscribe((url: string) => {
 
-    printWindow.onload = () => {
-      setTimeout(() => {
-        printWindow.focus();
-        printWindow.print();
-      }, 1000);
-    };
+        if (!url || !url.trim()) {
+          printWindow.document.body.innerHTML =
+            '<p>Print file is not ready. Please try again.</p>';
+          return;
+        }
 
-  } catch (err) {
-    console.error('Print error:', err);
-    printWindow.close();
-  } finally {
-    this.hideMainSpinner();
-  }
+        // open fresh updated PDF
+        printWindow.location.href = this.preparePrintUrl(url);
+
+      });
+
+  }, 11000); // wait 10 sec for generation
 }
-waitForOrderConfirmationUrlPromise(): Promise<string> {
-  return new Promise((resolve, reject) => {
-    let attempts = 0;
+// generateOrderReportPromise(): Promise<void> {
+//   return new Promise((resolve, reject) => {
+//     this.reportUrl = '';
 
-    const interval = setInterval(() => {
-      this._AppTransactionServiceProxy
-        .getTransactionOrderConfirmationUrl(this.orderId)
-        .subscribe({
-          next: (url) => {
-            if (url) {
-              clearInterval(interval);
-              resolve(url);
-            }
-          },
-          error: (err) => {
-            clearInterval(interval);
-            reject(err);
-          }
-        });
+//     this.printInfoParam = new ProductCatalogueReportParams();
+//     this.printInfoParam.reportTemplateName = this.transactionReportTemplateName;
+//     this.printInfoParam.TransactionId = this.orderId.toString();
+//     this.printInfoParam.saveToPDF = true;
+//     this.printInfoParam.tenantId = this.appSession?.tenantId;
+//     this.printInfoParam.userId = this.appSession?.userId;
 
-      attempts++;
+//     this._AppTransactionServiceProxy
+//       .getTenantRoleInTransaction(this.orderId, this.appTransactionsForViewDto.tenantId)
+//       .subscribe({
+//         next: (res) => {
+//           this.printInfoParam.orderConfirmationRole = res.contactRole;
+//           this.printInfoParam.contactName = res.contactName;
 
-      if (attempts > 30) {
-        clearInterval(interval);
-        reject('Timeout waiting for report');
-      }
+//           this.reportUrl = this.printInfoParam.getReportUrl();
+//           this.createReportViewer();
 
-    }, 5000);
-  });
-}
+//           resolve();
+//         },
+//         error: reject
+//       });
+//   });
+// }
+// waitForOrderConfirmationUrlPromise(): Promise<string> {
+//   return new Promise((resolve, reject) => {
+//     let attempts = 0;
+//     const maxAttempts = 12;
+
+//     const interval = setInterval(() => {
+//       attempts++;
+
+//       this._AppTransactionServiceProxy
+//         .getTransactionOrderConfirmationUrl(this.orderId)
+//         .subscribe({
+//           next: (url: string) => {
+//             if (url && url.trim() !== '') {
+//               clearInterval(interval);
+//               resolve(url);
+//               return;
+//             }
+
+//             if (attempts >= maxAttempts) {
+//               clearInterval(interval);
+//               reject('Timeout waiting for report URL');
+//             }
+//           },
+//           error: (err) => {
+//             clearInterval(interval);
+//             reject(err);
+//           }
+//         });
+//     }, 3000);
+//   });
+// }
   onShareTransaction() {
     this.onshare = true;
   }
