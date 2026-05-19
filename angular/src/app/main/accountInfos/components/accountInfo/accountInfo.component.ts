@@ -428,6 +428,8 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit {
             .subscribe((res) => {
                 this.getForEditResult = res
                 this.setProfileData(res)
+              this.setSelectedMarketplaceRoles();
+
             })
     }
 
