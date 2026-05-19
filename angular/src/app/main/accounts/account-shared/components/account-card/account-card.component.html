@@ -177,11 +177,11 @@ NOT CARDS VIEW MODE
             [tooltipEvent]="isSmallScreen ? 'focus' : 'hover'" [autoHide]="true" [showDelay]="100" [hideDelay]="100"
             [tabindex]="isSmallScreen ? 0 : null">
             {{account?.account?.name | textSubstring : 25 }}  
-          </h3>      <img *ngIf="account?.account?.isManual"   [pTooltip]="'ManualAccount' | localize" tooltipPosition="bottom"
+          </h3>      <img *ngIf="account?.account?.isManual && !fromMarketplace"   [pTooltip]="'ManualAccount' | localize" tooltipPosition="bottom"
             [tooltipEvent]="isSmallScreen ? 'focus' : 'hover'" [autoHide]="true" [showDelay]="100" [hideDelay]="100"
             [tabindex]="isSmallScreen ? 0 : null" style="width: 18px;"
                   src="../../assets/accounts/manual-i.svg" /> 
-                   <img *ngIf="!account?.account?.isManual"   [pTooltip]="'ConnectedAccount' | localize" tooltipPosition="bottom"
+                   <img *ngIf="!account?.account?.isManual && !fromMarketplace"   [pTooltip]="'ConnectedAccount' | localize" tooltipPosition="bottom"
             [tooltipEvent]="isSmallScreen ? 'focus' : 'hover'" [autoHide]="true" [showDelay]="100" [hideDelay]="100"
             [tabindex]="isSmallScreen ? 0 : null" style="width: 25px;"
                   src="../../assets/accounts/connected-i.svg" /> 
