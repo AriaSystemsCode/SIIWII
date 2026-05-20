@@ -81,6 +81,8 @@ using DocumentFormat.OpenXml.Office2021.Drawing.SketchyShapes;
 using DocumentFormat.OpenXml.Vml.Office;
 using DocumentFormat.OpenXml.Drawing.Diagrams;
 using Abp.Runtime.Session;
+using DocumentFormat.OpenXml.ExtendedProperties;
+using onetouch.Authorization.Roles;
 
 
 //using NUglify.Helpers;
@@ -4975,6 +4977,7 @@ namespace onetouch.AppSiiwiiTransaction
                                     //contactDto.TenantId = usr.SharedTenantId;
                                     //contactDto.Id = usr.Id;
                                     string userName = "";
+                                    bool canBeRemoved = true;
                                     var user = UserManager.GetUserById(long.Parse(usr.SharedUserId.ToString()));
                                     if (user != null)
                                     {
@@ -4992,9 +4995,19 @@ namespace onetouch.AppSiiwiiTransaction
                                                 {
                                                     userName =contact.Name.TrimEnd()
                                 .Replace(" ", "") + "@"+userCompany.Name.TrimEnd().Replace(" ", "");
+                                                    var tranContact = await _appTransactionContactsRepository.GetAll()
+                                            .Where(z => z.CompanySSIN == userCompany.SSIN && z.ContactSSIN == contact.SSIN
+                                              && z.TransactionId == transactionId &&
+                                             (z.ContactRole == ContactRoleEnum.Creator.ToString() ||
+                                             z.ContactRole == ContactRoleEnum.Seller.ToString() ||
+                                             z.ContactRole == ContactRoleEnum.Buyer.ToString())).FirstOrDefaultAsync();
+                                                    if(tranContact!=null)
+                                                        canBeRemoved = false;
                                                 }
                                             }
                                         }
+
+                                        
                                         viewTrans.SharedWithUsers.Add(new ContactInformationOutputDto
                                         {
                                             Id = usr.Id,
@@ -5003,17 +5016,15 @@ namespace onetouch.AppSiiwiiTransaction
                                             UserId = long.Parse(usr.SharedUserId.ToString()),
                                             UserImage = user != null && user.ProfilePictureId != null ? Guid.Parse(user.ProfilePictureId.ToString()) : null,
                                             UserName = (string.IsNullOrEmpty(userName)? user.UserName : userName) ,
-                                            TenantId = int.Parse(user.TenantId.ToString())
+                                            TenantId = int.Parse(user.TenantId.ToString()),
+                                            CanBeRemoved = canBeRemoved
                                         });
-
-
-
                                     }
                                 }
                             }
-                            }
                         }
-                        //MMT
+                    }
+                    //MMT
 
 
                         viewTrans.IsOwnedByMe = (AbpSession.TenantId == viewTrans.TenantOwner);
@@ -8488,133 +8499,169 @@ namespace onetouch.AppSiiwiiTransaction
         }
         public async Task<List<ContactInfoDto>> GetContactsList(string searchFilter, long transactionId)
         {
-            List<AppEntitySharings> transactionUsers = null;
-            List<string> transactionsUsersSSIN = null;
-            if (transactionId!=null && transactionId !=0)
+            using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
             {
-                transactionUsers = await _appEntitySharingsRepository.GetAll().Where(z => z.EntityId == transactionId).ToListAsync();
-                if (transactionUsers != null && transactionUsers.Count > 0)
+                List<AppEntitySharings> transactionUsers = null;
+                List<string> transactionsUsersSSIN = null;
+                if (transactionId != null && transactionId != 0)
                 {
-                }
-            }
-            List<ContactInfoDto> returnList = new List<ContactInfoDto>();
-            var businessType = await _helper.SystemTables.GetEntityObjectTypeParetner();
-            var perosnalType = await _helper.SystemTables.GetEntityObjectTypePersonId();
-            var activeRelationshipStatusId = await _helper.SystemTables.GetEntityObjectStatusRelationshipActive();
-            var currentTenantContact = await _appContactRepository.GetAll()
-                .Where(z => z.EntityFk.EntityObjectTypeId == businessType.Id && z.IsProfileData == true && z.TenantId == AbpSession.TenantId && z.ParentId == null).FirstOrDefaultAsync();
-            if (currentTenantContact != null)
-            {
-                var personalRelationships = await _appContactRelationshipInfoRepository.GetAll()
-                .Where(z=> z.RequesterContactSSIN==currentTenantContact.SSIN
-                && z.RecipientContactTypeId == perosnalType
-                //|| (z.RecipientContactSSIN== currentTenantContact.SSIN && z.RequesterContactTypeId== perosnalType))
-                && z.EntityObjectStatusId == activeRelationshipStatusId)
-                .WhereIf(!string.IsNullOrEmpty(searchFilter),z=>z.RecipientContactName
-                .ToUpper().Contains(searchFilter.ToUpper()) || z.RequesterContactName.ToUpper().Contains(searchFilter.ToUpper()))
-                .ToListAsync();
-                if (personalRelationships != null && personalRelationships.Count > 0)
-                {
-                    var tenant = TenantManager.GetById(int.Parse(AbpSession.TenantId.ToString()));
-                    foreach (var person in personalRelationships)
+                    transactionUsers = await _appEntitySharingsRepository.GetAll().Where(z => z.EntityId == transactionId).ToListAsync();
+                    if (transactionUsers != null && transactionUsers.Count > 0)
                     {
-                        ContactInfoDto contact = new ContactInfoDto();
-                        contact.ContactSSIN = person.RecipientContactSSIN;
-                        contact.CompanySSIN = currentTenantContact.SSIN;
-                        contact.TenantId = long.Parse(AbpSession.TenantId.ToString());
-                        
-                         if (tenant != null)
+                        transactionsUsersSSIN = new List<string>();
+                        foreach (var user in transactionUsers)
                         {
-                            contact.UserName =person.RecipientContactName.TrimEnd()
-                                .Replace(" ","") +"@"+ tenant.TenancyName.TrimEnd();
-                        }
-                         if(returnList.Where(z=>z.CompanySSIN== contact.CompanySSIN && z.ContactSSIN== contact.ContactSSIN).FirstOrDefault()== null)
-                        returnList.Add(contact);
-                    }
-                }
-                var businessRelationships = await _appContactRelationshipInfoRepository.GetAll()
-                .Where(z => ((z.RequesterContactSSIN == currentTenantContact.SSIN
-                && z.RecipientContactTypeId == businessType.Id) ||
-                (z.RecipientContactSSIN == currentTenantContact.SSIN
-                && z.RequesterContactTypeId == businessType.Id)) && z.EntityObjectStatusId == activeRelationshipStatusId).
-                ToListAsync();
-
-                if (businessRelationships != null && businessRelationships.Count > 0)
-                {
-                    foreach (var business in businessRelationships)
-                    {
-                        if (business.RequesterContactSSIN == currentTenantContact.SSIN)
-                        {
-                            var marketplaceCompany = await _appMarketplaceContactRepository.GetAll()
-                                .Where(z => z.SSIN == business.RecipientContactSSIN).FirstOrDefaultAsync();
-                            if (marketplaceCompany != null)
+                            var extrData = await _appEntityExtraData.GetAll()
+                                .Where(z => z.AttributeId == 715 && z.AttributeValue == user.SharedUserId.ToString()).FirstOrDefaultAsync();
+                            if (extrData != null)
                             {
-                                personalRelationships = await _appContactRelationshipInfoRepository.GetAll()
-                            .Where(z => z.RequesterContactSSIN == business.RecipientContactSSIN
-                             && z.RecipientContactTypeId == perosnalType
-                             && z.EntityObjectStatusId == activeRelationshipStatusId && z.SharingLevel==1)
-                            .WhereIf(!string.IsNullOrEmpty(searchFilter), z => z.RecipientContactName
-                            .ToUpper().Contains(searchFilter.ToUpper()) || z.RequesterContactName.ToUpper().Contains(searchFilter.ToUpper()))
-                            .ToListAsync();
-                                foreach (var person in personalRelationships)
-                                {
+                                var contactSharing = await _appContactRepository.GetAll()
+                                    .Where(z => z.EntityId == extrData.EntityId).FirstOrDefaultAsync();
 
-                                    ContactInfoDto contact = new ContactInfoDto();
-                                    contact.ContactSSIN = person.RecipientContactSSIN;
-                                    contact.CompanySSIN = business.RecipientContactSSIN;
-                                    contact.TenantId = marketplaceCompany.TenantOwner;
-                                    var tenant = TenantManager.GetById(marketplaceCompany.TenantOwner);
-                                    if (tenant != null)
-                                    {
-                                        contact.UserName = person.RecipientContactName.TrimEnd()
-                                            .Replace(" ", "") + "@" + tenant.TenancyName.TrimEnd();
-                                    }
-                                    if (returnList.Where(z => z.CompanySSIN == contact.CompanySSIN && z.ContactSSIN == contact.ContactSSIN).FirstOrDefault() == null)
-                                        returnList.Add(contact);
+                                if (contactSharing != null && !string.IsNullOrEmpty(contactSharing.SSIN))
+                                {
+                                    var company = await _appContactRepository.GetAll()
+                                        .Where(z => z.TenantId == contactSharing.TenantId && z.IsProfileData == true && z.ParentId == null).FirstOrDefaultAsync();
+                                    if (company != null && company.SSIN != null)
+                                        transactionsUsersSSIN.Add(company.SSIN.Trim() + "-" + contactSharing.SSIN.Trim());
                                 }
                             }
                         }
-
-                        if (business.RecipientContactSSIN == currentTenantContact.SSIN)
-                        {
-                            var marketplaceCompany = await _appMarketplaceContactRepository.GetAll()
-                                .Where(z => z.SSIN == business.RequesterContactSSIN).FirstOrDefaultAsync();
-                            if (marketplaceCompany != null)
-                            {
-                                 personalRelationships = await _appContactRelationshipInfoRepository.GetAll()
-                            .Where(z => z.RequesterContactSSIN == business.RequesterContactSSIN
-                             && z.RecipientContactTypeId == perosnalType
-                             && z.EntityObjectStatusId == activeRelationshipStatusId && z.SharingLevel == 1)
-                            .WhereIf(!string.IsNullOrEmpty(searchFilter), z => z.RecipientContactName
-                            .ToUpper().Contains(searchFilter.ToUpper()) || z.RequesterContactName.ToUpper().Contains(searchFilter.ToUpper()))
-                            .ToListAsync();
-                                foreach (var person in personalRelationships)
-                                {
-
-                                    ContactInfoDto contact = new ContactInfoDto();
-                                    contact.ContactSSIN = person.RecipientContactSSIN;
-                                    contact.CompanySSIN = business.RequesterContactSSIN;
-                                    contact.TenantId = marketplaceCompany.TenantOwner;
-                                    var tenant = TenantManager.GetById(marketplaceCompany.TenantOwner);
-                                    if (tenant != null)
-                                    {
-                                        contact.UserName = person.RecipientContactName.TrimEnd()
-                                            .Replace(" ", "") + "@" + tenant.TenancyName.TrimEnd();
-                                    }
-                                    if (returnList.Where(z => z.CompanySSIN == contact.CompanySSIN && z.ContactSSIN == contact.ContactSSIN).FirstOrDefault() == null)
-                                        returnList.Add(contact);
-                                }
-                            }
-                        }
-
                     }
                 }
-                    
-                
-                
-            }
-            return returnList;
+                List<ContactInfoDto> returnList = new List<ContactInfoDto>();
+                var businessType = await _helper.SystemTables.GetEntityObjectTypeParetner();
+                var perosnalType = await _helper.SystemTables.GetEntityObjectTypePersonId();
+                var activeRelationshipStatusId = await _helper.SystemTables.GetEntityObjectStatusRelationshipActive();
+                var currentTenantContact = await _appContactRepository.GetAll()
+                    .Where(z => z.EntityFk.EntityObjectTypeId == businessType.Id && z.IsProfileData == true && z.TenantId == AbpSession.TenantId && z.ParentId == null).FirstOrDefaultAsync();
+                if (currentTenantContact != null)
+                {
+                    var personalRelationships = await _appContactRelationshipInfoRepository.GetAll()
+                    .Where(z => z.RequesterContactSSIN == currentTenantContact.SSIN
+                    && z.RecipientContactTypeId == perosnalType
+                    //|| (z.RecipientContactSSIN== currentTenantContact.SSIN && z.RequesterContactTypeId== perosnalType))
+                    && z.EntityObjectStatusId == activeRelationshipStatusId)
+                    .WhereIf(!string.IsNullOrEmpty(searchFilter), z => z.RecipientContactName
+                    .ToUpper().Contains(searchFilter.ToUpper()) || z.RequesterContactName.ToUpper().Contains(searchFilter.ToUpper()))
+                    .ToListAsync();
+                    if (personalRelationships != null && personalRelationships.Count > 0)
+                    {
+                        var tenant = TenantManager.GetById(int.Parse(AbpSession.TenantId.ToString()));
+                        foreach (var person in personalRelationships)
+                        {
+                            if (transactionsUsersSSIN != null && transactionsUsersSSIN.Count > 0)
+                            {
+                                var existingContact = transactionsUsersSSIN
+                                    .Where(z => z == currentTenantContact.SSIN.Trim()
+                                + "-" + person.RecipientContactSSIN.Trim()).FirstOrDefault();
+                                if (existingContact != null)
+                                    continue;
+                            }
+                            ContactInfoDto contact = new ContactInfoDto();
+                            contact.ContactSSIN = person.RecipientContactSSIN;
+                            contact.CompanySSIN = currentTenantContact.SSIN;
+                            contact.TenantId = long.Parse(AbpSession.TenantId.ToString());
 
+                            if (tenant != null)
+                            {
+                                contact.UserName = person.RecipientContactName.TrimEnd()
+                                    .Replace(" ", "") + "@" + tenant.TenancyName.TrimEnd();
+                            }
+                            if (returnList.Where(z => z.CompanySSIN == contact.CompanySSIN && z.ContactSSIN == contact.ContactSSIN).FirstOrDefault() == null)
+                                returnList.Add(contact);
+                        }
+                    }
+                    var businessRelationships = await _appContactRelationshipInfoRepository.GetAll()
+                    .Where(z => ((z.RequesterContactSSIN == currentTenantContact.SSIN
+                    && z.RecipientContactTypeId == businessType.Id) ||
+                    (z.RecipientContactSSIN == currentTenantContact.SSIN
+                    && z.RequesterContactTypeId == businessType.Id)) && z.EntityObjectStatusId == activeRelationshipStatusId).
+                    ToListAsync();
+
+                    if (businessRelationships != null && businessRelationships.Count > 0)
+                    {
+                        foreach (var business in businessRelationships)
+                        {
+                            if (business.RequesterContactSSIN == currentTenantContact.SSIN)
+                            {
+                                var marketplaceCompany = await _appMarketplaceContactRepository.GetAll()
+                                    .Where(z => z.SSIN == business.RecipientContactSSIN).FirstOrDefaultAsync();
+                                if (marketplaceCompany != null)
+                                {
+                                    personalRelationships = await _appContactRelationshipInfoRepository.GetAll()
+                                .Where(z => z.RequesterContactSSIN == business.RecipientContactSSIN
+                                 && z.RecipientContactTypeId == perosnalType
+                                 && z.EntityObjectStatusId == activeRelationshipStatusId && z.SharingLevel == 1)
+                                .WhereIf(!string.IsNullOrEmpty(searchFilter), z => z.RecipientContactName
+                                .ToUpper().Contains(searchFilter.ToUpper()) || z.RequesterContactName.ToUpper().Contains(searchFilter.ToUpper()))
+                                .ToListAsync();
+                                    foreach (var person in personalRelationships)
+                                    {
+                                        if (transactionsUsersSSIN != null && transactionsUsersSSIN.Count > 0)
+                                        {
+                                            var existingContact = transactionsUsersSSIN
+                                                .Where(z => z == business.RecipientContactSSIN.Trim()
+                                            + "-" + person.RecipientContactSSIN.Trim()).FirstOrDefault();
+                                            if (existingContact != null)
+                                                continue;
+                                        }
+                                        ContactInfoDto contact = new ContactInfoDto();
+                                        contact.ContactSSIN = person.RecipientContactSSIN;
+                                        contact.CompanySSIN = business.RecipientContactSSIN;
+                                        contact.TenantId = marketplaceCompany.TenantOwner;
+                                        var tenant = TenantManager.GetById(marketplaceCompany.TenantOwner);
+                                        if (tenant != null)
+                                        {
+                                            contact.UserName = person.RecipientContactName.TrimEnd()
+                                                .Replace(" ", "") + "@" + tenant.TenancyName.TrimEnd();
+                                        }
+                                        if (returnList.Where(z => z.CompanySSIN == contact.CompanySSIN && z.ContactSSIN == contact.ContactSSIN).FirstOrDefault() == null)
+                                            returnList.Add(contact);
+                                    }
+                                }
+                            }
+
+                            if (business.RecipientContactSSIN == currentTenantContact.SSIN)
+                            {
+                                var marketplaceCompany = await _appMarketplaceContactRepository.GetAll()
+                                    .Where(z => z.SSIN == business.RequesterContactSSIN).FirstOrDefaultAsync();
+                                if (marketplaceCompany != null)
+                                {
+                                    personalRelationships = await _appContactRelationshipInfoRepository.GetAll()
+                               .Where(z => z.RequesterContactSSIN == business.RequesterContactSSIN
+                                && z.RecipientContactTypeId == perosnalType
+                                && z.EntityObjectStatusId == activeRelationshipStatusId && z.SharingLevel == 1)
+                               .WhereIf(!string.IsNullOrEmpty(searchFilter), z => z.RecipientContactName
+                               .ToUpper().Contains(searchFilter.ToUpper()) || z.RequesterContactName.ToUpper().Contains(searchFilter.ToUpper()))
+                               .ToListAsync();
+                                    foreach (var person in personalRelationships)
+                                    {
+
+                                        ContactInfoDto contact = new ContactInfoDto();
+                                        contact.ContactSSIN = person.RecipientContactSSIN;
+                                        contact.CompanySSIN = business.RequesterContactSSIN;
+                                        contact.TenantId = marketplaceCompany.TenantOwner;
+                                        var tenant = TenantManager.GetById(marketplaceCompany.TenantOwner);
+                                        if (tenant != null)
+                                        {
+                                            contact.UserName = person.RecipientContactName.TrimEnd()
+                                                .Replace(" ", "") + "@" + tenant.TenancyName.TrimEnd();
+                                        }
+                                        if (returnList.Where(z => z.CompanySSIN == contact.CompanySSIN && z.ContactSSIN == contact.ContactSSIN).FirstOrDefault() == null)
+                                            returnList.Add(contact);
+                                    }
+                                }
+                            }
+
+                        }
+                    }
+
+
+
+                }
+                return returnList;
+            }         
         }
         //I49[End]
     }
