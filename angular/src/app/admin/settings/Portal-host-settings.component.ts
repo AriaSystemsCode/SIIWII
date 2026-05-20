@@ -120,7 +120,7 @@ export class PortalHostSettingsComponent extends AppComponentBase implements OnI
 
     async getSettingData() {
         this._appEntitiesServiceProxy.getCurrentHostEntityId().pipe(finalize(() => {
-            this._appEntitiesServiceProxy.getAppEntityForEdit(this.hostEntityId).subscribe(result => {
+            this._appEntitiesServiceProxy.getAppEntityForEdit(this.hostEntityId,true).subscribe(result => {
                 this.dynamicInputsForViewDto = result;
             });
 

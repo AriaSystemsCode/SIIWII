@@ -81,7 +81,7 @@ dynamicInputsComponents!: QueryList<dynamicInputs>;
 
   getSettingData() {
     this._appEntitiesServiceProxy.getCurrentTenantEntityId().pipe(finalize(() => {
-      this._appEntitiesServiceProxy.getAppEntityForEdit(this.tenantEntityId).subscribe(result => {
+      this._appEntitiesServiceProxy.getAppEntityForEdit(this.tenantEntityId,true).subscribe(result => {
         this.dynamicInputsForViewDto = result;
       });
 

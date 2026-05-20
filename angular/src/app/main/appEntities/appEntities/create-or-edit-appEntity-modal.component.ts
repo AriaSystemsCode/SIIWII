@@ -54,7 +54,7 @@ export class CreateOrEditAppEntityModalComponent extends AppComponentBase {
             this.active = true;
             this.modal.show();
         } else {
-            this._appEntitiesServiceProxy.getAppEntityForEdit(appEntityId).subscribe(result => {
+            this._appEntitiesServiceProxy.getAppEntityForEdit(appEntityId,true).subscribe(result => {
                 this.appEntity = result.appEntity;
 
                 this.sycEntityObjectTypeName = result.sycEntityObjectTypeName;
