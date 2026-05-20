@@ -1914,6 +1914,7 @@ namespace onetouch.AppSiiwiiTransaction
                         foreach (var user in returnUserList)
                             optionsDto.TransactionSharing.Add(new TransactionSharingDto { SharedUserId = user });
 
+                        optionsDto.Message = "";
                         await ShareTransactionByMessage(optionsDto);
                     }
                 }
@@ -3985,7 +3986,7 @@ namespace onetouch.AppSiiwiiTransaction
         //xx
         public async Task GetProductFromMarketplace(string productSSIN, int? tenantId, long transactionId)
         {
-            if (tenantId == null)
+            if (tenantId == null || productSSIN==null)
                 return;
             
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
@@ -4960,18 +4961,20 @@ namespace onetouch.AppSiiwiiTransaction
                         //        }
 
 
-                                var sharedUsersList = await _appEntitySharingsRepository.GetAll().Where(z => z.EntityId == viewTrans.Id).ToListAsync();
-                                if (sharedUsersList != null && sharedUsersList.Count > 0)
-                                {
-
-                            foreach (var usr in sharedUsersList)
+                        var sharedUsersList = await _appEntitySharingsRepository.GetAll().Where(z => z.EntityId == viewTrans.Id).ToListAsync();
+                        if (sharedUsersList != null && sharedUsersList.Count > 0)
+                        {
+                            using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
                             {
-                                //ContactInformationOutputDto contactDto = new ContactInformationOutputDto();
-                                //contactDto.UserId = usr.SharedUserId;
-                                //contactDto.Email = usr.SharedUserEMail;
-                                //contactDto.TenantId = usr.SharedTenantId;
-                                //contactDto.Id = usr.Id;
-                                
+                                viewTrans.SharedWithUsers = new List<ContactInformationOutputDto>();
+                                foreach (var usr in sharedUsersList)
+                                {
+                                    //ContactInformationOutputDto contactDto = new ContactInformationOutputDto();
+                                    //contactDto.UserId = usr.SharedUserId;
+                                    //contactDto.Email = usr.SharedUserEMail;
+                                    //contactDto.TenantId = usr.SharedTenantId;
+                                    //contactDto.Id = usr.Id;
+                                    string userName = "";
                                     var user = UserManager.GetUserById(long.Parse(usr.SharedUserId.ToString()));
                                     if (user != null)
                                     {
@@ -4980,7 +4983,17 @@ namespace onetouch.AppSiiwiiTransaction
                                     z.SharingLevel == 1 && z.IsProfileData == true && z.ParentId == null).FirstOrDefaultAsync();
                                         if (userCompany != null)
                                         {
-
+                                            var extraData = await _appEntityExtraData.GetAll()
+                                                .Where(z => z.AttributeId == 715 && z.AttributeValue == usr.SharedUserId.ToString()).FirstOrDefaultAsync();
+                                            if (extraData != null)
+                                            {
+                                                var contact = await _appContactRepository.GetAll().Where(z => z.EntityId == extraData.EntityId).FirstOrDefaultAsync();
+                                                if (contact!=null)
+                                                {
+                                                    userName =contact.Name.TrimEnd()
+                                .Replace(" ", "") + "@"+userCompany.Name.TrimEnd().Replace(" ", "");
+                                                }
+                                            }
                                         }
                                         viewTrans.SharedWithUsers.Add(new ContactInformationOutputDto
                                         {
@@ -4989,14 +5002,15 @@ namespace onetouch.AppSiiwiiTransaction
                                             Name = user.Name,
                                             UserId = long.Parse(usr.SharedUserId.ToString()),
                                             UserImage = user != null && user.ProfilePictureId != null ? Guid.Parse(user.ProfilePictureId.ToString()) : null,
-                                            UserName = user.UserName,
+                                            UserName = (string.IsNullOrEmpty(userName)? user.UserName : userName) ,
                                             TenantId = int.Parse(user.TenantId.ToString())
                                         });
-                                    
-                                
-                                
+
+
+
                                     }
                                 }
+                            }
                             }
                         }
                         //MMT
@@ -5507,6 +5521,7 @@ namespace onetouch.AppSiiwiiTransaction
                                             var userExtraData = userContact.EntityFk.EntityExtraData.Where(z => z.AttributeId == 715).FirstOrDefault();
                                             if (userExtraData != null&& !string.IsNullOrEmpty(userExtraData.AttributeValue))
                                                 user.SharedUserId = long.Parse(userExtraData.AttributeValue);
+
                                         }
                                     }
                                         
@@ -5529,8 +5544,11 @@ namespace onetouch.AppSiiwiiTransaction
                         string toUserList = "";
                         List<string> tenantsRoles = new List<string>();
                         List<long> userToShare = new List<long>();
+
                         foreach (var shar in input.TransactionSharing)
                         {
+                            if (shar.SharedUserId == null || shar.SharedUserId == 0)
+                                continue;
 
                             TransactionType? tranType = null;
                             try
@@ -5901,7 +5919,10 @@ namespace onetouch.AppSiiwiiTransaction
                                 detail.TransactionIdFk = tenantTransaction;
                                 detail.EntityObjectTypeId = tenantTransaction.EntityObjectTypeId;
                                 detail.EntityObjectTypeCode = tenantTransaction.EntityObjectTypeCode;
-                                detail.Code = tenantTransaction.TenantId.ToString().TrimEnd() + "-" + tenantTransaction.Code.TrimEnd() + "-" + detail.LineNo.ToString() + "-" + detail.SSIN.TrimEnd();
+                                detail.Code = tenantTransaction.TenantId.ToString().TrimEnd() + "-" +
+                                    tenantTransaction.Code.TrimEnd() + "-" + 
+                                    detail.LineNo.ToString() + "-" +
+                                    (string.IsNullOrEmpty(detail.SSIN) ? detail.ItemSSIN :detail.SSIN.TrimEnd());
                                 //marketplaceTransaction.AppMarketplaceTransactionDetails.Add(detail);
                                 if (det.EntityExtraData != null && det.EntityExtraData.Count > 0)
                                 {
@@ -6192,7 +6213,7 @@ namespace onetouch.AppSiiwiiTransaction
                                 detail.TransactionIdFk = tenantTransactionObj;
                                 detail.EntityObjectTypeId = tranType;
                                 detail.EntityObjectTypeCode = tranTypeCode;
-                                detail.Code = tenantTransactionObj.TenantId.ToString().TrimEnd() + "-" + tenantTransactionObj.Code.TrimEnd() + "-" + detail.LineNo.ToString() + "-" + detail.SSIN.TrimEnd();
+                                detail.Code = tenantTransactionObj.TenantId.ToString().TrimEnd() + "-" + tenantTransactionObj.Code.TrimEnd() + "-" + detail.LineNo.ToString() + "-" + (string.IsNullOrEmpty(detail.SSIN) ?detail.ItemSSIN.TrimEnd() :detail.SSIN.TrimEnd());
                                 if (det.EntityExtraData != null && det.EntityExtraData.Count > 0)
                                 {
                                     detail.EntityExtraData = new List<AppEntityExtraData>();
@@ -6331,7 +6352,7 @@ namespace onetouch.AppSiiwiiTransaction
         }
         public async Task<long> ShareTransactionOnMarketplace(long input)
         {
-            long returnId = 0;
+                long returnId = 0;
             var objectId = await _helper.SystemTables.GetObjectTransactionId();
 
 
@@ -8062,6 +8083,7 @@ namespace onetouch.AppSiiwiiTransaction
                     {
                         TransactionId = pTransactionID,
                         ItemSSIN = itemSsin,
+                        LineNo = lineNo,
                         Code = pTransactionID.ToString() + '-' + lineNo.ToString() + '-' + itemSsin,
                         //Note = calculationApi, // Storing CalculationAPI in Note for reference
                         Quantity = 1, // Default quantity, can be modified as needed
@@ -8464,8 +8486,17 @@ namespace onetouch.AppSiiwiiTransaction
             }
             return returnUserList;
         }
-        public async Task<List<ContactInfoDto>> GetContactsList(string searchFilter)
+        public async Task<List<ContactInfoDto>> GetContactsList(string searchFilter, long transactionId)
         {
+            List<AppEntitySharings> transactionUsers = null;
+            List<string> transactionsUsersSSIN = null;
+            if (transactionId!=null && transactionId !=0)
+            {
+                transactionUsers = await _appEntitySharingsRepository.GetAll().Where(z => z.EntityId == transactionId).ToListAsync();
+                if (transactionUsers != null && transactionUsers.Count > 0)
+                {
+                }
+            }
             List<ContactInfoDto> returnList = new List<ContactInfoDto>();
             var businessType = await _helper.SystemTables.GetEntityObjectTypeParetner();
             var perosnalType = await _helper.SystemTables.GetEntityObjectTypePersonId();
