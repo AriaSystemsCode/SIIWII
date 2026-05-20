@@ -200,7 +200,64 @@ handleCancel(): void {
     console.log('delete account');
   }
 
-  minimize(): void {
+//   minimize(): void {
+//   if (this.minimizedItems.length >= 5) {
+//     abp.message.warn('You can minimize maximum 5 accounts');
+//     return;
+//   }
+
+//   const title =
+//     this.tenantContactComponent?.accountData?.account?.name ||
+//     (this.contactType === TenantContactType.Manual ? 'Manual Account' : 'Connected Account');
+
+//   const alreadyExists = this.minimizedItems.some(x =>
+//     x.accountId === this.accountId &&
+//     x.contactType === this.contactType
+//   );
+
+//   if (!alreadyExists) {
+//     this.minimizedItems.push({
+//       mode: this.mode,
+//       contactType: this.contactType,
+//       accountId: this.accountId,
+//       title
+//     });
+//   }
+
+//   this.visible = false;
+// }
+
+minimize(): void {
+  this.addCurrentToTray();
+  this.visible = false;
+}
+
+restoreMinimized(index: number): void {
+  const item = this.minimizedItems[index];
+
+  // before opening new one, minimize current opened dialog
+  if (this.visible) {
+    this.addCurrentToTray();
+  }
+
+  // remove clicked item from tray because it will be opened
+  this.minimizedItems.splice(index, 1);
+
+  this.open({
+    mode: item.mode,
+    contactType: item.contactType,
+    accountId: item.accountId
+  });
+}
+
+private addCurrentToTray(): void {
+  const alreadyExists = this.minimizedItems.some(x =>
+    x.accountId === this.accountId &&
+    x.contactType === this.contactType
+  );
+
+  if (alreadyExists) return;
+
   if (this.minimizedItems.length >= 5) {
     abp.message.warn('You can minimize maximum 5 accounts');
     return;
@@ -210,32 +267,11 @@ handleCancel(): void {
     this.tenantContactComponent?.accountData?.account?.name ||
     (this.contactType === TenantContactType.Manual ? 'Manual Account' : 'Connected Account');
 
-  const alreadyExists = this.minimizedItems.some(x =>
-    x.accountId === this.accountId &&
-    x.contactType === this.contactType
-  );
-
-  if (!alreadyExists) {
-    this.minimizedItems.push({
-      mode: this.mode,
-      contactType: this.contactType,
-      accountId: this.accountId,
-      title
-    });
-  }
-
-  this.visible = false;
-}
-
-restoreMinimized(index: number): void {
-  const item = this.minimizedItems[index];
-
-  this.minimizedItems.splice(index, 1);
-
-  this.open({
-    mode: item.mode,
-    contactType: item.contactType,
-    accountId: item.accountId
+  this.minimizedItems.push({
+    mode: this.mode,
+    contactType: this.contactType,
+    accountId: this.accountId,
+    title
   });
 }
 
