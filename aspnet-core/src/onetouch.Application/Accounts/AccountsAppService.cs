@@ -3516,6 +3516,26 @@ namespace onetouch.Accounts
 
         }
         //I46[Start]
+        //I49[Start]
+        public async Task<List<ConnectionType>> GetAvailableConnections(string marketplaceRole)
+        {
+            string currentTenatntAccountMarketplaceRole = "";
+            List<ConnectionType> returnList = new List<ConnectionType>();
+            var currentTenantAccountObj = _appContactRepository.GetAll().Include(e => e.EntityFk).ThenInclude(z => z.EntityExtraData)
+                        .FirstOrDefault(e => e.TenantId == AbpSession.TenantId && e.IsProfileData && e.ParentId == null);
+            if (currentTenantAccountObj != null)
+            {
+                var extraDataRole = currentTenantAccountObj.EntityFk.EntityExtraData
+                                        .Where(z => z.AttributeId == 610).FirstOrDefault();
+                if (extraDataRole != null)
+                {
+                    currentTenatntAccountMarketplaceRole = extraDataRole.AttributeValue;
+                }
+
+            }
+            return returnList;
+        }
+        //I49[End]
         public async Task<GetContactDefaultsOutput> GetContactDefaults()
         {
             GetContactDefaultsOutput output = new GetContactDefaultsOutput();
