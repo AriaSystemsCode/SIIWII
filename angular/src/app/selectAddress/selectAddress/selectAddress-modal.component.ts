@@ -84,6 +84,11 @@ accountId: number;
 //     this.active = true;
 //   });
 // }
+
+chooseAddress(address: AppAddressDto): void {
+  this.selectedAddress = address;
+  this.selectedAddressId = address.id;
+}
 show(branch: any, accountId: number): void {
   this.branchId = branch?.node?.data?.branch?.id;
   this.spinnerService.show();

@@ -3,77 +3,90 @@
     <div class="modal-dialog modal-lg">
         <div class="modal-content"> -->
 <div class="modal-content-wrapper select-address-wrapper">
-            <form *ngIf="active" #selectAddressForm="ngForm" novalidate (ngSubmit)="selectAddress()" autocomplete="off">
-                <div class="modal-header" style="display: block;background-color: #ffffff !important;">
-                    <h4 class="modal-title">
-                        <span>{{l("SelectAddress")}}</span>
-                    </h4>
-                    <p>{{'Please select from the saved addresses below.' | localize}}</p>
-                    <div class="form-group has-search">
-                        <i  class="form-control-icon-search flaticon-search" ></i>
-                        <input type="text" (change)="onChangeSearch($event)" class="form-control bg-white form-control-sm aria-input-text" id="colFormLabelSm"
-                            placeholder="{{'looking in company Address…'|localize}}">
-                    </div>
-                    <button style="position: absolute;right: 0;top: 8px;" type="button" class="close" (click)="cancel()"
-                        aria-label="Close" [disabled]="saving">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
+    <form *ngIf="active" #selectAddressForm="ngForm" novalidate (ngSubmit)="selectAddress()" autocomplete="off">
+        <div class="modal-header" style="display: block;background-color: #ffffff !important;">
+            <h4 class="modal-title">
+                <span>{{l("SelectAddress")}}</span>
+            </h4>
+            <p>{{'Please select from the saved addresses below.' | localize}}</p>
+            <div class="form-group has-search">
+                <i class="form-control-icon-search flaticon-search"></i>
+                <input type="text" (change)="onChangeSearch($event)"
+                    class="form-control bg-white form-control-sm aria-input-text" id="colFormLabelSm"
+                    placeholder="{{'looking in company Address…'|localize}}">
+            </div>
+            <button style="position: absolute;right: 0;top: 8px;" type="button" class="close" (click)="cancel()"
+                aria-label="Close" [disabled]="saving">
+                <span aria-hidden="true">&times;</span>
+            </button>
 
-                </div>
-                <div class="mx-3">
+        </div>
+        <div class="mx-3">
 
 
 
-
+            <!-- 
                     <div class="row row-address" *ngFor="let address of filteredAddresses;let i=index" [ngClass]="(selectedAddressId == address.id)?'checkedAddress':''" (click)="selectedAddress=address">
                         <div class="col-md-12 cursor-pointer" style="margin-bottom: 0;display: flex;" (click)="selectedAddressId = address.id">
-                            <input type="radio" name="address" [value]="address.id" class="radio-select" [(ngModel)]="selectedAddressId"  >
+                            <input type="radio" name="address" [value]="address.id" class="radio-select" [(ngModel)]="selectedAddressId"  > -->
+            <div class="row row-address" *ngFor="let address of filteredAddresses; let i = index"
+                [ngClass]="selectedAddressId == address.id ? 'checkedAddress' : ''" (click)="chooseAddress(address)">
 
-                            <p type="text"  
-                            [ngClass]="(selectedAddressId == address.id)?'checkedAddress':''"  class="form-control bg-white address-name code-name m-2" name="Address1" style="overflow: hidden;
+                <div class="col-md-12 cursor-pointer" style="margin-bottom: 0; display: flex;">
+                    <input type="radio" name="address" [value]="address.id" class="radio-select"
+                        [(ngModel)]="selectedAddressId" (click)="chooseAddress(address); $event.stopPropagation()">
+
+                    <p type="text" [ngClass]="(selectedAddressId == address.id)?'checkedAddress':''"
+                        class="form-control bg-white address-name code-name m-2" name="Address1" style="overflow: hidden;
                             text-overflow: ellipsis;
                             width: 100%;
                             height: auto !important;">
-                                {{ address.name?  address.name : '' }}
-                                {{ address.addressLine1?  ' - ' + address.addressLine1 : '' }}
-                                {{ address.addressLine2?  ' - ' + address.addressLine2 : '' }}
-                                {{ address.city?  ' - ' + address.city : '' }}
-                                {{ address.state?  ' - ' + address.state : '' }}
-                                {{ address.postalCode?  ' - ' + address.postalCode : '' }}
-                                {{ address.countryIdName?  ' - ' + address.countryIdName : '' }}
-                            </p>
-                            <div class="btn-group " dropdown>
-                                <button id="button-config btn-action" dropdownToggle type="button"
-                                    class="btn btn-primary dropdown-toggle btn-actions btn-action" aria-controls="dropdown-config">
-                                </button>
-                                <ul id="dropdown-config" *dropdownMenu class="dropdown-menu dropdown-menu-actions" role="menu"
-                                    aria-labelledby="button-config">
-                                    <li role="menuitem"><a class="dropdown-item" (click)="askToConfirmEdit(address)">{{'Edit' |localize}}</a></li>
-                                    <li role="menuitem"><a class="dropdown-item" (click)="askToConfirmDelete(address)">{{'Delete' |localize}}</a>
-                                    </li>
+                        {{ address.name? address.name : '' }}
+                        {{ address.addressLine1? ' - ' + address.addressLine1 : '' }}
+                        {{ address.addressLine2? ' - ' + address.addressLine2 : '' }}
+                        {{ address.city? ' - ' + address.city : '' }}
+                        {{ address.state? ' - ' + address.state : '' }}
+                        {{ address.postalCode? ' - ' + address.postalCode : '' }}
+                        {{ address.countryIdName? ' - ' + address.countryIdName : '' }}
+                    </p>
+                    <div class="btn-group " dropdown>
+                        <button id="button-config btn-action" dropdownToggle type="button"
+                            class="btn btn-primary dropdown-toggle btn-actions btn-action"
+                            aria-controls="dropdown-config">
+                        </button>
+                        <ul id="dropdown-config" *dropdownMenu class="dropdown-menu dropdown-menu-actions" role="menu"
+                            aria-labelledby="button-config">
+                            <li role="menuitem"><a class="dropdown-item" (click)="askToConfirmEdit(address)">{{'Edit'
+                                    |localize}}</a></li>
+                            <li role="menuitem"><a class="dropdown-item"
+                                    (click)="askToConfirmDelete(address)">{{'Delete' |localize}}</a>
+                            </li>
 
-                                </ul>
-                            </div>
-                        </div>
-
+                        </ul>
                     </div>
-
-
                 </div>
-                <div class="modal-footer">
-                    <button [disabled]="saving" type="button" class="btn bgPurple mr-2"
-                        (click)="addNew()">{{l("CreateNewAddress")}}</button>
-                    <button type="submit" class="btn bgPurple mr-2" [disabled]="!selectAddressForm.form.valid || !selectedAddress"
-                        [buttonBusy]="saving" [busyText]="l('SavingWithThreeDot')"><span>{{l("Select")}}</span></button>
 
-                </div>
-            </form>
-        <!-- </div>
+            </div>
+
+
+        </div>
+        <div class="modal-footer">
+            <button [disabled]="saving" type="button" class="btn bgPurple mr-2"
+                (click)="addNew()">{{l("CreateNewAddress")}}</button>
+            <button type="submit" class="btn bgPurple mr-2"
+                [disabled]="!selectAddressForm.form.valid || !selectedAddress" [buttonBusy]="saving"
+                [busyText]="l('SavingWithThreeDot')"><span>{{l("Select")}}</span></button>
+
+        </div>
+    </form>
+    <!-- </div>
     </div> -->
 
 
 </div>
 
-<confirm-modal-side *ngIf="displayConfirmModal" [content1]="confirmModalOptions.title" [content2]="confirmModalOptions.message"
-    [buttonYes]="confirmModalOptions.buttonYes" [buttonNo]="confirmModalOptions.buttonNo" [type]="confirmModalOptions.type" [displayItem]="displayConfirmModal"
-    (buttonClicked)="onEmitButtonSaveYes($event)" [icon]="confirmModalOptions.icon" [iconIsText]="confirmModalOptions.iconIsText"></confirm-modal-side>
+<confirm-modal-side *ngIf="displayConfirmModal" [content1]="confirmModalOptions.title"
+    [content2]="confirmModalOptions.message" [buttonYes]="confirmModalOptions.buttonYes"
+    [buttonNo]="confirmModalOptions.buttonNo" [type]="confirmModalOptions.type" [displayItem]="displayConfirmModal"
+    (buttonClicked)="onEmitButtonSaveYes($event)" [icon]="confirmModalOptions.icon"
+    [iconIsText]="confirmModalOptions.iconIsText"></confirm-modal-side>

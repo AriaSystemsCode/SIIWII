@@ -499,7 +499,7 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit, 
     }
 
     getBuyerRelationshipName() {
-        const lowerRole = this.role.toLowerCase();
+        const lowerRole = this.role?.toLowerCase();
 
         if (lowerRole.includes('seller')) {
             this.buyerRelationshipName = "Selling to this buyer - As Seller";
@@ -517,7 +517,7 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit, 
 
     
     getSellerRelationshipName() {
-        const lowerRole = this.role.toLowerCase();
+        const lowerRole = this.role?.toLowerCase();
 
         if (lowerRole.includes('sales rep')) {
             this.sellerRelationshipName = "Selling on behalf of this Seller - As Sales Rep";

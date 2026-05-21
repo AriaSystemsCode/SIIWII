@@ -54,13 +54,19 @@ export class CreateOrEditBranchModalComponent extends AppComponentBase {
     };
     branchCode: string = "";
 
-    phonePattern = '^[0-9+()\\-\\s]*$'; 
-accountId?: number;
-branchId?: number;
-parentId?: number;
+    phonePattern = '^[0-9+()\\-\\s]*$';
+    accountId?: number;
+    branchId?: number;
+    parentId?: number;
+
+
+    draftAddresses: any;
+pendingSelectedAddress: AppAddressDto;
+pendingSelectedAddressNumber: number;
+
     constructor(
         injector: Injector,
-         public currentModalRef: BsModalRef,
+        public currentModalRef: BsModalRef,
         private _AccountsServiceProxy: AccountsServiceProxy,
         private _AppEntitiesServiceProxy: AppEntitiesServiceProxy
     ) {
@@ -74,9 +80,23 @@ parentId?: number;
             this.inputObj1.setNumber('+91987654321');
         }
     }
-    ngOnInit(){
-          this.show(this.accountId, this.branchId, this.parentId);
+    ngOnInit() {
+        this.show(this.accountId, this.branchId, this.parentId);
     }
+
+    private applyDraftAndPendingAddress(): void {
+  if (this.draftAddresses) {
+    this.address1 = this.draftAddresses.address1 || this.clearAddress();
+    this.address2 = this.draftAddresses.address2 || this.clearAddress();
+    this.address3 = this.draftAddresses.address3 || this.clearAddress();
+    this.address4 = this.draftAddresses.address4 || this.clearAddress();
+  }
+
+  if (this.pendingSelectedAddress && this.pendingSelectedAddressNumber) {
+    this.currSelectAddress = this.pendingSelectedAddressNumber;
+    this.addressSelected(this.pendingSelectedAddress);
+  }
+}
 
     // addressSelected(address) {
     //     this.active = true;
@@ -109,62 +129,164 @@ parentId?: number;
     //     x.countryIdName = address.countryIdName;
 
     // }
-    addressSelected(address: AppAddressDto): void {
+    //     addressSelected(address: AppAddressDto): void {
 
-    this.active = true;
+    //     this.active = true;
 
-    if (!this.currSelectAddress) {
-        this.currSelectAddress = 1;
-    }
+    //     if (!this.currSelectAddress) {
+    //         this.currSelectAddress = 1;
+    //     }
 
-    let x: AppContactAddressDto;
+    //     let x: AppContactAddressDto;
 
-    switch (this.currSelectAddress) {
+    //     switch (this.currSelectAddress) {
 
-        case 1:
-            if (!this.address1) {
-                this.address1 = this.clearAddress();
-            }
-            x = this.address1;
-            break;
+    //         case 1:
+    //             if (!this.address1) {
+    //                 this.address1 = this.clearAddress();
+    //             }
+    //             x = this.address1;
+    //             break;
 
-        case 2:
-            if (!this.address2) {
-                this.address2 = this.clearAddress();
-            }
-            x = this.address2;
-            break;
+    //         case 2:
+    //             if (!this.address2) {
+    //                 this.address2 = this.clearAddress();
+    //             }
+    //             x = this.address2;
+    //             break;
 
-        case 3:
-            if (!this.address3) {
-                this.address3 = this.clearAddress();
-            }
-            x = this.address3;
-            break;
+    //         case 3:
+    //             if (!this.address3) {
+    //                 this.address3 = this.clearAddress();
+    //             }
+    //             x = this.address3;
+    //             break;
 
-        case 4:
-            if (!this.address4) {
-                this.address4 = this.clearAddress();
-            }
-            x = this.address4;
-            break;
+    //         case 4:
+    //             if (!this.address4) {
+    //                 this.address4 = this.clearAddress();
+    //             }
+    //             x = this.address4;
+    //             break;
 
-        default:
-            this.address1 = this.clearAddress();
-            x = this.address1;
-            break;
-    }
+    //         default:
+    //             this.address1 = this.clearAddress();
+    //             x = this.address1;
+    //             break;
+    //     }
 
-    x.addressId = address.id;
-    x.code = address.code;
-    x.name = address.name;
-    x.addressLine1 = address.addressLine1;
-    x.addressLine2 = address.addressLine2;
-    x.city = address.city;
-    x.state = address.state;
-    x.postalCode = address.postalCode;
-    x.countryId = address.countryId;
-    x.countryIdName = address.countryIdName;
+    //     x.addressId = address.id;
+    //     x.code = address.code;
+    //     x.name = address.name;
+    //     x.addressLine1 = address.addressLine1;
+    //     x.addressLine2 = address.addressLine2;
+    //     x.city = address.city;
+    //     x.state = address.state;
+    //     x.postalCode = address.postalCode;
+    //     x.countryId = address.countryId;
+    //     x.countryIdName = address.countryIdName;
+    // }
+
+
+    // addressSelected(address: AppAddressDto): void {
+    //     this.active = true;
+
+    //     if (!this.currSelectAddress) {
+    //         this.currSelectAddress = 1;
+    //     }
+
+    //     let x: AppContactAddressDto;
+
+    //     switch (this.currSelectAddress) {
+    //         case 1:
+    //             x = this.address1 || this.clearAddress();
+    //             this.address1 = x;
+    //             break;
+
+    //         case 2:
+    //             x = this.address2 || this.clearAddress();
+    //             this.address2 = x;
+    //             break;
+
+    //         case 3:
+    //             x = this.address3 || this.clearAddress();
+    //             this.address3 = x;
+    //             break;
+
+    //         case 4:
+    //             x = this.address4 || this.clearAddress();
+    //             this.address4 = x;
+    //             break;
+    //     }
+
+    //     if (x.addressId && x.addressId !== address.id) {
+    //         x.id = undefined;
+    //     }
+
+    //     x.addressId = address.id;
+    //     x.code = address.code;
+    //     x.name = address.name;
+    //     x.addressLine1 = address.addressLine1;
+    //     x.addressLine2 = address.addressLine2;
+    //     x.city = address.city;
+    //     x.state = address.state;
+    //     x.postalCode = address.postalCode;
+    //     x.countryId = address.countryId;
+    //     x.countryIdName = address.countryIdName;
+    //     x.addressFk = undefined;
+    // }
+
+   addressSelected(address: AppAddressDto): void {
+  this.active = true;
+
+  if (!this.currSelectAddress) {
+    this.currSelectAddress = 1;
+  }
+
+  let x: AppContactAddressDto;
+
+  switch (this.currSelectAddress) {
+    case 1:
+      x = this.address1 || this.clearAddress();
+      this.address1 = x;
+      break;
+
+    case 2:
+      x = this.address2 || this.clearAddress();
+      this.address2 = x;
+      break;
+
+    case 3:
+      x = this.address3 || this.clearAddress();
+      this.address3 = x;
+      break;
+
+    case 4:
+      x = this.address4 || this.clearAddress();
+      this.address4 = x;
+      break;
+
+    default:
+      x = this.address1 || this.clearAddress();
+      this.address1 = x;
+      break;
+  }
+
+  // DO NOT clear x.id here.
+  // x.id is the branch-address relation id and must stay for edit.
+
+  x.addressFk = undefined;
+
+  x.addressId = address.id;
+  x.code = address.code;
+  x.name = address.name;
+  x.addressLine1 = address.addressLine1;
+  x.addressLine2 = address.addressLine2;
+  x.city = address.city;
+  x.state = address.state;
+  x.postalCode = address.postalCode;
+  x.countryId = address.countryId;
+  x.countryIdName = address.countryIdName;
 }
 
     show(accountId?: number, branchId?: number, parentId?: number): void {
@@ -183,6 +305,9 @@ parentId?: number;
             this.branch.parentId = parentId;
             this.active = true;
             // this.modal.show();
+
+this.applyDraftAndPendingAddress();
+
             this.hideMainSpinner();
         } else {
             this._AccountsServiceProxy.getBranchForEdit(branchId).subscribe(result => {
@@ -191,7 +316,7 @@ parentId?: number;
                 // if (subCode >= 0)
                 //     this.branchCode = this.branch.code.substring(subCode + 1, this.branch.code.length);
                 // else
-                    this.branchCode = this.branch.code
+                this.branchCode = this.branch.code
 
                 if (this.branch.parentId) this.branch.accountId = accountId
                 let x1 = this.branch.contactAddresses.find(x => x.addressTypeId == this.billingAddressDef.value)
@@ -211,8 +336,10 @@ parentId?: number;
 
                 this.accountInfoLoded = true;
                 this.setDefaultPhoneTypes();
-                this.hideMainSpinner();
                 this.active = true;
+this.applyDraftAndPendingAddress();
+                this.hideMainSpinner();
+                // this.active = true;
                 // this.modal.show();
             });
         }
@@ -305,74 +432,142 @@ parentId?: number;
         }
     }
 
-    // Add inside the component (private helpers)
-    private toAppAddressDto(src: any, tenantId: number): AppAddressDto {
-        return Object.assign(new AppAddressDto(), {
-            id: src.addressId,
-            code: src.code,
-            name: src.name,
-            addressLine1: src.addressLine1,
-            addressLine2: src.addressLine2,
-            city: src.city,
-            state: src.state,
-            postalCode: src.postalCode,
-            countryId: src.countryId,
-            countryCode: src.countryCode,
-            tenantId: tenantId,
-        
-        });
-    }
+    
+  private toAppAddressDto(src: any, tenantId: number): AppAddressDto {
+  return Object.assign(new AppAddressDto(), {
+    id: src.addressId,
+    code: src.code,
+    name: src.name,
+    addressLine1: src.addressLine1,
+    addressLine2: src.addressLine2,
+    city: src.city,
+    state: src.state,
+    postalCode: src.postalCode,
+    countryId: src.countryId,
+    countryCode: src.countryCode,
+    tenantId: tenantId
+  });
+}
 
-    private pushAddress(
-        contactAddr: any,
-        addressTypeId: number,
-        patch?: Record<string, any>
-    ): void {
-        if (!contactAddr || !(contactAddr.addressId > 0)) return;
+    // private pushAddress(
+    //     contactAddr: any,
+    //     addressTypeId: number,
+    //     patch?: Record<string, any>
+    // ): void {
+    //     if (!contactAddr || !(contactAddr.addressId > 0)) return;
 
-        contactAddr.addressTypeId = addressTypeId;
-        // contactAddr.accountId = this.appSession.user.accountId
-        if (patch) Object.assign(contactAddr, patch);
+    //     contactAddr.addressTypeId = addressTypeId;
+    //     // contactAddr.accountId = this.appSession.user.accountId
+    //     if (patch) Object.assign(contactAddr, patch);
 
-        contactAddr.addressFk = this.toAppAddressDto(contactAddr, this.branch?.tenantId);
-        this.branch.contactAddresses.push(contactAddr);
-    }
+    //     contactAddr.addressFk = this.toAppAddressDto(contactAddr, this.branch?.tenantId);
+    //     this.branch.contactAddresses.push(contactAddr);
+    // }
+    // private pushAddress(
+    //     contactAddr: any,
+    //     addressTypeId: number,
+    //     patch?: Record<string, any>
+    // ): void {
+    //     if (!contactAddr || !(contactAddr.addressId > 0)) return;
 
-    save(): void {
-        this.saving = true;
+    //     const dto = Object.assign(new AppContactAddressDto(), contactAddr);
 
-        this.branch.code = this.branchCode;
-        this.branch.contactAddresses = [];
+    //     dto.addressTypeId = addressTypeId;
 
-        this.pushAddress(this.address1, this.billingAddressDef.value);
+    //     if (patch) {
+    //         Object.assign(dto, patch);
+    //     }
 
-        this.pushAddress(
-            this.address2,
-            this.directShippingAddressDef.value
-        );
+    //     dto.addressFk = this.toAppAddressDto(dto, this.branch?.tenantId);
 
-        this.pushAddress(this.address3, this.distributionCenterAddressDef.value);
-        this.pushAddress(this.address4, this.mailingAddressDef.value);
+    //     this.branch.contactAddresses.push(dto);
+    // }
 
-        let addNew = this.branch.id == null || this.branch.id == undefined || this.branch.id == 0
-        this.branch.accountId = this.appSession.user.accountId
-        this._AccountsServiceProxy.createOrEditBranch(this.branch)
-            .pipe(finalize(() => { this.saving = false; }))
-            .subscribe(value => {
-                this.notify.info(this.l('SavedSuccessfully'));
-                this.close();
-                addNew ? this.branchAdded.emit(value) : this.branchUpdated.emit(value);
-            });
-    }
+   private pushAddress(
+  contactAddr: any,
+  addressTypeId: number,
+  patch?: Record<string, any>
+): void {
+  if (!contactAddr || !(contactAddr.addressId > 0)) return;
+
+  const dto = Object.assign(new AppContactAddressDto(), contactAddr);
+
+  // keep dto.id if editing existing Billing/Shipping relation
+  dto.addressTypeId = addressTypeId;
+
+  if (patch) {
+    Object.assign(dto, patch);
+  }
+
+  dto.addressFk = this.toAppAddressDto(dto, this.branch?.tenantId);
+
+  this.branch.contactAddresses.push(dto);
+}
+    // save(): void {
+    //     this.saving = true;
+
+    //     this.branch.code = this.branchCode;
+    //     this.branch.contactAddresses = [];
+
+    //     this.pushAddress(this.address1, this.billingAddressDef.value);
+
+    //     this.pushAddress(
+    //         this.address2,
+    //         this.directShippingAddressDef.value
+    //     );
+
+    //     this.pushAddress(this.address3, this.distributionCenterAddressDef.value);
+    //     this.pushAddress(this.address4, this.mailingAddressDef.value);
+
+    //     let addNew = this.branch.id == null || this.branch.id == undefined || this.branch.id == 0
+    //     this.branch.accountId = this.appSession.user.accountId
+    //     this._AccountsServiceProxy.createOrEditBranch(this.branch)
+    //         .pipe(finalize(() => { this.saving = false; }))
+    //         .subscribe(value => {
+    //             this.notify.info(this.l('SavedSuccessfully'));
+    //             this.close();
+    //             addNew ? this.branchAdded.emit(value) : this.branchUpdated.emit(value);
+    //         });
+    // }
 
 
+save(): void {
+  this.saving = true;
 
+  this.branch.code = this.branchCode;
+
+  // IMPORTANT: rebuild addresses from current selected UI values only
+  this.branch.contactAddresses = [];
+
+  this.pushAddress(this.address1, this.billingAddressDef.value);
+  this.pushAddress(this.address2, this.directShippingAddressDef.value);
+  this.pushAddress(this.address3, this.distributionCenterAddressDef.value);
+  this.pushAddress(this.address4, this.mailingAddressDef.value);
+
+  const addNew =
+    this.branch.id == null ||
+    this.branch.id == undefined ||
+    this.branch.id == 0;
+
+  this.branch.accountId = this.appSession.user.accountId;
+
+  this._AccountsServiceProxy.createOrEditBranch(this.branch)
+    .pipe(finalize(() => { this.saving = false; }))
+    .subscribe(value => {
+      this.notify.info(this.l('SavedSuccessfully'));
+      this.close();
+
+      addNew
+        ? this.branchAdded.emit(value)
+        : this.branchUpdated.emit(value);
+    });
+}
 
     close(): void {
         // this.active = false;
         // this.modal.hide();
-          this.currentModalRef.setClass('right-modal slide-right-out');
-  this.currentModalRef.hide();
+        this.currentModalRef.setClass('right-modal slide-right-out');
+        this.currentModalRef.hide();
     }
 
     getCodeValue(code: string) {

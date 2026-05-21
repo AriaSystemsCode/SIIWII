@@ -56,6 +56,14 @@ lastSelectedAddressNumber: number;
         super(injector)
         this.getAllBranchesTypes();
     }
+    branchDraftAddresses: any = {
+  address1: null,
+  address2: null,
+  address3: null,
+  address4: null
+};
+
+
 
     // editBranch(rowNode: { level: number, node: TreeNodeOfBranchForViewDto, parent: TreeNodeOfBranchForViewDto, visible: boolean }) {
     //     this.currBranchNode = rowNode
@@ -144,17 +152,69 @@ lastSelectedAddressNumber: number;
 //     this.branchModalRef?.hide();
 //     this.selectAddressModal.show(this.currBranchNode, this.accountId);
 // }
-selectAddress(): void {
+// selectAddress(): void {
 
-  const branchContent =
+//   const branchContent =
+//     this.branchModalRef?.content as CreateOrEditBranchModalComponent;
+
+//   this.lastSelectedAddressNumber =
+//     branchContent?.currSelectAddress;
+
+//   this.branchModalRef?.hide();
+
+//   this.openSelectAddressModal();
+// }
+selectAddress(): void {
+  const content =
     this.branchModalRef?.content as CreateOrEditBranchModalComponent;
 
-  this.lastSelectedAddressNumber =
-    branchContent?.currSelectAddress;
+  this.lastSelectedAddressNumber = content?.currSelectAddress;
+
+   this.branchDraftAddresses = {
+  address1: content.address1
+    ? JSON.parse(JSON.stringify(content.address1))
+    : null,
+
+  address2: content.address2
+    ? JSON.parse(JSON.stringify(content.address2))
+    : null,
+
+  address3: content.address3
+    ? JSON.parse(JSON.stringify(content.address3))
+    : null,
+
+  address4: content.address4
+    ? JSON.parse(JSON.stringify(content.address4))
+    : null
+};
 
   this.branchModalRef?.hide();
 
   this.openSelectAddressModal();
+}
+
+restoreBranchDraftAddresses(): void {
+
+  const content =
+    this.branchModalRef?.content as CreateOrEditBranchModalComponent;
+
+  if (!content) return;
+
+  content.address1 = this.branchDraftAddresses.address1
+    ? JSON.parse(JSON.stringify(this.branchDraftAddresses.address1))
+    : content.clearAddress();
+
+  content.address2 = this.branchDraftAddresses.address2
+    ? JSON.parse(JSON.stringify(this.branchDraftAddresses.address2))
+    : content.clearAddress();
+
+  content.address3 = this.branchDraftAddresses.address3
+    ? JSON.parse(JSON.stringify(this.branchDraftAddresses.address3))
+    : content.clearAddress();
+
+  content.address4 = this.branchDraftAddresses.address4
+    ? JSON.parse(JSON.stringify(this.branchDraftAddresses.address4))
+    : content.clearAddress();
 }
     // addressSelected(address) {
     //     this.selectAddressModal.close();
@@ -171,30 +231,90 @@ selectAddress(): void {
 
 //     content?.addressSelected(address);
 // }
-addressSelected(address): void {
+// addressSelected(address): void {
 
+//   this.selectAddressModalRef?.hide();
+
+//   this.openCreateOrEditBranchModal(
+//     this.accountId,
+//     this.selectedBranchId,
+//     this.selectedParentBranchId
+//   );
+
+//   setTimeout(() => {
+
+//     const content =
+//       this.branchModalRef?.content as CreateOrEditBranchModalComponent;
+
+//     if (content) {
+
+//       content.currSelectAddress =
+//         this.lastSelectedAddressNumber;
+
+//       content.addressSelected(address);
+//     }
+
+//   }, 300);
+// }
+// addressSelected(address): void {
+//   this.selectAddressModalRef?.hide();
+
+//   this.openCreateOrEditBranchModal(
+//     this.accountId,
+//     this.selectedBranchId,
+//     this.selectedParentBranchId
+//   );
+
+//   setTimeout(() => {
+//     const content =
+//       this.branchModalRef?.content as CreateOrEditBranchModalComponent;
+
+//     if (!content) return;
+
+//     this.restoreBranchDraftAddresses();
+
+//     content.currSelectAddress = this.lastSelectedAddressNumber;
+//     content.addressSelected(address);
+
+//     // save again after applying selected address
+//     this.branchDraftAddresses = {
+//       address1: content.address1,
+//       address2: content.address2,
+//       address3: content.address3,
+//       address4: content.address4
+//     };
+//   }, 300);
+// }
+
+addressSelected(address): void {
   this.selectAddressModalRef?.hide();
 
-  this.openCreateOrEditBranchModal(
-    this.accountId,
-    this.selectedBranchId,
-    this.selectedParentBranchId
-  );
+  const config: ModalOptions = new ModalOptions();
 
-  setTimeout(() => {
+  config.class = 'right-modal slide-right-in';
+  config.initialState = {
+    accountId: this.accountId,
+    branchId: this.selectedBranchId,
+    parentId: this.selectedParentBranchId,
 
-    const content =
-      this.branchModalRef?.content as CreateOrEditBranchModalComponent;
+    billingAddressDef: this.billingAddressDef,
+    directShippingAddressDef: this.directShippingAddressDef,
+    distributionCenterAddressDef: this.distributionCenterAddressDef,
+    mailingAddressDef: this.mailingAddressDef,
 
-    if (content) {
+    draftAddresses: this.branchDraftAddresses,
+    pendingSelectedAddress: address,
+    pendingSelectedAddressNumber: this.lastSelectedAddressNumber
+  };
 
-      content.currSelectAddress =
-        this.lastSelectedAddressNumber;
+  const modalRef = this._BsModalService.show(CreateOrEditBranchModalComponent, config);
+  this.branchModalRef = modalRef;
 
-      content.addressSelected(address);
-    }
+  const content = modalRef.content as CreateOrEditBranchModalComponent;
 
-  }, 300);
+  content.branchAdded.subscribe((event) => this.branchAdded(event));
+  content.branchUpdated.subscribe((event) => this.branchUpdated(event));
+  content.selectAddress.subscribe(() => this.selectAddress());
 }
     // createOrEditaddressCanceled() {
     //     this.selectAddressModal.show(this.currBranchNode, this.accountId)
