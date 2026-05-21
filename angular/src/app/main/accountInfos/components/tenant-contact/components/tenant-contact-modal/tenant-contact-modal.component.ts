@@ -96,7 +96,7 @@ export class TenantContactModalComponent {
   this.dialogStyle = {
     width: '1350px',
     maxWidth: '1350px',
-    height: '92vh'
+    height: '92vh',
   };
 }
   // open(config: {

@@ -1902,6 +1902,75 @@ canConfirm(charge): boolean {
     charge.chargeAmount !== charge.originalAmount &&
     charge.chargeAmount >= 0
   );
+  
 }
 
+// /////////////////////// p-dialog login
+
+
+
+
+dialog = {
+  visible: false,
+  message: '',
+  icon: '',
+  iconColor: '#F6851D',
+  confirmText: 'Ok',
+  cancelText: 'No',
+  showCancel: false,
+  style: { width: '474px' },
+  confirmAction: () => {}
+};
+
+closeDialog() {
+  this.dialog.visible = false;
+}
+openOrderSuccessDialog() {
+  this.dialog = {
+    visible: true,
+    message: `Order # ${this.transactionCode} placed successfully`,
+    icon: 'fa fa-check-circle',
+    iconColor: '#4A0D4A',
+    confirmText: 'Ok',
+    cancelText: 'No',
+    showCancel: false,
+    style: { width: '474px' },
+    confirmAction: () => {
+      this.dialog.visible = false;
+      this.askForShareTransactions();
+    }
+  };
+}
+openSpecialPriceDialog() {
+  this.dialog = {
+    visible: true,
+    message: 'the price assigned to the ordered Items will be updated',
+    icon: 'fa fa-bell',
+    iconColor: '#F6851D',
+    confirmText: 'Yes',
+    cancelText: 'No',
+    showCancel: false,
+    style: { width: '425px' },
+    confirmAction: () => {
+      this.dialog.visible = false;
+      this.onEditpecialPrice();
+    }
+  };
+}
+openPlaceOrderConfirm() {
+  this.dialog = {
+    visible: true,
+    message: 'Are you sure you want to place the order ?',
+    icon: 'fa fa-bell',
+    iconColor: '#F6851D',
+    confirmText: 'Yes',
+    cancelText: 'No',
+    showCancel: true,
+    style: { width: '474px' },
+    confirmAction: () => {
+      this.dialog.visible = false;
+      this.PlaceOrder();
+    }
+  };
+}
 }

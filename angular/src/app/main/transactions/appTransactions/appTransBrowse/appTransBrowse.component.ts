@@ -68,9 +68,9 @@ export class AppTransactionsBrowseComponent extends AppComponentBase implements 
     rowsPerPage: number = 10;
     sortField: string | undefined;
     sortOrder: number | undefined;
-    isAmountReset :boolean
-    isReset :boolean
-    isTypeReset :boolean
+   isAmountReset = false;
+isReset = false;
+isTypeReset = false;
 
 
     constructor(
@@ -85,15 +85,10 @@ export class AppTransactionsBrowseComponent extends AppComponentBase implements 
         this.tenantRoleService.loadRoles();
 
     }
-    ngOnInit(): void {
-        setTimeout(() => {
-            this.showHeader = true;
-            this.cdr.detectChanges();
-        });
-        this.setPageMainFilters();
-        this.initFilterForm();
-
-    }
+   ngOnInit(): void {
+    this.setPageMainFilters();
+    this.initFilterForm();
+}
 
     ngOnChanges(): void {
         this.initFilterForm();

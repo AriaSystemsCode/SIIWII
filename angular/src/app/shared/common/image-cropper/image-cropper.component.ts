@@ -28,18 +28,34 @@ export class ImageCropperComponent implements OnInit  {
     isArabic: boolean
     constructor(public bsModalRef: BsModalRef) { }
     imgFile : File
-    ngOnInit(){
-        this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
-        this.currentLang == 'ar' || this.currentLang == 'ar-EG'  ? this.isArabic = true : this.isArabic = false
-        this.resetImage()
-        const eventTarget  = (this.originalFileChangeEvent.target as HTMLInputElement)
-        const file:File = eventTarget.files[0]
-        this.imgFile = file;
-        this.fileToBase64(file)
-        if(!this.aspectRatio) this.aspectRatio = eventTarget.parentElement.offsetWidth / eventTarget.parentElement.offsetHeight
 
-    }
 
+ngOnInit() {
+  this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName');
+  this.isArabic = this.currentLang === 'ar' || this.currentLang === 'ar-EG';
+
+  this.resetImage();
+
+  const eventTarget = this.originalFileChangeEvent?.target as HTMLInputElement;
+  const file: File = eventTarget?.files?.[0];
+
+  if (!file) {
+    this.aspectRatio = 1;
+    return;
+  }
+
+  this.imgFile = file;
+  this.fileToBase64(file);
+
+  if (!this.aspectRatio || this.aspectRatio <= 0 || isNaN(this.aspectRatio)) {
+    const parentWidth = eventTarget?.parentElement?.offsetWidth || 1;
+    const parentHeight = eventTarget?.parentElement?.offsetHeight || 1;
+
+    const ratio = parentWidth / parentHeight;
+
+    this.aspectRatio = ratio > 0 && isFinite(ratio) ? ratio : 1;
+  }
+}
 
     fileToBase64(file:File){
         var reader = new FileReader();
