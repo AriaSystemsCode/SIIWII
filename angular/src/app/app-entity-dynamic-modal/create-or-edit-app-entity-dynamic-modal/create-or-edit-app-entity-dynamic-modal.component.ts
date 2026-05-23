@@ -138,7 +138,7 @@ isArabic: boolean = false;
             this.appEntity.nonlookup = false;
     
             this._appEntitiesServiceProxy
-                .getAppEntityForEdit(this.appEntity.id)
+                .getAppEntityForEdit(this.appEntity.id,true)
                 .pipe(
                     finalize(() => {
                         this.getExtrAttributes();

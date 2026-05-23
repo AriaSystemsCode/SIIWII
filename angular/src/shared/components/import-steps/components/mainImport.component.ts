@@ -1150,7 +1150,7 @@ export class MainImportComponent
         }
 
         else if (record?.isCodeColorLookup || record?._isLinkingColorLookup) {
-            this._appEntitiesServiceProxy.getAppEntityForEdit(selectedItem.id)
+            this._appEntitiesServiceProxy.getAppEntityForEdit(selectedItem.id,true)
                 .pipe(
                     finalize(() => {
                         this.hideMainSpinner();
