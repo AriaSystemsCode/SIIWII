@@ -35,7 +35,6 @@ using Microsoft.EntityFrameworkCore;
 using onetouch.Migrations.Seed;
 using StackExchange.Redis;
 using System.Threading.Tasks;
-using System.IO;
 
 namespace onetouch.Web.Startup
 {
@@ -180,48 +179,21 @@ namespace onetouch.Web.Startup
 
                     SeedHelper.SeedHostDb(context);
 
-                    //// Log DB name and seed datetime to Logs.txt (same file used by the app logger)
+                    // Log DB name and seed datetime to Logs.txt (same file used by the app logger)
                     var seedDbName = new Microsoft.Data.SqlClient.SqlConnectionStringBuilder(connectionString).InitialCatalog;
                     var seedLogDir  = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "App_Data", "Logs");
-                    //var seedLogPath = System.IO.Path.Combine(seedLogDir, "Logs.txt");
-                    //try
-                    //{
-                    //    System.IO.Directory.CreateDirectory(seedLogDir); // no-op if already exists
-                    //    var seedLogEntry = $"[{DateTime.UtcNow:yyyy-MM-dd HH:mm:ss} UTC] Database seeded: {seedDbName}{Environment.NewLine}";
-                    //    System.IO.File.AppendAllText(seedLogPath, seedLogEntry);
-                    //}
-                    //catch (Exception logEx)
-                    //{
-                    //    // Last-resort: write the logging failure to Console so it appears in the process output
-                    //    Console.WriteLine($"[{DateTime.UtcNow:yyyy-MM-dd HH:mm:ss} UTC] WARNING: Could not write seed log to '{seedLogPath}': {logEx.Message}");
-                    //}
-
-
+                    var seedLogPath = System.IO.Path.Combine(seedLogDir, "LogsSeeding.txt");
                     try
                     {
-                        System.IO.Directory.CreateDirectory(seedLogDir);
-
-                        var seedLogPath = Path.Combine(seedLogDir, "SeedLogs.txt");
-
-                        var seedLogEntry =
-                            $"[{DateTime.UtcNow:yyyy-MM-dd HH:mm:ss} UTC] Database seeded: {seedDbName}{Environment.NewLine}";
-
-                        using (var stream = new FileStream(
-                            seedLogPath,
-                            FileMode.Append,
-                            FileAccess.Write,
-                            FileShare.ReadWrite))
-                        using (var writer = new StreamWriter(stream))
-                        {
-                            writer.Write(seedLogEntry);
-                        }
+                        System.IO.Directory.CreateDirectory(seedLogDir); // no-op if already exists
+                        var seedLogEntry = $"[{DateTime.UtcNow:yyyy-MM-dd HH:mm:ss} UTC] Database seeded: {seedDbName}{Environment.NewLine}";
+                        System.IO.File.AppendAllText(seedLogPath, seedLogEntry);
                     }
                     catch (Exception logEx)
                     {
-                        Console.WriteLine(
-                            $"[{DateTime.UtcNow:yyyy-MM-dd HH:mm:ss} UTC] WARNING: Could not write seed log: {logEx.Message}");
+                        // Last-resort: write the logging failure to Console so it appears in the process output
+                        Console.WriteLine($"[{DateTime.UtcNow:yyyy-MM-dd HH:mm:ss} UTC] WARNING: Could not write seed log to '{seedLogPath}': {logEx.Message}");
                     }
-
 
                     // Update IsSeeded flag in Aria.MASTER
                     using (var conn = new System.Data.SqlClient.SqlConnection(AriaMasterConnection))
