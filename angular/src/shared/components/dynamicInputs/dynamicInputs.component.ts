@@ -181,7 +181,7 @@ handleRelatedWhen(attr: any, finalValue: any, updatedDataMap: Map<number, any>) 
       });
     }
 
-    return this._appEntitiesServiceProxy.getAppEntityForEdit(Number(finalValue))
+    return this._appEntitiesServiceProxy.getAppEntityForEdit(Number(finalValue),true)
       .pipe(
         map((result: any) => {
           const newValue = result.extraDataAttributes

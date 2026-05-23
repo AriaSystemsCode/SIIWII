@@ -6964,7 +6964,7 @@ export class AppEntitiesServiceProxy {
      * @param ignoreTenantId (optional) 
      * @return Success
      */
-    getAppEntityForEdit(id: number | undefined, ignoreTenantId: boolean | undefined = false): Observable<GetAppEntityForEditOutput> {
+    getAppEntityForEdit(id: number | undefined, ignoreTenantId: boolean | undefined): Observable<GetAppEntityForEditOutput> {
         let url_ = this.baseUrl + "/api/services/app/AppEntities/GetAppEntityForEdit?";
         if (id === null)
             throw new Error("The parameter 'id' cannot be null.");
@@ -30331,12 +30331,17 @@ export class AppTransactionServiceProxy {
 
     /**
      * @param searchFilter (optional) 
+     * @param transactionId (optional) 
      * @return Success
      */
-    getContactsList(searchFilter: string | null | undefined): Observable<ContactInfoDto[]> {
+    getContactsList(searchFilter: string | null | undefined, transactionId: number | undefined): Observable<ContactInfoDto[]> {
         let url_ = this.baseUrl + "/api/services/app/AppTransaction/GetContactsList?";
         if (searchFilter !== undefined && searchFilter !== null)
             url_ += "searchFilter=" + encodeURIComponent("" + searchFilter) + "&";
+        if (transactionId === null)
+            throw new Error("The parameter 'transactionId' cannot be null.");
+        else if (transactionId !== undefined)
+            url_ += "transactionId=" + encodeURIComponent("" + transactionId) + "&";
         url_ = url_.replace(/[?&]$/, "");
 
         let options_ : any = {

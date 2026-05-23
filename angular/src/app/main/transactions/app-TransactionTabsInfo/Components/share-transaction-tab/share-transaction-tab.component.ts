@@ -307,7 +307,7 @@ export class ShareTransactionTabComponent extends AppComponentBase {
   filterContacts(event: AutoCompleteCompleteEvent) {
     let filtered: any[] = [];
     let query = event.query;
-    this._AppTransactionServiceProxy.getContactsList(query).subscribe(result => {
+    this._AppTransactionServiceProxy.getContactsList(query,this.appTransactionsForViewDto?.id).subscribe(result => {
       this.suggestionsContacts = [];
       for (let i = 0; i < result.length; i++) {
         if (result[i].userImage) {
