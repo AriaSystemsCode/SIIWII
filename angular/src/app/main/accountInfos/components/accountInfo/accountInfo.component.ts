@@ -145,6 +145,10 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit {
             selectedRoles!: any[];
             roleSeller:boolean = false;
             connnectionInfo=[];
+
+            availableConnections: any[] = [];
+selectedConnection: any = null;
+showConnectionPopup = false;
     constructor(
         injector: Injector,
         private _route: ActivatedRoute,
@@ -995,32 +999,84 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit {
 }
 
 
-    async saveExternalOrManualAccount() {
-   
+  async saveExternalOrManualAccount(): Promise<void> {
     this.updateMarketplaceRolesExtraData();
-        this._AccountsServiceProxy.createOrEditAccount(this.accountInfoTemp)
-            .pipe(finalize(() => {
-                this.saving = false;
 
-            }))
-            .subscribe(result => {
-                this.notify.info(this.l('SavedSuccessfully'));
-                if (!this.accountInfoTemp.id) {
-                    return this._router.navigate(['app/main/accounts'])
-                }
-                this.touched = false
-                if (this.accountLevel === this.accountLevelEnum.External) {
-                    this.displaySaveAccount = true;
-                    this.getForEditResult.lastChangesIsPublished = false
-                    this.handleComponentMode();
+    this._AccountsServiceProxy
+        .getAvailableConnections(this.selectedRoles?.join('-')?.toLowerCase())
+        .subscribe((connections: any[]) => {
 
-                } else {
-                    this._router.navigate([`/app/main/account/view/${this.accountInfoTemp.id}`])
-                    this.changeTab(AccountInfoPageTabs.ProfileView);
-                    this.getAccountDataForView()
-                }
-            }, err => this.touched = true);
-    }
+            this.availableConnections = connections || [];
+
+            if (this.availableConnections.length === 0) {
+                this.saveAccountAfterConnectionSelected();
+                return;
+            }
+
+            if (this.availableConnections.length === 1) {
+                this.selectedConnection = this.availableConnections[0];
+                this.setSelectedRelationshipId();
+                this.saveAccountAfterConnectionSelected();
+                return;
+            }
+
+            this.selectedConnection = this.availableConnections[0];
+            this.showConnectionPopup = true;
+
+        }, err => {
+            this.touched = true;
+        });
+}
+
+confirmSelectedConnection(): void {
+    if (!this.selectedConnection) return;
+
+    this.setSelectedRelationshipId();
+    this.showConnectionPopup = false;
+    this.saveAccountAfterConnectionSelected();
+}
+
+cancelConnectionPopup(): void {
+    this.showConnectionPopup = false;
+    this.selectedConnection = null;
+    this.saving = false;
+
+}
+
+private setSelectedRelationshipId(): void {
+ 
+    this.accountInfoTemp.relationshipId = this.selectedConnection?.connectionEntityId;
+}
+
+private saveAccountAfterConnectionSelected(): void {
+    this.saving = true;
+
+    this._AccountsServiceProxy.createOrEditAccount(this.accountInfoTemp)
+        .pipe(finalize(() => {
+            this.saving = false;
+        }))
+        .subscribe(result => {
+            this.notify.info(this.l('SavedSuccessfully'));
+
+            if (!this.accountInfoTemp.id) {
+                return this._router.navigate(['app/main/accounts']);
+            }
+
+            this.touched = false;
+
+            if (this.accountLevel === this.accountLevelEnum.External) {
+                this.displaySaveAccount = true;
+                this.getForEditResult.lastChangesIsPublished = false;
+                this.handleComponentMode();
+            } else {
+                this._router.navigate([`/app/main/account/view/${this.accountInfoTemp.id}`]);
+                this.changeTab(AccountInfoPageTabs.ProfileView);
+                this.getAccountDataForView();
+            }
+        }, err => {
+            this.touched = true;
+        });
+}
 
     save(): void {
         if (this.uploader.isUploading) {
