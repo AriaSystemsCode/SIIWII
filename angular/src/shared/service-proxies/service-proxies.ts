@@ -2388,6 +2388,67 @@ export class AccountsServiceProxy {
     }
 
     /**
+     * @param marketplaceRole (optional) 
+     * @return Success
+     */
+    getAvailableConnections(marketplaceRole: string | null | undefined): Observable<ConnectionType[]> {
+        let url_ = this.baseUrl + "/api/services/app/Accounts/GetAvailableConnections?";
+        if (marketplaceRole !== undefined && marketplaceRole !== null)
+            url_ += "marketplaceRole=" + encodeURIComponent("" + marketplaceRole) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetAvailableConnections(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetAvailableConnections(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<ConnectionType[]>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<ConnectionType[]>;
+        }));
+    }
+
+    protected processGetAvailableConnections(response: HttpResponseBase): Observable<ConnectionType[]> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            if (Array.isArray(resultData200)) {
+                result200 = [] as any;
+                for (let item of resultData200)
+                    result200!.push(ConnectionType.fromJS(item));
+            }
+            else {
+                result200 = <any>null;
+            }
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
      * @return Success
      */
     getContactDefaults(): Observable<GetContactDefaultsOutput> {
@@ -66072,6 +66133,7 @@ export class CreateOrEditAccountInfoDto implements ICreateOrEditAccountInfoDto {
     paymentTermsId!: number | undefined;
     extraDataAttributes!: ExtraDataAttrDto[] | undefined;
     recordType!: string | undefined;
+    relationshipId!: number | undefined;
     id!: number | undefined;
 
     [key: string]: any;
@@ -66180,6 +66242,7 @@ export class CreateOrEditAccountInfoDto implements ICreateOrEditAccountInfoDto {
                     this.extraDataAttributes!.push(ExtraDataAttrDto.fromJS(item));
             }
             this.recordType = _data["recordType"];
+            this.relationshipId = _data["relationshipId"];
             this.id = _data["id"];
         }
     }
@@ -66286,6 +66349,7 @@ export class CreateOrEditAccountInfoDto implements ICreateOrEditAccountInfoDto {
                 data["extraDataAttributes"].push(item.toJSON());
         }
         data["recordType"] = this.recordType;
+        data["relationshipId"] = this.relationshipId;
         data["id"] = this.id;
         return data;
     }
@@ -66349,6 +66413,7 @@ export interface ICreateOrEditAccountInfoDto {
     paymentTermsId: number | undefined;
     extraDataAttributes: ExtraDataAttrDto[] | undefined;
     recordType: string | undefined;
+    relationshipId: number | undefined;
     id: number | undefined;
 
     [key: string]: any;
@@ -67745,6 +67810,7 @@ export class AppContactValidationInputDTO implements IAppContactValidationInputD
     paymentTermsId!: number | undefined;
     extraDataAttributes!: ExtraDataAttrDto[] | undefined;
     recordType!: string | undefined;
+    relationshipId!: number | undefined;
     id!: number | undefined;
 
     [key: string]: any;
@@ -67858,6 +67924,7 @@ export class AppContactValidationInputDTO implements IAppContactValidationInputD
                     this.extraDataAttributes!.push(ExtraDataAttrDto.fromJS(item));
             }
             this.recordType = _data["recordType"];
+            this.relationshipId = _data["relationshipId"];
             this.id = _data["id"];
         }
     }
@@ -67969,6 +68036,7 @@ export class AppContactValidationInputDTO implements IAppContactValidationInputD
                 data["extraDataAttributes"].push(item.toJSON());
         }
         data["recordType"] = this.recordType;
+        data["relationshipId"] = this.relationshipId;
         data["id"] = this.id;
         return data;
     }
@@ -68033,6 +68101,7 @@ export interface IAppContactValidationInputDTO {
     paymentTermsId: number | undefined;
     extraDataAttributes: ExtraDataAttrDto[] | undefined;
     recordType: string | undefined;
+    relationshipId: number | undefined;
     id: number | undefined;
 
     [key: string]: any;
