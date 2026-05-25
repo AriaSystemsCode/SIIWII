@@ -290,14 +290,7 @@ NOT CARDS VIEW MODE
             </div>
 
             <div class="card-actions">
-              <!-- <div style="width: 100%;" class="d-flex justify-content-between align-items-center"
-                *ngIf="(account?.connectionsInfo?.length > 0 &&  !fromMarketplace) ">
-                <img *ngIf="account?.visibility == 'Public' && !fromMarketplace" style="width: 30px;" class="mx-2"
-                  src="../../assets/accounts/views.png" (click)="makeRelationPrivatePublic(account,false)" />
-
-                <img *ngIf="account?.visibility != 'Public' && !fromMarketplace" style="width: 30px;" class="mx-2"
-                  src="../../assets/accounts/hidden.png" (click)="makeRelationPrivatePublic(account,true)" />
-              </div> -->
+  
 
               <div style="width: 100%;" class="d-lg-flex d-none justify-content-between" *ngIf="isAuthenticated">
                 <div *ngIf="account?.connectionsInfo?.length > 0" class="d-flex align-items-center flex-wrap">

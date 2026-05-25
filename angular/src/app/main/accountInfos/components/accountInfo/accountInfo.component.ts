@@ -120,7 +120,7 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit {
 
     accountDataForView: AccountDto
     accountContactForView: any
-    entityExtraData:any
+    entityExtraData: any
     isPublished: boolean;
     isSync: boolean;
     connectionCount: number;
@@ -140,15 +140,17 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit {
     imgCropperModalRef: BsModalRef
     accData: GetAccountForViewDto
     editedContactPerData: any
-    relationId:number = 0 ;
-    roles:any
-            selectedRoles!: any[];
-            roleSeller:boolean = false;
-            connnectionInfo=[];
+    relationId: number = 0;
+    roles: any
+    selectedRoles!: any[];
+    roleSeller: boolean = false;
+    connnectionInfo = [];
 
-            availableConnections: any[] = [];
-selectedConnection: any = null;
-showConnectionPopup = false;
+    availableConnections: any[] = [];
+    selectedConnection: any = null;
+    showConnectionPopup = false;
+    previousSelectedRoles: string[] = [];
+    isRestoringRoles = false;
     constructor(
         injector: Injector,
         private _route: ActivatedRoute,
@@ -162,8 +164,8 @@ showConnectionPopup = false;
         private _activatedRoute: ActivatedRoute,
         private _sycIdentifierDefinitionsServiceProxy: SycIdentifierDefinitionsServiceProxy,
         private _marketplaceAccountsServiceProxy: MarketplaceAccountsServiceProxy,
-    
-        
+
+
     ) {
         super(injector);
 
@@ -176,25 +178,25 @@ showConnectionPopup = false;
 
 
     async ngOnInit() {
-     
+
         this.roles = [
             { name: 'Buyer' },
             { name: 'Seller' },
             { name: 'Sales Rep' },
             { name: 'Buying Office' },
-         
+
         ];
 
-      if (this.accountLevel == null) {
-        this.accountLevel = AccountLevelEnum.Profile
-      }
-    
-      await this.handleComponentMode();
-    
-      this.isHost = !this._abpSessionService.tenantId;
-      this.handleRoutingChange();
-      this.initUploaders();
-      this.GetContactDefaults();
+        if (this.accountLevel == null) {
+            this.accountLevel = AccountLevelEnum.Profile
+        }
+
+        await this.handleComponentMode();
+
+        this.isHost = !this._abpSessionService.tenantId;
+        this.handleRoutingChange();
+        this.initUploaders();
+        this.GetContactDefaults();
         this.getRelationshipRoles(this._abpSessionService.tenantId, this.accountDataForView.ssin).subscribe(roles => {
             this.roleSeller = (roles || []).some(r =>
                 (r.requesterMarketplaceRole || '').toLowerCase().includes('seller') ||
@@ -203,7 +205,7 @@ showConnectionPopup = false;
 
         });
     }
-    
+
     get isExternalAccount(): boolean { return this.accountLevel == AccountLevelEnum.External && !this.viewMode }
     get isExternalAccountCreate(): boolean { return this.isExternalAccount && !Boolean(this.accountId) }
     get isExternalAccountEdit(): boolean { return this.isExternalAccount && Boolean(this.accountId) }
@@ -377,8 +379,8 @@ showConnectionPopup = false;
         this.getCurrencies();
         this.getPhoneTypes();
         this.allPriceLevel = this.getPriceLevel();
-       this.getShipVia();
-       this.getPaymentTerms();
+        this.getShipVia();
+        this.getPaymentTerms();
         this.getAccountTypes();
     }
 
@@ -404,9 +406,9 @@ showConnectionPopup = false;
                 // const business = list.find(x => x.label === 'Business'); // x is scoped here
                 // this.accountTypes = business ? [business] : [];
 
-      this.accountTypes = list.filter(x =>
-        x?.code === 'BUSINESS' || x?.code === 'PERSONAL'
-      );
+                this.accountTypes = list.filter(x =>
+                    x?.code === 'BUSINESS' || x?.code === 'PERSONAL'
+                );
 
 
 
@@ -432,7 +434,7 @@ showConnectionPopup = false;
             .subscribe((res) => {
                 this.getForEditResult = res
                 this.setProfileData(res)
-              this.setSelectedMarketplaceRoles();
+                this.setSelectedMarketplaceRoles();
 
             })
     }
@@ -445,7 +447,7 @@ showConnectionPopup = false;
             this.getForEditResult = result
             this.accountInfoOldCurrencyId = this.getForEditResult?.accountInfo?.currencyId;
             this.setProfileData(result)
-              this.setSelectedMarketplaceRoles();
+            this.setSelectedMarketplaceRoles();
             if (!result.accountInfo.id) {
                 this.accountInfoTemp.name = this.appSession?.tenant?.name
                 this.accountInfoTemp.tradeName = this.appSession?.tenant?.name
@@ -483,9 +485,9 @@ showConnectionPopup = false;
                     }
                 )
             this.accData = JSON.parse(JSON.stringify(result));
-        this.relationId = result.relationId ? result.relationId : 0
-        this.connnectionInfo=result.connnectionInfo ? result.connnectionInfo : []
-        this.entityExtraData = result ? result.entityExtraData : undefined
+            this.relationId = result.relationId ? result.relationId : 0
+            this.connnectionInfo = result.connnectionInfo ? result.connnectionInfo : []
+            this.entityExtraData = result ? result.entityExtraData : undefined
 
         }
 
@@ -525,7 +527,7 @@ showConnectionPopup = false;
         this.accountDataForView = result ? result.account : undefined
         this.entityExtraData = result ? result.entityExtraData : undefined
         this.relationId = result.relationId ? result.relationId : 0
-        this.connnectionInfo= result.connnectionInfo ? result.connnectionInfo : []
+        this.connnectionInfo = result.connnectionInfo ? result.connnectionInfo : []
         this.accountContactForView = result ? result.contact : undefined
         this.isRecordOwner = this.accountDataForView?.id == this.appSession.user?.accountId ? true : false
         if (this.accountDataForView.logoUrl) this.companyLogo = `${this.attachmentBaseUrl}/${this.accountDataForView.logoUrl}`;
@@ -543,104 +545,104 @@ showConnectionPopup = false;
             this.currencyIdName = result.currencyName;
             this.languageIdName = result.languageName;
         }
-        if(this.isManualAccountCreate){
+        if (this.isManualAccountCreate) {
             this.setManualAccCode()
         }
-     
+
         if (!this.accountInfoTemp.entityAttachments) this.accountInfoTemp.entityAttachments = [];
         if (!this.accountInfoTemp.entityCategories) this.accountInfoTemp.entityCategories = [];
         if (!this.accountInfoTemp.entityClassifications) this.accountInfoTemp.entityClassifications = [];
         if (!this.accountInfoTemp.accountType) this.accountInfoTemp.accountType = '';
         if (!this.accountInfoTemp.accountTypeId) this.accountInfoTemp.accountTypeId = 0;
-    
+
         if (!this.accountInfoTemp.contactAddresses) this.accountInfoTemp.contactAddresses = [];
         if (!this.accountInfoTemp.contactPaymentMethods) this.accountInfoTemp.contactPaymentMethods = [];
         if (!this.accountInfoTemp.branches) this.accountInfoTemp.branches = [];
-    
+
 
         if (!this.accountInfoTemp.id && this.isMyAccount) {
-    
-      
+
+
             if (!this.accountInfoTemp.languageId && !this.hasRequestedCode) {
                 this.hasRequestedCode = true;
-    
+
                 this._AccountsServiceProxy.getMyAccountForEdit().subscribe(async myResult => {
                     if (!myResult) {
                         return;
                     }
-    
-             
+
+
                     if (!this.accountInfoTemp.code) {
                         let sequance = '';
-    
+
                         const typeCode =
                             myResult?.accountInfo?.accountTypeId == 19
                                 ? 'BUSINESS'
                                 : myResult?.accountInfo?.accountTypeId == 21
                                     ? 'PERSONAL'
                                     : 'GROUP';
-                                    this.entityObjectType =typeCode
+                        this.entityObjectType = typeCode
                         const getNextEntityCodeRes = await this._sycIdentifierDefinitionsServiceProxy
                             .getNextEntityCode(typeCode, this.appSession.tenantId)
                             .toPromise();
-    
+
                         if (getNextEntityCodeRes) {
-                            
+
                             sequance = getNextEntityCodeRes;
                             this.accountInfoTemp.code = 'M' + sequance;
                         }
                     }
-    
+
                     // Default language
                     if (!this.accountInfoTemp.languageId) {
                         this.languageIdName = myResult.languageName;
                         this.accountInfoTemp.languageId = myResult.accountInfo.languageId;
                     }
-    
+
                     // Default payment terms / ship via
                     this.accountInfoTemp.paymentTermsId = !myResult?.accountInfo?.id
                         ? this.paymentTermsId
                         : (myResult.accountInfo?.paymentTermsId ?? this.paymentTermsId);
-    
+
                     this.accountInfoTemp.shipViaId = !myResult?.accountInfo?.id
                         ? this.shipViaId
                         : (myResult.accountInfo?.shipViaId ?? this.shipViaId);
                 });
             }
-    
+
         } else {
-       
+
             this.accountInfoTemp.paymentTermsId = !this.accountInfoTemp?.id
                 ? this.paymentTermsId
                 : (result?.accountInfo?.paymentTermsId ?? this.paymentTermsId);
-    
+
             this.accountInfoTemp.shipViaId = !this.accountInfoTemp?.id
                 ? this.shipViaId
                 : (result?.accountInfo?.shipViaId ?? this.shipViaId);
         }
-    
+
 
         this.getAllForAccountInfo();
         this.accountInfoLoded = true;
-    
-    
+
+
         this.categoriesIds = [];
         this.accountInfoTemp.entityCategories.forEach(element => {
             this.categoriesIds.push(element.entityObjectCategoryId);
         });
-    
+
         this.classificationsIds = [];
         this.accountInfoTemp.entityClassifications.forEach(element => {
             this.classificationsIds.push(element.entityObjectClassificationId);
         });
-    
+
         setTimeout(() => {
             this.getCategories(undefined);
             this.getClassifications(undefined);
         }, 500);
     }
-    
-    
+
+
 
     getAllForAccountInfo() {
         this.getSycAttachmentCategoriesByCodes(['LOGO', "BANNER", "IMAGE"]).subscribe((result) => {
@@ -769,7 +771,7 @@ showConnectionPopup = false;
     }
     getCotactData(event) {
         this.editedContactPerData = event
-   
+
 
 
     }
@@ -854,12 +856,12 @@ showConnectionPopup = false;
         }
 
         if (event?.entityExtraData?.length) {
-    const marketplaceRole = event.entityExtraData.find(x => x.attributeId === 610);
+            const marketplaceRole = event.entityExtraData.find(x => x.attributeId === 610);
 
-    if (marketplaceRole) {
-        this.setStringValue(610, marketplaceRole.attributeValue);
-    }
-}
+            if (marketplaceRole) {
+                this.setStringValue(610, marketplaceRole.attributeValue);
+            }
+        }
 
         this.saveMyAccount();
 
@@ -935,148 +937,213 @@ showConnectionPopup = false;
     }
 
 
+
+storeRolesBeforeChange(): void {
+  this.previousSelectedRoles = [...(this.selectedRoles || [])];
+}
+
+onRolesChange(event?: any): void {
+  if (this.isRestoringRoles) return;
+
+  const oldRoles = this.previousSelectedRoles || [];
+  const newRoles = this.selectedRoles || [];
+
+  const removedRoles = oldRoles.filter(role => !newRoles.includes(role));
+
+  if (!removedRoles.length) {
+    this.previousSelectedRoles = [...newRoles];
+    this.changeTouchState();
+    return;
+  }
+
+  this.validateRemovedRoles(removedRoles);
+}
+
+private validateRemovedRoles(removedRoles: string[]): void {
+  const accountSSIN = this.accountDataForView?.ssin || this.accountInfoTemp?.ssin;
+
+  if (!accountSSIN) {
+    this.restoreRemovedRoles(removedRoles);
+    return;
+  }
+
+  removedRoles.forEach(role => {
+    this._AccountsServiceProxy
+      .roleCanbeRemoved(accountSSIN, role)
+      .subscribe((canRemove: boolean) => {
+        if (!canRemove) {
+          this.restoreRemovedRoles([role]);
+
+          this.notify.warn(
+            this.l('This role cannot be removed because it is used in an existing relationship.')
+          );
+
+          return;
+        }
+
+        this.previousSelectedRoles = [...(this.selectedRoles || [])];
+        this.changeTouchState();
+      });
+  });
+}
+
+private restoreRemovedRoles(rolesToRestore: string[]): void {
+  this.isRestoringRoles = true;
+
+  this.selectedRoles = [
+    ...new Set([
+      ...(this.selectedRoles || []),
+      ...rolesToRestore
+    ])
+  ];
+
+  setTimeout(() => {
+    this.isRestoringRoles = false;
+    this.previousSelectedRoles = [...(this.selectedRoles || [])];
+  });
+}
     saveMyAccount() {
-    this.accountInfoTemp.entityExtraData ??= [];
+        this.accountInfoTemp.entityExtraData ??= [];
 
-    if (!this.accountInfoTemp.id) {
-        const mustHave = [701, 702, 703, 706, 707, 708, 709, 710, 711, 712, 713, 714, 715];
-        mustHave.forEach(id => this.ensureAttribute(id));
+        if (!this.accountInfoTemp.id) {
+            const mustHave = [701, 702, 703, 706, 707, 708, 709, 710, 711, 712, 713, 714, 715];
+            mustHave.forEach(id => this.ensureAttribute(id));
 
-        this.setStringValue(701, this.accountInfoTemp.entityExtraData[0].attributeValue);
-        this.setStringValue(702, this.accountInfoTemp.entityExtraData[1].attributeValue);
-        this.setStringValue(707, '');
-        this.setStringValue(706, '');
-        this.setBooleanValue(713, true);
-        this.setBooleanValue(708, true);
-        this.setBooleanValue(710, true);
-        this.setStringValue(715, '');
-        this.setBooleanValue(711, true);
-        this.setBooleanValue(712, true);
-        this.setBooleanValue(709, true);
-        this.setStringValue(703, '');
-        this.setBooleanValue(714, true);
+            this.setStringValue(701, this.accountInfoTemp.entityExtraData[0].attributeValue);
+            this.setStringValue(702, this.accountInfoTemp.entityExtraData[1].attributeValue);
+            this.setStringValue(707, '');
+            this.setStringValue(706, '');
+            this.setBooleanValue(713, true);
+            this.setBooleanValue(708, true);
+            this.setBooleanValue(710, true);
+            this.setStringValue(715, '');
+            this.setBooleanValue(711, true);
+            this.setBooleanValue(712, true);
+            this.setBooleanValue(709, true);
+            this.setStringValue(703, '');
+            this.setBooleanValue(714, true);
+        }
+
+        this.updateMarketplaceRolesExtraData();
+        this.accountInfoTemp.accountLevel = 0;
+        this.saving = true;
+
+        this._AccountsServiceProxy.createOrEditMyAccount(this.accountInfoTemp)
+            .pipe(finalize(() => {
+                this.saving = false;
+            }))
+            .subscribe(async result => {
+                if (!result) return;
+                await this.tenantRoleService.loadRoles();
+                this.accountId = result?.accountInfo?.id;
+
+                if (this.appSession?.user) {
+                    this.appSession.user.accountId = this.accountId;
+                }
+
+                this.touched = false;
+                this.notify.success(this.l('SavedSuccessfully'));
+
+                this.appSession.tenant.currencyInfoDto =
+                    this.allCurrencies.find(e => e.value == this.accountInfoTemp.currencyId);
+                this.tenantDefaultCurrency = this.appSession.tenant.currencyInfoDto;
+                this.displaySaveAccount = true;
+                this.canPublish = true;
+                this.getForEditResult.lastChangesIsPublished = false;
+
+                this.updateLogoService.updateLogo();
+
+                await this.getMyAccountDataForView(); // one refresh only
+
+                this._router.navigate(['/app/main/account'], {
+                    queryParams: { tab: 'ProfileView' }
+                });
+
+                this.changeTab(this.accountInfoPageTabsEnum.ProfileView);
+            }, _ => {
+                this.touched = true;
+            });
     }
 
-    this.updateMarketplaceRolesExtraData();
-    this.accountInfoTemp.accountLevel = 0;
-    this.saving = true;
 
-    this._AccountsServiceProxy.createOrEditMyAccount(this.accountInfoTemp)
-        .pipe(finalize(() => {
-            this.saving = false;
-        }))
-        .subscribe(async result => {
-            if (!result) return;
-       await this.tenantRoleService.loadRoles();
-            this.accountId = result?.accountInfo?.id;
+    async saveExternalOrManualAccount(): Promise<void> {
+        this.updateMarketplaceRolesExtraData();
 
-            if (this.appSession?.user) {
-                this.appSession.user.accountId = this.accountId;
-            }
+        this._AccountsServiceProxy
+            .getAvailableConnections(this.selectedRoles?.join('-')?.toLowerCase())
+            .subscribe((connections: any[]) => {
 
-            this.touched = false;
-            this.notify.success(this.l('SavedSuccessfully'));
+                this.availableConnections = connections || [];
 
-            this.appSession.tenant.currencyInfoDto =
-                this.allCurrencies.find(e => e.value == this.accountInfoTemp.currencyId);
-            this.tenantDefaultCurrency = this.appSession.tenant.currencyInfoDto;
-            this.displaySaveAccount = true;
-            this.canPublish = true;
-            this.getForEditResult.lastChangesIsPublished = false;
+                if (this.availableConnections.length === 0) {
+                    this.saveAccountAfterConnectionSelected();
+                    return;
+                }
 
-            this.updateLogoService.updateLogo();
+                if (this.availableConnections.length === 1) {
+                    this.selectedConnection = this.availableConnections[0];
+                    this.setSelectedRelationshipId();
+                    this.saveAccountAfterConnectionSelected();
+                    return;
+                }
 
-            await this.getMyAccountDataForView(); // one refresh only
-
-            this._router.navigate(['/app/main/account'], {
-                queryParams: { tab: 'ProfileView' }
-            });
-
-            this.changeTab(this.accountInfoPageTabsEnum.ProfileView);
-        }, _ => {
-            this.touched = true;
-        });
-}
-
-
-  async saveExternalOrManualAccount(): Promise<void> {
-    this.updateMarketplaceRolesExtraData();
-
-    this._AccountsServiceProxy
-        .getAvailableConnections(this.selectedRoles?.join('-')?.toLowerCase())
-        .subscribe((connections: any[]) => {
-
-            this.availableConnections = connections || [];
-
-            if (this.availableConnections.length === 0) {
-                this.saveAccountAfterConnectionSelected();
-                return;
-            }
-
-            if (this.availableConnections.length === 1) {
                 this.selectedConnection = this.availableConnections[0];
-                this.setSelectedRelationshipId();
-                this.saveAccountAfterConnectionSelected();
-                return;
-            }
+                this.showConnectionPopup = true;
 
-            this.selectedConnection = this.availableConnections[0];
-            this.showConnectionPopup = true;
+            }, err => {
+                this.touched = true;
+            });
+    }
 
-        }, err => {
-            this.touched = true;
-        });
-}
+    confirmSelectedConnection(): void {
+        if (!this.selectedConnection) return;
 
-confirmSelectedConnection(): void {
-    if (!this.selectedConnection) return;
+        this.setSelectedRelationshipId();
+        this.showConnectionPopup = false;
+        this.saveAccountAfterConnectionSelected();
+    }
 
-    this.setSelectedRelationshipId();
-    this.showConnectionPopup = false;
-    this.saveAccountAfterConnectionSelected();
-}
+    cancelConnectionPopup(): void {
+        this.showConnectionPopup = false;
+        this.selectedConnection = null;
+        this.saving = false;
 
-cancelConnectionPopup(): void {
-    this.showConnectionPopup = false;
-    this.selectedConnection = null;
-    this.saving = false;
+    }
 
-}
+    private setSelectedRelationshipId(): void {
 
-private setSelectedRelationshipId(): void {
- 
-    this.accountInfoTemp.relationshipId = this.selectedConnection?.connectionEntityId;
-}
+        this.accountInfoTemp.relationshipId = this.selectedConnection?.connectionEntityId;
+    }
 
-private saveAccountAfterConnectionSelected(): void {
-    this.saving = true;
+    private saveAccountAfterConnectionSelected(): void {
+        this.saving = true;
 
-    this._AccountsServiceProxy.createOrEditAccount(this.accountInfoTemp)
-        .pipe(finalize(() => {
-            this.saving = false;
-        }))
-        .subscribe(result => {
-            this.notify.info(this.l('SavedSuccessfully'));
+        this._AccountsServiceProxy.createOrEditAccount(this.accountInfoTemp)
+            .pipe(finalize(() => {
+                this.saving = false;
+            }))
+            .subscribe(result => {
+                this.notify.info(this.l('SavedSuccessfully'));
 
-            if (!this.accountInfoTemp.id) {
-                return this._router.navigate(['app/main/accounts']);
-            }
+                if (!this.accountInfoTemp.id) {
+                    return this._router.navigate(['app/main/accounts']);
+                }
 
-            this.touched = false;
+                this.touched = false;
 
-            if (this.accountLevel === this.accountLevelEnum.External) {
-                this.displaySaveAccount = true;
-                this.getForEditResult.lastChangesIsPublished = false;
-                this.handleComponentMode();
-            } else {
-                this._router.navigate([`/app/main/account/view/${this.accountInfoTemp.id}`]);
-                this.changeTab(AccountInfoPageTabs.ProfileView);
-                this.getAccountDataForView();
-            }
-        }, err => {
-            this.touched = true;
-        });
-}
+                if (this.accountLevel === this.accountLevelEnum.External) {
+                    this.displaySaveAccount = true;
+                    this.getForEditResult.lastChangesIsPublished = false;
+                    this.handleComponentMode();
+                } else {
+                    this._router.navigate([`/app/main/account/view/${this.accountInfoTemp.id}`]);
+                    this.changeTab(AccountInfoPageTabs.ProfileView);
+                    this.getAccountDataForView();
+                }
+            }, err => {
+                this.touched = true;
+            });
+    }
 
     save(): void {
         if (this.uploader.isUploading) {
@@ -1084,7 +1151,7 @@ private saveAccountAfterConnectionSelected(): void {
             return
         }
         this.saving = true;
-        if (this.accountLevel === AccountLevelEnum.Profile &&  (this.isRecordOwner || !this.accountInfoTemp.id ))  {
+        if (this.accountLevel === AccountLevelEnum.Profile && (this.isRecordOwner || !this.accountInfoTemp.id)) {
 
             if (this.accountInfoOldCurrencyId && this.accountInfoTemp.currencyId != this.accountInfoOldCurrencyId) {
                 this.message.confirm(
@@ -1109,7 +1176,7 @@ private saveAccountAfterConnectionSelected(): void {
             }
 
         } else {
-      
+
             this.saveExternalOrManualAccount()
         }
     }
@@ -1361,7 +1428,7 @@ private saveAccountAfterConnectionSelected(): void {
     }
 
     disConnect(): void {
-        this._AccountsServiceProxy.disconnect(this.accountDataForView.id,undefined)
+        this._AccountsServiceProxy.disconnect(this.accountDataForView.id, undefined)
             .subscribe(() => {
                 this.notify.success(this.l('SuccessfullyDisconnected'));
                 this.accountDataForView.status = false
@@ -1610,11 +1677,11 @@ private saveAccountAfterConnectionSelected(): void {
 
     setManualAccCode(): void {
         this.entityObjectType = 'BUSINESS';
-    
+
         if (this.accountInfoTemp.code) {
             return;
         }
-    
+
         this._sycIdentifierDefinitionsServiceProxy
             .getNextEntityCode(this.entityObjectType, this.appSession.tenantId)
             .subscribe(code => {
@@ -1625,52 +1692,52 @@ private saveAccountAfterConnectionSelected(): void {
     }
 
 
-buildMarketplaceRolesExtraData(): AppEntityExtraDataDto[] {
-  if (!this.selectedRoles?.length) {
-    return [];
-  }
+    buildMarketplaceRolesExtraData(): AppEntityExtraDataDto[] {
+        if (!this.selectedRoles?.length) {
+            return [];
+        }
 
-  const uniqueRoles = [...new Set(this.selectedRoles)].filter(Boolean);
-  const joinedRoles = uniqueRoles.join('-');
+        const uniqueRoles = [...new Set(this.selectedRoles)].filter(Boolean);
+        const joinedRoles = uniqueRoles.join('-');
 
-  const dto = new AppEntityExtraDataDto();
-  dto.entityId = this.accountInfoTemp?.id || 0;
-  dto.entityObjectTypeId = 610;
-  dto.entityObjectTypeCode = 'PROD-RAWM-TRIM-POMP'; // keep your actual backend value
-  dto.entityObjectTypeName = 'Marketplace Role';
-  dto.attributeValueId = null;
-  dto.attributeValue = joinedRoles;
-  dto.attributeId = 610;
-  dto.attributeValueFkName = null;
-  dto.attributeValueFkCode = null;
-  dto.attributeCode = 'MARKETPLACE-ROLE';
-  dto.id = 0;
+        const dto = new AppEntityExtraDataDto();
+        dto.entityId = this.accountInfoTemp?.id || 0;
+        dto.entityObjectTypeId = 610;
+        dto.entityObjectTypeCode = 'PROD-RAWM-TRIM-POMP'; // keep your actual backend value
+        dto.entityObjectTypeName = 'Marketplace Role';
+        dto.attributeValueId = null;
+        dto.attributeValue = joinedRoles;
+        dto.attributeId = 610;
+        dto.attributeValueFkName = null;
+        dto.attributeValueFkCode = null;
+        dto.attributeCode = 'MARKETPLACE-ROLE';
+        dto.id = 0;
 
-  return [dto];
-}
+        return [dto];
+    }
 
-updateMarketplaceRolesExtraData(): void {
-  if (!this.accountInfoTemp) {
-    return;
-  }
+    updateMarketplaceRolesExtraData(): void {
+        if (!this.accountInfoTemp) {
+            return;
+        }
 
-  this.accountInfoTemp.entityExtraData = [
-    ...(this.accountInfoTemp.entityExtraData || []).filter(
-      item => item.attributeCode !== 'MARKETPLACE-ROLE'
-    ),
-    ...this.buildMarketplaceRolesExtraData()
-  ];
-}
+        this.accountInfoTemp.entityExtraData = [
+            ...(this.accountInfoTemp.entityExtraData || []).filter(
+                item => item.attributeCode !== 'MARKETPLACE-ROLE'
+            ),
+            ...this.buildMarketplaceRolesExtraData()
+        ];
+    }
 
 
-setSelectedMarketplaceRoles(): void {
-  const marketplaceRole = this.accountInfoTemp?.entityExtraData?.find(
-    x => x.attributeCode === 'MARKETPLACE-ROLE'
-  );
+    setSelectedMarketplaceRoles(): void {
+        const marketplaceRole = this.accountInfoTemp?.entityExtraData?.find(
+            x => x.attributeCode === 'MARKETPLACE-ROLE'
+        );
 
-  this.selectedRoles = marketplaceRole?.attributeValue
-    ? marketplaceRole.attributeValue.split('-').filter(x => x)
-    : [];
-}
-    
+        this.selectedRoles = marketplaceRole?.attributeValue
+            ? marketplaceRole.attributeValue.split('-').filter(x => x)
+            : [];
+    }
+
 }
