@@ -79,7 +79,7 @@
                                     </div>
                                 </div>
                                 <div class="row row-item row-item-main-data"
-                                    *ngIf="accountInfoTemp?.accountType != 'People' && accountInfoTemp?.accountType != 'Personal' && accountDataForView?.accountTypeId != 21">
+                                    *ngIf="accountDataForView?.accountTypeId != 21">
                                     <div class="col-md-4 row-item-title emailColor">
                                         {{l("Website")}}</div>
                                     <div class="col-md-8 row-item-desc text-right">
@@ -153,7 +153,8 @@
                                     </a>
 
                                 </li>
-                                <li class="nav-item">
+                                <li class="nav-item"
+                                 >
                                     <a class="nav-link" (click)="changeTab(accountInfoPageTabsEnum.Branches)"
                                         [ngClass]="currentTab==accountInfoPageTabsEnum.Branches?'active':''">
                                         <img class="sidebar-menu-item-img"
@@ -163,14 +164,10 @@
                                             *ngIf="currentTab == accountInfoPageTabsEnum.Branches"
                                             style="color: #F88011;"></i>
                                         <span *ngIf="accountLevel === accountLevelEnum.Profile && !viewMode">
-                                            {{ accountInfoTemp?.accountType != 'People' && accountInfoTemp?.accountType?.toUpperCase()
-                                            != 'PERSONAL' && accountDataForView?.accountTypeId != 21 ?
-                                            l("MyBranches/Addresses") : l("My Addresses") }}
+                                            {{l("MyBranches/Addresses")}}
                                         </span>
                                         <span *ngIf="accountLevel !== accountLevelEnum.Profile || viewMode">
-                                            {{accountInfoTemp?.accountType != 'People' && accountInfoTemp?.accountType?.toUpperCase()
-                                            != 'PERSONAL' && accountDataForView?.accountTypeId != 21 ?
-                                            l("MyBranches/Addresses") : l("My Addresses") }}
+                                            {{l("AccountBranches/Addresses")}}
                                         </span>
                                     </a>
                                 </li>
@@ -292,46 +289,36 @@
                                     <div class="kt-portlet__body" *ngIf="accountInfoTemp">
                                         <div class="row">
                                             <div class="offset-md-2 col-md-9">
-                                                <p class="title-blue">{{ accountInfoTemp?.accountType != 'People' &&
-                                                    accountInfoTemp?.accountType != 'Personal' ? l("CompanyInformation")
-                                                    : l("Profile Information ")}}</p>
+                                                <p class="title-blue">{{l("CompanyInformation")}}</p>
                                             </div>
                                         </div>
 
                                         <div class="form-group row ">
                                             <label for="colFormLabelSm"
-                                                class="col-sm-2 col-form-label col-form-label-sm label-form">{{
-                                                accountInfoTemp?.accountType != 'People' && accountInfoTemp?.accountType
-                                                != 'Personal' ? l("CompnayLogo") : l("Profile picture ")}}
+                                                class="col-sm-2 col-form-label col-form-label-sm label-form">{{l("CompnayLogo")}}
                                             </label>
-                                            <!-- merge -->
                                             <app-image-upload [sycAttachmentCategory]="sycAttachmentCategoryLogo"
                                                 [isDisabled]="(accountDataForView?.isConnected && currentTab === accountInfoPageTabsEnum.ProfileCreateOrEdit && !isRecordOwner)"
                                                 [image]="companyLogo" [staticWidth]="170" [showGuidelines]="true"
                                                 (imageBrowseDone)="imageBrowseDone($event,sycAttachmentCategoryLogo)"
-                                                (removeImage)="removeImage($event,sycAttachmentCategoryLogo,-1)"
-                                                [customExtentionsImgs]="true">
+                                                (removeImage)="removeImage($event,sycAttachmentCategoryLogo,-1)">
                                             </app-image-upload>
                                         </div>
 
                                         <div class="form-group row ">
-                                            <label class="col-sm-2 col-form-label col-form-label-sm label-form">{{
-                                                accountInfoTemp?.accountType != 'People' && accountInfoTemp?.accountType
-                                                != 'Personal' ? l("CompnayImages") : l("Cover image")}}
+                                            <label
+                                                class="col-sm-2 col-form-label col-form-label-sm label-form">{{l("CompnayImages")}}
                                             </label>
-                                            <!-- merge -->
                                             <app-image-upload [sycAttachmentCategory]="sycAttachmentCategoryBanner"
                                                 [isDisabled]="(accountDataForView?.isConnected && currentTab === accountInfoPageTabsEnum.ProfileCreateOrEdit && !isRecordOwner)"
                                                 [image]="coverPhoto" [staticHeight]="120" [showGuidelines]="true"
                                                 (imageBrowseDone)="imageBrowseDone($event,sycAttachmentCategoryBanner)"
-                                                (removeImage)="removeImage($event,sycAttachmentCategoryBanner,-2)"
-                                                [customExtentionsImgs]="true">
+                                                (removeImage)="removeImage($event,sycAttachmentCategoryBanner,-2)">
                                             </app-image-upload>
 
                                         </div>
 
-                                        <div class="form-group row"
-                                            *ngIf="accountInfoTemp?.accountType != 'People' && accountInfoTemp?.accountType != 'Personal'">
+                                        <div class="form-group row" *ngIf="accountInfoTemp?.accountType != 'People' && accountInfoTemp?.accountType != 'Personal'">
                                             <div
                                                 class="col-sm-10 offset-sm-2 d-flex align-items-center d-flex flex-wrap">
                                                 <!--Other image 1-->
@@ -341,8 +328,7 @@
                                                         [sycAttachmentCategory]="sycAttachmentCategoryImage"
                                                         [image]="OtherImages1" [staticHeight]="100"
                                                         (imageBrowseDone)="imageBrowseDone($event,sycAttachmentCategoryImage,1)"
-                                                        (removeImage)="removeImage($event,sycAttachmentCategoryImage,1)"
-                                                        [customExtentionsImgs]="true">
+                                                        (removeImage)="removeImage($event,sycAttachmentCategoryImage,1)">
                                                     </app-image-upload>
                                                 </div>
 
@@ -353,8 +339,7 @@
                                                         [sycAttachmentCategory]="sycAttachmentCategoryImage"
                                                         [image]="OtherImages2" [staticHeight]="100"
                                                         (imageBrowseDone)="imageBrowseDone($event,sycAttachmentCategoryImage,2)"
-                                                        (removeImage)="removeImage($event,sycAttachmentCategoryImage,2)"
-                                                        [customExtentionsImgs]="true">
+                                                        (removeImage)="removeImage($event,sycAttachmentCategoryImage,2)">
                                                     </app-image-upload>
                                                 </div>
 
@@ -365,8 +350,7 @@
                                                         [sycAttachmentCategory]="sycAttachmentCategoryImage"
                                                         [image]="OtherImages3" [staticHeight]="100"
                                                         (imageBrowseDone)="imageBrowseDone($event,sycAttachmentCategoryImage,3)"
-                                                        (removeImage)="removeImage($event,sycAttachmentCategoryImage,3)"
-                                                        [customExtentionsImgs]="true">
+                                                        (removeImage)="removeImage($event,sycAttachmentCategoryImage,3)">
                                                     </app-image-upload>
                                                 </div>
                                                 <!--Other image 4-->
@@ -376,8 +360,7 @@
                                                         [sycAttachmentCategory]="sycAttachmentCategoryImage"
                                                         [image]="OtherImages4" [staticHeight]="100"
                                                         (imageBrowseDone)="imageBrowseDone($event,sycAttachmentCategoryImage,4)"
-                                                        (removeImage)="removeImage($event,sycAttachmentCategoryImage,4)"
-                                                        [customExtentionsImgs]="true">
+                                                        (removeImage)="removeImage($event,sycAttachmentCategoryImage,4)">
                                                     </app-image-upload>
                                                 </div>
 
@@ -404,8 +387,7 @@
                                         </div>
 
 
-                                        <div class="form-group row"
-                                            *ngIf="accountInfoTemp?.accountType != 'People' && accountInfoTemp?.accountType != 'Personal'">
+                                        <div class="form-group row">
                                             <label for="colFormLabelSm"
                                                 class="col-sm-2 col-form-label col-form-label-sm label-form">
                                                 <span class="text-danger font-weight-bold">*</span>
@@ -425,8 +407,7 @@
 
                                         </div>
 
-                                        <div class="form-group row"
-                                            *ngIf="accountInfoTemp?.accountType != 'People' && accountInfoTemp?.accountType != 'Personal'">
+                                        <div class="form-group row">
                                             <label for="colFormLabelSm"
                                                 class="col-sm-2 col-form-label col-form-label-sm label-form">
                                                 <span class="text-danger font-weight-bold">*</span>
@@ -445,55 +426,7 @@
                                                 <validation-messages [formCtrl]="nameInput"></validation-messages>
                                             </div>
                                         </div>
-
-                                        <div class="form-group row"
-                                            *ngIf="accountInfoTemp?.accountType == 'People' || accountInfoTemp?.accountType == 'Personal'">
-                                            <label for="colFormLabelSm"
-                                                class="col-sm-2 col-form-label col-form-label-sm label-form">
-                                                <span class="text-danger font-weight-bold">*</span>
-                                                {{l("First Name")}}
-                                            </label>
-                                            <div class="col-sm-8">
-
-                                                <input type="text" id="AccountInfoTemp_Name" #nameInput="ngModel"
-                                                    class="form-control form-control-sm aria-input-text"
-                                                    [disabled]="accountDataForView?.isConnected && currentTab === accountInfoPageTabsEnum.ProfileCreateOrEdit && !isRecordOwner"
-                                                    [ngStyle]="{'cursor': accountDataForView?.isConnected && currentTab === accountInfoPageTabsEnum.ProfileCreateOrEdit ? 'not-allowed' : 'pointer'}"
-                                                    id="colFormLabelSm"
-                                                    [(ngModel)]="accountInfoTemp.entityExtraData[0].attributeValue"
-                                                    name="firstName" minlength="2" maxlength="250" required
-                                                    (input)="changeTouchState()"
-                                                    [placeholder]=" 'PleaseEnterFirstName...' | localize ">
-
-                                                <validation-messages [formCtrl]="nameInput"></validation-messages>
-                                            </div>
-                                        </div>
-
-                                        <div class="form-group row"
-                                            *ngIf="accountInfoTemp?.accountType == 'People' || accountInfoTemp?.accountType == 'Personal'">
-                                            <label for="colFormLabelSm"
-                                                class="col-sm-2 col-form-label col-form-label-sm label-form">
-                                                <span class="text-danger font-weight-bold">*</span>
-                                                {{ (languageSettingName === 'en-GB' ? 'Sur Name' : 'Last Name') | localize }}
-                                            </label>
-                                            <div class="col-sm-8">
-
-                                                <input type="text" id="AccountInfoTemp_Name" #nameInput="ngModel"
-                                                    class="form-control form-control-sm aria-input-text"
-                                                    [disabled]="accountDataForView?.isConnected && currentTab === accountInfoPageTabsEnum.ProfileCreateOrEdit && !isRecordOwner"
-                                                    [ngStyle]="{'cursor': accountDataForView?.isConnected && currentTab === accountInfoPageTabsEnum.ProfileCreateOrEdit ? 'not-allowed' : 'pointer'}"
-                                                    id="colFormLabelSm"
-                                                    [(ngModel)]="accountInfoTemp.entityExtraData[1].attributeValue"
-                                                    name="lastName" minlength="2" maxlength="250" required
-                                                    (input)="changeTouchState()"
-                                                    [placeholder]=" 'PleaseEnterLastName...' | localize ">
-
-                                                <validation-messages [formCtrl]="nameInput"></validation-messages>
-                                            </div>
-                                        </div>
-
-                                        <div class="form-group row"
-                                            *ngIf="accountInfoTemp?.accountType != 'People' && accountInfoTemp?.accountType != 'Personal'">
+                                        <div class="form-group row">
                                             <label for="colFormLabelSm"
                                                 class="col-sm-2 col-form-label col-form-label-sm label-form">
                                                 <!-- <span class="text-danger font-weight-bold">*</span> -->
@@ -531,8 +464,7 @@
                                                     [formCtrl]="emailAddressInput"></validation-messages>
                                             </div>
                                         </div>
-                                        <div class="form-group row"
-                                            *ngIf="accountInfoTemp?.accountType != 'People' && accountInfoTemp?.accountType != 'Personal'">
+                                        <div class="form-group row" *ngIf="accountDataForView?.accountTypeId != 21">
                                             <label for="colFormLabelSm"
                                                 class="col-sm-2 col-form-label col-form-label-sm label-form">
                                                 {{l("Website")}}</label>
@@ -639,27 +571,7 @@
                                             </div>
                                         </div>
 
-                                        <div class="form-group row"
-                                            *ngIf="accountInfoTemp?.accountType == 'People' || accountInfoTemp?.accountType == 'Personal'">
-                                            <label for="colFormLabelSm"
-                                                class="col-sm-2 col-form-label col-form-label-sm label-form">
-                                                {{l("Job title")}}</label>
-                                            <div class="col-sm-8">
-
-
-                                                <input type="text" class="form-control form-control-sm aria-input-text"
-                                                    [(ngModel)]="jobTitle" (input)="changeTouchState()" name="jobTitle"
-                                                    minlength="2" maxlength="100"
-                                                    [disabled]="accountDataForView?.isConnected && currentTab === accountInfoPageTabsEnum.ProfileCreateOrEdit && !isRecordOwner"
-                                                    [placeholder]="'PleaseEnterJobTitle' | localize" />
-
-                                                <!-- <validation-messages [formCtrl]="jobInput"></validation-messages> -->
-                                                <div class="form-control-feedback" *ngIf="websiteValidation">{{
-                                                    'InvalidWebsiteFormat' | localize }}</div>
-                                            </div>
-                                        </div>
-
-                                        <!-- <div class="form-group row"
+                                       <!--  <div class="form-group row"
                                             *ngIf="(accountLevel == accountLevelEnum.Manual || (accountDataForView?.isConnected && currentTab === accountInfoPageTabsEnum.ProfileCreateOrEdit)) && !isRecordOwner">
                                             <label for="colFormLabelSm"
                                                 class="col-sm-2 col-form-label col-form-label-sm label-form">{{l("PriceLevel")}}</label>
@@ -668,15 +580,15 @@
                                                     styleClass="form-control aria-select" [filter]="false"
                                                     name="PriceLevelId" [(ngModel)]="accountInfoTemp.priceLevel"
                                                     (onChange)="changeTouchState()"
-                                                    [placeholder]="'PleaseSelect' | localize"></p-dropdown>
+                                                    [placeholder]="'PleaseSelect' | localize"></p-dropdown> 
 
                                             </div>
                                             <span  *ngIf="accountInfoTemp?.priceLevel" class="mt-2"><a class="reset-link" (click)="accountInfoTemp.priceLevel =null; changeTouchState()">Reset</a></span>
                                         </div>
  -->
 
-                                        <div class="form-group row"
-                                             *ngIf="isRecordOwner && accountLevel == accountLevelEnum.Profile && accountInfoTemp?.accountType != 'People' && accountInfoTemp?.accountType != 'Personal'">
+                                        <div class="form-group row" 
+                                        *ngIf="isRecordOwner && accountLevel == accountLevelEnum.Profile && accountInfoTemp?.accountType != 'People' && accountInfoTemp?.accountType != 'Personal'">
                                             <label for="colFormLabelSm"
                                                 class="col-sm-2 col-form-label col-form-label-sm label-form">
 
@@ -694,7 +606,7 @@
                                             </div>
                                         </div>
 
-                                            <div class="form-group row" *ngIf="isRecordOwner && accountLevel == accountLevelEnum.Profile && accountInfoTemp?.accountType != 'People' && accountInfoTemp?.accountType != 'Personal'">
+                                        <div class="form-group row" *ngIf="isRecordOwner && accountLevel == accountLevelEnum.Profile && accountInfoTemp?.accountType != 'People' && accountInfoTemp?.accountType != 'Personal'">
                                             <label for="colFormLabelSm"
                                                 class="col-sm-2 col-form-label col-form-label-sm label-form">
 
@@ -709,122 +621,6 @@
                                                 </p-dropdown>
                                             </div>
                                         </div> 
-
-                                        <!-- Phone 1 -->
-                                        <div class="form-group row">
-                                            <label class="col-sm-2 col-form-label col-form-label-sm label-form">
-                                                {{ l("Phone") }}
-                                            </label>
-
-                                            <div class="col-sm-8">
-                                                <div class="row">
-                                                    <!-- Type -->
-                                                    <div class="col-md-4 mb-2 mb-md-0">
-                                                        <p-dropdown [options]="allPhoneTypes" optionLabel="label"
-                                                            optionValue="value"
-                                                            [(ngModel)]="accountInfoTemp.phone1TypeId"
-                                                            name="phone1TypeId" styleClass="form-control aria-select"
-                                                            [placeholder]="'Type' | localize"
-                                                            (onChange)="changeTouchState()">
-                                                        </p-dropdown>
-                                                    </div>
-
-                                                    <!-- Number -->
-                                                    <div  class=" mb-2 mb-md-0" [ngClass]="accountInfoTemp?.accountType != 'People' && accountInfoTemp?.accountType != 'Personal' ?'col-md-5':'col-md-8'">
-                                                        <input type="text"
-                                                            class="form-control form-control-sm aria-input-text"
-                                                            [(ngModel)]="accountInfoTemp.phone1Number"
-                                                            name="phone1Number" [placeholder]="'PhoneNumber' | localize"
-                                                            (input)="changeTouchState()" />
-                                                    </div>
-
-                                                    <!-- Ex -->
-                                                    <div class="col-md-3"  *ngIf="accountInfoTemp?.accountType != 'People' && accountInfoTemp?.accountType != 'Personal'">
-                                                        <input type="text"
-                                                            class="form-control form-control-sm aria-input-text"
-                                                            [(ngModel)]="accountInfoTemp.phone1Ex" name="phone1Ex"
-                                                            [placeholder]="'Ex' | localize"
-                                                            (input)="changeTouchState()" />
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <!-- Phone 2 -->
-                                        <div class="form-group row">
-                                            <label class="col-sm-2 col-form-label col-form-label-sm label-form">
-                                                {{ l("Phone2") }}
-                                            </label>
-
-                                            <div class="col-sm-8">
-                                                <div class="row">
-                                                    <div class="col-md-4 mb-2 mb-md-0">
-                                                        <p-dropdown [options]="allPhoneTypes" optionLabel="label"
-                                                            optionValue="value"
-                                                            [(ngModel)]="accountInfoTemp.phone2TypeId"
-                                                            name="phone2TypeId" styleClass="form-control aria-select"
-                                                            [placeholder]="'Type' | localize"
-                                                            (onChange)="changeTouchState()">
-                                                        </p-dropdown>
-                                                    </div>
-
-                                                    <div  class=" mb-2 mb-md-0" [ngClass]="accountInfoTemp?.accountType != 'People' && accountInfoTemp?.accountType != 'Personal' ?'col-md-5':'col-md-8'">
-                                                        <input type="text"
-                                                            class="form-control form-control-sm aria-input-text"
-                                                            [(ngModel)]="accountInfoTemp.phone2Number"
-                                                            name="phone2Number" [placeholder]="'PhoneNumber' | localize"
-                                                            (input)="changeTouchState()" />
-                                                    </div>
-
-                                                    <div class="col-md-3"  *ngIf="accountInfoTemp?.accountType != 'People' && accountInfoTemp?.accountType != 'Personal'">
-                                                        <input type="text"
-                                                            class="form-control form-control-sm aria-input-text"
-                                                            [(ngModel)]="accountInfoTemp.phone2Ex" name="phone2Ex"
-                                                            [placeholder]="'Ex' | localize"
-                                                            (input)="changeTouchState()" />
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <!-- Phone 3 -->
-                                        <div class="form-group row">
-                                            <label class="col-sm-2 col-form-label col-form-label-sm label-form">
-                                                {{ l("Phone3") }}
-                                            </label>
-
-                                            <div class="col-sm-8">
-                                                <div class="row">
-                                                    <div class="col-md-4 mb-2 mb-md-0">
-                                                        <p-dropdown [options]="allPhoneTypes" optionLabel="label"
-                                                            optionValue="value"
-                                                            [(ngModel)]="accountInfoTemp.phone3TypeId"
-                                                            name="phone3TypeId" styleClass="form-control aria-select"
-                                                            [placeholder]="'Type' | localize"
-                                                            (onChange)="changeTouchState()">
-                                                        </p-dropdown>
-                                                    </div>
-
-                                                    <div class=" mb-2 mb-md-0" [ngClass]="accountInfoTemp?.accountType != 'People' && accountInfoTemp?.accountType != 'Personal' ?'col-md-5':'col-md-8'">
-                                                        <input type="text"
-                                                            class="form-control form-control-sm aria-input-text"
-                                                            [(ngModel)]="accountInfoTemp.phone3Number"
-                                                            name="phone3Number" [placeholder]="'PhoneNumber' | localize"
-                                                            (input)="changeTouchState()" />
-                                                    </div>
-
-                                                    <div class="col-md-3"  *ngIf="accountInfoTemp?.accountType != 'People' && accountInfoTemp?.accountType != 'Personal'">
-                                                        <input type="text"
-                                                            class="form-control form-control-sm aria-input-text"
-                                                            [(ngModel)]="accountInfoTemp.phone3Ex" name="phone3Ex"
-                                                            [placeholder]="'Ex' | localize"
-                                                            (input)="changeTouchState()" />
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-
-
 
                                         <div class="form-group row">
                                             <label for="colFormLabelSm"
@@ -841,9 +637,7 @@
 
                                         <div class="form-group row">
                                             <label for="colFormLabelSm"
-                                                class="col-sm-2 col-form-label col-form-label-sm label-form">{{
-                                                accountInfoTemp?.accountType != 'People' && accountInfoTemp?.accountType
-                                                != 'Personal' ? l("AboutUs") : l("About")}}
+                                                class="col-sm-2 col-form-label col-form-label-sm label-form">{{l("AboutUs")}}
                                             </label>
                                             <div class="col-sm-8">
                                                 <textarea class="form-control z-depth-1 aria-textarea-text"
@@ -852,7 +646,7 @@
                                                     (input)="changeTouchState()"
                                                     [disabled]="accountDataForView?.isConnected && currentTab === accountInfoPageTabsEnum.ProfileCreateOrEdit && !isRecordOwner"
                                                     [ngStyle]="{'cursor': accountDataForView?.isConnected && currentTab === accountInfoPageTabsEnum.ProfileCreateOrEdit ? 'not-allowed' : 'pointer'}"
-                                                    [placeholder]="  accountInfoTemp?.accountType != 'People' && accountInfoTemp?.accountType != 'Personal' ?'PleaseEnterAboutUs' : 'PleaseEnterAbout' | localize "></textarea>
+                                                    [placeholder]=" 'PleaseEnterAboutUs' | localize "></textarea>
                                             </div>
                                         </div>
 
@@ -861,9 +655,9 @@
                                     </div>
                                 </div>
 
-                                <div class="kt-portlet m-portlet--full-height mt-0"
+                                <div class="kt-portlet m-portlet--full-height"
                                     *ngIf="accountInfoTemp?.accountType != 'People' && accountInfoTemp?.accountType != 'Personal'">
-                                    <div class="kt-portlet__head aria-header-block header-no-mr-bt d-flex justify-content-between align-items-center bg-white">
+                                    <div class="kt-portlet__head aria-header-block header-no-mr-bt">
                                         <div class="col-md-10">
                                             <div class="kt-portlet__head-label aria-header">
 
@@ -874,7 +668,7 @@
 
                                             </div>
                                         </div>
-                                        <div class="col-md-2">
+                                        <div class="col-md-2  header-block-buttons">
 
 
                                             <button class="btn  btn-save"
@@ -1008,8 +802,8 @@
 
                                                         </tr>
                                                     </ng-template>
-                                                    <ng-template pTemplate="body"  let-index let-record="$implicit"
-                                                      >
+                                                    <ng-template pTemplate="body" let-record="$implicit"
+                                                        let-index="rowIndex">
                                                         <tr>
                                                             <td style="width:150px">
                                                                 {{record.entityObjectCategoryCode}}
@@ -1022,7 +816,7 @@
                                                                     container="body">
                                                                     <img src="assets/profile/Remove-item-from-list.svg">
                                                                     <button class="btn btn-sm btn-remove"
-                                                                        (click)="removeCategory(record)">
+                                                                        (click)="removeCategory(index)">
                                                                         {{l("Delete")}}
                                                                     </button>
                                                                 </div>
@@ -1059,8 +853,7 @@
                         </div>
                         <div class="tab2" *ngIf="currentTab == accountInfoPageTabsEnum.Branches ">
                             <app-branches [branches]='accountDataForView.branches' [accountId]='accountId'
-                                (askToPublish)="askToPublish($event)" [viewMode]="viewMode"
-                                [accountData]="accountDataForView"></app-branches>
+                                (askToPublish)="askToPublish($event)" [viewMode]="viewMode"></app-branches>
                         </div>
                         <div class="tab3" *ngIf="currentTab == accountInfoPageTabsEnum.Payments">
                             <app-payment-methods-list [accountId]='accountId'
@@ -1075,7 +868,7 @@
                             <app-view-profile [accountData]="accountDataForView" [contactData]="accountContactForView" [entityExtraData]="entityExtraData"
                                 [isPublished]="isPublished" [viewMode]="viewMode" [accountLevel]="accountLevel"
                                 (edit)="triggerProfile($event)" (editedData)="savePerData($event)"
-                                (delete)="askToConfirmDeleteAccount()" (publish)="refreshPublish($event)"
+                                (delete)="askToConfirmDeleteAccount()" 
                                 (editedContactData)="getCotactData($event)" [isSync]="isSync"
                                 [connectionCount]="connectionCount"
                                 [personalAccount]="accountDataForView?.accountTypeId == 21 ? true : false"></app-view-profile>
