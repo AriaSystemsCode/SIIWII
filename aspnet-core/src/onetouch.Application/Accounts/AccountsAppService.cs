@@ -734,6 +734,22 @@ namespace onetouch.Accounts
 
             }
         }
+        //Change role
+        public async Task<bool> RoleCanbeRemoved(string accountSSIN, string roleToRemove)
+        {
+            bool returnValue = true;
+            var activeRelationshipStatusId = await _helper.SystemTables.GetEntityObjectStatusRelationshipActive();
+            var relationship = await _appContactRelationshipInfoRepository.GetAll()
+                .Where(z => ((z.RecipientContactSSIN == accountSSIN &&
+                z.RecipientMarketplaceRole.ToLower() == roleToRemove.ToLower()) ||
+                (z.RequesterContactSSIN == accountSSIN &&
+                z.RequesterMarketplaceRole.ToLower() == roleToRemove.ToLower())) &&
+                z.EntityObjectStatusId == activeRelationshipStatusId).FirstOrDefaultAsync();
+            if (relationship != null)
+                return false;
+            return returnValue;
+        }
+        //Change Role
           [AbpAllowAnonymous]
         public async Task<PagedResultDto<GetAccountForViewDto>> GetAllMyConnections(GetAllAccountsInput input)
         {
