@@ -1592,10 +1592,7 @@ top: 4px;">
                                         ">
                                             <div class="orderHeader  d-flex align-items-center justify-content-between">
                                                 <div class="d-flex" style="height: 36px;">
-                                                    <!-- <img class="mt-2"
-                                                        [src]="attachmentBaseUrl + '/' + order.color.colorImg"
-                                                        style="width: 24px; height: 24px; border-radius: 6px;"
-                                                        onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'" /> -->
+                                                 
                                                         <ng-container *ngIf="(order?.color?.colorCode || order?.color?.colorHexaCode); else showThumb">
                                                             <div
                                                               style="width:24px;height:24px;border-radius:6px;"

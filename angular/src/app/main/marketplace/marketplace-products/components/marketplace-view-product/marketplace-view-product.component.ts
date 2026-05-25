@@ -898,10 +898,10 @@ export class MarketplaceViewProductComponent
             "SellerSSIN",
             JSON.stringify(this.productData.sellerSSIN)
         );
-        localStorage.setItem(
-            "currencyCode",
-            JSON.stringify(this.productBodyData.currencyCode)
-        );
+        // localStorage.setItem(
+        //     "currencyCode",
+        //     JSON.stringify(this.productBodyData.currencyCode)
+        // );
         localStorage.setItem("fromSellerRoom", JSON.stringify(true));
 
         localStorage.setItem("fromMarketPlace", JSON.stringify(false));
