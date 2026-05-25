@@ -60,7 +60,7 @@
 
             <!-- Searchable dropdown -->
             <div class="flex-grow-1" *ngIf="extraAttr.dataType === 'SearchableDropdown'">
-              <div class="row d-flex align-items-baseline justify-content-start">
+              <div class="d-flex align-items-baseline justify-content-start">
                 <p-dropdown [options]="getDropdownOptions(extraAttr)"
                                 [(ngModel)]="extraAttr.selectedValues"
                             [placeholder]="l('Select') + ' ' + (extraAttr.name | localize)"
@@ -89,7 +89,7 @@
 
             <!-- Dropdown list with static values -->
             <div class="flex-grow-1" *ngIf="extraAttr.dataType === 'dropDownList'">
-              <div class="row d-flex align-items-baseline justify-content-start">
+              <div class="d-flex align-items-baseline justify-content-start">
                 <p-dropdown [options]="getDropdownOptions(extraAttr)"
                                 [(ngModel)]="extraAttr.selectedValues"
                             [placeholder]="l('Select') + ' ' + (extraAttr.name | localize)"
@@ -225,12 +225,27 @@
             </div>
 
             <!-- Numeric input -->
-            <div class="flex-grow-1 position-relative" *ngIf="extraAttr.dataType === 'Numeric'">
-              <input type="number" name="{{extraAttr.name}}" placeholder="{{extraAttr.name| localize}}" class="form-control"
-                     id="extraAttr{{extraAttr.name}}"     [(ngModel)]="extraAttr.selectedValues" (ngModelChange)="onAnyInputChange()" />
-              <i class="pi pi-times position-absolute" style="right: 10px; top: 15px; cursor: pointer;"
-                 *ngIf="extraAttr.selectedValues" (click)="clearExtraAttr(extraAttr)"></i>
-            </div>
+       <div class="flex-grow-1 position-relative"
+     *ngIf="extraAttr.dataType === 'Numeric'">
+
+    <input
+        type="number"
+        name="{{extraAttr.name}}"
+        placeholder="{{extraAttr.name | localize}}"
+        class="form-control"
+        [ngClass]="extraAttr.selectedValues ? 'has-clear-icon' : ''"
+        id="extraAttr{{extraAttr.name}}"
+        [(ngModel)]="extraAttr.selectedValues"
+        (ngModelChange)="onAnyInputChange()" />
+
+    <i
+        class="pi pi-times clear-number-icon"
+        *ngIf="
+                 extraAttr.selectedValues > 0"
+        (click)="clearExtraAttr(extraAttr)">
+    </i>
+
+</div>
 
             <!-- text eitor -->
             <div class="flex-grow-1 w-100"

@@ -734,7 +734,23 @@ namespace onetouch.Accounts
 
             }
         }
-        [AbpAllowAnonymous]
+        //Change role
+        public async Task<bool> RoleCanbeRemoved(string accountSSIN, string roleToRemove)
+        {
+            bool returnValue = true;
+            var activeRelationshipStatusId = await _helper.SystemTables.GetEntityObjectStatusRelationshipActive();
+            var relationship = await _appContactRelationshipInfoRepository.GetAll()
+                .Where(z => ((z.RecipientContactSSIN == accountSSIN &&
+                z.RecipientMarketplaceRole.ToLower() == roleToRemove.ToLower()) ||
+                (z.RequesterContactSSIN == accountSSIN &&
+                z.RequesterMarketplaceRole.ToLower() == roleToRemove.ToLower())) &&
+                z.EntityObjectStatusId == activeRelationshipStatusId).FirstOrDefaultAsync();
+            if (relationship != null)
+                return false;
+            return returnValue;
+        }
+        //Change Role
+          [AbpAllowAnonymous]
         public async Task<PagedResultDto<GetAccountForViewDto>> GetAllMyConnections(GetAllAccountsInput input)
         {
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
@@ -3508,6 +3524,15 @@ namespace onetouch.Accounts
                 {
                     var tenant = input.TenantId == null ? AbpSession.TenantId : input.TenantId;
                     await PublishManualAccount(contact.SSIN, long.Parse(tenant.ToString()));
+                    var contactFortCurrTenant = await _appContactRepository.GetAll()
+                        .Where(z => z.IsProfileData == true && z.PartnerId == null && z.ParentId == null).FirstOrDefaultAsync();
+                    if (contactFortCurrTenant != null)
+                    {
+                      var returnVal =
+                       await _iCreateMarketplaceAccount.CreateOrEditMarketplaceContactRelationship(contactFortCurrTenant.SSIN,
+                        contact.SSIN, 
+                        false, false, input.RelationshipId,null);
+                    }
                     await _iCreateMarketplaceAccount.HideAccount(contact.SSIN);
                 }
             }
@@ -3533,6 +3558,48 @@ namespace onetouch.Accounts
                 if (extraDataRole != null)
                 {
                     currentTenatntAccountMarketplaceRole = extraDataRole.AttributeValue;
+                    //Start
+                    var marketplaceRelationshipSycEntityObjId = await _helper.SystemTables.GetEntityObjectTypeMarketplaceRelationship();
+                    var relationShipLookups = await _appEntityRepository.GetAll().Include(z => z.EntityExtraData)
+                            .Where(z => z.EntityObjectTypeId == marketplaceRelationshipSycEntityObjId).ToListAsync();
+                    foreach (var relationshipCodeLookup in relationShipLookups)
+                    {
+                       
+                        var requestorRole = relationshipCodeLookup.EntityExtraData.Where(z => z.AttributeId == 610).FirstOrDefault();
+                        var recepientRole = relationshipCodeLookup.EntityExtraData.Where(z => z.AttributeId == 611).FirstOrDefault();
+                        var requestorType = relationshipCodeLookup.EntityExtraData.Where(z => z.AttributeId == 606).FirstOrDefault();
+                        if (requestorType != null &&
+                            requestorType.AttributeValue.TrimEnd().ToLower() == currentTenantAccountObj.EntityFk.EntityObjectTypeCode.ToLower() &&
+                            ((!string.IsNullOrEmpty(currentTenatntAccountMarketplaceRole)
+                            && requestorRole != null && !string.IsNullOrEmpty(requestorRole.AttributeValue)) ?
+                            (currentTenatntAccountMarketplaceRole.ToLower().Contains(requestorRole.AttributeValue.ToLower().TrimEnd())) : true))
+                        {
+                            var responseType = relationshipCodeLookup.EntityExtraData.Where(z => z.AttributeId == 607).FirstOrDefault();
+                            if (responseType != null &&
+                                responseType.AttributeValue.TrimEnd().ToLower() == currentTenantAccountObj.EntityFk.EntityObjectTypeCode.ToLower()
+                                && ((!string.IsNullOrEmpty(marketplaceRole)
+                                && recepientRole != null && !string.IsNullOrEmpty(recepientRole.AttributeValue)) ?
+                                marketplaceRole.ToLower().Contains(recepientRole.AttributeValue.ToLower().TrimEnd())
+                                : true))
+                            {
+                                var connectLabel = relationshipCodeLookup.EntityExtraData.Where(z => z.AttributeId == 601).FirstOrDefault();
+                                if (connectLabel != null)
+                                {
+                                    var sharingLevl = relationshipCodeLookup.EntityExtraData.Where(z => z.AttributeId == 605).FirstOrDefault();
+
+                                    returnList.Add(new ConnectionType
+                                    {
+                                        ConnectionName = relationshipCodeLookup.Name,
+                                        ConnectionEntityId = relationshipCodeLookup.Id,
+                                        ConnectLabel = connectLabel.AttributeValue,
+                                        DefaultVisibility = sharingLevl != null && !string.IsNullOrEmpty(sharingLevl.AttributeValue) ? sharingLevl.AttributeValue : "Public"
+                                    });
+                                }
+                            }
+
+                        }
+                    }
+                    //End
                 }
 
             }

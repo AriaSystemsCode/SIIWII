@@ -2407,7 +2407,7 @@ namespace onetouch.AppSiiwiiTransaction
         public async Task<PagedResultDto<GetAccountInformationOutputDto>> GetRelatedAccounts(GetAllAccountsInput accountFilter, bool? lExclueMyAcc = false, string? transactionType = null)
         {
             transactionType = (!string.IsNullOrEmpty(transactionType) && transactionType == "PO") ? "Seller" : "Buyer";
-
+            var activeRelationshipStatusId = await _helper.SystemTables.GetEntityObjectStatusRelationshipActive();
             var currentAccount = await _appContactRepository.GetAll().Include(z => z.EntityFk)
                 .Where(z => z.TenantId == AbpSession.TenantId
                 && z.IsProfileData == true
@@ -2418,6 +2418,7 @@ namespace onetouch.AppSiiwiiTransaction
 
             var relationships = _appContactRelationshipInfoRepository.GetAll()
                 .Where(r => (r.RelationshipEndDate == null || r.RelationshipEndDate < DateTime.Now) &&
+                r.EntityObjectStatusId== activeRelationshipStatusId &&
                 (
                 (r.RequesterContactSSIN == ssin
                 &&
