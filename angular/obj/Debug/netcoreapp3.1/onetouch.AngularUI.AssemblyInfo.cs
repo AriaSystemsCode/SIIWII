@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("onetouch.AngularUI")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+3c2a33f57687e309c493bbb35405fb6551e3f424")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+9482439394a79449564c921dc12f34ecbe09f178")]
 [assembly: System.Reflection.AssemblyProductAttribute("onetouch.AngularUI")]
 [assembly: System.Reflection.AssemblyTitleAttribute("onetouch.AngularUI")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
