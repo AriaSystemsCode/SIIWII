@@ -23,3 +23,6 @@
 /angular/src/app/main/SycLandingPageSettings/SycLandingPageSettings.module.ts
 /angular/src/app/main/SycLandingPageSettings/SycLandingPageSettingsRoutingModule-routing.module.ts
 /.gitignore
+angular/obj/Debug/netcoreapp3.1/onetouch.AngularUI.AssemblyInfo.cs
+angular/obj/Debug/netcoreapp3.1/onetouch.AngularUI.AssemblyInfoInputs.cache
+angular/obj/Debug/netcoreapp3.1/onetouch.AngularUI.AssemblyInfo.cs
