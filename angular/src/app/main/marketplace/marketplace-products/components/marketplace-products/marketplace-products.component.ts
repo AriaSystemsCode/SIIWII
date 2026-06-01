@@ -286,10 +286,12 @@ export class MarketplaceProductsComponent
 
     getAllProducts() {
         this.showMainSpinner();
-        const selectedCurrency =
-            (this.fromMarketAcoount)
-                ? (this.marketplaceAccCurrency || 'USD')
-                : (this.selectedCurrrency || 'USD');
+
+        // const selectedCurrency =
+        //     (this.fromMarketAcoount)
+        //         ? (this.marketplaceAccCurrency || 'USD')
+        //         : (this.selectedCurrrency || 'USD');
+        const currencyCode = this.getCurrencyCodeForRequest();
 
         const requestParams = {
             contactSSIN: this.contactSSIN,
@@ -308,13 +310,12 @@ export class MarketplaceProductsComponent
             startShipData: this.startShipData || null,
             endShipData: this.endShipData || null,
             brands: this.brands || [],
-            selectedCurrency: selectedCurrency,
+            selectedCurrency: currencyCode,
             selectedSort: this.selectedSort?.value || 'name',
             skipCount: this.skipCount,
             maxResultCount:  this.maxResultCount
         };
         localStorage.setItem("productFilters", JSON.stringify(requestParams));
-        const currencyCode = this.getCurrencyCodeForRequest();
     
         this._AppMarketplaceItemsServiceProxy
             .getAll(
@@ -578,7 +579,7 @@ export class MarketplaceProductsComponent
         }
 
 
-        localStorage.setItem("currencyCode", null);
+        // localStorage.setItem("currencyCode", null);
     }
 
 
@@ -591,12 +592,7 @@ export class MarketplaceProductsComponent
         this.displayFitlers = true;
     }
 
-    applyFilters() {
-        this.getAllProducts();
-        this.currency = this.selectedCurrrency?.code ? this.selectedCurrrency?.code : this.selectedCurrrency;
-        localStorage.setItem("currencyCode", this.currency);
 
-    }
     clearFiltrs(value) {
         if (value) {
             this.resetProducts('')
