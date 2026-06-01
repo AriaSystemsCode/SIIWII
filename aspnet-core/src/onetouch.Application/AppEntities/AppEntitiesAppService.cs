@@ -2623,7 +2623,7 @@ namespace onetouch.AppEntities
                                   .Where(z => z.TenantId == null && z.EntityObjectTypeId == presonEntityObjectTypeId && z.TenantOwner != null);*/
 
                         var contactsList = _appContactRepository.GetAll().Include(z => z.EntityFk).ThenInclude(z => z.EntityExtraData.Where(s => s.AttributeId == 715))
-                                  .Where(z => z.TenantId == null && z.ParentId != null && z.EntityFk.EntityObjectTypeId == presonEntityObjectTypeId);
+                                  .Where(z => z.TenantId == AbpSession.TenantId && z.EntityFk.EntityObjectTypeId == presonEntityObjectTypeId);
 
 
                         var contact = from t in transactionContacts
@@ -2643,7 +2643,7 @@ namespace onetouch.AppEntities
                         foreach (var acc in transactionContactsList)
                         {
                             var contacts = await _appContactRepository.GetAll().Include(z => z.EntityFk).ThenInclude(z => z.EntityExtraData.Where(s => s.AttributeId == 715))
-                                .Where(z => z.TenantId == null &&  z.AccountId==acc.AccountId).ToListAsync();
+                                .Where(z => z.TenantId == AbpSession.TenantId &&  z.AccountId==acc.AccountId).ToListAsync();
                             //await newContact.WhereIf(!string.IsNullOrEmpty(filter), z => z.contact.Name.Contains(filter)).OrderBy(z => z.contact.Id).ToListAsync();
 
                             if (contacts != null && contacts.Count() > 0)
