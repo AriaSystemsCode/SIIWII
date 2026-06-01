@@ -1,3 +1,8 @@
 is_global = true
 build_property.RootNamespace = onetouch.AngularUI
-build_property.ProjectDir = d:\WorkingFolder\tfs\OneTouchAll2020\angular\
+build_property.ProjectDir = C:\Hassan\SIIWII\angular\
+build_property.EnableComHosting = 
+build_property.EnableGeneratedComInterfaceComImportInterop = 
+build_property.CsWinRTUseWindowsUIXamlProjections = false
+build_property.EffectiveAnalysisLevelStyle = 
+build_property.EnableCodeStyleSeverity = 
