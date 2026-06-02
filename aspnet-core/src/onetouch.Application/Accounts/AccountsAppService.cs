@@ -1790,9 +1790,13 @@ namespace onetouch.Accounts
                     if (accountConnection != null && accountConnection.Id > 0)
                     {
                         var relationshipsList = await _appContactRelationshipInfoRepository.GetAll()
-                                .Where(z => ((z.RecipientContactSSIN == currentAccount.SSIN && z.RequesterContactSSIN == accountConnection.SSIN)
-                                || (z.RecipientContactSSIN == accountConnection.SSIN && z.RequesterContactSSIN == currentAccount.SSIN))
-                               ).OrderByDescending(z => z.CreationTime).ToListAsync();
+                                .Where(z => ((z.RecipientContactSSIN == currentAccount.SSIN && 
+                                z.RequesterContactSSIN == accountConnection.SSIN)
+                                ||
+                                (z.RecipientContactSSIN == accountConnection.SSIN 
+                                && z.RequesterContactSSIN == currentAccount.SSIN))
+                               && z.EntityObjectStatusId == activeRelationshipStatusId)
+                                .OrderByDescending(z => z.CreationTime).ToListAsync();
                         if (relationshipsList != null && relationshipsList.Count > 0)
                         {
                             output.ConnectionsInfo = new List<ConnectionInfo>();
@@ -3125,27 +3129,38 @@ namespace onetouch.Accounts
 
                 if (existed != null)
                 {
+                    var relationshipCnt = await _appContactRelationshipInfoRepository.GetAll()
+                               .Where(z => currentaccount != null &&
+                               (((z.RecipientContactSSIN == currentaccount.SSIN && 
+                               z.RequesterContactSSIN == account.SSIN)
+                               || (z.RecipientContactSSIN == account.SSIN &&
+                               z.RequesterContactSSIN == currentaccount.SSIN)) &&
+                               z.EntityObjectStatusId != inActiveRealtionshipStatusId && z.Id != relationshipId)
+                              ).CountAsync();
 
                     //Mariam[Start]
-                    var contactsInfo = _appContactRepository.GetAll().Where(x => x.AccountId == existed.Id).ToList();
-                    foreach (var contactRec in contactsInfo)
+                    if (relationshipCnt == 0)
                     {
-                        await _appContactAddressRepository.DeleteAsync(z => z.ContactId == contactRec.Id);
-                        await _appEntityRepository.DeleteAsync(contactRec.EntityId);
-                        await _appContactRepository.DeleteAsync(contactRec.Id);
-                        await _appAddressRepository.DeleteAsync(z => z.AccountId == existed.Id);
-                    }
-                    if (originalConnectRecordFortOtherTenant != null)
-                    {
-                        var otherContactsInfo = _appContactRepository.GetAll().Where(x => x.AccountId == originalConnectRecordFortOtherTenant.Id).ToList();
-                        foreach (var contactRec in otherContactsInfo)
+                        var contactsInfo = _appContactRepository.GetAll().Where(x => x.AccountId == existed.Id).ToList();
+                        foreach (var contactRec in contactsInfo)
                         {
                             await _appContactAddressRepository.DeleteAsync(z => z.ContactId == contactRec.Id);
                             await _appEntityRepository.DeleteAsync(contactRec.EntityId);
                             await _appContactRepository.DeleteAsync(contactRec.Id);
-                            await _appAddressRepository.DeleteAsync(z => z.AccountId == originalConnectRecordFortOtherTenant.Id);
+                            await _appAddressRepository.DeleteAsync(z => z.AccountId == existed.Id);
                         }
-                    }
+                        if (originalConnectRecordFortOtherTenant != null)
+                        {
+                            var otherContactsInfo = _appContactRepository.GetAll().Where(x => x.AccountId == originalConnectRecordFortOtherTenant.Id).ToList();
+                            foreach (var contactRec in otherContactsInfo)
+                            {
+                                await _appContactAddressRepository.DeleteAsync(z => z.ContactId == contactRec.Id);
+                                await _appEntityRepository.DeleteAsync(contactRec.EntityId);
+                                await _appContactRepository.DeleteAsync(contactRec.Id);
+                                await _appAddressRepository.DeleteAsync(z => z.AccountId == originalConnectRecordFortOtherTenant.Id);
+                            }
+                        }
+                    
                     //Mariam[End]
 
 
@@ -3160,26 +3175,27 @@ namespace onetouch.Accounts
                     }
                     //T-SII-20221013.0006,1 MMT 11/02/2022 Notify the destination tenant that another tenant connected to him[Start]
                     var PublishContactFortDisconnectFromTenant = await _appMarketplaceContactRepository.GetAll().FirstOrDefaultAsync(x => x.SSIN == partnerId);
-                    if (PublishContactFortDisconnectFromTenant != null)
-                    {
-                        //var profileContactofOtherTenant = await _appContactRepository.GetAll().FirstOrDefaultAsync(x => x.Id == PublishContactFortDisconnectFromTenant.PartnerId);
-                       // if (profileContactofOtherTenant != null && profileContactofOtherTenant.TenantId != null)
+                        if (PublishContactFortDisconnectFromTenant != null)
                         {
-                            var tenantObject = await TenantManager.GetByIdAsync(int.Parse(PublishContactFortDisconnectFromTenant.TenantOwner.ToString()));
-                            if (tenantObject != null)
+                            //var profileContactofOtherTenant = await _appContactRepository.GetAll().FirstOrDefaultAsync(x => x.Id == PublishContactFortDisconnectFromTenant.PartnerId);
+                            // if (profileContactofOtherTenant != null && profileContactofOtherTenant.TenantId != null)
                             {
-                                string tenancyName = tenantObject.TenancyName;
-                                var adminUser = await _userManager.FindByNameAsync("admin@" + tenancyName);
-                                if (adminUser != null)
+                                var tenantObject = await TenantManager.GetByIdAsync(int.Parse(PublishContactFortDisconnectFromTenant.TenantOwner.ToString()));
+                                if (tenantObject != null)
                                 {
-                                    var myTenantObject = await TenantManager.GetByIdAsync(int.Parse(AbpSession.TenantId.ToString()));
-                                    //T-SII-20220413.0001,1 MMT 05/15/2023 -The notification message Enhachment[Start]
-                                    string accProfileUrl = _appConfiguration["App:ClientRootAddress"] + "app/main/account/view/" + originalPublishContactFortCurrTenant.Id.ToString() + "?tab=ProfileView";
-                                    await _appNotifier.SendMessageAsync(new Abp.UserIdentifier(PublishContactFortDisconnectFromTenant.TenantOwner, adminUser.Id),
-                                        "Tenant <a  href=\"" + accProfileUrl + "\">" + myTenantObject.Name + "</a>  has been disconnected from you",
-                                        Abp.Notifications.NotificationSeverity.Info,
-                                        new Abp.Domain.Entities.EntityIdentifier(typeof(AppContact), originalPublishContactFortCurrTenant.Id));
-                                    //T-SII-20220413.0001,1 MMT 05/15/2023 -The notification message Enhachment[End]
+                                    string tenancyName = tenantObject.TenancyName;
+                                    var adminUser = await _userManager.FindByNameAsync("admin@" + tenancyName);
+                                    if (adminUser != null)
+                                    {
+                                        var myTenantObject = await TenantManager.GetByIdAsync(int.Parse(AbpSession.TenantId.ToString()));
+                                        //T-SII-20220413.0001,1 MMT 05/15/2023 -The notification message Enhachment[Start]
+                                        string accProfileUrl = _appConfiguration["App:ClientRootAddress"] + "app/main/account/view/" + originalPublishContactFortCurrTenant.Id.ToString() + "?tab=ProfileView";
+                                        await _appNotifier.SendMessageAsync(new Abp.UserIdentifier(PublishContactFortDisconnectFromTenant.TenantOwner, adminUser.Id),
+                                            "Tenant <a  href=\"" + accProfileUrl + "\">" + myTenantObject.Name + "</a>  has been disconnected from you",
+                                            Abp.Notifications.NotificationSeverity.Info,
+                                            new Abp.Domain.Entities.EntityIdentifier(typeof(AppContact), originalPublishContactFortCurrTenant.Id));
+                                        //T-SII-20220413.0001,1 MMT 05/15/2023 -The notification message Enhachment[End]
+                                    }
                                 }
                             }
                         }
