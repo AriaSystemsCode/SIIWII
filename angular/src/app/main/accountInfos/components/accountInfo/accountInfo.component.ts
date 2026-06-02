@@ -946,16 +946,18 @@ onRolesChange(event?: any): void {
   if (this.isRestoringRoles) return;
 
   const oldRoles = this.previousSelectedRoles || [];
-  const newRoles = this.selectedRoles || [];
+  const newRoles = event?.value || this.selectedRoles || [];
 
   const removedRoles = oldRoles.filter(role => !newRoles.includes(role));
 
   if (!removedRoles.length) {
     this.previousSelectedRoles = [...newRoles];
+    this.selectedRoles = [...newRoles];
     this.changeTouchState();
     return;
   }
 
+  this.selectedRoles = [...newRoles];
   this.validateRemovedRoles(removedRoles);
 }
 
@@ -1730,14 +1732,25 @@ private restoreRemovedRoles(rolesToRestore: string[]): void {
     }
 
 
-    setSelectedMarketplaceRoles(): void {
-        const marketplaceRole = this.accountInfoTemp?.entityExtraData?.find(
-            x => x.attributeCode === 'MARKETPLACE-ROLE'
-        );
+    // setSelectedMarketplaceRoles(): void {
+    //     const marketplaceRole = this.accountInfoTemp?.entityExtraData?.find(
+    //         x => x.attributeCode === 'MARKETPLACE-ROLE'
+    //     );
 
-        this.selectedRoles = marketplaceRole?.attributeValue
-            ? marketplaceRole.attributeValue.split('-').filter(x => x)
-            : [];
-    }
+    //     this.selectedRoles = marketplaceRole?.attributeValue
+    //         ? marketplaceRole.attributeValue.split('-').filter(x => x)
+    //         : [];
+    // }
+    setSelectedMarketplaceRoles(): void {
+  const marketplaceRole = this.accountInfoTemp?.entityExtraData?.find(
+    x => x.attributeCode === 'MARKETPLACE-ROLE'
+  );
+
+  this.selectedRoles = marketplaceRole?.attributeValue
+    ? marketplaceRole.attributeValue.split('-').filter(x => x)
+    : [];
+
+  this.previousSelectedRoles = [...this.selectedRoles];
+}
 
 }
