@@ -202,12 +202,16 @@ export class PortalHostSettingsComponent extends AppComponentBase implements OnI
       const extraDataList = this.dynamicInputsForViewDto?.entityExtraData || [];
 
         let appEntityDto: AppEntityDto = new AppEntityDto();
+        appEntityDto = Object.assign(
+                  new AppEntityDto(),
+                   this.dynamicInputsForViewDto.appEntity
+                );
         appEntityDto.entityExtraData = this.dynamicInputsForViewDto?.entityExtraData || [];
-        appEntityDto.id = this.hostEntityId;
+       /* appEntityDto.id = this.hostEntityId;
         appEntityDto.entityObjectTypeId = this.entityObjectTypeHostId;
         appEntityDto.objectId = 2;
         appEntityDto.code = this.dynamicInputsForViewDto.appEntity.code;
-        appEntityDto.name = this.dynamicInputsForViewDto.appEntity.name;
+        appEntityDto.name = this.dynamicInputsForViewDto.appEntity.name;*/
 
         appEntityDto.extraDataFileTypeIndex = appEntityDto.entityExtraData
             .map((item, index) =>

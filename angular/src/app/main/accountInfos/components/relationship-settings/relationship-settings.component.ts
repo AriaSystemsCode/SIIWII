@@ -6,7 +6,7 @@ import { EExtraAttributeUsage } from '@app/main/app-items/appItems/models/extra-
 import { SelectItem } from '@node_modules/primeng/api';
 import { finalize } from 'rxjs/operators';
 import { AppComponentBase } from '@shared/common/app-component-base';
-import { AppEntitiesServiceProxy, AppEntityDto, AppEntityExtraDataDto, GetAppEntityForEditOutput, LookupLabelDto, SycEntityObjectTypesServiceProxy } from '@shared/service-proxies/service-proxies';
+import { AppEntitiesServiceProxy, AppEntityDto, AppEntityExtraDataDto, ConnectionInfo, GetAppEntityForEditOutput, LookupLabelDto, SycEntityObjectTypesServiceProxy } from '@shared/service-proxies/service-proxies';
 import { dynamicInputs } from '@shared/components/dynamicInputs/dynamicInputs.component';
 @Component({
   selector: 'app-relationship-settings',
@@ -29,7 +29,7 @@ export class RelationshipSettingsComponent extends AppComponentBase implements O
 
 @ViewChildren('appdynamicInputs')
 dynamicInputsComponents!: QueryList<dynamicInputs>;
-  @Input() connnectionInfo=[];
+  @Input() connectionsInfo:ConnectionInfo;
 
   constructor(
     injector: Injector,
@@ -51,8 +51,7 @@ dynamicInputsComponents!: QueryList<dynamicInputs>;
   }
 
   getRelations() {
-    //i49-get relations
-    const defaultId = this.connnectionInfo?.[0]?.id ?? this.relationId;
+    const defaultId = this.connectionsInfo?.[0]?.relationEntityId ?? this.relationId;
     this.onRelationshipOptionChange(defaultId);
   }
 
@@ -316,15 +315,11 @@ dynamicInputsComponents!: QueryList<dynamicInputs>;
     this.showMainSpinner();
   
     let appEntityDto: AppEntityDto = new AppEntityDto();
+     appEntityDto = Object.assign(
+      new AppEntityDto(),
+       this.dynamicInputsForViewDto.appEntity
+    );
     appEntityDto.entityExtraData = this.dynamicInputsForViewDto?.entityExtraData || [];
-    appEntityDto.id = this.relationId;
-    appEntityDto.entityObjectTypeId = this.entityObjectTypeId;
-    appEntityDto.objectId = 2;
-    appEntityDto.tenantId = this.appSession.tenantId;
-    appEntityDto.code = this.dynamicInputsForViewDto.appEntity.code;
-    appEntityDto.name = this.dynamicInputsForViewDto.appEntity.name
-      //i49-save relations values ??      appEntityDto.entityObjectTypeId= this.relationId
-
          this.dynamicInputsComponents.first.saveAll(appEntityDto);
 
   }

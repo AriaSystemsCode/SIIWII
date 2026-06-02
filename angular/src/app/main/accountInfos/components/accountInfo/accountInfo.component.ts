@@ -1,5 +1,5 @@
 ﻿import { Component, Injector, ViewEncapsulation, OnInit, Input, ViewChild, ChangeDetectorRef, } from '@angular/core';
-import { CurrencyInfoDto, AccountsServiceProxy, CreateOrEditAccountInfoDto, AppEntitiesServiceProxy, LookupLabelDto, AppEntityClassificationDto, AppEntityCategoryDto, SycAttachmentCategoriesServiceProxy, SycAttachmentCategorySycAttachmentCategoryLookupTableDto, GetSycAttachmentCategoryForViewDto, AppEntityAttachmentDto, BranchDto, AppContactAddressDto, TreeNodeOfGetSycEntityObjectCategoryForViewDto, TreeNodeOfGetSycEntityObjectClassificationForViewDto, AccountLevelEnum, GetAccountInfoForEditOutput, GetAccountForViewDto, AccountDto, SessionServiceProxy, ContactDto, MemberFilterTypeEnum, SycEntityObjectClassificationDto, SycIdentifierDefinitionsServiceProxy, SycAttachmentCategoryDto, MarketplaceAccountsServiceProxy, AppEntityExtraDataDto } from '@shared/service-proxies/service-proxies';
+import { CurrencyInfoDto, AccountsServiceProxy, CreateOrEditAccountInfoDto, AppEntitiesServiceProxy, LookupLabelDto, AppEntityClassificationDto, AppEntityCategoryDto, SycAttachmentCategoriesServiceProxy, SycAttachmentCategorySycAttachmentCategoryLookupTableDto, GetSycAttachmentCategoryForViewDto, AppEntityAttachmentDto, BranchDto, AppContactAddressDto, TreeNodeOfGetSycEntityObjectCategoryForViewDto, TreeNodeOfGetSycEntityObjectClassificationForViewDto, AccountLevelEnum, GetAccountInfoForEditOutput, GetAccountForViewDto, AccountDto, SessionServiceProxy, ContactDto, MemberFilterTypeEnum, SycEntityObjectClassificationDto, SycIdentifierDefinitionsServiceProxy, SycAttachmentCategoryDto, MarketplaceAccountsServiceProxy, AppEntityExtraDataDto, ConnectionInfo } from '@shared/service-proxies/service-proxies';
 import { AppComponentBase } from '@shared/common/app-component-base';
 import { appModuleAnimation } from '@shared/animations/routerTransition';
 import { ActivatedRoute } from '@angular/router';
@@ -144,7 +144,7 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit {
     roles: any
     selectedRoles!: any[];
     roleSeller: boolean = false;
-    connnectionInfo = [];
+    connectionsInfo :ConnectionInfo [] =[];
 
     availableConnections: any[] = [];
     selectedConnection: any = null;
@@ -486,7 +486,7 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit {
                 )
             this.accData = JSON.parse(JSON.stringify(result));
             this.relationId = result.relationId ? result.relationId : 0
-            this.connnectionInfo = result.connnectionInfo ? result.connnectionInfo : []
+            this.connectionsInfo = result.connectionsInfo ? result.connectionsInfo : []
             this.entityExtraData = result ? result.entityExtraData : undefined
 
         }
@@ -527,7 +527,7 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit {
         this.accountDataForView = result ? result.account : undefined
         this.entityExtraData = result ? result.entityExtraData : undefined
         this.relationId = result.relationId ? result.relationId : 0
-        this.connnectionInfo = result.connnectionInfo ? result.connnectionInfo : []
+        this.connectionsInfo = result.connectionsInfo ? result.connectionsInfo : []
         this.accountContactForView = result ? result.contact : undefined
         this.isRecordOwner = this.accountDataForView?.id == this.appSession.user?.accountId ? true : false
         if (this.accountDataForView.logoUrl) this.companyLogo = `${this.attachmentBaseUrl}/${this.accountDataForView.logoUrl}`;
