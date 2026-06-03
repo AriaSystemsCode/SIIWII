@@ -458,11 +458,18 @@ export class AccountsComponent
     }
 
 
- createRelation(account) {
+isCreatingRelation = false;
+
+createRelation(account) {
+  if (this.isCreatingRelation) {
+    return;
+  }
+
   if (!account?.account?.account?.id || !account?.relation?.connectionEntityId) {
     return;
   }
 
+  this.isCreatingRelation = true;
   this.showMainSpinner();
 
   forkJoin({
@@ -472,9 +479,8 @@ export class AccountsComponent
     loggedTenantRoles: this.AppTransactionServiceProxy.getAccountMarketplaceRoles(
       this.loginTenaneSsin
     )
-  })
-    .pipe(finalize(() => this.hideMainSpinner()))
-    .subscribe(({ recipientRoles, loggedTenantRoles }: any) => {
+  }).subscribe({
+    next: ({ recipientRoles, loggedTenantRoles }: any) => {
       const recipientHasRoles = this.hasMarketplaceRoles(recipientRoles);
       const loggedTenantHasRoles = this.hasMarketplaceRoles(loggedTenantRoles);
 
@@ -483,21 +489,22 @@ export class AccountsComponent
           'Cannot connect, you need to update the marketplace role of your account / the recipient account marketplace role in order to build relationship together',
           ''
         );
+
+        this.isCreatingRelation = false;
+        this.hideMainSpinner();
         return;
       }
 
       this.applyRelation(account);
-    });
-}
-private hasMarketplaceRoles(response: any): boolean {
-  const roles = response?.result ?? response;
-
-  return Array.isArray(roles) && roles.length > 0;
+    },
+    error: () => {
+      this.isCreatingRelation = false;
+      this.hideMainSpinner();
+    }
+  });
 }
 
 private applyRelation(account): void {
-  this.showMainSpinner();
-
   this._accountsServiceProxy
     .applyRelationOnProfile(
       account.account.account.id,
@@ -505,7 +512,12 @@ private applyRelation(account): void {
       account.relation.defaultVisibility === 'Public',
       account.relation.connectionEntityId
     )
-    .pipe(finalize(() => this.hideMainSpinner()))
+    .pipe(
+      finalize(() => {
+        this.isCreatingRelation = false;
+        this.hideMainSpinner();
+      })
+    )
     .subscribe((result: any) => {
       const i = this.accounts.findIndex(
         x => x.account.id === account.account.account.id
@@ -515,9 +527,10 @@ private applyRelation(account): void {
 
       const currentAccount = this.accounts[i];
 
-      currentAccount.availableConnections = (currentAccount.availableConnections || []).filter(
-        x => x.connectionEntityId !== account.relation.connectionEntityId
-      );
+      currentAccount.availableConnections =
+        (currentAccount.availableConnections || []).filter(
+          x => x.connectionEntityId !== account.relation.connectionEntityId
+        );
 
       currentAccount.connectionsInfo = currentAccount.connectionsInfo || [];
 
@@ -533,6 +546,12 @@ private applyRelation(account): void {
       this.accounts = [...this.accounts];
     });
 }
+private hasMarketplaceRoles(response: any): boolean {
+  const roles = response?.result ?? response;
+
+  return Array.isArray(roles) && roles.length > 0;
+}
+
 
 
 

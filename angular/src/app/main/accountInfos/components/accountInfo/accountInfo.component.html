@@ -523,19 +523,19 @@
                                         
 
                                       <p-multiSelect
-  [options]="roles"
-  [(ngModel)]="selectedRoles"
-  [ngModelOptions]="{ standalone: true }"
-  optionLabel="name"
-  optionValue="name"
-  placeholder="Select Roles"
-  [maxSelectedLabels]="3"
-  class="w-100 md:w-80"
-  display="chip"
-  [disabled]="accountDataForView?.isConnected && currentTab === accountInfoPageTabsEnum.ProfileCreateOrEdit && !isRecordOwner"
-  (onPanelShow)="storeRolesBeforeChange()"
-  (onChange)="onRolesChange($event)">
-</p-multiSelect>
+                                        [options]="roles"
+                                        [(ngModel)]="selectedRoles"
+                                        [ngModelOptions]="{ standalone: true }"
+                                        optionLabel="name"
+                                        optionValue="name"
+                                        placeholder="Select Roles"
+                                        [maxSelectedLabels]="3"
+                                        class="w-100 md:w-80"
+                                        display="chip"
+                                        [disabled]="accountDataForView?.isConnected && currentTab === accountInfoPageTabsEnum.ProfileCreateOrEdit && !isRecordOwner"
+                                        (onPanelShow)="storeRolesBeforeChange()"
+                                        (onChange)="onRolesChange($event)">
+                                        </p-multiSelect>
 
                                             </div>
                                         </div>
