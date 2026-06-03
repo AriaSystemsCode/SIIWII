@@ -2403,8 +2403,30 @@ namespace onetouch.AppSiiwiiTransaction
         }
         */
 
-        public async Task<PagedResultDto<GetAccountInformationOutputDto>> GetRelatedAccounts(GetAllAccountsInput accountFilter, bool? lExclueMyAcc = false, string? transactionType = null)
+        public async Task<PagedResultDto<GetAccountInformationOutputDto>> GetRelatedAccounts(GetAllAccountsInput accountFilter, bool? lExclueMyAcc = false, string? transactionType = null, string? selectedAccountRole = null)
         {
+            if (string.IsNullOrEmpty(selectedAccountRole))
+            {
+                if (!string.IsNullOrEmpty(transactionType) && transactionType == "PO")
+                {
+                    selectedAccountRole = "Buyer";
+                }
+                else
+                {
+                    selectedAccountRole = "Seller";
+                }
+            }
+            else
+            {
+                if (selectedAccountRole.Contains("Buyer"))
+                {
+                    selectedAccountRole = "Buyer";
+                }
+                if (selectedAccountRole.Contains("Seller"))
+                {
+                    selectedAccountRole = "Seller";
+                }
+            }
             transactionType = (!string.IsNullOrEmpty(transactionType) && transactionType == "PO") ? "Seller" : "Buyer";
             var activeRelationshipStatusId = await _helper.SystemTables.GetEntityObjectStatusRelationshipActive();
             var currentAccount = await _appContactRepository.GetAll().Include(z => z.EntityFk)
@@ -2419,13 +2441,15 @@ namespace onetouch.AppSiiwiiTransaction
                 .Where(r => (r.RelationshipEndDate == null || r.RelationshipEndDate < DateTime.Now) &&
                 r.EntityObjectStatusId== activeRelationshipStatusId &&
                 (
-                (r.RequesterContactSSIN == ssin
+                (r.RequesterContactSSIN == ssin &&
+                r.RequesterMarketplaceRole== selectedAccountRole
                 &&
                 (r.RecipientMarketplaceRole == transactionType  
                 )
                 )
                   ||
-                 (r.RecipientContactSSIN == ssin 
+                 (r.RecipientContactSSIN == ssin &&
+                 r.RecipientMarketplaceRole == selectedAccountRole
                  && 
                  (r.RequesterMarketplaceRole == transactionType  
                  )
