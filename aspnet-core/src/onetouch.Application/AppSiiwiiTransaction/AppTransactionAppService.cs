@@ -2267,7 +2267,7 @@ namespace onetouch.AppSiiwiiTransaction
                 .WhereIf(!string.IsNullOrEmpty(filter), a => a.Name.ToLower().Contains(filter.ToLower()))
                 .Where(a => a.TenantId == AbpSession.TenantId //& a.ParentId != null
                  & a.EntityFk.EntityObjectTypeId == presonEntityObjectTypeId
-                & (a.AccountId == accountId &&
+                & (//a.AccountId == accountId &&
                     _appContactRelationshipInfoRepository.GetAll().Count(z => z.RequesterContactSSIN == accountObject.SSIN &&
                     z.RecipientContactSSIN == a.SSIN && z.ConsiderAsTeamMember == true && z.EntityObjectStatusId == activeRealtionshipStatusId) > 0)
                 );
@@ -3873,7 +3873,7 @@ namespace onetouch.AppSiiwiiTransaction
                     .WhereIf(!string.IsNullOrEmpty(filter), a => a.Name.ToLower().Contains(filter.ToLower()))
                     .Where(a => a.TenantId == AbpSession.TenantId //& a.ParentId != null 
                      & a.EntityFk.EntityObjectTypeId == presonEntityObjectTypeId &
-                     (a.AccountId == accountId.Id &&
+                     (//a.AccountId == accountId.Id &&
                     _appContactRelationshipInfoRepository.GetAll().Count(z => z.RequesterContactSSIN == accountSSIN &&
                     z.RecipientContactSSIN == a.SSIN && z.ConsiderAsTeamMember == true && z.EntityObjectStatusId == activeRealtionshipStatusId) > 0)
                     );
