@@ -39,11 +39,11 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
     companyFilterValue: string = "";
     tempAccount: boolean = false;
     tempContact: boolean = false;
-    companyNamePlaceholder: string = "Select Company Name";
-    defaultcompanyNamePlaceholder: string = "Select Company Name";
+companyNamePlaceholder = 'SelectCompanyName';
+defaultcompanyNamePlaceholder = 'SelectCompanyName';
 
-    contactNamePlaceholder: string = "Select Contact Name";
-    defaultcontactNamePlaceholder: string = "Select Contact Name";
+contactNamePlaceholder = 'SelectContactName';
+defaultcontactNamePlaceholder = 'SelectContactName';
     contactFilterValue: string = "";
     filteredContacts: any[] = []
     filteredBranches: any[] = []
@@ -864,7 +864,7 @@ export class ContactComponent extends AppComponentBase implements OnInit, OnChan
               undefined, undefined, undefined, undefined, undefined, undefined,
               undefined, undefined, undefined, undefined, undefined, undefined,
               undefined, undefined, undefined, undefined, undefined, undefined,undefined,
-              undefined, false, null
+              undefined, false, null, this.appTransactionsForViewDto?.enteredByUserRole
             )
             .pipe(finalize(() => {
               this.companyLoading = false;

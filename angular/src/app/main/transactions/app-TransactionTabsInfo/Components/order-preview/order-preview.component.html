@@ -6,9 +6,9 @@
                 }" frameborder="0" (error)="loadingError = true"></iframe>
             <div *ngIf="loadingError">
                 <p>
-                    Unable to display PDF file.
+                   {{'UnableToDisplayPDFFile' | localize}}
                     <span *ngIf="transactionFormPath">
-                        <a [href]="transactionFormPath" target="_blank">Download</a> instead.
+                        <a [href]="transactionFormPath" target="_blank">{{'Download' | localize}}</a> {{'instead' | localize}}.
                     </span>
                 </p>
             </div>
@@ -22,7 +22,7 @@
             height: !loadingError ? '150px' : '0px' 
         }" *ngIf="transactionFormPath">
         <a class="btn btnPdf  mt-3" [href]="transactionFormPath" target="_blank">
-            Download PDF
+            {{'DownloadPDF' | localize}}
         </a>
     </div>
 </div>
@@ -33,23 +33,14 @@
 
 <p-dialog [(visible)]="visible && startload" [modal]="true" [style]="{ width: '500px' }" [draggable]="false">
     <div class="d-flex justify-content-start  mb-3">
-
-
-
-        <span class=" ml-2 regText ">Regenerating order confirmation</span>
+        <span class=" ml-2 regText "> {{'RegeneratingOrderConfirmation' | localize}}</span>
     </div>
     <div class=" con-body">
-
         <p class="mb-3 text-center">
             <p-progressBar *ngIf="showbar" mode="indeterminate" [style]="{'height': '6px'}" />
-
         </p>
         <div *ngIf="SuccessMsg" class="d-flex justify-content-center btns">
-
-
-            <button (click)="onDialogClose()" label="Ok" class="p-button-text">Ok</button>
+            <button (click)="onDialogClose()" label="Ok" class="p-button-text">{{'Ok' | localize}}</button>
         </div>
     </div>
-
-
 </p-dialog>
