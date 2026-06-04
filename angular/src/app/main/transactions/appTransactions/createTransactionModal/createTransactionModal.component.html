@@ -2,21 +2,23 @@
 <p-dialog [style]="{ width: '656px',padding:'10px !important' }" [breakpoints]="{ '960px': '75vw', '640px': '97vw' }"
     [baseZIndex]="10000" [modal]="true" [header]="modalheaderName + ' ' + orderNo" [(visible)]="display"
     [draggable]="false" [closable]="true" (onHide)="cancel()" class="transM">
-    <div class="wrapper">
+    <div class="wrapper" [ngClass]="isArabic ? 'rtl-autoC' : 'ltr-autoC'">
 
         <div class="w-50 my-2">
             <p-dropdown [options]="roles" class="w-100" placeholder="Please Select your Role" optionLabel="name"
-                (onChange)="handleRoleChange($event)" #Role [(ngModel)]="roleDdval"  [disabled]="roles?.length === 1"></p-dropdown>
+                (onChange)="handleRoleChange($event)" #Role [(ngModel)]="roleDdval"
+                [disabled]="roles?.length === 1"></p-dropdown>
             <small class="text-danger" *ngIf="isRoleExist">
-                Please Select Role
+                {{'PleaseSelectRole' | localize }}
             </small>
         </div>
 
         <div class="seller mobile">
-             <div class="sellerHeader d-flex justify-content-between align-items-center">
-            <span>Buyer Information</span>
-             <span class="ml-auto" *ngIf="showBuyerRelationshipIcon"><i class="fa fa-handshake" style="color: #4A0D4A;cursor: pointer;" [title]="buyerRelationshipName"></i></span>
-        </div>
+            <div class="sellerHeader d-flex justify-content-between align-items-center">
+                <span>{{'BuyerInformation' | localize}}</span>
+                <span class="ml-auto" *ngIf="showBuyerRelationshipIcon"><i class="fa fa-handshake"
+                         [title]="buyerRelationshipName"></i></span>
+            </div>
             <form [formGroup]="orderForm" class="form ">
                 <div class="row mt-3">
                     <div class="col-md-12">
@@ -24,24 +26,25 @@
 
                             <input type="checkbox" name="istemp" class="m-2" formControlName="istemp"
                                 (click)="selectTempBuyer()" />
-                            <label for="ny" class="p-0 mb-0">Temp Account</label>
+                            <label for="ny" class="p-0 mb-0">{{'TempAccount' | localize}}</label>
                         </div>
                     </div>
                     <!-- buyer company Name -->
                     <div class="col-md-6">
                         <div class="mb-3">
-                            <label for="" class="form-label">Buyer Company Name*</label>
+                            <label for="" class="form-label">{{'BuyerCompanyName' | localize}} *</label>
                             <div *ngIf="isBuyerTempAccount || isCompantIdExist">
                                 <input [readonly]="
                                         !isBuyerTempAccount && isCompantIdExist
                                     " type="text" name="Buyer Company Name" class="form-control"
-                                    placeholder="Buyer Company Name..." formControlName="buyerCompanyName" />
+                                    [placeholder]="('BuyerCompanyName' | localize) + ' ...'"
+                                    formControlName="buyerCompanyName" />
                             </div>
 
                             <div *ngIf="!isCompantIdExist">
                                 <p-dropdown *ngIf="!isBuyerTempAccount" [options]="buyerCompanies"
                                     formControlName="buyerCompanyName" [filter]="true" optionLabel="name"
-                                    placeholder="Please Select Buyer Company Name" (onFilter)="
+                                    [placeholder]="'PleaseSelectBuyerCompanyName' | localize" (onFilter)="
                                         handleBuyerCompanySearch($event)
                                     " (onChange)="
                                         handleBuyerCompanyChange($event)
@@ -53,7 +56,7 @@
                                         .get('buyerCompanyName')
                                         ?.hasError('required')
                                 ">
-                                Buyer company Name is required
+                                {{'BuyerCompanyNameRequired' | localize}}
                             </small>
                         </div>
                     </div>
@@ -65,31 +68,22 @@
                             <label for="" class="form-label">Buyer Contact Name</label>
                             <input type="text" name="" id="" class="form-control" placeholder="Buyer Contact Name"
                                 formControlName="buyerContactName" *ngIf="isBuyerTempAccount" />
-
-
                             <div>
-
-
-
-                                <p-autoComplete #autoComplete [dropdown]="true" *ngIf="!isBuyerTempAccount" [ngClass]="isArabic? 'rtl-autoC':'ltr-autoC'"
-                                    [suggestions]="filteredBuyerContacts" formControlName="buyerContactName"
-                                    [(ngModel)]="selectedBuyerContact" (completeMethod)="handleBuyerNameSearch($event)"
+                                <p-autoComplete #autoComplete [dropdown]="true" *ngIf="!isBuyerTempAccount"
+                                    [ngClass]="isArabic? 'rtl-autoC':'ltr-autoC'" [suggestions]="filteredBuyerContacts"
+                                    formControlName="buyerContactName" [(ngModel)]="selectedBuyerContact"
+                                    (completeMethod)="handleBuyerNameSearch($event)"
                                     (ngModelChange)="handleBuyerNameChange($event)" (click)="loadInitialContacts()"
-                                    [placeholder]=" 'Please Select Buyer Name'" field="name" [forceSelection]="false">
+                                    [placeholder]=" 'PleaseSelectBuyerName' | localize" field="name"
+                                    [forceSelection]="false">
 
                                     <ng-template pTemplate="empty">
                                         <div *ngIf="buyerContacts.length === 0" class="no-data">
-                                            No data found
+                                            {{'NoDataFound...' | localize}}
                                         </div>
                                     </ng-template>
                                 </p-autoComplete>
-
-
-
-
                             </div>
-
-
 
                             <small class="text-danger" *ngIf="
                                     submitted &&
@@ -97,7 +91,7 @@
                                         .get('buyerContactName')
                                         ?.hasError('required')
                                 ">
-                                Buyer Name is required
+                                {{'BuyerNameRequired' | localize}}
                             </small>
                         </div>
                     </div>
@@ -108,7 +102,8 @@
                         <div class="mb-3">
                             <label for="" class="form-label">{{buyerPhoneLabel}}
                             </label>
-                            <input type="text" class="form-control" placeholder="Buyer Phone Number..."
+                            <input type="text" class="form-control"
+                                [placeholder]="('BuyerPhoneNumber' | localize) + ' ...'"
                                 formControlName="buyerContactPhoneNumber" minlength="5" maxlength="20" [ngClass]="{
                                     'is-invalid': orderForm.controls['buyerContactPhoneNumber'].invalid && orderForm.controls['buyerContactPhoneNumber'].touched
                                   }" />
@@ -125,7 +120,7 @@
                                         .get('buyerContactPhoneNumber')
                                         ?.hasError('pattern')
                                 ">
-                                phone Number is Invalid
+                                {{'phoneNumberInvalid' | localize}}
                             </small>
                         </div>
                     </div>
@@ -134,9 +129,10 @@
                     <!-- buyer email -->
                     <div class="col-md-6">
                         <div class="mb-3">
-                            <label for="" class="form-label">Buyer Email
+                            <label for="" class="form-label">{{'BuyerEmail' | localize}}
                             </label>
-                            <input type="email" name="" id="" class="form-control" placeholder="Buyer Email..."
+                            <input type="email" name="" id="" class="form-control"
+                                [placeholder]="('BuyerEmail' | localize) + '...'"
                                 formControlName="buyerContactEMailAddress" minlength="5" maxlength="100" [ngClass]="{
                                     'is-invalid': orderForm.controls['buyerContactEMailAddress'].invalid && orderForm.controls['buyerContactEMailAddress'].touched
                                   }" />
@@ -153,7 +149,7 @@
                                         .get('buyerContactEMailAddress')
                                         ?.hasError('email')
                                 ">
-                                Email Address is Invalid
+                                {{'EmailAddressInvalid' | localize}}
                             </small>
                         </div>
                     </div>
@@ -162,22 +158,24 @@
 
                     <div class="col-md-6">
                         <div class="mb-3">
-                            <label for="" class="form-label">Branch*</label>
+                            <label for="" class="form-label">{{'Branch' | localize}} *</label>
                             <div>
                                 <p-dropdown class="custom-dropdown" [ngClass]="{
                                     'addDanger': submitted && orderForm.get('buyerCompanyBranch')?.hasError('required')
                                 }" *ngIf="!isBuyerTempAccount" [options]="buyerBranches"
                                     formControlName="buyerCompanyBranch" [filter]="true" optionLabel="name"
-                                    placeholder="Please Select Branch" [required]="!isBuyerTempAccount"></p-dropdown>
+                                    [placeholder]="'PleaseSelectBranch' | localize"
+                                    [required]="!isBuyerTempAccount"></p-dropdown>
 
                                 <small class="text-danger"
                                     *ngIf="submitted && orderForm.get('buyerCompanyBranch')?.hasError('required')">
-                                    Branch is required
+                                    {{'BranchIsRequired' | localize}}
                                 </small>
 
                             </div>
                             <input type="text" name="" id="" [value]="'Main'" readonly class="form-control"
-                                placeholder="Main" formControlName="buyerBranchName" *ngIf="isBuyerTempAccount" />
+                                [placeholder]="'Main' | localize" formControlName="buyerBranchName"
+                                *ngIf="isBuyerTempAccount" />
 
 
                         </div>
@@ -187,11 +185,6 @@
                     <!--price level and currency  -->
 
                     <div class="col-md-6 d-flex price-sec" *ngIf="isBuyerTempAccount">
-
-
-
-
-
                         <div class="mb-3 w-100">
                             <label for="" class="form-label"> {{l("Currency")}}</label>
                             <div>
@@ -207,7 +200,7 @@
                                                                 .get('currencyId')
                                                                 ?.hasError('required')
                                                         ">
-                                Currency is required
+                                {{'CurrencyIsRequired' | localize}}
                             </small>
                         </div>
 
@@ -226,7 +219,7 @@
                                                                                 .get('priceLevel')
                                                                                 ?.hasError('required')
                                                                         ">
-                                Price Level is required
+                                {{'PriceLevelIsRequired' | localize}}
                             </small>
                         </div>
                         <!-- price level and currency -->
@@ -238,8 +231,9 @@
         </div>
         <div class="seller mobile">
             <div class="sellerHeader d-flex justify-content-between align-items-center">
-                <span>Seller Information</span>
-                <span  class="ml-auto" *ngIf="showSellerRelationshipIcon"><i class="fa fa-handshake" style="color: #4A0D4A;cursor: pointer;" [title]="sellerRelationshipName"></i></span>
+                <span>{{'SellerInformation' | localize}}</span>
+                <span class="ml-auto" *ngIf="showSellerRelationshipIcon"><i class="fa fa-handshake"
+                         [title]="sellerRelationshipName"></i></span>
             </div>
             <form class="form mt-3" [formGroup]="orderForm">
                 <div class="row " [ngClass]="isArabic?'calendar-form-ar':'calendar-form'">
@@ -247,15 +241,16 @@
                     <!-- Seller company Name -->
                     <div class="col-md-6">
                         <div class="mb-3">
-                            <label for="" class="form-label">Seller Company Name*</label>
+                            <label for="" class="form-label">{{'SellerCompanyName' | localize}} *</label>
                             <div *ngIf="isSellerCompanyIdExist">
                                 <input type="text" name="sellerCompanyName" class="form-control"
-                                    placeholder="seller Company Name..." formControlName="sellerCompanyName" readonly />
+                                    [placeholder]="('SellerCompanyName' | localize) + '...'"
+                                    formControlName="sellerCompanyName" readonly />
                             </div>
                             <div *ngIf="!isSellerCompanyIdExist">
                                 <p-dropdown [options]="sellerCompanies" formControlName="sellerCompanyName"
-                                    [filter]="true" optionLabel="name" placeholder="Please Select Seller Company Name"
-                                    (onFilter)="
+                                    [filter]="true" optionLabel="name"
+                                    [placeholder]="'PleaseSelectSellerCompanyName' | localize" (onFilter)="
                                         handleSellerCompanySearch($event)
                                     " (onChange)="
                                         handleSellerCompanyChange($event)
@@ -268,7 +263,7 @@
                                         .get('sellerCompanyName')
                                         ?.hasError('required')
                                 ">
-                                Seller company Name is required
+                                {{'SellerCompanyNameIsRequired' | localize}}
                             </small>
                         </div>
                     </div>
@@ -277,13 +272,13 @@
                     <!-- seller Name -->
                     <div class="col-md-6">
                         <div class="mb-3">
-                            <label for="" class="form-label">Seller Contact Name</label>
+                            <label for="" class="form-label">{{'SellerContactName' | localize}}</label>
 
-                            <p-autoComplete #autoComplete [dropdown]="true" [suggestions]="filteredSellerContacts" [ngClass]="isArabic? 'rtl-autoC':'ltr-autoC'"
-                                formControlName="sellerContactName" [(ngModel)]="selectedSellerContact"
-                                (completeMethod)="handleSellerNameSearch($event)"
+                            <p-autoComplete #autoComplete [dropdown]="true" [suggestions]="filteredSellerContacts"
+                                [ngClass]="isArabic? 'rtl-autoC':'ltr-autoC'" formControlName="sellerContactName"
+                                [(ngModel)]="selectedSellerContact" (completeMethod)="handleSellerNameSearch($event)"
                                 (ngModelChange)="handleSellerNameChange($event)" (click)="loadInitialSellerContacts()"
-                                [placeholder]=" 'Please Select Seller Contact Name'" field="name"
+                                [placeholder]=" 'PleaseSelectSellerContactName' | localize" field="name"
                                 [forceSelection]="false">
 
 
@@ -295,7 +290,7 @@
                                         .get('sellerContactName')
                                         ?.hasError('required')
                                 ">
-                                Seller Name is required
+                                {{'SellerNameIsRequired' | localize}}
                             </small>
                         </div>
                     </div>
@@ -306,7 +301,8 @@
                         <div class="mb-3">
                             <label for="" class="form-label">{{sellerPhoneLabel}}
                             </label>
-                            <input type="text" name="mobileNumber" class="form-control" placeholder="Phone Number..."
+                            <input type="text" name="mobileNumber" class="form-control"
+                                [placeholder]="('PhoneNumber' | localize) + '...'"
                                 formControlName="sellerContactPhoneNumber" minlength="5" maxlength="20" [ngClass]="{
                                     'is-invalid': orderForm.controls['sellerContactPhoneNumber'].invalid && orderForm.controls['sellerContactPhoneNumber'].touched
                                   }" />
@@ -322,7 +318,7 @@
                                         .get('sellerContactPhoneNumber')
                                         ?.hasError('pattern')
                                 ">
-                                phone Number is Invalid
+                                {{'phoneNumberInvalid' | localize}}
                             </small>
                         </div>
                     </div>
@@ -331,10 +327,10 @@
                     <!-- Seller email -->
                     <div class="col-md-6">
                         <div class="mb-3">
-                            <label for="" class="form-label">Seller Email</label>
+                            <label for="" class="form-label">{{'SellerEmail' | localize}}</label>
                             <input type="email" name="sellerContactEMailAddress" class="form-control"
-                                placeholder="Seller Email..." formControlName="sellerContactEMailAddress" minlength="5"
-                                maxlength="100" [ngClass]="{
+                                [placeholder]="('SellerEmail' | localize) + '...'"
+                                formControlName="sellerContactEMailAddress" minlength="5" maxlength="100" [ngClass]="{
                                     'is-invalid': orderForm.controls['sellerContactEMailAddress'].invalid && orderForm.controls['sellerContactEMailAddress'].touched
                                   }" />
                             <small class="text-danger" *ngIf="invalidSellerContactEMailAddress  && 
@@ -349,7 +345,7 @@
                                         .get('sellerContactEMailAddress')
                                         ?.hasError('email')
                                 ">
-                                Email Address is Invalid
+                                {{'EmailAddressInvalid' | localize}}
                             </small>
                         </div>
                     </div>
@@ -357,12 +353,12 @@
                     <!-- buyer company branch -->
                     <div class="col-md-6">
                         <div class="mb-3">
-                            <label for="" class="form-label">Branch*</label>
+                            <label for="" class="form-label">{{'Branch' | localize}} *</label>
                             <div>
                                 <p-dropdown [ngClass]="{
                                         'addDanger': submitted && orderForm.get('sellerCompanyBranch')?.hasError('required')
                                     }" [options]="sellerBranches" formControlName="sellerCompanyBranch" [filter]="true"
-                                    optionLabel="name" placeholder="Please Select Branch" (onFilter)="
+                                    optionLabel="name" [placeholder]="'PleaseSelectBranch' | localize" (onFilter)="
                                             handleBuyerCompanySearch($event)
                                         " required></p-dropdown>
                             </div>
@@ -373,7 +369,7 @@
                                                         .get('sellerCompanyBranch')
                                                         ?.hasError('required')
                                                 ">
-                                Branch is required
+                                {{'BranchIsRequired' | localize}}
                             </small>
                         </div>
                     </div>
@@ -381,57 +377,52 @@
                     <div class="col-12 my-2">
                         <div *ngIf="areSame" class="alert alert-danger" role="alert">
                             <p class="mb-0">
-                                Buyer and Seller are same person please choose another option
+                                {{'BuyerAndSellerAreSamePersonMsg' | localize}}
                             </p>
                         </div>
                     </div>
 
 
-        <div class="orderInfo seller mobile w-100 mr-4">
+                    <div class="orderInfo seller mobile w-100 mr-4">
 
-            <div class="user d-flex align-items-center justify-content-between ">
-                <div class="sellerHeader">
-                    <span>Order Information</span>
-                </div>
-            </div>
-            <form [formGroup]="orderForm" class="form mt-3  calendar-form">
-                <div class="row">
-                    <div class="col-12 col-md-6 pt-4">
-                        <div class="mb-3 pt-2">
-                            <div class="enter d-flex align-items-center justify-content-start gap-2">
-                                <span class="mr-2 spEnterd">Entered By :</span>
-                                <a class="enteredBy" rel="noopener noreferrer">{{
-                                    fullName
-                                    }}</a>
+                        <div class="user d-flex align-items-center justify-content-between ">
+                            <div class="sellerHeader">
+                                <span>{{'OrderInformation' | localize}}</span>
                             </div>
                         </div>
+                        <form [formGroup]="orderForm" class="form mt-3  calendar-form">
+                            <div class="row">
+                                <div class="col-12 col-md-6 pt-4">
+                                    <div class="mb-3 pt-2">
+                                        <div class="enter d-flex align-items-center justify-content-start gap-2">
+                                            <span class="mr-2 spEnterd">{{'EnteredBy' | localize}} :</span>
+                                            <a class="enteredBy" rel="noopener noreferrer">{{
+                                                fullName
+                                                }}</a>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-12 col-md-6">
+                                    <div class="mb-3">
+                                        <label for="" class="form-label">{{'Reference' | localize}} #
+                                        </label>
+                                        <input type="text" class="form-control"
+                                            [placeholder]="'EnterTransactionReference' | localize"
+                                            formControlName="reference" />
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
                     </div>
-                    <div class="col-12 col-md-6">
-                        <div class="mb-3">
-                            <label for="" class="form-label">Reference #
-                            </label>
-                            <input type="text" class="form-control" placeholder="Enter Transaction Reference #"
-                                formControlName="reference" />
-
-
-
-                        </div>
-                    </div>
-
-
-                </div>
-            </form>
-        </div>
                     <div class="col-12 col-md-6 ">
                         <div class="mb-3 ">
-                            <label class="form-label">Entered Date*</label>
+                            <label class="form-label">{{'EnteredDate' | localize}}*</label>
                             <div class="position-relative">
 
-                                <p-calendar #calendar1 [appendTo]="'body'" formControlName="enteredDate" [dateFormat]="primeDateFormat" 
-                                    [showIcon]="true" [readonlyInput]="false" 
+                                <p-calendar #calendar1 [appendTo]="'body'" formControlName="enteredDate"
+                                    [dateFormat]="primeDateFormat" [showIcon]="true" [readonlyInput]="false"
                                     (ngModelChange)="changeEnteredDate(orderForm.get('enteredDate'))"
-                                   [showOtherMonths]="true"
-                                    [selectOtherMonths]="true"></p-calendar>
+                                    [showOtherMonths]="true" [selectOtherMonths]="true"></p-calendar>
                                 <img src="../../../../../assets/icons/calendar.png" (click)="openCalendar(calendar1)"
                                     alt="" srcset="">
                             </div>
@@ -439,10 +430,11 @@
                     </div>
                     <div class="col-12 col-md-6">
                         <div class="mb-3 ">
-                            <label class="form-label">Start Date*</label>
+                            <label class="form-label">{{'StartDate' | localize}} *</label>
                             <div class="position-relative">
-                                <p-calendar #calendar2 [appendTo]="'body'" #calendar formControlName="startDate" [dateFormat]="primeDateFormat" 
-                                    [showIcon]="true" (ngModelChange)="changeStartDate(orderForm.get('startDate'))"
+                                <p-calendar #calendar2 [appendTo]="'body'" #calendar formControlName="startDate"
+                                    [dateFormat]="primeDateFormat" [showIcon]="true"
+                                    (ngModelChange)="changeStartDate(orderForm.get('startDate'))"
                                     [readonlyInput]="false" [minDate]="minSEnteredDate" [showOtherMonths]="true"
                                     [selectOtherMonths]="true"></p-calendar>
                                 <img (click)="openCalendar(calendar2)" src="../../../../../assets/icons/calendar.png"
@@ -455,17 +447,18 @@
                                
                             submitted &&  startDateMsg
                             ">
-                                start date Can’t be befor the Entered date
+                                {{'StartDateValidationMsg' | localize}}
                             </small>
                         </div>
                     </div>
                     <div class="col-12 col-md-6">
                         <div class="mb-3 relative">
-                            <label class="form-label">Complete Date*</label>
+                            <label class="form-label">{{'CompleteDate' | localize}} *</label>
                             <div class="position-relative">
 
-                                <p-calendar #calendar3 [appendTo]="'body'" formControlName="completeDate" [dateFormat]="primeDateFormat" 
-                                    [showIcon]="true" [minDate]="minStartDate" [readonlyInput]="false"
+                                <p-calendar #calendar3 [appendTo]="'body'" formControlName="completeDate"
+                                    [dateFormat]="primeDateFormat" [showIcon]="true" [minDate]="minStartDate"
+                                    [readonlyInput]="false"
                                     (ngModelChange)="changeCompleteDate(orderForm.get('completeDate'))"
                                     [showOtherMonths]="true" [selectOtherMonths]="true"></p-calendar>
                                 <img (click)="openCalendar(calendar3)" src="../../../../../assets/icons/calendar.png"
@@ -475,17 +468,17 @@
                                
                             submitted &&  comtDateMsg
                             ">
-                                Complete date Can’t be before the Start date
+                                {{'CompleteDateValidationMsg' | localize}}
                             </small>
                         </div>
                     </div>
                     <div class="col-12 col-md-6">
                         <div class="mb-3 ">
-                            <label class="form-label">Available Date*</label>
+                            <label class="form-label">{{'AvailableDate' | localize}} *</label>
                             <div class="position-relative">
 
-                                <p-calendar #calendar4 [appendTo]="'body'" formControlName="availableDate" [dateFormat]="primeDateFormat" 
-                                    [showIcon]="true" [readonlyInput]="false"
+                                <p-calendar #calendar4 [appendTo]="'body'" formControlName="availableDate"
+                                    [dateFormat]="primeDateFormat" [showIcon]="true" [readonlyInput]="false"
                                     (ngModelChange)="changeAvailbeDate(orderForm.get('availableDate'))"
                                     [showOtherMonths]="true" [selectOtherMonths]="true"
                                     [minDate]="minCompleteDate"></p-calendar>
@@ -497,7 +490,7 @@
                            
                         submitted &&  avalabletDateMsg
                         ">
-                            Available date Can’t be before the complete date
+                            {{'AvailableDateValidationMsg' | localize}}
                         </small>
                     </div>
                 </div>
@@ -506,7 +499,7 @@
     </div>
     <div class="footer">
         <button pButton [loading]="btnLoader" (click)="getStarted()" class=" btn-c">
-            Start Shopping
+            {{'StartShopping' | localize}}
         </button>
     </div>
 </p-dialog>

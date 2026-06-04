@@ -56,8 +56,8 @@
         <hr>
         <div class="filter-add-comp col-12 mb-1 d-flex">
             <div class="w-100">
-                <input class="filter-adress-list form-control w-100" placeholder="Lookin in addresses .." #filterVal
-                    (keyup)="filterAddressList(filterVal.value)" type="text" />
+                <input class="filter-adress-list form-control w-100" [placeholder]="'LookinInAddresses' | localize"
+                    #filterVal (keyup)="filterAddressList(filterVal.value)" type="text" />
                 <i class="fa fa-search search-input-icon" aria-hidden="true"></i>
             </div>
             <div class="d-flex justify-content-end" *ngIf="showAddBtn && showEditDelBtn && fromSalesRep">
@@ -120,42 +120,44 @@
             <div class="row">
                 <div class="col-12">
                     <label class="label mt-2 mb-2">{{l("Code")}} *</label>
-                    <input type="text" placeholder="Adress Code..." class="form-control w-100" name="addressCode"
-                        [(ngModel)]="addressCode" #Code="ngModel" required maxlength="6" minlength="1" />
+                    <input type="text" [placeholder]="('Code' | localize) + '...'" class="form-control w-100"
+                        name="addressCode" [(ngModel)]="addressCode" #Code="ngModel" required maxlength="6"
+                        minlength="1" />
 
                 </div>
                 <div class="col-12">
                     <label class="label mt-2 mb-2">{{l("Name")}} *</label>
-                    <input type="text" placeholder="Adress Name..." class="form-control w-100" name="name"
+                    <input type="text" [placeholder]=" 'AddressName' | localize" class="form-control w-100" name="name"
                         [(ngModel)]="name" #Name="ngModel" required />
 
                 </div>
                 <div class="col-12">
                     <label class="label mt-2 mb-2">{{l("AddressLineOne")}} *</label>
-                    <input type="text" placeholder="Adress Line 1..." class="form-control w-100" name="address1"
+                    <input type="text" [placeholder]="'Address1' | localize" class="form-control w-100" name="address1"
                         [(ngModel)]="address1" #addressOne="ngModel" required />
                 </div>
                 <div class="col-12">
                     <label class="label mt-2 mb-2">{{l("AddressLineTow")}}</label>
-                    <input type="text" placeholder="Adress Line 2..." class="form-control w-100" name="address2"
+                    <input type="text" [placeholder]="'Address2' | localize" class="form-control w-100" name="address2"
                         [(ngModel)]="address2" #addressTwo="ngModel" />
                 </div>
                 <div class="col-12">
                     <label class="label mt-2 mb-2">{{l("City")}} *</label>
-                    <input type="text" placeholder="City..." class="form-control w-100" name="cityAddress"
-                        [(ngModel)]="city" #cityAddress="ngModel" required/>
+                    <input type="text" [placeholder]="('City' | localize) + '...'" class="form-control w-100" name="cityAddress"
+                        [(ngModel)]="city" #cityAddress="ngModel" required />
                 </div>
                 <div class="col-12">
                     <label class="label mt-2 mb-2">{{l("State")}} *</label>
-                    <input type="text" placeholder="State..." class="form-control w-100" name="State"
+                    <input type="text" placeholder="('State' | localize) + '...'" class="form-control w-100" name="State"
                         [(ngModel)]="state" #AddState="ngModel" required />
 
 
                 </div>
                 <div class="col-md-6">
                     <label class="label mt-2 mb-2">{{l("PostalCode")}} * </label>
-                    <input type="text" placeholder="Postal Code 1..." class="form-control w-100" name="postalCode"
-                        [(ngModel)]="postalCode" #postal_Code="ngModel" required pattern="^[a-zA-Z0-9- ]+$" maxlength="20" />
+                    <input type="text" placeholder="('PostalCode' | localize) + '...'" class="form-control w-100" name="postalCode"
+                        [(ngModel)]="postalCode" #postal_Code="ngModel" required pattern="^[a-zA-Z0-9- ]+$"
+                        maxlength="20" />
                 </div>
                 <div class="col-md-6" *ngIf="countries.length>0">
                     <label class="label mt-2 mb-2">{{l("Country")}} </label>

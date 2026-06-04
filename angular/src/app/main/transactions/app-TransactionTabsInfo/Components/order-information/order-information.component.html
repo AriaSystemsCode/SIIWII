@@ -18,7 +18,7 @@
             <div *ngIf="createOrEditorderInfo" class="formGroup  col-md-6 col-12 pl-md-0 "
                 style="padding-right: 13px;padding-left: 4px !important;">
                 <label class="label pl-1">{{'Reference' | localize}} #</label>
-                <input type="text" placeholder="Reference Number" class="form-control " style="    width: 95% !important;
+                <input type="text" [placeholder]="'ReferenceNumber' | localize" class="form-control " style="    width: 95% !important;
     margin-left: 3px;"    [(ngModel)]="reference" name="reference"
                    (ngModelChange)="onReferenceChange()"   />
 
@@ -101,7 +101,7 @@
                         <div class="d-flex mt-2" *ngIf="showClassBtn ">
                             <div class="formGroup  col-8">
 
-                                <input type="text" placeholder="classification" class="form-control "
+                                <input type="text" [placeholder]="'Classification' | localize" class="form-control "
                                     style="width: 95% !important;" [(ngModel)]="classification.name" name="classificationName" />
 
 
@@ -128,7 +128,7 @@
                             <div *ngIf="showExistClass" class="flex justify-content-center treeSel">
                                 <p-treeSelect class="w-full md:w-20rem" containerStyleClass="w-full"
                                     [(ngModel)]="selectedClassification" [options]="allClassFilteredRecords"
-                                    display="chip" selectionMode="checkbox" placeholder="Select Item" [filter]="true"
+                                    display="chip" selectionMode="checkbox" [placeholder]="'SelectItem' | localize" [filter]="true"
                                     filterPlaceholder="Search Items" (onNodeSelect)="onNodeSelect($event)"
                                     (onNodeUnselect)="onNodeUnselect($event)">
                                     <ng-template pTemplate="default">
@@ -297,7 +297,7 @@
                         <div class="d-flex mt-2" *ngIf="(showCatBtn ) ">
                             <div class="formGroup  col-8">
 
-                                <input type="text" placeholder="Category" class="form-control "
+                                <input type="text" [placeholder]="'Category' | localize" class="form-control "
                                     style="width: 95% !important;" [(ngModel)]="category.name" name="categoryName" />
 
 
@@ -324,7 +324,7 @@
                             <div *ngIf="showExistCat" class="flex justify-content-center treeSel">
                                 <p-treeSelect class="w-full md:w-20rem" containerStyleClass="w-full"
                                     [(ngModel)]="selectedCategories" [options]="filteredRecords" display="chip"
-                                    selectionMode="checkbox" placeholder="Select Item" [filter]="true"
+                                    selectionMode="checkbox" [placeholder]="'SelectItem' | localize" [filter]="true"
                                     filterPlaceholder="Search Items" (onNodeSelect)="onNodeSelectCat($event)"
                                     (onNodeUnselect)="onNodeUnselectCat($event)">
                                     <!-- Header Template to Create Space After the Search Filter -->
@@ -571,7 +571,7 @@
                         <label class="label">{{'ExchangeRate' | localize}}</label>
                         <input
                             [readonly]="appTransactionsForViewDto?.currencyExchangeRate && appTransactionsForViewDto?.currencyExchangeRate >0"
-                            type="text" placeholder="Exchange Rate..." class="form-control w-100"
+                            type="text" placeholder="('ExchangeRate' | localize) + '...'" class="form-control w-100"
                             [(ngModel)]="appTransactionsForViewDto.currencyExchangeRate" name="exchangeRate" />
                     </div>
                     <div *ngIf="!createOrEditorderInfo">
