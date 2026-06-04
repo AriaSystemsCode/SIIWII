@@ -94,6 +94,7 @@ using SixLabors.Fonts;
 using System.Management.Automation;
 using Newtonsoft.Json;
 using DocumentFormat.OpenXml.Spreadsheet;
+using DocumentFormat.OpenXml.Wordprocessing;
 //using Microsoft.AspNetCore.Http;
 
 namespace onetouch.Accounts
@@ -2118,6 +2119,9 @@ namespace onetouch.Accounts
                 //var originalContactFortCurrTenant = await _appContactRepository.GetAll().FirstOrDefaultAsync(x => x.TenantId == tenantId && x.IsProfileData == true && x.ParentId == null);
 
                 //if (originalContactFortCurrTenant != null)
+                var currentTenantAccount = await _appContactRepository.GetAll()
+                .Where(z => z.IsProfileData == true && z.ParentId == null && z.TenantId == tenantId).FirstOrDefaultAsync();
+                if (currentTenantAccount!= null)
                     originalPublishContactFortCurrTenant = await _appMarketplaceContactRepository.GetAll()
                         .AsNoTracking()
                         .Include(x => x.ContactAddresses).ThenInclude(x => x.AddressFk).AsNoTracking()
@@ -2127,7 +2131,11 @@ namespace onetouch.Accounts
                         .Include(x => x.EntityAttachments).ThenInclude(x => x.AttachmentFk)
                         .Include(x => x.EntityExtraData)
                         //.Include(z => z.ContactAddresses).ThenInclude(z => z.AddressFk)
-                        .FirstOrDefaultAsync(x => x.SharingLevel == 1 && x.TenantOwner == tenantId && x.IsProfileData == true && x.ParentId== null );
+                        .FirstOrDefaultAsync(x => x.SharingLevel == 1 &&
+                        x.TenantOwner == tenantId && 
+                        x.IsProfileData == true && 
+                        x.ParentId== null &&
+                        x.SSIN== currentTenantAccount.SSIN);
                
                 originalContact = await _appMarketplaceContactRepository.GetAll().AsNoTracking()
                         .Include(x => x.ContactAddresses).ThenInclude(x => x.AddressFk).AsNoTracking()
@@ -2861,19 +2869,19 @@ namespace onetouch.Accounts
                         BranchDto savedContactDto = await CreateOrEditBranch(contactDto);
 
 
-                        var addressesIds = branchesPublishedParentContact.ContactAddresses.Select(x => x.AddressId).Distinct().ToArray();
+                        var addressesIds = branchesPublishedParentContact.ContactAddresses.Select(x => x.AddressCode).Distinct().ToArray();
 
-                        var addresses = _appAddressRepository.GetAll().Where(x => addressesIds.Contains(x.Id)).ToList();
+                        var addresses = _appAddressRepository.GetAll().Where(x => addressesIds.Contains(x.Code)).ToList();
                         //Copy Addresses[Start]
                         if (branchesParentContact.ContactAddresses != null && branchesParentContact.ContactAddresses.Count > 0)
                         {
                             foreach (var contactAddress in branchesParentContact.ContactAddresses)
                             {
-                                var savedAddress = await _appAddressRepository.FirstOrDefaultAsync(x => x.Id == contactAddress.AddressId);
+                                var savedAddress = await _appAddressRepository.FirstOrDefaultAsync(x => x.Code == contactAddress.AddressCode);
                                 AppAddress address = new AppAddress();
                                 if (savedAddress != null)
                                 {
-                                    var addressCon = await _appAddressRepository.GetAll().FirstOrDefaultAsync(z => z.Code == savedAddress.Code && z.TenantId == contactDto.TenantId && z.AccountId == contactDto.Id);
+                                     var addressCon = await _appAddressRepository.GetAll().FirstOrDefaultAsync(z => z.Code == savedAddress.Code && z.TenantId == contactDto.TenantId);
                                     if (addressCon == null)
                                     {
                                         ObjectMapper.Map(savedAddress, address);

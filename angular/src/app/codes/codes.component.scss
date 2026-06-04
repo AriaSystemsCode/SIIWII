@@ -5,3 +5,19 @@
 .bg-white{
     background-color: white !important;
 }
+
+input:required {
+    border: 1px solid #c8c8c8 !important; 
+}
+
+input:required:focus {
+    border: 1px solid #c8c8c8 !important; 
+}
+
+input:required:invalid:focus {
+    border: 1px solid #c8c8c8 !important; 
+}
+
+input:required:invalid:not(:focus) {
+    border: 1px solid #C83532 !important; 
+}
