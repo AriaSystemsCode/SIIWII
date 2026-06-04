@@ -3,7 +3,7 @@
         <div class="container-fluid InfoForm thin-scroll">
             <div *ngFor="let salesRep of salesReps; let salesRepIndex = index">
                 <div class="header p-3 my-2 d-flex align-items-center justify-content-between p-2">
-                    <h6 *ngIf="salesRepIndex > 0"><span class="headertxt"> Sales Rep {{salesRepIndex}} : </span></h6>
+                    <h6 *ngIf="salesRepIndex > 0"><span class="headertxt"> {{'SalesRep' | localize}} {{salesRepIndex}} : </span></h6>
                 </div>
 
                 <hr class="my-2" *ngIf="salesRepIndex > 0" />
@@ -26,22 +26,22 @@
             <div class="d-flex justify-content-end mt-3 pr-3">
                 <button *ngIf="!showSaveBtn && salesReps?.length" [disabled]="!isContactsValid"
                     (click)="createOrEditTransaction()" class="continuebtn text-center btn">
-                    Continue
+                     {{l("Continue")}}
                 </button>
 
                 <button *ngIf="showSaveBtn" (click)="cancel" class="cancelbtn text-center btn ml-2">
-                    Cancel
+               {{l("Cancel")}}
                 </button>
                 <button *ngIf="showSaveBtn" (click)="save()" [disabled]="!isContactsValid"
                     class="previewbtn text-center btn ml-2">
-                    Save
+               {{l("Save")}}
                 </button>
             </div>
         </div>
 
         <br />
         <button class="addbtn mr-3" (click)="addNewSalesRep()" *ngIf="salesReps?.length <= 2">
-            Add <i class="fa fa-plus" style="color:#F88011"></i>
+            {{'Add' | localize}} <i class="fa fa-plus" style="color:#F88011"></i>
         </button>
         <br /><br />
     </div>

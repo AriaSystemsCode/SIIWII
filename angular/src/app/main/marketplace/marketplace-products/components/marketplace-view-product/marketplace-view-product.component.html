@@ -1,10 +1,15 @@
-<div [@routerTransition] style="margin-top: -50px" class="wrapper kt-container web -5 pt-lg-2 pl-0 pr-lg-4 pr-0 " [ngClass]="isArabic && isAuthenticated ? 'addPt':'mt-lg-2'">
+<div [@routerTransition] style="margin-top: -50px" class="wrapper kt-container web -5 pt-lg-2 pl-0 pr-lg-4 pr-0 "
+    [ngClass]="{
+  'addPt': isArabic && isAuthenticated,
+  'mt-lg-2': !isAuthenticated
+}">
     <div class=" pr-md-3 addMtM">
         <div
             class="d-flex justify-content-start pageHeader mt-lg-4 mt-5 pt-2 ml-md-5 ml-2 pl-lg-4 mb-2 align-items-center">
             <button (click)="backToResult()" class="backBtn"> <img class="mt-2 "
-                    src="../../../../../assets/placeholders/go-back.png" style=" border-radius: 6px;" /> {{'BackToResults' | localize}} </button>
-            <h6 class="ml-2">{{'MarketplaceProductDetailView' | localize}}</h6> 
+                    src="../../../../../assets/placeholders/go-back.png" style=" border-radius: 6px;" />
+                {{'BackToResults' | localize}} </button>
+            <h6 class="ml-2">{{'MarketplaceProductDetailView' | localize}}</h6>
 
         </div>
         <div class="d-md-block d-none">
@@ -32,7 +37,7 @@
                             </div>
                             <div class="orderedSummary">
                                 <div *ngIf="orderSummary.length === 0" class="default">
-                                  {{'ProductOrderSummary' | localize}} 
+                                    {{'ProductOrderSummary' | localize}}
                                 </div>
 
                                 <div *ngIf="orderSummary.length !== 0" class="summaryTables">
@@ -219,9 +224,9 @@
                             </div>
                             <div class="p-3">
 
-                                <button [disabled]="orderSummary.length == 0 || !isAuthenticated" (click)="addToShoppingCart()"
-                                    class="btn m-0 add-btn">
-                                  {{'AddToShoppingCart' | localize}}  
+                                <button [disabled]="orderSummary.length == 0 || !isAuthenticated"
+                                    (click)="addToShoppingCart()" class="btn m-0 add-btn">
+                                    {{'AddToShoppingCart' | localize}}
                                 </button>
                             </div>
                         </div>
@@ -252,29 +257,37 @@
 
                             <div class="d-flex justify-content-between align-items-center">
                                 <div class="d-flex mb-1 align-items-center">
-                                <p
-                                    style="color: #1B101B; font-size: 16px;font-weight: 500;margin-top: 4px;white-space: break-space !important;">
-                                    {{productDetails?.name}}</p>
-                                <div class="type ml-3 pt-2 text-center">
-                                    <p class="mb-0 " style="white-space: nowrap;"> {{
-                                        productDetails?.orderByPrePack === false
-                                        ? "BySize"
-                                        : "ByPrepack"
-                                         | localize}}</p>
+                                    <p
+                                        style="color: #1B101B; font-size: 16px;font-weight: 500;margin-top: 4px;white-space: break-space !important;">
+                                        {{productDetails?.name}}</p>
+                                    <div class="type ml-3 pt-2 text-center">
+                                        <p class="mb-0 " style="white-space: nowrap;"> {{
+                                            productDetails?.orderByPrePack === false
+                                            ? "BySize"
+                                            : "ByPrepack"
+                                            | localize}}</p>
 
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="d-flex align-items-center" style="white-space: nowrap;"><p class="mb-0 rateTxt">{{overRating?.overAllRating | number: '1.2-2' }} </p><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M6.31093 21.6915C6.13113 21.8057 5.90292 21.646 5.94863 21.4379L7.42044 14.7403C7.43881 14.6568 7.41118 14.5697 7.34797 14.512L2.40117 9.99757C2.24741 9.85726 2.33352 9.60112 2.54081 9.58217L9.05425 8.98701C9.14379 8.97883 9.2212 8.92119 9.2547 8.83775L11.7779 2.55353C11.8583 2.35319 12.1419 2.35319 12.2224 2.55353L14.7455 8.83775C14.779 8.92119 14.8565 8.97883 14.946 8.98701L21.4594 9.58217C21.6667 9.60112 21.7528 9.85726 21.5991 9.99757L16.6523 14.512C16.5891 14.5697 16.5614 14.6568 16.5798 14.7403L18.0516 21.4379C18.0973 21.646 17.8691 21.8057 17.6893 21.6915L12.1285 18.1605C12.0501 18.1107 11.9501 18.1107 11.8717 18.1605L6.31093 21.6915Z" fill="#FFD233"/>
-                                </svg>  <p class="mb-0 numRate">({{overRating?.totalNumberOfRating}})  {{'Reviews' | localize}}</p>
+                                <div class="d-flex align-items-center" style="white-space: nowrap;">
+                                    <p class="mb-0 rateTxt">{{overRating?.overAllRating | number: '1.2-2' }} </p><svg
+                                        width="24" height="24" viewBox="0 0 24 24" fill="none"
+                                        xmlns="http://www.w3.org/2000/svg">
+                                        <path
+                                            d="M6.31093 21.6915C6.13113 21.8057 5.90292 21.646 5.94863 21.4379L7.42044 14.7403C7.43881 14.6568 7.41118 14.5697 7.34797 14.512L2.40117 9.99757C2.24741 9.85726 2.33352 9.60112 2.54081 9.58217L9.05425 8.98701C9.14379 8.97883 9.2212 8.92119 9.2547 8.83775L11.7779 2.55353C11.8583 2.35319 12.1419 2.35319 12.2224 2.55353L14.7455 8.83775C14.779 8.92119 14.8565 8.97883 14.946 8.98701L21.4594 9.58217C21.6667 9.60112 21.7528 9.85726 21.5991 9.99757L16.6523 14.512C16.5891 14.5697 16.5614 14.6568 16.5798 14.7403L18.0516 21.4379C18.0973 21.646 17.8691 21.8057 17.6893 21.6915L12.1285 18.1605C12.0501 18.1107 11.9501 18.1107 11.8717 18.1605L6.31093 21.6915Z"
+                                            fill="#FFD233" />
+                                    </svg>
+                                    <p class="mb-0 numRate">({{overRating?.totalNumberOfRating}}) {{'Reviews' |
+                                        localize}}</p>
                                 </div>
                             </div>
                             <div class="price mb-4">
                                 <!-- show msrp price and range in this product has no special pricing -->
                                 <div class="msrp d-flex " *ngIf="productData?.showMSRP == 'Yes'">
-                             
-                                    <h5 class="mr-2" style="color: black !important;font-size: 16px;">{{languageSettingName!='en-GB' ? "MSRP"  :  "RRP"  }}: </h5>
-                                    <h5 >
+
+                                    <h5 class="mr-2" style="color: black !important;font-size: 16px;">
+                                        {{languageSettingName!='en-GB' ? "MSRP" : "RRP" }}: </h5>
+                                    <h5>
 
                                         {{
                                         currencySymbol
@@ -290,7 +303,7 @@
                                     <h5 *ngIf="
                                         productDetails?.minMSRP !==
                                         productDetails?.maxMSRP
-                                    "  >
+                                    ">
 
                                         {{
                                         currencySymbol
@@ -299,7 +312,7 @@
                                     </h5>
                                     <h5> /EAC </h5>
                                 </div>
-                                <div class="msrp d-flex justify-content-between align-items-center" >
+                                <div class="msrp d-flex justify-content-between align-items-center">
                                     <div>
                                         <div class="msrp d-flex align-items-center ">
                                             <h5 class="mr-2" *ngIf="productDetails?.maxSpecialPrice"
@@ -308,8 +321,9 @@
 
 
 
-                                            <h5 *ngIf="productDetails?.maxSpecialPrice && showEditSpecialPrice" >
-                                                {{ currencySymbol }} {{ (productDetails?.maxSpecialPrice || 0) | number:'1.2-2' }}
+                                            <h5 *ngIf="productDetails?.maxSpecialPrice && showEditSpecialPrice">
+                                                {{ currencySymbol }} {{ (productDetails?.maxSpecialPrice || 0) |
+                                                number:'1.2-2' }}
                                             </h5>
 
                                             <img *ngIf="orderType == 'SO'  && showEditSpecialPrice && showSpecialPrice "
@@ -322,7 +336,8 @@
                                     </div>
                                     <div *ngIf="showEditSpecialPrice" class="description d-flex ">
                                         <button (click)="scrollToTargetDiv()" class="btn text-primary p-lg-3 p-md-2">
-                                            <a style="text-decoration: none;font-weight: bold;">{{'ProductDescription' | localize}}</a>
+                                            <a style="text-decoration: none;font-weight: bold;">{{'ProductDescription' |
+                                                localize}}</a>
                                         </button>
                                     </div>
                                 </div>
@@ -338,8 +353,8 @@
                               height: 44px;
                               border-radius: 8px;
                               border: 2px solid #4A0D4A;" [(ngModel)]="updatedSpecialPrice">
-                                                    <div class="input-group-append  " [ngClass]="isArabic ? 'editPcAr':'editPcEn'"
-                                                      >
+                                                    <div class="input-group-append  "
+                                                        [ngClass]="isArabic ? 'editPcAr':'editPcEn'">
                                                         <button class="btn ml-0 pl-2 pt-3 pb-3"
                                                             (click)="showEditSpecialPrice= true">
                                                             <i class="clear-text fa fa-1x fa-times fa-2x"
@@ -367,17 +382,19 @@ top: 4px;">
 
                                     <div class="description d-flex">
                                         <button (click)="scrollToTargetDiv()" class="btn text-primary ">
-                                            <a style="text-decoration: none;font-weight: bold;">{{'ProductDescription' | localize}}</a>
+                                            <a style="text-decoration: none;font-weight: bold;">{{'ProductDescription' |
+                                                localize}}</a>
                                         </button>
                                     </div>
                                 </div>
-                    
-                                <h6 *ngIf="productDetails?.stockAvailability ==0 && productData?.showWarningLabelMajorOutStockFlag == 'True'" class="text-danger">{{Warningmessage}}</h6>
+
+                                <h6 *ngIf="productDetails?.stockAvailability ==0 && productData?.showWarningLabelMajorOutStockFlag == 'True'"
+                                    class="text-danger">{{Warningmessage}}</h6>
 
                             </div>
                         </div>
 
-                
+
                     </div>
 
                     <hr style="
@@ -418,18 +435,17 @@ top: 4px;">
 
                         </div>
                         <!-- color selections -->
-                         
+
                         <div *ngIf="filteredColors?.length <= handleSCreenSelect"
                             class="d-flex flex-wrap align-items-center justify-content-lg-start">
                             <div class="mr-3" *ngFor="let color of filteredColors; let i = index"
                                 [title]="color.colorName" position="top" class="imagAndHexaCode d-flex flex-column "
                                 tooltipPositionStyleClass="custom-tooltip">
                                 <h6 *ngIf="productData?.showInOutStockFlag == 'ItemColorlevel' ||  productData?.showInOutStockFlag == 'Bothlevels'"
-                                class="mb-1" style="margin-right: 10px;"
-                                [ngClass]="hasColorStock(color) ? 'text-success' : 'text-danger'"
-                              >
-                                {{ hasColorStock(color) ? 'InStock' : 'OutOfStock' | localize }}
-                    </h6>
+                                    class="mb-1" style="margin-right: 10px;"
+                                    [ngClass]="hasColorStock(color) ? 'text-success' : 'text-danger'">
+                                    {{ hasColorStock(color) ? 'InStock' : 'OutOfStock' | localize }}
+                                </h6>
 
                                 <div style=" margin-right :10px;    border-top-right-radius: 6px;    border-top-left-radius: 6px;"
                                     [ngClass]="
@@ -438,9 +454,11 @@ top: 4px;">
                                             : ''
                                     ">
 
-                                    <div   *ngIf="(!color?.colorImg && color?.colorCode ) || (color?.colorImg && color?.colorCode)" class="colorBox" [ngStyle]="{'background-color':color.colorCode}"
+                                    <div *ngIf="(!color?.colorImg && color?.colorCode ) || (color?.colorImg && color?.colorCode)"
+                                        class="colorBox" [ngStyle]="{'background-color':color.colorCode}"
                                         (click)="setSizes(i)"></div>
-                                    <img *ngIf="(color?.colorImg && !color?.colorCode) || (!color?.colorImg && !color?.colorCode)" (click)="setSizes(i)" [src]="
+                                    <img *ngIf="(color?.colorImg && !color?.colorCode) || (!color?.colorImg && !color?.colorCode)"
+                                        (click)="setSizes(i)" [src]="
                                         attachmentBaseUrl + '/' + color.colorImg
                                     " alt="images slides" class="imageSlides"
                                         onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'" />
@@ -476,20 +494,26 @@ top: 4px;">
                                             let color of filteredColors;
                                             let i = index
                                         " [title]="color.colorName" position="top"
-                                        tooltipPositionStyleClass="custom-tooltip">
-
+                                        tooltipPositionStyleClass="custom-tooltip" class="d-flex flex-column">
+                                        <h6 *ngIf="productData?.showInOutStockFlag == 'ItemColorlevel' ||  productData?.showInOutStockFlag == 'Bothlevels'"
+                                            class="mb-1" style="margin-right: 10px;"
+                                            [ngClass]="hasColorStock(color) ? 'text-success' : 'text-danger'">
+                                            {{ hasColorStock(color) ? 'InStock' : 'OutOfStock' | localize }}
+                                        </h6>
                                         <div style=" margin-right :10px;    border-top-right-radius: 6px;    border-top-left-radius: 6px;"
                                             [ngClass]="
                                         i === currentIndex
                                             ? 'border border-primary '
                                             : ''
                                     ">
-                                    <div  *ngIf="(!color?.colorImg && color?.colorCode ) || (color?.colorImg && color?.colorCode)" class="colorBox" [ngStyle]="{'background-color':color.colorCode}"
-                                        (click)="setSizes(i)"></div>
-                                    <img  *ngIf="(color?.colorImg && !color?.colorCode) || (!color?.colorImg && !color?.colorCode)" (click)="setSizes(i)" [src]="
+                                            <div *ngIf="(!color?.colorImg && color?.colorCode ) || (color?.colorImg && color?.colorCode)"
+                                                class="colorBox" [ngStyle]="{'background-color':color.colorCode}"
+                                                (click)="setSizes(i)"></div>
+                                            <img *ngIf="(color?.colorImg && !color?.colorCode) || (!color?.colorImg && !color?.colorCode)"
+                                                (click)="setSizes(i)" [src]="
                                         attachmentBaseUrl + '/' + color.colorImg
                                     " alt="images slides" class="imageSlides"
-                                        onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'" />
+                                                onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'" />
                                             <div class="card-body">
 
 
@@ -520,7 +544,8 @@ top: 4px;">
                             <thead>
                                 <tr>
                                     <th scope="col">{{'Size' | localize}}</th>
-                                    <th scope="col" *ngIf="productData?.showStockAvailability != 'No'">{{'AvailableQTY' | localize}}</th>
+                                    <th scope="col" *ngIf="productData?.showStockAvailability != 'No'">{{'AvailableQTY'
+                                        | localize}}</th>
                                     <th scope="col">{{'Ordered' | localize}}</th>
                                 </tr>
                             </thead>
@@ -531,14 +556,19 @@ top: 4px;">
                                         let i = index
                                     ">
                                     <td>{{ size.label }}</td>
-                                    <td *ngIf="((productData?.showInOutStockFlag == 'ItemColorSizeLevel' || productData?.showInOutStockFlag == 'Bothlevels') && size.stockAvailability ==0 ) && productData?.showStockAvailability != 'No'" class="text-danger">{{'OutOfStock' | localize}}</td>
+                                    <td *ngIf="((productData?.showInOutStockFlag == 'ItemColorSizeLevel' || productData?.showInOutStockFlag == 'Bothlevels') && size.stockAvailability ==0 ) && productData?.showStockAvailability != 'No'"
+                                        class="text-danger">{{'OutOfStock' | localize}}</td>
 
-                                    <td *ngIf="((productData?.showInOutStockFlag == 'ItemColorSizeLevel' || productData?.showInOutStockFlag == 'Bothlevels') && size.stockAvailability >0 ) && productData?.showStockAvailability != 'No'" class="text-success">{{'InStock' | localize}}</td>
+                                    <td *ngIf="((productData?.showInOutStockFlag == 'ItemColorSizeLevel' || productData?.showInOutStockFlag == 'Bothlevels') && size.stockAvailability >0 ) && productData?.showStockAvailability != 'No'"
+                                        class="text-success">{{'InStock' | localize}}</td>
 
-                                    <td *ngIf="((productData?.showInOutStockFlag != 'ItemColorSizeLevel' && productData?.showInOutStockFlag != 'Bothlevels' ) ) && productData?.showStockAvailability != 'No'">{{  size.stockAvailability  }}</td>
+                                    <td
+                                        *ngIf="((productData?.showInOutStockFlag != 'ItemColorSizeLevel' && productData?.showInOutStockFlag != 'Bothlevels' ) ) && productData?.showStockAvailability != 'No'">
+                                        {{ size.stockAvailability }}</td>
                                     <td>
-                                        <p-inputNumber [(ngModel)]="size.orderedQty" mode="decimal" [showButtons]="true" [disabled]="!isAuthenticated"
-                                            inputId="minmax-buttons" [min]="0" (ngModelChange)="
+                                        <p-inputNumber [(ngModel)]="size.orderedQty" mode="decimal" [showButtons]="true"
+                                            [disabled]="!isAuthenticated" inputId="minmax-buttons" [min]="0"
+                                            (ngModelChange)="
                                                 onNumberChange(
                                                     $event,
                                                     filteredColors[currentIndex],
@@ -602,7 +632,8 @@ top: 4px;">
                                     class="table text-center table-bordered table-white">
                                     <thead>
                                         <tr>
-                                            <th scope="col" scope="col" *ngIf="productData?.showStockAvailability != 'No'">
+                                            <th scope="col" scope="col"
+                                                *ngIf="productData?.showStockAvailability != 'No'">
                                                 {{'AvailablePrepacks' | localize}}
                                             </th>
                                             <th scope="col">{{'Ordered' | localize}}</th>
@@ -611,9 +642,12 @@ top: 4px;">
                                     <tbody
                                         *ngIf="filteredColors?.length > 0 && filteredColors[currentIndex]?.sizes?.length > 0">
                                         <tr>
-                                            <td *ngIf="(productData?.showInOutStockFlag == 'ItemColorSizeLevel' || productData?.showInOutStockFlag == 'Bothlevels' ) &&  filteredColors[currentIndex]?.sizes[0]?.noOfAvailablePrepacks >0 && productData?.showStockAvailability != 'No'" class="text-success">{{'InStock' | localize}}</td>
-                                            <td *ngIf="(productData?.showInOutStockFlag == 'ItemColorSizeLevel' || productData?.showInOutStockFlag == 'Bothlevels' ) &&  filteredColors[currentIndex]?.sizes[0]?.noOfAvailablePrepacks ==0 && productData?.showStockAvailability != 'No'" class="text-danger">{{'OutOfStock' | localize}}</td>
-                                            <td *ngIf="(productData?.showInOutStockFlag != 'ItemColorSizeLevel' && productData?.showInOutStockFlag != 'Bothlevels' ) && productData?.showStockAvailability != 'No' ">
+                                            <td *ngIf="(productData?.showInOutStockFlag == 'ItemColorSizeLevel' || productData?.showInOutStockFlag == 'Bothlevels' ) &&  filteredColors[currentIndex]?.sizes[0]?.noOfAvailablePrepacks >0 && productData?.showStockAvailability != 'No'"
+                                                class="text-success">{{'InStock' | localize}}</td>
+                                            <td *ngIf="(productData?.showInOutStockFlag == 'ItemColorSizeLevel' || productData?.showInOutStockFlag == 'Bothlevels' ) &&  filteredColors[currentIndex]?.sizes[0]?.noOfAvailablePrepacks ==0 && productData?.showStockAvailability != 'No'"
+                                                class="text-danger">{{'OutOfStock' | localize}}</td>
+                                            <td
+                                                *ngIf="(productData?.showInOutStockFlag != 'ItemColorSizeLevel' && productData?.showInOutStockFlag != 'Bothlevels' ) && productData?.showStockAvailability != 'No' ">
                                                 {{
                                                 filteredColors[currentIndex]?.sizes[0]?.noOfAvailablePrepacks
                                                 }}
@@ -645,7 +679,8 @@ top: 4px;">
                                     <thead>
                                         <tr>
                                             <th scope="col">{{'Size' | localize}}</th>
-                                            <th scope="col" *ngIf="productData?.showStockAvailability != 'No'">{{'AvailableQTY' | localize}}</th>
+                                            <th scope="col" *ngIf="productData?.showStockAvailability != 'No'">
+                                                {{'AvailableQTY' | localize}}</th>
                                             <th scope="col">{{'Ordered' | localize}}</th>
                                         </tr>
                                     </thead>
@@ -657,11 +692,15 @@ top: 4px;">
                                                 let i = index
                                             ">
                                             <td>{{ size.label }}</td>
-                                            <td  *ngIf="(productData?.showInOutStockFlag == 'ItemColorSizeLevel' || productData?.showInOutStockFlag == 'Bothlevels' ) &&  filteredColors[currentIndex]?.sizes[0]?.noOfAvailablePrepacks >0 && productData?.showStockAvailability != 'No'" class="text-danger">{{'OutOfStock' | localize}}</td>
+                                            <td *ngIf="(productData?.showInOutStockFlag == 'ItemColorSizeLevel' || productData?.showInOutStockFlag == 'Bothlevels' ) &&  filteredColors[currentIndex]?.sizes[0]?.noOfAvailablePrepacks >0 && productData?.showStockAvailability != 'No'"
+                                                class="text-danger">{{'OutOfStock' | localize}}</td>
 
-                                            <td *ngIf="(productData?.showInOutStockFlag == 'ItemColorSizeLevel' || productData?.showInOutStockFlag == 'Bothlevels' ) &&  filteredColors[currentIndex]?.sizes[0]?.noOfAvailablePrepacks ==0 && productData?.showStockAvailability != 'No'" class="text-success">{{'InStock' | localize}}</td>
+                                            <td *ngIf="(productData?.showInOutStockFlag == 'ItemColorSizeLevel' || productData?.showInOutStockFlag == 'Bothlevels' ) &&  filteredColors[currentIndex]?.sizes[0]?.noOfAvailablePrepacks ==0 && productData?.showStockAvailability != 'No'"
+                                                class="text-success">{{'InStock' | localize}}</td>
 
-                                            <td *ngIf="(productData?.showInOutStockFlag != 'ItemColorSizeLevel' && productData?.showInOutStockFlag != 'Bothlevels' ) && productData?.showStockAvailability != 'No'">{{  size.stockAvailability  }}</td>
+                                            <td
+                                                *ngIf="(productData?.showInOutStockFlag != 'ItemColorSizeLevel' && productData?.showInOutStockFlag != 'Bothlevels' ) && productData?.showStockAvailability != 'No'">
+                                                {{ size.stockAvailability }}</td>
                                             <td
                                                 *ngIf="filteredColors?.length > 0 && filteredColors[currentIndex]?.sizes?.length > 0">
 
@@ -726,22 +765,19 @@ top: 4px;">
                                                 <!-- <img class="mt-2" [src]="attachmentBaseUrl + '/' + order.color.colorImg"
                                                     style="width: 24px; height: 24px; border-radius: 6px;"
                                                     onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'" /> -->
-                                                    <ng-container *ngIf="(order?.color?.colorCode || order?.color?.colorHexaCode); else showThumb">
-                                                        <div
-                                                          style="width:24px;height:24px;border-radius:6px;"
-                                                          [ngStyle]="{ 'background-color': (order?.color?.colorCode || order?.color?.colorHexaCode) }">
-                                                        </div>
-                                                      </ng-container>
-                                                      
-                                                      <ng-template #showThumb>
-                                                        <img
-                                                        [src]="attachmentBaseUrl + '/' + order.color.colorImg"
-                                                          class="mt-2"
-                                                         
-                                                          style="width: 24px; height: 24px; border-radius: 6px;"
-                                                        />
-                                                      </ng-template>
-                                                      
+                                                <ng-container
+                                                    *ngIf="(order?.color?.colorCode || order?.color?.colorHexaCode); else showThumb">
+                                                    <div style="width:24px;height:24px;border-radius:6px;"
+                                                        [ngStyle]="{ 'background-color': (order?.color?.colorCode || order?.color?.colorHexaCode) }">
+                                                    </div>
+                                                </ng-container>
+
+                                                <ng-template #showThumb>
+                                                    <img [src]="attachmentBaseUrl + '/' + order.color.colorImg"
+                                                        class="mt-2"
+                                                        style="width: 24px; height: 24px; border-radius: 6px;" />
+                                                </ng-template>
+
                                                 <div>
                                                     <p class="ml-2 mb-0" style="
                                     font-style: normal;
@@ -932,9 +968,9 @@ top: 4px;">
                             </div>
                         </div>
                         <div class="p-3">
-                            <button [disabled]="orderSummary.length == 0 || !isAuthenticated" (click)="addToShoppingCart()"
-                                class="btn m-0 add-btn">
-                               {{' AddToShoppingCart' | localize}}
+                            <button [disabled]="orderSummary.length == 0 || !isAuthenticated"
+                                (click)="addToShoppingCart()" class="btn m-0 add-btn">
+                                {{' AddToShoppingCart' | localize}}
                             </button>
                         </div>
 
@@ -955,32 +991,71 @@ top: 4px;">
                 <div id="targetDiv" class="bg-white rounded p-4 my-4">
                     <h4>{{'ProductDetails' | localize}}</h4>
                     <hr />
-                    <div class="row">
+                    <div class="row mb-2">
                         <div class="col-md-4">
-                            <h6>{{'ProductType' | localize}}</h6>
-                            <h6 style="padding: 10px 0px">{{'SSIN' | localize}}</h6>
-                            <h6>{{'Department' | localize}}</h6>
-                            <h6 style="padding: 10px 0px">{{'Brand' | localize}}</h6>
-                            <h6>{{'SoldOut Date' | localize}}</h6>
-                            <h6 style="padding: 10px 0px">{{'StartShipDate' | localize}}</h6>
+                            <h6>{{ 'ProductType' | localize }}</h6>
                         </div>
                         <div class="col-md-8">
-                            <p>{{ productDetails?.entityObjectTypeName }}</p>
-                            <p>{{ productDetails?.code }}</p>
-                            <p *ngIf="productDetails
-                            ?.entityDepartmentsNames.items.length >0">
-                                <span class="mr-2 p-2 border" *ngFor="
-                                        let item of productDetails
-                                            ?.entityDepartmentsNames.items
-                                    ">{{ item }}</span>
+                            <p>{{ productDetails?.entityObjectTypeName || '-' }}</p>
+                        </div>
+                    </div>
+
+                    <div class="row mb-2">
+                        <div class="col-md-4">
+                            <h6>{{ 'SSIN' | localize }}</h6>
+                        </div>
+                        <div class="col-md-8">
+                            <p>{{ productDetails?.code || '-' }}</p>
+                        </div>
+                    </div>
+
+                    <div class="row mb-2">
+                        <div class="col-md-4">
+                            <h6>{{ 'Department' | localize }}</h6>
+                        </div>
+                        <div class="col-md-8">
+                            <div class="department-list" *ngIf="productDetails?.entityDepartmentsNames?.items?.length">
+                                <span class="department-chip"
+                                    *ngFor="let item of productDetails?.entityDepartmentsNames?.items">
+                                    {{ item }}
+                                </span>
+                            </div>
+
+                            <p *ngIf="!productDetails?.entityDepartmentsNames?.items?.length">
+                                -
                             </p>
-                            <p *ngIf="productDetails
-                            ?.entityDepartmentsNames.items.length  ==0">
-                              -
+                        </div>
+                    </div>
+
+                    <div class="row mb-2">
+                        <div class="col-md-4">
+                            <h6>{{ 'Brand' | localize }}</h6>
+                        </div>
+                        <div class="col-md-8">
+                            <p>
+                                {{ productDetails?.brand || '-' }}
+
+                                <img *ngIf="productDetails?.brandAttchment" style="width:60px;height:60px"
+                                    [src]="attachmentBaseUrl + '/' + productDetails?.brandAttchment" />
                             </p>
-                            <p>{{ productDetails?.brand ? productDetails?.brand : '-' }} <img *ngIf="productDetails?.brandAttchment" style="width: 60px;height: 60px;" [src]="attachmentBaseUrl + '/' + productDetails?.brandAttchment" alt="" srcset=""></p>
-                            <p>{{ productDetails?.soldOutDate ? productDetails?.soldOutDate : '-' }}</p>
-                            <p>{{ productDetails?.startShipDate ? productDetails?.startShipDate : '-' }}</p>
+                        </div>
+                    </div>
+
+                    <div class="row mb-2">
+                        <div class="col-md-4">
+                            <h6>{{ 'SoldOut Date' | localize }}</h6>
+                        </div>
+                        <div class="col-md-8">
+                            <p>{{ productDetails?.soldOutDate || '-' }}</p>
+                        </div>
+                    </div>
+
+                    <div class="row mb-2">
+                        <div class="col-md-4">
+                            <h6>{{ 'StartShipDate' | localize }}</h6>
+                        </div>
+                        <div class="col-md-8">
+                            <p>{{ productDetails?.startShipDate || '-' }}</p>
                         </div>
                     </div>
                 </div>
@@ -988,79 +1063,64 @@ top: 4px;">
 
 
             <div></div>
-            
+
             <div class="bg-white rounded p-4 m-2 mb-4">
                 <h4>{{'Relatedproducts' | localize}}</h4>
-              
+
                 <!-- ≤ 4 → grid -->
                 <ng-container *ngIf="(relatedTotal || 0) <= 4; else relatedCarousel">
-                  <div class="row gx-3">
-                    <div class="col-6 col-md-4 col-lg-3" *ngFor="let product of relatedItems">
-                      <div class="px-2 my-2">
-                        <app-prodcut-card
-                          [product]="product.appItem"
-                          [productCard]="product"
-                          (prodcutId)="openRelatedProduct($event)"
-                        ></app-prodcut-card>
-                      </div>
+                    <div class="row gx-3">
+                        <div class="col-6 col-md-4 col-lg-3" *ngFor="let product of relatedItems">
+                            <div class="px-2 my-2">
+                                <app-prodcut-card [product]="product.appItem" [productCard]="product"
+                                    (prodcutId)="openRelatedProduct($event)"></app-prodcut-card>
+                            </div>
+                        </div>
+                        <h6 *ngIf="relatedItems.length ==0" class="mx-auto">{{'Noitems ...' | localize}}</h6>
                     </div>
-                    <h6 *ngIf="relatedItems.length ==0" class="mx-auto">{{'Noitems ...' | localize}}</h6>
-                  </div>
                 </ng-container>
-              
+
                 <!-- > 4 → carousel, lazy-load next 4 on arrow -->
                 <ng-template #relatedCarousel>
-                    <p-carousel
-                      [value]="relatedItemsUi"
-                      [numVisible]="4"
-                      [numScroll]="4"
-                      [circular]="false"
-                      [showIndicators]="false"
-                      [showNavigators]="true"
-                      [responsiveOptions]="[
+                    <p-carousel [value]="relatedItemsUi" [numVisible]="4" [numScroll]="4" [circular]="false"
+                        [showIndicators]="false" [showNavigators]="true" [responsiveOptions]="[
                         { breakpoint: '1199px', numVisible: 3, numScroll: 3 },
                         { breakpoint: '991px',  numVisible: 2, numScroll: 2 },
                         { breakpoint: '575px',  numVisible: 1, numScroll: 1 }
-                      ]"
-                      (onPage)="onRelatedPage($event)"
-                      class="p-4 m-2 rounded"
-                    >
-                      <ng-template pTemplate="item" let-product>
-                        <!-- Ghost page (loading placeholder) -->
-                        <div *ngIf="product?.__ghost" class="px-2 my-2">
-                          <div class="card p-4 text-center">
-                            <p class="mb-2">{{'LoadingMoreRelatedProducts…' | localize}}</p>
-                            <div
-                              class="w-100"
-                              style="height: 150px; border-radius: 8px; background: #f5f5f5;"
-                            ></div>
-                          </div>
-                        </div>
-                  
-                        <!-- Real product -->
-                        <div *ngIf="!product?.__ghost" class="px-2 my-2">
-                          <app-prodcut-card
-                            [product]="product.appItem"
-                            [productCard]="product"
-                          ></app-prodcut-card>
-                        </div>
-                      </ng-template>
-                    </p-carousel>
-                  </ng-template>
-                  
-              </div>
-              
-            <div class="mb-2 p-2 m-2 bg-white rounded row">
-             <div class="col-lg-4 col-6">
-            <app-overallRating [overRating]="overRating"  ></app-overallRating>
+                      ]" (onPage)="onRelatedPage($event)" class="p-4 m-2 rounded">
+                        <ng-template pTemplate="item" let-product>
+                            <!-- Ghost page (loading placeholder) -->
+                            <div *ngIf="product?.__ghost" class="px-2 my-2">
+                                <div class="card p-4 text-center">
+                                    <p class="mb-2">{{'LoadingMoreRelatedProducts…' | localize}}</p>
+                                    <div class="w-100" style="height: 150px; border-radius: 8px; background: #f5f5f5;">
+                                    </div>
+                                </div>
+                            </div>
 
-             </div>
-             <div class="col-lg-8 col-6">
-               <app-all-reviews-list [entityID]="productBodyData?.id" (refreshRating)="handleRefreshRating($event)"></app-all-reviews-list>
-             </div>
+                            <!-- Real product -->
+                            <div *ngIf="!product?.__ghost" class="px-2 my-2">
+                                <app-prodcut-card [product]="product.appItem"
+                                    [productCard]="product"></app-prodcut-card>
+                            </div>
+                        </ng-template>
+                    </p-carousel>
+                </ng-template>
+
+            </div>
+
+            <div class="mb-2 p-2 m-2 bg-white rounded row">
+                <div class="col-lg-4 col-6">
+                    <app-overallRating [overRating]="overRating"></app-overallRating>
+
+                </div>
+                <div class="col-lg-8 col-6">
+                    <app-all-reviews-list [entityID]="productBodyData?.id"
+                        (refreshRating)="handleRefreshRating($event)"></app-all-reviews-list>
+                </div>
             </div>
             <div class=" p-4 m-2 bg-white rounded">
-                <app-questions [entityID]="productBodyData?.id" ></app-questions>
+                <app-questions [entityID]="productBodyData?.id"></app-questions>
             </div>
         </div>
 
@@ -1126,8 +1186,9 @@ top: 4px;">
 
                                     <div class="price mb-4" style="font-size: 12px !important;white-space: nowrap;">
                                         <!-- show msrp price and range in this product has no special pricing -->
-                                        <div class="msrp d-flex mb-2"  *ngIf="productData?.showMSRP == 'Yes'">
-                                            <h5 class="mr-2" style="color: black !important;font-size: 12px;">{{languageSettingName!='en-GB' ? "MSRP"  :  "RRP"  }}:
+                                        <div class="msrp d-flex mb-2" *ngIf="productData?.showMSRP == 'Yes'">
+                                            <h5 class="mr-2" style="color: black !important;font-size: 12px;">
+                                                {{languageSettingName!='en-GB' ? "MSRP" : "RRP" }}:
                                             </h5>
                                             <h5>
 
@@ -1145,7 +1206,7 @@ top: 4px;">
                                             <h5 *ngIf="
                                                     productDetails?.minMSRP !==
                                                     productDetails?.maxMSRP
-                                                " >
+                                                ">
 
                                                 {{
                                                 currencySymbol
@@ -1157,14 +1218,16 @@ top: 4px;">
                                         <div class="msrp d-flex justify-content-between">
                                             <div>
                                                 <div class="msrp d-flex align-items-center ">
-                                                    <h5 *ngIf="productDetails?.maxSpecialPrice" class="mr-2" style="color: black !important;font-size: 12px;">
-                                                       {{'SpecialPrice' | localize}}: </h5>
+                                                    <h5 *ngIf="productDetails?.maxSpecialPrice" class="mr-2"
+                                                        style="color: black !important;font-size: 12px;">
+                                                        {{'SpecialPrice' | localize}}: </h5>
 
 
 
-                                                    <h5 *ngIf="productDetails?.maxSpecialPrice && showEditSpecialPrice" >
+                                                    <h5 *ngIf="productDetails?.maxSpecialPrice && showEditSpecialPrice">
 
-                                                        {{ currencySymbol }} {{ (productDetails?.maxSpecialPrice || 0) | number:'1.2-2' }}
+                                                        {{ currencySymbol }} {{ (productDetails?.maxSpecialPrice || 0) |
+                                                        number:'1.2-2' }}
                                                     </h5>
 
                                                     <img *ngIf="orderType == 'SO'  && showEditSpecialPrice && showSpecialPrice"
@@ -1177,7 +1240,8 @@ top: 4px;">
                                             </div>
                                             <div *ngIf="showEditSpecialPrice" class="description d-flex">
                                                 <button (click)="goToSummary()" class="btn text-primary ">
-                                                    <a style="text-decoration: none;font-weight: bold;">{{'ProductDescription' | localize}}</a>
+                                                    <a style="text-decoration: none;font-weight: bold;">{{'ProductDescription'
+                                                        | localize}}</a>
                                                 </button>
                                             </div>
                                         </div>
@@ -1193,8 +1257,8 @@ top: 4px;">
                               height: 44px;
                               border-radius: 8px;
                               border: 2px solid #4A0D4A;" [(ngModel)]="updatedSpecialPrice">
-                                                            <div class="input-group-append "  [ngClass]="isArabic ? 'editPcAr':'editPcEn'"
-                                                             >
+                                                            <div class="input-group-append "
+                                                                [ngClass]="isArabic ? 'editPcAr':'editPcEn'">
                                                                 <button class="btn ml-0 pl-2 pt-3 pb-3"
                                                                     (click)="showEditSpecialPrice= true">
                                                                     <i class="clear-text fa fa-1x fa-times fa-2x"
@@ -1223,12 +1287,14 @@ top: 4px;">
 
                                             <div class="description d-flex">
                                                 <button (click)="scrollToTargetDiv()" class="btn text-primary">
-                                                    <a style="text-decoration: none;font-weight: bold;">{{'ProductDescription' | localize}}</a>
+                                                    <a style="text-decoration: none;font-weight: bold;">{{'ProductDescription'
+                                                        | localize}}</a>
                                                 </button>
                                             </div>
                                         </div>
 
-                                        <h6 *ngIf="productDetails?.stockAvailability ==0 && productData?.showWarningLabelMajorOutStockFlag == 'True'" class="text-danger">{{Warningmessage}}</h6>
+                                        <h6 *ngIf="productDetails?.stockAvailability ==0 && productData?.showWarningLabelMajorOutStockFlag == 'True'"
+                                            class="text-danger">{{Warningmessage}}</h6>
 
                                     </div>
                                 </div>
@@ -1276,27 +1342,29 @@ top: 4px;">
                                 <div *ngIf="filteredColors?.length <= 3"
                                     class="d-flex flex-wrap align-items-center justify-content-lg-start">
                                     <div class="mr-3" *ngFor="let color of filteredColors; let i = index"
-                                        [title]="color.colorName" position="top" class="imagAndHexaCode"
+                                        [title]="color.colorName" position="top"
+                                        class="imagAndHexaCode d-flex flex-column"
                                         tooltipPositionStyleClass="custom-tooltip">
 
                                         <h6 *ngIf="productData?.showInOutStockFlag == 'ItemColorlevel' ||  productData?.showInOutStockFlag == 'Bothlevels'"
-                                        class="mb-1" style="margin-right: 10px;"
-                                        [ngClass]="hasColorStock(color) ? 'text-success' : 'text-danger'"
-                                      >
-                                        {{ hasColorStock(color) ? 'In stock' : 'Out of stock' }}
-                            </h6>
+                                            class="mb-1" style="margin-right: 10px;"
+                                            [ngClass]="hasColorStock(color) ? 'text-success' : 'text-danger'">
+                                            {{ hasColorStock(color) ? 'In stock' : 'Out of stock' }}
+                                        </h6>
                                         <div style=" margin-right :10px;    border-top-right-radius: 6px;    border-top-left-radius: 6px;"
                                             [ngClass]="
                                         i === currentIndex
                                             ? 'border border-primary '
                                             : ''
                                     ">
-                                    <div *ngIf="(!color?.colorImg && color?.colorCode ) || (color?.colorImg && color?.colorCode)" class="colorBox" [ngStyle]="{'background-color':color.colorCode}"
-                                        (click)="setSizes(i)"></div>
-                                    <img  *ngIf="(color?.colorImg && !color?.colorCode) || (!color?.colorImg && !color?.colorCode)" (click)="setSizes(i)" [src]="
+                                            <div *ngIf="(!color?.colorImg && color?.colorCode ) || (color?.colorImg && color?.colorCode)"
+                                                class="colorBox" [ngStyle]="{'background-color':color.colorCode}"
+                                                (click)="setSizes(i)"></div>
+                                            <img *ngIf="(color?.colorImg && !color?.colorCode) || (!color?.colorImg && !color?.colorCode)"
+                                                (click)="setSizes(i)" [src]="
                                         attachmentBaseUrl + '/' + color.colorImg
                                     " alt="images slides" class="imageSlides"
-                                        onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'" />
+                                                onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'" />
                                             <div class="card-body">
 
 
@@ -1337,12 +1405,15 @@ top: 4px;">
                                                         ? 'border border-primary '
                                                         : ''
                                                 ">
-                                                <div    *ngIf="(!color?.colorImg && color?.colorCode ) || (color?.colorImg && color?.colorCode)" class="colorBox" [ngStyle]="{'background-color':color.colorCode}"
-                                                    (click)="setSizes(i)"></div>
-                                                <img *ngIf="(color?.colorImg && !color?.colorCode) || (!color?.colorImg && !color?.colorCode)" (click)="setSizes(i)" [src]="
+                                                    <div *ngIf="(!color?.colorImg && color?.colorCode ) || (color?.colorImg && color?.colorCode)"
+                                                        class="colorBox"
+                                                        [ngStyle]="{'background-color':color.colorCode}"
+                                                        (click)="setSizes(i)"></div>
+                                                    <img *ngIf="(color?.colorImg && !color?.colorCode) || (!color?.colorImg && !color?.colorCode)"
+                                                        (click)="setSizes(i)" [src]="
                                                     attachmentBaseUrl + '/' + color.colorImg
                                                 " alt="images slides" class="imageSlides"
-                                                    onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'" />
+                                                        onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'" />
                                                     <div class="card-body">
 
 
@@ -1374,7 +1445,8 @@ top: 4px;">
                                     <thead>
                                         <tr>
                                             <th scope="col">{{'Size' | localize}}</th>
-                                            <th scope="col" *ngIf="productData?.showStockAvailability != 'No'">{{'AvailableQTY' | localize}}</th>
+                                            <th scope="col" *ngIf="productData?.showStockAvailability != 'No'">
+                                                {{'AvailableQTY' | localize}}</th>
                                             <th scope="col">{{'Ordered' | localize}}</th>
                                         </tr>
                                     </thead>
@@ -1385,15 +1457,19 @@ top: 4px;">
                                                     let i = index
                                                 ">
                                             <td>{{ size.label }}</td>
-                                            <td *ngIf="((productData?.showInOutStockFlag == 'ItemColorSizeLevel' || productData?.showInOutStockFlag == 'Bothlevels') && size.stockAvailability ==0 ) && productData?.showStockAvailability != 'No'" class="text-danger">{{'OutOfStock' | localize}}</td>
+                                            <td *ngIf="((productData?.showInOutStockFlag == 'ItemColorSizeLevel' || productData?.showInOutStockFlag == 'Bothlevels') && size.stockAvailability ==0 ) && productData?.showStockAvailability != 'No'"
+                                                class="text-danger">{{'OutOfStock' | localize}}</td>
 
-                                            <td *ngIf="((productData?.showInOutStockFlag == 'ItemColorSizeLevel' || productData?.showInOutStockFlag == 'Bothlevels') && size.stockAvailability >0 ) && productData?.showStockAvailability != 'No'" class="text-success">{{'InStock' | localize}}</td>
+                                            <td *ngIf="((productData?.showInOutStockFlag == 'ItemColorSizeLevel' || productData?.showInOutStockFlag == 'Bothlevels') && size.stockAvailability >0 ) && productData?.showStockAvailability != 'No'"
+                                                class="text-success">{{'InStock' | localize}}</td>
 
-                                            <td *ngIf="((productData?.showInOutStockFlag != 'ItemColorSizeLevel' && productData?.showInOutStockFlag != 'Bothlevels' ) ||  productData?.showInOutStockFlag == 'ItemColorlevel') && productData?.showStockAvailability != 'No'">{{  size.stockAvailability  }}</td>
+                                            <td
+                                                *ngIf="((productData?.showInOutStockFlag != 'ItemColorSizeLevel' && productData?.showInOutStockFlag != 'Bothlevels' ) ||  productData?.showInOutStockFlag == 'ItemColorlevel') && productData?.showStockAvailability != 'No'">
+                                                {{ size.stockAvailability }}</td>
                                             <td>
-                                                <p-inputNumber [(ngModel)]="size.orderedQty" mode="decimal" [disabled]="!isAuthenticated"
-                                                    [showButtons]="true" inputId="minmax-buttons" [min]="0"
-                                                    (ngModelChange)="
+                                                <p-inputNumber [(ngModel)]="size.orderedQty" mode="decimal"
+                                                    [disabled]="!isAuthenticated" [showButtons]="true"
+                                                    inputId="minmax-buttons" [min]="0" (ngModelChange)="
                                                             onNumberChange(
                                                                 $event,
                                                                 filteredColors[currentIndex],
@@ -1440,7 +1516,8 @@ top: 4px;">
 
 
                                 <span *ngIf="orderType == 'SO' && productDetails?.orderByPrePack"
-                                    class="p-4 font-weight-bold" style="color:black !important">{{'OrderByPrepack' | localize}}</span>
+                                    class="p-4 font-weight-bold" style="color:black !important">{{'OrderByPrepack' |
+                                    localize}}</span>
                                 <label *ngIf="orderType == 'SO' && productDetails?.orderByPrePack"
                                     class="switch switch-container my-4 font-weight-bold">
                                     <input type="checkbox" [(ngModel)]="chk_Order_by_prepack[currentIndex]" checked
@@ -1456,7 +1533,8 @@ top: 4px;">
                                             class="table text-center table-bordered table-white">
                                             <thead>
                                                 <tr>
-                                                    <th scope="col" *ngIf="productData?.showStockAvailability != 'No'" scope="col">
+                                                    <th scope="col" *ngIf="productData?.showStockAvailability != 'No'"
+                                                        scope="col">
                                                         {{'AvailablePrepacks' | localize}}
                                                     </th>
                                                     <th scope="col">{{'Ordered' | localize}}</th>
@@ -1464,9 +1542,12 @@ top: 4px;">
                                             </thead>
                                             <tbody>
                                                 <tr>
-                                                    <td *ngIf="(productData?.showInOutStockFlag == 'ItemColorSizeLevel' || productData?.showInOutStockFlag == 'Bothlevels' ) &&  filteredColors[currentIndex]?.sizes[0]?.noOfAvailablePrepacks >0 && productData?.showStockAvailability != 'No'" class="text-success">{{'InStock' | localize}}</td>
-                                                    <td *ngIf="(productData?.showInOutStockFlag == 'ItemColorSizeLevel' || productData?.showInOutStockFlag == 'Bothlevels' ) &&  filteredColors[currentIndex]?.sizes[0]?.noOfAvailablePrepacks ==0 && productData?.showStockAvailability != 'No'" class="text-danger">{{'OutOfStock' | localize}}</td>
-                                                    <td *ngIf="(productData?.showInOutStockFlag != 'ItemColorSizeLevel' && productData?.showInOutStockFlag != 'Bothlevels' ) && productData?.showStockAvailability != 'No'">
+                                                    <td *ngIf="(productData?.showInOutStockFlag == 'ItemColorSizeLevel' || productData?.showInOutStockFlag == 'Bothlevels' ) &&  filteredColors[currentIndex]?.sizes[0]?.noOfAvailablePrepacks >0 && productData?.showStockAvailability != 'No'"
+                                                        class="text-success">{{'InStock' | localize}}</td>
+                                                    <td *ngIf="(productData?.showInOutStockFlag == 'ItemColorSizeLevel' || productData?.showInOutStockFlag == 'Bothlevels' ) &&  filteredColors[currentIndex]?.sizes[0]?.noOfAvailablePrepacks ==0 && productData?.showStockAvailability != 'No'"
+                                                        class="text-danger">{{'OutOfStock' | localize}}</td>
+                                                    <td
+                                                        *ngIf="(productData?.showInOutStockFlag != 'ItemColorSizeLevel' && productData?.showInOutStockFlag != 'Bothlevels' ) && productData?.showStockAvailability != 'No'">
                                                         {{
                                                         filteredColors[currentIndex]?.sizes[0]?.noOfAvailablePrepacks
                                                         }}
@@ -1500,7 +1581,8 @@ top: 4px;">
                                             <thead>
                                                 <tr>
                                                     <th scope="col">{{'Size' | localize}}</th>
-                                                    <th scope="col" *ngIf="productData?.showStockAvailability != 'No'">{{'AvailableQTY' | localize}}</th>
+                                                    <th scope="col" *ngIf="productData?.showStockAvailability != 'No'">
+                                                        {{'AvailableQTY' | localize}}</th>
                                                     <th scope="col">{{'Ordered' | localize}}</th>
                                                 </tr>
                                             </thead>
@@ -1512,10 +1594,14 @@ top: 4px;">
                                                             let i = index
                                                         ">
                                                     <td>{{ size.label }}</td>
-                                                    <td *ngIf="((productData?.showInOutStockFlag == 'ItemColorSizeLevel' || productData?.showInOutStockFlag == 'Bothlevels') && size.stockAvailability ==0 ) && productData?.showStockAvailability != 'No'" class="text-danger">{{'OutOfStock' | localize}}</td>
+                                                    <td *ngIf="((productData?.showInOutStockFlag == 'ItemColorSizeLevel' || productData?.showInOutStockFlag == 'Bothlevels') && size.stockAvailability ==0 ) && productData?.showStockAvailability != 'No'"
+                                                        class="text-danger">{{'OutOfStock' | localize}}</td>
 
-                                                    <td *ngIf="((productData?.showInOutStockFlag == 'ItemColorSizeLevel' || productData?.showInOutStockFlag == 'Bothlevels') && size.stockAvailability >0 ) && productData?.showStockAvailability != 'No'" class="text-success">{{'InStock' | localize}}</td>
-                                                    <td *ngIf="((productData?.showInOutStockFlag != 'ItemColorSizeLevel' && productData?.showInOutStockFlag != 'Bothlevels' &&  productData?.showInOutStockFlag != 'ItemColorlevel') ||  productData?.showInOutStockFlag == 'ItemColorlevel') && productData?.showStockAvailability != 'No'">{{  size.stockAvailability  }}</td>
+                                                    <td *ngIf="((productData?.showInOutStockFlag == 'ItemColorSizeLevel' || productData?.showInOutStockFlag == 'Bothlevels') && size.stockAvailability >0 ) && productData?.showStockAvailability != 'No'"
+                                                        class="text-success">{{'InStock' | localize}}</td>
+                                                    <td
+                                                        *ngIf="((productData?.showInOutStockFlag != 'ItemColorSizeLevel' && productData?.showInOutStockFlag != 'Bothlevels' &&  productData?.showInOutStockFlag != 'ItemColorlevel') ||  productData?.showInOutStockFlag == 'ItemColorlevel') && productData?.showStockAvailability != 'No'">
+                                                        {{ size.stockAvailability }}</td>
                                                     <td
                                                         *ngIf="filteredColors?.length > 0 && filteredColors[currentIndex]?.sizes?.length > 0">
 
@@ -1582,7 +1668,7 @@ top: 4px;">
                                 </div>
                                 <div class="orderedSummary">
                                     <div *ngIf="orderSummary.length === 0" class="default">
-                                       {{'ProductOrderSummary' | localize}}
+                                        {{'ProductOrderSummary' | localize}}
                                     </div>
 
                                     <div *ngIf="orderSummary.length !== 0" class="summaryTables">
@@ -1592,23 +1678,20 @@ top: 4px;">
                                         ">
                                             <div class="orderHeader  d-flex align-items-center justify-content-between">
                                                 <div class="d-flex" style="height: 36px;">
-                                                 
-                                                        <ng-container *ngIf="(order?.color?.colorCode || order?.color?.colorHexaCode); else showThumb">
-                                                            <div
-                                                              style="width:24px;height:24px;border-radius:6px;"
-                                                              [ngStyle]="{ 'background-color': (order?.color?.colorCode || order?.color?.colorHexaCode) }">
-                                                            </div>
-                                                          </ng-container>
-                                                          
-                                                          <ng-template #showThumb>
-                                                            <img
-                                                            [src]="attachmentBaseUrl + '/' + order.color.colorImg"
-                                                              class="mt-2"
-                                                             
-                                                              style="width: 24px; height: 24px; border-radius: 6px;"
-                                                            />
-                                                          </ng-template>
-                                                          
+
+                                                    <ng-container
+                                                        *ngIf="(order?.color?.colorCode || order?.color?.colorHexaCode); else showThumb">
+                                                        <div style="width:24px;height:24px;border-radius:6px;"
+                                                            [ngStyle]="{ 'background-color': (order?.color?.colorCode || order?.color?.colorHexaCode) }">
+                                                        </div>
+                                                    </ng-container>
+
+                                                    <ng-template #showThumb>
+                                                        <img [src]="attachmentBaseUrl + '/' + order.color.colorImg"
+                                                            class="mt-2"
+                                                            style="width: 24px; height: 24px; border-radius: 6px;" />
+                                                    </ng-template>
+
                                                     <div>
                                                         <p class="ml-2 mb-0" style="
                                             font-style: normal;
@@ -1786,8 +1869,8 @@ top: 4px;">
                                 </div>
                                 <div class="p-3">
 
-                                    <button [disabled]="orderSummary.length == 0 || !isAuthenticated" (click)="addToShoppingCart()"
-                                        class="btn m-0 add-btn">
+                                    <button [disabled]="orderSummary.length == 0 || !isAuthenticated"
+                                        (click)="addToShoppingCart()" class="btn m-0 add-btn">
                                         {{'AddToShoppingCart' | localize}}
                                     </button>
                                 </div>
@@ -1804,45 +1887,134 @@ top: 4px;">
                             <div id="targetDiv2" class="bg-white rounded p-4 my-4">
                                 <h4>{{'ProductDetails' | localize}}</h4>
                                 <hr />
-                                <div class="row">
-                                    <div class="col-6">
-                                        <h6>{{'ProductType' | localize}}</h6>
-                                        <h6 style="padding: 10px 0px">{{'SSIN' | localize}}</h6>
-                                        <h6>{{'Department' | localize}}</h6>
-                                        <h6 style="padding: 10px 0px">{{'Brand' | localize}}</h6>
-                                        <h6>{{'SoldOutDate' | localize}}</h6>
-                                        <h6 style="padding: 10px 0px">{{'StartShipDate' | localize}}</h6>
+                                <div class="row mb-2">
+                                    <div class="col-md-4">
+                                        <h6>{{ 'ProductType' | localize }}</h6>
                                     </div>
-                                    <div class="col-6" style="font-size: 12px;">
-                                        <p>{{ productDetails?.entityObjectTypeName }}</p>
-                                        <p>{{ productDetails?.code }}</p>
-                                        <p *ngFor="
-                                        let item of productDetails
-                                            ?.entityDepartmentsNames.items
-                                    " class="d-flex">
-                                            <span class="mr-2 p-2 border" >{{ item }}</span>
+                                    <div class="col-md-8">
+                                        <p>{{ productDetails?.entityObjectTypeName || '-' }}</p>
+                                    </div>
+                                </div>
+
+                                <div class="row mb-2">
+                                    <div class="col-md-4">
+                                        <h6>{{ 'SSIN' | localize }}</h6>
+                                    </div>
+                                    <div class="col-md-8">
+                                        <p>{{ productDetails?.code || '-' }}</p>
+                                    </div>
+                                </div>
+
+                                <div class="row mb-2">
+                                    <div class="col-md-4">
+                                        <h6>{{ 'Department' | localize }}</h6>
+                                    </div>
+                                    <div class="col-md-8">
+                                        <div class="department-list"
+                                            *ngIf="productDetails?.entityDepartmentsNames?.items?.length">
+                                            <span class="department-chip"
+                                                *ngFor="let item of productDetails?.entityDepartmentsNames?.items">
+                                                {{ item }}
+                                            </span>
+                                        </div>
+
+                                        <p *ngIf="!productDetails?.entityDepartmentsNames?.items?.length">
+                                            -
                                         </p>
-                                        <p>{{ productDetails?.brand }} <img *ngIf="productDetails?.brandAttchment" style="width: 60px;height: 60px;" [src]="attachmentBaseUrl + '/' + productDetails?.brandAttchment" alt="" srcset=""></p>
-                                        <p>{{ productDetails?.soldOutDate }}</p>
-                                        <p>{{ productDetails?.startShipDate }}</p>
+                                    </div>
+                                </div>
+
+                                <div class="row mb-2">
+                                    <div class="col-md-4">
+                                        <h6>{{ 'Brand' | localize }}</h6>
+                                    </div>
+                                    <div class="col-md-8">
+                                        <p>
+                                            {{ productDetails?.brand || '-' }}
+
+                                            <img *ngIf="productDetails?.brandAttchment" style="width:60px;height:60px"
+                                                [src]="attachmentBaseUrl + '/' + productDetails?.brandAttchment" />
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <div class="row mb-2">
+                                    <div class="col-md-4">
+                                        <h6>{{ 'SoldOut Date' | localize }}</h6>
+                                    </div>
+                                    <div class="col-md-8">
+                                        <p>{{ productDetails?.soldOutDate || '-' }}</p>
+                                    </div>
+                                </div>
+
+                                <div class="row mb-2">
+                                    <div class="col-md-4">
+                                        <h6>{{ 'StartShipDate' | localize }}</h6>
+                                    </div>
+                                    <div class="col-md-8">
+                                        <p>{{ productDetails?.startShipDate || '-' }}</p>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
+                    <div class="bg-white rounded p-4 m-2 mb-4">
+                        <h4>{{'Relatedproducts' | localize}}</h4>
 
+                        <!-- ≤ 4 → grid -->
+                        <ng-container *ngIf="(relatedTotal || 0) <= 4; else relatedCarousel">
+                            <div class="row gx-3">
+                                <div class="col-6 col-md-4 col-lg-3" *ngFor="let product of relatedItems">
+                                    <div class="px-2 my-2">
+                                        <app-prodcut-card [product]="product.appItem" [productCard]="product"
+                                            (prodcutId)="openRelatedProduct($event)"></app-prodcut-card>
+                                    </div>
+                                </div>
+                                <h6 *ngIf="relatedItems.length ==0" class="mx-auto">{{'Noitems ...' | localize}}</h6>
+                            </div>
+                        </ng-container>
+
+                        <!-- > 4 → carousel, lazy-load next 4 on arrow -->
+                        <ng-template #relatedCarousel>
+                            <p-carousel [value]="relatedItemsUi" [numVisible]="4" [numScroll]="4" [circular]="false"
+                                [showIndicators]="false" [showNavigators]="true" [responsiveOptions]="[
+                        { breakpoint: '1199px', numVisible: 3, numScroll: 3 },
+                        { breakpoint: '991px',  numVisible: 2, numScroll: 2 },
+                        { breakpoint: '575px',  numVisible: 1, numScroll: 1 }
+                      ]" (onPage)="onRelatedPage($event)" class="p-4 m-2 rounded">
+                                <ng-template pTemplate="item" let-product>
+                                    <!-- Ghost page (loading placeholder) -->
+                                    <div *ngIf="product?.__ghost" class="px-2 my-2">
+                                        <div class="card p-4 text-center">
+                                            <p class="mb-2">{{'LoadingMoreRelatedProducts…' | localize}}</p>
+                                            <div class="w-100"
+                                                style="height: 150px; border-radius: 8px; background: #f5f5f5;"></div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Real product -->
+                                    <div *ngIf="!product?.__ghost" class="px-2 my-2">
+                                        <app-prodcut-card [product]="product.appItem"
+                                            [productCard]="product"></app-prodcut-card>
+                                    </div>
+                                </ng-template>
+                            </p-carousel>
+                        </ng-template>
+
+                    </div>
                     <div class="mb-2 p-2 m-2 bg-white rounded row">
                         <div class="col-12">
-                       <app-overallRating [overRating]="overRating"  ></app-overallRating>
-           
+                            <app-overallRating [overRating]="overRating"></app-overallRating>
+
                         </div>
                         <div class="col-12">
-                          <app-all-reviews-list [entityID]="productBodyData?.id" (refreshRating)="handleRefreshRating($event)"></app-all-reviews-list>
+                            <app-all-reviews-list [entityID]="productBodyData?.id"
+                                (refreshRating)="handleRefreshRating($event)"></app-all-reviews-list>
                         </div>
-                       </div>
-                       <div class=" p-4 m-2 bg-white rounded">
-                           <app-questions *ngIf="isAuthenticated" [entityID]="productBodyData?.id" ></app-questions>
-                       </div>
+                    </div>
+                    <div class=" p-4 m-2 bg-white rounded">
+                        <app-questions *ngIf="isAuthenticated" [entityID]="productBodyData?.id"></app-questions>
+                    </div>
 
 
                 </p-tabPanel>
@@ -1853,86 +2025,92 @@ top: 4px;">
 
             </p-tabView>
 
-     
-   
+
+
 
         </div>
     </div>
 
-<p-confirmDialog #cd [style]="{ width: '25vw' }">
-    <ng-template pTemplate="header">
-        <h3>{{'AddToShoppingCart' | localize}}</h3>
-    </ng-template>
-    <ng-template pTemplate="footer">
-        <button type="button" pButton icon="pi pi-times" label="No" (click)="cd.reject()"></button>
-        <button type="button" pButton icon="pi pi-check" label="Yes" (click)="cd.accept()"></button>
-    </ng-template>
-</p-confirmDialog>
-<p-dialog [(visible)]="visible" [modal]="true" [style]="{ 'width': '450px', 'border-radius': '20px' }"
-    [draggable]="false">
+    <p-confirmDialog #cd [style]="{ width: '25vw' }">
+        <ng-template pTemplate="header">
+            <h3>{{'AddToShoppingCart' | localize}}</h3>
+        </ng-template>
+        <ng-template pTemplate="footer">
+            <button type="button" pButton icon="pi pi-times" label="No" (click)="cd.reject()"></button>
+            <button type="button" pButton icon="pi pi-check" label="Yes" (click)="cd.accept()"></button>
+        </ng-template>
+    </p-confirmDialog>
+    <p-dialog [(visible)]="visible" [modal]="true" [style]="{ 'width': '450px', 'border-radius': '20px' }"
+        [draggable]="false">
 
-    <div class="p-2 con-body">
-        <p>
-            <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path
-                    d="M1.168 4.446C1.31469 4.22511 1.54311 4.07152 1.80302 4.01901C2.06294 3.9665 2.33306 4.01938 2.554 4.166L5.554 6.168C5.76621 6.31847 5.91143 6.54571 5.95884 6.80149C6.00625 7.05727 5.95213 7.32146 5.80795 7.53799C5.66377 7.75451 5.44089 7.90634 5.18661 7.96123C4.93233 8.01612 4.66666 7.96977 4.446 7.832L1.446 5.832C1.22543 5.685 1.07225 5.45643 1.02012 5.19654C0.967996 4.93665 1.02118 4.6667 1.168 4.446ZM16 4C13.6131 4 11.3239 4.94821 9.63604 6.63604C7.94821 8.32387 7 10.6131 7 13V17.802L5.072 22.628C5.01119 22.7797 4.98851 22.944 5.00593 23.1066C5.02335 23.2691 5.08034 23.4249 5.17192 23.5603C5.26349 23.6957 5.38686 23.8065 5.53123 23.8832C5.67559 23.9599 5.83654 24 6 24H26C26.1632 23.9998 26.3239 23.9597 26.468 23.8832C26.6122 23.8066 26.7354 23.6959 26.8269 23.5608C26.9184 23.4257 26.9755 23.2702 26.9931 23.108C27.0107 22.9457 26.9884 22.7816 26.928 22.63L25 17.8V13C25 10.6131 24.0518 8.32387 22.364 6.63604C20.6761 4.94821 18.3869 4 16 4ZM16 29C15.113 29.0002 14.2512 28.7056 13.5499 28.1626C12.8486 27.6195 12.3477 26.8588 12.126 26H19.874C19.6523 26.8588 19.1514 27.6195 18.4501 28.1626C17.7488 28.7056 16.887 29.0002 16 29ZM29.446 4.168C29.6667 4.03023 29.9323 3.98388 30.1866 4.03877C30.4409 4.09367 30.6638 4.24549 30.8079 4.46202C30.9521 4.67854 31.0063 4.94273 30.9588 5.19852C30.9114 5.4543 30.7662 5.68153 30.554 5.832L27.554 7.832C27.3333 7.96977 27.0677 8.01612 26.8134 7.96123C26.5591 7.90634 26.3362 7.75451 26.1921 7.53799C26.0479 7.32146 25.9937 7.05727 26.0412 6.80149C26.0886 6.54571 26.2338 6.31847 26.446 6.168L29.446 4.168ZM0 13C0 12.7348 0.105357 12.4804 0.292893 12.2929C0.48043 12.1054 0.734784 12 1 12H4C4.26522 12 4.51957 12.1054 4.70711 12.2929C4.89464 12.4804 5 12.7348 5 13C5 13.2652 4.89464 13.5196 4.70711 13.7071C4.51957 13.8946 4.26522 14 4 14H1C0.734784 14 0.48043 13.8946 0.292893 13.7071C0.105357 13.5196 0 13.2652 0 13ZM31 12C31.2652 12 31.5196 12.1054 31.7071 12.2929C31.8946 12.4804 32 12.7348 32 13C32 13.2652 31.8946 13.5196 31.7071 13.7071C31.5196 13.8946 31.2652 14 31 14H28C27.7348 14 27.4804 13.8946 27.2929 13.7071C27.1054 13.5196 27 13.2652 27 13C27 12.7348 27.1054 12.4804 27.2929 12.2929C27.4804 12.1054 27.7348 12 28 12H31Z"
-                    fill="#F6851D" />
-            </svg> <span style="font-size: 24px;color: #1B101B; font-weight: 700;">{{'the price assigned to the ordered
-                Items will be updated' | localize}} </span>
-        </p>
+        <div class="p-2 con-body">
+            <p>
+                <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path
+                        d="M1.168 4.446C1.31469 4.22511 1.54311 4.07152 1.80302 4.01901C2.06294 3.9665 2.33306 4.01938 2.554 4.166L5.554 6.168C5.76621 6.31847 5.91143 6.54571 5.95884 6.80149C6.00625 7.05727 5.95213 7.32146 5.80795 7.53799C5.66377 7.75451 5.44089 7.90634 5.18661 7.96123C4.93233 8.01612 4.66666 7.96977 4.446 7.832L1.446 5.832C1.22543 5.685 1.07225 5.45643 1.02012 5.19654C0.967996 4.93665 1.02118 4.6667 1.168 4.446ZM16 4C13.6131 4 11.3239 4.94821 9.63604 6.63604C7.94821 8.32387 7 10.6131 7 13V17.802L5.072 22.628C5.01119 22.7797 4.98851 22.944 5.00593 23.1066C5.02335 23.2691 5.08034 23.4249 5.17192 23.5603C5.26349 23.6957 5.38686 23.8065 5.53123 23.8832C5.67559 23.9599 5.83654 24 6 24H26C26.1632 23.9998 26.3239 23.9597 26.468 23.8832C26.6122 23.8066 26.7354 23.6959 26.8269 23.5608C26.9184 23.4257 26.9755 23.2702 26.9931 23.108C27.0107 22.9457 26.9884 22.7816 26.928 22.63L25 17.8V13C25 10.6131 24.0518 8.32387 22.364 6.63604C20.6761 4.94821 18.3869 4 16 4ZM16 29C15.113 29.0002 14.2512 28.7056 13.5499 28.1626C12.8486 27.6195 12.3477 26.8588 12.126 26H19.874C19.6523 26.8588 19.1514 27.6195 18.4501 28.1626C17.7488 28.7056 16.887 29.0002 16 29ZM29.446 4.168C29.6667 4.03023 29.9323 3.98388 30.1866 4.03877C30.4409 4.09367 30.6638 4.24549 30.8079 4.46202C30.9521 4.67854 31.0063 4.94273 30.9588 5.19852C30.9114 5.4543 30.7662 5.68153 30.554 5.832L27.554 7.832C27.3333 7.96977 27.0677 8.01612 26.8134 7.96123C26.5591 7.90634 26.3362 7.75451 26.1921 7.53799C26.0479 7.32146 25.9937 7.05727 26.0412 6.80149C26.0886 6.54571 26.2338 6.31847 26.446 6.168L29.446 4.168ZM0 13C0 12.7348 0.105357 12.4804 0.292893 12.2929C0.48043 12.1054 0.734784 12 1 12H4C4.26522 12 4.51957 12.1054 4.70711 12.2929C4.89464 12.4804 5 12.7348 5 13C5 13.2652 4.89464 13.5196 4.70711 13.7071C4.51957 13.8946 4.26522 14 4 14H1C0.734784 14 0.48043 13.8946 0.292893 13.7071C0.105357 13.5196 0 13.2652 0 13ZM31 12C31.2652 12 31.5196 12.1054 31.7071 12.2929C31.8946 12.4804 32 12.7348 32 13C32 13.2652 31.8946 13.5196 31.7071 13.7071C31.5196 13.8946 31.2652 14 31 14H28C27.7348 14 27.4804 13.8946 27.2929 13.7071C27.1054 13.5196 27 13.2652 27 13C27 12.7348 27.1054 12.4804 27.2929 12.2929C27.4804 12.1054 27.7348 12 28 12H31Z"
+                        fill="#F6851D" />
+                </svg> <span style="font-size: 24px;color: #1B101B; font-weight: 700;">{{'the price assigned to the
+                    ordered
+                    Items will be updated' | localize}} </span>
+            </p>
 
-    </div>
+        </div>
 
-    <div class="p-2 d-flex justify-content-center">
-        <button type="button" (click)="visible = false; onEditpecialPrice(updatedSpecialPrice)" label="Okay"
-            class="pBtntext">{{'Okay' | localize}}</button>
-    </div>
+        <div class="p-2 d-flex justify-content-center">
+            <button type="button" (click)="visible = false; onEditpecialPrice(updatedSpecialPrice)" label="Okay"
+                class="pBtntext">{{'Okay' | localize}}</button>
+        </div>
 
-</p-dialog>
-
-
-
+    </p-dialog>
 
 
-<p-dialog [(visible)]="alreadyOrderd" [modal]="true" [style]="{ 'width': '450px', 'border-radius': '20px' }"
-    [draggable]="false">
-
-    <div class="p-2 con-body">
-        <p>
-            <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path
-                    d="M1.168 4.446C1.31469 4.22511 1.54311 4.07152 1.80302 4.01901C2.06294 3.9665 2.33306 4.01938 2.554 4.166L5.554 6.168C5.76621 6.31847 5.91143 6.54571 5.95884 6.80149C6.00625 7.05727 5.95213 7.32146 5.80795 7.53799C5.66377 7.75451 5.44089 7.90634 5.18661 7.96123C4.93233 8.01612 4.66666 7.96977 4.446 7.832L1.446 5.832C1.22543 5.685 1.07225 5.45643 1.02012 5.19654C0.967996 4.93665 1.02118 4.6667 1.168 4.446ZM16 4C13.6131 4 11.3239 4.94821 9.63604 6.63604C7.94821 8.32387 7 10.6131 7 13V17.802L5.072 22.628C5.01119 22.7797 4.98851 22.944 5.00593 23.1066C5.02335 23.2691 5.08034 23.4249 5.17192 23.5603C5.26349 23.6957 5.38686 23.8065 5.53123 23.8832C5.67559 23.9599 5.83654 24 6 24H26C26.1632 23.9998 26.3239 23.9597 26.468 23.8832C26.6122 23.8066 26.7354 23.6959 26.8269 23.5608C26.9184 23.4257 26.9755 23.2702 26.9931 23.108C27.0107 22.9457 26.9884 22.7816 26.928 22.63L25 17.8V13C25 10.6131 24.0518 8.32387 22.364 6.63604C20.6761 4.94821 18.3869 4 16 4ZM16 29C15.113 29.0002 14.2512 28.7056 13.5499 28.1626C12.8486 27.6195 12.3477 26.8588 12.126 26H19.874C19.6523 26.8588 19.1514 27.6195 18.4501 28.1626C17.7488 28.7056 16.887 29.0002 16 29ZM29.446 4.168C29.6667 4.03023 29.9323 3.98388 30.1866 4.03877C30.4409 4.09367 30.6638 4.24549 30.8079 4.46202C30.9521 4.67854 31.0063 4.94273 30.9588 5.19852C30.9114 5.4543 30.7662 5.68153 30.554 5.832L27.554 7.832C27.3333 7.96977 27.0677 8.01612 26.8134 7.96123C26.5591 7.90634 26.3362 7.75451 26.1921 7.53799C26.0479 7.32146 25.9937 7.05727 26.0412 6.80149C26.0886 6.54571 26.2338 6.31847 26.446 6.168L29.446 4.168ZM0 13C0 12.7348 0.105357 12.4804 0.292893 12.2929C0.48043 12.1054 0.734784 12 1 12H4C4.26522 12 4.51957 12.1054 4.70711 12.2929C4.89464 12.4804 5 12.7348 5 13C5 13.2652 4.89464 13.5196 4.70711 13.7071C4.51957 13.8946 4.26522 14 4 14H1C0.734784 14 0.48043 13.8946 0.292893 13.7071C0.105357 13.5196 0 13.2652 0 13ZM31 12C31.2652 12 31.5196 12.1054 31.7071 12.2929C31.8946 12.4804 32 12.7348 32 13C32 13.2652 31.8946 13.5196 31.7071 13.7071C31.5196 13.8946 31.2652 14 31 14H28C27.7348 14 27.4804 13.8946 27.2929 13.7071C27.1054 13.5196 27 13.2652 27 13C27 12.7348 27.1054 12.4804 27.2929 12.2929C27.4804 12.1054 27.7348 12 28 12H31Z"
-                    fill="#F6851D" />
-            </svg> <span style="font-size: 24px;color: #1B101B; font-weight: 700;"> {{'This variation is already added to
-                the order' | localize}}</span>
-        </p>
-
-    </div>
-
-    <div class="p-2 d-flex justify-content-center">
-        <button type="button" (click)="alreadyOrderd = false;" label="Okay" class="pBtntext">{{'Okay' | localize}}</button>
-    </div>
-
-</p-dialog>
 
 
-<p-dialog [(visible)]="IsConnected" [modal]="true" [style]="{ 'width': '450px', 'border-radius': '20px' }"
-    [draggable]="false">
 
-    <div class="p-2 con-body">
-        <p>
-            <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path
-                    d="M1.168 4.446C1.31469 4.22511 1.54311 4.07152 1.80302 4.01901C2.06294 3.9665 2.33306 4.01938 2.554 4.166L5.554 6.168C5.76621 6.31847 5.91143 6.54571 5.95884 6.80149C6.00625 7.05727 5.95213 7.32146 5.80795 7.53799C5.66377 7.75451 5.44089 7.90634 5.18661 7.96123C4.93233 8.01612 4.66666 7.96977 4.446 7.832L1.446 5.832C1.22543 5.685 1.07225 5.45643 1.02012 5.19654C0.967996 4.93665 1.02118 4.6667 1.168 4.446ZM16 4C13.6131 4 11.3239 4.94821 9.63604 6.63604C7.94821 8.32387 7 10.6131 7 13V17.802L5.072 22.628C5.01119 22.7797 4.98851 22.944 5.00593 23.1066C5.02335 23.2691 5.08034 23.4249 5.17192 23.5603C5.26349 23.6957 5.38686 23.8065 5.53123 23.8832C5.67559 23.9599 5.83654 24 6 24H26C26.1632 23.9998 26.3239 23.9597 26.468 23.8832C26.6122 23.8066 26.7354 23.6959 26.8269 23.5608C26.9184 23.4257 26.9755 23.2702 26.9931 23.108C27.0107 22.9457 26.9884 22.7816 26.928 22.63L25 17.8V13C25 10.6131 24.0518 8.32387 22.364 6.63604C20.6761 4.94821 18.3869 4 16 4ZM16 29C15.113 29.0002 14.2512 28.7056 13.5499 28.1626C12.8486 27.6195 12.3477 26.8588 12.126 26H19.874C19.6523 26.8588 19.1514 27.6195 18.4501 28.1626C17.7488 28.7056 16.887 29.0002 16 29ZM29.446 4.168C29.6667 4.03023 29.9323 3.98388 30.1866 4.03877C30.4409 4.09367 30.6638 4.24549 30.8079 4.46202C30.9521 4.67854 31.0063 4.94273 30.9588 5.19852C30.9114 5.4543 30.7662 5.68153 30.554 5.832L27.554 7.832C27.3333 7.96977 27.0677 8.01612 26.8134 7.96123C26.5591 7.90634 26.3362 7.75451 26.1921 7.53799C26.0479 7.32146 25.9937 7.05727 26.0412 6.80149C26.0886 6.54571 26.2338 6.31847 26.446 6.168L29.446 4.168ZM0 13C0 12.7348 0.105357 12.4804 0.292893 12.2929C0.48043 12.1054 0.734784 12 1 12H4C4.26522 12 4.51957 12.1054 4.70711 12.2929C4.89464 12.4804 5 12.7348 5 13C5 13.2652 4.89464 13.5196 4.70711 13.7071C4.51957 13.8946 4.26522 14 4 14H1C0.734784 14 0.48043 13.8946 0.292893 13.7071C0.105357 13.5196 0 13.2652 0 13ZM31 12C31.2652 12 31.5196 12.1054 31.7071 12.2929C31.8946 12.4804 32 12.7348 32 13C32 13.2652 31.8946 13.5196 31.7071 13.7071C31.5196 13.8946 31.2652 14 31 14H28C27.7348 14 27.4804 13.8946 27.2929 13.7071C27.1054 13.5196 27 13.2652 27 13C27 12.7348 27.1054 12.4804 27.2929 12.2929C27.4804 12.1054 27.7348 12 28 12H31Z"
-                    fill="#F6851D" />
-            </svg> <span style="font-size: 24px;color: #1B101B; font-weight: 700;"> {{'you need to connect to this seller account , to be able to proceed' | localize}}</span>
-        </p>
+    <p-dialog [(visible)]="alreadyOrderd" [modal]="true" [style]="{ 'width': '450px', 'border-radius': '20px' }"
+        [draggable]="false">
 
-    </div>
+        <div class="p-2 con-body">
+            <p>
+                <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path
+                        d="M1.168 4.446C1.31469 4.22511 1.54311 4.07152 1.80302 4.01901C2.06294 3.9665 2.33306 4.01938 2.554 4.166L5.554 6.168C5.76621 6.31847 5.91143 6.54571 5.95884 6.80149C6.00625 7.05727 5.95213 7.32146 5.80795 7.53799C5.66377 7.75451 5.44089 7.90634 5.18661 7.96123C4.93233 8.01612 4.66666 7.96977 4.446 7.832L1.446 5.832C1.22543 5.685 1.07225 5.45643 1.02012 5.19654C0.967996 4.93665 1.02118 4.6667 1.168 4.446ZM16 4C13.6131 4 11.3239 4.94821 9.63604 6.63604C7.94821 8.32387 7 10.6131 7 13V17.802L5.072 22.628C5.01119 22.7797 4.98851 22.944 5.00593 23.1066C5.02335 23.2691 5.08034 23.4249 5.17192 23.5603C5.26349 23.6957 5.38686 23.8065 5.53123 23.8832C5.67559 23.9599 5.83654 24 6 24H26C26.1632 23.9998 26.3239 23.9597 26.468 23.8832C26.6122 23.8066 26.7354 23.6959 26.8269 23.5608C26.9184 23.4257 26.9755 23.2702 26.9931 23.108C27.0107 22.9457 26.9884 22.7816 26.928 22.63L25 17.8V13C25 10.6131 24.0518 8.32387 22.364 6.63604C20.6761 4.94821 18.3869 4 16 4ZM16 29C15.113 29.0002 14.2512 28.7056 13.5499 28.1626C12.8486 27.6195 12.3477 26.8588 12.126 26H19.874C19.6523 26.8588 19.1514 27.6195 18.4501 28.1626C17.7488 28.7056 16.887 29.0002 16 29ZM29.446 4.168C29.6667 4.03023 29.9323 3.98388 30.1866 4.03877C30.4409 4.09367 30.6638 4.24549 30.8079 4.46202C30.9521 4.67854 31.0063 4.94273 30.9588 5.19852C30.9114 5.4543 30.7662 5.68153 30.554 5.832L27.554 7.832C27.3333 7.96977 27.0677 8.01612 26.8134 7.96123C26.5591 7.90634 26.3362 7.75451 26.1921 7.53799C26.0479 7.32146 25.9937 7.05727 26.0412 6.80149C26.0886 6.54571 26.2338 6.31847 26.446 6.168L29.446 4.168ZM0 13C0 12.7348 0.105357 12.4804 0.292893 12.2929C0.48043 12.1054 0.734784 12 1 12H4C4.26522 12 4.51957 12.1054 4.70711 12.2929C4.89464 12.4804 5 12.7348 5 13C5 13.2652 4.89464 13.5196 4.70711 13.7071C4.51957 13.8946 4.26522 14 4 14H1C0.734784 14 0.48043 13.8946 0.292893 13.7071C0.105357 13.5196 0 13.2652 0 13ZM31 12C31.2652 12 31.5196 12.1054 31.7071 12.2929C31.8946 12.4804 32 12.7348 32 13C32 13.2652 31.8946 13.5196 31.7071 13.7071C31.5196 13.8946 31.2652 14 31 14H28C27.7348 14 27.4804 13.8946 27.2929 13.7071C27.1054 13.5196 27 13.2652 27 13C27 12.7348 27.1054 12.4804 27.2929 12.2929C27.4804 12.1054 27.7348 12 28 12H31Z"
+                        fill="#F6851D" />
+                </svg> <span style="font-size: 24px;color: #1B101B; font-weight: 700;"> {{'This variation is already
+                    added to
+                    the order' | localize}}</span>
+            </p>
 
-    <div class="p-2 d-flex justify-content-center">
-        <button type="button" (click)="connect()" label="Connect & Proceed " class="pBtntext mr-2">{{'Connect & Proceed' | localize}} </button>
-        <button type="button" (click)="IsConnected = false;" label="Cancel" class="pBtnCancel">{{'Cancel' | localize}}</button>
-    </div>
+        </div>
 
-</p-dialog>
+        <div class="p-2 d-flex justify-content-center">
+            <button type="button" (click)="alreadyOrderd = false;" label="Okay" class="pBtntext">{{'Okay' |
+                localize}}</button>
+        </div>
+
+    </p-dialog>
+
+
+    <p-dialog [(visible)]="IsConnected" [modal]="true" [style]="{ 'width': '450px', 'border-radius': '20px' }"
+        [draggable]="false">
+
+        <div class="p-2 con-body">
+            <p>
+                <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path
+                        d="M1.168 4.446C1.31469 4.22511 1.54311 4.07152 1.80302 4.01901C2.06294 3.9665 2.33306 4.01938 2.554 4.166L5.554 6.168C5.76621 6.31847 5.91143 6.54571 5.95884 6.80149C6.00625 7.05727 5.95213 7.32146 5.80795 7.53799C5.66377 7.75451 5.44089 7.90634 5.18661 7.96123C4.93233 8.01612 4.66666 7.96977 4.446 7.832L1.446 5.832C1.22543 5.685 1.07225 5.45643 1.02012 5.19654C0.967996 4.93665 1.02118 4.6667 1.168 4.446ZM16 4C13.6131 4 11.3239 4.94821 9.63604 6.63604C7.94821 8.32387 7 10.6131 7 13V17.802L5.072 22.628C5.01119 22.7797 4.98851 22.944 5.00593 23.1066C5.02335 23.2691 5.08034 23.4249 5.17192 23.5603C5.26349 23.6957 5.38686 23.8065 5.53123 23.8832C5.67559 23.9599 5.83654 24 6 24H26C26.1632 23.9998 26.3239 23.9597 26.468 23.8832C26.6122 23.8066 26.7354 23.6959 26.8269 23.5608C26.9184 23.4257 26.9755 23.2702 26.9931 23.108C27.0107 22.9457 26.9884 22.7816 26.928 22.63L25 17.8V13C25 10.6131 24.0518 8.32387 22.364 6.63604C20.6761 4.94821 18.3869 4 16 4ZM16 29C15.113 29.0002 14.2512 28.7056 13.5499 28.1626C12.8486 27.6195 12.3477 26.8588 12.126 26H19.874C19.6523 26.8588 19.1514 27.6195 18.4501 28.1626C17.7488 28.7056 16.887 29.0002 16 29ZM29.446 4.168C29.6667 4.03023 29.9323 3.98388 30.1866 4.03877C30.4409 4.09367 30.6638 4.24549 30.8079 4.46202C30.9521 4.67854 31.0063 4.94273 30.9588 5.19852C30.9114 5.4543 30.7662 5.68153 30.554 5.832L27.554 7.832C27.3333 7.96977 27.0677 8.01612 26.8134 7.96123C26.5591 7.90634 26.3362 7.75451 26.1921 7.53799C26.0479 7.32146 25.9937 7.05727 26.0412 6.80149C26.0886 6.54571 26.2338 6.31847 26.446 6.168L29.446 4.168ZM0 13C0 12.7348 0.105357 12.4804 0.292893 12.2929C0.48043 12.1054 0.734784 12 1 12H4C4.26522 12 4.51957 12.1054 4.70711 12.2929C4.89464 12.4804 5 12.7348 5 13C5 13.2652 4.89464 13.5196 4.70711 13.7071C4.51957 13.8946 4.26522 14 4 14H1C0.734784 14 0.48043 13.8946 0.292893 13.7071C0.105357 13.5196 0 13.2652 0 13ZM31 12C31.2652 12 31.5196 12.1054 31.7071 12.2929C31.8946 12.4804 32 12.7348 32 13C32 13.2652 31.8946 13.5196 31.7071 13.7071C31.5196 13.8946 31.2652 14 31 14H28C27.7348 14 27.4804 13.8946 27.2929 13.7071C27.1054 13.5196 27 13.2652 27 13C27 12.7348 27.1054 12.4804 27.2929 12.2929C27.4804 12.1054 27.7348 12 28 12H31Z"
+                        fill="#F6851D" />
+                </svg> <span style="font-size: 24px;color: #1B101B; font-weight: 700;"> {{'you need to connect to this
+                    seller account , to be able to proceed' | localize}}</span>
+            </p>
+
+        </div>
+
+        <div class="p-2 d-flex justify-content-center">
+            <button type="button" (click)="connect()" label="Connect & Proceed " class="pBtntext mr-2">{{'Connect &
+                Proceed' | localize}} </button>
+            <button type="button" (click)="IsConnected = false;" label="Cancel" class="pBtnCancel">{{'Cancel' |
+                localize}}</button>
+        </div>
+
+    </p-dialog>

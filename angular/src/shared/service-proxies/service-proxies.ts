@@ -26837,9 +26837,10 @@ export class AppTransactionServiceProxy {
      * @param maxResultCount (optional) 
      * @param lExclueMyAcc (optional) 
      * @param transactionType (optional) 
+     * @param selectedAccountRole (optional) 
      * @return Success
      */
-    getRelatedAccounts(filter: string | null | undefined, filterType: number | undefined, name: string | null | undefined, address: string | null | undefined, city: string | null | undefined, state: string | null | undefined, postal: string | null | undefined, sSIN: string | null | undefined, accountTypeId: number | undefined, accountType: string | null | undefined, accountTypes: number[] | null | undefined, status: number[] | null | undefined, languages: number[] | null | undefined, countries: number[] | null | undefined, classifications: number[] | null | undefined, categories: number[] | null | undefined, curruncies: number[] | null | undefined, filterCondition: string | null | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined, lExclueMyAcc: boolean | null | undefined, transactionType: string | null | undefined): Observable<PagedResultDtoOfGetAccountInformationOutputDto> {
+    getRelatedAccounts(filter: string | null | undefined, filterType: number | undefined, name: string | null | undefined, address: string | null | undefined, city: string | null | undefined, state: string | null | undefined, postal: string | null | undefined, sSIN: string | null | undefined, accountTypeId: number | undefined, accountType: string | null | undefined, accountTypes: number[] | null | undefined, status: number[] | null | undefined, languages: number[] | null | undefined, countries: number[] | null | undefined, classifications: number[] | null | undefined, categories: number[] | null | undefined, curruncies: number[] | null | undefined, filterCondition: string | null | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined, lExclueMyAcc: boolean | null | undefined, transactionType: string | null | undefined, selectedAccountRole: string | null | undefined): Observable<PagedResultDtoOfGetAccountInformationOutputDto> {
         let url_ = this.baseUrl + "/api/services/app/AppTransaction/GetRelatedAccounts?";
         if (filter !== undefined && filter !== null)
             url_ += "Filter=" + encodeURIComponent("" + filter) + "&";
@@ -26895,6 +26896,8 @@ export class AppTransactionServiceProxy {
             url_ += "lExclueMyAcc=" + encodeURIComponent("" + lExclueMyAcc) + "&";
         if (transactionType !== undefined && transactionType !== null)
             url_ += "transactionType=" + encodeURIComponent("" + transactionType) + "&";
+        if (selectedAccountRole !== undefined && selectedAccountRole !== null)
+            url_ += "selectedAccountRole=" + encodeURIComponent("" + selectedAccountRole) + "&";
         url_ = url_.replace(/[?&]$/, "");
 
         let options_ : any = {

@@ -3,7 +3,7 @@
 
         <div class="kt-content kt-grid__item kt-grid__item--fluid kt-grid kt-grid--hor">
             <div class="kt-subheader kt-grid__item" >
-                <div [class]="containerClass">
+                <div [class]="containerClass" >
                   <div class="kt-subheader__main">
                     <h3 class="kt-subheader__title " >
                         <a  class="text-capitalize" type="button">
@@ -23,7 +23,7 @@
 
                 </div>
             </div>
-            <div [class]="containerClass + ' kt-grid__item kt-grid__item--fluid'">
+            <div [class]="containerClass + ' kt-grid__item kt-grid__item--fluid'"  [ngClass]="{'mt-lg-5 mt-md-0 mt-5 pt-lg-5 pt-md-0 pt-5':isArabic}">
                 <div class="kt-portlet kt-portlet--mobile">
                     <div class="kt-portlet__body">
                        <div class="row ">

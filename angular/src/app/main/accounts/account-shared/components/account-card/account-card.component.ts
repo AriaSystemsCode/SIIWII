@@ -34,7 +34,7 @@ export class AccountCardComponent extends AppComponentBase implements OnChanges 
   showRelationsDialog = false;
   selectedAccountForRelations: any = null;
   openedRelationMenuId: number | null = null;
-
+  isCreatingRelation = false; 
   constructor(
     injector: Injector,
     private router: Router,
@@ -100,9 +100,21 @@ export class AccountCardComponent extends AppComponentBase implements OnChanges 
     }
   }
 
-  createRelation(relationType) {
-    this._createRelation.emit({ account: this.account, relation: relationType });
+  createRelation(relationType: any) {
+  if (this.isCreatingRelation) {
+    return;
   }
+
+  this.isCreatingRelation = true;
+
+  this._createRelation.emit({
+    account: this.account,
+    relation: relationType,
+    done: () => {
+      this.isCreatingRelation = false;
+    }
+  });
+}
   getFormattedConnectionName(label: string): string {
     if (!label) return '';
 

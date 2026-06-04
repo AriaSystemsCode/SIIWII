@@ -1,7 +1,7 @@
 <div class="container-fluid InfoForm thin-scroll mt-3 py-3">
     <div *ngFor="let salesRep of salesReps ;let salesRepIndex = index">
         <div class="header  d-flex align-items-center justify-content-between p-2">
-            <h6 *ngIf="salesRepIndex>0"><span class="headertxt"> Sales Rep {{salesRepIndex}} : </span></h6>
+            <h6 *ngIf="salesRepIndex>0"><span class="headertxt"> {{'SalesRep' | localize}} {{salesRepIndex}} : </span></h6>
             <div *ngIf="salesRepIndex==0">
                 <button (click)="showEditMode()" class="previewbtn text-center btn float-right" *ngIf="canChange">
                     <img src="../../../../../assets/shoppingCart/edit.png" class="imgIcon" />

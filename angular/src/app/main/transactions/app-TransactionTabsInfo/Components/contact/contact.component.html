@@ -5,7 +5,7 @@
             <div class="formGroup">
                 <div class="d-flex justify-content-between flex-column">
                     <div class="d-flex justify-content-between">
-                        <label class="label ml-3">Company Code</label>
+                        <label class="label ml-3">{{'CompanyCode' | localize}}</label>
 
 
                         <div class="d-flex align-items-center gap-1 "
@@ -14,7 +14,7 @@
                             <input type="checkbox" name="company" class="m-2" [(ngModel)]="comNew"
                                 (change)="createManualCompany($event,'company')" />
                             <div class="tooltip-container">
-                                <label for="ny" class="p-0 mb-0">Create new </label>
+                                <label for="ny" class="p-0 mb-0">{{'CreateNew' | localize}} </label>
 
                             </div>
 
@@ -22,14 +22,14 @@
                     </div>
 
 
-                    <input [disabled]="appTransactionsForViewDto?.buyerCompanySSIN != ''" placeholder="Company Code"
+                    <input [disabled]="appTransactionsForViewDto?.buyerCompanySSIN != ''" [placeholder]="'CompanyCode' | localize"
                         type="text" class="form-control ml-3 w-100"
                         [(ngModel)]="appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedCompany.code"
                         #companyCodeInput="ngModel" name="companyCode" (input)="setCompanyCode($event)"
                         (keyup)="isCodoExist(appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedCompany.code,'company')" />
 
                     <div *ngIf="isCompanyExist" class="text-danger m-2">
-                        This Company code already exists!
+                        {{'CodeCompanyValidationMsg' | localize}}
                     </div>
 
                 </div>
@@ -42,7 +42,7 @@
             <div class="formGroup">
                 <div class="d-flex justify-content-between">
 
-                    <label class="label">Company Name</label>
+                    <label class="label">{{'CompanyName' | localize }}</label>
 
                 </div>
 
@@ -54,7 +54,7 @@
                     #autoComplete [dropdown]="true" [suggestions]="companeyNames" [ngModelOptions]="{standalone: true}"
                     [(ngModel)]="appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedCompany"
                     (completeMethod)="handleCompanySearch($event)"  (onSelect)="onChangeCompany($event)" (onFocus)="handleCompanySearch('')"
-                    [placeholder]="tempAccount ? companyNamePlaceholder : defaultcompanyNamePlaceholder" field="name"
+                    [placeholder]="(tempAccount ? companyNamePlaceholder : defaultcompanyNamePlaceholder) | localize"field="name"
                     [forceSelection]="false" class="w-100" [ngClass]="{'tempAccount': tempAccount}" [ngClass]="{
                         'tempAccount': tempAccount,
                         'rtl-autoC': isArabic,
@@ -74,10 +74,7 @@
                           }}
                         
                     </p>
-                    <!-- <p class="previewValue text-nowrap m-0 p-0 pl-5 col-6"
-                        *ngIf="!appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedCompany?.name">
-                        -
-                    </p> -->
+         
                 </div>
             </div>
 
@@ -90,7 +87,7 @@
             <div class="formGroup">
                 <div class="d-flex justify-content-between flex-column">
                     <div class="d-flex justify-content-between">
-                        <label class="label ml-3">Contact Code</label>
+                        <label class="label ml-3">{{'ContactCode' | localize}}</label>
 
 
                         <div class="d-flex align-items-center gap-1 "
@@ -100,7 +97,7 @@
                             <input type="checkbox" name="contact" class="m-2" [(ngModel)]=" conNew"
                                 (change)="createManualCompany($event,'contact')" />
                             <div class="tooltip-container">
-                                <label for="ny" class="p-0 mb-0">Create new </label>
+                                <label for="ny" class="p-0 mb-0">{{'CreateNew' | localize}} </label>
 
 
                             </div>
@@ -109,13 +106,13 @@
                         </div>
                     </div>
 
-                    <input placeholder="contact Code" type="text" class="form-control ml-3 w-100"
+                    <input [placeholder]="'ContactCode' | localize" type="text" class="form-control ml-3 w-100"
                         [disabled]="appTransactionsForViewDto?.buyerCompanySSIN != ''" (input)="setContactCode($event)"
                         [(ngModel)]="appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedContact.code"
                         #contactCodeInput="ngModel" name="contactCode"
                         (keyup)="isCodoExist(appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedContact.code,'contact')" />
                     <div *ngIf="isContactExist" class="text-danger m-2">
-                        This contact code already exists!
+                       {{'CodeContactValidationMsg' | localize}}
                     </div>
                 </div>
 
@@ -127,7 +124,7 @@
             <div class="formGroup">
                 <div class="d-flex justify-content-between">
 
-                    <label class="label">Contact Name</label>
+                    <label class="label">{{'ContactName' | localize}}</label>
 
 
                 </div>
@@ -167,10 +164,10 @@
         <div class="col-md-6 pl-3">
             <div class="row">
                 <div class="col-6 pl-md-4">
-                    <label class="label">Phone Type</label>
+                    <label class="label">{{'PhoneType' | localize}}</label>
                 </div>
                 <div class="col">
-                    <label class="label">Phone Number</label>
+                    <label class="label">{{'PhoneNumber' | localize}}</label>
                 </div>
                 <div class="col-12 pl-md-2 pl-0">
                     <div class="groupForm">
@@ -182,7 +179,7 @@
                             [style]="{'width':'100%'}" (onChange)="onchangePhoneType($event)"></p-dropdown>
                         <div class="w-100">
 
-                            <input placeholder="Phone Number..." type="text" class="form-control ml-3 w-100"
+                            <input [placeholder]="('PhoneNumber' | localize) + '...'" type="text" class="form-control ml-3 w-100"
                                 (change)="onChangePhoneNumber($event)"
                                 [(ngModel)]="appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectContactPhoneNumber"
                                 #phoneNumberInput="ngModel" name="phoneNumber" minlength="5" maxlength="20"
@@ -192,11 +189,11 @@
                     <div *ngIf="phoneNumberInput.invalid && (phoneNumberInput.dirty || phoneNumberInput.touched)"
                         class="text-danger">
                         <small *ngIf="phoneNumberInput.errors?.pattern">
-                            Phone number must contain only numbers.
+                            {{'PhoneValidationMsg' | localize}}
                         </small>
                         <small
                             *ngIf="!phoneNumberInput.errors?.pattern && (phoneNumberInput.value.length < 5 || phoneNumberInput.value.length > 20)">
-                            Phone number must be between 5 and 20 characters long.
+                            {{'PhoneBetween5To20' | localize}}
                         </small>
                     </div>
                 </div>
@@ -206,15 +203,15 @@
         <!-- Email -->
         <div class="col-md-6 my-2 pr-0 pl-md-3" *ngIf=" activeTab==transactionCartoccordionTabs.BuyerContactInfo">
             <div>
-                <label class="label">Email</label>
-                <input type="text" placeholder="Email..." class="form-control w-100" (change)="onChangeEmail($event)"
+                <label class="label">{{'Email'| localize}}</label>
+                <input type="text" [placeholder]="('Email' | localize) + '...'" class="form-control w-100" (change)="onChangeEmail($event)"
                     [pattern]="emailPattern" #emailInput="ngModel"
                     [(ngModel)]="appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedContactEmail"
                     name="email" />
             </div>
             <div *ngIf="emailInput.errors &&(emailInput.touched || emailInput.dirty)" class="text-danger">
                 <small>
-                    Invalid Email
+                    {{'InvalidEmail' | localize}}
                 </small>
             </div>
         </div>
@@ -222,15 +219,15 @@
         <!-- Email -->
         <div class="col-md-6 my-2 pr-0 pl-md-4" *ngIf=" activeTab!=transactionCartoccordionTabs.BuyerContactInfo">
             <div>
-                <label class="label">Email</label>
-                <input type="text" placeholder="Email..." class="form-control w-100" (change)="onChangeEmail($event)"
+                <label class="label">{{'Email' | localize}}</label>
+                <input type="text" [placeholder]="('Email' | localize) + '...'" class="form-control w-100" (change)="onChangeEmail($event)"
                     [pattern]="emailPattern" #emailInput="ngModel"
                     [(ngModel)]="appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedContactEmail"
                     name="email" />
             </div>
             <div *ngIf="emailInput.errors &&(emailInput.touched || emailInput.dirty)" class="text-danger">
                 <small>
-                    Invalid Email
+                    {{'InvalidEmail' | localize}}
                 </small>
             </div>
         </div>
@@ -240,16 +237,16 @@
             <div class="formGroup">
                 <div class="d-flex justify-content-between flex-column">
 
-                    <label class="label ml-3">Branch Code</label>
+                    <label class="label ml-3">{{'BranchCode' | localize }}</label>
 
-                    <input placeholder="Branch Code" type="text" class="form-control ml-3 w-100"
+                    <input [placeholder]="'BranchCode' | localize" type="text" class="form-control ml-3 w-100"
                         [disabled]="appTransactionsForViewDto?.buyerCompanySSIN != ''"
                         [(ngModel)]="appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedBranch.code"
                         #branchCodeInput="ngModel" name="branchCode" (input)="setBranchCode($event)"
                         (keyup)="isCodoExist(appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedBranch.code,'branch')" />
 
                     <div *ngIf="isBranchExist" class="text-danger m-2">
-                        This Branch code already exists!
+                        {{'CodeBranchValidationMsg' | localize}}
                     </div>
                 </div>
 
@@ -258,7 +255,7 @@
         </div>
         <div class="col-md-6 col-12 my-2 pr-0">
             <div>
-                <label class="label">Branch</label>
+                <label class="label">{{'Branch' | localize}}</label>
 
 
                 <p-autoComplete #autoComplete [dropdown]="true" [suggestions]="filteredBranches"
@@ -282,15 +279,15 @@
         <!-- Department -->
         <div class="col-md-12 my-2 pr-0" *ngIf="showDepartment">
             <div>
-                <label class="label">Department</label>
-                <input type="text" placeholder="Department Name..." class="form-control w-100" name="DepartmentName"
+                <label class="label">{{'Department' | localize}}</label>
+                <input type="text" [placeholder]="('DepartmentName' | localize) + '...'" class="form-control w-100" name="DepartmentName"
                     [(ngModel)]="appTransactionsForViewDto.buyerDepartment" #DepartmentName="ngModel" />
                 <div *ngIf="
                     DepartmentName.invalid &&
                         (DepartmentName.dirty || DepartmentName.touched)
                     " class="text-danger">
                     <small *ngIf="DepartmentName.errors.required">
-                        Department Name is required.
+                        {{'DepartmentReqMsg' | localize}}
                     </small>
                 </div>
             </div>
@@ -304,7 +301,7 @@
         <div class="col-md-6 my-2" *ngIf=" activeTab==transactionCartoccordionTabs.BuyerContactInfo">
             <div>
                 <div class="d-flex align-items-center   w-100">
-                    <h6 class="previewTitle m-0 p-0  col-6">Company Code:</h6>
+                    <h6 class="previewTitle m-0 p-0  col-6">{{'CompanyCode' | localize}}:</h6>
                     <p class=" previewValue   m-0 p-0  col-6"
                         *ngIf="appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedCompany?.code  || appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.companyCode">
                         {{
@@ -321,7 +318,7 @@
         <div class="col-md-6 my-2">
             <div>
                 <div class="d-flex align-items-center   w-100">
-                    <h6 class="previewTitle m-0 p-0  col-6">Company Name:</h6>
+                    <h6 class="previewTitle m-0 p-0  col-6">{{'CompanyName' | localize}}:</h6>
                     <p class=" previewValue text-nowrap  m-0 p-0  col-6"
                         *ngIf="appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedCompany?.name  || appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.companyName">
                         {{
@@ -347,7 +344,7 @@
                     <div class="d-flex align-items-center   w-100">
                         <h6 class="previewTitle m-0 p-0  "
                             [ngClass]="activeTab==transactionCartoccordionTabs.BuyerContactInfo ?'col-md-6 col-6':'col-md-3 col-6'">
-                            Phone : </h6>
+                            {{'Phone' | localize}} : </h6>
                         <p class=" previewValue text-nowrap  m-0 p-0 "
                             [ngClass]="activeTab==transactionCartoccordionTabs.BuyerContactInfo ? ' col-md-6 col-6':' col-md-9 col-6'"
                             *ngIf="appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectContactPhoneNumber || appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex]?.contactPhoneNumber">
@@ -372,7 +369,7 @@
         <div class="col-md-6 my-2" *ngIf=" activeTab==transactionCartoccordionTabs.BuyerContactInfo">
             <div>
                 <div class="d-flex    w-100">
-                    <h6 class="previewTitle m-0 p-0  col-md-6 col-6">Email :</h6>
+                    <h6 class="previewTitle m-0 p-0  col-md-6 col-6">{{'Email' | localize}} :</h6>
                     <p class=" previewValue  m-0 p-0  col-md-6 col-6" style="word-break: break-word;"
                         *ngIf="appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.contactEmail ">
                         {{
@@ -390,7 +387,7 @@
         <div class="col-md-6 my-2" *ngIf=" activeTab==transactionCartoccordionTabs.BuyerContactInfo">
             <div>
                 <div class="d-flex align-items-center   w-100">
-                    <h6 class="previewTitle m-0 p-0  col-6">Contact Code:</h6>
+                    <h6 class="previewTitle m-0 p-0  col-6">{{'ContactCode' | localize}}:</h6>
                     <p class=" previewValue   m-0 p-0  col-6"
                         *ngIf="appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedContact?.code  || appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.contactCode">
                         {{
@@ -407,7 +404,7 @@
         <div class="col-md-6 my-2">
             <div>
                 <div class="d-flex align-items-center   w-100">
-                    <h6 class="previewTitle m-0 p-0  col-6">Contact Name :</h6>
+                    <h6 class="previewTitle m-0 p-0  col-6">{{'ContactName' | localize}} :</h6>
                     <p class=" previewValue text-nowrap  m-0 p-0  col-6"
                         *ngIf="appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedContact?.name || this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.contactName">
                         {{
@@ -430,7 +427,7 @@
         <div class="col-md-6 my-2" *ngIf=" activeTab!=transactionCartoccordionTabs.BuyerContactInfo">
             <div>
                 <div class="d-flex    w-100">
-                    <h6 class="previewTitle m-0 p-0  col-md-3 col-6">Email :</h6>
+                    <h6 class="previewTitle m-0 p-0  col-md-3 col-6">{{'Email' | localize}} :</h6>
                     <p class=" previewValue  m-0 p-0  col-md-9 col-6" style="word-break: break-word;"
                         *ngIf="appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.contactEmail ">
                         {{
@@ -450,7 +447,7 @@
         <div class="col-md-6 my-2" *ngIf=" activeTab==transactionCartoccordionTabs.BuyerContactInfo">
             <div>
                 <div class="d-flex align-items-center   w-100">
-                    <h6 class="previewTitle m-0 p-0  col-6">Branch Code:</h6>
+                    <h6 class="previewTitle m-0 p-0  col-6">{{'BranchCode' | localize}}:</h6>
                     <p class=" previewValue  m-0 p-0  col-6"
                         *ngIf="appTransactionsForViewDto?.appTransactionContacts[appTransactionContactsIndex]?.branchCode">
                         {{ appTransactionsForViewDto?.appTransactionContacts[appTransactionContactsIndex]?.branchCode }}
@@ -465,7 +462,7 @@
         <div class="col-md-6 my-2">
             <div>
                 <div class="d-flex align-items-center   w-100">
-                    <h6 class="previewTitle m-0 p-0  col-6">Branch :</h6>
+                    <h6 class="previewTitle m-0 p-0  col-6">{{'Branch' | localize}} :</h6>
                     <p class=" previewValue text-nowrap  m-0 p-0  col-6"
                         *ngIf="appTransactionsForViewDto?.appTransactionContacts[appTransactionContactsIndex]?.branchName">
                         {{ appTransactionsForViewDto?.appTransactionContacts[appTransactionContactsIndex]?.branchName }}
@@ -483,7 +480,7 @@
         <div class="col-md-11 my-2" *ngIf="showDepartment">
             <div>
                 <div class="d-flex align-items-center   w-100">
-                    <h6 class="previewTitle m-0 p-0   col-6">Department Name :</h6>
+                    <h6 class="previewTitle m-0 p-0   col-6">{{'DepartmentName' | localize}} :</h6>
                     <p class=" previewValue text-nowrap  m-0 p-0  col-6"
                         *ngIf="appTransactionsForViewDto?.buyerDepartment">
                         {{ appTransactionsForViewDto?.buyerDepartment }}

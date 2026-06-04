@@ -2,7 +2,7 @@
     <div class="container-fluid orderInfoForm thin-scroll">
         <div class="row mb-3">
             <h6 class="col-6 mt-4 pl-3 mb-3"><span class="headertxt previewTitle ml-md-2 white-space-nowrap"
-                    style="white-space: nowrap;"> Entered By : <span style="color: #888;
+                    style="white-space: nowrap;"> {{'EnteredBy' | localize}} : <span style="color: #888;
                
                 font-size: 14px; margin-left: 5px; ">{{fullName}}</span></span></h6>
             <div class="col-6" *ngIf="!createOrEditorderInfo &&  !showSaveBtn &&  canChange">
@@ -11,14 +11,14 @@
 
                     <img src="../../../../../assets/shoppingCart/edit.png" class="imgIcon"
                         style="position: relative;right: 0 !important;bottom: 0 !important;" />
-                    <span class="mx-1 text-white"> Edit</span>
+                    <span class="mx-1 text-white"> {{'Edit' | localize}}</span>
 
                 </button>
             </div>
             <div *ngIf="createOrEditorderInfo" class="formGroup  col-md-6 col-12 pl-md-0 "
                 style="padding-right: 13px;padding-left: 4px !important;">
-                <label class="label pl-1">Reference #</label>
-                <input type="text" placeholder="Reference Number" class="form-control " style="    width: 95% !important;
+                <label class="label pl-1">{{'Reference' | localize}} #</label>
+                <input type="text" [placeholder]="'ReferenceNumber' | localize" class="form-control " style="    width: 95% !important;
     margin-left: 3px;"    [(ngModel)]="reference" name="reference"
                    (ngModelChange)="onReferenceChange()"   />
 
@@ -38,7 +38,7 @@
                 <div *ngIf="!createOrEditorderInfo" class="col-md-6 col-12 mt-2">
 
                     <div class="d-flex align-items-center   w-100">
-                        <h6 class="previewTitle  m-0 p-0 col-6 my-2">Reference Number:</h6>
+                        <h6 class="previewTitle  m-0 p-0 col-6 my-2">{{'ReferenceNumber' | localize}}:</h6>
                         <p class="previewValue  m-0 p-0 col-6 my-2">
                             {{ appTransactionsForViewDto?.reference }}
                         </p>
@@ -55,11 +55,10 @@
                     (getCodeValue)="getClassCodeValue($event)"></app-codes>
                 <div class="col-md-12 mt-2">
                     <div *ngIf="createOrEditorderInfo" class="d-flex flex-column">
-                        <div class="d-flex"> <label class="label pt-2 mr-2 ">Classifications</label>
+                        <div class="d-flex"> <label class="label pt-2 mr-2 ">{{'Classifications' | localize}}</label>
                             <div *ngIf="allClassFilteredRecords.length == 0 &&  appTransactionsForViewDto?.entityClassifications?.length == 0"
                                 (click)="showClassBtn = true ; toggleAppCodes() "
-                                class="d-flex p-y-1 px-4 rounded  cat"> <span class="mr-2">+</span> Add New
-                                Classification</div>
+                                class="d-flex p-y-1 px-4 rounded  cat"> <span class="mr-2">+</span> {{'AddNewClassification' | localize}}</div>
                             <div class="d-flex">
 
                                 <div class="d-flex" *ngIf="showSelectedClass || appTransactionsForViewDto?.entityClassifications?.length != 0
@@ -83,14 +82,12 @@
 
                                 <div *ngIf="allClassFilteredRecords.length != 0 &&  !showExistClass "
                                     (click)="showExistClass = true;showClassBtn= false"
-                                    class="d-flex p-y-1 px-4 rounded  cat"> <span class="mr-2">+</span> Add
-                                    Classification</div>
+                                    class="d-flex p-y-1 px-4 rounded  cat"> <span class="mr-2">+</span> {{'AddClassification' | localize}}</div>
                             </div>
 
                             <div *ngIf="allClassFilteredRecords.length == 0 &&  appTransactionsForViewDto?.entityClassifications?.length != 0"
                                 (click)="showClassBtn = true ; toggleAppCodes() "
-                                class="d-flex p-y-1 px-4 rounded  cat"> <span class="mr-2">+</span> Add New
-                                Classification</div>
+                                class="d-flex p-y-1 px-4 rounded  cat"> <span class="mr-2">+</span> {{'AddNewClassification' | localize}}</div>
 
 
                         </div>
@@ -104,19 +101,19 @@
                         <div class="d-flex mt-2" *ngIf="showClassBtn ">
                             <div class="formGroup  col-8">
 
-                                <input type="text" placeholder="classification" class="form-control "
+                                <input type="text" [placeholder]="'Classification' | localize" class="form-control "
                                     style="width: 95% !important;" [(ngModel)]="classification.name" name="classificationName" />
 
 
                             </div>
                             <button (click)="saveClass(classification);hideClassBtn =true;showClassBtn = false"
                                 class="previewbtn text-center btn ">
-                                Save
+                                {{'Save' | localize}}
 
                             </button>
                             <button (click)="cancelClassification();hideClassBtn =true;showExistClass = true;showClassBtn = false;
 " class="cancelbtn text-center btn ">
-                                Cancel
+                                {{'Cancel' | localize}}
 
                             </button>
                         </div>
@@ -131,15 +128,15 @@
                             <div *ngIf="showExistClass" class="flex justify-content-center treeSel">
                                 <p-treeSelect class="w-full md:w-20rem" containerStyleClass="w-full"
                                     [(ngModel)]="selectedClassification" [options]="allClassFilteredRecords"
-                                    display="chip" selectionMode="checkbox" placeholder="Select Item" [filter]="true"
+                                    display="chip" selectionMode="checkbox" [placeholder]="'SelectItem' | localize" [filter]="true"
                                     filterPlaceholder="Search Items" (onNodeSelect)="onNodeSelect($event)"
                                     (onNodeUnselect)="onNodeUnselect($event)">
                                     <ng-template pTemplate="default">
                                         <div class="header p-2 d-flex align-items-center justify-content-between">
                                             <div>
-                                                <input type="checkbox" (change)="toggleSelectAll()" /> Select All
+                                                <input type="checkbox" (change)="toggleSelectAll()" /> {{'SelectAll' | localize}}
                                             </div>
-                                            <button class="btn btn-link" (click)="collapseAll()">Collapse All</button>
+                                            <button class="btn btn-link" (click)="collapseAll()">{{'CollapseAll' | localize}}</button>
                                         </div>
                                     </ng-template>
 
@@ -206,9 +203,9 @@
 
                                     <ng-template let-last pTemplate="footer">
                                         <div class="d-flex justify-content-end p-2">
-                                            <button class="btn bgPurple" (click)="saveClassSelection()">Save</button>
+                                            <button class="btn bgPurple" (click)="saveClassSelection()">{{'Save' | localize}}</button>
                                             <button class="btn btn-secondary"
-                                                (click)="cancelClassSelection()">Cancel</button>
+                                                (click)="cancelClassSelection()">{{'Cancel' | localize}}</button>
                                         </div>
                                     </ng-template>
                                 </p-treeSelect>
@@ -219,15 +216,14 @@
 
                             <button *ngIf=" showExistClass"
                                 (click)="showClassBtn = true;showExistClass= false ; toggleAppCodes()"
-                                class="d-flex p-y-1 px-4 rounded cat"> <span class="mr-2">+</span> Add New
-                                Classification</button>
+                                class="d-flex p-y-1 px-4 rounded cat"> <span class="mr-2">+</span> {{'AddNewClassification' | localize}}</button>
                         </div>
                     </div>
                     <div *ngIf="!createOrEditorderInfo">
                         <div
                             class="align-items-center big-scroll categoriesClassificationsContainer   d-flex  row   w-100 ">
                             <h6 class="previewTitle  m-0 p-0 pr-2 ">
-                                Classifications :
+                                {{'Classifications' | localize}} :
                             </h6>
                             <p class="previewValue classificationsValues  m-0 p-0  my-2" *ngFor="
                                     let item of appTransactionsForViewDto?.entityClassificationsNames?.items
@@ -253,10 +249,10 @@
                     [code]="category?.code" (getCodeValue)="getCodeValue($event)"></app-codes>
                 <div class="col-md-12 mt-2">
                     <div *ngIf="createOrEditorderInfo" class="d-flex flex-column">
-                        <div class="d-flex" style="gap: 50px;"> <label class="label pt-2 mr-2 ">Categories</label>
+                        <div class="d-flex" style="gap: 50px;"> <label class="label pt-2 mr-2 ">{{'Categories' | localize}}</label>
                             <div *ngIf="filteredRecords.length == 0  &&  appTransactionsForViewDto?.entityCategories?.length == 0"
                                 (click)="showCatBtn = true; toggleAppCatCodes()" class="d-flex p-y-1 px-4 rounded  cat">
-                                <span class="mr-2">+</span> Add New Categories
+                                <span class="mr-2">+</span> {{'AddNewCategories' | localize}}
                             </div>
                             <div class="d-flex">
 
@@ -286,12 +282,11 @@
                                 <div *ngIf="filteredRecords.length != 0 && !showExistCat"
                                     (click)="showExistCat = true;showCatBtn= false"
                                     class="d-flex p-y-1 px-4 rounded cat">
-                                    <span class="mr-2">+</span> Add Categories
+                                    <span class="mr-2">+</span> {{'AddCategories' | localize}}
                                 </div>
                                 <div *ngIf="filteredRecords.length == 0  &&  appTransactionsForViewDto?.entityCategories?.length != 0"
                                     (click)="showCatBtn = true; toggleAppCatCodes()"
-                                    class="d-flex p-y-1 px-4 rounded  cat"> <span class="mr-2">+</span> Add New
-                                    Categories</div>
+                                    class="d-flex p-y-1 px-4 rounded  cat"> <span class="mr-2">+</span> {{'AddNewCategories' | localize}}</div>
                             </div>
 
 
@@ -302,19 +297,19 @@
                         <div class="d-flex mt-2" *ngIf="(showCatBtn ) ">
                             <div class="formGroup  col-8">
 
-                                <input type="text" placeholder="Category" class="form-control "
+                                <input type="text" [placeholder]="'Category' | localize" class="form-control "
                                     style="width: 95% !important;" [(ngModel)]="category.name" name="categoryName" />
 
 
                             </div>
                             <button (click)="saveCat(category);hideCatBtn =true;showCatBtn = false;category.name ='' "
                                 class="previewbtn text-center btn ">
-                                Save
+                                {{'Save' | localize}}
 
                             </button>
                             <button (click)="cancelCategory();hideCatBtn =true;showExistCat = true;showCatBtn = false;"
                                 class="cancelbtn text-center btn ">
-                                Cancel
+                                {{'Cancel' | localize}}
 
                             </button>
                         </div>
@@ -329,7 +324,7 @@
                             <div *ngIf="showExistCat" class="flex justify-content-center treeSel">
                                 <p-treeSelect class="w-full md:w-20rem" containerStyleClass="w-full"
                                     [(ngModel)]="selectedCategories" [options]="filteredRecords" display="chip"
-                                    selectionMode="checkbox" placeholder="Select Item" [filter]="true"
+                                    selectionMode="checkbox" [placeholder]="'SelectItem' | localize" [filter]="true"
                                     filterPlaceholder="Search Items" (onNodeSelect)="onNodeSelectCat($event)"
                                     (onNodeUnselect)="onNodeUnselectCat($event)">
                                     <!-- Header Template to Create Space After the Search Filter -->
@@ -415,9 +410,9 @@
                                     <!-- Footer Template -->
                                     <ng-template pTemplate="footer">
                                         <div class="d-flex justify-content-end p-2">
-                                            <button class="btn bgPurple" (click)="saveSelection()">Save</button>
+                                            <button class="btn bgPurple" (click)="saveSelection()">{{'Save' | localize}}</button>
                                             <button class="btn btn-secondary"
-                                                (click)="cancelSelection()">Cancel</button>
+                                                (click)="cancelSelection()">{{'Cancel' | localize}}</button>
                                         </div>
                                     </ng-template>
                                 </p-treeSelect>
@@ -427,14 +422,13 @@
 
                             <button *ngIf="showExistCat "
                                 (click)="showCatBtn = true;showExistCat = false ; toggleAppCatCodes()"
-                                class="d-flex p-y-1 px-4 rounded cat"> <span class="mr-2">+</span> Add New
-                                Categories</button>
+                                class="d-flex p-y-1 px-4 rounded cat"> <span class="mr-2">+</span> {{'AddNewCategories'}}</button>
                         </div>
                     </div>
                     <div *ngIf="!createOrEditorderInfo">
                         <div
                             class="categoriesClassificationsContainer d-flex align-items-center big-scroll   row   w-100">
-                            <h6 class="previewTitle  m-0 p-0 pr-2">Categories :</h6>
+                            <h6 class="previewTitle  m-0 p-0 pr-2">{{'Categories' | localize}} :</h6>
                             <p class="previewValue classificationsValues  m-0 p-0  my-2" *ngFor="
                                     let item of appTransactionsForViewDto?.entityCategoriesNames?.items
                                 ">
@@ -455,7 +449,7 @@
                 <!-- dates -->
                 <div class="col-md-6 mt-2 position-relative "  [ngClass]="isArabic?'dates-ar':'dates'">
                     <div *ngIf="createOrEditorderInfo">
-                        <label class="label">Entered Date</label>
+                        <label class="label">{{'EnteredDate' | localize}}</label>
                         <div class="">
                             <p-calendar #calendar1 appendTo="body" [(ngModel)]="enteredDate" [showIcon]="true" [dateFormat]="primeDateFormat" 
                                 (ngModelChange)="onChangeDate()" [showOtherMonths]="true" name="enteredDate" 
@@ -468,7 +462,7 @@
                     </div>
                     <div *ngIf="!createOrEditorderInfo">
                         <div class="d-flex align-items-center   w-100">
-                            <h6 class="previewTitle  m-0 p-0 col-6 my-2">Entered Date :</h6>
+                            <h6 class="previewTitle  m-0 p-0 col-6 my-2">{{'EnteredDate' | localize}} :</h6>
                             <p class="previewValue  m-0 p-0 col-6 my-2" *ngIf="languageSettingName != 'en-GB'">
                                 {{ appTransactionsForViewDto?.enteredDate | momentFormat:'L'  }}
                             </p>
@@ -481,7 +475,7 @@
                 </div>
                 <div class="col-md-6 mt-2 position-relative "  [ngClass]="isArabic?'dates-ar':'dates'">
                     <div *ngIf="createOrEditorderInfo">
-                        <label class="label">Start Date</label>
+                        <label class="label">{{'StartDate' | localize}}</label>
                         <p-calendar #calendar2 appendTo="body" [(ngModel)]="startDate" name="startDate" [showIcon]="true" [dateFormat]="primeDateFormat" 
                             (ngModelChange)="onChangeDate()" [showOtherMonths]="true"
                             [selectOtherMonths]="true"></p-calendar>
@@ -491,7 +485,7 @@
                     </div>
                     <div *ngIf="!createOrEditorderInfo">
                         <div class="d-flex align-items-center   w-100">
-                            <h6 class="previewTitle  m-0 p-0 col-6 my-2">Start Date :</h6>
+                            <h6 class="previewTitle  m-0 p-0 col-6 my-2">{{'StartDate' | localize}} :</h6>
                             <p class="previewValue  m-0 p-0 col-6 my-2" *ngIf="languageSettingName != 'en-GB'">
                                 {{ appTransactionsForViewDto?.startDate | momentFormat:'L'}}
                             </p>
@@ -504,7 +498,7 @@
                 </div>
                 <div class="col-md-6 mt-2 position-relative " [ngClass]="isArabic?'dates-ar':'dates'">
                     <div *ngIf="createOrEditorderInfo">
-                        <label class="label">Available Date</label>
+                        <label class="label">{{'AvailableDate' | localize}}</label>
                         <p-calendar #calendar3 appendTo="body" [(ngModel)]="availableDate" name="availableDate" [showIcon]="true" [dateFormat]="primeDateFormat" 
                             (ngModelChange)="onChangeDate()" [minDate]="startDate" [showOtherMonths]="true"
                             [selectOtherMonths]="true"></p-calendar>
@@ -515,7 +509,7 @@
                     <div *ngIf="!createOrEditorderInfo">
                         <div class="d-flex align-items-center   w-100">
                             <h6 class="previewTitle  m-0 p-0 col-6 my-2">
-                                Avaialable Date :
+                                {{'AvaialableDate' | localize}} :
                             </h6>
                             <p class="previewValue  m-0 p-0 col-6 my-2" *ngIf="languageSettingName != 'en-GB'">
                                 {{ appTransactionsForViewDto?.availableDate | momentFormat:'L' }}
@@ -528,7 +522,7 @@
                 </div>
                 <div class="col-md-6 mt-2 position-relative "  [ngClass]="isArabic?'dates-ar':'dates'">
                     <div *ngIf="createOrEditorderInfo">
-                        <label class="label">Complete Date</label>
+                        <label class="label">{{'CompleteDate' | localize}}</label>
                         <p-calendar #calendar4 appendTo="body" [(ngModel)]="completeDate" name="completeDate" [showIcon]="true" [dateFormat]="primeDateFormat" 
                             (onSelect)="changeCompleteDate(completeDate)"
                             (ngModelChange)="changeCompleteDate(completeDate)" [minDate]="availableDate"
@@ -540,7 +534,7 @@
                     <div *ngIf="!createOrEditorderInfo">
                         <div class="d-flex align-items-center   w-100">
                             <h6 class="previewTitle  m-0 p-0 col-6 my-2">
-                                Complete Date :
+                                {{'CompleteDate' | localize}} :
                             </h6>
                             <p class="previewValue  m-0 p-0 col-6 my-2" *ngIf="languageSettingName != 'en-GB'">
                                 {{ appTransactionsForViewDto?.completeDate | momentFormat:'L' }}
@@ -556,13 +550,13 @@
                 <!-- currency -->
                 <div class="col-md-6 mt-2">
                     <div *ngIf="createOrEditorderInfo">
-                        <label class="label">Currency</label>
+                        <label class="label">{{'Currency' | localize}}</label>
                         <p-dropdown [options]="currencies" [(ngModel)]="selectedCurrency" optionLabel="code"
                             optionValue="value" class="w-100" (onChange)="onchangeCurrency()"></p-dropdown>
                     </div>
                     <div *ngIf="!createOrEditorderInfo">
                         <div class="d-flex align-items-center  ">
-                            <h6 class="previewTitle  m-0 p-0 col-6  my-2">Currency :</h6>
+                            <h6 class="previewTitle  m-0 p-0 col-6  my-2">{{'Currency' | localize}} :</h6>
                             <p class="previewValue  m-0 p-0 col-6 my-2">
                                 {{ appTransactionsForViewDto?.currencyCode }}
                             </p>
@@ -574,16 +568,16 @@
                 <!-- exchange rate -->
                 <div class="col-md-6 mt-2">
                     <div *ngIf="createOrEditorderInfo" class="formGroup">
-                        <label class="label">Exchange Rate</label>
+                        <label class="label">{{'ExchangeRate' | localize}}</label>
                         <input
                             [readonly]="appTransactionsForViewDto?.currencyExchangeRate && appTransactionsForViewDto?.currencyExchangeRate >0"
-                            type="text" placeholder="Exchange Rate..." class="form-control w-100"
+                            type="text" placeholder="('ExchangeRate' | localize) + '...'" class="form-control w-100"
                             [(ngModel)]="appTransactionsForViewDto.currencyExchangeRate" name="exchangeRate" />
                     </div>
                     <div *ngIf="!createOrEditorderInfo">
                         <div class="d-flex align-items-center   w-100">
                             <h6 class="previewTitle  m-0 p-0 col-6 my-2">
-                                Exchange Rate :
+                                {{'ExchangeRate' | localize}} :
                             </h6>
                             <p class="previewValue  m-0 p-0 col-6  my-2">
                                 {{ appTransactionsForViewDto?.currencyExchangeRate }}
@@ -599,15 +593,15 @@
             <button [disabled]="!(isContactsValid && isSalesOrderValidForm())"
                 *ngIf="createOrEditorderInfo && !showSaveBtn" (click)="createOrEditTransaction()"
                 class="continuebtn text-center btn float-right">
-                Continue
+                {{'Continue' | localize}}
             </button>
 
             <button *ngIf="showSaveBtn" (click)="cancel()" class="cancelbtn text-center btn float-right">
-                Cancel
+                {{'Cancel' | localize}}
             </button>
             <button *ngIf="showSaveBtn" [disabled]="!( isSalesOrderValidForm())" (click)="save()"
                 class="previewbtn text-center btn float-right">
-                Save
+                {{'Save' | localize}}
             </button>
         </div>
     </div>

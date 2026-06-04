@@ -47,10 +47,7 @@
                 [ngClass]="singleItemPerRowMode ? 'col-md-4' : 'col-md-5'"
             >
                 <div class="align-items-end d-flex flex-column justify-content-end">
-                    <!-- <p class="m-0 p-0 mr-2">
-                        {{"ItemAdded"|localize}} July 16, 2020
-                        {{ ("ItemAdded" | localize) + " " + (item.creationTime | date : 'longDate') }}
-                    </p> -->
+                
                     <div
                         class="btn-group dropdown"
                         dropdown
@@ -58,39 +55,8 @@
                         placement="bottom right"
                         *ngIf="!viewMode"
                     >
-                        <!-- <button
-                            class="dropdown-toggle btn btn-sm btn-action"
-                            dropdownToggle
-                            type="button"
-                        ></button>
-                        <ul
-                            class="dropdown-menu dropdown-action-btn dropdown-menu-right"
-                            *dropdownMenu
-                        >
-                            <li>
-                                <a href="javascript:;" *ngIf="item.state == StateEnum.ToBeRemoved" (click)="markItemAs(StateEnum.ActiveOrEmpty)">{{
-                                    "Undo" | localize
-                                }}</a>
-                                <a href="javascript:;" *ngIf="item.state == StateEnum.ToBeAdded" (click)="deleteItem()">{{
-                                    "Remove" | localize
-                                }}</a>
-                                <a href="javascript:;" *ngIf="item.state == StateEnum.ActiveOrEmpty" (click)="markItemAs(StateEnum.ToBeRemoved)">{{
-                                    "Remove" | localize
-                                }}</a>
-                            </li>
-                            <li >
-                                <a
-                                    href="javascript:;"
-                                    (click)="
-                                        openVariationModal()
-                                    "
-                                    >{{
-                                        ("Variation" | localize)
-                                    }}</a
-                                >
-                            </li>
-                        </ul> -->
-                            <button 
+                    
+                        <button 
                             class="btn btn-outline-primary pl-4 pr-4"
                             (click)="openVariationModal()"
                             type="button"

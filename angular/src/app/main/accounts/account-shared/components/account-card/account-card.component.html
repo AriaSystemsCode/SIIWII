@@ -99,7 +99,7 @@ CARDS VIEW MODE
 
             <li role="menuitem" *ngFor="let option of account.availableConnections" class="relation-item">
 
-              <button class="dropdown-item relation-btn" type="button" (click)="createRelation(option)">
+              <button class="dropdown-item relation-btn" type="button" (click)="!isCreatingRelation && createRelation(option)">
 
                 <div class="d-flex align-items-center justify-content-between w-100">
                   <div class="d-flex align-items-center">
@@ -121,7 +121,7 @@ CARDS VIEW MODE
             <div class="relationWrap w-100 text-center position-relative" dropdown container="body">
               <button type="button" class="relation_button market-follow-btn w-100" dropdownToggle style="font-size: 12px;">
                 <img class="pb-1" style="width: 13px;" [src]="getConnectionIcon(options[0]?.connectionName)" alt="" />
-                <span class="ml-1" [title]="options[0]?.connectionName" (click)="createRelation(options[0])">
+                <span class="ml-1" [title]="options[0]?.connectionName" (click)="!isCreatingRelation && createRelation(options[0])">
                   {{ options[0]?.connectionName | textSubstring : 22 }}
                 </span>
 
@@ -131,7 +131,7 @@ CARDS VIEW MODE
               <ng-container *ngIf="options.length > 0">
                 <ul *dropdownMenu class="dropdown-menu" role="menu">
                   <li role="menuitem" *ngFor="let option of options | slice:1" class="py-2">
-                    <button class="dropdown-item" type="button" (click)="createRelation(option)">
+                    <button class="dropdown-item" type="button" (click)="!isCreatingRelation && createRelation(option)">
                       {{ option?.connectionName }}
                     </button>
                   </li>
@@ -326,9 +326,9 @@ NOT CARDS VIEW MODE
                   <ng-container *ngIf="account?.availableConnections as options">
                     <div class="relationWrap " style="text-align: end;" dropdown container="body">
                       <button type="button" class="relation_button" dropdownToggle>
-                        <img class="pb-1" style="width: 12px;" (click)="createRelation(options[0])"
+                        <img class="pb-1" style="width: 12px;" (click)="!isCreatingRelation && createRelation(options[0])"
                           [src]="getConnectionIcon(options[0]?.connectionName)" alt="" />
-                        <span (click)="createRelation(options[0])" class="ml-1" [title]="options[0]?.connectionName"
+                        <span (click)="!isCreatingRelation && createRelation(options[0])" class="ml-1" [title]="options[0]?.connectionName"
                           style="font-size: 11px;">
                           {{ options[0]?.connectionName | textSubstring : 20 }}
                         </span>
@@ -340,7 +340,7 @@ NOT CARDS VIEW MODE
                       <ng-container *ngIf="options.length > 1">
                         <ul *dropdownMenu class="dropdown-menu" role="menu">
                           <li role="menuitem" *ngFor="let option of options | slice:1" class="py-2">
-                            <button class="dropdown-item" type="button" (click)="createRelation(option)">
+                            <button class="dropdown-item" type="button" (click)="!isCreatingRelation && createRelation(option)">
                               {{ option?.connectionName }}
                             </button>
                           </li>
@@ -394,7 +394,7 @@ NOT CARDS VIEW MODE
                     [ngClass]="isArabic ? 'dropdown-menu-ar' : 'dropdown-menu-en'">
 
                     <li role="menuitem" *ngFor="let option of account.availableConnections" class="relation-item">
-                      <button class="dropdown-item relation-btn" type="button" (click)="createRelation(option)">
+                      <button class="dropdown-item relation-btn" type="button" (click)="!isCreatingRelation && createRelation(option)">
                         <div class="d-flex align-items-center justify-content-between w-100">
                           <div class="d-flex align-items-center">
                             <img class="relation-icon mr-2" [src]="getConnectionIcon(option?.connectionName)" alt="" />
@@ -424,7 +424,7 @@ NOT CARDS VIEW MODE
                       <ng-container *ngIf="options.length > 0">
                         <ul *dropdownMenu class="dropdown-menu" role="menu">
                           <li role="menuitem" *ngFor="let option of options | slice:1" class="py-2">
-                            <button class="dropdown-item" type="button" (click)="createRelation(option)">
+                            <button class="dropdown-item" type="button" (click)="!isCreatingRelation && createRelation(option)">
                               {{ option?.connectionName }}
                             </button>
                           </li>

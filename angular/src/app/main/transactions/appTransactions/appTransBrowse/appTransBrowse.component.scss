@@ -23,9 +23,11 @@
         top: 10px;
     }
 }
+
 .kt-portlet {
     margin-top: 0px !important;
 }
+
 .m-input {
     padding-left: 35px;
 }
@@ -114,7 +116,7 @@
 }
 
 .selected-month-btn {
-    background:  #4A0D4A;
+    background: #4A0D4A;
     width: Hug (152px)px;
     height: Hug (37px)px;
     padding: 11px 20px 11px 20px;
@@ -169,4 +171,41 @@
 .Reset {
     background-color: transparent !important;
 
-   }
+}
+
+
+.w-150 {
+    width: 150px
+}
+
+.pi-times {
+    cursor: pointer;
+    margin-left: 5px;
+    padding: 5px;
+    width: 20px;
+}
+
+.spanStyle {
+    line-height: 40px;
+    padding: 0 15px 0 15px;
+}
+
+
+.w-160 {
+    width: 160px
+}
+
+.w-190 {
+    width: 190px
+}
+
+.tabsSec {
+    gap: 10px; margin-left: 10px;
+}
+.h-48 {
+    height: 48px;
+}
+
+.kt-form {
+     border-bottom: solid 2px #e5e2e2;
+}
