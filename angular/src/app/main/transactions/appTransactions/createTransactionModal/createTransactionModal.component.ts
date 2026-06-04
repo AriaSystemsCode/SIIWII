@@ -94,8 +94,8 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit, 
     invalidSellerPhoneNumber = "";
     invalidBuyerContactEMailAddress = "";
     invalidSellerContactEMailAddress = "";
-    sellerPhoneLabel: string = "Phone Number";
-    buyerPhoneLabel: string = "Phone Number";
+    sellerPhoneLabel: string =  this.l('PhoneNumber');
+    buyerPhoneLabel: string = this.l('PhoneNumber');
     showAdd: boolean = false
 
     body: any;

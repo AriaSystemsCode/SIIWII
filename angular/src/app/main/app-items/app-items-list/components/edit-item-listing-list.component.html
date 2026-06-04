@@ -1,404 +1,407 @@
 <form #listForm="ngForm" (ngSubmit)="createOrEditAppItemList(listForm)">
-    <div [@routerTransition] style="margin-top: -90px" class="wrapper">
-        <div class="kt-content kt-grid__item kt-grid__item--fluid kt-grid kt-grid--hor">
-            <div class="kt-subheader kt-grid__item" style="margin-left: 15px;">
-                <div [class]="containerClass">
-                    <div class="kt-subheader__main" style="height: 95px;">
-                        <h3 class="kt-subheader__title pl-4">
-                            <a class="text-capitalize text-dark" type="button" (click)="backURL()">
-                                <i class="fas fa-arrow-left"></i>
-                                {{ "Back" | localize }}
-                            </a>
-                        </h3>
-                        <span class="kt-subheader__separator kt-subheader__separator--v"></span>
-                        <span class="kt-subheader__desc">
-                            {{ "ManageMyLists" | localize }}
-                        </span>
-                        <span class="mr-1"> > </span>
-                        <span class="kt-subheader__desc">
-                            <a class="text-capitalize text-black-50" (click)="redirectToAppItemList()">
-                                {{ "MyProductLists" | localize }}
-                            </a>
-                        </span>
-                        <span class="mr-1"> > </span>
-                        <span class="kt-subheader__desc">
-                            {{ list?.appItemsList?.name }}
-                        </span>
-                        <span class="kt-subheader__separator kt-subheader__separator--v"></span>
-                        <span>
-                            <div class="share-level px-2">
-                                <span
-                                    *ngIf="list?.appItemsList?.sharingLevel === 1 || list?.appItemsList?.sharingLevel === 2 ">
-                                    {{'Shared' | localize}} <div class="shared-dot"></div> </span>
-                                <span *ngIf="list?.appItemsList?.sharingLevel === 3 "> {{'Private' | localize}} <div
-                                        class="private-dot"></div> </span>
-                                <span *ngIf="list?.appItemsList?.sharingLevel === 4 "> {{'Hidden' | localize}} <div
-                                        class="hidden-dot"></div> </span>
-                                <span
-                                    *ngIf="list?.appItemsList?.sharingLevel === null || list?.appItemsList?.sharingLevel === 0 ">
-                                    {{'NotShared' | localize}} </span>
-                            </div>
-                        </span>
+  <div
+    [@routerTransition]
+    class="wrapper product-list-page"
+    [ngClass]="{ 'rtl-layout': isArabic }"
+  >
+    <div class="kt-content kt-grid__item kt-grid__item--fluid kt-grid kt-grid--hor">
 
-                        <span class="kt-subheader__separator kt-subheader__separator--v" *ngIf="
-                                !loading &&
-                                list?.appItemsList?.statusCode &&
-                                viewMode
-                            "></span>
-                        <span *ngIf="viewMode" class="ml-1 mr-3 text-success">
-                            {{
-                            !loading && list?.appItemsList?.statusCode
-                            ? l(
-                            list?.appItemsList?.statusCode
-                            | titlecase
-                            )
-                            : ""
-                            }}
-                        </span>
-                    </div>
-                    <div class="share-sync my-3 d-flex flex-column align-items-center gap-3 justify-content-end w-50">
-                        <div class="d-flex align-items-center gap-3 w-100 justify-content-end">
-                            <button pButton pRipple [label]="'Share' | localize" class="share mr-2"
-                                icon="pi pi-share-alt" type="button" (click)="openShareProductListingModal()"></button>
-                            <button pRipple class="sync" type="button" [disabled]="!list.showSync"
-                                (click)="syncProduct()">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
-                                    xmlns="http://www.w3.org/2000/svg">
-                                    <path
-                                        d="M12 4V1L8 5L12 9V6C15.31 6 18 8.69 18 12C18 13.01 17.75 13.97 17.3 14.8L18.76 16.26C19.5702 14.9869 20.0004 13.5091 20 12C20 7.58 16.42 4 12 4ZM12 18C8.69 18 6 15.31 6 12C6 10.99 6.25 10.03 6.7 9.2L5.24 7.74C4.42975 9.01309 3.99958 10.4909 4 12C4 16.42 7.58 20 12 20V23L16 19L12 15V18Z"
-                                        fill="#F6851D" />
-                                </svg>
-                                <span>{{'Sync' | localize}}</span>
-                            </button>
-                        </div>
-                        <div class="last-updated my-3 d-flex align-items-center gap-3 justify-content-end w-100">
-                            <p>{{'LastEdit' | localize}} {{ lastUpdatedDate }}</p>
-                        </div>
-                    </div>
-                    <div class="kt-subheader__toolbar" *ngIf="!viewMode">
-                        <div class="kt-subheader__wrapper">
-                            <button class="btn btn-success text-capitalize mr-2" type="button" (click)="SaveAsDraft()">
-                                <span>{{ l("SaveAsDraft") }}</span>
-                            </button>
-                            <button class="btn btn-primary text-capitalize mr-2" type="button"
-                                (click)="openMultiSelector()">
-                                <span>{{ l("AddProduct(s)") }}</span>
-                            </button>
-                            <button class="btn btn-primary text-capitalize mr-2" type="submit" [buttonBusy]="false"
-                                [busyText]="l('SavingWithThreeDot')">
-                                <span>{{ l("SaveChanges") }}</span>
-                            </button>
-                            <button class="btn rounded bg-secondary" type="button" (click)="cancel()">
-                                {{ "Cancel" | localize }}
-                            </button>
-                        </div>
-                    </div>
-                </div>
+      <!-- HEADER -->
+      <div class="product-page-header" [ngClass]="{ 'mt-lg-1 mt-md-3 mt-5 pt-lg-5 pt-md-0 pt-5': isArabic }">
+
+        <div class="product-header-row">
+          <!-- BREADCRUMB -->
+          <div class="breadcrumb-section">
+            <a class="back-link" type="button" (click)="backURL()">
+              <i class="fas fa-arrow-left"></i>
+              {{ 'Back' | localize }}
+            </a>
+
+            <span class="header-separator"></span>
+
+            <span>{{ 'ManageMyLists' | localize }}</span>
+            <span>></span>
+
+            <a class="breadcrumb-link" (click)="redirectToAppItemList()">
+              {{ 'MyProductLists' | localize }}
+            </a>
+
+            <span>></span>
+            <span>{{ list?.appItemsList?.name }}</span>
+
+            <span class="header-separator"></span>
+
+            <div class="share-level">
+              <span *ngIf="list?.appItemsList?.sharingLevel === 1 || list?.appItemsList?.sharingLevel === 2">
+                {{ 'Shared' | localize }}
+                <span class="shared-dot"></span>
+              </span>
+
+              <span *ngIf="list?.appItemsList?.sharingLevel === 3">
+                {{ 'Private' | localize }}
+                <span class="private-dot"></span>
+              </span>
+
+              <span *ngIf="list?.appItemsList?.sharingLevel === 4">
+                {{ 'Hidden' | localize }}
+                <span class="hidden-dot"></span>
+              </span>
+
+              <span *ngIf="list?.appItemsList?.sharingLevel === null || list?.appItemsList?.sharingLevel === 0">
+                {{ 'NotShared' | localize }}
+              </span>
             </div>
-            <div [class]="containerClass + ' kt-grid__item kt-grid__item--fluid'" *ngIf="viewMode">
-                <div class="kt-portlet kt-portlet--mobile ">
-                    <div class="kt-portlet__body ">
-                        <div class="row align-items-center">
-                            <div class="col-10 d-flex flex-column justify-content-between">
-                                <h3 class="align-items-baseline d-flex kt-subheader__title">
-                                    {{ "View" | localize }}
-                                    {{ list?.appItemsList?.name }}
-                                    {{ "List" | localize }}
-                                    <span class="ml-2 mr-2 items-count-icon">
-                                        {{
-                                        list?.appItemsList
-                                        ?.appItemsListItems?.totalCount
-                                        }}
-                                    </span>
-                                    {{ "items" | localize }}
-                                    <p class="border-left ml-3 mr-1 pl-3">
-                                        {{ "ThisListSharedWith" | localize }}:
-                                    </p>
-                                    <div class="users-list">
-                                        <ng-container *ngFor="
-                                                let user of list?.appItemsList
-                                                    ?.users;
-                                                index as i
-                                            ">
-                                            <img [ngStyle]="{
-                                                    left: 10 + i * 20 + 'px',
-                                                    'z-index': i + 1
-                                                }" [title]="user.name" [src]="
-                                                    user.imageURL ||
-                                                    'assets/common/images/avatar-icon1.jpg'
-                                                " alt="" />
-                                        </ng-container>
-                                        <span class="users-count-icon" [ngStyle]="{
-                                                left:
-                                                    10 +
-                                                    list?.appItemsList?.users
-                                                        ?.length *
-                                                        20 +
-                                                    'px',
-                                                'z-index':
-                                                    list?.appItemsList?.users
-                                                        ?.length + 1
-                                            }">
-                                            {{
-                                            list?.appItemsList?.usersCount >
-                                            5
-                                            ? "+"
-                                            : ""
-                                            }}
-                                            {{ list?.appItemsList?.usersCount }}
-                                        </span>
-                                    </div>
-                                </h3>
-                            </div>
-                            <div class="col text-right">
-                                <div class="btn-group dropdown" dropdown container="body" placement="bottom right">
-                                    <button class="dropdown-toggle btn btn-sm btn-action" dropdownToggle
-                                        type="button"></button>
-                                    <ul class="dropdown-menu dropdown-action-btn dropdown-menu-right" *dropdownMenu>
 
-                                        <li *ngIf="canEdit">
-                                            <a href="javascript:;" [routerLink]="[
-                                                    '/app/main/productslists/edit',
-                                                    list?.appItemsList?.id
-                                                ]">{{
-                                                "EditProductsList"
-                                                | localize
-                                                }}</a>
-                                        </li>
-                                        <li>
-                                            <a href="javascript:;" [ngClass]="{
-                                                    dimmed: !canPrint
-                                                }" (click)="printList()">{{
-                                                "PrintLinesheet"
-                                                | localize
-                                                }}</a>
-                                        </li>
-                                        <li *ngIf="canDelete">
-                                            <a href="javascript:;" (click)="
-                                                    askToConfirmDeleteList()
-                                                ">{{
-                                                "DeleteThisList" | localize
-                                                }}</a>
-                                        </li>
-                                        <li>
-                                            <a href="javascript:;"
-                                                (click)="sync(list?.appItemsList?.id , list?.appItemsList?.itemsCount)">{{
-                                                "SyncToMyProducts" | localize
-                                                }}</a>
-                                        </li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+            <span *ngIf="viewMode" class="status-text">
+              {{
+                !loading && list?.appItemsList?.statusCode
+                  ? l(list?.appItemsList?.statusCode | titlecase)
+                  : ''
+              }}
+            </span>
+          </div>
+
+          <!-- SHARE / SYNC -->
+          <div class="header-actions-right">
+            <div class="top-actions-buttons">
+              <button
+                pButton
+                pRipple
+                [label]="'Share' | localize"
+                icon="pi pi-share-alt"
+                type="button"
+                class="share-btn"
+                (click)="openShareProductListingModal()"
+              ></button>
+
+              <button
+                pRipple
+                type="button"
+                class="sync-btn"
+                [disabled]="!list.showSync"
+                (click)="syncProduct()"
+              >
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                  <path
+                    d="M12 4V1L8 5L12 9V6C15.31 6 18 8.69 18 12C18 13.01 17.75 13.97 17.3 14.8L18.76 16.26C19.5702 14.9869 20.0004 13.5091 20 12C20 7.58 16.42 4 12 4ZM12 18C8.69 18 6 15.31 6 12C6 10.99 6.25 10.03 6.7 9.2L5.24 7.74C4.42975 9.01309 3.99958 10.4909 4 12C4 16.42 7.58 20 12 20V23L16 19L12 15V18Z"
+                    fill="#F6851D"
+                  />
+                </svg>
+                <span>{{ 'Sync' | localize }}</span>
+              </button>
             </div>
-            <div [class]="containerClass + ' kt-grid__item kt-grid__item--fluid'">
-                <div class="kt-portlet kt-portlet--mobile body-cont" [ngClass]="{ veiwMode: viewMode }">
-                    <div class="kt-portlet__body">
-                        <div class="row">
-                            <div *ngIf="!viewMode" class="col-12 list-toolbar border-dashed-bottom pb-4">
-                                <div class="h3 text-center text-success">
-                                    {{
-                                    !loading &&
-                                    list?.appItemsList?.statusCode
-                                    ? l(
-                                    list?.appItemsList?.statusCode
-                                    | titlecase
-                                    )
-                                    : ""
-                                    }}
-                                </div>
-                                <div class="align-items-baseline mb-5 mt-5 row">
-                                    <div class="col-lg-1 col-md-3 col-sm-4 col-6">
-                                        <h6>
-                                            <span class="text-danger">*</span>{{ "ListName" | localize }}
-                                        </h6>
-                                    </div>
-                                    <div class="col">
-                                        <ng-container *ngIf="list?.appItemsList">
-                                            <input type="text" [required]="true" name="name" [(ngModel)]="
-                                                    list.appItemsList.name
-                                                " class="form-control bg-white form-control-border-grey" [ngClass]="{
-                                                    'border-danger': false
-                                                }" placeholder="{{
-                                                    'List name' | localize
-                                                }}" (blur)="
-                                                    onHeaderInputsBlur($event)
-                                                " />
-                                        </ng-container>
-                                    </div>
-                                    <div class="col-lg-1 col-md-3 col-sm-4 col-6">
-                                        <span class="text-muted">50 {{ "digits" | localize }}</span>
-                                    </div>
-                                </div>
-                                <div class="align-items-baseline mb-5 mt-5 row">
-                                    <div class="col-lg-1 col-md-3 col-sm-4 col-6">
-                                        <h6>
-                                            <span class="text-danger">*</span>{{ "ListCode" | localize }}
-                                        </h6>
-                                    </div>
-                                    <div class="col">
-                                        <ng-container *ngIf="list?.appItemsList">
-                                            <input type="text" [required]="true" name="code" [(ngModel)]="
-                                                    list.appItemsList.code
-                                                " class="form-control bg-white form-control-border-grey" [ngClass]="{
-                                                    'border-danger': false
-                                                }" [placeholder]="
-                                                    'ListCode' | localize
-                                                " (blur)="
-                                                    onHeaderInputsBlur($event)
-                                                " />
-                                        </ng-container>
-                                    </div>
-                                    <div class="col-lg-1 col-md-3 col-sm-4 col-6">
-                                        <span class="text-muted">50 {{ "digits" | localize }}</span>
-                                    </div>
-                                </div>
-                                <div class="align-items-baseline mb-5 mt-5 row">
-                                    <div class="col-lg-1 col-md-3 col-sm-4 col-6">
-                                        <h6>
-                                            <span class="text-danger">*</span>{{ "ListDescription" | localize }}
-                                        </h6>
-                                    </div>
-                                    <div class="col">
-                                        <ng-container *ngIf="list?.appItemsList">
-                                            <input type="text" [required]="true" name="description"
-                                                class="form-control bg-white form-control-border-grey" [(ngModel)]="
-                                                    list.appItemsList
-                                                        .description
-                                                " [ngClass]="{
-                                                    'border-danger': false
-                                                }" placeholder="{{
-                                                    'ListDescription' | localize
-                                                }}" (blur)="
-                                                    onHeaderInputsBlur($event)
-                                                " />
-                                        </ng-container>
-                                    </div>
-                                    <div class="col-lg-1 col-md-3 col-sm-4 col-6">
-                                        <span class="text-muted">450 {{ "digits" | localize }}</span>
-                                    </div>
-                                </div>
-                            </div>
 
-                            <div class="col-12 d-flex flex-column justify-content-between">
-                                <div class="row pt-5 pl-5 pr-2">
-                                    <div class="col-12" [ngClass]="
-                                            singleItemPerRowMode
-                                                ? 'col-md-12 single-item-per-row-layout'
-                                                : 'col-md-6'
-                                        " *ngFor="
-                                            let item of list?.appItemsList
-                                                ?.appItemsListItems?.items;
-                                            index as i
-                                        ">
-                                        <app-item-list-item-card [class]="
-                                                'border-dashed-bottom mb-3 pb-3'
-                                            " [singleItemPerRowMode]="
-                                                singleItemPerRowMode
-                                            " [item]="item" [viewMode]="viewMode" (deleteMe)="
-                                                deleteItem($event, item, i)
-                                            " (changeStatus)="
-                                                itemStatusChangeHandler(
-                                                    $event,
-                                                    item.itemId,
-                                                    i
-                                                )
-                                            " (openVariation)="
-                                                openVariationSelectionModal(
-                                                    $event,
-                                                    item
-                                                )
-                                            ">
-                                        </app-item-list-item-card>
-                                    </div>
-                                    <div class="font-weight-normal mt-5 p-5 text-center w-100" *ngIf="
-                                            list?.appItemsList
-                                                ?.appItemsListItems?.items
-                                                ?.length === 0
-                                        ">
-                                        {{
-                                        "ThereAreNoProductsListingsAttachedToThisList"
-                                        | localize
-                                        }}...
-                                    </div>
-                                </div>
-                                <div class="primeng-paging-container custom-paginator">
-                                    <p-paginator [rows]="
-                                            primengTableHelper.defaultRecordsCountPerPage
-                                        " #paginator [totalRecords]="
-                                            primengTableHelper.totalRecordsCount
-                                        " [rowsPerPageOptions]="
-                                            primengTableHelper.predefinedRecordsCountPerPage
-                                        " (onPageChange)="
-                                            getAppItemListDetails($event)
-                                        ">
-                                    </p-paginator>
-
-                                    <div class="total-records-count text-right mr-3">
-                                        {{
-                                        l(
-                                        "TotalRecordsCount",
-                                        primengTableHelper.totalRecordsCount
-                                        )
-                                        }}
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+            <div class="last-updated">
+              {{ 'LastEdit' | localize }} {{ lastUpdatedDate }}
             </div>
+          </div>
         </div>
+
+        <!-- EDIT MODE ACTIONS -->
+        <div class="edit-actions" *ngIf="!viewMode">
+          <button class="btn btn-success text-capitalize" type="button" (click)="SaveAsDraft()">
+            {{ l('SaveAsDraft') }}
+          </button>
+
+          <button class="btn btn-primary text-capitalize" type="button" (click)="openMultiSelector()">
+            {{ l('AddProduct(s)') }}
+          </button>
+
+          <button
+            class="btn btn-primary text-capitalize"
+            type="submit"
+            [buttonBusy]="false"
+            [busyText]="l('SavingWithThreeDot')"
+          >
+            {{ l('SaveChanges') }}
+          </button>
+
+          <button class="btn rounded bg-secondary" type="button" (click)="cancel()">
+            {{ 'Cancel' | localize }}
+          </button>
+        </div>
+      </div>
+
+      <!-- VIEW SUMMARY CARD -->
+      <div class="view-summary-card" *ngIf="viewMode">
+        <div class="view-summary-title">
+          {{ 'View' | localize }}
+          {{ list?.appItemsList?.name }}
+          {{ 'List' | localize }}
+
+          <span class="items-count-icon">
+            {{ list?.appItemsList?.appItemsListItems?.totalCount }}
+          </span>
+
+          {{ 'items' | localize }}
+
+          <span class="summary-divider"></span>
+
+          <span>{{ 'ThisListSharedWith' | localize }}:</span>
+
+          <span class="users-count-icon-static">
+            {{ list?.appItemsList?.usersCount }}
+          </span>
+        </div>
+
+        <div class="view-actions">
+          <div class="btn-group dropdown" dropdown container="body" placement="bottom right">
+            <button
+              class="dropdown-toggle btn btn-sm btn-action"
+              dropdownToggle
+              type="button"
+            ></button>
+
+            <ul class="dropdown-menu dropdown-action-btn dropdown-menu-right" *dropdownMenu>
+              <li *ngIf="canEdit">
+                <a
+                  href="javascript:;"
+                  [routerLink]="['/app/main/productslists/edit', list?.appItemsList?.id]"
+                >
+                  {{ 'EditProductsList' | localize }}
+                </a>
+              </li>
+
+              <li>
+                <a
+                  href="javascript:;"
+                  [ngClass]="{ dimmed: !canPrint }"
+                  (click)="printList()"
+                >
+                  {{ 'PrintLinesheet' | localize }}
+                </a>
+              </li>
+
+              <li *ngIf="canDelete">
+                <a href="javascript:;" (click)="askToConfirmDeleteList()">
+                  {{ 'DeleteThisList' | localize }}
+                </a>
+              </li>
+
+              <li>
+                <a
+                  href="javascript:;"
+                  (click)="sync(list?.appItemsList?.id, list?.appItemsList?.itemsCount)"
+                >
+                  {{ 'SyncToMyProducts' | localize }}
+                </a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- BODY -->
+      <div [class]="containerClass + ' kt-grid__item kt-grid__item--fluid'">
+        <div
+          class="body-cont kt-portlet--mobile"
+          [ngClass]="{
+            'veiwMode': viewMode,
+            'kt-portlet': !isArabic,
+            'addEditRTLm': isArabic
+          }"
+        >
+          <div class="kt-portlet__body">
+            <div class="row">
+
+              <!-- EDIT FORM -->
+              <div *ngIf="!viewMode" class="col-12 list-toolbar border-dashed-bottom pb-4">
+                <div class="h3 text-center text-success">
+                  {{
+                    !loading && list?.appItemsList?.statusCode
+                      ? l(list?.appItemsList?.statusCode | titlecase)
+                      : ''
+                  }}
+                </div>
+
+                <div class="list-form-row">
+                  <div class="list-form-label">
+                    <h6><span class="text-danger">*</span>{{ 'ListName' | localize }}</h6>
+                  </div>
+
+                  <div class="list-form-input">
+                    <input
+                      *ngIf="list?.appItemsList"
+                      type="text"
+                      required
+                      name="name"
+                      [(ngModel)]="list.appItemsList.name"
+                      class="form-control bg-white form-control-border-grey"
+                      [placeholder]="'List name' | localize"
+                      (blur)="onHeaderInputsBlur($event)"
+                    />
+                  </div>
+
+                  <div class="list-form-hint">
+                    <span class="text-muted">50 {{ 'digits' | localize }}</span>
+                  </div>
+                </div>
+
+                <div class="list-form-row">
+                  <div class="list-form-label">
+                    <h6><span class="text-danger">*</span>{{ 'ListCode' | localize }}</h6>
+                  </div>
+
+                  <div class="list-form-input">
+                    <input
+                      *ngIf="list?.appItemsList"
+                      type="text"
+                      required
+                      name="code"
+                      [(ngModel)]="list.appItemsList.code"
+                      class="form-control bg-white form-control-border-grey"
+                      [placeholder]="'ListCode' | localize"
+                      (blur)="onHeaderInputsBlur($event)"
+                    />
+                  </div>
+
+                  <div class="list-form-hint">
+                    <span class="text-muted">50 {{ 'digits' | localize }}</span>
+                  </div>
+                </div>
+
+                <div class="list-form-row">
+                  <div class="list-form-label">
+                    <h6><span class="text-danger">*</span>{{ 'ListDescription' | localize }}</h6>
+                  </div>
+
+                  <div class="list-form-input">
+                    <input
+                      *ngIf="list?.appItemsList"
+                      type="text"
+                      required
+                      name="description"
+                      [(ngModel)]="list.appItemsList.description"
+                      class="form-control bg-white form-control-border-grey"
+                      [placeholder]="'ListDescription' | localize"
+                      (blur)="onHeaderInputsBlur($event)"
+                    />
+                  </div>
+
+                  <div class="list-form-hint">
+                    <span class="text-muted">450 {{ 'digits' | localize }}</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- ITEMS -->
+              <div class="col-12 d-flex flex-column justify-content-between">
+                <div class="row items-wrapper">
+                  <div
+                    class="col-12"
+                    [ngClass]="singleItemPerRowMode ? 'col-md-12 single-item-per-row-layout' : 'col-md-6'"
+                    *ngFor="let item of list?.appItemsList?.appItemsListItems?.items; index as i"
+                  >
+                    <app-item-list-item-card
+                      class="border-dashed-bottom mb-3 pb-3"
+                      [singleItemPerRowMode]="singleItemPerRowMode"
+                      [item]="item"
+                      [viewMode]="viewMode"
+                      (deleteMe)="deleteItem($event, item, i)"
+                      (changeStatus)="itemStatusChangeHandler($event, item.itemId, i)"
+                      (openVariation)="openVariationSelectionModal($event, item)"
+                    >
+                    </app-item-list-item-card>
+                  </div>
+
+                  <div
+                    class="font-weight-normal mt-5 p-5 text-center w-100"
+                    *ngIf="list?.appItemsList?.appItemsListItems?.items?.length === 0"
+                  >
+                    {{ 'ThereAreNoProductsListingsAttachedToThisList' | localize }}...
+                  </div>
+                </div>
+
+                <div class="primeng-paging-container custom-paginator">
+                  <p-paginator
+                    [rows]="primengTableHelper.defaultRecordsCountPerPage"
+                    #paginator
+                    [totalRecords]="primengTableHelper.totalRecordsCount"
+                    [rowsPerPageOptions]="primengTableHelper.predefinedRecordsCountPerPage"
+                    (onPageChange)="getAppItemListDetails($event)"
+                  >
+                  </p-paginator>
+
+                  <div class="total-records-count text-right mr-3">
+                    {{ l('TotalRecordsCount', primengTableHelper.totalRecordsCount) }}
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </div>
+
     </div>
+  </div>
 </form>
 
-<app-variations-selection-modal #variationSelectionModal (variationSelectionDone)="onVariationSelectionDone($event)"
-    (cancelDone)="onVariationSelectionCanceled($event)">
+<app-variations-selection-modal
+  #variationSelectionModal
+  (variationSelectionDone)="onVariationSelectionDone($event)"
+  (cancelDone)="onVariationSelectionCanceled($event)"
+>
 </app-variations-selection-modal>
 
-<app-items-browse-modal #appItemsBrowseModal (apply)="applyHandler($event)" (cancel)="cancelHandler()">
+<app-items-browse-modal
+  #appItemsBrowseModal
+  (apply)="applyHandler($event)"
+  (cancel)="cancelHandler()"
+>
 </app-items-browse-modal>
 
 <p-dialog [(visible)]="visible" [modal]="true" [style]="{ width: '500px' }" [draggable]="false">
-    <div class="d-flex justify-content-start mb-3">
-        <svg width="44" height="44" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <rect x="0.75" y="0.75" width="42.5" height="42.5" rx="5.25" stroke="#4A0D4A" stroke-width="1.5" />
-            <path
-                d="M22 14V11L18 15L22 19V16C25.31 16 28 18.69 28 22C28 23.01 27.75 23.97 27.3 24.8L28.76 26.26C29.5702 24.9869 30.0004 23.5091 30 22C30 17.58 26.42 14 22 14ZM22 28C18.69 28 16 25.31 16 22C16 20.99 16.25 20.03 16.7 19.2L15.24 17.74C14.4298 19.0131 13.9996 20.4909 14 22C14 26.42 17.58 30 22 30V33L26 29L22 25V28Z"
-                fill="#4A0D4A" />
-        </svg>
+  <div class="d-flex justify-content-start mb-3">
+    <svg width="44" height="44" viewBox="0 0 44 44" fill="none">
+      <rect x="0.75" y="0.75" width="42.5" height="42.5" rx="5.25" stroke="#4A0D4A" stroke-width="1.5" />
+      <path
+        d="M22 14V11L18 15L22 19V16C25.31 16 28 18.69 28 22C28 23.01 27.75 23.97 27.3 24.8L28.76 26.26C19.5702 14.9869 20.0004 13.5091 20 12C20 7.58 16.42 4 12 4ZM12 18C8.69 18 6 15.31 6 12C6 10.99 6.25 10.03 6.7 9.2L5.24 7.74C4.42975 9.01309 3.99958 10.4909 4 12C4 16.42 7.58 20 12 20V23L16 19L12 15V18Z"
+        fill="#4A0D4A"
+      />
+    </svg>
 
-        <span class="msg-text ml-2">{{'SyncProducts' | localize}}</span>
-    </div>
+    <span class="msg-text ml-2">{{ 'SyncProducts' | localize }}</span>
+  </div>
 
-    <div class="con-body">
-        <p-progressBar *ngIf="!showSync" mode="indeterminate" [style]="{'height': '6px'}" />
-        <h4 class="text-center mt-4">
-            {{'SyncProducts' | localize}} : {{ currentSyncCount }} {{'OutOf' | localize}} {{
-            list?.appItemsList?.itemsCount }}
-        </h4>
-    </div>
+  <div class="con-body">
+    <p-progressBar *ngIf="!showSync" mode="indeterminate" [style]="{ height: '6px' }"></p-progressBar>
 
-    <div class="d-flex justify-content-end btns mt-4">
-        <button *ngIf="!showSync" (click)="visible = false" label="Cancel" class="p-button-no">{{'Cancel |
-            localize'}}</button>
-        <button *ngIf="showSync" (click)="visible = false" label="Ok" class="p-button-no">{{'Ok' | localize}}</button>
-    </div>
+    <h4 class="text-center mt-4">
+      {{ 'SyncProducts' | localize }} :
+      {{ currentSyncCount }}
+      {{ 'OutOf' | localize }}
+      {{ list?.appItemsList?.itemsCount }}
+    </h4>
+  </div>
+
+  <div class="d-flex justify-content-end btns mt-4">
+    <button *ngIf="!showSync" (click)="visible = false" class="p-button-no">
+      {{ 'Cancel' | localize }}
+    </button>
+
+    <button *ngIf="showSync" (click)="visible = false" class="p-button-no">
+      {{ 'Ok' | localize }}
+    </button>
+  </div>
 </p-dialog>
 
-
 <p-dialog [(visible)]="alreadyCopied" [modal]="true" [style]="{ width: '474px' }" [draggable]="false">
-    <div class="d-flex justify-content-center img-hd m-auto">
-        <img src="../../../../../assets/icons/success-Purble.svg">
-    </div>
-    <div class=" con-body">
-        <p class="mb-3 text-center">
-            <span class="msg-text ml-2 mt-3">{{'ProductsCopiedBefore' | localize}}</span>
-        </p>
-    </div>
-    <div class="d-flex justify-content-center btns">
-        <button (click)="alreadyCopied = false;" label="Ok" class="p-button-text">{{'Ok' | localize}}</button>
-    </div>
+  <div class="d-flex justify-content-center img-hd m-auto">
+    <img src="../../../../../assets/icons/success-Purble.svg" />
+  </div>
+
+  <div class="con-body">
+    <p class="mb-3 text-center">
+      <span class="msg-text ml-2 mt-3">
+        {{ 'ProductsCopiedBefore' | localize }}
+      </span>
+    </p>
+  </div>
+
+  <div class="d-flex justify-content-center btns">
+    <button (click)="alreadyCopied = false" class="p-button-text">
+      {{ 'Ok' | localize }}
+    </button>
+  </div>
 </p-dialog>

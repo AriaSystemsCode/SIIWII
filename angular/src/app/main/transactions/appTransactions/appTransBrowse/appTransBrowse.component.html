@@ -313,7 +313,7 @@
 
                     <div  class="row align-items-center pt-5  mt-4 arrows" [ngClass]="showHeader ? 'd-block' : 'd-none' ">
                       
-                        <div class="primeng-datatable-container col-12" [busyIf]="primengTableHelper.isLoading">
+                        <div class="primeng-datatable-container col-12" [busyIf]="primengTableHelper.isLoading"  [ngClass]="isArabic ? 'rtl-autoC' : 'ltr-autoC'">
                             <p-table #dataTable [value]="primengTableHelper.records" [lazy]="true"
                                 (onLazyLoad)="getAppTransactions($event)" [loading]="loading"
                                 rows="{{primengTableHelper.defaultRecordsCountPerPage}}" [paginator]="false"

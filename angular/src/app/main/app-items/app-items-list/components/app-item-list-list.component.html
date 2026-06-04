@@ -2,7 +2,7 @@
     <div [@routerTransition] style="margin-top: -90px;" class="wrapper" >
 
         <div class="kt-content kt-grid__item kt-grid__item--fluid kt-grid kt-grid--hor">
-            <div class="kt-subheader kt-grid__item" >
+            <!-- <div class="kt-subheader kt-grid__item" >
                 <div [class]="containerClass" >
                   <div class="kt-subheader__main">
                     <h3 class="kt-subheader__title " >
@@ -22,9 +22,9 @@
                   </div>
 
                 </div>
-            </div>
-            <div [class]="containerClass + ' kt-grid__item kt-grid__item--fluid'"  [ngClass]="{'mt-lg-5 mt-md-0 mt-5 pt-lg-5 pt-md-0 pt-5':isArabic}">
-                <div class="kt-portlet kt-portlet--mobile">
+            </div> -->
+            <div [class]="containerClass + ' kt-grid__item kt-grid__item--fluid'"  [ngClass]="{'mt-lg-5 mt-md-0 mt-5 pt-lg-5 pt-md-0 pt-5 ':isArabic}">
+                <div class=" kt-portlet--mobile" [ngClass]="isArabic ? 'addRTLm':'kt-portlet'">
                     <div class="kt-portlet__body">
                        <div class="row ">
                             <div class="col-12 list-toolbar  pb-4">
@@ -166,7 +166,7 @@
 
 
 <app-create-or-edit-appitem-list
-    #createOrEditListModal
+    #createOrEditListModal   [isArabic]="isArabic"
     (createOrEditDone)="onCreateOrEditDone($event)"
 >
 </app-create-or-edit-appitem-list>

@@ -2119,6 +2119,8 @@
 		<text name="ManualAccounts">Manual Accounts</text>
 		<text name="ExternalAccounts">External Accounts</text>
 		<text name="BusinessClassifications" >Business Classifications</text>
+
+		
 		<text name="Countries" >Countries</text>
 		<text name="Currencies" >Currencies</text>
 		<text name="ThereIsNoCurrenciesAddedYet" >There is no currencies added yet</text>
@@ -2726,9 +2728,6 @@
 	<text name="GROUP">Group</text>
 
 
-
-
-
  
 	<text name="ContactUs">Contact Us</text>
 	<text name="YourRequestHasBeenSubmitted">Your request has been submitted</text>
@@ -2842,16 +2841,36 @@
 <text name="SellingOnBehalfSeller">Selling on behalf of this Seller - As Sales Rep</text>
 <text name="BuyingFromSellerAsBuyer">Buying from this Seller - As Buyer</text>
 <text name="ConnectedToSellerAsBuyingOffice">Connected to this Seller - As Buying Office</text>
-
-
 <text name="NotShared">Not Shared</text>
 <text name="SyncToMyProducts">Sync To My Products</text>
 <text name="SyncProducts">Sync Products</text>
 <text name="OutOf">OutOf</text>
 <text name="ProductsCopiedBefore">Products copied before</text>
+<text name="WhatAreYouLookingFor">What are you looking for…</text>
+<text name="BuyerContactName">Buyer Contact Name</text>
+  <text name="Transaction">Transaction</text>
+  <text name="Order Approval">Order Approval</text>
+  <text name="OrderPreview">Order Preview</text>
+
+  <text name="OrderAmount">Order Amount</text>
+  <text name="Monthly">Monthly</text>
+  <text name="Yearly">Yearly</text>
+  <text name="Plans">Plans</text>
+  <text name="Custom">Custom</text>
+  <text name="Prices">Prices</text>
+  <text name="ConfirmationMessgae">Confirmation Messgae</text>
+  <text name="SelectPlanMsg">Please press yes button to confirm changing your current subscription plan to</text>
+  <text name="NoteMsgPlan">Note:- you will be on the new plan starting from the next month.</text>
+  <text name="Invoices">Invoices</text>
+  <text name="AccountBilling">Account Billing</text>
+  <text name="ActivityLog">Activity Log</text>
+  <text name="Add-ons">Add-ons</text>
+  <text name="Feature">Feature</text>
+  <text name="Add-onCart">Add-on Cart</text>
+  <text name="PurchaseAdd-Ons">Purchase Add-Ons</text>
 
 
-  
+
 	
   </texts>  
 </localizationDictionary>

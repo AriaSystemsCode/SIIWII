@@ -65,8 +65,8 @@
                     <!-- buyer name -->
                     <div class="col-md-6">
                         <div class="mb-3">
-                            <label for="" class="form-label">Buyer Contact Name</label>
-                            <input type="text" name="" id="" class="form-control" placeholder="Buyer Contact Name"
+                            <label for="" class="form-label">{{'BuyerContactName' | localize}}</label>
+                            <input type="text" name="" id="" class="form-control" [placeholder]="'BuyerContactName' | localize"
                                 formControlName="buyerContactName" *ngIf="isBuyerTempAccount" />
                             <div>
                                 <p-autoComplete #autoComplete [dropdown]="true" *ngIf="!isBuyerTempAccount"
@@ -395,7 +395,7 @@
                                 <div class="col-12 col-md-6 pt-4">
                                     <div class="mb-3 pt-2">
                                         <div class="enter d-flex align-items-center justify-content-start gap-2">
-                                            <span class="mr-2 spEnterd">{{'EnteredBy' | localize}} :</span>
+                                            <span class="mr-2 spEnterd">{{'Enteredby' | localize}} :</span>
                                             <a class="enteredBy" rel="noopener noreferrer">{{
                                                 fullName
                                                 }}</a>
