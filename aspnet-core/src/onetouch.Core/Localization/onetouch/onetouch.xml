@@ -2853,7 +2853,6 @@
   <text name="OrderPreview">Order Preview</text>
 
   <text name="OrderAmount">Order Amount</text>
-  <text name="Monthly">Monthly</text>
   <text name="Yearly">Yearly</text>
   <text name="Plans">Plans</text>
   <text name="Custom">Custom</text>
@@ -2862,7 +2861,7 @@
   <text name="SelectPlanMsg">Please press yes button to confirm changing your current subscription plan to</text>
   <text name="NoteMsgPlan">Note:- you will be on the new plan starting from the next month.</text>
   <text name="Invoices">Invoices</text>
-  <text name="AccountBilling">Account Billing</text>
+
   <text name="ActivityLog">Activity Log</text>
   <text name="Add-ons">Add-ons</text>
   <text name="Feature">Feature</text>

@@ -1245,7 +1245,7 @@
 <text name="TotalCharges">إجمالي الرسوم</text>
     <text name="Reference">الرقم المرجعي</text>
 <text name="TransactionType">نوع المعاملة</text>
-<text name="Transaction">نوع المعاملة</text>
+
 
 
 <text name="OrderSummary">ملخص الطلب</text>
@@ -1401,7 +1401,6 @@
 
 
 <text name="OrderAmount">قيمة الطلب</text>
-<text name="Monthly">شهري</text>
 <text name="Yearly">سنوي</text>
 <text name="Plans">الخطط</text>
 <text name="Custom">مخصص</text>
