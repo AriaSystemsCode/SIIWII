@@ -47,31 +47,12 @@
 
             >
                 <div class="input-group mb-3">
-                    <!-- <div
-                        class="input-group-prepend"
-                        style="
-                            background-color: #ededed;
-                            height: 39px;
-                            width: 77px;
-                            border-radius: 5px;
-                        ">
-                        <div class="btn-group">
-                            <button class="btn btn-secondary btn-sm dropdown-toggle" style="width: 77px" type="button"
-                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                All
-                            </button>
-                            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                <a class="dropdown-item" href="#">Action</a>
-                                <a class="dropdown-item" href="#">Another action</a>
-                                <a class="dropdown-item" href="#">Something else here</a>
-                            </div>
-                        </div>
-                    </div> -->
+            
                     <input
                         type="text"
                         class="form-control"
                         style="background-color: #f3f6f9; height: 39px"
-                        placeholder="What are you looking for…"
+                        [placeholder]="'WhatAreYouLookingFor' | localize"
                         name="globalSearch"                               
                         [(ngModel)]="searchInput"
                         [ngModelOptions]="{ standalone: true }"         
@@ -90,12 +71,7 @@
                 </div>
             </div>
         </form>
-        <!--  <a
-        class="nav-link active d-flex flex-column text-center"
-        [routerLink]="['/app/main/HomeSearch/']"
-        class="navbar-brand pt-0 d-block d-md-none m-0 rightSearch"
-        routerLinkActive="header-link-active"
-    > -->
+
         <a class="nav-link active d-flex flex-column text-center"
             class="navbar-brand pt-0 d-block d-sm-none m-0 rightSearch" routerLinkActive="header-link-active"
             *ngIf="showSearch">

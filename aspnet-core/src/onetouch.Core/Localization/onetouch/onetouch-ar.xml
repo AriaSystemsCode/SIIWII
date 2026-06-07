@@ -1202,7 +1202,7 @@
 <text name="Sellercontactinfo">معلومات اتصال البائع</text>
 <text name="SalesRepInformation">معلومات مندوب المبيعات</text>
 <text name="Shippinginformation">معلومات الشحن</text>
-<text name="BillingInformation">معلومات الفوترة</text>
+<text name="BillingInformation">بيانات الفاتورة</text>
 <text name="OrderDetails">تفاصيل الطلب</text>
 <text name="ShowVariations">عرض المتغيرات</text>
 <text name="DiscardShopping">إلغاء التسوق</text>
@@ -1330,6 +1330,96 @@
 <text name="ConnectedAccount">الحساب المرتبط</text>
 <text name="ConnectedAccounts">الحسابات المرتبطة</text>
 <text name="ManualAccounts">الحسابات اليدوية</text>
+<text name="MarketPlace">المتجر الإلكتروني</text>
+<text name="WhatAreYouLookingFor">ابحث عما تريد...</text>
+
+
+<text name="Owner">المالك</text>
+<text name="Share">مشاركة</text>
+<text name="SharedWithMe">تمت مشاركته معي</text>
+<text name="Location">الموقع</text>
+<text name="CreateNewProductList">إنشاء قائمة منتجات جديدة</text>
+<text name="ManageMyLists">إدارة قوائمي</text>
+<text name="MyProductLists">قوائم منتجاتي</text>
+<text name="ItemAdded">تمت إضافة العنصر</text>
+<text name="SelectVariations">اختر المتغيرات</text>
+<text name="SelectTheVariationsYouWantAddedToYourList">اختر المتغيرات التي تريد إضافتها إلى قائمتك</text>
+<text name="YourListingIsNowAddedToThe{0}List">تمت إضافة هذا الإدراج إلى قائمة {0}</text>
+<text name="AddedSuccessfully">تمت الإضافة بنجاح</text>
+<text name="MyLists">قوائمي</text>
+<text name="AccountCode">رمز الحساب</text>
+<text name="CompanyName">اسم الشركة</text>
+<text name="AccountInformations">معلومات الحساب</text>
+<text name="AccountSignUp">تسجيل الحساب</text>
+<text name="CurrentQueue">قائمة الانتظار الحالية</text>
+<text name="Creator">المنشئ</text>
+<text name="EditedfieldswillnotbesyncwithAutotask">لن تتم مزامنة الحقول المعدلة مع Autotask</text>
+<text name="deleteList">حذف القائمة</text>
+<text name="ThereAreNoProductsListingsAttachedToThisList">لا توجد إدراجات منتجات مرتبطة بهذه القائمة</text>
+<text name="ThereAreNoListsFound">لم يتم العثور على أي قوائم</text>
+<text name="AreYouSureYouWantToDeleteThisList?">هل أنت متأكد من أنك تريد حذف هذه القائمة؟</text>
+<text name="over">من أصل</text>
+<text name="ResultsOf">نتائج</text>
+<text name="ProductsListings">إدراجات المنتجات</text>
+<text name="Contains">تحتوي على</text>
+<text name="AreYouSureYouWantToRemoveThisListingFromTheProductsList?">هل أنت متأكد من أنك تريد إزالة هذا الإدراج من قائمة المنتجات؟</text>
+<text name="PublishList">نشر القائمة</text>
+<text name="UnpublishList">إلغاء نشر القائمة</text>
+<text name="AreYouSureYouWantToCancelPrintingThisProductListCatalogue?">هل أنت متأكد من أنك تريد إلغاء طباعة كتالوج قائمة المنتجات؟</text>
+<text name="PrintProductsList">طباعة قائمة المنتجات</text>
+<text name="CatalogueReport">تقرير الكتالوج</text>
+<text name="ProductsCatalogInfo/Print">معلومات كتالوج المنتجات / طباعة</text>
+<text name="ChooseTemplate">اختر قالبًا</text>
+<text name="PleaseChooseATemplateFirst">يرجى اختيار قالب أولاً</text>
+<text name="PleaseFillTheRequiredProductsCatalogInfo">يرجى استكمال معلومات كتالوج المنتجات المطلوبة</text>
+<text name="ProductCatalogTitle">عنوان كتالوج المنتجات</text>
+<text name="EnterATitle">أدخل عنوانًا</text>
+<text name="SelectAccount">اختر حسابًا</text>
+<text name="ProductsCatalogDetailsShow/Hide">إظهار/إخفاء تفاصيل كتالوج المنتجات</text>
+<text name="PrintAndFinish">طباعة وإنهاء</text>
+<text name="PreparedForAccount">مُعد للحساب</text>
+<text name="EnterAccountName">أدخل اسم الحساب</text>
+<text name="NoListingsInThisProductList.CannotPrint.">لا توجد إدراجات في قائمة المنتجات هذه. لا يمكن الطباعة.</text>
+<text name="DeleteThisList">حذف هذه القائمة</text>
+<text name="EditProductsList">تعديل قائمة المنتجات</text>
+<text name="MyItemsList">قوائم منتجاتي</text>
+<text name="Savedsuccessfully,AreYouWantToPublishThisList?">تم الحفظ بنجاح، هل تريد نشر هذه القائمة؟</text>
+<text name="AllAccounts">جميع الحسابات</text>
+<text name="MyAccounts">حساباتي</text>
+
+<text name="ExternalAccounts">الحسابات الخارجية</text>
+<text name="BusinessClassifications">التصنيفات التجارية</text>
+<text name="Removed">محذوف</text>
+
+<text name="DRAFT">قيد المسودة</text>
+<text name="DateCreated">تاريخ الإنشاء</text>
+<text name="Qty">الكمية</text>
+<text name="BuyerContactName">اسم جهة اتصال المشتري</text>
+<text name="Transaction">الطلب</text>
+<text name="Order Approval">الموافقة على الطلب</text>
+<text name="OrderPreview">عرض الطلب</text>
+
+
+<text name="OrderAmount">قيمة الطلب</text>
+<text name="Monthly">شهري</text>
+<text name="Yearly">سنوي</text>
+<text name="Plans">الخطط</text>
+<text name="Custom">مخصص</text>
+<text name="Prices">الأسعار</text>
+<text name="ConfirmationMessgae">رسالة التأكيد</text>
+<text name="SelectPlanMsg">
+يرجى الضغط على زر نعم لتأكيد تغيير خطة الاشتراك الحالية إلى
+</text>
+<text name="NoteMsgPlan">
+ملاحظة: سيتم تطبيق الخطة الجديدة بدءًا من الشهر القادم.
+</text>
+<text name="Invoices">الفواتير</text>
+<text name="AccountBilling">فوترة الحساب</text>
+<text name="ActivityLog">سجل النشاط</text>
+<text name="Add-ons">الإضافات</text>
+<text name="Feature">الميزة</text>
+<text name="Add-onCart">سلة الإضافات</text>
+<text name="PurchaseAdd-Ons">شراء الإضافات</text>
 
   </texts>
 </localizationDictionary>

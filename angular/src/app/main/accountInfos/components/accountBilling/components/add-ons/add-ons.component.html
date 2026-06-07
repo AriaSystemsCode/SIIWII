@@ -41,7 +41,7 @@
 
 
         <div class="header d-flex justify-content-between">
-          <h6 class="p-0 m-0 add-head">Add-on Cart</h6>
+          <h6 class="p-0 m-0 add-head">{{'Add-onCart' | localize}}</h6>
           <button type="button" class="btn close border rounded-circle m-0 p-0"  (click)="clearCart()">
             <i class="fas fa-times p-0 m-0"></i>
           </button>
@@ -52,8 +52,8 @@
 
         <!-- merge -->
         <div class="totals d-flex justify-content-between">
-          <p class="p-0 m-0 qty">QTY : {{ totalQuantity  }}</p>
-          <p class="p-0 m-0 qty">Amount : {{ totalAmount | number: '1.2-2' }}</p>
+          <p class="p-0 m-0 qty">{{'QTY' | localize}} : {{ totalQuantity  }}</p>
+          <p class="p-0 m-0 qty">{{'Amount' | localize}} : {{ totalAmount | number: '1.2-2' }}</p>
         </div>
 
 
@@ -62,10 +62,10 @@
             <table class="table table-bordered">
               <thead>
                 <tr class="head-th">
-                  <th>Feature</th>
-                  <th>QTY</th>
-                  <th>Price</th>
-                  <th>Amount</th>
+                  <th>{{'Feature' | localize}}</th>
+                  <th>{{'QTY' | localize}}</th>
+                  <th>{{'Price' | localize}}</th>
+                  <th>{{'Amount' | localize}}</th>
                 </tr>
               </thead>
               <tbody>
@@ -82,7 +82,7 @@
                         '1.2-2' }}</p>
                       <a type="button" class="btn removeBtn p-0"
                         (click)="removeRecord(cartItem)">
-                        Remove
+                        {{'Remove' | localize}}
                       </a>
                     </div>
                   </td>
@@ -94,8 +94,8 @@
 
         <div class=" d-flex justify-content-center purchase-btn-wrapper"
           [ngClass]=" cart.length == 0 ? 'noCart' :'hasCart'" style=" background-color: white;">
-          <button class="btn m-0 add-p" (click)="purchaseAddons()" [disabled]="cart.length == 0">Purchase
-            Add-Ons</button>
+          <button class="btn m-0 add-p" (click)="purchaseAddons()" [disabled]="cart.length == 0">
+            {{'PurchaseAdd-Ons' | localize}}</button>
         </div>
 
       </div>
