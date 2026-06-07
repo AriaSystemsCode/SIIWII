@@ -93,7 +93,7 @@ color: #9E9E9E;
 }
 
 
-::ng-deep{
+
 
 
   @media only screen and (min-width: 1024px) {
@@ -108,11 +108,10 @@ color: #9E9E9E;
 
   @media only screen and (max-width: 1024px) {
     .addRTLm {
-        margin-top: 20px !important;
+        margin-top: 130px !important;
         background-color: #FFFFFF;
         border-radius: 12px;
         padding: 20px;
     }
 
-}
 }

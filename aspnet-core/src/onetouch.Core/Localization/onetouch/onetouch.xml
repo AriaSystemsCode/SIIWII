@@ -2869,7 +2869,11 @@
   <text name="PurchaseAdd-Ons">Purchase Add-Ons</text>
 
 
+  <text name="Sync">Sync</text>
+  <text name="ForMoreInquiriesCustomPricing">For More Inquiries and Custom Pricing , Please email</text>
+  <text name="Selected">Selected</text>
 
+  
 	
   </texts>  
 </localizationDictionary>

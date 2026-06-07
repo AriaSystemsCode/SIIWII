@@ -389,7 +389,7 @@
   }
 
   .view-summary-card {
-    flex-direction: column;
+    // flex-direction: column;
     align-items: stretch;
     padding: 18px;
   }
@@ -425,4 +425,37 @@
     text-align: center !important;
     margin: 0 !important;
   }
+}
+
+
+
+.view-actions {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.view-actions-dropdown {
+  position: relative;
+}
+
+.dropdown-action-btn {
+  min-width: 220px;
+  max-width: 260px;
+  right: 0 !important;
+  left: auto !important;
+  white-space: normal;
+  overflow-wrap: break-word;
+}
+
+.dropdown-action-btn li a {
+  display: block;
+  padding: 10px 16px;
+  white-space: normal;
+  word-break: break-word;
+}
+
+.rtl-layout .dropdown-action-btn {
+  right: auto !important;
+  left: 0 !important;
+  text-align: right;
 }

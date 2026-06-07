@@ -2,7 +2,7 @@
     <form #accountInfoForm="ngForm" novalidate autocomplete="off">
         <div class="kt-content  kt-grid__item kt-grid__item--fluid kt-grid kt-grid--hor">
             <div class="kt-subheader kt-grid__item" style="height: 80px!important">
-                <div [class]="containerClass">
+                <div [class]="containerClass" >
                     <div class="kt-subheader__main">
                         <h3 class="kt-subheader__title">
                             <span class="pageTitle">
@@ -38,8 +38,8 @@
                 </div>
             </div>
             <div [class]="containerClass + ' kt-grid__item kt-grid__item--fluid'">
-                <div class="row align-items-start accountinfo-container justify-content-center">
-                    <div class="col-lg-3 col-md-12 col-sm-12 sidebar-grid">
+                <div class="row align-items-start  justify-content-center" [ngClass]="isArabic ? 'addRTLm':'accountinfo-container'">
+                    <div class="col-lg-3 col-md-12 col-sm-12 tabsSection mb-2">
                         <div>
                             <div class="row">
                                 <div class="col-md-12">
