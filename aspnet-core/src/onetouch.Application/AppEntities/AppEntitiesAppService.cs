@@ -871,11 +871,31 @@ namespace onetouch.AppEntities
                 (x.TenantId == AbpSession.TenantId || x.TenantId == null))
                 .WhereIf(!string.IsNullOrWhiteSpace(input.NameFilter), x => false || x.Name.Contains(input.NameFilter));// *Abdo : is added to filter by name "Red" as  example
 
-            var pagedAndFilteredAppEntities = filteredAppEntities
-              .OrderBy(input.Sorting ?? "Name asc")
-              .PageBy(input);
+                //T-SII-20250221.0002 [Begin]
 
-            string imagesUrl = _appConfiguration[$"Attachment:Path"].Replace(_appConfiguration[$"Attachment:Omitt"], "") + @"/";
+                //var pagedAndFilteredAppEntities = filteredAppEntities
+                //  .OrderBy(input.Sorting ?? "Name asc")
+                //  .PageBy(input);
+                var pagedAndFilteredAppEntities = filteredAppEntities;
+
+                if (!string.IsNullOrWhiteSpace(input.NameFilter))
+                {
+                    var filter = input.NameFilter.Trim().ToLower();
+
+                    pagedAndFilteredAppEntities = pagedAndFilteredAppEntities
+                        .OrderByDescending(x => x.Name.ToLower().StartsWith(filter))
+                        .ThenBy(x => x.Name);
+                }
+                else
+                {
+                    pagedAndFilteredAppEntities = pagedAndFilteredAppEntities
+                        .OrderBy(input.Sorting ?? "Name asc");
+                }
+
+                pagedAndFilteredAppEntities = pagedAndFilteredAppEntities.PageBy(input);
+                //T-SII-20250221.0002 [End]
+
+                string imagesUrl = _appConfiguration[$"Attachment:Path"].Replace(_appConfiguration[$"Attachment:Omitt"], "") + @"/";
 
             var appEntities = from o in pagedAndFilteredAppEntities
                               select new LookupLabelDto()
