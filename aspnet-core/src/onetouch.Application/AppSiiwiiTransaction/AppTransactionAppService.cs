@@ -83,6 +83,8 @@ using DocumentFormat.OpenXml.Drawing.Diagrams;
 using Abp.Runtime.Session;
 using DocumentFormat.OpenXml.ExtendedProperties;
 using onetouch.Authorization.Roles;
+using DocumentFormat.OpenXml.InkML;
+using Abp.MultiTenancy;
 
 
 //using NUglify.Helpers;
@@ -147,6 +149,7 @@ namespace onetouch.AppSiiwiiTransaction
         //I40[Start]
         private readonly IRepository<AppContactRelationshipInfo, long> _appContactRelationshipInfoRepository;
         //I40[End]
+
         public AppTransactionAppService(IRepository<AppTransactionHeaders, long> appTransactionsHeaderRepository,
             IRepository<SydObject, long> sydObjectRepository, IRepository<SycEntityObjectType, long> sycEntityObjectType,
             IRepository<SycCounter, long> sycCounter, IRepository<AppContact, long> appContactRepository, IRepository<AppMarketplaceAccountsPriceLevels.AppMarketplaceAccountsPriceLevels, long> appMarketplaceAccountsPriceLevelsRepository,
@@ -172,6 +175,7 @@ namespace onetouch.AppSiiwiiTransaction
              TimeZoneInfoAppService timeZoneInfoAppService, IAppTenantActivitiesLogAppService appTenantActivitiesLogAppService,
              IRepository<AppEntityLog, long> appEntityLogRepository, IRepository<AppMarketplaceContact, long> appMarketplaceContactRepository,
              IRepository<AppContactRelationshipInfo, long> appContactRelationshipInfoRepository
+             
              )
         {
             _sycIdentifierDefinitionsAppService = sycIdentifierDefinitionsAppService;
@@ -231,6 +235,7 @@ namespace onetouch.AppSiiwiiTransaction
             //I40[Start]
             _appContactRelationshipInfoRepository = appContactRelationshipInfoRepository;
             //I40[End]
+            
         }
         //public async Task<long> CreateOrEditSalesOrder(CreateOrEditAppTransactionsDto input)
         //{
@@ -2685,10 +2690,36 @@ namespace onetouch.AppSiiwiiTransaction
                                          .Where(e => !(e.CreatorUserId != AbpSession.UserId && e.EntityObjectStatusId == entityObjectStatusId) && e.EntityObjectStatusId != null && e.TenantId == AbpSession.TenantId)
                                          ;
 
-
-                var pagedAndFilteredAppTransactions = filteredAppTransactions
-                    .OrderBy(input.Sorting ?? "id asc")
+                //MMT2026-06,1 Fix sort by creator Tenant issue[Start]
+                //var pagedAndFilteredAppTransactions = filteredAppTransactions
+                //    .OrderBy(input.Sorting ?? "id asc")
+                //    .PageBy(input);
+                IQueryable<AppTransactionHeaders> pagedAndFilteredAppTransactions = null;
+                if (!string.IsNullOrEmpty(input.Sorting) && input.Sorting.ToLower().Contains("CreatorTenantName".ToLower()))
+                {
+                    //var dbContext = UnitOfWorkManager.Current.GetDbContext<onetouchDbContext>();
+                    if (input.Sorting.ToLower().Contains(" desc".ToLower()))
+                    {
+                        pagedAndFilteredAppTransactions = filteredAppTransactions
+                            .OrderByDescending(u => u.TenantOwnerFk.TenancyName
+                            )
                     .PageBy(input);
+                    }
+                    else
+                    {
+                        pagedAndFilteredAppTransactions = filteredAppTransactions
+                           .OrderBy(u => u.TenantOwnerFk.TenancyName
+                                   )
+                           .PageBy(input);
+                    }
+                }
+                else
+                {
+                    pagedAndFilteredAppTransactions = filteredAppTransactions
+                          .OrderBy(input.Sorting ?? "id asc")
+                          .PageBy(input);
+                }
+                //MMT2026-06,1 Fix sort by creator Tenant issue[End]
 
                 //var appTransactions = from o in pagedAndFilteredAppTransactions
                 //                      select new GetAllAppTransactionsForViewDto()
@@ -5580,13 +5611,20 @@ namespace onetouch.AppSiiwiiTransaction
                         string toUserList = "";
                         List<string> tenantsRoles = new List<string>();
                         List<long> userToShare = new List<long>();
-
+                        string transactionType = "";
+                        var trans = await _appTransactionsHeaderRepository.GetAll()
+                            .Where(z => z.Id == input.TransactionId).FirstOrDefaultAsync();
+                        if (trans != null)
+                        {
+                            transactionType = trans.EntityObjectTypeCode;
+                        }
                         foreach (var shar in input.TransactionSharing)
                         {
                             if (shar.SharedUserId == null || shar.SharedUserId == 0)
                                 continue;
 
-                            TransactionType? tranType = null;
+                            TransactionType? tranType = transactionType == "SALESORDER"? TransactionType.SalesOrder : TransactionType.PurchaseOrder;
+                               
                             try
                             {
                                 var user = UserManager.GetUserById(long.Parse(shar.SharedUserId.ToString()));
