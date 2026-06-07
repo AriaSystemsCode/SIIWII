@@ -10047,6 +10047,7 @@ namespace onetouch.AppItems
                                 EntityCode = appChildItem.Code
 
                             };
+                            //var colorsList
                             //entityExtraData.Add(new AppEntityExtraData
                             //{
                             //    AttributeCode = item.ExtraAttributesValues[etx].Code,
@@ -10231,6 +10232,11 @@ namespace onetouch.AppItems
                                 .Where(z => z.Code == colorExtraAtt.AttributeCode && z.EntityObjectTypeCode == "COLOR" && (z.TenantId == AbpSession.TenantId || z.TenantId == null)).FirstOrDefaultAsync();
                             if (colorExtra != null)
                             {
+                                //P-SII-20250522.0001 [Begin]
+                                // update the color name if mathes the colors lookup
+                                colorExtraAtt.AttributeValue = colorExtra.Name;
+                                //P-SII-20250522.0001 [End]
+
                                 if (colorExtra.EntityAttachments != null && colorExtra.EntityAttachments.Count > 0 && !string.IsNullOrEmpty(colorExtra.EntityAttachments[0].AttachmentFk.Attachment))
                                 {
                                     var colorImage = childEntity.EntityExtraData.Where(z => z.AttributeId == 202).FirstOrDefault();
