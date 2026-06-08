@@ -11,7 +11,7 @@
                                 <div class="col-12 col-md-3 col-sm-6 list-toolbar-filter mb-0 mb-4 mb-md-0">
                                     <div class="btn-group dropdown list-toolbar-dropdown" dropdown
                                         *ngIf="showMainFiltersOptions">
-                                        <button class="dropdown-toggle btn btn-sm font-weight-normal p-0"
+                                        <button class="dropdown-toggle btn btn-sm font-weight-normal p-0 d-flex"
                                             dropdownToggle>
                                             <h4 class="list-toolbar-dropdown-filter-selectedItem fs-4 fw-bold">
                                                 {{
@@ -343,7 +343,7 @@
 
                                         </th>
                                         <th pSortableColumn="code" class="purpleColor w-150">
-                                            {{l('Transaction #')}}
+                                            {{l('Transaction')}}#
                                             <p-sortIcon class="purpleSortableIcon" field="code"></p-sortIcon>
                                
                                         </th>
@@ -410,11 +410,11 @@
                                         <td class="w-160">
                                             <span class="p-column-title"> {{l('TransactionType')}}</span>
                                             <span *ngIf="record.entityObjectTypeCode">
-                                                {{record?.entityObjectTypeCode == 'SALESORDER' ? 'SalesOrder' : 'PurchaseOrder' | localize}}
+                                           {{ (record?.entityObjectTypeCode === 'SALESORDER' ? 'SalesOrder' : 'purchaseOrder') | localize }}
                                             </span>
                                         </td>
                                         <td class="w-150">
-                                            <span class="p-column-title"> {{l('Transaction #')}}</span>
+                                            <span class="p-column-title"> {{l('Transaction')}}#</span> 
                                             <span *ngIf="record.code">
                                                 {{record.code}}
                                             </span>
@@ -422,7 +422,8 @@
                                         <td class="w-150">
                                             <span class="p-column-title"> {{l('Status')}}</span>
                                             <span *ngIf="record.entityObjectStatusCode">
-                                                {{record.entityObjectStatusCode}}
+                                                
+                                                {{record.entityObjectStatusCode | localize}}
                                             </span>
                                         </td>
                                         <td class="w-150">

@@ -38,5 +38,5 @@
     <app-activity-log></app-activity-log>
   </div>
   <div class="tab4" *ngIf="currentTab == billingOptionsTabs.InvoicesOption">
-    <app-tenant-invoices></app-tenant-invoices>
+    <app-tenant-invoices [fromBilling]="true"></app-tenant-invoices>
   </div>

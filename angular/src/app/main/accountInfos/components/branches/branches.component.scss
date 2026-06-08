@@ -15,3 +15,44 @@ border-radius: 10px;
         min-height: auto !important;
     }
 }
+.left-modal {
+  .modal-dialog {
+    margin-left: 0;
+    margin-right: auto;
+    height: 100%;
+  }
+}
+
+.right-modal {
+  .modal-dialog {
+    margin-right: 0;
+    margin-left: auto;
+    height: 100%;
+  }
+}
+
+.slide-right-in {
+  animation: slideRightIn .3s ease;
+}
+
+.slide-left-in {
+  animation: slideLeftIn .3s ease;
+}
+
+@keyframes slideRightIn {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideLeftIn {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}

@@ -33,6 +33,8 @@ export class CreateOrEditAddressModalComponent extends AppComponentBase {
     branchId: number
     entityObjectType: string = "ADDRESS";
     addressCode: string = "";
+            currentLang:string
+    isArabic:boolean = true
     constructor(
         injector: Injector,
         private _accountsServiceProxy: AccountsServiceProxy,
@@ -40,6 +42,10 @@ export class CreateOrEditAddressModalComponent extends AppComponentBase {
     ) {
         super(injector);
 
+    }
+        ngOnInit(){
+                this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
+        this.currentLang == 'ar' || this.currentLang == 'ar-EG'  ? this.isArabic = true : this.isArabic = false
     }
     show(addressId?: number, branch?: any, accountId?: number): void {
         this.branchId = branch?.node?.data?.branch?.id

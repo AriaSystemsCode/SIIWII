@@ -1,15 +1,26 @@
-﻿<div bsModal #createOrEditModal="bs-modal" class="modal right fade" tabindex="-1" role="dialog"
-  aria-labelledby="createOrEditModal" aria-hidden="true" [config]="{backdrop: 'static'}">
-  <div class="modal-dialog modal-lg">
+﻿<div
+  bsModal
+  #createOrEditModal="bs-modal"
+  class="modal fade"
+  tabindex="-1"
+  role="dialog"
+  aria-hidden="true"
+  [config]="{ backdrop: 'static' }"
+>
+  <div
+    class="modal-dialog modal-lg side-modal"
+    [ngClass]="isArabic ? 'left-modal' : 'right-modal'"
+    role="document"
+  >
     <div class="modal-content">
       <form *ngIf="active" #branchForm="ngForm" novalidate (ngSubmit)="save()" autocomplete="off">
-        <div class="modal-header" style="display: block;">
+        <div class="modal-header mx-2" style="display: block;">
           <h4 class="modal-title">
             <span *ngIf="branch.id">{{l("EditBranch")}}</span>
             <span *ngIf="!branch.id">{{l("AddnewBranchDetails")}}</span>
           </h4>
           <p>{{l("PleaseFillTheNewBranchDetailsBelow")}}</p>
-          <button style="position: absolute;right: 0;top: 8px;" type="button" class="close" (click)="close()"
+          <button style="position: absolute;top: 8px; width: 70px;" [ngStyle]="isArabic ? {'left':'0'} : {'right':'0'}" type="button" class="close" (click)="close()"
             aria-label="Close" [disabled]="saving">
             <span aria-hidden="true">&times;</span>
           </button>
@@ -109,7 +120,7 @@
                           class="text-danger"
                           *ngIf="phone1Number.invalid && phone1Number.errors?.pattern && (phone1Number.dirty || phone1Number.touched)"
                         >
-                          {{ 'Invalid Phone Number' | localize }}
+                          {{ 'InvalidPhoneNumber' | localize }}
                         </small>
                                             </div>
                     <input type="text" id="branch_Phone1Ex"
@@ -158,7 +169,7 @@
                         class="text-danger"
                         *ngIf="phone2Number.invalid && phone2Number.errors?.pattern && (phone2Number.dirty || phone2Number.touched)"
                       >
-                        {{ 'Invalid Phone Number' | localize }}
+                        {{ 'InvalidPhoneNumber' | localize }}
                       </small>
                     </div>
                     <input type="text" id="branch_Phone2Ex"
@@ -205,7 +216,7 @@
                         class="text-danger"
                         *ngIf="phone3Number.invalid && phone3Number.errors?.pattern && (phone3Number.dirty || phone3Number.touched)"
                       >
-                        {{ 'Invalid Phone Number' | localize }}
+                        {{ 'InvalidPhoneNumber' | localize }}
                       </small>
                     </div>
                     <input type="text" id="branch_Phone3Ex"

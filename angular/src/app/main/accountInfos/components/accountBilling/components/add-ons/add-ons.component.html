@@ -26,7 +26,7 @@
                 <p class="unitss">${{ record?.appSubscriptionPlanDetail?.unitPrice }}/ <span class="measure">{{
                     record?.appSubscriptionPlanDetail?.unitOfMeasurementName }}</span></p>
                 <button class="btn btn-add" (click)="addToCart(record)" [disabled]="isRecordInCart(record)">
-                  {{ isRecordInCart(record) ? 'Added' : 'Add' }}
+                  {{ isRecordInCart(record) ? 'Added' : 'Add' | localize }}
                 </button>
               </div>
             </td>

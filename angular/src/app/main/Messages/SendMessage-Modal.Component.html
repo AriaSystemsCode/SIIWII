@@ -8,7 +8,10 @@
     aria-hidden="true"
     *ngIf="modalView"
 >
-    <div class="d-none d-md-block  modal-dialog modal-lg MessageDialog thin-scroll"> 
+<div
+  class="d-none d-md-block modal-dialog modal-lg MessageDialog thin-scroll"  
+  [ngClass]="{ 'MessageDialog-ar': isArabic }"
+>
         <div class="modal-content">
             <form *ngIf="active" #MessageForm="ngForm" novalidate>
                 <div class="modal-header Header">

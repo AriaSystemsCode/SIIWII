@@ -55,7 +55,8 @@ export class CreateOrEditBranchModalComponent extends AppComponentBase {
     branchCode: string = "";
 
     phonePattern = '^[0-9+()\\-\\s]*$'; 
-
+    currentLang:string
+    isArabic:boolean = true
     constructor(
         injector: Injector,
         private _AccountsServiceProxy: AccountsServiceProxy,
@@ -70,6 +71,11 @@ export class CreateOrEditBranchModalComponent extends AppComponentBase {
         if (this.inputObj1) {
             this.inputObj1.setNumber('+91987654321');
         }
+    }
+
+    ngOnInit(){
+                this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
+        this.currentLang == 'ar' || this.currentLang == 'ar-EG'  ? this.isArabic = true : this.isArabic = false
     }
 
     addressSelected(address) {

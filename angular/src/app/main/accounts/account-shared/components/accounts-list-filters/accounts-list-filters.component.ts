@@ -306,17 +306,21 @@ getAccountTypesList(): void {
 
         if (['BUSINESS', 'GROUP'].includes(code) && !uniqueCodes.has(code)) {
           uniqueCodes.add(code);
-          filteredItems.push(item);
+        //   filteredItems.push(item);
+            filteredItems.push({
+      ...item,
+      label: this.l(code) // BUSINESS, GROUP
+    });
         }
 
         if (code === 'PERSONAL' && !uniqueCodes.has('PERSONAL')) {
           uniqueCodes.add('PERSONAL');
-          filteredItems.push({ ...item, label: 'Personal' });
+          filteredItems.push({ ...item, label: this.l('PERSONAL') });
         }
 
         if (item.label?.toUpperCase() === 'PEOPLE' && !uniqueCodes.has('PERSONAL')) {
           uniqueCodes.add('PERSONAL');
-          filteredItems.push({ ...item, label: 'Personal', code: 'PERSONAL' });
+          filteredItems.push({ ...item, label: this.l('PERSONAL'), code: 'PERSONAL' });
         }
       });
 

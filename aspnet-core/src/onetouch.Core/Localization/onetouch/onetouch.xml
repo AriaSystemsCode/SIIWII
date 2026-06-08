@@ -1711,7 +1711,7 @@
 		<text name="EntityId">Entity Id</text>
 		<text name="SelfUserDelegationErrorMessage">You can't delegate authorization to yourself !</text>
 		<text name="Compose"></text>
-		<text name="Sent items">Sent Items"</text>
+		<text name="Sent items">Sent Items</text>
 		<text name="Favourite">Favourite</text>
 		<text name="Archive">Archive</text>
 		<text name="Trash">Trash</text>
@@ -2568,7 +2568,9 @@
 	    <text name="DateCreated">Date Created</text>
 	    <text name="MyTransactions">My Transactions</text>
 	    <text name="SalesOrder">Sales Order</text>
-	    <text name="purchaseOrder">purchase Order</text>
+	    <text name="Sales Order">Sales Order</text>
+	    <text name="purchaseOrder">Purchase Order</text>
+	    <text name="Purchase Order">Purchase Order</text>
 	
 
 		<text name="DetailsPage">Details Page</text>
@@ -2874,6 +2876,27 @@
   <text name="Selected">Selected</text>
 
   
+  <text name="Added">Added</text>
+  <text name="OPEN">Open</text>
+  <text name="My Connections">My Connections</text>
+  <text name="My Transaction">My Transaction</text>
+  <text name="BeforeSavingManualAccountMsg">Before saving, please select the relationship you would like to build with this manual account</text>
+  <text name="SaveManualAccount">Save Manual Account</text>
+  <text name="SentItems">Sent Items</text>
+  <text name="Favorite">Favorite</text>
+  <text name="DirectMessage">Direct Message</text>
+  <text name="RelatedData">RelatedData</text>
+  <text name="SearchMessages">Search messages</text>
+<text name="DirectMessageIn">Direct Message in</text>
+<text name="ThreadIn">Thread in</text>
+<text name="MentionIn">Mention in</text>
+<text name="SeeLess">See Less</text>
+
+
+<text name="Show details">Show details</text>
+<text name="Hide details">Hide details</text>
+
+
 	
   </texts>  
 </localizationDictionary>

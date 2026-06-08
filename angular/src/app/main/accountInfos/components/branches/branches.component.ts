@@ -42,6 +42,8 @@ export class BranchesComponent extends AppComponentBase {
     distributionCenterAddressDef: LookupLabelDto
     mailingAddressDef: LookupLabelDto
 
+     currentLang:string
+    isArabic:boolean = true
     constructor(
         injector: Injector,
         private _BsModalService: BsModalService,
@@ -52,6 +54,10 @@ export class BranchesComponent extends AppComponentBase {
         this.getAllBranchesTypes();
     }
 
+    ngOnInit(){
+              this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
+        this.currentLang == 'ar' || this.currentLang == 'ar-EG'  ? this.isArabic = true : this.isArabic = false
+    }
     editBranch(rowNode: { level: number, node: TreeNodeOfBranchForViewDto, parent: TreeNodeOfBranchForViewDto, visible: boolean }) {
         this.currBranchNode = rowNode
         this.selectedBranchId = rowNode.node.data.branch.id
@@ -203,7 +209,10 @@ export class BranchesComponent extends AppComponentBase {
 
     openBranchDetailsModal(branchId: number, branchName: string) {
         let config: ModalOptions = new ModalOptions()
-        config.class = 'right-modal slide-right-in'
+        // config.class = 'right-modal slide-right-in'
+        config.class = this.isArabic
+  ? 'left-modal slide-left-in'
+  : 'right-modal slide-right-in';
         let modalDefaultData: Partial<BranchDetailsDynamicModalComponent> = {
             branchId,
             branchName,
