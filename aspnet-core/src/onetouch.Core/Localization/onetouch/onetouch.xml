@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" ?>
+﻿<?xml version="1.0" encoding="utf-8" ?>
 <localizationDictionary culture="en">
 	<texts>
 	<text name="Signature">Signature</text>
@@ -2892,14 +2892,13 @@
 <text name="MentionIn">Mention in</text>
 <text name="SeeLess">See Less</text>
 
-<text name="ProductName">Product Name</text>
-<text name="ProductCode">Product Code</text>
+
 <text name="PriceLowToHigh">Price Low To High</text>
 <text name="PriceHighToLow">Price High To Low</text>
 
 <text name="PublicAndSharedWithMe">Public And Shared With Me</text>
-<text name="Public">Public</text>
-<text name="SharedWithMe">Shared With Me</text>
+
+
 
 
 <text name="Show details">Show details</text>
@@ -2911,7 +2910,7 @@
 <text name="select color">select color</text>
 <text name="select size">select size</text>
 <text name="NoAddressesFound">No Addresses Found</text>
-<text name="SortBy">Sort By</text>
+
 <text name="ShowFilters">Show Filters</text>
 <text name="HideFilters">Hide Filters</text>
 <text name="ProductList">Product List</text>
