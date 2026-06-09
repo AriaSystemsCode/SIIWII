@@ -120,7 +120,7 @@
 
         </div>
         <!-- contact name -->
-        <div class="col-md-6 my-3 pr-0">
+        <div class="col-md-6  pr-0" [ngClass]="activeTab==transactionCartoccordionTabs.BuyerContactInfo ? 'my-3':''">
             <div class="formGroup">
                 <div class="d-flex justify-content-between">
 
@@ -201,7 +201,7 @@
         </div>
         <!-- phone -->
         <!-- Email -->
-        <div class="col-md-6 my-2 pr-0 pl-md-3" *ngIf=" activeTab==transactionCartoccordionTabs.BuyerContactInfo">
+        <div class="col-md-6 pr-0 pl-md-3" *ngIf=" activeTab==transactionCartoccordionTabs.BuyerContactInfo">
             <div>
                 <label class="label">{{'Email'| localize}}</label>
                 <input type="text" [placeholder]="('Email' | localize) + '...'" class="form-control w-100" (change)="onChangeEmail($event)"
@@ -217,7 +217,7 @@
         </div>
 
         <!-- Email -->
-        <div class="col-md-6 my-2 pr-0 pl-md-4" *ngIf=" activeTab!=transactionCartoccordionTabs.BuyerContactInfo">
+        <div class="col-md-6 pr-0 pl-md-4" *ngIf=" activeTab!=transactionCartoccordionTabs.BuyerContactInfo">
             <div>
                 <label class="label">{{'Email' | localize}}</label>
                 <input type="text" [placeholder]="('Email' | localize) + '...'" class="form-control w-100" (change)="onChangeEmail($event)"
@@ -253,7 +253,7 @@
             </div>
 
         </div>
-        <div class="col-md-6 col-12 my-2 pr-0">
+        <div class="col-md-6 col-12 pr-0">
             <div>
                 <label class="label">{{'Branch' | localize}}</label>
 

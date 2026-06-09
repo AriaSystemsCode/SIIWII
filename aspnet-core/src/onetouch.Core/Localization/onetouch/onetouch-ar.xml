@@ -1466,5 +1466,52 @@
 <text name="MentionIn">إشارة في</text>
 <text name="SeeLess">عرض أقل</text>
 
+
+<text name="SycCurrencyExchangeRates">سعر صرف العملة</text>
+<text name="onetouch.SycCurrencyExchangeRates.SycCurrencyExchangeRates">أسعار صرف العملات</text>
+<text name="CurrencyCode">رمز العملة</text>
+<text name="BaseCurrencyCode">رمز العملة الأساسية</text>
+<text name="ExchangeRate">سعر الصرف</text>
+<text name="CurrencyMethod">طريقة العملة</text>
+<text name="CurrencyUnit">وحدة العملة</text>
+<text name="SycCurrencyExchangeRatesHeaderInfo">معلومات أسعار صرف العملات</text>
+<text name="CreateNewSycCurrencyExchangeRates">إنشاء سعر صرف عملة جديد</text>
+<text name="EditSycCurrencyExchangeRates">تعديل سعر صرف العملة</text>
+<text name="DeleteSycCurrencyExchangeRates">حذف سعر صرف العملة</text>
+<text name="StartShipDate">تاريخ بدء الشحن</text>
+
+<text name="ProductName">اسم المنتج</text>
+<text name="ProductCode">كود المنتج</text>
+<text name="PriceLowToHigh">السعر من الأقل إلى الأعلى</text>
+<text name="PriceHighToLow">السعر من الأعلى إلى الأقل</text>
+
+<text name="PublicAndSharedWithMe">عام ومشارك معي</text>
+<text name="Public">عام</text>
+<text name="SharedWithMe">مشارك معي</text>
+
+
+    <text name="Show details">عرض التفاصيل</text>
+<text name="Hide details">إخفاء التفاصيل</text>
+<text name="Created">تم الإنشاء</text>
+<text name="TypeYourNotesHere">اكتب ملاحظاتك هنا</text>
+<text name="Any">الكل</text>
+<text name="Color">اللون</text>
+<text name="select color">اختر اللون</text>
+<text name="select size">اختر المقاس</text>
+<text name="NoAddressesFound">لم يتم العثور على عناوين</text>
+<text name="SortBy">ترتيب حسب</text>
+<text name="ShowFilters">إظهار الفلاتر</text>
+<text name="HideFilters">إخفاء الفلاتر</text>
+<text name="ProductList">قائمة المنتجات</text>
+<text name="Brands">العلامات التجارية</text>
+<text name="AddyourQuestion">أضف سؤالك</text>
+<text name="AddYourReview">أضف تقييمك</text>
+<text name="Threads">المحادثات</text>
+<text name="Mentions">الإشارات</text>
+<text name="AddToFavourite">إضافة إلى المفضلة</text>
+<text name="RemoveFromFavourite">إزالة من المفضلة</text>
+<text name="HideData">إخفاء البيانات</text>
+<text name="AvailableQty">الكمية المتاحة</text>
+
   </texts>
 </localizationDictionary>

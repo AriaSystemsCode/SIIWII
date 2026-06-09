@@ -1,16 +1,12 @@
 
 <div
     [@routerTransition]
-  
- 
     class="wrapper kt-container web pl-lg-3 p-md-2 pl-0 pr-lg-2 pr-md-4 pr-0 mt-lg-1 mt-md-5 mt-0"
     [ngClass]="{
       'addPadding'  : fromMarketAcoount && !isArabic , 'addPt': isArabic , 'addARPadding'  : fromMarketAcoount && isArabic 
     }"
 >
-    <div
-
-    >
+    <div>
         <div class="marketplace-products" [ngClass]="fromMarketAcoount && !isArabic ? 'marketplace-mg':''">
             <div   class="row" >
                 <div class="col-md-12 mb-4 app-seller" *ngIf="isSellerIdExists && isFromSellerRoom ">
@@ -39,7 +35,7 @@
                                 <input
                                     id="_searchInput"
                                     type="text"
-                                    placeholder="Search"
+                                    [placeholder]="'Search' | localize"
                                     pInputText
                                     class="w-100 search-in"
                                     [(ngModel)]="searchInput"
@@ -56,7 +52,7 @@
                         <p-dropdown
                         [options]="sortingData"
                         [(ngModel)]="selectedSort"
-                        placeholder="Sort by"
+                        [placeholder]="'SortBy' | localize"
                         optionLabel="label"
                         class="sortBy"
                         (onChange)="handleSortingChange($event)"
@@ -64,11 +60,7 @@
                  
                     <p-button
                     icon="pi pi-sliders-h"
-                    [label]="
-                        isFilterHidden
-                            ? 'Show Filters '
-                            : 'Hide Filters'
-                    "
+                  [label]="(isFilterHidden ? ('ShowFilters' | localize) : ('HideFilters' | localize))"
                     (click)="toggleFilters()"
                     class="filterBtn d-lg-block d-none"
                     styleClass="p-button-outlined p-button-secondary"

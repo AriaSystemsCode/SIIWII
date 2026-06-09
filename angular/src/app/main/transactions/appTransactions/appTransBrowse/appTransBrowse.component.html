@@ -186,7 +186,7 @@
                                         <div class="form-group">
                                             <label for="statusFilter">{{l("Status")}}</label>
                                             <p-dropdown [options]="filterStatus"
-                                                (onChange)=" getAppTransactions()" placeholder="Any" [showClear]="true"
+                                                (onChange)=" getAppTransactions()" [placeholder]="'Any' | localize" [showClear]="true"
                                                 appendTo="body" formControlName="statusFilter">
                                             </p-dropdown>
                                         </div>

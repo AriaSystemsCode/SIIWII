@@ -3,11 +3,11 @@ import {
     Injector,
     OnDestroy,
     ViewChild,
-    SimpleChanges, OnChanges, ViewChildren, 
+    SimpleChanges, OnChanges, ViewChildren,
     Input,
     QueryList
 } from "@angular/core";
-import {  ActivatedRoute, Router } from "@angular/router";
+import { ActivatedRoute, Router } from "@angular/router";
 import { AppItemsComponent } from "@app/main/app-items/app-items-browse/components/appItems.component";
 import {
     AppEntitiesServiceProxy,
@@ -38,7 +38,7 @@ export class MarketplaceProductsComponent
     @ViewChildren(ProdcutCardComponent) ProdcutCardComponent: ProdcutCardComponent;
     @ViewChild("p", { static: false }) paginator!: Paginator;
     @ViewChild("filters", { static: false }) filters!: any;
-    @ViewChildren(ProdcutCardComponent) productCards!: QueryList<ProdcutCardComponent>; 
+    @ViewChildren(ProdcutCardComponent) productCards!: QueryList<ProdcutCardComponent>;
 
     @Input() fromMarketAcoount: boolean;
     @Input() accountDataForView: any
@@ -64,7 +64,7 @@ export class MarketplaceProductsComponent
     filterType: string;
     tentantID: number;
     isMobile: boolean = false;
-    
+
     sellerSSIN: string;
     buyerSSIN: string;
     contactSSIN: string;
@@ -80,9 +80,9 @@ export class MarketplaceProductsComponent
     appItemListId: any;
     selectedDepartments: any;
 
-    isAuthenticate= this.appSession?.user
-    selectedCategories: number[] = []; 
-    sellerSSinSetting:string
+    isAuthenticate = this.appSession?.user
+    selectedCategories: number[] = [];
+    sellerSSinSetting: string
 
 
     constructor(
@@ -93,7 +93,7 @@ export class MarketplaceProductsComponent
         private _pricingHelperService: PricingHelpersService,
         public datepipe: DatePipe,
         public breakpointObserver: BreakpointObserver,
-        private route: ActivatedRoute,   
+        private route: ActivatedRoute,
 
     ) {
         super(injector);
@@ -122,33 +122,42 @@ export class MarketplaceProductsComponent
                 });
         }
         this.sortingData = [
-            { label: "Product Name", value: "name" },
-            { label: "Product code", value: "manufacturercode" },
-            { label: "Price low to high", value: "price" },
-            { label: "Price high to low", value: "price desc" },
+            { label: this.l('ProductName'), value: 'name' },
+            { label: this.l('ProductCode'), value: 'manufacturercode' },
+            { label: this.l('PriceLowToHigh'), value: 'price' },
+            { label: this.l('PriceHighToLow'), value: 'price desc' },
         ];
-        this.selectedSort = { label: "Product Name", value: "name" };
+
+        this.selectedSort = {
+            label: this.l('ProductName'),
+            value: 'name'
+        };
+
         this.sharingOptions = [
-            { label: "Public And Shared With Me", value: 2 },
-            { label: "Public", value: 0 },
-            { label: "Shared With Me", value: 1 },
+            { label: this.l('PublicAndSharedWithMe'), value: 2 },
+            { label: this.l('Public'), value: 0 },
+            { label: this.l('SharedWithMe'), value: 1 },
         ];
-        (this.seletedOption = { label: "Public And Shared With Me", value: 2 }),
+
+        this.seletedOption = {
+            label: this.l('PublicAndSharedWithMe'),
+            value: 2
+        };
         this.setCurrency();
         this.tentantID = this.appSession?.tenant?.id;
 
 
 
         this.checkMediaQuery();
-        if(this.isAuthenticate){
+        if (this.isAuthenticate) {
             this.getAllCurrencies();
             this.getAspectatio();
         }
-        
+
     }
     ngOnInit() {
-      this.getSettingDataMsrp()
-      this.getSettingData()
+        this.getSettingDataMsrp()
+        this.getSettingData()
         const state = (this._router.getCurrentNavigation()?.extras?.state ?? history.state) as any;
 
         if (state?.accountDataForView) {
@@ -160,75 +169,75 @@ export class MarketplaceProductsComponent
         }
         const savedFilters = localStorage.getItem("productFilters");
         if (savedFilters) {
-          const parsedFilters = JSON.parse(savedFilters);
-          this.onlyAvialbleStock = parsedFilters.onlyAvailableStock ?? undefined;
-          this.selectedCurrrency = parsedFilters.selectedCurrency ?? this.selectedCurrrency;
-          this.selectedSort = this.sortingData.find(s => s.value === parsedFilters.selectedSort) ?? this.selectedSort;
-      
-          this.appItemListId = parsedFilters.appItemListId || this.appItemListId;
-          this.searchInput = parsedFilters.searchText || this.searchInput;
-          this.selectedDepartments = parsedFilters.selectedDepartments || this.selectedDepartments;
-          this.selectedCategories = parsedFilters.selectedCategory || this.selectedCategories;
-          this.minimumPrice = parsedFilters.minimumPrice || this.minimumPrice;
-          this.maximumPrice = parsedFilters.maximumPrice || this.maximumPrice;
-          this.startSoldOutData = parsedFilters.startSoldOutData || this.startSoldOutData;
-          this.endSoldOutData = parsedFilters.endSoldOutData || this.endSoldOutData;
-          this.startShipData = parsedFilters.startShipData ? new Date(parsedFilters.startShipData) : this.startShipData;
-          this.endShipData = parsedFilters.endShipData ? new Date(parsedFilters.endShipData) : this.endShipData;
-          this.brands = parsedFilters.brands || this.brands;
-          this.seletedOption = this.sharingOptions.find(option => option.value === parsedFilters.selectedOption) || this.seletedOption;
-          this.skipCount = parsedFilters.skipCount || this.skipCount;
-          this.maxResultCount = parsedFilters.maxResultCount || this.maxResultCount;
+            const parsedFilters = JSON.parse(savedFilters);
+            this.onlyAvialbleStock = parsedFilters.onlyAvailableStock ?? undefined;
+            this.selectedCurrrency = parsedFilters.selectedCurrency ?? this.selectedCurrrency;
+            this.selectedSort = this.sortingData.find(s => s.value === parsedFilters.selectedSort) ?? this.selectedSort;
+
+            this.appItemListId = parsedFilters.appItemListId || this.appItemListId;
+            this.searchInput = parsedFilters.searchText || this.searchInput;
+            this.selectedDepartments = parsedFilters.selectedDepartments || this.selectedDepartments;
+            this.selectedCategories = parsedFilters.selectedCategory || this.selectedCategories;
+            this.minimumPrice = parsedFilters.minimumPrice || this.minimumPrice;
+            this.maximumPrice = parsedFilters.maximumPrice || this.maximumPrice;
+            this.startSoldOutData = parsedFilters.startSoldOutData || this.startSoldOutData;
+            this.endSoldOutData = parsedFilters.endSoldOutData || this.endSoldOutData;
+            this.startShipData = parsedFilters.startShipData ? new Date(parsedFilters.startShipData) : this.startShipData;
+            this.endShipData = parsedFilters.endShipData ? new Date(parsedFilters.endShipData) : this.endShipData;
+            this.brands = parsedFilters.brands || this.brands;
+            this.seletedOption = this.sharingOptions.find(option => option.value === parsedFilters.selectedOption) || this.seletedOption;
+            this.skipCount = parsedFilters.skipCount || this.skipCount;
+            this.maxResultCount = parsedFilters.maxResultCount || this.maxResultCount;
         }
 
-      this.getSettingData().subscribe({
-        next: (res) => {
-          
-          this.sellerSSinSetting = (res as any)?.value ?? (res as any) ?? null;
+        this.getSettingData().subscribe({
+            next: (res) => {
 
-          this.route.queryParamMap.subscribe((params) => {
-            const q = params.get('q');
-            if (q !== null) this.searchInput = q;
-    
-            const brandParams = params.getAll('brand');
-            if (brandParams?.length) this.brands = brandParams.map(v => +v);
-    
-            const deptParam = params.get('dept');
-            if (deptParam) {
-              const id = +deptParam;
-              this.selectedDepartments = [id];
-              if (this.filters) this.filters.preselectDeptId = id;
+                this.sellerSSinSetting = (res as any)?.value ?? (res as any) ?? null;
+
+                this.route.queryParamMap.subscribe((params) => {
+                    const q = params.get('q');
+                    if (q !== null) this.searchInput = q;
+
+                    const brandParams = params.getAll('brand');
+                    if (brandParams?.length) this.brands = brandParams.map(v => +v);
+
+                    const deptParam = params.get('dept');
+                    if (deptParam) {
+                        const id = +deptParam;
+                        this.selectedDepartments = [id];
+                        if (this.filters) this.filters.preselectDeptId = id;
+                    }
+
+                    const listParam = params.get('proList');
+                    if (listParam) {
+                        const id = +listParam;
+                        this.appItemListId = id || null;
+                        if (this.filters) this.filters.catalogId = id ?? null;
+                    }
+
+                    const catParam = params.get('cat');
+                    if (catParam) {
+                        const id = +catParam;
+                        this.selectedCategories = [id];
+                        if (this.filters) this.filters.preselectCategoryId = id;
+                    }
+
+                    this.getAllProducts();
+                });
+            },
+            error: () => {
+
+                this.sellerSSinSetting = null;
+
+                this.route.queryParamMap.subscribe(() => this.getAllProducts());
             }
-    
-            const listParam = params.get('proList');
-            if (listParam) {
-              const id = +listParam;
-              this.appItemListId = id || null;
-              if (this.filters) this.filters.catalogId = id ?? null;
-            }
-    
-            const catParam = params.get('cat');
-            if (catParam) {
-              const id = +catParam;
-              this.selectedCategories = [id];
-              if (this.filters) this.filters.preselectCategoryId = id;
-            }
-    
-            this.getAllProducts(); 
-          });
-        },
-        error: () => {
-        
-          this.sellerSSinSetting = null;
-    
-          this.route.queryParamMap.subscribe(() => this.getAllProducts());
-        }
-      });
+        });
     }
-    
-      
 
-    
+
+
+
     ngAfterViewInit() {
         document.getElementById("_searchInput").focus();
 
@@ -296,7 +305,7 @@ export class MarketplaceProductsComponent
             appItemListId: this.appItemListId || null,
             searchText: this.searchInput || '',
             selectedDepartments: this.selectedDepartments || [],
-            selectedCategory: this.selectedCategories || [], 
+            selectedCategory: this.selectedCategories || [],
             minimumPrice: this.minimumPrice || null,
             maximumPrice: this.maximumPrice || null,
             selectedOption: this.seletedOption?.value ?? 2,
@@ -309,40 +318,40 @@ export class MarketplaceProductsComponent
             selectedCurrency: currencyCode,
             selectedSort: this.selectedSort?.value || 'name',
             skipCount: this.skipCount,
-            maxResultCount:  this.maxResultCount
+            maxResultCount: this.maxResultCount
         };
         localStorage.setItem("productFilters", JSON.stringify(requestParams));
-    
+
         this._AppMarketplaceItemsServiceProxy
             .getAll(
-                 this.contactSSIN,
-                this.fromMarketAcoount 
-                ? this.accountDataForView?.ssin
-                : this.sellerSSinSetting? this.sellerSSinSetting: sessionStorage.getItem("SellerSSIN"),
+                this.contactSSIN,
+                this.fromMarketAcoount
+                    ? this.accountDataForView?.ssin
+                    : this.sellerSSinSetting ? this.sellerSSinSetting : sessionStorage.getItem("SellerSSIN"),
                 null,
-                requestParams.appItemListId ||  this.appItemListId,
-                false, 
+                requestParams.appItemListId || this.appItemListId,
+                false,
                 requestParams.searchText || this.searchInput,
-                null, 
                 null,
-                null, 
-                requestParams.selectedDepartments ||     this.selectedDepartments,
-                requestParams.minimumPrice||     this.minimumPrice,
+                null,
+                null,
+                requestParams.selectedDepartments || this.selectedDepartments,
+                requestParams.minimumPrice || this.minimumPrice,
                 requestParams.maximumPrice || this.maximumPrice,
-               this.seletedOption.value,
-                requestParams.onlyAvailableStock ||    this.onlyAvialbleStock,
+                this.seletedOption.value,
+                requestParams.onlyAvailableStock || this.onlyAvialbleStock,
                 requestParams.startSoldOutData || this.startSoldOutData,
-                requestParams.endSoldOutData ||  this.endSoldOutData,
+                requestParams.endSoldOutData || this.endSoldOutData,
                 requestParams.startShipData || this.startShipData,
-                requestParams.endShipData ||  this.endShipData,
-                requestParams.brands ||  this.brands, // ids
+                requestParams.endShipData || this.endShipData,
+                requestParams.brands || this.brands, // ids
                 currencyCode,
                 undefined,
                 requestParams.selectedCategory || this.selectedCategories,  //category
                 undefined,
                 requestParams.selectedSort || this.selectedSort.value,
                 requestParams.skipCount || this.skipCount,
-                requestParams.maxResultCount ||  this.maxResultCount
+                requestParams.maxResultCount || this.maxResultCount
             )
             .pipe(
                 finalize(() => {
@@ -369,18 +378,18 @@ export class MarketplaceProductsComponent
     }
 
     setCurrency() {
-      const raw = localStorage.getItem("currencyCode");
-      let code = this.tenantDefaultCurrency?.code || 'USD';
-    
-      if (raw && raw !== 'undefined' && raw !== 'null') {
-        try {
-          const parsed = JSON.parse(raw);
-          code = parsed?.code ?? parsed ?? code;
-        } catch { code = raw; }
-      }
-    
-      this.selectedCurrrency = this.currencies?.find(c => c.code === code) || 'USD';
-      this.currency = this.selectedCurrrency?.code || code;
+        const raw = localStorage.getItem("currencyCode");
+        let code = this.tenantDefaultCurrency?.code || 'USD';
+
+        if (raw && raw !== 'undefined' && raw !== 'null') {
+            try {
+                const parsed = JSON.parse(raw);
+                code = parsed?.code ?? parsed ?? code;
+            } catch { code = raw; }
+        }
+
+        this.selectedCurrrency = this.currencies?.find(c => c.code === code) || 'USD';
+        this.currency = this.selectedCurrrency?.code || code;
     }
 
 
@@ -423,53 +432,53 @@ export class MarketplaceProductsComponent
     }
 
     selectCatalog(value: any) {
-      if (!value || !value.id) {
-        this.appItemListId = null;
-        this.updateUrlQueryParams({ proList: null });
-      } else {
-        this.appItemListId = value.id;
-        this.updateUrlQueryParams({ proList: String(value.id) }); 
-      }
-      this.getAllProducts();
+        if (!value || !value.id) {
+            this.appItemListId = null;
+            this.updateUrlQueryParams({ proList: null });
+        } else {
+            this.appItemListId = value.id;
+            this.updateUrlQueryParams({ proList: String(value.id) });
+        }
+        this.getAllProducts();
     }
-    
-      
-      private updateUrlQueryParams(partial: {
+
+
+    private updateUrlQueryParams(partial: {
         dept?: string | null;
         proList?: string | null;
         q?: string | null;
         cat?: string | null;
         brand?: string | string[] | null;
-      }) {
+    }) {
         this._router.navigate([], {
-          relativeTo: this.route,
-          queryParams: {
-            dept: partial.dept ?? undefined,
-            proList: partial.proList ?? undefined,
-            q: partial.q ?? undefined,
-            cat: partial.cat ?? undefined,
-            brand: partial.brand ?? undefined,
-          },
-          queryParamsHandling: 'merge',
+            relativeTo: this.route,
+            queryParams: {
+                dept: partial.dept ?? undefined,
+                proList: partial.proList ?? undefined,
+                q: partial.q ?? undefined,
+                cat: partial.cat ?? undefined,
+                brand: partial.brand ?? undefined,
+            },
+            queryParamsHandling: 'merge',
         });
-      }
-      
-      
-      
+    }
 
-      selectDepartment(value) {
+
+
+
+    selectDepartment(value) {
         if (!value) {
-          this.selectedDepartments = [];
-          this.updateUrlQueryParams({ dept: null });
+            this.selectedDepartments = [];
+            this.updateUrlQueryParams({ dept: null });
         } else {
-          const id = value.node.data.sycEntityObjectCategory.id;
-          this.selectedDepartments = [id];
-          this.updateUrlQueryParams({ dept: String(id) }); 
+            const id = value.node.data.sycEntityObjectCategory.id;
+            this.selectedDepartments = [id];
+            this.updateUrlQueryParams({ dept: String(id) });
         }
         this.getAllProducts();
-      }
-      
-      
+    }
+
+
 
 
     setPriceFrom(value) {
@@ -506,22 +515,22 @@ export class MarketplaceProductsComponent
     brands: any[] = [];
 
     async selectBrands(value: any[]) {
-      this.brands = value || [];
-    
-      // No brands -> remove param
-      if (!this.brands.length) {
-        this.updateUrlQueryParams({ brand: null });
+        this.brands = value || [];
+
+        // No brands -> remove param
+        if (!this.brands.length) {
+            this.updateUrlQueryParams({ brand: null });
+            this.getAllProducts();
+            return;
+        }
+
+        // Just send IDs as strings
+        const brandIdsAsString = this.brands.map(id => String(id));
+
+        // URL becomes ?brand=12&brand=34
+        this.updateUrlQueryParams({ brand: brandIdsAsString });
+
         this.getAllProducts();
-        return;
-      }
-    
-      // Just send IDs as strings
-      const brandIdsAsString = this.brands.map(id => String(id));
-    
-      // URL becomes ?brand=12&brand=34
-      this.updateUrlQueryParams({ brand: brandIdsAsString });
-    
-      this.getAllProducts();
     }
     resetProducts($event) {
         this.filters.resetFilters();
@@ -538,35 +547,35 @@ export class MarketplaceProductsComponent
         this.selectedSort = { label: "Product Name", value: "name" };
         this.searchInput = "";
         this.paginator.changePageToFirst($event);
-         this.appItemListId =''
-         this.selectedCategories = [];
-        this.brands =[]
-        this.skipCount= 0;
-        this.maxResultCount= 12;
-        this.selectedDepartments =[]
+        this.appItemListId = ''
+        this.selectedCategories = [];
+        this.brands = []
+        this.skipCount = 0;
+        this.maxResultCount = 12;
+        this.selectedDepartments = []
         this.onlyAvialbleStock = undefined
         localStorage.removeItem("productFilters");
         this.getAllProducts();
     }
     selectCategory(value: any) {
-      if (!value) {
-        this.selectedCategories = [];
-        this.updateUrlQueryParams({ cat: null });
-      } else {
-        const node = value.node?.data?.sycEntityObjectCategory;
-        const id = node?.id;
-        this.selectedCategories = id ? [id] : [];
-        this.updateUrlQueryParams({ cat: id ? String(id) : null }); 
-      }
-      this.getAllProducts();
+        if (!value) {
+            this.selectedCategories = [];
+            this.updateUrlQueryParams({ cat: null });
+        } else {
+            const node = value.node?.data?.sycEntityObjectCategory;
+            const id = node?.id;
+            this.selectedCategories = id ? [id] : [];
+            this.updateUrlQueryParams({ cat: id ? String(id) : null });
+        }
+        this.getAllProducts();
     }
-    
-        
+
+
     ngOnDestroy() {
 
-          // Keep SellerSSIN while navigating inside the seller room / product views
-  const inSellerRoom = JSON.parse(localStorage.getItem('fromSellerRoom') || 'false');
-  const inMarketplace = JSON.parse(localStorage.getItem('fromMarketPlace') || 'false');
+        // Keep SellerSSIN while navigating inside the seller room / product views
+        const inSellerRoom = JSON.parse(localStorage.getItem('fromSellerRoom') || 'false');
+        const inMarketplace = JSON.parse(localStorage.getItem('fromMarketPlace') || 'false');
 
         if ((!inSellerRoom || inMarketplace) && !this.fromMarketAcoount) {
             sessionStorage.removeItem('SellerSSIN');
@@ -595,99 +604,99 @@ export class MarketplaceProductsComponent
 
     }
     // private getCurrencyCodeForRequest(): string {
-   
+
     //     if (this.selectedCurrrency && typeof this.selectedCurrrency === 'object' && this.selectedCurrrency.code) {
     //       return this.selectedCurrrency.code;
     //     }
-    
+
     //     if (typeof this.selectedCurrrency === 'string' && this.selectedCurrrency.trim()) {
     //       return this.selectedCurrrency.trim();
     //     }
-    
+
     //     const stored = localStorage.getItem('currencyCode');
     //     if (stored && stored !== 'undefined' && stored !== 'null') {
     //       try {
     //         const parsed = JSON.parse(stored);
-    
+
     //         if (typeof parsed === 'string' && parsed.trim()) {
     //           return parsed.trim();
     //         }
-    
+
     //         if (parsed && typeof parsed === 'object' && parsed.code) {
     //           return parsed.code;
     //         }
     //       } catch {
-    
+
     //         if (stored.trim()) {
     //           return stored.trim();
     //         }
     //       }
     //     }
-    
+
     //     if ((this as any).tenantDefaultCurrency?.code) {
     //       return (this as any).tenantDefaultCurrency.code;
     //     }
-      
+
     //     return 'USD';
     //   }
 
-     private getCurrencyCodeForRequest(): string {
-  const clean = (val: any): string | null => {
-    if (!val) return null;
+    private getCurrencyCodeForRequest(): string {
+        const clean = (val: any): string | null => {
+            if (!val) return null;
 
-    if (typeof val === 'string') {
-      const v = val.trim();
+            if (typeof val === 'string') {
+                const v = val.trim();
 
-      if (
-        !v ||
-        v === 'undefined' ||
-        v === 'null' ||
-        v === 'XUA'
-      ) {
-        return null;
-      }
+                if (
+                    !v ||
+                    v === 'undefined' ||
+                    v === 'null' ||
+                    v === 'XUA'
+                ) {
+                    return null;
+                }
 
-      return v;
+                return v;
+            }
+
+            if (typeof val === 'object' && val.code) {
+                return clean(val.code);
+            }
+
+            return null;
+        };
+
+        let code = clean(this.selectedCurrrency);
+
+        if (!code) {
+            const stored = localStorage.getItem('currencyCode');
+
+            if (stored) {
+                try {
+                    code = clean(JSON.parse(stored)) || clean(stored);
+                } catch {
+                    code = clean(stored);
+                }
+            }
+        }
+
+        // ✅ Do NOT fallback to tenantDefaultCurrency if it is XUA
+        return code || 'USD';
     }
 
-    if (typeof val === 'object' && val.code) {
-      return clean(val.code);
-    }
-
-    return null;
-  };
-
-  let code = clean(this.selectedCurrrency);
-
-  if (!code) {
-    const stored = localStorage.getItem('currencyCode');
-
-    if (stored) {
-      try {
-        code = clean(JSON.parse(stored)) || clean(stored);
-      } catch {
-        code = clean(stored);
-      }
-    }
-  }
-
-  // ✅ Do NOT fallback to tenantDefaultCurrency if it is XUA
-  return code || 'USD';
-}
-
-      getSettingData() {
+    getSettingData() {
         return this._AppEntitiesServiceProxy.getHostSettingValue(1316, null);
-      }
-
-      showMsrP:boolean
-      getSettingDataMsrp(){
-        this._AppEntitiesServiceProxy.getHostSettingValue(1214, null)
-        .subscribe((result) => {
-          this.showMsrP = result?.toString().toLowerCase() =='yes' ? true : false;
-      
-        });
-    
     }
-      
-      
+
+    showMsrP: boolean
+    getSettingDataMsrp() {
+        this._AppEntitiesServiceProxy.getHostSettingValue(1214, null)
+            .subscribe((result) => {
+                this.showMsrP = result?.toString().toLowerCase() == 'yes' ? true : false;
+
+            });
+
+    }
+
+
 }

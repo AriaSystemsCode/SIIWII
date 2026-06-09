@@ -2892,9 +2892,39 @@
 <text name="MentionIn">Mention in</text>
 <text name="SeeLess">See Less</text>
 
+<text name="ProductName">Product Name</text>
+<text name="ProductCode">Product Code</text>
+<text name="PriceLowToHigh">Price Low To High</text>
+<text name="PriceHighToLow">Price High To Low</text>
+
+<text name="PublicAndSharedWithMe">Public And Shared With Me</text>
+<text name="Public">Public</text>
+<text name="SharedWithMe">Shared With Me</text>
+
 
 <text name="Show details">Show details</text>
 <text name="Hide details">Hide details</text>
+<text name="Created">Created</text>
+<text name="TypeYourNotesHere">Type Your Notes Here</text>
+<text name="Any">Any</text>
+<text name="Color">Color</text>
+<text name="select color">select color</text>
+<text name="select size">select size</text>
+<text name="NoAddressesFound">No Addresses Found</text>
+<text name="SortBy">Sort By</text>
+<text name="ShowFilters">Show Filters</text>
+<text name="HideFilters">Hide Filters</text>
+<text name="ProductList">Product List</text>
+<text name="Brands">Brands</text>
+<text name="AddyourQuestion">Add your Question</text>
+<text name="AddYourReview">Add Your Review</text>
+<text name="Threads">Threads</text>
+<text name="Mentions">Mentions</text>
+<text name="AddToFavourite">Add To Favourite</text>
+<text name="RemoveFromFavourite">Remove From Favourite</text>
+<text name="HideData">Hide Data</text>
+
+
 
 
 	

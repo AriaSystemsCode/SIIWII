@@ -15,7 +15,7 @@
             <label class="label mt-2 mb-2 mr-4">{{l("Address")}}</label>
             <textarea class="form-control   d-inline-block ml-md-4 textAr" style="min-height: 80px;"
                 readonly>{{selectedAddress?.addressLine1 ? selectedAddress?.addressLine1+' ,' : ''}}{{selectedAddress?.addressLine2 ? selectedAddress?.addressLine2+' ,' : ''}}{{ selectedAddress?.city ? selectedAddress?.city+' ,' : ''}}{{selectedAddress?.state ? selectedAddress?.state+' ,' : ''}}{{ selectedAddress?.countryName ? selectedAddress?.countryName : selectedAddress?.countryCode ? selectedAddress?.countryCode  +' ,' : ''}}{{selectedAddress?.postalCode ? selectedAddress?.postalCode : ''}}</textarea>
-            <div class="pull-right">
+            <div [ngClass]="isArabic? 'pull-left': 'pull-right'">
                 <button *ngIf="canChange" class="savebtn text-center btn float-right mt-2" (click)="showAddressList()">
                     {{l("Change")}}
                     <i class="fas fa-edit ml-1 mr-1"></i>
@@ -101,7 +101,7 @@
                 </div>
             </li>
         </ul>
-        <label class="noAddressMsg" *ngIf="savedAddressesList.length==0"> No Addresses found</label>
+        <label class="noAddressMsg" *ngIf="savedAddressesList.length==0">{{'NoAddressesFound' | localize}}</label>
 
     </div>
 </div>
@@ -148,14 +148,14 @@
                 </div>
                 <div class="col-12">
                     <label class="label mt-2 mb-2">{{l("State")}} *</label>
-                    <input type="text" placeholder="('State' | localize) + '...'" class="form-control w-100" name="State"
+                    <input type="text" [placeholder]="('State' | localize) + '...'" class="form-control w-100" name="State"
                         [(ngModel)]="state" #AddState="ngModel" required />
 
 
                 </div>
                 <div class="col-md-6">
                     <label class="label mt-2 mb-2">{{l("PostalCode")}} * </label>
-                    <input type="text" placeholder="('PostalCode' | localize) + '...'" class="form-control w-100" name="postalCode"
+                    <input type="text" [placeholder]="('PostalCode' | localize) + '...'" class="form-control w-100" name="postalCode"
                         [(ngModel)]="postalCode" #postal_Code="ngModel" required pattern="^[a-zA-Z0-9- ]+$"
                         maxlength="20" />
                 </div>
