@@ -325,7 +325,8 @@ name="description" [readonly]="readonlyDesc"
                                         <a class="aria-tag border mb-3 mr-3 pb-2 pl-3 position-relative pr-3 pt-2 rounded-lg"
                                             *ngFor="let relatedItem of relatedItems;index  as i"
                                             [ngClass]="{'removed' : relatedItem.removed}">
-                                            {{relatedItem?.entityDto?.appItemName}}
+                                            <!-- {{relatedItem?.entityDto?.appItemName}}-->
+                                            {{relatedItem?.entityDto?.appItemCode}}
                                             <span *ngIf="!relatedItem.removed"
                                                 class="bg-white position-absolute aria-tag-action remove-tag  rounded-circle"
                                                 (click)="removeRelatedItem(relatedItem,i)">
