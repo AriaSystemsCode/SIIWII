@@ -270,6 +270,9 @@
 
                                             <div class="wide-drop-down flex-grow-1 "
                                                 *ngIf="extraAttr?.lookupData && !extraAttr?.acceptMultipleValues">
+                                                <label class="pr-2">
+                                                    {{extraAttr.name| localize}}
+                                                </label>
                                                 <div *ngIf="!isSize">
 
                                                     <p-dropdown [options]="extraAttr.lookupData"
