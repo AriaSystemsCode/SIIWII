@@ -922,13 +922,13 @@
 <ng-template #shoppingcartContainer>
 
     <div class="h-100 parentDiv">
-        <div class="modal-content big-scroll pb-5 pl-3">
+        <div class="modal-content big-scroll pb-5 px-3">
             <div class="row topheader">
                 <div class="">
                     <div class="row bg-white  m-3 p-2  pl-4 cartSec">
                         {{'Transactions' | localize}} &nbsp; &nbsp; > &nbsp; &nbsp;
                         {{appTransactionsForViewDto?.transactionType == 0 ?
-                        'SalesOrder':'PurchaseOrder' | localize}} &nbsp; &nbsp; >
+                        'Sales Order':'Purchase Order' | localize}} &nbsp; &nbsp; >
                         &nbsp; &nbsp;
                         {{transactionCode}}
                     </div>
@@ -968,7 +968,7 @@
                     </div>
                 </div>
                 <div>
-                    <div class="py-2 px-3 text-right  row  d-lg-flex
+                    <div class="py-2 px-3 text-right row  d-lg-flex btnsGap
                 d-none">
                         <button *ngIf="appTransactionsForViewDto?.isOwnedByMe" type="button"
                             class="btn  syncBtn btnHgtNoWrap" [disabled]="!appTransactionsForViewDto?.showSync "
@@ -983,7 +983,7 @@
                             {{l("Sync")}}
                         </button>
                         <button *ngIf="appTransactionsForViewDto?.isOwnedByMe" type="button"
-                            class="btn   border-0  shareBtn btnHgtNoWrap"
+                            class="btn   border-0  shareBtn btnHgtNoWrap mx-0"
                             [disabled]="appTransactionsForViewDto?.entityStatusCode?.toUpperCase()!='OPEN'"
                             [ngClass]="{ disabled:appTransactionsForViewDto?.entityStatusCode?.toUpperCase()!='OPEN'}"
                             (click)="onShareTransaction()">
@@ -1016,7 +1016,7 @@
 
                     </div>
                     <div class="d-lg-none d-block">
-                        <div class="btn-group greyMDlightColor" dropdown>
+                        <div class="greyMDlightColor" dropdown>
                             <button dropdownToggle type="button" class="btn   border-0 dropdownBtn"
                                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 <div class="d-flex flex-column align-items-center">
@@ -1088,7 +1088,7 @@
 
                 </div>
                 <div *ngIf="appTransactionsForViewDto?.entityStatusCode?.toUpperCase()=='DRAFT'">
-                    <div class="px-4  py-2 text-right border-left d-flex">
+                    <div class="px-4  py-2 text-right border-left d-flex btnsGap">
                         <button *ngIf="appTransactionsForViewDto?.entityStatusCode?.toUpperCase()=='DRAFT'"
                             type="button" class="btn  bgPurple border-0  btnHgtNoWrap" (click)="onContinueShopping()"
                             [disabled]="!isOwnedByMe" [ngClass]="{ disabled:!isOwnedByMe}">
@@ -1112,7 +1112,7 @@
                 </div>
 
                 <div class="col-4 p-4"
-                    [ngClass]="showTabs  && appTransactionsForViewDto?.entityStatusCode?.toUpperCase()=='DRAFT' ? 'fixScrollS':''"
+                    [ngClass]="showTabs  && appTransactionsForViewDto?.entityStatusCode?.toUpperCase()=='DRAFT' && !isArabic ? 'fixScrollS': showTabs  && appTransactionsForViewDto?.entityStatusCode?.toUpperCase()=='DRAFT' && isArabic ?'fixScrollSAr':''"
                     id="rightCol">
                     <ng-container *ngTemplateOutlet="transactionOrderSummaryTemplate"></ng-container>
                     <ng-container *ngTemplateOutlet="transactionNotesTemplate"></ng-container>
@@ -1130,8 +1130,8 @@
             <div class="tablet" *ngIf="!onshare">
 
                 <div class="card position-relative dot">
-                    <div class="d-md-none d-block actionsSec">
-                        <div class="btn-group greyMDlightColor" dropdown>
+                    <div class="d-md-none d-block actionsSec" [ngStyle]="isArabic ? {'left':'-33px'} : {'right':'-33px'}">
+                        <div class=" greyMDlightColor" dropdown style="width: 110px;">
                             <button dropdownToggle type="button" class="btn   border-0" data-toggle="dropdown"
                                 aria-haspopup="true" aria-expanded="false">
                                 <div class="d-flex flex-column align-items-center">

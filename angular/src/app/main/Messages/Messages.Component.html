@@ -331,7 +331,7 @@
                                                     | niceDateFormatPipe
                                                     }}</span>
                                             </a>
-                                            <span class="mail-info text-right">
+                                            <span class="mail-info "  [ngStyle]="!isArabic ? {'text-align':'right'} : {'text-align':'left'}">
                                                 <i [ngClass]="
                                                     message.entityObjectStatusCode ==
                                                     'UNREAD'?'far fa-envelope':'far fa-envelope-open'
@@ -358,15 +358,13 @@
                                                             <a (click)="
                                                         favoriteMessage(message)
                                                     " class="link-action"><img src="assets/message/addFav.png"
-                                                                    class="mr-2">{{ l("Add To
-                                                                Favourite") }}</a>
+                                                                    class="mr-2">{{ l("AddToFavourite") }}</a>
                                                         </li>
                                                         <li>
                                                             <a *ngIf="message.isFavorite" (click)="
                                                         favoriteMessage(message)
                                                     " class="link-action"><img src="assets/message/addFav.png"
-                                                                    class="mr-2"> {{ l("Remove from
-                                                                Favourite") }}</a>
+                                                                    class="mr-2"> {{ l("RemoveFromFavourite") }}</a>
                                                         </li>
                                                         <li>
                                                             <a (click)="
@@ -488,7 +486,7 @@
                                                     | niceDateFormatPipe
                                                     }}</span>
                                             </a>
-                                            <span class="mail-info d-flex align-items-end">
+                                            <span class="mail-info d-flex align-items-end"  [ngClass]="isArabic ? 'text-left' : 'text-right'">
                                                 <div class="d-flex">
                                                     <i [ngClass]="
                                                 message.entityObjectStatusCode ==
@@ -514,14 +512,12 @@
                                                             <li>
                                                                 <a (click)="
                                                     favoriteMessage(message)
-                                                " class="link-action"><img src="assets/message/addFav.png"> {{ l("Add To Favourite")
-                                                                    }}</a>
+                                                " class="link-action"><img src="assets/message/addFav.png">{{ l("AddToFavourite") }}</a>
                                                             </li>
                                                             <li>
                                                                 <a *ngIf="message.isFavorite" (click)="
                                                     favoriteMessage(message)
-                                                " class="link-action"><img src="assets/message/addFav.png"> {{ l("Remove from
-                                                                    Favourite") }}</a>
+                                                " class="link-action"><img src="assets/message/addFav.png"> {{ l("RemoveFromFavourite") }}</a>
                                                             </li>
                                                             <li>
                                                                 <a (click)="
@@ -574,14 +570,14 @@
                                         class="ml-1">
                                         <img class="pr-1 " *ngIf="messageTypeIndex == 1" [src]="
                                 appRootUrl() +
-                                'assets/message/Direct-Message-icon.svg'" border="0" /> Direct Message in {{
+                                'assets/message/Direct-Message-icon.svg'" border="0" /> {{'DirectMessageIn' | localize}} {{
                                         messagesDetails[0]?.messages?.relatedEntityObjectTypeDescription }}
                                     </p>
                                     <p *ngIf="!messagesDetails[0]?.messages?.relatedEntityObjectTypeDescription "
                                         class="ml-1">
                                         <img class="pr-1 " *ngIf="messageTypeIndex == 1" [src]="
                             appRootUrl() +
-                            'assets/message/Direct-Message-icon.svg'" border="0" /> Direct Message in {{
+                            'assets/message/Direct-Message-icon.svg'" border="0" />{{'DirectMessageIn' | localize}} {{
                                         messagesDetails[0]?.messages?.subject }}
                                     </p>
                                 </h4>
@@ -593,14 +589,14 @@
                                         class="ml-1">
                                         <img class=" pr-1 " *ngIf="messageTypeIndex == 1" [src]="
                             appRootUrl() +
-                            'assets/message/thread-svg-icon.svg'" border="0" /> Thread in {{
+                            'assets/message/thread-svg-icon.svg'" border="0" /> {{'ThreadIn' | localize}} {{
                                         messagesDetails[0]?.messages?.relatedEntityObjectTypeDescription }}
                                     </p>
                                     <p *ngIf="!messagesDetails[0]?.messages?.relatedEntityObjectTypeDescription "
                                         class="ml-1">
                                         <img class=" pr-1 " *ngIf="messageTypeIndex == 1" [src]="
                         appRootUrl() +
-                        'assets/message/thread-svg-icon.svg'" border="0" /> Thread in {{
+                        'assets/message/thread-svg-icon.svg'" border="0" /> {{'ThreadIn' | localize}} {{
                                         messagesDetails[0]?.messages?.subject }}
                                     </p>
                                 </h4>
@@ -612,14 +608,14 @@
                                         class="ml-1">
                                         <img class="pb-2 pr-1 mt-1" *ngIf="messageTypeIndex == 1" [src]="
                         appRootUrl() +
-                        'assets/message/mention-square-icon.svg'" border="0" /> Mention in {{
+                        'assets/message/mention-square-icon.svg'" border="0" /> {{'MentionIn' | localize}} {{
                                         messagesDetails[0]?.messages?.relatedEntityObjectTypeDescription }}
                                     </p>
                                     <p *ngIf="!messagesDetails[0]?.messages?.relatedEntityObjectTypeDescription "
                                         class="ml-1">
                                         <img class="pb-2 pr-1 mt-1" *ngIf="messageTypeIndex == 1" [src]="
                     appRootUrl() +
-                    'assets/message/mention-square-icon.svg'" border="0" /> Mention in {{
+                    'assets/message/mention-square-icon.svg'" border="0" />{{'MentionIn' | localize}} {{
                                         messagesDetails[0]?.messages?.subject }}
                                     </p>
                                 </h4>

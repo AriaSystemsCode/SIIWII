@@ -186,7 +186,7 @@
                                         <div class="form-group">
                                             <label for="statusFilter">{{l("Status")}}</label>
                                             <p-dropdown [options]="filterStatus"
-                                                (onChange)=" getAppTransactions()" placeholder="Any" [showClear]="true"
+                                                (onChange)=" getAppTransactions()" [placeholder]="'Any' | localize" [showClear]="true"
                                                 appendTo="body" formControlName="statusFilter">
                                             </p-dropdown>
                                         </div>
@@ -533,7 +533,7 @@
                             </ng-template>
                             <ng-template pTemplate="body" let-product>
                                 <tr >
-                                    <td>{{ product?.transactionType == 0 ?   'SalesOrder'  : 'PurchaseOrder' | localize}}</td>
+                              <td> {{ product?.transactionType == 0 ? l('SalesOrder') : l('PurchaseOrder') }}</td>
                                     <td>{{ product.transactionNumber }}</td>
                                     <td><img [src]="attachmentBaseUrl + '/' + product.image" alt="Product Image" class="itemImg" onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'"></td>
                                     <td> <span style="white-space: pre-wrap">{{ product.manufacturerCode }}</span></td>

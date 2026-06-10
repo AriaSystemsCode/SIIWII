@@ -531,12 +531,12 @@ export class TransactionInformationComponent
 
   getColumns() {
     this.cols = [
-      { field: "image", header: "Image" },
-      { field: "manufacturerCode", header: "Code" },
-      { field: "name", header: "Name" },
-      { field: "qty", header: "Quantity" },
-      { field: "price", header: "Price" },
-      { field: "amount", header: "Amount" }
+      { field: "image", header: this.l("Image") },
+      { field: "manufacturerCode", header: this.l("Code") },
+      { field: "name", header: this.l("Name") },
+      { field: "qty", header: this.l("Quantity") },
+      { field: "price", header: this.l("Price") },
+      { field: "amount", header: this.l("Amount") }
     ];
   }
 

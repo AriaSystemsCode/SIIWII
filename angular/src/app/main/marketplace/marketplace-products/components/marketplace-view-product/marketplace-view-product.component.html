@@ -18,219 +18,9 @@
                     <app-product-detail-images [productImages]="productImages"
                         [colorAttachmentForMainIamge]="colorAttachmentForMainIamge" [colorView]="isColorView"
                         (setColorView)="setColorView($event)"></app-product-detail-images>
-                    <div class=" summary-sec summaryTab">
-                        <div class="summary border">
-                            <div class="header">
-                                <h6 class="p-0 m-0" style=" font-weight: bold;"> {{'OrderedSummary' | localize}} </h6>
-                            </div>
-                            <div class="totals">
-                                <p class="p-0 m-0">{{'Qty' | localize}} {{ totalOrderQTY }}</p>
-                                <p class="p-0 m-0">
-
-                                    {{
-                                    currencySymbol
-                                    }}
-
-                                    {{ totlaOrderPrices| currency:' ' }}
-
-                                </p>
-                            </div>
-                            <div class="orderedSummary">
-                                <div *ngIf="orderSummary.length === 0" class="default">
-                                    {{'ProductOrderSummary' | localize}}
-                                </div>
-
-                                <div *ngIf="orderSummary.length !== 0" class="summaryTables">
-                                    <div class="each-table" *ngFor="
-                                        let order of orderSummary;
-                                        let orderIndex = index
-                                    ">
-                                        <div class="orderHeader  d-flex align-items-center justify-content-between">
-                                            <div class="d-flex" style="height: 36px;">
-                                                <img class="mt-2" [src]="attachmentBaseUrl + '/' + order.color.colorImg"
-                                                    style="width: 24px; height: 24px; border-radius: 6px;"
-                                                    onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'" />
-                                                <div>
-                                                    <p class="ml-2 mb-0" style="
-                                        font-style: normal;
-                                        font-weight: 700;
-                                        font-size: 10px;
-                                        line-height: 15px;                               
-                                        color: #1B101B;                               
-                                        ">
-                                                        {{ order.color.colorCodeSelectedValues }}
-                                                    </p>
-                                                    <p class="ml-2 mb-0" style="color: #9E9E9E;
-                                        font-weight: 600;
-                                        font-size: 10px;
-                                        line-height: 15px;
-                                        color: #9E9E9E;
-                                        ">
-                                                        {{ order.color.colorName }}
-                                                    </p>
-                                                </div>
-                                            </div>
-                                            <a (click)="removeColor(order, orderIndex)">
-                                                <img class="mt-2"
-                                                    src="../../../../../assets/placeholders/edit-svgrepo-com 3.svg"
-                                                    style=" border-radius: 6px;" />
-                                            </a>
-                                        </div>
-                                        <!-- order by size summary table -->
-                                        <table class="table table-bordered mb-0">
-                                            <thead>
-                                                <tr>
-                                                    <th>{{'Size' | localize}} </th>
-                                                    <th>{{'QTY | localize'}}</th>
-                                                    <th>{{'Price' | localize}}</th>
-                                                    <th>{{'Amount | localize'}}</th>
-                                                    <th>{{'Actions' | localize}}</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody *ngIf="!productDetails?.orderByPrePack">
-                                                <ng-container *ngFor="
-                                                    let size of order?.color?.sizes;
-                                                    let i = index
-                                                ">
-                                                    <tr *ngIf="size.orderedQty !== 0">
-
-                                                        <td>{{ size.label }}</td>
-                                                        <td>{{ size.orderedQty }}</td>
-                                                        <td>{{ size.price| currency:' ' }}</td>
-                                                        <td>
-                                                            {{
-                                                            (size.orderedQty *
-                                                            size.price) | currency:' '
-                                                            }}
-                                                        </td>
-                                                        <td>
-                                                            <a (click)="
-                                                                removeSize(
-                                                                    i,
-                                                                    size,
-                                                                    order,
-                                                                    orderIndex
-                                                                )
-                                                            ">
-                                                                <img class="mt-2"
-                                                                    src="../../../../../assets/placeholders/edit-svgrepo-com 3.svg"
-                                                                    style=" border-radius: 6px;" />
-                                                            </a>
-                                                        </td>
-                                                    </tr>
-                                                </ng-container>
-                                                <tr *ngIf="
-                                                    calculateOrderedQTYSum(
-                                                        order.color.sizes
-                                                    ) !== 0
-                                                ">
-                                                    <th class="text-center">{{'Total' | localize}}</th>
-                                                    <th>
-                                                        {{
-                                                        calculateOrderedQTYSum(
-                                                        order.color.sizes
-                                                        )
-                                                        }}
-                                                    </th>
-                                                    <th colspan="3" style=" text-align: center;">
-                                                        {{
-                                                        calculatePriceSum(
-                                                        order.color.sizes
-                                                        )| currency:' '
-                                                        }}
-                                                    </th>
-                                                </tr>
-                                            </tbody>
-                                            <tbody *ngIf="productDetails?.orderByPrePack&&calculatePrepackOrderedQTYSum(
-                                                order.color.sizes,
-                                                orderIndex, order.colorIndex
-                                            )">
-                                                <ng-container *ngFor="
-                                                    let size of order.color.sizes;
-                                                    let i = index
-                                                ">
-                                                    <tr *ngIf="size.orderedPrePacks !== 0">
-                                                        >
-                                                        <td>{{ size.label }}</td>
-                                                        <td>
-                                                            {{
-                                                            !(orderType == 'SO' && productDetails?.orderByPrePack &&
-                                                            !chk_Order_by_prepack[orderIndex] ) ?
-                                                            size.sizeRatio *
-                                                            order?.color?.sizes[0]?.orderedPrePacks
-
-                                                            : order.color.sizes[i]
-                                                            .orderedPrePacks
-
-                                                            }}
-                                                        </td>
-                                                        <td>{{ size.price | currency:' '}}</td>
-                                                        <td>
-                                                            {{
-                                                            !(orderType == 'SO' && productDetails?.orderByPrePack &&
-                                                            !chk_Order_by_prepack[orderIndex] ) ?
-                                                            ( size.sizeRatio *
-                                                            order?.color?.sizes[0]?.orderedPrePacks *
-                                                            size.price | currency:' '
-                                                            )
-                                                            : (order.color.sizes[i]
-                                                            .orderedPrePacks *
-                                                            size.price | currency:' '
-                                                            )
-
-                                                            }}
-                                                        </td>
-                                                        <td>
-                                                            <a (click)="
-                                                                removeSize(
-                                                                    i,
-                                                                    size,
-                                                                    order,
-                                                                    orderIndex
-                                                                )
-                                                            ">
-                                                                <img class="mt-2"
-                                                                    src="../../../../../assets/placeholders/edit-svgrepo-com 3.svg"
-                                                                    style=" border-radius: 6px;" />
-                                                            </a>
-                                                        </td>
-                                                    </tr>
-                                                </ng-container>
-                                                <tr>
-                                                    <th class="text-center">{{'Total' | localize}}</th>
-                                                    <th>
-                                                        {{
-                                                        calculatePrepackOrderedQTYSum(
-                                                        order.color.sizes,
-                                                        orderIndex, order.colorIndex
-                                                        )
-                                                        }}
-                                                    </th>
-                                                    <th colspan="3" style="text-align: center;">
-                                                        {{
-                                                        getTotalPrepackSizeAmount(
-                                                        order.color.sizes,
-                                                        orderIndex,order.colorIndex
-                                                        )| currency:' '
-                                                        }}
-                                                    </th>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                        <!-- order by size summary table -->
-
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="p-3">
-
-                                <button [disabled]="orderSummary.length == 0 || !isAuthenticated"
-                                    (click)="addToShoppingCart()" class="btn m-0 add-btn">
-                                    {{'AddToShoppingCart' | localize}}
-                                </button>
-                            </div>
-                        </div>
-                    </div>
+                    <ng-container
+                    *ngTemplateOutlet="orderSummaryTemplate; context: { summaryClass: 'summary-sec summaryTab' }">
+                    </ng-container>>
                 </div>
                 <div class="col-6 bg-white details-sec">
                     <div class="details  d-flex flex-column">
@@ -261,11 +51,11 @@
                                         style="color: #1B101B; font-size: 16px;font-weight: 500;margin-top: 4px;white-space: break-space !important;">
                                         {{productDetails?.name}}</p>
                                     <div class="type ml-3 pt-2 text-center">
-                                        <p class="mb-0 " style="white-space: nowrap;"> {{
-                                            productDetails?.orderByPrePack === false
-                                            ? "BySize"
-                                            : "ByPrepack"
-                                            | localize}}</p>
+                                   <p class="mb-0">
+                                    {{ productDetails?.orderByPrePack === false
+                                        ? l('BySize')
+                                        : l('ByPrepack') }}
+                                    </p>
 
                                     </div>
                                 </div>
@@ -402,580 +192,15 @@ top: 4px;">
                             border-radius: 13px;
                         " />
 
-                    <div class="color-selection">
-                        <div class="d-flex justify-content-between">
-                            <h5 class="my-2" style="text-decoration: none;color:black  !important">
-                                {{
-                                productDetails
-                                ?.variations[0]?.extraAttrName
-                                }}
-                            </h5>
-                            <div class="mb-0 ">
-                                <div class="form-group m-form__group align-items-center">
-                                    <div class="input-group">
-                                        <span class="input-group-btn">
-                                            <button class="searchBtn" type="submit">
-                                                <img src="../../../assets/landingPage/Search.png" />
-                                            </button>
-                                        </span>
-                                        <input #filterInput [(ngModel)]="filterText"
-                                            (ngModelChange)="onFilterTextChanged()" class="form-control m-input"
-                                            placeholder="search with color" type="text">
-
-                                        <a class="clear-icon" *ngIf="showIconClose"
-                                            (click)="clearFilterText(filterInput)">
-                                            <i class=" fa fa-1x fa-times fa-1x" style="color: #fff;"></i>
-
-                                        </a>
-
-
-                                    </div>
-                                </div>
-                            </div>
-
-                        </div>
-                        <!-- color selections -->
-
-                        <div *ngIf="filteredColors?.length <= handleSCreenSelect"
-                            class="d-flex flex-wrap align-items-center justify-content-lg-start">
-                            <div class="mr-3" *ngFor="let color of filteredColors; let i = index"
-                                [title]="color.colorName" position="top" class="imagAndHexaCode d-flex flex-column "
-                                tooltipPositionStyleClass="custom-tooltip">
-                                <h6 *ngIf="productData?.showInOutStockFlag == 'ItemColorlevel' ||  productData?.showInOutStockFlag == 'Bothlevels'"
-                                    class="mb-1" style="margin-right: 10px;"
-                                    [ngClass]="hasColorStock(color) ? 'text-success' : 'text-danger'">
-                                    {{ hasColorStock(color) ? 'InStock' : 'OutOfStock' | localize }}
-                                </h6>
-
-                                <div style=" margin-right :10px;    border-top-right-radius: 6px;    border-top-left-radius: 6px;"
-                                    [ngClass]="
-                                        i === currentIndex
-                                            ? 'border border-primary '
-                                            : ''
-                                    ">
-
-                                    <div *ngIf="(!color?.colorImg && color?.colorCode ) || (color?.colorImg && color?.colorCode)"
-                                        class="colorBox" [ngStyle]="{'background-color':color.colorCode}"
-                                        (click)="setSizes(i)"></div>
-                                    <img *ngIf="(color?.colorImg && !color?.colorCode) || (!color?.colorImg && !color?.colorCode)"
-                                        (click)="setSizes(i)" [src]="
-                                        attachmentBaseUrl + '/' + color.colorImg
-                                    " alt="images slides" class="imageSlides"
-                                        onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'" />
-                                    <div class="card-body">
-
-
-                                        <p class="card-text desc fw-bold">
-                                            {{ color?.colorCodeSelectedValues?.slice(0,8)}} <span
-                                                *ngIf="color?.colorCodeSelectedValues?.length > 8">...</span>
-                                        </p>
-
-                                        <p class="seller">{{ color?.colorName?.slice(0,13) }} <span
-                                                *ngIf="color?.colorName?.length > 13">...</span> </p>
-
-
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <!-- color selection -->
-
-                        <!-- color slider -->
-                        <div class="d-flex parent-slider" style="height: 130px;"
-                            *ngIf="filteredColors?.length > handleSCreenSelect">
-                            <button (click)="slideToPreviousImage()" class="mr-4 indicator-btns">
-                                <i class="fa fa-chevron-left"></i>
-                            </button>
-                            <div class="slider-container">
-                                <div class="slider" [style.transform]="
-                                        'translateX(' + translateX + 'px)'
-                                    ">
-                                    <div *ngFor="
-                                            let color of filteredColors;
-                                            let i = index
-                                        " [title]="color.colorName" position="top"
-                                        tooltipPositionStyleClass="custom-tooltip" class="d-flex flex-column">
-                                        <h6 *ngIf="productData?.showInOutStockFlag == 'ItemColorlevel' ||  productData?.showInOutStockFlag == 'Bothlevels'"
-                                            class="mb-1" style="margin-right: 10px;"
-                                            [ngClass]="hasColorStock(color) ? 'text-success' : 'text-danger'">
-                                            {{ hasColorStock(color) ? 'InStock' : 'OutOfStock' | localize }}
-                                        </h6>
-                                        <div style=" margin-right :10px;    border-top-right-radius: 6px;    border-top-left-radius: 6px;"
-                                            [ngClass]="
-                                        i === currentIndex
-                                            ? 'border border-primary '
-                                            : ''
-                                    ">
-                                            <div *ngIf="(!color?.colorImg && color?.colorCode ) || (color?.colorImg && color?.colorCode)"
-                                                class="colorBox" [ngStyle]="{'background-color':color.colorCode}"
-                                                (click)="setSizes(i)"></div>
-                                            <img *ngIf="(color?.colorImg && !color?.colorCode) || (!color?.colorImg && !color?.colorCode)"
-                                                (click)="setSizes(i)" [src]="
-                                        attachmentBaseUrl + '/' + color.colorImg
-                                    " alt="images slides" class="imageSlides"
-                                                onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'" />
-                                            <div class="card-body">
-
-
-                                                <p class="card-text desc fw-bold">
-                                                    {{ color?.colorCodeSelectedValues?.slice(0,8)}} <span
-                                                        *ngIf="color?.colorCodeSelectedValues?.length > 8">...</span>
-                                                </p>
-                                                <p class="seller">{{ color?.colorName?.slice(0,13) }} <span
-                                                        *ngIf="color?.colorName?.length > 13">...</span> </p>
-
-
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <button (click)="slideToNextImage()" class="indicator-btns">
-                                <i class="fa fa-chevron-right"></i>
-                            </button>
-                        </div>
-
-                        <!-- start order by size -->
-                        <h5 *ngIf="!productDetails?.orderByPrePack" class="my-4" style="text-decoration: none">
-                            {{'OrderBySize' | localize}}
-                        </h5>
-                        <table *ngIf="!productDetails?.orderByPrePack"
-                            class="table text-center table-bordered table-white">
-                            <thead>
-                                <tr>
-                                    <th scope="col">{{'Size' | localize}}</th>
-                                    <th scope="col" *ngIf="productData?.showStockAvailability != 'No'">{{'AvailableQTY'
-                                        | localize}}</th>
-                                    <th scope="col">{{'Ordered' | localize}}</th>
-                                </tr>
-                            </thead>
-                            <tbody
-                                *ngIf="filteredColors?.length > 0 && filteredColors[currentIndex]?.sizes?.length > 0">
-                                <tr *ngFor="
-                                        let size of filteredColors[currentIndex]?.sizes;
-                                        let i = index
-                                    ">
-                                    <td>{{ size.label }}</td>
-                                    <td *ngIf="((productData?.showInOutStockFlag == 'ItemColorSizeLevel' || productData?.showInOutStockFlag == 'Bothlevels') && size.stockAvailability ==0 ) && productData?.showStockAvailability != 'No'"
-                                        class="text-danger">{{'OutOfStock' | localize}}</td>
-
-                                    <td *ngIf="((productData?.showInOutStockFlag == 'ItemColorSizeLevel' || productData?.showInOutStockFlag == 'Bothlevels') && size.stockAvailability >0 ) && productData?.showStockAvailability != 'No'"
-                                        class="text-success">{{'InStock' | localize}}</td>
-
-                                    <td
-                                        *ngIf="((productData?.showInOutStockFlag != 'ItemColorSizeLevel' && productData?.showInOutStockFlag != 'Bothlevels' ) ) && productData?.showStockAvailability != 'No'">
-                                        {{ size.stockAvailability }}</td>
-                                    <td>
-                                        <p-inputNumber [(ngModel)]="size.orderedQty" mode="decimal" [showButtons]="true"
-                                            [disabled]="!isAuthenticated" inputId="minmax-buttons" [min]="0"
-                                            (ngModelChange)="
-                                                onNumberChange(
-                                                    $event,
-                                                    filteredColors[currentIndex],
-                                                    i
-                                                )
-                                            ">
-                                        </p-inputNumber>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                        <!-- end order by size -->
-
-                        <!-- start order by prepack -->
-                        <h5 *ngIf="productDetails?.orderByPrePack" class="my-4"
-                            style="text-decoration: none;color:black  !important">
-                            {{'PrepackDefinition' | localize}}
-                        </h5>
-                        <table *ngIf="productDetails?.orderByPrePack"
-                            class="table text-center table-bordered table-white">
-                            <tbody
-                                *ngIf="filteredColors?.length > 0 && filteredColors[currentIndex]?.sizes?.length > 0">
-                                <tr *ngIf="filteredColors?.[currentIndex]?.sizes?.length">
-                                    <th style="background-color: #F8F8F8;">{{'Size' | localize}}</th>
-                                    <td *ngFor="
-                                            let size of filteredColors[currentIndex]?.sizes
-                                        ">
-                                        {{ size.label }}
-                                    </td>
-                                    <th style="background-color: #F8F8F8;">{{'TotalPcs' | localize}}</th>
-                                </tr>
-                                <tr
-                                    *ngIf="filteredColors?.length > 0 && filteredColors[currentIndex]?.sizes?.length > 0">
-                                    <th style="background-color: #F8F8F8;">{{'Prepack' | localize}}</th>
-                                    <td *ngFor="
-                                            let size of filteredColors[currentIndex]?.sizes
-                                        ">
-                                        {{ size.sizeRatio }}
-                                    </td>
-                                    <th>{{ getTotlaPrepackSum()}}</th>
-                                </tr>
-                            </tbody>
-                        </table>
-
-
-                        <span *ngIf="orderType == 'SO' && productDetails?.orderByPrePack" class="p-4 font-weight-bold"
-                            style="color:black !important">{{'OrderByPrepack' | localize}}</span>
-                        <label *ngIf="orderType == 'SO' && productDetails?.orderByPrePack"
-                            class="switch switch-container my-4 font-weight-bold">
-                            <input type="checkbox" [(ngModel)]="chk_Order_by_prepack[currentIndex]" checked
-                                (change)="onChangechk_Order_by_prepack()">
-                            <span class="slider round"></span>
-
-                        </label>
-
-                        <p-tabView *ngIf="productDetails?.orderByPrePack"
-                            [activeIndex]="chk_Order_by_prepack[currentIndex]? 0 : 1">
-
-                            <p-tabPanel header="Order By Prepack" [disabled]="!chk_Order_by_prepack[currentIndex]">
-                                <table *ngIf="productDetails?.orderByPrePack"
-                                    class="table text-center table-bordered table-white">
-                                    <thead>
-                                        <tr>
-                                            <th scope="col" scope="col"
-                                                *ngIf="productData?.showStockAvailability != 'No'">
-                                                {{'AvailablePrepacks' | localize}}
-                                            </th>
-                                            <th scope="col">{{'Ordered' | localize}}</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody
-                                        *ngIf="filteredColors?.length > 0 && filteredColors[currentIndex]?.sizes?.length > 0">
-                                        <tr>
-                                            <td *ngIf="(productData?.showInOutStockFlag == 'ItemColorSizeLevel' || productData?.showInOutStockFlag == 'Bothlevels' ) &&  filteredColors[currentIndex]?.sizes[0]?.noOfAvailablePrepacks >0 && productData?.showStockAvailability != 'No'"
-                                                class="text-success">{{'InStock' | localize}}</td>
-                                            <td *ngIf="(productData?.showInOutStockFlag == 'ItemColorSizeLevel' || productData?.showInOutStockFlag == 'Bothlevels' ) &&  filteredColors[currentIndex]?.sizes[0]?.noOfAvailablePrepacks ==0 && productData?.showStockAvailability != 'No'"
-                                                class="text-danger">{{'OutOfStock' | localize}}</td>
-                                            <td
-                                                *ngIf="(productData?.showInOutStockFlag != 'ItemColorSizeLevel' && productData?.showInOutStockFlag != 'Bothlevels' ) && productData?.showStockAvailability != 'No' ">
-                                                {{
-                                                filteredColors[currentIndex]?.sizes[0]?.noOfAvailablePrepacks
-                                                }}
-                                            </td>
-                                            <td>
-                                                <p-inputNumber
-                                                    [disabled]="(orderType == 'SO' &&  !chk_Order_by_prepack[currentIndex]) || !isAuthenticated"
-                                                    [(ngModel)]="
-                                                        filteredColors[currentIndex]?.sizes[0].orderedPrePacks
-                                                    " mode="decimal" [showButtons]="true" inputId="minmax-buttons"
-                                                    [min]="0" (ngModelChange)="
-                                                        onNumberChange(
-                                                            $event,
-                                                            filteredColors[
-                                                                currentIndex
-                                                            ],
-                                                            null
-                                                        )
-                                                    ">
-                                                </p-inputNumber>
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </p-tabPanel>
-                            <p-tabPanel class="sm-tab"
-                                [header]="(orderType == 'SO'  &&  productDetails?.orderByPrePack && !chk_Order_by_prepack[currentIndex])  ? 'Order By Size' : 'View Ordered Quantity By Size'">
-                                <table class="table text-center table-bordered table-white">
-                                    <thead>
-                                        <tr>
-                                            <th scope="col">{{'Size' | localize}}</th>
-                                            <th scope="col" *ngIf="productData?.showStockAvailability != 'No'">
-                                                {{'AvailableQTY' | localize}}</th>
-                                            <th scope="col">{{'Ordered' | localize}}</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr *ngFor="
-                                                let size of filteredColors[
-                                                    currentIndex
-                                                ]?.sizes;
-                                                let i = index
-                                            ">
-                                            <td>{{ size.label }}</td>
-                                            <td *ngIf="(productData?.showInOutStockFlag == 'ItemColorSizeLevel' || productData?.showInOutStockFlag == 'Bothlevels' ) &&  filteredColors[currentIndex]?.sizes[0]?.noOfAvailablePrepacks >0 && productData?.showStockAvailability != 'No'"
-                                                class="text-danger">{{'OutOfStock' | localize}}</td>
-
-                                            <td *ngIf="(productData?.showInOutStockFlag == 'ItemColorSizeLevel' || productData?.showInOutStockFlag == 'Bothlevels' ) &&  filteredColors[currentIndex]?.sizes[0]?.noOfAvailablePrepacks ==0 && productData?.showStockAvailability != 'No'"
-                                                class="text-success">{{'InStock' | localize}}</td>
-
-                                            <td
-                                                *ngIf="(productData?.showInOutStockFlag != 'ItemColorSizeLevel' && productData?.showInOutStockFlag != 'Bothlevels' ) && productData?.showStockAvailability != 'No'">
-                                                {{ size.stockAvailability }}</td>
-                                            <td
-                                                *ngIf="filteredColors?.length > 0 && filteredColors[currentIndex]?.sizes?.length > 0">
-
-                                                <p-inputNumber
-                                                    [(ngModel)]="!(orderType == 'SO'  &&  productDetails?.orderByPrePack && !chk_Order_by_prepack[currentIndex] ) ? (size.sizeRatio * filteredColors[currentIndex]?.sizes[0]?.orderedPrePacks) : filteredColors[currentIndex]?.sizes[i].orderedPrePacks"
-                                                    mode="decimal" [showButtons]="true" inputId="minmax-buttons"
-                                                    [min]="0"
-                                                    [disabled]="orderType != 'SO' || (orderType == 'SO' &&  chk_Order_by_prepack[currentIndex]) || !isAuthenticated"
-                                                    (ngModelChange)="
-                                                        onNumberChange(
-                                                            $event,
-                                                            filteredColors[
-                                                                currentIndex
-                                                            ],
-                                                            i
-                                                        )
-                                                    ">
-                                                </p-inputNumber>
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </p-tabPanel>
-                        </p-tabView>
-                        <!-- end order by prepack -->
-                    </div>
+                    <ng-container
+                        *ngTemplateOutlet="productOrderSectionTemplate; context: { isMobile: false }">
+                        </ng-container>>
                 </div>
 
                 <!-- summary section -->
-                <div class="col-3 summary-sec summaryWeb">
-                    <div class="summary border">
-                        <div class="header">
-                            <h6 class="p-0 m-0" style=" font-weight: bold;">{{'OrderedSummary' | localize}}</h6>
-                        </div>
-                        <div class="totals">
-                            <p class="p-0 m-0">{{'Qty' | localize}} {{ totalOrderQTY }}</p>
-                            <p class="p-0 m-0">
-
-                                {{
-                                currencySymbol
-                                }}
-
-                                {{ totlaOrderPrices| currency:' ' }}
-
-                            </p>
-                        </div>
-                        <div class="orderedSummary">
-                            <div *ngIf="orderSummary.length === 0" class="default">
-                                {{'ProductOrderSummary' | localize}}
-                            </div>
-
-                            <div *ngIf="orderSummary.length !== 0" class="summaryTables">
-                                <div class="each-table" *ngFor="
-                            let order of orderSummary;
-                            let orderIndex = index
-                        ">
-                                    <div class="orderHeader d-flex align-items-center justify-content-between">
-                                        <div class="d-flex align-items-center justify-content-lg-start"
-                                            style="gap: 5px">
-
-                                            <div class="d-flex" style="height: 36px;">
-                                                <!-- <img class="mt-2" [src]="attachmentBaseUrl + '/' + order.color.colorImg"
-                                                    style="width: 24px; height: 24px; border-radius: 6px;"
-                                                    onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'" /> -->
-                                                <ng-container
-                                                    *ngIf="(order?.color?.colorCode || order?.color?.colorHexaCode); else showThumb">
-                                                    <div style="width:24px;height:24px;border-radius:6px;"
-                                                        [ngStyle]="{ 'background-color': (order?.color?.colorCode || order?.color?.colorHexaCode) }">
-                                                    </div>
-                                                </ng-container>
-
-                                                <ng-template #showThumb>
-                                                    <img [src]="attachmentBaseUrl + '/' + order.color.colorImg"
-                                                        class="mt-2"
-                                                        style="width: 24px; height: 24px; border-radius: 6px;" />
-                                                </ng-template>
-
-                                                <div>
-                                                    <p class="ml-2 mb-0" style="
-                                    font-style: normal;
-                                    font-weight: 700;
-                                    font-size: 10px;
-                                    line-height: 15px;                               
-                                    color: #1B101B;                               
-                                    ">
-                                                        {{ order.color.colorCodeSelectedValues }}
-                                                    </p>
-                                                    <p class="ml-2 mb-0" style="color: #9E9E9E;
-                                    font-weight: 600;
-                                    font-size: 10px;
-                                    line-height: 15px;
-                                    color: #9E9E9E;
-                                    ">
-                                                        {{ order.color.colorName }}
-                                                    </p>
-                                                </div>
-                                            </div>
-
-                                        </div>
-                                        <a (click)="removeColor(order, orderIndex)">
-                                            <img class="mt-2"
-                                                src="../../../../../assets/placeholders/edit-svgrepo-com 3.svg"
-                                                style=" border-radius: 6px;" />
-                                        </a>
-                                    </div>
-                                    <!-- order by size summary table -->
-                                    <table class="table table-bordered mb-0">
-                                        <thead>
-                                            <tr style="    font-weight: 700;
-                                font-size: 10px;
-                                line-height: 15px;
-
-                                
-                                color: #1B101B;">
-                                                <th>{{'Size' | localize}}</th>
-                                                <th>{{'QTY' | localize}}</th>
-                                                <th>{{'Price' | localize}}</th>
-                                                <th>{{'Amount' | localize}}</th>
-                                                <th>{{'Actions' | localize}}</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody *ngIf="!productDetails?.orderByPrePack">
-                                            <ng-container *ngFor="
-                                        let size of order.color.sizes;
-                                        let i = index
-                                    ">
-                                                <tr *ngIf="size.orderedQty !== 0" style="
-                                    font-weight: 400;
-                                    font-size: 12px;
-                                    line-height: 20px;
-                             
-                                    
-                                    color: #9E9E9E;
-                                    
-                            
-                                    ">
-
-                                                    <td>{{ size.label }}</td>
-                                                    <td>{{ size.orderedQty }}</td>
-                                                    <td>{{ size.price| currency:' ' }}</td>
-                                                    <td>
-                                                        {{
-                                                        (size.orderedQty *
-                                                        size.price) | currency:' '
-                                                        }}
-                                                    </td>
-                                                    <td>
-                                                        <a (click)="
-                                                    removeSize(
-                                                        i,
-                                                        size,
-                                                        order,
-                                                        orderIndex
-                                                    )
-                                                ">
-                                                            <img src="../../../../../assets/placeholders/edit-svgrepo-com 3.svg"
-                                                                style=" border-radius: 6px;" />
-                                                        </a>
-                                                    </td>
-                                                </tr>
-                                            </ng-container>
-                                            <tr *ngIf="
-                                        calculateOrderedQTYSum(
-                                            order.color.sizes
-                                        ) !== 0
-                                    ">
-                                                <th class="text-center">{{'Total' | localize}}</th>
-                                                <th>
-                                                    {{
-                                                    calculateOrderedQTYSum(
-                                                    order.color.sizes
-                                                    )
-                                                    }}
-                                                </th>
-                                                <th colspan="3" style=" text-align: center;">
-                                                    {{
-                                                    calculatePriceSum(
-                                                    order.color.sizes
-                                                    )| currency:' '
-                                                    }}
-                                                </th>
-                                            </tr>
-                                        </tbody>
-                                        <tbody *ngIf="productDetails?.orderByPrePack&&calculatePrepackOrderedQTYSum(
-                                            order.color.sizes,
-                                            orderIndex, order.colorIndex
-                                )">
-                                            <ng-container *ngFor="
-                                        let size of order.color.sizes;
-                                        let i = index
-                                    ">
-                                                <tr *ngIf="size.orderedPrePacks !== 0">
-
-                                                    <td>{{ size.label }}</td>
-                                                    <td>
-                                                        {{
-                                                        !(orderType == 'SO' && productDetails?.orderByPrePack &&
-                                                        !chk_Order_by_prepack[orderIndex] ) ?
-                                                        size.sizeRatio *
-                                                        order.color.sizes[0]
-                                                        .orderedPrePacks
-
-                                                        : order.color.sizes[i]
-                                                        .orderedPrePacks
-
-                                                        }}
-                                                    </td>
-                                                    <td>{{ size.price | currency:' '}}</td>
-                                                    <td>
-                                                        {{
-                                                        !(orderType == 'SO' && productDetails?.orderByPrePack &&
-                                                        !chk_Order_by_prepack[orderIndex] ) ?
-                                                        ( size.sizeRatio *
-                                                        order.color.sizes[0]
-                                                        .orderedPrePacks *
-                                                        size.price | currency:' '
-                                                        )
-                                                        : (order.color.sizes[i]
-                                                        .orderedPrePacks *
-                                                        size.price | currency:' '
-                                                        )
-
-                                                        }}
-                                                    </td>
-                                                    <td>
-                                                        <a (click)="
-                                                    removeSize(
-                                                        i,
-                                                        size,
-                                                        order,
-                                                        orderIndex
-                                                    )
-                                                ">
-                                                            <img class="mt-2"
-                                                                src="../../../../../assets/placeholders/edit-svgrepo-com 3.svg"
-                                                                style=" border-radius: 6px;" />
-                                                        </a>
-                                                    </td>
-                                                </tr>
-                                            </ng-container>
-                                            <tr>
-                                                <th class="text-center">{{'Total' | localize}}</th>
-                                                <th>
-                                                    {{
-                                                    calculatePrepackOrderedQTYSum(
-                                                    order.color.sizes,
-                                                    orderIndex, order.colorIndex
-                                                    )
-                                                    }}
-                                                </th>
-                                                <th colspan="3" style="text-align: center;">
-                                                    {{
-                                                    getTotalPrepackSizeAmount(
-                                                    order.color.sizes,
-                                                    orderIndex,order.colorIndex
-                                                    )| currency:' '
-                                                    }}
-                                                </th>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                    <!-- order by size summary table -->
-
-                                </div>
-                            </div>
-                        </div>
-                        <div class="p-3">
-                            <button [disabled]="orderSummary.length == 0 || !isAuthenticated"
-                                (click)="addToShoppingCart()" class="btn m-0 add-btn">
-                                {{' AddToShoppingCart' | localize}}
-                            </button>
-                        </div>
-
-                    </div>
-                </div>
+                <ng-container
+                *ngTemplateOutlet="orderSummaryTemplate; context: { summaryClass: 'col-3 summary-sec summaryWeb' }">
+                </ng-container>>
             </div>
 
 
@@ -1135,7 +360,7 @@ top: 4px;">
                                 <path
                                     d="M0.667969 2.66634C0.667969 2.18011 0.861123 1.7138 1.20494 1.36998C1.54876 1.02616 2.01507 0.833008 2.5013 0.833008H35.5013C35.9875 0.833008 36.4538 1.02616 36.7977 1.36998C37.1415 1.7138 37.3346 2.18011 37.3346 2.66634C37.3346 3.15257 37.1415 3.61889 36.7977 3.9627C36.4538 4.30652 35.9875 4.49967 35.5013 4.49967H2.5013C2.01507 4.49967 1.54876 4.30652 1.20494 3.9627C0.861123 3.61889 0.667969 3.15257 0.667969 2.66634ZM0.667969 9.99967C0.667969 9.51344 0.861123 9.04713 1.20494 8.70331C1.54876 8.3595 2.01507 8.16634 2.5013 8.16634H35.5013C35.9875 8.16634 36.4538 8.3595 36.7977 8.70331C37.1415 9.04713 37.3346 9.51344 37.3346 9.99967C37.3346 10.4859 37.1415 10.9522 36.7977 11.296C36.4538 11.6399 35.9875 11.833 35.5013 11.833H2.5013C2.01507 11.833 1.54876 11.6399 1.20494 11.296C0.861123 10.9522 0.667969 10.4859 0.667969 9.99967ZM2.5013 15.4997C2.01507 15.4997 1.54876 15.6928 1.20494 16.0366C0.861123 16.3805 0.667969 16.8468 0.667969 17.333C0.667969 17.8192 0.861123 18.2856 1.20494 18.6294C1.54876 18.9732 2.01507 19.1663 2.5013 19.1663H24.5013C24.9875 19.1663 25.4538 18.9732 25.7977 18.6294C26.1415 18.2856 26.3346 17.8192 26.3346 17.333C26.3346 16.8468 26.1415 16.3805 25.7977 16.0366C25.4538 15.6928 24.9875 15.4997 24.5013 15.4997H2.5013Z" />
                             </svg>
-                            <p class="mb-0 mt-md-4 " style="font-size: 11px;"> Details</p>
+                            <p class="mb-0 mt-md-4 " style="font-size: 11px;"> {{'Details' | localize}}</p>
                         </div>
                     </ng-template>
                     <div class="row">
@@ -1307,327 +532,9 @@ top: 4px;">
                                         border-radius: 13px;
                                     " />
 
-                            <div class="color-selection">
-                                <div class="d-flex">
-
-
-
-
-
-                                    <h5 class="my-2" style="text-decoration: none;color:black  !important">
-                                        {{'Colors' | localize}}
-                                    </h5>
-                                    <div class="form-group m-form__group align-items-center">
-                                        <div class="input-group">
-                                            <span class="input-group-btn">
-                                                <button class="searchBtn" type="submit">
-                                                    <img src="../../../assets/landingPage/Search.png" />
-                                                </button>
-                                            </span>
-                                            <input #filterInput [(ngModel)]="filterText"
-                                                (ngModelChange)="onFilterTextChanged()" class="form-control m-input"
-                                                placeholder="search with color" type="text">
-
-                                            <a class="clear-icon" *ngIf="showIconClose"
-                                                (click)="clearFilterText(filterInput)">
-                                                <i class=" fa fa-1x fa-times fa-1x" style="color: #fff;"></i>
-
-                                            </a>
-
-
-                                        </div>
-                                    </div>
-                                </div>
-                                <!-- color selections -->
-                                <div *ngIf="filteredColors?.length <= 3"
-                                    class="d-flex flex-wrap align-items-center justify-content-lg-start">
-                                    <div class="mr-3" *ngFor="let color of filteredColors; let i = index"
-                                        [title]="color.colorName" position="top"
-                                        class="imagAndHexaCode d-flex flex-column"
-                                        tooltipPositionStyleClass="custom-tooltip">
-
-                                        <h6 *ngIf="productData?.showInOutStockFlag == 'ItemColorlevel' ||  productData?.showInOutStockFlag == 'Bothlevels'"
-                                            class="mb-1" style="margin-right: 10px;"
-                                            [ngClass]="hasColorStock(color) ? 'text-success' : 'text-danger'">
-                                            {{ hasColorStock(color) ? 'In stock' : 'Out of stock' }}
-                                        </h6>
-                                        <div style=" margin-right :10px;    border-top-right-radius: 6px;    border-top-left-radius: 6px;"
-                                            [ngClass]="
-                                        i === currentIndex
-                                            ? 'border border-primary '
-                                            : ''
-                                    ">
-                                            <div *ngIf="(!color?.colorImg && color?.colorCode ) || (color?.colorImg && color?.colorCode)"
-                                                class="colorBox" [ngStyle]="{'background-color':color.colorCode}"
-                                                (click)="setSizes(i)"></div>
-                                            <img *ngIf="(color?.colorImg && !color?.colorCode) || (!color?.colorImg && !color?.colorCode)"
-                                                (click)="setSizes(i)" [src]="
-                                        attachmentBaseUrl + '/' + color.colorImg
-                                    " alt="images slides" class="imageSlides"
-                                                onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'" />
-                                            <div class="card-body">
-
-
-                                                <p class="card-text desc fw-bold">
-                                                    {{ color?.colorCodeSelectedValues?.slice(0,8)}} <span
-                                                        *ngIf="color?.colorCodeSelectedValues?.length > 8">...</span>
-                                                </p>
-                                                <p class="seller">{{ color?.colorName?.slice(0,13) }} <span
-                                                        *ngIf="color?.colorName?.length > 13">...</span> </p>
-
-
-
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <!-- color selection -->
-
-                                <!-- color slider -->
-                                <div class="d-flex parent-slider" style="height: 120px;"
-                                    *ngIf="filteredColors?.length > 3">
-                                    <button (click)="slideToPreviousImage()" class="mr-4 indicator-btns">
-                                        <i class="fa fa-chevron-left"></i>
-                                    </button>
-                                    <div class="slider-container">
-                                        <div class="slider" [style.transform]="
-                                                    'translateX(' + translateX + 'px)'
-                                                ">
-                                            <div *ngFor="
-                                                        let color of filteredColors;
-                                                        let i = index
-                                                    " [title]="color.colorName" position="top"
-                                                tooltipPositionStyleClass="custom-tooltip">
-
-                                                <div style=" margin-right :10px;    border-top-right-radius: 6px;    border-top-left-radius: 6px;"
-                                                    [ngClass]="
-                                                    i === currentIndex
-                                                        ? 'border border-primary '
-                                                        : ''
-                                                ">
-                                                    <div *ngIf="(!color?.colorImg && color?.colorCode ) || (color?.colorImg && color?.colorCode)"
-                                                        class="colorBox"
-                                                        [ngStyle]="{'background-color':color.colorCode}"
-                                                        (click)="setSizes(i)"></div>
-                                                    <img *ngIf="(color?.colorImg && !color?.colorCode) || (!color?.colorImg && !color?.colorCode)"
-                                                        (click)="setSizes(i)" [src]="
-                                                    attachmentBaseUrl + '/' + color.colorImg
-                                                " alt="images slides" class="imageSlides"
-                                                        onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'" />
-                                                    <div class="card-body">
-
-
-                                                        <p class="card-text desc fw-bold">
-                                                            {{ color?.colorCodeSelectedValues?.slice(0,8)}} <span
-                                                                *ngIf="color?.colorCodeSelectedValues?.length > 8">...</span>
-                                                        </p>
-                                                        <p class="seller">{{ color.colorName.slice(0,13) }} <span
-                                                                *ngIf="color.colorName.length > 13">...</span> </p>
-
-
-
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <button (click)="slideToNextImage()" class="indicator-btns">
-                                        <i class="fa fa-chevron-right"></i>
-                                    </button>
-                                </div>
-
-                                <!-- start order by size -->
-                                <h5 *ngIf="!productDetails?.orderByPrePack" class="my-4" style="text-decoration: none">
-                                    {{'OrderBySize' | localize}}
-                                </h5>
-                                <table *ngIf="!productDetails?.orderByPrePack"
-                                    class="table text-center table-bordered table-white">
-                                    <thead>
-                                        <tr>
-                                            <th scope="col">{{'Size' | localize}}</th>
-                                            <th scope="col" *ngIf="productData?.showStockAvailability != 'No'">
-                                                {{'AvailableQTY' | localize}}</th>
-                                            <th scope="col">{{'Ordered' | localize}}</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody
-                                        *ngIf="filteredColors?.length > 0 && filteredColors[currentIndex]?.sizes?.length > 0">
-                                        <tr *ngFor="
-                                                    let size of filteredColors[currentIndex]?.sizes;
-                                                    let i = index
-                                                ">
-                                            <td>{{ size.label }}</td>
-                                            <td *ngIf="((productData?.showInOutStockFlag == 'ItemColorSizeLevel' || productData?.showInOutStockFlag == 'Bothlevels') && size.stockAvailability ==0 ) && productData?.showStockAvailability != 'No'"
-                                                class="text-danger">{{'OutOfStock' | localize}}</td>
-
-                                            <td *ngIf="((productData?.showInOutStockFlag == 'ItemColorSizeLevel' || productData?.showInOutStockFlag == 'Bothlevels') && size.stockAvailability >0 ) && productData?.showStockAvailability != 'No'"
-                                                class="text-success">{{'InStock' | localize}}</td>
-
-                                            <td
-                                                *ngIf="((productData?.showInOutStockFlag != 'ItemColorSizeLevel' && productData?.showInOutStockFlag != 'Bothlevels' ) ||  productData?.showInOutStockFlag == 'ItemColorlevel') && productData?.showStockAvailability != 'No'">
-                                                {{ size.stockAvailability }}</td>
-                                            <td>
-                                                <p-inputNumber [(ngModel)]="size.orderedQty" mode="decimal"
-                                                    [disabled]="!isAuthenticated" [showButtons]="true"
-                                                    inputId="minmax-buttons" [min]="0" (ngModelChange)="
-                                                            onNumberChange(
-                                                                $event,
-                                                                filteredColors[currentIndex],
-                                                                i
-                                                            )
-                                                        " class="input-custom">
-                                                </p-inputNumber>
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                                <!-- end order by size -->
-
-                                <!-- start order by prepack -->
-                                <h5 *ngIf="productDetails?.orderByPrePack" class="my-4"
-                                    style="text-decoration: none;color:black  !important">
-                                    {{'PrepackDefinition' | localize}}
-                                </h5>
-                                <table *ngIf="productDetails?.orderByPrePack"
-                                    class="table text-center table-bordered table-white">
-                                    <tbody
-                                        *ngIf="filteredColors?.length > 0 && filteredColors[currentIndex]?.sizes?.length > 0">
-                                        <tr>
-                                            <th style="background-color: #F8F8F8;">{{'Size' | localize}}</th>
-                                            <td *ngFor="
-                                                        let size of filteredColors[currentIndex]?.sizes
-                                                    ">
-                                                {{ size.label }}
-                                            </td>
-                                            <th style="background-color: #F8F8F8;">{{'TotalPcs' | localize}}</th>
-                                        </tr>
-                                        <tr
-                                            *ngIf="filteredColors?.length > 0 && filteredColors[currentIndex]?.sizes?.length > 0">
-                                            <th style="background-color: #F8F8F8;">{{'Prepack' | localize}}</th>
-                                            <td *ngFor="
-                                                        let size of filteredColors[currentIndex]?.sizes
-                                                    ">
-                                                {{ size.sizeRatio }}
-                                            </td>
-                                            <th>{{ getTotlaPrepackSum()}}</th>
-                                        </tr>
-                                    </tbody>
-                                </table>
-
-
-                                <span *ngIf="orderType == 'SO' && productDetails?.orderByPrePack"
-                                    class="p-4 font-weight-bold" style="color:black !important">{{'OrderByPrepack' |
-                                    localize}}</span>
-                                <label *ngIf="orderType == 'SO' && productDetails?.orderByPrePack"
-                                    class="switch switch-container my-4 font-weight-bold">
-                                    <input type="checkbox" [(ngModel)]="chk_Order_by_prepack[currentIndex]" checked
-                                        (change)="onChangechk_Order_by_prepack()">
-                                    <span class="slider round"></span>
-                                </label>
-
-                                <p-tabView *ngIf="productDetails?.orderByPrePack"
-                                    [activeIndex]="chk_Order_by_prepack[currentIndex]? 0 : 1" class="table-mob">
-                                    <p-tabPanel header="Order By Prepack"
-                                        [disabled]="!chk_Order_by_prepack[currentIndex]" class="tabView-mob">
-                                        <table *ngIf="productDetails?.orderByPrePack"
-                                            class="table text-center table-bordered table-white">
-                                            <thead>
-                                                <tr>
-                                                    <th scope="col" *ngIf="productData?.showStockAvailability != 'No'"
-                                                        scope="col">
-                                                        {{'AvailablePrepacks' | localize}}
-                                                    </th>
-                                                    <th scope="col">{{'Ordered' | localize}}</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <tr>
-                                                    <td *ngIf="(productData?.showInOutStockFlag == 'ItemColorSizeLevel' || productData?.showInOutStockFlag == 'Bothlevels' ) &&  filteredColors[currentIndex]?.sizes[0]?.noOfAvailablePrepacks >0 && productData?.showStockAvailability != 'No'"
-                                                        class="text-success">{{'InStock' | localize}}</td>
-                                                    <td *ngIf="(productData?.showInOutStockFlag == 'ItemColorSizeLevel' || productData?.showInOutStockFlag == 'Bothlevels' ) &&  filteredColors[currentIndex]?.sizes[0]?.noOfAvailablePrepacks ==0 && productData?.showStockAvailability != 'No'"
-                                                        class="text-danger">{{'OutOfStock' | localize}}</td>
-                                                    <td
-                                                        *ngIf="(productData?.showInOutStockFlag != 'ItemColorSizeLevel' && productData?.showInOutStockFlag != 'Bothlevels' ) && productData?.showStockAvailability != 'No'">
-                                                        {{
-                                                        filteredColors[currentIndex]?.sizes[0]?.noOfAvailablePrepacks
-                                                        }}
-                                                    </td>
-                                                    <td
-                                                        *ngIf="filteredColors?.length > 0 && filteredColors[currentIndex]?.sizes?.length > 0">
-                                                        <p-inputNumber
-                                                            [disabled]="(orderType == 'SO' &&  !chk_Order_by_prepack[currentIndex]) || !isAuthenticated"
-                                                            [(ngModel)]="
-                                                                    filteredColors[currentIndex]?.sizes[0]
-                                                                        .orderedPrePacks
-                                                                " mode="decimal" [showButtons]="true"
-                                                            inputId="minmax-buttons" [min]="0" (ngModelChange)="
-                                                                    onNumberChange(
-                                                                        $event,
-                                                                        filteredColors[
-                                                                            currentIndex
-                                                                        ],
-                                                                        null
-                                                                    )
-                                                                " class="input-custom">
-                                                        </p-inputNumber>
-                                                    </td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                    </p-tabPanel>
-                                    <p-tabPanel
-                                        [header]="(orderType == 'SO'  &&  productDetails?.orderByPrePack && !chk_Order_by_prepack[currentIndex])  ? 'Order By Size' : 'View Ordered Quantity By Size'">
-                                        <table class="table text-center table-bordered table-white">
-                                            <thead>
-                                                <tr>
-                                                    <th scope="col">{{'Size' | localize}}</th>
-                                                    <th scope="col" *ngIf="productData?.showStockAvailability != 'No'">
-                                                        {{'AvailableQTY' | localize}}</th>
-                                                    <th scope="col">{{'Ordered' | localize}}</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <tr *ngFor="
-                                                            let size of filteredColors[
-                                                                currentIndex
-                                                            ]?.sizes;
-                                                            let i = index
-                                                        ">
-                                                    <td>{{ size.label }}</td>
-                                                    <td *ngIf="((productData?.showInOutStockFlag == 'ItemColorSizeLevel' || productData?.showInOutStockFlag == 'Bothlevels') && size.stockAvailability ==0 ) && productData?.showStockAvailability != 'No'"
-                                                        class="text-danger">{{'OutOfStock' | localize}}</td>
-
-                                                    <td *ngIf="((productData?.showInOutStockFlag == 'ItemColorSizeLevel' || productData?.showInOutStockFlag == 'Bothlevels') && size.stockAvailability >0 ) && productData?.showStockAvailability != 'No'"
-                                                        class="text-success">{{'InStock' | localize}}</td>
-                                                    <td
-                                                        *ngIf="((productData?.showInOutStockFlag != 'ItemColorSizeLevel' && productData?.showInOutStockFlag != 'Bothlevels' &&  productData?.showInOutStockFlag != 'ItemColorlevel') ||  productData?.showInOutStockFlag == 'ItemColorlevel') && productData?.showStockAvailability != 'No'">
-                                                        {{ size.stockAvailability }}</td>
-                                                    <td
-                                                        *ngIf="filteredColors?.length > 0 && filteredColors[currentIndex]?.sizes?.length > 0">
-
-                                                        <p-inputNumber
-                                                            [(ngModel)]="!(orderType == 'SO'  &&  productDetails?.orderByPrePack && !chk_Order_by_prepack[currentIndex] ) ? (size.sizeRatio * filteredColors[currentIndex]?.sizes[0]?.orderedPrePacks) : filteredColors[currentIndex]?.sizes[i].orderedPrePacks"
-                                                            class="input-custom" mode="decimal" [showButtons]="true"
-                                                            inputId="minmax-buttons" [min]="0"
-                                                            [disabled]="orderType != 'SO' || (orderType == 'SO' &&  chk_Order_by_prepack[currentIndex]) || !isAuthenticated"
-                                                            (ngModelChange)="
-                                                                    onNumberChange(
-                                                                        $event,
-                                                                        filteredColors[
-                                                                            currentIndex
-                                                                        ],
-                                                                        i
-                                                                    )
-                                                                ">
-                                                        </p-inputNumber>
-                                                    </td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                    </p-tabPanel>
-                                </p-tabView>
-                                <!-- end order by prepack -->
-                            </div>
+                            <ng-container
+                            *ngTemplateOutlet="productOrderSectionTemplate; context: { isMobile: true }">
+                            </ng-container>>
                         </div>
 
 
@@ -1649,233 +556,9 @@ top: 4px;">
 
 
                     <div class="row">
-                        <div class="col-12 summary-sec ">
-                            <div class="summary border">
-                                <div class="header">
-                                    <h6 class="p-0 m-0" style=" font-weight: bold;">{{'OrderedSummary' | localize}}</h6>
-                                </div>
-                                <div class="totals">
-                                    <p class="p-0 m-0">{{'Qty' | localize}} {{ totalOrderQTY }}</p>
-                                    <p class="p-0 m-0">
-
-                                        {{
-                                        currencySymbol
-                                        }}
-
-                                        {{ totlaOrderPrices| currency:' ' }}
-
-                                    </p>
-                                </div>
-                                <div class="orderedSummary">
-                                    <div *ngIf="orderSummary.length === 0" class="default">
-                                        {{'ProductOrderSummary' | localize}}
-                                    </div>
-
-                                    <div *ngIf="orderSummary.length !== 0" class="summaryTables">
-                                        <div class="each-table" *ngFor="
-                                            let order of orderSummary;
-                                            let orderIndex = index
-                                        ">
-                                            <div class="orderHeader  d-flex align-items-center justify-content-between">
-                                                <div class="d-flex" style="height: 36px;">
-
-                                                    <ng-container
-                                                        *ngIf="(order?.color?.colorCode || order?.color?.colorHexaCode); else showThumb">
-                                                        <div style="width:24px;height:24px;border-radius:6px;"
-                                                            [ngStyle]="{ 'background-color': (order?.color?.colorCode || order?.color?.colorHexaCode) }">
-                                                        </div>
-                                                    </ng-container>
-
-                                                    <ng-template #showThumb>
-                                                        <img [src]="attachmentBaseUrl + '/' + order.color.colorImg"
-                                                            class="mt-2"
-                                                            style="width: 24px; height: 24px; border-radius: 6px;" />
-                                                    </ng-template>
-
-                                                    <div>
-                                                        <p class="ml-2 mb-0" style="
-                                            font-style: normal;
-                                            font-weight: 700;
-                                            font-size: 10px;
-                                            line-height: 15px;                               
-                                            color: #1B101B;                               
-                                            ">
-                                                            {{ order.color.colorCodeSelectedValues }}
-                                                        </p>
-                                                        <p class="ml-2 mb-0" style="color: #9E9E9E;
-                                            font-weight: 600;
-                                            font-size: 10px;
-                                            line-height: 15px;
-                                            color: #9E9E9E;
-                                            ">
-                                                            {{ order.color.colorName }}
-                                                        </p>
-                                                    </div>
-                                                </div>
-                                                <a (click)="removeColor(order, orderIndex)">
-                                                    <img class="mt-2"
-                                                        src="../../../../../assets/placeholders/edit-svgrepo-com 3.svg"
-                                                        style=" border-radius: 6px;" />
-                                                </a>
-                                            </div>
-                                            <!-- order by size summary table -->
-                                            <table class="table table-bordered mb-0">
-                                                <thead>
-                                                    <tr>
-                                                        <th>{{'Size' | localize}}</th>
-                                                        <th>{{'QTY' | localize}}</th>
-                                                        <th>{{'Price' | localize}}</th>
-                                                        <th>{{'Amount' | localize}}</th>
-                                                        <th>{{'Actions' | localize}}</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody *ngIf="!productDetails?.orderByPrePack">
-                                                    <ng-container *ngFor="
-                                                        let size of order.color.sizes;
-                                                        let i = index
-                                                    ">
-                                                        <tr *ngIf="size.orderedQty !== 0">
-
-                                                            <td>{{ size.label }}</td>
-                                                            <td>{{ size.orderedQty }}</td>
-                                                            <td>{{ size.price| currency:' ' }}</td>
-                                                            <td>
-                                                                {{
-                                                                (size.orderedQty *
-                                                                size.price) | currency:' '
-                                                                }}
-                                                            </td>
-                                                            <td>
-                                                                <a (click)="
-                                                                    removeSize(
-                                                                        i,
-                                                                        size,
-                                                                        order,
-                                                                        orderIndex
-                                                                    )
-                                                                ">
-                                                                    <img class="mt-2"
-                                                                        src="../../../../../assets/placeholders/edit-svgrepo-com 3.svg"
-                                                                        style=" border-radius: 6px;" />
-                                                                </a>
-                                                            </td>
-                                                        </tr>
-                                                    </ng-container>
-                                                    <tr *ngIf="
-                                                        calculateOrderedQTYSum(
-                                                            order.color.sizes
-                                                        ) !== 0
-                                                    ">
-                                                        <th class="text-center">{{'Total' | localize}}</th>
-                                                        <th>
-                                                            {{
-                                                            calculateOrderedQTYSum(
-                                                            order.color.sizes
-                                                            )
-                                                            }}
-                                                        </th>
-                                                        <th colspan="3" style=" text-align: center;">
-                                                            {{
-                                                            calculatePriceSum(
-                                                            order.color.sizes
-                                                            )| currency:' '
-                                                            }}
-                                                        </th>
-                                                    </tr>
-                                                </tbody>
-                                                <tbody *ngIf="productDetails?.orderByPrePack&&calculatePrepackOrderedQTYSum(
-                                                    order.color.sizes,
-                                                    orderIndex, order.colorIndex
-                                                )">
-                                                    <ng-container *ngFor="
-                                                        let size of order.color.sizes;
-                                                        let i = index
-                                                    ">
-                                                        <tr *ngIf="size.orderedPrePacks !== 0">
-
-                                                            <td>{{ size.label }}</td>
-                                                            <td>
-                                                                {{
-                                                                !(orderType == 'SO' && productDetails?.orderByPrePack &&
-                                                                !chk_Order_by_prepack[orderIndex]) ?
-                                                                size.sizeRatio *
-                                                                order.color.sizes[0]
-                                                                .orderedPrePacks
-
-                                                                : order.color.sizes[i]
-                                                                .orderedPrePacks
-
-                                                                }}
-                                                            </td>
-                                                            <td>{{ size.price | currency:' '}}</td>
-                                                            <td>
-                                                                {{
-                                                                !(orderType == 'SO' && productDetails?.orderByPrePack &&
-                                                                !chk_Order_by_prepack[orderIndex] ) ?
-                                                                ( size.sizeRatio *
-                                                                order.color.sizes[0]
-                                                                .orderedPrePacks *
-                                                                size.price | currency:' '
-                                                                )
-                                                                : (order.color.sizes[i]
-                                                                .orderedPrePacks *
-                                                                size.price | currency:' '
-                                                                )
-
-                                                                }}
-                                                            </td>
-
-                                                            <td>
-                                                                <a (click)="
-                                                                    removeSize(
-                                                                        i,
-                                                                        size,
-                                                                        order,
-                                                                        orderIndex
-                                                                    )
-                                                                ">
-                                                                    <img class="mt-2"
-                                                                        src="../../../../../assets/placeholders/edit-svgrepo-com 3.svg"
-                                                                        style=" border-radius: 6px;" />
-                                                                </a>
-                                                            </td>
-                                                        </tr>
-                                                    </ng-container>
-                                                    <tr>
-                                                        <th class="text-center">{{'Total' | localize}}</th>
-                                                        <th>
-                                                            {{
-                                                            calculatePrepackOrderedQTYSum(
-                                                            order.color.sizes,
-                                                            orderIndex, order.colorIndex
-                                                            )
-                                                            }}
-                                                        </th>
-                                                        <th colspan="3" style="text-align: center;">
-                                                            {{
-                                                            getTotalPrepackSizeAmount(
-                                                            order.color.sizes,
-                                                            orderIndex,order.colorIndex
-                                                            )| currency:' '
-                                                            }}
-                                                        </th>
-                                                    </tr>
-                                                </tbody>
-                                            </table>
-                                            <!-- order by size summary table -->
-
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="p-3">
-
-                                    <button [disabled]="orderSummary.length == 0 || !isAuthenticated"
-                                        (click)="addToShoppingCart()" class="btn m-0 add-btn">
-                                        {{'AddToShoppingCart' | localize}}
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
+                        <ng-container
+                            *ngTemplateOutlet="orderSummaryTemplate; context: { summaryClass: 'col-12 summary-sec' }">
+                            </ng-container>>
                         <div class="col-12">
                             <div class="bg-white rounded p-4 my-4">
                                 <h4>{{'ProductDescription' | localize}}</h4>
@@ -2040,7 +723,513 @@ top: 4px;">
             <button type="button" pButton icon="pi pi-check" label="Yes" (click)="cd.accept()"></button>
         </ng-template>
     </p-confirmDialog>
-    <p-dialog [(visible)]="visible" [modal]="true" [style]="{ 'width': '450px', 'border-radius': '20px' }"
+    
+<!-- ================= REUSABLE TEMPLATES - REMOVES DUPLICATED HTML ================= -->
+
+<ng-template #orderSummaryTemplate let-summaryClass="summaryClass">
+    <div [ngClass]="summaryClass">
+        <div class="summary border">
+            <div class="header">
+                <h6 class="p-0 m-0 fw-bold">{{ 'OrderedSummary' | localize }}</h6>
+            </div>
+
+            <div class="totals">
+                <p class="p-0 m-0">{{ 'Qty' | localize }} {{ totalOrderQTY }}</p>
+                <p class="p-0 m-0">
+                    {{ currencySymbol }}
+                    {{ totlaOrderPrices | currency:' ' }}
+                </p>
+            </div>
+
+            <div class="orderedSummary">
+                <div *ngIf="orderSummary.length === 0" class="default">
+                    {{ 'ProductOrderSummary' | localize }}
+                </div>
+
+                <div *ngIf="orderSummary.length !== 0" class="summaryTables">
+                    <div
+                        class="each-table"
+                        *ngFor="let order of orderSummary; let orderIndex = index">
+
+                        <div class="orderHeader d-flex align-items-center justify-content-between">
+                            <div class="d-flex align-items-center justify-content-lg-start summary-color-row">
+                                <div class="d-flex summary-color-info">
+                                    <ng-container *ngIf="(order?.color?.colorCode || order?.color?.colorHexaCode); else orderImageThumb">
+                                        <div
+                                            class="summary-color-swatch"
+                                            [ngStyle]="{
+                                                'background-color': (order?.color?.colorCode || order?.color?.colorHexaCode)
+                                            }">
+                                        </div>
+                                    </ng-container>
+
+                                    <ng-template #orderImageThumb>
+                                        <img
+                                            class="mt-2 summary-color-img"
+                                            [src]="attachmentBaseUrl + '/' + order?.color?.colorImg"
+                                            onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'" />
+                                    </ng-template>
+
+                                    <div>
+                                        <p class="ml-2 mb-0 summary-color-code">
+                                            {{ order?.color?.colorCodeSelectedValues }}
+                                        </p>
+
+                                        <p class="ml-2 mb-0 summary-color-name">
+                                            {{ order?.color?.colorName }}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <a class="cursor-pointer" (click)="removeColor(order, orderIndex)">
+                                <img
+                                    class="mt-2 rounded-6"
+                                    src="../../../../../assets/placeholders/edit-svgrepo-com 3.svg" />
+                            </a>
+                        </div>
+
+                        <table class="table table-bordered mb-0">
+                            <thead>
+                                <tr class="summary-table-head">
+                                    <th>{{ 'Size' | localize }}</th>
+                                    <th>{{ 'QTY' | localize }}</th>
+                                    <th>{{ 'Price' | localize }}</th>
+                                    <th>{{ 'Amount' | localize }}</th>
+                                    <th>{{ 'Actions' | localize }}</th>
+                                </tr>
+                            </thead>
+
+                            <tbody *ngIf="!productDetails?.orderByPrePack">
+                                <ng-container *ngFor="let size of order?.color?.sizes; let i = index">
+                                    <tr *ngIf="size.orderedQty !== 0" class="summary-table-row">
+                                        <td>{{ size.label }}</td>
+                                        <td>{{ size.orderedQty }}</td>
+                                        <td>{{ size.price | currency:' ' }}</td>
+                                        <td>{{ (size.orderedQty * size.price) | currency:' ' }}</td>
+                                        <td>
+                                            <a class="cursor-pointer" (click)="removeSize(i, size, order, orderIndex)">
+                                                <img
+                                                    class="rounded-6"
+                                                    src="../../../../../assets/placeholders/edit-svgrepo-com 3.svg" />
+                                            </a>
+                                        </td>
+                                    </tr>
+                                </ng-container>
+
+                                <tr *ngIf="calculateOrderedQTYSum(order.color.sizes) !== 0">
+                                    <th class="text-center">{{ 'Total' | localize }}</th>
+                                    <th>{{ calculateOrderedQTYSum(order.color.sizes) }}</th>
+                                    <th colspan="3" class="text-center">
+                                        {{ calculatePriceSum(order.color.sizes) | currency:' ' }}
+                                    </th>
+                                </tr>
+                            </tbody>
+
+                            <tbody
+                                *ngIf="productDetails?.orderByPrePack && calculatePrepackOrderedQTYSum(order.color.sizes, orderIndex, order.colorIndex)">
+                                <ng-container *ngFor="let size of order.color.sizes; let i = index">
+                                    <tr *ngIf="size.orderedPrePacks !== 0" class="summary-table-row">
+                                        <td>{{ size.label }}</td>
+
+                                        <td>
+                                            {{
+                                                !(orderType == 'SO' && productDetails?.orderByPrePack && !chk_Order_by_prepack[orderIndex])
+                                                    ? size.sizeRatio * order?.color?.sizes[0]?.orderedPrePacks
+                                                    : order.color.sizes[i].orderedPrePacks
+                                            }}
+                                        </td>
+
+                                        <td>{{ size.price | currency:' ' }}</td>
+
+                                        <td>
+                                            {{
+                                                !(orderType == 'SO' && productDetails?.orderByPrePack && !chk_Order_by_prepack[orderIndex])
+                                                    ? (size.sizeRatio * order?.color?.sizes[0]?.orderedPrePacks * size.price | currency:' ')
+                                                    : (order.color.sizes[i].orderedPrePacks * size.price | currency:' ')
+                                            }}
+                                        </td>
+
+                                        <td>
+                                            <a class="cursor-pointer" (click)="removeSize(i, size, order, orderIndex)">
+                                                <img
+                                                    class="mt-2 rounded-6"
+                                                    src="../../../../../assets/placeholders/edit-svgrepo-com 3.svg" />
+                                            </a>
+                                        </td>
+                                    </tr>
+                                </ng-container>
+
+                                <tr>
+                                    <th class="text-center">{{ 'Total' | localize }}</th>
+                                    <th>{{ calculatePrepackOrderedQTYSum(order.color.sizes, orderIndex, order.colorIndex) }}</th>
+                                    <th colspan="3" class="text-center">
+                                        {{ getTotalPrepackSizeAmount(order.color.sizes, orderIndex, order.colorIndex) | currency:' ' }}
+                                    </th>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="p-3">
+                <button
+                    [disabled]="orderSummary.length == 0 || !isAuthenticated"
+                    (click)="addToShoppingCart()"
+                    class="btn m-0 add-btn">
+                    {{ 'AddToShoppingCart' | localize }}
+                </button>
+            </div>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #productOrderSectionTemplate let-isMobile="isMobile">
+    <div class="color-selection">
+        <div
+            [ngClass]="{
+                'd-flex justify-content-between': !isMobile,
+                'd-flex': isMobile
+            }">
+            <h5 class="my-2 color-section-title">
+                {{ isMobile ? ('Colors' | localize) : productDetails?.variations?.[0]?.extraAttrName }}
+            </h5>
+
+            <div class="mb-0">
+                <div class="form-group m-form__group align-items-center">
+                    <div class="input-group">
+                        <span class="input-group-btn">
+                            <button class="searchBtn" type="submit">
+                                <img src="../../../assets/landingPage/Search.png" />
+                            </button>
+                        </span>
+
+                        <input
+                            #filterInput
+                            [(ngModel)]="filterText"
+                            (ngModelChange)="onFilterTextChanged()"
+                            class="form-control m-input"
+                            [placeholder]="'SearchWithColor' | localize"
+                            type="text" />
+
+                        <a
+                            class="clear-icon cursor-pointer"
+                            *ngIf="showIconClose"
+                            (click)="clearFilterText(filterInput)">
+                            <i class="fa fa-1x fa-times fa-1x clear-icon-x"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <ng-container *ngIf="filteredColors?.length <= (isMobile ? 3 : handleSCreenSelect); else colorSliderTemplate">
+            <div class="d-flex flex-wrap align-items-center justify-content-lg-start">
+                <div class="mr-3" *ngFor="let color of filteredColors; let i = index">
+                    <ng-container
+                        *ngTemplateOutlet="colorCardTemplate; context: { color: color, index: i }">
+                    </ng-container>
+                </div>
+            </div>
+        </ng-container>
+
+        <ng-template #colorSliderTemplate>
+            <div
+                class="d-flex parent-slider"
+                [ngClass]="{ 'parent-slider-mobile': isMobile, 'parent-slider-desktop': !isMobile }">
+                <button (click)="slideToPreviousImage()" class="mr-4 indicator-btns">
+                    <i class="fa fa-chevron-left"></i>
+                </button>
+
+                <div class="slider-container">
+                    <div class="slider" [style.transform]="'translateX(' + translateX + 'px)'">
+                        <div *ngFor="let color of filteredColors; let i = index">
+                            <ng-container
+                                *ngTemplateOutlet="colorCardTemplate; context: { color: color, index: i }">
+                            </ng-container>
+                        </div>
+                    </div>
+                </div>
+
+                <button (click)="slideToNextImage()" class="indicator-btns">
+                    <i class="fa fa-chevron-right"></i>
+                </button>
+            </div>
+        </ng-template>
+
+        <ng-container *ngTemplateOutlet="orderBySizeTemplate"></ng-container>
+        <ng-container *ngTemplateOutlet="orderByPrepackTemplate; context: { isMobile: isMobile }"></ng-container>
+    </div>
+</ng-template>
+
+<ng-template #colorCardTemplate let-color="color" let-i="index">
+    <div
+        class="imagAndHexaCode d-flex flex-column"
+        [title]="color.colorName"
+        position="top"
+        tooltipPositionStyleClass="custom-tooltip">
+        <h6
+            *ngIf="productData?.showInOutStockFlag == 'ItemColorlevel' || productData?.showInOutStockFlag == 'Bothlevels'"
+            class="mb-1 color-stock"
+            [ngClass]="hasColorStock(color) ? 'text-success' : 'text-danger'">
+            {{ (hasColorStock(color) ? 'InStock' : 'OutOfStock') | localize }}
+        </h6>
+
+        <div
+            class="color-card"
+            [ngClass]="i === currentIndex ? 'border border-primary' : ''">
+            <div
+                *ngIf="color?.colorCode"
+                class="colorBox"
+                [ngStyle]="{ 'background-color': color.colorCode }"
+                (click)="setSizes(i)">
+            </div>
+
+            <img
+                *ngIf="!color?.colorCode"
+                (click)="setSizes(i)"
+                [src]="attachmentBaseUrl + '/' + color.colorImg"
+                alt="images slides"
+                class="imageSlides"
+                onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'" />
+
+            <div class="card-body">
+                <p class="card-text desc fw-bold">
+                    {{ color?.colorCodeSelectedValues?.slice(0, 8) }}
+                    <span *ngIf="color?.colorCodeSelectedValues?.length > 8">...</span>
+                </p>
+
+                <p class="seller">
+                    {{ color?.colorName?.slice(0, 13) }}
+                    <span *ngIf="color?.colorName?.length > 13">...</span>
+                </p>
+            </div>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #orderBySizeTemplate>
+    <h5 *ngIf="!productDetails?.orderByPrePack" class="my-4 order-section-title">
+        {{ 'OrderBySize' | localize }}
+    </h5>
+
+    <table
+        *ngIf="!productDetails?.orderByPrePack"
+        class="table text-center table-bordered table-white">
+        <thead>
+            <tr>
+                <th scope="col">{{ 'Size' | localize }}</th>
+                <th scope="col" *ngIf="productData?.showStockAvailability != 'No'">
+                    {{ 'AvailableQTY' | localize }}
+                </th>
+                <th scope="col">{{ 'Ordered' | localize }}</th>
+            </tr>
+        </thead>
+
+        <tbody *ngIf="filteredColors?.length > 0 && filteredColors[currentIndex]?.sizes?.length > 0">
+            <tr *ngFor="let size of filteredColors[currentIndex]?.sizes; let i = index">
+                <td>{{ size.label }}</td>
+
+                <td
+                    *ngIf="((productData?.showInOutStockFlag == 'ItemColorSizeLevel' || productData?.showInOutStockFlag == 'Bothlevels') && size.stockAvailability == 0) && productData?.showStockAvailability != 'No'"
+                    class="text-danger">
+                    {{ 'OutOfStock' | localize }}
+                </td>
+
+                <td
+                    *ngIf="((productData?.showInOutStockFlag == 'ItemColorSizeLevel' || productData?.showInOutStockFlag == 'Bothlevels') && size.stockAvailability > 0) && productData?.showStockAvailability != 'No'"
+                    class="text-success">
+                    {{ 'InStock' | localize }}
+                </td>
+
+                <td
+                    *ngIf="((productData?.showInOutStockFlag != 'ItemColorSizeLevel' && productData?.showInOutStockFlag != 'Bothlevels') || productData?.showInOutStockFlag == 'ItemColorlevel') && productData?.showStockAvailability != 'No'">
+                    {{ size.stockAvailability }}
+                </td>
+
+                <td>
+                    <p-inputNumber
+                        [(ngModel)]="size.orderedQty"
+                        mode="decimal"
+                        [showButtons]="true"
+                        [disabled]="!isAuthenticated"
+                        inputId="minmax-buttons"
+                        [min]="0"
+                        (ngModelChange)="onNumberChange($event, filteredColors[currentIndex], i)"
+                        class="input-custom">
+                    </p-inputNumber>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</ng-template>
+
+<ng-template #orderByPrepackTemplate let-isMobile="isMobile">
+    <h5 *ngIf="productDetails?.orderByPrePack" class="my-4 order-section-title">
+        {{ 'PrepackDefinition' | localize }}
+    </h5>
+
+    <table
+        *ngIf="productDetails?.orderByPrePack"
+        class="table text-center table-bordered table-white">
+        <tbody *ngIf="filteredColors?.length > 0 && filteredColors[currentIndex]?.sizes?.length > 0">
+            <tr *ngIf="filteredColors?.[currentIndex]?.sizes?.length">
+                <th class="table-muted-head">{{ 'Size' | localize }}</th>
+                <td *ngFor="let size of filteredColors[currentIndex]?.sizes">
+                    {{ size.label }}
+                </td>
+                <th class="table-muted-head">{{ 'TotalPcs' | localize }}</th>
+            </tr>
+
+            <tr>
+                <th class="table-muted-head">{{ 'Prepack' | localize }}</th>
+                <td *ngFor="let size of filteredColors[currentIndex]?.sizes">
+                    {{ size.sizeRatio }}
+                </td>
+                <th>{{ getTotlaPrepackSum() }}</th>
+            </tr>
+        </tbody>
+    </table>
+
+    <span
+        *ngIf="orderType == 'SO' && productDetails?.orderByPrePack"
+        class="p-4 font-weight-bold order-by-prepack-label">
+        {{ 'OrderByPrepack' | localize }}
+    </span>
+
+    <label
+        *ngIf="orderType == 'SO' && productDetails?.orderByPrePack"
+        class="switch switch-container my-4 font-weight-bold">
+        <input
+            type="checkbox"
+            [(ngModel)]="chk_Order_by_prepack[currentIndex]"
+            checked
+            (change)="onChangechk_Order_by_prepack()" />
+        <span class="slider round"></span>
+    </label>
+
+    <p-tabView
+        *ngIf="productDetails?.orderByPrePack"
+        [activeIndex]="chk_Order_by_prepack[currentIndex] ? 0 : 1"
+        [ngClass]="{ 'table-mob': isMobile }">
+        <p-tabPanel
+            [header]="'OrderByPrepack' | localize"
+            [disabled]="!chk_Order_by_prepack[currentIndex]"
+            [ngClass]="{ 'tabView-mob': isMobile }">
+            <table
+                *ngIf="productDetails?.orderByPrePack"
+                class="table text-center table-bordered table-white">
+                <thead>
+                    <tr>
+                        <th scope="col" *ngIf="productData?.showStockAvailability != 'No'">
+                            {{ 'AvailablePrepacks' | localize }}
+                        </th>
+                        <th scope="col">{{ 'Ordered' | localize }}</th>
+                    </tr>
+                </thead>
+
+                <tbody *ngIf="filteredColors?.length > 0 && filteredColors[currentIndex]?.sizes?.length > 0">
+                    <tr>
+                        <td
+                            *ngIf="(productData?.showInOutStockFlag == 'ItemColorSizeLevel' || productData?.showInOutStockFlag == 'Bothlevels') && filteredColors[currentIndex]?.sizes[0]?.noOfAvailablePrepacks > 0 && productData?.showStockAvailability != 'No'"
+                            class="text-success">
+                            {{ 'InStock' | localize }}
+                        </td>
+
+                        <td
+                            *ngIf="(productData?.showInOutStockFlag == 'ItemColorSizeLevel' || productData?.showInOutStockFlag == 'Bothlevels') && filteredColors[currentIndex]?.sizes[0]?.noOfAvailablePrepacks == 0 && productData?.showStockAvailability != 'No'"
+                            class="text-danger">
+                            {{ 'OutOfStock' | localize }}
+                        </td>
+
+                        <td
+                            *ngIf="(productData?.showInOutStockFlag != 'ItemColorSizeLevel' && productData?.showInOutStockFlag != 'Bothlevels') && productData?.showStockAvailability != 'No'">
+                            {{ filteredColors[currentIndex]?.sizes[0]?.noOfAvailablePrepacks }}
+                        </td>
+
+                        <td>
+                            <p-inputNumber
+                                [disabled]="(orderType == 'SO' && !chk_Order_by_prepack[currentIndex]) || !isAuthenticated"
+                                [(ngModel)]="filteredColors[currentIndex]?.sizes[0].orderedPrePacks"
+                                mode="decimal"
+                                [showButtons]="true"
+                                inputId="minmax-buttons"
+                                [min]="0"
+                                (ngModelChange)="onNumberChange($event, filteredColors[currentIndex], null)"
+                                class="input-custom">
+                            </p-inputNumber>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </p-tabPanel>
+
+        <p-tabPanel
+            [header]="
+                (orderType == 'SO' && productDetails?.orderByPrePack && !chk_Order_by_prepack[currentIndex])
+                    ? ('OrderBySize' | localize)
+                    : ('ViewOrderedQuantityBySize' | localize)
+            ">
+            <table class="table text-center table-bordered table-white">
+                <thead>
+                    <tr>
+                        <th scope="col">{{ 'Size' | localize }}</th>
+                        <th scope="col" *ngIf="productData?.showStockAvailability != 'No'">
+                            {{ 'AvailableQTY' | localize }}
+                        </th>
+                        <th scope="col">{{ 'Ordered' | localize }}</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    <tr *ngFor="let size of filteredColors[currentIndex]?.sizes; let i = index">
+                        <td>{{ size.label }}</td>
+
+                        <td
+                            *ngIf="((productData?.showInOutStockFlag == 'ItemColorSizeLevel' || productData?.showInOutStockFlag == 'Bothlevels') && size.stockAvailability == 0) && productData?.showStockAvailability != 'No'"
+                            class="text-danger">
+                            {{ 'OutOfStock' | localize }}
+                        </td>
+
+                        <td
+                            *ngIf="((productData?.showInOutStockFlag == 'ItemColorSizeLevel' || productData?.showInOutStockFlag == 'Bothlevels') && size.stockAvailability > 0) && productData?.showStockAvailability != 'No'"
+                            class="text-success">
+                            {{ 'InStock' | localize }}
+                        </td>
+
+                        <td
+                            *ngIf="((productData?.showInOutStockFlag != 'ItemColorSizeLevel' && productData?.showInOutStockFlag != 'Bothlevels') || productData?.showInOutStockFlag == 'ItemColorlevel') && productData?.showStockAvailability != 'No'">
+                            {{ size.stockAvailability }}
+                        </td>
+
+                        <td *ngIf="filteredColors?.length > 0 && filteredColors[currentIndex]?.sizes?.length > 0">
+                            <p-inputNumber
+                                [(ngModel)]="
+                                    !(orderType == 'SO' && productDetails?.orderByPrePack && !chk_Order_by_prepack[currentIndex])
+                                        ? (size.sizeRatio * filteredColors[currentIndex]?.sizes[0]?.orderedPrePacks)
+                                        : filteredColors[currentIndex]?.sizes[i].orderedPrePacks
+                                "
+                                mode="decimal"
+                                [showButtons]="true"
+                                inputId="minmax-buttons"
+                                [min]="0"
+                                [disabled]="orderType != 'SO' || (orderType == 'SO' && chk_Order_by_prepack[currentIndex]) || !isAuthenticated"
+                                (ngModelChange)="onNumberChange($event, filteredColors[currentIndex], i)"
+                                class="input-custom">
+                            </p-inputNumber>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </p-tabPanel>
+    </p-tabView>
+</ng-template>
+
+<!-- ================= END REUSABLE TEMPLATES ================= -->
+
+
+<p-dialog [(visible)]="visible" [modal]="true" [style]="{ 'width': '450px', 'border-radius': '20px' }"
         [draggable]="false">
 
         <div class="p-2 con-body">

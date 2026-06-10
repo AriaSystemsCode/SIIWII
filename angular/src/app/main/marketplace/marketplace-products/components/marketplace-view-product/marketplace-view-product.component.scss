@@ -115,6 +115,7 @@ td {
 
 .slider {
     display: flex;
+    gap: 5px;
     flex-direction: row;
     transition: transform 0.5s;
     background-color: transparent !important;
@@ -960,4 +961,8 @@ p-dialog {
     padding: 6px 12px;
     border: 1px solid #ddd;
     border-radius: 4px;
+}
+
+.parent-slider-mobile , .parent-slider-desktop {
+    min-height: 120px;
 }

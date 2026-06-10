@@ -290,20 +290,13 @@ selectedMessageAfterRefresh: number | null = null;
             });
     }
     showSideBar: boolean = false;
-    showHideSideBarTitle: string = !this.showSideBar ? "Show details" : "Hide details";
+    showHideSideBarTitle: string = !this.showSideBar ? this.l( "Show details") : this.l("Hide details") ;
     onShowSideBar(showSideBar: boolean) {
         this.showSideBar = showSideBar;
-        this.showHideSideBarTitle = !this.showSideBar ? "Show details" : "Hide details";
+        this.showHideSideBarTitle = !this.showSideBar ?  this.l( "Show details") :  this.l("Hide details") ;
     }
 
-    // getPrimaryMessage(event) {
-    //     this.clearActiveTab();
-    //     event.target.closest('button').classList.add('active-tab');
-    //     this.messageCategoryFilter = "MESSAGE";
-    //     this.messages = [];
-    //     this.messagesDetails = [];
-    //     this.getMesssage();
-    // }
+
 getPrimaryMessage(event) {
     this.clearActiveTab();
     event.target.closest('button').classList.add('active-tab');
@@ -418,7 +411,7 @@ getPrimaryMessage(event) {
     selectMessage(message: MessagesDto): void {
         this.showMainSpinner();
         this.showSideBar=false;
-        this.showHideSideBarTitle = !this.showSideBar ? "Show Data" : "Hide Data";
+        this.showHideSideBarTitle = !this.showSideBar ? this.l("ShowData")  : this.l("HideData") ;
         this.highlightFirstMsg = false;
         this.selectedMessage = message.id;
         this.selectedMessageIndx=this.messages.findIndex(x=>x.id==message.id);
