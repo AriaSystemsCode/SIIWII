@@ -117,3 +117,138 @@ button{
 .ml-43{
     margin-left: 43px !important;
 }
+
+
+
+
+@media (max-width: 768px) {
+    .dev-logo {
+        padding-bottom: 60px;
+        padding-top: 60px;
+    }
+    .logo-profile {
+        top: -52px;
+    }
+    .addPad {
+        padding-top: 100px !important;
+    }
+    .leesTop {
+        top: 70% !important;
+    }
+    .list-toolbar .list-toolbar-search {
+        width: 178px !important;
+        margin-left: 0 !important;
+      
+    }
+    .handlWM {
+        
+            border: 1px solid #D9D9D9 !important;
+            color: #D9D9D9 !important;
+            border-radius: 5px;
+      
+            width: 250px !important;
+            margin-left: 100px !important;
+            height: 46px !important;
+            background-color: #FFFFFF;
+        
+    }
+
+
+}
+
+
+    @media (max-width: 480px) {
+        .handlWM {
+        
+       
+            width: 340px !important;
+            margin-left: 0 !important;
+    
+        
+    }
+    }
+
+
+::ng-deep {
+    @media (max-width: 768px) {
+        .view-profile-wrapper .logo-profile {
+            top: 0 !important;
+            height: 100px !important;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .handleImg {
+            // top: 0 !important;
+            height: 170px !important;
+        }
+    }
+}
+
+.ml-43{
+    margin-left: 43px !important;
+}
+
+
+.filter-overlay {
+    position: fixed;
+    bottom: 0;
+    left: 5%;
+    right: 0;
+    height: 70%;
+    background: white;
+    border-radius: 20px 20px 0 0;
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.2);
+    transform: translateY(100%);
+    animation: slide-up 0.3s forwards;
+    z-index: 1050;
+    overflow-y: auto;
+    width: 90%;
+  }
+  
+  @keyframes slide-up {
+    from {
+      transform: translateY(100%);
+    }
+    to {
+      transform: translateY(0%);
+    }
+  }
+  
+  .overlay-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    border-bottom: 1px solid #ddd;
+  }
+  
+  .btn-close {
+    font-size: 1.5rem;
+    background: none;
+    border: none;
+    cursor: pointer;
+  }
+  
+  .filter-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: #007bff;
+    color: white;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 1040;
+  }
+  
+  @media (min-width: 577px) {
+    .filter-icon {
+      display: none;
+    }
+  }
+  

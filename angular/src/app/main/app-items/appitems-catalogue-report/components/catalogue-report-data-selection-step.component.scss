@@ -1,5 +1,7 @@
+@import '../../../../../assets/styles/base/variables';
+
 .Input {
-    border: 1px solid black !important;
+    border: 1px solid #D5D4DC !important;
 }
 
 .pointer{
@@ -8,5 +10,73 @@
 
 input:focus
 {
-    border: 1px solid black !important;
+    border: 1px solid #D5D4DC !important;
 }
+
+
+.contBtn {
+/* Components / Button / Desktop / Medium / Basic */
+
+/* Auto layout */
+color: #fff;
+padding: 11px 32px;
+
+
+
+background: #4A0D4A;
+/* Elevation 2 */
+box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.25);
+border-radius: 12px;
+
+
+
+}
+::ng-deep {
+    .p-inputswitch.p-inputswitch-checked:not(.p-disabled):hover .p-inputswitch-slider {
+        background: #2DC74F!important;
+    }
+    .p-inputswitch.p-inputswitch-checked .p-inputswitch-slider {
+        background: #2DC74F !important;
+
+    }
+}
+
+.plzTx {
+    color: #9E9E9E;
+    font-weight: 600;
+}
+
+.titls {
+
+font-weight: 700;
+font-size: 16px;
+line-height: 24px;
+
+color: #10002E;
+
+
+}
+
+.onlyTxt {
+
+font-weight: 700;
+font-size: 16px;
+
+color: #9E9E9E;
+
+
+}
+
+@media (min-width: 600px) {
+  .handleW {
+    width: 75%;
+  }
+}
+
+
+@media (max-width: 600px) {
+    .handleW {
+      width: 100%;
+    }
+  }
+  

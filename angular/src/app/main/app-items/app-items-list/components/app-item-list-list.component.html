@@ -1,5 +1,5 @@
-<form [formGroup]="filtersForm">
-    <div [@routerTransition] style="margin-top: -90px;" class="wrapper" >
+<form [formGroup]="filtersForm" class=" bg-white mx-lg-5 mx-2 mt-lg-0 mt-5 p-3 formSec">
+    <div [@routerTransition] class="">
 
         <div class="kt-content kt-grid__item kt-grid__item--fluid kt-grid kt-grid--hor">
             <!-- <div class="kt-subheader kt-grid__item" >
@@ -24,7 +24,7 @@
                 </div>
             </div> -->
             <div [class]="containerClass + ' kt-grid__item kt-grid__item--fluid'"  [ngClass]="{'mt-lg-5 mt-md-0 mt-5 pt-lg-5 pt-md-0 pt-5 ':isArabic}">
-                <div class=" kt-portlet--mobile" [ngClass]="isArabic ? 'addRTLm':'kt-portlet'">
+                <div class=" kt-portlet--mobile" [ngClass]="isArabic ? 'addRTLm':'itemListSec'">
                     <div class="kt-portlet__body">
                        <div class="row ">
                             <div class="col-12 list-toolbar  pb-4">
@@ -62,7 +62,7 @@
                                     </div>
                                     <!-- <div class="list-toolbar-divider"></div> -->
                                     <div class="mb-4 mb-md-0 text-center ">
-                                       <a *ngIf="isGranted('Pages.AppItemsLists.Create')" class="btn createBtn font-weight-normal pl-3 pr-3 text-center list-toolbar-btn d-flex align-items-center" (click)="openCreateOrEditModal()"   >
+                                       <a *ngIf="isGranted('Pages.AppItemsLists.Create')" class="btn createBtn font-weight-normal px-lg-3 px-2 text-center list-toolbar-btn d-flex align-items-center" (click)="openCreateOrEditModal()"   >
                                         <h3 class="mr-2 mt-1">+</h3>    {{ "CreateNewProductList" | localize }} 
                                         </a>
                                     </div>
@@ -122,7 +122,7 @@
                                 </div>
                            </div>
                            <div class="col-12 d-flex flex-column justify-content-between">
-                            <div class="row pt-5 pl-5 pr-2" style="min-height: 60vh;">
+                            <div class="row pt-lg-5 pt-3 pl-lg-5 pl-3 pr-2" style="min-height: 60vh;">
                                 <div  class="col-12" *ngFor="let item of items;index as i" [ngClass]="singleItemPerRowMode?'col-md-12 single-item-per-row-layout' : 'col-lg-6 col-12'">
                                     <app-app-item-list-card
                                     [class]="'border-dashed-bottom mb-3 pb-3'"

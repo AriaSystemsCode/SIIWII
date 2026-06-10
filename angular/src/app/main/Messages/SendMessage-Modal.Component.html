@@ -1,213 +1,109 @@
-<div
-    bsModal
-    #SendMessageModal="bs-modal"
-    class="modal fade"
-    tabindex="-1"
-    role="dialog"
-    aria-labelledby="mySmallModalLabel"
-    aria-hidden="true"
-    *ngIf="modalView"
->
-<div
-  class="d-none d-md-block modal-dialog modal-lg MessageDialog thin-scroll"  
-  [ngClass]="{ 'MessageDialog-ar': isArabic }"
->
+<div bsModal #SendMessageModal="bs-modal" class="modal fade sendMsgTxt" tabindex="-1" role="dialog"
+    aria-labelledby="mySmallModalLabel" aria-hidden="true" *ngIf="modalView">
+    <div class="d-none d-md-block modal-dialog modal-lg MessageDialog thin-scroll"
+        [ngClass]="{ 'MessageDialog-ar': isArabic }">
         <div class="modal-content">
             <form *ngIf="active" #MessageForm="ngForm" novalidate>
                 <div class="modal-header Header">
                     <label *ngIf="replyMessageId == 0">
-                        {{ "New Message" | localize }}</label
-                    >
+                        {{ "New Message" | localize }}</label>
                     <label *ngIf="replyMessageId > 0"> {{ subject }}</label>
-                    <button
-                        type="button"
-                        class="close"
-                        (click)="close()"
-                    ></button>
+                    <button type="button" class="close" (click)="close()"></button>
                 </div>
                 <div class="modal-body">
                     <div class="row align-items-start mb-3 border-bottom">
                         <div class="col-md-1">
                             <div class="InputText">
-                                <span class="text-input-label"
-                                    >{{ "To" | localize }}:</span
-                                >
+                                <span class="text-input-label">{{ "To" | localize }}:</span>
                             </div>
                         </div>
-                        <div
-                            class="p-0 sendusers mb-1 mb-1"
-                            [ngClass]="
+                        <div class="p-0 sendusers mb-1 mb-1" [ngClass]="
                                 'col-md-' +
                                 (9 + (displayCC ? 1 : 0) + (displayBCC ? 1 : 0))
-                            "
-                        >
-                            <p-autoComplete
-                                [style]="{ width: '100%' }"
-                                [inputStyle]="{ width: '100%' }"
-                                class="
+                            ">
+                            <p-autoComplete [style]="{ width: '100%' }" [inputStyle]="{ width: '100%' }" class="
                                     InputText
                                     email-autocomplete
                                     sendMessageInputs
-                                "
-                                [(ngModel)]="toUsers"
-                                [forceSelection]="true"
-                                [suggestions]="filteredUsers"
-                                (completeMethod)="filterUsers($event)"
-                                [minLength]="1"
-                                field="name"
-                                name="MultiSelectInputTo"
-                                id="MultiSelectInputTo"
-                                [required]="true"
-                                [multiple]="true"
-                            >
+                                " [(ngModel)]="toUsers" [forceSelection]="true" [suggestions]="filteredUsers"
+                                (completeMethod)="filterUsers($event)" [minLength]="1" field="name"
+                                name="MultiSelectInputTo" id="MultiSelectInputTo" [required]="true" [multiple]="true">
                             </p-autoComplete>
                         </div>
-                        <div
-                            [ngClass]="{
+                        <div [ngClass]="{
                                 'col-md-2': !displayCC && !displayBCC,
                                 'col-md-1':
                                     (!displayCC && displayBCC) ||
                                     (displayCC && !displayBCC),
                                 'd-none': displayCC && displayBCC
-                            }"
-                        >
+                            }">
                             <div>
-                                <a
-                                    href="javascript:;"
-                                    (click)="showCC()"
-                                    *ngIf="!displayCC"
-                                    ><span class="text-input-label">{{
+                                <a href="javascript:;" (click)="showCC()" *ngIf="!displayCC"><span
+                                        class="text-input-label">{{
                                         "CC" | localize
-                                    }}</span></a
-                                >
-                                <a
-                                    href="javascript:;"
-                                    (click)="showBCC()"
-                                    *ngIf="!displayBCC"
-                                    ><span class="text-input-label">
-                                        {{ "BCC" | localize }}</span
-                                    ></a
-                                >
+                                        }}</span></a>
+                                <a href="javascript:;" (click)="showBCC()" *ngIf="!displayBCC"><span
+                                        class="text-input-label">
+                                        {{ "BCC" | localize }}</span></a>
                             </div>
                         </div>
                     </div>
 
                     <div class="row align-items-start mb-3 border-bottom" *ngIf="displayCC">
                         <div class="col-md-1">
-                            <div
-                                class="InputText"
-                                *ngIf="displayCC"
-                                style="padding-top: 0px !important"
-                            >
-                                <span class="text-input-label"
-                                    >{{ "CC" | localize }}:</span
-                                >
+                            <div class="InputText" *ngIf="displayCC" style="padding-top: 0px !important">
+                                <span class="text-input-label">{{ "CC" | localize }}:</span>
                             </div>
                         </div>
                         <div class="col-md-11 sendusers mb-1">
-                            <p-autoComplete
-                                [style]="{ width: '100%' }"
-                                [inputStyle]="{
+                            <p-autoComplete [style]="{ width: '100%' }" [inputStyle]="{
                                     width: '100%'
-                                }"
-                                *ngIf="displayCC"
-                                class="
+                                }" *ngIf="displayCC" class="
                                     InputText
                                     email-autocomplete
                                     sendMessageInputs
-                                "
-                                [(ngModel)]="ccUsers"
-                                [suggestions]="filteredUsers"
-                                (completeMethod)="filterUsers($event)"
-                                [minLength]="1"
-                                field="name"
-                                name="MultiSelectInputCC"
-                                id="MultiSelectInputCC"
-                                [multiple]="true"
-                            >
+                                " [(ngModel)]="ccUsers" [suggestions]="filteredUsers"
+                                (completeMethod)="filterUsers($event)" [minLength]="1" field="name"
+                                name="MultiSelectInputCC" id="MultiSelectInputCC" [multiple]="true">
                             </p-autoComplete>
                         </div>
                     </div>
 
                     <div class="row align-items-start mb-3 border-bottom" *ngIf="displayBCC">
                         <div class="col-md-1">
-                            <div
-                                class="InputText"
-                                *ngIf="displayBCC"
-                                style="padding-top: 0px !important"
-                            >
-                                <span class="text-input-label"
-                                    >{{ "BCC" | localize }}:</span
-                                >
+                            <div class="InputText" *ngIf="displayBCC" style="padding-top: 0px !important">
+                                <span class="text-input-label">{{ "BCC" | localize }}:</span>
                             </div>
                         </div>
                         <div class="col-md-11 sendusers mb-1">
-                            <p-autoComplete
-                                [style]="{ width: '100%' }"
-                                [inputStyle]="{ width: '100%' }"
-                                *ngIf="displayBCC"
-                                class="
+                            <p-autoComplete [style]="{ width: '100%' }" [inputStyle]="{ width: '100%' }"
+                                *ngIf="displayBCC" class="
                                     InputText
                                     email-autocomplete
                                     sendMessageInputs
-                                "
-                                [(ngModel)]="bccUsers"
-                                [suggestions]="filteredUsers"
-                                (completeMethod)="filterUsers($event)"
-                                [minLength]="1"
-                                field="name"
-                                name="MultiSelectInputBCC"
-                                id="MultiSelectInputBCC"
-                                [multiple]="true"
-                            >
+                                " [(ngModel)]="bccUsers" [suggestions]="filteredUsers"
+                                (completeMethod)="filterUsers($event)" [minLength]="1" field="name"
+                                name="MultiSelectInputBCC" id="MultiSelectInputBCC" [multiple]="true">
                             </p-autoComplete>
                         </div>
                     </div>
 
                     <div class="form-group group-input subject-label">
-                        <div
-                            class="InputText"
-                            *ngIf="replyMessageId == 0"
-                            style="padding-top: 4px !important; display: flex"
-                        >
-                            <span
-                                class="text-input-label subject-label"
-                                *ngIf="replyMessageId == 0"
-                                >{{ "subject" | localize }}:</span
-                            >
-                            <input
-                                *ngIf="replyMessageId == 0"
-                                class="form-control Input bg-white"
-                                style="padding: 6px; height: 20px !important"
-                                placeholder=""
-                                type="Text"
-                                [(ngModel)]="subject"
-                                name="subject"
-                                required
-                            
-                            />
+                        <div class="InputText" *ngIf="replyMessageId == 0"
+                            style="padding-top: 4px !important; display: flex">
+                            <span class="text-input-label subject-label" *ngIf="replyMessageId == 0">{{ "subject" |
+                                localize }}:</span>
+                            <input *ngIf="replyMessageId == 0" class="form-control Input bg-white"
+                                style="padding: 6px; height: 20px !important" placeholder="" type="Text"
+                                [(ngModel)]="subject" name="subject" required />
                         </div>
-                        <div
-                            class="InputText"
-                            *ngIf="replyMessageId > 0"
-                            style="padding-top: 4px !important; display: flex"
-                        >
-                            <span
-                                class="text-input-label subject-label"
-                                *ngIf="replyMessageId > 0"
-                                >{{ "Subject" | localize }}:</span
-                            >
-                            <input
-                                *ngIf="replyMessageId > 0"
-                                readonly
-                                class="form-control Input"
-                                style="padding: 6px; height: 9px"
-                                placeholder=""
-                                type="Text"
-                                [(ngModel)]="subject"
-                                name="subject"
-                                required
-                            />
+                        <div class="InputText" *ngIf="replyMessageId > 0"
+                            style="padding-top: 4px !important; display: flex">
+                            <span class="text-input-label subject-label" *ngIf="replyMessageId > 0">{{ "Subject" |
+                                localize }}:</span>
+                            <input *ngIf="replyMessageId > 0" readonly class="form-control Input"
+                                style="padding: 6px; height: 9px" placeholder="" type="Text" [(ngModel)]="subject"
+                                name="subject" required />
                         </div>
                     </div>
 
@@ -216,11 +112,8 @@
                     <form class="kt-form">
                         <div class="kt-portlet__body">
                             <div class="form-group editor-text">
-                                <p-editor
-                                    [(ngModel)]="htmlEditorInput"
-                                    [ngModelOptions]="{standalone: true}"
-                                    [style]="{ height: '200px' }"
-                                >
+                                <p-editor [(ngModel)]="htmlEditorInput" [ngModelOptions]="{standalone: true}"
+                                    [style]="{ height: '200px' }">
                                 </p-editor>
                             </div>
                         </div>
@@ -230,36 +123,23 @@
                 <div class="attachments-files">
                     <div *ngFor="let item of attachments">
                         <div *ngIf="item.type.includes('image')">
-                            <img
-                                src="assets/message/image.png"
-                                class="icon-file"
-                            /><span>{{ item.name }}</span>
+                            <img src="assets/message/image.png" class="icon-file" /><span>{{ item.name }}</span>
                         </div>
-                        <div
-                            *ngIf="
+                        <div *ngIf="
                                 item.name.includes('.doc') ||
                                 item.name.includes('.docs')
-                            "
-                        >
-                            <img
-                                src="assets/message/microsoft-word.svg"
-                                class="icon-file"
-                            /><span>{{ item.name }}</span>
+                            ">
+                            <img src="assets/message/microsoft-word.svg" class="icon-file" /><span>{{ item.name
+                                }}</span>
                         </div>
                         <div *ngIf="item.name.includes('.ppt')">
-                            <img
-                                src="assets/message/microsoft-powerpoint.svg"
-                                class="icon-file"
-                            /><span>{{ item.name }}</span>
+                            <img src="assets/message/microsoft-powerpoint.svg" class="icon-file" /><span>{{ item.name
+                                }}</span>
                         </div>
                         <div *ngIf="item.name.includes('.xls')">
-                            <img
-                                src="assets/message/excel.svg"
-                                class="icon-file"
-                            /><span>{{ item.name }}</span>
+                            <img src="assets/message/excel.svg" class="icon-file" /><span>{{ item.name }}</span>
                         </div>
-                        <div
-                            *ngIf="
+                        <div *ngIf="
                                 item.name.toLowerCase().indexOf('.ppt') ===
                                     -1 &&
                                 item.name.toLowerCase().indexOf('.xls') ===
@@ -267,298 +147,173 @@
                                 item.name.toLowerCase().indexOf('.doc') ===
                                     -1 &&
                                 item.type.toLowerCase().indexOf('image') === -1
-                            "
-                        >
-                            <img
-                                src="assets/message/document.png"
-                                class="icon-file"
-                            /><span>{{ item.name }}</span>
+                            ">
+                            <img src="assets/message/document.png" class="icon-file" /><span>{{ item.name }}</span>
                         </div>
                     </div>
                 </div>
-                <div
-                    class="modal-footer"
-                    style="
+                <div class="modal-footer" style="
                         border-bottom: none;
-                    "
-                >
-                   
+                    ">
+
                     <div class="icon-upload">
                         <label for="file-input">
                             <!-- <i class="fa fa-paperclip" aria-hidden="true"></i> -->
-                            <i  aria-hidden="true"> <img
-                                src="../../../assets/message/iconamoon_attachment.png"
-                                class="icon-file"
-                            /></i>
+                            <i aria-hidden="true"> <img src="../../../assets/message/iconamoon_attachment.png"
+                                    class="icon-file" /></i>
                         </label>
 
-                        <input
-                            id="file-input"
-                            type="file"
-                            (change)="handleInputChangeAttachment($event)"
-                            multiple
-                        />
+                        <input id="file-input" type="file" (change)="handleInputChangeAttachment($event)" multiple />
                     </div>
-                  
-                    <button
-                    type="button"
-                    [class.disabled]="toUsers.length == 0 ||  subject.trim() === ''"
-                    [disabled]="toUsers.length == 0 || subject == ''"
-                    class="sendBtn"
-                    (click)="sendMessage()"
-                >
-                <i class="fa  fa-paper-plane mr-1" style="color: white;"></i>   {{ "Send" | localize }}
-                </button>
+
+                    <button type="button" [class.disabled]="toUsers.length == 0 ||  subject.trim() === ''"
+                        [disabled]="toUsers.length == 0 || subject == ''" class="sendBtn" (click)="sendMessage()">
+                        <i class="fa  fa-paper-plane mr-1" style="color: white;"></i> {{ "Send" | localize }}
+                    </button>
                 </div>
             </form>
-            
-        </div>    </div>
-        <div class="d-block d-md-none modal-lg MessageDialog thin-scroll pb-5" style="overflow-y: auto;">
-            <div class="modal-content h-100">
-                <form *ngIf="active" #MessageForm="ngForm" novalidate class="h-100">
-                    <div class="p-4 pb-5 Header">
-                    <img src="../../../assets/events/Icon-ionic-ios-arrow-back.svg" class="pointer arrow-back"
-                    (click)="close()" />
 
-                        <label class="pl-4" *ngIf="replyMessageId == 0">
-                            {{ "New Message" | localize }}</label
-                        >
-                        <label class="p-3"  *ngIf="replyMessageId > 0"> {{ subject }}</label>
-                    </div>
-                    <div class="modal-body  h-100 mr-3">
-                        <div class="row align-items-start mb-3 border-bottom">
-                            <div class="col-1">
-                                <div class="InputText">
-                                    <span class="text-input-label"
-                                        >{{ "To" | localize }}:</span
-                                    >
-                                </div>
+        </div>
+    </div>
+    <div class="d-block d-md-none modal-lg MessageDialog thin-scroll pb-5" style="overflow-y: auto;">
+        <div class="modal-content h-100">
+            <form *ngIf="active" #MessageForm="ngForm" novalidate class="h-100">
+                <div class="p-4 pb-5 Header">
+                    <img src="../../../assets/events/Icon-ionic-ios-arrow-back.svg" class="pointer arrow-back"
+                        (click)="close()" />
+
+                    <label class="pl-4" *ngIf="replyMessageId == 0">
+                        {{ "New Message" | localize }}</label>
+                    <label class="p-3" *ngIf="replyMessageId > 0"> {{ subject }}</label>
+                </div>
+                <div class="modal-body  h-100 mr-3">
+                    <div class="row align-items-start mb-3 border-bottom">
+                        <div class="col-1">
+                            <div class="InputText">
+                                <span class="text-input-label">{{ "To" | localize }}:</span>
                             </div>
-                            <div
-                                class="p-0 sendusers mb-1"
-                                [ngClass]="
+                        </div>
+                        <div class="p-0 sendusers mb-1" [ngClass]="
                                     'col-' +
                                     (9 + (displayCC ? 1 : 0) + (displayBCC ? 1 : 0))
-                                "
-                            >
-                                <p-autoComplete
-                                    [style]="{ width: '100%' }"
-                                    [inputStyle]="{ width: '100%' }"
-                                    class="
+                                ">
+                            <p-autoComplete [style]="{ width: '100%' }" [inputStyle]="{ width: '100%' }" class="
                                         InputText
                                         email-autocomplete
                                         sendMessageInputs
-                                    "
-                                    [(ngModel)]="toUsers"
-                                    [forceSelection]="true"
-                                    [suggestions]="filteredUsers"
-                                    (completeMethod)="filterUsers($event)"
-                                    [minLength]="1"
-                                    field="name"
-                                    name="MultiSelectInputTo"
-                                    id="MultiSelectInputTo"
-                                    [required]="true"
-                                    [multiple]="true"
-                                >
-                                </p-autoComplete>
-                            </div>
-                            <div
-                                [ngClass]="{
+                                    " [(ngModel)]="toUsers" [forceSelection]="true" [suggestions]="filteredUsers"
+                                (completeMethod)="filterUsers($event)" [minLength]="1" field="name"
+                                name="MultiSelectInputTo" id="MultiSelectInputTo" [required]="true" [multiple]="true">
+                            </p-autoComplete>
+                        </div>
+                        <div [ngClass]="{
                                     'col-2': !displayCC && !displayBCC,
                                     'col-1':
                                         (!displayCC && displayBCC) ||
                                         (displayCC && !displayBCC),
                                     'd-none': displayCC && displayBCC
-                                }"
-                            >
-                                <div>
-                                    <a
-                                        href="javascript:;"
-                                        (click)="showCC()"
-                                        *ngIf="!displayCC"
-                                        ><span class="text-input-label">{{
-                                            "CC" | localize
-                                        }}</span></a
-                                    >
-                                    <a
-                                        href="javascript:;"
-                                        (click)="showBCC()"
-                                        *ngIf="!displayBCC"
-                                        ><span class="text-input-label">
-                                            {{ "BCC" | localize }}</span
-                                        ></a
-                                    >
-                                </div>
+                                }">
+                            <div>
+                                <a href="javascript:;" (click)="showCC()" *ngIf="!displayCC"><span
+                                        class="text-input-label">{{
+                                        "CC" | localize
+                                        }}</span></a>
+                                <a href="javascript:;" (click)="showBCC()" *ngIf="!displayBCC"><span
+                                        class="text-input-label">
+                                        {{ "BCC" | localize }}</span></a>
                             </div>
                         </div>
-    
-                        <div class="row align-items-start mb-3 border-bottom" *ngIf="displayCC">
-                            <div class="col-1">
-                                <div
-                                    class="InputText"
-                                    *ngIf="displayCC"
-                                    style="padding-top: 0px !important"
-                                >
-                                    <span class="text-input-label"
-                                        >{{ "CC" | localize }}:</span
-                                    >
-                                </div>
+                    </div>
+
+                    <div class="row align-items-start mb-3 border-bottom" *ngIf="displayCC">
+                        <div class="col-1">
+                            <div class="InputText" *ngIf="displayCC" style="padding-top: 0px !important">
+                                <span class="text-input-label">{{ "CC" | localize }}:</span>
                             </div>
-                            <div class="col-11 sendusers mb-1">
-                                <p-autoComplete
-                                    [style]="{ width: '100%' }"
-                                    [inputStyle]="{
+                        </div>
+                        <div class="col-11 sendusers mb-1">
+                            <p-autoComplete [style]="{ width: '100%' }" [inputStyle]="{
                                         width: '100%'
-                                    }"
-                                    *ngIf="displayCC"
-                                    class="
+                                    }" *ngIf="displayCC" class="
                                         InputText
                                         email-autocomplete
                                         sendMessageInputs
-                                    "
-                                    [(ngModel)]="ccUsers"
-                                    [suggestions]="filteredUsers"
-                                    (completeMethod)="filterUsers($event)"
-                                    [minLength]="1"
-                                    field="name"
-                                    name="MultiSelectInputCC"
-                                    id="MultiSelectInputCC"
-                                    [multiple]="true"
-                                >
-                                </p-autoComplete>
+                                    " [(ngModel)]="ccUsers" [suggestions]="filteredUsers"
+                                (completeMethod)="filterUsers($event)" [minLength]="1" field="name"
+                                name="MultiSelectInputCC" id="MultiSelectInputCC" [multiple]="true">
+                            </p-autoComplete>
+                        </div>
+                    </div>
+
+                    <div class="row align-items-start mb-3 border-bottom" *ngIf="displayBCC">
+                        <div class="col-1">
+                            <div class="InputText" *ngIf="displayBCC" style="padding-top: 0px !important">
+                                <span class="text-input-label">{{ "BCC" | localize }}:</span>
                             </div>
                         </div>
-    
-                        <div class="row align-items-start mb-3 border-bottom" *ngIf="displayBCC">
-                            <div class="col-1">
-                                <div
-                                    class="InputText"
-                                    *ngIf="displayBCC"
-                                    style="padding-top: 0px !important"
-                                >
-                                    <span class="text-input-label"
-                                        >{{ "BCC" | localize }}:</span
-                                    >
-                                </div>
-                            </div>
-                            <div class="col-11 sendusers mb-1">
-                                <p-autoComplete
-                                    [style]="{ width: '100%' }"
-                                    [inputStyle]="{ width: '100%' }"
-                                    *ngIf="displayBCC"
-                                    class="
+                        <div class="col-11 sendusers mb-1">
+                            <p-autoComplete [style]="{ width: '100%' }" [inputStyle]="{ width: '100%' }"
+                                *ngIf="displayBCC" class="
                                         InputText
                                         email-autocomplete
                                         sendMessageInputs
-                                    "
-                                    [(ngModel)]="bccUsers"
-                                    [suggestions]="filteredUsers"
-                                    (completeMethod)="filterUsers($event)"
-                                    [minLength]="1"
-                                    field="name"
-                                    name="MultiSelectInputBCC"
-                                    id="MultiSelectInputBCC"
-                                    [multiple]="true"
-                                >
-                                </p-autoComplete>
+                                    " [(ngModel)]="bccUsers" [suggestions]="filteredUsers"
+                                (completeMethod)="filterUsers($event)" [minLength]="1" field="name"
+                                name="MultiSelectInputBCC" id="MultiSelectInputBCC" [multiple]="true">
+                            </p-autoComplete>
+                        </div>
+                    </div>
+
+                    <div class="form-group group-input subject-label">
+                        <div class="InputText" *ngIf="replyMessageId == 0"
+                            style="padding-top: 4px !important; display: flex">
+                            <span class="text-input-label subject-label" *ngIf="replyMessageId == 0">{{ "subject" |
+                                localize }}:</span>
+                            <input *ngIf="replyMessageId == 0" class="form-control Input bg-white"
+                                style="padding: 6px; height: 20px !important" placeholder="" type="Text"
+                                [(ngModel)]="subject" name="subject" required />
+                        </div>
+                        <div class="InputText" *ngIf="replyMessageId > 0"
+                            style="padding-top: 4px !important; display: flex">
+                            <span class="text-input-label subject-label" *ngIf="replyMessageId > 0">{{ "Subject" |
+                                localize }}:</span>
+                            <input *ngIf="replyMessageId > 0" readonly class="form-control Input"
+                                style="padding: 6px; height: 9px" placeholder="" type="Text" [(ngModel)]="subject"
+                                name="subject" required />
+                        </div>
+                    </div>
+
+                    <hr />
+
+                    <form class="kt-form  h-50">
+                        <div class="kt-portlet__body h-100">
+                            <div class="form-group editor-text h-100">
+                                <p-editor [(ngModel)]="htmlEditorInput" [ngModelOptions]="{standalone: true}"
+                                    class="HtmlEditorInput-sm h-100" [style]="{ height: '70%' }">
+                                </p-editor>
                             </div>
                         </div>
-    
-                        <div class="form-group group-input subject-label">
-                            <div
-                                class="InputText"
-                                *ngIf="replyMessageId == 0"
-                                style="padding-top: 4px !important; display: flex"
-                            >
-                                <span
-                                    class="text-input-label subject-label"
-                                    *ngIf="replyMessageId == 0"
-                                    >{{ "subject" | localize }}:</span
-                                >
-                                <input
-                                    *ngIf="replyMessageId == 0"
-                                    class="form-control Input bg-white"
-                                    style="padding: 6px; height: 20px !important"
-                                    placeholder=""
-                                    type="Text"
-                                    [(ngModel)]="subject"
-                                    name="subject"
-                                    required
-                                 
-                                />
-                            </div>
-                            <div
-                                class="InputText"
-                                *ngIf="replyMessageId > 0"
-                                style="padding-top: 4px !important; display: flex"
-                            >
-                                <span
-                                    class="text-input-label subject-label"
-                                    *ngIf="replyMessageId > 0"
-                                    >{{ "Subject" | localize }}:</span
-                                >
-                                <input
-                                    *ngIf="replyMessageId > 0"
-                                    readonly
-                                    class="form-control Input"
-                                    style="padding: 6px; height: 9px"
-                                    placeholder=""
-                                    type="Text"
-                                    [(ngModel)]="subject"
-                                    name="subject"
-                                    required
-                                />
-                            </div>
-                        </div>
-    
-                        <hr />
-    
-                        <form class="kt-form  h-50">
-                            <div class="kt-portlet__body h-100">
-                                <div class="form-group editor-text h-100">
-                                    <p-editor
-                                        [(ngModel)]="htmlEditorInput"
-                                        [ngModelOptions]="{standalone: true}"
-                                        class="HtmlEditorInput-sm h-100"
-                                        [style]="{ height: '70%' }"
-                                    >
-                                    </p-editor>
-                                </div>
-                            </div>
-                        </form> 
-                        <div class="attachments-files thin-scroll mr-2 p-2 mt-1" *ngIf="attachments.length>0">
+                    </form>
+                    <div class="attachments-files thin-scroll mr-2 p-2 mt-1" *ngIf="attachments.length>0">
                         <div *ngFor="let item of attachments">
                             <div *ngIf="item.type.includes('image')">
-                                <img
-                                    src="assets/message/image.png"
-                                    class="icon-file"
-                                /><span>{{ item.name }}</span>
+                                <img src="assets/message/image.png" class="icon-file" /><span>{{ item.name }}</span>
                             </div>
-                            <div
-                                *ngIf="
+                            <div *ngIf="
                                     item.name.includes('.doc') ||
                                     item.name.includes('.docs')
-                                "
-                            >
-                                <img
-                                    src="assets/message/microsoft-word.svg"
-                                    class="icon-file"
-                                /><span>{{ item.name }}</span>
+                                ">
+                                <img src="assets/message/microsoft-word.svg" class="icon-file" /><span>{{ item.name
+                                    }}</span>
                             </div>
                             <div *ngIf="item.name.includes('.ppt')">
-                                <img
-                                    src="assets/message/microsoft-powerpoint.svg"
-                                    class="icon-file"
-                                /><span>{{ item.name }}</span>
+                                <img src="assets/message/microsoft-powerpoint.svg" class="icon-file" /><span>{{
+                                    item.name }}</span>
                             </div>
                             <div *ngIf="item.name.includes('.xls')">
-                                <img
-                                    src="assets/message/excel.svg"
-                                    class="icon-file"
-                                /><span>{{ item.name }}</span>
+                                <img src="assets/message/excel.svg" class="icon-file" /><span>{{ item.name }}</span>
                             </div>
-                            <div
-                                *ngIf="
+                            <div *ngIf="
                                     item.name.toLowerCase().indexOf('.ppt') ===
                                         -1 &&
                                     item.name.toLowerCase().indexOf('.xls') ===
@@ -566,252 +321,140 @@
                                     item.name.toLowerCase().indexOf('.doc') ===
                                         -1 &&
                                     item.type.toLowerCase().indexOf('image') === -1
-                                "
-                            >
-                                <img
-                                    src="assets/message/document.png"
-                                    class="icon-file"
-                                /><span>{{ item.name }}</span>
+                                ">
+                                <img src="assets/message/document.png" class="icon-file" /><span>{{ item.name }}</span>
                             </div>
                         </div>
                     </div>
-                    <div
-                        class="modal-footer w-100 mt-3"
-                        style="
+                    <div class="modal-footer w-100 mt-3" style="
                             border-bottom: none;
-                        "
-                    >
-                        
+                        ">
+
                         <div class="icon-upload">
                             <label for="file-input">
                                 <!-- <i class="fa fa-paperclip" aria-hidden="true"></i> -->
-                                <i  aria-hidden="true"> <img
-                                    src="../../../assets/message/iconamoon_attachment.png"
-                                    class="icon-file"
-                                /></i>
+                                <i aria-hidden="true"> <img src="../../../assets/message/iconamoon_attachment.png"
+                                        class="icon-file" /></i>
                             </label>
-    
-                            <input
-                                id="file-input"
-                                type="file"
-                                (change)="handleInputChangeAttachment($event)"
-                                multiple
-                            />
+
+                            <input id="file-input" type="file" (change)="handleInputChangeAttachment($event)"
+                                multiple />
                         </div>
-                  
-                        <button
-                            type="button"
-                            [class.disabled]="toUsers.length == 0 || subject == ''"
-                            [disabled]="toUsers.length == 0 || subject == ''"
-                            class="sendBtn"
-                            (click)="sendMessage()"
-                        >
-                        <i class="fa  fa-paper-plane mr-1" style="color: white;"></i> {{ "Send" | localize }}
+
+                        <button type="button" [class.disabled]="toUsers.length == 0 || subject == ''"
+                            [disabled]="toUsers.length == 0 || subject == ''" class="sendBtn" (click)="sendMessage()">
+                            <i class="fa  fa-paper-plane mr-1" style="color: white;"></i> {{ "Send" | localize }}
                         </button>
                     </div>
-                    </div>
-    
-                   
-                </form>
-            </div>
-    </div>    
+                </div>
+
+
+            </form>
+        </div>
+    </div>
 </div>
-<form class="reply-w-direct-message p-0" *ngIf="!modalView" #MessageForm="ngForm" novalidate style="position: relative;">
-    <div class="threadDiv"><h4>Direct Message</h4></div>
+<form class="reply-w-direct-message p-0 sendMsgTxt" *ngIf="!modalView" #MessageForm="ngForm" novalidate
+    style="position: relative;">
+    <div class="threadDiv">
+        <h4>{{'DirectMessage' | localize}}</h4>
+    </div>
     <div class="modal-body p-2">
         <div class="row px-2">
-            <a
-                href="javascript:;"
-                (click)="showCC()"
-                *ngIf="!displayCC"
-                ><span class="text-input-label mr-1 ml-1">{{
+            <a href="javascript:;" (click)="showCC()" *ngIf="!displayCC"><span class="text-input-label mr-1 ml-1">{{
                     "CC" | localize
-                }}</span></a
-            >
-            <a
-                href="javascript:;"
-                (click)="showBCC()"
-                *ngIf="!displayBCC"
-                ><span class="text-input-label mr-1 ml-1">
-                    {{ "BCC" | localize }}</span
-                ></a
-            >
+                    }}</span></a>
+            <a href="javascript:;" (click)="showBCC()" *ngIf="!displayBCC"><span class="text-input-label mr-1 ml-1">
+                    {{ "BCC" | localize }}</span></a>
         </div>
         <div class="row align-items-start mb-3 mb-1 border-bottom">
 
             <div class="col-md-1">
                 <div class="InputText">
-                    <span class="text-input-label"
-                        >{{ "To" | localize }}:</span
-                    >
+                    <span class="text-input-label">{{ "To" | localize }}:</span>
                 </div>
             </div>
-            <div
-                class="p-0 sendusers mb-1 col-md-10">
-                <p-autoComplete
-                    [style]="{ width: '100%' }"
-                    [inputStyle]="{ width: '100%' }"
-                    class="
+            <div class="p-0 sendusers mb-1 col-md-10">
+                <p-autoComplete [style]="{ width: '100%' }" [inputStyle]="{ width: '100%' }" class="
                         InputText
                         email-autocomplete
                         sendMessageInputs
-                    "
-                    [(ngModel)]="toUsers"
-                    [forceSelection]="true"
-                    [suggestions]="filteredUsers"
-                    (completeMethod)="filterUsersFilterByEntity($event)"
-                    [minLength]="1"
-                    field="name"
-                    name="MultiSelectInputTo"
-                    id="MultiSelectInputTo"
-                    [required]="true"
-                    [multiple]="true"
-                >
+                    " [(ngModel)]="toUsers" [forceSelection]="true" [suggestions]="filteredUsers"
+                    (completeMethod)="filterUsersFilterByEntity($event)" [minLength]="1" field="name"
+                    name="MultiSelectInputTo" id="MultiSelectInputTo" [required]="true" [multiple]="true">
                 </p-autoComplete>
             </div>
-            <div
-                [ngClass]="{
+            <div [ngClass]="{
                     'col-md-2': !displayCC && !displayBCC,
                     'col-md-1':
                         (!displayCC && displayBCC) ||
                         (displayCC && !displayBCC),
                     'd-none': displayCC && displayBCC
-                }"
-            >
+                }">
 
             </div>
         </div>
 
         <div class="row align-items-start mb-3 mb-1 border-bottom" *ngIf="displayCC">
             <div class="col-md-1">
-                <div
-                    class="InputText"
-                    *ngIf="displayCC"
-                    style="padding-top: 0px !important"
-                >
-                    <span class="text-input-label"
-                        >{{ "CC" | localize }}:</span
-                    >
+                <div class="InputText" *ngIf="displayCC" style="padding-top: 0px !important">
+                    <span class="text-input-label">{{ "CC" | localize }}:</span>
                 </div>
             </div>
             <div class="col-md-11 sendusers mb-1">
-                <p-autoComplete
-                    [style]="{ width: '100%' }"
-                    [inputStyle]="{
+                <p-autoComplete [style]="{ width: '100%' }" [inputStyle]="{
                         width: '100%'
-                    }"
-                    *ngIf="displayCC"
-                    class="
+                    }" *ngIf="displayCC" class="
                         InputText
                         email-autocomplete
                         sendMessageInputs
-                    "
-                    [(ngModel)]="ccUsers"
-                    [suggestions]="filteredUsers"
-                    (completeMethod)="filterUsersFilterByEntity($event)"
-                    [minLength]="1"
-                    field="name"
-                    name="MultiSelectInputCC"
-                    id="MultiSelectInputCC"
-                    [multiple]="true"
-                >
+                    " [(ngModel)]="ccUsers" [suggestions]="filteredUsers"
+                    (completeMethod)="filterUsersFilterByEntity($event)" [minLength]="1" field="name"
+                    name="MultiSelectInputCC" id="MultiSelectInputCC" [multiple]="true">
                 </p-autoComplete>
             </div>
         </div>
 
         <div class="row align-items-start mb-3 mb-1 border-bottom" *ngIf="displayBCC">
             <div class="col-md-1">
-                <div
-                    class="InputText"
-                    *ngIf="displayBCC"
-                    style="padding-top: 0px !important"
-                >
-                    <span class="text-input-label"
-                        >{{ "BCC" | localize }}:</span
-                    >
+                <div class="InputText" *ngIf="displayBCC" style="padding-top: 0px !important">
+                    <span class="text-input-label">{{ "BCC" | localize }}:</span>
                 </div>
             </div>
             <div class="col-md-11 sendusers mb-1">
-                <p-autoComplete
-                    [style]="{ width: '100%' }"
-                    [inputStyle]="{ width: '100%' }"
-                    *ngIf="displayBCC"
-                    class="
+                <p-autoComplete [style]="{ width: '100%' }" [inputStyle]="{ width: '100%' }" *ngIf="displayBCC" class="
                         InputText
                         email-autocomplete
                         sendMessageInputs
-                    "
-                    [(ngModel)]="bccUsers"
-                    [suggestions]="filteredUsers"
-                    (completeMethod)="filterUsersFilterByEntity($event)"
-                    [minLength]="1"
-                    field="name"
-                    name="MultiSelectInputBCC"
-                    id="MultiSelectInputBCC"
-                    [multiple]="true"
-                >
+                    " [(ngModel)]="bccUsers" [suggestions]="filteredUsers"
+                    (completeMethod)="filterUsersFilterByEntity($event)" [minLength]="1" field="name"
+                    name="MultiSelectInputBCC" id="MultiSelectInputBCC" [multiple]="true">
                 </p-autoComplete>
             </div>
         </div>
 
         <div class="form-group group-input subject-label">
-            <div
-                class="InputText "
-                *ngIf="replyMessageId == 0"
-                style="padding-top: 4px !important;"
-            >
-                <span
-                    class="text-input-label subject-label "
-                    *ngIf="replyMessageId == 0"
-                    >{{ "subject" | localize }}:</span
-                >
+            <div class="InputText " *ngIf="replyMessageId == 0" style="padding-top: 4px !important;">
+                <span class="text-input-label subject-label " *ngIf="replyMessageId == 0">{{ "subject" | localize
+                    }}:</span>
                 <div class="">
-                                    <input
-                    *ngIf="replyMessageId == 0"
-                    class="form-control Input bg-white"
-                    style="padding: 6px; height: 30px !important;    background-color: white !important;
-    border: 1px solid #EEEEEEEE !important;"
-                    placeholder=""
-                    type="Text"
-                    [(ngModel)]="subject"
-                    name="subject"
-                    required
-               
-                />
+                    <input *ngIf="replyMessageId == 0" class="form-control Input bg-white" style="padding: 6px; height: 30px !important;    background-color: white !important;
+    border: 1px solid #EEEEEEEE !important;" placeholder="" type="Text" [(ngModel)]="subject" name="subject"
+                        required />
                 </div>
 
             </div>
-            <div
-                class="InputText"
-                *ngIf="replyMessageId > 0"
-                style="padding-top: 4px !important; display: flex"
-            >
-                <span
-                    class="text-input-label subject-label"
-                    *ngIf="replyMessageId > 0"
-                    >{{ "Subject" | localize }}:</span
-                >
-                <input
-                    *ngIf="replyMessageId > 0"
-                    readonly
-                    class="form-control Input"
-                    style="padding: 6px; height: 9px"
-                    placeholder=""
-                    type="Text"
-                    [(ngModel)]="subject"
-                    name="subject"
-                    required
-                />
+            <div class="InputText" *ngIf="replyMessageId > 0" style="padding-top: 4px !important; display: flex">
+                <span class="text-input-label subject-label" *ngIf="replyMessageId > 0">{{ "Subject" | localize
+                    }}:</span>
+                <input *ngIf="replyMessageId > 0" readonly class="form-control Input" style="padding: 6px; height: 9px"
+                    placeholder="" type="Text" [(ngModel)]="subject" name="subject" required />
             </div>
         </div>
         <form class="kt-form">
             <div class="kt-portlet__body">
-                <div class="form-group editor-text mt-1 mb-1">  
-                    <p-editor
-                        [(ngModel)]="htmlEditorInput"
-                        [ngModelOptions]="{standalone: true}"
-                        [style]="{ height: '100px' }"
-                    >
+                <div class="form-group editor-text mt-1 mb-1">
+                    <p-editor [(ngModel)]="htmlEditorInput" [ngModelOptions]="{standalone: true}"
+                        [style]="{ height: '100px' }">
                     </p-editor>
                 </div>
             </div>
@@ -821,36 +464,21 @@
     <div class="attachments-files p-2">
         <div *ngFor="let item of attachments">
             <div *ngIf="item.type.includes('image')">
-                <img
-                    src="assets/message/image.png"
-                    class="icon-file"
-                /><span>{{ item.name }}</span>
+                <img src="assets/message/image.png" class="icon-file" /><span>{{ item.name }}</span>
             </div>
-            <div
-                *ngIf="
+            <div *ngIf="
                     item.name.includes('.doc') ||
                     item.name.includes('.docs')
-                "
-            >
-                <img
-                    src="assets/message/microsoft-word.svg"
-                    class="icon-file"
-                /><span>{{ item.name }}</span>
+                ">
+                <img src="assets/message/microsoft-word.svg" class="icon-file" /><span>{{ item.name }}</span>
             </div>
             <div *ngIf="item.name.includes('.ppt')">
-                <img
-                    src="assets/message/microsoft-powerpoint.svg"
-                    class="icon-file"
-                /><span>{{ item.name }}</span>
+                <img src="assets/message/microsoft-powerpoint.svg" class="icon-file" /><span>{{ item.name }}</span>
             </div>
             <div *ngIf="item.name.includes('.xls')">
-                <img
-                    src="assets/message/excel.svg"
-                    class="icon-file"
-                /><span>{{ item.name }}</span>
+                <img src="assets/message/excel.svg" class="icon-file" /><span>{{ item.name }}</span>
             </div>
-            <div
-                *ngIf="
+            <div *ngIf="
                     item.name.toLowerCase().indexOf('.ppt') ===
                         -1 &&
                     item.name.toLowerCase().indexOf('.xls') ===
@@ -858,47 +486,28 @@
                     item.name.toLowerCase().indexOf('.doc') ===
                         -1 &&
                     item.type.toLowerCase().indexOf('image') === -1
-                "
-            >
-                <img
-                    src="assets/message/document.png"
-                    class="icon-file"
-                /><span>{{ item.name }}</span>
+                ">
+                <img src="assets/message/document.png" class="icon-file" /><span>{{ item.name }}</span>
             </div>
         </div>
     </div>
-    <div
-        class="modal-footer"
-        style="
+    <div class="modal-footer" style="
             border-bottom: none;
-        "
-    >
-    <div class="icon-upload">
-        <label for="file-input">
-            <!-- <i class="fa fa-paperclip" aria-hidden="true"></i> -->
-            <i  aria-hidden="true"> <img
-                src="../../../assets/message/iconamoon_attachment.png"
-                class="icon-file"
-            /></i>
-        </label>
+        ">
+        <div class="icon-upload">
+            <label for="file-input">
+                <!-- <i class="fa fa-paperclip" aria-hidden="true"></i> -->
+                <i aria-hidden="true"> <img src="../../../assets/message/iconamoon_attachment.png"
+                        class="icon-file" /></i>
+            </label>
 
-        <input
-            id="file-input"
-            type="file"
-            (change)="handleInputChangeAttachment($event)"
-            multiple
-        />
-    </div>
-  
-        <button
-            type="button"
-            [class.disabled]="toUsers.length == 0 || htmlEditorInput == ''"
-            [disabled]="toUsers.length == 0 || htmlEditorInput == ''"
-            class="sendBtn"
-            (click)="sendMessage()"
-        >
-        <i class="fa  fa-paper-plane mr-1" style="color: white;"></i>  {{ "Send" | localize }}
+            <input id="file-input" type="file" (change)="handleInputChangeAttachment($event)" multiple />
+        </div>
+
+        <button type="button" [class.disabled]="toUsers.length == 0 || htmlEditorInput == ''"
+            [disabled]="toUsers.length == 0 || htmlEditorInput == ''" class="sendBtn" (click)="sendMessage()">
+            <i class="fa  fa-paper-plane mr-1" style="color: white;"></i> {{ "Send" | localize }}
         </button>
-        
+
     </div>
 </form>

@@ -24,6 +24,8 @@ export class AppItemsBrowseModalComponent extends AppComponentBase {
     totalSelected:number = 0
     multiSelectionInfo : MultiSelectionInfo = new MultiSelectionInfo()
     lastFilterType:any;
+    @Input('fromCta') fromCta :boolean = false
+
     constructor(injector: Injector, private appItemSelectorsServiceProxy:AppItemSelectorsServiceProxy) {
         super(injector)
     }

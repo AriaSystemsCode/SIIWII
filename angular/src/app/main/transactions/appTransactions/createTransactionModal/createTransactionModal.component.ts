@@ -1083,27 +1083,38 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit, 
                         JSON.stringify(this.sellerCompanySSIN)
                     );
 
-                    if (this.isBuyerTempAccount) {
-                        localStorage.setItem(
-                            "currencyCode",
-                            JSON.stringify(null)
-                        );
-                    } else {
-                        localStorage.setItem(
-                            "BuyerSSIN",
-                            JSON.stringify(this.buyerCompanySSIN)
-                        );
+                    // if (this.isBuyerTempAccount) {
+                    //     localStorage.setItem(
+                    //         "currencyCode",
+                    //         JSON.stringify(null)
+                    //     );
+                    // } else {
+                    //     localStorage.setItem(
+                    //         "BuyerSSIN",
+                    //         JSON.stringify(this.buyerCompanySSIN)
+                    //     );
 
 
-                        if (this.formType?.toUpperCase() == "PO")
-                            this.currencyCode = this.appSession.tenant.currencyInfoDto;
+                    //     if (this.formType?.toUpperCase() == "PO")
+                    //         this.currencyCode = this.appSession.tenant.currencyInfoDto;
 
-                        localStorage.setItem(
-                            "currencyCode",
-                            JSON.stringify(this.sellerCurrencyCode)
-                        );
-                    }
+                    //     localStorage.setItem(
+                    //         "currencyCode",
+                    //         JSON.stringify(this.sellerCurrencyCode)
+                    //     );
+                    // }
+if (!this.isBuyerTempAccount) {
+    localStorage.setItem("BuyerSSIN", JSON.stringify(this.buyerCompanySSIN));
+}
 
+const transactionCurrencyCode = this.getTransactionCurrencyCode();
+
+localStorage.setItem(
+    "currencyCode",
+    JSON.stringify(transactionCurrencyCode)
+);
+
+this.currencyCode = transactionCurrencyCode;
                     if (this.currencyCode) {
                         this._AppMarketplaceItemsServiceProxy
                             .checkCurrencyExchangeRate(this.currencyCode)
@@ -1139,11 +1150,12 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit, 
                     }
 
                     else {
-                        this.currencyCode = this.sellerCurrencyCode ? this.sellerCurrencyCode : this.appSession.tenant.currencyInfoDto;
-                        localStorage.setItem(
-                            "currencyCode",
-                            JSON.stringify(this.currencyCode)
-                        );
+                        // this.currencyCode = this.sellerCurrencyCode ? this.sellerCurrencyCode : this.appSession.tenant.currencyInfoDto;
+                        // localStorage.setItem(
+                        //     "currencyCode",
+                        //     JSON.stringify(this.currencyCode)
+                        // );
+                        this.currencyCode = this.appSession.tenant.currencyInfoDto?.code || 'USD';
                     }
 
                     if (location.href.toString() == AppConsts.appBaseUrl + "/app/main/marketplace/products")
@@ -1253,5 +1265,17 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit, 
         this.sellerRelationshipName = '';
         this.sellerCompanyRelationId = "";
         this.buyerCompanyRelationId = "";
+}
+
+private getTransactionCurrencyCode(): string {
+    if (this.formType?.toUpperCase() === 'SO') {
+        return this.currencyCode || this.appSession.tenant.currencyInfoDto?.code || 'USD';
+    }
+
+    if (this.formType?.toUpperCase() === 'PO') {
+        return this.sellerCurrencyCode || this.appSession.tenant.currencyInfoDto?.code || 'USD';
+    }
+
+    return this.appSession.tenant.currencyInfoDto?.code || 'USD';
 }
 }

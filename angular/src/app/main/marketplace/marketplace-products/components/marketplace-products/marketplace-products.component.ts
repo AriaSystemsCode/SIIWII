@@ -680,7 +680,7 @@ export class MarketplaceProductsComponent
             }
         }
 
-        // ✅ Do NOT fallback to tenantDefaultCurrency if it is XUA
+        //  Do NOT fallback to tenantDefaultCurrency if it is XUA
         return code || 'USD';
     }
 

@@ -1,12 +1,12 @@
-.kt-portlet {
+.kt-itemListSec {
 
   @media only screen and (min-width: 1024px) { 
-    margin-top: 125px !important;
+    margin-top: 45px !important;
   
   }
 
   @media only screen and (max-width: 1024px) { 
-    margin-top: 25px !important;
+    margin-top: 120px !important;
   
   }
     
@@ -65,9 +65,7 @@ color: #1B101B !important;
   
   }
 
-  .kt-subheader__title {
-    // padding-left: 35px !important;
-  }
+
   .sort-toggle {
  color: #9E9E9E;
 background: #FFFFFF;
@@ -114,4 +112,7 @@ color: #9E9E9E;
         padding: 20px;
     }
 
+}
+.formSec {
+  border-radius: 12px;
 }

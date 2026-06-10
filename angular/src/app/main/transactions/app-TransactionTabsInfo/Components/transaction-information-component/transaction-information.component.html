@@ -894,7 +894,7 @@
 <ng-template #transactionNotesTemplate>
     <ng-container *ngIf="loadNotesComp;">
 
-        <div class="row mt-4 m-1">
+        <div class="row mt-lg-4 m-1">
             <div class="col-12">
 
                 <!-- app Notes shared component-->
@@ -922,9 +922,8 @@
 <ng-template #shoppingcartContainer>
 
     <div class="h-100 parentDiv">
-        <div class="modal-content big-scroll pb-5 px-3">
-            <div class="row topheader">
-                <div class="">
+        <div class="modal-content big-scroll pb-5 ">
+            <div class=" topheader d-flex justify-content-between align-items-center">
                     <div class="row bg-white  m-3 p-2  pl-4 cartSec">
                         {{'Transactions' | localize}} &nbsp; &nbsp; > &nbsp; &nbsp;
                         {{appTransactionsForViewDto?.transactionType == 0 ?
@@ -932,8 +931,7 @@
                         &nbsp; &nbsp;
                         {{transactionCode}}
                     </div>
-                </div>
-                <div class="col p-4 position-absolute text-right">
+                <div class="mx-2">
                     <button (click)="minimizeScreen()" class="btn bgPurple">
 
                         <img src="../../../../../assets/shoppingCart/minimize.svg" class="pointer" />
@@ -943,7 +941,7 @@
                 </div>
             </div>
             <div
-                class="d-md-flex d-none justify-content-between  ml-1 mr-1 topsubheader border-bottom mobile align-items-center">
+                class="d-md-flex d-none justify-content-between mx-2 topsubheader border-bottom mobile align-items-center">
                 <div class="ml-1 previousArrow">
                     <button *ngIf="showCarousel" (click)="goPrevious_Next_Transaction(transactionPosition.Previous)"
                         [disabled]="appTransactionsForViewDto?.firstRecord" class="previousBtn"
@@ -1130,9 +1128,27 @@
             <div class="tablet" *ngIf="!onshare">
 
                 <div class="card position-relative dot">
-                    <div class="d-md-none d-block actionsSec" [ngStyle]="isArabic ? {'left':'-33px'} : {'right':'-33px'}">
-                        <div class=" greyMDlightColor" dropdown style="width: 110px;">
-                            <button dropdownToggle type="button" class="btn   border-0" data-toggle="dropdown"
+                    <div class="d-md-none d-block actionsSec" [ngStyle]="
+  isArabic
+    ? {
+        'left': '-33px',
+        'border-right': '1px solid #eee'
+      }
+    : {
+        'right': '-33px',
+        'border-left': '1px solid #eee'
+      }
+">
+                        <div class=" greyMDlightColor" dropdown style="width: 110px;height: 60px;" [ngStyle]="
+  isArabic
+    ? {
+        'margin-right': '8px'
+      }
+    : {
+        'margin-left': '8px'
+      }
+">
+                            <button dropdownToggle type="button" class="btn   border-0 mt-3" data-toggle="dropdown"
                                 aria-haspopup="true" aria-expanded="false">
                                 <div class="d-flex flex-column align-items-center">
                                     <i class="fa fa-ellipsis-v text-muted more-icon"></i>

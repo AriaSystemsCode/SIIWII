@@ -3,7 +3,8 @@
 :host {
     height: 100%;
 }
-.wizard{
+
+.wizard {
     max-height: 450px;
     max-width: 1000px;
     //height: 450px;
@@ -17,19 +18,22 @@
 
 
 .kt-portlet {
-    margin-top: 45px!important;
+    margin-top: 45px !important;
 }
-.kt-portlet.isModal{
-    margin-top: 0!important;
+
+.kt-portlet.isModal {
+    margin-top: 0 !important;
 }
 
 
 .fake-circle {
-    background-color: #aaaa;
+    background-color: #EEEEEE;
     width: 25px;
     height: 25px;
     display: block;
     border-radius: 50%;
+    border: 2px solid #DDDDDD;
+
     i {
         color: $white-color;
     }
@@ -37,17 +41,223 @@
 
 .current-step {
     color: $primary-color;
+
     .fake-circle {
-        background-color: $primary-color;
+        background-color: #4A0D4A;
     }
 }
+
 .done-step {
     color: $success-color;
+
     .fake-circle {
-        background-color: $success-color;
+        background-color: #4A0D4A;
     }
 }
-input:focus
-{
-    border: 1px solid black !important;
+
+input:focus {
+    border: 1px solid #D5D4DC !important;
+}
+
+
+
+@media (min-width: 1210px) {
+    .fake-circle {
+        background-color: #DDDDDD;
+        width: 50px;
+        height: 50px;
+        display: block;
+        border-radius: 50%;
+
+        i {
+            color: $white-color;
+        }
+    }
+
+    .addW {
+        max-width: 120px !important;
+    }
+
+    .addFW {
+        max-width: 220px !important;
+    }
+
+    .svgW {
+        width: 25px !important;
+    }
+}
+
+
+@media (max-width: 1210px) {
+    .fake-circle {
+        background-color: #DDDDDD;
+        width: 25px;
+        height: 25px;
+        display: block;
+        border-radius: 50%;
+
+        i {
+            color: $white-color;
+        }
+
+    }
+
+    .svgW {
+        width: 15px !important;
+    }
+
+    .addW {
+        max-width: 48px !important;
+    }
+
+    .addFW {
+        max-width: 125px !important;
+    }
+
+    .stpTitle {
+        font-size: 14px !important;
+    }
+
+    .currStp {
+
+        font-size: 14px !important;
+    }
+
+    .defStp {
+
+        font-size: 14px !important;
+
+    }
+
+    .handlPos {
+            right: 38% !important;
+        top: 5% !important;
+    }
+
+    .defPos {
+               right: 32% !important;
+        top: 5% !important;
+    }
+}
+
+::ng-deep {
+    @media only screen and (max-width: 575px) {
+        .addW {
+            max-width: 35px !important;
+        }
+
+        .addFW {
+            max-width: 45px !important;
+        }
+
+        .rout-c {
+            padding-left: 0 !important;
+            padding-right: 0 !important;
+            // overflow-x: hidden;
+            // padding-top: 70px;
+        }
+    }
+
+
+    @media only screen and (min-width: 575px) and (max-width: 1024px) {
+        .rout-c {
+            padding-left: 75px !important;
+            padding-right: 0px !important;
+
+        }
+    }
+}
+
+@media only screen and (max-width: 575px) {
+    .svgW {
+        width: 15px !important;
+    }
+
+    .addW {
+        max-width: 30px !important;
+    }
+
+    .addFW {
+        max-width: 50px !important;
+    }
+
+    .stpTitle {
+        font-size: 8px;
+    }
+
+    .currStp {
+        color: #1B101B;
+        font-weight: 500;
+        // line-height: 22px;
+        font-size: 8.5px !important;
+        margin-bottom: 7px !important;
+    }
+
+    .defStp {
+        color: #D3D3D3;
+        font-weight: 500;
+        font-size: 8.5px !important;
+
+    }
+
+    .handlPos {
+
+        top: 5% !important;
+    }
+
+    .defPos {
+        right: 40% !important;
+        top: 20% !important;
+    }
+}
+
+
+.currStp {
+    color: #1B101B;
+    font-weight: 600;
+    line-height: 22px;
+    font-size: 20px;
+}
+
+.defStp {
+    color: #D3D3D3;
+    font-weight: 500;
+    font-size: 20px;
+
+}
+
+.linshW {
+    color: #1B101B;
+    font-weight: 700;
+}
+
+.addBrdr {
+    border-bottom: 1px solid #EEEEEEEE;
+}
+
+.handlPos {
+    right: 43%;
+    top: 25%;
+}
+
+.defPos {
+    right: 40%;
+    top: 20%;
+}
+
+.radius-12 {
+    border-radius: 12px !important;
+}
+
+@media (min-width: 1024px) {
+    .addMrLg {
+        padding-top: 9rem !important;
+    }
+}
+
+.closBtn{
+        font-size: 25px;
+    font-weight: 300;
+    border: none;
+    background: transparent;
 }

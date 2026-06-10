@@ -8,3 +8,19 @@
         padding-top: 110px!important;
     }
 }
+
+::ng-deep {
+    @media (min-width: 1400px) {
+        .modal-dialog.modal-xl {
+            max-width: 1299px !important;
+        }
+    }
+    @media  (max-width: 768px) and (min-width: 576px) {
+        .modal-dialog {
+            max-width: 650px !important;
+            /* margin-left: 71px; */
+            margin: 1.75rem;
+            margin-left: 90px !important;
+        }
+    }
+}

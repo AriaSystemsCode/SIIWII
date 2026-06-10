@@ -31,7 +31,7 @@
                     </div>
                 </div>
             </div>
-            <div [class]="containerClass + ' kt-grid__item kt-grid__item--fluid'">
+            <div [class]="containerClass + ' kt-grid__item kt-grid__item--fluid'" [ngClass]="fromCta ? 'addPad':''">
                 <div  [ngClass]="{'kt-portlet kt-portlet--mobile':!isModal}" style="background-color: transparent !important;">
                     <div [ngClass]="{'kt-portlet__body':!isModal}">
                         <div class="row view-profile-wrapper" style="margin: 0px imo !important;background-color: transparent; position: relative !important;">
@@ -44,6 +44,7 @@
                                 [image]="coverPhoto"
                                 [sycAttachmentCategory]="sycAttachmentCategoryBanner"
                                 [staticWidth]="viewProfileCover?.offsetWidth"
+                                   [classList]="fromCta ? 'handleImg':''"
                                 >
                             </app-image-display>
                             <div class="row w-100" style="position: absolute;
@@ -61,7 +62,7 @@ transform: translateY(-50%);">
                                     </app-image-display>
                                 </div>
                                 <h3  class="mt-3" 
-                                [ngClass]="{'ml-5 ml-43':appSession?.tenant?.name?.length <=10 }"
+                                [ngClass]="{'ml-5 ml-43':appSession?.tenant?.name?.length <=10 ,'leesTop' : fromCta}"
                                 style="font-size: 24px;color: white;position: absolute;
    top: 90%;
    white-space: nowrap;
@@ -85,7 +86,7 @@ transform: translateY(-50%);">
                         </div>
                          <div class="row ">
                         <div class="col-12 list-toolbar  pb-4">
-                            <div class="row mb-3 justify-content-between pt-2" >
+                            <div class="row mb-3 justify-content-between pt-2"  [ngClass]="fromCta ? 'ml-2':''">
                                 <div class="col-12 col-md-3 col-sm-6 list-toolbar-filter mb-0 mb-4 mb-md-0 d-flex justify-content-center align-items-center mb-4 mb-md-0 mr-5 pr-5">
                                     <div class="btn-group dropdown list-toolbar-dropdown" dropdown  *ngIf="showMainFiltersOptions">
                                         <button class="dropdown-toggle btn btn-sm font-weight-normal p-0" style="border: 1px solid #D9D9D9 !important;
@@ -161,6 +162,11 @@ transform: translateY(-50%);">
                                     <!-- <div class="list-toolbar-divider"></div> -->
 
                                 <div class="d-flex justify-content-center align-items-center mb-4 mb-md-0" style="margin-right: 15px;" >
+                                      <a *ngIf="fromCta" style="padding-right: 4px;padding-left: 10px;" [title]="'Filter' | localize" class="btn icon-box  font-weight-normal text-center text-primary toolbar-btn" [ngClass]="fromCta ? 'd-md-none d-block':''" (click)="toggleFilterOverlay()">
+                                        <i  class="fas fa-filter p-0" style="color: #4A0D4A !important;width: 24px !important;
+                                        height: 24px !important;
+                                        align-content: center;"></i>
+                                    </a>
                                     <a style="padding-right: 4px !important;
                                     padding-left: 10px !important;
                                     display: flex
@@ -187,14 +193,14 @@ transform: translateY(-50%);">
                             </div>
                            
                         </div>
-                        <div class="col-6 col-md-3 col-sm-4  left-aside-filters pt-4 mt-2">
+                        <div class="col-6 col-md-3 col-sm-4  left-aside-filters pt-4 mt-2" [ngClass]="fromCta ? 'col-lg-3 col-md-5 px-0 addBorder d-md-block d-none':'col-md-3'">
                             <app-items-filters
                                 [filterForm]="filterForm"
                                 [filtersFlags]="filtersFlags"
                             ></app-items-filters>
                         </div>
                         <div  class="col d-flex flex-column  app-items-container thin-scroll"   >
-                            <div class="d-flex justify-content-between pl-5" >
+                            <div class="d-flex justify-content-between pl-5" [ngClass]="fromCta ? '':'pl-5'">
                                 <div class="font-weight-normal list-toolbar-data-summary" [ngStyle]="{ visibility : loading ? 'hidden' : 'visible' }" style="border: 1px solid #D9D9D9 !important;
                                 color: #212121 !important;
                                 border-radius: 5px;
@@ -207,7 +213,7 @@ transform: translateY(-50%);">
                                 <div style="margin-right: 15px;background-color: white;
     padding: 5px;">
                                     <div class="btn-group dropdown list-toolbar-dropdown" dropdown >
-                                        <button class="dropdown-toggle btn btn-sm font-weight-normal p-0 "
+                                        <button class="dropdown-toggle btn btn-sm font-weight-normal p-0 " [ngClass]="fromCta ?'handlWM':'defaultW'"
                                         type="button"
                                             dropdownToggle>
                                             <span class="list-toolbar-dropdown-sort-label">
@@ -235,7 +241,10 @@ transform: translateY(-50%);">
                                 </div>
                             </div>
                             <div class="row  pl-5 pr-2">
-                                <div *ngFor="let item of items;index as i" class="col-12 mb-5 p-0 " [ngClass]="singleItemPerRowMode?'col-md-12 single-item-per-row-layout' : 'col-md-3'">
+                                <div *ngFor="let item of items;index as i" class="col-12 mb-5 p-0 "   [ngClass]="{ 'col-md-12 single-item-per-row-layout': singleItemPerRowMode  ,
+                                'col-md-3': !singleItemPerRowMode && !fromCta,
+                                'col-lg-3 col-md-6 p-0': fromCta
+                            }">
                                     <app-item-card
                                         [item]="item"
                                         [filterForm]="filterForm"
@@ -293,6 +302,15 @@ transform: translateY(-50%);">
         </div>
     </div>
 </form>
+
+
+<div class="filter-overlay" *ngIf="showOverlay && fromCta">
+      
+    <app-items-filters
+      [filterForm]="filterForm"
+      [filtersFlags]="filtersFlags"
+    ></app-items-filters>
+  </div>
 
 
 

@@ -43,7 +43,7 @@
 
         <!-- Search form -->
         <form class="input-group pt-3 input-group-form d-lg-block d-none">
-            <div class="position-relative search-bar w-75" [ngClass]="!isHost && !isAuthenticated ? 'addMl' : ''"
+            <div class="position-relative search-bar w-75" [ngClass]="!isHost && !isAuthenticated && !isArabic ? 'addMl' : !isHost && !isAuthenticated && isArabic ? 'addMR': ''"
 
             >
                 <div class="input-group mb-3">
@@ -128,16 +128,15 @@
                         style="width: 20px; height: 20px; cursor: pointer;" class="m-auto"
                         *ngIf="shoppingCartSummary?.shoppingCartId >0" />
                     <div *ngIf="shoppingCartSummary?.shoppingCartId >0 && shoppingCartSummary?.qty">
-                        <span class="kt-badge kt-badge--primary unread-notification-count" style="
+                        <span class="kt-badge kt-badge--primary unread-notification-count" [ngStyle]="isArabic ? {'left':'10px'} : {'right':'10px'}" style="
                                 top: 5px !important;
-                                right: 10px !important;
                             ">
                             {{ shoppingCartSummary?.qty }}
                         </span>
                     </div>
                 </span>
                 <p *ngIf="shoppingCartSummary?.shoppingCartId >0 && shoppingCartSummary?.qty" class="text-white mb-0"
-                    style="white-space: nowrap;font-size: 10px;">My cart</p>
+                    style="white-space: nowrap;font-size: 10px;">{{'MyCart' | localize}}</p>
             </div>
             <div *ngIf="shoppingCartSummary?.shoppingCartId >0 && shoppingCartSummary?.qty"
                 class="ml-3 mt-2 pt-3 d-lg-block d-none">
@@ -158,10 +157,8 @@
                                 <img src="../../../assets/landingPage/message.png" style="width: 20px; height: 20px"
                                     class="m-auto" />
                                 <div *ngIf="unreadMessageCount">
-                                    <span class="kt-badge kt-badge--primary unread-notification-count" style="
-                                            top: 5px !important;
-                                            right: 0px !important;
-                                        ">
+                                    <span class="kt-badge kt-badge--primary unread-notification-count" [ngStyle]="isArabic ? {'left':'0'} : {'right':'0'}" style="
+                                            top: 5px !important;">
                                         {{ unreadMessageCount }}
                                     </span>
                                 </div>
@@ -402,7 +399,7 @@
                     [routerLink]="['/app/main/account/login']"
                     >
                     <i class="fas fa-user-circle mr-2"></i>
-                    <span>{{'Login' | localize}}</span>
+                    <span>{{'LogIn' | localize}}</span>
                     </button>
 
             <!-- <button class=" p-2 m-2 mr-4 mt-4 regBtn"      [routerLink]="['/app/main/account/login']">Login</button> -->
@@ -441,10 +438,8 @@
                             <img src="../../../assets/shoppingCart/Icon-awesome-shopping-cart.svg"
                                 style="width: 20px; height: 20px; cursor: pointer;" class="m-auto" />
                             <div *ngIf="shoppingCartSummary?.shoppingCartId >0 && shoppingCartSummary?.qty">
-                                <span class="kt-badge kt-badge--primary unread-notification-count" style="
-                        top: 5px !important;
-                        right: -15px !important;
-                    ">
+                                <span class="kt-badge kt-badge--primary unread-notification-count" [ngStyle]="isArabic ? {'left':'-15px'} : {'right':'-15px'}" style="
+                        top: 5px !important;">
                                     {{ shoppingCartSummary?.qty }}
                                 </span>
                             </div>
@@ -459,10 +454,8 @@
                                 <img src="../../../assets/landingPage/message.png" style="width: 20px; height: 20px"
                                     class="m-auto" />
                                 <div *ngIf="unreadMessageCount">
-                                    <span class="kt-badge kt-badge--primary unread-notification-count" style="
-                                            top: 5px !important;
-                                            right: 0px !important;
-                                        ">
+                                    <span class="kt-badge kt-badge--primary unread-notification-count" [ngStyle]="isArabic ? {'left':'0'} : {'right':'0'}" style="
+                                            top: 5px !important;">
                                         {{ unreadMessageCount }}
 
                                     </span>
