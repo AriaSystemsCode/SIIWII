@@ -92,6 +92,12 @@ color: #9E9E9E;
 
 
 
+    .addRTLm {
+  
+        background-color: #FFFFFF;
+        border-radius: 12px;
+   
+    }
 
 
   @media only screen and (min-width: 1024px) {
@@ -99,17 +105,17 @@ color: #9E9E9E;
         margin-top: 90px !important;
         background-color: #FFFFFF;
         border-radius: 12px;
-        padding: 20px;
+        // padding: 20px;
     }
 
 }
 
-  @media only screen and (max-width: 1024px) {
+  @media only screen and (max-width: 576px) {
     .addRTLm {
-        margin-top: 130px !important;
+        margin-top: 90px !important;
         background-color: #FFFFFF;
         border-radius: 12px;
-        padding: 20px;
+        // padding: 20px;
     }
 
 }

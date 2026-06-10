@@ -113,7 +113,7 @@ sycAttachmentCategoryLogo :SycAttachmentCategoryDto
     acceptedAspectRatio:number=0;
 
     @Input('fromCta') fromCta :boolean = false
-showOverlay
+showOverlay :boolean=false
     constructor(
         injector: Injector,
         private _importService: MainImportService,

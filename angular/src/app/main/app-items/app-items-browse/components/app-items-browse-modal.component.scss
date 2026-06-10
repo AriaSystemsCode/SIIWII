@@ -24,3 +24,45 @@
         }
     }
 }
+
+
+.browse-product-dialog {
+  height: 90vh;
+}
+
+.browse-modal-body {
+  overflow-x: hidden;
+}
+
+.browse-close-btn {
+  position: absolute;
+  top: 8px;
+  right: 0;
+}
+
+.rtl-modal {
+  direction: rtl;
+  text-align: right;
+
+}
+    @media (min-width: 567px) and (max-width: 768px) {
+    .rtl-modal {
+
+  right: 10%;
+}
+}
+.rtl-modal .browse-close-btn {
+  right: auto;
+  left: 0;
+}
+
+.rtl-modal .modal-header,
+.rtl-modal .modal-body {
+  direction: rtl;
+  text-align: right;
+}
+
+.rtl-modal .mr-2 {
+  margin-right: 0 !important;
+  margin-left: 0.5rem !important;
+}
