@@ -1,15 +1,27 @@
-﻿<div bsModal #createOrEditModal="bs-modal" class="modal right fade" tabindex="-1" role="dialog" aria-labelledby="createOrEditModal" aria-hidden="true" [config]="{backdrop: 'static'}">
-  <div class="modal-dialog modal-lg">
+﻿<div
+  bsModal
+  #createOrEditModal="bs-modal"
+  class="modal fade"
+  tabindex="-1"
+  role="dialog"
+  aria-hidden="true"
+  [config]="{ backdrop: 'static' }"
+>
+  <div
+    class="modal-dialog modal-lg side-modal"
+    [ngClass]="isArabic ? 'left-modal' : 'right-modal'"
+    role="document"
+  >
     <div class="modal-content">
       <form *ngIf="active" #addressForm="ngForm" novalidate (ngSubmit)="save()" autocomplete="off" class="h-100">
         <div class="modal-content-wrapper">
-          <div class="modal-header" style="display: block;background-color: #ffffff !important;">
+          <div class="modal-header mx-2" style="display: block;background-color: #ffffff !important;">
                 <h4 class="modal-title" style="display: block;">
                     <span *ngIf="address.id">{{l("EditAddress")}}</span>
                     <span *ngIf="!address.id">{{l("AddnewAddressDetails")}}</span>
                 </h4>
                 <p>{{l("PleaseEnterTheNewAddressInformation")}}</p>
-                <button style="position: absolute;right: 0;top: 8px;" type="button" class="close" (click)="cancel()" aria-label="Close" [disabled]="saving">
+                <button style="position: absolute;top: 8px; width: 70px;" [ngStyle]="isArabic ? {'left':'0'} : {'right':'0'}" type="button" class="close" (click)="cancel()" aria-label="Close" [disabled]="saving">
                     <span aria-hidden="true">&times;</span>
                 </button>
           </div>

@@ -1717,7 +1717,7 @@
 		<text name="EntityId">Entity Id</text>
 		<text name="SelfUserDelegationErrorMessage">You can't delegate authorization to yourself !</text>
 		<text name="Compose"></text>
-		<text name="Sent items">Sent Items"</text>
+		<text name="Sent items">Sent Items</text>
 		<text name="Favourite">Favourite</text>
 		<text name="Archive">Archive</text>
 		<text name="Trash">Trash</text>
@@ -2125,6 +2125,8 @@
 		<text name="ManualAccounts">Manual Accounts</text>
 		<text name="ExternalAccounts">External Accounts</text>
 		<text name="BusinessClassifications" >Business Classifications</text>
+
+		
 		<text name="Countries" >Countries</text>
 		<text name="Currencies" >Currencies</text>
 		<text name="ThereIsNoCurrenciesAddedYet" >There is no currencies added yet</text>
@@ -2572,7 +2574,9 @@
 	    <text name="DateCreated">Date Created</text>
 	    <text name="MyTransactions">My Transactions</text>
 	    <text name="SalesOrder">Sales Order</text>
-	    <text name="purchaseOrder">purchase Order</text>
+	    <text name="Sales Order">Sales Order</text>
+	    <text name="purchaseOrder">Purchase Order</text>
+	    <text name="Purchase Order">Purchase Order</text>
 	
 
 		<text name="DetailsPage">Details Page</text>
@@ -2737,6 +2741,8 @@
     
 	
 	
+
+
  
 	<text name="ContactUs">Contact Us</text>
 	<text name="YourRequestHasBeenSubmitted">Your request has been submitted</text>
@@ -2746,6 +2752,163 @@
 	<text name="RelationshipSettingsHeaderInfo">Show and change relationship settings.</text>
 	<text name="MarketplaceRole">Marketplace Role</text>
 	<text name="AllAccountTypes">All Account Types</text>
+
+	<text name="PhoneValidationMsg">Please enter a valid phone number.</text>
+	<text name="PhoneBetween5To20">Phone number must be between 5 and 20 characters long.</text>
+	<text name="ContactName">Contact Name</text>
+	<text name="DepartmentReqMsg">Department Name is required.</text>
+	<text name="DepartmentName">Department Name</text>
+	<text name="CodeCompanyValidationMsg">This Company code already exists!</text>
+	<text name="CodeContactValidationMsg"> This contact code already exists!</text>
+	<text name="CodeBranchValidationMsg"> This Branch code already exists!</text>
+	<text name="ContactCode">Contact Code</text>
+	<text name="CompanyCode">Company Code</text>
+
+
+	<text name="CompanyContactInfo">Company &amp; Contact Information</text>
+	<text name="CreatingAccountsMsg">Creating new accounts / contacts will take place upon placing the order</text>
+	<text name="Information">Information</text>
+	<text name="ReferenceNumber">Reference Number</text>
+	<text name="AddClassification">Add Classification</text>
+	<text name="SelectAll">Select All</text>
+	<text name="CollapseAll">Collapse All</text>
+	<text name="AddNewCategories">Add New Categories</text>
+	<text name="AddCategories">Add Categories</text>
+
+	<text name="PleaseSelectShipVia">Please select ship via option</text>
+	<text name="SalesRep">Sales Rep</text>
+
+	<text name="LookinInAddresses">Lookin in addresses...</text>
+	<text name="AddressCode">Address Code...</text>
+	<text name="AddressName">Address Name...</text>
+	<text name="Address1">Address Line 1...</text>
+	<text name="Address2">Address Line 2...</text>
+	<text name="SelectCompanyName">Select Company Name</text>
+<text name="SelectContactName">Select Contact Name</text>
+
+<text name="PleaseSelectValidAccount">Please select valid account or create a new one</text>
+<text name="PleaseSelectAddShipAddress">Please select or add ( ship to) address</text>
+<text name="PleaseSelectAddBillAddress">Please select or add billing address</text>
+<text name="AddNewLine">Add new line</text>
+<text name="ProductColor">Product Color</text>
+<text name="AdditionalCharges">Additional Charges</text>
+<text name="Transactions">Transactions</text>
+<text name="LastEdit">Last Edit</text>
+<text name="OrderPlacedSuccessfully">Order #{0} placed successfully</text>
+<text name="SpecialPriceUpdateMessage">The price assigned to the ordered items will be updated.</text>
+<text name="ConfirmPlaceOrder">Are you sure you want to place the order?</text>
+<text name="UnableToDisplayPDFFile.">Unable to display PDF file.</text>
+<text name="instead">instead</text>
+<text name="DownloadPDF">Download PDF</text>
+<text name="RegeneratingOrderConfirmation">Regenerating order confirmation</text>
+<text name="TotalCharges">Total Charges</text>
+
+<text name="OrderSummary">Order Summary</text>
+<text name="PleaseSelectRole">Please Select Role</text>
+<text name="TempAccount">Temp Account</text>
+<text name="BuyerCompanyName">Buyer Company Name</text>
+<text name="BuyerCompanyNameRequired">Buyer company Name is required</text>
+<text name="BuyerNameRequired">Buyer Name is required</text>
+<text name="phoneNumberInvalid">phone Number is Invalid</text>
+<text name="BuyerEmail">Buyer Email</text>
+<text name="EmailAddressInvalid">Email Address is Invalid</text>
+<text name="Branch">Branch</text>
+<text name="BranchIsRequired">Branch is required</text>
+<text name="CurrencyIsRequired">Currency is required</text>
+<text name="PriceLevelIsRequired">Price Level is required</text>
+<text name="SellerInformation">Seller Information</text>
+<text name="SellerCompanyName">Seller Company Name</text>
+<text name="SellerCompanyNameIsRequired">Seller company Name is required</text>
+<text name="SellerContactName">Seller Contact Name</text>
+<text name="SellerNameIsRequired">Seller Name is required</text>
+<text name="SellerEmail">Seller Email</text>
+<text name="BuyerAndSellerAreSamePersonMsg">Buyer and Seller are same person please choose another option</text>
+<text name="OrderInformation">Order Information</text>
+<text name="EnteredDate">Entered Date</text>
+<text name="AvailableDate">Available Date</text>
+<text name="StartDateValidationMsg">start date Can’t be befor the Entered date</text>
+<text name="CompleteDateValidationMsg">Complete date Can’t be before the Start date</text>
+<text name="AvailableDateValidationMsg">Available date Can’t be before the complete date</text>
+<text name="StartShopping">Start Shopping</text>
+<text name="BuyerInformation">Buyer Information</text>
+<text name="PleaseSelectBuyerCompanyName">Please Select Buyer Company Name</text>
+<text name="PleaseSelectBuyerName">Please Select Buyer Name</text>
+<text name="BuyerPhoneNumber">Buyer Phone Number</text>
+<text name="Main">Main</text>
+<text name="PleaseSelectSellerCompanyName">Please Select Seller Company Name</text>
+<text name="PleaseSelectSellerContactName">Please Select Seller Contact Name</text>
+<text name="EnterTransactionReference">Enter Transaction Reference #</text>
+<text name="CreatorTenantName">Creator Tenant Name</text>
+
+<text name="BuyerPhoneNumberTooShort">Buyer phone Number too short</text>
+<text name="BuyerPhoneNumberTooLong">Buyer phone Number too long</text>
+<text name="SellerPhoneNumberTooShort">Seller phone Number too short</text>
+<text name="SellerPhoneNumberTooLong">Seller phone Number too long</text>
+<text name="EmailAddressTooShort">Email Address is too short</text>
+<text name="EmailAddressTooLong">Email Address is too long</text>
+<text name="ConflictNewOrderActiveCart">Conflict between the new order and the active shopping cart order</text>
+<text name="ContinueWithShoppingCart">Continue with the Shopping Cart</text>
+<text name="ContinueWithNewOrder">Continue with the new order</text>
+<text name="CurrencyRateNotDefined">Currency exchange rate hasn't been defined switching to seller currency</text>
+<text name="SellingToBuyerAsSeller">Selling to this buyer - As Seller</text>
+<text name="ConnectedToBuyerAsSalesRep">Connected to this buyer - As Sales Rep</text>
+<text name="BuyingOnBehalfBuyer">Buying on behalf this Buyer - As Buying Office</text>
+<text name="SellingOnBehalfSeller">Selling on behalf of this Seller - As Sales Rep</text>
+<text name="BuyingFromSellerAsBuyer">Buying from this Seller - As Buyer</text>
+<text name="ConnectedToSellerAsBuyingOffice">Connected to this Seller - As Buying Office</text>
+<text name="NotShared">Not Shared</text>
+<text name="SyncToMyProducts">Sync To My Products</text>
+<text name="SyncProducts">Sync Products</text>
+<text name="OutOf">OutOf</text>
+<text name="ProductsCopiedBefore">Products copied before</text>
+<text name="WhatAreYouLookingFor">What are you looking for…</text>
+<text name="BuyerContactName">Buyer Contact Name</text>
+  <text name="Transaction">Transaction</text>
+  <text name="Order Approval">Order Approval</text>
+  <text name="OrderPreview">Order Preview</text>
+
+  <text name="OrderAmount">Order Amount</text>
+  <text name="Yearly">Yearly</text>
+  <text name="Plans">Plans</text>
+  <text name="Custom">Custom</text>
+  <text name="Prices">Prices</text>
+  <text name="ConfirmationMessgae">Confirmation Messgae</text>
+  <text name="SelectPlanMsg">Please press yes button to confirm changing your current subscription plan to</text>
+  <text name="NoteMsgPlan">Note:- you will be on the new plan starting from the next month.</text>
+  <text name="Invoices">Invoices</text>
+
+  <text name="ActivityLog">Activity Log</text>
+  <text name="Add-ons">Add-ons</text>
+  <text name="Feature">Feature</text>
+  <text name="Add-onCart">Add-on Cart</text>
+  <text name="PurchaseAdd-Ons">Purchase Add-Ons</text>
+
+
+  <text name="Sync">Sync</text>
+  <text name="ForMoreInquiriesCustomPricing">For More Inquiries and Custom Pricing , Please email</text>
+  <text name="Selected">Selected</text>
+
+  
+  <text name="Added">Added</text>
+  <text name="OPEN">Open</text>
+  <text name="My Connections">My Connections</text>
+  <text name="My Transaction">My Transaction</text>
+  <text name="BeforeSavingManualAccountMsg">Before saving, please select the relationship you would like to build with this manual account</text>
+  <text name="SaveManualAccount">Save Manual Account</text>
+  <text name="SentItems">Sent Items</text>
+  <text name="Favorite">Favorite</text>
+  <text name="DirectMessage">Direct Message</text>
+  <text name="RelatedData">RelatedData</text>
+  <text name="SearchMessages">Search messages</text>
+<text name="DirectMessageIn">Direct Message in</text>
+<text name="ThreadIn">Thread in</text>
+<text name="MentionIn">Mention in</text>
+<text name="SeeLess">See Less</text>
+
+
+<text name="Show details">Show details</text>
+<text name="Hide details">Hide details</text>
+
 
 	
   </texts>  

@@ -9,6 +9,7 @@ using Abp.Domain.Entities;
 using Abp.Auditing;
 using System.Collections.Generic;
 using onetouch.AppItems;
+using onetouch.MultiTenancy;
 
 namespace onetouch.AppEntities
 {
@@ -81,5 +82,7 @@ namespace onetouch.AppEntities
         //MMT46[Start]
         public virtual bool IsDefault { set; get; }
         //MMT46[End]
+        [ForeignKey("TenantOwner")]
+        public Tenant TenantOwnerFk { get; set; }
     }
 }

@@ -1147,5 +1147,324 @@
 <text name="CreateGroupAccount">إنشاء حساب مجموعة</text>
 		<text name="Products">Products</text>
 
+<text name="ContactUs">اتصل بنا</text>
+<text name="YourRequestHasBeenSubmitted">تم إرسال طلبك بنجاح</text>
+<text name="Telephone">رقم الهاتف</text>
+<text name="PleaseEnterPhoneNumber">يرجى إدخال رقم الهاتف</text>
+<text name="RelationshipSettings">إعدادات العلاقة</text>
+<text name="RelationshipSettingsHeaderInfo">عرض وتعديل إعدادات العلاقة.</text>
+<text name="MarketplaceRole">دور السوق الإلكتروني</text>
+<text name="AllAccountTypes">جميع أنواع الحسابات</text>
+
+<text name="PhoneValidationMsg">يرجى إدخال رقم هاتف صحيح.</text>
+<text name="PhoneBetween5To20">يجب أن يكون رقم الهاتف بين 5 و20 خانة.</text>
+<text name="ContactName">اسم جهة الاتصال</text>
+<text name="DepartmentReqMsg">اسم القسم مطلوب.</text>
+<text name="DepartmentName">اسم القسم</text>
+
+<text name="CodeCompanyValidationMsg">رمز الشركة هذا موجود بالفعل!</text>
+<text name="CodeContactValidationMsg">رمز جهة الاتصال هذا موجود بالفعل!</text>
+<text name="CodeBranchValidationMsg">رمز الفرع هذا موجود بالفعل!</text>
+
+<text name="ContactCode">رمز جهة الاتصال</text>
+<text name="CompanyCode">رمز الشركة</text>
+
+
+<text name="CompanyContactInfo">معلومات الشركة وجهة الاتصال</text>
+<text name="CreatingAccountsMsg">سيتم إنشاء الحسابات / جهات الاتصال الجديدة عند إتمام إنشاء الطلب.</text>
+<text name="Information">المعلومات</text>
+<text name="ReferenceNumber">الرقم المرجعي</text>
+<text name="AddClassification">إضافة تصنيف</text>
+<text name="SelectAll">تحديد الكل</text>
+<text name="CollapseAll">طي الكل</text>
+<text name="AddNewCategories">إضافة فئات جديدة</text>
+<text name="AddCategories">إضافة فئات</text>
+<text name="PleaseSelectShipVia">يرجى اختيار طريقة الشحن</text>
+<text name="SalesRep">مندوب المبيعات</text>
+<text name="LookinInAddresses">البحث ضمن العناوين...</text>
+<text name="AddressCode">أدخل رمز العنوان...</text>
+<text name="AddressName">أدخل اسم العنوان...</text>
+<text name="Address1">أدخل العنوان 1...</text>
+<text name="Address2">أدخل العنوان 2...</text>
+<text name="SelectCompanyName">اختر شركة</text>
+<text name="SelectContactName">اختر جهة اتصال</text>
+
+<text name="SellerName">اسم البائع</text>
+<text name="BuyerName">اسم المشتري</text>
+<text name="CompleteDate">تاريخ الإكمال</text>
+<text name="DateCreateRange">نطاق تاريخ الإنشاء</text>
+<text name="DateCompleteRange">نطاق تاريخ الإكمال</text>
+<text name="TotalQuantity">إجمالي الكمية</text>
+<text name="Proceedtocheckout">المتابعة لإتمام الطلب</text>
+<text name="Header">البيانات الأساسية</text>
+<text name="Enteredby">تم الإدخال بواسطة</text>
+<text name="Buyercontactinfo">معلومات اتصال المشتري</text>
+<text name="Sellercontactinfo">معلومات اتصال البائع</text>
+<text name="SalesRepInformation">معلومات مندوب المبيعات</text>
+<text name="Shippinginformation">معلومات الشحن</text>
+<text name="BillingInformation">بيانات الفاتورة</text>
+<text name="OrderDetails">تفاصيل الطلب</text>
+<text name="ShowVariations">عرض المتغيرات</text>
+<text name="DiscardShopping">إلغاء التسوق</text>
+<text name="ContinueShopping">متابعة التسوق</text>
+<text name="Placeyourorder">إنشاء الطلب</text>
+<text name="Comments">التعليقات</text>
+<text name="ShipFrom">الشحن من</text>
+<text name="ShipTo">الشحن إلى</text>
+<text name="SelectAddresses">اختيار العناوين</text>
+<text name="AddNewAddressDetails">إضافة تفاصيل عنوان جديد</text>
+<text name="PleaseSelectFromTheSavedAddressesBelow">يرجى اختيار أحد العناوين المحفوظة أدناه</text>
+<text name="PleaseEnterThenewAddressInformation">يرجى إدخال معلومات العنوان الجديد</text>
+<text name="AddANewAddress">إضافة عنوان جديد</text>
+<text name="AddressLineOne">العنوان 1</text>
+<text name="AddressLineTow">العنوان 2</text>
+<text name="AddressType">نوع العنوان</text>
+<text name="Store">المتجر</text>
+<text name="ShipVia">طريقة الشحن</text>
+<text name="APContact">جهة اتصال الحسابات الدائنة (AP)</text>
+<text name="ARContact">جهة اتصال الحسابات المدينة (AR)</text>
+<text name="PaymentInformation">معلومات الدفع</text>
+<text name="PaymentTerms">شروط الدفع</text>
+<text name="ShareTransaction">مشاركة المعاملة</text>
+
+<text name="PleaseSelectValidAccount">يرجى اختيار حساب صالح أو إنشاء حساب جديد</text>
+<text name="PleaseSelectAddShipAddress">يرجى اختيار أو إضافة عنوان الشحن (الشحن إلى)</text>
+<text name="PleaseSelectAddBillAddress">يرجى اختيار أو إضافة عنوان الفوترة</text>
+<text name="AddNewLine">إضافة سطر جديد</text>
+<text name="ProductColor">لون المنتج</text>
+<text name="AdditionalCharges">الرسوم الإضافية</text>
+<text name="Transactions">المعاملات</text>
+<text name="LastEdit">آخر تعديل</text>
+<text name="OrderPlacedSuccessfully">تم إنشاء الطلب رقم {0} بنجاح</text>
+<text name="SpecialPriceUpdateMessage">سيتم تحديث الأسعار المخصصة للأصناف المطلوبة.</text>
+<text name="ConfirmPlaceOrder">هل أنت متأكد من أنك تريد إنشاء الطلب؟</text>
+<text name="UnableToDisplayPDFFile.">تعذر عرض ملف PDF.</text>
+<text name="instead">بدلاً من ذلك</text>
+<text name="DownloadPDF">تنزيل ملف PDF</text>
+<text name="RegeneratingOrderConfirmation">إعادة إنشاء تأكيد الطلب</text>
+<text name="TotalCharges">إجمالي الرسوم</text>
+    <text name="Reference">الرقم المرجعي</text>
+<text name="TransactionType">نوع المعاملة</text>
+
+
+
+<text name="OrderSummary">ملخص الطلب</text>
+<text name="PleaseSelectRole">يرجى اختيار الدور</text>
+<text name="TempAccount">حساب مؤقت</text>
+<text name="BuyerCompanyName">اسم شركة المشتري</text>
+<text name="BuyerCompanyNameRequired">اسم شركة المشتري مطلوب</text>
+<text name="BuyerNameRequired">اسم المشتري مطلوب</text>
+<text name="phoneNumberInvalid">رقم الهاتف غير صحيح</text>
+<text name="BuyerEmail">البريد الإلكتروني للمشتري</text>
+<text name="EmailAddressInvalid">عنوان البريد الإلكتروني غير صحيح</text>
+<text name="Branch">الفرع</text>
+<text name="BranchIsRequired">الفرع مطلوب</text>
+<text name="CurrencyIsRequired">العملة مطلوبة</text>
+<text name="PriceLevelIsRequired">مستوى السعر مطلوب</text>
+<text name="SellerInformation">معلومات البائع</text>
+<text name="SellerCompanyName">اسم شركة البائع</text>
+<text name="SellerCompanyNameIsRequired">اسم شركة البائع مطلوب</text>
+<text name="SellerContactName">اسم جهة اتصال البائع</text>
+<text name="SellerNameIsRequired">اسم البائع مطلوب</text>
+<text name="SellerEmail">البريد الإلكتروني للبائع</text>
+<text name="BuyerAndSellerAreSamePersonMsg">المشتري والبائع هما نفس الشخص، يرجى اختيار خيار آخر</text>
+<text name="OrderInformation">معلومات الطلب</text>
+<text name="EnteredDate">تاريخ الإدخال</text>
+<text name="AvailableDate">تاريخ التوفر</text>
+<text name="StartDateValidationMsg">لا يمكن أن يكون تاريخ البدء قبل تاريخ الإدخال</text>
+<text name="CompleteDateValidationMsg">لا يمكن أن يكون تاريخ الإكمال قبل تاريخ البدء</text>
+<text name="AvailableDateValidationMsg">لا يمكن أن يكون تاريخ التوفر قبل تاريخ الإكمال</text>
+<text name="StartShopping">ابدأ التسوق</text>
+<text name="BuyerInformation">معلومات المشتري</text>
+<text name="PleaseSelectBuyerCompanyName">يرجى اختيار اسم شركة المشتري</text>
+<text name="PleaseSelectBuyerName">يرجى اختيار اسم المشتري</text>
+<text name="BuyerPhoneNumber">رقم هاتف المشتري</text>
+<text name="Main">الرئيسي</text>
+<text name="PleaseSelectSellerCompanyName">يرجى اختيار اسم شركة البائع</text>
+<text name="PleaseSelectSellerContactName">يرجى اختيار اسم جهة اتصال البائع</text>
+<text name="EnterTransactionReference">أدخل الرقم المرجعي للمعاملة</text>
+<text name="CreatorTenantName">اسم المنشئ</text>
+
+<text name="BuyerPhoneNumberTooShort">رقم هاتف المشتري قصير جدًا</text>
+<text name="BuyerPhoneNumberTooLong">رقم هاتف المشتري طويل جدًا</text>
+<text name="SellerPhoneNumberTooShort">رقم هاتف البائع قصير جدًا</text>
+<text name="SellerPhoneNumberTooLong">رقم هاتف البائع طويل جدًا</text>
+<text name="EmailAddressTooShort">عنوان البريد الإلكتروني قصير جدًا</text>
+<text name="EmailAddressTooLong">عنوان البريد الإلكتروني طويل جدًا</text>
+<text name="ConflictNewOrderActiveCart">يوجد تعارض بين الطلب الجديد وطلب عربة التسوق النشط</text>
+<text name="ContinueWithShoppingCart">المتابعة بعربة التسوق</text>
+<text name="ContinueWithNewOrder">المتابعة بالطلب الجديد</text>
+<text name="CurrencyRateNotDefined">لم يتم تعريف سعر صرف العملة، سيتم التحويل إلى عملة البائع</text>
+<text name="SellingToBuyerAsSeller">البيع لهذا المشتري - كبائع</text>
+<text name="ConnectedToBuyerAsSalesRep">مرتبط بهذا المشتري - كمندوب مبيعات</text>
+<text name="BuyingOnBehalfBuyer">الشراء نيابةً عن هذا المشتري - كمكتب شراء</text>
+<text name="SellingOnBehalfSeller">البيع نيابةً عن هذا البائع - كمندوب مبيعات</text>
+<text name="BuyingFromSellerAsBuyer">الشراء من هذا البائع - كمشتري</text>
+<text name="ConnectedToSellerAsBuyingOffice">مرتبط بهذا البائع - كمكتب شراء</text>
+
+<text name="MyTransactions">طلباتي</text>
+<text name="SalesOrder">طلب بيع</text>
+<text name="Sales Order">طلب بيع</text>
+<text name="purchaseOrder">طلب شراء</text>
+<text name="Purchase Order">طلب شراء</text>
+
+<text name="NotShared">غير مشارك</text>
+<text name="SyncToMyProducts">مزامنة إلى منتجاتي</text>
+<text name="SyncProducts">مزامنة المنتجات</text>
+<text name="OutOf">من أصل</text>
+<text name="ProductsCopiedBefore">تم نسخ المنتجات مسبقًا</text>
+
+<text name="BUSINESSAccount">حساب أعمال</text>
+<text name="BusinessAccount">حساب أعمال</text>
+<text name="PERSONALAccount">حساب شخصي</text>
+<text name="PersonalAccount">حساب شخصي</text>
+<text name="GROUPAccount">حساب مجموعة</text>
+<text name="GroupAccount">حساب مجموعة</text>
+<text name="OnlineEvent">فعالية عبر الإنترنت</text>
+<text name="InPersonEvent">فعالية حضورية</text>
+<text name="BUSINESS">أعمال</text>
+<text name="PERSONAL">شخصي</text>
+<text name="GROUP">مجموعة</text>
+
+
+
+<text name="ManualAccount">الحساب اليدوي</text>
+<text name="ConnectedAccount">الحساب المرتبط</text>
+<text name="ConnectedAccounts">الحسابات المرتبطة</text>
+<text name="ManualAccounts">الحسابات اليدوية</text>
+<text name="MarketPlace">المتجر الإلكتروني</text>
+<text name="WhatAreYouLookingFor">ابحث عما تريد...</text>
+
+
+<text name="Owner">المالك</text>
+<text name="Share">مشاركة</text>
+<text name="SharedWithMe">تمت مشاركته معي</text>
+<text name="Location">الموقع</text>
+<text name="CreateNewProductList">إنشاء قائمة منتجات جديدة</text>
+<text name="ManageMyLists">إدارة قوائمي</text>
+<text name="MyProductLists">قوائم منتجاتي</text>
+<text name="ItemAdded">تمت إضافة العنصر</text>
+<text name="SelectVariations">اختر المتغيرات</text>
+<text name="SelectTheVariationsYouWantAddedToYourList">اختر المتغيرات التي تريد إضافتها إلى قائمتك</text>
+<text name="YourListingIsNowAddedToThe{0}List">تمت إضافة هذا الإدراج إلى قائمة {0}</text>
+<text name="AddedSuccessfully">تمت الإضافة بنجاح</text>
+<text name="MyLists">قوائمي</text>
+<text name="AccountCode">رمز الحساب</text>
+<text name="CompanyName">اسم الشركة</text>
+<text name="AccountInformations">معلومات الحساب</text>
+<text name="AccountSignUp">تسجيل الحساب</text>
+<text name="CurrentQueue">قائمة الانتظار الحالية</text>
+<text name="Creator">المنشئ</text>
+<text name="EditedfieldswillnotbesyncwithAutotask">لن تتم مزامنة الحقول المعدلة مع Autotask</text>
+<text name="deleteList">حذف القائمة</text>
+<text name="ThereAreNoProductsListingsAttachedToThisList">لا توجد إدراجات منتجات مرتبطة بهذه القائمة</text>
+<text name="ThereAreNoListsFound">لم يتم العثور على أي قوائم</text>
+<text name="AreYouSureYouWantToDeleteThisList?">هل أنت متأكد من أنك تريد حذف هذه القائمة؟</text>
+<text name="over">من أصل</text>
+<text name="ResultsOf">نتائج</text>
+<text name="ProductsListings">إدراجات المنتجات</text>
+<text name="Contains">تحتوي على</text>
+<text name="AreYouSureYouWantToRemoveThisListingFromTheProductsList?">هل أنت متأكد من أنك تريد إزالة هذا الإدراج من قائمة المنتجات؟</text>
+<text name="PublishList">نشر القائمة</text>
+<text name="UnpublishList">إلغاء نشر القائمة</text>
+<text name="AreYouSureYouWantToCancelPrintingThisProductListCatalogue?">هل أنت متأكد من أنك تريد إلغاء طباعة كتالوج قائمة المنتجات؟</text>
+<text name="PrintProductsList">طباعة قائمة المنتجات</text>
+<text name="CatalogueReport">تقرير الكتالوج</text>
+<text name="ProductsCatalogInfo/Print">معلومات كتالوج المنتجات / طباعة</text>
+<text name="ChooseTemplate">اختر قالبًا</text>
+<text name="PleaseChooseATemplateFirst">يرجى اختيار قالب أولاً</text>
+<text name="PleaseFillTheRequiredProductsCatalogInfo">يرجى استكمال معلومات كتالوج المنتجات المطلوبة</text>
+<text name="ProductCatalogTitle">عنوان كتالوج المنتجات</text>
+<text name="EnterATitle">أدخل عنوانًا</text>
+<text name="SelectAccount">اختر حسابًا</text>
+<text name="ProductsCatalogDetailsShow/Hide">إظهار/إخفاء تفاصيل كتالوج المنتجات</text>
+<text name="PrintAndFinish">طباعة وإنهاء</text>
+<text name="PreparedForAccount">مُعد للحساب</text>
+<text name="EnterAccountName">أدخل اسم الحساب</text>
+<text name="NoListingsInThisProductList.CannotPrint.">لا توجد إدراجات في قائمة المنتجات هذه. لا يمكن الطباعة.</text>
+<text name="DeleteThisList">حذف هذه القائمة</text>
+<text name="EditProductsList">تعديل قائمة المنتجات</text>
+<text name="MyItemsList">قوائم منتجاتي</text>
+<text name="Savedsuccessfully,AreYouWantToPublishThisList?">تم الحفظ بنجاح، هل تريد نشر هذه القائمة؟</text>
+<text name="AllAccounts">جميع الحسابات</text>
+<text name="MyAccounts">حساباتي</text>
+
+<text name="ExternalAccounts">الحسابات الخارجية</text>
+<text name="BusinessClassifications">التصنيفات التجارية</text>
+<text name="Removed">محذوف</text>
+
+<text name="DRAFT">قيد المسودة</text>
+<text name="DateCreated">تاريخ الإنشاء</text>
+<text name="Qty">الكمية</text>
+<text name="BuyerContactName">اسم جهة اتصال المشتري</text>
+<text name="Transaction">الطلب</text>
+<text name="Order Approval">الموافقة على الطلب</text>
+<text name="OrderPreview">عرض الطلب</text>
+
+
+<text name="OrderAmount">قيمة الطلب</text>
+<text name="Yearly">سنوي</text>
+<text name="Plans">الخطط</text>
+<text name="Custom">مخصص</text>
+<text name="Prices">الأسعار</text>
+<text name="ConfirmationMessgae">رسالة التأكيد</text>
+<text name="SelectPlanMsg">
+يرجى الضغط على زر نعم لتأكيد تغيير خطة الاشتراك الحالية إلى
+</text>
+<text name="NoteMsgPlan">
+ملاحظة: سيتم تطبيق الخطة الجديدة بدءًا من الشهر القادم.
+</text>
+<text name="Invoices">الفواتير</text>
+<text name="AccountBilling">فوترة الحساب</text>
+<text name="ActivityLog">سجل النشاط</text>
+<text name="Add-ons">الإضافات</text>
+<text name="Feature">الميزة</text>
+<text name="Add-onCart">سلة الإضافات</text>
+<text name="PurchaseAdd-Ons">شراء الإضافات</text>
+
+<text name="Sync">مزامنة</text>
+<text name="ForMoreInquiriesCustomPricing">
+للمزيد من الاستفسارات أو للحصول على تسعير مخصص، يرجى التواصل عبر البريد الإلكتروني
+</text>
+<text name="Selected">تم الاختيار</text>
+<text name="ActivityDateTimeRange">نطاق تاريخ ووقت النشاط</text>
+<text name="FeatureCode">رمز الميزة</text>
+<text name="FeatureName">اسم الميزة</text>
+<text name="Availability">التوفر</text>
+<text name="FeatureLimit">حد الميزة</text>
+<text name="RollOver">قابل للترحيل</text>
+<text name="NotRollOver">غير قابل للترحيل</text>
+<text name="DueDate">تاريخ الاستحقاق</text>
+<text name="PayDate">تاريخ الدفع</text>
+
+<text name="ActivityType">نوع النشاط</text>
+<text name="AppSubscriptionPlanHeaderId">معرّف خطة الاشتراك</text>
+<text name="AppSubscriptionPlanCode">رمز خطة الاشتراك</text>
+<text name="ActivityDateTime">تاريخ/وقت النشاط</text>
+<text name="Invoiced">تمت الفوترة</text>
+<text name="NotInvoiced">لم تتم الفوترة</text>
+
+
+<text name="Linesheet">قائمة المنتجات</text>
+
+
+<text name="Added">تمت الإضافة</text>
+<text name="OPEN">مفتوح</text>
+<text name="My Connections">حساباتي المرتبطة</text>
+<text name="My Transaction">معاملاتي</text>
+<text name="BeforeSavingManualAccountMsg">
+قبل الحفظ، يرجى تحديد العلاقة التي ترغب في إنشائها مع هذا الحساب اليدوي
+</text>
+<text name="SaveManualAccount">حفظ الحساب اليدوي</text>
+<text name="SentItems">العناصر المرسلة</text>
+<text name="Favorite">المفضلة</text>
+<text name="DirectMessage">رسالة مباشرة</text>
+<text name="RelatedData">البيانات المرتبطة</text>
+<text name="SearchMessages">البحث في الرسائل</text>
+<text name="DirectMessageIn">رسالة مباشرة في</text>
+<text name="ThreadIn">محادثة في</text>
+<text name="MentionIn">إشارة في</text>
+<text name="SeeLess">عرض أقل</text>
+
   </texts>
 </localizationDictionary>

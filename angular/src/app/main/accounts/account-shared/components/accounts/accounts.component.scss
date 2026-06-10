@@ -157,9 +157,8 @@ input[type="radio"]:checked+label {
   }
 }
 
-.wrapper {
-  // padding: 0 !important;
-}
+
+
 
 .list-toolbar-data-summary {
   color: #9E9E9E;
@@ -208,17 +207,7 @@ input[type="radio"]:checked+label {
   }
 }
 @media (min-width: 1024px) {
-// .addMg {
-//   margin-top: -90px
-// }
-// }
 
-//  .addMgAr {
-//   @media (max-width: 1024px) {
-  
-//         margin-left: 10px !important;
-   
-// }
 }
 }
 ::ng-deep {
@@ -228,6 +217,22 @@ input[type="radio"]:checked+label {
         margin-top: 0px !important;
     }
 }
+
+
+}
+::ng-deep .accountsEnt {
+    @media only screen and (min-width: 575px) and (max-width: 1024px) {
+        .modal-dialog{
+    width: 100% !important;
+    right: 10% !important;
+        }
+    }
+    @media only screen and (max-width: 575px) {
+    .modal-dialog {
+    width: 97% !important;
+    right: 0% !important;
+}
+    }
 }
 
 .bodySec {
@@ -238,3 +243,5 @@ box-shadow: 4px 4px 10px rgba(22, 22, 22, 0.15);
 border-radius: 20px;
 
 }
+
+

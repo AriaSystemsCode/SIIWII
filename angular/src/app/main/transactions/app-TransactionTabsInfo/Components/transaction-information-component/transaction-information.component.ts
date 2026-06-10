@@ -461,7 +461,7 @@ export class TransactionInformationComponent
           undefined,
           undefined,
           0,
-          undefined, false, null
+          undefined, false, null ,this.appTransactionsForViewDto?.enteredByUserRole
         )
         .subscribe((res2: PagedResultDtoOfGetAccountInformationOutputDto) => {
           this.companeyNames = [...res2.items];
@@ -1982,6 +1982,76 @@ canConfirm(charge): boolean {
     charge.chargeAmount !== charge.originalAmount &&
     charge.chargeAmount >= 0
   );
+}
+
+
+// /////////////////////// p-dialog login
+
+
+
+
+dialog = {
+  visible: false,
+  message: '',
+  icon: '',
+  iconColor: '#F6851D',
+  confirmText: 'Ok',
+  cancelText: 'No',
+  showCancel: false,
+  style: { width: '474px' },
+  confirmAction: () => {}
+};
+
+closeDialog() {
+  this.dialog.visible = false;
+}
+openOrderSuccessDialog() {
+  this.dialog = {
+    visible: true,
+   message: this.l('OrderPlacedSuccessfully', this.transactionCode),
+    icon: 'fa fa-check-circle',
+    iconColor: '#4A0D4A',
+    confirmText: this.l('Ok'),
+    cancelText: this.l('No'),
+    showCancel: false,
+    style: { width: '474px' },
+    confirmAction: () => {
+      this.dialog.visible = false;
+      this.askForShareTransactions();
+    }
+  };
+}
+openSpecialPriceDialog() {
+  this.dialog = {
+    visible: true,
+    message: this.l('SpecialPriceUpdateMessage'),
+    icon: 'fa fa-bell',
+    iconColor: '#F6851D',
+    confirmText: this.l('Yes'),
+    cancelText: this.l('No'),
+    showCancel: false,
+    style: { width: '425px' },
+    confirmAction: () => {
+      this.dialog.visible = false;
+      this.onEditpecialPrice();
+    }
+  };
+}
+openPlaceOrderConfirm() {
+  this.dialog = {
+    visible: true,
+    message: this.l('ConfirmPlaceOrder'),
+    icon: 'fa fa-bell',
+    iconColor: '#F6851D',
+    confirmText: this.l('Yes'),
+    cancelText: this.l('No'),
+    showCancel: true,
+    style: { width: '474px' },
+    confirmAction: () => {
+      this.dialog.visible = false;
+      this.PlaceOrder();
+    }
+  };
 }
 
 }

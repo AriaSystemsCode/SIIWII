@@ -2,7 +2,7 @@
     <form #accountInfoForm="ngForm" novalidate autocomplete="off">
         <div class="kt-content  kt-grid__item kt-grid__item--fluid kt-grid kt-grid--hor">
             <div class="kt-subheader kt-grid__item" style="height: 80px!important">
-                <div [class]="containerClass">
+                <div [class]="containerClass" >
                     <div class="kt-subheader__main">
                         <h3 class="kt-subheader__title">
                             <span class="pageTitle">
@@ -38,8 +38,8 @@
                 </div>
             </div>
             <div [class]="containerClass + ' kt-grid__item kt-grid__item--fluid'">
-                <div class="row align-items-start accountinfo-container justify-content-center">
-                    <div class="col-lg-3 col-md-12 col-sm-12 sidebar-grid">
+                <div class="row align-items-start  justify-content-center" [ngClass]="isArabic ? 'addRTLm':'accountinfo-container'">
+                    <div class="col-lg-3 col-md-12 col-sm-12 tabsSection mb-2">
                         <div>
                             <div class="row">
                                 <div class="col-md-12">
@@ -99,7 +99,7 @@
                             <ul class="nav nav-pills flex-column text-capitalize">
                                 <li class="nav-item" *ngIf="false">
                                     <a class="nav-link">
-                                        <img class="sidebar-menu-item-img"
+                                        <img class=""
                                             src="assets/profile/My-Account-Overview_Default.svg">
                                         {{l("MyAccountOverview")}}
                                         <span class="sr-only">(current)</span></a>
@@ -130,7 +130,7 @@
                                                 </defs>
                                             </svg>
 
-                                            <img class="sidebar-menu-item-img"
+                                            <img class=""
                                                 *ngIf="currentTab !== accountInfoPageTabsEnum.ProfileView && currentTab !== accountInfoPageTabsEnum.ProfileCreateOrEdit"
                                                 src="assets/profile/My-Account-Information-Default.svg">
                                             <span *ngIf="accountLevel === accountLevelEnum.Profile && !viewMode">
@@ -157,10 +157,10 @@
                                  >
                                     <a class="nav-link" (click)="changeTab(accountInfoPageTabsEnum.Branches)"
                                         [ngClass]="currentTab==accountInfoPageTabsEnum.Branches?'active':''">
-                                        <img class="sidebar-menu-item-img"
+                                        <img class=""
                                             *ngIf="currentTab != accountInfoPageTabsEnum.Branches"
                                             src="assets/profile/My-Addresses-Default.svg">
-                                        <i class=" fa fa-map-marker-alt sidebar-menu-item-img"
+                                        <i class=" fa fa-map-marker-alt "
                                             *ngIf="currentTab == accountInfoPageTabsEnum.Branches"
                                             style="color: #F88011;"></i>
                                         <span *ngIf="accountLevel === accountLevelEnum.Profile && !viewMode">
@@ -174,7 +174,7 @@
 
                                 <li class="nav-item" *ngIf="false">
                                     <a class="nav-link" disabled>
-                                        <img class="sidebar-menu-item-img"
+                                        <img class=""
                                             *ngIf="currentTab != accountInfoPageTabsEnum.Lookups"
                                             src="assets/profile/My-Lookups-Default.svg">
                                         <span>{{l("MyLookups")}}</span>
@@ -184,7 +184,7 @@
                                     <a class="nav-link" (click)="changeTab(accountInfoPageTabsEnum.Payments)"
                                         [ngClass]="currentTab == accountInfoPageTabsEnum.Payments?'active':''">
                                         <img *ngIf="currentTab != accountInfoPageTabsEnum.Payments"
-                                            class="sidebar-menu-item-img" src="assets/payment/payment-method1.png">
+                                            class="" src="assets/payment/payment-method1.png">
 
                                         <svg *ngIf="currentTab == accountInfoPageTabsEnum.Payments" width="18"
                                             height="18" viewBox="0 0 18 18" fill="none"
@@ -251,7 +251,7 @@
 
                                 <li class="nav-item" *ngIf="false">
                                     <a class="nav-link" disabled>
-                                        <img class="sidebar-menu-item-img"
+                                        <img class=""
                                             src="assets/profile/My-Settings-Default.svg">{{l("MySettings")}}
                                     </a>
                                 </li>
@@ -523,19 +523,19 @@
                                         
 
                                       <p-multiSelect
-  [options]="roles"
-  [(ngModel)]="selectedRoles"
-  [ngModelOptions]="{ standalone: true }"
-  optionLabel="name"
-  optionValue="name"
-  placeholder="Select Roles"
-  [maxSelectedLabels]="3"
-  class="w-100 md:w-80"
-  display="chip"
-  [disabled]="accountDataForView?.isConnected && currentTab === accountInfoPageTabsEnum.ProfileCreateOrEdit && !isRecordOwner"
-  (onPanelShow)="storeRolesBeforeChange()"
-  (onChange)="onRolesChange($event)">
-</p-multiSelect>
+                                        [options]="roles"
+                                        [(ngModel)]="selectedRoles"
+                                        [ngModelOptions]="{ standalone: true }"
+                                        optionLabel="name"
+                                        optionValue="name"
+                                        placeholder="Select Roles"
+                                        [maxSelectedLabels]="3"
+                                        class="w-100 md:w-80"
+                                        display="chip"
+                                        [disabled]="accountDataForView?.isConnected && currentTab === accountInfoPageTabsEnum.ProfileCreateOrEdit && !isRecordOwner"
+                                        (onPanelShow)="storeRolesBeforeChange()"
+                                        (onChange)="onRolesChange($event)">
+                                        </p-multiSelect>
 
                                             </div>
                                         </div>
@@ -592,7 +592,7 @@
                                             <label for="colFormLabelSm"
                                                 class="col-sm-2 col-form-label col-form-label-sm label-form">
 
-                                                {{l("Ship Via")}}
+                                                {{l("ShipVia")}}
                                             </label>
 
                                             <div class="col-sm-8">
@@ -889,7 +889,7 @@
                         </div>
                         <div class="tab9" *ngIf="currentTab == accountInfoPageTabsEnum.RelationshipSettings">
                             <app-relationship-settings 
-                                [accountId]="accountId" [relationId]="relationId" [connnectionInfo]="connnectionInfo">
+                                [accountId]="accountId" [relationId]="relationId" [connectionsInfo]="connectionsInfo">
                             </app-relationship-settings>
                         </div>
 
@@ -914,7 +914,7 @@
     header="Multiple roles detected">
 
     <p class="mb-3">
-        Before saving, please select the relationship you would like to build with this manual account
+        {{'BeforeSavingManualAccountMsg' | localize}}
     </p>
 
     <div *ngFor="let connection of availableConnections" class="mb-3">
@@ -936,14 +936,14 @@
             class="btn bgPurple"
             [disabled]="!selectedConnection"
             (click)="confirmSelectedConnection()">
-            Save Manual Account
+            {{'SaveManualAccount' | localize}}
         </button>
 
         <button
             type="button"
             class="btn btn-secondary ml-3"
             (click)="cancelConnectionPopup()">
-            Cancel
+            {{'Cancel' | localize}}
         </button>
     </ng-template>
 </p-dialog>

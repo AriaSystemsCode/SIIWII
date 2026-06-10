@@ -64,9 +64,9 @@
                                     <input type="text" [required]="true" [(ngModel)]="selectedItemTypeData.name"
                                         name="type" readonly class="form-control bg-white form-control-border-grey"
                                         [ngClass]="{'border-danger' : !appItem.entityObjectTypeId && submitted }"
+    #typeModel="ngModel"     [class.border-danger]="typeModel.invalid && typeModel.touched"
                                         placeholder="{{ 'ProductType' | localize}}"
-                                        style="background-color: #EEEEEE !important;
-                                        border: none !important">
+                                        style="background-color: #EEEEEE !important">
                                 </div>
                             </div>
                             <div class="col-lg-2 col-md-3 col-sm-4 col-6">
@@ -106,11 +106,12 @@
                             </div>
                             <div class="col">
                                 <input type="text" [required]="true" [(ngModel)]="appItem.name" name="name"
+                                    #nameModel="ngModel"
                                     class="form-control bg-white form-control-border-grey"
-                                    [ngClass]="{'border-danger' : !appItem.name && submitted }"
+                                      [ngClass]="{'border-danger' : !appItem.name && submitted }"                                                    
+                                        [class.border-danger]="nameModel.invalid && nameModel.touched"
                                     placeholder="{{ 'ProductName' | localize}}"
-                                    style="background-color: #EEEEEE !important;
-                                    border: none !important">
+                                    style="background-color: #EEEEEE !important;">
                             </div>
                             <div class="col-lg-2 col-md-3 col-sm-4 col-6">
                                 <span class="text-muted">250 {{ 'digits' | localize}}</span>
@@ -143,7 +144,9 @@
                                     (selectTab)="triggerDescription($event, 0)">
                                    <div *ngIf="activeDescriptionIndex==0">
                                             <p-editor [required]="true" [appFixPEditorAutoScroll]="appItem.description"
-                                                name="description" [readonly]="readonlyDesc"
+                                              #editorModel="ngModel"
+        [ngClass]="{'invalid-editor': editorModel.invalid && editorModel.touched}"
+name="description" [readonly]="readonlyDesc"
                                                 [(ngModel)]="appItem.description" [style]="{'height':'300px'}">
                                             </p-editor>
                                         </div>
@@ -154,7 +157,9 @@
                                                 placeholder="{{ 'description' | localize}}"
                                                 [(ngModel)]="appItem.description" class="form-control"
                                                 id="exampleFormControlTextarea1" rows="5"  style="background-color: white !important;
-                                                border: 1px solid #c8c8c8 !important;"></textarea>
+                                                " 
+    #descModel="ngModel"
+[class.border-danger]="descModel.invalid && descModel.touched"></textarea>
                                         </div>
                                     </tab>
                                 </tabset>
@@ -320,7 +325,8 @@
                                         <a class="aria-tag border mb-3 mr-3 pb-2 pl-3 position-relative pr-3 pt-2 rounded-lg"
                                             *ngFor="let relatedItem of relatedItems;index  as i"
                                             [ngClass]="{'removed' : relatedItem.removed}">
-                                            {{relatedItem?.entityDto?.appItemName}}
+                                          <!-- {{relatedItem?.entityDto?.appItemName}}-->
+                                            {{relatedItem?.entityDto?.appItemCode}}
                                             <span *ngIf="!relatedItem.removed"
                                                 class="bg-white position-absolute aria-tag-action remove-tag  rounded-circle"
                                                 (click)="removeRelatedItem(relatedItem,i)">
@@ -529,8 +535,7 @@
                                             [ngModel]="convertTodecimal(appItem.appItemPriceInfos[defaultCurrencyMSRPPriceIndex].price)"
                                             [ngModelOptions]="{updateOn:'blur'}"
                                             (ngModelChange)="appItem.appItemPriceInfos[defaultCurrencyMSRPPriceIndex].price=convertTodecimal($event)" 
-                                            style="background-color: #EEEEEE !important;
-                                            border: none !important"
+                                            style="background-color: #EEEEEE !important;"
                                            >
                                            <!-- required [min]="1"  -->
                                         <!-- <div *ngIf="!appItem?.appItemPriceInfos[defaultCurrencyMSRPPriceIndex]?.price  || appItem?.appItemPriceInfos[defaultCurrencyMSRPPriceIndex]?.price <=0">
@@ -561,7 +566,9 @@
                                 <p-inputNumber [ariaRequired]="true" mode="decimal" #AppItem_StockAvailability="ngModel"
                                     [(ngModel)]="appItem.stockAvailability" name="stockAvailability" [min]="0"
                                     [disabled]="appItem?.variationItems?.length || sellVariationChecked"
-                                    (ngModelChange)="stockAvailabilityChanged($event)" class="bg-input custom-style" >
+                                    (ngModelChange)="stockAvailabilityChanged($event)" class="bg-input custom-style"    
+    #stockModel="ngModel"
+[styleClass]="stockModel.invalid && stockModel.touched ? 'invalid-number' : ''">
                                 </p-inputNumber>
                                 <span class="ml-2">
                                     <validation-messages [formCtrl]="AppItem_StockAvailability"></validation-messages>

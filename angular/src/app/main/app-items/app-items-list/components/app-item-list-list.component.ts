@@ -15,6 +15,7 @@ import { Observable } from 'rxjs';
 import { SelectItem, LazyLoadEvent } from 'primeng/api';
 import { Paginator } from 'primeng/paginator';
 import { Table } from 'primeng/table';
+import { AppConsts } from '@shared/AppConsts';
 
 @Component({
   selector: 'app-app-item-list-list',
@@ -46,7 +47,9 @@ export class AppItemListListComponent extends AppComponentBase implements OnInit
     pageMainFilters:SelectItem[] = []
     @ViewChild('createOrEditListModal', { static: true }) createOrEditListModal: CreateOrEditAppitemListComponent;
     @ViewChild('entityTypeHistoryModal', { static: true }) entityTypeHistoryModal: EntityTypeHistoryModalComponent;
-
+    languageSettingName  =AppConsts.languageSettingName;
+    currentLang:string
+    isArabic:boolean = true
     constructor(
         injector: Injector,
         private _appItemsListsServiceProxy: AppItemsListsServiceProxy,
@@ -67,6 +70,8 @@ export class AppItemListListComponent extends AppComponentBase implements OnInit
     }
 
     ngOnInit(): void {
+            this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
+        this.currentLang == 'ar' || this.currentLang == 'ar-EG'  ? this.isArabic = true : this.isArabic = false
         this.getUserPreferenceForListView()
         this.defineSortingOptions()
         this.definePagesMainFilter()

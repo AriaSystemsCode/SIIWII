@@ -94,8 +94,8 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit, 
     invalidSellerPhoneNumber = "";
     invalidBuyerContactEMailAddress = "";
     invalidSellerContactEMailAddress = "";
-    sellerPhoneLabel: string = "Phone Number";
-    buyerPhoneLabel: string = "Phone Number";
+    sellerPhoneLabel: string =  this.l('PhoneNumber');
+    buyerPhoneLabel: string = this.l('PhoneNumber');
     showAdd: boolean = false
 
     body: any;
@@ -405,7 +405,7 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit, 
             undefined, undefined, undefined, undefined, undefined,
             undefined, undefined, undefined, undefined, undefined,undefined,
             true,
-            this.role == "I'm an Independent buying office." ? 'SO' : this.formType?.toUpperCase()
+            this.role == "I'm an Independent buying office." ? 'SO' : this.formType?.toUpperCase() , this.role
           )
           .subscribe((res: any) => {
             this.buyerCompanies = [...(res.items || [])];
@@ -440,7 +440,7 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit, 
             undefined, undefined, undefined, undefined, undefined,
             undefined, undefined, undefined, undefined, undefined,undefined,
             true,
-            this.role == "I'm an Independent Sales Rep." ? 'PO' : this.formType?.toUpperCase()
+            this.role == "I'm an Independent Sales Rep." ? 'PO' : this.formType?.toUpperCase() ,this.role
           )
           .subscribe((res: any) => {
             this.sellerCompanies = [...(res.items || [])];
@@ -507,13 +507,13 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit, 
         const lowerRole = this.role?.toLowerCase();
 
         if (lowerRole.includes('seller')) {
-            this.buyerRelationshipName = "Selling to this buyer - As Seller";
+            this.buyerRelationshipName = this.l('SellingToBuyerAsSeller');
 
         } else if (lowerRole.includes('sales rep')) {
-            this.buyerRelationshipName = "Connected to this buyer - As Sales Rep";
+            this.buyerRelationshipName = this.l('ConnectedToBuyerAsSalesRep');
 
         } else if (lowerRole.includes('buying office')) {
-            this.buyerRelationshipName = "Buying on behalf this Buyer - As Buying Office";
+            this.buyerRelationshipName = this.l('BuyingOnBehalfBuyer');
 
         } else {
             this.buyerRelationshipName = '';
@@ -525,13 +525,13 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit, 
         const lowerRole = this.role?.toLowerCase();
 
         if (lowerRole.includes('sales rep')) {
-            this.sellerRelationshipName = "Selling on behalf of this Seller - As Sales Rep";
+            this.sellerRelationshipName = this.l('SellingOnBehalfSeller');
 
         } else if (lowerRole.includes('buyer')) {
-            this.sellerRelationshipName = "Buying from this Seller - As Buyer";
+            this.sellerRelationshipName = this.l('BuyingFromSellerAsBuyer');
 
         } else if (lowerRole.includes('buying office')) {
-            this.sellerRelationshipName = "Connected to this Seller - As Buying Office";
+            this.sellerRelationshipName = this.l('ConnectedToSellerAsBuyingOffice');
 
         } else {
             this.sellerRelationshipName = '';
@@ -711,45 +711,45 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit, 
             if (
                 this.orderForm.get("buyerContactPhoneNumber")?.value && this.orderForm.get("buyerContactPhoneNumber")?.value?.length < 5
             )
-                this.invalidBuyerPhoneNumber = "Buyer phone Number too short";
+                this.invalidBuyerPhoneNumber = this.l('BuyerPhoneNumberTooShort');
 
             if (
                 this.orderForm.get("buyerContactPhoneNumber")?.value && this.orderForm.get("buyerContactPhoneNumber")?.value?.length >
                 20
             )
-                this.invalidBuyerPhoneNumber = "Buyer phone Number too long";
+                this.invalidBuyerPhoneNumber = this.l('BuyerPhoneNumberTooLong');
 
             this.invalidSellerPhoneNumber = "";
             if (
                 this.orderForm.get("sellerContactPhoneNumber")?.value && this.orderForm.get("sellerContactPhoneNumber")?.value?.length < 5
             )
-                this.invalidSellerPhoneNumber = "Seller phone Number too short";
+                this.invalidSellerPhoneNumber =  this.l('SellerPhoneNumberTooShort');
 
             if (
                 this.orderForm.get("sellerContactPhoneNumber")?.value && this.orderForm.get("sellerContactPhoneNumber")?.value?.length >
                 20
             )
-                this.invalidSellerPhoneNumber = "Seller phone Number too long";
+                this.invalidSellerPhoneNumber = this.l('SellerPhoneNumberTooLong');
 
             if (
                 this.orderForm.get("buyerContactEMailAddress")?.value && this.orderForm.get("buyerContactEMailAddress")?.value?.length < 5
             )
-                this.invalidBuyerContactEMailAddress = "Email Address is too short";
+                this.invalidBuyerContactEMailAddress = this.l('EmailAddressTooShort');
 
             if (
                 this.orderForm.get("buyerContactEMailAddress")?.value && this.orderForm.get("buyerContactEMailAddress")?.value?.length > 100
             )
-                this.invalidBuyerContactEMailAddress = "Email Address is too long";
+                this.invalidBuyerContactEMailAddress = this.l('EmailAddressTooLong');
 
             if (
                 this.orderForm.get("sellerContactEMailAddress")?.value && this.orderForm.get("sellerContactEMailAddress")?.value?.length < 5
             )
-                this.invalidSellerContactEMailAddress = "Email Address is too short";
+                this.invalidSellerContactEMailAddress = this.l('EmailAddressTooShort');
 
             if (
                 this.orderForm.get("sellerContactEMailAddress")?.value && this.orderForm.get("sellerContactEMailAddress")?.value?.length > 100
             )
-                this.invalidSellerContactEMailAddress = " Email Address is too long";
+                this.invalidSellerContactEMailAddress =  this.l('EmailAddressTooLong');
 
 
             if (this.invalidSellerPhoneNumber || this.invalidBuyerPhoneNumber || this.invalidBuyerContactEMailAddress || this.invalidSellerContactEMailAddress)
@@ -981,12 +981,11 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit, 
                         this.hideMainSpinner();
                         await Swal.fire({
                             title: "",
-                            text: "Conflict between the new order and the active shopping cart order",
+                            text: this.l('ConflictNewOrderActiveCart'),
                             icon: "info",
                             showCancelButton: true,
-                            confirmButtonText:
-                                "Continue with the Shopping Cart",
-                            cancelButtonText: "Continue with the new order",
+                            confirmButtonText: this.l('ContinueWithShoppingCart'),
+                            cancelButtonText: this.l('ContinueWithNewOrder'),
                             allowOutsideClick: false,
                             allowEscapeKey: false,
                             backdrop: true,
@@ -1112,11 +1111,11 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit, 
                                 if (!res) {
                                     Swal.fire({
                                         title: "",
-                                        text: "Currency exchange rate hasn't been defined switching to seller currency",
+                                        text: this.l('CurrencyRateNotDefined'),
                                         icon: "info",
                                         showCancelButton: false,
                                         confirmButtonText:
-                                            "Ok",
+                                          this.l('Ok') ,
                                         allowOutsideClick: false,
                                         allowEscapeKey: false,
                                         backdrop: true,

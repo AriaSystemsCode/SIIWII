@@ -2,9 +2,9 @@
     <div class="kt-content kt-grid__item kt-grid__item--fluid kt-grid kt-grid--hor">
     
     
-                  <div class="kt-subheader kt-grid__item">
+                  <div class="kt-subheader kt-grid__item" *ngIf="!fromBilling">
                     <div [class]="containerClass">
-                      <div class="kt-subheader__main">
+                      <div class="kt-subheader__main" >
                           <h3 class="kt-subheader__title">
                               <span>{{l("AppTenantInvoices")}}</span>
                           </h3>
@@ -29,7 +29,7 @@
                                       <div class="input-group">
                                           <input [(ngModel)]="filterText" name="filterText" autoFocus class="form-control m-input" [placeholder]="l('SearchWithThreeDot')" type="text">
                                           <span class="input-group-btn">
-                                              <button (click)="getAppTenantInvoices()" class="btn searchBtn" type="submit"><i class="flaticon-search-1"></i></button>
+                                              <button (click)="getAppTenantInvoices()" class="btn searchBtn mt-0" type="submit"><i class="flaticon-search-1"></i></button>
                                           </span>
                                       </div>
                                   </div>
@@ -212,7 +212,7 @@
                           </div>
                           <div class="primeng-paging-container d-flex justify-content-between align-items-center">
                             <span style="color: #595959;">
-                                Showing    {{ primengTableHelper.totalRecordsCount < 10 ? primengTableHelper.totalRecordsCount : first+rows}} of   {{ primengTableHelper.totalRecordsCount}} data
+                                {{'Showing' | localize}}    {{ primengTableHelper.totalRecordsCount < 10 ? primengTableHelper.totalRecordsCount : first+rows}} {{'of' | localize}}   {{ primengTableHelper.totalRecordsCount}} {{'data' | localize}}
                                   </span>
                               <p-paginator [rows]="primengTableHelper.defaultRecordsCountPerPage"
                               #paginator

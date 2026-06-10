@@ -91,3 +91,27 @@ color: #9E9E9E;
   .kt-portlet .kt-portlet__body {
     padding: 25px !important;
 }
+
+
+
+
+
+  @media only screen and (min-width: 1024px) {
+    .addRTLm {
+        margin-top: 90px !important;
+        background-color: #FFFFFF;
+        border-radius: 12px;
+        padding: 20px;
+    }
+
+}
+
+  @media only screen and (max-width: 1024px) {
+    .addRTLm {
+        margin-top: 130px !important;
+        background-color: #FFFFFF;
+        border-radius: 12px;
+        padding: 20px;
+    }
+
+}

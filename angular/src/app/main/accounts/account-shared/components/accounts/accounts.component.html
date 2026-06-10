@@ -1,13 +1,13 @@
-﻿<form [formGroup]="filterForm">
-    <div [@routerTransition] class="wrapper" [ngClass]="!isArabic ? 'addMg':  isAuthenticated && isArabic ? 'mt-lg-5' : 'addMg'">
+﻿<form [formGroup]="filterForm" class="accountsEnt">
+    <div [@routerTransition] class="mr-lg-0 mr-md-2 mr-0 mt-lg-0 mt-md-4 mt-0" [ngClass]="!isArabic ? 'addMg':  isAuthenticated && isArabic ? 'mt-lg-5' : 'addMg'">
         <div class="kt-grid__item kt-grid__item--fluid kt-grid kt-grid--hor  marginMob mb-3">
-            <div [class]="containerClass + ' kt-grid__item kt-grid__item--fluid'">
+            <div [class]="containerClass + ' kt-grid__item kt-grid__item--fluid'" style="overflow-x: hidden;" [ngClass]="{'mt-lg-5 mt-md-0 mt-5 pt-lg-5 pt-md-0 pt-5':isArabic}">
                 <div class="bodySec kt-portlet--mobile " [ngClass]="!isAuthenticated ? 'm-4': isAuthenticated && isArabic ? 'mt-lg-4 mt-md-3 mt-5':'mt-lg-0 mt-3'">
-                    <div class="kt-portlet__body ml-3">
+                    <div class="kt-portlet__body ml-md-3 ">
                         <div class="row">
                             <div class="col-12 list-toolbar">
                                 <div class="row mb-3 justify-content-between mt-3">
-                                    <div class="col-6 col-md-3 col-sm-3 list-toolbar-filter mb-0 mb-4 mb-md-0">
+                                    <div class="col-5 col-md-3  list-toolbar-filter mb-0 mb-4 mb-md-0 p-0">
                                         <div class="btn-group dropdown list-toolbar-dropdown" dropdown
                                             *ngIf="showMainFiltersOptions">
                                             <button class="dropdown-toggle btn btn-sm  p-0"
@@ -115,7 +115,7 @@
                                     </div>
                                     <div class=""></div>
 
-                                    <div class="text-center d-flex mt-lg-0" style="height: 40px; width: 160px;">
+                                    <div class="text-center d-flex mt-lg-0" style="height: 40px; ">
 
                                         <button
                                       

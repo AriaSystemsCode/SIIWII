@@ -1031,3 +1031,31 @@ border-radius: 6px;
        margin: 0 2px !important;
 }
 }
+
+
+  @media only screen and (min-width: 1024px) {
+    .addRTLm {
+        margin-top: 150px !important;
+      //   background-color: #FFFFFF;
+      //   border-radius: 12px;
+      //   padding: 20px;
+    }
+
+}
+
+//   @media only screen and (max-width: 1024px) {
+//     .addRTLm {
+//         margin-top: 130px !important;
+//         background-color: #FFFFFF;
+//         border-radius: 12px;
+//         padding: 20px;
+//     }
+
+// }
+
+
+.tabsSection {
+           background-color: #FFFFFF;
+        border-radius: 6px;
+        padding: 15px;
+}

@@ -1,5 +1,4 @@
 <div class="footer-bottom-wrapper pt-5">
-  <!-- <h2>{{sectionData?.name}}</h2> -->
     <a *ngFor="let s of links; "
          rel="noopener" (click)="openTab(s?.link)"
        class="generic-anchor pr-4 ">
@@ -7,7 +6,6 @@
         <div class="d-inline-block pl-1" style="background-color:#fff;width:40px;height:35px;border-radius:5px;">
           <img [src]="attachmentBaseUrl + '/' + s.image" style="width:34px;height:34px" alt="{{s.name}}"/>
         </div>
-        <!-- <img *ngSwitchDefault [src]="s.iconSrc" alt="{{s.name}}"/> -->
       </ng-container>
     </a>
   </div>

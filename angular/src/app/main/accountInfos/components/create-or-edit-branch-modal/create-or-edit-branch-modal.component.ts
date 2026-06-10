@@ -67,6 +67,8 @@ private pendingSelectedAddress: any = null;
 private pendingAddressSlot: number = 0; // 1..4
 private isNewBranch = false;
 
+    currentLang:string
+    isArabic:boolean = true
     constructor(
         injector: Injector,
         private _AccountsServiceProxy: AccountsServiceProxy,
@@ -83,38 +85,12 @@ private isNewBranch = false;
         }
     }
 
-    // addressSelected(address) {
-    //     this.active = true;
-    //     this.modal.show();
+    ngOnInit(){
+                this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
+        this.currentLang == 'ar' || this.currentLang == 'ar-EG'  ? this.isArabic = true : this.isArabic = false
+    }
 
-    //     let x: AppContactAddressDto;
-
-    //     if (this.currSelectAddress == 1) {
-    //         x = this.address1;
-    //     }
-    //     if (this.currSelectAddress == 2) {
-    //         x = this.address2;
-    //     }
-    //     if (this.currSelectAddress == 3) {
-    //         x = this.address3;
-    //     }
-    //     if (this.currSelectAddress == 4) {
-    //         x = this.address4;
-    //     }
-
-    //     x.addressId = address.id;
-    //     x.code = address.code;
-    //     x.name = address.name;
-    //     x.addressLine1 = address.addressLine1;
-    //     x.addressLine2 = address.addressLine2;
-    //     x.city = address.city;
-    //     x.state = address.state;
-    //     x.postalCode = address.postalCode;
-    //     x.countryId = address.countryId;
-    //     x.countryIdName = address.countryIdName;
-
-    // }
-    addressSelected(address: any) {
+    addressSelected(address) {
         this.active = true;
         this.modal.show();
       

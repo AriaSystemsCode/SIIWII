@@ -90,6 +90,9 @@ alreadyCopied : boolean = false;
 beforeMsg: boolean = false;
 successMsg: boolean = false;
 showSync: boolean = false;
+
+    currentLang:string
+    isArabic:boolean = true
     constructor(
         injector: Injector,
         _location: Location,
@@ -107,6 +110,8 @@ showSync: boolean = false;
     }
 
     ngOnInit(): void {
+                this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
+        this.currentLang == 'ar' || this.currentLang == 'ar-EG'  ? this.isArabic = true : this.isArabic = false
         this.listId = this._activatedRoute.snapshot.params.id;
         this.getAppItemListForEdit();
         this.checkPermissions();

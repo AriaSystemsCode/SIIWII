@@ -71,7 +71,8 @@ export class AppTransactionsBrowseComponent extends AppComponentBase implements 
     isAmountReset :boolean
     isReset :boolean
     isTypeReset :boolean
-
+  currentLang: string
+  isArabic: boolean
 
     constructor(
         injector: Injector,
@@ -86,6 +87,8 @@ export class AppTransactionsBrowseComponent extends AppComponentBase implements 
 
     }
     ngOnInit(): void {
+            this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
+    this.currentLang == 'ar' || this.currentLang == 'ar-EG' ? this.isArabic = true : this.isArabic = false
         setTimeout(() => {
             this.showHeader = true;
             this.cdr.detectChanges();

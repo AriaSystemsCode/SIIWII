@@ -613,6 +613,14 @@ span.p-tabview-title {
     .p-calendar.ng-dirty.ng-invalid > .p-calendar > .p-inputtext {
         border:2px solid #C83532 !important;
     }
+     .invalid-editor .p-editor-container {
+    border: 1px solid #C83532 !important;
+    border-radius: 4px;
+}
+
+.invalid-number .p-inputnumber-input {
+    border: 1px solid #C83532 !important;
+}
 }
 // inputs focus {
     .p-inputtext:enabled:focus{
@@ -887,4 +895,13 @@ searchicon {
     padding: 0px;
 }
 
-  
+
+.border-danger {
+    border: 1px solid #C83532 !important;
+}
+
+
+::ng-deep .invalid-editor .p-editor-container {
+    border: 1px solid #C83532 !important;
+    border-radius: 4px;
+}

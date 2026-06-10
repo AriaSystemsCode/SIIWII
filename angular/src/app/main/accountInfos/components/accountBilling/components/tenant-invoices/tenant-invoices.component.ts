@@ -1,4 +1,4 @@
-import { Component, Injector, ViewChild } from '@angular/core';
+import { Component, Injector, Input, ViewChild } from '@angular/core';
 import {  Router } from '@angular/router';
 import { EntityTypeHistoryModalComponent } from '@app/shared/common/entityHistory/entity-type-history-modal.component';
 import { AppComponentBase } from '@shared/common/app-component-base';
@@ -26,7 +26,7 @@ export class TenantInvoicesComponent extends AppComponentBase {
     
   @ViewChild('dataTable', { static: true }) dataTable: Table;
   @ViewChild('paginator', { static: true }) paginator: Paginator;
-
+@Input('fromBilling') fromBilling: boolean = false
   advancedFiltersAreShown = false;
   filterText = '';
   invoiceNumberFilter = '';

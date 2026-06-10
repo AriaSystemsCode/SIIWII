@@ -58,7 +58,10 @@ export class EventsBrowseCardComponent extends AppComponentBase implements OnCha
 
     ngOnChanges(changes: SimpleChanges) {
         this.getAddressDetails();
+        if(this.item?.appEvent?.profilePictureId){
         this.getProfilePictureById(this.item?.appEvent?.profilePictureId);
+
+        }
     }
 
     getProfilePictureById(id: string) {

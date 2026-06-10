@@ -13,8 +13,6 @@ import {
 import { appModuleAnimation } from "@shared/animations/routerTransition";
 import { AppComponentBase } from "@shared/common/app-component-base";
 import { FileDownloadService } from "@shared/download/fileDownload.service";
-
-import { SendMessageModalComponent } from "./SendMessage-Modal.Component";
 import {
     SycEntityObjectClassificationsServiceProxy,
     MessageServiceProxy,
@@ -28,8 +26,7 @@ import { DomSanitizer } from "@angular/platform-browser";
 import { MessageReadService } from "@shared/utils/message-read.service";
 import { finalize } from "rxjs/operators";
 import { AddCommentComponent } from "../comments/components/add-comment/add-comment.component";
-import { ConsoleLogger } from "@node_modules/@microsoft/signalr/dist/esm/Utils";
-import { Console } from "console";
+
 @Component({
     templateUrl: "./Messages.component.html",
     styleUrls: ["./Messages.component.scss"],
@@ -41,10 +38,8 @@ export class MessagesComponent extends AppComponentBase implements OnInit {
     @ViewChild("container", { static: true }) container;
     @ViewChild("messageEl") containerdetails: ElementRef;
     @ViewChild('AddCommentComponent',{static:false}) addCommentComponent :AddCommentComponent
-@ViewChild('SendMessageModal')
-SendMessageModal: any;
+@ViewChild('SendMessageModal')SendMessageModal: any;
     longmsgId: any = false;
-    // sendMessageModal: SendMessageModalComponent;
     displayDeleteMessage: boolean = false;
     messageTypeIndex: number = 0;
     messageType: string = "";
@@ -80,6 +75,9 @@ SendMessageModal: any;
 
     replyingToMessage: MessagesDto;
 selectedMessageAfterRefresh: number | null = null;
+
+  currentLang:string
+  isArabic:boolean
     constructor(
         injector: Injector,
         private _downloadService: FileDownloadService,
@@ -93,6 +91,8 @@ selectedMessageAfterRefresh: number | null = null;
     }
 
     ngOnInit(): void {
+            this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
+        this.currentLang == 'ar' || this.currentLang == 'ar-EG'  ? this.isArabic = true : this.isArabic = false
         this.messages = [];
         this.highlightFirstMsg = true;
         this.displayMessageDetails = false;
@@ -105,8 +105,9 @@ selectedMessageAfterRefresh: number | null = null;
             .subscribe((result) => {
                 this.lablesList = result;
             });
-        // this.scrollToBottom();
+
     }
+
 
         expandedMessageId: number | null = null;
         maxChars = 410; // Max characters before truncation
@@ -520,15 +521,7 @@ getPrimaryMessage(event) {
             this.notify.info(this.l("MessageAddedToTrash"));
             this.selectMessagetype(this.messageTypeIndex, this.messageType);
         });
-        // this._MessageServiceProxy
-        //     .delete(id)
-        //     .subscribe((result) => {
-        //         //this.Messages = [];
-        //         //this.MessagesDetails=null;
-        //         this.notify.info(this.l('MessageAddedToTrash'));
-        //         //this.GetMesssage();
-        //         this.Select(this.MessageTypeIndex, this.MessageType);
-        //     });
+
     }
     //xxxx
     HardDeleteMessage(id) {
@@ -585,17 +578,6 @@ getPrimaryMessage(event) {
         else return this.selectedMessage === message.id;
     }
 
-    // refreshData(event){
-    //     console.log(event,'eventevent')
-    //     if(event){
-         
-
-    //         // this.messageCategoryFilter = 'THREAD';
-    //         this.messages = [];
-    //         this.messagesDetails = [];
-    //         this.getMesssage();
-    //     }
-    // }
     refreshData(event) {
     if (event) {
         this.selectedMessageAfterRefresh = this.selectedMessage;
@@ -605,20 +587,6 @@ getPrimaryMessage(event) {
         this.getMesssage();
     }
 }
-
-//     onReplyMessage(event: MouseEvent): void {
-//   event.stopPropagation();
-
-//   const msg = this.messagesDetails?.[0]?.messages;
-//   if (!msg) return;
-
-//   this.SendMessageModal.show(
-//     msg.id,
-//     msg.threadId,
-//     false,
-//     msg.mesasgeObjectType
-//   );
-// }
 
 onReplyMessage(event: MouseEvent): void {
     event.stopPropagation();

@@ -1,27 +1,27 @@
 <div dropdown container="body" class="body-c">
   <div class="container" class="mainSec">
-    <p class="align-paragraph accBil">Account Billing</p>
+    <p class="align-paragraph accBil">{{'AccountBilling' | localize}}</p>
 
     <div class="absolute-item">
       <button id="invoicebtn" [ngClass]="{'billing-option-btn': !isInvoice, 'billing-option-btn-clicked': isInvoice}"
         class="btn billing-option-btn pull-right"
         (click)="openbillingpage(billingOptionsTabs.InvoicesOption,'invoicebtn')">
-        Invoices
+        {{'Invoices' | localize}}
       </button>
       <button id="actlogbtn"
         [ngClass]="{'billing-option-btn': !isActivityLog, 'billing-option-btn-clicked': isActivityLog}"
         class="btn billing-option-btn pull-right"
         (click)="openbillingpage(billingOptionsTabs.ActivityLogOption,'actlogbtn')">
-        Activity Log
+        {{'ActivityLog' | localize}}
       </button>
 
       <button id="addonbtn" [ngClass]="{'billing-option-btn': !isAddOn, 'billing-option-btn-clicked': isAddOn}"
         class="btn billing-option-btn pull-right" (click)="openbillingpage(billingOptionsTabs.AddOnsOption,'addonbtn')">
-        Add-ons
+        {{'Add-ons' | localize}}
       </button>
       <button id="planbtn" [ngClass]="{'billing-option-btn': !isPlan, 'billing-option-btn-clicked': isPlan}"
         class="btn billing-option-btn pull-right" (click)="openbillingpage(billingOptionsTabs.PlansOption,'planbtn')">
-        Plans
+        {{'Plans' | localize}}
       </button>
     </div>
     <br />
@@ -38,5 +38,5 @@
     <app-activity-log></app-activity-log>
   </div>
   <div class="tab4" *ngIf="currentTab == billingOptionsTabs.InvoicesOption">
-    <app-tenant-invoices></app-tenant-invoices>
+    <app-tenant-invoices [fromBilling]="true"></app-tenant-invoices>
   </div>
