@@ -87,9 +87,7 @@ export class MarketplaceProductsComponent
     brandIdFromUrl: number | null = null;
     catIdFromUrl: number | null = null;
     sellerSSinSetting:string
-    isAuthenticate = this.appSession?.user
-    selectedCategories: number[] = [];
-    sellerSSinSetting: string
+   
 
 
     constructor(
