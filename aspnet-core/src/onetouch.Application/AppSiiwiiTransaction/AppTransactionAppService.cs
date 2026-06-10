@@ -2520,7 +2520,7 @@ namespace onetouch.AppSiiwiiTransaction
         [AbpAuthorize(AppPermissions.Pages_AppSiiwiiTransactions)]
         public async Task<PagedResultDto<GetAllAppTransactionsForViewDto>> GetAll(GetAllAppTransactionsInputDto input)
         {
-
+            
             var entityObjectStatusId = await _helper.SystemTables.GetEntityObjectStatusDraftTransaction();
             if (input.fromExport)
             {
@@ -2551,10 +2551,10 @@ namespace onetouch.AppSiiwiiTransaction
                             .WhereIf(!string.IsNullOrWhiteSpace(input.Filter), e => e.Code.Contains(input.Filter))
                             .WhereIf(!string.IsNullOrWhiteSpace(input.Filter), e => e.Code.Contains(input.Filter))
                             .WhereIf(!string.IsNullOrWhiteSpace(input.CodeFilter), e => e.Code == input.CodeFilter)
-                            .WhereIf(input.FromCreationDateFilter != null, e => e.CreationTime >= input.FromCreationDateFilter)
-                            .WhereIf(input.ToCreationDateFilter != null, e => e.CreationTime <= input.ToCreationDateFilter)
-                            .WhereIf(input.FromCompleteDateFilter != null, e => e.CompleteDate >= input.FromCompleteDateFilter)
-                            .WhereIf(input.ToCompleteDateFilter != null, e => e.CompleteDate <= input.ToCompleteDateFilter)
+                            .WhereIf(input.FromCreationDateFilter != DateTime.MinValue &&  input.FromCreationDateFilter != null, e => e.CreationTime >= input.FromCreationDateFilter)
+                            .WhereIf(input.ToCreationDateFilter != DateTime.MinValue && input.ToCreationDateFilter != null, e => e.CreationTime <= input.ToCreationDateFilter)
+                            .WhereIf(input.FromCompleteDateFilter != DateTime.MinValue && input.FromCompleteDateFilter != null, e => e.CompleteDate >= input.FromCompleteDateFilter)
+                            .WhereIf(input.ToCompleteDateFilter != DateTime.MinValue && input.ToCompleteDateFilter != null, e => e.CompleteDate <= input.ToCompleteDateFilter)
                             .WhereIf(input.StatusId > 0, e => e.EntityObjectStatusId == input.StatusId)
                             .WhereIf(!string.IsNullOrEmpty(input.ReferenceFilter), z => z.Reference.Contains(input.ReferenceFilter))
                             .WhereIf(input.EntityTypeIdFilter > 0, e => e.EntityObjectTypeId == input.EntityTypeIdFilter)
@@ -2682,10 +2682,10 @@ namespace onetouch.AppSiiwiiTransaction
                                          .WhereIf(!string.IsNullOrWhiteSpace(input.Filter), e => e.Code.Contains(input.Filter))
                                          .WhereIf(!string.IsNullOrWhiteSpace(input.Filter), e => e.Code.Contains(input.Filter))
                                          .WhereIf(!string.IsNullOrWhiteSpace(input.CodeFilter), e => e.Code == input.CodeFilter)
-                                         .WhereIf(input.FromCreationDateFilter != null, e => e.CreationTime >= input.FromCreationDateFilter)
-                                         .WhereIf(input.ToCreationDateFilter != null, e => e.CreationTime <= input.ToCreationDateFilter)
-                                         .WhereIf(input.FromCompleteDateFilter != null, e => e.CompleteDate >= input.FromCompleteDateFilter)
-                                         .WhereIf(input.ToCompleteDateFilter != null, e => e.CompleteDate <= input.ToCompleteDateFilter)
+                                         .WhereIf(input.FromCreationDateFilter != DateTime.MinValue && input.FromCreationDateFilter != null, e => e.CreationTime >= input.FromCreationDateFilter)
+                                         .WhereIf(input.ToCreationDateFilter != DateTime.MinValue && input.ToCreationDateFilter != null, e => e.CreationTime <= input.ToCreationDateFilter)
+                                         .WhereIf(input.FromCompleteDateFilter != DateTime.MinValue && input.FromCompleteDateFilter != null, e => e.CompleteDate >= input.FromCompleteDateFilter)
+                                         .WhereIf(input.ToCompleteDateFilter != DateTime.MinValue && input.ToCompleteDateFilter != null, e => e.CompleteDate <= input.ToCompleteDateFilter)
                                          .WhereIf(input.StatusId > 0, e => e.EntityObjectStatusId == input.StatusId)
                                          .WhereIf(input.EntityTypeIdFilter > 0, e => e.EntityObjectTypeId == input.EntityTypeIdFilter)
                                          .WhereIf(!string.IsNullOrEmpty(input.ReferenceFilter), z => z.Reference.Contains(input.ReferenceFilter))
@@ -8199,7 +8199,7 @@ namespace onetouch.AppSiiwiiTransaction
                 {
                     var isTaxable = relation.EntityExtraData.FirstOrDefault(e => e.AttributeId == 911);
 
-                    if (isTaxable != null && isTaxable.AttributeValue.ToUpper() == "TRUE")
+                    if (isTaxable != null && isTaxable.AttributeValue.ToUpper() == "YES")
                     {
                         var transItems = await _appTransactionDetails.GetAll().Where(e => e.TransactionId == pTransactionID && e.EntityObjectTypeId != entityObjectChargesId)
                             .ToListAsync();

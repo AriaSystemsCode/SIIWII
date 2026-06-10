@@ -18,10 +18,10 @@ namespace onetouch.AppSiiwiiTransaction.Dtos
         public string CodeFilter { get; set; }
         public string DescriptionFilter { get; set; }
         public long? EntityTypeIdFilter { get; set; } = null;
-        public DateTime? FromCreationDateFilter { set; get; } = null;
-        public DateTime? ToCreationDateFilter { set; get; } = null;
-        public DateTime? FromCompleteDateFilter { set; get; } = null;
-        public DateTime? ToCompleteDateFilter { set; get; } = null;
+        public DateTime? FromCreationDateFilter { set; get; } = DateTime.MinValue;
+        public DateTime? ToCreationDateFilter { set; get; } = DateTime.MinValue;
+        public DateTime? FromCompleteDateFilter { set; get; } = DateTime.MinValue;
+        public DateTime? ToCompleteDateFilter { set; get; } = DateTime.MinValue;
         public string SellerName { get; set; }
         public string SellerSSIN { get; set; }
         public string BuyerName { get; set; }
