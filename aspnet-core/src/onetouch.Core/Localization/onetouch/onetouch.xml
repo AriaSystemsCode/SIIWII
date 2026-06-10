@@ -2923,9 +2923,14 @@
 <text name="RemoveFromFavourite">Remove From Favourite</text>
 <text name="HideData">Hide Data</text>
 
+<text name="Mandatory">Mandatory</text>
+<text name="MyCart">My Cart</text>
+<text name="AccountLogin">Account Login</text>
+<text name="EnterYourPassword">Enter Your Password</text>
+<text name="Or">Or</text>
 
 
-
+<text name="MaxLength250">Maximum length is 250 characters</text>
 	
   </texts>  
 </localizationDictionary>

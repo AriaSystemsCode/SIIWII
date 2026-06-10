@@ -1513,5 +1513,59 @@
 <text name="HideData">إخفاء البيانات</text>
 <text name="AvailableQty">الكمية المتاحة</text>
 
+
+
+<text name="Please select the data that you will add to the linesheet">يرجى تحديد البيانات التي ستضيفها إلى قائمة المنتجات</text>
+<text name="Please select one of the available linesheet templates">يرجى اختيار أحد قوالب قائمة المنتجات المتاحة</text>
+<text name="Please fill the required linesheet information">يرجى إدخال معلومات قائمة المنتجات المطلوبة</text>
+<text name="Please show/hide the linesheet detail information">يرجى إظهار/إخفاء تفاصيل قائمة المنتجات</text>
+
+<text name="DataSelection">تحديد البيانات</text>
+<text name="CoverPageinfo">معلومات صفحة الغلاف</text>
+<text name="Detailsinfo">معلومات التفاصيل</text>
+<text name="Deliveryoptions">خيارات الإرسال</text>
+
+<text name="LinesheetName">اسم قائمة المنتجات</text>
+<text name="Enterlinesheetname">أدخل اسم قائمة المنتجات</text>
+
+<text name="CoverPage">صفحة الغلاف</text>
+<text name="ColorPage">صفحة الألوان</text>
+<text name="MSRPPrice">سعر MSRP</text>
+<text name="SpecialPrice">السعر الخاص</text>
+<text name="EmailLinesheet">إرسال قائمة المنتجات بالبريد الإلكتروني</text>
+<text name="PrintLinesheet">طباعة قائمة المنتجات</text>
+
+<text name="MyProductsList">قائمة منتجاتي</text>
+<text name="EnterProductsListname">أدخل اسم قائمة المنتجات</text>
+<text name="Numberofselectedproducts">عدد المنتجات المحددة</text>
+<text name="GenerateLinesheet">إنشاء قائمة المنتجات</text>
+<text name="AreYouSureYouWantToCancelPrintingTheseProducts?">هل أنت متأكد من إلغاء طباعة هذه المنتجات؟</text>
+
+
+
+<text name="EnterProductList">أدخل قائمة المنتجات</text>
+<text name="Mandatory">إلزامي</text>
+<text name="MyCart">سلة التسوق الخاصة بي</text>
+<text name="AccountLogin">تسجيل الدخول إلى الحساب</text>
+<text name="EnterYourPassword">أدخل كلمة المرور الخاصة بك</text>
+<text name="Or">أو</text>
+
+<text name="MaxLength250">الحد الأقصى 250 حرفًا</text>
+
+<text name="DetailsPage">صفحة التفاصيل</text>
+<text name="Customizeyourlinesheet">تخصيص قائمة المنتجات</text>
+<text name="ShowProductCode">إظهار كود المنتج</text>
+<text name="ShowProductAvailableQuantity">إظهار الكمية المتاحة للمنتج</text>
+<text name="ShowMSRPPrice">إظهار سعر MSRP</text>
+<text name="ShowSpecialPrice">إظهار السعر الخاص</text>
+<text name="ShowGroupheaderindetailpages">إظهار عنوان المجموعة في صفحات التفاصيل</text>
+<text name="ShowGroupheaderinColorpage">إظهار عنوان المجموعة في صفحة الألوان</text>
+<text name="Background">الخلفية</text>
+<text name="NoBackground">بدون خلفية</text>
+<text name="ShowColorPage">إظهار صفحة الألوان</text>
+<text name="ShowCoverPage">إظهار صفحة الغلاف</text>
+<text name="ColorName">اسم اللون</text>
+<text name="MaterialContent">محتوى الخامة</text>
+
   </texts>
 </localizationDictionary>
