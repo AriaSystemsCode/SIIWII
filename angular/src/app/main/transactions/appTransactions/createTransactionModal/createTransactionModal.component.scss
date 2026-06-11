@@ -432,6 +432,8 @@
             height: 44px !important;
             border-top-left-radius: 8px !important;
             border-bottom-left-radius: 8px !important;
+              border-top-right-radius: 0 !important;
+            border-bottom-right-radius: 0 !important;
             border: 1px solid #D9D9D9 !important;
             border-right: none !important;
             color: #595959 !important;
@@ -495,4 +497,12 @@ label {
 .rtl-autoC {
     direction: rtl;
     text-align: right;
+}
+::ng-deep .calendarss{
+.p-calendar-w-btn .p-datepicker-trigger , .p-button:enabled:hover  {
+    border-radius: 8px !important;
+    background: #4A0D4A !important;
+    color: #EFEFEF !important;
+    border: none !important;
+}
 }

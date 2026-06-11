@@ -46,11 +46,14 @@ export class AppItemCardComponent extends AppComponentBase {
 
     @Input()   sycAttachmentCategoryImage :SycAttachmentCategoryDto
     @Input()   acceptedAspectRatio
+
+     @Input() isArabic:boolean = false
     constructor(
         injector: Injector,
     ) {
         super(injector);
     }
+
 
     eventHandler($event:ActionsMenuEventEmitter<AppItemBrowseEvents>){
         console.log(">>", 'publish')

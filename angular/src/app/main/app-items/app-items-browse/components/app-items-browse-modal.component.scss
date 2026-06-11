@@ -3,10 +3,19 @@
 }
 .modal-content-wrapper {
     justify-content: flex-start!important;
+        @media (min-width: 1024px) {
     .modal-body {
         max-height: 100%;
-        padding-top: 110px!important;
+        padding-top: 70px!important;
     }
+  }
+
+      @media (max-width: 1024px) {
+    .modal-body {
+        max-height: 100%;
+        padding-top: 130px!important;
+    }
+  }
 }
 
 ::ng-deep {
