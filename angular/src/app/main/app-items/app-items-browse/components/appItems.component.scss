@@ -10,13 +10,13 @@ button {
 
 .thin-scroll::-webkit-scrollbar,
 .p-table-scrollable-body::-webkit-scrollbar {
-    width: 15px;
+    width: 8px;
     height: 15px;
 }
 
 .thin-scroll::-webkit-scrollbar,
 .p-table-scrollable-body::-webkit-scrollbar {
-    width: 15px;
+    width: 8px;
     height: 6px;
 }
 
@@ -30,11 +30,14 @@ button {
 }
 
 .btn-sync {
+        display: flex;
+    gap: 4px;
+    align-items: center;
     border-radius: 6px;
     background-color: white !important;
     color: #F88011 !important;
     border: 1px #EEEEEEEE !important;
-    padding: 15px !important
+    padding: 13px !important
 }
 
 .btn-applySelection {
@@ -213,16 +216,22 @@ button {
 
 
 @media (min-width: 1024px) {
+    .mgLtrtop {
+        margin-top: -50px;
+    }
     .mainFilterToggle {
         width: 24.5% !important;
     }
 
     .list-toolbar-search {
-        width: 50% !important;
+        width: 47% !important;
     }
 }
 
 @media (max-width: 1024px) {
+       .mgLtrtop {
+        margin-top: 30px;
+    }
     .mainFilterToggle {
         width: 42.5% !important;
     }
@@ -266,7 +275,7 @@ button {
 
 .logoSec {
     position: absolute;
-    top: 50%;
+    top: 55%;
     transform: translateY(-50%);
 }
 

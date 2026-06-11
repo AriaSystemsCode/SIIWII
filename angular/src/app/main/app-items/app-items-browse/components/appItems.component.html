@@ -1,5 +1,5 @@
 ﻿<form [formGroup]="filterForm">
-    <div [@routerTransition] class="wrapper" [ngStyle]="isArabic ? '' : {'margin-top':'-90px'}">
+    <div [@routerTransition]  [ngClass]="isArabic && !fromCta ? 'mt-5 pt-lg-5 pt-md-0 pt-5': isArabic && fromCta ?'' : !isArabic && !fromCta ? 'mgLtrtop' :''">
         <div #parentContainer
             class="kt-content kt-grid__item kt-grid__item--fluid kt-grid kt-grid--hor position-relative">
             <div [ngStyle]="{'width.px':parentContainer?.offsetWidth}"
@@ -46,7 +46,7 @@
                 </div>
             </div>
             <div [class]="containerClass + ' kt-grid__item kt-grid__item--fluid'" style="margin-top: 10px;">
-                <div [ngClass]="{'kt-portlet kt-portlet--mobile':!isModal}"
+                <div [ngClass]="{'kt-portlet--mobile':!isModal}"
                     style="background-color: transparent !important;">
                     <div [ngClass]="{'kt-portlet__body':!isModal}" class="p-0">
                         <div class="row view-profile-wrapper m-0 position-relative radius-12">
@@ -179,7 +179,7 @@
                                         {{ primengTableHelper?.totalRecordsCount }} {{"Results" | localize }}
                                     </div>
 
-                                    <div class="bg-white  sortDroD p-2">
+                                    <div class="bg-white  sortDroD py-2 px-4">
                                         <div class="btn-group dropdown list-toolbar-dropdown" dropdown>
                                             <button class="dropdown-toggle btn-sm font-weight-normal p-0 "
                                                 [ngClass]="fromCta ?'handlWM':'defaultW'" type="button" dropdownToggle>
@@ -213,7 +213,7 @@
                                 <div class="row">
                                     <div *ngFor="let item of items;index as i" class="mb-5 p-0 " [ngClass]="{ 'col-md-12 single-item-per-row-layout': singleItemPerRowMode  ,
                                 'col-lg-3 col-6 p-0': !singleItemPerRowMode}">
-                                        <app-item-card [isArabic]="true" [item]="item" [filterForm]="filterForm"
+                                        <app-item-card [item]="item" [filterForm]="filterForm"
                                             [actionsMenuFlags]="actionsMenuFlags" [statusesFlags]="statusesFlags"
                                             [browseMode]="browseMode" [singleItemPerRowMode]="singleItemPerRowMode"
                                             (eventTriggered)="eventHandler($event,i)"
