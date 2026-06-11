@@ -19,7 +19,7 @@ namespace onetouch.Migrations.Seed.Host
             {
                 new ApplicationLanguage(tenantId, "en", "English", "famfamfam-flags us"),
                 new ApplicationLanguage(tenantId, "en-GB", "English (UK)", "famfamfam-flags gb"),
-                new ApplicationLanguage(tenantId, "ar", "العربية", "famfamfam-flags sa"),
+                new ApplicationLanguage(tenantId, "ar-EG", "العربية", "famfamfam-flags sa"),
                 new ApplicationLanguage(tenantId, "de", "Deutsch", "famfamfam-flags de"),
                 new ApplicationLanguage(tenantId, "it", "Italiano", "famfamfam-flags it"),
                 new ApplicationLanguage(tenantId, "fr", "Français", "famfamfam-flags fr"),

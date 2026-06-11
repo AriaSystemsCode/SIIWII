@@ -85,6 +85,7 @@ using DocumentFormat.OpenXml.ExtendedProperties;
 using onetouch.Authorization.Roles;
 using DocumentFormat.OpenXml.InkML;
 using Abp.MultiTenancy;
+using System.Globalization;
 
 
 //using NUglify.Helpers;
@@ -235,7 +236,7 @@ namespace onetouch.AppSiiwiiTransaction
             //I40[Start]
             _appContactRelationshipInfoRepository = appContactRelationshipInfoRepository;
             //I40[End]
-            
+           
         }
         //public async Task<long> CreateOrEditSalesOrder(CreateOrEditAppTransactionsDto input)
         //{
@@ -2551,10 +2552,10 @@ namespace onetouch.AppSiiwiiTransaction
                             .WhereIf(!string.IsNullOrWhiteSpace(input.Filter), e => e.Code.Contains(input.Filter))
                             .WhereIf(!string.IsNullOrWhiteSpace(input.Filter), e => e.Code.Contains(input.Filter))
                             .WhereIf(!string.IsNullOrWhiteSpace(input.CodeFilter), e => e.Code == input.CodeFilter)
-                            .WhereIf(input.FromCreationDateFilter != DateTime.MinValue &&  input.FromCreationDateFilter != null, e => e.CreationTime >= input.FromCreationDateFilter)
-                            .WhereIf(input.ToCreationDateFilter != DateTime.MinValue && input.ToCreationDateFilter != null, e => e.CreationTime <= input.ToCreationDateFilter)
-                            .WhereIf(input.FromCompleteDateFilter != DateTime.MinValue && input.FromCompleteDateFilter != null, e => e.CompleteDate >= input.FromCompleteDateFilter)
-                            .WhereIf(input.ToCompleteDateFilter != DateTime.MinValue && input.ToCompleteDateFilter != null, e => e.CompleteDate <= input.ToCompleteDateFilter)
+                            .WhereIf(input.FromCreationDateFilter != null, e => e.CreationTime >= input.FromCreationDateFilter)
+                            .WhereIf(input.ToCreationDateFilter != null, e => e.CreationTime <= input.ToCreationDateFilter)
+                            .WhereIf(input.FromCompleteDateFilter != null, e => e.CompleteDate >= input.FromCompleteDateFilter)
+                            .WhereIf(input.ToCompleteDateFilter != null, e => e.CompleteDate <= input.ToCompleteDateFilter)
                             .WhereIf(input.StatusId > 0, e => e.EntityObjectStatusId == input.StatusId)
                             .WhereIf(!string.IsNullOrEmpty(input.ReferenceFilter), z => z.Reference.Contains(input.ReferenceFilter))
                             .WhereIf(input.EntityTypeIdFilter > 0, e => e.EntityObjectTypeId == input.EntityTypeIdFilter)
@@ -2682,10 +2683,10 @@ namespace onetouch.AppSiiwiiTransaction
                                          .WhereIf(!string.IsNullOrWhiteSpace(input.Filter), e => e.Code.Contains(input.Filter))
                                          .WhereIf(!string.IsNullOrWhiteSpace(input.Filter), e => e.Code.Contains(input.Filter))
                                          .WhereIf(!string.IsNullOrWhiteSpace(input.CodeFilter), e => e.Code == input.CodeFilter)
-                                         .WhereIf(input.FromCreationDateFilter != DateTime.MinValue && input.FromCreationDateFilter != null, e => e.CreationTime >= input.FromCreationDateFilter)
-                                         .WhereIf(input.ToCreationDateFilter != DateTime.MinValue && input.ToCreationDateFilter != null, e => e.CreationTime <= input.ToCreationDateFilter)
-                                         .WhereIf(input.FromCompleteDateFilter != DateTime.MinValue && input.FromCompleteDateFilter != null, e => e.CompleteDate >= input.FromCompleteDateFilter)
-                                         .WhereIf(input.ToCompleteDateFilter != DateTime.MinValue && input.ToCompleteDateFilter != null, e => e.CompleteDate <= input.ToCompleteDateFilter)
+                                         .WhereIf(input.FromCreationDateFilter != null, e => e.CreationTime >= input.FromCreationDateFilter)
+                                         .WhereIf(input.ToCreationDateFilter != null, e => e.CreationTime <= input.ToCreationDateFilter)
+                                         .WhereIf(input.FromCompleteDateFilter != null, e => e.CompleteDate >= input.FromCompleteDateFilter)
+                                         .WhereIf(input.ToCompleteDateFilter != null, e => e.CompleteDate <= input.ToCompleteDateFilter)
                                          .WhereIf(input.StatusId > 0, e => e.EntityObjectStatusId == input.StatusId)
                                          .WhereIf(input.EntityTypeIdFilter > 0, e => e.EntityObjectTypeId == input.EntityTypeIdFilter)
                                          .WhereIf(!string.IsNullOrEmpty(input.ReferenceFilter), z => z.Reference.Contains(input.ReferenceFilter))
