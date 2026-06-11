@@ -1,4 +1,4 @@
-.card {
+.cardDiv {
   border-top-left-radius: 10.82px !important;
   border-top-right-radius: 10.82px !important;
   width: 15rem;
@@ -16,6 +16,9 @@
     border-bottom-left-radius: 10.82px !important;
     border-bottom-right-radius: 10.82px !important;
     min-height: 104px;
+    background-color: #fff;
+    box-shadow: 3.61px 3.61px 9.02px 0px #1616161A;
+
 
     .ssin {
       color: #4A0D4A;
