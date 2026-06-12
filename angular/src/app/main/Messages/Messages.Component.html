@@ -1,5 +1,5 @@
 <div
-  class="boxes row mt-md-5 mb-5"
+  class="boxes row mt-5 mb-5"
   [ngClass]="{
     'rtl-layout': isArabic,
     'mx-lg-0 mx-md-5 mx-1 px-lg-0 px-md-5 px-0': isArabic
@@ -306,9 +306,9 @@
                                                     ? message.profilePictureUrl
                                                     : 'assets/chat/user-chat.png'
                                             " class="rounded-circle chatImg" />
-                                    <ul class="msg-content row">
+                                    <ul class="msg-content">
                                         <li
-                                            class="Messages col-12 mb-0 col-md mr-5 mr-md-0 d-flex justify-content-between">
+                                            class="Messages d-flex justify-content-between">
 
                                             <a>
                                                 <span [ngClass]="{
@@ -334,7 +334,7 @@
                                             <span class="mail-info "  [ngStyle]="!isArabic ? {'text-align':'right'} : {'text-align':'left'}">
                                                 <i [ngClass]="
                                                     message.entityObjectStatusCode ==
-                                                    'UNREAD'?'far fa-envelope':'far fa-envelope-open'
+                                                    'UNREAD'?'far fa-envelope mx-2':'far fa-envelope-open mx-2'
                                             "></i>
                                                 <div class="actionDropdown btn-group dropdown mb-2 "
                                                     dropdown container="body">
@@ -414,7 +414,7 @@
                     *ngIf="!displayMessageDetails">
                     <div class="row">
                         <div class="col-md-12 mb-2 borderBm" *ngFor="let message of itemsToShow; let i = index">
-                         <div *ngIf="messageCategoryFilter == 'MESSAGE'" class="message-category-title">
+                         <div *ngIf="messageCategoryFilter == 'MESSAGE'" class="message-category-title px-2">
   <img
     class="message-category-icon"
     *ngIf="messageTypeIndex == 1"
@@ -427,7 +427,7 @@
   </span>
 </div>
 
-<div *ngIf="messageCategoryFilter == 'THREAD'" class="message-category-title">
+<div *ngIf="messageCategoryFilter == 'THREAD'" class="message-category-title px-2">
   <img
     class="message-category-icon"
     *ngIf="messageTypeIndex == 1"
@@ -440,7 +440,7 @@
   </span>
 </div>
 
-<div *ngIf="messageCategoryFilter == 'MENTION'" class="message-category-title">
+<div *ngIf="messageCategoryFilter == 'MENTION'" class="message-category-title px-2">
   <img
     class="message-category-icon"
     *ngIf="messageTypeIndex == 1"
@@ -461,9 +461,9 @@
                                                     ? message.profilePictureUrl
                                                     : 'assets/chat/user-chat.png'
                                             " class="rounded-circle userImgMd"  (click)="selectMessage(message)" />
-                                    <ul class="msg-content row">
+                                    <ul class="msg-content">
                                         <li
-                                            class="Messages col-12 mb-0 col-md mr-5 mr-md-0 d-flex justify-content-between">
+                                            class="Messages d-flex justify-content-between">
 
                                             <a (click)="selectMessage(message)">
                                                 <span [ngClass]="{
@@ -486,11 +486,11 @@
                                                     | niceDateFormatPipe
                                                     }}</span>
                                             </a>
-                                            <span class="mail-info d-flex align-items-end"  [ngClass]="isArabic ? 'text-left' : 'text-right'">
-                                                <div class="d-flex">
+                                            <span class="mail-info d-flex align-items-end flex-column"  [ngClass]="isArabic ? 'text-left' : 'text-right'">
+                                                <div class="d-flex align-items-center">
                                                     <i [ngClass]="
                                                 message.entityObjectStatusCode ==
-                                                'UNREAD'?'far fa-envelope':'far fa-envelope-open'
+                                                'UNREAD'?'far fa-envelope mx-2':'far fa-envelope-open mx-2'
                                         "></i>
                                                     <div class="actionDropdown btn-group dropdown mb-2 "  dropdown container="body">
                                                         <button class="dropdown-toggle btn btn-sm  btn-action  cursor-pointer"
@@ -529,7 +529,7 @@
                                                         </ul>
                                                     </div>
                                                 </div>
-                                                <span class="mt-1" style="    margin-left: 50%;">{{message.receiveDate |
+                                                <span class="mt-1">{{message.receiveDate |
                                                     date:'hh:mm a, MM/dd/yyyy' }}</span>
                                             </span>
 
@@ -622,7 +622,7 @@
                             </div>
                         </span>
                         <div class="actions-message pr-3  ">
-                            <div class="row">
+                            <div class="d-flex align-items-center">
                                 <div class="">
                                     <button
                                         class="btn detalsBtn btn-sm d-block mr-2  show-detail-btn ng-tns-c357-9  m-0  cursor-pointer"
@@ -636,7 +636,7 @@ margin-right: 6px;"></i>
                                 </div>
                                 <div class="d-flex flex-row justify-content-between pt-1">
 
-                                    <div class="actionDropdown btn-group dropdown mb-3 " dropdown container="body">
+                                    <div class="actionDropdown btn-group dropdown " dropdown container="body">
                                         <button class="dropdown-toggle btn btn-sm  btn-action  cursor-pointer" dropdownToggle
                                           ></button>
 
@@ -944,10 +944,10 @@ margin-right: 6px;"></i>
 
             <div class="col-md-5 p-0 pr-2  m-md-0" [ngClass]="showSideBar ? 'd-none':'d-md-none d-block'"
               *ngIf="displayMessageDetails && messagesDetails ">
-                <div class=" row ml-3 mt-2">
+                <div class=" row ml-3">
                     <img src="../../../assets/message/Header_arrow-back_Btn.svg" class="pointer"
                         (click)="messageDetailsGoback()" />
-                    <div class="mt-1"><span class="pl-3 subject-msg">
+                    <div class="mt-1 my-2"><span class="pl-3 subject-msg d-flex align-items-center">
                           
                             <div *ngIf="messageCategoryFilter=='MESSAGE'" class="mx-3 mt-2">
                                 <h4 class="d-flex">
@@ -1007,16 +1007,15 @@ margin-right: 6px;"></i>
                             </div>
                         </span>
                     </div>
-                    <div class="actions-message w-100 pr-4 d-flex justify-content-end">
+                    <div class="actions-message w-100 pr-4 d-flex justify-content-end" style="gap: 20px;">
                         <button class="btn detalsBtn btn-sm d-block  show-detail-btn ng-tns-c357-9  m-0  cursor-pointer" (click)="onShowSideBar(!showSideBar)">
-                            <i class="fa fa-eye fa-2x" aria-hidden="true" style="margin-top: -3px;
-margin-right: 6px;"></i>
+                            <i class="fa fa-eye fa-2x" aria-hidden="true"></i>
 
                             <span class="spBtnDe" >{{showHideSideBarTitle | localize}}</span>
                         </button>
                         <div class="row">
 
-                            <div class="btn-group dropdown actionDropdown mr-3 mt-2" dropdown container="body">
+                            <div class="btn-group dropdown actionDropdown" dropdown container="body">
                                 <button class="dropdown-toggle btn btn-sm  btn-action  cursor-pointer" dropdownToggle
                                 ></button>
 
