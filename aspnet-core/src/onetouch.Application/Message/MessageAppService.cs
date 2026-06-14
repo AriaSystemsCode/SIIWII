@@ -368,7 +368,7 @@ namespace onetouch.Message
         [AbpAllowAnonymous]
         public async Task<MessagePagedResultDto> GetAllComments(GetAllMessagesInput input)
         {
-            return new MessagePagedResultDto(0,0, new List<GetMessagesForViewDto>());
+            //return new MessagePagedResultDto(0,0, new List<GetMessagesForViewDto>());
             var entityObjectTypeComment = await _helper.SystemTables.GetEntityObjectTypeComment();
             var entityObjectTypeMessage = await _helper.SystemTables.GetEntityObjectTypeMessageID();
             var orgComponentId = input.MainComponentEntitlyId;
