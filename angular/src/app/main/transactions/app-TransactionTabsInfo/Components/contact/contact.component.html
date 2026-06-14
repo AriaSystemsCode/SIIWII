@@ -1,5 +1,5 @@
 <form #contactForm="ngForm" class="pl-2">
-    <div class="row" style="width: 100%;" *ngIf="isCreateOrEdit">
+    <div class="row w-100" *ngIf="isCreateOrEdit">
         <!-- company code -->
         <div class="col-md-6 " *ngIf=" activeTab==transactionCartoccordionTabs.BuyerContactInfo">
             <div class="formGroup">
@@ -370,7 +370,7 @@
             <div>
                 <div class="d-flex    w-100">
                     <h6 class="previewTitle m-0 p-0  col-md-6 col-6">{{'Email' | localize}} :</h6>
-                    <p class=" previewValue  m-0 p-0  col-md-6 col-6" style="word-break: break-word;"
+                    <p class=" previewValue  m-0 p-0  col-md-6 col-6 word-break"
                         *ngIf="appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.contactEmail ">
                         {{
                         appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.contactEmail
@@ -428,7 +428,7 @@
             <div>
                 <div class="d-flex    w-100">
                     <h6 class="previewTitle m-0 p-0  col-md-3 col-6">{{'Email' | localize}} :</h6>
-                    <p class=" previewValue  m-0 p-0  col-md-9 col-6" style="word-break: break-word;"
+                    <p class=" previewValue  m-0 p-0  col-md-9 col-6 word-break"
                         *ngIf="appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.contactEmail ">
                         {{
                         appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.contactEmail

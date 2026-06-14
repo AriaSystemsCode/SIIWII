@@ -155,19 +155,10 @@
             <div>
 
             </div>
-
-
-
-
         </p-accordionTab>
 
 
-
-
-
-
-        <p-accordionTab class="shoppingCartAccordionTabBG"
-            (selectedChange)="currentTab = getOrderDetailsTabIndex();  getLinesData()">
+        <p-accordionTab class="shoppingCartAccordionTabBG" (selectedChange)="onOrderDetailsTabSelected($event)">
             <ng-template pTemplate="header">
                 <div class="d-inline-block custom-header d-flex">
                     <h6 class="mb-1 mt-1 purpleColor">{{l("OrderDetails")}}</h6>
@@ -537,7 +528,7 @@
                                             class="colorBox"
                                             [ngStyle]="{'background-color':selectedColorCode, 'height.px':  (65 / acceptedAspectRatio )}">
                                         </div>
-                                        <div class="" style="font-size: 10px;">
+                                        <div class="fs-10">
 
 
                                             <p class="card-text desc fw-bold">
@@ -870,10 +861,10 @@
             </div>
 
             <!-- Buttons -->
-            <div class="row w-100 mt-4 ml-1 position-relative" style="height: 50px;"
+            <div class="row w-100 mt-4 ml-1 position-relative"
                 *ngIf="!showTabs || (showTabs && appTransactionsForViewDto?.entityStatusCode?.toUpperCase()=='DRAFT')">
 
-                <button type="button" class="btn bgPurple border-0 w-100" style="height: 37px;" *ngIf="!showTabs"
+                <button type="button" class="btn bgPurple border-0 w-100" *ngIf="!showTabs"
                     (click)="onProceedToCheckout()">
                     {{l("Proceedtocheckout")}}
                 </button>
@@ -924,13 +915,13 @@
     <div class="h-100 parentDiv">
         <div class="modal-content big-scroll pb-5 ">
             <div class=" topheader d-flex justify-content-between align-items-center">
-                    <div class="row bg-white  m-3 p-2  pl-4 cartSec">
-                        {{'Transactions' | localize}} &nbsp; &nbsp; > &nbsp; &nbsp;
-                        {{appTransactionsForViewDto?.transactionType == 0 ?
-                        'Sales Order':'Purchase Order' | localize}} &nbsp; &nbsp; >
-                        &nbsp; &nbsp;
-                        {{transactionCode}}
-                    </div>
+                <div class="row bg-white  m-3 p-2  pl-4 cartSec">
+                    {{'Transactions' | localize}} &nbsp; &nbsp; > &nbsp; &nbsp;
+                    {{appTransactionsForViewDto?.transactionType == 0 ?
+                    'Sales Order':'Purchase Order' | localize}} &nbsp; &nbsp; >
+                    &nbsp; &nbsp;
+                    {{transactionCode}}
+                </div>
                 <div class="mx-2">
                     <button (click)="minimizeScreen()" class="btn bgPurple">
 
@@ -991,7 +982,7 @@
                         <button type="button"
                             [disabled]="appTransactionsForViewDto?.entityStatusCode?.toUpperCase()!='OPEN'"
                             [ngClass]="{ disabled:appTransactionsForViewDto?.entityStatusCode?.toUpperCase()!='OPEN'}"
-                            class="btn  bgPurple border-0 d-lg-block d-none prntBtn" (click)="printTransaction()">
+                            class="btn  bgPurple border-0 d-lg-block d-none prntBtn mx-0" (click)="printTransaction()">
                             <img src="../../../../../assets/shoppingCart/print.svg" />
                             {{"Print" | localize}}</button>
 
@@ -1014,9 +1005,9 @@
 
                     </div>
                     <div class="d-lg-none d-block">
-                        <div class="greyMDlightColor" dropdown>
+                        <div class="greyMDlightColor dropdown" dropdown>
                             <button dropdownToggle type="button" class="btn   border-0 dropdownBtn"
-                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" id="dropdownMenuButton" >
                                 <div class="d-flex flex-column align-items-center">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" viewBox="0 0 25 25"
                                         fill="none">
@@ -1028,7 +1019,7 @@
 
                                 </div>
                             </button>
-                            <div class="dropdown-menu dropdown-menu-right dropdown-excel-operations" *dropdownMenu>
+                            <div class="dropdown-menu dropdown-menu-right dropdown-excel-operations" *dropdownMenu  aria-labelledby="dropdownMenuButton">
                                 <a class="dropdown-item d-flex" id="shareTransaction" href="javascript:;">
 
 
@@ -1129,25 +1120,25 @@
 
                 <div class="card position-relative dot">
                     <div class="d-md-none d-block actionsSec" [ngStyle]="
-  isArabic
-    ? {
-        'left': '-33px',
-        'border-right': '1px solid #eee'
-      }
-    : {
-        'right': '-33px',
-        'border-left': '1px solid #eee'
-      }
-">
+                                    isArabic
+                                        ? {
+                                            'left': '-33px',
+                                            'border-right': '1px solid #eee'
+                                        }
+                                        : {
+                                            'right': '-33px',
+                                            'border-left': '1px solid #eee'
+                                        }
+                                    ">
                         <div class=" greyMDlightColor" dropdown style="width: 110px;height: 60px;" [ngStyle]="
-  isArabic
-    ? {
-        'margin-right': '8px'
-      }
-    : {
-        'margin-left': '8px'
-      }
-">
+                                    isArabic
+                                        ? {
+                                            'margin-right': '8px'
+                                        }
+                                        : {
+                                            'margin-left': '8px'
+                                        }
+                                    ">
                             <button dropdownToggle type="button" class="btn   border-0 mt-3" data-toggle="dropdown"
                                 aria-haspopup="true" aria-expanded="false">
                                 <div class="d-flex flex-column align-items-center">

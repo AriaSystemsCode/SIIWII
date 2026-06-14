@@ -73,7 +73,7 @@
                                     [ngClass]="isArabic? 'rtl-autoC':'ltr-autoC'" [suggestions]="filteredBuyerContacts"
                                     formControlName="buyerContactName" [(ngModel)]="selectedBuyerContact"
                                     (completeMethod)="handleBuyerNameSearch($event)"
-                                    (ngModelChange)="handleBuyerNameChange($event)" (click)="loadInitialContacts()"
+                                    (ngModelChange)="handleBuyerNameChange($event)"
                                     [placeholder]=" 'PleaseSelectBuyerName' | localize" field="name"
                                     [forceSelection]="false">
 
@@ -277,7 +277,7 @@
                             <p-autoComplete #autoComplete [dropdown]="true" [suggestions]="filteredSellerContacts"
                                 [ngClass]="isArabic? 'rtl-autoC':'ltr-autoC'" formControlName="sellerContactName"
                                 [(ngModel)]="selectedSellerContact" (completeMethod)="handleSellerNameSearch($event)"
-                                (ngModelChange)="handleSellerNameChange($event)" (click)="loadInitialSellerContacts()"
+                                (ngModelChange)="handleSellerNameChange($event)" 
                                 [placeholder]=" 'PleaseSelectSellerContactName' | localize" field="name"
                                 [forceSelection]="false">
 

@@ -1,4 +1,4 @@
-<div class="selected-addr-comp mb-3" style="padding: 0 20px;" *ngIf="isCreateOredit">
+<div class="selected-addr-comp mb-3 py-0 px-3" *ngIf="isCreateOredit">
     <div class="selected-add-edit row">
         <div class="col-md-12 mb-3" *ngIf="showAddressType">
             <label class="label mt-2 mb-2">{{l("AddressType")}}</label>
@@ -13,7 +13,7 @@
         </div>
         <div class="col-md-12 mb-3">
             <label class="label mt-2 mb-2 mr-4">{{l("Address")}}</label>
-            <textarea class="form-control   d-inline-block ml-md-4 textAr" style="min-height: 80px;"
+            <textarea class="form-control   d-inline-block ml-md-4 textAr"
                 readonly>{{selectedAddress?.addressLine1 ? selectedAddress?.addressLine1+' ,' : ''}}{{selectedAddress?.addressLine2 ? selectedAddress?.addressLine2+' ,' : ''}}{{ selectedAddress?.city ? selectedAddress?.city+' ,' : ''}}{{selectedAddress?.state ? selectedAddress?.state+' ,' : ''}}{{ selectedAddress?.countryName ? selectedAddress?.countryName : selectedAddress?.countryCode ? selectedAddress?.countryCode  +' ,' : ''}}{{selectedAddress?.postalCode ? selectedAddress?.postalCode : ''}}</textarea>
             <div [ngClass]="isArabic? 'pull-left': 'pull-right'">
                 <button *ngIf="canChange" class="savebtn text-center btn float-right mt-2" (click)="showAddressList()">
@@ -34,7 +34,7 @@
             <label class="label mt-2 mb-2 selected-add ml-4" *ngIf="!selectedAddressDetails">-</label>
         </div>
         <div class="col-md-12">
-            <label class="label mt-2 mb-2 mr-4" style="margin-left: 10px;">{{l("Address")}} :</label>
+            <label class="label mt-2 mb-2 mr-4">{{l("Address")}} :</label>
             <label class="label mt-2 mb-2 selected-add ml-4" *ngIf="selectedAddressDetails">
                 {{selectedAddressDetails?.addressLine1+' ,'}}{{selectedAddressDetails?.addressLine2+'
                 ,'}}{{selectedAddressDetails?.city+' ,'}}{{selectedAddressDetails?.state+'
@@ -82,7 +82,7 @@
                 </div>
                 <div class="p mt-2 d-flex" *ngIf="showAddBtn && showEditDelBtn && fromSalesRep">
                     <button (click)="editAddress(address.id)" class="acBtn">
-                        <img class="mx-1" style="height: 20px;" src="../../../../../assets/icons/edit-icon.png">
+                        <img class="mx-1 h-20" src="../../../../../assets/icons/edit-icon.png">
 
 
 
@@ -92,7 +92,7 @@
                     <button
                         (click)="(appTransactionsForViewDto?.buyerCompanySSIN == '' || appTransactionsForViewDto?.buyerCompanySSIN == null) && ((currentTab == 4 && shipInfoIndex == 2) ||  (currentTab == 5 && billingIndexInfo == 1))  ? deleteTempAddress(address.id):  deleteAddress(address.id)"
                         class="acBtn">
-                        <img class="mx-1" style="height: 20px;" src="../../../../../assets/icons/fluent_delete.png">
+                        <img class="mx-1 h-20" src="../../../../../assets/icons/fluent_delete.png">
 
 
                         <p class="delText">{{l("Delete")}}</p>

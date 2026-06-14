@@ -538,6 +538,7 @@ loadCommentsList() {
     ];
   }
 
+  
   getShoppingCartData(temp: TreeNode<any>[] = null) {
 
     this.temp = temp;
@@ -1971,4 +1972,14 @@ openPlaceOrderConfirm() {
   };
 }
 
+
+onOrderDetailsTabSelected(isSelected: boolean) {
+  if (!isSelected) return;
+
+  this.currentTab = this.getOrderDetailsTabIndex();
+
+  if (!this.shoppingCartDetails) {
+    this.getLinesData();
+  }
+}
 }

@@ -1343,8 +1343,8 @@ input:checked+.slider:before {
 }
 
 .btnHgtNoWrap {
-    height: 37px;
-    white-space: nowrap;
+    // height: 37px;
+    // white-space: nowrap;
 }
 
 .cursor-pointer {
@@ -1498,4 +1498,8 @@ height: 48px;
 
 .btnsGap {
     gap: 4px;
+}
+
+.fs-10{
+    font-size: 10px;
 }
