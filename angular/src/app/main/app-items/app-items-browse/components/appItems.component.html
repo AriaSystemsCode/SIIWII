@@ -1,299 +1,251 @@
 ﻿<form [formGroup]="filterForm">
-    <div [@routerTransition] style="margin-top: -90px;" class="wrapper">
-        <div #parentContainer class="kt-content kt-grid__item kt-grid__item--fluid kt-grid kt-grid--hor position-relative">
-            <div [ngStyle]="{'width.px':parentContainer?.offsetWidth}" class="d-flex flex-wrap justify-content-between align-items-center selection-bar p-3" style="background-color: white !important;" *ngIf="(browseMode == BrowseModeEnum.Selection || browseMode == BrowseModeEnum.ActionsAndSelections) && (initialyShowTopBar || (!initialyShowTopBar && multiSelectionInfo?.totalCount) )">
-                <div class="d-flex h4 pl-2" [ngStyle]="{'visibility-hidden': !multiSelectionInfo?.totalCount}">
-                    <span class="mr-4"><i class="fas fa-circle"></i></span>
-                 <span style="color: #4A0D4A !important;">  {{multiSelectionInfo?.totalCount}} {{'SelectedProducts' | localize }} </span> 
+    <div [@routerTransition]  [ngClass]="isArabic && !fromCta ? 'mt-5 pt-lg-5 pt-md-0 pt-5': isArabic && fromCta ?'' : !isArabic && !fromCta ? 'mgLtrtop' :''">
+        <div #parentContainer
+            class="kt-content kt-grid__item kt-grid__item--fluid kt-grid kt-grid--hor position-relative">
+            <div [ngStyle]="{'width.px':parentContainer?.offsetWidth}"
+                class="d-flex flex-wrap justify-content-between align-items-center selection-bar p-3 bg-white"
+                *ngIf="(browseMode == BrowseModeEnum.Selection || browseMode == BrowseModeEnum.ActionsAndSelections) && (initialyShowTopBar || (!initialyShowTopBar && multiSelectionInfo?.totalCount) )">
+                <div class="d-flex h4 " [ngStyle]="{'visibility-hidden': !multiSelectionInfo?.totalCount}">
+                    <span><i class="fas fa-circle"></i></span>
+                    <span class="selectedItms" style="color: #4A0D4A !important;"> {{multiSelectionInfo?.totalCount}} {{'SelectedProducts' |
+                        localize }} </span>
                 </div>
-                <div class="d-flex justify-content-between align-items-center selection-bar-actions" >
-                    <div class="d-flex flex-grow actions" >
-                        <button class="btn  selection-btns selection-btns-sz" (click)="selectAll()" *ngIf="multiSelectionInfo?.bulkActionLimit >= primengTableHelper?.totalRecordsCount">{{'All' | localize}}</button>
-                        <button class="btn  selection-btns selection-btns-sz" (click)="selectNone()" [disabled]="!multiSelectionInfo?.totalCount">{{'None' | localize}}</button>
-                        <button class="btn  selection-btns selection-btns-sz" (click)="invertSelection()" *ngIf="multiSelectionInfo?.bulkActionLimit >= primengTableHelper?.totalRecordsCount" [disabled]="!multiSelectionInfo?.totalCount || multiSelectionInfo?.totalCount == primengTableHelper?.totalRecordsCount">{{'Invert' | localize}}</button>
+                <div class="d-flex justify-content-between align-items-center selection-bar-actions">
+                    <div class="d-flex flex-grow actions">
+                        <button class="btn  selection-btns selection-btns-sz" (click)="selectAll()"
+                            *ngIf="multiSelectionInfo?.bulkActionLimit >= primengTableHelper?.totalRecordsCount">{{'All'
+                            | localize}}</button>
+                        <button class="btn  selection-btns selection-btns-sz" (click)="selectNone()"
+                            [disabled]="!multiSelectionInfo?.totalCount">{{'None' | localize}}</button>
+                        <button class="btn  selection-btns selection-btns-sz" (click)="invertSelection()"
+                            *ngIf="multiSelectionInfo?.bulkActionLimit >= primengTableHelper?.totalRecordsCount"
+                            [disabled]="!multiSelectionInfo?.totalCount || multiSelectionInfo?.totalCount == primengTableHelper?.totalRecordsCount">{{'Invert'
+                            | localize}}</button>
                     </div>
                 </div>
-                <div class="d-flex justify-content-between align-items-center selection-bar-actions" >
+                <div class="d-flex justify-content-between align-items-center selection-bar-actions gap-4">
                     <div>
-                        <button class="btn  selection-btns" (click)="bulkShareItems()"><i class="fa fa-share-alt" aria-hidden="true"></i>
+                        <button class="selection-btns" (click)="bulkShareItems()"><i class="fa fa-share-alt"
+                                aria-hidden="true"></i>
                             {{'Share' | localize }}</button>
                     </div>
                     <div>
-                        <button class="btn btn-success btn-sync" (click)="bulkSyncItems()" [disabled]="!allSelectedShared"><i class="fa fa-sync"></i>{{'Sync' | localize }}</button>
-                    </div>
-                   
-                    <div>
-                        <button class="btn  selection-btns" (click)="cancelSelection()">{{'Cancel' | localize }}</button>
+                        <button class=" btn-success btn-sync" (click)="bulkSyncItems()"
+                            [disabled]="!allSelectedShared"><i class="fa fa-sync"></i>{{'Sync' | localize }}</button>
                     </div>
 
                     <div>
-                        <button class="btn  btn-applySelection" [disabled]="!multiSelectionInfo?.totalCount" (click)="applySelection()">{{ applySelectionTitle | localize }}</button>
+                        <button class="  selection-btns" (click)="cancelSelection()">{{'Cancel' | localize
+                            }}</button>
+                    </div>
+
+                    <div>
+                        <button class=" btn-applySelection" [disabled]="!multiSelectionInfo?.totalCount"
+                            (click)="applySelection()">{{ applySelectionTitle | localize }}</button>
                     </div>
                 </div>
             </div>
-            <div [class]="containerClass + ' kt-grid__item kt-grid__item--fluid'" [ngClass]="fromCta ? 'addPad':''">
-                <div  [ngClass]="{'kt-portlet kt-portlet--mobile':!isModal}" style="background-color: transparent !important;">
-                    <div [ngClass]="{'kt-portlet__body':!isModal}">
-                        <div class="row view-profile-wrapper" style="margin: 0px imo !important;background-color: transparent; position: relative !important;">
-                           
-                        <!-- /////////////////////////////////////////////// -->
+            <div [class]="containerClass + ' kt-grid__item kt-grid__item--fluid'" style="margin-top: 10px;">
+                <div [ngClass]="{'kt-portlet--mobile':!isModal}"
+                    style="background-color: transparent !important;">
+                    <div [ngClass]="{'kt-portlet__body':!isModal}" class="p-0">
+                        <div class="row view-profile-wrapper m-0 position-relative radius-12">
 
-                        <div #viewProfileCover class="view-profile-cover d-flex justify-content-center align-items-center position-relative w-100">
-                            <!-- <img  src="{{coverPhoto}}" class="w-100 h-100" onerror="this.src='../../../assets/placeholders/_default_cover.jpg'"> -->
-                            <app-image-display
-                                [image]="coverPhoto"
-                                [sycAttachmentCategory]="sycAttachmentCategoryBanner"
-                                [staticWidth]="viewProfileCover?.offsetWidth"
-                                   [classList]="fromCta ? 'handleImg':''"
-                                >
-                            </app-image-display>
-                            <div class="row w-100" style="position: absolute;
-top: 50%;
-left: 3%;
-transform: translateY(-50%);">
-                            <div class="col-md-2 ">
-                                <div class="dev-logo">
-                                    <app-image-display
-                                        [image]="logoPhoto"
-                                        [sycAttachmentCategory]="sycAttachmentCategoryLogo"
-                                        [classList]="'logo-profile'"
-                                        [staticHeight]="150"
-                                    >
-                                    </app-image-display>
+                            <div #viewProfileCover
+                                class="d-flex justify-content-center align-items-center position-relative">
+                                <app-image-display [image]="coverPhoto" [classList]="'img-cover'" [staticWidth]="1385"
+                                    [sycAttachmentCategory]="sycAttachmentCategoryBanner"
+                                
+                                    [classList]="'handleImg'">
+                                </app-image-display>
+                                <div class=" logoSec position-absolute"
+                                    [ngStyle]="isArabic ? {'right':'3%'} : {'left':'3%'}">
+
+
+                                    <img [src]="attachmentBaseUrl + '/' + logoPhoto"
+                                        onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'"
+                                        class="dev-logo-img" />
+
+
+                                    <h3 class="mt-3 nameH3 mx-auto"
+                                        [ngClass]="{'leesTop' : fromCta}">
+                                        {{appSession?.tenant?.name}}</h3>
+
                                 </div>
-                                <h3  class="mt-3" 
-                                [ngClass]="{'ml-5 ml-43':appSession?.tenant?.name?.length <=10 ,'leesTop' : fromCta}"
-                                style="font-size: 24px;color: white;position: absolute;
-   top: 90%;
-   white-space: nowrap;
-   background-color: #D4D4D4 !important;
-    border-radius: 10px;
-    border: 1px solid #D4D4D4 !important;
-    padding: 0px 5px;">{{appSession?.tenant?.name}}</h3>
-                                <!-- <img [src]="logoPhoto"  onerror="this.src='../../../assets/placeholders/_logo-placeholder.png';" class="logo-profile ml-4"> -->
                             </div>
+
                         </div>
-                        </div>
-
-
-
-
-
-
-
-                        <!-- ///////////////////////////////////// -->
-                            
-                        </div>
-                         <div class="row ">
-                        <div class="col-12 list-toolbar  pb-4">
-                            <div class="row mb-3 justify-content-between pt-2"  [ngClass]="fromCta ? 'ml-2':''">
-                                <div class="col-12 col-md-3 col-sm-6 list-toolbar-filter mb-0 mb-4 mb-md-0 d-flex justify-content-center align-items-center mb-4 mb-md-0 mr-5 pr-5">
-                                    <div class="btn-group dropdown list-toolbar-dropdown" dropdown  *ngIf="showMainFiltersOptions">
-                                        <button class="dropdown-toggle btn btn-sm font-weight-normal p-0" style="border: 1px solid #D9D9D9 !important;
-                                        color: #D9D9D9 !important;
-                                        border-radius: 5px;
-                                        /* padding: 10px 300px 10px 10px !important; */
-                                        width: 317px !important;
-                                        height: 46px !important;background-color: #FFFFFF;"
-                                        type="button"
-                                            dropdownToggle>
-                                            <span class="list-toolbar-dropdown-filter-selectedItem">
-                                                {{mainFilterCtrl?.value?.label | localize}}
-                                            </span>
-                                        </button>
-                                        <ul class="dropdown-menu actions-dropdown-menu"  *dropdownMenu>
-                                            <li *ngFor="let filter of pageMainFilters">
-                                                <a href="javascript:;" (click)="mainFilterCtrl.setValue(filter)" class="list-toolbar-dropdown-item">
-                                                    <span>
-                                                        <i [ngClass]="{'visibility-hidden': mainFilterCtrl?.value?.value != filter?.value }"  class="flaticon2-check-mark text-success mr-2 icon-sm list-toolbar-dropdown-icon"></i>
-                                                        <span class="list-toolbar-dropdown-title">
-                                                            {{ filter?.label | localize }}
+                        <div class="row px-lg-3 px-2">
+                            <div class="col-12 list-toolbar">
+                                <div class="row mb-3 justify-content-between pt-2 align-items-center" [ngClass]="fromCta ? 'ml-2':''">
+                                    <div class="mainFilterToggle">
+                                        <div class="btn-group dropdown list-toolbar-dropdown w-100" dropdown
+                                            *ngIf="showMainFiltersOptions">
+                                            <button class="dropdown-toggle btn btn-sm font-weight-normal toogleBtn"
+                                                type="button" dropdownToggle>
+                                                <span class="fw-bold fs-18">
+                                                    {{mainFilterCtrl?.value?.label | localize}}
+                                                </span>
+                                            </button>
+                                            <ul class="dropdown-menu actions-dropdown-menu" *dropdownMenu>
+                                                <li *ngFor="let filter of pageMainFilters">
+                                                    <a href="javascript:;" (click)="mainFilterCtrl.setValue(filter)"
+                                                        class="list-toolbar-dropdown-item">
+                                                        <span>
+                                                            <i [ngClass]="{'visibility-hidden': mainFilterCtrl?.value?.value != filter?.value }"
+                                                                class="flaticon2-check-mark text-success mr-2 icon-sm list-toolbar-dropdown-icon"></i>
+                                                            <span class="list-toolbar-dropdown-title">
+                                                                {{ filter?.label | localize }}
+                                                            </span>
                                                         </span>
-                                                    </span>
-                                                </a>
-                                            </li>
-                                        </ul>
-                                    </div>
-                                    <div class="list-toolbar-dropdown-filter-selectedItem font-weight-normal text-dark" *ngIf="!showMainFiltersOptions">
-                                        {{ mainFilterCtrl?.value?.label | localize }}
-                                    </div>
-
-                                </div>
-
-
-                                <div class="d-flex justify-content-center align-items-center mb-4 mb-md-0 list-toolbar-search" style="margin-left: -145px;">
-                                    <div class="kt-input-icon kt-input-icon--left">
-                                        <input type="text" formControlName="search" class="form-control" [placeholder]="'SearchWithThreeDot' | localize" id="generalSearch" style="border: 1px solid #D9D9D9 !important;
-                                        background-color: white !important;">
-                                        <span class="kt-input-icon__icon kt-input-icon__icon--left">
-                                            <span><i class="flaticon2-search-1 icon-md text-primary" style="color: #777777 !important;"></i></span>
-                                        </span>
+                                                    </a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                        <div class="list-toolbar-dropdown-filter-selectedItem font-weight-normal text-dark"
+                                            *ngIf="!showMainFiltersOptions">
+                                            {{ mainFilterCtrl?.value?.label | localize }}
+                                        </div>
 
                                     </div>
-                                </div>
 
-                                <!-- <div class="list-toolbar-divider" *ngIf="canAdd"> </div> -->
 
-                                <div class="d-flex justify-content-center align-items-center mb-4 mb-md-0" *ngIf="canAdd">
-                                   
-                                    <a  class="btn btn-primary font-weight-normal pl-2 pr-2 text-center list-toolbar-btn selection-btns" (click)="eventHandler({event:AppItemBrowseEvents.Create})"  style="background-color: #4A0D4A !important;
-                                    border: none !important; color: white !important;">
-                                       <i  class="fa-plus  fas ml-1"></i>  {{ "CreateNewProduct" | localize }}
-                                    </a>
+                                    <div
+                                        class="d-flex justify-content-center align-items-center  mb-md-0 " [ngClass]="fromCta ? 'searchCta':'list-toolbar-search'">
+                                        <div class="kt-input-icon kt-input-icon--left">
+                                            <input type="text" formControlName="search" class="form-control"
+                                                [placeholder]="'SearchWithThreeDot' | localize" id="generalSearch">
+                                            <span class="kt-input-icon__icon kt-input-icon__icon--left">
+                                                <span><i class="flaticon2-search-1 icon-md text-primary"
+                                                        style="color: #777777 !important;"></i></span>
+                                            </span>
 
-                                        <a  style="padding-right: 3px;padding-left: 9px;" [title]="'ImportProducts' | localize"   class="btn  font-weight-normal toolbar-btn pr-0 icon-box"
-                                        (click)="showImportProducts()"
-                                        >
-                                            <!-- <i class='d-inline-block w-100  fa-file-import fas  icon-center'></i> -->
-                                            <img
-                                            src='../../../../../assets/Items/Upload product icon.png'
-                                        />
+                                        </div>
+                                    </div>
+
+                                    <div class="d-flex justify-content-center align-items-center mb-md-0 gap-4"
+                                        *ngIf="canAdd">
+
+                                        <a class=" btn-primary font-weight-normal text-center list-toolbar-btn selection-btns bgPurple text-white border-none d-flex align-items-center"
+                                            (click)="eventHandler({event:AppItemBrowseEvents.Create})">
+                                            <i class="fa-plus  fas ml-1"></i> <span class="d-lg-flex d-none">{{
+                                                "CreateNewProduct" | localize }}</span>
                                         </a>
 
-                                        <a  style="padding-right: 3px;padding-left: 9px;" [title]="'UploadAvailableInventory' | localize"   class="btn  font-weight-normal toolbar-btn pr-0 icon-box"
-                                        (click)="showImportAvailableInventory()"
-                                        >
-                                            <!-- <i class='d-inline-block w-100  fa-file-import fas  icon-center'></i> -->
-                                            <img
-                                            src='../../../../../assets/Items/Upload Inventory icon.png'
-                                        />
+                                        <a [title]="'ImportProducts' | localize"
+                                            class="  font-weight-normal toolbar-btn pr-0 icon-box"
+                                            (click)="showImportProducts()">
+                                            <img src='../../../../../assets/Items/Upload product icon.png' />
+                                        </a>
+
+                                        <a [title]="'UploadAvailableInventory' | localize"
+                                            class="font-weight-normal toolbar-btn pr-0 icon-box"
+                                            (click)="showImportAvailableInventory()">
+                                            <img src='../../../../../assets/Items/Upload Inventory icon.png' />
                                         </a>
                                     </div>
-                                    <!-- <div class="list-toolbar-divider"></div> -->
 
-                                <div class="d-flex justify-content-center align-items-center mb-4 mb-md-0" style="margin-right: 15px;" >
-                                      <a *ngIf="fromCta" style="padding-right: 4px;padding-left: 10px;" [title]="'Filter' | localize" class="btn icon-box  font-weight-normal text-center text-primary toolbar-btn" [ngClass]="fromCta ? 'd-md-none d-block':''" (click)="toggleFilterOverlay()">
-                                        <i  class="fas fa-filter p-0" style="color: #4A0D4A !important;width: 24px !important;
-                                        height: 24px !important;
-                                        align-content: center;"></i>
-                                    </a>
-                                    <a style="padding-right: 4px !important;
-                                    padding-left: 10px !important;
-                                    display: flex
-                                ;
-                                    justify-content: center;
-                                    align-items: center;" [title]="'ResetData' | localize" class="btn icon-box  font-weight-normal text-center text-primary toolbar-btn" (click)="resetList()">
-                                        <i  class="flaticon2-reload" style="color: #4A0D4A !important;width: 24px !important;
-                                        height: 24px !important;
-                                        align-content: center;"></i>
-                                    </a>
-                                    <a style="padding-left: 10px;" [title]="'ToggleView' | localize" (click)="triggerListView()" class="btn  font-weight-normal pr-1 text-center text-primary toolbar-btn">
-                                        <i   [ngClass]="singleItemPerRowMode ? 'flaticon2-menu' : 'fa-bars fas'" style="border: 1px solid #4A0D4A                                        !important;
-                                           border: 1px solid #4A0D4A !important;
-    padding: 7px !important;
-    background-color: #4A0D4A !important;
-    border-radius: 6px !important;
-    width: 35px !important;
-    height: 35px !important;
-    align-content: center;   
-     color: white !important;"></i>
-                                    </a>
+                                    <div class="d-flex justify-content-center align-items-center  mb-md-0 gap-4">
+                                        <a  [title]="'Filter' | localize"
+                                            class="icon-box  font-weight-normal text-center text-primary toolbar-btn d-md-none d-block"
+                                            (click)="toggleFilterOverlay()">
+                                            <i class="fas fa-filter p-0"></i>
+                                        </a>
+                                        <a [title]="'ResetData' | localize"
+                                            class="icon-box  font-weight-normal text-center text-primary toolbar-btn resetBtn"
+                                            (click)="resetList()">
+                                            <i class="flaticon2-reload"></i>
+                                        </a>
+                                        <a [title]="'ToggleView' | localize" (click)="triggerListView()"
+                                            class="font-weight-normal pr-1 text-center text-primary toolbar-btn">
+                                            <i [ngClass]="singleItemPerRowMode ? 'flaticon2-menu' : 'fa-bars fas'"
+                                                class="toggBtn"></i>
+                                        </a>
+                                    </div>
                                 </div>
 
                             </div>
-                           
-                        </div>
-                        <div class="col-6 col-md-3 col-sm-4  left-aside-filters pt-4 mt-2" [ngClass]="fromCta ? 'col-lg-3 col-md-5 px-0 addBorder d-md-block d-none':'col-md-3'">
-                            <app-items-filters
-                                [filterForm]="filterForm"
-                                [filtersFlags]="filtersFlags"
-                            ></app-items-filters>
-                        </div>
-                        <div  class="col d-flex flex-column  app-items-container thin-scroll"   >
-                            <div class="d-flex justify-content-between pl-5" [ngClass]="fromCta ? '':'pl-5'">
-                                <div class="font-weight-normal list-toolbar-data-summary" [ngStyle]="{ visibility : loading ? 'hidden' : 'visible' }" style="border: 1px solid #D9D9D9 !important;
-                                color: #212121 !important;
-                                border-radius: 5px;
-                                padding: 5px;width: fit-content;background-color: white !important;">
-                                    {{ items.length  }}
-                                    {{ primengTableHelper?.totalRecordsCount ? ("over" | localize) : ''}}
-                                    {{ primengTableHelper?.totalRecordsCount }} {{"Results" | localize }}
-                                </div>
+                            <div class="col-lg-3 col-md-5 col-12 left-aside-filters pt-4 mt-2 px-0 addBorder d-md-block d-none"
+                                >
+                                <app-items-filters [filterForm]="filterForm"
+                                    [filtersFlags]="filtersFlags"></app-items-filters>
+                            </div>
+                            <div class="col-lg-9 col-md-7 col-12 d-flex flex-column  app-items-container thin-scroll">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div class="font-weight-normal list-toolbar-data-summary"
+                                        [ngStyle]="{ visibility : loading ? 'hidden' : 'visible' }">
+                                        {{ items.length }}
+                                        {{ primengTableHelper?.totalRecordsCount ? ("over" | localize) : ''}}
+                                        {{ primengTableHelper?.totalRecordsCount }} {{"Results" | localize }}
+                                    </div>
 
-                                <div style="margin-right: 15px;background-color: white;
-    padding: 5px;">
-                                    <div class="btn-group dropdown list-toolbar-dropdown" dropdown >
-                                        <button class="dropdown-toggle btn btn-sm font-weight-normal p-0 " [ngClass]="fromCta ?'handlWM':'defaultW'"
-                                        type="button"
-                                            dropdownToggle>
-                                            <span class="list-toolbar-dropdown-sort-label">
-                                                {{"SortBy" | localize}}
-                                            </span>
-                                            <span class="list-toolbar-dropdown-sort-selectedItem">
-                                                {{ sortingCtrl?.value?.label ? ":   " +(sortingCtrl?.value?.label | localize) : "" }}
-                                            </span>
-                                        </button>
-                                        <ul class="dropdown-menu actions-dropdown-menu"  *dropdownMenu>
-                                            <li *ngFor="let sortOption of sortingOptions" class="list-toolbar-dropdown-item">
-                                                <a href="javascript:;" (click)="sortingCtrl.setValue(sortOption)" >
-                                                    <span>
-                                                        <i [ngClass]="{'visibility-hidden':  sortOption?.value != sortingCtrl?.value?.value , 
+                                    <div class="bg-white  sortDroD py-2 px-4">
+                                        <div class="btn-group dropdown list-toolbar-dropdown" dropdown>
+                                            <button class="dropdown-toggle btn-sm font-weight-normal p-0 "
+                                                [ngClass]="fromCta ?'handlWM':'defaultW'" type="button" dropdownToggle>
+                                                <span class="list-toolbar-dropdown-sort-label">
+                                                    {{"SortBy" | localize}}
+                                                </span>
+                                                <span class="list-toolbar-dropdown-sort-selectedItem">
+                                                    {{ sortingCtrl?.value?.label ? ": " +(sortingCtrl?.value?.label |
+                                                    localize) : "" }}
+                                                </span>
+                                            </button>
+                                            <ul class="dropdown-menu actions-dropdown-menu" *dropdownMenu>
+                                                <li *ngFor="let sortOption of sortingOptions"
+                                                    class="list-toolbar-dropdown-item">
+                                                    <a href="javascript:;" (click)="sortingCtrl.setValue(sortOption)">
+                                                        <span>
+                                                            <i [ngClass]="{'visibility-hidden':  sortOption?.value != sortingCtrl?.value?.value , 
                                                         'd-none': sortOption?.value != sortingCtrl?.value?.value,
-                                                        'd-inline': sortOption?.value == sortingCtrl?.value?.value }"  class=" text-success mr-2 icon-sm list-toolbar-dropdown-item-icon fa fa-check fa-sm pr-1"></i>
-                                                        <span class="list-toolbar-dropdown-item-value">
-                                                            {{sortOption.label | localize }}
+                                                        'd-inline': sortOption?.value == sortingCtrl?.value?.value }"
+                                                                class=" text-success mr-2 icon-sm list-toolbar-dropdown-item-icon fa fa-check fa-sm pr-1"></i>
+                                                            <span class="list-toolbar-dropdown-item-value">
+                                                                {{sortOption.label | localize }}
+                                                            </span>
                                                         </span>
-                                                    </span>
-                                                </a>
-                                            </li>
-                                        </ul>
+                                                    </a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div *ngFor="let item of items;index as i" class="mb-5 p-0 " [ngClass]="{ 'col-md-12 single-item-per-row-layout': singleItemPerRowMode  ,
+                                'col-lg-3 col-6 p-0': !singleItemPerRowMode}">
+                                        <app-item-card [item]="item" [filterForm]="filterForm"
+                                            [actionsMenuFlags]="actionsMenuFlags" [statusesFlags]="statusesFlags"
+                                            [browseMode]="browseMode" [singleItemPerRowMode]="singleItemPerRowMode"
+                                            (eventTriggered)="eventHandler($event,i)"
+                                            [sycAttachmentCategoryImage]="sycAttachmentCategoryImage"
+                                            [acceptedAspectRatio]="acceptedAspectRatio"></app-item-card>
+                                    </div>
+                                    <div class="font-weight-normal mt-5 p-5 text-center w-100"
+                                        *ngIf="items.length == 0 && !loading">
+                                        {{ "NoDataFound" | localize }}
+                                    </div>
+                                </div>
+                                <div class="primeng-paging-container custom-paginator">
+                                    <p-paginator [rows]="
+                                        primengTableHelper.defaultRecordsCountPerPage
+                                    " #paginator (onPageChange)="getAppItems($event)" [totalRecords]="
+                                        primengTableHelper.totalRecordsCount
+                                    " [rowsPerPageOptions]="
+                                        primengTableHelper.predefinedRecordsCountPerPage
+                                    ">
+                                    </p-paginator>
+
+                                    <div class="total-records-count text-right mr-3">
+                                        {{
+                                        l(
+                                        "TotalRecordsCount",
+                                        primengTableHelper.totalRecordsCount
+                                        )
+                                        }}
                                     </div>
                                 </div>
                             </div>
-                            <div class="row  pl-5 pr-2">
-                                <div *ngFor="let item of items;index as i" class="col-12 mb-5 p-0 "   [ngClass]="{ 'col-md-12 single-item-per-row-layout': singleItemPerRowMode  ,
-                                'col-md-3': !singleItemPerRowMode && !fromCta,
-                                'col-lg-3 col-md-6 p-0': fromCta
-                            }">
-                                    <app-item-card
-                                        [item]="item"
-                                        [filterForm]="filterForm"
-                                        [actionsMenuFlags]="actionsMenuFlags"
-                                        [statusesFlags]="statusesFlags"
-                                        [browseMode]="browseMode"
-                                        [singleItemPerRowMode]="singleItemPerRowMode"
-                                        (eventTriggered)="eventHandler($event,i)"
-                                        [sycAttachmentCategoryImage]="sycAttachmentCategoryImage"
-                                        [acceptedAspectRatio]="acceptedAspectRatio"
-                                    ></app-item-card>
-                                </div>
-                                <div
-                                    class="font-weight-normal mt-5 p-5 text-center w-100"
-                                    *ngIf="items.length == 0 && !loading"
-                                >
-                                    {{ "NoDataFound" | localize }}
-                                </div>
-                            </div>
-                            <div class="primeng-paging-container custom-paginator"
-                            >
-                                <p-paginator
-                                    [rows]="
-                                        primengTableHelper.defaultRecordsCountPerPage
-                                    "
-                                    #paginator
-                                    (onPageChange)="getAppItems($event)"
-                                    [totalRecords]="
-                                        primengTableHelper.totalRecordsCount
-                                    "
-                                    [rowsPerPageOptions]="
-                                        primengTableHelper.predefinedRecordsCountPerPage
-                                    "
-                                >
-                                </p-paginator>
-
-                                <div
-                                    class="total-records-count text-right mr-3"
-                                >
-                                    {{
-                                        l(
-                                            "TotalRecordsCount",
-                                            primengTableHelper.totalRecordsCount
-                                        )
-                                    }}
-                                </div>
-                            </div>
                         </div>
-                    </div>
                     </div>
                 </div>
             </div>
@@ -304,14 +256,26 @@ transform: translateY(-50%);">
 </form>
 
 
-<div class="filter-overlay" *ngIf="showOverlay && fromCta">
-      
+<div
+    class="filter-overlay"
+    *ngIf="showOverlay"
+    [ngStyle]="isArabic ? {'right':'3%'} : {'left':'3%'}">
+
+    <div class="filter-overlay-header">
+        <h5 class="mb-0">{{ 'Filters' | localize }}</h5>
+
+        <button
+            type="button"
+            class="filter-close-btn"
+            (click)="showOverlay = false">
+
+            <i class="fa fa-times"></i>
+        </button>
+    </div>
+
     <app-items-filters
-      [filterForm]="filterForm"
-      [filtersFlags]="filtersFlags"
-    ></app-items-filters>
-  </div>
+        [filterForm]="filterForm"
+        [filtersFlags]="filtersFlags">
+    </app-items-filters>
 
-
-
-
+</div>

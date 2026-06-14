@@ -419,20 +419,18 @@ export class TransactionInformationComponent
       this.loadCommentsList()
     }
   }
-  loadCommentsList() {
-    setTimeout(() => {
-      if (this.commentParentComponent?.first && this.commentParentComponent?.last) {
-        this.commentParentComponent?.first?.show(
-          this.appTransactionsForViewDto.creatorUserId,
-          this.orderId
-        );
-        this.commentParentComponent?.last?.show(
-          this.appTransactionsForViewDto.creatorUserId,
-          this.orderId
-        );
-      }
-    }, 200);
-  }
+loadCommentsList() {
+  setTimeout(() => {
+    const commentComp = this.commentParentComponent?.first;
+
+    if (commentComp) {
+      commentComp.show(
+        this.appTransactionsForViewDto.creatorUserId,
+        this.orderId
+      );
+    }
+  }, 200);
+}
 
 
   show(orderId: number, showCarousel: boolean = false, validateOrder: boolean = false, transactionCartMode: TransactionCartMode = TransactionCartMode.createOrEdit) {
@@ -1440,16 +1438,17 @@ export class TransactionInformationComponent
     this._AppMarketplaceItemsServiceProxy
       .getMarketplaceAppItemForView(
         undefined,
-        0,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
+                  0,
+                  undefined,
+                  undefined,
+                  undefined,
+                  undefined,
+                  undefined,
         this.appTransactionsForViewDto?.currencyCode,
         this.appTransactionsForViewDto?.buyer,
         this.appTransactionsForViewDto?.sellerCompanySSIN,
         this.appTransactionsForViewDto?.priceLevel,
+        id,
         this.appTransactionsForViewDto?.id,
         undefined,
         undefined,
@@ -1465,8 +1464,6 @@ export class TransactionInformationComponent
         undefined,
         undefined,
         undefined,
-        undefined,
-        // undefined,
         0,
         10
       )

@@ -1,5 +1,4 @@
-<div class="single-item  mb-0 position-relative" #singleItem [ngClass]=" { 'row': singleItemPerRowMode }" style="    border-radius: 11px;
-    border: 2px solid #EDEDED !important;">
+<div class="single-item  mb-0 position-relative" #singleItem [ngClass]=" { 'row': singleItemPerRowMode }">
     <div class="purple-selection position-absolute p-2" style="width: 45px;top: 3px;"
         *ngIf="(browseMode == BrowseModeEnum.Selection || browseMode == BrowseModeEnum.ActionsAndSelections  ) && !singleItemPerRowMode  ">
         <p-inputSwitch [(ngModel)]="item.selected" name="showCode" (onChange)="handleSelection($event)"
@@ -19,20 +18,18 @@
         [ngStyle]="{'height': singleItemPerRowMode ? '230px' : 'auto'}">
         <div class="row w-100">
 
-            <div class="pl-2 pr-0 pt-3 w-100" style="line-height: 1;"
+            <div class="pl-2 pr-0 pt-3 w-100"
                 [ngStyle]="{'margin-right.px':browseMode == BrowseModeEnum.Actions || browseMode == BrowseModeEnum.ActionsAndSelections ? 0 : 0}">
 
                 <div class="p-3 flex-nowrap"
                 [ngClass]="{ 'justify-content-between': !singleItemPerRowMode , 'd-flex': !singleItemPerRowMode }">
                <h4 class="m-0 mb-2 text-dark cursor-pointer font-weight-bold"
-                   style="white-space: nowrap;font-size: 14px !important;"
                    (click)="viewItemHandler()">
                    {{ item.appItem.code }}
                </h4>
-               <h6 class="m-0 mb-2 cursor-pointer"
-                   style="color: #9E9E9E; font-size: 10px !important; display: flex; align-items: center;">
-                   <div class="price"
-                        style="font-weight: bold; font-size: small; margin-left: 8px;">
+               <h6 class="m-0 mb-2 cursor-pointer d-flex align-items-center"
+                   style="color: #9E9E9E; font-size: 10px !important;">
+                   <div class="price">
                        {{ languageSettingName!='en-GB' ? "MSRP" : "RRP" }}:
                        {{ tenantDefaultCurrency.symbol }}{{ item?.appItem?.price }}
                    </div>
@@ -40,7 +37,7 @@
            </div>
            
 
-                <p class="mb-2 product-name pl-3" style="color: #9E9E9E;line-height: 21px;">
+                <p class="mb-2 product-name pl-3">
                     {{ item?.appItem?.name | textSubstring: 60 }}
                 </p>
 
@@ -48,7 +45,7 @@
 
                 <div class="pl-3 d-flex flex-nowrap"
                     *ngIf="singleItemPerRowMode &&  item.entityObjectCategoryNames?.length >  0 ">
-                    <p class="pt-2 product-name" style="color: #9E9E9E;">
+                    <p class="pt-2 product-name">
                         {{'Categories' | localize}}:
                     </p>
                     <div class="row details">
@@ -65,7 +62,7 @@
 
                 <div class="pl-3 d-flex flex-nowrap"
                     *ngIf="singleItemPerRowMode && item?.entityClassificationNames?.length >  0  ">
-                    <p class="pt-2 product-name" style="color: #9E9E9E;">
+                    <p class="pt-2 product-name">
                         {{'Classifications' | localize}} : </p>
                     <div class="row details">
                         <div *ngFor="let classification of item?.entityClassificationNames; let i = index">
@@ -116,16 +113,16 @@
                 </div>
             </ng-container>
 
-            <div class="purple-selection position-absolute p-2" style="width: 45px;
-            top: 1.5%;
-            right: 5%;"
+            <div class="purple-selection position-absolute p-2" [ngStyle]="isArabic ? {'left':'5%'} : {'right':'5%'}"
+ style="width: 45px;
+            top: 1.5%;"
                 *ngIf="(browseMode == BrowseModeEnum.Selection || browseMode == BrowseModeEnum.ActionsAndSelections  ) && singleItemPerRowMode  ">
                 <p-inputSwitch [(ngModel)]="item.selected" name="showCode" (onChange)="handleSelection($event)"
                     [styleClass]="'purple-selection'"
-                    [ngStyle]="{'right.px': !singleItemPerRowMode ? 50 : 0}"></p-inputSwitch>
+                  ></p-inputSwitch>
             </div>
 
-            <div class="actions-menu m-2"
+            <div class="actions-menu m-2"  [ngStyle]="isArabic ? {'left':'0'} : {'right':'0'}"
                 [ngClass]="{'d-none':actionsMenuFlags?.allIsHidden || (browseMode != BrowseModeEnum.Actions && browseMode != BrowseModeEnum.ActionsAndSelections) }">
                 <app-appitems-actions-menu #AppitemsActionsMenuComponent [item]="item.appItem"
                     [appItemType]="mainFilterCtrl?.value?.value" [actionsMenuFlags]="actionsMenuFlags"

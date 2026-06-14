@@ -608,6 +608,9 @@ span.p-tabview-title {
 
 // on error date 
 ::ng-deep {
+    .btn.dropdown-toggle{
+        background-color: transparent !important;
+    }
     .p-calendar.ng-dirty.ng-invalid > .p-calendar > .p-inputtext {
         border:2px solid #C83532 !important;
     }
