@@ -1122,7 +1122,7 @@ namespace onetouch.AppSiiwiiTransaction
                 {
                     //var user = UserManager.GetUserById(AbpSession.UserId);
                     var presonEntityObjectTypeId = await _helper.SystemTables.GetEntityObjectTypePersonId();
-
+                    var branchEntityObjectTypeId = await _helper.SystemTables.GetEntityObjectTypeBranchId();
                     var contact = await _appContactRepository.GetAll()
                         .Where(s => s.EntityFk.EntityObjectTypeId == presonEntityObjectTypeId && s.TenantId == AbpSession.TenantId
                         && s.EntityFk.EntityExtraData.Count(z => z.AttributeId == 715 && z.AttributeValue == AbpSession.UserId.ToString()) > 0).FirstOrDefaultAsync();
@@ -1132,7 +1132,10 @@ namespace onetouch.AppSiiwiiTransaction
                         var contactCompany = await _appContactRepository.GetAll()
                         .Where(s => s.EntityFk.EntityObjectTypeId != presonEntityObjectTypeId && s.TenantId == AbpSession.TenantId &&
                         s.ParentId == null && s.IsProfileData == true).FirstOrDefaultAsync();
-
+                        var conactBranch = await _appContactRepository.GetAll()
+                        .Where(s => s.EntityFk.EntityObjectTypeId == branchEntityObjectTypeId && s.TenantId == AbpSession.TenantId &&
+                        s.ParentId == contactCompany.Id).FirstOrDefaultAsync();
+                        
                         appTrans.AppTransactionContacts.Add(new AppTransactionContacts
                         {
                             ContactName = contact.Name,
@@ -1152,10 +1155,8 @@ namespace onetouch.AppSiiwiiTransaction
                             ContactRole = ContactRoleEnum.Creator.ToString(),
                             CompanySSIN = contactCompany != null ? contactCompany.SSIN : null,
                             CompanyName = contactCompany != null ? contactCompany.Name : null,
-                            BranchName = (input.TransactionType == TransactionType.SalesOrder && input.EnteredByUserRole == "I'm a Seller") ? input.SellerBranchName :
-                            ((input.TransactionType == TransactionType.PurchaseOrder && input.EnteredByUserRole == "I'm a Buyer") ? input.BuyerBranchName : null),
-                            BranchSSIN = (input.TransactionType == TransactionType.SalesOrder && input.EnteredByUserRole == "I'm a Seller") ? input.SellerBranchSSIN :
-                            ((input.TransactionType == TransactionType.PurchaseOrder && input.EnteredByUserRole == "I'm a Buyer") ? input.BuyerBranchSSIN : null)
+                            BranchName = conactBranch != null ? conactBranch.Name : null,
+                            BranchSSIN = conactBranch != null ? conactBranch.SSIN : null
                         });
                         //MMT2024[start]
                         //MMT2024[End]
@@ -1179,8 +1180,8 @@ namespace onetouch.AppSiiwiiTransaction
                                 ContactRole = ContactRoleEnum.SalesRep1.ToString(),
                                 CompanySSIN = contactCompany != null ? contactCompany.SSIN : null,
                                 CompanyName = contactCompany != null ? contactCompany.Name : null,
-                                BranchName = null,
-                                BranchSSIN = null
+                                BranchName = conactBranch != null? conactBranch.Name:null,
+                                BranchSSIN = conactBranch != null ? conactBranch.SSIN : null
                             });
 
                     }
@@ -2454,14 +2455,14 @@ namespace onetouch.AppSiiwiiTransaction
                 r.EntityObjectStatusId== activeRelationshipStatusId &&
                 (
                 (r.RequesterContactSSIN == ssin &&
-                r.RequesterMarketplaceRole== selectedAccountRole
+                ((selectedAccountRole == "Seller"|| selectedAccountRole == "Buyer") ? r.RequesterMarketplaceRole== selectedAccountRole: true)
                 &&
                 (r.RecipientMarketplaceRole == transactionType  
                 )
                 )
                   ||
                  (r.RecipientContactSSIN == ssin &&
-                 r.RecipientMarketplaceRole == selectedAccountRole
+                 ((selectedAccountRole == "Seller" || selectedAccountRole == "Buyer") ? r.RecipientMarketplaceRole == selectedAccountRole : true) 
                  && 
                  (r.RequesterMarketplaceRole == transactionType  
                  )
