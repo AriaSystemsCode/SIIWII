@@ -901,7 +901,7 @@
         [ngClass]="(!appTransactionsForViewDto?.isOwnedByMe ) || (appTransactionsForViewDto?.isOwnedByMe && (appTransactionsForViewDto?.sharedWithUsers?.length>0 || shareDone)) ?  'd-block' : 'd-none'">
         <h4 class="notes-title purpleColor font-weight-bold">{{l("Comments")}}</h4>
         <div class="w-100 comment-warper   order-summary p-4  mt-3 purpleColor">
-            <app-comment-parent [addNewThread]="true" *ngIf="appTransactionsForViewDto" [cartStyle]="true"
+            <app-comment-parent   #desktopComments [addNewThread]="true" [cartStyle]="true"   [loadComments]="true"
                 #commentParentComponent (refreshComments)="getCommentsRefreshed($event)"
                 (newCommentAdded)="onGeneratOrderReport(true)">
             </app-comment-parent>
@@ -1303,7 +1303,7 @@
                                 [ngClass]="(!appTransactionsForViewDto?.isOwnedByMe ) || (appTransactionsForViewDto?.isOwnedByMe && (appTransactionsForViewDto?.sharedWithUsers?.length>0 || shareDone)) ?  'd-block' : 'd-none'">
                                 <h4 class="notes-title purpleColor font-weight-bold">{{l("Comments")}}</h4>
                                 <div class="w-100 comment-warper  h-100 order-summary p-4  mt-3 purpleColor">
-                                    <app-comment-parent [addNewThread]="true" *ngIf="appTransactionsForViewDto"
+                                    <app-comment-parent   #mobileComments [addNewThread]="true"   [loadComments]="true"
                                         [cartStyle]="true" #commentParentComponent
                                         (newCommentAdded)="onGeneratOrderReport(true)">
                                     </app-comment-parent>

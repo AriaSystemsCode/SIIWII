@@ -1,11 +1,11 @@
-<form #contactForm="ngForm" class="pl-2">
+<form #contactForm="ngForm" class="contacts">
     <div class="row w-100" *ngIf="isCreateOrEdit">
         <!-- company code -->
-        <div class="col-md-6 " *ngIf=" activeTab==transactionCartoccordionTabs.BuyerContactInfo">
+        <div class="col-md-6 my-2" *ngIf=" activeTab==transactionCartoccordionTabs.BuyerContactInfo">
             <div class="formGroup">
                 <div class="d-flex justify-content-between flex-column">
                     <div class="d-flex justify-content-between">
-                        <label class="label ml-3">{{'CompanyCode' | localize}}</label>
+                        <label class="label">{{'CompanyCode' | localize}}</label>
 
 
                         <div class="d-flex align-items-center gap-1 "
@@ -23,7 +23,7 @@
 
 
                     <input [disabled]="appTransactionsForViewDto?.buyerCompanySSIN != ''" [placeholder]="'CompanyCode' | localize"
-                        type="text" class="form-control ml-3 w-100"
+                        type="text" class="form-control w-100"
                         [(ngModel)]="appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedCompany.code"
                         #companyCodeInput="ngModel" name="companyCode" (input)="setCompanyCode($event)"
                         (keyup)="isCodoExist(appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedCompany.code,'company')" />
@@ -38,7 +38,7 @@
 
         </div>
         <!-- company name -->
-        <div class="col-md-6 pr-0">
+        <div class="col-md-6 my-2">
             <div class="formGroup">
                 <div class="d-flex justify-content-between">
 
@@ -65,7 +65,7 @@
                 </p-autoComplete>
                 <div
                     *ngIf="activeTab==transactionCartoccordionTabs.orderInfo || activeTab==transactionCartoccordionTabs.SellerContactInfo">
-                    <p class="previewValue text-nowrap m-0 p-0  pl-2 col-6"
+                    <p class="previewValue text-nowrap m-0 p-0 col-6"
                         *ngIf="appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedCompany?.name          || appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.companyName">
                         {{
                             appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedCompany?.name
@@ -83,11 +83,11 @@
 
 
         <!-- contact code -->
-        <div class="col-md-6 my-3" *ngIf=" activeTab==transactionCartoccordionTabs.BuyerContactInfo">
+        <div class="col-md-6 my-2" *ngIf=" activeTab==transactionCartoccordionTabs.BuyerContactInfo">
             <div class="formGroup">
                 <div class="d-flex justify-content-between flex-column">
                     <div class="d-flex justify-content-between">
-                        <label class="label ml-3">{{'ContactCode' | localize}}</label>
+                        <label class="label">{{'ContactCode' | localize}}</label>
 
 
                         <div class="d-flex align-items-center gap-1 "
@@ -106,7 +106,7 @@
                         </div>
                     </div>
 
-                    <input [placeholder]="'ContactCode' | localize" type="text" class="form-control ml-3 w-100"
+                    <input [placeholder]="'ContactCode' | localize" type="text" class="form-control w-100"
                         [disabled]="appTransactionsForViewDto?.buyerCompanySSIN != ''" (input)="setContactCode($event)"
                         [(ngModel)]="appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedContact.code"
                         #contactCodeInput="ngModel" name="contactCode"
@@ -120,7 +120,7 @@
 
         </div>
         <!-- contact name -->
-        <div class="col-md-6  pr-0" [ngClass]="activeTab==transactionCartoccordionTabs.BuyerContactInfo ? 'my-3':''">
+        <div class="col-md-6 my-2">
             <div class="formGroup">
                 <div class="d-flex justify-content-between">
 
@@ -146,13 +146,13 @@
 
 
                 <div *ngIf="activeTab==transactionCartoccordionTabs.orderInfo">
-                    <p class=" previewValue text-nowrap  m-0 p-0 pl-2 col-4"
+                    <p class=" previewValue text-nowrap  m-0 p-0 col-4"
                         *ngIf="appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedContact?.name">
                         {{
                         appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedContact?.name
                         }}
                     </p>
-                    <p class=" previewValue text-nowrap  m-0 p-0  pl-5 col-4"
+                    <p class=" previewValue text-nowrap  m-0 p-0 col-4"
                         *ngIf="!appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedContact?.name">
                         -
                     </p>
@@ -161,25 +161,25 @@
         </div>
         <!-- contact name -->
         <!-- phone -->
-        <div class="col-md-6 pl-3">
+        <div class="col-md-6 my-2">
             <div class="row">
-                <div class="col-6 pl-md-4">
+                <div class="col-6">
                     <label class="label">{{'PhoneType' | localize}}</label>
                 </div>
                 <div class="col">
                     <label class="label">{{'PhoneNumber' | localize}}</label>
                 </div>
-                <div class="col-12 pl-md-2 pl-0">
-                    <div class="groupForm">
+                <div class="col-12">
+                    <div class="groupForm gap-4">
 
-                        <p-dropdown [options]="allPhoneTypes" class=" col-6"
-                            styleClass="form-control aria-select aria-select-modal aria-select-primeng" [filter]="false"
+                        <p-dropdown [options]="allPhoneTypes" class=" col-6 px-0"
+                            styleClass="form-control aria-select aria-select-modal aria-select-primeng"  [filter]="false"
                             name="selectedPhoneType" optionLabel="phoneTypeName"
                             [(ngModel)]="appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedPhoneType"
                             [style]="{'width':'100%'}" (onChange)="onchangePhoneType($event)"></p-dropdown>
                         <div class="w-100">
 
-                            <input [placeholder]="('PhoneNumber' | localize) + '...'" type="text" class="form-control ml-3 w-100"
+                            <input [placeholder]="('PhoneNumber' | localize) + '...'" type="text" class="form-control w-100"
                                 (change)="onChangePhoneNumber($event)"
                                 [(ngModel)]="appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectContactPhoneNumber"
                                 #phoneNumberInput="ngModel" name="phoneNumber" minlength="5" maxlength="20"
@@ -201,7 +201,7 @@
         </div>
         <!-- phone -->
         <!-- Email -->
-        <div class="col-md-6 pr-0 pl-md-3" *ngIf=" activeTab==transactionCartoccordionTabs.BuyerContactInfo">
+        <div class="col-md-6 my-2" *ngIf=" activeTab==transactionCartoccordionTabs.BuyerContactInfo">
             <div>
                 <label class="label">{{'Email'| localize}}</label>
                 <input type="text" [placeholder]="('Email' | localize) + '...'" class="form-control w-100" (change)="onChangeEmail($event)"
@@ -217,7 +217,7 @@
         </div>
 
         <!-- Email -->
-        <div class="col-md-6 pr-0 pl-md-4" *ngIf=" activeTab!=transactionCartoccordionTabs.BuyerContactInfo">
+        <div class="col-md-6 my-2" *ngIf=" activeTab!=transactionCartoccordionTabs.BuyerContactInfo">
             <div>
                 <label class="label">{{'Email' | localize}}</label>
                 <input type="text" [placeholder]="('Email' | localize) + '...'" class="form-control w-100" (change)="onChangeEmail($event)"
@@ -233,13 +233,13 @@
         </div>
         <!-- branches -->
         <!-- branch code -->
-        <div class="col-md-6 " *ngIf=" activeTab==transactionCartoccordionTabs.BuyerContactInfo">
+        <div class="col-md-6 my-2" *ngIf=" activeTab==transactionCartoccordionTabs.BuyerContactInfo">
             <div class="formGroup">
                 <div class="d-flex justify-content-between flex-column">
 
-                    <label class="label ml-3">{{'BranchCode' | localize }}</label>
+                    <label class="label">{{'BranchCode' | localize }}</label>
 
-                    <input [placeholder]="'BranchCode' | localize" type="text" class="form-control ml-3 w-100"
+                    <input [placeholder]="'BranchCode' | localize" type="text" class="form-control w-100"
                         [disabled]="appTransactionsForViewDto?.buyerCompanySSIN != ''"
                         [(ngModel)]="appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedBranch.code"
                         #branchCodeInput="ngModel" name="branchCode" (input)="setBranchCode($event)"
@@ -253,7 +253,7 @@
             </div>
 
         </div>
-        <div class="col-md-6 col-12 pr-0">
+        <div class="col-md-6 my-2 col-12">
             <div>
                 <label class="label">{{'Branch' | localize}}</label>
 
@@ -277,7 +277,7 @@
         <!-- branches -->
 
         <!-- Department -->
-        <div class="col-md-12 my-2 pr-0" *ngIf="showDepartment">
+        <div class="col-md-12" *ngIf="showDepartment">
             <div>
                 <label class="label">{{'Department' | localize}}</label>
                 <input type="text" [placeholder]="('DepartmentName' | localize) + '...'" class="form-control w-100" name="DepartmentName"
@@ -342,10 +342,10 @@
             <div class="row">
                 <div class="col-md-12">
                     <div class="d-flex align-items-center   w-100">
-                        <h6 class="previewTitle m-0 p-0  "
+                        <h6 class="previewTitle m-0 p-0  my-2"
                             [ngClass]="activeTab==transactionCartoccordionTabs.BuyerContactInfo ?'col-md-6 col-6':'col-md-3 col-6'">
                             {{'Phone' | localize}} : </h6>
-                        <p class=" previewValue text-nowrap  m-0 p-0 "
+                        <p class=" previewValue text-nowrap  m-0 p-0 my-2"
                             [ngClass]="activeTab==transactionCartoccordionTabs.BuyerContactInfo ? ' col-md-6 col-6':' col-md-9 col-6'"
                             *ngIf="appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectContactPhoneNumber || appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex]?.contactPhoneNumber">
                             {{appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectContactPhoneNumber
@@ -354,7 +354,7 @@
                             :
                             appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex]?.contactPhoneNumber}}
                         </p>
-                        <p class=" previewValue text-nowrap  m-0 p-0 pl-2"
+                        <p class=" previewValue text-nowrap  m-0 p-0 my-2"
                             [ngClass]="activeTab==transactionCartoccordionTabs.BuyerContactInfo ? ' col-md-6 col-6':' col-md-9 col-6'"
                             *ngIf="!appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectContactPhoneNumber && !appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex]?.contactPhoneNumber">
                             -
@@ -367,10 +367,9 @@
 
         <!-- Email -->
         <div class="col-md-6 my-2" *ngIf=" activeTab==transactionCartoccordionTabs.BuyerContactInfo">
-            <div>
                 <div class="d-flex    w-100">
-                    <h6 class="previewTitle m-0 p-0  col-md-6 col-6">{{'Email' | localize}} :</h6>
-                    <p class=" previewValue  m-0 p-0  col-md-6 col-6 word-break"
+                    <h6 class="previewTitle m-0 p-0  col-md-6 col-6 my-2">{{'Email' | localize}} :</h6>
+                    <p class=" previewValue  m-0 p-0  col-md-6 col-6 word-break my-2"
                         *ngIf="appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.contactEmail ">
                         {{
                         appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.contactEmail
@@ -381,7 +380,6 @@
                         -
                     </p>
                 </div>
-            </div>
         </div>
         <!-- contact code -->
         <div class="col-md-6 my-2" *ngIf=" activeTab==transactionCartoccordionTabs.BuyerContactInfo">
@@ -427,7 +425,7 @@
         <div class="col-md-6 my-2" *ngIf=" activeTab!=transactionCartoccordionTabs.BuyerContactInfo">
             <div>
                 <div class="d-flex    w-100">
-                    <h6 class="previewTitle m-0 p-0  col-md-3 col-6">{{'Email' | localize}} :</h6>
+                    <h6 class="previewTitle m-0 p-0  col-md-3 col-6 ">{{'Email' | localize}} :</h6>
                     <p class=" previewValue  m-0 p-0  col-md-9 col-6 word-break"
                         *ngIf="appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.contactEmail ">
                         {{

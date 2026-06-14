@@ -119,7 +119,7 @@ img {
 
 
 
-::ng-deep {
+::ng-deep .contacts {
     .rtl-autoC {
         .p-button {
             background-color: #fff !important;
@@ -157,7 +157,7 @@ img {
 
 }
 
-::ng-deep {
+::ng-deep .contacts {
     .ltr-autoC {
         .p-button {
             background-color: #fff !important;
@@ -200,4 +200,7 @@ img {
 
 .word-break{
     word-break: break-word;
+}
+.gap-4{
+    gap: 4px;
 }

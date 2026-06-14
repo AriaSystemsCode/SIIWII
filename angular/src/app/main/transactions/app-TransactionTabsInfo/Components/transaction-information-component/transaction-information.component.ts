@@ -35,7 +35,9 @@ export class TransactionInformationComponent
   implements OnInit {
   @ViewChild('reportViewerContainer', { read: ViewContainerRef }) reportViewerContainer: ViewContainerRef;
   @ViewChild("shoppingCartModal", { static: true }) modal: ModalDirective;
-  @ViewChildren(CommentParentComponent) commentParentComponent!: QueryList<CommentParentComponent>;
+  // @ViewChildren(CommentParentComponent) commentParentComponent!: QueryList<CommentParentComponent>;
+  @ViewChild('desktopComments') desktopComments!: CommentParentComponent;
+@ViewChild('mobileComments') mobileComments!: CommentParentComponent;
 
   @Output("hideShoppingCartModal") hideShoppingCartModal: EventEmitter<boolean> = new EventEmitter<boolean>()
   @Output("refreshReport") refreshReport: EventEmitter<boolean> = new EventEmitter<boolean>()
@@ -421,14 +423,13 @@ export class TransactionInformationComponent
   }
 loadCommentsList() {
   setTimeout(() => {
-    const commentComp = this.commentParentComponent?.first;
+    const target =
+      window.innerWidth <= 991 ? this.mobileComments : this.desktopComments;
 
-    if (commentComp) {
-      commentComp.show(
-        this.appTransactionsForViewDto.creatorUserId,
-        this.orderId
-      );
-    }
+    target?.show(
+      this.appTransactionsForViewDto.creatorUserId,
+      this.orderId
+    );
   }, 200);
 }
 
