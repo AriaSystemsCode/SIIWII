@@ -67,7 +67,7 @@ defaultcontactNamePlaceholder = 'SelectContactName';
 
 
     currentLang:string
-    isArabic:boolean 
+    isArabic:boolean =false
 
     private contactsLoadedForSSIN: string | null = null;
 private contactsLoading = false;
@@ -86,7 +86,7 @@ private contactsSearchSub?: import('rxjs').Subscription;
 
     async ngOnInit(): Promise<void> {
         this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
-        this.currentLang == 'ar' ? this.isArabic = true : this.isArabic = false
+        this.currentLang == 'ar' ||  this.currentLang == 'ar-EG' ? this.isArabic = true : this.isArabic = false
         this.getAppTransactionContactsIndex();
 
         const value = localStorage.getItem("comNew");
