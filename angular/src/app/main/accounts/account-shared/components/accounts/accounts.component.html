@@ -6,7 +6,7 @@
                     <div class="kt-portlet__body ml-md-3 ">
                         <div class="row">
                             <div class="col-12 list-toolbar">
-                                <div class="row mb-3 justify-content-between mt-3">
+                                <div class="row mb-3 justify-content-between mt-3 px-3">
                                     <div class="col-5 col-md-3  list-toolbar-filter mb-0 mb-4 mb-md-0 p-0">
                                         <div class="btn-group dropdown list-toolbar-dropdown" dropdown
                                             *ngIf="showMainFiltersOptions">
@@ -142,7 +142,7 @@
                                 <app-accounts-list-filters [filterForm]="filterForm" [fromMarketplace]="fromMarketplace"></app-accounts-list-filters>
                             </div> 
                             <div class="col-12  " [ngClass]="filterVisiblelg ? 'col-lg-9 col-md-7 p-0':'col-lg-12 col-md-12'">
-                                <div class="d-flex justify-content-between align-items-center mb-4">
+                                <div class="d-flex justify-content-between align-items-center mb-4 px-3">
                                     <div class="  list-toolbar-data-summary pl-2" *ngIf="active">
                                         {{
                                         paginator.getPage() *
