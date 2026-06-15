@@ -7892,6 +7892,17 @@ namespace onetouch.Accounts
                     .Where(z => z.Id == input.Id).FirstOrDefaultAsync();
                 if (orgAcc != null)
                 {
+                    if (orgAcc.AccountId != null && orgAcc.AccountId!=0)
+                    {
+                        var parentAcc = await _appContactRepository.GetAll()                    
+                    .Where(z => z.Id == orgAcc.AccountId).FirstOrDefaultAsync();
+                        if (parentAcc != null)
+                        { 
+                            parentAcc.LastModificationTime= DateTime.Now;
+                            await _appContactRepository.UpdateAsync(parentAcc);
+                        }
+
+                    }
                     branchObject = ObjectMapper.Map<CreateOrEditAccountInfoDto>(orgAcc);
                     branchObject.EMailAddress = input.EMailAddress;
                     branchObject.Website = input.Website;
@@ -8008,6 +8019,17 @@ namespace onetouch.Accounts
                     contactBranch.EntityFk.EntityObjectTypeId = await _helper.SystemTables.GetEntityObjectTypeBranchId();
                     await _appContactRepository.UpdateAsync(contactBranch);
                 }
+            }
+            if (branchObject.AccountId != null && branchObject.AccountId != 0)
+            {
+                var parentAcc = await _appContactRepository.GetAll()
+            .Where(z => z.Id == branchObject.AccountId).FirstOrDefaultAsync();
+                if (parentAcc != null)
+                {
+                    parentAcc.LastModificationTime = DateTime.Now;
+                    await _appContactRepository.UpdateAsync(parentAcc);
+                }
+
             }
             return ObjectMapper.Map<BranchDto>(output);
             //MMT40[End]
