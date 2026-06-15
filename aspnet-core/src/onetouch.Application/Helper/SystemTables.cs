@@ -592,6 +592,7 @@ namespace onetouch.Helpers
         //MMT30[Start]
         public async Task<string> GenerateSSIN(long objectTypeId, AppEntityDto appEntity = null)
         {
+            var swTotal = System.Diagnostics.Stopwatch.StartNew();
             //I45
             if (appEntity!=null)
             {
@@ -709,8 +710,10 @@ namespace onetouch.Helpers
                         returnString = await this.GenerateSSIN(objectTypeId, appEntity);
                 }
                 //MMT
+                try { System.IO.File.AppendAllText(@"C:\hassan\siiwii\log_save_import.txt", $"[{DateTime.Now.ToString()}] GenerateSSIN Total duration: {swTotal.ElapsedMilliseconds} ms{Environment.NewLine}--------------------------------------------------{Environment.NewLine}"); } catch { }
                 return returnString;
             }
+    
         }
         // MMT30[End]
         //MMT33[Start]
