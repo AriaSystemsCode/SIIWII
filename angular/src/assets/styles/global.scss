@@ -662,9 +662,12 @@ border: 1px solid #D9D9D9 !important;
 .p-dropdown:not(.p-disabled):hover{
 border: 1px solid #D9D9D9 !important;
 }
+.p-paginator .p-dropdown .p-dropdown-label{
+         text-align: end !important;
+}
 ::ng-deep {
     .p-paginator .p-dropdown .p-dropdown-label {
-        padding-right:  auto !important;
+        //padding-right:  auto !important;
     }
     .p-paginator .p-dropdown {
   
@@ -908,4 +911,8 @@ searchicon {
 ::ng-deep .invalid-editor .p-editor-container {
     border: 1px solid #C83532 !important;
     border-radius: 4px;
+}
+
+.alert, .toast, .modal {
+    z-index: 99999;
 }

@@ -18,7 +18,11 @@
   <div class="kt-grid kt-grid--hor kt-grid--root">
       <div class="kt-grid__item kt-grid__item--fluid kt-grid kt-grid--ver">
           <!-- BEGIN: Left Aside -->
-          <div *ngIf="isAuthenticated" [class.minimized]="isMinimized" class="sidebar pt-2 " [ngClass]="isMinimized ? 'min' : ''">
+          <div *ngIf="isAuthenticated" [class.minimized]="isMinimized" class="sidebar pt-2 " [ngClass]="{
+                  'min': isMinimized,
+                  'ar-index': isMinimized && isArabic,
+                  'index': !isMinimized || !isArabic
+               }">
               <div class="text-center">
               <!-- <img *ngIf="!tenantLogo" [src]="defaultLogo" alt="logo" height="38" class="rounded-circle" /> -->
 

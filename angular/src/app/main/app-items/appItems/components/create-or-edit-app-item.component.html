@@ -50,7 +50,8 @@
                     </div>
                 </div>
             </div>
-            <div [class]="containerClass + ' kt-grid__item kt-grid__item--fluid mt-5' ">
+            <div [class]="containerClass + ' kt-grid__item kt-grid__item--fluid mt-5' "
+            [ngStyle]="isArabic ? {'padding-top':'100px'} : {'padding-top':'unset'}">
                 <div class="kt-portlet kt-portlet--mobile">
                     <div class="kt-portlet__body p-0">
                         <h6 class="font-weight-bold p-3" style="background-color: #EEEEEEEE;

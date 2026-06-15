@@ -103,11 +103,18 @@
   .mlIcon {
     margin-left: 3.5rem;
   }
+
+  .sidebar.ar-index{
+    z-index: 20 !important;
+}
+.sidebar.index{
+    z-index: 9999 !important;
+}
+
   .sidebar.minimized {
     width: 76px;
     border-top-left-radius: 20px;
         background: #FFF;
-    z-index: 9999 !important;
     position: fixed;
     border-top-left-radius: 20px;
     text-align: center;
