@@ -68,6 +68,11 @@
 
 }
 
+.enterByTxt {
+    color: #888;
+               
+                font-size: 14px;
+}
 .groupForm {
     display: flex;
     align-items: center;
@@ -442,4 +447,8 @@
 }
 .w-95{
     width: 95% !important;
+}
+
+.bg-grey{
+    background-color: #777;
 }

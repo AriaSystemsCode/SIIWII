@@ -949,7 +949,7 @@
                         </div>
 
                     </div>
-                    <div class="px-4 py-2" style="line-height: 10px;">
+                    <div class="px-4 py-2">
                         <label class="pt-2 font-weight-bold purpleColor"> {{l("Created")}} </label>
                         <div class="purpleColor text-nowrap">
                             {{appTransactionsForViewDto?.creationDate | momentFormat:"LL h:mm A"}}
@@ -1130,15 +1130,7 @@
                                             'border-left': '1px solid #eee'
                                         }
                                     ">
-                        <div class=" greyMDlightColor" dropdown style="width: 110px;height: 60px;" [ngStyle]="
-                                    isArabic
-                                        ? {
-                                            'margin-right': '8px'
-                                        }
-                                        : {
-                                            'margin-left': '8px'
-                                        }
-                                    ">
+                        <div class=" greyMDlightColor dropActions" dropdown>
                             <button dropdownToggle type="button" class="btn   border-0 mt-3" data-toggle="dropdown"
                                 aria-haspopup="true" aria-expanded="false">
                                 <div class="d-flex flex-column align-items-center">
