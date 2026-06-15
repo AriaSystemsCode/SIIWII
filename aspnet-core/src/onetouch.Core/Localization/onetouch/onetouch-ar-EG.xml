@@ -1567,6 +1567,8 @@
 <text name="ColorName">اسم اللون</text>
 <text name="MaterialContent">محتوى الخامة</text>
 
+<text name="Brand">العلامة التجارية</text>
+<text name="Category">الفئة</text>
 
   </texts>
 </localizationDictionary>

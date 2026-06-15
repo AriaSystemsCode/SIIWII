@@ -2931,6 +2931,12 @@
 
 
 <text name="MaxLength250">Maximum length is 250 characters</text>
+
+
+
+<text name="Product">Product</text>
+<text name="Block">Block</text>
+
 	
   </texts>  
 </localizationDictionary>
