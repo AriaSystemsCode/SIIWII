@@ -1,7 +1,7 @@
 ﻿<form [formGroup]="filterForm" class="accountsEnt">
     <div [@routerTransition] class="mr-lg-0 mr-md-2 mr-0 mt-lg-0 mt-md-4 mt-0" [ngClass]="!isArabic ? 'addMg':  isAuthenticated && isArabic ? 'mt-lg-5' : 'addMg'">
         <div class="kt-grid__item kt-grid__item--fluid kt-grid kt-grid--hor  marginMob mb-3">
-            <div [class]="containerClass + ' kt-grid__item kt-grid__item--fluid'" style="overflow-x: hidden;" [ngClass]="{'mt-lg-5 mt-md-0 mt-5 pt-lg-5 pt-md-0 pt-5':isArabic}">
+            <div [class]="containerClass + ' kt-grid__item kt-grid__item--fluid'" [ngClass]="{'mt-lg-5 mt-md-0 mt-5 pt-lg-5 pt-md-0 pt-5':isArabic}">
                 <div class="bodySec kt-portlet--mobile " [ngClass]="!isAuthenticated ? 'm-4': isAuthenticated && isArabic ? 'mt-lg-4 mt-md-3 mt-5':'mt-lg-0 mt-3'">
                     <div class="kt-portlet__body ml-md-3 ">
                         <div class="row">
@@ -66,8 +66,8 @@
                                         </div>
                                     </div>
                                     <div class="" *ngIf="showAddButton"></div>
-                                    <div class="mb-lg-4 mb-0 text-center mt-lg-0 ">
-                                        <a *ngIf="isAuthenticated" class="btn   toolbar-btn btn_Primary SendMail"
+                                    <div class="mb-lg-4 mb-0 text-center mt-lg-0 d-flex align-items-center gap-4">
+                                        <a *ngIf="isAuthenticated" class="btn toolbar-btn btn_Primary SendMail"
                                
                                             (click)="showSendMail()">
                                             <img src="../../assets/img/input_icons/user-plus.png" class="alarmInfo mr-2 w-16">
@@ -79,7 +79,7 @@
                                                     'AddManualAccount'
                                                         | localize
                                                 "
-                                                class="btn   text-center toolbar-btn transparent-button"
+                                                class="text-center toolbar-btn transparent-button"
                                         
                                                 [routerLink]="[
                                                     '/app/main/account/create-manual'
@@ -91,7 +91,7 @@
                                                         | localize
                                                 "
                                            
-                                                class="btn   text-center toolbar-btn transparent-button"
+                                                class="text-center toolbar-btn transparent-button"
                                                 [routerLink]="[
                                                     '/app/main/account/create-external'
                                                 ]">
@@ -100,7 +100,7 @@
                                             <!-- Iteration-8 -->
                                             <a (click)="showImportAccounts()" [title]="
                                                     'ImportAccounts' | localize
-                                                " class="btn   toolbar-btn pr-0 transparent-button">
+                                                " class="toolbar-btn transparent-button">
                                                 <i class="d-inline-block w-100 fa-file-import fas icon-center"></i>
                                             </a>
                                             <!-- Iteration-8 -->
@@ -108,7 +108,7 @@
                                     </div>
                                     <div class=""></div>
 
-                                    <div class="text-center d-flex mt-lg-0 btns-actions">
+                                    <div class="text-center d-flex mt-lg-0 btns-actions gap-4">
                                         <button
                                         (click)="toggleFilter()"
                                         class="filterBtn ">    
@@ -118,14 +118,14 @@
                                     </button>
                                 
                                             <a [title]="'ResetData' | localize"
-                                            class="btn   text-center text-primary toolbar-btn ResetData_btn transparent-button" 
+                                            class="text-center text-primary toolbar-btn ResetData_btn transparent-button" 
                                             (click)="resetList()"> <img src="../../assets/img/input_icons/repeat.png"
                                                 class="alarmInfo">
                                      
                                         </a>
                                         <a  [title]="'ToggleView' | localize"
                                             (click)="triggerListView()"
-                                            class="btn   pr-1 text-center text-primary toolbar-btn btn_Primary ToggleView">
+                                            class="text-center text-primary toolbar-btn btn_Primary ToggleView">
 
                                             <i class="d-inline-block w-100" [ngClass]="
                                                     cardsViewMode
