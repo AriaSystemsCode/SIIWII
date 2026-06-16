@@ -1,13 +1,5 @@
-<div
-  [ngClass]="[
-    !active ? 'd-none' : '',
-    active && !fromOverview ? 'pt-4' : '',
-    cartStyle ? 'cart-cont' : '',
-    showRegularComment ? 'large-height' : '',
-    parentId || fromOverview ? 'addParSec' : 'parSec',
-    isArabic ? 'rtl-comments' : 'ltr-comments'
-  ]"
-  *ngIf="!addReplyScreen">
+<div [ngClass]="[!active ? 'd-none ' : '', active && !fromOverview ? 'pt-4':'',cartStyle?' cart-cont':'',showRegularComment?'large-height':'' ,parentId || fromOverview ? 'addParSec': 'parSec' ]"
+    *ngIf="!addReplyScreen">
 
 
     <div *ngIf="addNewThread&&cartStyle" class="toggle-replay-cont">
