@@ -35,7 +35,9 @@ export class TransactionInformationComponent
   implements OnInit {
   @ViewChild('reportViewerContainer', { read: ViewContainerRef }) reportViewerContainer: ViewContainerRef;
   @ViewChild("shoppingCartModal", { static: true }) modal: ModalDirective;
-  @ViewChildren(CommentParentComponent) commentParentComponent!: QueryList<CommentParentComponent>;
+  // @ViewChildren(CommentParentComponent) commentParentComponent!: QueryList<CommentParentComponent>;
+  @ViewChild('desktopComments') desktopComments!: CommentParentComponent;
+@ViewChild('mobileComments') mobileComments!: CommentParentComponent;
 
   @Output("hideShoppingCartModal") hideShoppingCartModal: EventEmitter<boolean> = new EventEmitter<boolean>()
   @Output("refreshReport") refreshReport: EventEmitter<boolean> = new EventEmitter<boolean>()
@@ -419,20 +421,17 @@ export class TransactionInformationComponent
       this.loadCommentsList()
     }
   }
-  loadCommentsList() {
-    setTimeout(() => {
-      if (this.commentParentComponent?.first && this.commentParentComponent?.last) {
-        this.commentParentComponent?.first?.show(
-          this.appTransactionsForViewDto.creatorUserId,
-          this.orderId
-        );
-        this.commentParentComponent?.last?.show(
-          this.appTransactionsForViewDto.creatorUserId,
-          this.orderId
-        );
-      }
-    }, 200);
-  }
+loadCommentsList() {
+  setTimeout(() => {
+    const target =
+      window.innerWidth <= 991 ? this.mobileComments : this.desktopComments;
+
+    target?.show(
+      this.appTransactionsForViewDto.creatorUserId,
+      this.orderId
+    );
+  }, 200);
+}
 
 
   show(orderId: number, showCarousel: boolean = false, validateOrder: boolean = false, transactionCartMode: TransactionCartMode = TransactionCartMode.createOrEdit) {
@@ -540,6 +539,7 @@ export class TransactionInformationComponent
     ];
   }
 
+  
   getShoppingCartData(temp: TreeNode<any>[] = null) {
 
     this.temp = temp;
@@ -1519,17 +1519,18 @@ async printTransaction(): Promise<void> {
     this._AppMarketplaceItemsServiceProxy
       .getMarketplaceAppItemForView(
         undefined,
-        0,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
+                  0,
+                  undefined,
+                  undefined,
+                  undefined,
+                  undefined,
+                  undefined,
         this.appTransactionsForViewDto?.currencyCode,
-        this.appTransactionsForViewDto?.buyer,
+        this.appTransactionsForViewDto?.buyerCompanySSIN,
         this.appTransactionsForViewDto?.sellerCompanySSIN,
         this.appTransactionsForViewDto?.priceLevel,
         this.appTransactionsForViewDto?.id,
+        id,
         undefined,
         undefined,
         undefined,
@@ -1544,8 +1545,6 @@ async printTransaction(): Promise<void> {
         undefined,
         undefined,
         undefined,
-        undefined,
-        // undefined,
         0,
         10
       )
@@ -2054,4 +2053,14 @@ openPlaceOrderConfirm() {
   };
 }
 
+
+onOrderDetailsTabSelected(isSelected: boolean) {
+  if (!isSelected) return;
+
+  this.currentTab = this.getOrderDetailsTabIndex();
+
+  if (!this.shoppingCartDetails) {
+    this.getLinesData();
+  }
+}
 }

@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
-<localizationDictionary culture="ar">
+<localizationDictionary culture="ar-EG">
   <texts>
 	  <text name="MinimumInStock">الحد الأدنى (في المخزون) الكمية</text>
 	  <text name="OnlyInStockColors">الألوان فقط (في المخزون).</text>
@@ -1566,6 +1566,9 @@
 <text name="ShowCoverPage">إظهار صفحة الغلاف</text>
 <text name="ColorName">اسم اللون</text>
 <text name="MaterialContent">محتوى الخامة</text>
+
+<text name="Brand">العلامة التجارية</text>
+<text name="Category">الفئة</text>
 
   </texts>
 </localizationDictionary>

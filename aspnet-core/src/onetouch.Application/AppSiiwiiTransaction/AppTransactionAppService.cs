@@ -85,6 +85,7 @@ using DocumentFormat.OpenXml.ExtendedProperties;
 using onetouch.Authorization.Roles;
 using DocumentFormat.OpenXml.InkML;
 using Abp.MultiTenancy;
+using System.Globalization;
 
 
 //using NUglify.Helpers;
@@ -236,7 +237,7 @@ namespace onetouch.AppSiiwiiTransaction
             //I40[Start]
             _appContactRelationshipInfoRepository = appContactRelationshipInfoRepository;
             //I40[End]
-            
+           
         }
         //public async Task<long> CreateOrEditSalesOrder(CreateOrEditAppTransactionsDto input)
         //{
@@ -1122,7 +1123,7 @@ namespace onetouch.AppSiiwiiTransaction
                 {
                     //var user = UserManager.GetUserById(AbpSession.UserId);
                     var presonEntityObjectTypeId = await _helper.SystemTables.GetEntityObjectTypePersonId();
-
+                    var branchEntityObjectTypeId = await _helper.SystemTables.GetEntityObjectTypeBranchId();
                     var contact = await _appContactRepository.GetAll()
                         .Where(s => s.EntityFk.EntityObjectTypeId == presonEntityObjectTypeId && s.TenantId == AbpSession.TenantId
                         && s.EntityFk.EntityExtraData.Count(z => z.AttributeId == 715 && z.AttributeValue == AbpSession.UserId.ToString()) > 0).FirstOrDefaultAsync();
@@ -1132,7 +1133,10 @@ namespace onetouch.AppSiiwiiTransaction
                         var contactCompany = await _appContactRepository.GetAll()
                         .Where(s => s.EntityFk.EntityObjectTypeId != presonEntityObjectTypeId && s.TenantId == AbpSession.TenantId &&
                         s.ParentId == null && s.IsProfileData == true).FirstOrDefaultAsync();
-
+                        var conactBranch = await _appContactRepository.GetAll()
+                        .Where(s => s.EntityFk.EntityObjectTypeId == branchEntityObjectTypeId && s.TenantId == AbpSession.TenantId &&
+                        s.ParentId == contactCompany.Id).FirstOrDefaultAsync();
+                        
                         appTrans.AppTransactionContacts.Add(new AppTransactionContacts
                         {
                             ContactName = contact.Name,
@@ -1152,10 +1156,8 @@ namespace onetouch.AppSiiwiiTransaction
                             ContactRole = ContactRoleEnum.Creator.ToString(),
                             CompanySSIN = contactCompany != null ? contactCompany.SSIN : null,
                             CompanyName = contactCompany != null ? contactCompany.Name : null,
-                            BranchName = (input.TransactionType == TransactionType.SalesOrder && input.EnteredByUserRole == "I'm a Seller") ? input.SellerBranchName :
-                            ((input.TransactionType == TransactionType.PurchaseOrder && input.EnteredByUserRole == "I'm a Buyer") ? input.BuyerBranchName : null),
-                            BranchSSIN = (input.TransactionType == TransactionType.SalesOrder && input.EnteredByUserRole == "I'm a Seller") ? input.SellerBranchSSIN :
-                            ((input.TransactionType == TransactionType.PurchaseOrder && input.EnteredByUserRole == "I'm a Buyer") ? input.BuyerBranchSSIN : null)
+                            BranchName = conactBranch != null ? conactBranch.Name : null,
+                            BranchSSIN = conactBranch != null ? conactBranch.SSIN : null
                         });
                         //MMT2024[start]
                         //MMT2024[End]
@@ -1179,8 +1181,8 @@ namespace onetouch.AppSiiwiiTransaction
                                 ContactRole = ContactRoleEnum.SalesRep1.ToString(),
                                 CompanySSIN = contactCompany != null ? contactCompany.SSIN : null,
                                 CompanyName = contactCompany != null ? contactCompany.Name : null,
-                                BranchName = null,
-                                BranchSSIN = null
+                                BranchName = conactBranch != null? conactBranch.Name:null,
+                                BranchSSIN = conactBranch != null ? conactBranch.SSIN : null
                             });
 
                     }
@@ -2454,14 +2456,14 @@ namespace onetouch.AppSiiwiiTransaction
                 r.EntityObjectStatusId== activeRelationshipStatusId &&
                 (
                 (r.RequesterContactSSIN == ssin &&
-                r.RequesterMarketplaceRole== selectedAccountRole
+                ((selectedAccountRole == "Seller"|| selectedAccountRole == "Buyer") ? r.RequesterMarketplaceRole== selectedAccountRole: true)
                 &&
                 (r.RecipientMarketplaceRole == transactionType  
                 )
                 )
                   ||
                  (r.RecipientContactSSIN == ssin &&
-                 r.RecipientMarketplaceRole == selectedAccountRole
+                 ((selectedAccountRole == "Seller" || selectedAccountRole == "Buyer") ? r.RecipientMarketplaceRole == selectedAccountRole : true) 
                  && 
                  (r.RequesterMarketplaceRole == transactionType  
                  )
@@ -2552,10 +2554,10 @@ namespace onetouch.AppSiiwiiTransaction
                             .WhereIf(!string.IsNullOrWhiteSpace(input.Filter), e => e.Code.Contains(input.Filter))
                             .WhereIf(!string.IsNullOrWhiteSpace(input.Filter), e => e.Code.Contains(input.Filter))
                             .WhereIf(!string.IsNullOrWhiteSpace(input.CodeFilter), e => e.Code == input.CodeFilter)
-                            .WhereIf(input.FromCreationDateFilter != DateTime.MinValue &&  input.FromCreationDateFilter != null, e => e.CreationTime >= input.FromCreationDateFilter)
-                            .WhereIf(input.ToCreationDateFilter != DateTime.MinValue && input.ToCreationDateFilter != null, e => e.CreationTime <= input.ToCreationDateFilter)
-                            .WhereIf(input.FromCompleteDateFilter != DateTime.MinValue && input.FromCompleteDateFilter != null, e => e.CompleteDate >= input.FromCompleteDateFilter)
-                            .WhereIf(input.ToCompleteDateFilter != DateTime.MinValue && input.ToCompleteDateFilter != null, e => e.CompleteDate <= input.ToCompleteDateFilter)
+                            .WhereIf(input.FromCreationDateFilter != null, e => e.CreationTime >= input.FromCreationDateFilter)
+                            .WhereIf(input.ToCreationDateFilter != null, e => e.CreationTime <= input.ToCreationDateFilter)
+                            .WhereIf(input.FromCompleteDateFilter != null, e => e.CompleteDate >= input.FromCompleteDateFilter)
+                            .WhereIf(input.ToCompleteDateFilter != null, e => e.CompleteDate <= input.ToCompleteDateFilter)
                             .WhereIf(input.StatusId > 0, e => e.EntityObjectStatusId == input.StatusId)
                             .WhereIf(!string.IsNullOrEmpty(input.ReferenceFilter), z => z.Reference.Contains(input.ReferenceFilter))
                             .WhereIf(input.EntityTypeIdFilter > 0, e => e.EntityObjectTypeId == input.EntityTypeIdFilter)
@@ -2683,10 +2685,10 @@ namespace onetouch.AppSiiwiiTransaction
                                          .WhereIf(!string.IsNullOrWhiteSpace(input.Filter), e => e.Code.Contains(input.Filter))
                                          .WhereIf(!string.IsNullOrWhiteSpace(input.Filter), e => e.Code.Contains(input.Filter))
                                          .WhereIf(!string.IsNullOrWhiteSpace(input.CodeFilter), e => e.Code == input.CodeFilter)
-                                         .WhereIf(input.FromCreationDateFilter != DateTime.MinValue && input.FromCreationDateFilter != null, e => e.CreationTime >= input.FromCreationDateFilter)
-                                         .WhereIf(input.ToCreationDateFilter != DateTime.MinValue && input.ToCreationDateFilter != null, e => e.CreationTime <= input.ToCreationDateFilter)
-                                         .WhereIf(input.FromCompleteDateFilter != DateTime.MinValue && input.FromCompleteDateFilter != null, e => e.CompleteDate >= input.FromCompleteDateFilter)
-                                         .WhereIf(input.ToCompleteDateFilter != DateTime.MinValue && input.ToCompleteDateFilter != null, e => e.CompleteDate <= input.ToCompleteDateFilter)
+                                         .WhereIf(input.FromCreationDateFilter != null, e => e.CreationTime >= input.FromCreationDateFilter)
+                                         .WhereIf(input.ToCreationDateFilter != null, e => e.CreationTime <= input.ToCreationDateFilter)
+                                         .WhereIf(input.FromCompleteDateFilter != null, e => e.CompleteDate >= input.FromCompleteDateFilter)
+                                         .WhereIf(input.ToCompleteDateFilter != null, e => e.CompleteDate <= input.ToCompleteDateFilter)
                                          .WhereIf(input.StatusId > 0, e => e.EntityObjectStatusId == input.StatusId)
                                          .WhereIf(input.EntityTypeIdFilter > 0, e => e.EntityObjectTypeId == input.EntityTypeIdFilter)
                                          .WhereIf(!string.IsNullOrEmpty(input.ReferenceFilter), z => z.Reference.Contains(input.ReferenceFilter))

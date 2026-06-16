@@ -1,7 +1,7 @@
 <div class="kt-login__form Login_container maxWd"  [@routerTransition]>
     <div class="kt-login__title">
         <h3 class="m-0 text-left title_KeyColor">
-            {{ 'Account Login' | localize }}
+            {{ 'AccountLogin' | localize }}
             
         </h3>
     </div>
@@ -27,7 +27,7 @@
             <img src="../../assets/img/input_icons/lock.png" class="icon-width" [ngClass]="isArabic ? 'ar-user_icon':'user_icon'">
             <input #passwordInput="ngModel" [(ngModel)]="loginService.authenticateModel.password"
                 class="form-control m-input MT0" type="password" autocomplete="new-password"
-                placeholder="{{'Enter Your Password' | localize}} *" name="password" required maxlength="32" /></div>
+                placeholder="{{'EnterYourPassword' | localize}} *" name="password" required maxlength="32" /></div>
             <validation-messages [formCtrl]="passwordInput" *ngIf="!passwordInput.touched"></validation-messages>
         </div>
         <div class="row">
@@ -56,7 +56,7 @@
     <div class="kt-login__divider">
         <div class="kt-divider">
             <span class="kt-divider_P1"></span>
-            <span class="W600" style="color: #595959;"> Or {{"LoginWith" | localize}}</span>
+            <span class="W600" style="color: #595959;"> {{'Or' | localize}} {{"LoginWith" | localize}}</span>
             <span class="kt-divider_P2" ></span>
         </div>
     </div>

@@ -31,6 +31,9 @@ export class AppitemslistCatalogueReportComponent extends AppComponentBase imple
     itemListId: number
     @Output() cancel : EventEmitter<any> =  new EventEmitter()
     invokeAction = '/DXXRDV'
+
+        currentLang:string
+    isArabic:boolean = true
     constructor(
         private _injector: Injector,
         private _activatedRoute: ActivatedRoute,
@@ -47,11 +50,15 @@ export class AppitemslistCatalogueReportComponent extends AppComponentBase imple
        // const step3 = new PrintCatalogueStep({ title: this.l("CoverPageinfo"), printCatalogueStepsEnum: PrintCatalogueStepsEnum.CoverPage, icon: "" });
         const step3 = new PrintCatalogueStep({ title: this.l("Detailsinfo"), printCatalogueStepsEnum: PrintCatalogueStepsEnum.DetailInfo, icon: "" });
         const step4 = new PrintCatalogueStep({ title: this.l("Deliveryoptions"), printCatalogueStepsEnum: PrintCatalogueStepsEnum.PrintInfo, icon: "" });
-        this.steps.push(step1, step2, step3, step4);
+            const step5 = new PrintCatalogueStep({ title: this.l(""), printCatalogueStepsEnum: PrintCatalogueStepsEnum.CoverPage, icon: "" });
+        this.steps.push(step1, step2, step3, step4,step5);
+        // this.steps.push(step1, step2, step3, step4);
     }
     title:string
     active:boolean = false
     ngOnInit(): void {
+              this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
+        this.currentLang == 'ar' || this.currentLang == 'ar-EG'  ? this.isArabic = true : this.isArabic = false
         this.itemListId = this._activatedRoute.snapshot?.params['listId']
         const sessionKey = this.sessionKey
         

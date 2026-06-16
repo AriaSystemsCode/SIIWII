@@ -290,32 +290,32 @@ getBlockTypeLabel(block) {
   switch (t) {
     case 'EVENT':
      if(block?.getAppEventForViewDto?.appEvent?.isOnLine){
-      return 'Online Event' 
+      return this.l('OnlineEvent') 
       }else{
-         return 'In person Event' 
+         return this.l('InPersonEvent' ) 
         
       }
     case 'CONTACT':
         if(block?.getAccountForViewDto?.account?.accountType == 'BUSINESS'){
-        return 'Business Account'
+        return this.l('BUSINESSAccount')
       } else  if(block?.getAccountForViewDto?.account?.accountType == 'PERSONAL'){
-           return 'Personal Account'
+           return this.l('PERSONALAccount')
 
       }else {
-    return 'Group Account'
+    return this.l('GROUPAccount')
 
       }
    
     case 'PRODUCT':
-      return 'Product';
+      return this.l('Product') ;
     case 'ATTACHMENT':
-      return 'Link';
+      return  this.l('Link') 
     case 'BRAND':
-      return 'Brand';
+      return this.l('Brand') ;
     case 'CATEGORY':
-      return 'Category';
+      return this.l('Category') ;
     default:
-      return 'Block';
+      return this.l('Block') ;
   }
 }
 

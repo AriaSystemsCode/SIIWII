@@ -68,6 +68,11 @@
 
 }
 
+.enterByTxt {
+    color: #888;
+               
+                font-size: 14px;
+}
 .groupForm {
     display: flex;
     align-items: center;
@@ -432,4 +437,18 @@
             width: 84% !important;
         }
     }
+}
+
+.white-space-nowrap{
+    white-space: nowrap;
+}
+.pointer{
+    cursor: pointer;
+}
+.w-95{
+    width: 95% !important;
+}
+
+.bg-grey{
+    background-color: #777;
 }

@@ -907,49 +907,38 @@ p-dialog {
 
 .editPcAr {
     position: absolute;
-    left: -8px;  z-index: 99;
+    left: -8px;
+    z-index: 99;
 }
 
 .editPcEn {
     position: absolute;
-    right: -8px;  z-index: 99;
+    right: -8px;
+    z-index: 99;
 }
+
 ::ng-deep {
-.p-tabview .p-tabview-panels {
-    background: transparent !important;
-}
+    .p-tabview .p-tabview-panels {
+        background: transparent !important;
+    }
 
 }
 
 
 .product-info-row {
-  display: flex;
-  align-items: flex-start;
-  margin-bottom: 10px;
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 10px;
 }
 
 .product-info-label {
-  width: 30%;
-  font-weight: 600;
+    width: 30%;
+    font-weight: 600;
 }
 
 .product-info-value {
-  width: 70%;
+    width: 70%;
 }
-
-.department-list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-.department-chip {
-  padding: 6px 12px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-}
-
-
 
 .department-list {
     display: flex;
@@ -959,10 +948,161 @@ p-dialog {
 
 .department-chip {
     padding: 6px 12px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
+background: #F8F8F8;
+border: 1px solid #CECECE;
+border-radius: 6px;
+color: #1B101B;
+font-weight: 600;
+
 }
 
-.parent-slider-mobile , .parent-slider-desktop {
+
+.parent-slider-mobile,
+.parent-slider-desktop {
     min-height: 120px;
+}
+
+.text-decoration-none {
+
+    height: 44px;
+    border-radius: 8px;
+    border: 2px solid #4A0D4A;
+}
+
+.btn-save {
+    background-color: #4A0D4A !important;
+    padding-left: 9px;
+    border-radius: 0px;
+}
+
+
+.fa-2x {
+    color: #777777;
+
+}
+
+.fs-11 {
+    font-size: 11px;
+}
+
+.fs-12 {
+    font-size: 12px;
+}
+
+.fs-14 {
+    font-size: 14px;
+}
+
+.fs-16 {
+    font-size: 16px;
+}
+
+.fs-18 {
+    font-size: 18px;
+}
+
+.priceMsg {
+    font-size: 24px;
+    color: #1B101B;
+    font-weight: 700;
+}
+
+.productNameP {
+    color: #1B101B;
+    font-size: 16px;
+    font-weight: 500;
+    margin-top: 8px;
+
+}
+
+.space-nowrap {
+    white-space: nowrap;
+}
+
+.proNameMd {
+    color: #1B101B;
+    font-size: 16px;
+    font-weight: 500;
+    margin-top: 4px;
+  
+}
+
+.poniter {
+    cursor: pointer;
+}
+
+.hrStyle {
+
+    border-top: 4px solid rgba(0, 0, 0, 0.1) !important;
+    border-radius: 13px;
+}
+
+.relatedSec {
+    height: 150px;
+    border-radius: 8px;
+    background: #f5f5f5;
+}
+
+.codeLg {
+    font-size: 20px;
+    margin-right: 10px;
+}
+
+.specialBtn {
+    z-index: 99;
+    height: 43px;
+    top: 4px;
+}
+
+.brandImg {
+    width: 60px;
+    height: 60px
+}
+
+.editInput {
+
+    height: 44px;
+    border-radius: 8px;
+    border: 2px solid #4A0D4A;
+}
+
+.editbtnDiv {
+
+    z-index: 99999;
+    height: 43px;
+
+    top: 4px;
+}
+
+.border-none {
+    border: 0 !important;
+}
+
+.divsStyle {
+
+
+background: #FFFFFF;
+border: 1px solid #EEEEEE;
+border-radius: 12px;
+margin-bottom: 12px;
+
+}
+
+.innerHtmlColor {
+font-style: normal;
+font-weight: 600;
+font-size: 14px;
+line-height: 21px;
+color: #9E9E9E;
+
+
+}
+
+.col-md-8 {
+font-weight: 500;
+font-size: 14px;
+line-height: 21px;
+color: #9E9E9E;
+
+
 }

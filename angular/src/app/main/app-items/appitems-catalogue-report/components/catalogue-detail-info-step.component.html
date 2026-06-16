@@ -4,9 +4,9 @@
     </app-catalogue-report-cover-page-step>
 </div>
 
-<div>
+<div class="mt-4">
     <div class="kt-portlet kt-portlet--mobile">
-        <div class="kt-portlet__body mb-0 pb-0">
+        <div class="kt-portlet__body mb-0 p-0 mx-2">
             <p-accordion>
                 <p-accordionTab>
                     <ng-template pTemplate="header">
@@ -18,23 +18,25 @@
 
                         </div>
                     </ng-template>
-                    <div class="align-items-center row col-6 pb-4 mt-5">
-                        <div class="col-6  text-black">
+                    <div class="align-items-center row col-lg-6 col-12 pb-4 mt-5">
+                        <div class="col-md-6 col-8  coverTxt">
                             {{ "ShowCoverPage" | localize }}
                         </div>
 
-                        <div class="col-6">
+                        <div class="col-md-6 col-4">
                             <p-inputSwitch [(ngModel)]="printInfoParam.showCover" name="showCover"
                                 (onChange)="onChangeShowCoverPage($event)"></p-inputSwitch>
                         </div>
                     </div>
 
-                    <div class="row ml-2 mt-3" [ngClass]="{ 'disableSection': !printInfoParam.showCover  ,
+                    <div class=" ml-2 mt-3 d-md-flex justify-content-between" [ngClass]="{ 'disableSection': !printInfoParam.showCover  ,
                     'enableSection': printInfoParam.showCover
                 }">
-                        <div class="row col-6 mb-5 mr-5">
+                        <div class="row col-md-6 col-12 mb-5 mr-5 d-flex flex-column">
+                           <p class="mb-2 bgTxt">
                             {{ "Background" | localize }}
-                            <div class="ml-4 w-75">
+                           </p> 
+                            <div class=" w-75">
                                 <p-dropdown [options]="backgrounds" placeholder=" {{ 'NoBackground' | localize }}"
                                     styleClass="linesheet-price form-control bg-white" name="Background"
                                     [(ngModel)]="bKGround" (onChange)="onChangeBackground($event)"
@@ -42,7 +44,7 @@
                                 </p-dropdown>
                             </div>
                         </div>
-                        <div class="image-wrapper mb-5 ml-5">
+                        <div class="image-wrapper mb-5  mr-4">
                             <div class="d-flex flex-column justify-content-center h-100 align-items-center kt-avatar">
                                 <div class="d-flex flex-column justify-content-center h-100 w-100 position-absolute">
                                 </div>
@@ -59,7 +61,7 @@
 
 <div>
     <div class="kt-portlet kt-portlet--mobile">
-        <div class="kt-portlet__body mb-0 pb-0">
+        <div class="kt-portlet__body mb-0 p-0 mx-2">
             <p-accordion>
                 <p-accordionTab>
                     <ng-template pTemplate="header">
@@ -71,22 +73,23 @@
 
                         </div>
                     </ng-template>
-                    <div class="align-items-center row col-6 pb-4 mt-5">
-                        <div class="col-6  text-black">
+                    <div class="align-items-center row col-md-6 col-12 pb-4 mt-5">
+                        <div class="col-lg-6 col-8  coverTxt">
                             {{ "ShowColorPage" | localize }}
                         </div>
-                        <div class="col-6">
+                        <div class="col-lg-6 col-4">
                             <p-inputSwitch [(ngModel)]="printInfoParam.showColors" name="showColors"
                                 (onChange)="onChangeShowColors($event)"></p-inputSwitch>
                         </div>
                     </div>
 
-                    <div class="row ml-2 mt-3" [ngClass]="{ 'disableSection': !printInfoParam.showColors  ,
+                    <div class="row  mt-3 align-items-center ml-1" [ngClass]="{ 'disableSection': !printInfoParam.showColors  ,
                     'enableSection': printInfoParam.showColors
                 }">
-                        <div class="align-items-center row col-6 mb-5  ml-2">
-                            {{ "SortBy" | localize }}
-                            <div class="ml-4 w-75">
+                        <div class="d-flex flex-column col-md-6 col-12 mb-5  ">
+                            <p class="mb-2 sortTxt">{{ "SortBy" | localize }}</p>
+                            
+                            <div class=" w-75">
                                 <p-dropdown [options]="lineSheetColorPageSort" placeholder="None"
                                     styleClass="linesheet-price form-control bg-white" name="detailsSortyBy"
                                     [(ngModel)]="colorPageSort" [disabled]="!printInfoParam.showColors"
@@ -94,9 +97,10 @@
                                 </p-dropdown>
                             </div>
                         </div>
-                        <div class="align-items-center row col-6 mb-5">
-                            <label class="kt-checkbox">
-                                {{ "ShowGroupheaderinColorpage" | localize }}
+                        <div class="d-flex flex-column row col-md-6 col-12 ml-2">
+                            <label class="kt-checkbox pl-0 grpTxt">
+                                <p class="ml-4 pl-3"> {{ "ShowGroupheaderinColorpage" | localize }}</p>
+                               
                                 <input class="form-control" [(ngModel)]="printInfoParam.ColorPageShowCategory"
                                     type="checkbox" name="ShowGroupheaderinColorpage"
                                     [disabled]="!printInfoParam.showColors" [ngClass]="{ 'd-none': !printInfoParam.showColors  
@@ -114,7 +118,7 @@
 
 <div>
     <div class="kt-portlet kt-portlet--mobile">
-        <div class="kt-portlet__body mb-0 pb-0">
+        <div class="kt-portlet__body mb-0 p-0 mx-2">
             <p-accordion>
                 <p-accordionTab>
                     <ng-template pTemplate="header">
@@ -129,42 +133,42 @@
 
                     <div class="d-flex flex-column h-100 justify-content-between wizard-wrapper">
                         <div class="d-flex flex-column h-100 justify-content-between thin-scroll _scroll">
-                            <div class="p-5 row">
-                                <div class="align-items-center row col-12 mb-5">
-                                    <div class="col-4  text-black">
+                            <div class="p-2 row">
+                                <div class="align-items-center row col-lg-6 col-12 mb-5">
+                                    <div class="col-lg-4 col-md-6 col-10 titlsSty">
                                         {{ "ShowProductCode" | localize }}
                                     </div>
-                                    <div class="col-6">
+                                    <div class="col-lg-6 col-2">
                                         <p-inputSwitch [(ngModel)]="printInfoParam.showCode"
                                             name="showCode"></p-inputSwitch>
                                     </div>
                                 </div>
-                                <div class="align-items-center row col-12 mb-5">
-                                    <div class="col-4  text-black">
+                                <div class="align-items-center row col-lg-6 col-12 mb-5">
+                                    <div class="col-md-6 col-10  titlsSty">
                                         {{ "ShowProductAvailableQuantity" | localize }}
                                     </div>
-                                    <div class="col-6">
+                                    <div class="col-lg-6 col-2">
                                         <p-inputSwitch [(ngModel)]="printInfoParam.showQty"
                                             name="showQty"></p-inputSwitch>
                                     </div>
                                 </div>
-                                <div class="align-items-center row col-12 mb-5">
-                                    <div class="col-4  text-black">
+                                <div class="align-items-center row col-lg-6 col-12 mb-5">
+                                    <div class="col-lg-4 col-md-6 col-10 titlsSty">
                                         {{ "ShowMSRPPrice" | localize }}
                                     </div>
-                                    <div class="col-6">
+                                    <div class="col-lg-6 col-2">
                                         <p-inputSwitch [(ngModel)]="printInfoParam.showPrice"
                                             name="showPrice"></p-inputSwitch>
                                     </div>
                                 </div>
-                                <div class="align-items-center row col-12 mb-5 ">
-                                    <div class="col-4  text-black">
+                                <div class="align-items-center row col-lg-6 col-12 mb-5 ">
+                                    <div class="col-md-6 col-10 titlsSty">
                                         {{ "ShowSpecialPrice" | localize }}
                                     </div>
-                                    <div class="col-md-6 col d-flex  align-items-center" style="gap:20px;">
+                                    <div class="col-md-6 col-2 d-flex  align-items-center" style="gap:20px;">
                                         <p-inputSwitch [(ngModel)]="printInfoParam.showSpecialPrice" name="showPrice"
                                             (onChange)="onChangeSpecialPrice($event)"></p-inputSwitch>
-                                        <div>
+                                        <div class="w-75 d-md-block d-none">
                                             <p-dropdown [options]="specialPrices" placeholder="Select Price"
                                                 styleClass="linesheet-price form-control bg-white" name="specialPrices"
                                                 [(ngModel)]="printInfoParam.specialPriceLevel"
@@ -172,20 +176,27 @@
                                             </p-dropdown>
                                         </div>
                                     </div>
-
+                                    <div class="w-75 d-md-none d-block ml-2 mt-2">
+                                        <p-dropdown [options]="specialPrices" placeholder="Select Price"
+                                            styleClass="linesheet-price form-control bg-white" name="specialPrices"
+                                            [(ngModel)]="printInfoParam.specialPriceLevel"
+                                            [disabled]="!printInfoParam.showSpecialPrice" required>
+                                        </p-dropdown>
+                                    </div>
                                 </div>
 
-                                <div class="align-items-center row col-6 mb-5">
-                                    {{ "SortBy" | localize }}
-                                    <div class="ml-4 w-75">
+                                <div class=" row col-md-6 col-12 mb-3 ml-1  d-flex flex-column pr-0">
+                                    <p class="titlsSty">{{ "SortBy" | localize }}</p>
+                                    
+                                    <div class="mt-2 " style="width: 90%;">
                                         <p-dropdown [options]="lineSheetDetailPageSort" placeholder="None"
                                             styleClass="linesheet-price form-control bg-white" name="detailsSortyBy"
                                             [(ngModel)]="detailPageSort" (onChange)="onChangeDetailPageSort($event)">
                                         </p-dropdown>
                                     </div>
                                 </div>
-                                <div class="align-items-center row col-6 mb-5">
-                                    <label class="kt-checkbox">
+                                <div class="align-items-center row col-md-6 col-12 ml-md-3 ml-3 ml-lg-0 pl-0">
+                                    <label class="kt-checkbox grpTxt">
                                         {{ "ShowGroupheaderindetailpages" | localize }}
                                         <input class="form-control" [(ngModel)]="printInfoParam.DetailPageShowCategory"
                                             type="checkbox" name="ShowGroupheaderindetailpages" />
@@ -204,12 +215,12 @@
 </div>
 
 
-<div class="d-flex flex-row justify-content-between pr-5 w-100 ">
-    <button class="btn btn-primary" type="button" (click)="previousStep()">
+<div class="d-flex flex-row justify-content-between pr-2 w-100 ">
+    <button class="btn btnPrev" type="button" (click)="previousStep()">
         <i class="fa-arrow-left fas ml-3"></i>
         {{ "Previous" | localize }}
     </button>
-    <button class="btn btn-primary" (click)="continueToNextStep()" [disabled]="!linesheetName && !printInfoParam?.reportTitle">
+    <button  class="btn btnCont " (click)="continueToNextStep()" [disabled]="!linesheetName && !printInfoParam?.reportTitle">
         {{ "Continue" | localize }}
         <i class="fa-arrow-right fas ml-3"></i>
     </button>

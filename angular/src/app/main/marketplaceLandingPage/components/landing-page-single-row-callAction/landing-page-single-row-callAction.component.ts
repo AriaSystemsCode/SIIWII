@@ -354,40 +354,40 @@ export class LandingPageSinglrRowCallActionComponent extends AppComponentBase im
 
   }
 
-  getBlockTypeLabel(block) {
-    let t = (block.blockType).toUpperCase();
+getBlockTypeLabel(block) {
+  let t  = (block.blockType).toUpperCase();
 
-    switch (t) {
-      case 'EVENT':
-        if (block?.getAppEventForViewDto?.appEvent?.isOnLine) {
-          return 'Online Event'
-        } else {
-          return 'In person Event'
+  switch (t) {
+    case 'EVENT':
+     if(block?.getAppEventForViewDto?.appEvent?.isOnLine){
+      return this.l('OnlineEvent') 
+      }else{
+         return this.l('InPersonEvent' ) 
+        
+      }
+    case 'CONTACT':
+        if(block?.getAccountForViewDto?.account?.accountType == 'BUSINESS'){
+        return this.l('BUSINESSAccount')
+      } else  if(block?.getAccountForViewDto?.account?.accountType == 'PERSONAL'){
+           return this.l('PERSONALAccount')
 
-        }
-      case 'CONTACT':
-        if (block?.getAccountForViewDto?.account?.accountType == 'BUSINESS') {
-          return 'Business Account'
-        } else if (block?.getAccountForViewDto?.account?.accountType == 'PERSONAL') {
-          return 'Personal Account'
+      }else {
+    return this.l('GROUPAccount')
 
-        } else {
-          return 'Group Account'
-
-        }
-
-      case 'PRODUCT':
-        return 'Product';
-      case 'ATTACHMENT':
-        return 'Link';
-      case 'BRAND':
-        return 'Brand';
-      case 'CATEGORY':
-        return 'Category';
-      default:
-        return 'Block';
-    }
+      }
+   
+    case 'PRODUCT':
+      return this.l('Product') ;
+    case 'ATTACHMENT':
+      return  this.l('Link') 
+    case 'BRAND':
+      return this.l('Brand') ;
+    case 'CATEGORY':
+      return this.l('Category') ;
+    default:
+      return this.l('Block') ;
   }
+}
 
   getBlockTypeIcon(block) {
     const t = (block.blockType).toUpperCase();

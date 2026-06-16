@@ -95,6 +95,6 @@ export class PricingHelpersService extends AppComponentBase {
     return prices.findIndex(item=>item.code == level &&  (currencyId ? currencyId == item.currencyId : true) )
   }
   getDefaultPricingIndex(prices:AppItemPriceInfo[]){
-    return this.getPricingIndex(prices, this.defaultLevel, this.tenantDefaultCurrency.value)
+   return this.getPricingIndex(prices,this.defaultLevel== "RRP"  ? "MSRP":  this.defaultLevel, this.tenantDefaultCurrency.value);
   }
 }

@@ -285,8 +285,21 @@ export class SelectCategoriesDynamicModalComponent
                     let currentLoadedItemsAfterExludingSelections: TreeNodeOfGetSycEntityObjectCategoryForViewDto[] =
                         [];
                     this.totalCount = result.totalCount;
-                    const isLastPage =
-                        this.skipCount + this.maxResultCount > this.totalCount;
+                    // number of items excluded from current page - savedIds
+                const excludedFromCurrentPage = this.savedIds?.length
+                    ? result.items.filter(i =>
+                        this.savedIds.includes(i.data.sycEntityObjectCategory.id)
+                    ).length
+                    : 0;
+
+                // total visible items after exclusion
+                const effectiveTotal = this.totalCount - excludedFromCurrentPage;
+
+                // correct last page check based on visible items
+                // const isLastPage = this.skipCount + this.maxResultCount > this.totalCount
+                const isLastPage =
+                    this.skipCount + this.maxResultCount >= effectiveTotal;
+
 
                     //check selection of the newly added elements
                     if (this.savedIds?.length) {
@@ -308,9 +321,9 @@ export class SelectCategoriesDynamicModalComponent
                             result.items;
                     }
                     this.lastSelectedRecords = this.selectedRecords;
-                    if (isFirstPage && !this.searchQuery) {
+                   /*  if (isFirstPage && !this.searchQuery) {
                         this.selectedRecords = [];
-                    }
+                    } */
                     currentLoadedItemsAfterExludingSelections.map((record) => {
                         const cachedItem: TreeNodeOfGetSycEntityObjectCategoryForViewDto =
                             this.loadedChildrenRecords.filter(

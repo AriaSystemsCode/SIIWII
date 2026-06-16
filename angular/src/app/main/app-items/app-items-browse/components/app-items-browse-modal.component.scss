@@ -3,8 +3,75 @@
 }
 .modal-content-wrapper {
     justify-content: flex-start!important;
+        @media (min-width: 1024px) {
     .modal-body {
         max-height: 100%;
-        padding-top: 110px!important;
+        padding-top: 70px!important;
     }
+  }
+
+      @media (max-width: 1024px) {
+    .modal-body {
+        max-height: 100%;
+        padding-top: 130px!important;
+    }
+  }
+}
+
+::ng-deep {
+    @media (min-width: 1400px) {
+        .modal-dialog.modal-xl {
+            max-width: 1299px !important;
+        }
+    }
+    @media  (max-width: 768px) and (min-width: 576px) {
+        .modal-dialog {
+            max-width: 650px !important;
+            /* margin-left: 71px; */
+            margin: 1.75rem;
+            margin-left: 90px !important;
+        }
+    }
+}
+
+
+.browse-product-dialog {
+  height: 90vh;
+}
+
+.browse-modal-body {
+  overflow-x: hidden;
+}
+
+.browse-close-btn {
+  position: absolute;
+  top: 8px;
+  right: 0;
+}
+
+.rtl-modal {
+  direction: rtl;
+  text-align: right;
+
+}
+    @media (min-width: 567px) and (max-width: 768px) {
+    .rtl-modal {
+
+  right: 10%;
+}
+}
+.rtl-modal .browse-close-btn {
+  right: auto;
+  left: 0;
+}
+
+.rtl-modal .modal-header,
+.rtl-modal .modal-body {
+  direction: rtl;
+  text-align: right;
+}
+
+.rtl-modal .mr-2 {
+  margin-right: 0 !important;
+  margin-left: 0.5rem !important;
 }

@@ -507,6 +507,9 @@ left: 30px;
     // right: 0px;
     background-color: #f88011;
     top: 0px;
+    img{
+        width: 30px;
+    }
 }
         ._divider span {
             width: 1px;
@@ -538,6 +541,10 @@ left: 30px;
 
         .addMl {
             margin-left: 100px;
+        }
+
+               .addMR {
+            margin-right: 100px;
         }
 
         .login-btn {
@@ -668,4 +675,22 @@ left: 30px;
     }
   
 
+  }
+
+
+  .wh-20 {
+width: 20px;
+height: 20px;
+cursor: pointer;
+  }
+
+  .pointer{
+        cursor:pointer;
+  }
+
+  .w-35{
+    width: 35px;
+  }
+  .globalSearch {
+    background-color: #f3f6f9; height: 39px
   }

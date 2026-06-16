@@ -260,8 +260,8 @@ font-weight: 500;
 
 
 .phone-extenstion {
-    width: 110px;
-    margin-left: 7px;
+    width: 145px;
+    // margin-left: 7px;
 }
 .phone-ng2-input-wrapper{
     width: 200px;
@@ -365,4 +365,8 @@ color: #fff;
   .side-modal {
     width: 75%;
   }
+}
+
+.gap-9{
+    gap: 9px;
 }

@@ -33,6 +33,8 @@ export class CatalogueReportDataSelectionStepComponent extends AppComponentBase 
   oldSelectedAppItemList : AppItemsListDto
   oldSelectedAppItemListKey : string
 
+     currentLang:string
+    isArabic:boolean = true
   constructor(
     injector: Injector,
     private _appItemsListsServiceProxy: AppItemsListsServiceProxy,
@@ -40,6 +42,10 @@ export class CatalogueReportDataSelectionStepComponent extends AppComponentBase 
     private _appItemsServiceProxy: AppItemsServiceProxy
   ) {
     super(injector);
+  }
+  ngOnInit(){
+              this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
+        this.currentLang == 'ar' || this.currentLang == 'ar-EG'  ? this.isArabic = true : this.isArabic = false
   }
   ngOnChanges(changes:SimpleChanges){
     if(!this.printInfoParam) return 
@@ -225,5 +231,11 @@ export class CatalogueReportDataSelectionStepComponent extends AppComponentBase 
     this.oldSelectedAppItemListKey = this.printInfoParam.selectedKey
   }
   
-  
+  clearMyProductsName() {
+    let body :GetAllAppItemsInput 
+    this.selectedAppItemList = null;  // Clear selected item
+    this.myProductsName = '';  
+ 
+   
+  }
 }

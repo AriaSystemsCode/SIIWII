@@ -1,7 +1,7 @@
-<form #listForm="ngForm" (ngSubmit)="createOrEditAppItemList(listForm)">
+<form #listForm="ngForm" (ngSubmit)="createOrEditAppItemList(listForm)" [ngClass]="!isArabic? 'addMrTop':''">
   <div
     [@routerTransition]
-    class="wrapper product-list-page"
+    class="wrapper"
     [ngClass]="{ 'rtl-layout': isArabic }"
   >
     <div class="kt-content kt-grid__item kt-grid__item--fluid kt-grid kt-grid--hor">
@@ -98,17 +98,17 @@
         </div>
 
         <!-- EDIT MODE ACTIONS -->
-        <div class="edit-actions" *ngIf="!viewMode">
+        <div class="edit-actions" [ngStyle]="isArabic ? {'gap':'10px'} : ''" *ngIf="!viewMode">
           <button class="btn btn-success text-capitalize" type="button" (click)="SaveAsDraft()">
             {{ l('SaveAsDraft') }}
           </button>
 
-          <button class="btn btn-primary text-capitalize" type="button" (click)="openMultiSelector()">
+          <button class="btn bgPurple text-capitalize" type="button" (click)="openMultiSelector()">
             {{ l('AddProduct(s)') }}
           </button>
 
           <button
-            class="btn btn-primary text-capitalize"
+            class="btn bgPurple text-capitalize"
             type="submit"
             [buttonBusy]="false"
             [busyText]="l('SavingWithThreeDot')"
@@ -192,12 +192,12 @@
       </div>
 
       <!-- BODY -->
-      <div [class]="containerClass + ' kt-grid__item kt-grid__item--fluid'">
+      <div >
         <div
           class="body-cont kt-portlet--mobile"
           [ngClass]="{
             'veiwMode': viewMode,
-            'kt-portlet': !isArabic,
+            'p-3': !isArabic,
             'addEditRTLm': isArabic
           }"
         >
