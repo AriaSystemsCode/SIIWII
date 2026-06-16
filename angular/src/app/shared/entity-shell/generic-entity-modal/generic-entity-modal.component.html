@@ -1,0 +1,20 @@
+<p-dialog
+  [(visible)]="visible"
+  [modal]="true"
+  [appendTo]="'body'"
+  [draggable]="false"
+  [resizable]="false"
+  [closable]="false"
+  [showHeader]="false"
+ [style]="{
+    width: maximized ? '100vw' : width,
+    height: maximized ? '100vh' : height,
+    'margin-left': '85px'
+  }"
+  [contentStyle]="{ padding: '0', height: '100%', overflow: 'hidden' }"
+  styleClass="generic-entity-modal"
+  (onHide)="onDialogHide()">
+
+  <ng-content></ng-content>
+
+</p-dialog>

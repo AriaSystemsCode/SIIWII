@@ -472,3 +472,20 @@ NOT CARDS VIEW MODE
   </div>
 
 </p-dialog>
+
+
+
+<app-generic-entity-modal
+    [(visible)]="showGenericEntityModal">
+
+    <app-generic-entity-shell>
+
+        <app-account-sections
+            entity-main-content
+            [accountId]="selectedAccountId"
+            [mode]="'view'">
+        </app-account-sections>
+
+    </app-generic-entity-shell>
+
+</app-generic-entity-modal>

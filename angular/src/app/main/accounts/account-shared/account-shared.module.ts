@@ -25,13 +25,16 @@ import { TabMenuModule } from 'primeng/tabmenu';
 import { TreeModule } from 'primeng/tree';
 import { TreeTableModule } from 'primeng/treetable';
 import { DialogModule } from 'primeng/dialog';
+import { AccountSectionsComponent } from './components/account-sections/account-sections.component';
+import { EntityShellModule } from '@app/shared/entity-shell/entity-shell.module';
 
 
 @NgModule({
     declarations: [
         AccountsComponent,
         AccountsListFiltersComponent,
-        AccountCardComponent
+        AccountCardComponent,
+        AccountSectionsComponent
     ],
     imports: [
         CommonModule,
@@ -55,7 +58,8 @@ import { DialogModule } from 'primeng/dialog';
         CheckboxModule,
        BulkImportModule,
         FiltersSharedModule,
-        DialogModule
+        DialogModule,
+        EntityShellModule
     ],
     providers: [
         { provide: BsDatepickerConfig, useFactory: NgxBootstrapDatePickerConfigService.getDatepickerConfig },
@@ -67,7 +71,8 @@ import { DialogModule } from 'primeng/dialog';
     exports: [
         AccountsComponent,
         AccountsListFiltersComponent,
-        AccountCardComponent
+        AccountCardComponent,
+        AccountSectionsComponent
     ]
 })
 export class AccountSharedModule { }

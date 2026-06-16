@@ -115,6 +115,7 @@ import { ExtraAttributeDataService } from "./main/app-items/app-item-shared/serv
 import { TransactionModule } from "./main/transactions/transaction.module";
 import { NotesModule } from "./admin/shared/notes/notes.module";
 import { OverALLRatingReviewsModule } from "./main/overallRating-reviews/overallRating-reviews.module";
+import { EntityShellModule } from "./shared/entity-shell/entity-shell.module";
 
 @NgModule({
     declarations: [
@@ -170,6 +171,7 @@ import { OverALLRatingReviewsModule } from "./main/overallRating-reviews/overall
         MenuSearchBarComponent,
         ActiveDelegatedUsersComboComponent,
 
+
   
 
     ],
@@ -220,7 +222,8 @@ import { OverALLRatingReviewsModule } from "./main/overallRating-reviews/overall
         NotesModule,
         TransactionModule,
 
-        OverALLRatingReviewsModule
+        OverALLRatingReviewsModule,
+        EntityShellModule
     ],
 
     providers: [

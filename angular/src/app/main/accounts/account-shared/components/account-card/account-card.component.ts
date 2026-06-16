@@ -75,29 +75,59 @@ export class AccountCardComponent extends AppComponentBase implements OnChanges 
     let editPrefix = this.isHost ? "external" : "manual"
     this.router.navigate([`/app/main/account/edit-${editPrefix}/${this.id}`])
   }
-  viewProfile(): void {
-    if (!this.fromMarketplace) {
-      if (!this.id) return
-      this.router.navigate([`/app/main/account/view/${this.id}`], {
-        queryParams: { fromMarketplace: this.fromMarketplace }
-      });
-    } else {
-      if (!this.id) return
-      this.router.navigate([`/app/main/account/view-marketplace-acc/${this.id}`], {
-        state: {
-          accountType: this.account.account.accountType,
-          ssin: this.account.account.ssin
-        }
-      });
-    }
+  // viewProfile(): void {
+  //   if (!this.fromMarketplace) {
+  //     if (!this.id) return
+  //     this.router.navigate([`/app/main/account/view/${this.id}`], {
+  //       queryParams: { fromMarketplace: this.fromMarketplace }
+  //     });
+  //   } else {
+  //     if (!this.id) return
+  //     this.router.navigate([`/app/main/account/view-marketplace-acc/${this.id}`], {
+  //       state: {
+  //         accountType: this.account.account.accountType,
+  //         ssin: this.account.account.ssin
+  //       }
+  //     });
+  //   }
 
-  }
+  // }
+
+showGenericEntityModal = false;
+
+selectedAccountId: number;
+
+viewProfile(): void {
+
+  // if (!this.id) {
+  //   return;
+  // }
+
+  // if (!this.fromMarketplace) {
+
+    this.selectedAccountId = this.id;
+
+    this.showGenericEntityModal = true;
+
+  //   return;
+  // }
+
+  // this.router.navigate(
+  //   [`/app/main/account/view-marketplace-acc/${this.id}`],
+  //   {
+  //     state: {
+  //       accountType: this.account.account.accountType,
+  //       ssin: this.account.account.ssin
+  //     }
+  //   }
+  // );
+}
   clickCardHandler() {
-    if (this.isManual) {
-      this.edit()
-    } else {
+    // if (this.isManual) {
+    //   this.edit()
+    // } else {
       this.viewProfile()
-    }
+    // }
   }
 
   createRelation(relationType: any) {
