@@ -3,7 +3,7 @@ import { AppComponentBase } from '@shared/common/app-component-base';
 import { CreateMessageInput, GetMessagesForViewDto,   MesasgeObjectType,   MessageServiceProxy } from '@shared/service-proxies/service-proxies';
 import { AddCommentComponent } from '../../../comments/components/add-comment/add-comment.component';
 import { SendMessageModalComponent } from '@app/main/Messages/SendMessage-Modal.Component';
-
+import { finalize } from 'rxjs/operators';
 @Component({
     selector: 'app-comment-parent',
     templateUrl: './comment-parent.component.html',
@@ -39,7 +39,9 @@ export class CommentParentComponent extends AppComponentBase implements AfterVie
     @Input() fromOverview:boolean=false;
   addReplyScreen: boolean ;
     currentComment: any;
-
+@Input() loadComments: boolean = true;
+private isLoadingComments = false;
+isArabic :boolean = false;
     constructor(
         private _messageServiceProxy : MessageServiceProxy,
         private _injector : Injector,
@@ -47,6 +49,11 @@ export class CommentParentComponent extends AppComponentBase implements AfterVie
         ) {
             super(_injector)
 
+         }
+
+         ngOnInit(){
+                this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
+    this.currentLang == 'ar' || this.currentLang == 'ar-EG' ? this.isArabic = true : this.isArabic = false
          }
          ngAfterViewInit(): void {
             this.toggleMessageType(this.commentType=='MESSAGE'?2:1)
@@ -84,18 +91,26 @@ export class CommentParentComponent extends AppComponentBase implements AfterVie
         }
         
  
-    show(creatorUserId:number,entityId:number,parentId?:number,threadId?:number){
-     this.reset()
-        this.creatorUserId = creatorUserId
-        this.entityId = entityId
-        if(parentId) this.parentId = parentId
-        if(threadId) this.threadId = threadId
-     if(this.comments.length === 0){
-            this.getAllComments()
-        }
-        this.showAddComment()
-        this.focusAddComment()
-    }
+   show(
+  creatorUserId: number,
+  entityId: number,
+  parentId?: number,
+  threadId?: number
+): void {
+  this.reset();
+
+  this.creatorUserId = creatorUserId;
+  this.entityId = entityId;
+  this.parentId = parentId;
+  this.threadId = threadId;
+
+  if (this.loadComments) {
+    this.getAllComments();
+  }
+
+  this.showAddComment();
+  this.focusAddComment();
+}
     showAddComment(){
         const comment = new CreateMessageInput();
         comment.relatedEntityId = this.entityId;
@@ -118,29 +133,42 @@ export class CommentParentComponent extends AppComponentBase implements AfterVie
             this.showDirectMessageComp=true;
         }
     }
-    getAllComments() {
-        this.showMainSpinner()
-        this._messageServiceProxy.getAllComments(
-            undefined,
-            undefined,
-            undefined,
-            undefined,
-            this.entityId,
-            this.parentId,
-            undefined,"MESSAGE",
-            undefined,
-            this.skipCount,
-            this.maxResultCount)
-        .subscribe((res)=>{
-            if(!res) return
-            this.skipCount += this.maxResultCount
-            this.totalCount = res.totalCount
-            this.comments.push(...res.items)
-        this.hideMainSpinner()
+ getAllComments(): void {
+  if (this.isLoadingComments || !this.entityId) return;
 
+  this.isLoadingComments = true;
+  this.showMainSpinner();
 
-        })
-    }
+  this._messageServiceProxy
+    .getAllComments(
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      this.entityId,
+      this.parentId,
+      undefined,
+      'MESSAGE',
+      undefined,
+      this.skipCount,
+      this.maxResultCount
+    )
+    .pipe(
+      finalize(() => {
+        this.isLoadingComments = false;
+        this.hideMainSpinner();
+      })
+    )
+    .subscribe((res) => {
+      if (!res) return;
+
+      this.skipCount += this.maxResultCount;
+      this.totalCount = res.totalCount;
+      this.comments = [...this.comments, ...res.items];
+
+      this.cdr.detectChanges();
+    });
+}
     newCommentAddedHandler($event?:GetMessagesForViewDto){
         this.newCommentAdded.emit()
         if($event)this.comments.unshift($event)

@@ -24,8 +24,15 @@ export class AppItemsBrowseModalComponent extends AppComponentBase {
     totalSelected:number = 0
     multiSelectionInfo : MultiSelectionInfo = new MultiSelectionInfo()
     lastFilterType:any;
+    @Input('fromCta') fromCta :boolean = false
+    currentLang:string
+    isArabic:boolean = true
     constructor(injector: Injector, private appItemSelectorsServiceProxy:AppItemSelectorsServiceProxy) {
         super(injector)
+    }
+    ngOnInit(){
+           this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
+        this.currentLang == 'ar' || this.currentLang == 'ar-EG'  ? this.isArabic = true : this.isArabic = false
     }
     show( multiSelectionInfo:MultiSelectionInfo, options?:Partial<AppItemsBrowseInputs>, appItemListId?:number): void {
         this.appItemsBrowseComponent.appItemListId= appItemListId;

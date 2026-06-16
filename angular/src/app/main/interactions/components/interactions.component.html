@@ -26,8 +26,8 @@
 <!-- <hr class="mb-4" *ngIf="!parentId">-->
 <div *ngIf="!showFirstBarOnly " class="d-flex" [ngClass]="parentId ? 'flex-column-reverse' : 'flex-column'">
     <div [ngStyle]="{'margin-left': parentId ? '25px' : ''}" class="d-flex justify-content-between align-items-center pr-4 pt-4" [ngClass]="{'visibility-hidden':!entityId}">
-        <div class="d-flex justify-content-between" [ngStyle]="{'gap': parentId ? '5px':'40px'}" style="white-space: nowrap;" [ngClass]="{'pr-5 w-100': parentId}">
-            <div class="d-flex" [ngStyle]="{'gap': parentId ? '5px':'40px'}"  style="white-space: nowrap;">
+        <div class="d-flex justify-content-between no-wrap" [ngStyle]="{'gap': parentId ? '5px':'40px'}"  [ngClass]="{'pr-5 w-100': parentId}">
+            <div class="d-flex no-wrap" [ngStyle]="{'gap': parentId ? '5px':'40px'}">
                 <div *ngIf="fromOverview" class="d-flex justify-content-between" [ngClass]="{'visibility-hidden' : !usersReactionsStats?.reactionsCount && !usersReactionsStats?.commentsCount }">
                     <app-reactions-stats
                         [entityId]="entityId"

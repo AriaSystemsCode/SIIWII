@@ -13,7 +13,7 @@
                             : 'assets/common/images/default-profile-picture.png'
                     " class="rounded-circle logo" />
      <div class="reviewSection mb-2">
-      <textarea class="form-control  border-0" placeholder="Add your review" [(ngModel)]="reviewText"
+      <textarea class="form-control  border-0" [placeholder]="'AddYourReview' | localize" [(ngModel)]="reviewText"
         style="height: auto; min-height: 100px; resize: none; overflow: hidden;border: none !important;max-width: 85%;overflow: auto;"
         (input)="adjustTextareaHeight($event)"></textarea>
   

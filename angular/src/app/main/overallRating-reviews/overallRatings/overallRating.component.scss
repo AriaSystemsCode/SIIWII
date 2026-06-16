@@ -1,10 +1,5 @@
-
-
-  
   .sec-data {
-  
-  
-  
+
     h4 {
   
       font-weight: 700;
@@ -17,10 +12,6 @@
     }
   }
   
-
-  
-
-  
   .sm-fs {
     font-size: 8px;
     color: #1B101B;
@@ -29,22 +20,6 @@
     span {
       color: #9E9E9E;
     }
-  }
-  
-
-  .stars-container {
-    display: inline-block;
-    color: transparent;
-    font-size: 28px;
-  }
-  
-  .fill-s {
-  
-    position: absolute !important;
-    left: 0;
-    overflow: hidden !important;
-    color: #F6851D;
-    height: 32px;
   }
   
   ::ng-deep {
@@ -72,15 +47,11 @@
   }
   
   
-
-  
   h2 {
     text-align: center;
     margin-bottom: 20px;
   }
   
-
-
   
   .star-rating {
     display: flex;
@@ -109,85 +80,18 @@
     font-size: 1rem;
     color: #333;
   }
-  
-  .rating-value {
-    font-size: 1rem;
-    color: #666;
-  }
-  
 
-  
-
-  
-  
-  .row-item-desc {
-  
-    font-weight: 600;
-    font-size: 14px;
-    line-height: 21px;
-  
-    text-transform: capitalize;
-  
-    color: #9E9E9E;
-  
-  
-  }
-  
-
-
-  .title {
-  
-    font-weight: 600;
-    font-size: 16px;
-    line-height: 24px;
-  
-  
-    color: #1B101B;
-  
-  
-  
-  }
-  
-
-  
-  
-
-  
-  .txtby {
-  
-    font-weight: 600;
-    font-size: 10px;
-    line-height: 15px;
-    white-space: nowrap;
-  
-    color: #9E9E9E;
-  
-  
-  }
-  
-  .txtBody {
-  
-    font-weight: 400;
-    font-size: 12px;
-    min-height: 120px;
-    color: #9E9E9E;
-  
-  
-  }
-  
   .w-wrap {
     white-space: noWrap;
+    color: #1B101B;
+      font-weight: 600;
   }
   
-  .rateNum {
-  
+  .rateNum { 
     font-weight: 600;
     font-size: 24px;
     line-height: 36px;
-  
-  
     color: #1B101B;
-  
   }
   
   .rateTxt {
@@ -195,211 +99,19 @@
     font-weight: 500;
     font-size: 14px;
     line-height: 21px;
-  
     color: #9E9E9E;
-  
-  
-  }
-
-
-  
-  .rating {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    font-size: 2rem;
-    color: #ffc107;
-    margin-top: 10px;
-  }
-  
-  .rating i {
-    cursor: pointer;
-    transition: color 0.2s;
-  }
-  
-  .rating .fa-star-o:before {
-    content: "\f005";
-    color: #E1E1E1;
-  }
-  
-  .rating .fa-star:before {
-    content: "\f005";
-    color: #F6851D;
-  }
-  
-  .rating i:hover,
-  .rating i:hover~i {
-    color: #ff9800;
-  }
-  
-  .rating span {
-    font-size: 1rem;
-    color: #666;
-    margin-left: 10px;
-  }
-  
-  .btnPost {
-  
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    align-items: center;
-    padding: 9.5px 18px;
-  
-    width: 63px;
-    height: 37px;
-  
-    background: #4A0D4A;
-    border-radius: 6px;
-  
-    color: #fff;
-  }
-  
-  
-  .iconImg {
-    height: 24px;
-    cursor: pointer;
-  }
-
-  
-
-  
-  .logo {
-    margin-right: 1rem;
-  }
-  
-  .rating .fa {
-    font-size: 1.2rem;
-    cursor: pointer;
-    color: #ffc107;
-  }
-  
-  .rating .fa-star-o {
-    color: #ccc;
-  }
-  
-  .bottomSec .iconImg {
-    width: 24px;
-    height: 24px;
-    cursor: pointer;
-  }
-  
- 
-  
-  
-  
-  
-  
-  
-  
-  
-  .img-hd {
-    position: inherit !important;
-    width: 100px !important;
-    height: 100px !important;
-  }
-  
-  .msg-text {
-    font-weight: 700 !important;
-    font-size: 22px !important;
-    line-height: 36px !important;
-    color: #1B101B !important;
-  }
-  
-  .btns {
-    gap: 24px !important;
-  }
-  
-  .p-button-text {
-    background-color: #4A0D4A !important;
-    color: #FFF !important;
-    border: none !important;
-    border-radius: 6px !important;
-    padding: 8px 32px;
-  }
-  
-  ::ng-deep {
-    .p-dialog .p-dialog-header {
-      background-color: #fff !important;
-      border: none !important;
-    }
-  }
-  
-  
-  
-  
-  media-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-    gap: 1rem;
-  }
-  
-
-  
-  
- 
-  
-
-  .modal-content {
-    position: relative;
-    text-align: center;
-  }
-  
-  .modal-image {
-    max-width: 100%;
-    height: auto;
-    border-radius: 8px;
-  }
-  
-  .nav-button {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    background: #EEEEEE;
-    color: #4A0D4A;
-    border: none;
-    border-radius: 6px;
-    width: 40px;
-    height: 40px;
-    cursor: pointer;
-  }
-  
-  
-  .nav-button:hover {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    background: #4A0D4A;
-    color: #FFFFFF;
-    border: none;
-    border-radius: 6px;
-    width: 40px;
-    height: 40px;
-    cursor: pointer;
-  }
-  
-  .nav-button.prev {
-    left: 10px;
-  }
-  
-  .nav-button.next {
-    right: 10px;
-  }
-
-  
-  
-
-  
-  .noDataTxt {
-  
-    font-weight: 600;
-    font-size: 14px;
-    line-height: 30px;
-  
-    color: #595959;
-  
   }
   
   .addSecMg {
     margin-top: 25px !important;
+  }
+
+  .numbers {
+    white-space: nowrap !important;
+    color: #1B101B !important;
+    font-weight: 600;
+  }
+
+  .gap-5 {
+    gap: 5px;
   }

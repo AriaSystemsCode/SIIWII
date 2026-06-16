@@ -22,28 +22,28 @@
 
     <p class="rateTxt">{{'BasedOn' | localize}} {{overRating?.totalNumberOfRating}} {{'Ratings' | localize}}</p>
     <div>
-      <div class="d-flex justify-content-between align-items-center" style="gap: 5px;">
-        <span style="white-space: nowrap;">5 <span class="star">★</span></span> <p-progressBar
+      <div class="d-flex justify-content-between align-items-center gap-5">
+        <span class="numbers">5 <span class="star">★</span></span> <p-progressBar
           [value]="overRating?.fiveTotal * 100"></p-progressBar> <span class="w-wrap"> {{overRating?.fiveTotal * 100 | number: '1.2-2' }}
           %</span>
       </div>
-      <div class="d-flex justify-content-between align-items-center" style="gap: 5px;">
-        <span style="white-space: nowrap;">4 <span class="star">★</span></span> <p-progressBar
+      <div class="d-flex justify-content-between align-items-center gap-5">
+        <span class="numbers">4 <span class="star">★</span></span> <p-progressBar
           [value]="overRating?.fourTotal * 100"></p-progressBar> <span class="w-wrap"> {{overRating?.fourTotal * 100 | number: '1.2-2' }}
           %</span>
       </div>
-      <div class="d-flex justify-content-between align-items-center" style="gap: 5px;">
-        <span style="white-space: nowrap;">3 <span class="star">★</span></span> <p-progressBar
+      <div class="d-flex justify-content-between align-items-center gap-5">
+        <span class="numbers">3 <span class="star">★</span></span> <p-progressBar
           [value]="overRating?.threeTotal * 100"></p-progressBar> <span class="w-wrap">{{overRating?.threeTotal *
           100 | number: '1.2-2' }} %</span>
       </div>
-      <div class="d-flex justify-content-between align-items-center" style="gap: 5px;">
-        <span style="white-space: nowrap;">2 <span class="star">★</span></span> <p-progressBar
+      <div class="d-flex justify-content-between align-items-center gap-5">
+        <span class="numbers">2 <span class="star">★</span></span> <p-progressBar
           [value]="overRating?.twoTotal * 100"></p-progressBar> <span class="w-wrap">{{overRating?.twoTotal * 100 | number: '1.2-2' }}
           %</span>
       </div>
-      <div class="d-flex justify-content-between align-items-center" style="gap: 5px;">
-        <span style="padding-left: 4px;white-space: nowrap;">1 <span class="star">★</span></span> <p-progressBar
+      <div class="d-flex justify-content-between align-items-center gap-5">
+        <span class="numbers">1 <span class="star">★</span></span> <p-progressBar
           [value]="overRating?.oneTotal * 100"></p-progressBar> <span class="w-wrap"> {{overRating?.oneTotal * 100 | number: '1.2-2' }}
           %</span>
       </div>

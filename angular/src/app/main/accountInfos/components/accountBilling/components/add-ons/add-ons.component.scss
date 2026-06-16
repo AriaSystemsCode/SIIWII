@@ -83,9 +83,15 @@
 
 }
 
-.firstSec {
+// .firstSec {
+//   height: 75vh; 
+//   overflow-y: scroll;
+// }
+@media (min-width: 1025px) {
+  .firstSec {
   height: 75vh; 
   overflow-y: scroll;
+  }
 }
 ::ng-deep {
   .p-datatable {

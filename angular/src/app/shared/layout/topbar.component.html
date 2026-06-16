@@ -9,7 +9,7 @@
       }"
      [style.backgroundColor]="bgCol">
     <!-- Container wrapper -->
-    <div class="container ml-0  position-lg-static " [ngClass]="isArabic ? '':'position-md-absolute'">
+    <div class="container ml-0  position-lg-static " [ngClass]="isArabic ? 'mt-0':'position-md-absolute'">
         <!-- Navbar brand -->
 
         <p-menu #menu [model]="items" [popup]="true"></p-menu>
@@ -43,15 +43,14 @@
 
         <!-- Search form -->
         <form class="input-group pt-3 input-group-form d-lg-block d-none">
-            <div class="position-relative search-bar w-75" [ngClass]="!isHost && !isAuthenticated ? 'addMl' : ''"
+            <div class="position-relative search-bar w-75" [ngClass]="!isHost && !isAuthenticated && !isArabic ? 'addMl' : !isHost && !isAuthenticated && isArabic ? 'addMR': ''"
 
             >
                 <div class="input-group mb-3">
             
                     <input
                         type="text"
-                        class="form-control"
-                        style="background-color: #f3f6f9; height: 39px"
+                        class="form-control globalSearch"
                         [placeholder]="'WhatAreYouLookingFor' | localize"
                         name="globalSearch"                               
                         [(ngModel)]="searchInput"
@@ -65,7 +64,6 @@
                     [ngClass]="isArabic ? 'search-ar':'search-en'"
                 >
                     <img (click)="onSearch($event)"
-                        style="width: 30px; height: 30px"
                         src="../../../assets/landingPage/Iconionic-md-search.png"
                     />
                 </div>
@@ -79,7 +77,7 @@
         </a>
 
         <!-- Collapsible wrapper -->
-        <div class="ml-4 d-sm-flex d-none " style="justify-content: center;margin-left: 35px;"
+        <div class="ml-4 d-sm-flex d-none justify-content-center" style="margin-left: 35px;"
             [ngClass]="isArabic ? 'rt-sec-section':'sec-section'">
             <!-- Left links -->
             <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
@@ -96,7 +94,7 @@
                             class="navbar-brand _navbar-brand m-auto"
                         />
                         <span class="small">{{
-                            "Marketplace" | localize
+                            "MarketPlace" | localize
                             }}</span>
                     </a>
                 </li>
@@ -121,23 +119,21 @@
                 </li>
             </ul>
 
-            <div class="position-relative pt-3 d-flex flex-column ml-4 mr-1" (click)="getShoppingCartInfo(true)"
-                style="cursor: pointer;">
+            <div class="position-relative pt-3 d-flex flex-column ml-4 mr-1 pointer" (click)="getShoppingCartInfo(true)">
                 <span class="kt-header__topbar-icon kt-header__topbar-icon--primary">
                     <img src="../../../assets/shoppingCart/Icon-awesome-shopping-cart.svg"
-                        style="width: 20px; height: 20px; cursor: pointer;" class="m-auto"
+                         class="m-auto wh-20"
                         *ngIf="shoppingCartSummary?.shoppingCartId >0" />
                     <div *ngIf="shoppingCartSummary?.shoppingCartId >0 && shoppingCartSummary?.qty">
-                        <span class="kt-badge kt-badge--primary unread-notification-count" style="
+                        <span class="kt-badge kt-badge--primary unread-notification-count" [ngStyle]="isArabic ? {'left':'10px'} : {'right':'10px'}" style="
                                 top: 5px !important;
-                                right: 10px !important;
                             ">
                             {{ shoppingCartSummary?.qty }}
                         </span>
                     </div>
                 </span>
                 <p *ngIf="shoppingCartSummary?.shoppingCartId >0 && shoppingCartSummary?.qty" class="text-white mb-0"
-                    style="white-space: nowrap;font-size: 10px;">My cart</p>
+                    style="white-space: nowrap;font-size: 10px;">{{'MyCart' | localize}}</p>
             </div>
             <div *ngIf="shoppingCartSummary?.shoppingCartId >0 && shoppingCartSummary?.qty"
                 class="ml-3 mt-2 pt-3 d-lg-block d-none">
@@ -148,20 +144,18 @@
         </div>
 
         <div  *ngIf="isAuthenticated" class=" ml-4 ml-lg-0 navbar-collapse d-sm-block d-none" [ngClass]="isArabic ? 'leftList':'rightList'">
-            <ul class="navbar-nav ms-auto mb-2 mb-lg-0 pt-2 d-sm-flex d-none " style="justify-content: space-around;">
+            <ul class="navbar-nav ms-auto mb-2 mb-lg-0 pt-2 d-sm-flex d-none justify-content-around">
                 <div class="border-left text-white  d-md-block  mt-lg-1 mt-4" style="height: 55px;"></div>
                 <li class="nav-item pl-3 pt-2 mt-lg-0 mt-4">
                     <a class="nav-link active d-flex flex-column text-center" [routerLink]="['/app/main/Messages']"
                         routerLinkActive="header-link-active">
                         <div class="position-relative">
                             <span class="kt-header__topbar-icon kt-header__topbar-icon--primary">
-                                <img src="../../../assets/landingPage/message.png" style="width: 20px; height: 20px"
-                                    class="m-auto" />
+                                <img src="../../../assets/landingPage/message.png"
+                                    class="m-auto wh-20" />
                                 <div *ngIf="unreadMessageCount">
-                                    <span class="kt-badge kt-badge--primary unread-notification-count" style="
-                                            top: 5px !important;
-                                            right: 0px !important;
-                                        ">
+                                    <span class="kt-badge kt-badge--primary unread-notification-count" [ngStyle]="isArabic ? {'left':'0'} : {'right':'0'}" style="
+                                            top: 5px !important;">
                                         {{ unreadMessageCount }}
                                     </span>
                                 </div>
@@ -182,14 +176,14 @@
 
                 <li class="nav-item pl-3 mt-lg-0 mt-4">
                     <a class="nav-link active d-flex flex-column text-center">
-                        <div dropdown class="kt-header__topbar-item dropdown h-100 align-items-center pl-lg-3 pr-lg-3 "
-                            style=" height: 40px; color: white">
+                        <div dropdown class="kt-header__topbar-item dropdown h-100 align-items-center pl-lg-3 pr-lg-3 text-white"
+                            style=" height: 40px;">
                             <div dropdownToggle class="kt-header__topbar-wrapper dropdown-toggle" data-toggle="dropdown"
                                 data-offset="30px,0px" aria-expanded="true" aria-haspopup="true">
                                 <div class="align-items-center d-flex flex-column justify-content-center text-center">
                                     <i *ngIf="isImpersonatedLogin" class="fa fa-reply kt-font-danger mr-2"></i>
-                                    <img class="header-profile-picture m--img-rounded m--marginless m--img-centered rounded-circle"
-                                        style="width: 35px;" alt="Pic" [src]="
+                                    <img class="header-profile-picture m--img-rounded m--marginless m--img-centered rounded-circle w-35"
+                                       alt="Pic" [src]="
                                         profilePicture
                                             ? profilePicture
                                             : 'assets/common/images/default-profile-picture.png'
@@ -224,8 +218,8 @@
                                             <span class="kt-nav__link-icon mr-2">
                                                 <i *ngIf="isImpersonatedLogin"
                                                     class="fa fa-reply kt-font-danger mr-2"></i>
-                                                <img *ngIf="profilePicture" style="width: 35px;"
-                                                    class="header-profile-picture m--img-rounded m--marginless m--img-centered rounded-circle"
+                                                <img *ngIf="profilePicture"
+                                                    class="header-profile-picture m--img-rounded m--marginless m--img-centered rounded-circle w-35"
                                                     alt="Pic" [src]="     profilePicture
                             ? profilePicture
                             : 'assets/common/images/default-profile-picture.png'
@@ -402,7 +396,7 @@
                     [routerLink]="['/app/main/account/login']"
                     >
                     <i class="fas fa-user-circle mr-2"></i>
-                    <span>{{'Login' | localize}}</span>
+                    <span>{{'LogIn' | localize}}</span>
                     </button>
 
             <!-- <button class=" p-2 m-2 mr-4 mt-4 regBtn"      [routerLink]="['/app/main/account/login']">Login</button> -->
@@ -439,12 +433,10 @@
                     <div class="position-relative " (click)="getShoppingCartInfo(true)">
                         <span class="kt-header__topbar-icon kt-header__topbar-icon--primary">
                             <img src="../../../assets/shoppingCart/Icon-awesome-shopping-cart.svg"
-                                style="width: 20px; height: 20px; cursor: pointer;" class="m-auto" />
+                                class="m-auto wh-20" />
                             <div *ngIf="shoppingCartSummary?.shoppingCartId >0 && shoppingCartSummary?.qty">
-                                <span class="kt-badge kt-badge--primary unread-notification-count" style="
-                        top: 5px !important;
-                        right: -15px !important;
-                    ">
+                                <span class="kt-badge kt-badge--primary unread-notification-count" [ngStyle]="isArabic ? {'left':'-15px'} : {'right':'-15px'}" style="
+                        top: 5px !important;">
                                     {{ shoppingCartSummary?.qty }}
                                 </span>
                             </div>
@@ -456,13 +448,11 @@
                         routerLinkActive="header-link-active">
                         <div class="position-relative">
                             <span class="kt-header__topbar-icon kt-header__topbar-icon--primary">
-                                <img src="../../../assets/landingPage/message.png" style="width: 20px; height: 20px"
-                                    class="m-auto" />
+                                <img src="../../../assets/landingPage/message.png"
+                                    class="m-auto wh-20" />
                                 <div *ngIf="unreadMessageCount">
-                                    <span class="kt-badge kt-badge--primary unread-notification-count" style="
-                                            top: 5px !important;
-                                            right: 0px !important;
-                                        ">
+                                    <span class="kt-badge kt-badge--primary unread-notification-count" [ngStyle]="isArabic ? {'left':'0'} : {'right':'0'}" style="
+                                            top: 5px !important;">
                                         {{ unreadMessageCount }}
 
                                     </span>
@@ -540,8 +530,8 @@
             <a class="kt-nav__link">
               <span class="kt-nav__link-icon mr-2">
                 <i *ngIf="isImpersonatedLogin" class="fa fa-reply kt-font-danger mr-2"></i>
-                <img *ngIf="profilePicture" style="width:35px;"
-                     class="header-profile-picture rounded-circle"
+                <img *ngIf="profilePicture"
+                     class="header-profile-picture rounded-circle w-35"
                      [src]="profilePicture" alt="Pic" />
               </span>
               <span class="kt-nav__link-text">

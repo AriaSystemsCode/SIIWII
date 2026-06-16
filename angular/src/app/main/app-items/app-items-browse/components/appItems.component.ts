@@ -111,6 +111,12 @@ sycAttachmentCategoryLogo :SycAttachmentCategoryDto
     sycAttachmentCategoryBanner :SycAttachmentCategoryDto
     sycAttachmentCategoryImage :SycAttachmentCategoryDto
     acceptedAspectRatio:number=0;
+
+    @Input('fromCta') fromCta :boolean = false
+showOverlay :boolean=false
+
+    currentLang:string
+    isArabic:boolean = true
     constructor(
         injector: Injector,
         private _importService: MainImportService,
@@ -181,6 +187,8 @@ sycAttachmentCategoryLogo :SycAttachmentCategoryDto
     }
 
     ngOnInit(): void {
+                    this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
+        this.currentLang == 'ar' || this.currentLang == 'ar-EG'  ? this.isArabic = true : this.isArabic = false
         this.entityHistoryEnabled = this.setIsEntityHistoryEnabled();
         this.getUserPreferenceForListView();
         this.initFilterForm()
@@ -569,11 +577,14 @@ sycAttachmentCategoryLogo :SycAttachmentCategoryDto
         this.eventTriggered.emit({ event:AppItemBrowseEvents.CancelSelection })
     }
     applySelection(){
-        debugger
+        
         this.eventTriggered.emit({ event:AppItemBrowseEvents.ApplySelection })
     }
     onFinishImport($event) {
         if ($event)
             this.reloadPage();
+    }
+    toggleFilterOverlay(){
+        this.showOverlay = !this.showOverlay
     }
 }

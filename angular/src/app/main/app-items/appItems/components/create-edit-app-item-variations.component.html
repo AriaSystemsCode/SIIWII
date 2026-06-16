@@ -1,4 +1,5 @@
-<div [@routerTransition]>
+<div [@routerTransition]
+  [ngStyle]="isArabic ? {'padding-top':'150px !important'} : {'padding-top':'unset'}">
     <form #ProductVariationForm="ngForm" >
         <div class="kt-content kt-grid__item kt-grid__item--fluid kt-grid kt-grid--hor font-weight-normal">
             <div class="kt-subheader kt-grid__item " >

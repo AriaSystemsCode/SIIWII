@@ -1,14 +1,12 @@
 <div class="container-fluid pt-1 mb-3 tab-cont thin-scroll">
     <div class="header p-2 my-3 d-flex  justify-content-between">
         <h6><span class="headertxt"> {{l("ShipFrom")}} : </span></h6>
-        <div>
-            <button (click)="showEditMode()" class="previewbtn text-center btn float-right" *ngIf="canChange">
+            <button (click)="showEditMode()" class="previewbtn text-center btn " *ngIf="canChange">
                 <img src="../../../../../assets/shoppingCart/edit.png" class="imgIcon" />
                 <span class="mx-1 text-white"> {{'Edit' | localize}}</span>
 
 
             </button>
-        </div>
     </div>
     <hr class="my-2" />
     <div class="InfoForm pr-3 thin-scroll">
@@ -44,13 +42,13 @@
     <app-address [appTransactionsForViewDto]="appTransactionsForViewDto" [isCreateOredit]="createOrEditshippingInfO"
         [contactId]="contactIdTo" [selectedAddressDetails]="selectedAddressDetailsTo" [showAddressType]="false"
         [canChange]="canChange" [currentTab]="currentTab"></app-address>
-    <div class="row view-mode mt-2 mb-2">
+    <div class="row view-mode mt-2 mb-2 d-flex gap-10">
         <div class="col-md-6 col-12" *ngIf="appTransactionsForViewDto?.buyerStore">
             <label class="label mt-1 mb-1  w-50">{{l("Store")}}</label>
             <label class="label mt-1 mb-1 w-50">{{appTransactionsForViewDto.buyerStore}}</label>
 
         </div>
-        <div class="col-md-6 col-12" *ngIf="appTransactionsForViewDto?.shipViaCode" style="margin-left: 10px;">
+        <div class="col-md-6 col-12" *ngIf="appTransactionsForViewDto?.shipViaCode" >
             <label class="label mt-1 mb-1 w-50">{{l("ShipVia")}}</label>
             <label class="label mt-1 mb-1 w-50">{{appTransactionsForViewDto?.shipViaName}}</label>
 

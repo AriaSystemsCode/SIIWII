@@ -1,18 +1,57 @@
 .MessageDialog {
-    background: #ffffff 0% 0% no-repeat padding-box;
-    box-shadow: 0px 3px 16px #e1e1ef41;
-    border-radius: 6px 6px 0px 0px;
-    opacity: 1;
-    position: fixed;
-    bottom: 0px;
-    right: 0px;
+  background: #ffffff;
+  box-shadow: 0px 3px 16px #e1e1ef41;
+  border-radius: 6px 6px 0 0;
+  position: fixed;
+  bottom: 0;
+  min-width: 350px;
+  width: 60%;
+  min-height: 150px;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+/* English */
+.MessageDialog:not(.MessageDialog-ar) {
+  right: 0 !important;
+  left: auto !important;
+}
+
+/* Arabic */
+.MessageDialog-ar {
+  left: 22% !important;
+  right: auto !important;
+  direction: rtl;
+  text-align: right;
+}
+
+/* remove/replace this old rule */
+.modal.show .modal-dialog {
+  position: fixed;
+  min-width: 350px;
+    width: 60%;
+  min-height: 150px;
+  bottom: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+/* Arabic header */
+.MessageDialog-ar .Header label {
+  text-align: right;
+}
+
+.MessageDialog-ar .close {
+  float: left;
+  padding-left: 10px;
+  padding-right: 0;
 }
 
 :host ::ng-deep .p-inputtext {
     border: none !important;
   
 }
- ::ng-deep  {
+ ::ng-deep .sendMsgTxt {
     p-autocomplete .p-autocomplete .p-inputtext {
         min-height: 80px !important;
 
@@ -107,14 +146,11 @@ border-radius: 12px;
     border-bottom: 2px solid #e1e1ef41;
     margin-bottom: 2px !important;
 }
-.subject-label {
-    // left: 6px;
-    // position: absolute;
-    // top: 45px;
-}
+
 .modal.show .modal-dialog {
     position: fixed;
-    width: 532px;
+  min-width: 350px;
+    width: 60%;
     min-height: 150px;
     bottom: 0px;
     right: 0px;
@@ -156,13 +192,6 @@ border-radius: 12px;
     cursor: not-allowed !important;
 }
 
-.modal-dialog {
-    /* width: 100%; */
-    width: 300px;
-    position: fixed;
-    bottom: 50%;
-    right: 581px;
-}
 
 .fa-paperclip{
     color: #700066;

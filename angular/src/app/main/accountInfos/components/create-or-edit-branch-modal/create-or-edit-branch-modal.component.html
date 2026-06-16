@@ -1,15 +1,26 @@
-﻿<div bsModal #createOrEditModal="bs-modal" class="modal right fade" tabindex="-1" role="dialog"
-  aria-labelledby="createOrEditModal" aria-hidden="true" [config]="{backdrop: 'static'}">
-  <div class="modal-dialog modal-lg">
+﻿<div
+  bsModal
+  #createOrEditModal="bs-modal"
+  class="modal fade"
+  tabindex="-1"
+  role="dialog"
+  aria-hidden="true"
+  [config]="{ backdrop: 'static' }"
+>
+  <div
+    class="modal-dialog modal-lg side-modal"
+    [ngClass]="isArabic ? 'left-modal' : 'right-modal'"
+    role="document"
+  >
     <div class="modal-content">
       <form *ngIf="active" #branchForm="ngForm" novalidate (ngSubmit)="save()" autocomplete="off">
-        <div class="modal-header" style="display: block;">
+        <div class="modal-header mx-2" style="display: block;">
           <h4 class="modal-title">
             <span *ngIf="branch.id">{{l("EditBranch")}}</span>
             <span *ngIf="!branch.id">{{l("AddnewBranchDetails")}}</span>
           </h4>
           <p>{{l("PleaseFillTheNewBranchDetailsBelow")}}</p>
-          <button style="position: absolute;right: 0;top: 8px;" type="button" class="close" (click)="close()"
+          <button style="position: absolute;top: 8px; width: 70px;" [ngStyle]="isArabic ? {'left':'0'} : {'right':'0'}" type="button" class="close" (click)="close()"
             aria-label="Close" [disabled]="saving">
             <span aria-hidden="true">&times;</span>
           </button>
@@ -17,22 +28,22 @@
         <div class="modal-body">
 
           <div class="row">
-            <div class="col-md-6">
+            <div class="col-md-6 col-12">
               <p class="branch-info">{{l("BranchInformation")}}</p>
             </div>
-            <div class="col-md-6">
+            <div class="col-md-6 col-12">
               <p class="contact-info">{{l("ContactInformation")}}</p>
             </div>
           </div>
           <div class="row align-items-center">
-            <div class="col-md-5">
+            <div class="col-lg-5 col-md-10 col-12">
               <div class="form-group">
                 <label for="branch_Name">{{l("Name")}} *</label>
                 <input type="text" id="branch_Name" class="form-control form-control-sm aria-input-text"
                   [(ngModel)]="branch.name" name="Name" minlength="2" maxlength="150" required />
               </div>
             </div>
-            <div class="col-md-7">
+            <div class="col-lg-7 col-md-10 col-12">
               <div class="row">
                 <div class="col-md-3">
                   <div class="form-group">
@@ -76,7 +87,7 @@
 
           </div>
           <div class="row align-items-center">
-            <div class="col-md-5">
+            <div class="col-lg-5 col-md-10 col-12">
               <div class="form-group">
                 <label for="branch_TradeName">{{l("TradeName")}} *</label>
                 <input type="text" id="branch_TradeName" #tradeNameInput="ngModel"
@@ -85,7 +96,7 @@
                 <validation-messages [formCtrl]="tradeNameInput"></validation-messages>
               </div>
             </div>
-            <div class="col-md-7">
+            <div class="col-lg-7 col-md-10 col-12">
               <div class="row align-items-center">
                 <div class="col-md-3 phone-type mt-4">
                   <div class="form-group m-form__group">
@@ -96,7 +107,7 @@
                   </div>
                 </div>
                 <div class="col-md-9 phone-col-ext mt-4">
-                  <div class="form-group m-form__group d-flex">
+                  <div class="form-group m-form__group d-flex gap-9">
                     <div class="phone-ng2-input-wrapper">
                       <input type="text" ng2TelInput [ng2TelInputOptions]="{initialCountry: 'us'}"
                         [(ngModel)]="branch.phone1Number" name="Phone1Number"
@@ -109,7 +120,7 @@
                           class="text-danger"
                           *ngIf="phone1Number.invalid && phone1Number.errors?.pattern && (phone1Number.dirty || phone1Number.touched)"
                         >
-                          {{ 'Invalid Phone Number' | localize }}
+                          {{ 'InvalidPhoneNumber' | localize }}
                         </small>
                                             </div>
                     <input type="text" id="branch_Phone1Ex"
@@ -126,7 +137,7 @@
             </div>
           </div>
           <div class="row align-items-center">
-            <div class="col-md-5">
+            <div class="col-lg-5 col-md-10 col-12">
               <div class="form-group ">
                 <label for="AppEntityName5">{{l("Language")}}</label>
                 <p-dropdown [options]="allLanguages" styleClass="form-control  aria-select aria-select-modal"
@@ -135,7 +146,7 @@
 
               </div>
             </div>
-            <div class="col-md-7">
+            <div class="col-lg-7 col-md-10 col-12">
               <div class="row align-items-center">
                 <div class="col-md-3 phone-type mt-4">
                   <div class="form-group m-form__group">
@@ -146,7 +157,7 @@
                   </div>
                 </div>
                 <div class="col-md-9 phone-col-ext mt-4">
-                  <div class="form-group m-form__group d-flex">
+                  <div class="form-group m-form__group d-flex gap-9">
                     <div class="phone-ng2-input-wrapper">
                       <input type="text"            class="form-control form-control-sm aria-input-text phone-input phnoeNum" name="Phone2Number"
                         ng2TelInput [ng2TelInputOptions]="{initialCountry: 'us'}"
@@ -158,7 +169,7 @@
                         class="text-danger"
                         *ngIf="phone2Number.invalid && phone2Number.errors?.pattern && (phone2Number.dirty || phone2Number.touched)"
                       >
-                        {{ 'Invalid Phone Number' | localize }}
+                        {{ 'InvalidPhoneNumber' | localize }}
                       </small>
                     </div>
                     <input type="text" id="branch_Phone2Ex"
@@ -174,7 +185,7 @@
             
           </div>
           <div class="row align-items-center">
-            <div class="col-md-5">
+            <div class="col-lg-5 col-md-10 col-12">
               <div class="form-group m-form__group">
                 <label for="AppEntityName4">{{l("Currency")}}</label>
                 <p-dropdown [options]="allCurrencies" styleClass="form-control aria-select aria-select-modal"
@@ -182,7 +193,7 @@
                   [placeholder]="'Please select' | localize"></p-dropdown>
               </div>
             </div>
-            <div class="col-md-7">
+            <div class="col-lg-7 col-md-10 col-12">
               <div class="row align-items-center">
                 <div class="col-md-3 phone-type mt-4">
                   <div class="form-group m-form__group">
@@ -193,7 +204,7 @@
                   </div>
                 </div>
                 <div class="col-md-9 phone-col-ext mt-4">
-                  <div class="form-group m-form__group d-flex">
+                  <div class="form-group m-form__group d-flex gap-9">
                     <div class="phone-ng2-input-wrapper">
                       <input type="text" class="form-control form-control-sm aria-input-text phone-input phnoeNum" ng2TelInput
                         [ng2TelInputOptions]="{initialCountry: 'us'}" name="Phone3Number"
@@ -205,7 +216,7 @@
                         class="text-danger"
                         *ngIf="phone3Number.invalid && phone3Number.errors?.pattern && (phone3Number.dirty || phone3Number.touched)"
                       >
-                        {{ 'Invalid Phone Number' | localize }}
+                        {{ 'InvalidPhoneNumber' | localize }}
                       </small>
                     </div>
                     <input type="text" id="branch_Phone3Ex"

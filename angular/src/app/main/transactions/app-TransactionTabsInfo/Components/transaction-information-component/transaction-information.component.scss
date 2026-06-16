@@ -196,7 +196,7 @@ button[disabled] {
     .p-treetable .p-treetable-thead>tr>th,
     .p-treetable .p-treetable-tbody>tr>td {
         border: 1px solid #E5E5E5 !important;
-        // border-radius: 10px !important;
+        border-radius: 12px !important;
         margin-bottom: 15px !important;
     }
 
@@ -832,6 +832,12 @@ input.ng-invalid.ng-touched {
         max-width: 25%;
         right: 11%;
     }
+
+        .fixScrollSAr {
+        position: fixed;
+        max-width: 25%;
+        left: 12%;
+    }
 }
 
 
@@ -840,6 +846,12 @@ input.ng-invalid.ng-touched {
         position: fixed;
         max-width: 23%;
         right: 15%;
+    }
+
+        .fixScrollSAr {
+        position: fixed;
+        max-width: 23%;
+        left: 15%;
     }
 }
 
@@ -1004,7 +1016,8 @@ input.ng-invalid.ng-touched {
         }
 
         .p-tabview .p-tabview-nav li {
-            margin-right: 17px !important;
+                   margin: 7px 8px !important;
+                width: 80px !important;
         }
 
         .tabPanel-custom {
@@ -1330,8 +1343,8 @@ input:checked+.slider:before {
 }
 
 .btnHgtNoWrap {
-    height: 37px;
-    white-space: nowrap;
+    // height: 37px;
+    // white-space: nowrap;
 }
 
 .cursor-pointer {
@@ -1460,8 +1473,7 @@ height: 48px;
 .actionsSec {
     z-index: 9999;
     position: absolute;
-    right: -33px;
-    top: 33px;
+    top: 20px;
 }
 
 .cartSec {
@@ -1482,4 +1494,15 @@ height: 48px;
 
 .openSpecialPricAr {
     z-index: 99;     height: 43px;left: 40px;top: 4px;
+}
+
+.btnsGap {
+    gap: 4px;
+}
+
+.fs-10{
+    font-size: 10px;
+}
+.dropActions {
+    width: 110px;height: 60px;
 }

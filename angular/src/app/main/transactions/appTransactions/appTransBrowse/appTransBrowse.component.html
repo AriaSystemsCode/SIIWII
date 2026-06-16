@@ -1,7 +1,9 @@
 ﻿<div [@routerTransition]>
-    <div class="kt-content kt-grid__item kt-grid__item--fluid kt-grid kt-grid--hor transPage mt-md-5 transBrow" [ngClass]="{'mt-5':isArabic}" >
+    <div class="kt-content kt-grid__item kt-grid__item--fluid kt-grid kt-grid--hor transPage mt-md-5 transBrow"
+        [ngClass]="{'mt-5':isArabic}">
 
-        <div [class]="containerClass + ' kt-grid__item kt-grid__item--fluid'" [ngClass]="{'mt-lg-5 mt-md-0 mt-5 pt-lg-5 pt-md-0 pt-5':isArabic}">
+        <div [class]="containerClass + ' kt-grid__item kt-grid__item--fluid'"
+            [ngClass]="{'mt-lg-5 mt-md-0 mt-5 pt-lg-5 pt-md-0 pt-5':isArabic}">
             <div class="kt-portlet kt-portlet--mobile">
                 <div class="kt-portlet__body">
                     <form class="kt-form" autocomplete="off" [formGroup]="filterForm">
@@ -11,7 +13,7 @@
                                 <div class="col-12 col-md-3 col-sm-6 list-toolbar-filter mb-0 mb-4 mb-md-0">
                                     <div class="btn-group dropdown list-toolbar-dropdown" dropdown
                                         *ngIf="showMainFiltersOptions">
-                                        <button class="dropdown-toggle btn btn-sm font-weight-normal p-0"
+                                        <button class="dropdown-toggle btn btn-sm font-weight-normal p-0 d-flex"
                                             dropdownToggle>
                                             <h4 class="list-toolbar-dropdown-filter-selectedItem fs-4 fw-bold">
                                                 {{
@@ -27,7 +29,8 @@
                                                     mainFilterCtrl.setValue(
                                                         filter
                                                     );getAppTransactions();getVariationDetail()
-                                                " [ngClass]="{ 'd-block': i < 3 || showHeader, 'd-none': i >= 3 && !showHeader }">
+                                                "
+                                                    [ngClass]="{ 'd-block': i < 3 || showHeader, 'd-none': i >= 3 && !showHeader }">
                                                     <span>
                                                         <i [ngClass]="{
                                                             'visibility-hidden':
@@ -53,341 +56,350 @@
                                         {{ mainFilterCtrl?.value?.displayName | localize }}
                                     </div>
                                 </div>
-                           
+
                             </div>
                             <div class="top-sec">
-                            <div class="row justify-content-between">
-                            <div class="mb-0 col-md-4 col-12 mb-md-0 list-toolbar-search">
-                                    <div class="form-group m-form__group align-items-center">
-                                        <div class="input-group">
-                                            <span class="input-group-btn">
-                                                <button class="searchBtn" type="submit">
-                                                    <img 
-                                                        src="../../../assets/landingPage/Search.png" />
-                                                    </button>
-                                            </span>
-                                            <input    formControlName="search" autoFocus
-                                                class="form-control m-input" [placeholder]="l('SearchWithThreeDot')"
-                                                type="text"     (keydown.enter)="onSearch($event)"
-                                               >
-                                         
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-4"></div>
-                           
-<div class="col-md-4 col-12 d-flex justify-content-md-end justify-content-start">
-                                <div class="text-center mr-2">
-                                    <a [title]="'ResetData' | localize"
-                                        class="btn  font-weight-normal text-center text-primary toolbar-btn pr-1 pl-2"
-                                        (click)="resetList()">
-                                        <i class="d-inline-block w-100 flaticon2-reload icon-center purpleColor"></i>
-                                    </a>
-
-                                </div>
-                                <div class="mb-3 mb-md-0 text-center">
-
-                                    <ng-container *ngIf="showAddButton">
-                                        <div class="btn-group" dropdown>
-                                            <button dropdownToggle type="button"  class="btn  bgPurpleM border-0 w-150 h-48" data-toggle="dropdown"
-                                                aria-haspopup="true" aria-expanded="false">
-                                                {{"CreateNew" | localize}} <i class="fa fa-plus pl-2"></i>
-                                            </button>
-                                            <div class="dropdown-menu dropdown-menu-right dropdown-excel-operations"
-                                                *dropdownMenu>
-                                                <a class="dropdown-item" id="createNewSalesOrder"
-                                                    (click)="createNewSalesOrder()" href="javascript:;">
-                                                    {{'SalesOrder' | localize}}
-                                                </a>
-                                                <a class="dropdown-item" id="createNewSalesOrder"
-                                                    (click)="createNewPurchaseOrder()" href="javascript:;">
-                                                    {{'purchaseOrder' | localize}}
-                                                </a>
-                                            </div>
-                                        </div>
-                                    </ng-container>
-                                </div>
-                            </div>
-                        </div>
-                            <div class="row " [hidden]="!advancedFiltersAreShown"    >
-                                <div class="col-md-12">
-                                    <div class="kt-separator kt-separator--border-dashed"></div>
-                                </div>
-                                 <div [ngClass]="showHeader ? 'd-block' : 'd-none' ">
-
-
-                              
-                                <div class="row w-100 pl-3 pt-3">
-                                    <div class="col-md-3 mr-5">
-                                        <div class="form-group">
-                                            <label for="SellerNameFilter">{{l("SellerName")}}</label>
-                                            <input type="text" class="form-control" id="SellerNameFilter"
-                                                formControlName="sellerNameFilter"
-                                                (keyup)="getAppTransactions()">
-                                        </div>
-                                    </div>
-                                    <div class="col-md-3 mr-5">
-                                        <div class="form-group">
-                                            <label for="BuyerNameFilter">{{l("BuyerName")}}</label>
-                                            <input type="text" class="form-control" id="BuyerNameFilter"
-                                                formControlName="buyerNameFilter" 
-                                                (keyup)="getAppTransactions()">
-                                        </div>
-                                    </div>
-
-
-                                    <div class="col-md-3">
-                                        <div class="form-group">
-                                            <label for="CodeFilter">{{l("Code")}}</label>
-                                            <input type="text" class="form-control" id="CodeFilter"
-                                                formControlName="codeFilter" 
-                                                (keyup)="getAppTransactions()">
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="row w-100 pl-3 pt-3">
-                                    <div class="col-md-3 mr-5">
-                                        <div class="form-group">
-                                            <label for="MinDateFilter">{{l("DateCreateRange")}}</label>
-                                            <div class="input-group">
-                                                <input class="form-control m-input" id="MinCreateDateFilter"
-                                                    formControlName="minCreateDateFilter" type="datetime" bsDatepicker
-                                                    placeholder="{{l('MinValue')}}"
-                                                    (focusout)="getAppTransactions()">
-                                                <span class="spanStyle"> &mdash; </span>
-                                                <input class="form-control m-input" id="MaxCreateDateFilter"
-                                                    formControlName="maxCreateDateFilter" type="datetime" bsDatepicker
-                                                    placeholder="{{l('MaxValue')}}"
-                                                    (focusout)="getAppTransactions()">
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-3">
-                                        <div class="form-group">
-                                            <label for="MinDateFilter">{{l("DateCompleteRange")}}</label>
-                                            <div class="input-group">
-                                                <input class="form-control m-input" id="MinCompleteDateFilter"
-                                                    formControlName="minCompleteDateFilter" type="datetime" bsDatepicker
-                                                    placeholder="{{l('MinValue')}}"
-                                                    (focusout)="getAppTransactions()">
-                                                <span class="spanStyle"> &mdash; </span>
-                                                <input class="form-control m-input" id="MaxCompleteDateFilter"
-                                                    formControlName="maxCompleteDateFilter" type="datetime" bsDatepicker
-                                                    placeholder="{{l('MaxValue')}}" 
-                                                    (focusout)="getAppTransactions()">
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="row w-100 pl-3 pt-3 pb-3">
-                                    <div class="col-md-3">
-                                        <div class="form-group">
-                                            <label for="statusFilter">{{l("Status")}}</label>
-                                            <p-dropdown [options]="filterStatus"
-                                                (onChange)=" getAppTransactions()" placeholder="Any" [showClear]="true"
-                                                appendTo="body" formControlName="statusFilter">
-                                            </p-dropdown>
-                                        </div>
-                                    </div>
-
-                                    
-                                    <div class="col-md-3">
-                                        <div class="form-group">
-                                            <label for="referenceNumberFilter">{{l("ReferenceNumber")}}</label>
-                                            <input type="text" class="form-control" id="referenceNumberFilter"
-                                                formControlName="referenceNumberFilter" 
-                                                (keyup)="getAppTransactions()">
-                                        </div>
-                                    </div>
-                                </div>
-                            </div> 
-
-
-
-                            <div [ngClass]="showDetails ? 'd-block' : 'd-none' ">
-
-
-                              
-                                <div class="row w-100 pl-3 pt-3">
-                                   
-                                    <div class="col-md-3 mr-5">
-                                        <div class="form-group">
-                                            <label for="transactionNumberFilter">{{l("TransactionNumber")}}</label>
-                                            <input type="text" class="form-control" id="transactionNumberFilter"
-                                                formControlName="transactionNumberFilter"
-                                                (keyup)="getVariationDetail()">
-                                        </div>
-                                    </div>
-
-
-                                    <div class="col-md-3">
-                                        <div class="form-group">
-                                            <label for="variationCodeFilter">{{l("VariationCode")}}</label>
+                                <div class="row justify-content-between">
+                                    <div class="mb-0 col-md-4 col-12 mb-md-0 list-toolbar-search">
+                                        <div class="form-group m-form__group align-items-center">
                                             <div class="input-group">
                                                 <span class="input-group-btn">
-                                                    <button  (click)="getVariationDetail()" class="searchBtn" type="submit">
-                                                        <img 
-                                                            src="../../../assets/landingPage/Search.png" />
-                                                        </button>
+                                                    <button class="searchBtn" type="submit">
+                                                        <img src="../../../assets/landingPage/Search.png" />
+                                                    </button>
                                                 </span>
-                                            
-                                                   <input type="text" style="padding-left: 35px;" class="form-control" id="variationCodeFilter"
-                                                   formControlName="variationCodeFilter" 
-                                                   (keydown.enter)="getVariationDetail()">
-                                            </div>
-                                       
-                                        </div>
-                                    </div>
+                                                <input formControlName="search" autoFocus class="form-control m-input"
+                                                    [placeholder]="l('SearchWithThreeDot')" type="text"
+                                                    (keydown.enter)="onSearch($event)">
 
-                                </div>
-
-                                <div class="row w-100 pl-3 pt-3">
-                                    <div class="col-md-3 mr-5">
-                                        <div class="form-group">
-                                            <label for="MinPriceFilter">{{l("PriceRange")}}</label>
-                                            <div class="input-group">
-                                                <input class="form-control m-input" id="minPrice"
-                                                    formControlName="minPrice" type="number" 
-                                                    placeholder="{{l('MinValue')}}" 
-                                                    (focusout)="getVariationDetail()">
-                                                <span class="spanStyle"> &mdash; </span>
-                                                <input class="form-control m-input" id="maxPrice" type="text" 
-                                                    formControlName="maxPrice" 
-                                                    placeholder="{{l('MaxValue')}}" 
-                                                    (focusout)="getVariationDetail()">
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="col-md-3">
-                                        <div class="form-group">
-                                            <label for="MinAmountFilter">{{l("AmountRange")}}</label>
-                                            <div class="input-group">
-                                                <input class="form-control m-input" id="minAmount"
-                                                    formControlName="minAmount" type="text" 
-                                                    placeholder="{{l('MinValue')}}"
-                                                    (focusout)="getVariationDetail()">
-                                                <span class="spanStyle"> &mdash; </span>
-                                                <input class="form-control m-input" id="maxAmount"
-                                                    formControlName="maxAmount" type="text" 
-                                                    placeholder="{{l('MaxValue')}}" 
-                                                    (focusout)="getVariationDetail()">
-                                            </div>
+                                    <div class="col-4"></div>
+
+                                    <div class="col-md-4 col-12 d-flex justify-content-md-end justify-content-start">
+                                        <div class="text-center mr-2">
+                                            <a [title]="'ResetData' | localize"
+                                                class="btn  font-weight-normal text-center text-primary toolbar-btn pr-1 pl-2"
+                                                (click)="resetList()">
+                                                <i
+                                                    class="d-inline-block w-100 flaticon2-reload icon-center purpleColor"></i>
+                                            </a>
+
+                                        </div>
+                                        <div class="mb-3 mb-md-0 text-center">
+
+                                            <ng-container *ngIf="showAddButton">
+                                                <div class="btn-group" dropdown>
+                                                    <button dropdownToggle type="button"
+                                                        class="btn  bgPurpleM border-0 w-150 h-48"
+                                                        data-toggle="dropdown" aria-haspopup="true"
+                                                        aria-expanded="false">
+                                                        {{"CreateNew" | localize}} <i class="fa fa-plus pl-2"></i>
+                                                    </button>
+                                                    <div class="dropdown-menu dropdown-menu-right dropdown-excel-operations"
+                                                        *dropdownMenu>
+                                                        <a class="dropdown-item" id="createNewSalesOrder"
+                                                            (click)="createNewSalesOrder()" href="javascript:;">
+                                                            {{'SalesOrder' | localize}}
+                                                        </a>
+                                                        <a class="dropdown-item" id="createNewSalesOrder"
+                                                            (click)="createNewPurchaseOrder()" href="javascript:;">
+                                                            {{'purchaseOrder' | localize}}
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                            </ng-container>
                                         </div>
                                     </div>
                                 </div>
-
-                       
-                            </div>
-                            </div>
-
-                            <div class="row mb-2 ">
-                                <div class="row col-12 d-flex justify-content-between align-items-center tabsSec">
-                                    <div>
-                                        <button id="monthlybtn" class="mr-2" [ngClass]="{'period-btn': !showHeader, 'selected-month-btn': showHeader}"
-                                        (click)="showDetails = false;showHeader = true;filterText = '';advancedFiltersAreShown = false;initFilterForm();  getAppTransactions() ">
-                                            {{'Header' | localize}}
-                                        </button>
-                                        <button id="yearlybtn" [ngClass]="{'period-btn': showHeader, 'selected-year-btn': !showHeader}"
-                                        (click)="showHeader = false;showDetails = true;filterText = '';advancedFiltersAreShown = false;initFilterForm();  getVariationDetail() ">
-                                            {{'Details' | localize}}
-                                        </button>
-                               
+                                <div class="row " [hidden]="!advancedFiltersAreShown">
+                                    <div class="col-md-12">
+                                        <div class="kt-separator kt-separator--border-dashed"></div>
                                     </div>
-                                    <span class="clickable-item text-muted" *ngIf="!advancedFiltersAreShown"
-                                        (click)="advancedFiltersAreShown=!advancedFiltersAreShown"><i
-                                            class="fa fa-angle-down"></i> {{l("ShowAdvancedFilters")}}</span>
-                                    <span class="clickable-item text-muted" *ngIf="advancedFiltersAreShown"
-                                        (click)="advancedFiltersAreShown=!advancedFiltersAreShown"><i
-                                            class="fa fa-angle-up"></i> {{l("HideAdvancedFilters")}}</span>
+                                    <div [ngClass]="showHeader ? 'd-block' : 'd-none' ">
 
 
-                                            
+
+                                        <div class="row w-100 pl-3 pt-3">
+                                            <div class="col-md-3 mr-5">
+                                                <div class="form-group">
+                                                    <label for="SellerNameFilter">{{l("SellerName")}}</label>
+                                                    <input type="text" class="form-control" id="SellerNameFilter"
+                                                        formControlName="sellerNameFilter"
+                                                        (keyup)="getAppTransactions()">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3 mr-5">
+                                                <div class="form-group">
+                                                    <label for="BuyerNameFilter">{{l("BuyerName")}}</label>
+                                                    <input type="text" class="form-control" id="BuyerNameFilter"
+                                                        formControlName="buyerNameFilter"
+                                                        (keyup)="getAppTransactions()">
+                                                </div>
+                                            </div>
+
+
+                                            <div class="col-md-3">
+                                                <div class="form-group">
+                                                    <label for="CodeFilter">{{l("Code")}}</label>
+                                                    <input type="text" class="form-control" id="CodeFilter"
+                                                        formControlName="codeFilter" (keyup)="getAppTransactions()">
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="row w-100 pl-3 pt-3">
+                                            <div class="col-md-3 mr-5">
+                                                <div class="form-group">
+                                                    <label for="MinDateFilter">{{l("DateCreateRange")}}</label>
+                                                    <div class="input-group">
+                                                        <input class="form-control m-input" id="MinCreateDateFilter"
+                                                            formControlName="minCreateDateFilter" type="datetime"
+                                                            bsDatepicker placeholder="{{l('MinValue')}}"
+                                                            (focusout)="getAppTransactions()">
+                                                        <span class="spanStyle"> &mdash; </span>
+                                                        <input class="form-control m-input" id="MaxCreateDateFilter"
+                                                            formControlName="maxCreateDateFilter" type="datetime"
+                                                            bsDatepicker placeholder="{{l('MaxValue')}}"
+                                                            (focusout)="getAppTransactions()">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="form-group">
+                                                    <label for="MinDateFilter">{{l("DateCompleteRange")}}</label>
+                                                    <div class="input-group">
+                                                        <input class="form-control m-input" id="MinCompleteDateFilter"
+                                                            formControlName="minCompleteDateFilter" type="datetime"
+                                                            bsDatepicker placeholder="{{l('MinValue')}}"
+                                                            (focusout)="getAppTransactions()">
+                                                        <span class="spanStyle"> &mdash; </span>
+                                                        <input class="form-control m-input" id="MaxCompleteDateFilter"
+                                                            formControlName="maxCompleteDateFilter" type="datetime"
+                                                            bsDatepicker placeholder="{{l('MaxValue')}}"
+                                                            (focusout)="getAppTransactions()">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="row w-100 pl-3 pt-3 pb-3">
+                                            <div class="col-md-3">
+                                                <div class="form-group">
+                                                    <label for="statusFilter">{{l("Status")}}</label>
+                                                    <p-dropdown [options]="filterStatus"
+                                                        [ngClass]="!isArabic? 'statusIcon': 'statusIconAr'"
+                                                        (onChange)=" getAppTransactions()"
+                                                        [placeholder]="'Any' | localize" [showClear]="true"
+                                                        appendTo="body" formControlName="statusFilter">
+                                                    </p-dropdown>
+                                                </div>
+                                            </div>
+
+
+                                            <div class="col-md-3">
+                                                <div class="form-group">
+                                                    <label for="referenceNumberFilter">{{l("ReferenceNumber")}}</label>
+                                                    <input type="text" class="form-control" id="referenceNumberFilter"
+                                                        formControlName="referenceNumberFilter"
+                                                        (keyup)="getAppTransactions()">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+
+
+                                    <div [ngClass]="showDetails ? 'd-block' : 'd-none' ">
+
+
+
+                                        <div class="row w-100 pl-3 pt-3">
+
+                                            <div class="col-md-3 mr-5">
+                                                <div class="form-group">
+                                                    <label
+                                                        for="transactionNumberFilter">{{l("TransactionNumber")}}</label>
+                                                    <input type="text" class="form-control" id="transactionNumberFilter"
+                                                        formControlName="transactionNumberFilter"
+                                                        (keyup)="getVariationDetail()">
+                                                </div>
+                                            </div>
+
+
+                                            <div class="col-md-3">
+                                                <div class="form-group">
+                                                    <label for="variationCodeFilter">{{l("VariationCode")}}</label>
+                                                    <div class="input-group">
+                                                        <span class="input-group-btn">
+                                                            <button (click)="getVariationDetail()" class="searchBtn"
+                                                                type="submit">
+                                                                <img src="../../../assets/landingPage/Search.png" />
+                                                            </button>
+                                                        </span>
+
+                                                        <input type="text"
+                                                            [ngStyle]="isArabic ? {'padding-right':'35px'} : {'padding-left':'35px'}"
+                                                            class="form-control" id="variationCodeFilter"
+                                                            formControlName="variationCodeFilter"
+                                                            (keydown.enter)="getVariationDetail()">
+                                                    </div>
+
+                                                </div>
+                                            </div>
+
+                                        </div>
+
+                                        <div class="row w-100 pl-3 pt-3">
+                                            <div class="col-md-3 mr-5">
+                                                <div class="form-group">
+                                                    <label for="MinPriceFilter">{{l("PriceRange")}}</label>
+                                                    <div class="input-group">
+                                                        <input class="form-control m-input" id="minPrice"
+                                                            formControlName="minPrice" type="number"
+                                                            placeholder="{{l('MinValue')}}"
+                                                            (focusout)="getVariationDetail()">
+                                                        <span class="spanStyle"> &mdash; </span>
+                                                        <input class="form-control m-input" id="maxPrice" type="text"
+                                                            formControlName="maxPrice" placeholder="{{l('MaxValue')}}"
+                                                            (focusout)="getVariationDetail()">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="form-group">
+                                                    <label for="MinAmountFilter">{{l("AmountRange")}}</label>
+                                                    <div class="input-group">
+                                                        <input class="form-control m-input" id="minAmount"
+                                                            formControlName="minAmount" type="text"
+                                                            placeholder="{{l('MinValue')}}"
+                                                            (focusout)="getVariationDetail()">
+                                                        <span class="spanStyle"> &mdash; </span>
+                                                        <input class="form-control m-input" id="maxAmount"
+                                                            formControlName="maxAmount" type="text"
+                                                            placeholder="{{l('MaxValue')}}"
+                                                            (focusout)="getVariationDetail()">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+
+                                    </div>
+                                </div>
+
+                                <div class="row mb-2 ">
+                                    <div class="row col-12 d-flex justify-content-between align-items-center tabsSec">
+                                        <div>
+                                            <button id="monthlybtn" class="mr-2"
+                                                [ngClass]="{'period-btn': !showHeader, 'selected-month-btn': showHeader}"
+                                                (click)="showDetails = false;showHeader = true;filterText = '';advancedFiltersAreShown = false;initFilterForm();  getAppTransactions() ">
+                                                {{'Header' | localize}}
+                                            </button>
+                                            <button id="yearlybtn"
+                                                [ngClass]="{'period-btn': showHeader, 'selected-year-btn': !showHeader}"
+                                                (click)="showHeader = false;showDetails = true;filterText = '';advancedFiltersAreShown = false;initFilterForm();  getVariationDetail() ">
+                                                {{'Details' | localize}}
+                                            </button>
+
+                                        </div>
+                                        <span class="clickable-item text-muted" *ngIf="!advancedFiltersAreShown"
+                                            (click)="advancedFiltersAreShown=!advancedFiltersAreShown"><i
+                                                class="fa fa-angle-down"></i> {{l("ShowAdvancedFilters")}}</span>
+                                        <span class="clickable-item text-muted" *ngIf="advancedFiltersAreShown"
+                                            (click)="advancedFiltersAreShown=!advancedFiltersAreShown"><i
+                                                class="fa fa-angle-up"></i> {{l("HideAdvancedFilters")}}</span>
+
+
+
+                                    </div>
                                 </div>
                             </div>
-                        </div>
                         </div>
                     </form>
-                    
 
-                    <div  class="row align-items-center pt-5  mt-4 arrows" [ngClass]="showHeader ? 'd-block' : 'd-none' ">
-                      
-                        <div class="primeng-datatable-container col-12" [busyIf]="primengTableHelper.isLoading"  [ngClass]="isArabic ? 'rtl-autoC' : 'ltr-autoC'">
+
+                    <div class="row align-items-center pt-5  mt-4 arrows"
+                        [ngClass]="showHeader ? 'd-block' : 'd-none' ">
+
+                        <div class="primeng-datatable-container col-12" [busyIf]="primengTableHelper.isLoading"
+                            [ngClass]="isArabic ? 'rtl-autoC' : 'ltr-autoC'">
                             <p-table #dataTable [value]="primengTableHelper.records" [lazy]="true"
                                 (onLazyLoad)="getAppTransactions($event)" [loading]="loading"
                                 rows="{{primengTableHelper.defaultRecordsCountPerPage}}" [paginator]="false"
                                 [scrollable]="true" ScrollWidth="100%" responsiveLayout="stack" [breakpoint]="'960px'"
                                 [tableStyle]="{'min-width': '50rem'}"
-                                [resizableColumns]="primengTableHelper.resizableColumns"
-                                selectionMode="single"     (selectionChange)="onSelectionChange($event)"
-                                >
+                                [resizableColumns]="primengTableHelper.resizableColumns" selectionMode="single"
+                                (selectionChange)="onSelectionChange($event)">
                                 <ng-template pTemplate="header">
                                     <tr>
                                         <th pSortableColumn="sellerCompanyName" class="purpleColor w-150">
                                             {{l('SellerName')}}
-                                            <p-sortIcon class="purpleSortableIcon" field="sellerCompanyName"></p-sortIcon>
-                                 
+                                            <p-sortIcon class="purpleSortableIcon"
+                                                field="sellerCompanyName"></p-sortIcon>
+
                                         </th>
                                         <th pSortableColumn="buyerCompanyName" class="purpleColor w-150">
                                             {{l('BuyerName')}}
-                                            <p-sortIcon class="purpleSortableIcon" field="buyerCompanyName"></p-sortIcon>
-                                   
+                                            <p-sortIcon class="purpleSortableIcon"
+                                                field="buyerCompanyName"></p-sortIcon>
+
                                         </th>
-                                        <th  pSortableColumn="entityObjectTypeCode"
-                                            class="purpleColor w-160">
+                                        <th pSortableColumn="entityObjectTypeCode" class="purpleColor w-160">
                                             {{l('TransactionType')}}
                                             <p-sortIcon class="purpleSortableIcon"
                                                 field="entityObjectTypeCode"></p-sortIcon>
-                                  
+
 
                                         </th>
                                         <th pSortableColumn="code" class="purpleColor w-150">
-                                            {{l('Transaction #')}}
+                                            {{l('Transaction')}}#
                                             <p-sortIcon class="purpleSortableIcon" field="code"></p-sortIcon>
-                               
+
                                         </th>
-                                        <th pSortableColumn="entityObjectStatusCode"
-                                            class="purpleColor  w-150">
+                                        <th pSortableColumn="entityObjectStatusCode" class="purpleColor  w-150">
                                             {{l('Status')}}
                                             <p-sortIcon class="purpleSortableIcon"
                                                 field="entityObjectStatusCode"></p-sortIcon>
-                                    
+
                                         </th>
                                         <th pSortableColumn="creationTime" class="purpleColor w-150">
                                             {{l('DateCreated')}}
                                             <p-sortIcon class="purpleSortableIcon" field="creationTime"></p-sortIcon>
-                                      
+
                                         </th>
                                         <th pSortableColumn="completeDate" class="purpleColor w-150">
                                             {{l('CompleteDate')}}
                                             <p-sortIcon class="purpleSortableIcon" field="completeDate"></p-sortIcon>
-                                
-                                        </th>
-                                        <th pSortableColumn="reference"   class="purpleColor w-150">
-                                            {{l('Reference')}} #
-                                            <p-sortIcon class="purpleSortableIcon"  field="reference"></p-sortIcon>
-                                
-                                        </th>
-                                        <th pSortableColumn="creatorTenantName"  class="purpleColor w-190">
-                                            {{l('CreatorTenantName')}}
-                                            <p-sortIcon class="purpleSortableIcon" field="creatorTenantName"></p-sortIcon>
-                               
-                                        </th>
-                                        
-                                
 
-                                        <th pSortableColumn="totalQuantity"  class="purpleColor w-150 text-end text-nowrap">
+                                        </th>
+                                        <th pSortableColumn="reference" class="purpleColor w-150">
+                                            {{l('Reference')}} #
+                                            <p-sortIcon class="purpleSortableIcon" field="reference"></p-sortIcon>
+
+                                        </th>
+                                        <th pSortableColumn="creatorTenantName" class="purpleColor w-190">
+                                            {{l('CreatorTenantName')}}
+                                            <p-sortIcon class="purpleSortableIcon"
+                                                field="creatorTenantName"></p-sortIcon>
+
+                                        </th>
+
+
+
+                                        <th pSortableColumn="totalQuantity"
+                                            class="purpleColor w-150 text-end text-nowrap">
                                             {{l('TotalQuantity')}}
                                             <p-sortIcon class="purpleSortableIcon" field="totalQuantity"></p-sortIcon>
-                              
+
                                         </th>
-                                        <th pSortableColumn="totalAmount"  class="purpleColor w-150 text-end">
+                                        <th pSortableColumn="totalAmount" class="purpleColor w-150 text-end">
                                             {{l('TotalAmount')}}
                                             <p-sortIcon class="purpleSortableIcon" field="totalAmount"></p-sortIcon>
-                                    
+
                                         </th>
-                                        
+
                                     </tr>
                                 </ng-template>
                                 <ng-template pTemplate="body" let-record="$implicit" let-i="rowIndex">
@@ -410,11 +422,12 @@
                                         <td class="w-160">
                                             <span class="p-column-title"> {{l('TransactionType')}}</span>
                                             <span *ngIf="record.entityObjectTypeCode">
-                                                {{record?.entityObjectTypeCode == 'SALESORDER' ? 'SalesOrder' : 'PurchaseOrder' | localize}}
+                                                {{ (record?.entityObjectTypeCode === 'SALESORDER' ? 'SalesOrder' :
+                                                'purchaseOrder') | localize }}
                                             </span>
                                         </td>
                                         <td class="w-150">
-                                            <span class="p-column-title"> {{l('Transaction #')}}</span>
+                                            <span class="p-column-title"> {{l('Transaction')}}#</span>
                                             <span *ngIf="record.code">
                                                 {{record.code}}
                                             </span>
@@ -422,7 +435,8 @@
                                         <td class="w-150">
                                             <span class="p-column-title"> {{l('Status')}}</span>
                                             <span *ngIf="record.entityObjectStatusCode">
-                                                {{record.entityObjectStatusCode}}
+
+                                                {{record.entityObjectStatusCode | localize}}
                                             </span>
                                         </td>
                                         <td class="w-150">
@@ -441,27 +455,27 @@
                                         </td>
                                         <td class="w-150">
                                             <span class="p-column-title"> {{l('Reference #')}}</span>
-                                            <span >
+                                            <span>
                                                 {{record.reference }}
                                             </span>
                                             <span *ngIf="!record.reference">-</span>
                                         </td>
                                         <td class="w-190">
                                             <span class="p-column-title text-nowrap"> {{l('CreatorTenantName')}}</span>
-                                            <span >
+                                            <span>
                                                 {{record.creatorTenantName }}
                                             </span>
-                                       
+
                                         </td>
                                         <td class="w-150 text-end">
                                             <span class="p-column-title text-end"> {{l('TotalQuantity')}}</span>
-                                            <span >
-                                                {{record.totalQuantity  }}
+                                            <span>
+                                                {{record.totalQuantity }}
                                             </span>
                                         </td>
                                         <td class="w-150 text-end">
-                                            <span class="p-column-title text-end" > {{l('TotalAmount' )}}</span>
-                                            <span >
+                                            <span class="p-column-title text-end"> {{l('TotalAmount' )}}</span>
+                                            <span>
                                                 {{record.totalAmount | number: '1.2-2' }}
                                             </span>
                                         </td>
@@ -469,10 +483,10 @@
 
                                 </ng-template>
                             </p-table>
-                            <div class="primeng-no-data" *ngIf="primengTableHelper.totalRecordsCount == 0"  >
+                            <div class="primeng-no-data" *ngIf="primengTableHelper.totalRecordsCount == 0">
                                 {{l('NoData')}}
                             </div>
-                            <div class="primeng-paging-container" >
+                            <div class="primeng-paging-container">
                                 <p-paginator [rows]="primengTableHelper.defaultRecordsCountPerPage" #paginator
                                     (onPageChange)="getAppTransactions($event)"
                                     [totalRecords]="primengTableHelper.totalRecordsCount"
@@ -484,86 +498,78 @@
                             </div>
                         </div>
                         <!--<Primeng-Datatable-End>-->
-                    </div>   
-               
-                    <div class="row align-items-center pt-5 mt-4 detailTab" [ngClass]="showDetails ? 'd-block' : 'd-none'">
-                        <p-table
-                          #dataDetailTable
-                        [value]="variationDetails"
-                        [paginator]="false"
-                        [lazy]="true"
-                        (onLazyLoad)="getVariationDetail($event)"
-                        (onSort)="onSort($event)"
-                        [rows]="rowsPerPage"
-                        [totalRecords]="totalRecords">
+                    </div>
+
+                    <div class="row align-items-center pt-5 mt-4 detailTab"
+                        [ngClass]="showDetails ? 'd-block' : 'd-none'">
+                        <p-table #dataDetailTable [value]="variationDetails" [paginator]="false" [lazy]="true"
+                            (onLazyLoad)="getVariationDetail($event)" (onSort)="onSort($event)" [rows]="rowsPerPage"
+                            [totalRecords]="totalRecords">
                             <ng-template pTemplate="header">
                                 <tr>
-                                    <th pSortableColumn="transactionType"   [ngClass]="isTypeReset ? 'Reset':''">{{l('TransactionType')}}      <p-sortIcon   *ngIf="sortField != 'transactionType'" class="purpleSortableIcon" field="transactionType"></p-sortIcon>
-                                        <i
-                                        *ngIf="sortField === 'transactionType'"
-                                        class="pi pi-times"
-                                        (click)="resetSort($event,'transactionType')"
-                                        title="Clear sorting"
-                                      ></i></th>
-                                    <th >{{l('Transaction #')}}</th>
+                                    <th pSortableColumn="transactionType" [ngClass]="isTypeReset ? 'Reset':''">
+                                        {{l('TransactionType')}} <p-sortIcon *ngIf="sortField != 'transactionType'"
+                                            class="purpleSortableIcon" field="transactionType"></p-sortIcon>
+                                        <i *ngIf="sortField === 'transactionType'" class="pi pi-times"
+                                            (click)="resetSort($event,'transactionType')" title="Clear sorting"></i>
+                                    </th>
+                                    <th>{{l('Transaction #')}}</th>
                                     <th>{{'Image' | localize}}</th>
                                     <th>{{'VariationCode' | localize}}</th>
                                     <th>{{'Name' | localize}}</th>
-                                    <th  class="text-end">{{'Qty' | localize}}.</th>
-                                    <th  pSortableColumn="price" class="text-end"  [ngClass]="isReset ? 'Reset':''">{{'Price' | localize}} 
-                                        <p-sortIcon    *ngIf="sortField != 'price'" class="purpleSortableIcon" field="price"></p-sortIcon>
-                                        <i
-                    *ngIf="sortField === 'price'"
-                    class="pi pi-times"
-                    (click)="resetSort($event,'price')"
-                    title="Clear sorting"
-                  ></i>
+                                    <th class="text-end">{{'Qty' | localize}}.</th>
+                                    <th pSortableColumn="price" class="text-end" [ngClass]="isReset ? 'Reset':''">
+                                        {{'Price' | localize}}
+                                        <p-sortIcon *ngIf="sortField != 'price'" class="purpleSortableIcon"
+                                            field="price"></p-sortIcon>
+                                        <i *ngIf="sortField === 'price'" class="pi pi-times"
+                                            (click)="resetSort($event,'price')" title="Clear sorting"></i>
                                     </th>
-                                    <th pSortableColumn="amount" class="text-end" [ngClass]="isAmountReset ? 'Reset':''">{{'Amount' | localize}} 
-                                        <p-sortIcon   *ngIf="sortField != 'amount'" class="purpleSortableIcon" field="amount"></p-sortIcon>
-                                        <i
-                                        *ngIf="sortField === 'amount'"
-                                        class="pi pi-times"
-                                        (click)="resetSort($event,'amount')"
-                                        title="Clear sorting"
-                                      ></i>
+                                    <th pSortableColumn="amount" class="text-end"
+                                        [ngClass]="isAmountReset ? 'Reset':''">{{'Amount' | localize}}
+                                        <p-sortIcon *ngIf="sortField != 'amount'" class="purpleSortableIcon"
+                                            field="amount"></p-sortIcon>
+                                        <i *ngIf="sortField === 'amount'" class="pi pi-times"
+                                            (click)="resetSort($event,'amount')" title="Clear sorting"></i>
                                     </th>
                                 </tr>
                             </ng-template>
                             <ng-template pTemplate="body" let-product>
-                                <tr >
-                                    <td>{{ product?.transactionType == 0 ?   'SalesOrder'  : 'PurchaseOrder' | localize}}</td>
+                                <tr>
+                                    <td> {{ product?.transactionType == 0 ? l('SalesOrder') : l('PurchaseOrder') }}</td>
                                     <td>{{ product.transactionNumber }}</td>
-                                    <td><img [src]="attachmentBaseUrl + '/' + product.image" alt="Product Image" class="itemImg" onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'"></td>
-                                    <td> <span style="white-space: pre-wrap">{{ product.manufacturerCode }}</span></td>
+                                    <td><img [src]="attachmentBaseUrl + '/' + product.image" alt="Product Image"
+                                            class="itemImg"
+                                            onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'">
+                                    </td>
+                                    <td> <span>{{ product.manufacturerCode }}</span></td>
                                     <td>{{ product.name }}</td>
-                                    <td class="text-end">{{ product.qty  }}</td>
-                                    <td class="text-end">{{ product.price | number: '1.2-2'  }}</td>
-                                    <td class="text-end">{{ product.amount | number: '1.2-2'  }}</td>
+                                    <td class="text-end">{{ product.qty }}</td>
+                                    <td class="text-end">{{ product.price | number: '1.2-2' }}</td>
+                                    <td class="text-end">{{ product.amount | number: '1.2-2' }}</td>
                                 </tr>
                             </ng-template>
                         </p-table>
-                    
+
                         <!-- No Data Message -->
                         <div class="primeng-no-data p-3 text-center" *ngIf="!loading && totalRecords === 0">
                             {{ l('NoData') }}
                         </div>
-                    
+
                         <!-- Paginator -->
                         <div class="primeng-paging-container">
-                            <p-paginator [rows]="rowsPerPage"
-                                         [totalRecords]="totalRecords"
-                                         (onPageChange)="getVariationDetail($event)"
-                                         [rowsPerPageOptions]="[10, 20,25, 50,100,250,500]">
+                            <p-paginator [rows]="rowsPerPage" [totalRecords]="totalRecords"
+                                (onPageChange)="getVariationDetail($event)"
+                                [rowsPerPageOptions]="[10, 20,25, 50,100,250,500]">
                             </p-paginator>
                             <span class="total-records-count">
                                 {{ l('TotalRecordsCount', totalRecords) }}
                             </span>
                         </div>
                     </div>
-                    
+
                     <div>
-                        
+
 
                     </div>
                 </div>
@@ -575,5 +581,5 @@
 <createTransactionModal (modalClose)="closeModal($event)" [roles]="roles" [modalheaderName]="modalheaderName"
     [formType]="formType" [orderNo]="orderNo" [fullName]="fullName" [display]="display"></createTransactionModal>
 
-    <app-transaction-information #shoppingCartModal  (hideShoppingCartModal)="onHideShoppingCartModal($event)"></app-transaction-information>
-
+<app-transaction-information #shoppingCartModal
+    (hideShoppingCartModal)="onHideShoppingCartModal($event)"></app-transaction-information>

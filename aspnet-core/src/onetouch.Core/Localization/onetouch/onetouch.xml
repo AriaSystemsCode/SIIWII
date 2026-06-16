@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" ?>
+﻿<?xml version="1.0" encoding="utf-8" ?>
 <localizationDictionary culture="en">
 	<texts>
 	<text name="Signature">Signature</text>
@@ -1711,7 +1711,7 @@
 		<text name="EntityId">Entity Id</text>
 		<text name="SelfUserDelegationErrorMessage">You can't delegate authorization to yourself !</text>
 		<text name="Compose"></text>
-		<text name="Sent items">Sent Items"</text>
+		<text name="Sent items">Sent Items</text>
 		<text name="Favourite">Favourite</text>
 		<text name="Archive">Archive</text>
 		<text name="Trash">Trash</text>
@@ -2568,7 +2568,9 @@
 	    <text name="DateCreated">Date Created</text>
 	    <text name="MyTransactions">My Transactions</text>
 	    <text name="SalesOrder">Sales Order</text>
-	    <text name="purchaseOrder">purchase Order</text>
+	    <text name="Sales Order">Sales Order</text>
+	    <text name="purchaseOrder">Purchase Order</text>
+	    <text name="Purchase Order">Purchase Order</text>
 	
 
 		<text name="DetailsPage">Details Page</text>
@@ -2869,6 +2871,71 @@
   <text name="PurchaseAdd-Ons">Purchase Add-Ons</text>
 
 
+  <text name="Sync">Sync</text>
+  <text name="ForMoreInquiriesCustomPricing">For More Inquiries and Custom Pricing , Please email</text>
+  <text name="Selected">Selected</text>
+
+  
+  <text name="Added">Added</text>
+  <text name="OPEN">Open</text>
+  <text name="My Connections">My Connections</text>
+  <text name="My Transaction">My Transaction</text>
+  <text name="BeforeSavingManualAccountMsg">Before saving, please select the relationship you would like to build with this manual account</text>
+  <text name="SaveManualAccount">Save Manual Account</text>
+  <text name="SentItems">Sent Items</text>
+  <text name="Favorite">Favorite</text>
+  <text name="DirectMessage">Direct Message</text>
+  <text name="RelatedData">RelatedData</text>
+  <text name="SearchMessages">Search messages</text>
+<text name="DirectMessageIn">Direct Message in</text>
+<text name="ThreadIn">Thread in</text>
+<text name="MentionIn">Mention in</text>
+<text name="SeeLess">See Less</text>
+
+
+<text name="PriceLowToHigh">Price Low To High</text>
+<text name="PriceHighToLow">Price High To Low</text>
+
+<text name="PublicAndSharedWithMe">Public And Shared With Me</text>
+
+
+
+
+<text name="Show details">Show details</text>
+<text name="Hide details">Hide details</text>
+<text name="Created">Created</text>
+<text name="TypeYourNotesHere">Type Your Notes Here</text>
+<text name="Any">Any</text>
+<text name="Color">Color</text>
+<text name="select color">select color</text>
+<text name="select size">select size</text>
+<text name="NoAddressesFound">No Addresses Found</text>
+
+<text name="ShowFilters">Show Filters</text>
+<text name="HideFilters">Hide Filters</text>
+<text name="ProductList">Product List</text>
+<text name="Brands">Brands</text>
+<text name="AddyourQuestion">Add your Question</text>
+<text name="AddYourReview">Add Your Review</text>
+<text name="Threads">Threads</text>
+<text name="Mentions">Mentions</text>
+<text name="AddToFavourite">Add To Favourite</text>
+<text name="RemoveFromFavourite">Remove From Favourite</text>
+<text name="HideData">Hide Data</text>
+
+<text name="Mandatory">Mandatory</text>
+<text name="MyCart">My Cart</text>
+<text name="AccountLogin">Account Login</text>
+<text name="EnterYourPassword">Enter Your Password</text>
+<text name="Or">Or</text>
+
+
+<text name="MaxLength250">Maximum length is 250 characters</text>
+
+
+
+<text name="Product">Product</text>
+<text name="Block">Block</text>
 
 	
   </texts>  

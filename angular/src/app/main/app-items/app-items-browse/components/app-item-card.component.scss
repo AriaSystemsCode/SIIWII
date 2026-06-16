@@ -12,8 +12,9 @@ $default-font-weight : 400;
     }
 }
 .single-item {
+     border-radius: 11px;
+    border: 2px solid #EDEDED !important;
     min-width: 0;
-    border: 1px solid #EDEDED !important;
     margin: 5px;
     background-color: #FFFFFF;
     height: 98% !important;
@@ -76,7 +77,8 @@ a.btn {
     }
 }
 .product-name {
-    font-weight: $default-font-weight + 300
+    font-weight: $default-font-weight + 300;
+    color: #9E9E9E;line-height: 21px;
 }
 
 .brand-name {
@@ -105,7 +107,6 @@ a.btn {
 .actions-menu {
     position: absolute;
     top: 3px;
-    right: 3px;
     border: 1px solid white;
     border-radius: 5px;
    background-color: white;
@@ -152,4 +153,13 @@ a.btn {
         width: 10px;
         padding-top: 3px;
     }
+}
+
+
+.price {
+    font-weight: bold; font-size: small;
+}
+
+h4{
+    white-space: nowrap;font-size: 14px !important;
 }

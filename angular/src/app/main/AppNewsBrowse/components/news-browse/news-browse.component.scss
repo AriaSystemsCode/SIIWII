@@ -132,12 +132,6 @@ border-radius: 10px;
   
   }
 
-  .mrAr {
-    // margin-top: -40px;
-  }
-  .mrEn{
-    // margin-top: -90px;
-  }
   
   ::ng-deep  {
     @media only screen and (min-width: 575px) and (max-width: 1024x) {
@@ -173,3 +167,7 @@ border-radius: 12px;
 
 }
       
+
+.filterBtn{
+    border: 1px solid #EEEEEE;
+}

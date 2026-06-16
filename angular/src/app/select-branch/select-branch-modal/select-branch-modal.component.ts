@@ -28,12 +28,19 @@ export class SelectBranchModalComponent extends AppComponentBase {
     isCheckedBranch = 0;
     busy=true;
     loading=false
+
+                currentLang:string
+    isArabic:boolean = true
     constructor(injector: Injector,private _accountsServiceProxy: AccountsServiceProxy,
 )  {
         super(injector);
         this.busy=true;
     }
 
+            ngOnInit(){
+                this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
+        this.currentLang == 'ar' || this.currentLang == 'ar-EG'  ? this.isArabic = true : this.isArabic = false
+    }
     show(branchs:TreeNodeOfBranchForViewDto[]): void {
         if (branchs !=undefined && branchs.length >0) {
             this.branchId = branchs[0].data.branch.id

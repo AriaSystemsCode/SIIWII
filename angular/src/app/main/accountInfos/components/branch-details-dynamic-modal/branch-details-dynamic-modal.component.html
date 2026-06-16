@@ -1,10 +1,15 @@
 
-<div class="modal-content-wrapper"  >
+<div
+  class="modal-content-wrapper"
+  [ngClass]="{ 'rtl-layout': isArabic }">
     <div class="modal-header">
         <h3 class="modal-title" >
             <span>{{branchName}} {{l("Branch Details")}}</span>
         </h3>
-        <button style="position: absolute;right: 0;top: 8px;" type="button" class="close" (click)="close()" aria-label="Close" >
+  <button
+  type="button"
+  class="close modal-close-btn"
+  (click)="close()">
             <span aria-hidden="true">&times;</span>
         </button>
     </div>

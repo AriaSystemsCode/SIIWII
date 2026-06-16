@@ -2,57 +2,30 @@ import {
     Component,
     Injector,
     ViewChild,
-    AfterViewInit,
     Input,
     Output,
     EventEmitter,
     OnInit,
-    ElementRef,
     SimpleChanges,
-    ChangeDetectorRef,
 } from "@angular/core";
 import {
-    CreateOrEditAccountInfoDto,
-    AccountInfoAppEntityLookupTableDto,
     AppEntitiesServiceProxy,
-    LookupLabelDto,
-    AppEntityClassificationDto,
-    AppEntityCategoryDto,
-    SycAttachmentCategoriesServiceProxy,
-    SycAttachmentCategorySycAttachmentCategoryLookupTableDto,
-    GetSycAttachmentCategoryForViewDto,
     AppEntityAttachmentDto,
-    BranchDto,
-    TreeNodeOfBranchForViewDto,
-    AppContactAddressDto,
     MesasgeObjectType,
 } from "@shared/service-proxies/service-proxies";
 
 import { appModuleAnimation } from "@shared/animations/routerTransition";
 import { AppComponentBase } from "@shared/common/app-component-base";
 import {
-    SycEntityObjectClassificationsServiceProxy,
     MessageServiceProxy,
-    MessagesDto,
-    GetMessagesForViewDto,
     CreateMessageInput,
     NameValueOfString,
-    GetUsersForMessageDto,
 } from "@shared/service-proxies/service-proxies";
-import { FileUploader, FileUploaderOptions, FileItem } from "ng2-file-upload";
-import { IAjaxResponse, TokenService } from "abp-ng2-module";
-
-import { Table } from "primeng/table";
-import { Paginator } from "primeng/paginator";
-import { LazyLoadEvent } from "primeng/api";
-import { forEach, isNull, isEmpty } from "lodash";
-import { timeStamp } from "console";
+import { FileUploader} from "ng2-file-upload";
+import {  isEmpty } from "lodash";
 import { ModalDirective } from "ngx-bootstrap/modal";
-import { SelectItem } from "primeng/api";
 import { finalize } from "rxjs/operators";
 import { DemoUiEditorComponent } from "@app/admin/demo-ui-components/demo-ui-editor.component";
-import { empty } from "rxjs";
-import { AppConsts } from "@shared/AppConsts";
 import * as moment from "moment";
 import { FileUploaderCustom } from "@shared/components/import-steps/models/FileUploaderCustom.model";
 
@@ -66,10 +39,8 @@ export class SendMessageModalComponent
     extends AppComponentBase
     implements OnInit
 {
-    @ViewChild("SendMessageModal", { static: false })
-    SendMessageModal: ModalDirective;
-    @ViewChild("demoUiEditor", { static: true })
-    demoUiEditor: DemoUiEditorComponent;
+    @ViewChild("SendMessageModal", { static: false })SendMessageModal: ModalDirective;
+    @ViewChild("demoUiEditor", { static: true })demoUiEditor: DemoUiEditorComponent;
     public uploader: FileUploader;
     @Output() modalSave: EventEmitter<any> = new EventEmitter<any>();
     @Output() refresh: EventEmitter<boolean> = new EventEmitter<boolean>();
@@ -94,19 +65,22 @@ export class SendMessageModalComponent
     threadId: number = 0;
     attachmentsUploader: FileUploaderCustom;
 
+    
+  currentLang:string
+  isArabic:boolean
+
     constructor(
         injector: Injector,
-        private _tokenService: TokenService,
         private _MessageServiceProxy: MessageServiceProxy,
         private _appEntitiesServiceProxy: AppEntitiesServiceProxy,
-        private cdr: ChangeDetectorRef
 
     ) {
         super(injector);
     }
 
     ngOnInit(): void {
-        // const toNameArray: string[] = this.toName.split(',').map((name) => name.trim());
+       this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
+        this.currentLang == 'ar' || this.currentLang == 'ar-EG'  ? this.isArabic = true : this.isArabic = false
         this.filterUsersFilterByEntity('')
     }
     ngOnChanges(changes: SimpleChanges): void {
@@ -244,10 +218,6 @@ export class SendMessageModalComponent
                             result[i].messages.senderName +
                             "<br>" +
                             "Date: " +
-                            /*  moment(
-                                result[i].messages.sendDate,
-                                "YYYY-MM-DD HH:mm"
-                            ).toString() + */
                             moment(result[i].messages.sendDate).format(
                                 "ddd, MMM D, YYYY  HH:mm A"
                             ) +
@@ -259,17 +229,7 @@ export class SendMessageModalComponent
                             "To: " +
                             result[i].messages.toName +
                             "<br>";
-                        if (!isEmpty(result[i].messages.cc)) {
-                            // this._MessageServiceProxy
-                            //     .getUsersNamesByID(result[i].messages.cc)
-                            //     .subscribe((result2) => {
-                            //         this.htmlEditorInput =
-                            //             this.htmlEditorInput +
-                            //             "Cc: " +
-                            //             result2 +
-                            //             "<br>";
-                            //     });
-                        }
+                    
                         this.htmlEditorInput =
                             this.htmlEditorInput +
                             "<br>" +
@@ -319,55 +279,7 @@ export class SendMessageModalComponent
         newExpression = newExpression.slice(0, -1);
         return newExpression;
     }
-    // addUserId(expression:string, userId:string){
-    //     expression= ',' + expression;
-    //     expression= expression + ',';
-
-    //     userId= ',' + userId;
-    //     userId= userId + ',';
-
-    //     expression.replace(oldId,newId)
-
-    //     return expression;
-    // }
-
-   /*  initUploaders(): void {
-        this.uploader = this.createUploader(
-            "/Attachment/UploadFiles",
-            (result) => {
-                // this.appSession.tenant.logoFileType = result.fileType;
-                // this.appSession.tenant.logoId = result.id;
-            }
-        );
-    } */
-  /*   createUploader(url: string, success?: (result: any) => void): FileUploader {
-        const uploader = new FileUploader({
-            url: AppConsts.remoteServiceBaseUrl + url,
-        });
-
-        uploader.onAfterAddingFile = (file) => {
-            file.withCredentials = false;
-        };
-
-        uploader.onSuccessItem = (item, response, status) => {
-            const ajaxResponse = <IAjaxResponse>JSON.parse(response);
-            if (ajaxResponse.success) {
-                this.notify.info(this.l("UploadSuccessfully"));
-                if (success) {
-                    success(ajaxResponse.result);
-                }
-            } else {
-                this.message.error(ajaxResponse.error.message);
-            }
-        };
-
-        const uploaderOptions: Partial<FileUploaderOptions> = {};
-        uploaderOptions.authToken = "Bearer " + this._tokenService.getToken();
-        uploaderOptions.removeAfterUpload = true;
-        uploader.setOptions(uploaderOptions as FileUploaderOptions);
-        return uploader;
-    } */
-
+ 
     close(): void {
         this.SendMessageModal.hide();
         this.active = false;
@@ -382,60 +294,7 @@ export class SendMessageModalComponent
     showBCC(): void {
         this.displayBCC = true;
     }
-    // guid(): string {
-    //     function s4() {
-    //         return Math.floor((1 + Math.random()) * 0x10000)
-    //             .toString(16)
-    //             .substring(1);
-    //     }
-    //     return (
-    //         s4() +
-    //         s4() +
-    //         "-" +
-    //         s4() +
-    //         "-" +
-    //         s4() +
-    //         "-" +
-    //         s4() +
-    //         "-" +
-    //         s4() +
-    //         s4() +
-    //         s4()
-    //     );
-    // }
-    // handleInputChangeAttachment(e) {
-    //     if (e.target.files.length === 0) return;
-    //     var file = e.dataTransfer ? e.dataTransfer.files[0] : e.target.files[0];
-    //     this.attachments.push(e.target.files[0]);
-    //     this.uploader.addToQueue(e.target.files);
 
-    //     let guid = this.guid();
-    //     this.uploader.onBuildItemForm = (fileItem: any, form: any) => {
-    //         form.append("guid", guid);
-    //     };
-
-    //     this.uploader.uploadAll();
-
-    //     var pattern = /image-*/;
-    //     var reader = new FileReader();
-    //     // if (!file.type.match(pattern)) {
-    //     //   alert('invalid format');
-    //     //   return;
-    //     // }
-    //     reader.onload = this._handleReaderLoadedAttachment.bind(this);
-    //     reader.readAsDataURL(file);
-    //     let att: AppEntityAttachmentDto = new AppEntityAttachmentDto();
-    //     att.fileName = e.target.files[0].name;
-    //     att.attachmentCategoryId = 4;
-    //     att.guid = guid;
-    //     if (
-    //         this.messages.entityAttachments == null ||
-    //         this.messages.entityAttachments == undefined
-    //     ) {
-    //         this.messages.entityAttachments = [];
-    //     }
-    //     this.messages.entityAttachments.push(att);
-    // }
     handleInputChangeAttachment(e) {
         if (e.target.files.length === 0) return;
         for (let i = 0; i < e.target.files.length; i++) {
@@ -445,12 +304,6 @@ export class SendMessageModalComponent
 }
 
 
-
-    _handleReaderLoadedAttachment(e) {
-        let reader = e.target;
-        // this.imageFeaturedImageSrc = reader.result;
-        // this.featuredImageControl.setValue(this.imageFeaturedImageSrc)
-    }
     onUploadAttachmets(){
             var uploadUrl = "/Attachment/UploadFiles";
             this.attachmentsUploader = this.createCustomUploader(uploadUrl);
@@ -522,8 +375,6 @@ export class SendMessageModalComponent
         this.messages.threadId = !this.modalView?this.entityId:this.threadId;
         this.messages.relatedEntityId =!this.modalView?this.entityId: undefined;
         this.messages.mesasgeObjectType = MesasgeObjectType.Message
-        //this.Messages.entityAttachments=[];
-        // this.Messages.entityAttachments=this.attachments
         this.saving = true;
         this._MessageServiceProxy
             .createMessage(this.messages)
@@ -600,8 +451,6 @@ export class SendMessageModalComponent
                                 toNameArray.some((name) => user.name.startsWith(name)) // Match name before '@'
 
                             );
-
-
                             this._MessageServiceProxy
                             .getMessagesForView(this.parentId)
                             .subscribe((result) => {
@@ -610,11 +459,6 @@ export class SendMessageModalComponent
                             });
                         }
                    
-            
-                        // Debugging logs
-                        // console.log('Filtered Users:', this.filteredUsers);
-                        // console.log('toNameArray:', toNameArray);
-                        // console.log('Default toUsers:', this.toUsers);
                     });
             }
 }

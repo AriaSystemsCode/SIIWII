@@ -1,4 +1,4 @@
-﻿import { Component, Injector, ViewEncapsulation, ViewChild } from '@angular/core';
+﻿import { Component, Injector, ViewEncapsulation, ViewChild, Input } from '@angular/core';
 import { Router } from '@angular/router';
 import { AppTenantActivitiesLogServiceProxy, AppTenantActivityLogDto } from '@shared/service-proxies/service-proxies';
 import { AppComponentBase } from '@shared/common/app-component-base';
@@ -22,7 +22,7 @@ import { DateType } from 'devextreme/ui/date_box';
     styles: [`
         .searchBtn {
     background: #4A0D4A !important;
-    margin-top: 3px !important;color:#595959;
+    margin-top: 0px !important;color:#595959;
 }
     `]
 })
@@ -32,7 +32,7 @@ export class AppTenantActivitiesLogComponent extends AppComponentBase {
     @ViewChild('entityTypeHistoryModal', { static: true }) entityTypeHistoryModal: EntityTypeHistoryModalComponent;
     @ViewChild('dataTable', { static: true }) dataTable: Table;
     @ViewChild('paginator', { static: true }) paginator: Paginator;
-
+@Input('fromBilling') fromBilling: boolean = false
     advancedFiltersAreShown = false;
     filterText = '';
     maxTenantIdFilterEmpty: number;

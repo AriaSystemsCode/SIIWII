@@ -89,8 +89,8 @@
       (isContactsValid_2)="isContactFormValid($event,2)">
     </app-view-shipping-information>
   </div>
-  <div *ngIf="showSaveBtn " class="d-flex justify-content-end pr-3">
-    <button *ngIf="showSaveBtn" (click)="cancel()" class="cancelbtn text-center btn float-right">
+  <div *ngIf="showSaveBtn " class="d-flex justify-content-end gap-5">
+    <button *ngIf="showSaveBtn" (click)="cancel()" class="cancelbtn text-center btn ">
       {{l("Cancel")}}
     </button>
     <button *ngIf="showSaveBtn" (click)="save()" [disabled]="!(shippingTabValid)" class="previewbtn text-center btn ">

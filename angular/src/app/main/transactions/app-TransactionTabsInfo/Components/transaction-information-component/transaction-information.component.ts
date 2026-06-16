@@ -35,7 +35,9 @@ export class TransactionInformationComponent
   implements OnInit {
   @ViewChild('reportViewerContainer', { read: ViewContainerRef }) reportViewerContainer: ViewContainerRef;
   @ViewChild("shoppingCartModal", { static: true }) modal: ModalDirective;
-  @ViewChildren(CommentParentComponent) commentParentComponent!: QueryList<CommentParentComponent>;
+  // @ViewChildren(CommentParentComponent) commentParentComponent!: QueryList<CommentParentComponent>;
+  @ViewChild('desktopComments') desktopComments!: CommentParentComponent;
+@ViewChild('mobileComments') mobileComments!: CommentParentComponent;
 
   @Output("hideShoppingCartModal") hideShoppingCartModal: EventEmitter<boolean> = new EventEmitter<boolean>()
   @Output("refreshReport") refreshReport: EventEmitter<boolean> = new EventEmitter<boolean>()
@@ -419,20 +421,17 @@ export class TransactionInformationComponent
       this.loadCommentsList()
     }
   }
-  loadCommentsList() {
-    setTimeout(() => {
-      if (this.commentParentComponent?.first && this.commentParentComponent?.last) {
-        this.commentParentComponent?.first?.show(
-          this.appTransactionsForViewDto.creatorUserId,
-          this.orderId
-        );
-        this.commentParentComponent?.last?.show(
-          this.appTransactionsForViewDto.creatorUserId,
-          this.orderId
-        );
-      }
-    }, 200);
-  }
+loadCommentsList() {
+  setTimeout(() => {
+    const target =
+      window.innerWidth <= 991 ? this.mobileComments : this.desktopComments;
+
+    target?.show(
+      this.appTransactionsForViewDto.creatorUserId,
+      this.orderId
+    );
+  }, 200);
+}
 
 
   show(orderId: number, showCarousel: boolean = false, validateOrder: boolean = false, transactionCartMode: TransactionCartMode = TransactionCartMode.createOrEdit) {
@@ -531,15 +530,16 @@ export class TransactionInformationComponent
 
   getColumns() {
     this.cols = [
-      { field: "image", header: "Image" },
-      { field: "manufacturerCode", header: "Code" },
-      { field: "name", header: "Name" },
-      { field: "qty", header: "Quantity" },
-      { field: "price", header: "Price" },
-      { field: "amount", header: "Amount" }
+      { field: "image", header: this.l("Image") },
+      { field: "manufacturerCode", header: this.l("Code") },
+      { field: "name", header: this.l("Name") },
+      { field: "qty", header: this.l("Quantity") },
+      { field: "price", header: this.l("Price") },
+      { field: "amount", header: this.l("Amount") }
     ];
   }
 
+  
   getShoppingCartData(temp: TreeNode<any>[] = null) {
 
     this.temp = temp;
@@ -1440,17 +1440,18 @@ export class TransactionInformationComponent
     this._AppMarketplaceItemsServiceProxy
       .getMarketplaceAppItemForView(
         undefined,
-        0,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
+                  0,
+                  undefined,
+                  undefined,
+                  undefined,
+                  undefined,
+                  undefined,
         this.appTransactionsForViewDto?.currencyCode,
-        this.appTransactionsForViewDto?.buyer,
+        this.appTransactionsForViewDto?.buyerCompanySSIN,
         this.appTransactionsForViewDto?.sellerCompanySSIN,
         this.appTransactionsForViewDto?.priceLevel,
         this.appTransactionsForViewDto?.id,
+        id,
         undefined,
         undefined,
         undefined,
@@ -1465,8 +1466,6 @@ export class TransactionInformationComponent
         undefined,
         undefined,
         undefined,
-        undefined,
-        // undefined,
         0,
         10
       )
@@ -1974,4 +1973,14 @@ openPlaceOrderConfirm() {
   };
 }
 
+
+onOrderDetailsTabSelected(isSelected: boolean) {
+  if (!isSelected) return;
+
+  this.currentTab = this.getOrderDetailsTabIndex();
+
+  if (!this.shoppingCartDetails) {
+    this.getLinesData();
+  }
+}
 }

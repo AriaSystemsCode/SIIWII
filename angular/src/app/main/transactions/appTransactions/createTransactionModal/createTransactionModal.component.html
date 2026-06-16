@@ -1,8 +1,8 @@
 <!-- dialog to start new sales order or purchase order -->
 <p-dialog [style]="{ width: '656px',padding:'10px !important' }" [breakpoints]="{ '960px': '75vw', '640px': '97vw' }"
-    [baseZIndex]="10000" [modal]="true" [header]="modalheaderName + ' ' + orderNo" [(visible)]="display"
+    [baseZIndex]="10000" [modal]="true" [header]="(modalheaderName | localize) + ' ' + orderNo" [(visible)]="display"
     [draggable]="false" [closable]="true" (onHide)="cancel()" class="transM">
-    <div class="wrapper" [ngClass]="isArabic ? 'rtl-autoC' : 'ltr-autoC'">
+    <div class="wrapper calendarss" [ngClass]="isArabic ? 'rtl-autoC' : 'ltr-autoC'">
 
         <div class="w-50 my-2">
             <p-dropdown [options]="roles" class="w-100" placeholder="Please Select your Role" optionLabel="name"
@@ -73,7 +73,7 @@
                                     [ngClass]="isArabic? 'rtl-autoC':'ltr-autoC'" [suggestions]="filteredBuyerContacts"
                                     formControlName="buyerContactName" [(ngModel)]="selectedBuyerContact"
                                     (completeMethod)="handleBuyerNameSearch($event)"
-                                    (ngModelChange)="handleBuyerNameChange($event)" (click)="loadInitialContacts()"
+                                    (ngModelChange)="handleBuyerNameChange($event)"
                                     [placeholder]=" 'PleaseSelectBuyerName' | localize" field="name"
                                     [forceSelection]="false">
 
@@ -277,7 +277,7 @@
                             <p-autoComplete #autoComplete [dropdown]="true" [suggestions]="filteredSellerContacts"
                                 [ngClass]="isArabic? 'rtl-autoC':'ltr-autoC'" formControlName="sellerContactName"
                                 [(ngModel)]="selectedSellerContact" (completeMethod)="handleSellerNameSearch($event)"
-                                (ngModelChange)="handleSellerNameChange($event)" (click)="loadInitialSellerContacts()"
+                                (ngModelChange)="handleSellerNameChange($event)" 
                                 [placeholder]=" 'PleaseSelectSellerContactName' | localize" field="name"
                                 [forceSelection]="false">
 

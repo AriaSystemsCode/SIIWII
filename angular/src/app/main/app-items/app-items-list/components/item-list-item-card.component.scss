@@ -68,3 +68,10 @@ a.btn {
 .brand-name {
     font-weight: $default-font-weight + 200;
 }
+
+
+.btn-outline-primary {
+    border: 1px solid #4A0D4A !important;
+    color: #4A0D4A !important;
+    font-weight: 600;
+}

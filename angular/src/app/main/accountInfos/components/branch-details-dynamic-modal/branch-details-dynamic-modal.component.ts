@@ -23,6 +23,9 @@ export class BranchDetailsDynamicModalComponent extends AppComponentBase impleme
     distributionAddress : AppContactAddressDto
     mailingAddress : AppContactAddressDto
 
+        currentLang:string
+    isArabic:boolean = true
+
     constructor(
         injector: Injector,
         public currentModalRef: BsModalRef,
@@ -33,11 +36,19 @@ export class BranchDetailsDynamicModalComponent extends AppComponentBase impleme
     }
 
     close(){
-        this.currentModalRef.setClass('right-modal slide-right-out')
+        // this.currentModalRef.setClass('right-modal slide-right-out')
+          this.currentModalRef.setClass(
+    this.isArabic
+      ? 'left-modal slide-left-out'
+      : 'right-modal slide-right-out'
+  );
+
         this.currentModalRef.hide()
     }
 
     ngOnInit(){
+            this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
+        this.currentLang == 'ar' || this.currentLang == 'ar-EG'  ? this.isArabic = true : this.isArabic = false
         if(this.branchId) {
             this.getBranchDetails(this.branchId)
         } else {

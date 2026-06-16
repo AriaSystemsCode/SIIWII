@@ -8,6 +8,9 @@ img {
 }
 
 ::ng-deep {
+    .form-control{
+        height: 44px !important;
+    }
     .aria-select-primeng.p-dropdown {
         min-width: 5.5em !important;
     }
@@ -116,7 +119,7 @@ img {
 
 
 
-::ng-deep {
+::ng-deep .contacts {
     .rtl-autoC {
         .p-button {
             background-color: #fff !important;
@@ -154,7 +157,7 @@ img {
 
 }
 
-::ng-deep {
+::ng-deep .contacts {
     .ltr-autoC {
         .p-button {
             background-color: #fff !important;
@@ -193,4 +196,11 @@ img {
 
 .label {
     white-space: nowrap;
+}
+
+.word-break{
+    word-break: break-word;
+}
+.gap-4{
+    gap: 4px;
 }

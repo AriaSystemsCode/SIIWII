@@ -38,6 +38,9 @@ export class SelectAddressModalComponent extends AppComponentBase {
         edit: "fas fa-4x text-danger fa-pencil",
         delete: "assets/profile/DeleteAddress.svg"
     }
+
+        currentLang:string
+    isArabic:boolean = true
     constructor(
         injector: Injector,
         private _accountsServiceProxy: AccountsServiceProxy,
@@ -47,7 +50,10 @@ export class SelectAddressModalComponent extends AppComponentBase {
         this.busy = true;
 
     }
-
+    ngOnInit(){
+                this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
+        this.currentLang == 'ar' || this.currentLang == 'ar-EG'  ? this.isArabic = true : this.isArabic = false
+    }
     show(branch: any, accountId: number): void {
         this.branchId = branch?.node?.data?.branch?.id
         this.spinnerService.show();

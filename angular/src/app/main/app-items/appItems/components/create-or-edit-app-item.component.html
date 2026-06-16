@@ -50,7 +50,8 @@
                     </div>
                 </div>
             </div>
-            <div [class]="containerClass + ' kt-grid__item kt-grid__item--fluid mt-5' ">
+            <div [class]="containerClass + ' kt-grid__item kt-grid__item--fluid mt-5' "
+            [ngStyle]="isArabic ? {'padding-top':'100px'} : {'padding-top':'unset'}">
                 <div class="kt-portlet kt-portlet--mobile">
                     <div class="kt-portlet__body p-0">
                         <h6 class="font-weight-bold p-3" style="background-color: #EEEEEEEE;
@@ -325,7 +326,8 @@ name="description" [readonly]="readonlyDesc"
                                         <a class="aria-tag border mb-3 mr-3 pb-2 pl-3 position-relative pr-3 pt-2 rounded-lg"
                                             *ngFor="let relatedItem of relatedItems;index  as i"
                                             [ngClass]="{'removed' : relatedItem.removed}">
-                                            {{relatedItem?.entityDto?.appItemName}}
+                                            <!-- {{relatedItem?.entityDto?.appItemName}}-->
+                                            {{relatedItem?.entityDto?.appItemCode}}
                                             <span *ngIf="!relatedItem.removed"
                                                 class="bg-white position-absolute aria-tag-action remove-tag  rounded-circle"
                                                 (click)="removeRelatedItem(relatedItem,i)">

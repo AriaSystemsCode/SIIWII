@@ -10,8 +10,11 @@
 }
 
 .ResetData_btn i {
-  padding-right: 0px;
-  padding-left: 7px;
+  background-color: #FFFFFF !important;
+  border: 1px solid #EEEEEEEE !important;
+  color: #4A0D4A !important;
+  padding: 10px;
+  border-radius: 6px;
 }
 
 .sortByDd {
@@ -117,13 +120,13 @@ input[type="radio"]:checked+label {
   background: #FFF !important;
   box-shadow: 1px 1px 6px 0px rgba(22, 22, 22, 0.05) !important;
   color: #1B101B !important;
-
+height: 40px; 
 
 }
 
 
 .ToggleView {
-  padding-left: 10px;
+  padding: 10px;
   background-color: #4A0D4A !important;
   color: white !important;
   border-radius: 6px;
@@ -142,8 +145,8 @@ input[type="radio"]:checked+label {
   color: #4A0D4A !important;
   padding: 10px;
   border-radius: 6px;
-  margin-left: 5px;
-  margin-right: 5px;
+  // margin-left: 5px;
+  // margin-right: 5px;
 }
 
 ::ng-deep {
@@ -151,9 +154,10 @@ input[type="radio"]:checked+label {
     .kt-subheader--enabled .kt-content {
       padding-top: 30px;
     }
+
     .kt-container {
-       padding: 0  !important;
-  }
+      padding: 0 !important;
+    }
   }
 }
 
@@ -165,42 +169,63 @@ input[type="radio"]:checked+label {
   font-weight: 600;
   font-size: 14px;
 }
-@media (min-width: 1024px) {
 
-}
+@media (min-width: 1024px) {}
 
 ::ng-deep {
- 
+
   @media (max-width: 1024px) {
     .kt-portlet {
-        margin-top: 0px !important;
+      margin-top: 0px !important;
     }
-}
+  }
 
 
 }
+
 ::ng-deep .accountsEnt {
-    @media only screen and (min-width: 575px) and (max-width: 1024px) {
-        .modal-dialog{
-    width: 100% !important;
-    right: 10% !important;
-        }
-    }
-    @media only screen and (max-width: 575px) {
+  @media only screen and (min-width: 575px) and (max-width: 1024px) {
     .modal-dialog {
-    width: 97% !important;
-    right: 0% !important;
-}
+      width: 100% !important;
+      right: 10% !important;
     }
+  }
+
+  @media only screen and (max-width: 575px) {
+    .modal-dialog {
+      width: 97% !important;
+      right: 0% !important;
+    }
+  }
 }
 
 .bodySec {
-padding: 14px;
-background: #FFFFFF;
-border: 1px solid #EEEEEE;
-box-shadow: 4px 4px 10px rgba(22, 22, 22, 0.15);
-border-radius: 20px;
+  padding: 14px;
+  background: #FFFFFF;
+  border: 1px solid #EEEEEE;
+  box-shadow: 4px 4px 10px rgba(22, 22, 22, 0.15);
+  border-radius: 20px;
 
 }
 
+.fa-file-import {
+  color: #4A0D4A;
+}
 
+.btns-actions{
+  height: 40px;
+}
+
+.w-16{
+  width: 16px;
+}
+.text-grey{
+color: #777777 !important
+}
+
+.gap-4{
+gap: 4px;}
+
+.alarmInfo{
+  width: 20px;
+}

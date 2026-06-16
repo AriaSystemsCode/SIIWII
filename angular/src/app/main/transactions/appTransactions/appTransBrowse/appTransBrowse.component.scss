@@ -215,3 +215,17 @@
     direction: rtl;
     text-align: right;
 }
+
+
+
+::ng-deep .statusIconAr {
+    .p-dropdown .p-dropdown-clear-icon {
+    left: 2.357rem !important;
+}
+}
+
+::ng-deep .statusIcon {
+    .p-dropdown .p-dropdown-clear-icon {
+    right: 2.357rem !important;
+}
+}

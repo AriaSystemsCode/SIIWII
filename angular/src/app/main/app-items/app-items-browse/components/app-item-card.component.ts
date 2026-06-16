@@ -46,10 +46,18 @@ export class AppItemCardComponent extends AppComponentBase {
 
     @Input()   sycAttachmentCategoryImage :SycAttachmentCategoryDto
     @Input()   acceptedAspectRatio
+
+        currentLang:string
+    isArabic:boolean = true
     constructor(
         injector: Injector,
     ) {
         super(injector);
+    }
+
+      ngOnInit(): void {
+                            this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
+        this.currentLang == 'ar' || this.currentLang == 'ar-EG'  ? this.isArabic = true : this.isArabic = false
     }
 
     eventHandler($event:ActionsMenuEventEmitter<AppItemBrowseEvents>){

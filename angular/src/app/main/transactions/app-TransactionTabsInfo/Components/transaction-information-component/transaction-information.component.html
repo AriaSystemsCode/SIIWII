@@ -155,19 +155,10 @@
             <div>
 
             </div>
-
-
-
-
         </p-accordionTab>
 
 
-
-
-
-
-        <p-accordionTab class="shoppingCartAccordionTabBG"
-            (selectedChange)="currentTab = getOrderDetailsTabIndex();  getLinesData()">
+        <p-accordionTab class="shoppingCartAccordionTabBG" (selectedChange)="onOrderDetailsTabSelected($event)">
             <ng-template pTemplate="header">
                 <div class="d-inline-block custom-header d-flex">
                     <h6 class="mb-1 mt-1 purpleColor">{{l("OrderDetails")}}</h6>
@@ -537,7 +528,7 @@
                                             class="colorBox"
                                             [ngStyle]="{'background-color':selectedColorCode, 'height.px':  (65 / acceptedAspectRatio )}">
                                         </div>
-                                        <div class="" style="font-size: 10px;">
+                                        <div class="fs-10">
 
 
                                             <p class="card-text desc fw-bold">
@@ -870,10 +861,10 @@
             </div>
 
             <!-- Buttons -->
-            <div class="row w-100 mt-4 ml-1 position-relative" style="height: 50px;"
+            <div class="row w-100 mt-4 ml-1 position-relative"
                 *ngIf="!showTabs || (showTabs && appTransactionsForViewDto?.entityStatusCode?.toUpperCase()=='DRAFT')">
 
-                <button type="button" class="btn bgPurple border-0 w-100" style="height: 37px;" *ngIf="!showTabs"
+                <button type="button" class="btn bgPurple border-0 w-100" *ngIf="!showTabs"
                     (click)="onProceedToCheckout()">
                     {{l("Proceedtocheckout")}}
                 </button>
@@ -894,7 +885,7 @@
 <ng-template #transactionNotesTemplate>
     <ng-container *ngIf="loadNotesComp;">
 
-        <div class="row mt-4 m-1">
+        <div class="row mt-lg-4 m-1">
             <div class="col-12">
 
                 <!-- app Notes shared component-->
@@ -910,7 +901,7 @@
         [ngClass]="(!appTransactionsForViewDto?.isOwnedByMe ) || (appTransactionsForViewDto?.isOwnedByMe && (appTransactionsForViewDto?.sharedWithUsers?.length>0 || shareDone)) ?  'd-block' : 'd-none'">
         <h4 class="notes-title purpleColor font-weight-bold">{{l("Comments")}}</h4>
         <div class="w-100 comment-warper   order-summary p-4  mt-3 purpleColor">
-            <app-comment-parent [addNewThread]="true" *ngIf="appTransactionsForViewDto" [cartStyle]="true"
+            <app-comment-parent   #desktopComments [addNewThread]="true" [cartStyle]="true"   [loadComments]="true"
                 #commentParentComponent (refreshComments)="getCommentsRefreshed($event)"
                 (newCommentAdded)="onGeneratOrderReport(true)">
             </app-comment-parent>
@@ -922,18 +913,16 @@
 <ng-template #shoppingcartContainer>
 
     <div class="h-100 parentDiv">
-        <div class="modal-content big-scroll pb-5 pl-3">
-            <div class="row topheader">
-                <div class="">
-                    <div class="row bg-white  m-3 p-2  pl-4 cartSec">
-                        {{'Transactions' | localize}} &nbsp; &nbsp; > &nbsp; &nbsp;
-                        {{appTransactionsForViewDto?.transactionType == 0 ?
-                        'SalesOrder':'PurchaseOrder' | localize}} &nbsp; &nbsp; >
-                        &nbsp; &nbsp;
-                        {{transactionCode}}
-                    </div>
+        <div class="modal-content big-scroll pb-5 ">
+            <div class=" topheader d-flex justify-content-between align-items-center">
+                <div class="row bg-white  m-3 p-2  pl-4 cartSec">
+                    {{'Transactions' | localize}} &nbsp; &nbsp; > &nbsp; &nbsp;
+                    {{appTransactionsForViewDto?.transactionType == 0 ?
+                    'Sales Order':'Purchase Order' | localize}} &nbsp; &nbsp; >
+                    &nbsp; &nbsp;
+                    {{transactionCode}}
                 </div>
-                <div class="col p-4 position-absolute text-right">
+                <div class="mx-2">
                     <button (click)="minimizeScreen()" class="btn bgPurple">
 
                         <img src="../../../../../assets/shoppingCart/minimize.svg" class="pointer" />
@@ -943,7 +932,7 @@
                 </div>
             </div>
             <div
-                class="d-md-flex d-none justify-content-between  ml-1 mr-1 topsubheader border-bottom mobile align-items-center">
+                class="d-md-flex d-none justify-content-between mx-2 topsubheader border-bottom mobile align-items-center">
                 <div class="ml-1 previousArrow">
                     <button *ngIf="showCarousel" (click)="goPrevious_Next_Transaction(transactionPosition.Previous)"
                         [disabled]="appTransactionsForViewDto?.firstRecord" class="previousBtn"
@@ -960,7 +949,7 @@
                         </div>
 
                     </div>
-                    <div class="px-4 py-2" style="line-height: 10px;">
+                    <div class="px-4 py-2">
                         <label class="pt-2 font-weight-bold purpleColor"> {{l("Created")}} </label>
                         <div class="purpleColor text-nowrap">
                             {{appTransactionsForViewDto?.creationDate | momentFormat:"LL h:mm A"}}
@@ -968,7 +957,7 @@
                     </div>
                 </div>
                 <div>
-                    <div class="py-2 px-3 text-right  row  d-lg-flex
+                    <div class="py-2 px-3 text-right row  d-lg-flex btnsGap
                 d-none">
                         <button *ngIf="appTransactionsForViewDto?.isOwnedByMe" type="button"
                             class="btn  syncBtn btnHgtNoWrap" [disabled]="!appTransactionsForViewDto?.showSync "
@@ -983,7 +972,7 @@
                             {{l("Sync")}}
                         </button>
                         <button *ngIf="appTransactionsForViewDto?.isOwnedByMe" type="button"
-                            class="btn   border-0  shareBtn btnHgtNoWrap"
+                            class="btn   border-0  shareBtn btnHgtNoWrap mx-0"
                             [disabled]="appTransactionsForViewDto?.entityStatusCode?.toUpperCase()!='OPEN'"
                             [ngClass]="{ disabled:appTransactionsForViewDto?.entityStatusCode?.toUpperCase()!='OPEN'}"
                             (click)="onShareTransaction()">
@@ -993,7 +982,7 @@
                         <button type="button"
                             [disabled]="appTransactionsForViewDto?.entityStatusCode?.toUpperCase()!='OPEN'"
                             [ngClass]="{ disabled:appTransactionsForViewDto?.entityStatusCode?.toUpperCase()!='OPEN'}"
-                            class="btn  bgPurple border-0 d-lg-block d-none prntBtn" (click)="printTransaction()">
+                            class="btn  bgPurple border-0 d-lg-block d-none prntBtn mx-0" (click)="printTransaction()">
                             <img src="../../../../../assets/shoppingCart/print.svg" />
                             {{"Print" | localize}}</button>
 
@@ -1016,9 +1005,9 @@
 
                     </div>
                     <div class="d-lg-none d-block">
-                        <div class="btn-group greyMDlightColor" dropdown>
+                        <div class="greyMDlightColor dropdown" dropdown>
                             <button dropdownToggle type="button" class="btn   border-0 dropdownBtn"
-                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" id="dropdownMenuButton" >
                                 <div class="d-flex flex-column align-items-center">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" viewBox="0 0 25 25"
                                         fill="none">
@@ -1030,7 +1019,7 @@
 
                                 </div>
                             </button>
-                            <div class="dropdown-menu dropdown-menu-right dropdown-excel-operations" *dropdownMenu>
+                            <div class="dropdown-menu dropdown-menu-right dropdown-excel-operations" *dropdownMenu  aria-labelledby="dropdownMenuButton">
                                 <a class="dropdown-item d-flex" id="shareTransaction" href="javascript:;">
 
 
@@ -1088,7 +1077,7 @@
 
                 </div>
                 <div *ngIf="appTransactionsForViewDto?.entityStatusCode?.toUpperCase()=='DRAFT'">
-                    <div class="px-4  py-2 text-right border-left d-flex">
+                    <div class="px-4  py-2 text-right border-left d-flex btnsGap">
                         <button *ngIf="appTransactionsForViewDto?.entityStatusCode?.toUpperCase()=='DRAFT'"
                             type="button" class="btn  bgPurple border-0  btnHgtNoWrap" (click)="onContinueShopping()"
                             [disabled]="!isOwnedByMe" [ngClass]="{ disabled:!isOwnedByMe}">
@@ -1112,7 +1101,7 @@
                 </div>
 
                 <div class="col-4 p-4"
-                    [ngClass]="showTabs  && appTransactionsForViewDto?.entityStatusCode?.toUpperCase()=='DRAFT' ? 'fixScrollS':''"
+                    [ngClass]="showTabs  && appTransactionsForViewDto?.entityStatusCode?.toUpperCase()=='DRAFT' && !isArabic ? 'fixScrollS': showTabs  && appTransactionsForViewDto?.entityStatusCode?.toUpperCase()=='DRAFT' && isArabic ?'fixScrollSAr':''"
                     id="rightCol">
                     <ng-container *ngTemplateOutlet="transactionOrderSummaryTemplate"></ng-container>
                     <ng-container *ngTemplateOutlet="transactionNotesTemplate"></ng-container>
@@ -1130,9 +1119,19 @@
             <div class="tablet" *ngIf="!onshare">
 
                 <div class="card position-relative dot">
-                    <div class="d-md-none d-block actionsSec">
-                        <div class="btn-group greyMDlightColor" dropdown>
-                            <button dropdownToggle type="button" class="btn   border-0" data-toggle="dropdown"
+                    <div class="d-md-none d-block actionsSec" [ngStyle]="
+                                    isArabic
+                                        ? {
+                                            'left': '-33px',
+                                            'border-right': '1px solid #eee'
+                                        }
+                                        : {
+                                            'right': '-33px',
+                                            'border-left': '1px solid #eee'
+                                        }
+                                    ">
+                        <div class=" greyMDlightColor dropActions" dropdown>
+                            <button dropdownToggle type="button" class="btn   border-0 mt-3" data-toggle="dropdown"
                                 aria-haspopup="true" aria-expanded="false">
                                 <div class="d-flex flex-column align-items-center">
                                     <i class="fa fa-ellipsis-v text-muted more-icon"></i>
@@ -1296,7 +1295,7 @@
                                 [ngClass]="(!appTransactionsForViewDto?.isOwnedByMe ) || (appTransactionsForViewDto?.isOwnedByMe && (appTransactionsForViewDto?.sharedWithUsers?.length>0 || shareDone)) ?  'd-block' : 'd-none'">
                                 <h4 class="notes-title purpleColor font-weight-bold">{{l("Comments")}}</h4>
                                 <div class="w-100 comment-warper  h-100 order-summary p-4  mt-3 purpleColor">
-                                    <app-comment-parent [addNewThread]="true" *ngIf="appTransactionsForViewDto"
+                                    <app-comment-parent   #mobileComments [addNewThread]="true"   [loadComments]="true"
                                         [cartStyle]="true" #commentParentComponent
                                         (newCommentAdded)="onGeneratOrderReport(true)">
                                     </app-comment-parent>
