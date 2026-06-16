@@ -90,7 +90,7 @@
 
 
     <div class="container-fluid pt-1 mb-3 " [ngClass]="createOrEditBillingInfo ?  'd-block' : 'd-none'">
-        <div class="header p-2 my-2 d-flex  justify-content-end pr-3">
+        <div class="header p-2 my-2 d-flex  justify-content-end gap-5">
             <button [disabled]="!(isContactsValid)" (click)="createOrEditTransaction()"
                 class="continuebtn text-center btn float-right" *ngIf="!showSaveBtn">
                 {{l("Continue")}}

@@ -23,7 +23,7 @@
                 <hr class="my-2" *ngIf="salesRepIndex > 0" />
             </div>
 
-            <div class="d-flex justify-content-end mt-3 pr-3">
+            <div class="d-flex justify-content-end mt-3 gap-5">
                 <button *ngIf="!showSaveBtn && salesReps?.length" [disabled]="!isContactsValid"
                     (click)="createOrEditTransaction()" class="continuebtn text-center btn">
                      {{l("Continue")}}
