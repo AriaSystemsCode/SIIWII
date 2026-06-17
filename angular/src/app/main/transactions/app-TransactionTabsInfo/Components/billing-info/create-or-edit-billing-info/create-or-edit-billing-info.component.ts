@@ -28,8 +28,8 @@ export class CreateOrEditBillingInfoComponent extends AppComponentBase implement
 
   isContactsValid: boolean = true;
   transactionCartoccordionTabs = TransactionCartoccordionTabs;
-  contactIdARContact: string = '';
-  contactIdApContact: string = '';
+contactIdARContact: string | number | null = null;
+contactIdApContact: string | number | null = null;
   payTermsListList: any = [];
   enableSAveApcontact: boolean = false;
   oldappTransactionsForViewDto: any;
@@ -62,6 +62,31 @@ export class CreateOrEditBillingInfoComponent extends AppComponentBase implement
     }
 
   }
+//   ngAfterViewInit() {
+//   if (this.currentTab !== TransactionCartoccordionTabs.BillingInfo) {
+//     return;
+//   }
+
+//   setTimeout(() => {
+//     if (this.apContactdata?.compId) {
+//       this.contactIdApContact = this.apContactdata.compId;
+
+//       const addressComponents = this.addressComponentRefs?.toArray();
+//       addressComponents
+//         ?.find(c => c.billingIndexInfo === 1)
+//         ?.getAddressList(this.apContactdata?.compssin, this.apContactdata?.branchSsin);
+//     }
+
+//     if (this.arContactdata?.compId) {
+//       this.contactIdARContact = this.arContactdata.compId;
+
+//       const addressComponents = this.addressComponentRefs?.toArray();
+//       addressComponents
+//         ?.find(c => c.billingIndexInfo === 2)
+//         ?.getAddressList(this.arContactdata?.compssin, this.arContactdata?.branchSsin);
+//     }
+//   });
+// }
   ngOnInit() {
     this.isMamualAcc()
     if (this.currentTab == TransactionCartoccordionTabs.BillingInfo) {
@@ -199,31 +224,61 @@ export class CreateOrEditBillingInfoComponent extends AppComponentBase implement
 
 
 
-  reloadAddresscomponentAPContact(data) {
-    this.apContactdata = data;
+  // reloadAddresscomponentAPContact(data) {
+  //   this.apContactdata = data;
 
-    if (this.currentTab == TransactionCartoccordionTabs.BillingInfo) {
-      this.contactIdApContact = this.apContactdata?.compId;
-      const addressComponents = this.addressComponentRefs?.toArray();
-      addressComponents?.find(c => c.billingIndexInfo === 1)?.getAddressList(this.apContactdata?.compssin, this.apContactdata?.branchSsin);
-    }
+  //   if (this.currentTab == TransactionCartoccordionTabs.BillingInfo) {
+  //     this.contactIdApContact = this.apContactdata?.compId;
+  //     const addressComponents = this.addressComponentRefs?.toArray();
+  //     addressComponents?.find(c => c.billingIndexInfo === 1)?.getAddressList(this.apContactdata?.compssin, this.apContactdata?.branchSsin);
+  //   }
 
 
+  // }
+
+
+  // reloadAddresscomponentARContact(data) {
+  //   this.arContactdata = data;
+  //   if (this.currentTab == TransactionCartoccordionTabs.BillingInfo) {
+  //     this.contactIdARContact = this.arContactdata?.compId;
+  //     const addressComponents = this.addressComponentRefs?.toArray();
+  //     addressComponents?.find(c => c.billingIndexInfo === 2)?.getAddressList(this.arContactdata?.compssin,  this.arContactdata?.branchSsin);
+  //   }
+
+
+  // }
+
+reloadAddresscomponentAPContact(data) {
+  this.apContactdata = data;
+
+  if (
+    this.currentTab === TransactionCartoccordionTabs.BillingInfo &&
+    data?.compId
+  ) {
+    this.contactIdApContact = data.compId;
+
+    const addressComponents = this.addressComponentRefs?.toArray();
+    addressComponents
+      ?.find(c => c.billingIndexInfo === 1)
+      ?.getAddressList(data?.compssin, data?.branchSsin);
   }
+}
 
+reloadAddresscomponentARContact(data) {
+  this.arContactdata = data;
 
-  reloadAddresscomponentARContact(data) {
-    this.arContactdata = data;
-    if (this.currentTab == TransactionCartoccordionTabs.BillingInfo) {
-      this.contactIdARContact = this.arContactdata?.compId;
-      const addressComponents = this.addressComponentRefs?.toArray();
-      addressComponents?.find(c => c.billingIndexInfo === 2)?.getAddressList(this.arContactdata?.compssin,  this.arContactdata?.branchSsin);
-    }
+  if (
+    this.currentTab === TransactionCartoccordionTabs.BillingInfo &&
+    data?.compId
+  ) {
+    this.contactIdARContact = data.compId;
 
-
+    const addressComponents = this.addressComponentRefs?.toArray();
+    addressComponents
+      ?.find(c => c.billingIndexInfo === 2)
+      ?.getAddressList(data?.compssin, data?.branchSsin);
   }
-
-
+}
 
   createOrEditTransaction() {
     this.showMainSpinner()
