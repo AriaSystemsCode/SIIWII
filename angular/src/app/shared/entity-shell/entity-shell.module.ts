@@ -53,47 +53,75 @@ import { EntityLeftSidePanelComponent } from './entity-left-side-panel/entity-le
 import { EntityBreadcrumbComponent } from './entity-breadcrumb/entity-breadcrumb.component';
 import { GenericEntityModalComponent } from './generic-entity-modal/generic-entity-modal.component';
 import { EntityHeaderComponent } from './entity-header/entity-header.component';
+import { InputSwitchModule } from 'primeng/inputswitch';
+import { CalendarModule } from 'primeng/calendar';
+import { ChipModule } from 'primeng/chip';
+import { NgSelectModule } from '@ng-select/ng-select';
+import { TreeTableModule } from 'primeng/treetable';
+import { TreeSelectModule } from 'primeng/treeselect';
+import { DevExpressDemoModule } from '@app/main/dev-express-demo/dev-express-demo.module';
+import { TabViewModule } from 'primeng/tabview';
+import { Ng2TelInputModule } from 'ng2-tel-input';
+import { AuditTrailComponent } from './entity-right-panel/audit-trail/audit-trail.component';
+import { RelatedEntitiesComponent } from './entity-right-panel/related-entities/related-entities.component';
 
 
 
 @NgModule({
     imports: [
-        FormsModule,
-        ReactiveFormsModule,
-        CommonModule,
-        FileUploadModule,
-        ModalModule.forRoot(),
-        TabsModule.forRoot(),
-        TooltipModule.forRoot(),
-        PopoverModule.forRoot(),
-        BsDropdownModule.forRoot(),
-        BsDatepickerModule.forRoot(),
-        UtilsModule,
-        AppCommonModule,
-        TableModule,
-        TreeModule,
-        DragDropModule,
-        ContextMenuModule,
-        PaginatorModule,
-        PrimeNgFileUploadModule,
-        AutoCompleteModule,
-        EditorModule,
-        InputMaskModule,
-        NgxChartsModule,
-        CountoModule,
-        TextMaskModule,
-        ImageCropperModule,
-        PerfectScrollbarModule,
-        DropdownModule,
-        AppBsModalModule,
-        CdkStepperModule,
-        MenuModule,
-        DialogModule,
-        DropdownModule,
-        ReactiveFormsModule,
-        CheckboxModule,
-        SharedDynamicInputsModule,
-        AccordionModule
+          CommonModule,
+               InputSwitchModule,
+               BsDropdownModule,
+               DropdownModule,
+               Ng2TelInputModule,
+               AppCommonModule,
+               UtilsModule,
+               FormsModule,
+               BsDatepickerModule.forRoot(),
+               CalendarModule,
+               FormsModule,
+               ReactiveFormsModule,
+               CommonModule,
+               FileUploadModule,
+               ModalModule.forRoot(),
+               TabsModule.forRoot(),
+               TooltipModule.forRoot(),
+               PopoverModule.forRoot(),
+               BsDropdownModule.forRoot(),
+               BsDatepickerModule.forRoot(),
+               UtilsModule,
+               AppCommonModule,
+               TableModule,
+               TreeModule,
+               DragDropModule,
+               ContextMenuModule,
+               PaginatorModule,
+               PrimeNgFileUploadModule,
+               AutoCompleteModule,
+               EditorModule,
+               InputMaskModule,
+               NgxChartsModule,
+               CountoModule,
+               TextMaskModule,
+               ImageCropperModule,
+               PerfectScrollbarModule,
+               DropdownModule,
+               AppBsModalModule,
+               CdkStepperModule,
+               MenuModule,
+               DialogModule,
+               DropdownModule,
+               ReactiveFormsModule,
+               CheckboxModule,
+               NgSelectModule,
+               AccordionModule,
+               TreeTableModule,
+               TreeSelectModule,
+               CalendarModule, TooltipModule, DevExpressDemoModule,
+               ChipModule,
+               TabViewModule,
+               SharedDynamicInputsModule,
+
     ],
     declarations: [
         GenericEntityShellComponent,
@@ -103,6 +131,8 @@ import { EntityHeaderComponent } from './entity-header/entity-header.component';
         EntityRightPanelComponent,
         GenericEntityModalComponent,
         EntityHeaderComponent,
+        AuditTrailComponent,
+        RelatedEntitiesComponent,
 
     ],
     exports: [
@@ -113,6 +143,8 @@ import { EntityHeaderComponent } from './entity-header/entity-header.component';
         EntityRightPanelComponent,
         GenericEntityModalComponent,
         EntityHeaderComponent,
+          AuditTrailComponent,
+        RelatedEntitiesComponent,
 
     ],
     providers: [

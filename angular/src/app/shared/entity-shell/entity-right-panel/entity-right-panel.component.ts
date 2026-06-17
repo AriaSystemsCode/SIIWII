@@ -6,5 +6,5 @@ import { Component } from '@angular/core';
   styleUrls: ['./entity-right-panel.component.scss']
 })
 export class EntityRightPanelComponent {
-
+  activeTabIndex = 0;
 }

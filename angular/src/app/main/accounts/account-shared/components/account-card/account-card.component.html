@@ -475,17 +475,20 @@ NOT CARDS VIEW MODE
 
 
 
-<app-generic-entity-modal
-    [(visible)]="showGenericEntityModal">
+<app-generic-entity-modal [(visible)]="showGenericEntityModal">
 
-    <app-generic-entity-shell>
+  <app-generic-entity-shell
+    [entity]="accountBasicInfo"
+    [mode]="'view'"
+    [entityTypes]="accountTypes"
+    [statuses]="statuses">
 
-        <app-account-sections
-            entity-main-content
-            [accountId]="selectedAccountId"
-            [mode]="'view'">
-        </app-account-sections>
+    <app-account-sections
+      entity-main-content
+      [accountId]="selectedAccountId"
+      [mode]="'view'">
+    </app-account-sections>
 
-    </app-generic-entity-shell>
+  </app-generic-entity-shell>
 
 </app-generic-entity-modal>

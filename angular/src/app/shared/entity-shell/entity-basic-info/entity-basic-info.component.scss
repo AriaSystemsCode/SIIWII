@@ -1,0 +1,84 @@
+.entity-basic-info.view-mode {
+  opacity: 0.65;
+  pointer-events: none;
+}
+
+.entity-basic-info {
+  // border: 1px solid #cfcfcf;
+  background: #fff;
+}
+
+.basic-top-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 6px 10px;
+  border-bottom: 1px solid #dcdcdc;
+  flex-wrap: wrap;
+}
+
+.field {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.field label {
+  font-size: 12px;
+  margin: 0;
+  white-space: nowrap;
+  color: black;
+}
+
+.field input {
+  height: 26px;
+  font-size: 12px;
+}
+
+.image-row {
+  display: flex;
+  align-items: center;
+  height: 110px;
+  padding: 14px 24px;
+  position: relative;
+}
+
+.logo-box {
+  width: 70px;
+  height: 70px;
+  border: 1px solid #333;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f8f8f8;
+}
+
+.logo-box img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.background-box {
+  flex: 1;
+  text-align: center;
+  font-size: 14px;
+}
+
+.add-bg-btn {
+  display: block;
+  margin: 0 auto 4px;
+  border: none;
+  background: transparent;
+  color: #d63384;
+  font-size: 12px;
+}
+
+.view-mode {
+  opacity: 0.6;
+}
+
+.view-mode input,
+.view-mode ::ng-deep .p-dropdown {
+  pointer-events: none;
+}

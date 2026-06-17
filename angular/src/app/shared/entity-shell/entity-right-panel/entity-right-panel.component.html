@@ -1,1 +1,26 @@
-<p>entity-right-panel works!</p>
+<div class="entity-right-panel">
+
+  <p-tabView [(activeIndex)]="activeTabIndex">
+
+    <p-tabPanel header="Audit trail">
+      <app-audit-trail
+   >
+      </app-audit-trail>
+    </p-tabPanel>
+
+    <p-tabPanel header="Messages">
+      <!-- <app-entity-messages
+        [entityId]="entityId"
+        [entityType]="entityType">
+      </app-entity-messages> -->
+    </p-tabPanel>
+
+    <p-tabPanel header="Related">
+      <app-related-entities
+       >
+      </app-related-entities>
+    </p-tabPanel>
+
+  </p-tabView>
+
+</div>

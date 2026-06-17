@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 
 @Component({
   selector: 'app-generic-entity-shell',
@@ -6,5 +6,11 @@ import { Component } from '@angular/core';
   styleUrls: ['./generic-entity-shell.component.scss']
 })
 export class GenericEntityShellComponent {
+  @Input() entity: any = {};
+  @Input() mode: any = 'view';
 
+  @Input() entityTypes: any[] = [];
+  @Input() statuses: any[] = [];
+
+  @Output() entityChange = new EventEmitter<any>();
 }

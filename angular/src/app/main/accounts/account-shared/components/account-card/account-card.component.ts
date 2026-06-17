@@ -266,4 +266,35 @@ viewProfile(): void {
     this.createRelation(option);
     this.openedRelationMenuId = null;
   }
+
+
+
+
+
+
+
+
+
+
+
+
+  ////////////////////////////////
+  accountBasicInfo = {
+  status: null,
+  type: null,
+  name: '',
+  code: '',
+  logoUrl: null,
+  backgroundUrl: null
+};
+
+statuses = [
+  { label: 'Active', value: 'Active' },
+  { label: 'Inactive', value: 'Inactive' }
+];
+
+accountTypes = [
+  { label: 'Business', value: 'Business' },
+  { label: 'Personal', value: 'Personal' }
+];
 }

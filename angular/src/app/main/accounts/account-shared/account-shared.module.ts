@@ -27,6 +27,7 @@ import { TreeTableModule } from 'primeng/treetable';
 import { DialogModule } from 'primeng/dialog';
 import { AccountSectionsComponent } from './components/account-sections/account-sections.component';
 import { EntityShellModule } from '@app/shared/entity-shell/entity-shell.module';
+import { AccordionModule } from "primeng/accordion";
 
 
 @NgModule({
@@ -59,7 +60,8 @@ import { EntityShellModule } from '@app/shared/entity-shell/entity-shell.module'
        BulkImportModule,
         FiltersSharedModule,
         DialogModule,
-        EntityShellModule
+        EntityShellModule,
+        AccordionModule
     ],
     providers: [
         { provide: BsDatepickerConfig, useFactory: NgxBootstrapDatePickerConfigService.getDatepickerConfig },

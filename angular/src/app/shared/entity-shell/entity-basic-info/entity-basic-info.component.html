@@ -1,1 +1,53 @@
-<p>entity-basic-info works!</p>
+<div class="entity-basic-info" >
+<!-- [class.view-mode]="mode === 'view'" -->
+  <div class="d-flex justify-content-between">
+    <div class="field">
+      <label>Status:</label>
+      <p-dropdown
+        [options]="statuses"
+        [(ngModel)]="entity.status"
+>
+      </p-dropdown>
+    </div>
+
+    <div class="field">
+      <label>Account Type:</label>
+      <p-dropdown
+        [options]="entityTypes"
+        [(ngModel)]="entity.type"
+  >
+      </p-dropdown>
+    </div>
+
+    <div class="field name-field">
+      <label>Name:</label>
+      <input
+        class="form-control"
+        [(ngModel)]="entity.name"
+       />
+    </div>
+
+    <div class="field code-field">
+      <label>Code:</label>
+      <input
+        class="form-control"
+        [(ngModel)]="entity.code"
+   />
+    </div>
+  </div>
+
+  <div class="image-row">
+    <!-- <div class="logo-box">
+      <img *ngIf="entity.logoUrl" [src]="entity.logoUrl" />
+      <i *ngIf="!entity.logoUrl" class="fa fa-user"></i>
+    </div> -->
+
+    <div class="background-box">
+      <!-- <button *ngIf="mode !== 'view'" class="add-bg-btn">
+        Add
+      </button> -->
+      <span>Background</span>
+    </div>
+  </div>
+
+</div>

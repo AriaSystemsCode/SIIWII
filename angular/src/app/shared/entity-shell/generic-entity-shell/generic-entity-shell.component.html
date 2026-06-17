@@ -4,11 +4,22 @@
 
   <app-entity-header></app-entity-header>
 
-  <app-entity-basic-info></app-entity-basic-info>
+  <app-entity-basic-info
+    [entity]="entity"
+    [mode]="mode"
+    [entityTypes]="entityTypes"
+    [statuses]="statuses"
+    (entityChange)="entityChange.emit($event)">
+  </app-entity-basic-info>
 
   <app-entity-left-side-panel></app-entity-left-side-panel>
+<div class="row">
+  <div class="col-7">
+  <ng-content  select="[entity-main-content]"></ng-content>
+</div>
+  <div class="col-5">
 
-  <ng-content select="[entity-main-content]"></ng-content>
   <app-entity-right-panel></app-entity-right-panel>
-
+  </div>
+</div>
 </div>

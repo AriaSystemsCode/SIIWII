@@ -9,9 +9,10 @@
  [style]="{
     width: maximized ? '100vw' : width,
     height: maximized ? '100vh' : height,
-    'margin-left': '85px'
+    'margin-left': '85px',
+    'overflow-x': 'hidden'
   }"
-  [contentStyle]="{ padding: '0', height: '100%', overflow: 'hidden' }"
+  [contentStyle]="{ padding: '0', height: '100%'}"
   styleClass="generic-entity-modal"
   (onHide)="onDialogHide()">
 

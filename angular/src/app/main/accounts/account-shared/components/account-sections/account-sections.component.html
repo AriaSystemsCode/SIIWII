@@ -1,6 +1,59 @@
-<h3>Account Sections Component</h3>
+<p-accordion *ngIf="account">
 
-<p>
-  Account Id:
-  {{accountId}}
-</p>
+  <p-accordionTab header="Basic Information" [selected]="true">
+
+    <div class="row">
+
+      <div class="col-md-6 mb-3">
+        <label>Trade Name:</label>
+        <input
+          class="form-control"
+          [(ngModel)]="account.name"
+          [readonly]="mode === 'view'" />
+      </div>
+
+      <div class="col-md-6 mb-3">
+        <label>Email:</label>
+        <input
+          class="form-control"
+          [(ngModel)]="account.email"
+          [readonly]="mode === 'view'" />
+      </div>
+
+      <div class="col-md-6 mb-3">
+        <label>Language:</label>
+        <input
+          class="form-control"
+          [(ngModel)]="account.language"
+          [readonly]="mode === 'view'" />
+      </div>
+
+      <div class="col-md-6 mb-3">
+        <label>Currency:</label>
+        <input
+          class="form-control"
+          [(ngModel)]="account.currency"
+          [readonly]="mode === 'view'" />
+      </div>
+
+      <div class="col-md-6 mb-3">
+        <label>Phone:</label>
+        <input
+          class="form-control"
+          [(ngModel)]="account.phone"
+          [readonly]="mode === 'view'" />
+      </div>
+
+    </div>
+
+  </p-accordionTab>
+
+  <p-accordionTab header="Business Information">
+    Business information here
+  </p-accordionTab>
+
+  <p-accordionTab header="Relationship name">
+    Relationship data here
+  </p-accordionTab>
+
+</p-accordion>
