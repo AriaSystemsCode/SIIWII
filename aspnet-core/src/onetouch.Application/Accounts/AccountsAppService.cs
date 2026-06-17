@@ -8318,7 +8318,8 @@ namespace onetouch.Accounts
                     ErrorType = "Stopper"
                 });
             }
-            if (accountExcelDto.RecordType == AccountExcelRecordType.Account.ToString() ?
+            if (accountExcelDto.RecordType == AccountExcelRecordType.Account.ToString() ||
+                accountExcelDto.RecordType == AccountExcelRecordType.Vendor.ToString() ?
                 (string.IsNullOrEmpty(accountExcelDto.AccountType) || !Enum.TryParse<AccountExcelAccountType>(accountExcelDto.AccountType, out accountExcelAccountType)) : false)
             {
                 returnList.Add(new ImportContactReturnDto
