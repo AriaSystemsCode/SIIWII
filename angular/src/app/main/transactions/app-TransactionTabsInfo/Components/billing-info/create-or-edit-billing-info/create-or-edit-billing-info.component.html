@@ -51,8 +51,7 @@
             <app-address [isCreateOredit]="createOrEditBillingInfo" [contactId]="contactIdARContact"
                 (updateSelectedAddress)="updateArContact($event)" [selectedAddressDetails]="arContactSelectedAdd"
                 [showAddressType]="false" [currentTab]="currentTab" [billingIndexInfo]="2"
-                [appTransactionsForViewDto]="appTransactionsForViewDto" [canChange]="canChange"
-                [currentTab]="currentTab" [appTransactionsForViewDto]="appTransactionsForViewDto"></app-address>
+                [appTransactionsForViewDto]="appTransactionsForViewDto" [canChange]="canChange"></app-address>
         </div>
         <div class="container-fluid pt-1 mb-3 mt-3" [ngClass]="createOrEditBillingInfo   ?  'd-block' : 'd-none'">
             <div class="header p-2 my-2 d-flex justify-content-between">
@@ -68,7 +67,7 @@
                     </p-dropdown>
                     <p class="text-danger" *ngIf="!appTransactionsForViewDto.paymentTermsId">
                         <small>
-                            Please select payment terms option
+                            {{'Please select payment terms option' | localize}}
                         </small>
                     </p>
                 </div>
@@ -90,7 +89,7 @@
 
 
     <div class="container-fluid pt-1 mb-3 " [ngClass]="createOrEditBillingInfo ?  'd-block' : 'd-none'">
-        <div class="header p-2 my-2 d-flex  justify-content-end pr-3">
+        <div class="header p-2 m-2 d-flex  justify-content-end gap-5">
             <button [disabled]="!(isContactsValid)" (click)="createOrEditTransaction()"
                 class="continuebtn text-center btn float-right" *ngIf="!showSaveBtn">
                 {{l("Continue")}}

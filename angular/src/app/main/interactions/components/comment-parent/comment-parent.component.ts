@@ -40,6 +40,7 @@ export class CommentParentComponent extends AppComponentBase implements AfterVie
     currentComment: any;
 @Input() loadComments: boolean = true;
 private isLoadingComments = false;
+isArabic :boolean = false;
     constructor(
         private _messageServiceProxy : MessageServiceProxy,
         private _injector : Injector,
@@ -47,6 +48,11 @@ private isLoadingComments = false;
         ) {
             super(_injector)
 
+         }
+
+         ngOnInit(){
+                this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
+    this.currentLang == 'ar' || this.currentLang == 'ar-EG' ? this.isArabic = true : this.isArabic = false
          }
          ngAfterViewInit(): void {
             this.toggleMessageType(this.commentType=='MESSAGE'?2:1)

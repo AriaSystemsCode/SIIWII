@@ -59,12 +59,22 @@ namespace onetouch.Web.Startup
         private void ConfigureXtraReportConnectionStrings()
         {
             var _appConfiguration = _configurationAccessor.Configuration;
-            var globalConnectionStrings = _appConfiguration
-                .GetSection("ConnectionStrings")
-                .AsEnumerable(true)
-                .Where(x => x.Key == "Reports")
-                .ToDictionary(x => x.Key, x => x.Value);
-            DevExpress.DataAccess.DefaultConnectionStringProvider.AssignConnectionStrings(globalConnectionStrings);
+            try
+            {
+                var globalConnectionStrings = _appConfiguration
+                    .GetSection("ConnectionStrings")
+                    .AsEnumerable(true)
+                    .Where(x => x.Key == "Reports")
+                    .ToDictionary(x => x.Key, x => x.Value);
+                DevExpress.DataAccess.DefaultConnectionStringProvider.AssignConnectionStrings(globalConnectionStrings);
+            }
+            catch (Exception ex)
+            {
+                // Log the exception or handle it as needed
+                Console.WriteLine($"Error configuring XtraReport connection strings: {ex.Message}");
+                // Optionally, you can rethrow the exception or ignore it if it's not critical
+                // throw;
+            }
         }
 
 

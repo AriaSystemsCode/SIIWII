@@ -922,7 +922,7 @@
                 {{ (hasColorStock(color) ? 'InStock' : 'OutOfStock') | localize }}
             </h6>
 
-            <div class="color-card" [ngClass]="i === currentIndex ? 'border border-primary' : ''">
+            <div class="color-card" [ngClass]="i === currentIndex ? 'border border-primary raduis-6' : ''">
                 <div *ngIf="color?.colorCode" class="colorBox" [ngStyle]="{ 'background-color': color.colorCode }"
                     (click)="setSizes(i)">
                 </div>
