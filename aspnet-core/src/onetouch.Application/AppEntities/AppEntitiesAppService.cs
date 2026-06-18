@@ -1180,6 +1180,16 @@ namespace onetouch.AppEntities
         //I46 {End}
         public async Task<long> SaveEntity(AppEntityDto input)
         {
+            return await SaveEntity(input, null, null);
+        }
+
+        public async Task<long> SaveEntityWithLookupCache(AppEntityDto input, IDictionary<long, long?> attributeValueEntityObjectTypeCache, IDictionary<string, long?> entityObjectTypeCodeCache)
+        {
+            return await SaveEntity(input, attributeValueEntityObjectTypeCache, entityObjectTypeCodeCache);
+        }
+
+        private async Task<long> SaveEntity(AppEntityDto input, IDictionary<long, long?> attributeValueEntityObjectTypeCache, IDictionary<string, long?> entityObjectTypeCodeCache)
+        {
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
             {
                 AppEntity entity;
@@ -1359,18 +1369,34 @@ namespace onetouch.AppEntities
                             //mmt30
                             if (extraData.AttributeValueId != 0 && extraData.AttributeValueId != null)
                             {
-                                var type = await _appEntityRepository.FirstOrDefaultAsync(x => x.Id == extraData.AttributeValueId);
-                                if (type!=null)
-                                    extraData.EntityObjectTypeId = type.EntityObjectTypeId;
+                                var attributeValueId = (long)extraData.AttributeValueId;
+                                if (attributeValueEntityObjectTypeCache == null || !attributeValueEntityObjectTypeCache.TryGetValue(attributeValueId, out var entityObjectTypeId))
+                                {
+                                    entityObjectTypeId = await _appEntityRepository.GetAll()
+                                        .Where(x => x.Id == attributeValueId)
+                                        .Select(x => (long?)x.EntityObjectTypeId)
+                                        .FirstOrDefaultAsync();
+                                    attributeValueEntityObjectTypeCache?.Add(attributeValueId, entityObjectTypeId);
+                                }
+                                if (entityObjectTypeId != null)
+                                    extraData.EntityObjectTypeId = entityObjectTypeId;
 
                             }
                             else
                             {
                                 if (!string.IsNullOrEmpty(extraData.EntityObjectTypeCode))
                                 {
-                                    var type = await _appEntityRepository.FirstOrDefaultAsync(x => x.EntityObjectTypeCode == extraData.EntityObjectTypeCode);
-                                    if (type != null)
-                                        extraData.EntityObjectTypeId = type.EntityObjectTypeId;
+                                    var entityObjectTypeCode = extraData.EntityObjectTypeCode;
+                                    if (entityObjectTypeCodeCache == null || !entityObjectTypeCodeCache.TryGetValue(entityObjectTypeCode, out var entityObjectTypeId))
+                                    {
+                                        entityObjectTypeId = await _appEntityRepository.GetAll()
+                                            .Where(x => x.EntityObjectTypeCode == entityObjectTypeCode)
+                                            .Select(x => (long?)x.EntityObjectTypeId)
+                                            .FirstOrDefaultAsync();
+                                        entityObjectTypeCodeCache?.Add(entityObjectTypeCode, entityObjectTypeId);
+                                    }
+                                    if (entityObjectTypeId != null)
+                                        extraData.EntityObjectTypeId = entityObjectTypeId;
                                 }
                                 else
                                 extraData.EntityObjectTypeId = null;
