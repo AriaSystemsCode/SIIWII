@@ -404,7 +404,10 @@ namespace onetouch.AppMarketplaceAccounts
                                ).OrderByDescending(z => z.CreationTime).FirstOrDefaultAsync();*/
                             var relationshipsList = await _appContactRelationshipInfoRepository.GetAll()
                                 .Where(z => currentTenantAccountObject != null && (((z.RecipientContactSSIN == currentTenantAccountObject.SSIN && z.RequesterContactSSIN == account.Account.SSIN)
-                                || (z.RecipientContactSSIN == account.Account.SSIN && z.RequesterContactSSIN == currentTenantAccountObject.SSIN)) && z.EntityObjectStatusId != inActiveRelationshipStatusId)
+                                ||
+                                (z.RecipientContactSSIN == account.Account.SSIN 
+                                && z.RequesterContactSSIN == currentTenantAccountObject.SSIN)) 
+                                && z.EntityObjectStatusId != inActiveRelationshipStatusId)
                                ).OrderByDescending(z => z.CreationTime).ToListAsync();
                             account.ConnectionsInfo = new List<ConnectionInfo>();
                             if (relationshipsList!=null && relationshipsList.Count>0)
@@ -419,6 +422,8 @@ namespace onetouch.AppMarketplaceAccounts
                                     connInfo.Visibility = relationship.SharingLevel == 1 ? "Public" : "Private";
                                     connInfo.ConnectionStatus = relationship.EntityObjectStatusCode;                                                         //account.Account.AccountType.Substring(0, 1);
                                     connInfo.RelationshipCode = relationship.EntityObjectTypeCode;                                                                                                            //xx
+                                    connInfo.RequestorRole = relationship.RequesterMarketplaceRole;
+                                    connInfo.RecipientRole = relationship.RecipientMarketplaceRole;
                                     var relationType = await _appEntityRepository.GetAll().Include(z => z.EntityExtraData).Where(z => z.Code == relationshipCode).FirstOrDefaultAsync();
                                     if (relationType != null)
                                     {
@@ -481,6 +486,16 @@ namespace onetouch.AppMarketplaceAccounts
                                         var existInconn = account.ConnectionsInfo.Where(z => z.RelationshipCode == relationshipCodeLookup.Code).FirstOrDefault();
                                         if (existInconn != null)
                                             continue;
+                                        else
+                                        {
+                                            string requestorMarketplaceRole = relationshipCodeLookup.EntityExtraData.Where(z => z.AttributeId == 610).Select(z => z.AttributeValue).FirstOrDefault();
+                                            string recipientMarketplaceRole = relationshipCodeLookup.EntityExtraData.Where(z => z.AttributeId == 611).Select(z => z.AttributeValue).FirstOrDefault();
+                                            var oppositeRelation = account.ConnectionsInfo
+                                                .Where(z => z.RecipientRole == requestorMarketplaceRole &&
+                                                z.RequestorRole == recipientMarketplaceRole).FirstOrDefault();
+                                            if (oppositeRelation != null)
+                                                continue;
+                                        }
                                     }
                                     if (account.AvailableConnections != null && account.AvailableConnections.Count > 0)
                                     {
@@ -560,6 +575,15 @@ namespace onetouch.AppMarketplaceAccounts
                                     var existInconn = account.ConnectionsInfo.Where(z => z.RelationshipCode == relationshipCodeLookup.Code).FirstOrDefault();
                                     if (existInconn != null)
                                         continue;
+                                    else {
+                                        string requestorMarketplaceRole = relationshipCodeLookup.EntityExtraData.Where(z => z.AttributeId == 610).Select(z => z.AttributeValue).FirstOrDefault();
+                                        string recipientMarketplaceRole = relationshipCodeLookup.EntityExtraData.Where(z => z.AttributeId == 611).Select(z => z.AttributeValue).FirstOrDefault();
+                                        var oppositeRelation = account.ConnectionsInfo
+                                            .Where(z => z.RecipientRole == requestorMarketplaceRole &&
+                                            z.RequestorRole == recipientMarketplaceRole).FirstOrDefault();
+                                        if (oppositeRelation != null)
+                                            continue;
+                                    }
                                 }
                                 if (account.AvailableConnections != null && account.AvailableConnections.Count > 0)
                                 {
@@ -1016,6 +1040,8 @@ namespace onetouch.AppMarketplaceAccounts
                                     connInfo.Visibility = relationship.SharingLevel == 1 ? "Public" : "Private";
                                     connInfo.ConnectionStatus = relationship.EntityObjectStatusCode;
                                     connInfo.RelationshipCode = relationship.EntityObjectTypeCode;
+                                    connInfo.RequestorRole = relationship.RequesterMarketplaceRole;
+                                    connInfo.RecipientRole = relationship.RecipientMarketplaceRole;
                                     var relationshipCode = await _appEntityRepository.GetAll().Include(z => z.EntityExtraData).Where(z => z.Code == relationship.EntityObjectTypeCode).FirstOrDefaultAsync();
                                     if (relationshipCode != null)
                                     {
@@ -1056,6 +1082,15 @@ namespace onetouch.AppMarketplaceAccounts
                                     var existInconn = output.ConnectionsInfo.Where(z => z.RelationshipCode == relationshipCodeLookup.Code).FirstOrDefault();
                                     if (existInconn != null)
                                         continue;
+                                    else {
+                                        string requestorMarketplaceRole = relationshipCodeLookup.EntityExtraData.Where(z => z.AttributeId == 610).Select(z => z.AttributeValue).FirstOrDefault();
+                                        string recipientMarketplaceRole = relationshipCodeLookup.EntityExtraData.Where(z => z.AttributeId == 611).Select(z => z.AttributeValue).FirstOrDefault();
+                                        var oppositeRelation = output.ConnectionsInfo
+                                            .Where(z => z.RecipientRole == requestorMarketplaceRole &&
+                                            z.RequestorRole == recipientMarketplaceRole).FirstOrDefault();
+                                        if (oppositeRelation != null)
+                                            continue;
+                                    }
                                 }
                                 var requestorRole = relationshipCodeLookup.EntityExtraData.Where(z => z.AttributeId == 610).FirstOrDefault();
                                 var recepientRole = relationshipCodeLookup.EntityExtraData.Where(z => z.AttributeId == 611).FirstOrDefault();
