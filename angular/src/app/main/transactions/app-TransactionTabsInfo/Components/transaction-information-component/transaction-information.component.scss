@@ -1506,3 +1506,25 @@ height: 48px;
 .dropActions {
     width: 110px;height: 60px;
 }
+
+
+::ng-deep{
+    @media (max-width: 768px) {
+        .p-treetable {
+
+   max-width: 40rem !important;
+    overflow-x: auto !important;
+    }
+}
+}
+
+
+::ng-deep{
+    @media (max-width: 520px) {
+        .p-treetable {
+
+   max-width: 33rem !important;
+    overflow-x: auto !important;
+    }
+}
+}

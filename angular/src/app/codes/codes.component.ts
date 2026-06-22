@@ -7,6 +7,8 @@ import {
   SycIdentifierDefinitionsServiceProxy,
 
 } from '@shared/service-proxies/service-proxies';
+import { Observable } from 'rxjs';
+import { shareReplay } from 'rxjs/operators';
 
 @Component({
   selector: 'app-codes',
@@ -14,6 +16,8 @@ import {
   styleUrls: ['./codes.component.scss']
 })
 export class CodesComponent extends AppComponentBase implements OnInit {
+
+  private static identifierDefCache = new Map<string, Observable<GetSycIdentifierDefinitionForViewDto>>();
 
   sycIdentifierDefinition: SycIdentifierDefinitionDto = new SycIdentifierDefinitionDto();
   getSycIdentifierDefinitionForViewDto: GetSycIdentifierDefinitionForViewDto = new GetSycIdentifierDefinitionForViewDto();
@@ -46,7 +50,14 @@ export class CodesComponent extends AppComponentBase implements OnInit {
     if (!this.editMode && !this.code) 
     this.code = ''; 
     
-    this._sycIdentifierDefinitionsServiceProxy.getSycIdentifierDefinitionByTypeForView(this.objectType).subscribe
+    let cacheKey = this.objectType || 'DEFAULT';
+    let obs$ = CodesComponent.identifierDefCache.get(cacheKey);
+    if (!obs$) {
+        obs$ = this._sycIdentifierDefinitionsServiceProxy.getSycIdentifierDefinitionByTypeForView(this.objectType).pipe(shareReplay(1));
+        CodesComponent.identifierDefCache.set(cacheKey, obs$);
+    }
+
+    obs$.subscribe
       ((result) => {
         this.sycIdentifierDefinition = result.sycIdentifierDefinition;
         this.getSycIdentifierDefinitionForViewDto = result;
