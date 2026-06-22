@@ -250,7 +250,7 @@
                                   <ng-container *ngIf="kindOf(activeAttachments[currentIndex]) === 'pdf'">
                                     <div *ngIf="pdfThumbLoadingMap[currentIndex]" class="main-loading">
                                       <i class="fa fa-spinner fa-spin fa-2x"></i>
-                                      <span class="mx-2">Loading preview...</span>
+                                      <span class="mx-2">{{ 'LoadingPreview' | localize }}</span>
                                     </div>
                               
                                     <img *ngIf="!pdfThumbLoadingMap[currentIndex] && pdfThumbMap[currentIndex]"
@@ -262,7 +262,7 @@
                                     <div *ngIf="!pdfThumbLoadingMap[currentIndex] && !pdfThumbMap[currentIndex]"
                                          class="main-fallback">
                                       <div>Unable to generate PDF preview.</div>
-                                      <a (click)="openNewTab(activeAttachments[currentIndex])">Open PDF</a>
+                                      <a (click)="openNewTab(activeAttachments[currentIndex])">{{ 'OpenPdf' | localize }}</a>
                                     </div>
                                   </ng-container>
                               
@@ -914,6 +914,8 @@
                 </div>
             </div>
         </div>
+
+        
         <div
             [class]="
                 containerClass + ' kt-grid__item kt-grid__item--fluid mt-5'
@@ -940,7 +942,7 @@
                     </div>
 
                     <div *ngIf="appItemForViewDto?.manufacturerCode" class="row">
-                        <h5>Manufacture Code  :</h5>
+                       <h5>{{ "ManufactureCode" | localize }} :</h5>
                         &nbsp;
                         {{ appItemForViewDto?.manufacturerCode }}
                     </div>
@@ -1011,6 +1013,8 @@
                 </ng-template>
             </div>
         </div>
+
+
         <div
             [class]="
                 containerClass + ' kt-grid__item kt-grid__item--fluid mt-5'

@@ -89,7 +89,7 @@
             #publishStatusFilter
             [filterMetaData]="publishStatusFilterMetaData"
             [formContol]="filterForm.controls.publishStatus"
-            [title]="'Sharing Status'"
+            [title]="'SharingStatus' | localize"
             (onLoadData)="getPublishOptionsList(publishStatusFilter)"
         >
         </app-single-selection-filter>

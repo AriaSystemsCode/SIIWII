@@ -62,7 +62,7 @@
 
                                 <p class="stpTitle ml-md-5 ml-2" style="white-space: nowrap;"
                                     [ngClass]="currentStep >= step.printCatalogueStepsEnum ? 'currStp':'defStp'">{{
-                                    step.title }}</p>
+                                   {{ step.title | localize }} }}</p>
                                 <div class="d-flex align-items-center">
 
                                     <span

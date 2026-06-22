@@ -7,6 +7,7 @@
     <text name="HomePage">الرئيسية</text>
     <text name="AboutUs">من نحن</text>
     <text name="Administration">الإدارة</text>
+    <text name="Administration">الإدارة</text>
     <text name="Roles">الأدوار</text>
     <text name="Users">المستخدمين</text>
     <text name="InvalidFormMessage">النموذج يحتوي على أخطاء - يرجى تصحيح الأخطاء و المحاولة مرة اخرى</text>
@@ -30,7 +31,7 @@
     <text name="RoleProperties">خصائص الدور</text>
     <text name="Permissions">إذونات</text>
     <text name="Save">حـفظ</text>
-    <text name="Cancel">إغلاق</text>
+    <text name="Cancel">إلغاء</text>
     <text name="RolesHeaderInfo">إستخدم الأدوار لإنشاء مجموعة إذونات</text>
     <text name="Static">مـثبّت</text>
     <text name="Actions">إجراءات</text>
@@ -58,7 +59,7 @@
     <text name="No">لا</text>
     <text name="MySettings">إعداداتي</text>
     <text name="Logout">تسجيل الخروج</text>
-    <text name="Reset">مسح</text>
+    <text name="Reset">>إعادة تعيين</text>
     <text name="ResetPermissionsTooltip"> هذا الزر سيقوم على الفور بمسح إذونات المستخدم. المستخدم سيملك الإذونات المرتبطة بالأدوار المعينة من قبل</text>
     <text name="ResetSuccessfully">تم المسح بنجاح</text>
     <text name="Tenants">عملاء</text>
@@ -162,7 +163,7 @@
     <text name="PersonalInformations">معلومات شخصية</text>
     <text name="AccountSettings">إعدادات الحساب</text>
     <text name="Captha_Hint">الرجاء إدخال الرمز الذي يظهر في الصورة أدناه</text>
-    <text name="Back">العودة</text>
+    <text name="Back">رجوع</text>
     <text name="Submit">أرسل</text>
     <text name="SignUp">إشترك</text>
     <text name="CaptchaCanNotBeEmpty">يجب أن تثبت أنك لست روبوتًا.</text>
@@ -1091,7 +1092,7 @@
 <text name="End">النهاية</text>
 <text name="By">بواسطة</text>
 <text name="ChooseDate">اختر التاريخ</text>
-<text name="OnlyAvailableInStock">المتاح بالمخزون فقط</text>
+<text name="OnlyAvailableInStock">>متوفر في المخزون فقط</text>
 <text name="ClearFilter">مسح الفلتر</text>
 <text name="Filter">فلتر</text>
 <text name="ClearAllFilters">مسح كل الفلاتر</text>
@@ -1145,7 +1146,7 @@
 <text name="InviteContact">دعوة جهة اتصال</text>
 <text name="CreateBusinessAccount">إنشاء حساب تجاري</text>
 <text name="CreateGroupAccount">إنشاء حساب مجموعة</text>
-		<text name="Products">Products</text>
+<text name="Products">المنتجات</text>
 
 <text name="ContactUs">اتصل بنا</text>
 <text name="YourRequestHasBeenSubmitted">تم إرسال طلبك بنجاح</text>
@@ -1567,5 +1568,246 @@
 <text name="ColorName">اسم اللون</text>
 <text name="MaterialContent">محتوى الخامة</text>
 
+	  <text name="Brand">العلامة التجارية</text>
+	  <text name="Category">الفئة</text>
+	  <text name="AddNew">إضافة جديد</text>
+	  <text name="AddedToLookup">تمت الإضافة إلى القائمة</text>
+	  <text name="SetDefaultValue">تعيين كقيمة افتراضية</text>
+	  <text name="AddToLookup">إضافة إلى القائمة</text>
+	  <text name="ImageType">نوع الصورة</text>
+	  <text name="UploadFiles">رفع الملفات</text>
+	  <text name="SelectAndUploadTheFiles">اختر الملفات وقم برفعها</text>
+	  <text name="OpenPDF">فتح ملف PDF</text>
+	  <text name="NoThanks">لا شكراً</text>
+	  <text name="CreateAnother">إنشاء عنصر آخر</text>
+	  <text name="PDF">ملف PDF</text>
+	  <text name="ImageAttach">إرفاق صورة</text>
+	  <text name="LoadMore">تحميل المزيد</text>
+	  <text name="UploadFile">رفع ملف</text>
+	  <text name="SelectImageFileTypes">اختر ملف JPG أو JPEG أو PNG أو GIF</text>
+	  <text name="PreviewOrApplyThisTheme">معاينة هذا المظهر أو تطبيقه.</text>
+	  <text name="PleaseSelectAProductTypeFirst">من فضلك اختر نوع المنتج أولاً</text>
+	  <text name="NoAttributes">لا توجد خصائص</text>
+	  <text name="ClickOrDrop">اضغط أو اسحب الملف</text>
+	  <text name="AspectRatio?">نسبة الأبعاد: {0}</text>
+	  <text name="MaxSize?">الحد الأقصى للحجم: {0}</text>
+	  <text name="AspectRatio">نسبة الأبعاد</text>
+	  <text name="MaxSize">الحد الأقصى للحجم</text>
+	  <text name="SupportedExtensions">الامتدادات المدعومة</text>
+	  <text name="AddNewValue">إضافة قيمة جديدة</text>
+	  <text name="NoRecordsFound">لا توجد بيانات</text>
+	  <text name="CreateNew">إنشاء جديد</text>
+	  <text name="PleaseFillTheBelowInformation">يرجى ملء البيانات التالية</text>
+	  <text name="CodeIsRequired">الكود مطلوب</text>
+	  <text name="Solid">لون صلب</text>
+	  <text name="ExtraAttributes">خصائص إضافية</text>
+	  <text name="Departments">الأقسام</text>
+	  <text name="Categories">التصنيفات</text>
+	  <text name="Classifications">التصنيفات</text>
+	  <text name="From">من</text>
+	  <text name="To">إلى</text>
+	  <text name="StartDate">تاريخ البداية</text>
+	  <text name="EndDate">تاريخ النهاية</text>
+	  <text name="ClearAllFilters">مسح كل الفلاتر</text>
+	  <text name="MSRP">السعر المقترح من المصنع</text>
+	  <text name="RRP">السعر التجزئة المقترح</text>
+	  <text name="SoldBy">يباع بواسطة</text>
+	  <text name="NoSellerName">لا يوجد اسم للبائع</text>
+	  <text name="ProductDescription">وصف المنتج</text>
+	  <text name="WarningMessage">رسالة تحذير</text>
+	  <text name="SearchWithColor">SearchWithColor</text>
+	  <text name="ViewOrderedQuantityBySize">عرض الكمية حسب المقاس</text>
+	  <text name="Connect , Proceed">الاتصال والمتابعة</text>
+	  <text name="LoadingPreview">جاري تحميل المعاينة</text>
+	  <text name="ManufactureCode">كود التصنيع</text>
+	  <text name="ProductType">نوع المنتج</text>
+	  <text name="UserDoesn'tAddAnyDepartmentsYet">لم يتم إضافة أقسام بعد</text>
+	  <text name="UserDoesn'tAddAnyClassificationsYet">لم يتم إضافة تصنيفات بعد</text>
+	  <text name="showmore">عرض المزيد</text>
+	  <text name="Showless">عرض أقل</text>
+	  <text name="Recommended">موصى به</text>
+	  <text name="Additional">إضافي</text>
+	  <text name="Shared">مشترك</text>
+	  <text name="Private">خاص</text>
+	  <text name="Hidden">مخفي</text>
+	  <text name="View">عرض</text>
+	  <text name="ToggleView">تغيير العرض</text>
+	  <text name="ResetData">إعادة ضبط البيانات</text>
+	  <text name="ListName">اسم القائمة</text>
+	  <text name="digits">حرف</text>
+	  <text name="ListCode">كود القائمة</text>
+	  <text name="ListDescription">وصف القائمة</text>
+	  <text name="Variation">الخيارات</text>
+	  <text name="Undo">تراجع</text>
+	  <text name="PublishListing">نشر المنتج</text>
+	  <text name="UnpublishListing">إلغاء نشر المنتج</text>
+	  <text name="SelectedProducts">المنتجات المحددة</text>
+	  <text name="Invert">عكس التحديد</text>
+	  <text name="ImportProducts">استيراد المنتجات</text>
+	  <text name="UploadAvailableInventory">رفع المخزون المتاح</text>
+	  <text name="Results">نتيجة</text>
+	  <text name="NoDataFound">لا توجد بيانات</text>
+	  <text name="SelectFromTheBelow">اختر من القائمة التالية</text>
+	  <text name="ProductTypes">أنواع المنتجات</text>
+	  <text name="SizeScale">مقياس المقاسات</text>
+	  <text name="ProductCategories">فئات المنتجات</text>
+	  <text name="ProductClassifications">تصنيفات المنتجات</text>
+	  <text name="SharingStatus">حالة المشاركة</text>]
+	  <text name="AttributesAndOptionsYou’veSelected">الخصائص والخيارات التي قمت بتحديدها</text>
+	  <text name="NumberOfVariations">عدد المتغيرات</text>
+	  <text name="PriceRangedFrom">يتراوح السعر من</text>
+	  <text name="AvailableQuantity">الكمية المتاحة</text>
+	  <text name="HeaderTitle">عنوان الصفحة</text>
+	  <text name="HeaderDesc">وصف الصفحة</text>
+	  <text name="SaveListing">حفظ الإعلان</text>
+	  <text name="SaveProduct">حفظ المنتج</text>
+	  <text name="SaveChanges">حفظ التعديلات</text>
+	  <text name="Publish">نشر</text>
+	  <text name="UnPublish">إلغاء النشر</text>
+	  <text name="ProductDetails">تفاصيل المنتج</text>
+	  <text name="TheProductType">نوع المنتج</text>
+	  <text name="Standard">قياسي</text>
+	  <text name="HTML">HTML</text>
+	  <text name="Description">الوصف</text>
+	  <text name="BuyersMayAlsoBeInterestedInTheseItemSpecifics">
+		  Buyers May Also Be Interested In These Item Specifics
+	  </text>
+	  <text name="BuyersMayAlsoBeInterestedInTheseItemSpecifics">
+		  قد يهتم المشترون أيضًا بهذه التفاصيل
+	  </text>
+	  <text name="NoCategoriesSelected">لم يتم اختيار تصنيفات</text>
+	  <text name="NoClassificationsSelected">لم يتم اختيار تصنيفات فرعية</text>
+	  <text name="NoDepartmentsSelected">لم يتم اختيار أقسام</text>
+	  <text name="ParentItemAttachments">مرفقات المنتج الأساسي</text>
+	  <text name="YouCanChangeTheVariationTypeToAddMorePhotos">
+		  You can change the variation type to add more photos
+	  </text>
+	  <text name="YouCanChangeTheVariationTypeToAddMorePhotos">
+		  يمكنك تغيير نوع المتغير لإضافة المزيد من الصور
+	  </text>
+	  <text name="ChooseAFileOrDragDropItHere">
+		  Choose a file or drag & drop it here
+	  </text>
+	  <text name="ChooseAFileOrDragDropItHere">
+		  اختر ملف أو اسحبه هنا
+	  </text>
+	  <text name="AddAttachment">إضافة مرفق</text>
+	  <text name="ImagePreview">معاينة الصورة</text>
+	  <text name="DefaultImage">الصورة الافتراضية</text>
+	  <text name="VisibleInMarketplace">مرئي في المتجر</text>
+	  <text name="AdvancedPricing">التسعير المتقدم</text>
+	  <text name="Variations">المتغيرات</text>
+	  <text name="CreateVariation">إنشاء متغير</text>
+	  <text name="EditVariations">تعديل المتغيرات</text>
+	  <text name="RemoveAll">حذف الكل</text>
+	  <text name="PleaseCheckThisBoxIfYouSellMultipleVariationsOfYourProduct">
+		  Please check this box if you sell multiple variations of your product
+	  </text>
+	  <text name="PleaseCheckThisBoxIfYouSellMultipleVariationsOfYourProduct">
+		  يرجى تحديد هذا الخيار إذا كنت تبيع أكثر من نسخة من المنتج
+	  </text>
+	  <text name="VariationCombinations">تركيبات المتغيرات</text>
+	  <text name="YouCanEditYourVariationsAndChangeThePriceForEach">
+		  يمكنك تعديل المتغيرات وتغيير السعر لكل واحد منها
+	  </text>
+	  <text name="ApplyVariations">تطبيق المتغيرات</text>
+	  <text name="ApplyChanges">تطبيق التعديلات</text>
+
+
+	  <text name="AGeneratedMatricesOfVariationCombinationWhereYouCanEditThemAsYouWant">
+		  مصفوفة تلقائية لتوليفات المتغيرات يمكنك تعديلها كما تريد
+	  </text>
+	  <text name="ExistingVariations">المتغيرات الحالية</text>
+	  <text name="NewVariations">متغيرات جديدة</text>
+	  <text name="SelectionActions">إجراءات التحديد</text>
+	  <text name="EditSetPrice">تعديل / تحديد السعر</text>
+	  <text name="EnterPriceForSelectedVariations">أدخل السعر للمتغيرات المحددة</text>
+	  <text name="PleaseEnterThePriceForTheSelectedItemsAfterThatThePriceWillApplyOnSelected">
+		  أدخل السعر للعناصر المحددة وسيتم تطبيقه عليها
+	  </text>
+	  <text name="DeleteSelections">حذف التحديدات</text>
+	  <text name="DeleteSelection">حذف التحديد</text>
+	  <text name="AreYouSureYouWantToDeleteTheseVariationSelected">
+		  هل أنت متأكد أنك تريد حذف هذه المتغيرات المحددة؟
+	  </text>
+	  <text name="ItemMajor">المنتج الأساسي</text>
+	  <text name="VariationCode">كود المتغير</text>
+	  <text name="SSINNumber">رقم SSIN</text>
+	  <text name="Photos">الصور</text>
+	  <text name="SiwiiMarketplace">منصة SIWII</text>
+	  <text name="Attributes">السمات</text>
+	  <text name="AddAttribute">إضافة سمة</text>
+	  <text name="AddVariationAttribute">إضافة سمة للمتغيرات</text>
+	  <text name="Options">الخيارات</text>
+	  <text name="CreateVariationsHint">
+		  اختر سمة ثم اختر الخيارات الخاصة بالمنتجات التي تبيعها. لعرض المزيد من السمات اضغط إضافة.
+	  </text>
+	  <text name="YouHaveBeenSelected">لقد قمت باختيار</text>
+	  <text name="SelectSizes">اختيار المقاسات</text>
+	  <text name="ViewSelectedSizes">عرض المقاسات المختارة</text>
+	  <text name="SizeRatio">نسبة المقاسات</text>
+	  <text name="AttributesAndOptionsYouHaveSelected">السمات والخيارات التي اخترتها</text>
+	  <text name="RegenerateVariation">إعادة توليد المتغيرات</text>
+
+	  <text name="ChangeVariationTypeToAddMorePhotos">يمكنك تغيير نوع المتغير لإضافة المزيد من الصور</text>
+	  <text name="ChooseFileOrDragDropHere">اختر ملف أو اسحبه هنا</text>
+	  <text name="SupportedFormatsAndSize">JPEG، PNG، PDF، MP4 حتى 25 ميجابايت</text>
+	  <text name="ImageAspectRatio16_9">نسبة الأبعاد 16:9</text>
+	  <text name="ReportViewer">عرض التقرير</text>
+	  <text name="PrintInfo">معلومات الطباعة</text>
+	  <text name="DetailInfo">تفاصيل البيانات</text>
+	  <text name="CoverPage">الصفحة الرئيسية</text>
+	  <text name="ChooseTemplate">اختيار القالب</text>
+	  <text name="DataSelection">اختيار البيانات</text>
+	  <text name="Continue">استمرار</text>
+	  <text name="SelectPrice">اختيار السعر</text>
+	  <text name="SelectLinesheetTemplate">
+		  من فضلك اختر أحد قوالب خط المنتجات المتاحة
+	  </text>
+	  <text name="PleaseFillRequiredLinesheetInformation">من فضلك املأ بيانات الخط الورقي المطلوبة</text>
+	  <text name="MyProducts">منتجاتي</text>
+	  <text name="CC">نسخة</text>
+	  <text name="BCC">نسخة مخفية</text>
+	  <text name="Subject">الموضوع</text>
+	  <text name="sendemail">إرسال البريد</text>
+	  <text name="EnterSizeRatioName">أدخل اسم نسبة المقاسات</text>
+	  <text name="SelectSizeRatio">اختيار نسبة المقاسات</text>
+	  <text name="SaveSizeRatio">حفظ نسبة المقاسات</text>
+	  <text name="SaveAsNewSizeRatio">حفظ كنسبة جديدة</text>
+	  <text name="RatioTotQty">إجمالي الكمية</text>
+	  <text name="IndividualSizesWillBeDisplayedAs">سيتم عرض المقاسات الفردية كالتالي</text>
+	  <text name="FirstDimensionName">البُعد الأول</text>
+	  <text name="SecondDimensionName">البُعد الثاني</text>
+	  <text name="ProductAdvancedPricing">التسعير المتقدم للمنتج</text>
+	  <text name="EditListing">تعديل القائمة</text>
+	  <text name="AddToProductList">إضافة إلى قائمة المنتجات</text>
+	  <text name="CreateNewList">إنشاء قائمة جديدة</text>
+
+	  <text name="SharingOptions">خيارات المشاركة</text>
+	  <text name="ChooseSharingOptions">اختر خيارات المشاركة</text>
+	  <text name="Restricted">مقيد</text>
+	  <text name="ShareWith">مشاركة مع</text>
+	  <text name="TypeOrSearchForMembersAndAccounts">اكتب أو ابحث عن الأعضاء والحسابات</text>
+	  <text name="NotifyPeople">إشعار الأشخاص</text>
+	  <text name="SubscribersToProduct">لديك {0} مشترك في هذا المنتج</text>
+	  <text name="MakePrivate">تحويل إلى خاص</text>
+	  <text name="Unhide">إظهار</text>
+  <text name="EnterSizeScaleName">أدخل اسم مقاس القياس</text>
+<text name="EnterFirstDimensionName">أدخل اسم البُعد الأول</text>
+<text name="EnterSecondDimensionName">أدخل اسم البُعد الثاني</text>
+	  <text name="YourListingIsNowAddedToTheList">تمت إضافة القائمة إلى قائمة {0}</text>
+	  <text name="SelectVariationsTitle">اختيار / إلغاء اختيار المتغيرات</text>
+	  <text name="SelectVariationsHint">اختر أو احذف المتغيرات التي تريد ظهورها في القائمة</text>
+	  <text name="Size">المقاس</text>
+	  <text name="Closure">الإغلاق</text>
+	  <text name="TrendingPosts">المواضيع الرائجة</text>
+	  <text name="TopIndividualContributors">أفضل المساهمين الأفراد</text>
+	  <text name="TopCompanyContributors">أفضل مساهمات الشركات</text>
+	  <text name="NewsDigest">ملخص الأخبار</text>
+	  <text name="SeeAll">عرض الكل</text>
+	  <text name="PostBy">بواسطة</text>
+	  <text name="UpcomingEvents">الأحداث القادمة</text>
+	  <text name="InPerson">حضوري</text>
+	  <text name="advertisement">إعلان</text>
   </texts>
 </localizationDictionary>

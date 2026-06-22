@@ -1155,9 +1155,6 @@
     </p-dialog>
 
 
-
-
-
     <p-dialog [(visible)]="alreadyOrderd" [modal]="true" [style]="{ 'width': '450px', 'border-radius': '20px' }"
         [draggable]="false">
 
@@ -1198,8 +1195,7 @@
         </div>
 
         <div class="p-2 d-flex justify-content-center">
-            <button type="button" (click)="connect()" label="Connect & Proceed " class="pBtntext mr-2">{{'Connect &
-                Proceed' | localize}} </button>
+            <button type="button" (click)="connect()" label="Connect & Proceed " class="pBtntext mr-2">{{'Connect , Proceed' | localize}} </button>
             <button type="button" (click)="IsConnected = false;" label="Cancel" class="pBtnCancel">{{'Cancel' |
                 localize}}</button>
         </div>

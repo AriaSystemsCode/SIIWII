@@ -28,7 +28,7 @@
                         <button class="btn btn-primary text-capitalize" type="button" [disabled]="editVariationsOpend"  (click)="saveVariations()"  style="border-radius: 5px;
                         background-color: #4A0D4A !important;
                         border: #4A0D4A !important;color: white;">
-                            {{  !appItem?.id   ?  ("ApplyVariations" | localize ): ("Apply Changes" | localize) }}
+                            {{  !appItem?.id   ?  ("ApplyVariations" | localize ): ("ApplyChanges" | localize) }}
                         </button>
                     </div>
                 </div>
@@ -60,14 +60,14 @@
                                              'text-white' : activeExisttingVariation , 
                                             'text-purple' : !activeExisttingVariation}"
                                                 (click)="getExistingVariations()" *ngIf="showExisttingVariation" >
-                                                Existing Variations
+                                                {{'ExistingVariations'  | localize }}
                                             </a>
                                             <a  class="aria-tag  border mb-3 mr-3 pl-5 pr-5 position-relative pt-2 pb-2 rounded-lg" *ngIf="!showExisttingVariation || showNewVariation"
                                             [ngClass]="{'active':activeNewVariation , 
                                              'text-white' : activeNewVariation , 
                                             'text-purple' : !activeNewVariation}"
                                             (click)="getNewVariations()"  >
-                                        New Variations
+                                          {{'NewVariations'  | localize }}
                                         </a>
                                         </div>
                                         <div class="mb-3 d-flex flex-row" *ngIf="selectedVaritaions.length > 0">
@@ -78,7 +78,7 @@
                                                 border: 1px solid #4A0D4A !important;
                                                 color: #4A0D4A !important;"
                                                     dropdownToggle>
-                                                    {{'edit/set price' | localize}}
+                                                    {{'EditSetPrice' | localize}}
                                                 </button>
                                                 <div class="dropdown-menu pl-3 pr-3"  *dropdownMenu>
                                                     <div class="form-group mb-0">
@@ -194,13 +194,13 @@
                                                         {{extraAttr.name | localize}} {{"Code" | localize}}
                                                     </th>
                                                     <th *ngFor="let extraAttr of selectedExtraAttributes" [hidden]="extraAttr.entityObjectTypeCode !== 'COLOR' && extraAttr.entityObjectTypeCode !== 'SIZE' && extraAttr?.entityObjectTypeCode!=='CLOSURE'">
-                                                      <div> SIWII Marketplace  {{extraAttr.name | localize}}</div> 
+                                                      <div> {{ "SiwiiMarketplace" | localize }}   {{extraAttr.name | localize}}</div> 
                                                     </th>
                                                     <th>
                                                         {{ "VariationCode" | localize }}
                                                     </th>
                                                     <th>
-                                                        SSIN Number
+                                                       {{ "SSINNumber" | localize }}
                                                     </th>
                                                     <th>
                                                         {{ "Photos" | localize }}
@@ -529,7 +529,7 @@
                                     </span> -->
                                     <span> 
                                         {{ "Selected " | localize }} {{selectedExtraAttributes[activeExtraAttributeIndex].name | localize }}{{"S: "}} 
-                                        <span style="color: #9E9E9E;" *ngIf="selectedExtraAttributes[activeExtraAttributeIndex]?.selectedValues?.length>0"> {{"You have been select "}} {{selectedExtraAttributes[activeExtraAttributeIndex]?.selectedValues?.length }} {{selectedExtraAttributes[activeExtraAttributeIndex].name | localize | lowercase }} </span>
+                                        <span style="color: #9E9E9E;" *ngIf="selectedExtraAttributes[activeExtraAttributeIndex]?.selectedValues?.length>0"> {{" 'YouHaveBeenSelected'  | localize "}} {{selectedExtraAttributes[activeExtraAttributeIndex]?.selectedValues?.length }} {{selectedExtraAttributes[activeExtraAttributeIndex].name | localize | lowercase }} </span>
                                     </span>
                                     <input type="text" class="bg-white form-control ml-2" style="width:200px" [placeholder]="('Search' | localize) + ' ' + selectedExtraAttributes[activeExtraAttributeIndex].name" (input)="filterLookup($event)" name="search" >
                                     <button style="border-radius: 5px;
@@ -630,11 +630,11 @@
                                 <div class="custom-header border-dashed-bottom pb-4 mb-4">
                                     <h5 class="mb-1">
                                         <span >
-                                            {{ "AttributesAndOptionsYou’veSelected" | localize }}
+                                            {{ "AttributesAndOptionsYouHaveSelected" | localize }}
                                         </span>
                                     </h5>
                                     <p class="hint m-0 p-0">
-                                        {{ "SelectAnAttributeAndThenSelectTheOptionsOfTheProductsYouSell.ToSeeMoreAttributes,ClickAdd." | localize }}
+                                        {{ "CreateVariationsHint" | localize }}
                                     </p>
                                 </div>
                                 <div class="selected-attributes-summary">
@@ -672,7 +672,7 @@
                                                         dropdownToggle>
                                                         <p class="hint m-0 p-0 pl-5 ml-5">
                                                             <img  class="mr-2"  src="../../../../../assets/Items/Vector2.png"/>
-                                                             {{ 'You can change the variation type to add more photos' | localize}}</p>
+                                                             {{ 'ChangeVariationTypeToAddMorePhotos' | localize}}</p>
                                                     </button>
                                                     <ul class="dropdown-menu actions-dropdown-menu"  *dropdownMenu>
                                                         <li *ngFor="let extraAttr of selectedExtraAttributes;let i = index"  [hidden]=" extraAttr?.entityObjectTypeCode !=='COLOR' && extraAttr?.entityObjectTypeCode!=='SIZE' && extraAttr?.entityObjectTypeCode!=='CLOSURE'">
@@ -736,20 +736,20 @@
                                                     <div class="text-center">
                                                         <p  style="font-weight: bold; color: black;
     white-space: nowrap;">
-                                                    Choose a file or drag & drop it here
+                                                      {{ 'ChooseFileOrDragDropHere' | localize}}
                                                         </p>
                                                         <!-- <a class="btn btn-primary btn-sm mb-3 upload-btn">
                                                             {{ "AddAttachedFile" | localize }}
                                                         </a> -->
                                                         <p>
                                                             <!-- {{ 'YouCanSendUpTo25MBInAttachments' | localize}}. -->
-                                                            {{ 'File an be JPEG, PNG, PDf, and MP4 formats, up to 25 MB' | localize}}.   
+                                                            {{ 'SupportedFormatsAndSize' | localize}}.   
                                                         </p>
-                                                        <p style="color: #F6851D !important;">*Image Aspect-Ratio is 16:9 </p>
+                                                        <p style="color: #F6851D !important;">* {{'ImageAspectRatio16_9' | localize}} </p>
 
                                                 <a class="btn border-0 btn-sm mb-3 upload-btn" style="color: white !important; background-color: #4A0D4A !important;">
                                                     <!-- {{ 'AddAttachedFile' | localize}} -->
-                                                    {{ 'Add Attachment' | localize}}
+                                                    {{ 'AddAttachment' | localize}}
                                                 </a>
                                                     </div>
                                                 </label>

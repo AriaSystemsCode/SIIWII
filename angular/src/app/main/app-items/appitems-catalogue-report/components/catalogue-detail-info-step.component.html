@@ -169,7 +169,7 @@
                                         <p-inputSwitch [(ngModel)]="printInfoParam.showSpecialPrice" name="showPrice"
                                             (onChange)="onChangeSpecialPrice($event)"></p-inputSwitch>
                                         <div class="w-75 d-md-block d-none">
-                                            <p-dropdown [options]="specialPrices" placeholder="Select Price"
+                                            <p-dropdown [options]="specialPrices" placeholder="{{ 'SelectPrice' | localize }}"
                                                 styleClass="linesheet-price form-control bg-white" name="specialPrices"
                                                 [(ngModel)]="printInfoParam.specialPriceLevel"
                                                 [disabled]="!printInfoParam.showSpecialPrice" required>
@@ -177,7 +177,7 @@
                                         </div>
                                     </div>
                                     <div class="w-75 d-md-none d-block ml-2 mt-2">
-                                        <p-dropdown [options]="specialPrices" placeholder="Select Price"
+                                        <p-dropdown [options]="specialPrices" placeholder="{{ 'SelectPrice' | localize }}"
                                             styleClass="linesheet-price form-control bg-white" name="specialPrices"
                                             [(ngModel)]="printInfoParam.specialPriceLevel"
                                             [disabled]="!printInfoParam.showSpecialPrice" required>
