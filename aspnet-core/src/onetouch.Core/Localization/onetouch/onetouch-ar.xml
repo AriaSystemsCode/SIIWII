@@ -1808,7 +1808,7 @@
 		<text name="LetsView">دعونا  نعرض</text>
 		<text name="Event">  فعالية</text>
 		<text name="Post">موضوع  </text>
-		<text name=" Portal Settings">إعدادات المنفذ  </text>
+		<text name="Portal Settings">إعدادات المنفذ  </text>
 		<text name="IsDefault">افتراضي </text>
   </texts>
 </localizationDictionary>
