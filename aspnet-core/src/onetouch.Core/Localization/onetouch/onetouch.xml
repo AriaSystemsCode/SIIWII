@@ -2957,13 +2957,12 @@
 <text name="NoSellerName">Seller Name</text>
 <text name="SearchWithColor">Search With Color</text>
 <text name="ViewOrderedQuantityBySize">ViewOrderedQuantityBySize</text>
-<text name="Connect , Proceed">Connect & Proceed</text>
+<text name="Connect , Proceed">Connect &amp; Proceed</text>
 <text name="LoadingPreview">Loading Preview ...</text>
 <text name="ManufactureCode">Manufacture Code</text>
 <text name="Shared">Shared</text>
 <text name="Hidden">Hidden</text>
-<text name="View">View</text>
-<text name="Variation">Variation</text>
+
 <text name="SharingStatus">Sharing Status</text>
 <text name="HeaderTitle">Header Title</text>
 <text name="HeaderDesc">Header Description</text>
@@ -2984,13 +2983,13 @@ Select an attribute and then select the options of the products you sell. To see
 <text name="YouHaveBeenSelected">You have selected</text>
 <text name="AttributesAndOptionsYouHaveSelected">Attributes and options you've selected</text>
 <text name="ChangeVariationTypeToAddMorePhotos">You can change the variation type to add more photos</text>
-<text name="ChooseFileOrDragDropHere">Choose a file or drag & drop it here</text>
+<text name="ChooseFileOrDragDropHere">Choose a file or drag &amp; drop it here</text>
 <text name="SupportedFormatsAndSize">JPEG, PNG, PDF, MP4 formats up to 25MB</text>
 <text name="ImageAspectRatio16_9">Image aspect ratio is 16:9</text>
-<text name="VisibleInMarketplace">Visible in marketplace</text>
-<text name="DataSelection">Data Selection</text>
-<text name="ChooseTemplate">Choose Template</text>
-<text name="CoverPage">Cover Page</text>
+
+
+
+
 <text name="DetailInfo">Detail Information</text>
 <text name="PrintInfo">Print Information</text>
 <text name="ReportViewer">Report Viewer</text>
