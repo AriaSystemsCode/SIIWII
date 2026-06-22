@@ -1946,7 +1946,7 @@
 		<text name="Published">Published</text>
 		<text name="UnPublishedSuccessfully">Unpublished Successfully</text>
 		<text name="CreateNewProduct">Create New Product</text>
-		<text name="ProductId">Product Id</text>
+		<text name="Product Id">Product Id</text>
 		<text name="MyListings">My Listings</text>
 		<text name="ChooseSharingOptions">Choose Sharing Options</text>
 		<text name="TypeOrSearchForMembersAndAccounts">Type Or Search For Members And Accounts</text>
@@ -3000,5 +3000,12 @@ Please select one of the available linesheet templates
 <text name="SelectVariationsTitle">Select / Unselect Variations</text>
 <text name="SelectVariationsHint">Select or remove the variation you want to appear on your list</text>
 <text name="ChooseAFileOrDragDropItHere"> Choose a file or drag &amp; drop it here </text>
+<text name="TaxRate"> Tax Rate </text>
+<text name="Variationrequiredtosave"> Variationrequiredtosave </text>
+<text name="SizeName"> Size Name </text>
+<text name="Dimension"> Dimension </text>
+		<text name="Create">Create </text>
+		<text name="Addtoproductlist">Add to product list </text>
+		<text name="IsDefault">IsDefault </text>
   </texts>  
 </localizationDictionary>

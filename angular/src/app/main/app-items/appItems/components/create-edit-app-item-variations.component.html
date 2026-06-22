@@ -287,7 +287,7 @@
                                                         <div *ngFor="let entityExtraData of record.entityExtraData, let i = index" >
                                                                 <div *ngIf="entityExtraData.entityObjectTypeCode === 'SIZEMARKETPLACECODE'">
                                                                     <select (change)="handleSizeChange($event.target.value,record.entityExtraData, i, index)"  class="form-select form-control" aria-label="Default select example">
-                                                                        <option selected>Size</option>
+                                                                        <option selected>{{"Size" |localize}}</option>
                                                                         <option *ngFor="let extraAttribute of sizes"
                                                                          [value]="extraAttribute.value"
                                                                          [disabled]="entityExtraData.attributeValueId === extraAttribute.value"
@@ -535,7 +535,7 @@
                                     <button style="border-radius: 5px;
                                     background-color: white !important;
                                     border: 1px solid #EEEEEEEE !important;color: #4A0D4A !important;" class="ml-3 p-3 btn btn-outline-primary font-weight-normal p-2" (click)="openCreateNewAppEntityModal()" *ngIf="selectedExtraAttributes[activeExtraAttributeIndex].allowAddNew" >
-                                        <span class="mr-1">+</span> {{ "Add " | localize }} {{selectedExtraAttributes[activeExtraAttributeIndex].name}}
+                                        <span class="mr-1">+</span> {{ "Add" | localize }} {{selectedExtraAttributes[activeExtraAttributeIndex].name}}
                                     </button>
                                 </h6>
                                 

@@ -148,7 +148,7 @@
     <text name="EmailConfirmationRequiredForLogin">مطلوب تأكيد البريد الإلكتروني لتسجيل الدخول </text>
     <text name="{0}UserCannotBeDeleted">لا يمكن حذف المستخدم {0}.</text>
     <text name="TenantNameCanNotBeEmpty">اسم العميل لا يمكن أن يكون فارغا</text>
-    <text name="ExportToExcel">تصدير إلى إكسل - Excel</text>
+    <text name="ExportToExcel">تصدير إلى إكسل </text>
     <text name="ChangeProfilePicture">تغيير الصورة الشخصية</text>
     <text name="TenantName_Regex_Description">يجب أن يكون اسم العميل على الأقل حرفين ويبدأ بحرف ومن ثم : حرف أو رقم أو شرطه أو شرطه سفلية.</text>
     <text name="ProfilePicture_Change_Info">يمكنك إختيار ملف JPG/JPEG/PNG وبحد أقصى للحجم {0} كيلوبايت  </text>
@@ -1495,7 +1495,6 @@
 <text name="Created">تم الإنشاء</text>
 <text name="TypeYourNotesHere">اكتب ملاحظاتك هنا</text>
 <text name="Any">الكل</text>
-<text name="Color">اللون</text>
 <text name="select color">اختر اللون</text>
 <text name="select size">اختر المقاس</text>
 <text name="NoAddressesFound">لم يتم العثور على عناوين</text>
@@ -1766,7 +1765,7 @@
 	  <text name="SecondDimensionName">البُعد الثاني</text>
 	  <text name="ProductAdvancedPricing">التسعير المتقدم للمنتج</text>
 	  <text name="EditListing">تعديل القائمة</text>
-	  <text name="AddToProductList">إضافة إلى قائمة المنتجات</text>
+	  <text name="Addtoproductlist">إضافة إلى قائمة المنتجات</text>
 	  <text name="CreateNewList">إنشاء قائمة جديدة</text>
 
 	  <text name="SharingOptions">خيارات المشاركة</text>
@@ -1784,7 +1783,6 @@
 	  <text name="YourListingIsNowAddedToTheList">تمت إضافة القائمة إلى قائمة {0}</text>
 	  <text name="SelectVariationsTitle">اختيار / إلغاء اختيار المتغيرات</text>
 	  <text name="SelectVariationsHint">اختر أو احذف المتغيرات التي تريد ظهورها في القائمة</text>
-	  <text name="Size">المقاس</text>
 	  <text name="Closure">الإغلاق</text>
 	  <text name="TrendingPosts">المواضيع الرائجة</text>
 	  <text name="TopIndividualContributors">أفضل المساهمين الأفراد</text>
@@ -1795,5 +1793,22 @@
 	  <text name="UpcomingEvents">الأحداث القادمة</text>
 	  <text name="InPerson">حضوري</text>
 	  <text name="advertisement">إعلان</text>
+  <text name="TaxRate"> >معدل الضريبة </text>
+	  <text name="Variationrequiredtosave"> يجب اختيار متغير للحفظ </text>
+	  <text name="SizeName"> اسم المقاس</text>
+<text name="Dimension"> البعد </text>
+	  <text name="SelectSizeScale">اختيار مقياس المقاسات</text>
+	  <text name="SaveSizeScale">حفظ مقياس المقاسات</text>
+	  <text name="SaveAsNewSizeScale">حفظ كمقياس مقاسات جديد</text>
+      <text name="Create">إنشاء </text>
+	  <text name="COLOR"> اللون </text>
+	  <text name="SIZE">المقاس </text>
+	  <text name="My Transactions"> معاملاتي </text>
+		<text name="Product Id">معرف المنتج</text>
+		<text name="LetsView">دعونا  نعرض</text>
+		<text name="Event">  فعالية</text>
+		<text name="Post">موضوع  </text>
+		<text name=" Portal Settings">إعدادات المنفذ  </text>
+		<text name="IsDefault">افتراضي </text>
   </texts>
 </localizationDictionary>

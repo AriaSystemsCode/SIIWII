@@ -13,7 +13,7 @@
                 <div class="kt-subheader__main">
                     <h3 class="kt-subheader__title pl-5">
                         <div class="header">
-                            {{ appItemViewInput?.header }}
+                            {{ appItemViewInput?.header  | localize}}
                         </div>
                     </h3>
                 </div>
@@ -44,6 +44,7 @@
         >
             <div
                 class="kt-portlet kt-portlet--mobile seconedContainer extraDatacontainer p-4"
+                [ngClass]="{'arabic-margin': isArabic}"
             >
                 <div class="row details">
                     <div class="col-6">
@@ -308,7 +309,7 @@
                                             {{
                                                 appItemForViewDto?.variations[0]
                                                     .extraAttrName
-                                            }} : {{ selectedValuesName }}
+                                             | localize}} : {{ selectedValuesName }}
                                         </h6>
                                     </div>
                                     <div class="col-12 pl-0">
@@ -523,7 +524,7 @@
                             <button
                                 pButton
                                 pRipple
-                                label="Share"
+                                label="{{'Share' |localize}}"
                                 class="share mr-2"
                                 icon="pi pi-share-alt"
                                 (click)="openShareProductListingModal()"
@@ -531,7 +532,7 @@
                             <button
                                 pButton
                                 pRipple
-                                label="Sync"
+                                label="{{'Sync' |localize}}"
                                 class="sync"
                                 icon="pi pi-sync"
                                 (click)="syncProduct()"
@@ -540,8 +541,8 @@
                             ></button>
                         </div>
                         <div class="last-updated  my-3 d-flex align-items-center gap-3 justify-content-end w-100">
-                            <p *ngIf="languageSettingName!='en-GB'">  Last Edit  {{lastUpdatedDate |  date: 'MMM d, y, h:mm a':"+timezoneOffset"}} </p>
-                            <p *ngIf="languageSettingName=='en-GB'">  Last Edit  {{lastUpdatedDate |  date: 'd MMM, y, h:mm a':"+timezoneOffset"}} </p>
+                            <p *ngIf="languageSettingName!='en-GB'">  {{'LastEdit' |localize}}  {{lastUpdatedDate |  date: 'MMM d, y, h:mm a':"+timezoneOffset"}} </p>
+                            <p *ngIf="languageSettingName=='en-GB'">  {{'LastEdit' |localize}}  {{lastUpdatedDate |  date: 'd MMM, y, h:mm a':"+timezoneOffset"}} </p>
                         </div>
                         <div class="header">
                             [{{ appItemForViewDto?.code }}]
@@ -556,7 +557,7 @@
                                     appItemForViewDto?.maxPrice
                                 "
                             >
-                                {{  languageSettingName!='en-GB' ? "MSRP"   :  "RRP"  | localize }} :
+                                {{  languageSettingName!='en-GB' ? ("MSRP"  | localize )  :  ("RRP"  | localize) }} :
                                 {{ tenantDefaultCurrency.symbol
                                 }}{{ appItemForViewDto?.minPrice }} -
                                 {{ tenantDefaultCurrency.symbol
@@ -609,9 +610,9 @@
                             </div>
                         </div>
                         <div class="share-level"  >
-                            <span *ngIf="_publishAppItemListingService.sharingStatus === 1 || _publishAppItemListingService.sharingStatus === 2 " > Shared  <div class="shared-dot"></div> </span>
-                            <span *ngIf="_publishAppItemListingService.sharingStatus === 3 " > Private  <div class="private-dot"></div> </span>
-                            <span *ngIf="_publishAppItemListingService.sharingStatus === 4 " > Hidden <div class="hidden-dot"></div> </span>
+                            <span *ngIf="_publishAppItemListingService.sharingStatus === 1 || _publishAppItemListingService.sharingStatus === 2 " > {{'Shared'|localize}}  <div class="shared-dot"></div> </span>
+                            <span *ngIf="_publishAppItemListingService.sharingStatus === 3 " > {{'Private'|localize}}  <div class="private-dot"></div> </span>
+                            <span *ngIf="_publishAppItemListingService.sharingStatus === 4 " > {{'Hidden'|localize}} <div class="hidden-dot"></div> </span>
                         </div>
                         <div
                             *ngIf="productDescription"
