@@ -36,11 +36,11 @@
         <img
           src="assets/placeholders/pdf-placeholder.png"
           class="pdf-thumb mb-2"
-          alt="PDF"
+        alt="{{ 'PDF' | localize }}"
           (click)="onPdfThumbClick($event)"
         />
         <span class="text-primary">
-          {{ 'Open PDF' | localize }}
+          {{ 'OpenPDF' | localize }}
         </span>
       </div>
     </ng-container>
@@ -75,7 +75,7 @@
       *ngIf="fromReview"
       src="assets/placeholders/imageAttach.png"
       class="mr-2 iconImg"
-      alt="Image Attach"
+      alt="{{ 'ImageAttach' | localize }}"
     />
     <img
       src="assets/profile/Remove_image.svg"

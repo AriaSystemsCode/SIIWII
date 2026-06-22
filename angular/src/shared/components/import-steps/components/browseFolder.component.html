@@ -76,7 +76,7 @@
     </div>
 
 
-    <div class="modal-lg m-auto  Download  pt-4 pb-4" *ngIf="importType!==ImportTypes.price">
+    <div class="modal-lg m-auto Download pt-4 pb-4" [class.download-disabled]="templateLoading">
         <div class="row align-items-baseline mb-4" *ngIf="importType==ImportTypes.Items">
             <div class="col-2 ml-4">
                 <h6><span style="color: #F6851D;">*</span>{{ 'ProductType' | localize}}</h6>
@@ -103,13 +103,14 @@
             <div class="col-6">
                 <h4>{{"Downloadthetemplatefile" | localize}} </h4>
                 <!-- <span> {{"Templatelastupdate" | localize}} {{templateDate}} {{"version"| localize}}  {{templateVersion}}</span> -->
-                <span> {{"TemplateVersion"| localize}} {{templateVersion}}</span>
+                <span *ngIf="templateLoading">Preparing template...</span>
+                <span *ngIf="!templateLoading"> {{"TemplateVersion"| localize}} {{templateVersion}}</span>
             </div>
             <div class="col-5 pr-4 text-right">
-                <button class="browse-btn" [disabled]="importType==ImportTypes.Items && !itemType" [ngClass]="{
-                    disabled: importType==ImportTypes.Items && !itemType
+                <button class="browse-btn" [disabled]="templateLoading || !templateUrl || (importType==ImportTypes.Items && !itemType)" [ngClass]="{
+                    disabled: templateLoading || !templateUrl || (importType==ImportTypes.Items && !itemType)
                 }"  (click)="downloadTemplate()">
-                    <span>{{"Download"| localize}}</span>
+                    <span>{{ templateLoading ? 'Preparing...' : ("Download"| localize) }}</span>
                   </button>
 
 

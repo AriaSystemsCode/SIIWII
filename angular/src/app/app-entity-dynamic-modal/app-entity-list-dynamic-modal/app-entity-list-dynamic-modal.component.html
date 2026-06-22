@@ -14,14 +14,14 @@
             <span class="mr-3">
                 <i class="fas fa-search"></i>
             </span>
-            <input type="text" name="search" id="search" placeholder="Search" (input)="onFilter()"
+            <input type="text" name="search" id="search" placeholder="{{ 'Search' | localize }}" (input)="onFilter()"
                 [(ngModel)]="searchQuery" class="form-control bg-white border-0">
         </div>
 
         <button style="background-color: white  !important;border: 1px solid #EBEBEB !important;color: #4A0D4A !important; height: 55px;" 
           *ngIf="showAddAction" title="{{ 'AddNewValue' | localize }}" type="button"
             class="btn btn-icon btn-primary col-5 mt-3" (click)="openCreateOrEditModal()">
-            <i class="flaticon2-plus" style="color: #4A0D4A !important;"> Add New  {{l(entityObjectType.name)}}</i>
+            <i class="flaticon2-plus" style="color: #4A0D4A !important;"> {{ 'AddNew' | localize }}  {{l(entityObjectType.name)}}</i>
         </button>
 </div>
         <div class="d-flex flex-column mb-3" *ngIf="displayedRecords.length">
@@ -57,7 +57,7 @@
                 </div>
                 </div>
                 <div class="row" *ngIf="showActions && !item.isHostRecord && item.value">
-                    *Added to lookup
+                    *{{ 'AddedToLookup' | localize }}
                 </div> 
                
                 <div *ngIf="showActions && !item.isHostRecord">

@@ -62,10 +62,10 @@
 
                         <div class="mb-3"
                             *ngIf="entityObjectType.code =='MARKETPLACESECTIONBLOCK' || entityObjectType.code =='MARKETPLACESECTION'">
-                            <p>Status</p>
+                            <p>{{ 'Status' | localize }}</p>
                             <p-dropdown [options]="statusValues" optionLabel="displayName" optionValue="id"
                                 name="entityObjectStatusId" [(ngModel)]="appEntity.entityObjectStatusId"
-                                [styleClass]="'w-100 custom-dropdown'" [placeholder]="l('Select') + ' Status'">
+                                [styleClass]="'w-100 custom-dropdown'" [placeholder]="l('Select') + ' ' + ('Status' | localize)">
                             </p-dropdown>
                         </div>
                         <div class="form-group">
@@ -77,7 +77,7 @@
                             <input type="checkbox" id="AppEntity_IsDefault"
                                 class="form-control form-control-sm  col-1 mr-3" [(ngModel)]="appEntity.isDefault"
                                 name="isDefault" />
-                            <label for="AppEntity_IsDefault" class="pt-2">{{l("Set default value")}} </label>
+                            <label for="AppEntity_IsDefault" class="pt-2">{{l("SetDefaultValue")}} </label>
                         </div>
 
                         <div class="form-group" *ngIf="addToLookup">
@@ -93,7 +93,7 @@
                             <input [disabled]="!enableAddToLookup" type="checkbox" id="AppEntity_AddToLookup"
                                 class="form-control form-control-sm  col-1 mr-3" [(ngModel)]="addToLookup"
                                 name="addToLookup" />
-                            <label for="AppEntity_AddToLookup" class="pt-2">{{l("Add to lookup")}} </label>
+                            <label for="AppEntity_AddToLookup" class="pt-2"> {{l("AddToLookup")}} </label>
                         </div>
 
 
@@ -116,7 +116,7 @@
                         <div class="row mb-3" *ngIf="visual.image">
                             <div class="col-12">
                               <label class="d-block mb-2 fs-3 my-2">
-                                <span class="required">* </span>{{ 'Image Type' | localize }}
+                                <span class="required">* </span>{{ 'ImageType' | localize }}
                               </label>
                           
                               <p-dropdown
@@ -150,10 +150,10 @@
                                             style="margin-right: 15px;" />
                                         <div style="    line-height: 0.5;" class="pt-3">
                                             <p style="font-weight: bold; color: black;">
-                                                {{ 'Upload files' | localize }}
+                                               {{ 'UploadFiles' | localize }}
                                             </p>
                                             <p>
-                                                {{ 'Select and upload the files' | localize }}
+                                                {{ 'SelectAndUploadTheFiles' | localize }}
                                             </p>
                                         </div>
                                     </div>
@@ -199,7 +199,7 @@
           class="pdf-icon-img"
           style="max-width: 80%; max-height: 80%; object-fit: contain;"
         />
-        <span class="mt-2">{{ 'Open PDF' | localize }}</span>
+        <span class="mt-2">{{ 'OpenPDF' | localize }}</span>
       </a>
     </div>
   </ng-container>
@@ -336,7 +336,7 @@
                                                     </label>
                                                     <a *ngIf="extraAttr.selectedValues && entityObjectType.code !='MARKETPLACESECTION'"
                                                         class="ml-5 text-underline text-black-50"
-                                                        (click)="resetExtraAttributeSelectedValue(extraAttr)"> Reset</a>
+                                                        (click)="resetExtraAttributeSelectedValue(extraAttr)"> {{ 'Reset' | localize }}</a>
                                                 </div>
                                             </div>
                                             <div class="flex-grow-1" *ngIf="extraAttr.dataType === 'Datetime' ">
@@ -440,8 +440,8 @@
 </div>
 
 
-<confirm-modal-side *ngIf="displaySaveSideBar" [content1]="'Successfully saved' | localize"
+<confirm-modal-side *ngIf="displaySaveSideBar" [content1]="'SuccessfullySaved' | localize"
     [content2]="'The '+ entityObjectType.code +' you created is successfully saved You can create another one Or Back to the Lookups list.'"
-    [buttonNo]="'No thanks' | localize" [defualtButton]="true"
-    [buttonYes]="('Create another' | localize) +' '+ entityObjectType.name" [type]="'displaySaveSideBar'" [icon]="''"
+    [buttonNo]="'NoThanks' | localize" [defualtButton]="true"
+    [buttonYes]="('CreateAnother' | localize) +' '+ entityObjectType.name" [type]="'displaySaveSideBar'" [icon]="''"
     [displayItem]="displaySaveSideBar" (buttonClicked)="askForAnotherAdd($event)"></confirm-modal-side>

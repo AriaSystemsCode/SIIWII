@@ -5,7 +5,7 @@
             <input
                 class="form-control mb-3"
                 type="text"
-                placeholder="{{ 'Size Name' | localize }} "
+                placeholder="{{ 'SizeName' | localize }} "
                 [(ngModel)]="appSizeScaleDto.name" 
                 name="appSizeScaleDtoName"
                 #sizeScaleName="ngModel"
@@ -19,7 +19,7 @@
                 <input 
                     class="form-control"
                     type="text"
-                    placeholder="{{ 'Dimension ' | localize }}"
+                    placeholder="{{ 'Dimension' | localize }}"
                     [(ngModel)]="appSizeScaleDto.dimesion2Name" 
                     (ngModelChange)="dimension2NameOnChange($event)"
                     name="SizeScaleSecondDimension"

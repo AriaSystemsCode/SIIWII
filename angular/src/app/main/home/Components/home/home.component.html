@@ -8,7 +8,8 @@
         <div class="middle-content">
             <app-post-list #apppostlistcomponent></app-post-list>
         </div>
-        <div class="right-sidebar thin-scroll pr-1 pl-5">
+        <div class="right-sidebar thin-scroll pr-1 pl-5"
+        [ngStyle]="{'right': isArabic ? '50px' : '20px'}">
             <div class="mb-3">
                 <app-ads-sidebar></app-ads-sidebar>
             </div>

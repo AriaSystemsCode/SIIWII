@@ -74,7 +74,10 @@
         </div>
 
     </div>
-    <div  class="subscribers" *ngIf="PublishAppItemListingService.sharingStatus !== 0" >You have {{PublishAppItemListingService.subscribersNumber}} Subscribers to this Product </div>
+
+    <div class="subscribers" *ngIf="PublishAppItemListingService.sharingStatus !== 0">
+  {{ "SubscribersToProduct" | localize: PublishAppItemListingService.subscribersNumber }}
+</div>
     <div class="modal-footer">
         <button type="button"  class="btn btn-outline-primary" [disabled]="!showCloseText && _notify && publishItemOptions.itemSharing.length === 0||publishItemOptions.sharingLevel === 2&&publishItemOptions.itemSharing.length==0" (click)="publishListing()" [buttonBusy]="saving" [busyText]="l('SavingWithThreeDot')">
             <!-- <span *ngIf="!_notify">{{"ShareAndPublish" | localize}}</span> -->

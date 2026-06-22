@@ -6,12 +6,12 @@
                     <div class="kt-subheader__main">
                         <h3 class="kt-subheader__title">
                             <span class="font-weight-bold">
-                                {{headerTitle}}
+                                {{headerTitle | localize}}
                             </span>
                         </h3>
                         <span class="kt-subheader__separator kt-subheader__separator--v"></span>
                         <span class="kt-subheader__desc">
-                            {{headerDesc}}
+                            {{ headerDesc | localize}}
                         </span>
                     </div>
                     <div class="kt-subheader__toolbar">
@@ -34,7 +34,7 @@
                                 style="border-radius: 5px;
                                 background-color: #4A0D4A !important;
                                 border: #4A0D4A !important;color: white;">
-                                <span>{{ listingMode !== undefined ? l("SaveListing") : !id  ?  l("SaveProduct") :  l("Save Changes") }}</span>
+                                <span>{{ listingMode !== undefined ? l("SaveListing") : !id  ?  l("SaveProduct") :  l("SaveChanges") }}</span>
                             </button>
                             <ng-container *ngIf="listingMode === 1 && !productForm.touched && !formTouched">
                                 <button class="btn        text-capitalize mr-2" type="button"
@@ -76,7 +76,7 @@
                                 cursor: pointer;"
                                     (click)="openSelectAppItemTypeModal()">
                                     {{ appItem.entityObjectTypeId ? ('Change'|localize) : ('Select'|localize) }}
-                                    {{ 'the product type' | localize}}
+                                    {{ 'TheProductType' | localize}}
                                 </a>
                             </div>
                         </div>
@@ -208,7 +208,7 @@ name="description" [readonly]="readonlyDesc"
                             </div>
                             <div class="col-lg-2 col-md-3 col-sm-4 col-6">
                                 <a class="text-primary pointer font-weight-bold border p-3" style="border-radius: 6px;" (click)="openSelectCategoriesModal()">
-                                    <span *ngIf="categories?.length" class="mr-1">+</span>     {{ categories?.length ? 'Add' : 'Select' }}
+                                    <span *ngIf="categories?.length" class="mr-1">+</span>     {{ categories?.length ? ('Add'|localize) : ('Select'|localize) }}
                                     {{ 'Categories' | localize}}
                                 </a>
                             </div>
@@ -255,7 +255,7 @@ name="description" [readonly]="readonlyDesc"
                             </div>
                             <div class="col-lg-2 col-md-3 col-sm-4 col-6">
                                 <a class="text-primary pointer font-weight-bold border p-3"  style="border-radius: 6px;" (click)="openSelectClassificationsModal()">
-                                    <span *ngIf="categories?.length" class="mr-1">+</span>   {{ classifications?.length ? 'Add' : 'Select' }}
+                                    <span *ngIf="classifications?.length" class="mr-1">+</span>   {{ classifications?.length ? ('Add'|localize) : ('Select'|localize) }}
                                     {{ 'Classifications' | localize}}
                                 </a>
                             </div>
@@ -301,7 +301,7 @@ name="description" [readonly]="readonlyDesc"
                             </div>
                             <div class="col-lg-2 col-md-3 col-sm-4 col-6">
                                 <a class="text-primary pointer font-weight-bold border p-3"  style="border-radius: 6px;" (click)="openSelectDepartmentsModal()">
-                                    <span *ngIf="categories?.length" class="mr-1">+</span>   {{ departments?.length ? 'Add' : 'Select' }}
+                                    <span *ngIf="departments?.length" class="mr-1">+</span>   {{ departments?.length ? ('Add'|localize) : ('Select'|localize) }}
                                     {{ 'Departments' | localize}}
                                 </a>
                             </div>
@@ -349,7 +349,7 @@ name="description" [readonly]="readonlyDesc"
                             </div>
                             <div class="col-lg-6 col-md-3 col-sm-4 col-6">
                                 <a class="text-primary pointer font-weight-bold border p-3"  style="border-radius: 6px;" (click)="openSelectRelatedItemsModal()">
-                                    <span class="mr-1">+</span>   {{ relatedItems?.length ? 'Add' : 'Select' }}
+                                    <span  *ngIf="relatedItems?.length"  class="mr-1">+</span>   {{ relatedItems?.length ? ('Add'|localize) : ('Select'|localize)}}
                                     {{ 'Relatedproducts' | localize}}
                                 </a>
                             </div>
@@ -369,7 +369,7 @@ name="description" [readonly]="readonlyDesc"
                                         <h6 class="font-weight-bold p-3" style="
                                         background-color: #EEEEEEEE;
                                         border-radius: 5px;">
-                                          <span class="text-danger">*</span>  {{ 'Parent Item Attachments' | localize}}
+                                          <span class="text-danger">*</span>  {{ 'ParentItemAttachments' | localize}}
                                         </h6>
                                             <p class="hint m-0 p-0 pl-5 ml-5 mt-4">
                                                 <!-- <i class="pr-2 fa fa-bell"></i>  -->
@@ -418,20 +418,20 @@ name="description" [readonly]="readonlyDesc"
                                             <div class="text-center">
                                                 <p  style="font-weight: bold; color: black;
     white-space: nowrap;">
-                                                    Choose a file or drag & drop it here
+                                                    {{'ChooseFileOrDragDropHere'| localize }}
                                                     <p >
                                                 <!-- <a class="btn        btn-sm mb-3 upload-btn">
                                                     {{ 'AddAttachedFile' | localize}}
                                                 </a> -->
                                                 <p>
                                                     <!-- {{ 'YouCanSendUpTo25MBInAttachments' | localize}}. -->
-                                                    {{ 'File an be JPEG, PNG, PDf, and MP4 formats, up to 25 MB' | localize}}.   
+                                                    {{ 'SupportedFormatsAndSize' | localize}}.   
                                                 </p>
-                                                <p style="color: #F6851D !important;">*Image Aspect-Ratio is 16:9 </p>
+                                                <p style="color: #F6851D !important;">*{{'ImageAspectRatio16_9'| localize}}</p>
 
                                                 <a class="btn btn-primary btn-sm mb-3 upload-btn" style="color: white !important; background-color: #4A0D4A !important;">
                                                     <!-- {{ 'AddAttachedFile' | localize}} -->
-                                                    {{ 'Add Attachment' | localize}}
+                                                    {{ 'AddAttachment' | localize}}
                                                 </a>
                                             </div>
                                         </label>
@@ -488,7 +488,7 @@ name="description" [readonly]="readonlyDesc"
                                                [checked]="appItem?.entityAttachments[i]?.isPublic" 
                                                (change)="setVisibleinMarketplaceImage(i)"
                                              />
-                                             {{ 'Visible in Marketplace' | localize }}
+                                             {{ 'VisibleInMarketplace' | localize }}
                                            </label>
                                          </a>
                                          
@@ -521,7 +521,7 @@ name="description" [readonly]="readonlyDesc"
                                 <div class="row mr-5 pr-5">
                                     <h6 class="font-weight-bold pt-3 pr-2">
                                         <span class="text-danger">*</span>
-                                        {{ languageSettingName!='en-GB' ? "MSRP"  :  "RRP" | localize}}
+                                        {{ languageSettingName!='en-GB' ? ("MSRP" | localize) : ( "RRP" | localize) }}
                                     </h6>
                                     <div class="d-flex align-items-baseline">
                                         <span
@@ -593,7 +593,7 @@ name="description" [readonly]="readonlyDesc"
     <div class="d-flex flex-row justify-content-between">
                 <div class="row mr-5 pr-5">
                     <h6 class="font-weight-bold pt-3 pr-2">
-                        {{ "Tax Rate" | localize}}
+                        {{ "TaxRate" | localize}}
                     </h6>
                     <div class="d-flex align-items-baseline">
 
@@ -644,7 +644,7 @@ name="description" [readonly]="readonlyDesc"
                                 <h6 class="font-weight-bold">
                                     <span class="text-danger">*</span>    {{ 'Variations' | localize}}
                                     <span style="color: #5F6368;font-size: 11px;margin-left: 20px;">
-                                         ( Variation required to save)
+                                         {{'Variationrequiredtosave' | localize}} 
                                     </span>
                                 </h6>
                               

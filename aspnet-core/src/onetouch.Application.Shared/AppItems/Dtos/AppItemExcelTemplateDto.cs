@@ -177,6 +177,11 @@ namespace onetouch.AppItems.Dtos
 
         public string ErrorMessage { get; set; }
         public bool HasDuplication { get; set; }
+        public string ResultKey { get; set; }
+        public bool IsPagedResult { get; set; }
+        public Int32 PageSkipCount { get; set; }
+        public Int32 PageMaxResultCount { get; set; }
+        public Int32 TotalDisplayRecords { get; set; }
     }
    
     

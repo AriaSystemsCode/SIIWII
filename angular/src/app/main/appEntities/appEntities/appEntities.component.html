@@ -1,5 +1,7 @@
 ﻿<div [@routerTransition]>
-    <div class="kt-content  kt-grid__item kt-grid__item--fluid kt-grid kt-grid--hor" id="lookups">
+    <div class="kt-content  kt-grid__item kt-grid__item--fluid kt-grid kt-grid--hor" id="lookups"
+[ngStyle]="{'margin-top': isArabic ? '6%' : 'unset'}"
+    >
          <div class="kt-subheader kt-grid__item">
             <div [class]="containerClass">
                 <div class="kt-subheader__main">
@@ -307,7 +309,7 @@
                                                             <p-sortIcon field="appEntity.notes"></p-sortIcon>
                                                         </th>
                                                         <th style="width: 150px" pSortableColumn="isDefault">
-                                                            {{l('Is Default')}}
+                                                            {{l('IsDefault')}}
                                                             <p-sortIcon field="appEntity.isDefault"></p-sortIcon>
                                                         </th>
                                                         <th style="width: 130px"

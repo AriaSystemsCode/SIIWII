@@ -192,7 +192,7 @@
   <div class="col-8 col-sm-9">
       <h5>
           {{"LetsView" | localize }}
-          {{ getAppEntityForViewDto.relatedEntityTypeCode | titlecase }} !
+          {{ getAppEntityForViewDto.relatedEntityTypeCode | titlecase |localize }} !
       </h5>
   </div>
   <div class="col-2">
@@ -201,7 +201,7 @@
           (click)="viewRelatedEntity()"
       >
           {{"View" | localize }}
-          {{ getAppEntityForViewDto.relatedEntityTypeCode | titlecase }}
+          {{ getAppEntityForViewDto.relatedEntityTypeCode | titlecase  |localize }}
       </button>
   </div>
 </div>

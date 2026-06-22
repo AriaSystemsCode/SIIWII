@@ -59,6 +59,8 @@ export class AppEntitiesComponent extends AppComponentBase {
     items = [];
     _entityTypeFullName = 'onetouch.AppEntities.AppEntity';
     entityHistoryEnabled = false;
+ currentLang: string;
+isArabic: boolean = false;
 
     constructor(
         injector: Injector,
@@ -75,7 +77,8 @@ export class AppEntitiesComponent extends AppComponentBase {
 
     ngOnInit(): void {
         this.entityHistoryEnabled = this.setIsEntityHistoryEnabled();
-
+this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName');
+        this.isArabic = this.currentLang === 'ar' || this.currentLang === 'ar-EG';
         // this.items1 = [
         //     {label: 'Home', icon: 'pi pi-fw pi-home'},
         //     {label: 'Calendar', icon: 'pi pi-fw pi-calendar'},
