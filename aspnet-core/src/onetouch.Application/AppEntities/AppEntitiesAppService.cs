@@ -83,8 +83,8 @@ namespace onetouch.AppEntities
         private readonly IRepository<AppTransactionContacts, long> _appTransactionContactsRepository;
         //T-SII-20221013.0006,1 MMT 11/02/2022 Notify the destination tenant that another tenant connected to him[End]
         //MMT 05-14-2026[Start]
-        private readonly IRepository<AppMarketplaceContacts.AppMarketplaceContact, long> _appMarketplaceContactsRepository;
-        private readonly IRepository<AppContactRelationshipInfo, long> _appContactRelationshipInfoRepository;
+        //private readonly IRepository<AppMarketplaceContacts.AppMarketplaceContact, long> _appMarketplaceContactsRepository;
+        //private readonly IRepository<AppContactRelationshipInfo, long> _appContactRelationshipInfoRepository;
         //MMT 05-14-2026[End]
         public AppEntitiesAppService(IRepository<AppEntity, long> appEntityRepository
             , IAppEntitiesExcelExporter appEntitiesExcelExporter
