@@ -1,11 +1,11 @@
 <div class="row pl-3">
   <div class="col-lg-8 col-md-10 col">
     <div class="row pt-4">
-  
+      <!-- Loop through extra attributes -->
       <div class="{{fromSetting ? 'col-12' : 'col-md-6'}} col-12 mb-4"
            *ngFor="let extraAttr of extraAttributeObject.value.filteredExtraAttributes">
         <div>
-    
+          <!-- Label -->
           <div>
             <label *ngIf="!extraAttr.visibleWhen || extraAttr.visibleWhen.extraAttributeId === extraAttr.attributeId"
                    [class.fromSettingLabel]="fromSetting">
@@ -14,7 +14,7 @@
           </div>
 
           <div class="d-flex align-items-center">
-         
+            <!-- Multi-select lookup for non-setting view -->
             <div class="wide-drop-down d-flex flex-grow-1"
                  *ngIf="extraAttr?.paginationSetting && extraAttr?.acceptMultipleValues && extraAttr.isLookup && !fromSetting">
               <div class="flex-grow-1 mr-1">
@@ -23,12 +23,12 @@
                                [styleClass]="'w-100'"
                                    [(ngModel)]="extraAttr.selectedValues"
                                name="extraAttr_{{extraAttr.name}}"
-                           placeholder="{{ 'Select' | localize }} {{ extraAttr.name | localize }}">
+                            placeholder="{{ 'Select' | localize }} {{ extraAttr.name | localize }}">
                 </p-multiSelect>
               </div>
             </div>
 
-
+            <!-- Multi-checkbox lookup for setting view -->
             <div class="wide-drop-down d-flex flex-grow-1"
                  *ngIf="extraAttr?.paginationSetting && extraAttr?.acceptMultipleValues && extraAttr.isLookup && fromSetting">
               <div class="flex-grow-1 mr-1">
@@ -46,6 +46,7 @@
               </div>
             </div>
 
+            <!-- Single-select lookup -->
             <div class="wide-drop-down flex-grow-1"
                  *ngIf="extraAttr?.paginationSetting && !extraAttr?.acceptMultipleValues && extraAttr.isLookup">
               <p-dropdown (onChange)="onDropdownChange(extraAttr)"
@@ -53,16 +54,16 @@
                           [styleClass]="'w-100'"
                               [(ngModel)]="extraAttr.selectedValues"
                           name="extraAttr_{{extraAttr.name}}"
-               placeholder="{{ 'Select' | localize }} {{ extraAttr.name | localize }}">
+                   placeholder="{{ 'Select' | localize }} {{ extraAttr.name | localize }}">
               </p-dropdown>
             </div>
 
-   
+            <!-- Searchable dropdown -->
             <div class="flex-grow-1" *ngIf="extraAttr.dataType === 'SearchableDropdown'">
               <div class="d-flex align-items-baseline justify-content-start">
                 <p-dropdown [options]="getDropdownOptions(extraAttr)"
                                 [(ngModel)]="extraAttr.selectedValues"
-               placeholder="{{ 'Select' | localize }} {{ extraAttr.name | localize }}"
+                           placeholder="{{ 'Select' | localize }} {{ extraAttr.name | localize }}"
                             [filter]="true"
                             filterBy="label"
                             [showClear]="true"
@@ -86,6 +87,7 @@
               </div>
             </div>
 
+            <!-- Dropdown list with static values -->
             <div class="flex-grow-1" *ngIf="extraAttr.dataType === 'dropDownList'">
               <div class="d-flex align-items-baseline justify-content-start">
                 <p-dropdown [options]="getDropdownOptions(extraAttr)"
@@ -111,18 +113,18 @@
               </div>
             </div>
 
-   
+            <!-- Text input -->
             <div class="ml-2 flex-grow-1 position-relative" *ngIf="extraAttr.dataType === 'string'&& !extraAttr.isLookup && isVisible(extraAttr)">
               <input type="text" name="{{extraAttr.name}}"
                      placeholder="{{extraAttr.name| localize}}"
                      class="form-control"
                          [(ngModel)]="extraAttr.selectedValues"
                      (ngModelChange)="onAnyInputChange()" />
-              <i class="pi pi-times position-absolute" style="right: 10px; top: 15px; cursor: pointer;"
+              <i class="pi pi-times position-absolute" style="right: 10px; top: 15px; cursor: pointer;"1
                  *ngIf="extraAttr.selectedValues" (click)="clearExtraAttr(extraAttr)"></i>
             </div>
 
-       
+            <!-- Boolean / Radio input -->
             <div class="flex-grow-1" *ngIf="extraAttr.dataType === 'boolean' || extraAttr.dataType === 'Boolean' || extraAttr.dataType === 'bit'">
               <div class="radio-inline mt-2">
                 <ng-container *ngIf="extraAttr.validEntries?.trim(); else yesNoBlock">
@@ -154,7 +156,7 @@
               </div>
             </div>
 
-       
+            <!-- Color picker -->
             <div class="flex-grow-1 position-relative d-flex align-items-center gap-2"
                  *ngIf="extraAttr.dataType === 'color'">
               <input type="color" class="form-control form-control-color col-1"
@@ -164,7 +166,7 @@
                  (click)="clearExtraAttr(extraAttr)"></i>
             </div>
 
-
+            <!-- File upload -->
             <div class="upload-card" *ngIf="extraAttr.dataType === 'file'">
               <div class="upload-box" *ngIf="!extraAttr.selectedValues" (click)="fileInput.click()">
                 <div class="upload-content">
@@ -191,7 +193,7 @@
               </div>
             </div>
 
-     
+            <!-- Pills / Themes -->
             <div class="theme-tabset" *ngIf="extraAttr.dataType === 'pills'">
               <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
                 <li class="nav-item m-3" *ngFor="let theme of extraAttr.themes; let i = index" role="presentation">
@@ -211,7 +213,7 @@
               </div>
             </div>
 
-     
+            <!-- Datetime picker -->
             <div class="position-relative {{fromSetting?'calWidth':''}}" *ngIf="extraAttr.dataType === 'Datetime'">
               <p-calendar #calendarRef     [(ngModel)]="extraAttr.selectedValues" [showIcon]="false"
                           [showOtherMonths]="true" [selectOtherMonths]="true"
@@ -222,6 +224,7 @@
                  *ngIf="extraAttr.selectedValues" (click)="clearExtraAttr(extraAttr)"></i>
             </div>
 
+            <!-- Numeric input -->
        <div class="flex-grow-1 position-relative"
      *ngIf="extraAttr.dataType === 'Numeric'">
 
@@ -244,6 +247,7 @@
 
 </div>
 
+            <!-- text eitor -->
             <div class="flex-grow-1 w-100"
                 *ngIf="extraAttr.dataType === 'html'">
               <p-editor
@@ -252,7 +256,7 @@
                 (ngModelChange)="onAnyInputChange()">
               </p-editor>
             </div>
-       
+            <!-- Add new lookup button -->
             <a class="border rounded text-primary add-new-lookup-btn ml-3"
                *ngIf="extraAttr.isLookup && extraAttr.allowAddNew">
               <i class="fas fa-pen"></i>
@@ -261,6 +265,7 @@
         </div>
       </div>
 
+      <!-- No attributes messages -->
       <div>
         <small class="ml-2" *ngIf="entityType=='Item' && !extraAttributeObject.value?.filteredExtraAttributes?.length && !entityObjectTypeId">
           {{ "PleaseSelectAProductTypeFirst" | localize }}
