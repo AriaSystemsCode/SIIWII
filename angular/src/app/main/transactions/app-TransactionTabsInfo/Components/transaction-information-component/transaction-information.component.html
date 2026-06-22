@@ -207,8 +207,8 @@
                 </div>
 
 
-                <div class="row">
-                    <div class="ml-4 mr-4">
+          
+                    <div class="mx-2">
                         <p-treeTable [value]="shoppingCartTreeNodes" [scrollable]="true"
                             [tableStyle]="{'min-width':'45rem'}">
                             <ng-template pTemplate="header">
@@ -616,7 +616,7 @@
                                 </table>
 
                                 <span *ngIf="orderType == 'SO' && productDetails?.orderByPrePack"
-                                    class="p-4 font-weight-bold bg-dark">{{'OrderByPrepack' | localize}}</span>
+                                    class="p-4 font-weight-bold">{{'OrderByPrepack' | localize}}</span>
                                 <label *ngIf="orderType == 'SO' && productDetails?.orderByPrePack"
                                     class="switch switch-container my-4 font-weight-bold">
                                     <input type="checkbox" [(ngModel)]="chk_Order_by_prepack[currentIndex]" checked
@@ -728,7 +728,7 @@
                             </div>
                         </form>
                     </div>
-                </div>
+          
             </div>
         </p-accordionTab>
 
@@ -1119,7 +1119,7 @@
             <div class="tablet" *ngIf="!onshare">
 
                 <div class="card position-relative dot">
-                    <div class="d-md-none d-block actionsSec" [ngStyle]="
+                    <!-- <div class="d-md-none d-block actionsSec" [ngStyle]="
                                     isArabic
                                         ? {
                                             'left': '-33px',
@@ -1236,8 +1236,98 @@
                         </div>
 
 
-                    </div>
-                    <p-tabView styleClass="tabview-custom" class="tabSSec">
+                    </div> -->
+                 
+                 <div class="mobile-manual-tabs d-md-none">
+  <button
+    type="button"
+    class="mobile-tab"
+    [class.active]="mobileTab === 'details'"
+    (click)="mobileTab = 'details'">
+
+    <span>{{ 'Details' | localize }}</span>
+    <i class="fa fa-info-circle"></i>
+  </button>
+
+  <button
+    type="button"
+    class="mobile-tab"
+    [class.active]="mobileTab === 'summary'"
+    (click)="mobileTab = 'summary'">
+
+    <span>{{ 'Summary' | localize }}</span>
+    <i class="fa fa-list-alt"></i>
+  </button>
+
+  <button
+    type="button"
+    class="mobile-tab"
+    [class.active]="mobileTab === 'chats'"
+    (click)="mobileTab = 'chats'">
+
+    <span>{{ 'Chats' | localize }}</span>
+    <i class="fa fa-comments"></i>
+  </button>
+
+  <button
+    type="button"
+    class="mobile-tab"
+    [class.active]="mobileTab === 'actions'"
+    (click)="mobileTab = 'actions'">
+
+    <span>{{ 'Actions' | localize }}</span>
+    <i class="fa fa-ellipsis-v"></i>
+  </button>
+</div>
+
+<div class="mobile-tab-content d-md-none">
+
+  <ng-container *ngIf="mobileTab === 'details'">
+    <ng-container *ngTemplateOutlet="transactionDetailsTemplate"></ng-container>
+  </ng-container>
+
+  <ng-container *ngIf="mobileTab === 'summary'">
+    <ng-container *ngTemplateOutlet="transactionOrderSummaryTemplate"></ng-container>
+  </ng-container>
+
+  <ng-container *ngIf="mobileTab === 'chats'">
+    <ng-container *ngTemplateOutlet="transactionNotesTemplate"></ng-container>
+    <ng-container *ngTemplateOutlet="transactionCommentsTemplate"></ng-container>
+  </ng-container>
+
+  <ng-container *ngIf="mobileTab === 'actions'">
+    <div class="mobile-actions-list">
+      <button
+        *ngIf="appTransactionsForViewDto?.isOwnedByMe"
+        class="btn w-100 mobile-action-btn"
+        [disabled]="appTransactionsForViewDto?.entityStatusCode?.toUpperCase() !== 'OPEN'"
+        (click)="onShareTransaction()">
+        <i class="fa fa-share-alt"></i>
+        {{ l('Share') }}
+      </button>
+
+      <button
+        class="btn w-100 mobile-action-btn"
+        [disabled]="appTransactionsForViewDto?.entityStatusCode?.toUpperCase() !== 'OPEN'"
+        (click)="printTransaction()">
+        <i class="fa fa-print"></i>
+        {{ 'Print' | localize }}
+      </button>
+
+      <button
+        *ngIf="appTransactionsForViewDto?.isOwnedByMe"
+        class="btn w-100 mobile-action-btn"
+        [disabled]="!appTransactionsForViewDto?.showSync"
+        (click)="sync()">
+        <i class="fa fa-sync"></i>
+        {{ l('Sync') }}
+      </button>
+    </div>
+  </ng-container>
+
+</div>
+                 
+                    <p-tabView styleClass="tabview-custom" class="tabSSec d-lg-none d-md-block d-none">
                         <p-tabPanel>
                             <ng-template pTemplate="header">
                                 <div class="tab-header">

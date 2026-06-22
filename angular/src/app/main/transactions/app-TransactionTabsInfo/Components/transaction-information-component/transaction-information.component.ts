@@ -142,6 +142,7 @@ export class TransactionInformationComponent
   isAuthenticated = this.appSession?.user
   orderAmount:number =0;
   totalCharges:number =0;
+  mobileTab: 'details' | 'summary' | 'chats' | 'actions' = 'details';
   constructor(
     injector: Injector,
     private _AppTransactionServiceProxy: AppTransactionServiceProxy,
