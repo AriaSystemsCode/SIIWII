@@ -123,7 +123,8 @@ namespace onetouch.AppMarketplaceContacts.Dtos
         public string ConnectedLabel { set; get; }
         public string Visibility { set; get; }
 		public string RelationshipCode { set; get; }
-
+		public string RequestorRole { set; get; }
+        public string RecipientRole { set; get; }
     }
         //I49{End}
 }
