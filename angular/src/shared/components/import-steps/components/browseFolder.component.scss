@@ -31,6 +31,16 @@ padding: 85px;
     opacity: 1;
     }
 
+.Download.download-disabled {
+    opacity: 0.65;
+}
+
+.Download.download-disabled input,
+.Download.download-disabled .select-btn,
+.Download.download-disabled .browse-btn {
+    cursor: wait !important;
+}
+
 .Download-Btn
 {
 background: #4A0D4A 0% 0% no-repeat padding-box;

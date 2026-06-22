@@ -27,6 +27,7 @@ export class BrowseFolderComponent extends AppComponentBase implements OnInit {
   templateFileName: string;
   templateVersion: string;
   templateDate: string;
+  templateLoading: boolean = false;
   importType: ImportTypes;
   ImportTypes = ImportTypes;
   itemType: string = "";
@@ -67,24 +68,17 @@ export class BrowseFolderComponent extends AppComponentBase implements OnInit {
   }
 
   show(importType: ImportTypes, importService: any, hasImages: boolean) {
-    this.spinnerService.show();
     this.hasImages = hasImages;
     this.itemType = "";
     this.itemTypeId = 0;
+    this.templateUrl = "";
+    this.templateFileName = "";
+    this.templateVersion = "";
+    this.templateDate = "";
     this.importServiceProxy = this.injector.get(importService);
     this.importType = importType;
-    this.importServiceProxy
-      .getExcelTemplate(this.itemTypeId)
-      .pipe(finalize(() => this.spinnerService.hide()))
-      .subscribe((result) => {
-        this.templateUrl = result.excelTemplateFullPath;
-        this.templateFileName = result.excelTemplateFile;
-        this.templateVersion = this.l(result.excelTemplateVersion);
-        this.templateDate = this.l(result.excelTemplateDate);
-        this.modal.show();
-      });
-
-
+    this.modal.show();
+    this.loadExcelTemplate();
   }
 
   hide() {
@@ -148,6 +142,7 @@ export class BrowseFolderComponent extends AppComponentBase implements OnInit {
     this.formTouched = true;
     this.itemTypeId = selected.data.sycEntityObjectType.id;
     this.itemType = selected.data.sycEntityObjectType.name;
+    this.loadExcelTemplate();
   }
   // <!-- Iteration-8 -->
 
@@ -205,16 +200,33 @@ export class BrowseFolderComponent extends AppComponentBase implements OnInit {
   }
 
   downloadTemplate() {
+    if (this.templateLoading || !this.templateUrl) {
+      return;
+    }
+
+    let attach = AppConsts.attachmentBaseUrl
+    let fullURL = `${attach}/${this.templateUrl}`;
+
+    //let fullURL = `${url}`; // FOR Local Use
+    this._downloadService.download(fullURL,
+      this.templateFileName);
+  }
+
+  private loadExcelTemplate() {
+    this.templateLoading = true;
+    this.templateUrl = "";
+    this.templateFileName = "";
+    this.templateVersion = "";
+    this.templateDate = "";
+
     this.importServiceProxy
       .getExcelTemplate(this.itemTypeId)
+      .pipe(finalize(() => this.templateLoading = false))
       .subscribe((result) => {
         this.templateUrl = result.excelTemplateFullPath;
-        let attach = AppConsts.attachmentBaseUrl
-        let fullURL = `${attach}/${this.templateUrl}`;
-
-        //let fullURL = `${url}`; // FOR Local Use
-        this._downloadService.download(fullURL,
-          this.templateFileName);
+        this.templateFileName = result.excelTemplateFile;
+        this.templateVersion = this.l(result.excelTemplateVersion);
+        this.templateDate = this.l(result.excelTemplateDate);
       });
   }
 

@@ -1188,6 +1188,260 @@ namespace onetouch.AppEntities
             return await SaveEntity(input, attributeValueEntityObjectTypeCache, entityObjectTypeCodeCache);
         }
 
+        public async Task<AppEntity> SaveVariationEntityLean(
+            AppEntityDto input,
+            IDictionary<long, long?> attributeValueEntityObjectTypeCache,
+            IDictionary<string, long?> entityObjectTypeCodeCache,
+            IDictionary<long, AppEntity> existingVariationEntitiesById = null,
+            IDictionary<string, AppEntity> variationEntitiesByUniqueKey = null)
+        {
+            if (string.IsNullOrEmpty(input.Code))
+                input.Code = System.Guid.NewGuid().ToString();
+
+            AppEntity entity;
+            if (input.Id != 0)
+            {
+                if (existingVariationEntitiesById == null || !existingVariationEntitiesById.TryGetValue(input.Id, out entity))
+                {
+                    entity = await _appEntityRepository.GetAll()
+                        .Include(x => x.EntityExtraData)
+                        .Include(x => x.EntityAttachments).ThenInclude(x => x.AttachmentFk)
+                        .FirstOrDefaultAsync(x => x.Id == input.Id);
+                }
+            }
+            else
+            {
+                var inputTenantId = input.TenantId == -1 ? AbpSession.TenantId : input.TenantId;
+                var uniqueKey = GetVariationEntityUniqueKey(inputTenantId, input.EntityObjectTypeCode, input.Code);
+                if (variationEntitiesByUniqueKey == null || !variationEntitiesByUniqueKey.TryGetValue(uniqueKey, out entity))
+                {
+                    entity = null;
+                    if (variationEntitiesByUniqueKey == null)
+                    {
+                        entity = await _appEntityRepository.GetAll()
+                            .Include(x => x.EntityExtraData)
+                            .Include(x => x.EntityAttachments).ThenInclude(x => x.AttachmentFk)
+                            .FirstOrDefaultAsync(x =>
+                                x.Code == input.Code &&
+                                x.TenantId == inputTenantId &&
+                                x.ObjectCode == null &&
+                                x.EntityObjectTypeCode == input.EntityObjectTypeCode);
+                    }
+                }
+
+                if (entity == null)
+                {
+                    entity = new AppEntity
+                    {
+                        EntityExtraData = new List<AppEntityExtraData>(),
+                        EntityAttachments = new List<AppEntityAttachment>()
+                    };
+                }
+            }
+
+            if (entity.EntityExtraData == null)
+                entity.EntityExtraData = new List<AppEntityExtraData>();
+            if (entity.EntityAttachments == null)
+                entity.EntityAttachments = new List<AppEntityAttachment>();
+
+            entity.ObjectId = input.ObjectId;
+            entity.EntityObjectStatusId = input.EntityObjectStatusId;
+            if (entity.EntityObjectStatusId == null)
+                entity.EntityObjectStatusCode = null;
+            entity.EntityObjectTypeId = input.EntityObjectTypeId;
+            entity.EntityObjectTypeCode = input.EntityObjectTypeCode;
+            entity.Name = input.Name;
+            entity.Code = input.Code;
+            entity.Notes = input.Notes;
+            entity.SSIN = input.SSIN;
+            entity.TenantOwner = int.Parse(input.TenantOwner.ToString());
+            entity.TimeStamp = input.TimeStamp;
+            if (entity.TenantId == null || entity.TenantId == 0)
+                entity.TenantId = input.TenantId == -1 ? AbpSession.TenantId : input.TenantId;
+            entity.IsDefault = input.IsDefault;
+
+            await SyncVariationExtraData(entity, input, attributeValueEntityObjectTypeCache, entityObjectTypeCodeCache);
+            SyncVariationAttachments(entity, input);
+
+            if (entity.Id == 0)
+                entity = await _appEntityRepository.InsertAsync(entity);
+
+            var entityUniqueKey = GetVariationEntityUniqueKey(entity.TenantId, entity.EntityObjectTypeCode, entity.Code);
+            if (variationEntitiesByUniqueKey != null && !variationEntitiesByUniqueKey.ContainsKey(entityUniqueKey))
+                variationEntitiesByUniqueKey.Add(entityUniqueKey, entity);
+
+            return entity;
+        }
+
+        public string GetVariationEntityUniqueKey(int? tenantId, string entityObjectTypeCode, string code)
+        {
+            return $"{tenantId}|{entityObjectTypeCode}|{code}";
+        }
+
+        private async Task SyncVariationExtraData(
+            AppEntity entity,
+            AppEntityDto input,
+            IDictionary<long, long?> attributeValueEntityObjectTypeCache,
+            IDictionary<string, long?> entityObjectTypeCodeCache)
+        {
+            var submittedExtraData = input.EntityExtraData ?? new List<AppEntityExtraDataDto>();
+            var matchedExistingIds = new HashSet<long>();
+
+            foreach (var item in submittedExtraData)
+            {
+                var extraData = item.Id != 0
+                    ? entity.EntityExtraData.FirstOrDefault(x => x.Id == item.Id)
+                    : null;
+
+                extraData ??= entity.EntityExtraData.FirstOrDefault(x =>
+                    x.AttributeId == item.AttributeId &&
+                    x.EntityObjectTypeCode == item.EntityObjectTypeCode);
+
+                if (extraData == null)
+                {
+                    extraData = ObjectMapper.Map<AppEntityExtraData>(item);
+                    entity.EntityExtraData.Add(extraData);
+                }
+                else
+                {
+                    var existingExtraDataId = extraData.Id;
+                    if (item.Id == 0)
+                        item.Id = existingExtraDataId;
+                    ObjectMapper.Map(item, extraData);
+                    extraData.Id = existingExtraDataId;
+                    if (extraData.Id != 0)
+                        matchedExistingIds.Add(extraData.Id);
+                }
+
+                extraData.EntityId = entity.Id;
+                extraData.EntityCode = entity.Code;
+                if (extraData.AttributeValueId == 0)
+                    extraData.AttributeValueId = null;
+
+                if (extraData.AttributeValueId != null)
+                {
+                    var attributeValueId = (long)extraData.AttributeValueId;
+                    if (!attributeValueEntityObjectTypeCache.TryGetValue(attributeValueId, out var entityObjectTypeId))
+                    {
+                        entityObjectTypeId = await _appEntityRepository.GetAll()
+                            .Where(x => x.Id == attributeValueId)
+                            .Select(x => (long?)x.EntityObjectTypeId)
+                            .FirstOrDefaultAsync();
+                        attributeValueEntityObjectTypeCache.Add(attributeValueId, entityObjectTypeId);
+                    }
+                    if (entityObjectTypeId != null)
+                        extraData.EntityObjectTypeId = entityObjectTypeId;
+                }
+                else if (!string.IsNullOrEmpty(extraData.EntityObjectTypeCode))
+                {
+                    if (!entityObjectTypeCodeCache.TryGetValue(extraData.EntityObjectTypeCode, out var entityObjectTypeId))
+                    {
+                        entityObjectTypeId = await _appEntityRepository.GetAll()
+                            .Where(x => x.EntityObjectTypeCode == extraData.EntityObjectTypeCode)
+                            .Select(x => (long?)x.EntityObjectTypeId)
+                            .FirstOrDefaultAsync();
+                        entityObjectTypeCodeCache.Add(extraData.EntityObjectTypeCode, entityObjectTypeId);
+                    }
+                    if (entityObjectTypeId != null)
+                        extraData.EntityObjectTypeId = entityObjectTypeId;
+                }
+                else
+                {
+                    extraData.EntityObjectTypeId = null;
+                }
+            }
+
+            foreach (var existingExtraData in entity.EntityExtraData.Where(x => x.Id != 0).ToList())
+            {
+                var stillSubmitted = submittedExtraData.Any(x =>
+                    x.Id == existingExtraData.Id ||
+                    (x.Id == 0 &&
+                     x.AttributeId == existingExtraData.AttributeId &&
+                     x.EntityObjectTypeCode == existingExtraData.EntityObjectTypeCode));
+
+                if (!stillSubmitted && !matchedExistingIds.Contains(existingExtraData.Id))
+                    await _appEntityExtraDataRepository.DeleteAsync(existingExtraData.Id);
+            }
+        }
+
+        private void SyncVariationAttachments(AppEntity entity, AppEntityDto input)
+        {
+            if (input.EntityAttachments == null)
+                return;
+
+            var submittedAttachmentIds = input.EntityAttachments.Select(x => x.Id).ToHashSet();
+            foreach (var existingAttachment in entity.EntityAttachments.Where(x => x.Id != 0 && !submittedAttachmentIds.Contains(x.Id)).ToList())
+            {
+                _appEntityAttachmentRepository.Delete(existingAttachment);
+                if (existingAttachment.AttachmentFk != null)
+                    _appAttachmentRepository.Delete(existingAttachment.AttachmentFk);
+            }
+
+            foreach (var item in input.EntityAttachments)
+            {
+                if ((input.Id == 0 || input.Id == null) && string.IsNullOrEmpty(item.guid))
+                    item.guid = item.FileName;
+
+                var filename = GetAttachmentFileName(item);
+                var existing = item.Id > 0
+                    ? entity.EntityAttachments.FirstOrDefault(x => x.Id == item.Id)
+                    : null;
+
+                if (existing == null && !string.IsNullOrEmpty(filename))
+                {
+                    var attachment = new AppAttachment
+                    {
+                        Name = item.guid == null ? item.DisplayName : item.FileName,
+                        Attachment = filename,
+                        TenantId = entity.TenantId
+                    };
+
+                    entity.EntityAttachments.Add(new AppEntityAttachment
+                    {
+                        AttachmentCategoryId = (int)item.AttachmentCategoryId,
+                        EntityId = entity.Id,
+                        EntityCode = entity.Code,
+                        AttachmentFk = attachment,
+                        IsDefault = item.IsDefault,
+                        IsPublic = item.IsPublic,
+                        Attributes = item.Attributes
+                    });
+                    continue;
+                }
+
+                if (existing?.AttachmentFk != null)
+                {
+                    existing.AttachmentFk.Name = item.DisplayName;
+                    if (!string.IsNullOrEmpty(filename))
+                        existing.AttachmentFk.Attachment = filename;
+                    existing.IsDefault = item.IsDefault;
+                    existing.IsPublic = item.IsPublic;
+                    existing.Attributes = item.Attributes;
+                }
+            }
+        }
+
+        private static string GetAttachmentFileName(AppEntityAttachmentDto item)
+        {
+            var extension = "";
+            if (!string.IsNullOrEmpty(item.FileName) && item.FileName.Split(".").Length > 1)
+                extension = item.FileName.Split(".")[item.FileName.Split(".").Length - 1];
+
+            if (item.guid != null && !item.guid.EndsWith("." + extension))
+                return item.guid + (extension == "" ? "" : "." + extension);
+
+            if (item.guid != null)
+                return item.guid;
+
+            if (item.Id > 0 && string.IsNullOrEmpty(item.Url) && string.IsNullOrEmpty(item.guid))
+                return item.FileName;
+
+            if (item.Id == 0 && !string.IsNullOrEmpty(item.FileName))
+                return item.FileName;
+
+            return "";
+        }
+
         private async Task<long> SaveEntity(AppEntityDto input, IDictionary<long, long?> attributeValueEntityObjectTypeCache, IDictionary<string, long?> entityObjectTypeCodeCache)
         {
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))

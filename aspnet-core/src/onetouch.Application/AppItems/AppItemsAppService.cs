@@ -1,4 +1,4 @@
-using Abp.Application.Services.Dto;
+﻿using Abp.Application.Services.Dto;
 using Abp.Authorization;
 using Abp.BackgroundJobs;
 using Abp.Collections.Extensions;
@@ -94,7 +94,7 @@ namespace onetouch.AppItems
         private readonly IRepository<AppItemsListDetail, long> _appItemsListDetailRepository;
         private readonly IRepository<AppItem, long> _appItemRepository;
         private readonly IAppItemsExcelExporter _appItemsExcelExporter;
-        private readonly IAppEntitiesAppService _appEntitiesAppService;
+        private readonly AppEntitiesAppService _appEntitiesAppService;
         private readonly IRepository<AppEntity, long> _appEntityRepository;
         private readonly IRepository<AppEntitiesRelationship, long> _appEntitiesRelationship;
         private readonly IRepository<SycEntityObjectCategory, long> _sycEntityObjectCategoryRepository;
@@ -136,7 +136,7 @@ namespace onetouch.AppItems
         private readonly IBackgroundJobManager _backgroundJobManager;
         public AppItemsAppService(
             IRepository<AppItem, long> appItemRepository,
-            IAppItemsExcelExporter appItemsExcelExporter, IAppEntitiesAppService appEntitiesAppService, Helper helper, IRepository<AppEntity, long> appEntityRepository, SycEntityObjectTypesAppService sycEntityObjectTypesAppService
+            IAppItemsExcelExporter appItemsExcelExporter, AppEntitiesAppService appEntitiesAppService, Helper helper, IRepository<AppEntity, long> appEntityRepository, SycEntityObjectTypesAppService sycEntityObjectTypesAppService
             , IRepository<AppEntityCategory, long> appEntityCategoryRepository
             , IRepository<AppEntityClassification, long> appEntityClassificationRepository
             , IRepository<AppEntityExtraData, long> appEntityExtraDataRepository
@@ -1999,19 +1999,6 @@ namespace onetouch.AppItems
         }
         private async Task<long> DoCreateOrEdit(CreateOrEditAppItemDto input)
         {
-            // Track total method time and time between major checkpoints for performance diagnostics.
-            var methodStopwatch = System.Diagnostics.Stopwatch.StartNew();
-            var stepStopwatch = System.Diagnostics.Stopwatch.StartNew();
-            var variationCount = input.VariationItems?.Count ?? 0;
-            void LogStep(string stepName)
-            {
-                Logger.Info($"[PERF] DoCreateOrEdit step for Item {input.Code} (Id: {input.Id}, variations: {variationCount}) - {stepName}: {stepStopwatch.ElapsedMilliseconds} ms, total: {methodStopwatch.ElapsedMilliseconds} ms");
-                stepStopwatch.Restart();
-            }
-
-            Logger.Info($"[PERF] DoCreateOrEdit started for Item {input.Code} (Id: {input.Id}, variations: {variationCount})");
-
-
             // Load shared values used by the parent item, child variations, prices, and entity status.
             var timeStamp = DateTime.Now;
             /*if(input.ItemType == 0)
@@ -2027,7 +2014,6 @@ namespace onetouch.AppItems
             { itemObjectId = await _helper.SystemTables.GetObjectListingId(); }
 
             var itemStatusId = input.Status == "ACTIVE" ? await _helper.SystemTables.GetEntityObjectStatusItemActive() : await _helper.SystemTables.GetEntityObjectStatusItemDraft();
-            LogStep("Loaded tenant currency, item object id, and status id");
 
             // Merge departments into categories because entity persistence stores both as category records.
             if (input.EntityDepartments != null)
@@ -2104,7 +2090,6 @@ namespace onetouch.AppItems
             { entity.EntityClassifications = ObjectMapper.Map<List<AppEntityClassificationDto>>(appItem.EntityFk.EntityClassifications); }
 
             entity.Notes = _helper.HtmlToPlainText(input.Description);
-            LogStep("Prepared parent item and entity DTO");
 
             // Apply category, department, and classification add/remove deltas from the edit screen.
             #region add and remove classifications/categories/department
@@ -2149,7 +2134,6 @@ namespace onetouch.AppItems
             {
                 entity.SSIN = appItem.SSIN;
             }
-            LogStep("Applied categories, classifications, departments, and SSIN");
             entity.TenantOwner = appItem.TenantOwner;
             if (input.Id == 0 && entity.TenantOwner != null && entity.TenantOwner != 0)
             {
@@ -2173,11 +2157,8 @@ namespace onetouch.AppItems
             entity.RelatedEntitiesIds = input.entityRelatedItems.Select(e=> e.EntityObjectCategoryId).ToList();
 
             #endregion Iteration49 handle the related items
-            LogStep("Prepared related items");
             var savedEntity = await _appEntitiesAppService.SaveEntity(entity);
-            LogStep("Saved parent entity");
             await CurrentUnitOfWork.SaveChangesAsync();
-            LogStep("Flushed parent entity changes");
             if (appItem.TenantId == null)
                 appItem.TenantId = AbpSession.TenantId;
 
@@ -2187,10 +2168,9 @@ namespace onetouch.AppItems
             if (appItem.Id == 0)
             {
                 appItem = await _appItemRepository.InsertAsync(appItem);
-                if (variationCount > 0)
+                if (input.VariationItems != null && input.VariationItems.Count > 0)
                 {
                     await CurrentUnitOfWork.SaveChangesAsync();
-                    LogStep("Flushed parent item insert");
                 }
 
                 {
@@ -2202,7 +2182,6 @@ namespace onetouch.AppItems
                 appItem = await _appItemRepository.UpdateAsync(appItem);
                 await _appTenantActivitiesLogAppService.AddUsageActivityLog("EDIT-PRODUCT", appItem.Code, appItem.EntityId, appItem.EntityFk.EntityObjectTypeId, appItem.EntityFk.EntityObjectTypeCode, appItem.Code, 1);
             }
-            LogStep("Saved parent item and usage activity");
 
 
             List<Action> pendingFileMoves = new List<Action>();
@@ -2232,7 +2211,6 @@ namespace onetouch.AppItems
                 await _appEntityRepository.DeleteAsync(x => EntityIds.Contains(x.Id));
                 //XX
                 string imagesUrl = _appConfiguration[$"Attachment:Path"].Replace(_appConfiguration[$"Attachment:Omitt"], "") + @"/";
-                LogStep("Matched existing variations and deleted removed variations/entities");
 
                 // These lists are used to rebuild the parent AppItem.Variations serialized summary.
                 #region set variations field lists
@@ -2287,7 +2265,6 @@ namespace onetouch.AppItems
                             .ToListAsync();
                     }
                 }
-                LogStep("Preloaded size and color lookup data for variations");
 
                 var existingVariationItemsById = appItemChildrenTmp.ToDictionary(x => x.Id);
                 var existingVariationEntitiesById = new Dictionary<long, AppEntity>();
@@ -2316,7 +2293,6 @@ namespace onetouch.AppItems
                         .GroupBy(x => x.AppItemId)
                         .ToDictionary(x => x.Key, x => x.ToList());
                 }
-                LogStep("Preloaded existing variation entities and prices");
 
                 var submittedVariationCodes = input.VariationItems
                     .Where(x => !string.IsNullOrEmpty(x.Code))
@@ -2346,28 +2322,12 @@ namespace onetouch.AppItems
                 }
 
                 var variationEntitiesByUniqueKey = existingVariationEntitiesById.Values
-                    .GroupBy(x => GetVariationEntityUniqueKey(x.TenantId, x.EntityObjectTypeCode, x.Code))
+                    .GroupBy(x => _appEntitiesAppService.GetVariationEntityUniqueKey(x.TenantId, x.EntityObjectTypeCode, x.Code))
                     .ToDictionary(x => x.Key, x => x.First());
 
-                var variationIndex = 0;
-                long totalVariationMapMs = 0;
-                long totalVariationEnrichMs = 0;
-                long totalVariationSaveEntityMs = 0;
-                long totalVariationPriceMs = 0;
-                long totalVariationListMs = 0;
-                long slowestVariationSaveEntityMs = 0;
-                string slowestVariationCode = "";
                 foreach (var child in input.VariationItems)
                 {
                     // Process one variation: map DTOs, enrich attributes, save child entity/item, and save prices.
-                    variationIndex++;
-                    var variationStopwatch = System.Diagnostics.Stopwatch.StartNew();
-                    long variationMapMs;
-                    long variationEnrichMs;
-                    long variationSaveEntityMs;
-                    long variationPriceMs;
-                    long variationListMs;
-
                     AppItem appItemChild = new AppItem();
                     // For new variations copy parent defaults first; for existing variations update the matched child.
                     if (child.Id == 0)
@@ -2412,8 +2372,6 @@ namespace onetouch.AppItems
                     childEntity.Id = appItemChild.EntityId;
                     childEntity.Name = appItem.Name;
                     childEntity.Notes = appItem.Description;
-                    variationMapMs = variationStopwatch.ElapsedMilliseconds;
-                    variationStopwatch.Restart();
 
                     // Fill missing derived size/color metadata and queue cross-tenant attachment moves.
                     using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
@@ -2608,8 +2566,6 @@ namespace onetouch.AppItems
 
                         }
                     }
-                    variationEnrichMs = variationStopwatch.ElapsedMilliseconds;
-                    variationStopwatch.Restart();
 
                     // Generate child SSIN when needed, save the child entity, then insert/update the child item.
                     appItemChild.TimeStamp = timeStamp;
@@ -2627,7 +2583,7 @@ namespace onetouch.AppItems
                     }
                     childEntity.TenantOwner = appItemChild.TenantOwner;
 
-                    var savedChildEntity = await SaveVariationEntityLean(childEntity, attributeValueEntityObjectTypeCache, entityObjectTypeCodeCache, existingVariationEntitiesById, variationEntitiesByUniqueKey);
+                    var savedChildEntity = await _appEntitiesAppService.SaveVariationEntityLean(childEntity, attributeValueEntityObjectTypeCache, entityObjectTypeCodeCache, existingVariationEntitiesById, variationEntitiesByUniqueKey);
 
                     appItemChild.EntityId = savedChildEntity.Id;
                     appItemChild.EntityFk = savedChildEntity;
@@ -2641,8 +2597,6 @@ namespace onetouch.AppItems
                         appItemChild = await _appItemRepository.InsertAsync(appItemChild);
                         // SaveChangesAsync intentionally removed for performance! EF Core will handle via Navigation Properties
                     }
-                    variationSaveEntityMs = variationStopwatch.ElapsedMilliseconds;
-                    variationStopwatch.Restart();
 
                     // Replace removed child prices and insert/update the submitted variation prices.
                     existingVariationPricesByItemId.TryGetValue(appItemChild.Id, out var existingVariationPrices);
@@ -2720,8 +2674,6 @@ namespace onetouch.AppItems
                             }
                         }
                     }
-                    variationPriceMs = variationStopwatch.ElapsedMilliseconds;
-                    variationStopwatch.Restart();
 
                     // Collect the attribute names, ids, values, and default images for AppItem.Variations.
                     #region fill variation field lists
@@ -2795,26 +2747,7 @@ namespace onetouch.AppItems
 
 
                     #endregion fill variation field lists
-                    variationListMs = variationStopwatch.ElapsedMilliseconds;
-                    totalVariationMapMs += variationMapMs;
-                    totalVariationEnrichMs += variationEnrichMs;
-                    totalVariationSaveEntityMs += variationSaveEntityMs;
-                    totalVariationPriceMs += variationPriceMs;
-                    totalVariationListMs += variationListMs;
-
-                    if (variationSaveEntityMs > slowestVariationSaveEntityMs)
-                    {
-                        slowestVariationSaveEntityMs = variationSaveEntityMs;
-                        slowestVariationCode = child.Code;
-                    }
-
-                    if (variationIndex % 25 == 0 || variationIndex == variationCount)
-                    {
-                        Logger.Info($"[PERF] DoCreateOrEdit variations progress for Item {input.Code}: processed {variationIndex}/{variationCount}, total save entity/item: {totalVariationSaveEntityMs} ms, total prices: {totalVariationPriceMs} ms, total method: {methodStopwatch.ElapsedMilliseconds} ms, slowest save entity/item: {slowestVariationSaveEntityMs} ms ({slowestVariationCode})");
-                    }
                 }
-                Logger.Info($"[PERF] DoCreateOrEdit variations summary for Item {input.Code}: count: {variationCount}, map: {totalVariationMapMs} ms, enrich attributes/images: {totalVariationEnrichMs} ms, save entity/item: {totalVariationSaveEntityMs} ms, prices: {totalVariationPriceMs} ms, build variation lists: {totalVariationListMs} ms, slowest save entity/item: {slowestVariationSaveEntityMs} ms ({slowestVariationCode}), total method: {methodStopwatch.ElapsedMilliseconds} ms");
-                LogStep("Processed all variations");
 
                 // Serialize variation metadata used by the UI to render variation selectors.
                 #region concatenate variation lists
@@ -2848,7 +2781,6 @@ namespace onetouch.AppItems
 
                 appItem.Variations = variation;
                 #endregion concatenate variation lists
-                LogStep("Built parent variation summary string");
 
             }
             else
@@ -2859,7 +2791,6 @@ namespace onetouch.AppItems
                     await _appItemRepository.DeleteAsync(x => x.ParentId == input.Id);
                     await CurrentUnitOfWork.SaveChangesAsync();
                 }
-                LogStep("Deleted existing variations because input has no variations");
             }
             // Remove parent price rows that are no longer present in the submitted DTO.
             if (input.AppItemPriceInfos != null && input.AppItemPriceInfos.Count() > 0)
@@ -2873,7 +2804,6 @@ namespace onetouch.AppItems
             }
 
             await CurrentUnitOfWork.SaveChangesAsync();
-            LogStep("Deleted stale parent prices and flushed changes");
 
             if (input.AppItemPriceInfos != null)
             {
@@ -2896,7 +2826,6 @@ namespace onetouch.AppItems
                         await _appItemPricesRepository.UpdateAsync(itemPriceObj);
                 }
             }
-            LogStep("Saved parent prices");
             if (input.AppItemSizesScaleInfo != null && input.AppItemSizesScaleInfo.Count() > 0)
             {
 
@@ -3011,11 +2940,9 @@ namespace onetouch.AppItems
                 // No size-scale data was submitted, so remove all item size-scale headers.
                 await _appItemSizeScalesHeaderRepository.DeleteAsync(z => z.AppItemId == appItem.Id);
             }
-            LogStep("Processed item size scales");
 
 
             await CurrentUnitOfWork.SaveChangesAsync();
-            LogStep("Final unit of work save");
 
             if (input.VariationItems != null && input.VariationItems.Any())
             {
@@ -3026,7 +2953,6 @@ namespace onetouch.AppItems
                         ObjectTypeId = itemObjectId,
                         TenantId = AbpSession.TenantId
                     });
-                LogStep("Queued variation SSIN background generation");
             }
 
             // Queue attachment file moves after database changes have been persisted without blocking the save response.
@@ -3041,273 +2967,14 @@ namespace onetouch.AppItems
                         {
                             moveAction();
                         }
-                        catch (Exception ex)
+                        catch (Exception)
                         {
-                            Logger.Warn("Failed to move queued variation attachment file.", ex);
                         }
                     }
                 });
             }
-            LogStep($"Queued pending file moves ({pendingFileMoves.Count})");
-
-            methodStopwatch.Stop();
-            Logger.Info($"[PERF] DoCreateOrEdit execution time for Item {input.Code}: {methodStopwatch.ElapsedMilliseconds} ms");
 
             return appItem.Id;
-        }
-
-        private async Task<AppEntity> SaveVariationEntityLean(
-            AppEntityDto input,
-            IDictionary<long, long?> attributeValueEntityObjectTypeCache,
-            IDictionary<string, long?> entityObjectTypeCodeCache,
-            IDictionary<long, AppEntity> existingVariationEntitiesById = null,
-            IDictionary<string, AppEntity> variationEntitiesByUniqueKey = null)
-        {
-            if (string.IsNullOrEmpty(input.Code))
-                input.Code = System.Guid.NewGuid().ToString();
-
-            AppEntity entity;
-            if (input.Id != 0)
-            {
-                if (existingVariationEntitiesById == null || !existingVariationEntitiesById.TryGetValue(input.Id, out entity))
-                {
-                    entity = await _appEntityRepository.GetAll()
-                        .Include(x => x.EntityExtraData)
-                        .Include(x => x.EntityAttachments).ThenInclude(x => x.AttachmentFk)
-                        .FirstOrDefaultAsync(x => x.Id == input.Id);
-                }
-            }
-            else
-            {
-                var inputTenantId = input.TenantId == -1 ? AbpSession.TenantId : input.TenantId;
-                var uniqueKey = GetVariationEntityUniqueKey(inputTenantId, input.EntityObjectTypeCode, input.Code);
-                if (variationEntitiesByUniqueKey == null || !variationEntitiesByUniqueKey.TryGetValue(uniqueKey, out entity))
-                {
-                    entity = null;
-                    if (variationEntitiesByUniqueKey == null)
-                    {
-                        entity = await _appEntityRepository.GetAll()
-                            .Include(x => x.EntityExtraData)
-                            .Include(x => x.EntityAttachments).ThenInclude(x => x.AttachmentFk)
-                            .FirstOrDefaultAsync(x =>
-                                x.Code == input.Code &&
-                                x.TenantId == inputTenantId &&
-                                x.ObjectCode == null &&
-                                x.EntityObjectTypeCode == input.EntityObjectTypeCode);
-                    }
-                }
-
-                if (entity == null)
-                {
-                    entity = new AppEntity
-                    {
-                        EntityExtraData = new List<AppEntityExtraData>(),
-                        EntityAttachments = new List<AppEntityAttachment>()
-                    };
-                }
-            }
-
-            if (entity.EntityExtraData == null)
-                entity.EntityExtraData = new List<AppEntityExtraData>();
-            if (entity.EntityAttachments == null)
-                entity.EntityAttachments = new List<AppEntityAttachment>();
-
-            entity.ObjectId = input.ObjectId;
-            entity.EntityObjectStatusId = input.EntityObjectStatusId;
-            if (entity.EntityObjectStatusId == null)
-                entity.EntityObjectStatusCode = null;
-            entity.EntityObjectTypeId = input.EntityObjectTypeId;
-            entity.EntityObjectTypeCode = input.EntityObjectTypeCode;
-            entity.Name = input.Name;
-            entity.Code = input.Code;
-            entity.Notes = input.Notes;
-            entity.SSIN = input.SSIN;
-            entity.TenantOwner = int.Parse(input.TenantOwner.ToString());
-            entity.TimeStamp = input.TimeStamp;
-            if (entity.TenantId == null || entity.TenantId == 0)
-                entity.TenantId = input.TenantId == -1 ? AbpSession.TenantId : input.TenantId;
-            entity.IsDefault = input.IsDefault;
-
-            await SyncVariationExtraData(entity, input, attributeValueEntityObjectTypeCache, entityObjectTypeCodeCache);
-            SyncVariationAttachments(entity, input);
-
-            if (entity.Id == 0)
-                entity = await _appEntityRepository.InsertAsync(entity);
-
-            var entityUniqueKey = GetVariationEntityUniqueKey(entity.TenantId, entity.EntityObjectTypeCode, entity.Code);
-            if (variationEntitiesByUniqueKey != null && !variationEntitiesByUniqueKey.ContainsKey(entityUniqueKey))
-                variationEntitiesByUniqueKey.Add(entityUniqueKey, entity);
-
-            return entity;
-        }
-
-        private string GetVariationEntityUniqueKey(int? tenantId, string entityObjectTypeCode, string code)
-        {
-            return $"{tenantId}|{entityObjectTypeCode}|{code}";
-        }
-
-        private async Task SyncVariationExtraData(
-            AppEntity entity,
-            AppEntityDto input,
-            IDictionary<long, long?> attributeValueEntityObjectTypeCache,
-            IDictionary<string, long?> entityObjectTypeCodeCache)
-        {
-            var submittedExtraData = input.EntityExtraData ?? new List<AppEntityExtraDataDto>();
-            var matchedExistingIds = new HashSet<long>();
-
-            foreach (var item in submittedExtraData)
-            {
-                var extraData = item.Id != 0
-                    ? entity.EntityExtraData.FirstOrDefault(x => x.Id == item.Id)
-                    : null;
-
-                extraData ??= entity.EntityExtraData.FirstOrDefault(x =>
-                    x.AttributeId == item.AttributeId &&
-                    x.EntityObjectTypeCode == item.EntityObjectTypeCode);
-
-                if (extraData == null)
-                {
-                    extraData = ObjectMapper.Map<AppEntityExtraData>(item);
-                    entity.EntityExtraData.Add(extraData);
-                }
-                else
-                {
-                    var existingExtraDataId = extraData.Id;
-                    if (item.Id == 0)
-                        item.Id = existingExtraDataId;
-                    ObjectMapper.Map(item, extraData);
-                    extraData.Id = existingExtraDataId;
-                    if (extraData.Id != 0)
-                        matchedExistingIds.Add(extraData.Id);
-                }
-
-                extraData.EntityId = entity.Id;
-                extraData.EntityCode = entity.Code;
-                if (extraData.AttributeValueId == 0)
-                    extraData.AttributeValueId = null;
-
-                if (extraData.AttributeValueId != null)
-                {
-                    var attributeValueId = (long)extraData.AttributeValueId;
-                    if (!attributeValueEntityObjectTypeCache.TryGetValue(attributeValueId, out var entityObjectTypeId))
-                    {
-                        entityObjectTypeId = await _appEntityRepository.GetAll()
-                            .Where(x => x.Id == attributeValueId)
-                            .Select(x => (long?)x.EntityObjectTypeId)
-                            .FirstOrDefaultAsync();
-                        attributeValueEntityObjectTypeCache.Add(attributeValueId, entityObjectTypeId);
-                    }
-                    if (entityObjectTypeId != null)
-                        extraData.EntityObjectTypeId = entityObjectTypeId;
-                }
-                else if (!string.IsNullOrEmpty(extraData.EntityObjectTypeCode))
-                {
-                    if (!entityObjectTypeCodeCache.TryGetValue(extraData.EntityObjectTypeCode, out var entityObjectTypeId))
-                    {
-                        entityObjectTypeId = await _appEntityRepository.GetAll()
-                            .Where(x => x.EntityObjectTypeCode == extraData.EntityObjectTypeCode)
-                            .Select(x => (long?)x.EntityObjectTypeId)
-                            .FirstOrDefaultAsync();
-                        entityObjectTypeCodeCache.Add(extraData.EntityObjectTypeCode, entityObjectTypeId);
-                    }
-                    if (entityObjectTypeId != null)
-                        extraData.EntityObjectTypeId = entityObjectTypeId;
-                }
-                else
-                {
-                    extraData.EntityObjectTypeId = null;
-                }
-            }
-
-            foreach (var existingExtraData in entity.EntityExtraData.Where(x => x.Id != 0).ToList())
-            {
-                var stillSubmitted = submittedExtraData.Any(x =>
-                    x.Id == existingExtraData.Id ||
-                    (x.Id == 0 &&
-                     x.AttributeId == existingExtraData.AttributeId &&
-                     x.EntityObjectTypeCode == existingExtraData.EntityObjectTypeCode));
-
-                if (!stillSubmitted && !matchedExistingIds.Contains(existingExtraData.Id))
-                    await _appEntityExtraDataRepository.DeleteAsync(existingExtraData.Id);
-            }
-        }
-
-        private void SyncVariationAttachments(AppEntity entity, AppEntityDto input)
-        {
-            if (input.EntityAttachments == null)
-                return;
-
-            var submittedAttachmentIds = input.EntityAttachments.Select(x => x.Id).ToHashSet();
-            foreach (var existingAttachment in entity.EntityAttachments.Where(x => x.Id != 0 && !submittedAttachmentIds.Contains(x.Id)).ToList())
-            {
-                _appEntityAttachmentRepository.Delete(existingAttachment);
-                if (existingAttachment.AttachmentFk != null)
-                    _appAttachmentRepository.Delete(existingAttachment.AttachmentFk);
-            }
-
-            foreach (var item in input.EntityAttachments)
-            {
-                if ((input.Id == 0 || input.Id == null) && string.IsNullOrEmpty(item.guid))
-                    item.guid = item.FileName;
-
-                var filename = GetAttachmentFileName(item);
-                var existing = item.Id > 0
-                    ? entity.EntityAttachments.FirstOrDefault(x => x.Id == item.Id)
-                    : null;
-
-                if (existing == null && !string.IsNullOrEmpty(filename))
-                {
-                    var attachment = new AppAttachment
-                    {
-                        Name = item.guid == null ? item.DisplayName : item.FileName,
-                        Attachment = filename,
-                        TenantId = entity.TenantId
-                    };
-
-                    entity.EntityAttachments.Add(new AppEntityAttachment
-                    {
-                        AttachmentCategoryId = (int)item.AttachmentCategoryId,
-                        EntityId = entity.Id,
-                        EntityCode = entity.Code,
-                        AttachmentFk = attachment,
-                        IsDefault = item.IsDefault,
-                        IsPublic = item.IsPublic,
-                        Attributes = item.Attributes
-                    });
-                    continue;
-                }
-
-                if (existing?.AttachmentFk != null)
-                {
-                    existing.AttachmentFk.Name = item.DisplayName;
-                    if (!string.IsNullOrEmpty(filename))
-                        existing.AttachmentFk.Attachment = filename;
-                    existing.IsDefault = item.IsDefault;
-                    existing.IsPublic = item.IsPublic;
-                    existing.Attributes = item.Attributes;
-                }
-            }
-        }
-
-        private static string GetAttachmentFileName(AppEntityAttachmentDto item)
-        {
-            var extension = "";
-            if (!string.IsNullOrEmpty(item.FileName) && item.FileName.Split(".").Length > 1)
-                extension = item.FileName.Split(".")[item.FileName.Split(".").Length - 1];
-
-            if (item.guid != null && !item.guid.EndsWith("." + extension))
-                return item.guid + (extension == "" ? "" : "." + extension);
-
-            if (item.guid != null)
-                return item.guid;
-
-            if (item.Id > 0 && string.IsNullOrEmpty(item.Url) && string.IsNullOrEmpty(item.guid))
-                return item.FileName;
-
-            if (item.Id == 0 && !string.IsNullOrEmpty(item.FileName))
-                return item.FileName;
-
-            return "";
         }
 
         [AbpAuthorize(AppPermissions.Pages_AccountInfo_Publish)]
@@ -5339,9 +5006,14 @@ namespace onetouch.AppItems
             }
 
             #endregion Iteration 44 save not used images
+            var resultKey = GetValidateExcelResultKey(guidFile);
+            var fullResponseRecords = itemExcelResultsDTO.ExcelRecords?.Count ?? 0;
+            await SaveValidateExcelResultJson(itemExcelResultsDTO, resultKey);
 
-            Logger.Info($"[PERF] ValidateExcel total duration for file {guidFile}: {validateExcelStopwatch.ElapsedMilliseconds} ms, records: {itemExcelResultsDTO.TotalRecords}, passed: {itemExcelResultsDTO.TotalPassedRecords}, failed: {itemExcelResultsDTO.TotalFailedRecords}, response records: {itemExcelResultsDTO.ExcelRecords?.Count ?? 0}");
-            return itemExcelResultsDTO;
+            var pagedResult = CreateValidateExcelPagedResult(itemExcelResultsDTO, resultKey, 0, ValidateExcelDefaultPageSize);
+
+            Logger.Info($"[PERF] ValidateExcel total duration for file {guidFile}: {validateExcelStopwatch.ElapsedMilliseconds} ms, records: {itemExcelResultsDTO.TotalRecords}, passed: {itemExcelResultsDTO.TotalPassedRecords}, failed: {itemExcelResultsDTO.TotalFailedRecords}, full response records: {fullResponseRecords}, returned records: {pagedResult.ExcelRecords?.Count ?? 0}, result key: {resultKey}");
+            return pagedResult;
         }
         //Iteation#46[Start]
         private sealed class ValidateImportItemDataContext
@@ -5367,6 +5039,133 @@ namespace onetouch.AppItems
         {
             if (!string.IsNullOrWhiteSpace(value))
                 keys.Add(value.Trim());
+        }
+
+        private const int ValidateExcelDefaultPageSize = 25;
+
+        private string GetValidateExcelResultKey(string guidFile)
+        {
+            return string.IsNullOrWhiteSpace(guidFile) ? Guid.NewGuid().ToString("N") : guidFile.Trim();
+        }
+
+        private string GetValidateExcelResultPath(string resultKey)
+        {
+            var tenantId = AbpSession.TenantId == null ? -1 : AbpSession.TenantId;
+            return Path.Combine(_appConfiguration[$"Attachment:PathTemp"], tenantId.ToString(), resultKey + ".validate-result.json");
+        }
+
+        private async Task SaveValidateExcelResultJson(AppItemExcelResultsDTO result, string resultKey)
+        {
+            var resultPath = GetValidateExcelResultPath(resultKey);
+            var resultDirectory = Path.GetDirectoryName(resultPath);
+            if (!Directory.Exists(resultDirectory))
+                Directory.CreateDirectory(resultDirectory);
+
+            result.ResultKey = resultKey;
+            result.IsPagedResult = false;
+            result.PageSkipCount = 0;
+            result.PageMaxResultCount = 0;
+            result.TotalDisplayRecords = result.ExcelRecords?.Count ?? 0;
+
+            var json = JsonConvert.SerializeObject(result);
+            await System.IO.File.WriteAllTextAsync(resultPath, json);
+        }
+
+        private async Task<AppItemExcelResultsDTO> LoadValidateExcelResultJson(string resultKey)
+        {
+            var resultPath = GetValidateExcelResultPath(resultKey);
+            if (!System.IO.File.Exists(resultPath))
+                throw new UserFriendlyException("Import validation result is expired or not found. Please validate the Excel file again.");
+
+            var json = await System.IO.File.ReadAllTextAsync(resultPath);
+            var result = JsonConvert.DeserializeObject<AppItemExcelResultsDTO>(json);
+            if (result == null)
+                throw new UserFriendlyException("Import validation result is invalid. Please validate the Excel file again.");
+
+            result.ResultKey = resultKey;
+            return result;
+        }
+
+        private AppItemExcelResultsDTO CreateValidateExcelPagedResult(AppItemExcelResultsDTO fullResult, string resultKey, int skipCount, int maxResultCount)
+        {
+            skipCount = Math.Max(0, skipCount);
+            maxResultCount = maxResultCount <= 0
+                ? ValidateExcelDefaultPageSize
+                : Math.Min(maxResultCount, ValidateExcelDefaultPageSize);
+
+            var fullRecords = fullResult.ExcelRecords ?? new List<AppItemtExcelRecordDTO>();
+            return new AppItemExcelResultsDTO
+            {
+                ExcelLogDTO = fullResult.ExcelLogDTO,
+                TotalRecords = fullResult.TotalRecords,
+                CodesFromList = fullResult.CodesFromList,
+                FromList = fullResult.FromList,
+                From = fullResult.From,
+                ToList = fullResult.ToList,
+                To = fullResult.To,
+                TotalPassedRecords = fullResult.TotalPassedRecords,
+                TotalFailedRecords = fullResult.TotalFailedRecords,
+                RepreateHandler = fullResult.RepreateHandler,
+                ExcelRecords = fullRecords.Skip(skipCount).Take(maxResultCount).ToList(),
+                FilePath = fullResult.FilePath,
+                ErrorMessage = fullResult.ErrorMessage,
+                HasDuplication = fullResult.HasDuplication,
+                ResultKey = resultKey,
+                IsPagedResult = true,
+                PageSkipCount = skipCount,
+                PageMaxResultCount = maxResultCount,
+                TotalDisplayRecords = fullRecords.Count
+            };
+        }
+
+        private void ApplyCurrentPageChanges(AppItemExcelResultsDTO fullResult, AppItemExcelResultsDTO currentResult)
+        {
+            if (fullResult?.ExcelRecords == null || currentResult?.ExcelRecords == null || currentResult.ExcelRecords.Count == 0)
+                return;
+
+            var fullRecordsByRow = fullResult.ExcelRecords
+                .Where(x => x?.ExcelDto != null && x.ExcelDto.rowNumber > 0)
+                .GroupBy(x => x.ExcelDto.rowNumber)
+                .ToDictionary(x => x.Key, x => x.First());
+
+            foreach (var changedRecord in currentResult.ExcelRecords)
+            {
+                AppItemtExcelRecordDTO fullRecord = null;
+                if (changedRecord?.ExcelDto != null && changedRecord.ExcelDto.rowNumber > 0)
+                    fullRecordsByRow.TryGetValue(changedRecord.ExcelDto.rowNumber, out fullRecord);
+
+                if (fullRecord == null && !string.IsNullOrWhiteSpace(changedRecord?.Code))
+                    fullRecord = fullResult.ExcelRecords.FirstOrDefault(x => string.Equals(x.Code, changedRecord.Code, StringComparison.OrdinalIgnoreCase));
+
+                if (fullRecord != null)
+                {
+                    var index = fullResult.ExcelRecords.IndexOf(fullRecord);
+                    fullResult.ExcelRecords[index] = changedRecord;
+                }
+            }
+        }
+
+        public async Task<AppItemExcelResultsDTO> GetValidateExcelResultPage(string resultKey, int skipCount, int maxResultCount)
+        {
+            var fullResult = await LoadValidateExcelResultJson(resultKey);
+            return CreateValidateExcelPagedResult(fullResult, resultKey, skipCount, maxResultCount);
+        }
+
+        public async Task<ExcelLogDto> SaveFromExcelResult(string resultKey, AppItemExcelResultsDTO currentResult)
+        {
+            var fullResult = await LoadValidateExcelResultJson(resultKey);
+            ApplyCurrentPageChanges(fullResult, currentResult);
+
+            if (currentResult != null)
+            {
+                fullResult.RepreateHandler = currentResult.RepreateHandler;
+                fullResult.From = currentResult.From;
+                fullResult.To = currentResult.To;
+                if (!string.IsNullOrWhiteSpace(currentResult.FilePath))
+                    fullResult.FilePath = currentResult.FilePath;
+            }
+
+            return await SaveFromExcel(fullResult);
         }
 
         private static IEnumerable<List<T>> ChunkList<T>(IEnumerable<T> source, int chunkSize)
