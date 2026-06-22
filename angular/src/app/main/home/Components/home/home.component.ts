@@ -17,9 +17,14 @@ export class HomeComponent implements OnInit {
     // refrence to post popup in post componenet
     @ViewChild("viewPostModal", { static: true })
     viewPostModal: ViewPostComponent;
+    currentLang: string;
+    isArabic: boolean = false;
+
     constructor(private _postService:AppPostsServiceProxy) { }
 
     ngOnInit(): void {
+        this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName');
+        this.isArabic = this.currentLang === 'ar' || this.currentLang === 'ar-EG';
     }
 
     onViewEventModal($event: number) {

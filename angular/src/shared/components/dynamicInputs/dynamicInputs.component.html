@@ -23,7 +23,7 @@
                                [styleClass]="'w-100'"
                                    [(ngModel)]="extraAttr.selectedValues"
                                name="extraAttr_{{extraAttr.name}}"
-                               [placeholder]="('Select') + ' ' + (extraAttr.name | localize)">
+                            placeholder="{{ 'Select' | localize }} {{ extraAttr.name | localize }}">
                 </p-multiSelect>
               </div>
             </div>
@@ -54,7 +54,7 @@
                           [styleClass]="'w-100'"
                               [(ngModel)]="extraAttr.selectedValues"
                           name="extraAttr_{{extraAttr.name}}"
-                          [placeholder]="('Select') + ' ' + (extraAttr.name| localize)">
+                   placeholder="{{ 'Select' | localize }} {{ extraAttr.name | localize }}">
               </p-dropdown>
             </div>
 
@@ -63,7 +63,7 @@
               <div class="d-flex align-items-baseline justify-content-start">
                 <p-dropdown [options]="getDropdownOptions(extraAttr)"
                                 [(ngModel)]="extraAttr.selectedValues"
-                            [placeholder]="l('Select') + ' ' + (extraAttr.name | localize)"
+                           placeholder="{{ 'Select' | localize }} {{ extraAttr.name | localize }}"
                             [filter]="true"
                             filterBy="label"
                             [showClear]="true"
@@ -77,7 +77,7 @@
                     <div *ngIf="item.isLoadMore; else normalItem"
                          class="load-more-item"
                          (click)="onLoadMoreClick($event, extraAttr)">
-                      Load More...
+                      {{ 'LoadMore' | localize }}...
                     </div>
                     <ng-template #normalItem>
                       {{item.label}}
@@ -92,7 +92,7 @@
               <div class="d-flex align-items-baseline justify-content-start">
                 <p-dropdown [options]="getDropdownOptions(extraAttr)"
                                 [(ngModel)]="extraAttr.selectedValues"
-                            [placeholder]="l('Select') + ' ' + (extraAttr.name | localize)"
+                        placeholder="{{ 'Select' | localize }} {{ extraAttr.name | localize }}"
                             [filter]="true"
                             filterBy="label"
                             [showClear]="true"
@@ -152,7 +152,7 @@
                     {{ "No" | localize }}
                   </label>
                 </ng-template>
-                <a *ngIf="extraAttr.selectedValues" class="ml-5 pointer text-black-50 font-weight-bold" (click)="reset(extraAttr)">Reset</a>
+                <a *ngIf="extraAttr.selectedValues" class="ml-5 pointer text-black-50 font-weight-bold" (click)="reset(extraAttr)">{{ 'Reset' | localize }}</a>
               </div>
             </div>
 
@@ -171,9 +171,9 @@
               <div class="upload-box" *ngIf="!extraAttr.selectedValues" (click)="fileInput.click()">
                 <div class="upload-content">
                   <i class="pi pi-upload upload-icon"></i>
-                  <span class="upload-text">Upload File</span>
+                  <span class="upload-text">{{ 'UploadFile' | localize }}</span>
                 </div>
-                <small class="upload-note">*Select a JPG | JPEG | PNG | GIF File</small>
+                <small class="upload-note">*{{ 'SelectImageFileTypes' | localize }}</small>
                 <input type="file" #fileInput class="d-none" accept=".jpg,.jpeg,.png,.gif"
                        (change)="onFileSelected($event, extraAttr)" />
               </div>
@@ -187,7 +187,7 @@
                   <button type="button" class="btn btn-sm uploadBtn me-2"
                           *ngIf="extraAttr?.showUploadBtn"
                           (click)="onUploadFile(extraAttr.selectedValues)">
-                    <i class="pi pi-upload me-1"></i> Upload
+                    <i class="pi pi-upload me-1"></i> {{ 'Upload' | localize }}
                   </button>
                 </div>
               </div>
@@ -208,7 +208,7 @@
               <div class="tab-content p-3 border rounded bg-light">
                 <div *ngIf="selectedTheme">
                   <h6 class="fw-semibold">{{ selectedTheme.name }}</h6>
-                  <p class="mb-0">Preview or apply this theme.</p>
+                  <p class="mb-0">{{ 'PreviewOrApplyThisTheme' | localize }}</p>
                 </div>
               </div>
             </div>

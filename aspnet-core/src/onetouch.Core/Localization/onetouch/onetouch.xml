@@ -1946,7 +1946,7 @@
 		<text name="Published">Published</text>
 		<text name="UnPublishedSuccessfully">Unpublished Successfully</text>
 		<text name="CreateNewProduct">Create New Product</text>
-		<text name="ProductId">Product Id</text>
+		<text name="Product Id">Product Id</text>
 		<text name="MyListings">My Listings</text>
 		<text name="ChooseSharingOptions">Choose Sharing Options</text>
 		<text name="TypeOrSearchForMembersAndAccounts">Type Or Search For Members And Accounts</text>
@@ -2936,7 +2936,76 @@
 
 <text name="Product">Product</text>
 <text name="Block">Block</text>
+<text name="AddedToLookup">Added to lookup</text>
+<text name="SetDefaultValue">Set Default Value</text>
+<text name="AddToLookup">Add To Lookup</text>
+<text name="UploadFiles">Upload Files</text>
+<text name="SelectAndUploadTheFiles">Select and Upload the Files</text>
+<text name="OpenPDF">Open PDF</text>
+<text name="NoThanks">No Thanks</text>
+<text name="CreateAnother">Create Another</text>
+<text name="PDF">PDF</text>
+<text name="ImageAttach">Image Attach</text>
+<text name="LoadMore">Load More</text>
+<text name="UploadFile">Upload File</text>
+<text name="SelectImageFileTypes">Select a JPG | JPEG | PNG | GIF File</text>
+<text name="PreviewOrApplyThisTheme">Preview or apply this theme.</text>
+<text name="SelectCurrency">Select Currency</text>
+	<text name="FilterBy">Filter By</text>
+<text name="RRP">RRP</text>
+<text name="SoldBy">Sold By</text>
+<text name="NoSellerName">Seller Name</text>
+<text name="SearchWithColor">Search With Color</text>
+<text name="ViewOrderedQuantityBySize">ViewOrderedQuantityBySize</text>
+<text name="Connect , Proceed">Connect &amp; Proceed</text>
+<text name="LoadingPreview">Loading Preview ...</text>
+<text name="ManufactureCode">Manufacture Code</text>
+<text name="Shared">Shared</text>
+<text name="Hidden">Hidden</text>
 
-	
+<text name="SharingStatus">Sharing Status</text>
+<text name="HeaderTitle">Header Title</text>
+<text name="HeaderDesc">Header Description</text>
+<text name="TheProductType">the product type</text>
+<text name="Standard">Standard</text>
+<text name="HTML">HTML</text>
+<text name="ParentItemAttachments">Parent Item Attachments</text>
+<text name="AddAttachment">Add Attachment</text>
+<text name="VisibleInMarketplace">Visible in Marketplace</text>
+<text name="ExistingVariations">Existing Variations</text>
+<text name="NewVariations">New Variations</text>
+<text name="EditSetPrice">Edit / Set Price</text>
+<text name="SSINNumber">SSIN Number</text>
+<text name="SiwiiMarketplace">SIWII Marketplace</text>
+<text name="CreateVariationsHint">
+Select an attribute and then select the options of the products you sell. To see more attributes, click add.
+</text>
+<text name="YouHaveBeenSelected">You have selected</text>
+<text name="AttributesAndOptionsYouHaveSelected">Attributes and options you've selected</text>
+<text name="ChangeVariationTypeToAddMorePhotos">You can change the variation type to add more photos</text>
+<text name="ChooseFileOrDragDropHere">Choose a file or drag &amp; drop it here</text>
+<text name="SupportedFormatsAndSize">JPEG, PNG, PDF, MP4 formats up to 25MB</text>
+<text name="ImageAspectRatio16_9">Image aspect ratio is 16:9</text>
+<text name="DetailInfo">Detail Information</text>
+<text name="PrintInfo">Print Information</text>
+<text name="ReportViewer">Report Viewer</text>
+<text name="SelectPrice">Select Price</text>
+<text name="Continue">Continue</text>
+<text name="SelectLinesheetTemplate">
+Please select one of the available linesheet templates
+</text>
+<text name="PleaseFillRequiredLinesheetInformation">Please fill the required linesheet information</text>
+<text name="SubscribersToProduct">You have {0} subscribers to this product</text>
+<text name="YourListingIsNowAddedToTheList">Your listing is now added to the {0} list</text>
+<text name="SelectVariationsTitle">Select / Unselect Variations</text>
+<text name="SelectVariationsHint">Select or remove the variation you want to appear on your list</text>
+<text name="ChooseAFileOrDragDropItHere"> Choose a file or drag &amp; drop it here </text>
+<text name="TaxRate"> Tax Rate </text>
+<text name="Variationrequiredtosave"> Variationrequiredtosave </text>
+<text name="SizeName"> Size Name </text>
+<text name="Dimension"> Dimension </text>
+		<text name="Create">Create </text>
+		<text name="Addtoproductlist">Add to product list </text>
+		<text name="IsDefault">IsDefault </text>
   </texts>  
 </localizationDictionary>
