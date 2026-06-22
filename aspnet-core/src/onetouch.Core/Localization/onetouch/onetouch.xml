@@ -2986,10 +2986,6 @@ Select an attribute and then select the options of the products you sell. To see
 <text name="ChooseFileOrDragDropHere">Choose a file or drag &amp; drop it here</text>
 <text name="SupportedFormatsAndSize">JPEG, PNG, PDF, MP4 formats up to 25MB</text>
 <text name="ImageAspectRatio16_9">Image aspect ratio is 16:9</text>
-
-
-
-
 <text name="DetailInfo">Detail Information</text>
 <text name="PrintInfo">Print Information</text>
 <text name="ReportViewer">Report Viewer</text>
@@ -3003,5 +2999,6 @@ Please select one of the available linesheet templates
 <text name="YourListingIsNowAddedToTheList">Your listing is now added to the {0} list</text>
 <text name="SelectVariationsTitle">Select / Unselect Variations</text>
 <text name="SelectVariationsHint">Select or remove the variation you want to appear on your list</text>
+<text name="ChooseAFileOrDragDropItHere"> Choose a file or drag &amp; drop it here </text>
   </texts>  
 </localizationDictionary>
