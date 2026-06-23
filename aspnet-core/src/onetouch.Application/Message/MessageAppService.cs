@@ -486,8 +486,9 @@ namespace onetouch.Message
                                               .WhereIf(input.ThreadId != null && input.ThreadId > 0, e => e.ThreadId == input.ThreadId)
                                           .Where(
                                                    x =>
-                                                   //x.EntityFk.EntityObjectTypeCode == MesasgeObjectType.Comment.ToString().ToUpper()  &&
-                                                   x.OriginalMessageId == x.Id && (x.UserId == AbpSession.UserId || x.SenderId==AbpSession.UserId )
+                                                  //x.EntityFk.EntityObjectTypeCode == MesasgeObjectType.Comment.ToString().ToUpper()  &&
+                                                  //x.OriginalMessageId == x.Id && (x.UserId == AbpSession.UserId || x.SenderId==AbpSession.UserId )
+                                                   (x.UserId == AbpSession.UserId || x.SenderId == AbpSession.UserId)
                                                    && x.EntityFk.EntityObjectTypeId == entityObjectTypeMessage && x.TenantId == AbpSession.TenantId
                                                );
 
