@@ -369,6 +369,15 @@ namespace onetouch.AppMarketplaceAccounts
                 {
                     var relationShipLookups = await _appEntityRepository.GetAll().Include(z => z.EntityExtraData)
                             .Where(z => z.EntityObjectTypeId == marketplaceRelationshipSycEntityObjId).ToListAsync();
+                    var relationshipsListAll = await _appContactRelationshipInfoRepository.GetAll()
+                                .Where(z => currentTenantAccountObject != null
+                                && (((z.RecipientContactSSIN == currentTenantAccountObject.SSIN)
+                                ||
+                                (z.RequesterContactSSIN == currentTenantAccountObject.SSIN))
+                                && z.EntityObjectStatusId != inActiveRelationshipStatusId)
+                               ).OrderByDescending(z => z.CreationTime).ToListAsync();
+
+
                     foreach (var account in accountsList)
                     {
                         //I50[Start]
@@ -402,13 +411,13 @@ namespace onetouch.AppMarketplaceAccounts
                                 .Where(z => currentTenantAccountObject != null && ((z.RecipientContactSSIN == currentTenantAccountObject.SSIN && z.RequesterContactSSIN == account.Account.SSIN)
                                 || (z.RecipientContactSSIN == account.Account.SSIN && z.RequesterContactSSIN == currentTenantAccountObject.SSIN))
                                ).OrderByDescending(z => z.CreationTime).FirstOrDefaultAsync();*/
-                            var relationshipsList = await _appContactRelationshipInfoRepository.GetAll()
-                                .Where(z => currentTenantAccountObject != null && (((z.RecipientContactSSIN == currentTenantAccountObject.SSIN && z.RequesterContactSSIN == account.Account.SSIN)
+                            var relationshipsList = relationshipsListAll
+                                .Where(z => currentTenantAccountObject != null 
+                                && (((z.RequesterContactSSIN == account.Account.SSIN)
                                 ||
-                                (z.RecipientContactSSIN == account.Account.SSIN 
-                                && z.RequesterContactSSIN == currentTenantAccountObject.SSIN)) 
+                                (z.RecipientContactSSIN == account.Account.SSIN)) 
                                 && z.EntityObjectStatusId != inActiveRelationshipStatusId)
-                               ).OrderByDescending(z => z.CreationTime).ToListAsync();
+                               ).OrderByDescending(z => z.CreationTime).ToList();
                             account.ConnectionsInfo = new List<ConnectionInfo>();
                             if (relationshipsList!=null && relationshipsList.Count>0)
                                 //if (relationship != null)

@@ -386,6 +386,9 @@ namespace onetouch.Accounts
         //X527[End]
         public async Task<PagedResultDto<GetAccountForViewDto>> GetAll(GetAllAccountsInput input)
         {
+            var stopwatch = new System.Diagnostics.Stopwatch();
+            stopwatch.Start();
+            
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
             {
                 try
@@ -566,6 +569,11 @@ namespace onetouch.Accounts
                     var inActiveRelationshipStatusId = await _helper.SystemTables.GetEntityObjectStatusRelationshipInActive();
                     if (currentTenantAccount != null)
                     {
+                        var relationshipsListAll = await _appContactRelationshipInfoRepository.GetAll()
+                                     .Where(z => (((z.RecipientContactSSIN == currentTenantAccount.SSIN)
+                                     || (z.RequesterContactSSIN == currentTenantAccount.SSIN))
+                                     && z.EntityObjectStatusId != inActiveRelationshipStatusId)
+                                    ).OrderByDescending(z => z.CreationTime).ToListAsync();
                         foreach (var account in accountsList)
                         {
                             account.AvailableConnections = new List<ConnectionType>();
@@ -575,10 +583,10 @@ namespace onetouch.Accounts
                             if (accountConnection != null && accountConnection.Id > 0)
                             {
                                 // account.ConnectionName = GetAction(account.Account.AccountType, currentTenantAccount, false);
-                                var relationshipsList = await _appContactRelationshipInfoRepository.GetAll()
-                                     .Where(z => (((z.RecipientContactSSIN == currentTenantAccount.SSIN && z.RequesterContactSSIN == account.Account.SSIN)
-                                     || (z.RecipientContactSSIN == account.Account.SSIN && z.RequesterContactSSIN == currentTenantAccount.SSIN)) && z.EntityObjectStatusId != inActiveRelationshipStatusId)
-                                    ).OrderByDescending(z => z.CreationTime).ToListAsync();
+                                var relationshipsList = relationshipsListAll
+                                     .Where(z => (((z.RequesterContactSSIN == account.Account.SSIN)
+                                     || (z.RecipientContactSSIN == account.Account.SSIN )) && z.EntityObjectStatusId != inActiveRelationshipStatusId)
+                                    ).OrderByDescending(z => z.CreationTime).ToList();
                                 if (relationshipsList != null && relationshipsList.Count > 0)
                                 {
                                     foreach (var relationship in relationshipsList)
@@ -738,6 +746,8 @@ namespace onetouch.Accounts
                         accountsList
                     );
 
+                    stopwatch.Stop();
+                    var elapsed_time = stopwatch.ElapsedMilliseconds;
                     return x;
                 }
                 catch (Exception ex)
