@@ -9118,6 +9118,63 @@ export class AppEntitiesServiceProxy {
      * @param body (optional) 
      * @return Success
      */
+    saveEntityWithLookupCache(body: AppEntityDto | undefined): Observable<number> {
+        let url_ = this.baseUrl + "/api/services/app/AppEntities/SaveEntityWithLookupCache";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json-patch+json",
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processSaveEntityWithLookupCache(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processSaveEntityWithLookupCache(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<number>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<number>;
+        }));
+    }
+
+    protected processSaveEntityWithLookupCache(response: HttpResponseBase): Observable<number> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+                result200 = resultData200 !== undefined ? resultData200 : <any>null;
+    
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return Success
+     */
     saveContact(body: AppContactDto | undefined): Observable<number> {
         let url_ = this.baseUrl + "/api/services/app/AppEntities/SaveContact";
         url_ = url_.replace(/[?&]$/, "");
@@ -15260,34 +15317,39 @@ export class AppItemsServiceProxy {
     }
 
     /**
-     * @param guidFile (optional) 
-     * @param body (optional) 
+     * @param resultKey (optional)
+     * @param skipCount (optional)
+     * @param maxResultCount (optional)
      * @return Success
      */
-    validatePriceCSV(guidFile: string | null | undefined, body: string[] | null | undefined): Observable<AppItemExcelResultsDTO> {
-        let url_ = this.baseUrl + "/api/services/app/AppItems/ValidatePriceCSV?";
-        if (guidFile !== undefined && guidFile !== null)
-            url_ += "guidFile=" + encodeURIComponent("" + guidFile) + "&";
+    getValidateExcelResultPage(resultKey: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<AppItemExcelResultsDTO> {
+        let url_ = this.baseUrl + "/api/services/app/AppItems/GetValidateExcelResultPage?";
+        if (resultKey !== undefined && resultKey !== null)
+            url_ += "resultKey=" + encodeURIComponent("" + resultKey) + "&";
+        if (skipCount === null)
+            throw new Error("The parameter 'skipCount' cannot be null.");
+        else if (skipCount !== undefined)
+            url_ += "skipCount=" + encodeURIComponent("" + skipCount) + "&";
+        if (maxResultCount === null)
+            throw new Error("The parameter 'maxResultCount' cannot be null.");
+        else if (maxResultCount !== undefined)
+            url_ += "maxResultCount=" + encodeURIComponent("" + maxResultCount) + "&";
         url_ = url_.replace(/[?&]$/, "");
 
-        const content_ = JSON.stringify(body);
-
         let options_ : any = {
-            body: content_,
             observe: "response",
             responseType: "blob",
             headers: new HttpHeaders({
-                "Content-Type": "application/json-patch+json",
                 "Accept": "text/plain"
             })
         };
 
-        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processValidatePriceCSV(response_);
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetValidateExcelResultPage(response_);
         })).pipe(_observableCatch((response_: any) => {
             if (response_ instanceof HttpResponseBase) {
                 try {
-                    return this.processValidatePriceCSV(response_ as any);
+                    return this.processGetValidateExcelResultPage(response_ as any);
                 } catch (e) {
                     return _observableThrow(e) as any as Observable<AppItemExcelResultsDTO>;
                 }
@@ -15296,7 +15358,7 @@ export class AppItemsServiceProxy {
         }));
     }
 
-    protected processValidatePriceCSV(response: HttpResponseBase): Observable<AppItemExcelResultsDTO> {
+    protected processGetValidateExcelResultPage(response: HttpResponseBase): Observable<AppItemExcelResultsDTO> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -15308,117 +15370,6 @@ export class AppItemsServiceProxy {
             let result200: any = null;
             let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
             result200 = AppItemExcelResultsDTO.fromJS(resultData200);
-            return _observableOf(result200);
-            }));
-        } else if (status !== 200 && status !== 204) {
-            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-            }));
-        }
-        return _observableOf(null as any);
-    }
-
-    /**
-     * @param filePath (optional) 
-     * @param body (optional) 
-     * @return Success
-     */
-    updateCsvStatusFromErrorLog(filePath: string | null | undefined, body: AppItemtExcelRecordDTO[] | null | undefined): Observable<void> {
-        let url_ = this.baseUrl + "/api/services/app/AppItems/UpdateCsvStatusFromErrorLog?";
-        if (filePath !== undefined && filePath !== null)
-            url_ += "filePath=" + encodeURIComponent("" + filePath) + "&";
-        url_ = url_.replace(/[?&]$/, "");
-
-        const content_ = JSON.stringify(body);
-
-        let options_ : any = {
-            body: content_,
-            observe: "response",
-            responseType: "blob",
-            headers: new HttpHeaders({
-                "Content-Type": "application/json-patch+json",
-            })
-        };
-
-        return this.http.request("put", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processUpdateCsvStatusFromErrorLog(response_);
-        })).pipe(_observableCatch((response_: any) => {
-            if (response_ instanceof HttpResponseBase) {
-                try {
-                    return this.processUpdateCsvStatusFromErrorLog(response_ as any);
-                } catch (e) {
-                    return _observableThrow(e) as any as Observable<void>;
-                }
-            } else
-                return _observableThrow(response_) as any as Observable<void>;
-        }));
-    }
-
-    protected processUpdateCsvStatusFromErrorLog(response: HttpResponseBase): Observable<void> {
-        const status = response.status;
-        const responseBlob =
-            response instanceof HttpResponse ? response.body :
-            (response as any).error instanceof Blob ? (response as any).error : undefined;
-
-        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
-        if (status === 200) {
-            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            return _observableOf(null as any);
-            }));
-        } else if (status !== 200 && status !== 204) {
-            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-            }));
-        }
-        return _observableOf(null as any);
-    }
-
-    /**
-     * @param body (optional) 
-     * @return Success
-     */
-    savePriceFromCSV(body: AppItemExcelResultsDTO | undefined): Observable<ExcelLogDto> {
-        let url_ = this.baseUrl + "/api/services/app/AppItems/SavePriceFromCSV";
-        url_ = url_.replace(/[?&]$/, "");
-
-        const content_ = JSON.stringify(body);
-
-        let options_ : any = {
-            body: content_,
-            observe: "response",
-            responseType: "blob",
-            headers: new HttpHeaders({
-                "Content-Type": "application/json-patch+json",
-                "Accept": "text/plain"
-            })
-        };
-
-        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processSavePriceFromCSV(response_);
-        })).pipe(_observableCatch((response_: any) => {
-            if (response_ instanceof HttpResponseBase) {
-                try {
-                    return this.processSavePriceFromCSV(response_ as any);
-                } catch (e) {
-                    return _observableThrow(e) as any as Observable<ExcelLogDto>;
-                }
-            } else
-                return _observableThrow(response_) as any as Observable<ExcelLogDto>;
-        }));
-    }
-
-    protected processSavePriceFromCSV(response: HttpResponseBase): Observable<ExcelLogDto> {
-        const status = response.status;
-        const responseBlob =
-            response instanceof HttpResponse ? response.body :
-            (response as any).error instanceof Blob ? (response as any).error : undefined;
-
-        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
-        if (status === 200) {
-            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            let result200: any = null;
-            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            result200 = ExcelLogDto.fromJS(resultData200);
             return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
@@ -16094,6 +16045,47 @@ export class AppItemsServiceProxy {
             }));
         }
         return _observableOf(null as any);
+    }
+
+    /**
+     * @param resultKey (optional)
+     * @param body (optional)
+     * @return Success
+     */
+    saveFromExcelResult(resultKey: string | null | undefined, body: AppItemExcelResultsDTO | undefined): Observable<ExcelLogDto> {
+        let url_ = this.baseUrl + "/api/services/app/AppItems/SaveFromExcelResult?";
+        if (resultKey !== undefined && resultKey !== null)
+            url_ += "resultKey=" + encodeURIComponent("" + resultKey) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json-patch+json",
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processSaveFromExcelResult(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processSaveFromExcelResult(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<ExcelLogDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<ExcelLogDto>;
+        }));
+    }
+
+    protected processSaveFromExcelResult(response: HttpResponseBase): Observable<ExcelLogDto> {
+        return this.processSaveFromExcel(response);
     }
 
     /**
@@ -74475,6 +74467,11 @@ export class AccountExcelResultsDTO implements IAccountExcelResultsDTO {
     filePath!: string | undefined;
     errorMessage!: string | undefined;
     hasDuplication!: boolean;
+    resultKey!: string | undefined;
+    isPagedResult!: boolean;
+    pageSkipCount!: number;
+    pageMaxResultCount!: number;
+    totalDisplayRecords!: number;
 
     [key: string]: any;
 
@@ -74523,6 +74520,11 @@ export class AccountExcelResultsDTO implements IAccountExcelResultsDTO {
             this.filePath = _data["filePath"];
             this.errorMessage = _data["errorMessage"];
             this.hasDuplication = _data["hasDuplication"];
+            this.resultKey = _data["resultKey"];
+            this.isPagedResult = _data["isPagedResult"];
+            this.pageSkipCount = _data["pageSkipCount"];
+            this.pageMaxResultCount = _data["pageMaxResultCount"];
+            this.totalDisplayRecords = _data["totalDisplayRecords"];
         }
     }
 
@@ -74569,6 +74571,11 @@ export class AccountExcelResultsDTO implements IAccountExcelResultsDTO {
         data["filePath"] = this.filePath;
         data["errorMessage"] = this.errorMessage;
         data["hasDuplication"] = this.hasDuplication;
+        data["resultKey"] = this.resultKey;
+        data["isPagedResult"] = this.isPagedResult;
+        data["pageSkipCount"] = this.pageSkipCount;
+        data["pageMaxResultCount"] = this.pageMaxResultCount;
+        data["totalDisplayRecords"] = this.totalDisplayRecords;
         return data;
     }
 }
@@ -74588,6 +74595,11 @@ export interface IAccountExcelResultsDTO {
     filePath: string | undefined;
     errorMessage: string | undefined;
     hasDuplication: boolean;
+    resultKey: string | undefined;
+    isPagedResult: boolean;
+    pageSkipCount: number;
+    pageMaxResultCount: number;
+    totalDisplayRecords: number;
 
     [key: string]: any;
 }

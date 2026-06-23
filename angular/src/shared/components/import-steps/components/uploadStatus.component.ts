@@ -1,5 +1,5 @@
 // <!-- Iteration-8 -->
-import { ChangeDetectorRef, ElementRef, HostListener, OnChanges, OnInit, QueryList, SimpleChanges, ViewChild, ViewChildren } from "@angular/core";
+import { ChangeDetectionStrategy, ChangeDetectorRef, ElementRef, HostListener, OnChanges, OnInit, QueryList, SimpleChanges, ViewChild, ViewChildren } from "@angular/core";
 import { Injector } from "@angular/core";
 import { Output } from "@angular/core";
 import { EventEmitter } from "@angular/core";
@@ -20,6 +20,7 @@ import { DomSanitizer, SafeHtml } from "@node_modules/@angular/platform-browser"
   selector: "uploadStatusModal",
   templateUrl: "./uploadStatus.component.html",
   styleUrls: ["./uploadStatus.component.scss"],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class uploadStatusComponent extends AppComponentBase implements OnInit, OnChanges {
   @ViewChild("uploadStatus", { static: true }) modal: ModalDirective;
@@ -34,6 +35,7 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
   ImportTypes = ImportTypes;
   activeRecordType: string = 'Data';
   uploadStatsColumnsName;
+  visibleColumns;
 
   @Input() imagesList;
   acceptedAspectRatio;
@@ -62,11 +64,14 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
   UploadActionEnum = UploadActionEnum;
   @Output() updatedRecords = new EventEmitter<any[]>();
   @Output() _validateRecord = new EventEmitter<any[]>();
+  @Output() loadMoreRecords = new EventEmitter<{ skipCount: number; maxResultCount: number }>();
   isConfirm: boolean = false;
   linkNewParentItem_Data;
   linkNewItemColor_Data;
   linkNewColorLookup_Data;
   @Output() _resetRecordsCompleted = new EventEmitter<void>();
+  pageSize: number = 25;
+  loadingMoreRecords: boolean = false;
 
 
   public constructor(
@@ -80,6 +85,7 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
 
   ngOnInit() {
     this.getuploadStatsColumnsName();
+    this.refreshVisibleColumns();
     this.getAspectatio();
   }
 
@@ -89,10 +95,11 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
 
 
     if (changes['uploadingResult'] && this.uploadingResult) {
+      const pageSkipCount = this.uploadingResult?.pageSkipCount || 0;
       this.uploadingResult.excelRecords = this.uploadingResult?.excelRecords.map((r, idx) => ({
         ...r,
-        id: r.id ?? idx,
-        __originalIndex: r.id ?? idx
+        id: r.id ?? pageSkipCount + idx,
+        __originalIndex: r.__originalIndex ?? pageSkipCount + idx
       }));
 
       const allRecords = this.uploadingResult?.excelRecords || [];
@@ -104,6 +111,7 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
       else
         this.activeRecordType = 'Image'
 
+      this.refreshVisibleColumns();
 
       if (!this.records || this.records?.length == 0) {
         this.records = this.filteredRecords()?.map((r, idx) => ({
@@ -176,6 +184,7 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
   show(importType: ImportTypes) {
     this.importType = importType;
     this.modal.show();
+    this.cdr.markForCheck();
   }
 
   hide() {
@@ -187,12 +196,13 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
     var _text = "";
     _text = "All " + ImportTypes[this.importType] + " Failed , can not import.";
 
+    if (!this.uploadingResult?.isPagedResult) {
+      this.uploadingResult.totalPassedRecords =
+        (this.uploadingResult?.excelRecords?.filter(r => r.status.toLowerCase() == 'passed')?.length || 0) +
+        (this.uploadingResult?.excelRecords?.filter(r => r.status.toLowerCase() == 'warning')?.length || 0);
 
-    this.uploadingResult.totalPassedRecords =
-      (this.uploadingResult?.excelRecords?.filter(r => r.status.toLowerCase() == 'passed')?.length || 0) +
-      (this.uploadingResult?.excelRecords?.filter(r => r.status.toLowerCase() == 'warning')?.length || 0);
-
-    this.uploadingResult.totalFailedRecords = this.uploadingResult?.excelRecords?.filter(r => r.status.toLowerCase() == 'failed')?.length;
+      this.uploadingResult.totalFailedRecords = this.uploadingResult?.excelRecords?.filter(r => r.status.toLowerCase() == 'failed')?.length;
+    }
 
     if (this.uploadingResult.totalPassedRecords == 0) {
       Swal.fire({
@@ -288,12 +298,45 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
 
   records;
 
+  appendRecords(newRecords: any[]) {
+    if (!newRecords?.length)
+      return;
+
+    const startIndex = this.uploadingResult?.excelRecords?.length || 0;
+    const normalizedRecords = newRecords.map((r, idx) => ({
+      ...r,
+      id: r.id ?? startIndex + idx,
+      __originalIndex: r.__originalIndex ?? startIndex + idx,
+      showActions: false
+    }));
+
+    this.uploadingResult.excelRecords = [
+      ...(this.uploadingResult?.excelRecords || []),
+      ...normalizedRecords
+    ];
+
+    const visibleRecords = this.activeRecordType == 'Data'
+      ? normalizedRecords.filter(r => r?.recordType !== 'Image')
+      : normalizedRecords.filter(r => r?.recordType === 'Image');
+
+    this.records = [
+      ...(this.records || []),
+      ...visibleRecords
+    ];
+
+    this.hasDataRecords = this.uploadingResult.excelRecords.some(r => r.recordType !== 'Image');
+    this.hasImageRecords = this.uploadingResult.excelRecords.some(r => r.recordType === 'Image');
+    this.loadingMoreRecords = false;
+    this.cdr.detectChanges();
+  }
+
   switchTab(type: string) {
     if (this.isActionInProgress()) {
       return;
     }
 
     this.activeRecordType = type;
+    this.refreshVisibleColumns();
 
     this.records = this.filteredRecords()?.map((r, idx) => ({
       ...r,
@@ -356,7 +399,23 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
       { name: "Price B" },
       { name: "Price C" },
       { name: "Price D" },
-    ];
+    ].map(column => ({
+      ...column,
+      key: this.mapColumnNameToKey(column.name)
+    }));
+  }
+
+  refreshVisibleColumns() {
+    this.visibleColumns = (this.uploadStatsColumnsName || [])
+      .filter(column => !column.showFor || column.showFor === this.activeRecordType);
+  }
+
+  trackByRecordId(index: number, record: any) {
+    return record?.id ?? record?.__originalIndex ?? index;
+  }
+
+  trackByColumnName(index: number, column: any) {
+    return column?.name ?? index;
   }
 
   getRecordValue(record: any, key: string): any {
@@ -815,6 +874,21 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
   }
 
   @ViewChild('tableScrollContainer') tableScrollContainer!: ElementRef;
+
+  onRecordsScroll(event: Event) {
+    if (!this.uploadingResult?.isPagedResult || this.loadingMoreRecords)
+      return;
+
+    const target = event.target as HTMLElement;
+    const loadedCount = this.uploadingResult?.excelRecords?.length || 0;
+    const totalCount = this.uploadingResult?.totalDisplayRecords || this.uploadingResult?.totalRecords || 0;
+    const nearBottom = target.scrollTop + target.clientHeight >= target.scrollHeight - 200;
+
+    if (nearBottom && loadedCount < totalCount) {
+      this.loadingMoreRecords = true;
+      this.loadMoreRecords.emit({ skipCount: loadedCount, maxResultCount: this.pageSize });
+    }
+  }
 
   @HostListener('window:keydown', ['$event'])
   handleKeyDown(event: KeyboardEvent) {

@@ -557,8 +557,26 @@ export class MainImportComponent
         if (iterationNo === 0) {
             this.uploadStartTime = Date.now();
         }
+
+        if (this.importType === ImportTypes.Items && this.uploadingResult?.resultKey) {
+            this.importServiceProxy
+                .saveFromExcelResult(this.uploadingResult.resultKey, this.uploadingResult)
+                .pipe(finalize(() => {
+                    this.spinnerService.hide();
+                }))
+                .subscribe(
+                    (result) => {
+                        this.logFileUrl = result.excelLogPath;
+                        this.logFileName = result.excelLogFileName;
+                    },
+                    () => {
+                        //this.notify.error("Import completed with some errors. Please check the log file.");
+                    }
+                );
+            return;
+        }
     
-        const hasImageRecords = this.uploadindResultExcelList.some(r => r.recordType === 'Image');
+        const hasImageRecords = this.uploadindResultExcelList?.some(r => r.recordType === 'Image');
     
         if (hasImageRecords || this.importType == ImportTypes.price){
             
@@ -618,6 +636,24 @@ export class MainImportComponent
                     } else {
                         this.callImport(iterationNo + 1);
                     }
+                }
+            );
+    }
+
+    onLoadMoreValidateExcelRecords($event: { skipCount: number; maxResultCount: number }) {
+        if (!this.uploadingResult?.resultKey || !this.importServiceProxy?.getValidateExcelResultPage) {
+            this.StatusModal.loadingMoreRecords = false;
+            return;
+        }
+
+        this.importServiceProxy
+            .getValidateExcelResultPage(this.uploadingResult.resultKey, $event.skipCount, $event.maxResultCount)
+            .subscribe(
+                (result) => {
+                    this.StatusModal.appendRecords(result?.excelRecords || []);
+                },
+                () => {
+                    this.StatusModal.loadingMoreRecords = false;
                 }
             );
     }

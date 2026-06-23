@@ -14,7 +14,7 @@
             </div>
             <div class="d-flex name-price" *ngIf="showMsrP">
             
-                <p class="price" >{{ languageSettingName!='en-GB' ? "MSRP"  :  "RRP"  }}:   {{ displayPrice | currency: currencyCode : 'symbol' : '1.2-2' }}</p>
+                <p class="price" >{{ (languageSettingName!='en-GB' ? 'MSRP' : 'RRP') | localize }}:   {{ displayPrice | currency: currencyCode : 'symbol' : '1.2-2' }}</p>
             </div>
         </div>
 

@@ -338,7 +338,7 @@
 
                         <form [formGroup]="filterForm" *ngIf="!addLine">
                             <div class="mb-3 w-100 row ">
-                                <div class="d-flex  w-100">
+                                <div class="row mx-2  w-100">
                                     <div class="col-md-4 col-12">
                                         <label class="form-label text-nowrap">{{'ProductCode' | localize}}</label>
                                         <p-dropdown [options]="displayedVariations" [filter]="true"
@@ -382,7 +382,7 @@
                             </div>
                             <hr class="greyColorlight">
                             <div class="d-flex row">
-                                <div class="col-md-6 col-12 d-flex" *ngIf="displayProductdata">
+                                <div class="col-lg-6 col-md-8 col-12 d-flex mb-2" *ngIf="displayProductdata">
                                     <img [src]="
                                                   attachmentBaseUrl + '/' + selectedMainImgProduct" alt="images slides"
                                         [ngStyle]="{ 'width.px':  (140 * acceptedAspectRatio )  }"
@@ -506,7 +506,7 @@
                                     </div>
 
                                 </div>
-                                <div *ngIf="filteredColors &&  displayColordata" class=" col-md-6 col-12 border-1-light"
+                                <div *ngIf="filteredColors &&  displayColordata" class=" col-lg-6 col-md-4 col-12 mb-2 border-1-light"
                                     [title]="selectedColorName" position="top"
                                     tooltipPositionStyleClass="custom-tooltip">
 

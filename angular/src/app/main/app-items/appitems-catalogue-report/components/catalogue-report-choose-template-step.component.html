@@ -1,7 +1,7 @@
 <div style="gap: 20px;" class="d-flex flex-column justify-content-between wizard-wrapper">
     <div class="d-flex">
     <img src="../../../../../assets/common/images/alarm.png" class="mr-2"/> 
-    <h5 *ngIf="templates && templates?.length >0" class="plzTxt mb-0 mt-2"> {{ "Please select one of the available linesheet templates" | localize }}</h5>
+    <h5 *ngIf="templates && templates?.length >0" class="plzTxt mb-0 mt-2"> {{ "SelectLinesheetTemplate" | localize }}</h5>
 </div>
     <div class="_scroll h-100 row thin-scroll text-center">
         <div class="col-lg-4 col-md-6 col-12" *ngFor="let template of templates;index as i">

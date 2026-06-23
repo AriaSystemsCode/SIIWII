@@ -624,6 +624,15 @@ span.p-tabview-title {
 .invalid-number .p-inputnumber-input {
     border: 1px solid #C83532 !important;
 }
+
+.p-dropdown-filter-icon{
+    position: absolute;
+    top: 70% !important;
+    margin-top: -.5rem !important;
+}
+.p-icon-wrapper {
+    display: inline;
+}
 }
 // inputs focus {
     .p-inputtext:enabled:focus{
@@ -887,9 +896,6 @@ th.sticky-header {
 }
 
 
-searchicon {
-    padding-top: 15%;
-}
 
 .is-disabled {
     pointer-events: none;
