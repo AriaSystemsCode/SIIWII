@@ -17,6 +17,7 @@
 
 .shoppingCartAccordionTabBG {
     background: #f1f2f3;
+    overflow-x: hidden;
 }
 
 .previousBtn:hover,
@@ -446,8 +447,8 @@ input.ng-invalid.ng-touched {
         border: 1px solid #E2E2E2 !important;
 
     }
-
-    @media only screen and (max-width: 992px) {
+@media only screen and (min-width: 575px) and (max-width: 992px)  {
+  
         h1 {
             font-size: 26px !important;
         }
@@ -598,7 +599,7 @@ input.ng-invalid.ng-touched {
         }
 
         .p-tabview .p-tabview-nav li .p-tabview-nav-link {
-            width: 90px !important;
+            width: fit-content !important;
             height: 66px !important;
             padding: 0 !important;
             font-size: 11px !important;
@@ -613,7 +614,7 @@ input.ng-invalid.ng-touched {
 
         .p-tabview .p-tabview-nav li {
             // width: 40% !important;
-            height: 66px !important;
+            height: 25px !important;
             border-right: 1px solid #eee !important;
         }
 
@@ -627,11 +628,11 @@ input.ng-invalid.ng-touched {
 
         .p-tabview .p-tabview-nav li.p-highlight .p-tabview-nav-link {
             background-color: white !important;
-            color: #777 !important;
+            color: #4A0D4A !important;
             border-radius: 0 !important;
             padding: 0 !important;
             height: 66px !important;
-            max-width: 75px !important;
+            max-width: fit-content !important;
 
             .tab-header {
                 background-color: #4A0D4A !important;
@@ -665,7 +666,7 @@ input.ng-invalid.ng-touched {
         display: flex !important;
         flex-direction: column !important;
         font-size: 14px !important;
-        width: 140px !important;
+        width: fit-content !important;
         height: 82px !important;
         align-items: center !important;
         fill: #777777 !important;
@@ -1017,7 +1018,7 @@ input.ng-invalid.ng-touched {
 
         .p-tabview .p-tabview-nav li {
                    margin: 7px 8px !important;
-                width: 80px !important;
+                width: 125px !important;
         }
 
         .tabPanel-custom {
@@ -1527,4 +1528,67 @@ height: 48px;
     overflow-x: auto !important;
     }
 }
+}
+
+.mobile-manual-tabs {
+  display: flex;
+  width: 100%;
+  background: #fff;
+  border: 1px solid #eee;
+  border-radius: 10px;
+  overflow: hidden;
+  margin-bottom: 12px;
+}
+
+.mobile-tab {
+  width: 25%;
+  min-height: 68px;
+  border: 0;
+  border-right: 1px solid #eee;
+  background: #fff;
+  color: #777;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.mobile-tab:last-child {
+  border-right: 0;
+}
+
+.mobile-tab i,
+.mobile-tab svg {
+  font-size: 18px;
+}
+
+.mobile-tab.active {
+  color: #fff;
+  background: #4A0D4A;
+}
+
+.mobile-tab-content {
+  background: #fff;
+  padding: 12px;
+  border-radius: 10px;
+}
+
+.mobile-actions-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.mobile-action-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 42px;
+  border: 1px solid #eee;
+  color: #4b2673;
+  background: #fff;
 }

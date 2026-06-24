@@ -155,7 +155,7 @@ export class ShareTransactionTabComponent extends AppComponentBase {
         sharedTenantId: contact.tenantId,
         sharedUserId: contact.userId,
         sharedUserEMail: contact.email,
-        sharedUserName: contact.name,
+        sharedUserName: contact.userName,
         sharedUserSureName: contact.name,
         sharedUserTenantName: contact.tenantName,
         id: contact.id,
