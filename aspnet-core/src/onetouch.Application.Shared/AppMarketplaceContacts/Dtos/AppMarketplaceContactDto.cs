@@ -101,6 +101,7 @@ namespace onetouch.AppMarketplaceContacts.Dtos
 		public List<ConnectionType> AvailableConnections { get; set; }
         public List<ConnectionInfo> ConnectionsInfo { get; set; }
         //MMT10
+        public bool IsProfileData { get; set; }
     }
 	//I40[Start]
 	public class ConnectionType
