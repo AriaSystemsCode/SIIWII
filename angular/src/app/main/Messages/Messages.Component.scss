@@ -1011,3 +1011,42 @@ body .btn.btn-action:after {
   padding-right: 40px;
   padding-left: 12px;
 }
+
+.message-attachments {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 12px;
+}
+
+.message-attachment-card {
+    width: 100px;
+    min-height: 110px;
+    padding: 5px;
+    border: 1px solid #eeeeee;
+    border-radius: 8px;
+    background: #ffffff;
+    cursor: pointer;
+    text-align: center;
+}
+
+.message-attachment-img {
+    width: 84px;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 6px;
+}
+
+.message-attachment-icon {
+    width: 70px;
+    height: fit-content;
+    margin-top: 12px;
+}
+
+.message-attachment-name {
+    display: block;
+    margin-top: 8px;
+    font-size: 11px;
+    color: #1B101B;
+    word-break: break-word;
+}

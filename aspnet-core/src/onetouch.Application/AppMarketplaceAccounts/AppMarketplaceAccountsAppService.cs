@@ -148,10 +148,11 @@ namespace onetouch.AppMarketplaceAccounts
                     long currentTenantAccountType = 0;
                     bool excludeGroupAccount = false;
                     long activeRelationshipStatusId = 0;
+                    AppContact currentTenantAccountObj =  null;
                     if (AbpSession.TenantId != null)
                     {
                         var contactObjectid = await _helper.SystemTables.GetObjectContactId();
-                        var currentTenantAccountObj = _appContactRepository.GetAll().Include(e => e.EntityFk).ThenInclude(z=>z.EntityExtraData)
+                         currentTenantAccountObj = _appContactRepository.GetAll().Include(e => e.EntityFk).ThenInclude(z=>z.EntityExtraData)
                         .FirstOrDefault(e => e.TenantId == AbpSession.TenantId && e.IsProfileData && e.ParentId == null);
                         if (currentTenantAccountObj != null)
                         {
@@ -311,6 +312,7 @@ namespace onetouch.AppMarketplaceAccounts
 
                                     select new GetMarketplaceAccountForViewDto ()
                                     {
+                                        IsProfileData = o.IsProfileData,
                                         IsPublished = (o.TenantOwner == AbpSession.TenantId ? true : false),
                                         //AvaliableConnectionName = GetAction(o.EntityObjectTypeCode),
                                         AvaliableConnectionName = "Follow",
@@ -356,11 +358,11 @@ namespace onetouch.AppMarketplaceAccounts
                          inActiveRelationshipStatusId = await _helper.SystemTables.GetEntityObjectStatusRelationshipInActive();
                     }
                     string currentTenantAccount = "";
-                    AppContact currentTenantAccountObject = null;
+                    AppContact currentTenantAccountObject = currentTenantAccountObj;
                     if (AbpSession.TenantId != null)
                     {
-                        currentTenantAccountObject = _appContactRepository.GetAll().Include(e => e.EntityFk)
-                            .FirstOrDefault(e => e.TenantId == AbpSession.TenantId && e.IsProfileData && e.ParentId == null);
+                        //currentTenantAccountObject = _appContactRepository.GetAll().Include(e => e.EntityFk)
+                         //   .FirstOrDefault(e => e.TenantId == AbpSession.TenantId && e.IsProfileData && e.ParentId == null);
                         currentTenantAccount = currentTenantAccountObject != null ? currentTenantAccountObject.EntityFk.EntityObjectTypeCode : null;
                     }
                     var accountsList = await _accounts.ToListAsync();
@@ -395,11 +397,13 @@ namespace onetouch.AppMarketplaceAccounts
                         //I50[End]
                         account.AvailableConnections = new List<ConnectionType>();
                         account.ConnectionName = "";
-                        var accountConnection = _appContactRepository.GetAll()
-                        .FirstOrDefault(e => e.TenantId == AbpSession.TenantId && e.SSIN == account.Account.SSIN);
-                        if (accountConnection != null && accountConnection.Id > 0)
-                        {
-                            if (accountConnection.IsProfileData)
+                        /*var accountConnection = _appContactRepository.GetAll()
+                        .FirstOrDefault(e => e.TenantId == AbpSession.TenantId && e.SSIN == account.Account.SSIN);*/
+                        //if (accountConnection != null && accountConnection.Id > 0)
+                        if (account.Account.Id > 0)
+                        { 
+                             //if (accountConnection.IsProfileData)
+                            if (account.IsProfileData)
                             {
                                 account.DisConnectLabel = "";
                                 account.ConnectionName = "";
