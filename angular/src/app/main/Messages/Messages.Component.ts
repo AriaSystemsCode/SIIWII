@@ -596,6 +596,46 @@ onReplyMessage(event: MouseEvent): void {
         msg.mesasgeObjectType
     );
 }
+
+isImageFile(fileName: string): boolean {
+    return /\.(jpg|jpeg|png|svg|gif|webp)$/i.test(fileName || '');
+}
+
+isPdfFile(fileName: string): boolean {
+    return /\.pdf$/i.test(fileName || '');
+}
+
+isExcelFile(fileName: string): boolean {
+    return /\.(xls|xlsx|csv)$/i.test(fileName || '');
+}
+
+isWordFile(fileName: string): boolean {
+    return /\.(doc|docx)$/i.test(fileName || '');
+}
+
+isPowerPointFile(fileName: string): boolean {
+    return /\.(ppt|pptx)$/i.test(fileName || '');
+}
+
+isOtherFile(fileName: string): boolean {
+    return !this.isImageFile(fileName)
+        && !this.isPdfFile(fileName)
+        && !this.isExcelFile(fileName)
+        && !this.isWordFile(fileName)
+        && !this.isPowerPointFile(fileName);
+}
+downloadAttachment(item: any): void {
+  const fileUrl = `${this.attachmentBaseUrl}/${item.url}`;
+
+  const link = document.createElement('a');
+  link.href = fileUrl;
+  link.download = item.displayName || item.fileName;
+  link.target = '_blank';
+
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+}
     ngOnDestroy() {
       
             localStorage.removeItem("messageView");

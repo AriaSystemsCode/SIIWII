@@ -300,12 +300,23 @@ export class SendMessageModalComponent
         this.displayBCC = true;
     }
 
-    handleInputChangeAttachment(e) {
-        if (e.target.files.length === 0) return;
-        for (let i = 0; i < e.target.files.length; i++) {
-        var file = e.dataTransfer ? e.dataTransfer.files[i] : e.target.files[i];
-        this.attachments.push(e.target.files[i]);  
-    }
+    // handleInputChangeAttachment(e) {
+    //     if (e.target.files.length === 0) return;
+    //     for (let i = 0; i < e.target.files.length; i++) {
+    //     var file = e.dataTransfer ? e.dataTransfer.files[i] : e.target.files[i];
+    //     this.attachments.push(e.target.files[i]);  
+    // }
+    handleInputChangeAttachment(event: any): void {
+    const files: FileList = event?.target?.files;
+
+    if (!files || files.length === 0) return;
+
+    Array.from(files).forEach((file: File) => {
+        this.attachments.push(file);
+    });
+
+    event.target.value = '';
+
 }
 
 

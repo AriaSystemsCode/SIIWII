@@ -729,6 +729,54 @@ margin-right: 6px;"></i>
                                 [ngClass]="longmsgId == messagedetail?.messages?.id || messagesDetails?.length == 1 ? '' : 'long-msg'">
                             </span>
                             <br />
+                     <div
+    class="message-attachments"
+    *ngIf="messagedetail?.messages?.entityAttachments?.length">
+
+    <div
+        class="message-attachment-card"
+        *ngFor="let item of messagedetail.messages.entityAttachments"
+       (click)="downloadAttachment(item)">
+
+        <!-- Image -->
+        <img
+            *ngIf="isImageFile(item.fileName)"
+            class="message-attachment-img"
+            [src]="attachmentBaseUrl + '/' + item.url" />
+
+        <!-- PDF -->
+        <img
+            *ngIf="isPdfFile(item.fileName)"
+            class="message-attachment-icon"
+            src="assets/message/adobe.svg" />
+
+        <!-- Excel -->
+        <img
+            *ngIf="isExcelFile(item.fileName)"
+            class="message-attachment-icon"
+            src="assets/message/excel.svg" />
+
+        <!-- Word -->
+        <img
+            *ngIf="isWordFile(item.fileName)"
+            class="message-attachment-icon"
+            src="assets/message/word.svg" />
+
+        <!-- PowerPoint -->
+        <img
+            *ngIf="isPowerPointFile(item.fileName)"
+            class="message-attachment-icon"
+            src="assets/message/powerpoint.png" />
+
+        <!-- Other -->
+        <img
+            *ngIf="isOtherFile(item.fileName)"
+            class="message-attachment-icon"
+            src="assets/message/document.png" />
+
+    
+    </div>
+</div>
                             <span
                                 [innerHTML]="truncateContent(messagedetail?.messages?.bodyFormat, messagedetail?.messages?.id)"
                                 class="msg-bodyformat word-preW">
@@ -823,6 +871,53 @@ margin-right: 6px;"></i>
                     ">
                         </span>
                         <br />
+                      <div
+    class="message-attachments"
+    *ngIf="messagedetail?.messages?.entityAttachments?.length">
+
+    <div
+        class="message-attachment-card"
+        *ngFor="let item of messagedetail.messages.entityAttachments"
+         (click)="downloadAttachment(item)">
+
+        <!-- Image -->
+        <img
+            *ngIf="isImageFile(item.fileName)"
+            class="message-attachment-img"
+            [src]="attachmentBaseUrl + '/' + item.url" />
+
+        <!-- PDF -->
+        <img
+            *ngIf="isPdfFile(item.fileName)"
+            class="message-attachment-icon"
+            src="assets/message/adobe.svg" />
+
+        <!-- Excel -->
+        <img
+            *ngIf="isExcelFile(item.fileName)"
+            class="message-attachment-icon"
+            src="assets/message/excel.svg" />
+
+        <!-- Word -->
+        <img
+            *ngIf="isWordFile(item.fileName)"
+            class="message-attachment-icon"
+            src="assets/message/word.svg" />
+
+        <!-- PowerPoint -->
+        <img
+            *ngIf="isPowerPointFile(item.fileName)"
+            class="message-attachment-icon"
+            src="assets/message/powerpoint.png" />
+
+        <!-- Other -->
+        <img
+            *ngIf="isOtherFile(item.fileName)"
+            class="message-attachment-icon"
+            src="assets/message/document.png" />
+
+    </div>
+</div>
                         <span
                             [innerHTML]="truncateContent(messagedetail.messages.bodyFormat, messagedetail.messages.id)"
                             class="msg-bodyformat word-preW">
@@ -1120,7 +1215,54 @@ margin-right: 6px;"></i>
                     ">
                         </span>
                         <br />
+<div
+    class="message-attachments"
+    *ngIf="messagedetail?.messages?.entityAttachments?.length">
 
+    <div
+        class="message-attachment-card"
+        *ngFor="let item of messagedetail.messages.entityAttachments"
+         (click)="downloadAttachment(item)">
+
+        <!-- Image -->
+        <img
+            *ngIf="isImageFile(item.fileName)"
+            class="message-attachment-img"
+            [src]="attachmentBaseUrl + '/' + item.url" />
+
+        <!-- PDF -->
+        <img
+            *ngIf="isPdfFile(item.fileName)"
+            class="message-attachment-icon"
+            src="assets/message/adobe.svg" />
+
+        <!-- Excel -->
+        <img
+            *ngIf="isExcelFile(item.fileName)"
+            class="message-attachment-icon"
+            src="assets/message/excel.svg" />
+
+        <!-- Word -->
+        <img
+            *ngIf="isWordFile(item.fileName)"
+            class="message-attachment-icon"
+            src="assets/message/word.svg" />
+
+        <!-- PowerPoint -->
+        <img
+            *ngIf="isPowerPointFile(item.fileName)"
+            class="message-attachment-icon"
+            src="assets/message/powerpoint.png" />
+
+        <!-- Other -->
+        <img
+            *ngIf="isOtherFile(item.fileName)"
+            class="message-attachment-icon"
+            src="assets/message/document.png" />
+
+       
+    </div>
+</div>
                         <span
                             [innerHTML]="truncateContent(messagedetail.messages.bodyFormat, messagedetail.messages.id)"
                             class="msg-bodyformat word-preW">
