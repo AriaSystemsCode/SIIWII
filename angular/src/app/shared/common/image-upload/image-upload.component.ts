@@ -47,7 +47,9 @@ export class ImageUploadComponent extends AppComponentBase implements OnChanges 
   sycAttachmentCategoryLogo :SycAttachmentCategoryDto
   sycAttachmentCategoryBanner :SycAttachmentCategoryDto
   sycAttachmentCategoryImage :SycAttachmentCategoryDto
-  @Input() attachmentTypeCode: 'LOGO' | 'BANNER' | 'IMAGE' = 'IMAGE';
+
+  @Input() attachmentTypeCode: 'LOGO' | 'BANNER' | 'IMAGE'  = 'LOGO';
+   @Input() selectedOrientation: 'Portrait' | 'Landscape' = 'Portrait';
 
   constructor(injector: Injector) {
     super(injector);
@@ -67,6 +69,11 @@ export class ImageUploadComponent extends AppComponentBase implements OnChanges 
     // when user changes Logo/Banner/Image in parent
     if (changes['attachmentTypeCode'] && this.attachmentTypeCode) {
       this.getAttachRatio();   // will set sycAttachmentCategory & ratio accordingly
+    }
+
+
+    if (changes['selectedOrientation'] && this.sycAttachmentCategory) {
+      this.applyAspectFromCategory(this.sycAttachmentCategory);
     }
   }
   
@@ -247,27 +254,36 @@ export class ImageUploadComponent extends AppComponentBase implements OnChanges 
       fileName
     );
   }
-  private applyAspectFromCategory(cat: SycAttachmentCategoryDto): void {
-    if (!cat || !cat.aspectRatio) {
-      return;
-    }
-  
-    const aspect = String(cat.aspectRatio);
-    const [width, height] = aspect.split(':');
-  
-    if (!width || !height || isNaN(+width) || isNaN(+height)) {
-      return;
-    }
-  
-    this.acceptedAspectRatio = Number(width) / Number(height);
-    this.detectSupportedExtensions();
-  
-    if (this.staticWidth) {
-      this.staticHeight = this.staticWidth / this.acceptedAspectRatio;
-    } else if (this.staticHeight) {
-      this.staticWidth = this.staticHeight * this.acceptedAspectRatio;
-    }
+ private applyAspectFromCategory(cat: SycAttachmentCategoryDto): void {
+  if (!cat || !cat.aspectRatio) {
+    return;
   }
+
+  const aspect = String(cat.aspectRatio);
+  const [w, h] = aspect.split(':');
+
+  if (!w || !h || isNaN(+w) || isNaN(+h)) {
+    return;
+  }
+
+  let width = Number(w);
+  let height = Number(h);
+
+  if (this.selectedOrientation === 'Landscape') {
+    [width, height] = [height, width];
+  }
+
+  this.acceptedAspectRatio = width / height;
+
+  this.detectSupportedExtensions();
+
+  // update crop size if needed
+  if (this.staticWidth) {
+    this.staticHeight = this.staticWidth / this.acceptedAspectRatio;
+  } else if (this.staticHeight) {
+    this.staticWidth = this.staticHeight * this.acceptedAspectRatio;
+  }
+}
   
   getAttachRatio() {
     this.getSycAttachmentCategoriesByCodes(['LOGO', 'BANNER', 'IMAGE'])
@@ -277,14 +293,15 @@ export class ImageUploadComponent extends AppComponentBase implements OnChanges 
             this.sycAttachmentCategoryLogo = item;
           } else if (item.code === 'BANNER') {
             this.sycAttachmentCategoryBanner = item;
-          } else if (item.code === 'IMAGE') {
+          }
+           else if (item.code === 'IMAGE') {
             this.sycAttachmentCategoryImage = item;
           }
         });
   
         // choose based on selected radio
         let selectedCat: SycAttachmentCategoryDto;
-  
+  debugger
         switch (this.attachmentTypeCode) {
           case 'LOGO':
             selectedCat = this.sycAttachmentCategoryLogo;

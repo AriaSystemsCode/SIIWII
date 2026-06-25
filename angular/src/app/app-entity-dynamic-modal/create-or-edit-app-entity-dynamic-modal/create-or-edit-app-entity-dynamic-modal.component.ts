@@ -82,11 +82,19 @@ export class CreateOrEditAppEntityDynamicModalComponent
     statusValues: SycEntityObjectStatusLookupTableDto[]
     hideAddToLookupOption = false;
     imageAttachmentType: 'IMAGE' | 'BANNER' | 'LOGO' = 'LOGO';
+
+
     imageTypeOptions = [
         { label: this.l('Logo'),   value: 'LOGO'   },
         { label: this.l('Image'),  value: 'IMAGE'  },
         { label: this.l('Banner'), value: 'BANNER' },
       ];
+
+  orientationOptions = [
+        { label: this.l('Portrait'),   value: 'Portrait'   },
+        { label: this.l('Landscape'),  value: 'Landscape'  }
+      ];
+      selectedOrientation='Portrait'
     currentLang: string;
 isArabic: boolean = false;
 
@@ -119,6 +127,9 @@ isArabic: boolean = false;
         this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName');
         this.isArabic = this.currentLang === 'ar' || this.currentLang === 'ar-EG';
         this.entityObjectType = entityObjectType;
+        this.imageAttachmentType = this.imageAttachmentType ?? 'LOGO';
+        this.selectedOrientation = this.selectedOrientation ?? 'Portrait';
+        
         this.displayVisualTypes();
         this.getStatusOptions();
         this.saving = false;
@@ -810,6 +821,7 @@ isArabic: boolean = false;
     setSolid(value: boolean) {
         this.visual.solid = value;
         this.visual.image = !value;
+        this.imageAttachmentType = this.imageAttachmentType ?? 'LOGO';
     }
 
     dropdownOptions(validEntries) {
