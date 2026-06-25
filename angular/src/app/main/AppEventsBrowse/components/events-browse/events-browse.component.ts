@@ -364,6 +364,7 @@ export class EventsBrowseComponent extends AppComponentBase  implements OnInit,O
             filters?.city || undefined,
             filters?.state || undefined,
             filters?.postalCode || undefined,
+            filters?.countryCode || undefined,
             this.accountDataForView?.tenantId ? this.accountDataForView?.tenantId : undefined,
                 undefined,
                 undefined,
