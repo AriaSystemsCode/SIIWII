@@ -1218,3 +1218,38 @@ input:checked + .slider:before {
     font-weight: 600;
     font-size: 16px;
 }
+
+@media only screen and (max-width: 992px) {
+    .parentDiv {
+        margin: 6rem 1rem 1rem !important;
+    }
+
+    .topheader {
+        .position-absolute {
+            position: static !important;
+            padding: 0.75rem 1rem !important;
+        }
+
+        .row.bg-white {
+            min-width: 0 !important;
+            width: calc(100% - 2rem);
+            margin: 0.75rem 1rem !important;
+            padding-left: 1rem !important;
+            word-break: break-word;
+        }
+    }
+}
+
+@media only screen and (max-width: 567px) {
+    .parentDiv {
+        margin: 5.5rem 0.5rem 0.5rem !important;
+    }
+
+    .topheader {
+        .row.bg-white {
+            font-size: 12px;
+            line-height: 1.4;
+            padding: 0.5rem 0.75rem !important;
+        }
+    }
+}
