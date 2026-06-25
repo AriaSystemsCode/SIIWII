@@ -9175,6 +9175,123 @@ export class AppEntitiesServiceProxy {
      * @param body (optional) 
      * @return Success
      */
+    saveVariationEntityLean(body: AppEntityDto | undefined): Observable<AppEntity> {
+        let url_ = this.baseUrl + "/api/services/app/AppEntities/SaveVariationEntityLean";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json-patch+json",
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processSaveVariationEntityLean(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processSaveVariationEntityLean(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<AppEntity>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<AppEntity>;
+        }));
+    }
+
+    protected processSaveVariationEntityLean(response: HttpResponseBase): Observable<AppEntity> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = AppEntity.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param tenantId (optional) 
+     * @param entityObjectTypeCode (optional) 
+     * @param code (optional) 
+     * @return Success
+     */
+    getVariationEntityUniqueKey(tenantId: number | null | undefined, entityObjectTypeCode: string | null | undefined, code: string | null | undefined): Observable<string> {
+        let url_ = this.baseUrl + "/api/services/app/AppEntities/GetVariationEntityUniqueKey?";
+        if (tenantId !== undefined && tenantId !== null)
+            url_ += "tenantId=" + encodeURIComponent("" + tenantId) + "&";
+        if (entityObjectTypeCode !== undefined && entityObjectTypeCode !== null)
+            url_ += "entityObjectTypeCode=" + encodeURIComponent("" + entityObjectTypeCode) + "&";
+        if (code !== undefined && code !== null)
+            url_ += "code=" + encodeURIComponent("" + code) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetVariationEntityUniqueKey(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetVariationEntityUniqueKey(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<string>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<string>;
+        }));
+    }
+
+    protected processGetVariationEntityUniqueKey(response: HttpResponseBase): Observable<string> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+                result200 = resultData200 !== undefined ? resultData200 : <any>null;
+    
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return Success
+     */
     saveContact(body: AppContactDto | undefined): Observable<number> {
         let url_ = this.baseUrl + "/api/services/app/AppEntities/SaveContact";
         url_ = url_.replace(/[?&]$/, "");
@@ -11456,6 +11573,7 @@ export class AppEventsServiceProxy {
      * @param locationFilter (optional) 
      * @param appEntityNameFilter (optional) 
      * @param cityFilter (optional) 
+     * @param countryCodeFilter (optional) 
      * @param stateFilter (optional) 
      * @param postalFilter (optional) 
      * @param tenantId (optional) 
@@ -11466,7 +11584,7 @@ export class AppEventsServiceProxy {
      * @param maxResultCount (optional) 
      * @return Success
      */
-    getAll(filterType: EventsFilterTypesEnum, filter: string | null | undefined, isOnLineFilter: boolean | null | undefined, isPublishedFilter: boolean | null | undefined, creatorUserIdFilter: number | null | undefined, idFilter: number | null | undefined, entityIdFilter: number | null | undefined, includeAttachments: boolean | undefined, timeZoneFilter: string | null | undefined, maxFromDateFilter: moment.Moment | null | undefined, minFromDateFilter: moment.Moment | null | undefined, maxToDateFilter: moment.Moment | null | undefined, minToDateFilter: moment.Moment | null | undefined, maxFromTimeFilter: moment.Moment | null | undefined, minFromTimeFilter: moment.Moment | null | undefined, maxToTimeFilter: moment.Moment | null | undefined, minToTimeFilter: moment.Moment | null | undefined, privacyFilter: boolean | null | undefined, guestCanInviteFriendsFilter: boolean | null | undefined, locationFilter: string | null | undefined, appEntityNameFilter: string | null | undefined, cityFilter: string | null | undefined, stateFilter: string | null | undefined, postalFilter: string | null | undefined, tenantId: number | null | undefined, noOfEventsToReturn: number | null | undefined, filterCondition: string | null | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<PagedResultDtoOfGetAppEventForViewDto> {
+    getAll(filterType: EventsFilterTypesEnum, filter: string | null | undefined, isOnLineFilter: boolean | null | undefined, isPublishedFilter: boolean | null | undefined, creatorUserIdFilter: number | null | undefined, idFilter: number | null | undefined, entityIdFilter: number | null | undefined, includeAttachments: boolean | undefined, timeZoneFilter: string | null | undefined, maxFromDateFilter: moment.Moment | null | undefined, minFromDateFilter: moment.Moment | null | undefined, maxToDateFilter: moment.Moment | null | undefined, minToDateFilter: moment.Moment | null | undefined, maxFromTimeFilter: moment.Moment | null | undefined, minFromTimeFilter: moment.Moment | null | undefined, maxToTimeFilter: moment.Moment | null | undefined, minToTimeFilter: moment.Moment | null | undefined, privacyFilter: boolean | null | undefined, guestCanInviteFriendsFilter: boolean | null | undefined, locationFilter: string | null | undefined, appEntityNameFilter: string | null | undefined, cityFilter: string | null | undefined, countryCodeFilter: string | null | undefined, stateFilter: string | null | undefined, postalFilter: string | null | undefined, tenantId: number | null | undefined, noOfEventsToReturn: number | null | undefined, filterCondition: string | null | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<PagedResultDtoOfGetAppEventForViewDto> {
         let url_ = this.baseUrl + "/api/services/app/AppEvents/GetAll?";
         if (filterType === undefined || filterType === null)
             throw new Error("The parameter 'filterType' must be defined and cannot be null.");
@@ -11516,6 +11634,8 @@ export class AppEventsServiceProxy {
             url_ += "AppEntityNameFilter=" + encodeURIComponent("" + appEntityNameFilter) + "&";
         if (cityFilter !== undefined && cityFilter !== null)
             url_ += "CityFilter=" + encodeURIComponent("" + cityFilter) + "&";
+        if (countryCodeFilter !== undefined && countryCodeFilter !== null)
+            url_ += "CountryCodeFilter=" + encodeURIComponent("" + countryCodeFilter) + "&";
         if (stateFilter !== undefined && stateFilter !== null)
             url_ += "StateFilter=" + encodeURIComponent("" + stateFilter) + "&";
         if (postalFilter !== undefined && postalFilter !== null)
@@ -15317,9 +15437,9 @@ export class AppItemsServiceProxy {
     }
 
     /**
-     * @param resultKey (optional)
-     * @param skipCount (optional)
-     * @param maxResultCount (optional)
+     * @param resultKey (optional) 
+     * @param skipCount (optional) 
+     * @param maxResultCount (optional) 
      * @return Success
      */
     getValidateExcelResultPage(resultKey: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<AppItemExcelResultsDTO> {
@@ -15370,6 +15490,65 @@ export class AppItemsServiceProxy {
             let result200: any = null;
             let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
             result200 = AppItemExcelResultsDTO.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param resultKey (optional) 
+     * @param body (optional) 
+     * @return Success
+     */
+    saveFromExcelResult(resultKey: string | null | undefined, body: AppItemExcelResultsDTO | undefined): Observable<ExcelLogDto> {
+        let url_ = this.baseUrl + "/api/services/app/AppItems/SaveFromExcelResult?";
+        if (resultKey !== undefined && resultKey !== null)
+            url_ += "resultKey=" + encodeURIComponent("" + resultKey) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json-patch+json",
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processSaveFromExcelResult(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processSaveFromExcelResult(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<ExcelLogDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<ExcelLogDto>;
+        }));
+    }
+
+    protected processSaveFromExcelResult(response: HttpResponseBase): Observable<ExcelLogDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = ExcelLogDto.fromJS(resultData200);
             return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
@@ -16040,47 +16219,6 @@ export class AppItemsServiceProxy {
             }));
         }
         return _observableOf(null as any);
-    }
-
-    /**
-     * @param resultKey (optional)
-     * @param body (optional)
-     * @return Success
-     */
-    saveFromExcelResult(resultKey: string | null | undefined, body: AppItemExcelResultsDTO | undefined): Observable<ExcelLogDto> {
-        let url_ = this.baseUrl + "/api/services/app/AppItems/SaveFromExcelResult?";
-        if (resultKey !== undefined && resultKey !== null)
-            url_ += "resultKey=" + encodeURIComponent("" + resultKey) + "&";
-        url_ = url_.replace(/[?&]$/, "");
-
-        const content_ = JSON.stringify(body);
-
-        let options_ : any = {
-            body: content_,
-            observe: "response",
-            responseType: "blob",
-            headers: new HttpHeaders({
-                "Content-Type": "application/json-patch+json",
-                "Accept": "text/plain"
-            })
-        };
-
-        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processSaveFromExcelResult(response_);
-        })).pipe(_observableCatch((response_: any) => {
-            if (response_ instanceof HttpResponseBase) {
-                try {
-                    return this.processSaveFromExcelResult(response_ as any);
-                } catch (e) {
-                    return _observableThrow(e) as any as Observable<ExcelLogDto>;
-                }
-            } else
-                return _observableThrow(response_) as any as Observable<ExcelLogDto>;
-        }));
-    }
-
-    protected processSaveFromExcelResult(response: HttpResponseBase): Observable<ExcelLogDto> {
-        return this.processSaveFromExcel(response);
     }
 
     /**
@@ -74381,11 +74519,6 @@ export class AccountExcelResultsDTO implements IAccountExcelResultsDTO {
     filePath!: string | undefined;
     errorMessage!: string | undefined;
     hasDuplication!: boolean;
-    resultKey!: string | undefined;
-    isPagedResult!: boolean;
-    pageSkipCount!: number;
-    pageMaxResultCount!: number;
-    totalDisplayRecords!: number;
 
     [key: string]: any;
 
@@ -74434,11 +74567,6 @@ export class AccountExcelResultsDTO implements IAccountExcelResultsDTO {
             this.filePath = _data["filePath"];
             this.errorMessage = _data["errorMessage"];
             this.hasDuplication = _data["hasDuplication"];
-            this.resultKey = _data["resultKey"];
-            this.isPagedResult = _data["isPagedResult"];
-            this.pageSkipCount = _data["pageSkipCount"];
-            this.pageMaxResultCount = _data["pageMaxResultCount"];
-            this.totalDisplayRecords = _data["totalDisplayRecords"];
         }
     }
 
@@ -74485,11 +74613,6 @@ export class AccountExcelResultsDTO implements IAccountExcelResultsDTO {
         data["filePath"] = this.filePath;
         data["errorMessage"] = this.errorMessage;
         data["hasDuplication"] = this.hasDuplication;
-        data["resultKey"] = this.resultKey;
-        data["isPagedResult"] = this.isPagedResult;
-        data["pageSkipCount"] = this.pageSkipCount;
-        data["pageMaxResultCount"] = this.pageMaxResultCount;
-        data["totalDisplayRecords"] = this.totalDisplayRecords;
         return data;
     }
 }
@@ -74509,11 +74632,6 @@ export interface IAccountExcelResultsDTO {
     filePath: string | undefined;
     errorMessage: string | undefined;
     hasDuplication: boolean;
-    resultKey: string | undefined;
-    isPagedResult: boolean;
-    pageSkipCount: number;
-    pageMaxResultCount: number;
-    totalDisplayRecords: number;
 
     [key: string]: any;
 }
@@ -83376,6 +83494,11 @@ export class AppItemExcelResultsDTO implements IAppItemExcelResultsDTO {
     filePath!: string | undefined;
     errorMessage!: string | undefined;
     hasDuplication!: boolean;
+    resultKey!: string | undefined;
+    isPagedResult!: boolean;
+    pageSkipCount!: number;
+    pageMaxResultCount!: number;
+    totalDisplayRecords!: number;
 
     [key: string]: any;
 
@@ -83425,6 +83548,11 @@ export class AppItemExcelResultsDTO implements IAppItemExcelResultsDTO {
             this.filePath = _data["filePath"];
             this.errorMessage = _data["errorMessage"];
             this.hasDuplication = _data["hasDuplication"];
+            this.resultKey = _data["resultKey"];
+            this.isPagedResult = _data["isPagedResult"];
+            this.pageSkipCount = _data["pageSkipCount"];
+            this.pageMaxResultCount = _data["pageMaxResultCount"];
+            this.totalDisplayRecords = _data["totalDisplayRecords"];
         }
     }
 
@@ -83472,6 +83600,11 @@ export class AppItemExcelResultsDTO implements IAppItemExcelResultsDTO {
         data["filePath"] = this.filePath;
         data["errorMessage"] = this.errorMessage;
         data["hasDuplication"] = this.hasDuplication;
+        data["resultKey"] = this.resultKey;
+        data["isPagedResult"] = this.isPagedResult;
+        data["pageSkipCount"] = this.pageSkipCount;
+        data["pageMaxResultCount"] = this.pageMaxResultCount;
+        data["totalDisplayRecords"] = this.totalDisplayRecords;
         return data;
     }
 }
@@ -83492,6 +83625,11 @@ export interface IAppItemExcelResultsDTO {
     filePath: string | undefined;
     errorMessage: string | undefined;
     hasDuplication: boolean;
+    resultKey: string | undefined;
+    isPagedResult: boolean;
+    pageSkipCount: number;
+    pageMaxResultCount: number;
+    totalDisplayRecords: number;
 
     [key: string]: any;
 }

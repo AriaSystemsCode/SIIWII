@@ -37,6 +37,7 @@ namespace onetouch.AppEvents.Dtos
         public string AppEntityNameFilter { get; set; }
 
         public string CityFilter { get; set; }
+        public string CountryCodeFilter { get; set; }
 
         public string StateFilter { get; set; }
 
