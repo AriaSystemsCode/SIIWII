@@ -1,7 +1,7 @@
 <div
     [@routerTransition]
-    style="margin-top: -50px;overflow: hidden;"
-    class="wrapper kt-container web pl-lg-3 p-md-2 pl-0 pr-lg-2 pr-md-4 pr-0"
+   
+    class="wrapper kt-container web pl-lg-3 p-md-2 pl-0 pr-lg-2 pr-md-4 pr-0 mp-inline-1"
 >
     <div
         class=""
@@ -25,8 +25,8 @@
                             ></p-dropdown>
                         </div>
                         <div
-                            class="sarch d-flex align-items-center justify-content-center"
-                            style="gap: 7px"
+                            class="sarch d-flex align-items-center justify-content-center mp-inline-2"
+                           
                         >
                          
                             <span class="p-input-icon-right group-srch">
@@ -156,7 +156,7 @@
     <div class="container-fluid">
         <div class="quickFilters">
         
-            <span class="p-input-icon-right " style="width: 40%;">
+            <span class="p-input-icon-right  mp-inline-3">
                 <i class="pi pi-search"></i>
                 <input
                     type="text"
@@ -167,9 +167,9 @@
                     (keyup)="handleProductSearchText()"
                 />
             </span>
-            <button style="width: 60%;"
+            <button
             (click)="openFiltersDialog('Shared With Me and Public')"
-            class="filter-btn"
+            class="filter-btn mp-inline-4"
         >
             Shared With Me and Public
         </button>
@@ -265,8 +265,8 @@
 
     <!-- currency Filters -->
     <div
-        class="flex flex-column gap-3"
-        style="overflow-y: scroll; height: 200px"
+        class="flex flex-column gap-3 mp-inline-5"
+       
         *ngIf="filterType === 'Select Currency'"
     >
         <div
