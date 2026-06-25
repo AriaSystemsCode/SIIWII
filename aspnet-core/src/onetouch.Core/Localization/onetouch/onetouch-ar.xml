@@ -1815,6 +1815,6 @@
 			<text name="Logo">شعار</text>
 		<text name="Banner">بانر</text>
 		<text name="Portrait">عمودي</text>
-		<text name="Landscape">أفقي</text></text>
+		<text name="Landscape">أفقي</text>
   </texts>
 </localizationDictionary>
