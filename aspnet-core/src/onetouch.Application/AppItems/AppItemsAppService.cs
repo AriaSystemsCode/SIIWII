@@ -898,7 +898,7 @@ namespace onetouch.AppItems
 
                     string variations = appItem.Variations;
                     output.AppItem.variations = new List<ExtraDataAttrDto>();
-                    if (!string.IsNullOrEmpty(variations))
+                    if (!string.IsNullOrEmpty(variations) && varAppItems.Count > 0)
                     {
                         string firstAttributeId = "";
                         var frstAttId = varAppItems.Select(x => x.EntityFk.EntityAttachments.Where(z => z.Attributes.Contains("=")).Select(a => a.Attributes)).FirstOrDefault();
@@ -2266,6 +2266,17 @@ namespace onetouch.AppItems
                     }
                 }
 
+                var sizesByCode = sizesList
+                    .OrderByDescending(x => x.TenantId == AbpSession.TenantId)
+                    .Where(x => !string.IsNullOrWhiteSpace(x.Code))
+                    .GroupBy(x => x.Code, StringComparer.OrdinalIgnoreCase)
+                    .ToDictionary(x => x.Key, x => x.First(), StringComparer.OrdinalIgnoreCase);
+                var colorsByCode = colorsList
+                    .OrderByDescending(x => x.TenantId == AbpSession.TenantId)
+                    .Where(x => !string.IsNullOrWhiteSpace(x.Code))
+                    .GroupBy(x => x.Code, StringComparer.OrdinalIgnoreCase)
+                    .ToDictionary(x => x.Key, x => x.First(), StringComparer.OrdinalIgnoreCase);
+
                 var existingVariationItemsById = appItemChildrenTmp.ToDictionary(x => x.Id);
                 var existingVariationEntitiesById = new Dictionary<long, AppEntity>();
                 var existingVariationPricesByItemId = new Dictionary<long, List<AppItemPrices>>();
@@ -2325,6 +2336,14 @@ namespace onetouch.AppItems
                     .GroupBy(x => _appEntitiesAppService.GetVariationEntityUniqueKey(x.TenantId, x.EntityObjectTypeCode, x.Code))
                     .ToDictionary(x => x.Key, x => x.First());
 
+                var bulkDbContext = UnitOfWorkManager.Current.GetDbContext<onetouchDbContext>(null, null);
+                var originalAutoDetectChanges = bulkDbContext.ChangeTracker.AutoDetectChangesEnabled;
+                var disableAutoDetectChanges = input.VariationItems.Count >= 25;
+                if (disableAutoDetectChanges)
+                    bulkDbContext.ChangeTracker.AutoDetectChangesEnabled = false;
+
+                try
+                {
                 foreach (var child in input.VariationItems)
                 {
                     // Process one variation: map DTOs, enrich attributes, save child entity/item, and save prices.
@@ -2445,7 +2464,7 @@ namespace onetouch.AppItems
                         var sizeExtraAtt = childEntity.EntityExtraData.Where(z => z.AttributeId == 105).FirstOrDefault();
                         if (sizeExtraAtt != null)
                         {
-                            var sizeExtra = sizesList.Where(z => z.Code == sizeExtraAtt.AttributeCode).FirstOrDefault();
+                            sizesByCode.TryGetValue(sizeExtraAtt.AttributeCode ?? string.Empty, out var sizeExtra);
                             if (sizeExtra != null)
                             {
                                 var sizeNRFEnt = sizeExtra.EntityExtraData.Where(z => z.AttributeId == 36).FirstOrDefault();
@@ -2478,7 +2497,7 @@ namespace onetouch.AppItems
                         }
                         if (colorExtraAtt != null)
                         {
-                            var colorExtra = colorsList.Where(z => z.Code == colorExtraAtt.AttributeCode).FirstOrDefault();
+                            colorsByCode.TryGetValue(colorExtraAtt.AttributeCode ?? string.Empty, out var colorExtra);
                             if (colorExtra != null)
                             {
                                 if (colorExtra.EntityAttachments != null && colorExtra.EntityAttachments.Count > 0 && !string.IsNullOrEmpty(colorExtra.EntityAttachments[0].AttachmentFk.Attachment))
@@ -2747,6 +2766,21 @@ namespace onetouch.AppItems
 
 
                     #endregion fill variation field lists
+                }
+                }
+                finally
+                {
+                    if (disableAutoDetectChanges)
+                    {
+                        try
+                        {
+                            bulkDbContext.ChangeTracker.DetectChanges();
+                        }
+                        finally
+                        {
+                            bulkDbContext.ChangeTracker.AutoDetectChangesEnabled = originalAutoDetectChanges;
+                        }
+                    }
                 }
 
                 // Serialize variation metadata used by the UI to render variation selectors.
@@ -4228,22 +4262,83 @@ namespace onetouch.AppItems
             itemExcelTemplateDto.ExcelTemplatePath = "";
             try
             {
-                #region get lookups
-                //get currency types
-                List<CurrencyInfoDto> currencyIds = await _appEntitiesAppService.GetAllCurrencyForTableDropdown();
-                // get Product Departments
-                PagedResultDto<TreeNode<GetSycEntityObjectCategoryForViewDto>> departmentIds = await _sycEntityObjectCategoriesAppService.GetAllDepartmentsWithChildsForProduct();
-                //get classifications for contacts
-                PagedResultDto<TreeNode<GetSycEntityObjectClassificationForViewDto>> classIds = await _sycEntityObjectClassificationsAppService.GetAllWithChildsForProductWithPaging(new GetAllSycEntityObjectClassificationsInput());
+                if (!productTypeId.HasValue)
+                {
+                    throw new UserFriendlyException("Product type is required.");
+                }
 
-                PagedResultDto<TreeNode<GetSycEntityObjectCategoryForViewDto>> categoriesIds = await _sycEntityObjectCategoriesAppService.GetAllWithChildsForProductWithPaging(new GetAllSycEntityObjectCategoriesInput() { DepartmentFlag = false, Sorting = "name" });
-                // get Product Categories
-                List<SycEntityObjectCategorySycEntityObjectCategoryLookupTableDto> productTypes = await _sycEntityObjectCategoriesAppService.GetAllSycEntityObjectCategoryForTableDropdown();
-                var retProductsTypes = await _SycEntityObjectTypesAppService.GetAllWithChildsForProduct();
+                #region get lookups
+                var itemObjectId = await _helper.SystemTables.GetObjectItemId();
+                var currencyTypeId = await _helper.SystemTables.GetEntityObjectTypeCurrencyId();
+
+                // The workbook only needs codes/names. Avoid loading tree nodes, localization
+                // joins, child collections, and currency extra data.
+                List<string> currencyCodes = await _appEntityRepository.GetAll()
+                    .AsNoTracking()
+                    .Where(x => x.EntityObjectTypeId == currencyTypeId &&
+                                (x.TenantId == AbpSession.TenantId || x.TenantId == null))
+                    .OrderBy(x => x.Name)
+                    .Select(x => x.Code)
+                    .ToListAsync();
+
+                List<string> departmentCodes = await _sycEntityObjectCategoryRepository.GetAll()
+                    .AsNoTracking()
+                    .Where(x => x.ObjectId == itemObjectId && x.ParentId == null && x.TenantId == null)
+                    .OrderBy(x => x.Name)
+                    .Select(x => x.Code)
+                    .ToListAsync();
+
+                List<string> classificationCodes = await _sycEntityObjectClassificationRepository.GetAll()
+                    .AsNoTracking()
+                    .Where(x => x.ObjectId == itemObjectId && x.ParentId == null &&
+                                (x.TenantId == AbpSession.TenantId || x.TenantId == null))
+                    .OrderBy(x => x.Name)
+                    .Select(x => x.Code)
+                    .ToListAsync();
+
+                List<string> categoryCodes = await _sycEntityObjectCategoryRepository.GetAll()
+                    .AsNoTracking()
+                    .Where(x => x.ObjectId == itemObjectId && x.ParentId == null &&
+                                x.TenantId == AbpSession.TenantId)
+                    .OrderBy(x => x.Name)
+                    .Select(x => x.Code)
+                    .ToListAsync();
+
+                List<string> productTypes = await _sycEntityObjectCategoryRepository.GetAll()
+                    .AsNoTracking()
+                    .Where(x => x.TenantId == AbpSession.TenantId || x.TenantId == null)
+                    .OrderBy(x => x.Name)
+                    .Select(x => x.Name)
+                    .ToListAsync();
 
                 List<SycAttachmentCategorySycAttachmentCategoryLookupTableDto> attachmentsCategories = await _sSycAttachmentCategoriesAppService.GetAllSycAttachmentCategoryForTableDropdown();
 
-                var entityObjectExtraAttribute = _SycEntityObjectTypesAppService.GetAllWithExtraAttributes(long.Parse(productTypeId.ToString())).Result.ToList().FirstOrDefault();
+                var entityObjectExtraAttribute = (await _SycEntityObjectTypesAppService
+                    .GetAllWithExtraAttributes(productTypeId.Value))
+                    .FirstOrDefault();
+
+                var lookupTypeCodes = entityObjectExtraAttribute?.ExtraAttributes?.ExtraAttributes?
+                    .Where(x => x.IsLookup && !string.IsNullOrWhiteSpace(x.EntityObjectTypeCode))
+                    .Select(x => x.EntityObjectTypeCode)
+                    .Distinct()
+                    .ToList() ?? new List<string>();
+
+                var lookupEntries = await _appEntityRepository.GetAll()
+                    .AsNoTracking()
+                    .Where(x => lookupTypeCodes.Contains(x.EntityObjectTypeCode) &&
+                                (x.TenantId == AbpSession.TenantId || x.TenantId == null))
+                    .OrderBy(x => x.Name)
+                    .Select(x => new
+                    {
+                        x.EntityObjectTypeCode,
+                        x.Code,
+                        Label = x.Name
+                    })
+                    .ToListAsync();
+
+                var lookupEntriesByTypeCode = lookupEntries
+                    .GroupBy(x => x.EntityObjectTypeCode)
+                    .ToDictionary(x => x.Key, x => x.ToList());
                 #endregion
 
                 string directory = _appConfiguration[$"Templates:ExcelTemplate"];
@@ -4342,22 +4437,22 @@ namespace onetouch.AppItems
                 int row = 2;
                 Sheetvalid.Cell(column + row.ToString()).Value = "Product Type";
                 row = 3;
-                foreach (var obj in productTypes)
+                foreach (var productType in productTypes)
                 {
 
 
                     row++;
-                    Sheetvalid.Cell(column + row.ToString()).Value = obj.DisplayName;
+                    Sheetvalid.Cell(column + row.ToString()).Value = productType;
                 }
 
                 column = "C";
                 row = 2;
                 Sheetvalid.Cell(column + row.ToString()).Value = "Currency";
                 row = 3;
-                foreach (var obj in currencyIds)
+                foreach (var currencyCode in currencyCodes)
                 {
                     row++;
-                    Sheetvalid.Cell(column + row.ToString()).Value = obj.Code;
+                    Sheetvalid.Cell(column + row.ToString()).Value = currencyCode;
                 }
 
                 // Image Type  
@@ -4376,30 +4471,30 @@ namespace onetouch.AppItems
                 row = 2;
                 Sheetvalid.Cell(column + row.ToString()).Value = "Department";
                 row = 3;
-                foreach (var obj in departmentIds.Items)
+                foreach (var departmentCode in departmentCodes)
                 {
                     row++;
-                    Sheetvalid.Cell(column + row.ToString()).Value = obj.Data.SycEntityObjectCategory.Code;
+                    Sheetvalid.Cell(column + row.ToString()).Value = departmentCode;
                 }
                 // Language 
                 column = "F";
                 row = 2;
                 Sheetvalid.Cell(column + row.ToString()).Value = "Classification";
                 row = 3;
-                foreach (var obj in classIds.Items)
+                foreach (var classificationCode in classificationCodes)
                 {
                     row++;
-                    Sheetvalid.Cell(column + row.ToString()).Value = obj.Data.SycEntityObjectClassification.Code; //.SycEntityObjectClassification.Code;
+                    Sheetvalid.Cell(column + row.ToString()).Value = classificationCode;
                 }
                 // Country 
                 column = "G";
                 row = 2;
                 Sheetvalid.Cell(column + row.ToString()).Value = "Category";
                 row = 3;
-                foreach (var obj in categoriesIds.Items)
+                foreach (var categoryCode in categoryCodes)
                 {
                     row++;
-                    Sheetvalid.Cell(column + row.ToString()).Value = obj.Data.SycEntityObjectCategory.Code;
+                    Sheetvalid.Cell(column + row.ToString()).Value = categoryCode;
                 }
                 int startCol = 7;
                 if (entityObjectExtraAttribute != null && entityObjectExtraAttribute.ExtraAttributes != null &&
@@ -4410,15 +4505,16 @@ namespace onetouch.AppItems
                         if (!entityObjectExtraAttribute.ExtraAttributes.ExtraAttributes[exAtr].IsLookup)
                             continue;
                         row = 1;
-                        var retrunValues = await _appEntitiesAppService.GetAllEntitiesByTypeCode(entityObjectExtraAttribute.ExtraAttributes.ExtraAttributes[exAtr].EntityObjectTypeCode);
-                        if (retrunValues != null && retrunValues.Count > 0)
+                        var lookupTypeCode = entityObjectExtraAttribute.ExtraAttributes.ExtraAttributes[exAtr].EntityObjectTypeCode;
+                        if (lookupEntriesByTypeCode.TryGetValue(lookupTypeCode, out var returnValues) &&
+                            returnValues.Count > 0)
                         {
-                            Sheetvalid.Cell(row, startCol).Value = entityObjectExtraAttribute.ExtraAttributes.ExtraAttributes[exAtr].EntityObjectTypeCode + " Code";
+                            Sheetvalid.Cell(row, startCol).Value = lookupTypeCode + " Code";
                             Sheetvalid.Cell(row, startCol).SetFontProperties("Calibri", true, false, false, 11, 0, 0, 0);
-                            Sheetvalid.Cell(row, startCol + 1).Value = entityObjectExtraAttribute.ExtraAttributes.ExtraAttributes[exAtr].EntityObjectTypeCode + " Description";
+                            Sheetvalid.Cell(row, startCol + 1).Value = lookupTypeCode + " Description";
                             Sheetvalid.Cell(row, startCol + 1).SetFontProperties("Calibri", true, false, false, 11, 0, 0, 0);
                             row = 2;
-                            foreach (var val in retrunValues)
+                            foreach (var val in returnValues)
                             {
                                 row++;
                                 Sheetvalid.Cell(row, startCol).Value = val.Code;
@@ -4447,7 +4543,6 @@ namespace onetouch.AppItems
         }
         public async Task<AppItemExcelResultsDTO> ValidateExcel(string guidFile, string[] imagesList)
         {
-            var validateExcelStopwatch = System.Diagnostics.Stopwatch.StartNew();
             AppItemExcelResultsDTO itemExcelResultsDTO = new AppItemExcelResultsDTO();
             itemExcelResultsDTO.ExcelRecords = new List<AppItemtExcelRecordDTO>();
 
@@ -4913,7 +5008,6 @@ namespace onetouch.AppItems
                 }
                 catch (Exception ex)
                 {
-                    Logger.Info($"[PERF] ValidateExcel total duration for file {guidFile}: {validateExcelStopwatch.ElapsedMilliseconds} ms before failure");
                     throw new UserFriendlyException(ex.Message);
                 }
 
@@ -5007,12 +5101,10 @@ namespace onetouch.AppItems
 
             #endregion Iteration 44 save not used images
             var resultKey = GetValidateExcelResultKey(guidFile);
-            var fullResponseRecords = itemExcelResultsDTO.ExcelRecords?.Count ?? 0;
             await SaveValidateExcelResultJson(itemExcelResultsDTO, resultKey);
 
             var pagedResult = CreateValidateExcelPagedResult(itemExcelResultsDTO, resultKey, 0, ValidateExcelDefaultPageSize);
 
-            Logger.Info($"[PERF] ValidateExcel total duration for file {guidFile}: {validateExcelStopwatch.ElapsedMilliseconds} ms, records: {itemExcelResultsDTO.TotalRecords}, passed: {itemExcelResultsDTO.TotalPassedRecords}, failed: {itemExcelResultsDTO.TotalFailedRecords}, full response records: {fullResponseRecords}, returned records: {pagedResult.ExcelRecords?.Count ?? 0}, result key: {resultKey}");
             return pagedResult;
         }
         //Iteation#46[Start]
@@ -5803,6 +5895,19 @@ namespace onetouch.AppItems
             return code;
 
         }
+
+        private static string GetItemCopyCode(string code, HashSet<string> reservedCodes)
+        {
+            for (var copyNumber = 1; copyNumber < 1000; copyNumber++)
+            {
+                var newCode = code + copyNumber;
+                if (reservedCodes.Add(newCode))
+                    return newCode;
+            }
+
+            return code;
+        }
+
         //Marima
         public async Task AddClassifications(List<AppItemExcelDto> result)
         {
@@ -5993,7 +6098,6 @@ namespace onetouch.AppItems
 
         public async Task<ExcelLogDto> SaveFromExcel(AppItemExcelResultsDTO excelResultsDTO)
         {
-
             List<AppItemExcelDto> result = excelResultsDTO.ExcelRecords.Where(r => r.Status !=
             ExcelRecordStatus.Failed.ToString()).Select(r => r.ExcelDto).ToList<AppItemExcelDto>();
 
@@ -6260,13 +6364,31 @@ namespace onetouch.AppItems
                 .Where(x => x != null && !string.IsNullOrEmpty(x.Name))
                 .GroupBy(x => x.Name, StringComparer.OrdinalIgnoreCase)
                 .ToDictionary(x => x.Key, x => x.First(), StringComparer.OrdinalIgnoreCase);
+            var attachmentsCategoriesByCode = attachmentsCategories
+                .Where(x => !string.IsNullOrWhiteSpace(x.Code))
+                .GroupBy(x => x.Code, StringComparer.OrdinalIgnoreCase)
+                .ToDictionary(x => x.Key, x => x.First(), StringComparer.OrdinalIgnoreCase);
+            var childrenByParentCode = result
+                .Where(x => !string.IsNullOrWhiteSpace(x.ParentCode))
+                .GroupBy(x => x.ParentCode, StringComparer.OrdinalIgnoreCase)
+                .ToDictionary(x => x.Key, x => x.ToList(), StringComparer.OrdinalIgnoreCase);
+            HashSet<string> reservedCopyCodes = null;
+            if (excelResultsDTO.RepreateHandler == ExcelRecordRepeateHandler.CreateACopy)
+            {
+                var existingCodes = await _appItemRepository.GetAll()
+                    .AsNoTracking()
+                    .Where(x => x.TenantId == AbpSession.TenantId && x.Code != null)
+                    .Select(x => x.Code)
+                    .ToListAsync();
+
+                reservedCopyCodes = new HashSet<string>(existingCodes, StringComparer.OrdinalIgnoreCase);
+            }
             DateTime start = DateTime.Now;
             var itemObjectId = await _helper.SystemTables.GetObjectItemId();
             var tenantId = AbpSession.TenantId == null ? -1 : AbpSession.TenantId;
             var path = _appConfiguration[$"Attachment:PathTemp"] + @"\" + tenantId + @"\";
             string imagesUrl = _appConfiguration[$"Attachment:Path"].Replace(_appConfiguration[$"Attachment:Omitt"], "") + @"/" + tenantId + @"/";
             var itemStatusId = await _helper.SystemTables.GetEntityObjectStatusItemActive();
-            var itemEntityExtraData = new List<AppEntityExtraData>();
             List<AppItem> appItemList = new List<AppItem>();
             List<AppItem> appItemModifyList = new List<AppItem>();
             List<AppEntity> appEntityDeleteList = new List<AppEntity>();
@@ -6276,18 +6398,43 @@ namespace onetouch.AppItems
             List<AppEntityExtraData> appEntityExtraDataDeleteList = new List<AppEntityExtraData>();
             var x = UnitOfWorkManager.Current.GetDbContext<onetouchDbContext>(null, null);
             List<string> sizeScaleNames = new List<string>();
+
+            var existingParentIds = result
+                .Where(z => string.IsNullOrEmpty(z.ParentCode) && z.Id != 0)
+                .Select(z => z.Id)
+                .Distinct()
+                .ToList();
+            var existingParentsById = existingParentIds.Count == 0
+                ? new Dictionary<long, AppItem>()
+                : (await _appItemRepository.GetAll()
+                    .AsNoTracking()
+                    .AsSplitQuery()
+                    .Where(z => existingParentIds.Contains(z.Id) && z.ListingItemId == null)
+                    .Include(z => z.EntityFk).ThenInclude(z => z.EntityCategories)
+                    .Include(z => z.EntityFk).ThenInclude(z => z.EntityClassifications)
+                    .Include(z => z.EntityFk).ThenInclude(z => z.EntityAttachments).ThenInclude(z => z.AttachmentFk)
+                    .Include(z => z.EntityFk).ThenInclude(z => z.EntityExtraData)
+                    .Include(z => z.ItemPricesFkList)
+                    .Include(z => z.ParentFkList).ThenInclude(z => z.EntityFk).ThenInclude(z => z.EntityExtraData)
+                    .Include(z => z.ParentFkList).ThenInclude(z => z.EntityFk).ThenInclude(z => z.EntityCategories)
+                    .Include(z => z.ParentFkList).ThenInclude(z => z.EntityFk).ThenInclude(z => z.EntityClassifications)
+                    .Include(z => z.ParentFkList).ThenInclude(z => z.EntityFk).ThenInclude(z => z.EntityAttachments).ThenInclude(z => z.AttachmentFk)
+                    .Include(z => z.ParentFkList).ThenInclude(z => z.ItemPricesFkList)
+                    .ToListAsync())
+                    .ToDictionary(z => z.Id);
+
             foreach (AppItemExcelDto excelDto in result)
             {
                 if (!string.IsNullOrEmpty(excelDto.ParentCode))
                     continue;
+                var itemEntityExtraData = new List<AppEntityExtraData>();
                 AppItem itemOrg = new AppItem();
                 if (excelDto.Id != 0)
                 {
                     //T-SII-20231127.0001,1 MMT 02/05/2024 Import product does not import new variations of an existing item[Start]
                     bool lNewVariation = false;
-                    var xx = result.Where(x => x.ParentCode == excelDto.Code && x.Id == 0).Count();
-                    if (xx > 0)
-                        lNewVariation = true;
+                    if (childrenByParentCode.TryGetValue(excelDto.Code, out var importedChildren))
+                        lNewVariation = importedChildren.Any(z => z.Id == 0);
                     //T-SII-20231127.0001,1 MMT 02/05/2024 Import product does not import new variations of an existing item[End]
                     switch (excelResultsDTO.RepreateHandler)
                     {
@@ -6295,23 +6442,7 @@ namespace onetouch.AppItems
                             //T-SII-20231127.0001,1 MMT 02/05/2024 Import product does not import new variations of an existing item[Start]
                             if (lNewVariation == true)
                             {
-                                itemOrg = _appItemRepository.GetAll().Where(c => c.Id == excelDto.Id && c.ListingItemId == null)//.Include(z=>z.ItemPricesFkList)
-                                .Include(x => x.EntityFk).AsNoTracking()
-                                .Include(x => x.EntityFk).ThenInclude(x => x.EntityCategories)
-                                .Include(x => x.EntityFk).ThenInclude(x => x.EntityClassifications)
-                                .Include(x => x.EntityFk).ThenInclude(x => x.EntityAttachments).ThenInclude(x => x.AttachmentFk)
-                                .Include(x => x.EntityFk).ThenInclude(x => x.EntityExtraData)
-                                .FirstOrDefault();
-                                if (itemOrg != null)
-                                {
-                                    itemOrg.ItemPricesFkList = _appItemPricesRepository.GetAll().AsNoTracking().Where(z => z.AppItemId == excelDto.Id).ToList();
-                                    itemOrg.ParentFkList = _appItemRepository.GetAll()
-                                   .Include(x => x.EntityFk).ThenInclude(x => x.EntityExtraData)
-                                   .Include(x => x.EntityFk).ThenInclude(x => x.EntityCategories)
-                                   .Include(x => x.EntityFk).ThenInclude(x => x.EntityClassifications)
-                                   .Include(x => x.EntityFk).ThenInclude(x => x.EntityAttachments).ThenInclude(x => x.AttachmentFk)
-                                   .Include(z => z.ItemPricesFkList).AsNoTracking().Where(z => z.ParentId == excelDto.Id).ToList();
-                                }
+                                existingParentsById.TryGetValue(excelDto.Id, out itemOrg);
                                 break;
                             }
                             else
@@ -6319,44 +6450,25 @@ namespace onetouch.AppItems
                                 continue;
                         case ExcelRecordRepeateHandler.ReplaceDuplicatedRecords: // replace
 
-                            itemOrg = _appItemRepository.GetAll().Where(c => c.Id == excelDto.Id && c.ListingItemId == null)//.Include(z=>z.ItemPricesFkList)
-                               .Include(x => x.EntityFk).AsNoTracking()
-                               .Include(x => x.EntityFk).ThenInclude(x => x.EntityCategories)
-                               .Include(x => x.EntityFk).ThenInclude(x => x.EntityClassifications)
-                               .Include(x => x.EntityFk).ThenInclude(x => x.EntityAttachments).ThenInclude(x => x.AttachmentFk)
-                               .Include(x => x.EntityFk).ThenInclude(x => x.EntityExtraData)
-                               .FirstOrDefault();
-                            if (itemOrg != null)
-                            {
-                                itemOrg.ItemPricesFkList = _appItemPricesRepository.GetAll().AsNoTracking().Where(z => z.AppItemId == excelDto.Id).ToList();
-                                itemOrg.ParentFkList = _appItemRepository.GetAll()
-                               .Include(x => x.EntityFk).ThenInclude(x => x.EntityExtraData)
-                               .Include(x => x.EntityFk).ThenInclude(x => x.EntityCategories)
-                               .Include(x => x.EntityFk).ThenInclude(x => x.EntityClassifications)
-                               .Include(x => x.EntityFk).ThenInclude(x => x.EntityAttachments).ThenInclude(x => x.AttachmentFk)
-                               .Include(z => z.ItemPricesFkList).AsNoTracking().Where(z => z.ParentId == excelDto.Id).ToList();
-                            }
+                            existingParentsById.TryGetValue(excelDto.Id, out itemOrg);
 
 
                             break;
                         case ExcelRecordRepeateHandler.CreateACopy: // override
                             string oldCode = excelDto.Code;
-                            excelDto.Code = GetItemCopyCode(excelDto.Code);
+                            excelDto.Code = GetItemCopyCode(excelDto.Code, reservedCopyCodes);
                             excelDto.Id = 0;
-                            var childItemsCopy = result.Where(x => x.ParentCode == oldCode);// && x.Id != 0);
-                            if (childItemsCopy != null && childItemsCopy.Count<AppItemExcelDto>() > 0)
+                            if (childrenByParentCode.TryGetValue(oldCode, out var childItemsCopy))
                             {
                                 foreach (var itemCopy in childItemsCopy)
                                 {
-                                    itemCopy.Code = GetItemCopyCode(itemCopy.Code);
+                                    itemCopy.Code = GetItemCopyCode(itemCopy.Code, reservedCopyCodes);
                                     itemCopy.Id = 0;
+                                    itemCopy.ParentCode = excelDto.Code;
                                 }
-                            }
 
-                            result.Where(x => x.ParentCode == oldCode).ToList().ForEach(x => x.ParentCode = excelDto.Code);
-                            if (!string.IsNullOrEmpty(excelDto.ParentCode))
-                            {
-                                result.Where(x => x.ParentCode == oldCode).ToList().ForEach(x => x.Id = 0);
+                                childrenByParentCode.Remove(oldCode);
+                                childrenByParentCode[excelDto.Code] = childItemsCopy;
                             }
                             break;
                         default:
@@ -6402,10 +6514,7 @@ namespace onetouch.AppItems
                 else
                 {
                     if (appItem.ItemPricesFkList.Count > 0)
-                    {
-                        await _appItemPricesRepository.DeleteAsync(z => z.AppItemId == appItem.Id);
                         appItem.ItemPricesFkList = new List<AppItemPrices>();
-                    }
                 }
                 {
                     appItem.ItemPricesFkList.Add(new AppItemPrices
@@ -6575,11 +6684,6 @@ namespace onetouch.AppItems
                         }
                     }
                 }
-                if (string.IsNullOrEmpty(appItem.SSIN))
-                {
-                    appItem.SSIN = await _helper.SystemTables.GenerateSSIN(itemObjectId, ObjectMapper.Map<AppEntityDto>(appItem.EntityFk));
-                    appItem.EntityFk.SSIN = appItem.SSIN;
-                }
                 appItem.TenantOwner = int.Parse(AbpSession.TenantId.ToString());
                 appItem.EntityFk.TenantOwner = int.Parse(AbpSession.TenantId.ToString());
                 if (excelDto.Id == 0)
@@ -6587,7 +6691,7 @@ namespace onetouch.AppItems
 
                 if (!string.IsNullOrEmpty(excelDto.ImageType) && excelDto.Images != null && excelDto.Images.Count > 0)
                 {
-                    var attachCategory = attachmentsCategories.Where(r => r.Code.ToUpper() == excelDto.ImageType.ToUpper()).FirstOrDefault();
+                    attachmentsCategoriesByCode.TryGetValue(excelDto.ImageType, out var attachCategory);
                     var defaultImage = excelDto.Images.Where(x => x.ImageFileName.ToLower().Contains("_default") || x.IsDefault).FirstOrDefault();
 
                     if (appItem.EntityFk.EntityAttachments.Count > 0)
@@ -6653,11 +6757,6 @@ namespace onetouch.AppItems
                 appItem.TimeStamp = timeStamp;
                 appItem.EntityFk.TimeStamp = timeStamp;
                 appItem.TenantOwner = int.Parse(AbpSession.TenantId.ToString());
-                if (string.IsNullOrEmpty(appItem.SSIN))
-                {
-                    appItem.SSIN = await _helper.SystemTables.GenerateSSIN(itemObjectId, ObjectMapper.Map<AppEntityDto>(appItem.EntityFk));
-                    appItem.EntityFk.SSIN = appItem.SSIN;
-                }
                 appItem.EntityFk.TenantOwner = appItem.TenantOwner;
                 if (!string.IsNullOrEmpty(excelDto.SizeScaleName))
                 {
@@ -6729,7 +6828,11 @@ namespace onetouch.AppItems
                                 });
                             }
                         }
-                        var sizes = result.Where(z => z.ParentCode == excelDto.Code).Select(a => new { a.SizeCode, a.D1Pos, a.D2Pos, a.D3Pos }).Distinct().ToList();
+                        childrenByParentCode.TryGetValue(excelDto.Code, out var sizeChildren);
+                        var sizes = (sizeChildren ?? new List<AppItemExcelDto>())
+                            .Select(a => new { a.SizeCode, a.D1Pos, a.D2Pos, a.D3Pos })
+                            .Distinct()
+                            .ToList();
                         if (sizes != null)
                         {
                             foreach (var sz in sizes)
@@ -6891,7 +6994,10 @@ namespace onetouch.AppItems
                                 {
                                     var sizesList = excelDto.SizeRatioValue.Split('|')[0].Split('~').ToList();
                                     var sizesRatios = excelDto.SizeRatioValue.Split('|')[1].Split('-').ToList();
-                                    var sizesRatio = result.Where(z => z.ParentCode == excelDto.Code).Select(a => new { a.SizeCode, a.D1Pos, a.D2Pos, a.D3Pos }).Distinct().ToList();
+                                    var sizesRatio = (sizeChildren ?? new List<AppItemExcelDto>())
+                                        .Select(a => new { a.SizeCode, a.D1Pos, a.D2Pos, a.D3Pos })
+                                        .Distinct()
+                                        .ToList();
                                     if (sizesRatio != null)
                                     {
                                         foreach (var sz in sizesRatio)
@@ -7077,7 +7183,9 @@ namespace onetouch.AppItems
                     appItemSizeScalesHeader.Dimesion1Name = scaleDim1Name;
                     appItemSizeScalesHeader.ParentId = null;
                     appItemSizeScalesHeader.AppItemSizeScalesDetails = new List<AppItemSizeScalesDetails>();
-                    var childItemsExtraData = result.Where(x => x.ParentCode == excelDto.Code).Select(a => new { a.ExtraAttributes, a.ExtraAttributesValues });
+                    childrenByParentCode.TryGetValue(excelDto.Code, out var childrenForParent);
+                    var childItemsExtraData = (childrenForParent ?? new List<AppItemExcelDto>())
+                        .Select(a => new { a.ExtraAttributes, a.ExtraAttributesValues });
                     List<string> sizeCodes = new List<string>();
                     foreach (var extrAt in childItemsExtraData)
                     {
@@ -7136,7 +7244,9 @@ namespace onetouch.AppItems
                     appItem.ItemSizeScaleHeadersFkList.Add(appItemSizeScalesHeader);
                 }
 
-                var childItems = result.Where(x => x.ParentCode == excelDto.Code);
+                var childItems = childrenByParentCode.TryGetValue(excelDto.Code, out var children)
+                    ? children
+                    : new List<AppItemExcelDto>();
                 bool firstItem = false;
                 foreach (var item in childItems)
                 {
@@ -7213,10 +7323,7 @@ namespace onetouch.AppItems
                     else
                     {
                         if (appChildItem.ItemPricesFkList.Count > 0)
-                        {
-                            await _appItemPricesRepository.DeleteAsync(z => z.AppItemId == appChildItem.Id);
                             appChildItem.ItemPricesFkList = new List<AppItemPrices>();
-                        }
                     }
                     if (string.IsNullOrEmpty(appChildItem.Price.ToString()))
                         appChildItem.Price = 0;
@@ -7304,11 +7411,6 @@ namespace onetouch.AppItems
                     appChildItem.TimeStamp = timeStamp;
                     appChildItem.EntityFk.TimeStamp = timeStamp;
                     appChildItem.TenantOwner = int.Parse(AbpSession.TenantId.ToString());
-                    if (string.IsNullOrEmpty(appChildItem.SSIN))
-                    {
-                        appChildItem.SSIN = await _helper.SystemTables.GenerateSSIN(itemObjectId, ObjectMapper.Map<AppEntityDto>(appChildItem.EntityFk));
-                        appChildItem.EntityFk.SSIN = appItem.SSIN;
-                    }
                     appChildItem.EntityFk.TenantOwner = appItem.TenantOwner;
                     if (appChildItem.Id == 0)
                         appChildItem.EntityFk.EntityExtraData = new List<AppEntityExtraData>();
@@ -7362,7 +7464,7 @@ namespace onetouch.AppItems
                             if (string.IsNullOrEmpty(item.ImageType)) { item.ImageType = "Image"; }
                             if (etx == 0 && !string.IsNullOrEmpty(item.ImageType) && item.Images != null && item.Images.Count > 0)
                             {
-                                var attachCategory = attachmentsCategories.Where(r => r.Code.ToUpper() == item.ImageType.ToUpper()).FirstOrDefault();
+                                attachmentsCategoriesByCode.TryGetValue(item.ImageType, out var attachCategory);
                                 var defaultImage = item.Images.Where(x => x.ImageFileName.ToLower().Contains("_default") && x.ImageGuid != null).FirstOrDefault();
 
                                 foreach (var img in item.Images)
@@ -7445,115 +7547,10 @@ namespace onetouch.AppItems
                     restAttributteValues.Add(secondAttributteValues);
 
                     secondAttributteValues = new List<AppItemExtraDto>();
-                    //Fix Extra
-                    using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
-                    {
-                        var childEntity = appChildItem.EntityFk;
-                        var sizeExtraAtt = childEntity.EntityExtraData.Where(z => z.AttributeId == 105).FirstOrDefault();
-                        if (sizeExtraAtt != null)
-                        {
-                            var sizeExtra = await _appEntityRepository.GetAll().Include(z => z.EntityExtraData).Where(z => z.Code == sizeExtraAtt.AttributeCode
-                            && z.EntityObjectTypeCode == "SIZE" && (z.TenantId == AbpSession.TenantId || z.TenantId == null)).FirstOrDefaultAsync();
-                            if (sizeExtra != null)
-                            {
-                                var sizeNRF = sizeExtra.EntityExtraData.Where(z => z.AttributeId == 36).FirstOrDefault();
-                                if (sizeNRF != null && !string.IsNullOrEmpty(sizeNRF.AttributeValue))
-                                {
-                                    var colorNRFv = childEntity.EntityExtraData.Where(z => z.AttributeId == 206).FirstOrDefault();
-                                    if (colorNRFv != null && string.IsNullOrEmpty(colorNRFv.AttributeValue)) colorNRFv.AttributeValue = sizeNRF.AttributeValue;
-                                }
-                                var sizeMarketplace = sizeExtra.EntityExtraData.Where(z => z.AttributeId == 35).FirstOrDefault();
-                                if (sizeMarketplace != null && !string.IsNullOrEmpty(sizeMarketplace.AttributeValue))
-                                {
-                                    var sizeMarketplacev = childEntity.EntityExtraData.Where(z => z.AttributeId == 205).FirstOrDefault();
-                                    if (sizeMarketplacev != null && string.IsNullOrEmpty(sizeMarketplacev.AttributeValue)) sizeMarketplacev.AttributeValue = sizeMarketplace.AttributeValue;
-                                }
-                            }
-                        }
-                        var colorExtraAtt = childEntity.EntityExtraData.Where(z => z.AttributeId == 101).FirstOrDefault();
-                        if (colorExtraAtt != null)
-                        {
-                            var colorExtra = await _appEntityRepository.GetAll().Include(z => z.EntityExtraData)
-                                .Include(z => z.EntityAttachments).ThenInclude(z => z.AttachmentFk)
-                                .Where(z => z.Code == colorExtraAtt.AttributeCode && z.EntityObjectTypeCode == "COLOR" && (z.TenantId == AbpSession.TenantId || z.TenantId == null)).FirstOrDefaultAsync();
-                            if (colorExtra != null)
-                            {
-                                //P-SII-20250522.0001 [Begin]
-                                // update the color name if mathes the colors lookup
-                                colorExtraAtt.AttributeValue = colorExtra.Name;
-                                //P-SII-20250522.0001 [End]
-
-                                if (colorExtra.EntityAttachments != null && colorExtra.EntityAttachments.Count > 0 && !string.IsNullOrEmpty(colorExtra.EntityAttachments[0].AttachmentFk.Attachment))
-                                {
-                                    var colorImage = childEntity.EntityExtraData.Where(z => z.AttributeId == 202).FirstOrDefault();
-                                    if (colorImage != null && string.IsNullOrEmpty(colorImage.AttributeValue))
-                                    {
-                                        if (colorExtra.EntityAttachments[0].AttachmentFk.TenantId != AbpSession.TenantId)
-                                            MoveFile(colorExtra.EntityAttachments[0].AttachmentFk.Attachment, colorExtra.EntityAttachments[0].AttachmentFk.TenantId, AbpSession.TenantId);
-                                        colorImage.AttributeValue = colorExtra.EntityAttachments[0].AttachmentFk.Attachment;
-                                    }
-                                }
-                                var colorHex = colorExtra.EntityExtraData.Where(z => z.AttributeId == 39).FirstOrDefault();
-                                if (colorHex != null && !string.IsNullOrEmpty(colorHex.AttributeValue))
-                                {
-                                    var colorHexa = childEntity.EntityExtraData.Where(z => z.AttributeId == 201).FirstOrDefault();
-                                    if (colorHexa != null && string.IsNullOrEmpty(colorHexa.AttributeValue)) colorHexa.AttributeValue = colorHex.AttributeValue;
-                                }
-
-                                var colorNRF = colorExtra.EntityExtraData.Where(z => z.AttributeId == 38).FirstOrDefault();
-                                if (colorNRF != null && !string.IsNullOrEmpty(colorNRF.AttributeValue))
-                                {
-                                    var colorNRFv = childEntity.EntityExtraData.Where(z => z.AttributeId == 204).FirstOrDefault();
-                                    if (colorNRFv != null && string.IsNullOrEmpty(colorNRFv.AttributeValue)) colorNRFv.AttributeValue = colorNRF.AttributeValue;
-                                }
-                                var colorSch = colorExtra.EntityExtraData.Where(z => z.AttributeId == 37).FirstOrDefault();
-                                if (colorSch != null && !string.IsNullOrEmpty(colorSch.AttributeValueId.ToString()))
-                                {
-                                    var colorSchv = childEntity.EntityExtraData.Where(z => z.AttributeId == 203).FirstOrDefault();
-                                    if (colorSchv != null && string.IsNullOrEmpty(colorSchv.AttributeValue)) colorSchv.AttributeValue = colorSch.AttributeValueId.ToString();
-                                }
-                            }
-
-                        }
-                    }
-                    //Fix Extra
                     if (appChildItem.Id == 0)
                         appItem.ParentFkList.Add(appChildItem);
 
                 }
-                #region concatenate variation lists
-                string variation = "";
-
-
-                if (excelDto.ExtraAttributes != null && excelDto.ExtraAttributes.Count > 0)
-                {
-                    variation = string.Join("|", attributteNames.Distinct()) + ";" + string.Join("|", attributteIDs.Distinct()) + ";" +
-                        string.Join("|", firstAttributteValues.Distinct()) + ";" + string.Join("|", firstAttributteImageDefaults) + ";";
-                }
-
-                if (restAttributteValues != null && restAttributteValues.Count > 0)
-                {
-                    var restLists = restAttributteValues.Distinct().SelectMany(r => r).ToList();
-                    string restValues = "";
-                    int cntAtt = 0;
-                    foreach (var attributteIDloop in attributteIDs)
-                    {
-                        if (cntAtt == 0)
-                        {
-                            cntAtt++;
-                            continue;
-                        }
-                        string attributteID = attributteIDloop.Split(',')[0];
-                        var attributeList = restLists.Where(r => r.Id.ToString() == attributteID).Select(r => r.Value + "," + r.ParentCode.ToString()).ToList();
-                        if (attributeList != null && attributeList.Count > 0)
-                        { restValues = restValues + string.Join("|", attributeList.Distinct()) + ";"; }
-                        cntAtt++;
-                    }
-                    variation = variation + restValues;
-                }
-
-                appItem.Variations = variation;
-                #endregion concatenate variation lists
                 if (appItem.SycIdentifierId == null)
                     appItem.SycIdentifierId = defIdentfier;
 
@@ -7589,7 +7586,6 @@ namespace onetouch.AppItems
             }
 
             #endregion send notification to current user
-
 
             return excelResultsDTO.ExcelLogDTO;
         }   //public async Task<ExcelResultsDTO> ValidateExcel(string guidFile, string[] imagesList)
