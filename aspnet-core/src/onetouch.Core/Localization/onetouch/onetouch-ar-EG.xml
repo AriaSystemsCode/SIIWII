@@ -1808,5 +1808,11 @@
 		<text name="Post">موضوع  </text>
 		<text name="Portal Settings">إعدادات المنفذ  </text>
 		<text name="IsDefault">افتراضي </text>
+		<text name="Orientation">الاتجاه </text>
+		<text name="SelectOrientationOptions">اختر خيارات الاتجاه </text>
+			<text name="Logo">شعار</text>
+		<text name="Banner">بانر</text>
+		<text name="Portrait">عمودي</text>
+		<text name="Landscape">أفقي</text>
   </texts>
 </localizationDictionary>
