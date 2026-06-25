@@ -42,7 +42,7 @@
             <app-multi-selection-filter
         #CountryFilter
         [filterMetaData]="countryFilterMetaData"
-        [formContol]="filterForm.controls.countries"
+       [formContol]="filterForm.get('countries')"
         [title]="'Countries' | localize"
         [showSearchBox]="true"
         (filterText)="onLookupSearch($event, 'country', CountryFilter)"
