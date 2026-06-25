@@ -9,12 +9,12 @@
                     <app-seller-data></app-seller-data>
                 </div>
                 <div class="col-md-12">
-                    <div class="d-flex align-items-center main-c ">
-                        <div class="share">
+                    <div class="d-flex align-items-center main-c flex-wrap">
+                        <div class="share toolbar-group toolbar-group-share">
                             <p-dropdown [options]="sharingOptions" [(ngModel)]="seletedOption" optionLabel="label"
                                 class="shares" (onChange)="handleSharingLevelsOptions($event)"></p-dropdown>
                         </div>
-                        <div class="sarch d-flex align-items-center justify-content-center" style="gap: 7px">
+                        <div class="sarch d-flex align-items-center Ajustify-content-center toolbar-group toolbar-group-search">
 
                             <span class="p-input-icon-right group-srch">
                                 <i class="pi pi-search"></i>
@@ -42,7 +42,7 @@
 
                     </div>
                 </div>
-                <div *ngIf="!isFilterHidden " class="col-lg-3 col-5 my-2 text-dark pr-0">
+                <div *ngIf="!isFilterHidden " class="col-xl-3 col-lg-4 col-md-5 col-12 my-2 text-dark pr-0 product-filters-col">
                     <app-product-filters [isSellerIdExists]="isSellerIdExists"
                         (handleCatalogSelections)="selectCatalog($event)"
                         (handledeDratmentsTreeSelections)="selectDepartment($event)"
@@ -60,12 +60,12 @@
 
                 </div>
 
-                <div [ngClass]="[
-                !isFilterHidden? 'col-lg-9 col-7' : 'col-md-12'
-              ]">
+                                <div [ngClass]="[
+                                !isFilterHidden? 'col-xl-9 col-lg-8 col-md-7 col-12' : 'col-md-12'
+                            ]" class="products-content-col">
                     <div class="row">
                         <div class="my-2" [ngClass]="
-                                !isFilterHidden ? 'col-6 col-lg-3 ' : 'col-md-2'
+                                                                !isFilterHidden ? 'col-xl-4 col-lg-6 col-md-6 col-sm-6 col-12' : 'col-xl-2 col-lg-3 col-md-4 col-sm-6 col-12'
                             " *ngFor="let product of items">
                             <app-prodcut-card [currency]="currency" [product]="product.appItem" [productCard]="product"
                                 [sellerSSIN]="sellerSSIN" [buyerSSIN]="buyerSSIN" [isSellerIdExists]="isSellerIdExists"
@@ -73,8 +73,7 @@
                         </div>
                     </div>
 
-                    <p *ngIf="items?.length === 0 && (fromMarketAcoount)" class="text-center mx-auto mt-5 pt-5"
-                        style="margin-top: 150px !important;">
+                    <p *ngIf="items?.length === 0 && (fromMarketAcoount)" class="text-center mx-auto mt-5 pt-5 no-data-placeholder">
                         <img src="../../../../../../assets/placeholders/fluent_alert.png" class="mr-2" alt="No Data">
                         <span class="noDataTxt">{{'NoDataFound...' | localize}} </span>
                     </p>
@@ -101,12 +100,12 @@
     <div class="container-fluid">
         <div class="quickFilters">
 
-            <span class="p-input-icon-right " style="width: 40%;">
+            <span class="p-input-icon-right mobile-search-span">
                 <i class="pi pi-search"></i>
                 <input type="text" placeholder="Search" pInputText class="w-100" [(ngModel)]="searchInput"
                     (keyup)="handleProductSearchText()" />
             </span>
-            <button style="width: 60%;" (click)="openFiltersDialog('Shared With Me and Public')" class="filter-btn">
+            <button (click)="openFiltersDialog('Shared With Me and Public')" class="filter-btn mobile-filter-btn">
                 {{'SharedWithMeAndPublic' | localize}}
             </button>
         </div>
@@ -126,7 +125,7 @@
         </div>
         <!-- list All products -->
         <div class="row">
-            <div class="col-6 col-md-4 my-2" *ngFor="let product of items">
+            <div class="col-sm-6 col-12 my-2" *ngFor="let product of items">
                 <app-prodcut-card [currency]="currency" [product]="product.appItem" [productCard]="product"
                     [sellerSSIN]="sellerSSIN" [buyerSSIN]="buyerSSIN" [showMsrP]="showMsrP"></app-prodcut-card>
             </div>
@@ -141,7 +140,7 @@
 </div>
 
 <!-- mobile filters dialog -->
-<p-dialog [style]="{ width: '40vw' }" [breakpoints]="{ '960px': '75vw', '640px': '97vw' }" [baseZIndex]="10000"
+<p-dialog styleClass="mobile-filters-dialog" [breakpoints]="{ '960px': '75vw', '640px': '97vw' }" [baseZIndex]="10000"
     [modal]="true" [(visible)]="displayFitlers" [draggable]="false" [closable]="true" position="bottom">
     <!-- sharing option filters -->
     <div class="flex flex-column gap-3" *ngIf="filterType === 'Shared With Me and Public'">
@@ -154,7 +153,7 @@
     </div>
 
     <!-- currency Filters -->
-    <div class="flex flex-column gap-3" style="overflow-y: scroll; height: 200px"
+    <div class="flex flex-column gap-3 currency-list"
         *ngIf="filterType === 'Select Currency'">
         <div *ngFor="let currency of currencies"
             class="field-checkbox d-flex justify-content-between align-items-md-start border-bottom py-3">

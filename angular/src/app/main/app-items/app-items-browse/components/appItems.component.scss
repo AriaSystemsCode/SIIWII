@@ -214,6 +214,42 @@ button {
     z-index: 1040;
 }
 
+.selection-bar {
+    left: 0;
+    right: 0;
+    width: 100% !important;
+
+    .selection-bar-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+}
+
+.list-toolbar-row {
+    row-gap: 12px;
+}
+
+.toolbar-group {
+    min-width: 0;
+}
+
+.toolbar-group-search {
+    .kt-input-icon,
+    #generalSearch {
+        width: 100%;
+    }
+}
+
+.results-sort-bar {
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.sortDroD {
+    margin-inline-start: auto;
+}
+
 
 @media (min-width: 1024px) {
     .mgLtrtop {
@@ -236,20 +272,80 @@ button {
         width: 42.5% !important;
     }
 
+    .toolbar-group-filter {
+        flex: 1 1 260px;
+    }
+
+    .toolbar-group-search {
+        flex: 1 1 320px;
+    }
+
+    .toolbar-group-create,
+    .toolbar-group-actions {
+        flex: 0 1 auto;
+    }
+
 }
-  @media only screen and (min-width: 575px) and (max-width: 1024px) {
-        .list-toolbar-search {
-        max-width: 20% !important;
+
+@media only screen and (min-width: 575px) and (max-width: 1024px) {
+    .list-toolbar-search {
+        max-width: 100% !important;
+    }
+}
+
+@media (max-width: 768px) {
+    .list-toolbar-row {
+        margin-left: 0 !important;
     }
 
-    @media (max-width: 575px) {
-      .list-toolbar-search {
-        max-width: 110% !important;
+    .mainFilterToggle,
+    .list-toolbar-search,
+    .searchCta,
+    .toolbar-group {
+        width: 100% !important;
+        max-width: 100% !important;
     }
 
-       .dev-logo-img{
-        height: 250px !important;
+    .toolbar-group-create,
+    .toolbar-group-actions {
+        justify-content: flex-start !important;
+        flex-wrap: wrap;
     }
+
+    .selection-bar {
+        top: 60px;
+    }
+
+    .selection-bar .h4,
+    .selection-bar .selection-bar-actions {
+        width: 100%;
+    }
+
+    .selection-btns,
+    .btn-sync,
+    .btn-applySelection {
+        padding: 10px !important;
+    }
+
+    .sortDroD {
+        width: 100%;
+        margin-inline-start: 0;
+        padding: 8px 12px !important;
+    }
+
+    .list-toolbar-data-summary {
+        white-space: normal;
+    }
+}
+
+@media (max-width: 575px) {
+    .dev-logo-img {
+        height: 100px !important;
+    }
+
+    .sortDroD .dropdown-toggle {
+        width: 100%;
+        text-align: left;
     }
 }
 @media (min-width: 577px) {

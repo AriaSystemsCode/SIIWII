@@ -23,7 +23,7 @@
                             | localize}}</button>
                     </div>
                 </div>
-                <div class="d-flex justify-content-between align-items-center selection-bar-actions gap-4">
+                <div class="d-flex justify-content-between align-items-center selection-bar-actions selection-bar-primary-actions gap-4">
                     <div>
                         <button class="selection-btns" (click)="bulkShareItems()"><i class="fa fa-share-alt"
                                 aria-hidden="true"></i>
@@ -77,8 +77,8 @@
                         </div>
                         <div class="row px-lg-3 px-2">
                             <div class="col-12 list-toolbar">
-                                <div class="row mb-3 justify-content-between pt-2 align-items-center" [ngClass]="fromCta ? 'ml-2':''">
-                                    <div class="mainFilterToggle">
+                                <div class="row mb-3 justify-content-between pt-2 align-items-center list-toolbar-row" [ngClass]="fromCta ? 'ml-2':''">
+                                    <div class="mainFilterToggle toolbar-group toolbar-group-filter">
                                         <div class="btn-group dropdown list-toolbar-dropdown w-100" dropdown
                                             *ngIf="showMainFiltersOptions">
                                             <button class="dropdown-toggle btn btn-sm font-weight-normal toogleBtn"
@@ -111,7 +111,7 @@
 
 
                                     <div
-                                        class="d-flex justify-content-center align-items-center  mb-md-0 " [ngClass]="fromCta ? 'searchCta':'list-toolbar-search'">
+                                        class="d-flex justify-content-center align-items-center mb-md-0 toolbar-group toolbar-group-search" [ngClass]="fromCta ? 'searchCta':'list-toolbar-search'">
                                         <div class="kt-input-icon kt-input-icon--left">
                                             <input type="text" formControlName="search" class="form-control"
                                                 [placeholder]="'SearchWithThreeDot' | localize" id="generalSearch">
@@ -123,7 +123,7 @@
                                         </div>
                                     </div>
 
-                                    <div class="d-flex justify-content-center align-items-center mb-md-0 gap-4"
+                                    <div class="d-flex justify-content-center align-items-center mb-md-0 gap-4 toolbar-group toolbar-group-create"
                                         *ngIf="canAdd">
 
                                         <a class=" btn-primary font-weight-normal text-center list-toolbar-btn selection-btns bgPurple text-white border-none d-flex align-items-center"
@@ -145,7 +145,7 @@
                                         </a>
                                     </div>
 
-                                    <div class="d-flex justify-content-center align-items-center  mb-md-0 gap-4">
+                                    <div class="d-flex justify-content-center align-items-center mb-md-0 gap-4 toolbar-group toolbar-group-actions">
                                         <a  [title]="'Filter' | localize"
                                             class="icon-box  font-weight-normal text-center text-primary toolbar-btn d-md-none d-block"
                                             (click)="toggleFilterOverlay()">
@@ -171,7 +171,7 @@
                                     [filtersFlags]="filtersFlags"></app-items-filters>
                             </div>
                             <div class="col-lg-9 col-md-7 col-12 d-flex flex-column  app-items-container thin-scroll">
-                                <div class="d-flex justify-content-between align-items-center">
+                                <div class="d-flex justify-content-between align-items-center results-sort-bar">
                                     <div class="font-weight-normal list-toolbar-data-summary"
                                         [ngStyle]="{ visibility : loading ? 'hidden' : 'visible' }">
                                         {{ items.length }}
@@ -179,7 +179,7 @@
                                         {{ primengTableHelper?.totalRecordsCount }} {{"Results" | localize }}
                                     </div>
 
-                                    <div class="bg-white  sortDroD py-2 px-4">
+                                    <div class="bg-white sortDroD py-2 px-4">
                                         <div class="btn-group dropdown list-toolbar-dropdown" dropdown>
                                             <button class="dropdown-toggle btn-sm font-weight-normal p-0 "
                                                 [ngClass]="fromCta ?'handlWM':'defaultW'" type="button" dropdownToggle>
@@ -211,8 +211,8 @@
                                     </div>
                                 </div>
                                 <div class="row">
-                                    <div *ngFor="let item of items;index as i" class="mb-5 p-0 " [ngClass]="{ 'col-md-12 single-item-per-row-layout': singleItemPerRowMode  ,
-                                'col-lg-3 col-6 p-0': !singleItemPerRowMode}">
+                                    <div *ngFor="let item of items;index as i" class="mb-5 p-0" [ngClass]="{ 'col-md-12 single-item-per-row-layout': singleItemPerRowMode,
+                                'col-xl-3 col-lg-4 col-md-6 col-12 p-0': !singleItemPerRowMode}">
                                         <app-item-card [item]="item" [filterForm]="filterForm"
                                             [actionsMenuFlags]="actionsMenuFlags" [statusesFlags]="statusesFlags"
                                             [browseMode]="browseMode" [singleItemPerRowMode]="singleItemPerRowMode"
