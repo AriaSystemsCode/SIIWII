@@ -241,7 +241,7 @@ private sellerCompanySearchTimer: any;
                     this.roleDdval = this.tenantRoleService.poRolesOptions.filter(role => role.code !== 2)[0];
                 }
             }
-            this.handleRoleChange({ value: this.roleDdval });
+            this.handleRoleChange({ value: this.l(this.roleDdval)  });
         })
     }
     getBranches(accountSSIN, objectToChangeName) {
