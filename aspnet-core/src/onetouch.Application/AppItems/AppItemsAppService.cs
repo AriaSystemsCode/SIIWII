@@ -7414,6 +7414,11 @@ namespace onetouch.AppItems
                     appChildItem.EntityFk.TenantOwner = appItem.TenantOwner;
                     if (appChildItem.Id == 0)
                         appChildItem.EntityFk.EntityExtraData = new List<AppEntityExtraData>();
+
+                    var lookupList = extrattributesLists
+                                    .FirstOrDefault(x => x.Key.Code == "COLOR")
+                                    .Value;
+
                     var entityExtraData = new List<AppEntityExtraData>();
                     if (item.ExtraAttributesValues != null)
                     {
@@ -7422,10 +7427,17 @@ namespace onetouch.AppItems
                             if (!item.ExtraAttributes[etx].IsVariation) continue;
 
                             extraAttributesByName.TryGetValue(item.ExtraAttributes[etx].Name, out var AttributeInfoObj);
+                            var colorLookupName = "";
+                            if (item.ExtraAttributes[etx].AttributeId == 101) //Color
+                            {
+                                 colorLookupName = lookupList?
+                                                        .FirstOrDefault(e => e.Code == item.ExtraAttributesValues[etx].Code)?.Label;
+                            }
+
                             AppEntityExtraData extra = new AppEntityExtraData
                             {
                                 AttributeCode = item.ExtraAttributesValues[etx].Code,
-                                AttributeValue = item.ExtraAttributesValues[etx].Value,
+                                AttributeValue = !string.IsNullOrEmpty(colorLookupName)? colorLookupName: item.ExtraAttributesValues[etx].Value,
                                 AttributeValueId = null, // AttributeValueId,
                                 EntityObjectTypeName = item.ExtraAttributes[etx].Name,
                                 AttributeId = item.ExtraAttributes[etx].AttributeId,
