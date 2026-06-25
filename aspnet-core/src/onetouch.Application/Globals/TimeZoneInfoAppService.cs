@@ -39,19 +39,42 @@ namespace onetouch.Globals
 
 
         }
-        [AbpAllowAnonymous]
-        public async  Task<List<DisplayNameValueDto>> GetTimeZonesList()
-        {
-            IReadOnlyCollection<TimeZoneInfo> zones = TimeZoneInfo.GetSystemTimeZones();
+        //[AbpAllowAnonymous]
+        //public async  Task<List<DisplayNameValueDto>> GetTimeZonesList()
+        //{
+        //    IReadOnlyCollection<TimeZoneInfo> zones = TimeZoneInfo.GetSystemTimeZones();
 
-            List<DisplayNameValueDto> result = new List<DisplayNameValueDto>();
-            foreach (var zone in zones)
-            {
-                result.Add(new DisplayNameValueDto { label = zone.DisplayName.ToString(), Value = zone.Id });
-            }
+        //    List<DisplayNameValueDto> result = new List<DisplayNameValueDto>();
+        //    foreach (var zone in zones)
+        //    {
+        //        result.Add(new DisplayNameValueDto { label = zone.DisplayName.ToString(), Value = zone.Id });
+        //    }
+        //    return result;
+        //}
+        [AbpAllowAnonymous]
+        public async Task<List<DisplayNameValueDto>> GetTimeZonesList()
+        {
+            var result = TimeZoneInfo.GetSystemTimeZones()
+                .Select(zone =>
+                {
+                    var offset = zone.GetUtcOffset(DateTime.UtcNow);
+
+                    string sign = offset >= TimeSpan.Zero ? "+" : "-";
+
+                    string currentOffset =
+                        $"UTC{sign}{Math.Abs(offset.Hours):00}:{Math.Abs(offset.Minutes):00}";
+
+                    return new DisplayNameValueDto
+                    {
+                        label = $"({currentOffset}) {zone.StandardName}",
+                        Value = zone.Id
+                    };
+                })
+                .OrderBy(x => x.label)
+                .ToList();
+
             return result;
         }
 
-        
     }
 }
