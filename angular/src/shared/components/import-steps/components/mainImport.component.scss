@@ -1,0 +1,84 @@
+@media (max-width: 768px) {
+	:host {
+		display: block;
+		width: 100%;
+	}
+
+	:host ::ng-deep .modal-dialog.modal-xl,
+	:host ::ng-deep .modal-dialog.modal-lg,
+	:host ::ng-deep .modal-dialog {
+		width: 96% !important;
+		max-width: 96% !important;
+		margin: 0.5rem auto !important;
+	}
+
+	:host ::ng-deep .modal-content {
+		max-width: 100% !important;
+	}
+
+	:host ::ng-deep .modal-header-custom {
+		padding: 14px 12px !important;
+		flex-wrap: wrap;
+		gap: 0.5rem;
+	}
+
+	:host ::ng-deep .btn,
+	:host ::ng-deep ._Btn,
+	:host ::ng-deep .Next-Btn,
+	:host ::ng-deep .next-btn,
+	:host ::ng-deep .browse-btn,
+	:host ::ng-deep .select-btn,
+	:host ::ng-deep .confirm-btn,
+	:host ::ng-deep .cancle-btn,
+	:host ::ng-deep .cancleUpload-btn,
+	:host ::ng-deep .importBtn {
+		max-width: 100%;
+	}
+}
+
+@media (max-width: 576px) {
+	:host {
+		display: block;
+		width: 100%;
+	}
+
+	:host ::ng-deep .modal-dialog.modal-xl,
+	:host ::ng-deep .modal-dialog.modal-lg,
+	:host ::ng-deep .modal-dialog {
+		width: 98% !important;
+		max-width: 98% !important;
+		margin: 0.5rem auto !important;
+	}
+
+	:host ::ng-deep .modal-content {
+		border-radius: 8px;
+	}
+
+	:host ::ng-deep .upload-modal {
+		width: 94% !important;
+		left: 3% !important;
+		transform: none !important;
+	}
+
+	:host ::ng-deep .modal-header-custom {
+		padding: 12px 10px !important;
+	}
+
+	:host ::ng-deep .btn,
+	:host ::ng-deep ._Btn,
+	:host ::ng-deep .Next-Btn,
+	:host ::ng-deep .next-btn,
+	:host ::ng-deep .browse-btn,
+	:host ::ng-deep .select-btn,
+	:host ::ng-deep .confirm-btn,
+	:host ::ng-deep .cancle-btn,
+	:host ::ng-deep .cancleUpload-btn,
+	:host ::ng-deep .importBtn {
+		width: 100% !important;
+		margin-right: 0 !important;
+	}
+
+	:host ::ng-deep .table-scroll-container {
+		max-height: 60vh;
+	}
+}
