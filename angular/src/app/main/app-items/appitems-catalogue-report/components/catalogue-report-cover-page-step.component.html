@@ -59,8 +59,11 @@
                                     <span>{{account.name}}</span>
                                 </ng-template>
                             </p-autoComplete>
-                            <img src="../../../../../assets/common/images/Icon2.png" class="frndImg"
-                                [ngStyle]="isArabic ? {'left':'-8px'} : {'right':'-8px'}" />
+                            <img
+                                src="../../../../../assets/common/images/Icon2.png"
+                                class="frndImg"
+                                [ngClass]="isArabic ? 'frnd-img-rtl' : 'frnd-img-ltr'"
+                            />
                         </div>
                     </div>
                 </div>

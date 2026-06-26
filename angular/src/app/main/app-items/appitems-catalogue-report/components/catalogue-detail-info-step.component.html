@@ -165,7 +165,7 @@
                                     <div class="col-md-6 col-10 titlsSty">
                                         {{ "ShowSpecialPrice" | localize }}
                                     </div>
-                                    <div class="col-md-6 col-2 d-flex  align-items-center" style="gap:20px;">
+                                    <div class="col-md-6 col-2 d-flex align-items-center special-price-switch-wrap">
                                         <p-inputSwitch [(ngModel)]="printInfoParam.showSpecialPrice" name="showPrice"
                                             (onChange)="onChangeSpecialPrice($event)"></p-inputSwitch>
                                         <div class="w-75 d-md-block d-none">
@@ -188,7 +188,7 @@
                                 <div class=" row col-md-6 col-12 mb-3 ml-1  d-flex flex-column pr-0">
                                     <p class="titlsSty">{{ "SortBy" | localize }}</p>
                                     
-                                    <div class="mt-2 " style="width: 90%;">
+                                    <div class="mt-2 details-sort-dropdown-wrap">
                                         <p-dropdown [options]="lineSheetDetailPageSort" placeholder="None"
                                             styleClass="linesheet-price form-control bg-white" name="detailsSortyBy"
                                             [(ngModel)]="detailPageSort" (onChange)="onChangeDetailPageSort($event)">

@@ -2,3 +2,38 @@
     width: 800px;
     max-height: 90vh;
 }
+
+.modal-content-rounded {
+    border-radius: 12px;
+}
+
+.modal-close-btn {
+    position: absolute;
+    right: 0;
+    top: 8px;
+}
+
+.pricing-cancel-btn {
+    border-radius: 5px;
+    border: 1px solid #ebebeb !important;
+    color: #4a0d4a !important;
+}
+
+.pricing-save-btn {
+    border-radius: 5px;
+    background-color: #4a0d4a !important;
+    border: #4a0d4a !important;
+    color: #fff;
+}
+
+@media (max-width: 992px) {
+    .modal-content {
+        width: 100%;
+        max-width: 100%;
+    }
+
+    .modal-footer {
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+}

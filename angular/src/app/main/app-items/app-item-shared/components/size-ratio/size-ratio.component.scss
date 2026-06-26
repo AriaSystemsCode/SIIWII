@@ -35,3 +35,37 @@
 .dimension-input{
     text-align: center;
 }
+
+.ratio-actions {
+    gap: 20px;
+}
+
+.ratio-action-btn {
+    border: none !important;
+}
+
+.ratio-action-btn-primary {
+    background-color: #4a0d4a !important;
+    color: #fff !important;
+}
+
+.ratio-action-btn-light {
+    background-color: #eeeeee !important;
+    color: #1b101b;
+}
+
+.ratio-action-btn-warning {
+    background-color: #eba461 !important;
+    color: #fff !important;
+}
+
+@media (max-width: 992px) {
+    .sizescale-name {
+        width: 100%;
+    }
+
+    .ratio-actions {
+        margin-top: 16px;
+        gap: 12px;
+    }
+}

@@ -1,13 +1,13 @@
 <div bsModal #bsModal="bs-modal" class="modal fade" tabindex="-1" role="dialog"
     aria-labelledby="selectListModal" aria-hidden="true">
     <div class="modal-dialog"  role="document">
-        <div class="modal-content" style="    border-radius: 12px;">
+        <div class="modal-content modal-content-rounded">
             <div class="modal-content-wrapper" >
                 <div class="modal-header flex-column">
                     <h3 class="modal-title text-left font-weight-bold">
                         <span> {{ l("ProductAdvancedPricing") }}</span>
                     </h3>
-                    <button style="position: absolute; right: 0; top: 8px" type="button" class="close mr-2 pt-4"
+                    <button type="button" class="close mr-2 pt-4 modal-close-btn"
                         (click)="cancel()" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -34,13 +34,10 @@
                 </div>
                 <div class="modal-footer">
                     
-                    <button type="button" class="btn  font-weight-bold" (click)="cancel()"   style="border-radius: 5px;
-                    border:1px solid #EBEBEB !important; color: #4A0D4A !important;">
+                    <button type="button" class="btn font-weight-bold pricing-cancel-btn" (click)="cancel()">
                         {{ l("Cancel") }}
                     </button>
-                    <button type="submit" *ngIf="!readOnly" class="btn btn-primar  font-weight-bold" (click)="submit()" [disabled]="!isValid"   style="border-radius: 5px;
-                    background-color: #4A0D4A !important;
-                    border: #4A0D4A !important;color: white;"
+                    <button type="submit" *ngIf="!readOnly" class="btn btn-primar font-weight-bold pricing-save-btn" (click)="submit()" [disabled]="!isValid"
                         >
                         <span>{{ l("Save") }}</span>
                     </button>

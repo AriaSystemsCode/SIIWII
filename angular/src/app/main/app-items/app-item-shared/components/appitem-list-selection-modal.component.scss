@@ -25,11 +25,29 @@
     max-height: 80vh;
     overflow-y: auto;
 }
+
+.modal-close-btn {
+    position: absolute;
+    right: 0;
+    top: 8px;
+}
+
 .list-row {
     transition: all .3s ease-in-out;
     &:hover {
         cursor: pointer;
         background-color: #f0f0f0!important;
         transition: all .3s ease-in-out;
+    }
+}
+
+@media (max-width: 768px) {
+    .create-edit-plus-btn {
+        right: 20px;
+        bottom: 10vh;
+    }
+
+    .modal-content {
+        width: 100%;
     }
 }
