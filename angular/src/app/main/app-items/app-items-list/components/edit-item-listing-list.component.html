@@ -98,7 +98,7 @@
         </div>
 
         <!-- EDIT MODE ACTIONS -->
-        <div class="edit-actions" [ngStyle]="isArabic ? {'gap':'10px'} : ''" *ngIf="!viewMode">
+        <div class="edit-actions" [ngClass]="{ 'rtl-edit-actions-gap': isArabic }" *ngIf="!viewMode">
           <button class="btn btn-success text-capitalize" type="button" (click)="SaveAsDraft()">
             {{ l('SaveAsDraft') }}
           </button>

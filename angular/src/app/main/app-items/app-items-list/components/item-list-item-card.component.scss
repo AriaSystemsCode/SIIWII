@@ -75,3 +75,70 @@ a.btn {
     color: #4A0D4A !important;
     font-weight: 600;
 }
+
+@media (max-width: 992px) {
+    .single-item {
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+    }
+
+    .single-item-body .row.h-100 {
+        row-gap: 0.5rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .single-item {
+        flex-wrap: wrap;
+    }
+
+    .single-item-photo {
+        width: 84px;
+        height: 120px;
+        margin-bottom: 0.5rem;
+    }
+
+    .single-item-body {
+        flex: 0 0 calc(100% - 90px);
+        max-width: calc(100% - 90px);
+    }
+
+    .single-item-body .d-flex.flex-md-column.flex-row.justify-content-around {
+        flex-direction: column !important;
+        align-items: stretch;
+        row-gap: 0.5rem;
+    }
+
+    .single-item-body .text-right {
+        text-align: left !important;
+    }
+
+    .btn-outline-primary {
+        width: 100%;
+    }
+}
+
+@media (max-width: 576px) {
+    .single-item {
+        flex-direction: column;
+    }
+
+    .single-item-photo {
+        width: 100px;
+        height: 141px;
+    }
+
+    .single-item-body {
+        flex: 0 0 100%;
+        max-width: 100%;
+    }
+
+    .single-item-body .row.h-100 > [class*='col-'] {
+        flex: 0 0 100%;
+        max-width: 100%;
+    }
+
+    .single-item-body p {
+        margin-bottom: 0.5rem !important;
+    }
+}
