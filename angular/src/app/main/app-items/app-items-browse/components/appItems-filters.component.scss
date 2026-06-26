@@ -1,0 +1,17 @@
+.wrapper-filters {
+    border-radius: 12px !important;
+    background-color: #ffffff !important;
+    border: 1px solid #eeeeee !important;
+}
+
+@media (max-width: 1024px) {
+    .wrapper-filters {
+        padding: 1rem !important;
+    }
+}
+
+@media (max-width: 768px) {
+    .wrapper-filters {
+        border-radius: 10px !important;
+    }
+}

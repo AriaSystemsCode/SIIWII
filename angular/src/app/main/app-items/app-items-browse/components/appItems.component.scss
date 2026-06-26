@@ -321,6 +321,20 @@ button {
         width: 100%;
     }
 
+    .selection-bar-primary-actions {
+        width: 100%;
+        justify-content: flex-start !important;
+        gap: 8px;
+    }
+
+    .selection-bar-primary-actions > div {
+        width: calc(50% - 4px);
+    }
+
+    .selection-bar-primary-actions button {
+        width: 100%;
+    }
+
     .selection-btns,
     .btn-sync,
     .btn-applySelection {
@@ -346,6 +360,19 @@ button {
     .sortDroD .dropdown-toggle {
         width: 100%;
         text-align: left;
+    }
+
+    .selection-bar {
+        top: 52px;
+    }
+
+    .selection-bar-primary-actions > div {
+        width: 100%;
+    }
+
+    .toolbar-group-actions {
+        width: 100%;
+        justify-content: space-between !important;
     }
 }
 @media (min-width: 577px) {
@@ -509,4 +536,30 @@ button {
 
 .fs-18 {
     font-size: 18px !important;
+}
+
+.selection-counter {
+    color: #4a0d4a !important;
+}
+
+.app-items-main-container {
+    margin-top: 10px;
+}
+
+.app-items-portlet-transparent {
+    background-color: transparent !important;
+}
+
+.search-icon {
+    color: #777777 !important;
+}
+
+@media (max-width: 1024px) {
+    .app-items-main-container {
+        margin-top: 8px;
+    }
+
+    .selection-bar {
+        padding: 0.75rem !important;
+    }
 }

@@ -12,6 +12,7 @@ import { forEach } from 'lodash';
 @Component({
   selector: 'app-items-filters',
   templateUrl: './appItems-filters.component.html',
+    styleUrls: ['./appItems-filters.component.scss'],
 })
 export class AppItemsFiltersComponent extends AppComponentBase implements OnInit, OnChanges {
     @Input() filterForm : FormGroup

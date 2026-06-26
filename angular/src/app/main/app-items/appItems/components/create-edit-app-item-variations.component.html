@@ -1,9 +1,9 @@
 <div [@routerTransition]
-  [ngStyle]="isArabic ? {'padding-top':'150px !important'} : {'padding-top':'unset'}">
+    [ngClass]="{ 'arabic-top-padding': isArabic }">
     <form #ProductVariationForm="ngForm" >
         <div class="kt-content kt-grid__item kt-grid__item--fluid kt-grid kt-grid--hor font-weight-normal">
             <div class="kt-subheader kt-grid__item " >
-                <div [class]="containerClass" style="background-color: #FAFAFAFA;">
+                <div [class]="containerClass" class="header-bg-soft">
                   <div class="kt-subheader__main">
                     <h3 class="kt-subheader__title">
                         {{ 'VariationCombinations' | localize }}
@@ -12,7 +12,7 @@
                     <span class="kt-subheader__desc">
                         <div class="hint">
                             <span class="mr-1">
-                                <i class="bg-warn bg-warning d-inline-flex flaticon2-information rounded-circle text-white" style="color: #F6851D  !important;"></i>
+                                <i class="bg-warn bg-warning d-inline-flex flaticon2-information rounded-circle text-white text-danger"></i>
                             </span>
                             {{ "YouCanEditYourVariationsAndChangeThePriceForEach" | localize }}.
                         </div>
@@ -20,21 +20,17 @@
                   </div>
                   <div class="kt-subheader__toolbar">
                     <div class="kt-subheader__wrapper">
-                        <button type="button" (click)="cancelVariations()" class="btn btn-light cancel text-capitalize mr-4" type="button" style="border-radius: 5px;
-                        background-color: white !important;
-                        border: white !important;color: #4A0D4A !important;">
+                        <button type="button" (click)="cancelVariations()" class="btn btn-light cancel text-capitalize mr-4 action-btn-cancel" type="button">
                             {{ "Cancel" | localize }}
                         </button>
-                        <button class="btn btn-primary text-capitalize" type="button" [disabled]="editVariationsOpend"  (click)="saveVariations()"  style="border-radius: 5px;
-                        background-color: #4A0D4A !important;
-                        border: #4A0D4A !important;color: white;">
+                        <button class="btn btn-primary text-capitalize action-btn-save" type="button" [disabled]="editVariationsOpend"  (click)="saveVariations()">
                             {{  !appItem?.id   ?  ("ApplyVariations" | localize ): ("ApplyChanges" | localize) }}
                         </button>
                     </div>
                 </div>
                 </div>
             </div>
-            <div [class]="containerClass + ' kt-grid__item kt-grid__item--fluid'" >
+            <div [class]="'mt-5 ' + containerClass + ' kt-grid__item kt-grid__item--fluid'" >
                 <div class="kt-portlet kt-portlet--mobile">
                     <div class="kt-portlet__body">
                         <p-accordion >
@@ -70,13 +66,10 @@
                                           {{'NewVariations'  | localize }}
                                         </a>
                                         </div>
-                                        <div class="mb-3 d-flex flex-row" *ngIf="selectedVaritaions.length > 0">
+                                        <div class="mb-3 d-flex flex-row selection-actions-row" *ngIf="selectedVaritaions.length > 0">
                                             <a class="mr-4">{{ "SelectionActions" | localize }}:</a>
                                             <div class="dropdown mr-4" dropdown #dropdown="bs-dropdown" [autoClose]="false"  [insideClick]="false">
-                                                <button type="button" class="btn btn-outline-primary drop-down-btn-without-icon dropdown-toggle font-weight-normal p-2" style="border-radius: 5px;
-                                                background-color: white !important;
-                                                border: 1px solid #4A0D4A !important;
-                                                color: #4A0D4A !important;"
+                                                <button type="button" class="btn btn-outline-primary drop-down-btn-without-icon dropdown-toggle font-weight-normal p-2 drop-down-primary-btn"
                                                     dropdownToggle>
                                                     {{'EditSetPrice' | localize}}
                                                 </button>
@@ -116,26 +109,17 @@
                                                         </div>
                                                     </div>
                                                     <div>
-                                                        <button [disabled]="!priceInput.value" class="btn btn-primary btn-sm text-capitalize mr-2" type="button" (click)="setPrice(priceInput.value,dropdown)" style="border-radius: 5px;
-                                                        background-color: white !important;
-                                                        border: 1px solid #4A0D4A !important;
-                                                        color: #4A0D4A !important;">
+                                                        <button [disabled]="!priceInput.value" class="btn btn-primary btn-sm text-capitalize mr-2 action-btn-cancel" type="button" (click)="setPrice(priceInput.value,dropdown)">
                                                             {{ 'Apply' | localize }}
                                                         </button>
-                                                        <button class="btn btn-outline-primary btn-sm cancel text-capitalize" type="button" (click)="dropdown.hide()" style="border-radius: 5px;
-                                                        background-color: white !important;
-                                                        border: 1px solid #4A0D4A !important;
-                                                        color: #4A0D4A !important;">
+                                                        <button class="btn btn-outline-primary btn-sm cancel text-capitalize action-btn-cancel" type="button" (click)="dropdown.hide()">
                                                             {{ 'Cancel' | localize}}
                                                         </button>
                                                     </div>
                                                 </div>
                                             </div>
                                             <div class="dropdown mr-4" *ngIf="listingMode === undefined && !activeNewVariation && isExistingVariationsSelected()" dropdown #dropdown="bs-dropdown" [autoClose]="true"  [insideClick]="false">
-                                                <button type="button" class="btn btn-outline-primary drop-down-btn-without-icon dropdown-toggle font-weight-normal p-2" style="border-radius: 5px;
-                                                background-color: white !important;
-                                                border: 1px solid #4A0D4A !important;
-                                                color: #4A0D4A !important;"
+                                                <button type="button" class="btn btn-outline-primary drop-down-btn-without-icon dropdown-toggle font-weight-normal p-2 drop-down-primary-btn"
                                                     dropdownToggle>
                                                     {{ "DeleteSelections" | localize }}
                                                 </button>
@@ -155,16 +139,10 @@
                                                         </div>
                                                     </div>
                                                     <div>
-                                                        <button type="button" class="btn btn-primary btn-sm text-capitalize mr-2" (click)="deleteSelectedVariations(dropdown)" style="border-radius: 5px;
-                                                        background-color: white !important;
-                                                        border: 1px solid #4A0D4A !important;
-                                                        color: #4A0D4A !important;">
+                                                        <button type="button" class="btn btn-primary btn-sm text-capitalize mr-2 action-btn-cancel" (click)="deleteSelectedVariations(dropdown)">
                                                             {{ "Yes" | localize }}
                                                         </button>
-                                                        <button class="btn btn-outline-primary btn-sm cancel text-capitalize" type="button" (click)="dropdown.hide()" style="border-radius: 5px;
-                                                        background-color: white !important;
-                                                        border: 1px solid #4A0D4A !important;
-                                                        color: #4A0D4A !important;">
+                                                        <button class="btn btn-outline-primary btn-sm cancel text-capitalize action-btn-cancel" type="button" (click)="dropdown.hide()">
                                                             {{ "Cancel" | localize }}
                                                         </button>
                                                     </div>
@@ -184,7 +162,7 @@
                                             [tableStyle]="{'min-width': '50rem'}">
                                             <ng-template pTemplate="header">
                                                 <tr>
-                                                    <th style="width: 4rem">
+                                                    <th class="w-4rem">
                                                         <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
                                                     </th>
                                                     <th>
@@ -205,7 +183,7 @@
                                                     <th>
                                                         {{ "Photos" | localize }}
                                                     </th>
-                                                    <th class="row mr-5" style="display: ruby;border: 0px !important;">
+                                                    <th class="row mr-5 price-header-cell">
                                                         <div>
                                                             <div class="text-center">
                                                                 {{ "Price" | localize }}
@@ -246,7 +224,7 @@
                                             </ng-template>
                                             <ng-template  pTemplate="body" let-record="$implicit" let-index ="rowIndex">
                                                 <tr [pSelectableRow]="record">
-                                                    <td style="width: 4rem">
+                                                    <td class="w-4rem">
                                                         <!-- <label class="h-100 w-100" [for]="'var_'+index"> -->
                                                             <p-tableCheckbox [inputId]="'var_'+index" [value]="record"></p-tableCheckbox>
                                                         <!-- </label> -->
@@ -392,15 +370,9 @@
                             </p>
                         </div> -->
                         <div class="mb-2 position-relative">
-                            <h6 class="font-weight-bold p-4" style="background-color: #FAFAFAFA;
-                            border-radius: 5px;">{{ "Attributes" | localize }} </h6>
+                            <h6 class="font-weight-bold p-4 section-title-box">{{ "Attributes" | localize }} </h6>
                                     <button [disabled]="shouldDisableCreateVarButton()"
-                                        class="btn btn-primary btn-sm text-capitalize mr-2" type="button" (click)="saveExtraAtrributeSelection()" style="
-                                        position: absolute;
-                                        border-radius: 5px;
-                                        background-color: #4A0D4A !important;
-                                        border: #4A0D4A !important;
-                                        color: white !important;" [ngClass]="isArabic ? 'rtlPos':'ltrPos'">
+                                        class="btn btn-sm text-capitalize mr-2 create-var-btn" type="button" (click)="saveExtraAtrributeSelection()" [ngClass]="isArabic ? 'rtlPos':'ltrPos'">
                                        {{ "Create" | localize }}
                                        {{ variationPossibilities > 0 ? variationPossibilities : ' '  }}
                                        {{ "Variations" | localize }}
@@ -479,14 +451,12 @@
                                
                             </div>
                         </div>
-                        <div *ngIf="activeExtraAttributeIndex > -1 && selectedExtraAttributes" class="extra-attribute-options-wrapper m-2 pb-4 pl-4 pr-4 pt-4" style="    background-color: white;
-                            border: 1px solid #EEEEEEEE;
-                            border-radius: 5px;">
+                        <div *ngIf="activeExtraAttributeIndex > -1 && selectedExtraAttributes" class="extra-attribute-options-wrapper m-2 pb-4 pl-4 pr-4 pt-4 extra-attribute-box">
                             <div class="tab-wrapper size-attr-tabset bg-white p-4" *ngIf="sizeExtraAttrCode == selectedExtraAttributes[activeExtraAttributeIndex].entityObjectTypeCode?.toUpperCase();else valuesSelectionelseTemp">
                                 <tabset>
                                     <tab (deselect)="sizeScalesChanged(sizeScaleComponent.mapMatrixGridToAppSizeScaleDto(),sizeScaleComponent?.sizeScaleForm?.form?.valid)">
                                         <ng-template tabHeading >
-                                            <span class="tab-item pl-4 pr-4 font-weight-bold" style="color: black;">{{'SelectSizes' | localize}}</span>
+                                            <span class="tab-item pl-4 pr-4 font-weight-bold tab-item-dark">{{'SelectSizes' | localize}}</span>
                                         </ng-template>
                                         <app-size-scale
                                             #sizeScaleComponent
@@ -498,7 +468,7 @@
                                     </tab>
                                     <tab >
                                         <ng-template tabHeading>
-                                            <span class="tab-item pl-4 pr-4 font-weight-bold"  style="color: black;">{{'ViewSelectedSizes' | localize}}</span>
+                                            <span class="tab-item pl-4 pr-4 font-weight-bold tab-item-dark">{{'ViewSelectedSizes' | localize}}</span>
                                         </ng-template>
                                         <app-size-scale
                                             #viewSelectedSizesComponent
@@ -510,7 +480,7 @@
                                     </tab>
                                     <tab (selectTab)="showSizeRatio()" >
                                         <ng-template tabHeading>
-                                            <span class="tab-item pl-4 pr-4 font-weight-bold"  style="color: black;">{{'SizeRatio' | localize}}</span>
+                                            <span class="tab-item pl-4 pr-4 font-weight-bold tab-item-dark">{{'SizeRatio' | localize}}</span>
                                         </ng-template>
                                         <app-size-ratio
                                             #sizeRatioComponent
@@ -529,12 +499,10 @@
                                     </span> -->
                                     <span> 
                                         {{ "Selected " | localize }} {{selectedExtraAttributes[activeExtraAttributeIndex].name | localize }}{{"S: "}} 
-                                        <span style="color: #9E9E9E;" *ngIf="selectedExtraAttributes[activeExtraAttributeIndex]?.selectedValues?.length>0"> {{" 'YouHaveBeenSelected'  | localize "}} {{selectedExtraAttributes[activeExtraAttributeIndex]?.selectedValues?.length }} {{selectedExtraAttributes[activeExtraAttributeIndex].name | localize | lowercase }} </span>
+                                        <span class="selected-values-note" *ngIf="selectedExtraAttributes[activeExtraAttributeIndex]?.selectedValues?.length>0"> {{'YouHaveBeenSelected'  | localize }} {{selectedExtraAttributes[activeExtraAttributeIndex]?.selectedValues?.length }} {{selectedExtraAttributes[activeExtraAttributeIndex].name | localize | lowercase }} </span>
                                     </span>
-                                    <input type="text" class="bg-white form-control ml-2" style="width:200px" [placeholder]="('Search' | localize) + ' ' + selectedExtraAttributes[activeExtraAttributeIndex].name" (input)="filterLookup($event)" name="search" >
-                                    <button style="border-radius: 5px;
-                                    background-color: white !important;
-                                    border: 1px solid #EEEEEEEE !important;color: #4A0D4A !important;" class="ml-3 p-3 btn btn-outline-primary font-weight-normal p-2" (click)="openCreateNewAppEntityModal()" *ngIf="selectedExtraAttributes[activeExtraAttributeIndex].allowAddNew" >
+                                    <input type="text" class="bg-white form-control ml-2 search-attr-input" [placeholder]="('Search' | localize) + ' ' + selectedExtraAttributes[activeExtraAttributeIndex].name" (input)="filterLookup($event)" name="search" >
+                                    <button class="ml-3 p-3 btn btn-outline-primary font-weight-normal p-2 action-btn-cancel" (click)="openCreateNewAppEntityModal()" *ngIf="selectedExtraAttributes[activeExtraAttributeIndex].allowAddNew" >
                                         <span class="mr-1">+</span> {{ "Add" | localize }} {{selectedExtraAttributes[activeExtraAttributeIndex].name}}
                                     </button>
                                 </h6>
@@ -556,23 +524,14 @@
                                     >
                                     </p-selectButton> -->
                                     <div class="d-flex flex-row mb-3 w-100" *ngIf="selectedExtraAttributes[activeExtraAttributeIndex]?.displayedSelectedValues?.length">
-                                        <div class="d-flex flex-column justify-content-between m-4 position-relative col-1 m-0 p-0" style="border-radius: 6px;border: 1px solid #EEEEEE;    background-color: white;"
+                                        <div class="d-flex flex-column justify-content-between m-4 position-relative col-1 m-0 p-0 attribute-value-card"
                                             *ngFor="let item of selectedExtraAttributes[activeExtraAttributeIndex].displayedSelectedValues;index as i">
-                                            <div class="d-flex flex-column" style="align-items: center; cursor: pointer;" title="{{item.label}}">
+                                            <div class="d-flex flex-column attribute-value-preview" title="{{item.label}}">
                             
-                                                <div style="
-                                width: 100%;
-                                height: 120px;
-                            " *ngIf="item?.hexaCode"  [ngStyle]="{'background-color': item?.hexaCode}"></div>
-                                                <img *ngIf="!item?.hexaCode && item?.image" style="
-                                width: 100%;
-                                height: 120px;
-                            " [src]="attachmentBaseUrl + '/' + item?.image" onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'" />
+                                                <div class="attribute-value-media" *ngIf="item?.hexaCode"  [ngStyle]="{'background-color': item?.hexaCode}"></div>
+                                                <img *ngIf="!item?.hexaCode && item?.image" class="attribute-value-media" [src]="attachmentBaseUrl + '/' + item?.image" onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'" />
                             
-                            <img *ngIf="!item?.hexaCode && !item?.image" style="
-                                 width: 100%;
-                                height: 120px;
-                            " src="../../../../../assets/placeholders/appitem-placeholder.png" />
+                                                <img *ngIf="!item?.hexaCode && !item?.image" class="attribute-value-media" src="../../../../../assets/placeholders/appitem-placeholder.png" />
                                               
                                                
                                             </div>
@@ -581,8 +540,7 @@
                                                 *Added to lookup
                                             </div> -->
                                             <div class="">
-                                                <div class="btn-group dropdown position-absolute" dropdown container="body" placement='bottom right' style="top: 0;
-                                                right: 0;">
+                                                <div class="btn-group dropdown position-absolute attribute-value-actions" dropdown container="body" placement='bottom right'>
                                                     <button class="dropdown-toggle btn btn-sm btn-action" dropdownToggle>
                                                     </button>
                                                     <ul id="dropdown-alignment" class="dropdown-menu dropdown-action-btn dropdown-menu-right"
@@ -598,7 +556,7 @@
                                             </div>
                                             <div class="d-flex flex-column p-3">
                                                 <span class="pt-1 font-weight-bold"> {{item.code}}</span>
-                                            <span class="pt-1" style="color: #9E9E9E;"> {{item.label | textSubstring:12}}</span>
+                                                <span class="pt-1 item-label-muted"> {{item.label | textSubstring:12}}</span>
                                         </div>
                             
                                         </div>
@@ -610,10 +568,8 @@
                             </ng-template>
                         </div>
                         <div class="mt-4 pl-4 pr-4">
-                            <!-- <button [disabled]="!variationPossibilities  || selectedExtraAttributes?.length  < 2   || !(selectedExtraAttributes?.length  >= 2  && selectedExtraAttributes[0]?.selectedValues?.length >0  && selectedExtraAttributes[1]?.selectedValues?.length >0 ) "
-                                 class="btn btn-primary btn-sm text-capitalize mr-2" type="button" (click)="saveExtraAtrributeSelection()" style="border-radius: 5px;
-                                 background-color: #4A0D4A !important;
-                                 border: #4A0D4A !important;color: white;">
+                               <!-- <button [disabled]="!variationPossibilities  || selectedExtraAttributes?.length  < 2   || !(selectedExtraAttributes?.length  >= 2  && selectedExtraAttributes[0]?.selectedValues?.length >0  && selectedExtraAttributes[1]?.selectedValues?.length >0 ) "
+                                   class="btn btn-primary btn-sm text-capitalize mr-2" type="button" (click)="saveExtraAtrributeSelection()">
                                 {{ "Create" | localize }}
                                 {{ variationPossibilities > 0 ? variationPossibilities : ' '  }}
                                 {{ "Variations" | localize }}
@@ -651,7 +607,7 @@
                     </ng-template>
                 </div>
             </div>
-            <div [class]="containerClass + ' kt-grid__item kt-grid__item--fluid'" >
+            <div [class]="'mt-5 ' + containerClass + ' kt-grid__item kt-grid__item--fluid'" >
                 <div class="kt-portlet kt-portlet--mobile">
                     <div class="kt-portlet__body">
                         <p-accordion>
@@ -694,7 +650,7 @@
                                         </div>
                                     </div>
                                     <div class="col-12 item-photos-body pt-4 pb-5" >
-                                        <div class="col-1" style="border-radius: 10px;">
+                                        <div class="col-1 photo-selector-col">
                                             <!-- <a
                                             class="mr-4 aria-tag p-2"
                                             *ngFor="let attachmentObj of defaultExtraAttrForAttachments?.selectedValuesAttachments | keyvalue"
@@ -717,8 +673,7 @@
                                             (dragleave)="onDragLeave($event)"
                                             (drop)="onDrop($event, i)"
                                        >
-                                                <label *ngIf="!attachment" class="d-flex flex-column justify-content-center h-100 align-items-center" style="border: 1px dashed #DADADA !important;
-    border-radius: 12px !important;" for="variation_file_{{i}}" [ngClass]="activeAttachmentOption.defaultImageIndex == i? 'default-border':'' ">
+                                                <label *ngIf="!attachment" class="d-flex flex-column justify-content-center h-100 align-items-center upload-dropzone" for="variation_file_{{i}}" [ngClass]="activeAttachmentOption.defaultImageIndex == i? 'default-border':'' ">
                                                     <div class="align-items-end d-flex justify-content-center mb-4 upload-image-icons mt-3">
                                                         <!-- <div class="left-icon">
                                                             <i class="fa-photo-video fas" ></i>
@@ -734,8 +689,7 @@
                                                         </div>
                                                     </div>
                                                     <div class="text-center">
-                                                        <p  style="font-weight: bold; color: black;
-    white-space: nowrap;">
+                                                        <p class="attachment-copy">
                                                       {{ 'ChooseFileOrDragDropHere' | localize}}
                                                         </p>
                                                         <!-- <a class="btn btn-primary btn-sm mb-3 upload-btn">
@@ -745,9 +699,9 @@
                                                             <!-- {{ 'YouCanSendUpTo25MBInAttachments' | localize}}. -->
                                                             {{ 'SupportedFormatsAndSize' | localize}}.   
                                                         </p>
-                                                        <p style="color: #F6851D !important;">* {{'ImageAspectRatio16_9' | localize}} </p>
+                                                        <p class="attachment-aspect-note">* {{'ImageAspectRatio16_9' | localize}} </p>
 
-                                                <a class="btn border-0 btn-sm mb-3 upload-btn" style="color: white !important; background-color: #4A0D4A !important;">
+                                                <a class="btn border-0 btn-sm mb-3 upload-btn">
                                                     <!-- {{ 'AddAttachedFile' | localize}} -->
                                                     {{ 'AddAttachment' | localize}}
                                                 </a>
@@ -790,13 +744,10 @@
     
 <!-- [ngClass]="{'d-block' : activeAttachmentOption.defaultImageIndex == i}" -->
                                                     <a  *ngIf="isImageFile(activeAttachmentOption?.entityAttachments[getAttachRealIndex(i)]?.fileName)"
-                                                    class="select-default-image d-block p-2 col-12 text-center"   style="    color: #4A0D4A !important;
-                                                    border: 1px solid #EEEEEEEE !important;
-                                                    border-radius: 12px;" (click)="setDefaultImage(i)">
+                                                    class="select-default-image default-image-link d-block p-2 col-12 text-center" (click)="setDefaultImage(i)">
                                                         <i class="fa" [ngClass]="activeAttachmentOption.defaultImageIndex == i? 'fa-check-square text-success':'fa-square text-grey'"></i>
                                                         {{ "Default Image" | localize }}
-                                                    </a>  <a class="p-2"
-                                                style="position: absolute; bottom: -100px;">
+                                                    </a>  <a class="p-2 visible-marketplace-toggle">
                                                 <label
                                                 [class.is-disabled]="activeAttachmentOption.defaultImageIndex == i"
                                                 class="text-purple d-flex align-items-center cursor-pointer"
