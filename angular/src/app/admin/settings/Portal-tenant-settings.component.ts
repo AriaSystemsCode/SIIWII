@@ -61,6 +61,9 @@ export class PortalTenantSettingsComponent extends AppComponentBase implements O
 @ViewChildren('appdynamicInputs')
 dynamicInputsComponents!: QueryList<dynamicInputs>;
 
+    
+    currentLang: string = 'en';
+    isArabic: boolean = false;
   constructor(
     injector: Injector,
     private _tenantSettingsService: TenantSettingsServiceProxy,
@@ -74,6 +77,8 @@ dynamicInputsComponents!: QueryList<dynamicInputs>;
   }
 
   ngOnInit(): void {
+       this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
+        this.currentLang == 'ar' || this.currentLang == 'ar-EG'  ? this.isArabic = true : this.isArabic = false
     this.stopFormListening=true;
     this.getSettingData()
     this.getAppItemTypeExtraAttributesById()

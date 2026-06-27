@@ -1,6 +1,6 @@
 <div [@routerTransition]>
     <div class="kt-content  kt-grid__item kt-grid__item--fluid kt-grid kt-grid--hor">
-        <div class="kt-subheader kt-grid__item">
+        <div class="kt-subheader kt-grid__item" [ngClass]="isArabic ? 'addMTMob':''">
             <div [class]="containerClass">
                 <div class="kt-subheader__main">
                     <h3 class="kt-subheader__title">
@@ -20,7 +20,7 @@
             </div>
         </div>
         <div [class]="containerClass + ' kt-grid__item kt-grid__item--fluid'">
-            <div class="kt-portlet">
+            <div class=""  [ngClass]="isArabic ? 'addMT body-sec':'kt-portlet'">
                 <div class="kt-portlet__body">
                     <div class="row">
                         <!-- Sidebar -->
