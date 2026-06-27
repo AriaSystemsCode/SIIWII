@@ -11574,6 +11574,7 @@ export class AppEventsServiceProxy {
      * @param appEntityNameFilter (optional) 
      * @param cityFilter (optional) 
      * @param countryCodeFilter (optional) 
+     * @param countryIDFilter (optional) 
      * @param stateFilter (optional) 
      * @param postalFilter (optional) 
      * @param tenantId (optional) 
@@ -11584,7 +11585,7 @@ export class AppEventsServiceProxy {
      * @param maxResultCount (optional) 
      * @return Success
      */
-    getAll(filterType: EventsFilterTypesEnum, filter: string | null | undefined, isOnLineFilter: boolean | null | undefined, isPublishedFilter: boolean | null | undefined, creatorUserIdFilter: number | null | undefined, idFilter: number | null | undefined, entityIdFilter: number | null | undefined, includeAttachments: boolean | undefined, timeZoneFilter: string | null | undefined, maxFromDateFilter: moment.Moment | null | undefined, minFromDateFilter: moment.Moment | null | undefined, maxToDateFilter: moment.Moment | null | undefined, minToDateFilter: moment.Moment | null | undefined, maxFromTimeFilter: moment.Moment | null | undefined, minFromTimeFilter: moment.Moment | null | undefined, maxToTimeFilter: moment.Moment | null | undefined, minToTimeFilter: moment.Moment | null | undefined, privacyFilter: boolean | null | undefined, guestCanInviteFriendsFilter: boolean | null | undefined, locationFilter: string | null | undefined, appEntityNameFilter: string | null | undefined, cityFilter: string | null | undefined, countryCodeFilter: string | null | undefined, stateFilter: string | null | undefined, postalFilter: string | null | undefined, tenantId: number | null | undefined, noOfEventsToReturn: number | null | undefined, filterCondition: string | null | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<PagedResultDtoOfGetAppEventForViewDto> {
+    getAll(filterType: EventsFilterTypesEnum, filter: string | null | undefined, isOnLineFilter: boolean | null | undefined, isPublishedFilter: boolean | null | undefined, creatorUserIdFilter: number | null | undefined, idFilter: number | null | undefined, entityIdFilter: number | null | undefined, includeAttachments: boolean | undefined, timeZoneFilter: string | null | undefined, maxFromDateFilter: moment.Moment | null | undefined, minFromDateFilter: moment.Moment | null | undefined, maxToDateFilter: moment.Moment | null | undefined, minToDateFilter: moment.Moment | null | undefined, maxFromTimeFilter: moment.Moment | null | undefined, minFromTimeFilter: moment.Moment | null | undefined, maxToTimeFilter: moment.Moment | null | undefined, minToTimeFilter: moment.Moment | null | undefined, privacyFilter: boolean | null | undefined, guestCanInviteFriendsFilter: boolean | null | undefined, locationFilter: string | null | undefined, appEntityNameFilter: string | null | undefined, cityFilter: string | null | undefined, countryCodeFilter: string | null | undefined, countryIDFilter: number | null | undefined, stateFilter: string | null | undefined, postalFilter: string | null | undefined, tenantId: number | null | undefined, noOfEventsToReturn: number | null | undefined, filterCondition: string | null | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<PagedResultDtoOfGetAppEventForViewDto> {
         let url_ = this.baseUrl + "/api/services/app/AppEvents/GetAll?";
         if (filterType === undefined || filterType === null)
             throw new Error("The parameter 'filterType' must be defined and cannot be null.");
@@ -11636,6 +11637,8 @@ export class AppEventsServiceProxy {
             url_ += "CityFilter=" + encodeURIComponent("" + cityFilter) + "&";
         if (countryCodeFilter !== undefined && countryCodeFilter !== null)
             url_ += "CountryCodeFilter=" + encodeURIComponent("" + countryCodeFilter) + "&";
+        if (countryIDFilter !== undefined && countryIDFilter !== null)
+            url_ += "CountryIDFilter=" + encodeURIComponent("" + countryIDFilter) + "&";
         if (stateFilter !== undefined && stateFilter !== null)
             url_ += "StateFilter=" + encodeURIComponent("" + stateFilter) + "&";
         if (postalFilter !== undefined && postalFilter !== null)

@@ -127,6 +127,7 @@ namespace onetouch.AppEvents
                             .WhereIf(!string.IsNullOrWhiteSpace(input.StateFilter), e => e.EntityFk.EntityAddresses != null && e.EntityFk.EntityAddresses.Count > 0 && e.EntityFk.EntityAddresses.FirstOrDefault().AddressFk.State.ToUpper().TrimEnd().Contains(input.StateFilter.ToUpper().TrimEnd()))
                             .WhereIf(!string.IsNullOrWhiteSpace(input.PostalFilter), e => e.EntityFk.EntityAddresses != null && e.EntityFk.EntityAddresses.Count > 0 && e.EntityFk.EntityAddresses.FirstOrDefault().AddressFk.PostalCode.ToUpper().TrimEnd().Contains(input.PostalFilter.ToUpper().TrimEnd()))
                             .WhereIf(!string.IsNullOrWhiteSpace(input.CountryCodeFilter), e => e.EntityFk.EntityAddresses != null && e.EntityFk.EntityAddresses.Count > 0 && e.EntityFk.EntityAddresses.FirstOrDefault().AddressFk.CountryCode.ToUpper().TrimEnd().Contains(input.CountryCodeFilter.ToUpper().TrimEnd()))
+                            .WhereIf(input.CountryIDFilter > 0, e => e.EntityFk.EntityAddresses != null && e.EntityFk.EntityAddresses.Count > 0 && e.EntityFk.EntityAddresses.FirstOrDefault().AddressFk.CountryId==input.CountryIDFilter)
                             .Where(e => ( input.FilterType == EventsFilterTypesEnum.MyEvents && e.TenantId == AbpSession.TenantId) || 
                                         ( input.FilterType == EventsFilterTypesEnum.AllEvents || input.FilterType == EventsFilterTypesEnum.UpcommingEvents || input.FilterType == EventsFilterTypesEnum.PriorEvents ) );
 
