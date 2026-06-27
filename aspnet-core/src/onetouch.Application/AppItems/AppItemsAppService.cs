@@ -5223,11 +5223,28 @@ namespace onetouch.AppItems
             foreach (var changedRecord in currentResult.ExcelRecords)
             {
                 AppItemtExcelRecordDTO fullRecord = null;
-                if (changedRecord?.ExcelDto != null && changedRecord.ExcelDto.rowNumber > 0)
-                    fullRecordsByRow.TryGetValue(changedRecord.ExcelDto.rowNumber, out fullRecord);
 
-                if (fullRecord == null && !string.IsNullOrWhiteSpace(changedRecord?.Code))
-                    fullRecord = fullResult.ExcelRecords.FirstOrDefault(x => string.Equals(x.Code, changedRecord.Code, StringComparison.OrdinalIgnoreCase));
+                if (string.Equals(changedRecord?.RecordType, "Image", StringComparison.OrdinalIgnoreCase) &&
+                    !string.IsNullOrWhiteSpace(changedRecord?.ExcelDto?.ImagePreview))
+                {
+                    var changedImageFileName = Path.GetFileName(changedRecord.ExcelDto.ImagePreview);
+                    fullRecord = fullResult.ExcelRecords.FirstOrDefault(x =>
+                        string.Equals(x?.RecordType, "Image", StringComparison.OrdinalIgnoreCase) &&
+                        string.Equals(
+                            Path.GetFileName(x?.ExcelDto?.ImagePreview),
+                            changedImageFileName,
+                            StringComparison.OrdinalIgnoreCase));
+                }
+                else
+                {
+                    if (changedRecord?.ExcelDto != null && changedRecord.ExcelDto.rowNumber > 0)
+                        fullRecordsByRow.TryGetValue(changedRecord.ExcelDto.rowNumber, out fullRecord);
+
+                    if (fullRecord == null && !string.IsNullOrWhiteSpace(changedRecord?.Code))
+                        fullRecord = fullResult.ExcelRecords.FirstOrDefault(x =>
+                            !string.Equals(x?.RecordType, "Image", StringComparison.OrdinalIgnoreCase) &&
+                            string.Equals(x.Code, changedRecord.Code, StringComparison.OrdinalIgnoreCase));
+                }
 
                 if (fullRecord != null)
                 {
