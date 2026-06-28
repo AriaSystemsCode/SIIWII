@@ -43,11 +43,33 @@ import { finalize } from 'rxjs/operators';
       }
     }
 
-      ::ng-deep .align-righ
-      {t .p-datatable .p-datatable-thead > tr > th {
-      text-align: right !important;
+    .alignStart{
+    text-align: start !important ;
     }
-  }
+
+
+    .w-150  {
+    width : 150px ;
+    }
+
+     .wPX100  {
+    width : 100px;
+    }
+
+
+     .w-250  {
+    width : 250px ;
+    }
+
+       .w-130  {
+    width : 130px ;
+    }
+
+      .btn-primary {
+        background-color: #4A0D4A !important;
+        color: #fff !important;
+        border: 1px solid #4A0D4A !important;
+    }
   `]
 })
 export class SubscriptionManagementComponent extends AppComponentBase implements OnInit {

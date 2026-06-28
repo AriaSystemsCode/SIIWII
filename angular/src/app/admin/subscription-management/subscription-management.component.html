@@ -1,6 +1,6 @@
 <div [@routerTransition]>
     <div class="kt-content  kt-grid__item kt-grid__item--fluid kt-grid kt-grid--hor">
-        <div class="kt-subheader kt-grid__item" [ngClass]="isArabic ? 'addMTMob align-right':''">
+        <div class="kt-subheader kt-grid__item" [ngClass]="isArabic ? 'addMTMob':''">
             <div [class]="containerClass">
                 <div class="kt-subheader__main">
                     <h3 class="kt-subheader__title">
@@ -10,7 +10,7 @@
             </div>
         </div>
         <div [class]="containerClass + ' kt-grid__item kt-grid__item--fluid'">
-            <div class=""  [ngClass]="isArabic ? 'addMT body-sec':'kt-portlet'">
+            <div  [ngClass]="isArabic ? 'addMT body-sec':'body-sec mt-lg-5'">
                 <div class="kt-portlet__body p-3">
                     <tabset>
                         <tab heading="{{'SubscriptionInformation' | localize}}">
@@ -20,9 +20,9 @@
 
                                 <div class="form-group row">
                                     <label
-                                        class="col-sm-4 control-label font-weight-bold text-right">{{"Edition" | localize}}</label>
+                                        class="col-sm-4 control-label font-weight-bold" [ngClass]="isArabic ? 'alignStart':''">{{"Edition" | localize}}</label>
                                     <div class="col-sm-8">
-                                        <p *ngIf="tenant.edition">
+                                        <p *ngIf="tenant.edition" [ngClass]="isArabic ? 'alignStart':''">
                                             {{tenant.edition.displayName}}
                                             <span *ngIf="tenant.edition.isFree"
                                                 class="kt-badge kt-badge--success kt-badge--inline">{{"Free" | localize}}</span>
@@ -33,17 +33,17 @@
 
                                 <div class="form-group row">
                                     <label
-                                        class="col-sm-4 control-label font-weight-bold text-right">{{"SubscriptionStartDate" | localize}}</label>
-                                    <div class="col-sm-8">
+                                        class="col-sm-4 control-label font-weight-bold " [ngClass]="isArabic ? 'alignStart':''">{{"SubscriptionStartDate" | localize}}</label>
+                                    <div class="col-sm-8" [ngClass]="isArabic ? 'alignStart':''">
                                         <p>{{ tenant.creationTimeString }}</p>
                                     </div>
                                 </div>
 
                                 <div class="form-group row">
                                     <label
-                                        class="col-sm-4 control-label font-weight-bold text-right">{{"SubscriptionEndDate" | localize}}</label>
+                                        class="col-sm-4 control-label font-weight-bold" [ngClass]="isArabic ? 'alignStart':''">{{"SubscriptionEndDate" | localize}}</label>
                                     <div class="col-sm-8">
-                                        <p *ngIf="tenant.edition">
+                                        <p *ngIf="tenant.edition" [ngClass]="isArabic ? 'alignStart':''">
                                             <span>{{tenant.subscriptionDateString}}</span>
                                         </p>
                                     </div>
@@ -51,7 +51,7 @@
 
                                 <div class="form-group row">
                                     <label class="col-sm-4 control-label"></label>
-                                    <div class="col-sm-8">
+                                    <div class="col-sm-8" [ngClass]="isArabic ? 'alignStart':''">
                                         <a *ngIf="!hasRecurringSubscription() && tenant.edition && !tenant.edition.isFree && !tenant.isInTrialPeriod"
                                             [routerLink]="['/account/extend']"
                                             [queryParams]="{ editionPaymentType: editionPaymentType.Extend}"
@@ -101,34 +101,34 @@
                                     responsiveLayout="stack" [breakpoint]="'960px'" [tableStyle]="{'min-width': '50rem'}">
                                     <ng-template pTemplate="header">
                                         <tr>
-                                            <th style="width: 130px">{{'Invoice' | localize}}</th>
-                                            <th style="width: 150px" pSortableColumn="creationTime">
+                                            <th class="w-130" [ngClass]="isArabic ? 'alignStart':''">{{'Invoice' | localize}}</th>
+                                            <th class="w-150" [ngClass]="isArabic ? 'alignStart':''" pSortableColumn="creationTime">
                                                 {{'ProcessTime' | localize}}
                                                 <p-sortIcon field="creationTime"></p-sortIcon>
                                             </th>
-                                            <th style="width: 150px" pSortableColumn="editionDisplayName">
+                                            <th class="w-150" [ngClass]="isArabic ? 'alignStart':''" pSortableColumn="editionDisplayName">
                                                 {{'Edition' | localize}}
                                                 <p-sortIcon field="editionDisplayName"></p-sortIcon>
                                             </th>
-                                            <th style="width: 150px" pSortableColumn="gateway">
+                                            <th class="w-150" [ngClass]="isArabic ? 'alignStart':''" pSortableColumn="gateway">
                                                 {{'Gateway' | localize}}
                                                 <p-sortIcon field="gateway"></p-sortIcon>
                                             </th>
-                                            <th style="width: 100px" pSortableColumn="amount">
+                                            <th class="wPX100" [ngClass]="isArabic ? 'alignStart':''" pSortableColumn="amount">
                                                 {{'Amount' | localize}}
                                                 <p-sortIcon field="amount"></p-sortIcon>
                                             </th>
-                                            <th style="width: 150px" pSortableColumn="status">
+                                            <th class="w-150" [ngClass]="isArabic ? 'alignStart':''" pSortableColumn="status">
                                                 {{'Status' | localize}}
                                                 <p-sortIcon field="status"></p-sortIcon>
                                             </th>
-                                            <th style="width: 150px" pSortableColumn="paymentPeriodType">
+                                            <th class="w-150" [ngClass]="isArabic ? 'alignStart':''" pSortableColumn="paymentPeriodType">
                                                 {{'Period' | localize}}
                                                 <p-sortIcon field="paymentPeriodType"></p-sortIcon>
                                             </th>
-                                            <th style="width: 100px">{{'DayCount' | localize}}</th>
-                                            <th style="width: 250px;">{{'PaymentId' | localize}}</th>
-                                            <th style="width: 150px" pSortableColumn="invoiceNo">
+                                            <th class="w-150" [ngClass]="isArabic ? 'alignStart':''">{{'DayCount' | localize}}</th>
+                                            <th class="w-250" [ngClass]="isArabic ? 'alignStart':''">{{'PaymentId' | localize}}</th>
+                                            <th class="w-150" [ngClass]="isArabic ? 'alignStart':''" pSortableColumn="invoiceNo">
                                                 {{'InvoiceNo' | localize}}
                                                 <p-sortIcon field="invoiceNo"></p-sortIcon>
                                             </th>
@@ -136,46 +136,46 @@
                                     </ng-template>
                                     <ng-template pTemplate="body" let-record="$implicit">
                                         <tr>
-                                            <td style="width: 130px">
+                                            <td class="w-130" [ngClass]="isArabic ? 'alignStart':''">
                                                 <button type="button" class="btn btn-sm btn-primary"
                                                     (click)="createOrShowInvoice(record.id, record.invoiceNo)">{{'ShowInvoice' | localize}}</button>
                                             </td>
-                                            <td style="width: 150px">
+                                            <td class="w-150" [ngClass]="isArabic ? 'alignStart':''">
                                                 <span class="p-column-title">{{'ProcessTime' | localize}}</span>
                                                 <span
                                                     *ngIf="record.creationTime">{{record.creationTime | momentFormat:'L'}}</span>
                                                 <span *ngIf="!record.creationTime">-</span>
                                             </td>
-                                            <td style="width: 150px">
+                                            <td class="w-150" [ngClass]="isArabic ? 'alignStart':''">
                                                 <span class="p-column-title">{{'Edition' | localize}}</span>
                                                 {{record.editionDisplayName}}
                                             </td>
-                                            <td style="width: 150px">
+                                            <td class="w-150">
                                                 <span class="p-column-title">{{'Gateway' | localize}}</span>
                                                 {{'SubscriptionPaymentGatewayType_' + record.gateway | localize}}
                                             </td>
-                                            <td style="width: 100px">
+                                            <td class="wPX100">
                                                 <span class="p-column-title">{{'Amount' | localize}}</span>
                                                 {{appSession.application.currencySign}}
                                                 {{record.amount | number : '1.2-2'}}
                                             </td>
-                                            <td style="width: 150px">
+                                            <td class="w-150" [ngClass]="isArabic ? 'alignStart':''">
                                                 <span class="p-column-title">{{'Status' | localize}}</span>
                                                 {{'SubscriptionPaymentStatus_' + record.status | localize}}
                                             </td>
-                                            <td style="width: 150px">
+                                            <td class="w-150" [ngClass]="isArabic ? 'alignStart':''">
                                                 <span class="p-column-title">{{'Period' | localize}}</span>
                                                 {{'PaymentPeriodType_' + record.paymentPeriodType | localize}}
                                             </td>
-                                            <td style="width: 100px">
+                                            <td class="wPX100" [ngClass]="isArabic ? 'alignStart':''">
                                                 <span class="p-column-title">{{'DayCount' | localize}}</span>
                                                 {{record.dayCount}}
                                             </td>
-                                            <td style="width: 250px;">
+                                            <td class="w-250" [ngClass]="isArabic ? 'alignStart':''">
                                                 <span class="p-column-title">{{'PaymentId' | localize}}</span>
                                                 {{record.paymentId}}
                                             </td>
-                                            <td style="width: 150px">
+                                            <td class="w-150" [ngClass]="isArabic ? 'alignStart':''">
                                                 <span class="p-column-title">{{'InvoiceNo' | localize}}</span>
                                                 {{record.invoiceNo}}
                                             </td>
