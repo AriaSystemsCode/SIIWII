@@ -1,8 +1,14 @@
 <div class="shell-container">
 
-  <app-entity-breadcrumb></app-entity-breadcrumb>
 
-  <app-entity-header></app-entity-header>
+  <app-entity-header
+    [title]="title"
+    [breadcrumbItems]="breadcrumbItems"
+    [mode]="mode"
+    (close)="close.emit()"
+    (minimize)="minimize.emit()"
+    (maximize)="maximize.emit()">
+  </app-entity-header>
 
   <app-entity-basic-info
     [entity]="entity"
@@ -13,7 +19,7 @@
   </app-entity-basic-info>
 
   <app-entity-left-side-panel></app-entity-left-side-panel>
-<div class="row">
+<div class="row p-4">
   <div class="col-7">
   <ng-content  select="[entity-main-content]"></ng-content>
 </div>

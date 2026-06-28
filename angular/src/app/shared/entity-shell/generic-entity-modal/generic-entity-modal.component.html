@@ -10,10 +10,16 @@
     width: maximized ? '100vw' : width,
     height: maximized ? '100vh' : height,
     'margin-left': '85px',
+    'overflow-x': 'hidden',
+    padding: '0 !important' 
+  }"
+ [contentStyle]="{
+    'padding': '0',
+    'height': '100%',
     'overflow-x': 'hidden'
   }"
-  [contentStyle]="{ padding: '0', height: '100%'}"
-  styleClass="generic-entity-modal"
+  styleClass="generic-entity-modal p-0"
+  [style.padding.!important]="'0px'"
   (onHide)="onDialogHide()">
 
   <ng-content></ng-content>

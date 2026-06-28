@@ -1,1 +1,35 @@
-<p>entity-header works!</p>
+<div class="entity-header">
+
+  <div class="header-left">
+    <app-entity-breadcrumb
+      [items]="breadcrumbItems">
+    </app-entity-breadcrumb>
+  </div>
+
+  <div class="header-title">
+    {{ title }}
+  </div>
+
+  <div class="header-actions">
+
+    <button
+      *ngIf="mode !== 'view'"
+      class="header-btn"
+      (click)="cancel.emit()">
+      Cancel
+    </button>
+
+    <button
+      *ngIf="mode !== 'view'"
+      class="header-btn"
+      (click)="save.emit()">
+      Save
+    </button>
+
+    <button class="window-btn" (click)="minimize.emit()">—</button>
+    <button class="window-btn" (click)="maximize.emit()">□</button>
+    <button class="window-btn" (click)="close.emit()">×</button>
+
+  </div>
+
+</div>

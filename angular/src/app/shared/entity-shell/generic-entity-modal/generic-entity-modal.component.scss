@@ -3,7 +3,15 @@
 
 }
 
-:host ::ng-deep .generic-entity-modal .p-dialog-content {
+::ng-deep .generic-entity-modal  {
+   .p-dialog  {
+  padding: 0 !important;
+   
+  }
+  body .p-dialog .p-dialog-content{
+  padding: 0 !important;
+
+  }
   padding: 0 !important;
   height: 100% !important;
 
@@ -12,3 +20,4 @@
 :host ::ng-deep .generic-entity-modal .p-dialog-header {
   display: none;
 }
+

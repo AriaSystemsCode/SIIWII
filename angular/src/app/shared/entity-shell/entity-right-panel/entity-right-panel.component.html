@@ -1,26 +1,49 @@
 <div class="entity-right-panel">
 
-  <p-tabView [(activeIndex)]="activeTabIndex">
+  <div class="panel-tabs">
 
-    <p-tabPanel header="Audit trail">
-      <app-audit-trail
-   >
-      </app-audit-trail>
-    </p-tabPanel>
+    <button
+      class="tab-btn"
+      [class.active]="activeTab === 'audit'"
+      (click)="activeTab = 'audit'">
+      Audit trail
+    </button>
 
-    <p-tabPanel header="Messages">
-      <!-- <app-entity-messages
-        [entityId]="entityId"
-        [entityType]="entityType">
-      </app-entity-messages> -->
-    </p-tabPanel>
+    <button
+      class="tab-btn"
+      [class.active]="activeTab === 'messages'"
+      (click)="activeTab = 'messages'">
+      Message
+    </button>
 
-    <p-tabPanel header="Related">
-      <app-related-entities
-       >
-      </app-related-entities>
-    </p-tabPanel>
+    <button
+      class="tab-btn"
+      [class.active]="activeTab === 'related'"
+      (click)="activeTab = 'related'">
+      Relations
+    </button>
 
-  </p-tabView>
+  </div>
+
+  <div class="tab-indicator">
+    <div
+      class="active-line"
+      [ngClass]="{
+        'audit': activeTab === 'audit',
+        'messages': activeTab === 'messages',
+        'related': activeTab === 'related'
+      }">
+    </div>
+  </div>
+
+  <div class="panel-content">
+
+    <app-audit-trail *ngIf="activeTab === 'audit'"></app-audit-trail>
+
+    <!-- <app-entity-messages *ngIf="activeTab === 'messages'"></app-entity-messages> -->
+
+    <app-related-entities *ngIf="activeTab === 'related'"></app-related-entities>
+
+  </div>
 
 </div>

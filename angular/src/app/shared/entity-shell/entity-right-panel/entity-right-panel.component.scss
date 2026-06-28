@@ -1,0 +1,64 @@
+.entity-right-panel {
+    height: 100%;
+    background: #fff;
+    border: 1px solid #e6e6e6;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.panel-tabs {
+    display: flex;
+    justify-content: space-around;
+    padding: 18px 18px 8px;
+}
+
+.tab-btn {
+    background: transparent;
+    border: none;
+    font-size: 17px;
+    font-weight: 600;
+    color: #b6b6b6;
+    cursor: pointer;
+    padding: 0;
+}
+
+.tab-btn.active {
+    color: #4b0f57;
+}
+
+.tab-indicator {
+    height: 4px;
+    background: #e5e5e5;
+    margin: 0 18px;
+    border-radius: 2px;
+    position: relative;
+}
+
+.active-line {
+    position: absolute;
+    height: 4px;
+    background: #4b0f57;
+    border-radius: 2px;
+    transition: .25s ease;
+}
+
+.active-line.audit {
+    left: 0;
+    width: 33.33%;
+}
+
+.active-line.messages {
+    left: 33.33%;
+    width: 33.33%;
+}
+
+.active-line.related {
+    left: 66.66%;
+    width: 33.33%;
+}
+
+.panel-content {
+    padding: 18px;
+    height: calc(100% - 70px);
+    overflow: auto;
+}

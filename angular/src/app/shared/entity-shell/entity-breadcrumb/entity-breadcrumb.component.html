@@ -1,1 +1,4 @@
-<p>entity-breadcrumb works!</p>
+<span *ngFor="let item of items; let last = last">
+  <span>{{ item.label }}</span>
+  <span *ngIf="!last"> / </span>
+</span>

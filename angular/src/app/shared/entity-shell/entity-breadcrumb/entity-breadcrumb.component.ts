@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
 
 @Component({
   selector: 'app-entity-breadcrumb',
@@ -6,5 +6,5 @@ import { Component } from '@angular/core';
   styleUrls: ['./entity-breadcrumb.component.scss']
 })
 export class EntityBreadcrumbComponent {
-
+  @Input() items: any[] = [];
 }
