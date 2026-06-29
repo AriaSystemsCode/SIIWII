@@ -926,3 +926,16 @@ th.sticky-header {
 .p-accordion .p-accordion-header .p-accordion-header-link {
 border-radius: 12px !important;
 }
+
+body p-paginator .p-paginator .p-paginator-element, body p-paginator .p-paginator .p-paginator-pages {
+    float: none !important;
+}
+
+
+
+body .Ar-paginator p-paginator .p-paginator .p-paginator-first,
+body .Ar-paginator p-paginator .p-paginator .p-paginator-prev,
+body .Ar-paginator p-paginator .p-paginator .p-paginator-next,
+body .Ar-paginator p-paginator .p-paginator .p-paginator-last {
+    transform: rotate(180deg) !important;
+}
