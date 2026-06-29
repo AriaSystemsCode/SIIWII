@@ -196,12 +196,20 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
     var _text = "";
     _text = "All " + ImportTypes[this.importType] + " Failed , can not import.";
 
-    if (!this.uploadingResult?.isPagedResult) {
+    const isImagesOnlyImport = this.imImages && !this.imData;
+
+    if (!this.uploadingResult?.isPagedResult || isImagesOnlyImport) {
       this.uploadingResult.totalPassedRecords =
         (this.uploadingResult?.excelRecords?.filter(r => r.status.toLowerCase() == 'passed')?.length || 0) +
         (this.uploadingResult?.excelRecords?.filter(r => r.status.toLowerCase() == 'warning')?.length || 0);
 
-      this.uploadingResult.totalFailedRecords = this.uploadingResult?.excelRecords?.filter(r => r.status.toLowerCase() == 'failed')?.length;
+      this.uploadingResult.totalFailedRecords = isImagesOnlyImport
+        ? Math.max(
+            0,
+            (this.uploadingResult?.totalDisplayRecords || this.uploadingResult?.excelRecords?.length || 0) -
+              this.uploadingResult.totalPassedRecords
+          )
+        : this.uploadingResult?.excelRecords?.filter(r => r.status.toLowerCase() == 'failed')?.length;
     }
 
     if (this.uploadingResult.totalPassedRecords == 0) {

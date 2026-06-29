@@ -63,7 +63,7 @@
  .rout-c-ar {
   padding-right: 85px !important;
   padding-left: 0px !important;
-  overflow-x: hidden;
+  overflow-x: hidden !important;
 
   padding-top: 50px;
  }
@@ -256,4 +256,8 @@ margin-bottom: 30px;
 ::-webkit-scrollbar-track {
     background-color: #D9D9D9 !important; /* Set the color of the track (the non-draggable part) */
     
+}
+
+.overflow-y-hidden {
+  overflow-x: hidden !important;
 }

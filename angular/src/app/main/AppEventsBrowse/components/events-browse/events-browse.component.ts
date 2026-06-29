@@ -362,9 +362,9 @@ export class EventsBrowseComponent extends AppComponentBase  implements OnInit,O
             undefined,
             undefined,
             filters?.city || undefined,
-           filters?.countries?.length
-  ? filters.countries.map(x => x.value ?? x.code ?? x.id).join(',')
-  : undefined,
+            undefined,
+            filters?.countries?.length ? filters?.countries : undefined,
+            
             filters?.state || undefined,
             filters?.postalCode || undefined,
        

@@ -639,3 +639,30 @@ div.cropper span.resize-bar {
     margin-right: 5px !important;
     font-size: 8px;
 }
+
+.button-busy-spinner {
+    display: inline-block;
+    width: 1em;
+    height: 1em;
+    margin-right: 0.4em;
+    vertical-align: -0.125em;
+    box-sizing: border-box;
+    border: 0.15em solid currentColor;
+    border-right-color: transparent;
+    border-radius: 50%;
+    transform-origin: 50% 50%;
+    animation: button-busy-spin 0.75s linear infinite;
+}
+
+@keyframes button-busy-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.p-dropdown .p-dropdown-clear-icon{
+    right: auto !important;
+    left: auto !important;
+}
+
+

@@ -207,456 +207,446 @@
                 </div>
 
 
-          
-                    <div class="mx-2">
-                        <p-treeTable [value]="shoppingCartTreeNodes" [scrollable]="true"
-                            [tableStyle]="{'min-width':'45rem'}">
-                            <ng-template pTemplate="header">
-                                <tr>
-                                    <th *ngFor="let col of cols" class="purpleColor w-7rem"
-                                        [ngClass]="{'col-2':col.field=='manufacturerCode'}">
-                                        {{ col.header }}
-                                    </th>
 
-                                    <th class="purpleColor w-5rem" *ngIf="canChange">
-                                        {{l("Action")}}
-                                    </th>
-                                </tr>
-                                <br />
-                            </ng-template>
-                            <ng-template pTemplate="body" let-rowNode let-rowData="rowData">
-                                <tr [ttRow]="rowNode">
+                <div class="mx-2">
+                    <p-treeTable [value]="shoppingCartTreeNodes" [scrollable]="true"
+                        [tableStyle]="{'min-width':'45rem'}">
+                        <ng-template pTemplate="header">
+                            <tr>
+                                <th *ngFor="let col of cols" class="purpleColor w-7rem"
+                                    [ngClass]="{'col-2':col.field=='manufacturerCode'}">
+                                    {{ col.header }}
+                                </th>
 
-                                    <td *ngFor="let col of cols; let i = index" class="p-treeTable w-7rem"
-                                        [ngClass]="{'col-2':col.field=='manufacturerCode'}">
-                                        <p-treeTableToggler [rowNode]="rowNode" *ngIf="i === 0"></p-treeTableToggler>
-                                        <label
-                                            *ngIf="(col.field!='image') &&  (col.field!='qty')&&  (col.field!='price')&&  (col.field!='amount')">
-                                            {{ rowData[col.field] }}</label>
-                                        <label
-                                            *ngIf="(col.field=='price' &&  !rowNode?.node?.data?.showEditPrice) || (col.field=='amount')">
-                                            {{ rowData[col.field] | currency:' ' }}</label>
-                                        <label
-                                            *ngIf="(col.field=='qty' &&  !rowNode?.node?.data?.editQty) || (col.field=='qty' && rowNode?.node?.data?.editQty && !rowNode?.node?.data?.showEditQty)">
-                                            {{ rowData[col.field] }}</label>
+                                <th class="purpleColor w-5rem" *ngIf="canChange">
+                                    {{l("Action")}}
+                                </th>
+                            </tr>
+                            <br />
+                        </ng-template>
+                        <ng-template pTemplate="body" let-rowNode let-rowData="rowData">
+                            <tr [ttRow]="rowNode">
 
-                                        <label *ngIf="col.field=='image'">
-                                            <img [src]="attachmentBaseUrl + '/' +  rowData[col.field]"
-                                                onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'"
-                                                class="imgIcon" />
+                                <td *ngFor="let col of cols; let i = index" class="p-treeTable w-7rem"
+                                    [ngClass]="{'col-2':col.field=='manufacturerCode'}">
+                                    <p-treeTableToggler [rowNode]="rowNode" *ngIf="i === 0"></p-treeTableToggler>
+                                    <label
+                                        *ngIf="(col.field!='image') &&  (col.field!='qty')&&  (col.field!='price')&&  (col.field!='amount')">
+                                        {{ rowData[col.field] }}</label>
+                                    <label
+                                        *ngIf="(col.field=='price' &&  !rowNode?.node?.data?.showEditPrice) || (col.field=='amount')">
+                                        {{ rowData[col.field] | currency:' ' }}</label>
+                                    <label
+                                        *ngIf="(col.field=='qty' &&  !rowNode?.node?.data?.editQty) || (col.field=='qty' && rowNode?.node?.data?.editQty && !rowNode?.node?.data?.showEditQty)">
+                                        {{ rowData[col.field] }}</label>
+
+                                    <label *ngIf="col.field=='image'">
+                                        <img [src]="attachmentBaseUrl + '/' +  rowData[col.field]"
+                                            onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'"
+                                            class="imgIcon" />
 
 
-                                        </label>
+                                    </label>
 
-                                        <label
-                                            *ngIf="col.field=='qty' && rowNode?.node?.data?.editQty && rowNode?.node?.data?.showEditQty">
-                                            <div class="editQtyContainer">
-                                                <div class="fieldset">
-                                                    <input type="number" min="0" class="form-control inputs form-text"
-                                                        id="editQty" [(ngModel)]="rowNode.node.data.updatedQty">
-                                                    <a class="clear-text fa fa-1x fa-times material-icons mr-5 mt-2"
-                                                        (click)="rowNode.node.data.showEditQty=false"></a>
-                                                    <button
-                                                        class="border-0 m-0 p-0 editBtn clear-text fa fa-1x fa-save material-icons mr-4 mt-2 save-icon"
-                                                        (click)="onEditQty(rowNode);"
-                                                        [ngClass]="{ disabled:!rowNode.node.data.updatedQty || rowNode.node.data.updatedQty==0 || rowNode.node.data.updatedQty< 0 || rowNode.node.data.updatedQty==rowNode.node.data.qty}"
-                                                        [disabled]="!rowNode.node.data.updatedQty || rowNode.node.data.updatedQty==0 || rowNode.node.data.updatedQty< 0  || rowNode.node.data.updatedQty==rowNode.node.data.qty"></button>
-                                                </div>
-                                                <label class="text-danger"
-                                                    *ngIf="rowNode?.node?.data?.invalidUpdatedQty">{{
-                                                    rowNode.node.data.invalidUpdatedQty}}
-                                                </label>
-
+                                    <label
+                                        *ngIf="col.field=='qty' && rowNode?.node?.data?.editQty && rowNode?.node?.data?.showEditQty">
+                                        <div class="editQtyContainer">
+                                            <div class="fieldset">
+                                                <input type="number" min="0" class="form-control inputs form-text"
+                                                    id="editQty" [(ngModel)]="rowNode.node.data.updatedQty">
+                                                <a class="clear-text fa fa-1x fa-times material-icons mr-5 mt-2"
+                                                    (click)="rowNode.node.data.showEditQty=false"></a>
+                                                <button
+                                                    class="border-0 m-0 p-0 editBtn clear-text fa fa-1x fa-save material-icons mr-4 mt-2 save-icon"
+                                                    (click)="onEditQty(rowNode);"
+                                                    [ngClass]="{ disabled:!rowNode.node.data.updatedQty || rowNode.node.data.updatedQty==0 || rowNode.node.data.updatedQty< 0 || rowNode.node.data.updatedQty==rowNode.node.data.qty}"
+                                                    [disabled]="!rowNode.node.data.updatedQty || rowNode.node.data.updatedQty==0 || rowNode.node.data.updatedQty< 0  || rowNode.node.data.updatedQty==rowNode.node.data.qty"></button>
                                             </div>
+                                            <label class="text-danger" *ngIf="rowNode?.node?.data?.invalidUpdatedQty">{{
+                                                rowNode.node.data.invalidUpdatedQty}}
+                                            </label>
 
-                                        </label>
+                                        </div>
 
-                                        <label *ngIf="col.field=='price' && rowNode?.node?.data?.showEditPrice">
-                                            <div class="editQtyContainer">
-                                                <div class="fieldset">
-                                                    <input type="number" min="0" class="form-control inputs form-text"
-                                                        id="editPrice" [(ngModel)]="rowNode.node.data.updatedPrice">
-                                                    <a class="clear-text fa fa-1x fa-times material-icons mr-5 mt-2"
-                                                        (click)="rowNode.node.data.showEditPrice=false"></a>
-                                                    <button
-                                                        class="border-0 m-0 p-0 editBtn clear-text fa fa-1x fa-save material-icons mr-4 mt-2 save-icon"
-                                                        (click)="onEditPrice(rowNode);"
-                                                        [ngClass]="{ disabled:!rowNode.node.data.updatedPrice || rowNode.node.data.updatedPrice==0 || rowNode.node.data.updatedPrice< 0 || rowNode.node.data.updatedPrice==rowNode.node.data.price}"
-                                                        [disabled]="!rowNode.node.data.updatedPrice || rowNode.node.data.updatedPrice==0 || rowNode.node.data.updatedPrice< 0  || rowNode.node.data.updatedPrice==rowNode.node.data.price"></button>
-                                                </div>
-                                            </div>
-                                        </label>
+                                    </label>
 
-                                    </td>
-
-                                    <td class="p-treeTable text-center w-5rem" *ngIf="canChange">
-
-                                        <div class="dropdown" dropdown>
-                                            <button class="btn btn-secondary dropdown-toggle p-0" type="button"
-                                                id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true"
-                                                aria-expanded="false" dropdownToggle>
-                                                <div class="three-dots"></div>
-                                            </button>
-                                            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton"
-                                                *dropdownMenu>
-                                                <div *ngIf="rowNode?.node?.data?.editQty" class="pointer"
-                                                    (click)="rowNode.node.data.showEditQty=true;  rowNode.node.data.updatedQty=rowNode.node.data.qty ; rowNode.node.data.showEditPrice=true;  rowNode.node.data.updatedPrice=rowNode.node.data.price">
-                                                    <a class="link purpleColor p-3">
-                                                        <i class="far fa-edit"></i>
-                                                        {{l('Edit')}} </a>
-                                                </div>
-
-                                                <div class="pointer ml-3 mt-3" (click)="onDelete(rowNode)">
-                                                    <a class="link purpleColor p-3">
-                                                        <i class="far fa-trash-alt"></i>
-                                                        {{l('Delete')}}</a>
-                                                </div>
+                                    <label *ngIf="col.field=='price' && rowNode?.node?.data?.showEditPrice">
+                                        <div class="editQtyContainer">
+                                            <div class="fieldset">
+                                                <input type="number" min="0" class="form-control inputs form-text"
+                                                    id="editPrice" [(ngModel)]="rowNode.node.data.updatedPrice">
+                                                <a class="clear-text fa fa-1x fa-times material-icons mr-5 mt-2"
+                                                    (click)="rowNode.node.data.showEditPrice=false"></a>
+                                                <button
+                                                    class="border-0 m-0 p-0 editBtn clear-text fa fa-1x fa-save material-icons mr-4 mt-2 save-icon"
+                                                    (click)="onEditPrice(rowNode);"
+                                                    [ngClass]="{ disabled:!rowNode.node.data.updatedPrice || rowNode.node.data.updatedPrice==0 || rowNode.node.data.updatedPrice< 0 || rowNode.node.data.updatedPrice==rowNode.node.data.price}"
+                                                    [disabled]="!rowNode.node.data.updatedPrice || rowNode.node.data.updatedPrice==0 || rowNode.node.data.updatedPrice< 0  || rowNode.node.data.updatedPrice==rowNode.node.data.price"></button>
                                             </div>
                                         </div>
-                                    </td>
+                                    </label>
 
-                                </tr>
-                            </ng-template>
-                            <ng-template>
+                                </td>
 
-                            </ng-template>
-                        </p-treeTable>
-                        <button
-                            (click)="addLine = false;addNewLinebtn = false ;showAddLine = true;getSellerVariations()"
-                            class="addNbtn"
-                            *ngIf="addLine && addNewLinebtn && appTransactionsForViewDto?.isOwnedByMe && appTransactionsForViewDto?.entityStatusCode?.toUpperCase()=='OPEN' ">
-                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none"
-                                xmlns="http://www.w3.org/2000/svg">
-                                <path
-                                    d="M2.5 2.5V5M2.5 5V8.33333C2.5 8.77536 2.67559 9.19928 2.98816 9.51184C3.30072 9.8244 3.72464 10 4.16667 10H7.5M2.5 5H7.5M17.5 2.5V5M17.5 5V8.33333C17.5 8.77536 17.3244 9.19928 17.0118 9.51184C16.6993 9.8244 16.2754 10 15.8333 10H7.5M17.5 5H7.5M7.5 10V5M7.5 5V2.5M12.5 2.5V10M10 12.5V15M10 15V17.5M10 15H12.5M10 15H7.5"
-                                    stroke="#777777" stroke-width="1.5" stroke-linecap="round"
-                                    stroke-linejoin="round" />
-                            </svg>
-                            <span> {{'AddNewLine' | localize}}</span>
-                        </button>
+                                <td class="p-treeTable text-center w-5rem" *ngIf="canChange">
 
+                                    <div class="dropdown" dropdown>
+                                        <button class="btn btn-secondary dropdown-toggle p-0" type="button"
+                                            id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true"
+                                            aria-expanded="false" dropdownToggle>
+                                            <div class="three-dots"></div>
+                                        </button>
+                                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton" *dropdownMenu>
+                                            <div *ngIf="rowNode?.node?.data?.editQty" class="pointer"
+                                                (click)="rowNode.node.data.showEditQty=true;  rowNode.node.data.updatedQty=rowNode.node.data.qty ; rowNode.node.data.showEditPrice=true;  rowNode.node.data.updatedPrice=rowNode.node.data.price">
+                                                <a class="link purpleColor p-3">
+                                                    <i class="far fa-edit"></i>
+                                                    {{l('Edit')}} </a>
+                                            </div>
 
-                        <form [formGroup]="filterForm" *ngIf="!addLine">
-                            <div class="mb-3 w-100 row ">
-                                <div class="row mx-2  w-100">
-                                    <div class="col-md-4 col-12">
-                                        <label class="form-label text-nowrap">{{'ProductCode' | localize}}</label>
-                                        <p-dropdown [options]="displayedVariations" [filter]="true"
-                                            optionLabel="appItem.manufacturerCode"
-                                            [placeholder]="'PleaseSelect' | localize"
-                                            (onFilter)="handleVarSearch($event, dropdown)"
-                                            formControlName="selectedVariation" (onChange)="onVariationSelect($event)"
-                                            #dropdown>
-                                            <!-- Custom item template -->
-                                            <ng-template let-option pTemplate="item">
-                                                <div>{{ option.appItem.manufacturerCode }} </div>
-                                            </ng-template>
-
-                                            <!-- Custom footer template for "Show More" button -->
-                                            <ng-template pTemplate="footer">
-                                                <div *ngIf="displayedVariations.length < totalVariationsCount"
-                                                    class="d-flex justify-content-center">
-                                                    <a (click)="loadMore($event, dropdown)" class="pb-4">{{'showmore' |
-                                                        localize}} ...</a>
-                                                </div>
-                                            </ng-template>
-                                        </p-dropdown>
+                                            <div class="pointer ml-3 mt-3" (click)="onDelete(rowNode)">
+                                                <a class="link purpleColor p-3">
+                                                    <i class="far fa-trash-alt"></i>
+                                                    {{l('Delete')}}</a>
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div class="col-md-4 col-12">
-                                        <label class="form-label text-nowrap">{{'ProductColor' | localize}}</label>
-                                        <p-dropdown [options]="filteredColors" [filter]="true" optionLabel="colorName"
-                                            [placeholder]="'PleaseSelect' | localize" (onChange)="onColorSelect($event)"
-                                            #dropdown>
+                                </td>
 
-                                            <!-- Custom item template -->
-                                            <ng-template let-option pTemplate="item">
-                                                <div>{{ option.colorName }} </div>
-                                            </ng-template>
+                            </tr>
+                        </ng-template>
+                        <ng-template>
+
+                        </ng-template>
+                    </p-treeTable>
+                    <button (click)="addLine = false;addNewLinebtn = false ;showAddLine = true;getSellerVariations()"
+                        class="addNbtn"
+                        *ngIf="addLine && addNewLinebtn && appTransactionsForViewDto?.isOwnedByMe && appTransactionsForViewDto?.entityStatusCode?.toUpperCase()=='OPEN' ">
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path
+                                d="M2.5 2.5V5M2.5 5V8.33333C2.5 8.77536 2.67559 9.19928 2.98816 9.51184C3.30072 9.8244 3.72464 10 4.16667 10H7.5M2.5 5H7.5M17.5 2.5V5M17.5 5V8.33333C17.5 8.77536 17.3244 9.19928 17.0118 9.51184C16.6993 9.8244 16.2754 10 15.8333 10H7.5M17.5 5H7.5M7.5 10V5M7.5 5V2.5M12.5 2.5V10M10 12.5V15M10 15V17.5M10 15H12.5M10 15H7.5"
+                                stroke="#777777" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                        </svg>
+                        <span> {{'AddNewLine' | localize}}</span>
+                    </button>
 
 
-                                        </p-dropdown>
-                                    </div>
+                    <form [formGroup]="filterForm" *ngIf="!addLine">
+                        <div class="mb-3 w-100 row ">
+                            <div class="row mx-2  w-100">
+                                <div class="col-md-4 col-12">
+                                    <label class="form-label text-nowrap">{{'ProductCode' | localize}}</label>
+                                    <p-dropdown [options]="displayedVariations" [filter]="true"
+                                        optionLabel="appItem.manufacturerCode" [placeholder]="'PleaseSelect' | localize"
+                                        (onFilter)="handleVarSearch($event, dropdown)"
+                                        formControlName="selectedVariation" (onChange)="onVariationSelect($event)"
+                                        #dropdown>
+                                        <!-- Custom item template -->
+                                        <ng-template let-option pTemplate="item">
+                                            <div>{{ option.appItem.manufacturerCode }} </div>
+                                        </ng-template>
 
+                                        <!-- Custom footer template for "Show More" button -->
+                                        <ng-template pTemplate="footer">
+                                            <div *ngIf="displayedVariations.length < totalVariationsCount"
+                                                class="d-flex justify-content-center">
+                                                <a (click)="loadMore($event, dropdown)" class="pb-4">{{'showmore' |
+                                                    localize}} ...</a>
+                                            </div>
+                                        </ng-template>
+                                    </p-dropdown>
+                                </div>
+                                <div class="col-md-4 col-12">
+                                    <label class="form-label text-nowrap">{{'ProductColor' | localize}}</label>
+                                    <p-dropdown [options]="filteredColors" [filter]="true" optionLabel="colorName"
+                                        [placeholder]="'PleaseSelect' | localize" (onChange)="onColorSelect($event)"
+                                        #dropdown>
+
+                                        <!-- Custom item template -->
+                                        <ng-template let-option pTemplate="item">
+                                            <div>{{ option.colorName }} </div>
+                                        </ng-template>
+
+
+                                    </p-dropdown>
                                 </div>
 
                             </div>
-                            <hr class="greyColorlight">
-                            <div class="d-flex row">
-                                <div class="col-lg-6 col-md-8 col-12 d-flex mb-2" *ngIf="displayProductdata">
-                                    <img [src]="
+
+                        </div>
+                        <hr class="greyColorlight">
+                        <div class="d-flex row">
+                            <div class="col-lg-6 col-md-8 col-12 d-flex mb-2" *ngIf="displayProductdata">
+                                <img [src]="
                                                   attachmentBaseUrl + '/' + selectedMainImgProduct" alt="images slides"
-                                        [ngStyle]="{ 'width.px':  (140 * acceptedAspectRatio )  }"
-                                        class="mainImgProduct"
-                                        onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'" />
-                                    <div class="details  d-flex flex-column ">
+                                    [ngStyle]="{ 'width.px':  (140 * acceptedAspectRatio )  }" class="mainImgProduct"
+                                    onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'" />
+                                <div class="details  d-flex flex-column ">
 
-                                        <div class="ssin_price align-items-center justify-content-between">
+                                    <div class="ssin_price align-items-center justify-content-between">
 
-                                            <div class="d-flex mb-1 align-items-center productName">
-                                                <p>
-                                                    {{productDetails?.name}}</p>
-                                                <div class="type ml-3 pt-2 text-center">
-                                                    <p class="mb-0 text-nowrap"> {{
-                                                        productDetails?.orderByPrePack === false
-                                                        ? "BySize"
-                                                        : "ByPrepack"
-                                                        | localize}}</p>
+                                        <div class="d-flex mb-1 align-items-center productName">
+                                            <p>
+                                                {{productDetails?.name}}</p>
+                                            <div class="type ml-3 pt-2 text-center">
+                                                <p class="mb-0 text-nowrap"> {{
+                                                    productDetails?.orderByPrePack === false
+                                                    ? "BySize"
+                                                    : "ByPrepack"
+                                                    | localize}}</p>
 
+                                            </div>
+
+                                        </div>
+                                        <div class="price mb-4">
+
+                                            <div class="msrp d-flex align-items-baseline">
+                                                <h5 class="mr-2 text-dark fs-5 mt-2">
+                                                    {{languageSettingName!='en-GB' ? "MSRP" : "RRP"
+                                                    }}: </h5>
+                                                <h5>
+
+                                                    {{
+                                                    currencySymbol
+                                                    }}
+                                                    {{ productDetails?.minMSRP | number:'1.2-2' }}
+                                                </h5>
+                                                <span *ngIf="
+                                                                  productDetails?.minMSRP !==
+                                                                  productDetails?.maxMSRP
+                                                              ">
+                                                    -
+                                                </span>
+                                                <h5 *ngIf="
+                                                                  productDetails?.minMSRP !==
+                                                                  productDetails?.maxMSRP
+                                                              ">
+
+                                                    {{
+                                                    currencySymbol
+                                                    }}
+                                                    {{ productDetails?.maxMSRP | number:'1.2-2' }}
+                                                </h5>
+                                                <h5> /EAC </h5>
+                                            </div>
+                                            <div class="msrp d-flex justify-content-between align-items-center">
+                                                <div>
+                                                    <div class="msrp d-flex align-items-center ">
+                                                        <h5 class="mr-2 text-dark text-nowrap text-14">
+                                                            {{'SpecialPrice' | localize}} : </h5>
+
+
+
+                                                        <h5 *ngIf="showEditSpecialPrice">
+                                                            {{ currencySymbol }} {{
+                                                            (productDetails?.maxSpecialPrice ?? 0) |
+                                                            number:'1.2-2' }}
+                                                        </h5>
+
+                                                        <img *ngIf="appTransactionsForViewDto.transactionType == 0  && showEditSpecialPrice"
+                                                            class="mx-1  cursor-pointer"
+                                                            src="../../../../../assets/Items//edit-svgrepo-com 1.png"
+                                                            (click)="showEditSpecialPrice =false;updatedSpecialPrice=productDetails?.maxSpecialPrice" />
+
+
+                                                    </div>
                                                 </div>
 
                                             </div>
-                                            <div class="price mb-4">
 
-                                                <div class="msrp d-flex align-items-baseline">
-                                                    <h5 class="mr-2 text-dark fs-5 mt-2">
-                                                        {{languageSettingName!='en-GB' ? "MSRP" : "RRP"
-                                                        }}: </h5>
-                                                    <h5>
+                                            <div class="msrp d-flex justify-content-between"
+                                                *ngIf="!showEditSpecialPrice">
+                                                <label class="ml-3">
+                                                    <div class="editQtyContainer">
+                                                        <div class="fieldset">
+                                                            <div class="input-group">
+                                                                <input type="number" min="0"
+                                                                    class="form-control inputs form-text editQty"
+                                                                    id="editQty" formControlName="updatedSpecialPrice">
 
-                                                        {{
-                                                        currencySymbol
-                                                        }}
-                                                        {{ productDetails?.minMSRP | number:'1.2-2' }}
-                                                    </h5>
-                                                    <span *ngIf="
-                                                                  productDetails?.minMSRP !==
-                                                                  productDetails?.maxMSRP
-                                                              ">
-                                                        -
-                                                    </span>
-                                                    <h5 *ngIf="
-                                                                  productDetails?.minMSRP !==
-                                                                  productDetails?.maxMSRP
-                                                              ">
+                                                                <div class="input-group-append position-absolute "
+                                                                    [ngClass]="isArabic ? 'updatedSpecialPriceAr':'updatedSpecialPriceEn'">
+                                                                    <button class="btn ml-0 pl-2 pt-3 pb-3"
+                                                                        (click)="showEditSpecialPrice= true">
+                                                                        <i
+                                                                            class="clear-text fa fa-1x fa-times fa-2x greyColorMd"></i>
+                                                                    </button>
+                                                                </div>
+                                                                <div class="input-group-append position-absolute"
+                                                                    [ngClass]="isArabic ? 'openSpecialPricAr':'openSpecialPricEn'">
 
-                                                        {{
-                                                        currencySymbol
-                                                        }}
-                                                        {{ productDetails?.maxMSRP | number:'1.2-2' }}
-                                                    </h5>
-                                                    <h5> /EAC </h5>
-                                                </div>
-                                                <div class="msrp d-flex justify-content-between align-items-center">
-                                                    <div>
-                                                        <div class="msrp d-flex align-items-center ">
-                                                            <h5 class="mr-2 text-dark text-nowrap text-14">
-                                                                {{'SpecialPrice' | localize}} : </h5>
+                                                                    <button class="btn btn-save  mr-0 pr-0"
+                                                                        (click)="openSpecialPriceDialog()"
+                                                                        [disabled]="updatedSpecialPrice < 0  ">
+                                                                        <i class="fa fa-check fa-2x greyColorMd"></i>
 
+                                                                    </button>
 
-
-                                                            <h5 *ngIf="showEditSpecialPrice">
-                                                                {{ currencySymbol }} {{
-                                                                (productDetails?.maxSpecialPrice ?? 0) |
-                                                                number:'1.2-2' }}
-                                                            </h5>
-
-                                                            <img *ngIf="appTransactionsForViewDto.transactionType == 0  && showEditSpecialPrice"
-                                                                class="mx-1  cursor-pointer"
-                                                                src="../../../../../assets/Items//edit-svgrepo-com 1.png"
-                                                                (click)="showEditSpecialPrice =false;updatedSpecialPrice=productDetails?.maxSpecialPrice" />
-
+                                                                </div>
+                                                            </div>
 
                                                         </div>
                                                     </div>
 
-                                                </div>
-
-                                                <div class="msrp d-flex justify-content-between"
-                                                    *ngIf="!showEditSpecialPrice">
-                                                    <label class="ml-3">
-                                                        <div class="editQtyContainer">
-                                                            <div class="fieldset">
-                                                                <div class="input-group">
-                                                                    <input type="number" min="0"
-                                                                        class="form-control inputs form-text editQty"
-                                                                        id="editQty"
-                                                                        formControlName="updatedSpecialPrice">
-
-                                                                    <div class="input-group-append position-absolute "
-                                                                        [ngClass]="isArabic ? 'updatedSpecialPriceAr':'updatedSpecialPriceEn'">
-                                                                        <button class="btn ml-0 pl-2 pt-3 pb-3"
-                                                                            (click)="showEditSpecialPrice= true">
-                                                                            <i
-                                                                                class="clear-text fa fa-1x fa-times fa-2x greyColorMd"></i>
-                                                                        </button>
-                                                                    </div>
-                                                                    <div class="input-group-append position-absolute"
-                                                                        [ngClass]="isArabic ? 'openSpecialPricAr':'openSpecialPricEn'">
-
-                                                                        <button class="btn btn-save  mr-0 pr-0"
-                                                                            (click)="openSpecialPriceDialog()"
-                                                                            [disabled]="updatedSpecialPrice < 0  ">
-                                                                            <i
-                                                                                class="fa fa-check fa-2x greyColorMd"></i>
-
-                                                                        </button>
-
-                                                                    </div>
-                                                                </div>
-
-                                                            </div>
-                                                        </div>
-
-                                                    </label>
+                                                </label>
 
 
-                                                </div>
                                             </div>
                                         </div>
                                     </div>
-
                                 </div>
-                                <div *ngIf="filteredColors &&  displayColordata" class=" col-lg-6 col-md-4 col-12 mb-2 border-1-light"
-                                    [title]="selectedColorName" position="top"
-                                    tooltipPositionStyleClass="custom-tooltip">
 
-                                    <div class="colorSec">
-                                        <div *ngIf="
+                            </div>
+                            <div *ngIf="filteredColors &&  displayColordata"
+                                class=" col-lg-6 col-md-4 col-12 mb-2 border-1-light" [title]="selectedColorName"
+                                position="top" tooltipPositionStyleClass="custom-tooltip">
+
+                                <div class="colorSec">
+                                    <div *ngIf="
                                           selectedColorName&&
                                               !selectedColorImg
                                           " class="colorBox" [ngStyle]="{'background-color': selectedColorCode}"></div>
 
-                                        <img *ngIf="
+                                    <img *ngIf="
                                      (( selectedColorCode =='' && selectedColorImg !=''  ) || (selectedColorCode=='' && selectedColorImg==''))
                                       " [src]="
                                           attachmentBaseUrl + '/' + selectedColorImg
                                       " [ngStyle]="{ 'height.px':  (65 / acceptedAspectRatio )  }" alt="images slides"
-                                            class="imageSlides w-65"
-                                            onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'" />
-                                        <div *ngIf="
+                                        class="imageSlides w-65"
+                                        onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'" />
+                                    <div *ngIf="
                                       ( selectedColorCode !='' )" class="imageSlides rounded-top-6 w-65"
-                                            class="colorBox"
-                                            [ngStyle]="{'background-color':selectedColorCode, 'height.px':  (65 / acceptedAspectRatio )}">
-                                        </div>
-                                        <div class="fs-10">
+                                        class="colorBox"
+                                        [ngStyle]="{'background-color':selectedColorCode, 'height.px':  (65 / acceptedAspectRatio )}">
+                                    </div>
+                                    <div class="fs-10">
 
 
-                                            <p class="card-text desc fw-bold">
-                                                {{ selectedColorCode?.slice(0,8)}} <span
-                                                    *ngIf="selectedColorCode?.length > 8">...</span>
-                                            </p>
-                                            <p class="seller">{{ selectedColorName?.slice(0,13) }} <span
-                                                    *ngIf="selectedColorName?.length > 13">...</span>
-                                            </p>
+                                        <p class="card-text desc fw-bold">
+                                            {{ selectedColorCode?.slice(0,8)}} <span
+                                                *ngIf="selectedColorCode?.length > 8">...</span>
+                                        </p>
+                                        <p class="seller">{{ selectedColorName?.slice(0,13) }} <span
+                                                *ngIf="selectedColorName?.length > 13">...</span>
+                                        </p>
 
 
-                                        </div>
                                     </div>
                                 </div>
                             </div>
-                            <hr class="greyColorlight">
+                        </div>
+                        <hr class="greyColorlight">
 
-                            <div *ngIf="displaysizesdata">
-                                <!-- start order by size -->
-                                <h5 *ngIf="!productDetails?.orderByPrePack" class="my-4 text-decoration-none">
-                                    {{'OrderBySize' | localize}}
-                                </h5>
-                                <table *ngIf="!productDetails?.orderByPrePack"
-                                    class="table text-center table-bordered table-white">
-                                    <thead>
-                                        <tr>
-                                            <th scope="col">{{'Size' | localize}}</th>
-                                            <th scope="col" class="text-end">{{'AvailableQTY' | localize}}</th>
-                                            <th scope="col" class="text-end">{{'Ordered' | localize}}</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr *ngFor="
+                        <div *ngIf="displaysizesdata">
+                            <!-- start order by size -->
+                            <h5 *ngIf="!productDetails?.orderByPrePack" class="my-4 text-decoration-none">
+                                {{'OrderBySize' | localize}}
+                            </h5>
+                            <table *ngIf="!productDetails?.orderByPrePack"
+                                class="table text-center table-bordered table-white">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">{{'Size' | localize}}</th>
+                                        <th scope="col" class="text-end">{{'AvailableQTY' | localize}}</th>
+                                        <th scope="col" class="text-end">{{'Ordered' | localize}}</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr *ngFor="
                                       let size of filteredColors[ currentIndex]?.sizes;
                                       let i = index
                                   ">
-                                            <td>{{ size.label }}</td>
-                                            <td class="text-end">{{ size.stockAvailability }}
-                                            </td>
-                                            <td class="mx-2 text-end">
-                                                <p-inputNumber [ngModelOptions]="{standalone: true}"
-                                                    [(ngModel)]="size.orderedQty" mode="decimal" [showButtons]="true"
-                                                    inputId="minmax-buttons" [min]="0" (ngModelChange)="
+                                        <td>{{ size.label }}</td>
+                                        <td class="text-end">{{ size.stockAvailability }}
+                                        </td>
+                                        <td class="mx-2 text-end">
+                                            <p-inputNumber [ngModelOptions]="{standalone: true}"
+                                                [(ngModel)]="size.orderedQty" mode="decimal" [showButtons]="true"
+                                                inputId="minmax-buttons" [min]="0" (ngModelChange)="
                                               onNumberChange(
                                                   $event,
                                                   filteredColors[ currentIndex],
                                                   i
                                               )
                                           ">
-                                                </p-inputNumber>
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                                <!-- end order by size -->
+                                            </p-inputNumber>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <!-- end order by size -->
 
-                                <!-- start order by prepack -->
-                                <h5 *ngIf="productDetails?.orderByPrePack" class="my-4 text-decoration-none text-dark">
-                                    {{'PrepackDefinition' | localize}}
-                                </h5>
-                                <table *ngIf="productDetails?.orderByPrePack"
-                                    class="table text-center table-bordered table-white">
-                                    <tbody
+                            <!-- start order by prepack -->
+                            <h5 *ngIf="productDetails?.orderByPrePack" class="my-4 text-decoration-none text-dark">
+                                {{'PrepackDefinition' | localize}}
+                            </h5>
+                            <table *ngIf="productDetails?.orderByPrePack"
+                                class="table text-center table-bordered table-white">
+                                <tbody
+                                    *ngIf="filteredColors?.length > 0 && filteredColors[ currentIndex]?.sizes?.length > 0">
+                                    <tr *ngIf="filteredColors?.[currentIndex]?.sizes?.length">
+                                        <th class="bg-light-white">{{'Size' | localize}}</th>
+                                        <td *ngFor="
+                                          let size of filteredColors[currentIndex]?.sizes
+                                      ">
+                                            {{ size.label }}
+                                        </td>
+                                        <th class="bg-light-white">{{'TotalPcs' | localize}}</th>
+                                    </tr>
+                                    <tr
                                         *ngIf="filteredColors?.length > 0 && filteredColors[ currentIndex]?.sizes?.length > 0">
-                                        <tr *ngIf="filteredColors?.[currentIndex]?.sizes?.length">
-                                            <th class="bg-light-white">{{'Size' | localize}}</th>
-                                            <td *ngFor="
+                                        <th class="bg-light-white">{{'Prepack' | localize}}</th>
+                                        <td *ngFor="
                                           let size of filteredColors[currentIndex]?.sizes
                                       ">
-                                                {{ size.label }}
-                                            </td>
-                                            <th class="bg-light-white">{{'TotalPcs' | localize}}</th>
-                                        </tr>
-                                        <tr
+                                            {{ size.sizeRatio }}
+                                        </td>
+                                        <th>{{ getTotlaPrepackSum()}}</th>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                            <span *ngIf="orderType == 'SO' && productDetails?.orderByPrePack"
+                                class="p-4 font-weight-bold">{{'OrderByPrepack' | localize}}</span>
+                            <label *ngIf="orderType == 'SO' && productDetails?.orderByPrePack"
+                                class="switch switch-container my-4 font-weight-bold">
+                                <input type="checkbox" [(ngModel)]="chk_Order_by_prepack[currentIndex]" checked
+                                    (change)="onChangechk_Order_by_prepack()" [ngModelOptions]="{standalone: true}">
+                                <span class="slider round"></span>
+
+                            </label>
+
+                            <p-tabView *ngIf="productDetails?.orderByPrePack"
+                                [activeIndex]="chk_Order_by_prepack[currentIndex]? 0 : 1">
+
+                                <p-tabPanel header="Order By Prepack" [disabled]="!chk_Order_by_prepack[currentIndex]">
+                                    <table *ngIf="productDetails?.orderByPrePack"
+                                        class="table text-center table-bordered table-white">
+                                        <thead>
+                                            <tr>
+                                                <th scope="col">
+                                                    {{'AvailablePrepacks' | localize}}
+                                                </th>
+                                                <th scope="col" class="text-end">{{'Ordered' | localize}}
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody
                                             *ngIf="filteredColors?.length > 0 && filteredColors[ currentIndex]?.sizes?.length > 0">
-                                            <th class="bg-light-white">{{'Prepack' | localize}}</th>
-                                            <td *ngFor="
-                                          let size of filteredColors[currentIndex]?.sizes
-                                      ">
-                                                {{ size.sizeRatio }}
-                                            </td>
-                                            <th>{{ getTotlaPrepackSum()}}</th>
-                                        </tr>
-                                    </tbody>
-                                </table>
-
-                                <span *ngIf="orderType == 'SO' && productDetails?.orderByPrePack"
-                                    class="p-4 font-weight-bold">{{'OrderByPrepack' | localize}}</span>
-                                <label *ngIf="orderType == 'SO' && productDetails?.orderByPrePack"
-                                    class="switch switch-container my-4 font-weight-bold">
-                                    <input type="checkbox" [(ngModel)]="chk_Order_by_prepack[currentIndex]" checked
-                                        (change)="onChangechk_Order_by_prepack()" [ngModelOptions]="{standalone: true}">
-                                    <span class="slider round"></span>
-
-                                </label>
-
-                                <p-tabView *ngIf="productDetails?.orderByPrePack"
-                                    [activeIndex]="chk_Order_by_prepack[currentIndex]? 0 : 1">
-
-                                    <p-tabPanel header="Order By Prepack"
-                                        [disabled]="!chk_Order_by_prepack[currentIndex]">
-                                        <table *ngIf="productDetails?.orderByPrePack"
-                                            class="table text-center table-bordered table-white">
-                                            <thead>
-                                                <tr>
-                                                    <th scope="col">
-                                                        {{'AvailablePrepacks' | localize}}
-                                                    </th>
-                                                    <th scope="col" class="text-end">{{'Ordered' | localize}}
-                                                    </th>
-                                                </tr>
-                                            </thead>
-                                            <tbody
-                                                *ngIf="filteredColors?.length > 0 && filteredColors[ currentIndex]?.sizes?.length > 0">
-                                                <tr>
-                                                    <td>
-                                                        {{
-                                                        filteredColors[
-                                                        currentIndex]?.sizes[0]?.noOfAvailablePrepacks
-                                                        }}
-                                                    </td>
-                                                    <td class="text-end">
-                                                        <p-inputNumber [ngModelOptions]="{standalone: true}"
-                                                            [disabled]="(orderType == 'SO' &&  !chk_Order_by_prepack[currentIndex])"
-                                                            [(ngModel)]="
+                                            <tr>
+                                                <td>
+                                                    {{
+                                                    filteredColors[
+                                                    currentIndex]?.sizes[0]?.noOfAvailablePrepacks
+                                                    }}
+                                                </td>
+                                                <td class="text-end">
+                                                    <p-inputNumber [ngModelOptions]="{standalone: true}"
+                                                        [disabled]="(orderType == 'SO' &&  !chk_Order_by_prepack[currentIndex])"
+                                                        [(ngModel)]="
                                                   filteredColors[currentIndex]?.sizes[0].orderedPrePacks
                                               " mode="decimal" [showButtons]="true" inputId="minmax-buttons" [min]="0"
-                                                            (ngModelChange)="
+                                                        (ngModelChange)="
                                                       onNumberChange(
                                                           $event,
                                                           filteredColors[
@@ -665,42 +655,42 @@
                                                           null
                                                       )
                                                   ">
-                                                        </p-inputNumber>
-                                                    </td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                    </p-tabPanel>
-                                    <p-tabPanel class="sm-tab"
-                                        [header]="(orderType == 'SO'  &&  productDetails?.orderByPrePack && !chk_Order_by_prepack[currentIndex])  ? 'Order By Size' : 'View Ordered Quantity By Size'">
-                                        <table class="table text-center table-bordered table-white">
-                                            <thead>
-                                                <tr>
-                                                    <th scope="col">{{'Size' | localize}}</th>
-                                                    <th scope="col">{{'AvailableQTY' | localize}}</th>
-                                                    <th scope="col">{{'Ordered' | localize}}</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <tr *ngFor="
+                                                    </p-inputNumber>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </p-tabPanel>
+                                <p-tabPanel class="sm-tab"
+                                    [header]="(orderType == 'SO'  &&  productDetails?.orderByPrePack && !chk_Order_by_prepack[currentIndex])  ? 'Order By Size' : 'View Ordered Quantity By Size'">
+                                    <table class="table text-center table-bordered table-white">
+                                        <thead>
+                                            <tr>
+                                                <th scope="col">{{'Size' | localize}}</th>
+                                                <th scope="col">{{'AvailableQTY' | localize}}</th>
+                                                <th scope="col">{{'Ordered' | localize}}</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr *ngFor="
                                               let size of filteredColors[
                                                   currentIndex
                                               ]?.sizes;
                                               let i = index
                                           ">
-                                                    <td>{{ size.label }}</td>
-                                                    <td>
-                                                        {{ size.stockAvailability }}
-                                                    </td>
-                                                    <td
-                                                        *ngIf="filteredColors?.length > 0 && filteredColors[currentIndex]?.sizes?.length > 0">
+                                                <td>{{ size.label }}</td>
+                                                <td>
+                                                    {{ size.stockAvailability }}
+                                                </td>
+                                                <td
+                                                    *ngIf="filteredColors?.length > 0 && filteredColors[currentIndex]?.sizes?.length > 0">
 
-                                                        <p-inputNumber
-                                                            [(ngModel)]="!(orderType == 'SO'  &&  productDetails?.orderByPrePack && !chk_Order_by_prepack[currentIndex] ) ? (size.sizeRatio * filteredColors[currentIndex]?.sizes[0]?.orderedPrePacks) : filteredColors[currentIndex]?.sizes[i].orderedPrePacks"
-                                                            [ngModelOptions]="{standalone: true}" mode="decimal"
-                                                            [showButtons]="true" inputId="minmax-buttons" [min]="0"
-                                                            [disabled]="orderType != 'SO' || (orderType == 'SO' &&  chk_Order_by_prepack[currentIndex])"
-                                                            (ngModelChange)="
+                                                    <p-inputNumber
+                                                        [(ngModel)]="!(orderType == 'SO'  &&  productDetails?.orderByPrePack && !chk_Order_by_prepack[currentIndex] ) ? (size.sizeRatio * filteredColors[currentIndex]?.sizes[0]?.orderedPrePacks) : filteredColors[currentIndex]?.sizes[i].orderedPrePacks"
+                                                        [ngModelOptions]="{standalone: true}" mode="decimal"
+                                                        [showButtons]="true" inputId="minmax-buttons" [min]="0"
+                                                        [disabled]="orderType != 'SO' || (orderType == 'SO' &&  chk_Order_by_prepack[currentIndex])"
+                                                        (ngModelChange)="
                                                       onNumberChange(
                                                           $event,
                                                           filteredColors[
@@ -709,26 +699,26 @@
                                                           i
                                                       )
                                                   ">
-                                                        </p-inputNumber>
-                                                    </td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                    </p-tabPanel>
-                                </p-tabView>
-                                <!-- end order by prepack -->
-                            </div>
+                                                    </p-inputNumber>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </p-tabPanel>
+                            </p-tabView>
+                            <!-- end order by prepack -->
+                        </div>
 
-                            <div *ngIf="showAddLine" class="d-flex justify-content-end mt-3">
-                                <button (click)="cancelVariationLine()"
-                                    class="cancelbtn text-center btn float-right">{{'Cancel' | localize}}</button>
-                                <button [disabled]="filterForm.controls['selectedVariation'].value == ''"
-                                    (click)="saveVariations()" class="previewbtn text-center btn ml-2">{{'Save' |
-                                    localize}}</button>
-                            </div>
-                        </form>
-                    </div>
-          
+                        <div *ngIf="showAddLine" class="d-flex justify-content-end mt-3">
+                            <button (click)="cancelVariationLine()"
+                                class="cancelbtn text-center btn float-right">{{'Cancel' | localize}}</button>
+                            <button [disabled]="filterForm.controls['selectedVariation'].value == ''"
+                                (click)="saveVariations()" class="previewbtn text-center btn ml-2">{{'Save' |
+                                localize}}</button>
+                        </div>
+                    </form>
+                </div>
+
             </div>
         </p-accordionTab>
 
@@ -901,7 +891,7 @@
         [ngClass]="(!appTransactionsForViewDto?.isOwnedByMe ) || (appTransactionsForViewDto?.isOwnedByMe && (appTransactionsForViewDto?.sharedWithUsers?.length>0 || shareDone)) ?  'd-block' : 'd-none'">
         <h4 class="notes-title purpleColor font-weight-bold">{{l("Comments")}}</h4>
         <div class="w-100 comment-warper   order-summary p-4  mt-3 purpleColor">
-            <app-comment-parent   #desktopComments [addNewThread]="true" [cartStyle]="true"   [loadComments]="true"
+            <app-comment-parent #desktopComments [addNewThread]="true" [cartStyle]="true" [loadComments]="true"
                 #commentParentComponent (refreshComments)="getCommentsRefreshed($event)"
                 (newCommentAdded)="onGeneratOrderReport(true)">
             </app-comment-parent>
@@ -1007,7 +997,8 @@
                     <div class="d-lg-none d-block">
                         <div class="greyMDlightColor dropdown" dropdown>
                             <button dropdownToggle type="button" class="btn   border-0 dropdownBtn"
-                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" id="dropdownMenuButton" >
+                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
+                                id="dropdownMenuButton">
                                 <div class="d-flex flex-column align-items-center">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" viewBox="0 0 25 25"
                                         fill="none">
@@ -1019,7 +1010,8 @@
 
                                 </div>
                             </button>
-                            <div class="dropdown-menu dropdown-menu-right dropdown-excel-operations" *dropdownMenu  aria-labelledby="dropdownMenuButton">
+                            <div class="dropdown-menu dropdown-menu-right dropdown-excel-operations" *dropdownMenu
+                                aria-labelledby="dropdownMenuButton">
                                 <a class="dropdown-item d-flex" id="shareTransaction" href="javascript:;">
 
 
@@ -1118,215 +1110,81 @@
             </div>
             <div class="tablet" *ngIf="!onshare">
 
-                <div class="card position-relative dot">
-                    <!-- <div class="d-md-none d-block actionsSec" [ngStyle]="
-                                    isArabic
-                                        ? {
-                                            'left': '-33px',
-                                            'border-right': '1px solid #eee'
-                                        }
-                                        : {
-                                            'right': '-33px',
-                                            'border-left': '1px solid #eee'
-                                        }
-                                    ">
-                        <div class=" greyMDlightColor dropActions" dropdown>
-                            <button dropdownToggle type="button" class="btn   border-0 mt-3" data-toggle="dropdown"
-                                aria-haspopup="true" aria-expanded="false">
-                                <div class="d-flex flex-column align-items-center">
-                                    <i class="fa fa-ellipsis-v text-muted more-icon"></i>
+                <div class="card position-relative">
 
-                                    <p class="mt-3">{{'Actions' | localize}}</p>
-                                </div>
-                            </button>
-                            <div class="dropdown-menu dropdown-menu-right dropdown-excel-operations" *dropdownMenu>
-                                <a class="dropdown-item d-flex" id="shareTransaction" href="javascript:;">
+                    <div class="mobile-manual-tabs d-md-none">
+                        <button type="button" class="mobile-tab" [class.active]="mobileTab === 'details'"
+                            (click)="mobileTab = 'details'">
 
+                            <span>{{ 'Details' | localize }}</span>
+                            <i class="fa fa-info-circle"></i>
+                        </button>
 
-                                    <button *ngIf="appTransactionsForViewDto?.isOwnedByMe" type="button"
-                                        class="btn border-0  mx-1 btnHgtNoWrap"
-                                        [disabled]="appTransactionsForViewDto?.entityStatusCode?.toUpperCase()!='OPEN'"
-                                        [ngClass]="{ disabled:appTransactionsForViewDto?.entityStatusCode?.toUpperCase()!='OPEN'}"
-                                        (click)="onShareTransaction()">
-                                        <i class="fa fa-share-alt"></i>
-                                        {{l("Share")}}
-                                    </button>
-                                </a>
-                                <a class="dropdown-item d-flex" id="printTransaction" href="javascript:;">
-                                    <button type="button"
-                                        [disabled]="appTransactionsForViewDto?.entityStatusCode?.toUpperCase()!='OPEN'"
-                                        [ngClass]="{ disabled:appTransactionsForViewDto?.entityStatusCode?.toUpperCase()!='OPEN'}"
-                                        class="btn  border-0 prntBtn" (click)="printTransaction()">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"
-                                            viewBox="0 0 20 20" fill="none">
-                                            <g clip-path="url(#clip0_924_2964)">
-                                                <path
-                                                    d="M14.0807 2.5C14.3066 2.49988 14.5246 2.58317 14.6928 2.73389C14.8611 2.8846 14.9678 3.09213 14.9924 3.31667L14.9974 3.41667V5.83333H15.8307C16.4684 5.8333 17.082 6.07694 17.5459 6.5144C18.0099 6.95187 18.2892 7.55009 18.3266 8.18667L18.3307 8.33333V14.1667C18.3309 14.5871 18.1721 14.9921 17.8861 15.3005C17.6002 15.6088 17.2084 15.7976 16.7891 15.8292L16.6641 15.8333H14.9974V17.4167C14.9975 17.6425 14.9142 17.8605 14.7635 18.0288C14.6128 18.197 14.4053 18.3037 14.1807 18.3283L14.0807 18.3333H5.91406C5.68818 18.3334 5.47021 18.2502 5.30196 18.0994C5.13371 17.9487 5.02704 17.7412 5.0024 17.5167L4.9974 17.4167V15.8333H3.33073C2.91025 15.8335 2.50526 15.6747 2.19694 15.3888C1.88862 15.1028 1.69977 14.711 1.66823 14.2917L1.66406 14.1667V8.33333C1.66403 7.69566 1.90767 7.08207 2.34513 6.61812C2.7826 6.15416 3.38082 5.87491 4.0174 5.8375L4.16406 5.83333H4.9974V3.41667C4.99728 3.19079 5.08057 2.97281 5.23128 2.80457C5.382 2.63632 5.58953 2.52964 5.81406 2.505L5.91406 2.5H14.0807ZM13.3307 13.3333H6.66406V16.6667H13.3307V13.3333ZM15.8307 7.5H4.16406C3.95995 7.50003 3.76295 7.57496 3.61042 7.7106C3.45789 7.84623 3.36044 8.03312 3.33656 8.23583L3.33073 8.33333V14.1667H4.9974V12.5833C4.99728 12.3575 5.08057 12.1395 5.23128 11.9712C5.382 11.803 5.58953 11.6963 5.81406 11.6717L5.91406 11.6667H14.0807C14.3066 11.6666 14.5246 11.7498 14.6928 11.9006C14.8611 12.0513 14.9678 12.2588 14.9924 12.4833L14.9974 12.5833V14.1667H16.6641V8.33333C16.6641 8.11232 16.5763 7.90036 16.42 7.74408C16.2637 7.5878 16.0517 7.5 15.8307 7.5ZM14.1641 8.33333C14.3765 8.33357 14.5808 8.4149 14.7352 8.56071C14.8896 8.70651 14.9826 8.90579 14.995 9.11783C15.0075 9.32986 14.9385 9.53865 14.8022 9.70153C14.6658 9.8644 14.4725 9.96908 14.2616 9.99417L14.1641 10H12.4974C12.285 9.99976 12.0807 9.91843 11.9263 9.77263C11.7718 9.62682 11.6789 9.42754 11.6664 9.2155C11.654 9.00347 11.723 8.79468 11.8593 8.63181C11.9956 8.46893 12.189 8.36425 12.3999 8.33917L12.4974 8.33333H14.1641ZM13.3307 4.16667H6.66406V5.83333H13.3307V4.16667Z"
-                                                    fill="#777777" />
-                                            </g>
-                                            <defs>
-                                                <clipPath id="clip0_924_2964">
-                                                    <rect width="20" height="20" fill="white" />
-                                                </clipPath>
-                                            </defs>
-                                        </svg>
-                                        {{"Print" | localize}}</button>
-                                </a>
-                                <a class="dropdown-item d-flex" id="continueShop" href="javascript:;">
+                        <button type="button" class="mobile-tab" [class.active]="mobileTab === 'summary'"
+                            (click)="mobileTab = 'summary'">
 
+                            <span>{{ 'Summary' | localize }}</span>
+                            <i class="fa fa-list-alt"></i>
+                        </button>
 
-                                    <button type="button" class="btn  border-0  btnHgtNoWrap"
-                                        *ngIf="appTransactionsForViewDto?.entityStatusCode?.toUpperCase()=='DRAFT'"
-                                        (click)="onContinueShopping()" [disabled]="!isOwnedByMe"
-                                        [ngClass]="{ disabled:!isOwnedByMe}">
-                                        <svg width="19" height="18" viewBox="0 0 19 18" fill="none"
-                                            xmlns="http://www.w3.org/2000/svg">
-                                            <path
-                                                d="M1.41406 7.54165C1.41406 5.91651 2.05965 4.35794 3.20879 3.20879C4.35794 2.05965 5.91651 1.41406 7.54165 1.41406C9.16679 1.41406 10.7254 2.05965 11.8745 3.20879C13.0237 4.35794 13.6692 5.91651 13.6692 7.54165C13.6692 7.72917 13.7437 7.909 13.8763 8.0416C14.0089 8.17419 14.1888 8.24868 14.3763 8.24868C14.5638 8.24868 14.7436 8.17419 14.8762 8.0416C15.0088 7.909 15.0833 7.72917 15.0833 7.54165C15.0833 6.05005 14.641 4.59195 13.8123 3.35174C12.9836 2.11152 11.8058 1.14489 10.4277 0.574077C9.04966 0.00326765 7.53328 -0.146082 6.07035 0.144914C4.60741 0.43591 3.26362 1.15418 2.2089 2.2089C1.15418 3.26362 0.43591 4.60741 0.144914 6.07035C-0.146082 7.53329 0.00326765 9.04966 0.574077 10.4277C1.14489 11.8058 2.11152 12.9836 3.35174 13.8123C4.59195 14.641 6.05005 15.0833 7.54165 15.0833C7.72917 15.0833 7.909 15.0088 8.0416 14.8762C8.17419 14.7436 8.24868 14.5638 8.24868 14.3763C8.24868 14.1888 8.17419 14.0089 8.0416 13.8763C7.909 13.7437 7.72917 13.6692 7.54165 13.6692C5.91651 13.6692 4.35794 13.0237 3.20879 11.8745C2.05965 10.7254 1.41406 9.16679 1.41406 7.54165Z"
-                                                fill="#777777" />
-                                            <path
-                                                d="M8.49961 13.8004L12.5947 17.8955C12.6442 17.9451 12.7072 17.9788 12.7759 17.9925C12.8445 18.0062 12.9157 17.9992 12.9804 17.9724C13.0451 17.9456 13.1003 17.9002 13.1392 17.8419C13.178 17.7837 13.1987 17.7152 13.1985 17.6452V14.6106H17.7942C18.0755 14.6106 18.3453 14.4989 18.5441 14.3C18.743 14.1011 18.8548 13.8314 18.8548 13.5501C18.8548 13.2688 18.743 12.9991 18.5441 12.8002C18.3453 12.6013 18.0755 12.4896 17.7942 12.4896H13.1985V9.45498C13.1987 9.38497 13.178 9.3165 13.1392 9.25825C13.1003 9.2 13.0451 9.15459 12.9804 9.12778C12.9157 9.10097 12.8445 9.09397 12.7759 9.10766C12.7072 9.12136 12.6442 9.15513 12.5947 9.20469L8.49961 13.2998C8.46669 13.3326 8.44057 13.3717 8.42275 13.4146C8.40493 13.4576 8.39576 13.5036 8.39576 13.5501C8.39576 13.5966 8.40493 13.6426 8.42275 13.6856C8.44057 13.7285 8.46669 13.7675 8.49961 13.8004ZM12.1804 5.8152C12.2788 5.71678 12.3569 5.59993 12.4102 5.47134C12.4634 5.34275 12.4908 5.20493 12.4908 5.06574C12.4908 4.92656 12.4634 4.78873 12.4102 4.66014C12.3569 4.53155 12.2788 4.41471 12.1804 4.31629C12.082 4.21787 11.9651 4.1398 11.8366 4.08654C11.708 4.03327 11.5701 4.00586 11.431 4.00586C11.2918 4.00586 11.1539 4.03327 11.0254 4.08654C10.8968 4.1398 10.7799 4.21787 10.6815 4.31629L6.48175 8.51463L4.40309 6.43738C4.30467 6.33896 4.18783 6.26089 4.05923 6.20763C3.93064 6.15436 3.79282 6.12695 3.65363 6.12695C3.51445 6.12695 3.37663 6.15436 3.24803 6.20763C3.11944 6.26089 3.0026 6.33896 2.90418 6.43738C2.80576 6.5358 2.72769 6.65264 2.67443 6.78123C2.62116 6.90982 2.59375 7.04765 2.59375 7.18683C2.59375 7.32602 2.62116 7.46384 2.67443 7.59243C2.72769 7.72102 2.80576 7.83786 2.90418 7.93628L5.7323 10.7644C5.83067 10.8629 5.94749 10.9411 6.07609 10.9944C6.20469 11.0477 6.34254 11.0751 6.48175 11.0751C6.62097 11.0751 6.75881 11.0477 6.88741 10.9944C7.01601 10.9411 7.13283 10.8629 7.2312 10.7644L12.1804 5.8152Z"
-                                                fill="#777777" />
-                                        </svg>
-                                        {{l("ContinueShopping")}}
-                                    </button>
+                        <button type="button" class="mobile-tab" [class.active]="mobileTab === 'chats'"
+                            (click)="mobileTab = 'chats'">
 
+                            <span>{{ 'Chats' | localize }}</span>
+                            <i class="fa fa-comments"></i>
+                        </button>
 
-                                </a>
-                                <a class="dropdown-item d-flex" id="discardShop" href="javascript:;">
+                        <button type="button" class="mobile-tab" [class.active]="mobileTab === 'actions'"
+                            (click)="mobileTab = 'actions'">
 
+                            <span>{{ 'Actions' | localize }}</span>
+                            <i class="fa fa-ellipsis-v"></i>
+                        </button>
+                    </div>
 
-                                    <button *ngIf="appTransactionsForViewDto?.entityStatusCode?.toUpperCase()!='OPEN'"
-                                        type="button" class="btn  border-0 btnHgtNoWrap " (click)="onDiscardShopping()">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"
-                                            viewBox="0 0 20 20" fill="none">
-                                            <g clip-path="url(#clip0_292_8477)">
-                                                <path
-                                                    d="M5.9375 14.375L14.0625 5.9375M18.125 10C18.125 14.4875 14.4875 18.125 10 18.125C5.5125 18.125 1.875 14.4875 1.875 10C1.875 5.5125 5.5125 1.875 10 1.875C14.4875 1.875 18.125 5.5125 18.125 10Z"
-                                                    stroke="#777777" stroke-width="2" stroke-linecap="round"
-                                                    stroke-linejoin="round" />
-                                            </g>
-                                            <defs>
-                                                <clipPath id="clip0_292_8477">
-                                                    <rect width="20" height="20" fill="white" />
-                                                </clipPath>
-                                            </defs>
-                                        </svg>
+                    <div class="mobile-tab-content d-md-none">
 
-                                        {{l("DiscardShopping")}}
-                                    </button>
+                        <ng-container *ngIf="mobileTab === 'details'">
+                            <ng-container *ngTemplateOutlet="transactionDetailsTemplate"></ng-container>
+                        </ng-container>
 
-                                </a>
-                                <a class="dropdown-item d-flex" id="syncTransaction">
-                                    <button *ngIf="appTransactionsForViewDto?.isOwnedByMe" type="button"
-                                        class="btn  btnHgtNoWrap" [disabled]="!appTransactionsForViewDto?.showSync"
-                                        (click)="sync()">
-                                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none"
-                                            xmlns="http://www.w3.org/2000/svg">
-                                            <path
-                                                d="M9.99967 3.33301V0.833008L6.66634 4.16634L9.99967 7.49967V4.99967C12.758 4.99967 14.9997 7.24134 14.9997 9.99967C14.9997 10.8413 14.7913 11.6413 14.4163 12.333L15.633 13.5497C16.3082 12.4888 16.6667 11.2572 16.6663 9.99967C16.6663 6.31634 13.683 3.33301 9.99967 3.33301ZM9.99967 14.9997C7.24134 14.9997 4.99967 12.758 4.99967 9.99967C4.99967 9.15801 5.20801 8.35801 5.58301 7.66634L4.36634 6.44967C3.69114 7.51058 3.33266 8.74222 3.33301 9.99967C3.33301 13.683 6.31634 16.6663 9.99967 16.6663V19.1663L13.333 15.833L9.99967 12.4997V14.9997Z"
-                                                fill="#777777" />
-                                        </svg>
+                        <ng-container *ngIf="mobileTab === 'summary'">
+                            <ng-container *ngTemplateOutlet="transactionOrderSummaryTemplate"></ng-container>
+                        </ng-container>
 
+                        <ng-container *ngIf="mobileTab === 'chats'">
+                            <ng-container *ngTemplateOutlet="transactionNotesTemplate"></ng-container>
+                            <ng-container *ngTemplateOutlet="transactionCommentsTemplate"></ng-container>
+                        </ng-container>
 
-                                        {{l("Sync")}}
-                                    </button>
-                                </a>
+                        <ng-container *ngIf="mobileTab === 'actions'">
+                            <div class="mobile-actions-list">
+                                <button *ngIf="appTransactionsForViewDto?.isOwnedByMe"
+                                    class="btn w-100 mobile-action-btn"
+                                    [disabled]="appTransactionsForViewDto?.entityStatusCode?.toUpperCase() !== 'OPEN'"
+                                    (click)="onShareTransaction()">
+                                    <i class="fa fa-share-alt"></i>
+                                    {{ l('Share') }}
+                                </button>
+
+                                <button class="btn w-100 mobile-action-btn"
+                                    [disabled]="appTransactionsForViewDto?.entityStatusCode?.toUpperCase() !== 'OPEN'"
+                                    (click)="printTransaction()">
+                                    <i class="fa fa-print"></i>
+                                    {{ 'Print' | localize }}
+                                </button>
+
+                                <button *ngIf="appTransactionsForViewDto?.isOwnedByMe"
+                                    class="btn w-100 mobile-action-btn"
+                                    [disabled]="!appTransactionsForViewDto?.showSync" (click)="sync()">
+                                    <i class="fa fa-sync"></i>
+                                    {{ l('Sync') }}
+                                </button>
                             </div>
-                        </div>
+                        </ng-container>
 
+                    </div>
 
-                    </div> -->
-                 
-                 <div class="mobile-manual-tabs d-md-none">
-  <button
-    type="button"
-    class="mobile-tab"
-    [class.active]="mobileTab === 'details'"
-    (click)="mobileTab = 'details'">
-
-    <span>{{ 'Details' | localize }}</span>
-    <i class="fa fa-info-circle"></i>
-  </button>
-
-  <button
-    type="button"
-    class="mobile-tab"
-    [class.active]="mobileTab === 'summary'"
-    (click)="mobileTab = 'summary'">
-
-    <span>{{ 'Summary' | localize }}</span>
-    <i class="fa fa-list-alt"></i>
-  </button>
-
-  <button
-    type="button"
-    class="mobile-tab"
-    [class.active]="mobileTab === 'chats'"
-    (click)="mobileTab = 'chats'">
-
-    <span>{{ 'Chats' | localize }}</span>
-    <i class="fa fa-comments"></i>
-  </button>
-
-  <button
-    type="button"
-    class="mobile-tab"
-    [class.active]="mobileTab === 'actions'"
-    (click)="mobileTab = 'actions'">
-
-    <span>{{ 'Actions' | localize }}</span>
-    <i class="fa fa-ellipsis-v"></i>
-  </button>
-</div>
-
-<div class="mobile-tab-content d-md-none">
-
-  <ng-container *ngIf="mobileTab === 'details'">
-    <ng-container *ngTemplateOutlet="transactionDetailsTemplate"></ng-container>
-  </ng-container>
-
-  <ng-container *ngIf="mobileTab === 'summary'">
-    <ng-container *ngTemplateOutlet="transactionOrderSummaryTemplate"></ng-container>
-  </ng-container>
-
-  <ng-container *ngIf="mobileTab === 'chats'">
-    <ng-container *ngTemplateOutlet="transactionNotesTemplate"></ng-container>
-    <ng-container *ngTemplateOutlet="transactionCommentsTemplate"></ng-container>
-  </ng-container>
-
-  <ng-container *ngIf="mobileTab === 'actions'">
-    <div class="mobile-actions-list">
-      <button
-        *ngIf="appTransactionsForViewDto?.isOwnedByMe"
-        class="btn w-100 mobile-action-btn"
-        [disabled]="appTransactionsForViewDto?.entityStatusCode?.toUpperCase() !== 'OPEN'"
-        (click)="onShareTransaction()">
-        <i class="fa fa-share-alt"></i>
-        {{ l('Share') }}
-      </button>
-
-      <button
-        class="btn w-100 mobile-action-btn"
-        [disabled]="appTransactionsForViewDto?.entityStatusCode?.toUpperCase() !== 'OPEN'"
-        (click)="printTransaction()">
-        <i class="fa fa-print"></i>
-        {{ 'Print' | localize }}
-      </button>
-
-      <button
-        *ngIf="appTransactionsForViewDto?.isOwnedByMe"
-        class="btn w-100 mobile-action-btn"
-        [disabled]="!appTransactionsForViewDto?.showSync"
-        (click)="sync()">
-        <i class="fa fa-sync"></i>
-        {{ l('Sync') }}
-      </button>
-    </div>
-  </ng-container>
-
-</div>
-                 
                     <p-tabView styleClass="tabview-custom" class="tabSSec d-lg-none d-md-block d-none">
                         <p-tabPanel>
                             <ng-template pTemplate="header">
@@ -1385,7 +1243,7 @@
                                 [ngClass]="(!appTransactionsForViewDto?.isOwnedByMe ) || (appTransactionsForViewDto?.isOwnedByMe && (appTransactionsForViewDto?.sharedWithUsers?.length>0 || shareDone)) ?  'd-block' : 'd-none'">
                                 <h4 class="notes-title purpleColor font-weight-bold">{{l("Comments")}}</h4>
                                 <div class="w-100 comment-warper  h-100 order-summary p-4  mt-3 purpleColor">
-                                    <app-comment-parent   #mobileComments [addNewThread]="true"   [loadComments]="true"
+                                    <app-comment-parent #mobileComments [addNewThread]="true" [loadComments]="true"
                                         [cartStyle]="true" #commentParentComponent
                                         (newCommentAdded)="onGeneratOrderReport(true)">
                                     </app-comment-parent>
