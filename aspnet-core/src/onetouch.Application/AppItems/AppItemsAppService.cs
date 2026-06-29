@@ -6404,6 +6404,8 @@ namespace onetouch.AppItems
             var itemObjectId = await _helper.SystemTables.GetObjectItemId();
             var tenantId = AbpSession.TenantId == null ? -1 : AbpSession.TenantId;
             var path = _appConfiguration[$"Attachment:PathTemp"] + @"\" + tenantId + @"\";
+            var attachmentTenantPath = _appConfiguration[$"Attachment:Path"] + @"\" + tenantId.ToString();
+            var attachmentTenantDirectoryEnsured = false;
             string imagesUrl = _appConfiguration[$"Attachment:Path"].Replace(_appConfiguration[$"Attachment:Omitt"], "") + @"/" + tenantId + @"/";
             var itemStatusId = await _helper.SystemTables.GetEntityObjectStatusItemActive();
             List<AppItem> appItemList = new List<AppItem>();
@@ -6415,6 +6417,18 @@ namespace onetouch.AppItems
             List<AppEntityExtraData> appEntityExtraDataDeleteList = new List<AppEntityExtraData>();
             var x = UnitOfWorkManager.Current.GetDbContext<onetouchDbContext>(null, null);
             List<string> sizeScaleNames = new List<string>();
+            var createdSizeScalesByName = new Dictionary<string, AppSizeScaleForEditDto>(StringComparer.OrdinalIgnoreCase);
+
+            void EnsureAttachmentTenantDirectory()
+            {
+                if (attachmentTenantDirectoryEnsured)
+                    return;
+
+                if (!System.IO.Directory.Exists(attachmentTenantPath))
+                    System.IO.Directory.CreateDirectory(attachmentTenantPath);
+
+                attachmentTenantDirectoryEnsured = true;
+            }
 
             var existingParentIds = result
                 .Where(z => string.IsNullOrEmpty(z.ParentCode) && z.Id != 0)
@@ -6439,6 +6453,41 @@ namespace onetouch.AppItems
                     .Include(z => z.ParentFkList).ThenInclude(z => z.ItemPricesFkList)
                     .ToListAsync())
                     .ToDictionary(z => z.Id);
+            var existingItemScaleHeadersByItemId = existingParentIds.Count == 0
+                ? new Dictionary<long, List<AppItemSizeScalesHeader>>()
+                : (await x.AppItemSizeScalesHeaders
+                    .AsNoTracking()
+                    .Where(z => existingParentIds.Contains(z.AppItemId))
+                    .Include(z => z.AppItemSizeScalesDetails)
+                    .ToListAsync())
+                    .GroupBy(z => z.AppItemId)
+                    .ToDictionary(z => z.Key, z => z.ToList());
+            var requestedSizeScaleNames = result
+                .Where(z => !string.IsNullOrWhiteSpace(z.SizeScaleName))
+                .Select(z => z.SizeScaleName.Trim())
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .ToList();
+            var requestedSizeRatioNames = result
+                .Where(z => !string.IsNullOrWhiteSpace(z.SizeRatioName) || !string.IsNullOrWhiteSpace(z.SizeScaleName))
+                .Select(z => !string.IsNullOrWhiteSpace(z.SizeRatioName) ? z.SizeRatioName.Trim() : z.SizeScaleName.TrimEnd() + " Ratio")
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .ToList();
+            var sizeScaleHeadersByName = requestedSizeScaleNames.Count == 0
+                ? new Dictionary<string, AppSizeScalesHeader>(StringComparer.OrdinalIgnoreCase)
+                : (await _appSizeScalesHeaderRepository.GetAll()
+                    .AsNoTracking()
+                    .Where(z => z.ParentId == null && requestedSizeScaleNames.Contains(z.Name))
+                    .ToListAsync())
+                    .GroupBy(z => z.Name, StringComparer.OrdinalIgnoreCase)
+                    .ToDictionary(z => z.Key, z => z.First(), StringComparer.OrdinalIgnoreCase);
+            var sizeRatioHeadersByName = requestedSizeRatioNames.Count == 0
+                ? new Dictionary<string, AppSizeScalesHeader>(StringComparer.OrdinalIgnoreCase)
+                : (await _appSizeScalesHeaderRepository.GetAll()
+                    .AsNoTracking()
+                    .Where(z => z.ParentId != null && requestedSizeRatioNames.Contains(z.Name))
+                    .ToListAsync())
+                    .GroupBy(z => z.Name, StringComparer.OrdinalIgnoreCase)
+                    .ToDictionary(z => z.Key, z => z.First(), StringComparer.OrdinalIgnoreCase);
 
             foreach (AppItemExcelDto excelDto in result)
             {
@@ -6725,27 +6774,21 @@ namespace onetouch.AppItems
                         if (img.ImageFileName == "noimage_item.jpg")
                         {
                             img.ImageGuid = Guid.NewGuid().ToString();
-                            if (!System.IO.Directory.Exists(_appConfiguration[$"Attachment:Path"] + @"\" + tenantId.ToString()))
-                            {
-                                System.IO.Directory.CreateDirectory(_appConfiguration[$"Attachment:Path"] + @"\" + tenantId.ToString());
-                            }
+                            EnsureAttachmentTenantDirectory();
 
                             try
                             {
-                                System.IO.File.Copy(System.IO.Directory.GetCurrentDirectory() + @"\Assets\noimage_item.jpg", _appConfiguration[$"Attachment:Path"] + @"\" + tenantId.ToString() + @"\" + img.ImageGuid + ".jpg", true);
+                                System.IO.File.Copy(System.IO.Directory.GetCurrentDirectory() + @"\Assets\noimage_item.jpg", attachmentTenantPath + @"\" + img.ImageGuid + ".jpg", true);
                             }
                             catch { }
                         }
                         else
                         {
-                            if (!System.IO.Directory.Exists(_appConfiguration[$"Attachment:Path"] + @"\" + tenantId.ToString()))
-                            {
-                                System.IO.Directory.CreateDirectory(_appConfiguration[$"Attachment:Path"] + @"\" + tenantId.ToString());
-                            }
+                            EnsureAttachmentTenantDirectory();
 
                             try
                             {
-                                System.IO.File.Copy(path + @"\" + img.ImageGuid + "." + img.ImageFileName.Split('.')[1], _appConfiguration[$"Attachment:Path"] + @"\" + tenantId.ToString() + @"\" + img.ImageGuid + "." + img.ImageFileName.Split('.')[1], true);
+                                System.IO.File.Copy(path + @"\" + img.ImageGuid + "." + img.ImageFileName.Split('.')[1], attachmentTenantPath + @"\" + img.ImageGuid + "." + img.ImageFileName.Split('.')[1], true);
                             }
                             catch { }
                         }
@@ -6777,8 +6820,8 @@ namespace onetouch.AppItems
                 appItem.EntityFk.TenantOwner = appItem.TenantOwner;
                 if (!string.IsNullOrEmpty(excelDto.SizeScaleName))
                 {
-                    var ratioHeader = _appSizeScalesHeaderRepository.GetAll().Where(x => x.Name == excelDto.SizeRatioName & x.ParentId != null).AsNoTracking().FirstOrDefault();
-                    var scaleHeader = _appSizeScalesHeaderRepository.GetAll().Where(x => x.Name == excelDto.SizeScaleName).AsNoTracking().FirstOrDefault();
+                    sizeRatioHeadersByName.TryGetValue(excelDto.SizeRatioName ?? string.Empty, out var ratioHeader);
+                    sizeScaleHeadersByName.TryGetValue(excelDto.SizeScaleName ?? string.Empty, out var scaleHeader);
                     if (scaleHeader == null || ratioHeader == null || (excelResultsDTO.RepreateHandler == ExcelRecordRepeateHandler.CreateACopy) ||
                        (excelResultsDTO.RepreateHandler == ExcelRecordRepeateHandler.ReplaceDuplicatedRecords) || (excelDto.Id == 0))
                     {
@@ -6890,32 +6933,38 @@ namespace onetouch.AppItems
                         appSizeScaleForEditDto.Dimesion1Name = excelDto.SizeScaleName;
                         appSizeScaleForEditDto.Name = excelDto.SizeScaleName;
                         long? sizeScaleSavedId = 0;
-                        Task<AppSizeScaleForEditDto> sizescale = null;
+                        AppSizeScaleForEditDto sizescale = null;
                         try
                         {
-                            sizescale = _appSizeScaleAppService.CreateOrEditAppSizeScale(appSizeScaleForEditDto);
-                            sizeScaleSavedId = sizescale.Result.Id;
-                            sizeScaleNames.Add(excelDto.SizeScaleName);
+                            if (!string.IsNullOrEmpty(excelDto.SizeScaleName) &&
+                                createdSizeScalesByName.TryGetValue(excelDto.SizeScaleName, out sizescale))
+                            {
+                                sizeScaleSavedId = sizescale.Id;
+                            }
+                            else
+                            {
+                                sizescale = await _appSizeScaleAppService.CreateOrEditAppSizeScale(appSizeScaleForEditDto);
+                                sizeScaleSavedId = sizescale.Id;
+                                if (!string.IsNullOrEmpty(excelDto.SizeScaleName))
+                                    createdSizeScalesByName[excelDto.SizeScaleName] = sizescale;
+                                sizeScaleNames.Add(excelDto.SizeScaleName);
+                            }
                         }
                         catch (Exception ex)
                         {
                             if (sizeScaleNames.FirstOrDefault(z => z == excelDto.SizeScaleName) != null)
                             {
-                                sizescale = _appSizeScaleAppService.GetSizeScaleForEdit(long.Parse(appSizeScaleForEditDto.Id.ToString()));
-                                sizeScaleSavedId = sizescale.Result.Id;
+                                sizescale = await _appSizeScaleAppService.GetSizeScaleForEdit(long.Parse(appSizeScaleForEditDto.Id.ToString()));
+                                sizeScaleSavedId = sizescale.Id;
+                                if (!string.IsNullOrEmpty(excelDto.SizeScaleName))
+                                    createdSizeScalesByName[excelDto.SizeScaleName] = sizescale;
                             }
                         }
 
                         long sizeRatioId = 0;
                         long sizeScaleId = 0;
-                        List<AppItemSizeScalesHeader> itemScaleData = new List<AppItemSizeScalesHeader>();
-                        if (appItem.Id != 0)
-                        {
-                            var sizeScaleList = await x.AppItemSizeScalesHeaders.Where(z => z.AppItemId == appItem.Id).AsNoTracking()
-                                 .Include(x => x.AppItemSizeScalesDetails).AsNoTracking().ToListAsync();
-                            itemScaleData = sizeScaleList;
-
-                        }
+                        existingItemScaleHeadersByItemId.TryGetValue(appItem.Id, out var itemScaleData);
+                        itemScaleData ??= new List<AppItemSizeScalesHeader>();
                         if (itemScaleData != null && itemScaleData.Count > 0)
                         {
                             var scaleObject = itemScaleData.FirstOrDefault(a => a.ParentId == null);
@@ -6932,10 +6981,10 @@ namespace onetouch.AppItems
                         appItemSizeScalesHeader.SizeScaleId = sizeScaleSavedId;
                         appItemSizeScalesHeader.Id = sizeScaleId;
                         appItemSizeScalesHeader.TenantId = AbpSession.TenantId;
-                        appItemSizeScalesHeader.Name = sizescale.Result.Name;
-                        appItemSizeScalesHeader.SizeScaleCode = sizescale.Result.Code;
-                        appItemSizeScalesHeader.NoOfDimensions = sizescale.Result.NoOfDimensions;
-                        appItemSizeScalesHeader.Dimesion1Name = sizescale.Result.Dimesion1Name;
+                        appItemSizeScalesHeader.Name = sizescale.Name;
+                        appItemSizeScalesHeader.SizeScaleCode = sizescale.Code;
+                        appItemSizeScalesHeader.NoOfDimensions = sizescale.NoOfDimensions;
+                        appItemSizeScalesHeader.Dimesion1Name = sizescale.Dimesion1Name;
                         appItemSizeScalesHeader.ParentId = null;
                         appItemSizeScalesHeader.AppItemSizeScalesDetails = ObjectMapper.Map<List<AppItemSizeScalesDetails>>(appSizeScalesDetailDtoList.Where(z => z.DimensionName != null));
                         appItemSizeScalesHeader.AppItemSizeScalesDetails.ForEach(a => a.Id = 0);
@@ -6980,14 +7029,15 @@ namespace onetouch.AppItems
 
 
                         {
-                            var scaleHeaderRatio = _appSizeScalesHeaderRepository.GetAll().Where(x => x.Name == (!string.IsNullOrEmpty(excelDto.SizeRatioName) ? excelDto.SizeRatioName : sizescale.Result.Name.TrimEnd() + " Ratio") & x.ParentId != null).AsNoTracking().FirstOrDefault();
+                            var scaleRatioName = !string.IsNullOrEmpty(excelDto.SizeRatioName) ? excelDto.SizeRatioName : sizescale.Name.TrimEnd() + " Ratio";
+                            sizeRatioHeadersByName.TryGetValue(scaleRatioName, out var scaleHeaderRatio);
                             if (scaleHeaderRatio == null || (excelResultsDTO.RepreateHandler == ExcelRecordRepeateHandler.CreateACopy) ||
                                 (excelResultsDTO.RepreateHandler == ExcelRecordRepeateHandler.ReplaceDuplicatedRecords))
                             {
                                 AppSizeScaleForEditDto appSizeScaleRatioForEditDto = new AppSizeScaleForEditDto();
                                 appSizeScaleRatioForEditDto.AppSizeScalesDetails = appSizeScalesDetailDtoList;
                                 appSizeScaleRatioForEditDto.NoOfDimensions = 1;
-                                appSizeScaleRatioForEditDto.ParentId = sizescale.Result.Id;
+                                appSizeScaleRatioForEditDto.ParentId = sizescale.Id;
 
                                 if (scaleHeaderRatio != null & (excelResultsDTO.RepreateHandler == ExcelRecordRepeateHandler.ReplaceDuplicatedRecords))
                                 {
@@ -6997,8 +7047,8 @@ namespace onetouch.AppItems
                                 else
                                     appSizeScaleRatioForEditDto.Code = "";
 
-                                appSizeScaleRatioForEditDto.Dimesion1Name = sizescale.Result.Dimesion1Name;
-                                appSizeScaleRatioForEditDto.Name = (!string.IsNullOrEmpty(excelDto.SizeRatioName) ? excelDto.SizeRatioName : sizescale.Result.Name.TrimEnd() + " Ratio");
+                                appSizeScaleRatioForEditDto.Dimesion1Name = sizescale.Dimesion1Name;
+                                appSizeScaleRatioForEditDto.Name = scaleRatioName;
                                 string[] arraySizeRatio = new string[sizes.Count];
                                 System.Array.Fill(arraySizeRatio, "0");
                                 if (!string.IsNullOrEmpty(excelDto.SizeRatioName))
@@ -7083,7 +7133,7 @@ namespace onetouch.AppItems
                                 appItemSizeScalesHeaderRatio.AppItemSizeScalesDetails = ObjectMapper.Map<List<AppItemSizeScalesDetails>>(appSizeScalesRatioDetailDtoList);
                                 appItemSizeScalesHeaderRatio.AppItemSizeScalesDetails.ForEach(a => a.Id = 0);
                                 appItemSizeScalesHeaderRatio.AppItemSizeScalesDetails.ForEach(a => a.TenantId = AbpSession.TenantId);
-                                appItemSizeScalesHeaderRatio.AppItemSizeScalesDetails.ForEach(a => a.DimensionName = sizescale.Result.Dimesion1Name);
+                                appItemSizeScalesHeaderRatio.AppItemSizeScalesDetails.ForEach(a => a.DimensionName = sizescale.Dimesion1Name);
                                 appItemSizeScalesHeaderRatio.AppItemSizeScalesDetails.ForEach(a => a.SizeScaleId = appItemSizeScalesHeaderRatio.Id);
                                 if (appItem.Id != 0 && itemScaleData != null && itemScaleData.Count > 0)
                                 {
@@ -7152,14 +7202,8 @@ namespace onetouch.AppItems
                     string scaleDim1Name = appItem.Code + " 1st Dimesion";
 
 
-                    List<AppItemSizeScalesHeader> itemScaleData = new List<AppItemSizeScalesHeader>();
-                    if (appItem.Id != 0)
-                    {
-                        var sizeScaleList = await x.AppItemSizeScalesHeaders.Where(z => z.AppItemId == appItem.Id).AsNoTracking()
-                             .Include(x => x.AppItemSizeScalesDetails).AsNoTracking().ToListAsync();
-                        itemScaleData = sizeScaleList;
-
-                    }
+                    existingItemScaleHeadersByItemId.TryGetValue(appItem.Id, out var itemScaleData);
+                    itemScaleData ??= new List<AppItemSizeScalesHeader>();
                     if (itemScaleData != null && itemScaleData.Count > 0)
                     {
                         var scaleObject = itemScaleData.FirstOrDefault(a => a.ParentId == null);
@@ -7508,14 +7552,11 @@ namespace onetouch.AppItems
                                     appEntityAttachment.Attributes = item.ExtraAttributes[0].AttributeId.ToString() + "=" + appChildItem.EntityFk.EntityExtraData[0].AttributeCode;
                                     appEntityAttachment.EntityCode = excelDto.Code;
 
-                                    if (!System.IO.Directory.Exists(_appConfiguration[$"Attachment:Path"] + @"\" + tenantId.ToString()))
-                                    {
-                                        System.IO.Directory.CreateDirectory(_appConfiguration[$"Attachment:Path"] + @"\" + tenantId.ToString());
-                                    }
+                                    EnsureAttachmentTenantDirectory();
 
                                     try
                                     {
-                                        System.IO.File.Copy(path + @"\" + img.ImageGuid + "." + img.ImageFileName.Split('.')[1], _appConfiguration[$"Attachment:Path"] + @"\" + tenantId.ToString() + @"\" + img.ImageGuid + "." + img.ImageFileName.Split('.')[1], true);
+                                        System.IO.File.Copy(path + @"\" + img.ImageGuid + "." + img.ImageFileName.Split('.')[1], attachmentTenantPath + @"\" + img.ImageGuid + "." + img.ImageFileName.Split('.')[1], true);
                                     }
                                     catch { }
 
