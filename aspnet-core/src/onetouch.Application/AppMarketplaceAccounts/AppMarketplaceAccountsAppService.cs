@@ -304,15 +304,16 @@ namespace onetouch.AppMarketplaceAccounts
                 else
                 {
                     _accounts = from o in pagedAndFilteredAccounts
-                                    //join o1 in _appContactRepository.GetAll() on o.SSIN equals o1.SSIN into j1
+                                    join o1 in _appContactRepository.GetAll().Where(z=>z.TenantId==AbpSession.TenantId) on o.SSIN equals o1.SSIN into j1
                                     //from s1 in j1.DefaultIfEmpty()
                                     //where s1.TenantId == AbpSession.TenantId
                                     //join o1 in _appEntityRepository.GetAll() on o.AppContactAddresses.FirstOrDefault().AddressFk.CountryId equals o1.Id into j1
-                                    //from s1 in j1.DefaultIfEmpty()
+                                    from s1 in j1.DefaultIfEmpty()
 
                                     select new GetMarketplaceAccountForViewDto ()
                                     {
-                                        IsProfileData = o.IsProfileData,
+                                        ConnectedAccountId = (s1 == null ? null: s1.Id),
+                                        IsProfileData = ( s1== null? false: s1.IsProfileData),
                                         IsPublished = (o.TenantOwner == AbpSession.TenantId ? true : false),
                                         //AvaliableConnectionName = GetAction(o.EntityObjectTypeCode),
                                         AvaliableConnectionName = "Follow",
@@ -400,7 +401,7 @@ namespace onetouch.AppMarketplaceAccounts
                         /*var accountConnection = _appContactRepository.GetAll()
                         .FirstOrDefault(e => e.TenantId == AbpSession.TenantId && e.SSIN == account.Account.SSIN);*/
                         //if (accountConnection != null && accountConnection.Id > 0)
-                        if (account.Account.Id > 0)
+                        if (account.ConnectedAccountId !=null && account.ConnectedAccountId > 0)
                         { 
                              //if (accountConnection.IsProfileData)
                             if (account.IsProfileData)
@@ -527,7 +528,7 @@ namespace onetouch.AppMarketplaceAccounts
                                         && ((!string.IsNullOrEmpty(currentTenatntAccountMarketplaceRole)
                                         && requestorRole != null && !string.IsNullOrEmpty(requestorRole.AttributeValue)) ?
                                         currentTenatntAccountMarketplaceRole.ToLower().Contains(requestorRole.AttributeValue.ToLower().TrimEnd().Replace(".", ""))
-                                        : true))
+                                        : false))
                                     {
                                         var responseType = relationshipCodeLookup.EntityExtraData.Where(z => z.AttributeId == 607).FirstOrDefault();
                                         if ((responseType != null && 
@@ -536,7 +537,7 @@ namespace onetouch.AppMarketplaceAccounts
                                             && ((!string.IsNullOrEmpty(account.Account.MarketplaceAccountRole)
                                             && recepientRole!=null && !string.IsNullOrEmpty(recepientRole.AttributeValue)) ?
                                             account.Account.MarketplaceAccountRole.Replace(".", "").ToLower().Contains(recepientRole.AttributeValue.ToLower().TrimEnd().Replace(".", ""))
-                                            : true))
+                                            : false))
                                         {
                                             var connectLabel = relationshipCodeLookup.EntityExtraData.Where(z => z.AttributeId == 601).FirstOrDefault();
                                             if (connectLabel != null)
@@ -614,7 +615,7 @@ namespace onetouch.AppMarketplaceAccounts
                                           && ((!string.IsNullOrEmpty(currentTenatntAccountMarketplaceRole)
                                         && requestorRole!= null && !string.IsNullOrEmpty(requestorRole.AttributeValue)) ?
                                         currentTenatntAccountMarketplaceRole.Replace(".", "").ToLower().Contains(requestorRole.AttributeValue.ToLower().TrimEnd())
-                                        : true))
+                                        : false))
                                 {
                                     var responseType = relationshipCodeLookup.EntityExtraData.Where(z => z.AttributeId == 607).FirstOrDefault();
                                     if ((responseType != null && responseType.AttributeValue.TrimEnd().ToLower() ==
@@ -622,7 +623,7 @@ namespace onetouch.AppMarketplaceAccounts
                                         ((!string.IsNullOrEmpty(account.Account.MarketplaceAccountRole)
                                         && recepientRole!= null && !string.IsNullOrEmpty(recepientRole.AttributeValue)) ?
                                         account.Account.MarketplaceAccountRole.Replace(".", "").ToLower().Contains(recepientRole.AttributeValue.ToLower().TrimEnd())
-                                        : true))
+                                        : false))
                                     {
                                         var connectLabel = relationshipCodeLookup.EntityExtraData.Where(z => z.AttributeId == 601).FirstOrDefault();
                                         if (connectLabel != null)
@@ -1112,7 +1113,7 @@ namespace onetouch.AppMarketplaceAccounts
                                     requestorType.AttributeValue.TrimEnd().ToLower() == currentTenantAccount.EntityFk.EntityObjectTypeCode.ToLower() &&
                                     ((!string.IsNullOrEmpty(currentTenatntAccountMarketplaceRole)
                                     && requestorRole!=null && !string.IsNullOrEmpty(requestorRole.AttributeValue)) ?
-                                    (currentTenatntAccountMarketplaceRole.ToLower().Replace(".", "").Contains(requestorRole.AttributeValue.ToLower().TrimEnd().Replace(".", ""))) : true))
+                                    (currentTenatntAccountMarketplaceRole.ToLower().Replace(".", "").Contains(requestorRole.AttributeValue.ToLower().TrimEnd().Replace(".", ""))) : false))
                                 {
                                     var responseType = relationshipCodeLookup.EntityExtraData.Where(z => z.AttributeId == 607).FirstOrDefault();
                                     if (responseType != null &&
@@ -1120,7 +1121,7 @@ namespace onetouch.AppMarketplaceAccounts
                                         && ((!string.IsNullOrEmpty(marketplaceAccountRole)
                                         && recepientRole!=null && !string.IsNullOrEmpty(recepientRole.AttributeValue)) ?
                                         marketplaceAccountRole.ToLower().Replace(".", "").Contains(recepientRole.AttributeValue.ToLower().TrimEnd().Replace(".", ""))
-                                        : true))
+                                        : false))
                                     {
                                         var connectLabel = relationshipCodeLookup.EntityExtraData.Where(z => z.AttributeId == 601).FirstOrDefault();
                                         if (connectLabel != null)

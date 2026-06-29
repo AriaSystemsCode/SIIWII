@@ -722,7 +722,7 @@ namespace onetouch.Accounts
                                         && ((!string.IsNullOrEmpty(currentTenatntAccountMarketplaceRole)
                                         && requestorRole != null && !string.IsNullOrEmpty(requestorRole.AttributeValue)) ?
                                         currentTenatntAccountMarketplaceRole.ToLower().Replace(".", "").Contains(requestorRole.AttributeValue.ToLower().TrimEnd().Replace(".", ""))
-                                        : true))
+                                        : false))
                                     {
                                         var responseType = relationshipCodeLookup.EntityExtraData.Where(z => z.AttributeId == 607).FirstOrDefault();
                                         if ((responseType != null &&
@@ -731,7 +731,7 @@ namespace onetouch.Accounts
                                             && ((!string.IsNullOrEmpty(account.Account.MarketplaceAccountRole)
                                             && recepientRole != null && !string.IsNullOrEmpty(recepientRole.AttributeValue)) ?
                                             account.Account.MarketplaceAccountRole.ToLower().Replace(".", "").Contains(recepientRole.AttributeValue.ToLower().TrimEnd().Replace(".", ""))
-                                            : true))
+                                            : false))
                                         {
                                             var connectLabel = relationshipCodeLookup.EntityExtraData.Where(z => z.AttributeId == 601).FirstOrDefault();
                                             if (connectLabel != null)
@@ -1938,7 +1938,7 @@ namespace onetouch.Accounts
                                 requestorType.AttributeValue.TrimEnd().ToLower() == currentAccount.EntityFk.EntityObjectTypeCode.ToLower() &&
                                 ((!string.IsNullOrEmpty(currentTenatntAccountMarketplaceRole)
                                 && requestorRole != null && !string.IsNullOrEmpty(requestorRole.AttributeValue)) ?
-                                (currentTenatntAccountMarketplaceRole.ToLower().Replace(".", "").Contains(requestorRole.AttributeValue.ToLower().TrimEnd().Replace(".", ""))) : true))
+                                (currentTenatntAccountMarketplaceRole.ToLower().Replace(".", "").Contains(requestorRole.AttributeValue.ToLower().TrimEnd().Replace(".", ""))) : false))
                             {
                                 var responseType = relationshipCodeLookup.EntityExtraData.Where(z => z.AttributeId == 607).FirstOrDefault();
                                 if (responseType != null &&
@@ -1946,7 +1946,7 @@ namespace onetouch.Accounts
                                     && ((!string.IsNullOrEmpty(marketplaceAccountRole)
                                     && recepientRole != null && !string.IsNullOrEmpty(recepientRole.AttributeValue)) ?
                                     marketplaceAccountRole.ToLower().Replace(".", "").Contains(recepientRole.AttributeValue.ToLower().TrimEnd().Replace(".", ""))
-                                    : true))
+                                    : false))
                                 {
                                     var connectLabel = relationshipCodeLookup.EntityExtraData.Where(z => z.AttributeId == 601).FirstOrDefault();
                                     if (connectLabel != null)
