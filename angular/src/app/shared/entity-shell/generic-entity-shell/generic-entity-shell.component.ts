@@ -21,4 +21,34 @@ export class GenericEntityShellComponent {
   @Output() close = new EventEmitter<void>();
   @Output() minimize = new EventEmitter<void>();
   @Output() maximize = new EventEmitter<void>();
+leftPanelCollapsed = false;
+  leftPanelSections = [
+  {
+    key: 'branches',
+    title: 'Branches',
+    type: 'tree',
+    canAdd: true,
+    items: [
+      {
+        id: 1,
+        label: 'Main Branch',
+        icon: 'fa fa-building',
+        children: [
+          { id: 2, label: 'Sub Branch 1', icon: 'fa fa-building' },
+          { id: 3, label: 'Sub Branch 2', icon: 'fa fa-building' }
+        ]
+      }
+    ]
+  },
+  {
+    key: 'contacts',
+    title: 'Contacts',
+    type: 'list',
+    canAdd: true,
+    items: [
+      { id: 10, label: 'Sarah Johnson', imageUrl: 'assets/demo/avatar1.png' },
+      { id: 11, label: 'Mark Green', imageUrl: 'assets/demo/avatar2.png' }
+    ]
+  }
+];
 }

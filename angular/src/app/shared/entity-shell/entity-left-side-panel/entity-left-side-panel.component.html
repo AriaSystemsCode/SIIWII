@@ -1,1 +1,68 @@
-<p>entity-left-side-panel works!</p>
+<div class="left-panel" [class.collapsed]="collapsed">
+
+  <button class="toggle-btn" type="button" (click)="onToggle()">
+    <i class="fa" [ngClass]="collapsed ? 'fa-chevron-right' : 'fa-chevron-left'"></i>
+  </button>
+
+  <ng-container *ngIf="!collapsed">
+
+    <div class="search-box">
+      <i class="fa fa-search"></i>
+      <input
+        type="text"
+        placeholder="Search"
+        [(ngModel)]="searchText" />
+    </div>
+
+    <div class="panel-section" *ngFor="let section of sections">
+
+      <div class="section-header">
+        <h6>{{ section.title }}</h6>
+
+        <button
+          *ngIf="section.canAdd"
+          class="add-btn"
+          type="button"
+          (click)="add.emit(section.key)">
+          +
+        </button>
+      </div>
+
+      <ul *ngIf="section.type === 'tree'" class="tree-list">
+        <li *ngFor="let item of section.items">
+          <div class="tree-item parent" (click)="itemSelect.emit(item)">
+            <i *ngIf="item.icon" [class]="item.icon"></i>
+            <span>{{ item.label }}</span>
+            <i *ngIf="item.children?.length" class="fa fa-caret-down ml-1"></i>
+          </div>
+
+          <ul class="child-list" *ngIf="item.children?.length">
+            <li *ngFor="let child of item.children">
+              <div class="tree-item child" (click)="itemSelect.emit(child)">
+                <i *ngIf="child.icon" [class]="child.icon"></i>
+                <span>{{ child.label }}</span>
+              </div>
+            </li>
+          </ul>
+        </li>
+      </ul>
+
+      <div *ngIf="section.type === 'list'" class="contacts-list">
+        <div
+          class="contact-item"
+          *ngFor="let item of section.items"
+          (click)="itemSelect.emit(item)">
+
+          <img *ngIf="item.imageUrl" [src]="item.imageUrl" />
+          <i *ngIf="item.icon && !item.imageUrl" [class]="item.icon"></i>
+          <span>{{ item.label }}</span>
+        </div>
+      </div>
+
+      <a class="see-more">See more...</a>
+
+    </div>
+
+  </ng-container>
+
+</div>

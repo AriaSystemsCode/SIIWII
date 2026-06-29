@@ -1,31 +1,48 @@
 <div class="shell-container">
 
+  <div
+  class="left-panel-container"
+  [class.collapsed]="leftPanelCollapsed">
 
-  <app-entity-header
-    [title]="title"
-    [breadcrumbItems]="breadcrumbItems"
-    [mode]="mode"
-    (close)="close.emit()"
-    (minimize)="minimize.emit()"
-    (maximize)="maximize.emit()">
-  </app-entity-header>
+  <app-entity-left-side-panel
+    [sections]="leftPanelSections"
+    [collapsed]="leftPanelCollapsed"
+    (toggle)="leftPanelCollapsed = !leftPanelCollapsed">
+  </app-entity-left-side-panel>
 
-  <app-entity-basic-info
-    [entity]="entity"
-    [mode]="mode"
-    [entityTypes]="entityTypes"
-    [statuses]="statuses"
-    (entityChange)="entityChange.emit($event)">
-  </app-entity-basic-info>
-
-  <app-entity-left-side-panel></app-entity-left-side-panel>
-<div class="row p-4">
-  <div class="col-7">
-  <ng-content  select="[entity-main-content]"></ng-content>
 </div>
-  <div class="col-5">
 
-  <app-entity-right-panel></app-entity-right-panel>
+  <div class="right-shell-container">
+
+    <app-entity-header
+      [title]="title"
+      [breadcrumbItems]="breadcrumbItems"
+      [mode]="mode"
+      (close)="close.emit()"
+      (minimize)="minimize.emit()"
+      (maximize)="maximize.emit()">
+    </app-entity-header>
+
+    <app-entity-basic-info
+      [entity]="entity"
+      [mode]="mode"
+      [entityTypes]="entityTypes"
+      [statuses]="statuses"
+      (entityChange)="entityChange.emit($event)">
+    </app-entity-basic-info>
+
+    <div class="content-row row">
+
+      <div class="main-content-container col-md-7">
+        <ng-content select="[entity-main-content]"></ng-content>
+      </div>
+
+      <div class="right-panel-container col-md-5">
+        <app-entity-right-panel></app-entity-right-panel>
+      </div>
+
+    </div>
+
   </div>
-</div>
+
 </div>

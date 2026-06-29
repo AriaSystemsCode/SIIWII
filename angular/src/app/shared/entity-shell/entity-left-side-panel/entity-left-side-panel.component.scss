@@ -1,0 +1,135 @@
+.search-box {
+  height: 36px;
+  background: #fff;
+  border: 1px solid #e1dff0;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  padding: 0 12px;
+  margin-bottom: 18px;
+}
+
+.search-box i {
+  color: #8c8ca3;
+  margin-right: 8px;
+}
+
+.search-box input {
+  border: none;
+  outline: none;
+  width: 100%;
+  font-size: 13px;
+  background: transparent;
+}
+
+.panel-section {
+  margin-bottom: 18px;
+  border-bottom: 1px solid #eeeaf7;
+  padding-bottom: 8px;
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.section-header h6 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 700;
+  color: #3f3454;
+}
+
+.add-btn {
+  width: 26px;
+  height: 26px;
+  border: 1px solid #9c9aa8;
+  background: #fff;
+  border-radius: 8px;
+  font-weight: 700;
+  color: #3f3454;
+}
+
+.tree-list,
+.child-list {
+  list-style: none;
+  padding-left: 0;
+  margin: 8px 0 0;
+}
+
+.child-list {
+  padding-left: 22px;
+}
+
+.tree-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: 24px;
+  font-size: 12px;
+  color: #5d5870;
+}
+
+.tree-item.parent {
+  font-weight: 700;
+  color: #3f3454;
+}
+
+.tree-item i.fa-briefcase {
+  color: #7d55c7;
+  font-size: 15px;
+}
+
+.contacts-list {
+  margin-top: 8px;
+}
+
+.contact-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 28px;
+  font-size: 12px;
+  color: #4f4a60;
+}
+
+.contact-item img {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.see-more {
+  display: block;
+  margin-top: 6px;
+  font-size: 11px;
+  color: #6d8edb;
+  cursor: pointer;
+}
+
+.left-panel {
+  width: 280px;
+  height: 100%;
+  background: #faf7ff;
+  position: relative;
+}
+
+.left-panel.collapsed {
+  width: 0;
+  padding: 0;
+  background: transparent;
+}
+
+.toggle-btn {
+  position: absolute;
+  top: 90px;
+  right: -36px;
+  width: 34px;
+  height: 28px;
+  z-index: 20;
+  border: 1px solid #d8d8e8;
+  background: #fff;
+  border-radius: 6px;
+}
