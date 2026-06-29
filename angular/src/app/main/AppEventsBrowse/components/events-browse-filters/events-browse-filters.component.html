@@ -38,16 +38,17 @@
   
     
     <div class="mt-4 mb-4 pb-5 pt-3 border-bottom"
-    *ngIf="filterForm?.get('countries') && countryFilterMetaData">
- <app-multi-selection-filter
-   #CountryFilter
-   [filterMetaData]="countryFilterMetaData"
-   [formContol]="filterForm.get('countries')"
-   [title]="'Countries' | localize"
-   [showSearchBox]="true"
-   (filterText)="onLookupSearch($event, 'country', CountryFilter)"
-   (onLoadData)="getCountriesList(CountryFilter)">
- </app-multi-selection-filter>
+  >
+            <app-multi-selection-filter
+        #CountryFilter
+        [filterMetaData]="countryFilterMetaData"
+       [formContol]="filterForm.get('countries')"
+        [title]="'Countries' | localize"
+        [showSearchBox]="true"
+        (filterText)="onLookupSearch($event, 'country', CountryFilter)"
+        (onLoadData)="getCountriesList(CountryFilter)">
+      </app-multi-selection-filter>
+
 </div>
 
     <div class="m-4">

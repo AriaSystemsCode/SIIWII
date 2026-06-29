@@ -127,7 +127,28 @@
                                 optionValue="value"
                                 [showClear]="true"
                                 [placeholder]="'SelectImageType' | localize"
+                             [disabled]=" (attachmentsSrcs  && attachmentsSrcs?.length >0 && attachmentsSrcs[0]!='' )"
                                 name="sectionImgType"
+                              >
+                              </p-dropdown>
+                            </div>
+
+
+                             <div class="col-12">
+                              <label class="d-block mb-2 fs-3 my-2">
+                                <span class="required">* </span>{{ 'Orientation' | localize }}
+                              </label>
+                          
+                              <p-dropdown
+                                class="w-100"
+                                [options]="orientationOptions"
+                                [(ngModel)]="selectedOrientation"
+                                optionLabel="label"
+                                optionValue="value"
+                                [showClear]="true"
+                                [placeholder]="'SelectOrientationOptions' | localize"
+                                [disabled]=" (attachmentsSrcs  && attachmentsSrcs?.length >0 && attachmentsSrcs[0]!='' )"
+                                name="sectionOrientation"
                               >
                               </p-dropdown>
                             </div>
@@ -213,6 +234,7 @@
                                         *ngIf="productImageCategory?.sycAttachmentCategory"
                                         [sycAttachmentCategory]="productImageCategory?.sycAttachmentCategory"
                                         [attachmentTypeCode]="imageAttachmentType"
+                                        [selectedOrientation]="selectedOrientation"
                                         [image]="attachmentsSrcs[i]"
                                         [showGuidelines]="true"
                                         (imageBrowseDone)="
@@ -234,6 +256,7 @@
                                           *ngIf="productImageCategory?.sycAttachmentCategory"
                                           [sycAttachmentCategory]="productImageCategory?.sycAttachmentCategory"
                                           [attachmentTypeCode]="imageAttachmentType"
+                                              [selectedOrientation]="selectedOrientation"
                                           [image]="null"
                                           [showGuidelines]="true"
                                           (imageBrowseDone)="

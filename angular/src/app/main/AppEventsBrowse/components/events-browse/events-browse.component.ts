@@ -136,8 +136,8 @@ export class EventsBrowseComponent extends AppComponentBase  implements OnInit,O
             this.filterForm.addControl("isOnline",EventTypeControl)
         }
         if(flags.country){
-            const EventTypeControl = this._fb.control(undefined)
-            this.filterForm.addControl("country",EventTypeControl)
+          
+          this.filterForm.addControl('countries', this._fb.control([]));
         }
         // if(flags.startDate && flags.endDate){
         //     // this.filterForm.setAsyncValidators()
@@ -362,8 +362,12 @@ export class EventsBrowseComponent extends AppComponentBase  implements OnInit,O
             undefined,
             undefined,
             filters?.city || undefined,
+            undefined,
+            filters?.countries?.length ? filters?.countries : undefined,
+            
             filters?.state || undefined,
             filters?.postalCode || undefined,
+       
             this.accountDataForView?.tenantId ? this.accountDataForView?.tenantId : undefined,
                 undefined,
                 undefined,

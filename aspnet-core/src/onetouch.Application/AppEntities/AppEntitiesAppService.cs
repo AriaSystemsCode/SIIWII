@@ -871,19 +871,16 @@ namespace onetouch.AppEntities
         [AbpAllowAnonymous]
         public async Task<PagedResultDto<LookupLabelDto>> GetAllEntitiesByTypeCodeWithPaging(GetAllAppEntitiesInput input)
         {
-            //var languageId = await _helper.SystemTables.GetEntityObjectTypeLanguageId(); *Abdo : Not used variable 
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
             {
-                var filteredAppEntities = _appEntityRepository.GetAll().Include(x => x.EntityAttachments).ThenInclude(z=>z.AttachmentFk).Include(z=>z.EntityExtraData)
-                .Where(x => x.EntityObjectTypeCode == input.SycEntityObjectTypeNameFilter &&
-                (x.TenantId == AbpSession.TenantId || x.TenantId == null))
-                .WhereIf(!string.IsNullOrWhiteSpace(input.NameFilter), x => false || x.Name.Contains(input.NameFilter));// *Abdo : is added to filter by name "Red" as  example
+                var filteredAppEntities = _appEntityRepository.GetAll()
+                    .AsNoTracking()
+                    .Where(x => x.EntityObjectTypeCode == input.SycEntityObjectTypeNameFilter &&
+                        (x.TenantId == AbpSession.TenantId || x.TenantId == null))
+                    .WhereIf(!string.IsNullOrWhiteSpace(input.NameFilter),
+                        x => x.Name.Contains(input.NameFilter));
 
-                //T-SII-20250221.0002 [Begin]
-
-                //var pagedAndFilteredAppEntities = filteredAppEntities
-                //  .OrderBy(input.Sorting ?? "Name asc")
-                //  .PageBy(input);
+                var totalCount = await filteredAppEntities.CountAsync();
                 var pagedAndFilteredAppEntities = filteredAppEntities;
 
                 if (!string.IsNullOrWhiteSpace(input.NameFilter))
@@ -901,30 +898,86 @@ namespace onetouch.AppEntities
                 }
 
                 pagedAndFilteredAppEntities = pagedAndFilteredAppEntities.PageBy(input);
-                //T-SII-20250221.0002 [End]
+                var appEntities = await pagedAndFilteredAppEntities
+                    .Select(o => new LookupLabelDto
+                    {
+                        Value = o.Id,
+                        Label = o.Name,
+                        Code = o.Code,
+                        IsHostRecord = o.TenantId == null,
+                        HexaCode = string.Empty,
+                        Image = string.Empty
+                    })
+                    .ToListAsync();
 
-                string imagesUrl = _appConfiguration[$"Attachment:Path"].Replace(_appConfiguration[$"Attachment:Omitt"], "") + @"/";
-
-            var appEntities = from o in pagedAndFilteredAppEntities
-                              select new LookupLabelDto()
-                              {
-                                  Value = o.Id,
-                                  Label = o.Name.ToString(),
-                                  Code = o.Code,
-                                  IsHostRecord = o.TenantId == null,
-                                  HexaCode = (o.EntityExtraData!=null && o.EntityExtraData.Where(z=>z.AttributeId ==39).FirstOrDefault()!=null) ? o.EntityExtraData.Where(z => z.AttributeId == 39).FirstOrDefault().AttributeValue:"",
-                                  Image = (o.EntityAttachments!= null && o.EntityAttachments.FirstOrDefault() !=null && o.EntityAttachments.FirstOrDefault().AttachmentFk !=null) ? 
-                                  (imagesUrl + (o.EntityAttachments.FirstOrDefault().AttachmentFk.TenantId==null? "-1": o.EntityAttachments.FirstOrDefault().AttachmentFk.TenantId.ToString()) + @"/" + o.EntityAttachments.FirstOrDefault().AttachmentFk.Attachment.ToString()):""
-        };
-
-
-            var totalCount = await filteredAppEntities.CountAsync();
-
-            return new PagedResultDto<LookupLabelDto>(
-                totalCount,
-                await appEntities.ToListAsync()
-            );
+                if (appEntities.Count == 0)
+                {
+                    return new PagedResultDto<LookupLabelDto>(totalCount, appEntities);
                 }
+
+                var entityIds = appEntities.Select(x => x.Value).ToList();
+                var imagesUrl = _appConfiguration["Attachment:Path"]
+                    .Replace(_appConfiguration["Attachment:Omitt"], "") + "/";
+
+                var attachments = await _appEntityAttachmentRepository.GetAll()
+                    .AsNoTracking()
+                    .Where(x => entityIds.Contains(x.EntityId) && x.AttachmentFk != null)
+                    .OrderByDescending(x => x.IsDefault)
+                    .ThenBy(x => x.Id)
+                    .Select(x => new
+                    {
+                        x.EntityId,
+                        x.AttachmentFk.TenantId,
+                        FileName = x.AttachmentFk.Attachment
+                    })
+                    .ToListAsync();
+
+                var imageByEntityId = attachments
+                    .GroupBy(x => x.EntityId)
+                    .ToDictionary(
+                        x => x.Key,
+                        x =>
+                        {
+                            var attachment = x.First();
+                            var attachmentTenantId = attachment.TenantId?.ToString() ?? "-1";
+                            return imagesUrl + attachmentTenantId + "/" + attachment.FileName;
+                        });
+
+                Dictionary<long, string> hexaCodeByEntityId = null;
+                if (input.IncludeExtraDataFilter)
+                {
+                    var hexaCodes = await _appEntityExtraDataRepository.GetAll()
+                        .AsNoTracking()
+                        .Where(x => entityIds.Contains(x.EntityId) && x.AttributeId == 39)
+                        .OrderBy(x => x.Id)
+                        .Select(x => new
+                        {
+                            x.EntityId,
+                            x.AttributeValue
+                        })
+                        .ToListAsync();
+
+                    hexaCodeByEntityId = hexaCodes
+                        .GroupBy(x => x.EntityId)
+                        .ToDictionary(x => x.Key, x => x.First().AttributeValue);
+                }
+
+                foreach (var appEntity in appEntities)
+                {
+                    if (imageByEntityId.TryGetValue(appEntity.Value, out var image))
+                    {
+                        appEntity.Image = image;
+                    }
+
+                    if (hexaCodeByEntityId != null &&
+                        hexaCodeByEntityId.TryGetValue(appEntity.Value, out var hexaCode))
+                    {
+                        appEntity.HexaCode = hexaCode;
+                    }
+                }
+
+                return new PagedResultDto<LookupLabelDto>(totalCount, appEntities);
+            }
         }
 
         public async Task<List<LookupLabelDto>> GetLineSheetColorSort()

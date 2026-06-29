@@ -1793,7 +1793,7 @@
 	  <text name="UpcomingEvents">الأحداث القادمة</text>
 	  <text name="InPerson">حضوري</text>
 	  <text name="advertisement">إعلان</text>
-  <text name="TaxRate"> >معدل الضريبة </text>
+  <text name="TaxRate">معدل الضريبة </text>
 	  <text name="Variationrequiredtosave"> يجب اختيار متغير للحفظ </text>
 	  <text name="SizeName"> اسم المقاس</text>
 <text name="Dimension"> البعد </text>
@@ -1810,5 +1810,11 @@
 		<text name="Post">موضوع  </text>
 		<text name="Portal Settings">إعدادات المنفذ  </text>
 		<text name="IsDefault">افتراضي </text>
+		<text name="Orientation">الاتجاه </text>
+		<text name="SelectOrientationOptions">اختر خيارات الاتجاه </text>
+			<text name="Logo">شعار</text>
+		<text name="Banner">بانر</text>
+		<text name="Portrait">عمودي</text>
+		<text name="Landscape">أفقي</text>
   </texts>
 </localizationDictionary>

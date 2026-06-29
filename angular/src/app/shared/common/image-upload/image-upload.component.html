@@ -53,7 +53,16 @@
         {{ l('ClickOrDrop') }}
       </div>
       <div *ngIf="sycAttachmentCategory?.aspectRatio && showGuidelines">
-        {{ l('AspectRatio?', sycAttachmentCategory?.aspectRatio) }}
+      {{
+      selectedOrientation === 'Landscape'
+      ? l(
+      'AspectRatio?',
+      sycAttachmentCategory?.aspectRatio?.split(':')[1] +
+      ':' +
+      sycAttachmentCategory?.aspectRatio?.split(':')[0]
+      )
+      : l('AspectRatio?', sycAttachmentCategory?.aspectRatio)
+      }}
       </div>
       <div *ngIf="sycAttachmentCategory?.maxFileSize && showGuidelines">
         {{ l('MaxSize?', sycAttachmentCategory?.maxFileSize) }} MB

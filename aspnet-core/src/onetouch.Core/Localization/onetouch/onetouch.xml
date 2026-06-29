@@ -3020,5 +3020,7 @@ Please select one of the available linesheet templates
 		<text name="Create">Create </text>
 		<text name="Addtoproductlist">Add to product list </text>
 		<text name="IsDefault">IsDefault </text>
+		<text name="Orientation">Orientation </text>
+		<text name="SelectOrientationOptions">Select Orientation Options </text>
   </texts>  
 </localizationDictionary>
