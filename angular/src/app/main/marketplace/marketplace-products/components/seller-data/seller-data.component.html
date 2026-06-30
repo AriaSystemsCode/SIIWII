@@ -7,7 +7,7 @@
         </app-image-display>
 
     </div>
-    <div class="logo-name w-25 position-absolute">
+    <div class="logo-name position-absolute">
         <img [src]="attachmentBaseUrl + '/' + sellerData?.logoImage"
             onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'" />
         <h3 class="text-white mt-3">  {{ sellerData?.name || ('NoSellerName' | localize) }} </h3>

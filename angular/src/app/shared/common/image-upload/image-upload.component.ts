@@ -1,6 +1,7 @@
 import {
   Component,
   EventEmitter,
+  HostBinding,
   Injector,
   Input,
   OnChanges,
@@ -21,6 +22,16 @@ export interface ImageUploadComponentOutput {
   styleUrls: ['./image-upload.component.scss'],
 })
 export class ImageUploadComponent extends AppComponentBase implements OnChanges {
+  @HostBinding('style.width')
+  get hostWidth(): string | null {
+    return this.staticWidth ? `${this.staticWidth}px` : null;
+  }
+
+  @HostBinding('style.height')
+  get hostHeight(): string | null {
+    return this.staticHeight ? `${this.staticHeight}px` : null;
+  }
+
   @Output() imageBrowseDone = new EventEmitter<ImageUploadComponentOutput>();
   @Output() removeImage = new EventEmitter<any>();
 

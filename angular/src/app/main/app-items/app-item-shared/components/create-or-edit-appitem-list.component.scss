@@ -36,3 +36,24 @@
     width: 350px;
 
 }
+
+.modal-close-btn-wide {
+  position: absolute;
+  width: 70px;
+  top: 8px;
+}
+
+.modal-close-btn-ltr {
+  right: 0;
+}
+
+.modal-close-btn-rtl {
+  left: 0;
+}
+
+@media (max-width: 768px) {
+  .modal-content {
+    width: 100%;
+    max-width: 100%;
+  }
+}

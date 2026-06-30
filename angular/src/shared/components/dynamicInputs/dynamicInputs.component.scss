@@ -21,6 +21,25 @@
     color: #1B101B;
     font-weight: 700;
 }
+
+.clear-action-icon {
+  right: 10px;
+  top: 15px;
+  cursor: pointer;
+}
+
+.clear-inline-icon {
+  cursor: pointer;
+}
+
+.upload-preview__success-icon {
+  color: #4A0D4A !important;
+}
+
+.upload-actions {
+  text-align: right;
+}
+
 .calWidth {
     width: 305px;
     .p-calendar {
@@ -56,7 +75,8 @@
     border: 1px solid #EEEEEE;
     cursor: pointer;
     transition: 0.2s ease;
-    width: max-content;
+    width: 100%;
+    max-width: 400px;
   }
   
   .upload-box:hover {
@@ -174,4 +194,47 @@
 .form-control {
   height: 46px !important;
 }
+
+  .dynamic-input-calendar .p-inputtext {
+    border: 1px solid #EEEEEE;
+    border-radius: 8px;
+    height: 44px;
+  }
+
+  .dynamic-input-editor .ql-container {
+    min-height: 170px;
+  }
+
+  .dynamic-input-editor .ql-editor {
+    min-height: 170px;
+  }
+}
+
+@media screen and (max-width: 991px) {
+    .calWidth {
+        width: 100%;
+
+        .p-calendar {
+            width: 100% !important;
+        }
+    }
+
+    .upload-card {
+        max-width: 100%;
+    }
+}
+
+@media screen and (max-width: 767px) {
+    .upload-box {
+        max-width: 100%;
+    }
+
+    .theme-thumbnail {
+        width: 90px;
+        height: 64px;
+    }
+
+    .upload-actions {
+        text-align: left;
+    }
 }

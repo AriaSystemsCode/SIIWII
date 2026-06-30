@@ -170,8 +170,7 @@
                                         "
                                         controls
                                         alt="defaultImage"
-                                        style="margin-top: -200px !important;"
-                                        class="w-100 imageContainer"
+                                        class="w-100 imageContainer video-top-shift"
                                         [ngStyle]="{'height.px':  (centerContatiner.clientWidth / acceptedAspectRatio )}"
                                     ></video>
 
@@ -233,12 +232,11 @@
                                 <div class="main">
                               
                                   <!-- MAIN IMAGE -->
-                                  <img *ngIf="kindOf(activeAttachments[currentIndex]) === 'image'"
-                                       class="main-media"
-                                       [src]="getUrl(activeAttachments[currentIndex])"
-                                       (error)="onMainError($event)"
-                                       (click)="openImagePreview(getUrl(activeAttachments[currentIndex]))"
-                                       style="cursor: zoom-in;" />
+                                    <img *ngIf="kindOf(activeAttachments[currentIndex]) === 'image'"
+                                        class="main-media zoom-in-cursor"
+                                        [src]="getUrl(activeAttachments[currentIndex])"
+                                        (error)="onMainError($event)"
+                                        (click)="openImagePreview(getUrl(activeAttachments[currentIndex]))" />
                               
                                   <!-- MAIN VIDEO -->
                                   <video *ngIf="kindOf(activeAttachments[currentIndex]) === 'video'"
@@ -254,10 +252,9 @@
                                       <span class="mx-2">{{ 'LoadingPreview' | localize }}</span>
                                     </div>
                               
-                                    <img *ngIf="!pdfThumbLoadingMap[currentIndex] && pdfThumbMap[currentIndex]"
-                                         class="main-media"
+                                     <img *ngIf="!pdfThumbLoadingMap[currentIndex] && pdfThumbMap[currentIndex]"
+                                         class="main-media pointer-cursor"
                                          [src]="pdfThumbMap[currentIndex]"
-                                         style="cursor:pointer;"
                                          (click)="openNewTab(activeAttachments[currentIndex])" />
                               
                                     <div *ngIf="!pdfThumbLoadingMap[currentIndex] && !pdfThumbMap[currentIndex]"
@@ -268,17 +265,16 @@
                                   </ng-container>
                               
                                   <!-- IMAGE PREVIEW DIALOG -->
-                                  <p-dialog [(visible)]="showImagePreview"
+                                                                    <p-dialog [(visible)]="showImagePreview"
                                             [modal]="true"
                                             [closable]="true"
                                             [dismissableMask]="true"
                                             [draggable]="false"
                                             [resizable]="false"
-                                            [style]="{width: '70vw', maxWidth: '900px'}"
-                                            [contentStyle]="{padding: '0'}">
+                                                                                        styleClass="image-preview-dialog">
                                     <div class="d-flex align-items-center justify-content-center p-3">
                                       <img [src]="previewImageUrl"
-                                           style="max-width: 100%; max-height: 70vh; object-fit: contain;"
+                                                                                     class="preview-image"
                                            (error)="onMainError($event)" />
                                     </div>
                                   </p-dialog>
@@ -288,8 +284,7 @@
                               
                      
                             <div
-                                class="pt-4  mb-5 text-center position-relative"
-                                style="left: 50%; transform: translateX(-50%);"
+                                class="pt-4  mb-5 text-center position-relative variation-center-row"
                                 *ngIf="
                                     appItemForViewDto?.variations[0]
                                         ?.selectedValues?.length > 0
@@ -317,8 +312,7 @@
                                             class="attachImage thin-scroll d-flex justify-content-center"
                                         >
                                             <p-carousel
-                                                [style]="{ width : '430px' }"
-                                                itemstyle="width :77px"
+                                                styleClass="variation-carousel"
                                                 [value]="
                                                     appItemForViewDto
                                                         ?.variations[0]
@@ -578,11 +572,9 @@
                             </div>
                             <div class="d-flex">
                                 <button
-                                    class="btn btn-primary"
+                                    class="btn btn-primary advanced-pricing-btn"
                                     type="button"
                                     (click)="showAdvancedPricingModal()"
-                                    style="background-color : #4A0D4A !important;
-    border : none !important;"
                                 >
                                     {{ "AdvancedPricing" | localize }}
                                 </button>

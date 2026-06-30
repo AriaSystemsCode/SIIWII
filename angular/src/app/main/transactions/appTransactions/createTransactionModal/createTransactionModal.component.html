@@ -5,9 +5,23 @@
     <div class="wrapper calendarss" [ngClass]="isArabic ? 'rtl-autoC' : 'ltr-autoC'">
 
         <div class="w-50 my-2">
-            <p-dropdown [options]="roles" class="w-100" placeholder="Please Select your Role" optionLabel="name"
-                (onChange)="handleRoleChange($event)" #Role [(ngModel)]="roleDdval"
-                [disabled]="roles?.length === 1"></p-dropdown>
+         <p-dropdown
+    [options]="roles"
+    class="w-100"
+    [placeholder]="'Please Select your Role'"
+    [(ngModel)]="roleDdval"
+    (onChange)="handleRoleChange($event)"
+    [disabled]="roles?.length === 1">
+
+    <ng-template pTemplate="selectedItem" let-role>
+        {{ role?.name | localize }}
+    </ng-template>
+
+    <ng-template pTemplate="item" let-role>
+        {{ role?.name | localize }}
+    </ng-template>
+
+</p-dropdown>
             <small class="text-danger" *ngIf="isRoleExist">
                 {{'PleaseSelectRole' | localize }}
             </small>

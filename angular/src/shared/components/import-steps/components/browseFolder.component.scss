@@ -352,3 +352,118 @@ font: normal normal normal 13px/20px Poppins;
     white-space: nowrap;
     border: 1px solid #EEEEEEEE;
   }
+
+.required-asterisk {
+  color: #F6851D;
+}
+
+.aspect-ratio-warning {
+  color: #F6851D !important;
+}
+
+@media (max-width: 1024px) {
+  .uploadfilecontainer {
+    padding: 56px;
+  }
+
+  .video-info-box {
+    flex-wrap: wrap;
+  }
+}
+
+@media (max-width: 768px) {
+  .uploadfilecontainer {
+    padding: 36px 20px;
+  }
+
+  .video-content {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .video-icon {
+    width: 72px;
+    height: 52px;
+  }
+
+  .browse-btn,
+  .select-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .Download .row > [class*='col-'] {
+    flex: 0 0 100%;
+    max-width: 100%;
+    margin-bottom: 0.75rem;
+    text-align: left !important;
+  }
+
+  .Download .row > .col-2,
+  .Download .row > .col-1 {
+    margin-left: 0 !important;
+  }
+
+  .modal-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    justify-content: flex-start;
+  }
+
+  .modal-actions .browse-btn,
+  .modal-actions .cancleUpload-btn {
+    width: 100%;
+    margin-left: 0 !important;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 576px) {
+  .modal-dialog {
+    width: 96%;
+    margin: 0.5rem auto;
+  }
+
+  .uploadfilecontainer {
+    padding: 24px 14px;
+  }
+
+  .modal-header-custom {
+    padding: 14px 12px;
+  }
+
+  .video-title {
+    font-size: 14px;
+  }
+
+  .video-description {
+    font-size: 12px;
+  }
+
+  .upload-modal {
+    width: 94%;
+    left: 3%;
+    transform: none;
+    top: 10%;
+    padding: 14px;
+  }
+
+  .folder-info {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .folder-details {
+    width: 100%;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.25rem;
+  }
+
+  .folder-meta {
+    margin-left: 0;
+    text-align: left;
+  }
+}

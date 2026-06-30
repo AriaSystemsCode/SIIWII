@@ -486,7 +486,8 @@ createRelation(account) {
 
       if (!recipientHasRoles || !loggedTenantHasRoles) {
         this.message.info(
-          'Cannot connect, you need to update the marketplace role of your account / the recipient account marketplace role in order to build relationship together',
+           this.l('Cannot connect, you need to update the marketplace role of your account / the recipient account marketplace role in order to build relationship together')  ,
+
           ''
         );
 

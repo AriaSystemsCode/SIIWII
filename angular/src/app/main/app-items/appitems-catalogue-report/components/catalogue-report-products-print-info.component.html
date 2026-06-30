@@ -3,12 +3,12 @@
     <div class="d-flex flex-column justify-content-between thin-scroll _scroll wizard-wrapper parSec">
         <div class="d-flex flex-column justify-content-between " >
             <div class="row justify-content-between">
-                <div class="align-items-center col-6 d-flex" style="gap:5px;">
+                <div class="align-items-center col-6 d-flex print-option-item">
                     <input type="radio" id="EmailLinesheet" name="EmailorPrint" value="true"  (change)="onEmailLinesheetChange($event.target.value)" [checked]="printInfoParam.EmailLinesheet"
                         >
                     <label for="EmailLinesheet" [ngClass]="printInfoParam.EmailLinesheet ? 'selected':'notS'" class=" mb-0">{{"EmailLinesheet" | localize}}</label>
                 </div>
-                <div class="align-items-center col-6 d-flex" style="gap:5px;">
+                <div class="align-items-center col-6 d-flex print-option-item">
                     <input type="radio" id="PrintLinesheet" name="EmailorPrint" value="true" (change)="onPrintLinesheetChange($event.target.value)" [checked]="printInfoParam.PrintLinesheet">
                     <label for="PrintLinesheet" class=" mb-0" [ngClass]="printInfoParam.PrintLinesheet ? 'selected':'notS'">{{"PrintLinesheet"| localize}}</label>
                 </div>
@@ -81,11 +81,7 @@
             </div>
             <div class="row align-items-start" *ngIf="displayCC">
                 <div class="col-md-1">
-                    <div
-                        class="InputText"
-                        *ngIf="displayCC"
-                        style="padding-top: 0px !important"
-                    >
+                    <div class="InputText input-text-no-top" *ngIf="displayCC">
                         <span class="text-input-label"
                             >{{ "CC" | localize }}:</span
                         >
@@ -118,11 +114,7 @@
             </div>
             <div class="row align-items-start" *ngIf="displayBCC">
                 <div class="col-md-1">
-                    <div
-                        class="InputText"
-                        *ngIf="displayBCC"
-                        style="padding-top: 0px !important"
-                    >
+                    <div class="InputText input-text-no-top" *ngIf="displayBCC">
                         <span class="text-input-label"
                             >{{ "BCC" | localize }}:</span
                         >
@@ -151,17 +143,13 @@
                 </div>
             </div>
             <div class="form-group group-input subject-label mb-0">
-                <div
-                    class="InputText d-md-flex"
-                    style="padding-top: 4px !important; "
-                >
+                <div class="InputText d-md-flex subject-row">
                     <span
                         class="text-input-label subject-label pr-4 mb-0" 
                         >{{ "subject" | localize }}:</span
                     >
                     <input
-                        class="form-control Input bg-white ml-4 w-100"
-                        style="padding: 6px"
+                        class="form-control Input bg-white ml-4 w-100 subject-input"
                         placeholder=""
                         type="Text"
                         [(ngModel)]="printInfoParam.subject"
@@ -172,10 +160,9 @@
             </div>
             <div class="form-group editor-text mb-0">
                 <textarea
-                class="col-11 p-3 ml-lg-5"
+                class="col-11 p-3 ml-lg-5 email-body-input"
                     [(ngModel)]="printInfoParam.body"
                     name="HtmlEditorInput"
-                    style="height: 180px ;border: 1px solid #D5D4DC !important; border-radius: 8px;"
                     placeholder="Write Somthing ...."
                 >
                 </textarea>

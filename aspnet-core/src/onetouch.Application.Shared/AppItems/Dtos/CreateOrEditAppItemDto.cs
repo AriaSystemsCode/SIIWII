@@ -82,6 +82,7 @@ namespace onetouch.AppItems.Dtos
         public string OriginalCode { get; set; }
         public long? SycIdentifierId { get; set; }
         public string? SSIN { set; get; }
+        public bool SkipGenerateSsin { set; get; }
         //MMT
         //MMT-IT41[Start]
         public IList<LookupLabelDto> NonLookupValues { set; get; }

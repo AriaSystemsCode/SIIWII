@@ -79,7 +79,7 @@
     <div class="modal-lg m-auto Download pt-4 pb-4" [class.download-disabled]="templateLoading">
         <div class="row align-items-baseline mb-4" *ngIf="importType==ImportTypes.Items">
             <div class="col-2 ml-4">
-                <h6><span style="color: #F6851D;">*</span>{{ 'ProductType' | localize}}</h6>
+                <h6><span class="required-asterisk">*</span>{{ 'ProductType' | localize}}</h6>
             </div>
             <div class="col-7 pl-0">
                 <div class="wide-drop-down">

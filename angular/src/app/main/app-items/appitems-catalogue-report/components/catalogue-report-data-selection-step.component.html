@@ -15,7 +15,7 @@
 
                         <div class="">
 
-                            <div class="wide-drop-down handleW" style="position: relative;">
+                            <div class="wide-drop-down handleW position-relative">
                                 <p-autoComplete [styleClass]="'w-100'" class="position-relative"
                                     [inputStyleClass]="'w-100 form-control pl-3 bg-white'" name="itemList"
                                     [inputId]="'itemList'" [suggestions]="appItemsLists"
@@ -28,9 +28,11 @@
                                         <span>{{itemList.appItemsList.name}}</span>
                                     </ng-template>
                                 </p-autoComplete>
-                                <img src="../../../../../assets/common/images/Icon.png"
-                                    [ngStyle]="isArabic ? {'left':'-3%'} : {'right':'-3%'}" class="position-absolute"
-                                    style="bottom: -26%;" />
+                                <img
+                                    src="../../../../../assets/common/images/Icon.png"
+                                    class="position-absolute picker-icon"
+                                    [ngClass]="isArabic ? 'picker-icon-rtl' : 'picker-icon-ltr'"
+                                />
                             </div>
                         </div>
                     </div>
@@ -47,14 +49,13 @@
                                 Input
                             " #reportMyProductsNameInput="ngModel" />
                             <div class=" text-right">
-                                <button class="p-0"
+                                <button class="p-0 products-picker-btn"
                                     [disabled]="printInfoParam.itemsListId && !isValid || selectedAppItemList?.id "
-                                    (click)="showProductsModal()" style="border: none;" [ngStyle]="{
-                                    'cursor': printInfoParam.itemsListId && !isValid ? 'not-allowed': 'pointer'
-                                }">
+                                    (click)="showProductsModal()"
+                                    [ngClass]="{ 'cursor-not-allowed': printInfoParam.itemsListId && !isValid }">
                                     <img src="../../../../../assets/common/images/Icon.png"
-                                        [ngStyle]="isArabic ? {'left':'-3%'} : {'right':'-3%'}"
-                                        class="position-absolute" style="bottom: -26%;" />
+                                        class="position-absolute picker-icon"
+                                        [ngClass]="isArabic ? 'picker-icon-rtl' : 'picker-icon-ltr'" />
                                 </button>
 
                             </div>
@@ -89,7 +90,7 @@
                     </div>
                     <div class="col-12">
                         <label class="mt-4" for="reportTitle">
-                            <h6 style="color: #9E9E9E;">
+                            <h6 class="selected-products-label">
                                 {{ "Numberofselectedproducts" | localize }} ({{numberofselectedproducts}})
                             </h6>
                         </label>
@@ -102,9 +103,7 @@
 
     <div class="text-right pr-5 w-100 mt-3">
 
-        <button class="btn contBtn" (click)="continueToNextStep()" [disabled]="!isValid" [ngStyle]="{
-            'cursor': !isValid ? 'not-allowed': 'pointer'
-        }">
+        <button class="btn contBtn" (click)="continueToNextStep()" [disabled]="!isValid" [ngClass]="{ 'cursor-not-allowed': !isValid }">
             {{ "Continue" | localize }}
             <i class="fa-arrow-right fas ml-3"></i>
 

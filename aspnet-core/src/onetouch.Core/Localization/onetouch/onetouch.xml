@@ -3022,5 +3022,14 @@ Please select one of the available linesheet templates
 		<text name="IsDefault">IsDefault </text>
 		<text name="Orientation">Orientation </text>
 		<text name="SelectOrientationOptions">Select Orientation Options </text>
+			<text name="Logo">Logo</text>
+		<text name="Banner">Banner</text>
+		<text name="Portrait">Portrait</text>
+		<text name="Landscape">Landscape</text>
+		<text name="ProductId">Product Id</text>
+		<text name="Accountuploadstatus">Account upload status</text>
+
+
+		
   </texts>  
 </localizationDictionary>

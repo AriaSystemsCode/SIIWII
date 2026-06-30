@@ -20,6 +20,7 @@ import { Observable } from 'rxjs';
 
 @Component({
     templateUrl: './sycEntityObjectTypes.component.html',
+    styleUrls: ['./sycEntityObjectTypes.component.scss'],
     encapsulation: ViewEncapsulation.None,
     animations: [appModuleAnimation()]
 })

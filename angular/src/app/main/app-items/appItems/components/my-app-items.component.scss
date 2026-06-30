@@ -1,0 +1,24 @@
+.linesheet-modal {
+	overflow: auto;
+}
+
+.linesheet-modal-dialog {
+	height: 90vh;
+}
+
+.linesheet-close-btn {
+	position: absolute;
+	right: 0;
+	top: 8px;
+}
+
+@media (max-width: 768px) {
+	.linesheet-modal-dialog {
+		height: 84vh;
+		margin: 0.75rem;
+	}
+
+	.linesheet-close-btn {
+		top: 4px;
+	}
+}

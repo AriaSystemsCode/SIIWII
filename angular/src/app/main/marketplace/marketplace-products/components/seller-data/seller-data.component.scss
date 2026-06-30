@@ -3,6 +3,7 @@
     overflow: hidden;
 
     .logo-name {
+        width: 25%;
         // background-color: #87878a;
         color: #fff;
         display: flex;
@@ -32,6 +33,22 @@
         align-items: flex-start;
         justify-content: center;
         margin-top: -180px;
+    }
+}
+
+@media only screen and (max-width: 991px) {
+    .seller-data {
+        height: 230px !important;
+
+        .logo-name {
+            width: 40%;
+            top: 55px;
+
+            img {
+                width: 96px;
+                height: 96px;
+            }
+        }
     }
 }
 
@@ -78,6 +95,11 @@
             bottom: 3px;
             left: 50px;
             color: white;
+            font-size: 14px;
+            width: calc(100% - 70px);
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
     }
 }

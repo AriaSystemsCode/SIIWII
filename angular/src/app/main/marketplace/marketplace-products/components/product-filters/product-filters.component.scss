@@ -138,3 +138,42 @@
     }
     
 }
+
+@media only screen and (max-width: 1024px) {
+    .filter-selection {
+        height: auto;
+        max-height: 70vh;
+        overflow-y: auto;
+    }
+
+    .price {
+        flex-wrap: wrap;
+    }
+
+    .price input {
+        flex: 1 1 calc(50% - 8px);
+        min-width: 120px;
+    }
+
+    .price span {
+        width: 100%;
+        color: #9e9e9e;
+        font-size: 12px;
+    }
+}
+
+@media only screen and (max-width: 576px) {
+    .stock-availablity {
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .stock-availablity p {
+        width: 100%;
+    }
+
+    .switch {
+        margin-top: 0;
+        margin-inline-start: auto;
+    }
+}

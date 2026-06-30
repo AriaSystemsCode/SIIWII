@@ -131,6 +131,10 @@
   margin-top: 18px;
 }
 
+.rtl-edit-actions-gap {
+  gap: 10px;
+}
+
 .edit-actions .btn {
   white-space: nowrap;
 }
@@ -372,6 +376,8 @@
     // display: grid;
     // grid-template-columns: 1fr;
     width: 100%;
+    flex-wrap: wrap;
+    gap: 0.5rem;
   }
 
   .top-actions-buttons button,
@@ -384,6 +390,8 @@
     // display: grid;
     // grid-template-columns: 1fr;
     width: 100%;
+    flex-wrap: wrap;
+    gap: 0.5rem;
   }
 
   .last-updated {
@@ -421,6 +429,16 @@
 
   .items-wrapper {
     padding: 24px 0 0;
+  }
+
+  .view-summary-card {
+    flex-direction: column;
+  }
+
+  .view-actions {
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
   }
 
   .total-records-count {
@@ -468,5 +486,27 @@
   button{
     padding: 8px 4px;
   }
+}
+
+.product-page-header {
+  padding: 10px 0;
+}
+
+.product-header-row {
+  padding: 12px;
+}
+
+.view-summary-card {
+  padding: 12px;
+}
+
+.view-summary-title {
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.dropdown-action-btn {
+  min-width: 190px;
+  max-width: calc(100vw - 2rem);
 }
 }

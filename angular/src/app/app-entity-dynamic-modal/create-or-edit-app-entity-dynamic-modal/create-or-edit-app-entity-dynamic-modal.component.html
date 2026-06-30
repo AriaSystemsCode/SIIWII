@@ -1,27 +1,13 @@
-    <div
-        bsModal
-        #createOreEditLookups="bs-modal"
-        class="modal fade"
-        tabindex="-1"
-        role="dialog"
-        aria-labelledby="createOreEditLookups"
-        aria-hidden="true"
-    >
-        <div
-        class="modal-dialog"
-    [ngClass]="[
-      isArabic ? 'left-modal ngLeft' : 'right-modal ngRight',
-      active ? (isArabic ? 'slide-left-in' : 'slide-right-in')
-             : (isArabic ? 'slide-left-out' : 'slide-right-out')
-    ]"
-    role="document"
-        >
-            <form class="h-100" *ngIf="active" #appEntityForm="ngForm" novalidate (ngSubmit)="save(appEntityForm)" autocomplete="off">
+<div bsModal #createOreEditLookups="bs-modal" class="modal fade" tabindex="-1" role="dialog"
+    aria-labelledby="createOreEditLookups" aria-hidden="true">
+    <div class="modal-dialog" [ngClass]="isArabic ? (active ? 'left-modal slide-left-in' : 'left-modal slide-left-out') : (active ? 'right-modal slide-right-in' : 'right-modal slide-right-out')" role="document">
+        <form class="h-100" *ngIf="active" #appEntityForm="ngForm" novalidate (ngSubmit)="save(appEntityForm)"
+            autocomplete="off">
 
             <div class="modal-content">
                 <div class="modal-content-wrapper">
-                    <div class="modal-header" style="display: block;background-color: #ffffff !important;">
-                        <h4 class="modal-title text-left" style="display: block;">
+                    <div class="modal-header entity-modal-header">
+                        <h4 class="modal-title text-left entity-modal-header__title">
                             <span *ngIf="appEntity?.id" class="font-weight-bold">{{l("Edit")}}
                                 {{entityObjectType.name}}</span>
                             <span *ngIf="!appEntity?.id" class="font-weight-bold">{{l("CreateNew")}}
@@ -29,12 +15,12 @@
                         </h4>
                         <p>* {{l("PleaseFillTheBelowInformation")}}</p>
 
-                            <button style="position: absolute;top: 8px;" type="button" class="close" (click)="close()" [ngClass]="isArabic ? 'closeIcon-ar':'closeIcon-en'"
-                            aria-label="Close" [disabled]="saving">
+                        <button type="button" class="close modal-close-btn"
+                            (click)="close()" aria-label="Close" [disabled]="saving">
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
-                    <div class="modal-body text-left">
+                    <div class="modal-body" [ngClass]="isArabic ? 'text-right create-lookup-modal--arabic' : 'text-left'">
 
                         <div class="form-group">
                             <label for="AppEntity_Code">
@@ -82,8 +68,8 @@
 
                         <div class="form-group" *ngIf="addToLookup">
                             <label for="AppEntity_Notes">{{l("Notes")}}</label>
-                            <input style="height: 131px !important;" type="text" id="AppEntity_Notes"
-                                class="form-control form-control-sm aria-input-text" [(ngModel)]="appEntity.notes"
+                            <input type="text" id="AppEntity_Notes"
+                                class="form-control form-control-sm aria-input-text notes-input" [(ngModel)]="appEntity.notes"
                                 name="Notes" />
                         </div>
 
@@ -155,22 +141,17 @@
                           </div>
                           
                         <div class="row align-items-baseline mb-5 item-photos m-1 py-3 px-1" *ngIf="visual.image"
-                            [ngStyle]="{
-                            'border': attachmentsSrcs  && attachmentsSrcs?.length >0  && attachmentsSrcs[0]!='' ? 'none': '2px solid #EEEEEEEE' 
-                        }" style=" border-radius: 12px;">
-                        <!-- choose image kind BEFORE upload -->
+                            [ngClass]="{'item-photos--filled': attachmentsSrcs && attachmentsSrcs?.length > 0 && attachmentsSrcs[0] != ''}">
 
-                            <div class="col-12 item-photos-header pt-4 pb-2"
-                                style="    background-color: white !important;">
+                            <div class="col-12 item-photos-header item-photos-header--plain pt-4 pb-2">
                                 <div class="d-flex flex-wrap justify-content-between">
 
 
-                                    <div style="display: flex; align-items: center;"
+                                    <div class="upload-intro"
                                         *ngIf="! (attachmentsSrcs  && attachmentsSrcs?.length >0 && attachmentsSrcs[0]!='' )">
-                                        <img src="../../../assets/placeholders/Group 15.png"
-                                            style="margin-right: 15px;" />
-                                        <div style="    line-height: 0.5;" class="pt-3">
-                                            <p style="font-weight: bold; color: black;">
+                                        <img src="../../../assets/placeholders/Group 15.png" class="upload-intro__icon" />
+                                        <div class="pt-3 upload-intro__content">
+                                            <p class="upload-intro__title">
                                                {{ 'UploadFiles' | localize }}
                                             </p>
                                             <p>
@@ -185,20 +166,13 @@
                                 </div>
                             </div>
                             <div class="col-12 item-photos-body"
-                            [ngStyle]="{
-                              'border': attachmentsSrcs && attachmentsSrcs.length > 0 && attachmentsSrcs[0] != ''
-                                        ? 'none' : '2px dashed #EEEEEE'
-                            }"
-                            style="background-color: white !important; border-radius: 12px;">
+                                                                [ngClass]="{'item-photos-body--filled': attachmentsSrcs && attachmentsSrcs.length > 0 && attachmentsSrcs[0] != ''}">
                             <div class="row">
                                 <div class="image-wrapper mb-3" *ngFor="let i of displaySlots">
-                                  <!--  If there is PDF for this index -->
-                               <!--  If there is PDF for this index -->
 <ng-container *ngIf="pdfSafeMap[i]; else imageOrUpload">
     <div
       class="d-flex flex-column justify-content-center h-100 align-items-center kt-avatar position-relative w-100"
     >
-      <!-- overlay with remove button (optional, keep as you like) -->
       <div
         class="d-flex flex-column justify-content-center h-100 w-100 position-absolute view-img-overlay"
       >
@@ -207,7 +181,6 @@
         </div>
       </div>
   
-      <!--  PDF icon that opens PDF in new tab -->
       <a
         [href]="pdfSafeMap[i]"
         target="_blank"
@@ -217,8 +190,7 @@
         <img
           src="assets/Items/pdf-Icon.png"
           alt="PDF"
-          class="pdf-icon-img"
-          style="max-width: 80%; max-height: 80%; object-fit: contain;"
+                    class="pdf-icon-img"
         />
         <span class="mt-2">{{ 'OpenPDF' | localize }}</span>
       </a>
@@ -226,9 +198,7 @@
   </ng-container>
   
                               
-                                  <!-- 🖼 image or empty upload slot -->
                                   <ng-template #imageOrUpload>
-                                    <!-- 💡 If we already have an image for this index -->
                                     <ng-container *ngIf="attachmentsSrcs[i]; else uploadSlot">
                                       <app-image-upload
                                         *ngIf="productImageCategory?.sycAttachmentCategory"
@@ -249,7 +219,6 @@
                                       </app-image-upload>
                                     </ng-container>
                               
-                                    <!--  empty slot – only when allowed -->
                                     <ng-template #uploadSlot>
                                       <div class="image-wrapper upload " *ngIf="showUploadSlot(i)">
                                         <app-image-upload
@@ -399,8 +368,7 @@
                                                         *ngIf="extraAttr.dataType === 'string' && !extraAttr.isLookup  ">
                                                         <input (colorPickerChange)="onColorChange($event, extraAttr)"
                                                             *ngIf="extraAttr.name === 'Color HEXA Code' || extraAttr.name === 'Color HEX Code'"
-                                                            class="picker" [(colorPicker)]="extraAttr.selectedValues"  [disabled]="extraAttr?.disabled"
-                                                            [style.background]="extraAttr.selectedValues || '#09c' " />
+                                                            class="picker" [(colorPicker)]="extraAttr.selectedValues"  [disabled]="extraAttr?.disabled" />
                                                     </div>
                                                 </div>
                                             </div>
@@ -444,13 +412,8 @@
 
                     </div>
                     <div class="modal-footer">
-                        <button [disabled]="saving" type="button" class="btn btn-default btn-gray" (click)="close()"
-                            style="border-radius: 5px;
-                    background-color: white !important;
-                    border: white !important;color: #4A0D4A !important;">{{l("Cancel")}}</button>
-                        <button type="submit" class="btn btn-primary blue  btn-blue btn-save" style="border-radius: 5px;
-                    background-color: #4A0D4A !important;
-                    border: #4A0D4A !important;color: white;"
+                        <button [disabled]="saving" type="button" class="btn btn-default btn-gray modal-footer-btn modal-footer-btn--secondary" (click)="close()">{{l("Cancel")}}</button>
+                        <button type="submit" class="btn btn-primary blue  btn-blue btn-save modal-footer-btn modal-footer-btn--primary"
                             [disabled]="!appEntityForm.form.valid || uploader.isUploading" [buttonBusy]="saving"
                             [busyText]="l('SavingWithThreeDot')"> <span>{{l("Save")}}</span></button>
                     </div>

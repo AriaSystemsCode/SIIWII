@@ -1,8 +1,10 @@
-<div [@routerTransition] [ngStyle]="{'margin-top': isModal ? '0!important':'-90px!important'}" class="pr-lg-4"
-    style="padding-top: 40px;">
+<div
+    [@routerTransition]
+    class="pr-lg-4 linesheet-report-root"
+    [ngClass]="{ 'is-modal-view': isModal, 'not-modal-view': !isModal }"
+>
     <div>
-        <div class="kt-subheader kt-grid__item"
-            style="height: 80px !important;    border-bottom-right-radius: 12px !important;" *ngIf="!isModal">
+        <div class="kt-subheader kt-grid__item linesheet-subheader" *ngIf="!isModal">
             <div [class]="containerClass">
                 <div class="kt-subheader__main">
                     <h3 class="kt-subheader__title">
@@ -60,7 +62,7 @@
                                           
                                     }">
 
-                                <p class="stpTitle ml-md-5 ml-2" style="white-space: nowrap;"
+                                <p class="stpTitle ml-md-5 ml-2 stp-title-nowrap"
                                     [ngClass]="currentStep >= step.printCatalogueStepsEnum ? 'currStp':'defStp'">
                                    {{ step.title | localize }}</p>
                                 <div class="d-flex align-items-center">
@@ -75,7 +77,10 @@
                                           
                             >{{ (i == 1 || i ==0) ? step.printCatalogueStepsEnum + 1 :
                                             step.printCatalogueStepsEnum }}</p>
-                                        <svg *ngIf="i == 4"  [ngStyle]="isArabic ? {'left':'20%'} : {'right':'20%'}" class="svgW position-absolute"
+                                        <svg
+                                            *ngIf="i == 4"
+                                            class="svgW position-absolute step-complete-icon"
+                                            [ngClass]="isArabic ? 'step-complete-icon-rtl' : 'step-complete-icon-ltr'"
                                             height="32" viewBox="0 0 32 32" fill="none"
                                             xmlns="http://www.w3.org/2000/svg">
                                             <path d="M6 17.6L11.7143 24L26 8" stroke="white" stroke-width="3"

@@ -38,3 +38,40 @@ label {
     font-weight: unset;
     line-height: unset;
 }
+
+.success-download-link {
+    color: #4A0D4A !important;
+}
+
+@media (max-width: 768px) {
+    .modal-content {
+        width: 92%;
+        height: auto;
+        padding: 1rem;
+    }
+
+    ._Btn {
+        width: 100%;
+    }
+
+    .pt-3 {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .modal-dialog {
+        width: 96%;
+        margin: 0.5rem auto;
+    }
+
+    .modal-content {
+        width: 100%;
+    }
+
+    h4 {
+        font-size: 1rem;
+    }
+}

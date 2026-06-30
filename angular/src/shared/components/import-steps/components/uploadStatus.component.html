@@ -82,7 +82,7 @@
             
 
             <div class="table-scroll-container" #tableScrollContainer (scroll)="onRecordsScroll($event)">
-              <table class="browser-table min-width-table" style="min-width: 1000px;">
+              <table class="browser-table min-width-table">
                 <thead>
                   <tr>
                     <th class="sticky-action-col sticky-header" *ngIf="importType == ImportTypes.Items">Actions
@@ -100,8 +100,8 @@
                       [class.pointer-events-none]="currentActionRecord && record !== currentActionRecord">
                       <div class="dropdown" #dropdownRef>
                         <!-- IF not in action mode -->
-                        <span class="pointer dropdownPointer" *ngIf="!record._inAction"
-                          (click)="toggleMenu(record, $event)" style="font-size: 20px;">
+                        <span class="pointer dropdownPointer actions-menu-trigger" *ngIf="!record._inAction"
+                          (click)="toggleMenu(record, $event)">
                           ⋮
                         </span>
 
@@ -184,8 +184,7 @@
                         <span *ngSwitchCase="'Status'">{{ record.status || '—' }}</span>
 
                         <!--Record Status -->
-                        <ul *ngSwitchCase="'Record Status'"
-                          style="padding-left: 1rem; margin: 0; list-style-type: none;">
+                        <ul *ngSwitchCase="'Record Status'" class="record-status-list">
                           <ng-container *ngIf="record.fieldsErrors?.length > 0; else showErrorMessage">
                             <li *ngFor="let error of record.fieldsErrors">
                               {{ error?.errorMessage ? error.errorMessage : (error || '—') }}
@@ -351,8 +350,8 @@
                               <ng-template #editableInput>
                                 <!-- Special case for Price Currency Code -->
                                 <ng-container *ngIf="column.name === 'Price Currency Code'; else normalEditableInput">
-                                  <input type="text" class="form-control text-uppercase"
-                                    [attr.data-record-id]="record.id" style="text-transform: uppercase;"
+                                  <input type="text" class="form-control text-uppercase force-uppercase"
+                                    [attr.data-record-id]="record.id"
                                     [ngModel]="getRecordValue(record, column.key)"
                                     (ngModelChange)="setRecordValue(record, column.key, $event?.toUpperCase())"
                                     [ngClass]="{
@@ -398,9 +397,9 @@
 
                             <ng-template #normalMode>
                               <ng-container *ngIf="column.name === 'Product Description'; else normalTextInput">
-                                <div class="form-control"
+                                <div class="form-control readonly-display-field"
                                   [innerHTML]="getSafeHtml(getRecordValue(record, 'productDescription'))"
-                                  style="background-color: #f4f4f4 !important; opacity: 1; cursor: not-allowed;height: auto;">
+                                  >
                                 </div>
                               </ng-container>
 
@@ -459,13 +458,13 @@
                                 </ng-container>
 
                                 <input *ngIf="column.name === 'Price Currency Code'" type="text"
-                                  class="form-control link-parent-input" style="text-transform: uppercase;"
+                                  class="form-control link-parent-input force-uppercase"
                                   [ngModel]="getRecordValue(record, 'priceCurrencyCode')"
                                   (ngModelChange)="setRecordValue(record, 'priceCurrencyCode', $event?.toUpperCase())" />
 
 
 
-                                <input type="text" class="form-control" style="width: fit-content;"
+                                <input type="text" class="form-control fit-content-input"
                                   [ngModel]="getRecordValue(record, column.key)"
                                   (ngModelChange)="setRecordValue(record, column.key, $event)"
                                   [disabled]="!(column.name === 'Code' && (record._isLinkingParent || record._isLinkingItemColor || record._isLinkNewParent ||  record._isLinkNewItemColor))"
@@ -487,7 +486,7 @@
 
                         <!-- image input -->
                         <!-- <img *ngSwitchCase="'Image Preview'" [src]="getImageUrl(getRecordValue(record, 'imagePreview'))"
-                      width="60" height="60" style="object-fit: cover; border-radius: 4px;" /> -->
+                      width="60" height="60" class="legacy-image-preview" /> -->
 
                         <a *ngSwitchCase="'Image Preview'" class="selectImageActive">
                           <ng-container *ngIf="getImageSource(record) as src; else fallback">

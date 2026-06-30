@@ -170,3 +170,80 @@ a.btn {
 h4{
     white-space: nowrap;font-size: 14px !important;
 }
+
+.selection-switch-wrap {
+    width: 45px;
+    top: 3px;
+}
+
+.selection-switch-wrap-row {
+    top: 1.5%;
+}
+
+.meta-price,
+.description-preview {
+    color: #9e9e9e;
+}
+
+.meta-price {
+    font-size: 10px !important;
+}
+
+.description-preview {
+    max-width: 70ch;
+}
+
+.shared-status {
+    color: #2dc74f;
+}
+
+.private-status {
+    color: #fee462;
+}
+
+.hidden-status {
+    color: #b3b7ce;
+}
+
+.actions-menu-edge {
+    top: 0;
+}
+
+@media (max-width: 992px) {
+    .selection-switch-wrap {
+        width: 40px;
+    }
+
+    .description-preview {
+        max-width: 100%;
+    }
+
+    .single-item-per-row-layout {
+        .single-item {
+            height: auto !important;
+        }
+
+        .single-item-body {
+            min-height: 220px;
+        }
+    }
+}
+
+@media (max-width: 576px) {
+    .single-item {
+        margin: 0 0 1rem 0;
+        height: auto !important;
+    }
+
+    .single-item-per-row-layout {
+        .single-item-photo,
+        .single-item-body {
+            width: 100%;
+        }
+
+        .share-level-div {
+            position: static;
+            float: none;
+        }
+    }
+}
