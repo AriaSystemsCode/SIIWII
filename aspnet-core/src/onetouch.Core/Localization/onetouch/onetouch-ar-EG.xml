@@ -3,8 +3,9 @@
   <texts>
 	  <text name="MinimumInStock">الحد الأدنى (في المخزون) الكمية</text>
 	  <text name="OnlyInStockColors">الألوان فقط (في المخزون).</text>
-	  
-    <text name="HomePage">الرئيسية</text>
+	  <text name="AppEntities">البيانات الرئيسية</text>
+
+	  <text name="HomePage">الرئيسية</text>
     <text name="AboutUs">من نحن</text>
     <text name="Administration">الإدارة</text>
     <text name="Roles">الأدوار</text>

@@ -2125,7 +2125,7 @@ namespace onetouch.AppItems
             entity.TimeStamp = timeStamp;
             if (appItem.TenantOwner == null)
                 appItem.TenantOwner = int.Parse(AbpSession.TenantId.ToString());
-            if (string.IsNullOrEmpty(appItem.SSIN))
+            if (string.IsNullOrEmpty(appItem.SSIN) && !input.SkipGenerateSsin)
             {
                 appItem.SSIN = await _helper.SystemTables.GenerateSSIN(itemObjectId, ObjectMapper.Map<AppEntityDto>(entity));
                 entity.SSIN = appItem.SSIN;
@@ -2978,7 +2978,7 @@ namespace onetouch.AppItems
 
             await CurrentUnitOfWork.SaveChangesAsync();
 
-            if (input.VariationItems != null && input.VariationItems.Any())
+            if (!input.SkipGenerateSsin && input.VariationItems != null && input.VariationItems.Any())
             {
                 await _backgroundJobManager.EnqueueAsync<GenerateVariationSsinsJob, GenerateVariationSsinsJobArgs>(
                     new GenerateVariationSsinsJobArgs
@@ -7631,6 +7631,7 @@ namespace onetouch.AppItems
                     appItemModifyList.Add(appItem);*/
                 CreateOrEditAppItemDto createOrEditAppItemDto = ObjectMapper.Map<CreateOrEditAppItemDto>(appItem);
                 createOrEditAppItemDto.NonLookupValues = new List<LookupLabelDto>();
+                createOrEditAppItemDto.SkipGenerateSsin = true;
                 await CreateOrEdit(createOrEditAppItemDto);
             }
 
