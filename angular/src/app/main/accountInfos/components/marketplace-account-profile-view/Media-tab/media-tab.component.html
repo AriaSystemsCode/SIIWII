@@ -46,9 +46,11 @@
 
     <!-- Navigation Buttons -->
     <button *ngIf="mediaItems?.length > 0 && selectedIndex > 0" class="nav-button prev"
-      (click)="prevMedia()">&#10094;</button>
+      (click)="prevMedia()">   {{ isArabic ? '\u276F' : '\u276E' }}
+</button>
     <button *ngIf="mediaItems?.length > 0 && selectedIndex < mediaItems.length - 1" class="nav-button next"
-      (click)="nextMedia()">&#10095;</button>
+      (click)="nextMedia()">  {{ !isArabic ? '\u276F' : '\u276E' }}
+</button>
   </div>
 </p-dialog>
 </div>

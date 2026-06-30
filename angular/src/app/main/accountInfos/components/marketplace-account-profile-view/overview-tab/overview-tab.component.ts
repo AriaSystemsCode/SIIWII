@@ -11,8 +11,6 @@ import { finalize } from 'rxjs';
   styleUrls: ['./overview-tab.component.scss'],
 })
 export class OverviewTabComponent extends AppComponentBase implements OnInit, OnDestroy {
-
-
   @Input('accountDataForView') accountDataForView: AccountDto;
   @Input('marketPlaceData') marketPlaceData: AccountDto;
   @Output("activeTabIndexBtn") activeTabIndexBtn: EventEmitter<number> = new EventEmitter<number>()
@@ -27,9 +25,11 @@ export class OverviewTabComponent extends AppComponentBase implements OnInit, On
   isModalOpen: boolean = false;
   selectedIndex: number = 0;
   totalImgs: number = 0
-  accountReviewMsg = "Your review for this account has already been recorded."
+  accountReviewMsg = this.l("Your review for this account has already been recorded.") 
   isLoading: boolean = false
   items: any[]
+    currentLang:string
+  isArabic:boolean 
   constructor(injector: Injector, private messageServiceProxy: MessageServiceProxy, private _AccountsServiceProxy: AccountsServiceProxy, private _AppMarketplaceItemsServiceProxy: AppMarketplaceItemsServiceProxy,
     private _router: Router,
 
@@ -39,7 +39,8 @@ export class OverviewTabComponent extends AppComponentBase implements OnInit, On
   }
 
   ngOnInit() {
-
+    this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
+    this.currentLang == 'ar' || this.currentLang == 'ar-EG'  ? this.isArabic = true : this.isArabic = false
     this.getOverAllRatings()
     this.getAllMedia()
 
@@ -163,15 +164,8 @@ export class OverviewTabComponent extends AppComponentBase implements OnInit, On
       )
       .subscribe((result) => {
         this.items = result.items;
-
-    
-
-
-
       });
   }
-
-
 
   ngOnDestroy() {
     this.unsubscribeToAllSubscriptions();

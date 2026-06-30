@@ -947,14 +947,6 @@ body p-paginator .p-paginator .p-paginator-element, body p-paginator .p-paginato
 
 
 }
-.Ar-paginator {
-.p-paginator .p-paginator-first, .p-paginator .p-paginator-prev, .p-paginator .p-paginator-next, .p-paginator .p-paginator-last {
-    transform: rotate(180deg) !important;
-
-}
-
-}
-
 
 .btn-primary:hover,
 .btn-primary:focus,
@@ -967,3 +959,4 @@ body p-paginator .p-paginator .p-paginator-element, body p-paginator .p-paginato
 .text-primary {
     color: #4A0D4A !important;
 }
+

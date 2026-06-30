@@ -667,10 +667,9 @@ div.cropper span.resize-bar {
 }
 
 
-.Ar-paginator {
-.p-paginator .p-paginator-first, .p-paginator .p-paginator-prev, .p-paginator .p-paginator-next, .p-paginator .p-paginator-last {
-    transform: rotate(180deg) !important;
-
-}
-
+html[dir="rtl"] p-paginator .p-paginator-first svg,
+html[dir="rtl"] p-paginator .p-paginator-prev svg,
+html[dir="rtl"] p-paginator .p-paginator-next svg,
+html[dir="rtl"] p-paginator .p-paginator-last svg {
+    transform: scaleX(-1);
 }
