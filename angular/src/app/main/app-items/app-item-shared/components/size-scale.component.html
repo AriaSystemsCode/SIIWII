@@ -1,7 +1,7 @@
 <form #sizeScaleForm="ngForm" >
     <div class="row" >
         <div class="dimension-input" *ngIf="appSizeScaleDto">
-            <span class="font-weight-bold"  style="color: black;">{{ 'EnterSizeScaleName' | localize }}</span>
+            <span class="font-weight-bold input-label-black">{{ 'EnterSizeScaleName' | localize }}</span>
             <input
                 class="form-control mb-3"
                 type="text"
@@ -14,7 +14,7 @@
             />
             <validation-messages [formCtrl]="sizeScaleName" *ngIf="sizeScaleName.touched"></validation-messages>
             <ng-container *ngIf="!readOnly || (readOnly && appSizeScaleDto.dimesion2Name)">
-                <span class="font-weight-bold"  style="color: black;white-space: nowrap;">{{ 'EnterSecondDimensionName' | localize }}</span>
+                <span class="font-weight-bold input-label-black input-label-nowrap">{{ 'EnterSecondDimensionName' | localize }}</span>
 
                 <input 
                     class="form-control"
@@ -35,7 +35,7 @@
         </div>
         <div class="col flex-column ml-3">
             <div class="dimension-input mb-2" *ngIf="appSizeScaleDto">
-                <span class="font-weight-bold"  style="color: black;">{{ 'EnterFirstDimensionName' | localize }}</span>
+                <span class="font-weight-bold input-label-black">{{ 'EnterFirstDimensionName' | localize }}</span>
                 <input
                     class="form-control mb-3"
                     type="text"
@@ -86,19 +86,9 @@
             </div>
         </div>
         <div class="align-items-center buttons-list col-2 d-flex flex-column" *ngIf="!readOnly">
-            <button class="btn w-100" (click)="openSelectSizeScaleModal()"  style="background-color: #4A0D4A !important; color:white !important;
-                border: 1px solid #4A0D4A !important;
-                border-radius: 12px;font-weight: bold; text-wrap: nowrap;min-width: fit-content;">{{'SelectSizeScale' | localize}}</button>
-            <button class="btn w-100" (click)="createOrEdit(false)" [disabled]="!appSizeScaleDto?.sizeScaleId" style="    background-color: white !important;
-            border: 1px solid #EEEEEEEE !important;
-            border-radius: 12px;
-            font-weight: bold;
-            color: #4A0D4A !important;text-wrap: nowrap;min-width: fit-content;">{{'SaveSizeScale' | localize}}</button>
-            <button class="btn w-100" (click)="createOrEdit(true)" style="border: 1px solid #F6851D !important;
-            border-radius: 12px;
-            font-weight: bold;
-            color: white !important;
-            background-color: #F6851D !important; text-wrap: nowrap;min-width: fit-content;">{{'SaveAsNewSizeScale' | localize}}</button>
+            <button class="btn w-100 size-scale-btn size-scale-btn-primary" (click)="openSelectSizeScaleModal()">{{'SelectSizeScale' | localize}}</button>
+            <button class="btn w-100 size-scale-btn size-scale-btn-light" (click)="createOrEdit(false)" [disabled]="!appSizeScaleDto?.sizeScaleId">{{'SaveSizeScale' | localize}}</button>
+            <button class="btn w-100 size-scale-btn size-scale-btn-warning" (click)="createOrEdit(true)">{{'SaveAsNewSizeScale' | localize}}</button>
         </div>
     </div>
 </form>

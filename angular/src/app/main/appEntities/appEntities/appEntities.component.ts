@@ -27,7 +27,7 @@ export interface AccordionTabItem {
 }
 @Component({
     templateUrl:'./appEntities.component.html',
-    styleUrls: ['./appEntities.component.css'],
+    styleUrls: ['./appEntities.component.scss'],
     encapsulation: ViewEncapsulation.None,
     animations: [appModuleAnimation()],
     // providers: [MessageService]

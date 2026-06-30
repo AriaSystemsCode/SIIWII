@@ -181,7 +181,7 @@
 }
 
 .browser-table tr:nth-child(even) {
-  //background-color: #fafafa;
+  background-color: inherit;
 }
 
 .browser-table img {
@@ -427,4 +427,141 @@
   max-height: 500px;
     overflow-x: hidden;
     overflow-y: auto;
+}
+
+.actions-menu-trigger {
+  font-size: 20px;
+}
+
+.record-status-list {
+  padding-left: 1rem;
+  margin: 0;
+  list-style-type: none;
+}
+
+.force-uppercase {
+  text-transform: uppercase;
+}
+
+.readonly-display-field {
+  background-color: #f4f4f4 !important;
+  opacity: 1;
+  cursor: not-allowed;
+  height: auto;
+}
+
+.fit-content-input {
+  width: fit-content;
+}
+
+@media (max-width: 1024px) {
+  .modal-dialog {
+    width: 95%;
+    max-width: 95%;
+    margin: 0.5rem auto;
+  }
+
+  .min-width-table {
+    min-width: 960px;
+  }
+}
+
+@media (max-width: 768px) {
+  .modal-header-custom {
+    padding: 14px 12px;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .modal-body.p-0.pl-4.uploadStatusContainer {
+    padding-left: 0.75rem !important;
+    padding-right: 0.75rem !important;
+  }
+
+  .row.pl-5.pt-4.pb-3,
+  .row.pl-3.pr-3.pb-4,
+  .border-bottom.modal-body.pb-4.row {
+    padding-left: 0.75rem !important;
+    padding-right: 0.75rem !important;
+  }
+
+  .Status.ml-3.pt-2.text-center {
+    margin-left: 0 !important;
+    margin-top: 0.5rem;
+  }
+
+  .border-bottom.modal-body.pb-4.row > .col-10,
+  .border-bottom.modal-body.pb-4.row > .Status {
+    flex: 0 0 100%;
+    max-width: 100%;
+  }
+
+  .tabs {
+    flex-wrap: wrap;
+  }
+
+  .tab-item {
+    min-width: 50%;
+  }
+
+  .min-width-table {
+    min-width: 760px;
+  }
+
+  .Next-Btn {
+    width: 100%;
+  }
+
+  .pb-4.pl-5.border-top.pt-4.mt-4.text-right.mr-4 {
+    padding-left: 1rem !important;
+    margin-right: 0 !important;
+    text-align: left !important;
+  }
+}
+
+@media (max-width: 576px) {
+  .modal-dialog {
+    width: 98%;
+    margin: 0.5rem auto;
+  }
+
+  .modal-title {
+    font-size: 14px;
+  }
+
+  .tab-item {
+    min-width: 100%;
+  }
+
+  .min-width-table {
+    min-width: 640px;
+  }
+
+  .browser-table th,
+  .browser-table td {
+    padding: 8px;
+  }
+
+  .modal-body.p-0.pl-4.uploadStatusContainer {
+    padding-left: 0.5rem !important;
+    padding-right: 0.5rem !important;
+  }
+
+  .row.pl-5.pt-4.pb-3,
+  .row.pl-3.pr-3.pb-4,
+  .border-bottom.modal-body.pb-4.row,
+  .pb-4.pl-5.border-top.pt-4.mt-4.text-right.mr-4 {
+    padding-left: 0.5rem !important;
+    padding-right: 0.5rem !important;
+  }
+
+  .fixed-dropdown-menu {
+    max-width: calc(100vw - 2rem);
+    min-width: 220px;
+    left: 0 !important;
+  }
+
+  .table-scroll-container {
+    max-height: 60vh;
+  }
 }

@@ -1,7 +1,7 @@
 ﻿<div bsModal #createOrEditModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="createOrEditModal" aria-hidden="true" [config]="{backdrop: 'static'}">
-    <div class="modal-dialog modal-lg">
+    <div class="modal-dialog modal-lg entity-object-type-modal">
         <div class="modal-content">
-            <form *ngIf="active" #sycEntityObjectTypeForm="ngForm" novalidate (ngSubmit)="save()" autocomplete="off">
+            <form *ngIf="active" #sycEntityObjectTypeForm="ngForm" novalidate (ngSubmit)="save()" autocomplete="off" class="entity-object-type-modal__form">
                 <div class="modal-header">
                     <h4 class="modal-title">
                         <span *ngIf="sycEntityObjectType.id">{{l("EditEntityObjectType")}}</span>
@@ -65,7 +65,7 @@
 
 					<div class="form-group">
 						<label for="SycEntityObjectType_ExtraAttributes">{{l("ExtraAttributes")}}</label>
-                        <div class="form-control" contentEditable="false"  [innerText]="sycEntityObjectType.extraAttributes" >
+                        <div class="form-control entity-object-type-modal__extra-attributes" contentEditable="false"  [innerText]="sycEntityObjectType.extraAttributes" >
                         </div>
 					</div>
 

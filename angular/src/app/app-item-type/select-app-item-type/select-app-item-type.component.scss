@@ -1,3 +1,165 @@
 :host {
     height: 100%;
 }
+
+.modal-content-wrapper {
+    position: relative;
+}
+
+.modal-header {
+    position: relative;
+    padding-right: 2.5rem;
+}
+
+.modal-title {
+    margin-bottom: 0;
+    padding-right: 0.5rem;
+}
+
+.desc-menu-item {
+    margin-bottom: 0;
+}
+
+.modal-close-btn {
+    position: absolute;
+    right: 0;
+    top: 8px;
+}
+
+.modal-body-content {
+    max-height: 60vh;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.search-box-wrapper {
+    min-height: 44px;
+}
+
+:host ::ng-deep .modal-content {
+    max-width: 100%;
+}
+
+.modal-footer-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.modal-action-btn {
+    border-radius: 5px;
+    min-width: 110px;
+}
+
+.cancel-action-btn {
+    background-color: #fff !important;
+    border: 1px solid #fff !important;
+    color: #4a0d4a !important;
+}
+
+.select-action-btn {
+    background-color: #4a0d4a !important;
+    border: 1px solid #4a0d4a !important;
+    color: #fff !important;
+}
+
+:host ::ng-deep .p-tree {
+    max-height: 45vh;
+    overflow: auto;
+}
+
+@media (max-width: 992px) {
+    .modal-body-content {
+        max-height: 55vh;
+    }
+
+    .modal-footer-actions {
+        justify-content: flex-start;
+    }
+
+    .modal-title {
+        font-size: 1rem;
+        line-height: 1.35;
+    }
+
+    .btn-font-hover-brand.ml-3 {
+        margin-left: 0.75rem !important;
+    }
+}
+
+@media (max-width: 768px) {
+    .modal-header {
+        padding-right: 2rem;
+    }
+
+    .modal-title {
+        margin-right: 1.5rem;
+    }
+
+    .search-box-wrapper {
+        margin: 0.75rem !important;
+        padding-left: 0.75rem !important;
+    }
+
+    .title-tree {
+        margin-left: 0.75rem !important;
+    }
+
+    .modal-footer-actions {
+        gap: 0.5rem;
+    }
+
+    .modal-action-btn {
+        flex: 1 1 calc(50% - 0.5rem);
+        min-width: 0;
+    }
+
+    .modal-body-content {
+        padding-bottom: 0.5rem;
+    }
+
+    :host ::ng-deep .p-tree .p-treenode-content {
+        padding-right: 0.25rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .modal-close-btn {
+        top: 4px;
+    }
+
+    .modal-body-content {
+        margin-right: 0 !important;
+        max-height: 50vh;
+    }
+
+    .modal-title {
+        margin-right: 1.25rem;
+        font-size: 0.95rem;
+    }
+
+    .desc-menu-item {
+        font-size: 0.8rem;
+        line-height: 1.25;
+    }
+
+    .search-box-wrapper {
+        margin: 0.5rem !important;
+        padding-left: 0.5rem !important;
+    }
+
+    .title-tree {
+        margin-left: 0.5rem !important;
+    }
+
+    .btn-font-hover-brand.ml-3 {
+        margin-left: 0.5rem !important;
+    }
+
+    .modal-action-btn {
+        flex: 1 1 100%;
+        width: 100%;
+    }
+}

@@ -1018,7 +1018,6 @@
     <text name="GoToLoginPage">انتقل إلى صفحة تسجيل الدخول</text>
     <text name="ShowLockScreenWhenTimedOut">إظهار قفل الشاشة عند انتهاء المهلة</text>
     <text name="YourSessionIsLocked">الجلسة مغلقة</text>
-    <text name="WebhookSubscriptionId">Webhook Subscription Id</text>
     <text name="ParameterName">اسم الحقل</text>
     <text name="InputType">نوع الإدخال</text>
     <text name="AddNewDynamicParameter">أضف حقل ديناميكي جديد</text>
@@ -1026,7 +1025,6 @@
     <text name="DynamicParameter">الحقل الديناميكي</text>
     <text name="DynamicParameterDetail">تفاصيل الحقل الديناميكي</text>
     <text name="DynamicParameterValues">قيم الحقل الديناميكي</text>
-    <text name="Values">قيم</text>
     <text name="Value">قيمة</text>
     <text name="SelectAPermission">حدد إذن</text>
     <text name="EntityDynamicParameters">الحقول الديناميكية للكيان</text>
@@ -1585,20 +1583,15 @@
   <text name="SelectImageFileTypes">اختر ملف JPG أو JPEG أو PNG أو GIF</text>
   <text name="PreviewOrApplyThisTheme">معاينة هذا المظهر أو تطبيقه.</text>
   <text name="PleaseSelectAProductTypeFirst">من فضلك اختر نوع المنتج أولاً</text>
-  <text name="NoAttributes">لا توجد خصائص</text>
   <text name="ClickOrDrop">اضغط أو اسحب الملف</text>
    <text name="AspectRatio?">نسبة الأبعاد: {0}</text>
   <text name="MaxSize?">الحد الأقصى للحجم: {0}</text>
 <text name="AspectRatio">نسبة الأبعاد</text>
-	  <text name="MaxSize">الحد الأقصى للحجم</text>
 	  <text name="SupportedExtensions">الامتدادات المدعومة</text>
 	  <text name="AddNewValue">إضافة قيمة جديدة</text>
-<text name="NoRecordsFound">لا توجد بيانات</text>
 <text name="CreateNew">إنشاء جديد</text>
 <text name="PleaseFillTheBelowInformation">يرجى ملء البيانات التالية</text>
 <text name="CodeIsRequired">الكود مطلوب</text>
-	  <text name="Solid">لون صلب</text>
-<text name="ExtraAttributes">خصائص إضافية</text>
 <text name="Departments">الأقسام</text>
 <text name="Categories">التصنيفات</text>
 <text name="Classifications">التصنيفات</text>
@@ -1611,8 +1604,6 @@
 <text name="SoldBy">يباع بواسطة</text>
 <text name="NoSellerName">لا يوجد اسم للبائع</text>  
 <text name="ProductDescription">وصف المنتج</text>
-  <text name="WarningMessage">رسالة تحذير</text>
-  <text name="SearchWithColor">SearchWithColor</text>
   <text name="ViewOrderedQuantityBySize">عرض الكمية حسب المقاس</text>
   <text name="Connect , Proceed">الاتصال والمتابعة</text>
 <text name="LoadingPreview">جاري تحميل المعاينة</text>
@@ -1681,7 +1672,6 @@
 </text>
 <text name="AddAttachment">إضافة مرفق</text>
 <text name="ImagePreview">معاينة الصورة</text>
-<text name="DefaultImage">الصورة الافتراضية</text>
 <text name="VisibleInMarketplace">مرئي في المتجر</text>
 <text name="AdvancedPricing">التسعير المتقدم</text>
 <text name="Variations">المتغيرات</text>
@@ -1706,7 +1696,6 @@
 <text name="NewVariations">متغيرات جديدة</text>
 <text name="SelectionActions">إجراءات التحديد</text>
 <text name="EditSetPrice">تعديل / تحديد السعر</text>
-<text name="EnterPriceForSelectedVariations">أدخل السعر للمتغيرات المحددة</text>
 <text name="PleaseEnterThePriceForTheSelectedItemsAfterThatThePriceWillApplyOnSelected">
 أدخل السعر للعناصر المحددة وسيتم تطبيقه عليها
 </text>
@@ -1769,25 +1758,22 @@
   <text name="CreateNewList">إنشاء قائمة جديدة</text>
   <text name="SharingOptions">خيارات المشاركة</text>
 	  <text name="ChooseSharingOptions">اختر خيارات المشاركة</text>
-	  <text name="Restricted">مقيد</text>
 	  <text name="ShareWith">مشاركة مع</text>
 	  <text name="TypeOrSearchForMembersAndAccounts">اكتب أو ابحث عن الأعضاء والحسابات</text>
 	  <text name="NotifyPeople">إشعار الأشخاص</text>
 	  <text name="SubscribersToProduct">لديك {0} مشترك في هذا المنتج</text>
-	  <text name="MakePrivate">تحويل إلى خاص</text>
-	  <text name="Unhide">إظهار</text>
+
   <text name="EnterSizeScaleName">أدخل اسم مقاس القياس</text>
 <text name="EnterFirstDimensionName">أدخل اسم البُعد الأول</text>
 <text name="EnterSecondDimensionName">أدخل اسم البُعد الثاني</text>
 <text name="YourListingIsNowAddedToTheList">تمت إضافة القائمة إلى قائمة {0}</text>
 	  <text name="SelectVariationsTitle">اختيار / إلغاء اختيار المتغيرات</text>
 	  <text name="SelectVariationsHint">اختر أو احذف المتغيرات التي تريد ظهورها في القائمة</text>
-	  <text name="Closure">الإغلاق</text>
+
   <text name="TrendingPosts">المواضيع الرائجة</text>
 <text name="TopIndividualContributors">أفضل المساهمين الأفراد</text>
 <text name="TopCompanyContributors">أفضل مساهمات الشركات</text>
 <text name="NewsDigest">ملخص الأخبار</text>
-<text name="SeeAll">عرض الكل</text>
 <text name="PostBy">بواسطة</text>
 <text name="UpcomingEvents">الأحداث القادمة</text>
 <text name="InPerson">حضوري</text>
@@ -1800,14 +1786,11 @@
 	  <text name="SaveSizeScale">حفظ مقياس المقاسات</text>
 	  <text name="SaveAsNewSizeScale">حفظ كمقياس مقاسات جديد</text>
 	  <text name="Create">إنشاء </text>
-	  <text name="COLOR"> اللون </text>
-	  <text name="SIZE">المقاس </text>
 	  <text name="My Transactions"> معاملاتي </text>
 		<text name="Product Id">معرف المنتج</text>
 		<text name="LetsView">دعونا  نعرض</text>
 		<text name="Event">  فعالية</text>
 		<text name="Post">موضوع  </text>
-		<text name="Portal Settings">إعدادات المنفذ  </text>
 		<text name="IsDefault">افتراضي </text>
 		<text name="Orientation">الاتجاه </text>
 		<text name="SelectOrientationOptions">اختر خيارات الاتجاه </text>

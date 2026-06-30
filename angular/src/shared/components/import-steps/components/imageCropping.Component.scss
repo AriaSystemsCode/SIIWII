@@ -302,4 +302,118 @@ background: #4A0D4A 0% 0% no-repeat padding-box;
     border: 1px solid #EEEEEEEE;
   }
 
+.meta-section-title {
+  color: #1B101B;
+}
+
+.metadata-value-col {
+  text-align: right;
+}
+
+@media (max-width: 1024px) {
+  .modal-content {
+    width: 92%;
+    margin: 0 auto;
+  }
+
+  .leftContainer {
+    max-width: 150px;
+  }
+
+  .center-dev {
+    width: calc(100% - 420px);
+  }
+
+  .row.p-4.border-top.mt-4.ml-0.mr-0.justify-content-between.d-flex.w-100 {
+    gap: 0.5rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .modal-content {
+    width: 96%;
+    padding-left: 0.75rem !important;
+  }
+
+  .row.ml-2.mr-2.pt-4 {
+    flex-wrap: wrap;
+  }
+
+  .leftContainer,
+  .rightContainer,
+  .center-dev {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin-right: 0 !important;
+    margin-bottom: 0.75rem;
+  }
+
+  .row.p-4.border-top.mt-4.ml-0.mr-0.justify-content-between.d-flex.w-100 {
+    padding: 0.75rem !important;
+    flex-direction: column;
+    align-items: stretch !important;
+    gap: 0.5rem;
+  }
+
+  .row.p-4.border-top.mt-4.ml-0.mr-0.justify-content-between.d-flex.w-100 > div {
+    width: 100%;
+  }
+
+  .row.d-flex.center-dev.w-100.pt-3 {
+    margin: 0 !important;
+    row-gap: 0.5rem;
+  }
+
+  .row.d-flex.center-dev.w-100.pt-3 > .col-2,
+  .row.d-flex.center-dev.w-100.pt-3 > .col-7 {
+    flex: 0 0 100%;
+    max-width: 100%;
+  }
+
+  .metadata-value-col {
+    text-align: left;
+  }
+
+  .next-btn,
+  ._Btn {
+    width: 100%;
+  }
+}
+
+@media (max-width: 576px) {
+  .modal-dialog {
+    width: 98%;
+    margin: 0.5rem auto;
+  }
+
+  .modal-header-custom {
+    padding: 12px 10px;
+  }
+
+  ._leftContainer {
+    width: 88px;
+    height: 44px;
+  }
+
+  input {
+    width: 100% !important;
+  }
+
+  .Crop-Btn,
+  .UndoCrop-Btn {
+    width: 100%;
+    margin-bottom: 0.5rem;
+  }
+
+  .row.ml-2.mr-2.pt-4 {
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+  }
+
+  .pl-4.pr-4.pt-3.mr-2.center-dev {
+    padding-left: 0.5rem !important;
+    padding-right: 0.5rem !important;
+  }
+}
+
   

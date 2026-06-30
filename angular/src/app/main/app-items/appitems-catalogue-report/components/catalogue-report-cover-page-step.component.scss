@@ -19,3 +19,22 @@ h6 {
     height: 58px;
     border-bottom-right-radius: 6px;
 }
+
+.frnd-img-ltr {
+    right: -8px;
+}
+
+.frnd-img-rtl {
+    left: -8px;
+}
+
+@media (max-width: 1024px) {
+    h6 {
+        font-size: 15px;
+    }
+
+    .frndImg {
+        height: 48px;
+        bottom: -6px;
+    }
+}

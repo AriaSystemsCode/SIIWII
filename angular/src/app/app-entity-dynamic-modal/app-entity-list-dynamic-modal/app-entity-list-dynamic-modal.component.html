@@ -1,33 +1,32 @@
-<div class="modal-content-wrapper" *ngIf="active">
+<div class="modal-content-wrapper" *ngIf="active" [ngClass]="{'lookup-modal--arabic': isArabic}">
     <div class="modal-header">
         <h4 class="modal-title">
             <p class="desc-menu-item">{{l(entityObjectType.name)}} {{l("values")}} </p>
         </h4>
-        <button style="position: absolute;right: 0;top: 8px;" type="button" class="close" (click)="close()"
+        <button type="button" class="close modal-close-btn" (click)="close()"
             aria-label="Close">
             <span aria-hidden="true">&times;</span>
         </button>
     </div>
-    <div class="modal-body p-0 thin-scroll mr-2">
-        <div class="row">
-        <div class="align-items-center border d-flex m-3 pb-2 pl-3 pt-2 rounded col-5">
-            <span class="mr-3">
-                <i class="fas fa-search"></i>
-            </span>
-            <input type="text" name="search" id="search" placeholder="{{ 'Search' | localize }}" (input)="onFilter()"
-                [(ngModel)]="searchQuery" class="form-control bg-white border-0">
-        </div>
+    <div class="modal-body p-0 thin-scroll" [ngClass]="isArabic ? 'ml-2 mr-0' : 'mr-2'">
+        <div class="row lookup-toolbar">
+            <div class="align-items-center border d-flex m-3 pb-2 pl-3 pt-2 rounded col-12 col-md-5 lookup-search">
+                <span class="mr-3 lookup-search__icon">
+                    <i class="fas fa-search"></i>
+                </span>
+                <input type="text" name="search" id="search" placeholder="{{ 'Search' | localize }}" (input)="onFilter()"
+                    [(ngModel)]="searchQuery" class="form-control bg-white border-0 lookup-search__input">
+            </div>
 
-        <button style="background-color: white  !important;border: 1px solid #EBEBEB !important;color: #4A0D4A !important; height: 55px;" 
-          *ngIf="showAddAction" title="{{ 'AddNewValue' | localize }}" type="button"
-            class="btn btn-icon btn-primary col-5 mt-3" (click)="openCreateOrEditModal()">
-            <i class="flaticon2-plus" style="color: #4A0D4A !important;"> {{ 'AddNew' | localize }}  {{l(entityObjectType.name)}}</i>
-        </button>
-</div>
+            <button *ngIf="showAddAction" title="{{ 'AddNewValue' | localize }}" type="button"
+                class="btn btn-icon btn-primary col-12 col-md-5 mt-3 lookup-add-btn" (click)="openCreateOrEditModal()">
+                <i class="flaticon2-plus lookup-add-btn__icon"> {{ 'AddNew' | localize }} {{l(entityObjectType.name)}}</i>
+            </button>
+        </div>
         <div class="d-flex flex-column mb-3" *ngIf="displayedRecords.length">
-            <div class="align-items-center border-dashed-bottom d-flex justify-content-between p-3"
+            <div class="align-items-center border-dashed-bottom d-flex justify-content-between p-3 lookup-record"
                 *ngFor="let item of displayedRecords;index as i">
-                <div class="d-flex" style="align-items: center;" [ngClass]="{'t-checkbox-list':acceptMultiValues}">
+                <div class="d-flex align-items-center lookup-record__content" [ngClass]="{'t-checkbox-list':acceptMultiValues}">
                     <label class="pl-3 pt-3 pr-2" [ngClass]="acceptMultiValues ? 'kt-checkbox kt-checkbox--dark':'ml-3'"
                     [for]="!isNonLookupValue(item.code) ? item.value : item.code">
                     <p-checkbox *ngIf="acceptMultiValues" [value]="!isNonLookupValue(item.code) ? item.value : item.code" [id]="!isNonLookupValue(item.code) ? item.value : item.code"
@@ -36,32 +35,27 @@
                         [(ngModel)]="selectedRecords" [name]="entityObjectType.name" />
                 </label>
 
-                    <div style="
-    width: 50px;
-    height: 50px;
-" *ngIf="item?.hexaCode"  [ngStyle]="{'background-color': item?.hexaCode}"></div>
-                    <img *ngIf="!item?.hexaCode && item?.image" style="
-    width: 50px;
-    height: 50px;
-" [src]="attachmentBaseUrl + '/' + item?.image" onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'" />
+                    <svg *ngIf="item?.hexaCode" class="lookup-record__swatch" viewBox="0 0 50 50" aria-hidden="true">
+                        <rect width="50" height="50" rx="6" ry="6" [attr.fill]="item?.hexaCode"></rect>
+                    </svg>
+                    <img *ngIf="!item?.hexaCode && item?.image" class="lookup-record__image"
+                        [src]="attachmentBaseUrl + '/' + item?.image" onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'" />
 
-<img *ngIf="!item?.hexaCode && !item?.image" style="
-    width: 50px;
-    height: 50px;
-" src="../../../../../assets/placeholders/appitem-placeholder.png" />
+                    <img *ngIf="!item?.hexaCode && !item?.image" class="lookup-record__image"
+                        src="../../../../../assets/placeholders/appitem-placeholder.png" />
 
                   
-                    <div class="d-flex flex-column pl-3">
+                    <div class="d-flex flex-column pl-3 lookup-record__meta">
                         <span class="pt-1  font-weight-bold"> {{item.code}}</span>
                     <span class="pt-1"> {{item.label}}</span>
                 </div>
                 </div>
-                <div class="row" *ngIf="showActions && !item.isHostRecord && item.value">
+                <div class="row lookup-record__message" *ngIf="showActions && !item.isHostRecord && item.value">
                     *{{ 'AddedToLookup' | localize }}
                 </div> 
                
-                <div *ngIf="showActions && !item.isHostRecord">
-                    <div class="btn-group dropdown" dropdown container="body" placement='bottom right'>
+                <div class="lookup-record__actions" *ngIf="showActions && !item.isHostRecord">
+                    <div class="btn-group dropdown" dropdown container="body" [placement]="isArabic ? 'bottom left' : 'bottom right'">
                         <button class="dropdown-toggle btn btn-sm btn-action" dropdownToggle>
                         </button>
                         <ul id="dropdown-alignment" class="dropdown-menu dropdown-action-btn dropdown-menu-right"
@@ -78,7 +72,7 @@
 
             </div>
             <div *ngIf="displayedRecords?.length">
-                <button class="btn btn-font-hover-brand ml-3" (click)="showMoreListData()"
+                <button class="btn btn-font-hover-brand" [ngClass]="isArabic ? 'mr-3 ml-0' : 'ml-3'" (click)="showMoreListData()"
                     *ngIf="showMoreListDataButton">
                     {{ 'showmore' | localize }} ...
                 </button>
@@ -87,21 +81,11 @@
                 {{ 'NoRecordsFound...' | localize }}
             </div>
         </div>
-        <!-- <button style="background-color: #4A0D4A !important;
-        border: #4A0D4A !important;
-        color: white !important;" *ngIf="showAddAction" title="{{ 'AddNewValue' | localize }}" type="button"
-            class="btn btn-icon btn-primary btn-circle create-edit-btn" (click)="openCreateOrEditModal()">
-            <i class="flaticon2-plus"></i>
-        </button> -->
     </div>
     <div class="modal-footer">
 
-        <button type="button" class="btn btn-default btn-gray" (click)="close()" style="border-radius: 5px;
-        background-color: white !important;
-        border: white !important;color: #4A0D4A !important;">{{l("Cancel")}}</button>
-        <button type="button" class="btn btn-primary" (click)="submitSelection()" style="border-radius: 5px;
-        background-color: #4A0D4A !important;
-        border: #4A0D4A !important;color: white;">
+        <button type="button" class="btn btn-default btn-gray modal-footer-btn modal-footer-btn--secondary" (click)="close()">{{l("Cancel")}}</button>
+        <button type="button" class="btn btn-primary modal-footer-btn modal-footer-btn--primary" (click)="submitSelection()">
             {{l("Add")}}
         </button>
     </div>

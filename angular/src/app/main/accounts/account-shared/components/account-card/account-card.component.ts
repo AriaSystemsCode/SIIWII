@@ -165,8 +165,8 @@ export class AccountCardComponent extends AppComponentBase implements OnChanges 
         relation.visibility = relation.visibility === 'Public' ? 'Private' : 'Public';
 
         relation.visibility === 'Public'
-          ? this.notify.success('Account is Shared')
-          : this.notify.success('Account is Private');
+          ? this.notify.success(this.l('Account is Shared'))
+          : this.notify.success(this.l('Account is Private'));
       });
   }
 

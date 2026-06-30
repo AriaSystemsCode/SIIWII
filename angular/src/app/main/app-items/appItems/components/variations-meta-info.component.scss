@@ -5,3 +5,31 @@
     font-size: .8rem;
     color: $grey-5;
 }
+
+.meta-row {
+    margin-left: 0;
+    margin-right: 0;
+}
+
+.meta-label {
+    min-width: 170px;
+}
+
+.meta-value {
+    min-width: 0;
+    word-break: break-word;
+}
+
+@media (max-width: 768px) {
+    .meta-row {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .meta-label,
+    .meta-value {
+        width: 100%;
+        text-align: left !important;
+        padding-left: 0 !important;
+    }
+}

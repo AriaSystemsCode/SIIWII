@@ -1,7 +1,4 @@
-<div
-  class="d-flex justify-content-center image-upload-container"
-  [ngStyle]="{ 'width.px': staticWidth, 'height.px': staticHeight }"
->
+<div class="d-flex justify-content-center image-upload-container">
   <label
     class="p-0 mb-0 w-100 h-100"
     for="image{{ inputID }}"
@@ -16,7 +13,7 @@
       (change)="fileChange($event)"
       [accept]="acceptedExtensions"
       [disabled]="isDisabled"
-      [ngStyle]="{ cursor: isDisabled ? 'not-allowed' : 'pointer' }"
+      [ngClass]="{ 'input-file--disabled': isDisabled }"
     />
 
     <!-- 🖼 IMAGE PREVIEW -->

@@ -456,6 +456,21 @@ tabset .nav-link.active span {
     color: #4A0D4A !important;
 }
 
+[dir="rtl"] .p-datatable .p-datatable-thead > tr > th,
+[dir="rtl"] .p-datatable .p-sortable-column,
+[dir="rtl"] .p-treetable .p-treetable-thead > tr > th,
+[dir="rtl"] .p-treetable .p-sortable-column,
+.kt-body-rtl .p-datatable .p-datatable-thead > tr > th,
+.kt-body-rtl .p-datatable .p-sortable-column,
+.kt-body-rtl .p-treetable .p-treetable-thead > tr > th,
+.kt-body-rtl .p-treetable .p-sortable-column,
+.rtl-layout .p-datatable .p-datatable-thead > tr > th,
+.rtl-layout .p-datatable .p-sortable-column,
+.rtl-layout .p-treetable .p-treetable-thead > tr > th,
+.rtl-layout .p-treetable .p-sortable-column {
+    text-align: right !important;
+}
+
 input[type="radio"], input[type="checkbox"] {
     accent-color: #4A0D4A !important;
 }
@@ -922,3 +937,26 @@ th.sticky-header {
 .alert, .toast, .modal {
     z-index: 99999;
 }
+
+.p-accordion .p-accordion-header .p-accordion-header-link {
+border-radius: 12px !important;
+}
+
+body p-paginator .p-paginator .p-paginator-element, body p-paginator .p-paginator .p-paginator-pages {
+    float: none !important;
+
+
+}
+
+.btn-primary:hover,
+.btn-primary:focus,
+.btn-primary:not(:disabled):not(.disabled):active,
+.btn-primary:not(:disabled):not(.disabled).active {
+    background-color: #4A0D4A !important;
+    border-color: #4A0D4A !important;
+}
+
+.text-primary {
+    color: #4A0D4A !important;
+}
+

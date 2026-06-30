@@ -659,3 +659,17 @@ div.cropper span.resize-bar {
         transform: rotate(360deg);
     }
 }
+
+.p-dropdown .p-dropdown-clear-icon{
+    right: auto !important;
+    left: auto !important;
+        width: 10px !important;
+}
+
+
+html[dir="rtl"] p-paginator .p-paginator-first svg,
+html[dir="rtl"] p-paginator .p-paginator-prev svg,
+html[dir="rtl"] p-paginator .p-paginator-next svg,
+html[dir="rtl"] p-paginator .p-paginator-last svg {
+    transform: scaleX(-1);
+}

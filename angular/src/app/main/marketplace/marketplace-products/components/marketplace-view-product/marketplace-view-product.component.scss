@@ -1,3 +1,11 @@
+.wrapper {
+    margin-top: -50px;
+}
+
+::ng-deep .product-confirm-dialog {
+    width: 25vw;
+}
+
 .type {
 
     padding: 6px 16px;
@@ -1096,6 +1104,59 @@ line-height: 21px;
 color: #9E9E9E;
 
 
+}
+
+@media only screen and (max-width: 1200px) {
+    .showRoomLink {
+        max-width: 100%;
+        padding: 10px 14px !important;
+        white-space: nowrap;
+    }
+
+    .details-sec {
+        padding: 0 12px 12px;
+    }
+}
+
+@media only screen and (max-width: 991px) {
+    .summaryTab {
+        margin-top: 16px;
+        padding-right: 0;
+    }
+
+    .priceMsg {
+        font-size: 20px;
+    }
+
+    .proNameMd,
+    .productNameP {
+        font-size: 14px;
+    }
+
+    .codeLg {
+        font-size: 16px;
+    }
+}
+
+@media only screen and (max-width: 767px) {
+    .divsStyle {
+        margin: 0 0 12px;
+        border-radius: 10px;
+    }
+
+    .department-chip {
+        font-size: 12px;
+        padding: 4px 8px;
+    }
+
+    .priceMsg {
+        font-size: 18px;
+    }
+
+    .showRoomLink {
+        width: 100%;
+        max-height: none;
+    }
 }
 
 .col-md-8 {

@@ -29,6 +29,8 @@ export class MediaTabComponent extends AppComponentBase implements OnInit, OnCha
 
   private mediaLoaded = false;
 
+    currentLang:string
+  isArabic:boolean 
   constructor(
     injector: Injector,
     private _AccountsServiceProxy: AccountsServiceProxy,
@@ -38,7 +40,8 @@ export class MediaTabComponent extends AppComponentBase implements OnInit, OnCha
   }
 
   ngOnInit(): void {
-
+    this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
+    this.currentLang == 'ar' || this.currentLang == 'ar-EG'  ? this.isArabic = true : this.isArabic = false
   }
 
   ngOnChanges(changes: SimpleChanges): void {

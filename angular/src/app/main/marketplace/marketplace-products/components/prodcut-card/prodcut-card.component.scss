@@ -1,7 +1,9 @@
 .cardDiv {
   border-top-left-radius: 10.82px !important;
   border-top-right-radius: 10.82px !important;
-  width: 15rem;
+  width: 100%;
+  max-width: 15rem;
+  margin: 0 auto;
   cursor: pointer;
 
   .img {
@@ -66,10 +68,22 @@
   }
 }
 
+@media only screen and (max-width: 992px) {
+  .cardDiv {
+    max-width: 100%;
+  }
+}
+
 
 @media only screen and (max-width: 600px) {
-  .card {
+  .cardDiv {
     width: 100%;
+    max-width: 100%;
+  }
+
+  .rateNum,
+  h5 {
+    white-space: normal;
   }
 }
 
