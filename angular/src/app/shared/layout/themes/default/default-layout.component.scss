@@ -205,16 +205,16 @@ margin-bottom: 30px;
   }
 
   .rtl-arr {
-    position: absolute;
+    position: sticky;
     right: 60px;
-    top: 70px;
+    top: 0px;
     transform: rotate(180deg);
 
   }
   .rtl-arr-left {
     position: absolute;
     right: 205px;
-    top: 70px;
+    top: 0px;
     transform: rotate(180deg);
 
   }

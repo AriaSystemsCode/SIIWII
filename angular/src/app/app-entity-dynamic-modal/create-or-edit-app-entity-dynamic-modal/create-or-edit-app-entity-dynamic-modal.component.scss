@@ -231,6 +231,39 @@
 }
 
 @media screen and (max-width: 991px) {
+    :host ::ng-deep .modal-dialog.right-modal {
+        width: min(100vw, 540px) !important;
+        max-width: calc(100vw - 1rem) !important;
+        margin: 0 0 0 auto !important;
+        right: 0 !important;
+    }
+
+    :host ::ng-deep .modal-dialog.right-modal.slide-right-out {
+        right: -100vw !important;
+    }
+
+    .modal-body {
+        padding: 1.5rem 1rem 2.25rem !important;
+    }
+
+    .modal-body .row.col-12 {
+        margin-left: 0;
+        margin-right: 0;
+        padding-left: 0;
+        padding-right: 0;
+    }
+
+    .modal-body .form-group.d-flex,
+    .modal-body .d-flex.align-items-center {
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+
+    .modal-body .form-group.d-flex input[type='checkbox'] {
+        max-width: 28px;
+        flex: 0 0 28px;
+    }
+
     .image-wrapper {
         width: calc(50% - 1rem);
         margin-right: 1rem;
@@ -239,16 +272,69 @@
     .upload-intro {
         width: 100%;
     }
+
+    .item-photos {
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+    }
+
+    .item-photos .row {
+        margin-left: 0;
+        margin-right: 0;
+    }
 }
 
 @media screen and (max-width: 767px) {
+    :host ::ng-deep .modal-dialog.right-modal {
+        width: 100vw !important;
+        max-width: 100vw !important;
+        height: 100vh !important;
+        margin: 0 !important;
+        right: 0 !important;
+    }
+
+    :host ::ng-deep .modal-dialog.right-modal .modal-content {
+        height: 100vh;
+    }
+
     .modal-body {
         padding: 1.25rem 1rem 2rem !important;
+    }
+
+    .entity-modal-header {
+        padding-right: 2.5rem;
+    }
+
+    .entity-modal-header__title {
+        font-size: 1.1rem;
+        line-height: 1.35;
+    }
+
+    .modal-close-btn {
+        right: 0.5rem;
+        top: 0.5rem;
+    }
+
+    .modal-body .radio-inline {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+
+    .modal-body .radio-inline .ml-5 {
+        margin-left: 0 !important;
+    }
+
+    .wide-drop-down,
+    .wide-drop-down .p-dropdown,
+    .wide-drop-down .p-multiselect {
+        width: 100%;
     }
 
     .image-wrapper {
         width: 100%;
         margin-right: 0;
+        margin-bottom: 0.75rem !important;
     }
 
     .upload-intro {
@@ -268,5 +354,34 @@
 
     .modal-footer-btn {
         width: 100%;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .modal-body {
+        padding: 1rem 0.75rem 1.5rem !important;
+    }
+
+    .item-photos {
+        padding-left: 0.5rem !important;
+        padding-right: 0.5rem !important;
+    }
+
+    .item-photos-header {
+        padding-top: 0.75rem !important;
+    }
+
+    .upload-intro__icon {
+        width: 40px;
+        height: 40px;
+    }
+
+    .upload-intro__title {
+        font-size: 0.95rem;
+    }
+
+    .modal-footer {
+        padding-left: 0.75rem;
+        padding-right: 0.75rem;
     }
 }

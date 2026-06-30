@@ -265,6 +265,10 @@ body #lookups .p-accordion .p-accordion-header a {
     width: 130px;
 }
 
+.primeng-paging-container {
+    gap: 0.75rem;
+}
+
 @media screen and (max-width: 991px) {
     .lookups-page__content {
         margin-top: 1rem;
@@ -302,6 +306,26 @@ body #lookups .p-accordion .p-accordion-header a {
     .lookup-table {
         min-width: 100%;
     }
+
+    .primeng-paging-container {
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .primeng-paging-container p-paginator {
+        width: 100%;
+    }
+
+    .primeng-paging-container .total-records-count {
+        float: none !important;
+        position: static !important;
+        bottom: auto !important;
+        margin-left: 0;
+        margin-top: 0.5rem;
+        white-space: normal;
+        text-align: center;
+    }
 }
 
 @media screen and (max-width: 767px) {
@@ -335,5 +359,18 @@ body #lookups .p-accordion .p-accordion-header a {
 
     .input-group {
         flex-wrap: nowrap;
+    }
+
+    .primeng-paging-container {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .primeng-paging-container .total-records-count {
+        float: none !important;
+        position: static !important;
+        bottom: auto !important;
+        font-size: 0.9rem;
     }
 }
