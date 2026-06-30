@@ -663,6 +663,14 @@ div.cropper span.resize-bar {
 .p-dropdown .p-dropdown-clear-icon{
     right: auto !important;
     left: auto !important;
+        width: 10px !important;
 }
 
 
+.Ar-paginator {
+.p-paginator .p-paginator-first, .p-paginator .p-paginator-prev, .p-paginator .p-paginator-next, .p-paginator .p-paginator-last {
+    transform: rotate(180deg) !important;
+
+}
+
+}

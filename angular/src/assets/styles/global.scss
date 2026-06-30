@@ -944,16 +944,17 @@ border-radius: 12px !important;
 
 body p-paginator .p-paginator .p-paginator-element, body p-paginator .p-paginator .p-paginator-pages {
     float: none !important;
+
+
 }
-
-
-
-body .Ar-paginator p-paginator .p-paginator .p-paginator-first,
-body .Ar-paginator p-paginator .p-paginator .p-paginator-prev,
-body .Ar-paginator p-paginator .p-paginator .p-paginator-next,
-body .Ar-paginator p-paginator .p-paginator .p-paginator-last {
+.Ar-paginator {
+.p-paginator .p-paginator-first, .p-paginator .p-paginator-prev, .p-paginator .p-paginator-next, .p-paginator .p-paginator-last {
     transform: rotate(180deg) !important;
+
 }
+
+}
+
 
 .btn-primary:hover,
 .btn-primary:focus,

@@ -5,7 +5,7 @@
 
 
 <ng-template #transactionDetailsTemplate>
-    <h1 class="mb-4 purpleColor"> {{appTransactionsForViewDto?.name}} </h1>
+    <h1 class="mb-4 purpleColor"> {{appTransactionsForViewDto?.entityObjectTypeCode | localize }} {{'#'}} {{appTransactionsForViewDto?.code}}  </h1>
     <p-accordion class="shoppingCartAccordionTabBG mt-4" [(activeIndex)]="activeIndex"
         [ngClass]="isArabic ? 'rtl-arr-acc':'ltr-arr-acc'">
         <!-- order information tab -->
@@ -907,8 +907,9 @@
             <div class=" topheader d-flex justify-content-between align-items-center">
                 <div class="row bg-white  m-3 p-2  pl-4 cartSec">
                     {{'Transactions' | localize}} &nbsp; &nbsp; > &nbsp; &nbsp;
-                    {{appTransactionsForViewDto?.transactionType == 0 ?
-                    'Sales Order':'Purchase Order' | localize}} &nbsp; &nbsp; >
+                   {{ (appTransactionsForViewDto?.transactionType == 0
+    ? 'Sales Order'
+    : 'Purchase Order') | localize }} &nbsp; &nbsp; >
                     &nbsp; &nbsp;
                     {{transactionCode}}
                 </div>
