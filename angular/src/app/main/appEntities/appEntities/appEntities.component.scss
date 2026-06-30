@@ -24,7 +24,7 @@
 .btn-p-21:hover,
 .btn-p-21:focus {
     padding: 9px 23px !important;
-    margin-right: 11px;
+    margin-right: 0;
 }
 
 .btn-white,
@@ -35,7 +35,7 @@
     border: 1px solid #464E5F;
     padding: 9px 17px !important;
     border-color: #464E5F;
-    margin-right: 16px;
+    margin-right: 0;
 }
 
 .p-table-scrollable-header-box th {
@@ -205,7 +205,7 @@ body #lookups .p-accordion .p-accordion-header a {
 }
 
 .lookups-page--arabic {
-    margin-top: 6%;
+    margin-top: 10%;
 }
 
 .lookups-page__content {
@@ -235,6 +235,55 @@ body #lookups .p-accordion .p-accordion-header a {
 
 .accordion-toolbar--legacy {
     top: 0;
+}
+
+.accordion-toolbar .kt-subheader__wrapper,
+.accordion-toolbar--legacy .kt-subheader__wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 0.75rem;
+}
+
+.lookups-page--arabic .accordion-toolbar,
+.lookups-page--arabic .accordion-toolbar--legacy {
+    left: 5px;
+    right: auto;
+}
+
+.lookups-page--arabic .according_desc {
+    right: 162px;
+    left: auto;
+}
+
+.lookups-page--arabic .according_desc-17 {
+    right: 143px;
+    left: auto;
+}
+
+.lookups-page--arabic .according_desc-19 {
+    right: 135px;
+    left: auto;
+}
+
+.lookups-page--arabic .according_desc-20 {
+    right: 139px;
+    left: auto;
+}
+
+.lookups-page--arabic .according_desc-21 {
+    right: 125px;
+    left: auto;
+}
+
+.lookups-page--arabic .according_desc-22 {
+    right: 156px;
+    left: auto;
+}
+
+.lookups-page--arabic .according_desc-23 {
+    right: 120px;
+    left: auto;
 }
 
 .action-btn {
@@ -358,6 +407,7 @@ body #lookups .p-accordion .p-accordion-header a {
     }
 
     .input-group {
+ 
         flex-wrap: nowrap;
     }
 

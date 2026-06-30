@@ -1,4 +1,4 @@
-<div class="modal-content-wrapper" *ngIf="active">
+<div class="modal-content-wrapper" *ngIf="active" [ngClass]="{'lookup-modal--arabic': isArabic}">
     <div class="modal-header">
         <h4 class="modal-title">
             <p class="desc-menu-item">{{l(entityObjectType.name)}} {{l("values")}} </p>
@@ -8,7 +8,7 @@
             <span aria-hidden="true">&times;</span>
         </button>
     </div>
-    <div class="modal-body p-0 thin-scroll mr-2">
+    <div class="modal-body p-0 thin-scroll" [ngClass]="isArabic ? 'ml-2 mr-0' : 'mr-2'">
         <div class="row lookup-toolbar">
             <div class="align-items-center border d-flex m-3 pb-2 pl-3 pt-2 rounded col-12 col-md-5 lookup-search">
                 <span class="mr-3 lookup-search__icon">
@@ -55,7 +55,7 @@
                 </div> 
                
                 <div class="lookup-record__actions" *ngIf="showActions && !item.isHostRecord">
-                    <div class="btn-group dropdown" dropdown container="body" placement='bottom right'>
+                    <div class="btn-group dropdown" dropdown container="body" [placement]="isArabic ? 'bottom left' : 'bottom right'">
                         <button class="dropdown-toggle btn btn-sm btn-action" dropdownToggle>
                         </button>
                         <ul id="dropdown-alignment" class="dropdown-menu dropdown-action-btn dropdown-menu-right"
@@ -72,7 +72,7 @@
 
             </div>
             <div *ngIf="displayedRecords?.length">
-                <button class="btn btn-font-hover-brand ml-3" (click)="showMoreListData()"
+                <button class="btn btn-font-hover-brand" [ngClass]="isArabic ? 'mr-3 ml-0' : 'ml-3'" (click)="showMoreListData()"
                     *ngIf="showMoreListDataButton">
                     {{ 'showmore' | localize }} ...
                 </button>

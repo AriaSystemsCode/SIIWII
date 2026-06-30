@@ -1,6 +1,6 @@
 <div bsModal #createOreEditLookups="bs-modal" class="modal fade" tabindex="-1" role="dialog"
     aria-labelledby="createOreEditLookups" aria-hidden="true">
-    <div class="modal-dialog right-modal" [ngClass]="active ? 'slide-right-in' : 'slide-right-out'" role="document">
+    <div class="modal-dialog" [ngClass]="isArabic ? (active ? 'left-modal slide-left-in' : 'left-modal slide-left-out') : (active ? 'right-modal slide-right-in' : 'right-modal slide-right-out')" role="document">
         <form class="h-100" *ngIf="active" #appEntityForm="ngForm" novalidate (ngSubmit)="save(appEntityForm)"
             autocomplete="off">
 
@@ -20,7 +20,7 @@
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
-                    <div class="modal-body text-left">
+                    <div class="modal-body" [ngClass]="isArabic ? 'text-right create-lookup-modal--arabic' : 'text-left'">
 
                         <div class="form-group">
                             <label for="AppEntity_Code">

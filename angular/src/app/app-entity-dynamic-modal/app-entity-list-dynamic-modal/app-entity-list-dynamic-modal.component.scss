@@ -95,6 +95,40 @@
     color: #fff;
 }
 
+.lookup-modal--arabic {
+    direction: rtl;
+}
+
+.lookup-modal--arabic .modal-close-btn {
+    right: auto;
+    left: 0;
+}
+
+.lookup-modal--arabic .lookup-search {
+    padding-left: 0.75rem !important;
+    padding-right: 1rem !important;
+}
+
+.lookup-modal--arabic .lookup-search__icon {
+    margin-right: 0 !important;
+    margin-left: 0.75rem;
+}
+
+.lookup-modal--arabic .lookup-record__meta {
+    padding-left: 0 !important;
+    padding-right: 0.75rem;
+    text-align: right;
+}
+
+.lookup-modal--arabic .lookup-record__message {
+    text-align: left;
+}
+
+.lookup-modal--arabic .lookup-record__actions {
+    margin-left: 0;
+    margin-right: auto;
+}
+
 @media screen and (max-width: 991px) {
     .lookup-toolbar {
         padding: 0 0.75rem;
@@ -119,6 +153,12 @@
         width: 100%;
         text-align: left;
         padding-left: 4.5rem;
+    }
+
+    .lookup-modal--arabic .lookup-record__message {
+        text-align: right;
+        padding-left: 0;
+        padding-right: 4.5rem;
     }
 }
 
@@ -161,8 +201,17 @@
         margin-left: auto;
     }
 
+    .lookup-modal--arabic .lookup-record__actions {
+        margin-left: 0;
+        margin-right: auto;
+    }
+
     .lookup-record__message {
         padding-left: 0;
+    }
+
+    .lookup-modal--arabic .lookup-record__message {
+        padding-right: 0;
     }
 
     .modal-footer {
@@ -190,5 +239,10 @@
 
     .lookup-record__meta {
         padding-left: 0.5rem !important;
+    }
+
+    .lookup-modal--arabic .lookup-record__meta {
+        padding-left: 0 !important;
+        padding-right: 0.5rem !important;
     }
 }
