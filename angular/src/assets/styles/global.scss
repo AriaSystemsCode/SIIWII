@@ -939,3 +939,15 @@ body .Ar-paginator p-paginator .p-paginator .p-paginator-next,
 body .Ar-paginator p-paginator .p-paginator .p-paginator-last {
     transform: rotate(180deg) !important;
 }
+
+.btn-primary:hover,
+.btn-primary:focus,
+.btn-primary:not(:disabled):not(.disabled):active,
+.btn-primary:not(:disabled):not(.disabled).active {
+    background-color: #4A0D4A !important;
+    border-color: #4A0D4A !important;
+}
+
+.text-primary {
+    color: #4A0D4A !important;
+}

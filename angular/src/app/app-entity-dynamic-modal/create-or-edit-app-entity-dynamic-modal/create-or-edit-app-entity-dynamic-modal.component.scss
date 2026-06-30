@@ -5,16 +5,40 @@
 .modal-body {
     padding: 2rem 1.25rem 4rem 1.25rem !important;
 }
+
 .form-control , .custom-dropdown {
     background-color: #F8F8F8 !important;
 }
+
 :host {
     height: 100%;
+    display: block;
 }
+
 .add-new-lookup-btn {
     padding: 0.5rem 0.9rem;
     border: 1px solid #999;
 }
+
+.entity-modal-header {
+    display: block;
+    background-color: #ffffff !important;
+}
+
+.entity-modal-header__title {
+    display: block;
+}
+
+.modal-close-btn {
+    position: absolute;
+    right: 8px;
+    top: 8px;
+}
+
+.notes-input {
+    min-height: 131px;
+}
+
 .fileImage{
     position: absolute;
     width: 100%;
@@ -113,19 +137,62 @@
     }
 }
 
+.item-photos {
+    border: 2px solid #eeeeee;
+    border-radius: 12px;
+
+    &.item-photos--filled {
+        border: none;
+    }
+
+    .item-photos-header {
+        background-color: #3699FF1A;
+    }
+
+    .item-photos-body {
+        background-color: #F5FAFF;
+        border: 2px dashed #EEEEEE;
+        border-radius: 12px;
+
+        &.item-photos-body--filled {
+            border: none;
+        }
+    }
+}
+
+.item-photos-header--plain,
+.item-photos-body {
+    background-color: white !important;
+}
+
+.upload-intro {
+    display: flex;
+    align-items: center;
+}
+
+.upload-intro__icon {
+    margin-right: 15px;
+}
+
+.upload-intro__content {
+    line-height: 1.2;
+}
+
+.upload-intro__title {
+    font-weight: bold;
+    color: black;
+}
+
+.pdf-icon-img {
+    max-width: 80%;
+    max-height: 80%;
+    object-fit: contain;
+}
+
 .select-default-image {
     display: none;
     position: absolute;
     bottom: -30px;
-}
-
-.item-photos {
-    .item-photos-header {
-        background-color: #3699FF1A;
-    }
-    .item-photos-body {
-        background-color: #F5FAFF;
-    }
 }
 
 .picker{
@@ -145,4 +212,61 @@
     align-items: center;
     gap: 10px;
     margin-bottom: 4px;
-  }
+}
+
+.modal-footer-btn {
+    border-radius: 5px;
+}
+
+.modal-footer-btn--secondary {
+    background-color: white !important;
+    border: white !important;
+    color: #4A0D4A !important;
+}
+
+.modal-footer-btn--primary {
+    background-color: #4A0D4A !important;
+    border: #4A0D4A !important;
+    color: white;
+}
+
+@media screen and (max-width: 991px) {
+    .image-wrapper {
+        width: calc(50% - 1rem);
+        margin-right: 1rem;
+    }
+
+    .upload-intro {
+        width: 100%;
+    }
+}
+
+@media screen and (max-width: 767px) {
+    .modal-body {
+        padding: 1.25rem 1rem 2rem !important;
+    }
+
+    .image-wrapper {
+        width: 100%;
+        margin-right: 0;
+    }
+
+    .upload-intro {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .upload-intro__icon {
+        margin-right: 0;
+        margin-bottom: 1rem;
+    }
+
+    .modal-footer {
+        flex-direction: column-reverse;
+        gap: 0.75rem;
+    }
+
+    .modal-footer-btn {
+        width: 100%;
+    }
+}

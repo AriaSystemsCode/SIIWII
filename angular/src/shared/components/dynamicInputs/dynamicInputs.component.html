@@ -120,7 +120,7 @@
                      class="form-control"
                          [(ngModel)]="extraAttr.selectedValues"
                      (ngModelChange)="onAnyInputChange()" />
-              <i class="pi pi-times position-absolute" style="right: 10px; top: 15px; cursor: pointer;"1
+              <i class="pi pi-times position-absolute clear-action-icon"
                  *ngIf="extraAttr.selectedValues" (click)="clearExtraAttr(extraAttr)"></i>
             </div>
 
@@ -162,7 +162,7 @@
               <input type="color" class="form-control form-control-color col-1"
                          [(ngModel)]="extraAttr.selectedValues" (ngModelChange)="onAnyInputChange()" />
               <span>{{ extraAttr.selectedValues | localize }}</span>
-              <i class="pi pi-times" style="cursor: pointer;" *ngIf="extraAttr.selectedValues"
+              <i class="pi pi-times clear-inline-icon" *ngIf="extraAttr.selectedValues"
                  (click)="clearExtraAttr(extraAttr)"></i>
             </div>
 
@@ -179,11 +179,11 @@
               </div>
               <div *ngIf="extraAttr.selectedValues">
                 <div class="uploaded-preview mt-2 d-flex align-items-center">
-                  <i class="pi pi-check-circle text-success me-2" style="color: #4A0D4A !important;"></i>
+                  <i class="pi pi-check-circle me-2 upload-preview__success-icon"></i>
                   <span class="mr-2">{{ extraAttr?.selectedValues?.name?.split('|')[0] || extraAttr?.selectedValues?.split('|')[0] }}</span>
-                  <i class="pi pi-times text-danger" style="cursor: pointer;" (click)="clearExtraAttr(extraAttr)"></i>
+                  <i class="pi pi-times text-danger clear-inline-icon" (click)="clearExtraAttr(extraAttr)"></i>
                 </div>
-                <div class="mt-1" style="text-align: right;">
+                <div class="mt-1 upload-actions">
                   <button type="button" class="btn btn-sm uploadBtn me-2"
                           *ngIf="extraAttr?.showUploadBtn"
                           (click)="onUploadFile(extraAttr.selectedValues)">
@@ -218,9 +218,9 @@
               <p-calendar #calendarRef     [(ngModel)]="extraAttr.selectedValues" [showIcon]="false"
                           [showOtherMonths]="true" [selectOtherMonths]="true"
                           placeholder="{{extraAttr.name| localize}}" (ngModelChange)="onAnyInputChange()" appendTo="body"
-                          [inputStyle]="{'border': '1px solid #EEEEEE','border-radius':'8px','height':'44px'}" styleClass="w-100">
+                          styleClass="w-100 dynamic-input-calendar">
               </p-calendar>
-              <i class="pi pi-times position-absolute" style="right: 10px; top: 15px; cursor: pointer;"
+              <i class="pi pi-times position-absolute clear-action-icon"
                  *ngIf="extraAttr.selectedValues" (click)="clearExtraAttr(extraAttr)"></i>
             </div>
 
@@ -252,7 +252,7 @@
                 *ngIf="extraAttr.dataType === 'html'">
               <p-editor
                 [(ngModel)]="extraAttr.selectedValues"
-                [style]="{ height: '220px' }"
+                styleClass="dynamic-input-editor"
                 (ngModelChange)="onAnyInputChange()">
               </p-editor>
             </div>
