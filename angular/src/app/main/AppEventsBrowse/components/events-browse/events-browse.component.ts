@@ -330,7 +330,7 @@ export class EventsBrowseComponent extends AppComponentBase  implements OnInit,O
     getEvents(event?: LazyLoadEvent) {
         if ( isNaN(this.defaultMainFilter) ) return
         if (this.primengTableHelper.shouldResetPaging(event)) {
-            this.paginator.totalRecords = 10;
+            this.paginator.totalRecords = 12;
             this.paginator.changePage(0);
             return;
         }
