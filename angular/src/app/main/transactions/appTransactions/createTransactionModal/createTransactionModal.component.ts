@@ -228,6 +228,7 @@ private sellerCompanySearchTimer: any;
   .some(x => x.includes('seller'))) {
                     this.roleDdval = this.tenantRoleService.soRolesOptions.filter(role => role.code == 1)[0];
 
+
                 } else {
                     this.roleDdval = this.tenantRoleService.soRolesOptions.filter(role => role.code !== 1)[0];
                 }
@@ -241,7 +242,14 @@ private sellerCompanySearchTimer: any;
                     this.roleDdval = this.tenantRoleService.poRolesOptions.filter(role => role.code !== 2)[0];
                 }
             }
+            this.roleDdval = {
+    ...this.roleDdval,
+    name: this.l(this.roleDdval.name)
+};
+
+
             this.handleRoleChange({ value: this.roleDdval  });
+        
         })
     }
     getBranches(accountSSIN, objectToChangeName) {
