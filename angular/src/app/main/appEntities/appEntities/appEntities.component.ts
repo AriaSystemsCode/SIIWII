@@ -19,6 +19,8 @@ import * as _ from 'lodash';
 import * as moment from 'moment';
 import { CreateOrEditAppEntityDynamicModalComponent } from '@app/app-entity-dynamic-modal/create-or-edit-app-entity-dynamic-modal/create-or-edit-app-entity-dynamic-modal.component';
 // import { CreateOrEditAppEntityDynamicModalComponent } from '@app/app-entity-dynamic-modal/create-or-edit-app-entity-dynamic-modal/create-or-edit-app-entity-dynamic-modal.component';
+
+import { finalize } from 'rxjs/operators';
 export interface AccordionTabItem {
     id: number,
     label: string,
@@ -232,16 +234,18 @@ this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName');
     }
 
     exportToExcel(): void {
+        this.showMainSpinner();
         this._appEntitiesServiceProxy.getAppEntitiesToExcel(
             this.filterText,
             this.nameFilter,
             this.codeFilter,
             this.descriptionFilter,
             this.extraDataFilter,
-            this.sycEntityObjectTypeNameFilter,
+          this.sycEntityObjectTypeNameFilter && this.sycEntityObjectTypeNameFilter!= '' ? this.sycEntityObjectTypeNameFilter :   this.currTab.label,
             this.sycEntityObjectStatusNameFilter,
             this.sydObjectNameFilter,
         )
+        .pipe(finalize(() => this.hideMainSpinner()))
             .subscribe(result => {
                 this._fileDownloadService.downloadTempFile(result);
             });

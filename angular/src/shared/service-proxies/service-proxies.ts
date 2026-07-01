@@ -82330,6 +82330,7 @@ export class CreateOrEditAppItemDto implements ICreateOrEditAppItemDto {
     originalCode!: string | undefined;
     sycIdentifierId!: number | undefined;
     ssin!: string | undefined;
+    skipGenerateSsin!: boolean;
     nonLookupValues!: LookupLabelDto[] | undefined;
     manufacturerCode!: string | undefined;
     tenantId!: number | undefined;
@@ -82485,6 +82486,7 @@ export class CreateOrEditAppItemDto implements ICreateOrEditAppItemDto {
             this.originalCode = _data["originalCode"];
             this.sycIdentifierId = _data["sycIdentifierId"];
             this.ssin = _data["ssin"];
+            this.skipGenerateSsin = _data["skipGenerateSsin"];
             if (Array.isArray(_data["nonLookupValues"])) {
                 this.nonLookupValues = [] as any;
                 for (let item of _data["nonLookupValues"])
@@ -82642,6 +82644,7 @@ export class CreateOrEditAppItemDto implements ICreateOrEditAppItemDto {
         data["originalCode"] = this.originalCode;
         data["sycIdentifierId"] = this.sycIdentifierId;
         data["ssin"] = this.ssin;
+        data["skipGenerateSsin"] = this.skipGenerateSsin;
         if (Array.isArray(this.nonLookupValues)) {
             data["nonLookupValues"] = [];
             for (let item of this.nonLookupValues)
@@ -82700,6 +82703,7 @@ export interface ICreateOrEditAppItemDto {
     originalCode: string | undefined;
     sycIdentifierId: number | undefined;
     ssin: string | undefined;
+    skipGenerateSsin: boolean;
     nonLookupValues: LookupLabelDto[] | undefined;
     manufacturerCode: string | undefined;
     tenantId: number | undefined;
@@ -84049,6 +84053,7 @@ export class AppItemValidationInputDTO implements IAppItemValidationInputDTO {
     originalCode!: string | undefined;
     sycIdentifierId!: number | undefined;
     ssin!: string | undefined;
+    skipGenerateSsin!: boolean;
     nonLookupValues!: LookupLabelDto[] | undefined;
     manufacturerCode!: string | undefined;
     tenantId!: number | undefined;
@@ -84209,6 +84214,7 @@ export class AppItemValidationInputDTO implements IAppItemValidationInputDTO {
             this.originalCode = _data["originalCode"];
             this.sycIdentifierId = _data["sycIdentifierId"];
             this.ssin = _data["ssin"];
+            this.skipGenerateSsin = _data["skipGenerateSsin"];
             if (Array.isArray(_data["nonLookupValues"])) {
                 this.nonLookupValues = [] as any;
                 for (let item of _data["nonLookupValues"])
@@ -84371,6 +84377,7 @@ export class AppItemValidationInputDTO implements IAppItemValidationInputDTO {
         data["originalCode"] = this.originalCode;
         data["sycIdentifierId"] = this.sycIdentifierId;
         data["ssin"] = this.ssin;
+        data["skipGenerateSsin"] = this.skipGenerateSsin;
         if (Array.isArray(this.nonLookupValues)) {
             data["nonLookupValues"] = [];
             for (let item of this.nonLookupValues)
@@ -84430,6 +84437,7 @@ export interface IAppItemValidationInputDTO {
     originalCode: string | undefined;
     sycIdentifierId: number | undefined;
     ssin: string | undefined;
+    skipGenerateSsin: boolean;
     nonLookupValues: LookupLabelDto[] | undefined;
     manufacturerCode: string | undefined;
     tenantId: number | undefined;
