@@ -133,3 +133,9 @@
   background: #fff;
   border-radius: 6px;
 }
+
+::ng-deep .left-panel  {
+  p-tree .p-treenode-content.p-treenode-selectable ,.p-tree {
+    background-color: inherit !important;
+  }
+}

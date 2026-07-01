@@ -25,13 +25,14 @@
 
     <app-entity-basic-info
       [entity]="entity"
+      [entityData]="entityData"
       [mode]="mode"
       [entityTypes]="entityTypes"
       [statuses]="statuses"
       (entityChange)="entityChange.emit($event)">
     </app-entity-basic-info>
 
-    <div class="content-row row">
+    <div class="content-row row m-3">
 
       <div class="main-content-container col-md-7">
         <ng-content select="[entity-main-content]"></ng-content>

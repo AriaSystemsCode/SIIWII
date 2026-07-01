@@ -16,15 +16,7 @@
         <label>Email:</label>
         <input
           class="form-control"
-          [(ngModel)]="account.email"
-          [readonly]="mode === 'view'" />
-      </div>
-
-      <div class="col-md-6 mb-3">
-        <label>Language:</label>
-        <input
-          class="form-control"
-          [(ngModel)]="account.language"
+          [(ngModel)]="account.eMailAddress"
           [readonly]="mode === 'view'" />
       </div>
 
@@ -32,7 +24,7 @@
         <label>Currency:</label>
         <input
           class="form-control"
-          [(ngModel)]="account.currency"
+          [(ngModel)]="account.currencyCode"
           [readonly]="mode === 'view'" />
       </div>
 
@@ -40,7 +32,23 @@
         <label>Phone:</label>
         <input
           class="form-control"
-          [(ngModel)]="account.phone"
+          [(ngModel)]="account.phone1Number"
+          [readonly]="mode === 'view'" />
+      </div>
+
+      <div class="col-md-6 mb-3">
+        <label>Account Type:</label>
+        <input
+          class="form-control"
+          [(ngModel)]="account.accountType"
+          [readonly]="mode === 'view'" />
+      </div>
+
+      <div class="col-md-6 mb-3">
+        <label>SSIN:</label>
+        <input
+          class="form-control"
+          [(ngModel)]="account.ssin"
           [readonly]="mode === 'view'" />
       </div>
 
@@ -49,11 +57,34 @@
   </p-accordionTab>
 
   <p-accordionTab header="Business Information">
-    Business information here
+    <div class="row">
+
+      <div class="col-md-6 mb-3">
+        <label>Website:</label>
+        <input class="form-control" [(ngModel)]="account.website" [readonly]="mode === 'view'" />
+      </div>
+
+      <div class="col-md-6 mb-3">
+        <label>City:</label>
+        <input class="form-control" [(ngModel)]="account.city" [readonly]="mode === 'view'" />
+      </div>
+
+      <div class="col-md-6 mb-3">
+        <label>State:</label>
+        <input class="form-control" [(ngModel)]="account.state" [readonly]="mode === 'view'" />
+      </div>
+
+      <div class="col-md-6 mb-3">
+        <label>Zip Code:</label>
+        <input class="form-control" [(ngModel)]="account.zipCode" [readonly]="mode === 'view'" />
+      </div>
+
+    </div>
   </p-accordionTab>
 
-  <p-accordionTab header="Relationship name">
-    Relationship data here
+  <p-accordionTab header="Relationship">
+    <p>Visibility: {{ entityData?.visibility || '-' }}</p>
+    <p>Connection Count: {{ entityData?.connectionCount || 0 }}</p>
   </p-accordionTab>
 
 </p-accordion>

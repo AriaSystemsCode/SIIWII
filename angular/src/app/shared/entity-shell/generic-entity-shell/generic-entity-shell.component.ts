@@ -11,7 +11,7 @@ export class GenericEntityShellComponent {
   @Input() title = '';
   @Input() breadcrumbItems: any[] = [];
   @Input() mode: 'create' | 'edit' | 'view' = 'view';
-
+   @Input() entityData : any
   @Input() entityTypes: any[] = [];
   @Input() statuses: any[] = [];
 
@@ -22,11 +22,10 @@ export class GenericEntityShellComponent {
   @Output() minimize = new EventEmitter<void>();
   @Output() maximize = new EventEmitter<void>();
 leftPanelCollapsed = false;
-  leftPanelSections = [
+leftPanelSections = [
   {
     key: 'branches',
     title: 'Branches',
-    type: 'tree',
     canAdd: true,
     items: [
       {
@@ -34,8 +33,7 @@ leftPanelCollapsed = false;
         label: 'Main Branch',
         icon: 'fa fa-building',
         children: [
-          { id: 2, label: 'Sub Branch 1', icon: 'fa fa-building' },
-          { id: 3, label: 'Sub Branch 2', icon: 'fa fa-building' }
+          { id: 2, label: 'Sub Branch 1', icon: 'fa fa-building' }
         ]
       }
     ]
@@ -43,12 +41,15 @@ leftPanelCollapsed = false;
   {
     key: 'contacts',
     title: 'Contacts',
-    type: 'list',
     canAdd: true,
     items: [
-      { id: 10, label: 'Sarah Johnson', imageUrl: 'assets/demo/avatar1.png' },
-      { id: 11, label: 'Mark Green', imageUrl: 'assets/demo/avatar2.png' }
+      { id: 10, label: 'Sarah Johnson', icon: 'fa fa-user' },
+      { id: 11, label: 'Mark Green', icon: 'fa fa-user' }
     ]
   }
 ];
+
+ngOnInit(){
+  console.log(this.entityData,'entityData')
+}
 }

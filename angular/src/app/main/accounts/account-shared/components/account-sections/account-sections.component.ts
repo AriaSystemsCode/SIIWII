@@ -7,25 +7,29 @@ import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
 })
 export class AccountSectionsComponent implements OnChanges {
   @Input() accountId: number;
+  @Input() entityData: any;
   @Input() mode: 'create' | 'edit' | 'view' = 'view';
 
   account: any;
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes.accountId && this.accountId) {
+    if (changes.entityData && this.entityData?.account) {
+      this.account = this.entityData.account;
+      return;
+    }
+
+    if (changes.accountId && this.accountId && !this.account) {
       this.loadAccount();
     }
   }
 
   loadAccount(): void {
-    // TEMP example until API integration
     this.account = {
       id: this.accountId,
-      name: 'Zara Clothing',
-      email: 'zara@gmail.com',
-      language: 'English',
-      currency: 'USD',
-      phone: '156889453'
+      name: '',
+      eMailAddress: '',
+      currencyCode: '',
+      phone1Number: ''
     };
   }
 }

@@ -486,12 +486,12 @@ NOT CARDS VIEW MODE
 ]"
   [mode]="'view'"
   [entityTypes]="accountTypes"
-  [statuses]="statuses">
+  [statuses]="statuses" [entityData]="account">
 
   <app-account-sections
     entity-main-content
     [accountId]="selectedAccountId"
-    [mode]="'view'">
+    [mode]="'view'" [entityData]="account">
   </app-account-sections>
 
 </app-generic-entity-shell>

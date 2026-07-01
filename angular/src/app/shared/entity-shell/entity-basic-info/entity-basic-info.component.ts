@@ -1,4 +1,5 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { AppConsts } from '@shared/AppConsts';
 
 @Component({
   selector: 'app-entity-basic-info',
@@ -6,7 +7,7 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
   styleUrls: ['./entity-basic-info.component.scss']
 })
 export class EntityBasicInfoComponent {
-
+   @Input() entityData : any
   @Input() entity: any;
 @Input() mode: 'create' | 'edit' | 'view' = 'view';
 @Input() entityTypes: any[] = [];
@@ -15,5 +16,5 @@ export class EntityBasicInfoComponent {
 @Output() entityChange = new EventEmitter<any>();
 @Output() imageChange = new EventEmitter<any>();
 @Output() backgroundChange = new EventEmitter<any>();
-
+ attachmentBaseUrl: string = AppConsts.attachmentBaseUrl
 }
