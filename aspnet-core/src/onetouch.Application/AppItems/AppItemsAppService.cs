@@ -6047,61 +6047,67 @@ namespace onetouch.AppItems
 
         }
 
-        public async Task<AppItemtExcelRecordDTO> AddExtraAttrs(AppItemtExcelRecordDTO input)
+        private async Task<(string ProductTypeCode, List<ExtraAttribute> ExtraAttributes)> GetDefaultImportExtraAttributes()
         {
             var itemObjectId = await _helper.SystemTables.GetObjectItemId();
             var defaultProductType = _sycEntityObjectTypeRepository.GetAll().Where(x => x.ObjectId == itemObjectId && x.IsDefault == true).Select(z => z.Code).FirstOrDefault();
             if (defaultProductType == null)
                 throw new UserFriendlyException("No Product type is marked as default.");
-            else
+
+            var pdtyp = await _SycEntityObjectTypesAppService.GetAllWithExtraAttributesByCode(defaultProductType);
+            var productTypeId = pdtyp.FirstOrDefault();
+            var entityObjectExtraAttribute = await _SycEntityObjectTypesAppService.GetAllWithExtraAttributes(long.Parse(productTypeId.Id.ToString()));
+            var entityextr = entityObjectExtraAttribute.FirstOrDefault();
+            var entityExtraAttributes = entityextr?.ExtraAttributes?.ExtraAttributes ?? new List<ExtraAttribute>();
+
+            return (defaultProductType, entityExtraAttributes);
+        }
+
+        public async Task<AppItemtExcelRecordDTO> AddExtraAttrs(AppItemtExcelRecordDTO input)
+        {
+            var defaultExtraAttributes = await GetDefaultImportExtraAttributes();
+            return AddExtraAttrs(input, defaultExtraAttributes.ProductTypeCode, defaultExtraAttributes.ExtraAttributes);
+        }
+
+        private AppItemtExcelRecordDTO AddExtraAttrs(AppItemtExcelRecordDTO input, string defaultProductType, List<ExtraAttribute> entityExtraAttributes)
+        {
+            input.ExcelDto.ProductType = defaultProductType;
+            input.ExcelDto.ExtraAttributes = entityExtraAttributes;
+            input.ExcelDto.ExtraAttributesValues = new List<AppItemImpExtrAttributes>();
+
+            foreach (var extra in entityExtraAttributes)
             {
-                var pdtyp = await _SycEntityObjectTypesAppService.GetAllWithExtraAttributesByCode(defaultProductType);
-                var productTypeId = pdtyp.FirstOrDefault();
 
-                input.ExcelDto.ProductType = defaultProductType;
-                var entityObjectExtraAttribute = await _SycEntityObjectTypesAppService.GetAllWithExtraAttributes(long.Parse(productTypeId.Id.ToString()));
-                var entityextr = entityObjectExtraAttribute.FirstOrDefault();
-                List<ExtraAttribute> entityExtraAttributes = null;
-                if (entityextr != null && entityextr.ExtraAttributes != null)
-                    entityExtraAttributes = entityextr.ExtraAttributes.ExtraAttributes;
-                input.ExcelDto.ExtraAttributes = entityExtraAttributes;
-                input.ExcelDto.ExtraAttributesValues = new List<AppItemImpExtrAttributes>();
-
-                foreach (var extra in entityExtraAttributes)
+                if (extra != null)
                 {
+                    var xCode = extra.IsLookup ? extra.Name.Replace(" ", "") + "Code" : extra.Name.Replace(" ", "");
+                    var xName = extra.IsLookup ? extra.Name.Replace(" ", "") + "Name" : extra.Name.Replace(" ", "");
 
-                    if (extra != null)
+                    var valueCode = input.ExcelDto.GetType()
+                      .GetProperty(xCode,
+                          System.Reflection.BindingFlags.IgnoreCase
+                          | System.Reflection.BindingFlags.Public
+                          | System.Reflection.BindingFlags.Instance)
+                      ?.GetValue(input.ExcelDto, null);
+
+                    var valueName = input.ExcelDto.GetType()
+                      .GetProperty(xName,
+                          System.Reflection.BindingFlags.IgnoreCase
+                          | System.Reflection.BindingFlags.Public
+                          | System.Reflection.BindingFlags.Instance)
+                      ?.GetValue(input.ExcelDto, null);
+
+
+                    input.ExcelDto.ExtraAttributesValues.Add(new AppItemImpExtrAttributes
                     {
-                        var xCode = extra.IsLookup ? extra.Name.Replace(" ", "") + "Code" : extra.Name.Replace(" ", "");
-                        var xName = extra.IsLookup ? extra.Name.Replace(" ", "") + "Name" : extra.Name.Replace(" ", "");
+                        Name = extra.Name.ToString(),
+                        Code = valueCode == null ? "" : valueCode.ToString(),
+                        Value = valueName == null ? "" : valueName.ToString(),
+                    });
 
-                        var valueCode = input.ExcelDto.GetType()
-                          .GetProperty(xCode,
-                              System.Reflection.BindingFlags.IgnoreCase
-                              | System.Reflection.BindingFlags.Public
-                              | System.Reflection.BindingFlags.Instance)
-                          ?.GetValue(input.ExcelDto, null);
-
-                        var valueName = input.ExcelDto.GetType()
-                          .GetProperty(xName,
-                              System.Reflection.BindingFlags.IgnoreCase
-                              | System.Reflection.BindingFlags.Public
-                              | System.Reflection.BindingFlags.Instance)
-                          ?.GetValue(input.ExcelDto, null);
-
-
-                        input.ExcelDto.ExtraAttributesValues.Add(new AppItemImpExtrAttributes
-                        {
-                            Name = extra.Name.ToString(),
-                            Code = valueCode == null ? "" : valueCode.ToString(),
-                            Value = valueName == null ? "" : valueName.ToString(),
-                        });
-
-                    }
                 }
-
-
             }
+
             return input;
         }
 
@@ -6134,6 +6140,20 @@ namespace onetouch.AppItems
                 || r.ExcelDto.Actions == "9"
                 || r.ExcelDto.Actions == "10" || r.RecordType == "Color")
                 && r.Status != ExcelRecordStatus.Failed.ToString()).Select(r => r).ToList<AppItemtExcelRecordDTO>();
+
+            string defaultImportProductType = null;
+            List<ExtraAttribute> defaultImportExtraAttributes = null;
+
+            async Task EnsureDefaultImportExtraAttributesLoaded()
+            {
+                if (defaultImportExtraAttributes != null)
+                    return;
+
+                var defaultExtraAttributes = await GetDefaultImportExtraAttributes();
+                defaultImportProductType = defaultExtraAttributes.ProductTypeCode;
+                defaultImportExtraAttributes = defaultExtraAttributes.ExtraAttributes;
+            }
+
             foreach (var excelDto in result123)
             {
                 int number = 0;
@@ -6165,7 +6185,8 @@ namespace onetouch.AppItems
                         if (excelDto.ExcelDto.NoOfDim == null) { excelDto.ExcelDto.NoOfDim = "1"; }
                         if (string.IsNullOrEmpty(excelDto.ExcelDto.ImageType)) { excelDto.ExcelDto.ImageType = "Image"; }
 
-                        var xexcelDto = await AddExtraAttrs(excelDto);
+                        await EnsureDefaultImportExtraAttributesLoaded();
+                        var xexcelDto = AddExtraAttrs(excelDto, defaultImportProductType, defaultImportExtraAttributes);
                         excelDto.ExcelDto.ExtraAttributes = xexcelDto.ExcelDto.ExtraAttributes;
                         excelDto.ExcelDto.ExtraAttributesValues = xexcelDto.ExcelDto.ExtraAttributesValues;
 
@@ -6219,7 +6240,8 @@ namespace onetouch.AppItems
                             childNo += 1;
                             thirdItemCopy.ExcelDto.D1Pos = childNo.ToString();
 
-                            var xexcelDto = await AddExtraAttrs(thirdItemCopy);
+                            await EnsureDefaultImportExtraAttributesLoaded();
+                            var xexcelDto = AddExtraAttrs(thirdItemCopy, defaultImportProductType, defaultImportExtraAttributes);
                             thirdItemCopy.ExcelDto.ExtraAttributes = xexcelDto.ExcelDto.ExtraAttributes;
                             thirdItemCopy.ExcelDto.ExtraAttributesValues = xexcelDto.ExcelDto.ExtraAttributesValues;
                             thirdItemCopy.ExcelDto.ParentCode = thirdItemCopy.ParentCode;
@@ -6418,6 +6440,7 @@ namespace onetouch.AppItems
             var x = UnitOfWorkManager.Current.GetDbContext<onetouchDbContext>(null, null);
             List<string> sizeScaleNames = new List<string>();
             var createdSizeScalesByName = new Dictionary<string, AppSizeScaleForEditDto>(StringComparer.OrdinalIgnoreCase);
+            var createdSizeRatiosByName = new Dictionary<string, AppSizeScaleForEditDto>(StringComparer.OrdinalIgnoreCase);
 
             void EnsureAttachmentTenantDirectory()
             {
@@ -6428,6 +6451,56 @@ namespace onetouch.AppItems
                     System.IO.Directory.CreateDirectory(attachmentTenantPath);
 
                 attachmentTenantDirectoryEnsured = true;
+            }
+
+            const int importSaveBatchSize = 100;
+            var pendingLeanImportItems = 0;
+
+            async Task SaveLeanImportBatchIfNeeded()
+            {
+                if (pendingLeanImportItems < importSaveBatchSize)
+                    return;
+
+                await x.SaveChangesAsync();
+                x.ChangeTracker.Clear();
+                pendingLeanImportItems = 0;
+            }
+
+            async Task FlushLeanImportBatch()
+            {
+                if (pendingLeanImportItems == 0)
+                    return;
+
+                await x.SaveChangesAsync();
+                x.ChangeTracker.Clear();
+                pendingLeanImportItems = 0;
+            }
+
+            async Task SaveImportedItemLean(AppItem importedItem)
+            {
+                if (importedItem.Id == 0)
+                {
+                    x.AppItems.Add(importedItem);
+                }
+                else
+                {
+                    var importedItemIds = new List<long> { importedItem.Id };
+                    if (importedItem.ParentFkList != null)
+                    {
+                        importedItemIds.AddRange(importedItem.ParentFkList
+                            .Where(z => z.Id != 0)
+                            .Select(z => z.Id));
+                    }
+
+                    await x.AppItemPrices
+                        .Where(z => importedItemIds.Contains(z.AppItemId))
+                        .DeleteAsync();
+
+                    x.AppItems.Update(importedItem);
+                }
+
+                pendingLeanImportItems++;
+                await SaveLeanImportBatchIfNeeded();
             }
 
             var existingParentIds = result
@@ -7108,16 +7181,25 @@ namespace onetouch.AppItems
                                 appSizeScaleRatioForEditDto.Id = 0;
                                 AppSizeScaleForEditDto sizescaleRatio = null;
 
-                                try
+                                if (createdSizeRatiosByName.TryGetValue(scaleRatioName, out sizescaleRatio))
                                 {
-                                    sizescaleRatio = await _appSizeScaleAppService.CreateOrEditAppSizeScale(appSizeScaleRatioForEditDto);
-
+                                    // Reuse the ratio created earlier in this import batch.
                                 }
-                                catch (Exception ex)
+                                else
                                 {
-                                    if (sizeScaleNames.FirstOrDefault(z => z == excelDto.SizeScaleName) != null)
+                                    try
                                     {
-                                        sizescaleRatio = await _appSizeScaleAppService.GetSizeScaleForEdit(long.Parse(appSizeScaleRatioForEditDto.Id.ToString()));
+                                        sizescaleRatio = await _appSizeScaleAppService.CreateOrEditAppSizeScale(appSizeScaleRatioForEditDto);
+                                        createdSizeRatiosByName[scaleRatioName] = sizescaleRatio;
+
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        if (sizeScaleNames.FirstOrDefault(z => z == excelDto.SizeScaleName) != null)
+                                        {
+                                            sizescaleRatio = await _appSizeScaleAppService.GetSizeScaleForEdit(long.Parse(appSizeScaleRatioForEditDto.Id.ToString()));
+                                            createdSizeRatiosByName[scaleRatioName] = sizescaleRatio;
+                                        }
                                     }
                                 }
                                 //T-SII-20250725.0002,1 MMT 09/24/2025 Fix import item issues[End]
@@ -7624,26 +7706,10 @@ namespace onetouch.AppItems
                 if (appItem.SycIdentifierId == null)
                     appItem.SycIdentifierId = defIdentfier;
 
-                /*
-                if (excelDto.Id == 0)
-                    appItemList.Add(appItem);
-                else
-                    appItemModifyList.Add(appItem);*/
-                CreateOrEditAppItemDto createOrEditAppItemDto = ObjectMapper.Map<CreateOrEditAppItemDto>(appItem);
-                createOrEditAppItemDto.NonLookupValues = new List<LookupLabelDto>();
-                createOrEditAppItemDto.SkipGenerateSsin = true;
-                await CreateOrEdit(createOrEditAppItemDto);
+                await SaveImportedItemLean(appItem);
             }
 
-
-            /*if (appItemModifyList.Count > 0)
-                x.AppItems.UpdateRange(appItemModifyList);
-
-            if (appItemList.Count > 0)
-                x.AppItems.AddRange(appItemList);
-
-            if (appItemModifyList.Count > 0 || appItemList.Count > 0)
-                await x.SaveChangesAsync();*/
+            await FlushLeanImportBatch();
 
             #region send notification to current user
             if (AbpSession.UserId != null)
