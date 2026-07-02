@@ -3,6 +3,7 @@ using Abp.Authorization;
 using Abp.Auditing;
 using Abp.BackgroundJobs;
 using Abp.Collections.Extensions;
+using Abp.Configuration.Startup;
 using Abp.Domain.Entities;
 using Abp.Domain.Repositories;
 using Abp.Domain.Uow;
@@ -136,6 +137,10 @@ namespace onetouch.AppItems
         private readonly IAppTenantActivitiesLogAppService _appTenantActivitiesLogAppService;
         private readonly IRepository<ValidationRule> _validationRuleRepo;
         private readonly IBackgroundJobManager _backgroundJobManager;
+        private readonly IAbpStartupConfiguration _abpStartupConfiguration;
+        private static readonly object ImportEntityHistoryIgnoredTypesLock = new object();
+        private static readonly HashSet<Type> ImportEntityHistoryTypesAddedByScope = new HashSet<Type>();
+        private static int ImportEntityHistorySuppressionCount;
         public AppItemsAppService(
             IRepository<AppItem, long> appItemRepository,
             IAppItemsExcelExporter appItemsExcelExporter, AppEntitiesAppService appEntitiesAppService, Helper helper, IRepository<AppEntity, long> appEntityRepository, SycEntityObjectTypesAppService sycEntityObjectTypesAppService
@@ -163,10 +168,12 @@ namespace onetouch.AppItems
             IRepository<AppTransactionDetails, long> appTransactionDetails, IAppTenantActivitiesLogAppService appTenantActivitiesLogAppService,
              IRepository<AppMarketplaceItemsListDetails, long> appMarketplaceItemsListDetails, IRepository<ValidationRule> validationRuleRepo,
              IRepository<AppEntitiesRelationship, long> appEntitiesRelationship,
-             IBackgroundJobManager backgroundJobManager
+             IBackgroundJobManager backgroundJobManager,
+             IAbpStartupConfiguration abpStartupConfiguration
             )
         {
             _backgroundJobManager = backgroundJobManager;
+            _abpStartupConfiguration = abpStartupConfiguration;
             _appEntitiesRelationship = appEntitiesRelationship;
             _appTenantActivitiesLogAppService = appTenantActivitiesLogAppService;
             _appMarketplaceItemsListDetails = appMarketplaceItemsListDetails;
@@ -6129,6 +6136,77 @@ namespace onetouch.AppItems
         }
 
 
+        private IDisposable SuppressEntityHistoryForExcelImport()
+        {
+            return new ImportEntityHistorySuppressionScope(_abpStartupConfiguration);
+        }
+
+        private sealed class ImportEntityHistorySuppressionScope : IDisposable
+        {
+            private static readonly Type[] IgnoredImportEntityTypes =
+            {
+                typeof(AppItem),
+                typeof(AppItemPrices),
+                typeof(AppItemSizeScalesHeader),
+                typeof(AppItemSizeScalesDetails),
+                typeof(AppSizeScalesHeader),
+                typeof(AppSizeScalesDetail),
+                typeof(AppEntity),
+                typeof(AppEntityCategory),
+                typeof(AppEntityClassification),
+                typeof(AppEntityExtraData),
+                typeof(AppEntityAttachment),
+                typeof(AppEntityAddress),
+                typeof(AppAttachment)
+            };
+
+            private readonly IAbpStartupConfiguration _configuration;
+            private bool _disposed;
+
+            public ImportEntityHistorySuppressionScope(IAbpStartupConfiguration configuration)
+            {
+                _configuration = configuration;
+
+                lock (ImportEntityHistoryIgnoredTypesLock)
+                {
+                    if (ImportEntityHistorySuppressionCount++ == 0)
+                    {
+                        foreach (var ignoredType in IgnoredImportEntityTypes)
+                        {
+                            if (!_configuration.EntityHistory.IgnoredTypes.Contains(ignoredType))
+                            {
+                                _configuration.EntityHistory.IgnoredTypes.Add(ignoredType);
+                                ImportEntityHistoryTypesAddedByScope.Add(ignoredType);
+                            }
+                        }
+                    }
+                }
+            }
+
+            public void Dispose()
+            {
+                if (_disposed)
+                {
+                    return;
+                }
+
+                lock (ImportEntityHistoryIgnoredTypesLock)
+                {
+                    ImportEntityHistorySuppressionCount--;
+                    if (ImportEntityHistorySuppressionCount == 0)
+                    {
+                        foreach (var ignoredType in ImportEntityHistoryTypesAddedByScope)
+                        {
+                            _configuration.EntityHistory.IgnoredTypes.Remove(ignoredType);
+                        }
+
+                        ImportEntityHistoryTypesAddedByScope.Clear();
+                    }
+                }
+
+                _disposed = true;
+            }
+        }
         //    // select type images
         //    // action 2 add to item
         //    // action 3 add to item code
@@ -6139,6 +6217,8 @@ namespace onetouch.AppItems
         [DisableAuditing]
         public async Task<ExcelLogDto> SaveFromExcel(AppItemExcelResultsDTO excelResultsDTO)
         {
+            using var importEntityHistorySuppression = SuppressEntityHistoryForExcelImport();
+
             List<AppItemExcelDto> result = excelResultsDTO.ExcelRecords.Where(r => r.Status !=
             ExcelRecordStatus.Failed.ToString()).Select(r => r.ExcelDto).ToList<AppItemExcelDto>();
 
