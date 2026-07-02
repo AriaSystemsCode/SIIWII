@@ -58,11 +58,10 @@
                             <div class="col">
                                 <div class="wide-drop-down">
                                     <input type="text" [required]="true" [(ngModel)]="selectedItemTypeData.name"
-                                        name="type" readonly class="form-control bg-white form-control-border-grey"
+                                        name="type" readonly class="form-control bg-white form-control-border-grey input-bg-soft"
                                         [ngClass]="{'border-danger' : !appItem.entityObjectTypeId && submitted }"
     #typeModel="ngModel"     [class.border-danger]="typeModel.invalid && typeModel.touched"
-                                        placeholder="{{ 'ProductType' | localize}}"
-                                        class="input-bg-soft">
+                                        placeholder="{{ 'ProductType' | localize}}">
                                 </div>
                             </div>
                             <div class="col-lg-2 col-md-3 col-sm-4 col-6">
@@ -104,8 +103,7 @@
                                                                         class="form-control bg-white form-control-border-grey input-bg-soft"
                                       [ngClass]="{'border-danger' : !appItem.name && submitted }"                                                    
                                         [class.border-danger]="nameModel.invalid && nameModel.touched"
-                                    placeholder="{{ 'ProductName' | localize}}"
-                                    class="input-bg-soft">
+                                    placeholder="{{ 'ProductName' | localize}}">
                             </div>
                             <div class="col-lg-2 col-md-3 col-sm-4 col-6">
                                 <span class="text-muted">250 {{ 'digits' | localize}}</span>
@@ -477,9 +475,9 @@
                                          </a>
                                          
                                         </a>
-                                        <input type="file" id="file_{{i}}" class="d-none" #file
+                                        <input type="file" id="file_{{i}}" class="d-none input-bg-soft border-none" #file
                                             (change)="fileChange($event,productImageCategory,i,undefined,true)"
-                                            class="input-bg-soft border-none">
+                                           >
                                     </div>
 
                                 </div>

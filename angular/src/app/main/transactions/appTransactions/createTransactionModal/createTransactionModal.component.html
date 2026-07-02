@@ -8,7 +8,7 @@
          <p-dropdown
     [options]="roles"
     class="w-100"
-    [placeholder]="'Please Select your Role'"
+    [placeholder]="'Please Select your Role' | localize"
     [(ngModel)]="roleDdval"
     (onChange)="handleRoleChange($event)"
     [disabled]="roles?.length === 1">
