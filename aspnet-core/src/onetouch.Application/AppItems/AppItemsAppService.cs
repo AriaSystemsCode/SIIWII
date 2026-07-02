@@ -6498,6 +6498,13 @@ namespace onetouch.AppItems
                 .Where(x => x != null && !string.IsNullOrEmpty(x.Name))
                 .GroupBy(x => x.Name, StringComparer.OrdinalIgnoreCase)
                 .ToDictionary(x => x.Key, x => x.First(), StringComparer.OrdinalIgnoreCase);
+            var colorLookupByCode = extrattributesLists
+                .FirstOrDefault(x => x.Key?.Code == "COLOR")
+                .Value?
+                .Where(x => !string.IsNullOrWhiteSpace(x.Code))
+                .GroupBy(x => x.Code, StringComparer.OrdinalIgnoreCase)
+                .ToDictionary(x => x.Key, x => x.First().Label, StringComparer.OrdinalIgnoreCase)
+                ?? new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
             var attachmentsCategoriesByCode = attachmentsCategories
                 .Where(x => !string.IsNullOrWhiteSpace(x.Code))
                 .GroupBy(x => x.Code, StringComparer.OrdinalIgnoreCase)
@@ -7745,10 +7752,6 @@ namespace onetouch.AppItems
                     if (appChildItem.Id == 0)
                         appChildItem.EntityFk.EntityExtraData = new List<AppEntityExtraData>();
 
-                    var lookupList = extrattributesLists
-                                    .FirstOrDefault(x => x.Key.Code == "COLOR")
-                                    .Value;
-
                     var entityExtraData = new List<AppEntityExtraData>();
                     if (item.ExtraAttributesValues != null)
                     {
@@ -7758,10 +7761,9 @@ namespace onetouch.AppItems
 
                             extraAttributesByName.TryGetValue(item.ExtraAttributes[etx].Name, out var AttributeInfoObj);
                             var colorLookupName = "";
-                            if (item.ExtraAttributes[etx].AttributeId == 101) //Color
+                            if (item.ExtraAttributes[etx].AttributeId == 101 && !string.IsNullOrEmpty(item.ExtraAttributesValues[etx].Code)) //Color
                             {
-                                 colorLookupName = lookupList?
-                                                        .FirstOrDefault(e => e.Code == item.ExtraAttributesValues[etx].Code)?.Label;
+                                colorLookupByCode.TryGetValue(item.ExtraAttributesValues[etx].Code, out colorLookupName);
                             }
 
                             AppEntityExtraData extra = new AppEntityExtraData
@@ -7777,30 +7779,29 @@ namespace onetouch.AppItems
 
                             };
 
-                            try
+                            var childEntityExtraData = appChildItem.EntityFk.EntityExtraData ??= new List<AppEntityExtraData>();
+                            if (appChildItem.Id == 0)
                             {
-                                if (appChildItem.Id == 0)
-                                    appChildItem.EntityFk.EntityExtraData.Add(extra);
+                                childEntityExtraData.Add(extra);
+                            }
+                            else
+                            {
+                                var ext = childEntityExtraData.FirstOrDefault(x => x.AttributeId == item.ExtraAttributes[etx].AttributeId);
+                                if (ext == null)
+                                {
+                                    childEntityExtraData.Add(extra);
+                                }
                                 else
                                 {
-                                    var ext = appChildItem.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == item.ExtraAttributes[etx].AttributeId);
-                                    if (ext == null)
-                                        appChildItem.EntityFk.EntityExtraData.Add(extra);
-                                    else
-                                    {
-                                        ext.AttributeCode = item.ExtraAttributesValues[etx].Code;
-                                        ext.AttributeValue = item.ExtraAttributesValues[etx].Value;
-                                        ext.AttributeValueId = null;
-                                        ext.EntityObjectTypeName = item.ExtraAttributes[etx].Name;
-                                        ext.EntityObjectTypeId = AttributeInfoObj != null ? AttributeInfoObj.Id : null;
-                                        ext.EntityObjectTypeCode = item.ExtraAttributes[etx].EntityObjectTypeCode;
-                                        ext.EntityCode = appChildItem.Code;
-                                    }
-
+                                    ext.AttributeCode = item.ExtraAttributesValues[etx].Code;
+                                    ext.AttributeValue = item.ExtraAttributesValues[etx].Value;
+                                    ext.AttributeValueId = null;
+                                    ext.EntityObjectTypeName = item.ExtraAttributes[etx].Name;
+                                    ext.EntityObjectTypeId = AttributeInfoObj != null ? AttributeInfoObj.Id : null;
+                                    ext.EntityObjectTypeCode = item.ExtraAttributes[etx].EntityObjectTypeCode;
+                                    ext.EntityCode = appChildItem.Code;
                                 }
                             }
-                            catch
-                            { }
                             if (etx == 0)
                                 firstAttributteValues.Add(item.ExtraAttributesValues[etx].Value);
                             if (string.IsNullOrEmpty(item.ImageType)) { item.ImageType = "Image"; }
@@ -7868,17 +7869,12 @@ namespace onetouch.AppItems
                             }
 
                             isDefault = "0";
-                            //appChildItem.EntityFk.EntityExtraData[0].Id -AttributeValueId
-                            try
+                            secondAttributteValues.Add(new AppItemExtraDto()
                             {
-                                secondAttributteValues.Add(new AppItemExtraDto()
-                                {
-                                    ParentCode = appChildItem.EntityFk.EntityExtraData[etx].AttributeCode,
-                                    Id = item.ExtraAttributes[etx].AttributeId,
-                                    Value = item.ExtraAttributesValues[etx].Value
-                                });
-                            }
-                            catch { }
+                                ParentCode = extra.AttributeCode,
+                                Id = item.ExtraAttributes[etx].AttributeId,
+                                Value = item.ExtraAttributesValues[etx].Value
+                            });
                         }
                     }
                     importVariationSectionWatch.Stop();
