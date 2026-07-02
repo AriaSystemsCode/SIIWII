@@ -90,7 +90,7 @@ export class CreateOrEditAddressModalComponent extends AppComponentBase {
         let tenancyName = this.appSession.tenancyName;
         this.address.code = tenancyName + "-" + this.addressCode;
       
-        // ✅ Assign country name if applicable
+        //  Assign country name if applicable
         const selectedCountry = this.allCountries.find(c => c.value === this.address.countryId);
         this.address.countryIdName = selectedCountry?.label ?? null;
       

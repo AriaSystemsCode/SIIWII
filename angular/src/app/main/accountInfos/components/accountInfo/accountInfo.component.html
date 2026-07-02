@@ -2,7 +2,7 @@
     <form #accountInfoForm="ngForm" novalidate autocomplete="off">
         <div class="kt-content  kt-grid__item kt-grid__item--fluid kt-grid kt-grid--hor">
             <div class="kt-subheader kt-grid__item" style="height: 80px!important">
-                <div [class]="containerClass" >
+                <div [class]="containerClass">
                     <div class="kt-subheader__main">
                         <h3 class="kt-subheader__title">
                             <span class="pageTitle">
@@ -38,7 +38,8 @@
                 </div>
             </div>
             <div [class]="containerClass + ' kt-grid__item kt-grid__item--fluid'">
-                <div class="row align-items-start  justify-content-center" [ngClass]="isArabic ? 'addRTLm':'accountinfo-container'">
+                <div class="row align-items-start  justify-content-center"
+                    [ngClass]="isArabic ? 'addRTLm':'accountinfo-container'">
                     <div class="col-lg-3 col-md-12 col-sm-12 tabsSection mb-2">
                         <div>
                             <div class="row">
@@ -86,21 +87,135 @@
                                         <span> {{ accountDataForView?.website || '-' }} </span>
                                     </div>
                                 </div>
-                                <div *ngIf="viewMode && !isHost">
-                                    <button type="button"
+                                <div>
+                                    <!-- <button type="button"
                                         *ngIf="accountDataForView && accountDataForView.status === true && !isHost && !isRecordOwner"
                                         class="btn mb-3 mt-4 w-100 btn-danger" (click)="disConnect()">
                                         {{ accData?.disConnectLabel != null ? getFormattedConnectionName() :
                                         "Disconnect" | localize }}
-                                    </button>
+                                    </button> -->
+
+                                    <div class=" d-flex align-items-center m-2 w-100" *ngIf="accountDataForView && accountDataForView.status === true && !isHost && !isRecordOwner">
+                                    
+                                        <!-- Case 1: No current connections, only available connections -->
+                                        <ng-container
+                                            *ngIf="!connectionsInfo?.length && availableConnectionsInfo?.length > 0">
+                                            <div class="w-100 d-flex justify-content-center">
+                                                <div dropdown class="w-100 position-relative">
+                                                    <button type="button"
+                                                        class="relation_button w-100 d-flex align-items-center justify-content-center"
+                                                        dropdownToggle>
+                                                        <img src="assets/accounts/CONNECT.png" alt="" srcset="">
+                                                        <span>{{
+                                                           availableConnectionsInfo[0]?.connectionName
+                                                            }}</span>
+                                                        <i *ngIf="availableConnectionsInfo?.length > 1"
+                                                            class="fas fa-angle-down ml-2"
+                                                            style="color: #fff !important;"></i>
+                                                    </button>
+
+                                                    <ul *dropdownMenu class="dropdown-menu w-100" role="menu"
+                                                        container="body">
+
+                                                        <li role="menuitem"
+                                                            *ngFor="let option of availableConnectionsInfo | slice:1"
+                                                            class="py-2">
+                                                            <button class="dropdown-item" type="button"
+                                                                (click)="createRelation(option)">
+                                                                {{ option?.connectionName }}
+                                                            </button>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </ng-container>
+
+                                        <!-- Case 2: Only current connections, no available -->
+                                        <ng-container
+                                            *ngIf="connectionsInfo?.length > 0 && !availableConnectionsInfo?.length">
+                                            <div class="w-100 d-flex justify-content-center">
+                                                <div class="d-flex align-items-center justify-content-center w-100"
+                                                    style="gap: 6px;">
+                                                    <button type="button" class="relation-chip"
+                                                        style="white-space: nowrap; max-width: calc(100% - 70px);">
+                                                        <span>
+                                                            {{
+                                                            getFormattedConnectionName(connectionsInfo[0]?.connectedLabel)
+                                                            }}
+                                                        </span>
+                                                        <i class="pi pi-times ml-1 removI"
+                                                            (click)="disconnect(connectionsInfo[0])"></i>
+                                                    </button>
+
+                                                    <button *ngIf="connectionsInfo?.length > 1"
+                                                        type="button" class="relation-chip more-chip"
+                                                        (click)="openConnectionsDialog()">
+                                                        +{{ connectionsInfo?.length - 1 }}
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </ng-container>
+
+                                        <!-- Case 3: Both current connections and available connections -->
+                                        <ng-container
+                                            *ngIf="connectionsInfo?.length > 0 && availableConnectionsInfo?.length > 0">
+                                            <div class="w-100 d-flex align-items-center justify-content-between position-relative"
+                                                style="gap: 8px;">
+                                                <!-- Left: current connection info -->
+                                                <div class="d-flex align-items-center" style="min-width: 0; gap: 6px;">
+                                                    <button type="button" class="relation-chip"
+                                                        style="white-space: nowrap; max-width: 225px; ; text-overflow: ellipsis;">
+                                                        <span>
+                                                            {{
+                                                            getFormattedConnectionName(connectionsInfo[0]?.connectedLabel)
+                                                            | textSubstring : 40 }}
+                                                        </span>
+                                                        <i class="pi pi-times ml-1 removI"
+                                                            (click)="disconnect(connectionsInfo[0])"></i>
+                                                    </button>
+
+                                                    <button *ngIf="connectionsInfo?.length > 1"
+                                                        type="button" class="relation-chip more-chip"
+                                                        (click)="openConnectionsDialog()">
+                                                        +{{ connectionsInfo?.length - 1 }}
+                                                    </button>
+                                                </div>
+
+                                                <!-- Right: first available connection + dropdown for rest -->
+                                                 <div *ngIf="availableConnectionsInfo?.length > 0 && connectionsInfo?.length > 0"
+                  class="relation-more-menu position-relative" dropdown container="body">
+
+                  <button type="button" class="dots-btn" dropdownToggle>
+                    <img src="assets/accounts/CONNECT.png" alt="" srcset="">
+                  </button>
+
+                  <ul *dropdownMenu class="dropdown-menu relation-dropdown" role="menu"
+                    [ngClass]="isArabic ? 'dropdown-menu-ar' : 'dropdown-menu-en'">
+
+                    <li role="menuitem" *ngFor="let option of availableConnectionsInfo" class="relation-item">
+                      <button class="dropdown-item relation-btn" type="button" (click)="createRelation(option)">
+                        <div class="d-flex align-items-center justify-content-between w-100">
+                          <div class="d-flex align-items-center">
+                            <img class="relation-icon mr-2" [src]="getConnectionIcon(option?.connectionName)" alt="" />
+                            <span class="relation-label">
+                              {{ option?.connectionName }}
+                            </span>
+                          </div>
+                        </div>
+                      </button>
+                    </li>
+                  </ul>
+                </div>
+                                            </div>
+                                        </ng-container>
+                                    </div>
                                 </div>
                             </div>
 
                             <ul class="nav nav-pills flex-column text-capitalize">
                                 <li class="nav-item" *ngIf="false">
                                     <a class="nav-link">
-                                        <img class=""
-                                            src="assets/profile/My-Account-Overview_Default.svg">
+                                        <img class="" src="assets/profile/My-Account-Overview_Default.svg">
                                         {{l("MyAccountOverview")}}
                                         <span class="sr-only">(current)</span></a>
                                 </li>
@@ -153,12 +268,10 @@
                                     </a>
 
                                 </li>
-                                <li class="nav-item"
-                                 >
+                                <li class="nav-item">
                                     <a class="nav-link" (click)="changeTab(accountInfoPageTabsEnum.Branches)"
                                         [ngClass]="currentTab==accountInfoPageTabsEnum.Branches?'active':''">
-                                        <img class=""
-                                            *ngIf="currentTab != accountInfoPageTabsEnum.Branches"
+                                        <img class="" *ngIf="currentTab != accountInfoPageTabsEnum.Branches"
                                             src="assets/profile/My-Addresses-Default.svg">
                                         <i class=" fa fa-map-marker-alt "
                                             *ngIf="currentTab == accountInfoPageTabsEnum.Branches"
@@ -174,8 +287,7 @@
 
                                 <li class="nav-item" *ngIf="false">
                                     <a class="nav-link" disabled>
-                                        <img class=""
-                                            *ngIf="currentTab != accountInfoPageTabsEnum.Lookups"
+                                        <img class="" *ngIf="currentTab != accountInfoPageTabsEnum.Lookups"
                                             src="assets/profile/My-Lookups-Default.svg">
                                         <span>{{l("MyLookups")}}</span>
                                     </a>
@@ -183,8 +295,8 @@
                                 <li class="nav-item" *ngIf="(accountLevel == accountLevelEnum.Profile && !viewMode) ">
                                     <a class="nav-link" (click)="changeTab(accountInfoPageTabsEnum.Payments)"
                                         [ngClass]="currentTab == accountInfoPageTabsEnum.Payments?'active':''">
-                                        <img *ngIf="currentTab != accountInfoPageTabsEnum.Payments"
-                                            class="" src="assets/payment/payment-method1.png">
+                                        <img *ngIf="currentTab != accountInfoPageTabsEnum.Payments" class=""
+                                            src="assets/payment/payment-method1.png">
 
                                         <svg *ngIf="currentTab == accountInfoPageTabsEnum.Payments" width="18"
                                             height="18" viewBox="0 0 18 18" fill="none"
@@ -251,29 +363,27 @@
 
                                 <li class="nav-item" *ngIf="false">
                                     <a class="nav-link" disabled>
-                                        <img class=""
-                                            src="assets/profile/My-Settings-Default.svg">{{l("MySettings")}}
+                                        <img class="" src="assets/profile/My-Settings-Default.svg">{{l("MySettings")}}
                                     </a>
                                 </li>
 
                                 <li class="nav-item ml-2" *ngIf="relationId && relationId>0 && roleSeller">
-                                    <a class="nav-link" (click)="changeTab(accountInfoPageTabsEnum.RelationshipSettings)"
+                                    <a class="nav-link"
+                                        (click)="changeTab(accountInfoPageTabsEnum.RelationshipSettings)"
                                         [ngClass]="currentTab == accountInfoPageTabsEnum.RelationshipSettings?'active':''">
 
                                         <i *ngIf="currentTab != accountInfoPageTabsEnum.RelationshipSettings"
-           class="fa fa-user-cog"
-           style="color: #84818A">
-        </i>
+                                            class="fa fa-user-cog" style="color: #84818A">
+                                        </i>
 
-        <i *ngIf="currentTab == accountInfoPageTabsEnum.RelationshipSettings"
-           class="fa fa-user-cog"
-           style="color: #F88011">
-        </i>
+                                        <i *ngIf="currentTab == accountInfoPageTabsEnum.RelationshipSettings"
+                                            class="fa fa-user-cog" style="color: #F88011">
+                                        </i>
 
-        <span class="ml-2">
-            {{ "RelationshipSettings"| localize }}
-        </span>
-    </a>
+                                        <span class="ml-2">
+                                            {{ "RelationshipSettings"| localize }}
+                                        </span>
+                                    </a>
 
                                 </li>
                             </ul>
@@ -299,7 +409,7 @@
                                             </label>
                                             <app-image-upload [sycAttachmentCategory]="sycAttachmentCategoryLogo"
                                                 [isDisabled]="(accountDataForView?.isConnected && currentTab === accountInfoPageTabsEnum.ProfileCreateOrEdit && !isRecordOwner)"
-                                                [image]="companyLogo" [staticWidth]="170" [showGuidelines]="true"
+                                                [image]="companyLogo" [staticWidth]="140" [showGuidelines]="true"
                                                 (imageBrowseDone)="imageBrowseDone($event,sycAttachmentCategoryLogo)"
                                                 (removeImage)="removeImage($event,sycAttachmentCategoryLogo,-1)">
                                             </app-image-upload>
@@ -318,7 +428,8 @@
 
                                         </div>
 
-                                        <div class="form-group row" *ngIf="accountInfoTemp?.accountType != 'People' && accountInfoTemp?.accountType != 'Personal'">
+                                        <div class="form-group row"
+                                            *ngIf="accountInfoTemp?.accountType != 'People' && accountInfoTemp?.accountType != 'Personal'">
                                             <div
                                                 class="col-sm-10 offset-sm-2 d-flex align-items-center d-flex flex-wrap">
                                                 <!--Other image 1-->
@@ -394,15 +505,14 @@
                                                 {{l("Code")}}
                                             </label>
                                             <div class="col-sm-8">
-                                         
-                                            <input type="text" id="AccountInfoTemp_Code" #codeInput="ngModel"
-                                            class="form-control form-control-sm aria-input-text" maxlength="6"
-                                            [disabled]="accountInfoTemp?.id>0"
-                               
-                                            id="colFormLabelSm" [(ngModel)]="accountInfoTemp.code" name="code"
-                                            required (input)="changeTouchState()"
-                                            [placeholder]=" 'PleaseEnterCompanyCode...' | localize ">
-                                        </div> 
+
+                                                <input type="text" id="AccountInfoTemp_Code" #codeInput="ngModel"
+                                                    class="form-control form-control-sm aria-input-text" maxlength="6"
+                                                    [disabled]="accountInfoTemp?.id>0" id="colFormLabelSm"
+                                                    [(ngModel)]="accountInfoTemp.code" name="code" required
+                                                    (input)="changeTouchState()"
+                                                    [placeholder]=" 'PleaseEnterCompanyCode...' | localize ">
+                                            </div>
 
 
                                         </div>
@@ -516,31 +626,29 @@
                                         </div>
 
 
-                                                  <div class="form-group row" >
+                                        <div class="form-group row">
                                             <label for="colFormLabelSm"
-                                                class="col-sm-2 col-form-label col-form-label-sm label-form" style="white-space: nowrap;">   <span class="text-danger font-weight-bold">*</span> {{l("MarketplaceRole")}}</label>  
+                                                class="col-sm-2 col-form-label col-form-label-sm label-form"
+                                                style="white-space: nowrap;"> <span
+                                                    class="text-danger font-weight-bold">*</span>
+                                                {{l("MarketplaceRole")}}</label>
                                             <div class="col-sm-8">
-                                        
 
-                                      <p-multiSelect
-                                        [options]="roles"
-                                        [(ngModel)]="selectedRoles"
-                                        [ngModelOptions]="{ standalone: true }"
-                                        optionLabel="name"
-                                        optionValue="name"
-                                        placeholder="Select Roles"
-                                        [maxSelectedLabels]="3"
-                                        class="w-100 md:w-80"
-                                        display="chip"
-                                        [disabled]="accountDataForView?.isConnected && currentTab === accountInfoPageTabsEnum.ProfileCreateOrEdit && !isRecordOwner"
-                                        (onPanelShow)="storeRolesBeforeChange()"
-                                        (onChange)="onRolesChange($event)">
-                                        </p-multiSelect>
+
+                                                <p-multiSelect [options]="roles" [(ngModel)]="selectedRoles"
+                                                    [ngModelOptions]="{ standalone: true }" optionLabel="name"
+                                                    optionValue="name" placeholder="Select Roles"
+                                                    [maxSelectedLabels]="3" class="w-100 md:w-80" display="chip"
+                                                    [disabled]="accountDataForView?.isConnected && currentTab === accountInfoPageTabsEnum.ProfileCreateOrEdit && !isRecordOwner"
+                                                    (onPanelShow)="storeRolesBeforeChange()"
+                                                    (onChange)="onRolesChange($event)">
+                                                </p-multiSelect>
 
                                             </div>
                                         </div>
 
-                                        <div class="form-group row" *ngIf="accountInfoTemp?.accountType != 'People' && accountInfoTemp?.accountType != 'Personal'">
+                                        <div class="form-group row"
+                                            *ngIf="accountInfoTemp?.accountType != 'People' && accountInfoTemp?.accountType != 'Personal'">
 
                                             <label for="colFormLabelSm"
                                                 class="col-sm-2 col-form-label col-form-label-sm label-form">
@@ -571,7 +679,7 @@
                                             </div>
                                         </div>
 
-                                       <!--  <div class="form-group row"
+                                        <!--  <div class="form-group row"
                                             *ngIf="(accountLevel == accountLevelEnum.Manual || (accountDataForView?.isConnected && currentTab === accountInfoPageTabsEnum.ProfileCreateOrEdit)) && !isRecordOwner">
                                             <label for="colFormLabelSm"
                                                 class="col-sm-2 col-form-label col-form-label-sm label-form">{{l("PriceLevel")}}</label>
@@ -587,8 +695,8 @@
                                         </div>
  -->
 
-                                        <div class="form-group row" 
-                                        *ngIf="isRecordOwner && accountLevel == accountLevelEnum.Profile && accountInfoTemp?.accountType != 'People' && accountInfoTemp?.accountType != 'Personal'">
+                                        <div class="form-group row"
+                                            *ngIf="isRecordOwner && accountLevel == accountLevelEnum.Profile && accountInfoTemp?.accountType != 'People' && accountInfoTemp?.accountType != 'Personal'">
                                             <label for="colFormLabelSm"
                                                 class="col-sm-2 col-form-label col-form-label-sm label-form">
 
@@ -606,7 +714,8 @@
                                             </div>
                                         </div>
 
-                                        <div class="form-group row" *ngIf="isRecordOwner && accountLevel == accountLevelEnum.Profile && accountInfoTemp?.accountType != 'People' && accountInfoTemp?.accountType != 'Personal'">
+                                        <div class="form-group row"
+                                            *ngIf="isRecordOwner && accountLevel == accountLevelEnum.Profile && accountInfoTemp?.accountType != 'People' && accountInfoTemp?.accountType != 'Personal'">
                                             <label for="colFormLabelSm"
                                                 class="col-sm-2 col-form-label col-form-label-sm label-form">
 
@@ -620,7 +729,7 @@
                                                     optionValue="value" (onChange)="changeTouchState()">
                                                 </p-dropdown>
                                             </div>
-                                        </div> 
+                                        </div>
 
                                         <div class="form-group row">
                                             <label for="colFormLabelSm"
@@ -865,10 +974,10 @@
                             </app-members-list>
                         </div>
                         <div class="tab5" *ngIf="currentTab == accountInfoPageTabsEnum.ProfileView">
-                            <app-view-profile [accountData]="accountDataForView" [contactData]="accountContactForView" [entityExtraData]="entityExtraData"
-                                [isPublished]="isPublished" [viewMode]="viewMode" [accountLevel]="accountLevel"
-                                (edit)="triggerProfile($event)" (editedData)="savePerData($event)"
-                                (delete)="askToConfirmDeleteAccount()" 
+                            <app-view-profile [accountData]="accountDataForView" [contactData]="accountContactForView"
+                                [entityExtraData]="entityExtraData" [isPublished]="isPublished" [viewMode]="viewMode"
+                                [accountLevel]="accountLevel" (edit)="triggerProfile($event)"
+                                (editedData)="savePerData($event)" (delete)="askToConfirmDeleteAccount()"
                                 (editedContactData)="getCotactData($event)" [isSync]="isSync"
                                 [connectionCount]="connectionCount"
                                 [personalAccount]="accountDataForView?.accountTypeId == 21 ? true : false"></app-view-profile>
@@ -888,8 +997,8 @@
                             <app-accountbilling></app-accountbilling>
                         </div>
                         <div class="tab9" *ngIf="currentTab == accountInfoPageTabsEnum.RelationshipSettings">
-                            <app-relationship-settings 
-                                [accountId]="accountId" [relationId]="relationId" [connectionsInfo]="connectionsInfo">
+                            <app-relationship-settings [accountId]="accountId" [relationId]="relationId"
+                                [connectionsInfo]="connectionsInfo">
                             </app-relationship-settings>
                         </div>
 
@@ -904,24 +1013,15 @@
 </div>
 
 
-<p-dialog
-    [(visible)]="showConnectionPopup"
-    [modal]="true"
-    [closable]="true"
-    [draggable]="false"
-    [style]="{ width: '650px' }"
-    [contentStyle]="{ padding: '20px' }"
-    header="Multiple roles detected">
+<p-dialog [(visible)]="showConnectionPopup" [modal]="true" [closable]="true" [draggable]="false"
+    [style]="{ width: '650px' }" [contentStyle]="{ padding: '20px' }" header="Multiple roles detected">
 
     <p class="mb-3">
         {{'BeforeSavingManualAccountMsg' | localize}}
     </p>
 
     <div *ngFor="let connection of availableConnections" class="mb-3">
-        <p-radioButton
-            name="selectedConnection"
-            [value]="connection"
-            [(ngModel)]="selectedConnection"
+        <p-radioButton name="selectedConnection" [value]="connection" [(ngModel)]="selectedConnection"
             [inputId]="'connection_' + connection.connectionEntityId">
         </p-radioButton>
 
@@ -931,19 +1031,26 @@
     </div>
 
     <ng-template pTemplate="footer">
-        <button
-            type="button"
-            class="btn bgPurple"
-            [disabled]="!selectedConnection"
+        <button type="button" class="btn bgPurple" [disabled]="!selectedConnection"
             (click)="confirmSelectedConnection()">
             {{'SaveManualAccount' | localize}}
         </button>
 
-        <button
-            type="button"
-            class="btn btn-secondary ml-3"
-            (click)="cancelConnectionPopup()">
+        <button type="button" class="btn btn-secondary ml-3" (click)="cancelConnectionPopup()">
             {{'Cancel' | localize}}
         </button>
     </ng-template>
+</p-dialog>
+
+
+
+<p-dialog header="{{ 'Connections' | localize }}" [(visible)]="showConnectionsDialog" [modal]="true"
+    [style]="{ width: '450px' }" [draggable]="false" [resizable]="false">
+    <div *ngIf="connectionsInfo?.length > 0">
+        <div *ngFor="let relation of connectionsInfo"
+            class="d-flex justify-content-between align-items-center mb-2 relation-dialog-item">
+            <span>{{ getFormattedConnectionName(relation.connectedLabel) }}</span>
+            <i class="pi pi-times removI" (click)="disconnect(relation)"></i>
+        </div>
+    </div>
 </p-dialog>

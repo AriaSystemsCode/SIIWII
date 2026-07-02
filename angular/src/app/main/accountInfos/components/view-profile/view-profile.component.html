@@ -122,14 +122,15 @@
                             <div class="row" *ngIf="!(Editting && personalAccount)">
                                 <div class="col-md-2 ml-5">
                                     <div class="dev-logo">
-                                        <app-image-display
+                                        <img [src]="companyLogo ? companyLogo  :'../../../../assets/common/images/default-profile-picture.png'" alt="" srcset="" [ngClass]="isArabic ? 'dev-logo-ar' : 'logo-profile'" style="height: 120px;width: 120px;">
+                                        <!-- <app-image-display
                                             [image]="companyLogo ? companyLogo  :'../../../../assets/common/images/default-profile-picture.png'"
                                             [sycAttachmentCategory]="sycAttachmentCategoryLogo"
-                                             [classList]="isArabic ? 'dev-logo-ar' : 'logo-profile'" [staticHeight]="74">
-                                        </app-image-display>
+                                             [classList]="isArabic ? 'dev-logo-ar' : 'logo-profile'" [staticHeight]="120">
+                                        </app-image-display> -->
                                     </div>
                                 </div>
-                                <div class="col title-cover">
+                                <div class="col title-cover px-4">
                                     <h5 class="account-name">{{accountData?.name}}
 
                                     </h5>

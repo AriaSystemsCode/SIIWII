@@ -118,7 +118,7 @@ export class ImageUploadComponent extends AppComponentBase implements OnChanges 
       }
     }
   
-    // 🔒 Max file size (applies to both images & PDFs)
+    //  Max file size (applies to both images & PDFs)
     if (this.checkImageSize(imgFile.size)) {
       this.message.error(this.l('MaxFileSizeExceeded'));
       resetInput();
@@ -159,12 +159,12 @@ export class ImageUploadComponent extends AppComponentBase implements OnChanges 
       this.acceptedAspectRatio - buffer < currentAspectRatio &&
       this.acceptedAspectRatio + buffer > currentAspectRatio
     ) {
-      // ✅ Aspect ratio is within tolerance
+      //  Aspect ratio is within tolerance
       this.image = (renderedImage as any).src;
       this.imgFile = imgFile;
       this.imageBrowseDone.emit({ file: this.imgFile, image: this.image });
     } else {
-      // ❌ Aspect ratio off → open cropper
+      //  Aspect ratio off → open cropper
       const { onCropDone, data } = this.openImageCropper(
         $event as any,
         this.acceptedAspectRatio

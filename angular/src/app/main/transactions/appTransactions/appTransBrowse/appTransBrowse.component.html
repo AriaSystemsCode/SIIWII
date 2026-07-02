@@ -6,14 +6,17 @@
             [ngClass]="{'mt-lg-5 mt-md-0 mt-5 pt-lg-5 pt-md-0 pt-5':isArabic}">
             <div class="kt-portlet kt-portlet--mobile">
                 <div class="kt-portlet__body">
-                    <form class="kt-form" autocomplete="off" [formGroup]="filterForm">
+                    <form class="kt-form"
+    autocomplete="off"
+    [formGroup]="filterForm"
+    (keydown.enter)="$event.preventDefault()">
                         <div>
 
                             <div class="row mb-3 ">
                                 <div class="col-12 col-md-3 col-sm-6 list-toolbar-filter mb-0 mb-4 mb-md-0">
                                     <div class="btn-group dropdown list-toolbar-dropdown" dropdown
                                         *ngIf="showMainFiltersOptions">
-                                        <button class="dropdown-toggle btn btn-sm font-weight-normal p-0 d-flex"
+                                        <button    type="button" class="dropdown-toggle btn btn-sm font-weight-normal p-0 d-flex"
                                             dropdownToggle>
                                             <h4 class="list-toolbar-dropdown-filter-selectedItem fs-4 fw-bold">
                                                 {{
@@ -64,7 +67,7 @@
                                         <div class="form-group m-form__group align-items-center">
                                             <div class="input-group">
                                                 <span class="input-group-btn">
-                                                    <button class="searchBtn" type="submit">
+                                                    <button class="searchBtn" type="button">
                                                         <img src="../../../assets/landingPage/Search.png" />
                                                     </button>
                                                 </span>
@@ -234,7 +237,7 @@
                                                     <div class="input-group">
                                                         <span class="input-group-btn">
                                                             <button (click)="getVariationDetail()" class="searchBtn"
-                                                                type="submit">
+                                                                type="button">
                                                                 <img src="../../../assets/landingPage/Search.png" />
                                                             </button>
                                                         </span>
