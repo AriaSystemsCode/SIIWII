@@ -6524,14 +6524,7 @@ namespace onetouch.AppItems
 
                 reservedCopyCodes = new HashSet<string>(existingCodes, StringComparer.OrdinalIgnoreCase);
             }
-            DateTime start = DateTime.Now;
-            var importPerf = Stopwatch.StartNew();
-            var importPhase = Stopwatch.StartNew();
-            long importImageCopyMs = 0;
-            var importImageCopyCount = 0;
             var importParentCount = result.Count(z => string.IsNullOrEmpty(z.ParentCode));
-            var importVariationCount = result.Count(z => !string.IsNullOrEmpty(z.ParentCode));
-            Logger.Info($"[AppItemImportPerf] Start tenant={AbpSession.TenantId} user={AbpSession.UserId} totalRows={result.Count} parents={importParentCount} variations={importVariationCount} repeatHandler={excelResultsDTO.RepreateHandler}");
             var itemObjectId = await _helper.SystemTables.GetObjectItemId();
             var tenantId = AbpSession.TenantId == null ? -1 : AbpSession.TenantId;
             var path = _appConfiguration[$"Attachment:PathTemp"] + @"\" + tenantId + @"\";
@@ -6569,14 +6562,11 @@ namespace onetouch.AppItems
             SycSegmentIdentifierDefinition importSsinSequenceSegment = null;
             SycCounter importSsinCounter = null;
             long? importSsinNextCounter = null;
-            long importSsinPreloadMs = 0;
-
             async Task PrepareImportSsinRange(int requiredCount)
             {
                 if (requiredCount <= 0 || importSsinNextCounter.HasValue)
                     return;
 
-                var importSsinPreloadWatch = Stopwatch.StartNew();
                 using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
                 {
                     var objectRec = await _syObjectRepository.GetAll()
@@ -6621,8 +6611,6 @@ namespace onetouch.AppItems
 
                     await CurrentUnitOfWork.SaveChangesAsync();
                 }
-                importSsinPreloadWatch.Stop();
-                importSsinPreloadMs += importSsinPreloadWatch.ElapsedMilliseconds;
             }
 
             async Task GenerateImportedParentSsin(AppItem importedItem)
@@ -6746,9 +6734,6 @@ namespace onetouch.AppItems
                 await SaveLeanImportBatchIfNeeded();
             }
 
-            Logger.Info($"[AppItemImportPerf] Setup/preload-base elapsedMs={importPhase.ElapsedMilliseconds} totalMs={importPerf.ElapsedMilliseconds}");
-            importPhase.Restart();
-
             var existingParentIds = result
                 .Where(z => string.IsNullOrEmpty(z.ParentCode) && z.Id != 0)
                 .Select(z => z.Id)
@@ -6807,27 +6792,11 @@ namespace onetouch.AppItems
                     .ToListAsync())
                     .GroupBy(z => z.Name, StringComparer.OrdinalIgnoreCase)
                     .ToDictionary(z => z.Key, z => z.First(), StringComparer.OrdinalIgnoreCase);
-            Logger.Info($"[AppItemImportPerf] Existing-data preload elapsedMs={importPhase.ElapsedMilliseconds} totalMs={importPerf.ElapsedMilliseconds} existingParents={existingParentsById.Count} scaleHeaders={sizeScaleHeadersByName.Count} ratioHeaders={sizeRatioHeadersByName.Count}");
-            importPhase.Restart();
-
-            long importParentBuildMs = 0;
-            long importVariationBuildMs = 0;
-            long importVariationMapMs = 0;
-            long importVariationPriceMs = 0;
-            long importVariationExtraMs = 0;
-            long importVariationImageAttachMs = 0;
-            long importVariationFinalizeMs = 0;
-            long importSsinMs = 0;
-            long importSaveLeanMs = 0;
-            var importParentCountInLoop = 0;
-            var importVariationCountInLoop = 0;
             await PrepareImportSsinRange(importParentCount);
             foreach (AppItemExcelDto excelDto in result)
             {
                 if (!string.IsNullOrEmpty(excelDto.ParentCode))
                     continue;
-                var importParentWatch = Stopwatch.StartNew();
-                importParentCountInLoop++;
                 var itemEntityExtraData = new List<AppEntityExtraData>();
                 AppItem itemOrg = new AppItem();
                 if (excelDto.Id != 0)
@@ -7113,11 +7082,7 @@ namespace onetouch.AppItems
 
                             try
                             {
-                                var imageCopyWatch = Stopwatch.StartNew();
                                 System.IO.File.Copy(System.IO.Directory.GetCurrentDirectory() + @"\Assets\noimage_item.jpg", attachmentTenantPath + @"\" + img.ImageGuid + ".jpg", true);
-                                imageCopyWatch.Stop();
-                                importImageCopyMs += imageCopyWatch.ElapsedMilliseconds;
-                                importImageCopyCount++;
                             }
                             catch { }
                         }
@@ -7127,15 +7092,7 @@ namespace onetouch.AppItems
 
                             try
                             {
-                                var imageCopyWatch = Stopwatch.StartNew();
-
                                 System.IO.File.Copy(path + @"\" + img.ImageGuid + "." + img.ImageFileName.Split('.')[1], attachmentTenantPath + @"\" + img.ImageGuid + "." + img.ImageFileName.Split('.')[1], true);
-
-                                imageCopyWatch.Stop();
-
-                                importImageCopyMs += imageCopyWatch.ElapsedMilliseconds;
-
-                                importImageCopyCount++;
                             }
                             catch { }
                         }
@@ -7165,13 +7122,7 @@ namespace onetouch.AppItems
                 appItem.EntityFk.TimeStamp = timeStamp;
                 appItem.TenantOwner = int.Parse(AbpSession.TenantId.ToString());
                 appItem.EntityFk.TenantOwner = appItem.TenantOwner;
-                importParentWatch.Stop();
-                importParentBuildMs += importParentWatch.ElapsedMilliseconds;
-                var importSsinWatch = Stopwatch.StartNew();
                 await GenerateImportedParentSsin(appItem);
-                importSsinWatch.Stop();
-                importSsinMs += importSsinWatch.ElapsedMilliseconds;
-                importParentWatch.Restart();
 
                 if (appItem.ParentFkList != null && appItem.ParentFkList.Any())
                     importedParentsWithVariations.Add(appItem);
@@ -7672,17 +7623,12 @@ namespace onetouch.AppItems
                     appItem.ItemSizeScaleHeadersFkList.Add(appItemSizeScalesHeader);
                 }
 
-                importParentWatch.Stop();
-                importParentBuildMs += importParentWatch.ElapsedMilliseconds;
-                var importVariationWatch = Stopwatch.StartNew();
                 var childItems = childrenByParentCode.TryGetValue(excelDto.Code, out var children)
                     ? children
                     : new List<AppItemExcelDto>();
-                importVariationCountInLoop += childItems.Count;
                 bool firstItem = false;
                 foreach (var item in childItems)
                 {
-                    var importVariationSectionWatch = Stopwatch.StartNew();
                     var appChildItem = new AppItem();
                     if (excelDto.Id != 0)
                     {
@@ -7750,9 +7696,6 @@ namespace onetouch.AppItems
                         appChildItem.EntityFk.EntityAttachments = new List<AppEntityAttachment>();
 
                     }
-                    importVariationSectionWatch.Stop();
-                    importVariationMapMs += importVariationSectionWatch.ElapsedMilliseconds;
-                    importVariationSectionWatch.Restart();
                     //XX
                     if (appChildItem.ItemPricesFkList == null)
                         appChildItem.ItemPricesFkList = new List<AppItemPrices>();
@@ -7843,9 +7786,6 @@ namespace onetouch.AppItems
                             IsDefault = true
                         });
                     }
-                    importVariationSectionWatch.Stop();
-                    importVariationPriceMs += importVariationSectionWatch.ElapsedMilliseconds;
-                    importVariationSectionWatch.Restart();
                     //XX
                     appChildItem.TimeStamp = timeStamp;
                     appChildItem.EntityFk.TimeStamp = timeStamp;
@@ -7909,7 +7849,6 @@ namespace onetouch.AppItems
                             if (string.IsNullOrEmpty(item.ImageType)) { item.ImageType = "Image"; }
                             if (etx == 0 && !string.IsNullOrEmpty(item.ImageType) && item.Images != null && item.Images.Count > 0)
                             {
-                                var importVariationImageAttachWatch = Stopwatch.StartNew();
                                 attachmentsCategoriesByCode.TryGetValue(item.ImageType, out var attachCategory);
                                 var defaultImage = item.Images.Where(x => x.ImageFileName.ToLower().Contains("_default") && x.ImageGuid != null).FirstOrDefault();
 
@@ -7929,15 +7868,7 @@ namespace onetouch.AppItems
 
                                     try
                                     {
-                                        var imageCopyWatch = Stopwatch.StartNew();
-
                                         System.IO.File.Copy(path + @"\" + img.ImageGuid + "." + img.ImageFileName.Split('.')[1], attachmentTenantPath + @"\" + img.ImageGuid + "." + img.ImageFileName.Split('.')[1], true);
-
-                                        imageCopyWatch.Stop();
-
-                                        importImageCopyMs += imageCopyWatch.ElapsedMilliseconds;
-
-                                        importImageCopyCount++;
                                     }
                                     catch { }
 
@@ -7955,9 +7886,6 @@ namespace onetouch.AppItems
                                     appChildItem.EntityFk.EntityAttachments[0].IsDefault = true;
                                     firstAttributteImageDefaults.Add(string.IsNullOrEmpty(appChildItem.EntityFk.EntityAttachments[0].AttachmentFk.Attachment) ? "" : imagesUrl + appChildItem.EntityFk.EntityAttachments[0].AttachmentFk.Attachment);
                                 }
-
-                                importVariationImageAttachWatch.Stop();
-                                importVariationImageAttachMs += importVariationImageAttachWatch.ElapsedMilliseconds;
                             }
                             if (etx == 0 && !string.IsNullOrEmpty(item.ImageType) && (item.Images == null || item.Images.Count == 0))
                             {
@@ -7979,9 +7907,6 @@ namespace onetouch.AppItems
                             });
                         }
                     }
-                    importVariationSectionWatch.Stop();
-                    importVariationExtraMs += importVariationSectionWatch.ElapsedMilliseconds;
-                    importVariationSectionWatch.Restart();
                     if (appChildItem.Id == 0)
                     {
                         appChildItem.CreatorUserId = AbpSession.UserId;
@@ -8001,27 +7926,14 @@ namespace onetouch.AppItems
                     if (appChildItem.Id == 0)
                         appItem.ParentFkList.Add(appChildItem);
 
-                    importVariationSectionWatch.Stop();
-                    importVariationFinalizeMs += importVariationSectionWatch.ElapsedMilliseconds;
                 }
-                importVariationWatch.Stop();
-                importVariationBuildMs += importVariationWatch.ElapsedMilliseconds;
                 if (appItem.SycIdentifierId == null)
                     appItem.SycIdentifierId = defIdentfier;
 
-                var importSaveLeanWatch = Stopwatch.StartNew();
                 await SaveImportedItemLean(appItem);
-                importSaveLeanWatch.Stop();
-                importSaveLeanMs += importSaveLeanWatch.ElapsedMilliseconds;
             }
 
-            Logger.Info($"[AppItemImportPerf] Build-and-save loop elapsedMs={importPhase.ElapsedMilliseconds} totalMs={importPerf.ElapsedMilliseconds} parents={importParentCountInLoop} variations={importVariationCountInLoop} parentBuildMs={importParentBuildMs} variationBuildMs={importVariationBuildMs} variationMapMs={importVariationMapMs} variationPriceMs={importVariationPriceMs} variationExtraMs={importVariationExtraMs} variationImageAttachMs={importVariationImageAttachMs} variationFinalizeMs={importVariationFinalizeMs} ssinPreloadMs={importSsinPreloadMs} ssinMs={importSsinMs} saveLeanMs={importSaveLeanMs} imageCopies={importImageCopyCount} imageCopyMs={importImageCopyMs}");
-            importPhase.Restart();
-
             await FlushLeanImportBatch();
-
-            Logger.Info($"[AppItemImportPerf] Final flush elapsedMs={importPhase.ElapsedMilliseconds} totalMs={importPerf.ElapsedMilliseconds}");
-            importPhase.Restart();
 
             foreach (var importedParent in importedParentsWithVariations.Where(x => x.Id != 0))
             {
@@ -8042,8 +7954,6 @@ namespace onetouch.AppItems
             }
 
             #endregion send notification to current user
-            Logger.Info($"[AppItemImportPerf] Notify-and-return elapsedMs={importPhase.ElapsedMilliseconds} totalMs={importPerf.ElapsedMilliseconds} imageCopies={importImageCopyCount} imageCopyMs={importImageCopyMs}");
-
             return excelResultsDTO.ExcelLogDTO;
         }   //public async Task<ExcelResultsDTO> ValidateExcel(string guidFile, string[] imagesList)
 
