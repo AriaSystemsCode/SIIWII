@@ -6167,6 +6167,59 @@ namespace onetouch.AppItems
             List<AppItemExcelDto> result = excelResultsDTO.ExcelRecords.Where(r => r.Status !=
             ExcelRecordStatus.Failed.ToString()).Select(r => r.ExcelDto).ToList<AppItemExcelDto>();
 
+            async Task ValidateExcelItemsAsCreateOrEdit()
+            {
+                var parentRows = result.Where(x => string.IsNullOrEmpty(x.ParentCode)).ToList();
+                if (parentRows.Count == 0)
+                    return;
+
+                var productTypeIdsByCode = new Dictionary<string, long>(StringComparer.OrdinalIgnoreCase);
+                foreach (var productTypeCode in parentRows.Select(x => x.ProductType).Where(x => !string.IsNullOrWhiteSpace(x)).Distinct(StringComparer.OrdinalIgnoreCase))
+                {
+                    var productTypes = await _SycEntityObjectTypesAppService.GetAllWithExtraAttributesByCode(productTypeCode);
+                    var productType = productTypes.FirstOrDefault();
+                    if (productType != null)
+                        productTypeIdsByCode[productTypeCode] = productType.Id;
+                }
+
+                var validateInput = new List<AppItemValidationInputDTO>();
+                foreach (var excelDto in parentRows)
+                {
+                    decimal.TryParse(excelDto.Price, out var price);
+                    productTypeIdsByCode.TryGetValue(excelDto.ProductType ?? string.Empty, out var entityObjectTypeId);
+
+                    validateInput.Add(new AppItemValidationInputDTO
+                    {
+                        Id = excelDto.Id,
+                        Code = excelDto.Code,
+                        Name = excelDto.Name,
+                        Description = excelDto.ProductDescription,
+                        Price = price,
+                        EntityObjectTypeId = entityObjectTypeId,
+                        ItemType = 0,
+                        ParentId = null
+                    });
+                }
+
+                var validationResults = await ValidateItemData(validateInput);
+                var errorList = new List<string>();
+
+                foreach (var item in validationResults.Where(x => x.ErrorMessages != null && x.ErrorMessages.Count > 0))
+                {
+                    var row = parentRows.FirstOrDefault(x => x.Code == item.Code);
+                    var rowLabel = row != null && row.rowNumber > 0 ? $"Row {row.rowNumber} ({item.Code})" : item.Code;
+                    foreach (var err in item.ErrorMessages)
+                    {
+                        errorList.Add($"{rowLabel}: {err}");
+                    }
+                }
+
+                if (errorList.Count > 0)
+                    throw new UserFriendlyException(string.Join("\n", errorList));
+            }
+
+            await ValidateExcelItemsAsCreateOrEdit();
+
             #region handle 4,2,3 actions
             // select type images
             // action 2 add to item
