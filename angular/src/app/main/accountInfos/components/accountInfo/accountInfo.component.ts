@@ -1,5 +1,5 @@
 ﻿import { Component, Injector, ViewEncapsulation, OnInit, Input, ViewChild, ChangeDetectorRef, } from '@angular/core';
-import { CurrencyInfoDto, AccountsServiceProxy, CreateOrEditAccountInfoDto, AppEntitiesServiceProxy, LookupLabelDto, AppEntityClassificationDto, AppEntityCategoryDto, SycAttachmentCategoriesServiceProxy, SycAttachmentCategorySycAttachmentCategoryLookupTableDto, GetSycAttachmentCategoryForViewDto, AppEntityAttachmentDto, BranchDto, AppContactAddressDto, TreeNodeOfGetSycEntityObjectCategoryForViewDto, TreeNodeOfGetSycEntityObjectClassificationForViewDto, AccountLevelEnum, GetAccountInfoForEditOutput, GetAccountForViewDto, AccountDto, SessionServiceProxy, ContactDto, MemberFilterTypeEnum, SycEntityObjectClassificationDto, SycIdentifierDefinitionsServiceProxy, SycAttachmentCategoryDto, MarketplaceAccountsServiceProxy, AppEntityExtraDataDto, ConnectionInfo } from '@shared/service-proxies/service-proxies';
+import { CurrencyInfoDto, AccountsServiceProxy, CreateOrEditAccountInfoDto, AppEntitiesServiceProxy, LookupLabelDto, AppEntityClassificationDto, AppEntityCategoryDto, SycAttachmentCategoriesServiceProxy, SycAttachmentCategorySycAttachmentCategoryLookupTableDto, GetSycAttachmentCategoryForViewDto, AppEntityAttachmentDto, BranchDto, AppContactAddressDto, TreeNodeOfGetSycEntityObjectCategoryForViewDto, TreeNodeOfGetSycEntityObjectClassificationForViewDto, AccountLevelEnum, GetAccountInfoForEditOutput, GetAccountForViewDto, AccountDto, SessionServiceProxy, ContactDto, MemberFilterTypeEnum, SycEntityObjectClassificationDto, SycIdentifierDefinitionsServiceProxy, SycAttachmentCategoryDto, MarketplaceAccountsServiceProxy, AppEntityExtraDataDto, ConnectionInfo, AppTransactionServiceProxy } from '@shared/service-proxies/service-proxies';
 import { AppComponentBase } from '@shared/common/app-component-base';
 import { appModuleAnimation } from '@shared/animations/routerTransition';
 import { ActivatedRoute } from '@angular/router';
@@ -9,7 +9,7 @@ import { FileUploader, FileUploaderOptions } from 'ng2-file-upload';
 import { BsModalRef, BsModalService, ModalOptions } from 'ngx-bootstrap/modal';
 import { finalize } from 'rxjs/operators';
 import { PrimengTableHelper } from '@shared/helpers/PrimengTableHelper';
-import { Observable, Subscription } from 'rxjs';
+import { forkJoin, Observable, Subscription } from 'rxjs';
 import { ImageCropperComponent } from '@app/shared/common/image-cropper/image-cropper.component';
 import { SelectCategoriesDynamicModalComponent } from '@app/categories/select-categories-dynamic-modal.component';
 import { SelectClassificationDynamicModalComponent } from '@app/classification/select-classification-dynamic-modal.component';
@@ -145,6 +145,7 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit {
     selectedRoles!: any[];
     roleSeller: boolean = false;
     connectionsInfo :ConnectionInfo [] =[];
+    availableConnectionsInfo :ConnectionInfo [] =[];
 
     availableConnections: any[] = [];
     selectedConnection: any = null;
@@ -164,6 +165,8 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit {
         private _activatedRoute: ActivatedRoute,
         private _sycIdentifierDefinitionsServiceProxy: SycIdentifierDefinitionsServiceProxy,
         private _marketplaceAccountsServiceProxy: MarketplaceAccountsServiceProxy,
+         private AppTransactionServiceProxy:AppTransactionServiceProxy
+        
 
 
     ) {
@@ -491,6 +494,7 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit {
             this.accData = JSON.parse(JSON.stringify(result));
             this.relationId = result.relationId ? result.relationId : 0
             this.connectionsInfo = result.connectionsInfo ? result.connectionsInfo : []
+            this.availableConnectionsInfo = result.availableConnections ? result.availableConnections : []
             this.entityExtraData = result ? result.entityExtraData : undefined
 
         }
@@ -532,6 +536,7 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit {
         this.entityExtraData = result ? result.entityExtraData : undefined
         this.relationId = result.relationId ? result.relationId : 0
         this.connectionsInfo = result.connectionsInfo ? result.connectionsInfo : []
+      
         this.accountContactForView = result ? result.contact : undefined
         this.isRecordOwner = this.accountDataForView?.id == this.appSession.user?.accountId ? true : false
         if (this.accountDataForView.logoUrl) this.companyLogo = `${this.attachmentBaseUrl}/${this.accountDataForView.logoUrl}`;
@@ -1669,16 +1674,16 @@ private restoreRemovedRoles(rolesToRestore: string[]): void {
 
     }
 
-    getFormattedConnectionName(): string | null {
-        let raw: string | undefined;
-        raw = this.accData?.disConnectLabel?.trim();
-        if (!raw) return null;
-        if (raw.startsWith('MPAction')) {
-            const label = raw.replace('MPAction', '');
-            return label.charAt(0).toUpperCase() + label.slice(1).toLowerCase();
-        }
-        return null;
-    }
+    // getFormattedConnectionName(): string | null {
+    //     let raw: string | undefined;
+    //     raw = this.accData?.disConnectLabel?.trim();
+    //     if (!raw) return null;
+    //     if (raw.startsWith('MPAction')) {
+    //         const label = raw.replace('MPAction', '');
+    //         return label.charAt(0).toUpperCase() + label.slice(1).toLowerCase();
+    //     }
+    //     return null;
+    // }
 
 
     setManualAccCode(): void {
@@ -1781,4 +1786,110 @@ private restoreRemovedRoles(rolesToRestore: string[]): void {
   this.previousSelectedRoles = [...this.selectedRoles];
 }
 
+loginTenaneSsin
+createRelation(relation: any): void {
+  if (!relation?.connectionEntityId || !this.accountId) return;
+
+  this.showMainSpinner();
+
+  forkJoin({
+    recipientRoles: this.AppTransactionServiceProxy.getAccountMarketplaceRoles(
+      this.accountDataForView?.ssin // or recipient account ssin
+    ),
+    loggedTenantRoles: this.AppTransactionServiceProxy.getAccountMarketplaceRoles(
+      this.loginTenaneSsin
+    )
+  })
+    .pipe(finalize(() => this.hideMainSpinner()))
+    .subscribe(({ recipientRoles, loggedTenantRoles }: any) => {
+      const recipientHasRoles = this.hasMarketplaceRoles(recipientRoles);
+      const loggedTenantHasRoles = this.hasMarketplaceRoles(loggedTenantRoles);
+
+      if (!recipientHasRoles || !loggedTenantHasRoles) {
+        this.message.info(
+         this.l('Cannot connect, you need to update the marketplace role of your account / the recipient account marketplace role in order to build relationship together')  ,
+          ''
+        );
+        return;
+      }
+
+      this.applyRelation(relation);
+    });
+}
+private hasMarketplaceRoles(response: any): boolean {
+  const roles = response?.result ?? response;
+  return Array.isArray(roles) && roles.length > 0;
+}
+
+private applyRelation(relation: any): void {
+  this.showMainSpinner();
+
+  this._AccountsServiceProxy
+    .applyRelationOnProfile(
+      this.accountId,
+      undefined,
+      relation.defaultVisibility === 'Public',
+      relation.connectionEntityId
+    )
+    .pipe(
+      finalize(() => {
+        this.hideMainSpinner();
+        this.getAccountDataForView();
+      })
+    )
+    .subscribe();
+}
+
+getFormattedConnectionName(label: string): string {
+  if (!label) return '';
+
+  if (label === 'Follow' || label === 'Connect' || label === 'Join' || label === 'Employ') {
+    return label;
+  }
+
+  if (label.startsWith('MPAction')) {
+    const clean = label.replace('MPAction', '');
+    return clean.charAt(0).toUpperCase() + clean.slice(1).toLowerCase();
+  }
+
+  return label;
+}
+  disconnect(relation): void {
+
+    console.log(this.accountDataForView.id,'this.accountDataForView.account.id')
+    console.log(relation.relationEntityId,'relation.relationEntityId')
+    this.showMainSpinner();
+    this._AccountsServiceProxy
+      .disconnect(this.accountDataForView.id,relation.relationEntityId)
+      .pipe(
+        finalize(() => {
+          this.hideMainSpinner();
+          this.getAccountDataForView();
+        })
+      )
+      .subscribe((res) => {
+        this.notify.success(this.l("SuccessfullyDisconnected"));
+     
+      });
+  }
+  private readonly ICONS: Record<string, string> = {
+    FOLLOW: 'assets/accounts/FOLLOW.png',
+    CONNECT: 'assets/accounts/CONNECT.png',
+    EMPLOY: 'assets/accounts/CONNECT.png',
+    EMPLOYEE: 'assets/accounts/EMPLOYEE.png',
+    JOIN: 'assets/accounts/JOIN.png',
+  };
+  getConnectionIcon(label?: string): string {
+    const t = (label || '').toUpperCase();
+    for (const key of Object.keys(this.ICONS)) {
+      if (t.includes(key)) return this.ICONS[key];
+    }
+    return 'assets/accounts/CONNECT.png'; // fallback
+  }
+
+showConnectionsDialog = false;
+
+openConnectionsDialog(): void {
+  this.showConnectionsDialog = true;
+}
 }

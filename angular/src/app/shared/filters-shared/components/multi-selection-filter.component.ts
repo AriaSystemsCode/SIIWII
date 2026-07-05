@@ -25,13 +25,13 @@ export class MultiSelectionFilterComponent implements OnInit, OnChanges {
   collapseListDataCollapseButton = false;
   showMoreListDataButton = false;
 
-  // ✅ Use FormControl, not string
+
   searchCtrl = new FormControl<string>('');
 
   ngOnInit() {
     this.subscribeToFormControlChange();
 
-    // ✅ Debounced search emitter
+  
     if (this.showSearchBox) {
       this.searchCtrl.valueChanges
         .pipe(debounceTime(300), distinctUntilChanged())
@@ -73,7 +73,7 @@ export class MultiSelectionFilterComponent implements OnInit, OnChanges {
 
     this.filterMetaData.listSkipCount += this.filterMetaData.listMaxResultCount;
 
-    // ✅ Fix accidental assignment (=) to comparison (===)
+    //  Fix accidental assignment (=) to comparison (===)
     if (this.filterMetaData.listMaxResultCount === this.filterMetaData.collapsedDisplayedListCount) {
       this.filterMetaData.listMaxResultCount = 10;
     }

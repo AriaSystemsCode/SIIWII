@@ -228,6 +228,7 @@ private sellerCompanySearchTimer: any;
   .some(x => x.includes('seller'))) {
                     this.roleDdval = this.tenantRoleService.soRolesOptions.filter(role => role.code == 1)[0];
 
+
                 } else {
                     this.roleDdval = this.tenantRoleService.soRolesOptions.filter(role => role.code !== 1)[0];
                 }
@@ -241,7 +242,14 @@ private sellerCompanySearchTimer: any;
                     this.roleDdval = this.tenantRoleService.poRolesOptions.filter(role => role.code !== 2)[0];
                 }
             }
-            this.handleRoleChange({ value: this.l(this.roleDdval)  });
+            this.roleDdval = {
+    ...this.roleDdval,
+    name: this.l(this.roleDdval.name)
+};
+
+
+            this.handleRoleChange({ value: this.roleDdval  });
+        
         })
     }
     getBranches(accountSSIN, objectToChangeName) {
@@ -1074,7 +1082,8 @@ handleSellerNameSearch(event: any) {
                     //         "currencyCode",
                     //         JSON.stringify(null)
                     //     );
-                    // } else {
+                    // }
+                    // else {
                     //     localStorage.setItem(
                     //         "BuyerSSIN",
                     //         JSON.stringify(this.buyerCompanySSIN)
@@ -1162,7 +1171,8 @@ this.currencyCode = transactionCurrencyCode;
         this.buyerContacts = [];
         this.orderForm.reset();
         this.role = "";
-        this.Role.value = {};
+        // this.Role.value = {};
+        this.roleDdval = null;
         this.submitted = false;
         this.isSellerCompanyIdExist = false;
         this.invalidSellerPhoneNumber = "";
@@ -1228,7 +1238,8 @@ this.currencyCode = transactionCurrencyCode;
         this.role = "";
         this.modalClose.emit(false);
         this.display = false;
-        this.Role.value = {};
+        // this.Role.value = {};
+        this.roleDdval = null;
         this.submitted = false;
         this.invalidSellerPhoneNumber = "";
         this.invalidBuyerPhoneNumber = "";
