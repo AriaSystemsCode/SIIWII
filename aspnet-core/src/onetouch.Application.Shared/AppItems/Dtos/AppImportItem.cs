@@ -22,7 +22,7 @@ namespace onetouch.AppItems.Dtos
     }
     public class PriceImportFailureLogDto
     {
-        public string AppItemCode { get; set; }   // StyMajor
+        public string AppItemCode { get; set; }
         public string SSIN { get; set; }
         public string Currency { get; set; }
         public string Price { get; set; }

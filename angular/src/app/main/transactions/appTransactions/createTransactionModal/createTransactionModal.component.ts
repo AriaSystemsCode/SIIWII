@@ -7,6 +7,7 @@ import {
     EventEmitter,
     Input,
     ViewChild,
+    SimpleChanges,
 } from "@angular/core";
 import { SelectItem } from "primeng/api";
 import {
@@ -94,7 +95,7 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit, 
     invalidSellerPhoneNumber = "";
     invalidBuyerContactEMailAddress = "";
     invalidSellerContactEMailAddress = "";
-    sellerPhoneLabel: string =  this.l('PhoneNumber');
+    sellerPhoneLabel: string = this.l('PhoneNumber');
     buyerPhoneLabel: string = this.l('PhoneNumber');
     showAdd: boolean = false
 
@@ -132,23 +133,23 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit, 
     isSeller: boolean = false;
 
     primeDateFormat = 'mm/dd/yy'; // default
-    languageSettingName  =AppConsts.languageSettingName;
-    currentLang:string
-    isArabic:boolean = true
-    showSellerRelationshipIcon:boolean=false;
-    showBuyerRelationshipIcon:boolean=false;
-    buyerRelationshipName:string="";
-    sellerRelationshipName:string="";
+    languageSettingName = AppConsts.languageSettingName;
+    currentLang: string
+    isArabic: boolean = true
+    showSellerRelationshipIcon: boolean = false;
+    showBuyerRelationshipIcon: boolean = false;
+    buyerRelationshipName: string = "";
+    sellerRelationshipName: string = "";
     buyerCompanyRelationId;
     sellerCompanyRelationId;
 
     private buyerCompanyLoadedKey = '';
-private sellerCompanyLoadedKey = '';
-private buyerContactsLoadedCompanyId: number | null = null;
-private sellerContactsLoadedCompanyId: number | null = null;
+    private sellerCompanyLoadedKey = '';
+    private buyerContactsLoadedCompanyId: number | null = null;
+    private sellerContactsLoadedCompanyId: number | null = null;
 
-private buyerCompanySearchTimer: any;
-private sellerCompanySearchTimer: any;
+    private buyerCompanySearchTimer: any;
+    private sellerCompanySearchTimer: any;
 
     constructor(
         injector: Injector,
@@ -194,8 +195,8 @@ private sellerCompanySearchTimer: any;
         this.orderForm.controls['startDate'].setValue(new Date());
         this.orderForm.controls['enteredDate'].setValue(new Date());
         this.buyerCompanySSIN = ''
-        this.sellerCompanyRelationId="";
-        this.buyerCompanyRelationId="";
+        this.sellerCompanyRelationId = "";
+        this.buyerCompanyRelationId = "";
     }
 
     updateControlState() {
@@ -211,21 +212,23 @@ private sellerCompanySearchTimer: any;
     }
 
 
-    ngOnChanges() {
-        this.getCurrencies();
-        this.allPriceLevel = this.getPriceLevel();
-        this.updateControlState()
-        this.initForm()
-        this.changeStartDate(this.orderForm.get('startDate'));
-        this.getUserDefultRole();
+    ngOnChanges(changes: SimpleChanges) {
+        if (changes['display']?.currentValue === true) {
+            this.getCurrencies();
+            this.allPriceLevel = this.getPriceLevel();
+            this.updateControlState();
+            this.initForm();
+            this.changeStartDate(this.orderForm.get('startDate'));
+            this.getUserDefultRole();
+        }
     }
 
     getUserDefultRole() {
         this._AppTransactionServiceProxy.getUserDefaultRole(this.formType?.toUpperCase()).subscribe(result => {
             if (this.formType?.toUpperCase() == "SO") {
                 if (result?.toLowerCase()?.includes('seller') && this.tenantRoleService.soRolesOptions
-  .map(x => x.name?.toLowerCase())
-  .some(x => x.includes('seller'))) {
+                    .map(x => x.name?.toLowerCase())
+                    .some(x => x.includes('seller'))) {
                     this.roleDdval = this.tenantRoleService.soRolesOptions.filter(role => role.code == 1)[0];
 
 
@@ -233,9 +236,9 @@ private sellerCompanySearchTimer: any;
                     this.roleDdval = this.tenantRoleService.soRolesOptions.filter(role => role.code !== 1)[0];
                 }
             } else if (this.formType?.toUpperCase() == "PO") {
-                if (result?.toLowerCase()?.includes('buyer')&&  this.tenantRoleService.poRolesOptions
-  .map(x => x.name?.toLowerCase())
-  .some(x => x.includes('buyer'))) {
+                if (result?.toLowerCase()?.includes('buyer') && this.tenantRoleService.poRolesOptions
+                    .map(x => x.name?.toLowerCase())
+                    .some(x => x.includes('buyer'))) {
                     this.roleDdval = this.tenantRoleService.poRolesOptions.filter(role => role.code == 2)[0];
 
                 } else {
@@ -243,13 +246,13 @@ private sellerCompanySearchTimer: any;
                 }
             }
             this.roleDdval = {
-    ...this.roleDdval,
-    name: this.l(this.roleDdval.name)
-};
+                ...this.roleDdval,
+                name: this.l(this.roleDdval.name)
+            };
 
 
-            this.handleRoleChange({ value: this.roleDdval  });
-        
+            this.handleRoleChange({ value: this.roleDdval });
+
         })
     }
     getBranches(accountSSIN, objectToChangeName) {
@@ -310,6 +313,7 @@ private sellerCompanySearchTimer: any;
 
     }
     handleRoleChange(data: any) {
+
         this.role = data?.value?.name;
         this.handleSellerCompanySearch('')
         this.handleBuyerCompanySearch('')
@@ -319,17 +323,25 @@ private sellerCompanySearchTimer: any;
             this.isSeller = true;
             this.isBuyer = false;
             this.buyerContacts = [];
+            const selectedCode = data.value.code;
             this._AppTransactionServiceProxy
                 .getCurrentTenantAccountProfileInformation()
                 .subscribe((res: any) => {
+                    if (this.roleDdval?.code !== selectedCode) {
+                        return;
+                    }
+
                     this.sellerCompanyId = res.id;
-                    this.sellerCompanySSIN = res.accountSSIN;
+                    this.updateSellerSSIN(res.accountSSIN);
+
                     this.isSellerCompanyIdExist = true;
                     this.isCompantIdExist = false;
+
                     this.handleSellerNameSearch("");
+
                     // add seller values
                     // this.selectedSellerContact = { name: `${this.appSession?.user?.name}  ${this.appSession?.user?.surname}` }
-                    
+
 
                     this.orderForm.get("sellerCompanyName").setValue(res.name);
                     this.orderForm.get('sellerContactPhoneNumber').setValue(res.phone)
@@ -350,6 +362,7 @@ private sellerCompanySearchTimer: any;
             this.isSeller = false;
             this.isBuyer = true;
             this.sellerContacts = [];
+            this.updateSellerSSIN('');
             this._AppTransactionServiceProxy
                 .getCurrentTenantAccountProfileInformation()
                 .subscribe((res: any) => {
@@ -393,6 +406,9 @@ private sellerCompanySearchTimer: any;
             this.isBuyer = false;
             this.isCompantIdExist = false;
             this.isSellerCompanyIdExist = false;
+            this.updateSellerSSIN('');
+            this.sellerCompanyId = 0;
+
             // remove seller values
             this.orderForm.get("sellerContactName").reset();
             this.orderForm.get("sellerCompanyName").reset();
@@ -406,77 +422,77 @@ private sellerCompanySearchTimer: any;
 
     }
 
-handleBuyerCompanySearch(event: any) {
-    const filter = typeof event === 'string' ? event : (event?.filter ?? '');
-    const type = this.role == "I'm an Independent buying office."
-        ? 'SO'
-        : this.formType?.toUpperCase();
+    handleBuyerCompanySearch(event: any) {
+        const filter = typeof event === 'string' ? event : (event?.filter ?? '');
+        const type = this.role == "I'm an Independent buying office."
+            ? 'SO'
+            : this.formType?.toUpperCase();
 
-    const key = `${filter}|${type}|${this.role}`;
+        const key = `${filter}|${type}|${this.role}`;
 
-    if (this.buyerCompanyLoadedKey === key && this.buyerCompanies?.length) return;
+        if (this.buyerCompanyLoadedKey === key && this.buyerCompanies?.length) return;
 
-    clearTimeout(this.buyerCompanySearchTimer);
+        clearTimeout(this.buyerCompanySearchTimer);
 
-    this.buyerCompanySearchTimer = setTimeout(() => {
-        this.buyerCompanyLoadedKey = key;
+        this.buyerCompanySearchTimer = setTimeout(() => {
+            this.buyerCompanyLoadedKey = key;
 
-        this._AppTransactionServiceProxy
-            .getRelatedAccounts(
-                filter,
-                undefined, undefined, undefined, undefined,
-                undefined, undefined, undefined, undefined, undefined,
-                undefined, undefined, undefined, undefined, undefined,
-                undefined, undefined, undefined, undefined, undefined, undefined,
-                true,
-                type,
-                this.role
-            )
-            .subscribe((res: any) => {
-                this.buyerCompanies = [...(res.items || [])];
-            });
-    }, 300);
-}
+            this._AppTransactionServiceProxy
+                .getRelatedAccounts(
+                    filter,
+                    undefined, undefined, undefined, undefined,
+                    undefined, undefined, undefined, undefined, undefined,
+                    undefined, undefined, undefined, undefined, undefined,
+                    undefined, undefined, undefined, undefined, undefined, undefined,
+                    true,
+                    type,
+                    this.role
+                )
+                .subscribe((res: any) => {
+                    this.buyerCompanies = [...(res.items || [])];
+                });
+        }, 300);
+    }
 
-handleSellerCompanySearch(event: any) {
-    const filter = typeof event === 'string' ? event : (event?.filter ?? '');
-    const type = this.role == "I'm an Independent Sales Rep."
-        ? 'PO'
-        : this.formType?.toUpperCase();
+    handleSellerCompanySearch(event: any) {
+        const filter = typeof event === 'string' ? event : (event?.filter ?? '');
+        const type = this.role == "I'm an Independent Sales Rep."
+            ? 'PO'
+            : this.formType?.toUpperCase();
 
-    const key = `${filter}|${type}|${this.role}`;
+        const key = `${filter}|${type}|${this.role}`;
 
-    if (this.sellerCompanyLoadedKey === key && this.sellerCompanies?.length) return;
+        if (this.sellerCompanyLoadedKey === key && this.sellerCompanies?.length) return;
 
-    clearTimeout(this.sellerCompanySearchTimer);
+        clearTimeout(this.sellerCompanySearchTimer);
 
-    this.sellerCompanySearchTimer = setTimeout(() => {
-        this.sellerCompanyLoadedKey = key;
+        this.sellerCompanySearchTimer = setTimeout(() => {
+            this.sellerCompanyLoadedKey = key;
 
-        this._AppTransactionServiceProxy
-            .getRelatedAccounts(
-                filter,
-                undefined, undefined, undefined, undefined,
-                undefined, undefined, undefined, undefined, undefined,
-                undefined, undefined, undefined, undefined, undefined,
-                undefined, undefined, undefined, undefined, undefined, undefined,
-                true,
-                type,
-                this.role
-            )
-            .subscribe((res: any) => {
-                this.sellerCompanies = [...(res.items || [])];
-            });
-    }, 300);
-}
-      
+            this._AppTransactionServiceProxy
+                .getRelatedAccounts(
+                    filter,
+                    undefined, undefined, undefined, undefined,
+                    undefined, undefined, undefined, undefined, undefined,
+                    undefined, undefined, undefined, undefined, undefined,
+                    undefined, undefined, undefined, undefined, undefined, undefined,
+                    true,
+                    type,
+                    this.role
+                )
+                .subscribe((res: any) => {
+                    this.sellerCompanies = [...(res.items || [])];
+                });
+        }, 300);
+    }
+
 
     handleBuyerCompanyChange(event: any) {
         this.searchTerm = ''
         this.selectedBuyerContact = ''
         this.buyerComapnyId = event.value.id;
         this.buyerCompanySSIN = event.value.accountSSIN;
-        this.buyerCompanyRelationId=event.value.relationId;
+        this.buyerCompanyRelationId = event.value.relationId;
         this.currencyCode = event.value.currencyCode;
         this.areSame = false
         this.orderForm.get('buyerContactPhoneNumber').setValue(event.value.phone)
@@ -485,16 +501,18 @@ handleSellerCompanySearch(event: any) {
         this.buyerBranches = [];
         this.getBranches(this.buyerCompanySSIN, 'buyer')
 
-          this.showBuyerRelationshipIcon = true;
-       this.getBuyerRelationshipName ();
+        this.showBuyerRelationshipIcon = true;
+        this.getBuyerRelationshipName();
     }
 
     handleSellerCompanyChange(event: any) {
+
         this.selectedSellerContact = ''
 
         this.sellerCompanyId = event.value.id;
-        this.sellerCompanySSIN = event.value.accountSSIN;
-        this.sellerCompanyRelationId=event.value.relationId;
+        this.updateSellerSSIN(event.value.accountSSIN);
+
+        this.sellerCompanyRelationId = event.value.relationId;
 
         this.sellerCurrencyCode = event.value.currencyCode;
         this.areSame = false
@@ -504,7 +522,7 @@ handleSellerCompanySearch(event: any) {
         this.sellerBranches = [];
         this.getBranches(this.sellerCompanySSIN, 'seller')
 
-         this.showSellerRelationshipIcon = true;
+        this.showSellerRelationshipIcon = true;
         this.getSellerRelationshipName();
     }
 
@@ -525,7 +543,7 @@ handleSellerCompanySearch(event: any) {
         }
     }
 
-    
+
     getSellerRelationshipName() {
         const lowerRole = this.role?.toLowerCase();
 
@@ -546,67 +564,67 @@ handleSellerCompanySearch(event: any) {
 
 
     loadInitialContacts() {
-    if (!this.buyerComapnyId) return;
+        if (!this.buyerComapnyId) return;
 
-    if (this.buyerContactsLoadedCompanyId === this.buyerComapnyId && this.buyerContacts?.length) {
-        this.filteredBuyerContacts = [...this.buyerContacts];
-        return;
-    }
-
-    this.buyerContactsLoadedCompanyId = this.buyerComapnyId;
-
-    this._AppTransactionServiceProxy
-        .getAccountRelatedContacts(this.buyerComapnyId, '')
-        .subscribe((res: any) => {
-            this.buyerContacts = res || [];
+        if (this.buyerContactsLoadedCompanyId === this.buyerComapnyId && this.buyerContacts?.length) {
             this.filteredBuyerContacts = [...this.buyerContacts];
-        });
-}
+            return;
+        }
 
-loadInitialSellerContacts() {
-    if (!this.sellerCompanyId) return;
+        this.buyerContactsLoadedCompanyId = this.buyerComapnyId;
 
-    if (this.sellerContactsLoadedCompanyId === this.sellerCompanyId && this.sellerContacts?.length) {
-        this.filteredSellerContacts = [...this.sellerContacts];
-        return;
+        this._AppTransactionServiceProxy
+            .getAccountRelatedContacts(this.buyerComapnyId, '')
+            .subscribe((res: any) => {
+                this.buyerContacts = res || [];
+                this.filteredBuyerContacts = [...this.buyerContacts];
+            });
     }
 
-    this.sellerContactsLoadedCompanyId = this.sellerCompanyId;
+    loadInitialSellerContacts() {
+        if (!this.sellerCompanyId) return;
 
-    this._AppTransactionServiceProxy
-        .getAccountRelatedContacts(this.sellerCompanyId, '')
-        .subscribe((res: any) => {
-            this.sellerContacts = res || [];
+        if (this.sellerContactsLoadedCompanyId === this.sellerCompanyId && this.sellerContacts?.length) {
             this.filteredSellerContacts = [...this.sellerContacts];
-        });
-}
+            return;
+        }
 
+        this.sellerContactsLoadedCompanyId = this.sellerCompanyId;
 
-  handleBuyerNameSearch(event: any) {
-    const query = (event?.query || '').toLowerCase();
-
-    if (!this.buyerContacts?.length) {
-        this.loadInitialContacts();
-        return;
+        this._AppTransactionServiceProxy
+            .getAccountRelatedContacts(this.sellerCompanyId, '')
+            .subscribe((res: any) => {
+                this.sellerContacts = res || [];
+                this.filteredSellerContacts = [...this.sellerContacts];
+            });
     }
 
-    this.filteredBuyerContacts = this.buyerContacts.filter(x =>
-        x?.name?.toLowerCase().includes(query)
-    );
-}
 
-handleSellerNameSearch(event: any) {
-    const query = (event?.query || '').toLowerCase();
+    handleBuyerNameSearch(event: any) {
+        const query = (event?.query || '').toLowerCase();
 
-    if (!this.sellerContacts?.length) {
-        this.loadInitialSellerContacts();
-        return;
+        if (!this.buyerContacts?.length) {
+            this.loadInitialContacts();
+            return;
+        }
+
+        this.filteredBuyerContacts = this.buyerContacts.filter(x =>
+            x?.name?.toLowerCase().includes(query)
+        );
     }
 
-    this.filteredSellerContacts = this.sellerContacts.filter(x =>
-        x?.name?.toLowerCase().includes(query)
-    );
-}
+    handleSellerNameSearch(event: any) {
+        const query = (event?.query || '').toLowerCase();
+
+        if (!this.sellerContacts?.length) {
+            this.loadInitialSellerContacts();
+            return;
+        }
+
+        this.filteredSellerContacts = this.sellerContacts.filter(x =>
+            x?.name?.toLowerCase().includes(query)
+        );
+    }
 
     handleBuyerNameChange(event: any) {
 
@@ -633,29 +651,29 @@ handleSellerNameSearch(event: any) {
     }
     private preselectSellerContact(): void {
         this._AppTransactionServiceProxy
-          .getAccountRelatedContacts(this.sellerCompanyId, '')
-          .subscribe((res: any[]) => {
-            this.sellerContacts = res || [];
-            this.filteredSellerContacts = this.sellerContacts;
-      
-            const userEmail = (this.appSession?.user?.emailAddress || '').toLowerCase();
-      
-            const pick =
-              this.sellerContacts.find(c => (c.email || '').toLowerCase() === userEmail) ||
-              this.sellerContacts.find(c => c.isDefault) ||
-              this.sellerContacts[0];
-      
-            if (pick) {
-              // set the control value so the UI shows the selected contact
-              this.orderForm.get('sellerContactName')?.setValue(pick);
-              this.selectedSellerContact = pick;
-      
-              // reuse your existing logic to fill ssin/id/phone/email
-              this.handleSellerNameChange(pick);
-            }
-          });
-      }
-      
+            .getAccountRelatedContacts(this.sellerCompanyId, '')
+            .subscribe((res: any[]) => {
+                this.sellerContacts = res || [];
+                this.filteredSellerContacts = this.sellerContacts;
+
+                const userEmail = (this.appSession?.user?.emailAddress || '').toLowerCase();
+
+                const pick =
+                    this.sellerContacts.find(c => (c.email || '').toLowerCase() === userEmail) ||
+                    this.sellerContacts.find(c => c.isDefault) ||
+                    this.sellerContacts[0];
+
+                if (pick) {
+                    // set the control value so the UI shows the selected contact
+                    this.orderForm.get('sellerContactName')?.setValue(pick);
+                    this.selectedSellerContact = pick;
+
+                    // reuse your existing logic to fill ssin/id/phone/email
+                    this.handleSellerNameChange(pick);
+                }
+            });
+    }
+
     handleSellerNameChange(event: any) {
 
         this.sellerContactId = event?.id;
@@ -717,7 +735,7 @@ handleSellerNameSearch(event: any) {
             if (
                 this.orderForm.get("sellerContactPhoneNumber")?.value && this.orderForm.get("sellerContactPhoneNumber")?.value?.length < 5
             )
-                this.invalidSellerPhoneNumber =  this.l('SellerPhoneNumberTooShort');
+                this.invalidSellerPhoneNumber = this.l('SellerPhoneNumberTooShort');
 
             if (
                 this.orderForm.get("sellerContactPhoneNumber")?.value && this.orderForm.get("sellerContactPhoneNumber")?.value?.length >
@@ -743,7 +761,7 @@ handleSellerNameSearch(event: any) {
             if (
                 this.orderForm.get("sellerContactEMailAddress")?.value && this.orderForm.get("sellerContactEMailAddress")?.value?.length > 100
             )
-                this.invalidSellerContactEMailAddress =  this.l('EmailAddressTooLong');
+                this.invalidSellerContactEMailAddress = this.l('EmailAddressTooLong');
 
 
             if (this.invalidSellerPhoneNumber || this.invalidBuyerPhoneNumber || this.invalidBuyerContactEMailAddress || this.invalidSellerContactEMailAddress)
@@ -817,10 +835,10 @@ handleSellerNameSearch(event: any) {
                         buyerBranchName: this.isBuyerTempAccount ? this.orderForm.controls['buyerBranchName']?.setValue('Main') : this.orderForm.controls['buyerCompanyBranch']?.value?.name,
                         sellerBranchSSIN: this.orderForm.controls['sellerCompanyBranch']?.value?.ssin,
                         sellerBranchName: this.orderForm.controls['sellerCompanyBranch']?.value?.name,
-                        completeDate: this.isArabic ? this.orderForm.controls['completeDate']?.value :  moment(this.orderForm.controls['completeDate']?.value).format('YYYY-MM-DD'),
-                        enteredDate:this.isArabic ? this.orderForm.controls['enteredDate']?.value: moment(this.orderForm.controls['enteredDate']?.value).format('YYYY-MM-DD'),
-                        startDate: this.isArabic ? this.orderForm.controls['startDate']?.value:  moment(this.orderForm.controls['startDate']?.value).format('YYYY-MM-DD'),
-                        availableDate: this.isArabic? this.orderForm.controls['availableDate']?.value  : moment(this.orderForm.controls['availableDate']?.value).format('YYYY-MM-DD'),
+                        completeDate: this.isArabic ? this.orderForm.controls['completeDate']?.value : moment(this.orderForm.controls['completeDate']?.value).format('YYYY-MM-DD'),
+                        enteredDate: this.isArabic ? this.orderForm.controls['enteredDate']?.value : moment(this.orderForm.controls['enteredDate']?.value).format('YYYY-MM-DD'),
+                        startDate: this.isArabic ? this.orderForm.controls['startDate']?.value : moment(this.orderForm.controls['startDate']?.value).format('YYYY-MM-DD'),
+                        availableDate: this.isArabic ? this.orderForm.controls['availableDate']?.value : moment(this.orderForm.controls['availableDate']?.value).format('YYYY-MM-DD'),
                         reference: this.orderForm.controls['reference']?.value ? this.orderForm.controls['reference']?.value : "",
                         priceLevel: this.orderForm.controls['priceLevel']?.value ? this.orderForm.controls['priceLevel']?.value : "MSRP",
                         currencyId: this.orderForm.controls['currencyId']?.value ? this.orderForm.controls['currencyId']?.value : this.appSession.tenant.currencyInfoDto.value
@@ -1020,7 +1038,7 @@ handleSellerNameSearch(event: any) {
             this.showMainSpinner();
             this.btnLoader = true;
 
-            this.body.buyerRelationId  = this.sellerCompanyRelationId;
+            this.body.buyerRelationId = this.sellerCompanyRelationId;
             this.body.sellerRelationId = this.buyerCompanyRelationId;
             this._AppTransactionServiceProxy
                 .createOrEdit(this.body)
@@ -1031,7 +1049,7 @@ handleSellerNameSearch(event: any) {
                     localStorage.removeItem("productFilters");
                 }))
                 .subscribe((response: any) => {
-                              
+
                     localStorage.setItem("transId", JSON.stringify(response));
 
                     if (this.setCurrentUserActiveTransaction) {
@@ -1072,10 +1090,10 @@ handleSellerNameSearch(event: any) {
                         JSON.stringify(this.buyerContactSSIN)
                     );
 
-                    sessionStorage.setItem(
-                        "SellerSSIN",
-                        JSON.stringify(this.sellerCompanySSIN)
-                    );
+                    // sessionStorage.setItem(
+                    //     "SellerSSIN",
+                    //     JSON.stringify(this.sellerCompanySSIN)
+                    // );
 
                     // if (this.isBuyerTempAccount) {
                     //     localStorage.setItem(
@@ -1098,18 +1116,18 @@ handleSellerNameSearch(event: any) {
                     //         JSON.stringify(this.sellerCurrencyCode)
                     //     );
                     // }
-if (!this.isBuyerTempAccount) {
-    localStorage.setItem("BuyerSSIN", JSON.stringify(this.buyerCompanySSIN));
-}
+                    if (!this.isBuyerTempAccount) {
+                        localStorage.setItem("BuyerSSIN", JSON.stringify(this.buyerCompanySSIN));
+                    }
 
-const transactionCurrencyCode = this.getTransactionCurrencyCode();
+                    const transactionCurrencyCode = this.getTransactionCurrencyCode();
 
-localStorage.setItem(
-    "currencyCode",
-    JSON.stringify(transactionCurrencyCode)
-);
+                    localStorage.setItem(
+                        "currencyCode",
+                        JSON.stringify(transactionCurrencyCode)
+                    );
 
-this.currencyCode = transactionCurrencyCode;
+                    this.currencyCode = transactionCurrencyCode;
                     if (this.currencyCode) {
                         this._AppMarketplaceItemsServiceProxy
                             .checkCurrencyExchangeRate(this.currencyCode)
@@ -1121,7 +1139,7 @@ this.currencyCode = transactionCurrencyCode;
                                         icon: "info",
                                         showCancelButton: false,
                                         confirmButtonText:
-                                          this.l('Ok') ,
+                                            this.l('Ok'),
                                         allowOutsideClick: false,
                                         allowEscapeKey: false,
                                         backdrop: true,
@@ -1205,8 +1223,8 @@ this.currencyCode = transactionCurrencyCode;
 
     ngOnInit(): void {
         this.primeDateFormat = this.languageSettingName != 'en-GB'
-        ? 'mm/dd/yy'
-        : 'dd/mm/yy';
+            ? 'mm/dd/yy'
+            : 'dd/mm/yy';
         this.today = new Date()
         this.updateControlState()
         this.initForm()
@@ -1219,7 +1237,7 @@ this.currencyCode = transactionCurrencyCode;
         this.minDate.setMonth(prevMonth);
         this.minDate.setFullYear(prevYear);
         this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
-        this.currentLang == 'ar' || this.currentLang == 'ar-EG'  ? this.isArabic = true : this.isArabic = false
+        this.currentLang == 'ar' || this.currentLang == 'ar-EG' ? this.isArabic = true : this.isArabic = false
 
     }
 
@@ -1251,17 +1269,35 @@ this.currencyCode = transactionCurrencyCode;
         this.sellerRelationshipName = '';
         this.sellerCompanyRelationId = "";
         this.buyerCompanyRelationId = "";
-}
+    }
 
-private getTransactionCurrencyCode(): string {
-    if (this.formType?.toUpperCase() === 'SO') {
+    private getTransactionCurrencyCode(): string {
+          if (this.formType?.toUpperCase() === 'SO') {
+        // Sales Order -> Buyer currency
         return this.currencyCode || this.appSession.tenant.currencyInfoDto?.code || 'USD';
     }
 
     if (this.formType?.toUpperCase() === 'PO') {
-        return this.sellerCurrencyCode || this.appSession.tenant.currencyInfoDto?.code || 'USD';
+        // Purchase Order -> Buyer currency
+        return this.currencyCode || this.appSession.tenant.currencyInfoDto?.code || 'USD';
     }
 
     return this.appSession.tenant.currencyInfoDto?.code || 'USD';
-}
+    }
+
+    private updateSellerSSIN(value: string): void {
+
+        this.sellerCompanySSIN = value || '';
+
+        if (this.sellerCompanySSIN) {
+            sessionStorage.setItem(
+                'SellerSSIN',
+                JSON.stringify(this.sellerCompanySSIN)
+            );
+        } else {
+            sessionStorage.removeItem('SellerSSIN');
+        }
+    }
+
+
 }

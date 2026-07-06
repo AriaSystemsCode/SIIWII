@@ -2467,6 +2467,7 @@
 		<text name="fromDateUpcomingEventsErroMessage">Main filter type will be changed to all events as you choose 'From Date' on the past</text>
 		<text name="toDatePriorEventsErroMessage">Main filter type will be changed to all events as you choose 'To Date' on the futrue</text>
 		<text name="UploadAvailableInventory"> Upload Available Inventory</text>
+		<text name="ImportCustomprices">Import Custom prices</text>
 		<text name="TotalQty">Total Qty</text>
 		<text name="ImportQtysuccessfully">Import Qty successfully</text>
 		<text name="TotalpassedQty">Total passed Qty</text>

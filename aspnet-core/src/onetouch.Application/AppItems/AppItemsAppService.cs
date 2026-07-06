@@ -9,6 +9,7 @@ using Abp.Domain.Repositories;
 using Abp.Domain.Uow;
 using Abp.EntityFrameworkCore.Uow;
 using Abp.Linq.Extensions;
+using Abp.Timing;
 using Abp.UI;
 using AutoMapper;
 using Bytescout.Spreadsheet;
@@ -115,6 +116,7 @@ namespace onetouch.AppItems
         private readonly SycEntityObjectCategoriesAppService _sycEntityObjectCategoriesAppService;
         private readonly ISycAttachmentCategoriesAppService _sSycAttachmentCategoriesAppService;
         private readonly IRepository<AppItemPrices, long> _appItemPricesRepository;
+        private readonly IRepository<AppContact, long> _appContactRepository;
         private readonly IRepository<AppItemSizeScalesHeader, long> _appItemSizeScalesHeaderRepository;
         private readonly IRepository<AppItemSizeScalesDetails, long> _appItemSizeScalesDetailRepository;
         private readonly SycIdentifierDefinitionsAppService _iAppSycIdentifierDefinitionsService;
@@ -169,7 +171,8 @@ namespace onetouch.AppItems
              IRepository<AppMarketplaceItemsListDetails, long> appMarketplaceItemsListDetails, IRepository<ValidationRule> validationRuleRepo,
              IRepository<AppEntitiesRelationship, long> appEntitiesRelationship,
              IBackgroundJobManager backgroundJobManager,
-             IAbpStartupConfiguration abpStartupConfiguration
+             IAbpStartupConfiguration abpStartupConfiguration,
+             IRepository<AppContact, long> appContactRepository
             )
         {
             _backgroundJobManager = backgroundJobManager;
@@ -205,6 +208,7 @@ namespace onetouch.AppItems
             _appSizeScalesHeaderRepository = appSizeScalesHeaderRepository;
             _appSizeScaleAppService = appSizeScaleAppService;
             _appItemPricesRepository = appItemPricesRepository;
+            _appContactRepository = appContactRepository;
             _sycEntityObjectClassificationsAppService = sycEntityObjectClassificationsAppService;
             _sycEntityObjectCategoriesAppService = sycEntityObjectCategoriesAppService;
             _sSycAttachmentCategoriesAppService = sSycAttachmentCategoriesAppService;
@@ -617,7 +621,12 @@ namespace onetouch.AppItems
                     .Where(x => x.ParentId == appItemId).ToListAsync();
                 if (appItems != null && appItems.Count > 0)
                 {
-                    var filteredItems = appItems.Where(x => x.EntityFk.EntityExtraData.Where(z => z.AttributeId == attributeId && z.AttributeValue.ToUpper() == attributeCode.ToUpper()).Count() > 0).ToList();
+                    var filteredItems = appItems.Where(x => x.EntityFk.EntityExtraData
+                        .Any(z => z.AttributeId == attributeId
+                                  && !string.IsNullOrEmpty(z.AttributeValue)
+                                  && !string.IsNullOrEmpty(attributeCode)
+                                  && string.Equals(z.AttributeValue, attributeCode, StringComparison.OrdinalIgnoreCase)))
+                        .ToList();
                     foreach (var item in filteredItems)
                     {
                         var extraAttributes = item.EntityFk.EntityExtraData.Where(z => (item.EntityFk.EntityExtraData.Count() > 1 ? z.AttributeId != attributeId : z.AttributeId == attributeId) && z.AttributeValue != null).ToList();
@@ -733,6 +742,7 @@ namespace onetouch.AppItems
                     appItem.EntityFk.EntitiesRelationships = new List<AppEntitiesRelationship>();
                 }
 
+                appItem.ParentFkList = varAppItems;
                 var output = new GetAppItemDetailForViewDto { AppItem = ObjectMapper.Map<AppItemForViewDto>(appItem) };
                 if (appItem.ManufacturerCode == null && (appItem.TenantOwner == AbpSession.TenantId || appItem.TenantOwner == null || appItem.TenantOwner == 0))
                 {
@@ -880,26 +890,53 @@ namespace onetouch.AppItems
 
                     string variations = appItem.Variations;
                     output.AppItem.variations = new List<ExtraDataAttrDto>();
-                    if (!string.IsNullOrEmpty(variations) && varAppItems.Count > 0)
+                    if (varAppItems.Count > 0)
                     {
                         string firstAttributeId = "";
-                        var frstAttId = varAppItems.Select(x => x.EntityFk.EntityAttachments.Where(z => z.Attributes.Contains("=")).Select(a => a.Attributes)).FirstOrDefault();
+                        var frstAttId = varAppItems.Select(x => x.EntityFk.EntityAttachments.Where(z => !string.IsNullOrEmpty(z.Attributes) && z.Attributes.Contains("=")).Select(a => a.Attributes)).FirstOrDefault();
                         if (frstAttId != null && frstAttId.Count() > 0)
                             firstAttributeId = frstAttId.FirstOrDefault().ToString().Split("=")[0];
 
                         var firstItem = varAppItems.FirstOrDefault();
-                        List<string> attributeValues = firstItem.EntityFk.EntityExtraData.Select(x => x.EntityObjectTypeCode).Distinct().ToList();
-                        List<string> attributeIDs = firstItem.EntityFk.EntityExtraData.Select(x => x.AttributeId.ToString()).Distinct().ToList();
-                        var firstAttributeID = firstItem.EntityFk.EntityExtraData.WhereIf(!string.IsNullOrEmpty(firstAttributeId), a => a.AttributeId == long.Parse(firstAttributeId)).Select(x => x.AttributeId)
-                            .FirstOrDefault().ToString();
+                        var selectableExtraData = firstItem.EntityFk.EntityExtraData
+                            .Where(x => !string.IsNullOrEmpty(x.EntityObjectTypeCode)
+                                        && !string.IsNullOrEmpty(x.AttributeValue)
+                                        && !string.IsNullOrEmpty(x.AttributeCode))
+                            .GroupBy(x => x.AttributeId)
+                            .Select(x => x.First())
+                            .ToList();
+                        if (selectableExtraData.Count == 0)
+                        {
+                            selectableExtraData = firstItem.EntityFk.EntityExtraData
+                                .Where(x => !string.IsNullOrEmpty(x.EntityObjectTypeCode))
+                                .GroupBy(x => x.AttributeId)
+                                .Select(x => x.First())
+                                .ToList();
+                        }
+
+                        AppEntityExtraData firstAttribute = null;
+                        if (!string.IsNullOrEmpty(firstAttributeId) && long.TryParse(firstAttributeId, out var firstAttributeIdLongFromImage))
+                        {
+                            firstAttribute = selectableExtraData.FirstOrDefault(a => a.AttributeId == firstAttributeIdLongFromImage);
+                        }
+                        firstAttribute = firstAttribute
+                                         ?? selectableExtraData.FirstOrDefault(a => a.EntityObjectTypeCode == "COLOR")
+                                         ?? selectableExtraData.FirstOrDefault();
+
+                        selectableExtraData = selectableExtraData
+                            .Where(x => x.AttributeId == firstAttribute.AttributeId)
+                            .Concat(selectableExtraData.Where(x => x.AttributeId != firstAttribute.AttributeId))
+                            .ToList();
+
+                        List<string> attributeValues = selectableExtraData.Select(x => x.EntityObjectTypeCode).Distinct().ToList();
+                        List<string> attributeIDs = selectableExtraData.Select(x => x.AttributeId.ToString()).Distinct().ToList();
+                        var firstAttributeID = firstAttribute.AttributeId.ToString();
                         var secondAttId = attributeIDs.FirstOrDefault(a => a != firstAttributeID.ToString());
-                        var firstAttributeValue = firstItem.EntityFk.EntityExtraData
-                            .WhereIf(!string.IsNullOrEmpty(firstAttributeId), a => a.AttributeId == long.Parse(firstAttributeId))
-                            .Where(x => !string.IsNullOrEmpty(x.EntityObjectTypeCode)).Select(x => x.EntityObjectTypeCode.ToString()).FirstOrDefault();
+                        var firstAttributeValue = firstAttribute.EntityObjectTypeCode.ToString();
                         var firstattributeValues = varAppItems.Select(x => x.EntityFk.EntityExtraData.Where(z => z.AttributeId == long.Parse(firstAttributeID))
                                                    .Select(z => z.AttributeValue)).Distinct().Select(a => a.FirstOrDefault()).Distinct().ToList();//.ToList().FirstOrDefault().Distinct().ToList();
                         int firstattributeValuesCount = firstattributeValues.Count();
-                        var firstattributeDefaultImages1 = varAppItems.Select(x => x.EntityFk.EntityAttachments.Where(z => z.Attributes.Contains(firstAttributeID) & z.IsDefault).Select(z => new { z.AttachmentFk.Attachment, z.Attributes })).ToList().Distinct().ToList().Distinct().ToList();
+                        var firstattributeDefaultImages1 = varAppItems.Select(x => x.EntityFk.EntityAttachments.Where(z => !string.IsNullOrEmpty(z.Attributes) && z.Attributes.Contains(firstAttributeID) & z.IsDefault).Select(z => new { z.AttachmentFk.Attachment, z.Attributes })).ToList().Distinct().ToList().Distinct().ToList();
                         var firstattributeDefaultImages = firstattributeDefaultImages1.Select(x => x.FirstOrDefault()).Distinct().ToList();
                         var secondAttributeValuesFor1st = new List<string>();
                         var firstattributeCodes = varAppItems.Select(x => x.EntityFk.EntityExtraData.Where(z => z.AttributeId == long.Parse(firstAttributeID))
@@ -975,7 +1012,7 @@ namespace onetouch.AppItems
                         }
 
 
-                        List<string> variationsLists = variations.Split(';').ToList();
+                        List<string> variationsLists = string.IsNullOrEmpty(variations) ? new List<string>() : variations.Split(';').ToList();
                         if (variationsLists != null)
                         {
 
@@ -5220,6 +5257,470 @@ namespace onetouch.AppItems
         {
             var fullResult = await LoadValidateExcelResultJson(resultKey);
             return CreateValidateExcelPagedResult(fullResult, resultKey, skipCount, maxResultCount);
+        }
+
+        public async Task<AppItemExcelResultsDTO> ValidatePriceCSV(string guidFile, string[] imagesList)
+        {
+            var resultDto = new AppItemExcelResultsDTO
+            {
+                ExcelRecords = new List<AppItemtExcelRecordDTO>(),
+                TotalRecords = 0,
+                TotalPassedRecords = 0,
+                TotalFailedRecords = 0
+            };
+
+            if (string.IsNullOrEmpty(guidFile))
+                return resultDto;
+
+            try
+            {
+                var tenantId = AbpSession.TenantId ?? -1;
+                var path = Path.Combine(
+                    _appConfiguration["Attachment:PathTemp"],
+                    tenantId.ToString(),
+                    guidFile + ".csv"
+                );
+
+                if (!System.IO.File.Exists(path))
+                    throw new UserFriendlyException("CSV file not found.");
+
+                var lines = System.IO.File.ReadAllLines(path);
+                if (lines.Length < 2)
+                    throw new UserFriendlyException("CSV file is empty.");
+
+                var headers = lines[0].Split(',').Select(h => h.Trim()).ToList();
+
+                if (!headers.Any(h => h.Equals("accountssin", StringComparison.OrdinalIgnoreCase)) ||
+                    !headers.Any(h => h.Equals("discsplit", StringComparison.OrdinalIgnoreCase)) ||
+                    !headers.Any(h => h.Equals("currcode", StringComparison.OrdinalIgnoreCase)))
+                {
+                    throw new UserFriendlyException("CSV must contain accountssin, discsplit, and currcode columns.");
+                }
+
+                if (!headers.Any(h => h.Equals("Status", StringComparison.OrdinalIgnoreCase)))
+                    headers.Add("Status");
+
+                if (!headers.Any(h => h.Equals("ErrorMessage", StringComparison.OrdinalIgnoreCase)))
+                    headers.Add("ErrorMessage");
+
+                var outputLines = new List<string>
+                {
+                    string.Join(",", headers)
+                };
+
+                var currencies = await _appEntitiesAppService.GetAllCurrencyForTableDropdown();
+
+                var appContacts = await _appContactRepository.GetAll().ToListAsync();
+                var appContactsDict = appContacts
+                    .Where(x => !string.IsNullOrWhiteSpace(x.SSIN))
+                    .GroupBy(x => x.SSIN.Trim().ToUpper())
+                    .ToDictionary(g => g.Key, g => g.First());
+
+                var appItems = await _appItemRepository.GetAll()
+                    .AsNoTracking()
+                    .Where(x => !string.IsNullOrWhiteSpace(x.Code))
+                    .Select(x => new { x.Id, x.Code })
+                    .ToListAsync();
+                var appItemDict = appItems
+                    .GroupBy(x => NormalizePriceImportKey(x.Code))
+                    .ToDictionary(g => g.Key, g => g.First());
+
+                var currencyDict = currencies
+                    .Where(x => !string.IsNullOrWhiteSpace(x.Code))
+                    .GroupBy(x => x.Code.Trim().ToUpper())
+                    .ToDictionary(g => g.Key, g => g.First());
+
+                int rowNumber = 1;
+
+                for (int i = 1; i < lines.Length; i++)
+                {
+                    rowNumber++;
+
+                    var values = lines[i].Split(',');
+
+                    var row = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+                    for (int h = 0; h < headers.Count; h++)
+                        row[headers[h]] = h < values.Length ? values[h] : "";
+
+                    var record = new AppItemtExcelRecordDTO
+                    {
+                        Status = ExcelRecordStatus.Passed.ToString(),
+                        FieldsErrors = new List<string>(),
+                        ErrorMessage = ""
+                    };
+
+                    var dto = new AppItemPriceCsvDto
+                    {
+                        Code = row.ContainsKey("stymajor") ? row["stymajor"]?.Trim() : "",
+                        SSIN = row["accountssin"]?.Trim(),
+                        Currency = row["currcode"]?.Trim(),
+                        Price = row["discsplit"]?.Trim(),
+                        RowNumber = rowNumber
+                    };
+
+                    record.Code = dto.Code;
+                    record.RecordType = "Account Code";
+
+                    bool hasError = false;
+
+                    if (string.IsNullOrWhiteSpace(dto.SSIN))
+                    {
+                        record.FieldsErrors.Add("SSIN is required.");
+                        hasError = true;
+                    }
+                    else if (!appContactsDict.TryGetValue(dto.SSIN.ToUpper(), out var appContact))
+                    {
+                        record.FieldsErrors.Add("SSIN is not found.");
+                        hasError = true;
+                    }
+
+                    appItemDict.TryGetValue(NormalizePriceImportKey(dto.Code), out var item);
+
+                    if (item == null)
+                    {
+                        record.FieldsErrors.Add($"Item code {dto.Code} not found.");
+                        hasError = true;
+                    }
+
+                    if (!decimal.TryParse(dto.Price, out decimal price) || price <= 0)
+                    {
+                        record.FieldsErrors.Add("Invalid price value.");
+                        hasError = true;
+                    }
+
+                    long currencyId = 0;
+                    string currencyCode = "";
+
+                    currencyDict.TryGetValue(dto.Currency?.Trim().ToUpper() ?? string.Empty, out var matchedCurrency);
+
+                    if (matchedCurrency == null)
+                    {
+                        record.FieldsErrors.Add("Invalid currency code.");
+                        hasError = true;
+                    }
+                    else
+                    {
+                        currencyId = matchedCurrency.Value;
+                        currencyCode = matchedCurrency.Code;
+                    }
+
+                    if (hasError)
+                    {
+                        record.Status = ExcelRecordStatus.Failed.ToString();
+                        record.ErrorMessage = string.Join(" | ", record.FieldsErrors);
+                        resultDto.TotalFailedRecords++;
+                    }
+                    else
+                    {
+                        record.Status = ExcelRecordStatus.Passed.ToString();
+                        record.ErrorMessage = "";
+
+                        record.ExcelDto = new AppItemExcelDto
+                        {
+                            Code = dto.Code,
+                            EntityObjectCategoryID = item.Id,
+                            Name = dto.SSIN,
+                            Price = price.ToString(),
+                            Currency = currencyCode,
+                            ParentId = currencyId,
+                            RecordType = "Price",
+                            ProductDescription = "-",
+                            ProductType = "-"
+                        };
+
+                        resultDto.TotalPassedRecords++;
+                    }
+
+                    row["Status"] = record.Status;
+                    row["ErrorMessage"] = record.ErrorMessage;
+
+                    outputLines.Add(string.Join(",", headers.Select(h => row[h])));
+
+                    resultDto.ExcelRecords.Add(record);
+                }
+
+                resultDto.TotalRecords = resultDto.ExcelRecords.Count;
+
+                var newFileName = $"{Path.GetFileNameWithoutExtension(path)}_Validated_{DateTime.Now:yyyyMMddHHmmss}.csv";
+                var newPath = Path.Combine(Path.GetDirectoryName(path), newFileName);
+
+                newPath = newPath.Replace(_appConfiguration[$"Attachment:PathTemp"].ToString(), _appConfiguration[$"Attachment:Path"]);
+                resultDto.FilePath = newPath;
+
+                System.IO.File.WriteAllLines(newPath, outputLines);
+                newPath = newPath.Replace(_appConfiguration[$"Attachment:Omitt"].ToString(), "");
+
+                resultDto.ExcelLogDTO = new ExcelLogDto();
+                resultDto.ExcelLogDTO.ExcelLogPath = newPath;
+                resultDto.ExcelLogDTO.ExcelLogFileName = newFileName;
+            }
+            catch (Exception ex)
+            {
+                throw new UserFriendlyException(ex.Message);
+            }
+
+            return resultDto;
+        }
+
+        public void UpdateCsvStatusFromErrorLog(string csvFilePath, List<AppItemtExcelRecordDTO> errorLogList)
+        {
+            if (string.IsNullOrEmpty(csvFilePath) || errorLogList == null || !errorLogList.Any())
+                return;
+
+            if (!System.IO.File.Exists(csvFilePath))
+                return;
+
+            var lines = System.IO.File.ReadAllLines(csvFilePath).ToList();
+            if (lines.Count < 2)
+                return;
+
+            var headers = lines[0].Split(',').Select(h => h.Trim()).ToList();
+
+            int statusCol = headers.FindIndex(h => h.Equals("Status", StringComparison.OrdinalIgnoreCase));
+            int errorMsgCol = headers.FindIndex(h => h.Equals("ErrorMessage", StringComparison.OrdinalIgnoreCase));
+
+            if (statusCol < 0)
+            {
+                headers.Add("Status");
+                statusCol = headers.Count - 1;
+            }
+
+            if (errorMsgCol < 0)
+            {
+                headers.Add("ErrorMessage");
+                errorMsgCol = headers.Count - 1;
+            }
+
+            lines[0] = string.Join(",", headers);
+
+            for (int i = 1; i < lines.Count && i <= errorLogList.Count; i++)
+            {
+                var values = lines[i].Split(',').ToList();
+
+                while (values.Count < headers.Count)
+                    values.Add("");
+
+                values[statusCol] = errorLogList[i - 1].Status;
+                values[errorMsgCol] = errorLogList[i - 1].ErrorMessage;
+
+                lines[i] = string.Join(",", values);
+            }
+
+            System.IO.File.WriteAllLines(csvFilePath, lines);
+        }
+
+        private static string NormalizePriceImportKey(string value)
+        {
+            return string.IsNullOrWhiteSpace(value)
+                ? string.Empty
+                : value.Replace(" ", "").Trim().ToUpper();
+        }
+
+        private static string GetPriceImportLookupKey(long appItemId, string code, string buyerSsin, string currencyCode)
+        {
+            return $"{appItemId}|{NormalizePriceImportKey(code)}|{NormalizePriceImportKey(buyerSsin)}|{NormalizePriceImportKey(currencyCode)}";
+        }
+
+        public async Task<ExcelLogDto> SavePriceFromCSV(AppItemExcelResultsDTO itemExcelResultsDTO)
+        {
+            var excelLog = new ExcelLogDto();
+
+            if (itemExcelResultsDTO?.ExcelRecords == null || !itemExcelResultsDTO.ExcelRecords.Any())
+                return excelLog;
+
+            var result = itemExcelResultsDTO.ExcelRecords.Where(r => r.Status !=
+            ExcelRecordStatus.Failed.ToString()).ToList();
+
+            var tenantId = AbpSession.TenantId;
+            var userId = AbpSession.UserId;
+            var now = Clock.Now;
+
+            var appItems = await _appItemRepository.GetAll().ToListAsync();
+            var appItemDict = appItems
+                .Where(x => !string.IsNullOrWhiteSpace(x.Code))
+                .GroupBy(x => NormalizePriceImportKey(x.Code))
+                .ToDictionary(g => g.Key, g => g.First());
+
+            var currencies = await _appEntitiesAppService.GetAllCurrencyForTableDropdown();
+            var currencyDict = currencies
+                .Where(x => !string.IsNullOrWhiteSpace(x.Code))
+                .GroupBy(x => x.Code?.Trim().ToUpper())
+                .ToDictionary(g => g.Key, g => g.First());
+
+            var appContacts = await _appContactRepository.GetAll().ToListAsync();
+            var appContactsDict = appContacts
+                .Where(x => !string.IsNullOrWhiteSpace(x.SSIN))
+                .GroupBy(x => x.SSIN.Trim().ToUpper())
+                .ToDictionary(g => g.Key, g => g.First());
+
+            var importAppItemIds = new HashSet<long>();
+            var importBuyerSsins = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            var importCurrencyCodes = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+            foreach (var record in result)
+            {
+                var dto = record.ExcelDto;
+                if (dto == null)
+                    continue;
+
+                if (appItemDict.TryGetValue(NormalizePriceImportKey(dto.Code), out var appItem))
+                    importAppItemIds.Add(appItem.Id);
+
+                if (!string.IsNullOrWhiteSpace(dto.Name))
+                    importBuyerSsins.Add(dto.Name.Trim());
+
+                if (!string.IsNullOrWhiteSpace(dto.Currency))
+                    importCurrencyCodes.Add(dto.Currency.Trim());
+            }
+
+            var importAppItemIdsList = importAppItemIds.ToList();
+            var importBuyerSsinsList = importBuyerSsins.ToList();
+            var importCurrencyCodesList = importCurrencyCodes.ToList();
+
+            var existingPrices = await _appItemPricesRepository.GetAll()
+                .Where(x =>
+                    !x.IsDeleted &&
+                    importAppItemIdsList.Contains(x.AppItemId) &&
+                    importBuyerSsinsList.Contains(x.BuyerSSIN) &&
+                    importCurrencyCodesList.Contains(x.CurrencyCode))
+                .ToListAsync();
+
+            var existingPriceDict = existingPrices
+                .GroupBy(x => GetPriceImportLookupKey(x.AppItemId, x.Code, x.BuyerSSIN, x.CurrencyCode))
+                .ToDictionary(g => g.Key, g => g.First());
+
+            var updatedAppItemIds = new HashSet<long>();
+
+            foreach (var logRecord in result)
+            {
+                var excelDto = logRecord.ExcelDto;
+
+                try
+                {
+                    if (string.IsNullOrWhiteSpace(excelDto.Code) ||
+                        string.IsNullOrWhiteSpace(excelDto.Name) ||
+                        string.IsNullOrWhiteSpace(excelDto.Currency) ||
+                        string.IsNullOrWhiteSpace(excelDto.Price))
+                    {
+                        logRecord.Status = "Failed";
+                        logRecord.ErrorMessage = "Required field is missing";
+                        continue;
+                    }
+
+                    if (!decimal.TryParse(excelDto.Price, out var price))
+                    {
+                        logRecord.Status = "Failed";
+                        logRecord.ErrorMessage = "Invalid price value";
+                        continue;
+                    }
+
+                    var appItemKey = NormalizePriceImportKey(excelDto.Code);
+                    var currencyKey = excelDto.Currency.Trim().ToUpper();
+                    var appContactKey = excelDto.Name.Trim().ToUpper();
+
+                    if (!appItemDict.TryGetValue(appItemKey, out var appItem))
+                    {
+                        logRecord.Status = "Failed";
+                        logRecord.ErrorMessage = "AppItem not found";
+                        continue;
+                    }
+
+                    if (!appContactsDict.TryGetValue(appContactKey, out var appContact))
+                    {
+                        logRecord.Status = "Failed";
+                        logRecord.ErrorMessage = "SSIN not found";
+                        continue;
+                    }
+
+                    if (!currencyDict.TryGetValue(currencyKey, out var currency))
+                    {
+                        logRecord.Status = "Failed";
+                        logRecord.ErrorMessage = "Currency not found";
+                        continue;
+                    }
+
+                    var priceCode = excelDto.Name.Trim();
+                    var currencyCode = currency.Code.Trim();
+
+                    existingPriceDict.TryGetValue(
+                        GetPriceImportLookupKey(appItem.Id, priceCode, excelDto.Name, currencyCode),
+                        out var existingPrice);
+
+                    if (existingPrice != null)
+                    {
+                        existingPrice.Price = price;
+                        existingPrice.BuyerSSIN = excelDto.Name;
+                        existingPrice.LastModificationTime = now;
+                        existingPrice.LastModifierUserId = userId;
+                        existingPrice.IsDefault = true;
+
+                        await _appItemPricesRepository.UpdateAsync(existingPrice);
+                    }
+                    else
+                    {
+                        var priceEntity = new AppItemPrices
+                        {
+                            CreationTime = now,
+                            CreatorUserId = userId,
+                            TenantId = tenantId,
+                            Code = priceCode,
+                            Price = price,
+                            BuyerSSIN = excelDto.Name,
+                            AppItemId = (long)excelDto.EntityObjectCategoryID,
+                            AppItemCode = excelDto.Code,
+                            CurrencyId = excelDto.ParentId,
+                            CurrencyCode = excelDto.Currency,
+                            IsDefault = true,
+                            IsDeleted = false
+                        };
+
+                        await _appItemPricesRepository.InsertAsync(priceEntity);
+                        existingPriceDict[GetPriceImportLookupKey(priceEntity.AppItemId, priceEntity.Code, priceEntity.BuyerSSIN, priceEntity.CurrencyCode)] = priceEntity;
+                    }
+
+                    if (updatedAppItemIds.Add(appItem.Id))
+                    {
+                        appItem.LastModificationTime = now;
+                        appItem.LastModifierUserId = userId;
+                        appItem.TimeStamp = now;
+                    }
+
+                    logRecord.Status = "Success";
+                    logRecord.ErrorMessage = "";
+                }
+                catch (Exception ex)
+                {
+                    logRecord.Status = "Failed";
+                    logRecord.ErrorMessage = ex.Message;
+                }
+            }
+
+            foreach (var appItemId in updatedAppItemIds)
+            {
+                var appItem = appItems.First(x => x.Id == appItemId);
+                await _appItemRepository.UpdateAsync(appItem);
+            }
+
+            var attachmentFolder = Path.Combine(_appConfiguration[$"Attachment:Path"], tenantId.ToString());
+            if (!Directory.Exists(attachmentFolder))
+                Directory.CreateDirectory(attachmentFolder);
+
+            this.UpdateCsvStatusFromErrorLog(itemExcelResultsDTO.FilePath, itemExcelResultsDTO.ExcelRecords);
+
+            if (AbpSession.UserId != null)
+            {
+                long abpSessionUserId = (long)AbpSession.UserId;
+                string message = "Items imported successfully.";
+                if (!string.IsNullOrEmpty(itemExcelResultsDTO.FilePath) && !itemExcelResultsDTO.FilePath.ToUpper().Contains("UNDEFINED"))
+                {
+                    message = "Importing Item result can be downloaded from <a href=\"" + itemExcelResultsDTO.FilePath + "\" download>" + "here" + "</a>";
+                }
+                await _appNotifier.SendMessageAsync(new Abp.UserIdentifier(AbpSession.TenantId, abpSessionUserId),
+                    message,
+                    Abp.Notifications.NotificationSeverity.Info, null);
+            }
+
+            return itemExcelResultsDTO.ExcelLogDTO;
         }
 
         [DisableAuditing]

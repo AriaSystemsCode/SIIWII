@@ -167,8 +167,8 @@ export class MainImportComponent
         this.importService = importService;
         this.serviceUtilites = serviceUtilites;
         this.importServiceProxy = this.injector.get(this.importService);
-        this.validMethodName = this.importType!=ImportTypes.price ? 'validateExcel' : 'validatePriceCSV';
-        this.saveMethodName = this.importType!=ImportTypes.price ? 'saveFromExcel' : 'savePriceFromCSV';
+        this.validMethodName = this.importType != ImportTypes.price ? 'validateExcel' : 'validatePriceCSV';
+        this.saveMethodName = this.importType != ImportTypes.price ? 'saveFromExcel' : 'savePriceFromCSV';
         this.serviceUtilitesProxy = this.injector.get(this.serviceUtilites);
         this.UploadedFolder = [];
         this.imagesName = [];
@@ -578,8 +578,7 @@ export class MainImportComponent
     
         const hasImageRecords = this.uploadindResultExcelList?.some(r => r.recordType === 'Image');
     
-        if (hasImageRecords || this.importType == ImportTypes.price){
-            
+        if (hasImageRecords || this.importType == ImportTypes.price) {
             this.importServiceProxy[this.saveMethodName](this.uploadingResult)
                 .pipe(finalize(() => {
                     this.spinnerService.hide();
