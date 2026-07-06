@@ -1,5 +1,6 @@
 export enum ImportTypes {
     Accounts,
     Items ,
-    Qty
+    Qty,
+    price
 }

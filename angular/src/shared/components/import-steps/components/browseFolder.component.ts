@@ -13,6 +13,7 @@ import { SelectAppItemTypeComponent } from "@app/app-item-type/select-app-item-t
 import { Subscription } from "rxjs";
 import { ImportTypes } from "../models/ImportTypes";
 import { finalize } from "rxjs/operators";
+import Swal from "sweetalert2";
 
 @Component({
   selector: "BrowseFolderModal",
@@ -94,6 +95,23 @@ export class BrowseFolderComponent extends AppComponentBase implements OnInit {
 
     const input = event.target as HTMLInputElement;
 
+    if(this.importType == ImportTypes.price){
+      const invalidFiles = Array.from(input.files).filter(file => {
+        const ext = file.name.split('.').pop()?.toLowerCase();
+        return ext !== 'csv';
+      });
+  
+      if (invalidFiles.length > 0) {
+        Swal.fire(
+          " ",
+          "Invalid file format, the supported format is csv.",
+          "error"
+        );
+        input.value = '';
+        return;
+      }
+    }
+
     this.fileevent = event;
     if (input.files && input.files.length > 0) {
       const files = input.files;
@@ -156,6 +174,9 @@ export class BrowseFolderComponent extends AppComponentBase implements OnInit {
   }
 
   extractFolderName(file: File): string {
+    if( this.importType==ImportTypes.price)
+        return file?.name;
+
     const pathParts = file.webkitRelativePath.split('/');
     return pathParts.length > 1 ? pathParts[0] : 'Main Folder';
   }

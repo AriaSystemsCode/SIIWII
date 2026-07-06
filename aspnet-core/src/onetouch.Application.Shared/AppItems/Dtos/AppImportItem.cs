@@ -11,6 +11,23 @@ namespace onetouch.AppItems.Dtos
 
         public string DisplayName { get; set; }
     }
+    public class AppItemPriceCsvDto
+    {
+        public string Code { get; set; }
+        public string SSIN { get; set; }
+        public string StyMajor { get; set; }
+        public string Currency { get; set; }
+        public string Price { get; set; }
+        public int RowNumber { get; set; }
+    }
+    public class PriceImportFailureLogDto
+    {
+        public string AppItemCode { get; set; }
+        public string SSIN { get; set; }
+        public string Currency { get; set; }
+        public string Price { get; set; }
+        public string Reason { get; set; }
+    }
 
     public partial class AppItemExcelResultsDTO
     {

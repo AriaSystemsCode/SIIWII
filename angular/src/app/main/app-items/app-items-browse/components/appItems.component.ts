@@ -564,6 +564,14 @@ showOverlay :boolean=false
         this.ImportProductsModal.show(ImportTypes.Qty,importService,serviceUtilites,null,false,importStepsInfo);
     }
 
+    showImportCustomprices(){
+        let importService=AppItemsServiceProxy;
+        let serviceUtilites=itemsImport;
+        let importStepsInfo:ImportStepInfo[];
+        importStepsInfo= this._importService.getOriginalImportSteps();
+        this.ImportProductsModal.show(ImportTypes.price,importService,serviceUtilites,["IMAGE"],false,importStepsInfo);
+    }
+
     selectAll(){
         this.eventTriggered.emit({ event:AppItemBrowseEvents.SelectAll})
     }
