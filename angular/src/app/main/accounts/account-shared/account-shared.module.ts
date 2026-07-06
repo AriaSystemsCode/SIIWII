@@ -28,6 +28,7 @@ import { DialogModule } from 'primeng/dialog';
 import { AccountSectionsComponent } from './components/account-sections/account-sections.component';
 import { EntityShellModule } from '@app/shared/entity-shell/entity-shell.module';
 import { AccordionModule } from "primeng/accordion";
+import { SharedDynamicInputsModule } from '@shared/shared-module';
 
 
 @NgModule({
@@ -61,7 +62,8 @@ import { AccordionModule } from "primeng/accordion";
         FiltersSharedModule,
         DialogModule,
         EntityShellModule,
-        AccordionModule
+        AccordionModule,
+        SharedDynamicInputsModule
     ],
     providers: [
         { provide: BsDatepickerConfig, useFactory: NgxBootstrapDatePickerConfigService.getDatepickerConfig },

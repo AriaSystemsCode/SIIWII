@@ -87,4 +87,56 @@
     <p>Connection Count: {{ entityData?.connectionCount || 0 }}</p>
   </p-accordionTab>
 
+
+  <p-accordionTab  header="Roles">
+        <!-- <div >
+    <div class="kt-content  kt-grid__item kt-grid__item--fluid kt-grid kt-grid--hor">
+        <div class="kt-subheader kt-grid__item">
+            <div [class]="containerClass">
+                <div class="kt-subheader__main">
+                    <h3 class="kt-subheader__title">
+                        <span>{{"RelationshipSettingsHeaderInfo" | localize}}</span>
+                    </h3>
+                    <span class="kt-subheader__separator kt-subheader__separator--v"></span>
+                    <span class="kt-subheader__desc">
+                        {{"SettingsHeaderInfo" | localize}}
+                    </span>
+                </div>
+                <div class="kt-subheader__toolbar">
+                    <div class="kt-subheader__wrapper">
+                        <button class="btn saveBtn" (click)="saveAll()">
+                            {{"SaveAll" | localize}}</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div [class]="containerClass + ' kt-grid__item kt-grid__item--fluid'">
+            <div class="kt-portlet m-0">
+                <div class="kt-portlet__body">
+                    <div class="row">
+
+                        <div class="col-12">
+                            <div *ngFor="let usage of usageList; let i = index" [attr.id]="'usage_' + usage">
+                                <h5 class="usage-block">{{ usage }}</h5>
+                                <p-dropdown *ngIf="connectionsInfo?.length > 1" [options]="connectionsInfo" optionLabel="connectedLabel"
+                                    optionValue="relationEntityId" (onChange)="onRelationshipOptionChange($event.value)">
+                                </p-dropdown>
+                                <app-dynamicInputs #appdynamicInputs
+                                    [extraAttributeObject]="{ value: { filteredExtraAttributes: groupedByUsage[usage], extraAttributes: allAttributes } }"
+                                    [entityObjectTypeId]="entityObjectTypeId" [entityType]="'MARKETPLACECONTACTRELATIONSHIP'"
+                                    [dynamicInputsForViewDto]="dynamicInputsForViewDto" (extraDataCleared)="onExtraAttributeCleared($event)"
+                                    (extraDataChanged)="onExtraAttributesChanged($event)" [fromSetting]="true">
+                                </app-dynamicInputs>
+                            
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div> -->
+  </p-accordionTab>
 </p-accordion>

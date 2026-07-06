@@ -15,3 +15,13 @@ export interface EntityLeftPanelItem {
   expanded?: boolean;
   children?: EntityLeftPanelItem[];
 }
+export interface EntityBasicInfoField {
+  key: string;
+  label: string;
+  type: 'text' | 'dropdown';
+  valuePath: string;
+  options?: any[];
+  optionLabel?: string;
+  optionValue?: string;
+  readonly?: boolean;
+}

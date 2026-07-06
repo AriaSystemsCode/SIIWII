@@ -64,6 +64,7 @@ import { TabViewModule } from 'primeng/tabview';
 import { Ng2TelInputModule } from 'ng2-tel-input';
 import { AuditTrailComponent } from './entity-right-panel/audit-trail/audit-trail.component';
 import { RelatedEntitiesComponent } from './entity-right-panel/related-entities/related-entities.component';
+import { EntityMessagesComponent } from './entity-right-panel/entity-messages/entity-messages.component';
 
 
 
@@ -133,6 +134,7 @@ import { RelatedEntitiesComponent } from './entity-right-panel/related-entities/
         EntityHeaderComponent,
         AuditTrailComponent,
         RelatedEntitiesComponent,
+        EntityMessagesComponent,
 
     ],
     exports: [
@@ -145,6 +147,8 @@ import { RelatedEntitiesComponent } from './entity-right-panel/related-entities/
         EntityHeaderComponent,
           AuditTrailComponent,
         RelatedEntitiesComponent,
+        EntityMessagesComponent,
+
 
     ],
     providers: [

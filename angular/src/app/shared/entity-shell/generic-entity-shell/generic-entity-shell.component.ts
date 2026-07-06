@@ -6,6 +6,8 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
   styleUrls: ['./generic-entity-shell.component.scss']
 })
 export class GenericEntityShellComponent {
+  accountTypes: any;
+
   @Input() entity: any = {};
   @Input() entityType = '';
   @Input() title = '';
@@ -21,6 +23,7 @@ export class GenericEntityShellComponent {
   @Output() close = new EventEmitter<void>();
   @Output() minimize = new EventEmitter<void>();
   @Output() maximize = new EventEmitter<void>();
+  
 leftPanelCollapsed = false;
 leftPanelSections = [
   {
@@ -48,7 +51,35 @@ leftPanelSections = [
     ]
   }
 ];
-
+basicInfoFields = [
+  {
+    key: 'status',
+    label: 'Status',
+    type: 'dropdown',
+    valuePath: 'account.status',
+    options: this.statuses
+  },
+  {
+    key: 'accountType',
+    label: 'Account Type',
+    type: 'dropdown',
+    valuePath: 'account.accountTypeId',
+    options: {}
+  },
+  {
+    key: 'name',
+    label: 'Name',
+    type: 'text',
+    valuePath: 'account.name'
+  },
+  {
+    key: 'ssin',
+    label: 'SSIN',
+    type: 'text',
+    valuePath: 'account.ssin',
+    readonly: true
+  }
+];
 ngOnInit(){
   console.log(this.entityData,'entityData')
 }

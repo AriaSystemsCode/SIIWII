@@ -1,63 +1,30 @@
-<div class="entity-basic-info p-4" >
-<!-- [class.view-mode]="mode === 'view'" -->
-  <div class="d-flex justify-content-between">
-    <div class="field">
-      <label>Status:</label>
+<div class="entity-basic-info p-4">
+
+  <div class="d-flex flex-wrap justify-content-between">
+
+    <div class="field" *ngFor="let field of fields">
+
+      <label>{{ field.label }}:</label>
+
+      <input
+        *ngIf="field.type === 'text'"
+        class="form-control"
+        [ngModel]="getValue(field.valuePath)"
+        (ngModelChange)="setValue(field.valuePath, $event)"
+        [readonly]="mode === 'view' || field.readonly" />
+
       <p-dropdown
-        [options]="statuses"
-        [(ngModel)]="entity.status"
->
+        *ngIf="field.type === 'dropdown'"
+        [options]="field.options"
+        [optionLabel]="field.optionLabel || 'label'"
+        [optionValue]="field.optionValue || 'value'"
+        [ngModel]="getValue(field.valuePath)"
+        (ngModelChange)="setValue(field.valuePath, $event)"
+        [disabled]="mode === 'view' || field.readonly">
       </p-dropdown>
+
     </div>
 
-    <div class="field">
-      <label>Account Type:</label>
-      <p-dropdown
-        [options]="entityTypes"
-        [(ngModel)]="entity.type"
-  >
-      </p-dropdown>
-    </div>
-
-    <div class="field name-field">
-      <label>Name:</label>
-      <input
-        class="form-control"
-        [(ngModel)]="entityData.account.name"
-       />
-    </div>
-
-    <!-- <div class="field code-field">
-      <label>Code:</label>
-      <input
-        class="form-control"
-        [(ngModel)]="entityData.account.code"
-   />
-    </div> -->
-  </div>
-  <div class="d-flex justify-content-between">
-        <div class="field code-field">
-      <label>SSin:</label>
-      <input
-        class="form-control"
-        [(ngModel)]="entityData.account.ssin"
-   />
-    </div>
-  </div>
-  <div class="image-row mt-3">
-    <!-- <div class="logo-box">
-      <i *ngIf="!entity.logoUrl" class="fa fa-user"></i>
-    </div> -->
-
-    <div class="background-box position-relative">
-      <!-- <button *ngIf="mode !== 'view'" class="add-bg-btn">
-        Add
-      </button> -->
-      <img  [src]="'assets/placeholders/appitem-placeholder.png'" style="height: 120px;width: 100%;border-radius: 12px;" />
-
-      <img *ngIf="entityData.account.logoUrl" [src]="attachmentBaseUrl + '/' + entityData.account.logoUrl"  style="position: absolute;top: 10px;width: 100px; left: 20px;border-radius: 12px;"/>
-      
-    </div>
   </div>
 
 </div>
