@@ -44,15 +44,8 @@
                     <h5>{{"Dropyourfolderhereorclickheretoupload" | localize}} </h5>
                     <h5> {{"FilesformatsSupportedareXLSX,JPGandPNG" | localize}}</h5>
                     <span *ngIf="hasImages">{{"Pleasemakesuretheimagessize5MB" | localize}}</span>
-                    <p style="color: #F6851D !important;">*Image Aspect-Ratio is {{aspectRatioNumbers}} </p>
-                     </div> 
-                     <div *ngIf="importType==ImportTypes.price">
-                      
-                    <input #fileInputRef type="file" id="_input" (change)="fileChangeEvent($event)" name="fileList" 
-                     class="upload-input"   accept=".csv" />
-                    <h5> Drop your file here Or Click to Upload </h5>
-                     </div>
-                  </label>
+                    <p class="aspect-ratio-warning">*Image Aspect-Ratio is {{aspectRatioNumbers}} </p>
+                </label>
             </div>
             
 
