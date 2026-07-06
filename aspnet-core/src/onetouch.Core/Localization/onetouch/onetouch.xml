@@ -2655,8 +2655,7 @@
 	<text name="FilesformatsSupportedareXLSX,JPGandPNG">Files formats Supported are XLSX,JPG and PNG</text>
 	<text name="Relatedproducts">Related products</text>
 	<text name="noproductsarelinked">no products are linked</text>
-    <text name="ImportCustomprices">Import Custom prices</text>
-	<text name="Totalpassedprice">Total passed price </text>
+ 	<text name="Totalpassedprice">Total passed price </text>
 	<text name="Totalfailedprice">Total failed price</text>
 	<text name="BussinessClassification">Bussiness Classification</text>
 	<text name="OverallRating">Overall Rating</text>
