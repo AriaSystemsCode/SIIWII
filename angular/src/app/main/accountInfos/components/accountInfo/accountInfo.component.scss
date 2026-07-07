@@ -468,13 +468,16 @@ button.btn.btn-outline-secondary.button-border.ng-tns-c374-7 {
 }
 
 .header-block-buttons {
-   padding-right: 0;
-   text-align: right;
-   display: flex;
-   float: right;
-   clear: both;
-   position: absolute;
-   right: 0;
+   // padding-right: 0;
+   // text-align: right;
+   // display: flex;
+   // float: right;
+   // clear: both;
+   // position: absolute;
+   // right: 0;
+       height: 40px;
+    display: flex;
+    justify-content: end;
 }
 
 .title-blue {

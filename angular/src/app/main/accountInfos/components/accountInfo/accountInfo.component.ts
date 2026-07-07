@@ -1133,7 +1133,21 @@ private restoreRemovedRoles(rolesToRestore: string[]): void {
                 this.notify.info(this.l('SavedSuccessfully'));
 
                 if (!this.accountInfoTemp.id) {
-                    return this._router.navigate(['app/main/accounts']);
+                    // return this._router.navigate(['app/main/accounts']);
+                            this.accountId = result.accountInfo.id;
+                    this.accountInfoTemp.id = result.accountInfo.id;
+
+                    this.viewMode = true;
+
+                    this._router.navigate(
+                        [`/app/main/account/view/${this.accountId}`],
+                        {
+                            queryParams: { tab: 'ProfileView' }
+                        }
+                    );
+
+                    return;
+
                 }
 
                 this.touched = false;
