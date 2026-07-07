@@ -86,6 +86,7 @@ using onetouch.Authorization.Roles;
 using DocumentFormat.OpenXml.InkML;
 using Abp.MultiTenancy;
 using System.Globalization;
+using onetouch.AppMarketplaceAccounts;
 
 
 //using NUglify.Helpers;
@@ -151,7 +152,7 @@ namespace onetouch.AppSiiwiiTransaction
         //I40[Start]
         private readonly IRepository<AppContactRelationshipInfo, long> _appContactRelationshipInfoRepository;
         //I40[End]
-
+        private readonly ICreateMarketplaceAccount _iCreateMarketplaceAccount;
         public AppTransactionAppService(IRepository<AppTransactionHeaders, long> appTransactionsHeaderRepository,
             IRepository<SydObject, long> sydObjectRepository, IRepository<SycEntityObjectType, long> sycEntityObjectType,
             IRepository<SycCounter, long> sycCounter, IRepository<AppContact, long> appContactRepository, IRepository<AppMarketplaceAccountsPriceLevels.AppMarketplaceAccountsPriceLevels, long> appMarketplaceAccountsPriceLevelsRepository,
@@ -176,10 +177,11 @@ namespace onetouch.AppSiiwiiTransaction
              IRepository<AppContactAddress, long> appContactAddressRepository, IRepository<onetouch.SycCurrencyExchangeRates.SycCurrencyExchangeRates, long> sycCurrencyExchangeRateRepository,
              TimeZoneInfoAppService timeZoneInfoAppService, IAppTenantActivitiesLogAppService appTenantActivitiesLogAppService,
              IRepository<AppEntityLog, long> appEntityLogRepository, IRepository<AppMarketplaceContact, long> appMarketplaceContactRepository,
-             IRepository<AppContactRelationshipInfo, long> appContactRelationshipInfoRepository
-             
+             IRepository<AppContactRelationshipInfo, long> appContactRelationshipInfoRepository,
+             ICreateMarketplaceAccount iCreateMarketplaceAccount
              )
         {
+            _iCreateMarketplaceAccount = iCreateMarketplaceAccount;
             _sycIdentifierDefinitionsAppService = sycIdentifierDefinitionsAppService;
             _accountAppService = accountAppService;
             _sycEntityObjectClassificationRepository = sycEntityObjectClassificationRepository;
@@ -523,6 +525,21 @@ namespace onetouch.AppSiiwiiTransaction
                         ContactDto savedContactDto = await _accountAppService.CreateOrEditContact(contactDto);
                         if (savedContactDto != null)
                         {
+                            //mm
+                            using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
+                            {
+                                var publishContactAccount = await _appMarketplaceContactRepository.GetAll().AsNoTracking()
+                                    //.Include(x => x.ContactAddresses)
+                                    .FirstOrDefaultAsync(x => x.SSIN == accountObj.SSIN);
+                                if (publishContactAccount != null && publishContactAccount.TenantOwner == AbpSession.TenantId)
+                                {
+                                    var presonEntityObjectTypeId = await _helper.SystemTables.GetEntityObjectTypePersonId();
+                                    //await PublishMember(contact.Id);
+                                    await _iCreateMarketplaceAccount.PublishMember(savedContactDto.Id, publishContactAccount.Id, presonEntityObjectTypeId, null, publishContactAccount.Id);
+                                    await _iCreateMarketplaceAccount.CreateOrEditMarketplaceContactRelationship(publishContactAccount.SSIN, savedContactDto.SSIN, false, null, null, null);
+                                }
+                            }
+                            //mm
                             input.BuyerContactSSIN = savedContactDto.SSIN;
                             buyerContact.ContactSSIN = savedContactDto.SSIN;
                         }
@@ -8395,11 +8412,11 @@ namespace onetouch.AppSiiwiiTransaction
 
                     if (isTaxable != null && isTaxable.AttributeValue.ToUpper() == "YES")
                     {
-                        var transItems = await _appTransactionDetails.GetAll().Where(e => e.TransactionId == pTransactionID && e.EntityObjectTypeId != entityObjectChargesId)
+                        var transItems = await _appTransactionDetails.GetAll().Where(e => e.TransactionId == pTransactionID && e.EntityObjectTypeId != entityObjectChargesId && e.ParentId!=null)
                             .ToListAsync();
 
                         var transItemSsins = transItems.Select(i => i.ItemSSIN).ToList();
-                        var products = await _appItems.GetAll().Where(e => transItemSsins.Contains(e.SSIN)).ToListAsync();
+                        var products = await _appMarketplaceItem.GetAll().Where(e => transItemSsins.Contains(e.SSIN)).ToListAsync();
 
                         foreach (var item in transItems)
                         {
