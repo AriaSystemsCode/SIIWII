@@ -105,7 +105,7 @@
   }
 
   .sidebar.ar-index{
-    z-index: 20 !important;
+    z-index: 999 !important;
 }
 .sidebar.index{
     z-index: 9999 !important;
@@ -113,10 +113,10 @@
 
   .sidebar.minimized {
     width: 76px;
-    border-top-left-radius: 20px;
+    // border-top-left-radius: 20px;
         background: #FFF;
     position: fixed;
-    border-top-left-radius: 20px;
+    // border-top-left-radius: 20px;
     text-align: center;
     box-shadow: 4px 4px 10px 0px rgba(22, 22, 22, 0.10);
     @media only screen and (max-width: 576px) {
