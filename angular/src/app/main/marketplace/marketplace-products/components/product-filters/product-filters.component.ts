@@ -260,7 +260,8 @@ export class ProductFiltersComponent extends AppComponentBase implements OnInit,
           0,
           10
         ).subscribe(res => {
-          node.children = res.items;
+                                  // E-SII-20250507.0050 
+          node.children = this.filterEmptyLeafCategories(res.items);
           node.expanded = true;
 
           const found = this.findNodeById(node.children, targetId);
@@ -299,7 +300,8 @@ export class ProductFiltersComponent extends AppComponentBase implements OnInit,
         )
         .pipe(finalize(() => (this.loading = false)))
         .subscribe((res: any) => {
-          value.node.children = res.items;
+              // E-SII-20250507.0050 
+          value.node.children = this.filterEmptyLeafCategories(res.items);
         });
     }
   }
@@ -389,7 +391,8 @@ export class ProductFiltersComponent extends AppComponentBase implements OnInit,
         0,
         10
       ).subscribe((res: any) => {
-        this.files = res.items;
+            // E-SII-20250507.0050 
+        this.files = this.filterEmptyLeafCategories(res.items);
         resolve(); 
       });
     });
@@ -411,7 +414,8 @@ export class ProductFiltersComponent extends AppComponentBase implements OnInit,
         0,
         10
       ).subscribe((res: any) => {
-        this.categories = res.items;
+            // E-SII-20250507.0050 
+        this.categories = this.filterEmptyLeafCategories(res.items);
   
         // 🔹 If we already know which category to preselect, expand to it
         if (this.preselectCategoryId) {
@@ -423,9 +427,23 @@ export class ProductFiltersComponent extends AppComponentBase implements OnInit,
     });
   }
   
-  
+      // E-SII-20250507.0050 
+  filterEmptyLeafCategories(nodes: any[]): any[] {
+    if (!nodes) return [];
+    return nodes.filter(node => {
+      if (!node?.leaf) {
+        return true;
+      }
+
+      if (node?.resultCount === undefined || node?.resultCount === null) {
+        return true;
+      }
+
+      return node?.resultCount !== 0;
+    });
+  }
+
   nodeCatExpand(evt: any) {
-    if (!evt?.node) return;
     this.loading = true;
     this._sycEntityObjectCategoriesServiceProxy
       .getAllChildsWithPaging(
@@ -435,7 +453,7 @@ export class ProductFiltersComponent extends AppComponentBase implements OnInit,
         undefined, undefined, undefined,'name', 0, 10
       )
       .pipe(finalize(() => (this.loading = false)))
-      .subscribe((res: any) => (evt.node.children = res.items));
+      .subscribe((res: any) => (evt.node.children = this.filterEmptyLeafCategories(res.items)));     // E-SII-20250507.0050 
   }
   
   nodeCatSelect(evt: any) {
@@ -469,7 +487,8 @@ export class ProductFiltersComponent extends AppComponentBase implements OnInit,
             undefined, undefined, undefined,'name', 0, 10
           )
           .toPromise();
-        node.children = res.items;
+              // E-SII-20250507.0050 
+        node.children = this.filterEmptyLeafCategories(res.items); 
       }
   
       const found = await this.expandAndSelectNodeLazyCat(targetId, node.children, node);
@@ -579,7 +598,8 @@ export class ProductFiltersComponent extends AppComponentBase implements OnInit,
           0,
           10
         ).subscribe(res => {
-          node.children = res.items;
+              // E-SII-20250507.0050 
+          node.children = this.filterEmptyLeafCategories(res.items);
           node.expanded = true;
           this.expandAndSelectNode(targetId, node.children, node);
         });
@@ -621,7 +641,8 @@ export class ProductFiltersComponent extends AppComponentBase implements OnInit,
           undefined, undefined, undefined, undefined, undefined, undefined, undefined,
           currentId, true, undefined, undefined, undefined,"name", 0, 10
         ).toPromise();
-        node.children = res.items;
+            // E-SII-20250507.0050 
+        node.children = this.filterEmptyLeafCategories(res.items);
       }
   
       const foundInChildren = await this.expandAndSelectNodeLazy(targetId, node.children, node);
@@ -673,7 +694,8 @@ export class ProductFiltersComponent extends AppComponentBase implements OnInit,
               undefined, undefined, undefined, undefined, undefined, undefined, undefined,
               id, true, undefined, undefined, undefined, "name", 0, 10
             ).toPromise();
-          node.children = res.items;
+                // E-SII-20250507.0050 
+          node.children = this.filterEmptyLeafCategories(res.items);
         }
         node.expanded = true;
         return node;
