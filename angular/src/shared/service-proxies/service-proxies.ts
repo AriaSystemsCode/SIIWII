@@ -15440,65 +15440,6 @@ export class AppItemsServiceProxy {
     }
 
     /**
-     * @param guidFile (optional) 
-     * @param body (optional) 
-     * @return Success
-     */
-    validatePriceCSV(guidFile: string | null | undefined, body: string[] | null | undefined): Observable<AppItemExcelResultsDTO> {
-        let url_ = this.baseUrl + "/api/services/app/AppItems/ValidatePriceCSV?";
-        if (guidFile !== undefined && guidFile !== null)
-            url_ += "guidFile=" + encodeURIComponent("" + guidFile) + "&";
-        url_ = url_.replace(/[?&]$/, "");
-
-        const content_ = JSON.stringify(body);
-
-        let options_ : any = {
-            body: content_,
-            observe: "response",
-            responseType: "blob",
-            headers: new HttpHeaders({
-                "Content-Type": "application/json-patch+json",
-                "Accept": "text/plain"
-            })
-        };
-
-        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processValidatePriceCSV(response_);
-        })).pipe(_observableCatch((response_: any) => {
-            if (response_ instanceof HttpResponseBase) {
-                try {
-                    return this.processValidatePriceCSV(response_ as any);
-                } catch (e) {
-                    return _observableThrow(e) as any as Observable<AppItemExcelResultsDTO>;
-                }
-            } else
-                return _observableThrow(response_) as any as Observable<AppItemExcelResultsDTO>;
-        }));
-    }
-
-    protected processValidatePriceCSV(response: HttpResponseBase): Observable<AppItemExcelResultsDTO> {
-        const status = response.status;
-        const responseBlob =
-            response instanceof HttpResponse ? response.body :
-            (response as any).error instanceof Blob ? (response as any).error : undefined;
-
-        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
-        if (status === 200) {
-            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            let result200: any = null;
-            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            result200 = AppItemExcelResultsDTO.fromJS(resultData200);
-            return _observableOf(result200);
-            }));
-        } else if (status !== 200 && status !== 204) {
-            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-            }));
-        }
-        return _observableOf(null as any);
-    }
-
-    /**
      * @param resultKey (optional) 
      * @param skipCount (optional) 
      * @param maxResultCount (optional) 
@@ -15563,14 +15504,14 @@ export class AppItemsServiceProxy {
     }
 
     /**
-     * @param resultKey (optional) 
+     * @param guidFile (optional) 
      * @param body (optional) 
      * @return Success
      */
-    saveFromExcelResult(resultKey: string | null | undefined, body: AppItemExcelResultsDTO | undefined): Observable<ExcelLogDto> {
-        let url_ = this.baseUrl + "/api/services/app/AppItems/SaveFromExcelResult?";
-        if (resultKey !== undefined && resultKey !== null)
-            url_ += "resultKey=" + encodeURIComponent("" + resultKey) + "&";
+    validatePriceCSV(guidFile: string | null | undefined, body: string[] | null | undefined): Observable<AppItemExcelResultsDTO> {
+        let url_ = this.baseUrl + "/api/services/app/AppItems/ValidatePriceCSV?";
+        if (guidFile !== undefined && guidFile !== null)
+            url_ += "guidFile=" + encodeURIComponent("" + guidFile) + "&";
         url_ = url_.replace(/[?&]$/, "");
 
         const content_ = JSON.stringify(body);
@@ -15586,20 +15527,20 @@ export class AppItemsServiceProxy {
         };
 
         return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processSaveFromExcelResult(response_);
+            return this.processValidatePriceCSV(response_);
         })).pipe(_observableCatch((response_: any) => {
             if (response_ instanceof HttpResponseBase) {
                 try {
-                    return this.processSaveFromExcelResult(response_ as any);
+                    return this.processValidatePriceCSV(response_ as any);
                 } catch (e) {
-                    return _observableThrow(e) as any as Observable<ExcelLogDto>;
+                    return _observableThrow(e) as any as Observable<AppItemExcelResultsDTO>;
                 }
             } else
-                return _observableThrow(response_) as any as Observable<ExcelLogDto>;
+                return _observableThrow(response_) as any as Observable<AppItemExcelResultsDTO>;
         }));
     }
 
-    protected processSaveFromExcelResult(response: HttpResponseBase): Observable<ExcelLogDto> {
+    protected processValidatePriceCSV(response: HttpResponseBase): Observable<AppItemExcelResultsDTO> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -15610,8 +15551,63 @@ export class AppItemsServiceProxy {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
             let result200: any = null;
             let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            result200 = ExcelLogDto.fromJS(resultData200);
+            result200 = AppItemExcelResultsDTO.fromJS(resultData200);
             return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param csvFilePath (optional) 
+     * @param body (optional) 
+     * @return Success
+     */
+    updateCsvStatusFromErrorLog(csvFilePath: string | null | undefined, body: AppItemtExcelRecordDTO[] | null | undefined): Observable<void> {
+        let url_ = this.baseUrl + "/api/services/app/AppItems/UpdateCsvStatusFromErrorLog?";
+        if (csvFilePath !== undefined && csvFilePath !== null)
+            url_ += "csvFilePath=" + encodeURIComponent("" + csvFilePath) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json-patch+json",
+            })
+        };
+
+        return this.http.request("put", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processUpdateCsvStatusFromErrorLog(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processUpdateCsvStatusFromErrorLog(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<void>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<void>;
+        }));
+    }
+
+    protected processUpdateCsvStatusFromErrorLog(response: HttpResponseBase): Observable<void> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return _observableOf(null as any);
             }));
         } else if (status !== 200 && status !== 204) {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
@@ -15656,6 +15652,65 @@ export class AppItemsServiceProxy {
     }
 
     protected processSavePriceFromCSV(response: HttpResponseBase): Observable<ExcelLogDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = ExcelLogDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param resultKey (optional) 
+     * @param body (optional) 
+     * @return Success
+     */
+    saveFromExcelResult(resultKey: string | null | undefined, body: AppItemExcelResultsDTO | undefined): Observable<ExcelLogDto> {
+        let url_ = this.baseUrl + "/api/services/app/AppItems/SaveFromExcelResult?";
+        if (resultKey !== undefined && resultKey !== null)
+            url_ += "resultKey=" + encodeURIComponent("" + resultKey) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json-patch+json",
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processSaveFromExcelResult(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processSaveFromExcelResult(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<ExcelLogDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<ExcelLogDto>;
+        }));
+    }
+
+    protected processSaveFromExcelResult(response: HttpResponseBase): Observable<ExcelLogDto> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
