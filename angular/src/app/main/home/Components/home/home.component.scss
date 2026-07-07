@@ -1,38 +1,53 @@
-.middle-content {
-    flex-grow: 1;
-    width: 100%;
-    height: auto;
-    box-shadow: 0 3px 16px rgb(225 225 239 / 25%);
-    border-radius: 6px;
-    // overflow: hidden;
-   // padding-left: 25px;
+.home-layout {
+  margin-top: 0;
+  padding: 16px 20px 24px;
 }
-.left-sidebar ,.right-sidebar {
-    width: 20%;
-    position: fixed;
-    max-height: 90vh;
-    overflow-y: scroll;
+
+.home-layout .row {
+  width: min(100%, 1460px);
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: minmax(220px, 280px) minmax(0, 1fr) minmax(220px, 300px);
+  column-gap: 20px;
+  align-items: start;
 }
-.left-sidebar {
-    left: 80px;
-}
+
+.left-sidebar,
 .right-sidebar {
-    right: 20px;
+  position: sticky;
+  top: 84px;
+  max-height: calc(100vh - 104px);
+  overflow-y: auto;
+  overflow-x: hidden;
+  width: 100%;
+  padding-bottom: 8px;
 }
-.row {
-    width: 700px;
-    position: relative;
-    margin: 0 auto;
+
+.middle-content {
+  min-width: 0;
+  width: 100%;
+  height: auto;
+  border-radius: 6px;
 }
-.container-fluid {
-    margin-top: -40px;
+
+/* Keep long inline content (emoji-heavy text, links) from breaking cards */
+:host ::ng-deep .middle-content * {
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
+
 @media screen and (max-width: 1300px) {
-    .row{
-        width: 100%;
-       // margin-left: 60px;
-    }
-    .left-sidebar ,.right-sidebar {
-        display: none;
-    }
+  .home-layout {
+    padding: 12px 12px 20px;
+  }
+
+  .home-layout .row {
+    display: block;
+    width: 100%;
+  }
+
+  .left-sidebar,
+  .right-sidebar {
+    display: none;
+  }
 }

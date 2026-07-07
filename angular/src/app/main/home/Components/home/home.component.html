@@ -1,4 +1,4 @@
-<div class="container-fluid">
+<div class="container-fluid home-layout" [class.rtl-layout]="isArabic">
     <div class="row justify-content-center">
         <div class="left-sidebar thin-scroll pr-1">
             <app-trending-posts (viewPost)="showPost($event)"></app-trending-posts>
@@ -8,8 +8,7 @@
         <div class="middle-content">
             <app-post-list #apppostlistcomponent></app-post-list>
         </div>
-        <div class="right-sidebar thin-scroll pr-1 pl-5"
-        [ngStyle]="{'right': isArabic ? '50px' : '20px'}">
+        <div class="right-sidebar thin-scroll pr-1 pl-5">
             <div class="mb-3">
                 <app-ads-sidebar></app-ads-sidebar>
             </div>
