@@ -14064,13 +14064,14 @@ export class AppItemsServiceProxy {
      * @param departmentFlag (optional) 
      * @param entityId (optional) 
      * @param excludeIds (optional) 
+     * @param includeResultCount (optional) 
      * @param filterCondition (optional) 
      * @param sorting (optional) 
      * @param skipCount (optional) 
      * @param maxResultCount (optional) 
      * @return Success
      */
-    getAllWithChildsExceptSelectedForProductWithPaging(filter: string | null | undefined, codeFilter: string | null | undefined, nameFilter: string | null | undefined, sydObjectNameFilter: string | null | undefined, sycEntityObjectCategoryNameFilter: string | null | undefined, eagger: boolean | undefined, objectId: number | undefined, parentId: number | undefined, departmentFlag: boolean | undefined, entityId: number | undefined, excludeIds: number[] | null | undefined, filterCondition: string | null | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<PagedResultDtoOfTreeNodeOfGetSycEntityObjectCategoryForViewDto> {
+    getAllWithChildsExceptSelectedForProductWithPaging(filter: string | null | undefined, codeFilter: string | null | undefined, nameFilter: string | null | undefined, sydObjectNameFilter: string | null | undefined, sycEntityObjectCategoryNameFilter: string | null | undefined, eagger: boolean | undefined, objectId: number | undefined, parentId: number | undefined, departmentFlag: boolean | undefined, entityId: number | undefined, excludeIds: number[] | null | undefined, includeResultCount: boolean | undefined, filterCondition: string | null | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<PagedResultDtoOfTreeNodeOfGetSycEntityObjectCategoryForViewDto> {
         let url_ = this.baseUrl + "/api/services/app/AppItems/GetAllWithChildsExceptSelectedForProductWithPaging?";
         if (filter !== undefined && filter !== null)
             url_ += "Filter=" + encodeURIComponent("" + filter) + "&";
@@ -14104,6 +14105,10 @@ export class AppItemsServiceProxy {
             url_ += "EntityId=" + encodeURIComponent("" + entityId) + "&";
         if (excludeIds !== undefined && excludeIds !== null)
             excludeIds && excludeIds.forEach(item => { url_ += "ExcludeIds=" + encodeURIComponent("" + item) + "&"; });
+        if (includeResultCount === null)
+            throw new Error("The parameter 'includeResultCount' cannot be null.");
+        else if (includeResultCount !== undefined)
+            url_ += "IncludeResultCount=" + encodeURIComponent("" + includeResultCount) + "&";
         if (filterCondition !== undefined && filterCondition !== null)
             url_ += "FilterCondition=" + encodeURIComponent("" + filterCondition) + "&";
         if (sorting !== undefined && sorting !== null)
@@ -14174,13 +14179,14 @@ export class AppItemsServiceProxy {
      * @param departmentFlag (optional) 
      * @param entityId (optional) 
      * @param excludeIds (optional) 
+     * @param includeResultCount (optional) 
      * @param filterCondition (optional) 
      * @param sorting (optional) 
      * @param skipCount (optional) 
      * @param maxResultCount (optional) 
      * @return Success
      */
-    getAppItemRelatedProductsWithPaging(filter: string | null | undefined, codeFilter: string | null | undefined, nameFilter: string | null | undefined, sydObjectNameFilter: string | null | undefined, sycEntityObjectCategoryNameFilter: string | null | undefined, eagger: boolean | undefined, objectId: number | undefined, parentId: number | undefined, departmentFlag: boolean | undefined, entityId: number | undefined, excludeIds: number[] | null | undefined, filterCondition: string | null | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<PagedResultDtoOfAppItemLookupDto> {
+    getAppItemRelatedProductsWithPaging(filter: string | null | undefined, codeFilter: string | null | undefined, nameFilter: string | null | undefined, sydObjectNameFilter: string | null | undefined, sycEntityObjectCategoryNameFilter: string | null | undefined, eagger: boolean | undefined, objectId: number | undefined, parentId: number | undefined, departmentFlag: boolean | undefined, entityId: number | undefined, excludeIds: number[] | null | undefined, includeResultCount: boolean | undefined, filterCondition: string | null | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<PagedResultDtoOfAppItemLookupDto> {
         let url_ = this.baseUrl + "/api/services/app/AppItems/GetAppItemRelatedProductsWithPaging?";
         if (filter !== undefined && filter !== null)
             url_ += "Filter=" + encodeURIComponent("" + filter) + "&";
@@ -14214,6 +14220,10 @@ export class AppItemsServiceProxy {
             url_ += "EntityId=" + encodeURIComponent("" + entityId) + "&";
         if (excludeIds !== undefined && excludeIds !== null)
             excludeIds && excludeIds.forEach(item => { url_ += "ExcludeIds=" + encodeURIComponent("" + item) + "&"; });
+        if (includeResultCount === null)
+            throw new Error("The parameter 'includeResultCount' cannot be null.");
+        else if (includeResultCount !== undefined)
+            url_ += "IncludeResultCount=" + encodeURIComponent("" + includeResultCount) + "&";
         if (filterCondition !== undefined && filterCondition !== null)
             url_ += "FilterCondition=" + encodeURIComponent("" + filterCondition) + "&";
         if (sorting !== undefined && sorting !== null)
@@ -44349,13 +44359,14 @@ export class SycEntityObjectCategoriesServiceProxy {
      * @param departmentFlag (optional) 
      * @param entityId (optional) 
      * @param excludeIds (optional) 
+     * @param includeResultCount (optional) 
      * @param filterCondition (optional) 
      * @param sorting (optional) 
      * @param skipCount (optional) 
      * @param maxResultCount (optional) 
      * @return Success
      */
-    getAll(filter: string | null | undefined, codeFilter: string | null | undefined, nameFilter: string | null | undefined, sydObjectNameFilter: string | null | undefined, sycEntityObjectCategoryNameFilter: string | null | undefined, eagger: boolean | undefined, objectId: number | undefined, parentId: number | undefined, departmentFlag: boolean | undefined, entityId: number | undefined, excludeIds: number[] | null | undefined, filterCondition: string | null | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<PagedResultDtoOfTreeNodeOfGetSycEntityObjectCategoryForViewDto> {
+    getAll(filter: string | null | undefined, codeFilter: string | null | undefined, nameFilter: string | null | undefined, sydObjectNameFilter: string | null | undefined, sycEntityObjectCategoryNameFilter: string | null | undefined, eagger: boolean | undefined, objectId: number | undefined, parentId: number | undefined, departmentFlag: boolean | undefined, entityId: number | undefined, excludeIds: number[] | null | undefined, includeResultCount: boolean | undefined, filterCondition: string | null | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<PagedResultDtoOfTreeNodeOfGetSycEntityObjectCategoryForViewDto> {
         let url_ = this.baseUrl + "/api/services/app/SycEntityObjectCategories/GetAll?";
         if (filter !== undefined && filter !== null)
             url_ += "Filter=" + encodeURIComponent("" + filter) + "&";
@@ -44389,6 +44400,10 @@ export class SycEntityObjectCategoriesServiceProxy {
             url_ += "EntityId=" + encodeURIComponent("" + entityId) + "&";
         if (excludeIds !== undefined && excludeIds !== null)
             excludeIds && excludeIds.forEach(item => { url_ += "ExcludeIds=" + encodeURIComponent("" + item) + "&"; });
+        if (includeResultCount === null)
+            throw new Error("The parameter 'includeResultCount' cannot be null.");
+        else if (includeResultCount !== undefined)
+            url_ += "IncludeResultCount=" + encodeURIComponent("" + includeResultCount) + "&";
         if (filterCondition !== undefined && filterCondition !== null)
             url_ += "FilterCondition=" + encodeURIComponent("" + filterCondition) + "&";
         if (sorting !== undefined && sorting !== null)
@@ -44459,13 +44474,14 @@ export class SycEntityObjectCategoriesServiceProxy {
      * @param departmentFlag (optional) 
      * @param entityId (optional) 
      * @param excludeIds (optional) 
+     * @param includeResultCount (optional) 
      * @param filterCondition (optional) 
      * @param sorting (optional) 
      * @param skipCount (optional) 
      * @param maxResultCount (optional) 
      * @return Success
      */
-    getAllWithChildsForContactAsTreeViewWithPaging(filter: string | null | undefined, codeFilter: string | null | undefined, nameFilter: string | null | undefined, sydObjectNameFilter: string | null | undefined, sycEntityObjectCategoryNameFilter: string | null | undefined, eagger: boolean | undefined, objectId: number | undefined, parentId: number | undefined, departmentFlag: boolean | undefined, entityId: number | undefined, excludeIds: number[] | null | undefined, filterCondition: string | null | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<PagedResultDtoOfTreeviewItem> {
+    getAllWithChildsForContactAsTreeViewWithPaging(filter: string | null | undefined, codeFilter: string | null | undefined, nameFilter: string | null | undefined, sydObjectNameFilter: string | null | undefined, sycEntityObjectCategoryNameFilter: string | null | undefined, eagger: boolean | undefined, objectId: number | undefined, parentId: number | undefined, departmentFlag: boolean | undefined, entityId: number | undefined, excludeIds: number[] | null | undefined, includeResultCount: boolean | undefined, filterCondition: string | null | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<PagedResultDtoOfTreeviewItem> {
         let url_ = this.baseUrl + "/api/services/app/SycEntityObjectCategories/GetAllWithChildsForContactAsTreeViewWithPaging?";
         if (filter !== undefined && filter !== null)
             url_ += "Filter=" + encodeURIComponent("" + filter) + "&";
@@ -44499,6 +44515,10 @@ export class SycEntityObjectCategoriesServiceProxy {
             url_ += "EntityId=" + encodeURIComponent("" + entityId) + "&";
         if (excludeIds !== undefined && excludeIds !== null)
             excludeIds && excludeIds.forEach(item => { url_ += "ExcludeIds=" + encodeURIComponent("" + item) + "&"; });
+        if (includeResultCount === null)
+            throw new Error("The parameter 'includeResultCount' cannot be null.");
+        else if (includeResultCount !== undefined)
+            url_ += "IncludeResultCount=" + encodeURIComponent("" + includeResultCount) + "&";
         if (filterCondition !== undefined && filterCondition !== null)
             url_ += "FilterCondition=" + encodeURIComponent("" + filterCondition) + "&";
         if (sorting !== undefined && sorting !== null)
@@ -44671,13 +44691,14 @@ export class SycEntityObjectCategoriesServiceProxy {
      * @param departmentFlag (optional) 
      * @param entityId (optional) 
      * @param excludeIds (optional) 
+     * @param includeResultCount (optional) 
      * @param filterCondition (optional) 
      * @param sorting (optional) 
      * @param skipCount (optional) 
      * @param maxResultCount (optional) 
      * @return Success
      */
-    getAllWithChildsForContactWithPaging(filter: string | null | undefined, codeFilter: string | null | undefined, nameFilter: string | null | undefined, sydObjectNameFilter: string | null | undefined, sycEntityObjectCategoryNameFilter: string | null | undefined, eagger: boolean | undefined, objectId: number | undefined, parentId: number | undefined, departmentFlag: boolean | undefined, entityId: number | undefined, excludeIds: number[] | null | undefined, filterCondition: string | null | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<PagedResultDtoOfTreeNodeOfGetSycEntityObjectCategoryForViewDto> {
+    getAllWithChildsForContactWithPaging(filter: string | null | undefined, codeFilter: string | null | undefined, nameFilter: string | null | undefined, sydObjectNameFilter: string | null | undefined, sycEntityObjectCategoryNameFilter: string | null | undefined, eagger: boolean | undefined, objectId: number | undefined, parentId: number | undefined, departmentFlag: boolean | undefined, entityId: number | undefined, excludeIds: number[] | null | undefined, includeResultCount: boolean | undefined, filterCondition: string | null | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<PagedResultDtoOfTreeNodeOfGetSycEntityObjectCategoryForViewDto> {
         let url_ = this.baseUrl + "/api/services/app/SycEntityObjectCategories/GetAllWithChildsForContactWithPaging?";
         if (filter !== undefined && filter !== null)
             url_ += "Filter=" + encodeURIComponent("" + filter) + "&";
@@ -44711,6 +44732,10 @@ export class SycEntityObjectCategoriesServiceProxy {
             url_ += "EntityId=" + encodeURIComponent("" + entityId) + "&";
         if (excludeIds !== undefined && excludeIds !== null)
             excludeIds && excludeIds.forEach(item => { url_ += "ExcludeIds=" + encodeURIComponent("" + item) + "&"; });
+        if (includeResultCount === null)
+            throw new Error("The parameter 'includeResultCount' cannot be null.");
+        else if (includeResultCount !== undefined)
+            url_ += "IncludeResultCount=" + encodeURIComponent("" + includeResultCount) + "&";
         if (filterCondition !== undefined && filterCondition !== null)
             url_ += "FilterCondition=" + encodeURIComponent("" + filterCondition) + "&";
         if (sorting !== undefined && sorting !== null)
@@ -44888,13 +44913,14 @@ export class SycEntityObjectCategoriesServiceProxy {
      * @param departmentFlag (optional) 
      * @param entityId (optional) 
      * @param excludeIds (optional) 
+     * @param includeResultCount (optional) 
      * @param filterCondition (optional) 
      * @param sorting (optional) 
      * @param skipCount (optional) 
      * @param maxResultCount (optional) 
      * @return Success
      */
-    getAllWithChildsForProductWithPaging(filter: string | null | undefined, codeFilter: string | null | undefined, nameFilter: string | null | undefined, sydObjectNameFilter: string | null | undefined, sycEntityObjectCategoryNameFilter: string | null | undefined, eagger: boolean | undefined, objectId: number | undefined, parentId: number | undefined, departmentFlag: boolean | undefined, entityId: number | undefined, excludeIds: number[] | null | undefined, filterCondition: string | null | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<PagedResultDtoOfTreeNodeOfGetSycEntityObjectCategoryForViewDto> {
+    getAllWithChildsForProductWithPaging(filter: string | null | undefined, codeFilter: string | null | undefined, nameFilter: string | null | undefined, sydObjectNameFilter: string | null | undefined, sycEntityObjectCategoryNameFilter: string | null | undefined, eagger: boolean | undefined, objectId: number | undefined, parentId: number | undefined, departmentFlag: boolean | undefined, entityId: number | undefined, excludeIds: number[] | null | undefined, includeResultCount: boolean | undefined, filterCondition: string | null | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<PagedResultDtoOfTreeNodeOfGetSycEntityObjectCategoryForViewDto> {
         let url_ = this.baseUrl + "/api/services/app/SycEntityObjectCategories/GetAllWithChildsForProductWithPaging?";
         if (filter !== undefined && filter !== null)
             url_ += "Filter=" + encodeURIComponent("" + filter) + "&";
@@ -44928,6 +44954,10 @@ export class SycEntityObjectCategoriesServiceProxy {
             url_ += "EntityId=" + encodeURIComponent("" + entityId) + "&";
         if (excludeIds !== undefined && excludeIds !== null)
             excludeIds && excludeIds.forEach(item => { url_ += "ExcludeIds=" + encodeURIComponent("" + item) + "&"; });
+        if (includeResultCount === null)
+            throw new Error("The parameter 'includeResultCount' cannot be null.");
+        else if (includeResultCount !== undefined)
+            url_ += "IncludeResultCount=" + encodeURIComponent("" + includeResultCount) + "&";
         if (filterCondition !== undefined && filterCondition !== null)
             url_ += "FilterCondition=" + encodeURIComponent("" + filterCondition) + "&";
         if (sorting !== undefined && sorting !== null)
@@ -45101,13 +45131,14 @@ export class SycEntityObjectCategoriesServiceProxy {
      * @param departmentFlag (optional) 
      * @param entityId (optional) 
      * @param excludeIds (optional) 
+     * @param includeResultCount (optional) 
      * @param filterCondition (optional) 
      * @param sorting (optional) 
      * @param skipCount (optional) 
      * @param maxResultCount (optional) 
      * @return Success
      */
-    getAllChildsWithPaging(filter: string | null | undefined, codeFilter: string | null | undefined, nameFilter: string | null | undefined, sydObjectNameFilter: string | null | undefined, sycEntityObjectCategoryNameFilter: string | null | undefined, eagger: boolean | undefined, objectId: number | undefined, parentId: number | undefined, departmentFlag: boolean | undefined, entityId: number | undefined, excludeIds: number[] | null | undefined, filterCondition: string | null | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<PagedResultDtoOfTreeNodeOfGetSycEntityObjectCategoryForViewDto> {
+    getAllChildsWithPaging(filter: string | null | undefined, codeFilter: string | null | undefined, nameFilter: string | null | undefined, sydObjectNameFilter: string | null | undefined, sycEntityObjectCategoryNameFilter: string | null | undefined, eagger: boolean | undefined, objectId: number | undefined, parentId: number | undefined, departmentFlag: boolean | undefined, entityId: number | undefined, excludeIds: number[] | null | undefined, includeResultCount: boolean | undefined, filterCondition: string | null | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<PagedResultDtoOfTreeNodeOfGetSycEntityObjectCategoryForViewDto> {
         let url_ = this.baseUrl + "/api/services/app/SycEntityObjectCategories/GetAllChildsWithPaging?";
         if (filter !== undefined && filter !== null)
             url_ += "Filter=" + encodeURIComponent("" + filter) + "&";
@@ -45141,6 +45172,10 @@ export class SycEntityObjectCategoriesServiceProxy {
             url_ += "EntityId=" + encodeURIComponent("" + entityId) + "&";
         if (excludeIds !== undefined && excludeIds !== null)
             excludeIds && excludeIds.forEach(item => { url_ += "ExcludeIds=" + encodeURIComponent("" + item) + "&"; });
+        if (includeResultCount === null)
+            throw new Error("The parameter 'includeResultCount' cannot be null.");
+        else if (includeResultCount !== undefined)
+            url_ += "IncludeResultCount=" + encodeURIComponent("" + includeResultCount) + "&";
         if (filterCondition !== undefined && filterCondition !== null)
             url_ += "FilterCondition=" + encodeURIComponent("" + filterCondition) + "&";
         if (sorting !== undefined && sorting !== null)
@@ -45831,13 +45866,14 @@ export class SycEntityObjectCategoriesServiceProxy {
      * @param departmentFlag (optional) 
      * @param entityId (optional) 
      * @param excludeIds (optional) 
+     * @param includeResultCount (optional) 
      * @param filterCondition (optional) 
      * @param sorting (optional) 
      * @param skipCount (optional) 
      * @param maxResultCount (optional) 
      * @return Success
      */
-    getAllWithChildsForTransactionWithPaging(filter: string | null | undefined, codeFilter: string | null | undefined, nameFilter: string | null | undefined, sydObjectNameFilter: string | null | undefined, sycEntityObjectCategoryNameFilter: string | null | undefined, eagger: boolean | undefined, objectId: number | undefined, parentId: number | undefined, departmentFlag: boolean | undefined, entityId: number | undefined, excludeIds: number[] | null | undefined, filterCondition: string | null | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<PagedResultDtoOfTreeNodeOfGetSycEntityObjectCategoryForViewDto> {
+    getAllWithChildsForTransactionWithPaging(filter: string | null | undefined, codeFilter: string | null | undefined, nameFilter: string | null | undefined, sydObjectNameFilter: string | null | undefined, sycEntityObjectCategoryNameFilter: string | null | undefined, eagger: boolean | undefined, objectId: number | undefined, parentId: number | undefined, departmentFlag: boolean | undefined, entityId: number | undefined, excludeIds: number[] | null | undefined, includeResultCount: boolean | undefined, filterCondition: string | null | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<PagedResultDtoOfTreeNodeOfGetSycEntityObjectCategoryForViewDto> {
         let url_ = this.baseUrl + "/api/services/app/SycEntityObjectCategories/GetAllWithChildsForTransactionWithPaging?";
         if (filter !== undefined && filter !== null)
             url_ += "Filter=" + encodeURIComponent("" + filter) + "&";
@@ -45871,6 +45907,10 @@ export class SycEntityObjectCategoriesServiceProxy {
             url_ += "EntityId=" + encodeURIComponent("" + entityId) + "&";
         if (excludeIds !== undefined && excludeIds !== null)
             excludeIds && excludeIds.forEach(item => { url_ += "ExcludeIds=" + encodeURIComponent("" + item) + "&"; });
+        if (includeResultCount === null)
+            throw new Error("The parameter 'includeResultCount' cannot be null.");
+        else if (includeResultCount !== undefined)
+            url_ += "IncludeResultCount=" + encodeURIComponent("" + includeResultCount) + "&";
         if (filterCondition !== undefined && filterCondition !== null)
             url_ += "FilterCondition=" + encodeURIComponent("" + filterCondition) + "&";
         if (sorting !== undefined && sorting !== null)
@@ -66052,6 +66092,7 @@ export class TreeNodeOfBranchForViewDto implements ITreeNodeOfBranchForViewDto {
     expanded!: boolean;
     label!: string | undefined;
     totalChildrenCount!: number | undefined;
+    resultCount!: number | undefined;
 
     [key: string]: any;
 
@@ -66080,6 +66121,7 @@ export class TreeNodeOfBranchForViewDto implements ITreeNodeOfBranchForViewDto {
             this.expanded = _data["expanded"];
             this.label = _data["label"];
             this.totalChildrenCount = _data["totalChildrenCount"];
+            this.resultCount = _data["resultCount"];
         }
     }
 
@@ -66106,6 +66148,7 @@ export class TreeNodeOfBranchForViewDto implements ITreeNodeOfBranchForViewDto {
         data["expanded"] = this.expanded;
         data["label"] = this.label;
         data["totalChildrenCount"] = this.totalChildrenCount;
+        data["resultCount"] = this.resultCount;
         return data;
     }
 }
@@ -66117,6 +66160,7 @@ export interface ITreeNodeOfBranchForViewDto {
     expanded: boolean;
     label: string | undefined;
     totalChildrenCount: number | undefined;
+    resultCount: number | undefined;
 
     [key: string]: any;
 }
@@ -73770,6 +73814,7 @@ export class TreeNodeOfGetSycEntityObjectClassificationForViewDto implements ITr
     expanded!: boolean;
     label!: string | undefined;
     totalChildrenCount!: number | undefined;
+    resultCount!: number | undefined;
 
     [key: string]: any;
 
@@ -73798,6 +73843,7 @@ export class TreeNodeOfGetSycEntityObjectClassificationForViewDto implements ITr
             this.expanded = _data["expanded"];
             this.label = _data["label"];
             this.totalChildrenCount = _data["totalChildrenCount"];
+            this.resultCount = _data["resultCount"];
         }
     }
 
@@ -73824,6 +73870,7 @@ export class TreeNodeOfGetSycEntityObjectClassificationForViewDto implements ITr
         data["expanded"] = this.expanded;
         data["label"] = this.label;
         data["totalChildrenCount"] = this.totalChildrenCount;
+        data["resultCount"] = this.resultCount;
         return data;
     }
 }
@@ -73835,6 +73882,7 @@ export interface ITreeNodeOfGetSycEntityObjectClassificationForViewDto {
     expanded: boolean;
     label: string | undefined;
     totalChildrenCount: number | undefined;
+    resultCount: number | undefined;
 
     [key: string]: any;
 }
@@ -73978,6 +74026,7 @@ export class TreeNodeOfGetSycEntityObjectCategoryForViewDto implements ITreeNode
     expanded!: boolean;
     label!: string | undefined;
     totalChildrenCount!: number | undefined;
+    resultCount!: number | undefined;
 
     [key: string]: any;
 
@@ -74006,6 +74055,7 @@ export class TreeNodeOfGetSycEntityObjectCategoryForViewDto implements ITreeNode
             this.expanded = _data["expanded"];
             this.label = _data["label"];
             this.totalChildrenCount = _data["totalChildrenCount"];
+            this.resultCount = _data["resultCount"];
         }
     }
 
@@ -74032,6 +74082,7 @@ export class TreeNodeOfGetSycEntityObjectCategoryForViewDto implements ITreeNode
         data["expanded"] = this.expanded;
         data["label"] = this.label;
         data["totalChildrenCount"] = this.totalChildrenCount;
+        data["resultCount"] = this.resultCount;
         return data;
     }
 }
@@ -74043,6 +74094,7 @@ export interface ITreeNodeOfGetSycEntityObjectCategoryForViewDto {
     expanded: boolean;
     label: string | undefined;
     totalChildrenCount: number | undefined;
+    resultCount: number | undefined;
 
     [key: string]: any;
 }
@@ -111732,6 +111784,7 @@ export class TreeNodeOfGetSycEntityObjectTypeForViewDto implements ITreeNodeOfGe
     expanded!: boolean;
     label!: string | undefined;
     totalChildrenCount!: number | undefined;
+    resultCount!: number | undefined;
 
     [key: string]: any;
 
@@ -111760,6 +111813,7 @@ export class TreeNodeOfGetSycEntityObjectTypeForViewDto implements ITreeNodeOfGe
             this.expanded = _data["expanded"];
             this.label = _data["label"];
             this.totalChildrenCount = _data["totalChildrenCount"];
+            this.resultCount = _data["resultCount"];
         }
     }
 
@@ -111786,6 +111840,7 @@ export class TreeNodeOfGetSycEntityObjectTypeForViewDto implements ITreeNodeOfGe
         data["expanded"] = this.expanded;
         data["label"] = this.label;
         data["totalChildrenCount"] = this.totalChildrenCount;
+        data["resultCount"] = this.resultCount;
         return data;
     }
 }
@@ -111797,6 +111852,7 @@ export interface ITreeNodeOfGetSycEntityObjectTypeForViewDto {
     expanded: boolean;
     label: string | undefined;
     totalChildrenCount: number | undefined;
+    resultCount: number | undefined;
 
     [key: string]: any;
 }
@@ -114688,6 +114744,7 @@ export class TreeNodeOfGetSydObjectForViewDto implements ITreeNodeOfGetSydObject
     expanded!: boolean;
     label!: string | undefined;
     totalChildrenCount!: number | undefined;
+    resultCount!: number | undefined;
 
     [key: string]: any;
 
@@ -114716,6 +114773,7 @@ export class TreeNodeOfGetSydObjectForViewDto implements ITreeNodeOfGetSydObject
             this.expanded = _data["expanded"];
             this.label = _data["label"];
             this.totalChildrenCount = _data["totalChildrenCount"];
+            this.resultCount = _data["resultCount"];
         }
     }
 
@@ -114742,6 +114800,7 @@ export class TreeNodeOfGetSydObjectForViewDto implements ITreeNodeOfGetSydObject
         data["expanded"] = this.expanded;
         data["label"] = this.label;
         data["totalChildrenCount"] = this.totalChildrenCount;
+        data["resultCount"] = this.resultCount;
         return data;
     }
 }
@@ -114753,6 +114812,7 @@ export interface ITreeNodeOfGetSydObjectForViewDto {
     expanded: boolean;
     label: string | undefined;
     totalChildrenCount: number | undefined;
+    resultCount: number | undefined;
 
     [key: string]: any;
 }
@@ -115311,6 +115371,7 @@ export class TreeNodeOfGetSysObjectTypeForViewDto implements ITreeNodeOfGetSysOb
     expanded!: boolean;
     label!: string | undefined;
     totalChildrenCount!: number | undefined;
+    resultCount!: number | undefined;
 
     [key: string]: any;
 
@@ -115339,6 +115400,7 @@ export class TreeNodeOfGetSysObjectTypeForViewDto implements ITreeNodeOfGetSysOb
             this.expanded = _data["expanded"];
             this.label = _data["label"];
             this.totalChildrenCount = _data["totalChildrenCount"];
+            this.resultCount = _data["resultCount"];
         }
     }
 
@@ -115365,6 +115427,7 @@ export class TreeNodeOfGetSysObjectTypeForViewDto implements ITreeNodeOfGetSysOb
         data["expanded"] = this.expanded;
         data["label"] = this.label;
         data["totalChildrenCount"] = this.totalChildrenCount;
+        data["resultCount"] = this.resultCount;
         return data;
     }
 }
@@ -115376,6 +115439,7 @@ export interface ITreeNodeOfGetSysObjectTypeForViewDto {
     expanded: boolean;
     label: string | undefined;
     totalChildrenCount: number | undefined;
+    resultCount: number | undefined;
 
     [key: string]: any;
 }

@@ -256,6 +256,7 @@ export class ProductFiltersComponent extends AppComponentBase implements OnInit,
           undefined,
           undefined,
           undefined,
+          undefined,
           "name",
           0,
           10
@@ -291,6 +292,7 @@ export class ProductFiltersComponent extends AppComponentBase implements OnInit,
           undefined,
           value.node.data.sycEntityObjectCategory.id,
           true,
+          undefined,
           undefined,
           undefined,
           undefined,
@@ -387,7 +389,9 @@ export class ProductFiltersComponent extends AppComponentBase implements OnInit,
         true,
         undefined,
         undefined,
+        true,
         undefined,
+        "name",
         0,
         10
       ).subscribe((res: any) => {
@@ -409,8 +413,9 @@ export class ProductFiltersComponent extends AppComponentBase implements OnInit,
         false,
         undefined,
         [],
-         undefined,
+        true,
         undefined,
+        "name",
         0,
         10
       ).subscribe((res: any) => {
@@ -450,7 +455,7 @@ export class ProductFiltersComponent extends AppComponentBase implements OnInit,
         undefined, undefined, undefined, undefined, undefined, undefined, undefined,
         evt.node.data.sycEntityObjectCategory.id,
         false,   
-        undefined, undefined, undefined,'name', 0, 10
+        undefined, undefined, undefined, undefined,'name', 0, 10
       )
       .pipe(finalize(() => (this.loading = false)))
       .subscribe((res: any) => (evt.node.children = this.filterEmptyLeafCategories(res.items)));     // E-SII-20250507.0050 
@@ -484,7 +489,7 @@ export class ProductFiltersComponent extends AppComponentBase implements OnInit,
             undefined, undefined, undefined, undefined, undefined, undefined, undefined,
             currentId,
             /* forDepartments? */ false,
-            undefined, undefined, undefined,'name', 0, 10
+            undefined, undefined, undefined, undefined,'name', 0, 10
           )
           .toPromise();
               // E-SII-20250507.0050 
@@ -594,6 +599,7 @@ export class ProductFiltersComponent extends AppComponentBase implements OnInit,
           undefined,
           undefined,
           undefined,
+          undefined,
           "name",
           0,
           10
@@ -639,7 +645,7 @@ export class ProductFiltersComponent extends AppComponentBase implements OnInit,
       if (!node.children || node.children.length === 0) {
         const res = await this._sycEntityObjectCategoriesServiceProxy.getAllChildsWithPaging(
           undefined, undefined, undefined, undefined, undefined, undefined, undefined,
-          currentId, true, undefined, undefined, undefined,"name", 0, 10
+          currentId, true, undefined, undefined, undefined, undefined,"name", 0, 10
         ).toPromise();
             // E-SII-20250507.0050 
         node.children = this.filterEmptyLeafCategories(res.items);
@@ -692,7 +698,7 @@ export class ProductFiltersComponent extends AppComponentBase implements OnInit,
           const res = await this._sycEntityObjectCategoriesServiceProxy
             .getAllChildsWithPaging(
               undefined, undefined, undefined, undefined, undefined, undefined, undefined,
-              id, true, undefined, undefined, undefined, "name", 0, 10
+          id, true, undefined, undefined, undefined, undefined, "name", 0, 10
             ).toPromise();
                 // E-SII-20250507.0050 
           node.children = this.filterEmptyLeafCategories(res.items);
