@@ -80,7 +80,7 @@ export class ProductCatalogueReportParams implements ProductCatalogueReportParam
         });
     }
     getReportUrl(){
-        debugger;
+        // debugger;
        let url = ""
        let  toUsers= ""
        let ccUsers= ""
