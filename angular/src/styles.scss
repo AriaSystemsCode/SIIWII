@@ -667,9 +667,18 @@ div.cropper span.resize-bar {
 }
 
 
-html[dir="rtl"] p-paginator .p-paginator-first svg,
-html[dir="rtl"] p-paginator .p-paginator-prev svg,
-html[dir="rtl"] p-paginator .p-paginator-next svg,
-html[dir="rtl"] p-paginator .p-paginator-last svg {
-    transform: scaleX(-1);
-}
+// html[dir="rtl"] p-paginator .p-paginator-first svg,
+// html[dir="rtl"] p-paginator .p-paginator-prev svg,
+// html[dir="rtl"] p-paginator .p-paginator-next svg,
+// html[dir="rtl"] p-paginator .p-paginator-last svg {
+//     transform: scaleX(-1);
+// }
+
+// html[dir="rtl"] .p-carousel .p-carousel-content .p-carousel-prev svg,
+// html[dir="rtl"] .p-carousel .p-carousel-content .p-carousel-next svg {
+//     transform: scaleX(-1);
+// }
+
+// body.kt-demo-panel--left .p-multiselect .p-multiselect-trigger {
+//     width: revert-rule !important;
+// }
