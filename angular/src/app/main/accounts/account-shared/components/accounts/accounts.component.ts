@@ -491,17 +491,19 @@ createRelation(account) {
           ''
         );
 
-        this.isCreatingRelation = false;
-        this.hideMainSpinner();
-        return;
+      this.isCreatingRelation = false;
+    account.done?.();
+    this.hideMainSpinner();
+    return;
       }
 
       this.applyRelation(account);
     },
-    error: () => {
-      this.isCreatingRelation = false;
-      this.hideMainSpinner();
-    }
+   error: () => {
+    this.isCreatingRelation = false;
+    account.done?.();
+    this.hideMainSpinner();
+}
   });
 }
 
@@ -516,6 +518,7 @@ private applyRelation(account): void {
     .pipe(
       finalize(() => {
         this.isCreatingRelation = false;
+        account.done?.();
         this.hideMainSpinner();
       })
     )
