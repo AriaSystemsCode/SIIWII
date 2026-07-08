@@ -488,42 +488,53 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit, 
 
 
     handleBuyerCompanyChange(event: any) {
-        this.searchTerm = ''
-        this.selectedBuyerContact = ''
+        this.searchTerm = '';
+        this.selectedBuyerContact = '';
+        this.buyerContacts = [];
+        this.filteredBuyerContacts = [];
+        this.buyerContactsLoadedCompanyId = null;
+
+        this.orderForm.get('buyerContactName')?.reset();
+        this.buyerContactId = 0;
+        this.buyerContactSSIN = undefined;
+
         this.buyerComapnyId = event.value.id;
         this.buyerCompanySSIN = event.value.accountSSIN;
         this.buyerCompanyRelationId = event.value.relationId;
         this.currencyCode = event.value.currencyCode;
-        this.areSame = false
-        this.orderForm.get('buyerContactPhoneNumber').setValue(event.value.phone)
-        this.orderForm.get('buyerContactEMailAddress').setValue(event.value.email)
-        this.handleBuyerNameSearch("");
-        this.buyerBranches = [];
-        this.getBranches(this.buyerCompanySSIN, 'buyer')
 
-        this.showBuyerRelationshipIcon = true;
-        this.getBuyerRelationshipName();
+        this.orderForm.get('buyerContactPhoneNumber')?.setValue(event.value.phone);
+        this.orderForm.get('buyerContactEMailAddress')?.setValue(event.value.email);
+
+        this.loadInitialContacts();
+
+        this.buyerBranches = [];
+        this.getBranches(this.buyerCompanySSIN, 'buyer');
     }
 
     handleSellerCompanyChange(event: any) {
+        this.selectedSellerContact = '';
+        this.sellerContacts = [];
+        this.filteredSellerContacts = [];
+        this.sellerContactsLoadedCompanyId = null;
 
-        this.selectedSellerContact = ''
+        this.orderForm.get('sellerContactName')?.reset();
+        this.sellerContactId = 0;
+        this.sellerContactSSIN = undefined;
 
         this.sellerCompanyId = event.value.id;
         this.updateSellerSSIN(event.value.accountSSIN);
 
         this.sellerCompanyRelationId = event.value.relationId;
-
         this.sellerCurrencyCode = event.value.currencyCode;
-        this.areSame = false
-        this.orderForm.get('sellerContactPhoneNumber').setValue(event.value.phone)
-        this.orderForm.get('sellerContactEMailAddress').setValue(event.value.email)
-        this.handleSellerNameSearch("");
-        this.sellerBranches = [];
-        this.getBranches(this.sellerCompanySSIN, 'seller')
 
-        this.showSellerRelationshipIcon = true;
-        this.getSellerRelationshipName();
+        this.orderForm.get('sellerContactPhoneNumber')?.setValue(event.value.phone);
+        this.orderForm.get('sellerContactEMailAddress')?.setValue(event.value.email);
+
+        this.loadInitialSellerContacts();
+
+        this.sellerBranches = [];
+        this.getBranches(this.sellerCompanySSIN, 'seller');
     }
 
     getBuyerRelationshipName() {
@@ -1272,17 +1283,17 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit, 
     }
 
     private getTransactionCurrencyCode(): string {
-          if (this.formType?.toUpperCase() === 'SO') {
-        // Sales Order -> Buyer currency
-        return this.currencyCode || this.appSession.tenant.currencyInfoDto?.code || 'USD';
-    }
+        if (this.formType?.toUpperCase() === 'SO') {
+            // Sales Order -> Buyer currency
+            return this.currencyCode || this.appSession.tenant.currencyInfoDto?.code || 'USD';
+        }
 
-    if (this.formType?.toUpperCase() === 'PO') {
-        // Purchase Order -> Buyer currency
-        return this.currencyCode || this.appSession.tenant.currencyInfoDto?.code || 'USD';
-    }
+        if (this.formType?.toUpperCase() === 'PO') {
+            // Purchase Order -> Buyer currency
+            return this.currencyCode || this.appSession.tenant.currencyInfoDto?.code || 'USD';
+        }
 
-    return this.appSession.tenant.currencyInfoDto?.code || 'USD';
+        return this.appSession.tenant.currencyInfoDto?.code || 'USD';
     }
 
     private updateSellerSSIN(value: string): void {

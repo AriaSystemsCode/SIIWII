@@ -29,12 +29,19 @@
     position: relative;
     text-align: center;
     padding: 85px;
-    font-size: 14px;
+    font-size: 13px;
+    word-break: break-word;
 }
 
 .image-upload-container {
     width: 100%;
     height: 100%;
+}
+
+.inputBorder {
+      border: 2px dashed #CFCFD4;
+    border-radius: 12px;
+    transition: all .25s ease;
 }
 
 .input-file {
@@ -46,6 +53,7 @@
     left: 0px;
     cursor: pointer;
     opacity: 0;
+
 }
 
 .input-file--disabled {

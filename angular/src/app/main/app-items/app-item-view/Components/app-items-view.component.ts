@@ -804,6 +804,7 @@ previewImageUrl = '';
                     undefined,
                     undefined,
                     undefined,
+                    undefined,
                     this.skipClassificationCount,
                     this.maxClassificationCount
                 )

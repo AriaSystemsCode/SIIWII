@@ -100,6 +100,11 @@
                                                 (click)="this.showEditConnected =false;editAccount()">
                                                 {{ "Edit" | localize }}
                                             </button>
+
+                                                 <button class="btn mb-3 mt-4 w-100 btn-danger mx-2" *ngIf="accountData.isManual"
+                                                (click)="deleteAccount()">
+                                                {{ "Delete" | localize }}
+                                            </button>
                                         </div>
                                         <div class="d-flex "
                                             [ngClass]="isArabic ? 'view-profile-action-buttons-ar':'view-profile-action-buttons-en'"
@@ -500,7 +505,7 @@
                             </div>
                             <hr class="header">
                             <div class="col-md-12  align-items-baseline pt-2 pb-2  pl-3 d-flex">
-                                <h6 class="font-weight-bold mr-3  " [ngClass]="Editting ? 'addWidth':''"><img
+                                <h6 class="font-weight-bold mx-3  " [ngClass]="Editting ? 'addWidth':''"><img
                                         src="../../assets/img/input_icons/letter.png" class="">{{ ( "Email" |
                                     localize ) + " :" }}</h6>
 
@@ -532,8 +537,8 @@
                             </div>
                             <hr class="header">
                             <div class="col-md-12  align-items-baseline pt-2 pb-2 pl-3 d-flex">
-                                <h6 class="text-right font-weight-bold mr-3 "> <img
-                                        src="../../assets/img/input_icons/language.png" style="margin-right: 15px;"> {{
+                                <h6 class="text-right font-weight-bold mx-3 "> <img
+                                        src="../../assets/img/input_icons/language.png"> {{
                                     ( "Language" |
                                     localize ) + " :" }}</h6>
 

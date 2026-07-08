@@ -2646,6 +2646,8 @@ namespace onetouch.AppItems
 
                     if (child.AppItemPriceInfos != null)
                     {
+                        EnsureDefaultPriceInfos(child.AppItemPriceInfos, currency);
+
                         if (appItemChild.ItemPricesFkList == null)
                             appItemChild.ItemPricesFkList = new List<AppItemPrices>();
 
@@ -2839,6 +2841,7 @@ namespace onetouch.AppItems
 
             if (input.AppItemPriceInfos != null)
             {
+                EnsureDefaultPriceInfos(input.AppItemPriceInfos, currency);
 
                 // Insert or update parent item prices and mark the tenant currency as default.
                 foreach (var itemPrice in input.AppItemPriceInfos)
@@ -3459,6 +3462,7 @@ namespace onetouch.AppItems
                     appItem.ItemSizeScaleHeadersFkList = await _appItemSizeScalesHeaderRepository.GetAll()
                         .Include(a => a.AppItemSizeScalesDetails).AsNoTracking().Where(a => a.AppItemId == input.AppItemId).ToListAsync();
                     appItem.ItemPricesFkList = await _appItemPricesRepository.GetAll().AsNoTracking().Where(a => a.AppItemId == input.AppItemId).ToListAsync();
+                    EnsureDefaultPrices(appItem.ItemPricesFkList);
                     var itemObjectId = await _helper.SystemTables.GetObjectListingId();
                     List<AppMarketplaceItems.AppMarketplaceItems> children = new List<AppMarketplaceItems.AppMarketplaceItems>();
                     //XX
@@ -3878,6 +3882,7 @@ namespace onetouch.AppItems
                     foreach (var child in appItem.ParentFkList)
                     {
                         child.ItemPricesFkList = await _appItemPricesRepository.GetAll().AsNoTracking().Where(a => a.AppItemId == child.Id).ToListAsync();
+                        EnsureDefaultPrices(child.ItemPricesFkList);
                         AppMarketplaceItems.AppMarketplaceItems publishChild = new AppMarketplaceItems.AppMarketplaceItems(); ;
                         if (publishedEntityId != 0)
                             publishChild = await _appMarketplaceItem.GetAll().Include(x => x.EntityAttachments).ThenInclude(z => z.AttachmentFk)
@@ -4069,6 +4074,48 @@ namespace onetouch.AppItems
                 }
             }
 
+        }
+        private static void EnsureDefaultPriceInfos(IEnumerable<AppItemPriceInfo> prices, string currencyCode)
+        {
+            if (prices == null)
+                return;
+
+            var priceList = prices.ToList();
+            foreach (var price in priceList.Where(x => !string.IsNullOrEmpty(currencyCode) && x.CurrencyCode == currencyCode))
+            {
+                price.IsDefault = true;
+            }
+
+            foreach (var priceGroup in priceList.Where(x => !string.IsNullOrEmpty(x.Code)).GroupBy(x => x.Code))
+            {
+                if (!priceGroup.Any(x => x.IsDefault))
+                    priceGroup.First().IsDefault = true;
+            }
+
+            foreach (var buyerGroup in priceList.Where(x => !string.IsNullOrEmpty(x.BuyerSSIN)).GroupBy(x => x.BuyerSSIN))
+            {
+                if (!buyerGroup.Any(x => x.IsDefault))
+                    buyerGroup.First().IsDefault = true;
+            }
+        }
+
+        private static void EnsureDefaultPrices(IEnumerable<AppItemPrices> prices)
+        {
+            if (prices == null)
+                return;
+
+            var priceList = prices.ToList();
+            foreach (var priceGroup in priceList.Where(x => !string.IsNullOrEmpty(x.Code)).GroupBy(x => x.Code))
+            {
+                if (!priceGroup.Any(x => x.IsDefault))
+                    priceGroup.First().IsDefault = true;
+            }
+
+            foreach (var buyerGroup in priceList.Where(x => !string.IsNullOrEmpty(x.BuyerSSIN)).GroupBy(x => x.BuyerSSIN))
+            {
+                if (!buyerGroup.Any(x => x.IsDefault))
+                    buyerGroup.First().IsDefault = true;
+            }
         }
         private async Task SaveItemSharingOptions(SharingItemOptions input)
         {

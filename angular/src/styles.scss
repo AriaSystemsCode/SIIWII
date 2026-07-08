@@ -673,3 +673,28 @@ html[dir="rtl"] p-paginator .p-paginator-next svg,
 html[dir="rtl"] p-paginator .p-paginator-last svg {
     transform: scaleX(-1);
 }
+
+html[dir="rtl"] .p-carousel .p-carousel-content .p-carousel-prev svg,
+html[dir="rtl"] .p-carousel .p-carousel-content .p-carousel-next svg {
+    transform: scaleX(-1);
+}
+
+body.kt-demo-panel--left .p-multiselect .p-multiselect-trigger {
+    width: revert-rule !important;
+}
+
+html[dir="rtl"] .p-carousel .p-carousel-items-content,
+html[dir="rtl"] .p-carousel .p-carousel-items-container {
+    direction: ltr !important;
+}
+
+html[dir="rtl"] .p-carousel .p-carousel-prev svg,
+html[dir="rtl"] .p-carousel .p-carousel-next svg,
+html[dir="rtl"] .p-carousel .p-carousel-prev .pi,
+html[dir="rtl"] .p-carousel .p-carousel-next .pi {
+    transform: scaleX(-1) !important;
+}
+
+.p-dropdown-panel .p-dropdown-header .p-dropdown-filter{
+    margin: auto !important;
+}

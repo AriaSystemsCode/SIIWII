@@ -35,7 +35,7 @@
     <ng-container *ngIf="mediaItems?.[selectedIndex]?.attachmentCategoryId !== 8; else videoTemplate">
       <img onerror="this.src='../../assets/placeholders/appitem-placeholder.png'"
         [src]="attachmentBaseUrl + '/' + mediaItems?.[selectedIndex]?.url" alt="Selected Media" class="modal-image"
-        style="max-width: 100%; max-height: 100%; border-radius: 8px; min-height: 350px;" loading="lazy" />
+         loading="lazy" />
     </ng-container>
 
     <ng-template #videoTemplate>
@@ -45,12 +45,25 @@
     </ng-template>
 
     <!-- Navigation Buttons -->
-    <button *ngIf="mediaItems?.length > 0 && selectedIndex > 0" class="nav-button prev"
-      (click)="prevMedia()">   {{ isArabic ? '\u276F' : '\u276E' }}
+     <div *ngIf="!isArabic">
+   <button *ngIf="mediaItems?.length > 0 && selectedIndex > 0" class="nav-button prev"
+      (click)="prevMedia()">   {{  '\u276E' }}
 </button>
     <button *ngIf="mediaItems?.length > 0 && selectedIndex < mediaItems.length - 1" class="nav-button next"
-      (click)="nextMedia()">  {{ !isArabic ? '\u276F' : '\u276E' }}
+      (click)="nextMedia()">  {{  '\u276F'  }}
 </button>
+     </div>
+
+        <div *ngIf="isArabic">
+              <button *ngIf="mediaItems?.length > 0 && selectedIndex > 0" class="nav-button next"
+      (click)="prevMedia()">  {{ '\u276E' }}
+</button>
+   <button *ngIf="mediaItems?.length > 0 && selectedIndex < mediaItems.length - 1"  class="nav-button prev"
+      (click)="nextMedia()">   {{  '\u276F'  }}
+</button>
+
+     </div>
+ 
   </div>
 </p-dialog>
 </div>
