@@ -3100,9 +3100,12 @@ namespace onetouch.Accounts
                 string marketplaceAccountRole = "";
                 string recipientEntityObjecttypeId = "";
                 string RequestorEntityObjecttypeId = "";
+                bool isManualAccount = false;
                 var account = await _appMarketplaceContactRepository.GetAll().Include(z => z.EntityExtraData).Where(z => z.Id == id).FirstOrDefaultAsync();
                 if (account != null)
                 {
+                    if (account.TenantOwner == null || account.TenantOwner == 0 || account.TenantOwner ==AbpSession.TenantId)
+                        isManualAccount = true;
                     recipientSSIN = account.SSIN;
                     recipientEntityObjecttypeId = account.EntityObjectTypeCode;
                     var extraDataRole = account.EntityExtraData
@@ -3118,6 +3121,8 @@ namespace onetouch.Accounts
                         .ThenInclude(z => z.EntityExtraData).Where(z => z.Id == id).FirstOrDefaultAsync();
                     if (releatedAccount != null)
                     {
+                        if (releatedAccount.EntityFk.TenantOwner == null || releatedAccount.EntityFk.TenantOwner == 0 ||releatedAccount.EntityFk.TenantOwner == AbpSession.TenantId)
+                            isManualAccount = true;
                         account = await _appMarketplaceContactRepository.GetAll()
                             .Include(z => z.EntityExtraData).Where(z => z.SSIN == releatedAccount.SSIN).FirstOrDefaultAsync();
                         recipientSSIN = releatedAccount.SSIN;
@@ -3156,14 +3161,14 @@ namespace onetouch.Accounts
                     var requestorType = relationshipCodeLookup.EntityExtraData.Where(z => z.AttributeId == 606).FirstOrDefault();
                     if ((requestorType != null && requestorType.AttributeValue.TrimEnd().ToLower() == RequestorEntityObjecttypeId.ToLower())
                          && ((requestorRole != null && !string.IsNullOrEmpty(requestorRole.AttributeValue)) ?
-                         (currentTenatntAccountMarketplaceRole.ToLower().Replace(".", "").Contains(requestorRole.AttributeValue.ToLower().TrimEnd().Replace(".", ""))) : true))
+                         (currentTenatntAccountMarketplaceRole.ToLower().Replace(".", "").Contains(requestorRole.AttributeValue.ToLower().TrimEnd().Replace(".", ""))) : false))
                     {
                         var responseType = relationshipCodeLookup.EntityExtraData.Where(z => z.AttributeId == 607).FirstOrDefault();
                         if (((responseType != null && responseType.AttributeValue.TrimEnd().ToLower() == recipientEntityObjecttypeId.ToLower())
                             && ((!string.IsNullOrEmpty(marketplaceAccountRole)
                                         && recepientRole != null && !string.IsNullOrEmpty(recepientRole.AttributeValue)) ?
                                         marketplaceAccountRole.ToLower().Replace(".","").Contains(recepientRole.AttributeValue.ToLower().TrimEnd().Replace(".", ""))
-                                        : true)))
+                                        : false)))
 
                         {
                             var connectLabel = relationshipCodeLookup.EntityExtraData.Where(z => z.AttributeId == 601).FirstOrDefault();
@@ -3232,7 +3237,7 @@ namespace onetouch.Accounts
                               ).CountAsync();
 
                     //Mariam[Start]
-                    if (relationshipCnt == 0)
+                    if (relationshipCnt == 0 && isManualAccount==false)
                     {
                         var contactsInfo = _appContactRepository.GetAll().Where(x => x.AccountId == existed.Id).ToList();
                         foreach (var contactRec in contactsInfo)
@@ -3752,13 +3757,22 @@ namespace onetouch.Accounts
                         .Where(z => z.IsProfileData == true && z.PartnerId == null && z.ParentId == null).FirstOrDefaultAsync();
                     if (contactFortCurrTenant != null)
                     {
-                      var returnVal =
-                       await _iCreateMarketplaceAccount.CreateOrEditMarketplaceContactRelationship(contactFortCurrTenant.SSIN,
-                        contact.SSIN, 
-                        false, false, input.RelationshipId,null);
+                        var returnVal =
+                         await _iCreateMarketplaceAccount.CreateOrEditMarketplaceContactRelationship(contactFortCurrTenant.SSIN,
+                          contact.SSIN,
+                          false, false, input.RelationshipId, null);
                     }
                     await _iCreateMarketplaceAccount.HideAccount(contact.SSIN);
                 }
+            }
+            else
+            {
+                if (input.ParentId == null && (input.Id != 0 && input.Id != null))
+                {
+                    var tenant = input.TenantId == null ? AbpSession.TenantId : input.TenantId;
+                    await PublishManualAccount(contact.SSIN, long.Parse(tenant.ToString()));
+                }
+                
             }
             //I40
             await CurrentUnitOfWork.SaveChangesAsync();
@@ -4189,7 +4203,7 @@ namespace onetouch.Accounts
 
                     CreateOrEditMarketplaceAccountInfoDto createOrEditAccountInfoDto = new CreateOrEditMarketplaceAccountInfoDto();
                     ObjectMapper.Map(contact, createOrEditAccountInfoDto);
-                    var appMarketplaceContact = await _iCreateMarketplaceAccount.CreateOrEditMarketplaceAccount(createOrEditAccountInfoDto, false);
+                    var appMarketplaceContact = await _iCreateMarketplaceAccount.CreateOrEditMarketplaceAccount(createOrEditAccountInfoDto,(publishContact==null?false:true));
                     return true;
                 }
                 return false;

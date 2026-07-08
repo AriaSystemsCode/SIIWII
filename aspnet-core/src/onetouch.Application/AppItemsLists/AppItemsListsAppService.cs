@@ -225,7 +225,7 @@ namespace onetouch.AppItemsLists
                                             Name = o.Name,
                                             //T-SII-20230618.0001,1 MMT 06/20/2023 Enhance Product browse page[Start]
                                             //SharingLevel = o.SharingLevel,
-                                            SharingLevel = j2 != null ? j2.SharingLevel : null,
+                                            SharingLevel = ((input.FilterType != ItemsListFilterTypesEnum.MyItemsList)? o.SharingLevel: (j2 != null ? j2.SharingLevel : null)),
                                             //T-SII-20230618.0001,1 MMT 06/20/2023 Enhance Product browse page[End]
                                             Id = o.Id,
                                             Description = o.Description,
@@ -1322,8 +1322,9 @@ namespace onetouch.AppItemsLists
 
                 //get publishedItemsList
                 AppMarketplaceItemLists.AppMarketplaceItemLists publishItemsList = new AppMarketplaceItemLists.AppMarketplaceItemLists();
-                if (entitiesRelationship != null)
-                    publishItemsList = await _appMarketplaceItemListRepository.GetAll().FirstOrDefaultAsync(x => x.Id == entitiesRelationship.RelatedEntityId);
+                //if (entitiesRelationship != null)
+                //publishItemsList = await _appMarketplaceItemListRepository.GetAll().FirstOrDefaultAsync(x => x.Id == entitiesRelationship.RelatedEntityId);
+                publishItemsList = await _appMarketplaceItemListRepository.GetAll().FirstOrDefaultAsync(x => x.SSIN == itemsList.SSIN);
 
                 if (publishItemsList == null || publishItemsList.Id == 0)
                 {
