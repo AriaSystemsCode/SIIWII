@@ -25,7 +25,7 @@ import { ViewMemberProfileComponentInputsI } from '@app/main/teamMembers/models/
 import { MembersListComponent } from '@app/main/members-list/components/members-list/members-list.component';
 import { ImageUploadComponentOutput } from '@app/shared/common/image-upload/image-upload.component';
 import { Paginator } from 'primeng/paginator';
-
+import { Location } from '@angular/common';
 @Component({
     selector: 'app-account-info',
     templateUrl: './accountInfo.component.html',
@@ -324,7 +324,7 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit {
         this._AppEntitiesServiceProxy.getAllPhoneTypeForTableDropdown().subscribe(result => {
             this.allPhoneTypes = result;
             this.phoneTypesLoaded = true;
-            // this.setDefaultPhoneTypes();
+            this.setDefaultPhoneTypes();
 
         });
     }
@@ -463,6 +463,9 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit {
                 !result?.accountInfo?.id ? this.shipViaId :
                     result.accountInfo?.shipViaId ? result.accountInfo?.shipViaId : this.shipViaId;
 
+      
+
+
         }
     }
     resetFormData() {
@@ -473,7 +476,8 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit {
         this.accountInfoForm.form.patchValue(this.accountInfoTemp.toJSON())
         this.companyLogo = this.accountDataForView?.logoUrl ? `${this.attachmentBaseUrl}/${this.accountDataForView?.logoUrl}` : undefined;
         this.coverPhoto = this.accountDataForView?.coverUrl ? `${this.attachmentBaseUrl}/${this.accountDataForView?.coverUrl}` : undefined;
-        this.changeTab(!this.accountInfoTemp?.id && !this.accountId ? this.accountInfoPageTabsEnum.ProfileCreateOrEdit : this.accountInfoPageTabsEnum.ProfileView)
+        !this.accountInfoTemp?.id && !this.accountId ? this._router.navigate(['/app/main/accounts']) :   this.changeTab(this.accountInfoPageTabsEnum.ProfileView)
+    
     }
     async getAccountDataForView() {
 
@@ -843,11 +847,11 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit {
         if (this.editedContactPerData?.userId != null) {
             this.setStringValue(715, this.editedContactPerData?.userId);
         }
-        if (event?.phone1IsPublic != null) {
-            this.setBooleanValue(711, event.phone1IsPublic); // boolean
+        if (event?.phone2IsPublic != null) {
+            this.setBooleanValue(711, event.phone2IsPublic); // boolean
         }
-        if (this.editedContactPerData?.phone2IsPublic != null) {
-            this.setBooleanValue(712, this.editedContactPerData.phone2IsPublic); // boolean
+        if (this.editedContactPerData?.phone3IsPublic != null) {
+            this.setBooleanValue(712, this.editedContactPerData.phone3IsPublic); // boolean
         }
         if (event?.emailAddressIsPublic != null) {
             this.setBooleanValue(709, event.emailAddressIsPublic); // boolean
@@ -1202,17 +1206,17 @@ private restoreRemovedRoles(rolesToRestore: string[]): void {
 
 
 
-    // setDefaultPhoneTypes(): void {
+    setDefaultPhoneTypes(): void {
 
-    //     if (!this.accountInfoLoded || !this.phoneTypesLoaded) return;
+        if (!this.accountInfoLoded || !this.phoneTypesLoaded) return;
 
-    //     //set default phone types tobe displayed
-    //     if (this.accountInfoTemp.phone1TypeId == 0 || this.accountInfoTemp.phone1TypeId == null) {
-    //         this.accountInfoTemp.phone1TypeId = this.allPhoneTypes.length > 0 ? this.allPhoneTypes[0].value : this.accountInfoTemp.phone1TypeId;
-    //         this.accountInfoTemp.phone2TypeId = this.allPhoneTypes.length > 1 ? this.allPhoneTypes[1].value : this.accountInfoTemp.phone2TypeId;
-    //         this.accountInfoTemp.phone3TypeId = this.allPhoneTypes.length > 2 ? this.allPhoneTypes[2].value : this.accountInfoTemp.phone3TypeId;
-    //     }
-    // }
+        //set default phone types tobe displayed
+        if (this.accountInfoTemp.phone1TypeId == 0 || this.accountInfoTemp.phone1TypeId == null) {
+            this.accountInfoTemp.phone1TypeId = this.allPhoneTypes.length > 0 ? this.allPhoneTypes[0].value : this.accountInfoTemp.phone1TypeId;
+            this.accountInfoTemp.phone2TypeId = this.allPhoneTypes.length > 1 ? this.allPhoneTypes[1].value : this.accountInfoTemp.phone2TypeId;
+            this.accountInfoTemp.phone3TypeId = this.allPhoneTypes.length > 2 ? this.allPhoneTypes[2].value : this.accountInfoTemp.phone3TypeId;
+        }
+    }
 
 
     openImageCropper(event, aspectRatio?: number, noOptions?: boolean): { onCropDone: Observable<any>, data: ImageCropperComponent } {
@@ -1598,7 +1602,7 @@ private restoreRemovedRoles(rolesToRestore: string[]): void {
     getClassifications(event: LazyLoadEvent) {
         if (this.primengTableHelperClass.shouldResetPaging(event)) {
             setTimeout(() => {
-                this.paginatorClass.changePage(0);
+                this.paginatorClass?.changePage(0);
             }, 500);
             return;
         }
@@ -1612,7 +1616,7 @@ private restoreRemovedRoles(rolesToRestore: string[]): void {
     getCategories(event: LazyLoadEvent) {
         if (this.primengTableHelperCateg.shouldResetPaging(event)) {
             setTimeout(() => {
-                this.paginatorCateg.changePage(0);
+                this.paginatorCateg?.changePage(0);
             }, 500);
             return;
         }
@@ -1698,6 +1702,30 @@ private restoreRemovedRoles(rolesToRestore: string[]): void {
             });
     }
 
+    refreshPublish(event){
+        if(event){
+            this.getMyAccountDataForView() 
+        }
+    }
+
+    get jobTitle(): string {
+        return (
+          this.accountInfoTemp?.entityExtraData?.find(x => x.attributeId === 706)
+            ?.attributeValue || ''
+        );
+      }
+      
+      set jobTitle(value: string) {
+        this.ensureAttribute(706);
+        const attr = this.accountInfoTemp.entityExtraData.find(x => x.attributeId === 706);
+        attr.attributeValue = value;
+      }
+      private normalizePhone(v?: string): string | undefined {
+        if (!v) return undefined;
+        const trimmed = v.trim();
+        return trimmed.length ? trimmed : undefined;
+      }
+ 
 
     buildMarketplaceRolesExtraData(): AppEntityExtraDataDto[] {
         if (!this.selectedRoles?.length) {

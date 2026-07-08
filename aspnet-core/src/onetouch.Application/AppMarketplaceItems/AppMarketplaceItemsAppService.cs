@@ -68,7 +68,7 @@ namespace onetouch.AppMarketplaceItems
         private readonly IMessageAppService _messageAppService;
         //I48[End]
         //I40[Start]
-        IRepository<AppMarketplaceContact, long> _appMarketplaceContactRepository;
+        IRepository<AppMarketplaceContacts.AppMarketplaceContact, long> _appMarketplaceContactRepository;
         //I40[End]
         //I49[Start]
         private readonly IRepository<AppContactRelationshipInfo, long> _appContactRelationshipInfoRepository;
@@ -101,6 +101,7 @@ namespace onetouch.AppMarketplaceItems
             _appConfiguration = appConfigurationAccessor.Configuration;
             _appEntitiesAppService = appEntitiesAppService;
             _appMarketplaceAccountsPriceLevels = appMarketplaceAccountsPriceLevels;
+            _appEntitiesRelationship = appEntitiesRelationship;
             _appMarketplaceContactRepository = appMarketplaceContactRepository;
             _appEntitiesRelationship = appEntitiesRelationship;
             //I49[Start]
@@ -360,7 +361,7 @@ namespace onetouch.AppMarketplaceItems
                                                o.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.CurrencyCode == input.CurrencyCode).Select(a => a.Price).FirstOrDefault() :
                                               (o.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.CurrencyCode == "USD").FirstOrDefault() == null ? //0 :
                                               (o.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.IsDefault == true && q.CurrencyCode != input.CurrencyCode).FirstOrDefault() != null ?
-                                              ((o.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.IsDefault && q.CurrencyCode != input.CurrencyCode).FirstOrDefault().Price) * (input.CurrencyCode == "USD" ? u.ExchangeRate : (1 / u.ExchangeRate) * exchangeRate)) : 0) :
+                                              ((o.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.IsDefault && q.CurrencyCode != input.CurrencyCode).FirstOrDefault().Price) * (input.CurrencyCode == "USD" ? u.ExchangeRate : (1 / (u.ExchangeRate == 0 ? 1 : u.ExchangeRate)) * exchangeRate)) : 0) :
                                               (o.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.CurrencyCode == "USD").FirstOrDefault() != null ?
                                               (o.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.CurrencyCode == "USD").Select(a => a.Price).FirstOrDefault() * exchangeRate) : 0)))),
                                        Id = o.Id,
@@ -370,14 +371,14 @@ namespace onetouch.AppMarketplaceItems
                                                o.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.CurrencyCode == input.CurrencyCode).Select(a => a.Price).FirstOrDefault() :
                                               (o.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.CurrencyCode == "USD").FirstOrDefault() == null ? //0 :
                                               (o.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.IsDefault == true && q.CurrencyCode != input.CurrencyCode).FirstOrDefault() != null ?
-                                              ((o.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.IsDefault && q.CurrencyCode != input.CurrencyCode).FirstOrDefault().Price) * (input.CurrencyCode == "USD" ? u.ExchangeRate : (1 / u.ExchangeRate) * exchangeRate)) : 0) :
+                                              ((o.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.IsDefault && q.CurrencyCode != input.CurrencyCode).FirstOrDefault().Price) * (input.CurrencyCode == "USD" ? u.ExchangeRate : (1 /(u.ExchangeRate==0? 1 : u.ExchangeRate)) * exchangeRate)) : 0) :
                                               (o.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.CurrencyCode == "USD").FirstOrDefault() != null ? (o.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.CurrencyCode == "USD").Select(a => a.Price).FirstOrDefault() * exchangeRate) : 0)))) >= (decimal)input.MinimumPrice) : true) &&
                                               (input.MaximumPrice != null ? ((decimal)(input.CurrencyCode == null ? o.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.CurrencyCode == "USD").Select(a => a.Price).FirstOrDefault() :
                                                (o.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.CurrencyCode == input.CurrencyCode).FirstOrDefault() != null ?
                                                o.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.CurrencyCode == input.CurrencyCode).Select(a => a.Price).FirstOrDefault() :
                                               (o.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.CurrencyCode == "USD").FirstOrDefault() == null ? //0 :
                                               (o.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.IsDefault == true && q.CurrencyCode != input.CurrencyCode).FirstOrDefault() != null ?
-                                              ((o.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.IsDefault && q.CurrencyCode != input.CurrencyCode).FirstOrDefault().Price) * (input.CurrencyCode == "USD" ? u.ExchangeRate : (1 / u.ExchangeRate) * exchangeRate)) : 0) :
+                                              ((o.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.IsDefault && q.CurrencyCode != input.CurrencyCode).FirstOrDefault().Price) * (input.CurrencyCode == "USD" ? u.ExchangeRate : (1 / (u.ExchangeRate == 0 ? 1 : u.ExchangeRate)) * exchangeRate)) : 0) :
                                               (o.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.CurrencyCode == "USD").FirstOrDefault() != null ? (o.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.CurrencyCode == "USD").Select(a => a.Price).FirstOrDefault() * exchangeRate) : 0)))) <= (decimal)input.MaximumPrice) : true),
 
                                        ImageUrl = (o.EntityAttachments.FirstOrDefault(x => x.IsDefault == true) == null ?
@@ -414,7 +415,7 @@ namespace onetouch.AppMarketplaceItems
                                                o.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.CurrencyCode == input.CurrencyCode).Select(a => a.Price).FirstOrDefault() :
                                               (o.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.CurrencyCode == "USD").FirstOrDefault() == null ? //0 :
                                               (o.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.IsDefault == true && q.CurrencyCode != input.CurrencyCode).FirstOrDefault() != null ?
-                                              ((o.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.IsDefault && q.CurrencyCode != input.CurrencyCode).FirstOrDefault().Price) * (input.CurrencyCode == "USD" ? u.ExchangeRate : (1 / u.ExchangeRate) * exchangeRate)) : 0) :
+                                              ((o.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.IsDefault && q.CurrencyCode != input.CurrencyCode).FirstOrDefault().Price) * (input.CurrencyCode == "USD" ? u.ExchangeRate : (1 / (u.ExchangeRate == 0 ? 1 : u.ExchangeRate)) * exchangeRate)) : 0) :
                                               (o.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.CurrencyCode == "USD").FirstOrDefault() != null ?
                                               (o.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.CurrencyCode == "USD").Select(a => a.Price).FirstOrDefault() * exchangeRate) : 0)))),
                                        Id = o.Id,
@@ -424,14 +425,14 @@ namespace onetouch.AppMarketplaceItems
                                                o.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.CurrencyCode == input.CurrencyCode).Select(a => a.Price).FirstOrDefault() :
                                               (o.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.CurrencyCode == "USD").FirstOrDefault() == null ? //0 :
                                               (o.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.IsDefault == true && q.CurrencyCode != input.CurrencyCode).FirstOrDefault() != null ?
-                                              ((o.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.IsDefault && q.CurrencyCode != input.CurrencyCode).FirstOrDefault().Price) * (input.CurrencyCode == "USD" ? u.ExchangeRate : (1 / u.ExchangeRate) * exchangeRate)) : 0) :
+                                              ((o.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.IsDefault && q.CurrencyCode != input.CurrencyCode).FirstOrDefault().Price) * (input.CurrencyCode == "USD" ? u.ExchangeRate : (1 / (u.ExchangeRate == 0 ? 1 : u.ExchangeRate)) * exchangeRate)) : 0) :
                                               (o.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.CurrencyCode == "USD").FirstOrDefault() != null ? (o.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.CurrencyCode == "USD").Select(a => a.Price).FirstOrDefault() * exchangeRate) : 0)))) >= (decimal)input.MinimumPrice) : true) &&
                                               (input.MaximumPrice != null ? ((decimal)(input.CurrencyCode == null ? o.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.CurrencyCode == "USD").Select(a => a.Price).FirstOrDefault() :
                                                (o.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.CurrencyCode == input.CurrencyCode).FirstOrDefault() != null ?
                                                o.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.CurrencyCode == input.CurrencyCode).Select(a => a.Price).FirstOrDefault() :
                                               (o.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.CurrencyCode == "USD").FirstOrDefault() == null ? //0 :
                                               (o.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.IsDefault == true && q.CurrencyCode != input.CurrencyCode).FirstOrDefault() != null ?
-                                              ((o.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.IsDefault && q.CurrencyCode != input.CurrencyCode).FirstOrDefault().Price) * (input.CurrencyCode == "USD" ? u.ExchangeRate : (1 / u.ExchangeRate) * exchangeRate)) : 0) :
+                                              ((o.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.IsDefault && q.CurrencyCode != input.CurrencyCode).FirstOrDefault().Price) * (input.CurrencyCode == "USD" ? u.ExchangeRate : (1 / (u.ExchangeRate == 0 ? 1 : u.ExchangeRate)) * exchangeRate)) : 0) :
                                               (o.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.CurrencyCode == "USD").FirstOrDefault() != null ? (o.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.CurrencyCode == "USD").Select(a => a.Price).FirstOrDefault() * exchangeRate) : 0)))) <= (decimal)input.MaximumPrice) : true),
 
                                        ImageUrl = (o.EntityAttachments.FirstOrDefault(x => x.IsDefault == true) == null ?
@@ -616,7 +617,7 @@ namespace onetouch.AppMarketplaceItems
             
         }
         //Iteration#49,1 MMT 09/28/2025 Allow unauthenticated user to view the product marketplace view page[Start]
-        [AbpAllowAnonymous]
+        [AbpAllowAnonymous] 
         //Iteration#49,1 MMT 09/28/2025 Allow unauthenticated user to view the product marketplace browse page[End]
         public async Task<GetAppMarketplaceItemDetailForViewDto> GetMarketplaceAppItemForView(GetAppMarketplaceItemWithPagedAttributesForViewInput input)
         {
@@ -2200,7 +2201,7 @@ namespace onetouch.AppMarketplaceItems
                   marketpaceItem.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.CurrencyCode == currencyCode).Select(a => a.Price).FirstOrDefault() :
                  (marketpaceItem.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.CurrencyCode == "USD").FirstOrDefault() == null ? //0 :
                  (marketpaceItem.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.IsDefault == true && q.CurrencyCode != currencyCode).FirstOrDefault() != null ?
-                 ((marketpaceItem.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.IsDefault && q.CurrencyCode != currencyCode).FirstOrDefault().Price) * (currencyCode == "USD" ? exchangeRateVal : (1 / exchangeRateVal) * exchangeRate)) : 0) :
+                 ((marketpaceItem.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.IsDefault && q.CurrencyCode != currencyCode).FirstOrDefault().Price) * (currencyCode == "USD" ? exchangeRateVal : (1 / (exchangeRateVal == 0 ? 1 : exchangeRateVal)) * exchangeRate)) : 0) :
                  (marketpaceItem.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.CurrencyCode == "USD").FirstOrDefault() != null ?
                  (marketpaceItem.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.CurrencyCode == "USD").Select(a => a.Price).FirstOrDefault() * exchangeRate) : 0)))),
                         Id = marketpaceItem.Id,

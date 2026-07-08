@@ -231,9 +231,9 @@ export class AccountsListFiltersComponent extends AppComponentBase implements On
 
     getCurrenciesList(componentRef: { onListLoadCallback: Function }) {
         const subs = this._appEntitiesServiceProxy.getAllCurrencyForTableDropdownWithPaging(
-            this.currencyFilter,           undefined,
+            this.currencyFilter,           
             undefined, undefined, undefined, undefined, undefined, undefined, undefined,
-            undefined,
+            undefined,undefined,
             this.sortBy,
             this.currencyFilterMetaData.listSkipCount,
             this.currencyFilterMetaData.listMaxResultCount,

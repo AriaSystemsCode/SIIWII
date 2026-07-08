@@ -26,6 +26,7 @@ import * as moment from "moment";
 import {  ConfirmationService } from "primeng/api";
 import { finalize } from "rxjs/operators";
 import Swal from "sweetalert2";
+import { Location } from '@angular/common';
 
 
 @Component({
@@ -107,6 +108,7 @@ export class MarketplaceViewProductComponent
         private appItemsAppservice: AppItemsServiceProxy,
          private messageServiceProxy: MessageServiceProxy,
          private route: ActivatedRoute,  
+         private location: Location,
         injector: Injector
     ) {
         super(injector);
@@ -911,7 +913,9 @@ export class MarketplaceViewProductComponent
 
     backToResult() {
 
-        this.router.navigateByUrl("app/main/marketplace/products");
+        // this.router.navigateByUrl("app/main/marketplace/products");
+        this.location.back();
+
     }
 
     onEditpecialPrice(updatedSpecialPrice) {

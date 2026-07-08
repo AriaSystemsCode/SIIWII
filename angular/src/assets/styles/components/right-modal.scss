@@ -87,7 +87,7 @@ button[aria-label=Close] {
     display: flex!important;
     justify-content: space-between!important;
     flex-direction: column;
-    height: 100%;
+    height: 100vh;
     .modal-body {
         flex-grow: 1!important;
         max-height: 80vh;

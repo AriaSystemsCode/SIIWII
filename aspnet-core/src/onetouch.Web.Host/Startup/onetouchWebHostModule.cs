@@ -88,7 +88,7 @@ namespace onetouch.Web.Startup
             {
                 var _appConfigurationMaster = _configurationAccessor.Configuration;
                 string AriaMasterConnection = _appConfigurationMaster["ConnectionStrings:AriaMaster"]?.ToString();
-                if(string.IsNullOrEmpty(AriaMasterConnection))
+                if (string.IsNullOrEmpty(AriaMasterConnection))
                 {
                     // use connection string from config if available, otherwise fallback to hardcoded one
                     AriaMasterConnection = "Server=WEBAPP-DEV\\SIIWII; Database=Aria.MASTER;TrustServerCertificate=True;User ID=sa;Password=Siiwii@2024;";
@@ -97,7 +97,7 @@ namespace onetouch.Web.Startup
                 using (var conn = new SqlConnection(AriaMasterConnection))
                 {
                     conn.Open();
-                     
+
                     using (var cmd = new SqlCommand("SELECT TOP 1 * FROM Clients WHERE Url = @Url", conn))
                     {
                         cmd.Parameters.AddWithValue("@Url", origin);
@@ -111,7 +111,7 @@ namespace onetouch.Web.Startup
                                 var path = reader["Path"]?.ToString();   // <-- Path column
                                 var pathTemp = reader["TempPath"]?.ToString();   // <-- Path Temp column
                                 var omitt = reader["Omitt"]?.ToString();   // <-- Omitt column
-                               
+
 
                                 if (!string.IsNullOrEmpty(connectionString))
                                 {
@@ -191,7 +191,7 @@ namespace onetouch.Web.Startup
 
                     // Log DB name and seed datetime to Logs.txt (same file used by the app logger)
                     var seedDbName = new Microsoft.Data.SqlClient.SqlConnectionStringBuilder(connectionString).InitialCatalog;
-                    var seedLogDir  = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "App_Data", "Logs");
+                    var seedLogDir = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "App_Data", "Logs");
                     var seedLogPath = System.IO.Path.Combine(seedLogDir, "LogsSeeding.txt");
                     try
                     {
@@ -240,7 +240,7 @@ namespace onetouch.Web.Startup
 
         public override void PreInitialize()
         {
-            Configuration.Modules.AbpWebCommon().MultiTenancy.DomainFormat = _appConfiguration["App:ServerRootAddress"] ?? "https://localhost:44336/";
+            Configuration.Modules.AbpWebCommon().MultiTenancy.DomainFormat = _appConfiguration["App:ServerRootAddress"] ?? "https://localhost:44300/";
             Configuration.Modules.AspNetZero().LicenseCode = _appConfiguration["AbpZeroLicenseCode"];
 
 

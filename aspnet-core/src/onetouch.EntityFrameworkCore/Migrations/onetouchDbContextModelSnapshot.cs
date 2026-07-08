@@ -2362,6 +2362,8 @@ namespace onetouch.Migrations
 
                     b.HasIndex("ObjectId");
 
+                    b.HasIndex("TenantOwner");
+
                     b.ToTable("AppEntities", t =>
                         {
                             t.HasTrigger("AppEntities_Trigger");
@@ -7651,6 +7653,9 @@ namespace onetouch.Migrations
                     b.Property<long>("StockAvailability")
                         .HasColumnType("bigint");
 
+                    b.Property<decimal>("TaxRate")
+                        .HasColumnType("decimal(18,2)");
+
                     b.Property<string>("Variations")
                         .HasColumnType("nvarchar(max)");
 
@@ -8630,11 +8635,19 @@ namespace onetouch.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("onetouch.MultiTenancy.Tenant", "TenantOwnerFk")
+                        .WithMany()
+                        .HasForeignKey("TenantOwner")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("EntityObjectStatusFk");
 
                     b.Navigation("EntityObjectTypeFk");
 
                     b.Navigation("ObjectFk");
+
+                    b.Navigation("TenantOwnerFk");
                 });
 
             modelBuilder.Entity("onetouch.AppEntities.AppEntityAddress", b =>

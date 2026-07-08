@@ -9,6 +9,12 @@
 	<text name="SHIPPINGCHARGE">Shipping Charge</text>
 	<text name="SHIPPINGMINIMUMAMOUNT">Shipping Minimum Amount</text>		
 		
+	<text name="DefaultContactUsEmail">Default contact us email</text>
+	<text name="Defaultcontactusemailtemplate">Default contact us email template</text>
+	<text name="MarketplacesellerSSIN">Marketplace seller SSIN</text>
+	<text name="Defaultlandingpageis">Default landing page is</text>
+	<text name="Auto-connecttenantstoMarketplaceselleruponcreation">Auto-connect tenants to Marketplace seller upon creation</text>
+	<text name="Auto-shareTenantstoMarketplaceuponcreation">Auto-share Tenants to Marketplace upon creation</text>		
 	<text name="Portalimage">Portal image</text>
 	<text name="Portalslogan">Portal slogan</text>
 	<text name="Shownewsfeed">Show news feed</text>
@@ -2645,10 +2651,13 @@
 	<text name="IsAddOn">Add-On</text>
 	<text name="Limited">Limited</text>
     <text name="UpdateAccountInformation">Update Account Information</text>
-    <text name="Pleasemakesuretheimagessize5MB">Please make sure the images size 5MB</text>
+    
 	<text name="FilesformatsSupportedareXLSX,JPGandPNG">Files formats Supported are XLSX,JPG and PNG</text>
 	<text name="Relatedproducts">Related products</text>
 	<text name="noproductsarelinked">no products are linked</text>
+    <text name="ImportCustomprices">Import Custom prices</text>
+	<text name="Totalpassedprice">Total passed price </text>
+	<text name="Totalfailedprice">Total failed price</text>
 	<text name="BussinessClassification">Bussiness Classification</text>
 	<text name="OverallRating">Overall Rating</text>
 	<text name="Media">Media</text>
@@ -2729,6 +2738,10 @@
 	<text name="BUSINESS">Business</text>
 	<text name="PERSONAL">Personal</text>
 	<text name="GROUP">Group</text>
+	<text name="PleaseEnteraValidEmailAddress"> Please enter a valid email address</text>
+    
+	
+	
 
 
  

@@ -14,3 +14,38 @@
     display: block;
     border-radius: 50%;
 }
+.modal {
+    width: 40% !important;
+}
+::ng-deep {
+    .modal-rtl {
+        position: fixed;
+        top: 0;
+        left:  0 !important;
+        z-index: 1050;
+        display: none;
+        width: 40%;
+        height: 100%;
+        overflow: hidden;
+        outline: 0;
+    }
+    .modal-ltr {
+        position: fixed;
+        top: 0;
+        right: 0 !important;
+        z-index: 1050;
+        display: none;
+        width: 40%;
+        height: 100%;
+        overflow: hidden;
+        outline: 0;
+    }
+}
+.closeIcon-ar {
+    left: 0;
+    width: 60px !important;
+}
+
+.closeIcon-en {
+    right: 0;
+}

@@ -7,7 +7,8 @@ import {
     LookupLabelDto,
     AppEntitiesServiceProxy,
     AppContactAddressDto,
-    AppAddressDto
+    AppAddressDto,
+    AccountDto
 } from '@shared/service-proxies/service-proxies';
 import { AppComponentBase } from '@shared/common/app-component-base';
 
@@ -24,7 +25,8 @@ export class CreateOrEditBranchModalComponent extends AppComponentBase {
     @Input() directShippingAddressDef: LookupLabelDto
     @Input() distributionCenterAddressDef: LookupLabelDto
     @Input() mailingAddressDef: LookupLabelDto
-
+   @Input('accountData') accountData: AccountDto
+   
     @Output() branchAdded: EventEmitter<any> = new EventEmitter<any>();
     @Output() branchUpdated: EventEmitter<any> = new EventEmitter<any>();
     @Output() selectAddress: EventEmitter<any> = new EventEmitter<any>();
@@ -55,6 +57,16 @@ export class CreateOrEditBranchModalComponent extends AppComponentBase {
     branchCode: string = "";
 
     phonePattern = '^[0-9+()\\-\\s]*$'; 
+
+
+// Dialog state
+showApplyAddressDialog = false;
+
+// Keep what user selected until he decides
+private pendingSelectedAddress: any = null;
+private pendingAddressSlot: number = 0; // 1..4
+private isNewBranch = false;
+
     currentLang:string
     isArabic:boolean = true
     constructor(
@@ -81,36 +93,26 @@ export class CreateOrEditBranchModalComponent extends AppComponentBase {
     addressSelected(address) {
         this.active = true;
         this.modal.show();
-
-        let x: AppContactAddressDto;
-
-        if (this.currSelectAddress == 1) {
-            x = this.address1;
+      
+        const isPersonal = this.accountData?.accountTypeId == 21;
+      
+        if (!isPersonal) {
+          // normal behavior: only selected slot
+          const slotRef = this.getSlotRef(this.currSelectAddress);
+          this.fillContactAddress(slotRef, address);
+          return;
         }
-        if (this.currSelectAddress == 2) {
-            x = this.address2;
-        }
-        if (this.currSelectAddress == 3) {
-            x = this.address3;
-        }
-        if (this.currSelectAddress == 4) {
-            x = this.address4;
-        }
-
-        x.addressId = address.id;
-        x.code = address.code;
-        x.name = address.name;
-        x.addressLine1 = address.addressLine1;
-        x.addressLine2 = address.addressLine2;
-        x.city = address.city;
-        x.state = address.state;
-        x.postalCode = address.postalCode;
-        x.countryId = address.countryId;
-        x.countryIdName = address.countryIdName;
-
-    }
+      
+        // personal: open dialog
+        this.pendingSelectedAddress = address;
+        this.pendingAddressSlot = this.currSelectAddress;
+        this.showApplyAddressDialog = true;
+      }
+      
+      
 
     show(accountId?: number, branchId?: number, parentId?: number): void {
+        this.isNewBranch = !branchId; 
         this.address1 = this.clearAddress();
         this.address2 = this.clearAddress();
         this.address3 = this.clearAddress();
@@ -120,8 +122,11 @@ export class CreateOrEditBranchModalComponent extends AppComponentBase {
         if (!branchId) {
             this.branch = new BranchDto();
             this.branch.accountId = accountId
+            this.branch.phone1TypeId = null;
+            this.branch.phone2TypeId = null;
+            this.branch.phone3TypeId = null;
             this.accountInfoLoded = true;
-            this.setDefaultPhoneTypes();
+            // this.setDefaultPhoneTypes();
             this.branch.id = branchId;
             this.branch.parentId = parentId;
             this.active = true;
@@ -153,7 +158,7 @@ export class CreateOrEditBranchModalComponent extends AppComponentBase {
                 if (x4 != undefined) this.address4 = x4;
 
                 this.accountInfoLoded = true;
-                this.setDefaultPhoneTypes();
+                // this.setDefaultPhoneTypes();
                 this.hideMainSpinner();
                 this.active = true;
                 this.modal.show();
@@ -161,7 +166,8 @@ export class CreateOrEditBranchModalComponent extends AppComponentBase {
         }
 
         this._AppEntitiesServiceProxy.getAllPhoneTypeForTableDropdown().subscribe(result => {
-            this.allPhoneTypes = result;
+            // this.allPhoneTypes = result;
+            this.allPhoneTypes = this.filterPhoneTypesForAccount(result);
             this.phoneTypesLoaded = true;
             this.setDefaultPhoneTypes();
 
@@ -237,16 +243,16 @@ export class CreateOrEditBranchModalComponent extends AppComponentBase {
 
         return address
     }
-    setDefaultPhoneTypes(): void {
+    // setDefaultPhoneTypes(): void {
 
 
-        if (!this.accountInfoLoded || !this.phoneTypesLoaded) return;
-        if (this.branch.phone1TypeId == 0 || this.branch.phone1TypeId == null || this.branch.phone1TypeId == undefined) {
-            this.branch.phone1TypeId = this.allPhoneTypes.length > 0 ? this.allPhoneTypes[0].value : this.branch.phone1TypeId;
-            this.branch.phone2TypeId = this.allPhoneTypes.length > 1 ? this.allPhoneTypes[1].value : this.branch.phone2TypeId;
-            this.branch.phone3TypeId = this.allPhoneTypes.length > 2 ? this.allPhoneTypes[2].value : this.branch.phone3TypeId;
-        }
-    }
+    //     if (!this.accountInfoLoded || !this.phoneTypesLoaded) return;
+    //     if (this.branch.phone1TypeId == 0 || this.branch.phone1TypeId == null || this.branch.phone1TypeId == undefined) {
+    //         this.branch.phone1TypeId = this.allPhoneTypes.length > 0 ? this.allPhoneTypes[0].value : this.branch.phone1TypeId;
+    //         this.branch.phone2TypeId = this.allPhoneTypes.length > 1 ? this.allPhoneTypes[1].value : this.branch.phone2TypeId;
+    //         this.branch.phone3TypeId = this.allPhoneTypes.length > 2 ? this.allPhoneTypes[2].value : this.branch.phone3TypeId;
+    //     }
+    // }
 
     // Add inside the component (private helpers)
     private toAppAddressDto(src: any, tenantId: number): AppAddressDto {
@@ -320,4 +326,108 @@ export class CreateOrEditBranchModalComponent extends AppComponentBase {
         this.branchCode = code;
     }
 
+
+    private fillContactAddress(target: AppContactAddressDto, address: any): void {
+        target.addressId = address.id;
+        target.code = address.code;
+        target.name = address.name;
+        target.addressLine1 = address.addressLine1;
+        target.addressLine2 = address.addressLine2;
+        target.city = address.city;
+        target.state = address.state;
+        target.postalCode = address.postalCode;
+        target.countryId = address.countryId;
+        target.countryIdName = address.countryIdName;
+      }
+      
+      private getSlotRef(slot: number): AppContactAddressDto {
+        switch (slot) {
+          case 1: return this.address1;
+          case 2: return this.address2;
+          case 3: return this.address3;
+          case 4: return this.address4;
+          default: return this.address1;
+        }
+      }
+      
+      private applyAddressToAllSlots(address: any): void {
+        this.fillContactAddress(this.address1, address);
+        this.fillContactAddress(this.address2, address);
+        this.fillContactAddress(this.address3, address);
+        this.fillContactAddress(this.address4, address);
+      }
+      applySelectedAddressOnly(): void {
+        if (!this.pendingSelectedAddress) return;
+      
+        const slotRef = this.getSlotRef(this.pendingAddressSlot);
+        this.fillContactAddress(slotRef, this.pendingSelectedAddress);
+      
+        this.resetApplyDialog();
+      }
+      
+      applySelectedAddressToAll(): void {
+        if (!this.pendingSelectedAddress) return;
+      
+        this.applyAddressToAllSlots(this.pendingSelectedAddress);
+      
+        this.resetApplyDialog();
+      }
+      
+      cancelApplyDialog(): void {
+    
+        this.resetApplyDialog();
+      }
+      
+      private resetApplyDialog(): void {
+        this.showApplyAddressDialog = false;
+        this.pendingSelectedAddress = null;
+        this.pendingAddressSlot = 0;
+      }
+      
+      private filterPhoneTypesForAccount(types: LookupLabelDto[]): LookupLabelDto[] {
+        const isPersonal = this.accountData?.accountTypeId == 21;
+        if (!isPersonal) return types || [];
+      
+        return (types || []).filter(t => (t?.code || '').toUpperCase() !== 'BUSINE');
+      }
+      
+      
+      private getTypeIdByCode(code: string): number | null {
+        const target = (code || '').toUpperCase();
+        const found = (this.allPhoneTypes || []).find(x => ((x as any).code || '').toUpperCase() === target);
+        return found?.value ?? null;
+      }
+      
+      setDefaultPhoneTypes(): void {
+        if (!this.phoneTypesLoaded) return;
+      
+        const isPersonal = this.accountData?.accountTypeId === 21;
+        if (!isPersonal) {
+      
+          if (!this.branch.phone1TypeId) this.branch.phone1TypeId = this.allPhoneTypes?.[0]?.value ?? null;
+          if (!this.branch.phone2TypeId) this.branch.phone2TypeId = this.allPhoneTypes?.[1]?.value ?? null;
+          if (!this.branch.phone3TypeId) this.branch.phone3TypeId = this.allPhoneTypes?.[2]?.value ?? null;
+          return;
+        }
+      
+   
+        const mobileId = this.getTypeIdByCode('MOBILE'); // 817
+        const homeId   = this.getTypeIdByCode('HOME');   // 815
+        const cell2Id  = this.getTypeIdByCode('CELLP');  // 534384
+      
+    
+        if (this.isNewBranch) {
+          this.branch.phone1TypeId = mobileId;
+          this.branch.phone2TypeId = homeId;
+          this.branch.phone3TypeId = cell2Id;
+          return;
+        }
+  
+        if (!this.branch.phone1TypeId) this.branch.phone1TypeId = mobileId;
+        if (!this.branch.phone2TypeId) this.branch.phone2TypeId = homeId;
+        if (!this.branch.phone3TypeId) this.branch.phone3TypeId = cell2Id;
+      }
+      
+      
+      
 }

@@ -34,6 +34,8 @@ using Abp.AspNetZeroCore.Timing;
 using onetouch.AppMarketplaceContacts;
 using onetouch.AppSiiwiiTransaction.Dtos;
 using onetouch.AppContacts;
+using Microsoft.Extensions.Configuration;
+using onetouch.Configuration;
 
 namespace onetouch.AppItemsLists
 {
@@ -68,6 +70,7 @@ namespace onetouch.AppItemsLists
         //I49[Start]
         private readonly IRepository<AppMarketplaceContact, long> _appMarketplaceAccountsRepository;
         private readonly IRepository<AppContactRelationshipInfo,long> _appContactRelationshipInfoRepository;
+        private readonly IConfigurationRoot _appConfiguration;
         //I49[End]
         public AppItemsListsAppService(IRepository<AppItemsList, long> appItemsListRepository, IAppItemsListsExcelExporter appItemsListsExcelExporter, Helper helper
             , IAppEntitiesAppService appEntitiesAppService
@@ -85,8 +88,10 @@ namespace onetouch.AppItemsLists
              IAppItemsAppService appItemsAppService,
              ISycEntityObjectTypesAppService sycEntityObjectTypesAppService, 
              IRepository<SydObject, long> sydObjectRepository, IRepository<AppMarketplaceContact, long> appMarketplaceAccountsRepository,
-             IRepository<AppContactRelationshipInfo, long> appContactRelationshipInfoRepository)
+             IRepository<AppContactRelationshipInfo, long> appContactRelationshipInfoRepository,
+             IAppConfigurationAccessor appConfigurationAccessor)
         {
+            _appConfiguration = appConfigurationAccessor.Configuration;
             //I45
             _sydObjectRepository = sydObjectRepository;
             _appItemsAppService = appItemsAppService;
@@ -220,7 +225,7 @@ namespace onetouch.AppItemsLists
                                             Name = o.Name,
                                             //T-SII-20230618.0001,1 MMT 06/20/2023 Enhance Product browse page[Start]
                                             //SharingLevel = o.SharingLevel,
-                                            SharingLevel = j2 != null ? j2.SharingLevel : null,
+                                            SharingLevel = ((input.FilterType != ItemsListFilterTypesEnum.MyItemsList)? o.SharingLevel: (j2 != null ? j2.SharingLevel : null)),
                                             //T-SII-20230618.0001,1 MMT 06/20/2023 Enhance Product browse page[End]
                                             Id = o.Id,
                                             Description = o.Description,
@@ -376,6 +381,17 @@ namespace onetouch.AppItemsLists
             {
 
                 var appItemsList = await _appItemsListRepository.GetAll().Where(x => x.Id == id).Include(x => x.EntityFk).Include(x => x.ItemSharingFkList).ThenInclude(x => x.UserFk).FirstOrDefaultAsync();
+                //T-SII-20260212.0001 [Begin]
+                if (appItemsList == null)
+                {
+                    id = await GetMainItemListID(id);
+                    if (id != 0)
+                    {
+                        appItemsList = await _appItemsListRepository.GetAll().Where(x => x.Id == id).Include(x => x.EntityFk).Include(x => x.ItemSharingFkList).ThenInclude(x => x.UserFk).FirstOrDefaultAsync();
+                    }
+                    else
+                    { return null; }
+                }
 
                 var output = new GetAppItemsListForEditOutput { AppItemsList = ObjectMapper.Map<CreateOrEditAppItemsListDto>(appItemsList), TenantId = appItemsList.TenantId };
                 output.AppItemsList.AppItemsListItems = await GetDetails(new GetDetailsInput { ItemListId = id, SkipCount = 0, MaxResultCount = 10 });
@@ -449,7 +465,7 @@ namespace onetouch.AppItemsLists
                 var itemslistItemsIDsAndState = _appMarketplaceItemsListDetailRepository.GetAll().Where(x => x.AppMarketplaceItemsListId == input.ItemListId).Select(x => new { ItemId = x.AppMarketplaceItemId, x.State }).ToArray();
 
                 var filteredAppItemsListItems = _appMarketplaceItemsListDetailRepository.GetAll()
-                            .Include(x => x.ItemFK).ThenInclude(x => x.EntityAttachments)
+                            .Include(x => x.ItemFK).ThenInclude(x => x.EntityAttachments).ThenInclude(z=>z.AttachmentFk)
                             .Include(x => x.ItemFK).ThenInclude(x => x.ParentFkList).ThenInclude(x => x.EntityExtraData).ThenInclude(x => x.AttributeValueFk)
                             .Include(x => x.ItemFK).ThenInclude(x => x.ParentFkList).ThenInclude(x => x.EntityExtraData).ThenInclude(x => x.EntityObjectTypeFk)
                             .WhereIf(input.ItemId > 0, x => x.AppMarketplaceItemId == input.ItemId)
@@ -467,8 +483,11 @@ namespace onetouch.AppItemsLists
                 foreach (var item in appItemsLists)
                 {
                     item.AppItemsListItemVariations = await GetMarketplaceItemsListVariations(item.ItemId, input.ItemListId);
-                    item.ImageURL = imageQuery.FirstOrDefault(x => x.ItemFK.EntityAttachments.Count > 0) != null
-                                                ? "attachments/" + "-1" + "/" + imageQuery.FirstOrDefault(x => x.ItemFK.EntityAttachments.Count > 0).ItemFK.EntityAttachments.FirstOrDefault().AttachmentFk.Attachment
+                    //item.ImageURL = imageQuery.FirstOrDefault(x => x.it == item.ItemSSIN && x.ItemFK.EntityAttachments.Count > 0) != null
+                    //                            ? "attachments/" + "-1" + "/" + imageQuery.FirstOrDefault(x => x.AppMarketplaceItemSSIN == item.ItemSSIN && x.ItemFK.EntityAttachments.Count > 0).ItemFK.EntityAttachments.FirstOrDefault().AttachmentFk.Attachment
+                    //                                : "";
+                    item.ImageURL = pagedAndFilteredAppItemsListItems.FirstOrDefault(x => x.Id == item.Id && x.ItemFK.EntityAttachments.Count > 0) != null
+                                                ? "attachments/" + "-1" + "/" + pagedAndFilteredAppItemsListItems.FirstOrDefault(x => x.Id == item.Id && x.ItemFK.EntityAttachments.Count > 0).ItemFK.EntityAttachments.FirstOrDefault().AttachmentFk.Attachment
                                                     : "";
                     //var maketItem = await _appMarketplaceItem.GetAll().Where(z => z.Id == item.ItemId).FirstOrDefaultAsync();
                     //if (maketItem!=null)
@@ -1271,6 +1290,23 @@ namespace onetouch.AppItemsLists
             await ShareItemList(input);
 
         }
+        //T-SII-20260212.0001
+        public async Task<long> GetMainItemListID(long sharedItemListId)
+        {
+            if(sharedItemListId>0)
+            {
+                var mainItemListEntity =  await _appEntitiesRelationshipRepository.GetAll().Where(e => e.RelatedEntityId == sharedItemListId)
+                                            .FirstOrDefaultAsync();
+                if(mainItemListEntity != null)
+                {
+                    var MainItemList = await _appItemsListRepository.GetAll().Where(e => e.EntityId == mainItemListEntity.EntityId  )
+                                            .FirstOrDefaultAsync();
+                    if(MainItemList != null) { return MainItemList.Id; }
+                }
+            }
+
+            return 0;
+        }
         [AbpAuthorize(AppPermissions.Pages_AppItemsLists_Publish)]
         public async Task ShareItemList(ShareItemListOptions input)
         {
@@ -1286,8 +1322,9 @@ namespace onetouch.AppItemsLists
 
                 //get publishedItemsList
                 AppMarketplaceItemLists.AppMarketplaceItemLists publishItemsList = new AppMarketplaceItemLists.AppMarketplaceItemLists();
-                if (entitiesRelationship != null)
-                    publishItemsList = await _appMarketplaceItemListRepository.GetAll().FirstOrDefaultAsync(x => x.Id == entitiesRelationship.RelatedEntityId);
+                //if (entitiesRelationship != null)
+                //publishItemsList = await _appMarketplaceItemListRepository.GetAll().FirstOrDefaultAsync(x => x.Id == entitiesRelationship.RelatedEntityId);
+                publishItemsList = await _appMarketplaceItemListRepository.GetAll().FirstOrDefaultAsync(x => x.SSIN == itemsList.SSIN);
 
                 if (publishItemsList == null || publishItemsList.Id == 0)
                 {
@@ -1380,7 +1417,7 @@ namespace onetouch.AppItemsLists
 
                     if (publishChild == null)
                     {
-                        var marketplaceItem = await _appMarketplaceItem.GetAll().FirstOrDefaultAsync(x => x.Code == child.ItemSSIN);
+                        var marketplaceItem = await _appMarketplaceItem.GetAll().FirstOrDefaultAsync(x => x.SSIN == child.ItemSSIN);
                         //T-SII-20231205.0004,1 MMT 01/01/2024 -Products List - internal error while sharing the products list[Start]
                         if (marketplaceItem == null)
                             continue;
@@ -1653,9 +1690,10 @@ namespace onetouch.AppItemsLists
                                 var variationList = await _appItemsAppService.GetVariationsCodes(long.Parse(identifier.ToString()), nextCode, variationListOrg, marketItem.EntityObjectTypeId, AbpSession.TenantId);
                                 itemC.SycIdentifierId = identifier;
 
-                                foreach (var att in itemC.EntityAttachments)
+                                foreach (var parentAttach in itemC.EntityAttachments)
                                 {
-                                    att.Id = 0;
+                                    parentAttach.Id = 0;
+                                    MoveFile(parentAttach.FileName,-1, AbpSession.TenantId);
                                 }
                                 foreach (var ext in itemC.EntityExtraData)
                                 {
@@ -1679,6 +1717,7 @@ namespace onetouch.AppItemsLists
                                     foreach (var att in vari.EntityAttachments)
                                     {
                                         att.Id = 0;
+                                        MoveFile(att.FileName, -1, AbpSession.TenantId);
                                     }
                                     foreach (var ext in vari.EntityExtraData)
                                     {
@@ -1746,6 +1785,36 @@ namespace onetouch.AppItemsLists
                     }
                 }
                 return retutnval;
+            }
+        }
+        private void MoveFile(string fileName, int? sourceTenantId, int? distinationTenantId)
+        {
+            if (sourceTenantId == null) sourceTenantId = -1;
+            if (distinationTenantId == null) distinationTenantId = -1;
+
+            var tmpPath = _appConfiguration[$"Attachment:PathTemp"] + @"\" + sourceTenantId + @"\" + fileName;
+            var pathSource = _appConfiguration[$"Attachment:Path"] + @"\" + sourceTenantId + @"\" + fileName;
+            var path = _appConfiguration[$"Attachment:Path"] + @"\" + distinationTenantId + @"\" + fileName;
+
+            if (!System.IO.Directory.Exists(_appConfiguration[$"Attachment:Path"] + @"\" + distinationTenantId))
+            {
+                System.IO.Directory.CreateDirectory(_appConfiguration[$"Attachment:Path"] + @"\" + distinationTenantId);
+            }
+
+            try
+            {
+                System.IO.File.Copy(tmpPath.Replace(@"\", @"\"), path.Replace(@"\", @"\"), true);
+            }
+            catch (Exception ex)
+            {
+                try
+                {
+                    System.IO.File.Copy(pathSource.Replace(@"\", @"\"), path.Replace(@"\", @"\"), true);
+                }
+                catch (Exception ex1)
+                {
+
+                }
             }
         }
         private async Task<long?> GetProductTypeIdentifier(int productTypeId, long? tenantId)

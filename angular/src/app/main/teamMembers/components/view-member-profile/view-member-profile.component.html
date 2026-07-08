@@ -249,8 +249,8 @@
                                     <p class="text-left " style="color: #595959;">{{memberData?.phone1Number}} <span class="phoneExt">{{memberData?.phone1Ex}}</span>
                                     </p>
                                 </div>
-                                <hr class="header"   >
-                                <div class="col-md-12  align-items-baseline pt-2 pb-2 pl-3"
+                                <hr class="header"   *ngIf="memberData?.phone2Number">
+                                <div *ngIf="memberData?.phone2Number" class="col-md-12  align-items-baseline pt-2 pb-2 pl-3"
                          >
                                     <h6 class="text-right font-weight-bold mr-3 ">
                                         <img src="../../assets/img/input_icons/phone.png" class=""> {{
@@ -260,8 +260,8 @@
                                     <p class="text-left " style="color: #595959;">{{memberData?.phone2Number}} <span class="phoneExt">{{memberData?.phone2Ex}}</span>
                                     </p>
                                 </div>
-                                <hr class="header"    >
-                                <div class="col-md-12  align-items-baseline pt-2 pb-2 pl-3"
+                                <hr class="header"   *ngIf="memberData?.phone3Number" >
+                                <div *ngIf="memberData?.phone3Number" class="col-md-12  align-items-baseline pt-2 pb-2 pl-3"
                               >
                                     <h6 class="text-right font-weight-bold mr-3">
                                         <img src="../../assets/img/input_icons/phone.png" class=""> {{

@@ -5,7 +5,8 @@ import {
     AccountsServiceProxy,
     LookupLabelDto,
     AppEntitiesServiceProxy,
-    AppAddressDto
+    AppAddressDto,
+    AppContactAddressDto
 } from '@shared/service-proxies/service-proxies';
 import { AppComponentBase } from '@shared/common/app-component-base';
 
@@ -85,29 +86,30 @@ export class CreateOrEditAddressModalComponent extends AppComponentBase {
 
     }
 
+
     save() {
         this.saving = true;
-        let tenancyName = this.appSession.tenancyName;
+      
+        const tenancyName = this.appSession.tenancyName;
         this.address.code = tenancyName + "-" + this.addressCode;
       
         //  Assign country name if applicable
         const selectedCountry = this.allCountries.find(c => c.value === this.address.countryId);
         this.address.countryIdName = selectedCountry?.label ?? null;
       
-        let addNew = this.address.id == null || this.address.id == undefined || this.address.id == 0;
+        const addNew = !this.address.id;
+
+          this._accountsServiceProxy.createOrEditAddress(this.address)
+            .pipe(finalize(() => this.saving = false))
+            .subscribe(value => {
+              this.notify.info(this.l('SavedSuccessfully'));
+              this.close();
+              addNew ? this.addressAdded.emit(value) : this.addressUpdated.emit(value);
+            });
       
-        this._accountsServiceProxy.createOrEditAddress(this.address)
-          .pipe(finalize(() => { this.saving = false; }))
-          .subscribe((value) => {
-            this.notify.info(this.l('SavedSuccessfully'));
-            this.close();
-            if (addNew) {
-              this.addressAdded.emit(value);
-            } else {
-              this.addressUpdated.emit(value);
-            }
-          });
+        
       }
+      
       
 
     close(): void {

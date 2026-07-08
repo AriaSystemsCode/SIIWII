@@ -7,6 +7,7 @@ import {
     EventEmitter,
     OnInit,
     SimpleChanges,
+    ChangeDetectorRef,
 } from "@angular/core";
 import {
     AppEntitiesServiceProxy,
@@ -69,11 +70,12 @@ export class SendMessageModalComponent
   currentLang:string
   isArabic:boolean
 
+@Input() toUser: NameValueOfString;
     constructor(
         injector: Injector,
         private _MessageServiceProxy: MessageServiceProxy,
         private _appEntitiesServiceProxy: AppEntitiesServiceProxy,
-
+    private cdr: ChangeDetectorRef,
     ) {
         super(injector);
     }
@@ -81,10 +83,13 @@ export class SendMessageModalComponent
     ngOnInit(): void {
        this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
         this.currentLang == 'ar' || this.currentLang == 'ar-EG'  ? this.isArabic = true : this.isArabic = false
+     
         this.filterUsersFilterByEntity('')
     }
     ngOnChanges(changes: SimpleChanges): void {
-      
+       if (changes['toUser']?.currentValue) {
+    this.setToUser(changes['toUser'].currentValue);
+  }
     }
   
     mesasgeObjectType: MesasgeObjectType = MesasgeObjectType.Message
@@ -295,12 +300,23 @@ export class SendMessageModalComponent
         this.displayBCC = true;
     }
 
-    handleInputChangeAttachment(e) {
-        if (e.target.files.length === 0) return;
-        for (let i = 0; i < e.target.files.length; i++) {
-        var file = e.dataTransfer ? e.dataTransfer.files[i] : e.target.files[i];
-        this.attachments.push(e.target.files[i]);  
-    }
+    // handleInputChangeAttachment(e) {
+    //     if (e.target.files.length === 0) return;
+    //     for (let i = 0; i < e.target.files.length; i++) {
+    //     var file = e.dataTransfer ? e.dataTransfer.files[i] : e.target.files[i];
+    //     this.attachments.push(e.target.files[i]);  
+    // }
+    handleInputChangeAttachment(event: any): void {
+    const files: FileList = event?.target?.files;
+
+    if (!files || files.length === 0) return;
+
+    Array.from(files).forEach((file: File) => {
+        this.attachments.push(file);
+    });
+
+    event.target.value = '';
+
 }
 
 
@@ -425,40 +441,106 @@ export class SendMessageModalComponent
     }
     
                // get Users related to entity
-               filterUsersFilterByEntity(event): void {
-                this._appEntitiesServiceProxy
-                    .getContactsToMention(this.entityId, event.query)
-                    .subscribe((users) => {
-                        this.filteredUsers = [];
-                        for (let i = 0; i < users.length; i++) {
-                            if (users[i]?.users?.value.toString() !== this.appSession.userId.toString()) {
-                                users[i].users = {
-                                    name: users[i].name + '@' + users[i].tenantName,
-                                    value: users[i].userId.toString()
-                                };
-                                this.filteredUsers.push(users[i].users);
-                            }
-                        }
+            //    filterUsersFilterByEntity(event): void {
+            //     this._appEntitiesServiceProxy
+            //         .getContactsToMention(this.entityId, event.query)
+            //         .subscribe((users) => {
+            //             this.filteredUsers = [];
+            //             for (let i = 0; i < users.length; i++) {
+            //                 if (users[i]?.users?.value.toString() !== this.appSession.userId.toString()) {
+            //                     users[i].users = {
+            //                         name: users[i].name + '@' + users[i].tenantName,
+            //                         value: users[i].userId.toString()
+            //                     };
+            //                     this.filteredUsers.push(users[i].users);
+            //                 }
+            //             }
             
-                        // Normalize names in toNameArray to match filteredUsers
-                        const toNameArray: string[] = this.toName
-                            .split(',')
-                            .map((name) => name.trim().replace(/\./g, ' ')); // Replace dots with spaces
+            //             // Normalize names in toNameArray to match filteredUsers
+            //             const toNameArray: string[] = this.toName
+            //                 .split(',')
+            //                 .map((name) => name.trim().replace(/\./g, ' ')); // Replace dots with spaces
             
-                        // // Set default selected users
-                        if(this.parentId){
-                            this.toUsers = this.filteredUsers.filter((user) =>
-                                toNameArray.some((name) => user.name.startsWith(name)) // Match name before '@'
+            //             // // Set default selected users
+            //             if(this.parentId){
+            //                 this.toUsers = this.filteredUsers.filter((user) =>
+            //                     toNameArray.some((name) => user.name.startsWith(name)) // Match name before '@'
 
-                            );
-                            this._MessageServiceProxy
-                            .getMessagesForView(this.parentId)
-                            .subscribe((result) => {
+            //                 );
+
+
+            //                 this._MessageServiceProxy
+            //                 .getMessagesForView(this.parentId)
+            //                 .subscribe((result) => {
                            
-                                this.subject = result[0].messages.subject;
-                            });
-                        }
+            //                     this.subject = result[0].messages.subject;
+            //                 });
+            //             }
                    
-                    });
-            }
+         
+            //         });
+            // }
+
+
+filterUsersFilterByEntity(event: any): void {
+  const query = typeof event === 'string' ? event : (event?.query || '');
+
+  this._appEntitiesServiceProxy
+    .getContactsToMention(this.entityId, query)
+    .subscribe((users) => {
+      this.filteredUsers = [];
+
+      for (let i = 0; i < users.length; i++) {
+        if (users[i]?.userId?.toString() !== this.appSession.userId.toString()) {
+          const user = new NameValueOfString();
+          user.name = users[i].name + '@' + users[i].tenantName;
+          user.value = users[i].userId.toString();
+
+          this.filteredUsers.push(user);
+        }
+      }
+
+      if (this.parentId && this.toUser?.value) {
+        const selectedSender = this.filteredUsers.find(
+          x => x.value === this.toUser.value.toString()
+        );
+
+        this.toUsers = selectedSender
+          ? [selectedSender]
+          : [this.toUser];
+      }
+
+      if (this.parentId) {
+        this._MessageServiceProxy
+          .getMessagesForView(this.parentId)
+          .subscribe((result) => {
+            this.subject = result?.[0]?.messages?.subject || '';
+          });
+      }
+
+      this.cdr.detectChanges();
+    });
+}
+    setToUser(user: any): void {
+  if (!user?.name || !user?.value) return;
+
+  const selectedUser = new NameValueOfString();
+  selectedUser.name = user.name;
+  selectedUser.value = user.value.toString();
+
+  this.toUsers = [selectedUser];
+
+  const exists = this.filteredUsers?.some(
+    x => x.value === selectedUser.value
+  );
+
+  if (!exists) {
+    this.filteredUsers = [
+      selectedUser,
+      ...(this.filteredUsers || [])
+    ];
+  }
+
+  this.cdr.detectChanges();
+}
 }

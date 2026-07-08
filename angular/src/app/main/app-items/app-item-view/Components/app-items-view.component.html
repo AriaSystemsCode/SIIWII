@@ -515,15 +515,16 @@
                         <div
                             class="share-sync my-3 d-flex align-items-center gap-3 justify-content-end w-100"
                         >
-                            <button
+                            <button  *ngIf="tenantOwner == null || tenantOwner === appSession?.tenant?.id"
                                 pButton
                                 pRipple
                                 label="{{'Share' |localize}}"
                                 class="share mr-2"
                                 icon="pi pi-share-alt"
+                               
                                 (click)="openShareProductListingModal()"
                             ></button>
-                            <button
+                            <button  *ngIf="tenantOwner == null || tenantOwner === appSession?.tenant?.id"
                                 pButton
                                 pRipple
                                 label="{{'Sync' |localize}}"

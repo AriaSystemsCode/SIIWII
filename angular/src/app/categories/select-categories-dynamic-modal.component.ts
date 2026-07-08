@@ -49,6 +49,9 @@ export class SelectCategoriesDynamicModalComponent
     lastSelectedRecords: TreeNodeOfGetSycEntityObjectCategoryForViewDto[] = [];
     searchQuery?: string;
     searchSubj: Subject<string> = new Subject<string>();
+
+    currentLang: string
+    isArabic: boolean
     constructor(
         injector: Injector,
         public currentModalRef: BsModalRef,
@@ -59,6 +62,8 @@ export class SelectCategoriesDynamicModalComponent
     }
 
     ngOnInit(): void {
+        this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
+        this.currentLang == 'ar' || this.currentLang == 'ar-EG'  ? this.isArabic = true : this.isArabic = false
         this.getCategoriesList();
         this.searchSubj
             .pipe(debounceTime(300), distinctUntilChanged())
@@ -80,11 +85,11 @@ export class SelectCategoriesDynamicModalComponent
         // data to be shared to the modal
         config.initialState = {
             title: "Edit Category",
-        }; 
-        config.class = "right-modal slide-right-in";
+        };
+        this.isArabic ?  config.class = "left-modal slide-left-in ngLeft" : config.class = "right-modal slide-right-in";
         config.backdrop = true;
         config.ignoreBackdropClick = true;
-        this.currentModalRef.setClass("right-modal slide-right-out");
+       this.isArabic ? this.currentModalRef.setClass("left-modal slide-left-out") : this.currentModalRef.setClass("right-modal slide-right-out");
 
         let initialModalData: Partial<CreateOrEditCategoryDynamicModalComponent> =
             {};
@@ -117,7 +122,7 @@ export class SelectCategoriesDynamicModalComponent
     }
 
     onCreateOrEditDoneHandler() {
-        this.currentModalRef.setClass("right-modal slide-right-in");
+       this.isArabic ?  this.currentModalRef.setClass("left-modal slide-left-in ngLeft"):this.currentModalRef.setClass("right-modal slide-right-in");
         let data = this.createOrEditModalRef.content;
         setTimeout(() => {
             this.isHiddenToCreateOrEdit = false;
@@ -166,7 +171,7 @@ export class SelectCategoriesDynamicModalComponent
             }
         }
     close() {
-        this.currentModalRef.setClass("right-modal slide-right-out");
+       this.isArabic ?  this.currentModalRef.setClass("left-modal slide-left-out") :  this.currentModalRef.setClass("right-modal slide-right-out");
         this.selectionDone = false;
         this.currentModalRef.hide();
     }

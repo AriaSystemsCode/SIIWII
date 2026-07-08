@@ -597,7 +597,7 @@
     "npm_package_scripts_compodoc": "npx compodoc -p tsconfig.doc.json",
     "npm_package_scripts_create_dynamic_bundles": "gulp buildDev",
     "npm_package_scripts_e2e": "gulp buildDev && protractor",
-    "npm_package_scripts_hmr": "gulp buildDev && ng serve --host 0.0.0.0 --port 4240 --hmr",
+    "npm_package_scripts_hmr": "gulp buildDev && ng serve --host 0.0.0.0 --port 4200 --hmr",
     "npm_package_scripts_ng": "ng",
     "npm_package_scripts_nswag": "cd nswag/ && refresh.bat",
     "npm_package_scripts_pree2e": "webdriver-manager update --standalone false --gecko false",

@@ -19,6 +19,7 @@ namespace onetouch.AppItems.Dtos
         //MMT-IT41[Start]
         public IList<LookupLabelDto> NonLookupValues { set; get; }
         //MMT-IT41[End]
+        public long? TenantOwner { set; get; }
 
     }
     //MMT30[Start]

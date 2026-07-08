@@ -459,7 +459,8 @@ namespace onetouch
             configuration.CreateMap<AppMarketplaceContact, AppContact>()
             .ForMember(d => d.AppContactAddresses, s => s.MapFrom(ss => ss.ContactAddresses));
             configuration.CreateMap<AppContact, AppMarketplaceContact>()
-                .ForMember(d => d.ContactAddresses, s => s.MapFrom(ss => ss.AppContactAddresses));
+                .ForMember(d => d.ContactAddresses, s => s.MapFrom(ss => ss.AppContactAddresses))
+                .ForMember(d=>d.Id, s=>s.Ignore());
 
             configuration.CreateMap<AppContactAddressDto, AppMarketplaceContactAddress>().ReverseMap();
 

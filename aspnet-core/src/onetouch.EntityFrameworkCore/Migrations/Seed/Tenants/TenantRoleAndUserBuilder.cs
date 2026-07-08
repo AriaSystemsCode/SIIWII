@@ -59,7 +59,7 @@ namespace onetouch.Migrations.Seed.Tenants
             {
                 //Mariam[Start]
                // adminUser = User.CreateTenantAdminUser(_tenantId, "admin@defaulttenant.com");
-                adminUser = User.CreateTenantAdminUser(_tenantId, "admin@defaulttenant.com","",adminUser.Name,adminUser.Surname);
+                adminUser = User.CreateTenantAdminUser(_tenantId, "admin@defaulttenant.com","",adminUser.Name,adminUser.Surname,"admin");
                 //Mariam[End]
                 adminUser.Password = new PasswordHasher<User>(new OptionsWrapper<PasswordHasherOptions>(new PasswordHasherOptions())).HashPassword(adminUser, "123qwe");
                 adminUser.IsEmailConfirmed = true;

@@ -80,9 +80,14 @@ export class MarketplaceProductsComponent
     appItemListId: any;
     selectedDepartments: any;
 
-    isAuthenticate = this.appSession?.user
-    selectedCategories: number[] = [];
-    sellerSSinSetting: string
+    isAuthenticate= this.appSession?.user
+    selectedCategories: number[] = []; 
+
+     
+    brandIdFromUrl: number | null = null;
+    catIdFromUrl: number | null = null;
+    sellerSSinSetting:string
+   
 
 
     constructor(
@@ -422,6 +427,7 @@ export class MarketplaceProductsComponent
             }, 1500);
 
     }
+
 
     handleSortingChange(data: any) {
         this.getAllProducts();

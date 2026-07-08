@@ -20,7 +20,7 @@
         </a>
 
         <!-- IMAGE clickable area -->
-        <div class="cursor-pointer" (click)="onSlideClick(slide, $event)">
+        <div class="cursor-pointer" (click)="onSlideClick(slide, $event)" style="max-height: 400px !important;">
           <app-image-display
             [image]="getSlideImage(slide)"
             [sycAttachmentCategory]="sycAttachmentCategoryAutoSlider"

@@ -1644,7 +1644,7 @@ export class CreateOrEditAppItemComponent
                     return this.askToPublish();
                 this.goBack("app/main/products");
             });
-    }
+}
     extraSelectedValuesExtraData() {
         const recentlyExtraAttributes: FilteredExtraAttribute<any>[] = [
             ...this.extraAttributes.ADDITIONAL.extraAttributes,
