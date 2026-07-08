@@ -1256,4 +1256,43 @@ border-radius: 6px;
     text-align: right;
     background-color: #fff;
   }
-  
+ .profile-nav .profile-nav-link {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.profile-nav .nav-icon-box {
+    width: 24px;
+    min-width: 24px;
+    height: 24px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.profile-nav .nav-icon-box img,
+.profile-nav .nav-icon-box svg {
+    width: 18px;
+    height: 18px;
+    object-fit: contain;
+}
+
+.profile-nav .nav-icon-box i {
+    width: 18px;
+    font-size: 16px;
+    color: #84818A;
+    text-align: center;
+}
+
+.profile-nav .active-nav-icon {
+    color: #F88011 !important;
+}
+
+.profile-nav .nav-title {
+    flex: 1;
+}
+
+.gap-12 {
+   gap: 12px;
+}

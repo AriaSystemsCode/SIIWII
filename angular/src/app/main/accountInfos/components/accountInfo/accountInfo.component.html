@@ -95,8 +95,9 @@
                                         "Disconnect" | localize }}
                                     </button> -->
 
-                                    <div class=" d-flex align-items-center m-2 w-100" *ngIf="accountDataForView && accountDataForView.status === true && !isHost && !isRecordOwner">
-                                    
+                                    <div class=" d-flex align-items-center m-2 w-100"
+                                        *ngIf="accountDataForView && accountDataForView.status === true && !isHost && !isRecordOwner">
+
                                         <!-- Case 1: No current connections, only available connections -->
                                         <ng-container
                                             *ngIf="!connectionsInfo?.length && availableConnectionsInfo?.length > 0">
@@ -107,7 +108,7 @@
                                                         dropdownToggle>
                                                         <img src="assets/accounts/CONNECT.png" alt="" srcset="">
                                                         <span>{{
-                                                           availableConnectionsInfo[0]?.connectionName
+                                                            availableConnectionsInfo[0]?.connectionName
                                                             }}</span>
                                                         <i *ngIf="availableConnectionsInfo?.length > 1"
                                                             class="fas fa-angle-down ml-2"
@@ -140,15 +141,15 @@
                                                         style="white-space: nowrap; max-width: calc(100% - 70px);">
                                                         <span>
                                                             {{
-                                                            getFormattedConnectionName(connectionsInfo[0]?.connectedLabel)
+                                                            getFormattedConnectionName(connectionsInfo[0]?.connectedLabel) | textSubstring : 33
                                                             }}
                                                         </span>
                                                         <i class="pi pi-times ml-1 removI"
                                                             (click)="disconnect(connectionsInfo[0])"></i>
                                                     </button>
 
-                                                    <button *ngIf="connectionsInfo?.length > 1"
-                                                        type="button" class="relation-chip more-chip"
+                                                    <button *ngIf="connectionsInfo?.length > 1" type="button"
+                                                        class="relation-chip more-chip"
                                                         (click)="openConnectionsDialog()">
                                                         +{{ connectionsInfo?.length - 1 }}
                                                     </button>
@@ -168,224 +169,252 @@
                                                         <span>
                                                             {{
                                                             getFormattedConnectionName(connectionsInfo[0]?.connectedLabel)
-                                                            | textSubstring : 40 }}
+                                                            | textSubstring : 33 }}
                                                         </span>
                                                         <i class="pi pi-times ml-1 removI"
                                                             (click)="disconnect(connectionsInfo[0])"></i>
                                                     </button>
 
-                                                    <button *ngIf="connectionsInfo?.length > 1"
-                                                        type="button" class="relation-chip more-chip"
+                                                    <button *ngIf="connectionsInfo?.length > 1" type="button"
+                                                        class="relation-chip more-chip"
                                                         (click)="openConnectionsDialog()">
                                                         +{{ connectionsInfo?.length - 1 }}
                                                     </button>
                                                 </div>
 
                                                 <!-- Right: first available connection + dropdown for rest -->
-                                                 <div *ngIf="availableConnectionsInfo?.length > 0 && connectionsInfo?.length > 0"
-                  class="relation-more-menu position-relative" dropdown container="body">
+                                                <div *ngIf="availableConnectionsInfo?.length > 0 && connectionsInfo?.length > 0"
+                                                    class="relation-more-menu position-relative" dropdown
+                                                    container="body">
 
-                  <button type="button" class="dots-btn" dropdownToggle>
-                    <img src="assets/accounts/CONNECT.png" alt="" srcset="">
-                  </button>
+                                                    <button type="button" class="dots-btn" dropdownToggle>
+                                                        <img src="assets/accounts/CONNECT.png" alt="" srcset="">
+                                                    </button>
 
-                  <ul *dropdownMenu class="dropdown-menu relation-dropdown" role="menu"
-                    [ngClass]="isArabic ? 'dropdown-menu-ar' : 'dropdown-menu-en'">
+                                                    <ul *dropdownMenu class="dropdown-menu relation-dropdown"
+                                                        role="menu"
+                                                        [ngClass]="isArabic ? 'dropdown-menu-ar' : 'dropdown-menu-en'">
 
-                    <li role="menuitem" *ngFor="let option of availableConnectionsInfo" class="relation-item">
-                      <button class="dropdown-item relation-btn" type="button" (click)="createRelation(option)">
-                        <div class="d-flex align-items-center justify-content-between w-100">
-                          <div class="d-flex align-items-center">
-                            <img class="relation-icon mr-2" [src]="getConnectionIcon(option?.connectionName)" alt="" />
-                            <span class="relation-label">
-                              {{ option?.connectionName }}
-                            </span>
-                          </div>
-                        </div>
-                      </button>
-                    </li>
-                  </ul>
-                </div>
+                                                        <li role="menuitem"
+                                                            *ngFor="let option of availableConnectionsInfo"
+                                                            class="relation-item">
+                                                            <button class="dropdown-item relation-btn" type="button"
+                                                                (click)="createRelation(option)">
+                                                                <div
+                                                                    class="d-flex align-items-center justify-content-between w-100">
+                                                                    <div class="d-flex align-items-center">
+                                                                        <img class="relation-icon mr-2"
+                                                                            [src]="getConnectionIcon(option?.connectionName)"
+                                                                            alt="" />
+                                                                        <span class="relation-label">
+                                                                            {{ option?.connectionName }}
+                                                                        </span>
+                                                                    </div>
+                                                                </div>
+                                                            </button>
+                                                        </li>
+                                                    </ul>
+                                                </div>
                                             </div>
                                         </ng-container>
                                     </div>
                                 </div>
                             </div>
 
-                            <ul class="nav nav-pills flex-column text-capitalize">
-                                <li class="nav-item" *ngIf="false">
-                                    <a class="nav-link">
-                                        <img class="" src="assets/profile/My-Account-Overview_Default.svg">
-                                        {{l("MyAccountOverview")}}
-                                        <span class="sr-only">(current)</span></a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link d-flex w-100 justify-content-between"
-                                        (click)="changeTab( !accountInfoTemp?.id && !accountId ? accountInfoPageTabsEnum.ProfileCreateOrEdit : accountInfoPageTabsEnum.ProfileView  )"
-                                        [ngClass]="{'active' :currentTab ==  accountInfoPageTabsEnum.ProfileView || currentTab === accountInfoPageTabsEnum.ProfileCreateOrEdit }">
-                                        <span>
-                                            <svg *ngIf="currentTab === accountInfoPageTabsEnum.ProfileView || currentTab === accountInfoPageTabsEnum.ProfileCreateOrEdit"
-                                                width="18" height="18" viewBox="0 0 18 18" fill="#F88011"
-                                                xmlns="http://www.w3.org/2000/svg" >
-                                                <g clip-path="url(#clip0_271_11806)">
-                                                    <path
-                                                        d="M17.1816 9.76837C17.3157 9.76837 17.4314 9.81315 17.5137 9.89532C17.5959 9.97755 17.6406 10.0933 17.6406 10.2274V15.5457C17.6405 16.2687 17.0863 16.8231 16.3633 16.8231H1.63672C0.913734 16.8231 0.359513 16.2687 0.359375 15.5457V10.2274L0.367188 10.1307C0.383638 10.0376 0.424584 9.95707 0.486328 9.89532C0.568557 9.8131 0.684281 9.76837 0.818359 9.76837C0.952391 9.76839 1.06818 9.81312 1.15039 9.89532C1.23255 9.97754 1.27734 10.0933 1.27734 10.2274V15.5457C1.2774 15.6568 1.31422 15.7456 1.375 15.8065C1.43595 15.8674 1.52535 15.9041 1.63672 15.9041H16.3633C16.4746 15.9041 16.564 15.8674 16.625 15.8065C16.6858 15.7456 16.7226 15.6569 16.7227 15.5457V10.2274C16.7227 10.0934 16.7675 9.97754 16.8496 9.89532C16.9318 9.81314 17.0476 9.76842 17.1816 9.76837Z"
-                                                        fill="#F88011" stroke="#84818A" stroke-width="0.1" />
-                                                    <path
-                                                        d="M16.7725 4.04114C17.4955 4.04114 18.0498 4.59544 18.0498 5.31848V7.93665C18.0497 8.53299 17.6242 9.04315 17.0703 9.17102V9.172L10.6865 10.5948V11.8634C10.6865 11.9973 10.6416 12.1132 10.5596 12.1954C10.4774 12.2776 10.3615 12.3223 10.2275 12.3224H7.77246C7.6385 12.3223 7.5226 12.2776 7.44043 12.1954C7.35836 12.1132 7.31348 11.9974 7.31348 11.8634V10.5948L0.929688 9.172V9.17102C0.375752 9.04315 -0.0496896 8.53297 -0.0498047 7.93665V5.31848C-0.0498047 4.59541 0.504464 4.04114 1.22754 4.04114H16.7725ZM8.23145 11.4044H9.76855V9.86829H8.23145V11.4044ZM1.22754 4.95911C1.11619 4.95911 1.02677 4.99581 0.96582 5.05676C0.904872 5.11771 0.868164 5.20712 0.868164 5.31848V7.93665C0.868247 8.09639 0.950792 8.22491 1.0918 8.27844L1.15527 8.29602L1.15625 8.297L7.31348 9.67297V9.4093C7.31348 9.27535 7.35835 9.15949 7.44043 9.07727C7.5226 8.9951 7.63848 8.95038 7.77246 8.95032H10.2275C10.3615 8.95038 10.4774 8.9951 10.5596 9.07727C10.6416 9.15948 10.6865 9.27534 10.6865 9.4093V9.67297L16.8438 8.297L16.8447 8.29602L16.9082 8.27844C17.0492 8.22493 17.1317 8.09639 17.1318 7.93665V5.31848C17.1318 5.20713 17.0951 5.11772 17.0342 5.05676C16.9732 4.99581 16.8838 4.95911 16.7725 4.95911H1.22754Z"
-                                                        fill="#F88011" stroke="#84818A" stroke-width="0.1" />
-                                                    <path
-                                                        d="M11.0459 1.17773C11.7689 1.17782 12.3233 1.73205 12.3232 2.45508V2.86426C12.3232 2.99818 12.2775 3.11413 12.1953 3.19629C12.1132 3.27813 11.9979 3.32315 11.8643 3.32324C11.7304 3.32324 11.6144 3.27827 11.5322 3.19629C11.4501 3.11414 11.4044 2.99819 11.4043 2.86426V2.45508C11.4043 2.34373 11.3676 2.25431 11.3066 2.19336C11.2457 2.1326 11.157 2.09575 11.0459 2.0957H6.95508C6.84373 2.0957 6.75431 2.13242 6.69336 2.19336C6.63241 2.25431 6.5957 2.34371 6.5957 2.45508V2.86426C6.59562 2.99818 6.5509 3.11414 6.46875 3.19629C6.38655 3.27841 6.27068 3.32322 6.13672 3.32324C6.00277 3.32324 5.8869 3.27837 5.80469 3.19629C5.72253 3.11414 5.67782 2.99819 5.67773 2.86426V2.45508C5.67773 1.732 6.232 1.17773 6.95508 1.17773H11.0459Z"
-                                                        fill="#F88011" stroke="#84818A" stroke-width="0.1" />
-                                                </g>
-                                                <defs>
-                                                    <clipPath id="clip0_271_11806">
-                                                        <rect width="18" height="18" fill="white" />
-                                                    </clipPath>
-                                                </defs>
-                                            </svg>
+                            <ul class="nav nav-pills flex-column text-capitalize profile-nav">
 
-                                            <img class=""
-                                                *ngIf="currentTab !== accountInfoPageTabsEnum.ProfileView && currentTab !== accountInfoPageTabsEnum.ProfileCreateOrEdit"
-                                                src="assets/profile/My-Account-Information-Default.svg">
-                                            <span *ngIf="accountLevel === accountLevelEnum.Profile && !viewMode">
+                                <li class="nav-item" *ngIf="false">
+                                    <a class="nav-link profile-nav-link">
+                                        <span class="nav-icon-box">
+                                            <img src="assets/profile/My-Account-Overview_Default.svg">
+                                        </span>
+                                        <span class="nav-title">{{l("MyAccountOverview")}}</span>
+                                        <span class="sr-only">(current)</span>
+                                    </a>
+                                </li>
+
+                                <li class="nav-item">
+                                    <a class="nav-link profile-nav-link justify-content-between"
+                                        (click)="changeTab(!accountInfoTemp?.id && !accountId ? accountInfoPageTabsEnum.ProfileCreateOrEdit : accountInfoPageTabsEnum.ProfileView)"
+                                        [ngClass]="{'active': currentTab == accountInfoPageTabsEnum.ProfileView || currentTab === accountInfoPageTabsEnum.ProfileCreateOrEdit}">
+
+                                        <span class="d-flex align-items-center gap-12">
+                                            <span class="nav-icon-box">
+
+                                                <svg *ngIf="currentTab === accountInfoPageTabsEnum.ProfileView || currentTab === accountInfoPageTabsEnum.ProfileCreateOrEdit"
+                                                    width="18" height="18" viewBox="0 0 18 18" fill="#F88011"
+                                                    xmlns="http://www.w3.org/2000/svg">
+                                                    <g clip-path="url(#clip0_271_11806)" class="ng-tns-c467-489">
+                                                        <path
+                                                            d="M17.1816 9.76837C17.3157 9.76837 17.4314 9.81315 17.5137 9.89532C17.5959 9.97755 17.6406 10.0933 17.6406 10.2274V15.5457C17.6405 16.2687 17.0863 16.8231 16.3633 16.8231H1.63672C0.913734 16.8231 0.359513 16.2687 0.359375 15.5457V10.2274L0.367188 10.1307C0.383638 10.0376 0.424584 9.95707 0.486328 9.89532C0.568557 9.8131 0.684281 9.76837 0.818359 9.76837C0.952391 9.76839 1.06818 9.81312 1.15039 9.89532C1.23255 9.97754 1.27734 10.0933 1.27734 10.2274V15.5457C1.2774 15.6568 1.31422 15.7456 1.375 15.8065C1.43595 15.8674 1.52535 15.9041 1.63672 15.9041H16.3633C16.4746 15.9041 16.564 15.8674 16.625 15.8065C16.6858 15.7456 16.7226 15.6569 16.7227 15.5457V10.2274C16.7227 10.0934 16.7675 9.97754 16.8496 9.89532C16.9318 9.81314 17.0476 9.76842 17.1816 9.76837Z"
+                                                            fill="#F88011" stroke="#84818A" stroke-width="0.1"
+                                                            class="ng-tns-c467-489"></path>
+                                                        <path
+                                                            d="M16.7725 4.04114C17.4955 4.04114 18.0498 4.59544 18.0498 5.31848V7.93665C18.0497 8.53299 17.6242 9.04315 17.0703 9.17102V9.172L10.6865 10.5948V11.8634C10.6865 11.9973 10.6416 12.1132 10.5596 12.1954C10.4774 12.2776 10.3615 12.3223 10.2275 12.3224H7.77246C7.6385 12.3223 7.5226 12.2776 7.44043 12.1954C7.35836 12.1132 7.31348 11.9974 7.31348 11.8634V10.5948L0.929688 9.172V9.17102C0.375752 9.04315 -0.0496896 8.53297 -0.0498047 7.93665V5.31848C-0.0498047 4.59541 0.504464 4.04114 1.22754 4.04114H16.7725ZM8.23145 11.4044H9.76855V9.86829H8.23145V11.4044ZM1.22754 4.95911C1.11619 4.95911 1.02677 4.99581 0.96582 5.05676C0.904872 5.11771 0.868164 5.20712 0.868164 5.31848V7.93665C0.868247 8.09639 0.950792 8.22491 1.0918 8.27844L1.15527 8.29602L1.15625 8.297L7.31348 9.67297V9.4093C7.31348 9.27535 7.35835 9.15949 7.44043 9.07727C7.5226 8.9951 7.63848 8.95038 7.77246 8.95032H10.2275C10.3615 8.95038 10.4774 8.9951 10.5596 9.07727C10.6416 9.15948 10.6865 9.27534 10.6865 9.4093V9.67297L16.8438 8.297L16.8447 8.29602L16.9082 8.27844C17.0492 8.22493 17.1317 8.09639 17.1318 7.93665V5.31848C17.1318 5.20713 17.0951 5.11772 17.0342 5.05676C16.9732 4.99581 16.8838 4.95911 16.7725 4.95911H1.22754Z"
+                                                            fill="#F88011" stroke="#84818A" stroke-width="0.1"
+                                                            class="ng-tns-c467-489"></path>
+                                                        <path
+                                                            d="M11.0459 1.17773C11.7689 1.17782 12.3233 1.73205 12.3232 2.45508V2.86426C12.3232 2.99818 12.2775 3.11413 12.1953 3.19629C12.1132 3.27813 11.9979 3.32315 11.8643 3.32324C11.7304 3.32324 11.6144 3.27827 11.5322 3.19629C11.4501 3.11414 11.4044 2.99819 11.4043 2.86426V2.45508C11.4043 2.34373 11.3676 2.25431 11.3066 2.19336C11.2457 2.1326 11.157 2.09575 11.0459 2.0957H6.95508C6.84373 2.0957 6.75431 2.13242 6.69336 2.19336C6.63241 2.25431 6.5957 2.34371 6.5957 2.45508V2.86426C6.59562 2.99818 6.5509 3.11414 6.46875 3.19629C6.38655 3.27841 6.27068 3.32322 6.13672 3.32324C6.00277 3.32324 5.8869 3.27837 5.80469 3.19629C5.72253 3.11414 5.67782 2.99819 5.67773 2.86426V2.45508C5.67773 1.732 6.232 1.17773 6.95508 1.17773H11.0459Z"
+                                                            fill="#F88011" stroke="#84818A" stroke-width="0.1"
+                                                            class="ng-tns-c467-489"></path>
+                                                    </g>
+                                                    <defs class="ng-tns-c467-489">
+                                                        <clipPath id="clip0_271_11806" class="ng-tns-c467-489">
+                                                            <rect width="18" height="18" fill="white"
+                                                                class="ng-tns-c467-489"></rect>
+                                                        </clipPath>
+                                                    </defs>
+                                                </svg>
+
+                                                <img *ngIf="currentTab !== accountInfoPageTabsEnum.ProfileView && currentTab !== accountInfoPageTabsEnum.ProfileCreateOrEdit"
+                                                    src="assets/profile/My-Account-Information-Default.svg">
+                                            </span>
+
+                                            <span class="nav-title"
+                                                *ngIf="accountLevel === accountLevelEnum.Profile && !viewMode">
                                                 {{l("MyProfile")}}
                                             </span>
-                                            <span *ngIf="accountLevel !== accountLevelEnum.Profile || viewMode">
+                                            <span class="nav-title"
+                                                *ngIf="accountLevel !== accountLevelEnum.Profile || viewMode">
                                                 {{l("AccountProfile")}}
                                             </span>
                                         </span>
 
-                                        <span (click)="triggerProfile($event)"
+                                        <span class="nav-action-icon" (click)="triggerProfile($event)"
                                             *ngIf="(accountId || accountDataForView?.id) && !viewMode && (isRecordOwner && accountDataForView?.accountTypeId != 21) || accountDataForView?.isManual">
-                                            <i [title]=" 'EditMode' | localize "
+                                            <i [title]="'EditMode' | localize"
                                                 *ngIf="currentTab != accountInfoPageTabsEnum.ProfileCreateOrEdit"
                                                 class="far fa-edit"></i>
-                                            <i [title]=" 'ViewMode' | localize "
+                                            <i [title]="'ViewMode' | localize"
                                                 *ngIf="currentTab == accountInfoPageTabsEnum.ProfileCreateOrEdit"
                                                 class="far fa-eye"></i>
                                         </span>
                                     </a>
-
                                 </li>
+
                                 <li class="nav-item">
-                                    <a class="nav-link" (click)="changeTab(accountInfoPageTabsEnum.Branches)"
-                                        [ngClass]="currentTab==accountInfoPageTabsEnum.Branches?'active':''">
-                                        <img class="" *ngIf="currentTab != accountInfoPageTabsEnum.Branches"
-                                            src="assets/profile/My-Addresses-Default.svg">
-                                        <i class=" fa fa-map-marker-alt "
-                                            *ngIf="currentTab == accountInfoPageTabsEnum.Branches"
-                                            style="color: #F88011;"></i>
-                                        <span *ngIf="accountLevel === accountLevelEnum.Profile && !viewMode">
+                                    <a class="nav-link profile-nav-link"
+                                        (click)="changeTab(accountInfoPageTabsEnum.Branches)"
+                                        [ngClass]="currentTab == accountInfoPageTabsEnum.Branches ? 'active' : ''">
+
+                                        <span class="nav-icon-box">
+                                            <img *ngIf="currentTab != accountInfoPageTabsEnum.Branches"
+                                                src="assets/profile/My-Addresses-Default.svg">
+
+                                            <i *ngIf="currentTab == accountInfoPageTabsEnum.Branches"
+                                                class="fa fa-map-marker-alt active-nav-icon"></i>
+                                        </span>
+
+                                        <span class="nav-title"
+                                            *ngIf="accountLevel === accountLevelEnum.Profile && !viewMode">
                                             {{l("MyBranches/Addresses")}}
                                         </span>
-                                        <span *ngIf="accountLevel !== accountLevelEnum.Profile || viewMode">
+                                        <span class="nav-title"
+                                            *ngIf="accountLevel !== accountLevelEnum.Profile || viewMode">
                                             {{l("AccountBranches/Addresses")}}
                                         </span>
                                     </a>
                                 </li>
 
                                 <li class="nav-item" *ngIf="false">
-                                    <a class="nav-link" disabled>
-                                        <img class="" *ngIf="currentTab != accountInfoPageTabsEnum.Lookups"
-                                            src="assets/profile/My-Lookups-Default.svg">
-                                        <span>{{l("MyLookups")}}</span>
+                                    <a class="nav-link profile-nav-link" disabled>
+                                        <span class="nav-icon-box">
+                                            <img *ngIf="currentTab != accountInfoPageTabsEnum.Lookups"
+                                                src="assets/profile/My-Lookups-Default.svg">
+                                        </span>
+                                        <span class="nav-title">{{l("MyLookups")}}</span>
                                     </a>
                                 </li>
-                                <li class="nav-item" *ngIf="(accountLevel == accountLevelEnum.Profile && !viewMode) ">
-                                    <a class="nav-link" (click)="changeTab(accountInfoPageTabsEnum.Payments)"
-                                        [ngClass]="currentTab == accountInfoPageTabsEnum.Payments?'active':''">
-                                        <img *ngIf="currentTab != accountInfoPageTabsEnum.Payments" class=""
-                                            src="assets/payment/payment-method1.png">
 
-                                        <svg *ngIf="currentTab == accountInfoPageTabsEnum.Payments" width="18"
-                                            height="18" viewBox="0 0 18 18" fill="none"
-                                            xmlns="http://www.w3.org/2000/svg">
-                                            <g clip-path="url(#clip0_271_11828)">
-                                                <mask id="path-1-outside-1_271_11828" maskUnits="userSpaceOnUse"
-                                                    x="-0.71875" y="-0.718872" width="19" height="19" fill="black">
-                                                    <rect fill="white" x="-0.71875" y="-0.718872" width="19"
-                                                        height="19" />
-                                                    <path
-                                                        d="M17.1192 9.80454H13.2343C12.9037 9.80454 12.6347 10.0735 12.6347 10.4042V17.1193C12.6347 17.4499 12.9037 17.7189 13.2343 17.7189H17.1191C17.4497 17.7189 17.7187 17.4499 17.7187 17.1193V10.4042C17.7188 10.0736 17.4498 9.80454 17.1192 9.80454ZM16.0657 10.367L16.0084 10.522H14.3451L14.2878 10.367H16.0657ZM17.1562 17.1193C17.1562 17.1391 17.1389 17.1564 17.1192 17.1564H13.2343C13.2146 17.1564 13.1972 17.1391 13.1972 17.1193V10.4042C13.1972 10.3844 13.2146 10.367 13.2343 10.367H13.6881L13.8855 10.9009C13.9263 11.0113 14.0315 11.0846 14.1492 11.0846H16.2042C16.3219 11.0846 16.4271 11.0113 16.468 10.9009L16.6653 10.367H17.1191C17.1388 10.367 17.1562 10.3844 17.1562 10.4042V17.1193H17.1562ZM15.7839 16.7039C15.7839 16.8592 15.6579 16.9852 15.5026 16.9852L14.8509 16.9851C14.6956 16.9851 14.5696 16.8592 14.5696 16.7039C14.5696 16.5486 14.6956 16.4226 14.8509 16.4226L15.5026 16.4227C15.658 16.4227 15.7839 16.5486 15.7839 16.7039ZM9.39765 15.1732C9.39252 15.1732 9.38714 15.1733 9.38194 15.1733L6.94666 15.1826C6.9075 15.1826 6.86978 15.181 6.83241 15.1775C6.84278 15.1679 6.85304 15.1581 6.86317 15.1479C7.19269 14.8184 7.19712 14.2789 6.87322 13.9197C6.86475 13.9102 6.85564 13.9014 6.84598 13.8933C6.38279 13.5015 5.9766 13.0195 5.65021 12.6322C5.53549 12.4961 5.42718 12.3676 5.33194 12.262C4.92789 11.8137 4.37411 11.7531 3.88403 11.7544L2.17037 11.7565L2.17213 11.5522C2.17494 11.2263 1.91208 10.9589 1.58618 10.9561L0.907734 10.9503C0.906012 10.9503 0.904359 10.9503 0.902637 10.9503C0.579094 10.9503 0.314402 11.2121 0.31159 11.5363L0.281285 15.0605C0.279914 15.218 0.340207 15.3669 0.45109 15.4796C0.561938 15.5924 0.709699 15.6552 0.86727 15.6566L1.54568 15.6625H1.55092C1.70652 15.6625 1.85337 15.6023 1.96488 15.4926C2.07766 15.3818 2.14052 15.234 2.14186 15.0764L2.14418 14.8068H2.42369L4.3688 16.7522C4.70408 17.0875 5.12392 17.2638 5.58598 17.2638C5.60317 17.2638 5.62039 17.2635 5.63769 17.263L10.1208 17.136C10.5783 17.1231 10.9878 16.6647 10.9799 16.1743C10.9761 15.939 10.8508 15.1732 9.39765 15.1732ZM1.57057 15.0915C1.56656 15.0954 1.56009 15.1008 1.55053 15.1L0.872121 15.0941C0.862734 15.094 0.856125 15.0893 0.852223 15.0853C0.84832 15.0814 0.843715 15.0746 0.843785 15.0653L0.874055 11.5412C0.874195 11.5263 0.887836 11.5128 0.902672 11.5128H0.902883L1.58129 11.5186C1.59627 11.5187 1.60977 11.5325 1.60966 11.5475L1.58411 14.5255V14.5255V14.5256L1.57943 15.0716C1.57929 15.081 1.57454 15.0876 1.57057 15.0915ZM10.1049 16.5737L5.62177 16.7007C5.29291 16.71 5.00555 16.5935 4.76652 16.3544L2.73874 14.3267C2.68601 14.2739 2.61446 14.2443 2.5399 14.2443H2.14896L2.16548 12.319L3.88466 12.3169C4.40989 12.3148 4.70756 12.4094 4.91407 12.6385C5.00305 12.7372 5.1036 12.8565 5.22004 12.9947C5.5563 13.3937 5.97386 13.8892 6.46611 14.3087C6.58093 14.4467 6.58157 14.634 6.46538 14.7502C6.41904 14.7965 6.27866 14.9363 6.0248 14.7491C5.79277 14.5425 5.58225 14.3251 5.35964 14.0951C5.25248 13.9844 5.14171 13.8699 5.02618 13.7544C4.91636 13.6446 4.73829 13.6446 4.62846 13.7544C4.51863 13.8642 4.51863 14.0423 4.62846 14.1521C4.74072 14.2644 4.84987 14.3772 4.95545 14.4863C5.18906 14.7277 5.40974 14.9557 5.66198 15.1793C5.66346 15.1806 5.66501 15.1817 5.66648 15.183C5.66793 15.1842 5.66916 15.1855 5.67063 15.1867L5.87619 15.3545C6.19963 15.6173 6.54824 15.745 6.94192 15.745H6.94874L9.38405 15.7357C9.38841 15.7356 9.39273 15.7356 9.39705 15.7356C10.0224 15.7356 10.413 15.9067 10.4174 16.1833C10.4206 16.3798 10.244 16.5698 10.1049 16.5737ZM1.43427 12.0228C1.39127 12.1309 1.26868 12.1838 1.16051 12.1407C1.05233 12.0978 0.999492 11.9752 1.04249 11.867C1.08548 11.7588 1.20807 11.706 1.31625 11.749C1.42446 11.792 1.4773 11.9146 1.43427 12.0228ZM0.5625 6.96634H9.23259L10.3556 8.08927C10.5093 8.24297 10.7141 8.32763 10.9325 8.32763C11.1508 8.32763 11.3558 8.24297 11.5094 8.0893L15.489 4.10972C15.6427 3.95605 15.7274 3.75116 15.7274 3.53281C15.7274 3.31445 15.6427 3.10956 15.489 2.95589L13.0528 0.519672C12.7347 0.201613 12.2171 0.201613 11.899 0.519672L11.0144 1.40427C10.9658 1.36416 10.9035 1.34008 10.8355 1.34008H0.5625C0.40718 1.34008 0.28125 1.46601 0.28125 1.62133V6.68509C0.28125 6.84041 0.40718 6.96634 0.5625 6.96634ZM8.54659 3.872H7.71936C7.56404 3.872 7.43811 3.99793 7.43811 4.15325C7.43811 4.30857 7.56404 4.4345 7.71936 4.4345H7.98409L7.91933 4.49925C7.64016 4.77843 7.60612 5.2112 7.81703 5.52807H2.24926C2.16225 5.2613 1.95504 5.04977 1.69316 4.95998V3.34648C1.95504 3.25669 2.16229 3.04516 2.24926 2.77839H9.14857C9.18626 2.89458 9.24708 3.00118 9.32653 3.09205L8.54659 3.872ZM15.1648 3.53281C15.1648 3.60094 15.1387 3.66454 15.0912 3.712L11.1116 7.69158C11.0642 7.73904 11.0006 7.76516 10.9325 7.76516C10.8644 7.76516 10.8007 7.73904 10.7533 7.69155L8.95113 5.88944L13.2891 1.55151L15.0912 3.35365C15.1387 3.40108 15.1648 3.46471 15.1648 3.53281ZM12.2967 0.91743C12.3461 0.868035 12.4109 0.843355 12.4758 0.843355C12.5407 0.843355 12.6056 0.868035 12.655 0.91743L12.8913 1.15375L8.55341 5.49168L8.31713 5.25539C8.2183 5.15657 8.2183 4.9958 8.31713 4.89705L12.2967 0.91743ZM0.84375 1.90258H10.516L9.72703 2.69155C9.68889 2.63608 9.6667 2.56882 9.6667 2.49714C9.6667 2.34182 9.54077 2.21589 9.38545 2.21589H2.01248C1.85716 2.21589 1.73123 2.34182 1.73123 2.49714C1.73123 2.68104 1.58797 2.8307 1.41191 2.8307C1.25659 2.8307 1.13066 2.95663 1.13066 3.11195V5.19447C1.13066 5.34979 1.25659 5.47572 1.41191 5.47572C1.58801 5.47572 1.73123 5.62538 1.73123 5.80928C1.73123 5.9646 1.85716 6.09053 2.01248 6.09053H8.35678L8.67006 6.40381H0.84375V1.90258ZM3.95975 4.15325C3.95975 4.30857 3.83382 4.4345 3.6785 4.4345H2.77302C2.6177 4.4345 2.49177 4.30857 2.49177 4.15325C2.49177 3.99793 2.6177 3.872 2.77302 3.872H3.6785C3.83382 3.872 3.95975 3.99793 3.95975 4.15325ZM5.74594 3.8701C5.72477 3.86662 5.53922 3.83452 5.53641 3.77669C5.53331 3.71298 5.61814 3.68869 5.64423 3.68279C5.66325 3.6785 5.83158 3.64499 5.89387 3.79339C5.95399 3.93661 6.1188 4.00394 6.26207 3.94382C6.40529 3.8837 6.47262 3.71886 6.4125 3.57563C6.32869 3.37598 6.17108 3.2311 5.97976 3.16079C5.97143 3.01295 5.84891 2.89564 5.69897 2.89564C5.5479 2.89564 5.42464 3.01478 5.418 3.1642C5.13524 3.26787 4.96048 3.51425 4.97454 3.80393C4.98122 3.94132 5.03476 4.15258 5.27411 4.29577C5.23023 4.28445 5.18298 4.28361 5.13594 4.29528C4.98523 4.33286 4.8935 4.48551 4.93109 4.63622C4.9925 4.88246 5.17521 5.06724 5.41828 5.14799C5.42781 5.2947 5.54984 5.41075 5.69893 5.41075C5.84624 5.41075 5.96711 5.29748 5.9792 5.15334C6.12352 5.11073 6.24874 5.03539 6.33512 4.93554C6.44442 4.80916 6.49118 4.65183 6.4704 4.48048C6.44266 4.25175 6.29445 3.96017 5.74594 3.8701ZM5.91216 4.56426C5.90344 4.58275 5.825 4.62747 5.71243 4.63014C5.69176 4.63067 5.50955 4.63116 5.47689 4.5002C5.46149 4.4384 5.42672 4.38651 5.38066 4.34938C5.45716 4.38152 5.54769 4.40764 5.65481 4.42521C5.81882 4.45214 5.90534 4.49352 5.91198 4.5483C5.91321 4.55803 5.91247 4.56327 5.91216 4.56426ZM11.4742 4.99165C11.3158 4.83334 11.058 4.83331 10.8996 4.99165C10.8996 4.99169 10.8996 4.99169 10.8996 4.99172L10.2295 5.66177C10.0711 5.82018 10.0711 6.07798 10.2295 6.23646L10.662 6.66896C10.7387 6.74567 10.8407 6.78789 10.9494 6.78789C11.0581 6.78789 11.1601 6.74567 11.2367 6.66903L11.9068 5.99902C11.9834 5.92234 12.0257 5.82029 12.0257 5.71162C12.0257 5.60298 11.9834 5.50096 11.9068 5.42432L11.4742 4.99165ZM10.9494 6.16084L10.7377 5.9491L11.1869 5.49991L11.3987 5.71162L10.9494 6.16084ZM13.5363 2.35497C13.6461 2.24518 13.8242 2.24518 13.934 2.35497C14.0439 2.46483 14.0439 2.64286 13.934 2.75273L12.5202 4.16661C12.4653 4.22152 12.3933 4.24898 12.3213 4.24898C12.2493 4.24898 12.1774 4.22152 12.1224 4.16661C12.0126 4.05674 12.0126 3.87871 12.1224 3.76885L13.5363 2.35497ZM14.057 3.33808C14.1668 3.44794 14.1668 3.62597 14.057 3.73584L13.0732 4.71961C13.0183 4.77453 12.9464 4.80198 12.8744 4.80198C12.8024 4.80198 12.7304 4.77453 12.6755 4.71961C12.5657 4.60975 12.5657 4.43172 12.6755 4.32186L13.6593 3.33808C13.7691 3.22829 13.9472 3.22829 14.057 3.33808ZM15.1767 7.76C14.6761 7.76 14.2041 7.97494 13.8475 8.36521C13.7427 8.47993 13.5648 8.48794 13.4501 8.38318C13.3355 8.27841 13.3275 8.10052 13.4322 7.98584C13.8966 7.47748 14.5162 7.1975 15.1767 7.1975C15.8373 7.1975 16.4569 7.47748 16.9213 7.98584C17.026 8.10052 17.018 8.27841 16.9033 8.38318C16.8494 8.43246 16.7814 8.45679 16.7137 8.45679C16.6374 8.45679 16.5614 8.42596 16.506 8.36525C16.1494 7.97491 15.6774 7.76 15.1767 7.76ZM15.1767 6.26343C16.0652 6.26343 16.8991 6.64055 17.5247 7.32529C17.6295 7.43997 17.6215 7.61786 17.5068 7.72266C17.4529 7.77191 17.3849 7.79628 17.3172 7.79628C17.2409 7.79628 17.1649 7.76545 17.1095 7.70473C16.5916 7.13801 15.9053 6.82593 15.1767 6.82593C14.4482 6.82593 13.7618 7.13801 13.244 7.70473C13.1392 7.81934 12.9613 7.82746 12.8466 7.72266C12.7319 7.61789 12.7239 7.43997 12.8287 7.32529C13.4544 6.64052 14.2883 6.26343 15.1767 6.26343ZM16.3178 8.64632C16.4225 8.761 16.4145 8.93889 16.2998 9.04369C16.2459 9.09295 16.178 9.11731 16.1102 9.11731C16.034 9.11731 15.958 9.08651 15.9025 9.02576C15.7071 8.81187 15.4493 8.6941 15.1767 8.6941C14.9041 8.6941 14.6463 8.81187 14.4509 9.02576C14.3462 9.14041 14.1683 9.14842 14.0536 9.04369C13.9389 8.93893 13.9309 8.761 14.0357 8.64632C14.3389 8.31441 14.7442 8.1316 15.1767 8.1316C15.6092 8.1316 16.0145 8.31441 16.3178 8.64632ZM16.1702 14.2437C16.1959 14.4559 16.1384 14.6502 16.0039 14.8057C15.877 14.9524 15.682 15.0579 15.458 15.106V15.1701C15.458 15.3254 15.3321 15.4514 15.1767 15.4514C15.0214 15.4514 14.8955 15.3254 14.8955 15.1701V15.1011C14.5408 15.014 14.2708 14.7651 14.1858 14.4238C14.1482 14.2731 14.2399 14.1204 14.3906 14.0828C14.5414 14.0455 14.6939 14.137 14.7315 14.2877C14.7856 14.5047 15.0172 14.5763 15.1993 14.5723C15.3572 14.5686 15.5131 14.5132 15.5784 14.4377C15.5995 14.4133 15.62 14.3793 15.6117 14.3115C15.604 14.2474 15.5857 14.0973 15.1332 14.0231C14.3939 13.9017 14.264 13.4808 14.2523 13.2407C14.2334 12.8511 14.49 12.5234 14.8955 12.4112V12.3371C14.8955 12.1818 15.0214 12.0558 15.1767 12.0558C15.332 12.0558 15.458 12.1818 15.458 12.3371V12.4087C15.7194 12.4782 15.964 12.6526 16.0951 12.9647C16.1552 13.1079 16.0879 13.2728 15.9446 13.3329C15.8013 13.3931 15.6365 13.3257 15.5764 13.1825C15.4705 12.9301 15.2077 12.9159 15.0692 12.9474C15.007 12.9615 14.8049 13.0224 14.8142 13.2134C14.8167 13.265 14.8233 13.4021 15.2243 13.468C15.8009 13.5627 16.1191 13.8237 16.1702 14.2437ZM12.1237 12.9681C12.1237 13.1235 11.9978 13.2494 11.8425 13.2494H8.37063C8.21531 13.2494 8.08938 13.1235 8.08938 12.9681C8.08938 12.8128 8.21531 12.6869 8.37063 12.6869H11.8425C11.9978 12.6869 12.1237 12.8128 12.1237 12.9681ZM9.26142 8.01055C9.39593 8.08821 9.44202 8.26023 9.36436 8.39474L7.62845 11.4014C7.57635 11.4917 7.48181 11.5421 7.38461 11.5421C7.3369 11.5421 7.28852 11.5299 7.24423 11.5044C7.10972 11.4267 7.06363 11.2547 7.14129 11.1202L8.8772 8.11349C8.9549 7.97895 9.12691 7.93286 9.26142 8.01055ZM5.26201 7.63755L6.16061 10.9911C6.20082 11.1411 6.11177 11.2953 5.96173 11.3356C5.93736 11.3421 5.91286 11.3452 5.88878 11.3452C5.76457 11.3452 5.65095 11.2623 5.61727 11.1366L4.71867 7.78309C4.67845 7.63305 4.7675 7.47885 4.91755 7.43863C5.0677 7.39859 5.22179 7.4875 5.26201 7.63755Z" />
-                                                </mask>
-                                                <path
-                                                    d="M17.1192 9.80454H13.2343C12.9037 9.80454 12.6347 10.0735 12.6347 10.4042V17.1193C12.6347 17.4499 12.9037 17.7189 13.2343 17.7189H17.1191C17.4497 17.7189 17.7187 17.4499 17.7187 17.1193V10.4042C17.7188 10.0736 17.4498 9.80454 17.1192 9.80454ZM16.0657 10.367L16.0084 10.522H14.3451L14.2878 10.367H16.0657ZM17.1562 17.1193C17.1562 17.1391 17.1389 17.1564 17.1192 17.1564H13.2343C13.2146 17.1564 13.1972 17.1391 13.1972 17.1193V10.4042C13.1972 10.3844 13.2146 10.367 13.2343 10.367H13.6881L13.8855 10.9009C13.9263 11.0113 14.0315 11.0846 14.1492 11.0846H16.2042C16.3219 11.0846 16.4271 11.0113 16.468 10.9009L16.6653 10.367H17.1191C17.1388 10.367 17.1562 10.3844 17.1562 10.4042V17.1193H17.1562ZM15.7839 16.7039C15.7839 16.8592 15.6579 16.9852 15.5026 16.9852L14.8509 16.9851C14.6956 16.9851 14.5696 16.8592 14.5696 16.7039C14.5696 16.5486 14.6956 16.4226 14.8509 16.4226L15.5026 16.4227C15.658 16.4227 15.7839 16.5486 15.7839 16.7039ZM9.39765 15.1732C9.39252 15.1732 9.38714 15.1733 9.38194 15.1733L6.94666 15.1826C6.9075 15.1826 6.86978 15.181 6.83241 15.1775C6.84278 15.1679 6.85304 15.1581 6.86317 15.1479C7.19269 14.8184 7.19712 14.2789 6.87322 13.9197C6.86475 13.9102 6.85564 13.9014 6.84598 13.8933C6.38279 13.5015 5.9766 13.0195 5.65021 12.6322C5.53549 12.4961 5.42718 12.3676 5.33194 12.262C4.92789 11.8137 4.37411 11.7531 3.88403 11.7544L2.17037 11.7565L2.17213 11.5522C2.17494 11.2263 1.91208 10.9589 1.58618 10.9561L0.907734 10.9503C0.906012 10.9503 0.904359 10.9503 0.902637 10.9503C0.579094 10.9503 0.314402 11.2121 0.31159 11.5363L0.281285 15.0605C0.279914 15.218 0.340207 15.3669 0.45109 15.4796C0.561938 15.5924 0.709699 15.6552 0.86727 15.6566L1.54568 15.6625H1.55092C1.70652 15.6625 1.85337 15.6023 1.96488 15.4926C2.07766 15.3818 2.14052 15.234 2.14186 15.0764L2.14418 14.8068H2.42369L4.3688 16.7522C4.70408 17.0875 5.12392 17.2638 5.58598 17.2638C5.60317 17.2638 5.62039 17.2635 5.63769 17.263L10.1208 17.136C10.5783 17.1231 10.9878 16.6647 10.9799 16.1743C10.9761 15.939 10.8508 15.1732 9.39765 15.1732ZM1.57057 15.0915C1.56656 15.0954 1.56009 15.1008 1.55053 15.1L0.872121 15.0941C0.862734 15.094 0.856125 15.0893 0.852223 15.0853C0.84832 15.0814 0.843715 15.0746 0.843785 15.0653L0.874055 11.5412C0.874195 11.5263 0.887836 11.5128 0.902672 11.5128H0.902883L1.58129 11.5186C1.59627 11.5187 1.60977 11.5325 1.60966 11.5475L1.58411 14.5255V14.5255V14.5256L1.57943 15.0716C1.57929 15.081 1.57454 15.0876 1.57057 15.0915ZM10.1049 16.5737L5.62177 16.7007C5.29291 16.71 5.00555 16.5935 4.76652 16.3544L2.73874 14.3267C2.68601 14.2739 2.61446 14.2443 2.5399 14.2443H2.14896L2.16548 12.319L3.88466 12.3169C4.40989 12.3148 4.70756 12.4094 4.91407 12.6385C5.00305 12.7372 5.1036 12.8565 5.22004 12.9947C5.5563 13.3937 5.97386 13.8892 6.46611 14.3087C6.58093 14.4467 6.58157 14.634 6.46538 14.7502C6.41904 14.7965 6.27866 14.9363 6.0248 14.7491C5.79277 14.5425 5.58225 14.3251 5.35964 14.0951C5.25248 13.9844 5.14171 13.8699 5.02618 13.7544C4.91636 13.6446 4.73829 13.6446 4.62846 13.7544C4.51863 13.8642 4.51863 14.0423 4.62846 14.1521C4.74072 14.2644 4.84987 14.3772 4.95545 14.4863C5.18906 14.7277 5.40974 14.9557 5.66198 15.1793C5.66346 15.1806 5.66501 15.1817 5.66648 15.183C5.66793 15.1842 5.66916 15.1855 5.67063 15.1867L5.87619 15.3545C6.19963 15.6173 6.54824 15.745 6.94192 15.745H6.94874L9.38405 15.7357C9.38841 15.7356 9.39273 15.7356 9.39705 15.7356C10.0224 15.7356 10.413 15.9067 10.4174 16.1833C10.4206 16.3798 10.244 16.5698 10.1049 16.5737ZM1.43427 12.0228C1.39127 12.1309 1.26868 12.1838 1.16051 12.1407C1.05233 12.0978 0.999492 11.9752 1.04249 11.867C1.08548 11.7588 1.20807 11.706 1.31625 11.749C1.42446 11.792 1.4773 11.9146 1.43427 12.0228ZM0.5625 6.96634H9.23259L10.3556 8.08927C10.5093 8.24297 10.7141 8.32763 10.9325 8.32763C11.1508 8.32763 11.3558 8.24297 11.5094 8.0893L15.489 4.10972C15.6427 3.95605 15.7274 3.75116 15.7274 3.53281C15.7274 3.31445 15.6427 3.10956 15.489 2.95589L13.0528 0.519672C12.7347 0.201613 12.2171 0.201613 11.899 0.519672L11.0144 1.40427C10.9658 1.36416 10.9035 1.34008 10.8355 1.34008H0.5625C0.40718 1.34008 0.28125 1.46601 0.28125 1.62133V6.68509C0.28125 6.84041 0.40718 6.96634 0.5625 6.96634ZM8.54659 3.872H7.71936C7.56404 3.872 7.43811 3.99793 7.43811 4.15325C7.43811 4.30857 7.56404 4.4345 7.71936 4.4345H7.98409L7.91933 4.49925C7.64016 4.77843 7.60612 5.2112 7.81703 5.52807H2.24926C2.16225 5.2613 1.95504 5.04977 1.69316 4.95998V3.34648C1.95504 3.25669 2.16229 3.04516 2.24926 2.77839H9.14857C9.18626 2.89458 9.24708 3.00118 9.32653 3.09205L8.54659 3.872ZM15.1648 3.53281C15.1648 3.60094 15.1387 3.66454 15.0912 3.712L11.1116 7.69158C11.0642 7.73904 11.0006 7.76516 10.9325 7.76516C10.8644 7.76516 10.8007 7.73904 10.7533 7.69155L8.95113 5.88944L13.2891 1.55151L15.0912 3.35365C15.1387 3.40108 15.1648 3.46471 15.1648 3.53281ZM12.2967 0.91743C12.3461 0.868035 12.4109 0.843355 12.4758 0.843355C12.5407 0.843355 12.6056 0.868035 12.655 0.91743L12.8913 1.15375L8.55341 5.49168L8.31713 5.25539C8.2183 5.15657 8.2183 4.9958 8.31713 4.89705L12.2967 0.91743ZM0.84375 1.90258H10.516L9.72703 2.69155C9.68889 2.63608 9.6667 2.56882 9.6667 2.49714C9.6667 2.34182 9.54077 2.21589 9.38545 2.21589H2.01248C1.85716 2.21589 1.73123 2.34182 1.73123 2.49714C1.73123 2.68104 1.58797 2.8307 1.41191 2.8307C1.25659 2.8307 1.13066 2.95663 1.13066 3.11195V5.19447C1.13066 5.34979 1.25659 5.47572 1.41191 5.47572C1.58801 5.47572 1.73123 5.62538 1.73123 5.80928C1.73123 5.9646 1.85716 6.09053 2.01248 6.09053H8.35678L8.67006 6.40381H0.84375V1.90258ZM3.95975 4.15325C3.95975 4.30857 3.83382 4.4345 3.6785 4.4345H2.77302C2.6177 4.4345 2.49177 4.30857 2.49177 4.15325C2.49177 3.99793 2.6177 3.872 2.77302 3.872H3.6785C3.83382 3.872 3.95975 3.99793 3.95975 4.15325ZM5.74594 3.8701C5.72477 3.86662 5.53922 3.83452 5.53641 3.77669C5.53331 3.71298 5.61814 3.68869 5.64423 3.68279C5.66325 3.6785 5.83158 3.64499 5.89387 3.79339C5.95399 3.93661 6.1188 4.00394 6.26207 3.94382C6.40529 3.8837 6.47262 3.71886 6.4125 3.57563C6.32869 3.37598 6.17108 3.2311 5.97976 3.16079C5.97143 3.01295 5.84891 2.89564 5.69897 2.89564C5.5479 2.89564 5.42464 3.01478 5.418 3.1642C5.13524 3.26787 4.96048 3.51425 4.97454 3.80393C4.98122 3.94132 5.03476 4.15258 5.27411 4.29577C5.23023 4.28445 5.18298 4.28361 5.13594 4.29528C4.98523 4.33286 4.8935 4.48551 4.93109 4.63622C4.9925 4.88246 5.17521 5.06724 5.41828 5.14799C5.42781 5.2947 5.54984 5.41075 5.69893 5.41075C5.84624 5.41075 5.96711 5.29748 5.9792 5.15334C6.12352 5.11073 6.24874 5.03539 6.33512 4.93554C6.44442 4.80916 6.49118 4.65183 6.4704 4.48048C6.44266 4.25175 6.29445 3.96017 5.74594 3.8701ZM5.91216 4.56426C5.90344 4.58275 5.825 4.62747 5.71243 4.63014C5.69176 4.63067 5.50955 4.63116 5.47689 4.5002C5.46149 4.4384 5.42672 4.38651 5.38066 4.34938C5.45716 4.38152 5.54769 4.40764 5.65481 4.42521C5.81882 4.45214 5.90534 4.49352 5.91198 4.5483C5.91321 4.55803 5.91247 4.56327 5.91216 4.56426ZM11.4742 4.99165C11.3158 4.83334 11.058 4.83331 10.8996 4.99165C10.8996 4.99169 10.8996 4.99169 10.8996 4.99172L10.2295 5.66177C10.0711 5.82018 10.0711 6.07798 10.2295 6.23646L10.662 6.66896C10.7387 6.74567 10.8407 6.78789 10.9494 6.78789C11.0581 6.78789 11.1601 6.74567 11.2367 6.66903L11.9068 5.99902C11.9834 5.92234 12.0257 5.82029 12.0257 5.71162C12.0257 5.60298 11.9834 5.50096 11.9068 5.42432L11.4742 4.99165ZM10.9494 6.16084L10.7377 5.9491L11.1869 5.49991L11.3987 5.71162L10.9494 6.16084ZM13.5363 2.35497C13.6461 2.24518 13.8242 2.24518 13.934 2.35497C14.0439 2.46483 14.0439 2.64286 13.934 2.75273L12.5202 4.16661C12.4653 4.22152 12.3933 4.24898 12.3213 4.24898C12.2493 4.24898 12.1774 4.22152 12.1224 4.16661C12.0126 4.05674 12.0126 3.87871 12.1224 3.76885L13.5363 2.35497ZM14.057 3.33808C14.1668 3.44794 14.1668 3.62597 14.057 3.73584L13.0732 4.71961C13.0183 4.77453 12.9464 4.80198 12.8744 4.80198C12.8024 4.80198 12.7304 4.77453 12.6755 4.71961C12.5657 4.60975 12.5657 4.43172 12.6755 4.32186L13.6593 3.33808C13.7691 3.22829 13.9472 3.22829 14.057 3.33808ZM15.1767 7.76C14.6761 7.76 14.2041 7.97494 13.8475 8.36521C13.7427 8.47993 13.5648 8.48794 13.4501 8.38318C13.3355 8.27841 13.3275 8.10052 13.4322 7.98584C13.8966 7.47748 14.5162 7.1975 15.1767 7.1975C15.8373 7.1975 16.4569 7.47748 16.9213 7.98584C17.026 8.10052 17.018 8.27841 16.9033 8.38318C16.8494 8.43246 16.7814 8.45679 16.7137 8.45679C16.6374 8.45679 16.5614 8.42596 16.506 8.36525C16.1494 7.97491 15.6774 7.76 15.1767 7.76ZM15.1767 6.26343C16.0652 6.26343 16.8991 6.64055 17.5247 7.32529C17.6295 7.43997 17.6215 7.61786 17.5068 7.72266C17.4529 7.77191 17.3849 7.79628 17.3172 7.79628C17.2409 7.79628 17.1649 7.76545 17.1095 7.70473C16.5916 7.13801 15.9053 6.82593 15.1767 6.82593C14.4482 6.82593 13.7618 7.13801 13.244 7.70473C13.1392 7.81934 12.9613 7.82746 12.8466 7.72266C12.7319 7.61789 12.7239 7.43997 12.8287 7.32529C13.4544 6.64052 14.2883 6.26343 15.1767 6.26343ZM16.3178 8.64632C16.4225 8.761 16.4145 8.93889 16.2998 9.04369C16.2459 9.09295 16.178 9.11731 16.1102 9.11731C16.034 9.11731 15.958 9.08651 15.9025 9.02576C15.7071 8.81187 15.4493 8.6941 15.1767 8.6941C14.9041 8.6941 14.6463 8.81187 14.4509 9.02576C14.3462 9.14041 14.1683 9.14842 14.0536 9.04369C13.9389 8.93893 13.9309 8.761 14.0357 8.64632C14.3389 8.31441 14.7442 8.1316 15.1767 8.1316C15.6092 8.1316 16.0145 8.31441 16.3178 8.64632ZM16.1702 14.2437C16.1959 14.4559 16.1384 14.6502 16.0039 14.8057C15.877 14.9524 15.682 15.0579 15.458 15.106V15.1701C15.458 15.3254 15.3321 15.4514 15.1767 15.4514C15.0214 15.4514 14.8955 15.3254 14.8955 15.1701V15.1011C14.5408 15.014 14.2708 14.7651 14.1858 14.4238C14.1482 14.2731 14.2399 14.1204 14.3906 14.0828C14.5414 14.0455 14.6939 14.137 14.7315 14.2877C14.7856 14.5047 15.0172 14.5763 15.1993 14.5723C15.3572 14.5686 15.5131 14.5132 15.5784 14.4377C15.5995 14.4133 15.62 14.3793 15.6117 14.3115C15.604 14.2474 15.5857 14.0973 15.1332 14.0231C14.3939 13.9017 14.264 13.4808 14.2523 13.2407C14.2334 12.8511 14.49 12.5234 14.8955 12.4112V12.3371C14.8955 12.1818 15.0214 12.0558 15.1767 12.0558C15.332 12.0558 15.458 12.1818 15.458 12.3371V12.4087C15.7194 12.4782 15.964 12.6526 16.0951 12.9647C16.1552 13.1079 16.0879 13.2728 15.9446 13.3329C15.8013 13.3931 15.6365 13.3257 15.5764 13.1825C15.4705 12.9301 15.2077 12.9159 15.0692 12.9474C15.007 12.9615 14.8049 13.0224 14.8142 13.2134C14.8167 13.265 14.8233 13.4021 15.2243 13.468C15.8009 13.5627 16.1191 13.8237 16.1702 14.2437ZM12.1237 12.9681C12.1237 13.1235 11.9978 13.2494 11.8425 13.2494H8.37063C8.21531 13.2494 8.08938 13.1235 8.08938 12.9681C8.08938 12.8128 8.21531 12.6869 8.37063 12.6869H11.8425C11.9978 12.6869 12.1237 12.8128 12.1237 12.9681ZM9.26142 8.01055C9.39593 8.08821 9.44202 8.26023 9.36436 8.39474L7.62845 11.4014C7.57635 11.4917 7.48181 11.5421 7.38461 11.5421C7.3369 11.5421 7.28852 11.5299 7.24423 11.5044C7.10972 11.4267 7.06363 11.2547 7.14129 11.1202L8.8772 8.11349C8.9549 7.97895 9.12691 7.93286 9.26142 8.01055ZM5.26201 7.63755L6.16061 10.9911C6.20082 11.1411 6.11177 11.2953 5.96173 11.3356C5.93736 11.3421 5.91286 11.3452 5.88878 11.3452C5.76457 11.3452 5.65095 11.2623 5.61727 11.1366L4.71867 7.78309C4.67845 7.63305 4.7675 7.47885 4.91755 7.43863C5.0677 7.39859 5.22179 7.4875 5.26201 7.63755Z"
-                                                    fill="#F88011" />
-                                                <path
-                                                    d="M17.1192 9.80454H13.2343C12.9037 9.80454 12.6347 10.0735 12.6347 10.4042V17.1193C12.6347 17.4499 12.9037 17.7189 13.2343 17.7189H17.1191C17.4497 17.7189 17.7187 17.4499 17.7187 17.1193V10.4042C17.7188 10.0736 17.4498 9.80454 17.1192 9.80454ZM16.0657 10.367L16.0084 10.522H14.3451L14.2878 10.367H16.0657ZM17.1562 17.1193C17.1562 17.1391 17.1389 17.1564 17.1192 17.1564H13.2343C13.2146 17.1564 13.1972 17.1391 13.1972 17.1193V10.4042C13.1972 10.3844 13.2146 10.367 13.2343 10.367H13.6881L13.8855 10.9009C13.9263 11.0113 14.0315 11.0846 14.1492 11.0846H16.2042C16.3219 11.0846 16.4271 11.0113 16.468 10.9009L16.6653 10.367H17.1191C17.1388 10.367 17.1562 10.3844 17.1562 10.4042V17.1193H17.1562ZM15.7839 16.7039C15.7839 16.8592 15.6579 16.9852 15.5026 16.9852L14.8509 16.9851C14.6956 16.9851 14.5696 16.8592 14.5696 16.7039C14.5696 16.5486 14.6956 16.4226 14.8509 16.4226L15.5026 16.4227C15.658 16.4227 15.7839 16.5486 15.7839 16.7039ZM9.39765 15.1732C9.39252 15.1732 9.38714 15.1733 9.38194 15.1733L6.94666 15.1826C6.9075 15.1826 6.86978 15.181 6.83241 15.1775C6.84278 15.1679 6.85304 15.1581 6.86317 15.1479C7.19269 14.8184 7.19712 14.2789 6.87322 13.9197C6.86475 13.9102 6.85564 13.9014 6.84598 13.8933C6.38279 13.5015 5.9766 13.0195 5.65021 12.6322C5.53549 12.4961 5.42718 12.3676 5.33194 12.262C4.92789 11.8137 4.37411 11.7531 3.88403 11.7544L2.17037 11.7565L2.17213 11.5522C2.17494 11.2263 1.91208 10.9589 1.58618 10.9561L0.907734 10.9503C0.906012 10.9503 0.904359 10.9503 0.902637 10.9503C0.579094 10.9503 0.314402 11.2121 0.31159 11.5363L0.281285 15.0605C0.279914 15.218 0.340207 15.3669 0.45109 15.4796C0.561938 15.5924 0.709699 15.6552 0.86727 15.6566L1.54568 15.6625H1.55092C1.70652 15.6625 1.85337 15.6023 1.96488 15.4926C2.07766 15.3818 2.14052 15.234 2.14186 15.0764L2.14418 14.8068H2.42369L4.3688 16.7522C4.70408 17.0875 5.12392 17.2638 5.58598 17.2638C5.60317 17.2638 5.62039 17.2635 5.63769 17.263L10.1208 17.136C10.5783 17.1231 10.9878 16.6647 10.9799 16.1743C10.9761 15.939 10.8508 15.1732 9.39765 15.1732ZM1.57057 15.0915C1.56656 15.0954 1.56009 15.1008 1.55053 15.1L0.872121 15.0941C0.862734 15.094 0.856125 15.0893 0.852223 15.0853C0.84832 15.0814 0.843715 15.0746 0.843785 15.0653L0.874055 11.5412C0.874195 11.5263 0.887836 11.5128 0.902672 11.5128H0.902883L1.58129 11.5186C1.59627 11.5187 1.60977 11.5325 1.60966 11.5475L1.58411 14.5255V14.5255V14.5256L1.57943 15.0716C1.57929 15.081 1.57454 15.0876 1.57057 15.0915ZM10.1049 16.5737L5.62177 16.7007C5.29291 16.71 5.00555 16.5935 4.76652 16.3544L2.73874 14.3267C2.68601 14.2739 2.61446 14.2443 2.5399 14.2443H2.14896L2.16548 12.319L3.88466 12.3169C4.40989 12.3148 4.70756 12.4094 4.91407 12.6385C5.00305 12.7372 5.1036 12.8565 5.22004 12.9947C5.5563 13.3937 5.97386 13.8892 6.46611 14.3087C6.58093 14.4467 6.58157 14.634 6.46538 14.7502C6.41904 14.7965 6.27866 14.9363 6.0248 14.7491C5.79277 14.5425 5.58225 14.3251 5.35964 14.0951C5.25248 13.9844 5.14171 13.8699 5.02618 13.7544C4.91636 13.6446 4.73829 13.6446 4.62846 13.7544C4.51863 13.8642 4.51863 14.0423 4.62846 14.1521C4.74072 14.2644 4.84987 14.3772 4.95545 14.4863C5.18906 14.7277 5.40974 14.9557 5.66198 15.1793C5.66346 15.1806 5.66501 15.1817 5.66648 15.183C5.66793 15.1842 5.66916 15.1855 5.67063 15.1867L5.87619 15.3545C6.19963 15.6173 6.54824 15.745 6.94192 15.745H6.94874L9.38405 15.7357C9.38841 15.7356 9.39273 15.7356 9.39705 15.7356C10.0224 15.7356 10.413 15.9067 10.4174 16.1833C10.4206 16.3798 10.244 16.5698 10.1049 16.5737ZM1.43427 12.0228C1.39127 12.1309 1.26868 12.1838 1.16051 12.1407C1.05233 12.0978 0.999492 11.9752 1.04249 11.867C1.08548 11.7588 1.20807 11.706 1.31625 11.749C1.42446 11.792 1.4773 11.9146 1.43427 12.0228ZM0.5625 6.96634H9.23259L10.3556 8.08927C10.5093 8.24297 10.7141 8.32763 10.9325 8.32763C11.1508 8.32763 11.3558 8.24297 11.5094 8.0893L15.489 4.10972C15.6427 3.95605 15.7274 3.75116 15.7274 3.53281C15.7274 3.31445 15.6427 3.10956 15.489 2.95589L13.0528 0.519672C12.7347 0.201613 12.2171 0.201613 11.899 0.519672L11.0144 1.40427C10.9658 1.36416 10.9035 1.34008 10.8355 1.34008H0.5625C0.40718 1.34008 0.28125 1.46601 0.28125 1.62133V6.68509C0.28125 6.84041 0.40718 6.96634 0.5625 6.96634ZM8.54659 3.872H7.71936C7.56404 3.872 7.43811 3.99793 7.43811 4.15325C7.43811 4.30857 7.56404 4.4345 7.71936 4.4345H7.98409L7.91933 4.49925C7.64016 4.77843 7.60612 5.2112 7.81703 5.52807H2.24926C2.16225 5.2613 1.95504 5.04977 1.69316 4.95998V3.34648C1.95504 3.25669 2.16229 3.04516 2.24926 2.77839H9.14857C9.18626 2.89458 9.24708 3.00118 9.32653 3.09205L8.54659 3.872ZM15.1648 3.53281C15.1648 3.60094 15.1387 3.66454 15.0912 3.712L11.1116 7.69158C11.0642 7.73904 11.0006 7.76516 10.9325 7.76516C10.8644 7.76516 10.8007 7.73904 10.7533 7.69155L8.95113 5.88944L13.2891 1.55151L15.0912 3.35365C15.1387 3.40108 15.1648 3.46471 15.1648 3.53281ZM12.2967 0.91743C12.3461 0.868035 12.4109 0.843355 12.4758 0.843355C12.5407 0.843355 12.6056 0.868035 12.655 0.91743L12.8913 1.15375L8.55341 5.49168L8.31713 5.25539C8.2183 5.15657 8.2183 4.9958 8.31713 4.89705L12.2967 0.91743ZM0.84375 1.90258H10.516L9.72703 2.69155C9.68889 2.63608 9.6667 2.56882 9.6667 2.49714C9.6667 2.34182 9.54077 2.21589 9.38545 2.21589H2.01248C1.85716 2.21589 1.73123 2.34182 1.73123 2.49714C1.73123 2.68104 1.58797 2.8307 1.41191 2.8307C1.25659 2.8307 1.13066 2.95663 1.13066 3.11195V5.19447C1.13066 5.34979 1.25659 5.47572 1.41191 5.47572C1.58801 5.47572 1.73123 5.62538 1.73123 5.80928C1.73123 5.9646 1.85716 6.09053 2.01248 6.09053H8.35678L8.67006 6.40381H0.84375V1.90258ZM3.95975 4.15325C3.95975 4.30857 3.83382 4.4345 3.6785 4.4345H2.77302C2.6177 4.4345 2.49177 4.30857 2.49177 4.15325C2.49177 3.99793 2.6177 3.872 2.77302 3.872H3.6785C3.83382 3.872 3.95975 3.99793 3.95975 4.15325ZM5.74594 3.8701C5.72477 3.86662 5.53922 3.83452 5.53641 3.77669C5.53331 3.71298 5.61814 3.68869 5.64423 3.68279C5.66325 3.6785 5.83158 3.64499 5.89387 3.79339C5.95399 3.93661 6.1188 4.00394 6.26207 3.94382C6.40529 3.8837 6.47262 3.71886 6.4125 3.57563C6.32869 3.37598 6.17108 3.2311 5.97976 3.16079C5.97143 3.01295 5.84891 2.89564 5.69897 2.89564C5.5479 2.89564 5.42464 3.01478 5.418 3.1642C5.13524 3.26787 4.96048 3.51425 4.97454 3.80393C4.98122 3.94132 5.03476 4.15258 5.27411 4.29577C5.23023 4.28445 5.18298 4.28361 5.13594 4.29528C4.98523 4.33286 4.8935 4.48551 4.93109 4.63622C4.9925 4.88246 5.17521 5.06724 5.41828 5.14799C5.42781 5.2947 5.54984 5.41075 5.69893 5.41075C5.84624 5.41075 5.96711 5.29748 5.9792 5.15334C6.12352 5.11073 6.24874 5.03539 6.33512 4.93554C6.44442 4.80916 6.49118 4.65183 6.4704 4.48048C6.44266 4.25175 6.29445 3.96017 5.74594 3.8701ZM5.91216 4.56426C5.90344 4.58275 5.825 4.62747 5.71243 4.63014C5.69176 4.63067 5.50955 4.63116 5.47689 4.5002C5.46149 4.4384 5.42672 4.38651 5.38066 4.34938C5.45716 4.38152 5.54769 4.40764 5.65481 4.42521C5.81882 4.45214 5.90534 4.49352 5.91198 4.5483C5.91321 4.55803 5.91247 4.56327 5.91216 4.56426ZM11.4742 4.99165C11.3158 4.83334 11.058 4.83331 10.8996 4.99165C10.8996 4.99169 10.8996 4.99169 10.8996 4.99172L10.2295 5.66177C10.0711 5.82018 10.0711 6.07798 10.2295 6.23646L10.662 6.66896C10.7387 6.74567 10.8407 6.78789 10.9494 6.78789C11.0581 6.78789 11.1601 6.74567 11.2367 6.66903L11.9068 5.99902C11.9834 5.92234 12.0257 5.82029 12.0257 5.71162C12.0257 5.60298 11.9834 5.50096 11.9068 5.42432L11.4742 4.99165ZM10.9494 6.16084L10.7377 5.9491L11.1869 5.49991L11.3987 5.71162L10.9494 6.16084ZM13.5363 2.35497C13.6461 2.24518 13.8242 2.24518 13.934 2.35497C14.0439 2.46483 14.0439 2.64286 13.934 2.75273L12.5202 4.16661C12.4653 4.22152 12.3933 4.24898 12.3213 4.24898C12.2493 4.24898 12.1774 4.22152 12.1224 4.16661C12.0126 4.05674 12.0126 3.87871 12.1224 3.76885L13.5363 2.35497ZM14.057 3.33808C14.1668 3.44794 14.1668 3.62597 14.057 3.73584L13.0732 4.71961C13.0183 4.77453 12.9464 4.80198 12.8744 4.80198C12.8024 4.80198 12.7304 4.77453 12.6755 4.71961C12.5657 4.60975 12.5657 4.43172 12.6755 4.32186L13.6593 3.33808C13.7691 3.22829 13.9472 3.22829 14.057 3.33808ZM15.1767 7.76C14.6761 7.76 14.2041 7.97494 13.8475 8.36521C13.7427 8.47993 13.5648 8.48794 13.4501 8.38318C13.3355 8.27841 13.3275 8.10052 13.4322 7.98584C13.8966 7.47748 14.5162 7.1975 15.1767 7.1975C15.8373 7.1975 16.4569 7.47748 16.9213 7.98584C17.026 8.10052 17.018 8.27841 16.9033 8.38318C16.8494 8.43246 16.7814 8.45679 16.7137 8.45679C16.6374 8.45679 16.5614 8.42596 16.506 8.36525C16.1494 7.97491 15.6774 7.76 15.1767 7.76ZM15.1767 6.26343C16.0652 6.26343 16.8991 6.64055 17.5247 7.32529C17.6295 7.43997 17.6215 7.61786 17.5068 7.72266C17.4529 7.77191 17.3849 7.79628 17.3172 7.79628C17.2409 7.79628 17.1649 7.76545 17.1095 7.70473C16.5916 7.13801 15.9053 6.82593 15.1767 6.82593C14.4482 6.82593 13.7618 7.13801 13.244 7.70473C13.1392 7.81934 12.9613 7.82746 12.8466 7.72266C12.7319 7.61789 12.7239 7.43997 12.8287 7.32529C13.4544 6.64052 14.2883 6.26343 15.1767 6.26343ZM16.3178 8.64632C16.4225 8.761 16.4145 8.93889 16.2998 9.04369C16.2459 9.09295 16.178 9.11731 16.1102 9.11731C16.034 9.11731 15.958 9.08651 15.9025 9.02576C15.7071 8.81187 15.4493 8.6941 15.1767 8.6941C14.9041 8.6941 14.6463 8.81187 14.4509 9.02576C14.3462 9.14041 14.1683 9.14842 14.0536 9.04369C13.9389 8.93893 13.9309 8.761 14.0357 8.64632C14.3389 8.31441 14.7442 8.1316 15.1767 8.1316C15.6092 8.1316 16.0145 8.31441 16.3178 8.64632ZM16.1702 14.2437C16.1959 14.4559 16.1384 14.6502 16.0039 14.8057C15.877 14.9524 15.682 15.0579 15.458 15.106V15.1701C15.458 15.3254 15.3321 15.4514 15.1767 15.4514C15.0214 15.4514 14.8955 15.3254 14.8955 15.1701V15.1011C14.5408 15.014 14.2708 14.7651 14.1858 14.4238C14.1482 14.2731 14.2399 14.1204 14.3906 14.0828C14.5414 14.0455 14.6939 14.137 14.7315 14.2877C14.7856 14.5047 15.0172 14.5763 15.1993 14.5723C15.3572 14.5686 15.5131 14.5132 15.5784 14.4377C15.5995 14.4133 15.62 14.3793 15.6117 14.3115C15.604 14.2474 15.5857 14.0973 15.1332 14.0231C14.3939 13.9017 14.264 13.4808 14.2523 13.2407C14.2334 12.8511 14.49 12.5234 14.8955 12.4112V12.3371C14.8955 12.1818 15.0214 12.0558 15.1767 12.0558C15.332 12.0558 15.458 12.1818 15.458 12.3371V12.4087C15.7194 12.4782 15.964 12.6526 16.0951 12.9647C16.1552 13.1079 16.0879 13.2728 15.9446 13.3329C15.8013 13.3931 15.6365 13.3257 15.5764 13.1825C15.4705 12.9301 15.2077 12.9159 15.0692 12.9474C15.007 12.9615 14.8049 13.0224 14.8142 13.2134C14.8167 13.265 14.8233 13.4021 15.2243 13.468C15.8009 13.5627 16.1191 13.8237 16.1702 14.2437ZM12.1237 12.9681C12.1237 13.1235 11.9978 13.2494 11.8425 13.2494H8.37063C8.21531 13.2494 8.08938 13.1235 8.08938 12.9681C8.08938 12.8128 8.21531 12.6869 8.37063 12.6869H11.8425C11.9978 12.6869 12.1237 12.8128 12.1237 12.9681ZM9.26142 8.01055C9.39593 8.08821 9.44202 8.26023 9.36436 8.39474L7.62845 11.4014C7.57635 11.4917 7.48181 11.5421 7.38461 11.5421C7.3369 11.5421 7.28852 11.5299 7.24423 11.5044C7.10972 11.4267 7.06363 11.2547 7.14129 11.1202L8.8772 8.11349C8.9549 7.97895 9.12691 7.93286 9.26142 8.01055ZM5.26201 7.63755L6.16061 10.9911C6.20082 11.1411 6.11177 11.2953 5.96173 11.3356C5.93736 11.3421 5.91286 11.3452 5.88878 11.3452C5.76457 11.3452 5.65095 11.2623 5.61727 11.1366L4.71867 7.78309C4.67845 7.63305 4.7675 7.47885 4.91755 7.43863C5.0677 7.39859 5.22179 7.4875 5.26201 7.63755Z"
-                                                    stroke="#84818A" stroke-width="0.2"
-                                                    mask="url(#path-1-outside-1_271_11828)" />
-                                            </g>
-                                            <defs>
-                                                <clipPath id="clip0_271_11828">
-                                                    <rect width="18" height="18" fill="white" />
-                                                </clipPath>
-                                            </defs>
-                                        </svg>
+                                <li class="nav-item" *ngIf="accountLevel == accountLevelEnum.Profile && !viewMode">
+                                    <a class="nav-link profile-nav-link"
+                                        (click)="changeTab(accountInfoPageTabsEnum.Payments)"
+                                        [ngClass]="currentTab == accountInfoPageTabsEnum.Payments ? 'active' : ''">
 
-                                        <span> {{l("MyPaymentMethods")}}</span>
+                                        <span class="nav-icon-box">
+                                            <img *ngIf="currentTab != accountInfoPageTabsEnum.Payments"
+                                                src="assets/payment/payment-method1.png">
+
+                                            <svg *ngIf="currentTab == accountInfoPageTabsEnum.Payments" width="18"
+                                                height="18" viewBox="0 0 18 18" fill="none"
+                                                xmlns="http://www.w3.org/2000/svg">
+                                                <!-- keep your existing payment active svg here -->
+                                            </svg>
+                                        </span>
+
+                                        <span class="nav-title">{{l("MyPaymentMethods")}}</span>
                                     </a>
                                 </li>
 
                                 <li class="nav-item"
-                                    *ngIf=" accountDataForView?.accountTypeId != 21 && (accountInfoTemp?.accountType != 'People' && accountInfoTemp?.accountType != 'Personal')">
-                                    <a class="nav-link" (click)="changeTab(accountInfoPageTabsEnum.MembersList)"
-                                        [ngClass]="currentTab == accountInfoPageTabsEnum.MembersList?'active':''">
+                                    *ngIf="accountDataForView?.accountTypeId != 21 && (accountInfoTemp?.accountType != 'People' && accountInfoTemp?.accountType != 'Personal')">
+                                    <a class="nav-link profile-nav-link"
+                                        (click)="changeTab(accountInfoPageTabsEnum.MembersList)"
+                                        [ngClass]="currentTab == accountInfoPageTabsEnum.MembersList ? 'active' : ''">
 
-                                        <i *ngIf="currentTab != accountInfoPageTabsEnum.MembersList"
-                                            class="fa fa-users mr-3"> </i>
-                                        <i *ngIf="currentTab == accountInfoPageTabsEnum.MembersList"
-                                            class="fa fa-users mr-3" style="color: #F88011;width: 22px;"> </i>
-                                        <span *ngIf="accountLevel === accountLevelEnum.Profile && !viewMode">
+                                        <span class="nav-icon-box">
+                                            <i *ngIf="currentTab != accountInfoPageTabsEnum.MembersList"
+                                                class="fa fa-users"></i>
+
+                                            <i *ngIf="currentTab == accountInfoPageTabsEnum.MembersList"
+                                                class="fa fa-users active-nav-icon"></i>
+                                        </span>
+
+                                        <span class="nav-title"
+                                            *ngIf="accountLevel === accountLevelEnum.Profile && !viewMode">
                                             {{l("MyTeamMembers")}}
                                         </span>
-                                        <span *ngIf="accountLevel !== accountLevelEnum.Profile || viewMode">
+                                        <span class="nav-title"
+                                            *ngIf="accountLevel !== accountLevelEnum.Profile || viewMode">
                                             {{l("Contacts")}}
                                         </span>
-
                                     </a>
                                 </li>
-                                <li class="nav-item ml-2"
+
+                                <li class="nav-item"
                                     *ngIf="(accountDataForView?.accountTypeId != 21 && accountLevel == accountLevelEnum.Profile && isRecordOwner) && (accountInfoTemp?.accountType != 'People' && accountInfoTemp?.accountType != 'Personal')">
-                                    <a class="nav-link" (click)="changeTab(accountInfoPageTabsEnum.AccountBilling)"
-                                        [ngClass]="currentTab == accountInfoPageTabsEnum.AccountBilling?'active':''">
+                                    <a class="nav-link profile-nav-link"
+                                        (click)="changeTab(accountInfoPageTabsEnum.AccountBilling)"
+                                        [ngClass]="currentTab == accountInfoPageTabsEnum.AccountBilling ? 'active' : ''">
 
-                                        <i *ngIf="currentTab != accountInfoPageTabsEnum.AccountBilling"
-                                            class="fa fa-file-invoice" style="color: #84818A"> </i>
-                                        <i *ngIf="currentTab == accountInfoPageTabsEnum.AccountBilling"
-                                            class="fa fa-file-invoice" style="color: #F88011"> </i>
-                                        <span class="ml-2"> {{l("AccountBilling")}}</span>
+                                        <span class="nav-icon-box">
+                                            <i *ngIf="currentTab != accountInfoPageTabsEnum.AccountBilling"
+                                                class="fa fa-file-invoice"></i>
+
+                                            <i *ngIf="currentTab == accountInfoPageTabsEnum.AccountBilling"
+                                                class="fa fa-file-invoice active-nav-icon"></i>
+                                        </span>
+
+                                        <span class="nav-title">{{l("AccountBilling")}}</span>
                                     </a>
-
                                 </li>
-
 
                                 <li class="nav-item" *ngIf="false">
-                                    <a class="nav-link" disabled>
-                                        <img class="" src="assets/profile/My-Settings-Default.svg">{{l("MySettings")}}
-                                    </a>
-                                </li>
-
-                                <li class="nav-item ml-2" *ngIf="relationId && relationId>0 && roleSeller">
-                                    <a class="nav-link"
-                                        (click)="changeTab(accountInfoPageTabsEnum.RelationshipSettings)"
-                                        [ngClass]="currentTab == accountInfoPageTabsEnum.RelationshipSettings?'active':''">
-
-                                        <i *ngIf="currentTab != accountInfoPageTabsEnum.RelationshipSettings"
-                                            class="fa fa-user-cog" style="color: #84818A">
-                                        </i>
-
-                                        <i *ngIf="currentTab == accountInfoPageTabsEnum.RelationshipSettings"
-                                            class="fa fa-user-cog" style="color: #F88011">
-                                        </i>
-
-                                        <span class="ml-2">
-                                            {{ "RelationshipSettings"| localize }}
+                                    <a class="nav-link profile-nav-link" disabled>
+                                        <span class="nav-icon-box">
+                                            <img src="assets/profile/My-Settings-Default.svg">
                                         </span>
+                                        <span class="nav-title">{{l("MySettings")}}</span>
                                     </a>
-
                                 </li>
+
+                                <li class="nav-item" *ngIf="relationId && relationId > 0 && roleSeller">
+                                    <a class="nav-link profile-nav-link"
+                                        (click)="changeTab(accountInfoPageTabsEnum.RelationshipSettings)"
+                                        [ngClass]="currentTab == accountInfoPageTabsEnum.RelationshipSettings ? 'active' : ''">
+
+                                        <span class="nav-icon-box">
+                                            <i *ngIf="currentTab != accountInfoPageTabsEnum.RelationshipSettings"
+                                                class="fa fa-user-cog"></i>
+
+                                            <i *ngIf="currentTab == accountInfoPageTabsEnum.RelationshipSettings"
+                                                class="fa fa-user-cog active-nav-icon"></i>
+                                        </span>
+
+                                        <span class="nav-title">{{"RelationshipSettings" | localize}}</span>
+                                    </a>
+                                </li>
+
                             </ul>
                         </div>
                     </div>
