@@ -388,11 +388,13 @@ namespace onetouch.SystemObjects
             if (!string.IsNullOrEmpty(tmpInput.Filter))
             //T-SII-20250307.0003,1 MMT 09/25/2025 departments filter works only in the product add mode[End]
             {
-                return await  GetAllDepartmentsByFilterWithChildsForProduct(tmpInput.Filter);
+                return await  GetAllDepartmentsByFilterWithChildsForProduct(tmpInput.Filter, tmpInput.IncludeResultCount);
             }
             //MMT2024
             PagedResultDto<TreeNode<GetSycEntityObjectCategoryForViewDto>> allParents = await GetAll(tmpInput);
-            return allParents;
+            return tmpInput.IncludeResultCount
+                ? await PrepareProductCategoryResult(allParents, tmpInput.ObjectId)
+                : allParents;
          }
 
 
@@ -910,7 +912,7 @@ namespace onetouch.SystemObjects
         //MMT36
         //MMT24
       
-        private async Task<PagedResultDto<TreeNode<GetSycEntityObjectCategoryForViewDto>>> GetAllDepartmentsByFilterWithChildsForProduct(string filter)
+        private async Task<PagedResultDto<TreeNode<GetSycEntityObjectCategoryForViewDto>>> GetAllDepartmentsByFilterWithChildsForProduct(string filter, bool includeResultCount)
         {
             GetAllSycEntityObjectCategoriesInput tmpInput = new GetAllSycEntityObjectCategoriesInput
             {
@@ -930,8 +932,130 @@ namespace onetouch.SystemObjects
                 item.Expanded = true;
             }
 
-            return allParents;
+            return includeResultCount
+                ? await PrepareProductCategoryResult(allParents, tmpInput.ObjectId)
+                : allParents;
 
+        }
+        private async Task<PagedResultDto<TreeNode<GetSycEntityObjectCategoryForViewDto>>> PrepareProductCategoryResult(PagedResultDto<TreeNode<GetSycEntityObjectCategoryForViewDto>> categories, long itemObjectId)
+        {
+            await SetProductResultCounts(categories.Items, itemObjectId);
+
+            var items = NormalizeProductCategoryNodes(categories.Items)
+                .Where(z => z.resultCount != 0)
+                .ToList();
+            SetProductCategoryLabels(items);
+
+            return new PagedResultDto<TreeNode<GetSycEntityObjectCategoryForViewDto>>(items.Count, items);
+        }
+
+        private async Task SetProductResultCounts(IReadOnlyList<TreeNode<GetSycEntityObjectCategoryForViewDto>> categories, long itemObjectId)
+        {
+            if (categories == null || categories.Count == 0)
+            {
+                return;
+            }
+
+            var categoryNodes = categories
+                .SelectMany(GetTreeNodes)
+                .Where(z => z?.Data?.SycEntityObjectCategory != null)
+                .ToList();
+
+            var categoryIds = categoryNodes
+                .Select(z => z.Data.SycEntityObjectCategory.Id)
+                .Distinct()
+                .ToList();
+
+            if (categoryIds.Count == 0)
+            {
+                return;
+            }
+
+            var productCounts = await _context.AppEntityCategories
+                .AsNoTracking()
+                .Where(z => categoryIds.Contains(z.EntityObjectCategoryId) && z.EntityFk.ObjectId == itemObjectId)
+                .GroupBy(z => z.EntityObjectCategoryId)
+                .Select(z => new
+                {
+                    CategoryId = z.Key,
+                    ResultCount = z.Select(r => r.EntityId).Distinct().LongCount()
+                })
+                .ToDictionaryAsync(z => z.CategoryId, z => z.ResultCount);
+
+            foreach (var category in categoryNodes)
+            {
+                category.resultCount = productCounts.TryGetValue(category.Data.SycEntityObjectCategory.Id, out var resultCount) ? resultCount : 0;
+            }
+        }
+
+        private IReadOnlyList<TreeNode<GetSycEntityObjectCategoryForViewDto>> NormalizeProductCategoryNodes(IReadOnlyList<TreeNode<GetSycEntityObjectCategoryForViewDto>> categories)
+        {
+            return (categories ?? new List<TreeNode<GetSycEntityObjectCategoryForViewDto>>())
+                .Where(z => z?.Data?.SycEntityObjectCategory != null)
+                .GroupBy(z => z.Data.SycEntityObjectCategory.Id)
+                .Select(z =>
+                {
+                    var category = z.First();
+                    if (category.Children != null)
+                    {
+                        category.Children = NormalizeProductCategoryNodes(category.Children)
+                            .Where(c => c.resultCount != 0)
+                            .ToList();
+                    }
+
+                    return category;
+                })
+                .ToList();
+        }
+
+        private void SetProductCategoryLabels(IReadOnlyList<TreeNode<GetSycEntityObjectCategoryForViewDto>> categories)
+        {
+            foreach (var category in categories ?? new List<TreeNode<GetSycEntityObjectCategoryForViewDto>>())
+            {
+                if (category.resultCount > 0)
+                {
+                    category.label = $"{GetProductCategoryBaseLabel(category)} ({category.resultCount})";
+                }
+
+                if (category.Children != null)
+                {
+                    SetProductCategoryLabels(category.Children);
+                }
+            }
+        }
+
+        private string GetProductCategoryBaseLabel(TreeNode<GetSycEntityObjectCategoryForViewDto> category)
+        {
+            var label = string.IsNullOrWhiteSpace(category.label)
+                ? category.Data?.SycEntityObjectCategory?.Name
+                : category.label;
+
+            if (string.IsNullOrWhiteSpace(label))
+            {
+                return string.Empty;
+            }
+
+            return System.Text.RegularExpressions.Regex.Replace(label, @"\s\(\d+\)$", string.Empty);
+        }
+
+        private IEnumerable<TreeNode<GetSycEntityObjectCategoryForViewDto>> GetTreeNodes(TreeNode<GetSycEntityObjectCategoryForViewDto> category)
+        {
+            if (category == null)
+            {
+                yield break;
+            }
+
+            yield return category;
+
+            if (category.Children == null)
+            {
+                yield break;
+            }
+
+            foreach (var child in category.Children.SelectMany(GetTreeNodes))
+            {
+                yield return child;
+            }
         }
         private async Task LoadFilteredChilds(TreeNode<GetSycEntityObjectCategoryForViewDto> parent, string filter)
         {

@@ -1,4 +1,4 @@
-﻿using Abp.Application.Services.Dto;
+using Abp.Application.Services.Dto;
 using Abp.Collections.Extensions;
 using Abp.Domain.Repositories;
 using Abp.Domain.Uow;
@@ -106,6 +106,61 @@ namespace onetouch.AppMarketplaceItems
             //I49[Start]
             _appContactRelationshipInfoRepository = appContactRelationshipInfoRepository;
             //I49[End]
+        }
+        private decimal ConvertMarketplacePrice(AppMarketplaceItemPrices price, string currencyCode, decimal usdExchangeRate)
+        {
+            if (price == null || price.Price <= 0)
+                return 0;
+
+            if (string.IsNullOrEmpty(price.CurrencyCode) || price.CurrencyCode == currencyCode)
+                return price.Price;
+
+            var exchangeRate = price.CurrencyCode == "USD"
+                ? usdExchangeRate
+                : _helper.SystemTables.GetExchangeRate(price.CurrencyCode, currencyCode);
+
+            return exchangeRate == 0 ? 0 : price.Price * exchangeRate;
+        }
+
+        private decimal ResolveMarketplacePrice(IEnumerable<AppMarketplaceItemPrices> prices, string code, string currencyCode, decimal usdExchangeRate, string buyerSSIN = null)
+        {
+            if (prices == null)
+                return 0;
+
+            var priceList = prices
+                .Where(x => x.Code == code && (buyerSSIN == null || x.BuyerSSIN == buyerSSIN))
+                .ToList();
+
+            var price = priceList.FirstOrDefault(x => x.CurrencyCode == currencyCode)
+                ?? priceList.FirstOrDefault(x => x.CurrencyCode == "USD")
+                ?? priceList.FirstOrDefault(x => x.IsDefault)
+                ?? priceList.FirstOrDefault();
+
+            return ConvertMarketplacePrice(price, currencyCode, usdExchangeRate);
+        }
+
+        private static void ApplyMinMax(ref decimal minPrice, ref decimal maxPrice, decimal price)
+        {
+            if (price <= 0)
+                return;
+
+            if (minPrice <= 0 || price < minPrice)
+                minPrice = price;
+
+            if (maxPrice <= 0 || price > maxPrice)
+                maxPrice = price;
+        }
+
+        private static void ApplyMinMax(ref decimal? minPrice, ref decimal? maxPrice, decimal price)
+        {
+            if (price <= 0)
+                return;
+
+            if (minPrice == null || minPrice <= 0 || price < minPrice)
+                minPrice = price;
+
+            if (maxPrice == null || maxPrice <= 0 || price > maxPrice)
+                maxPrice = price;
         }
         //Iteration#49,1 MMT 09/28/2025 Allow unauthenticated user to view the product marketplace browse page[Start]
         [AbpAllowAnonymous]
@@ -224,7 +279,7 @@ namespace onetouch.AppMarketplaceItems
                 //var currencyTenant = TenantManager.GetTenantCurrency();
                 //var account = await _appContactRepository.GetAll().Include(x => x.CurrencyFk).ThenInclude(x => x.EntityExtraData).FirstOrDefaultAsync(x => x.TenantId ==null && x.IsProfileData==false && x.ParentId == null && x.PartnerId == null && x.AccountId == null);
                  if (input.CurrencyCode != null)
-                 exchangeRate = _helper.SystemTables.GetExchangeRate("USD",input.CurrencyCode);
+                 exchangeRate = _helper.SystemTables.GetExchangeRate("USD", input.CurrencyCode);
 
                 if (input.CurrencyCode=="USD")
                     exchangeRate = 1;
@@ -857,13 +912,39 @@ namespace onetouch.AppMarketplaceItems
                                             decimal exchangeRateDef = 1;
                                             if (msrpObjDef.CurrencyCode != null)
                                             {
-                                                exchangeRateDef = _helper.SystemTables.GetExchangeRate("USD", msrpObjDef.CurrencyCode);
+                                                exchangeRateDef = _helper.SystemTables.GetExchangeRate(msrpObjDef.CurrencyCode, currencyCode);
                                                 output.AppItem.MinMSRP = msrpObjDef.Price * exchangeRateDef;
                                                 output.AppItem.MaxMSRP = msrpObjDef.Price * exchangeRateDef;
                                             }
                                         }
                                     }
 
+                                }
+                                var resolvedMainMSRP = ResolveMarketplacePrice(appItem.ItemPricesFkList, "MSRP", currencyCode, exchangeRate);
+                                if (resolvedMainMSRP > 0)
+                                {
+                                    output.AppItem.MinMSRP = resolvedMainMSRP;
+                                    output.AppItem.MaxMSRP = resolvedMainMSRP;
+                                }
+
+                                if (!string.IsNullOrEmpty(level) && level != "MSRP")
+                                {
+                                    var resolvedMainSpecialPrice = ResolveMarketplacePrice(appItem.ItemPricesFkList, level, currencyCode, exchangeRate);
+                                    if (resolvedMainSpecialPrice > 0)
+                                    {
+                                        output.AppItem.MinSpecialPrice = resolvedMainSpecialPrice;
+                                        output.AppItem.MaxSpecialPrice = resolvedMainSpecialPrice;
+                                    }
+                                }
+
+                                if (!string.IsNullOrEmpty(input.BuyerAccountSSIN))
+                                {
+                                    var resolvedMainBuyerPrice = ResolveMarketplacePrice(appItem.ItemPricesFkList, "", currencyCode, exchangeRate, input.BuyerAccountSSIN);
+                                    if (resolvedMainBuyerPrice > 0)
+                                    {
+                                        output.AppItem.MinSpecialPrice = resolvedMainBuyerPrice;
+                                        output.AppItem.MaxSpecialPrice = resolvedMainBuyerPrice;
+                                    }
                                 }
                                 mainItemMSRP = output.AppItem.MinMSRP;
                                 if (!string.IsNullOrEmpty(level) && level != "MSRP")
@@ -890,7 +971,7 @@ namespace onetouch.AppMarketplaceItems
                                                 decimal exchangeRateDef = 1;
                                                 if (msrpObjDef.CurrencyCode != null)
                                                 {
-                                                    exchangeRateDef = _helper.SystemTables.GetExchangeRate("USD", msrpObjDef.CurrencyCode);
+                                                    exchangeRateDef = _helper.SystemTables.GetExchangeRate(msrpObjDef.CurrencyCode, currencyCode);
                                                     output.AppItem.MinSpecialPrice = msrpObjDef.Price * exchangeRateDef;
                                                     output.AppItem.MaxSpecialPrice = msrpObjDef.Price * exchangeRateDef;
                                                 }
@@ -927,7 +1008,7 @@ namespace onetouch.AppMarketplaceItems
                                                 decimal exchangeRateDef = 1;
                                                 if (buyerObjDef.CurrencyCode != null)
                                                 {
-                                                    exchangeRateDef = _helper.SystemTables.GetExchangeRate("USD", buyerObjDef.CurrencyCode);
+                                                    exchangeRateDef = _helper.SystemTables.GetExchangeRate(buyerObjDef.CurrencyCode, currencyCode);
                                                     output.AppItem.MinSpecialPrice = buyerObjDef.Price * exchangeRateDef;
                                                     output.AppItem.MaxSpecialPrice = buyerObjDef.Price * exchangeRateDef;
                                                 }
@@ -971,7 +1052,7 @@ namespace onetouch.AppMarketplaceItems
                                                 decimal exchangeRateDef = 1;
                                                 if (msrpObjDef.CurrencyCode != null)
                                                 {
-                                                    exchangeRateDef = _helper.SystemTables.GetExchangeRate("USD", msrpObjDef.CurrencyCode);
+                                                    exchangeRateDef = _helper.SystemTables.GetExchangeRate(msrpObjDef.CurrencyCode, currencyCode);
                                                     itemPrice = msrpObjDef.Price * exchangeRateDef;
                                                     output.AppItem.MaxMSRP = output.AppItem.MaxMSRP > itemPrice ? output.AppItem.MaxMSRP : itemPrice;
                                                     output.AppItem.MinMSRP = output.AppItem.MinMSRP > itemPrice ? itemPrice : output.AppItem.MinMSRP;
@@ -980,6 +1061,12 @@ namespace onetouch.AppMarketplaceItems
                                         }
 
                                     }
+                                    var resolvedVariantMSRP = ResolveMarketplacePrice(prObj.ItemPricesFkList, "MSRP", currencyCode, exchangeRate);
+                                    var minMSRP = output.AppItem.MinMSRP;
+                                    var maxMSRP = output.AppItem.MaxMSRP;
+                                    ApplyMinMax(ref minMSRP, ref maxMSRP, resolvedVariantMSRP);
+                                    output.AppItem.MinMSRP = minMSRP;
+                                    output.AppItem.MaxMSRP = maxMSRP;
                                     if (level != "MSRP")
                                     {
                                         var itemLevelPrice = prObj.ItemPricesFkList.Where(x => x.Code.ToUpper() == level && x.CurrencyCode == currencyCode).Select(x => x.Price).FirstOrDefault();
@@ -1005,7 +1092,7 @@ namespace onetouch.AppMarketplaceItems
                                                     decimal exchangeRateDef = 1;
                                                     if (msrpObjDef.CurrencyCode != null)
                                                     {
-                                                        exchangeRateDef = _helper.SystemTables.GetExchangeRate("USD", msrpObjDef.CurrencyCode);
+                                                        exchangeRateDef = _helper.SystemTables.GetExchangeRate(msrpObjDef.CurrencyCode, currencyCode);
                                                         itemPrice = msrpObjDef.Price * exchangeRateDef;
                                                         output.AppItem.MaxSpecialPrice = output.AppItem.MaxSpecialPrice > itemPrice ? output.AppItem.MaxSpecialPrice : itemPrice;
                                                         output.AppItem.MinSpecialPrice = output.AppItem.MinSpecialPrice > itemPrice ? itemPrice : output.AppItem.MinSpecialPrice;
@@ -1015,6 +1102,15 @@ namespace onetouch.AppMarketplaceItems
 
                                         }
                                     }
+                                        if (level != "MSRP")
+                                        {
+                                            var resolvedVariantSpecialPrice = ResolveMarketplacePrice(prObj.ItemPricesFkList, level, currencyCode, exchangeRate);
+                                            var minSpecialPrice = output.AppItem.MinSpecialPrice;
+                                            var maxSpecialPrice = output.AppItem.MaxSpecialPrice;
+                                            ApplyMinMax(ref minSpecialPrice, ref maxSpecialPrice, resolvedVariantSpecialPrice);
+                                            output.AppItem.MinSpecialPrice = minSpecialPrice;
+                                            output.AppItem.MaxSpecialPrice = maxSpecialPrice;
+                                        }
                                     //I49[Start]
                                     if (!string.IsNullOrEmpty(input.BuyerAccountSSIN))
                                     {
@@ -1044,7 +1140,7 @@ namespace onetouch.AppMarketplaceItems
                                                     decimal exchangeRateDef = 1;
                                                     if (buyerObjDef.CurrencyCode != null)
                                                     {
-                                                        exchangeRateDef = _helper.SystemTables.GetExchangeRate("USD", buyerObjDef.CurrencyCode);
+                                                        exchangeRateDef = _helper.SystemTables.GetExchangeRate(buyerObjDef.CurrencyCode, currencyCode);
                                                         var pirceValue = buyerObjDef.Price * exchangeRateDef;
                                                         output.AppItem.MinSpecialPrice = output.AppItem.MinSpecialPrice > pirceValue ? pirceValue : output.AppItem.MinSpecialPrice;
                                                         output.AppItem.MaxSpecialPrice = output.AppItem.MaxSpecialPrice > pirceValue ? output.AppItem.MaxSpecialPrice : pirceValue;
@@ -1054,6 +1150,15 @@ namespace onetouch.AppMarketplaceItems
                                             }
                                         }
                                     }
+                                        if (!string.IsNullOrEmpty(input.BuyerAccountSSIN))
+                                        {
+                                            var resolvedVariantBuyerPrice = ResolveMarketplacePrice(prObj.ItemPricesFkList, "", currencyCode, exchangeRate, input.BuyerAccountSSIN);
+                                            var minSpecialPrice = output.AppItem.MinSpecialPrice;
+                                            var maxSpecialPrice = output.AppItem.MaxSpecialPrice;
+                                            ApplyMinMax(ref minSpecialPrice, ref maxSpecialPrice, resolvedVariantBuyerPrice);
+                                            output.AppItem.MinSpecialPrice = minSpecialPrice;
+                                            output.AppItem.MaxSpecialPrice = maxSpecialPrice;
+                                        }
                                     //I49[End]
                                 }
                             }
@@ -1351,7 +1456,7 @@ namespace onetouch.AppMarketplaceItems
                                                                     decimal exchangeRateDef = 1;
                                                                     if (msrpObjDef.CurrencyCode != null)
                                                                     {
-                                                                        exchangeRateDef = _helper.SystemTables.GetExchangeRate("USD", msrpObjDef.CurrencyCode);
+                                                                        exchangeRateDef = _helper.SystemTables.GetExchangeRate(msrpObjDef.CurrencyCode, currencyCode);
                                                                         attlook.Price = msrpObjDef.Price * exchangeRateDef;
                                                                     }
                                                                 }
@@ -1386,7 +1491,7 @@ namespace onetouch.AppMarketplaceItems
                                                                     decimal exchangeRateDef = 1;
                                                                     if (msrpObjDef.CurrencyCode != null)
                                                                     {
-                                                                        exchangeRateDef = _helper.SystemTables.GetExchangeRate("USD", msrpObjDef.CurrencyCode);
+                                                                        exchangeRateDef = _helper.SystemTables.GetExchangeRate(msrpObjDef.CurrencyCode, currencyCode);
                                                                         attlook.Price = msrpObjDef.Price * exchangeRateDef;
                                                                     }
                                                                 }
@@ -1505,7 +1610,7 @@ namespace onetouch.AppMarketplaceItems
                                                                     decimal exchangeRateDef = 1;
                                                                     if (msrpObjDef.CurrencyCode != null)
                                                                     {
-                                                                        exchangeRateDef = _helper.SystemTables.GetExchangeRate("USD", msrpObjDef.CurrencyCode);
+                                                                        exchangeRateDef = _helper.SystemTables.GetExchangeRate(msrpObjDef.CurrencyCode, currencyCode);
                                                                         attlook.Price = msrpObjDef.Price * exchangeRateDef;
                                                                     }
                                                                 }
@@ -1546,7 +1651,7 @@ namespace onetouch.AppMarketplaceItems
                                                                     decimal exchangeRateDef = 1;
                                                                     if (msrpObjDef.CurrencyCode != null)
                                                                     {
-                                                                        exchangeRateDef = _helper.SystemTables.GetExchangeRate("USD", msrpObjDef.CurrencyCode);
+                                                                        exchangeRateDef = _helper.SystemTables.GetExchangeRate(msrpObjDef.CurrencyCode, currencyCode);
                                                                         attlook.Price = msrpObjDef.Price * exchangeRateDef;
                                                                     }
                                                                 }
