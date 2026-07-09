@@ -265,11 +265,18 @@ export class CreateOrEditBranchModalComponent extends AppComponentBase {
         });
     }
 
-    private pushAddress(contactAddr: any, addressTypeId: number): void {
+    private pushAddress(contactAddr: any, addressTypeDef: LookupLabelDto): void {
         if (!contactAddr || !(contactAddr.addressId > 0)) return;
 
-        contactAddr.addressTypeId = addressTypeId;
-        contactAddr.addressFk = this.toAppAddressDto(contactAddr, this.branch?.tenantId);
+        contactAddr.addressTypeId = addressTypeDef.value;
+        contactAddr.addressTypeCode = addressTypeDef.code;
+        contactAddr.contactCode = this.branch.code;
+        contactAddr.addressCode = contactAddr.code;
+
+        contactAddr.addressFk = this.toAppAddressDto(
+            contactAddr,
+            this.branch?.tenantId
+        );
 
         this.branch.contactAddresses.push(contactAddr);
     }
@@ -280,10 +287,10 @@ export class CreateOrEditBranchModalComponent extends AppComponentBase {
         this.branch.code = this.branchCode;
         this.branch.contactAddresses = [];
 
-        this.pushAddress(this.address1, this.billingAddressDef.value);
-        this.pushAddress(this.address2, this.directShippingAddressDef.value);
-        this.pushAddress(this.address3, this.distributionCenterAddressDef.value);
-        this.pushAddress(this.address4, this.mailingAddressDef.value);
+        this.pushAddress(this.address1, this.billingAddressDef);
+        this.pushAddress(this.address2, this.directShippingAddressDef);
+        this.pushAddress(this.address3, this.distributionCenterAddressDef);
+        this.pushAddress(this.address4, this.mailingAddressDef);
 
         const addNew = !this.branch.id;
 
