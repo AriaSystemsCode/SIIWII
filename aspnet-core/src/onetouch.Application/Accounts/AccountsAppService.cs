@@ -7945,7 +7945,11 @@ namespace onetouch.Accounts
                         {
                             foreach (var addrss in input.ContactAddresses)
                             {
+                                
                                 addrss.AddressFk = null;
+                                addrss.AddressTypeCode = addrss.AddressTypeIdName;
+                                addrss.ContactCode = input.Code;
+                                addrss.AddressCode = addrss.AddressCode;
                                 branchObject.ContactAddresses.Add(addrss);
                             }
                         }
@@ -8004,6 +8008,13 @@ namespace onetouch.Accounts
                     if (conAdd.AddressFk != null && conAdd.AddressFk.AccountId==null)
                     {
                         conAdd.AddressFk.AccountId = branchObject.AccountId;
+                        var addEntity = await _appEntityRepository.GetAll()
+                            .Where(z => z.Id == conAdd.AddressFk.Id).FirstOrDefaultAsync();
+                        if(addEntity!=null)
+                            conAdd.AddressTypeCode = addEntity.Code;
+
+                        conAdd.ContactCode = input.Code;
+                        conAdd.AddressCode = conAdd.AddressCode;
                     }
                 }
             }
