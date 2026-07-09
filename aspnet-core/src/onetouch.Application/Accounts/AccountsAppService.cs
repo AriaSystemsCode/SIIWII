@@ -3767,7 +3767,9 @@ namespace onetouch.Accounts
             }
             else
             {
-                if (input.ParentId == null && (input.Id != 0 && input.Id != null))
+                if (input.ParentId == null && (input.Id != 0 && input.Id != null)
+                    && (input.TenantOwner== AbpSession.TenantId || 
+                    input.TenantOwner ==0|| input.TenantOwner==null))
                 {
                     var tenant = input.TenantId == null ? AbpSession.TenantId : input.TenantId;
                     await PublishManualAccount(contact.SSIN, long.Parse(tenant.ToString()));
