@@ -26,14 +26,15 @@ import { finalize } from "rxjs";
   styleUrls: ["./product-filters.component.scss"],
 })
 export class ProductFiltersComponent extends AppComponentBase implements OnInit, OnDestroy {
+  private readonly departmentsPageSize = 9999;
   isExpanded: boolean = true;
   productList: GetAllMarketplaceItemListsOutputDto[];
   selectedList: boolean = false;
   catalogId: number;
   files: TreeNodeOfGetSycEntityObjectCategoryForViewDto[];
   loading: boolean;
-  selectedFile: any;
-  selectedCatFile: any;
+  selectedFile: any[] = [];
+  selectedCatFile: any[] = [];
   startShipDate: Date;
   endShipDate: Date;
   startSoldout: string;
@@ -87,9 +88,6 @@ export class ProductFiltersComponent extends AppComponentBase implements OnInit,
 
     if (this.savedFilters) {
       const parsedFilters = JSON.parse(this.savedFilters);
-
-      this.selectedFile = parsedFilters.selectedDepartments;
-  this.selectedCatFile = parsedFilters.selectedCategory
 
       this.min = parsedFilters.minimumPrice;
       this.max = parsedFilters.maximumPrice;
@@ -255,11 +253,11 @@ export class ProductFiltersComponent extends AppComponentBase implements OnInit,
           true,
           undefined,
           undefined,
-          undefined,
+          true,
           undefined,
           "name",
           0,
-          10
+          this.getNodeChildrenPageSize(node)
         ).subscribe(res => {
                                   // E-SII-20250507.0050 
           node.children = this.filterEmptyLeafCategories(res.items);
@@ -267,7 +265,7 @@ export class ProductFiltersComponent extends AppComponentBase implements OnInit,
 
           const found = this.findNodeById(node.children, targetId);
           if (found) {
-            this.selectedFile = found;
+            this.addNodeToSelection('selectedFile', found);
           } else {
             this.expandToNodeById(node.children, targetId);
           }
@@ -294,11 +292,11 @@ export class ProductFiltersComponent extends AppComponentBase implements OnInit,
           true,
           undefined,
           undefined,
-          undefined,
+          true,
           undefined,
           "name",
           0,
-          10
+          this.getNodeChildrenPageSize(value.node)
         )
         .pipe(finalize(() => (this.loading = false)))
         .subscribe((res: any) => {
@@ -320,12 +318,11 @@ export class ProductFiltersComponent extends AppComponentBase implements OnInit,
     return null;
   }
   nodeSelect(value: any) {
-    this.handledeDratmentsTreeSelections.emit(value);
+    this.emitDepartmentSelection();
   }
 
   nodeUnselect(value: any) {
-
-    this.handledeDratmentsTreeSelections.emit(null);
+    this.emitDepartmentSelection();
   }
 
   handleStartPriceTyping(event) {
@@ -393,7 +390,7 @@ export class ProductFiltersComponent extends AppComponentBase implements OnInit,
         undefined,
         "name",
         0,
-        10
+        this.departmentsPageSize
       ).subscribe((res: any) => {
             // E-SII-20250507.0050 
         this.files = this.filterEmptyLeafCategories(res.items);
@@ -413,7 +410,7 @@ export class ProductFiltersComponent extends AppComponentBase implements OnInit,
         false,
         undefined,
         [],
-        true,
+        false,
         undefined,
         "name",
         0,
@@ -435,7 +432,7 @@ export class ProductFiltersComponent extends AppComponentBase implements OnInit,
       // E-SII-20250507.0050 
   filterEmptyLeafCategories(nodes: any[]): any[] {
     if (!nodes) return [];
-    return nodes.filter(node => {
+    const filteredNodes = nodes.map((node) => this.setProductCategoryDisplayLabel(node)).filter(node => {
       if (!node?.leaf) {
         return true;
       }
@@ -446,6 +443,91 @@ export class ProductFiltersComponent extends AppComponentBase implements OnInit,
 
       return node?.resultCount !== 0;
     });
+
+    return Array.from(
+      filteredNodes.reduce((items, node) => {
+        const categoryId = node?.data?.sycEntityObjectCategory?.id;
+        if (categoryId !== undefined && !items.has(categoryId)) {
+          items.set(categoryId, node);
+        }
+
+        return items;
+      }, new Map<number, any>()).values()
+    );
+  }
+
+  private setProductCategoryDisplayLabel(node: any): any {
+    if (node?.children?.length) {
+      node.children = this.filterEmptyLeafCategories(node.children);
+    }
+
+    const resultCount = node?.resultCount;
+    const baseLabel = this.getProductCategoryBaseLabel(node);
+
+    node.label = resultCount === undefined || resultCount === null
+      ? baseLabel
+      : `${baseLabel} (${resultCount})`;
+
+    return node;
+  }
+
+  private getProductCategoryBaseLabel(node: any): string {
+    return (node?.label || '').replace(/\s\(\d+\)$/, '');
+  }
+
+  private getNodeChildrenPageSize(node: any): number {
+    return Number(node?.totalChildrenCount) > 0 ? Number(node.totalChildrenCount) : 10;
+  }
+
+  private emitDepartmentSelection(): void {
+    this.handledeDratmentsTreeSelections.emit(this.getSelectedNodeIds(this.selectedFile));
+  }
+
+  private emitCategorySelection(): void {
+    this.handleCategoriesTreeSelections.emit(this.getSelectedNodeIds(this.selectedCatFile));
+  }
+
+  private getSelectedNodeIds(selection: any): number[] {
+    if (!selection) {
+      return [];
+    }
+
+    if (Array.isArray(selection)) {
+      return selection
+        .map((node) => typeof node === 'number' ? node : this.getNodeId(node))
+        .filter((id) => !!id);
+    }
+
+    const nodeId = this.getNodeId(selection);
+    if (nodeId) {
+      return [nodeId];
+    }
+
+    return Object.keys(selection)
+      .filter((key) => selection[key])
+      .map((key) => Number(key))
+      .filter((id) => !!id);
+  }
+
+  private getNodeId(node: any): number {
+    return Number(node?.data?.sycEntityObjectCategory?.id || node?.id || 0);
+  }
+
+  private addNodeToSelection(selectionProperty: 'selectedFile' | 'selectedCatFile', node: any): void {
+    if (!node) {
+      return;
+    }
+
+    const currentSelection = Array.isArray(this[selectionProperty])
+      ? this[selectionProperty]
+      : [];
+    const nodeId = this.getNodeId(node);
+
+    if (!currentSelection.some((selectedNode) => this.getNodeId(selectedNode) === nodeId)) {
+      currentSelection.push(node);
+    }
+
+    this[selectionProperty] = currentSelection;
   }
 
   nodeCatExpand(evt: any) {
@@ -455,18 +537,18 @@ export class ProductFiltersComponent extends AppComponentBase implements OnInit,
         undefined, undefined, undefined, undefined, undefined, undefined, undefined,
         evt.node.data.sycEntityObjectCategory.id,
         false,   
-        undefined, undefined, undefined, undefined,'name', 0, 10
+        undefined, undefined, undefined, undefined,'name', 0, this.getNodeChildrenPageSize(evt.node)
       )
       .pipe(finalize(() => (this.loading = false)))
       .subscribe((res: any) => (evt.node.children = this.filterEmptyLeafCategories(res.items)));     // E-SII-20250507.0050 
   }
   
   nodeCatSelect(evt: any) {
-    this.handleCategoriesTreeSelections.emit(evt);
+    this.emitCategorySelection();
   }
   
   nodeCatUnselect(_: any) {
-    this.handleCategoriesTreeSelections.emit(null);
+    this.emitCategorySelection();
   }
   async expandAndSelectNodeLazyCat(
     targetId: number,
@@ -479,7 +561,7 @@ export class ProductFiltersComponent extends AppComponentBase implements OnInit,
       if (currentId === targetId) {
         if (parentNode) parentNode.expanded = true;
         node.expanded = true;
-        this.selectedCatFile = node;
+        this.addNodeToSelection('selectedCatFile', node);
         return true;
       }
   
@@ -489,7 +571,7 @@ export class ProductFiltersComponent extends AppComponentBase implements OnInit,
             undefined, undefined, undefined, undefined, undefined, undefined, undefined,
             currentId,
             /* forDepartments? */ false,
-            undefined, undefined, undefined, undefined,'name', 0, 10
+           undefined, undefined, undefined, undefined,'name', 0, this.getNodeChildrenPageSize(node)
           )
           .toPromise();
               // E-SII-20250507.0050 
@@ -531,7 +613,7 @@ export class ProductFiltersComponent extends AppComponentBase implements OnInit,
     const finalNode = this.findNodeById(this.categories, targetId);
     if (finalNode) {
       finalNode.expanded = true;
-      this.selectedCatFile = finalNode;
+      this.addNodeToSelection('selectedCatFile', finalNode);
     }
   }
   
@@ -546,8 +628,6 @@ export class ProductFiltersComponent extends AppComponentBase implements OnInit,
         const selectedCatId  = parsed.selectedCategory?.[0];
   
         // mirror saved values into component state
-        this.selectedFile = parsed.selectedDepartments;
-        this.selectedCatFile = parsed.selectedCategory;
         this.min = parsed.minimumPrice;
         this.max = parsed.maximumPrice;
         this.catalogId = parsed.appItemListId;
@@ -579,7 +659,7 @@ export class ProductFiltersComponent extends AppComponentBase implements OnInit,
           parentNode.expanded = true; 
         }
         node.expanded = true;
-        this.selectedFile = node;
+        this.addNodeToSelection('selectedFile', node);
         return;
       }
 
@@ -598,11 +678,11 @@ export class ProductFiltersComponent extends AppComponentBase implements OnInit,
           true,
           undefined,
           undefined,
-          undefined,
+          true,
           undefined,
           "name",
           0,
-          10
+          this.getNodeChildrenPageSize(node)
         ).subscribe(res => {
               // E-SII-20250507.0050 
           node.children = this.filterEmptyLeafCategories(res.items);
@@ -637,7 +717,7 @@ export class ProductFiltersComponent extends AppComponentBase implements OnInit,
       if (currentId === targetId) {
         if (parentNode) parentNode.expanded = true;
         node.expanded = true;
-        this.selectedFile = node;
+        this.addNodeToSelection('selectedFile', node);
         return true;
       }
   
@@ -645,7 +725,7 @@ export class ProductFiltersComponent extends AppComponentBase implements OnInit,
       if (!node.children || node.children.length === 0) {
         const res = await this._sycEntityObjectCategoriesServiceProxy.getAllChildsWithPaging(
           undefined, undefined, undefined, undefined, undefined, undefined, undefined,
-          currentId, true, undefined, undefined, undefined, undefined,"name", 0, 10
+          currentId, true, undefined, undefined, true, undefined,"name", 0, this.getNodeChildrenPageSize(node)
         ).toPromise();
             // E-SII-20250507.0050 
         node.children = this.filterEmptyLeafCategories(res.items);
@@ -688,7 +768,7 @@ export class ProductFiltersComponent extends AppComponentBase implements OnInit,
     const finalNode = this.findNodeById(this.files, targetId);
     if (finalNode) {
       finalNode.expanded = true;
-      this.selectedFile = finalNode;
+      this.addNodeToSelection('selectedFile', finalNode);
     }
   }
   async expandAndReturnNode(id: number, nodes: any[]): Promise<any> {
@@ -698,7 +778,7 @@ export class ProductFiltersComponent extends AppComponentBase implements OnInit,
           const res = await this._sycEntityObjectCategoriesServiceProxy
             .getAllChildsWithPaging(
               undefined, undefined, undefined, undefined, undefined, undefined, undefined,
-          id, true, undefined, undefined, undefined, undefined, "name", 0, 10
+          id, true, undefined, undefined, true, undefined, "name", 0, this.getNodeChildrenPageSize(node)
             ).toPromise();
                 // E-SII-20250507.0050 
           node.children = this.filterEmptyLeafCategories(res.items);
@@ -730,7 +810,10 @@ export class ProductFiltersComponent extends AppComponentBase implements OnInit,
     // wait until deptTree is populated (if it's async, call this after you set it)
     queueMicrotask(() => {
       if (this.preselectDeptId) {
-        this.selectedFile = { [this.preselectDeptId]: true };
+        const node = this.findNodeById(this.files, this.preselectDeptId);
+        if (node) {
+          this.addNodeToSelection('selectedFile', node);
+        }
       }
     });
   }
