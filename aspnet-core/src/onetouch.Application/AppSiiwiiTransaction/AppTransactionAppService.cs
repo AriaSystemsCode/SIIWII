@@ -2458,6 +2458,10 @@ namespace onetouch.AppSiiwiiTransaction
                     selectedAccountRole = "Seller";
                 }
             }
+            if (selectedAccountRole != "Seller" && selectedAccountRole != "Buyer")
+            {
+                selectedAccountRole = (!string.IsNullOrEmpty(transactionType) && transactionType == "SO") ? "Seller" : "Buyer";
+            }
             transactionType = (!string.IsNullOrEmpty(transactionType) && transactionType == "PO") ? "Seller" : "Buyer";
             var activeRelationshipStatusId = await _helper.SystemTables.GetEntityObjectStatusRelationshipActive();
             var currentAccount = await _appContactRepository.GetAll().Include(z => z.EntityFk)
