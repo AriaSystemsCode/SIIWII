@@ -85,9 +85,9 @@ private isNewBranch = false;
         }
     }
 
-    ngOnInit(){
-                this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
-        this.currentLang == 'ar' || this.currentLang == 'ar-EG'  ? this.isArabic = true : this.isArabic = false
+    ngOnInit() {
+        this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
+        this.currentLang == 'ar' || this.currentLang == 'ar-EG' ? this.isArabic = true : this.isArabic = false
     }
 
     addressSelected(address) {
@@ -139,7 +139,7 @@ private isNewBranch = false;
                 // if (subCode >= 0)
                 //     this.branchCode = this.branch.code.substring(subCode + 1, this.branch.code.length);
                 // else
-                    this.branchCode = this.branch.code
+                this.branchCode = this.branch.code
 
                 if (this.branch.parentId) this.branch.accountId = accountId
                 let x1 = this.branch.contactAddresses.find(x => x.addressTypeId == this.billingAddressDef.value)
@@ -268,22 +268,22 @@ private isNewBranch = false;
             countryId: src.countryId,
             countryCode: src.countryCode,
             tenantId: tenantId,
-        
         });
     }
 
-    private pushAddress(
-        contactAddr: any,
-        addressTypeId: number,
-        patch?: Record<string, any>
-    ): void {
+    private pushAddress(contactAddr: any, addressTypeDef: LookupLabelDto): void {
         if (!contactAddr || !(contactAddr.addressId > 0)) return;
 
-        contactAddr.addressTypeId = addressTypeId;
-        // contactAddr.accountId = this.appSession.user.accountId
-        if (patch) Object.assign(contactAddr, patch);
+        contactAddr.addressTypeId = addressTypeDef.value;
+        contactAddr.addressTypeCode = addressTypeDef.code;
+        contactAddr.contactCode = this.branch.code;
+        contactAddr.addressCode = contactAddr.code;
 
-        contactAddr.addressFk = this.toAppAddressDto(contactAddr, this.branch?.tenantId);
+        contactAddr.addressFk = this.toAppAddressDto(
+            contactAddr,
+            this.branch?.tenantId
+        );
+
         this.branch.contactAddresses.push(contactAddr);
     }
 
@@ -293,18 +293,15 @@ private isNewBranch = false;
         this.branch.code = this.branchCode;
         this.branch.contactAddresses = [];
 
-        this.pushAddress(this.address1, this.billingAddressDef.value);
+        this.pushAddress(this.address1, this.billingAddressDef);
+        this.pushAddress(this.address2, this.directShippingAddressDef);
+        this.pushAddress(this.address3, this.distributionCenterAddressDef);
+        this.pushAddress(this.address4, this.mailingAddressDef);
 
-        this.pushAddress(
-            this.address2,
-            this.directShippingAddressDef.value
-        );
+        const addNew = !this.branch.id;
 
-        this.pushAddress(this.address3, this.distributionCenterAddressDef.value);
-        this.pushAddress(this.address4, this.mailingAddressDef.value);
+        this.branch.accountId = this.appSession.user.accountId;
 
-        let addNew = this.branch.id == null || this.branch.id == undefined || this.branch.id == 0
-        this.branch.accountId = this.appSession.user.accountId
         this._AccountsServiceProxy.createOrEditBranch(this.branch)
             .pipe(finalize(() => { this.saving = false; }))
             .subscribe(value => {
@@ -313,9 +310,6 @@ private isNewBranch = false;
                 addNew ? this.branchAdded.emit(value) : this.branchUpdated.emit(value);
             });
     }
-
-
-
 
     close(): void {
         this.active = false;
