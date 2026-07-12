@@ -65749,6 +65749,9 @@ export class AppContactAddressDto implements IAppContactAddressDto {
     countryId!: number;
     countryIdName!: string | undefined;
     addressFk!: AppAddressDto;
+    addressTypeCode!: string | undefined;
+    contactCode!: string | undefined;
+    addressCode!: string | undefined;
     id!: number;
 
     [key: string]: any;
@@ -65783,6 +65786,9 @@ export class AppContactAddressDto implements IAppContactAddressDto {
             this.countryId = _data["countryId"];
             this.countryIdName = _data["countryIdName"];
             this.addressFk = _data["addressFk"] ? AppAddressDto.fromJS(_data["addressFk"]) : <any>undefined;
+            this.addressTypeCode = _data["addressTypeCode"];
+            this.contactCode = _data["contactCode"];
+            this.addressCode = _data["addressCode"];
             this.id = _data["id"];
         }
     }
@@ -65815,6 +65821,9 @@ export class AppContactAddressDto implements IAppContactAddressDto {
         data["countryId"] = this.countryId;
         data["countryIdName"] = this.countryIdName;
         data["addressFk"] = this.addressFk ? this.addressFk.toJSON() : <any>undefined;
+        data["addressTypeCode"] = this.addressTypeCode;
+        data["contactCode"] = this.contactCode;
+        data["addressCode"] = this.addressCode;
         data["id"] = this.id;
         return data;
     }
@@ -65836,6 +65845,9 @@ export interface IAppContactAddressDto {
     countryId: number;
     countryIdName: string | undefined;
     addressFk: AppAddressDto;
+    addressTypeCode: string | undefined;
+    contactCode: string | undefined;
+    addressCode: string | undefined;
     id: number;
 
     [key: string]: any;
