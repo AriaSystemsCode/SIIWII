@@ -1,33 +1,48 @@
 .home-layout {
   margin-top: 0;
   padding: 16px 20px 24px;
+  --sidebar-width: clamp(220px, 22vw, 280px);
+  --sidebar-gap: 20px;
 }
 
 .home-layout .row {
   width: min(100%, 1460px);
   margin: 0 auto;
-  display: grid;
-  grid-template-columns: minmax(220px, 280px) minmax(0, 1fr) minmax(220px, 300px);
-  column-gap: 20px;
+  display: block;
   align-items: start;
 }
 
-.left-sidebar,
-.right-sidebar {
-  position: sticky;
+.left-sidebar {
+  position: fixed;
+  left: max(12px, calc((100vw - min(100vw, 1460px)) / 2));
   top: 84px;
   max-height: calc(100vh - 104px);
   overflow-y: auto;
   overflow-x: hidden;
-  width: 100%;
+  width: var(--sidebar-width);
   padding-bottom: 8px;
+  z-index: 10;
+}
+
+.right-sidebar {
+  position: fixed;
+  right: max(12px, calc((100vw - min(100vw, 1460px)) / 2));
+  top: 84px;
+  max-height: calc(100vh - 104px);
+  overflow-y: auto;
+  overflow-x: hidden;
+  width: var(--sidebar-width);
+  padding-bottom: 8px;
+  z-index: 10;
 }
 
 .middle-content {
   min-width: 0;
-  width: 100%;
+  width: auto;
   height: auto;
   border-radius: 6px;
+  margin-left: calc(var(--sidebar-width) + var(--sidebar-gap));
+  margin-right: calc(var(--sidebar-width) + var(--sidebar-gap));
 }
 
 /* Keep long inline content (emoji-heavy text, links) from breaking cards */
@@ -49,5 +64,11 @@
   .left-sidebar,
   .right-sidebar {
     display: none;
+  }
+
+  .middle-content {
+    margin-left: 0;
+    margin-right: 0;
+    width: 100%;
   }
 }
