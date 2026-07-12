@@ -258,7 +258,7 @@ export class AppItemsFiltersComponent extends AppComponentBase implements OnInit
             false,
             undefined,
             undefined,
-            true,
+            false,
             undefined,
             this.sortBy,
             this.categoriesFilterMetaData.listSkipCount,
@@ -316,7 +316,7 @@ export class AppItemsFiltersComponent extends AppComponentBase implements OnInit
             true,
             undefined,
             undefined,
-            true,
+            false,
             undefined,
             this.sortBy,
             this.departmentsFilterMetaData.listSkipCount,
@@ -348,7 +348,7 @@ export class AppItemsFiltersComponent extends AppComponentBase implements OnInit
                 true,
                 undefined,
                 undefined,
-                true,
+                false,
                 undefined,
                 this.sortBy,
                 0,
@@ -377,8 +377,7 @@ export class AppItemsFiltersComponent extends AppComponentBase implements OnInit
 
     private filterProductCategoryNodes(nodes: TreeNodeOfGetSycEntityObjectCategoryForViewDto[]): TreeNodeOfGetSycEntityObjectCategoryForViewDto[] {
         const filteredNodes = (nodes || [])
-            .map((node) => this.setProductCategoryDisplayLabel(node))
-            .filter((node) => this.getProductCategoryResultCount(node) !== 0);
+            .map((node) => this.setProductCategoryDisplayLabel(node));
 
         return Array.from(
             filteredNodes.reduce((items, node) => {
@@ -393,23 +392,13 @@ export class AppItemsFiltersComponent extends AppComponentBase implements OnInit
     }
 
     private setProductCategoryDisplayLabel(node: TreeNodeOfGetSycEntityObjectCategoryForViewDto): TreeNodeOfGetSycEntityObjectCategoryForViewDto {
-        const resultCount = this.getProductCategoryResultCount(node);
-
         if (node.children?.length) {
             node.children = this.filterProductCategoryNodes(node.children);
         }
 
-        if (resultCount !== undefined && resultCount > 0) {
-            node.label = `${this.getProductCategoryBaseLabel(node)} (${resultCount})`;
-        }
+        node.label = this.getProductCategoryBaseLabel(node);
 
         return node;
-    }
-
-    private getProductCategoryResultCount(node: TreeNodeOfGetSycEntityObjectCategoryForViewDto): number | undefined {
-        return node?.['resultCount'] === undefined || node?.['resultCount'] === null
-            ? undefined
-            : Number(node['resultCount']);
     }
 
     private getProductCategoryBaseLabel(node: TreeNodeOfGetSycEntityObjectCategoryForViewDto): string {

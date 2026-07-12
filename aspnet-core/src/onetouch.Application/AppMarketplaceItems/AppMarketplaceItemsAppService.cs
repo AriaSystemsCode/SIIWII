@@ -245,6 +245,10 @@ namespace onetouch.AppMarketplaceItems
                 if (input.departmentFilters == null)
                     input.departmentFilters = new long[] { };
                 var allCategories = input.departmentFilters.ToList();
+                if (allCategories.Count > 0)
+                {
+                    allCategories = await GetCategoryIdsWithDescendants(allCategories);
+                }
                 //I49[Start]
                 if (input.CategoryFilters == null)
                     input.CategoryFilters = new long[] { };
@@ -2012,6 +2016,56 @@ namespace onetouch.AppMarketplaceItems
             }
             return returnName;
 
+        }
+
+        private async Task<List<long>> GetCategoryIdsWithDescendants(IReadOnlyCollection<long> categoryIds)
+        {
+            var selectedIds = categoryIds?
+                .Where(id => id > 0)
+                .Distinct()
+                .ToList() ?? new List<long>();
+
+            if (selectedIds.Count == 0)
+            {
+                return selectedIds;
+            }
+
+            var categories = await _sycEntityObjectCategory.GetAll()
+                .AsNoTracking()
+                .Where(category => category.TenantId == null)
+                .Select(category => new
+                {
+                    category.Id,
+                    category.ParentId
+                })
+                .ToListAsync();
+
+            var childrenByParentId = categories
+                .Where(category => category.ParentId.HasValue)
+                .GroupBy(category => category.ParentId.Value)
+                .ToDictionary(group => group.Key, group => group.Select(category => category.Id).ToList());
+
+            var result = new HashSet<long>(selectedIds);
+            var pending = new Queue<long>(selectedIds);
+
+            while (pending.Count > 0)
+            {
+                var parentId = pending.Dequeue();
+                if (!childrenByParentId.TryGetValue(parentId, out var childIds))
+                {
+                    continue;
+                }
+
+                foreach (var childId in childIds)
+                {
+                    if (result.Add(childId))
+                    {
+                        pending.Enqueue(childId);
+                    }
+                }
+            }
+
+            return result.ToList();
         }
         //public async Task AddTransactionDetails(GetAppMarketplaceItemDetailForViewDto input, long transactionId)
         //{

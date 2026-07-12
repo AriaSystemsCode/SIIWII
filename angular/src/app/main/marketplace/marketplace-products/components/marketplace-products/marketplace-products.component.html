@@ -181,7 +181,10 @@
             (handleEndPrice)="setPriceTo($event)" (handleStockSiwtch)="swtichStock($event)"
             (handleStartShipDate)="setStartShipDate($event)" (handleEndShipDate)="setEndtShipDate($event)"
             (handleSatrtsoldOutDate)="setStartSoldOutDate($event)" (handleEndSoldOutDate)="setEndSoldOutDate($event)"
-            (handleBrandsSelection)="selectBrands($event)" (clearAll)="clearFiltrs($event)"
+            (handleBrandsSelection)="selectBrands($event)"
+            (handleCategoriesTreeSelections)="selectCategory($event)" (clearAll)="clearFiltrs($event)"
+            [selectedDepartmentId]="selectedDepartments?.[0]"
+            [preselectCategoryId]="selectedCategories?.[0]" [selectedBrands]="brands"
             #filters></app-product-filters>
     </div>
 

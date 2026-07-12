@@ -527,7 +527,9 @@ namespace onetouch.SystemObjects
                     totalCount,
                     sycEntityObjectCategoriesvar);
 
-                return sycEntityObjectCategoriesPages;
+                return input.IncludeResultCount
+                    ? await PrepareProductCategoryResult(sycEntityObjectCategoriesPages, input.ObjectId)
+                    : sycEntityObjectCategoriesPages;
             }
         }
 
@@ -971,21 +973,108 @@ namespace onetouch.SystemObjects
                 return;
             }
 
-            var productCounts = await _context.AppEntityCategories
+            using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
+            {
+            var allCategories = await _sycEntityObjectCategoryRepository.GetAll()
                 .AsNoTracking()
-                .Where(z => categoryIds.Contains(z.EntityObjectCategoryId) && z.EntityFk.ObjectId == itemObjectId)
-                .GroupBy(z => z.EntityObjectCategoryId)
-                .Select(z => new
+                .Where(category => category.TenantId == null || category.TenantId == AbpSession.TenantId)
+                .Select(category => new
                 {
-                    CategoryId = z.Key,
-                    ResultCount = z.Select(r => r.EntityId).Distinct().LongCount()
+                    category.Id,
+                    category.ParentId
                 })
-                .ToDictionaryAsync(z => z.CategoryId, z => z.ResultCount);
+                .ToListAsync();
+
+            var childrenByParentId = allCategories
+                .Where(category => category.ParentId.HasValue)
+                .GroupBy(category => category.ParentId.Value)
+                .ToDictionary(group => group.Key, group => group.Select(category => category.Id).ToList());
+
+            var descendantIdsByCategoryId = categoryIds
+                .ToDictionary(categoryId => categoryId, categoryId => GetCategoryIdsWithDescendants(categoryId, childrenByParentId));
+
+            var allCategoryIdsForCount = descendantIdsByCategoryId
+                .SelectMany(z => z.Value)
+                .Distinct()
+                .ToList();
+
+            var personEntityObjectTypeId = await _helper.SystemTables.GetEntityObjectTypePersonId();
+            var visibleSellerTenantIds = _appContactRepository.GetAll()
+                .AsNoTracking()
+                .Where(a => a.TenantId != null
+                    && a.ParentId == null
+                    && a.PartnerId == null
+                    && a.IsProfileData == true
+                    && a.EntityFk.EntityObjectTypeId != personEntityObjectTypeId)
+                .Select(a => a.TenantId.Value);
+            var exchangeCurrencyCodes = _context.SycCurrencyExchanges
+                .AsNoTracking()
+                .Select(a => a.CurrencyCode);
+
+            var eligibleMarketplaceItemIds = _context.AppMarketplaceItems
+                .AsNoTracking()
+                .Where(z => z.ParentId == null
+                    && (z.SharingLevel == 1
+                        || (z.SharingLevel == 2 && z.ItemSharingFkList.Any(c => c.SharedUserId == AbpSession.UserId))
+                        || z.TenantOwner == AbpSession.TenantId)
+                    && visibleSellerTenantIds.Contains(z.TenantOwner)
+                    && z.ItemPricesFkList.Any(p => p.Code == "MSRP"
+                        && (p.CurrencyCode == "USD"
+                            || (p.IsDefault && exchangeCurrencyCodes.Contains(p.CurrencyCode)))))
+                .Select(z => z.Id);
+
+            var productCategoryPairs = await _context.AppEntityCategories
+                .AsNoTracking()
+                .Where(c => allCategoryIdsForCount.Contains(c.EntityObjectCategoryId)
+                    && eligibleMarketplaceItemIds.Contains(c.EntityId))
+                .Select(c => new
+                {
+                    CategoryId = c.EntityObjectCategoryId,
+                    ProductId = c.EntityId
+                })
+                .Distinct()
+                .ToListAsync();
+
+            var productCountByCategoryId = productCategoryPairs
+                .GroupBy(z => z.CategoryId)
+                .ToDictionary(z => z.Key, z => z.Select(r => r.ProductId).Distinct().LongCount());
 
             foreach (var category in categoryNodes)
             {
-                category.resultCount = productCounts.TryGetValue(category.Data.SycEntityObjectCategory.Id, out var resultCount) ? resultCount : 0;
+                var categoryId = category.Data.SycEntityObjectCategory.Id;
+                category.resultCount = descendantIdsByCategoryId.TryGetValue(categoryId, out var countCategoryIds)
+                    ? countCategoryIds
+                        .Where(productCountByCategoryId.ContainsKey)
+                        .Sum(id => productCountByCategoryId[id])
+                    : 0;
             }
+            }
+        }
+
+        private HashSet<long> GetCategoryIdsWithDescendants(long categoryId, Dictionary<long, List<long>> childrenByParentId)
+        {
+            var result = new HashSet<long> { categoryId };
+            var pending = new Queue<long>();
+            pending.Enqueue(categoryId);
+
+            while (pending.Count > 0)
+            {
+                var parentId = pending.Dequeue();
+                if (!childrenByParentId.TryGetValue(parentId, out var childIds))
+                {
+                    continue;
+                }
+
+                foreach (var childId in childIds)
+                {
+                    if (result.Add(childId))
+                    {
+                        pending.Enqueue(childId);
+                    }
+                }
+            }
+
+            return result;
         }
 
         private IReadOnlyList<TreeNode<GetSycEntityObjectCategoryForViewDto>> NormalizeProductCategoryNodes(IReadOnlyList<TreeNode<GetSycEntityObjectCategoryForViewDto>> categories)
