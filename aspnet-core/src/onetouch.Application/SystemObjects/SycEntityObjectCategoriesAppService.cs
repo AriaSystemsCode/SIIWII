@@ -1,4 +1,4 @@
-﻿using onetouch.SystemObjects;
+using onetouch.SystemObjects;
 using System.Collections.Generic;
 using System;
 using System.Linq;
@@ -1035,17 +1035,19 @@ namespace onetouch.SystemObjects
                 .Distinct()
                 .ToListAsync();
 
-            var productCountByCategoryId = productCategoryPairs
+            var productIdsByCategoryId = productCategoryPairs
                 .GroupBy(z => z.CategoryId)
-                .ToDictionary(z => z.Key, z => z.Select(r => r.ProductId).Distinct().LongCount());
+                .ToDictionary(z => z.Key, z => z.Select(r => r.ProductId).Distinct().ToList());
 
             foreach (var category in categoryNodes)
             {
                 var categoryId = category.Data.SycEntityObjectCategory.Id;
                 category.resultCount = descendantIdsByCategoryId.TryGetValue(categoryId, out var countCategoryIds)
                     ? countCategoryIds
-                        .Where(productCountByCategoryId.ContainsKey)
-                        .Sum(id => productCountByCategoryId[id])
+                        .Where(productIdsByCategoryId.ContainsKey)
+                        .SelectMany(id => productIdsByCategoryId[id])
+                        .Distinct()
+                        .LongCount()
                     : 0;
             }
             }
