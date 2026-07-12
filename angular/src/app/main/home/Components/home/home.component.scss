@@ -1,8 +1,18 @@
 .home-layout {
   margin-top: 0;
   padding: 16px 20px 24px;
+  --layout-left-side-padding: 90px;
+    --layout-right-side-padding: 30px;
   --sidebar-width: clamp(220px, 22vw, 280px);
   --sidebar-gap: 20px;
+}
+
+@media screen and (min-width: 1301px) {
+  .home-layout {
+    padding: 16px 28px 24px;
+  --layout-left-side-padding: 90px;
+    --layout-right-side-padding: 30px;
+  }
 }
 
 .home-layout .row {
@@ -14,7 +24,7 @@
 
 .left-sidebar {
   position: fixed;
-  left: max(12px, calc((100vw - min(100vw, 1460px)) / 2));
+  left: var(--layout-left-side-padding);
   top: 84px;
   max-height: calc(100vh - 104px);
   overflow-y: auto;
@@ -26,7 +36,7 @@
 
 .right-sidebar {
   position: fixed;
-  right: max(12px, calc((100vw - min(100vw, 1460px)) / 2));
+  right: var(--layout-right-side-padding);
   top: 84px;
   max-height: calc(100vh - 104px);
   overflow-y: auto;
@@ -53,7 +63,9 @@
 
 @media screen and (max-width: 1300px) {
   .home-layout {
-    padding: 12px 12px 20px;
+    padding: 12px 16px 20px;
+  --layout-left-side-padding: 16px;
+    --layout-right-side-padding: 16px;
   }
 
   .home-layout .row {
