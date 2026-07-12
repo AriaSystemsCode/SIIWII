@@ -376,6 +376,12 @@ namespace onetouch.AppMarketplaceItems
                        && (((x.SharingLevel == 2 || x.SharingLevel == 1) && x.ItemSharingFkList.Count(c => c.SharedUserId == AbpSession.UserId) > 0 )
                            ||(x.SharingLevel == 1)))));*/
                 var presonEntityObjectTypeId = await _helper.SystemTables.GetEntityObjectTypePersonId();
+                var sellerContactIds = _appContactRepository.GetAll()
+                    .Where(a => a.TenantId != null && a.ParentId == null
+                        && a.PartnerId == null && a.IsProfileData == true && a.EntityFk.EntityObjectTypeId != presonEntityObjectTypeId)
+                    .GroupBy(a => a.TenantId)
+                    .Select(a => a.Min(c => c.Id));
+                var sellerContacts = _appContactRepository.GetAll().Where(a => sellerContactIds.Contains(a.Id));
                 input.Sorting ="AppItem." +input.Sorting;
                 var filteredOrderedAppItems = filteredAppItems;//.OrderBy(input.Sorting ?? "id asc")
                                                                //List<AppMarketplaceItem> filteredOrderedAppItems = null;
@@ -400,8 +406,7 @@ namespace onetouch.AppMarketplaceItems
                                join i in filteredItems on o.Id equals i.Id
                                join s in _sycCurrencyExchangeRateRepository.GetAll()
                                on o.defaultMsrp.CurrencyCode equals s.CurrencyCode into j
-                               join c in _appContactRepository.GetAll().Where(a => a.TenantId != null && a.ParentId == null
-                               && a.PartnerId == null && a.IsProfileData == true && a.EntityFk.EntityObjectTypeId != presonEntityObjectTypeId)
+                               join c in sellerContacts
                                on o.TenantOwner equals c.TenantId
                                from u in j.DefaultIfEmpty()
                                select new GetAppMarketItemForViewDto()
@@ -454,8 +459,7 @@ namespace onetouch.AppMarketplaceItems
                     appItems = from o in filteredOrderedAppItems
                                join s in _sycCurrencyExchangeRateRepository.GetAll()
                                on o.defaultMsrp.CurrencyCode equals s.CurrencyCode into j
-                               join c in _appContactRepository.GetAll().Where(a => a.TenantId != null && a.ParentId == null
-                               && a.PartnerId == null && a.IsProfileData == true && a.EntityFk.EntityObjectTypeId != presonEntityObjectTypeId)
+                               join c in sellerContacts
                                on o.TenantOwner equals c.TenantId
                                from u in j.DefaultIfEmpty()
                                select new GetAppMarketItemForViewDto()
