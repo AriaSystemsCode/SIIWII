@@ -41,11 +41,9 @@
                         (onNodeExpand)="nodeExpand($event)" [loading]="loading" selectionMode="checkbox"
                         (onNodeSelect)="nodeSelect($event)" (onNodeUnselect)="nodeUnselect($event)"
                         [(selection)]="selectedFile">
-                    <!-- E-SII-20250507.0050 -->
                     <ng-template let-node pTemplate="default">
                         <span>{{ node.label }}</span>
                     </ng-template>
-                    <!-- E-SII-20250507.0050 -->
                     </p-tree>
                 </div>
                 <div class="d-flex justify-content-end my-2 mx-4">
