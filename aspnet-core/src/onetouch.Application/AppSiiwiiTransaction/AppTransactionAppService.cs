@@ -8414,9 +8414,9 @@ namespace onetouch.AppSiiwiiTransaction
                 {
                     var isTaxable = relation.EntityExtraData.FirstOrDefault(e => e.AttributeId == 911);
 
-                    if (isTaxable != null && isTaxable.AttributeValue.ToUpper() == "YES")
+                    if (isTaxable != null && (isTaxable.AttributeValue.ToUpper() == "YES" || isTaxable.AttributeValue.ToUpper() == "TRUE"))
                     {
-                        var transItems = await _appTransactionDetails.GetAll().Where(e => e.TransactionId == pTransactionID && e.EntityObjectTypeId != entityObjectChargesId && e.ParentId!=null)
+                        var transItems = await _appTransactionDetails.GetAll().Where(e => e.TransactionId == pTransactionID && e.EntityObjectTypeId != entityObjectChargesId && e.ParentId==null)
                             .ToListAsync();
 
                         var transItemSsins = transItems.Select(i => i.ItemSSIN).ToList();
