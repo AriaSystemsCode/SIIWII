@@ -2739,22 +2739,49 @@ namespace onetouch.AppEntities
         }
         private async Task<UserInformationDto> GetUserInformation(long userId)
         {
+            var user = await UserManager.GetUserByIdAsync(userId);
+            if (user == null)
+                return null;
+            string businessAccSSIN = "";
+            string personalAccSSIN = "";
+            var buisnessAccount = await _appMarketplaceContactsRepository
+                .GetAll().Where(z => z.TenantOwner == user.TenantId
+                && z.IsProfileData == true && z.ParentId == null).FirstOrDefaultAsync();
+            if (buisnessAccount!=null)
+            {
+                businessAccSSIN = buisnessAccount.SSIN;
+            }
+            var activeRelationshipStatusId = await _helper.SystemTables.GetEntityObjectStatusRelationshipActive();
             var attPhotoId = await _helper.SystemTables.GetAttachmentCategoryId("LOGO");
-            var contactEntityExtraData = _appEntityExtraDataRepository.GetAll().FirstOrDefault(x => x.AttributeId == 715 && x.AttributeValue == userId.ToString());
+            var contactEntityExtraData = _appEntityExtraDataRepository.GetAll()
+                .Include(z=>z.EntityFk)
+                .FirstOrDefault(x => x.AttributeId == 715 && x.AttributeValue == userId.ToString());
             if (contactEntityExtraData != null)
             {
+                personalAccSSIN = contactEntityExtraData.EntityFk.SSIN;
                 UserInformationDto userInformationDto = new UserInformationDto();
-                var contact = _appContactRepository.GetAll().Include(x => x.AccountFk).Include(x => x.EntityFk).ThenInclude(x => x.EntityAttachments).ThenInclude(x => x.AttachmentFk)
+                /*var contact = _appContactRepository.GetAll().Include(x => x.AccountFk).Include(x => x.EntityFk).ThenInclude(x => x.EntityAttachments).ThenInclude(x => x.AttachmentFk)
                     .Include(x => x.EntityFk).ThenInclude(x => x.EntityExtraData)
-                    .FirstOrDefault(x => x.EntityId == contactEntityExtraData.EntityId);
+                    .FirstOrDefault(x => x.EntityId == contactEntityExtraData.EntityId);*/
+                var contact = await _appMarketplaceContactsRepository.GetAll().Include(z=>z.EntityAttachments).ThenInclude(x => x.AttachmentFk)
+                    .Include(z=>z.EntityExtraData)
+                    .Where(z => z.SSIN == personalAccSSIN).FirstOrDefaultAsync();
                 if (contact != null)
                 {
-                    if (contact.EntityFk.EntityAttachments.Count > 0 && contact.EntityFk.EntityAttachments.FirstOrDefault(x => x.AttachmentCategoryId == attPhotoId) != null)
-                        userInformationDto.UserImage = string.IsNullOrEmpty(contact.EntityFk.EntityAttachments.FirstOrDefault(x => x.AttachmentCategoryId == attPhotoId).AttachmentFk.Attachment) ?
+                    if (contact.EntityAttachments.Count > 0 && contact.EntityAttachments.FirstOrDefault(x => x.AttachmentCategoryId == attPhotoId) != null)
+                        userInformationDto.UserImage = string.IsNullOrEmpty(contact.EntityAttachments.FirstOrDefault(x => x.AttachmentCategoryId == attPhotoId).AttachmentFk.Attachment) ?
                                                  ""
-                                                 : "attachments/" + (contact.EntityFk.TenantId == null ? "-1" : contact.EntityFk.TenantId.ToString()) + "/" + contact.EntityFk.EntityAttachments.FirstOrDefault(x => x.AttachmentCategoryId == attPhotoId).AttachmentFk.Attachment;
-                    userInformationDto.JobTitle = contact.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 706) == null ? "" : contact.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 706).AttributeValue;
-                    userInformationDto.AccountName = contact.AccountFk== null?"":contact.AccountFk.Name;
+                                                 : "attachments/" + (contact.TenantId == null ? "-1" : contact.TenantId.ToString()) + "/" + contact.EntityAttachments.FirstOrDefault(x => x.AttachmentCategoryId == attPhotoId).AttachmentFk.Attachment;
+                    //userInformationDto.JobTitle = contact.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 706) == null ? "" : contact.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 706).AttributeValue;
+                    var relationship = await _appContactRelationshipInfoRepository.GetAll().Include(z=>z.EntityExtraData)
+                        .Where(z => z.RequesterContactSSIN == businessAccSSIN && z.RecipientContactSSIN == personalAccSSIN
+                        && z.EntityObjectTypeCode == "B00P" && z.EntityObjectStatusId == activeRelationshipStatusId).FirstOrDefaultAsync();
+                    if (relationship != null && relationship.EntityExtraData !=null)
+                    {
+                        userInformationDto.JobTitle = relationship.EntityExtraData.FirstOrDefault(x => x.AttributeId == 706) == null ? "" : relationship.EntityExtraData.FirstOrDefault(x => x.AttributeId == 706).AttributeValue;
+
+                    }
+                    userInformationDto.AccountName = buisnessAccount.Name;// contact.AccountFk== null?"":contact.AccountFk.Name;
                     userInformationDto.UserName = contact.Name;
                 }
                 return userInformationDto;
