@@ -142,3 +142,24 @@
 :host ::ng-deep .event-full-dialog .p-dialog-footer {
   padding: 0 !important;
 }
+
+.dialog-header {
+    position: fixed;
+    border-top-left-radius: 20px;
+    border-top-right-radius: 20px;
+    height: 40px;
+    width: stretch;
+    top: 0;
+    z-index: 1000;
+
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    background: #fff;
+}
+
+.close-btn {
+    cursor: pointer;
+    width: 18px;
+    margin: 0px 20px;
+}

@@ -156,10 +156,24 @@
 }
 
 
-:host ::ng-deep .few-items-carousel .p-carousel-items-container {
-  justify-content: center !important;
-  transform: none !important;
+// :host ::ng-deep .few-items-carousel .p-carousel-items-container {
+//   justify-content: center !important;
+//   transform: none !important;
+// }
+ :host ::ng-deep .few-items-carousel{
+@media (min-width: 993px) {
+  .p-carousel-items-container {
+    justify-content: center !important;
+  }
 }
+
+@media (max-width: 992px) {
+  .p-carousel-items-container {
+    justify-content: flex-start !important;
+  }
+}
+ }
+
 
 :host ::ng-deep .few-items-carousel .p-carousel-item {
   flex: 0 0 auto !important;
