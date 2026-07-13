@@ -153,6 +153,12 @@ selectedMessageAfterRefresh: number | null = null;
     newCommentAddedHandler(event){
       //  this.selectMessage(this.messagesDetails[0].messages);
         // this.getMesssage();
+
+         if (!event) {
+        return;
+    }
+
+    this.refreshSelectedMessage();
     }
     selectMessagetype(messagetypeIndex: number, messagetype: string): void {
         this.filterText = "";
@@ -635,6 +641,28 @@ downloadAttachment(item: any): void {
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
+}
+
+refreshSelectedMessage(): void {
+    const selectedId =
+        this.selectedMessage ||
+        this.messagesDetails?.[0]?.messages?.id;
+
+    if (!selectedId) {
+        this.getMesssage(true);
+        return;
+    }
+
+    const selectedMessage =
+        this.messages.find(x => x.id === selectedId) ||
+        this.messagesDetails?.[0]?.messages;
+
+    if (!selectedMessage) {
+        this.getMesssage(true);
+        return;
+    }
+
+    this.selectMessage(selectedMessage);
 }
     ngOnDestroy() {
       
