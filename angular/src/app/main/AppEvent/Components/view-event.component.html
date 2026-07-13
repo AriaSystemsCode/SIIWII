@@ -12,14 +12,22 @@
   styleClass="event-full-dialog"
   style="padding: 0 !important;"
 >
+       <div class="dialog-header p-0">
+    <img
+        src="../../../../assets/accounts/importAccounts/close.svg"
+        class="pointer close-btn"
+        (click)="hide()" />
+</div>
     <div class="modal-dialog modal-lg m-0">
+       
         <div class="modal-content h-100">
-            <div class="row  ml-3 mr-3 d-md-block d-none">
+            <!-- <div class="row  ml-3 mr-3 d-md-block d-none">
                 <div class="col-11"></div>
                 <div class="col-1 pt-5 text-right">
                     <img src="../../../../assets/accounts/importAccounts/close.svg" class="pointer" (click)="hide()" />
                 </div>
-            </div>
+            </div> -->
+      
             <div class="row m-0 pt-4 pb-4 events events-sm d-md-none d-flex flex-row">
 
                 <div class="col-1  text-right pt-2">
