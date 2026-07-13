@@ -3767,7 +3767,7 @@ namespace onetouch.Accounts
             }
             else
             {
-                if (input.ParentId == null && (input.Id != 0 && input.Id != null)
+                if (input.ParentId == null &&  (input.Id != 0 && input.Id != null && !contact.IsProfileData)
                     && (input.TenantOwner== AbpSession.TenantId || 
                     input.TenantOwner ==0|| input.TenantOwner==null))
                 {
