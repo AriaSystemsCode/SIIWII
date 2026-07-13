@@ -717,8 +717,8 @@ margin-right: 6px;"></i>
                             </div>
                             <br />
 
-                            <div class="message-data position-relative">
-                                <span class="dateMsg" [ngStyle]="isArabic ? {'left':'0'} : {'right':'0'}">
+                            <div class="message-data position-relative d-flex justify-content-end">
+                                <span class="dateMsg">
                                     {{ messagedetail?.messages?.sendDate | date:'hh:mm a, MM/dd/yyyy' }}
                                 </span>
                             </div>
@@ -1380,7 +1380,10 @@ margin-right: 6px;"></i>
 
 </div>
 
-<SendMessageModal [modalView]="true" #SendMessageModal (modalSave)="selectMessagetype(1, l('Inbox'))">
+<SendMessageModal
+    [modalView]="true"
+    #SendMessageModal
+    (modalSave)="refreshSelectedMessage()">
 </SendMessageModal>
 <confirm-modal [content1]="l('Are you sure?')" [content2]="l('Are you sure to remove this message?')"
     [buttonYes]="l('Yes,Remove')" [buttonNo]="l('CancelAction')" [display]="displayDeleteMessage"
