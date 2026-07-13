@@ -816,6 +816,38 @@ namespace onetouch.Message
         [AbpAllowAnonymous]
         public async Task<List<GetMessagesForViewDto>> CreateMessage(CreateMessageInput input)
         {
+            if (input.EntityAttachments != null && input.EntityAttachments.Count > 0)
+            {
+                var tenantId = AbpSession.TenantId == null ? -1 : AbpSession.TenantId;
+                var path = _appConfiguration[$"Attachment:PathTemp"] + @"\" + tenantId + @"\";
+                bool allFilesUploaded = false;
+                do {
+                        bool existingFile = true;
+                        foreach (var attch in input.EntityAttachments)
+                        {
+                            string extension = "";
+                            string filename = "";
+                            if (attch.FileName.Split(".").Length > 1)
+                            {
+                                extension = attch.FileName.Split(".")[attch.FileName.Split(".").Length - 1];
+                            }
+                            if (attch.guid != null && !attch.guid.EndsWith("." + extension))
+                            {
+                                filename = attch.guid + (extension == "" ? "" : "." + extension);
+                            }
+                            var fileToAttach = path + @"\" + filename;
+                            if (!System.IO.File.Exists(fileToAttach))
+                            {
+                                existingFile = existingFile && false;
+                            }
+                            else
+                            {
+                                existingFile = existingFile && true;
+                            }
+                        }
+                        allFilesUploaded = existingFile;
+                    } while (!allFilesUploaded);
+            }
             //I40-X27[Start]
             if (input.MesasgeObjectType == MesasgeObjectType.Review)
             {
