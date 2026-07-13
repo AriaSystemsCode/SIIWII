@@ -112,12 +112,13 @@ namespace onetouch.AppMarketplaceItems
             if (price == null || price.Price <= 0)
                 return 0;
 
-            if (string.IsNullOrEmpty(price.CurrencyCode) || price.CurrencyCode == currencyCode)
+            var targetCurrencyCode = string.IsNullOrEmpty(currencyCode) ? "USD" : currencyCode;
+            if (string.IsNullOrEmpty(price.CurrencyCode) || price.CurrencyCode == targetCurrencyCode)
                 return price.Price;
 
             var exchangeRate = price.CurrencyCode == "USD"
                 ? usdExchangeRate
-                : _helper.SystemTables.GetExchangeRate(price.CurrencyCode, currencyCode);
+                : _helper.SystemTables.GetExchangeRate(price.CurrencyCode, targetCurrencyCode);
 
             return exchangeRate == 0 ? 0 : price.Price * exchangeRate;
         }
@@ -131,7 +132,8 @@ namespace onetouch.AppMarketplaceItems
                 .Where(x => x.Code == code && (buyerSSIN == null || x.BuyerSSIN == buyerSSIN))
                 .ToList();
 
-            var price = priceList.FirstOrDefault(x => x.CurrencyCode == currencyCode)
+            var targetCurrencyCode = string.IsNullOrEmpty(currencyCode) ? "USD" : currencyCode;
+            var price = priceList.FirstOrDefault(x => x.CurrencyCode == targetCurrencyCode)
                 ?? priceList.FirstOrDefault(x => x.CurrencyCode == "USD")
                 ?? priceList.FirstOrDefault(x => x.IsDefault)
                 ?? priceList.FirstOrDefault();
@@ -232,6 +234,7 @@ namespace onetouch.AppMarketplaceItems
                 }
 
                 input.Sorting = input.Sorting ?? "id";
+                var itemSorting = input.Sorting;
                 List<long> AppItemListDetails = new List<long>();
                 if (input.AppItemListId != null && input.AppItemListId > 0)
                 {
@@ -383,6 +386,7 @@ namespace onetouch.AppMarketplaceItems
                     .Select(a => a.Min(c => c.Id));
                 var sellerContacts = _appContactRepository.GetAll().Where(a => sellerContactIds.Contains(a.Id));
                 input.Sorting ="AppItem." +input.Sorting;
+                var rawItemSorting = "Item." + itemSorting;
                 var filteredOrderedAppItems = filteredAppItems;//.OrderBy(input.Sorting ?? "id asc")
                                                                //List<AppMarketplaceItem> filteredOrderedAppItems = null;
                                                                //I50[Start]
@@ -399,119 +403,72 @@ namespace onetouch.AppMarketplaceItems
                 //I50[End]
 
                 //.PageBy(input);
-                IQueryable<GetAppMarketItemForViewDto> appItems = null;
-                if (filteredItems != null)
+                var rawAppItemsQuery = filteredItems != null
+                    ? (from o in filteredOrderedAppItems
+                             join i in filteredItems on o.Id equals i.Id
+                             join c in sellerContacts on o.TenantOwner equals c.TenantId
+                             select new
+                             {
+                                 Item = o,
+                                 Selected = (input.SelectorKey != null && SelectedItems != null && SelectedItems.Count > 0 && SelectedItems.Contains(o.Id)) ? true : false,
+                                 SellerSSIN = c.SSIN,
+                                 SellerName = c.Name
+                             })
+                    : (from o in filteredOrderedAppItems
+                             join c in sellerContacts on o.TenantOwner equals c.TenantId
+                             select new
+                             {
+                                 Item = o,
+                                 Selected = (input.SelectorKey != null && SelectedItems != null && SelectedItems.Count > 0 && SelectedItems.Contains(o.Id)) ? true : false,
+                                 SellerSSIN = c.SSIN,
+                                 SellerName = c.Name
+                             });
+
+                var hasPriceFilter = input.MinimumPrice != null || input.MaximumPrice != null;
+                var totalCount = hasPriceFilter ? 0 : await rawAppItemsQuery.CountAsync();
+                var rawAppItems = hasPriceFilter
+                    ? await rawAppItemsQuery.ToListAsync()
+                    : await rawAppItemsQuery.OrderBy(rawItemSorting).PageBy(input).ToListAsync();
+
+                var materializedAppItems = rawAppItems.Select(o =>
                 {
-                    appItems = from o in filteredOrderedAppItems
-                               join i in filteredItems on o.Id equals i.Id
-                               join s in _sycCurrencyExchangeRateRepository.GetAll()
-                               on o.defaultMsrp.CurrencyCode equals s.CurrencyCode into j
-                               join c in sellerContacts
-                               on o.TenantOwner equals c.TenantId
-                               from u in j.DefaultIfEmpty()
-                               select new GetAppMarketItemForViewDto()
-                               {
-                                   AppItem = new AppItemDto
-                                   {
-                                       ManufacturerCode = o.ManufacturerCode,
-                                       SellerName = c.Name,
-                                       SSIN = o.Code,
-                                       Code = o.Code,
-                                       Name = o.Name,
-                                       Description = o.Notes,
-                                       Price = (decimal)(input.CurrencyCode == null && o.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.CurrencyCode == "USD").FirstOrDefault() != null ? o.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.CurrencyCode == "USD").Select(a => a.Price).FirstOrDefault() :
-                                               (o.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.CurrencyCode == input.CurrencyCode).FirstOrDefault() != null ?
-                                               o.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.CurrencyCode == input.CurrencyCode).Select(a => a.Price).FirstOrDefault() :
-                                              (o.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.CurrencyCode == "USD").FirstOrDefault() == null ? //0 :
-                                              (o.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.IsDefault == true && q.CurrencyCode != input.CurrencyCode).FirstOrDefault() != null ?
-                                              ((o.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.IsDefault && q.CurrencyCode != input.CurrencyCode).FirstOrDefault().Price) * (input.CurrencyCode == "USD" ? u.ExchangeRate : (1 / u.ExchangeRate) * exchangeRate)) : 0) :
-                                              (o.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.CurrencyCode == "USD").FirstOrDefault() != null ?
-                                              (o.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.CurrencyCode == "USD").Select(a => a.Price).FirstOrDefault() * exchangeRate) : 0)))),
-                                       Id = o.Id,
-                                       ShowItem = (input.MinimumPrice != null ? ((decimal)(input.CurrencyCode == null &&
-                                                   o.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.CurrencyCode == "USD").FirstOrDefault() != null ? o.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.CurrencyCode == "USD").Select(a => a.Price).FirstOrDefault() :
-                                               (o.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.CurrencyCode == input.CurrencyCode).FirstOrDefault() != null ?
-                                               o.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.CurrencyCode == input.CurrencyCode).Select(a => a.Price).FirstOrDefault() :
-                                              (o.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.CurrencyCode == "USD").FirstOrDefault() == null ? //0 :
-                                              (o.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.IsDefault == true && q.CurrencyCode != input.CurrencyCode).FirstOrDefault() != null ?
-                                              ((o.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.IsDefault && q.CurrencyCode != input.CurrencyCode).FirstOrDefault().Price) * (input.CurrencyCode == "USD" ? u.ExchangeRate : (1 / u.ExchangeRate) * exchangeRate)) : 0) :
-                                              (o.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.CurrencyCode == "USD").FirstOrDefault() != null ? (o.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.CurrencyCode == "USD").Select(a => a.Price).FirstOrDefault() * exchangeRate) : 0)))) >= (decimal)input.MinimumPrice) : true) &&
-                                              (input.MaximumPrice != null ? ((decimal)(input.CurrencyCode == null ? o.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.CurrencyCode == "USD").Select(a => a.Price).FirstOrDefault() :
-                                               (o.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.CurrencyCode == input.CurrencyCode).FirstOrDefault() != null ?
-                                               o.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.CurrencyCode == input.CurrencyCode).Select(a => a.Price).FirstOrDefault() :
-                                              (o.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.CurrencyCode == "USD").FirstOrDefault() == null ? //0 :
-                                              (o.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.IsDefault == true && q.CurrencyCode != input.CurrencyCode).FirstOrDefault() != null ?
-                                              ((o.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.IsDefault && q.CurrencyCode != input.CurrencyCode).FirstOrDefault().Price) * (input.CurrencyCode == "USD" ? u.ExchangeRate : (1 / u.ExchangeRate) * exchangeRate)) : 0) :
-                                              (o.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.CurrencyCode == "USD").FirstOrDefault() != null ? (o.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.CurrencyCode == "USD").Select(a => a.Price).FirstOrDefault() * exchangeRate) : 0)))) <= (decimal)input.MaximumPrice) : true),
+                    var price = ResolveMarketplacePrice(o.Item.ItemPricesFkList, "MSRP", input.CurrencyCode, exchangeRate, null);
+                    var defaultAttachment = o.Item.EntityAttachments.FirstOrDefault(x => x.IsDefault == true) ?? o.Item.EntityAttachments.FirstOrDefault();
+                    var imageUrl = defaultAttachment == null || defaultAttachment.AttachmentFk == null || string.IsNullOrEmpty(defaultAttachment.AttachmentFk.Attachment)
+                        ? ""
+                        : "attachments/" + (o.Item.TenantId.HasValue ? o.Item.TenantId : -1) + "/" + defaultAttachment.AttachmentFk.Attachment;
 
-                                       ImageUrl = (o.EntityAttachments.FirstOrDefault(x => x.IsDefault == true) == null ?
-                                        (o.EntityAttachments.FirstOrDefault() == null ? "attachments/" + o.TenantId + "/" + o.EntityAttachments.FirstOrDefault().AttachmentFk.Attachment : "")
-                                        : "attachments/" + (o.TenantId.HasValue ? o.TenantId : -1) + "/" + o.EntityAttachments.FirstOrDefault(x => x.IsDefault == true).AttachmentFk.Attachment) // "attachments/3/6a567354-819d-ddf9-7ebb-76da114e7547.jpg"
-                                   },
-                                   Selected = (input.SelectorKey != null && SelectedItems != null && SelectedItems.Count > 0 && SelectedItems.Contains(o.Id)) ? true : false,
-                                   //146[Start]
-                                   SellerSSIN = c.SSIN,
-                                   //I46[End]
-                               };
-                }
-                else 
-                {
-                    appItems = from o in filteredOrderedAppItems
-                               join s in _sycCurrencyExchangeRateRepository.GetAll()
-                               on o.defaultMsrp.CurrencyCode equals s.CurrencyCode into j
-                               join c in sellerContacts
-                               on o.TenantOwner equals c.TenantId
-                               from u in j.DefaultIfEmpty()
-                               select new GetAppMarketItemForViewDto()
-                               {
-                                   AppItem = new AppItemDto
-                                   {
-                                       ManufacturerCode = o.ManufacturerCode,
-                                       SellerName = c.Name,
-                                       SSIN = o.Code,
-                                       Code = o.Code,
-                                       Name = o.Name,
-                                       Description = o.Notes,
-                                       Price = (decimal)(input.CurrencyCode == null && o.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.CurrencyCode == "USD").FirstOrDefault() != null ? o.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.CurrencyCode == "USD").Select(a => a.Price).FirstOrDefault() :
-                                               (o.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.CurrencyCode == input.CurrencyCode).FirstOrDefault() != null ?
-                                               o.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.CurrencyCode == input.CurrencyCode).Select(a => a.Price).FirstOrDefault() :
-                                              (o.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.CurrencyCode == "USD").FirstOrDefault() == null ? //0 :
-                                              (o.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.IsDefault == true && q.CurrencyCode != input.CurrencyCode).FirstOrDefault() != null ?
-                                              ((o.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.IsDefault && q.CurrencyCode != input.CurrencyCode).FirstOrDefault().Price) * (input.CurrencyCode == "USD" ? u.ExchangeRate : (1 / u.ExchangeRate) * exchangeRate)) : 0) :
-                                              (o.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.CurrencyCode == "USD").FirstOrDefault() != null ?
-                                              (o.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.CurrencyCode == "USD").Select(a => a.Price).FirstOrDefault() * exchangeRate) : 0)))),
-                                       Id = o.Id,
-                                       ShowItem = (input.MinimumPrice != null ? ((decimal)(input.CurrencyCode == null &&
-                                                   o.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.CurrencyCode == "USD").FirstOrDefault() != null ? o.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.CurrencyCode == "USD").Select(a => a.Price).FirstOrDefault() :
-                                               (o.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.CurrencyCode == input.CurrencyCode).FirstOrDefault() != null ?
-                                               o.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.CurrencyCode == input.CurrencyCode).Select(a => a.Price).FirstOrDefault() :
-                                              (o.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.CurrencyCode == "USD").FirstOrDefault() == null ? //0 :
-                                              (o.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.IsDefault == true && q.CurrencyCode != input.CurrencyCode).FirstOrDefault() != null ?
-                                              ((o.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.IsDefault && q.CurrencyCode != input.CurrencyCode).FirstOrDefault().Price) * (input.CurrencyCode == "USD" ? u.ExchangeRate : (1 / u.ExchangeRate) * exchangeRate)) : 0) :
-                                              (o.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.CurrencyCode == "USD").FirstOrDefault() != null ? (o.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.CurrencyCode == "USD").Select(a => a.Price).FirstOrDefault() * exchangeRate) : 0)))) >= (decimal)input.MinimumPrice) : true) &&
-                                              (input.MaximumPrice != null ? ((decimal)(input.CurrencyCode == null ? o.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.CurrencyCode == "USD").Select(a => a.Price).FirstOrDefault() :
-                                               (o.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.CurrencyCode == input.CurrencyCode).FirstOrDefault() != null ?
-                                               o.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.CurrencyCode == input.CurrencyCode).Select(a => a.Price).FirstOrDefault() :
-                                              (o.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.CurrencyCode == "USD").FirstOrDefault() == null ? //0 :
-                                              (o.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.IsDefault == true && q.CurrencyCode != input.CurrencyCode).FirstOrDefault() != null ?
-                                              ((o.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.IsDefault && q.CurrencyCode != input.CurrencyCode).FirstOrDefault().Price) * (input.CurrencyCode == "USD" ? u.ExchangeRate : (1 / u.ExchangeRate) * exchangeRate)) : 0) :
-                                              (o.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.CurrencyCode == "USD").FirstOrDefault() != null ? (o.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.CurrencyCode == "USD").Select(a => a.Price).FirstOrDefault() * exchangeRate) : 0)))) <= (decimal)input.MaximumPrice) : true),
+                    return new GetAppMarketItemForViewDto()
+                    {
+                        AppItem = new AppItemDto
+                        {
+                            ManufacturerCode = o.Item.ManufacturerCode,
+                            SellerName = o.SellerName,
+                            SSIN = o.Item.Code,
+                            Code = o.Item.Code,
+                            Name = o.Item.Name,
+                            Description = o.Item.Notes,
+                            Price = price,
+                            Id = o.Item.Id,
+                            ShowItem = (input.MinimumPrice != null ? price >= (decimal)input.MinimumPrice : true) &&
+                                   (input.MaximumPrice != null ? price <= (decimal)input.MaximumPrice : true),
 
-                                       ImageUrl = (o.EntityAttachments.FirstOrDefault(x => x.IsDefault == true) == null ?
-                                        (o.EntityAttachments.FirstOrDefault() == null ? "attachments/" + o.TenantId + "/" + o.EntityAttachments.FirstOrDefault().AttachmentFk.Attachment : "")
-                                        : "attachments/" + (o.TenantId.HasValue ? o.TenantId : -1) + "/" + o.EntityAttachments.FirstOrDefault(x => x.IsDefault == true).AttachmentFk.Attachment) // "attachments/3/6a567354-819d-ddf9-7ebb-76da114e7547.jpg"
-                                   },
-                                   Selected = (input.SelectorKey != null && SelectedItems != null && SelectedItems.Count > 0 && SelectedItems.Contains(o.Id)) ? true : false,
-                                   //146[Start]
-                                   SellerSSIN = c.SSIN,
-                                   //I46[End]
-                               };
-                }
-                var orderedItemsFilter = appItems.Where(x => x.AppItem.ShowItem && x.AppItem.Price != null).OrderBy(input.Sorting ?? "AppItem.id asc");
-                var orderedItems = orderedItemsFilter.PageBy(input);
+                            ImageUrl = imageUrl
+                        },
+                        Selected = o.Selected,
+                        //146[Start]
+                        SellerSSIN = o.SellerSSIN,
+                        //I46[End]
+                    };
+                }).ToList();
 
-                //var appItemsList = await appItems.ToListAs ync();
-                var appItemsList = await orderedItems.ToListAsync();
+                var orderedItemsFilter = materializedAppItems
+                    .Where(x => x.AppItem.ShowItem && x.AppItem.Price != null)
+                    .AsQueryable()
+                    .OrderBy(input.Sorting ?? "AppItem.id asc");
+                if (hasPriceFilter)
+                    totalCount = orderedItemsFilter.Count();
+                var appItemsList = hasPriceFilter ? orderedItemsFilter.PageBy(input).ToList() : orderedItemsFilter.ToList();
                 //I48[Start]
                 
                 foreach (var item in appItemsList)
@@ -532,8 +489,6 @@ namespace onetouch.AppMarketplaceItems
                 {
                     appItemsList = appItemsList.Where(e => e.Selected).ToList();
                 }
-                var totalCount = await orderedItemsFilter.CountAsync(x => x.AppItem.ShowItem);
-
                 stopwatch.Stop();
                 var elapsed_time = stopwatch.ElapsedMilliseconds;
 
