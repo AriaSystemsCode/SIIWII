@@ -2,6 +2,7 @@ import { Component, Injector, Input, OnInit, ViewChild } from '@angular/core';
 import { AppComponentBase } from '@shared/common/app-component-base';
 import { AppEntitiesServiceProxy, AppEntityDto, CreateOrEditAppEntityDto, LookupLabelDto } from '@shared/service-proxies/service-proxies';
 import { BsModalRef, BsModalService, ModalOptions } from 'ngx-bootstrap/modal';
+import { BsDropdownDirective } from 'ngx-bootstrap/dropdown';
 import { Observable, Subject, Subscription } from 'rxjs';
 import { debounceTime, distinctUntilChanged, finalize } from 'rxjs/operators';
 import { CreateOrEditAppEntityDynamicModalComponent } from '../create-or-edit-app-entity-dynamic-modal/create-or-edit-app-entity-dynamic-modal.component';
@@ -116,7 +117,9 @@ export class AppEntityListDynamicModalComponent extends AppComponentBase impleme
         else
         return false;
     }
-    openCreateOrEditModal(entityLookup?:LookupLabelDto) : void {
+    openCreateOrEditModal(entityLookup?:LookupLabelDto, dropdown?: BsDropdownDirective) : void {
+
+        this.closeActionsDropdown(dropdown)
 
         let appEntity : AppEntityDto = new AppEntityDto()
         if(entityLookup){
@@ -149,6 +152,13 @@ export class AppEntityListDynamicModalComponent extends AppComponentBase impleme
     onCanceledHandler(){
         this.active = true
     }
+
+    closeActionsDropdown(dropdown?: BsDropdownDirective): void {
+        if (dropdown?.isOpen) {
+            dropdown.hide();
+        }
+    }
+
     onCreateOrEditDoneHandler(){
         this.resetList()
     }
@@ -164,7 +174,9 @@ export class AppEntityListDynamicModalComponent extends AppComponentBase impleme
         this.currentModalRef.hide()
     }
 
-    deleteSycEntityObject(_item,index:number): void {
+    deleteSycEntityObject(_item,index:number, dropdown?: BsDropdownDirective): void {
+        this.closeActionsDropdown(dropdown)
+
         var isConfirmed: Observable<boolean>;
         isConfirmed   = this.askToConfirm("","AreYouSure");
     
