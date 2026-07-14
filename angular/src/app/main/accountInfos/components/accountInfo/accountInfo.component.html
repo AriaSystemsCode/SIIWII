@@ -270,7 +270,7 @@
                                                     src="assets/profile/My-Account-Information-Default.svg">
                                             </span>
 
-                                            <span class="nav-title"
+                                            <span class="nav-title" (click)="getMyAccountDataForView(true)"
                                                 *ngIf="accountLevel === accountLevelEnum.Profile && !viewMode">
                                                 {{l("MyProfile")}}
                                             </span>
@@ -990,7 +990,7 @@
                             </div>
                         </div>
                         <div class="tab2" *ngIf="currentTab == accountInfoPageTabsEnum.Branches ">
-                            <app-branches [branches]='accountDataForView.branches' [accountId]='accountId'
+                            <app-branches [branches]='accountDataForView.branches' [accountId]='accountId' 
                                 (askToPublish)="askToPublish($event)" [viewMode]="viewMode"></app-branches>
                         </div>
                         <div class="tab3" *ngIf="currentTab == accountInfoPageTabsEnum.Payments">
