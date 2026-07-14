@@ -830,7 +830,7 @@ isArabic: boolean = false;
       displayVisualTypes(): boolean {
         //i49- what else ? 
        // const hiddenTypes = ['CHARGES', 'TRANSACTIONCHARGES','SHIPVIA', 'CHARGETYPES'];
-        const showenTypes = ['COLOR', 'BACKGROUND', 'MARKETPLACESECTIONBLOCK', 'MARKETPLACESECTION','BRAND','PATTERN'];
+        const showenTypes = ['COLOR', 'BACKGROUND', 'MARKETPLACESECTIONBLOCK', 'MARKETPLACESECTION','BRAND','PATTERN','LANDINGPAGESETTINGS'];
 
         this._displayVisualTypes = showenTypes.includes(
     this.entityObjectType.code.toString().toUpperCase()
