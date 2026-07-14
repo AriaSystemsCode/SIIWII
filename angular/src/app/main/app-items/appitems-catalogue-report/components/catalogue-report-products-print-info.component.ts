@@ -92,5 +92,87 @@ export class CatalogueReportProductsPrintInfoComponent extends AppComponentBase 
                 }
             });
     }
+addPersonalEmail(
+    event: KeyboardEvent,
+    type: 'to' | 'cc' | 'bcc',
+    autoComplete: any
+): void {
+    event.preventDefault();
+    event.stopPropagation();
+
+    const input = event.target as HTMLInputElement;
+    const email = input?.value?.trim().replace(/,$/, '');
+
+    if (!email) {
+        return;
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!emailRegex.test(email)) {
+        this.notify.warn(this.l('EmailAddressInvalid'));
+        return;
+    }
+
+    const newEmail = new NameValueOfString();
+    newEmail.name = email;
+    newEmail.value = email;
+
+    let currentList: NameValueOfString[] = [];
+
+    if (type === 'to') {
+        currentList = this.printInfoParam.toUsers || [];
+
+        if (!this.emailAlreadyExists(currentList, email)) {
+            this.printInfoParam.toUsers = [...currentList, newEmail];
+        }
+    }
+
+    if (type === 'cc') {
+        currentList = this.printInfoParam.ccUsers || [];
+
+        if (!this.emailAlreadyExists(currentList, email)) {
+            this.printInfoParam.ccUsers = [...currentList, newEmail];
+        }
+    }
+
+    if (type === 'bcc') {
+        currentList = this.printInfoParam.bccUsers || [];
+
+        if (!this.emailAlreadyExists(currentList, email)) {
+            this.printInfoParam.bccUsers = [...currentList, newEmail];
+        }
+    }
+
+    input.value = '';
+
+    if (autoComplete?.inputEL?.nativeElement) {
+        autoComplete.inputEL.nativeElement.value = '';
+    }
+
+    autoComplete.inputValue = '';
+    autoComplete.hide?.();
+}
+
+handleEmailSeparator(
+    event: KeyboardEvent,
+    type: 'to' | 'cc' | 'bcc',
+    autoComplete: any
+): void {
+    if (event.key === ',') {
+        this.addPersonalEmail(event, type, autoComplete);
+    }
+}
+
+private emailAlreadyExists(
+    list: NameValueOfString[],
+    email: string
+): boolean {
+    return list.some(
+        item =>
+            item?.value?.trim().toLowerCase() ===
+            email.toLowerCase()
+    );
+}
      
 }
