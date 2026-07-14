@@ -392,10 +392,6 @@ namespace onetouch.AppItems
                 if (input.PublishStatus == 0)
                 {
                     appItems = from d in filteredOrderedAppItems
-                               join
-                                          m in marketplaceItems
-                                          on d.SSIN equals m.Code into j1
-                               from j2 in j1.DefaultIfEmpty()
                                select new GetAppItemForViewDto()
                                {
                                    AppItem = new AppItemDto
@@ -409,7 +405,7 @@ namespace onetouch.AppItems
                                        Id = d.Id,
 
                                        SSIN = d.SSIN,
-                                       SharingLevel = j2 != null ? j2.SharingLevel.ToString() : null,
+                                       SharingLevel = d.SharingLevel == 0 ? null : d.SharingLevel.ToString(),
 
                                        Listed = d.ListingItemFkList.Any(),
                                        ImageUrl = (d.EntityFk.EntityAttachments.FirstOrDefault(x => x.IsDefault == true) == null ?
@@ -427,11 +423,11 @@ namespace onetouch.AppItems
                 {
                     if (input.PublishStatus != 3) //(input.SharingLevel != "N")
                     {
-                        var joined = filteredOrderedAppItems.Join(marketplaceItems
-                                                  .WhereIf(input.PublishStatus == 1, a => a.SharingLevel == 1)
-                                               .WhereIf(input.PublishStatus == 2, a => a.SharingLevel == 2)
-                                               .WhereIf(input.PublishStatus == 4, a => a.SharingLevel == 4),
-                       x => x.SSIN.Trim(), sa => sa.Code.Trim(), (s, sa) => new { item = s, marketplaceItem = sa });
+                        var joined = filteredOrderedAppItems
+                            .WhereIf(input.PublishStatus == 1, a => a.SharingLevel == 1)
+                            .WhereIf(input.PublishStatus == 2, a => a.SharingLevel == 2)
+                            .WhereIf(input.PublishStatus == 4, a => a.SharingLevel == 4)
+                            .Select(s => new { item = s });
                         appItems = from o in joined
                                    select new GetAppItemForViewDto()
                                    {
@@ -445,7 +441,7 @@ namespace onetouch.AppItems
                                            Id = o.item.Id,
                                            ManufacturerCode = (o.item.ManufacturerCode == null && (o.item.TenantOwner == AbpSession.TenantId || o.item.TenantOwner == null || o.item.TenantOwner == 0) ? o.item.Code : o.item.ManufacturerCode),
                                            SSIN = o.item.SSIN,
-                                           SharingLevel = o.marketplaceItem != null ? o.marketplaceItem.SharingLevel.ToString() : null,
+                                           SharingLevel = o.item.SharingLevel == 0 ? null : o.item.SharingLevel.ToString(),
                                            //T-SII-20230618.0001,1 MMT 06/20/2023 Enhance Product browse page[End]
                                            Listed = o.item.ListingItemFkList.Any(),
                                            Published = o.item.PublishedListingItemFkList.Any(),
@@ -460,11 +456,7 @@ namespace onetouch.AppItems
                     }
                     else
                     {
-                        appItems = from d in filteredOrderedAppItems.Where(z => (!marketplaceItems.Any(f => f.SSIN == z.SSIN)) || (marketplaceItems.Any(f => f.SSIN == z.SSIN && f.SharingLevel == 3)))
-                                   join
-                                         m in marketplaceItems.Where(a => a.SharingLevel == 3)
-                                         on d.SSIN equals m.Code into j1
-                                   from j2 in j1.DefaultIfEmpty()
+                        appItems = from d in filteredOrderedAppItems.Where(z => z.SharingLevel == 0 || z.SharingLevel == 3)
                                    select new GetAppItemForViewDto()
                                    {
                                        AppItem = new AppItemDto
@@ -479,7 +471,7 @@ namespace onetouch.AppItems
                                            Id = d.Id,
                                            //T-SII-20230618.0001,1 MMT 06/20/2023 Enhance Product browse page[Start]
                                            SSIN = d.SSIN,
-                                           SharingLevel = j2 != null ? j2.SharingLevel.ToString() : null,
+                                           SharingLevel = d.SharingLevel == 0 ? null : d.SharingLevel.ToString(),
                                            //T-SII-20230618.0001,1 MMT 06/20/2023 Enhance Product browse page[End]
                                            Listed = d.ListingItemFkList.Any(),
                                            ImageUrl = (d.EntityFk.EntityAttachments.FirstOrDefault(x => x.IsDefault == true) == null ?
@@ -786,19 +778,9 @@ namespace onetouch.AppItems
                     }
                     output.AppItem.ShowSync = false;
                     var marketplaceItem = await _appMarketplaceItem.GetAll().Where(a => a.Code == appItem.SSIN || (a.ManufacturerCode == appItem.Code && a.TenantOwner == appItem.TenantId)).FirstOrDefaultAsync();
-                    if (marketplaceItem != null)
+                    if (marketplaceItem != null && marketplaceItem.TimeStamp < appItem.EntityFk.TimeStamp)
                     {
-                        output.AppItem.SharingLevel = marketplaceItem.SharingLevel;
-
-                        if (marketplaceItem.TimeStamp < appItem.EntityFk.TimeStamp)
-                            output.AppItem.ShowSync = true;
-
-
-                    }
-                    else
-                    {
-                        output.AppItem.ShowSync = false;
-                        output.AppItem.SharingLevel = 0;
+                        output.AppItem.ShowSync = true;
                     }
                     if (output.AppItem.SharingLevel == 0)
                     {
@@ -813,7 +795,7 @@ namespace onetouch.AppItems
                     if (output.AppItem.SharingLevel == 2)
                     {
                         output.AppItem.ItemSharing = new List<ItemSharingDto>();
-                        var sharedUsers = await _appMarketplaceItemSharing.GetAll().Where(a => a.AppMarketplaceItemId == marketplaceItem.Id).ToListAsync();
+                        var sharedUsers = marketplaceItem == null ? new List<AppMarketplaceItemSharings>() : await _appMarketplaceItemSharing.GetAll().Where(a => a.AppMarketplaceItemId == marketplaceItem.Id).ToListAsync();
                         if (sharedUsers != null && sharedUsers.Count > 0)
                         {
                             output.AppItem.ItemSharing = ObjectMapper.Map<List<ItemSharingDto>>(sharedUsers);
@@ -3472,6 +3454,9 @@ namespace onetouch.AppItems
 
                 if (await TryUpdateMarketplaceSharingOptions(input))
                     return;
+
+                if (!input.SyncProduct)
+                    await UpdateMarketplaceSharingLevelForItemAndChildren(input.AppItemId, input.SharingLevel);
 
                 using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
                 {
