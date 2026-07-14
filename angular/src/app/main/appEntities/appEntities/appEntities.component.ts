@@ -21,6 +21,7 @@ import { CreateOrEditAppEntityDynamicModalComponent } from '@app/app-entity-dyna
 // import { CreateOrEditAppEntityDynamicModalComponent } from '@app/app-entity-dynamic-modal/create-or-edit-app-entity-dynamic-modal/create-or-edit-app-entity-dynamic-modal.component';
 
 import { finalize } from 'rxjs/operators';
+import { BsDropdownDirective } from 'ngx-bootstrap/dropdown';
 export interface AccordionTabItem {
     id: number,
     label: string,
@@ -186,10 +187,16 @@ this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName');
         this.getAppEntities($event)
     }
 
-    createOrEditAppEntity(event,id?:number): void {
+    createOrEditAppEntity(event,id?:number, dropdown?: BsDropdownDirective): void {
         event.preventDefault();
         event.stopPropagation();
-        this.openCreateOrEditModal(id)
+        this.openCreateOrEditModal(id, dropdown)
+    }
+
+    closeActionsDropdown(dropdown?: BsDropdownDirective): void {
+        if (dropdown?.isOpen) {
+            dropdown.hide();
+        }
     }
 
     showHistory(appEntity: AppEntityDto): void {
@@ -199,7 +206,8 @@ this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName');
             entityTypeDescription: ''
         });
     }
-    deleteEntity(appEntity: AppEntityDto) {
+    deleteEntity(appEntity: AppEntityDto, dropdown?: BsDropdownDirective) {
+        this.closeActionsDropdown(dropdown);
         this.displayDeleteEntity = true;
         this.recordEntity = appEntity
     }
@@ -212,7 +220,8 @@ this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName');
             this.displayDeleteEntity = false;
         }
     }
-    deleteAppEntity(appEntity: AppEntityDto): void {
+    deleteAppEntity(appEntity: AppEntityDto, dropdown?: BsDropdownDirective): void {
+        this.closeActionsDropdown(dropdown);
         this._appEntitiesServiceProxy.delete(appEntity.id)
         .subscribe(() => {
             this.reloadPage();
@@ -250,7 +259,8 @@ this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName');
                 this._fileDownloadService.downloadTempFile(result);
             });
     }
-    openCreateOrEditModal(id?:number) : void {
+    openCreateOrEditModal(id?:number, dropdown?: BsDropdownDirective) : void {
+        this.closeActionsDropdown(dropdown);
 
         const appEntity : AppEntityDto = new AppEntityDto()
         if(id) {
@@ -265,7 +275,8 @@ this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName');
         // this.active = false
     }
 
-    setAsDefault (_item): void {
+        setAsDefault (_item, dropdown?: BsDropdownDirective): void {
+            this.closeActionsDropdown(dropdown);
       let recordEntity = _item.appEntity
                  this.showMainSpinner();
                      this._appEntitiesServiceProxy.setAsDefault(recordEntity.id,recordEntity.entityObjectTypeId)

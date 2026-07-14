@@ -113,12 +113,13 @@ namespace onetouch.AppMarketplaceItems
             if (price == null || price.Price <= 0)
                 return 0;
 
-            if (string.IsNullOrEmpty(price.CurrencyCode) || price.CurrencyCode == currencyCode)
+            var targetCurrencyCode = string.IsNullOrEmpty(currencyCode) ? "USD" : currencyCode;
+            if (string.IsNullOrEmpty(price.CurrencyCode) || price.CurrencyCode == targetCurrencyCode)
                 return price.Price;
 
             var exchangeRate = price.CurrencyCode == "USD"
                 ? usdExchangeRate
-                : _helper.SystemTables.GetExchangeRate(price.CurrencyCode, currencyCode);
+                : _helper.SystemTables.GetExchangeRate(price.CurrencyCode, targetCurrencyCode);
 
             return exchangeRate == 0 ? 0 : price.Price * exchangeRate;
         }
@@ -132,7 +133,8 @@ namespace onetouch.AppMarketplaceItems
                 .Where(x => x.Code == code && (buyerSSIN == null || x.BuyerSSIN == buyerSSIN))
                 .ToList();
 
-            var price = priceList.FirstOrDefault(x => x.CurrencyCode == currencyCode)
+            var targetCurrencyCode = string.IsNullOrEmpty(currencyCode) ? "USD" : currencyCode;
+            var price = priceList.FirstOrDefault(x => x.CurrencyCode == targetCurrencyCode)
                 ?? priceList.FirstOrDefault(x => x.CurrencyCode == "USD")
                 ?? priceList.FirstOrDefault(x => x.IsDefault)
                 ?? priceList.FirstOrDefault();
@@ -233,6 +235,7 @@ namespace onetouch.AppMarketplaceItems
                 }
 
                 input.Sorting = input.Sorting ?? "id";
+                var itemSorting = input.Sorting;
                 List<long> AppItemListDetails = new List<long>();
                 if (input.AppItemListId != null && input.AppItemListId > 0)
                 {
@@ -384,6 +387,7 @@ namespace onetouch.AppMarketplaceItems
                     .Select(a => a.Min(c => c.Id));
                 var sellerContacts = _appContactRepository.GetAll().Where(a => sellerContactIds.Contains(a.Id));
                 input.Sorting ="AppItem." +input.Sorting;
+                var rawItemSorting = "Item." + itemSorting;
                 var filteredOrderedAppItems = filteredAppItems;//.OrderBy(input.Sorting ?? "id asc")
                                                                //List<AppMarketplaceItem> filteredOrderedAppItems = null;
                                                                //I50[Start]
@@ -533,8 +537,6 @@ namespace onetouch.AppMarketplaceItems
                 {
                     appItemsList = appItemsList.Where(e => e.Selected).ToList();
                 }
-                var totalCount = await orderedItemsFilter.CountAsync(x => x.AppItem.ShowItem);
-
                 stopwatch.Stop();
                 var elapsed_time = stopwatch.ElapsedMilliseconds;
 

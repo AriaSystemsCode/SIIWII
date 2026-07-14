@@ -3233,33 +3233,7 @@ namespace onetouch.AppItems
         [AbpAuthorize(AppPermissions.Pages_AccountInfo_Publish)]
         public async Task MakeProductPrivate(long appItemId)
         {
-            using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
-            {
-
-                var appItem = await _appItemRepository.GetAll().Include(a => a.ParentFkList).AsNoTracking().FirstOrDefaultAsync(x => x.Id == appItemId);
-                if (appItem != null)
-                {
-                    var appMarketplaceItem = await _appMarketplaceItem.GetAll().Where(x => x.Code == appItem.SSIN).FirstOrDefaultAsync();
-                    if (appMarketplaceItem != null)
-                    {
-                        appMarketplaceItem.SharingLevel = 3;
-                        await _appMarketplaceItem.UpdateAsync(appMarketplaceItem);
-                    }
-                    if (appItem.ParentFkList != null && appItem.ParentFkList.Count > 0)
-                    {
-                        foreach (var child in appItem.ParentFkList)
-                        {
-                            var appMarketplaceItemChild = await _appMarketplaceItem.GetAll().Where(x => x.Code == child.SSIN).FirstOrDefaultAsync();
-                            if (appMarketplaceItemChild != null)
-                            {
-                                appMarketplaceItemChild.SharingLevel = 3;
-                                await _appMarketplaceItem.UpdateAsync(appMarketplaceItemChild);
-                            }
-                        }
-                    }
-                }
-                await CurrentUnitOfWork.SaveChangesAsync();
-            }
+            await UpdateMarketplaceSharingLevelForItemAndChildren(appItemId, 3);
         }
         [AbpAuthorize(AppPermissions.Pages_AppItems_Publish)]
         public async Task SyncProduct(long appItemId)
@@ -3305,65 +3279,124 @@ namespace onetouch.AppItems
         {
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
             {
-                var appItem = await _appItemRepository.GetAll().Include(a => a.ParentFkList).AsNoTracking().FirstOrDefaultAsync(x => x.Id == appItemId);
-                if (appItem != null)
-                {
-                    byte sharingLevel = 1;
-                    var appMarketplaceItem = await _appMarketplaceItem.GetAll().Include(x => x.ItemSharingFkList).Where(x => x.Code == appItem.SSIN).FirstOrDefaultAsync();
-                    if (appMarketplaceItem != null)
-                    {
-                        appMarketplaceItem.SharingLevel = (appMarketplaceItem.ItemSharingFkList != null && appMarketplaceItem.ItemSharingFkList.Count > 0) ? byte.Parse(2.ToString()) : byte.Parse(1.ToString());
-                        sharingLevel = appMarketplaceItem.SharingLevel;
-                        await _appMarketplaceItem.UpdateAsync(appMarketplaceItem);
-                    }
-                    if (appItem.ParentFkList != null && appItem.ParentFkList.Count > 0)
-                    {
-                        foreach (var child in appItem.ParentFkList)
-                        {
-                            var appMarketplaceItemChild = await _appMarketplaceItem.GetAll().Where(x => x.Code == child.SSIN).FirstOrDefaultAsync();
-                            if (appMarketplaceItemChild != null)
-                            {
-                                appMarketplaceItemChild.SharingLevel = sharingLevel;
-                                await _appMarketplaceItem.UpdateAsync(appMarketplaceItemChild);
-                            }
-                        }
-                    }
-                }
-                await CurrentUnitOfWork.SaveChangesAsync();
-            }
+                var parentSsin = await _appItemRepository.GetAll().AsNoTracking()
+                    .Where(x => x.Id == appItemId)
+                    .Select(x => x.SSIN)
+                    .FirstOrDefaultAsync();
 
+                if (string.IsNullOrEmpty(parentSsin))
+                    return;
+
+                var sharingLevel = await _appMarketplaceItemSharing.GetAll().AsNoTracking()
+                    .AnyAsync(x => x.AppMarketplaceItemIdFk.Code == parentSsin) ? (byte)2 : (byte)1;
+
+                await UpdateMarketplaceSharingLevelForItemAndChildren(appItemId, sharingLevel);
+            }
         }
         [AbpAuthorize(AppPermissions.Pages_AppItems_Publish)]
         public async Task HideProduct(long appItemId)
         {
+            await UpdateMarketplaceSharingLevelForItemAndChildren(appItemId, 4);
+        }
+
+        private async Task<List<string>> GetItemAndChildSsins(long appItemId)
+        {
+            var ssins = await _appItemRepository.GetAll().AsNoTracking()
+                .Where(x => x.Id == appItemId || x.ParentId == appItemId)
+                .Select(x => x.SSIN)
+                .Where(x => !string.IsNullOrEmpty(x))
+                .ToListAsync();
+
+            return ssins.Distinct().ToList();
+        }
+
+        private async Task UpdateMarketplaceSharingLevelForItemAndChildren(long appItemId, byte sharingLevel)
+        {
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
             {
-                var appItem = await _appItemRepository.GetAll().Include(a => a.ParentFkList).AsNoTracking().FirstOrDefaultAsync(x => x.Id == appItemId);
-                if (appItem != null)
+                var ssins = await GetItemAndChildSsins(appItemId);
+                if (ssins.Count == 0)
+                    return;
+
+                var appItems = await _appItemRepository.GetAll()
+                    .Where(x => x.Id == appItemId || x.ParentId == appItemId)
+                    .ToListAsync();
+
+                foreach (var appItem in appItems)
                 {
-                    var appMarketplaceItem = await _appMarketplaceItem.GetAll().Where(x => x.Code == appItem.SSIN).FirstOrDefaultAsync();
-                    if (appMarketplaceItem != null)
-                    {
-                        appMarketplaceItem.SharingLevel = 4;
-                        await _appMarketplaceItem.UpdateAsync(appMarketplaceItem);
-                    }
-                    if (appItem.ParentFkList != null && appItem.ParentFkList.Count > 0)
-                    {
-                        foreach (var child in appItem.ParentFkList)
-                        {
-                            var appMarketplaceItemChild = await _appMarketplaceItem.GetAll().Where(x => x.Code == child.SSIN).FirstOrDefaultAsync();
-                            if (appMarketplaceItemChild != null)
-                            {
-                                appMarketplaceItemChild.SharingLevel = 4;
-                                await _appMarketplaceItem.UpdateAsync(appMarketplaceItemChild);
-                            }
-                        }
-                    }
+                    appItem.SharingLevel = sharingLevel;
                 }
+
+                var marketplaceItems = await _appMarketplaceItem.GetAll()
+                    .Where(x => ssins.Contains(x.Code))
+                    .ToListAsync();
+
+                foreach (var marketplaceItem in marketplaceItems)
+                {
+                    marketplaceItem.SharingLevel = sharingLevel;
+                }
+
                 await CurrentUnitOfWork.SaveChangesAsync();
             }
-
         }
+
+        private async Task<bool> TryUpdateMarketplaceSharingOptions(SharingItemOptions input)
+        {
+            if (input.SyncProduct)
+                return false;
+
+            var sourceItem = await _appItemRepository.GetAll().AsNoTracking()
+                .Where(x => x.Id == input.AppItemId)
+                .Select(x => new { x.SSIN, x.Code, x.TenantId })
+                .FirstOrDefaultAsync();
+
+            if (sourceItem == null || string.IsNullOrEmpty(sourceItem.SSIN))
+                return false;
+
+            var marketplaceItem = await _appMarketplaceItem.GetAll().AsNoTracking()
+                .Where(x => x.Code == sourceItem.SSIN || (x.ManufacturerCode == sourceItem.Code && x.TenantOwner == sourceItem.TenantId))
+                .Select(x => new { x.Id, x.Code })
+                .FirstOrDefaultAsync();
+
+            if (marketplaceItem == null)
+                return false;
+
+            var ssins = await GetItemAndChildSsins(input.AppItemId);
+            var appItems = await _appItemRepository.GetAll()
+                .Where(x => x.Id == input.AppItemId || x.ParentId == input.AppItemId)
+                .ToListAsync();
+
+            foreach (var appItem in appItems)
+            {
+                appItem.SharingLevel = input.SharingLevel;
+            }
+
+            var marketplaceItems = await _appMarketplaceItem.GetAll()
+                .Where(x => ssins.Contains(x.Code))
+                .ToListAsync();
+
+            foreach (var item in marketplaceItems)
+            {
+                item.SharingLevel = input.SharingLevel;
+            }
+
+            await _appMarketplaceItemSharing.DeleteAsync(x => x.AppMarketplaceItemId == marketplaceItem.Id);
+            if (input.ItemSharing != null)
+            {
+                foreach (var sharingDto in input.ItemSharing)
+                {
+                    var sharing = ObjectMapper.Map<AppMarketplaceItemSharings>(sharingDto);
+                    sharing.Id = 0;
+                    sharing.AppMarketplaceItemId = marketplaceItem.Id;
+                    sharing.AppMarketplaceItemListId = null;
+                    await _appMarketplaceItemSharing.InsertAsync(sharing);
+                }
+            }
+
+            await CurrentUnitOfWork.SaveChangesAsync();
+            return true;
+        }
+
         private void MoveFile(string fileName, int? sourceTenantId, int? distinationTenantId)
         {
             if (sourceTenantId == null) sourceTenantId = -1;
@@ -3436,6 +3469,9 @@ namespace onetouch.AppItems
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
             {
                 var x = UnitOfWorkManager.Current.GetDbContext<onetouchDbContext>(null, null);
+
+                if (await TryUpdateMarketplaceSharingOptions(input))
+                    return;
 
                 using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
                 {

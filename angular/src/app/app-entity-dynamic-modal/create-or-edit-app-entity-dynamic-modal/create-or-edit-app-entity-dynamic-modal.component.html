@@ -368,8 +368,11 @@
                                                         *ngIf="extraAttr.dataType === 'string' && !extraAttr.isLookup  ">
                                                         <input (colorPickerChange)="onColorChange($event, extraAttr)"
                                                             *ngIf="extraAttr.name === 'Color HEXA Code' || extraAttr.name === 'Color HEX Code'"
-                                                            class="picker" [(colorPicker)]="extraAttr.selectedValues"  [disabled]="extraAttr?.disabled" />
-                                                    </div>
+                                                            class="picker" 
+                                                            [(colorPicker)]="extraAttr.selectedValues"
+                                                            [style.backgroundColor]="extraAttr.selectedValues"
+                                                            [disabled]="extraAttr?.disabled" />
+                                                             </div>
                                                 </div>
                                             </div>
 

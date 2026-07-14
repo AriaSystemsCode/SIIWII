@@ -520,10 +520,13 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit {
         if (this.accountDataForView?.coverUrl) this.coverPhoto = `${this.attachmentBaseUrl}/${this.accountDataForView.coverUrl}`;
     }
 
-    async getMyAccountDataForView() {
+    async getMyAccountDataForView(hideSppiner:boolean = false) {
         let id = this.appSession.user.accountId
         if (!id) return
+        if(!hideSppiner){
         this.showMainSpinner()
+
+        }
         const result = await this._AccountsServiceProxy.getAccountForView(id, 5)
             .toPromise()
             .finally(
@@ -1906,4 +1909,6 @@ showConnectionsDialog = false;
 openConnectionsDialog(): void {
   this.showConnectionsDialog = true;
 }
+
+
 }
