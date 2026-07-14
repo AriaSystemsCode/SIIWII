@@ -2746,7 +2746,7 @@ namespace onetouch.AppEntities
             string personalAccSSIN = "";
             var buisnessAccount = await _appMarketplaceContactsRepository
                 .GetAll().Where(z => z.TenantOwner == user.TenantId
-                && z.IsProfileData == true && z.ParentId == null).FirstOrDefaultAsync();
+                && z.IsProfileData == true && z.ParentId == null && z.SharingLevel==1).FirstOrDefaultAsync();
             if (buisnessAccount!=null)
             {
                 businessAccSSIN = buisnessAccount.SSIN;
