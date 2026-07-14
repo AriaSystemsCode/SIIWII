@@ -55,16 +55,16 @@
                 </div> 
                
                 <div class="lookup-record__actions" *ngIf="showActions && !item.isHostRecord">
-                    <div class="btn-group dropdown" dropdown container="body" [placement]="isArabic ? 'bottom left' : 'bottom right'">
+                    <div class="btn-group dropdown" dropdown container="body" [placement]="isArabic ? 'bottom left' : 'bottom right'" #closeDropdown="bs-dropdown">
                         <button class="dropdown-toggle btn btn-sm btn-action" dropdownToggle>
                         </button>
                         <ul id="dropdown-alignment" class="dropdown-menu dropdown-action-btn dropdown-menu-right"
                             *dropdownMenu>
                             <li>
-                                <a (click)="openCreateOrEditModal(item)">{{'Edit' | localize}}</a>
+                                <a (click)="openCreateOrEditModal(item, closeDropdown)">{{'Edit' | localize}}</a>
                             </li>
                             <li>
-                                <a (click)="deleteSycEntityObject(item,i)">{{'Delete' | localize}}</a>
+                                <a (click)="deleteSycEntityObject(item,i, closeDropdown)">{{'Delete' | localize}}</a>
                             </li>
                         </ul>
                     </div>

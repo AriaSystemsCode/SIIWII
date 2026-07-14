@@ -148,7 +148,7 @@
                                                     
                                                     <td class="lookup-table__col lookup-table__col--actions"
                                                         [hidden]="!isGrantedAny('Pages.AppEntities.Edit', 'Pages.AppEntities.Delete')">
-                                                        <div class="btn-group dropdown " dropdown container="body" insideClick="false">
+                                                        <div class="btn-group dropdown " dropdown container="body" insideClick="false" #closeDropdown="bs-dropdown">
 
                                                             <button class="dropdown-toggle btn btn-sm btn-action"
                                                                 dropdownToggle>
@@ -161,15 +161,15 @@
                                                                 <li>
                                                                     <a href="javascript:;"
                                                                         *ngIf="permission.isGranted('Pages.AppEntities.Edit')"
-                                                                        (click)="createOrEditAppEntity($event,record.appEntity.id)">{{l('Edit')}}</a>
+                                                                        (click)="createOrEditAppEntity($event,record.appEntity.id, closeDropdown)">{{l('Edit')}}</a>
                                                                 </li>
                                                                 <li>
                                                                     <a href="javascript:;"
                                                                         *ngIf="permission.isGranted('Pages.AppEntities.Delete')"
-                                                                        (click)="deleteAppEntity(record.appEntity)">{{l('Delete')}}</a>
+                                                                        (click)="deleteAppEntity(record.appEntity, closeDropdown)">{{l('Delete')}}</a>
                                                                 </li>
                             <li>
-                                <a href="javascript:;"  *ngIf="permission.isGranted('Pages.AppEntities.Edit') && !record.appEntity.isDefault" (click)="setAsDefault(record)">Set as default</a>
+                                <a href="javascript:;"  *ngIf="permission.isGranted('Pages.AppEntities.Edit') && !record.appEntity.isDefault" (click)="setAsDefault(record, closeDropdown)">Set as default</a>
                             </li>
                                                                 <li>
                                                                     <a href="javascript:;" *ngIf="entityHistoryEnabled"
@@ -336,7 +336,7 @@
                                                         <td class="lookup-table__col lookup-table__col--actions"
                                                             [hidden]="!isGrantedAny('Pages.AppEntities.Edit', 'Pages.AppEntities.Delete')">
                                                             <ng-container *ngIf="(appSession.tenantId == null  && record.appEntity.isHostRecord) || (appSession.tenantId != null && !record.appEntity.isHostRecord)">
-                                                                <div  class="btn-group dropdown " dropdown container="body"  >
+                                                                <div  class="btn-group dropdown " dropdown container="body" #closeDropdown="bs-dropdown" >
 
                                                                     <button
                                                                         class="dropdown-toggle btn btn-sm btn-action"
@@ -350,7 +350,7 @@
                                                                         <li>
                                                                             <a href="javascript:;"
                                                                                 *ngIf="permission.isGranted('Pages.AppEntities.Edit')"
-                                                                                (click)="createOrEditAppEntity($event,record.appEntity.id)">{{l('Edit')}}</a>
+                                                                                (click)="createOrEditAppEntity($event,record.appEntity.id, closeDropdown)">{{l('Edit')}}</a>
                                                                         </li>
                                                                         <!-- <li>
                                                                             <a href="javascript:;"
@@ -360,10 +360,10 @@
                                                                         <li>
                                                                             <a href="javascript:;"
                                                                                 *ngIf="permission.isGranted('Pages.AppEntities.Delete')"
-                                                                                (click)="deleteEntity(record.appEntity)">{{l('Delete')}}</a>
+                                                                                (click)="deleteEntity(record.appEntity, closeDropdown)">{{l('Delete')}}</a>
                                                                         </li>
                                                                         <li>
-                                                                            <a href="javascript:;"  *ngIf="permission.isGranted('Pages.AppEntities.Edit') && !record.appEntity.isDefault" (click)="setAsDefault(record)">Set as default</a>
+                                                                            <a href="javascript:;"  *ngIf="permission.isGranted('Pages.AppEntities.Edit') && !record.appEntity.isDefault" (click)="setAsDefault(record, closeDropdown)">Set as default</a>
                                                                         </li>
                                                                         <li>
                                                                             <a href="javascript:;"
