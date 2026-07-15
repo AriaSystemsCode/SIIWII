@@ -814,6 +814,24 @@ namespace onetouch.Message
             }
         }
         [AbpAllowAnonymous]
+        bool IsFileReady(string path)
+        {
+            try
+            {
+                using var stream = new FileStream(
+                    path,
+                    FileMode.Open,
+                    FileAccess.Read,
+                    FileShare.None);
+
+                return true;
+            }
+            catch (IOException)
+            {
+                return false;
+            }
+        }
+        [AbpAllowAnonymous]
         public async Task<List<GetMessagesForViewDto>> CreateMessage(CreateMessageInput input)
         {
             if (input.EntityAttachments != null && input.EntityAttachments.Count > 0)
@@ -836,7 +854,7 @@ namespace onetouch.Message
                                 filename = attch.guid + (extension == "" ? "" : "." + extension);
                             }
                             var fileToAttach = path + @"\" + filename;
-                            if (!System.IO.File.Exists(fileToAttach))
+                            if (!System.IO.File.Exists(fileToAttach) || !IsFileReady(fileToAttach))
                             {
                                 existingFile = existingFile && false;
                             }

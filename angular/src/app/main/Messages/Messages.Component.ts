@@ -78,6 +78,8 @@ selectedMessageAfterRefresh: number | null = null;
 
   currentLang:string
   isArabic:boolean
+
+  selectedEntityObjectTypeCode: string | null = null;
     constructor(
         injector: Injector,
         private _downloadService: FileDownloadService,
@@ -415,6 +417,8 @@ getPrimaryMessage(event) {
  
       
     selectMessage(message: MessagesDto): void {
+          this.selectedEntityObjectTypeCode =
+        message?.entityObjectTypeCode?.toUpperCase() || null;
         this.showMainSpinner();
         this.showSideBar=false;
         this.showHideSideBarTitle = !this.showSideBar ? this.l("ShowData")  : this.l("HideData") ;
@@ -663,6 +667,14 @@ refreshSelectedMessage(): void {
     }
 
     this.selectMessage(selectedMessage);
+}
+
+get selectedThreadIsComment(): boolean {
+    return this.selectedEntityObjectTypeCode === 'COMMENT';
+}
+
+get selectedThreadIsMessage(): boolean {
+    return this.selectedEntityObjectTypeCode !== 'COMMENT';
 }
     ngOnDestroy() {
       
