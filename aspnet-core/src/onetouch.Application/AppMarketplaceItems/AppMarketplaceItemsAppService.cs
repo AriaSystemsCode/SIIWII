@@ -113,7 +113,9 @@ namespace onetouch.AppMarketplaceItems
                 return 0;
 
             var targetCurrencyCode = string.IsNullOrEmpty(currencyCode) ? "USD" : currencyCode;
-            var effectiveSourceCurrencyCode = string.IsNullOrEmpty(price.CurrencyCode) ? sourceCurrencyCode : price.CurrencyCode;
+            // Marketplace MSRP rows can contain the buyer currency after publishing. The
+            // seller tenant currency is the authoritative currency of the base MSRP.
+            var effectiveSourceCurrencyCode = string.IsNullOrEmpty(sourceCurrencyCode) ? price.CurrencyCode : sourceCurrencyCode;
             if (string.IsNullOrEmpty(effectiveSourceCurrencyCode) || effectiveSourceCurrencyCode == targetCurrencyCode)
                 return price.Price;
 
@@ -131,6 +133,8 @@ namespace onetouch.AppMarketplaceItems
 
             var priceList = prices
                 .Where(x => x.Code == code && (buyerSSIN == null ? string.IsNullOrEmpty(x.BuyerSSIN) : x.BuyerSSIN == buyerSSIN))
+                .OrderByDescending(x => x.IsDefault)
+                .ThenByDescending(x => x.Id)
                 .ToList();
 
             var targetCurrencyCode = string.IsNullOrEmpty(currencyCode) ? "USD" : currencyCode;
@@ -141,7 +145,11 @@ namespace onetouch.AppMarketplaceItems
                 ?? priceList.FirstOrDefault(x => x.CurrencyCode == "USD")
                 ?? priceList.FirstOrDefault();
 
-                        var resolvedPrice = ConvertMarketplacePrice(price, currencyCode, usdExchangeRate, sourceCurrencyCode);
+            var resolvedPrice = ConvertMarketplacePrice(
+                price,
+                currencyCode,
+                usdExchangeRate,
+                string.Equals(code, "MSRP", StringComparison.OrdinalIgnoreCase) ? sourceCurrencyCode : null);
             if (!string.IsNullOrEmpty(debugLabel) && debugLabel.Contains("DONNA", StringComparison.OrdinalIgnoreCase))
             {
                 var priceRows = string.Join(" | ", priceList.Select(x => $"Id={x.Id},Code={x.Code},Price={x.Price},Currency={x.CurrencyCode},IsDefault={x.IsDefault},Buyer={x.BuyerSSIN}"));
@@ -818,7 +826,8 @@ namespace onetouch.AppMarketplaceItems
                         var output = new GetAppMarketplaceItemDetailForViewDto { AppItem = ObjectMapper.Map<AppMarketplaceItemForViewDto>(appItem) };
                         var sellerCurrencyCode = await _appContactRepository.GetAll()
                             .AsNoTracking()
-                            .Where(a => a.TenantId == appItem.TenantOwner && a.IsProfileData && a.ParentId == null && a.PartnerId == null && a.AccountId == null)
+                            .Where(a => a.TenantId == appItem.TenantOwner && a.IsProfileData && a.ParentId == null && a.PartnerId == null)
+                            .OrderBy(a => a.Id)
                             .Select(a => a.CurrencyFk != null ? a.CurrencyFk.Code : a.CurrencyCode)
                             .FirstOrDefaultAsync();
                         //
