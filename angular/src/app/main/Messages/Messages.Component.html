@@ -792,7 +792,13 @@ margin-right: 6px;"></i>
                             <br />
 
                         </div>
-                        <div class="btns-replay" *ngIf="messageCategoryFilter!=='MENTION' && messageCategoryFilter!=='THREAD'">
+                        <div class="btns-replay" *ngIf="
+        messageCategoryFilter === 'MESSAGE' ||
+        (
+            messageCategoryFilter === 'THREAD' &&
+            selectedThreadIsMessage
+        )
+    ">
                             <button (click)="onReplyMessage($event)" class="ReplyBtn btn ">
                                 <i class="fa fa-reply"></i>
                                 <span> {{ "Reply" | localize }}</span>
@@ -810,7 +816,13 @@ margin-right: 6px;"></i>
                                     }}</span>
                             </button>
                         </div>
-                        <app-add-comment [hidden]="messageCategoryFilter!=='MENTION' && messageCategoryFilter!=='THREAD'" [cartStyle]="true"
+                        <app-add-comment  *ngIf="
+        (
+            messageCategoryFilter === 'THREAD' ||
+            messageCategoryFilter === 'MENTION'
+        ) &&
+        selectedThreadIsComment
+    " [cartStyle]="true"
                             (saveDone)="newCommentAddedHandler($event)"
                             [relatedEntityId]="messagesDetails[0]?.messages?.entityId" #AddCommentComponent>
                         </app-add-comment>
@@ -1011,7 +1023,13 @@ margin-right: 6px;"></i>
 
 
 
-                    <div class="btns-replay" *ngIf="messageCategoryFilter!=='MENTION' && messageCategoryFilter!=='THREAD'">
+                    <div class="btns-replay" *ngIf="
+        messageCategoryFilter === 'MESSAGE' ||
+        (
+            messageCategoryFilter === 'THREAD' &&
+            selectedThreadIsMessage
+        )
+    ">
                         <button (click)="onReplyMessage($event)" class="ReplyBtn btn ">
                             <i class="fa fa-reply"></i>
                             <span> {{ "Reply" | localize }}</span>
@@ -1029,7 +1047,13 @@ margin-right: 6px;"></i>
                                 }}</span>
                         </button>
                     </div>
-                    <app-add-comment [hidden]="messageCategoryFilter!=='MENTION' && messageCategoryFilter!=='THREAD'" [cartStyle]="true"
+                    <app-add-comment  *ngIf="
+        (
+            messageCategoryFilter === 'THREAD' ||
+            messageCategoryFilter === 'MENTION'
+        ) &&
+        selectedThreadIsComment
+    " [cartStyle]="true"
                         (saveDone)="newCommentAddedHandler($event)"
                         [relatedEntityId]="messagesDetails[0]?.messages?.entityId" #AddCommentComponent>
                     </app-add-comment>
@@ -1343,7 +1367,13 @@ margin-right: 6px;"></i>
 
 
 
-                    <div class="btns-replay" *ngIf="messageCategoryFilter!=='MENTION' && messageCategoryFilter!=='THREAD'">
+                    <div class="btns-replay" *ngIf="
+        messageCategoryFilter === 'MESSAGE' ||
+        (
+            messageCategoryFilter === 'THREAD' &&
+            selectedThreadIsMessage
+        )
+    ">
                         <button (click)="onReplyMessage($event)" class="ReplyBtn btn ">
                             <i class="fa fa-reply"></i>
                             <span> {{ "Reply" | localize }}</span>
@@ -1361,7 +1391,13 @@ margin-right: 6px;"></i>
                                 }}</span>
                         </button>
                     </div>
-                    <app-add-comment [hidden]="messageCategoryFilter!=='MENTION' && messageCategoryFilter!=='THREAD'" [cartStyle]="true"
+                    <app-add-comment  *ngIf="
+        (
+            messageCategoryFilter === 'THREAD' ||
+            messageCategoryFilter === 'MENTION'
+        ) &&
+        selectedThreadIsComment
+    " [cartStyle]="true"
                         (saveDone)="newCommentAddedHandler($event)"
                         [relatedEntityId]="messagesDetails[0]?.messages?.entityId" #AddCommentComponent>
                     </app-add-comment>
