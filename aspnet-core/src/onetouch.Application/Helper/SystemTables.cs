@@ -566,27 +566,35 @@ namespace onetouch.Helpers
             return obj.Id;
         }
         //MMT33-3[Start]
-        public decimal GetExchangeRate(string fromCurrencyCode,string toCurrencyCode)
-        { 
-            decimal returnVal = 0;
-            onetouch.SycCurrencyExchangeRates.SycCurrencyExchangeRates sourceCurrency = null;
-            if (fromCurrencyCode != "USD")
+        public decimal GetExchangeRate(string fromCurrencyCode, string toCurrencyCode)
+        {
+            if (string.IsNullOrEmpty(fromCurrencyCode) || string.IsNullOrEmpty(toCurrencyCode))
+                return 0;
+
+            if (string.Equals(fromCurrencyCode, toCurrencyCode, StringComparison.OrdinalIgnoreCase))
+                return 1;
+
+            if (string.Equals(fromCurrencyCode, "USD", StringComparison.OrdinalIgnoreCase))
             {
-                sourceCurrency = _sycCurrencyExchangeRate.GetAll().FirstOrDefault(x => x.CurrencyCode == fromCurrencyCode);
-                if (sourceCurrency !=null && sourceCurrency.ExchangeRate != 0)
-                returnVal = 1 / sourceCurrency.ExchangeRate;
+                var targetCurrency = _sycCurrencyExchangeRate.GetAll()
+                    .FirstOrDefault(x => x.CurrencyCode == toCurrencyCode);
+                return targetCurrency?.ExchangeRate ?? 0;
             }
-            var toCurrency = _sycCurrencyExchangeRate.GetAll().FirstOrDefault(x => x.CurrencyCode == toCurrencyCode);
-            if (toCurrency != null)
-            {
-                if (fromCurrencyCode == "USD")
-                    return toCurrency.ExchangeRate;
-                else
-                {
-                    returnVal *= toCurrency.ExchangeRate;
-                }
-            }
-            return returnVal;
+
+            var sourceCurrency = _sycCurrencyExchangeRate.GetAll()
+                .FirstOrDefault(x => x.CurrencyCode == fromCurrencyCode);
+            if (sourceCurrency == null || sourceCurrency.ExchangeRate == 0)
+                return 0;
+
+            if (string.Equals(toCurrencyCode, "USD", StringComparison.OrdinalIgnoreCase))
+                return 1 / sourceCurrency.ExchangeRate;
+
+            var crossTargetCurrency = _sycCurrencyExchangeRate.GetAll()
+                .FirstOrDefault(x => x.CurrencyCode == toCurrencyCode);
+            if (crossTargetCurrency == null)
+                return 0;
+
+            return crossTargetCurrency.ExchangeRate / sourceCurrency.ExchangeRate;
         }
         //MMT33-3[End]
         //MMT30[Start]
