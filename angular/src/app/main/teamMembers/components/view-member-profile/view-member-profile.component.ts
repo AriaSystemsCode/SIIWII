@@ -264,8 +264,9 @@ export class ViewMemberProfileComponent extends AppComponentBase implements OnIn
     const userId = Number(rawId);
 
     if (Number.isNaN(userId) || userId <= 0) {
-      this.message.error('Invalid linked user id: ' + rawId);
-      return;
+      // this.message.error('Invalid linked user id: ' + rawId);
+      // return;
+      this.CreateUserName()
     }
 
     this.createOrEditUserModal.user = new UserEditDto();

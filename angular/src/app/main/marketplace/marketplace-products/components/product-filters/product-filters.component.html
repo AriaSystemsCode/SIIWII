@@ -38,19 +38,16 @@
                 <div class="card flex justify-content-start">
                     <p-tree [styleClass]="selectedFile?.length >0 ? 'bgAdd' : ''"
                         [ngClass]="selectedFile?.length >0 ? 'bgAdd' : ''" class="w-full md:w-30rem" [value]="files" 
-                        (onNodeExpand)="nodeExpand($event)" [loading]="loading" selectionMode="single"
+                        (onNodeExpand)="nodeExpand($event)" [loading]="loading" selectionMode="checkbox"
                         (onNodeSelect)="nodeSelect($event)" (onNodeUnselect)="nodeUnselect($event)"
                         [(selection)]="selectedFile">
-                    <!-- E-SII-20250507.0050 -->
                     <ng-template let-node pTemplate="default">
-                        <span>{{ node.label }}<ng-container *ngIf="node?.resultCount != null"> ({{ node?.resultCount
-                                }})</ng-container></span>
+                        <span>{{ node.label }}</span>
                     </ng-template>
-                    <!-- E-SII-20250507.0050 -->
                     </p-tree>
                 </div>
                 <div class="d-flex justify-content-end my-2 mx-4">
-                    <a (click)="handledeDratmentsTreeSelections.emit(null);selectedFile=''" class="clrBtn"> {{'ClearFilter' | localize}}</a>
+                    <a (click)="selectedFile=[]; handledeDratmentsTreeSelections.emit([])" class="clrBtn"> {{'ClearFilter' | localize}}</a>
                 </div>
             </p-accordionTab>
 
@@ -82,7 +79,7 @@
                         class="w-full md:w-30rem"
                         [value]="categories"
                         [loading]="loading"
-                        selectionMode="single"
+                        selectionMode="checkbox"
                         [(selection)]="selectedCatFile"
                         (onNodeExpand)="nodeCatExpand($event)"
                         (onNodeSelect)="nodeCatSelect($event)"
@@ -92,7 +89,7 @@
                   
                     <div class="d-flex justify-content-end my-2 mx-4">
                       <a
-                        (click)="selectedCatFile = ''; handleCategoriesTreeSelections.emit(null)"
+                        (click)="selectedCatFile = []; handleCategoriesTreeSelections.emit([])"
                         class="clrBtn"
                         >{{'ClearFilter' | localize}}</a
                       >
