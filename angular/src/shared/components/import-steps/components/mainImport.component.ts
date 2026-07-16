@@ -237,7 +237,7 @@ export class MainImportComponent
                 continue;
 
             const isSheet = file.type.includes("sheet") ||  file.type.includes("text/csv");
-            const isImage =   file.type.includes("image")
+            const isImage = file.type.includes("image") || this.isSupportedImportImage(file.name);
             if (isSheet && (this.importType !== ImportTypes.Items || this.imData)) {   
                 hasExcelFile = true;
                 this.uploader.addToQueue(new Array<File>(file));
@@ -248,8 +248,7 @@ export class MainImportComponent
                 hasImageFile = true;
                 if (file.type.includes("image") && this.hasImages) {
                     totalImageFiles++;
-                    if (this._importService.checkImageValidExt(file.name, this.sycAttachmentCategory, "IMPORT") 
-                    ||  this._importService.checkImageValidExt(file.name, this.sycAttachmentCategory, "IMAGE")  ) {
+                    if (this.isSupportedImportImage(file.name)) {
                         this.imagesName.push(file.name.toUpperCase());
                         var imgFile = new ImageFile();
                         imgFile.file = file;
@@ -433,6 +432,11 @@ export class MainImportComponent
             this.ProgressDetail ="Uploading the files that you want to import";
         }
 
+    }
+
+    private isSupportedImportImage(fileName: string): boolean {
+        const extension = fileName?.split('.').pop()?.toLowerCase();
+        return extension === 'jpg' || extension === 'jpeg' || extension === 'png';
     }
 
     ontotalFailedRecords($event) {
@@ -639,17 +643,26 @@ export class MainImportComponent
             );
     }
 
-    onLoadMoreValidateExcelRecords($event: { skipCount: number; maxResultCount: number }) {
+    onLoadMoreValidateExcelRecords($event: { skipCount: number; maxResultCount: number; recordType: string }) {
         if (!this.uploadingResult?.resultKey || !this.importServiceProxy?.getValidateExcelResultPage) {
             this.StatusModal.loadingMoreRecords = false;
             return;
         }
 
         this.importServiceProxy
-            .getValidateExcelResultPage(this.uploadingResult.resultKey, $event.skipCount, $event.maxResultCount)
+            .getValidateExcelResultPage(
+                this.uploadingResult.resultKey,
+                $event.skipCount,
+                $event.maxResultCount,
+                $event.recordType
+            )
             .subscribe(
                 (result) => {
-                    this.StatusModal.appendRecords(result?.excelRecords || []);
+                    this.StatusModal.appendRecords(
+                        result?.excelRecords || [],
+                        result?.totalDisplayRecords,
+                        $event.recordType
+                    );
                 },
                 () => {
                     this.StatusModal.loadingMoreRecords = false;

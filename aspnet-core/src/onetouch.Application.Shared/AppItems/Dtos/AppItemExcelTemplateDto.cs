@@ -187,6 +187,8 @@ namespace onetouch.AppItems.Dtos
     
     public class AppItemtExcelRecordDTO
     {
+        public int RecordIndex { get; set; }
+
         public string RecordType { get; set; }
 
         public string ParentCode { get; set; }

@@ -201,6 +201,8 @@ export class MarketplaceProductsComponent
                 this.sellerSSinSetting = (res as any)?.value ?? (res as any) ?? null;
 
                 this.route.queryParamMap.subscribe((params) => {
+
+                    // merege
                     const q = params.get('q');
                     if (q !== null) this.searchInput = q;
 

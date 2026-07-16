@@ -5096,17 +5096,27 @@ namespace onetouch.AppItems
                 .ToList();
 
 
+            var uploadedImageNames = imagesList
+                .Where(img => !string.IsNullOrWhiteSpace(img))
+                .Select(img => img.Trim())
+                .ToHashSet(StringComparer.OrdinalIgnoreCase);
+
             var usedImageNames = imageUsages
-                .Select(x => x.ImageFileName)
-                .Distinct()
-                .ToHashSet();
+                .Select(x => x.ImageFileName.Trim())
+                .ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+            // An Excel image reference is not a successfully uploaded image unless
+            // the corresponding file is also present in the selected folder.
+            var uploadedImageUsages = imageUsages
+                .Where(x => uploadedImageNames.Contains(x.ImageFileName.Trim()))
+                .ToList();
 
             var uniqueImageFileNamesNotUsed = imagesList
                 .Where(img => !string.IsNullOrWhiteSpace(img))
                 .Where(img => !usedImageNames.Contains(img))
                 .ToList();
 
-            foreach (var img in imageUsages)
+            foreach (var img in uploadedImageUsages)
             {//add line to each image into the excel dto(s) to return to FE
                 AppItemtExcelRecordDTO appItemExcelRecordDto = new AppItemtExcelRecordDTO();
 
@@ -5245,7 +5255,7 @@ namespace onetouch.AppItems
             return result;
         }
 
-        private AppItemExcelResultsDTO CreateValidateExcelPagedResult(AppItemExcelResultsDTO fullResult, string resultKey, int skipCount, int maxResultCount)
+        private AppItemExcelResultsDTO CreateValidateExcelPagedResult(AppItemExcelResultsDTO fullResult, string resultKey, int skipCount, int maxResultCount, string recordType = null)
         {
             skipCount = Math.Max(0, skipCount);
             maxResultCount = maxResultCount <= 0
@@ -5253,6 +5263,15 @@ namespace onetouch.AppItems
                 : Math.Min(maxResultCount, ValidateExcelDefaultPageSize);
 
             var fullRecords = fullResult.ExcelRecords ?? new List<AppItemtExcelRecordDTO>();
+            for (var index = 0; index < fullRecords.Count; index++)
+                fullRecords[index].RecordIndex = index;
+
+            var displayRecords = string.Equals(recordType, "Image", StringComparison.OrdinalIgnoreCase)
+                ? fullRecords.Where(x => string.Equals(x?.RecordType, "Image", StringComparison.OrdinalIgnoreCase)).ToList()
+                : string.Equals(recordType, "Data", StringComparison.OrdinalIgnoreCase)
+                    ? fullRecords.Where(x => !string.Equals(x?.RecordType, "Image", StringComparison.OrdinalIgnoreCase)).ToList()
+                    : fullRecords;
+
             return new AppItemExcelResultsDTO
             {
                 ExcelLogDTO = fullResult.ExcelLogDTO,
@@ -5265,7 +5284,7 @@ namespace onetouch.AppItems
                 TotalPassedRecords = fullResult.TotalPassedRecords,
                 TotalFailedRecords = fullResult.TotalFailedRecords,
                 RepreateHandler = fullResult.RepreateHandler,
-                ExcelRecords = fullRecords.Skip(skipCount).Take(maxResultCount).ToList(),
+                ExcelRecords = displayRecords.Skip(skipCount).Take(maxResultCount).ToList(),
                 FilePath = fullResult.FilePath,
                 ErrorMessage = fullResult.ErrorMessage,
                 HasDuplication = fullResult.HasDuplication,
@@ -5273,7 +5292,7 @@ namespace onetouch.AppItems
                 IsPagedResult = true,
                 PageSkipCount = skipCount,
                 PageMaxResultCount = maxResultCount,
-                TotalDisplayRecords = fullRecords.Count
+                TotalDisplayRecords = displayRecords.Count
             };
         }
 
@@ -5295,12 +5314,17 @@ namespace onetouch.AppItems
                     !string.IsNullOrWhiteSpace(changedRecord?.ExcelDto?.ImagePreview))
                 {
                     var changedImageFileName = Path.GetFileName(changedRecord.ExcelDto.ImagePreview);
-                    fullRecord = fullResult.ExcelRecords.FirstOrDefault(x =>
+                    var matchingImageRecords = fullResult.ExcelRecords.Where(x =>
                         string.Equals(x?.RecordType, "Image", StringComparison.OrdinalIgnoreCase) &&
                         string.Equals(
                             Path.GetFileName(x?.ExcelDto?.ImagePreview),
                             changedImageFileName,
-                            StringComparison.OrdinalIgnoreCase));
+                            StringComparison.OrdinalIgnoreCase))
+                        .ToList();
+
+                    fullRecord = matchingImageRecords.FirstOrDefault(x =>
+                        string.Equals(x?.Code, changedRecord?.Code, StringComparison.OrdinalIgnoreCase))
+                        ?? (matchingImageRecords.Count == 1 ? matchingImageRecords[0] : null);
                 }
                 else
                 {
@@ -5321,10 +5345,10 @@ namespace onetouch.AppItems
             }
         }
 
-        public async Task<AppItemExcelResultsDTO> GetValidateExcelResultPage(string resultKey, int skipCount, int maxResultCount)
+        public async Task<AppItemExcelResultsDTO> GetValidateExcelResultPage(string resultKey, int skipCount, int maxResultCount, string recordType = null)
         {
             var fullResult = await LoadValidateExcelResultJson(resultKey);
-            return CreateValidateExcelPagedResult(fullResult, resultKey, skipCount, maxResultCount);
+            return CreateValidateExcelPagedResult(fullResult, resultKey, skipCount, maxResultCount, recordType);
         }
 
         public async Task<AppItemExcelResultsDTO> ValidatePriceCSV(string guidFile, string[] imagesList)

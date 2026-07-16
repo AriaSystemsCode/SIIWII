@@ -757,10 +757,10 @@
                                                   type="checkbox" 
                                                   class="mr-2 ml-2" 
                                                   [checked]="
-                                                    activeAttachmentOption?.entityAttachments[getAttachRealIndex(i)]?.isPublic ||
+                                                                                                        activeAttachmentOption?.entityAttachments[getAttachRealIndex(i)]?.isPublic !== false ||
                                                     activeAttachmentOption.defaultImageIndex == i
                                                   "
-                                                  (change)="setVisibleinMarketplaceImage(getAttachRealIndex(i))"
+                                                                                                    (change)="setVisibleinMarketplaceImage(getAttachRealIndex(i), $event.target.checked)"
                                                 />
                                                 {{ 'Visible in Marketplace' | localize }}
                                               </label>
