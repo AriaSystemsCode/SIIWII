@@ -263,6 +263,7 @@ export class SelectCategoriesDynamicModalComponent
             this.isDepartment,
             this.entityId,    
             [],               
+            false,     
             undefined,     
             this.sortBy,     
             this.skipCount,

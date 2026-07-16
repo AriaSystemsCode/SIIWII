@@ -59,10 +59,8 @@
         </div>
 
         <div *ngIf="importType == ImportTypes.Items">
-          <ng-container *ngIf="records?.length > 0; else noData">
-
-            <!-- Tabs -->
-            <ul class="tabs no-gutters d-flex justify-content-center">
+          <!-- Keep selected import tabs visible even when their records are on a later page. -->
+          <ul class="tabs no-gutters d-flex justify-content-center">
               <li
                 *ngIf="hasImageRecords"
                 [class.active]="activeRecordType === 'Image'"
@@ -78,8 +76,9 @@
                 class="tab-item text-center py-2">
                 Product Data
               </li>
-            </ul>
-            
+          </ul>
+
+          <ng-container *ngIf="records?.length > 0; else noData">
 
             <div class="table-scroll-container" #tableScrollContainer (scroll)="onRecordsScroll($event)">
               <table class="browser-table min-width-table">
@@ -518,12 +517,12 @@
         </div>
         <ng-template #noData>
           <div class="text-center text-muted py-5">
-            <ng-container *ngIf="!hasDataRecords || this.importType != ImportTypes.Items ">
-              No Data Records
+            <ng-container *ngIf="loadingMoreRecords; else emptyRecords">
+              Loading {{ activeRecordType === 'Image' ? 'Image' : 'Data' }} Records...
             </ng-container>
-            <ng-container *ngIf="!hasImageRecords &&  this.importType == ImportTypes.Items">
-              No Image Records
-            </ng-container>
+            <ng-template #emptyRecords>
+              No {{ activeRecordType === 'Image' ? 'Image' : 'Data' }} Records
+            </ng-template>
           </div>
         </ng-template>
 
