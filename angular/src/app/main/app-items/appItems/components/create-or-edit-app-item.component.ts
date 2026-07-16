@@ -1424,7 +1424,7 @@ export class CreateOrEditAppItemComponent
         att.fileName = file?.name;
         att.attachmentCategoryId = attachmentCategory.sycAttachmentCategory.id;
         att.guid = guid;
-        att.isPublic=false;
+        att.isPublic = true;
         const tempFile = guid + file.name.match(/\.[0-9a-z]+$/i)[0];
         this.addTempAttachments([    
 
@@ -1490,6 +1490,8 @@ export class CreateOrEditAppItemComponent
         this.defaultImageIndex = index;
         this.appItem.entityAttachments.map((item, i) => {
             item.isDefault = index == i ? true : false;
+            if (item.isDefault)
+                item.isPublic = true;
             return item;
         });
     }
@@ -2098,11 +2100,13 @@ export class CreateOrEditAppItemComponent
         return inputvalue;
     }
 
-    setVisibleinMarketplaceImage(index) {
+    setVisibleinMarketplaceImage(index, isChecked: boolean) {
+        if (this.defaultImageIndex === index)
+            return;
         this.formTouched = true;
         this.appItem.entityAttachments?.map((item, i) => {
             if (index == i) {
-                item.isPublic = !item.isPublic;
+                item.isPublic = isChecked;
                 return item;
             }
         });
