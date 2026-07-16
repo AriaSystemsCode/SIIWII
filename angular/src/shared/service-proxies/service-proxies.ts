@@ -15453,9 +15453,10 @@ export class AppItemsServiceProxy {
      * @param resultKey (optional) 
      * @param skipCount (optional) 
      * @param maxResultCount (optional) 
+     * @param recordType (optional)
      * @return Success
      */
-    getValidateExcelResultPage(resultKey: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<AppItemExcelResultsDTO> {
+    getValidateExcelResultPage(resultKey: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined, recordType: string | null | undefined = undefined): Observable<AppItemExcelResultsDTO> {
         let url_ = this.baseUrl + "/api/services/app/AppItems/GetValidateExcelResultPage?";
         if (resultKey !== undefined && resultKey !== null)
             url_ += "resultKey=" + encodeURIComponent("" + resultKey) + "&";
@@ -15467,6 +15468,8 @@ export class AppItemsServiceProxy {
             throw new Error("The parameter 'maxResultCount' cannot be null.");
         else if (maxResultCount !== undefined)
             url_ += "maxResultCount=" + encodeURIComponent("" + maxResultCount) + "&";
+        if (recordType !== undefined && recordType !== null)
+            url_ += "recordType=" + encodeURIComponent("" + recordType) + "&";
         url_ = url_.replace(/[?&]$/, "");
 
         let options_ : any = {
@@ -83628,6 +83631,7 @@ export interface IAppItemExcelDto {
 }
 
 export class AppItemtExcelRecordDTO implements IAppItemtExcelRecordDTO {
+    recordIndex!: number;
     recordType!: string | undefined;
     parentCode!: string | undefined;
     code!: string | undefined;
@@ -83656,6 +83660,7 @@ export class AppItemtExcelRecordDTO implements IAppItemtExcelRecordDTO {
                 if (_data.hasOwnProperty(property))
                     this[property] = _data[property];
             }
+            this.recordIndex = _data["recordIndex"];
             this.recordType = _data["recordType"];
             this.parentCode = _data["parentCode"];
             this.code = _data["code"];
@@ -83686,6 +83691,7 @@ export class AppItemtExcelRecordDTO implements IAppItemtExcelRecordDTO {
             if (this.hasOwnProperty(property))
                 data[property] = this[property];
         }
+        data["recordIndex"] = this.recordIndex;
         data["recordType"] = this.recordType;
         data["parentCode"] = this.parentCode;
         data["code"] = this.code;
@@ -83705,6 +83711,7 @@ export class AppItemtExcelRecordDTO implements IAppItemtExcelRecordDTO {
 }
 
 export interface IAppItemtExcelRecordDTO {
+    recordIndex: number;
     recordType: string | undefined;
     parentCode: string | undefined;
     code: string | undefined;
