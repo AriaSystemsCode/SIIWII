@@ -56,6 +56,7 @@ using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Threading.Tasks;
 using System.Timers;
+using System.Transactions;
 using System.Xml.Serialization;
 using ExtraAttribute = onetouch.AppItems.Dtos.ExtraAttribute;
 using onetouch.AppMarketplaceItems;
@@ -3405,34 +3406,50 @@ namespace onetouch.AppItems
         [AbpAuthorize(AppPermissions.Pages_AppItems_Publish)]
         public async Task<long> ShareSelectedProducts(Guid key)
         {
-
             long returnCount = 0;
             var apptemSelector = from o in _appItemSelectorRepository.GetAll().Where(e => e.Key == key)
                                  join i in _appItemRepository.GetAll() on o.SelectedId equals i.Id into j
                                  from j1 in j
                                  select new { item = j1 };
 
-            var selectedItems = apptemSelector.ToList(); //3194a542-2d03-13c2-82f3-6914504839dd
-            if (selectedItems != null && selectedItems.Count > 0)
-            {
-                using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
-                {
+            var selectedItems = await apptemSelector
+                .AsNoTracking()
+                .ToListAsync(); //3194a542-2d03-13c2-82f3-6914504839dd
 
-                    foreach (var itm in selectedItems)
+            if (selectedItems.Count > 0)
+            {
+                foreach (var itm in selectedItems)
+                {
+                    if (string.IsNullOrEmpty(itm.item.SSIN))
+                        continue;
+
+                    try
                     {
-                        if (itm.item.SSIN == null)
-                            continue;
-                        var sharedItem = await _appMarketplaceItem.GetAll().Where(z => z.SSIN == itm.item.SSIN).FirstOrDefaultAsync();
-                        if (sharedItem == null)
+                        // Keep every product in an independent transaction. A constraint or
+                        // data failure rolls back only this product and does not poison the
+                        // DbContext used for the remaining selection.
+                        using (var itemUnitOfWork = UnitOfWorkManager.Begin(TransactionScopeOption.RequiresNew))
                         {
-                            returnCount++;
-                            SharingItemOptions shareOp = new SharingItemOptions();
-                            shareOp.AppItemId = itm.item.Id;
-                            shareOp.SharingLevel = 1;
-                            shareOp.SyncProduct = false;
-                            shareOp.ItemSharing = new List<ItemSharingDto>();
-                            await ShareProduct(shareOp);
+                            using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
+                            {
+                                SharingItemOptions shareOp = new SharingItemOptions
+                                {
+                                    AppItemId = itm.item.Id,
+                                    SharingLevel = 1,
+                                    SyncProduct = false,
+                                    ItemSharing = new List<ItemSharingDto>()
+                                };
+
+                                await ShareProduct(shareOp);
+                                await itemUnitOfWork.CompleteAsync();
+                            }
                         }
+
+                        returnCount++;
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.Error($"Failed to share selected product {itm.item.Id} (SSIN: {itm.item.SSIN}). Continuing with the remaining products.", ex);
                     }
                 }
             }
@@ -3894,13 +3911,20 @@ namespace onetouch.AppItems
 
                     foreach (var child in appItem.ParentFkList)
                     {
+                        if (string.IsNullOrWhiteSpace(child.SSIN))
+                        {
+                            Logger.Warn($"Child item {child.Id} was not shared because it has no SSIN.");
+                            continue;
+                        }
+
+                        var marketplaceCode = child.SSIN;
                         child.ItemPricesFkList = await _appItemPricesRepository.GetAll().AsNoTracking().Where(a => a.AppItemId == child.Id).ToListAsync();
                         EnsureDefaultPrices(child.ItemPricesFkList);
                         AppMarketplaceItems.AppMarketplaceItems publishChild = new AppMarketplaceItems.AppMarketplaceItems(); ;
                         if (publishedEntityId != 0)
                             publishChild = await _appMarketplaceItem.GetAll().Include(x => x.EntityAttachments).ThenInclude(z => z.AttachmentFk)
                                 .Include(z => z.EntityExtraData).Include(z => z.ItemPricesFkList)
-                                .Where(x => x.Code == child.SSIN).FirstOrDefaultAsync();
+                                .Where(x => x.Code == marketplaceCode).FirstOrDefaultAsync();
                         long publishId = 0;
                         if (publishChild == null)
                             publishChild = new AppMarketplaceItems.AppMarketplaceItems();
@@ -3944,6 +3968,7 @@ namespace onetouch.AppItems
                             //SS
                         }
                         ObjectMapper.Map(child, publishChild);
+                        publishChild.Code = marketplaceCode;
 
                         if (publishChild.EntityExtraData != null)
                         {
