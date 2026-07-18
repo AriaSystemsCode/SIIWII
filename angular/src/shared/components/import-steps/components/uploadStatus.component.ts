@@ -550,10 +550,7 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
     record.showActions = !record.showActions;
 
     if (record.showActions) {
-      record.dropdownPosition = {
-        top: event.clientY,
-        left: event.clientX
-      };
+      record.dropdownPosition = {};
     }
   }
 
