@@ -64,7 +64,7 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
   UploadActionEnum = UploadActionEnum;
   @Output() updatedRecords = new EventEmitter<any[]>();
   @Output() _validateRecord = new EventEmitter<any[]>();
-  @Output() loadMoreRecords = new EventEmitter<{ skipCount: number; maxResultCount: number }>();
+  @Output() loadMoreRecords = new EventEmitter<{ skipCount: number; maxResultCount: number; recordType: string }>();
   isConfirm: boolean = false;
   linkNewParentItem_Data;
   linkNewItemColor_Data;
@@ -72,6 +72,7 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
   @Output() _resetRecordsCompleted = new EventEmitter<void>();
   pageSize: number = 25;
   loadingMoreRecords: boolean = false;
+  private recordTotals: { [recordType: string]: number } = {};
 
 
   public constructor(
@@ -98,13 +99,15 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
       const pageSkipCount = this.uploadingResult?.pageSkipCount || 0;
       this.uploadingResult.excelRecords = this.uploadingResult?.excelRecords.map((r, idx) => ({
         ...r,
-        id: r.id ?? pageSkipCount + idx,
-        __originalIndex: r.__originalIndex ?? pageSkipCount + idx
+        id: r.recordIndex ?? pageSkipCount + idx,
+        __originalIndex: r.recordIndex ?? pageSkipCount + idx
       }));
 
       const allRecords = this.uploadingResult?.excelRecords || [];
-      this.hasDataRecords = allRecords.some(r => r.recordType !== 'Image');
-      this.hasImageRecords = allRecords.some(r => r.recordType === 'Image');
+      // A paged result may contain only data rows on its first page. Keep the
+      // tabs selected by the user visible until the corresponding rows load.
+      this.hasDataRecords = !!this.imData || allRecords.some(r => r.recordType !== 'Image');
+      this.hasImageRecords = !!this.imImages || allRecords.some(r => r.recordType === 'Image');
 
       if (this.hasDataRecords)
         this.activeRecordType = 'Data'
@@ -267,12 +270,10 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
     resetFlags(record);
 
     // reset for the one inside excelRecords
-    if (
-      Array.isArray(this.uploadingResult?.excelRecords) &&
-      originalIndex >= 0 &&
-      originalIndex < this.uploadingResult.excelRecords.length
-    ) {
-      resetFlags(this.uploadingResult.excelRecords[originalIndex]);
+    if (Array.isArray(this.uploadingResult?.excelRecords)) {
+      const originalRecord = this.uploadingResult.excelRecords.find(r => r.id === record.id);
+      if (originalRecord)
+        resetFlags(originalRecord);
     }
 
     this.currentActionRecord = null;
@@ -306,36 +307,43 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
 
   records;
 
-  appendRecords(newRecords: any[]) {
-    if (!newRecords?.length)
-      return;
+  appendRecords(newRecords: any[], totalCount?: number, recordType?: string) {
+    if (recordType && totalCount !== undefined)
+      this.recordTotals[recordType] = totalCount;
 
     const startIndex = this.uploadingResult?.excelRecords?.length || 0;
-    const normalizedRecords = newRecords.map((r, idx) => ({
+    const normalizedRecords = (newRecords || []).map((r, idx) => ({
       ...r,
-      id: r.id ?? startIndex + idx,
-      __originalIndex: r.__originalIndex ?? startIndex + idx,
+      id: r.recordIndex ?? startIndex + idx,
+      __originalIndex: r.recordIndex ?? startIndex + idx,
       showActions: false
     }));
 
+    const existingIds = new Set((this.uploadingResult?.excelRecords || []).map(r => r.id));
+    const recordsToAppend = normalizedRecords.filter(r => !existingIds.has(r.id));
+
     this.uploadingResult.excelRecords = [
       ...(this.uploadingResult?.excelRecords || []),
-      ...normalizedRecords
+      ...recordsToAppend
     ];
 
     const visibleRecords = this.activeRecordType == 'Data'
-      ? normalizedRecords.filter(r => r?.recordType !== 'Image')
-      : normalizedRecords.filter(r => r?.recordType === 'Image');
+      ? recordsToAppend.filter(r => r?.recordType !== 'Image')
+      : recordsToAppend.filter(r => r?.recordType === 'Image');
 
     this.records = [
       ...(this.records || []),
       ...visibleRecords
     ];
 
-    this.hasDataRecords = this.uploadingResult.excelRecords.some(r => r.recordType !== 'Image');
-    this.hasImageRecords = this.uploadingResult.excelRecords.some(r => r.recordType === 'Image');
+    this.hasDataRecords = !!this.imData || this.uploadingResult.excelRecords.some(r => r.recordType !== 'Image');
+    this.hasImageRecords = !!this.imImages || this.uploadingResult.excelRecords.some(r => r.recordType === 'Image');
     this.loadingMoreRecords = false;
     this.cdr.detectChanges();
+
+    // Image rows can be after several pages of data rows. When the Images tab
+    // is selected, continue paging until an image row is found or all rows are loaded.
+    this.loadNextPageForEmptyActiveTab();
   }
 
   switchTab(type: string) {
@@ -352,6 +360,34 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
     })) || [];
 
     this.records?.forEach(r => r.showActions = false);
+    this.loadNextPageForEmptyActiveTab();
+  }
+
+  private loadNextPageForEmptyActiveTab(): void {
+    if (!this.uploadingResult?.isPagedResult || this.loadingMoreRecords || this.records?.length)
+      return;
+
+    const loadedCount = this.getLoadedRecordCount(this.activeRecordType);
+    const totalCount = this.recordTotals[this.activeRecordType]
+      ?? this.uploadingResult?.totalDisplayRecords
+      ?? this.uploadingResult?.totalRecords
+      ?? 0;
+
+    if (loadedCount < totalCount) {
+      this.loadingMoreRecords = true;
+      this.loadMoreRecords.emit({
+        skipCount: loadedCount,
+        maxResultCount: this.pageSize,
+        recordType: this.activeRecordType
+      });
+    }
+  }
+
+  private getLoadedRecordCount(recordType: string): number {
+    const records = this.uploadingResult?.excelRecords || [];
+    return recordType === 'Image'
+      ? records.filter(r => r?.recordType === 'Image').length
+      : records.filter(r => r?.recordType !== 'Image').length;
   }
 
 
@@ -547,7 +583,9 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
       record._previousAction = record?.excelDto?.actions;
 
     record.excelDto.actions = action;
-    this.uploadingResult.excelRecords[originalIndex]._inAction = true;
+    const loadedRecord = this.uploadingResult?.excelRecords?.find(r => r.id === record.id);
+    if (loadedRecord)
+      loadedRecord._inAction = true;
     record._inAction = true;
     record._original = JSON.parse(JSON.stringify(record));
 
@@ -888,13 +926,20 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
       return;
 
     const target = event.target as HTMLElement;
-    const loadedCount = this.uploadingResult?.excelRecords?.length || 0;
-    const totalCount = this.uploadingResult?.totalDisplayRecords || this.uploadingResult?.totalRecords || 0;
+    const loadedCount = this.getLoadedRecordCount(this.activeRecordType);
+    const totalCount = this.recordTotals[this.activeRecordType]
+      ?? this.uploadingResult?.totalDisplayRecords
+      ?? this.uploadingResult?.totalRecords
+      ?? 0;
     const nearBottom = target.scrollTop + target.clientHeight >= target.scrollHeight - 200;
 
     if (nearBottom && loadedCount < totalCount) {
       this.loadingMoreRecords = true;
-      this.loadMoreRecords.emit({ skipCount: loadedCount, maxResultCount: this.pageSize });
+      this.loadMoreRecords.emit({
+        skipCount: loadedCount,
+        maxResultCount: this.pageSize,
+        recordType: this.activeRecordType
+      });
     }
   }
 
@@ -1105,15 +1150,14 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
 
   resumeConfirm(record) {
     const originalIndex = record.__originalIndex;
-    if (
-      Array.isArray(this.uploadingResult?.excelRecords) &&
-      originalIndex >= 0 &&
-      originalIndex < this.uploadingResult?.excelRecords.length
-    ) {
-      this.uploadingResult.excelRecords[originalIndex] = {
-        ...this.uploadingResult?.excelRecords[originalIndex],
+    if (Array.isArray(this.uploadingResult?.excelRecords)) {
+      const loadedIndex = this.uploadingResult.excelRecords.findIndex(r => r.id === record.id);
+      if (loadedIndex >= 0) {
+        this.uploadingResult.excelRecords[loadedIndex] = {
+        ...this.uploadingResult?.excelRecords[loadedIndex],
         ...record
       };
+      }
     }
     this.resetRecords(record, originalIndex);
     this.cdr.detectChanges();
