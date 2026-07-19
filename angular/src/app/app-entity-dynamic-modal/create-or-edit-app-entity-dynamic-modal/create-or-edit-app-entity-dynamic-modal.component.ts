@@ -664,7 +664,7 @@ isArabic: boolean = false;
       
          if (
     this.entityObjectType.code === 'MARKETPLACESECTION' &&
-    extraAttrDefinition.attributeId === 1006 &&
+    (extraAttrDefinition.attributeId === 1006 || extraAttrDefinition.attributeId === 1026) &&
     value !== ''
   ) {
     this.setStringValue(1009, 'Single Type Blocks');
@@ -1017,11 +1017,17 @@ if(!this._displayVisualTypes)
 
 
     isBlockTypeLocked(extraAttr: FilteredExtraAttribute): boolean {
-  if (this.entityObjectType.code !== 'MARKETPLACESECTION') return false;
-  if (extraAttr?.attributeId !== 1009) return false;
+  if (
+    this.entityObjectType?.code !== 'MARKETPLACESECTION' ||
+    extraAttr?.attributeId !== 1009
+  ) {
+    return false;
+  }
 
-  const triggerAttr = this.extraAttributes?.find(x => x.attributeId === 1006);
-  return !!triggerAttr?.selectedValues;
+  const attr1006 = this.extraAttributes?.find(x => x.attributeId === 1006);
+  const attr1026 = this.extraAttributes?.find(x => x.attributeId === 1026);
+
+  return !!attr1006?.selectedValues || !!attr1026?.selectedValues;
 }
 
 toggleLastFields(enable: boolean): void {

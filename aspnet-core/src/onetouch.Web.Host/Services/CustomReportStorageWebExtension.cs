@@ -131,12 +131,7 @@ namespace onetouch.Web.Services
                 }
                 if (ReportsFactory.Reports.ContainsKey(reportName))
                 {
-                    using (MemoryStream ms = new MemoryStream())
-                    {
-                        ReportsFactory.Reports[reportName]().SaveLayoutToXml(ms);
-                        //report = ms.ToArray();
-                        report = ReportsFactory.Reports[reportName]();
-                    }
+                    report = ReportsFactory.Reports[reportName]();
                 }
 
                 if (report != null)
@@ -173,14 +168,29 @@ namespace onetouch.Web.Services
                                 switch (parameterName.ToUpper())
                                 {
                                     case "ATTACHMENTBASEURL":
-                                        var attachmentPath = _appConfiguration[$"Attachment:Path"];
-                                        attachmentPath = attachmentPath.Replace(_appConfiguration[$"Attachment:Omitt"].ToString(),"");
-                                        attachmentPath = attachmentPath.Replace(@"\", @"/");
+                                        var reportParameters = report.Parameters
+                                            .ToDynamicList<DevExpress.XtraReports.Parameters.Parameter>();
+                                        var attachmentClientUrlParameter = reportParameters.Find(x =>
+                                            string.Equals(x.Name, "attachmentClientUrl", StringComparison.OrdinalIgnoreCase));
+                                        var attachmentBaseUrlParameter = reportParameters.Find(x =>
+                                            string.Equals(x.Name, "attachmentBaseUrl", StringComparison.OrdinalIgnoreCase));
 
-                                        if (report.Parameters.ToDynamicList<DevExpress.XtraReports.Parameters.Parameter>().Find(x => x.Name == "attachmentClientUrl") != null)
-                                        { report.Parameters["attachmentClientUrl"].Value = attachmentPath; }
+                                        if (attachmentClientUrlParameter != null)
+                                        {
+                                            var attachmentPath = _appConfiguration["Attachment:Path"] ?? string.Empty;
+                                            var attachmentPathPartToOmit = _appConfiguration["Attachment:Omitt"];
+                                            if (!string.IsNullOrEmpty(attachmentPathPartToOmit))
+                                            {
+                                                attachmentPath = attachmentPath.Replace(attachmentPathPartToOmit, string.Empty);
+                                            }
 
-                                        report.Parameters["attachmentBaseUrl"].Value = parameters.Get("attachmentBaseUrl");
+                                            attachmentClientUrlParameter.Value = attachmentPath.Replace(@"\", @"/");
+                                        }
+
+                                        if (attachmentBaseUrlParameter != null)
+                                        {
+                                            attachmentBaseUrlParameter.Value = parameters.Get("attachmentBaseUrl");
+                                        }
                                         break;
 
                                     case "ORDERCONFIRMATIONROLE":
@@ -279,11 +289,23 @@ namespace onetouch.Web.Services
                         {
                             using (var stream = new MemoryStream())
                             {
-                                //report.ExportToPdf(stream);
+                                report.ExportToPdf(stream);
                                 stream.Position = 0;
-                                //var attachment = new Attachment(stream, System.Net.Mime.MediaTypeNames.Application.Pdf);
-                                var attachment = new Attachment(stream, "LineSheet.pdf");
-                                _userEmailer.SendEmailAsync(userId, (int)tenantId, subject, to, cc, bcc, body, attachment);
+                                using (var attachment = new Attachment(
+                                    stream,
+                                    "LineSheet.pdf",
+                                    System.Net.Mime.MediaTypeNames.Application.Pdf))
+                                {
+                                    _userEmailer.SendEmailAsync(
+                                        userId,
+                                        (int)tenantId,
+                                        subject,
+                                        to,
+                                        cc,
+                                        bcc,
+                                        body,
+                                        attachment).GetAwaiter().GetResult();
+                                }
                             }
                         }
                     }

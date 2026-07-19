@@ -313,29 +313,56 @@ namespace onetouch.AppItemsLists
         {
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
             {
-                var itemslistItemsIDsAndState = _appItemsListDetailRepository.GetAll().Where(x => x.ItemsListId == input.ItemListId).Select(x => new { x.ItemId, x.State }).ToArray();
-
                 var filteredAppItemsListItems = _appItemsListDetailRepository.GetAll()
-                            .Include(x => x.ItemFK).ThenInclude(x => x.EntityFk).ThenInclude(x => x.EntityAttachments)
-                            .Include(x => x.ItemFK).ThenInclude(x => x.ParentFkList).ThenInclude(x => x.EntityFk).ThenInclude(x => x.EntityExtraData).ThenInclude(x => x.AttributeValueFk)
-                            .Include(x => x.ItemFK).ThenInclude(x => x.ParentFkList).ThenInclude(x => x.EntityFk).ThenInclude(x => x.EntityExtraData).ThenInclude(x => x.EntityObjectTypeFk)
+                            .AsNoTracking()
                             .WhereIf(input.ItemId > 0, x => x.ItemId == input.ItemId)
                             .Where(x => x.ItemsListId == input.ItemListId && x.ItemFK.ParentId == null)
                             ;
 
                 var pagedAndFilteredAppItemsListItems = filteredAppItemsListItems
+                    .Include(x => x.ItemFK).ThenInclude(x => x.EntityFk).ThenInclude(x => x.EntityAttachments).ThenInclude(x => x.AttachmentFk)
                     .OrderBy(input.Sorting ?? "id asc")
                     .PageBy(input);
 
-                var appItemsLists = ObjectMapper.Map<IReadOnlyList<CreateOrEditAppItemsListItemDto>>(pagedAndFilteredAppItemsListItems);
+                var pagedItems = await pagedAndFilteredAppItemsListItems.ToListAsync();
+                var appItemsLists = ObjectMapper.Map<IReadOnlyList<CreateOrEditAppItemsListItemDto>>(pagedItems);
 
-                var imageQuery = _appItemsListDetailRepository.GetAll().Include(x => x.ItemFK).ThenInclude(x => x.EntityFk).ThenInclude(x => x.EntityAttachments).ThenInclude(x => x.AttachmentFk);
+                var parentItemIds = pagedItems.Select(x => x.ItemId).ToList();
+                var variations = parentItemIds.Count == 0
+                    ? new List<AppItemsListDetail>()
+                    : await _appItemsListDetailRepository.GetAll()
+                        .AsNoTracking()
+                        .Include(x => x.ItemFK).ThenInclude(x => x.ParentFk)
+                        .Include(x => x.ItemFK).ThenInclude(x => x.EntityFk).ThenInclude(x => x.EntityAttachments).ThenInclude(x => x.AttachmentFk)
+                        .Include(x => x.ItemFK).ThenInclude(x => x.EntityFk).ThenInclude(x => x.EntityExtraData).ThenInclude(x => x.AttributeValueFk)
+                        .Include(x => x.ItemFK).ThenInclude(x => x.EntityFk).ThenInclude(x => x.EntityExtraData).ThenInclude(x => x.EntityObjectTypeFk)
+                        .Where(x => x.ItemsListId == input.ItemListId &&
+                                    x.ItemFK.ParentId.HasValue &&
+                                    parentItemIds.Contains(x.ItemFK.ParentId.Value))
+                        .ToListAsync();
+
+                var variationsByParentId = variations
+                    .GroupBy(x => x.ItemFK.ParentId.Value)
+                    .ToDictionary(
+                        group => group.Key,
+                        group => group.Select(itemVariation =>
+                        {
+                            var variationDto = ObjectMapper.Map<AppItemsListItemVariationDto>(itemVariation);
+                            variationDto.Variation = ObjectMapper.Map<AppItemVariationDto>(itemVariation.ItemFK);
+                            return variationDto;
+                        }).ToList());
+
+                var pagedItemsById = pagedItems.ToDictionary(x => x.Id);
                 foreach (var item in appItemsLists)
                 {
-                    item.AppItemsListItemVariations = await GetItemsListVariations(item.ItemId, item.ItemsListId);
-                    item.ImageURL = imageQuery.FirstOrDefault(x => x.Id == item.Id && x.ItemFK.EntityFk.EntityAttachments.Count > 0) != null
-                                                ? "attachments/" + item.ImageURL + "/" + imageQuery.FirstOrDefault(x => x.Id == item.Id && x.ItemFK.EntityFk.EntityAttachments.Count > 0).ItemFK.EntityFk.EntityAttachments.FirstOrDefault().AttachmentFk.Attachment
-                                                    : "";
+                    item.AppItemsListItemVariations = variationsByParentId.TryGetValue(item.ItemId, out var itemVariations)
+                        ? itemVariations
+                        : new List<AppItemsListItemVariationDto>();
+
+                    var attachment = pagedItemsById[item.Id].ItemFK.EntityFk.EntityAttachments.FirstOrDefault()?.AttachmentFk;
+                    item.ImageURL = attachment == null
+                        ? ""
+                        : "attachments/" + item.ImageURL + "/" + attachment.Attachment;
                 }
 
                 var totalCount = await filteredAppItemsListItems.CountAsync();
@@ -380,28 +407,23 @@ namespace onetouch.AppItemsLists
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
             {
 
-                var appItemsList = await _appItemsListRepository.GetAll().Where(x => x.Id == id).Include(x => x.EntityFk).Include(x => x.ItemSharingFkList).ThenInclude(x => x.UserFk).FirstOrDefaultAsync();
-                //T-SII-20260212.0001 [Begin]
-                if (appItemsList == null)
-                {
-                    id = await GetMainItemListID(id);
-                    if (id != 0)
-                    {
-                        appItemsList = await _appItemsListRepository.GetAll().Where(x => x.Id == id).Include(x => x.EntityFk).Include(x => x.ItemSharingFkList).ThenInclude(x => x.UserFk).FirstOrDefaultAsync();
-                    }
-                    else
-                    { return null; }
-                }
+                var appItemsList = await _appItemsListRepository.GetAll()
+                    .AsNoTracking()
+                    .Where(x => x.Id == id)
+                    .Include(x => x.EntityFk)
+                    .Include(x => x.ItemSharingFkList).ThenInclude(x => x.UserFk)
+                    .FirstOrDefaultAsync();
 
                 var output = new GetAppItemsListForEditOutput { AppItemsList = ObjectMapper.Map<CreateOrEditAppItemsListDto>(appItemsList), TenantId = appItemsList.TenantId };
                 output.AppItemsList.AppItemsListItems = await GetDetails(new GetDetailsInput { ItemListId = id, SkipCount = 0, MaxResultCount = 10 });
 
                 //get published flag
-                var relation = await _appEntitiesRelationshipRepository.FirstOrDefaultAsync(x => x.EntityId == appItemsList.EntityId);
-                output.AppItemsList.Published = relation != null;
+                output.AppItemsList.Published = await _appEntitiesRelationshipRepository.GetAll()
+                    .AsNoTracking()
+                    .AnyAsync(x => x.EntityId == appItemsList.EntityId);
 
                 //get entity state
-                var jsonstring = _appEntitiesAppService.GetAppEntityState(appItemsList.EntityId).Result;
+                var jsonstring = await _appEntitiesAppService.GetAppEntityState(appItemsList.EntityId);
                 if (!string.IsNullOrEmpty(jsonstring))
                 {
                     var jsonObject = JsonConvert.DeserializeObject<AppItemsList>(jsonstring);
@@ -411,7 +433,9 @@ namespace onetouch.AppItemsLists
                 }
                 //MMT33-2
                 output.ShowSync = false;
-                var marketplaceItemList = await _appMarketplaceItemListRepository.GetAll().Where(a => a.Code == appItemsList.SSIN).FirstOrDefaultAsync();
+                var marketplaceItemList = await _appMarketplaceItemListRepository.GetAll()
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(a => a.Code == appItemsList.SSIN);
                 if (marketplaceItemList != null)
                 {
                     if (marketplaceItemList.TimeStamp < marketplaceItemList.TimeStamp)

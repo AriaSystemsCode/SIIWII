@@ -414,13 +414,8 @@ namespace onetouch.AppEntities
 
         public async Task<string> GetAppEntityState(long id)
         {
-            var obj = _appEntityStateRepository.FirstOrDefaultAsync(e => e.EntityId == id).Result;
-            if (obj != null)
-            { return obj.JsonString; }
-            else
-            { return ""; }
-
-            return "";
+            var obj = await _appEntityStateRepository.FirstOrDefaultAsync(e => e.EntityId == id);
+            return obj?.JsonString ?? "";
         }
 
         public async Task SetAppEntityState(long id, string jsonString)

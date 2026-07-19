@@ -163,3 +163,159 @@
     width: 18px;
     margin: 0px 20px;
 }
+
+
+@media screen and (max-width: 767px) {
+  :host ::ng-deep .event-full-dialog {
+    width: 100vw !important;
+    height: 100dvh !important;
+    max-height: 100dvh !important;
+  }
+
+  :host ::ng-deep .event-full-dialog .p-dialog {
+    width: 100vw !important;
+    height: 100dvh !important;
+    max-height: 100dvh !important;
+    margin: 0 !important;
+    border-radius: 0 !important;
+  }
+
+  :host ::ng-deep .event-full-dialog .p-dialog-content {
+    height: 100% !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+  }
+
+  .modal-dialog,
+  .modal-content {
+    width: 100%;
+    max-width: 100%;
+    min-height: 100%;
+    margin: 0;
+  }
+
+  .modal-content {
+    max-height: none;
+    overflow: visible;
+  }
+
+  /* Cover area */
+  .event-cover-wrapper {
+    height: 150px;
+    margin: 12px !important;
+  }
+
+  .cover {
+    width: 100%;
+    height: 150px;
+    overflow: hidden;
+    border-radius: 10px;
+  }
+
+  .cover app-image-display {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  /* Logo */
+  .logo {
+    top: 50%;
+    // bottom: -35px;
+    left: 16px;
+    width: 120px;
+    height: 120px;
+    z-index: 2;
+  }
+
+  html[dir='rtl'] .logo {
+    left: auto;
+    right: 16px;
+  }
+
+  .logo app-image-display {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  /* Leave space below overlapping logo */
+  .event-actions {
+    margin-top: 45px !important;
+    padding: 0 12px;
+  }
+
+  /* Buttons */
+  .event-action-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .event-action-buttons > div {
+    width: 100%;
+    max-width: 100%;
+    flex: 0 0 100%;
+    padding: 0;
+    text-align: initial !important;
+  }
+
+  ._Btn {
+    width: 100% !important;
+    height: 42px;
+    margin: 0 !important;
+  }
+
+  /* RSVP popup */
+  .response-action {
+    position: relative;
+  }
+
+  .response-options {
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 0;
+    right: 0;
+    width: 100% !important;
+    padding: 12px;
+    border-radius: 8px;
+    box-shadow: 0 5px 18px rgba(0, 0, 0, 0.15);
+    z-index: 1001;
+  }
+
+  /* Event information */
+  .event-main-info {
+    margin: 20px 12px 12px !important;
+  }
+
+  .event-main-info > .col-9,
+  .event-main-info > .col-3 {
+    flex: 0 0 100%;
+    max-width: 100%;
+  }
+
+  .event-status {
+    margin-top: 10px;
+  }
+
+  .about,
+  .event-address,
+  .event-link {
+    margin: 12px !important;
+    padding: 12px;
+  }
+
+  .about {
+    box-shadow: none;
+  }
+
+  .eventDetails h6 {
+    line-height: 1.6;
+    overflow-wrap: anywhere;
+  }
+
+  .dialog-header {
+    height: 44px;
+    border-radius: 0;
+  }
+}

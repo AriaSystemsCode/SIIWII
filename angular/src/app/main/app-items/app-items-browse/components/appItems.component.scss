@@ -40,6 +40,10 @@ button {
     padding: 13px !important
 }
 
+.btn-sync:disabled {
+    cursor: not-allowed;
+}
+
 .btn-applySelection {
     border-radius: 6px;
     background-color: #4A0D4A !important;

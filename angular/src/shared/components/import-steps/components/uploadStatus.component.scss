@@ -303,13 +303,16 @@
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
   padding: 8px 0;
   margin: 0;
-  top: 15px !important;
-  left: 15px !important;
+  max-height: 260px;
+  overflow-y: auto;
+  top: 100%;
+  left: 0;
 }
 
 .fixed-dropdown-menu.drop-up {
-  transform: translateY(-100%);
-  margin-top: -5px;
+  top: auto;
+  bottom: 100%;
+  margin-bottom: 5px;
 }
 
 

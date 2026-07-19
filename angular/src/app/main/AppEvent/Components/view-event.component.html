@@ -28,7 +28,7 @@
                 </div>
             </div> -->
       
-            <div class="row m-0 pt-4 pb-4 events events-sm d-md-none d-flex flex-row">
+            <div class="row m-0 pt-4 pb-4 events events-sm d-md-none d-flex flex-row" *ngIf="hideViewEv">
 
                 <div class="col-1  text-right pt-2">
                     <img src="../../../../assets/events/Icon-ionic-ios-arrow-back.svg" class="pointer"
@@ -53,16 +53,18 @@
 
 
             <div class="row m-3">
-                <div class="w-100" #viewProfileCover style="position: relative; left: 0; top: 0;height: 200px;">
+                <div class="w-100" #viewProfileCover style="position: relative; left: 0; top: 0;height: 200px;border-radius: 12px;">
                     <div class="cover">
-                        <app-image-display [image]="coverPhoto || coverDefaultImage"
+                        <!-- <app-image-display [image]="coverPhoto || coverDefaultImage"
                             [sycAttachmentCategory]="sycAttachmentCategoryBanner"
-                            [staticWidth]="viewProfileCover?.offsetWidth">
-                        </app-image-display>
+                            [staticWidth]="viewProfileCover?.offsetWidth"  >
+                        </app-image-display> -->
+                        <img [src]="coverPhoto  ? coverPhoto :  '../../../assets/placeholders/_default_cover.jpg'" onerror="'assets/common/images/default-profile-picture.png'" alt="" srcset="" style="height: 150px;width: 100%;
+                        object-fit: cover;">
                     </div>
                     <div class="logo">
                         <app-image-display [image]="logoPhoto || logoDefaultImage"
-                            [sycAttachmentCategory]="sycAttachmentCategoryLogo" [staticHeight]="140">
+                            [sycAttachmentCategory]="sycAttachmentCategoryLogo" [staticHeight]="120">
                         </app-image-display>
                     </div>
 
