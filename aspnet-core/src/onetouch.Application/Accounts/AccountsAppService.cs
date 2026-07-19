@@ -3773,6 +3773,7 @@ namespace onetouch.Accounts
                 {
                     var tenant = input.TenantId == null ? AbpSession.TenantId : input.TenantId;
                     await PublishManualAccount(contact.SSIN, long.Parse(tenant.ToString()));
+                    await _iCreateMarketplaceAccount.HideAccount(contact.SSIN);
                 }
                 
             }

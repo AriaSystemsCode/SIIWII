@@ -1302,12 +1302,14 @@ namespace onetouch.AppMarketplaceAccounts
                     if (relatedContacts != null && relatedContacts.Count() > 0)
                         _appMarketplaceContactRepository.GetAll().Where(e => e.TenantId == null && e.AccountId == ret.Id).ForEach(z => z.SharingLevel = 4);
 
-
-                    //I40[Start]
-                    var itemObjectId = await _helper.SystemTables.GetObjectListingId();
-                    onetouchDbContext dbContext = CurrentUnitOfWork.GetDbContext<onetouchDbContext>();
-                    dbContext.AppMarketplaceItems.Where(z => z.TenantOwner == ret.TenantOwner && z.ObjectId == itemObjectId && z.SharingLevel != 4)
-                        .ForEach(z => z.SharingLevel = 4);
+                    if (ret.IsProfileData == true)
+                    {
+                        //I40[Start]
+                        var itemObjectId = await _helper.SystemTables.GetObjectListingId();
+                        onetouchDbContext dbContext = CurrentUnitOfWork.GetDbContext<onetouchDbContext>();
+                        dbContext.AppMarketplaceItems.Where(z => z.TenantOwner == ret.TenantOwner && z.ObjectId == itemObjectId && z.SharingLevel != 4)
+                            .ForEach(z => z.SharingLevel = 4);
+                    }
                 }
                 //var marketplaceItems = await _appMarketplaceItemRepository.GetAll().Where(z => z.TenantOwner == AbpSession.TenantId && z.ObjectId == itemObjectId && z.SharingLevel !=4).ToListAsync();
                 //if (marketplaceItems != null && marketplaceItems.Count() > 0)
