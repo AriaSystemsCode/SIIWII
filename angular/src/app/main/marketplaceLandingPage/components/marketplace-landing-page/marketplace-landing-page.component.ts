@@ -6,6 +6,8 @@ import {
   SydObjectsServiceProxy,
 } from "@shared/service-proxies/service-proxies";
 import { SectionType, ApiRow, SectionConfig, SectionItem } from "../../models/landingPage-types";
+import { Router } from "@node_modules/@angular/router";
+import Swal from 'sweetalert2';
 
 
 @Component({
@@ -25,13 +27,16 @@ export class MarketplaceLandingPageComponent
   sectionsFlat: SectionItem[] = [];
 
 loginTenaneSsin:string
+        defaultUrl:string
+
   constructor(
     injector: Injector,
     private _sydObjectsAppService: SydObjectsServiceProxy,
-     private _AccountsServiceProxy: AccountsServiceProxy,
+     private _AccountsServiceProxy: AccountsServiceProxy, private router: Router,
 
   ) {
     super(injector);
+       this.redirectTo();    
 
   }
 
@@ -174,6 +179,37 @@ loginTenaneSsin:string
     })
 
     }
+
+       async redirectTo() {
+                console.log(this.defaultUrl,'defau')
+    
+                if (this.appSession.tenantId && !this.appSession.user.accountId)
+                    await this.askForCompleteProfile();
+            }
+        
+            async askForCompleteProfile() {
+          
+                    Swal.fire({
+                        title: "",
+                        text: "Please Complete Your Profile Information",
+                        icon: "warning",
+                        showCancelButton: true,
+                        cancelButtonText: "Later",
+                        confirmButtonText: "Proceed",
+                        allowOutsideClick: false,
+                        customClass: {
+                            popup: 'popup-class',
+                            icon: 'icon-class',
+                            content: 'content-class',
+                            actions: 'actions-class',
+                            confirmButton: 'confirm-button-class2'
+                        }
+                }).then((result) => {
+                    if (result.isConfirmed)
+                    this.router.navigate(['/app/main/account'])
+                });
+            }
+     
 
   ngOnDestroy() {
     this.unsubscribeToAllSubscriptions();
