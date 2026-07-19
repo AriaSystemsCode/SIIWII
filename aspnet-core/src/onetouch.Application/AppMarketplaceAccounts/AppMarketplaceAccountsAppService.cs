@@ -50,6 +50,7 @@ using Microsoft.Identity.Client;
 using Abp.Extensions;
 using DocumentFormat.OpenXml.Drawing.Diagrams;
 using ClosedXML.Excel;
+using System.Transactions;
 
 namespace onetouch.AppMarketplaceAccounts
 {
@@ -1758,6 +1759,7 @@ namespace onetouch.AppMarketplaceAccounts
         }
 
         //I40 -MMT[Start]
+        [UnitOfWork(TransactionScopeOption.RequiresNew)]
         public async Task<string> CreateOrEditMarketplaceContactRelationship(string requesterSSIN, string recipientSSIN, bool? disconnect, 
             bool? isPublic, long? connectionTypeId, long? disconnectRelationId)
         {
