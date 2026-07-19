@@ -173,12 +173,29 @@ namespace onetouch.Web.Services
                                 switch (parameterName.ToUpper())
                                 {
                                     case "ATTACHMENTBASEURL":
-                                        var attachmentPath = _appConfiguration[$"Attachment:Path"];
-                                        attachmentPath = attachmentPath.Replace(_appConfiguration[$"Attachment:Omitt"].ToString(),"");
-                                        attachmentPath = attachmentPath.Replace(@"\", @"/");
+                                        var reportParameters = report.Parameters
+                                            .ToDynamicList<DevExpress.XtraReports.Parameters.Parameter>();
+                                        var attachmentClientUrlParameter = reportParameters.Find(x =>
+                                            string.Equals(x.Name, "attachmentClientUrl", StringComparison.OrdinalIgnoreCase));
+                                        var attachmentBaseUrlParameter = reportParameters.Find(x =>
+                                            string.Equals(x.Name, "attachmentBaseUrl", StringComparison.OrdinalIgnoreCase));
 
-                                        report.Parameters["attachmentClientUrl"].Value = attachmentPath;
-                                        report.Parameters["attachmentBaseUrl"].Value = parameters.Get("attachmentBaseUrl");
+                                        if (attachmentClientUrlParameter != null)
+                                        {
+                                            var attachmentPath = _appConfiguration["Attachment:Path"] ?? string.Empty;
+                                            var attachmentPathPartToOmit = _appConfiguration["Attachment:Omitt"];
+                                            if (!string.IsNullOrEmpty(attachmentPathPartToOmit))
+                                            {
+                                                attachmentPath = attachmentPath.Replace(attachmentPathPartToOmit, string.Empty);
+                                            }
+
+                                            attachmentClientUrlParameter.Value = attachmentPath.Replace(@"\", @"/");
+                                        }
+
+                                        if (attachmentBaseUrlParameter != null)
+                                        {
+                                            attachmentBaseUrlParameter.Value = parameters.Get("attachmentBaseUrl");
+                                        }
                                         break;
 
                                     case "ORDERCONFIRMATIONROLE":
@@ -277,11 +294,23 @@ namespace onetouch.Web.Services
                         {
                             using (var stream = new MemoryStream())
                             {
-                                //report.ExportToPdf(stream);
+                                report.ExportToPdf(stream);
                                 stream.Position = 0;
-                                //var attachment = new Attachment(stream, System.Net.Mime.MediaTypeNames.Application.Pdf);
-                                var attachment = new Attachment(stream, "LineSheet.pdf");
-                                _userEmailer.SendEmailAsync(userId, (int)tenantId, subject, to, cc, bcc, body, attachment);
+                                using (var attachment = new Attachment(
+                                    stream,
+                                    "LineSheet.pdf",
+                                    System.Net.Mime.MediaTypeNames.Application.Pdf))
+                                {
+                                    _userEmailer.SendEmailAsync(
+                                        userId,
+                                        (int)tenantId,
+                                        subject,
+                                        to,
+                                        cc,
+                                        bcc,
+                                        body,
+                                        attachment).GetAwaiter().GetResult();
+                                }
                             }
                         }
                     }
