@@ -131,12 +131,7 @@ namespace onetouch.Web.Services
                 }
                 if (ReportsFactory.Reports.ContainsKey(reportName))
                 {
-                    using (MemoryStream ms = new MemoryStream())
-                    {
-                        ReportsFactory.Reports[reportName]().SaveLayoutToXml(ms);
-                        //report = ms.ToArray();
-                        report = ReportsFactory.Reports[reportName]();
-                    }
+                    report = ReportsFactory.Reports[reportName]();
                 }
 
                 if (report != null)
