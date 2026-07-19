@@ -61,7 +61,7 @@
                                                         <path d="M15.479 4.12991L8.47497 11.1339C8.20832 11.4006 7.94167 11.925 7.88834 12.3072L7.50614 14.9826C7.36392 15.9514 8.04833 16.6269 9.01716 16.4936L11.6926 16.1114C12.0659 16.0581 12.5903 15.7914 12.8658 15.5248L19.8698 8.52076C21.0787 7.31194 21.6475 5.90758 19.8698 4.12991C18.0922 2.35224 16.6878 2.9211 15.479 4.12991Z" stroke="#4A0D4A" stroke-width="2" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
                                                         <path d="M14.4749 5.13428C15.0704 7.25859 16.7325 8.92072 18.8657 9.52512" stroke="#4A0D4A" stroke-width="2" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
                                                         </svg>
-                                                    {{ "Edit User Info" | localize }}
+                                                    {{ "CreateUserInfo" | localize }}
                                                     </button>
 
                                                     <!-- Edit User Button (if User Id is present) -->
@@ -76,7 +76,7 @@
                                                         <path d="M14.4749 5.13428C15.0704 7.25859 16.7325 8.92072 18.8657 9.52512" stroke="#4A0D4A" stroke-width="2" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
                                                         </svg>
                                                         
-                                                    {{ "Edit User Info" | localize }}
+                                                    {{ "EditUserInfo" | localize }}
                                                     </button>
                                             
                                                     <button *ngIf="canEdit" class="btn mb-3 mt-4 editAccount_butn"
@@ -93,7 +93,7 @@
                                             </div>
 
                                         </div>
-                                        <div class="col-md-2  ml-5">
+                                        <div class="col-md-2">
                                             <div class="dev-logo">
                                                 <app-image-display [image]="logoPhoto || logoDefaultImage"
                                                     [sycAttachmentCategory]="sycAttachmentCategoryLogo"
@@ -102,7 +102,7 @@
                                             </div>
                                         </div>
                                         <div class="col-md-10 title-cover">
-                                            <h5 class="account-name font-weight-bold">{{getStringValue(701)}}
+                                            <h5 class="account-name font-weight-bold mx-5">{{getStringValue(701)}}
                                                 {{" "}} {{getStringValue(702)}} </h5>
                                             <p class="jobTitle-label">{{getStringValue(706)}} </p>
                                             <div class="desc">

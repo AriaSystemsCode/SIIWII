@@ -452,9 +452,8 @@
                                             src="../../../../../assets/Items/pdf-Icon.png" />
 
                                             
-                                            <a class="select-default-image default-image-link p-2"
+                                            <a class="select-default-image default-image-link p-2 d-block"
                                             *ngIf="isImageFile(appItem.entityAttachments[i]?.fileName)"
-                                                [ngClass]="{'d-block' : defaultImageIndex == i}"
                                                 (click)="setDefaultImage(i)">
                                                 <i class="fa fa-check-square mr-2"
                                                     [ngClass]="defaultImageIndex == i? 'text-purple':'text-grey' "> </i>
@@ -465,10 +464,11 @@
                                             <a class="p-2 visible-marketplace-toggle">
                                            <label class="text-purple d-flex align-items-center cursor-pointer">
                                              <input 
+                                                                                             [class.is-disabled]="defaultImageIndex == i"
                                                type="checkbox" 
                                                class="mr-2" 
-                                               [checked]="appItem?.entityAttachments[i]?.isPublic" 
-                                               (change)="setVisibleinMarketplaceImage(i)"
+                                                                                             [checked]="appItem?.entityAttachments[i]?.isPublic !== false || defaultImageIndex == i" 
+                                                                                             (change)="setVisibleinMarketplaceImage(i, $event.target.checked)"
                                              />
                                              {{ 'VisibleInMarketplace' | localize }}
                                            </label>
