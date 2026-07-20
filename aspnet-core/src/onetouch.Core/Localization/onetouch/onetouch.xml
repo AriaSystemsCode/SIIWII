@@ -3028,7 +3028,7 @@ Please select one of the available linesheet templates
 		<text name="Landscape">Landscape</text>
 		<text name="ProductId">Product Id</text>
 		<text name="Accountuploadstatus">Account upload status</text>
-
+		<text name="SharedWithYou">is shared with you</text>
 
 		
   </texts>  

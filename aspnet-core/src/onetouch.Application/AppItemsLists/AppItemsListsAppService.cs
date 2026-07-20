@@ -36,6 +36,7 @@ using onetouch.AppSiiwiiTransaction.Dtos;
 using onetouch.AppContacts;
 using Microsoft.Extensions.Configuration;
 using onetouch.Configuration;
+using onetouch.Notifications;
 
 namespace onetouch.AppItemsLists
 {
@@ -72,6 +73,7 @@ namespace onetouch.AppItemsLists
         private readonly IRepository<AppContactRelationshipInfo,long> _appContactRelationshipInfoRepository;
         private readonly IConfigurationRoot _appConfiguration;
         //I49[End]
+        private readonly IAppNotifier _appNotifier;
         public AppItemsListsAppService(IRepository<AppItemsList, long> appItemsListRepository, IAppItemsListsExcelExporter appItemsListsExcelExporter, Helper helper
             , IAppEntitiesAppService appEntitiesAppService
             , IRepository<AppItem, long> appItemRepository
@@ -89,8 +91,10 @@ namespace onetouch.AppItemsLists
              ISycEntityObjectTypesAppService sycEntityObjectTypesAppService, 
              IRepository<SydObject, long> sydObjectRepository, IRepository<AppMarketplaceContact, long> appMarketplaceAccountsRepository,
              IRepository<AppContactRelationshipInfo, long> appContactRelationshipInfoRepository,
-             IAppConfigurationAccessor appConfigurationAccessor)
+             IAppConfigurationAccessor appConfigurationAccessor,
+             IAppNotifier appNotifier)
         {
+            _appNotifier = appNotifier;
             _appConfiguration = appConfigurationAccessor.Configuration;
             //I45
             _sydObjectRepository = sydObjectRepository;
@@ -1420,7 +1424,20 @@ namespace onetouch.AppItemsLists
 
                     await CurrentUnitOfWork.SaveChangesAsync();
                 }
-
+                //T-SII-20260214.0001,1 MMT 02/25/2026 – Product List: “Notify People” Option Not Functioning in Restricted Share[Start]
+                if (input.ItemSharing.Count() > 0)
+                {
+                    foreach (var sharingDto in input.ItemSharing)
+                    {
+                        var user = await UserManager.GetUserByIdAsync(long.Parse(sharingDto.SharedUserId.ToString()));
+                        if (user != null)
+                            await _appNotifier.SendMessageAsync(new Abp.UserIdentifier(int.Parse(user.TenantId.ToString()), long.Parse(sharingDto.SharedUserId.ToString())),
+                               itemsList.Name.TrimEnd() + " " + L("SharedWithYou"),
+                               Abp.Notifications.NotificationSeverity.Info,
+                               new Abp.Domain.Entities.EntityIdentifier(typeof(AppMarketplaceItemList), publishItemsList.Id));
+                    }
+                }
+                //T-SII-20260214.0001,1 MMT 02/25/2026 – Product List: “Notify People” Option Not Functioning in Restricted Share[End]
                 //Delete removed child items
                 var publishedDetails = _appMarketplaceItemsListDetailRepository.GetAll().AsNoTracking().Where(x => x.AppMarketplaceItemsListId == publishItemsList.Id);
                 var existedIds = publishedDetails.Select(x => x.Id).ToArray();
