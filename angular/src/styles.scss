@@ -698,3 +698,20 @@ html[dir="rtl"] .p-carousel .p-carousel-next .pi {
 .p-dropdown-panel .p-dropdown-header .p-dropdown-filter{
     margin: auto !important;
 }
+
+.p-multiselect-filter-container {
+    flex: unset !important;
+}
+
+.p-icon-wrapper {
+    display: initial !important;
+}
+
+.p-dropdown .p-dropdown-trigger {
+        margin: 2px 9px !important;
+}
+
+.p-multiselect .p-multiselect-trigger {
+        margin: 2px 15px !important;
+
+}
