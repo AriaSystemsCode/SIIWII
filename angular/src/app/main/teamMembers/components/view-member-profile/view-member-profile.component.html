@@ -93,18 +93,18 @@
                                             </div>
 
                                         </div>
-                                        <div class="col-md-2">
-                                            <div class="dev-logo">
+                                        <div class="col-md-2" style="max-width: 120px;">
+                                            <div class="">
                                                 <app-image-display [image]="logoPhoto || logoDefaultImage"
                                                     [sycAttachmentCategory]="sycAttachmentCategoryLogo"
-                                                    [classList]="'logo-profile'" [staticHeight]="85">
+                                                    [classList]="'logo-profile'" [staticWidth]="120">
                                                 </app-image-display>
                                             </div>
                                         </div>
                                         <div class="col-md-10 title-cover">
                                             <h5 class="account-name font-weight-bold mx-5">{{getStringValue(701)}}
                                                 {{" "}} {{getStringValue(702)}} </h5>
-                                            <p class="jobTitle-label">{{getStringValue(706)}} </p>
+                                            <p class="jobTitle-label mx-5">{{getStringValue(706)}} </p>
                                             <div class="desc">
                                                 <p>
                                                     {{memberData?.notes}}

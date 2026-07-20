@@ -140,14 +140,14 @@
             {{'Cancel' | localize}}
           </button>
 
-          <button type="submit"
-                  class="btn text-white"
-                  [ngClass]="'bgPurple'"
-                  [disabled]="(saving || !contactForm.form.valid) && isContactUsFound" 
-                  [buttonBusy]="saving"
-                  [busyText]="l('SavingWithThreeDot')">
-            {{'Submit' | localize}}
-          </button>
+      <button
+  type="submit"
+  class="btn text-white bgPurple"
+  [disabled]="saving || !contactForm.form.valid || !isContactUsFound"
+  [buttonBusy]="saving"
+  [busyText]="l('SavingWithThreeDot')">
+  {{ 'Submit' | localize }}
+</button>
         </div>
 
       </form>
