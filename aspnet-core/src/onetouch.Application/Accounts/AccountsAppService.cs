@@ -3900,6 +3900,7 @@ namespace onetouch.Accounts
                 {
                     var tenant = input.TenantId == null ? AbpSession.TenantId : input.TenantId;
                     await PublishManualAccount(contact.SSIN, long.Parse(tenant.ToString()));
+                    await _iCreateMarketplaceAccount.HideAccount(contact.SSIN);
                 }
                 
             }
@@ -4911,12 +4912,14 @@ namespace onetouch.Accounts
                 returnVal = await _iCreateMarketplaceAccount.CreateOrEditMarketplaceContactRelationship(originalPublishContactFortCurrTenant.SSIN, ssin, false, isPublic, connectionTypeId, null);
             //I40[Start]
             var activeRelationshipStatusId = await _helper.SystemTables.GetEntityObjectStatusRelationshipActive();
+           
             var currentRelation = await _appContactRelationshipInfoRepository.GetAll()
                 .Where(z => z.RequesterContactSSIN == originalPublishContactFortCurrTenant.SSIN &&
                 z.RecipientContactSSIN == ssin && z.EntityObjectStatusId == activeRelationshipStatusId &&
                 z.ConsiderAsTeamMember == true).FirstOrDefaultAsync();
 
-            if (currentRelation == null)
+
+            if (currentRelation != null)
             {
                 var accountConnection = _appContactRepository.GetAll().Include(z => z.EntityFk)
                        .FirstOrDefault(e => e.TenantId == AbpSession.TenantId && e.EntityFk.TenantOwner != AbpSession.TenantId && e.EntityFk.TenantOwner != 0 && e.EntityFk.TenantOwner != null);
