@@ -4788,8 +4788,8 @@ namespace onetouch.Accounts
            
             var currentRelation = await _appContactRelationshipInfoRepository.GetAll()
                 .Where(z => z.RequesterContactSSIN == originalPublishContactFortCurrTenant.SSIN &&
-                z.RecipientContactSSIN == ssin && z.EntityObjectStatusId == activeRelationshipStatusId &&
-                z.ConsiderAsTeamMember == true).FirstOrDefaultAsync();
+                z.RecipientContactSSIN == ssin && z.EntityObjectStatusId == activeRelationshipStatusId 
+                ).FirstOrDefaultAsync();
 
 
             if (currentRelation != null)
@@ -10036,11 +10036,21 @@ namespace onetouch.Accounts
                     string code = createOrEditAccountInfoDto.Code;
                     string oldCode = createOrEditAccountInfoDto.Code;
                     long entId = 0;
-                    if (account != null && account.Id > 0)
+                    if (account != null && account.Id != 0)
                     {
                         switch (accountExcelResultsDTO.RepreateHandler)
                         {
                             case ExcelRecordRepeateHandler.IgnoreDuplicatedRecords: //ignore
+                                var relationship = await _appContactRelationshipInfoRepository.GetAll()
+                                    .Where(z => z.RecipientContactSSIN == account.SSIN).FirstOrDefaultAsync();
+                                if (relationship == null)
+                                {
+                                    createOrEditAccountInfoDto.Id = account.Id;
+                                    entId = account.EntityId;
+                                    createOrEditAccountInfoDto.SSIN = account.SSIN;
+                                    break;
+                                }
+                                else
                                 continue;
                             case ExcelRecordRepeateHandler.ReplaceDuplicatedRecords: // replace
                                 createOrEditAccountInfoDto.Id = account.Id;
@@ -10262,7 +10272,17 @@ namespace onetouch.Accounts
                                 switch (accountExcelResultsDTO.RepreateHandler)
                                 {
                                     case ExcelRecordRepeateHandler.IgnoreDuplicatedRecords: //ignore
-                                        continue;
+                                        var relationship = await _appContactRelationshipInfoRepository.GetAll()
+                                        .Where(z => z.RecipientContactSSIN == account.SSIN).FirstOrDefaultAsync();
+                                        if (relationship == null)
+                                        {
+                                            branchDto.Id = accountA.Id;
+                                            accountId = accountA.AccountId;
+                                            bEntityId = accountA.EntityId;
+                                            break;
+                                        }
+                                        else
+                                            continue;
                                     case ExcelRecordRepeateHandler.ReplaceDuplicatedRecords: // replace
                                         branchDto.Id = accountA.Id;
                                         accountId = accountA.AccountId;
@@ -10446,6 +10466,16 @@ namespace onetouch.Accounts
                                         switch (accountExcelResultsDTO.RepreateHandler)
                                         {
                                             case ExcelRecordRepeateHandler.IgnoreDuplicatedRecords: //ignore
+                                                var relationship = await _appContactRelationshipInfoRepository.GetAll()
+                                       .Where(z => z.RecipientContactSSIN == accountTeam.SSIN).FirstOrDefaultAsync();
+                                                if (relationship == null)
+                                                {
+                                                    personDto.Id = accountTeam.Id;
+                                                    accountId = accountTeam.AccountId;
+                                                    entityId = accountTeam.EntityId;
+                                                    break;
+                                                }
+                                                else
                                                 continue;
                                             case ExcelRecordRepeateHandler.ReplaceDuplicatedRecords: // replace
                                                 personDto.Id = accountTeam.Id;
@@ -10665,6 +10695,7 @@ namespace onetouch.Accounts
                         foreach (var acc in manualAccounts)
                         {
                             //xx
+                            
                             if (acc.AppContactAddresses != null)
                             {
                                 foreach (var z in acc.AppContactAddresses)
@@ -10736,9 +10767,14 @@ namespace onetouch.Accounts
                                 //if (contactFortCurrTenant != null)
                                 {
                                     var returnVal =
-                                        await _iCreateMarketplaceAccount.CreateOrEditMarketplaceContactRelationship(contactFortCurrTenant.SSIN, acc.SSIN, false, false, null,null);
+                                        await _iCreateMarketplaceAccount.CreateOrEditMarketplaceContactRelationship(contactFortCurrTenant.SSIN, acc.SSIN, false, false, null, null);
                                 }
                                 await _iCreateMarketplaceAccount.HideAccount(acc.SSIN);
+                            }
+                            else
+                            {
+                                var returnVal =
+                                       await _iCreateMarketplaceAccount.CreateOrEditMarketplaceContactRelationship(contactFortCurrTenant.SSIN, acc.SSIN, false, false, null, null);
                             }
                         }
                         foreach (var acc in manualAccounts)
