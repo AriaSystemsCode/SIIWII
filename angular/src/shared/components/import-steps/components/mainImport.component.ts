@@ -1032,6 +1032,7 @@ export class MainImportComponent
         if (record?.isCodeItem || record?._isLinkingParent) {
             this.importServiceProxy.getAppItemForEditData(
                 selectedItem.id,
+                record.excelDto?.rowNumber,
                 record.recordType,
                 record.parentCode,
                 record.code,
@@ -1118,6 +1119,7 @@ export class MainImportComponent
         else if (record?.isCodeColorItem || record?._isLinkingItemColor) {
             this.importServiceProxy.getAppItemColorForEditData(
                 selectedItem.id,
+                record.excelDto?.rowNumber,
                 record.recordType,
                 record.parentCode,
                 record.code,

@@ -41,6 +41,7 @@ import { MultiSelectionInfo } from "../models/multi-selection-info.model";
 import { ImportStepInfo } from "@shared/components/import-steps/models/ImportStepInfo";
 import { ImportStepsEnum } from "@shared/components/import-steps/models/ImportStepsEnum";
 import { MainImportService } from "@shared/components/import-steps/services/mainImport.service";
+import Swal from "sweetalert2";
 
 @Component({
     selector: "app-app-items",
@@ -91,7 +92,6 @@ export class AppItemsComponent extends AppComponentBase {
     get searchCtrl () { return this.filterForm.get('search') }
     get sortingCtrl () { return this.filterForm.get('sorting') }
     get extraAttributesCtrl () { return this.filterForm.get('extraAttributes') }
-    totalCount:number;
     @ViewChild("ImportProductsModal", { static: true })
     ImportProductsModal: MainImportComponent;
 
@@ -490,6 +490,7 @@ showOverlay :boolean=false
 
     bulkShareItems(){
         this.showMainSpinner()
+        let _result=0;
         this._appItemsServiceProxy
         .shareSelectedProducts(this.filterBody.selectorKey)
         .pipe(
@@ -497,14 +498,38 @@ showOverlay :boolean=false
                 this.hideMainSpinner();
             }))
         .subscribe((result) => {
-            debugger
-            this.notify.success(this.l(result+" Item shared"));
+           _result = result;
+            if (_result === 0) {
+                this.notify.success(this.l(_result + " Item shared"));
+                this.reloadPage();
+                return;
+            }
+
+            Swal.fire({
+                title: "",
+                text: _result?.toString() + " of " + this.multiSelectionInfo?.totalCount?.toString() + " products will be shared to the marketplace",
+                icon: "info",
+                confirmButtonText: "OK",
+                customClass: {
+                    popup: "popup-class",
+                    icon: "icon-class",
+                    content: "content-class",
+                    actions: "actions-class",
+                    confirmButton: "confirm-button-class",
+                },
+            }).then((swalResult) => {
+                if (swalResult.isConfirmed) {
+                    this.notify.success(this.l(_result + " Item shared"));
+                }
+            });
+
             this.reloadPage();
             
         });
     }
     bulkSyncItems(){
         this.showMainSpinner()
+        let _result=0;
         this._appItemsServiceProxy
         .syncSelectedProduct(this.filterBody.selectorKey)
         .pipe(
@@ -512,8 +537,31 @@ showOverlay :boolean=false
                 this.hideMainSpinner();
             }))
         .subscribe((result) => {
-            debugger
-            this.notify.success(this.l(result+" Item synced"));
+            _result = result;
+            if (_result === 0) {
+                this.notify.success(this.l(_result + " Item synced"));
+                this.reloadPage();
+                return;
+            }
+
+            Swal.fire({
+                title: "",
+                text: _result?.toString() + " of " + this.multiSelectionInfo?.totalCount?.toString() + " products will be synced",
+                icon: "info",
+                confirmButtonText: "OK",
+                customClass: {
+                    popup: "popup-class",
+                    icon: "icon-class",
+                    content: "content-class",
+                    actions: "actions-class",
+                    confirmButton: "confirm-button-class",
+                },
+            }).then((swalResult) => {
+                if (swalResult.isConfirmed) {
+                    this.notify.success(this.l(_result + " Item synced"));
+                }
+            });
+
             this.reloadPage();
         });
     }
