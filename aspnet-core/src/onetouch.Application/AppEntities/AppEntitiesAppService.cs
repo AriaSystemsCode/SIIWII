@@ -1454,6 +1454,7 @@ namespace onetouch.AppEntities
                         IsPublic = item.IsPublic,
                         Attributes = item.Attributes
                     });
+                    MoveVariationAttachmentFile(input, entity, filename);
                     continue;
                 }
 
@@ -1466,7 +1467,19 @@ namespace onetouch.AppEntities
                     existing.IsPublic = item.IsPublic;
                     existing.Attributes = item.Attributes;
                 }
+
+                if (!string.IsNullOrEmpty(filename))
+                    MoveVariationAttachmentFile(input, entity, filename);
             }
+        }
+
+        private void MoveVariationAttachmentFile(AppEntityDto input, AppEntity entity, string filename)
+        {
+            var sourceTenantId = input.AttachmentSourceTenantId != null &&
+                                 input.AttachmentSourceTenantId > -2
+                ? input.AttachmentSourceTenantId
+                : AbpSession.TenantId;
+            MoveFile(filename, sourceTenantId, entity.TenantId);
         }
 
         private static string GetAttachmentFileName(AppEntityAttachmentDto item)
