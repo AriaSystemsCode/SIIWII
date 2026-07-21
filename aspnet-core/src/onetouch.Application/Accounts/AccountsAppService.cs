@@ -9913,9 +9913,1270 @@ namespace onetouch.Accounts
             return returnList;
         }
         //I46[End]
+        public async Task<ExcelLogDto> SaveFromExcel(AccountExcelResultsDTO accountExcelResultsDTO)
+        //MMT2
+        {
+            #region get lists
+
+            // get not failed recoreds
+            List<AccountExcelDto> result = accountExcelResultsDTO.ExcelRecords.Where(r => r.Status !=
+            ExcelRecordStatus.Failed.ToString()).Select(r => r.ExcelDto).ToList<AccountExcelDto>();
+
+            List<LookupLabelDto> countries = await _appEntitiesAppService.GetAllCountryForTableDropdown();
+
+            //await AddAddresses(result, countries);
+            await AddClassifications(result.ToList<AccountExcelDto>());
+            await AddCategories(result);
+            //stopped as per Ahmed email and approved by Omar
+            //await AddTitles(result);
+
+            // get addresses
+            //IList<AppAddressDto> addresses = await GetAllAddresses();
+            IList<AppAddressDto> addresses = new List<AppAddressDto>();
+
+            // get Product Departments
+            PagedResultDto<TreeNode<GetSycEntityObjectCategoryForViewDto>> departmentIds = await _sycEntityObjectCategoriesAppService.GetAllDepartmentsWithChildsForProduct();
+
+            // get addresses types
+            List<LookupLabelDto> addressTypes = await _appEntitiesAppService.GetAllAddressTypeForTableDropdown();
+
+            //get classifications for contacts
+            PagedResultDto<TreeNode<GetSycEntityObjectClassificationForViewDto>> classIds = await _sycEntityObjectClassificationsAppService.GetAllWithChildsForContact();
+
+            //get phone types
+            List<LookupLabelDto> phoneTypes = await _appEntitiesAppService.GetAllPhoneTypeForTableDropdown();
+
+            //get currency types
+            List<CurrencyInfoDto> currencyIds = await _appEntitiesAppService.GetAllCurrencyForTableDropdown();
+
+            //get language types            
+            List<LookupLabelDto> languageIds = await _appEntitiesAppService.GetAllLanguageForTableDropdown();
+
+            //get attachments category
+            List<SycAttachmentCategorySycAttachmentCategoryLookupTableDto> attachmentsCategories = await _sSycAttachmentCategoriesAppService.GetAllSycAttachmentCategoryForTableDropdown();
+
+            //get titles
+            //List<LookupLabelDto> titleIds = await _appEntitiesAppService.GetAllTitlesForTableDropdown();
+
+            //get account types
+            List<LookupLabelDto> accountTypes = await _appEntitiesAppService.GetAllAccountTypesForTableDropdown();
+            #endregion get lists
+
+            #region CreateOrEditAccountInfoDto Mapper - Save
+
+            try
+            {
+                // Abdo to fix compiling issue - Start
+                List<LookupLabelDto> _currencyIds = new List<LookupLabelDto>();
+                ObjectMapper.Map<List<CurrencyInfoDto>, List<LookupLabelDto>>(currencyIds, _currencyIds);
+                // Abdo to fix compiling issue - End
+                //xx
+                var contactObjectId = await _helper.SystemTables.GetObjectContactId();
+                var partnerEntityObjectType = await _helper.SystemTables.GetEntityObjectTypeParetner();
+                var partnerEntityObjectTypeId = partnerEntityObjectType.Id;
+                var partnerEntityObjectTypeCode = partnerEntityObjectType.Code;
+                //xx
+                #region add accounts
+                MapperConfiguration configurationAccount;
+                configurationAccount = new MapperConfiguration(a =>
+                {
+                    a.AddProfile(new CreateOrEditAccountInfoDtoProfile(phoneTypes, _currencyIds, languageIds, classIds, addresses, addressTypes, AbpSession.TenantId.ToString(), departmentIds, attachmentsCategories, accountTypes));
+                });
+                var presonEntityObjectTypeId = await _helper.SystemTables.GetEntityObjectTypePersonId();
+                var presonEntityObjectTypeCode = await _helper.SystemTables.GetEntityObjectTypePersonCode();
+                //I40[start]
+                //var branchEntityObjecttypeId = await _helper.SystemTables.GetEntityObjectTypeBranchId();
+                var branchEntityObjectType = await _helper.SystemTables.GetEntityObjectTypeBranch();
+                var branchEntityObjectTypeId = branchEntityObjectType.Id;
+                var branchEntityObjectTypeCode = branchEntityObjectType.Code;
+                //I40[END]
+                IMapper mapperAccount;
+                mapperAccount = configurationAccount.CreateMapper();
+                List<AppContact> accountsList = new List<AppContact>();
+                List<AppContact> accountsListUpdated = new List<AppContact>();
+                //I40[Start]
+                var mainResultAccount = result.Where(r => r.RecordType == "Account" && string.IsNullOrEmpty(r.ParentCode)
+                && r.rowNumber >= accountExcelResultsDTO.From && r.rowNumber <= accountExcelResultsDTO.To).ToList();
+                List<AccountExcelDto> mainBranchesList = new List<AccountExcelDto>();
+
+                foreach (var account in mainResultAccount)
+                {
+                    var branch = result.Where(r => r.RecordType == "Branch" && r.ParentCode == account.Code).FirstOrDefault();
+                    if (branch == null)
+                    {
+                        AccountExcelDto branchObject = account.ShallowCopy();
+                        branchObject.ParentCode = account.Code;
+                        branchObject.Code = account.Code.TrimEnd() + "-MAIN";
+                        branchObject.Name = branchObject.Name.TrimEnd() + " Main Branch";
+                        branchObject.RecordType = "Branch";
+                        mainBranchesList.Add(branchObject);
+                    }
+
+                }
+                foreach (var br in mainBranchesList)
+                {
+                    //result.Where(z => z.ParentCode == br.ParentCode).ForEach(z => z.ParentCode = br.Code);
+                    result.Add(br);
+
+                }
+                //I40[End]
+                List<AccountExcelDto> accountsResult = result.Where(r => r.RecordType == "Account" && string.IsNullOrEmpty(r.ParentCode)
+                && r.rowNumber >= accountExcelResultsDTO.From && r.rowNumber <= accountExcelResultsDTO.To).ToList();
+                List<CreateOrEditAccountInfoDto> resultAccount = mapperAccount.Map<List<AccountExcelDto>, List<CreateOrEditAccountInfoDto>>(accountsResult);
+                //xx
+                var accountList = (from o in _appContactRepository.GetAll().AsNoTracking().Where(r => r.EntityFk.EntityObjectTypeId == partnerEntityObjectTypeId).ToList()
+                                   join s in resultAccount on o.Code equals s.Code
+                                   select o).ToList();
+                //xx
+
+                foreach (CreateOrEditAccountInfoDto createOrEditAccountInfoDto in resultAccount)
+                {
+                    AppContact account = accountList.FirstOrDefault(a => a.Code == createOrEditAccountInfoDto.Code);
+                    //_appContactRepository.GetAll().AsNoTracking().Where(r => r.EntityFk.EntityObjectTypeId == partnerEntityObjectTypeId  && r.Code == createOrEditAccountInfoDto.Code).FirstOrDefault();
+                    string code = createOrEditAccountInfoDto.Code;
+                    string oldCode = createOrEditAccountInfoDto.Code;
+                    long entId = 0;
+                    if (account != null && account.Id > 0)
+                    {
+                        switch (accountExcelResultsDTO.RepreateHandler)
+                        {
+                            case ExcelRecordRepeateHandler.IgnoreDuplicatedRecords: //ignore
+                                continue;
+                            case ExcelRecordRepeateHandler.ReplaceDuplicatedRecords: // replace
+                                createOrEditAccountInfoDto.Id = account.Id;
+                                entId = account.EntityId;
+                                createOrEditAccountInfoDto.SSIN = account.SSIN;
+                                break;
+                            case ExcelRecordRepeateHandler.CreateACopy: // override
+                                createOrEditAccountInfoDto.Code = GetAccountCopyCode(code, partnerEntityObjectTypeId);
+                                var mainbr = result.FirstOrDefault(z => z.Code == oldCode.TrimEnd() + "-MAIN");
+                                if (mainbr != null)
+                                {
+                                    string oldMainBranch = mainbr.Code;
+                                    mainbr.Code = createOrEditAccountInfoDto.Code.TrimEnd() + "-MAIN";
+                                    result.Where(z => z.ParentCode == oldMainBranch).ForEach(z => z.ParentCode = mainbr.Code);
+                                }
+                                createOrEditAccountInfoDto.Id = 0;
+                                break;
+                            default:
+                                break;
+                        }
+
+                    }
+
+                    //XXa
+
+                    AppContact accountContact = new AppContact();
+                    accountContact.AccountId = null;
+                    accountContact.Id = 0;
+                    if (createOrEditAccountInfoDto.Id != null && createOrEditAccountInfoDto.Id > 0)
+                    {
+                        accountContact.AccountId = long.Parse(createOrEditAccountInfoDto.Id.ToString());
+                        accountContact.Id = long.Parse(createOrEditAccountInfoDto.Id.ToString());
+                        accountContact.SSIN = createOrEditAccountInfoDto.SSIN;
+                    }
+                    accountContact.ParentId = null;
+                    accountContact.AccountType = createOrEditAccountInfoDto.AccountType;
+                    accountContact.AccountTypeId = createOrEditAccountInfoDto.AccountTypeId;
+                    //I40[Start]
+                    //accountContact.AppContactAddresses = ObjectMapper.Map<List<AppContactAddress>>(createOrEditAccountInfoDto.ContactAddresses);
+                    //I40[End]
+                    // accountContact.AccountId = null;
+                    accountContact.AppContactPaymentMethods = ObjectMapper.Map<List<AppContactPaymentMethod>>(createOrEditAccountInfoDto.ContactPaymentMethods);
+                    accountContact.Code = createOrEditAccountInfoDto.Code;
+                    accountContact.Name = createOrEditAccountInfoDto.Name;
+                    accountContact.TradeName = createOrEditAccountInfoDto.TradeName;
+                    accountContact.TenantId = AbpSession.TenantId;
+                    accountContact.CurrencyId = createOrEditAccountInfoDto.CurrencyId;
+                    accountContact.EMailAddress = createOrEditAccountInfoDto.EMailAddress;
+                    accountContact.Phone2Number = createOrEditAccountInfoDto.Phone2Number;
+                    accountContact.Phone1Number = createOrEditAccountInfoDto.Phone1Number;
+                    accountContact.Phone3Number = createOrEditAccountInfoDto.Phone3Number;
+                    accountContact.IsProfileData = createOrEditAccountInfoDto.AccountLevel == AccountLevelEnum.Profile;
+                    accountContact.LanguageId = createOrEditAccountInfoDto.LanguageId;
+                    accountContact.Phone1Ext = createOrEditAccountInfoDto.Phone1Ex;
+                    accountContact.Phone2Ext = createOrEditAccountInfoDto.Phone2Ex;
+                    accountContact.Phone3Ext = createOrEditAccountInfoDto.Phone3Ex;
+                    accountContact.Phone1TypeId = createOrEditAccountInfoDto.Phone1TypeId == 0 ? null : createOrEditAccountInfoDto.Phone1TypeId;
+                    accountContact.Phone2TypeId = createOrEditAccountInfoDto.Phone2TypeId == 0 ? null : createOrEditAccountInfoDto.Phone2TypeId;
+                    accountContact.Phone3TypeId = createOrEditAccountInfoDto.Phone3TypeId == 0 ? null : createOrEditAccountInfoDto.Phone3TypeId;
+                    accountContact.PriceLevel = createOrEditAccountInfoDto.PriceLevel;
+                    accountContact.Website = createOrEditAccountInfoDto.Website;
+                    accountContact.EntityFk = new AppEntity();
+                    accountContact.EntityFk.Id = entId;
+                    accountContact.PartnerId = null;
+                    accountContact.EntityFk.TenantId = AbpSession.TenantId;
+                    accountContact.EntityFk.Code = createOrEditAccountInfoDto.Code;
+                    accountContact.EntityFk.Name = createOrEditAccountInfoDto.Name;
+                    accountContact.EntityFk.Notes = createOrEditAccountInfoDto.Notes;
+                    accountContact.EntityFk.ObjectId = contactObjectId;
+                    accountContact.EntityFk.EntityObjectTypeId = partnerEntityObjectTypeId;
+                    accountContact.EntityFk.EntityObjectTypeCode = partnerEntityObjectTypeCode;
+                    accountContact.EntityFk.EntityObjectTypeFk = partnerEntityObjectType;
+                    accountContact.EntityFk.EntityCategories = ObjectMapper.Map<List<AppEntityCategory>>(createOrEditAccountInfoDto.EntityCategories);
+                    accountContact.EntityFk.EntityAttachments = ObjectMapper.Map<List<AppEntityAttachment>>(createOrEditAccountInfoDto.EntityAttachments);
+                    //accountContact.EntityFk.EntityAddresses = createOrEditAccountInfoDto.ContactAddresses;
+                    if (string.IsNullOrEmpty(createOrEditAccountInfoDto.SSIN))
+                    {
+                        accountContact.EntityFk.SSIN = await
+                            _helper.SystemTables.GenerateSSIN(contactObjectId, ObjectMapper.Map<AppEntityDto>(accountContact.EntityFk));
+                        accountContact.SSIN = accountContact.EntityFk.SSIN;
+                    }
+                    //accountContact.EntityFk.EntityAddresses = ObjectMapper.Map<List<AppEntityAddress>>(createOrEditAccountInfoDto.ContactAddresses);
+                    accountContact.ParentFkList = new List<AppContact>();
+                    //I40[Start]
+                    if (accountContact.Id > 0)
+                        accountsListUpdated.Add(accountContact);
+                    else
+                        accountsList.Add(accountContact);
+                    //I40[End]
+                    //XXa
+                    //I40[Start]
+                    //foreach (var address in createOrEditAccountInfoDto.ContactAddresses)
+                    //{
+                    //    //address.AccountId = createOrEditAccountInfoDto.AccountId;
+                    //    var addressId = await AddAddress(0, address, countries);
+                    //    if (addressId != null)
+                    //        address.AddressId = addressId;
+                    //}
+                    //List<AppContactAddress> accAddress = new List<AppContactAddress>();
+                    //accountContact.AppContactAddresses = new List<AppContactAddress>();
+                    //accAddress = ObjectMapper.Map<List<AppContactAddress>>(createOrEditAccountInfoDto.ContactAddresses);
+                    //foreach (var address in accAddress)
+                    //{
+                    //    accountContact.AppContactAddresses.Add(new AppContactAddress
+                    //    {
+                    //        AddressFk = address.AddressFk,
+                    //        ContactFk = accountContact,
+                    //        AddressId = address.AddressId,
+                    //        AddressCode = address.AddressCode,
+                    //        ContactCode = accountContact.Code,
+                    //        ContactId = accountContact.Id,
+                    //        AddressTypeId = address.AddressTypeId
+                    //    });
+                    //}
+                    //I40[End]
+                    //I40[Start]
+                    /*if (accountContact.Id > 0)
+                        accountsListUpdated.Add(accountContact);
+                    else
+                        accountsList.Add(accountContact);*/
+                    //I40[End]
+                    accountContact.ParentFkList = new List<AppContact>();
+                    //XXB
+
+
+                    MapperConfiguration configurationBranchAcc;
+                    configurationBranchAcc = new MapperConfiguration(a => { a.AddProfile(new BranchDtoProfile(phoneTypes, _currencyIds, languageIds, classIds, addresses, addressTypes)); });
+                    IMapper mapperBranchAcc;
+                    mapperBranchAcc = configurationBranchAcc.CreateMapper();
+                    List<AccountExcelDto> resultExcelAccBranch = accountExcelResultsDTO.ExcelRecords.Where(r => r.Status
+                 != ExcelRecordStatus.Failed.ToString()).Select(r => r.ExcelDto).ToList<AccountExcelDto>();
+
+                    ////I40[Start]
+                    //AccountExcelDto mainBranch = new AccountExcelDto();
+                    //mainBranch.ParentCode = oldCode;//accountContact.Code;
+                    //mainBranch.Name = "*Main*";
+                    //mainBranch.Code = "";
+                    //mainBranch.TradeName = accountContact.TradeName;
+                    //var tenantObj = await TenantManager.GetByIdAsync(int.Parse(AbpSession.TenantId.ToString()));
+                    //if (tenantObj != null)
+                    //{
+                    //    string sequance = await _iAppSycIdentifierDefinitionsService.GetNextEntityCode("TENANTBRANCH", AbpSession.TenantId);
+                    //    mainBranch.Code = tenantObj.TenancyName.Trim() + "-" + sequance;
+                    //}
+                    //mainBranch.Currency = accountContact.CurrencyCode;
+                    //mainBranch.EmailAddress = accountContact.EMailAddress;
+                    //mainBranch.Language = accountContact.LanguageCode;
+                    //mainBranch.Phone1Number = accountContact.Phone1Number;
+                    //mainBranch.Phone2Number = accountContact.Phone3Number;
+                    //mainBranch.Phone3Number = accountContact.Phone3Number;
+                    //mainBranch.Phone1Type = accountContact.Phone1TypeName;
+                    //mainBranch.Phone2Type = accountContact.Phone2TypeName;
+                    //mainBranch.Phone3Type = accountContact.Phone3TypeName;
+                    //mainBranch.Phone1Ext = accountContact.Phone1Ext;
+                    //mainBranch.Phone2Ext = accountContact.Phone2Ext;
+                    //mainBranch.Phone3Ext = accountContact.Phone3Ext;
+                    //mainBranch.RecordType = "Branch";
+                    //mainBranch.rowNumber = accountExcelResultsDTO.From;
+                    //resultExcelAccBranch.Where(z => z.RecordType == "Branch" && z.ParentCode == oldCode).ForEach(z => z.ParentCode = mainBranch.Code);
+                    //resultExcelAccBranch.Add(mainBranch);
+                    ////I40[End]
+
+
+                    List<AccountExcelDto> resultExcelAccBranchOnly = result.Where(r => r.RecordType == "Branch"
+                    && !string.IsNullOrEmpty(r.ParentCode) && (r.ParentCode == oldCode || r.ParentCode == createOrEditAccountInfoDto.Code.TrimEnd() + "-MAIN")
+                    && r.rowNumber >= accountExcelResultsDTO.From && r.rowNumber <= accountExcelResultsDTO.To
+                    ).OrderBy(r => r.ParentCode).ToList();
+
+
+                    foreach (var branch in resultExcelAccBranchOnly.OrderBy(z => z.ParentCode))
+                    {
+                        branch.ParentId = 0;
+                        try
+                        {
+                            //var BranchParent = _appContactRepository.GetAll().AsNoTracking().Where(r => r.EntityFk.EntityObjectTypeId == partnerEntityObjectTypeId && r.Code == branch.ParentCode).FirstOrDefault();
+                            var BranchParent = accountList.FirstOrDefault(r => r.Code == branch.ParentCode);
+                            if (BranchParent != null)
+                            {
+                                branch.ParentId = BranchParent.Id;
+                                branch.AccountId = BranchParent.Id;
+
+                                if (BranchParent.AccountId != null && BranchParent.AccountId > 0)
+                                { branch.AccountId = BranchParent.AccountId; }
+                            }
+                        }
+                        catch (Exception ex) { branch.ParentId = 0; }
+
+                    }
+                    List<BranchDto> resultBranchDtoA = mapperBranchAcc.Map<List<AccountExcelDto>, List<BranchDto>>(resultExcelAccBranchOnly);
+                    //XXX
+                    var accountBranchList = (from o in _appContactRepository.GetAll().AsNoTracking().Where(r => r.EntityFk.EntityObjectTypeId == branchEntityObjectTypeId).ToList()
+                                             join s in resultBranchDtoA on o.Code equals s.Code
+                                             select o).ToList();
+                    //XXX
+                    foreach (BranchDto branchDto in resultBranchDtoA.OrderBy(z => z.Code))
+                    {
+                        //I40[Start]
+                        //if (branchDto.Name == "*Main*")
+                        //{
+                        //    branchDto.ContactAddresses = new List<AppContactAddressDto>();
+                        //    foreach (var addrss in createOrEditAccountInfoDto.ContactAddresses)
+                        //    {
+                        //        branchDto.ContactAddresses.Add(addrss);
+                        //    }
+                        //}
+                        //I40[End]
+                        string oldSSIN = "";
+                        if (true)// (branchDto.ParentId > 0)&& r.ParentCode== oldCode
+                        {
+                            AppContact accountA = accountBranchList.FirstOrDefault(r => r.Code == branchDto.Code); //_appContactRepository.GetAll().AsNoTracking().Include(z => z.EntityFk)
+                                                                                                                   //.Where(r => r.Code == branchDto.Code && r.EntityFk.EntityObjectTypeId == partnerEntityObjectTypeId ).FirstOrDefault();
+                            string codeA = branchDto.Code;
+                            string oldBranchCode = branchDto.Code;
+                            long? accountId = null;
+                            long bEntityId = 0;
+                            if (accountA != null && accountA.Id > 0)
+                            {
+                                oldSSIN = accountA.SSIN;
+                                switch (accountExcelResultsDTO.RepreateHandler)
+                                {
+                                    case ExcelRecordRepeateHandler.IgnoreDuplicatedRecords: //ignore
+                                        continue;
+                                    case ExcelRecordRepeateHandler.ReplaceDuplicatedRecords: // replace
+                                        branchDto.Id = accountA.Id;
+                                        accountId = accountA.AccountId;
+                                        bEntityId = accountA.EntityId;
+                                        break;
+                                    case ExcelRecordRepeateHandler.CreateACopy: // override
+                                        branchDto.Code = GetAccountCopyCode(codeA, branchEntityObjectTypeId);
+                                        oldSSIN = "";
+                                        break;
+                                    default:
+                                        break;
+                                }
+                            }
+                            //branchDto.AccountId = branchDto.ParentId;
+                            foreach (var address in branchDto.ContactAddresses)
+                            {
+
+                                address.AccountId = branchDto.AccountId != null ? (long)branchDto.AccountId : 0;
+                                // var addressObj = ObjectMapper.Map<AppAddress>(address);
+
+                                var addressId = await AddAddress(address.AccountId, address, countries);
+                                if (addressId != null)
+                                    address.AddressId = addressId;
+                            }
+                            //xxxxx
+
+                            //xxb
+                            AppContact branchContact = new AppContact();
+                            branchContact.SSIN = oldSSIN;
+                            branchContact.AccountId = null;//accountContact.Id;
+
+                            branchContact.AccountType = accountContact.AccountType;
+                            branchContact.AccountTypeId = accountContact.AccountTypeId;
+                            List<AppContactAddress> bAddress = new List<AppContactAddress>();
+                            branchContact.AppContactAddresses = new List<AppContactAddress>();
+                            bAddress = ObjectMapper.Map<List<AppContactAddress>>(branchDto.ContactAddresses);
+                            foreach (var address in bAddress)
+                            {
+                                branchContact.AppContactAddresses.Add(new AppContactAddress
+                                {
+                                    AddressFk = address.AddressFk,
+                                    ContactFk = branchContact,
+                                    AddressId = address.AddressId,
+                                    AddressCode = address.AddressCode,
+                                    ContactCode = branchContact.Code,
+                                    ContactId = branchContact.Id,
+                                    AddressTypeId = address.AddressTypeId
+                                });
+                            }
+                            branchContact.AccountId = null;//accountContact.Id; 
+                            branchContact.Id = 0;
+                            if (branchDto.Id != null && branchDto.Id > 0)
+                            {
+                                branchContact.AccountId = accountId;
+                                branchContact.Id = long.Parse(branchDto.Id.ToString());
+                            }
+                            branchContact.AppContactPaymentMethods = accountContact.AppContactPaymentMethods;
+                            branchContact.Code = branchDto.Code;
+                            branchContact.Name = branchDto.Name;
+                            branchContact.TradeName = branchDto.TradeName;
+                            branchContact.TenantId = AbpSession.TenantId;
+                            branchContact.CurrencyId = string.IsNullOrEmpty(branchDto.CurrencyId.ToString()) || branchDto.CurrencyId == 0 ? null : branchDto.CurrencyId;
+                            branchContact.EMailAddress = branchDto.EMailAddress;
+                            branchContact.Phone2Number = branchDto.Phone2Number;
+                            branchContact.Phone1Number = branchDto.Phone1Number;
+                            branchContact.Phone3Number = branchDto.Phone3Number;
+                            branchContact.IsProfileData = true;
+                            branchContact.LanguageId = branchDto.LanguageId;
+                            branchContact.Phone1Ext = branchDto.Phone1Ext;
+                            branchContact.Phone2Ext = branchDto.Phone2Ext;
+                            branchContact.Phone3Ext = branchDto.Phone3Ext;
+                            branchContact.Phone1TypeId = branchDto.Phone1TypeId == 0 ? null : branchDto.Phone1TypeId;
+                            branchContact.Phone2TypeId = branchDto.Phone2TypeId == 0 ? null : branchDto.Phone2TypeId;
+                            branchContact.Phone3TypeId = branchDto.Phone3TypeId == 0 ? null : branchDto.Phone3TypeId;
+                            branchContact.PriceLevel = accountContact.PriceLevel;
+                            branchContact.Website = branchDto.Website;
+                            branchContact.EntityFk = new AppEntity();
+                            branchContact.EntityFk.Id = bEntityId;
+                            branchContact.EntityFk.TenantId = AbpSession.TenantId;
+                            branchContact.PartnerId = null;
+                            branchContact.EntityFk.Code = branchDto.Code;
+                            branchContact.EntityFk.Name = branchDto.Name;
+                            branchContact.EntityFk.Notes = accountContact.EntityFk.Notes;
+                            branchContact.EntityFk.ObjectId = contactObjectId;
+                            //I40[Start]
+                            //branchContact.EntityFk.EntityObjectTypeId = partnerEntityObjectTypeId;
+                            //branchContact.EntityFk.EntityObjectTypeCode = partnerEntityObjectTypeCode;
+                            //branchContact.EntityFk.EntityObjectTypeFk = partnerEntityObjectType;
+                            branchContact.EntityFk.EntityObjectTypeId = branchEntityObjectTypeId;
+                            branchContact.EntityFk.EntityObjectTypeCode = branchEntityObjectTypeCode;
+                            branchContact.EntityFk.EntityObjectTypeFk = branchEntityObjectType;
+                            //I40[End]
+                            branchContact.EntityFk.EntityCategories = accountContact.EntityFk.EntityCategories;
+                            branchContact.EntityFk.EntityAttachments = accountContact.EntityFk.EntityAttachments;
+                            //accountContact.EntityFk.EntityAddresses = createOrEditAccountInfoDto.ContactAddresses;
+                            if (string.IsNullOrEmpty(branchContact.SSIN))
+                            {
+                                branchContact.EntityFk.SSIN = await
+                                    _helper.SystemTables.GenerateSSIN(contactObjectId, ObjectMapper.Map<AppEntityDto>(branchContact.EntityFk));
+                                branchContact.SSIN = branchContact.EntityFk.SSIN;
+                            }
+                            // branchContact.EntityFk.EntityAddresses = ObjectMapper.Map<List<AppEntityAddress>>(branchDto.ContactAddresses);
+
+                            if (branchDto.ParentCode == createOrEditAccountInfoDto.Code.TrimEnd() + "-MAIN")
+                            {
+                                var mainbr = accountContact.ParentFkList.FirstOrDefault(z => z.Code == createOrEditAccountInfoDto.Code.TrimEnd() + "-MAIN");
+                                if (mainbr != null)
+                                {
+                                    if (mainbr.ParentFkList == null)
+                                    {
+                                        mainbr.ParentFkList = new List<AppContact>();
+                                    }
+                                    branchContact.ParentId = mainbr.Id;
+                                    mainbr.ParentFkList.Add(branchContact);
+                                }
+                            }
+                            else
+                            {
+                                branchContact.ParentId = accountContact.Id;
+                                accountContact.ParentFkList.Add(branchContact);
+                            }
+
+
+                            //xxb
+                            //xxTM
+                            MapperConfiguration configurationContactAcc;
+                            //stopped as per Ahmed email and approved by Omar
+                            //configurationContact = new MapperConfiguration(a => { a.AddProfile(new ContactDtoProfile(phoneTypes, currencyIds, languageIds, classIds, addresses, addressTypes, titleIds)); });
+                            configurationContactAcc = new MapperConfiguration(a => { a.AddProfile(new ContactDtoProfile(phoneTypes, ObjectMapper.Map<List<LookupLabelDto>>(currencyIds), languageIds, classIds, addresses, addressTypes)); });
+
+                            IMapper mapperContactAcc;
+                            mapperContactAcc = configurationContactAcc.CreateMapper();
+                            List<AccountExcelDto> resultExcelPersonAcc = accountExcelResultsDTO.ExcelRecords.Where(r => r.Status
+                            != ExcelRecordStatus.Failed.ToString()).Select(r => r.ExcelDto).ToList<AccountExcelDto>();
+                            List<AccountExcelDto> contactsExcelOnlyResultAcc = resultExcelPersonAcc.Where(r => r.RecordType == "Contact"
+                            && !string.IsNullOrEmpty(r.ParentCode) && r.ParentCode == oldBranchCode
+                            && r.rowNumber >= accountExcelResultsDTO.From && r.rowNumber <= accountExcelResultsDTO.To
+                            ).OrderBy(r => r.ParentCode).ToList<AccountExcelDto>();
+                            foreach (AccountExcelDto personExcelDto in contactsExcelOnlyResultAcc)
+                            {
+                                personExcelDto.ParentId = 0;
+                                try
+                                {
+                                    var BranchParent = _appContactRepository.GetAll().AsNoTracking().Where(r => r.Code == personExcelDto.ParentCode).FirstOrDefault();
+                                    if (BranchParent != null)
+                                    {
+                                        personExcelDto.ParentId = BranchParent.Id;
+                                        personExcelDto.AccountId = BranchParent.Id;
+
+                                        if (BranchParent.AccountId != null && BranchParent.AccountId > 0)
+                                        { personExcelDto.AccountId = BranchParent.AccountId; }
+                                    }
+                                }
+                                catch (Exception ex) { personExcelDto.ParentId = 0; }
+                            }
+
+                            List<ContactDto> resultContactAcc = mapperContactAcc.Map<List<AccountExcelDto>, List<ContactDto>>(contactsExcelOnlyResultAcc);
+                            //XXX
+                            var accountContactTeamList = (from o in _appContactRepository.GetAll().AsNoTracking().Where(r => r.EntityFk.EntityObjectTypeId == presonEntityObjectTypeId).ToList()
+                                                          join s in resultContactAcc on o.Code equals s.Code
+                                                          select o).ToList();
+                            //XXX
+                            foreach (ContactDto personDto in resultContactAcc)
+                            {
+                                string oldTMSSIN = "";
+                                if (true)//(personDto.ParentId > 0) && r.ParentCode == oldBranchCode
+                                {
+                                    //AppContact account = _appContactRepository.GetAll().Where(r => r.Code == personDto.Code && r.ParentId == personDto.ParentId).FirstOrDefault();
+                                    //AppContact accountTeam = _appContactRepository.GetAll().AsNoTracking().Include(z=>z.EntityFk)
+                                    //  .Where(r => r.Code == personDto.Code &&
+                                    //  r.EntityFk.EntityObjectTypeId == presonEntityObjectTypeId ).FirstOrDefault();
+                                    AppContact accountTeam = accountContactTeamList.FirstOrDefault(r => r.Code == personDto.Code);
+                                    string codeT = personDto.Code;
+                                    string oldPersonCode = personDto.Code;
+                                    long entityId = 0;
+                                    if (accountTeam != null)
+                                        oldTMSSIN = accountTeam.SSIN;
+
+                                    if (accountTeam != null && accountTeam.Id > 0)
+                                    {
+                                        switch (accountExcelResultsDTO.RepreateHandler)
+                                        {
+                                            case ExcelRecordRepeateHandler.IgnoreDuplicatedRecords: //ignore
+                                                continue;
+                                            case ExcelRecordRepeateHandler.ReplaceDuplicatedRecords: // replace
+                                                personDto.Id = accountTeam.Id;
+                                                accountId = accountTeam.AccountId;
+                                                entityId = accountTeam.EntityId;
+                                                break;
+                                            case ExcelRecordRepeateHandler.CreateACopy: // override
+                                                personDto.Code = GetAccountCopyCode(codeT, presonEntityObjectTypeId);
+                                                oldTMSSIN = "";
+                                                break;
+                                            default:
+                                                break;
+                                        }
+
+                                    }
+                                    foreach (var address in personDto.ContactAddresses)
+                                    {
+                                        address.AccountId = personDto.AccountId;
+                                        var addressId = await AddAddress(personDto.AccountId, address, countries);
+                                        if (addressId != null)
+                                            address.AddressId = addressId;
+                                    }
+
+                                    AppContact teamContact = new AppContact();
+                                    teamContact.AccountId = null;//accountContact.Id;
+                                    teamContact.SSIN = oldTMSSIN;
+                                    teamContact.ParentId = branchContact.Id;
+                                    teamContact.AccountType = accountContact.AccountType;
+                                    teamContact.AccountTypeId = accountContact.AccountTypeId;
+                                    teamContact.AppContactAddresses = ObjectMapper.Map<List<AppContactAddress>>(personDto.ContactAddresses);
+                                    if (personDto.Id != null && personDto.Id > 0)
+                                    {
+                                        teamContact.AccountId = accountId;
+                                        teamContact.Id = long.Parse(personDto.Id.ToString());
+                                    }
+                                    teamContact.AppContactPaymentMethods = accountContact.AppContactPaymentMethods;
+                                    teamContact.Code = personDto.Code;
+                                    teamContact.Name = personDto.Name;
+                                    teamContact.TradeName = personDto.TradeName;
+                                    teamContact.TenantId = AbpSession.TenantId;
+                                    teamContact.CurrencyId = string.IsNullOrEmpty(personDto.CurrencyId.ToString()) || personDto.CurrencyId == 0 ? null : personDto.CurrencyId;
+                                    teamContact.EMailAddress = personDto.EMailAddress;
+                                    teamContact.Phone2Number = personDto.Phone2Number;
+                                    teamContact.Phone1Number = personDto.Phone1Number;
+                                    teamContact.Phone3Number = personDto.Phone3Number;
+                                    teamContact.IsProfileData = true;
+                                    teamContact.LanguageId = personDto.LanguageId;
+                                    teamContact.Phone1Ext = personDto.Phone1Ext;
+                                    teamContact.Phone2Ext = personDto.Phone2Ext;
+                                    teamContact.Phone3Ext = personDto.Phone3Ext;
+                                    teamContact.Phone1TypeId = personDto.Phone1TypeId == 0 ? null : personDto.Phone1TypeId;
+                                    teamContact.Phone2TypeId = personDto.Phone2TypeId == 0 ? null : personDto.Phone2TypeId;
+                                    teamContact.Phone3TypeId = personDto.Phone3TypeId == 0 ? null : personDto.Phone3TypeId;
+                                    teamContact.PriceLevel = accountContact.PriceLevel;
+                                    teamContact.Website = personDto.Website;
+                                    teamContact.EntityFk = new AppEntity();
+                                    teamContact.EntityFk.Id = entityId;
+                                    teamContact.PartnerId = null;
+                                    teamContact.EntityFk.TenantId = AbpSession.TenantId;
+                                    teamContact.EntityFk.Code = personDto.Code;
+                                    teamContact.EntityFk.Name = personDto.Name;
+                                    teamContact.EntityFk.Notes = accountContact.EntityFk.Notes;
+                                    teamContact.EntityFk.ObjectId = contactObjectId;
+                                    teamContact.EntityFk.EntityObjectTypeId = presonEntityObjectTypeId;
+                                    teamContact.EntityFk.EntityObjectTypeCode = presonEntityObjectTypeCode;
+                                    teamContact.EntityFk.EntityObjectTypeFk = null;
+                                    teamContact.EntityFk.EntityCategories = accountContact.EntityFk.EntityCategories;
+                                    teamContact.EntityFk.EntityAttachments = accountContact.EntityFk.EntityAttachments;
+                                    teamContact.EntityFk.EntityExtraData = new List<AppEntityExtraData>();
+                                    if (!string.IsNullOrEmpty(personDto.FirstName))
+                                    {
+                                        AppEntityExtraData appEntityExtraDto = new AppEntityExtraData();
+                                        appEntityExtraDto.AttributeValueId = null;
+                                        appEntityExtraDto.AttributeValue = personDto.FirstName;
+                                        appEntityExtraDto.AttributeId = 701;
+                                        teamContact.EntityFk.EntityExtraData.Add(appEntityExtraDto);
+                                    }
+
+                                    if (!string.IsNullOrEmpty(personDto.LastName))
+                                    {
+                                        AppEntityExtraData appEntityExtraLNameDto = new AppEntityExtraData();
+                                        appEntityExtraLNameDto.AttributeValueId = null;
+                                        appEntityExtraLNameDto.AttributeValue = personDto.LastName;
+                                        appEntityExtraLNameDto.AttributeId = 702;
+                                        teamContact.EntityFk.EntityExtraData.Add(appEntityExtraLNameDto);
+                                    }
+
+
+                                    if (personDto.Phone1IsPublic != null)
+                                    {
+                                        AppEntityExtraData appEntityExtraTitleDto = new AppEntityExtraData();
+
+                                        appEntityExtraTitleDto.AttributeValue = "True";
+                                        appEntityExtraTitleDto.AttributeValueId = null;
+                                        appEntityExtraTitleDto.AttributeId = 710;
+                                        teamContact.EntityFk.EntityExtraData.Add(appEntityExtraTitleDto);
+                                    }
+
+
+                                    if (personDto.Phone2IsPublic != null)
+                                    {
+                                        AppEntityExtraData appEntityExtraTitleDto = new AppEntityExtraData();
+                                        appEntityExtraTitleDto.AttributeValue = "True";
+                                        appEntityExtraTitleDto.AttributeValueId = null;
+                                        appEntityExtraTitleDto.AttributeId = 711;
+                                        teamContact.EntityFk.EntityExtraData.Add(appEntityExtraTitleDto);
+                                    }
+                                    if (personDto.Phone3IsPublic != null)
+                                    {
+                                        AppEntityExtraData appEntityExtraTitleDto = new AppEntityExtraData();
+
+                                        appEntityExtraTitleDto.AttributeValue = "True";
+                                        appEntityExtraTitleDto.AttributeValueId = null;
+                                        appEntityExtraTitleDto.AttributeId = 712;
+                                        teamContact.EntityFk.EntityExtraData.Add(appEntityExtraTitleDto);
+                                    }
+                                    if (personDto.EmailAddressIsPublic != null)
+                                    {
+                                        AppEntityExtraData appEntityExtraTitleDto = new AppEntityExtraData();
+
+                                        appEntityExtraTitleDto.AttributeValue = "True";
+                                        appEntityExtraTitleDto.AttributeValueId = null;
+                                        appEntityExtraTitleDto.AttributeId = 709;
+                                        teamContact.EntityFk.EntityExtraData.Add(appEntityExtraTitleDto);
+                                    }
+                                    //accountContact.EntityFk.EntityAddresses = createOrEditAccountInfoDto.ContactAddresses;
+                                    if (string.IsNullOrEmpty(teamContact.SSIN))
+                                    {
+                                        teamContact.EntityFk.SSIN = await
+                                            _helper.SystemTables.GenerateSSIN(contactObjectId, ObjectMapper.Map<AppEntityDto>(teamContact.EntityFk));
+                                        teamContact.SSIN = teamContact.EntityFk.SSIN;
+                                    }
+                                    List<AppContactAddress> teamAddress = new List<AppContactAddress>();
+                                    teamContact.AppContactAddresses = new List<AppContactAddress>();
+                                    teamAddress = ObjectMapper.Map<List<AppContactAddress>>(personDto.ContactAddresses);
+                                    foreach (var address in teamAddress)
+                                    {
+                                        teamContact.AppContactAddresses.Add(new AppContactAddress
+                                        {
+                                            AddressFk = address.AddressFk,
+                                            ContactFk = accountContact,
+                                            AddressId = address.AddressId,
+                                            AddressCode = address.AddressCode,
+                                            ContactCode = accountContact.Code,
+                                            ContactId = accountContact.Id,
+                                            AddressTypeId = address.AddressTypeId
+                                        });
+                                    }
+                                    //teamContact.EntityFk.EntityAddresses = ObjectMapper.Map<List<AppEntityAddress>>(branchDto.ContactAddresses);
+                                    if (branchContact.ParentFkList == null)
+                                        branchContact.ParentFkList = new List<AppContact>();
+                                    branchContact.ParentFkList.Add(teamContact);
+                                    //var contact = await CreateOrEditContact(personDto);
+
+                                }
+                                else
+                                {
+                                    // add to log
+                                }
+                            }
+                            //XXTM
+                        }
+                    }
+
+                    //XXXB
+                    //        var retAccount = await CreateOrEditAccount(createOrEditAccountInfoDto);
+                    //try
+                    //{
+                    //    var objContact = _appContactRepository.GetAll().Where(r => r.Code == createOrEditAccountInfoDto.Code).FirstOrDefault();
+                    //    long newId = objContact.Id;
+                    //    foreach (AccountExcelDto accountExcelDto in result.Where(r => r.ParentCode == oldCode))
+                    //    {
+                    //        accountExcelDto.ParentCode = createOrEditAccountInfoDto.Code;
+                    //        accountExcelDto.ParentId = newId;
+                    //    }
+                    //    foreach (var address in createOrEditAccountInfoDto.ContactAddresses)
+                    //    {
+                    //        try
+                    //        {
+                    //            var appaddress = _appAddressRepository.GetAll().Where(r => r.Id == address.AddressId).First();
+                    //            appaddress.AccountId = objContact.Id;
+                    //            await _appAddressRepository.UpdateAsync(appaddress);
+                    //            await CurrentUnitOfWork.SaveChangesAsync();
+                    //        }
+                    //        catch (Exception ex) { }
+                    //    }
+                    //}
+                    //catch (Exception ex) { }
+
+                }
+
+                var con = UnitOfWorkManager.Current.GetDbContext<onetouchDbContext>(null, null);
+                // {
+                //  var oldChange = con.ChangeTracker.AutoDetectChangesEnabled;
+                //   con.ChangeTracker.AutoDetectChangesEnabled = false;
+                List<AppContact> manualAccounts = new List<AppContact>();
+                List<AppContact> contacts = new List<AppContact>();
+                try
+                {
+                    // using (var dbContextTransaction = con.Database.BeginTransaction())
+                    {
+                        if (accountsList.Count > 0)
+                        {
+                            con.AppContacts.AddRange(accountsList);
+                            manualAccounts.AddRange(accountsList);
+                        }
+                        if (accountsListUpdated.Count > 0)
+                        {
+                            con.AppContacts.UpdateRange(accountsListUpdated);
+                            manualAccounts.AddRange(accountsListUpdated);
+                        }
+                        await con.SaveChangesAsync();
+
+                        // accountsList.ForEach(s => s.ParentFkList.ForEach(a => a.AccountId = s.Id));
+                        // ac  ol6tttttt5countsList.ForEach(s => s.ParentFkList.ForEach(a => a.ParentFkList.ForEach(e=>e.AccountId=s.Id)));
+
+                        foreach (var acc in manualAccounts)
+                        {
+                            //xx
+                            if (acc.AppContactAddresses != null)
+                            {
+                                foreach (var z in acc.AppContactAddresses)
+                                {
+                                    if (z.AddressFk != null)
+                                        z.AddressFk.AccountId = acc.Id;
+                                }
+                            }
+                            //xx
+                            foreach (var br in acc.ParentFkList)
+                            {
+                                //xx
+                                if (br.AppContactAddresses != null)
+                                {
+                                    foreach (var z in br.AppContactAddresses)
+                                    {
+                                        if (z.AddressFk != null)
+                                            z.AddressFk.AccountId = acc.Id;
+                                    }
+                                }
+                                //xx
+                                br.AccountId = acc.Id;
+                                if (br.ParentFkList != null)
+                                {
+                                    foreach (var cont in br.ParentFkList)
+                                    {
+                                        //xx
+                                        foreach (var z in cont.AppContactAddresses)
+                                        {
+                                            if (z.AddressFk != null)
+                                                z.AddressFk.AccountId = acc.Id;
+                                        }
+                                        //xx
+                                        cont.AccountId = acc.Id;
+                                        contacts.Add(cont);
+                                    }
+                                }
+                            }
+
+                        }
+                        con.AppContacts.UpdateRange(accountsList);
+                        await con.SaveChangesAsync();
+                        //I40[Start]
+                        //  dbContextTransaction.Commit();
+                    }
+
+                    var contactFortCurrTenant = await _appContactRepository.GetAll()
+                          .AsNoTracking()
+                          .FirstOrDefaultAsync(x => x.TenantId == AbpSession.TenantId && x.IsProfileData == true && x.ParentId == null);
+
+                    if (contactFortCurrTenant != null)
+                    {
+                        var publishedMainAcc = await _appMarketplaceContactRepository.GetAll().Where(z => z.SSIN == contactFortCurrTenant.SSIN).FirstOrDefaultAsync();
+                        if (publishedMainAcc == null)
+                        {
+                            await PublishProfile();
+                            await _iCreateMarketplaceAccount.HideAccount(contactFortCurrTenant.SSIN);
+                        }
+
+                        foreach (var acc in manualAccounts)
+                        {
+                            var publishedAcc = await _appMarketplaceContactRepository.GetAll().Where(z => z.SSIN == acc.SSIN).FirstOrDefaultAsync();
+                            if (publishedAcc == null)
+                            {
+
+                                var tenant = AbpSession.TenantId;
+                                await PublishManualAccount(acc.SSIN, long.Parse(tenant.ToString()));
+
+                                //if (contactFortCurrTenant != null)
+                                {
+                                    var returnVal =
+                                        await _iCreateMarketplaceAccount.CreateOrEditMarketplaceContactRelationship(contactFortCurrTenant.SSIN, acc.SSIN, false, false, null,null);
+                                }
+                                await _iCreateMarketplaceAccount.HideAccount(acc.SSIN);
+                            }
+                        }
+                        foreach (var acc in manualAccounts)
+                        {
+                            var account = await _appContactRepository.GetAll().Include(z => z.EntityFk)
+                                .Where(z => z.Code == acc.Code && z.EntityFk.EntityObjectTypeId == partnerEntityObjectTypeId).FirstOrDefaultAsync();
+                            if (account != null)
+                            {
+                                //var contactList = await _appContactRepository.GetAll().Include(z => z.EntityFk)
+                                //.Where(z => z.AccountId == account.Id && acc.EntityFk.EntityObjectTypeId == presonEntityObjectTypeId).ToListAsync();
+                                var contactList = contacts.Where(z => z.AccountId == account.Id).ToList();
+
+                                if (contactList != null && contactList.Count() > 0)
+                                {
+                                    foreach (var cont in contactList)
+                                    {
+                                        if (cont.ParentId != null && cont.AccountId != null)
+                                        {
+                                            var accountObj = await _appContactRepository.GetAll().Where(z => z.Id == cont.AccountId).FirstOrDefaultAsync();
+                                            if (accountObj != null)
+                                            {
+                                                var publishedAccount = await _appMarketplaceContactRepository.GetAll().Where(z => z.TenantOwner == accountObj.TenantId && z.SSIN == accountObj.SSIN).FirstOrDefaultAsync();
+                                                if (publishedAccount != null)
+                                                {
+                                                    //var presonEntityObjectTypeId = await _helper.SystemTables.GetEntityObjectTypePersonId();
+                                                    await _iCreateMarketplaceAccount.PublishMember(cont.Id, publishedAccount.Id, presonEntityObjectTypeId, publishedAccount.Id, publishedAccount.Id);
+                                                    await _iCreateMarketplaceAccount.CreateOrEditMarketplaceContactRelationship(publishedAccount.SSIN, cont.SSIN, false, null, null,null);
+                                                    await _iCreateMarketplaceAccount.HideAccount(accountObj.SSIN);
+
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        //I40
+                        foreach (var acc in accountsListUpdated)
+                        {
+                            var publishedAcc = await _appMarketplaceContactRepository.GetAll().Where(z => z.SSIN == acc.SSIN).FirstOrDefaultAsync();
+                            if (publishedAcc == null)
+                            {
+
+                                var tenant = AbpSession.TenantId;
+                                await PublishManualAccount(acc.SSIN, long.Parse(tenant.ToString()));
+
+                                //if (contactFortCurrTenant != null)
+                                {
+                                    var returnVal =
+                                        await _iCreateMarketplaceAccount.CreateOrEditMarketplaceContactRelationship(contactFortCurrTenant.SSIN, acc.SSIN, false, false, null,null);
+                                }
+                                await _iCreateMarketplaceAccount.HideAccount(acc.SSIN);
+                            }
+                        }
+                    }
+                    //i40
+                    //I40[End]
+                    // accountContact
+
+                }
+                catch (Exception expt)
+                {
+
+                    using (var dbContextTransaction = con.Database.BeginTransaction())
+                    {
+
+                        //x.AppContacts.AddRange(accountsList);
+                        if (accountsList.Count > 0)
+                            con.AppContacts.AddRange(accountsList);
+
+                        if (accountsListUpdated.Count > 0)
+                            con.AppContacts.UpdateRange(accountsListUpdated);
+
+                        await con.SaveChangesAsync();
+                        foreach (var acc in accountsList)
+                        {
+                            //xx
+                            foreach (var z in acc.AppContactAddresses)
+                            {
+                                if (z.AddressFk != null)
+                                    z.AddressFk.AccountId = acc.Id;
+                            }
+                            //xx
+                            foreach (var br in acc.ParentFkList)
+                            {
+                                //xx
+                                foreach (var z in br.AppContactAddresses)
+                                {
+                                    if (z.AddressFk != null)
+                                        z.AddressFk.AccountId = acc.Id;
+                                }
+                                //xx
+                                br.AccountId = acc.Id;
+                                foreach (var cont in br.ParentFkList)
+                                {
+                                    //xx
+                                    foreach (var z in cont.AppContactAddresses)
+                                    {
+                                        if (z.AddressFk != null)
+                                            z.AddressFk.AccountId = acc.Id;
+                                    }
+                                    //xx
+                                    cont.AccountId = acc.Id;
+                                }
+                            }
+
+                        }
+                        con.AppContacts.UpdateRange(accountsList);
+                        await con.SaveChangesAsync();
+                        dbContextTransaction.Commit();
+                        //
+                        //I40[Start]
+
+                        //foreach (var acc in accountsList)
+                        //{
+                        //    var contactList = await _appContactRepository.GetAll().Include(z => z.EntityFk)
+                        //        .Where(z => z.AccountId == acc.Id && acc.EntityFk.EntityObjectTypeId == presonEntityObjectTypeId).ToListAsync();
+
+                        //    if (contactList != null && contactList.Count() > 0)
+                        //    {
+                        //        foreach (var cont in contactList)
+                        //        {
+                        //            if (cont.ParentId != null && cont.AccountId != null)
+                        //            {
+                        //                var accountObj = await _appContactRepository.GetAll().Where(z => z.Id == cont.AccountId).FirstOrDefaultAsync();
+                        //                if (accountObj != null)
+                        //                {
+                        //                    var publishedAccount = await _appMarketplaceContactRepository.GetAll().Where(z => z.TenantOwner == accountObj.TenantId && z.SSIN == accountObj.SSIN).FirstOrDefaultAsync();
+                        //                    if (publishedAccount != null)
+                        //                    {
+                        //                        //var presonEntityObjectTypeId = await _helper.SystemTables.GetEntityObjectTypePersonId();
+                        //                        await _iCreateMarketplaceAccount.PublishMember(cont.Id, publishedAccount.Id, presonEntityObjectTypeId, publishedAccount.Id, publishedAccount.Id);
+                        //                        await _iCreateMarketplaceAccount.HideAccount(accountObj.SSIN);
+
+                        //                    }
+                        //                }
+                        //            }
+                        //        }
+                        //    }
+                        //}
+                        var contactFortCurrTenant = await _appContactRepository.GetAll()
+                          .AsNoTracking()
+                          .FirstOrDefaultAsync(x => x.TenantId == AbpSession.TenantId && x.IsProfileData == true && x.ParentId == null);
+
+                        if (contactFortCurrTenant != null)
+                        {
+                            var publishedMainAcc = await _appMarketplaceContactRepository.GetAll().Where(z => z.SSIN == contactFortCurrTenant.SSIN).FirstOrDefaultAsync();
+                            if (publishedMainAcc == null)
+                            {
+                                await PublishProfile();
+                                await _iCreateMarketplaceAccount.HideAccount(contactFortCurrTenant.SSIN);
+                            }
+
+                            foreach (var acc in manualAccounts)
+                            {
+                                var publishedAcc = await _appMarketplaceContactRepository.GetAll().Where(z => z.SSIN == acc.SSIN).FirstOrDefaultAsync();
+                                if (publishedAcc == null)
+                                {
+
+                                    var tenant = AbpSession.TenantId;
+                                    await PublishManualAccount(acc.SSIN, long.Parse(tenant.ToString()));
+
+                                    //if (contactFortCurrTenant != null)
+                                    {
+                                        var returnVal =
+                                            await _iCreateMarketplaceAccount.CreateOrEditMarketplaceContactRelationship(contactFortCurrTenant.SSIN, acc.SSIN, false, false, null,null);
+                                    }
+                                    await _iCreateMarketplaceAccount.HideAccount(acc.SSIN);
+                                }
+                            }
+                            foreach (var acc in manualAccounts)
+                            {
+                                var account = await _appContactRepository.GetAll().Include(z => z.EntityFk)
+                                    .Where(z => z.Code == acc.Code && z.EntityFk.EntityObjectTypeId == partnerEntityObjectTypeId).FirstOrDefaultAsync();
+                                if (account != null)
+                                {
+                                    //var contactList = await _appContactRepository.GetAll().Include(z => z.EntityFk)
+                                    //.Where(z => z.AccountId == account.Id && acc.EntityFk.EntityObjectTypeId == presonEntityObjectTypeId).ToListAsync();
+                                    var contactList = contacts.Where(z => z.AccountId == account.Id).ToList();
+
+                                    if (contactList != null && contactList.Count() > 0)
+                                    {
+                                        foreach (var cont in contactList)
+                                        {
+                                            if (cont.ParentId != null && cont.AccountId != null)
+                                            {
+                                                var accountObj = await _appContactRepository.GetAll().Where(z => z.Id == cont.AccountId).FirstOrDefaultAsync();
+                                                if (accountObj != null)
+                                                {
+                                                    var publishedAccount = await _appMarketplaceContactRepository.GetAll().Where(z => z.TenantOwner == accountObj.TenantId && z.SSIN == accountObj.SSIN).FirstOrDefaultAsync();
+                                                    if (publishedAccount != null)
+                                                    {
+                                                        //var presonEntityObjectTypeId = await _helper.SystemTables.GetEntityObjectTypePersonId();
+                                                        await _iCreateMarketplaceAccount.PublishMember(cont.Id, publishedAccount.Id, presonEntityObjectTypeId, publishedAccount.Id, publishedAccount.Id);
+                                                        await _iCreateMarketplaceAccount.CreateOrEditMarketplaceContactRelationship(publishedAccount.SSIN, cont.SSIN, false, null, null,null);
+                                                        await _iCreateMarketplaceAccount.HideAccount(accountObj.SSIN);
+
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            //I40
+                            foreach (var acc in accountsListUpdated)
+                            {
+                                var publishedAcc = await _appMarketplaceContactRepository.GetAll().Where(z => z.SSIN == acc.SSIN).FirstOrDefaultAsync();
+                                if (publishedAcc == null)
+                                {
+
+                                    var tenant = AbpSession.TenantId;
+                                    await PublishManualAccount(acc.SSIN, long.Parse(tenant.ToString()));
+
+                                    //if (contactFortCurrTenant != null)
+                                    {
+                                        var returnVal =
+                                            await _iCreateMarketplaceAccount.CreateOrEditMarketplaceContactRelationship(contactFortCurrTenant.SSIN, acc.SSIN, false, false, null,null);
+                                    }
+                                    await _iCreateMarketplaceAccount.HideAccount(acc.SSIN);
+                                }
+                            }
+                        }
+                        //I40[End]
+                        //
+                    }
+                    //  con.ChangeTracker.AutoDetectChangesEnabled= oldChange;
+                    // }
+                }
+                return accountExcelResultsDTO.ExcelLogDTO;
+                #endregion add accounts
+
+                #region add branchs
+                MapperConfiguration configurationBranch;
+                configurationBranch = new MapperConfiguration(a => { a.AddProfile(new BranchDtoProfile(phoneTypes, _currencyIds, languageIds, classIds, addresses, addressTypes)); });
+                IMapper mapperBranch;
+                mapperBranch = configurationBranch.CreateMapper();
+                List<AccountExcelDto> resultExcelBranch = accountExcelResultsDTO.ExcelRecords.Where(r => r.Status
+                != ExcelRecordStatus.Failed.ToString()).Select(r => r.ExcelDto).ToList<AccountExcelDto>();
+                List<AccountExcelDto> resultExcelBranchOnly = resultExcelBranch.Where(r => r.RecordType == "Branch"
+                && !string.IsNullOrEmpty(r.ParentCode)
+                && r.rowNumber >= accountExcelResultsDTO.From && r.rowNumber <= accountExcelResultsDTO.To
+                ).OrderBy(r => r.ParentCode).ToList();
+
+                foreach (AccountExcelDto branchExcelDto in resultExcelBranchOnly)
+                {
+                    branchExcelDto.ParentId = 0;
+                    try
+                    {
+                        var BranchParent = _appContactRepository.GetAll().Where(r => r.Code == branchExcelDto.ParentCode).FirstOrDefault();
+                        branchExcelDto.ParentId = BranchParent.Id;
+                        branchExcelDto.AccountId = BranchParent.Id;
+
+                        if (BranchParent.AccountId != null && BranchParent.AccountId > 0)
+                        { branchExcelDto.AccountId = BranchParent.AccountId; }
+
+                    }
+                    catch (Exception ex) { branchExcelDto.ParentId = 0; }
+                }
+
+                List<BranchDto> resultBranchDto = mapperBranch.Map<List<AccountExcelDto>, List<BranchDto>>(resultExcelBranchOnly);
+                foreach (BranchDto branchDto in resultBranchDto)
+                {
+                    if (true)//(branchDto.ParentId > 0)
+                    {
+                        AppContact account = _appContactRepository.GetAll().Where(r => r.Code == branchDto.Code).FirstOrDefault();
+                        string code = branchDto.Code;
+                        string oldBranchCode = branchDto.Code;
+                        if (account != null && account.Id > 0)
+                        {
+                            switch (accountExcelResultsDTO.RepreateHandler)
+                            {
+                                case ExcelRecordRepeateHandler.IgnoreDuplicatedRecords: //ignore
+                                    continue;
+                                case ExcelRecordRepeateHandler.ReplaceDuplicatedRecords: // replace
+                                    branchDto.Id = account.Id;
+                                    break;
+                                case ExcelRecordRepeateHandler.CreateACopy: // override
+                                                                            //  branchDto.Code = GetAccountCopyCode(code);
+                                    break;
+                                default:
+                                    break;
+                            }
+                        }
+                        //branchDto.AccountId = branchDto.ParentId;
+                        foreach (var address in branchDto.ContactAddresses)
+                        {
+                            address.AccountId = (long)branchDto.AccountId;
+                            await AddAddress((long)branchDto.AccountId, address, countries);
+                        }
+
+                        var contact = await CreateOrEditBranch(branchDto);
+
+                        try
+                        {
+                            long newId = _appContactRepository.GetAll().Where(r => r.Code == branchDto.Code).FirstOrDefault().Id;
+                            foreach (AccountExcelDto accountExcelDto in result.Where(r => r.ParentCode == oldBranchCode))
+                            {
+                                accountExcelDto.ParentCode = branchDto.Code;
+                                accountExcelDto.ParentId = newId;
+                            }
+
+                        }
+                        catch (Exception ex) { }
+
+                    }
+                    else
+                    { // add to log
+                    }
+                }
+
+
+                #endregion add branchs
+
+                #region add contacts
+                MapperConfiguration configurationContact;
+                //stopped as per Ahmed email and approved by Omar
+                //configurationContact = new MapperConfiguration(a => { a.AddProfile(new ContactDtoProfile(phoneTypes, currencyIds, languageIds, classIds, addresses, addressTypes, titleIds)); });
+                configurationContact = new MapperConfiguration(a => { a.AddProfile(new ContactDtoProfile(phoneTypes, ObjectMapper.Map<List<LookupLabelDto>>(currencyIds), languageIds, classIds, addresses, addressTypes)); });
+
+                IMapper mapperContact;
+                mapperContact = configurationContact.CreateMapper();
+                List<AccountExcelDto> resultExcelPerson = accountExcelResultsDTO.ExcelRecords.Where(r => r.Status
+                != ExcelRecordStatus.Failed.ToString()).Select(r => r.ExcelDto).ToList<AccountExcelDto>();
+                List<AccountExcelDto> contactsExcelOnlyResult = resultExcelPerson.Where(r => r.RecordType == "Contact"
+                && !string.IsNullOrEmpty(r.ParentCode)
+                && r.rowNumber >= accountExcelResultsDTO.From && r.rowNumber <= accountExcelResultsDTO.To
+                ).OrderBy(r => r.ParentCode).ToList<AccountExcelDto>();
+
+                foreach (AccountExcelDto personExcelDto in contactsExcelOnlyResult)
+                {
+                    personExcelDto.ParentId = 0;
+                    try
+                    {
+                        var BranchParent = _appContactRepository.GetAll().Where(r => r.Code == personExcelDto.ParentCode).FirstOrDefault();
+
+                        personExcelDto.ParentId = BranchParent.Id;
+                        personExcelDto.AccountId = BranchParent.Id;
+
+                        if (BranchParent.AccountId != null && BranchParent.AccountId > 0)
+                        { personExcelDto.AccountId = BranchParent.AccountId; }
+
+                    }
+                    catch (Exception ex) { personExcelDto.ParentId = 0; }
+                }
+
+                List<ContactDto> resultContact = mapperContact.Map<List<AccountExcelDto>, List<ContactDto>>(contactsExcelOnlyResult);
+                foreach (ContactDto personDto in resultContact)
+                {
+                    if (personDto.ParentId > 0)
+                    {
+                        //AppContact account = _appContactRepository.GetAll().Where(r => r.Code == personDto.Code && r.ParentId == personDto.ParentId).FirstOrDefault();
+                        AppContact account = _appContactRepository.GetAll().Where(r => r.Code == personDto.Code).FirstOrDefault();
+                        string code = personDto.Code;
+                        string oldPersonCode = personDto.Code;
+                        if (account != null && account.Id > 0)
+                        {
+                            switch (accountExcelResultsDTO.RepreateHandler)
+                            {
+                                case ExcelRecordRepeateHandler.IgnoreDuplicatedRecords: //ignore
+                                    continue;
+                                case ExcelRecordRepeateHandler.ReplaceDuplicatedRecords: // replace
+                                    personDto.Id = account.Id;
+                                    break;
+                                case ExcelRecordRepeateHandler.CreateACopy: // override
+                                                                            //   personDto.Code = GetAccountCopyCode(code);
+                                    break;
+                                default:
+                                    break;
+                            }
+
+                        }
+                        foreach (var address in personDto.ContactAddresses)
+                        {
+                            address.AccountId = personDto.AccountId;
+                            await AddAddress(personDto.AccountId, address, countries);
+                        }
+                        var contact = await CreateOrEditContact(personDto);
+                    }
+                    else
+                    {
+                        // add to log
+                    }
+                }
+                #endregion add contacts
+            }
+            catch (Exception ex) { }
+
+            #endregion CreateOrEditAccountInfoDto Mapper - Save
+
+            //#region update the excel sheet with errors
+            // Create new Spreadsheet
+            //Spreadsheet document = new Spreadsheet();
+            //document.LoadFromFile(accountExcelResultsDTO.FilePath);
+
+            //// Get worksheet by name
+            //Worksheet Sheet = document.Workbook.Worksheets[0];
+            //// Set current cell
+            //Sheet.Cell("CA1").Value = "Processing Status";
+            //Sheet.Cell("CB1").Value = "Processing Error Message";
+            //Sheet.Cell("CC1").Value = "Processing Error Details";
+            //int rowNumber = 1;
+            //foreach (AccountExcelRecordDTO logRecord in accountExcelResultsDTO.AccountExcelRecords)
+            //{
+            //    rowNumber++;
+            //    Sheet.Cell("CA" + rowNumber.ToString()).Value = logRecord.Status;
+            //    Sheet.Cell("CB" + rowNumber.ToString()).Value = logRecord.ErrorMessage;
+            //    Sheet.Cell("CC" + rowNumber.ToString()).Value = logRecord.FieldsErrors.JoinAsString(",");
+            //}
+            ////move to attachment folder and save
+            //accountExcelResultsDTO.FilePath = accountExcelResultsDTO.FilePath.Replace(_appConfiguration[$"Attachment:PathTemp"], _appConfiguration[$"Attachment:Path"]);
+            //accountExcelResultsDTO.FilePath = accountExcelResultsDTO.FilePath.Replace(_appConfiguration[$"Attachment:PathTemp"], _appConfiguration[$"Attachment:Path"]);
+
+            //string tempFileName = accountExcelResultsDTO.FilePath;
+
+            //document.SaveAsXLSX(tempFileName.ToUpper().Replace(".XLSX", accountExcelResultsDTO.From.ToString() + ".XLSX"));
+
+            //// Close document
+            //document.Close();
+
+
+
+            //#endregion update the excel sheet with errors
+
+
+            //AccountExcelLogDto accountExcelLogDto = new AccountExcelLogDto();
+
+            //accountExcelLogDto.AccountExcelLogPath = accountExcelResultsDTO.FilePath.Replace(_appConfiguration[$"Templates:ExcelTemplateOmitt"], "");
+            //accountExcelLogDto.AccountExcelLogFileName = _appConfiguration[$"Templates:AccountExcelLogFileName"];
+
+
+            //return accountExcelLogDto;
+            return accountExcelResultsDTO.ExcelLogDTO;
+        }
+        //MMT22
         //MMT
         //public async Task<AccountExcelLogDto> SaveAccountFromExcel(AccountExcelResultsDTO accountExcelResultsDTO)
-        public async Task<ExcelLogDto> SaveFromExcel(AccountExcelResultsDTO accountExcelResultsDTO)
+        public async Task<ExcelLogDto> _SaveFromExcel(AccountExcelResultsDTO accountExcelResultsDTO)
         //MMT2
         {
             #region get lists
