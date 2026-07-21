@@ -50,6 +50,7 @@ using Microsoft.Identity.Client;
 using Abp.Extensions;
 using DocumentFormat.OpenXml.Drawing.Diagrams;
 using ClosedXML.Excel;
+using System.Transactions;
 
 namespace onetouch.AppMarketplaceAccounts
 {
@@ -118,6 +119,8 @@ namespace onetouch.AppMarketplaceAccounts
         [AbpAllowAnonymous]
         public async Task<PagedResultDto<GetMarketplaceAccountForViewDto>> GetAll(GetAllAccountsInput input)
         {
+            var stopwatch = new System.Diagnostics.Stopwatch();
+            stopwatch.Start();
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
             {
                 //I50[Start]
@@ -203,11 +206,11 @@ namespace onetouch.AppMarketplaceAccounts
                             .WhereIf(AbpSession.TenantId != null && input.Status != null && input.Status.Count(x => x == 1) > 0,
                                  //I49[Start]
                                  //x => _appContactRepository.GetAll().Count(c => c.TenantId == AbpSession.TenantId && c.SSIN == x.SSIN) > 0)
-                                 x => _appContactRelationshipInfoRepository.GetAll().Count(
+                                 x => _appContactRelationshipInfoRepository.GetAll().Any(
                                     z => ((z.RecipientContactSSIN == x.SSIN && z.RequesterContactSSIN == currentTenantAccountSSIN)
                                     || (z.RequesterContactSSIN == x.SSIN && z.RecipientContactSSIN == currentTenantAccountSSIN)) &&
                                     z.EntityObjectStatusId == activeRelationshipStatusId
-                                    ) > 0)
+                                    ))
                             //I49[End]
                             .WhereIf(AbpSession.TenantId != null && input.Status != null && input.Status.Count(x => x == 2) > 0,
                                // x => (//_appContactRepository.GetAll().Count(c => c.TenantId == AbpSession.TenantId && c.SSIN == x.SSIN) == 0)
@@ -304,7 +307,9 @@ namespace onetouch.AppMarketplaceAccounts
                 else
                 {
                     _accounts = from o in pagedAndFilteredAccounts
-                                    join o1 in _appContactRepository.GetAll().Where(z=>z.TenantId==AbpSession.TenantId) on o.SSIN equals o1.SSIN into j1
+                                    join o1 in _appContactRepository.GetAll()
+                                    .Where(z=>z.TenantId==AbpSession.TenantId)
+                                    on o.SSIN equals o1.SSIN into j1
                                     //from s1 in j1.DefaultIfEmpty()
                                     //where s1.TenantId == AbpSession.TenantId
                                     //join o1 in _appEntityRepository.GetAll() on o.AppContactAddresses.FirstOrDefault().AddressFk.CountryId equals o1.Id into j1
@@ -384,17 +389,21 @@ namespace onetouch.AppMarketplaceAccounts
                     foreach (var account in accountsList)
                     {
                         //I50[Start]
-                        var relationshipsQuery = _appContactRelationshipInfoRepository.GetAll()
+                        var relationshipsQuery = _appContactRelationshipInfoRepository
+                            .GetAll()
                         .Where(z => ((z.RequesterContactSSIN == account.Account.SSIN)
-                         || (z.RecipientContactSSIN == account.Account.SSIN)) && z.EntityObjectStatusId == activeRelationshipStatusId &&
+                         || (z.RecipientContactSSIN == account.Account.SSIN)) && 
+                         z.EntityObjectStatusId != inActiveRelationshipStatusId &&
                         (z.SharingLevel == 1));
+                        if (!string.IsNullOrEmpty(input.FilterCondition))
+                        {
+                            var relationshipQ = from b in _appMarketplaceContactRepository.GetAll().Where(z => z.SSIN != account.Account.SSIN && z.IsDeleted == false && z.SharingLevel == 1)
+                                                from a in relationshipsQuery
+                                                where (b.SSIN == a.RequesterContactSSIN || b.SSIN == a.RecipientContactSSIN)
+                                                select new { obj = b.SSIN };
 
-                        var relationshipQ = from b in _appMarketplaceContactRepository.GetAll().Where(z => z.SSIN != account.Account.SSIN && z.IsDeleted == false && z.SharingLevel == 1)
-                                            from a in relationshipsQuery
-                                            where (b.SSIN == a.RequesterContactSSIN || b.SSIN == a.RecipientContactSSIN)
-                                            select new { obj = b.SSIN };
-
-                        account.Account.Connections = await relationshipQ.Distinct().CountAsync();
+                            account.Account.Connections = await relationshipQ.Distinct().CountAsync();
+                        }
                         //I50[End]
                         account.AvailableConnections = new List<ConnectionType>();
                         account.ConnectionName = "";
@@ -438,7 +447,8 @@ namespace onetouch.AppMarketplaceAccounts
                                     connInfo.RelationshipCode = relationship.EntityObjectTypeCode;                                                                                                            //xx
                                     connInfo.RequestorRole = relationship.RequesterMarketplaceRole;
                                     connInfo.RecipientRole = relationship.RecipientMarketplaceRole;
-                                    var relationType = await _appEntityRepository.GetAll().Include(z => z.EntityExtraData).Where(z => z.Code == relationshipCode).FirstOrDefaultAsync();
+                                    //var relationType = await _appEntityRepository.GetAll().Include(z => z.EntityExtraData).Where(z => z.Code == relationshipCode).FirstOrDefaultAsync();
+                                    var relationType = relationShipLookups.Where(z => z.Code == relationshipCode).FirstOrDefault();
                                     if (relationType != null)
                                     {
                                         var extrDataDisconnect = relationType.EntityExtraData.Where(z => z.AttributeId == 602).FirstOrDefault();
@@ -556,7 +566,7 @@ namespace onetouch.AppMarketplaceAccounts
 
                                     }
                                 }
-                                if (currentTenantAccountObject != null)
+                                if(false)//(currentTenantAccountObject != null)
                                 {
                                     string relationshipCode = currentTenantAccountObject.EntityFk.EntityObjectTypeCode.Substring(0, 1) + "T" +
                                         account.Account.AccountType.Substring(0, 1);
@@ -642,7 +652,7 @@ namespace onetouch.AppMarketplaceAccounts
 
                                 }
                             }
-                            if (currentTenantAccountObject != null)
+                            if(false)//(currentTenantAccountObject != null)
                             {
                                 string relationshipCode = currentTenantAccountObject.EntityFk.EntityObjectTypeCode.Substring(0, 1) + "T" +
                                     account.Account.AccountType.Substring(0, 1);
@@ -675,8 +685,9 @@ namespace onetouch.AppMarketplaceAccounts
                         totalCount,
                         accountsList
                     );
-
-                    return x;
+                stopwatch.Stop();
+                var elapsed_time = stopwatch.ElapsedMilliseconds;
+                return x;
                     //}
                     //catch (Exception ex)
                     //{
@@ -1302,12 +1313,14 @@ namespace onetouch.AppMarketplaceAccounts
                     if (relatedContacts != null && relatedContacts.Count() > 0)
                         _appMarketplaceContactRepository.GetAll().Where(e => e.TenantId == null && e.AccountId == ret.Id).ForEach(z => z.SharingLevel = 4);
 
-
-                    //I40[Start]
-                    var itemObjectId = await _helper.SystemTables.GetObjectListingId();
-                    onetouchDbContext dbContext = CurrentUnitOfWork.GetDbContext<onetouchDbContext>();
-                    dbContext.AppMarketplaceItems.Where(z => z.TenantOwner == ret.TenantOwner && z.ObjectId == itemObjectId && z.SharingLevel != 4)
-                        .ForEach(z => z.SharingLevel = 4);
+                    if (ret.IsProfileData == true)
+                    {
+                        //I40[Start]
+                        var itemObjectId = await _helper.SystemTables.GetObjectListingId();
+                        onetouchDbContext dbContext = CurrentUnitOfWork.GetDbContext<onetouchDbContext>();
+                        dbContext.AppMarketplaceItems.Where(z => z.TenantOwner == ret.TenantOwner && z.ObjectId == itemObjectId && z.SharingLevel != 4)
+                            .ForEach(z => z.SharingLevel = 4);
+                    }
                 }
                 //var marketplaceItems = await _appMarketplaceItemRepository.GetAll().Where(z => z.TenantOwner == AbpSession.TenantId && z.ObjectId == itemObjectId && z.SharingLevel !=4).ToListAsync();
                 //if (marketplaceItems != null && marketplaceItems.Count() > 0)
@@ -1756,6 +1769,7 @@ namespace onetouch.AppMarketplaceAccounts
         }
 
         //I40 -MMT[Start]
+        [UnitOfWork(TransactionScopeOption.RequiresNew)]
         public async Task<string> CreateOrEditMarketplaceContactRelationship(string requesterSSIN, string recipientSSIN, bool? disconnect, 
             bool? isPublic, long? connectionTypeId, long? disconnectRelationId)
         {
