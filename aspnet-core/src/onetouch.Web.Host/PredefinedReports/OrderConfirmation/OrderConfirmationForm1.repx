@@ -460,7 +460,7 @@
               </ExpressionBindings>
               <StylePriority Ref="238" UseFont="false" UseBackColor="false" UseTextAlignment="false" />
             </Item1>
-            <Item2 Ref="234" ControlType="XRLabel" Name="label32" KeepTogether="true" Multiline="true" CanGrow="false" Text="label32" TextAlignment="TopCenter" SizeF="111.124992,49.426302" LocationFloat="11.3750324,0" Dpi="254" Font="Arial, 7pt, style=Bold" BackColor="WhiteSmoke" Padding="5,5,0,0,254">
+            <Item2 Ref="287" ControlType="XRLabel" Name="label32" KeepTogether="true" Multiline="true" CanGrow="false" Text="label32" TextAlignment="TopCenter" SizeF="111.124992,49.426302" LocationFloat="11.3750324,0" Dpi="254" Font="Arial, 7pt, style=Bold" BackColor="WhiteSmoke" Padding="5,5,0,0,254">
               <ExpressionBindings>
                 <Item1 Ref="240" EventName="BeforePrint" PropertyName="Text" Expression="[AttributeSizeCode]" />
                 <Item2 Ref="241" EventName="BeforePrint" PropertyName="Visible" Expression="Sum(Iif([AttributeValue] == ^.[AttributeValue], 1, 0)) &gt; 1&#xA;&#xA;" />
