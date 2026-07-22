@@ -502,36 +502,30 @@
                                         {{ languageSettingName!='en-GB' ? ("MSRP" | localize) : ( "RRP" | localize) }}
                                     </h6>
                                     <div class="d-flex align-items-baseline">
-                                        <span
-                                            class="mr-2">{{appItem.appItemPriceInfos[defaultCurrencyMSRPPriceIndex].currencySymbol}}</span>
-                                        <!-- <p-inputNumber [ariaRequired]="true" mode="decimal" #AppItem_Price="ngModel"
-                                            [(ngModel)]="appItem.appItemPriceInfos[defaultCurrencyMSRPPriceIndex].price" name="price" [min]="1" [styleClass]="'price'"
-                                            [minFractionDigits]="2" [maxFractionDigits]="2">
-                                        </p-inputNumber> -->
-
+                                        <span class="mr-2">{{appItem.appItemPriceInfos[defaultCurrencyMSRPPriceIndex].currencySymbol}}</span>
                                         <input type="number" step="any" name="price" class="form-control input-bg-soft"
                                             id="AppItem_Price" #AppItem_Price="ngModel"
                                             [ngModel]="convertTodecimal(appItem.appItemPriceInfos[defaultCurrencyMSRPPriceIndex].price)"
                                             [ngModelOptions]="{updateOn:'blur'}"
-                                            (ngModelChange)="appItem.appItemPriceInfos[defaultCurrencyMSRPPriceIndex].price=convertTodecimal($event)"
-                                           >
-                                           <!-- required [min]="1"  -->
-                                        <!-- <div *ngIf="!appItem?.appItemPriceInfos[defaultCurrencyMSRPPriceIndex]?.price  || appItem?.appItemPriceInfos[defaultCurrencyMSRPPriceIndex]?.price <=0">
-                                            <span class="ml-2">
-                                                <validation-messages [formCtrl]="AppItem_Price"></validation-messages> 
-                                                {{PriceValidMsg}}
-                                            </span>
-                                        </div> -->
+                                            (ngModelChange)="appItem.appItemPriceInfos[defaultCurrencyMSRPPriceIndex].price=convertTodecimal($event)">
                                     </div>
                                 </div>
-                               <!--  <div *ngIf="defaultCurrencyMSRPPriceIndex > -1">
+                            </div>
+
+                            <div class=" ml-4 pl-4 row pt-4 price-gap" *ngIf="defaultCurrencyMSRPPriceIndex <= -1">
+                                <div class="row mr-5 pr-5">
+                                    <h6 class="font-weight-bold pt-3 pr-2">
+                                        <span class="text-danger">*</span>
+                                        {{ languageSettingName!='en-GB' ? ("MSRP" | localize) : ( "RRP" | localize) }}
+                                    </h6>
                                     <div class="d-flex align-items-baseline">
-                                        <button class="btn mr-5 ml-5 advanced-pricing-btn" type="button"
-                                            (click)="showAdvancedPricingModal()">
-                                            {{'AdvancedPricing' | localize}}
-                                        </button>
+                                        <span class="mr-2 ml-2"></span>
+                                        <input type="number" step="any" name="price" class="form-control input-bg-soft"
+                                            id="AppItem_Price" #AppItem_Price="ngModel"
+                                            [ngModel]="0"
+                                            [ngModelOptions]="{updateOn:'blur'}">
                                     </div>
-                                </div> -->
+                                </div>
                             </div>
                             <div class="d-flex flex-row ml-5 pl-5 mr-5 pr-5">
                                 <h6  class="font-weight-bold mr-3"><span class="text-danger">*</span>
