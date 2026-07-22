@@ -10275,6 +10275,16 @@ namespace onetouch.Accounts
                     accountContact.EntityFk.EntityCategories = ObjectMapper.Map<List<AppEntityCategory>>(createOrEditAccountInfoDto.EntityCategories);
                     accountContact.EntityFk.EntityAttachments = ObjectMapper.Map<List<AppEntityAttachment>>(createOrEditAccountInfoDto.EntityAttachments);
                     //accountContact.EntityFk.EntityAddresses = createOrEditAccountInfoDto.ContactAddresses;
+                    //I49[Start]
+                    accountContact.EntityFk.EntityExtraData = new List<AppEntityExtraData>();
+                    accountContact.EntityFk.EntityExtraData.Add(new AppEntityExtraData
+                    {
+                        AttributeId = 610,
+                        AttributeCode = "MARKETPLACE-ROLE",
+                        EntityCode = createOrEditAccountInfoDto.Code,
+                        AttributeValue = (createOrEditAccountInfoDto.RecordType == "Vendor" ? ContactRoleEnum.Seller.ToString() : ContactRoleEnum.Buyer.ToString())
+                    });
+                    //I49[End]
                     if (string.IsNullOrEmpty(createOrEditAccountInfoDto.SSIN))
                     {
                         accountContact.EntityFk.SSIN = await
