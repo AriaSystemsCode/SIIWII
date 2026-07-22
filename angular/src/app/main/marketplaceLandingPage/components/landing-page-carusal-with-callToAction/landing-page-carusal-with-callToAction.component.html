@@ -1,4 +1,19 @@
-<p-carousel
+
+<div class="section-content position-relative">
+
+  <!-- Loader -->
+  <div
+    *ngIf="loading"
+    class="section-loading d-flex justify-content-center align-items-center">
+
+    <div class="spinner-border purple-spinner" role="status">
+      <span class="sr-only">
+        {{ 'Loading' | localize }}
+      </span>
+    </div>
+
+  </div>
+<p-carousel  *ngIf="!loading && sycLangingPageSetting.length > 0"
   [value]="blocksSorted"
   [numVisible]="numVisible"
   [numScroll]="1"
@@ -40,3 +55,24 @@
   </div>
 </ng-template>
 </p-carousel>
+
+
+  <!-- Empty state -->
+  <div
+    *ngIf="!loading && !hasLoadError && sycLangingPageSetting.length === 0"
+    class="section-empty text-center py-5">
+
+    {{ 'NoDataFound' | localize }}
+
+  </div>
+
+  <!-- Error state -->
+  <div
+    *ngIf="!loading && hasLoadError"
+    class="section-error text-center py-5">
+
+    {{ 'FailedToLoadData' | localize }}
+
+  </div>
+
+</div>
