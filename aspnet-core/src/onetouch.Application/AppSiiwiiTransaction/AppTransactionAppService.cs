@@ -8622,6 +8622,33 @@ namespace onetouch.AppSiiwiiTransaction
 
                     }
                 }
+                else
+                {
+                    var contactLocal = await _appContactRepository.GetAll().Include(z=>z.EntityFk)
+                  .ThenInclude(z => z.EntityExtraData)
+                  .Where(z => z.SSIN == accountSSIN).FirstOrDefaultAsync();
+                    if (contactLocal != null)
+                    {
+                        var extraCRole = contactLocal.EntityFk.EntityExtraData.Where(z => z.AttributeId == 610).FirstOrDefault();
+                        if (extraCRole != null)
+                        {
+                            string rolesString = extraCRole.AttributeValue;
+                            if (!string.IsNullOrEmpty(rolesString))
+                            {
+                                var roles = rolesString.Split('-');
+                                if (roles.Count() > 0)
+                                {
+                                    foreach (var role in roles)
+                                    {
+                                        returnRoles.Add(role);
+                                    }
+                                }
+
+                            }
+
+                        }
+                    }
+                }
                 //var relations = await _appContactRelationshipInfoRepository.GetAll().Where(z => (z.RecipientContactSSIN == contact.SSIN ||
                 // z.RequesterContactSSIN == contact.SSIN) && z.EntityObjectStatusId==activeRealtionshipStatusId && z.SharingLevel==1).ToListAsync();
                 // if (relations != null && relations.Count > 0)

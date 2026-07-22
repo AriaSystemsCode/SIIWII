@@ -602,6 +602,9 @@ namespace onetouch.Accounts
                     var inActiveRelationshipStatusId = await _helper.SystemTables.GetEntityObjectStatusRelationshipInActive();
                     if (currentTenantAccount != null)
                     {
+                        var relationShipLookups = await _appEntityRepository.GetAll().Include(z => z.EntityExtraData)
+                            .Where(z => z.EntityObjectTypeId == marketplaceRelationshipSycEntityObjId).ToListAsync();
+
                         var relationshipsListAll = await _appContactRelationshipInfoRepository.GetAll()
                                      .Where(z => (((z.RecipientContactSSIN == currentTenantAccount.SSIN)
                                      || (z.RequesterContactSSIN == currentTenantAccount.SSIN))
@@ -638,7 +641,7 @@ namespace onetouch.Accounts
                                         connInfo.RecipientRole = relationship.RecipientMarketplaceRole;
                                         connInfo.RequestorRole = relationship.RequesterMarketplaceRole;
                                         //xx
-                                        var relationType = await _appEntityRepository.GetAll().Include(z => z.EntityExtraData).Where(z => z.Code == relationshipCode).FirstOrDefaultAsync();
+                                        var relationType =  relationShipLookups.Where(z => z.Code == relationshipCode).FirstOrDefault();
                                         if (relationType != null)
                                         {
                                             var extrDataDisconnect = relationType.EntityExtraData.Where(z => z.AttributeId == 602).FirstOrDefault();
@@ -691,8 +694,8 @@ namespace onetouch.Accounts
                             //else
                             {
                                
-                                var relationShipLookups = await _appEntityRepository.GetAll().Include(z => z.EntityExtraData)
-                                .Where(z => z.EntityObjectTypeId == marketplaceRelationshipSycEntityObjId).ToListAsync();
+                                /*var relationShipLookups = await _appEntityRepository.GetAll().Include(z => z.EntityExtraData)
+                                .Where(z => z.EntityObjectTypeId == marketplaceRelationshipSycEntityObjId).ToListAsync();*/
                                 foreach (var relationshipCodeLookup in relationShipLookups)
                                 {
                                     //if (account.Account.IsManual == true)
@@ -3873,7 +3876,8 @@ namespace onetouch.Accounts
             //I40[End]
             // await CreateAdminContact();
             //I40
-            if (input.ParentId == null && (input.Id == 0 || input.Id == null))
+            if (input.ParentId == null && (input.Id == 0 || input.Id == null) 
+                && (input.TenantId == AbpSession.TenantId && input.TenantOwner == AbpSession.TenantId))
             {
                 var publishedAcc = await _appMarketplaceContactRepository.GetAll().Where(z => z.SSIN == contact.SSIN).FirstOrDefaultAsync();
                 if (publishedAcc == null)
