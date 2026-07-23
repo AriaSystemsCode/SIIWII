@@ -34,28 +34,3 @@
   </ng-template>
 </p-carousel>
 
-
-
-  <!-- Empty state -->
-  <div
-    *ngIf="!loading && !hasLoadError && blocksSorted.length === 0"
-    class="section-empty text-center py-5">
-
-    {{ 'NoDataFound' | localize }}
-
-  </div>
-
-  <!-- Error state -->
-  <div
-    *ngIf="!loading && hasLoadError"
-    class="section-error text-center py-5">
-
-    {{ 'FailedToLoadData' | localize }}
-
-  </div>
-
-</div>
-
-<!-- Optional empty state -->
-<!-- <div *ngIf="!blocksSorted?.length" class="text-center py-4">No data</div>
-</div> -->

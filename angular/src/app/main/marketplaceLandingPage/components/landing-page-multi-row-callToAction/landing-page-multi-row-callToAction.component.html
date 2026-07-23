@@ -92,25 +92,6 @@
   </div>
 </div>
 
-  <!-- Empty state -->
-  <div
-    *ngIf="!loading && !hasLoadError && sliderItems.length === 0"
-    class="section-empty text-center py-5">
-
-    {{ 'NoDataFound' | localize }}
-
-  </div>
-
-  <!-- Error state -->
-  <div
-    *ngIf="!loading && hasLoadError"
-    class="section-error text-center py-5">
-
-    {{ 'FailedToLoadData' | localize }}
-
-  </div>
-
-</div>
 
   <app-view-event [hideViewEv]="false"
   #viewEventModal
