@@ -8752,7 +8752,7 @@ namespace onetouch.AppSiiwiiTransaction
                     && z.RequesterContactSSIN == accountSSIN) ||
                     (z.RequesterContactSSIN == contact.SSIN
                     && z.RecipientContactSSIN == accountSSIN)) 
-                    && z.EntityObjectStatusId == activeRealtionshipStatusId && z.SharingLevel == 1).ToListAsync();
+                    && z.EntityObjectStatusId == activeRealtionshipStatusId ).ToListAsync();//&& z.SharingLevel == 1
                 if (relations != null && relations.Count > 0)
                 {
                     foreach (var relation in relations)

@@ -2358,7 +2358,8 @@ namespace onetouch.Accounts
                         }
                         else {
                             //MMT2026[start]
-                            if (originalPublishContactFortCurrTenant.EntityObjectTypeId != presonEntityObjectTypeId)
+                            if (originalPublishContactFortCurrTenant.EntityObjectTypeId != presonEntityObjectTypeId
+                                && tenantId != AbpSession.TenantId)
                             {
                                 CreateOrEditAccountInfoDto createOrEditAccountInfoDto = new CreateOrEditAccountInfoDto();
                                 createOrEditAccountInfoDto = ObjectMapper.Map<CreateOrEditAccountInfoDto>(originalPublishContactFortCurrTenant);
@@ -2589,7 +2590,8 @@ namespace onetouch.Accounts
                         /// _appAttachmentRepository.RemoveRange(rangeToRemove);
                         //  _appEntityAttachmentRepository.RemoveRange(existed.EntityFk.EntityAttachments);
                         // };
-                        if (originalContact.EntityObjectTypeId != presonEntityObjectTypeId)
+                        if (originalContact.EntityObjectTypeId != presonEntityObjectTypeId &&
+                            originalContact.TenantOwner != AbpSession.TenantId)
                         {
                             if (existed.AppContactAddresses != null)
                             {
@@ -2745,10 +2747,13 @@ namespace onetouch.Accounts
                     //MMT33-3
 
                     //Connect Current Account branches with the other account
-                    if (originalPublishContactFortCurrTenant.EntityObjectTypeId != presonEntityObjectTypeId && sync == false)
+                    if (originalPublishContactFortCurrTenant.EntityObjectTypeId != presonEntityObjectTypeId && sync == false
+                        && originalPublishContactFortCurrTenant.TenantOwner != AbpSession.TenantId
+                        )
                         await ConnectBranches(originalPublishContactFortCurrTenant.Id, id);
 
-                    if (originalContact.EntityObjectTypeId != presonEntityObjectTypeId && sync == false)
+                    if (originalContact.EntityObjectTypeId != presonEntityObjectTypeId && sync == false &&
+                        originalContact.TenantOwner != AbpSession.TenantId)
                         await ConnectBranches(id, originalPublishContactFortCurrTenant.Id);
 
                     //Mariam[End]
@@ -3944,7 +3949,7 @@ namespace onetouch.Accounts
                             requestorType.AttributeValue.TrimEnd().ToLower() == currentTenantAccountObj.EntityFk.EntityObjectTypeCode.ToLower() &&
                             ((!string.IsNullOrEmpty(currentTenatntAccountMarketplaceRole)
                             && requestorRole != null && !string.IsNullOrEmpty(requestorRole.AttributeValue)) ?
-                            (currentTenatntAccountMarketplaceRole.ToLower().Contains(requestorRole.AttributeValue.ToLower().TrimEnd().Replace(".", ""))) : true))
+                            (currentTenatntAccountMarketplaceRole.ToLower().Contains(requestorRole.AttributeValue.ToLower().TrimEnd().Replace(".", ""))) : false))
                         {
                             var responseType = relationshipCodeLookup.EntityExtraData.Where(z => z.AttributeId == 607).FirstOrDefault();
                             if (responseType != null &&
@@ -3952,7 +3957,7 @@ namespace onetouch.Accounts
                                 && ((!string.IsNullOrEmpty(marketplaceRole)
                                 && recepientRole != null && !string.IsNullOrEmpty(recepientRole.AttributeValue)) ?
                                 marketplaceRole.ToLower().Contains(recepientRole.AttributeValue.ToLower().TrimEnd().Replace(".", ""))
-                                : true))
+                                : false))
                             {
                                 var connectLabel = relationshipCodeLookup.EntityExtraData.Where(z => z.AttributeId == 601).FirstOrDefault();
                                 if (connectLabel != null)
@@ -8496,8 +8501,18 @@ namespace onetouch.Accounts
             return value;
         }
         //I46[Start]
-        public async Task<List<ImportContactReturnDto>> ValidateImportContactData(AccountExcelDto accountExcelDto)
+        public async Task<List<ImportContactReturnDto>>
+            ValidateImportContactData(AccountExcelDto accountExcelDto,
+            PagedResultDto<TreeNode<GetSycEntityObjectCategoryForViewDto>>? departmentIds,
+            PagedResultDto<TreeNode<GetSycEntityObjectClassificationForViewDto>>? classIds,
+            List<LookupLabelDto>? addressTypes,
+        List<LookupLabelDto>? phoneTypes ,
+        List<CurrencyInfoDto>? currencyIds,
+        List<LookupLabelDto>? languageIds ,
+        List<LookupLabelDto>? DeptIds,
+        List<LookupLabelDto>? countries )
         {
+            /*
             PagedResultDto<TreeNode<GetSycEntityObjectCategoryForViewDto>> departmentIds = null;
             PagedResultDto<TreeNode<GetSycEntityObjectClassificationForViewDto>> classIds = null;
             List<LookupLabelDto> addressTypes = null;
@@ -8505,18 +8520,26 @@ namespace onetouch.Accounts
             List<CurrencyInfoDto> currencyIds = null;
             List<LookupLabelDto> languageIds = null;
             List<LookupLabelDto> DeptIds = null;
-            List<LookupLabelDto> countries = null;
-            addressTypes = await _appEntitiesAppService.GetAllAddressTypeForTableDropdown();
-            departmentIds = await _sycEntityObjectCategoriesAppService.GetAllDepartmentsWithChildsForProduct();
-            countries = await _appEntitiesAppService.GetAllCountryForTableDropdown();
-            phoneTypes = await _appEntitiesAppService.GetAllPhoneTypeForTableDropdown();
-            classIds = await _sycEntityObjectClassificationsAppService.GetAllWithChildsForContact();
+            List<LookupLabelDto> countries = null;*/
+            if (addressTypes == null)
+                addressTypes = await _appEntitiesAppService.GetAllAddressTypeForTableDropdown();
+            if(departmentIds==null)
+                departmentIds = await _sycEntityObjectCategoriesAppService.GetAllDepartmentsWithChildsForProduct();
+            if(countries==null)
+                countries = await _appEntitiesAppService.GetAllCountryForTableDropdown();
+            if(phoneTypes==null)
+                phoneTypes = await _appEntitiesAppService.GetAllPhoneTypeForTableDropdown();
+            if(classIds==null)
+                classIds = await _sycEntityObjectClassificationsAppService.GetAllWithChildsForContact();
 
             //get currency types
-            currencyIds = await _appEntitiesAppService.GetAllCurrencyForTableDropdown();
+            if(currencyIds==null)
+                currencyIds = await _appEntitiesAppService.GetAllCurrencyForTableDropdown();
 
-            //get language types            
-            languageIds = await _appEntitiesAppService.GetAllLanguageForTableDropdown();
+            //get language types
+            if(languageIds==null)
+                languageIds = await _appEntitiesAppService.GetAllLanguageForTableDropdown();
+
             List<ImportContactReturnDto> returnList = new List<ImportContactReturnDto>();
             if (string.IsNullOrEmpty(accountExcelDto.Code))
             {
@@ -9102,6 +9125,22 @@ namespace onetouch.Accounts
                     //accountExcelRecordDto = new List<AccountExcelRecordDTO>() { };
                     //accountExcelResultsDTO.ExcelRecords = new List<ExpandoObject>() { };
                     //MMT22
+                    //PagedResultDto<TreeNode<GetSycEntityObjectCategoryForViewDto>> departmentIds = null;
+                    //PagedResultDto<TreeNode<GetSycEntityObjectClassificationForViewDto>> classIds = null;
+                    //List<LookupLabelDto> addressTypes = null;
+                    //List<LookupLabelDto> phoneTypes = null;
+                    //List<CurrencyInfoDto> currencyIds = null;
+                    //List<LookupLabelDto> languageIds = null;
+                    //List<LookupLabelDto> DeptIds = null;
+                    //List<LookupLabelDto> countries = null;
+                    //addressTypes = await _appEntitiesAppService.GetAllAddressTypeForTableDropdown();
+                    //departmentIds = await _sycEntityObjectCategoriesAppService.GetAllDepartmentsWithChildsForProduct();
+                    //countries = await _appEntitiesAppService.GetAllCountryForTableDropdown();
+                    //phoneTypes = await _appEntitiesAppService.GetAllPhoneTypeForTableDropdown();
+                    //classIds = await _sycEntityObjectClassificationsAppService.GetAllWithChildsForContact();
+                    //currencyIds = await _appEntitiesAppService.GetAllCurrencyForTableDropdown();
+                    //languageIds = await _appEntitiesAppService.GetAllLanguageForTableDropdown();
+
                     List<string> RecordsCodes = result.Select(r => r.Code).ToList();
                     List<string> RecordsParentCodes = result.Select(r => r.ParentCode).ToList();
                     foreach (AccountExcelDto accountExcelDto in result)
@@ -9244,7 +9283,10 @@ namespace onetouch.Accounts
                         #endregion check record type
 
                         //I46[Start]
-                        var validationList = await ValidateImportContactData(accountExcelDto);
+                        var validationList = await ValidateImportContactData(accountExcelDto,
+                            departmentIds, classIds, addressTypes, phoneTypes, currencyIds,
+                            languageIds, DeptIds, countries);
+
                         if (validationList != null && validationList.Count > 0)
                         {
                             foreach (var err in validationList)
@@ -9948,6 +9990,21 @@ namespace onetouch.Accounts
             saveExcelinput.RepreateHandler = (ExcelRecordRepeateHandler)Enum.Parse(typeof(ExcelRecordRepeateHandler), repeatHandler.ToString());
             saveExcelinput.To = contactExcelDtoList.Count;
             saveExcelinput.From = 0;
+            PagedResultDto<TreeNode<GetSycEntityObjectCategoryForViewDto>> departmentIds = null;
+            PagedResultDto<TreeNode<GetSycEntityObjectClassificationForViewDto>> classIds = null;
+            List<LookupLabelDto> addressTypes = null;
+            List<LookupLabelDto> phoneTypes = null;
+            List<CurrencyInfoDto> currencyIds = null;
+            List<LookupLabelDto> languageIds = null;
+            List<LookupLabelDto> DeptIds = null;
+            List<LookupLabelDto> countries = null;
+            addressTypes = await _appEntitiesAppService.GetAllAddressTypeForTableDropdown();
+            departmentIds = await _sycEntityObjectCategoriesAppService.GetAllDepartmentsWithChildsForProduct();
+            countries = await _appEntitiesAppService.GetAllCountryForTableDropdown();
+            phoneTypes = await _appEntitiesAppService.GetAllPhoneTypeForTableDropdown();
+            classIds = await _sycEntityObjectClassificationsAppService.GetAllWithChildsForContact();
+            currencyIds = await _appEntitiesAppService.GetAllCurrencyForTableDropdown();
+            languageIds = await _appEntitiesAppService.GetAllLanguageForTableDropdown();
             List<ImportContactReturnDto> returnList = new List<ImportContactReturnDto>();
             foreach (var excelDto in contactExcelDtoList)
             {
@@ -9955,7 +10012,9 @@ namespace onetouch.Accounts
                     continue;
                 long id = 0;
                 bool canBeSaved = true;
-                var list = await ValidateImportContactData(excelDto);
+                var list = await ValidateImportContactData(excelDto,
+     departmentIds, classIds, addressTypes, phoneTypes, currencyIds,
+     languageIds, DeptIds, countries);
                 if (list != null && list.Count > 0)
                 {
                     foreach (var err in list)
@@ -10704,6 +10763,13 @@ namespace onetouch.Accounts
                                     teamContact.EntityFk.EntityCategories = accountContact.EntityFk.EntityCategories;
                                     teamContact.EntityFk.EntityAttachments = accountContact.EntityFk.EntityAttachments;
                                     teamContact.EntityFk.EntityExtraData = new List<AppEntityExtraData>();
+                                    teamContact.EntityFk.EntityExtraData.Add(new AppEntityExtraData
+                                    {
+                                        AttributeId = 610,
+                                        AttributeCode = "MARKETPLACE-ROLE",
+                                        EntityCode = teamContact.EntityFk.Code,
+                                        AttributeValue = (createOrEditAccountInfoDto.RecordType == "Vendor" ? ContactRoleEnum.Buyer.ToString() : ContactRoleEnum.Seller.ToString())
+                                    });
                                     if (!string.IsNullOrEmpty(personDto.FirstName))
                                     {
                                         AppEntityExtraData appEntityExtraDto = new AppEntityExtraData();
