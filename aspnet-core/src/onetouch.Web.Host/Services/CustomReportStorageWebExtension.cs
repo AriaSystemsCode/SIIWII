@@ -122,14 +122,30 @@ namespace onetouch.Web.Services
                 var dir = Path.Combine(ReportDirectory, tenantId.ToString());
                 Directory.CreateDirectory(dir);
 
-                if (Directory.EnumerateFiles(dir).Select(Path.GetFileNameWithoutExtension).Contains(reportName))
+                var tenantReportPath = Path.Combine(dir, reportName + FileExtension);
+                var defaultReportPath = Path.Combine(ReportDirectory, reportName + FileExtension);
+
+                // Seed a new tenant with the default report layout on first use.
+                // Existing tenant-specific layouts are never overwritten.
+                if (!File.Exists(tenantReportPath) && File.Exists(defaultReportPath))
                 {
-                    //report = File.ReadAllBytes(Path.Combine(dir, reportName + FileExtension));
-                    byte[] reportBytes = File.ReadAllBytes(Path.Combine(dir, reportName + FileExtension));
+                    try
+                    {
+                        File.Copy(defaultReportPath, tenantReportPath, overwrite: false);
+                    }
+                    catch (IOException) when (File.Exists(tenantReportPath))
+                    {
+                        // Another concurrent request seeded the tenant first.
+                    }
+                }
+
+                if (File.Exists(tenantReportPath))
+                {
+                    byte[] reportBytes = File.ReadAllBytes(tenantReportPath);
                     using (MemoryStream ms = new MemoryStream(reportBytes))
                         report = XtraReport.FromStream(ms);
                 }
-                if (ReportsFactory.Reports.ContainsKey(reportName))
+                if (report == null && ReportsFactory.Reports.ContainsKey(reportName))
                 {
                     report = ReportsFactory.Reports[reportName]();
                 }
@@ -395,6 +411,7 @@ namespace onetouch.Web.Services
             var dir = Path.Combine(ReportDirectory, tenantId.ToString());
             if (!IsWithinReportsFolder(reportName, dir))
                 throw new DevExpress.XtraReports.Web.ClientControls.FaultException("Invalid report name.");
+            Directory.CreateDirectory(dir);
             report.SaveLayoutToXml(Path.Combine(dir, reportName + FileExtension));
         }
 

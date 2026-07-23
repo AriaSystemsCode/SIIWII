@@ -176,11 +176,11 @@
                             <hr class="header" *ngIf="!personalAccount">
                             <div class="row mx-1" *ngIf="!personalAccount">
                                 <div class="col-md-12">
-                                    <div class="address"
+                                    <div class="address mb-3"
                                         *ngIf="accountData?.addressLine1 || accountData?.city || accountData?.state || accountData?.zipCode || accountData?.countryName">
                                         <img class="icon-address" src="assets/accounts/Address.svg">
 
-                                        <p class="title-account" *ngIf="accountData">
+                                        <p class="title-account mb-0" *ngIf="accountData">
                                             <span>
                                                 {{"Headquarters" | localize}}:
                                             </span>
@@ -204,10 +204,10 @@
                                             </span>
                                         </p>
                                     </div>
-                                    <div class="mail" *ngIf="accountData?.website">
+                                    <div class="mail mb-3 mx-2" *ngIf="accountData?.website">
                                         <img class="icon-web" src="assets/accounts/website.svg">
 
-                                        <p class="title-account">{{accountData?.website}}</p>
+                                        <p class="title-account mb-0">{{accountData?.website}}</p>
                                     </div>
                                 </div>
 
@@ -284,10 +284,10 @@
       </div>
     </div>
 
-    <div class="account-info-item" *ngIf="accountData?.currency">
+    <div class="account-info-item" *ngIf="accountData?.currencyName">
       <p class="title-dev-slider">{{ "Currency" | localize }}</p>
       <div class="account-type">
-        <p class="title-tag">{{ accountData.currency }}</p>
+        <p class="title-tag">{{ accountData.currencyName }}</p>
       </div>
     </div>
 

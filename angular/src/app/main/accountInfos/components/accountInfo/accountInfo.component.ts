@@ -1082,6 +1082,8 @@ private restoreRemovedRoles(rolesToRestore: string[]): void {
 
     async saveExternalOrManualAccount(): Promise<void> {
         this.updateMarketplaceRolesExtraData();
+if( !this.accountInfoTemp?.id){
+
 
         this._AccountsServiceProxy
             .getAvailableConnections(this.selectedRoles?.join('-')?.toLowerCase())
@@ -1107,6 +1109,9 @@ private restoreRemovedRoles(rolesToRestore: string[]): void {
             }, err => {
                 this.touched = true;
             });
+        }else {
+                 this.saveAccountAfterConnectionSelected();
+        }
     }
 
     confirmSelectedConnection(): void {
@@ -1144,7 +1149,7 @@ private restoreRemovedRoles(rolesToRestore: string[]): void {
                             this.accountId = result.accountInfo.id;
                     this.accountInfoTemp.id = result.accountInfo.id;
 
-                    this.viewMode = true;
+                    // this.viewMode = true;
 
                     this._router.navigate(
                         [`/app/main/account/view/${this.accountId}`],
@@ -1872,9 +1877,6 @@ getFormattedConnectionName(label: string): string {
   return label;
 }
   disconnect(relation): void {
-
-    console.log(this.accountDataForView.id,'this.accountDataForView.account.id')
-    console.log(relation.relationEntityId,'relation.relationEntityId')
     this.showMainSpinner();
     this._AccountsServiceProxy
       .disconnect(this.accountDataForView.id,relation.relationEntityId)
