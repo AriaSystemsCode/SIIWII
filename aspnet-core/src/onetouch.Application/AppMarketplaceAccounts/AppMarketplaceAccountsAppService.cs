@@ -1810,10 +1810,19 @@ namespace onetouch.AppMarketplaceAccounts
 
             string returnLabel = "";
             var activeRealtionshipStatusId = await _helper.SystemTables.GetEntityObjectStatusRelationshipActive();
-            var requestContact = await _appMarketplaceContactRepository.GetAll().Where(z => z.SSIN == requesterSSIN).FirstOrDefaultAsync();
-            var recipientContact = await _appMarketplaceContactRepository.GetAll().Where(z => z.SSIN == recipientSSIN).FirstOrDefaultAsync();
+            var requestContact = await _appMarketplaceContactRepository.GetAll().Include(z=>z.EntityExtraData).Where(z => z.SSIN == requesterSSIN).FirstOrDefaultAsync();
+            var recipientContact = await _appMarketplaceContactRepository.GetAll().Include(z => z.EntityExtraData).Where(z => z.SSIN == recipientSSIN).FirstOrDefaultAsync();
             var recipientType = await _sycEntityObjectTypeRepository.GetAll().Where(z => z.Id == recipientContact.EntityObjectTypeId).FirstOrDefaultAsync();
             var requesterType = await _sycEntityObjectTypeRepository.GetAll().Where(z => z.Id == requestContact.EntityObjectTypeId).FirstOrDefaultAsync();
+            var requestorRoleEx = requestContact.EntityExtraData.Where(z => z.AttributeId == 610).FirstOrDefault();
+            var recepientRoleEx = recipientContact.EntityExtraData.Where(z => z.AttributeId == 610).FirstOrDefault();
+            string requestorRole = "";
+            string recepientRole = "";
+            if (requestorRoleEx!=null)
+             requestorRole = requestorRoleEx.AttributeValue;
+            if(recepientRoleEx!=null)
+                recepientRole = recepientRoleEx.AttributeValue;
+
             //var relation = await _appContactRelationshipInfoRepository.GetAll().Where(z => ((z.RecipientContactSSIN == recipientSSIN && z.RequesterContactSSIN == requesterSSIN) 
             ////||
             //        //(z.RecipientContactSSIN == requesterSSIN && z.RequesterContactSSIN == recipientSSIN)
@@ -1874,11 +1883,32 @@ namespace onetouch.AppMarketplaceAccounts
 
                         foreach (var relationshipCodeLookup in relationShipLookups)
                         {
+                            var requestorRoleRel = relationshipCodeLookup.EntityExtraData.Where(z => z.AttributeId == 610).FirstOrDefault();
+                            var recepientRoleRel = relationshipCodeLookup.EntityExtraData.Where(z => z.AttributeId == 611).FirstOrDefault();
                             var requestorType = relationshipCodeLookup.EntityExtraData.Where(z => z.AttributeId == 606).FirstOrDefault();
-                            if (requestorType != null && requestorType.AttributeValue.TrimEnd().ToLower() == requesterType.Code.ToLower())
+                            if (requestorType != null && requestorType.AttributeValue.TrimEnd().ToLower() == requesterType.Code.ToLower()
+                            &&
+                            ((!string.IsNullOrEmpty(requestorRole)
+                            && requestorRoleRel != null && !string.IsNullOrEmpty(requestorRoleRel.AttributeValue)) ?
+                            (requestorRole.ToLower().Contains(requestorRoleRel.AttributeValue.ToLower().TrimEnd().Replace(".", ""))) : false))
                             {
                                 var responseType = relationshipCodeLookup.EntityExtraData.Where(z => z.AttributeId == 607).FirstOrDefault();
-                                if (responseType != null && responseType.AttributeValue.TrimEnd().ToLower() == recipientType.Code.ToLower())
+                                if (recipientType.Code == "PERSONAL")
+                                {
+                                    if (responseType != null && 
+                                        responseType.AttributeValue.TrimEnd().ToLower() == 
+                                        recipientType.Code.ToLower())
+                                    {
+                                        connectionTypeId = relationshipCodeLookup.Id;
+                                        break;
+                                    }
+                                }
+                                
+                                if (responseType != null && responseType.AttributeValue.TrimEnd().ToLower() == recipientType.Code.ToLower() 
+                                    && 
+                                   ((!string.IsNullOrEmpty(recepientRole)
+                            && recepientRoleRel  != null && !string.IsNullOrEmpty(recepientRoleRel.AttributeValue)) ?
+                            (recepientRole.ToLower().Contains(recepientRoleRel.AttributeValue.ToLower().TrimEnd().Replace(".", ""))) : false)) 
                                 {
                                     connectionTypeId = relationshipCodeLookup.Id;
                                     break;
