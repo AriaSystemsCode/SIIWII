@@ -8,7 +8,7 @@ import { ViewEventComponent } from '@app/main/AppEvent/Components/view-event.com
 import { finalize } from 'rxjs';
 import { EventsBrowseComponentActionsMenuFlags } from '@app/main/AppEventsBrowse/models/EventsBrowseComponentActionsMenuFlags';
 import { EventsBrowseComponentStatusesFlags } from '@app/main/AppEventsBrowse/models/EventsBrowseComponentStatusesFlags';
-import { BsModalRef, BsModalService, ModalOptions } from 'ngx-bootstrap/modal';
+import { BsModalRef } from 'ngx-bootstrap/modal';
 
 
 @Component({
@@ -96,6 +96,10 @@ export class LandingPageSinglrRowCallActionComponent extends AppComponentBase im
   languageSettingName: string = AppConsts.languageSettingName;
     isSmallScreen = false;
 
+
+    loading = false;
+hasLoadError = false;
+
   constructor(
     injector: Injector,
     private syd: SydObjectsServiceProxy,
@@ -144,17 +148,34 @@ export class LandingPageSinglrRowCallActionComponent extends AppComponentBase im
     return (this.items ?? []).slice().sort(cmp);
   }
 
-  getBlocksData() {
-    this.syd.getAllSectionBlocks(this.sectionId, Intl.DateTimeFormat().resolvedOptions().timeZone).subscribe(res => {
-      this.items = res ?? [];
-
-
-      // Pre-prepare PDFs so iframes have src ready
-      this.items
-        .filter(b => b.blockType === 'Attachment' && this.isPdf(b?.image))
-  
-    });
+  getBlocksData(): void {
+  if (!this.sectionId) {
+    return;
   }
+
+  this.loading = true;
+  this.hasLoadError = false;
+
+  this.syd
+    .getAllSectionBlocks(
+      this.sectionId,
+      Intl.DateTimeFormat().resolvedOptions().timeZone
+    )
+    .pipe(
+      finalize(() => {
+        this.loading = false;
+      })
+    )
+    .subscribe({
+      next: (res) => {
+        this.items = res ?? [];
+      },
+      error: () => {
+        this.items = [];
+        this.hasLoadError = true;
+      }
+    });
+}
 
   fullUrl(path?: string): string {
     const p = (path ?? '').trim();
