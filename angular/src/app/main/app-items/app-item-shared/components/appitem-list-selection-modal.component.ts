@@ -35,11 +35,18 @@ export class AppitemListSelectionModalComponent extends AppComponentBase impleme
     searchQuery: string
     searchQuerySubject : Subject<string> = new Subject<string>()
     searchQuery$: Observable<string> = this.searchQuerySubject.asObservable()
+             currentLang:string
+        isArabic:boolean = true
     constructor(
         injector: Injector,
         private appItemsListsServiceProxy:AppItemsListsServiceProxy
     ) {
         super(injector);
+    }
+
+    ngOnInit(){
+                        this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
+        this.currentLang == 'ar' || this.currentLang == 'ar-EG'  ? this.isArabic = true : this.isArabic = false
     }
 
     ngAfterViewInit(){
