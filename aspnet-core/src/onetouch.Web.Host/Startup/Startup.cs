@@ -32,6 +32,7 @@ using GraphQL.Server.Ui.Playground;
 using HealthChecks.UI.Client;
 using IdentityServer4.Configuration;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using onetouch.Configure;
@@ -438,6 +439,7 @@ namespace onetouch.Web.Startup
                 app.UseExceptionHandler("/Error");
             }
 
+            ConfigureAttachmentStaticFiles(app);
             app.UseStaticFiles();
             app.UseRouting();
 
@@ -579,6 +581,37 @@ namespace onetouch.Web.Startup
             // Log exceptions here. For instance:
             System.Diagnostics.Debug.WriteLine("[{0}]: Exception occured. Message: '{1}'. Exception Details:\r\n{2}",
                 DateTime.Now, message, ex);
+        }
+
+        private void ConfigureAttachmentStaticFiles(IApplicationBuilder app)
+        {
+            ConfigureAttachmentStaticFiles(
+                app,
+                _appConfiguration["Attachment:Path"],
+                _appConfiguration["Attachment:RequestPath"] ?? "/attachments");
+
+            ConfigureAttachmentStaticFiles(
+                app,
+                _appConfiguration["Attachment:PathTemp"],
+                _appConfiguration["Attachment:TempRequestPath"] ?? "/tempattachments");
+        }
+
+        private static void ConfigureAttachmentStaticFiles(
+            IApplicationBuilder app,
+            string physicalPath,
+            string requestPath)
+        {
+            if (string.IsNullOrWhiteSpace(physicalPath) || !Path.IsPathRooted(physicalPath))
+            {
+                return;
+            }
+
+            // Validate shared storage while starting, before this web node accepts traffic.
+            app.UseStaticFiles(new StaticFileOptions
+            {
+                FileProvider = new PhysicalFileProvider(physicalPath),
+                RequestPath = requestPath
+            });
         }
 
 
