@@ -1883,26 +1883,32 @@ namespace onetouch.AppMarketplaceAccounts
 
                         foreach (var relationshipCodeLookup in relationShipLookups)
                         {
+                            var responseType = relationshipCodeLookup.EntityExtraData.Where(z => z.AttributeId == 607).FirstOrDefault();
+                            var requestorType = relationshipCodeLookup.EntityExtraData.Where(z => z.AttributeId == 606).FirstOrDefault();
+                            if (recipientType.Code.ToUpper() == "PERSONAL" &&
+                                requesterType.Code.ToUpper() == "BUSINESS")
+                            {
+                                if (requestorType != null && requestorType.AttributeValue.TrimEnd().ToLower() == requesterType.Code.ToLower())
+                                {
+
+                                    if (responseType != null && responseType.AttributeValue.TrimEnd().ToLower() == recipientType.Code.ToLower())
+                                    {
+                                        connectionTypeId = relationshipCodeLookup.Id;
+                                        break;
+                                    }
+                                }
+                            }
                             var requestorRoleRel = relationshipCodeLookup.EntityExtraData.Where(z => z.AttributeId == 610).FirstOrDefault();
                             var recepientRoleRel = relationshipCodeLookup.EntityExtraData.Where(z => z.AttributeId == 611).FirstOrDefault();
-                            var requestorType = relationshipCodeLookup.EntityExtraData.Where(z => z.AttributeId == 606).FirstOrDefault();
+                            
                             if (requestorType != null && requestorType.AttributeValue.TrimEnd().ToLower() == requesterType.Code.ToLower()
                             &&
                             ((!string.IsNullOrEmpty(requestorRole)
                             && requestorRoleRel != null && !string.IsNullOrEmpty(requestorRoleRel.AttributeValue)) ?
                             (requestorRole.ToLower().Contains(requestorRoleRel.AttributeValue.ToLower().TrimEnd().Replace(".", ""))) : false))
                             {
-                                var responseType = relationshipCodeLookup.EntityExtraData.Where(z => z.AttributeId == 607).FirstOrDefault();
-                                if (recipientType.Code == "PERSONAL")
-                                {
-                                    if (responseType != null && 
-                                        responseType.AttributeValue.TrimEnd().ToLower() == 
-                                        recipientType.Code.ToLower())
-                                    {
-                                        connectionTypeId = relationshipCodeLookup.Id;
-                                        break;
-                                    }
-                                }
+                                
+                               
                                 
                                 if (responseType != null && responseType.AttributeValue.TrimEnd().ToLower() == recipientType.Code.ToLower() 
                                     && 
