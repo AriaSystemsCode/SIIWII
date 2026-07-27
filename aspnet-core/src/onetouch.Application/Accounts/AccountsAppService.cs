@@ -98,6 +98,7 @@ using DocumentFormat.OpenXml.Wordprocessing;
 using DocumentFormat.OpenXml.Drawing.Diagrams;
 using Microsoft.EntityFrameworkCore.Internal;
 using DocumentFormat.OpenXml.InkML;
+using onetouch.Authorization.Roles;
 //using Microsoft.AspNetCore.Http;
 
 namespace onetouch.Accounts
@@ -124,6 +125,7 @@ namespace onetouch.Accounts
         private readonly ISycAttachmentCategoriesAppService _sSycAttachmentCategoriesAppService;
         private readonly Helper _helper;
         private readonly UserManager _userManager;
+        private readonly RoleManager _roleManager;
         private readonly SycIdentifierDefinitionsAppService _iAppSycIdentifierDefinitionsService;
         //T-SII-20221013.0006,1 MMT 11/02/2022 Notify the destination tenant that another tenant connected to him[Start]
         private readonly IAppNotifier _appNotifier;
@@ -176,11 +178,13 @@ namespace onetouch.Accounts
               ISycEntityObjectTypesAppService sycEntityObjectTypesAppService, IRepository<ValidationRule> validationRuleRepo,
               IRepository<AppContactRelationshipInfo, long> appContactRelationshipInfoRepository,
               IRepository<SycEntityObjectType, long> sycEntityObjectTypeRepository,
-              IRepository<AppMarketplaceAddress, long> appMarketplaceAddressRepository)
+              IRepository<AppMarketplaceAddress, long> appMarketplaceAddressRepository,
+              RoleManager roleManager)
         // IRepository<onetouch.AppMarketplaceItems.AppMarketplaceItem, long> appMarketplaceItemRepository
 
 
         {
+            _roleManager = roleManager;
             _emailingTemplateAppService = emailingTemplateAppService;
             _appEntityCategoryRepository = appEntityCategoryRepository;
             _appEntityClassficationRepository = appEntityClassficationRepository;
@@ -398,9 +402,11 @@ namespace onetouch.Accounts
                 {
                     var currentTenantAccount = _appContactRepository.GetAll().Include(e => e.EntityFk).ThenInclude(z => z.EntityExtraData)
                           .FirstOrDefault(e => e.TenantId == AbpSession.TenantId && e.IsProfileData && e.ParentId == null);
-                    //var currentTenantAccount  = await _appContactRepository.GetAll().Where(z => z.TenantId == AbpSession.TenantId && z.IsProfileData == true &&
-                    //z.ParentId == null).FirstOrDefaultAsync();
-                    var activeRelationshipStatusId = await _helper.SystemTables.GetEntityObjectStatusRelationshipActive();
+                    if (currentTenantAccount == null)
+                        return new PagedResultDto<GetAccountForViewDto>();
+                        //var currentTenantAccount  = await _appContactRepository.GetAll().Where(z => z.TenantId == AbpSession.TenantId && z.IsProfileData == true &&
+                        //z.ParentId == null).FirstOrDefaultAsync();
+                        var activeRelationshipStatusId = await _helper.SystemTables.GetEntityObjectStatusRelationshipActive();
                     //T-SII-20221004.0002, MMT 10.26.2022 Add unpublish option to Account Profile page[Start]
                     long cancelledStatusId = await _helper.SystemTables.GetEntityObjectStatusContactCancelled();
                     //T-SII-20221004.0002, MMT 10.26.2022 Add unpublish option to Account Profile page[End]
@@ -1999,8 +2005,23 @@ namespace onetouch.Accounts
                 contact.AccountInfo.EntityExtraData = new List<AppEntityExtraDataDto>();
                 if (tenant != null)
                 {
+                    
+                    //var adminUser = await _userManager.FindByNameAsync("admin@" + tenant.TenancyName);
+                    var adminRole = await _roleManager.Roles
+                    .FirstOrDefaultAsync(r => r.TenantId == AbpSession.TenantId && r.Name == StaticRoleNames.Tenants.Admin);
 
-                    var adminUser = await _userManager.FindByNameAsync("admin@" + tenant.TenancyName);
+                    if (adminRole == null)
+                    {
+                        return null;
+                    }
+
+                    var adminRoleId = adminRole.Id;
+
+                    var adminUser = await _userManager.Users
+                        .Where(u => u.TenantId == AbpSession.TenantId)
+                        .Where(u => u.Roles.Any(r => r.RoleId == adminRoleId))
+                        .FirstOrDefaultAsync();
+
                     if (adminUser != null && adminUser.Id != 0)
                     {
                         firstName = adminUser.Name;
