@@ -1,6 +1,7 @@
 <div class="entity-basic-info p-4">
 
-  <div class="d-flex flex-wrap justify-content-between">
+  <!-- Dynamic basic fields -->
+  <div class="d-flex flex-wrap justify-content-between basic-fields">
 
     <div class="field" *ngFor="let field of fields">
 
@@ -26,5 +27,145 @@
     </div>
 
   </div>
+
+  <!-- Media accordion -->
+  <p-accordion styleClass="entity-media-accordion">
+
+    <p-accordionTab
+  
+      [selected]="true">
+
+      <!-- Cover and logo -->
+      <div class="cover-section">
+
+        <div
+          class="cover-image"
+          [ngStyle]="{
+            'background-image': coverImageUrl
+              ? 'url(' + coverImageUrl + ')'
+              : 'none'
+          }">
+
+          <div
+            *ngIf="!coverImageUrl"
+            class="cover-placeholder">
+            <!-- {{ 'Background' | localize }} -->
+          </div>
+
+          <!-- Change cover button -->
+          <label
+            *ngIf="mode !== 'view'"
+            class="change-cover-btn">
+
+            <i class="fa fa-camera"></i>
+            {{ 'ChangeBackground' | localize }}
+
+            <input
+              type="file"
+              accept="image/*"
+              hidden
+              (change)="onBackgroundSelected($event)" />
+          </label>
+
+          <!-- Logo -->
+          <div class="logo-wrapper">
+
+            <img
+              *ngIf="logoImageUrl"
+              class="logo-image"
+              [src]="logoImageUrl"
+              alt="Entity logo" />
+
+            <div
+              *ngIf="!logoImageUrl"
+              class="logo-placeholder">
+              <i class="fa fa-user"></i>
+            </div>
+
+            <label
+              *ngIf="mode !== 'view'"
+              class="change-logo-btn">
+
+              <i class="fa fa-camera"></i>
+
+              <input
+                type="file"
+                accept="image/*"
+                hidden
+                (change)="onLogoSelected($event)" />
+            </label>
+
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- Attachment images -->
+      <div class="attachments-section">
+
+        <div class="attachments-header">
+
+          <h6 class="mb-0">
+            <!-- {{ 'Attachments' | localize }} -->
+          </h6>
+
+          <label
+            *ngIf="mode !== 'view'"
+            class="add-image-btn">
+
+            <i class="fa fa-plus"></i>
+            {{ 'AddImage' | localize }}
+
+            <input
+              type="file"
+              accept="image/*"
+              multiple
+              hidden
+              (change)="onAttachmentsSelected($event)" />
+          </label>
+
+        </div>
+
+        <div
+          *ngIf="attachmentImages.length;"
+          class="attachments-row">
+
+          <div
+            class="attachment-card"
+            *ngFor="let image of attachmentImages; let i = index">
+
+            <img
+              [src]="image.url"
+              [alt]="image.fileName || 'Attachment'"
+              (error)="onImageError($event)" />
+
+            <button
+              *ngIf="mode !== 'view'"
+              type="button"
+              class="remove-image-btn"
+              (click)="removeAttachment(image, i)">
+
+              <i class="fa fa-times"></i>
+
+            </button>
+
+          </div>
+
+        </div>
+<!-- 
+        <ng-template #noAttachments>
+
+          <div class="no-attachments">
+            {{ 'NoImagesAvailable' | localize }}
+          </div>
+
+        </ng-template> -->
+
+      </div>
+
+    </p-accordionTab>
+
+  </p-accordion>
 
 </div>

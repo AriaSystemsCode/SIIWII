@@ -1,0 +1,70 @@
+:host {
+  display: block;
+}
+
+.basic-info-form {
+  width: 100%;
+  max-width: 720px;
+  padding: 0.75rem 1rem;
+}
+
+.basic-info-row,
+.phone-row {
+  display: grid;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.basic-info-row {
+  grid-template-columns: 105px minmax(180px, 280px);
+}
+
+.phone-row {
+    grid-template-columns: 50px 109px minmax(130px, 110px) 50px;
+}
+
+.field-label {
+  margin: 0;
+  font-weight: 500;
+//   text-align: right;
+}
+
+.field-control {
+  width: 100%;
+}
+
+.dropdown-control,
+.dropdown-control ::ng-deep .p-dropdown {
+  width: 100%;
+}
+
+.phone-type-dropdown {
+  width: 100%;
+}
+
+::ng-deep .phone-type-dropdown.p-dropdown {
+  width: 100%;
+}
+
+.phone-number,
+.phone-extension {
+  width: 100%;
+}
+
+.phone-separator {
+  max-width: 610px;
+  margin: 1rem 0;
+  border-top: 1px solid #d8d8d8;
+}
+
+@media (max-width: 768px) {
+  .basic-info-row,
+  .phone-row {
+    grid-template-columns: 1fr;
+  }
+
+  .field-label {
+    text-align: left;
+  }
+}

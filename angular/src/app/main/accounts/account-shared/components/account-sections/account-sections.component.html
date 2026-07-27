@@ -1,142 +1,206 @@
 <p-accordion *ngIf="account">
 
-  <p-accordionTab header="Basic Information" [selected]="true">
+  <p-accordionTab
+    header="{{ 'BasicInformation' | localize }}"
+    [selected]="true">
 
-    <div class="row">
+    <div class="basic-info-form">
 
-      <div class="col-md-6 mb-3">
-        <label>Trade Name:</label>
-        <input
-          class="form-control"
-          [(ngModel)]="account.name"
-          [readonly]="mode === 'view'" />
-      </div>
+      <!-- Trade name -->
+      <div class="basic-info-row">
+        <label class="field-label">
+          {{ 'TradeName' | localize }}:
+        </label>
 
-      <div class="col-md-6 mb-3">
-        <label>Email:</label>
-        <input
-          class="form-control"
-          [(ngModel)]="account.eMailAddress"
-          [readonly]="mode === 'view'" />
-      </div>
-
-      <div class="col-md-6 mb-3">
-        <label>Currency:</label>
-        <input
-          class="form-control"
-          [(ngModel)]="account.currencyCode"
-          [readonly]="mode === 'view'" />
-      </div>
-
-      <div class="col-md-6 mb-3">
-        <label>Phone:</label>
-        <input
-          class="form-control"
-          [(ngModel)]="account.phone1Number"
-          [readonly]="mode === 'view'" />
-      </div>
-
-      <div class="col-md-6 mb-3">
-        <label>Account Type:</label>
-        <input
-          class="form-control"
-          [(ngModel)]="account.accountType"
-          [readonly]="mode === 'view'" />
-      </div>
-
-      <div class="col-md-6 mb-3">
-        <label>SSIN:</label>
-        <input
-          class="form-control"
-          [(ngModel)]="account.ssin"
-          [readonly]="mode === 'view'" />
-      </div>
-
-    </div>
-
-  </p-accordionTab>
-
-  <p-accordionTab header="Business Information">
-    <div class="row">
-
-      <div class="col-md-6 mb-3">
-        <label>Website:</label>
-        <input class="form-control" [(ngModel)]="account.website" [readonly]="mode === 'view'" />
-      </div>
-
-      <div class="col-md-6 mb-3">
-        <label>City:</label>
-        <input class="form-control" [(ngModel)]="account.city" [readonly]="mode === 'view'" />
-      </div>
-
-      <div class="col-md-6 mb-3">
-        <label>State:</label>
-        <input class="form-control" [(ngModel)]="account.state" [readonly]="mode === 'view'" />
-      </div>
-
-      <div class="col-md-6 mb-3">
-        <label>Zip Code:</label>
-        <input class="form-control" [(ngModel)]="account.zipCode" [readonly]="mode === 'view'" />
-      </div>
-
-    </div>
-  </p-accordionTab>
-
-  <p-accordionTab header="Relationship">
-    <p>Visibility: {{ entityData?.visibility || '-' }}</p>
-    <p>Connection Count: {{ entityData?.connectionCount || 0 }}</p>
-  </p-accordionTab>
-
-
-  <p-accordionTab  header="Roles">
-        <!-- <div >
-    <div class="kt-content  kt-grid__item kt-grid__item--fluid kt-grid kt-grid--hor">
-        <div class="kt-subheader kt-grid__item">
-            <div [class]="containerClass">
-                <div class="kt-subheader__main">
-                    <h3 class="kt-subheader__title">
-                        <span>{{"RelationshipSettingsHeaderInfo" | localize}}</span>
-                    </h3>
-                    <span class="kt-subheader__separator kt-subheader__separator--v"></span>
-                    <span class="kt-subheader__desc">
-                        {{"SettingsHeaderInfo" | localize}}
-                    </span>
-                </div>
-                <div class="kt-subheader__toolbar">
-                    <div class="kt-subheader__wrapper">
-                        <button class="btn saveBtn" (click)="saveAll()">
-                            {{"SaveAll" | localize}}</button>
-                    </div>
-                </div>
-            </div>
+        <div class="field-control">
+          <input
+            type="text"
+            class="form-control"
+            [(ngModel)]="mainBranch.tradeName"
+            name="tradeName"
+            [readonly]="isViewMode" />
         </div>
-        <div [class]="containerClass + ' kt-grid__item kt-grid__item--fluid'">
-            <div class="kt-portlet m-0">
-                <div class="kt-portlet__body">
-                    <div class="row">
+      </div>
 
-                        <div class="col-12">
-                            <div *ngFor="let usage of usageList; let i = index" [attr.id]="'usage_' + usage">
-                                <h5 class="usage-block">{{ usage }}</h5>
-                                <p-dropdown *ngIf="connectionsInfo?.length > 1" [options]="connectionsInfo" optionLabel="connectedLabel"
-                                    optionValue="relationEntityId" (onChange)="onRelationshipOptionChange($event.value)">
-                                </p-dropdown>
-                                <app-dynamicInputs #appdynamicInputs
-                                    [extraAttributeObject]="{ value: { filteredExtraAttributes: groupedByUsage[usage], extraAttributes: allAttributes } }"
-                                    [entityObjectTypeId]="entityObjectTypeId" [entityType]="'MARKETPLACECONTACTRELATIONSHIP'"
-                                    [dynamicInputsForViewDto]="dynamicInputsForViewDto" (extraDataCleared)="onExtraAttributeCleared($event)"
-                                    (extraDataChanged)="onExtraAttributesChanged($event)" [fromSetting]="true">
-                                </app-dynamicInputs>
-                            
-                            </div>
-                        </div>
+      <!-- Email -->
+      <div class="basic-info-row">
+        <label class="field-label">
+          {{ 'Email' | localize }}:
+        </label>
 
-                    </div>
-
-                </div>
-            </div>
+        <div class="field-control">
+          <input
+            type="email"
+            class="form-control"
+            [(ngModel)]="account.eMailAddress"
+            name="emailAddress"
+            [readonly]="isViewMode" />
         </div>
+      </div>
+
+      <!-- Language -->
+      <div class="basic-info-row">
+        <label class="field-label">
+          {{ 'Language' | localize }}:
+        </label>
+
+        <div class="field-control dropdown-control">
+          <p-dropdown
+            [options]="allLanguages"
+            [(ngModel)]="mainBranch.languageId"
+            name="languageId"
+            optionLabel="label"
+            optionValue="value"
+            placeholder="{{ 'SelectLanguage' | localize }}"
+            [disabled]="isViewMode"
+            appendTo="body">
+          </p-dropdown>
+        </div>
+      </div>
+
+      <!-- Currency -->
+      <div class="basic-info-row">
+        <label class="field-label">
+          {{ 'Currency' | localize }}:
+        </label>
+
+        <div class="field-control dropdown-control">
+          <p-dropdown
+            [options]="allCurrencies"
+            [(ngModel)]="account.currencyId"
+            name="currencyId"
+            optionLabel="label"
+            optionValue="value"
+            placeholder="{{ 'SelectCurrency' | localize }}"
+            [disabled]="isViewMode"
+            appendTo="body">
+          </p-dropdown>
+        </div>
+      </div>
+
+      <div class="phone-separator"></div>
+
+      <!-- Phone 1 -->
+      <div class="phone-row">
+        <label class="field-label">
+          {{ 'Phone' | localize }}:
+        </label>
+
+        <p-dropdown
+          styleClass="phone-type-dropdown"
+          [options]="allPhoneTypes"
+          [(ngModel)]="mainBranch.phone1TypeId"
+          name="phone1TypeId"
+          optionLabel="label"
+          optionValue="value"
+          placeholder="{{ 'Type' | localize }}"
+          [disabled]="isViewMode"
+          appendTo="body">
+        </p-dropdown>
+
+        <input
+          type="text"
+          class="form-control phone-number"
+          [(ngModel)]="mainBranch.phone1Number"
+          name="phone1Number"
+          [readonly]="isViewMode" />
+
+        <input
+          type="text"
+          class="form-control phone-extension"
+          [(ngModel)]="mainBranch.phone1Ext"
+          name="phone1Ext"
+          placeholder="{{ 'Ext' | localize }}"
+          [readonly]="isViewMode" />
+      </div>
+
+      <!-- Phone 2 -->
+      <div class="phone-row">
+        <label class="field-label">
+          {{ 'Phone' | localize }}:
+        </label>
+
+        <p-dropdown
+          styleClass="phone-type-dropdown"
+          [options]="allPhoneTypes"
+          [(ngModel)]="mainBranch.phone2TypeId"
+          name="phone2TypeId"
+          optionLabel="label"
+          optionValue="value"
+          placeholder="{{ 'Type' | localize }}"
+          [disabled]="isViewMode"
+          appendTo="body">
+        </p-dropdown>
+
+        <input
+          type="text"
+          class="form-control phone-number"
+          [(ngModel)]="mainBranch.phone2Number"
+          name="phone2Number"
+          [readonly]="isViewMode" />
+
+        <input
+          type="text"
+          class="form-control phone-extension"
+          [(ngModel)]="mainBranch.phone2Ext"
+          name="phone2Ext"
+          placeholder="{{ 'Ext' | localize }}"
+          [readonly]="isViewMode" />
+      </div>
+
+      <!-- Phone 3 -->
+      <div class="phone-row">
+        <label class="field-label">
+          {{ 'Phone' | localize }}:
+        </label>
+
+        <p-dropdown
+          styleClass="phone-type-dropdown"
+          [options]="allPhoneTypes"
+          [(ngModel)]="mainBranch.phone3TypeId"
+          name="phone3TypeId"
+          optionLabel="label"
+          optionValue="value"
+          placeholder="{{ 'Type' | localize }}"
+          [disabled]="isViewMode"
+          appendTo="body">
+        </p-dropdown>
+
+        <input
+          type="text"
+          class="form-control phone-number"
+          [(ngModel)]="mainBranch.phone3Number"
+          name="phone3Number"
+          [readonly]="isViewMode" />
+
+        <input
+          type="text"
+          class="form-control phone-extension"
+          [(ngModel)]="mainBranch.phone3Ext"
+          name="phone3Ext"
+          placeholder="{{ 'Ext' | localize }}"
+          [readonly]="isViewMode" />
+      </div>
+
     </div>
-</div> -->
+
   </p-accordionTab>
+
+  <p-accordionTab header="{{ 'BusinessInformation' | localize }}">
+    <!-- Fixed account business fields -->
+  </p-accordionTab>
+
+
+<p-accordionTab header="{{ 'Relationship' | localize }}">
+
+  <!-- <app-dynamicInputs
+    *ngIf="rolesEntityObjectTypeId"
+    [entityObjectTypeId]="rolesEntityObjectTypeId"
+    [entityType]="'MARKETPLACECONTACTRELATIONSHIP'"
+    [dynamicInputsForViewDto]="dynamicInputsForViewDto"
+    [fromSetting]="true">
+  </app-dynamicInputs> -->
+
+</p-accordionTab>
+
 </p-accordion>

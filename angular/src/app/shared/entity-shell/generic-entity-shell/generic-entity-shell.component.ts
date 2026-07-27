@@ -36,18 +36,33 @@ leftPanelSections = [
         label: 'Main Branch',
         icon: 'fa fa-building',
         children: [
-          { id: 2, label: 'Sub Branch 1', icon: 'fa fa-building' }
+          {
+            id: 10,
+            label: 'Sarah Johnson',
+            icon: 'fa fa-user',
+            type: 'contact'
+          },
+          {
+            id: 11,
+            label: 'Mark Green',
+            icon: 'fa fa-user',
+            type: 'contact'
+          }
         ]
-      }
-    ]
-  },
-  {
-    key: 'contacts',
-    title: 'Contacts',
-    canAdd: true,
-    items: [
-      { id: 10, label: 'Sarah Johnson', icon: 'fa fa-user' },
-      { id: 11, label: 'Mark Green', icon: 'fa fa-user' }
+      },
+      // {
+      //   id: 2,
+      //   label: 'Cairo Branch',
+      //   icon: 'fa fa-building',
+      //   children: [
+      //     {
+      //       id: 20,
+      //       label: 'John Smith',
+      //       icon: 'fa fa-user',
+      //       type: 'contact'
+      //     }
+      //   ]
+      // }
     ]
   }
 ];
