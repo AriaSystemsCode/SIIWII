@@ -2747,9 +2747,9 @@ namespace onetouch.Accounts
                     //MMT33-3
 
                     //Connect Current Account branches with the other account
-                    if (originalPublishContactFortCurrTenant.EntityObjectTypeId != presonEntityObjectTypeId && sync == false
-                        && originalPublishContactFortCurrTenant.TenantOwner != AbpSession.TenantId
-                        )
+                      if (originalPublishContactFortCurrTenant.EntityObjectTypeId != presonEntityObjectTypeId && sync == false)
+                        //&& originalPublishContactFortCurrTenant.TenantOwner != AbpSession.TenantId
+                       // )
                         await ConnectBranches(originalPublishContactFortCurrTenant.Id, id);
 
                     if (originalContact.EntityObjectTypeId != presonEntityObjectTypeId && sync == false &&
@@ -3078,7 +3078,7 @@ namespace onetouch.Accounts
                         contactDto.UseDTOTenant = true;
                         contactDto.ParentId = parentContact.Id;
                         contactDto.ContactAddresses = null;
-                        contactDto.TenantOwner = branchesPublishedParentContact.TenantOwner;
+                        //contactDto.TenantOwner = branchesPublishedParentContact.TenantOwner;
                         var tenantObj = await TenantManager.GetByIdAsync(int.Parse(connectTenant.ToString()));
                         if (tenantObj != null)
                         {
@@ -3163,7 +3163,7 @@ namespace onetouch.Accounts
                             //accountDto.EntityExtraData.ForEach(z => z.Id = 0);
                             //accountDto.EntityAttachments.ForEach(z => z.Id = 0);
                             accountDto.TenantId = int.Parse(connectTenant.ToString());
-                            contactDto.TenantOwner = contactObj.TenantOwner;
+                            //contactDto.TenantOwner = contactObj.TenantOwner;
                             //XXX
                             //CreateOrEditAccountInfoDto createOrEditAccountInfoDto = new CreateOrEditAccountInfoDto();
                             //createOrEditAccountInfoDto = ObjectMapper.Map<CreateOrEditAccountInfoDto>(contactObj);
