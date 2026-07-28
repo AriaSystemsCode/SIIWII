@@ -32,6 +32,7 @@ using GraphQL.Server.Ui.Playground;
 using HealthChecks.UI.Client;
 using IdentityServer4.Configuration;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using onetouch.Configure;
@@ -438,6 +439,7 @@ namespace onetouch.Web.Startup
                 app.UseExceptionHandler("/Error");
             }
 
+            ConfigureAttachmentStaticFiles(app);
             app.UseStaticFiles();
             app.UseRouting();
 
@@ -579,6 +581,95 @@ namespace onetouch.Web.Startup
             // Log exceptions here. For instance:
             System.Diagnostics.Debug.WriteLine("[{0}]: Exception occured. Message: '{1}'. Exception Details:\r\n{2}",
                 DateTime.Now, message, ex);
+        }
+
+        private void ConfigureAttachmentStaticFiles(IApplicationBuilder app)
+        {
+            ConfigureAttachmentStaticFiles(
+                app,
+                _appConfiguration["Attachment:Path"],
+                _appConfiguration["Attachment:RequestPath"] ?? "/attachments");
+
+            ConfigureAttachmentStaticFiles(
+                app,
+                _appConfiguration["Attachment:PathTemp"],
+                _appConfiguration["Attachment:TempRequestPath"] ?? "/tempattachments");
+        }
+
+        private static void ConfigureAttachmentStaticFiles(
+            IApplicationBuilder app,
+            string physicalPath,
+            string requestPath)
+        {
+            physicalPath = physicalPath?.Trim().Trim('"');
+            requestPath = requestPath?.Trim();
+
+            if (string.IsNullOrWhiteSpace(physicalPath))
+            {
+                Console.WriteLine(
+                    $"[AttachmentStaticFiles] Mapping for '{requestPath}' was skipped because the physical path is empty.");
+                return;
+            }
+
+            if (!Path.IsPathRooted(physicalPath))
+            {
+                Console.WriteLine(
+                    $"[AttachmentStaticFiles] Mapping for '{requestPath}' was skipped because " +
+                    $"'{physicalPath}' is a relative legacy path. The default wwwroot provider will be used.");
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(requestPath))
+            {
+                throw new InvalidOperationException(
+                    $"A request path is required for attachment storage '{physicalPath}'.");
+            }
+
+            if (!requestPath.StartsWith("/", StringComparison.Ordinal))
+            {
+                requestPath = "/" + requestPath;
+            }
+
+            // A temporarily unavailable network share must not prevent the API from
+            // starting. The route is enabled after connectivity is restored and the
+            // application pool is recycled.
+            if (!Directory.Exists(physicalPath))
+            {
+                Console.Error.WriteLine(
+                    $"[AttachmentStaticFiles] Attachment directory '{physicalPath}' is unavailable. " +
+                    $"Static-file mapping for '{requestPath}' was skipped.");
+                return;
+            }
+
+            try
+            {
+                var fileProvider = new PhysicalFileProvider(physicalPath);
+
+                app.UseStaticFiles(new StaticFileOptions
+                {
+                    FileProvider = fileProvider,
+                    RequestPath = requestPath,
+                    OnPrepareResponse = context =>
+                    {
+                        context.Context.Response.Headers["X-Siiwii-Attachment-Provider"] = "Configured";
+                    }
+                });
+
+                Console.WriteLine(
+                    $"[AttachmentStaticFiles] Mapped '{requestPath}' to '{physicalPath}'.");
+            }
+            catch (IOException ex)
+            {
+                Console.Error.WriteLine(
+                    $"[AttachmentStaticFiles] Attachment directory '{physicalPath}' could not be mapped to " +
+                    $"'{requestPath}': {ex.Message}");
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                Console.Error.WriteLine(
+                    $"[AttachmentStaticFiles] Access to attachment directory '{physicalPath}' was denied while " +
+                    $"mapping '{requestPath}': {ex.Message}");
+            }
         }
 
 

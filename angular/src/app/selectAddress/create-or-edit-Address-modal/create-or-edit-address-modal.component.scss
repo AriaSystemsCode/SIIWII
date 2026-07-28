@@ -119,9 +119,9 @@
     padding: 15px 15px 80px;
 }
 
-.modal-body {
-    margin-top: 74px;
-}
+// .modal-body {
+//     margin-top: 74px;
+// }
 
 /*Right*/
 .modal.right.fade .modal-dialog {
@@ -349,4 +349,8 @@
   .side-modal {
     width: 75%;
   }
+}
+
+.p-10 {
+    padding: 10px;
 }
