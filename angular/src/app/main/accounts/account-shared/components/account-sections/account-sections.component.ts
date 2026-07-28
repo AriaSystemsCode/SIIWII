@@ -72,6 +72,29 @@ roleAttributes: any[] = [];
 
 isLoadingRoles = false;
 
+  //Department
+    showMoreDepartment: boolean = false;
+    showLessDepartment: boolean = false;
+    totalDepartment: number;
+    noOfDepartmentToShowInitially: number;
+    maxDepartmentCount: number;
+    skipDepartmentCount: number;
+    departmentToLoad: number;
+    initDepartment: string[] = [];
+    scrollDepartment: boolean = false;
+    maxDepartmentCnt: number;
+    //Classification
+    showMoreClassification: boolean = false;
+    showLessClassification: boolean = false;
+    totalClassification: number;
+    noOfClassificationToShowInitially: number;
+    maxClassificationCount: number;
+    skipClassificationCount: number;
+    classificationToLoad: number;
+    initClassification: string[] = [];
+    scrollClassification: boolean = false;
+    maxClassificationCnt: number;
+    maxContainerHeight: number = 150;
   constructor(
     injector: Injector,
     private _accountsServiceProxy: AccountsServiceProxy,
@@ -96,7 +119,6 @@ isLoadingRoles = false;
 
   if (this.entityData?.account) {
     this.setAccountData(this.entityData);
-    this.roleEntityObjectTypeId = this.entityData?.account?.accountTypeId
     
   }
 }
@@ -117,8 +139,13 @@ isLoadingRoles = false;
     if (changes.entityData?.currentValue?.account) {
     this.setAccountData(changes.entityData.currentValue);
   }
-}
 
+        this.initDepartmentVariables(true);
+            this.initClassificationVariables(true);
+}
+trackByValue(index: number, value: string): string {
+  return value || index.toString();
+}
   // private setAccountData(data: any): void {
   //   this.entityData = data;
 
@@ -156,6 +183,7 @@ isLoadingRoles = false;
 private setAccountData(data: any): void {
   this.entityData = data;
   this.account = data?.account ?? {};
+    this.roleEntityObjectTypeId = this.entityData?.account?.accountTypeId
 
   this.mainBranch =
     this.account?.branches?.[0]?.data?.branch ??
@@ -211,38 +239,59 @@ private initializeRolesSection(): void {
           }
         });
 
-        /*
-         * dynamicInputs expects:
-         *
-         * extraDataAttributes: [
-         *   {
-         *     extraAttributeId,
-         *     selectedValues: [{ value }]
-         *   }
-         * ]
-         */
+     
         this.roleDynamicInputsForViewDto =
           new GetAppEntityForEditOutput();
+(this.roleDynamicInputsForViewDto as any).extraDataAttributes =
+  this.roleAttributes.map(attribute => {
 
-        (this.roleDynamicInputsForViewDto as any).extraDataAttributes =
-          this.roleAttributes.map(attribute => {
-            const matchedValues = accountExtraData.filter(
-              value =>
-                value.attributeId === attribute.attributeId
-            );
+    const matchedValues = accountExtraData.filter(
+      item =>
+        item.attributeId === attribute.attributeId
+    );
 
-            return {
-              extraAttributeId: attribute.attributeId,
-              extraAttrName: attribute.name,
-              selectedValues: matchedValues.map(value => ({
-                value:
-                  value.attributeValueId ??
-                  value.attributeValue ??
-                  ''
-              }))
-            };
-          });
+    let selectedValues: Array<{ value: any }> = [];
 
+    const isMultiSelect =
+      attribute.dataType?.toUpperCase() ===
+        'MULTISELECTDROPDOWNLIST' ||
+      attribute.acceptMultipleValues === true;
+
+    if (isMultiSelect) {
+      selectedValues = matchedValues.flatMap(item => {
+        const rawValue =
+          item.attributeValue ??
+          item.attributeValueId ??
+          '';
+
+        if (Array.isArray(rawValue)) {
+          return rawValue.map(value => ({
+            value
+          }));
+        }
+
+        return this.parseMultiSelectValue(
+          rawValue,
+          attribute.validEntries
+        ).map(value => ({
+          value
+        }));
+      });
+    } else {
+      selectedValues = matchedValues.map(item => ({
+        value:
+          item.attributeValueId ??
+          item.attributeValue ??
+          ''
+      }));
+    }
+
+    return {
+      extraAttributeId: attribute.attributeId,
+      extraAttrName: attribute.name,
+      selectedValues
+    };
+  });
         /*
          * Keep entityExtraData because you use it later for saving.
          */
@@ -268,6 +317,61 @@ private initializeRolesSection(): void {
       }
     });
 }
+
+
+private parseMultiSelectValue(
+  rawValue: any,
+  validEntries: string
+): string[] {
+
+  if (
+    rawValue === null ||
+    rawValue === undefined ||
+    rawValue === ''
+  ) {
+    return [];
+  }
+
+  if (Array.isArray(rawValue)) {
+    return rawValue;
+  }
+
+  const value = String(rawValue).trim();
+
+  const options = (validEntries ?? '')
+    .split('|')
+    .map(option => option.trim())
+    .filter(Boolean);
+
+  /*
+   * Safest method:
+   * find which valid options exist in the stored string.
+   *
+   * Stored:
+   * Buyer-Seller-Sales Rep-Buying Office
+   */
+  if (options.length) {
+    return options.filter(option => {
+      const escapedOption =
+        option.replace(
+          /[.*+?^${}()|[\]\\]/g,
+          '\\$&'
+        );
+
+      const pattern = new RegExp(
+        `(^|-)${escapedOption}(?=-|$)`,
+        'i'
+      );
+
+      return pattern.test(value);
+    });
+  }
+
+  return value
+    .split('-')
+    .map(item => item.trim())
+    .filter(Boolean);
+}
 private initializeRelationshipSection(): void {
   if (!this.connectionsInfo?.length) {
     this.resetRelationshipData();
@@ -286,6 +390,118 @@ private initializeRelationshipSection(): void {
 
   this.loadRelationshipData(firstRelationId);
 }
+
+
+
+  //Department
+    initDepartmentVariables(firstInit: boolean) {
+        if (firstInit)
+            this.initDepartment = this.entityData.account.categories;
+        else this.entityData.account.categories = this.initDepartment;
+
+        this.noOfDepartmentToShowInitially = 10;
+        this.maxDepartmentCount = 10;
+        this.scrollDepartment = false;
+        this.maxDepartmentCnt = 40;
+        this.departmentToLoad = 20;
+        this.totalDepartment =
+            this.entityData?.account?.categoriesTotalCount;
+
+        if (this.noOfDepartmentToShowInitially < this.totalDepartment)
+            this.showMoreDepartment = true;
+        else this.showMoreDepartment = false;
+        this.showLessDepartment = false;
+    }
+
+    showDepartment() {
+        if (this.noOfDepartmentToShowInitially < this.totalDepartment) {
+            this.maxDepartmentCount = this.departmentToLoad;
+            this.skipDepartmentCount = this.noOfDepartmentToShowInitially;
+            this.noOfDepartmentToShowInitially += this.departmentToLoad;
+
+            this._AppEntitiesServiceProxy
+                .getAppEntityDepartmentsNamesWithPaging(
+                    this.entityData?.account?.entityId,
+                    undefined,
+                    this.skipDepartmentCount,
+                    this.maxDepartmentCount,
+                )
+                .subscribe((res) => {
+                    if (
+                        this.noOfDepartmentToShowInitially >=
+                        this.totalDepartment
+                    ) {
+                        this.showMoreDepartment = false;
+                        this.showLessDepartment = true;
+                    }
+
+                    this.entityData.account.categories =
+                        this.entityData.account.categories.concat(
+                            res.items
+                        );
+                    if (
+                        this.entityData.account.categories.length >= this.maxDepartmentCnt
+                    )
+                        this.scrollDepartment = true;
+                });
+        } else {
+            this.initDepartmentVariables(false);
+        }
+    }
+
+    //Classification
+    initClassificationVariables(firstInit: boolean) {
+        if (firstInit)
+            this.initClassification = this.entityData.account.classfications
+        else this.entityData.account.classfications = this.initClassification;
+
+        this.noOfClassificationToShowInitially = 10;
+        this.maxClassificationCount = 10;
+        this.scrollClassification = false;
+        this.maxClassificationCnt = 40;
+        this.classificationToLoad = 20;
+        this.totalClassification = this.entityData.account.classificationsTotalCount;
+        if (this.noOfClassificationToShowInitially < this.totalClassification)
+            this.showMoreClassification = true;
+        else this.showMoreClassification = false;
+        this.showLessClassification = false;
+    }
+    showClassification() {
+        if (this.noOfClassificationToShowInitially < this.totalClassification) {
+            this.maxClassificationCount = this.classificationToLoad;
+            this.skipClassificationCount =
+                this.noOfClassificationToShowInitially;
+            this.noOfClassificationToShowInitially += this.classificationToLoad;
+
+            this._AppEntitiesServiceProxy
+                .getAppEntityClassificationsNamesWithPaging(
+                    this.entityData.account.entityId,
+                    undefined,
+                    this.skipDepartmentCount,
+                    this.maxDepartmentCount,
+                )
+                .subscribe((res) => {
+                    if (
+                        this.noOfClassificationToShowInitially >=
+                        this.totalClassification
+                    ) {
+                        this.showMoreClassification = false;
+                        this.showLessClassification = true;
+                    }
+
+                    this.entityData.account.classfications = this.entityData.account.classfications.concat(
+                        res.items
+                    );
+                    if (
+                        this.entityData.account.classfications.length >= this.maxClassificationCnt
+                    )
+                        this.scrollClassification = true;
+                });
+        } else {
+            this.initClassificationVariables(false);
+        }
+    }
+
 onRelationshipOptionChange(
   relationId: number
 ): void {

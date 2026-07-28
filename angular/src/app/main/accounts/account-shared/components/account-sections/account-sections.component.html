@@ -187,7 +187,83 @@
   </p-accordionTab>
 
   <p-accordionTab header="{{ 'BusinessInformation' | localize }}">
-    <!-- Fixed account business fields -->
+   <div
+  *ngIf="roleEntityObjectTypeId !== 21"
+>
+
+  <!-- Departments -->
+  <div class="department-block">
+
+    <h3 class="department-title">
+      {{ "Departments" | localize }}:
+    </h3>
+
+    <ng-container
+      *ngIf="entityData?.account?.categories?.length > 0; else noDepartment">
+
+      <div class="department-list">
+
+        <div
+          class="department-item"
+          *ngFor="
+            let department of entityData?.account?.categories;
+            trackBy: trackByValue
+          ">
+          {{ department }}
+        </div>
+
+      </div>
+
+    </ng-container>
+
+    <ng-template #noDepartment>
+      <p class="empty-message">
+        {{ "NoDepartmentstodisplay" | localize }}
+      </p>
+    </ng-template>
+
+  </div>
+
+  <!-- Business Classifications -->
+  <div class="department-block">
+
+    <h3 class="department-title">
+      {{ "BusinessClassifications" | localize }}:
+    </h3>
+
+    <ng-container
+      *ngIf="
+        entityData?.account?.classfications?.length > 0;
+        else noClassification
+      ">
+
+      <div class="department-list">
+
+        <div
+          class="department-item"
+          *ngFor="
+            let classification of entityData?.account?.classfications;
+            trackBy: trackByValue
+          ">
+          {{ classification }}
+        </div>
+
+      </div>
+
+    </ng-container>
+
+    <ng-template #noClassification>
+      <p class="empty-message">
+        {{
+          "NoBusinessclassificationstodisplay"
+            | localize
+        }}
+      </p>
+    </ng-template>
+
+  </div>
+
+</div>
   </p-accordionTab>
 <p-accordionTab header="{{ 'Roles' | localize }}">
 

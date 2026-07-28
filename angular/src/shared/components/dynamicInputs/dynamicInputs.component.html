@@ -1,4 +1,4 @@
-<div class="row pl-3">
+<div class="row pl-3 dynamicIn">
   <div class="col-lg-8 col-md-10 col">
     <div class="row pt-4">
       <!-- Loop through extra attributes -->
@@ -267,19 +267,16 @@
     optionValue="value"
     display="chip"
     [filter]="true"
-    [showClear]="true"
+  
     [placeholder]="
       ('Select' | localize) +
       ' ' +
       (extraAttr.name | localize)
     "
-    name="extraAttr_{{ extraAttr.attributeId }}"
-    appendTo="body"
+
+
     (onChange)="onAnyInputChange()">
 
-    <ng-template let-item pTemplate="item">
-      {{ item.label | localize }}
-    </ng-template>
 
   </p-multiSelect>
 
