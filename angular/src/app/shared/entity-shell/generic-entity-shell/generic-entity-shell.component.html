@@ -23,7 +23,7 @@
       (maximize)="maximize.emit()">
     </app-entity-header>
 
-    <app-entity-basic-info
+    <!-- <app-entity-basic-info
       [entity]="entity"
       [entityData]="entityData"
       [mode]="mode"
@@ -31,7 +31,22 @@
       [statuses]="statuses"
        [fields]="basicInfoFields"
       (entityChange)="entityChange.emit($event)">
-    </app-entity-basic-info>
+    </app-entity-basic-info> -->
+
+
+    <app-entity-basic-info
+  [entity]="entity"
+  [entityData]="entityData"
+  [mode]="mode"
+  [entityTypes]="entityTypes"
+  [statuses]="statuses"
+  [fields]="basicInfoFields"
+  [logoPath]="logoPath"
+  [coverPath]="coverPath"
+  [imagesPath]="imagesPath"
+  [attachmentsPath]="attachmentsPath"
+  (entityChange)="entityChange.emit($event)">
+</app-entity-basic-info>
 
     <div class="content-row row m-3">
 

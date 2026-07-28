@@ -114,18 +114,18 @@
             </div>
 
             <!-- Text input -->
-            <div class="ml-2 flex-grow-1 position-relative" *ngIf="extraAttr.dataType === 'string'&& !extraAttr.isLookup && isVisible(extraAttr)">
+            <div class="ml-2 flex-grow-1 position-relative" *ngIf="extraAttr.dataType?.toLowerCase() === 'string'&& !extraAttr.isLookup && isVisible(extraAttr)">
               <input type="text" name="{{extraAttr.name}}"
                      placeholder="{{extraAttr.name| localize}}"
                      class="form-control"
                          [(ngModel)]="extraAttr.selectedValues"
                      (ngModelChange)="onAnyInputChange()" />
-              <i class="pi pi-times position-absolute" style="right: 10px; top: 15px; cursor: pointer;"1
+              <i class="pi pi-times position-absolute" style="right: 10px; top: 15px; cursor: pointer;"
                  *ngIf="extraAttr.selectedValues" (click)="clearExtraAttr(extraAttr)"></i>
             </div>
 
             <!-- Boolean / Radio input -->
-            <div class="flex-grow-1" *ngIf="extraAttr.dataType === 'boolean' || extraAttr.dataType === 'Boolean' || extraAttr.dataType === 'bit'">
+            <div class="flex-grow-1" *ngIf="extraAttr.dataType?.toLowerCase() === 'boolean' ||  extraAttr.dataType === 'bit'">
               <div class="radio-inline mt-2">
                 <ng-container *ngIf="extraAttr.validEntries?.trim(); else yesNoBlock">
                   <label class="radio radio-accent radio-primary mr-4"
@@ -214,7 +214,9 @@
             </div>
 
             <!-- Datetime picker -->
-            <div class="position-relative {{fromSetting?'calWidth':''}}" *ngIf="extraAttr.dataType === 'Datetime'">
+            <div class="position-relative {{fromSetting?'calWidth':''}}"  *ngIf="
+    extraAttr.dataType?.toLowerCase() === 'datetime' ||
+    extraAttr.dataType?.toLowerCase() === 'date'">
               <p-calendar #calendarRef     [(ngModel)]="extraAttr.selectedValues" [showIcon]="false"
                           [showOtherMonths]="true" [selectOtherMonths]="true"
                           placeholder="{{extraAttr.name| localize}}" (ngModelChange)="onAnyInputChange()" appendTo="body"
@@ -226,7 +228,7 @@
 
             <!-- Numeric input -->
        <div class="flex-grow-1 position-relative"
-     *ngIf="extraAttr.dataType === 'Numeric'">
+     *ngIf="extraAttr.dataType?.toLowerCase() === 'numeric'">
 
     <input
         type="number"
@@ -247,6 +249,41 @@
 
 </div>
 
+
+
+<!-- Multi-select dropdown with static validEntries -->
+<div
+  class="wide-drop-down flex-grow-1"
+  *ngIf="
+    extraAttr.dataType?.toUpperCase() ===
+    'MULTISELECTDROPDOWNLIST'
+  ">
+
+  <p-multiSelect
+    [options]="getMultiSelectOptions(extraAttr)"
+    [(ngModel)]="extraAttr.selectedValues"
+    [styleClass]="'w-100'"
+    optionLabel="label"
+    optionValue="value"
+    display="chip"
+    [filter]="true"
+    [showClear]="true"
+    [placeholder]="
+      ('Select' | localize) +
+      ' ' +
+      (extraAttr.name | localize)
+    "
+    name="extraAttr_{{ extraAttr.attributeId }}"
+    appendTo="body"
+    (onChange)="onAnyInputChange()">
+
+    <ng-template let-item pTemplate="item">
+      {{ item.label | localize }}
+    </ng-template>
+
+  </p-multiSelect>
+
+</div>
             <!-- text eitor -->
             <div class="flex-grow-1 w-100"
                 *ngIf="extraAttr.dataType === 'html'">

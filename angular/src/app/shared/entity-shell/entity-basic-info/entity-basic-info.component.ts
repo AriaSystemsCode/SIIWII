@@ -31,19 +31,7 @@ export class EntityBasicInfoComponent {
   @Input() statuses: any[] = [];
   @Input() fields: EntityBasicInfoField[] = [];
 
-  /*
-   * Configurable paths make the component work with:
-   *
-   * Account:
-   * account.logoUrl
-   * account.coverUrl
-   * account.imagesUrls
-   *
-   * Item:
-   * item.logoUrl
-   * item.coverUrl
-   * item.imagesUrls
-   */
+ 
   @Input() logoPath = 'account.logoUrl';
   @Input() coverPath = 'account.coverUrl';
   @Input() imagesPath = 'account.imagesUrls';

@@ -3,7 +3,7 @@ import { Router } from '@angular/router';
 import { finalize } from 'rxjs/operators';
 import { AppConsts } from '@shared/AppConsts';
 import { AppComponentBase } from '@shared/common/app-component-base';
-import { CreateMarketplaceAccountServiceProxy, GetAccountForViewDto } from '@shared/service-proxies/service-proxies';
+import { AccountsServiceProxy, CreateMarketplaceAccountServiceProxy, GetAccountForViewDto } from '@shared/service-proxies/service-proxies';
 
 @Component({
   selector: 'app-account-card',
@@ -35,9 +35,13 @@ export class AccountCardComponent extends AppComponentBase implements OnChanges 
   selectedAccountForRelations: any = null;
   openedRelationMenuId: number | null = null;
   isCreatingRelation = false; 
+
+  accountViewData: GetAccountForViewDto | null = null;
+isLoadingAccountView = false;
   constructor(
     injector: Injector,
     private router: Router,
+     private _accountsServiceProxy: AccountsServiceProxy,
     private CreateMarketplaceAccountServiceProxy: CreateMarketplaceAccountServiceProxy,
   ) {
     super(injector);
@@ -97,30 +101,114 @@ showGenericEntityModal = false;
 
 selectedAccountId: number;
 
+
+accountTypes = [
+  { label: 'Business', value: 19 },
+  { label: 'Personal', value: 21 }
+];
+
+statuses = [
+  { label: 'Active', value: true },
+  { label: 'Inactive', value: false }
+];
+accountBasicInfoFields = [
+  {
+    key: 'status',
+    label: 'Status',
+    type: 'dropdown',
+    valuePath: 'account.status',
+    options: this.statuses,
+    optionLabel: 'label',
+    optionValue: 'value'
+  },
+  {
+    key: 'accountType',
+    label: 'Account Type',
+    type: 'dropdown',
+    valuePath: 'account.accountTypeId',
+    options: this.accountTypes,
+    optionLabel: 'label',
+    optionValue: 'value'
+  },
+  {
+    key: 'name',
+    label: 'Name',
+    type: 'text',
+    valuePath: 'account.name'
+  },
+  {
+    key: 'ssin',
+    label: 'SSIN',
+    type: 'text',
+    valuePath: 'account.ssin',
+    readonly: true
+  }
+];
+
+// viewProfile(): void {
+
+//   // if (!this.id) {
+//   //   return;
+//   // }
+
+//   // if (!this.fromMarketplace) {
+
+//     this.selectedAccountId = this.id;
+
+//     this.showGenericEntityModal = true;
+
+//   //   return;
+//   // }
+
+//   // this.router.navigate(
+//   //   [`/app/main/account/view-marketplace-acc/${this.id}`],
+//   //   {
+//   //     state: {
+//   //       accountType: this.account.account.accountType,
+//   //       ssin: this.account.account.ssin
+//   //     }
+//   //   }
+//   // );
+// }
+
 viewProfile(): void {
+  if (!this.id || this.isLoadingAccountView) {
+    return;
+  }
 
-  // if (!this.id) {
-  //   return;
-  // }
+  this.selectedAccountId = this.id;
 
-  // if (!this.fromMarketplace) {
-
-    this.selectedAccountId = this.id;
-
+  /*
+   * Avoid calling the API again when the same account
+   * is already loaded.
+   */
+  if (
+    this.accountViewData?.account?.id === this.selectedAccountId
+  ) {
     this.showGenericEntityModal = true;
+    return;
+  }
 
-  //   return;
-  // }
+  this.isLoadingAccountView = true;
+  this.showMainSpinner();
 
-  // this.router.navigate(
-  //   [`/app/main/account/view-marketplace-acc/${this.id}`],
-  //   {
-  //     state: {
-  //       accountType: this.account.account.accountType,
-  //       ssin: this.account.account.ssin
-  //     }
-  //   }
-  // );
+  this._accountsServiceProxy
+    .getAccountForView(this.selectedAccountId, 5)
+    .pipe(
+      finalize(() => {
+        this.isLoadingAccountView = false;
+        this.hideMainSpinner();
+      })
+    )
+    .subscribe({
+      next: result => {
+        this.accountViewData = result;
+        this.showGenericEntityModal = true;
+      },
+      error: error => {
+        console.error('Failed to load account profile:', error);
+      }
+    });
 }
   clickCardHandler() {
     // if (this.isManual) {
@@ -288,13 +376,13 @@ viewProfile(): void {
   backgroundUrl: null
 };
 
-statuses = [
-  { label: 'Active', value: 'Active' },
-  { label: 'Inactive', value: 'Inactive' }
-];
+// statuses = [
+//   { label: 'Active', value: 'Active' },
+//   { label: 'Inactive', value: 'Inactive' }
+// ];
 
-accountTypes = [
-  { label: 'Business', value: 'Business' },
-  { label: 'Personal', value: 'Personal' }
-];
+// accountTypes = [
+//   { label: 'Business', value: 'Business' },
+//   { label: 'Personal', value: 'Personal' }
+// ];
 }

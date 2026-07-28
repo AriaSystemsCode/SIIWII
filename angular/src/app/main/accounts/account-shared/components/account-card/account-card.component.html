@@ -475,7 +475,7 @@ NOT CARDS VIEW MODE
 
 
 
-<app-generic-entity-modal [(visible)]="showGenericEntityModal">
+<!-- <app-generic-entity-modal [(visible)]="showGenericEntityModal">
 
 <app-generic-entity-shell
   [entity]="accountBasicInfo"
@@ -495,5 +495,47 @@ NOT CARDS VIEW MODE
   </app-account-sections>
 
 </app-generic-entity-shell>
+
+</app-generic-entity-modal> -->
+
+
+<app-generic-entity-modal
+  [(visible)]="showGenericEntityModal">
+
+  <app-generic-entity-shell
+    *ngIf="accountViewData"
+    [entity]="accountViewData?.account"
+    [entityType]="'Account'"
+    [title]="
+      'View ' +
+      accountViewData?.account?.name +
+      (
+        accountViewData?.account?.isManual
+          ? ' (Manual Account)'
+          : ''
+      )
+    "
+    [breadcrumbItems]="[
+      {
+        label: accountViewData?.account?.name
+      }
+    ]"
+    [mode]="'view'"
+    [entityTypes]="accountTypes"
+    [statuses]="statuses"
+    [entityData]="accountViewData"
+    [basicInfoFields]="accountBasicInfoFields"
+    [logoPath]="'account.logoUrl'"
+    [coverPath]="'account.coverUrl'"
+    [imagesPath]="'account.imagesUrls'">
+
+    <app-account-sections
+      entity-main-content
+      [accountId]="selectedAccountId"
+      [mode]="'view'"
+      [entityData]="accountViewData">
+    </app-account-sections>
+
+  </app-generic-entity-shell>
 
 </app-generic-entity-modal>

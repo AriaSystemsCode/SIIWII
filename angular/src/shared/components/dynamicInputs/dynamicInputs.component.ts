@@ -118,6 +118,7 @@ attr.selectedValues = formattedValue;
         }
       }
 
+      
       const originalValue = this.originalValuesMap.get(attr.attributeId);
       const isSame = JSON.stringify(originalValue) === JSON.stringify(formattedValue);
 
@@ -132,7 +133,15 @@ attr.selectedValues = formattedValue;
       } else {
         finalValue = formattedValue || '';
       }
-
+if (
+  attr.acceptMultipleValues &&
+  Array.isArray(formattedValue)
+) {
+  finalValue =
+    formattedValue.length
+      ? formattedValue
+      : [];
+}
       const updatedValue = {
         attributeId: attr.attributeId,
         value: finalValue,
@@ -254,61 +263,163 @@ handleRelatedWhen(attr: any, finalValue: any, updatedDataMap: Map<number, any>) 
 
 
 
-  fillSelectedValuesFromDto() {
-    if (!this.extraAttributeObject?.value?.extraAttributes || !this.dynamicInputsForViewDto?.extraDataAttributes) {
-      return;
-    }
+  // fillSelectedValuesFromDto() {
+  //   if (!this.extraAttributeObject?.value?.extraAttributes || !this.dynamicInputsForViewDto?.extraDataAttributes) {
+  //     return;
+  //   }
 
-    const dtoData = this.dynamicInputsForViewDto.extraDataAttributes;
+  //   const dtoData = this.dynamicInputsForViewDto.extraDataAttributes;
 
-    const allAttributes = [
-      ...(this.extraAttributeObject.value.extraAttributes || []),
-      ...(this.extraAttributeObject.value.filteredExtraAttributes || [])
-    ];
+  //   const allAttributes = [
+  //     ...(this.extraAttributeObject.value.extraAttributes || []),
+  //     ...(this.extraAttributeObject.value.filteredExtraAttributes || [])
+  //   ];
 
-    for (const attr of allAttributes) {
+  //   for (const attr of allAttributes) {
 
-      const matchedDto = dtoData.find(d => d.extraAttributeId === attr.attributeId);
+  //     const matchedDto = dtoData.find(d => d.extraAttributeId === attr.attributeId);
 
-      if (matchedDto && matchedDto.selectedValues?.length) {
-        const dtoValue = matchedDto.selectedValues[matchedDto.selectedValues.length - 1].value;
+  //     if (matchedDto && matchedDto.selectedValues?.length) {
+  //       const dtoValue = matchedDto.selectedValues[matchedDto.selectedValues.length - 1].value;
 
-        if (attr.isLookup) {
-          const matchedOption = attr.paginationSetting?.list?.find(opt => {
-            return opt.label === dtoValue || opt.value === dtoValue;
-          });
+  //       if (attr.isLookup) {
+  //         const matchedOption = attr.paginationSetting?.list?.find(opt => {
+  //           return opt.label === dtoValue || opt.value === dtoValue;
+  //         });
 
-          if (matchedOption) {
-            attr.selectedValues = matchedOption.value;
-          } else {
-            const manualOption = {
-              value: dtoValue,
-              label: dtoValue,
-              code: null,
-              isHostRecord: false,
-              stockAvailability: null,
-              image: null,
-              hexaCode: null
-            };
-            attr.paginationSetting.list.push(manualOption);
-            attr.selectedValues = manualOption.value;
-          }
-        } else if (attr.dataType === 'Datetime' && typeof dtoValue === 'string') {
-          attr.selectedValues = new Date(dtoValue);
-        } else {
-          attr.selectedValues = dtoValue;
-        }
-        this.originalValuesMap.set(attr.attributeId, attr.selectedValues);
-      }
-      //     else {
-      //         if ((attr.dataType === 'boolean' || attr.dataType === 'bit') && (attr.selectedValues == null || attr.selectedValues === '')) {
-      //   attr.selectedValues = this.defaultBooleanValue;
-      // }
-      //     }
-    }
+  //         if (matchedOption) {
+  //           attr.selectedValues = matchedOption.value;
+  //         } else {
+  //           const manualOption = {
+  //             value: dtoValue,
+  //             label: dtoValue,
+  //             code: null,
+  //             isHostRecord: false,
+  //             stockAvailability: null,
+  //             image: null,
+  //             hexaCode: null
+  //           };
+  //           attr.paginationSetting.list.push(manualOption);
+  //           attr.selectedValues = manualOption.value;
+  //         }
+  //       } else if (attr.dataType === 'Datetime' && typeof dtoValue === 'string') {
+  //         attr.selectedValues = new Date(dtoValue);
+  //       } else {
+  //         attr.selectedValues = dtoValue;
+  //       }
+  //       this.originalValuesMap.set(attr.attributeId, attr.selectedValues);
+  //     }
+  //     //     else {
+  //     //         if ((attr.dataType === 'boolean' || attr.dataType === 'bit') && (attr.selectedValues == null || attr.selectedValues === '')) {
+  //     //   attr.selectedValues = this.defaultBooleanValue;
+  //     // }
+  //     //     }
+  //   }
 
+  // }
+fillSelectedValuesFromDto(): void {
+  if (
+    !this.extraAttributeObject?.value?.extraAttributes ||
+    !this.dynamicInputsForViewDto?.extraDataAttributes
+  ) {
+    return;
   }
 
+  const dtoData =
+    this.dynamicInputsForViewDto.extraDataAttributes;
+
+  const allAttributes = [
+    ...(
+      this.extraAttributeObject.value
+        .extraAttributes ?? []
+    ),
+    ...(
+      this.extraAttributeObject.value
+        .filteredExtraAttributes ?? []
+    )
+  ];
+
+  const uniqueAttributes = Array.from(
+    new Map(
+      allAttributes.map(attribute => [
+        attribute.attributeId,
+        attribute
+      ])
+    ).values()
+  );
+
+  for (const attr of uniqueAttributes) {
+    const matchedDto = dtoData.find(
+      dto =>
+        dto.extraAttributeId ===
+        attr.attributeId
+    );
+
+    if (!matchedDto?.selectedValues?.length) {
+      if (
+        attr.dataType?.toUpperCase() ===
+        'MULTISELECTDROPDOWNLIST'
+      ) {
+        attr.selectedValues = [];
+      }
+
+      continue;
+    }
+
+    const values =
+      matchedDto.selectedValues
+        .map(item => item.value)
+        .filter(value =>
+          value !== null &&
+          value !== undefined &&
+          value !== ''
+        );
+
+    if (
+      attr.dataType?.toUpperCase() ===
+        'MULTISELECTDROPDOWNLIST' ||
+      attr.acceptMultipleValues
+    ) {
+      attr.selectedValues = values;
+    } else {
+      const dtoValue =
+        values[values.length - 1];
+
+      if (
+        attr.isLookup
+      ) {
+        const matchedOption =
+          attr.paginationSetting?.list?.find(
+            option =>
+              option.label === dtoValue ||
+              option.value === dtoValue
+          );
+
+        if (matchedOption) {
+          attr.selectedValues =
+            matchedOption.value;
+        }
+      } else if (
+        attr.dataType?.toLowerCase() ===
+          'datetime' ||
+        attr.dataType?.toLowerCase() ===
+          'date'
+      ) {
+        attr.selectedValues =
+          dtoValue
+            ? new Date(dtoValue)
+            : null;
+      } else {
+        attr.selectedValues = dtoValue;
+      }
+    }
+
+    this.originalValuesMap.set(
+      attr.attributeId,
+      attr.selectedValues
+    );
+  }
+}
 
   clearExtraAttr(attr: any) {
     if (attr.acceptMultipleValues) {
@@ -591,6 +702,22 @@ handleRelatedWhen(attr: any, finalValue: any, updatedDataMap: Map<number, any>) 
   return parentAttr.selectedValues?.toString().toLowerCase() ===
          extraAttr.visibleWhen.value?.toString().toLowerCase();
 }
+getMultiSelectOptions(
+  extraAttr: any
+): Array<{ label: string; value: string }> {
 
+  if (!extraAttr?.validEntries) {
+    return [];
+  }
+
+  return extraAttr.validEntries
+    .split('|')
+    .map((value: string) => value.trim())
+    .filter((value: string) => !!value)
+    .map((value: string) => ({
+      label: value,
+      value
+    }));
+}
 
 }

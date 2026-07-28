@@ -189,17 +189,120 @@
   <p-accordionTab header="{{ 'BusinessInformation' | localize }}">
     <!-- Fixed account business fields -->
   </p-accordionTab>
+<p-accordionTab header="{{ 'Roles' | localize }}">
 
+  <div
+    *ngIf="isLoadingRoles"
+    class="text-center py-3">
+    <i class="fa fa-spinner fa-spin"></i>
+  </div>
 
-<p-accordionTab header="{{ 'Relationship' | localize }}">
+  <app-dynamicInputs
+    *ngIf="
+      !isLoadingRoles &&
+      roleExtraAttributeObject &&
+      roleDynamicInputsForViewDto
+    "
+    [extraAttributeObject]="roleExtraAttributeObject"
+    [entityObjectTypeId]="roleEntityObjectTypeId"
+    [entityType]="'Contacts'"
+    [dynamicInputsForViewDto]="roleDynamicInputsForViewDto"
+    [fromSetting]="false"
+    (extraDataChanged)="onRoleExtraAttributesChanged($event)"
+    (extraDataCleared)="onRoleExtraAttributeCleared($event)">
+  </app-dynamicInputs>
 
-  <!-- <app-dynamicInputs
+  <div
+    *ngIf="!isLoadingRoles && !roleAttributes?.length"
+    class="text-muted py-3">
+    {{ 'NoRolesAvailable' | localize }}
+  </div>
+
+</p-accordionTab>
+
+<!-- <p-accordionTab header="{{ 'Relationship' | localize }}">
+
+  <app-dynamicInputs
     *ngIf="rolesEntityObjectTypeId"
     [entityObjectTypeId]="rolesEntityObjectTypeId"
     [entityType]="'MARKETPLACECONTACTRELATIONSHIP'"
     [dynamicInputsForViewDto]="dynamicInputsForViewDto"
     [fromSetting]="true">
-  </app-dynamicInputs> -->
+  </app-dynamicInputs>
+
+</p-accordionTab> -->
+
+
+<p-accordionTab header="{{ 'Relationship' | localize }}">
+
+  <div
+    *ngIf="connectionsInfo?.length; "
+    class="relationship-section">
+
+    <div
+      *ngIf="connectionsInfo.length > 1"
+      class="relationship-selector mb-3">
+
+      <label>
+        {{ 'Relationship' | localize }}:
+      </label>
+
+      <p-dropdown
+        [options]="connectionsInfo"
+        [(ngModel)]="selectedRelationId"
+        optionLabel="connectedLabel"
+        optionValue="relationEntityId"
+        [disabled]="isLoadingRelationship"
+        appendTo="body"
+        (onChange)="onRelationshipOptionChange($event.value)">
+      </p-dropdown>
+
+    </div>
+
+    <div
+      *ngIf="isLoadingRelationship"
+      class="text-center py-3">
+
+      <i class="fa fa-spinner fa-spin"></i>
+
+    </div>
+
+    <ng-container *ngIf="!isLoadingRelationship">
+
+      <div
+        *ngFor="let usage of usageList"
+        class="relationship-usage-block"
+        [attr.id]="'account_relationship_usage_' + usage">
+
+        <h5 class="usage-block">
+          {{ usage | localize }}
+        </h5>
+
+        <app-dynamicInputs
+          *ngIf="
+            relationshipEntityObjectTypeId &&
+            dynamicInputsForViewDto
+          "
+          [extraAttributeObject]="{
+            value: {
+              filteredExtraAttributes: groupedByUsage[usage],
+              extraAttributes: allRelationshipAttributes
+            }
+          }"
+          [entityObjectTypeId]="relationshipEntityObjectTypeId"
+          [entityType]="'MARKETPLACECONTACTRELATIONSHIP'"
+          [dynamicInputsForViewDto]="dynamicInputsForViewDto"
+          [fromSetting]="true"
+          (extraDataChanged)="onRelationshipExtraDataChanged($event)"
+          (extraDataCleared)="onRelationshipExtraDataCleared($event)">
+        </app-dynamicInputs>
+
+      </div>
+
+    </ng-container>
+
+  </div>
+
 
 </p-accordionTab>
 

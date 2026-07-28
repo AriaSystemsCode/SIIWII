@@ -16,7 +16,7 @@ export class GenericEntityShellComponent {
    @Input() entityData : any
   @Input() entityTypes: any[] = [];
   @Input() statuses: any[] = [];
-
+ @Input() basicInfoFields
   @Output() entityChange = new EventEmitter<any>();
   @Output() save = new EventEmitter<void>();
   @Output() cancel = new EventEmitter<void>();
@@ -66,35 +66,44 @@ leftPanelSections = [
     ]
   }
 ];
-basicInfoFields = [
-  {
-    key: 'status',
-    label: 'Status',
-    type: 'dropdown',
-    valuePath: 'account.status',
-    options: this.statuses
-  },
-  {
-    key: 'accountType',
-    label: 'Account Type',
-    type: 'dropdown',
-    valuePath: 'account.accountTypeId',
-    options: {}
-  },
-  {
-    key: 'name',
-    label: 'Name',
-    type: 'text',
-    valuePath: 'account.name'
-  },
-  {
-    key: 'ssin',
-    label: 'SSIN',
-    type: 'text',
-    valuePath: 'account.ssin',
-    readonly: true
-  }
-];
+// basicInfoFields = [
+//   {
+//     key: 'status',
+//     label: 'Status',
+//     type: 'dropdown',
+//     valuePath: 'account.status',
+//     options: this.statuses
+//   },
+//   {
+//     key: 'accountType',
+//     label: 'Account Type',
+//     type: 'dropdown',
+//     valuePath: 'account.accountTypeId',
+//     options: {}
+//   },
+//   {
+//     key: 'name',
+//     label: 'Name',
+//     type: 'text',
+//     valuePath: 'account.name'
+//   },
+//   {
+//     key: 'ssin',
+//     label: 'SSIN',
+//     type: 'text',
+//     valuePath: 'account.ssin',
+//     readonly: true
+//   }
+// ];
+
+
+
+
+  @Input() logoPath = '';
+  @Input() coverPath = '';
+  @Input() imagesPath = '';
+  @Input() attachmentsPath = '';
+
 ngOnInit(){
   console.log(this.entityData,'entityData')
 }
