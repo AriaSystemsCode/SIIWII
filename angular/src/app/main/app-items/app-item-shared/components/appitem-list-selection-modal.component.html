@@ -3,14 +3,14 @@
     #selectListModal="bs-modal"
     class="modal fade"
     tabindex="-1"
-    role="dialog"
-    aria-labelledby="selectListModal"
-    aria-hidden="true"
+  role="dialog"
+  aria-hidden="true"
+  [config]="{ backdrop: 'static' }"
 >
     <div
-        class="modal-dialog right-modal"
-        [ngClass]="active ? 'slide-right-in' : 'slide-right-out'"
-        role="document"
+      class="modal-dialog modal-lg side-modal"
+    [ngClass]="isArabic ? 'left-modal' : 'right-modal'"
+    role="document"
     >
         <div class="modal-content">
             <div class="modal-content-wrapper">
