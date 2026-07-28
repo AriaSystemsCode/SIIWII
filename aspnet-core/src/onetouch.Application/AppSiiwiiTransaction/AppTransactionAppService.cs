@@ -372,6 +372,14 @@ namespace onetouch.AppSiiwiiTransaction
                             accountInput.AccountTypeId = businessType.Id;
                             accountInput.AccountType = businessType.Code;
                         }
+                        accountInput.EntityExtraData = new List<AppEntityExtraDataDto>();
+                        accountInput.EntityExtraData.Add(new AppEntityExtraDataDto
+                        {
+                            AttributeId = 610,
+                            AttributeCode = "MARKETPLACE-ROLE",
+                           // EntityCode = accountInput.Code,
+                            AttributeValue =  ContactRoleEnum.Buyer.ToString()
+                        });
                         // var accountSSIN = await CreateManualAccount(accountInput);
                         var account = await _accountAppService.CreateOrEditAccount(accountInput);
                         if (account != null && account.AccountInfo != null && account.AccountInfo.Id != 0)
@@ -8792,6 +8800,9 @@ namespace onetouch.AppSiiwiiTransaction
                         using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
                         {
                             var companyObj = _appMarketplaceContactRepository.GetAll().Where(z => z.SSIN == contact.CompanySSIN).FirstOrDefault();
+                            if (companyObj == null)
+                                continue;
+
                             var contactTenant = companyObj.TenantOwner;
                             var tenantContact = _appContactRepository.GetAll().Include(z => z.EntityFk)
                                 .ThenInclude(z => z.EntityExtraData)
