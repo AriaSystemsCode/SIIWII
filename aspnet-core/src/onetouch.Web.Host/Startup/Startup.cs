@@ -606,12 +606,37 @@ namespace onetouch.Web.Startup
                 return;
             }
 
-            // Validate shared storage while starting, before this web node accepts traffic.
-            app.UseStaticFiles(new StaticFileOptions
+            // A temporarily unavailable network share must not prevent the API from
+            // starting. The attachment route remains disabled until the application
+            // is recycled after connectivity/permissions are restored.
+            if (!Directory.Exists(physicalPath))
             {
-                FileProvider = new PhysicalFileProvider(physicalPath),
-                RequestPath = requestPath
-            });
+                Console.Error.WriteLine(
+                    $"Attachment directory '{physicalPath}' is unavailable. " +
+                    $"Static-file mapping for '{requestPath}' was skipped.");
+                return;
+            }
+
+            try
+            {
+                app.UseStaticFiles(new StaticFileOptions
+                {
+                    FileProvider = new PhysicalFileProvider(physicalPath),
+                    RequestPath = requestPath
+                });
+            }
+            catch (IOException ex)
+            {
+                Console.Error.WriteLine(
+                    $"Attachment directory '{physicalPath}' could not be mapped to " +
+                    $"'{requestPath}': {ex.Message}");
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                Console.Error.WriteLine(
+                    $"Access to attachment directory '{physicalPath}' was denied while " +
+                    $"mapping '{requestPath}': {ex.Message}");
+            }
         }
 
 
