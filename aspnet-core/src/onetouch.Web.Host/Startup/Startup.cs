@@ -601,40 +601,73 @@ namespace onetouch.Web.Startup
             string physicalPath,
             string requestPath)
         {
-            if (string.IsNullOrWhiteSpace(physicalPath) || !Path.IsPathRooted(physicalPath))
+            physicalPath = physicalPath?.Trim().Trim('"');
+            requestPath = requestPath?.Trim();
+
+            if (string.IsNullOrWhiteSpace(physicalPath))
             {
+                Console.WriteLine(
+                    $"[AttachmentStaticFiles] Mapping for '{requestPath}' was skipped because the physical path is empty.");
                 return;
             }
 
+            if (!Path.IsPathRooted(physicalPath))
+            {
+                Console.WriteLine(
+                    $"[AttachmentStaticFiles] Mapping for '{requestPath}' was skipped because " +
+                    $"'{physicalPath}' is a relative legacy path. The default wwwroot provider will be used.");
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(requestPath))
+            {
+                throw new InvalidOperationException(
+                    $"A request path is required for attachment storage '{physicalPath}'.");
+            }
+
+            if (!requestPath.StartsWith("/", StringComparison.Ordinal))
+            {
+                requestPath = "/" + requestPath;
+            }
+
             // A temporarily unavailable network share must not prevent the API from
-            // starting. The attachment route remains disabled until the application
-            // is recycled after connectivity/permissions are restored.
+            // starting. The route is enabled after connectivity is restored and the
+            // application pool is recycled.
             if (!Directory.Exists(physicalPath))
             {
                 Console.Error.WriteLine(
-                    $"Attachment directory '{physicalPath}' is unavailable. " +
+                    $"[AttachmentStaticFiles] Attachment directory '{physicalPath}' is unavailable. " +
                     $"Static-file mapping for '{requestPath}' was skipped.");
                 return;
             }
 
             try
             {
+                var fileProvider = new PhysicalFileProvider(physicalPath);
+
                 app.UseStaticFiles(new StaticFileOptions
                 {
-                    FileProvider = new PhysicalFileProvider(physicalPath),
-                    RequestPath = requestPath
+                    FileProvider = fileProvider,
+                    RequestPath = requestPath,
+                    OnPrepareResponse = context =>
+                    {
+                        context.Context.Response.Headers["X-Siiwii-Attachment-Provider"] = "Configured";
+                    }
                 });
+
+                Console.WriteLine(
+                    $"[AttachmentStaticFiles] Mapped '{requestPath}' to '{physicalPath}'.");
             }
             catch (IOException ex)
             {
                 Console.Error.WriteLine(
-                    $"Attachment directory '{physicalPath}' could not be mapped to " +
+                    $"[AttachmentStaticFiles] Attachment directory '{physicalPath}' could not be mapped to " +
                     $"'{requestPath}': {ex.Message}");
             }
             catch (UnauthorizedAccessException ex)
             {
                 Console.Error.WriteLine(
-                    $"Access to attachment directory '{physicalPath}' was denied while " +
+                    $"[AttachmentStaticFiles] Access to attachment directory '{physicalPath}' was denied while " +
                     $"mapping '{requestPath}': {ex.Message}");
             }
         }
