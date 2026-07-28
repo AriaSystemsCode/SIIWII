@@ -3903,7 +3903,7 @@ namespace onetouch.Accounts
             // await CreateAdminContact();
             //I40
             if (input.ParentId == null && (input.Id == 0 || input.Id == null) 
-                && (input.TenantId == AbpSession.TenantId && input.TenantOwner == AbpSession.TenantId))
+                && ((input.TenantId == null || input.TenantId == 0 || input.TenantId == AbpSession.TenantId) && (input.TenantOwner == null || input.TenantOwner ==0 || input.TenantOwner == AbpSession.TenantId)))
             {
                 var publishedAcc = await _appMarketplaceContactRepository.GetAll().Where(z => z.SSIN == contact.SSIN).FirstOrDefaultAsync();
                 if (publishedAcc == null)
@@ -3925,7 +3925,7 @@ namespace onetouch.Accounts
             else
             {
                 if (input.ParentId == null &&  (input.Id != 0 && input.Id != null && !contact.IsProfileData)
-                    && ((input.TenantId == AbpSession.TenantId && input.TenantOwner== AbpSession.TenantId) || 
+                    && (((input.TenantId == null || input.TenantId == 0 || input.TenantId == AbpSession.TenantId) && input.TenantOwner== AbpSession.TenantId) || 
                     input.TenantOwner ==0|| input.TenantOwner==null))
                 {
                     var tenant = input.TenantId == null ? AbpSession.TenantId : input.TenantId;
