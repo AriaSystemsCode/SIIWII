@@ -195,7 +195,7 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit {
         }
 
         await this.handleComponentMode();
-
+        this.getLoginAccountDataForView()
         this.isHost = !this._abpSessionService.tenantId;
         this.handleRoutingChange();
         this.initUploaders();
@@ -1794,12 +1794,13 @@ createRelation(relation: any): void {
       this.loginTenaneSsin
     )
   })
-    .pipe(finalize(() => this.hideMainSpinner()))
+    // .pipe(finalize(() => this.hideMainSpinner()))
     .subscribe(({ recipientRoles, loggedTenantRoles }: any) => {
       const recipientHasRoles = this.hasMarketplaceRoles(recipientRoles);
       const loggedTenantHasRoles = this.hasMarketplaceRoles(loggedTenantRoles);
 
       if (!recipientHasRoles || !loggedTenantHasRoles) {
+        this.hideMainSpinner()
         this.message.info(
          this.l('Cannot connect, you need to update the marketplace role of your account / the recipient account marketplace role in order to build relationship together')  ,
           ''
@@ -1883,6 +1884,16 @@ showConnectionsDialog = false;
 openConnectionsDialog(): void {
   this.showConnectionsDialog = true;
 }
+    getLoginAccountDataForView() {
+        let id = this.appSession.user.accountId
+        if (!id) return
 
+      this._AccountsServiceProxy.getAccountForView(id, 5).pipe(
+  
+    ).subscribe((res) => {
+      this.loginTenaneSsin = res?.account?.ssin
+    })
+
+    }
 
 }
