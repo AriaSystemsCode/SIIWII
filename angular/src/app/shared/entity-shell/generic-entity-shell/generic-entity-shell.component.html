@@ -1,61 +1,89 @@
 <div class="shell-container">
 
   <div
-  class="left-panel-container"
-  [class.collapsed]="leftPanelCollapsed">
+    class="left-panel-container"
+    [class.collapsed]="
+      leftPanelCollapsed
+    ">
 
-  <app-entity-left-side-panel
-    [sections]="leftPanelSections"
-    [collapsed]="leftPanelCollapsed"
-    (toggle)="leftPanelCollapsed = !leftPanelCollapsed">
-  </app-entity-left-side-panel>
+    <app-entity-left-side-panel
+      [sections]="leftPanelSections"
+      [collapsed]="
+        leftPanelCollapsed
+      "
+      (toggle)="
+        leftPanelCollapsed =
+          !leftPanelCollapsed
+      ">
+    </app-entity-left-side-panel>
 
-</div>
+  </div>
 
   <div class="right-shell-container">
 
     <app-entity-header
       [title]="title"
-      [breadcrumbItems]="breadcrumbItems"
+      [breadcrumbItems]="
+        breadcrumbItems
+      "
       [mode]="mode"
       (close)="close.emit()"
-      (minimize)="minimize.emit()"
-      (maximize)="maximize.emit()">
+      (minimize)="
+        minimize.emit()
+      "
+      (maximize)="
+        maximize.emit()
+      ">
     </app-entity-header>
 
-    <!-- <app-entity-basic-info
-      [entity]="entity"
-      [entityData]="entityData"
-      [mode]="mode"
-      [entityTypes]="entityTypes"
-      [statuses]="statuses"
-       [fields]="basicInfoFields"
-      (entityChange)="entityChange.emit($event)">
-    </app-entity-basic-info> -->
-
-
-    <app-entity-basic-info
+ <app-entity-basic-info
   [entity]="entity"
   [entityData]="entityData"
   [mode]="mode"
+
   [entityTypes]="entityTypes"
   [statuses]="statuses"
   [fields]="basicInfoFields"
+
   [logoPath]="logoPath"
   [coverPath]="coverPath"
-  [imagesPath]="imagesPath"
   [attachmentsPath]="attachmentsPath"
-  (entityChange)="entityChange.emit($event)">
+
+  [logoAttachmentCategory]="logoAttachmentCategory"
+  [bannerAttachmentCategory]="bannerAttachmentCategory"
+  [imageAttachmentCategory]="imageAttachmentCategory"
+
+  [saving]="saving"
+  [uploading]="uploading"
+
+  (entityChange)="entityChange.emit($event)"
+  (logoChange)="logoChange.emit($event)"
+  (backgroundChange)="backgroundChange.emit($event)"
+  (imageChange)="imageChange.emit($event)"
+  (attachmentRemove)="attachmentRemove.emit($event)"
+
+  (edit)="edit.emit()"
+  (save)="save.emit()"
+  (cancel)="cancel.emit()">
 </app-entity-basic-info>
 
     <div class="content-row row m-3">
 
-      <div class="main-content-container col-md-7">
-        <ng-content select="[entity-main-content]"></ng-content>
+      <div
+        class="main-content-container col-md-7">
+
+        <ng-content
+          select="[entity-main-content]">
+        </ng-content>
+
       </div>
 
-      <div class="right-panel-container col-md-5">
-        <app-entity-right-panel></app-entity-right-panel>
+      <div
+        class="right-panel-container col-md-5">
+
+        <app-entity-right-panel>
+        </app-entity-right-panel>
+
       </div>
 
     </div>

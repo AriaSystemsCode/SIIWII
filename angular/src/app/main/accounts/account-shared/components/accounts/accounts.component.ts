@@ -17,9 +17,14 @@ import {
     EmailingTemplateServiceProxy,
     AppTransactionServiceProxy,
     CreateMarketplaceAccountServiceProxy,
+    CreateOrEditAccountInfoDto,
+    AccountLevelEnum,
+    SycAttachmentCategoryDto,
+    AppEntityAttachmentDto,
+    SycIdentifierDefinitionsServiceProxy,
 
 } from "@shared/service-proxies/service-proxies";
-import { AbpSessionService } from "abp-ng2-module";
+import { AbpSessionService, IAjaxResponse, TokenService } from "abp-ng2-module";
 import { AppComponentBase } from "@shared/common/app-component-base";
 import { appModuleAnimation } from "@shared/animations/routerTransition";
 import { Table } from "primeng/table";
@@ -32,11 +37,12 @@ import { MainImportComponent } from "../../../../../../shared/components/import-
 import { AccountMainFilterEnum } from "../../models/accounts-main-filter.enum";
 import { AbstractControl, FormBuilder, FormGroup } from "@angular/forms";
 import { AppConsts } from "@shared/AppConsts";
-import { forkJoin, Observable } from "rxjs";
+import { forkJoin, Observable, of } from "rxjs";
 import { ImportTypes } from "@shared/components/import-steps/models/ImportTypes";
 import { AccountsImport } from "@shared/components/import-steps/services/accountsImport.service";
 import { ImportStepInfo } from "@shared/components/import-steps/models/ImportStepInfo";
 import { MainImportService } from "@shared/components/import-steps/services/mainImport.service";
+import { FileUploader, FileUploaderOptions } from "@node_modules/ng2-file-upload";
 
 @Component({
     selector: "app-accounts",
@@ -86,6 +92,8 @@ export class AccountsComponent
     isArabic: boolean
     isAuthenticated: boolean = false;
     loginTenaneSsin:string
+
+    entityObjectType = 'BUSINESS';
     constructor(
         injector: Injector,
         private _accountsServiceProxy: AccountsServiceProxy,
@@ -95,8 +103,10 @@ export class AccountsComponent
         private _formBuilder: FormBuilder,
         private _emailingTemplateAppService: EmailingTemplateServiceProxy,
         private AppTransactionServiceProxy:AppTransactionServiceProxy,
-         private CreateMarketplaceAccountServiceProxy: CreateMarketplaceAccountServiceProxy,
-        // MarketplaceAccountsModule  
+  
+           private _tokenService:TokenService,
+         private _sycIdentifierDefinitionsServiceProxy:
+    SycIdentifierDefinitionsServiceProxy,
     ) {
         super(injector);
         this.overridePrimeTableSetting();
@@ -110,6 +120,9 @@ export class AccountsComponent
         this.getUserPreferenceForListView();
         this.initFilterForm();
         this.getLoginAccountDataForView()
+
+
+  this.loadAttachmentCategories();
     }
     ngOnChanges(changes: SimpleChanges) {
         if (changes?.defaultMainFilter?.firstChange) {
@@ -567,4 +580,1211 @@ private hasMarketplaceRoles(response: any): boolean {
 
     }
 
+
+    showGenericEntityModal = false;
+
+entityMode: 'create' | 'edit' | 'view' = 'create';
+
+accountData: any = null;
+
+
+
+accountTypes = [
+  { label: 'Business', value: 19 },
+  { label: 'Personal', value: 21 }
+];
+
+statuses = [
+  { label: 'Active', value: true },
+  { label: 'Inactive', value: false }
+];
+accountBasicInfoFields = [
+  {
+    key: 'status',
+    label: 'Status',
+    type: 'dropdown',
+    valuePath: 'account.status',
+    options: this.statuses,
+    optionLabel: 'label',
+    optionValue: 'value'
+  },
+  {
+    key: 'accountType',
+    label: 'Account Type',
+    type: 'dropdown',
+    valuePath: 'account.accountTypeId',
+    options: this.accountTypes,
+    optionLabel: 'label',
+    optionValue: 'value'
+  },
+  {
+    key: 'name',
+    label: 'Name',
+    type: 'text',
+    valuePath: 'account.name'
+  },
+  {
+    key: 'code',
+    label: 'Code',
+    type: 'text',
+    valuePath: 'account.code',
+    readonly: true
+  },
+  {
+    key: 'ssin',
+    label: 'SSIN',
+    type: 'text',
+    valuePath: 'account.ssin',
+    readonly: true
+  }
+];
+
+
+
+accountDto =
+  new CreateOrEditAccountInfoDto();
+
+saving = false;
+uploadingImages = false;
+
+private originalAccountDto: any = null;
+accountId
+
+
+private pendingLogoFile: File | null = null;
+private pendingBackgroundFile: File | null = null;
+private pendingImageFiles: File[] = [];
+
+onLogoChange(event: any): void {
+  const file: File = event?.file;
+
+  if (!file) {
+    return;
+  }
+
+  this.pendingLogoFile = file;
+}
+
+onBackgroundChange(event: any): void {
+  const file: File = event?.file;
+
+  if (!file) {
+    return;
+  }
+
+  this.pendingBackgroundFile = file;
+}
+
+
+onImagesChange(event: any): void {
+  const file: File =
+    event?.file;
+
+  const index: number =
+    event?.index;
+
+  if (!file) {
+    return;
+  }
+
+  if (
+    index === undefined ||
+    index === null ||
+    index < 0 ||
+    index > 3
+  ) {
+    return;
+  }
+
+  this.pendingImageFiles[index] =
+    file;
+
+  this.pendingImageFiles = [
+    ...this.pendingImageFiles
+  ];
+}
+
+
+onAttachmentRemove(
+  event: any
+): void {
+
+  const type =
+    event?.attachmentType;
+
+  const index =
+    event?.index;
+
+  const attachment =
+    event?.attachment;
+
+  if (type === 'LOGO') {
+    this.pendingLogoFile = null;
+  }
+
+  if (type === 'BANNER') {
+    this.pendingBackgroundFile = null;
+  }
+
+  if (
+    type === 'IMAGE' &&
+    index !== undefined &&
+    index !== null
+  ) {
+    this.pendingImageFiles[index] =
+      null;
+
+    this.pendingImageFiles = [
+      ...this.pendingImageFiles
+    ];
+  }
+
+  if (!attachment) {
+    return;
+  }
+
+  this.accountDto.entityAttachments =
+    (
+      this.accountDto
+        .entityAttachments ??
+      []
+    ).filter(item => {
+
+      if (
+        attachment.id &&
+        item.id === attachment.id
+      ) {
+        return false;
+      }
+
+      if (
+        attachment.guid &&
+        item.guid ===
+          attachment.guid
+      ) {
+        return false;
+      }
+
+      if (
+        attachment.fileName &&
+        item.fileName ===
+          attachment.fileName
+      ) {
+        return false;
+      }
+
+      return item !== attachment;
+    });
+
+  this.buildAccountData();
+}
+
+cancelAccount(): void {
+  if (
+    this.saving ||
+    this.uploadingImages
+  ) {
+    return;
+  }
+
+  if (
+    this.entityMode === 'create'
+  ) {
+    this.resetGenericAccountState();
+    return;
+  }
+
+  if (
+    this.originalAccountDto
+  ) {
+    this.accountDto =
+      CreateOrEditAccountInfoDto.fromJS(
+        this.cloneValue(
+          this.originalAccountDto
+        )
+      );
+
+    this.initializeDtoArrays();
+    this.buildAccountData();
+  }
+
+  this.showGenericEntityModal = false;
+}
+
+
+private resetGenericAccountState(): void {
+  this.showGenericEntityModal = false;
+
+  this.accountId = null;
+  this.accountData = null;
+
+  this.accountDto =
+    new CreateOrEditAccountInfoDto();
+
+  this.originalAccountDto = null;
+
+  this.pendingLogoFile = null;
+  this.pendingBackgroundFile = null;
+  this.pendingImageFiles = [];
+
+  this.uploadingImages = false;
+  this.saving = false;
+}
+
+closeGenericEntityModal(): void {
+  if (
+    this.saving ||
+    this.uploadingImages
+  ) {
+    return;
+  }
+
+  this.resetGenericAccountState();
+}
+openCreateManualAccount(): void {
+  this.loadAttachmentCategories();
+
+  this.accountId = null;
+  this.entityMode = 'create';
+
+  this.accountDto =
+    this.createEmptyAccountDto();
+
+  this.buildAccountData();
+
+  this.setManualAccCode();
+
+  this.originalAccountDto =
+    this.cloneValue(
+      this.accountDto.toJSON()
+    );
+
+  this.clearPendingFiles();
+
+  this.showGenericEntityModal =
+    true;
+}
+
+
+
+openEditAccount(accountId: number): void {
+  this.accountId = accountId;
+  this.entityMode = 'edit';
+  this.showGenericEntityModal = true;
+
+  this.loadAccountForEdit(accountId);
+}
+
+private loadAccountForEdit(
+  accountId: number
+): void {
+  this.showMainSpinner();
+
+  this._accountsServiceProxy
+    .getAccountForEdit(accountId)
+    .pipe(
+      finalize(() => {
+        this.hideMainSpinner();
+      })
+    )
+    .subscribe({
+      next: result => {
+        this.accountDto =
+          CreateOrEditAccountInfoDto.fromJS(
+            result.accountInfo
+          );
+
+        this.initializeDtoArrays();
+        this.buildAccountData();
+
+        this.originalAccountDto =
+          this.cloneValue(
+            this.accountDto.toJSON()
+          );
+      },
+      error: error => {
+        console.error(
+          'Failed to load account:',
+          error
+        );
+
+        this.notify.error(
+          this.l('FailedToLoadAccount')
+        );
+
+        this.showGenericEntityModal = false;
+      }
+    });
+}
+
+
+private createEmptyAccountDto():
+  CreateOrEditAccountInfoDto {
+
+  const dto =
+    new CreateOrEditAccountInfoDto();
+
+  dto.id = undefined;
+  dto.accountId = undefined;
+
+  dto.name = '';
+  dto.code = '';
+  dto.tradeName = '';
+
+  dto.website = '';
+  dto.eMailAddress =
+    this.appSession?.user?.emailAddress ??
+    '';
+
+  dto.accountTypeId = 19;
+  dto.accountType = 'Business';
+
+  dto.accountLevel =
+    AccountLevelEnum.Manual;
+
+  dto.status = true;
+
+  dto.languageId = undefined;
+  dto.currencyId = undefined;
+
+  dto.phone1TypeId = undefined;
+  dto.phone1Number = '';
+  dto.phone1Ex = '';
+
+  dto.phone2TypeId = undefined;
+  dto.phone2Number = '';
+  dto.phone2Ex = '';
+
+  dto.phone3TypeId = undefined;
+  dto.phone3Number = '';
+  dto.phone3Ex = '';
+
+  dto.entityAttachments = [];
+  dto.entityCategories = [];
+  dto.entityClassifications = [];
+  dto.entityExtraData = [];
+
+  dto.branches = [];
+  dto.contactAddresses = [];
+  dto.contactPaymentMethods = [];
+
+  dto.returnId = true;
+  dto.useDTOTenant = false;
+
+  return dto;
+}
+
+
+
+
+private buildAccountData(): void {
+  this.initializeDtoArrays();
+
+  this.accountData = {
+    account: this.accountDto,
+    entityExtraData:
+      this.accountDto.entityExtraData,
+    connectionsInfo:
+      this.accountData?.connectionsInfo ?? []
+  };
+}
+
+
+private initializeDtoArrays(): void {
+  this.accountDto.entityAttachments ??= [];
+  this.accountDto.entityCategories ??= [];
+  this.accountDto.entityClassifications ??= [];
+  this.accountDto.entityExtraData ??= [];
+
+  this.accountDto.branches ??= [];
+  this.accountDto.contactAddresses ??= [];
+  this.accountDto.contactPaymentMethods ??= [];
+}
+
+
+
+onAccountChanged(data: any): void {
+  if (!data?.account) {
+    return;
+  }
+
+  this.accountDto = data.account;
+
+  this.accountDto.entityExtraData =
+    data.entityExtraData ??
+    this.accountDto.entityExtraData ??
+    [];
+}
+
+// saveAccount(): void {
+//   if (
+//     this.saving ||
+//     this.uploadingImages
+//   ) {
+//     return;
+//   }
+
+//   this.prepareDtoBeforeSave();
+
+//   if (!this.validateAccount()) {
+//     return;
+//   }
+
+//   this.saving = true;
+//   console.log(this.accountData,'dataaaaa')
+
+// //   this._accountsServiceProxy
+// //     .createOrEditAccount(
+// //       this.accountDto
+// //     )
+// //     .pipe(
+// //       finalize(() => {
+// //         this.saving = false;
+// //       })
+// //     )
+// //     .subscribe({
+// //       next: result => {
+// //         this.notify.success(
+// //           this.l('SavedSuccessfully')
+// //         );
+
+// //         const savedAccount =
+// //           result?.accountInfo ??
+// //           result?.account ??
+// //           result;
+
+// //         if (savedAccount) {
+// //           this.accountDto =
+// //             CreateOrEditAccountInfoDto.fromJS(
+// //               savedAccount
+// //             );
+
+// //           this.initializeDtoArrays();
+// //           this.buildAccountData();
+
+// //           this.accountId =
+// //             this.accountDto.id ??
+// //             this.accountDto.accountId ??
+// //             this.accountId;
+
+// //           this.originalAccountDto =
+// //             this.cloneValue(
+// //               this.accountDto.toJSON()
+// //             );
+// //         }
+
+// //         this.entityMode = 'view';
+// //       },
+// //       error: error => {
+// //         console.error(
+// //           'Failed to save account:',
+// //           error
+// //         );
+
+// //         this.notify.error(
+// //           this.l('SaveFailed')
+// //         );
+// //       }
+// //     });
+// }
+saveAccount(): void {
+  if (
+    this.saving ||
+    this.uploadingImages
+  ) {
+    return;
+  }
+
+  this.prepareDtoBeforeSave();
+
+  if (!this.validateAccount()) {
+    return;
+  }
+
+  this.saving = true;
+  this.uploadingImages = true;
+
+  this.uploadPendingAttachments()
+    .pipe(
+      finalize(() => {
+        this.uploadingImages = false;
+      })
+    )
+    .subscribe({
+      next: attachments => {
+
+        this.applyUploadedAttachments(
+          attachments
+        );
+
+        this.saveAccountDto();
+      },
+      error: error => {
+        console.error(
+          'Attachment upload failed:',
+          error
+        );
+
+        this.saving = false;
+
+        this.notify.error(
+          this.l('UploadFailed')
+        );
+      }
+    });
+}
+
+
+private saveAccountDto(): void {
+    console.log(this.accountData,'daaataaa')
+  this._accountsServiceProxy
+    .createOrEditAccount(
+      this.accountDto
+    )
+    .pipe(
+      finalize(() => {
+        this.saving = false;
+      })
+    )
+    .subscribe({
+      next: result => {
+        this.notify.success(
+          this.l('SavedSuccessfully')
+        );
+
+        const savedAccount =
+          result?.accountInfo ??
+          result?.account ??
+          result;
+
+        if (savedAccount) {
+          this.accountDto =
+            CreateOrEditAccountInfoDto
+              .fromJS(savedAccount);
+
+          this.initializeDtoArrays();
+          this.buildAccountData();
+
+          this.accountId =
+            this.accountDto.id ??
+            this.accountDto.accountId ??
+            this.accountId;
+
+          this.originalAccountDto =
+            this.cloneValue(
+              this.accountDto.toJSON()
+            );
+        }
+
+        this.clearPendingFiles();
+
+        this.showGenericEntityModal =
+          false;
+
+        this.reloadPage();
+      },
+      error: error => {
+        console.error(
+          'Account save failed:',
+          error
+        );
+
+        this.notify.error(
+          this.l('SaveFailed')
+        );
+      }
+    });
+}
+
+
+private setManualAccCode(): void {
+  this.entityObjectType =
+    'BUSINESS';
+
+  if (this.accountDto.code) {
+    return;
+  }
+
+  this._sycIdentifierDefinitionsServiceProxy
+    .getNextEntityCode(
+      this.entityObjectType,
+      this.appSession.tenantId
+    )
+    .subscribe({
+      next: code => {
+        if (!code) {
+          return;
+        }
+
+        this.accountDto.code =
+          `M${code}`;
+
+        /*
+         * accountData.account and accountDto
+         * should be the same reference,
+         * but assign it to ensure UI refresh.
+         */
+        this.accountData = {
+          ...this.accountData,
+          account: this.accountDto
+        };
+      },
+      error: error => {
+        console.error(
+          'Failed to generate account code:',
+          error
+        );
+
+        this.notify.error(
+          this.l(
+            'FailedToGenerateAccountCode'
+          )
+        );
+      }
+    });
+}
+
+private uploadPendingAttachments():
+  Observable<
+    UploadedAttachmentResult[]
+  > {
+
+  const uploads:
+    Observable<
+      UploadedAttachmentResult
+    >[] = [];
+
+  if (
+    this.pendingLogoFile &&
+    this.logoAttachmentCategory?.id
+  ) {
+    uploads.push(
+      this.uploadSingleAttachment(
+        this.pendingLogoFile,
+        this.logoAttachmentCategory.id,
+        'LOGO'
+      )
+    );
+  }
+
+  if (
+    this.pendingBackgroundFile &&
+    this.bannerAttachmentCategory?.id
+  ) {
+    uploads.push(
+      this.uploadSingleAttachment(
+        this.pendingBackgroundFile,
+        this.bannerAttachmentCategory.id,
+        'BANNER'
+      )
+    );
+  }
+
+  this.pendingImageFiles
+    .forEach((file, index) => {
+      if (
+        file &&
+        this.imageAttachmentCategory?.id
+      ) {
+        uploads.push(
+          this.uploadSingleAttachment(
+            file,
+            this.imageAttachmentCategory.id,
+            'IMAGE',
+            index
+          )
+        );
+      }
+    });
+
+  if (!uploads.length) {
+    return of([]);
+  }
+
+  return forkJoin(uploads);
+}
+
+private createGuid(): string {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'
+    .replace(/[xy]/g, character => {
+      const random =
+        Math.random() * 16 | 0;
+
+      const value =
+        character === 'x'
+          ? random
+          : (random & 0x3) | 0x8;
+
+      return value.toString(16);
+    });
+}
+private uploadSingleAttachment(
+  file: File,
+  attachmentCategoryId: number,
+  attachmentType:
+    'LOGO' |
+    'BANNER' |
+    'IMAGE',
+  index?: number
+): Observable<
+  UploadedAttachmentResult
+> {
+
+  return new Observable(
+    observer => {
+
+      const guid =
+        this.createGuid();
+
+      const uploader =
+        this.createAttachmentUploader();
+
+      uploader.onBuildItemForm =
+        (
+          item,
+          form: FormData
+        ) => {
+          form.append(
+            'guid',
+            guid
+          );
+        };
+
+      uploader.onSuccessItem =
+        (
+          item,
+          response
+        ) => {
+          try {
+            const parsedResponse =
+              JSON.parse(
+                response
+              ) as IAjaxResponse;
+
+            if (
+              !parsedResponse?.success
+            ) {
+              observer.error(
+                parsedResponse?.error ??
+                new Error(
+                  'Upload failed'
+                )
+              );
+
+              return;
+            }
+
+            const attachment =
+              this.createAttachmentDto(
+                file,
+                guid,
+                attachmentCategoryId,
+                parsedResponse.result
+              );
+
+            observer.next({
+              attachment,
+              attachmentType,
+              index
+            });
+
+            observer.complete();
+          } catch (error) {
+            observer.error(error);
+          }
+        };
+
+      uploader.onErrorItem =
+        (
+          item,
+          response,
+          status
+        ) => {
+          observer.error({
+            response,
+            status
+          });
+        };
+
+      uploader.addToQueue([
+        file
+      ]);
+
+      uploader.uploadAll();
+    }
+  );
+}
+
+private createAttachmentUploader():
+  FileUploader {
+
+  const uploader =
+    new FileUploader({
+      url:
+        AppConsts
+          .remoteServiceBaseUrl +
+        '/Attachment/UploadFiles'
+    });
+
+  uploader.onAfterAddingFile =
+    fileItem => {
+      fileItem.withCredentials =
+        false;
+    };
+
+  const options:
+    Partial<
+      FileUploaderOptions
+    > = {
+
+    authToken:
+      'Bearer ' +
+      this._tokenService
+        .getToken(),
+
+    removeAfterUpload: true
+  };
+
+  uploader.setOptions(
+    options as
+      FileUploaderOptions
+  );
+
+  return uploader;
+}
+
+private createAttachmentDto(
+  file: File,
+  guid: string,
+  attachmentCategoryId: number,
+  uploadResult: any
+): AppEntityAttachmentDto {
+
+  const attachment =
+    new AppEntityAttachmentDto();
+
+  const result =
+    uploadResult ?? {};
+
+  attachment.init({
+    id: undefined,
+
+    guid:
+      result.guid ??
+      guid,
+
+    fileName:
+      result.fileName ??
+      file.name,
+
+    url:
+      result.url ??
+      result.fileName ??
+      file.name,
+
+    attachmentCategoryId,
+
+    index: undefined
+  });
+
+  return attachment;
+}
+private applyUploadedAttachments(
+  uploaded:
+    UploadedAttachmentResult[]
+): void {
+
+  this.accountDto
+    .entityAttachments ??= [];
+
+  uploaded.forEach(result => {
+
+    const categoryId =
+      result.attachment
+        .attachmentCategoryId;
+
+    /*
+     * Logo and banner:
+     * replace existing attachment
+     * of the same category.
+     */
+    if (
+      result.attachmentType ===
+        'LOGO' ||
+      result.attachmentType ===
+        'BANNER'
+    ) {
+      this.accountDto
+        .entityAttachments =
+        this.accountDto
+          .entityAttachments
+          .filter(item =>
+            Number(
+              item
+                .attachmentCategoryId
+            ) !==
+            Number(categoryId)
+          );
+    }
+
+    /*
+     * Additional image:
+     * replace a specific existing slot,
+     * when editing.
+     */
+    if (
+      result.attachmentType ===
+        'IMAGE' &&
+      result.index !== undefined
+    ) {
+      const existingImages =
+        this.accountDto
+          .entityAttachments
+          .filter(item =>
+            Number(
+              item
+                .attachmentCategoryId
+            ) ===
+            Number(
+              this.imageAttachmentCategory
+                ?.id
+            )
+          );
+
+      const existingAtIndex =
+        existingImages[
+          result.index
+        ];
+
+      if (existingAtIndex) {
+        this.accountDto
+          .entityAttachments =
+          this.accountDto
+            .entityAttachments
+            .filter(item =>
+              item !==
+              existingAtIndex
+            );
+      }
+    }
+
+    this.accountDto
+      .entityAttachments
+      .push(result.attachment);
+  });
+
+  this.accountData.account =
+    this.accountDto;
+}
+
+private clearPendingFiles():
+  void {
+
+  this.pendingLogoFile = null;
+
+  this.pendingBackgroundFile =
+    null;
+
+  this.pendingImageFiles = [
+    null,
+    null,
+    null,
+    null
+  ];
+}
+private prepareDtoBeforeSave(): void {
+  this.initializeDtoArrays();
+
+  if (this.accountData?.account) {
+    this.accountDto =
+      this.accountData.account;
+  }
+
+  this.accountDto.entityExtraData =
+    this.accountData?.entityExtraData ??
+    this.accountDto.entityExtraData ??
+    [];
+
+  this.accountDto.entityExtraData =
+    this.accountDto.entityExtraData.map(
+      item => {
+
+        if (
+          Array.isArray(
+            item.attributeValue
+          )
+        ) {
+          item.attributeValue =
+            item.attributeValue.join('-');
+        }
+
+        /*
+         * Backend requires Int64,
+         * so entityid cannot be null.
+         */
+        if (
+          item.entityid === null ||
+          item.entityid === undefined
+        ) {
+          item.entityid =
+            this.accountDto.id ?? 0;
+        }
+
+        return item;
+      }
+    );
+
+  if (
+    this.entityMode === 'edit' &&
+    this.accountId
+  ) {
+    this.accountDto.id =
+      this.accountDto.id ??
+      this.accountId;
+  }
+
+  if (
+    this.entityMode === 'create'
+  ) {
+    this.accountDto.id =
+      undefined;
+
+    this.accountDto.accountId =
+      undefined;
+  }
+
+  this.accountDto.returnId = true;
+
+  this.accountData.account =
+    this.accountDto;
+
+  this.accountData.entityExtraData =
+    this.accountDto.entityExtraData;
+}
+
+private validateAccount(): boolean {
+  if (
+    !this.accountDto.name?.trim()
+  ) {
+    this.notify.warn(
+      this.l('NameIsRequired')
+    );
+
+    return false;
+  }
+
+  if (
+    !this.accountDto.accountTypeId
+  ) {
+    this.notify.warn(
+      this.l('AccountTypeIsRequired')
+    );
+
+    return false;
+  }
+
+  return true;
+}
+
+private cloneValue(value: any): any {
+  return JSON.parse(
+    JSON.stringify(value)
+  );
+}
+logoAttachmentCategory:
+  SycAttachmentCategoryDto;
+
+bannerAttachmentCategory:
+  SycAttachmentCategoryDto;
+
+imageAttachmentCategory:
+  SycAttachmentCategoryDto;
+
+loadingAttachmentCategories = false;
+
+private loadAttachmentCategories(): void {
+  if (this.loadingAttachmentCategories) {
+    return;
+  }
+
+  if (
+    this.logoAttachmentCategory &&
+    this.bannerAttachmentCategory &&
+    this.imageAttachmentCategory
+  ) {
+    return;
+  }
+
+  this.loadingAttachmentCategories = true;
+
+  this.getSycAttachmentCategoriesByCodes([
+    'LOGO',
+    'BANNER',
+    'IMAGE'
+  ])
+    .pipe(
+      finalize(() => {
+        this.loadingAttachmentCategories = false;
+      })
+    )
+    .subscribe({
+      next: result => {
+        const categories =
+          result ?? [];
+
+        this.logoAttachmentCategory =
+          categories.find(
+            item => item.code === 'LOGO'
+          );
+
+        this.bannerAttachmentCategory =
+          categories.find(
+            item => item.code === 'BANNER'
+          );
+
+        this.imageAttachmentCategory =
+          categories.find(
+            item => item.code === 'IMAGE'
+          );
+
+        if (
+          !this.logoAttachmentCategory ||
+          !this.bannerAttachmentCategory ||
+          !this.imageAttachmentCategory
+        ) {
+          console.warn(
+            'Some attachment categories were not returned:',
+            categories
+          );
+        }
+      },
+      error: error => {
+        console.error(
+          'Failed to load attachment categories:',
+          error
+        );
+
+        this.notify.error(
+          this.l(
+            'FailedToLoadAttachmentCategories'
+          )
+        );
+      }
+    });
+}
+
+
+}
+
+
+interface UploadedAttachmentResult {
+  attachment:
+    AppEntityAttachmentDto;
+
+  attachmentType:
+    'LOGO' |
+    'BANNER' |
+    'IMAGE';
+
+  index?: number;
 }

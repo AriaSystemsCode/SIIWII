@@ -65,9 +65,9 @@ export class ImageUploadComponent extends AppComponentBase implements OnChanges 
     }
   
     // when user changes Logo/Banner/Image in parent
-    if (changes['attachmentTypeCode'] && this.attachmentTypeCode) {
-      this.getAttachRatio();   // will set sycAttachmentCategory & ratio accordingly
-    }
+    // if (changes['attachmentTypeCode'] && this.attachmentTypeCode) {
+    //   this.getAttachRatio();   // will set sycAttachmentCategory & ratio accordingly
+    // }
   }
   
   
@@ -198,11 +198,29 @@ export class ImageUploadComponent extends AppComponentBase implements OnChanges 
     this.removeImage.emit();
   }
 
-  checkImageSize(imgSize: number) {
-    const maxFileSize =
-      this.sycAttachmentCategory.maxFileSize * this.mbToByteConversionFactor;
-    return imgSize > maxFileSize;
+  // checkImageSize(imgSize: number) {
+  //   const maxFileSize =
+  //     this.sycAttachmentCategory.maxFileSize * this.mbToByteConversionFactor;
+  //   return imgSize > maxFileSize;
+  // }
+
+  checkImageSize(
+  imgSize: number
+): boolean {
+  const maxFileSize =
+    this.sycAttachmentCategory
+      ?.maxFileSize;
+
+  if (!maxFileSize) {
+    return false;
   }
+
+  return (
+    imgSize >
+    maxFileSize *
+      this.mbToByteConversionFactor
+  );
+}
 
   async renderImageAndGetDimensions(file: File): Promise<HTMLImageElement> {
     return new Promise((resolve) => {
@@ -218,29 +236,57 @@ export class ImageUploadComponent extends AppComponentBase implements OnChanges 
     });
   }
 
-  detectSupportedExtensions() {
-    this.acceptedExtensionsArr = [];
-    this.acceptedExtensions = '';
+  // detectSupportedExtensions() {
+  //   this.acceptedExtensionsArr = [];
+  //   this.acceptedExtensions = '';
   
-    this.sycAttachmentCategory.sycAttachmentTypeDto.forEach((item, index) => {
-      const notFirst = index > 0;
-      const itemsCount = this.sycAttachmentCategory.sycAttachmentTypeDto.length;
+  //   this.sycAttachmentCategory.sycAttachmentTypeDto.forEach((item, index) => {
+  //     const notFirst = index > 0;
+  //     const itemsCount = this.sycAttachmentCategory.sycAttachmentTypeDto.length;
   
-      if (notFirst && itemsCount > 1) {
-        this.acceptedExtensions += ',';
-      }
+  //     if (notFirst && itemsCount > 1) {
+  //       this.acceptedExtensions += ',';
+  //     }
   
-      this.acceptedExtensions += `.${item.extension}`;
-      this.acceptedExtensionsArr.push(`.${item.extension}`);
-    });
+  //     this.acceptedExtensions += `.${item.extension}`;
+  //     this.acceptedExtensionsArr.push(`.${item.extension}`);
+  //   });
   
    
-    if (!this.acceptedExtensionsArr.includes('.pdf')) {
-      this.acceptedExtensionsArr.push('.pdf');
-      this.acceptedExtensions += (this.acceptedExtensions ? ',' : '') + '.pdf';
-    }
-  }
+  //   if (!this.acceptedExtensionsArr.includes('.pdf')) {
+  //     this.acceptedExtensionsArr.push('.pdf');
+  //     this.acceptedExtensions += (this.acceptedExtensions ? ',' : '') + '.pdf';
+  //   }
+  // }
   
+
+  detectSupportedExtensions(): void {
+  this.acceptedExtensionsArr = [];
+  this.acceptedExtensions = '';
+
+  const types =
+    this.sycAttachmentCategory
+      ?.sycAttachmentTypeDto ??
+    [];
+
+  types.forEach(item => {
+    if (!item?.extension) {
+      return;
+    }
+
+    const extension =
+      item.extension.startsWith('.')
+        ? item.extension
+        : `.${item.extension}`;
+
+    this.acceptedExtensionsArr.push(
+      extension
+    );
+  });
+
+  this.acceptedExtensions =
+    this.acceptedExtensionsArr.join(',');
+}
 
   hasValidExtension(fileName: string, exts: string[]) {
     return new RegExp('(' + exts.join('|').replace(/\./g, '\\.') + ')$').test(

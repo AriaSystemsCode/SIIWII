@@ -1,32 +1,108 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  Input,
+  Output
+} from '@angular/core';
+import { SycAttachmentCategoryDto } from '@shared/service-proxies/service-proxies';
 
 @Component({
   selector: 'app-generic-entity-shell',
-  templateUrl: './generic-entity-shell.component.html',
-  styleUrls: ['./generic-entity-shell.component.scss']
+  templateUrl:
+    './generic-entity-shell.component.html',
+  styleUrls: [
+    './generic-entity-shell.component.scss'
+  ]
 })
 export class GenericEntityShellComponent {
-  accountTypes: any;
 
   @Input() entity: any = {};
+  @Input() entityData: any;
+
   @Input() entityType = '';
   @Input() title = '';
-  @Input() breadcrumbItems: any[] = [];
-  @Input() mode: 'create' | 'edit' | 'view' = 'view';
-   @Input() entityData : any
-  @Input() entityTypes: any[] = [];
-  @Input() statuses: any[] = [];
- @Input() basicInfoFields
-  @Output() entityChange = new EventEmitter<any>();
-  @Output() save = new EventEmitter<void>();
-  @Output() cancel = new EventEmitter<void>();
-  @Output() close = new EventEmitter<void>();
-  @Output() minimize = new EventEmitter<void>();
-  @Output() maximize = new EventEmitter<void>();
-  
-leftPanelCollapsed = false;
-leftPanelSections = [
-  {
+
+  @Input()
+  breadcrumbItems: any[] = [];
+
+  @Input()
+  mode:
+    'create' |
+    'edit' |
+    'view' = 'view';
+
+  @Input()
+  entityTypes: any[] = [];
+
+  @Input()
+  statuses: any[] = [];
+
+  @Input()
+  basicInfoFields: any[] = [];
+
+  @Input()
+  logoPath =
+    'account.logoUrl';
+
+  @Input()
+  coverPath =
+    'account.coverUrl';
+
+  @Input()
+  imagesPath =
+    'account.imagesUrls';
+
+  @Input()
+  attachmentsPath =
+    'account.entityAttachments';
+
+  @Input() saving = false;
+  @Input() uploading = false;
+
+  @Output()
+  entityChange =
+    new EventEmitter<any>();
+
+  @Output()
+  logoChange =
+    new EventEmitter<any>();
+
+  @Output()
+  backgroundChange =
+    new EventEmitter<any>();
+
+  @Output()
+  imageChange =
+    new EventEmitter<any>();
+
+  @Output()
+  attachmentRemove =
+    new EventEmitter<any>();
+
+  @Output()
+  save =
+    new EventEmitter<void>();
+
+  @Output()
+  cancel =
+    new EventEmitter<void>();
+
+  @Output()
+  close =
+    new EventEmitter<void>();
+
+  @Output()
+  minimize =
+    new EventEmitter<void>();
+
+  @Output()
+  maximize =
+    new EventEmitter<void>();
+
+  leftPanelCollapsed = false;
+
+  leftPanelSections = [
+   {
     key: 'branches',
     title: 'Branches',
     canAdd: true,
@@ -50,61 +126,22 @@ leftPanelSections = [
           }
         ]
       },
-      // {
-      //   id: 2,
-      //   label: 'Cairo Branch',
-      //   icon: 'fa fa-building',
-      //   children: [
-      //     {
-      //       id: 20,
-      //       label: 'John Smith',
-      //       icon: 'fa fa-user',
-      //       type: 'contact'
-      //     }
-      //   ]
-      // }
-    ]
-  }
-];
-// basicInfoFields = [
-//   {
-//     key: 'status',
-//     label: 'Status',
-//     type: 'dropdown',
-//     valuePath: 'account.status',
-//     options: this.statuses
-//   },
-//   {
-//     key: 'accountType',
-//     label: 'Account Type',
-//     type: 'dropdown',
-//     valuePath: 'account.accountTypeId',
-//     options: {}
-//   },
-//   {
-//     key: 'name',
-//     label: 'Name',
-//     type: 'text',
-//     valuePath: 'account.name'
-//   },
-//   {
-//     key: 'ssin',
-//     label: 'SSIN',
-//     type: 'text',
-//     valuePath: 'account.ssin',
-//     readonly: true
-//   }
-// ];
+  ]
+}]
 
+  @Input()
+logoAttachmentCategory:
+  SycAttachmentCategoryDto;
 
+@Input()
+bannerAttachmentCategory:
+  SycAttachmentCategoryDto;
 
+@Input()
+imageAttachmentCategory:
+  SycAttachmentCategoryDto;
 
-  @Input() logoPath = '';
-  @Input() coverPath = '';
-  @Input() imagesPath = '';
-  @Input() attachmentsPath = '';
-
-ngOnInit(){
-  console.log(this.entityData,'entityData')
-}
+@Output()
+edit =
+  new EventEmitter<void>();
 }

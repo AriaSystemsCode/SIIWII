@@ -21,3 +21,17 @@
   display: none;
 }
 
+
+
+
+::ng-deep .generic-entity-modal {
+  z-index: 1100;
+}
+
+::ng-deep .modal {
+  z-index: 12000 !important;
+}
+
+::ng-deep .modal-backdrop {
+  z-index: 11999 !important;
+}

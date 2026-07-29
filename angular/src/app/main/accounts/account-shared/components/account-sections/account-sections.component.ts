@@ -180,14 +180,102 @@ trackByValue(index: number, value: string): string {
 //   this.initializeRelationshipSection();
 // }
 
+// private setAccountData(data: any): void {
+//   this.entityData = data;
+
+//   this.account =
+//     data?.account ?? {};
+
+//   /*
+//    * Important:
+//    * All Account Sections fields now update
+//    * the same CreateOrEditAccountInfoDto.
+//    */
+//   this.mainBranch =
+//     this.account;
+
+//   this.roleEntityObjectTypeId =
+//     this.account?.accountTypeId;
+
+//   this.loadedAccountId =
+//     this.account?.id ??
+//     this.accountId ??
+//     null;
+
+//   this.connectionsInfo =
+//     data?.connectionsInfo ??
+//     this.account?.connectionsInfo ??
+//     [];
+
+//   this.initializeAccountFields();
+
+//   if (this.roleEntityObjectTypeId) {
+//     this.initializeRolesSection();
+//   }
+
+//   if (
+//     this.mode !== 'create' &&
+//     this.connectionsInfo?.length
+//   ) {
+//     this.initializeRelationshipSection();
+//   } else {
+//     this.resetRelationshipData();
+//   }
+// }
+
 private setAccountData(data: any): void {
   this.entityData = data;
   this.account = data?.account ?? {};
-    this.roleEntityObjectTypeId = this.entityData?.account?.accountTypeId
 
-  this.mainBranch =
-    this.account?.branches?.[0]?.data?.branch ??
-    this.createEmptyMainBranch();
+  const branch =
+    this.account?.branches?.[0]?.data?.branch;
+
+  // View API keeps these values inside main branch.
+  if (branch) {
+    this.account.tradeName ??=
+      branch.tradeName;
+
+    this.account.languageId ??=
+      branch.languageId;
+
+    this.account.currencyId ??=
+      branch.currencyId;
+
+    this.account.phone1TypeId ??=
+      branch.phone1TypeId;
+
+    this.account.phone1Number ??=
+      branch.phone1Number;
+
+    this.account.phone1Ex ??=
+      branch.phone1Ex ??
+      branch.phone1Ext;
+
+    this.account.phone2TypeId ??=
+      branch.phone2TypeId;
+
+    this.account.phone2Number ??=
+      branch.phone2Number;
+
+    this.account.phone2Ex ??=
+      branch.phone2Ex ??
+      branch.phone2Ext;
+
+    this.account.phone3TypeId ??=
+      branch.phone3TypeId;
+
+    this.account.phone3Number ??=
+      branch.phone3Number;
+
+    this.account.phone3Ex ??=
+      branch.phone3Ex ??
+      branch.phone3Ext;
+  }
+
+  this.mainBranch = this.account;
+
+  this.roleEntityObjectTypeId =
+    this.account?.accountTypeId;
 
   this.loadedAccountId =
     this.account?.id ??
@@ -199,9 +287,78 @@ private setAccountData(data: any): void {
     this.account?.connectionsInfo ??
     [];
 
-  this.initializeRolesSection();
-  this.initializeRelationshipSection();
+  this.initializeAccountFields();
+
+  if (this.roleEntityObjectTypeId) {
+    this.initializeRolesSection();
+  }
+
+  if (
+    this.mode !== 'create' &&
+    this.connectionsInfo?.length
+  ) {
+    this.initializeRelationshipSection();
+  } else {
+    this.resetRelationshipData();
+  }
 }
+// private initializeAccountFields(): void {
+//   this.account.tradeName ??= '';
+//   this.account.languageId ??= undefined;
+
+//   this.account.phone1TypeId ??= undefined;
+//   this.account.phone1Number ??= '';
+//   this.account.phone1Ex ??= '';
+
+//   this.account.phone2TypeId ??= undefined;
+//   this.account.phone2Number ??= '';
+//   this.account.phone2Ex ??= '';
+
+//   this.account.phone3TypeId ??= undefined;
+//   this.account.phone3Number ??= '';
+//   this.account.phone3Ex ??= '';
+
+//   this.account.entityExtraData ??= [];
+//   this.account.entityAttachments ??= [];
+//   this.account.entityCategories ??= [];
+//   this.account.entityClassifications ??= [];
+
+//   this.entityData.entityExtraData =
+//     this.account.entityExtraData;
+// }
+
+private initializeAccountFields(): void {
+  this.account.tradeName ??= '';
+  this.account.languageId ??= undefined;
+
+  this.account.phone1TypeId ??= undefined;
+  this.account.phone1Number ??= '';
+  this.account.phone1Ex ??= '';
+
+  this.account.phone2TypeId ??= undefined;
+  this.account.phone2Number ??= '';
+  this.account.phone2Ex ??= '';
+
+  this.account.phone3TypeId ??= undefined;
+  this.account.phone3Number ??= '';
+  this.account.phone3Ex ??= '';
+
+  const existingExtraData =
+    this.entityData?.entityExtraData ??
+    this.account?.entityExtraData ??
+    [];
+
+  this.account.entityExtraData =
+    existingExtraData;
+
+  this.entityData.entityExtraData =
+    existingExtraData;
+
+  this.account.entityAttachments ??= [];
+  this.account.entityCategories ??= [];
+  this.account.entityClassifications ??= [];
+}
+
 private initializeRolesSection(): void {
   this.isLoadingRoles = true;
   this.roleExtraAttributeObject = null;
@@ -245,10 +402,16 @@ private initializeRolesSection(): void {
 (this.roleDynamicInputsForViewDto as any).extraDataAttributes =
   this.roleAttributes.map(attribute => {
 
-    const matchedValues = accountExtraData.filter(
-      item =>
-        item.attributeId === attribute.attributeId
-    );
+  const attributeId =
+  attribute.attributeId ??
+  attribute.id;
+
+const matchedValues =
+  accountExtraData.filter(
+    item =>
+      Number(item.attributeId) ===
+      Number(attributeId)
+  );
 
     let selectedValues: Array<{ value: any }> = [];
 
@@ -286,11 +449,11 @@ private initializeRolesSection(): void {
       }));
     }
 
-    return {
-      extraAttributeId: attribute.attributeId,
-      extraAttrName: attribute.name,
-      selectedValues
-    };
+  return {
+  extraAttributeId: attributeId,
+  extraAttrName: attribute.name,
+  selectedValues
+};
   });
         /*
          * Keep entityExtraData because you use it later for saving.

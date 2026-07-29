@@ -75,7 +75,7 @@
                                          
                                         </a>
                                         <ng-container *ngIf="showAddButton">
-                                            <a *ngIf="!this.isHost" [title]="
+                                            <!-- <a *ngIf="!this.isHost" [title]="
                                                     'AddManualAccount'
                                                         | localize
                                                 "
@@ -85,7 +85,16 @@
                                                     '/app/main/account/create-manual'
                                                 ]">
                                                 <i class="d-inline-block w-100 fas fa-user-plus icon-center"></i>
-                                            </a>
+                                            </a> -->
+                                            <a
+                                            *ngIf="!isHost"
+                                            [title]="'AddManualAccount' | localize"
+                                            class="text-center toolbar-btn transparent-button"
+                                            (click)="openCreateManualAccount()">
+
+                                            <i class="d-inline-block w-100 fas fa-user-plus icon-center"></i>
+
+                                        </a>
                                             <a *ngIf="this.isHost" [title]="
                                                     'AddExternalAccount'
                                                         | localize
@@ -290,3 +299,48 @@
   <app-accounts-list-filters [filterForm]="filterForm"  [fromMarketplace]="fromMarketplace" (click)="toggleFilter()"></app-accounts-list-filters>
 </div>
 </div>
+
+<app-generic-entity-modal
+  [(visible)]="showGenericEntityModal">
+
+  <app-generic-entity-shell
+    *ngIf="showGenericEntityModal && accountData"
+
+    [entityData]="accountData"
+    [entityTypes]="accountTypes"
+    [statuses]="statuses"
+    [basicInfoFields]="accountBasicInfoFields"
+    [mode]="entityMode"
+
+    [saving]="saving"
+    [uploading]="uploadingImages"
+
+    [logoPath]="'account.logoUrl'"
+    [coverPath]="'account.coverUrl'"
+    [imagesPath]="'account.imagesUrls'"
+    [attachmentsPath]="'account.entityAttachments'"
+
+    [logoAttachmentCategory]="logoAttachmentCategory"
+    [bannerAttachmentCategory]="bannerAttachmentCategory"
+    [imageAttachmentCategory]="imageAttachmentCategory"
+
+    (entityChange)="onAccountChanged($event)"
+    (logoChange)="onLogoChange($event)"
+    (backgroundChange)="onBackgroundChange($event)"
+    (imageChange)="onImagesChange($event)"
+    (attachmentRemove)="onAttachmentRemove($event)"
+
+    (save)="saveAccount()"
+    (cancel)="cancelAccount()"
+    (close)="closeGenericEntityModal()">
+
+    <app-account-sections
+      entity-main-content
+      [entityData]="accountData"
+      [accountId]="accountId"
+      [mode]="entityMode">
+    </app-account-sections>
+
+  </app-generic-entity-shell>
+
+</app-generic-entity-modal>
