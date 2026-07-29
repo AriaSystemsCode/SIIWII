@@ -1049,7 +1049,7 @@ namespace onetouch.AppMarketplaceAccounts
                     { 
                        var accountConnection = _appContactRepository.GetAll().Include(z=>z.EntityFk)
                         .FirstOrDefault(e => e.TenantId == AbpSession.TenantId && e.SSIN == output.Account.SSIN);
-                        if (accountConnection != null && accountConnection.Id > 0)
+                        if (accountConnection != null && accountConnection.Id > 0 && currentTenantAccount!=null)
                         {
                             var relationshipsList = await _appContactRelationshipInfoRepository.GetAll()
                                     .Where(z => ((z.RecipientContactSSIN == currentTenantAccount.SSIN && z.RequesterContactSSIN == accountConnection.SSIN)
@@ -1076,7 +1076,7 @@ namespace onetouch.AppMarketplaceAccounts
                                             //output.DisConnectLabel = "MPAction" + extrDataDisconnect.AttributeValue;
                                             connInfo.DisconnectLabel = "MPAction" + extrDataDisconnect.AttributeValue;
                                         }
-                                        if (relationship.EntityObjectStatusId == activeRelationshipStatusId)
+                                        if (relationship.EntityObjectStatusId == activeRelationshipStatusId && currentTenantAccount!=null)
                                         {
                                             var extrDataSharing = relationshipCode.EntityExtraData.Where(z => z.AttributeId == (relationship.RequesterContactSSIN == currentTenantAccount.SSIN ? 604 : 612)).FirstOrDefault();
                                             if (extrDataSharing != null)
@@ -1120,7 +1120,7 @@ namespace onetouch.AppMarketplaceAccounts
                                 var requestorRole = relationshipCodeLookup.EntityExtraData.Where(z => z.AttributeId == 610).FirstOrDefault();
                                 var recepientRole = relationshipCodeLookup.EntityExtraData.Where(z => z.AttributeId == 611).FirstOrDefault();
                                 var requestorType = relationshipCodeLookup.EntityExtraData.Where(z => z.AttributeId == 606).FirstOrDefault();
-                                if (requestorType != null && 
+                                if (currentTenantAccount!=null && requestorType != null && 
                                     requestorType.AttributeValue.TrimEnd().ToLower() == currentTenantAccount.EntityFk.EntityObjectTypeCode.ToLower() &&
                                     ((!string.IsNullOrEmpty(currentTenatntAccountMarketplaceRole)
                                     && requestorRole!=null && !string.IsNullOrEmpty(requestorRole.AttributeValue)) ?
