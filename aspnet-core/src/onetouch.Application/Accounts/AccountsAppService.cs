@@ -7621,7 +7621,8 @@ namespace onetouch.Accounts
                         //I40[Start]  
                         if (accountDto.AccountId != null && accountDto.AccountId != 0)
                         {
-                            if (accountDto.ParentId != null && (accountDto.Id == 0 || accountDto.Id == null))
+                            if (accountDto.ParentId != null &&
+                                (accountDto.Id == 0 || accountDto.Id == null))
                             {
                                 var publishedAcc = await _appMarketplaceContactRepository.GetAll().Where(z => z.SSIN == account.SSIN).FirstOrDefaultAsync();
                                 if (publishedAcc == null)
@@ -7631,7 +7632,8 @@ namespace onetouch.Accounts
                                     await _iCreateMarketplaceAccount.HideAccount(contact.SSIN);
                                 }
                             }
-                            if (accountDto.ParentId != null && accountDto.AccountId != null)
+                            if (accountDto.ParentId != null && accountDto.AccountId != null
+                                && accountDto.TenantOwner==AbpSession.TenantId)
                             {
                                 var accountObj = await _appContactRepository.GetAll().Where(z => z.Id == accountDto.AccountId).FirstOrDefaultAsync();
                                 if (accountObj != null)
