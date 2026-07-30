@@ -7,9 +7,9 @@ import { AbpSessionService, IAjaxResponse, TokenService } from 'abp-ng2-module';
 import { AppConsts } from '@shared/AppConsts';
 import { FileUploader, FileUploaderOptions } from 'ng2-file-upload';
 import { BsModalRef, BsModalService, ModalOptions } from 'ngx-bootstrap/modal';
-import { finalize } from 'rxjs/operators';
+import { finalize, map, switchMap } from 'rxjs/operators';
 import { PrimengTableHelper } from '@shared/helpers/PrimengTableHelper';
-import { forkJoin, Observable, Subscription } from 'rxjs';
+import { forkJoin, Observable, of, Subscription, throwError } from 'rxjs';
 import { ImageCropperComponent } from '@app/shared/common/image-cropper/image-cropper.component';
 import { SelectCategoriesDynamicModalComponent } from '@app/categories/select-categories-dynamic-modal.component';
 import { SelectClassificationDynamicModalComponent } from '@app/classification/select-classification-dynamic-modal.component';
@@ -195,7 +195,7 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit {
         }
 
         await this.handleComponentMode();
-        this.getLoginAccountDataForView()
+     
         this.isHost = !this._abpSessionService.tenantId;
         this.handleRoutingChange();
         this.initUploaders();
@@ -1808,60 +1808,165 @@ if( !this.accountInfoTemp?.id){
   this.previousSelectedRoles = [...this.selectedRoles];
 }
 
-loginTenaneSsin
+// loginTenaneSsin
+// createRelation(relation: any): void {
+//   if (!relation?.connectionEntityId || !this.accountId) return;
+
+//   this.showMainSpinner();
+
+//   forkJoin({
+//     recipientRoles: this.AppTransactionServiceProxy.getAccountMarketplaceRoles(
+//       this.accountDataForView?.ssin // or recipient account ssin
+//     ),
+//     loggedTenantRoles: this.AppTransactionServiceProxy.getAccountMarketplaceRoles(
+//       this.loginTenaneSsin
+//     )
+//   })
+//     // .pipe(finalize(() => this.hideMainSpinner()))
+//     .subscribe(({ recipientRoles, loggedTenantRoles }: any) => {
+//       const recipientHasRoles = this.hasMarketplaceRoles(recipientRoles);
+//       const loggedTenantHasRoles = this.hasMarketplaceRoles(loggedTenantRoles);
+
+//       if (!recipientHasRoles || !loggedTenantHasRoles) {
+//         this.hideMainSpinner()
+//         this.message.info(
+//          this.l('Cannot connect, you need to update the marketplace role of your account / the recipient account marketplace role in order to build relationship together')  ,
+//           ''
+//         );
+//         return;
+//       }
+
+//       this.applyRelation(relation);
+//     });
+// }
+
+loginTenaneSsin: string;
+
 createRelation(relation: any): void {
-  if (!relation?.connectionEntityId || !this.accountId) return;
+    if (!relation?.connectionEntityId || !this.accountId) {
+        return;
+    }
 
-  this.showMainSpinner();
+    const recipientSsin = this.accountDataForView?.ssin;
 
-  forkJoin({
-    recipientRoles: this.AppTransactionServiceProxy.getAccountMarketplaceRoles(
-      this.accountDataForView?.ssin // or recipient account ssin
-    ),
-    loggedTenantRoles: this.AppTransactionServiceProxy.getAccountMarketplaceRoles(
-      this.loginTenaneSsin
-    )
-  })
-    // .pipe(finalize(() => this.hideMainSpinner()))
-    .subscribe(({ recipientRoles, loggedTenantRoles }: any) => {
-      const recipientHasRoles = this.hasMarketplaceRoles(recipientRoles);
-      const loggedTenantHasRoles = this.hasMarketplaceRoles(loggedTenantRoles);
-
-      if (!recipientHasRoles || !loggedTenantHasRoles) {
-        this.hideMainSpinner()
-        this.message.info(
-         this.l('Cannot connect, you need to update the marketplace role of your account / the recipient account marketplace role in order to build relationship together')  ,
-          ''
+    if (!recipientSsin) {
+        this.message.warn(
+            this.l('Recipient account SSIN is not available'),
+            ''
         );
         return;
-      }
+    }
 
-      this.applyRelation(relation);
-    });
+    this.showMainSpinner();
+
+    this.getLoginTenantSsin()
+        .pipe(
+            switchMap((loginTenantSsin: string) => {
+                if (!loginTenantSsin) {
+                    throw new Error('Logged-in tenant SSIN is not available');
+                }
+
+                this.loginTenaneSsin = loginTenantSsin;
+
+                return forkJoin({
+                    recipientRoles:
+                        this.AppTransactionServiceProxy
+                            .getAccountMarketplaceRoles(recipientSsin),
+
+                    loggedTenantRoles:
+                        this.AppTransactionServiceProxy
+                            .getAccountMarketplaceRoles(loginTenantSsin)
+                });
+            }),
+
+            switchMap(({ recipientRoles, loggedTenantRoles }) => {
+                const recipientHasRoles =
+                    this.hasMarketplaceRoles(recipientRoles);
+
+                const loggedTenantHasRoles =
+                    this.hasMarketplaceRoles(loggedTenantRoles);
+
+                if (!recipientHasRoles || !loggedTenantHasRoles) {
+                    throw new Error('MARKETPLACE_ROLES_MISSING');
+                }
+
+                return this._AccountsServiceProxy.applyRelationOnProfile(
+                    this.accountId,
+                    undefined,
+                    relation.defaultVisibility === 'Public',
+                    relation.connectionEntityId
+                );
+            }),
+
+            finalize(() => {
+                this.hideMainSpinner();
+            })
+        )
+        .subscribe({
+            next: () => {
+                this.notify.success(
+                    this.l('SuccessfullyConnected')
+                );
+
+                this.getAccountDataForView();
+            },
+
+            error: error => {
+                if (error?.message === 'MARKETPLACE_ROLES_MISSING') {
+                    this.message.info(
+                        this.l(
+                            'Cannot connect, you need to update the marketplace role of your account / the recipient account marketplace role in order to build relationship together'
+                        ),
+                        ''
+                    );
+
+                    return;
+                }
+
+                if (
+                    error?.message ===
+                    'Logged-in tenant SSIN is not available'
+                ) {
+                    this.message.warn(
+                        this.l(
+                            'Logged-in account SSIN is not available'
+                        ),
+                        ''
+                    );
+
+                    return;
+                }
+
+                this.message.error(
+                    this.l('AnErrorOccurredWhileCreatingRelation'),
+                    ''
+                );
+            }
+        });
 }
 private hasMarketplaceRoles(response: any): boolean {
   const roles = response?.result ?? response;
   return Array.isArray(roles) && roles.length > 0;
 }
 
-private applyRelation(relation: any): void {
-  this.showMainSpinner();
+// private applyRelation(relation: any): void {
+//   this.showMainSpinner();
 
-  this._AccountsServiceProxy
-    .applyRelationOnProfile(
-      this.accountId,
-      undefined,
-      relation.defaultVisibility === 'Public',
-      relation.connectionEntityId
-    )
-    .pipe(
-      finalize(() => {
-        this.hideMainSpinner();
-        this.getAccountDataForView();
-      })
-    )
-    .subscribe();
-}
+//   this._AccountsServiceProxy
+//     .applyRelationOnProfile(
+//       this.accountId,
+//       undefined,
+//       relation.defaultVisibility === 'Public',
+//       relation.connectionEntityId
+//     )
+//     .pipe(
+//       finalize(() => {
+//         this.hideMainSpinner();
+//         this.getAccountDataForView();
+//       })
+//     )
+//     .subscribe();
+// }
 
 getFormattedConnectionName(label: string): string {
   if (!label) return '';
@@ -1912,16 +2017,18 @@ showConnectionsDialog = false;
 openConnectionsDialog(): void {
   this.showConnectionsDialog = true;
 }
-    getLoginAccountDataForView() {
-        let id = this.appSession.user.accountId
-        if (!id) return
-
-      this._AccountsServiceProxy.getAccountForView(id, 5).pipe(
-  
-    ).subscribe((res) => {
-      this.loginTenaneSsin = res?.account?.ssin
-    })
-
+private getLoginTenantSsin(): Observable<string> {
+    if (this.loginTenaneSsin) {
+        return of(this.loginTenaneSsin);
     }
 
+    return this._AccountsServiceProxy
+        .getAccountForView(this.appSession.user.accountId, 5)
+        .pipe(
+            map(result => {
+                this.loginTenaneSsin = result.account?.ssin;
+                return this.loginTenaneSsin;
+            })
+        );
+}
 }
