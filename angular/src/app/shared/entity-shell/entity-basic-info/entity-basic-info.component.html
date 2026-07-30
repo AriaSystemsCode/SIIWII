@@ -281,7 +281,7 @@
 
   <div class="additional-images-section">
 
-    <div class="additional-images-header">
+    <!-- <div class="additional-images-header">
 
       <span class="additional-images-title">
         {{ 'Images' | localize }}
@@ -292,16 +292,16 @@
         {{ 'Maximum' | localize }}
       </span>
 
-    </div>
+    </div> -->
 
     <div class="additional-images-row">
 
-      <div
-        class="additional-image-slot"
-        *ngFor="
-          let slot of additionalImageSlots;
-          let imageIndex = index
-        ">
+     <div
+  class="additional-image-slot"
+  *ngFor="
+    let slot of getVisibleAdditionalImages();
+    let imageIndex = index
+  ">
 
         <!-- Image: View mode -->
 
@@ -315,7 +315,7 @@
           [src]="slot.previewUrl"
           alt="Account image" />
 
-        <div
+        <!-- <div
           *ngIf="
             mode === 'view' &&
             !slot.previewUrl
@@ -324,7 +324,7 @@
 
           <i class="fa fa-image"></i>
 
-        </div>
+        </div> -->
 
         <!-- Image: Create/Edit mode -->
 

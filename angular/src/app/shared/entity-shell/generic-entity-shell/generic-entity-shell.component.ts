@@ -144,4 +144,17 @@ imageAttachmentCategory:
 @Output()
 edit =
   new EventEmitter<void>();
+
+
+rightPanelCollapsed = false;
+
+ngOnInit() {
+    this.rightPanelCollapsed =
+        this.mode !== 'view';
+}
+
+toggleRightPanel() {
+    this.rightPanelCollapsed =
+        !this.rightPanelCollapsed;
+}
 }

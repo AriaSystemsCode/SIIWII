@@ -65,27 +65,44 @@
   (cancel)="cancel.emit()">
 </app-entity-basic-info>
 
-    <div class="content-row row m-3">
+<div class="content-row">
 
-      <div
-        class="main-content-container col-md-7">
+    <div
+        class="main-content-container"
+        [class.expanded]="rightPanelCollapsed">
 
         <ng-content
-          select="[entity-main-content]">
+            select="[entity-main-content]">
         </ng-content>
-
-      </div>
-
-      <div
-        class="right-panel-container col-md-5">
-
-        <app-entity-right-panel>
-        </app-entity-right-panel>
-
-      </div>
 
     </div>
 
+    <div
+        class="right-panel-wrapper"
+        [class.collapsed]="rightPanelCollapsed">
+
+        <button
+            class="panel-toggle-btn"
+            (click)="toggleRightPanel()">
+
+            <i
+                class="fa"
+                [ngClass]="
+                    rightPanelCollapsed
+                        ? 'fa-chevron-left'
+                        : 'fa-chevron-right'
+                ">
+            </i>
+
+        </button>
+
+        <app-entity-right-panel
+            *ngIf="!rightPanelCollapsed">
+        </app-entity-right-panel>
+
+    </div>
+
+</div>
   </div>
 
 </div>

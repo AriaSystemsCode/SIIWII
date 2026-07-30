@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
 
 @Component({
   selector: 'app-entity-right-panel',
@@ -8,4 +8,11 @@ import { Component } from '@angular/core';
 export class EntityRightPanelComponent {
 
    activeTab: 'audit' | 'messages' | 'related' = 'audit';
+
+
+   @Input() collapsed = false;
+
+togglePanel(): void {
+  this.collapsed = !this.collapsed;
+}
 }

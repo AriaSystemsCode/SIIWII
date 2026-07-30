@@ -146,7 +146,7 @@ export class EntityBasicInfoComponent
    * Upload box dimensions.
    */
   @Input()
-  bannerWidth = 900;
+  bannerWidth = 1050;
 
   @Input()
   bannerHeight = 180;
@@ -968,6 +968,18 @@ this.additionalImageSlots =
     this.additionalImageSlots =
       this.createEmptyImageSlots();
   }
+
+  getVisibleAdditionalImages():
+  EntityImageSlot[] {
+
+  if (this.mode === 'view') {
+    return this.additionalImageSlots.filter(
+      slot => !!slot.previewUrl
+    );
+  }
+
+  return this.additionalImageSlots;
+}
 
   ngOnDestroy(): void {
     this.clearLocalImages();
