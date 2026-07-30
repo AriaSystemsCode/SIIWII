@@ -6,21 +6,30 @@ import {
   OnInit,
   SimpleChanges
 } from '@angular/core';
+import { SelectCategoriesDynamicModalComponent } from '@app/categories/select-categories-dynamic-modal.component';
+import { SelectClassificationDynamicModalComponent } from '@app/classification/select-classification-dynamic-modal.component';
+import { BsModalRef, BsModalService, ModalOptions } from '@node_modules/ngx-bootstrap/modal';
 
 import { AppComponentBase } from '@shared/common/app-component-base';
 import {
   AccountsServiceProxy,
   AppEntitiesServiceProxy,
+  AppEntityCategoryDto,
+  AppEntityClassificationDto,
   AppEntityExtraDataDto,
   ConnectionInfo,
   CurrencyInfoDto,
   GetAppEntityForEditOutput,
   LookupLabelDto,
-  SycEntityObjectTypesServiceProxy
+  SycEntityObjectTypesServiceProxy,
+  TreeNodeOfGetSycEntityObjectCategoryForViewDto,
+  TreeNodeOfGetSycEntityObjectClassificationForViewDto
 } from '@shared/service-proxies/service-proxies';
-import { forkJoin } from 'rxjs';
+import { forkJoin, Subscription } from 'rxjs';
 import { finalize, switchMap } from 'rxjs/operators';
 type EntityMode = 'create' | 'edit' | 'view';
+
+
 
 @Component({
   selector: 'app-account-sections',
@@ -95,25 +104,26 @@ isLoadingRoles = false;
     scrollClassification: boolean = false;
     maxClassificationCnt: number;
     maxContainerHeight: number = 150;
+
+
+
+    categoriesIds: number[] = [];
+
+classificationsIds: number[] = [];
   constructor(
     injector: Injector,
     private _accountsServiceProxy: AccountsServiceProxy,
         private _AppEntitiesServiceProxy: AppEntitiesServiceProxy,
        
   private _sycEntityObjectTypesServiceProxy:
-    SycEntityObjectTypesServiceProxy
+    SycEntityObjectTypesServiceProxy,  private _bsModalService:
+    BsModalService
   ) {
     super(injector);
   }
 
   ngOnInit(): void {
-  // this.loadLookups();
 
-  // if (this.accountId) {
-  //   this.getAccountDataForView();
-  // } else if (this.entityData?.account) {
-  //   this.setAccountData(this.entityData);
-  // }
 
     this.loadLookups();
 
@@ -123,18 +133,6 @@ isLoadingRoles = false;
   }
 }
  ngOnChanges(changes: SimpleChanges): void {
-  // if (
-  //   changes.accountId &&
-  //   this.accountId &&
-  //   changes.accountId.currentValue !== changes.accountId.previousValue
-  // ) {
-  //   this.getAccountDataForView();
-  //   return;
-  // }
-
-  // if (changes.entityData?.currentValue?.account && !this.accountId) {
-  //   this.setAccountData(changes.entityData.currentValue);
-  // }
 
     if (changes.entityData?.currentValue?.account) {
     this.setAccountData(changes.entityData.currentValue);
@@ -146,82 +144,7 @@ isLoadingRoles = false;
 trackByValue(index: number, value: string): string {
   return value || index.toString();
 }
-  // private setAccountData(data: any): void {
-  //   this.entityData = data;
 
-  //   this.account = data?.account ?? {};
-
-  //   this.mainBranch =
-  //     this.account?.branches?.[0]?.data?.branch ??
-  //     this.createEmptyMainBranch();
-
-  //   this.loadedAccountId = this.account?.id ?? this.accountId ?? null;
-  // }
-
-//   private setAccountData(data: any): void {
-//   this.entityData = data;
-
-//   this.account = data?.account ?? {};
-
-//   this.mainBranch =
-//     this.account?.branches?.[0]?.data?.branch ??
-//     this.createEmptyMainBranch();
-
-//   this.loadedAccountId =
-//     this.account?.id ??
-//     this.accountId ??
-//     null;
-
-//   this.connectionsInfo =
-//     data?.connectionsInfo ??
-//     this.account?.connectionsInfo ??
-//     [];
-
-//   this.initializeRelationshipSection();
-// }
-
-// private setAccountData(data: any): void {
-//   this.entityData = data;
-
-//   this.account =
-//     data?.account ?? {};
-
-//   /*
-//    * Important:
-//    * All Account Sections fields now update
-//    * the same CreateOrEditAccountInfoDto.
-//    */
-//   this.mainBranch =
-//     this.account;
-
-//   this.roleEntityObjectTypeId =
-//     this.account?.accountTypeId;
-
-//   this.loadedAccountId =
-//     this.account?.id ??
-//     this.accountId ??
-//     null;
-
-//   this.connectionsInfo =
-//     data?.connectionsInfo ??
-//     this.account?.connectionsInfo ??
-//     [];
-
-//   this.initializeAccountFields();
-
-//   if (this.roleEntityObjectTypeId) {
-//     this.initializeRolesSection();
-//   }
-
-//   if (
-//     this.mode !== 'create' &&
-//     this.connectionsInfo?.length
-//   ) {
-//     this.initializeRelationshipSection();
-//   } else {
-//     this.resetRelationshipData();
-//   }
-// }
 
 private setAccountData(data: any): void {
   this.entityData = data;
@@ -302,30 +225,7 @@ private setAccountData(data: any): void {
     this.resetRelationshipData();
   }
 }
-// private initializeAccountFields(): void {
-//   this.account.tradeName ??= '';
-//   this.account.languageId ??= undefined;
 
-//   this.account.phone1TypeId ??= undefined;
-//   this.account.phone1Number ??= '';
-//   this.account.phone1Ex ??= '';
-
-//   this.account.phone2TypeId ??= undefined;
-//   this.account.phone2Number ??= '';
-//   this.account.phone2Ex ??= '';
-
-//   this.account.phone3TypeId ??= undefined;
-//   this.account.phone3Number ??= '';
-//   this.account.phone3Ex ??= '';
-
-//   this.account.entityExtraData ??= [];
-//   this.account.entityAttachments ??= [];
-//   this.account.entityCategories ??= [];
-//   this.account.entityClassifications ??= [];
-
-//   this.entityData.entityExtraData =
-//     this.account.entityExtraData;
-// }
 
 private initializeAccountFields(): void {
   this.account.tradeName ??= '';
@@ -357,6 +257,8 @@ private initializeAccountFields(): void {
   this.account.entityAttachments ??= [];
   this.account.entityCategories ??= [];
   this.account.entityClassifications ??= [];
+
+  this.initializeBusinessSelections();
 }
 
 private initializeRolesSection(): void {
@@ -1116,5 +1018,479 @@ onRoleExtraAttributeCleared(
 
   this.entityData.entityExtraData =
     this.roleDynamicInputsForViewDto.entityExtraData;
+}
+
+get selectedDepartments():
+  AppEntityCategoryDto[] {
+
+  return this.account
+    ?.entityCategories ?? [];
+}
+
+get selectedClassifications():
+  AppEntityClassificationDto[] {
+
+  return this.account
+    ?.entityClassifications ?? [];
+}
+
+
+private initializeBusinessSelections(): void {
+  this.account.entityCategories ??= [];
+  this.account.entityClassifications ??= [];
+
+  this.categoriesIds =
+    this.account.entityCategories
+      .map(
+        item =>
+          Number(
+            item.entityObjectCategoryId
+          )
+      )
+      .filter(id => !!id);
+
+  this.classificationsIds =
+    this.account.entityClassifications
+      .map(
+        item =>
+          Number(
+            item.entityObjectClassificationId
+          )
+      )
+      .filter(id => !!id);
+}
+
+openSelectCategoriesModal(): void {
+  if (this.isViewMode) {
+    return;
+  }
+
+  const config =
+    new ModalOptions();
+
+  config.class =
+    'right-modal slide-right-in';
+
+  const initialState:
+    Partial<SelectCategoriesDynamicModalComponent> = {
+
+    savedIds: [
+      ...this.categoriesIds
+    ],
+
+    showAddAction: false,
+    showActions: false,
+
+    entityObjectName:
+      'Product',
+
+    entityObjectDisplayName:
+      'Departments',
+
+    isDepartment: true,
+
+    entityId:
+      this.account?.entityId ??
+      undefined
+  };
+
+  config.initialState =
+    initialState;
+
+  const modalRef:
+    BsModalRef =
+      this._bsModalService.show(
+        SelectCategoriesDynamicModalComponent,
+        config
+      );
+
+  const subscription:
+    Subscription =
+      this._bsModalService
+        .onHidden
+        .subscribe(() => {
+
+          this.handleSelectedCategories(
+            modalRef
+          );
+
+          subscription.unsubscribe();
+        });
+}
+
+private handleSelectedCategories(
+  modalRef: BsModalRef
+): void {
+
+  const modal:
+    SelectCategoriesDynamicModalComponent =
+      modalRef.content;
+
+  if (
+    !modal?.selectionDone ||
+    !Array.isArray(
+      modal.selectedRecords
+    )
+  ) {
+    return;
+  }
+
+  this.addSelectedCategories(
+    modal.selectedRecords
+  );
+}
+
+
+private addSelectedCategories(
+  selected:
+    TreeNodeOfGetSycEntityObjectCategoryForViewDto[]
+): void {
+
+  this.account.entityCategories ??= [];
+
+  const existingIds =
+    new Set(
+      this.account.entityCategories.map(
+        item =>
+          Number(
+            item.entityObjectCategoryId
+          )
+      )
+    );
+
+  const newCategories =
+    (selected ?? [])
+      .map(node => {
+        const category =
+          node?.data
+            ?.sycEntityObjectCategory;
+
+        if (
+          !category?.id ||
+          existingIds.has(
+            Number(category.id)
+          )
+        ) {
+          return null;
+        }
+
+        const dto =
+          new AppEntityCategoryDto();
+
+        dto.id = 0;
+
+        dto.entityObjectCategoryId =
+          category.id;
+
+        dto.entityObjectCategoryCode =
+          category.code;
+
+        dto.entityObjectCategoryName =
+          category.name;
+
+        existingIds.add(
+          Number(category.id)
+        );
+
+        return dto;
+      })
+      .filter(
+        (
+          item
+        ): item is AppEntityCategoryDto =>
+          !!item
+      );
+
+  this.account.entityCategories = [
+    ...this.account.entityCategories,
+    ...newCategories
+  ];
+
+  this.categoriesIds =
+    this.account.entityCategories.map(
+      item =>
+        Number(
+          item.entityObjectCategoryId
+        )
+    );
+
+  this.syncBusinessInformation();
+}
+
+removeCategory(
+  index: number
+): void {
+
+  if (
+    this.isViewMode ||
+    index < 0
+  ) {
+    return;
+  }
+
+  this.message.confirm(
+    this.l(
+      'AreYouSureYouWantToRemoveThisDepartment?'
+    ),
+    this.l('AreYouSure'),
+    confirmed => {
+
+      if (!confirmed) {
+        return;
+      }
+
+      this.account.entityCategories
+        .splice(index, 1);
+
+      this.categoriesIds =
+        this.account.entityCategories.map(
+          item =>
+            Number(
+              item.entityObjectCategoryId
+            )
+        );
+
+      this.syncBusinessInformation();
+    }
+  );
+}
+
+openSelectClassificationsModal():
+  void {
+
+  if (this.isViewMode) {
+    return;
+  }
+
+  const config =
+    new ModalOptions();
+
+  config.class =
+    'right-modal slide-right-in';
+
+  const initialState:
+    Partial<SelectClassificationDynamicModalComponent> = {
+
+    savedIds: [
+      ...this.classificationsIds
+    ],
+
+    showAddAction: false,
+    showActions: false,
+
+    entityObjectName:
+      'Contact',
+
+    entityObjectDisplayName:
+      'Business Classifications',
+
+    entityId:
+      this.account?.entityId ??
+      undefined
+  };
+
+  config.initialState =
+    initialState;
+
+  const modalRef:
+    BsModalRef =
+      this._bsModalService.show(
+        SelectClassificationDynamicModalComponent,
+        config
+      );
+
+  const subscription:
+    Subscription =
+      this._bsModalService
+        .onHidden
+        .subscribe(() => {
+
+          this.handleSelectedClassifications(
+            modalRef
+          );
+
+          subscription.unsubscribe();
+        });
+}
+
+private handleSelectedClassifications(
+  modalRef: BsModalRef
+): void {
+
+  const modal:
+    SelectClassificationDynamicModalComponent =
+      modalRef.content;
+
+  if (
+    !modal?.selectionDone ||
+    !Array.isArray(
+      modal.selectedRecords
+    )
+  ) {
+    return;
+  }
+
+  this.addSelectedClassifications(
+    modal.selectedRecords
+  );
+}
+
+private addSelectedClassifications(
+  selected:
+    TreeNodeOfGetSycEntityObjectClassificationForViewDto[]
+): void {
+
+  this.account.entityClassifications ??=
+    [];
+
+  const existingIds =
+    new Set(
+      this.account
+        .entityClassifications
+        .map(
+          item =>
+            Number(
+              item
+                .entityObjectClassificationId
+            )
+        )
+    );
+
+  const newClassifications =
+    (selected ?? [])
+      .map(node => {
+        const classification =
+          node?.data
+            ?.sycEntityObjectClassification;
+
+        if (
+          !classification?.id ||
+          existingIds.has(
+            Number(
+              classification.id
+            )
+          )
+        ) {
+          return null;
+        }
+
+        const dto =
+          new AppEntityClassificationDto();
+
+        dto.id = 0;
+
+        dto.entityObjectClassificationId =
+          classification.id;
+
+        dto.entityObjectClassificationCode =
+          classification.code;
+
+        dto.entityObjectClassificationName =
+          classification.name;
+
+        existingIds.add(
+          Number(
+            classification.id
+          )
+        );
+
+        return dto;
+      })
+      .filter(
+        (
+          item
+        ): item is AppEntityClassificationDto =>
+          !!item
+      );
+
+  this.account.entityClassifications = [
+    ...this.account.entityClassifications,
+    ...newClassifications
+  ];
+
+  this.classificationsIds =
+    this.account
+      .entityClassifications
+      .map(
+        item =>
+          Number(
+            item
+              .entityObjectClassificationId
+          )
+      );
+
+  this.syncBusinessInformation();
+}
+
+removeClassification(
+  index: number
+): void {
+
+  if (
+    this.isViewMode ||
+    index < 0
+  ) {
+    return;
+  }
+
+  this.message.confirm(
+    this.l(
+      'AreYouSureTouWantToRemoveThisClassification?'
+    ),
+    this.l('AreYouSure'),
+    confirmed => {
+
+      if (!confirmed) {
+        return;
+      }
+
+      this.account
+        .entityClassifications
+        .splice(index, 1);
+
+      this.classificationsIds =
+        this.account
+          .entityClassifications
+          .map(
+            item =>
+              Number(
+                item
+                  .entityObjectClassificationId
+              )
+          );
+
+      this.syncBusinessInformation();
+    }
+  );
+}
+
+private syncBusinessInformation():
+  void {
+
+  this.account.entityCategories ??= [];
+  this.account.entityClassifications ??=
+    [];
+
+  this.entityData.account =
+    this.account;
+
+  /*
+   * Optional display arrays used by
+   * getAccountForView response shape.
+   */
+  this.entityData.account.categories =
+    this.account.entityCategories.map(
+      item =>
+        item.entityObjectCategoryName
+    );
+
+  this.entityData.account.classfications =
+    this.account
+      .entityClassifications
+      .map(
+        item =>
+          item
+            .entityObjectClassificationName
+      );
 }
 }

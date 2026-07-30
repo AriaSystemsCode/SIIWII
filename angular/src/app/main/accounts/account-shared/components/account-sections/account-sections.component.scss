@@ -80,8 +80,10 @@
   // margin: 0 0 38px;
   color: #000;
   font-size: 18px;
-  font-weight: 400;
+  font-weight: 600;
   line-height: 1.2;
+  
+  
 }
 
 .department-list {
@@ -159,3 +161,31 @@
 }
 
 
+.selectItem {
+
+font-weight: 600;
+font-size: 14px;
+line-height: 17px;
+
+color: #595959;
+
+
+}
+
+.selectBtn {
+  
+display: flex;
+
+align-items: center;
+padding:10px;
+
+width: 100px;
+height: 38.5px;
+
+background: #4A0D4A;
+border: 1px solid #4A0D4A;
+border-radius: 5px;
+    justify-content: center;
+    font-size: 14px;
+
+}
