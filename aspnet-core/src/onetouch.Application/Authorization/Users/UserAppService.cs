@@ -683,7 +683,7 @@ namespace onetouch.Authorization.Users
                 else
                 { 
                 var account = _appContactRepository.GetAll().FirstOrDefault(x => x.TenantId == AbpSession.TenantId && x.IsProfileData && x.ParentId == null && x.PartnerId == null && x.AccountId == null);
-                if (account != null && false) // Stop creating contact
+                if (account != null) // Stop creating contact
                     {
                         //I40 {Start}
                         //ContactDto contactDto = new ContactDto();
