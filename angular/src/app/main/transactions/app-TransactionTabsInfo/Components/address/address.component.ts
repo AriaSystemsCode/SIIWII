@@ -27,7 +27,8 @@ export class AddressComponent extends AppComponentBase implements OnInit, OnChan
   @Input("billingIndexInfo") billingIndexInfo: number;
   @Input("canChange") canChange: boolean = true;
   @Input("currentTab") currentTab: number;
-
+@Input() companySsin: string | null = null;
+@Input() branchSsin: string | null = null;
   @Output("updateSelectedAddress") updateSelectedAddress = new EventEmitter<any>();
 
   @ViewChild("addressForm") addressForm: NgForm;
@@ -58,6 +59,8 @@ export class AddressComponent extends AppComponentBase implements OnInit, OnChan
   isArabic: boolean
   selectedAddressIndex: number | null = null;
   selectedAddressText = '';
+
+  loadingAddresses:any
 
   constructor(injector: Injector,
     private _AppEntitiesServiceProxy: AppEntitiesServiceProxy,
@@ -620,9 +623,429 @@ export class AddressComponent extends AppComponentBase implements OnInit, OnChan
       }
     })
   }
-  showAddressList() {
+  // showAddressList() {
+  //   this.showAddList = true;
+  // }
+showAddressList(): void {
+    const role = this.getCurrentRole();
+
+    if (!role) {
+        console.warn('Cannot load addresses: role is missing', {
+            currentTab: this.currentTab,
+            shipInfoIndex: this.shipInfoIndex,
+            billingIndexInfo: this.billingIndexInfo
+        });
+
+        return;
+    }
+
+    const transactionContact =
+        this.appTransactionsForViewDto
+            ?.appTransactionContacts
+            ?.find(
+                contact =>
+                    contact?.contactRole === role
+            );
+
+    const validCompanySsin =
+        (
+            this.companySsin ||
+            transactionContact?.companySSIN
+        )
+            ?.trim();
+
+    const validBranchSsin =
+        this.branchSsin ||
+        transactionContact?.branchSSIN ||
+        transactionContact?.branchSsin ||
+        null;
+
+    console.log('Change address clicked:', {
+        inputCompanySsin: this.companySsin,
+        transactionCompanySsin:
+            transactionContact?.companySSIN,
+        resolvedCompanySsin:
+            validCompanySsin,
+        resolvedBranchSsin:
+            validBranchSsin,
+        role
+    });
+
+ 
+    if (validCompanySsin) {
+        this.loadCompanyAddresses(
+            validCompanySsin,
+            validBranchSsin
+        );
+
+        return;
+    }
+
+    
+    this.restoreSelectedAddressIndex();
+    this.openAddNewAddForm = false;
     this.showAddList = true;
-  }
+}
+
+private loadCompanyAddresses(
+    companySsin: string,
+    branchSsin?: string | null
+): void {
+    const role = this.getCurrentRole();
+
+    if (!role) {
+        console.warn('Address role could not be resolved', {
+            currentTab: this.currentTab,
+            shipInfoIndex: this.shipInfoIndex,
+            billingIndexInfo: this.billingIndexInfo
+        });
+
+        return;
+    }
+
+    this.loadingAddresses = true;
+    this.showMainSpinner();
+
+    const subscription =
+        this._AppTransactionServiceProxy
+            .getCompanyAddresses(
+                companySsin,
+                null
+            )
+            .pipe(
+                finalize(() => {
+                    this.loadingAddresses = false;
+                    this.hideMainSpinner();
+                })
+            )
+            .subscribe({
+                next: result => {
+                  
+                    this.savedAddressesList =
+                        this.removeDuplicateAddresses(
+                            result || []
+                        );
+
+                    this.refSavedAddressesList = [
+                        ...this.savedAddressesList
+                    ];
+
+                
+                    const selectedFound =
+                        this.restoreSelectedAddressIndex();
+
+                    if (selectedFound) {
+                        this.showAddressOptions();
+                        return;
+                    }
+
+                    this.loadDefaultAddress(
+                        companySsin,
+                        branchSsin || undefined,
+                        role
+                    );
+                },
+
+                error: error => {
+                    console.error(
+                        'Failed to load company addresses',
+                        error
+                    );
+
+                    this.savedAddressesList = [];
+                    this.refSavedAddressesList = [];
+                    this.selectedAddressIndex = null;
+
+                    this.showAddressOptions();
+                }
+            });
+
+    this.subscriptions.push(subscription);
+}
+
+private loadDefaultAddress(
+    companySsin: string,
+    branchSsin: string | undefined,
+    role: ContactRoleEnum
+): void {
+    const subscription =
+        this._AppTransactionServiceProxy
+            .getCompanyDefaultAddresses(
+                companySsin,
+                branchSsin
+            )
+            .subscribe({
+                next: defaults => {
+                    if (!defaults?.length) {
+                        this.selectedAddressIndex = null;
+                        this.showAddressOptions();
+                        return;
+                    }
+
+                    const expectedType =
+                        role === ContactRoleEnum.ShipFromContact ||
+                        role === ContactRoleEnum.ShipToContact
+                            ? 'Shipping'
+                            : 'Billing';
+
+                    const defaultAddress =
+                        defaults.find(
+                            item =>
+                                item.addressType
+                                    ?.trim()
+                                    .toLowerCase() ===
+                                expectedType.toLowerCase()
+                        );
+
+                    if (!defaultAddress) {
+                        this.selectedAddressIndex = null;
+                        this.showAddressOptions();
+                        return;
+                    }
+
+                    const index =
+                        this.savedAddressesList.findIndex(
+                            address =>
+                                address.id ===
+                                defaultAddress.addressId
+                        );
+
+                    if (index < 0) {
+                        this.selectedAddressIndex = null;
+                        this.showAddressOptions();
+                        return;
+                    }
+
+                    this.setSelectedAddressFromList(
+                        index,
+                        false
+                    );
+
+                    this.showAddressOptions();
+                },
+
+                error: error => {
+                    console.error(
+                        'Failed to load default address',
+                        error
+                    );
+
+                    this.selectedAddressIndex = null;
+                    this.showAddressOptions();
+                }
+            });
+
+    this.subscriptions.push(subscription);
+}
+
+private restoreSelectedAddressIndex(): boolean {
+    const currentSelected =
+        this.selectedAddressDetails ||
+        this.selectedAddress;
+
+    if (!currentSelected) {
+        this.selectedAddressIndex = null;
+        return false;
+    }
+
+    const selectedId =
+        currentSelected?.id ||
+        currentSelected?.contactAddressId;
+
+    let index = -1;
+
+    if (selectedId) {
+        index =
+            this.savedAddressesList.findIndex(
+                address =>
+                    address.id === selectedId ||
+                    address.contactAddressId === selectedId
+            );
+    }
+
+
+    if (index < 0) {
+        const selectedKey =
+            this.getAddressKey(currentSelected);
+
+        index =
+            this.savedAddressesList.findIndex(
+                address =>
+                    this.getAddressKey(address) ===
+                    selectedKey
+            );
+    }
+
+    if (index < 0) {
+        this.selectedAddressIndex = null;
+        return false;
+    }
+
+    this.setSelectedAddressFromList(
+        index,
+        false
+    );
+
+    return true;
+}
+
+private setSelectedAddressFromList(
+    index: number,
+    emitChange: boolean
+): void {
+    const address =
+        this.savedAddressesList?.[index];
+
+    if (!address) {
+        return;
+    }
+
+    const country =
+        this.countries?.find(
+            item =>
+                item.value === address.countryId
+        );
+
+    const selected =
+        new ContactAppAddressDto({
+            code: address?.code,
+            name: address?.name,
+
+            countryName:
+                country?.label ||
+                address?.countryName ||
+                '',
+
+            addressLine1:
+                address?.addressLine1 || '',
+
+            addressLine2:
+                address?.addressLine2 || '',
+
+            city:
+                address?.city || '',
+
+            state:
+                address?.state || '',
+
+            postalCode:
+                address?.postalCode || '',
+
+            countryId:
+                address?.countryId || 0,
+
+            countryCode:
+                country?.code ||
+                address?.countryCode ||
+                '',
+
+            countryIdName:
+                address?.countryIdName || '',
+
+            contactEmail:
+                address?.contactEmail,
+
+            contactPhone:
+                address?.contactPhone,
+
+            tenantId:
+                address?.tenantId,
+
+            accountId:
+                address?.accountId,
+
+            contactAddressId:
+                address?.contactAddressId ||
+                address?.id,
+
+            useDTOTenant:
+                address?.useDTOTenant,
+
+            id:
+                address?.id
+        });
+
+    this.selectedAddressIndex = index;
+    this.selectedAddress = selected;
+    this.selectedAddressDetails = selected;
+    this.selectedAddressText =
+        this.getAddressText(selected);
+
+    if (emitChange) {
+        this.updateSelectedAddress.emit({
+            id: selected.id,
+            code: selected.code,
+            selectedAddressObj: selected
+        });
+    }
+}
+
+selectAddressByIndex(
+    index: number
+): void {
+    const address =
+        this.savedAddressesList?.[index];
+
+    if (!address) {
+        return;
+    }
+
+    this.setSelectedAddressFromList(
+        index,
+        true
+    );
+
+    this.showAddList = false;
+}
+
+private removeDuplicateAddresses(
+    addresses: any[]
+): any[] {
+    const addressMap =
+        new Map<string, any>();
+
+    for (const address of addresses || []) {
+        const key =
+            address?.id
+                ? `id:${address.id}`
+                : this.getAddressKey(address);
+
+        if (!addressMap.has(key)) {
+            addressMap.set(key, {
+                ...address
+            });
+        }
+    }
+
+    return Array.from(
+        addressMap.values()
+    );
+}
+
+private getAddressKey(
+    address: any
+): string {
+    return [
+        address?.code,
+        address?.addressLine1,
+        address?.addressLine2,
+        address?.city,
+        address?.state,
+        address?.countryCode,
+        address?.postalCode
+    ]
+        .map(value =>
+            String(value || '')
+                .trim()
+                .toLowerCase()
+        )
+        .join('|');
+}
+
+private showAddressOptions(): void {
+    this.openAddNewAddForm = false;
+    this.showAddList = true;
+}
   ngOnInit(): void {
     this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
     this.currentLang == 'ar' || this.currentLang == 'ar-EG' ? this.isArabic = true : this.isArabic = false
@@ -660,67 +1083,67 @@ export class AddressComponent extends AppComponentBase implements OnInit, OnChan
       .filter(x => x !== null && x !== undefined && x !== '')
       .join(' , ');
   }
-  selectAddressByIndex(index: number): void {
-    const currentAddress = this.savedAddressesList?.[index];
-    if (!currentAddress) {
-      return;
-    }
+  // selectAddressByIndex(index: number): void {
+  //   const currentAddress = this.savedAddressesList?.[index];
+  //   if (!currentAddress) {
+  //     return;
+  //   }
 
-    this.selectedAddressIndex = index;
+  //   this.selectedAddressIndex = index;
 
 
-    const country = this.countries?.find(item => item.value === currentAddress.countryId);
+  //   const country = this.countries?.find(item => item.value === currentAddress.countryId);
 
-    const updatedContactAddressDto = new ContactAppAddressDto({
-      code: currentAddress?.code,
-      name: currentAddress?.name,
-      countryName: country?.label || currentAddress?.countryName || '',
-      addressLine1: currentAddress?.addressLine1 || '',
-      addressLine2: currentAddress?.addressLine2 || '',
-      city: currentAddress?.city || '',
-      state: currentAddress?.state || '',
-      postalCode: currentAddress?.postalCode || '',
-      countryId: currentAddress?.countryId || 0,
-      countryCode: country?.code || currentAddress?.countryCode || '',
-      countryIdName: currentAddress?.countryIdName || '',
-      contactEmail: currentAddress?.contactEmail,
-      contactPhone: currentAddress?.contactPhone,
-      tenantId: currentAddress?.tenantId,
-      accountId: currentAddress?.accountId,
-      contactAddressId: currentAddress?.contactAddressId,
-      useDTOTenant: currentAddress?.useDTOTenant,
-      id: currentAddress?.id || this.generateNewId()
-    });
+  //   const updatedContactAddressDto = new ContactAppAddressDto({
+  //     code: currentAddress?.code,
+  //     name: currentAddress?.name,
+  //     countryName: country?.label || currentAddress?.countryName || '',
+  //     addressLine1: currentAddress?.addressLine1 || '',
+  //     addressLine2: currentAddress?.addressLine2 || '',
+  //     city: currentAddress?.city || '',
+  //     state: currentAddress?.state || '',
+  //     postalCode: currentAddress?.postalCode || '',
+  //     countryId: currentAddress?.countryId || 0,
+  //     countryCode: country?.code || currentAddress?.countryCode || '',
+  //     countryIdName: currentAddress?.countryIdName || '',
+  //     contactEmail: currentAddress?.contactEmail,
+  //     contactPhone: currentAddress?.contactPhone,
+  //     tenantId: currentAddress?.tenantId,
+  //     accountId: currentAddress?.accountId,
+  //     contactAddressId: currentAddress?.contactAddressId,
+  //     useDTOTenant: currentAddress?.useDTOTenant,
+  //     id: currentAddress?.id || this.generateNewId()
+  //   });
 
-    this.selectedAddress = updatedContactAddressDto as any;
-    this.selectedAddressDetails = updatedContactAddressDto;
-    this.selectedAddressText = this.getAddressText(updatedContactAddressDto);
+  //   this.selectedAddress = updatedContactAddressDto as any;
+  //   this.selectedAddressDetails = updatedContactAddressDto;
+  //   this.selectedAddressText = this.getAddressText(updatedContactAddressDto);
 
-    this.showAddList = false;
+  //   this.showAddList = false;
 
-    if (
-      this.appTransactionsForViewDto?.buyerCompanySSIN === '' ||
-      this.appTransactionsForViewDto?.buyerCompanySSIN === null
-    ) {
-      if (
-        this.currentTab === TransactionCartoccordionTabs.ShippingInfo &&
-        this.shipInfoIndex === 2
-      ) {
-        this.addAddressDataToDto(2);
-      } else if (
-        this.currentTab === TransactionCartoccordionTabs.BillingInfo &&
-        this.billingIndexInfo === 1
-      ) {
-        this.addAddressDataToDto(1);
-      }
-    }
+  //   if (
+  //     this.appTransactionsForViewDto?.buyerCompanySSIN === '' ||
+  //     this.appTransactionsForViewDto?.buyerCompanySSIN === null
+  //   ) {
+  //     if (
+  //       this.currentTab === TransactionCartoccordionTabs.ShippingInfo &&
+  //       this.shipInfoIndex === 2
+  //     ) {
+  //       this.addAddressDataToDto(2);
+  //     } else if (
+  //       this.currentTab === TransactionCartoccordionTabs.BillingInfo &&
+  //       this.billingIndexInfo === 1
+  //     ) {
+  //       this.addAddressDataToDto(1);
+  //     }
+  //   }
 
-    this.updateSelectedAddress.emit({
-      id: updatedContactAddressDto.id,
-      code: currentAddress?.code,
-      selectedAddressObj: updatedContactAddressDto
-    });
-  }
+  //   this.updateSelectedAddress.emit({
+  //     id: updatedContactAddressDto.id,
+  //     code: currentAddress?.code,
+  //     selectedAddressObj: updatedContactAddressDto
+  //   });
+  // }
   ngOnDestroy() {
     this.unsubscribeToAllSubscriptions();
 

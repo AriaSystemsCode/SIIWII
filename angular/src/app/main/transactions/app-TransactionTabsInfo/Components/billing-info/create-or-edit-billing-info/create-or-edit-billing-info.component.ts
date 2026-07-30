@@ -39,8 +39,8 @@ contactIdApContact: string | number | null = null;
   cancelBtn: boolean = false;
   saveBtn: boolean = false;
   isAccManual: boolean = false
-  apContactdata;
-  arContactdata;
+apContactdata: any = null;
+arContactdata: any = null;
 
   subscriptions: Subscription[] = [];
   constructor(
@@ -413,6 +413,69 @@ reloadAddresscomponentARContact(data) {
     this.appTransactionsForViewDto.availableDate = moment.utc(moment(availableDate).format('YYYY-MM-DD'));
     this.appTransactionsForViewDto.completeDate = moment.utc(moment(completeDate).format('YYYY-MM-DD'));
   }
+
+  get apCompanySsin(): string | null {
+    return (
+        this.apContactdata?.compssin ??
+        this.appTransactionsForViewDto
+            ?.appTransactionContacts
+            ?.find(
+                contact =>
+                    contact.contactRole ===
+                    ContactRoleEnum.APContact
+            )
+            ?.companySSIN ??
+        null
+    );
+}
+
+get arCompanySsin(): string | null {
+    return (
+        this.arContactdata?.compssin ??
+        this.appTransactionsForViewDto
+            ?.appTransactionContacts
+            ?.find(
+                contact =>
+                    contact.contactRole ===
+                    ContactRoleEnum.ARContact
+            )
+            ?.companySSIN ??
+        null
+    );
+}
+
+get apBranchSsin(): string | null {
+    const contact =
+        this.appTransactionsForViewDto
+            ?.appTransactionContacts
+            ?.find(
+                item =>
+                    item.contactRole ===
+                    ContactRoleEnum.APContact
+            );
+
+    return (
+        this.apContactdata?.branchSsin ??
+        contact?.branchSSIN ??
+        null
+    );
+}
+get arBranchSsin(): string | null {
+    const contact =
+        this.appTransactionsForViewDto
+            ?.appTransactionContacts
+            ?.find(
+                item =>
+                    item.contactRole ===
+                    ContactRoleEnum.ARContact
+            );
+
+    return (
+        this.arContactdata?.branchSsin ??
+        contact?.branchSSIN ??
+        null
+    );
+}
   ngOnDestroy() {
     this.unsubscribeToAllSubscriptions();
 
