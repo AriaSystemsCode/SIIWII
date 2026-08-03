@@ -21,12 +21,43 @@
         </div>
 
         <div [ngClass]="createOrEditBillingInfo ?  'd-block' : 'd-none'">
-            <app-address [isCreateOredit]="createOrEditBillingInfo" [contactId]="contactIdApContact"
-                (updateSelectedAddress)="updateApContact($event)" [selectedAddressDetails]="apContactSelectedAdd"
-                [showAddBtn]="!(appTransactionsForViewDto?.entityObjectTypeCode == 'SALESORDER' && !isAccManual) || (appTransactionsForViewDto?.entityObjectTypeCode == 'SALESORDER' && (appTransactionsForViewDto?.buyerCompanySSIN == '' || appTransactionsForViewDto?.buyerCompanySSIN == null)  ) || (appTransactionsForViewDto?.entityObjectTypeCode == 'I\'m an Independent Sales Rep.' && (appTransactionsForViewDto?.buyerCompanySSIN == '' || appTransactionsForViewDto?.buyerCompanySSIN == null)  ) || (appTransactionsForViewDto?.entityObjectTypeCode == 'PURCHASEORDER' && isAccManual) ? true : false"
-                [showAddressType]="false" [currentTab]="currentTab"
-                [appTransactionsForViewDto]="appTransactionsForViewDto" [billingIndexInfo]="1" [canChange]="canChange"
-                [currentTab]="currentTab" [appTransactionsForViewDto]="appTransactionsForViewDto"></app-address>
+          <app-address
+    [isCreateOredit]="createOrEditBillingInfo"
+    [contactId]="contactIdApContact"
+    (updateSelectedAddress)="updateApContact($event)"
+    [selectedAddressDetails]="apContactSelectedAdd"
+
+    [showAddBtn]="
+        !(appTransactionsForViewDto?.entityObjectTypeCode == 'SALESORDER' && !isAccManual) ||
+        (
+            appTransactionsForViewDto?.entityObjectTypeCode == 'SALESORDER' &&
+            (
+                appTransactionsForViewDto?.buyerCompanySSIN == '' ||
+                appTransactionsForViewDto?.buyerCompanySSIN == null
+            )
+        ) ||
+        (
+            appTransactionsForViewDto?.entityObjectTypeCode == 'I\'m an Independent Sales Rep.' &&
+            (
+                appTransactionsForViewDto?.buyerCompanySSIN == '' ||
+                appTransactionsForViewDto?.buyerCompanySSIN == null
+            )
+        ) ||
+        (
+            appTransactionsForViewDto?.entityObjectTypeCode == 'PURCHASEORDER' &&
+            isAccManual
+        )
+    "
+
+    [showAddressType]="false"
+    [currentTab]="currentTab"
+    [appTransactionsForViewDto]="appTransactionsForViewDto"
+    [billingIndexInfo]="1"
+    [canChange]="canChange"
+
+    [companySsin]="apContactdata?.compssin"
+    [branchSsin]="apContactdata?.branchSsin">
+</app-address>
         </div>
 
         <div class="container-fluid pt-1" [ngClass]="createOrEditBillingInfo   ?  'd-block' : 'd-none'">
@@ -48,10 +79,20 @@
 
 
         <div [ngClass]="createOrEditBillingInfo ?  'd-block' : 'd-none'">
-            <app-address [isCreateOredit]="createOrEditBillingInfo" [contactId]="contactIdARContact"
-                (updateSelectedAddress)="updateArContact($event)" [selectedAddressDetails]="arContactSelectedAdd"
-                [showAddressType]="false" [currentTab]="currentTab" [billingIndexInfo]="2"
-                [appTransactionsForViewDto]="appTransactionsForViewDto" [canChange]="canChange"></app-address>
+         <app-address
+    [isCreateOredit]="createOrEditBillingInfo"
+    [contactId]="contactIdARContact"
+    (updateSelectedAddress)="updateArContact($event)"
+    [selectedAddressDetails]="arContactSelectedAdd"
+    [showAddressType]="false"
+    [currentTab]="currentTab"
+    [billingIndexInfo]="2"
+    [appTransactionsForViewDto]="appTransactionsForViewDto"
+    [canChange]="canChange"
+
+    [companySsin]="arContactdata?.compssin"
+    [branchSsin]="arContactdata?.branchSsin">
+</app-address>
         </div>
         <div class="container-fluid pt-1 mb-3 mt-3" [ngClass]="createOrEditBillingInfo   ?  'd-block' : 'd-none'">
             <div class="header p-2 my-2 d-flex justify-content-between">

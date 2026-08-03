@@ -398,10 +398,10 @@ namespace onetouch.Message
                 }
                 //MMT
                 filteredMessages = _AppMarketplaceMessagesRepository.GetAll()
-                                   .Include(x => x.EntityFk).ThenInclude(x => x.EntityClassifications)
-                                   .Include(x => x.EntityFk).ThenInclude(x => x.EntityObjectStatusFk)
+                                   .AsNoTracking()
+                                   .AsSplitQuery()
                                    .Include(x => x.ParentFKList).ThenInclude(x => x.EntityFk)
-                                   .Include(x => x.ParentFKList).ThenInclude(z => z.ParentFKList).Include(x => x.EntityFk)
+                                   .Include(x => x.ParentFKList).ThenInclude(z => z.ParentFKList)
                                    .Include(x => x.EntityFk).ThenInclude(x => x.EntitiesRelationships)
                                    .Include(x => x.EntityFk).ThenInclude(x => x.RelatedEntitiesRelationships)
                             //Iteration37-MMT[Start]
@@ -410,8 +410,8 @@ namespace onetouch.Message
                             //Iteration37-MMT[End]
 
                             .WhereIf(input.MainComponentEntitlyId != null && input.MainComponentEntitlyId != 0,
-                                e => e.EntityFk.EntitiesRelationships.Where(ee => ee.RelatedEntityId == (long)input.MainComponentEntitlyId).Count() > 0 ||
-                                     e.EntityFk.RelatedEntitiesRelationships.Where(ee => ee.EntityId == (long)input.MainComponentEntitlyId).Count() > 0)
+                                e => e.EntityFk.EntitiesRelationships.Any(ee => ee.RelatedEntityId == (long)input.MainComponentEntitlyId) ||
+                                     e.EntityFk.RelatedEntitiesRelationships.Any(ee => ee.EntityId == (long)input.MainComponentEntitlyId))
 
                             .WhereIf(input.ParentId == null || input.ParentId == 0, e => e.ParentId == null)
                             .WhereIf(input.ParentId != null && input.ParentId >= 0, e => e.ParentId == input.ParentId)
@@ -468,15 +468,15 @@ namespace onetouch.Message
                 if (orgComponentId != null && orgComponentId != 0 && orgComponentId != input.MainComponentEntitlyId)
                 {
                     var filteredMessages2 = _MessagesRepository.GetAll()
-                                                     .Include(x => x.EntityFk).ThenInclude(x => x.EntityClassifications)
-                                                     .Include(x => x.EntityFk).ThenInclude(x => x.EntityObjectStatusFk)
+                                                     .AsNoTracking()
+                                                     .AsSplitQuery()
                                                      .Include(x => x.ParentFKList).ThenInclude(x => x.EntityFk)
-                                                     .Include(x => x.ParentFKList).ThenInclude(z => z.ParentFKList).Include(x => x.EntityFk)
+                                                     .Include(x => x.ParentFKList).ThenInclude(z => z.ParentFKList)
                                                      .Include(x => x.EntityFk).ThenInclude(x => x.EntitiesRelationships)
                                                      .Include(x => x.EntityFk).ThenInclude(x => x.RelatedEntitiesRelationships)
                                               .WhereIf(orgComponentId != null && orgComponentId != 0,
-                                                  e => e.EntityFk.EntitiesRelationships.Where(ee => ee.RelatedEntityId == (long)orgComponentId).Count() > 0 ||
-                                                       e.EntityFk.RelatedEntitiesRelationships.Where(ee => ee.EntityId == (long)orgComponentId).Count() > 0)
+                                                  e => e.EntityFk.EntitiesRelationships.Any(ee => ee.RelatedEntityId == (long)orgComponentId) ||
+                                                       e.EntityFk.RelatedEntitiesRelationships.Any(ee => ee.EntityId == (long)orgComponentId))
 
                                               .WhereIf(input.ParentId == null || input.ParentId == 0, e => e.ParentId == null)
                                               .WhereIf(input.ParentId != null && input.ParentId >= 0, e => e.ParentId == input.ParentId)
@@ -566,10 +566,22 @@ namespace onetouch.Message
                     //results.AddRange(results2);
                 }
                 //MMT
+                var senderIds = results
+                    .Where(x => x.Messages.SenderId.HasValue)
+                    .Select(x => x.Messages.SenderId.Value)
+                    .Distinct()
+                    .ToList();
+                var profilePictureIds = await UserManager.Users
+                    .AsNoTracking()
+                    .Where(y => senderIds.Contains(y.Id))
+                    .Select(y => new { y.Id, y.ProfilePictureId })
+                    .ToDictionaryAsync(y => y.Id, y => y.ProfilePictureId);
+
                 foreach (var x in results)
                 {
-                    var profilePictureId = UserManager.Users.FirstOrDefault(y => y.Id == x.Messages.SenderId).ProfilePictureId;
-                    if (profilePictureId != null)
+                    if (x.Messages.SenderId.HasValue &&
+                        profilePictureIds.TryGetValue(x.Messages.SenderId.Value, out var profilePictureId) &&
+                        profilePictureId != null)
                     { x.Messages.ProfilePictureId = (Guid)profilePictureId; }
                     if (x.Messages.ParentFKList != null && x.Messages.ParentFKList.Count > 0)
                     {

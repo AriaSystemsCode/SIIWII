@@ -7336,6 +7336,25 @@ namespace onetouch.AppSiiwiiTransaction
                             }
                         }
                     }
+
+                    // Buyer/Seller transaction rows can represent the company only, so
+                    // ContactSSIN is null while CompanySSIN identifies the tenant account.
+                    // Fall back to that account-level match when no person contact matched.
+                    if (returnObj.ContactRole == null && !string.IsNullOrEmpty(myAccount.SSIN))
+                    {
+                        var accountContact = transactionContacts.FirstOrDefault(cont =>
+                            cont.CompanySSIN == myAccount.SSIN &&
+                            (cont.ContactRole == ContactRoleEnum.Buyer.ToString() ||
+                             cont.ContactRole == ContactRoleEnum.Seller.ToString() ||
+                             cont.ContactRole == ContactRoleEnum.SalesRep1.ToString() ||
+                             cont.ContactRole == ContactRoleEnum.SalesRep2.ToString()));
+
+                        if (accountContact != null)
+                        {
+                            returnObj.ContactRole = accountContact.ContactRole;
+                            returnObj.ContactName = accountContact.ContactName ?? myAccount.Name;
+                        }
+                    }
                 }
                 return returnObj;
             }

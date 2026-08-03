@@ -25,7 +25,8 @@
         [showAddBtn]="(appTransactionsForViewDto?.entityObjectTypeCode == 'PURCHASEORDER' && !isAccManual) || ((appTransactionsForViewDto?.enteredByUserRole == 'I\'m an Independent Sales Rep.') && !isAccManual)  ? false : true"
         [contactId]="contactIdShipFrom" (updateSelectedAddress)="updateShipFromAddress($event)"
         [selectedAddressDetails]="shipFromSelectedAdd" [showAddressType]="false" [canChange]="canChange"
-        [currentTab]="currentTab" [shipInfoIndex]="1"></app-address>
+        [currentTab]="currentTab" [shipInfoIndex]="1" [companySsin]="shipFromData?.compssin"
+    [branchSsin]="shipFromData?.branchSsin"></app-address>
     </div>
     <div class="container-fluid pt-1" [ngClass]="createOrEditshippingInfO   ?  'd-block' : 'd-none'">
       <div class="header p-2 my-2 d-flex  justify-content-between">
@@ -52,7 +53,8 @@
         [showAddBtn]="!(appTransactionsForViewDto?.entityObjectTypeCode == 'SALESORDER' && !isAccManual) || (appTransactionsForViewDto?.entityObjectTypeCode == 'SALESORDER' && (appTransactionsForViewDto?.buyerCompanySSIN == '' || appTransactionsForViewDto?.buyerCompanySSIN == null)  ) || (appTransactionsForViewDto?.entityObjectTypeCode == 'I\'m an Independent Sales Rep.' && (appTransactionsForViewDto?.buyerCompanySSIN == '' || appTransactionsForViewDto?.buyerCompanySSIN == null)  ) ? true : false"
         [isCreateOredit]="createOrEditshippingInfO" [contactId]="contactIdShipTo"
         (updateSelectedAddress)="updateShipToAddress($event)" [selectedAddressDetails]="shipToSelectedAdd"
-        [showAddressType]="false"></app-address>
+        [showAddressType]="false"   [companySsin]="shipToData?.compssin"
+    [branchSsin]="shipToData?.branchSsin"></app-address>
     </div>
 
     <div class="row edit-mode " [ngClass]="createOrEditshippingInfO   ?  'd-block' : 'd-none'">

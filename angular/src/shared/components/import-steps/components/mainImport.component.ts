@@ -1240,7 +1240,13 @@ export class MainImportComponent
         }
          _ImportItemInputDto = this.mapRecordToImportItemInputDto(record)
          
-        this.importServiceProxy.validateImportItemData(_ImportItemInputDto)
+        // Call this endpoint directly so the DTO is always sent in the request body.
+        // Older generated proxies treated the argument as an `index` query parameter,
+        // which serialized the record as `index=[object Object]` and caused HTTP 400.
+        this._httpClient.post<ImportItemReturnDto[]>(
+            AppConsts.remoteServiceBaseUrl + "/api/services/app/AppItems/ValidateImportItemData",
+            _ImportItemInputDto
+        )
             .subscribe((result: ImportItemReturnDto[]) => {
                 const hasErrors = Array.isArray(result) && result.length > 0;
 
