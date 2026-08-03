@@ -335,7 +335,10 @@ namespace onetouch.AppMarketplaceItems
                         x.EntityExtraData,
                         x.EntityCategories,
                         x.ItemSharingFkList,
-                        x.EntityAttachments,
+                        DefaultAttachmentFile = x.EntityAttachments
+                            .OrderByDescending(a => a.IsDefault)
+                            .Select(a => a.AttachmentFk.Attachment)
+                            .FirstOrDefault(),
                         x.ItemPricesFkList,
                         x.TenantOwner,
                         x.SSIN,
@@ -453,10 +456,9 @@ namespace onetouch.AppMarketplaceItems
                 var materializedAppItems = rawAppItems.Select(o =>
                 {
                     var price = ResolveMarketplacePrice(o.Item.ItemPricesFkList, "MSRP", input.CurrencyCode, exchangeRate, null, o.SellerCurrencyCode, $"GetAll;Id={o.Item.Id};Name={o.Item.Name};Manufacturer={o.Item.ManufacturerCode};Seller={o.SellerName}");
-                    var defaultAttachment = o.Item.EntityAttachments.FirstOrDefault(x => x.IsDefault == true) ?? o.Item.EntityAttachments.FirstOrDefault();
-                    var imageUrl = defaultAttachment == null || defaultAttachment.AttachmentFk == null || string.IsNullOrEmpty(defaultAttachment.AttachmentFk.Attachment)
+                    var imageUrl = string.IsNullOrEmpty(o.Item.DefaultAttachmentFile)
                         ? ""
-                        : "attachments/" + (o.Item.TenantId.HasValue ? o.Item.TenantId : -1) + "/" + defaultAttachment.AttachmentFk.Attachment;
+                        : "attachments/" + (o.Item.TenantId.HasValue ? o.Item.TenantId : -1) + "/" + o.Item.DefaultAttachmentFile;
 
                     return new GetAppMarketItemForViewDto()
                     {
