@@ -686,9 +686,24 @@ namespace onetouch.AppSiiwiiTransaction
                 //I46[End]
                 //Iteration#37 -MMT [Start]
                 #region read defaults for shipvia and payment terms from contact and account default
-                if(input.SellerRelationId != null)
-                {
-                    var relationInfo = await _appContactRelationshipInfoRepository.GetAll().Include(e=> e.EntityExtraData).Where(z => z.Id == input.SellerRelationId).FirstOrDefaultAsync();
+                //if(input.SellerRelationId != null)
+                //{
+                //    var relationInfo = await _appContactRelationshipInfoRepository.GetAll().Include(e=> e.EntityExtraData).Where(z => z.Id == input.SellerRelationId).FirstOrDefaultAsync();
+                if (!string.IsNullOrEmpty(input.SellerCompanySSIN) && !string.IsNullOrEmpty(input.BuyerCompanySSIN))
+                    {
+                    var activeRelationshipStatusId = await _helper.SystemTables.GetEntityObjectStatusRelationshipActive();
+                    var relationInfo = await _appContactRelationshipInfoRepository.GetAll()
+                        .Include(e => e.EntityExtraData)
+                        .Where(z =>((z.RequesterContactSSIN== input.SellerCompanySSIN && 
+                                    z.RecipientContactSSIN==input.BuyerCompanySSIN &&
+                                    z.RequesterMarketplaceRole ==ContactRoleEnum.Seller.ToString() &&
+                                    z.RecipientMarketplaceRole== ContactRoleEnum.Buyer.ToString()) || 
+                                    (z.RequesterContactSSIN == input.BuyerCompanySSIN  &&
+                                    z.RecipientContactSSIN == input.SellerCompanySSIN &&
+                                    z.RequesterMarketplaceRole == ContactRoleEnum.Buyer.ToString() &&
+                                    z.RecipientMarketplaceRole == ContactRoleEnum.Seller.ToString()))
+                                    && z.EntityObjectStatusId == activeRelationshipStatusId)
+                        .FirstOrDefaultAsync();
                     if (relationInfo != null)
                     {
                         if (relationInfo.EntityExtraData != null)
