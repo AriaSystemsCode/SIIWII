@@ -35,7 +35,7 @@ export class SelectCategoriesDynamicModalComponent
     active: boolean = false;
     loading: boolean;
     entityObjectName: string = "Product";
-    entityObjectDisplayName: string = "Product Categories";
+    entityObjectDisplayName: string = "ProductCategories";
     isDepartment: boolean = false;
     isHiddenToCreateOrEdit: boolean = false;
     maxResultCount: number = 10;

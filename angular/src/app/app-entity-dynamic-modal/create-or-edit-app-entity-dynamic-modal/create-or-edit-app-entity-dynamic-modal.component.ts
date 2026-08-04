@@ -707,7 +707,9 @@ isArabic: boolean = false;
 
     openCreateAppEntityListModal(extraAttr: FilteredExtraAttribute) {
         let config: ModalOptions = new ModalOptions();
-        config.class = "right-modal slide-right-in";
+        config.class = this.isArabic
+            ? "left-modal slide-left-in ngLeft"
+            : "right-modal slide-right-in";
         let modalDefaultData: Partial<AppEntityListDynamicModalComponent> = {
             entityObjectType: {
                 name: extraAttr.name,

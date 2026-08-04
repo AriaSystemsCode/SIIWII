@@ -27,7 +27,7 @@ export class SelectClassificationDynamicModalComponent extends AppComponentBase 
     active: boolean = false;
     loading: boolean;
     entityObjectName: string = "Product"
-    entityObjectDisplayName: string = "Product Classifications"
+    entityObjectDisplayName: string = "ProductClassifications"
     isHiddenToCreateOrEdit: boolean = false
     maxResultCount: number = 10
     skipCount: number = 0

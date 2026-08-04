@@ -169,7 +169,11 @@ export class AppEntityListDynamicModalComponent extends AppComponentBase impleme
     }
 
     close(){
-        this.currentModalRef.setClass('right-modal slide-right-out')
+        this.currentModalRef.setClass(
+            this.isArabic
+                ? 'left-modal slide-left-out ngLeft'
+                : 'right-modal slide-right-out'
+        )
         this.selectionDone = false
         this.currentModalRef.hide()
     }
