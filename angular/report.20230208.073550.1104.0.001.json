@@ -16,7 +16,7 @@
       "--host",
       "0.0.0.0",
       "--port",
-      "4241"
+      "4249"
     ],
     "nodejsVersion": "v12.13.0",
     "wordSize": 64,
@@ -91,7 +91,7 @@
       {
         "model": "Intel(R) Xeon(R) CPU E5-2609 v3 @ 1.90GHz",
         "speed": 1898,
-        "user": 106424112,
+        "user": 106424912,
         "nice": 0,
         "sys": 75931078,
         "idle": 1833413468,
@@ -120,7 +120,7 @@
         "speed": 1898,
         "user": 112283484,
         "nice": 0,
-        "sys": 79924241,
+        "sys": 79924249,
         "idle": 1823557171,
         "irq": 514421
       }
@@ -248,7 +248,7 @@
     },
     {
       "pc": "0x00007ff6c61727fc",
-      "symbol": "v8::internal::SetupIsolateDelegate::SetupHeap+42414"
+      "symbol": "v8::internal::SetupIsolateDelegate::SetupHeap+42494"
     },
     {
       "pc": "0x0000018b026c2342",
@@ -488,7 +488,7 @@
     "npm_config_viewer": "browser",
     "npm_execpath": "C:\\Program Files\\nodejs\\node_modules\\npm\\bin\\npm-cli.js",
     "npm_lifecycle_event": "start-dev",
-    "npm_lifecycle_script": "ng serve --host 0.0.0.0 --port 4241",
+    "npm_lifecycle_script": "ng serve --host 0.0.0.0 --port 4249",
     "npm_node_execpath": "C:\\Program Files\\nodejs\\node.exe",
     "npm_package_dependencies_abp_ng2_module": "^6.0.0",
     "npm_package_dependencies_abp_web_resources": "^5.2.0",
@@ -597,14 +597,14 @@
     "npm_package_scripts_compodoc": "npx compodoc -p tsconfig.doc.json",
     "npm_package_scripts_create_dynamic_bundles": "gulp buildDev",
     "npm_package_scripts_e2e": "gulp buildDev && protractor",
-    "npm_package_scripts_hmr": "gulp buildDev && ng serve --host 0.0.0.0 --port 4241 --hmr",
+    "npm_package_scripts_hmr": "gulp buildDev && ng serve --host 0.0.0.0 --port 4249 --hmr",
     "npm_package_scripts_ng": "ng",
     "npm_package_scripts_nswag": "cd nswag/ && refresh.bat",
     "npm_package_scripts_pree2e": "webdriver-manager update --standalone false --gecko false",
     "npm_package_scripts_prepublish": "npm --no-git-tag-version version patch",
     "npm_package_scripts_publish": "gulp build && ng build --prod",
-    "npm_package_scripts_start": "gulp buildDev && ng serve --host 0.0.0.0 --port 4241",
-    "npm_package_scripts_start_dev": "ng serve --host 0.0.0.0 --port 4241",
+    "npm_package_scripts_start": "gulp buildDev && ng serve --host 0.0.0.0 --port 4249",
+    "npm_package_scripts_start_dev": "ng serve --host 0.0.0.0 --port 4249",
     "npm_package_scripts_test": "gulp buildDev && ng test",
     "npm_package_version": "8.7.10",
     "NPM_PREFIX_NPM_CLI_JS": "C:\\Users\\mariam\\AppData\\Roaming\\npm\\node_modules\\npm\\bin\\npm-cli.js",
