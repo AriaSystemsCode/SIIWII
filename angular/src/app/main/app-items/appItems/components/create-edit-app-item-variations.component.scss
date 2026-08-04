@@ -181,20 +181,42 @@ label.checkbox {
 
 
 .primeng-datatable-container {
-    max-height: 540px;
+  max-height: 540px;
   overflow-x: auto;
-  overflow-y: visible;
+  overflow-y: auto;
     .row-item {
         background-color: $white !important;;
         border: 1px solid #ECECEC !important;
         height: 60px;
-        width: 200px !important;
+        min-width: 140px;
+        width: auto !important;
+        max-width: 240px;
         border-radius: 8px !important;
     }
     font: normal normal normal 13px/20px Poppins;
 }
 
 
+
+.variation-table-scroll-wrapper {
+    position: relative;
+}
+
+.top-scrollbar {
+    position: sticky;
+    top: 0;
+    z-index: 12;
+    overflow-x: auto;
+    overflow-y: hidden;
+    background: #fff;
+    border-bottom: 1px solid #ececec;
+    height: 18px;
+}
+
+.top-scrollbar .scrollbar-inner {
+    height: 1px;
+    width: 100%;
+}
 
 .primeng-datatable-container .active {
     border-bottom: 2px solid $primary-color;
@@ -354,11 +376,24 @@ a.nav-link.active {
 }
 
 .price-header-cell {
-  display: ruby;
+  display: table-cell;
   border: 0 !important;
+  vertical-align: top;
+  min-width: 280px;
+  white-space: normal;
 
   .d-flex.justify-content-between.align-items-baseline {
-    gap: 0.5rem;
+   // gap: 0.5rem;
+    //flex-wrap: wrap;
+  }
+
+  .price-filter-col {
+    flex: 1 1 48%;
+    min-width: 120px;
+  }
+
+  .aria-select-primeng {
+    width: 100% !important;
   }
 }
 
@@ -370,6 +405,17 @@ a.nav-link.active {
 
 .create-var-btn {
   position: absolute;
+  background-color: $purple !important;
+  color: #fff !important;
+  border: none !important;
+  padding:12px !important;
+  font-weight: 600;
+  border-radius: 8px !important;
+  box-shadow: 0 6px 18px rgba(74,13,74,0.12);
+  transform: translateY(0);
+  transition: transform 120ms ease, box-shadow 120ms ease;
+  z-index: 50;
+  line-height: 1;
 }
 
 .tab-item-dark,

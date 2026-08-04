@@ -636,9 +636,8 @@
                                         <button type="button" class="btn btn-outline-primary edit-variations-btn"
                                             (click)="showCreateOrEditVariationPage()">{{ 'EditVariations' |
                                             localize}}</button>
-                                        <button type="button" class="btn btn-outline-hover-danger "
-                                            *ngIf="listingMode === undefined" (click)="removeAllVariations()"
-                                            class="remove-all-btn">{{
+                                        <button type="button" class="btn remove-all-btn edit-variations-btn"
+                                            *ngIf="listingMode === undefined" (click)="removeAllVariations()">{{
                                             'RemoveAll' | localize}}</button>
                                     </div>
                                 </div>
