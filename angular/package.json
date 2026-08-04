@@ -1,7 +1,7 @@
 {
   "name": "siwii",
   "uniqueName": "SIWII",
-  "version": "8.7.60",
+  "version": "8.7.61",
   "license": "MIT",
   "angular-cli": {},
   "scripts": {
@@ -38,6 +38,7 @@
     "@ng-select/ng-select": "^11.0.0",
     "@schematics/angular": "^16.1.0",
     "@swimlane/ngx-charts": "^20.1.2",
+    "@syncfusion/ej2-angular-spreadsheet": "^20.4.38",
     "@types/file-saver": "^2.0.1",
     "abp-ng2-module": "^8.0.0",
     "abp-web-resources": "^5.2.0",
@@ -95,7 +96,7 @@
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "^15.2.11",
-    "@angular/cli": "^16.1.0",
+    "@angular/cli": "15.2.11",
     "@angular/compiler-cli": "^15.2.2",
     "@angularclass/hmr": "^3.0.0",
     "@angularclass/hmr-loader": "^3.0.4",
@@ -105,6 +106,8 @@
     "@types/lodash": "^4.14.149",
     "@types/moment-timezone": "^0.5.13",
     "@types/node": "^18.15.2",
+    "ajv": "^8.12.0",
+    "ajv-formats": "^2.1.1",
     "codelyzer": "^0.0.28",
     "gulp": "^3.9.1",
     "gulp-clean-css": "^4.3.0",
@@ -126,10 +129,6 @@
     "protractor": "^3.3.0",
     "ts-node": "^10.9.1",
     "tslint": "~6.1.0",
-    "typescript": "4.9.5",
-    "webpack": "^5.106.2"
-  },
-  "resolutions": {
-    "webpack": "^5.0.0"
+    "typescript": "4.9.5"
   }
 }

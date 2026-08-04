@@ -6,7 +6,10 @@ import { environment } from './environments/environment';
 import { hmrBootstrap } from './hmr';
 import './polyfills.ts';
 import { RootModule } from './root.module';
+import { registerLicense } from '@syncfusion/ej2-base';
 
+
+registerLicense('Ngo9BigBOggjHTQxAR8/V1JAaF5cX2pCd0x0WmFZfVhgfV9EZFZVRWYuP1ZhSXxVdk1jWn9Xc3FURWVYUEF9XEY=');
 export function getBaseUrl() {
     return document.getElementsByTagName('base')[0].href;
   }

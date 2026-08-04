@@ -222,3 +222,52 @@
     text-align: start !important ;
     }
 
+
+
+
+:host ::ng-deep
+.transaction-spreadsheet-dialog
+.p-dialog-content {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden !important;
+}
+
+.spreadsheet-page {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.spreadsheet-actions {
+    flex: 0 0 auto;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 15px;
+    border-bottom: 1px solid #ddd;
+}
+
+.spreadsheet-container {
+    flex: 1 1 auto;
+    min-height: 0;
+    width: 100%;
+    overflow: hidden;
+}
+
+.spreadsheet-record-count {
+    margin-left: auto;
+    color: #777;
+}
+
+:host ::ng-deep .spreadsheet-container .e-spreadsheet {
+    height: 100% !important;
+}
+
+:host ::ng-deep .spreadsheet-container .e-sheet {
+    height: 100% !important;
+}

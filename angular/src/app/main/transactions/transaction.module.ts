@@ -66,6 +66,7 @@ import { CreateOrEditBuyerSellerContactInfoComponent } from './app-TransactionTa
 import { ViewBuyerSellerContactInfoComponent } from './app-TransactionTabsInfo/Components/buyer-seller-contact-info/view-buyer-seller-contact-info/view-buyer-seller-contact-info.component';
 import { CreateOrEditSalesRepInfoComponent } from './app-TransactionTabsInfo/Components/salesRep-info/create-or-edit-salesRep-info/create-or-edit-sales-rep-info.component';
 import { ViewSalesRepInfoComponent } from './app-TransactionTabsInfo/Components/salesRep-info/view-salesRep-info/view-sales-rep-info.component';
+import { SpreadsheetAllModule } from '@syncfusion/ej2-angular-spreadsheet';
 
 
 @NgModule({
@@ -145,7 +146,8 @@ import { ViewSalesRepInfoComponent } from './app-TransactionTabsInfo/Components/
         TabViewModule,
         SharedDynamicInputsModule,
         InteractionsModule,
-        NotesModule
+        NotesModule,
+        SpreadsheetAllModule
 
     ],
     exports: [
