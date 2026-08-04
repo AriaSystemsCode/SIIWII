@@ -98,8 +98,7 @@ export class SelectRelatedItemDynamicModalComponent extends AppComponentBase imp
                     let currentLoadedItemsAfterExludingSelections: TreeNodeOfGetSycEntityObjectCategoryForViewDto[] =
                         [];
                     this.totalCount = result.totalCount;
-                    debugger
-                   // number of items excluded from current page - savedIds
+                    // number of items excluded from current page - savedIds
                 const excludedFromCurrentPage = this.savedIds?.length
                     ? result.items.filter(i =>
                         this.savedIds.includes(i.data.sycEntityObjectCategory.id)
@@ -134,10 +133,22 @@ export class SelectRelatedItemDynamicModalComponent extends AppComponentBase imp
                         currentLoadedItemsAfterExludingSelections =
                             result.items;
                     }
-                    this.lastSelectedRecords = this.selectedRecords;
-                   /*  if (isFirstPage && !this.searchQuery) {
-                        this.selectedRecords = [];
-                    } */
+
+                    const previousSelectedRecords = [...this.selectedRecords];
+                    const currentPageItemIds = new Set(
+                        currentLoadedItemsAfterExludingSelections.map(
+                            (item) => item.data.sycEntityObjectCategory.id
+                        )
+                    );
+
+                    this.lastSelectedRecords = previousSelectedRecords;
+                    this.selectedRecords = previousSelectedRecords.filter(
+                        (item) =>
+                            !currentPageItemIds.has(
+                                item.data.sycEntityObjectCategory.id
+                            )
+                    );
+
                     currentLoadedItemsAfterExludingSelections.map((record) => {
                         const cachedItem: TreeNodeOfGetSycEntityObjectCategoryForViewDto =
                             this.loadedChildrenRecords.filter(
@@ -196,7 +207,7 @@ export class SelectRelatedItemDynamicModalComponent extends AppComponentBase imp
 
         if (!item.children || item.children.length === 0) {
             // If the node has no children and is selected, add it directly to the selected records
-            this.selectedRecords.push(item);
+            this.addSelectedRecord(item);
         } else {
             // If the node has children, recursively check selection for child nodes
             let allChildrenSelected = true;
@@ -209,13 +220,25 @@ export class SelectRelatedItemDynamicModalComponent extends AppComponentBase imp
 
             if (!allChildrenSelected) {
                 // If not all children are selected, add the parent node to the selected records
-                this.selectedRecords.push(item);
+                this.addSelectedRecord(item);
             }
 
             // Recursively check selection for child nodes
             item.children.forEach((childItem) => {
                 this.checkItemSelection(childItem);
             });
+        }
+    }
+
+    private addSelectedRecord(
+        item: TreeNodeOfGetSycEntityObjectCategoryForViewDto
+    ) {
+        const itemId = item.data.sycEntityObjectCategory.id;
+        const alreadyAdded = this.selectedRecords.some(
+            (record) => record.data.sycEntityObjectCategory.id === itemId
+        );
+        if (!alreadyAdded) {
+            this.selectedRecords.push(item);
         }
     }
     close() {
