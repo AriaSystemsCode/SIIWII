@@ -160,7 +160,7 @@ export class SizeScaleComponent extends AppComponentBase implements OnChanges, O
   openAppEntityListModal(dimension:1|2|3) {
     let config : ModalOptions = new ModalOptions()
     const acceptMultiValues = true
-   this.isArabic ? config.class = 'left-modal slide-left-in ngLeft' :  config.class = 'right-modal slide-right-in'
+    config.class = this.isArabic ? 'left-modal slide-left-in' : 'right-modal slide-right-in'
     let selectedRecords = []
     switch (dimension) {
       case 1:
