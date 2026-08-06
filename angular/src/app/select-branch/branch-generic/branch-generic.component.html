@@ -1,0 +1,286 @@
+<div
+  *ngIf="entity"
+  class="branch-generic-content">
+
+  <p-accordion>
+
+    <p-accordionTab
+      header="{{
+        'BranchInformation'
+          | localize
+      }}"
+      [selected]="true">
+
+      <div class="branch-form">
+
+        <div class="branch-form-row">
+
+          <label>
+            {{ 'TradeName' | localize }}:
+          </label>
+
+          <input
+            type="text"
+            class="form-control"
+            [(ngModel)]="
+              entity.tradeName
+            "
+            [readonly]="isViewMode" />
+
+        </div>
+
+        <div class="branch-form-row">
+
+          <label>
+            {{ 'Email' | localize }}:
+          </label>
+
+          <input
+            type="email"
+            class="form-control"
+            [(ngModel)]="
+              entity.eMailAddress
+            "
+            [readonly]="isViewMode" />
+
+        </div>
+
+        <div class="branch-form-row">
+
+          <label>
+            {{ 'Website' | localize }}:
+          </label>
+
+          <input
+            type="text"
+            class="form-control"
+            [(ngModel)]="
+              entity.website
+            "
+            [readonly]="isViewMode" />
+
+        </div>
+
+        <div class="branch-form-row">
+
+          <label>
+            {{ 'Language' | localize }}:
+          </label>
+
+          <p-dropdown
+            [options]="allLanguages"
+            [(ngModel)]="
+              entity.languageId
+            "
+            optionLabel="label"
+            optionValue="value"
+            [disabled]="isViewMode"
+            appendTo="body">
+          </p-dropdown>
+
+        </div>
+
+        <div class="branch-form-row">
+
+          <label>
+            {{ 'Currency' | localize }}:
+          </label>
+
+          <p-dropdown
+            [options]="allCurrencies"
+            [(ngModel)]="
+              entity.currencyId
+            "
+            optionLabel="label"
+            optionValue="value"
+            [disabled]="isViewMode"
+            appendTo="body">
+          </p-dropdown>
+
+        </div>
+
+      </div>
+
+    </p-accordionTab>
+
+    <p-accordionTab
+      header="{{
+        'ContactInformation'
+          | localize
+      }}">
+
+      <div class="branch-phone-row">
+
+        <label>
+          {{ 'Phone' | localize }}:
+        </label>
+
+        <p-dropdown
+          [options]="allPhoneTypes"
+          [(ngModel)]="
+            entity.phone1TypeId
+          "
+          optionLabel="label"
+          optionValue="value"
+          [disabled]="isViewMode"
+          appendTo="body">
+        </p-dropdown>
+
+        <input
+          type="text"
+          class="form-control"
+          [(ngModel)]="
+            entity.phone1Number
+          "
+          [readonly]="isViewMode" />
+
+        <input
+          type="text"
+          class="form-control"
+          [(ngModel)]="
+            entity.phone1Ext
+          "
+          placeholder="{{
+            'Extension' | localize
+          }}"
+          [readonly]="isViewMode" />
+
+      </div>
+
+      <div class="branch-phone-row">
+
+        <label>
+          {{ 'Phone' | localize }}:
+        </label>
+
+        <p-dropdown
+          [options]="allPhoneTypes"
+          [(ngModel)]="
+            entity.phone2TypeId
+          "
+          optionLabel="label"
+          optionValue="value"
+          [disabled]="isViewMode"
+          appendTo="body">
+        </p-dropdown>
+
+        <input
+          type="text"
+          class="form-control"
+          [(ngModel)]="
+            entity.phone2Number
+          "
+          [readonly]="isViewMode" />
+
+        <input
+          type="text"
+          class="form-control"
+          [(ngModel)]="
+            entity.phone2Ext
+          "
+          placeholder="{{
+            'Extension' | localize
+          }}"
+          [readonly]="isViewMode" />
+
+      </div>
+
+      <div class="branch-phone-row">
+
+        <label>
+          {{ 'Phone' | localize }}:
+        </label>
+
+        <p-dropdown
+          [options]="allPhoneTypes"
+          [(ngModel)]="
+            entity.phone3TypeId
+          "
+          optionLabel="label"
+          optionValue="value"
+          [disabled]="isViewMode"
+          appendTo="body">
+        </p-dropdown>
+
+        <input
+          type="text"
+          class="form-control"
+          [(ngModel)]="
+            entity.phone3Number
+          "
+          [readonly]="isViewMode" />
+
+        <input
+          type="text"
+          class="form-control"
+          [(ngModel)]="
+            entity.phone3Ext
+          "
+          placeholder="{{
+            'Extension' | localize
+          }}"
+          [readonly]="isViewMode" />
+
+      </div>
+
+    </p-accordionTab>
+
+    <p-accordionTab
+      header="{{
+        'Addresses'
+          | localize
+      }}">
+
+      <div
+        *ngIf="
+          entity.contactAddresses
+            ?.length;
+          else noAddresses
+        "
+        class="branch-address-list">
+
+        <div
+          *ngFor="
+            let address of
+              entity.contactAddresses
+          "
+          class="branch-address-card">
+
+          <strong>
+            {{ address.name }}
+          </strong>
+
+          <div>
+            {{ address.addressLine1 }}
+          </div>
+
+          <div>
+            {{ address.addressLine2 }}
+          </div>
+
+          <div>
+            {{ address.city }}
+            {{ address.state }}
+            {{ address.postalCode }}
+          </div>
+
+        </div>
+
+      </div>
+
+      <ng-template #noAddresses>
+
+        <div class="text-muted py-3">
+          {{
+            'NoAddressesAvailable'
+              | localize
+          }}
+        </div>
+
+      </ng-template>
+
+    </p-accordionTab>
+
+  </p-accordion>
+
+</div>

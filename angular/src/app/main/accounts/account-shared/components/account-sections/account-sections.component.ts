@@ -44,8 +44,17 @@ export class AccountSectionsComponent
   @Input() entityData: any;
   @Input() mode: EntityMode = 'view';
 
+
+  @Input()
+fieldPermissions:
+  Record<string, boolean> = {};
+
+@Input()
+sectionPermissions:
+  Record<string, boolean> = {};
+
   account: any = {};
-  mainBranch: any = {};
+  // mainBranch: any = {};
 
   allLanguages: LookupLabelDto[] = [];
   allCurrencies: CurrencyInfoDto[] = [];
@@ -145,86 +154,134 @@ trackByValue(index: number, value: string): string {
   return value || index.toString();
 }
 
-
+mainBranch
 private setAccountData(data: any): void {
-  this.entityData = data;
-  this.account = data?.account ?? {};
+  if (!data?.account) {
+    this.entityData = null;
+    this.account = {};
+    this.mainBranch = {};
+    this.connectionsInfo = [];
 
-  const branch =
-    this.account?.branches?.[0]?.data?.branch;
-
-  // View API keeps these values inside main branch.
-  if (branch) {
-    this.account.tradeName ??=
-      branch.tradeName;
-
-    this.account.languageId ??=
-      branch.languageId;
-
-    this.account.currencyId ??=
-      branch.currencyId;
-
-    this.account.phone1TypeId ??=
-      branch.phone1TypeId;
-
-    this.account.phone1Number ??=
-      branch.phone1Number;
-
-    this.account.phone1Ex ??=
-      branch.phone1Ex ??
-      branch.phone1Ext;
-
-    this.account.phone2TypeId ??=
-      branch.phone2TypeId;
-
-    this.account.phone2Number ??=
-      branch.phone2Number;
-
-    this.account.phone2Ex ??=
-      branch.phone2Ex ??
-      branch.phone2Ext;
-
-    this.account.phone3TypeId ??=
-      branch.phone3TypeId;
-
-    this.account.phone3Number ??=
-      branch.phone3Number;
-
-    this.account.phone3Ex ??=
-      branch.phone3Ex ??
-      branch.phone3Ext;
+    return;
   }
 
+  this.entityData = data;
+  this.account = data.account;
+
+  /*
+   * No branch fallback.
+   */
   this.mainBranch = this.account;
 
+  this.account.categories ??= [];
+  this.account.classfications ??= [];
+  this.account.imagesUrls ??= [];
+
+  this.account.entityAttachments ??= [];
+  this.account.entityCategories ??= [];
+  this.account.entityClassifications ??= [];
+
+  const existingExtraData =
+    data.entityExtraData ??
+    this.account.entityExtraData ??
+    [];
+
+  this.account.entityExtraData =
+    existingExtraData;
+
+  this.entityData.entityExtraData =
+    existingExtraData;
+
+  this.connectionsInfo =
+    data.connectionsInfo ?? [];
+
   this.roleEntityObjectTypeId =
-    this.account?.accountTypeId;
+    this.account.accountTypeId ?? null;
 
   this.loadedAccountId =
-    this.account?.id ??
+    this.account.id ??
     this.accountId ??
     null;
 
-  this.connectionsInfo =
-    data?.connectionsInfo ??
-    this.account?.connectionsInfo ??
-    [];
-
   this.initializeAccountFields();
+  this.initializeSelectedBusinessData();
 
   if (this.roleEntityObjectTypeId) {
     this.initializeRolesSection();
+  } else {
+    // this.resetRoleData();
   }
 
   if (
     this.mode !== 'create' &&
-    this.connectionsInfo?.length
+    this.connectionsInfo.length
   ) {
     this.initializeRelationshipSection();
   } else {
     this.resetRelationshipData();
   }
 }
+
+
+private initializeSelectedBusinessData():
+  void {
+
+  this.account.entityCategories =
+    Array.isArray(
+      this.account
+        .entityCategories
+    )
+      ? this.account
+          .entityCategories
+      : [];
+
+  this.account
+    .entityClassifications =
+    Array.isArray(
+      this.account
+        .entityClassifications
+    )
+      ? this.account
+          .entityClassifications
+      : [];
+
+  this.categoriesIds =
+    this.account
+      .entityCategories
+      .map(item =>
+        Number(
+          item
+            .entityObjectCategoryId
+        )
+      )
+      .filter(id => id > 0);
+
+  this.classificationsIds =
+    this.account
+      .entityClassifications
+      .map(item =>
+        Number(
+          item
+            .entityObjectClassificationId
+        )
+      )
+      .filter(id => id > 0);
+}
+
+
+private initializeBusinessSelections(): void {
+  this.categoriesIds = (this.account.entityCategories ?? [])
+    .map(item => Number(item.entityObjectCategoryId))
+    .filter(id => id > 0);
+
+  this.classificationsIds =
+    (this.account.entityClassifications ?? [])
+      .map(item =>
+        Number(item.entityObjectClassificationId)
+      )
+      .filter(id => id > 0);
+}
+
 
 
 private initializeAccountFields(): void {
@@ -371,10 +428,7 @@ const matchedValues =
         };
       },
       error: error => {
-        console.error(
-          'Failed to load role attributes:',
-          error
-        );
+   
 
         this.roleAttributes = [];
         this.roleExtraAttributeObject = null;
@@ -408,13 +462,6 @@ private parseMultiSelectValue(
     .map(option => option.trim())
     .filter(Boolean);
 
-  /*
-   * Safest method:
-   * find which valid options exist in the stored string.
-   *
-   * Stored:
-   * Buyer-Seller-Sales Rep-Buying Office
-   */
   if (options.length) {
     return options.filter(option => {
       const escapedOption =
@@ -824,32 +871,7 @@ private groupRelationshipAttributesByUsage(
     {}
   );
 }
-  private createEmptyMainBranch(): any {
-    return {
-      tradeName: '',
 
-      languageId: null,
-      languageName: '',
-
-      currencyId: null,
-      currencyName: '',
-
-      phone1TypeId: null,
-      phone1TypeName: '',
-      phone1Number: '',
-      phone1Ext: '',
-
-      phone2TypeId: null,
-      phone2TypeName: '',
-      phone2Number: '',
-      phone2Ext: '',
-
-      phone3TypeId: null,
-      phone3TypeName: '',
-      phone3Number: '',
-      phone3Ext: ''
-    };
-  }
 
   getAccountDataForView(): void {
     if (!this.accountId) {
@@ -911,104 +933,144 @@ private groupRelationshipAttributesByUsage(
     return roleExtraData?.entityObjectTypeId ?? null;
   }
 
-  onRoleExtraAttributesChanged(
+
+onRoleExtraAttributesChanged(
   changedAttributes: any[]
 ): void {
+  if (!this.canEditSection('roles')) {
+    return;
+  }
 
   if (!this.roleDynamicInputsForViewDto) {
     this.roleDynamicInputsForViewDto =
       new GetAppEntityForEditOutput();
   }
 
-  if (!this.roleDynamicInputsForViewDto.entityExtraData) {
-    this.roleDynamicInputsForViewDto.entityExtraData = [];
-  }
+  this.roleDynamicInputsForViewDto
+    .entityExtraData ??= [];
 
   const existingData =
-    this.roleDynamicInputsForViewDto.entityExtraData;
+    this.roleDynamicInputsForViewDto
+      .entityExtraData;
 
-  const incomingData: AppEntityExtraDataDto[] =
-    (changedAttributes ?? []).flatMap(attribute => {
+  const incomingData:
+    AppEntityExtraDataDto[] =
+      (changedAttributes ?? []).map(
+        attribute => {
+          const dto =
+            new AppEntityExtraDataDto();
 
-      if (
-        attribute.isLookup &&
-        attribute.acceptMultipleValues
-      ) {
-        return (attribute.value ?? []).map(value => {
-          const dto = new AppEntityExtraDataDto();
+          dto.attributeId =
+            attribute.attributeId;
 
-          dto.attributeId = attribute.attributeId;
           dto.entityObjectTypeId =
             this.roleEntityObjectTypeId;
 
+          /*
+           * Use the AppEntity ID.
+           */
           dto.entityid =
-            this.account?.id ??
-            this.accountId;
+            this.account?.entityId ??
+            null;
 
-          dto.attributeValueId = value;
+          const isMultiSelect =
+            attribute
+              .acceptMultipleValues === true ||
+            String(attribute.dataType)
+              .toUpperCase() ===
+              'MULTISELECTDROPDOWNLIST';
+
+          if (isMultiSelect) {
+            const values =
+              Array.isArray(attribute.value)
+                ? attribute.value
+                : attribute.value
+                  ? [attribute.value]
+                  : [];
+
+            /*
+             * Backend expects a string,
+             * not a JavaScript array.
+             */
+            dto.attributeValue = values
+              .map(value =>
+                typeof value === 'object'
+                  ? value?.value ??
+                    value?.label ??
+                    ''
+                  : value
+              )
+              .filter(Boolean)
+              .join('-');
+
+            dto.attributeValueId = null;
+          } else if (attribute.isLookup) {
+            const parsedValue =
+              Number(attribute.value);
+
+            dto.attributeValueId =
+              Number.isNaN(parsedValue)
+                ? null
+                : parsedValue;
+
+            dto.attributeValue = null;
+          } else {
+            dto.attributeValue =
+              attribute.value ?? '';
+
+            dto.attributeValueId = null;
+          }
 
           return dto;
-        });
-      }
+        }
+      );
 
-      const dto = new AppEntityExtraDataDto();
-
-      dto.attributeId = attribute.attributeId;
-      dto.entityObjectTypeId =
-        this.roleEntityObjectTypeId;
-
-      dto.entityid =
-        this.account?.id ??
-        this.accountId;
-
-      if (attribute.isLookup) {
-        const parsedValue = Number(attribute.value);
-
-        dto.attributeValueId =
-          Number.isNaN(parsedValue)
-            ? null
-            : parsedValue;
-      } else {
-        dto.attributeValue = attribute.value;
-      }
-
-      return [dto];
-    });
-
-  const incomingAttributeIds = new Set(
-    incomingData.map(item => item.attributeId)
-  );
+  const changedAttributeIds =
+    new Set(
+      incomingData.map(
+        item => item.attributeId
+      )
+    );
 
   const remainingExistingData =
     existingData.filter(
       item =>
-        !incomingAttributeIds.has(item.attributeId)
+        !changedAttributeIds.has(
+          item.attributeId
+        )
     );
 
-  this.roleDynamicInputsForViewDto.entityExtraData = [
+  const finalExtraData = [
     ...remainingExistingData,
     ...incomingData
   ];
 
-  /*
-   * Keep the main account view DTO synchronized.
-   */
+  this.roleDynamicInputsForViewDto
+    .entityExtraData = finalExtraData;
+
   this.entityData.entityExtraData =
-    this.roleDynamicInputsForViewDto.entityExtraData;
+    finalExtraData;
+
+  this.account.entityExtraData =
+    finalExtraData;
+
+  this.entityData.__extraDataTouched = true;
 }
+
+
 
 onRoleExtraAttributeCleared(
   attributeId: number
 ): void {
-
   if (
+    !this.canEditSection('roles') ||
     !this.roleDynamicInputsForViewDto
       ?.entityExtraData
   ) {
     return;
   }
 
-  this.roleDynamicInputsForViewDto.entityExtraData =
+  const filteredData =
     this.roleDynamicInputsForViewDto
       .entityExtraData
       .filter(
@@ -1016,48 +1078,16 @@ onRoleExtraAttributeCleared(
           item.attributeId !== attributeId
       );
 
+  this.roleDynamicInputsForViewDto
+    .entityExtraData = filteredData;
+
   this.entityData.entityExtraData =
-    this.roleDynamicInputsForViewDto.entityExtraData;
-}
+    filteredData;
 
-get selectedDepartments():
-  AppEntityCategoryDto[] {
+  this.account.entityExtraData =
+    filteredData;
 
-  return this.account
-    ?.entityCategories ?? [];
-}
-
-get selectedClassifications():
-  AppEntityClassificationDto[] {
-
-  return this.account
-    ?.entityClassifications ?? [];
-}
-
-
-private initializeBusinessSelections(): void {
-  this.account.entityCategories ??= [];
-  this.account.entityClassifications ??= [];
-
-  this.categoriesIds =
-    this.account.entityCategories
-      .map(
-        item =>
-          Number(
-            item.entityObjectCategoryId
-          )
-      )
-      .filter(id => !!id);
-
-  this.classificationsIds =
-    this.account.entityClassifications
-      .map(
-        item =>
-          Number(
-            item.entityObjectClassificationId
-          )
-      )
-      .filter(id => !!id);
+  this.entityData.__extraDataTouched = true;
 }
 
 openSelectCategoriesModal(): void {
@@ -1142,42 +1172,38 @@ private handleSelectedCategories(
 
 
 private addSelectedCategories(
-  selected:
+  selectedNodes:
     TreeNodeOfGetSycEntityObjectCategoryForViewDto[]
 ): void {
 
-  this.account.entityCategories ??= [];
+  this.account
+    .entityCategories ??= [];
 
   const existingIds =
     new Set(
-      this.account.entityCategories.map(
-        item =>
+      this.account
+        .entityCategories
+        .map(item =>
           Number(
-            item.entityObjectCategoryId
+            item
+              .entityObjectCategoryId
           )
-      )
+        )
     );
 
   const newCategories =
-    (selected ?? [])
+    (selectedNodes ?? [])
       .map(node => {
         const category =
           node?.data
             ?.sycEntityObjectCategory;
 
-        if (
-          !category?.id ||
-          existingIds.has(
-            Number(category.id)
-          )
-        ) {
+        if (!category) {
           return null;
         }
 
         const dto =
           new AppEntityCategoryDto();
-
-        dto.id = 0;
 
         dto.entityObjectCategoryId =
           category.id;
@@ -1188,42 +1214,69 @@ private addSelectedCategories(
         dto.entityObjectCategoryName =
           category.name;
 
-        existingIds.add(
-          Number(category.id)
-        );
-
         return dto;
       })
       .filter(
         (
           item
-        ): item is AppEntityCategoryDto =>
-          !!item
+        ): item is
+          AppEntityCategoryDto =>
+          !!item &&
+          !existingIds.has(
+            Number(
+              item
+                .entityObjectCategoryId
+            )
+          )
       );
 
-  this.account.entityCategories = [
-    ...this.account.entityCategories,
-    ...newCategories
-  ];
+  this.account
+    .entityCategories = [
+      ...this.account
+        .entityCategories,
+      ...newCategories
+    ];
 
   this.categoriesIds =
-    this.account.entityCategories.map(
-      item =>
+    this.account
+      .entityCategories
+      .map(item =>
         Number(
-          item.entityObjectCategoryId
+          item
+            .entityObjectCategoryId
         )
-    );
+      )
+      .filter(id => id > 0);
 
-  this.syncBusinessInformation();
+  this.entityData
+    .__categoriesTouched =
+    true;
+
+  this.syncCategoryNames();
 }
-
 removeCategory(
   index: number
 ): void {
 
   if (
-    this.isViewMode ||
-    index < 0
+    !this.canEditSection(
+      'business'
+    )
+  ) {
+    return;
+  }
+
+  const categories =
+    this.account
+      ?.entityCategories;
+
+  if (
+    !Array.isArray(
+      categories
+    ) ||
+    index < 0 ||
+    index >=
+      categories.length
   ) {
     return;
   }
@@ -1239,20 +1292,59 @@ removeCategory(
         return;
       }
 
-      this.account.entityCategories
-        .splice(index, 1);
-
-      this.categoriesIds =
-        this.account.entityCategories.map(
-          item =>
-            Number(
-              item.entityObjectCategoryId
-            )
+      this.account
+        .entityCategories =
+        categories.filter(
+          (
+            _,
+            currentIndex
+          ) =>
+            currentIndex !==
+            index
         );
 
-      this.syncBusinessInformation();
+      this.categoriesIds =
+        this.account
+          .entityCategories
+          .map(item =>
+            Number(
+              item
+                .entityObjectCategoryId
+            )
+          )
+          .filter(id => id > 0);
+
+      /*
+       * This tells buildAccountEditDto()
+       * to send the collection, even if
+       * the user removed everything.
+       */
+      this.entityData
+        .__categoriesTouched =
+        true;
+
+      this.syncCategoryNames();
     }
   );
+}
+
+private syncCategoryNames():
+  void {
+
+  this.account.categories =
+    (
+      this.account
+        .entityCategories ??
+      []
+    )
+      .map(item =>
+        item
+          .entityObjectCategoryName
+      )
+      .filter(Boolean);
+
+  this.entityData.account =
+    this.account;
 }
 
 openSelectClassificationsModal():
@@ -1336,48 +1428,39 @@ private handleSelectedClassifications(
 }
 
 private addSelectedClassifications(
-  selected:
+  selectedNodes:
     TreeNodeOfGetSycEntityObjectClassificationForViewDto[]
 ): void {
 
-  this.account.entityClassifications ??=
+  this.account
+    .entityClassifications ??=
     [];
 
   const existingIds =
     new Set(
       this.account
         .entityClassifications
-        .map(
-          item =>
-            Number(
-              item
-                .entityObjectClassificationId
-            )
+        .map(item =>
+          Number(
+            item
+              .entityObjectClassificationId
+          )
         )
     );
 
   const newClassifications =
-    (selected ?? [])
+    (selectedNodes ?? [])
       .map(node => {
         const classification =
           node?.data
             ?.sycEntityObjectClassification;
 
-        if (
-          !classification?.id ||
-          existingIds.has(
-            Number(
-              classification.id
-            )
-          )
-        ) {
+        if (!classification) {
           return null;
         }
 
         const dto =
           new AppEntityClassificationDto();
-
-        dto.id = 0;
 
         dto.entityObjectClassificationId =
           classification.id;
@@ -1388,38 +1471,45 @@ private addSelectedClassifications(
         dto.entityObjectClassificationName =
           classification.name;
 
-        existingIds.add(
-          Number(
-            classification.id
-          )
-        );
-
         return dto;
       })
       .filter(
         (
           item
-        ): item is AppEntityClassificationDto =>
-          !!item
+        ): item is
+          AppEntityClassificationDto =>
+          !!item &&
+          !existingIds.has(
+            Number(
+              item
+                .entityObjectClassificationId
+            )
+          )
       );
 
-  this.account.entityClassifications = [
-    ...this.account.entityClassifications,
-    ...newClassifications
-  ];
+  this.account
+    .entityClassifications = [
+      ...this.account
+        .entityClassifications,
+      ...newClassifications
+    ];
 
   this.classificationsIds =
     this.account
       .entityClassifications
-      .map(
-        item =>
-          Number(
-            item
-              .entityObjectClassificationId
-          )
-      );
+      .map(item =>
+        Number(
+          item
+            .entityObjectClassificationId
+        )
+      )
+      .filter(id => id > 0);
 
-  this.syncBusinessInformation();
+  this.entityData
+    .__classificationsTouched =
+    true;
+
+  this.syncClassificationNames();
 }
 
 removeClassification(
@@ -1427,8 +1517,24 @@ removeClassification(
 ): void {
 
   if (
-    this.isViewMode ||
-    index < 0
+    !this.canEditSection(
+      'business'
+    )
+  ) {
+    return;
+  }
+
+  const classifications =
+    this.account
+      ?.entityClassifications;
+
+  if (
+    !Array.isArray(
+      classifications
+    ) ||
+    index < 0 ||
+    index >=
+      classifications.length
   ) {
     return;
   }
@@ -1445,39 +1551,62 @@ removeClassification(
       }
 
       this.account
-        .entityClassifications
-        .splice(index, 1);
+        .entityClassifications =
+        classifications.filter(
+          (
+            _,
+            currentIndex
+          ) =>
+            currentIndex !==
+            index
+        );
 
       this.classificationsIds =
         this.account
           .entityClassifications
-          .map(
-            item =>
-              Number(
-                item
-                  .entityObjectClassificationId
-              )
-          );
+          .map(item =>
+            Number(
+              item
+                .entityObjectClassificationId
+            )
+          )
+          .filter(id => id > 0);
 
-      this.syncBusinessInformation();
+      this.entityData
+        .__classificationsTouched =
+        true;
+
+      this.syncClassificationNames();
     }
   );
 }
 
-private syncBusinessInformation():
+
+private syncClassificationNames():
   void {
 
+  this.account.classfications =
+    (
+      this.account
+        .entityClassifications ??
+      []
+    )
+      .map(item =>
+        item
+          .entityObjectClassificationName
+      )
+      .filter(Boolean);
+
+  this.entityData.account =
+    this.account;
+}
+private syncBusinessInformation(): void {
   this.account.entityCategories ??= [];
-  this.account.entityClassifications ??=
-    [];
+  this.account.entityClassifications ??= [];
 
   this.entityData.account =
     this.account;
 
-  /*
-   * Optional display arrays used by
-   * getAccountForView response shape.
-   */
   this.entityData.account.categories =
     this.account.entityCategories.map(
       item =>
@@ -1485,12 +1614,113 @@ private syncBusinessInformation():
     );
 
   this.entityData.account.classfications =
-    this.account
-      .entityClassifications
-      .map(
-        item =>
-          item
-            .entityObjectClassificationName
-      );
+    this.account.entityClassifications.map(
+      item =>
+        item.entityObjectClassificationName
+    );
 }
+
+get selectedDepartments():
+  AppEntityCategoryDto[] {
+
+  return (
+    this.account
+      ?.entityCategories ??
+    []
+  );
+}
+
+get selectedClassifications():
+  AppEntityClassificationDto[] {
+
+  return (
+    this.account
+      ?.entityClassifications ??
+    []
+  );
+}
+
+get isManualAccount(): boolean {
+  return this.account?.isManual === true;
+}
+
+get isConnectedAccount(): boolean {
+  return this.account?.isConnected === true;
+}
+
+get canEditAccountData(): boolean {
+  if (this.mode === 'view') {
+    return false;
+  }
+
+  if (this.mode === 'create') {
+    return true;
+  }
+
+  if (this.mode === 'edit') {
+    return this.isManualAccount &&
+      !this.isConnectedAccount;
+  }
+
+  return false;
+}
+
+get canEditRelationship(): boolean {
+  if (this.mode === 'view') {
+    return false;
+  }
+
+  if (this.mode === 'create') {
+    return false;
+  }
+
+  /*
+   * Connected account:
+   * Relationship is the only editable section.
+   */
+  return this.isConnectedAccount;
+}
+canEditField(fieldName: string): boolean {
+  if (!this.canEditAccountData) {
+    return false;
+  }
+
+  /*
+   * SSIN is never manually editable.
+   */
+  if (fieldName === 'ssin') {
+    return false;
+  }
+
+  /*
+   * Code:
+   * editable only during create.
+   */
+  if (fieldName === 'code') {
+    return this.mode === 'create';
+  }
+
+  return true;
+}
+
+canEditSection(
+  section:
+    'basic' |
+    'business' |
+    'roles' |
+    'relationship'
+): boolean {
+
+  if (section === 'relationship') {
+    return this.canEditRelationship;
+  }
+
+  return this.canEditAccountData;
+}
+
+
+
+
+
+
 }

@@ -1,4 +1,4 @@
-<div class="shell-container">
+<!-- <div class="shell-container">
 
   <div
     class="left-panel-container"
@@ -7,15 +7,22 @@
     ">
 
     <app-entity-left-side-panel
-      [sections]="leftPanelSections"
-      [collapsed]="
-        leftPanelCollapsed
-      "
-      (toggle)="
-        leftPanelCollapsed =
-          !leftPanelCollapsed
-      ">
-    </app-entity-left-side-panel>
+  [sections]="leftPanelSections"
+  [collapsed]="leftPanelCollapsed"
+
+  (toggle)="
+    leftPanelCollapsed =
+      !leftPanelCollapsed
+  "
+
+  (itemSelect)="
+    entityItemSelect.emit($event)
+  "
+
+  (add)="
+    entityItemAdd.emit($event)
+  ">
+</app-entity-left-side-panel>
 
   </div>
 
@@ -65,7 +72,7 @@
   (cancel)="cancel.emit()">
 </app-entity-basic-info>
 
-<div class="content-row">
+<div class="content-row m-3">
 
     <div
         class="main-content-container"
@@ -103,6 +110,197 @@
     </div>
 
 </div>
+  </div>
+
+</div> -->
+<div class="shell-container">
+
+  <!-- ===================================================== -->
+  <!-- LEFT PANEL -->
+  <!-- ===================================================== -->
+
+  <div
+    class="left-panel-container"
+    [class.collapsed]="leftPanelCollapsed">
+
+    <app-entity-left-side-panel
+      [sections]="leftPanelSections"
+      [collapsed]="leftPanelCollapsed"
+
+      (toggle)="
+        leftPanelCollapsed =
+          !leftPanelCollapsed
+      "
+
+      (itemSelect)="
+        selectEntityNode($event)
+      "
+
+      (add)="
+        onEntityItemAdd($event)
+      ">
+    </app-entity-left-side-panel>
+
+  </div>
+
+  <!-- ===================================================== -->
+  <!-- RIGHT SHELL -->
+  <!-- ===================================================== -->
+
+  <div class="right-shell-container">
+
+    <!-- Header -->
+    <app-entity-header
+      [title]="currentTitle"
+      [breadcrumbItems]="currentBreadcrumbItems"
+      [mode]="displayedMode"
+
+      (close)="close.emit()"
+      (minimize)="minimize.emit()">
+    </app-entity-header>
+
+    <!-- =================================================== -->
+    <!-- ACCOUNT / BRANCH BASIC INFO -->
+    <!-- =================================================== -->
+
+    <app-entity-basic-info
+      [entity]="displayedEntity"
+      [entityData]="displayedEntityData"
+      [mode]="displayedMode"
+
+      [entityTypes]="entityTypes"
+      [statuses]="statuses"
+      [fields]="displayedBasicInfoFields"
+
+      [showMedia]="displayedShowMedia"
+
+      [namePath]="displayedNamePath"
+      [accountTypePath]="displayedAccountTypePath"
+      [requireAccountType]="displayedRequireAccountType"
+
+      [logoPath]="logoPath"
+      [coverPath]="coverPath"
+      [imagesPath]="imagesPath"
+      [attachmentsPath]="attachmentsPath"
+
+      [logoAttachmentCategory]="logoAttachmentCategory"
+      [bannerAttachmentCategory]="bannerAttachmentCategory"
+      [imageAttachmentCategory]="imageAttachmentCategory"
+
+      [saving]="displayedSaving"
+      [uploading]="
+        dynamicEntityActive
+          ? false
+          : uploading
+      "
+
+      (entityChange)="
+        onCurrentEntityChange($event)
+      "
+
+      (logoChange)="
+        onRootLogoChange($event)
+      "
+
+      (backgroundChange)="
+        onRootBackgroundChange($event)
+      "
+
+      (imageChange)="
+        onRootImageChange($event)
+      "
+
+      (attachmentRemove)="
+        onRootAttachmentRemove($event)
+      "
+
+      (edit)="editCurrentEntity()"
+      (save)="saveCurrentEntity()"
+      (cancel)="cancelCurrentEntity()">
+    </app-entity-basic-info>
+
+    <!-- =================================================== -->
+    <!-- CONTENT -->
+    <!-- =================================================== -->
+
+    <div class="content-row m-3">
+
+      <div
+        class="main-content-container"
+        [class.expanded]="rightPanelCollapsed">
+
+        <!-- Account projected content -->
+        <div
+          class="root-entity-content"
+          [hidden]="dynamicEntityActive">
+
+          <ng-content
+            select="[entity-main-content]">
+          </ng-content>
+
+        </div>
+
+        <!-- Dynamic entity loading -->
+        <div
+          *ngIf="
+            dynamicEntityActive &&
+            displayedLoading
+          "
+          class="text-center py-5">
+
+          <i class="fa fa-spinner fa-spin"></i>
+
+        </div>
+
+        <!--
+          This host must always exist.
+
+          When the branch is selected,
+          BranchGenericComponent is created here.
+        -->
+        <div
+          class="dynamic-entity-content"
+          [hidden]="!dynamicEntityActive">
+
+          <ng-template #entityComponentHost>
+          </ng-template>
+
+        </div>
+
+      </div>
+
+      <!-- ================================================= -->
+      <!-- RIGHT PANEL -->
+      <!-- ================================================= -->
+
+      <div
+        class="right-panel-wrapper"
+        [class.collapsed]="rightPanelCollapsed">
+
+        <button
+          type="button"
+          class="panel-toggle-btn"
+          (click)="toggleRightPanel()">
+
+          <i
+            class="fa"
+            [ngClass]="
+              rightPanelCollapsed
+                ? 'fa-chevron-left'
+                : 'fa-chevron-right'
+            ">
+          </i>
+
+        </button>
+
+        <app-entity-right-panel
+          *ngIf="!rightPanelCollapsed">
+        </app-entity-right-panel>
+
+      </div>
+
+    </div>
+
   </div>
 
 </div>

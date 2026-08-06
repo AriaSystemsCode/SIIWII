@@ -15,43 +15,14 @@ import {
 } from '@shared/service-proxies/service-proxies';
 
 import {
-  EntityBasicInfoField
+  EntityBasicInfoField,
+  EntityImageRemoveEvent,
+  EntityImageSlot,
+  EntityImageUploadEvent,
+  EntityMode,
+  ImageUploadComponentOutput
 } from '../models/generic-entity.model';
 
-export type EntityMode =
-  'create' |
-  'edit' |
-  'view';
-
-export type EntityAttachmentType =
-  'LOGO' |
-  'BANNER' |
-  'IMAGE';
-
-export interface ImageUploadComponentOutput {
-  image: string | null;
-  file: File;
-}
-
-export interface EntityImageUploadEvent {
-  file: File;
-  previewUrl: string | null;
-  attachmentType: EntityAttachmentType;
-  index?: number;
-  existingAttachment?: any;
-}
-
-export interface EntityImageRemoveEvent {
-  attachmentType: EntityAttachmentType;
-  index?: number;
-  attachment?: any;
-}
-
-export interface EntityImageSlot {
-  previewUrl: string | null;
-  file: File | null;
-  attachment: any;
-}
 
 @Component({
   selector: 'app-entity-basic-info',
@@ -61,24 +32,21 @@ export interface EntityImageSlot {
 export class EntityBasicInfoComponent
   implements OnChanges, OnDestroy {
 
-  /*
-   * Main entity data.
-   *
-   * Expected example:
-   *
-   * {
-   *   account: CreateOrEditAccountInfoDto,
-   *   entityExtraData: [],
-   *   connectionsInfo: []
-   * }
-   */
+ 
+  @Input()
+fieldPermissions:
+  Record<string, boolean> = {};
   @Input() entityData: any;
 
   @Input() entity: any;
 
   @Input()
   mode: EntityMode = 'view';
+@Input()
+requireAccountType = true;
 
+  @Input()
+showMedia = true;
   /*
    * Generic fields rendered at the top.
    */
@@ -342,28 +310,6 @@ imagesPath = 'account.imagesUrls';
     );
   }
 
-  /**
-   * Basic required-field validation.
-   */
-  get isBasicInfoValid():
-    boolean {
-
-    const name =
-      this.getValue(
-        this.namePath
-      );
-
-    const accountTypeId =
-      this.getValue(
-        this.accountTypePath
-      );
-
-    return (
-      typeof name === 'string' &&
-      !!name.trim() &&
-      !!accountTypeId
-    );
-  }
 
   /**
    * View mode -> Edit mode.
@@ -981,6 +927,128 @@ this.additionalImageSlots =
   return this.additionalImageSlots;
 }
 
+isFieldVisible(
+  field: EntityBasicInfoField
+): boolean {
+
+  if (
+    this.mode === 'create' &&
+    field.hiddenInCreate
+  ) {
+    return false;
+  }
+
+  if (
+    this.mode === 'edit' &&
+    field.hiddenInEdit
+  ) {
+    return false;
+  }
+
+  if (
+    this.mode === 'view' &&
+    field.hiddenInView
+  ) {
+    return false;
+  }
+
+  return true;
+}
+
+
+
+get account(): any {
+  return this.entityData?.account ?? {};
+}
+
+get isManualAccount(): boolean {
+  return this.account?.isManual === true;
+}
+
+get isConnectedAccount(): boolean {
+  return this.account?.isConnected === true;
+}
+
+isFieldDisabled(
+  field: EntityBasicInfoField
+): boolean {
+
+  if (this.mode === 'view') {
+    return true;
+  }
+
+  if (field.readonly) {
+    return true;
+  }
+
+  if (
+    field.key in this.fieldPermissions &&
+    this.fieldPermissions[field.key] === false
+  ) {
+    return true;
+  }
+
+  // Create: Code editable, SSIN remains readonly.
+  if (this.mode === 'create') {
+    return field.key === 'ssin';
+  }
+
+  // Connected account: no basic fields editable.
+  if (
+    this.mode === 'edit' &&
+    this.isConnectedAccount
+  ) {
+    return true;
+  }
+
+  // Manual account: everything except Code and SSIN.
+  if (
+    this.mode === 'edit' &&
+    this.isManualAccount
+  ) {
+    return (
+      field.key === 'code' ||
+      field.key === 'ssin'
+    );
+  }
+
+  return true;
+}
+
+get canEditImages(): boolean {
+  if (this.mode === 'create') {
+    return true;
+  }
+
+  return (
+    this.mode === 'edit' &&
+    this.isManualAccount &&
+    !this.isConnectedAccount
+  );
+}
+
+get isBasicInfoValid(): boolean {
+  const name =
+    this.getValue(this.namePath);
+
+  if (
+    typeof name !== 'string' ||
+    !name.trim()
+  ) {
+    return false;
+  }
+
+  if (!this.requireAccountType) {
+    return true;
+  }
+
+  const accountTypeId =
+    this.getValue(
+      this.accountTypePath
+    );
+
+  return !!accountTypeId;
+}
   ngOnDestroy(): void {
     this.clearLocalImages();
   }

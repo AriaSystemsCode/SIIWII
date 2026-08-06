@@ -40,6 +40,8 @@ export class dynamicInputs extends AppComponentBase implements OnInit, OnChanges
   warningMsg: string = "";
   isInitializing = true;
 
+  @Input()
+canChange = true;
   public constructor(
     private _tokenService: TokenService,
     private dynamicApi: DynamicApiDispatcherService,

@@ -474,31 +474,7 @@ NOT CARDS VIEW MODE
 </p-dialog>
 
 
-
-<!-- <app-generic-entity-modal [(visible)]="showGenericEntityModal">
-
-<app-generic-entity-shell
-  [entity]="accountBasicInfo"
-  [entityType]="'Account'"
-[title]="'View ' + account?.account?.name + (account?.account?.isManual ? ' (Manual Account)' : '')"
- [breadcrumbItems]="[
-  { label: account?.account?.name }
-]"
-  [mode]="'view'"
-  [entityTypes]="accountTypes"
-  [statuses]="statuses" [entityData]="account">
-
-  <app-account-sections
-    entity-main-content
-    [accountId]="selectedAccountId"
-    [mode]="'view'" [entityData]="account">
-  </app-account-sections>
-
-</app-generic-entity-shell>
-
-</app-generic-entity-modal> -->
-
-
+<!-- 
 <app-generic-entity-modal
   [(visible)]="showGenericEntityModal">
 
@@ -520,7 +496,7 @@ NOT CARDS VIEW MODE
         label: accountViewData?.account?.name
       }
     ]"
-    [mode]="'view'"
+[mode]="entityMode"
     [entityTypes]="accountTypes"
     [statuses]="statuses"
     [entityData]="accountViewData"
@@ -534,7 +510,78 @@ NOT CARDS VIEW MODE
     <app-account-sections
       entity-main-content
       [accountId]="selectedAccountId"
-      [mode]="'view'"
+     [mode]="entityMode"
+      [entityData]="accountViewData">
+    </app-account-sections>
+
+  </app-generic-entity-shell>
+
+</app-generic-entity-modal> -->
+
+<app-generic-entity-modal
+  [(visible)]="showGenericEntityModal">
+
+  <app-generic-entity-shell
+    *ngIf="accountViewData"
+
+    [entity]="accountViewData?.account"
+    [entityType]="'Account'"
+
+    [title]="
+      (entityMode === 'edit' ? 'Edit ' : 'View ') +
+      accountViewData?.account?.name +
+      (
+        accountViewData?.account?.isManual
+          ? ' (Manual Account)'
+          : ''
+      )
+    "
+
+    [breadcrumbItems]="[
+      {
+        label: accountViewData?.account?.name
+      }
+    ]"
+
+    [mode]="entityMode"
+    [entityTypes]="accountTypes"
+    [statuses]="statuses"
+    [entityData]="accountViewData"
+    [basicInfoFields]="accountBasicInfoFields"
+
+    [saving]="saving"
+    [uploading]="uploadingImages"
+
+    [logoPath]="'account.logoUrl'"
+    [coverPath]="'account.coverUrl'"
+    [imagesPath]="'account.imagesUrls'"
+    [attachmentsPath]="'account.entityAttachments'"
+
+    [logoAttachmentCategory]="logoAttachmentCategory"
+    [bannerAttachmentCategory]="bannerAttachmentCategory"
+    [imageAttachmentCategory]="imageAttachmentCategory"
+
+        [leftPanelSections]="leftPanelSections"
+
+    (entityChange)="accountViewData = $event"
+
+    (logoChange)="onLogoChange($event)"
+    (backgroundChange)="onBackgroundChange($event)"
+    (imageChange)="onImagesChange($event)"
+    (attachmentRemove)="onAttachmentRemove($event)"
+    (dynamicEntitySaved)="
+      onDynamicEntitySaved($event)
+    "
+
+    (edit)="enableEditMode()"
+    (cancel)="cancelEdit()"
+    (save)="saveAccount()"
+    (close)="closeGenericEntityModal()">
+
+    <app-account-sections
+      entity-main-content
+      [accountId]="selectedAccountId"
+      [mode]="entityMode"
       [entityData]="accountViewData">
     </app-account-sections>
 

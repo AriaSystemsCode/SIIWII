@@ -8,10 +8,13 @@ import { AppCommonModule } from '@app/shared/common/app-common.module';
 import { UtilsModule } from '@shared/utils/utils.module';
 import { ModalModule } from 'ngx-bootstrap/modal';
 import { TreeModule } from 'primeng/tree';
+import { BranchGenericComponent } from './branch-generic/branch-generic.component';
+import { AccordionModule } from 'primeng/accordion';
+import { DropdownModule } from 'primeng/dropdown';
 
 
 @NgModule({
-  declarations: [SelectBranchModalComponent],
+  declarations: [SelectBranchModalComponent,BranchGenericComponent],
   imports: [
     ModalModule.forRoot(),
     CommonModule,
@@ -22,7 +25,9 @@ import { TreeModule } from 'primeng/tree';
     UtilsModule,
     FormsModule,
     ReactiveFormsModule,
+    AccordionModule,
+      DropdownModule,
   ],
-  exports : [SelectBranchModalComponent]
+  exports : [SelectBranchModalComponent,BranchGenericComponent]
 })
 export class SelectBranchModule { }

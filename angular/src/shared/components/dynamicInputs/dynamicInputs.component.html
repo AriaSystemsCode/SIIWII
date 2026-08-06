@@ -22,7 +22,7 @@
                                [options]="extraAttr.paginationSetting.list"
                                [styleClass]="'w-100'"
                                    [(ngModel)]="extraAttr.selectedValues"
-                               name="extraAttr_{{extraAttr.name}}"
+                               name="extraAttr_{{extraAttr.name}}"   [disabled]="!canChange"
                                [placeholder]="('Select') + ' ' + (extraAttr.name | localize)">
                 </p-multiSelect>
               </div>
@@ -35,10 +35,10 @@
                 <div class="form-check" *ngFor="let item of extraAttr.paginationSetting.list">
                   <input class="form-check-input" type="checkbox"
                          [id]="'checkbox_' + extraAttr.name + '_' + item.value"
-                         [value]="item.value"
+                         [value]="item.value" [disabled]="!canChange"
                          [checked]="isArray(extraAttr.selectedValues) && extraAttr.selectedValues.includes(item.value)"
                          (change)="onCheckboxChange($event.target.checked, item.value, extraAttr)" />
-                  <label class="form-check-label"
+                  <label class="form-check-label"   
                          [for]="'checkbox_' + extraAttr.name + '_' + item.value">
                     {{ item.label | localize }}
                   </label>
@@ -52,7 +52,7 @@
               <p-dropdown (onChange)="onDropdownChange(extraAttr)"
                           [options]="extraAttr.paginationSetting.list"
                           [styleClass]="'w-100'"
-                              [(ngModel)]="extraAttr.selectedValues"
+                              [(ngModel)]="extraAttr.selectedValues"   [disabled]="!canChange"
                           name="extraAttr_{{extraAttr.name}}"
                           [placeholder]="('Select') + ' ' + (extraAttr.name| localize)">
               </p-dropdown>
@@ -71,7 +71,7 @@
                             optionValue="value"
                             name="extraAttr_{{extraAttr.name}}"
                             (onClick)="onDropdownClick(extraAttr)"
-                            class="w-100 searchableDropdown"
+                            class="w-100 searchableDropdown"   [disabled]="!canChange"
                             (onChange)="onDropdownChange(extraAttr)">
                   <ng-template let-item pTemplate="item">
                     <div *ngIf="item.isLoadMore; else normalItem"
@@ -97,7 +97,7 @@
                             filterBy="label"
                             [showClear]="true"
                             (onClick)="onDropdownClick(extraAttr)"
-                            class="w-100 searchableDropdown"
+                            class="w-100 searchableDropdown"   [disabled]="!canChange"
                             (onChange)="onDropdownChange(extraAttr)">
                   <ng-template let-item pTemplate="item">
                     <div *ngIf="item.isLoadMore; else normalItem"
@@ -118,7 +118,7 @@
               <input type="text" name="{{extraAttr.name}}"
                      placeholder="{{extraAttr.name| localize}}"
                      class="form-control"
-                         [(ngModel)]="extraAttr.selectedValues"
+                         [(ngModel)]="extraAttr.selectedValues"   [disabled]="!canChange"
                      (ngModelChange)="onAnyInputChange()" />
               <i class="pi pi-times position-absolute" style="right: 10px; top: 15px; cursor: pointer;"
                  *ngIf="extraAttr.selectedValues" (click)="clearExtraAttr(extraAttr)"></i>
@@ -135,19 +135,19 @@
                            [name]="'extraAttr_' + getSafeString(extraAttr.name)"
                            [id]="'extraAttr_' + getSafeString(extraAttr.name) + '_' + getSafeString(option)"
                            [value]="option"
-                               [(ngModel)]="extraAttr.selectedValues"
+                               [(ngModel)]="extraAttr.selectedValues"   [disabled]="!canChange"
                            (ngModelChange)="onAnyInputChange()" />
                     {{ option | localize }}
                   </label>
                 </ng-container>
                 <ng-template #yesNoBlock>
                   <label class="radio radio-accent radio-primary mr-4" [for]="'extraAttr' + extraAttr.name + '_yes'">
-                    <input type="radio" [name]="'extraAttr_' + extraAttr.name" [id]="'extraAttr' + extraAttr.name + '_yes'"
+                    <input type="radio" [name]="'extraAttr_' + extraAttr.name" [id]="'extraAttr' + extraAttr.name + '_yes'"   [disabled]="!canChange"
                            value="true"     [(ngModel)]="extraAttr.selectedValues" (ngModelChange)="onAnyInputChange()" />
                     {{ "Yes" | localize }}
                   </label>
                   <label class="radio radio-accent radio-primary" [for]="'extraAttr' + extraAttr.name + '_no'">
-                    <input type="radio" [name]="'extraAttr_' + extraAttr.name" [id]="'extraAttr' + extraAttr.name + '_no'"
+                    <input type="radio" [name]="'extraAttr_' + extraAttr.name" [id]="'extraAttr' + extraAttr.name + '_no'"   [disabled]="!canChange"
                            value="false"     [(ngModel)]="extraAttr.selectedValues" (ngModelChange)="onAnyInputChange()" />
                     {{ "No" | localize }}
                   </label>
@@ -159,7 +159,7 @@
             <!-- Color picker -->
             <div class="flex-grow-1 position-relative d-flex align-items-center gap-2"
                  *ngIf="extraAttr.dataType === 'color'">
-              <input type="color" class="form-control form-control-color col-1"
+              <input type="color" class="form-control form-control-color col-1"   [disabled]="!canChange"
                          [(ngModel)]="extraAttr.selectedValues" (ngModelChange)="onAnyInputChange()" />
               <span>{{ extraAttr.selectedValues | localize }}</span>
               <i class="pi pi-times" style="cursor: pointer;" *ngIf="extraAttr.selectedValues"
@@ -174,7 +174,7 @@
                   <span class="upload-text">Upload File</span>
                 </div>
                 <small class="upload-note">*Select a JPG | JPEG | PNG | GIF File</small>
-                <input type="file" #fileInput class="d-none" accept=".jpg,.jpeg,.png,.gif"
+                <input type="file" #fileInput class="d-none" accept=".jpg,.jpeg,.png,.gif"   [disabled]="!canChange"
                        (change)="onFileSelected($event, extraAttr)" />
               </div>
               <div *ngIf="extraAttr.selectedValues">
@@ -218,7 +218,7 @@
     extraAttr.dataType?.toLowerCase() === 'datetime' ||
     extraAttr.dataType?.toLowerCase() === 'date'">
               <p-calendar #calendarRef     [(ngModel)]="extraAttr.selectedValues" [showIcon]="false"
-                          [showOtherMonths]="true" [selectOtherMonths]="true"
+                          [showOtherMonths]="true" [selectOtherMonths]="true"   [disabled]="!canChange"
                           placeholder="{{extraAttr.name| localize}}" (ngModelChange)="onAnyInputChange()" appendTo="body"
                           [inputStyle]="{'border': '1px solid #EEEEEE','border-radius':'8px','height':'44px'}" styleClass="w-100">
               </p-calendar>
@@ -233,7 +233,7 @@
     <input
         type="number"
         name="{{extraAttr.name}}"
-        placeholder="{{extraAttr.name | localize}}"
+        placeholder="{{extraAttr.name | localize}}"   [disabled]="!canChange"
         class="form-control"
         [ngClass]="extraAttr.selectedValues ? 'has-clear-icon' : ''"
         id="extraAttr{{extraAttr.name}}"
@@ -274,7 +274,7 @@
       (extraAttr.name | localize)
     "
 
-
+  [disabled]="!canChange"
     (onChange)="onAnyInputChange()">
 
 
@@ -285,7 +285,7 @@
             <div class="flex-grow-1 w-100"
                 *ngIf="extraAttr.dataType === 'html'">
               <p-editor
-                [(ngModel)]="extraAttr.selectedValues"
+                [(ngModel)]="extraAttr.selectedValues"   [disabled]="!canChange"
                 [style]="{ height: '220px' }"
                 (ngModelChange)="onAnyInputChange()">
               </p-editor>

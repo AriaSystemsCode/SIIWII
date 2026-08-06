@@ -628,7 +628,7 @@ accountBasicInfoFields = [
     label: 'Code',
     type: 'text',
     valuePath: 'account.code',
-    readonly: true
+   
   },
   {
     key: 'ssin',

@@ -11,17 +11,12 @@
         </label>
 
         <div class="field-control">
-          <!-- <input
-            type="text"
-            class="form-control"
-            [(ngModel)]="mainBranch.tradeName"
-            name="tradeName"
-            [readonly]="isViewMode" /> -->
+
 
 
           <!-- Trade name -->
           <input type="text" class="form-control" [(ngModel)]="account.tradeName" name="tradeName"
-            [readonly]="isViewMode" />
+            [disabled]="!canEditField('tradeName')" />
         </div>
       </div>
 
@@ -34,7 +29,7 @@
         <div class="field-control">
           <!-- Email -->
           <input type="email" class="form-control" [(ngModel)]="account.eMailAddress" name="emailAddress"
-            [readonly]="isViewMode" />
+            [disabled]="!canEditField('eMailAddress')" />
         </div>
       </div>
 
@@ -47,7 +42,8 @@
         <div class="field-control dropdown-control">
           <!-- Language -->
           <p-dropdown [options]="allLanguages" [(ngModel)]="account.languageId" name="languageId" optionLabel="label"
-            optionValue="value" placeholder="{{ 'SelectLanguage' | localize }}" [disabled]="isViewMode" appendTo="body">
+            optionValue="value" placeholder="{{ 'SelectLanguage' | localize }}" [disabled]="!canEditField('languageId')"
+            appendTo="body">
           </p-dropdown>
         </div>
       </div>
@@ -61,7 +57,8 @@
         <div class="field-control dropdown-control">
           <!-- Currency -->
           <p-dropdown [options]="allCurrencies" [(ngModel)]="account.currencyId" name="currencyId" optionLabel="label"
-            optionValue="value" placeholder="{{ 'SelectCurrency' | localize }}" [disabled]="isViewMode" appendTo="body">
+            optionValue="value" placeholder="{{ 'SelectCurrency' | localize }}" [disabled]="!canEditField('currencyId')"
+            appendTo="body">
           </p-dropdown>
         </div>
       </div>
@@ -74,16 +71,16 @@
           {{ 'Phone' | localize }}:
         </label>
 
-        <p-dropdown styleClass="phone-type-dropdown" [options]="allPhoneTypes" [(ngModel)]="mainBranch.phone1TypeId"
+        <p-dropdown styleClass="phone-type-dropdown" [options]="allPhoneTypes" [(ngModel)]="account.phone1TypeId"
           name="phone1TypeId" optionLabel="label" optionValue="value" placeholder="{{ 'Type' | localize }}"
-          [disabled]="isViewMode" appendTo="body">
+          [disabled]="!canEditField('phone1TypeId')" appendTo="body">
         </p-dropdown>
 
-        <input type="text" class="form-control phone-number" [(ngModel)]="mainBranch.phone1Number" name="phone1Number"
-          [readonly]="isViewMode" />
+        <input type="text" class="form-control phone-number" [(ngModel)]="account.phone1Number" name="phone1Number"
+          [disabled]="!canEditField('phone1Number')" />
 
-        <input type="text" class="form-control phone-extension" [(ngModel)]="mainBranch.phone1Ex" name="phone1Ex"
-          placeholder="{{ 'Ext' | localize }}" [readonly]="isViewMode" />
+        <input type="text" class="form-control phone-extension" [(ngModel)]="account.phone1Ex" name="phone1Ex"
+          placeholder="{{ 'Ext' | localize }}" [disabled]="!canEditField('phone1Ex')" />
       </div>
 
       <!-- Phone 2 -->
@@ -92,16 +89,16 @@
           {{ 'Phone' | localize }}:
         </label>
 
-        <p-dropdown styleClass="phone-type-dropdown" [options]="allPhoneTypes" [(ngModel)]="mainBranch.phone2TypeId"
+        <p-dropdown styleClass="phone-type-dropdown" [options]="allPhoneTypes" [(ngModel)]="account.phone2TypeId"
           name="phone2TypeId" optionLabel="label" optionValue="value" placeholder="{{ 'Type' | localize }}"
-          [disabled]="isViewMode" appendTo="body">
+          [disabled]="!canEditField('phone2TypeId')" appendTo="body">
         </p-dropdown>
 
-        <input type="text" class="form-control phone-number" [(ngModel)]="mainBranch.phone2Number" name="phone2Number"
-          [readonly]="isViewMode" />
+        <input type="text" class="form-control phone-number" [(ngModel)]="account.phone2Number" name="phone2Number"
+          [disabled]="!canEditField('phone2Number')" />
 
-        <input type="text" class="form-control phone-extension" [(ngModel)]="mainBranch.phone2Ex" name="phone2Ex"
-          placeholder="{{ 'Ext' | localize }}" [readonly]="isViewMode" />
+        <input type="text" class="form-control phone-extension" [(ngModel)]="account.phone2Ex" name="phone2Ex"
+          placeholder="{{ 'Ext' | localize }}" [disabled]="!canEditField('phone1Ex')" />
       </div>
 
       <!-- Phone 3 -->
@@ -110,16 +107,16 @@
           {{ 'Phone' | localize }}:
         </label>
 
-        <p-dropdown styleClass="phone-type-dropdown" [options]="allPhoneTypes" [(ngModel)]="mainBranch.phone3TypeId"
+        <p-dropdown styleClass="phone-type-dropdown" [options]="allPhoneTypes" [(ngModel)]="account.phone3TypeId"
           name="phone3TypeId" optionLabel="label" optionValue="value" placeholder="{{ 'Type' | localize }}"
-          [disabled]="isViewMode" appendTo="body">
+          [disabled]="!canEditField('phone3TypeId')" appendTo="body">
         </p-dropdown>
 
-        <input type="text" class="form-control phone-number" [(ngModel)]="mainBranch.phone3Number" name="phone3Number"
-          [readonly]="isViewMode" />
+        <input type="text" class="form-control phone-number" [(ngModel)]="account.phone3Number" name="phone3Number"
+          [disabled]="!canEditField('phone3Number')" />
 
-        <input type="text" class="form-control phone-extension" [(ngModel)]="mainBranch.phone3Ex" name="phone3Ex"
-          placeholder="{{ 'Ext' | localize }}" [readonly]="isViewMode" />
+        <input type="text" class="form-control phone-extension" [(ngModel)]="account.phone3Ex" name="phone3Ex"
+          placeholder="{{ 'Ext' | localize }}" [disabled]="!canEditField('phone1Ex')" />
       </div>
 
     </div>
@@ -142,16 +139,16 @@
       <div class="department-block">
 
         <div class="business-section-header d-flex justify-content-between">
-<div>
- <h3 class="department-title">
-            {{ 'Departments' | localize }}:
-          </h3>
+          <div>
+            <h3 class="department-title">
+              {{ 'Departments' | localize }}:
+            </h3>
 
-          <p *ngIf="mode != 'view'" class="selectItem">{{'Select your company Business Category' | localize}}</p>
-</div>
-         
+            <p *ngIf="mode != 'view'" class="selectItem">{{'Select your company Business Category' | localize}}</p>
+          </div>
 
-          <button *ngIf="!isViewMode" type="button" class="btn bgPurple btn-sm selectBtn" (click)="
+
+          <button *ngIf="canEditSection('business')" type="button" class="btn bgPurple btn-sm selectBtn" (click)="
             openSelectCategoriesModal()
           ">
 
@@ -199,7 +196,7 @@
 
               </div>
 
-              <button type="button" class="btn btn-link text-danger p-0" (click)="
+              <button *ngIf="canEditSection('business')" type="button" class="btn btn-link text-danger p-0" (click)="
                 removeCategory(
                   departmentIndex
                 )
@@ -251,19 +248,20 @@
       <div class="department-block">
 
         <div class="business-section-header d-flex justify-content-between">
-<div>
-  <h3 class="department-title">
-            {{
-            'BusinessClassifications'
-            | localize
-            }}:
-          </h3>
+          <div>
+            <h3 class="department-title">
+              {{
+              'BusinessClassifications'
+              | localize
+              }}:
+            </h3>
 
-          <p *ngIf="mode != 'view'" class="selectItem">{{'Select your company business classifications' | localize}}</p>
-</div>
-        
+            <p *ngIf="mode != 'view'" class="selectItem">{{'Select your company business classifications' | localize}}
+            </p>
+          </div>
 
-          <button *ngIf="!isViewMode" type="button" class="btn bgPurple btn-sm selectBtn" (click)="
+
+          <button *ngIf="canEditSection('business')" type="button" class="btn bgPurple btn-sm selectBtn" (click)="
             openSelectClassificationsModal()
           ">
 
@@ -312,7 +310,7 @@
 
               </div>
 
-              <button type="button" class="btn btn-link text-danger p-0" (click)="
+              <button *ngIf="canEditSection('business')" type="button" class="btn btn-link text-danger p-0" (click)="
                 removeClassification(
                   classificationIndex
                 )
@@ -354,7 +352,7 @@
 
         </ng-template>
 
- 
+
 
       </div>
 
@@ -366,14 +364,13 @@
     <div *ngIf="isLoadingRoles" class="text-center py-3">
       <i class="fa fa-spinner fa-spin"></i>
     </div>
-
     <app-dynamicInputs *ngIf="
-      !isLoadingRoles &&
-      roleExtraAttributeObject &&
-      roleDynamicInputsForViewDto
-    " [extraAttributeObject]="roleExtraAttributeObject" [entityObjectTypeId]="roleEntityObjectTypeId"
+    !isLoadingRoles &&
+    roleExtraAttributeObject &&
+    roleDynamicInputsForViewDto
+  " [extraAttributeObject]="roleExtraAttributeObject" [entityObjectTypeId]="roleEntityObjectTypeId"
       [entityType]="'Contacts'" [dynamicInputsForViewDto]="roleDynamicInputsForViewDto" [fromSetting]="false"
-      (extraDataChanged)="onRoleExtraAttributesChanged($event)"
+      [canChange]="canEditSection('roles')" (extraDataChanged)="onRoleExtraAttributesChanged($event)"
       (extraDataCleared)="onRoleExtraAttributeCleared($event)">
     </app-dynamicInputs>
 
@@ -383,17 +380,6 @@
 
   </p-accordionTab>
 
-  <!-- <p-accordionTab header="{{ 'Relationship' | localize }}">
-
-  <app-dynamicInputs
-    *ngIf="rolesEntityObjectTypeId"
-    [entityObjectTypeId]="rolesEntityObjectTypeId"
-    [entityType]="'MARKETPLACECONTACTRELATIONSHIP'"
-    [dynamicInputsForViewDto]="dynamicInputsForViewDto"
-    [fromSetting]="true">
-  </app-dynamicInputs>
-
-</p-accordionTab> -->
 
 
   <p-accordionTab header="{{ 'Relationship' | localize }}">
@@ -429,16 +415,16 @@
           </h5>
 
           <app-dynamicInputs *ngIf="
-            relationshipEntityObjectTypeId &&
-            dynamicInputsForViewDto
-          " [extraAttributeObject]="{
-            value: {
-              filteredExtraAttributes: groupedByUsage[usage],
-              extraAttributes: allRelationshipAttributes
-            }
-          }" [entityObjectTypeId]="relationshipEntityObjectTypeId" [entityType]="'MARKETPLACECONTACTRELATIONSHIP'"
+    relationshipEntityObjectTypeId &&
+    dynamicInputsForViewDto
+  " [extraAttributeObject]="{
+    value: {
+      filteredExtraAttributes: groupedByUsage[usage],
+      extraAttributes: allRelationshipAttributes
+    }
+  }" [entityObjectTypeId]="relationshipEntityObjectTypeId" [entityType]="'MARKETPLACECONTACTRELATIONSHIP'"
             [dynamicInputsForViewDto]="dynamicInputsForViewDto" [fromSetting]="true"
-            (extraDataChanged)="onRelationshipExtraDataChanged($event)"
+            [canChange]="canEditSection('relationship')" (extraDataChanged)="onRelationshipExtraDataChanged($event)"
             (extraDataCleared)="onRelationshipExtraDataCleared($event)">
           </app-dynamicInputs>
 
