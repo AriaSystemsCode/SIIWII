@@ -1101,42 +1101,17 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit, 
                         JSON.stringify(this.buyerContactSSIN)
                     );
 
-                    // sessionStorage.setItem(
-                    //     "SellerSSIN",
-                    //     JSON.stringify(this.sellerCompanySSIN)
-                    // );
 
-                    // if (this.isBuyerTempAccount) {
-                    //     localStorage.setItem(
-                    //         "currencyCode",
-                    //         JSON.stringify(null)
-                    //     );
-                    // }
-                    // else {
-                    //     localStorage.setItem(
-                    //         "BuyerSSIN",
-                    //         JSON.stringify(this.buyerCompanySSIN)
-                    //     );
-
-
-                    //     if (this.formType?.toUpperCase() == "PO")
-                    //         this.currencyCode = this.appSession.tenant.currencyInfoDto;
-
-                    //     localStorage.setItem(
-                    //         "currencyCode",
-                    //         JSON.stringify(this.sellerCurrencyCode)
-                    //     );
-                    // }
                     if (!this.isBuyerTempAccount) {
                         localStorage.setItem("BuyerSSIN", JSON.stringify(this.buyerCompanySSIN));
                     }
 
-                    // const transactionCurrencyCode = this.getTransactionCurrencyCode();
+                    const transactionCurrencyCode = this.getTransactionCurrencyCode();
 
-                    // localStorage.setItem(
-                    //     "currencyCode",
-                    //     JSON.stringify(transactionCurrencyCode)
-                    // );
+                    localStorage.setItem(
+                        "currencyCode",
+                        JSON.stringify(transactionCurrencyCode)
+                    );
 
                     // this.currencyCode = transactionCurrencyCode;
                     // if (this.currencyCode) {
@@ -1173,39 +1148,87 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit, 
                     //         });
                     // }
 
-                    // else {
-                    //     // this.currencyCode = this.sellerCurrencyCode ? this.sellerCurrencyCode : this.appSession.tenant.currencyInfoDto;
-                    //     // localStorage.setItem(
-                    //     //     "currencyCode",
-                    //     //     JSON.stringify(this.currencyCode)
-                    //     // );
-                    //     this.currencyCode = this.appSession.tenant.currencyInfoDto?.code || 'USD';
-                    // }
+                    this.currencyCode =
+    transactionCurrencyCode;
 
-                    const transactionCurrency = this.getTransactionCurrency();
+const currencyDto =
+    this.allCurrencies?.find(
+        currency =>
+            String(currency?.code)
+                .trim()
+                .toUpperCase() ===
+            String(
+                transactionCurrencyCode
+            )
+                .trim()
+                .toUpperCase()
+    );
 
-localStorage.setItem(
-    "currencyCode",
-    JSON.stringify(transactionCurrency?.code)
-);
-
-this.currencyCode = transactionCurrency?.code;
-
-if (transactionCurrency) {
+if (currencyDto) {
     this._AppMarketplaceItemsServiceProxy
-        .checkCurrencyExchangeRate(transactionCurrency)
-        .subscribe((res: boolean) => {
-            if (!res) {
+        .checkCurrencyExchangeRate(
+            currencyDto
+        )
+        .subscribe({
+            next: (
+                exchangeRateExists:
+                    boolean
+            ) => {
+                if (
+                    exchangeRateExists
+                ) {
+                    return;
+                }
+
                 Swal.fire({
-                    title: "",
-                    text: this.l("CurrencyRateNotDefined"),
-                    icon: "info",
-                    showCancelButton: false,
-                    confirmButtonText: this.l("Ok")
+                    title: '',
+                    text:
+                        this.l(
+                            'CurrencyRateNotDefined'
+                        ),
+                    icon: 'info',
+                    showCancelButton:
+                        false,
+                    confirmButtonText:
+                        this.l('Ok'),
+                    allowOutsideClick:
+                        false,
+                    allowEscapeKey:
+                        false,
+                    backdrop: true,
+                    customClass: {
+                        popup:
+                            'popup-class',
+                        icon:
+                            'icon-class',
+                        content:
+                            'content-class',
+                        actions:
+                            'actions-class',
+                        confirmButton:
+                            'confirm-button-class2'
+                    }
                 });
+            },
+
+            error: error => {
+                console.error(
+                    'Currency exchange-rate check failed:',
+                    error
+                );
             }
         });
 }
+
+                    else {
+                        // this.currencyCode = this.sellerCurrencyCode ? this.sellerCurrencyCode : this.appSession.tenant.currencyInfoDto;
+                        // localStorage.setItem(
+                        //     "currencyCode",
+                        //     JSON.stringify(this.currencyCode)
+                        // );
+                        this.currencyCode = this.appSession.tenant.currencyInfoDto?.code || 'USD';
+                    }
+
 
                     if (location.href.toString() == AppConsts.appBaseUrl + "/app/main/marketplace/products")
                         location.reload();
@@ -1307,35 +1330,26 @@ if (transactionCurrency) {
         this.buyerCompanyRelationId = "";
     }
 
-    // private getTransactionCurrencyCode(): string {
-    //     if (this.formType?.toUpperCase() === 'SO') {
-    //         // Sales Order -> Buyer currency
-    //         return this.currencyCode || this.appSession.tenant.currencyInfoDto?.code || 'USD';
-    //     }
+    private getTransactionCurrencyCode(): string {
+        if (this.formType?.toUpperCase() === 'SO') {
+            // Sales Order -> Buyer currency
+            return this.currencyCode || this.appSession.tenant.currencyInfoDto?.code || 'USD';
+        }
 
-    //     if (this.formType?.toUpperCase() === 'PO') {
-    //         // Purchase Order -> Buyer currency
-    //         return this.currencyCode || this.appSession.tenant.currencyInfoDto?.code || 'USD';
-    //     }
+        if (this.formType?.toUpperCase() === 'PO' && this.isBuyer) {
+            // Purchase Order -> Buyer currency
+            this.appSession.tenant.currencyInfoDto?.code || 'USD';
+        }
 
-    //     return this.appSession.tenant.currencyInfoDto?.code || 'USD';
-    // }
+        if (this.formType?.toUpperCase() === 'PO') {
+            // Purchase Order -> Buyer currency
+            this.appSession.tenant.currencyInfoDto?.code || 'USD';
+        }
 
-    private getTransactionCurrency(): CurrencyInfoDto {
-    // Purchase Order: logged-in tenant is the buyer
-    if (this.formType?.toUpperCase() === 'PO' && this.isBuyer) {
-        return this.appSession?.tenant?.currencyInfoDto;
+        return this.appSession.tenant.currencyInfoDto?.code || 'USD';
     }
 
-    const currencyCode =
-        this.formType?.toUpperCase() === 'SO'
-            ? this.currencyCode
-            : this.sellerCurrencyCode;
 
-    return this.allCurrencies?.find(
-        currency => currency.code === currencyCode
-    ) || this.appSession?.tenant?.currencyInfoDto;
-}
 
     private updateSellerSSIN(value: string): void {
 
