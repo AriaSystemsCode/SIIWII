@@ -3122,7 +3122,7 @@ namespace onetouch.Accounts
                                 AppAddress address = new AppAddress();
                                 if (savedAddress != null)
                                 {
-                                     var addressCon = await _appAddressRepository.GetAll().FirstOrDefaultAsync(z => z.Code == savedAddress.Code && z.TenantId == contactDto.TenantId);
+                                    var addressCon = await _appAddressRepository.GetAll().FirstOrDefaultAsync(z => z.Code == savedAddress.Code && z.TenantId == contactDto.TenantId);
                                     if (addressCon == null)
                                     {
                                         ObjectMapper.Map(savedAddress, address);
@@ -3225,7 +3225,15 @@ namespace onetouch.Accounts
                         }
                         //Contacts[End]
                     }
-
+                    else
+                    {
+                        if (connectedBranchContact.ParentId != null &&
+                             connectedBranchContact.ParentId != parentContact.Id)
+                        {
+                            connectedBranchContact.ParentId = parentContact.Id;
+                            await _appContactRepository.UpdateAsync(connectedBranchContact);
+                        }
+                    }
                 }
                 var branchObjectTypeId = await _helper.SystemTables.GetEntityObjectTypeBranchId();
                 var branchInfo = _appMarketplaceContactRepository.GetAll().Where(x => x.TenantId == null &&
