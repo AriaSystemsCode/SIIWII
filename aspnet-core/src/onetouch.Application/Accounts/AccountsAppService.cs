@@ -3076,7 +3076,7 @@ namespace onetouch.Accounts
                 using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
                 {
                     //var dbContxt = CurrentUnitOfWork.GetDbContext<onetouchDbContext>();
-                    var connectedBranchContactQ = _appContactRepository.GetAll().AsNoTracking().IgnoreQueryFilters()
+                    var connectedBranchContactQ = _appContactRepository.GetAll().IgnoreQueryFilters()
                     .Where(x => x.TenantId == connectTenant && x.IsDeleted == false
                     && x.SSIN.ToLower().Trim() == branchesPublishedParentContact.SSIN.ToLower().Trim());
 

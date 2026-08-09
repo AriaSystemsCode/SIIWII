@@ -1394,7 +1394,7 @@ namespace onetouch.AppMarketplaceAccounts
                                                  && ((x.Name == input.Name && x.EntityObjectTypeId == input.AccountTypeId)));
                     if (FoundPublishContact != null)
                     {
-                        input.SSIN = FoundPublishContact.SSIN;
+                        FoundPublishContact.SSIN= input.SSIN;
                         FoundPublishContact.SharingLevel = 1;
                         sync = true;
                     }
