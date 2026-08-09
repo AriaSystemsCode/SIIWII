@@ -1243,23 +1243,30 @@ export class MainImportComponent
         // Call this endpoint directly so the DTO is always sent in the request body.
         // Older generated proxies treated the argument as an `index` query parameter,
         // which serialized the record as `index=[object Object]` and caused HTTP 400.
-        this._httpClient.post<ImportItemReturnDto[]>(
+        this._httpClient.post<any>(
             AppConsts.remoteServiceBaseUrl + "/api/services/app/AppItems/ValidateImportItemData",
             _ImportItemInputDto
         )
-            .subscribe((result: ImportItemReturnDto[]) => {
-                const hasErrors = Array.isArray(result) && result.length > 0;
+            .subscribe({
+            next: (response: any) => {
+                // Depending on whether the ABP response interceptor runs, the
+                // validation array is returned directly or inside `result`.
+                const result: ImportItemReturnDto[] = Array.isArray(response)
+                    ? response
+                    : (Array.isArray(response?.result) ? response.result : []);
+                const hasErrors = result.length > 0;
 
-                //record.fieldsErrors = hasErrors ? result : [];
                 record.fieldsErrors = hasErrors
                     ? result.map(err => err.errorMessage)
                     : [];
-                record.errorMessage = hasErrors ? "" : record.errorMessage;
-                let allWarnings = result.every(
+                record.errorMessage = "";
+                const allWarnings = hasErrors && result.every(
                     x => x.errorType?.toLowerCase() === "warning" ||
                          x.errorType?.toLowerCase() === "duplication"
-                  );
-                                                   record.status =hasErrors ? (allWarnings ? "Warning" :  "Failed" ) : "Passed"
+                );
+                record.status = hasErrors
+                    ? (allWarnings ? "Warning" : "Failed")
+                    : "Passed";
                 if (record._isCreateParent || record._isCreateItemColor) {
                     record.recordType = "Image";
                     record.excelDto.recordType = "Image";
@@ -1268,9 +1275,24 @@ export class MainImportComponent
                 this.updatedRecordData = {
                     record,
                     newData: record
+                };
+            },
+            error: () => {
+                record.status = "Failed";
+                record.errorMessage = "Unable to validate this record.";
+                record.fieldsErrors = [record.errorMessage];
+
+                if (record._isCreateParent || record._isCreateItemColor) {
+                    record.recordType = "Image";
+                    record.excelDto.recordType = "Image";
                 }
 
-            });
+                this.updatedRecordData = {
+                    record,
+                    newData: record
+                };
+            }
+        });
 
     }
 
