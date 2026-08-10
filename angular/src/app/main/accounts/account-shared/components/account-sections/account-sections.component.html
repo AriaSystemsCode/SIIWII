@@ -180,12 +180,7 @@
 
               <div class="business-item-content">
 
-                <span class="business-item-code">
-                  {{
-                  department
-                  .entityObjectCategoryCode
-                  }}
-                </span>
+           
 
                 <span>
                   {{
@@ -294,12 +289,7 @@
 
               <div class="business-item-content">
 
-                <span class="business-item-code">
-                  {{
-                  classification
-                  .entityObjectClassificationCode
-                  }}
-                </span>
+           
 
                 <span>
                   {{
@@ -382,59 +372,108 @@
 
 
 
-  <p-accordionTab header="{{ 'Relationship' | localize }}">
+<p-accordionTab
+  header="{{ 'Relationship' | localize }}">
 
-    <div *ngIf="connectionsInfo?.length; " class="relationship-section">
+  <div
+    *ngIf="connectionsInfo?.length"
+    class="relationship-section">
 
-      <div *ngIf="connectionsInfo.length > 1" class="relationship-selector mb-3">
+    <div
+      *ngIf="connectionsInfo.length > 1"
+      class="relationship-selector mb-3">
 
-        <label>
-          {{ 'Relationship' | localize }}:
-        </label>
+      <label>
+        {{ 'Relationship' | localize }}:
+      </label>
 
-        <p-dropdown [options]="connectionsInfo" [(ngModel)]="selectedRelationId" optionLabel="connectedLabel"
-          optionValue="relationEntityId" [disabled]="isLoadingRelationship" appendTo="body"
-          (onChange)="onRelationshipOptionChange($event.value)">
-        </p-dropdown>
-
-      </div>
-
-      <div *ngIf="isLoadingRelationship" class="text-center py-3">
-
-        <i class="fa fa-spinner fa-spin"></i>
-
-      </div>
-
-      <ng-container *ngIf="!isLoadingRelationship">
-
-        <div *ngFor="let usage of usageList" class="relationship-usage-block"
-          [attr.id]="'account_relationship_usage_' + usage">
-
-          <h5 class="usage-block">
-            {{ usage | localize }}
-          </h5>
-
-          <app-dynamicInputs *ngIf="
-    relationshipEntityObjectTypeId &&
-    dynamicInputsForViewDto
-  " [extraAttributeObject]="{
-    value: {
-      filteredExtraAttributes: groupedByUsage[usage],
-      extraAttributes: allRelationshipAttributes
-    }
-  }" [entityObjectTypeId]="relationshipEntityObjectTypeId" [entityType]="'MARKETPLACECONTACTRELATIONSHIP'"
-            [dynamicInputsForViewDto]="dynamicInputsForViewDto" [fromSetting]="true"
-            [canChange]="canEditSection('relationship')" (extraDataChanged)="onRelationshipExtraDataChanged($event)"
-            (extraDataCleared)="onRelationshipExtraDataCleared($event)">
-          </app-dynamicInputs>
-
-        </div>
-
-      </ng-container>
+      <p-dropdown
+        [options]="connectionsInfo"
+        [(ngModel)]="selectedRelationId"
+        optionLabel="connectedLabel"
+        optionValue="relationEntityId"
+        [disabled]="isLoadingRelationship"
+        appendTo="body"
+        (onChange)="
+          onRelationshipOptionChange(
+            $event.value
+          )
+        ">
+      </p-dropdown>
 
     </div>
 
 
-  </p-accordionTab>
+    <div
+      *ngIf="isLoadingRelationship"
+      class="text-center py-3">
+
+      <i class="fa fa-spinner fa-spin"></i>
+
+    </div>
+
+
+    <ng-container
+      *ngIf="!isLoadingRelationship">
+
+      <div
+  *ngFor="let usage of usageList"
+  class="relationship-usage-block">
+
+  <h5 class="usage-block">
+    {{ usage | localize }}
+  </h5>
+
+  <app-dynamicInputs
+    #relationshipDynamicInput
+
+    [extraAttributeObject]="{
+      value: {
+        filteredExtraAttributes:
+          groupedByUsage[usage],
+
+        extraAttributes:
+          allRelationshipAttributes
+      }
+    }"
+
+    [entityObjectTypeId]="
+      relationshipEntityObjectTypeId
+    "
+
+    [entityType]="
+      'MARKETPLACECONTACTRELATIONSHIP'
+    "
+
+    [dynamicInputsForViewDto]="
+      relationshipDynamicInputsForViewDto
+    "
+
+    [fromSetting]="true"
+
+    [canChange]="
+      canEditSection('relationship')
+    "
+
+    (extraDataCleared)="
+      onRelationshipExtraDataCleared(
+        $event
+      )
+    "
+
+    (extraDataChanged)="
+      onRelationshipExtraDataChanged(
+        $event
+      )
+    ">
+  </app-dynamicInputs>
+
+</div>
+
+    </ng-container>
+
+  </div>
+
+</p-accordionTab>
 
 </p-accordion>

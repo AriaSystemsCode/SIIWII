@@ -4,18 +4,23 @@ import {
   Input,
   OnChanges,
   OnInit,
-  SimpleChanges
+  QueryList,
+  SimpleChanges,
+  ViewChildren
 } from '@angular/core';
 import { SelectCategoriesDynamicModalComponent } from '@app/categories/select-categories-dynamic-modal.component';
 import { SelectClassificationDynamicModalComponent } from '@app/classification/select-classification-dynamic-modal.component';
+import { ExtraAttributeDataService } from '@app/main/app-items/app-item-shared/services/extra-attribute-data.service';
 import { BsModalRef, BsModalService, ModalOptions } from '@node_modules/ngx-bootstrap/modal';
 
 import { AppComponentBase } from '@shared/common/app-component-base';
+import { dynamicInputs } from '@shared/components/dynamicInputs/dynamicInputs.component';
 import {
   AccountsServiceProxy,
   AppEntitiesServiceProxy,
   AppEntityCategoryDto,
   AppEntityClassificationDto,
+  AppEntityDto,
   AppEntityExtraDataDto,
   ConnectionInfo,
   CurrencyInfoDto,
@@ -25,8 +30,9 @@ import {
   TreeNodeOfGetSycEntityObjectCategoryForViewDto,
   TreeNodeOfGetSycEntityObjectClassificationForViewDto
 } from '@shared/service-proxies/service-proxies';
-import { forkJoin, Subscription } from 'rxjs';
-import { finalize, switchMap } from 'rxjs/operators';
+import { forkJoin, Subscription ,   Observable,
+  of } from 'rxjs';
+import { finalize, switchMap ,tap } from 'rxjs/operators';
 type EntityMode = 'create' | 'edit' | 'view';
 
 
@@ -119,10 +125,32 @@ isLoadingRoles = false;
     categoriesIds: number[] = [];
 
 classificationsIds: number[] = [];
+
+
+
+@ViewChildren('appdynamicInputs')
+dynamicInputsComponents!: QueryList<dynamicInputs>;
+
+relationshipDynamicInputsForViewDto:
+  GetAppEntityForEditOutput;
+
+
+  allShipVia: LookupLabelDto[] = [];
+allPaymentTerms: LookupLabelDto[] = [];
+allPriceLevel: any[] = [];
+
+@ViewChildren('relationshipDynamicInput')
+relationshipDynamicInputs!:
+  QueryList<dynamicInputs>;
+
+
+relationshipTouched = false;
+
   constructor(
     injector: Injector,
     private _accountsServiceProxy: AccountsServiceProxy,
         private _AppEntitiesServiceProxy: AppEntitiesServiceProxy,
+         private _extraAttributeDataService: ExtraAttributeDataService,
        
   private _sycEntityObjectTypesServiceProxy:
     SycEntityObjectTypesServiceProxy,  private _bsModalService:
@@ -484,25 +512,164 @@ private parseMultiSelectValue(
     .map(item => item.trim())
     .filter(Boolean);
 }
-private initializeRelationshipSection(): void {
+// private initializeRelationshipSection(): void {
+
+//   if (!this.connectionsInfo?.length) {
+//     this.resetRelationshipData();
+//     return;
+//   }
+
+//   this.loadRelationshipStaticLookups();
+
+//   const firstRelationId =
+//     this.connectionsInfo[0]
+//       ?.relationEntityId;
+
+//   if (!firstRelationId) {
+//     this.resetRelationshipData();
+//     return;
+//   }
+
+//   this.selectedRelationId =
+//     firstRelationId;
+
+//   this.loadRelationshipData();
+// }
+
+private initializeRelationshipSection():
+  void {
+
   if (!this.connectionsInfo?.length) {
+
     this.resetRelationshipData();
+
     return;
   }
+
 
   const firstRelationId =
-    this.connectionsInfo[0]?.relationEntityId;
+    this.connectionsInfo[0]
+      ?.relationEntityId;
+
 
   if (!firstRelationId) {
+
     this.resetRelationshipData();
+
     return;
   }
 
-  this.selectedRelationId = firstRelationId;
 
-  this.loadRelationshipData(firstRelationId);
+  this.selectedRelationId =
+    firstRelationId;
+
+
+  /*
+   * IMPORTANT:
+   * Load Ship Via / Payment Terms
+   * BEFORE creating dynamicInputs.
+   */
+  this.loadRelationshipStaticLookups()
+    .subscribe({
+
+      next: () => {
+
+        this.loadRelationshipData();
+
+      },
+
+      error: error => {
+
+        console.error(
+          'Relationship lookup loading failed:',
+          error
+        );
+
+        this.loadRelationshipData();
+      }
+
+    });
 }
 
+private applyRelationshipLookupLists(): void {
+
+  this.allRelationshipAttributes
+    .forEach((attr: any) => {
+
+      const code =
+        String(
+          attr.code ??
+          attr.attributeCode ??
+          attr.name ??
+          ''
+        )
+          .trim()
+          .toUpperCase();
+
+
+      attr.paginationSetting ??= {
+        skipCount: 0,
+        maxResultCount: 10,
+        totalCount: 0,
+        list: []
+      };
+
+
+      /*
+       * Ship Via
+       */
+      if (
+        code.includes('SHIP') &&
+        code.includes('VIA')
+      ) {
+
+        attr.paginationSetting.list =
+          [...this.allShipVia];
+
+        attr.paginationSetting.totalCount =
+          this.allShipVia.length;
+
+        return;
+      }
+
+
+      /*
+       * Payment Terms
+       */
+      if (
+        code.includes('PAYMENT') &&
+        code.includes('TERM')
+      ) {
+
+        attr.paginationSetting.list =
+          [...this.allPaymentTerms];
+
+        attr.paginationSetting.totalCount =
+          this.allPaymentTerms.length;
+
+        return;
+      }
+
+
+      /*
+       * Price Level
+       */
+      if (
+        code.includes('PRICE') &&
+        code.includes('LEVEL')
+      ) {
+
+        attr.paginationSetting.list =
+          [...this.allPriceLevel];
+
+        attr.paginationSetting.totalCount =
+          this.allPriceLevel.length;
+
+        return;
+      }
+
+    });
+}
 
 
   //Department
@@ -622,40 +789,54 @@ onRelationshipOptionChange(
     return;
   }
 
-  this.selectedRelationId = relationId;
+  this.selectedRelationId =
+    relationId;
 
-  this.loadRelationshipData(relationId);
+  this.loadRelationshipData();
 }
+
+
 onRelationshipExtraDataChanged(
-  changedAttributes: any[]
+  dataFromChild: any[]
 ): void {
 
-  if (!this.dynamicInputsForViewDto) {
-    this.dynamicInputsForViewDto =
+  this.relationshipTouched = true;
+
+  if (
+    !this.relationshipDynamicInputsForViewDto
+  ) {
+    this.relationshipDynamicInputsForViewDto =
       new GetAppEntityForEditOutput();
   }
 
-  if (!this.dynamicInputsForViewDto.entityExtraData) {
-    this.dynamicInputsForViewDto.entityExtraData = [];
-  }
+  this.relationshipDynamicInputsForViewDto
+    .entityExtraData ??= [];
 
   const existingData =
-    this.dynamicInputsForViewDto.entityExtraData;
+    this.relationshipDynamicInputsForViewDto
+      .entityExtraData;
 
-  const incomingData: AppEntityExtraDataDto[] =
-    (changedAttributes ?? []).flatMap(attribute => {
+  const incomingData:
+    AppEntityExtraDataDto[] =
+      dataFromChild.flatMap(attr => {
 
-      if (
-        attribute.isLookup &&
-        attribute.acceptMultipleValues
-      ) {
-        return (attribute.value ?? []).map(
-          value => {
+        if (
+          attr.isLookup &&
+          attr.acceptMultipleValues
+        ) {
+
+          const values =
+            Array.isArray(attr.value)
+              ? attr.value
+              : [];
+
+          return values.map(value => {
+
             const dto =
               new AppEntityExtraDataDto();
 
             dto.attributeId =
-              attribute.attributeId;
+              attr.attributeId;
 
             dto.entityObjectTypeId =
               this.relationshipEntityObjectTypeId;
@@ -663,144 +844,259 @@ onRelationshipExtraDataChanged(
             dto.entityid =
               this.selectedRelationId;
 
-            dto.attributeValueId = value;
+            dto.attributeValueId =
+              Number(value);
 
             return dto;
-          }
-        );
-      }
+          });
+        }
 
-      const dto =
-        new AppEntityExtraDataDto();
 
-      dto.attributeId =
-        attribute.attributeId;
+        const dto =
+          new AppEntityExtraDataDto();
 
-      dto.entityObjectTypeId =
-        this.relationshipEntityObjectTypeId;
+        dto.attributeId =
+          attr.attributeId;
 
-      dto.entityid =
-        this.selectedRelationId;
+        dto.entityObjectTypeId =
+          this.relationshipEntityObjectTypeId;
 
-      if (attribute.isLookup) {
-        const parsedValue =
-          Number(attribute.value);
+        dto.entityid =
+          this.selectedRelationId;
 
-        dto.attributeValueId =
-          Number.isNaN(parsedValue)
-            ? null
-            : parsedValue;
-      } else {
-        dto.attributeValue =
-          attribute.value;
-      }
 
-      return [dto];
-    });
+        if (attr.isLookup) {
 
-  const changedAttributeIds =
+          const parsedValue =
+            Number(attr.value);
+
+          dto.attributeValueId =
+            !Number.isNaN(parsedValue)
+              ? parsedValue
+              : null;
+
+          dto.attributeValue =
+            null;
+
+        } else {
+
+          dto.attributeValue =
+            attr.value ?? null;
+
+          dto.attributeValueId =
+            null;
+        }
+
+        return dto;
+      });
+
+
+  const changedIds =
     new Set(
       incomingData.map(
         item => item.attributeId
       )
     );
 
-  const unchangedExistingData =
+
+  const unchanged =
     existingData.filter(
       item =>
-        !changedAttributeIds.has(
+        !changedIds.has(
           item.attributeId
         )
     );
 
-  this.dynamicInputsForViewDto.entityExtraData = [
-    ...unchangedExistingData,
-    ...incomingData
-  ];
-}
-private loadRelationshipData(
-  relationId: number
-): void {
 
-  if (!relationId) {
+  this.relationshipDynamicInputsForViewDto
+    .entityExtraData = [
+      ...unchanged,
+      ...incomingData
+    ];
+
+
+  console.log(
+    'RELATION CHANGED:',
+    this.relationshipDynamicInputsForViewDto
+      .entityExtraData
+  );
+}
+private loadRelationshipData(): void {
+
+  if (!this.selectedRelationId) {
     return;
   }
 
-  this.isLoadingRelationship = true;
+  this.isLoadingRelationship =
+    true;
 
-  this.dynamicInputsForViewDto = null;
-  this.allRelationshipAttributes = [];
-  this.groupedByUsage = {};
-  this.usageList = [];
-
-  const relationshipValues$ =
-    this._AppEntitiesServiceProxy
-      .getAppEntityForEdit(relationId, true);
-
-  const relationshipType$ =
-    this._sycEntityObjectTypesServiceProxy
-      .getAllWithExtraAttributesByCode(
-        'BTB',
-        'MARKETPLACECONTACTRELATIONSHIP'
-      );
-
-  forkJoin({
-    relationshipValues: relationshipValues$,
-    relationshipType: relationshipType$
-  })
+  this._AppEntitiesServiceProxy
+    .getAppEntityForEdit(
+      this.selectedRelationId,
+      true
+    )
     .pipe(
-      switchMap(result => {
-        this.dynamicInputsForViewDto =
-          result.relationshipValues;
-
-        const type =
-          result.relationshipType?.find(
-            item => item.code === 'BTB'
-          ) ??
-          result.relationshipType?.[0];
-
-        this.relationshipEntityObjectTypeId =
-          type?.id ?? null;
-
-        if (!this.relationshipEntityObjectTypeId) {
-          throw new Error(
-            'Relationship entity object type was not found.'
-          );
-        }
-
-        return this._sycEntityObjectTypesServiceProxy
-          .getAllWithExtraAttributes(
-            this.relationshipEntityObjectTypeId
-          );
-      }),
       finalize(() => {
-        this.isLoadingRelationship = false;
+        this.isLoadingRelationship =
+          false;
       })
     )
     .subscribe({
+
       next: result => {
-        const typeData = result?.[0];
 
-        this.allRelationshipAttributes =
-          typeData?.extraAttributes?.extraAttributes ??
-          [];
+        this.relationshipDynamicInputsForViewDto =
+          result;
 
-        this.groupedByUsage =
-          this.groupRelationshipAttributesByUsage(
-            this.allRelationshipAttributes
-          );
-
-        this.usageList =
-          Object.keys(this.groupedByUsage);
+        this.loadRelationshipAttributes();
       },
-      error: error => {
+
+      error: err => {
+
         console.error(
-          'Failed to load relationship information:',
-          error
+          'Failed to load relationship:',
+          err
+        );
+      }
+
+    });
+}
+private loadRelationshipAttributes():
+  void {
+
+  this._sycEntityObjectTypesServiceProxy
+    .getAllWithExtraAttributesByCode(
+      'BTB',
+      'MARKETPLACECONTACTRELATIONSHIP'
+    )
+    .pipe(
+      finalize(() => {
+
+        this._sycEntityObjectTypesServiceProxy
+          .getAllWithExtraAttributes(
+            this.relationshipEntityObjectTypeId
+          )
+          .subscribe(res => {
+
+            if (!res?.length) {
+              return;
+            }
+
+            this.allRelationshipAttributes =
+              res[0]?.extraAttributes
+                ?.extraAttributes ??
+              [];
+
+          
+            this.groupedByUsage =
+              this.groupRelationshipAttributesByUsage(
+                this.allRelationshipAttributes
+              );
+
+            this.usageList =
+              Object.keys(
+                this.groupedByUsage
+              );
+              this.applyRelationshipLookupLists();
+            this.prepareRelationshipLookupLists();
+          });
+      })
+    )
+    .subscribe(res => {
+
+      this.relationshipEntityObjectTypeId =
+        res.find(
+          x =>
+            x.code === 'BTB'
+        )?.id ?? 747;
+    });
+}
+
+private prepareRelationshipLookupLists():
+  void {
+
+  this.allRelationshipAttributes
+    .forEach((attr: any) => {
+
+      if (!attr.isLookup) {
+        return;
+      }
+
+      const code =
+        String(
+          attr.code ??
+          attr.attributeCode ??
+          attr.name ??
+          ''
+        )
+          .trim()
+          .toUpperCase();
+
+      const isSpecialLookup =
+        (
+          code.includes('SHIP') &&
+          code.includes('VIA')
+        )
+        ||
+        (
+          code.includes('PAYMENT') &&
+          code.includes('TERM')
+        )
+        ||
+        (
+          code.includes('PRICE') &&
+          code.includes('LEVEL')
         );
 
-        this.resetRelationshipData();
+      if (isSpecialLookup) {
+        return;
       }
+
+      this.loadRelationshipLookupList(
+        attr
+      );
+    });
+}
+
+private loadRelationshipLookupList(
+  extraAttr: any
+): void {
+
+  this._extraAttributeDataService
+    .getExtraAttributeLookupDataWithPaging(
+
+      extraAttr.entityObjectTypeCode,
+
+      extraAttr.paginationSetting
+        .skipCount,
+
+      extraAttr.paginationSetting
+        .maxResultCount
+    )
+    .subscribe(result => {
+
+      extraAttr.paginationSetting
+        .totalCount =
+          result.totalCount;
+
+      if (
+        extraAttr.paginationSetting
+          .skipCount === 0
+      ) {
+
+        extraAttr.paginationSetting
+          .list = [];
+      }
+
+      extraAttr.paginationSetting
+        .list.push(
+          ...(result.items ?? [])
+        );
+
+      extraAttr.paginationSetting
+        .skipCount +=
+          extraAttr.paginationSetting
+            .maxResultCount;
     });
 }
 private resetRelationshipData(): void {
@@ -822,41 +1118,55 @@ onRelationshipExtraDataCleared(
   attributeId: number
 ): void {
 
-  if (
-    !this.dynamicInputsForViewDto
-      ?.entityExtraData
-  ) {
+  this.relationshipTouched = true;
+
+  const data =
+    this.relationshipDynamicInputsForViewDto
+      ?.entityExtraData;
+
+  if (!data) {
     return;
   }
 
-  this.dynamicInputsForViewDto.entityExtraData =
-    this.dynamicInputsForViewDto
-      .entityExtraData
-      .filter(
+  this.relationshipDynamicInputsForViewDto
+    .entityExtraData =
+      data.filter(
         item =>
-          item.attributeId !== attributeId
+          Number(item.attributeId) !==
+          Number(attributeId)
       );
 }
 private groupRelationshipAttributesByUsage(
   attributes: any[]
 ): Record<string, any[]> {
 
-  return (attributes ?? []).reduce(
+  return attributes.reduce(
     (
-      groups: Record<string, any[]>,
-      attribute: any
+      result:
+        Record<string, any[]>,
+      attr
     ) => {
 
       const usage =
-        attribute?.usage ||
-        this.l('RelationshipSettings');
+        attr.usage ||
+        this.l(
+          'RelationshipSettings'
+        );
 
-      if (!groups[usage]) {
-        groups[usage] = [];
+      if (!result[usage]) {
+        result[usage] = [];
       }
 
-      if (!attribute.paginationSetting) {
-        attribute.paginationSetting = {
+      /*
+       * Dynamic inputs expects
+       * paginationSetting to exist
+       * for lookup attributes.
+       */
+      if (
+        !attr.paginationSetting
+      ) {
+
+        attr.paginationSetting = {
           skipCount: 0,
           maxResultCount: 10,
           totalCount: 0,
@@ -864,14 +1174,15 @@ private groupRelationshipAttributesByUsage(
         };
       }
 
-      groups[usage].push(attribute);
+      result[usage].push(
+        attr
+      );
 
-      return groups;
+      return result;
     },
     {}
   );
 }
-
 
   getAccountDataForView(): void {
     if (!this.accountId) {
@@ -1059,36 +1370,6 @@ onRoleExtraAttributesChanged(
 
 
 
-onRoleExtraAttributeCleared(
-  attributeId: number
-): void {
-  if (
-    !this.canEditSection('roles') ||
-    !this.roleDynamicInputsForViewDto
-      ?.entityExtraData
-  ) {
-    return;
-  }
-
-  const filteredData =
-    this.roleDynamicInputsForViewDto
-      .entityExtraData
-      .filter(
-        item =>
-          item.attributeId !== attributeId
-      );
-
-  this.roleDynamicInputsForViewDto
-    .entityExtraData = filteredData;
-
-  this.entityData.entityExtraData =
-    filteredData;
-
-  this.account.entityExtraData =
-    filteredData;
-
-  this.entityData.__extraDataTouched = true;
-}
 
 openSelectCategoriesModal(): void {
   if (this.isViewMode) {
@@ -1664,22 +1945,11 @@ get canEditAccountData(): boolean {
 
   return false;
 }
-
 get canEditRelationship(): boolean {
-  if (this.mode === 'view') {
-    return false;
-  }
-
-  if (this.mode === 'create') {
-    return false;
-  }
-
-  /*
-   * Connected account:
-   * Relationship is the only editable section.
-   */
-  return this.isConnectedAccount;
+  return this.mode === 'edit';
 }
+
+
 canEditField(fieldName: string): boolean {
   if (!this.canEditAccountData) {
     return false;
@@ -1720,7 +1990,416 @@ canEditSection(
 
 
 
+// saveRelationship(): void {
+
+//   if (
+//     !this.relationshipDynamicInputsForViewDto
+//       ?.appEntity
+//   ) {
+
+//     console.warn(
+//       'No relationship AppEntity to save'
+//     );
+
+//     return;
+//   }
 
 
+//   const relationshipInput =
+//     this.relationshipDynamicInputs
+//       ?.first;
+
+
+//   if (!relationshipInput) {
+
+//     console.warn(
+//       'Relationship dynamic input not found'
+//     );
+
+//     return;
+//   }
+
+
+//   let appEntityDto =
+//     Object.assign(
+//       new AppEntityDto(),
+//       this.relationshipDynamicInputsForViewDto
+//         .appEntity
+//     );
+
+
+//   appEntityDto.entityExtraData =
+//     this.relationshipDynamicInputsForViewDto
+//       .entityExtraData ?? [];
+
+
+//   console.log(
+//     'RELATION SAVE DTO:',
+//     appEntityDto
+//   );
+
+
+//   relationshipInput.saveAll(
+//     appEntityDto
+//   );
+// }
+
+saveRelationship(): void {
+
+  if (!this.relationshipTouched) {
+    return;
+  }
+
+  if (
+    !this.dynamicInputsForViewDto
+      ?.appEntity
+  ) {
+
+    console.warn(
+      'Relationship appEntity is missing'
+    );
+
+    return;
+  }
+
+  const dynamicInput =
+    this.relationshipDynamicInputs
+      ?.first;
+
+  if (!dynamicInput) {
+
+    console.warn(
+      'Relationship dynamic input not found'
+    );
+
+    return;
+  }
+
+
+  const appEntityDto =
+    Object.assign(
+      new AppEntityDto(),
+      this.dynamicInputsForViewDto
+        .appEntity
+    );
+
+
+  appEntityDto.entityExtraData =
+    this.dynamicInputsForViewDto
+      .entityExtraData ?? [];
+
+
+  console.log(
+    'RELATION SAVE ENTITY:',
+    appEntityDto
+  );
+
+
+  /*
+   * This calls SaveEntity internally,
+   * same behavior as old
+   * RelationshipSettingsComponent.
+   */
+  dynamicInput.saveAll(
+    appEntityDto
+  );
+
+
+  this.relationshipTouched =
+    false;
+}
+
+onExtraAttributeCleared(
+  attributeId: number
+): void {
+
+  this.relationshipTouched = true;
+
+  if (
+    !this.dynamicInputsForViewDto
+      ?.entityExtraData
+  ) {
+    return;
+  }
+
+  this.dynamicInputsForViewDto
+    .entityExtraData =
+      this.dynamicInputsForViewDto
+        .entityExtraData
+        .filter(
+          x =>
+            Number(x.attributeId) !==
+            Number(attributeId)
+        );
+}
+onRoleExtraAttributeCleared(
+  attributeId: number
+): void {
+
+  if (
+    !this.canEditSection('roles')
+  ) {
+    return;
+  }
+
+  const currentData =
+    this.roleDynamicInputsForViewDto
+      ?.entityExtraData ?? [];
+
+  const updatedData =
+    currentData.filter(
+      item =>
+        Number(item.attributeId) !==
+        Number(attributeId)
+    );
+
+  if (
+    this.roleDynamicInputsForViewDto
+  ) {
+    this.roleDynamicInputsForViewDto
+      .entityExtraData =
+        updatedData;
+  }
+
+  this.entityData.entityExtraData =
+    updatedData;
+
+  this.account.entityExtraData =
+    updatedData;
+
+  /*
+   * So the parent knows extra data
+   * changed and should be sent on save.
+   */
+  this.entityData.__extraDataTouched =
+    true;
+}
+
+
+
+// private loadRelationshipStaticLookups(): void {
+
+//   this._AppEntitiesServiceProxy
+//     .getAllEntitiesByTypeCode('SHIPVIA')
+//     .subscribe(result => {
+//       this.allShipVia = result ?? [];
+//     });
+
+//   this._AppEntitiesServiceProxy
+//     .getAllEntitiesByTypeCode('PAYMENT-TERMS')
+//     .subscribe(result => {
+//       this.allPaymentTerms = result ?? [];
+//     });
+
+//   this.allPriceLevel =
+//     this.getPriceLevel();
+// }
+
+private loadRelationshipStaticLookups():
+  Observable<any> {
+
+  return forkJoin({
+
+    shipVia:
+      this._AppEntitiesServiceProxy
+        .getAllEntitiesByTypeCode(
+          'SHIPVIA'
+        ),
+
+    paymentTerms:
+      this._AppEntitiesServiceProxy
+        .getAllEntitiesByTypeCode(
+          'PAYMENT-TERMS'
+        )
+
+  }).pipe(
+
+    tap(result => {
+
+      this.allShipVia =
+        result.shipVia ?? [];
+
+      this.allPaymentTerms =
+        result.paymentTerms ?? [];
+
+      this.allPriceLevel =
+        this.getPriceLevel();
+
+    })
+
+  );
+}
+
+onExtraAttributesChanged(dataFromChild: any[]): void {
+
+  this.relationshipTouched = true;
+
+  if (!this.dynamicInputsForViewDto) {
+    return;
+  }
+
+  this.dynamicInputsForViewDto.entityExtraData ??= [];
+
+  const existingData =
+    this.dynamicInputsForViewDto.entityExtraData;
+
+  const incomingData =
+    dataFromChild.flatMap(attr => {
+
+      if (
+        attr.isLookup &&
+        attr.acceptMultipleValues
+      ) {
+        const values =
+          Array.isArray(attr.value)
+            ? attr.value
+            : [];
+
+        return values.map(value => {
+
+          const dto =
+            new AppEntityExtraDataDto();
+
+          dto.attributeId =
+            attr.attributeId;
+
+          dto.entityObjectTypeId =
+            this.relationshipEntityObjectTypeId;
+
+          dto.entityid =
+            this.selectedRelationId;
+
+          dto.attributeValueId =
+            Number(value);
+
+          return dto;
+        });
+      }
+
+      const dto =
+        new AppEntityExtraDataDto();
+
+      dto.attributeId =
+        attr.attributeId;
+
+      dto.entityObjectTypeId =
+        this.relationshipEntityObjectTypeId;
+
+      dto.entityid =
+        this.selectedRelationId;
+
+      if (attr.isLookup) {
+
+        const value =
+          Number(attr.value);
+
+        dto.attributeValueId =
+          !isNaN(value)
+            ? value
+            : null;
+
+      } else {
+
+        dto.attributeValue =
+          attr.value;
+      }
+
+      return dto;
+    });
+
+  const changedIds =
+    new Set(
+      incomingData.map(x => x.attributeId)
+    );
+
+  const oldUnchanged =
+    existingData.filter(
+      x => !changedIds.has(x.attributeId)
+    );
+
+  this.dynamicInputsForViewDto.entityExtraData = [
+    ...oldUnchanged,
+    ...incomingData
+  ];
+}
+
+
+saveRelationshipEntity():
+  Observable<any> {
+
+  console.log(
+    'saveRelationshipEntity called',
+    {
+      touched:
+        this.relationshipTouched,
+
+      dto:
+        this.relationshipDynamicInputsForViewDto,
+
+      selectedRelationId:
+        this.selectedRelationId
+    }
+  );
+
+
+  if (!this.relationshipTouched) {
+
+    console.log(
+      'Relationship unchanged - skip SaveEntity'
+    );
+
+    return of(null);
+  }
+
+
+  const relationshipDto =
+    this.relationshipDynamicInputsForViewDto;
+
+
+  if (!relationshipDto?.appEntity) {
+
+    console.warn(
+      'Relationship appEntity missing',
+      relationshipDto
+    );
+
+    return of(null);
+  }
+
+
+  const dto =
+    Object.assign(
+      new AppEntityDto(),
+      relationshipDto.appEntity
+    );
+
+
+  dto.entityExtraData =
+    relationshipDto.entityExtraData ?? [];
+
+
+  console.log(
+    'CALLING SaveEntity:',
+    dto
+  );
+
+
+  return this._AppEntitiesServiceProxy
+    .saveEntity(dto)
+    .pipe(
+
+      tap(result => {
+
+        console.log(
+          'SaveEntity result:',
+          result
+        );
+
+        this.relationshipTouched =
+          false;
+      })
+
+    );
+}
 
 }

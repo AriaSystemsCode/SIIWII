@@ -11,7 +11,7 @@ import { TreeModule } from 'primeng/tree';
 import { BranchGenericComponent } from './branch-generic/branch-generic.component';
 import { AccordionModule } from 'primeng/accordion';
 import { DropdownModule } from 'primeng/dropdown';
-
+import { RadioButtonModule } from 'primeng/radiobutton';
 
 @NgModule({
   declarations: [SelectBranchModalComponent,BranchGenericComponent],
@@ -27,6 +27,7 @@ import { DropdownModule } from 'primeng/dropdown';
     ReactiveFormsModule,
     AccordionModule,
       DropdownModule,
+      RadioButtonModule
   ],
   exports : [SelectBranchModalComponent,BranchGenericComponent]
 })

@@ -324,3 +324,23 @@ export interface GenericEntityChangedEvent {
 
   entityData: any;
 }
+
+
+
+export interface BranchAddressSection {
+  code:
+    | 'BILLING'
+    | 'SHIPPING'
+    | 'DISTRIBUTION'
+    | 'MAILING';
+
+  label: string;
+
+  selectedAddress: any | null;
+
+  selectorOpen: boolean;
+  showNewAddressForm: boolean;
+  searchText: string;
+
+  newAddress: any;
+}

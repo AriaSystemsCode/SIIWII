@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Injector, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
+import { Component, EventEmitter, Injector, Input, OnChanges, Output, SimpleChanges, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { AppConsts } from '@shared/AppConsts';
 import { AppComponentBase } from '@shared/common/app-component-base';
@@ -25,6 +25,7 @@ import {
 } from 'rxjs/operators';
 import { GenericEntityNode, GenericSelectedEntity, PendingUpload } from '@app/shared/entity-shell/models/generic-entity.model';
 import { BranchGenericComponent } from '@app/select-branch/branch-generic/branch-generic.component';
+import { AccountSectionsComponent } from '../account-sections/account-sections.component';
 @Component({
   selector: 'app-account-card',
   templateUrl: './account-card.component.html',
@@ -66,7 +67,9 @@ imageAttachmentCategory: SycAttachmentCategoryDto;
 
 isLoadingAttachmentCategories = false;
 
-
+@ViewChild(AccountSectionsComponent)
+accountSectionsComponent:
+  AccountSectionsComponent;
 
 leftPanelSections: Array<{
   key: string;
@@ -1056,7 +1059,87 @@ private markAttachmentsTouched(): void {
 
   (this.accountViewData as any).__attachmentsTouched = true;
 }
+// saveAccount(): void {
+//   if (
+//     this.saving ||
+//     this.entityMode !== 'edit' ||
+//     !this.accountViewData?.account
+//   ) {
+//     return;
+//   }
+
+//   const account = this.accountViewData.account;
+
+//   if (
+//     account.isConnected &&
+//     !account.isManual
+//   ) {
+//     return;
+//   }
+
+//   this.saving = true;
+//   this.uploadingImages =
+//     this.hasPendingUploads();
+
+//   this.showMainSpinner();
+
+//   this.uploadPendingAttachments()
+//     .pipe(
+//       /*
+//        * switchMap runs only after
+//        * uploadPendingAttachments emits.
+//        *
+//        * Because uploadPendingAttachments uses forkJoin,
+//        * it emits only after every upload completes.
+//        */
+//       switchMap(uploadedAttachments => {
+//         this.applyUploadedAttachments(
+//           uploadedAttachments
+//         );
+
+//         const payload =
+//           this.buildAccountEditDto();
+
+//         console.log(
+//           'All uploads completed. Calling CreateOrEditAccount:',
+//           payload.toJSON()
+//         );
+
+//         return this._accountsServiceProxy
+//           .createOrEditAccount(payload);
+//       }),
+
+//       finalize(() => {
+//         this.saving = false;
+//         this.uploadingImages = false;
+//         this.hideMainSpinner();
+//       })
+//     )
+//     .subscribe({
+//       next: result => {
+//         this.notify.success(
+//           this.l('SavedSuccessfully')
+//         );
+
+//         this.clearPendingUploads();
+//         this.reloadAccountAfterSave();
+//       },
+
+//       error: error => {
+//         console.error(
+//           'Upload or account save failed:',
+//           error
+//         );
+
+//         this.notify.error(
+//           this.l('SaveFailed')
+//         );
+//       }
+//     });
+// }
+
 saveAccount(): void {
+
   if (
     this.saving ||
     this.entityMode !== 'edit' ||
@@ -1065,7 +1148,10 @@ saveAccount(): void {
     return;
   }
 
-  const account = this.accountViewData.account;
+
+  const account =
+    this.accountViewData.account;
+
 
   if (
     account.isConnected &&
@@ -1074,64 +1160,140 @@ saveAccount(): void {
     return;
   }
 
+
   this.saving = true;
+
   this.uploadingImages =
     this.hasPendingUploads();
 
+
   this.showMainSpinner();
+
 
   this.uploadPendingAttachments()
     .pipe(
+
       /*
-       * switchMap runs only after
-       * uploadPendingAttachments emits.
-       *
-       * Because uploadPendingAttachments uses forkJoin,
-       * it emits only after every upload completes.
+       * 1. Wait for image uploads
        */
-      switchMap(uploadedAttachments => {
-        this.applyUploadedAttachments(
-          uploadedAttachments
-        );
+      switchMap(
+        uploadedAttachments => {
 
-        const payload =
-          this.buildAccountEditDto();
+          this.applyUploadedAttachments(
+            uploadedAttachments
+          );
 
-        console.log(
-          'All uploads completed. Calling CreateOrEditAccount:',
-          payload.toJSON()
-        );
 
-        return this._accountsServiceProxy
-          .createOrEditAccount(payload);
-      }),
+          /*
+           * 2. Save Account
+           */
+          const payload =
+            this.buildAccountEditDto();
+
+
+          console.log(
+            'Calling CreateOrEditAccount:',
+            payload.toJSON()
+          );
+
+
+          return this._accountsServiceProxy
+            .createOrEditAccount(payload);
+        }
+      ),
+
+
+      /*
+       * 3. AFTER Account is saved,
+       * save Relationship settings.
+       */
+      switchMap(
+        accountResult => {
+
+          const relationshipSave$ =
+            this.accountSectionsComponent
+              ?.saveRelationshipEntity();
+
+
+          /*
+           * AccountSections may not exist,
+           * or Relationship was unchanged.
+           */
+          if (!relationshipSave$) {
+
+            return of({
+              accountResult,
+              relationshipResult:
+                null
+            });
+          }
+
+
+          return relationshipSave$
+            .pipe(
+
+              map(
+                relationshipResult => ({
+                  accountResult,
+                  relationshipResult
+                })
+              )
+
+            );
+        }
+      ),
+
 
       finalize(() => {
-        this.saving = false;
-        this.uploadingImages = false;
+
+        this.saving =
+          false;
+
+        this.uploadingImages =
+          false;
+
         this.hideMainSpinner();
       })
+
     )
     .subscribe({
+
       next: result => {
-        this.notify.success(
-          this.l('SavedSuccessfully')
+
+        console.log(
+          'Account + Relationship saved:',
+          result
         );
 
+
+        this.notify.success(
+          this.l(
+            'SavedSuccessfully'
+          )
+        );
+
+
         this.clearPendingUploads();
+
         this.reloadAccountAfterSave();
       },
 
+
       error: error => {
+
         console.error(
-          'Upload or account save failed:',
+          'Save failed:',
           error
         );
 
+
         this.notify.error(
-          this.l('SaveFailed')
+          this.l(
+            'SaveFailed'
+          )
         );
       }
+
     });
 }
 

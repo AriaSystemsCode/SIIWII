@@ -4,15 +4,17 @@
 
   <p-accordion>
 
+    <!-- ================================================== -->
+    <!-- BRANCH INFORMATION -->
+    <!-- ================================================== -->
+
     <p-accordionTab
-      header="{{
-        'BranchInformation'
-          | localize
-      }}"
+      header="{{ 'BranchInformation' | localize }}"
       [selected]="true">
 
       <div class="branch-form">
 
+        <!-- Trade name -->
         <div class="branch-form-row">
 
           <label>
@@ -22,13 +24,12 @@
           <input
             type="text"
             class="form-control"
-            [(ngModel)]="
-              entity.tradeName
-            "
+            [(ngModel)]="entity.tradeName"
             [readonly]="isViewMode" />
 
         </div>
 
+        <!-- Email -->
         <div class="branch-form-row">
 
           <label>
@@ -38,13 +39,12 @@
           <input
             type="email"
             class="form-control"
-            [(ngModel)]="
-              entity.eMailAddress
-            "
+            [(ngModel)]="entity.eMailAddress"
             [readonly]="isViewMode" />
 
         </div>
 
+        <!-- Website -->
         <div class="branch-form-row">
 
           <label>
@@ -54,13 +54,12 @@
           <input
             type="text"
             class="form-control"
-            [(ngModel)]="
-              entity.website
-            "
+            [(ngModel)]="entity.website"
             [readonly]="isViewMode" />
 
         </div>
 
+        <!-- Language -->
         <div class="branch-form-row">
 
           <label>
@@ -69,17 +68,17 @@
 
           <p-dropdown
             [options]="allLanguages"
-            [(ngModel)]="
-              entity.languageId
-            "
+            [(ngModel)]="entity.languageId"
             optionLabel="label"
             optionValue="value"
             [disabled]="isViewMode"
-            appendTo="body">
+            appendTo="body"
+            styleClass="w-100">
           </p-dropdown>
 
         </div>
 
+        <!-- Currency -->
         <div class="branch-form-row">
 
           <label>
@@ -88,196 +87,648 @@
 
           <p-dropdown
             [options]="allCurrencies"
-            [(ngModel)]="
-              entity.currencyId
-            "
+            [(ngModel)]="entity.currencyId"
             optionLabel="label"
             optionValue="value"
             [disabled]="isViewMode"
-            appendTo="body">
+            appendTo="body"
+            styleClass="w-100">
           </p-dropdown>
 
         </div>
 
       </div>
 
+      <!-- ================================================== -->
+      <!-- PHONES -->
+      <!-- ================================================== -->
+
+      <div class="branch-section-separator"></div>
+
+      <!-- Phone 1 -->
+      <div class="row align-items-center mb-3">
+
+        <label class="col-md-2 col-form-label">
+          {{ 'Phone1' | localize }}:
+        </label>
+
+        <div class="col-md-3">
+
+          <p-dropdown
+            [options]="allPhoneTypes"
+            [(ngModel)]="entity.phone1TypeId"
+            optionLabel="label"
+            optionValue="value"
+            [disabled]="isViewMode"
+            appendTo="body"
+            styleClass="w-100">
+          </p-dropdown>
+
+        </div>
+
+        <div class="col-md-4">
+
+          <input
+            type="text"
+            class="form-control"
+            [(ngModel)]="entity.phone1Number"
+            [readonly]="isViewMode"
+            [placeholder]="'PhoneNumber' | localize" />
+
+        </div>
+
+        <div class="col-md-3">
+
+          <input
+            type="text"
+            class="form-control"
+            [(ngModel)]="entity.phone1Ext"
+            [readonly]="isViewMode"
+            [placeholder]="'Extension' | localize" />
+
+        </div>
+
+      </div>
+
+      <!-- Phone 2 -->
+      <div class="row align-items-center mb-3">
+
+        <label class="col-md-2 col-form-label">
+          {{ 'Phone2' | localize }}:
+        </label>
+
+        <div class="col-md-3">
+
+          <p-dropdown
+            [options]="allPhoneTypes"
+            [(ngModel)]="entity.phone2TypeId"
+            optionLabel="label"
+            optionValue="value"
+            [disabled]="isViewMode"
+            appendTo="body"
+            styleClass="w-100">
+          </p-dropdown>
+
+        </div>
+
+        <div class="col-md-4">
+
+          <input
+            type="text"
+            class="form-control"
+            [(ngModel)]="entity.phone2Number"
+            [readonly]="isViewMode"
+            [placeholder]="'PhoneNumber' | localize" />
+
+        </div>
+
+        <div class="col-md-3">
+
+          <input
+            type="text"
+            class="form-control"
+            [(ngModel)]="entity.phone2Ext"
+            [readonly]="isViewMode"
+            [placeholder]="'Extension' | localize" />
+
+        </div>
+
+      </div>
+
+      <!-- Phone 3 -->
+      <div class="row align-items-center">
+
+        <label class="col-md-2 col-form-label">
+          {{ 'Phone3' | localize }}:
+        </label>
+
+        <div class="col-md-3">
+
+          <p-dropdown
+            [options]="allPhoneTypes"
+            [(ngModel)]="entity.phone3TypeId"
+            optionLabel="label"
+            optionValue="value"
+            [disabled]="isViewMode"
+            appendTo="body"
+            styleClass="w-100">
+          </p-dropdown>
+
+        </div>
+
+        <div class="col-md-4">
+
+          <input
+            type="text"
+            class="form-control"
+            [(ngModel)]="entity.phone3Number"
+            [readonly]="isViewMode"
+            [placeholder]="'PhoneNumber' | localize" />
+
+        </div>
+
+        <div class="col-md-3">
+
+          <input
+            type="text"
+            class="form-control"
+            [(ngModel)]="entity.phone3Ext"
+            [readonly]="isViewMode"
+            [placeholder]="'Extension' | localize" />
+
+        </div>
+
+      </div>
+
     </p-accordionTab>
 
-    <p-accordionTab
-      header="{{
-        'ContactInformation'
-          | localize
-      }}">
 
-      <div class="branch-phone-row">
-
-        <label>
-          {{ 'Phone' | localize }}:
-        </label>
-
-        <p-dropdown
-          [options]="allPhoneTypes"
-          [(ngModel)]="
-            entity.phone1TypeId
-          "
-          optionLabel="label"
-          optionValue="value"
-          [disabled]="isViewMode"
-          appendTo="body">
-        </p-dropdown>
-
-        <input
-          type="text"
-          class="form-control"
-          [(ngModel)]="
-            entity.phone1Number
-          "
-          [readonly]="isViewMode" />
-
-        <input
-          type="text"
-          class="form-control"
-          [(ngModel)]="
-            entity.phone1Ext
-          "
-          placeholder="{{
-            'Extension' | localize
-          }}"
-          [readonly]="isViewMode" />
-
-      </div>
-
-      <div class="branch-phone-row">
-
-        <label>
-          {{ 'Phone' | localize }}:
-        </label>
-
-        <p-dropdown
-          [options]="allPhoneTypes"
-          [(ngModel)]="
-            entity.phone2TypeId
-          "
-          optionLabel="label"
-          optionValue="value"
-          [disabled]="isViewMode"
-          appendTo="body">
-        </p-dropdown>
-
-        <input
-          type="text"
-          class="form-control"
-          [(ngModel)]="
-            entity.phone2Number
-          "
-          [readonly]="isViewMode" />
-
-        <input
-          type="text"
-          class="form-control"
-          [(ngModel)]="
-            entity.phone2Ext
-          "
-          placeholder="{{
-            'Extension' | localize
-          }}"
-          [readonly]="isViewMode" />
-
-      </div>
-
-      <div class="branch-phone-row">
-
-        <label>
-          {{ 'Phone' | localize }}:
-        </label>
-
-        <p-dropdown
-          [options]="allPhoneTypes"
-          [(ngModel)]="
-            entity.phone3TypeId
-          "
-          optionLabel="label"
-          optionValue="value"
-          [disabled]="isViewMode"
-          appendTo="body">
-        </p-dropdown>
-
-        <input
-          type="text"
-          class="form-control"
-          [(ngModel)]="
-            entity.phone3Number
-          "
-          [readonly]="isViewMode" />
-
-        <input
-          type="text"
-          class="form-control"
-          [(ngModel)]="
-            entity.phone3Ext
-          "
-          placeholder="{{
-            'Extension' | localize
-          }}"
-          [readonly]="isViewMode" />
-
-      </div>
-
-    </p-accordionTab>
+    <!-- ================================================== -->
+    <!-- ADDRESSES -->
+    <!-- ================================================== -->
 
     <p-accordionTab
-      header="{{
-        'Addresses'
-          | localize
-      }}">
+      header="{{ 'Addresses' | localize }}">
 
-      <div
-        *ngIf="
-          entity.contactAddresses
-            ?.length;
-          else noAddresses
-        "
-        class="branch-address-list">
+      <div class="branch-address-types">
 
         <div
           *ngFor="
-            let address of
-              entity.contactAddresses
+            let section of addressSections;
+            trackBy: trackByAddressSection
           "
-          class="branch-address-card">
+          class="address-type-section">
 
-          <strong>
-            {{ address.name }}
-          </strong>
+          <!-- ============================================ -->
+          <!-- ADDRESS TYPE HEADER -->
+          <!-- ============================================ -->
 
-          <div>
-            {{ address.addressLine1 }}
+          <div class="address-type-header">
+
+            <div class="address-type-title">
+              {{ section.label | localize }}
+            </div>
+
+     
+
           </div>
 
-          <div>
-            {{ address.addressLine2 }}
+
+          <!-- ============================================ -->
+          <!-- ASSIGNED ADDRESS -->
+          <!-- ============================================ -->
+
+          <div
+            *ngIf="section.selectedAddress"
+            class="assigned-address-row">
+
+            <div
+              class="assigned-address-icon"
+              [class.view-mode]="isViewMode">
+
+              <i
+                class="fa"
+                [ngClass]="
+                  isViewMode
+                    ? 'fa-map-marker'
+                    : 'fa-check'
+                ">
+              </i>
+
+            </div>
+
+            <div class="assigned-address-text">
+
+              {{ formatAddress(section.selectedAddress) }}
+
+            </div>
+
+            <button
+              *ngIf="!isViewMode"
+              type="button"
+              class="clear-address-button"
+              (click)="clearSelectedAddress(section)">
+
+              <i class="fa fa-times"></i>
+
+            </button>
+
           </div>
 
-          <div>
-            {{ address.city }}
-            {{ address.state }}
-            {{ address.postalCode }}
+
+          <!-- ============================================ -->
+          <!-- NO ADDRESS -->
+          <!-- ============================================ -->
+
+          <div
+            *ngIf="
+              !section.selectedAddress &&
+              !section.selectorOpen
+            "
+            class="empty-address-row">
+
+            <button
+              *ngIf="!isViewMode"
+              type="button"
+              class="empty-address-plus"
+              (click)="openAddressSelector(section)">
+
+              <i class="fa fa-plus"></i>
+
+            </button>
+
+            <span>
+              {{ 'NoAddressAssigned' | localize }}
+            </span>
+
+          </div>
+
+
+          <!-- ============================================ -->
+          <!-- ADDRESS PICKER -->
+          <!-- ============================================ -->
+
+          <div
+            *ngIf="
+              !isViewMode &&
+              section.selectorOpen
+            "
+            class="address-selector-panel">
+
+            <!-- Toolbar -->
+            <div class="address-selector-toolbar">
+
+              <div class="address-search-box">
+
+                <input
+                  type="text"
+                  class="form-control"
+                  [(ngModel)]="section.searchText"
+                  [name]="'addressSearch_' + section.code"
+                  placeholder="{{ 'LookInAddresses' | localize }}" />
+
+                <i class="fa fa-search"></i>
+
+              </div>
+
+              <button
+                type="button"
+                class="add-address-button"
+                (click)="showAddAddressForm(section)">
+
+                <i class="fa fa-plus"></i>
+
+                {{ 'AddANewAddress' | localize }}
+
+              </button>
+
+            </div>
+
+
+            <!-- ========================================== -->
+            <!-- EXISTING ADDRESS LIST -->
+            <!-- ========================================== -->
+
+            <div class="account-address-list">
+
+              <!-- loading -->
+              <div
+                *ngIf="loadingAddresses"
+                class="address-loading">
+
+                <i class="fa fa-spinner fa-spin"></i>
+
+              </div>
+
+
+              <div
+                *ngFor="
+                  let address of getFilteredAddresses(section);
+                  trackBy: trackByAddressId
+                "
+                class="account-address-option"
+                [class.selected]="
+                  section.selectedAddress?.id ===
+                  address.id
+                ">
+
+                <!-- Radio + text -->
+                <div
+                  class="address-select-area"
+                  (click)="selectAddress(section, address)">
+
+                  <input
+                    type="radio"
+                    class="address-radio"
+                    [name]="'selectedAddress_' + section.code"
+                    [checked]="
+                      section.selectedAddress?.id ===
+                      address.id
+                    " />
+
+                  <div class="account-address-details">
+
+                    <strong>
+                      {{ formatAddress(address) }}
+                    </strong>
+
+                  </div>
+
+                </div>
+
+
+                <!-- actions -->
+                <div class="address-actions">
+
+                  <button
+                    type="button"
+                    class="address-action edit"
+                    (click)="
+                      editAddress(
+                        section,
+                        address,
+                        $event
+                      )
+                    ">
+
+                    <i class="fa fa-edit"></i>
+
+                    {{ 'Edit' | localize }}
+
+                  </button>
+
+                  <button
+                    type="button"
+                    class="address-action delete"
+                    (click)="
+                      removeAddressFromList(
+                        section,
+                        address,
+                        $event
+                      )
+                    ">
+
+                    <i class="fa fa-trash"></i>
+
+                    {{ 'Delete' | localize }}
+
+                  </button>
+
+                </div>
+
+              </div>
+
+
+              <!-- empty -->
+              <div
+                *ngIf="
+                  !loadingAddresses &&
+                  !getFilteredAddresses(section).length
+                "
+                class="no-address-results">
+
+                {{ 'NoAddressesAvailable' | localize }}
+
+              </div>
+
+            </div>
+
+
+            <!-- ========================================== -->
+            <!-- ADD / EDIT ADDRESS FORM -->
+            <!-- ========================================== -->
+
+            <div
+              *ngIf="section.showNewAddressForm"
+              class="new-address-form">
+
+              <div class="new-address-form-header">
+
+                <div class="new-address-title">
+
+                  {{
+                    (
+                      section.newAddress?.id
+                        ? 'EditAddressDetails'
+                        : 'AddNewAddressDetails'
+                    ) | localize
+                  }}
+
+                </div>
+
+                <small>
+
+                  {{
+                    'PleaseEnterTheNewAddressInformation'
+                      | localize
+                  }}
+
+                </small>
+
+              </div>
+
+
+              <!-- Code -->
+              <div class="address-form-group">
+
+                <label>
+                  {{ 'Code' | localize }} *
+                </label>
+
+                <input
+                  type="text"
+                  class="form-control"
+                  [(ngModel)]="section.newAddress.code"
+                  [name]="'addressCode_' + section.code"
+                  placeholder="{{ 'AddressCode' | localize }}" />
+
+              </div>
+
+
+              <!-- Name -->
+              <div class="address-form-group">
+
+                <label>
+                  {{ 'Name' | localize }} *
+                </label>
+
+                <input
+                  type="text"
+                  class="form-control"
+                  [(ngModel)]="section.newAddress.name"
+                  [name]="'addressName_' + section.code"
+                  placeholder="{{ 'AddressName' | localize }}" />
+
+              </div>
+
+
+              <!-- Address 1 -->
+              <div class="address-form-group">
+
+                <label>
+                  {{ 'AddressLine1' | localize }} *
+                </label>
+
+                <input
+                  type="text"
+                  class="form-control"
+                  [(ngModel)]="section.newAddress.addressLine1"
+                  [name]="'addressLine1_' + section.code"
+                  placeholder="{{ 'AddressLine1' | localize }}" />
+
+              </div>
+
+
+              <!-- Address 2 -->
+              <div class="address-form-group">
+
+                <label>
+                  {{ 'AddressLine2' | localize }}
+                </label>
+
+                <input
+                  type="text"
+                  class="form-control"
+                  [(ngModel)]="section.newAddress.addressLine2"
+                  [name]="'addressLine2_' + section.code"
+                  placeholder="{{ 'AddressLine2' | localize }}" />
+
+              </div>
+
+
+              <!-- City -->
+              <div class="address-form-group">
+
+                <label>
+                  {{ 'City' | localize }} *
+                </label>
+
+                <input
+                  type="text"
+                  class="form-control"
+                  [(ngModel)]="section.newAddress.city"
+                  [name]="'addressCity_' + section.code"
+                  placeholder="{{ 'City' | localize }}" />
+
+              </div>
+
+
+              <!-- State -->
+              <div class="address-form-group">
+
+                <label>
+                  {{ 'State' | localize }} *
+                </label>
+
+                <input
+                  type="text"
+                  class="form-control"
+                  [(ngModel)]="section.newAddress.state"
+                  [name]="'addressState_' + section.code"
+                  placeholder="{{ 'State' | localize }}" />
+
+              </div>
+
+
+              <!-- Postal + Country -->
+              <div class="row">
+
+                <div class="col-md-6">
+
+                  <div class="address-form-group">
+
+                    <label>
+                      {{ 'PostalCode' | localize }} *
+                    </label>
+
+                    <input
+                      type="text"
+                      class="form-control"
+                      [(ngModel)]="section.newAddress.postalCode"
+                      [name]="'postalCode_' + section.code"
+                      placeholder="{{ 'PostalCode' | localize }}" />
+
+                  </div>
+
+                </div>
+
+
+                <div class="col-md-6">
+
+                  <div class="address-form-group">
+
+                    <label>
+                      {{ 'Country' | localize }}
+                    </label>
+
+                    <p-dropdown
+                      [options]="allCountries"
+                      [(ngModel)]="section.newAddress.countryId"
+                      [name]="'country_' + section.code"
+                      optionLabel="label"
+                      optionValue="value"
+                      placeholder="{{ 'PleaseSelect' | localize }}"
+                      appendTo="body"
+                      styleClass="w-100">
+                    </p-dropdown>
+
+                  </div>
+
+                </div>
+
+              </div>
+
+
+              <!-- Buttons -->
+              <div class="new-address-actions">
+
+                <button
+                  type="button"
+                  class="btn btnCancel"
+                  [disabled]="savingAddress"
+                  (click)="cancelNewAddress(section)">
+
+                  {{ 'Cancel' | localize }}
+
+                </button>
+
+                <button
+                  type="button"
+                  class="btn bgPurple"
+                  [buttonBusy]="savingAddress"
+                  [disabled]="
+                    savingAddress ||
+                    !isNewAddressValid(section.newAddress)
+                  "
+                  (click)="saveNewAddress(section)">
+
+                  {{ 'Save' | localize }}
+
+                </button>
+
+              </div>
+
+            </div>
+
+
+            <div class="address-selector-close">
+
+              <button
+                type="button"
+                class="btn btn-link"
+                (click)="closeAddressSelector(section)">
+
+                {{ 'Close' | localize }}
+
+              </button>
+
+            </div>
+
           </div>
 
         </div>
 
       </div>
-
-      <ng-template #noAddresses>
-
-        <div class="text-muted py-3">
-          {{
-            'NoAddressesAvailable'
-              | localize
-          }}
-        </div>
-
-      </ng-template>
 
     </p-accordionTab>
 
