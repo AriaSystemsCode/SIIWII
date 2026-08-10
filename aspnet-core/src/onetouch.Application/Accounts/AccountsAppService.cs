@@ -1635,16 +1635,27 @@ namespace onetouch.Accounts
                 .Include(z => z.CurrencyFk).FirstOrDefaultAsync(x => x.ParentId == id && x.EntityFk.EntityObjectTypeId == branchEntityObjectTypeId);
                 if (mainBranch == null
                     && (account.EntityFk.TenantOwner == AbpSession.TenantId || account.EntityFk.TenantOwner == 0 ||
-                    account.EntityFk.TenantOwner == null) && account.EntityFk.EntityObjectTypeId != presonEntityObjectTypeId)
+                    account.EntityFk.TenantOwner == null))// && account.EntityFk.EntityObjectTypeId != presonEntityObjectTypeId)
                 {
                     BranchDto branchDto = new BranchDto();
                     branchDto.AccountId = account.Id;
                     branchDto.ParentId = account.Id;
                     branchDto.TenantId = AbpSession.TenantId;
 
-                    branchDto.Code = account.Code.TrimEnd() + "-MAIN";
-                    branchDto.Name = account.Name.TrimEnd() + " Main Branch";
-                    branchDto.CurrencyId = account.CurrencyId;
+                        //branchDto.Code = account.Code.TrimEnd() + "-MAIN";
+                        //branchDto.Name = account.Name.TrimEnd() + " Main Branch";
+                        if (account.EntityFk.EntityObjectTypeId == presonEntityObjectTypeId)
+                        {
+
+                            branchDto.Code = (account.Code.TrimEnd() + "-MAINADDRESS").Length > 50 ? (account.Code.TrimEnd() + "-MAINADDRESS").Substring(0, 50) : account.Code.TrimEnd() + "-MAINADDRESS";
+                            branchDto.Name = "Main Address";
+                        }
+                        else
+                        {
+                            branchDto.Code = (account.Code.TrimEnd() + "-MAIN").Length > 50 ? (account.Code.TrimEnd() + "-MAIN").Substring(0, 50) : account.Code.TrimEnd() + "-MAIN";
+                            branchDto.Name = account.Name.TrimEnd() + " Main Branch";
+                        }
+                        branchDto.CurrencyId = account.CurrencyId;
                     branchDto.EMailAddress = account.EMailAddress;
                     branchDto.LanguageId = account.LanguageId;
                     branchDto.Id = 0;
