@@ -387,21 +387,78 @@ fillSelectedValuesFromDto(): void {
       const dtoValue =
         values[values.length - 1];
 
-      if (
-        attr.isLookup
-      ) {
-        const matchedOption =
-          attr.paginationSetting?.list?.find(
-            option =>
-              option.label === dtoValue ||
-              option.value === dtoValue
-          );
+      // if (
+      //   attr.isLookup
+      // ) {
+      //   const matchedOption =
+      //     attr.paginationSetting?.list?.find(
+      //       option =>
+      //         option.label === dtoValue ||
+      //         option.value === dtoValue
+      //     );
 
-        if (matchedOption) {
-          attr.selectedValues =
-            matchedOption.value;
-        }
-      } else if (
+      //   if (matchedOption) {
+      //     attr.selectedValues =
+      //       matchedOption.value;
+      //   }
+      // }
+      if (attr.isLookup) {
+
+  const options =
+    attr.paginationSetting?.list ?? [];
+
+  const matchedOption =
+    options.find(
+      option => {
+
+        return (
+          String(option?.value) ===
+            String(dtoValue) ||
+
+          String(option?.label) ===
+            String(dtoValue)
+        );
+      }
+    );
+
+
+  if (matchedOption) {
+
+    /*
+     * Important:
+     * Use the actual option value,
+     * preserving its original type.
+     *
+     * Example:
+     * API = "534386"
+     * option.value = 534386
+     *
+     * selectedValues becomes 534386
+     * not "534386".
+     */
+    attr.selectedValues =
+      matchedOption.value;
+
+  } else {
+
+    /*
+     * Lookup options may still be loading.
+     *
+     * Payment Terms / Ship Via return
+     * numeric IDs as strings from
+     * extraDataAttributes.
+     */
+    const numericValue =
+      Number(dtoValue);
+
+    attr.selectedValues =
+      dtoValue !== '' &&
+      !Number.isNaN(numericValue)
+        ? numericValue
+        : dtoValue;
+  }
+}
+       else if (
         attr.dataType?.toLowerCase() ===
           'datetime' ||
         attr.dataType?.toLowerCase() ===
