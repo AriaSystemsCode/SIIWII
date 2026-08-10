@@ -8443,8 +8443,9 @@ namespace onetouch.AppSiiwiiTransaction
                 }
 
             }
-
+            await CurrentUnitOfWork.SaveChangesAsync();
             await RecalculateTransactionTotalAmount(pTransactionID);
+            
         }
 
         private async Task<decimal> CalculateTaxes(long pTransactionID, long entityObjectChargesId, AppContactRelationshipInfo relation)
