@@ -1,1 +1,672 @@
-<p>related-entities works!</p>
+<div class="related-entities">
+
+  <!-- ===================================== -->
+  <!-- HEADER -->
+  <!-- ===================================== -->
+
+  <div class="related-header">
+
+    <!-- <h4 class="related-title">
+      {{ 'RelatedEntities' | localize }}
+    </h4> -->
+
+    <div class="related-type-dropdown">
+
+      <p-dropdown
+        [options]="viewOptions"
+        [(ngModel)]="selectedView"
+        optionLabel="label"
+        optionValue="value"
+        appendTo="body"
+        styleClass="w-100"
+        (onChange)="
+          onViewChange($event.value)
+        ">
+      </p-dropdown>
+
+    </div>
+
+  </div>
+
+
+  <!-- ===================================== -->
+  <!-- HEADER TRANSACTIONS -->
+  <!-- ===================================== -->
+
+  <div
+    *ngIf="
+      selectedView === 'header'
+    "
+    class="related-table-section">
+
+    <p-table
+  #headerTable
+
+  [value]="headerTransactions"
+
+  [loading]="headerLoading"
+
+  [paginator]="false"
+
+  [scrollable]="true"
+
+  responsiveLayout="scroll"
+
+  [tableStyle]="{
+    'min-width': '70rem'
+  }"
+
+  (onSort)="
+    onHeaderSort()
+  ">
+
+      <!-- Table Header -->
+
+      <ng-template
+        pTemplate="header">
+
+        <tr>
+
+          <th
+            pSortableColumn="
+              sellerCompanyName
+            ">
+
+            {{
+              'SellerName'
+                | localize
+            }}
+
+            <p-sortIcon
+              field="
+                sellerCompanyName
+              ">
+            </p-sortIcon>
+
+          </th>
+
+
+          <th
+            pSortableColumn="
+              buyerCompanyName
+            ">
+
+            {{
+              'BuyerName'
+                | localize
+            }}
+
+            <p-sortIcon
+              field="
+                buyerCompanyName
+              ">
+            </p-sortIcon>
+
+          </th>
+
+
+          <th
+            pSortableColumn="
+              entityObjectTypeCode
+            ">
+
+            {{
+              'TransactionType'
+                | localize
+            }}
+
+            <p-sortIcon
+              field="
+                entityObjectTypeCode
+              ">
+            </p-sortIcon>
+
+          </th>
+
+
+          <th
+            pSortableColumn="code">
+
+            {{
+              'Transaction'
+                | localize
+            }} #
+
+            <p-sortIcon
+              field="code">
+            </p-sortIcon>
+
+          </th>
+
+
+          <th
+            pSortableColumn="
+              entityObjectStatusCode
+            ">
+
+            {{
+              'Status'
+                | localize
+            }}
+
+            <p-sortIcon
+              field="
+                entityObjectStatusCode
+              ">
+            </p-sortIcon>
+
+          </th>
+
+
+          <th
+            pSortableColumn="
+              creationTime
+            ">
+
+            {{
+              'DateCreated'
+                | localize
+            }}
+
+            <p-sortIcon
+              field="
+                creationTime
+              ">
+            </p-sortIcon>
+
+          </th>
+
+
+          <th
+            pSortableColumn="
+              completeDate
+            ">
+
+            {{
+              'CompleteDate'
+                | localize
+            }}
+
+            <p-sortIcon
+              field="
+                completeDate
+              ">
+            </p-sortIcon>
+
+          </th>
+
+
+          <th>
+            {{
+              'Reference'
+                | localize
+            }} #
+          </th>
+
+
+          <th class="text-right">
+            {{
+              'TotalQuantity'
+                | localize
+            }}
+          </th>
+
+
+          <th class="text-right">
+            {{
+              'TotalAmount'
+                | localize
+            }}
+          </th>
+
+        </tr>
+
+      </ng-template>
+
+
+      <!-- Table Body -->
+
+      <ng-template
+        pTemplate="body"
+        let-record>
+
+        <tr>
+
+          <td>
+            {{
+              record
+                ?.sellerCompanyName
+                || '-'
+            }}
+          </td>
+
+
+          <td>
+            {{
+              record
+                ?.buyerCompanyName
+                || '-'
+            }}
+          </td>
+
+
+          <td>
+
+            {{
+              (
+                record
+                  ?.entityObjectTypeCode
+                  === 'SALESORDER'
+                  ? 'SalesOrder'
+                  : 'purchaseOrder'
+              )
+                | localize
+            }}
+
+          </td>
+
+
+          <td>
+            {{
+              record?.code || '-'
+            }}
+          </td>
+
+
+          <td>
+
+            {{
+              record
+                ?.entityObjectStatusCode
+                | localize
+            }}
+
+          </td>
+
+
+          <td>
+
+            <ng-container
+              *ngIf="
+                record?.creationTime;
+                else emptyValue
+              ">
+
+              {{
+                record.creationTime
+                  | momentFormat:'L'
+              }}
+
+            </ng-container>
+
+          </td>
+
+
+          <td>
+
+            <ng-container
+              *ngIf="
+                record?.completeDate;
+                else emptyValue
+              ">
+
+              {{
+                record.completeDate
+                  | momentFormat:'L'
+              }}
+
+            </ng-container>
+
+          </td>
+
+
+          <td>
+            {{
+              record?.reference || '-'
+            }}
+          </td>
+
+
+          <td class="text-right">
+            {{
+              record?.totalQuantity
+            }}
+          </td>
+
+
+          <td class="text-right">
+            {{
+              record?.totalAmount
+                | number:'1.2-2'
+            }}
+          </td>
+
+        </tr>
+
+      </ng-template>
+
+    </p-table>
+
+
+    <!-- Empty -->
+
+    <div
+      *ngIf="
+        !headerLoading &&
+        headerTotalRecords === 0
+      "
+      class="empty-table">
+
+      {{ 'NoData' | localize }}
+
+    </div>
+
+
+    <!-- Pagination -->
+
+    <div
+      *ngIf="
+        headerTotalRecords > 0
+      "
+      class="related-pagination">
+
+      <p-paginator
+        #headerPaginator
+        [rows]="headerRows"
+        [totalRecords]="
+          headerTotalRecords
+        "
+        [rowsPerPageOptions]="[
+          10,
+          20,
+          25,
+          50,
+          100
+        ]"
+        (onPageChange)="
+          loadHeaderTransactions(
+            $event
+          )
+        ">
+      </p-paginator>
+
+   <span>
+  {{
+    'TotalRecordsCount'
+      | localize: headerTotalRecords
+  }}
+</span>
+
+    </div>
+
+  </div>
+
+
+  <!-- ===================================== -->
+  <!-- DETAILS TRANSACTIONS -->
+  <!-- ===================================== -->
+
+  <div
+    *ngIf="
+      selectedView === 'details'
+    "
+    class="related-table-section">
+
+    <p-table
+      #detailsTable
+      [value]="transactionDetails"
+      [lazy]="true"
+      [loading]="detailsLoading"
+      [paginator]="false"
+      [scrollable]="true"
+      responsiveLayout="scroll"
+      [tableStyle]="{
+        'min-width': '60rem'
+      }"
+      (onLazyLoad)="
+        loadTransactionDetails(
+          $event
+        )
+      "
+      (onSort)="
+        onDetailsSort()
+      ">
+
+      <ng-template
+        pTemplate="header">
+
+        <tr>
+
+          <th
+            pSortableColumn="
+              transactionType
+            ">
+
+            {{
+              'TransactionType'
+                | localize
+            }}
+
+            <p-sortIcon
+              field="
+                transactionType
+              ">
+            </p-sortIcon>
+
+          </th>
+
+
+          <th>
+            {{
+              'Transaction'
+                | localize
+            }} #
+          </th>
+
+
+          <th>
+            {{ 'Image' | localize }}
+          </th>
+
+
+          <th>
+            {{
+              'VariationCode'
+                | localize
+            }}
+          </th>
+
+
+          <th>
+            {{ 'Name' | localize }}
+          </th>
+
+
+          <th class="text-right">
+            {{ 'Qty' | localize }}
+          </th>
+
+
+          <th
+            class="text-right"
+            pSortableColumn="price">
+
+            {{ 'Price' | localize }}
+
+            <p-sortIcon
+              field="price">
+            </p-sortIcon>
+
+          </th>
+
+
+          <th
+            class="text-right"
+            pSortableColumn="amount">
+
+            {{ 'Amount' | localize }}
+
+            <p-sortIcon
+              field="amount">
+            </p-sortIcon>
+
+          </th>
+
+        </tr>
+
+      </ng-template>
+
+
+      <ng-template
+        pTemplate="body"
+        let-product>
+
+        <tr>
+
+          <td>
+
+            {{
+              (
+                product
+                  ?.transactionType
+                  === 0
+                  ? 'SalesOrder'
+                  : 'PurchaseOrder'
+              )
+                | localize
+            }}
+
+          </td>
+
+
+          <td>
+            {{
+              product
+                ?.transactionNumber
+                || '-'
+            }}
+          </td>
+
+
+          <td>
+
+            <img
+              *ngIf="product?.image"
+              [src]="
+                attachmentBaseUrl +
+                '/' +
+                product.image
+              "
+              class="related-product-image"
+              onerror="
+                this.src='../../../../../assets/placeholders/appitem-placeholder.png'
+              ">
+
+          </td>
+
+
+          <td>
+            {{
+              product
+                ?.manufacturerCode
+                || '-'
+            }}
+          </td>
+
+
+          <td>
+            {{
+              product?.name || '-'
+            }}
+          </td>
+
+
+          <td class="text-right">
+            {{ product?.qty }}
+          </td>
+
+
+          <td class="text-right">
+
+            {{
+              product?.price
+                | number:'1.2-2'
+            }}
+
+          </td>
+
+
+          <td class="text-right">
+
+            {{
+              product?.amount
+                | number:'1.2-2'
+            }}
+
+          </td>
+
+        </tr>
+
+      </ng-template>
+
+    </p-table>
+
+
+    <div
+      *ngIf="
+        !detailsLoading &&
+        detailsTotalRecords === 0
+      "
+      class="empty-table">
+
+      {{ 'NoData' | localize }}
+
+    </div>
+
+
+    <div
+      *ngIf="
+        detailsTotalRecords > 0
+      "
+      class="related-pagination">
+
+  <p-paginator
+  #headerPaginator
+
+  [rows]="headerRows"
+
+  [totalRecords]="
+    headerTotalRecords
+  "
+
+  [rowsPerPageOptions]="[
+    10,
+    20,
+    25,
+    50,
+    100
+  ]"
+
+  (onPageChange)="
+    loadHeaderTransactions(
+      $event
+    )
+  ">
+</p-paginator>
+
+  <span>
+  {{
+    'TotalRecordsCount'
+      | localize: detailsTotalRecords
+  }}
+</span>
+    </div>
+
+  </div>
+
+
+  <ng-template #emptyValue>
+    -
+  </ng-template>
+
+</div>

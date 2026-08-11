@@ -299,6 +299,8 @@
         <app-entity-right-panel
   *ngIf="!rightPanelCollapsed"
 
+   [entityData]="displayedEntityData"
+
   [entityId]="
     displayedEntity?.entityId ??
     displayedEntity?.id

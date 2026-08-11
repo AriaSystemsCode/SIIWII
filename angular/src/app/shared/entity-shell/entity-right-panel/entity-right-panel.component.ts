@@ -9,11 +9,10 @@ export class EntityRightPanelComponent {
 
    activeTab: 'audit' | 'messages' | 'related' = 'audit';
 
-
+   @Input()entityData:any
    @Input() collapsed = false;
 
-   @Input()
-entityId: number;
+   @Input()entityId: number;
 
 @Input()
 creatorUserId: number;

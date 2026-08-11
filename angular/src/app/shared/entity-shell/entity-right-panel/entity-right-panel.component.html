@@ -20,7 +20,7 @@
       class="tab-btn"
       [class.active]="activeTab === 'related'"
       (click)="activeTab = 'related'">
-      Relations
+      Related
     </button>
 
   </div>
@@ -51,7 +51,7 @@
   [parentId]="parentId">
 </app-entity-messages>
 
-    <app-related-entities *ngIf="activeTab === 'related'"></app-related-entities>
+    <app-related-entities *ngIf="activeTab === 'related'" [entityData]="entityData"></app-related-entities>
 
   </div>
 
