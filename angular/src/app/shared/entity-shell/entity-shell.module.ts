@@ -66,6 +66,7 @@ import { AuditTrailComponent } from './entity-right-panel/audit-trail/audit-trai
 import { RelatedEntitiesComponent } from './entity-right-panel/related-entities/related-entities.component';
 import { EntityMessagesComponent } from './entity-right-panel/entity-messages/entity-messages.component';
 import { InteractionsModule } from '@app/main/interactions/interactions.module';
+import { TransactionModule } from '@app/main/transactions/transaction.module';
 
 
 
@@ -123,7 +124,8 @@ import { InteractionsModule } from '@app/main/interactions/interactions.module';
                ChipModule,
                TabViewModule,
                SharedDynamicInputsModule,
-               InteractionsModule
+               InteractionsModule,
+               TransactionModule
 
     ],
     declarations: [

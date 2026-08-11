@@ -39,26 +39,25 @@
     "
     class="related-table-section">
 
-    <p-table
+  <p-table
   #headerTable
-
   [value]="headerTransactions"
-
   [loading]="headerLoading"
-
   [paginator]="false"
-
   [scrollable]="true"
-
+  selectionMode="single"
   responsiveLayout="scroll"
-
   [tableStyle]="{
     'min-width': '70rem'
   }"
-
+  (selectionChange)="
+    onHeaderTransactionSelect($event)
+  "
   (onSort)="
     onHeaderSort()
   ">
+
+
 
       <!-- Table Header -->
 
@@ -226,124 +225,96 @@
 
       <!-- Table Body -->
 
-      <ng-template
-        pTemplate="body"
-        let-record>
+   <ng-template
+  pTemplate="body"
+  let-record>
 
-        <tr>
+  <tr
+    [pSelectableRow]="record"
+    class="transaction-row">
 
-          <td>
-            {{
-              record
-                ?.sellerCompanyName
-                || '-'
-            }}
-          </td>
+    <td>
+      {{
+        record?.sellerCompanyName || '-'
+      }}
+    </td>
 
+    <td>
+      {{
+        record?.buyerCompanyName || '-'
+      }}
+    </td>
 
-          <td>
-            {{
-              record
-                ?.buyerCompanyName
-                || '-'
-            }}
-          </td>
+    <td>
+      {{
+        (
+          record?.entityObjectTypeCode === 'SALESORDER'
+            ? 'SalesOrder'
+            : 'purchaseOrder'
+        )
+          | localize
+      }}
+    </td>
 
+    <td>
+      {{ record?.code || '-' }}
+    </td>
 
-          <td>
+    <td>
+      {{
+        record?.entityObjectStatusCode
+          | localize
+      }}
+    </td>
 
-            {{
-              (
-                record
-                  ?.entityObjectTypeCode
-                  === 'SALESORDER'
-                  ? 'SalesOrder'
-                  : 'purchaseOrder'
-              )
-                | localize
-            }}
+    <td>
+      <ng-container
+        *ngIf="
+          record?.creationTime;
+          else emptyValue
+        ">
 
-          </td>
+        {{
+          record.creationTime
+            | momentFormat:'L'
+        }}
 
+      </ng-container>
+    </td>
 
-          <td>
-            {{
-              record?.code || '-'
-            }}
-          </td>
+    <td>
+      <ng-container
+        *ngIf="
+          record?.completeDate;
+          else emptyValue
+        ">
 
+        {{
+          record.completeDate
+            | momentFormat:'L'
+        }}
 
-          <td>
+      </ng-container>
+    </td>
 
-            {{
-              record
-                ?.entityObjectStatusCode
-                | localize
-            }}
+    <td>
+      {{ record?.reference || '-' }}
+    </td>
 
-          </td>
+    <td class="text-right">
+      {{ record?.totalQuantity }}
+    </td>
 
+    <td class="text-right">
+      {{
+        record?.totalAmount
+          | number:'1.2-2'
+      }}
+    </td>
 
-          <td>
+  </tr>
 
-            <ng-container
-              *ngIf="
-                record?.creationTime;
-                else emptyValue
-              ">
-
-              {{
-                record.creationTime
-                  | momentFormat:'L'
-              }}
-
-            </ng-container>
-
-          </td>
-
-
-          <td>
-
-            <ng-container
-              *ngIf="
-                record?.completeDate;
-                else emptyValue
-              ">
-
-              {{
-                record.completeDate
-                  | momentFormat:'L'
-              }}
-
-            </ng-container>
-
-          </td>
-
-
-          <td>
-            {{
-              record?.reference || '-'
-            }}
-          </td>
-
-
-          <td class="text-right">
-            {{
-              record?.totalQuantity
-            }}
-          </td>
-
-
-          <td class="text-right">
-            {{
-              record?.totalAmount
-                | number:'1.2-2'
-            }}
-          </td>
-
-        </tr>
-
-      </ng-template>
+</ng-template>
 
     </p-table>
 
@@ -670,3 +641,12 @@
   </ng-template>
 
 </div>
+
+
+
+<app-transaction-information
+  #shoppingCartModal
+  (hideShoppingCartModal)="
+    onHideShoppingCartModal($event)
+  ">
+</app-transaction-information>

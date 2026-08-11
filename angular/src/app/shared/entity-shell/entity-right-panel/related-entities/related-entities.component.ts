@@ -22,6 +22,8 @@ import {
   finalize
 } from 'rxjs/operators';
 import { forkJoin } from 'rxjs';
+import { TransactionInformationComponent } from '@app/main/transactions/app-TransactionTabsInfo/Components/transaction-information-component/transaction-information.component';
+import { TransactionCartMode } from '@app/main/transactions/enums/TransactionCartMode';
 type RelatedTransactionView =
   'header' |
   'details';
@@ -64,7 +66,12 @@ export class RelatedEntitiesComponent
   )
   detailsTable: any;
 
-
+@ViewChild(
+  'shoppingCartModal',
+  { static: false }
+)
+shoppingCartModal:
+  TransactionInformationComponent;
   /*
    * Dropdown
    */
@@ -681,4 +688,69 @@ loadHeaderTransactions(event?: any): void {
       rows: this.detailsRows
     });
   }
+
+  onHeaderTransactionSelect(
+  record: any
+): void {
+
+  if (
+    !record?.id ||
+    !this.shoppingCartModal
+  ) {
+    return;
+  }
+
+  const transactionId =
+    Number(record.id);
+
+  if (!transactionId) {
+    return;
+  }
+
+
+  /*
+   * Same behavior as the old browse:
+   *
+   * DRAFT -> create/edit
+   * otherwise -> view
+   */
+  if (
+    record.entityObjectStatusCode ===
+    'DRAFT'
+  ) {
+
+    this.shoppingCartModal.show(
+      transactionId,
+      true,
+      true,
+      TransactionCartMode.createOrEdit
+    );
+
+  } else {
+
+    this.shoppingCartModal.show(
+      transactionId,
+      true,
+      true,
+      TransactionCartMode.view
+    );
+  }
+}
+
+
+onHideShoppingCartModal(
+  event: any
+): void {
+
+  if (event) {
+    this.loadHeaderTransactions({
+      first:
+        this.headerPaginator?.first ??
+        0,
+
+      rows:
+        this.headerRows
+    });
+  }
+}
 }

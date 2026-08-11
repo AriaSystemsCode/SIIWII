@@ -81,3 +81,11 @@
     align-items: flex-start;
   }
 }
+
+.transaction-row {
+  cursor: pointer;
+}
+
+.transaction-row:hover {
+  background: #f7f7f7;
+}
