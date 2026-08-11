@@ -12,6 +12,15 @@ export class EntityRightPanelComponent {
 
    @Input() collapsed = false;
 
+   @Input()
+entityId: number;
+
+@Input()
+creatorUserId: number;
+
+@Input()
+parentId?: number;
+
 togglePanel(): void {
   this.collapsed = !this.collapsed;
 }

@@ -1,1 +1,82 @@
-<p>entity-messages works!</p>
+<div class="message-tabs">
+
+  <button
+    type="button"
+    class="message-tab"
+    [class.active]="activeMessageTab === 'direct'"
+    (click)="selectTab('direct')">
+    Direct message
+  </button>
+
+  <button
+    type="button"
+    class="message-tab"
+    [class.active]="activeMessageTab === 'threads'"
+    (click)="selectTab('threads')">
+    Threads
+  </button>
+
+  <button
+    type="button"
+    class="message-tab"
+    [class.active]="activeMessageTab === 'mentions'"
+    (click)="selectTab('mentions')">
+    Mentions
+  </button>
+
+</div>
+
+<app-comment-parent
+  *ngIf="activeMessageTab !== 'mentions'"
+  #commentParentComponent
+
+  [addNewThread]="true"
+  [cartStyle]="true"
+  [loadComments]="true"
+
+  [commentType]="
+    activeMessageTab === 'direct'
+      ? 'MESSAGE'
+      : 'COMMENT'
+  "
+
+  (refreshComments)="
+    getCommentsRefreshed($event)
+  "
+
+  (newCommentAdded)="
+    onNewMessageAdded()
+  ">
+</app-comment-parent>
+<!-- <app-comment-parent
+  #commentParentComponent
+
+  [addNewThread]="true"
+  [cartStyle]="true"
+  [loadComments]="true"
+
+  [messageObjectType]="
+    currentMessageObjectType
+  "
+
+  [commentType]="
+    currentMessageObjectType
+  "
+
+  (refreshComments)="
+    getCommentsRefreshed($event)
+  "
+
+  (newCommentAdded)="
+    onNewMessageAdded()
+  ">
+</app-comment-parent> -->
+
+
+<div
+  *ngIf="activeMessageTab === 'mentions'"
+  class="p-3 text-muted">
+
+  {{ 'NoMentionsAvailable' | localize }}
+
+</div>

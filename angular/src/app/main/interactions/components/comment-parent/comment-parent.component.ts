@@ -19,7 +19,7 @@ export class CommentParentComponent extends AppComponentBase implements AfterVie
     @Input() addNewThread:boolean;
     @Input() commentType:any;
     @Input() fromTrans:boolean = false;
-    
+    @Input()messageObjectType: 'MESSAGE' | 'THREAD' | 'MENTION' = 'MESSAGE';
     @Input() toName:string = '';
 
 

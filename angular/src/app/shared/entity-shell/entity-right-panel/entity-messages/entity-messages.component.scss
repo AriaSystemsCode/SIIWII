@@ -1,0 +1,33 @@
+.message-tabs {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.message-tab {
+  height: 38px;
+  padding: 0 20px;
+
+  background: #fff;
+  border: 1px solid #eeeeee;
+  border-radius: 6px;
+
+  color: #4a0d4a;
+  font-size: 14px;
+  font-weight: 600;
+
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  white-space: nowrap;
+
+  &:hover {
+    background: #f8f4f8;
+  }
+
+  &.active {
+    background: #4a0d4a;
+    border-color: #4a0d4a;
+    color: #fff;
+  }
+}

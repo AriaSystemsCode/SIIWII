@@ -293,9 +293,25 @@
 
         </button>
 
-        <app-entity-right-panel
+        <!-- <app-entity-right-panel
           *ngIf="!rightPanelCollapsed">
-        </app-entity-right-panel>
+        </app-entity-right-panel> -->
+        <app-entity-right-panel
+  *ngIf="!rightPanelCollapsed"
+
+  [entityId]="
+    displayedEntity?.entityId ??
+    displayedEntity?.id
+  "
+
+  [creatorUserId]="
+    displayedEntity?.creatorUserId
+  "
+
+  [parentId]="
+    displayedEntity?.parentId
+  ">
+</app-entity-right-panel>
 
       </div>
 
