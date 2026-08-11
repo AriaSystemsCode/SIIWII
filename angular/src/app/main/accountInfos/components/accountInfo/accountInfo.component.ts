@@ -1174,42 +1174,105 @@ if( !this.accountInfoTemp?.id){
             });
     }
 
-    save(): void {
-        if (this.uploader.isUploading) {
-            this.notify.info(this.l('WaitUntilUploadingImagesIsCompleted'));
-            return
-        }
-        this.saving = true;
-        if (this.accountLevel === AccountLevelEnum.Profile && (this.isRecordOwner || !this.accountInfoTemp.id)) {
+    // save(): void {
+    //     if (this.uploader.isUploading) {
+    //         this.notify.info(this.l('WaitUntilUploadingImagesIsCompleted'));
+    //         return
+    //     }
+    //     this.saving = true;
+    //     if (this.accountLevel === AccountLevelEnum.Profile && (this.isRecordOwner || !this.accountInfoTemp.id)) {
 
-            if (this.accountInfoOldCurrencyId && this.accountInfoTemp.currencyId != this.accountInfoOldCurrencyId) {
-                this.message.confirm(
-                    '',
-                    this.l('Are you sure you want to change the default currency? , The pricing you assign to all of the products may change as a result of the change in your default currency. Do you have to make this change now?'),
-                    (isConfirmed) => {
-                        if (!isConfirmed) {
-                            this.accountInfoTemp.currencyId = this.accountInfoOldCurrencyId;
-                            this.changeCurrency = false;
-                            this.saving = false;
-                        }
-                        else {
-                            this.changeCurrency = true;
-                            this.saveMyAccount()
-                        }
-                    }
-                );
-            }
-            else {
-                this.saveMyAccount()
+    //         if (this.accountInfoOldCurrencyId && this.accountInfoTemp.currencyId != this.accountInfoOldCurrencyId) {
+    //             this.message.confirm(
+    //                 '',
+    //                 this.l('Are you sure you want to change the default currency? , The pricing you assign to all of the products may change as a result of the change in your default currency. Do you have to make this change now?'),
+    //                 (isConfirmed) => {
+    //                     if (!isConfirmed) {
+    //                         this.accountInfoTemp.currencyId = this.accountInfoOldCurrencyId;
+    //                         this.changeCurrency = false;
+    //                         this.saving = false;
+    //                     }
+    //                     else {
+    //                         this.changeCurrency = true;
+    //                         this.saveMyAccount()
+    //                     }
+    //                 }
+    //             );
+    //         }
+    //         else {
+    //             this.saveMyAccount()
 
-            }
+    //         }
 
-        } else {
+    //     } else {
 
-            this.saveExternalOrManualAccount()
-        }
+    //         this.saveExternalOrManualAccount()
+    //     }
+    // }
+save(): void {
+    if (this.uploader.isUploading) {
+        this.notify.info(
+            this.l(
+                'WaitUntilUploadingImagesIsCompleted'
+            )
+        );
+        return;
     }
 
+    this.saving = true;
+
+    const isNormalAccount =
+        this.isManualAccount ||
+        this.isExternalAccount ||
+        this.accountDataForView?.isManual === true ||
+        this.accountDataForView?.isConnected === true;
+
+    if (isNormalAccount) {
+        this.saveExternalOrManualAccount();
+        return;
+    }
+
+   
+    if (this.isMyAccount) {
+
+        if (
+            this.accountInfoOldCurrencyId &&
+            this.accountInfoTemp.currencyId !==
+                this.accountInfoOldCurrencyId
+        ) {
+            this.message.confirm(
+                '',
+                this.l(
+                    'Are you sure you want to change the default currency? , The pricing you assign to all of the products may change as a result of the change in your default currency. Do you have to make this change now?'
+                ),
+                (isConfirmed) => {
+
+                    if (!isConfirmed) {
+                        this.accountInfoTemp.currencyId =
+                            this.accountInfoOldCurrencyId;
+
+                        this.changeCurrency = false;
+                        this.saving = false;
+
+                        return;
+                    }
+
+                    this.changeCurrency = true;
+
+                    this.saveMyAccount();
+                }
+            );
+
+            return;
+        }
+
+        this.saveMyAccount();
+        return;
+    }
+
+
+    this.saveExternalOrManualAccount();
+}
 
 
     onWebsiteChange() {
