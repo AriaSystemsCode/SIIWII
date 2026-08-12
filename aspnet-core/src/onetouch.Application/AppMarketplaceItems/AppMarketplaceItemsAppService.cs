@@ -719,16 +719,17 @@ namespace onetouch.AppMarketplaceItems
                                     var buyerRole = transContact.AppTransactionContacts.Where(z => z.CompanySSIN == input.BuyerAccountSSIN).FirstOrDefault();
                                     if (buyerRole!=null)
                                     {
-
+                                        var activeRelationshipStatusId = await _helper.SystemTables.GetEntityObjectStatusRelationshipActive();
                                         var relationshipSellBuy = await _appContactRelationshipInfoRepository.GetAll()
-                                        .Where(z => (z.RequesterContactSSIN == input.SellerAccountSSIN &&
+                                        .Where(z => ((z.RequesterContactSSIN == input.SellerAccountSSIN &&
                                         z.RecipientContactSSIN == input.BuyerAccountSSIN &&
                                         z.RequesterMarketplaceRole == sellerRole.ContactRole.ToString() &&
                                         z.RecipientMarketplaceRole == buyerRole.ContactRole.ToString()) ||
                                         (z.RecipientContactSSIN == input.SellerAccountSSIN &&
                                         z.RequesterContactSSIN == input.BuyerAccountSSIN &&
                                         z.RecipientMarketplaceRole == sellerRole.ContactRole.ToString() &&
-                                        z.RequesterMarketplaceRole == buyerRole.ContactRole.ToString())
+                                        z.RequesterMarketplaceRole == buyerRole.ContactRole.ToString()))
+                                        && z.EntityObjectStatusId == activeRelationshipStatusId
                                         ).Include(z => z.EntityExtraData).FirstOrDefaultAsync();
                                         if (relationshipSellBuy != null)
                                         {
