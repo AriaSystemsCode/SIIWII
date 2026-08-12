@@ -45,7 +45,7 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit {
     @ViewChild('accountInfoForm', { static: true }) accountInfoForm: NgForm
 
     @Input('viewMode') viewMode: boolean = false
-    @Input('accountId') accountId: number = this.appSession?.user?.accountId
+    @Input('accountId') accountId: number 
     @Input('AccountInfo') accountInfoTemp: CreateOrEditAccountInfoDto = new CreateOrEditAccountInfoDto()
     @Input('fromMarketplace') fromMarketplace: boolean = false;
     @Input('fromManualAcc') fromManualAcc: boolean;
@@ -209,107 +209,18 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit {
         });
     }
 
-    // get isExternalAccount(): boolean { return this.accountLevel == AccountLevelEnum.External && !this.viewMode }
-    // get isExternalAccountCreate(): boolean { return this.isExternalAccount && !Boolean(this.accountId) }
-    // get isExternalAccountEdit(): boolean { return this.isExternalAccount && Boolean(this.accountId) }
+    get isExternalAccount(): boolean { return this.accountLevel == AccountLevelEnum.External && !this.viewMode }
+    get isExternalAccountCreate(): boolean { return this.isExternalAccount && !Boolean(this.accountId) }
+    get isExternalAccountEdit(): boolean { return this.isExternalAccount && Boolean(this.accountId) }
 
-    // get isManualAccount(): boolean { return this.accountLevel == AccountLevelEnum.Manual && !this.viewMode }
-    // get isManualAccountCreate(): boolean { return this.isManualAccount && !Boolean(this.accountId) }
-    // get isManualAccountEdit(): boolean { return this.isManualAccount && Boolean(this.accountId) }
+    get isManualAccount(): boolean { return this.accountLevel == AccountLevelEnum.Manual && !this.viewMode }
+    get isManualAccountCreate(): boolean { return this.isManualAccount && !Boolean(this.accountId) }
+    get isManualAccountEdit(): boolean { return this.isManualAccount && Boolean(this.accountId) }
 
-    // get isMyAccount(): boolean { return this.accountLevel == AccountLevelEnum.Profile && !this.viewMode }
-    // get isMyAccountCreate(): boolean { return this.isMyAccount && !Boolean(this.accountId) }
-    // get isMyAccountEdit(): boolean { return this.isMyAccount && Boolean(this.accountId) }
+    get isMyAccount(): boolean { return this.accountLevel == AccountLevelEnum.Profile && !this.viewMode }
+    get isMyAccountCreate(): boolean { return this.isMyAccount && !Boolean(this.accountId) }
+    get isMyAccountEdit(): boolean { return this.isMyAccount && Boolean(this.accountId) }
 
-
-    get isManualAccount(): boolean {
-    return (
-        !this.viewMode &&
-        (
-            this.accountLevel === AccountLevelEnum.Manual ||
-            this.accountDataForView?.isManual === true
-        )
-    );
-}
-
-get isExternalAccount(): boolean {
-    return (
-        !this.viewMode &&
-        this.accountLevel === AccountLevelEnum.External
-    );
-}
-
-get isConnectedAccount(): boolean {
-    return (
-        this.accountDataForView?.isConnected === true
-    );
-}
-
-get isMyAccount(): boolean {
-
-    if (this.viewMode) {
-        return false;
-    }
-
-    /*
-     * Manual / connected / external accounts
-     * are NEVER My Account.
-     */
-    if (
-        this.accountDataForView?.isManual === true ||
-        this.accountDataForView?.isConnected === true ||
-        this.accountLevel === AccountLevelEnum.Manual ||
-        this.accountLevel === AccountLevelEnum.External
-    ) {
-        return false;
-    }
-
-    return (
-        this.accountLevel === AccountLevelEnum.Profile
-    );
-}
-
-get isManualAccountCreate(): boolean {
-    return (
-        this.isManualAccount &&
-        !Boolean(this.accountId)
-    );
-}
-
-get isManualAccountEdit(): boolean {
-    return (
-        this.isManualAccount &&
-        Boolean(this.accountId)
-    );
-}
-
-get isExternalAccountCreate(): boolean {
-    return (
-        this.isExternalAccount &&
-        !Boolean(this.accountId)
-    );
-}
-
-get isExternalAccountEdit(): boolean {
-    return (
-        this.isExternalAccount &&
-        Boolean(this.accountId)
-    );
-}
-
-get isMyAccountCreate(): boolean {
-    return (
-        this.isMyAccount &&
-        !Boolean(this.accountId)
-    );
-}
-
-get isMyAccountEdit(): boolean {
-    return (
-        this.isMyAccount &&
-        Boolean(this.accountId)
-    );
-}
 
     get otherAccount(): boolean { return this.viewMode }
 
@@ -806,25 +717,26 @@ async getAccountDataForView() {
             ? result.account
             : undefined;
 
-    /*
-     * IMPORTANT:
-     * API result is the source of truth.
-     *
-     * If this is a manual account,
-     * do not leave accountLevel as Profile.
-     */
-    if (
-        this.accountDataForView?.isManual === true
-    ) {
-        this.accountLevel =
-            AccountLevelEnum.Manual;
-    }
-
 
     this.accountContactForView =
         result
             ? result.contact
             : undefined;
+
+            this.accountDataForView = result?.account;
+
+if (this.accountDataForView) {
+
+    if (this.accountDataForView.isManual === true) {
+        this.accountLevel = AccountLevelEnum.Manual;
+    }
+    else if (this.accountDataForView.isConnected === true) {
+        this.accountLevel = AccountLevelEnum.External;
+    }
+    else {
+        this.accountLevel = AccountLevelEnum.Profile;
+    }
+}
 
     this.isRecordOwner =
         this.accountDataForView?.id ===
@@ -1662,6 +1574,12 @@ if( !this.accountInfoTemp?.id){
     }
 
     private saveAccountAfterConnectionSelected(): void {
+        if(this.accountInfoTemp.isManual || this.accountInfoTemp.accountLevel == this.accountLevelEnum.Manual){
+            this.accountInfoTemp.accountLevel = this.accountLevelEnum.Manual
+        }else if (this.accountInfoTemp.isConnected || this.accountInfoTemp.accountLevel == this.accountLevelEnum.Connected){
+            this.accountInfoTemp.accountLevel = this.accountLevelEnum.Connected
+
+        }
         this.saving = true;
 
         this._AccountsServiceProxy.createOrEditAccount(this.accountInfoTemp)
