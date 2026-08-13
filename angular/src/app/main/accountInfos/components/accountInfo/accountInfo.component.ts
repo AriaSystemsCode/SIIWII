@@ -25,7 +25,7 @@ import { ViewMemberProfileComponentInputsI } from '@app/main/teamMembers/models/
 import { MembersListComponent } from '@app/main/members-list/components/members-list/members-list.component';
 import { ImageUploadComponentOutput } from '@app/shared/common/image-upload/image-upload.component';
 import { Paginator } from 'primeng/paginator';
-import { Location } from '@angular/common';
+
 @Component({
     selector: 'app-account-info',
     templateUrl: './accountInfo.component.html',
@@ -45,7 +45,7 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit {
     @ViewChild('accountInfoForm', { static: true }) accountInfoForm: NgForm
 
     @Input('viewMode') viewMode: boolean = false
-    @Input('accountId') accountId: number = this.appSession?.user?.accountId
+    @Input('accountId') accountId: number 
     @Input('AccountInfo') accountInfoTemp: CreateOrEditAccountInfoDto = new CreateOrEditAccountInfoDto()
     @Input('fromMarketplace') fromMarketplace: boolean = false;
     @Input('fromManualAcc') fromManualAcc: boolean;
@@ -221,6 +221,7 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit {
     get isMyAccountCreate(): boolean { return this.isMyAccount && !Boolean(this.accountId) }
     get isMyAccountEdit(): boolean { return this.isMyAccount && Boolean(this.accountId) }
 
+
     get otherAccount(): boolean { return this.viewMode }
 
     GetContactDefaults() {
@@ -230,52 +231,173 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit {
                 this.shipViaId = res.shipViaId;
             });
     }
-    handleRoutingChange() {
-        this._route.queryParamMap.subscribe(paramsObj => {
-            const params = paramsObj['params']
-            const currentTab: string = params['tab']
-            this.selectedMember = {
-                userId: params['userId'],
-                memberId: params['memberId']
+    // handleRoutingChange() {
+    //     this._route.queryParamMap.subscribe(paramsObj => {
+    //         const params = paramsObj['params']
+    //         const currentTab: string = params['tab']
+    //         this.selectedMember = {
+    //             userId: params['userId'],
+    //             memberId: params['memberId']
+    //         }
+
+    //         if (this.firstLoad)
+    //             this.firstLoad = false
+    //         else {
+    //             if (Object.keys(params).length === 0) return
+    //         }
+    //         const noSelectedTabs: boolean = isNaN(AccountInfoPageTabs[currentTab])
+    //         const isCreateMode = this.isMyAccountCreate || this.isExternalAccountCreate || this.isManualAccountCreate
+    //         this.currentTab = AccountInfoPageTabs[currentTab]
+
+    //         if (noSelectedTabs) {
+    //             if (this.isMyAccountEdit || this.isExternalAccountEdit || this.isManualAccountEdit || this.otherAccount) return this.changeTab(AccountInfoPageTabs.ProfileView)
+    //             if (isCreateMode) return this.changeTab(AccountInfoPageTabs.ProfileCreateOrEdit)
+    //         }
+
+    //         this.currentTab = AccountInfoPageTabs[currentTab]
+    //         switch (currentTab) {
+    //             case this.accountInfoPageTabsEnum[AccountInfoPageTabs.ViewMember] || this.accountInfoPageTabsEnum[AccountInfoPageTabs.ViewContact]:
+    //                 this.openViewMemberProfile()
+    //                 break;
+    //             case this.accountInfoPageTabsEnum[AccountInfoPageTabs.MembersList] || this.accountInfoPageTabsEnum[AccountInfoPageTabs.ContactsList]:
+    //                 this.openMembersList()
+    //                 break;
+    //             case this.accountInfoPageTabsEnum[AccountInfoPageTabs.CreateOrEditMember] || this.accountInfoPageTabsEnum[AccountInfoPageTabs.CreateOrEditContact]:
+    //                 this.openCreateOrEditMember()
+    //                 break;
+    //             case this.accountInfoPageTabsEnum[AccountInfoPageTabs.ProfileCreateOrEdit]:
+    //                 if (this.isMyAccount) this.getMyAccountDataForEdit()
+    //                 else if (this.isManualAccountEdit || this.isExternalAccountEdit || this.accountDataForView?.isConnected) this.getAccountDataForEdit()
+    //                 break;
+    //             default:
+    //                 break;
+    //         }
+
+    //     });
+    // }
+
+handleRoutingChange() {
+    this._route.queryParamMap.subscribe(paramsObj => {
+        const params = paramsObj['params'];
+        const currentTab: string = params['tab'];
+
+        this.selectedMember = {
+            userId: params['userId'],
+            memberId: params['memberId']
+        };
+
+        if (this.firstLoad) {
+            this.firstLoad = false;
+        } else {
+            if (Object.keys(params).length === 0) {
+                return;
+            }
+        }
+
+        const noSelectedTabs: boolean =
+            isNaN(AccountInfoPageTabs[currentTab]);
+
+        const isCreateMode =
+            this.isMyAccountCreate ||
+            this.isExternalAccountCreate ||
+            this.isManualAccountCreate;
+
+        this.currentTab =
+            AccountInfoPageTabs[currentTab];
+
+        if (noSelectedTabs) {
+
+            if (
+                this.isMyAccountEdit ||
+                this.isExternalAccountEdit ||
+                this.isManualAccountEdit ||
+                this.otherAccount
+            ) {
+                this.changeTab(
+                    AccountInfoPageTabs.ProfileView
+                );
+
+                return;
             }
 
-            if (this.firstLoad)
-                this.firstLoad = false
-            else {
-                if (Object.keys(params).length === 0) return
+            if (isCreateMode) {
+                this.changeTab(
+                    AccountInfoPageTabs.ProfileCreateOrEdit
+                );
+
+                return;
             }
-            const noSelectedTabs: boolean = isNaN(AccountInfoPageTabs[currentTab])
-            const isCreateMode = this.isMyAccountCreate || this.isExternalAccountCreate || this.isManualAccountCreate
-            this.currentTab = AccountInfoPageTabs[currentTab]
+        }
 
-            if (noSelectedTabs) {
-                if (this.isMyAccountEdit || this.isExternalAccountEdit || this.isManualAccountEdit || this.otherAccount) return this.changeTab(AccountInfoPageTabs.ProfileView)
-                if (isCreateMode) return this.changeTab(AccountInfoPageTabs.ProfileCreateOrEdit)
-            }
+        this.currentTab =
+            AccountInfoPageTabs[currentTab];
 
-            this.currentTab = AccountInfoPageTabs[currentTab]
-            switch (currentTab) {
-                case this.accountInfoPageTabsEnum[AccountInfoPageTabs.ViewMember] || this.accountInfoPageTabsEnum[AccountInfoPageTabs.ViewContact]:
-                    this.openViewMemberProfile()
-                    break;
-                case this.accountInfoPageTabsEnum[AccountInfoPageTabs.MembersList] || this.accountInfoPageTabsEnum[AccountInfoPageTabs.ContactsList]:
-                    this.openMembersList()
-                    break;
-                case this.accountInfoPageTabsEnum[AccountInfoPageTabs.CreateOrEditMember] || this.accountInfoPageTabsEnum[AccountInfoPageTabs.CreateOrEditContact]:
-                    this.openCreateOrEditMember()
-                    break;
-                case this.accountInfoPageTabsEnum[AccountInfoPageTabs.ProfileCreateOrEdit]:
-                    if (this.isMyAccount) this.getMyAccountDataForEdit()
-                    else if (this.isManualAccountEdit || this.isExternalAccountEdit || this.accountDataForView?.isConnected) this.getAccountDataForEdit()
-                    break;
-                default:
-                    break;
-            }
+        switch (currentTab) {
 
-        });
-    }
+            case this.accountInfoPageTabsEnum[
+                AccountInfoPageTabs.ViewMember
+            ] ||
+                this.accountInfoPageTabsEnum[
+                    AccountInfoPageTabs.ViewContact
+                ]:
 
+                this.openViewMemberProfile();
+                break;
 
+            case this.accountInfoPageTabsEnum[
+                AccountInfoPageTabs.MembersList
+            ] ||
+                this.accountInfoPageTabsEnum[
+                    AccountInfoPageTabs.ContactsList
+                ]:
+
+                this.openMembersList();
+                break;
+
+            case this.accountInfoPageTabsEnum[
+                AccountInfoPageTabs.CreateOrEditMember
+            ] ||
+                this.accountInfoPageTabsEnum[
+                    AccountInfoPageTabs.CreateOrEditContact
+                ]:
+
+                this.openCreateOrEditMember();
+                break;
+
+            case this.accountInfoPageTabsEnum[
+                AccountInfoPageTabs.ProfileCreateOrEdit
+            ]:
+
+                /*
+                 * IMPORTANT:
+                 * Manual / Connected / External accounts
+                 * must use GetAccountForEdit.
+                 */
+                if (
+                    this.accountDataForView?.isManual === true ||
+                    this.accountDataForView?.isConnected === true ||
+                    this.isManualAccountEdit ||
+                    this.isExternalAccountEdit
+                ) {
+                    this.getAccountDataForEdit();
+                    break;
+                }
+
+                /*
+                 * Only real My Account
+                 * uses GetMyAccountForEdit.
+                 */
+                if (this.isMyAccount) {
+                    this.getMyAccountDataForEdit();
+                }
+
+                break;
+
+            default:
+                break;
+        }
+    });
+}
     initUploaders(): void {
         this.uploader = this.createUploader(
             '/Attachment/UploadFiles',
@@ -324,7 +446,7 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit {
         this._AppEntitiesServiceProxy.getAllPhoneTypeForTableDropdown().subscribe(result => {
             this.allPhoneTypes = result;
             this.phoneTypesLoaded = true;
-            this.setDefaultPhoneTypes();
+            // this.setDefaultPhoneTypes();
 
         });
     }
@@ -463,9 +585,6 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit {
                 !result?.accountInfo?.id ? this.shipViaId :
                     result.accountInfo?.shipViaId ? result.accountInfo?.shipViaId : this.shipViaId;
 
-      
-
-
         }
     }
     resetFormData() {
@@ -476,50 +595,167 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit {
         this.accountInfoForm.form.patchValue(this.accountInfoTemp.toJSON())
         this.companyLogo = this.accountDataForView?.logoUrl ? `${this.attachmentBaseUrl}/${this.accountDataForView?.logoUrl}` : undefined;
         this.coverPhoto = this.accountDataForView?.coverUrl ? `${this.attachmentBaseUrl}/${this.accountDataForView?.coverUrl}` : undefined;
-        !this.accountInfoTemp?.id && !this.accountId ? this._router.navigate(['/app/main/accounts']) :   this.changeTab(this.accountInfoPageTabsEnum.ProfileView)
-    
+        this.changeTab(!this.accountInfoTemp?.id && !this.accountId ? this.accountInfoPageTabsEnum.ProfileCreateOrEdit : this.accountInfoPageTabsEnum.ProfileView)
     }
-    async getAccountDataForView() {
+    // async getAccountDataForView() {
 
-        this.showMainSpinner();
-        let result;
-        if (!this.fromMarketplace) {
-            result = await this._AccountsServiceProxy.getAccountForView(this.accountId, 5)
-                .toPromise()
-                .finally(
-                    () => {
-                        this.hideMainSpinner()
-                    }
+    //     this.showMainSpinner();
+    //     let result;
+    //     if (!this.fromMarketplace) {
+    //         result = await this._AccountsServiceProxy.getAccountForView(this.accountId, 5)
+    //             .toPromise()
+    //             .finally(
+    //                 () => {
+    //                     this.hideMainSpinner()
+    //                 }
+    //             )
+    //         this.accData = JSON.parse(JSON.stringify(result));
+    //         this.relationId = result.relationId ? result.relationId : 0
+    //         this.connectionsInfo = result.connectionsInfo ? result.connectionsInfo : []
+    //         this.availableConnectionsInfo = result.availableConnections ? result.availableConnections : []
+    //         this.entityExtraData = result ? result.entityExtraData : undefined
+
+    //     }
+
+    //     else {
+    //         result = await this._marketplaceAccountsServiceProxy.getAccountForView(this.accountId, undefined, 5)
+    //             .toPromise()
+    //             .finally(
+    //                 () => {
+    //                     this.hideMainSpinner()
+    //                 }
+    //             )
+    //     }
+
+
+    //     this.isPublished = result ? result.isPublished : false;
+    //     this.isSync = result ? result.isSync : false;
+    //     this.connectionCount = result ? result.connectionCount : 0;
+    //     this.accountDataForView = result ? result.account : undefined
+    //     this.accountContactForView = result ? result.contact : undefined
+    //     this.isRecordOwner = this.accountDataForView?.id == this.appSession.user?.accountId ? true : false
+    //     if (this.accountDataForView?.logoUrl) this.companyLogo = `${this.attachmentBaseUrl}/${this.accountDataForView.logoUrl}`;
+    //     if (this.accountDataForView?.coverUrl) this.coverPhoto = `${this.attachmentBaseUrl}/${this.accountDataForView.coverUrl}`;
+    // }
+async getAccountDataForView() {
+
+    this.showMainSpinner();
+
+    let result;
+
+    if (!this.fromMarketplace) {
+
+        result =
+            await this._AccountsServiceProxy
+                .getAccountForView(
+                    this.accountId,
+                    5
                 )
-            this.accData = JSON.parse(JSON.stringify(result));
-            this.relationId = result.relationId ? result.relationId : 0
-            this.connectionsInfo = result.connectionsInfo ? result.connectionsInfo : []
-            this.availableConnectionsInfo = result.availableConnections ? result.availableConnections : []
-            this.entityExtraData = result ? result.entityExtraData : undefined
-
-        }
-
-        else {
-            result = await this._marketplaceAccountsServiceProxy.getAccountForView(this.accountId, undefined, 5)
                 .toPromise()
-                .finally(
-                    () => {
-                        this.hideMainSpinner()
-                    }
+                .finally(() => {
+                    this.hideMainSpinner();
+                });
+
+        this.accData =
+            JSON.parse(
+                JSON.stringify(result)
+            );
+
+        this.relationId =
+            result?.relationId
+                ? result.relationId
+                : 0;
+
+        this.connectionsInfo =
+            result?.connectionsInfo
+                ? result.connectionsInfo
+                : [];
+
+        this.availableConnectionsInfo =
+            result?.availableConnections
+                ? result.availableConnections
+                : [];
+
+        this.entityExtraData =
+            result
+                ? result.entityExtraData
+                : undefined;
+
+    } else {
+
+        result =
+            await this
+                ._marketplaceAccountsServiceProxy
+                .getAccountForView(
+                    this.accountId,
+                    undefined,
+                    5
                 )
-        }
-
-
-        this.isPublished = result ? result.isPublished : false;
-        this.isSync = result ? result.isSync : false;
-        this.connectionCount = result ? result.connectionCount : 0;
-        this.accountDataForView = result ? result.account : undefined
-        this.accountContactForView = result ? result.contact : undefined
-        this.isRecordOwner = this.accountDataForView?.id == this.appSession.user?.accountId ? true : false
-        if (this.accountDataForView?.logoUrl) this.companyLogo = `${this.attachmentBaseUrl}/${this.accountDataForView.logoUrl}`;
-        if (this.accountDataForView?.coverUrl) this.coverPhoto = `${this.attachmentBaseUrl}/${this.accountDataForView.coverUrl}`;
+                .toPromise()
+                .finally(() => {
+                    this.hideMainSpinner();
+                });
     }
 
+    this.isPublished =
+        result
+            ? result.isPublished
+            : false;
+
+    this.isSync =
+        result
+            ? result.isSync
+            : false;
+
+    this.connectionCount =
+        result
+            ? result.connectionCount
+            : 0;
+
+    this.accountDataForView =
+        result
+            ? result.account
+            : undefined;
+
+
+    this.accountContactForView =
+        result
+            ? result.contact
+            : undefined;
+
+            this.accountDataForView = result?.account;
+
+if (this.accountDataForView) {
+
+    if (this.accountDataForView.isManual === true) {
+        this.accountLevel = AccountLevelEnum.Manual;
+    }
+    else if (this.accountDataForView.isConnected === true) {
+        this.accountLevel = AccountLevelEnum.External;
+    }
+    else {
+        this.accountLevel = AccountLevelEnum.Profile;
+    }
+}
+
+    this.isRecordOwner =
+        this.accountDataForView?.id ===
+        this.appSession.user?.accountId;
+
+    if (
+        this.accountDataForView?.logoUrl
+    ) {
+        this.companyLogo =
+            `${this.attachmentBaseUrl}/${this.accountDataForView.logoUrl}`;
+    }
+
+    if (
+        this.accountDataForView?.coverUrl
+    ) {
+        this.coverPhoto =
+            `${this.attachmentBaseUrl}/${this.accountDataForView.coverUrl}`;
+    }
+}
     async getMyAccountDataForView(hideSppiner:boolean = false) {
         let id = this.appSession.user.accountId
         if (!id) return
@@ -787,98 +1023,301 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit {
 
 
     }
-    savePerData(event) {
+    // savePerData(event) {
 
 
-        this.accountInfoTemp = event
-        if (!this.accountInfoTemp.entityExtraData) {
-            this.accountInfoTemp.entityExtraData = [];
-        }
-        this.accountInfoTemp.entityAttachments = this.editedContactPerData?.entityAttachments
-        // Ensure attributes exist
-        this.ensureAttribute(701); // first name
-        this.ensureAttribute(702); // last name
-        this.ensureAttribute(705); // title id
-        this.ensureAttribute(707); // join date > date
-        this.ensureAttribute(706); // jobTitle
-        this.ensureAttribute(713); // join date is public > boolean
-        this.ensureAttribute(708); // lang is public >> boolean
-        this.ensureAttribute(710); // phone1IsPublic
-        this.ensureAttribute(715); // user id
-        this.ensureAttribute(711); // phone2IsPublic
-        this.ensureAttribute(712); // phone3IsPublic
-        this.ensureAttribute(709); // emailAddressIsPublic
-        this.ensureAttribute(703); // username
-        this.ensureAttribute(714); // username is public > public
-        this.ensureAttribute(610); // username is public > public
+    //     this.accountInfoTemp = event
+    //     if (!this.accountInfoTemp.entityExtraData) {
+    //         this.accountInfoTemp.entityExtraData = [];
+    //     }
+    //     this.accountInfoTemp.entityAttachments = this.editedContactPerData?.entityAttachments
+    //     // Ensure attributes exist
+    //     this.ensureAttribute(701); // first name
+    //     this.ensureAttribute(702); // last name
+    //     this.ensureAttribute(705); // title id
+    //     this.ensureAttribute(707); // join date > date
+    //     this.ensureAttribute(706); // jobTitle
+    //     this.ensureAttribute(713); // join date is public > boolean
+    //     this.ensureAttribute(708); // lang is public >> boolean
+    //     this.ensureAttribute(710); // phone1IsPublic
+    //     this.ensureAttribute(715); // user id
+    //     this.ensureAttribute(711); // phone2IsPublic
+    //     this.ensureAttribute(712); // phone3IsPublic
+    //     this.ensureAttribute(709); // emailAddressIsPublic
+    //     this.ensureAttribute(703); // username
+    //     this.ensureAttribute(714); // username is public > public
+    //     this.ensureAttribute(610); // username is public > public
 
 
 
-        // Set values using helper functions
-        if (event?.firstName != null) {
-            this.setStringValue(701, event?.firstName);
-        }
+    //     // Set values using helper functions
+    //     if (event?.firstName != null) {
+    //         this.setStringValue(701, event?.firstName);
+    //     }
 
-        if (event?.lastName != null) {
-            this.setStringValue(702, event?.lastName);
-        }
+    //     if (event?.lastName != null) {
+    //         this.setStringValue(702, event?.lastName);
+    //     }
 
-        if (this.editedContactPerData?.titleId != null) {
-            this.setStringValue(705, this.editedContactPerData?.titleId);
-        }
-        if (this.editedContactPerData?.joinDate?._i != null) {
-            this.setStringValue(707, this.editedContactPerData?.joinDate?._i);
-        }
+    //     if (this.editedContactPerData?.titleId != null) {
+    //         this.setStringValue(705, this.editedContactPerData?.titleId);
+    //     }
+    //     if (this.editedContactPerData?.joinDate?._i != null) {
+    //         this.setStringValue(707, this.editedContactPerData?.joinDate?._i);
+    //     }
 
-        if (event?.jobTitle != null) {
-            this.setStringValue(706, event?.jobTitle);
-        }
-        if (this.editedContactPerData?.joinDateIsPublic != null) {
-
-
-            this.setBooleanValue(713, true);
-        }
-
-        if (this.editedContactPerData?.languageIsPublic != null) {
-            this.setBooleanValue(708, this.editedContactPerData?.languageIsPublic);
-        }
+    //     if (event?.jobTitle != null) {
+    //         this.setStringValue(706, event?.jobTitle);
+    //     }
+    //     if (this.editedContactPerData?.joinDateIsPublic != null) {
 
 
-        if (event?.phone1IsPublic != null) {
-            this.setBooleanValue(710, event.phone1IsPublic); // boolean
-        }
-        if (this.editedContactPerData?.userId != null) {
-            this.setStringValue(715, this.editedContactPerData?.userId);
-        }
-        if (event?.phone2IsPublic != null) {
-            this.setBooleanValue(711, event.phone2IsPublic); // boolean
-        }
-        if (this.editedContactPerData?.phone3IsPublic != null) {
-            this.setBooleanValue(712, this.editedContactPerData.phone3IsPublic); // boolean
-        }
-        if (event?.emailAddressIsPublic != null) {
-            this.setBooleanValue(709, event.emailAddressIsPublic); // boolean
-        }
+    //         this.setBooleanValue(713, true);
+    //     }
 
-        if (this.editedContactPerData?.userName != null) {
-            this.setStringValue(703, this.editedContactPerData?.userName);
-        }
-        if (this.editedContactPerData?.userNameIsPublic != null) {
-            this.setBooleanValue(714, this.editedContactPerData.userNameIsPublic); // boolean
-        }
+    //     if (this.editedContactPerData?.languageIsPublic != null) {
+    //         this.setBooleanValue(708, this.editedContactPerData?.languageIsPublic);
+    //     }
 
-        if (event?.entityExtraData?.length) {
-            const marketplaceRole = event.entityExtraData.find(x => x.attributeId === 610);
 
-            if (marketplaceRole) {
-                this.setStringValue(610, marketplaceRole.attributeValue);
-            }
-        }
+    //     if (event?.phone1IsPublic != null) {
+    //         this.setBooleanValue(710, event.phone1IsPublic); // boolean
+    //     }
+    //     if (this.editedContactPerData?.userId != null) {
+    //         this.setStringValue(715, this.editedContactPerData?.userId);
+    //     }
+    //     if (event?.phone1IsPublic != null) {
+    //         this.setBooleanValue(711, event.phone1IsPublic); // boolean
+    //     }
+    //     if (this.editedContactPerData?.phone2IsPublic != null) {
+    //         this.setBooleanValue(712, this.editedContactPerData.phone2IsPublic); // boolean
+    //     }
+    //     if (event?.emailAddressIsPublic != null) {
+    //         this.setBooleanValue(709, event.emailAddressIsPublic); // boolean
+    //     }
 
-        this.saveMyAccount();
+    //     if (this.editedContactPerData?.userName != null) {
+    //         this.setStringValue(703, this.editedContactPerData?.userName);
+    //     }
+    //     if (this.editedContactPerData?.userNameIsPublic != null) {
+    //         this.setBooleanValue(714, this.editedContactPerData.userNameIsPublic); // boolean
+    //     }
 
+    //     if (event?.entityExtraData?.length) {
+    //         const marketplaceRole = event.entityExtraData.find(x => x.attributeId === 610);
+
+    //         if (marketplaceRole) {
+    //             this.setStringValue(610, marketplaceRole.attributeValue);
+    //         }
+    //     }
+
+    //     this.saveMyAccount();
+
+    // }
+savePerData(event) {
+
+    this.accountInfoTemp = event;
+
+    if (!this.accountInfoTemp.entityExtraData) {
+        this.accountInfoTemp.entityExtraData = [];
     }
 
+    this.accountInfoTemp.entityAttachments =
+        this.editedContactPerData?.entityAttachments;
+
+    this.ensureAttribute(701);
+    this.ensureAttribute(702);
+    this.ensureAttribute(705);
+    this.ensureAttribute(707);
+    this.ensureAttribute(706);
+    this.ensureAttribute(713);
+    this.ensureAttribute(708);
+    this.ensureAttribute(710);
+    this.ensureAttribute(715);
+    this.ensureAttribute(711);
+    this.ensureAttribute(712);
+    this.ensureAttribute(709);
+    this.ensureAttribute(703);
+    this.ensureAttribute(714);
+    this.ensureAttribute(610);
+
+    if (event?.firstName != null) {
+        this.setStringValue(
+            701,
+            event.firstName
+        );
+    }
+
+    if (event?.lastName != null) {
+        this.setStringValue(
+            702,
+            event.lastName
+        );
+    }
+
+    if (
+        this.editedContactPerData
+            ?.titleId != null
+    ) {
+        this.setStringValue(
+            705,
+            this.editedContactPerData
+                .titleId
+        );
+    }
+
+    if (
+        this.editedContactPerData
+            ?.joinDate?._i != null
+    ) {
+        this.setStringValue(
+            707,
+            this.editedContactPerData
+                .joinDate._i
+        );
+    }
+
+    if (event?.jobTitle != null) {
+        this.setStringValue(
+            706,
+            event.jobTitle
+        );
+    }
+
+    if (
+        this.editedContactPerData
+            ?.joinDateIsPublic != null
+    ) {
+        this.setBooleanValue(
+            713,
+            true
+        );
+    }
+
+    if (
+        this.editedContactPerData
+            ?.languageIsPublic != null
+    ) {
+        this.setBooleanValue(
+            708,
+            this.editedContactPerData
+                .languageIsPublic
+        );
+    }
+
+    if (
+        event?.phone1IsPublic != null
+    ) {
+        this.setBooleanValue(
+            710,
+            event.phone1IsPublic
+        );
+    }
+
+    if (
+        this.editedContactPerData
+            ?.userId != null
+    ) {
+        this.setStringValue(
+            715,
+            this.editedContactPerData
+                .userId
+        );
+    }
+
+    if (
+        event?.phone1IsPublic != null
+    ) {
+        this.setBooleanValue(
+            711,
+            event.phone1IsPublic
+        );
+    }
+
+    if (
+        this.editedContactPerData
+            ?.phone2IsPublic != null
+    ) {
+        this.setBooleanValue(
+            712,
+            this.editedContactPerData
+                .phone2IsPublic
+        );
+    }
+
+    if (
+        event?.emailAddressIsPublic != null
+    ) {
+        this.setBooleanValue(
+            709,
+            event.emailAddressIsPublic
+        );
+    }
+
+    if (
+        this.editedContactPerData
+            ?.userName != null
+    ) {
+        this.setStringValue(
+            703,
+            this.editedContactPerData
+                .userName
+        );
+    }
+
+    if (
+        this.editedContactPerData
+            ?.userNameIsPublic != null
+    ) {
+        this.setBooleanValue(
+            714,
+            this.editedContactPerData
+                .userNameIsPublic
+        );
+    }
+
+    if (
+        event?.entityExtraData?.length
+    ) {
+        const marketplaceRole =
+            event.entityExtraData.find(
+                x =>
+                    x.attributeId === 610
+            );
+
+        if (marketplaceRole) {
+            this.setStringValue(
+                610,
+                marketplaceRole
+                    .attributeValue
+            );
+        }
+    }
+
+    /*
+     * IMPORTANT:
+     * Personal manual/connected account
+     * must NOT use CreateOrEditMyAccount.
+     */
+    if (
+        this.accountDataForView
+            ?.isManual === true ||
+        this.accountDataForView
+            ?.isConnected === true ||
+        this.accountLevel ===
+            AccountLevelEnum.Manual ||
+        this.accountLevel ===
+            AccountLevelEnum.External
+    ) {
+        this.saveExternalOrManualAccount();
+        return;
+    }
+
+    /*
+     * Real profile only.
+     */
+    this.saveMyAccount();
+}
     private ensureAttribute(attrId: number): void {
         const exists = this.accountInfoTemp.entityExtraData?.some(attr => attr.attributeId === attrId);
         if (!exists) {
@@ -1135,6 +1574,12 @@ if( !this.accountInfoTemp?.id){
     }
 
     private saveAccountAfterConnectionSelected(): void {
+        if(this.accountInfoTemp.isManual || this.accountInfoTemp.accountLevel == this.accountLevelEnum.Manual){
+            this.accountInfoTemp.accountLevel = this.accountLevelEnum.Manual
+        }else if (this.accountInfoTemp.isConnected || this.accountInfoTemp.accountLevel == this.accountLevelEnum.Connected){
+            this.accountInfoTemp.accountLevel = this.accountLevelEnum.Connected
+
+        }
         this.saving = true;
 
         this._AccountsServiceProxy.createOrEditAccount(this.accountInfoTemp)
@@ -1291,17 +1736,17 @@ save(): void {
 
 
 
-    setDefaultPhoneTypes(): void {
+    // setDefaultPhoneTypes(): void {
 
-        if (!this.accountInfoLoded || !this.phoneTypesLoaded) return;
+    //     if (!this.accountInfoLoded || !this.phoneTypesLoaded) return;
 
-        //set default phone types tobe displayed
-        if (this.accountInfoTemp.phone1TypeId == 0 || this.accountInfoTemp.phone1TypeId == null) {
-            this.accountInfoTemp.phone1TypeId = this.allPhoneTypes.length > 0 ? this.allPhoneTypes[0].value : this.accountInfoTemp.phone1TypeId;
-            this.accountInfoTemp.phone2TypeId = this.allPhoneTypes.length > 1 ? this.allPhoneTypes[1].value : this.accountInfoTemp.phone2TypeId;
-            this.accountInfoTemp.phone3TypeId = this.allPhoneTypes.length > 2 ? this.allPhoneTypes[2].value : this.accountInfoTemp.phone3TypeId;
-        }
-    }
+    //     //set default phone types tobe displayed
+    //     if (this.accountInfoTemp.phone1TypeId == 0 || this.accountInfoTemp.phone1TypeId == null) {
+    //         this.accountInfoTemp.phone1TypeId = this.allPhoneTypes.length > 0 ? this.allPhoneTypes[0].value : this.accountInfoTemp.phone1TypeId;
+    //         this.accountInfoTemp.phone2TypeId = this.allPhoneTypes.length > 1 ? this.allPhoneTypes[1].value : this.accountInfoTemp.phone2TypeId;
+    //         this.accountInfoTemp.phone3TypeId = this.allPhoneTypes.length > 2 ? this.allPhoneTypes[2].value : this.accountInfoTemp.phone3TypeId;
+    //     }
+    // }
 
 
     openImageCropper(event, aspectRatio?: number, noOptions?: boolean): { onCropDone: Observable<any>, data: ImageCropperComponent } {
@@ -1687,7 +2132,7 @@ save(): void {
     getClassifications(event: LazyLoadEvent) {
         if (this.primengTableHelperClass.shouldResetPaging(event)) {
             setTimeout(() => {
-                this.paginatorClass?.changePage(0);
+                this.paginatorClass.changePage(0);
             }, 500);
             return;
         }
@@ -1701,7 +2146,7 @@ save(): void {
     getCategories(event: LazyLoadEvent) {
         if (this.primengTableHelperCateg.shouldResetPaging(event)) {
             setTimeout(() => {
-                this.paginatorCateg?.changePage(0);
+                this.paginatorCateg.changePage(0);
             }, 500);
             return;
         }
@@ -1787,30 +2232,6 @@ save(): void {
             });
     }
 
-    refreshPublish(event){
-        if(event){
-            this.getMyAccountDataForView() 
-        }
-    }
-
-    get jobTitle(): string {
-        return (
-          this.accountInfoTemp?.entityExtraData?.find(x => x.attributeId === 706)
-            ?.attributeValue || ''
-        );
-      }
-      
-      set jobTitle(value: string) {
-        this.ensureAttribute(706);
-        const attr = this.accountInfoTemp.entityExtraData.find(x => x.attributeId === 706);
-        attr.attributeValue = value;
-      }
-      private normalizePhone(v?: string): string | undefined {
-        if (!v) return undefined;
-        const trimmed = v.trim();
-        return trimmed.length ? trimmed : undefined;
-      }
- 
 
     buildMarketplaceRolesExtraData(): AppEntityExtraDataDto[] {
         if (!this.selectedRoles?.length) {
