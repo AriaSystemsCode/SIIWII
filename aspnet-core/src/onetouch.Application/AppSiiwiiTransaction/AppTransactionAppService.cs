@@ -2581,7 +2581,7 @@ namespace onetouch.AppSiiwiiTransaction
                 }
                 //log[Start]
                 var statusCode = await _helper.SystemTables.GetEntityObjectStatusReadyToSendEntityLog();
-                var notSentTransactions = _appEntityLogRepository.GetAll().Where(z => z.TenantId == AbpSession.TenantId &&
+                var notSentTransactions = _appEntityLogRepository.GetAll().AsNoTracking().Where(z => z.TenantId == AbpSession.TenantId &&
                 z.EntityObjectTypeId == input.EntityTypeIdFilter && z.EntityObjectStatusId == statusCode);
                 var idList = new List<string>();
                 if (!string.IsNullOrEmpty(input.At_Id))
@@ -2590,7 +2590,7 @@ namespace onetouch.AppSiiwiiTransaction
                 }
 
                 //log[End]
-                var filteredAppTransactions = _appTransactionsHeaderRepository.GetAll()
+                var filteredAppTransactions = _appTransactionsHeaderRepository.GetAll().AsNoTracking()
                     .Include(x => x.AppTransactionContacts).ThenInclude(s => s.ContactAddressFk)
                     .Include(z => z.AppTransactionDetails.Where(x => input.hasParentItems == false ? x.ParentId != null : true))
                     .Include(z => z.PaymentTermsFk).ThenInclude(z => z.EntityExtraData)
@@ -2639,10 +2639,10 @@ namespace onetouch.AppSiiwiiTransaction
                                                                                                   //.Include(z => z.apptransaction.AppTransactionDetails
                                                                                                   //.Where(x => input.hasParentItems == false ? x.ParentId != null : true))
                                                          join
-                                                         x in _appContactRepository.GetAll().Where(s => s.TenantId == AbpSession.TenantId) on
+                                                         x in _appContactRepository.GetAll().AsNoTracking().Where(s => s.TenantId == AbpSession.TenantId) on
                                                          e.apptransaction.SellerCompanySSIN.Trim() equals x.SSIN.Trim()
                                                          join
-                                                         s in _appContactRepository.GetAll().Where(s => s.TenantId == AbpSession.TenantId) on
+                                                         s in _appContactRepository.GetAll().AsNoTracking().Where(s => s.TenantId == AbpSession.TenantId) on
                                                          e.apptransaction.BuyerCompanySSIN.Trim() equals s.SSIN.Trim() into j
                                                          from a in j.DefaultIfEmpty()
                                                          select new { Trans = e.apptransaction, TranSellerCode = x.Code, TranBuyerCode = a.Code, Log = e.log };
@@ -2724,7 +2724,8 @@ namespace onetouch.AppSiiwiiTransaction
             }
             else
             {
-                var filteredAppTransactions = _appTransactionsHeaderRepository.GetAll().Include(x => x.AppTransactionContacts)//.ThenInclude(s => s.ContactAddressFk)
+                var filteredAppTransactions = _appTransactionsHeaderRepository.GetAll()
+                    .AsNoTracking().Include(x => x.AppTransactionContacts)//.ThenInclude(s => s.ContactAddressFk)
                                          .WhereIf(!string.IsNullOrWhiteSpace(input.Filter), e => e.Name.Contains(input.Filter))
                                          .WhereIf(!string.IsNullOrWhiteSpace(input.Filter), e => e.Code.Contains(input.Filter))
                                          .WhereIf(!string.IsNullOrWhiteSpace(input.Filter), e => e.Code.Contains(input.Filter))
