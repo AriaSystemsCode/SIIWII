@@ -1524,7 +1524,7 @@ namespace onetouch.AppMarketplaceAccounts
                 appMarketplaceContact.Id = 0;
                 appMarketplaceContact.LastModificationTime = foundContactInfo.LastModificationTime;
                 appMarketplaceContact.AccountId = mainAccountID;
-                appMarketplaceContact.IsProfileData = true;
+                appMarketplaceContact.IsProfileData = foundContactInfo.IsProfileData;
                 appMarketplaceContact.ObjectId = foundEntity.ObjectId;
                 appMarketplaceContact.EntityObjectTypeId = foundEntity.EntityObjectTypeId;
                 appMarketplaceContact.EntityObjectTypeCode = foundEntity.EntityObjectTypeCode;
