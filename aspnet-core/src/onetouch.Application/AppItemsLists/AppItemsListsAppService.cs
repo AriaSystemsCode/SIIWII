@@ -1425,7 +1425,7 @@ namespace onetouch.AppItemsLists
                     await CurrentUnitOfWork.SaveChangesAsync();
                 }
                 //T-SII-20260214.0001,1 MMT 02/25/2026 – Product List: “Notify People” Option Not Functioning in Restricted Share[Start]
-                if (input.ItemSharing.Count() > 0)
+                if (input.ItemSharing!=null && input.ItemSharing.Count() > 0)
                 {
                     foreach (var sharingDto in input.ItemSharing)
                     {
