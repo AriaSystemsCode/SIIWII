@@ -301,7 +301,8 @@ namespace onetouch.AppSubScriptionPlan
             */
             // var appTenantActivityLogListDtos = await query.ToListAsync();
 
-            return _appTenantActivitiesLogExcelExporter.ExportToFile(appTenantActivityLogListDtos.Items.ToList());
+            //return _appTenantActivitiesLogExcelExporter.ExportToFile(appTenantActivityLogListDtos.Items.ToList());
+            return await _appTenantActivitiesLogExcelExporter.ExportAppTenantActivitiesLogToExcel(appTenantActivityLogListDtos.Items.ToList());
         }
         public async Task<bool> IsFeatureAvailable(string featureCode)
         {
