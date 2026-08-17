@@ -2485,14 +2485,14 @@ namespace onetouch.AppSiiwiiTransaction
             string selectedRoleOldValue = selectedAccountRole;
             if (selectedAccountRole != "Seller" && selectedAccountRole != "Buyer")
             {
-                if(selectedAccountRole.ToUpper().Contains("BUYING"))
-                    selectedAccountRole = (!string.IsNullOrEmpty(transactionType) && transactionType == "PO") ? "Seller" : "Buyer";
-                 else
+               // if(selectedAccountRole.ToUpper().Contains("BUYING"))
+                //    selectedAccountRole = (!string.IsNullOrEmpty(transactionType) && transactionType == "PO") ? "Seller" : "Buyer";
+                // else
                     selectedAccountRole = (!string.IsNullOrEmpty(transactionType) && transactionType == "SO") ? "Seller" : "Buyer";
             }
-             if (selectedRoleOldValue.ToUpper().Contains("BUYING"))
-                 transactionType = (!string.IsNullOrEmpty(transactionType) && transactionType == "SO") ? "Seller" : "Buyer";
-             else
+            // if (selectedRoleOldValue.ToUpper().Contains("BUYING"))
+           //      transactionType = (!string.IsNullOrEmpty(transactionType) && transactionType == "SO") ? "Seller" : "Buyer";
+             //else
                 transactionType = (!string.IsNullOrEmpty(transactionType) && transactionType == "PO") ? "Seller" : "Buyer";
 
             var activeRelationshipStatusId = await _helper.SystemTables.GetEntityObjectStatusRelationshipActive();
