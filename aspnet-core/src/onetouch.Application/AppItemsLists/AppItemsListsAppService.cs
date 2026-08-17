@@ -1461,7 +1461,16 @@ namespace onetouch.AppItemsLists
                         var marketplaceItem = await _appMarketplaceItem.GetAll().FirstOrDefaultAsync(x => x.SSIN == child.ItemSSIN);
                         //T-SII-20231205.0004,1 MMT 01/01/2024 -Products List - internal error while sharing the products list[Start]
                         if (marketplaceItem == null)
-                            continue;
+                        {
+                            var item = await _appItemRepository.GetAll().Where(z => z.SSIN == child.ItemSSIN).FirstOrDefaultAsync();
+                            if (item != null)
+                            {
+                                await _appItemsAppService.ShareProduct(new SharingItemOptions 
+                                { AppItemId = item.Id, SharingLevel = 1, ItemSharing = new List<ItemSharingDto>()});
+                                marketplaceItem = await _appMarketplaceItem.GetAll().FirstOrDefaultAsync(x => x.SSIN == child.ItemSSIN);
+                            }
+                        }
+                           // continue;
                         //T-SII-20231205.0004,1 MMT 01/01/2024 -Products List - internal error while sharing the products list[End]
                         publishChild = new AppMarketplaceItemsListDetails();
                         ObjectMapper.Map(child, publishChild);
