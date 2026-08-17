@@ -2481,11 +2481,20 @@ namespace onetouch.AppSiiwiiTransaction
                     selectedAccountRole = "Seller";
                 }
             }
+            
+            string selectedRoleOldValue = selectedAccountRole;
             if (selectedAccountRole != "Seller" && selectedAccountRole != "Buyer")
             {
-                selectedAccountRole = (!string.IsNullOrEmpty(transactionType) && transactionType == "SO") ? "Seller" : "Buyer";
+                if(selectedAccountRole.ToUpper().Contains("BUYING"))
+                    selectedAccountRole = (!string.IsNullOrEmpty(transactionType) && transactionType == "PO") ? "Seller" : "Buyer";
+                 else
+                    selectedAccountRole = (!string.IsNullOrEmpty(transactionType) && transactionType == "SO") ? "Seller" : "Buyer";
             }
-            transactionType = (!string.IsNullOrEmpty(transactionType) && transactionType == "PO") ? "Seller" : "Buyer";
+             if (selectedRoleOldValue.ToUpper().Contains("BUYING"))
+                 transactionType = (!string.IsNullOrEmpty(transactionType) && transactionType == "SO") ? "Seller" : "Buyer";
+             else
+                transactionType = (!string.IsNullOrEmpty(transactionType) && transactionType == "PO") ? "Seller" : "Buyer";
+
             var activeRelationshipStatusId = await _helper.SystemTables.GetEntityObjectStatusRelationshipActive();
             var currentAccount = await _appContactRepository.GetAll().Include(z => z.EntityFk)
                 .Where(z => z.TenantId == AbpSession.TenantId
