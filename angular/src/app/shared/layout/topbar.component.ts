@@ -554,7 +554,12 @@ export class TopBarComponent extends ThemesLayoutBaseComponent implements OnInit
     }
 
     loadDefaultPage(): void {
+      
         this.getTenantData()
+          if(!this.isAuthenticated){
+                this.defaultHomeUrl = '/app/main/marketplace';
+                return
+        }
         this._AppEntitiesServiceProxy.getHostSettingValue(1203, null)
           .subscribe({
             next: (res2: string) => {
