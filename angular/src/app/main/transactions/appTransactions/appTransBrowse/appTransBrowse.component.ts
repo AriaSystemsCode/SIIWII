@@ -175,6 +175,10 @@ export class AppTransactionsBrowseComponent
 spreadsheetSaveUrl =
     'https://services.syncfusion.com/angular/production/api/spreadsheet/save';
 
+
+    isOpeningSavedSpreadsheet = false;
+    savedSpreadsheets: SavedSpreadsheet[] = [];
+    currentSavedSpreadsheetId: number | null = null;
     constructor(
         injector: Injector,
         private _appTransactionServiceProxy:
@@ -209,6 +213,7 @@ spreadsheetSaveUrl =
 
         this.setPageMainFilters();
         this.initFilterForm();
+        this.loadSavedSpreadsheets();
     }
 
     // =====================================================
@@ -482,15 +487,8 @@ spreadsheetSaveUrl =
                 this.primengTableHelper.records =
                     result.items;
 
-                /*
-                 * Selection is intentionally cleared
-                 * when the page changes because the API
-                 * returns server-paged data.
-                 *
-                 * Remove this line if you implement
-                 * cross-page selection by ID.
-                 */
-                this.selectedTransactions = [];
+             
+                // this.selectedTransactions = [];
             });
     }
 
@@ -847,6 +845,10 @@ openSelectedInSpreadsheet(): void {
         return;
     }
 
+    // This is a NEW spreadsheet, not an existing saved one.
+    this.currentSavedSpreadsheetId = null;
+    this.isOpeningSavedSpreadsheet = false;
+
     this.spreadsheetRows =
         this.selectedTransactions.map(record =>
             this.mapTransactionToSpreadsheetRow(record)
@@ -964,14 +966,27 @@ openSelectedInSpreadsheet(): void {
     }
 
 onSpreadsheetCreated(): void {
+
     if (!this.spreadsheet) {
+        return;
+    }
+
+    // IMPORTANT:
+    // Saved workbook is about to be loaded.
+    // Do not initialize a new workbook.
+    if (this.isOpeningSavedSpreadsheet) {
+        return;
+    }
+
+    // Also don't initialize if this is not a new
+    // transaction spreadsheet.
+    if (!this.spreadsheetRows?.length) {
         return;
     }
 
     const lastRow =
         this.spreadsheetRows.length + 1;
 
-    // Format Transactions headers.
     this.spreadsheet.cellFormat(
         {
             fontWeight: 'bold',
@@ -981,16 +996,13 @@ onSpreadsheetCreated(): void {
         'Transactions!A1:L1'
     );
 
-    // Format Quantity and Amount.
     this.spreadsheet.numberFormat(
         '0.00',
         `Transactions!K2:L${lastRow}`
     );
 
-    // Add helper data to Sheet1.
     this.prepareChartDataSheet();
 
-    // Return user to Transactions sheet.
     this.spreadsheet.activeSheetIndex = 0;
 
     this.spreadsheet.selectRange(
@@ -1091,342 +1103,8 @@ private prepareChartDataSheet(): void {
         this.showSpreadsheetDialog = false;
     }
 
-    // =====================================================
-    // ADD COLUMN
-    // =====================================================
-
-    addColumn(): void {
-        if (!this.spreadsheet) {
-            return;
-        }
-
-        const activeSheet =
-            this.spreadsheet.getActiveSheet();
-
-        const newColumnIndex =
-            activeSheet.usedRange?.colIndex !=
-            null
-                ? activeSheet.usedRange.colIndex +
-                  1
-                : 0;
-
-        this.spreadsheet.insertColumn(
-            newColumnIndex,
-            newColumnIndex
-        );
-
-        const columnName =
-            this.getColumnName(
-                newColumnIndex
-            );
-
-        this.spreadsheet.updateCell(
-            {
-                value: 'New Column',
-                style: {
-                    fontWeight: 'bold',
-                    textAlign: 'center'
-                }
-            },
-            `${columnName}1`
-        );
-
-        this.spreadsheet.selectRange(
-            `${columnName}1`
-        );
-    }
-
-    // =====================================================
-    // DELETE SELECTED COLUMN
-    // =====================================================
-
-    deleteSelectedColumn(): void {
-        if (!this.spreadsheet) {
-            return;
-        }
-
-        const selectedRange =
-            this.spreadsheet
-                .getActiveSheet()
-                .selectedRange;
-
-        if (!selectedRange) {
-            this.notify.warn(
-                'Select a cell in the column you want to delete.'
-            );
-
-            return;
-        }
-
-        const firstCell =
-            selectedRange.split(':')[0];
-
-        const columnIndex =
-            this.getColumnIndex(
-                firstCell
-            );
-
-        this.spreadsheet.delete(
-            columnIndex,
-            columnIndex,
-            'Column'
-        );
-    }
-
-    // =====================================================
-    // CHARTS
-    // =====================================================
-
-createQuantityChart(): void {
-    if (
-        !this.spreadsheet ||
-        !this.spreadsheetRows.length
-    ) {
-        return;
-    }
-
-    const lastRow =
-        this.spreadsheetRows.length + 1;
-
-    this.spreadsheet.activeSheetIndex = 1;
-
-    this.spreadsheet.insertChart([
-        {
-            type: 'Column',
-            range:
-                `Sheet1!A1:B${lastRow}`,
-            title:
-                'Quantity by Transaction',
-            height: 320,
-            width: 600,
-            top: 40,
-            left: 450,
-            isSeriesInRows: false
-        }
-    ]);
-}
-createAmountChart(): void {
-    if (
-        !this.spreadsheet ||
-        this.spreadsheetRows.length === 0
-    ) {
-        return;
-    }
-
-    this.prepareAmountChartData();
-
-    const lastRow =
-        this.spreadsheetRows.length + 1;
-
-    this.spreadsheet.activeSheetIndex = 1;
-
-    this.spreadsheet.selectRange(
-        `Sheet1!E1:F${lastRow}`
-    );
-
-    this.spreadsheet.insertChart([
-        {
-            type: 'Bar',
-            range: `Sheet1!E1:F${lastRow}`,
-            title: 'Amount by Transaction',
-            height: 380,
-            width: 680,
-            top: 440,
-            left: 500,
-            isSeriesInRows: false
-        }
-    ]);
-}
-
-private prepareAmountChartData(): void {
-    if (!this.spreadsheet) {
-        return;
-    }
-
-    this.spreadsheet.updateCell(
-        {
-            value: 'Transaction',
-            style: {
-                fontWeight: 'bold'
-            }
-        },
-        'Sheet1!E1'
-    );
-
-    this.spreadsheet.updateCell(
-        {
-            value: 'Amount',
-            style: {
-                fontWeight: 'bold'
-            }
-        },
-        'Sheet1!F1'
-    );
-
-    this.spreadsheetRows.forEach((row, index) => {
-        const excelRow = index + 2;
-
-        this.spreadsheet?.updateCell(
-            {
-                value: String(
-                    row.TransactionNumber ??
-                    `Transaction ${index + 1}`
-                )
-            },
-            `Sheet1!E${excelRow}`
-        );
-
-        this.spreadsheet?.updateCell(
-            {
-                value: String(
-                    Number(row.Amount ?? 0)
-                )
-            },
-            `Sheet1!F${excelRow}`
-        );
-    });
-
-    const lastRow =
-        this.spreadsheetRows.length + 1;
-
-    this.spreadsheet.numberFormat(
-        '0.00',
-        `Sheet1!F2:F${lastRow}`
-    );
-}
 
 
-createAmountLineChart(): void {
-    if (
-        !this.spreadsheet ||
-        !this.spreadsheetRows.length
-    ) {
-        return;
-    }
-
-    const lastRow =
-        this.spreadsheetRows.length + 1;
-
-    this.prepareAmountChartData();
-
-    this.spreadsheet.activeSheetIndex = 1;
-
-    this.spreadsheet.insertChart([
-        {
-            type: 'Line',
-            range:
-                `Sheet1!E1:F${lastRow}`,
-            title:
-                'Transaction Amount Trend',
-            height: 330,
-            width: 650,
-            top: 760,
-            left: 450,
-            isSeriesInRows: false
-        }
-    ]);
-}
-
-// createStatusPieChart(): void {
-//     if (
-//         !this.spreadsheet ||
-//         !this.spreadsheetRows.length
-//     ) {
-//         return;
-//     }
-
-//     const statusCounts =
-//         this.getStatusCounts();
-
-//     this.writeStatusSummary(statusCounts);
-
-//     const lastRow =
-//         statusCounts.length + 1;
-
-//     this.spreadsheet.activeSheetIndex = 1;
-
-//     this.spreadsheet.insertChart([
-//         {
-//             type: 'Pie',
-//             range:
-//                 `Sheet1!H1:I${lastRow}`,
-//             title:
-//                 'Transactions by Status',
-//             height: 350,
-//             width: 550,
-//             top: 40,
-//             left: 1120,
-//             isSeriesInRows: false
-//         }
-//     ]);
-// }
-    // =====================================================
-    // FORMULA COLUMN
-    // =====================================================
-
-    addTotalFormulaColumn(): void {
-        if (
-            !this.spreadsheet ||
-            this.spreadsheetRows.length === 0
-        ) {
-            return;
-        }
-
-        const activeSheet =
-            this.spreadsheet.getActiveSheet();
-
-        const newColumnIndex =
-            activeSheet.usedRange.colIndex + 1;
-
-        this.spreadsheet.insertColumn(
-            newColumnIndex,
-            newColumnIndex
-        );
-
-        const newColumnName =
-            this.getColumnName(
-                newColumnIndex
-            );
-
-        this.spreadsheet.updateCell(
-            {
-                value: 'Amount + Quantity',
-                style: {
-                    fontWeight: 'bold',
-                    textAlign: 'center'
-                }
-            },
-            `${newColumnName}1`
-        );
-
-        /*
-         * K = Quantity
-         * L = Amount
-         */
-        for (
-            let rowIndex = 2;
-            rowIndex <=
-            this.spreadsheetRows.length + 1;
-            rowIndex++
-        ) {
-            this.spreadsheet.updateCell(
-                {
-                    formula:
-                        `=K${rowIndex}+L${rowIndex}`
-                },
-                `${newColumnName}${rowIndex}`
-            );
-        }
-
-        this.spreadsheet.numberFormat(
-            '0.00',
-            `${newColumnName}2:` +
-                `${newColumnName}${
-                    this.spreadsheetRows
-                        .length + 1
-                }`
-        );
-    }
 
     // =====================================================
     // EXPORT
@@ -1517,4 +1195,384 @@ exportPdf(event?: Event): void {
 
         return name;
     }
+
+    openAllInSpreadsheet(): void {
+
+    const totalCount =
+        this.primengTableHelper.totalRecordsCount;
+
+    if (!totalCount) {
+        this.notify.warn('No transactions found.');
+        return;
+    }
+
+    const filters =
+        this.filterForm?.value ?? {};
+
+    this.showMainSpinner();
+
+    this._appTransactionServiceProxy
+        .getAll(
+            false,
+            0,
+            undefined,
+            filters.search,
+            filters.codeFilter,
+            undefined,
+            filters.mainFilterType?.id,
+            filters.minCreateDateFilter,
+            filters.maxCreateDateFilter,
+            filters.minCompleteDateFilter,
+            filters.maxCompleteDateFilter,
+            filters.sellerNameFilter,
+            undefined,
+            filters.buyerNameFilter,
+            undefined,
+            filters.statusFilter == null
+                ? undefined
+                : filters.statusFilter,
+            false,
+            undefined,
+            undefined,
+            filters.referenceNumberFilter,
+            this.primengTableHelper.getSorting(
+                this.dataTable
+            ),
+            0,              // skipCount
+            totalCount      // get all filtered records
+        )
+        .pipe(
+            finalize(() => {
+                this.hideMainSpinner();
+            })
+        )
+        .subscribe(result => {
+
+            this.openRecordsInSpreadsheet(
+                result.items
+            );
+
+        });
+}
+
+private openRecordsInSpreadsheet(
+    records: any[]
+): void {
+
+    if (!records?.length) {
+        this.notify.warn(
+            'No transactions found.'
+        );
+        return;
+    }
+
+    // This is a NEW spreadsheet, not an existing saved one.
+    this.currentSavedSpreadsheetId = null;
+    this.isOpeningSavedSpreadsheet = false;
+
+    this.spreadsheetRows =
+        records.map(record =>
+            this.mapTransactionToSpreadsheetRow(
+                record
+            )
+        );
+
+    this.sheets = [
+        {
+            name: 'Transactions',
+            ranges: [
+                {
+                    dataSource:
+                        this.spreadsheetRows,
+                    startCell: 'A1',
+                    showFieldAsHeader: true
+                }
+            ],
+            columns: [
+                { width: 145 },
+                { width: 145 },
+                { width: 180 },
+                { width: 180 },
+                { width: 110 },
+                { width: 130 },
+                { width: 130 },
+                { width: 130 },
+                { width: 180 },
+                { width: 100 },
+                { width: 110 },
+                { width: 130 }
+            ],
+            frozenRows: 1
+        },
+        {
+            name: 'Sheet1'
+        }
+    ];
+
+    this.showSpreadsheetDialog = true;
+}
+
+
+saveSpreadsheetLocal(): void {
+
+    if (!this.spreadsheet) {
+        this.notify.warn(
+            'Spreadsheet is not ready.'
+        );
+        return;
+    }
+
+    this.spreadsheet
+        .saveAsJson()
+        .then((workbook: any) => {
+
+            const existing: SavedSpreadsheet[] =
+                JSON.parse(
+                    localStorage.getItem(
+                        'savedSpreadsheets'
+                    ) || '[]'
+                );
+
+            // =========================
+            // UPDATE EXISTING
+            // =========================
+            if (this.currentSavedSpreadsheetId) {
+
+                const index =
+                    existing.findIndex(
+                        x =>
+                            x.id ===
+                            this.currentSavedSpreadsheetId
+                    );
+
+                if (index >= 0) {
+
+                    existing[index] = {
+                        ...existing[index],
+
+                        createdDate:
+                            existing[index]
+                                .createdDate,
+
+                        updatedDate:
+                            new Date().toISOString(),
+
+                        recordCount:
+                            this.getWorkbookRecordCount(
+                                workbook
+                            ),
+
+                        workbookJson:
+                            workbook
+                    };
+
+                    localStorage.setItem(
+                        'savedSpreadsheets',
+                        JSON.stringify(existing)
+                    );
+
+                    this.savedSpreadsheets =
+                        existing;
+
+                    this.notify.success(
+                        'Spreadsheet updated successfully.'
+                    );
+
+                    console.log(
+                        'Updated Spreadsheet:',
+                        existing[index]
+                    );
+
+                    return;
+                }
+            }
+
+            // =========================
+            // CREATE NEW
+            // =========================
+
+            const newSpreadsheet:
+                SavedSpreadsheet = {
+
+                id: Date.now(),
+
+                name:
+                    'Transaction Spreadsheet ' +
+                    (existing.length + 1),
+
+                createdDate:
+                    new Date().toISOString(),
+
+                updatedDate:
+                    new Date().toISOString(),
+
+                recordCount:
+                    this.getWorkbookRecordCount(
+                        workbook
+                    ),
+
+                workbookJson:
+                    workbook
+            };
+
+            existing.push(
+                newSpreadsheet
+            );
+
+            localStorage.setItem(
+                'savedSpreadsheets',
+                JSON.stringify(existing)
+            );
+
+            this.savedSpreadsheets =
+                existing;
+
+            // Remember which spreadsheet
+            // we are now editing
+            this.currentSavedSpreadsheetId =
+                newSpreadsheet.id;
+
+            this.notify.success(
+                'Spreadsheet created successfully.'
+            );
+
+            console.log(
+                'Created Spreadsheet:',
+                newSpreadsheet
+            );
+        });
+}
+private getWorkbookRecordCount(
+    workbook: any
+): number {
+
+    const transactionSheet =
+        workbook
+            ?.jsonObject
+            ?.Workbook
+            ?.sheets
+            ?.find(
+                (sheet: any) =>
+                    sheet.name ===
+                    'Transactions'
+            );
+
+    if (!transactionSheet?.rows?.length) {
+        return 0;
+    }
+
+    // remove header row
+    return Math.max(
+        transactionSheet.rows.length - 1,
+        0
+    );
+}
+
+
+loadSavedSpreadsheets(): void {
+
+    this.savedSpreadsheets =
+        JSON.parse(
+            localStorage.getItem(
+                'savedSpreadsheets'
+            ) || '[]'
+        );
+}
+openSavedSpreadsheet(
+    saved: SavedSpreadsheet
+): void {
+
+    if (
+        !saved?.workbookJson?.jsonObject
+    ) {
+        console.error(
+            'Invalid saved workbook:',
+            saved
+        );
+
+        this.notify.warn(
+            'Saved spreadsheet is invalid.'
+        );
+
+        return;
+    }
+
+    // Remember which saved spreadsheet is currently being edited.
+    // Save will UPDATE this record instead of creating a new one.
+    this.currentSavedSpreadsheetId = saved.id;
+
+    this.isOpeningSavedSpreadsheet = true;
+
+    // Important:
+    // don't leave data from previously opened
+    // transaction spreadsheet.
+    this.spreadsheetRows = [];
+    this.sheets = [];
+
+    this.showSpreadsheetDialog = true;
+
+    setTimeout(() => {
+
+        if (!this.spreadsheet) {
+            this.isOpeningSavedSpreadsheet = false;
+            return;
+        }
+
+        try {
+
+            console.log(
+                'Opening workbook:',
+                saved.workbookJson
+            );
+
+            console.log(
+                'Opening jsonObject:',
+                saved.workbookJson.jsonObject
+            );
+
+            this.spreadsheet.openFromJson({
+                file:
+                    saved.workbookJson.jsonObject
+            });
+
+            setTimeout(() => {
+
+                this.spreadsheet?.resize();
+
+                this.isOpeningSavedSpreadsheet =
+                    false;
+
+                this.notify.success(
+                    saved.name +
+                    ' opened successfully.'
+                );
+
+            }, 500);
+
+        } catch (error) {
+
+            this.isOpeningSavedSpreadsheet =
+                false;
+
+            console.error(
+                'Open spreadsheet error:',
+                error
+            );
+
+            this.notify.error(
+                'Failed to open spreadsheet.'
+            );
+        }
+
+    }, 300);
+}
+}
+
+interface SavedSpreadsheet {
+    id: number;
+    name: string;
+    createdDate: string;
+    updatedDate?: string;
+    recordCount: number;
+    workbookJson: any;
 }

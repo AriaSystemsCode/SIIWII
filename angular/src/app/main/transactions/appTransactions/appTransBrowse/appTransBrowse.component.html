@@ -168,7 +168,7 @@
 
                                     <!-- Send selected rows to spreadsheet -->
                                     <div class="mr-2">
-                                        <button
+                                        <!-- <button
                                             type="button"
                                             class="btn btn-success h-48"
                                             [disabled]="
@@ -190,7 +190,22 @@
                                                     selectedTransactions.length
                                                 }})
                                             </span>
-                                        </button>
+                                        </button> -->
+
+                                        <button
+    type="button"
+    class="btn btn-success h-48"
+    [disabled]="selectedTransactions.length === 0"
+    (click)="openSelectedInSpreadsheet()">
+
+    <i class="fa fa-table mr-1"></i>
+
+    Open in Spreadsheet
+
+    <span *ngIf="selectedTransactions.length">
+        ({{ selectedTransactions.length }})
+    </span>
+</button>
                                     </div>
 
                                     <!-- Create transaction -->
@@ -639,6 +654,57 @@
                                             {{ "Details" | localize }}
 
                                         </button>
+
+                                        <div
+    class="mt-3"
+    *ngIf="savedSpreadsheets.length > 0">
+
+    <h5 class="mb-3">
+        Saved Spreadsheets
+    </h5>
+
+    <div
+        *ngFor="let item of savedSpreadsheets"
+        class="border rounded p-3 mb-2
+               d-flex justify-content-between
+               align-items-center">
+
+        <div>
+
+            <strong>
+                {{ item.name }}
+            </strong>
+
+            <div class="text-muted small">
+
+                {{ item.recordCount }}
+                transaction(s)
+
+                -
+
+                {{
+                    item.createdDate
+                        | date:'short'
+                }}
+
+            </div>
+
+        </div>
+
+        <button
+            type="button"
+            class="btn btn-sm btn-primary"
+            (click)="openSavedSpreadsheet(item)">
+
+            <i class="fa fa-folder-open mr-1"></i>
+
+            Open
+
+        </button>
+
+    </div>
+
+</div>
                                     </div>
 
                                     <span
@@ -1074,6 +1140,20 @@
                                     }}
 
                                 </span>
+                                <button
+    type="button"
+    class="btn btn-primary h-48 mr-2"
+    [disabled]="primengTableHelper.totalRecordsCount === 0"
+    (click)="openAllInSpreadsheet()">
+
+    <i class="fa fa-table mr-1"></i>
+
+    Open All in Spreadsheet
+
+    <span>
+        ({{ primengTableHelper.totalRecordsCount }})
+    </span>
+</button>
                             </div>
                         </div>
                     </div>
@@ -1304,6 +1384,7 @@
                                 }}
 
                             </span>
+                            
                         </div>
                     </div>
                 </div>
@@ -1363,55 +1444,20 @@
         <div
             class="spreadsheet-actions d-flex flex-wrap align-items-center p-3">
 
-            <button
-                type="button"
-                class="btn btn-primary mr-2 mb-2"
-                (click)="addColumn()">
 
-                <i class="fa fa-plus mr-1"></i>
-                Add Column
 
-            </button>
 
-            <button
-                type="button"
-                class="btn btn-danger mr-2 mb-2"
-                (click)="deleteSelectedColumn()">
+<button
+    type="button"
+    class="btn btn-primary mr-2"
+    (click)="saveSpreadsheetLocal()">
 
-                <i class="fa fa-trash mr-1"></i>
-                Delete Selected Column
+    <i class="fa fa-save mr-1"></i>
 
-            </button>
+    Save Spreadsheet
 
-            <!-- <button
-                type="button"
-                class="btn btn-success mr-2 mb-2"
-                (click)="createQuantityChart()">
-
-                <i class="fa fa-bar-chart mr-1"></i>
-                Quantity Chart
-
-            </button> -->
-
-            <button
-                type="button"
-                class="btn btn-info mr-2 mb-2"
-                (click)="createAmountChart()">
-
-                <i class="fa fa-line-chart mr-1"></i>
-                Amount Chart
-
-            </button>
-
-            <button
-                type="button"
-                class="btn btn-secondary mr-2 mb-2"
-                (click)="addTotalFormulaColumn()">
-
-                <i class="fa fa-calculator mr-1"></i>
-                Add Amount + Quantity
-
-            </button>
+</button>
+            
 
        <button
     type="button"
