@@ -30,8 +30,11 @@ export class AccountsListFiltersComponent extends AppComponentBase implements On
     loading:boolean = false
 
     sortBy = 'name'
-    selectedClassifications: number[]
-    selectedCategories: number[]
+   selectedClassifications:
+    TreeNodeOfGetSycEntityObjectClassificationForViewDto[] = [];
+
+selectedCategories:
+    TreeNodeOfGetSycEntityObjectCategoryForViewDto[] = [];
 
     languageFilterMetaData :FilterMetaData<LookupLabelDto[]>
     accountTypeFilterMetaData :FilterMetaData<LookupLabelDto[]>
@@ -112,30 +115,67 @@ export class AccountsListFiltersComponent extends AppComponentBase implements On
       }
 
 
-    getClassificationsList( componentRef:{  onListLoadCallback  : Function } ){
-        this.loading = true
-        const subs = this._sycEntityObjectClassificationsServiceProxy.getAllWithChildsForContactWithPaging(
-            undefined,
-            undefined,
-            undefined,
-            undefined,
-            undefined,
-            undefined,
-            undefined,
-            undefined,
-            undefined,
-            this.sortBy,
-            this.classificationsFilterMetaData.listSkipCount,
-            this.classificationsFilterMetaData.listMaxResultCount,
-        )
-        .pipe(
-            finalize(()=>this.loading = false)
-        )
-        .subscribe((res)=>{
-            componentRef.onListLoadCallback(res)
-        })
-        this.subscriptions.push(subs)
-    }
+  getClassificationsList(
+    componentRef: any
+) {
+
+    this.loading = true;
+
+    const subs =
+        this
+            ._sycEntityObjectClassificationsServiceProxy
+            .getAllWithChildsForContactWithPaging(
+                undefined,
+                undefined,
+                undefined,
+                undefined,
+                undefined,
+                undefined,
+                undefined,
+                undefined,
+                undefined,
+                this.sortBy,
+                this.classificationsFilterMetaData
+                    .listSkipCount,
+                this.classificationsFilterMetaData
+                    .listMaxResultCount
+            )
+            .pipe(
+                finalize(
+                    () =>
+                        this.loading =
+                            false
+                )
+            )
+            .subscribe(res => {
+
+                componentRef
+                    .onListLoadCallback(
+                        res
+                    );
+
+                const ids =
+                    this.getSelectedIds(
+                        'classifications'
+                    );
+
+                const selectedNodes =
+                    this.findClassificationNodesByIds(
+                        res.items || [],
+                        ids
+                    );
+
+
+                componentRef
+                    .restoreSelection?.(
+                        selectedNodes
+                    );
+            });
+
+    this.subscriptions.push(
+        subs
+    );
+}
 
     loadClassificationNode(node : TreeNodeOfGetSycEntityObjectClassificationForViewDto){
         if (node) {
@@ -196,12 +236,38 @@ export class AccountsListFiltersComponent extends AppComponentBase implements On
         this.subscriptions.push(subs)
     }
 
-    loadCategoriesNode(node : TreeNodeOfGetSycEntityObjectCategoryForViewDto){
-        if (node) {
-            const loadedCompletely : boolean =  !isNaN(node?.totalChildrenCount) && !isNaN(node?.children?.length) && node.totalChildrenCount === node.children.length
-            if( loadedCompletely ) return
-            const parentId = node.data.sycEntityObjectCategory.id
-            const subs = this._sycEntityObjectCategoriesServiceProxy.getAllChildsWithPaging(
+  loadCategoriesNode(
+    node: TreeNodeOfGetSycEntityObjectCategoryForViewDto
+): void {
+
+    if (!node) {
+        return;
+    }
+
+    const loadedCompletely =
+        !isNaN(node?.totalChildrenCount) &&
+        !isNaN(node?.children?.length) &&
+        node.totalChildrenCount ===
+            node.children.length;
+
+    if (loadedCompletely) {
+        return;
+    }
+
+    const parentId =
+        node?.data
+            ?.sycEntityObjectCategory
+            ?.id;
+
+    if (!parentId) {
+        return;
+    }
+
+    this.loading = true;
+
+    const subs =
+        this._sycEntityObjectCategoriesServiceProxy
+            .getAllChildsWithPaging(
                 undefined,
                 undefined,
                 undefined,
@@ -209,57 +275,281 @@ export class AccountsListFiltersComponent extends AppComponentBase implements On
                 undefined,
                 undefined,
                 undefined,
+
                 parentId,
+
                 true,
+
+                undefined,
+                undefined,
+                undefined,
+                undefined,
+
+                this.sortBy,
+
+                0,
+
+                node.totalChildrenCount
+            )
+            .pipe(
+                finalize(() => {
+                    this.loading = false;
+                })
+            )
+            .subscribe({
+                next: (res) => {
+
+                    if (!node.children) {
+                        node.children = [];
+                    }
+
+
+                    const existingIds =
+                        new Set(
+                            node.children
+                                .map(
+                                    child =>
+                                        child?.data
+                                            ?.sycEntityObjectCategory
+                                            ?.id
+                                )
+                                .filter(
+                                    id =>
+                                        id !== null &&
+                                        id !== undefined
+                                )
+                        );
+
+                    const newChildren =
+                        (res?.items || [])
+                            .filter(
+                                child => {
+
+                                    const id =
+                                        child?.data
+                                            ?.sycEntityObjectCategory
+                                            ?.id;
+
+                                    return (
+                                        id !== null &&
+                                        id !== undefined &&
+                                        !existingIds.has(id)
+                                    );
+                                }
+                            );
+
+                    node.children.push(
+                        ...newChildren
+                    );
+
+                    /**
+                     * ---------------------------------
+                     * Restore saved selected categories
+                     * ---------------------------------
+
+                     */
+
+                    const selectedIds =
+                        this.getSelectedIds(
+                            'categories'
+                        );
+
+                    if (!selectedIds.length) {
+                        return;
+                    }
+
+                    const matchedNodes =
+                        this.findCategoryNodesByIds(
+                            node.children,
+                            selectedIds
+                        );
+
+                    if (
+                        !matchedNodes?.length
+                    ) {
+                        return;
+                    }
+
+
+                    const currentSelected =
+                        this.selectedCategories ||
+                        [];
+
+                    const currentIds =
+                        new Set(
+                            currentSelected
+                                .map(
+                                    item =>
+                                        item?.data
+                                            ?.sycEntityObjectCategory
+                                            ?.id
+                                )
+                                .filter(
+                                    id =>
+                                        id !== null &&
+                                        id !== undefined
+                                )
+                        );
+
+                    const nodesToAdd =
+                        matchedNodes.filter(
+                            item => {
+
+                                const id =
+                                    item?.data
+                                        ?.sycEntityObjectCategory
+                                        ?.id;
+
+                                return (
+                                    id !== null &&
+                                    id !== undefined &&
+                                    !currentIds.has(id)
+                                );
+                            }
+                        );
+
+                    this.selectedCategories = [
+                        ...currentSelected,
+                        ...nodesToAdd
+                    ];
+
+
+                },
+
+                error: () => {
+                    this.loading = false;
+                }
+            });
+
+    this.subscriptions.push(
+        subs
+    );
+}
+
+
+    getCurrenciesList(
+    componentRef: any
+) {
+
+    const subs =
+        this._appEntitiesServiceProxy
+            .getAllCurrencyForTableDropdownWithPaging(
+                this.currencyFilter,
+                undefined,
+                undefined,
+                undefined,
+                undefined,
+                undefined,
                 undefined,
                 undefined,
                 undefined,
                 undefined,
                 this.sortBy,
-                0,
-                node.totalChildrenCount,
+                this.currencyFilterMetaData
+                    .listSkipCount,
+                this.currencyFilterMetaData
+                    .listMaxResultCount
             )
-            .pipe(
-                finalize(()=>this.loading = false)
-            )
-            .subscribe((res)=>{
-                if(!node.children) node.children = []
-                node.children.push(...res.items)
-            })
-            this.subscriptions.push(subs)
-        }
-    }
+            .subscribe(
+                result => {
 
+                    componentRef
+                        .onListLoadCallback(
+                            result
+                        );
 
-    getCurrenciesList(componentRef: { onListLoadCallback: Function }) {
-        const subs = this._appEntitiesServiceProxy.getAllCurrencyForTableDropdownWithPaging(
-            this.currencyFilter,           undefined,
-            undefined, undefined, undefined, undefined, undefined, undefined, undefined,
-            undefined,
-            this.sortBy,
-            this.currencyFilterMetaData.listSkipCount,
-            this.currencyFilterMetaData.listMaxResultCount,
-        ).subscribe(result => {
-            componentRef.onListLoadCallback(result);
-        });
-        this.subscriptions.push(subs);
-      }
+                    // this.restoreSimpleCheckboxes(
+                    //     'currencies',
+                    //     result.items,
+                    //     componentRef
+                    // );
+                }
+            );
+
+    this.subscriptions.push(
+        subs
+    );
+}
       
 
-    getCountriesList(componentRef: { onListLoadCallback: Function }) {
-        const subs = this._appEntitiesServiceProxy.getAllCountryForTableDropdowWithPaging(
-            this.countryFilter,   undefined,
-            undefined, undefined, undefined, undefined, undefined, undefined, undefined,
-            undefined,
-            this.sortBy,
-            this.countryFilterMetaData.listSkipCount,
-            this.countryFilterMetaData.listMaxResultCount,
-        ).subscribe(result => {
-            componentRef.onListLoadCallback(result);
-        });
-        this.subscriptions.push(subs);
-      }
+  getCountriesList(
+    componentRef: {
+        onListLoadCallback:
+            Function
+    }
+) {
 
+    const subs =
+        this._appEntitiesServiceProxy
+            .getAllCountryForTableDropdowWithPaging(
+                this.countryFilter,
+                undefined,
+                undefined,
+                undefined,
+                undefined,
+                undefined,
+                undefined,
+                undefined,
+                undefined,
+                undefined,
+                this.sortBy,
+                this.countryFilterMetaData
+                    .listSkipCount,
+                this.countryFilterMetaData
+                    .listMaxResultCount
+            )
+            .subscribe(result => {
+
+                componentRef
+                    .onListLoadCallback(
+                        result
+                    );
+
+              
+            });
+
+    this.subscriptions.push(
+        subs
+    );
+}
+
+private restoreSimpleCheckboxes(
+    controlName: string,
+    items: any[],
+    componentRef: any
+): void {
+
+    const selectedIds =
+        this.getSelectedIds(
+            controlName
+        );
+
+    if (!selectedIds.length) {
+        return;
+    }
+
+    const selectedItems =
+        (items || [])
+            .filter(item =>
+                selectedIds.includes(
+                    Number(
+                        item?.value ??
+                        item?.id
+                    )
+                )
+            );
+
+
+
+    this.filterForm
+        .get(controlName)
+        ?.setValue(
+            selectedIds,
+            {
+                emitEvent: false
+            }
+        );
+}
     getLanguagesList(componentRef:{  onListLoadCallback  : Function}){
         const subs = this._appEntitiesServiceProxy.getAllLanguageForTableDropdownWithPaging(
             undefined,
@@ -276,8 +566,18 @@ export class AccountsListFiltersComponent extends AppComponentBase implements On
             this.languageFilterMetaData.listSkipCount,
             this.languageFilterMetaData.listMaxResultCount,
         ).subscribe(result => {
-            componentRef.onListLoadCallback(result)
-        });
+
+    componentRef
+        .onListLoadCallback(
+            result
+        );
+
+    // this.restoreSimpleCheckboxes(
+    //     'languages',
+    //     result.items,
+    //     componentRef
+    // );
+});
         this.subscriptions.push(subs)
     }
 
@@ -338,15 +638,49 @@ getAccountTypesList(): void {
       
       
 
-    getAccountStatuses(componentRef:{  onListLoadCallback  : Function}){
-        const result : PagedResultDtoOfLookupLabelDto = new PagedResultDtoOfLookupLabelDto()
-        result.items = [
-            new LookupLabelDto({label:this.l("Connected"),value:1,isHostRecord:true, code: undefined} as ILookupLabelDto),
-            new LookupLabelDto({label:this.l("Not Connected"),value:2,isHostRecord:true, code: undefined} as ILookupLabelDto)
-        ]
-        result.totalCount = result.items.length
-        componentRef.onListLoadCallback(result)
-    }
+    getAccountStatuses(
+    componentRef: any
+) {
+
+    const result =
+        new PagedResultDtoOfLookupLabelDto();
+
+    result.items = [
+        new LookupLabelDto({
+            label:
+                this.l(
+                    'Connected'
+                ),
+            value: 1,
+            isHostRecord: true,
+            code: undefined
+        } as ILookupLabelDto),
+
+        new LookupLabelDto({
+            label:
+                this.l(
+                    'Not Connected'
+                ),
+            value: 2,
+            isHostRecord: true,
+            code: undefined
+        } as ILookupLabelDto)
+    ];
+
+    result.totalCount =
+        result.items.length;
+
+    componentRef
+        .onListLoadCallback(
+            result
+        );
+
+    // this.restoreSimpleCheckboxes(
+    //     'statuses',
+    //     result.items,
+    //     componentRef
+    // );
+}
 
     onCategoriesSelect( $event : TreeNodeOfGetSycEntityObjectCategoryForViewDto[] ){
         const ids = $event.map(item=>item.data.sycEntityObjectCategory.id)
@@ -380,4 +714,153 @@ getAccountTypesList(): void {
     return selectedItem?.code?.toUpperCase() === 'BUSINESS';
 }
 
+
+/////////////////////////////
+private getSelectedIds(
+    controlName: string
+): number[] {
+
+    const value =
+        this.filterForm
+            ?.get(controlName)
+            ?.value;
+
+    if (!Array.isArray(value)) {
+        return [];
+    }
+
+    return value
+        .map(x => {
+
+            if (
+                typeof x === 'number'
+            ) {
+                return x;
+            }
+
+            if (
+                typeof x === 'string'
+            ) {
+                return Number(x);
+            }
+
+            return (
+                x?.value ??
+                x?.id ??
+                null
+            );
+        })
+        .filter(
+            x =>
+                x !== null &&
+                x !== undefined &&
+                !isNaN(Number(x))
+        )
+        .map(Number);
+}
+
+
+
+private findClassificationNodesByIds(
+    nodes:
+        TreeNodeOfGetSycEntityObjectClassificationForViewDto[],
+    ids: number[]
+):
+    TreeNodeOfGetSycEntityObjectClassificationForViewDto[] {
+
+    const selected:
+        TreeNodeOfGetSycEntityObjectClassificationForViewDto[] =
+        [];
+
+    const visit = (
+        list:
+            TreeNodeOfGetSycEntityObjectClassificationForViewDto[]
+    ) => {
+
+        (list || [])
+            .forEach(
+                node => {
+
+                    const id =
+                        node?.data
+                            ?.sycEntityObjectClassification
+                            ?.id;
+
+                    if (
+                        ids.includes(
+                            Number(id)
+                        )
+                    ) {
+                        selected.push(
+                            node
+                        );
+                    }
+
+                    if (
+                        node?.children
+                            ?.length
+                    ) {
+                        visit(
+                            node.children
+                        );
+                    }
+                }
+            );
+    };
+
+    visit(nodes);
+
+    return selected;
+}
+private findCategoryNodesByIds(
+    nodes:
+        TreeNodeOfGetSycEntityObjectCategoryForViewDto[],
+    ids: number[]
+):
+    TreeNodeOfGetSycEntityObjectCategoryForViewDto[] {
+
+    const selected:
+        TreeNodeOfGetSycEntityObjectCategoryForViewDto[] =
+        [];
+
+    const visit = (
+        list:
+            TreeNodeOfGetSycEntityObjectCategoryForViewDto[]
+    ) => {
+
+        (list || [])
+            .forEach(
+                node => {
+
+                    const id =
+                        node?.data
+                            ?.sycEntityObjectCategory
+                            ?.id;
+
+                    if (
+                        ids.includes(
+                            Number(id)
+                        )
+                    ) {
+                        selected.push(
+                            node
+                        );
+                    }
+
+                    if (
+                        node?.children
+                            ?.length
+                    ) {
+                        visit(
+                            node.children
+                        );
+                    }
+                }
+            );
+    };
+
+    visit(nodes);
+
+    return selected;
+}
 }

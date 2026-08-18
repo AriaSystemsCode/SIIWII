@@ -44,7 +44,7 @@ export class MarketplaceProductsComponent
     @Input() accountDataForView: any
     @Input() marketplaceAccCurrency: string
 
-    isFilterHidden: boolean = false;
+    isFilterHidden: boolean = true;
     sellerData: any;
     isSellerIdExists: boolean = false;
     currencies: CurrencyInfoDto[];
