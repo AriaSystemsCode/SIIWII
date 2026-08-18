@@ -1366,19 +1366,21 @@ namespace onetouch.AppItemsLists
                 }
                 else
                 {
+                    var sharingLevel = publishItemsList.SharingLevel;
                     var publishEntityId = publishItemsList.Id;
                     ObjectMapper.Map(itemsList, publishItemsList);
                     publishItemsList.AppItemsListDetails = null;
                     publishItemsList.Id = publishEntityId;
                     publishItemsList.TenantId = null;
                     publishItemsList.TenantOwner = int.Parse(itemsList.TenantId.ToString());
+                    publishItemsList.SharingLevel = sharingLevel ;
                 }
                 publishItemsList.Code = itemsList.SSIN;
                 if (!input.SyncProductList)
                     publishItemsList.SharingLevel = input.SharingLevel;
 
-                if (input.SyncProductList)
-                    publishItemsList.SharingLevel = 1;
+                //if (input.SyncProductList)
+                 //   publishItemsList.SharingLevel = 1;
 
 
                 if (publishItemsList.Id != 0)
@@ -1465,11 +1467,22 @@ namespace onetouch.AppItemsLists
                             var item = await _appItemRepository.GetAll().Where(z => z.SSIN == child.ItemSSIN).FirstOrDefaultAsync();
                             if (item != null)
                             {
-                                await _appItemsAppService.ShareProduct(new SharingItemOptions 
-                                { AppItemId = item.Id, SharingLevel = 1, ItemSharing = new List<ItemSharingDto>()});
-                                marketplaceItem = await _appMarketplaceItem.GetAll().FirstOrDefaultAsync(x => x.SSIN == child.ItemSSIN);
-                                if (marketplaceItem == null)
-                                    continue;
+                                if (item.ParentId == null)
+                                {
+                                    await _appItemsAppService.ShareProduct(new SharingItemOptions
+                                    { AppItemId = item.Id, SharingLevel = 1, ItemSharing = new List<ItemSharingDto>() });
+                                    marketplaceItem = await _appMarketplaceItem.GetAll().FirstOrDefaultAsync(x => x.SSIN == child.ItemSSIN);
+                                    if (marketplaceItem == null)
+                                        continue;
+                                }
+                                else
+                                {
+                                    await _appItemsAppService.ShareProduct(new SharingItemOptions
+                                    { AppItemId = long.Parse(item.ParentId.ToString()), SharingLevel = 1, ItemSharing = new List<ItemSharingDto>(), SyncProduct=true });
+                                    marketplaceItem = await _appMarketplaceItem.GetAll().FirstOrDefaultAsync(x => x.SSIN == child.ItemSSIN);
+                                    if (marketplaceItem == null)
+                                        continue;
+                                }
                             }
                         }
                         //T-SII-20231205.0004,1 MMT 01/01/2024 -Products List - internal error while sharing the products list[End]
