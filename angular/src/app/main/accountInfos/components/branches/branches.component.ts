@@ -3,7 +3,7 @@ import { CreateOrEditAddressModalComponent } from '@app/selectAddress/create-or-
 import { SelectAddressModalComponent } from '@app/selectAddress/selectAddress/selectAddress-modal.component';
 import { appModuleAnimation } from '@shared/animations/routerTransition';
 import { AppComponentBase } from '@shared/common/app-component-base';
-import { AccountLevelEnum, AccountsServiceProxy, AppEntitiesServiceProxy, BranchDto, LookupLabelDto, TreeNodeOfBranchForViewDto, TreeviewItem } from '@shared/service-proxies/service-proxies';
+import { AccountLevelEnum, AccountsServiceProxy, AppAddressDto, AppEntitiesServiceProxy, BranchDto, LookupLabelDto, TreeNodeOfBranchForViewDto, TreeviewItem } from '@shared/service-proxies/service-proxies';
 import { BsModalRef, BsModalService, ModalOptions } from 'ngx-bootstrap/modal';
 import { TreeTable } from 'primeng/treetable';
 import { Observable, Subscription } from 'rxjs';
@@ -113,10 +113,77 @@ export class BranchesComponent extends AppComponentBase {
         this.selectAddressModal.show(this.currBranchNode, this.accountId);
     }
 
-    addressSelected(address) {
-        this.selectAddressModal.close();
-        this.createOrEditBranchModal.addressSelected(address);
+ addressSelected(event: {
+    address: AppAddressDto;
+    wasUpdated: boolean;
+}): void {
+
+    const address =
+        event?.address;
+
+    if (!address) {
+        return;
     }
+
+    this.selectAddressModal.close();
+
+    this.createOrEditBranchModal.active =
+        true;
+
+    this.createOrEditBranchModal
+        .modal
+        .show();
+
+
+    // Normal selection
+    if (!event.wasUpdated) {
+
+        this.createOrEditBranchModal
+            .addressSelected(
+                address
+            );
+
+        return;
+    }
+
+    this.message.confirm(
+        this.l(
+            'Do you want to apply this updated address to all address types?'
+        ),
+        this.l('UpdateAddress'),
+        (applyToAll: boolean) => {
+
+            if (applyToAll) {
+
+                // FE only.
+                // No branch save yet.
+                this.createOrEditBranchModal
+                    .applyAddressToAllTypes(
+                        address
+                    );
+
+            } else {
+
+                this.createOrEditBranchModal
+                    .addressSelected(
+                        address
+                    );
+            }
+
+            this.createOrEditBranchModal
+                .active = true;
+
+            this.createOrEditBranchModal
+                .modal
+                .show();
+        }
+    );
+}
+
+    // addressSelected(address) {
+    //     this.selectAddressModal.close();
+    //     this.createOrEditBranchModal.addressSelected(address);
+    // }
 
     createOrEditaddressCanceled() {
         this.selectAddressModal.show(this.currBranchNode, this.accountId)
@@ -140,10 +207,18 @@ export class BranchesComponent extends AppComponentBase {
         this.selectAddressModal.addressAdded(address);
     }
 
-    addressUpdated(address) {
-        this.createOrEditAddressModal.close();
-        this.selectAddressModal.addressUpdated(address);
-    }
+   addressUpdated(
+    address: AppAddressDto
+): void {
+
+    this.createOrEditAddressModal
+        .close();
+
+    this.selectAddressModal
+        .addressUpdated(
+            address
+        );
+}
 
     getBranches(event) {
         this.loadingChilds = true;

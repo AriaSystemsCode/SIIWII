@@ -96,38 +96,53 @@ private readonly excludedBusinessPhoneCodes = [
         this.currentLang == 'ar' || this.currentLang == 'ar-EG' ? this.isArabic = true : this.isArabic = false
     }
 
-    addressSelected(address) {
-        this.active = true;
-        this.modal.show();
+addressSelected(
+    address: AppAddressDto
+): void {
 
-        let x: AppContactAddressDto;
-
-        if (this.currSelectAddress == 1) {
-            x = this.address1;
-        }
-        if (this.currSelectAddress == 2) {
-            x = this.address2;
-        }
-        if (this.currSelectAddress == 3) {
-            x = this.address3;
-        }
-        if (this.currSelectAddress == 4) {
-            x = this.address4;
-        }
-
-        x.addressId = address.id;
-        x.code = address.code;
-        x.name = address.name;
-        x.addressLine1 = address.addressLine1;
-        x.addressLine2 = address.addressLine2;
-        x.city = address.city;
-        x.state = address.state;
-        x.postalCode = address.postalCode;
-        x.countryId = address.countryId;
-        x.countryIdName = address.countryIdName;
-
+    if (!address) {
+        return;
     }
 
+    let target:
+        AppContactAddressDto;
+
+    switch (
+        this.currSelectAddress
+    ) {
+
+        case 1:
+            target =
+                this.address1;
+            break;
+
+        case 2:
+            target =
+                this.address2;
+            break;
+
+        case 3:
+            target =
+                this.address3;
+            break;
+
+        case 4:
+            target =
+                this.address4;
+            break;
+
+        default:
+            return;
+    }
+
+    this.copyAddress(
+        target,
+        address
+    );
+
+    this.active = true;
+    this.modal.show();
+}
     // show(accountId?: number, branchId?: number, parentId?: number): void {
     //     this.address1 = this.clearAddress();
     //     this.address2 = this.clearAddress();
@@ -754,6 +769,79 @@ private loadBranchLookups(): void {
                 }
             }
         });
+}
+
+
+applyAddressToAllTypes(
+    address: AppAddressDto
+): void {
+
+    if (!address) {
+        return;
+    }
+
+    this.copyAddress(
+        this.address1,
+        address
+    );
+
+    this.copyAddress(
+        this.address2,
+        address
+    );
+
+    this.copyAddress(
+        this.address3,
+        address
+    );
+
+    this.copyAddress(
+        this.address4,
+        address
+    );
+}
+
+private copyAddress(
+    target: AppContactAddressDto,
+    source: AppAddressDto
+): void {
+
+    if (!target || !source) {
+        return;
+    }
+
+    target.addressId =
+        source.id;
+
+    target.code =
+        source.code;
+
+    target.name =
+        source.name;
+
+    target.addressLine1 =
+        source.addressLine1;
+
+    target.addressLine2 =
+        source.addressLine2;
+
+    target.city =
+        source.city;
+
+    target.state =
+        source.state;
+
+    target.postalCode =
+        source.postalCode;
+
+    target.countryId =
+        source.countryId;
+
+    target.countryIdName =
+        source.countryIdName;
+
+    target.countryCode =
+        source.countryCode;
 }
 
 }

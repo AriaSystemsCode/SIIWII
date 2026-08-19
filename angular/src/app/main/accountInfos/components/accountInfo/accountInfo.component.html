@@ -234,9 +234,18 @@
                                 </li>
 
                                 <li class="nav-item">
-                                    <a class="nav-link profile-nav-link justify-content-between"
+                                    <!-- <a class="nav-link profile-nav-link justify-content-between"
                                         (click)="changeTab(!accountInfoTemp?.id && !accountId ? accountInfoPageTabsEnum.ProfileCreateOrEdit : accountInfoPageTabsEnum.ProfileView)"
-                                        [ngClass]="{'active': currentTab == accountInfoPageTabsEnum.ProfileView || currentTab === accountInfoPageTabsEnum.ProfileCreateOrEdit}">
+                                        [ngClass]="{'active': currentTab == accountInfoPageTabsEnum.ProfileView || currentTab === accountInfoPageTabsEnum.ProfileCreateOrEdit}"> -->
+                                        <a
+    class="nav-link profile-nav-link justify-content-between"
+    (click)="openProfileTab()"
+    [ngClass]="{
+        'active':
+            currentTab === accountInfoPageTabsEnum.ProfileView ||
+            currentTab === accountInfoPageTabsEnum.ProfileCreateOrEdit
+    }"
+>
 
                                         <span class="d-flex align-items-center gap-12">
                                             <span class="nav-icon-box">
@@ -270,7 +279,7 @@
                                                     src="assets/profile/My-Account-Information-Default.svg">
                                             </span>
 
-                                            <span class="nav-title" (click)="getMyAccountDataForView()"
+                                            <span class="nav-title" 
                                                 *ngIf="accountLevel === accountLevelEnum.Profile && !viewMode">
                                                 {{l("MyProfile")}}
                                             </span>
