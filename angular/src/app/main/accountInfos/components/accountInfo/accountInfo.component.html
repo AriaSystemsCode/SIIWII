@@ -991,7 +991,7 @@
                         </div>
                         <div class="tab2" *ngIf="currentTab == accountInfoPageTabsEnum.Branches ">
                             <app-branches [branches]='accountDataForView.branches' [accountId]='accountId' 
-                                (askToPublish)="askToPublish($event)" [viewMode]="viewMode"></app-branches>
+                                (askToPublish)="askToPublish($event)" [viewMode]="viewMode" [accountData]="accountDataForView"></app-branches>
                         </div>
                         <div class="tab3" *ngIf="currentTab == accountInfoPageTabsEnum.Payments">
                             <app-payment-methods-list [accountId]='accountId'

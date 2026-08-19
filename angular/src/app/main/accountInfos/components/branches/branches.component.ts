@@ -21,6 +21,9 @@ export class BranchesComponent extends AppComponentBase {
     @Input('accountId') accountId: number
     @Input('accountLevel') accountLevel: AccountLevelEnum
     @Input('viewMode') viewMode: boolean = false
+    @Input('accountData') accountData: any
+
+    
     @Output("askToPublish") askToPublish: EventEmitter<boolean> = new EventEmitter<boolean>()
     @Output("changeTouchState") changeTouchState: EventEmitter<boolean> = new EventEmitter<boolean>()
 

@@ -34,6 +34,7 @@
 .aria-input-text,.aria-select{
     height: 36px !important;
     background-color: #F3F6F9 !important;
+    color:#000 !important;
  }
  .desc-menu-item{
     color: #B5B5C3;
@@ -168,6 +169,8 @@ font-weight: 500;
     background-color: #F3F6F9 !important;
     // border: none;
     border-radius: 5px;
+    color:#000 !important;
+
  }
 
  .form-group-plus{
@@ -260,7 +263,7 @@ font-weight: 500;
 
 
 .phone-extenstion {
-    width: 145px;
+    width: 100px;
     // margin-left: 7px;
 }
 .phone-ng2-input-wrapper{
@@ -370,3 +373,15 @@ color: #fff;
 .gap-9{
     gap: 9px;
 }
+
+
+
+.aria-input-text{
+
+    color:#000 !important;
+
+ }
+
+ .p-dropdown-label{
+    overflow:visible !important;
+ }
