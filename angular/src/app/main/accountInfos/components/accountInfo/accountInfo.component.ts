@@ -780,13 +780,10 @@ if (this.accountDataForView) {
             `${this.attachmentBaseUrl}/${this.accountDataForView.coverUrl}`;
     }
 }
-    async getMyAccountDataForView(hideSppiner:boolean = false) {
+    async getMyAccountDataForView() {
         let id = this.appSession.user.accountId
         if (!id) return
-        if(!hideSppiner){
-        this.showMainSpinner()
-
-        }
+    
         const result = await this._AccountsServiceProxy.getAccountForView(id, 5)
             .toPromise()
             .finally(

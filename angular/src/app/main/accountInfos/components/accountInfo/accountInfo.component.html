@@ -270,11 +270,11 @@
                                                     src="assets/profile/My-Account-Information-Default.svg">
                                             </span>
 
-                                            <span class="nav-title" (click)="getMyAccountDataForView(true)"
+                                            <span class="nav-title" (click)="getMyAccountDataForView()"
                                                 *ngIf="accountLevel === accountLevelEnum.Profile && !viewMode">
                                                 {{l("MyProfile")}}
                                             </span>
-                                            <span class="nav-title"
+                                            <span class="nav-title" (click)="getAccountDataForView()"
                                                 *ngIf="accountLevel !== accountLevelEnum.Profile || viewMode">
                                                 {{l("AccountProfile")}}
                                             </span>
