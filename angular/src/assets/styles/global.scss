@@ -965,3 +965,13 @@ body p-paginator .p-paginator .p-paginator-element, body p-paginator .p-paginato
 .modal .modal-content .modal-header .modal-title {
     padding: 10px;
 }
+
+
+input[type='password']::-ms-reveal,
+input[type='password']::-ms-clear,
+input[type='password']::-webkit-credentials-auto-fill-button,
+input[type='password']::-webkit-contacts-auto-fill-button {
+  display: none !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
