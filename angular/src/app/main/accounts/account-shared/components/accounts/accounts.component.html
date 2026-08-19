@@ -245,14 +245,30 @@
                                         </div>
                                     </div>
                                     <div class="primeng-paging-container custom-paginator">
-                                        <p-paginator [rows]="
-                                                primengTableHelper.defaultRecordsCountPerPage
-                                            " #paginator (onPageChange)="getAccounts($event)" [totalRecords]="
-                                                primengTableHelper.totalRecordsCount
-                                            " [rowsPerPageOptions]="
-                                                primengTableHelper.predefinedRecordsCountPerPage
-                                            ">
-                                        </p-paginator>
+                                    <p-paginator
+    #paginator
+
+    [rows]="
+        primengTableHelper
+            .defaultRecordsCountPerPage
+    "
+
+    [first]="paginatorFirst"
+
+    [totalRecords]="
+        primengTableHelper
+            .totalRecordsCount
+    "
+
+    [rowsPerPageOptions]="
+        primengTableHelper
+            .predefinedRecordsCountPerPage
+    "
+
+    (onPageChange)="
+        onAccountsPageChange($event)
+    ">
+</p-paginator>
     
                                         <div class="total-records-count text-right mr-3">
                                             {{
