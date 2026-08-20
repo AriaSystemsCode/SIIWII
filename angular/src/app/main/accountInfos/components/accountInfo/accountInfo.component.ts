@@ -781,6 +781,7 @@ if (this.accountDataForView) {
     }
 }
     async getMyAccountDataForView() {
+        this.showMainSpinner()
         let id = this.appSession.user.accountId
         if (!id) return
     
@@ -2585,5 +2586,40 @@ private setCreateAccountDefaults(): void {
         this.languageIdName =
             english.label;
     }
+}
+
+async openProfileTab(): Promise<void> {
+
+    const isCreateMode =
+        !this.accountInfoTemp?.id &&
+        !this.accountId;
+
+    if (isCreateMode) {
+
+        this.changeTab(
+            this.accountInfoPageTabsEnum
+                .ProfileCreateOrEdit
+        );
+
+        return;
+    }
+
+    // My Profile
+    if (
+        this.accountLevel ===
+            AccountLevelEnum.Profile &&
+        !this.viewMode
+    ) {
+
+        await this.getMyAccountDataForView();
+
+    } else {
+
+        await this.getAccountDataForView();
+    }
+
+    this.changeTab(
+        this.accountInfoPageTabsEnum.ProfileView
+    );
 }
 }

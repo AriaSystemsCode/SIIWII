@@ -229,11 +229,10 @@
                 showPasswordRepeat
                     ? '../../assets/img/input_icons/unlock.png'
                     : '../../assets/img/input_icons/lock.png'
-            " class="icon-width SmallUser_icon password-toggle-icon" [ngClass]="
-                isArabic
-                    ? 'ar-user_icon'
-                    : 'user_icon'
-            " (click)="togglePasswordRepeat()" alt="Toggle confirm password visibility" />
+            " class="icon-width SmallUser_icon password-toggle-icon" [ngClass]="[
+    isArabic ? 'ar-user_icon' : 'user_icon',
+    showPasswordRepeat ? 'w-28' : ''
+]" (click)="togglePasswordRepeat()" alt="Toggle confirm password visibility" />
 
                     <input [type]="
                 showPasswordRepeat
