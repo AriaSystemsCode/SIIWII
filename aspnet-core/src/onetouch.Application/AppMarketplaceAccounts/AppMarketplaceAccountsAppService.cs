@@ -1370,6 +1370,7 @@ namespace onetouch.AppMarketplaceAccounts
         {
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
             {
+                long newId = 0;
                 var mainAccountID = input.Id;
                 var personEntityObjectTypeId = await _helper.SystemTables.GetEntityObjectTypePersonId();
                 var FoundPublishContact = await _appMarketplaceContactRepository.GetAll()
@@ -1472,8 +1473,10 @@ namespace onetouch.AppMarketplaceAccounts
                                 _appMarketplaceContactRepository.Delete(e => e.Id == contactAddress.Id);
                             }
                         }
-                        _appEntityRepository.Delete(e => e.Id == FoundPublishContact.Id);
-                        _appMarketplaceContactRepository.Delete(e => e.Id == FoundPublishContact.Id);
+
+                        //_appEntityRepository.Delete(e => e.Id == FoundPublishContact.Id);
+                        //_appMarketplaceContactRepository.Delete(e => e.Id == FoundPublishContact.Id);
+                        newId = FoundPublishContact.Id;
                         await CurrentUnitOfWork.SaveChangesAsync();
 
                         // ****delete accounts published at appcontact table
@@ -1713,8 +1716,14 @@ namespace onetouch.AppMarketplaceAccounts
                 }
                 //I40 -MMT  -Account Attachment[End]
 
-                long newId = 0;
+                if (newId == 0)
                 { newId = await _appMarketplaceContactRepository.InsertAndGetIdAsync(appMarketplaceContact); }
+                else
+                {
+                    appMarketplaceContact.Id = newId;
+                    await _appMarketplaceContactRepository.UpdateAsync(appMarketplaceContact);
+
+                }
                 await CurrentUnitOfWork.SaveChangesAsync();
 
 
