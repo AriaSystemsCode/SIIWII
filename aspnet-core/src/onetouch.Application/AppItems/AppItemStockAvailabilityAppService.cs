@@ -27,12 +27,16 @@ using Abp.Domain.Repositories;
 using AutoMapper.Internal.Mappers;
 using Newtonsoft.Json;
 using onetouch.Notifications;
+using onetouch.Authorization.Roles;
+using onetouch.Authorization.Users;
 
 namespace onetouch.AppItems
 {
     [AbpAuthorize(AppPermissions.Pages_AppItems)]
     public class AppItemStockAvailabilityAppService : onetouchAppServiceBase, IAppItemStockAvailabilityAppService, IExcelImporter<AppItemStockAvailabilityExcelResultsDTO>
     {
+        private readonly UserManager _userManager;
+        private readonly RoleManager _roleManager;
         private readonly IConfigurationRoot _appConfiguration;
         private readonly Helper _helper;
         //private readonly IAppItemRepository _appItemRepository;
@@ -41,8 +45,11 @@ namespace onetouch.AppItems
         private readonly IAppNotifier _appNotifier;
         public AppItemStockAvailabilityAppService(IAppConfigurationAccessor appConfigurationAccessor,
             IRepository<AppItem, long> appItemRepository, Helper helper,IAppItemsAppService appItemsAppService,
-             IAppNotifier appNotifier)
+             IAppNotifier appNotifier,
+             RoleManager roleManager, UserManager userManager)
         {
+            _userManager = userManager;
+            _roleManager = roleManager;
             _appNotifier = appNotifier;
             _appConfiguration = appConfigurationAccessor.Configuration;
             _helper = helper;
@@ -669,7 +676,20 @@ namespace onetouch.AppItems
                 //mmt
                 var myTenantObject = await TenantManager.GetByIdAsync(int.Parse(AbpSession.TenantId.ToString()));
                 string tenancyName = myTenantObject.TenancyName;
-                var adminUser = await UserManager.FindByNameAsync("admin@" + tenancyName);
+                //var adminUser = await UserManager.FindByNameAsync("admin@" + tenancyName);
+                var adminRole = await _roleManager.Roles
+                       .FirstOrDefaultAsync(r => r.TenantId == int.Parse(AbpSession.TenantId.ToString()) && r.Name == StaticRoleNames.Tenants.Admin);
+
+                Authorization.Users.User adminUser = null;
+                if (adminRole != null)
+                {
+                    var adminRoleId = adminRole.Id;
+
+                    adminUser = await _userManager.Users
+                        .Where(u => u.TenantId == int.Parse(AbpSession.TenantId.ToString()))
+                        .Where(u => u.Roles.Any(r => r.RoleId == adminRoleId))
+                        .FirstOrDefaultAsync();
+                }
                 if (adminUser != null)
                 {
                     await _appNotifier.SendMessageAsync(new Abp.UserIdentifier(AbpSession.TenantId, adminUser.Id),
@@ -694,7 +714,20 @@ namespace onetouch.AppItems
                 {
                     var myTenantObject = await TenantManager.GetByIdAsync(int.Parse(AbpSession.TenantId.ToString()));
                     string tenancyName = myTenantObject.TenancyName;
-                    var adminUser = await UserManager.FindByNameAsync("admin@" + tenancyName);
+                    //var adminUser = await UserManager.FindByNameAsync("admin@" + tenancyName);
+                    var adminRole = await _roleManager.Roles
+                      .FirstOrDefaultAsync(r => r.TenantId == int.Parse(AbpSession.TenantId.ToString()) && r.Name == StaticRoleNames.Tenants.Admin);
+
+                    Authorization.Users.User adminUser = null;
+                    if (adminRole != null)
+                    {
+                        var adminRoleId = adminRole.Id;
+
+                        adminUser = await _userManager.Users
+                            .Where(u => u.TenantId == int.Parse(AbpSession.TenantId.ToString()))
+                            .Where(u => u.Roles.Any(r => r.RoleId == adminRoleId))
+                            .FirstOrDefaultAsync();
+                    }
                     if (adminUser != null)
                     {
                         await _appNotifier.SendMessageAsync(new Abp.UserIdentifier(AbpSession.TenantId, adminUser.Id),

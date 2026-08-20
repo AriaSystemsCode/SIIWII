@@ -87,12 +87,16 @@ using System.Diagnostics;
 using DocumentFormat.OpenXml.Office2010.ExcelAc;
 using onetouch.MultiTenancy;
 using Org.BouncyCastle.Crypto.Agreement.JPake;
+using onetouch.Authorization.Roles;
+using onetouch.Authorization.Users;
 
 namespace onetouch.AppItems
 {
     [AbpAuthorize(AppPermissions.Pages_AppItems)]
     public partial class AppItemsAppService : onetouchAppServiceBase, IAppItemsAppService, IAppItemsAppImportService, IExcelImporter<AppItemExcelResultsDTO>
     {
+        private readonly UserManager _userManager;
+        private readonly RoleManager _roleManager;
         //i46[Start]
         public static IUnitOfWorkManager _unitOfWorkManagerValid;
         //I46[End]
@@ -173,9 +177,12 @@ namespace onetouch.AppItems
              IRepository<AppEntitiesRelationship, long> appEntitiesRelationship,
              IBackgroundJobManager backgroundJobManager,
              IAbpStartupConfiguration abpStartupConfiguration,
-             IRepository<AppContact, long> appContactRepository
+             IRepository<AppContact, long> appContactRepository,
+             RoleManager roleManager, UserManager userManager
             )
         {
+            _userManager = userManager;
+            _roleManager = roleManager;
             _backgroundJobManager = backgroundJobManager;
             _abpStartupConfiguration = abpStartupConfiguration;
             _appEntitiesRelationship = appEntitiesRelationship;
@@ -6114,7 +6121,20 @@ namespace onetouch.AppItems
                 await SaveFromExcel(saveExcelinput);
                 var myTenantObject = await TenantManager.GetByIdAsync(int.Parse(AbpSession.TenantId.ToString()));
                 string tenancyName = myTenantObject.TenancyName;
-                var adminUser = await UserManager.FindByNameAsync("admin@" + tenancyName);
+                //var adminUser = await UserManager.FindByNameAsync("admin@" + tenancyName);
+                var adminRole = await _roleManager.Roles
+                        .FirstOrDefaultAsync(r => r.TenantId == int.Parse(AbpSession.TenantId.ToString()) && r.Name == StaticRoleNames.Tenants.Admin);
+
+                Authorization.Users.User adminUser = null;
+                if (adminRole != null)
+                {
+                    var adminRoleId = adminRole.Id;
+
+                    adminUser = await _userManager.Users
+                        .Where(u => u.TenantId == int.Parse(AbpSession.TenantId.ToString()))
+                        .Where(u => u.Roles.Any(r => r.RoleId == adminRoleId))
+                        .FirstOrDefaultAsync();
+                }
                 if (adminUser != null)
                 {
                     await _appNotifier.SendMessageAsync(new Abp.UserIdentifier(AbpSession.TenantId, adminUser.Id),
@@ -6137,7 +6157,20 @@ namespace onetouch.AppItems
                 {
                     var myTenantObject = await TenantManager.GetByIdAsync(int.Parse(AbpSession.TenantId.ToString()));
                     string tenancyName = myTenantObject.TenancyName;
-                    var adminUser = await UserManager.FindByNameAsync("admin@" + tenancyName);
+                    //var adminUser = await UserManager.FindByNameAsync("admin@" + tenancyName);
+                    var adminRole = await _roleManager.Roles
+                       .FirstOrDefaultAsync(r => r.TenantId == int.Parse(AbpSession.TenantId.ToString()) && r.Name == StaticRoleNames.Tenants.Admin);
+
+                    Authorization.Users.User adminUser = null;
+                    if (adminRole != null)
+                    {
+                        var adminRoleId = adminRole.Id;
+
+                        adminUser = await _userManager.Users
+                            .Where(u => u.TenantId == int.Parse(AbpSession.TenantId.ToString()))
+                            .Where(u => u.Roles.Any(r => r.RoleId == adminRoleId))
+                            .FirstOrDefaultAsync();
+                    }
                     if (adminUser != null)
                     {
                         await _appNotifier.SendMessageAsync(new Abp.UserIdentifier(AbpSession.TenantId, adminUser.Id),

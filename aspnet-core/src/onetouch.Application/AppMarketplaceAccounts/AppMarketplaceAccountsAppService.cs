@@ -1887,7 +1887,8 @@ namespace onetouch.AppMarketplaceAccounts
                             var responseType = relationshipCodeLookup.EntityExtraData.Where(z => z.AttributeId == 607).FirstOrDefault();
                             var requestorType = relationshipCodeLookup.EntityExtraData.Where(z => z.AttributeId == 606).FirstOrDefault();
                             if (recipientType.Code.ToUpper() == "PERSONAL" &&
-                                requesterType.Code.ToUpper() == "BUSINESS")
+                                (requesterType.Code.ToUpper() == "BUSINESS" ||
+                                requesterType.Code.ToUpper() == "GROUP"))
                             {
                                 if (requestorType != null && requestorType.AttributeValue.TrimEnd().ToLower() == requesterType.Code.ToLower())
                                 {
