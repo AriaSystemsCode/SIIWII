@@ -1,6 +1,10 @@
 ﻿using Abp;
+using Abp.Authorization;
+using Abp.BackgroundJobs;
 using Abp.Domain.Uow;
 using Abp.EntityFrameworkCore.Uow;
+using Abp.MultiTenancy;
+using Abp.Runtime.Session;
 using AutoMapper;
 using Castle.Core.Logging;
 using Microsoft.EntityFrameworkCore;
@@ -12,11 +16,14 @@ using NPOI.OpenXmlFormats.Dml;
 using NPOI.SS.Formula.Functions;
 using NUglify.Helpers;
 using onetouch.AppEntities;
+using onetouch.AppItems.Dtos;
 using onetouch.AppItemsLists;
 using onetouch.AppMarketplaceItemLists;
 using onetouch.AppMarketplaceItems;
+using onetouch.Authorization;
 using onetouch.Configuration;
 using onetouch.EntityFrameworkCore;
+using onetouch.Helpers;
 using onetouch.SycCounters;
 using onetouch.SycSegmentIdentifierDefinitions;
 using onetouch.SystemObjects;
@@ -38,12 +45,117 @@ namespace onetouch.AppItems
     public class AppUpdateItemSSINAppService : AbpServiceBase, IAppUpdateItemSSINAppService
     {
         private readonly IConfigurationRoot _appConfiguration;
+        private readonly IBackgroundJobManager _backgroundJobManager;
+        private readonly Helper _helper;
+        private readonly IAbpSession _abpSession;
        // private readonly IDbContextFactory<onetouchDbContext> _contextFactory;
-        public AppUpdateItemSSINAppService(IAppConfigurationAccessor appConfigurationAccessor)
+        public AppUpdateItemSSINAppService(
+            IAppConfigurationAccessor appConfigurationAccessor,
+            IBackgroundJobManager backgroundJobManager,
+            Helper helper,
+            IAbpSession abpSession)
         {
             _appConfiguration = appConfigurationAccessor.Configuration;
+            _backgroundJobManager = backgroundJobManager;
+            _helper = helper;
+            _abpSession = abpSession;
             // _contextFactory = contextFactory;, IDbContextFactory<onetouchDbContext> contextFactory
         }
+
+        /// <summary>
+        /// Queues SSIN generation for active variations whose parent already has an SSIN.
+        /// currentTenant takes precedence over tenantId. If both are omitted, only a host
+        /// session may run the repair across all tenants.
+        /// </summary>
+        [AbpAuthorize(AppPermissions.Pages_AppItems_Edit)]
+        public async Task<FixSSINMissingVariationsResultDto> FixSSINMissingVariations(
+            int? tenantId,
+            bool currentTenant)
+        {
+            int? targetTenantId;
+            if (currentTenant)
+            {
+                if (!_abpSession.TenantId.HasValue)
+                    throw new AbpAuthorizationException("A tenant session is required when currentTenant is true.");
+
+                targetTenantId = _abpSession.TenantId.Value;
+            }
+            else if (tenantId.HasValue)
+            {
+                if (_abpSession.MultiTenancySide == MultiTenancySides.Tenant &&
+                    _abpSession.TenantId != tenantId)
+                {
+                    throw new AbpAuthorizationException("A tenant cannot repair another tenant's items.");
+                }
+
+                targetTenantId = tenantId.Value;
+            }
+            else
+            {
+                if (_abpSession.MultiTenancySide != MultiTenancySides.Host)
+                    throw new AbpAuthorizationException("Only a host session can repair all tenants.");
+
+                targetTenantId = null;
+            }
+
+            var context = UnitOfWorkManager.Current.GetDbContext<onetouchDbContext>(null, null);
+            var missingVariations = context.AppItems
+                .IgnoreQueryFilters()
+                .AsNoTracking()
+                .Where(variation =>
+                    !variation.IsDeleted &&
+                    variation.ParentId.HasValue &&
+                    variation.TenantId.HasValue &&
+                    (variation.SSIN == null || variation.SSIN == string.Empty) &&
+                    context.AppItems.IgnoreQueryFilters().Any(parent =>
+                        parent.Id == variation.ParentId.Value &&
+                        !parent.IsDeleted &&
+                        parent.SSIN != null &&
+                        parent.SSIN != string.Empty));
+
+            if (targetTenantId.HasValue)
+                missingVariations = missingVariations.Where(x => x.TenantId == targetTenantId.Value);
+
+            var affectedParents = await missingVariations
+                .GroupBy(x => new { TenantId = x.TenantId.Value, ParentItemId = x.ParentId.Value })
+                .Select(x => new
+                {
+                    x.Key.TenantId,
+                    x.Key.ParentItemId,
+                    MissingVariationCount = x.Count()
+                })
+                .OrderBy(x => x.TenantId)
+                .ThenBy(x => x.ParentItemId)
+                .ToListAsync();
+
+            var itemObjectId = await _helper.SystemTables.GetObjectItemId();
+            foreach (var parent in affectedParents)
+            {
+                await _backgroundJobManager.EnqueueAsync<GenerateVariationSsinsJob, GenerateVariationSsinsJobArgs>(
+                    new GenerateVariationSsinsJobArgs
+                    {
+                        ParentItemId = parent.ParentItemId,
+                        ObjectTypeId = itemObjectId,
+                        TenantId = parent.TenantId
+                    });
+            }
+
+            var result = new FixSSINMissingVariationsResultDto
+            {
+                TargetTenantCount = affectedParents.Select(x => x.TenantId).Distinct().Count(),
+                AffectedParentCount = affectedParents.Count,
+                MissingVariationCount = affectedParents.Sum(x => x.MissingVariationCount),
+                EnqueuedJobCount = affectedParents.Count
+            };
+
+            Logger.Info(
+                $"FixSSINMissingVariations queued {result.EnqueuedJobCount} jobs for " +
+                $"{result.MissingVariationCount} variations across {result.TargetTenantCount} tenants. " +
+                $"RequestedTenantId={tenantId?.ToString() ?? "all"}, CurrentTenant={currentTenant}.");
+
+            return result;
+        }
+
         private void MoveFileToMarketplace(string fileName, int? sourceTenantId, int? distinationTenantId)
         {
 
