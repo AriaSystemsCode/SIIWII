@@ -234,9 +234,18 @@
                                 </li>
 
                                 <li class="nav-item">
-                                    <a class="nav-link profile-nav-link justify-content-between"
+                                    <!-- <a class="nav-link profile-nav-link justify-content-between"
                                         (click)="changeTab(!accountInfoTemp?.id && !accountId ? accountInfoPageTabsEnum.ProfileCreateOrEdit : accountInfoPageTabsEnum.ProfileView)"
-                                        [ngClass]="{'active': currentTab == accountInfoPageTabsEnum.ProfileView || currentTab === accountInfoPageTabsEnum.ProfileCreateOrEdit}">
+                                        [ngClass]="{'active': currentTab == accountInfoPageTabsEnum.ProfileView || currentTab === accountInfoPageTabsEnum.ProfileCreateOrEdit}"> -->
+                                        <a
+    class="nav-link profile-nav-link justify-content-between"
+    (click)="openProfileTab()"
+    [ngClass]="{
+        'active':
+            currentTab === accountInfoPageTabsEnum.ProfileView ||
+            currentTab === accountInfoPageTabsEnum.ProfileCreateOrEdit
+    }"
+>
 
                                         <span class="d-flex align-items-center gap-12">
                                             <span class="nav-icon-box">
@@ -270,11 +279,11 @@
                                                     src="assets/profile/My-Account-Information-Default.svg">
                                             </span>
 
-                                            <span class="nav-title" (click)="getMyAccountDataForView(true)"
+                                            <span class="nav-title" 
                                                 *ngIf="accountLevel === accountLevelEnum.Profile && !viewMode">
                                                 {{l("MyProfile")}}
                                             </span>
-                                            <span class="nav-title"
+                                            <span class="nav-title" (click)="getAccountDataForView()"
                                                 *ngIf="accountLevel !== accountLevelEnum.Profile || viewMode">
                                                 {{l("AccountProfile")}}
                                             </span>
@@ -991,7 +1000,7 @@
                         </div>
                         <div class="tab2" *ngIf="currentTab == accountInfoPageTabsEnum.Branches ">
                             <app-branches [branches]='accountDataForView.branches' [accountId]='accountId' 
-                                (askToPublish)="askToPublish($event)" [viewMode]="viewMode"></app-branches>
+                                (askToPublish)="askToPublish($event)" [viewMode]="viewMode" [accountData]="accountDataForView"></app-branches>
                         </div>
                         <div class="tab3" *ngIf="currentTab == accountInfoPageTabsEnum.Payments">
                             <app-payment-methods-list [accountId]='accountId'

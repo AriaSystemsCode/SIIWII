@@ -451,19 +451,43 @@ handleRoutingChange() {
         });
     }
 
-    getLanguages() {
-        this._AppEntitiesServiceProxy.getAllLanguageForTableDropdown().subscribe(result => {
-            this.allLanguages = result;
+    // getLanguages() {
+    //     this._AppEntitiesServiceProxy.getAllLanguageForTableDropdown().subscribe(result => {
+    //         this.allLanguages = result;
+    //     });
+    // }
+
+    // getCurrencies() {
+    //     this._AppEntitiesServiceProxy.getAllCurrencyForTableDropdown().subscribe(result => {
+    //         this.allCurrencies = result;
+    //     });
+    // }
+
+getLanguages(): void {
+
+    this._AppEntitiesServiceProxy
+        .getAllLanguageForTableDropdown()
+        .subscribe(result => {
+
+            this.allLanguages =
+                result ?? [];
+
+            this.setCreateAccountDefaults();
         });
-    }
+}
 
-    getCurrencies() {
-        this._AppEntitiesServiceProxy.getAllCurrencyForTableDropdown().subscribe(result => {
-            this.allCurrencies = result;
+getCurrencies(): void {
+
+    this._AppEntitiesServiceProxy
+        .getAllCurrencyForTableDropdown()
+        .subscribe(result => {
+
+            this.allCurrencies =
+                result ?? [];
+
+            this.setCreateAccountDefaults();
         });
-    }
-
-
+}
 
     async handleComponentMode() {
 
@@ -497,8 +521,8 @@ handleRoutingChange() {
     }
 
     loadInitData() {
-        if (this.accountInfoTemp)
-            this.accountInfoTemp.currencyId = this.tenantDefaultCurrency.value;
+        // if (this.accountInfoTemp)
+        //     this.accountInfoTemp.currencyId = this.tenantDefaultCurrency.value;
 
         this.getLanguages();
         this.getCurrencies();
@@ -756,13 +780,11 @@ if (this.accountDataForView) {
             `${this.attachmentBaseUrl}/${this.accountDataForView.coverUrl}`;
     }
 }
-    async getMyAccountDataForView(hideSppiner:boolean = false) {
+    async getMyAccountDataForView() {
+        this.showMainSpinner()
         let id = this.appSession.user.accountId
         if (!id) return
-        if(!hideSppiner){
-        this.showMainSpinner()
-
-        }
+    
         const result = await this._AccountsServiceProxy.getAccountForView(id, 5)
             .toPromise()
             .finally(
@@ -841,11 +863,11 @@ if (this.accountDataForView) {
                         }
                     }
 
-                    // Default language
-                    if (!this.accountInfoTemp.languageId) {
-                        this.languageIdName = myResult.languageName;
-                        this.accountInfoTemp.languageId = myResult.accountInfo.languageId;
-                    }
+                    // // Default language
+                    // if (!this.accountInfoTemp.languageId) {
+                    //     this.languageIdName = myResult.languageName;
+                    //     this.accountInfoTemp.languageId = myResult.accountInfo.languageId;
+                    // }
 
                     // Default payment terms / ship via
                     this.accountInfoTemp.paymentTermsId = !myResult?.accountInfo?.id
@@ -870,9 +892,15 @@ if (this.accountDataForView) {
         }
 
 
-        this.getAllForAccountInfo();
-        this.accountInfoLoded = true;
-
+        // this.getAllForAccountInfo();
+        // this.accountInfoLoded = true;
+if (
+    this.isMyAccountCreate ||
+    this.isManualAccountCreate ||
+    this.isExternalAccountCreate
+) {
+    this.setCreateAccountDefaults();
+}
 
         this.categoriesIds = [];
         this.accountInfoTemp.entityCategories.forEach(element => {
@@ -2514,5 +2542,84 @@ private getLoginTenantSsin(): Observable<string> {
                 return this.loginTenaneSsin;
             })
         );
+}
+
+private setCreateAccountDefaults(): void {
+
+    const isCreate =
+        this.isMyAccountCreate ||
+        this.isManualAccountCreate ||
+        this.isExternalAccountCreate;
+
+    if (!isCreate) {
+        return;
+    }
+
+    const usd =
+        this.allCurrencies?.find(
+            x =>
+                x?.code
+                    ?.trim()
+                    .toUpperCase() === 'USD'
+        );
+
+    if (usd) {
+        this.accountInfoTemp.currencyId =
+            usd.value;
+
+        this.currencyIdName =
+            usd.label;
+    }
+
+    const english =
+        this.allLanguages?.find(
+            x =>
+                x?.code
+                    ?.trim()
+                    .toLowerCase() === 'eng'
+        );
+
+    if (english) {
+        this.accountInfoTemp.languageId =
+            english.value;
+
+        this.languageIdName =
+            english.label;
+    }
+}
+
+async openProfileTab(): Promise<void> {
+
+    const isCreateMode =
+        !this.accountInfoTemp?.id &&
+        !this.accountId;
+
+    if (isCreateMode) {
+
+        this.changeTab(
+            this.accountInfoPageTabsEnum
+                .ProfileCreateOrEdit
+        );
+
+        return;
+    }
+
+    // My Profile
+    if (
+        this.accountLevel ===
+            AccountLevelEnum.Profile &&
+        !this.viewMode
+    ) {
+
+        await this.getMyAccountDataForView();
+
+    } else {
+
+        await this.getAccountDataForView();
+    }
+
+    this.changeTab(
+        this.accountInfoPageTabsEnum.ProfileView
+    );
 }
 }

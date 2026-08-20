@@ -100,11 +100,11 @@
 <createOrEditBranchModal [billingAddressDef]="billingAddressDef" [directShippingAddressDef]="directShippingAddressDef"
     [distributionCenterAddressDef]="distributionCenterAddressDef" [mailingAddressDef]="mailingAddressDef"
     #createOrEditBranchModal (selectAddress)="selectAddress()" (branchAdded)="branchAdded($event)"
-    (branchUpdated)="branchUpdated($event)"  [accountData]="accountData"></createOrEditBranchModal>
+    (branchUpdated)="branchUpdated($event)" [accountData]="accountData"> </createOrEditBranchModal>
 
 <selectAddressModal #selectAddressModal (addressSelected)="addressSelected($event)" (addNewAddress)="addNewAddress()"
     (editAddress)="editAddress($event)" (addressSelectionCanceled)="addressSelectionCanceled()"></selectAddressModal>
 
 <createOrEditAddressModal #createOrEditAddressModal (addressAdded)="addressAdded($event)"
-    (addressUpdated)="addressUpdated($event)" (createOrEditaddressCanceled)="createOrEditaddressCanceled()">
+    (addressUpdated)="addressUpdated($event)" (createOrEditaddressCanceled)="createOrEditaddressCanceled()" [accountData]="accountData">
 </createOrEditAddressModal>
