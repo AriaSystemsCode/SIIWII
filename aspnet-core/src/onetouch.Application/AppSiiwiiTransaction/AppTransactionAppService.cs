@@ -3645,8 +3645,8 @@ namespace onetouch.AppSiiwiiTransaction
 
                         if (marketplaceItemMain != null)
                         {
-                            detParent = await _appTransactionDetails.GetAll().Include(z => z.ParentFkList).Where(z => z.TransactionId == header.Id &&
-                            z.ItemSSIN == marketplaceItemMain.SSIN && z.SSIN == marketplaceItemMain.SSIN).FirstOrDefaultAsync();
+                            //detParent = await _appTransactionDetails.GetAll().Include(z => z.ParentFkList).Where(z => z.TransactionId == header.Id &&
+                            //z.ItemSSIN == marketplaceItemMain.SSIN && z.SSIN == marketplaceItemMain.SSIN).FirstOrDefaultAsync();
                             if (detParent == null)
                             {
                                 //MMT-F
@@ -7700,12 +7700,13 @@ namespace onetouch.AppSiiwiiTransaction
                     if (marketplaceVariationParent != null)
                     {
                         long parentItemId = 0;
-                        var detParent = await _appTransactionDetails.GetAll().Include(z => z.ParentFkList).Where(z => z.TransactionId == input.TransactionId &&
-                        z.TransactionIdFk.EntityObjectTypeId == header.EntityObjectTypeId &&
-                        z.ItemSSIN == marketplaceVariationParent.SSIN).FirstOrDefaultAsync();
-                        if (detParent == null)
+                        var detParent = new AppTransactionDetails();
+                        //var detParent = await _appTransactionDetails.GetAll().Include(z => z.ParentFkList).Where(z => z.TransactionId == input.TransactionId &&
+                        //z.TransactionIdFk.EntityObjectTypeId == header.EntityObjectTypeId &&
+                        //z.ItemSSIN == marketplaceVariationParent.SSIN).FirstOrDefaultAsync();
+                        if (true)//(detParent == null)
                         {
-                            detParent = new AppTransactionDetails();
+                            //detParent = new AppTransactionDetails();
                             detParent = ObjectMapper.Map<AppTransactionDetails>(marketplaceVariationParent);
                             detParent.Amount = decimal.Parse((input.Price * input.Qty).ToString());
                             detParent.Quantity = double.Parse(input.Qty.ToString());
