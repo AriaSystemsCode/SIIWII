@@ -1659,6 +1659,7 @@ namespace onetouch.Accounts
                         branchDto.CurrencyId = account.CurrencyId;
                     branchDto.EMailAddress = account.EMailAddress;
                     branchDto.LanguageId = account.LanguageId;
+                        branchDto.Website = account.Website;
                     branchDto.Id = 0;
                     branchDto.Phone1Number = account.Phone1Number;
                     branchDto.Phone2Number = account.Phone3Number;
@@ -3933,9 +3934,9 @@ namespace onetouch.Accounts
                 branchDto.LanguageId = input.LanguageId;
                 branchDto.Code = input.Code.TrimEnd() + "-MAIN";
                 branchDto.Name = contact.Name.TrimEnd() + " Main Branch";
-                branchDto.CurrencyId = input.CurrencyId;
+                //branchDto.CurrencyId = input.CurrencyId;
                 branchDto.EMailAddress = input.EMailAddress;
-                branchDto.LanguageId = input.LanguageId;
+                //branchDto.LanguageId = input.LanguageId;
                 branchDto.Id = 0;
                 branchDto.Phone1Number = input.Phone1Number;
                 branchDto.Phone2Number = input.Phone3Number;
