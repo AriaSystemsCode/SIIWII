@@ -3928,7 +3928,9 @@ namespace onetouch.Accounts
                 branchDto.AccountId = newId;
                 branchDto.ParentId = newId;
                 branchDto.TenantId = AbpSession.TenantId;
-
+                branchDto.Website = input.Website;
+                branchDto.CurrencyId = input.CurrencyId;
+                branchDto.LanguageId = input.LanguageId;
                 branchDto.Code = input.Code.TrimEnd() + "-MAIN";
                 branchDto.Name = contact.Name.TrimEnd() + " Main Branch";
                 branchDto.CurrencyId = input.CurrencyId;
