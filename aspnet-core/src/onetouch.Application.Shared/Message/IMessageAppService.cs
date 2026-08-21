@@ -27,6 +27,7 @@ namespace onetouch.Message
         //I48[Start]
         Task<double> GetAllReviewsCount(long input);
         Task<OverAllRatingDto> GetOverAllRatings(long entityId);
+        Task<List<MarketplaceItemReviewSummaryDto>> GetMarketplaceItemReviewSummaries(List<long> entityIds);
         //I48[End]
     }
 }
