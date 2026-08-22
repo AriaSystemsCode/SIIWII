@@ -181,11 +181,12 @@ body {
 
 
 .bgPurple{
-    background-color: #700066 !important;
+    background-color: #4A0D4A !important;
+    color: #fff !important;
 }
 
 .colorPurple{
-    color: #700066 !important;
+    color: #4A0D4A !important;
 }
 
 .w-80{
@@ -222,7 +223,7 @@ body {
 
 .slide-md-Section{
     width: 90%;
-    height:238.4pt;
+    // height:238.4pt;
     border: solid 1px #B49BB4;
     background-color: #EFEFEF;
     border-radius: 2px 2px 10px 10px;
@@ -230,7 +231,7 @@ body {
 
 .slide-sm-Section{
     width: 198pt;
-    height: 250pt;
+    // height: 250pt;
     border: solid 1px #B49BB4;
     background-color: #EFEFEF;
     border-radius: 2px 2px 10px 10px;
@@ -253,14 +254,16 @@ body {
     cursor: pointer;
     display: block;
     width: 100%;
-    height: 80%;
+    // height: 80%;
+    height: 300px;
+    object-fit: cover;
 }
 .slide-small-image
 {
     cursor: pointer;
     display: block;
     width: 100%;
-    height: 80%;
+    // height: 80%;
 }
 
 .noRLMargin {
@@ -413,7 +416,7 @@ color: #700066 !important;
 .shoppingCartAccordionTabBG  .p-accordion .p-accordion-header .p-accordion-header-link  {
     background: #f1f2f3 !important;
     padding: 15px;
-    // border-radius: 10px !important;
+    border-radius: 10px !important;
 }
 .shoppingCartAccordionTabBG   .p-accordion .p-accordion-content{
     background:white !important;
@@ -424,17 +427,6 @@ color: #700066 !important;
     background:white !important;
     // border-color: #700066 !important;
 }
-//  p-treetable
-// .p-treetable .p-treetable-thead > tr {
-//     border: none !important;
-//    // background: white !important;
-// }
-
-// .p-treetable .p-treetable-thead > tr >  th
-// {
-//     border: 1px solid white !important;
-//     background: white !important;
-// }
 
 .p-treetable .p-treetable-scrollable-body{
     // overflow: hidden scroll;
@@ -443,9 +435,7 @@ color: #700066 !important;
 }
 
 
-.shoppingCartAccordionTabBG path {
-    // color: #700066;
-}
+
   .shoppingCartAccordionTabBG.shoppingCartAccordionNotValidTab .p-accordion .p-accordion-header .p-accordion-header-link  {
     background: red !important;
 }
@@ -466,6 +456,21 @@ tabset .nav-link.active span {
 }
 .text-primary {
     color: #4A0D4A !important;
+}
+
+[dir="rtl"] .p-datatable .p-datatable-thead > tr > th,
+[dir="rtl"] .p-datatable .p-sortable-column,
+[dir="rtl"] .p-treetable .p-treetable-thead > tr > th,
+[dir="rtl"] .p-treetable .p-sortable-column,
+.kt-body-rtl .p-datatable .p-datatable-thead > tr > th,
+.kt-body-rtl .p-datatable .p-sortable-column,
+.kt-body-rtl .p-treetable .p-treetable-thead > tr > th,
+.kt-body-rtl .p-treetable .p-sortable-column,
+.rtl-layout .p-datatable .p-datatable-thead > tr > th,
+.rtl-layout .p-datatable .p-sortable-column,
+.rtl-layout .p-treetable .p-treetable-thead > tr > th,
+.rtl-layout .p-treetable .p-sortable-column {
+    text-align: right !important;
 }
 
 input[type="radio"], input[type="checkbox"] {
@@ -595,7 +600,7 @@ span.p-tabview-title {
     border-radius: 8px !important;
     margin-right: -11px;
     border-right: none;
-    padding-right: 0 !important;
+    // padding-right: 0 !important;
     
 }
 
@@ -620,9 +625,29 @@ span.p-tabview-title {
 
 // on error date 
 ::ng-deep {
+    .btn.dropdown-toggle{
+        background-color: transparent !important;
+    }
     .p-calendar.ng-dirty.ng-invalid > .p-calendar > .p-inputtext {
         border:2px solid #C83532 !important;
     }
+     .invalid-editor .p-editor-container {
+    border: 1px solid #C83532 !important;
+    border-radius: 4px;
+}
+
+.invalid-number .p-inputnumber-input {
+    border: 1px solid #C83532 !important;
+}
+
+.p-dropdown-filter-icon{
+    position: absolute;
+    top: 70% !important;
+    margin-top: -.5rem !important;
+}
+.p-icon-wrapper {
+    display: inline;
+}
 }
 // inputs focus {
     .p-inputtext:enabled:focus{
@@ -663,7 +688,19 @@ border: 1px solid #D9D9D9 !important;
 .p-dropdown:not(.p-disabled):hover{
 border: 1px solid #D9D9D9 !important;
 }
+.p-paginator .p-dropdown .p-dropdown-label{
+         text-align: end !important;
+}
 ::ng-deep {
+    .p-paginator .p-dropdown .p-dropdown-label {
+        //padding-right:  auto !important;
+    }
+    .p-paginator .p-dropdown {
+  
+        height: 2.357rem !important;
+    }
+    
+    b
     .primeng-datatable-container .primeng-paging-container .p-paginator .p-paginator-rpp-options {
         margin-left: 0 !important;
     }
@@ -719,10 +756,7 @@ border: 1px solid #D9D9D9 !important;
       overflow: scroll !important;
       overflow-y: scroll !important;
     }
-    // .p-dropdown-panel {
-    //     z-index: 9999999999999 !important;
-    
-    // } 
+ 
 }
 
 .p-datepicker:not(.p-datepicker-inline) {
@@ -756,7 +790,7 @@ border: 1px solid #D9D9D9 !important;
 }
 
 .p-datatable .p-datatable-tbody > tr > td {
-    border: 1px solid #ECECEC !important;
+    border: 1px solid #c8c8c8 !important;
     // border-radius: 12px !important;
 }
 .table-transparent-rows .p-datatable .p-datatable-tbody > tr > td, .table-transparent-header .p-datatable .p-datatable-thead > tr > th{
@@ -764,8 +798,8 @@ border: 1px solid #D9D9D9 !important;
 }
 
 .variation-table .p-datatable .p-datatable-thead > tr > th, .variation-table .p-datatable.p-datatable-hoverable-rows .p-datatable-tbody > tr:not(.p-highlight):hover, .variation-table .p-datatable .p-datatable-tbody > tr.p-highlight {
-    padding: 20px !important;
-    border: 1px solid #ECECEC !important;
+    padding: 10px !important;
+    border: 1px solid #c8c8c8 !important;
     border-radius: 12px !important;
 }
 
@@ -786,8 +820,157 @@ html{
 
 
 
+/* .p-checkbox .p-checkbox-box .p-icon {
+    position: relative;
+    left: 0%;
+    right: 40%;
+} */
+.p-checkbox .p-checkbox-box {
+    display: flex;
+    align-items: center;  
+    justify-content: center; 
+}
+
+ .nav-tabs {
+    border-bottom: none !important;
+  }
+  
+   .tab-content {
+    border: none !important;
+  }
+  
+  .btn-outline-primary{
+    border: none !important;
+    background-color: #610061 !important;
+    color: white !important;
+  }
+.kt-scrolltop--on .kt-scrolltop:hover {
+    background-color: #4A0D4A !important;
+}
+
+
+.p-icon-wrapper{
+    right: auto !important;
+}
+
+.marketplaceAccountProfile .tabview-custom .p-tabview-nav {
+    border-bottom: 4px solid #EEEEEE;
+    margin: 5px;
+}
+
+.marketplaceAccountProfile  .tabview-custom .p-tabview-nav {
+    display: flex;
+    justify-content: space-between;
+}
+
+.marketplaceAccountProfile  .tabview-custom .p-tabview-nav li{
+    padding-bottom: 5px;
+}
+
+html{
+    overflow: auto !important;
+    overflow-y: auto !important;
 .p-checkbox .p-checkbox-box .p-icon {
     position: relative;
-    left: 40%;
-    right: 40%;
+    // left: 40%;
+    // right: 40%;
+}
+}
+
+.progress-bar{
+background-color:  #4A0D4A !important;
+}
+
+
+searchicon {
+    padding-top: 15%;
+}
+.swal2-styled.swal2-confirm {
+    background-color: #4A0D4A !important;
+}
+
+th.sticky-header {
+    color: #4a0d4a !important;
+}
+.p-checkbox .p-checkbox-box {
+    display: flex;
+    align-items: center;  
+    justify-content: center; 
+  }
+  
+  .p-checkbox .p-checkbox-box .p-icon {
+    position: static; 
+    margin: 0;
+  }
+  
+
+  .p-accordion-header-text {
+    color: #1B101B !important;
+    font-weight: 700 !important;
+    padding: 10px;
+}
+
+
+
+.is-disabled {
+    pointer-events: none;
+    cursor: not-allowed !important; 
+    opacity: 1;
+  }
+
+.searchableDropdown searchicon {
+    padding: 0px;
+}
+
+
+.border-danger {
+    border: 1px solid #C83532 !important;
+}
+
+
+::ng-deep .invalid-editor .p-editor-container {
+    border: 1px solid #C83532 !important;
+    border-radius: 4px;
+}
+
+.alert, .toast, .modal {
+    z-index: 99999;
+}
+
+.p-accordion .p-accordion-header .p-accordion-header-link {
+border-radius: 12px !important;
+}
+
+body p-paginator .p-paginator .p-paginator-element, body p-paginator .p-paginator .p-paginator-pages {
+    float: none !important;
+
+
+}
+
+.btn-primary:hover,
+.btn-primary:focus,
+.btn-primary:not(:disabled):not(.disabled):active,
+.btn-primary:not(:disabled):not(.disabled).active {
+    background-color: #4A0D4A !important;
+    border-color: #4A0D4A !important;
+    color:white !important;
+}
+
+.text-primary {
+    color: #4A0D4A !important;
+}
+
+
+.modal .modal-content .modal-header .modal-title {
+    padding: 10px;
+}
+
+
+input[type='password']::-ms-reveal,
+input[type='password']::-ms-clear,
+input[type='password']::-webkit-credentials-auto-fill-button,
+input[type='password']::-webkit-contacts-auto-fill-button {
+  display: none !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
 }

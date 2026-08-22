@@ -25,7 +25,8 @@
         [showAddBtn]="(appTransactionsForViewDto?.entityObjectTypeCode == 'PURCHASEORDER' && !isAccManual) || ((appTransactionsForViewDto?.enteredByUserRole == 'I\'m an Independent Sales Rep.') && !isAccManual)  ? false : true"
         [contactId]="contactIdShipFrom" (updateSelectedAddress)="updateShipFromAddress($event)"
         [selectedAddressDetails]="shipFromSelectedAdd" [showAddressType]="false" [canChange]="canChange"
-        [currentTab]="currentTab" [shipInfoIndex]="1"></app-address>
+        [currentTab]="currentTab" [shipInfoIndex]="1" [companySsin]="shipFromData?.compssin"
+    [branchSsin]="shipFromData?.branchSsin"></app-address>
     </div>
     <div class="container-fluid pt-1" [ngClass]="createOrEditshippingInfO   ?  'd-block' : 'd-none'">
       <div class="header p-2 my-2 d-flex  justify-content-between">
@@ -52,7 +53,8 @@
         [showAddBtn]="!(appTransactionsForViewDto?.entityObjectTypeCode == 'SALESORDER' && !isAccManual) || (appTransactionsForViewDto?.entityObjectTypeCode == 'SALESORDER' && (appTransactionsForViewDto?.buyerCompanySSIN == '' || appTransactionsForViewDto?.buyerCompanySSIN == null)  ) || (appTransactionsForViewDto?.entityObjectTypeCode == 'I\'m an Independent Sales Rep.' && (appTransactionsForViewDto?.buyerCompanySSIN == '' || appTransactionsForViewDto?.buyerCompanySSIN == null)  ) ? true : false"
         [isCreateOredit]="createOrEditshippingInfO" [contactId]="contactIdShipTo"
         (updateSelectedAddress)="updateShipToAddress($event)" [selectedAddressDetails]="shipToSelectedAdd"
-        [showAddressType]="false"></app-address>
+        [showAddressType]="false"   [companySsin]="shipToData?.compssin"
+    [branchSsin]="shipToData?.branchSsin"></app-address>
     </div>
 
     <div class="row edit-mode " [ngClass]="createOrEditshippingInfO   ?  'd-block' : 'd-none'">
@@ -68,7 +70,8 @@
         </p-dropdown>
         <p class="text-danger" *ngIf="!appTransactionsForViewDto.shipViaId">
           <small>
-            Please select ship via option
+            {{l("PleaseSelectShipVia")}}
+            
           </small>
         </p>
       </div>
@@ -88,12 +91,12 @@
       (isContactsValid_2)="isContactFormValid($event,2)">
     </app-view-shipping-information>
   </div>
-  <div *ngIf="showSaveBtn " class="d-flex justify-content-end pr-3">
-    <button *ngIf="showSaveBtn" (click)="cancel()" class="cancelbtn text-center btn float-right">
-      Cancel
+  <div *ngIf="showSaveBtn " class="d-flex justify-content-end gap-5 mx-2">
+    <button *ngIf="showSaveBtn" (click)="cancel()" class="cancelbtn text-center btn ">
+      {{l("Cancel")}}
     </button>
     <button *ngIf="showSaveBtn" (click)="save()" [disabled]="!(shippingTabValid)" class="previewbtn text-center btn ">
-      Save
+     {{l("Save")}}
     </button>
 
   </div>

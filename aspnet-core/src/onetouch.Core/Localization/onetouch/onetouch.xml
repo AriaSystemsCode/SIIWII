@@ -1,6 +1,80 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <localizationDictionary culture="en">
-	<texts>    <text name="ValidationRules">Validation rules</text>
+	<texts>
+	<text name="Signature">Signature</text>
+	<text name="CALCULATIONAPI">Calculation API</text>
+	<text name="CHARGETYPE">Charge Type</text>
+	<text name="ITEMSSIN">Item SSIN</text>
+	<text name="ISEDITABLE">Is Editable</text>	
+	<text name="SHIPPINGCHARGE">Shipping Charge</text>
+	<text name="SHIPPINGMINIMUMAMOUNT">Shipping Minimum Amount</text>		
+		
+	<text name="DefaultContactUsEmail">Default contact us email</text>
+	<text name="Defaultcontactusemailtemplate">Default contact us email template</text>
+	<text name="MarketplacesellerSSIN">Marketplace seller SSIN</text>
+	<text name="Defaultlandingpageis">Default landing page is</text>
+	<text name="Auto-connecttenantstoMarketplaceselleruponcreation">Auto-connect tenants to Marketplace seller upon creation</text>
+	<text name="Auto-shareTenantstoMarketplaceuponcreation">Auto-share Tenants to Marketplace upon creation</text>		
+	<text name="Portalimage">Portal image</text>
+	<text name="Portalslogan">Portal slogan</text>
+	<text name="Shownewsfeed">Show news feed</text>
+	<text name="Landingpageis">Landing page is</text>
+	<text name="Portallogo">Portal logo</text>
+	<text name="Portaltoolbarcolor">Portal toolbar color</text>
+	<text name="Portalfootertext">Portal footer text</text>
+	<text name="Allowtenantstoregistertotheportal">Allow tenants to register to the portal</text>
+	<text name="Newregisteredtenantsareactivebydefault">New registered tenants are active by default</text>
+	<text name="TenantTeammembersare">Tenant Team members are</text>
+	<text name="Marketplaceownertenantis">Marketplace owner tenant is</text>
+	<text name="Marketplaceanonymousbrowsing">Marketplace anonymous browsing</text>
+	<text name="ProductMSRPvisiblityinmarketplace">Product MSRP visiblity in marketplace</text>
+	<text name="ProductinventoryQtyvisiblityinmarketplace">Product inventory Qty visiblity in marketplace </text>
+	<text name="Show-InStock/OutofStock-flagson">Show - In Stock / Out of Stock - flags on</text>
+	<text name="ShowwarningmessagewhenmajorItemisoutofStockinmarketplace">Show warning message when major Item is out of Stock in marketplace</text>
+	<text name="Warningmessage">Warning message</text>
+	<text name="Newsfeed">News feed</text>
+	<text name="Marketplace">Marketplace</text>
+	<text name="Manualcontactpersons">Manual contact persons</text>
+	<text name="Connectedpersonsbasedonrelationships">Connected persons based on relationships</text>
+		<!--<text name="Enable">Enable</text>
+	<text name="Disable">Disable</text>
+	<text name="Yes">Yes</text>
+	<text name="No">No</text>
+	<text name="True">True</text>
+	<text name="False">False</text>-->
+	<text name="ItemColorlevel">Item-Color level</text>
+	<text name="ItemColorSizeLevel">Item-Color-Size Level</text>
+	<text name="Bothlevels">Both levels</text>
+
+	<text name="Notifyusersbyemail">Notify users by email</text>
+	<text name="Transactionsharingis">Transaction sharing is</text>
+	<!--<text name="Manual">Manual</text>-->
+	<text name="Automatic">Automatic</text>
+	<text name="Inquire">Inquire</text>
+
+	<text name="ValidationRules">Validation rules</text>
+	<text name="PortalImage">Portal Image</text>
+	<text name="PortalSlogan">Portal Slogan</text>
+	<text name="PortalHomepageIs">Portal Homepage Is</text>
+	<text name="PortalLogo">Portal Logo</text>
+	<text name="PortalToolbarColor">Portal Toolbar Color</text>
+	<text name="PortalFooterText">Portal Footer Text</text>
+	<text name="AllowTenantsToRegisterToThePortal">Allow tenants to register to the portal.</text>
+	<text name="NewRegisteredTenantsAreActiveByDefault">New registered tenants are active by default</text>
+	<text name="TenantTeamMembersAre">Tenant Team members are</text>
+	<text name="MarketplaceOwnerTenantIs">Marketplace Owner Tenant is</text>
+	<text name="PortalMarketplaceAnonymousBrowsing">Portal Marketplace Anonymous Browsing</text>
+	<text name="ProductMSRPVisibilityInMarketplace">Product MSRP Visiblity in Marketplace</text>
+	<text name="ProductInventoryQtyVisibilityInMarketplace">Product Inventory Qty Visiblity in Marketplace</text>
+	<text name="ShowInStockOutOfStockFlagsOn">Show (In Stock / Out of Stock ) flags on</text>
+	<text name="ShowWarningLabelWhenMajorItemIsOutOfStockInMarketplace">
+		Show Warning Label when Major Item is Out of Stock in Marketplace
+	</text>
+	<text name="ApplyTaxRules">Apply Tax Rules</text>
+	<text name="NotifyUsersByEmail">Notify Users by Email</text>
+	<text name="TransactionSharingIs">Transaction Sharing is</text>
+	<text name="InvitePartnerByType">Invite partner By Type</text>
+    
     <text name="ValidationRule">Validation rule</text>
     <text name="onetouch.ValidationRules.ValidationRule">ValidationRule</text>
     <text name="FieldName">Field name</text>
@@ -710,7 +784,7 @@
 		<text name="TenantNameCanNotBeEmpty">Tenant name can not be empty</text>
 		<text name="ExportToExcel">Export to excel</text>
 		<text name="ChangeProfilePicture">Change profile picture</text>
-		<text name="TenantName_Regex_Description">Domain name must be at least 2 characters, starts with a letter and continue with letter, number, dash or underscore.</text>
+		<text name="TenantName_Regex_Description">  Workspace name must be at least 2 characters, can include letters, numbers, and special characters, and cannot contain spaces.</text>
 		<text name="ProfilePicture_Change_Info">You can select a JPG/JPEG/PNG file with a maximum {0}MB size.</text>
 		<text name="ProfilePicture_Change_Error">Your profile picture could not be changed.</text>
 		<text name="ProfilePicture_Warn_SizeLimit">Picture size must be smaller than {0}MB. Please select another file.</text>
@@ -1643,7 +1717,7 @@
 		<text name="EntityId">Entity Id</text>
 		<text name="SelfUserDelegationErrorMessage">You can't delegate authorization to yourself !</text>
 		<text name="Compose"></text>
-		<text name="Sent items">Sent Items"</text>
+		<text name="Sent items">Sent Items</text>
 		<text name="Favourite">Favourite</text>
 		<text name="Archive">Archive</text>
 		<text name="Trash">Trash</text>
@@ -1878,7 +1952,7 @@
 		<text name="Published">Published</text>
 		<text name="UnPublishedSuccessfully">Unpublished Successfully</text>
 		<text name="CreateNewProduct">Create New Product</text>
-		<text name="ProductId">Product Id</text>
+		<text name="Product Id">Product Id</text>
 		<text name="MyListings">My Listings</text>
 		<text name="ChooseSharingOptions">Choose Sharing Options</text>
 		<text name="TypeOrSearchForMembersAndAccounts">Type Or Search For Members And Accounts</text>
@@ -2051,6 +2125,8 @@
 		<text name="ManualAccounts">Manual Accounts</text>
 		<text name="ExternalAccounts">External Accounts</text>
 		<text name="BusinessClassifications" >Business Classifications</text>
+
+		
 		<text name="Countries" >Countries</text>
 		<text name="Currencies" >Currencies</text>
 		<text name="ThereIsNoCurrenciesAddedYet" >There is no currencies added yet</text>
@@ -2391,6 +2467,7 @@
 		<text name="fromDateUpcomingEventsErroMessage">Main filter type will be changed to all events as you choose 'From Date' on the past</text>
 		<text name="toDatePriorEventsErroMessage">Main filter type will be changed to all events as you choose 'To Date' on the futrue</text>
 		<text name="UploadAvailableInventory"> Upload Available Inventory</text>
+		<text name="ImportCustomprices">Import Custom prices</text>
 		<text name="TotalQty">Total Qty</text>
 		<text name="ImportQtysuccessfully">Import Qty successfully</text>
 		<text name="TotalpassedQty">Total passed Qty</text>
@@ -2480,12 +2557,14 @@
 		<text name="MSRP">MSRP</text>
 		<text name="PleaseCheckThisBoxIfYouSellMultipleVariationsOfYourProduct">Please check this box if you sell multiple variations of your product</text>
 		<text name="AvailableQty">Available Qty</text>
+		<text name="StockAvailable">Stock Available</text>
 		<text name="ViewEvent">View Event</text>
 		<text name="FormIsInvalid">Form is invalid</text>
 		<text name="CurrenciesCannotBeDublicated">Currencies can't be dublicated</text>
 		<text name="DefaultCurrencyMustExist">Default currency must exist</text>
 		<text name="EnterProductList">Enter Product List</text>
 		<text name="ConnectedAccounts">Connected Accounts</text>
+		<text name="ConnectedAccount">Connected Account</text>
 	    <text name="PersonalEmailAddress">personal email</text>
 		<text name="PriceLevel">Price Level</text>
 		<text name="AccountSSIN">Account SSIN</text>
@@ -2496,7 +2575,9 @@
 	    <text name="DateCreated">Date Created</text>
 	    <text name="MyTransactions">My Transactions</text>
 	    <text name="SalesOrder">Sales Order</text>
-	    <text name="purchaseOrder">purchase Order</text>
+	    <text name="Sales Order">Sales Order</text>
+	    <text name="purchaseOrder">Purchase Order</text>
+	    <text name="Purchase Order">Purchase Order</text>
 	
 
 		<text name="DetailsPage">Details Page</text>
@@ -2569,5 +2650,386 @@
 	<text name="Absolute">Absolute</text>
 	<text name="IsAddOn">Add-On</text>
 	<text name="Limited">Limited</text>
+    <text name="UpdateAccountInformation">Update Account Information</text>
+    
+	<text name="FilesformatsSupportedareXLSX,JPGandPNG">Files formats Supported are XLSX,JPG and PNG</text>
+	<text name="Relatedproducts">Related products</text>
+	<text name="noproductsarelinked">no products are linked</text>
+ 	<text name="Totalpassedprice">Total passed price </text>
+	<text name="Totalfailedprice">Total failed price</text>
+	<text name="BussinessClassification">Bussiness Classification</text>
+	<text name="OverallRating">Overall Rating</text>
+	<text name="Media">Media</text>
+	<text name="RecentEvents">Recent Events</text>
+	<text name="Connections">Connections</text>
+	<text name="ForFullViewingOf">For full viewing of</text>
+	<text name="VisitVirtualShowroom">Visit Virtual Showroom</text>
+	<text name="RecentPosts">Recent Posts</text>
+	<text name="Reviews">Reviews</text>
+	<text name="Hide">Hide</text>
+	<text name="AccountLogo">Account Logo</text>
+	<text name="AccountCover">Account Cover</text>
+	<text name="Loading">Loading</text>
+	<text name="Filters">Filters</text>
+	<text name="CreatedBy">Created By</text>
+	<text name="Attendees">Attendees</text>
+	<text name="End">End</text>
+	<text name="By">By</text>
+	<text name="ChooseDate">Choose Date</text>
+	<text name="OnlyAvailableInStock">Only Available In Stock</text>
+	<text name="ClearFilter">Clear Filter</text>
+	<text name="Filter">Filter</text>
+	<text name="ClearAllFilters">Clear All Filters</text>
+	<text name="BackToResults">Back To Results</text>
+	<text name="MarketplaceProductDetailView">Marketplace Product Detail View</text>
+	<text name="OrderedSummary">Ordered Summary</text>
+	<text name="ProductOrderSummary">Product Order Summary</text>
+	<text name="AddToShoppingCart">Add To Shopping Cart</text>
+	<text name="BySize">By Size</text>
+	<text name="ByPrepack">By Prepack</text>
+	<text name="InStock">In Stock</text>
+	<text name="OutOfStock">Out Of Stock</text>
+	<text name="OrderBySize">Order By Size</text>
+	
+	<text name="Ordered">Ordered</text>
+	<text name="PrepackDefinition">Prepack Definition</text>
+	<text name="TotalPcs">Total Pcs</text>
+	<text name="Prepack">Prepack</text>
+	<text name="OrderByPrepack">Order by prepack</text>
+	<text name="AvailablePrepacks">Available Prepacks</text>
+	<text name="Department">Department</text>
+	<text name="Noitems ...">No items ...</text>
+	<text name="LoadingMoreRelatedProducts…">Loading more relatedproducts…</text>
+	<text name="Colors">Colors</text>
+	<text name="Summary">Summary</text>
+	<text name="SoldOutDate">SoldOut Date</text>
+	<text name="the price assigned to the ordered Items will be updated">the price assigned to the ordered
+                Items will be updated</text>
+	<text name="Okay">Okay</text>
+	<text name="This variation is already added to the order">This variation is already added to
+                the order</text>
+				<text name="you need to connect to this seller account , to be able to proceed">you need to connect to this seller account , to be able to proceed</text>
+	<text name="ConnectProceed">Connect and Proceed</text>
+	<text name="CustomersReviews">Customers Reviews</text>
+	<text name="CustomerQuestions">Customer Questions</text>
+	<text name="VerifiedPurchaser">Verified Purchaser</text>
+	<text name="OnlyOneImgOneVideo">Only one img or one video</text>
+	<text name="AccountAdmin">Account Admin</text>
+	<text name="ProfileOwner">Profile Owner</text>
+	<text name="NotVerifiedPurchaser">Not Verified Purchaser</text>
+	<text name="ReadMore">Read more</text>
+	<text name="ViewAllQuestions">View all questions</text>
+	<text name="OnlyOneReviewIsAllowed">Only one review is allowed!</text>
+	<text name="BasedOn">Based on</text>
+	<text name="Ratings">Ratings</text>
+	<text name="ViewAllReviews">View all reviews</text>
+	<text name="InviteContact">Invite Contact</text>
+	<text name="CreateBusinessAccount">Create Business Account</text>
+	<text name="CreateGroupAccount">Create Group Account</text>
+	<text name="BUSINESSAccount">Business Account</text>
+	<text name="BusinessAccount">Business Account</text>
+	<text name="PERSONALAccount">Personal Account</text>
+	<text name="PersonalAccount">Personal Account</text>
+	<text name="GROUPAccount">Group Account</text>
+	<text name="GroupAccount">Group Account</text>
+	<text name="OnlineEvent">Online Event</text>
+	<text name="InPersonEvent">In Person Event</text>
+	<text name="BUSINESS">Business</text>
+	<text name="PERSONAL">Personal</text>
+	<text name="GROUP">Group</text>
+	<text name="PleaseEnteraValidEmailAddress"> Please enter a valid email address</text>
+    
+	
+	
+
+
+ 
+	<text name="ContactUs">Contact Us</text>
+	<text name="YourRequestHasBeenSubmitted">Your request has been submitted</text>
+	<text name="Telephone">Telephone</text>
+	<text name="PleaseEnterPhoneNumber">Please Enter Phone Number</text>
+	<text name="RelationshipSettings">Relationship Settings</text>
+	<text name="RelationshipSettingsHeaderInfo">Show and change relationship settings.</text>
+	<text name="MarketplaceRole">Marketplace Role</text>
+	<text name="AllAccountTypes">All Account Types</text>
+
+	<text name="PhoneValidationMsg">Please enter a valid phone number.</text>
+	<text name="PhoneBetween5To20">Phone number must be between 5 and 20 characters long.</text>
+	<text name="ContactName">Contact Name</text>
+	<text name="DepartmentReqMsg">Department Name is required.</text>
+	<text name="DepartmentName">Department Name</text>
+	<text name="CodeCompanyValidationMsg">This Company code already exists!</text>
+	<text name="CodeContactValidationMsg"> This contact code already exists!</text>
+	<text name="CodeBranchValidationMsg"> This Branch code already exists!</text>
+	<text name="ContactCode">Contact Code</text>
+	<text name="CompanyCode">Company Code</text>
+
+
+	<text name="CompanyContactInfo">Company &amp; Contact Information</text>
+	<text name="CreatingAccountsMsg">Creating new accounts / contacts will take place upon placing the order</text>
+	<text name="Information">Information</text>
+	<text name="ReferenceNumber">Reference Number</text>
+	<text name="AddClassification">Add Classification</text>
+	<text name="SelectAll">Select All</text>
+	<text name="CollapseAll">Collapse All</text>
+	<text name="AddNewCategories">Add New Categories</text>
+	<text name="AddCategories">Add Categories</text>
+
+	<text name="PleaseSelectShipVia">Please select ship via option</text>
+	<text name="SalesRep">Sales Rep</text>
+
+	<text name="LookinInAddresses">Lookin in addresses...</text>
+	<text name="AddressCode">Address Code...</text>
+	<text name="AddressName">Address Name...</text>
+	<text name="Address1">Address Line 1...</text>
+	<text name="Address2">Address Line 2...</text>
+	<text name="SelectCompanyName">Select Company Name</text>
+<text name="SelectContactName">Select Contact Name</text>
+
+<text name="PleaseSelectValidAccount">Please select valid account or create a new one</text>
+<text name="PleaseSelectAddShipAddress">Please select or add ( ship to) address</text>
+<text name="PleaseSelectAddBillAddress">Please select or add billing address</text>
+<text name="AddNewLine">Add new line</text>
+<text name="ProductColor">Product Color</text>
+<text name="AdditionalCharges">Additional Charges</text>
+<text name="Transactions">Transactions</text>
+<text name="LastEdit">Last Edit</text>
+<text name="OrderPlacedSuccessfully">Order #{0} placed successfully</text>
+<text name="SpecialPriceUpdateMessage">The price assigned to the ordered items will be updated.</text>
+<text name="ConfirmPlaceOrder">Are you sure you want to place the order?</text>
+<text name="UnableToDisplayPDFFile.">Unable to display PDF file.</text>
+<text name="instead">instead</text>
+<text name="DownloadPDF">Download PDF</text>
+<text name="RegeneratingOrderConfirmation">Regenerating order confirmation</text>
+<text name="TotalCharges">Total Charges</text>
+
+<text name="OrderSummary">Order Summary</text>
+<text name="PleaseSelectRole">Please Select Role</text>
+<text name="TempAccount">Temp Account</text>
+<text name="BuyerCompanyName">Buyer Company Name</text>
+<text name="BuyerCompanyNameRequired">Buyer company Name is required</text>
+<text name="BuyerNameRequired">Buyer Name is required</text>
+<text name="phoneNumberInvalid">phone Number is Invalid</text>
+<text name="BuyerEmail">Buyer Email</text>
+<text name="EmailAddressInvalid">Email Address is Invalid</text>
+<text name="Branch">Branch</text>
+<text name="BranchIsRequired">Branch is required</text>
+<text name="CurrencyIsRequired">Currency is required</text>
+<text name="PriceLevelIsRequired">Price Level is required</text>
+<text name="SellerInformation">Seller Information</text>
+<text name="SellerCompanyName">Seller Company Name</text>
+<text name="SellerCompanyNameIsRequired">Seller company Name is required</text>
+<text name="SellerContactName">Seller Contact Name</text>
+<text name="SellerNameIsRequired">Seller Name is required</text>
+<text name="SellerEmail">Seller Email</text>
+<text name="BuyerAndSellerAreSamePersonMsg">Buyer and Seller are same person please choose another option</text>
+<text name="OrderInformation">Order Information</text>
+<text name="EnteredDate">Entered Date</text>
+<text name="AvailableDate">Available Date</text>
+<text name="StartDateValidationMsg">start date Can’t be befor the Entered date</text>
+<text name="CompleteDateValidationMsg">Complete date Can’t be before the Start date</text>
+<text name="AvailableDateValidationMsg">Available date Can’t be before the complete date</text>
+<text name="StartShopping">Start Shopping</text>
+<text name="BuyerInformation">Buyer Information</text>
+<text name="PleaseSelectBuyerCompanyName">Please Select Buyer Company Name</text>
+<text name="PleaseSelectBuyerName">Please Select Buyer Name</text>
+<text name="BuyerPhoneNumber">Buyer Phone Number</text>
+<text name="Main">Main</text>
+<text name="PleaseSelectSellerCompanyName">Please Select Seller Company Name</text>
+<text name="PleaseSelectSellerContactName">Please Select Seller Contact Name</text>
+<text name="EnterTransactionReference">Enter Transaction Reference #</text>
+<text name="CreatorTenantName">Creator Tenant Name</text>
+
+<text name="BuyerPhoneNumberTooShort">Buyer phone Number too short</text>
+<text name="BuyerPhoneNumberTooLong">Buyer phone Number too long</text>
+<text name="SellerPhoneNumberTooShort">Seller phone Number too short</text>
+<text name="SellerPhoneNumberTooLong">Seller phone Number too long</text>
+<text name="EmailAddressTooShort">Email Address is too short</text>
+<text name="EmailAddressTooLong">Email Address is too long</text>
+<text name="ConflictNewOrderActiveCart">Conflict between the new order and the active shopping cart order</text>
+<text name="ContinueWithShoppingCart">Continue with the Shopping Cart</text>
+<text name="ContinueWithNewOrder">Continue with the new order</text>
+<text name="CurrencyRateNotDefined">Currency exchange rate hasn't been defined switching to seller currency</text>
+<text name="SellingToBuyerAsSeller">Selling to this buyer - As Seller</text>
+<text name="ConnectedToBuyerAsSalesRep">Connected to this buyer - As Sales Rep</text>
+<text name="BuyingOnBehalfBuyer">Buying on behalf this Buyer - As Buying Office</text>
+<text name="SellingOnBehalfSeller">Selling on behalf of this Seller - As Sales Rep</text>
+<text name="BuyingFromSellerAsBuyer">Buying from this Seller - As Buyer</text>
+<text name="ConnectedToSellerAsBuyingOffice">Connected to this Seller - As Buying Office</text>
+<text name="NotShared">Not Shared</text>
+<text name="SyncToMyProducts">Sync To My Products</text>
+<text name="SyncProducts">Sync Products</text>
+<text name="OutOf">OutOf</text>
+<text name="ProductsCopiedBefore">Products copied before</text>
+<text name="WhatAreYouLookingFor">What are you looking for…</text>
+<text name="BuyerContactName">Buyer Contact Name</text>
+  <text name="Transaction">Transaction</text>
+  <text name="Order Approval">Order Approval</text>
+  <text name="OrderPreview">Order Preview</text>
+
+  <text name="OrderAmount">Order Amount</text>
+  <text name="Yearly">Yearly</text>
+  <text name="Plans">Plans</text>
+  <text name="Custom">Custom</text>
+  <text name="Prices">Prices</text>
+  <text name="ConfirmationMessgae">Confirmation Messgae</text>
+  <text name="SelectPlanMsg">Please press yes button to confirm changing your current subscription plan to</text>
+  <text name="NoteMsgPlan">Note:- you will be on the new plan starting from the next month.</text>
+  <text name="Invoices">Invoices</text>
+
+  <text name="ActivityLog">Activity Log</text>
+  <text name="Add-ons">Add-ons</text>
+  <text name="Feature">Feature</text>
+  <text name="Add-onCart">Add-on Cart</text>
+  <text name="PurchaseAdd-Ons">Purchase Add-Ons</text>
+
+
+  <text name="Sync">Sync</text>
+  <text name="ForMoreInquiriesCustomPricing">For More Inquiries and Custom Pricing , Please email</text>
+  <text name="Selected">Selected</text>
+
+  
+  <text name="Added">Added</text>
+  <text name="OPEN">Open</text>
+  <text name="My Connections">My Connections</text>
+  <text name="My Transaction">My Transaction</text>
+  <text name="BeforeSavingManualAccountMsg">Before saving, please select the relationship you would like to build with this manual account</text>
+  <text name="SaveManualAccount">Save Manual Account</text>
+  <text name="SentItems">Sent Items</text>
+  <text name="Favorite">Favorite</text>
+  <text name="DirectMessage">Direct Message</text>
+  <text name="RelatedData">RelatedData</text>
+  <text name="SearchMessages">Search messages</text>
+<text name="DirectMessageIn">Direct Message in</text>
+<text name="ThreadIn">Thread in</text>
+<text name="MentionIn">Mention in</text>
+<text name="SeeLess">See Less</text>
+
+
+<text name="PriceLowToHigh">Price Low To High</text>
+<text name="PriceHighToLow">Price High To Low</text>
+
+<text name="PublicAndSharedWithMe">Public And Shared With Me</text>
+
+
+
+
+<text name="Show details">Show details</text>
+<text name="Hide details">Hide details</text>
+<text name="Created">Created</text>
+<text name="TypeYourNotesHere">Type Your Notes Here</text>
+<text name="Any">Any</text>
+<text name="Color">Color</text>
+<text name="select color">select color</text>
+<text name="select size">select size</text>
+<text name="NoAddressesFound">No Addresses Found</text>
+
+<text name="ShowFilters">Show Filters</text>
+<text name="HideFilters">Hide Filters</text>
+<text name="ProductList">Product List</text>
+<text name="Brands">Brands</text>
+<text name="AddyourQuestion">Add your Question</text>
+<text name="AddYourReview">Add Your Review</text>
+<text name="Threads">Threads</text>
+<text name="Mentions">Mentions</text>
+<text name="AddToFavourite">Add To Favourite</text>
+<text name="RemoveFromFavourite">Remove From Favourite</text>
+<text name="HideData">Hide Data</text>
+
+<text name="Mandatory">Mandatory</text>
+<text name="MyCart">My Cart</text>
+<text name="AccountLogin">Account Login</text>
+<text name="EnterYourPassword">Enter Your Password</text>
+<text name="Or">Or</text>
+
+
+<text name="MaxLength250">Maximum length is 250 characters</text>
+
+
+
+<text name="Product">Product</text>
+<text name="Block">Block</text>
+<text name="AddedToLookup">Added to lookup</text>
+<text name="SetDefaultValue">Set Default Value</text>
+<text name="AddToLookup">Add To Lookup</text>
+<text name="UploadFiles">Upload Files</text>
+<text name="SelectAndUploadTheFiles">Select and Upload the Files</text>
+<text name="OpenPDF">Open PDF</text>
+<text name="NoThanks">No Thanks</text>
+<text name="CreateAnother">Create Another</text>
+<text name="PDF">PDF</text>
+<text name="ImageAttach">Image Attach</text>
+<text name="LoadMore">Load More</text>
+<text name="UploadFile">Upload File</text>
+<text name="SelectImageFileTypes">Select a JPG | JPEG | PNG | GIF File</text>
+<text name="PreviewOrApplyThisTheme">Preview or apply this theme.</text>
+<text name="SelectCurrency">Select Currency</text>
+	<text name="FilterBy">Filter By</text>
+<text name="RRP">RRP</text>
+<text name="SoldBy">Sold By</text>
+<text name="NoSellerName">Seller Name</text>
+<text name="SearchWithColor">Search With Color</text>
+<text name="ViewOrderedQuantityBySize">View Ordered Quantity By Size</text>
+<text name="Connect , Proceed">Connect &amp; Proceed</text>
+<text name="LoadingPreview">Loading Preview ...</text>
+<text name="ManufactureCode">Manufacture Code</text>
+<text name="Shared">Shared</text>
+<text name="Hidden">Hidden</text>
+
+<text name="SharingStatus">Sharing Status</text>
+<text name="HeaderTitle">Header Title</text>
+<text name="HeaderDesc">Header Description</text>
+<text name="TheProductType">the product type</text>
+<text name="Standard">Standard</text>
+<text name="HTML">HTML</text>
+<text name="ParentItemAttachments">Parent Item Attachments</text>
+<text name="AddAttachment">Add Attachment</text>
+<text name="VisibleInMarketplace">Visible in Marketplace</text>
+<text name="ExistingVariations">Existing Variations</text>
+<text name="NewVariations">New Variations</text>
+<text name="EditSetPrice">Edit / Set Price</text>
+<text name="SSINNumber">SSIN Number</text>
+<text name="SiwiiMarketplace">SIWII Marketplace</text>
+<text name="CreateVariationsHint">
+Select an attribute and then select the options of the products you sell. To see more attributes, click add.
+</text>
+<text name="YouHaveBeenSelected">You have selected</text>
+<text name="AttributesAndOptionsYouHaveSelected">Attributes and options you've selected</text>
+<text name="ChangeVariationTypeToAddMorePhotos">You can change the variation type to add more photos</text>
+<text name="ChooseFileOrDragDropHere">Choose a file or drag &amp; drop it here</text>
+<text name="SupportedFormatsAndSize">JPEG, PNG, PDF, MP4 formats up to 25MB</text>
+<text name="ImageAspectRatio16_9">Image aspect ratio is 16:9</text>
+<text name="DetailInfo">Detail Information</text>
+<text name="PrintInfo">Print Information</text>
+<text name="ReportViewer">Report Viewer</text>
+<text name="SelectPrice">Select Price</text>
+<text name="Continue">Continue</text>
+<text name="SelectLinesheetTemplate">
+Please select one of the available linesheet templates
+</text>
+<text name="PleaseFillRequiredLinesheetInformation">Please fill the required linesheet information</text>
+<text name="SubscribersToProduct">You have {0} subscribers to this product</text>
+<text name="YourListingIsNowAddedToTheList">Your listing is now added to the {0} list</text>
+<text name="SelectVariationsTitle">Select / Unselect Variations</text>
+<text name="SelectVariationsHint">Select or remove the variation you want to appear on your list</text>
+<text name="ChooseAFileOrDragDropItHere"> Choose a file or drag &amp; drop it here </text>
+<text name="TaxRate"> Tax Rate </text>
+<text name="Variationrequiredtosave"> Variationrequiredtosave </text>
+<text name="SizeName"> Size Name </text>
+<text name="Dimension"> Dimension </text>
+		<text name="Create">Create </text>
+		<text name="Addtoproductlist">Add to product list </text>
+		<text name="IsDefault">IsDefault </text>
+		<text name="Orientation">Orientation </text>
+		<text name="SelectOrientationOptions">Select Orientation Options </text>
+			<text name="Logo">Logo</text>
+		<text name="Banner">Banner</text>
+		<text name="Portrait">Portrait</text>
+		<text name="Landscape">Landscape</text>
+		<text name="ProductId">Product Id</text>
+		<text name="Accountuploadstatus">Account upload status</text>
+		<text name="SharedWithYou">is shared with you</text>
+
+		
   </texts>  
 </localizationDictionary>

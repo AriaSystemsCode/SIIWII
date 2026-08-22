@@ -1,10 +1,21 @@
-﻿<div bsModal   #selectAddressModal="bs-modal" class="modal right fade" tabindex="-1" role="dialog"
-    aria-labelledby="createOrEditModal" aria-hidden="true" [config]="{backdrop: 'static'}">
-    <div class="modal-dialog modal-lg">
+﻿<div
+  bsModal
+  #selectAddressModal="bs-modal"
+  class="modal fade"
+  tabindex="-1"
+  role="dialog"
+  aria-hidden="true"
+  [config]="{ backdrop: 'static' }"
+>
+  <div
+    class="modal-dialog modal-lg side-modal"
+    [ngClass]="isArabic ? 'left-modal' : 'right-modal'"
+    role="document"
+  >
         <div class="modal-content">
 
             <form *ngIf="active" #selectAddressForm="ngForm" novalidate (ngSubmit)="selectAddress()" autocomplete="off">
-                <div class="modal-header" style="display: block;background-color: #ffffff !important;">
+                <div class="modal-header mx-2" style="display: block;background-color: #ffffff !important;">
                     <h4 class="modal-title">
                         <span>{{l("SelectAddress")}}</span>
                     </h4>
@@ -14,7 +25,7 @@
                         <input type="text" (change)="onChangeSearch($event)" class="form-control bg-white form-control-sm aria-input-text" id="colFormLabelSm"
                             placeholder="{{'looking in company Address…'|localize}}">
                     </div>
-                    <button style="position: absolute;right: 0;top: 8px;" type="button" class="close" (click)="cancel()"
+                    <button  style="position: absolute;top: 8px; width: 70px;" [ngStyle]="isArabic ? {'left':'0'} : {'right':'0'}" type="button" class="close" (click)="cancel()"
                         aria-label="Close" [disabled]="saving">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -61,9 +72,9 @@
 
                 </div>
                 <div class="modal-footer">
-                    <button [disabled]="saving" type="button" class="btn btn-primary"
+                    <button [disabled]="saving" type="button" class="btn bgPurple mr-2"
                         (click)="addNew()">{{l("CreateNewAddress")}}</button>
-                    <button type="submit" class="btn btn-primary blue btn-blue" [disabled]="!selectAddressForm.form.valid || !selectedAddress"
+                    <button type="submit" class="btn bgPurple mr-2" [disabled]="!selectAddressForm.form.valid || !selectedAddress"
                         [buttonBusy]="saving" [busyText]="l('SavingWithThreeDot')"><span>{{l("Select")}}</span></button>
 
                 </div>

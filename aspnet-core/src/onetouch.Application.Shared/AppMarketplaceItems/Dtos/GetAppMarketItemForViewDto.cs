@@ -34,6 +34,12 @@ namespace onetouch.AppMarketplaceItems.Dtos
         public string SellerBranchName { set; get; }
         public long SellerMarketPlaceAccountId { set; get; }
         //I46[End]
+        //I49[Start]
+        public string ShowMSRP { set; get; }
+        public string ShowStockAvailability { set; get; }
+        public string ShowInOutStockFlag { set; get; }
+        public string ShowWarningLabelMajorOutStockFlag { set; get; }
+        //I49[End]
     }
     public class GetAppMarketplaceItemWithPagedAttributesForViewInput : GetAppItemWithPagedAttributesInput
     {
@@ -45,10 +51,14 @@ namespace onetouch.AppMarketplaceItems.Dtos
         public string BuyerAccountSSIN { set; get; }
         public string SellerAccountSSIN { set; get; }
         public string PriceLevel { set; get; }
+        public long TransactionId { set; get; }
 
     }
     public class AppMarketplaceItemForViewDto : GetAppMarketplaceItemDto
     {
+        //I49-MMT[Start]
+        public string BrandAttchment { set; get; } 
+        //I49-MMT[End]
         public string Brand { set; get; }
         public string ProductLabel { set; get; }
         public DateOnly? StartShipDate { get; set; }

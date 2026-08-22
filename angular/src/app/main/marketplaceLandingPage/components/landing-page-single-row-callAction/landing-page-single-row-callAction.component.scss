@@ -1,0 +1,212 @@
+/* PrimeNG item wrapper */
+:host ::ng-deep .p-carousel .p-carousel-item {
+  // display: flex;
+  justify-content: center;
+}
+
+.carousel-card-mixed {
+  max-width: 340px;    
+  // height: 240px;  
+}
+.carousel-card {
+  // width: 100%;
+    
+  // border: 1px solid #ebedf2;
+  border-radius: 12px;
+  // background: #ffffff;
+  box-sizing: border-box;
+  overflow: visible !important;
+  display: flex;
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+  margin-right: 10px;
+
+}
+.maxW{
+  max-width: 300px;
+}
+.carousel-card-body {
+  flex: 1;
+  // display: flex;
+  align-items: stretch;
+  justify-content: center;
+}
+
+
+
+
+/* ===============================
+   BRAND / ATTACHMENT
+   =============================== */
+
+.card-media {
+  // width: 100%;
+  height: 100%;
+  max-height: 200px;
+  border-radius: 12px;
+  object-fit: cover;  
+  cursor: pointer;
+}
+
+.pdf-icon {
+  object-fit: contain;
+  padding: 18px;
+}
+
+.other-file {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: underline;
+  color: #4a0d4a;
+  font-size: 14px;
+}
+
+/* Responsive */
+@media (max-width: 992px) {
+  :host ::ng-deep .p-carousel .p-carousel-item {
+    padding: 0 4px;
+  }
+}
+
+@media (max-width: 575px) {
+  .product-card-horizontal {
+    flex-direction: column;
+  }
+
+  .product-image-wrapper {
+    max-width: 100%;
+    height: 55%;
+  }
+}
+
+
+
+.carousel-card {
+  position: relative;
+}
+
+.arPos {
+  right: 10px;
+}
+.enPos {
+   left: 10px;
+
+}
+
+.one-style-badge {
+  position: absolute;
+  top: 10px;
+  z-index: 20;
+
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+
+  padding: 6px 10px;
+  border-radius: 6px;
+
+  background: rgba(0, 0, 0, 0.65);
+  color: #fff;
+
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1;
+
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+}
+
+.one-style-badge i {
+  font-size: 12px;
+}
+
+
+
+
+:host ::ng-deep .p-carousel,
+:host ::ng-deep .p-carousel-content,
+:host ::ng-deep .p-carousel-container,
+:host ::ng-deep .p-carousel-items-content {
+  overflow: hidden;
+}
+
+:host ::ng-deep .p-carousel .p-carousel-item {
+  display: flex;
+  justify-content: center;
+  overflow: visible;
+}
+
+.carousel-card {
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+.carousel-card-body.maxW {
+  max-width: 300px;
+  width: 100%;
+}
+
+:host ::ng-deep app-events-browse-card {
+  display: block;
+  width: 100%;
+  max-width: 300px;
+}
+
+
+// :host ::ng-deep .few-items-carousel .p-carousel-items-container {
+//   justify-content: center !important;
+//   transform: none !important;
+// }
+ :host ::ng-deep .few-items-carousel{
+@media (min-width: 993px) {
+  .p-carousel-items-container {
+    justify-content: center !important;
+  }
+}
+
+@media (max-width: 992px) {
+  .p-carousel-items-container {
+    justify-content: flex-start !important;
+  }
+}
+ }
+
+
+:host ::ng-deep .few-items-carousel .p-carousel-item {
+  flex: 0 0 auto !important;
+  width: auto !important;
+}
+
+:host ::ng-deep .few-items-carousel .carousel-card {
+  width: 300px;
+}
+
+
+.section-content {
+  // min-height: 260px;
+}
+
+.section-loading {
+  min-height: 260px;
+  width: 100%;
+}
+
+.purple-spinner {
+  color: #4a0d4a;
+  width: 2.5rem;
+  height: 2.5rem;
+}
+
+.section-empty,
+.section-error {
+  min-height: 180px;
+  color: #777;
+  margin-top: 100px;
+}
+
+.section-error {
+  color: #d9534f;
+}

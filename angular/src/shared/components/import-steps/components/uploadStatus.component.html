@@ -1,54 +1,545 @@
-
- <!-- Iteration-8 -->
- <div bsModal #uploadStatus="bs-modal" class="modal  fade" tabindex="-1" role="dialog"
-  aria-labelledby="uploadStatus" aria-hidden="true" [config]="{backdrop: 'static'}">
-  <div class="modal-dialog modal-lg modalCenter">
+<div bsModal #uploadStatus="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="uploadStatus"
+  aria-hidden="true" [config]="{backdrop: 'static'}">
+  <div class="modal-dialog modal-xl modalCenter">
     <div class="modal-content">
-        <div class="border-bottom">
-       <div class="row pt-4 pl-4 pb-1 pr-4"> 
-           <div class="col-8">
-            <h4 class="font-weight-bold pb-2">{{(ImportTypes[importType]+"uploadstatus") | localize}}</h4>
+      <div class="modal-header-custom">
+        <h5 class="modal-title font-weight-bold">Import {{ImportTypes[importType]}} information</h5>
+        <div>
+          <img src="../../../../assets/accounts/importAccounts/close.svg" class="pointer" (click)="askToClose()" />
+        </div>
+      </div>
 
-     <h5> {{("Total"+ImportTypes[importType]) | localize}} <span  class="font-weight-bold passed">{{"Passed:" | localize}} {{uploadingResult?.totalPassedRecords}}</span>,
-        {{"Totaldata" | localize}} <span  class="font-weight-bold failed">{{"Failed:" | localize}}  {{uploadingResult?.totalFailedRecords}}</span>
-      </h5> 
-</div>
-<div class="col-4 text-right">
-    <img src="../../../../assets/accounts/importAccounts/close.svg" class="pointer" (click)="askToClose()"/>
+      <div class="modal-header-custom">
+        <h5 class="modal-title"> {{ (ImportTypes[importType] + " Upload Status") | localize }} </h5>
+      </div>
+      
+        <div *ngIf="importType != ImportTypes.Items">
+          <div class="row pl-5 pt-4 pb-3" *ngIf="uploadingResult?.totalFailedRecords > 0">
+            <a class="_download font-weight-bold" (click)="downloadLogFile()"> {{"DownloadtheImportlogfile" | localize}}
+            </a>
+          </div>
+        </div>
+
+      <div class="border-bottom d-none" *ngIf="hasDataRecords">
+        <div class="row pl-3 pr-3 pb-4">
+          <div class="col-4 pt-4">
+            <h6>
+              {{ "Total Data " | localize }}
+              <span class="font-weight-bold passed">{{ " Passed:" | localize }} {{ uploadingResult?.totalPassedRecords
+                }}</span> |
+              <span class="font-weight-bold failed">{{ " Failed:" | localize }} {{ uploadingResult?.totalFailedRecords
+                }}</span>
+            </h6>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-body p-0 pl-4 uploadStatusContainer">
+
+        <div *ngIf="importType != ImportTypes.Items" class="_body">
+          <ng-container *ngIf="uploadingResult && uploadingResult?.excelRecords?.length > 0; else noData">
+            <div *ngFor="let record of uploadingResult.excelRecords" class="border-bottom modal-body pb-4 row">
+              <div class="col-10">
+                <h5>{{record.recordType}} {{record.code}} </h5>
+                <h6>{{record.name}} </h6>
+                <span class="{{record.status| uppercase}}STATUS font-weight-bold"> {{record.errorMessage}}</span>
+
+              </div>
+
+              <div class="Status ml-3   pt-2 text-center">
+                <img src="../../../../assets/accounts/importAccounts/{{record.status | uppercase}}.svg" class="pr-2" />
+                <span
+                  class="{{record.status| uppercase}}STATUS font-weight-bold">{{record.status+"STATUS"|uppercase|localize}}
+                </span>
+              </div>
+            </div>
+
+          </ng-container>
+
+        </div>
+
+        <div *ngIf="importType == ImportTypes.Items">
+          <!-- Keep selected import tabs visible even when their records are on a later page. -->
+          <ul class="tabs no-gutters d-flex justify-content-center">
+              <li
+                *ngIf="hasImageRecords"
+                [class.active]="activeRecordType === 'Image'"
+                (click)="switchTab('Image')"
+                class="tab-item text-center py-2">
+                Product Images
+              </li>
+            
+              <li
+                *ngIf="hasDataRecords"
+                [class.active]="activeRecordType === 'Data'"
+                (click)="switchTab('Data')"
+                class="tab-item text-center py-2">
+                Product Data
+              </li>
+          </ul>
+
+          <ng-container *ngIf="records?.length > 0; else noData">
+
+            <div class="table-scroll-container" #tableScrollContainer (scroll)="onRecordsScroll($event)">
+              <table class="browser-table min-width-table">
+                <thead>
+                  <tr>
+                    <th class="sticky-action-col sticky-header" *ngIf="importType == ImportTypes.Items">Actions
+                    </th>
+                    <th *ngFor="let column of visibleColumns; trackBy: trackByColumnName" class="sticky-header">
+                      {{ column.name }}
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr #rowRef *ngFor="let record of records; let i = index; trackBy: trackByRecordId" [attr.data-record-id]="record.id"
+                    [class.in-action]="record._inAction" [class.active-record]="activeRecord === record"
+                    [class.disabled-row]="currentActionRecord && record !== currentActionRecord">
+                    <td class="sticky-action-col" *ngIf="importType == ImportTypes.Items"
+                      [class.pointer-events-none]="currentActionRecord && record !== currentActionRecord">
+                      <div class="dropdown" #dropdownRef>
+                        <!-- IF not in action mode -->
+                        <span class="pointer dropdownPointer actions-menu-trigger" *ngIf="!record._inAction"
+                          (click)="toggleMenu(record, $event)">
+                          ⋮
+                        </span>
+
+                        <!-- IF action mode is active on this row -->
+                        <span *ngIf="record._inAction" class="action-icons d-flex align-items-center">
+                          <i class="text-success mr-2" [class.pointer-events-none]="!canConfirm(record)" [ngStyle]="{
+                          'cursor': !canConfirm(record) ? 'not-allowed' : 'pointer',
+                          'opacity': !canConfirm(record) ? '0.5' : '1'
+                        }" (click)="canConfirm(record) && confirmLinking(record)">
+                            ✔️
+                          </i>
+                          <i class="text-danger pointer" (click)="cancelLinking(record)">❌</i>
+                        </span>
+
+                        <ul class="fixed-dropdown-menu"
+                          *ngIf="record.showActions && (!currentActionRecord || currentActionRecord === record)"
+                          [ngClass]="{'drop-up': record.dropdownPosition?.dropUp}"
+                          [ngStyle]="{
+                            top: record.dropdownPosition?.top + 'px',
+                            left: record.dropdownPosition?.left + 'px'
+                          }">
+                          <ng-container *ngIf="record.recordType !== 'Image'">
+                            <li (click)="handleAction(record, UploadActionEnum.ValidateDataRecord)">
+                              Edit data record
+                            </li>
+                          </ng-container>
+
+                          <ng-container *ngIf="record.recordType === 'Image'">
+                            <li (click)="handleAction(record, UploadActionEnum.LinkToExistingParentItem)">
+                              Link to existing PARENT ITEM
+                            </li>
+                            <li (click)="handleAction(record, UploadActionEnum.LinkToExistingItemColor)">
+                              Link to existing ITEM COLOR
+                            </li>
+                            <li (click)="handleAction(record, UploadActionEnum.LinkToExistingColorLookup)">
+                              Link to existing COLOR LOOKUP
+                            </li>
+                            <li
+                              (click)="handleAction(record, UploadActionEnum.CreateNewParentItemAndLinkAsDefaultImage)">
+                              Create NEW PARENT ITEM and LINK AS DEFAULT IMAGE
+                            </li>
+                            <li
+                              (click)="handleAction(record, UploadActionEnum.CreateNewItemColorAndLinkImageAsDefaultImage)">
+                              Create NEW ITEM COLOR and LINK IMAGE AS DEFAULT IMAGE
+                            </li>
+                            <li (click)="handleAction(record, UploadActionEnum.CreateNewColorLookupAndLinkImage)">
+                              Create to NEW COLOR LOOKUP and Link IMAGE
+                            </li>
+                            <li *ngIf="hasDataRecords"
+                              (click)="handleAction(record, UploadActionEnum.LinkToNewParentItemCodeFromAssociatedData)">
+                              Link to NEW PARENT ITEM CODE FROM ASSOCIATED DATA
+                            </li>
+                            <li *ngIf="hasDataRecords"
+                              (click)="handleAction(record, UploadActionEnum.LinkToNewItemVariantCodeFromAssociatedData)">
+                              Link to NEW ITEM VARIANT CODE FROM ASSOCIATED DATA
+                            </li>
+                            <li *ngIf="hasDataRecords"
+                              (click)="handleAction(record, UploadActionEnum.LinkToNewColorLookupCodeFromAssociatedData)">
+                              Link to NEW COLOR LOOKUP CODE FROM ASSOCIATED DATA
+                            </li>
+                          </ng-container>
+                        </ul>
+
+                      </div>
+                    </td>
+
+                    <!-- Dynamic Columns -->
+                    <td *ngFor="let column of visibleColumns; trackBy: trackByColumnName" #imgPreview #codeCellRef
+                      [ngClass]="getStatusClass(column.name, getRecordValue(record, column.key))">
+                      <ng-container [ngSwitch]="column.name">
+                        <!-- Checkbox for "Image is Default" column -->
+                        <div *ngSwitchCase="'Image is Default'">
+                          <input type="checkbox" [checked]="getRecordValue(record, column.key)"
+                            [disabled]="!record._inAction"
+                            (change)="setRecordValue(record, column.key, $event.target.checked)" />
+                        </div>
+
+                        <!-- Text only -->
+                        <span *ngSwitchCase="'Record Type'">{{ record.recordType || '—' }}</span>
+                        <span *ngSwitchCase="'Status'">{{ record.status || '—' }}</span>
+
+                        <!--Record Status -->
+                        <ul *ngSwitchCase="'Record Status'" class="record-status-list">
+                          <ng-container *ngIf="record.fieldsErrors?.length > 0; else showErrorMessage">
+                            <li *ngFor="let error of record.fieldsErrors">
+                              {{ error?.errorMessage ? error.errorMessage : (error || '—') }}
+                            </li>
+                          </ng-container>
+                          <ng-template #showErrorMessage>
+                            <li>{{ record.errorMessage || '—' }}</li>
+                          </ng-template>
+                        </ul>
+
+                        <div *ngSwitchDefault>
+                          <div *ngIf="column.name === 'Code' && record._isLinkingParent"
+                            [attr.data-record-id]="record.id" class="position-relative" #codeInputContainer>
+                            <small class="text-danger d-block mb-1" *ngIf="!getRecordValue(record, 'code')">
+                              Search for Parent Item
+                            </small>
+
+                            <input type="text" class="form-control link-parent-input"
+                              [ngModel]="getRecordValue(record, 'code')"
+                              (ngModelChange)="onCodeInputChange(record, $event)" placeholder="🔍Search.." #codeInputRef
+                              (focus)="activeRecord = record" />
+
+                            <ul class="search-dropdown bg-white border position-absolute mt-1  shadow-sm"
+                              *ngIf="activeRecord === record && LinkToExistingITEM_Ret_Data?.items?.length > 0">
+                              <li *ngFor="let item of LinkToExistingITEM_Ret_Data.items"
+                                (click)="selectSuggestion(record, item)" class="dropdown-item pointer">
+                                {{item.displayName}}
+                              </li>
+                            </ul>
+
+                          </div>
+
+
+                          <div *ngIf="column.name === 'Code' && record._isLinkingItemColor"
+                            [attr.data-record-id]="record.id" class="position-relative" #codeInputContainer>
+                            <small class="text-danger d-block mb-1" *ngIf="!getRecordValue(record, 'code')">
+                              Search for Item - Color
+                            </small>
+
+                            <input type="text" class="form-control link-parent-input"
+                              [ngModel]="getRecordValue(record, 'code')"
+                              (ngModelChange)="onCodeInputChange(record, $event)" placeholder="🔍Search.." #codeInputRef
+                              (focus)="activeRecord = record" />
+
+                            <ul class="search-dropdown bg-white border position-absolute mt-1  shadow-sm"
+                              *ngIf="activeRecord === record && LinkToExistingItemColor_Ret_Data?.items?.length > 0">
+                              <li *ngFor="let item of LinkToExistingItemColor_Ret_Data.items"
+                                (click)="selectSuggestion(record, item)" class="dropdown-item pointer">
+                                {{item.displayName}}
+                              </li>
+                            </ul>
+                          </div>
+
+
+                          <div *ngIf="column.name === 'Image Folder Name'">
+                            <input type="text" class="form-control link-parent-input" [ngModel]="!getRecordValue(record, 'image') || getRecordValue(record, 'image') === 'noimage_item.jpg' 
+                                   ? '-' 
+                                   : './' + getRecordValue(record, 'image')" disabled />
+                          </div>
+
+
+                          <div *ngIf="column.name === 'Color Code'&& record._isLinkingColorLookup"
+                            [attr.data-record-id]="record.id" class="position-relative" #colorCodeInputContainer>
+
+                            <small class="text-danger d-block mb-1" *ngIf="!getRecordValue(record, 'colorCode')">
+                              Search for Color Lookup
+                            </small>
+
+                            <input type="text" class="form-control link-parent-input"
+                              [ngModel]="getRecordValue(record, 'colorCode')"
+                              (ngModelChange)="onCodeInputChange(record, $event)" placeholder="🔍Search.."
+                              #colorCodeInputRef (focus)="activeRecord = record" />
+
+                            <ul class="search-dropdown bg-white border position-absolute mt-1  shadow-sm"
+                              *ngIf="activeRecord === record && LinkToExistingColorLookup_Ret_Data?.items?.length > 0">
+                              <li *ngFor="let item of LinkToExistingColorLookup_Ret_Data.items"
+                                (click)="selectSuggestion(record, item)" class="dropdown-item pointer">
+                                {{item.displayName}}
+                              </li>
+                            </ul>
+                          </div>
+                        </div>
+
+                        <!-- Default input -->
+                        <div *ngSwitchDefault>
+
+                          <div *ngIf="isCreateNewCase(record, column.name); else normalInput">
+
+                            <ng-container *ngIf="column.name === 'Product Description'; else checkOtherColumns">
+                              <input type="text" class="form-control" [attr.data-record-id]="record.id"
+                                #codeInputContainer [ngModel]="getRecordValue(record, 'productDescription')"
+                                (ngModelChange)="setRecordValue(record, 'productDescription', $event)" [ngClass]="{
+                                     'border-danger': isRequiredColumnForCreateNewCase(record, column.name) && 
+                                                      !getRecordValue(record, 'productDescription')
+                                   }" />
+                              <small class="text-danger" *ngIf="!getRecordValue(record, 'productDescription')">
+                                {{ getExampleTextForCases(record, column.name) }}
+                              </small>
+                            </ng-container>
+
+                            <ng-template #checkOtherColumns>
+
+                              <ng-container *ngIf="column.name === 'Code'; else checkColorCode">
+                                <input type="text" class="form-control" [attr.data-record-id]="record.id"
+                                  #codeInputContainer [ngModel]="getRecordValue(record, 'code')"
+                                  (ngModelChange)="setRecordValue(record, 'code', $event)" [ngClass]="{
+                                       'border-danger': isRequiredColumnForCreateNewCase(record, column.name) && 
+                                                        !getRecordValue(record, 'code')
+                                     }" />
+                                <small class="text-danger" *ngIf="!getRecordValue(record, 'code')">
+                                  {{ getExampleTextForCases(record, column.name) }}
+                                </small>
+                              </ng-container>
+
+                              <ng-template #checkColorCode>
+                                <ng-container *ngIf="column.name === 'Color Code'; else checkParentCode">
+                                  <input type="text" class="form-control" [attr.data-record-id]="record.id"
+                                    #colorCodeInputContainer [ngModel]="getRecordValue(record, 'colorCode')"
+                                    (ngModelChange)="setRecordValue(record, 'colorCode', $event)" [ngClass]="{
+                                         'border-danger': isRequiredColumnForCreateNewCase(record, column.name) && 
+                                                          !getRecordValue(record, 'colorCode')
+                                       }" />
+                                  <small class="text-danger" *ngIf="!getRecordValue(record, 'colorCode')">
+                                    {{ getExampleTextForCases(record, column.name) }}
+                                  </small>
+                                </ng-container>
+                              </ng-template>
+
+                              <ng-template #checkParentCode>
+                                <ng-container *ngIf="column.name === 'Parent Code'; else checkPrice">
+                                  <div #parentCodeInputContainer [attr.data-record-id]="record.id">
+                                    <input type="text" class="form-control"
+                                      [ngModel]="getRecordValue(record, 'parentCode')"
+                                      (ngModelChange)="setRecordValue(record, 'parentCode', $event)" [ngClass]="{
+                                           'border-danger': isRequiredColumnForCreateNewCase(record, column.name) && 
+                                                            !getRecordValue(record, 'parentCode')
+                                         }" />
+                                    <small class="text-danger" *ngIf="!getRecordValue(record, 'parentCode')">
+                                      {{ getExampleTextForCases(record, column.name) }}
+                                    </small>
+                                  </div>
+                                </ng-container>
+                              </ng-template>
+
+                              <ng-template #checkPrice>
+                                <ng-container *ngIf="column.name === 'Price'; else editableInput">
+                                  <input type="text" class="form-control" [attr.data-record-id]="record.id"
+                                    [ngModel]="getRecordValue(record, 'price')"
+                                    (ngModelChange)="setRecordValue(record, 'price', $event)" inputmode="decimal"
+                                    pattern="^-?\\d+(\\.\\d+)?$" [ngClass]="{
+                                         'border-danger': isRequiredColumnForCreateNewCase(record, column.name) && 
+                                                          !getRecordValue(record, 'price')
+                                       }" />
+                                  <small class="text-danger" *ngIf="!getRecordValue(record, 'price')">
+                                    {{ getExampleTextForCases(record, column.name) }}
+                                  </small>
+                                  <small class="text-danger" *ngIf="isPriceFieldInvalid(record, column.name)">
+                                    Please enter a valid number for Price.
+                                  </small>
+                                </ng-container>
+                              </ng-template>
+
+                              <ng-template #editableInput>
+                                <!-- Special case for Price Currency Code -->
+                                <ng-container *ngIf="column.name === 'Price Currency Code'; else normalEditableInput">
+                                  <input type="text" class="form-control text-uppercase force-uppercase"
+                                    [attr.data-record-id]="record.id"
+                                    [ngModel]="getRecordValue(record, column.key)"
+                                    (ngModelChange)="setRecordValue(record, column.key, $event?.toUpperCase())"
+                                    [ngClass]="{
+                                                'border-danger': isRequiredColumnForCreateNewCase(record, column.name) &&
+                                                                 !getRecordValue(record, column.key)
+                                              }" />
+                                  <small class="text-danger" *ngIf="isRequiredColumnForCreateNewCase(record, column.name) &&
+                                        !getRecordValue(record, column.key)">
+                                    {{ getExampleTextForCases(record, column.name) }}
+                                  </small>
+                                </ng-container>
+
+                                <!-- Fallback to normal input -->
+                                <ng-template #normalEditableInput>
+                                  <input type="text" class="form-control" [attr.data-record-id]="record.id"
+                                    [ngModel]="getRecordValue(record, column.key)"
+                                    (ngModelChange)="setRecordValue(record, column.key, $event)"
+                                    [ngClass]="{
+                                          'border-danger': isRequiredColumnForCreateNewCase(record, column.name) &&
+                                                           !getRecordValue(record, column.key)
+                                        }" />
+                                  <small class="text-danger"
+                                    *ngIf="isRequiredColumnForCreateNewCase(record, column.name) &&
+                                                                  !getRecordValue(record, column.key)">
+                                    {{ getExampleTextForCases(record, column.name) }}
+                                  </small>
+                                </ng-template>
+                              </ng-template>
+
+
+                            </ng-template>
+
+                          </div>
+
+                          <ng-template #normalInput>
+
+
+                            <ng-container *ngIf="record._isDataRecord; else normalMode">
+                              <input type="text" class="form-control"
+                                [ngModel]="getRecordValue(record, column.key)"
+                                (ngModelChange)="setRecordValue(record, column.key, $event)" />
+                            </ng-container>
+
+                            <ng-template #normalMode>
+                              <ng-container *ngIf="column.name === 'Product Description'; else normalTextInput">
+                                <div class="form-control readonly-display-field"
+                                  [innerHTML]="getSafeHtml(getRecordValue(record, 'productDescription'))"
+                                  >
+                                </div>
+                              </ng-container>
+
+                              <ng-template #normalTextInput>
+
+                                <ng-container
+                                  *ngIf="column.name === 'Code' && (record._isLinkNewParent ||  record._isLinkNewItemColor) ">
+                                  <input (focus)="activeRecord = record" #codeInputContainer
+                                    [attr.data-record-id]="record.id" class="position-relative" type="text"
+                                    class="form-control" [ngModel]="getRecordValue(record, 'code')"
+                                    (ngModelChange)="setRecordValue(record, 'code', $event)" [ngClass]="{
+                                        'border-danger': !getRecordValue(record, 'code')
+                                     }" (ngModelChange)="onAssCodeInputChange(record, $event)" />
+                                  <small class="text-danger" *ngIf="!getRecordValue(record, 'code')">
+                                    {{ getExampleTextForCases(record, column.name) }}
+                                  </small>
+
+                                  <ul class="search-dropdown bg-white border position-absolute mt-1  shadow-sm"
+                                    *ngIf="activeRecord === record && record._isLinkNewParent  && linkNewParentItem_Data?.length > 0">
+                                    <li *ngFor="let item of linkNewParentItem_Data"
+                                      (click)="selectSuggestion(record, item)" class="dropdown-item pointer">
+                                      {{item.displayName}}
+                                    </li>
+                                  </ul>
+
+                                  <ul class="search-dropdown bg-white border position-absolute mt-1  shadow-sm"
+                                    *ngIf="activeRecord === record  && record._isLinkNewItemColor && linkNewItemColor_Data?.length > 0">
+                                    <li *ngFor="let item of linkNewItemColor_Data"
+                                      (click)="selectSuggestion(record, item)" class="dropdown-item pointer">
+                                      {{item.displayName}}
+                                    </li>
+                                  </ul>
+
+                                </ng-container>
+
+
+                                <ng-container *ngIf="column.name === 'Color Code' && record._isLinkNewColorLookup">
+                                  <input type="text" class="form-control" [attr.data-record-id]="record.id"
+                                    (focus)="activeRecord = record" #colorCodeInputContainer
+                                    [ngModel]="getRecordValue(record, 'colorCode')"
+                                    (ngModelChange)="onAssCodeInputChange(record, $event)" [ngClass]="{
+                                       'border-danger': isRequiredColumnForCreateNewCase(record, column.name) && 
+                                                        !getRecordValue(record, 'colorCode')
+                                     }" />
+                                  <small class="text-danger" *ngIf="!getRecordValue(record, 'colorCode')">
+                                    {{ getExampleTextForCases(record, column.name) }}
+                                  </small>
+
+                                  <ul class="search-dropdown bg-white border position-absolute mt-1  shadow-sm"
+                                    *ngIf="activeRecord === record   && record._isLinkNewColorLookup  && linkNewColorLookup_Data?.length > 0">
+                                    <li *ngFor="let item of linkNewColorLookup_Data"
+                                      (click)="selectSuggestion(record, item)" class="dropdown-item pointer">
+                                      {{item.displayName}}
+                                    </li>
+                                  </ul>
+                                </ng-container>
+
+                                <input *ngIf="column.name === 'Price Currency Code'" type="text"
+                                  class="form-control link-parent-input force-uppercase"
+                                  [ngModel]="getRecordValue(record, 'priceCurrencyCode')"
+                                  (ngModelChange)="setRecordValue(record, 'priceCurrencyCode', $event?.toUpperCase())" />
+
+
+
+                                <input type="text" class="form-control fit-content-input"
+                                  [ngModel]="getRecordValue(record, column.key)"
+                                  (ngModelChange)="setRecordValue(record, column.key, $event)"
+                                  [disabled]="!(column.name === 'Code' && (record._isLinkingParent || record._isLinkingItemColor || record._isLinkNewParent ||  record._isLinkNewItemColor))"
+                                  [ngClass]="{
+                                     'link-parent-input': column.name === 'Code' && 
+                                                          (record._isLinkingParent || record._isLinkingItemColor  || record._isLinkNewParent ||  record._isLinkNewItemColor)
+                                   }" [hidden]="
+                                     (column.name === 'Code' && (record._isLinkingParent || record._isLinkingItemColor  || record._isLinkNewParent ||  record._isLinkNewItemColor)) ||
+                                     (column.name === 'Color Code' &&(record._isLinkingColorLookup ||  record._isLinkNewColorLookup )) ||
+                                     (column.name === 'Image Folder Name')||
+                                     (column.name === 'Price Currency Code')
+                                   " />
+                              </ng-template>
+                            </ng-template>
+                          </ng-template>
+
+                        </div>
+
+
+                        <!-- image input -->
+                        <!-- <img *ngSwitchCase="'Image Preview'" [src]="getImageUrl(getRecordValue(record, 'imagePreview'))"
+                      width="60" height="60" class="legacy-image-preview" /> -->
+
+                        <a *ngSwitchCase="'Image Preview'" class="selectImageActive">
+                          <ng-container *ngIf="getImageSource(record) as src; else fallback">
+                            <img 
+                              [src]="src"
+                              class="pointer"
+                              #imgRef
+                              [ngStyle]="{
+                                'object-fit': 'cover',
+                                'border-radius.px': 4,
+                                'width.px': 36,
+                                'height.px': 36 / acceptedAspectRatio
+                              }"
+                            />
+                          </ng-container>
+                          
+                          <ng-template #fallback>
+                            <span #fallbackText class="ml-4">-</span>
+                          </ng-template>
+                        </a>
+                      </ng-container>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+          </ng-container>
+        </div>
+        <ng-template #noData>
+          <div class="text-center text-muted py-5">
+            <ng-container *ngIf="loadingMoreRecords; else emptyRecords">
+              Loading {{ activeRecordType === 'Image' ? 'Image' : 'Data' }} Records...
+            </ng-container>
+            <ng-template #emptyRecords>
+              No {{ activeRecordType === 'Image' ? 'Image' : 'Data' }} Records
+            </ng-template>
+          </div>
+        </ng-template>
+
+
+
+        <div class="pb-4 pl-5 border-top pt-4 mt-4 text-right mr-4">
+          <ng-container *ngIf="!isActionInProgress(); else disableBtn">
+            <button class="Next-Btn" (click)="GoNextstep()">
+              {{ "Next" | localize }}
+            </button>
+          </ng-container>
+          <ng-template #disableBtn>
+            <button class="Next-Btn disabled" disabled>
+              {{ "Next" | localize }}
+            </button>
+          </ng-template>
+        </div>
+      </div>
     </div>
-</div> 
-
-<div class="row pl-5 pb-3" *ngIf="uploadingResult?.totalFailedRecords > 0"> 
-  <a class="_download font-weight-bold" (click)="downloadLogFile()"> {{"DownloadtheImportlogfile" | localize}} </a>
-</div>
-
-</div>
-<div class="modal-body thin-scroll p-0 pl-4 uploadStatusContainer">
-    <ng-container *ngIf="uploadingResult">
-<div *ngFor="let record of uploadingResult.excelRecords" class="border-bottom modal-body pb-4 row">
-        <div class="col-10">
-      <h5>{{record.recordType}} {{record.code}} </h5> 
-      <h6>{{record.name}} </h6>
-          <span class="{{record.status| uppercase}}STATUS font-weight-bold"> {{record.errorMessage}}</span>
-     
-</div>
-
-<div class="Status ml-3   pt-2 text-center">
-  <img src="../../../../assets/accounts/importAccounts/{{record.status | uppercase}}.svg" class="pr-2"/>
-  <span class="{{record.status| uppercase}}STATUS font-weight-bold">{{record.status+"STATUS"|uppercase|localize}}  </span>
   </div>
-</div>  
-</ng-container>  
-</div>
-
-<div class="pb-4 pl-5 border-top pt-4 mt-4">
-<button class="btn btn-primary  Next-Btn" (click)="GoNextstep()" >{{"Next" | localize}}</button>
-</div>
-
-</div>
-</div>
-</div>
- 
-
-  <!-- Iteration-8 -->
- 

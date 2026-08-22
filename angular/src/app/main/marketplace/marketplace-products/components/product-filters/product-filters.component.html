@@ -2,8 +2,8 @@
     <!-- stock available -->
 
     <div class="stock-availablity pt-2 d-flex align-items-center justify-content-between px-3">
-        <p class="pt-2 fw-bold fs-6 m-0" style="font-weight: 700">
-            Only Available in Stock
+        <p class="pt-2 fw-bold fs-6 m-0">
+            {{'OnlyAvailableInStock' | localize}}
         </p>
         <div class="switch">
             <p-inputSwitch [(ngModel)]="stockAvailablty" (onChange)="handleStockChange($event)"></p-inputSwitch>
@@ -17,7 +17,8 @@
     <div class="filter-selection">
         <p-accordion [multiple]="true">
             <!-- product list -->
-            <p-accordionTab header="Product List" *ngIf="isSellerIdExists || isFromSellerRoom" [selected]="true">
+            <p-accordionTab [header]="'ProductList' | localize" [selected]="true" *ngIf="isSellerIdExists || isFromSellerRoom">
+                <!-- <p-accordionTab header="Product List" *ngIf="isSellerIdExists || isFromSellerRoom" [selected]="true"> -->
                 <div *ngFor="let list of productList">
                     <button (click)="selectCatalog(list)" [ngClass]="{ 'selectedCatalog': catalogId == list.id  }"
                         class="btn btn-list w-100 d-flex align-items-center justify-content-lg-start">
@@ -28,52 +29,89 @@
 
 
                 <div class="d-flex justify-content-end my-2 mx-4">
-                    <a (click)="handleCatalogSelections.emit('');catalogId=null" class="clrBtn"> Clear Filter</a>
+                    <a (click)="handleCatalogSelections.emit('');catalogId=null" class="clrBtn"> {{'ClearFilter' | localize}}</a>
                 </div>
             </p-accordionTab>
             <!-- product list -->
-            <p-accordionTab header="Departments" [selected]="true">
+            <p-accordionTab [header]="'Departments' | localize" [selected]="true">
 
                 <div class="card flex justify-content-start">
                     <p-tree [styleClass]="selectedFile?.length >0 ? 'bgAdd' : ''"
-                        [ngClass]="selectedFile?.length >0 ? 'bgAdd' : ''" class="w-full md:w-30rem" [value]="files"
-                        (onNodeExpand)="nodeExpand($event)" [loading]="loading" selectionMode="single"
+                        [ngClass]="selectedFile?.length >0 ? 'bgAdd' : ''" class="w-full md:w-30rem" [value]="files" 
+                        (onNodeExpand)="nodeExpand($event)" [loading]="loading" selectionMode="checkbox"
                         (onNodeSelect)="nodeSelect($event)" (onNodeUnselect)="nodeUnselect($event)"
-                        [(selection)]="selectedFile"></p-tree>
+                        [(selection)]="selectedFile">
+                    <ng-template let-node pTemplate="default">
+                        <span>{{ node.label }}</span>
+                    </ng-template>
+                    </p-tree>
                 </div>
                 <div class="d-flex justify-content-end my-2 mx-4">
-                    <a (click)="handledeDratmentsTreeSelections.emit(null);selectedFile=''" class="clrBtn"> Clear
-                        Filter</a>
+                    <a (click)="selectedFile=[]; handledeDratmentsTreeSelections.emit([])" class="clrBtn"> {{'ClearFilter' | localize}}</a>
                 </div>
             </p-accordionTab>
-            <p-accordionTab header="Brands" [selected]="true" *ngIf="isSellerIdExists || isFromSellerRoom">
-                <div *ngFor="let brand of brands" class="d-flex align-items-center justify-content-lg-start px-2">
-                    <p-checkbox name="group1" [value]="brand.value" [(ngModel)]="selctedBradns" inputId="ny"
-                        (onChange)="handlebrandsSelction()"></p-checkbox>
-                    <label for="ny">{{ brand.label }}</label>
-                </div>
 
-                <div class="d-flex justify-content-end my-2 mx-4">
-                    <a (click)="handleBrandsSelection.emit([]);selctedBradns=[]" class="clrBtn"> Clear Filter</a>
+             <!-- brands -->
+             <p-accordionTab [header]="'Brands' | localize" [selected]="true" *ngIf="isSellerIdExists || isFromSellerRoom">
+                <div *ngFor="let brand of brands; let i = index" class="d-flex align-items-center justify-content-lg-start px-2">
+                  <p-checkbox
+                    name="brands"
+                    [value]="brand.value"
+                    [(ngModel)]="selctedBradns"
+                    [inputId]="'brand_' + i"
+                    (onChange)="handlebrandsSelction()"
+                  ></p-checkbox>
+                  <label [for]="'brand_' + i">{{ brand.label }}</label>
                 </div>
-            </p-accordionTab>
-            <p-accordionTab header="Price" [selected]="false">
+              
+                <div class="d-flex justify-content-end my-2 mx-4">
+                  <a (click)="selctedBradns=[]; handlebrandsSelction()" class="clrBtn">
+                    {{'ClearFilter' | localize}}
+                  </a>
+                </div>
+              </p-accordionTab>
+              
+                  <!-- categories -->
+                  <!-- <p-accordionTab [header]="'Categories' | localize" [selected]="true">
+                    <div class="card flex justify-content-start">
+                      <p-tree
+                        [styleClass]="selectedCatFile?.length > 0 ? 'bgAdd' : ''"
+                        class="w-full md:w-30rem"
+                        [value]="categories"
+                        [loading]="loading"
+                        selectionMode="checkbox"
+                        [(selection)]="selectedCatFile"
+                        (onNodeExpand)="nodeCatExpand($event)"
+                        (onNodeSelect)="nodeCatSelect($event)"
+                        (onNodeUnselect)="nodeCatUnselect($event)"
+                      ></p-tree>
+                    </div>
+                  
+                    <div class="d-flex justify-content-end my-2 mx-4">
+                      <a
+                        (click)="selectedCatFile = []; handleCategoriesTreeSelections.emit([])"
+                        class="clrBtn"
+                        >{{'ClearFilter' | localize}}</a
+                      >
+                    </div>
+                  </p-accordionTab>
+                   -->
+            <p-accordionTab [header]="'Price' | localize" [selected]="false">
                 <div class="price">
-                    <input type="number" name="priceFrom" class="form-control" placeholder="from" [(ngModel)]="min"
+                    <input type="number" name="priceFrom" class="form-control" [placeholder]="'From' | localize" [(ngModel)]="min"
                         (keyup)="handleStartPriceTyping($event)" />
-                    <span>Price</span>
-                    <input type="number" name="priceTo" class="form-control" placeholder="to" [(ngModel)]="max"
+                    <span>{{'Price' | localize}}</span>
+                    <input type="number" name="priceTo" class="form-control" [placeholder]="'To' | localize" [(ngModel)]="max"
                         (keyup)="handleEndPriceTyping($event)" />
                 </div>
                 <div class="d-flex justify-content-end my-2 mx-4">
-                    <a (click)="handleStartPrice.emit('');handleEndPrice.emit('');min = '';max=''" class="clrBtn"> Clear
-                        Filter</a>
+                    <a (click)="handleStartPrice.emit('');handleEndPrice.emit('');min = '';max=''" class="clrBtn"> {{'ClearFilter' | localize}}</a>
                 </div>
             </p-accordionTab>
-            <p-accordionTab header="Start Ship Date" [selected]="false">
+            <p-accordionTab [header]="'StartShipDate' | localize" [selected]="false">
                 <div class="ship-date px-3">
                     <div class="from-ship mb-3">
-                        <span class="text">From</span>
+                        <span class="text">{{'From' | localize}}</span>
                         <div class="card flex justify-content-lg-start">
                             <p-calendar appendTo="body" [(ngModel)]="startShipDate" [showIcon]="true"
                                 class="w-100" placeholder="Start Date"
@@ -81,7 +119,7 @@
                         </div>
                     </div>
                     <div class="to-ship">
-                        <span class="text">To</span>
+                        <span class="text">{{'To' | localize}}</span>
                         <div class="card flex justify-content-lg-start">
                             <p-calendar appendTo="body"  class="w-100" [(ngModel)]="endShipDate" [showIcon]="true"
                                 placeholder="End Date" (ngModelChange)="onEndShipDateChange()"></p-calendar>
@@ -90,20 +128,20 @@
                 </div>
                 <div class="d-flex justify-content-end my-2 mx-4">
                     <a (click)="handleEndShipDate.emit(undefined);handleStartShipDate.emit(undefined);endShipDate = undefined;startShipDate=undefined"
-                        class="clrBtn"> Clear Filter</a>
+                        class="clrBtn">{{'ClearFilter' | localize}}</a>
                 </div>
             </p-accordionTab>
-            <p-accordionTab header="Sold-Out Date" [selected]="false">
+            <p-accordionTab [header]="'SoldOutDate' | localize" [selected]="false">
                 <div class="soldout-date px-3">
                     <div class="from-soldout mb-3">
-                        <span class="text">From</span>
+                        <span class="text">{{'From' | localize}}</span>
                         <div class="card flex justify-content-lg-start">
                             <p-calendar appendTo="body" [(ngModel)]="startSoldout" [showIcon]="true"  class="w-100"
                                 placeholder="Start Date" (ngModelChange)="onStartSoldOutDateChange()"></p-calendar>
                         </div>
                     </div>
                     <div class="to-soldout">
-                        <span class="text">To</span>
+                        <span class="text">{{'To' | localize}}</span>
                         <div class="card flex justify-content-lg-start">
                             <p-calendar appendTo="body"  class="w-100" [(ngModel)]="endSoldout" [showIcon]="true"
                                 placeholder="End Date" (ngModelChange)="onEndSoldOutDateChange()"></p-calendar>
@@ -113,13 +151,13 @@
 
                 <div class="d-flex justify-content-end my-2 mx-4">
                     <a (click)="handleEndSoldOutDate.emit(undefined);handleSatrtsoldOutDate.emit(undefined);startSoldout = undefined;endSoldout=undefined"
-                        class="clrBtn"> Clear Filter</a>
+                        class="clrBtn">{{'ClearFilter' | localize}}</a>
                 </div>
             </p-accordionTab>
 
 
             <div class="d-flex justify-content-end my-3 mx-4">
-                <a (click)="clearAllFiltrs()" class="clrBtn"> Clear All Filters</a>
+                <a (click)="clearAllFiltrs()" class="clrBtn"> {{'ClearAllFilters' | localize}}</a>
             </div>
         </p-accordion>
     </div>

@@ -3,3 +3,18 @@
 }
 
 
+.closeIcon-ar {
+    left: 0;
+    width: 60px !important;
+}
+
+.closeIcon-en {
+    right: 0;
+}
+
+::ng-deep {
+    .ngLeft {
+        margin-left: 0 !important;
+        margin-top: 0 !important;
+    }
+}

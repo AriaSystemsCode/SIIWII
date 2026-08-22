@@ -23,6 +23,7 @@ export class LinkedAccountsModalComponent extends AppComponentBase {
     @ViewChild('paginator', {static: true}) paginator: Paginator;
 
     @Output() modalClose: EventEmitter<any> = new EventEmitter<any>();
+    isAuthenticated = this.appSession?.user
 
     constructor(
         injector: Injector,
@@ -35,8 +36,8 @@ export class LinkedAccountsModalComponent extends AppComponentBase {
 
     getLinkedUsers(event?: LazyLoadEvent) {
         this.primengTableHelper.showLoadingIndicator();
-
-        this._userLinkService.getLinkedUsers(
+        if(this.isAuthenticated) {
+                    this._userLinkService.getLinkedUsers(
             this.primengTableHelper.getMaxResultCount(this.paginator, event),
             this.primengTableHelper.getSkipCount(this.paginator, event),
             this.primengTableHelper.getSorting(this.dataTable)
@@ -45,6 +46,8 @@ export class LinkedAccountsModalComponent extends AppComponentBase {
             this.primengTableHelper.records = result.items;
             this.primengTableHelper.hideLoadingIndicator();
         });
+        }
+
     }
 
     getShownLinkedUserName(linkedUser: LinkedUserDto): string {

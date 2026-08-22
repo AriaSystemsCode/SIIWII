@@ -10,12 +10,12 @@ import { ModalModule } from 'ngx-bootstrap/modal';
 import { TabsModule } from 'ngx-bootstrap/tabs';
 import { TreeviewModule } from 'ngx-treeview';
 import {  BulkImportModule } from '../../../../shared/components/import-steps/bulk-import.module';
-import { AccountCardComponent } from './components/account-card.component';
-import { AccountsListFiltersComponent } from './components/accounts-list-filters.component';
-import { AccountsComponent } from './components/accounts.component';
+import { AccountCardComponent } from './components/account-card/account-card.component';
+import { AccountsListFiltersComponent } from './components/accounts-list-filters/accounts-list-filters.component';
+import { AccountsComponent } from './components/accounts/accounts.component';
 import { NgxBootstrapDatePickerConfigService } from 'assets/ngx-bootstrap/ngx-bootstrap-datepicker-config.service';
 import { FiltersSharedModule } from '@app/shared/filters-shared/filters-shared.module';
-import { EmailingTemplateServiceProxy } from '@shared/service-proxies/service-proxies';
+import { CreateMarketplaceAccountServiceProxy, EmailingTemplateServiceProxy } from '@shared/service-proxies/service-proxies';
 import { CheckboxModule } from 'primeng/checkbox';
 import { DropdownModule } from 'primeng/dropdown';
 import { MultiSelectModule } from 'primeng/multiselect';
@@ -24,6 +24,7 @@ import { TableModule } from 'primeng/table';
 import { TabMenuModule } from 'primeng/tabmenu';
 import { TreeModule } from 'primeng/tree';
 import { TreeTableModule } from 'primeng/treetable';
+import { DialogModule } from 'primeng/dialog';
 
 
 @NgModule({
@@ -53,13 +54,15 @@ import { TreeTableModule } from 'primeng/treetable';
         TreeModule,
         CheckboxModule,
        BulkImportModule,
-        FiltersSharedModule
+        FiltersSharedModule,
+        DialogModule
     ],
     providers: [
         { provide: BsDatepickerConfig, useFactory: NgxBootstrapDatePickerConfigService.getDatepickerConfig },
         { provide: BsDaterangepickerConfig, useFactory: NgxBootstrapDatePickerConfigService.getDaterangepickerConfig },
         { provide: BsLocaleService, useFactory: NgxBootstrapDatePickerConfigService.getDatepickerLocale },
-        EmailingTemplateServiceProxy
+        EmailingTemplateServiceProxy,
+        CreateMarketplaceAccountServiceProxy
     ],
     exports: [
         AccountsComponent,

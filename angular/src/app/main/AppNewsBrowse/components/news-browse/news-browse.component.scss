@@ -1,8 +1,173 @@
-.app-items-container{
+.app-items-container {
     overflow-y: auto;
     overflow-x: hidden;
-    height: 1000px;
     width: 100%;
-    // max-height: 100%;
-    // min-height: 800px;
+}
+
+.filterSec {
+    padding: 12px 12px 44px;
+    background: #FFFFFF;
+    border: 1px solid rgba(238, 238, 238, 0.933333);
+    border-radius: 12px;
+}
+
+.resetBtn {
+
+    padding: 11px 10px;
+    background: #FFFFFF;
+    border: 1px solid #EEEEEE;
+    box-shadow: 1px 1px 6px rgba(22, 22, 22, 0.05);
+    border-radius: 6px;
+    color: #4A0D4A;
+
+    i {
+        color: #4A0D4A;
+        fill: #4A0D4A;
+    }
+
+
+}
+
+.toggleBtn {
+
+    padding: 11px 10px;
+    background: #4A0D4A;
+    box-shadow: 1px 1px 6px rgba(22, 22, 22, 0.05);
+    border-radius: 6px;
+
+    color: #fff;
+
+    i {
+        color: #fff;
+        fill: #fff;
+    }
+
+
+}
+
+::ng-deep {
+
+    .form-control,
+    .form-control:focus,
+    .form-control:active {
+        border: 1px solid #D9D9D9 !important;
+        border-radius: 10px !important;
+    }
+
+}
+
+.list-toolbar-data-summary {
+    color: #9E9E9E;
+    font-weight: 600;
+}
+
+
+
+
+/* Mobile Filters Dialog as Bottom Sheet */
+:host ::ng-deep .mobile-filters-dialog {
+    width: 100vw !important;
+    max-width: 100vw !important;
+    margin: 0 !important;
+}
+
+:host ::ng-deep .mobile-filters-dialog .p-dialog {
+    margin: 0 !important;
+}
+
+:host ::ng-deep .mobile-filters-dialog .p-dialog-content {
+    padding: 0 !important;
+    border-top-left-radius: 16px;
+    border-top-right-radius: 16px;
+    overflow: hidden;
+}
+
+:host ::ng-deep .mobile-filters-dialog.p-dialog {
+    position: fixed !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    top: auto !important;
+    border-radius: 16px 16px 0 0;
+}
+
+.mobile-filters-body {
+    max-height: calc(75vh - 120px);
+    overflow: auto;
+}
+
+.mobile-filters-footer {
+    background: #fff;
+}
+
+/* Hide dialog on md+ (optional safety) */
+@media (min-width: 768px) {
+    :host ::ng-deep .mobile-filters-dialog {
+        display: none !important;
+    }
+}
+
+.applyBtn {
+    background-color: #4A0D4A !important;
+    color: #fff !important;
+}
+
+.sortBy {
+
+padding: 10px 12px;
+background: #FFFFFF;
+border: 1px solid #D9D9D9;
+border-radius: 10px;
+
+
+}
+.filterBtn {
+    color: #1B101B;
+    border-radius: 6px !important;
+    border: 1px solid #EBEBEB !important;
+    background: #FFF !important;
+    box-shadow: 1px 1px 6px 0px rgba(22, 22, 22, 0.05) !important;
+    color: #1B101B !important;
+    height: 43px;
+  
+  }
+
+  
+  ::ng-deep  {
+    @media only screen and (min-width: 575px) and (max-width: 1024x) {
+      .kt-container {
+        padding: 1px 0px 0px 15px !important;
+        
+      }
+  }
+  }
+
+  .bodySec {
+    padding: 14px;
+    background: #FFFFFF;
+    border: 1px solid #EEEEEE;
+    box-shadow: 4px 4px 10px rgba(22, 22, 22, 0.15);
+    border-radius: 20px;
+    
+    }
+    .sortByDd {
+        border: 1px solid #d9d9d9;
+        padding: 10px 30px !important;
+        border-radius: 10px;
+      }
+      
+
+
+.left-aside-filters {
+
+padding: 12px ;
+background: #FFFFFF;
+border: 1px solid rgba(238, 238, 238, 0.933333);
+border-radius: 12px;
+
+}
+      
+
+.filterBtn{
+    border: 1px solid #EEEEEE;
 }

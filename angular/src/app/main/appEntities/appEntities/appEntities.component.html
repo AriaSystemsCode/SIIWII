@@ -1,5 +1,6 @@
 ﻿<div [@routerTransition]>
-    <div class="kt-content  kt-grid__item kt-grid__item--fluid kt-grid kt-grid--hor" id="lookups">
+    <div class="kt-content kt-grid__item kt-grid__item--fluid kt-grid kt-grid--hor lookups-page" id="lookups"
+        [class.lookups-page--arabic]="isArabic">
          <div class="kt-subheader kt-grid__item">
             <div [class]="containerClass">
                 <div class="kt-subheader__main">
@@ -22,22 +23,21 @@
                 </div>  -->
             </div>
         </div>
-        <div [class]="containerClass + ' kt-grid__item kt-grid__item--fluid'" style="margin-top: 17px;">
+        <div [class]="containerClass + ' kt-grid__item kt-grid__item--fluid lookups-page__content'">
 
-                <div class="kt-portlet kt-portlet--mobile" style="display: none;">
+                <div class="kt-portlet kt-portlet--mobile lookups-page__legacy-mobile">
                     <div class="kt-portlet__body body-according">
-                        <p-accordion [style]="{'position': 'absolute', 'margin-bottom': '20px'}">
-                            <p-accordionTab header="Phone Types" [selected]="true" (click)="tabChanged(tabs[0])" style="position: relative;">
+                        <p-accordion class="lookups-accordion lookups-accordion--legacy">
+                            <p-accordionTab header="Phone Types" [selected]="true" (click)="tabChanged(tabs[0])" styleClass="lookups-accordion__tab">
                                 <span class="kt-subheader__desc according_desc according_desc-17">
                                     {{l("CreatenewEntityObjectType")}}
                                 </span>
-                                <div class="kt-subheader__toolbar" style="position: absolute;right: 5px ;top:
-                                0;">
+                                <div class="kt-subheader__toolbar accordion-toolbar accordion-toolbar--legacy">
                                     <div class="kt-subheader__wrapper" *ngIf="currTab && currTab.id == tabs[0].id ">
                                         <button (click)="exportToExcel()"
-                                            class="btn btn-outline-success btn-white">{{l("ExportToExcel")}}</button>
+                                            class="btn btn-outline-success btn-white action-btn action-btn--secondary">{{l("ExportToExcel")}}</button>
                                         <button *ngIf="currTab && currTab.id == tabs[0].id && isGranted('Pages.AppEntities.Create')" (click)="createOrEditAppEntity($event)"
-                                            class="btn btn-primary  btn-blue-create btn-p-21"> {{l("CreateNew")}}
+                                            class="btn btn-primary btn-blue-create btn-p-21 action-btn action-btn--primary"> {{l("CreateNew")}}
                                             {{ currTab.label}}</button>
                                     </div>
                                 </div>
@@ -49,8 +49,7 @@
                                                     <div class="input-group">
                                                         <input [(ngModel)]="filterText" name="filterText" autoFocus class="form-control m-input aria-input-text" [placeholder]="l('SearchWithThreeDot')" type="text">
                                                         <span class="input-group-btn input-search">
-                                                            <button (click)="getAppEntities()" class="btn btn-primary btn-search" type="submit"><i class="flaticon-search-1 icon-search" style="background-color: #4A0D4A !important;
-                                                                border: #4A0D4A !important;"></i></button>
+                                                            <button (click)="getAppEntities()" class="btn btn-primary btn-search btn-search--brand" type="submit"><i class="flaticon-search-1 icon-search search-icon-brand"></i></button>
                                                         </span>
                                                     </div>
                                                 </div>
@@ -96,27 +95,27 @@
                                             [value]="primengTableHelper.records"
                                             rows="{{primengTableHelper.defaultRecordsCountPerPage}}" [paginator]="false"
                                             [lazy]="true" [scrollable]="true" ScrollWidth="100%"
-                                            responsiveLayout="stack" [breakpoint]="'960px'" [tableStyle]="{'min-width': '50rem'}"
+                                            responsiveLayout="stack" [breakpoint]="'960px'" styleClass="lookup-table"
                                             [resizableColumns]="primengTableHelper.resizableColumns">
                                             <ng-template pTemplate="header">
                                                 <tr>
-                                                    <th style="width: 150px" pSortableColumn="name">
+                                                    <th class="lookup-table__col" pSortableColumn="name">
                                                         {{l('Name')}}
                                                         <p-sortIcon field="appEntity.name"></p-sortIcon>
                                                     </th>
-                                                    <th style="width: 150px" pSortableColumn="code">
+                                                    <th class="lookup-table__col" pSortableColumn="code">
                                                         {{l('Code')}}
                                                         <p-sortIcon field="appEntity.code"></p-sortIcon>
                                                     </th>
-                                                    <th style="width: 150px" pSortableColumn="Notes">
+                                                    <th class="lookup-table__col" pSortableColumn="Notes">
                                                         {{l('Notes')}}
                                                         <p-sortIcon field="appEntity.notes"></p-sortIcon>
                                                     </th>
-                                                    <th style="width: 150px" pSortableColumn="isDefault">
+                                                    <th class="lookup-table__col" pSortableColumn="isDefault">
                                                         {{l('Is Default')}}
                                                         <p-sortIcon field="appEntity.isDefault"></p-sortIcon>
                                                     </th>
-                                                    <th style="width: 130px"
+                                                    <th class="lookup-table__col lookup-table__col--actions"
                                                         [hidden]="!isGrantedAny('Pages.AppEntities.Edit', 'Pages.AppEntities.Delete')">
                                                         {{l('Actions')}}</th>
 
@@ -126,30 +125,30 @@
                                             </ng-template>
                                             <ng-template pTemplate="body" let-record="$implicit">
                                                 <tr>
-                                                    <td style="width:150px">
+                                                    <td class="lookup-table__col">
                                                         <span class="p-column-title"> {{l('Name')}}</span>
 
                                                         <span>{{record.appEntity.name}}</span>
                                                     </td>
-                                                    <td style="width:150px">
+                                                    <td class="lookup-table__col">
                                                         <span class="p-column-title"> {{l('Code')}}</span>
 
                                                         <span>{{record.appEntity.code}}</span>
                                                     </td>
-                                                    <td style="width:150px">
+                                                    <td class="lookup-table__col">
                                                         <span class="p-column-title"> {{l('Notes')}}</span>
 
                                                         <span>{{record.appEntity.notes}}</span>
                                                     </td>
-                                                    <td style="width:150px">
+                                                    <td class="lookup-table__col">
                                                         <span class="p-column-title"> {{l('Is Default')}}</span>
 
                                                         <span>{{record.appEntity?.isDefault}}</span>
                                                     </td>
                                                     
-                                                    <td style="width: 130px"
+                                                    <td class="lookup-table__col lookup-table__col--actions"
                                                         [hidden]="!isGrantedAny('Pages.AppEntities.Edit', 'Pages.AppEntities.Delete')">
-                                                        <div class="btn-group dropdown " dropdown container="body" insideClick="false">
+                                                        <div class="btn-group dropdown " dropdown container="body" insideClick="false" #closeDropdown="bs-dropdown">
 
                                                             <button class="dropdown-toggle btn btn-sm btn-action"
                                                                 dropdownToggle>
@@ -162,15 +161,15 @@
                                                                 <li>
                                                                     <a href="javascript:;"
                                                                         *ngIf="permission.isGranted('Pages.AppEntities.Edit')"
-                                                                        (click)="createOrEditAppEntity($event,record.appEntity.id)">{{l('Edit')}}</a>
+                                                                        (click)="createOrEditAppEntity($event,record.appEntity.id, closeDropdown)">{{l('Edit')}}</a>
                                                                 </li>
                                                                 <li>
                                                                     <a href="javascript:;"
                                                                         *ngIf="permission.isGranted('Pages.AppEntities.Delete')"
-                                                                        (click)="deleteAppEntity(record.appEntity)">{{l('Delete')}}</a>
+                                                                        (click)="deleteAppEntity(record.appEntity, closeDropdown)">{{l('Delete')}}</a>
                                                                 </li>
                             <li>
-                                <a href="javascript:;"  *ngIf="permission.isGranted('Pages.AppEntities.Edit') && !record.appEntity.isDefault" (click)="setAsDefault(record)">Set as default</a>
+                                <a href="javascript:;"  *ngIf="permission.isGranted('Pages.AppEntities.Edit') && !record.appEntity.isDefault" (click)="setAsDefault(record, closeDropdown)">Set as default</a>
                             </li>
                                                                 <li>
                                                                     <a href="javascript:;" *ngIf="entityHistoryEnabled"
@@ -213,24 +212,18 @@
                     <p-accordion>
 
                         <p-accordionTab  *ngFor="let item of tabs;let i=index;" [selected]="i==0" header="{{item.label}}"
-                                (onOpen)="onTabOpen($event,item)" (click)="tabChanged(item)" style="position: relative;">
+                                (onOpen)="onTabOpen($event,item)" (click)="tabChanged(item)" styleClass="lookups-accordion__tab">
                             <div class="kt-portlet kt-portlet--mobile">
-                                <div class="kt-portlet__body body-according" style="margin-top: -33px;position: relative;">
+                                <div class="kt-portlet__body body-according accordion-body">
                                     <span class="kt-subheader__desc according_desc according_desc-{{item.id}}">
                                         {{l("CreatenewEntityObjectType")}}
                                     </span>
-                                    <div class="kt-subheader__toolbar" style="position: absolute;right: 5px ;
-                                    top: -51px;">
+                                    <div class="kt-subheader__toolbar accordion-toolbar">
                                         <div class="kt-subheader__wrapper" *ngIf="currTab && currTab.id == item.id ">
                                             <button (click)="exportToExcel()"
-                                                class="btn btn-outline-success btn-white" style="border-radius: 5px;
-                                                background-color: white !important;
-                                                border: 1px solid #4A0D4A !important;
-                                                color: #4A0D4A !important;">{{l("ExportToExcel")}}</button>
-                                            <button  style="border-radius: 5px;
-                                            background-color: #4A0D4A !important;
-                                            border: #4A0D4A !important;color: white;" *ngIf="currTab && currTab.id == item.id && isGranted('Pages.AppEntities.Create')" (click)="createOrEditAppEntity($event)"
-                                                class="btn btn-primary  btn-blue-create btn-p-21"> {{l("CreateNew")}}
+                                                class="btn btn-outline-success btn-white action-btn action-btn--secondary">{{l("ExportToExcel")}}</button>
+                                            <button *ngIf="currTab && currTab.id == item.id && isGranted('Pages.AppEntities.Create')" (click)="createOrEditAppEntity($event)"
+                                                class="btn btn-primary btn-blue-create btn-p-21 action-btn action-btn--primary"> {{l("CreateNew")}}
                                                 {{ currTab.label}}</button>
                                         </div>
                                     </div>
@@ -242,8 +235,7 @@
                                                         <div class="input-group">
                                                             <input [(ngModel)]="filterText" name="filterText" autoFocus class="form-control m-input aria-input-text" [placeholder]="l('SearchWithThreeDot')" type="text">
                                                             <span class="input-group-btn input-search">
-                                                                <button (click)="getAppEntities()" class="btn btn-primary btn-search" type="submit" style="background-color: #4A0D4A !important;
-                                                                border: #4A0D4A !important;"><i class="flaticon-search-1 icon-search"></i></button>
+                                                                <button (click)="getAppEntities()" class="btn btn-primary btn-search btn-search--brand" type="submit"><i class="flaticon-search-1 icon-search"></i></button>
                                                             </span>
                                                         </div>
                                                     </div>
@@ -290,27 +282,27 @@
                                                 [value]="primengTableHelper.records"
                                                 rows="{{primengTableHelper.defaultRecordsCountPerPage}}"
                                                 [paginator]="false" [lazy]="true" [scrollable]="true" ScrollWidth="100%"
-                                                responsiveLayout="stack" [breakpoint]="'960px'" [tableStyle]="{'min-width': '50rem'}"
+                                                responsiveLayout="stack" [breakpoint]="'960px'" styleClass="lookup-table"
                                                 [resizableColumns]="primengTableHelper.resizableColumns">
                                                 <ng-template pTemplate="header">
                                                     <tr>
-                                                        <th style="width: 150px" pSortableColumn="name">
+                                                        <th class="lookup-table__col" pSortableColumn="name">
                                                             {{l('Name')}}
                                                             <p-sortIcon field="appEntity.name"></p-sortIcon>
                                                         </th>
-                                                        <th style="width: 150px" pSortableColumn="code">
+                                                        <th class="lookup-table__col" pSortableColumn="code">
                                                             {{l('Code')}}
                                                             <p-sortIcon field="appEntity.code"></p-sortIcon>
                                                         </th>
-                                                        <th style="width: 150px" pSortableColumn="Notes">
+                                                        <th class="lookup-table__col" pSortableColumn="Notes">
                                                             {{l('Notes')}}
                                                             <p-sortIcon field="appEntity.notes"></p-sortIcon>
                                                         </th>
-                                                        <th style="width: 150px" pSortableColumn="isDefault">
-                                                            {{l('Is Default')}}
+                                                        <th class="lookup-table__col" pSortableColumn="isDefault">
+                                                            {{l('IsDefault')}}
                                                             <p-sortIcon field="appEntity.isDefault"></p-sortIcon>
                                                         </th>
-                                                        <th style="width: 130px"
+                                                        <th class="lookup-table__col lookup-table__col--actions"
                                                             [hidden]="!isGrantedAny('Pages.AppEntities.Edit', 'Pages.AppEntities.Delete')">
                                                             {{l('Actions')}}</th>
 
@@ -320,31 +312,31 @@
                                                 </ng-template>
                                                 <ng-template pTemplate="body" let-record="$implicit" >
                                                     <tr>
-                                                        <td style="width:150px">
+                                                        <td class="lookup-table__col">
                                                             <span class="p-column-title"> {{l('Name')}}</span>
                                                             <span>{{record.appEntity.name}}</span>
                                                         </td>
-                                                        <td style="width:150px">
+                                                        <td class="lookup-table__col">
                                                             <span class="p-column-title"> {{l('Code')}}</span>
 
                                                             <span>{{record.appEntity.code}}</span>
                                                         </td>
-                                                        <td style="width:150px">
+                                                        <td class="lookup-table__col">
                                                             <span class="p-column-title"> {{l('Notes')}}</span>
 
                                                             <span>{{record.appEntity.notes}}</span>
 
                                                         </td>
-                                                        <td style="width:150px">
+                                                        <td class="lookup-table__col">
                                                             <span class="p-column-title"> {{l('Is Default')}}</span>
 
                                                             <span>{{record.appEntity.isDefault ? 'Yes' : '-'}}</span>
 
                                                         </td>
-                                                        <td style="width: 130px"
+                                                        <td class="lookup-table__col lookup-table__col--actions"
                                                             [hidden]="!isGrantedAny('Pages.AppEntities.Edit', 'Pages.AppEntities.Delete')">
                                                             <ng-container *ngIf="(appSession.tenantId == null  && record.appEntity.isHostRecord) || (appSession.tenantId != null && !record.appEntity.isHostRecord)">
-                                                                <div  class="btn-group dropdown " dropdown container="body"  >
+                                                                <div  class="btn-group dropdown " dropdown container="body" #closeDropdown="bs-dropdown" >
 
                                                                     <button
                                                                         class="dropdown-toggle btn btn-sm btn-action"
@@ -358,7 +350,7 @@
                                                                         <li>
                                                                             <a href="javascript:;"
                                                                                 *ngIf="permission.isGranted('Pages.AppEntities.Edit')"
-                                                                                (click)="createOrEditAppEntity($event,record.appEntity.id)">{{l('Edit')}}</a>
+                                                                                (click)="createOrEditAppEntity($event,record.appEntity.id, closeDropdown)">{{l('Edit')}}</a>
                                                                         </li>
                                                                         <!-- <li>
                                                                             <a href="javascript:;"
@@ -368,10 +360,10 @@
                                                                         <li>
                                                                             <a href="javascript:;"
                                                                                 *ngIf="permission.isGranted('Pages.AppEntities.Delete')"
-                                                                                (click)="deleteEntity(record.appEntity)">{{l('Delete')}}</a>
+                                                                                (click)="deleteEntity(record.appEntity, closeDropdown)">{{l('Delete')}}</a>
                                                                         </li>
                                                                         <li>
-                                                                            <a href="javascript:;"  *ngIf="permission.isGranted('Pages.AppEntities.Edit') && !record.appEntity.isDefault" (click)="setAsDefault(record)">Set as default</a>
+                                                                            <a href="javascript:;"  *ngIf="permission.isGranted('Pages.AppEntities.Edit') && !record.appEntity.isDefault" (click)="setAsDefault(record, closeDropdown)">Set as default</a>
                                                                         </li>
                                                                         <li>
                                                                             <a href="javascript:;"

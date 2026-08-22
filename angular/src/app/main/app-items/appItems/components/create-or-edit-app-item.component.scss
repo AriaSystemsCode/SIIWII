@@ -35,6 +35,299 @@
     width: 6rem;
 }
 
+:host ::ng-deep .editor-height-300 .ql-container {
+    height: 300px;
+}
+
+.textarea-white-bg {
+    background-color: #fff !important;
+}
+
+.image-wrapper-variant {
+    border: 1px solid #4a0d4a !important;
+    margin-bottom: 115px !important;
+    border-radius: 12px !important;
+}
+
+.header-bg-soft {
+    background-color: #eeeeee !important;
+}
+
+.action-btn-cancel {
+    border-radius: 5px;
+    background-color: #fff !important;
+    border: 1px solid #fff !important;
+    color: #4a0d4a !important;
+}
+
+.action-btn-save,
+.advanced-pricing-btn,
+.create-variation-btn,
+.edit-variations-btn {
+    border-radius: 5px;
+    background-color: #4a0d4a !important;
+    border: 1px solid #4a0d4a !important;
+    color: #fff !important;
+    width: 140px;
+    min-width: 140px;
+    justify-content: center;
+    display: inline-flex;
+}
+
+.remove-all-btn {
+    border-radius: 5px;
+    background-color: #F6851D !important;
+    border: 1px solid #F6851D !important;
+    color: #fff !important;
+}
+
+.section-title-box {
+    background-color: #eeeeee !important;
+    border-radius: 5px;
+}
+
+.input-bg-soft {
+    background-color: #eeeeee !important;
+}
+
+.link-primary-purple {
+    color: #4a0d4a !important;
+    cursor: pointer;
+}
+
+.box-rounded-12 {
+    border-radius: 12px;
+}
+
+.box-rounded-6 {
+    border-radius: 6px;
+}
+
+.price-gap {
+    gap: 20px;
+}
+
+.attachment-copy {
+    font-weight: bold;
+    color: black;
+    white-space: nowrap;
+}
+
+.attachment-aspect-note {
+    color: #f6851d !important;
+}
+
+.default-image-link {
+    border: 1px solid #eeeeee !important;
+    border-radius: 12px;
+}
+
+.visible-marketplace-toggle {
+    position: absolute;
+    bottom: -100px;
+}
+
+.border-none {
+    border: none !important;
+}
+
+.pointer-none {
+    pointer-events: none;
+}
+
+.variation-required-note {
+    color: #5f6368;
+    font-size: 11px;
+    margin-left: 20px;
+}
+
+.arabic-top-padding {
+    padding-top: 100px;
+}
+
+@media (max-width: 1024px) {
+    .custom-header {
+        margin-left: 0;
+    }
+
+    .image-wrapper {
+        width: 100%;
+        margin-right: 1rem;
+    }
+
+    .visible-marketplace-toggle {
+        position: static;
+        display: block;
+        margin-top: 0.5rem;
+    }
+
+    .row.align-items-baseline {
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+    }
+
+    .row.align-items-baseline > [class*='col-'] {
+        margin-bottom: 0.75rem;
+    }
+
+    .box-rounded-6 {
+        display: inline-flex;
+        width: 100%;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+    }
+}
+
+@media (max-width: 992px) {
+    .kt-subheader__wrapper {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        width: 100%;
+    }
+
+    .kt-subheader__wrapper > .action-btn-cancel,
+    .kt-subheader__wrapper > .action-btn-save,
+    .kt-subheader__wrapper > .btn {
+        flex: 1 1 calc(50% - 8px);
+        min-width: 180px;
+        margin: 0 !important;
+        text-align: center;
+    }
+
+    .kt-portlet__body > .row.align-items-baseline.mb-4.border.p-4.rounded-lg.box-rounded-12 {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: flex-start !important;
+        padding: 1rem !important;
+    }
+
+    .kt-portlet__body > .row.align-items-baseline.mb-4.border.p-4.rounded-lg.box-rounded-12 > div {
+        width: 100%;
+        max-width: 100%;
+    }
+
+    .aria-tag-wrapper {
+        padding-left: 0.5rem !important;
+        padding-right: 0.5rem !important;
+        max-height: 240px;
+    }
+
+    .wide-drop-down,
+    .wide-drop-down .form-control {
+        width: 100%;
+    }
+}
+
+@media (max-width: 768px) {
+    .kt-subheader {
+        margin-left: 0 !important;
+    }
+
+    .kt-subheader__main,
+    .kt-subheader__toolbar,
+    .kt-subheader__wrapper {
+        width: 100%;
+    }
+
+    .kt-subheader__wrapper {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .action-btn-cancel,
+    .action-btn-save,
+    .advanced-pricing-btn,
+    .create-variation-btn,
+    .edit-variations-btn,
+    .remove-all-btn {
+        width: 100%;
+        margin: 0 !important;
+    }
+
+    .box-rounded-12,
+    .box-rounded-6 {
+        border-radius: 8px;
+    }
+
+    .price-gap {
+        gap: 12px;
+    }
+
+    .attachment-copy,
+    .variation-required-note {
+        white-space: normal;
+    }
+
+    .arabic-top-padding {
+        padding-top: 72px;
+    }
+
+    .row.mt-4.pl-5.ml-5 {
+        margin-left: 0 !important;
+        padding-left: 0.75rem !important;
+        padding-right: 0.75rem !important;
+    }
+
+    .custom-header .hint {
+        margin-left: 0 !important;
+        padding-left: 1rem !important;
+        padding-right: 1rem;
+    }
+
+    .row.align-items-baseline > .col-lg-2,
+    .row.align-items-baseline > .col-md-3,
+    .row.align-items-baseline > .col-sm-4,
+    .row.align-items-baseline > .col-6 {
+        flex: 0 0 100%;
+        max-width: 100%;
+    }
+
+    .link-primary-purple,
+    .text-primary.pointer.font-weight-bold {
+        display: inline-block;
+        width: 100%;
+        text-align: center;
+    }
+
+    .hint.w-50.ml-3 {
+        width: 100% !important;
+        margin-left: 0 !important;
+    }
+
+    .add-new-lookup-btn.ml-3 {
+        margin-left: 0 !important;
+        margin-top: 0.5rem;
+        display: inline-block;
+    }
+
+    .custom-tab {
+        padding-inline: 0;
+    }
+}
+
+@media (max-width: 576px) {
+    .price {
+        width: 100%;
+    }
+
+    .image-wrapper,
+    .image-wrapper-variant {
+        height: auto;
+        min-height: 230px;
+        margin-right: 0;
+    }
+
+    .kt-subheader__wrapper > .action-btn-cancel,
+    .kt-subheader__wrapper > .action-btn-save,
+    .kt-subheader__wrapper > .btn {
+        flex: 1 1 100%;
+        min-width: 0;
+    }
+}
+
 
 
 .cancel {
@@ -104,6 +397,8 @@
     .view-img-overlay {
         opacity: 0;
         z-index: 0;
+        border: 1px solid;
+        border-radius: 12px !important;
         @extend %transition-all-3ms;
     }
 
@@ -148,7 +443,7 @@
 .select-default-image {
     display: none;
     position: absolute;
-    bottom: -45px;
+    bottom: -50px;
 }
 
 .item-photos {
@@ -174,7 +469,7 @@ textarea.ng-pristine.ng-invalid.ng-touched {
 
 .aria-tag-wrapper {
     max-height: 300px;
-    overflow-y: scroll;
+    overflow-y: auto;
 }
 
 .text-danger {
@@ -201,4 +496,12 @@ textarea.ng-pristine.ng-invalid.ng-touched {
 
 .text-purple{
     color: #4A0D4A !important;
+}
+
+
+::ng-deep {
+    .ngLeft {
+        margin-left: 0 !important;
+        margin-top: 0 !important;
+    }
 }

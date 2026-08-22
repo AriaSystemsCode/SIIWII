@@ -26,6 +26,7 @@ using onetouch.AppEntities.Dtos;
 using onetouch.SycIdentifierDefinitions;
 using Abp.Localization;
 using onetouch.Localization;
+using System.Globalization;
 
 namespace onetouch.SystemObjects
 {
@@ -61,6 +62,7 @@ namespace onetouch.SystemObjects
         }
         public async Task<string> GetDefaultLanguage()
         {
+            return CultureInfo.CurrentUICulture.Name;
             string name = "en";
             var defaultLanguage = await _lookup_ApplicationLanguages.GetDefaultLanguageOrNullAsync(AbpSession.TenantId);
             if (defaultLanguage != null) { name = defaultLanguage.Name; }
@@ -90,11 +92,14 @@ namespace onetouch.SystemObjects
                     // load xml ExtraData
                     var serializer = new XmlSerializer(typeof(ItemExtraAttributes));
                     ItemExtraAttributes result;
-                    using (TextReader reader = new StringReader(item.ExtraAttributes))
+                    try
                     {
-                        result = (ItemExtraAttributes)serializer.Deserialize(reader);
-                        type.ExtraAttributes = result;
-                    }
+                        using (TextReader reader = new StringReader(item.ExtraAttributes))
+                        {
+                            result = (ItemExtraAttributes)serializer.Deserialize(reader);
+                            type.ExtraAttributes = result;
+                        }
+                    }catch(Exception ex) { }
                 }
                 newList.Add(type);
 
@@ -103,14 +108,17 @@ namespace onetouch.SystemObjects
             return newList;
         }
 
-        public async Task<List<GetAllEntityObjectTypeOutput>> GetAllWithExtraAttributesByCode(string code)
+        public async Task<List<GetAllEntityObjectTypeOutput>> GetAllWithExtraAttributesByCode(string code, string objectCode="")
         {
             var type = await _sycEntityObjectTypeRepository.FirstOrDefaultAsync(x => x.Code == code && (x.TenantId == null || x.TenantId == AbpSession.TenantId));
             //XX
             if (type ==null)
                 return new List<GetAllEntityObjectTypeOutput>();
             //XX
-            var list = await _lookup_sycEntityObjectTypeRepository.GetAll().Where(x => x.TenantId == null && (x.Code == code)).FirstOrDefaultAsync();
+            var list = await _lookup_sycEntityObjectTypeRepository.GetAll()
+                .Where(x => x.TenantId == null && (x.Code == code))
+                .WhereIf(!string.IsNullOrEmpty(objectCode), x => x.ObjectCode == objectCode)
+                .FirstOrDefaultAsync();
             if (list != null)
                 return await GetAllWithExtraAttributes(list.Id);
             else
@@ -127,13 +135,10 @@ namespace onetouch.SystemObjects
         {
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
             {
-                var defaultLang = GetDefaultLanguage().Result;
+                var defaultLang = await GetDefaultLanguage();
 
                 var filteredSycEntityObjectTypes = _sycEntityObjectTypeRepository.GetAll()
-                            .Include(e => e.ObjectFk)
-                            .Include(e => e.ParentFk)
-                            .Include(e => e.SycEntityObjectTypes)
-                            .Include(e => e.SycIdentifierDefinitionFK)
+                            .AsNoTracking()
                             .WhereIf(input.Hidden != null, e => e.Hidden == null || (e.Hidden != null && (bool)e.Hidden == (bool)input.Hidden))
                             .WhereIf(!string.IsNullOrWhiteSpace(input.Filter), e => false || e.Code.Contains(input.Filter) || e.Name.Contains(input.Filter) || e.ExtraAttributes.Contains(input.Filter))
                             .WhereIf(!string.IsNullOrWhiteSpace(input.CodeFilter), e => e.Code == input.CodeFilter)
@@ -149,52 +154,95 @@ namespace onetouch.SystemObjects
                             .WhereIf(input.ParentIds?.Length > 0, e => input.ParentIds.Contains((long)e.ParentId))
                             .Where(x => x.TenantId == AbpSession.TenantId || x.TenantId == null);
 
-                var pagedAndFilteredSycEntityObjectTypes = filteredSycEntityObjectTypes
-                    .OrderBy(input.Sorting ?? "id asc")
-                    .PageBy(input);
-
-                var sycEntityObjectTypes = from o in pagedAndFilteredSycEntityObjectTypes
-                                           join o1 in _lookup_sydObjectRepository.GetAll() on o.ObjectId equals o1.Id into j1
-                                           from s1 in j1.DefaultIfEmpty()
-
-                                           join o2 in _lookup_sycEntityObjectTypeRepository.GetAll() on o.ParentId equals o2.Id into j2
-                                           from s2 in j2.DefaultIfEmpty()
-
-                                           join o3 in _lookup_ApplicationLanguageText.GetAll() on ("SYCENTITYOBJECTTYPES-NAME-" + o.Id.ToString() + "-" + o.Name).Trim().ToUpper() equals o3.Key into j3
-                                           from s3 in j3.DefaultIfEmpty()
-
-                                           join o4 in _lookup_ApplicationLanguageText.GetAll() on (s2 != null ? "SYCENTITYOBJECTTYPES-NAME-" + s2.Id.ToString() + "-" + s2.Name : "XXX").Trim().ToUpper() equals o4.Key into j4
-                                           from s4 in j4.DefaultIfEmpty()
-
-                                           where s3.LanguageName == defaultLang && ((s2 != null && s4.LanguageName == defaultLang) || (s2 == null))
-
-                                           select new TreeNode<GetSycEntityObjectTypeForViewDto>()
-                                           {
-                                               Data = new GetSycEntityObjectTypeForViewDto
-                                               {
-                                                   SycEntityObjectType = new SycEntityObjectTypeDto
-                                                   {
-                                                       Code = o.Code,
-                                                       Name = s3 == null ? o.Name : s3.Value.Trim(),
-                                                       ExtraAttributes = o.ExtraAttributes,
-                                                       Id = o.Id
-                                                   },
-                                                   SydObjectName = s1 == null ? "" : s1.Name.ToString(),
-                                                   SycEntityObjectTypeName = s2 == null ? "" : s4 == null ? s2.Name.ToString() : s4.Value,
-                                                   IdentifierCode = o.SycIdentifierDefinitionFK == null ? "" : o.SycIdentifierDefinitionFK.Code,
-
-                                               },
-                                               Leaf = o.SycEntityObjectTypes.Count() == 0,
-                                               label = s3 == null ? o.Name : s3.Value.Trim()
-                                           };
-
                 var totalCount = await filteredSycEntityObjectTypes.CountAsync();
+
+                var page = await filteredSycEntityObjectTypes
+                    .OrderBy(input.Sorting ?? "id asc")
+                    .PageBy(input)
+                    .Select(o => new
+                    {
+                        o.Id,
+                        o.Code,
+                        o.Name,
+                        o.ExtraAttributes,
+                        ObjectName = o.ObjectFk == null ? string.Empty : o.ObjectFk.Name,
+                        o.ParentId,
+                        ParentName = o.ParentFk == null ? string.Empty : o.ParentFk.Name,
+                        IdentifierCode = o.SycIdentifierDefinitionFK == null
+                            ? string.Empty
+                            : o.SycIdentifierDefinitionFK.Code,
+                        HasChildren = o.SycEntityObjectTypes.Any()
+                    })
+                    .ToListAsync();
+
+                var localizationKeys = page
+                    .Select(x => BuildEntityObjectTypeNameKey(x.Id, x.Name))
+                    .Concat(page
+                        .Where(x => x.ParentId.HasValue)
+                        .Select(x => BuildEntityObjectTypeNameKey(x.ParentId.Value, x.ParentName)))
+                    .Distinct()
+                    .ToList();
+
+                var localizedNames = await _lookup_ApplicationLanguageText.GetAll()
+                    .AsNoTracking()
+                    .Where(x => x.LanguageName == defaultLang &&
+                                localizationKeys.Contains(x.Key) &&
+                                (x.TenantId == AbpSession.TenantId || x.TenantId == null))
+                    .OrderByDescending(x => x.TenantId == AbpSession.TenantId)
+                    .Select(x => new { x.Key, x.Value })
+                    .ToListAsync();
+
+                var localizedNamesByKey = localizedNames
+                    .GroupBy(x => x.Key)
+                    .ToDictionary(x => x.Key, x => x.First().Value);
+
+                var items = page.Select(x =>
+                {
+                    var nameKey = BuildEntityObjectTypeNameKey(x.Id, x.Name);
+                    var localizedName = localizedNamesByKey.TryGetValue(nameKey, out var name)
+                        ? name.Trim()
+                        : x.Name;
+
+                    var localizedParentName = x.ParentName;
+                    if (x.ParentId.HasValue)
+                    {
+                        var parentKey = BuildEntityObjectTypeNameKey(x.ParentId.Value, x.ParentName);
+                        if (localizedNamesByKey.TryGetValue(parentKey, out var parentName))
+                        {
+                            localizedParentName = parentName.Trim();
+                        }
+                    }
+
+                    return new TreeNode<GetSycEntityObjectTypeForViewDto>
+                    {
+                        Data = new GetSycEntityObjectTypeForViewDto
+                        {
+                            SycEntityObjectType = new SycEntityObjectTypeDto
+                            {
+                                Code = x.Code,
+                                Name = localizedName,
+                                ExtraAttributes = x.ExtraAttributes,
+                                Id = x.Id
+                            },
+                            SydObjectName = x.ObjectName,
+                            SycEntityObjectTypeName = localizedParentName,
+                            IdentifierCode = x.IdentifierCode
+                        },
+                        Leaf = !x.HasChildren,
+                        label = localizedName
+                    };
+                }).ToList();
 
                 return new PagedResultDto<TreeNode<GetSycEntityObjectTypeForViewDto>>(
                     totalCount,
-                    await sycEntityObjectTypes.ToListAsync()
+                    items
                 );
             }
+        }
+
+        private static string BuildEntityObjectTypeNameKey(long id, string name)
+        {
+            return ("SYCENTITYOBJECTTYPES-NAME-" + id + "-" + name).Trim().ToUpper();
         }
 
         public async Task<SelectItemDto[]> GetAllParentsIds()

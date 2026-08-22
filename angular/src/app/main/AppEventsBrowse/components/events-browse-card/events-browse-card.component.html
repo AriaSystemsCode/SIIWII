@@ -1,91 +1,250 @@
-<div class="single-item row align-items-center">
-    <div class="single-item-photo mr-1" (click)="_triggerEvent(EventsBrowseActionsEvents.View)">
-        <img
-            class="w-100"
-            [src]="attachmentBaseUrl + '/' + item.appEvent.logoURL"
-            alt=""
-            onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'"
-        />
+<!-- WRAPPER ITEM -->
+<div class="event-card mb-2" [ngClass]="{
+    'mode-grid': !singleItemPerRowMode && !fromMarketPlaceProfile && !fromOverviewMarketPlaceProfile,
+    'mode-row': singleItemPerRowMode && !fromMarketPlaceProfile && !fromOverviewMarketPlaceProfile,
+    'mode-profile': fromMarketPlaceProfile && !fromOverviewMarketPlaceProfile,
+    'mode-overview': fromOverviewMarketPlaceProfile
+  }">
+  <div class="event-card__inner">
+
+    <!-- MEDIA -->
+    <div class="event-media" [ngClass]="{
+        'media--grid': !singleItemPerRowMode && !fromMarketPlaceProfile && !fromOverviewMarketPlaceProfile,
+        'media--row': singleItemPerRowMode && !fromMarketPlaceProfile && !fromOverviewMarketPlaceProfile,
+        'media--profile': fromMarketPlaceProfile && !fromOverviewMarketPlaceProfile,
+        'media--overview': fromOverviewMarketPlaceProfile
+      }" (click)="_triggerEvent(EventsBrowseActionsEvents.View)">
+        <div *ngIf="!FromLandingPage"
+    class="event-type-overlay-badge" [ngClass]="isArabic ? 'arIcon':'enIcon'"
+  [pTooltip]="(item?.appEvent?.isOnLine ? 'OnlineEvent' : 'InPersonEvent') | localize"
+    tooltipPosition="bottom"   [tooltipEvent]="isSmallScreen ? 'focus' : 'hover'" [autoHide]="true" [showDelay]="100" [hideDelay]="100"
+                [tabindex]="isSmallScreen ? 0 : null"
+  >
+    <i [ngClass]="getEventTypeIcon(item?.appEvent?.isOnLine)"></i>
+  </div>
+      <img class="event-img" [ngClass]="{
+          'fit-contain': fromOverviewMarketPlaceProfile,
+          'fit-cover': !fromOverviewMarketPlaceProfile
+        }" [src]="attachmentBaseUrl + '/' + item?.appEvent?.logoURL" alt=""
+        onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'" />
     </div>
-    <div
-        class="single-item-body col"
-        [ngClass]="{ singleItemPerRowMode: 'd-flex flex-row' }"
-    >
-        <div class="row">
-            <div
-                class="pt-3 col"
-            >
-                <h3
-                    class="m-0 mb-2 text-dark cursor-pointer"
-                    (click)="_triggerEvent(EventsBrowseActionsEvents.View)"
-                >
-                    {{ item.appEvent.name | textSubstring: 65 }}
-                </h3>
-                <p class="text-primary mb-2 product-name">
-                    {{ item.appEvent.fromDate?.toString() | date : 'fullDate'  }},
-                    {{ item.appEvent.fromTime?.toString() | date : 'shortTime' }}
-                    {{ item.appEvent.timeZone }}
-                </p>
-                <p
-                    class="text-dark mb-2"
-                >
-                    <span *ngIf="item?.appEvent?.isOnLine">
-                        <i class="fas fa-video"></i>
-                        {{ "Online" | localize }}
-                    </span>
-                    <span *ngIf="!item?.appEvent?.isOnLine">
-                        <i class="fas fa-users-rectangle"></i>
-                        {{ "InPerson" | localize }}
-                    </span>
-                </p>
-                <p
-                    class="text-dark mb-2"
-                    [ngClass]="{ 'd-none': !singleItemPerRowMode }"
-                >
-                    {{ item?.appEvent?.description | textSubstring: 230 }}
-                </p>
-                <p
-                    class="text-dark mb-2"
-                    *ngIf="item.appEvent.guestsCount > 0"
-                >
-                    <span >
-                        <i class="fas fa-users"></i>
-                        <span>
-                            {{item.appEvent.guestsCount}}
-                        </span>
-                        <span>
-                            {{"attendees"}}
-                        </span>
-                    </span>
-                </p>
-                <p
-                    class="text-dark mb-2"
-                    *ngIf="
-                        mainFilterCtrl?.value?.value == EventsFilterTypesEnum.MyEvents &&
-                         statusesFlags?.publicityStatus
-                    "
-                    [ngClass]="item?.appEvent?.isPublished ? 'text-success':'text-warn'"
-                >
-                    {{ ( item?.appEvent?.isPublished ? "Published" : "NotPublished") | localize }}
-                    <span class="ml-2">
-                        <i
-                            class="d-inline-flex flaticon2-information rounded-circle text-white bg-primary"
-                            [ngClass]="item?.appEvent?.isPublished ? 'bg-success':'bg-warn bg-warning'"
-                        ></i>
-                    </span>
-                </p>
+
+    <!-- BODY -->
+    <div class="event-body">
+
+      <!-- ============ CASE 1: NORMAL LIST (NOT marketplace profile) ============ -->
+      <ng-container *ngIf="!fromMarketPlaceProfile && !fromOverviewMarketPlaceProfile">
+        <h3 class="event-title cursor-pointer" (click)="_triggerEvent(EventsBrowseActionsEvents.View)" [pTooltip]="item?.appEvent?.name" tooltipPosition="bottom"   [tooltipEvent]="isSmallScreen ? 'focus' : 'hover'" [autoHide]="true" [showDelay]="100" [hideDelay]="100"
+                [tabindex]="isSmallScreen ? 0 : null">
+          {{ item?.appEvent?.name | textSubstring: 28 }}
+        </h3>
+
+        <p class="event-date">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path
+              d="M11.795 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V7C3 6.46957 3.21071 5.96086 3.58579 5.58579C3.96086 5.21071 4.46957 5 5 5H17C17.5304 5 18.0391 5.21071 18.4142 5.58579C18.7893 5.96086 19 6.46957 19 7V11M18 14V18H22"
+              stroke="#777777" stroke-linecap="round" stroke-linejoin="round" />
+            <path
+              d="M15 3V7M7 3V7M3 11H19M14 18C14 19.0609 14.4214 20.0783 15.1716 20.8284C15.9217 21.5786 16.9391 22 18 22C19.0609 22 20.0783 21.5786 20.8284 20.8284C21.5786 20.0783 22 19.0609 22 18C22 16.9391 21.5786 15.9217 20.8284 15.1716C20.0783 14.4214 19.0609 14 18 14C16.9391 14 15.9217 14.4214 15.1716 15.1716C14.4214 15.9217 14 16.9391 14 18Z"
+              stroke="#777777" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+          {{ item?.appEvent?.fromDate?.toString() | date: 'mediumDate' }} |
+          {{ item?.appEvent?.toDate?.toString() | date: 'mediumDate' }}
+          <!-- {{ item.appEvent.timeZone }} -->
+        </p>
+
+           <div class="stat">
+            <div class="stat-head">
+              <i class="fas fa-users stat-ico" [pTooltip]="'Attendees' | localize" tooltipPosition="bottom"   [tooltipEvent]="isSmallScreen ? 'focus' : 'hover'" [autoHide]="true" [showDelay]="100" [hideDelay]="100"
+                [tabindex]="isSmallScreen ? 0 : null"></i>
+        
             </div>
-            <div>
-                <app-events-browse-actions-menu
-                        #appEventsActionsMenuComponent
-                        [item]="item.appEvent"
-                        [filterType]="mainFilterCtrl?.value?.value"
-                        [actionsMenuFlags]="actionsMenuFlags"
-                        (triggerEvent)="_triggerEvent($event)"
-                    >
-                </app-events-browse-actions-menu>
+            <div class="stat-sub">
+              {{ item?.appEvent?.guestsCount || 0 }}
+            </div>
+          </div>
+
+        <p class="event-desc" *ngIf="singleItemPerRowMode">
+          {{ item?.appEvent?.description | textSubstring: 150 }}
+        </p>
+
+
+        <p class="event-publish"
+          *ngIf="mainFilterCtrl?.value?.value == EventsFilterTypesEnum.MyEvents && statusesFlags?.publicityStatus"
+          [ngClass]="item?.appEvent?.isPublished ? 'text-success' : 'text-warning'">
+          {{ (item?.appEvent?.isPublished ? 'Published' : 'NotPublished') | localize }}
+          <span class="ml-2">
+            <i class="d-inline-flex flaticon2-information rounded-circle text-white"
+              [ngClass]="item?.appEvent?.isPublished ? 'bg-success' : 'bg-warning'"></i>
+          </span>
+        </p>
+
+        <!-- Actions menu (only this case) -->
+        <app-events-browse-actions-menu *ngIf="!fromLandingPage" #appEventsActionsMenuComponent [item]="item?.appEvent"
+          [filterType]="mainFilterCtrl?.value?.value" [actionsMenuFlags]="actionsMenuFlags"
+          (triggerEvent)="_triggerEvent($event)">
+        </app-events-browse-actions-menu>
+      <div class="actions-right my-2" *ngIf="fromLandingPage" >
+                    <button class="btn-details" type="button" (click)="openViewEvent(item?.appEvent?.id)">
+        {{'Details' | localize }}
+      </button>
+      </div>
+      </ng-container>
+
+      <!-- ============ CASE 2: MARKETPLACE PROFILE ============ -->
+      <ng-container *ngIf="fromMarketPlaceProfile && !fromOverviewMarketPlaceProfile">
+        <h3 class="event-title profile-title cursor-pointer" (click)="_triggerEvent(EventsBrowseActionsEvents.View)">
+          {{ item?.appEvent?.name | textSubstring: 65 }}
+        </h3>
+
+        <div class="meta-row">
+          <div class="meta-item">
+            <img src="../../../../../assets/events/tabler_calendar-stats.png" class="meta-img" />
+            <div class="meta-text">
+              <div class="meta-label">{{ 'StartDate' | localize }}:</div>
+              <div class="meta-value">
+                {{ item?.appEvent?.fromDate?.toString() | date:'dd MMMM, yyyy' }},
+                {{ item?.appEvent?.fromTime?.toString() | date:'h:mm a' }}
+              </div>
+            </div>
+          </div>
+
+          <div class="meta-item">
+            <div class="meta-sep"></div>
+            <div class="meta-text">
+              <div class="meta-label">{{ 'EndDate' | localize }}:</div>
+              <div class="meta-value">
+                {{ item?.appEvent?.toDate?.toString() | date:'dd MMMM, yyyy' }},
+                {{ item?.appEvent?.toTime?.toString() | date:'h:mm a' }}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="meta-row">
+          <div class="meta-item">
+            <img
+              src="../../../../../assets/events/streamline_interface-presentation-podium-work-desk-notes-company-presentation-office-podium-microphone.png"
+              class="meta-img" />
+            <div class="meta-text">
+              <div class="meta-label">{{ 'CreatedBy' | localize }}:</div>
+              <div class="creator-pill">
+                <img class="creator-avatar"
+                  [src]="profilePicture ? profilePicture : '../../../../../assets/placeholders/appitem-placeholder.png'"
+                  onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'" />
+                <span>{{ item?.appEvent?.userName }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="info-boxes">
+          <div class="info-box">
+            <img src="../../../../../assets/events/fluent_guest-add-24-filled.png" class="info-ico" />
+            <span class="info-label">{{ 'Attendees' | localize }}:</span>
+            <span class="info-muted">{{ item?.appEvent?.guestsCount }} {{ 'attendees' | localize }}</span>
+          </div>
+
+          <div class="info-box">
+            <img src="../../../../../assets/events/carbon_location-company.png" class="info-ico" />
+            <span class="info-label">{{ 'Location' | localize }}:</span>
+            <span class="info-muted">
+              <ng-container *ngIf="eventAddress?.includes('online'); else locShort">
+                {{ eventAddress }}
+              </ng-container>
+              <ng-template #locShort>
+                {{ eventAddress | textSubstring: 20 }}
+              </ng-template>
+            </span>
+          </div>
+        </div>
+
+        <div class="actions-right">
+          <button class="btn-details" (click)="_triggerEvent(EventsBrowseActionsEvents.View)">
+            {{ 'Details' | localize }}
+          </button>
+        </div>
+      </ng-container>
+
+      <!-- ============ CASE 3: OVERVIEW WIDGET (Recent Events) ============ -->
+      <ng-container *ngIf="fromOverviewMarketPlaceProfile">
+        <div class="overview-wrap">
+          <h3 class="event-title overview-title cursor-pointer" (click)="_triggerEvent(EventsBrowseActionsEvents.View)">
+            {{ item?.appEvent?.name | textSubstring: 35 }}
+          </h3>
+
+          <div class="overview-lines ">
+            <div class="d-flex align-items-center addGp">
+              <svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path
+                  d="M13.7608 24.4997H5.83333C5.21449 24.4997 4.621 24.2538 4.18342 23.8163C3.74583 23.3787 3.5 22.7852 3.5 22.1663V8.16634C3.5 7.5475 3.74583 6.95401 4.18342 6.51643C4.621 6.07884 5.21449 5.83301 5.83333 5.83301H19.8333C20.4522 5.83301 21.0457 6.07884 21.4832 6.51643C21.9208 6.95401 22.1667 7.5475 22.1667 8.16634V12.833M21 16.333V20.9997H25.6667"
+                  stroke="#777777" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                <path
+                  d="M17.5 3.5V8.16667M8.16667 3.5V8.16667M3.5 12.8333H22.1667M16.3333 21C16.3333 22.2377 16.825 23.4249 17.7002 24.2998C18.5753 25.175 19.7623 25.6667 21 25.6667C22.2377 25.6667 23.4249 25.175 24.2998 24.2998C25.175 23.4249 25.6667 22.2377 25.6667 21C25.6667 19.7623 25.175 18.5753 24.2998 17.7002C23.4249 16.825 22.2377 16.3333 21 16.3333C19.7623 16.3333 18.5753 16.825 17.7002 17.7002C16.825 18.5753 16.3333 19.7623 16.3333 21Z"
+                  stroke="#777777" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+              <div>
+                <div class="ov-line">
+                  <span class="ov-label">{{ 'Start' | localize }}:</span>
+                  <span class="ov-value">
+                    {{ item?.appEvent?.fromDate?.toString() | date:'dd MMM, yyyy' }} {{
+                    item?.appEvent?.fromTime?.toString() | date:'h:mm a' }}
+                  </span>
+                </div>
+
+                <div class="ov-line">
+                  <span class="ov-label">{{ 'End' | localize }}:</span>
+                  <span class="ov-value">
+                    {{ item?.appEvent?.toDate?.toString() | date:'dd MMM, yyyy' }} {{ item?.appEvent?.toTime?.toString()
+                    | date:'h:mm a' }}
+                  </span>
+                </div>
+              </div>
             </div>
 
+            <div class="d-flex addGp align-items-center">
+              <svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <g clip-path="url(#clip0_461_3644)">
+                  <path
+                    d="M8.57138 14.5717H3.42852L1.71423 6.00028H22.2857L20.5714 14.5717H15.4285M11.9999 6.00028V0.857422M8.57138 11.1431V23.1431M15.4285 11.1431V23.1431M6.85709 23.1431H17.1428M4.28566 6.00028C4.28566 6.00028 4.28566 0.857422 7.71423 0.857422M19.7142 6.00028C19.7142 6.00028 19.7142 0.857422 16.2857 0.857422"
+                    stroke="#777777" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                </g>
+                <defs>
+                  <clipPath id="clip0_461_3644">
+                    <rect width="24" height="24" fill="white" />
+                  </clipPath>
+                </defs>
+              </svg>
+              <div class="ov-line-pf">
+                <span class="ov-label">{{ 'By' | localize }}:</span>
+                <span class="ov-value-pf"> <img [src]="profilePicture
+                          ? profilePicture
+                          : '../../../../../assets/placeholders/appitem-placeholder.png'" alt="" srcset=""
+                    class="cv-img"> {{ item?.appEvent?.userName }}</span>
+              </div>
+
+            </div>
+            <div class="actions-right">
+              <button class="btn-details" (click)="_triggerEvent(EventsBrowseActionsEvents.View)">
+                {{ 'Details' | localize }}
+              </button>
+            </div>
+
+          </div>
         </div>
+      </ng-container>
+
     </div>
+  </div>
 </div>
+
+
+
+
+
+
+
+  <app-view-event
+  #viewEventModal
+
+></app-view-event>

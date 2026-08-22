@@ -16,7 +16,7 @@ export class CreateOrEditAppitemListComponent extends AppComponentBase implement
     @ViewChild('createOrEditListModal', { static: true }) modal: ModalDirective;
     @Output() createOrEditDone: EventEmitter<number> = new EventEmitter<number>();
     @Output() cancelDone: EventEmitter<number> = new EventEmitter<number>();
-
+@Input() isArabic: boolean = false;
     active = false;
     saving = false;
     loading: boolean;

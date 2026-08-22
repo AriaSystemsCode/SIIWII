@@ -35,7 +35,7 @@ export class SelectCategoriesDynamicModalComponent
     active: boolean = false;
     loading: boolean;
     entityObjectName: string = "Product";
-    entityObjectDisplayName: string = "Product Categories";
+    entityObjectDisplayName: string = "ProductCategories";
     isDepartment: boolean = false;
     isHiddenToCreateOrEdit: boolean = false;
     maxResultCount: number = 10;
@@ -49,6 +49,9 @@ export class SelectCategoriesDynamicModalComponent
     lastSelectedRecords: TreeNodeOfGetSycEntityObjectCategoryForViewDto[] = [];
     searchQuery?: string;
     searchSubj: Subject<string> = new Subject<string>();
+
+    currentLang: string
+    isArabic: boolean
     constructor(
         injector: Injector,
         public currentModalRef: BsModalRef,
@@ -59,6 +62,8 @@ export class SelectCategoriesDynamicModalComponent
     }
 
     ngOnInit(): void {
+        this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
+        this.currentLang == 'ar' || this.currentLang == 'ar-EG'  ? this.isArabic = true : this.isArabic = false
         this.getCategoriesList();
         this.searchSubj
             .pipe(debounceTime(300), distinctUntilChanged())
@@ -73,7 +78,7 @@ export class SelectCategoriesDynamicModalComponent
         addAsChild = false,
     }: {
         parentCategory?: SycEntityObjectCategoryDto;
-        category?: SycEntityObjectCategoryDto;
+        category?;
         addAsChild?: boolean;
     } = {}): void {
         let config: ModalOptions = new ModalOptions();
@@ -81,10 +86,10 @@ export class SelectCategoriesDynamicModalComponent
         config.initialState = {
             title: "Edit Category",
         };
-        config.class = "right-modal slide-right-in";
+        this.isArabic ?  config.class = "left-modal slide-left-in ngLeft" : config.class = "right-modal slide-right-in";
         config.backdrop = true;
         config.ignoreBackdropClick = true;
-        this.currentModalRef.setClass("right-modal slide-right-out");
+       this.isArabic ? this.currentModalRef.setClass("left-modal slide-left-out") : this.currentModalRef.setClass("right-modal slide-right-out");
 
         let initialModalData: Partial<CreateOrEditCategoryDynamicModalComponent> =
             {};
@@ -95,7 +100,7 @@ export class SelectCategoriesDynamicModalComponent
             if (parentCategory) category.parentId = parentCategory.id;
         } else {
             if (!category)
-                category = new CreateOrEditSycEntityObjectCategoryDto();
+               category = new CreateOrEditSycEntityObjectCategoryDto();
             if (parentCategory) category.parentId = parentCategory.id;
         }
         if (parentCategory)
@@ -117,7 +122,7 @@ export class SelectCategoriesDynamicModalComponent
     }
 
     onCreateOrEditDoneHandler() {
-        this.currentModalRef.setClass("right-modal slide-right-in");
+       this.isArabic ?  this.currentModalRef.setClass("left-modal slide-left-in ngLeft"):this.currentModalRef.setClass("right-modal slide-right-in");
         let data = this.createOrEditModalRef.content;
         setTimeout(() => {
             this.isHiddenToCreateOrEdit = false;
@@ -166,7 +171,7 @@ export class SelectCategoriesDynamicModalComponent
             }
         }
     close() {
-        this.currentModalRef.setClass("right-modal slide-right-out");
+       this.isArabic ?  this.currentModalRef.setClass("left-modal slide-left-out") :  this.currentModalRef.setClass("right-modal slide-right-out");
         this.selectionDone = false;
         this.currentModalRef.hide();
     }
@@ -252,18 +257,20 @@ export class SelectCategoriesDynamicModalComponent
         this.loading = true;
         let apiMethod = `getAllWithChildsFor${this.entityObjectName}WithPaging`;
         const subs = this._sycEntityObjectCategoriesServiceProxy[apiMethod](
-            this.searchQuery,
-            undefined,
-            undefined,
-            undefined,
-            undefined,
-            undefined,
-            undefined,
-            undefined,
+            this.searchQuery, 
+            undefined,  
+            undefined,      
+            undefined,    
+            undefined,     
+            undefined,   
+            undefined,  
+            undefined,       
             this.isDepartment,
-            this.entityId,
-            [],
-            this.sortBy,
+            this.entityId,    
+            [],               
+            false,     
+            undefined,     
+            this.sortBy,     
             this.skipCount,
             this.maxResultCount
         )
@@ -279,8 +286,21 @@ export class SelectCategoriesDynamicModalComponent
                     let currentLoadedItemsAfterExludingSelections: TreeNodeOfGetSycEntityObjectCategoryForViewDto[] =
                         [];
                     this.totalCount = result.totalCount;
-                    const isLastPage =
-                        this.skipCount + this.maxResultCount > this.totalCount;
+                    // number of items excluded from current page - savedIds
+                const excludedFromCurrentPage = this.savedIds?.length
+                    ? result.items.filter(i =>
+                        this.savedIds.includes(i.data.sycEntityObjectCategory.id)
+                    ).length
+                    : 0;
+
+                // total visible items after exclusion
+                const effectiveTotal = this.totalCount - excludedFromCurrentPage;
+
+                // correct last page check based on visible items
+                // const isLastPage = this.skipCount + this.maxResultCount > this.totalCount
+                const isLastPage =
+                    this.skipCount + this.maxResultCount >= effectiveTotal;
+
 
                     //check selection of the newly added elements
                     if (this.savedIds?.length) {
@@ -302,9 +322,9 @@ export class SelectCategoriesDynamicModalComponent
                             result.items;
                     }
                     this.lastSelectedRecords = this.selectedRecords;
-                    if (isFirstPage && !this.searchQuery) {
+                   /*  if (isFirstPage && !this.searchQuery) {
                         this.selectedRecords = [];
-                    }
+                    } */
                     currentLoadedItemsAfterExludingSelections.map((record) => {
                         const cachedItem: TreeNodeOfGetSycEntityObjectCategoryForViewDto =
                             this.loadedChildrenRecords.filter(
@@ -387,6 +407,8 @@ export class SelectCategoriesDynamicModalComponent
                     parentId,
                     this.isDepartment,
                     this.entityId,
+                    undefined,
+                    undefined,
                     undefined,
                     this.sortBy,
                     0,

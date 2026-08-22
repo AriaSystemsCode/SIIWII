@@ -2,17 +2,17 @@
 using System;
 
 namespace onetouch.Accounts.Dtos
-{    
+{
     public class GetAllAccountsInput : PagedAndSortedResultRequestDto
     {
-		public string Filter { get; set; }
+        public string Filter { get; set; }
 
         public byte FilterType { get; set; }
 
         public string Name { get; set; }
 
         public string Address { get; set; }
-        
+
         public string City { get; set; }
 
         public string State { get; set; }
@@ -24,7 +24,7 @@ namespace onetouch.Accounts.Dtos
         public string AccountType { get; set; }
 
         public long[] AccountTypes { get; set; }
-        
+
         public long[] Status { get; set; }
 
         public long[] Languages { get; set; }
@@ -36,6 +36,12 @@ namespace onetouch.Accounts.Dtos
         public long[] Categories { get; set; }
 
         public long[] Curruncies { get; set; }
-
+        //I50[Start]
+        public string FilterCondition { set; get; }
+        //I50[End]
+    }
+    public class GetAllMediaAttachmentInput : PagedAndSortedResultRequestDto
+    {
+        public string AccountSSIN { get; set; }
     }
 }

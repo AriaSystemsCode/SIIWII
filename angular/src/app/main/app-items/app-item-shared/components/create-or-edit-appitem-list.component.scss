@@ -1,0 +1,59 @@
+.right-modal {
+  position: fixed;
+  right: 0;
+  top: 0;
+  margin: 0;
+  height: 100%;
+}
+
+.left-modal {
+  position: fixed;
+  left: 0;
+  right: auto;
+  top: 0;
+  margin: 0;
+  height: 100%;
+}
+
+.slide-right-in {
+  transform: translateX(0);
+}
+
+.slide-right-out {
+  transform: translateX(100%);
+}
+
+.slide-left-in {
+  transform: translateX(0);
+}
+
+.slide-left-out {
+  transform: translateX(-100%);
+}
+
+.modal-content {
+        height: 100vh;
+    width: 350px;
+
+}
+
+.modal-close-btn-wide {
+  position: absolute;
+  width: 70px;
+  top: 8px;
+}
+
+.modal-close-btn-ltr {
+  right: 0;
+}
+
+.modal-close-btn-rtl {
+  left: 0;
+}
+
+@media (max-width: 768px) {
+  .modal-content {
+    width: 100%;
+    max-width: 100%;
+  }
+}

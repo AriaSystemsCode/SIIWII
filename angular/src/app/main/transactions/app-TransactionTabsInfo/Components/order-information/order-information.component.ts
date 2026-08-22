@@ -19,6 +19,7 @@ import * as moment from "moment";
 import { TreeSelect } from "primeng/treeselect";
 import { Calendar } from "primeng/calendar";
 import { TransactionCartoccordionTabs } from "../../../enums/TransactionCartoccordionTabs";
+import { AppConsts } from "@shared/AppConsts";
 
 @Component({
   selector: "app-order-information",
@@ -102,7 +103,11 @@ export class OrderInformationComponent extends AppComponentBase implements OnIni
 
   oldappTransactionsForViewDto;
   isContactsValid = false;
+  primeDateFormat = 'mm/dd/yy'; // default
+ languageSettingName  =AppConsts.languageSettingName;
 
+  currentLang:string
+  isArabic:boolean 
 
   constructor(
     injector: Injector,
@@ -115,6 +120,11 @@ export class OrderInformationComponent extends AppComponentBase implements OnIni
     super(injector);
   }
   ngOnInit(): void {
+    this.primeDateFormat = this.languageSettingName != 'en-GB'
+    ? 'mm/dd/yy'
+    : 'dd/mm/yy';
+    this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
+    this.currentLang == 'ar' || this.currentLang == 'ar-EG'  ? this.isArabic = true : this.isArabic = false
     if (this.currentTab === TransactionCartoccordionTabs.orderInfo) {
       this.fullName = `${this.appSession.user.name}${this.appSession.user.surname}`;
       this.initDates();
@@ -490,6 +500,7 @@ export class OrderInformationComponent extends AppComponentBase implements OnIni
       });
     });
 
+ 
 
     this.appTransactionsForViewDto.entityCategoriesNames.totalCount = this.selectedCategories.length;
     this.appTransactionsForViewDto.entityCategoriesNames.items = this.selectedCategories.map(item => item.entityObjectCategoryName || '');

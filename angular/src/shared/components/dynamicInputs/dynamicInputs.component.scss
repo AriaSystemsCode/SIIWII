@@ -3,20 +3,238 @@
     opacity: 1;
     background: #fff;
     border-radius: 10px;
-
     a {
         width: 100%;
     }
-
     img {
         object-fit: cover;
         width: 100%;
         height: 100%;
     }
 }
-
 .container {
     max-width: 100% !important;
     margin-left: 0px !important;
     margin-right: 0px !important;
+}
+.fromSettingLabel {
+    color: #1B101B;
+    font-weight: 700;
+}
+
+.clear-action-icon {
+  right: 10px;
+  top: 15px;
+  cursor: pointer;
+}
+
+.clear-inline-icon {
+  cursor: pointer;
+}
+
+.upload-preview__success-icon {
+  color: #4A0D4A !important;
+}
+
+.upload-actions {
+  text-align: right;
+}
+
+.calWidth {
+    width: 305px;
+    .p-calendar {
+        width: 305px !important;
+    }
+}
+::ng-deep {
+    .calWidth {
+        .p-calendar {
+            // width: 305px !important;
+        }
+    }
+    .p-inputswitch.p-inputswitch-checked .p-inputswitch-slider {
+        background-color: #2DC74F !important;
+    }
+}
+
+
+.form-check-label {
+    color: #595959;
+}
+
+.upload-card {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-width: 400px;
+    font-family: "Inter", sans-serif;
+  }
+  
+  .upload-box {
+    padding: 16px;
+    border: 1px solid #EEEEEE;
+    cursor: pointer;
+    transition: 0.2s ease;
+    width: 100%;
+    max-width: 400px;
+  }
+  
+  .upload-box:hover {
+    border-color: #4A0D4A;
+    background-color: #f5f2ff;
+  }
+  
+  .upload-content {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 4px;
+  }
+  
+  .upload-icon {
+    font-size: 1.4rem;
+    color: #4A0D4A;
+  }
+  
+  .upload-text {
+    font-weight: 600;
+    color: #2b2b2b;
+  }
+  
+  .upload-note {
+    display: block;
+    font-size: 0.75rem;
+    color: #7a7a7a;
+    line-height: 1.2;
+  }
+  
+  .uploaded-preview {
+    display: flex;
+    align-items: center;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 0.9rem;
+    border: 1px solid #e0e0e0;
+  }
+
+  .theme-tabset {
+    text-align: center;
+  }
+  
+  .nav-pills .nav-link {
+    border-radius: 10px;
+    background-color: #f7f7f7;
+    margin: 0 8px;
+    padding: 6px 12px;
+    border: 1px solid transparent;
+    transition: 0.3s;
+  }
+  
+  .nav-pills .nav-link:hover {
+    border-color: #ccc;
+  }
+  
+  .nav-pills .nav-link.active {
+    background-color: #4A0D4A; 
+    color: #fff;
+    border-color: #4A0D4A;
+  }
+  
+  .theme-preview {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .theme-thumbnail {
+    width: 120px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 8px;
+    margin-bottom: 6px;
+  }
+  
+  .theme-name {
+    font-size: 14px;
+    font-weight: 500;
+  }
+
+
+  .uploadBtn{
+    border-radius: 5px;
+    background-color: #4A0D4A !important;
+    border: #4A0D4A !important;color: white;
+  }
+  
+.has-clear-icon {
+    padding-right: 42px !important;
+}
+
+.clear-number-icon {
+    position: absolute;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    z-index: 2;
+    color: #999;
+    font-size: 13px;
+}
+
+/* optional */
+.clear-number-icon:hover {
+    color: #4A0D4A;
+}
+
+::ng-deep {
+  body .wide-drop-down .p-dropdown .p-dropdown-trigger {
+    padding-right: 0 !important;
+}
+.form-control {
+  height: 46px !important;
+}
+
+  .dynamic-input-calendar .p-inputtext {
+    border: 1px solid #EEEEEE;
+    border-radius: 8px;
+    height: 44px;
+  }
+
+  .dynamic-input-editor .ql-container {
+    min-height: 170px;
+  }
+
+  .dynamic-input-editor .ql-editor {
+    min-height: 170px;
+  }
+}
+
+@media screen and (max-width: 991px) {
+    .calWidth {
+        width: 100%;
+
+        .p-calendar {
+            width: 100% !important;
+        }
+    }
+
+    .upload-card {
+        max-width: 100%;
+    }
+}
+
+@media screen and (max-width: 767px) {
+    .upload-box {
+        max-width: 100%;
+    }
+
+    .theme-thumbnail {
+        width: 90px;
+        height: 64px;
+    }
+
+    .upload-actions {
+        text-align: left;
+    }
 }

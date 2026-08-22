@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Abp.Application.Services.Dto;
 using onetouch.AppEntities.Dtos;
+using Abp.Timing;
 
 namespace onetouch.AppEvents.Dtos
 {
@@ -29,13 +30,17 @@ namespace onetouch.AppEvents.Dtos
 
         public virtual string Country { get; set; }
 
+        [DisableDateTimeNormalization]
         public virtual DateTime FromDate { get; set; }
         public virtual DateTime UTCFromDateTime { get; set; }
         public virtual DateTime UTCToDateTime { get; set; }
+        [DisableDateTimeNormalization]
         public virtual DateTime ToDate { get; set; }
 
+        [DisableDateTimeNormalization]
         public virtual DateTime FromTime { get; set; }
 
+        [DisableDateTimeNormalization]
         public virtual DateTime ToTime { get; set; }
 
         public virtual bool Privacy { get; set; }
@@ -55,6 +60,8 @@ namespace onetouch.AppEvents.Dtos
         public IList<AppEntityAttachmentDto> Attachments { get; set; }
 
         public AppEntityAddressDto Address { get; set; }
-
+        //IT40-X527[Start]
+        public Guid? ProfilePictureId { get; set; }
+        //IT40-X527[End]
     }
 }

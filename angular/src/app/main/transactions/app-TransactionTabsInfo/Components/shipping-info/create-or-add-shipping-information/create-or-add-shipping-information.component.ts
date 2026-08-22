@@ -27,11 +27,8 @@ export class CreateOrAddShippingInformationComponent extends AppComponentBase im
   @ViewChildren(AddressComponent) addressComponentRefs: QueryList<AddressComponent>;
 
   transactionCartoccordionTabs = TransactionCartoccordionTabs;
-  isshipFromContactsValid: boolean = false;
-  isShipToContactsValid: boolean = false;
-  contactIdShipTo: string = '';
-  contactIdShipFrom: string = '';
-  addressSelected: boolean = false;
+contactIdShipTo: string | number | null = null;
+contactIdShipFrom: string | number | null = null;
   enableSAveShipFrom: boolean = false;
   enableSAveShipTo: boolean = false;
   storeVal: any = null;
@@ -39,7 +36,6 @@ export class CreateOrAddShippingInformationComponent extends AppComponentBase im
   shipViaList: any = [];
   oldappTransactionsForViewDto;
   shippingTabValid: boolean = false;
-  addressSelectedShipTo: boolean = false;
   shipFromSelectedAdd: any;
   shipToSelectedAdd: any;
   isAccManual: boolean = false
@@ -65,13 +61,38 @@ export class CreateOrAddShippingInformationComponent extends AppComponentBase im
     if (this.currentTab == TransactionCartoccordionTabs.ShippingInfo) {
       this.contactIdShipFrom = this.shipFromData?.compId;
       this.contactIdShipTo = this.shipToData?.compId;
-      const addressComponents = this.addressComponentRefs.toArray();
-      addressComponents.find(c => c.shipInfoIndex === 1)?.getAddressList(this.shipFromData?.compssin, this.shipFromData?.branchSsin);
-      addressComponents.find(c => c.shipInfoIndex === 2)?.getAddressList(this.shipToData?.compssin, this.shipToData?.branchSsin);
+      const addressComponents = this.addressComponentRefs?.toArray();
+      addressComponents?.find(c => c.shipInfoIndex === 1)?.getAddressList(this.shipFromData?.compssin, this.shipFromData?.branchSsin);
+      addressComponents?.find(c => c.shipInfoIndex === 2)?.getAddressList(this.shipToData?.compssin, this.shipToData?.branchSsin);
 
     }
 
   }
+//   ngAfterViewInit() {
+//   if (this.currentTab !== TransactionCartoccordionTabs.ShippingInfo) {
+//     return;
+//   }
+
+//   setTimeout(() => {
+//     if (this.shipFromData?.compId) {
+//       this.contactIdShipFrom = this.shipFromData.compId;
+
+//       const addressComponents = this.addressComponentRefs?.toArray();
+//       addressComponents
+//         ?.find(c => c.shipInfoIndex === 1)
+//         ?.getAddressList(this.shipFromData?.compssin, this.shipFromData?.branchSsin);
+//     }
+
+//     if (this.shipToData?.compId) {
+//       this.contactIdShipTo = this.shipToData.compId;
+
+//       const addressComponents = this.addressComponentRefs?.toArray();
+//       addressComponents
+//         ?.find(c => c.shipInfoIndex === 2)
+//         ?.getAddressList(this.shipToData?.compssin, this.shipToData?.branchSsin);
+//     }
+//   });
+// }
   ngOnInit() {
     this.isMamualAcc()
     if (this.currentTab == TransactionCartoccordionTabs.ShippingInfo) {
@@ -276,7 +297,7 @@ export class CreateOrAddShippingInformationComponent extends AppComponentBase im
 
 
   selectShipVia($event) {
-    var index = this.shipViaList.findIndex(x => x.value == $event?.value)
+    var index = this.shipViaList?.findIndex(x => x.value == $event?.value)
     if (index >= 0) {
       this.appTransactionsForViewDto.shipViaId = this.shipViaList[index]?.value;
       this.appTransactionsForViewDto.shipViaCode = this.shipViaList[index]?.code;
@@ -329,30 +350,60 @@ export class CreateOrAddShippingInformationComponent extends AppComponentBase im
 
   }
 
-  reloadAddresscomponentShipFrom(data) {
-    this.shipFromData = data;
-    if (this.currentTab == TransactionCartoccordionTabs.ShippingInfo) {
-      this.contactIdShipFrom = this.shipFromData?.compId;
-      const addressComponents = this.addressComponentRefs.toArray();
-      addressComponents.find(c => c.shipInfoIndex === 1)?.getAddressList(this.shipFromData?.compssin, this.shipFromData?.branchSsin);
-    }
-    this.validateShippingTab();
+  // reloadAddresscomponentShipFrom(data) {
+  //   this.shipFromData = data;
+  //   if (this.currentTab == TransactionCartoccordionTabs.ShippingInfo) {
+  //     this.contactIdShipFrom = this.shipFromData?.compId;
+  //     const addressComponents = this.addressComponentRefs?.toArray();
+  //     addressComponents?.find(c => c.shipInfoIndex === 1)?.getAddressList(this.shipFromData?.compssin, this.shipFromData?.branchSsin);
+  //   }
+  //   this.validateShippingTab();
 
-  }
-  reloadAddresscomponentShipTo(data) {
+  // }
+  // reloadAddresscomponentShipTo(data) {
     
-    this.shipToData = data;
+  //   this.shipToData = data;
    
 
-    if (this.currentTab == TransactionCartoccordionTabs.ShippingInfo) {
-      this.contactIdShipTo = this.shipToData?.compId;
+  //   if (this.currentTab == TransactionCartoccordionTabs.ShippingInfo) {
+  //     this.contactIdShipTo = this.shipToData?.compId;
 
-      const addressComponents = this.addressComponentRefs.toArray();
-      addressComponents.find(c => c.shipInfoIndex === 2)?.getAddressList(this.shipToData?.compssin, this.shipToData?.branchSsin);
-    }
-    this.validateShippingTab();
+  //     const addressComponents = this.addressComponentRefs?.toArray();
+  //     addressComponents?.find(c => c.shipInfoIndex === 2)?.getAddressList(this.shipToData?.compssin, this.shipToData?.branchSsin);
+  //   }
+  //   this.validateShippingTab();
 
+  // }
+
+  reloadAddresscomponentShipFrom(data) {
+  this.shipFromData = data;
+
+  if (this.currentTab === TransactionCartoccordionTabs.ShippingInfo && data?.compId) {
+    this.contactIdShipFrom = data.compId;
+
+    const addressComponents = this.addressComponentRefs?.toArray();
+    addressComponents
+      ?.find(c => c.shipInfoIndex === 1)
+      ?.getAddressList(data?.compssin, data?.branchSsin);
   }
+
+  this.validateShippingTab();
+}
+
+reloadAddresscomponentShipTo(data) {
+  this.shipToData = data;
+
+  if (this.currentTab === TransactionCartoccordionTabs.ShippingInfo && data?.compId) {
+    this.contactIdShipTo = data.compId;
+
+    const addressComponents = this.addressComponentRefs?.toArray();
+    addressComponents
+      ?.find(c => c.shipInfoIndex === 2)
+      ?.getAddressList(data?.compssin, data?.branchSsin);
+  }
+
+  this.validateShippingTab();
+}
 
   validateShippingTab() {
 

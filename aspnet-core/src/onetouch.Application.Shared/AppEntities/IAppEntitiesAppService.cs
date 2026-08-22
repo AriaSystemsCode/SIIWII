@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Threading.Tasks;
 using Abp.Application.Services;
 using Abp.Application.Services.Dto;
@@ -17,7 +17,7 @@ namespace onetouch.AppEntities
 		Task<PagedResultDto<LookupLabelDto>> GetAllCurrencyForTableDropdownWithPaging(GetAllAppEntitiesInput input);
 		Task<PagedResultDto<LookupLabelDto>> GetAllLanguageForTableDropdownWithPaging(GetAllAppEntitiesInput input);
 		Task<PagedResultDto<LookupLabelDto>> GetAllCountryForTableDropdowWithPaging(GetAllAppEntitiesInput input);
-		Task<PagedResultDto<LookupLabelDto>> GetAllAccountTypesForTableDropdownWithPaging(GetAllAppEntitiesInput input);
+		Task<PagedResultDto<LookupLabelDto>> GetAllAccountTypesForTableDropdownWithPaging(GetAllAppEntitiesInput input, bool hasManual = true);
 		Task<PagedResultDto<LookupLabelDto>> GetAllEntityTypeForTableDropdown(GetAllAppEntitiesInput input);
 		Task<List<LookupLabelDto>> GetAllAccountTypeForTableDropdown();
 		Task<PagedResultDto<LookupLabelWithAttachmentDto>> GetAllBackgroundWithPaging(GetAllAppEntitiesInput input);
@@ -40,12 +40,13 @@ namespace onetouch.AppEntities
         Task<List<LookupLabelDto>> GetAllTitlesForTableDropdown();
 		
 		Task<PagedResultDto<GetAppEntityForViewDto>> GetAll(GetAllAppEntitiesInput input);
+		Task<PagedResultDto<ExtraDataAttrDto>> GetAppEntityExtraDataWithPaging(long entityId, long entityObjectTypeId);
 
         Task<GetAppEntityForViewDto> GetAppEntityForView(long id);
 		Task<string> GetAppEntityState(long id);
 		Task SetAppEntityState(long id, string jsonString);
 
-		Task<GetAppEntityForEditOutput> GetAppEntityForEdit(EntityDto<long> input);
+		Task<GetAppEntityForEditOutput> GetAppEntityForEdit(EntityDto<long> input, bool ignoreTenantId = false);
 
 		Task CreateOrEdit(CreateOrEditAppEntityDto input);
 
@@ -64,6 +65,7 @@ namespace onetouch.AppEntities
 		Task<long> SaveContact(AppContactDto input);
 
 		Task<long> SaveEntity(AppEntityDto input);
+		Task<long> SaveEntityWithLookupCache(AppEntityDto input, IDictionary<long, long?> attributeValueEntityObjectTypeCache, IDictionary<string, long?> entityObjectTypeCodeCache);
 		Task<PagedResultDto<AppEntityCategoryDto>> GetAppEntityCategoriesWithPaging(GetAppEntityAttributesInput input);
 		Task<PagedResultDto<AppEntityCategoryDto>> GetAppEntityDepartmentsWithPaging(GetAppEntityAttributesInput input);
 		Task<PagedResultDto<AppEntityClassificationDto>> GetAppEntityClassificationsWithPaging(GetAppEntityAttributesInput input);
@@ -92,5 +94,12 @@ namespace onetouch.AppEntities
 		Task<List<LookupLabelDto>> GetAllUOMForTableDropdown();
 		//Task<List<LookupLabelDto>> GetAllFeatureCategoryForTableDropdown();
 		//MMT-43
+		//I40[Start]
+		//Task<PagedResultDto<ExtraDataAttrDto>> GetAppEntityExtraDataWithPaging(long entityId, long entityObjectTypeId);
+		//I40[End]
+		//I49[Start]
+		Task<string> GetHostSettingValue(long settingId, string type="");
+		Task<string> GetTenantSettingValue(long settingId, string type="");
+		//I49[End]
     }
 }

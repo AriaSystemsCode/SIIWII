@@ -35,7 +35,9 @@ import {
     LookupLabelDto,
     AppEntitiesServiceProxy,
     VariationListToDeleteDto,
-    
+    AppItemLookupDto,
+    SydObjectsServiceProxy,
+
 } from "@shared/service-proxies/service-proxies";
 import { BsModalRef, BsModalService, ModalOptions } from "ngx-bootstrap/modal";
 import { TabDirective, TabsetComponent } from "ngx-bootstrap/tabs";
@@ -56,6 +58,7 @@ import { PricingHelpersService } from "../../app-item-shared/services/pricing-he
 import { ApplyVariationOutput } from "./create-edit-app-item-variations.component";
 import Swal from "sweetalert2";
 import { AppConsts } from "@shared/AppConsts";
+import { SelectRelatedItemDynamicModalComponent } from "@app/relatedItems/select-relatedItem-dynamic-modal.component";
 
 @Component({
     selector: "app-create-or-edit-app-item",
@@ -78,7 +81,7 @@ export class CreateOrEditAppItemComponent
     descriptionExportedHtml: string;
     saving = false;
     activeDescriptionIndex = 0;
-    extraVariationsTypes:any;
+    extraVariationsTypes: any;
     appItemTypeId: number;
     selectedItemTypeData: GetAllEntityObjectTypeOutput =
         new GetAllEntityObjectTypeOutput();
@@ -112,21 +115,26 @@ export class CreateOrEditAppItemComponent
 
     categoriesSkipCount: number = 0;
     departmentsSkipCount: number = 0;
+    relatedItemsSkipCount: number = 0;
     classificationsSkipCount: number = 0;
     categoriesTotalCount: number;
     departmentsTotalCount: number;
+    relatedItemsTotalCount: number;
     classificationsTotalCount: number;
     maxResultCount: number = 10;
     sortBy: string = "name";
     categories: AppEntityDtoWithActions<AppEntityCategoryDto>[] = [];
     departments: AppEntityDtoWithActions<AppEntityCategoryDto>[] = [];
+    relatedItems: AppEntityDtoWithActions<AppItemLookupDto>[] = [];
     classifications: AppEntityDtoWithActions<AppEntityClassificationDto>[] = [];
     entityObjectType: string = "PRODUCT";
     defaultCurrencyMSRPPriceIndex = -1;
     showAdvancedPricing: boolean = false;
     PriceValidMsg: string = "";
     oldnonLookupValues;
-
+     appEntities;
+     currentLang: string
+     isArabic: boolean
     constructor(
         injector: Injector,
         _location: Location,
@@ -138,6 +146,7 @@ export class CreateOrEditAppItemComponent
         private _activatedRoute: ActivatedRoute,
         private _pricingHelperService: PricingHelpersService,
         private _appEntitiesServiceProxy: AppEntitiesServiceProxy,
+        private _sydObjectsServiceProxy:SydObjectsServiceProxy,
         private _router: Router
     ) {
         super(injector, _location);
@@ -181,10 +190,28 @@ export class CreateOrEditAppItemComponent
         }
         return selectedIds;
     }
+
+
+    public get selectedRelatedItemsIds(): number[] {
+        let selectedIds: number[] = [];
+        if (this.relatedItems) {
+            selectedIds = this.relatedItems.reduce((accum, elem) => {
+                const addedAndNotSavedYet: boolean = !elem.entityDto.id;
+                if (addedAndNotSavedYet)
+                    accum.push(elem.entityDto.appItemId); 
+                  return accum;
+            }, []);
+        }
+        return selectedIds;
+    }
+
     id: number;
     // interfaces implementations
 
+    
     ngOnInit(): void {
+        this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
+        this.currentLang == 'ar' || this.currentLang == 'ar-EG'  ? this.isArabic = true : this.isArabic = false
         this.defineExtraAttributes();
         this.initUploaders();
         this.id = this.detectComponentMode();
@@ -209,9 +236,11 @@ export class CreateOrEditAppItemComponent
         this.getCurrencies();
         this.getAspectatio();
 
-        this.languageSettingName  =AppConsts.languageSettingName;
+        this.languageSettingName = AppConsts.languageSettingName;
         //this._pricingHelperService.defaultLevel= this.languageSettingName!='en-GB' ? "MSRP"  :  "RRP"
-      
+
+        if (!this.appItem?.taxRate)
+            this.appItem.taxRate=0;
     }
     languageSettingName;
     aspectRatio;
@@ -321,43 +350,50 @@ export class CreateOrEditAppItemComponent
     async getAppItemDataForEdit(id: number) {
         this.showMainSpinner();
         return await this._appItemsServiceProxy
-            .getAppItemForEdit(
-                id,
-                undefined,
-                0,
-                this.maxResultCount,
-                undefined,
-                0,
-                this.maxResultCount,
-                undefined,
-                0,
-                this.maxResultCount,
-                undefined,
-                undefined,
-                undefined
-            )
+        .getAppItemForEdit(
+            id,
+            undefined,
+            0,
+            this.maxResultCount,
+            undefined,
+            0,
+            this.maxResultCount,
+            undefined,
+            0,
+            this.maxResultCount,
+            undefined,
+            0,
+            this.maxResultCount,
+            undefined, ///item SSIN
+            undefined,
+            0,
+            this.maxResultCount
+        )
             .toPromise()
             .then((res) => {
                 this.appItem = CreateOrEditAppItemDto.fromJS({
                     ...res.appItem,
                     entityCategories: res.appItem.entityCategories.items,
                     entityDepartments: res.appItem.entityDepartments.items,
+                    entityRelatedItems: res.appItem.relatedAppItems.items,
                     entityClassifications:
                         res.appItem.entityClassifications.items,
-                        nonLookupValues: res.nonLookupValues
+                    nonLookupValues: res.nonLookupValues
                 });
-let x=  this.appItem.nonLookupValues;
-               // this.oldnonLookupValues = this.appItem.nonLookupValues  && this.appItem.nonLookupValues.length>0 ?  JSON.parse(JSON.stringify(x)) : [];
-                this.oldnonLookupValues = this.appItem.nonLookupValues && this.appItem.nonLookupValues.length > 0 ? 
-    x.map(item => new LookupLabelDto(item)) : [];
+                let x = this.appItem.nonLookupValues;
+                // this.oldnonLookupValues = this.appItem.nonLookupValues  && this.appItem.nonLookupValues.length>0 ?  JSON.parse(JSON.stringify(x)) : [];
+                this.oldnonLookupValues = this.appItem.nonLookupValues && this.appItem.nonLookupValues.length > 0 ?
+                    x.map(item => new LookupLabelDto(item)) : [];
                 this.categoriesTotalCount =
                     res.appItem.entityCategories.totalCount;
                 this.departmentsTotalCount =
                     res.appItem.entityDepartments.totalCount;
+                this.relatedItemsTotalCount = res.appItem?.relatedAppItems?.totalCount;
                 this.classificationsTotalCount =
                     res.appItem.entityClassifications.totalCount;
                 this.handleCategories(res.appItem.entityCategories.items);
                 this.handleDepartments(res.appItem.entityDepartments.items);
+                this.handleRelatedItems(res.appItem.relatedAppItems.items);
                 this.handleClassifications(
                     res.appItem.entityClassifications.items
                 );
@@ -373,7 +409,7 @@ let x=  this.appItem.nonLookupValues;
     }
 
     defineExtraAttributes() {
-        
+
         this.extraAttributes = {
             [EExtraAttributeUsage.Recommended]:
                 new CreateEditAppItemExtraAttribute({
@@ -404,15 +440,15 @@ let x=  this.appItem.nonLookupValues;
     selectTab(tabId: number) {
         this.staticTabs.tabs[tabId].active = true;
     }
-    getallAtrributes(id,oninit) {
+    getallAtrributes(id, oninit) {
         this._appItemsServiceProxy
             .getProductVariationsTypes(id)
             .subscribe((res: any) => {
-                if(JSON.stringify(this.extraVariationsTypes)==JSON.stringify(res)||! this.extraVariationsTypes){
+                if (JSON.stringify(this.extraVariationsTypes) == JSON.stringify(res) || !this.extraVariationsTypes) {
                     this.extraVariationsTypes = res;
                     this.getAppItemTypeExtraAttributesByIdFun(id);
 
-                }else{
+                } else {
 
                     Swal.fire({
                         title: "",
@@ -441,7 +477,7 @@ let x=  this.appItem.nonLookupValues;
                 }
             });
     }
-    getAppItemTypeExtraAttributesByIdFun(id){
+    getAppItemTypeExtraAttributesByIdFun(id) {
         if (!isNaN(id)) {
             this.getAppItemTypeExtraAttributesById(id).subscribe(
                 (result) => {
@@ -482,7 +518,7 @@ let x=  this.appItem.nonLookupValues;
     }
     // item type methods
     onItemTypeChange(id: number) {
-        this.getallAtrributes(id,false);
+        this.getallAtrributes(id, false);
     }
 
     loadRecommendedAndAdditionalExtraDataLookupLists() {
@@ -513,8 +549,8 @@ let x=  this.appItem.nonLookupValues;
                         extraAttr.paginationSetting.list.length - 1,
                         1
                     );
-                     let isExist=result.items.filter((item)=>{ return item.value==extraAttr.attributeId});
-                    if((isExist!.length==0||isExist==undefined)  && extraAttr?.selectedValues?.length>0){
+                let isExist = result.items.filter((item) => { return item.value == extraAttr.attributeId });
+                if ((isExist!.length == 0 || isExist == undefined) && extraAttr?.selectedValues?.length > 0) {
 
                         const tempAtt = new LookupLabelDto({
                             code:extraAttr.code,
@@ -523,7 +559,9 @@ let x=  this.appItem.nonLookupValues;
                             value:extraAttr.selectedValues,
                             isHostRecord:false,
                             hexaCode:undefined,
-                            image:undefined
+                            image:undefined,
+                            status:undefined,
+                            entityObjectStatusId:undefined
                         })
                         result.items.push(tempAtt)
                     }
@@ -565,34 +603,34 @@ let x=  this.appItem.nonLookupValues;
         });
     }
     removeAllVariations() {
-    this.formTouched = true;
-    this._appItemsServiceProxy.getItemVariationsToDelete(this.id,undefined)
-    .subscribe((res:VariationListToDeleteDto) => {
-        if (res && res?.variationsInUse?.length >0) {
-            Swal.fire({
-                title: "",
-                text:  res?.variationsInUse?.length==1 ? "Variation '"+res?.variationsInUse[0]?.code?.toString() + "' Is in use" :  "More than one variation in use",
-                icon: "info",
-                confirmButtonText:
-                    "Ok",
-                allowOutsideClick: false,
-                allowEscapeKey: false,
-                backdrop: true,
-                customClass: {
-                    popup: "popup-class",
-                    icon: "icon-class",
-                    content: "content-class",
-                    actions: "actions-class",
-                    confirmButton: "confirm-button-class2",
-                },
+        this.formTouched = true;
+        this._appItemsServiceProxy.getItemVariationsToDelete(this.id, undefined)
+            .subscribe((res: VariationListToDeleteDto) => {
+                if (res && res?.variationsInUse?.length > 0) {
+                    Swal.fire({
+                        title: "",
+                        text: res?.variationsInUse?.length == 1 ? "Variation '" + res?.variationsInUse[0]?.code?.toString() + "' Is in use" : "More than one variation in use",
+                        icon: "info",
+                        confirmButtonText:
+                            "Ok",
+                        allowOutsideClick: false,
+                        allowEscapeKey: false,
+                        backdrop: true,
+                        customClass: {
+                            popup: "popup-class",
+                            icon: "icon-class",
+                            content: "content-class",
+                            actions: "actions-class",
+                            confirmButton: "confirm-button-class2",
+                        },
+                    });
+                }
+                else {
+                    this.appItem.variationItems = [];
+                    this.removeSelectedOrAddUnSelectedExtraAttributesOnVariationsFromAppItemEntityExtraData();
+                    this.appItem.appItemSizesScaleInfo = [];
+                }
             });
-        }
-        else{
-        this.appItem.variationItems = [];
-        this.removeSelectedOrAddUnSelectedExtraAttributesOnVariationsFromAppItemEntityExtraData();
-        this.appItem.appItemSizesScaleInfo = [];
-        }
-    });
     }
     resetExtraData() {
         this.appItem.entityExtraData = [];
@@ -659,7 +697,7 @@ let x=  this.appItem.nonLookupValues;
 
     openSelectAppItemTypeModal() {
         let config: ModalOptions = new ModalOptions();
-        config.class = "right-modal slide-right-in";
+          !this.isArabic ?  config.class = "right-modal slide-right-in" : config.class = "left-modal slide-left-in ngLeft"
         let modalDefaultData: Partial<SelectAppItemTypeComponent> = {
             savedId: this.appItem.entityObjectTypeId,
         };
@@ -684,12 +722,12 @@ let x=  this.appItem.nonLookupValues;
         let data: SelectAppItemTypeComponent = modalRef.content;
         if (data.selectionDone && data.selectedRecord) {
             // add or edit done
-           if(!(this.appItem?.id>0)) {
-            this._appItemsServiceProxy.generateProductCode(data.selectedRecord.data.sycEntityObjectType.id, false,this.appSession.tenantId).subscribe((res: any) => {
-                this.appItem.code = res;
-                this.appItem.OriginalCode = res
-            })
-              }
+            if (!(this.appItem?.id > 0)) {
+                this._appItemsServiceProxy.generateProductCode(data.selectedRecord.data.sycEntityObjectType.id, false, this.appSession.tenantId).subscribe((res: any) => {
+                    this.appItem.code = res;
+                    this.appItem.OriginalCode = res
+                })
+            }
             this.productTypeId =
                 data.selectedRecord.data.sycEntityObjectType.id;
             this.addSelectedAppItemType(data.selectedRecord);
@@ -711,7 +749,7 @@ let x=  this.appItem.nonLookupValues;
     // Categories
     openSelectCategoriesModal() {
         let config: ModalOptions = new ModalOptions();
-        config.class = "right-modal slide-right-in";
+         !this.isArabic ?  config.class = "right-modal slide-right-in" : config.class = "left-modal slide-left-in ngLeft"
         let modalDefaultData: Partial<SelectCategoriesDynamicModalComponent> = {
             savedIds: this.selectedCategoriesIds,
             showAddAction: true,
@@ -725,8 +763,8 @@ let x=  this.appItem.nonLookupValues;
         );
         let subs: Subscription = this._BsModalService.onHidden.subscribe(() => {
             this.selectCategoriesHandler(modalRef);
-          //  if (!modalRef.content.isHiddenToCreateOrEdit) 
-            if ( modalRef.content.isHiddenToCreateOrEdit!=undefined && !modalRef.content.isHiddenToCreateOrEdit)subs.unsubscribe();
+            //  if (!modalRef.content.isHiddenToCreateOrEdit) 
+            if (modalRef.content.isHiddenToCreateOrEdit != undefined && !modalRef.content.isHiddenToCreateOrEdit) subs.unsubscribe();
         });
     }
     removeCategory(
@@ -784,20 +822,20 @@ let x=  this.appItem.nonLookupValues;
         selected.forEach((element) => {
             if (element.leaf) {
                 console.log(element);
-            const newCategory: AppEntityDtoWithActions<AppEntityCategoryDto> =
-                new AppEntityDtoWithActions<AppEntityCategoryDto>({
-                    entityDto: new AppEntityCategoryDto({
-                        id: 0,
-                        entityObjectCategoryId:
-                            element.data.sycEntityObjectCategory.id,
-                        entityObjectCategoryCode:
-                            element.data.sycEntityObjectCategory.code,
-                            entityObjectCategoryName:this.getPath(element),
-                    }),
-                });
-       
-            this.categories.push(newCategory);
-    }
+                const newCategory: AppEntityDtoWithActions<AppEntityCategoryDto> =
+                    new AppEntityDtoWithActions<AppEntityCategoryDto>({
+                        entityDto: new AppEntityCategoryDto({
+                            id: 0,
+                            entityObjectCategoryId:
+                                element.data.sycEntityObjectCategory.id,
+                            entityObjectCategoryCode:
+                                element.data.sycEntityObjectCategory.code,
+                            entityObjectCategoryName: this.getPath(element),
+                        }),
+                    });
+
+                this.categories.push(newCategory);
+            }
         });
         this.appItem.entityCategories = selectedCategories;
         this.formTouched = true;
@@ -816,11 +854,53 @@ let x=  this.appItem.nonLookupValues;
         this.appItem.entityDepartmentsRemoved = removedDepartments;
     }
 
+   
+
+    seperateNewAndRemovedRelatedItems() {
+        const newlyAddedRelatedItems: AppItemLookupDto[] = [];
+        const removedRelatedItems: AppItemLookupDto[] = [];
+    
+        this.relatedItems.forEach((relatedItem) => {
+            if (relatedItem.removed) {
+                removedRelatedItems.push(relatedItem.entityDto);
+            } else if (!relatedItem.entityDto.id) {
+                newlyAddedRelatedItems.push(relatedItem.entityDto);
+            }
+        });
+
+           const _entityRelatedItemAdded: AppEntityCategoryDto[] = newlyAddedRelatedItems.map(item => {
+            const dto = new AppEntityCategoryDto();
+            dto.entityObjectCategoryId = item.appItemId;
+            dto.entityObjectCategoryCode = item.appItemCode;
+            dto.entityObjectCategoryName = item.appItemName;
+            dto.id = 0;
+            //dto.appEntityId = this.appItem.id;
+           // dto.appEntityName = this.appItem.name;
+            return dto;
+        });
+
+
+        const _entityRelatedItemSRemoved: AppEntityCategoryDto[] = removedRelatedItems.map(item => {
+            const dto = new AppEntityCategoryDto();
+            dto.entityObjectCategoryId = item.appItemId;
+            dto.entityObjectCategoryCode = item.appItemCode;
+            dto.entityObjectCategoryName = item.appItemName;
+            dto.id = 0;
+            //dto.appEntityId = this.appItem.id;
+           // dto.appEntityName = this.appItem.name;
+            return dto;
+        });
+        this.appItem.entityRelatedItemAdded=_entityRelatedItemAdded;
+        this.appItem.entityRelatedItemsRemoved = _entityRelatedItemSRemoved;
+    }
+    
+    
+
     // Departmetns
     openSelectDepartmentsModal() {
         this.formTouched = true;
         let config: ModalOptions = new ModalOptions();
-        config.class = "right-modal slide-right-in";
+         !this.isArabic ?  config.class = "right-modal slide-right-in" : config.class = "left-modal slide-left-in ngLeft"
         let modalDefaultData: Partial<SelectCategoriesDynamicModalComponent> = {
             savedIds: this.selectedDepartmentsIds,
             showAddAction: false,
@@ -839,6 +919,28 @@ let x=  this.appItem.nonLookupValues;
             subs.unsubscribe();
         });
     }
+    openSelectRelatedItemsModal() {
+        this.formTouched = true;
+        let config: ModalOptions = new ModalOptions();
+          !this.isArabic ?  config.class = "right-modal slide-right-in" : config.class = "left-modal slide-left-in ngLeft"
+        let modalDefaultData: Partial<SelectRelatedItemDynamicModalComponent> = {
+            savedIds: this.selectedRelatedItemsIds,
+            showAddAction: false,
+            showActions: false,
+            entityObjectDisplayName: this.l("Relatedproducts"),
+            entityId: this.appItem.entityId,
+        };
+        config.initialState = modalDefaultData;
+        let modalRef: BsModalRef = this._BsModalService.show(
+            SelectRelatedItemDynamicModalComponent,
+            config
+        );
+        let subs: Subscription = this._BsModalService.onHidden.subscribe(() => {
+            this.selectRelatedItemsHandler(modalRef);
+            subs.unsubscribe();
+        });
+    }
+
 
     removeDepartment(
         department: AppEntityDtoWithActions<AppEntityCategoryDto>,
@@ -849,8 +951,23 @@ let x=  this.appItem.nonLookupValues;
             department.removed = true;
         } else this.departments.splice(i, 1);
     }
+
+    removeRelatedItem(relatedItem: AppEntityDtoWithActions<AppItemLookupDto>,
+        i: number) {
+        this.formTouched = true;
+        if (relatedItem.entityDto.id) {
+            relatedItem.removed = true;
+        } else this.relatedItems.splice(i, 1);
+    }
+
+
     undoDepartment(department: AppEntityDtoWithActions<AppEntityCategoryDto>) {
         department.removed = false;
+    }
+
+
+    undoRelatedItem(relatedItem: AppEntityDtoWithActions<AppItemLookupDto>) {
+        relatedItem.removed = false;
     }
 
     selectDepartmentsHandler(modalRef) {
@@ -862,6 +979,18 @@ let x=  this.appItem.nonLookupValues;
         ) {
             // add or edit done
             this.addSelectedDepartments(data.selectedRecords);
+        }
+    }
+
+    selectRelatedItemsHandler(modalRef) {
+        let data: SelectRelatedItemDynamicModalComponent = modalRef.content;
+        if (
+            data.selectionDone &&
+            Array.isArray(data.selectedRecords) &&
+            data.selectedRecords.length
+        ) {
+            // add or edit done
+            this.addSelectedRelatedItems(data.selectedRecords);
         }
     }
 
@@ -880,6 +1009,32 @@ let x=  this.appItem.nonLookupValues;
             });
     }
 
+    loadMoreRelatedItems() {
+        this.relatedItemsSkipCount += this.maxResultCount;
+          this._appItemsServiceProxy
+             .getAppItemRelatedProductsWithPaging(
+                undefined,
+                undefined,
+                undefined,
+                undefined,
+                undefined,
+                undefined,
+                undefined,
+                undefined,
+                 undefined,
+                 this.appItem.entityId,
+                 undefined,
+                 undefined,
+                 undefined,
+                 undefined,
+                 this.relatedItemsSkipCount,
+                 this.maxResultCount
+             )
+             .subscribe((res) => {
+                this.handleRelatedItems(res.items)
+             }); 
+    }
+
     handleDepartments(data: AppEntityCategoryDto[]) {
         if (!data) return;
         data.forEach((item) => {
@@ -889,23 +1044,56 @@ let x=  this.appItem.nonLookupValues;
         });
     }
 
+    handleRelatedItems(data: AppItemLookupDto[]) {
+        if (!data) return;
+        data.forEach((item) => {
+            const categ = new AppEntityDtoWithActions<AppItemLookupDto>();
+            categ.entityDto = item;
+            this.relatedItems.push(categ);
+        });
+    }
+
+
     addSelectedDepartments(
         selected: TreeNodeOfGetSycEntityObjectCategoryForViewDto[]
     ): void {
         let selectedCategories: AppEntityCategoryDto[] = [];
         selected.forEach((element) => {
             if (element.leaf) {
-                    const newCategory: AppEntityDtoWithActions<AppEntityCategoryDto> =
-                        new AppEntityDtoWithActions<AppEntityCategoryDto>({
-                            entityDto: new AppEntityCategoryDto({
-                                id: 0,
-                                entityObjectCategoryId: element.data.sycEntityObjectCategory.id,
-                                entityObjectCategoryCode: element.data.sycEntityObjectCategory.code,
-                                entityObjectCategoryName: this.getPath(element),
-                            }),
+                const newCategory: AppEntityDtoWithActions<AppEntityCategoryDto> =
+                    new AppEntityDtoWithActions<AppEntityCategoryDto>({
+                        entityDto: new AppEntityCategoryDto({
+                            id: 0,
+                            entityObjectCategoryId: element.data.sycEntityObjectCategory.id,
+                            entityObjectCategoryCode: element.data.sycEntityObjectCategory.code,
+                            entityObjectCategoryName: this.getPath(element),
+                        }),
+                    });
+                this.departments.push(newCategory);
+            }
+        });
+    }
+
+    addSelectedRelatedItems(
+        selected: TreeNodeOfGetSycEntityObjectCategoryForViewDto[]
+    ): void {
+        let selectedCategories: AppItemLookupDto[] = [];
+        selected.forEach((element) => {
+            if (element.leaf) {
+                const newCategory: AppEntityDtoWithActions<AppItemLookupDto> =
+                    new AppEntityDtoWithActions<AppItemLookupDto>({
+                        entityDto: new AppItemLookupDto({
+                            appItemId: element.data.sycEntityObjectCategory?.id ?? 0,
+                            appItemCode: element.data.sycEntityObjectCategory?.code?? '',
+                            appItemName: element.data.sycEntityObjectCategory?.name?? '',
+                            appItemDescription: element.data.sycEntityObjectCategory?.description?? '',
+                            appItemImageUrl: element.data.sycEntityObjectCategory?.appItemImageUrl?? '',
+                            appItemImageName:element.data.sycEntityObjectCategory?.appItemImageName?? '',
+                            id: 0
+                            })
                         });
-                    this.departments.push(newCategory);
-                }
+                this.relatedItems.push(newCategory);
+            }
         });
     }
 
@@ -913,7 +1101,7 @@ let x=  this.appItem.nonLookupValues;
         if (!item.parent) {
             return item.label;
         }
-    
+
         // Recursively build the path including all ancestor nodes
         const parentPath = this.getPath(item.parent);
         return parentPath ? parentPath + "-" + item.label : item.label;
@@ -935,7 +1123,7 @@ let x=  this.appItem.nonLookupValues;
     openSelectClassificationsModal() {
         this.formTouched = true;
         let config: ModalOptions = new ModalOptions();
-        config.class = "right-modal slide-right-in";
+         !this.isArabic ?  config.class = "right-modal slide-right-in" : config.class = "left-modal slide-left-in ngLeft"
         let modalDefaultData: Partial<SelectClassificationDynamicModalComponent> =
         {
             savedIds: this.selectedClassificationsIds,
@@ -950,8 +1138,8 @@ let x=  this.appItem.nonLookupValues;
         );
         let subs: Subscription = this._BsModalService.onHidden.subscribe(() => {
             this.selectClassificationsHandler(modalRef);
-          //  if (!modalRef.content.isHiddenToCreateOrEdit) 
-          if ( modalRef.content.isHiddenToCreateOrEdit!=undefined && !modalRef.content.isHiddenToCreateOrEdit) subs.unsubscribe();
+            //  if (!modalRef.content.isHiddenToCreateOrEdit) 
+            if (modalRef.content.isHiddenToCreateOrEdit != undefined && !modalRef.content.isHiddenToCreateOrEdit) subs.unsubscribe();
         });
     }
 
@@ -998,6 +1186,8 @@ let x=  this.appItem.nonLookupValues;
             });
     }
 
+
+
     handleClassifications(data: AppEntityClassificationDto[]) {
         if (!data) return;
         data.forEach((item) => {
@@ -1014,19 +1204,19 @@ let x=  this.appItem.nonLookupValues;
         this.formTouched = true;
         selected.forEach((element) => {
             if (element.leaf) {
-            const newClass: AppEntityDtoWithActions<AppEntityClassificationDto> =
-                new AppEntityDtoWithActions<AppEntityClassificationDto>({
-                    entityDto: new AppEntityClassificationDto({
-                        id: 0,
-                        entityObjectClassificationId:
-                            element.data.sycEntityObjectClassification.id,
-                        entityObjectClassificationCode:
-                            element.data.sycEntityObjectClassification.code,
+                const newClass: AppEntityDtoWithActions<AppEntityClassificationDto> =
+                    new AppEntityDtoWithActions<AppEntityClassificationDto>({
+                        entityDto: new AppEntityClassificationDto({
+                            id: 0,
+                            entityObjectClassificationId:
+                                element.data.sycEntityObjectClassification.id,
+                            entityObjectClassificationCode:
+                                element.data.sycEntityObjectClassification.code,
                             entityObjectClassificationName: this.getPath(element),
-                    }),
-                });
-            this.classifications.push(newClass);
-        }
+                        }),
+                    });
+                this.classifications.push(newClass);
+            }
         });
     }
 
@@ -1118,37 +1308,37 @@ let x=  this.appItem.nonLookupValues;
     onDragLeave(event: DragEvent) {
         event.preventDefault();
         event.stopPropagation();
-      }
+    }
 
-      onDragOver(event: DragEvent) {
+    onDragOver(event: DragEvent) {
         event.preventDefault(); // Required to allow dropping
         event.stopPropagation();
-      }
-      
+    }
+
     onDrop(event: DragEvent, index: number) {
         event.preventDefault();
         event.stopPropagation();
-      
-        if (event.dataTransfer?.files.length) {
-          const file = event.dataTransfer.files[0];
-      
-          console.log("File dropped:", file);
-      
-          const mockEvent = {
-            target: { files: [file], value: file.name } // Mimicking an input event
-          };
-      
-          this.fileChange(
-            mockEvent as unknown as Event,
-            this.productImageCategory,
-            index,
-            undefined,
-            true
-          );
-        }
-      }
 
-      
+        if (event.dataTransfer?.files.length) {
+            const file = event.dataTransfer.files[0];
+
+            console.log("File dropped:", file);
+
+            const mockEvent = {
+                target: { files: [file], value: file.name } // Mimicking an input event
+            };
+
+            this.fileChange(
+                mockEvent as unknown as Event,
+                this.productImageCategory,
+                index,
+                undefined,
+                true
+            );
+        }
+    }
+
+
     fileChange(
         event,
         attachmentCategory: GetSycAttachmentCategoryForViewDto,
@@ -1158,13 +1348,17 @@ let x=  this.appItem.nonLookupValues;
     ) {
         this.formTouched = true;
         if (event.target.value) {
+        let file = event.target?.files[0];
+            const fileType = file.type.toLowerCase();
 
             //get aspectRatio 
-            if(!aspectRatio)
-                aspectRatio=this.aspectRatio;
+            if (!aspectRatio)
+                aspectRatio = this.aspectRatio;
 
             // there is a file
             // destructing operator => declare 2 variables from the returned object with the same keys names
+            
+        if (fileType.startsWith('image/')) {
             let { onCropDone, data } = this.openImageCropper(
                 event,
                 aspectRatio,
@@ -1184,6 +1378,20 @@ let x=  this.appItem.nonLookupValues;
                 subs.unsubscribe();
             });
         }
+
+        else {
+            this.tempUploadImage(
+                event,
+                attachmentCategory,
+                null,
+                index
+            );
+            event.target.value = null;
+        }
+    }
+
+
+
     }
 
     tempUploadImage(
@@ -1192,10 +1400,16 @@ let x=  this.appItem.nonLookupValues;
         croppedImageContent: ImageCropperComponent,
         index?: number
     ) {
-        const file = (event.target as HTMLInputElement).files[0];
-        attachmentCategory.imgURL =
-            croppedImageContent.croppedImageAsBase64 as string;
 
+        const file = (event.target as HTMLInputElement).files?.[0];
+        if (!file) return;
+
+        const fileType = file.type;
+        const isImage = fileType.startsWith('image/');
+        const isPDF = fileType === 'application/pdf';
+        const isVideo = fileType.startsWith('video/');
+
+            
         if (
             this.appItem.entityAttachments == null ||
             this.appItem.entityAttachments == undefined
@@ -1210,24 +1424,59 @@ let x=  this.appItem.nonLookupValues;
         att.fileName = file?.name;
         att.attachmentCategoryId = attachmentCategory.sycAttachmentCategory.id;
         att.guid = guid;
+        att.isPublic = true;
         const tempFile = guid + file.name.match(/\.[0-9a-z]+$/i)[0];
-        this.addTempAttachments([tempFile]);
+        this.addTempAttachments([    
+
+
+        ]);
+
+        if (isImage) {
+        attachmentCategory.imgURL =
+            croppedImageContent.croppedImageAsBase64 as string;
+            
         // save image as a base64
         this.attachmentsSrcs[index] =
             croppedImageContent.croppedImageAsBase64 as string;
-        this.appItem.entityAttachments[index] = att;
-        if (index === 0) {
-            this.setDefaultImage(0);
+
+            this.uploadBlobAttachment(croppedImageContent.croppedImage, att);
+
+            this.appItem.entityAttachments[index] = att;
+            if (index === 0) {
+                this.setDefaultImage(0);
+            }
+    
+    
+            // if all is filled with images add new input
+            if (
+                this.attachmentsSrcs.every((elem) => elem) &&
+                this.attachmentsSrcs.length < 10
+            )
+                this.attachmentsSrcs.push("");
         }
 
-        this.uploadBlobAttachment(croppedImageContent.croppedImage, att);
+        else if (isPDF || isVideo) {
 
-        // if all is filled with images add new input
-        if (
-            this.attachmentsSrcs.every((elem) => elem) &&
-            this.attachmentsSrcs.length < 10
-        )
-            this.attachmentsSrcs.push("");
+            const reader = new FileReader();
+            reader.onload = () => {
+                this.attachmentsSrcs[index] = reader.result as string;
+                this.uploadBlobAttachment(file, att);
+
+                this.appItem.entityAttachments[index] = att;
+         
+    
+            // if all is filled with images add new input
+            if (
+                this.attachmentsSrcs.every((elem) => elem) &&
+                this.attachmentsSrcs.length < 10
+            )
+                this.attachmentsSrcs.push("");
+            };
+            reader.readAsDataURL(file);
+        }
+
+           
+       
     }
 
     setDefaultImage(index) {
@@ -1241,10 +1490,12 @@ let x=  this.appItem.nonLookupValues;
         this.defaultImageIndex = index;
         this.appItem.entityAttachments.map((item, i) => {
             item.isDefault = index == i ? true : false;
+            if (item.isDefault)
+                item.isPublic = true;
             return item;
         });
     }
-    removePhoto(i: number) {
+    removeAttach(i: number) {
         this.formTouched = true;
         if (
             this.defaultImageIndex === i &&
@@ -1291,19 +1542,19 @@ let x=  this.appItem.nonLookupValues;
         //     );
         // }
         // else {
-            this.appItem?.variationItems?.forEach((variation) => {
-                if(!variation.appItemPriceInfos)variation.appItemPriceInfos = this.getParentProductPrices();
-            });
-    // }
+        this.appItem?.variationItems?.forEach((variation) => {
+            if (!variation.appItemPriceInfos) variation.appItemPriceInfos = this.getParentProductPrices();
+        });
+        // }
 
-    const hasZeroPrice = this.appItem?.variationItems?.some(variation =>
-        variation.appItemPriceInfos?.some(priceInfo => priceInfo.price == 0)
-    );
-    if (hasZeroPrice) {
-        Swal.fire({
-            title: "",
-            text: "Some variation have zero price continue ?",
-             icon: "info",
+        const hasZeroPrice = this.appItem?.variationItems?.some(variation =>
+            variation.appItemPriceInfos?.some(priceInfo => priceInfo.price == 0)
+        );
+        if (hasZeroPrice) {
+            Swal.fire({
+                title: "",
+                text: "Some variation have zero price continue ?",
+                icon: "info",
                 showCancelButton: true,
                 confirmButtonText:
                     "Yes",
@@ -1317,22 +1568,22 @@ let x=  this.appItem.nonLookupValues;
                     content: "content-class",
                     actions: "actions-class",
                     confirmButton: "confirm-button-class2",
-            },
-        }).then((result) => {
-            if (!result.isConfirmed) 
-              return;
+                },
+            }).then((result) => {
+                if (!result.isConfirmed)
+                    return;
 
-            else
+                else
+                    this._saveProuct(form);
+            })
+        }
+        else
             this._saveProuct(form);
-    })
-}
-else
-this._saveProuct(form);
 
-}
+    }
 
 
-_saveProuct(form){
+    _saveProuct(form) {
         this.submitted = true;
         if (form.form.invalid) {
             form.form.markAllAsTouched();
@@ -1359,10 +1610,23 @@ _saveProuct(form){
         if (this.listingMode === ListingModeEnum.Create) delete this.appItem.id;
         this.seperateNewAndRemovedCategories();
         this.seperateNewAndRemovedDepartments();
+        this.seperateNewAndRemovedRelatedItems();
         this.seperateNewAndRemovedClassifications();
         this.extraSelectedValuesExtraData();
         if (this.appItem.sycIdentifierId == 0)
             this.appItem.sycIdentifierId = null;
+        let _entityRelatedItems: AppEntityCategoryDto[] = [];
+        _entityRelatedItems= this.appItem?.entityRelatedItems?.map(item => {
+            const dto = new AppEntityCategoryDto();
+            dto.entityObjectCategoryId = item.appItemId;
+            dto.entityObjectCategoryCode = item.appItemCode;
+            dto.entityObjectCategoryName = item.appItemName;
+            dto.id = item.id;
+            return dto;
+        });
+
+        this.appItem.entityRelatedItems =_entityRelatedItems;
+
         this._appItemsServiceProxy
             .createOrEdit(this.appItem)
             .pipe(
@@ -1419,11 +1683,11 @@ _saveProuct(form){
                     // single selection
                     const alreadySelected: AppEntityExtraDataDto =
                         previousExtraAttributes.filter((item) => {
-                         return   item.attributeId == extraAttr.attributeId;
+                            return item.attributeId == extraAttr.attributeId;
                         })[0];
                     if (alreadySelected) {
                         alreadySelected.attributeValueId =
-                        parseInt(extraAttr?.selectedValues);
+                            parseInt(extraAttr?.selectedValues);
                         this.appItem.entityExtraData.push(alreadySelected);
                     } else {
                         const entityExtraData: AppEntityExtraDataDto =
@@ -1439,7 +1703,7 @@ _saveProuct(form){
                 // any other not lookup data
                 const alreadySelected: AppEntityExtraDataDto =
                     previousExtraAttributes.filter((item) => {
-                       return item.attributeId == extraAttr?.attributeId;
+                        return item.attributeId == extraAttr?.attributeId;
                     })[0];
                 if (alreadySelected) {
                     alreadySelected.attributeValue = extraAttr?.selectedValues;
@@ -1459,10 +1723,10 @@ _saveProuct(form){
     showCreateOrEditVariationPage() {
         if (!this.appItem.entityObjectTypeId) {
             return this.notify.error(this.l("PleaseChooseAProductTypeFirst"));
-        }else if(!this.appItem?.code){
+        } else if (!this.appItem?.code) {
             return this.notify.error(this.l("PleaseAddAProductCode"));
         }
-         else if (
+        else if (
             !this.selectedItemTypeData.extraAttributes ||
             !this.selectedItemTypeData.extraAttributes.extraAttributes ||
             !this.selectedItemTypeData.extraAttributes.extraAttributes.length
@@ -1496,10 +1760,10 @@ _saveProuct(form){
     }
 
     applyVariations($event: ApplyVariationOutput) {
-        let x=this.appItem.nonLookupValues;
-       // this.oldnonLookupValues = this.appItem.nonLookupValues  && this.appItem.nonLookupValues.length>0 ?  JSON.parse(JSON.stringify(x)) : [];
-        this.oldnonLookupValues = this.appItem.nonLookupValues && this.appItem.nonLookupValues.length > 0 ? 
-             x.map(item => new LookupLabelDto(item)) : [];
+        let x = this.appItem.nonLookupValues;
+        // this.oldnonLookupValues = this.appItem.nonLookupValues  && this.appItem.nonLookupValues.length>0 ?  JSON.parse(JSON.stringify(x)) : [];
+        this.oldnonLookupValues = this.appItem.nonLookupValues && this.appItem.nonLookupValues.length > 0 ?
+            x.map(item => new LookupLabelDto(item)) : [];
 
         this.appItem.variationItems = $event.variation;
         this.appItem.appItemSizesScaleInfo = $event.appItemSizesScaleInfo;
@@ -1509,8 +1773,8 @@ _saveProuct(form){
         if (
             this.appItem.appItemPriceInfos.length ==
             this.appItem?.variationItems[0]?.appItemPriceInfos.length &&
-          this.appItem.appItemPriceInfos['currencyId']!==this.appItem?.variationItems[0]?.appItemPriceInfos['currencyId']
-          &&this.appItem.appItemPriceInfos['price']!==this.appItem?.variationItems[0]?.appItemPriceInfos['price']           
+            this.appItem.appItemPriceInfos['currencyId'] !== this.appItem?.variationItems[0]?.appItemPriceInfos['currencyId']
+            && this.appItem.appItemPriceInfos['price'] !== this.appItem?.variationItems[0]?.appItemPriceInfos['price']
         ) {
             this.message.confirm(
                 "",
@@ -1545,7 +1809,7 @@ _saveProuct(form){
         if ($event?.target?.files.length == 0)
             return;
         this.displayVariations = false;
-        this.appItem.nonLookupValues=this.oldnonLookupValues;
+        this.appItem.nonLookupValues = this.oldnonLookupValues;
     }
 
     allCurrencies: CurrencyInfoDto[] = [];
@@ -1575,10 +1839,10 @@ _saveProuct(form){
             }
         });
         const defaultCurrencyAlreadyAdded: boolean =
-                this.selectedCurrencies.findIndex(
-                    (item) => item.value == this.tenantDefaultCurrency.value
-                ) > -1;
-        if(!defaultCurrencyAlreadyAdded) this.selectedCurrencies.push(this.tenantDefaultCurrency) 
+            this.selectedCurrencies.findIndex(
+                (item) => item.value == this.tenantDefaultCurrency.value
+            ) > -1;
+        if (!defaultCurrencyAlreadyAdded) this.selectedCurrencies.push(this.tenantDefaultCurrency)
         this.formTouched = true;
         this.displayVariations = true;
     }
@@ -1626,7 +1890,7 @@ _saveProuct(form){
     openCreateNewAppEntityModal(extraAttr: FilteredExtraAttribute) {
         this.formTouched = true;
         let config: ModalOptions = new ModalOptions();
-        config.class = "right-modal slide-right-in";
+           !this.isArabic ?  config.class = "right-modal slide-right-in" : config.class = "left-modal  slide-left-in ngLeft"
         let modalDefaultData: Partial<AppEntityListDynamicModalComponent> = {
             entityObjectType: {
                 name: extraAttr.name,
@@ -1647,11 +1911,11 @@ _saveProuct(form){
             );
             let modalRefData: AppEntityListDynamicModalComponent =
                 modalRef.content;
-                
-              if(extraAttr?.paginationSetting?.skipCount)
-               extraAttr.paginationSetting.skipCount = 0; 
-            
-               this.loadExtraDataLookupList(extraAttr);
+
+            if (extraAttr?.paginationSetting?.skipCount)
+                extraAttr.paginationSetting.skipCount = 0;
+
+            this.loadExtraDataLookupList(extraAttr);
 
             if (modalRefData.selectionDone)
                 extraAttr.selectedValues = modalRefData.selectedRecords;
@@ -1690,8 +1954,8 @@ _saveProuct(form){
             //     }
             // }
 
-          //  if (!modalRef.content.isHiddenToCreateOrEdit) 
-            if ( modalRef.content.isHiddenToCreateOrEdit!=undefined && !modalRef.content.isHiddenToCreateOrEdit) subs.unsubscribe();
+            //  if (!modalRef.content.isHiddenToCreateOrEdit) 
+            if (modalRef.content.isHiddenToCreateOrEdit != undefined && !modalRef.content.isHiddenToCreateOrEdit) subs.unsubscribe();
         });
     }
     askToPublish() {
@@ -1773,11 +2037,11 @@ _saveProuct(form){
                     else this.appItem.variationItems[i].code = "";
                 }
 
-                if(this.appItem?.variationItems[i]?.entityExtraData[j]?.attributeValue ){
-                this.appItem.variationItems[i].code +=
-                    "-" +
-                    this.appItem?.variationItems[i]?.entityExtraData[j]
-                        ?.attributeValue;
+                if (this.appItem?.variationItems[i]?.entityExtraData[j]?.attributeValue) {
+                    this.appItem.variationItems[i].code +=
+                        "-" +
+                        this.appItem?.variationItems[i]?.entityExtraData[j]
+                            ?.attributeValue;
                 }
             }
         }
@@ -1793,15 +2057,22 @@ _saveProuct(form){
             this.notify.error("Available Qty should be >=0");
     }
     checkAndAddDefaultPriceObject() {
-        if (
-            !this.appItem.appItemPriceInfos ||
-            !this.appItem.appItemPriceInfos.length
-        ) {
-            this.appItem.appItemPriceInfos = [
-                this._pricingHelperService.getDefaultPricingInstance(),
-            ];
+        if (!this.appItem.appItemPriceInfos) {
+            this.appItem.appItemPriceInfos = [];
         }
-        this.checkDefaultCurrencyMSRPPriceIndex();
+
+        this.defaultCurrencyMSRPPriceIndex =
+            this._pricingHelperService.getDefaultPricingIndex(
+                this.appItem.appItemPriceInfos
+            );
+
+        if (this.defaultCurrencyMSRPPriceIndex < 0) {
+            this.appItem.appItemPriceInfos.push(
+                this._pricingHelperService.getDefaultPricingInstance()
+            );
+            this.defaultCurrencyMSRPPriceIndex =
+                this.appItem.appItemPriceInfos.length - 1;
+        }
     }
     showAdvancedPricingModal() {
         this.showAdvancedPricing = true;
@@ -1831,8 +2102,24 @@ _saveProuct(form){
         this.updateVariation = $event;
     }
 
-    convertTodecimal(value){
-        let inputvalue=value % 1 ==0?Math.round(value * 100 / 100).toFixed(2):value;
+    convertTodecimal(value) {
+        let inputvalue = value % 1 == 0 ? Math.round(value * 100 / 100).toFixed(2) : value;
         return inputvalue;
-      }
+    }
+
+    setVisibleinMarketplaceImage(index, isChecked: boolean) {
+        if (this.defaultImageIndex === index)
+            return;
+        this.formTouched = true;
+        this.appItem.entityAttachments?.map((item, i) => {
+            if (index == i) {
+                item.isPublic = isChecked;
+                return item;
+            }
+        });
+    }
+    fixNegative() {
+        if (this.appItem.taxRate < 0) 
+          this.appItem.taxRate = 0;
+    }
 }

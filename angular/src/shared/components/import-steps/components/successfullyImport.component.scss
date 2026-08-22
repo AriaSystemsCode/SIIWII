@@ -16,10 +16,11 @@
 {
     width: 304px;
     height: 45px;
-    background: #509AF7 0% 0% no-repeat padding-box;
+    background: #4A0D4A 0% 0% no-repeat padding-box;
     border-radius: 6px;
     opacity: 1;
     color:white;
+    border: 1px solid #4A0D4A;
 }
 
 ._download 
@@ -28,4 +29,49 @@
 letter-spacing: 0px !important;
 color: #509AF7 !important;
 opacity: 1 !important;;
+}
+
+label {
+    color:  unset !important;
+    font-size: unset;
+    font-style: unset;
+    font-weight: unset;
+    line-height: unset;
+}
+
+.success-download-link {
+    color: #4A0D4A !important;
+}
+
+@media (max-width: 768px) {
+    .modal-content {
+        width: 92%;
+        height: auto;
+        padding: 1rem;
+    }
+
+    ._Btn {
+        width: 100%;
+    }
+
+    .pt-3 {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .modal-dialog {
+        width: 96%;
+        margin: 0.5rem auto;
+    }
+
+    .modal-content {
+        width: 100%;
+    }
+
+    h4 {
+        font-size: 1rem;
+    }
 }

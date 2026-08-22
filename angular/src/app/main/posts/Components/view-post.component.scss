@@ -14,10 +14,6 @@
     width: 45px;
 }
 
-.descriptionContainer {
-    // word-wrap: break-word;
-    // white-space: pre;
-}
 
 .modalCenter {
     margin: 0 !important;
@@ -80,6 +76,8 @@ max-width: 989px;
         max-width: 100%;
         padding: 0px;
         margin: 1.75rem;
+        margin-left: 100px;
+
     }
 }
 
@@ -108,3 +106,21 @@ max-width: 989px;
 
 }
 
+
+.userName {
+    font-weight: 600;
+}
+
+
+
+::ng-deep {
+    .swal2-styled.swal2-confirm {
+        background-color: #4A0D4A !important;
+        color: #fff !important;
+    }
+    .swal2-styled.swal2-cancel {
+        background-color: #fff !important;
+        color: #4A0D4A !important;
+        border: 1px solid #EEEEEEEE;
+    }
+}

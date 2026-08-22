@@ -81,7 +81,7 @@ html[dir=rtl] .input-group span.input-group-btn button {
 }
 
 .kt-grid.kt-grid--hor.kt-grid--root {
-    height: 100vh;
+    /* height: 100vh; */
 }
 
 .form-control:disabled{
@@ -113,7 +113,7 @@ html[dir=rtl] .input-group span.input-group-btn button {
     position: absolute;
     left: 28px;
     top: 13px;
-    z-index: 234234234;
+    z-index: 234236234;
     display: inline-block;
     font: normal normal normal 16px/1 "LineAwesome";
     font-size: inherit;

@@ -45,7 +45,7 @@
     <Item3 Ref="26" ControlType="DetailBand" Name="Detail" DrillDownExpanded="false" KeepTogetherWithDetailReports="true" HeightF="2530.876" KeepTogether="true" Dpi="254">
       <HierarchyPrintOptions Ref="27" Indent="50.8" />
       <Controls>
-        <Item1 Ref="28" ControlType="XRPageInfo" Name="pageInfo3" PageInfo="DateTime" TextFormatString="{0:MMM dd, yyyy}" SizeF="227.5417,58.42034" LocationFloat="1906.45837,2447.456" Dpi="254" Font="Arial, 10pt" ForeColor="Black">
+        <Item1 Ref="28" ControlType="XRPageInfo" Name="pageInfo3" PageInfo="DateTime" TextFormatString="{0:MMM dd, yyyy}" SizeF="227.5417,58.42504" LocationFloat="1906.45837,2447.456" Dpi="254" Font="Arial, 10pt" ForeColor="Black">
           <StylePriority Ref="29" UseFont="false" UseForeColor="false" />
         </Item1>
         <Item2 Ref="30" ControlType="XRPictureBox" Name="pictureBox3" Sizing="ZoomImage" SizeF="250,250" LocationFloat="94.36861,29" Dpi="254">

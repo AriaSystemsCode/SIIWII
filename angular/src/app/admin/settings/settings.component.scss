@@ -1,0 +1,60 @@
+::ng-deep {
+    .p-accordion-header-link {
+        padding: 20px !important;
+    }
+    .list-group-item:last-child {
+        border: none !important;
+    }
+    .p-accordion-header-text {
+        color: #1B101B !important;
+        font-weight: 700 !important;
+        padding: 10px;
+    }
+}
+.leftSec {
+    border: 1px solid #EEE;
+    border-bottom:  none;
+    border-radius: 1px;
+}
+.saveBtn {
+    border-radius: 5px;
+    background-color: #4A0D4A !important;
+    border: #4A0D4A !important;color: white;
+}
+.list-group-item{
+font-weight: 600;
+font-size: 13px;
+line-height: 24px;
+border: none;
+color: #1B101B;
+height: 50px;
+}
+.list-group-item.active {
+    height: 50px;
+color: #4A0D4A;
+background: #FDF6FD;
+border: 1px solid #FDF6FD;
+box-shadow: 1px 1px 2px rgba(253, 246, 253, 0.05);
+border-radius: 4px;
+  }
+
+
+
+.body-sec{
+    background-color: #fff;
+    border-radius: 6px;
+    min-height: 100vh;
+    padding: 15px;
+}
+
+@media (min-width: 1024px) {
+.addMT{
+margin-top: 140px;
+}
+}
+
+@media (max-width: 540px) {
+.addMTMob{
+margin-top: 75px;
+}
+}

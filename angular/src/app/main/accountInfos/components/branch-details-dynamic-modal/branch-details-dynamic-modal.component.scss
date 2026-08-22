@@ -1,0 +1,78 @@
+:host {
+    height: 100%;
+}
+.label {
+    font-size: 16px;
+    font-weight: normal;
+}
+.text-primary {
+    color: #4A0D4A !important;
+    font-weight: 700;
+}
+
+.btn-save {
+    background-color: #4A0D4A;
+    color: #fff;
+ }
+
+ .label {
+    color: #10002E;
+    font-weight: 500;
+    font-size: 16px;
+ }
+
+ .modal-title {
+    span {
+        color: #10002E;
+        font-weight: 700;
+        font-size: 24px;
+    }
+   
+ }
+
+
+/* ngx-bootstrap modal dialog itself */
+::ng-deep .modal-dialog.left-modal,
+::ng-deep .modal-dialog.right-modal {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  width: 800px;
+  max-width: 100%;
+  height: 100%;
+  margin: 0;
+  transition: transform 0.3s ease;
+}
+
+::ng-deep .modal-dialog.left-modal {
+  left: 0 !important;
+  right: auto !important;
+}
+
+::ng-deep .modal-dialog.right-modal {
+  right: 0 !important;
+  left: auto !important;
+}
+
+::ng-deep .modal-dialog.slide-left-in {
+  transform: translateX(0);
+}
+
+::ng-deep .modal-dialog.slide-right-in {
+  transform: translateX(0);
+}
+
+::ng-deep .modal-dialog.slide-left-out {
+  transform: translateX(-100%);
+}
+
+::ng-deep .modal-dialog.slide-right-out {
+  transform: translateX(100%);
+}
+
+@media (max-width: 768px) {
+  ::ng-deep .modal-dialog.left-modal,
+  ::ng-deep .modal-dialog.right-modal {
+    width: 100%;
+  }
+}

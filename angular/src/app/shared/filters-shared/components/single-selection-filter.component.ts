@@ -1,74 +1,424 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { FormArray, FormControl } from '@angular/forms';
-import { LookupLabelDto, PagedResultDtoOfLookupLabelDto } from '@shared/service-proxies/service-proxies';
-import { FilterMetaData } from '../models/FilterMetaData.model';
+import {
+    Component,
+    EventEmitter,
+    Input,
+    OnChanges,
+    OnDestroy,
+    OnInit,
+    Output,
+    SimpleChanges
+} from '@angular/core';
+
+import {
+    AbstractControl
+} from '@angular/forms';
+
+import {
+    Subscription
+} from 'rxjs';
+
+import {
+    FilterMetaData
+} from '../models/FilterMetaData.model';
+
 
 @Component({
-  selector: 'app-single-selection-filter',
-  templateUrl: './single-selection-filter.component.html',
-  styleUrls: ['./single-selection-filter.component.scss']
+    selector:
+        'app-single-selection-filter',
+
+    templateUrl:
+        './single-selection-filter.component.html',
+
+    styleUrls: [
+        './single-selection-filter.component.scss'
+    ]
 })
-export class SingleSelectionFilterComponent implements OnInit {
-    @Input() title: string
-    @Input() filterMetaData: FilterMetaData<LookupLabelDto[]>
-    @Input() formContol: FormControl
+export class SingleSelectionFilterComponent
+    implements OnInit, OnChanges, OnDestroy {
 
-    @Output() onChange: EventEmitter<boolean> = new EventEmitter<boolean>()
-    @Output() onLoadData : EventEmitter<boolean> = new EventEmitter<boolean>()
+    @Input()
+    title: string;
 
-    selection : number
+    @Input()
+    filterMetaData:
+        FilterMetaData<any[]>;
 
-    collapseListDataCollapseButton: boolean = false
-    showMoreListDataButton: boolean = false
-    constructor() { }
+    @Input()
+    formContol:
+        AbstractControl;
 
-    ngOnInit(){
-        this.subscribeToFormControlChange()
-    }
-    ngOnChanges(){
-        if(this.filterMetaData) this.onLoadData.emit()
-    }
-    onSelectionChangeHandler($event) {
-        this.formContol.setValue(this.selection)
-    }
+    @Output()
+    onChange =
+        new EventEmitter<boolean>();
 
-    triggerListCollapse() {
-        this.collapseListDataCollapseButton = !this.collapseListDataCollapseButton
+    @Output()
+    onLoadData =
+        new EventEmitter<any>();
 
-        if( this.collapseListDataCollapseButton ) this.filterMetaData.displayedList = this.filterMetaData.list
-        else return this.filterMetaData.displayedList = this.filterMetaData.list.slice(0,this.filterMetaData.collapsedDisplayedListCount)
+    selection:
+        boolean | number | string | undefined =
+        undefined;
 
-        if( this.showMoreListDataButton && this.filterMetaData.list.length === this.filterMetaData.collapsedDisplayedListCount ) this.showMoreListData()
-    }
 
-    showMoreListData() {
-        if(!this.showMoreListDataButton) this.showMoreListDataButton = true
+    collapseListDataCollapseButton =
+        false;
 
-        this.filterMetaData.listSkipCount += this.filterMetaData.listMaxResultCount
+    showMoreListDataButton =
+        false;
 
-        if( this.filterMetaData.listMaxResultCount =  this.filterMetaData.collapsedDisplayedListCount ) this.filterMetaData.listMaxResultCount = 10
 
-        this.onLoadData.emit()
-    }
+    private formControlSub?:
+        Subscription;
 
-    onListLoadCallback(result:PagedResultDtoOfLookupLabelDto){
-        this.filterMetaData.list.push(...result.items);
-        this.filterMetaData.displayedList = [ ...this.filterMetaData.list ]
-        this.filterMetaData.listTotalCount = result.totalCount;
-        this.showMoreListDataButton = this.filterMetaData.list.length < this.filterMetaData.listTotalCount
+    ngOnInit(): void {
+
+        this.restoreSelectionFromForm();
+
+        this.subscribeToFormControlChange();
     }
 
-    resetSelection(){
-        this.selection = undefined
-    }
 
-    subscribeToFormControlChange(){
-        this.formContol.valueChanges
-        .subscribe((value)=>{
-            if( value === undefined || value === null || value === "" ) {
-                this.resetSelection()
+    ngOnChanges(
+        changes: SimpleChanges
+    ): void {
+
+        if (
+            changes?.filterMetaData &&
+            this.filterMetaData
+        ) {
+            this.onLoadData.emit();
+        }
+
+        if (
+            changes?.formContol
+        ) {
+
+            this.restoreSelectionFromForm();
+
+            if (
+                !changes.formContol
+                    .firstChange
+            ) {
+
+                this.subscribeToFormControlChange();
             }
-        })
+        }
+    }
+
+
+
+    restoreSelectionFromForm(): void {
+
+        if (!this.formContol) {
+
+            this.selection =
+                undefined;
+
+            return;
+        }
+
+
+        const value =
+            this.formContol.value;
+
+        if (
+            value === null ||
+            value === undefined ||
+            value === ''
+        ) {
+
+            this.selection =
+                undefined;
+
+            return;
+        }
+
+        if (
+            value === true ||
+            value === false
+        ) {
+
+            this.selection =
+                value;
+
+            return;
+        }
+
+
+        if (
+            value === 'true'
+        ) {
+
+            this.selection =
+                true;
+
+            return;
+        }
+
+
+        if (
+            value === 'false'
+        ) {
+
+            this.selection =
+                false;
+
+            return;
+        }
+
+
+        this.selection =
+            value;
+    }
+
+
+    onSelectionChangeHandler(
+        value: any
+    ): void {
+
+        this.selection =
+            value;
+
+
+        this.formContol?.setValue(
+            value
+        );
+
+
+        this.onChange.emit(
+            true
+        );
+    }
+
+    onListLoadCallback(
+        result: {
+            items: any[];
+            totalCount?: number;
+        }
+    ): void {
+
+        if (!this.filterMetaData) {
+            return;
+        }
+
+
+        if (!this.filterMetaData.list) {
+
+            this.filterMetaData.list =
+                [];
+        }
+
+        const existingValues =
+            new Set(
+                this.filterMetaData
+                    .list
+                    .map(
+                        item =>
+                            String(
+                                item?.value
+                            )
+                    )
+            );
+
+
+        const newItems =
+            (
+                result?.items ||
+                []
+            )
+                .filter(
+                    item =>
+                        !existingValues.has(
+                            String(
+                                item?.value
+                            )
+                        )
+                );
+
+
+        this.filterMetaData
+            .list.push(
+                ...newItems
+            );
+
+
+        this.filterMetaData
+            .displayedList = [
+                ...this.filterMetaData
+                    .list
+            ];
+
+
+        this.filterMetaData
+            .listTotalCount =
+            result?.totalCount ??
+            this.filterMetaData
+                .list.length;
+
+
+        this.showMoreListDataButton =
+            this.filterMetaData
+                .list.length <
+            this.filterMetaData
+                .listTotalCount;
+
+        this.restoreSelectionFromForm();
+    }
+
+    private subscribeToFormControlChange():
+        void {
+
+        this.formControlSub
+            ?.unsubscribe();
+
+
+        if (!this.formContol) {
+            return;
+        }
+
+
+        this.formControlSub =
+            this.formContol
+                .valueChanges
+                .subscribe(
+                    () => {
+                        this.restoreSelectionFromForm();
+                    }
+                );
+    }
+
+    get radioGroupName():
+        string {
+        return (
+            this.title ||
+            'singleSelectionFilter'
+        )
+            .replace(
+                /\s+/g,
+                '_'
+            );
+    }
+
+
+    getRadioId(
+        item: any
+    ): string {
+
+        let value =
+            item?.value;
+
+
+        if (
+            value === undefined ||
+            value === null
+        ) {
+            value =
+                'all';
+        }
+
+
+        return (
+            this.radioGroupName +
+            '_' +
+            String(value)
+        );
+    }
+
+
+    triggerListCollapse():
+        void {
+
+        this.collapseListDataCollapseButton =
+            !this
+                .collapseListDataCollapseButton;
+
+
+        if (
+            this
+                .collapseListDataCollapseButton
+        ) {
+
+            this.filterMetaData
+                .displayedList = [
+                    ...this.filterMetaData
+                        .list
+                ];
+
+        } else {
+
+            this.filterMetaData
+                .displayedList =
+                this.filterMetaData
+                    .list
+                    .slice(
+                        0,
+                        this.filterMetaData
+                            .collapsedDisplayedListCount
+                    );
+        }
+
+
+        if (
+            this.showMoreListDataButton &&
+            this.filterMetaData
+                .list.length ===
+            this.filterMetaData
+                .collapsedDisplayedListCount
+        ) {
+
+            this.showMoreListData();
+        }
+
+
+        this.restoreSelectionFromForm();
+    }
+
+    showMoreListData():
+        void {
+
+        if (
+            !this.showMoreListDataButton
+        ) {
+
+            this.showMoreListDataButton =
+                true;
+        }
+
+
+        this.filterMetaData
+            .listSkipCount +=
+            this.filterMetaData
+                .listMaxResultCount;
+
+
+        if (
+            this.filterMetaData
+                .listMaxResultCount ===
+            this.filterMetaData
+                .collapsedDisplayedListCount
+        ) {
+
+            this.filterMetaData
+                .listMaxResultCount =
+                10;
+        }
+
+
+        this.onLoadData.emit();
+    }
+
+
+    resetSelection():
+        void {
+
+        this.selection =
+            undefined;
+    }
+
+    ngOnDestroy():
+        void {
+
+        this.formControlSub
+            ?.unsubscribe();
     }
 }
-

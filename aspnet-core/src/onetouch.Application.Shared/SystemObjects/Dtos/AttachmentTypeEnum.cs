@@ -8,6 +8,7 @@ namespace onetouch.SystemObjects.Dtos
     {
         Image = 1,
         Video = 2,
-        Document = 3
+        Document = 3,
+        ImportImage = 4
     }
 }

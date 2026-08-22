@@ -4,6 +4,7 @@ import { DashboardCustomizationConst } from '@app/shared/common/customizable-das
 import { Router } from '@angular/router';
 import { AppConsts } from '@shared/AppConsts';
 import Swal from 'sweetalert2';
+import { AppEntitiesServiceProxy } from '@shared/service-proxies/service-proxies';
 @Component({
     templateUrl: './dashboard.component.html',
     styleUrls: ['./dashboard.component.scss'],
@@ -13,40 +14,31 @@ import Swal from 'sweetalert2';
 export class DashboardComponent extends AppComponentBase {
     dashboardName = DashboardCustomizationConst.dashboardNames.defaultTenantDashboard;
     defaultLogo = AppConsts.appBaseUrl + '/assets/common/images/logo.png';
+    defaultUrl:string
     constructor(
         injector: Injector,
         private router: Router,
+            private _appEntitiesServiceProxy: AppEntitiesServiceProxy
     ) {
         super(injector);
         // workaround to prevent tenant from seeing the dashboard
+        this.chooseDefaultPage()
 
         this.redirectTo();
     }
 
     async redirectTo() {
-        debugger;
+        console.log(this.defaultUrl,'defau')
+       
       this.router.navigate(['/app/main/Home'])
+    
         
         if (this.appSession.tenantId && !this.appSession.user.accountId)
             await this.askForCompleteProfile();
     }
 
     async askForCompleteProfile() {
-       /*  Swal.fire({
-            title: "",
-            text: "Please Complete Your Profile Information",
-            showCancelButton: true,
-            cancelButtonText: "Later",
-            icon: "warning",
-            confirmButtonText: "Proceed",
-            allowOutsideClick: false,
-            allowEscapeKey: false,
-            backdrop: true,
-            customClass: {
-                confirmButton: "swal-btn swal-confirm",
-                cancelButton: "swal-btn",
-                title: "swal-title",
-            }, */
+  
             Swal.fire({
                 title: "",
                 text: "Please Complete Your Profile Information",
@@ -66,5 +58,25 @@ export class DashboardComponent extends AppComponentBase {
             if (result.isConfirmed)
             this.router.navigate(['/app/main/account'])
         });
+    }
+    chooseDefaultPage(){
+
+        this._appEntitiesServiceProxy.getHostSettingValue(1213,null).subscribe({
+            next: res => {
+                this.defaultUrl = '/app/main/Home';
+
+                if (res) {
+
+                    // const value = res;
+                    if (res === 'Marketplace Landing page') {
+                        this.defaultUrl = '/app/main/marketplace';
+                    } else if (res === 'Feed (SIIWII homepage)') {
+                        this.defaultUrl = '/app/main/Home';
+                    }
+                }
+            },
+       
+          });
+    
     }
 }

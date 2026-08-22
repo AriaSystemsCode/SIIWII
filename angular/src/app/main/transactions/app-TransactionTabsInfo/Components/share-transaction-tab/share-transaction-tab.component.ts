@@ -86,58 +86,130 @@ export class ShareTransactionTabComponent extends AppComponentBase {
     if (this.emailList && this.messageBody) this.readyForSave = true
     if (this.readyForSave && this.sharingListForSave?.length > 0) this.dasableShareBtn = false;
   }
-  shareTransaction() {
-    let newsharingArray = [];
-    let shareTranOptionsDto: any = {
-      transactionId: undefined,
-      message: '',
-      transactionSharing: []
-    };
+  // shareTransaction() {
+  //   let newsharingArray = [];
+  //   let shareTranOptionsDto: any = {
+  //     transactionId: undefined,
+  //     message: '',
+  //     transactionSharing: []
+  //   };
 
-    if (this.sharingListForSave && this.sharingListForSave?.length > 0) {
-      this.sharingListForSave.forEach(function (contact, index) {
-        let contactUser: any = {};
-        contactUser.sharedTenantId = contact.tenantId;
-        contactUser.sharedUserId = contact.userId;
-        contactUser.sharedUserEMail = contact.email;
-        contactUser.sharedUserName = contact.name;
-        contactUser.sharedUserSureName = contact.name;
-        contactUser.sharedUserTenantName = contact.tenantName;
-        contactUser.id = contact.id;
-        newsharingArray.push(contactUser);
-      })
-      shareTranOptionsDto['transactionId'] = this.orderId;
-      shareTranOptionsDto['message'] = this.messageBody;
-      shareTranOptionsDto['transactionSharing'] = newsharingArray;
-      shareTranOptionsDto['subject'] = undefined;
-      this.showMainSpinner();
-      this._AppTransactionServiceProxy.shareTransactionByMessage(shareTranOptionsDto).subscribe(result => {
-        if (result.result) {
-          this.notify.success(this.l("TransactionHasBeenSent"));
+  //   if (this.sharingListForSave && this.sharingListForSave?.length > 0) {
+  //     this.sharingListForSave.forEach(function (contact, index) {
+  //       let contactUser: any = {};
+  //       contactUser.sharedTenantId = contact.tenantId;
+  //       contactUser.sharedUserId = contact.userId;
+  //       contactUser.sharedUserEMail = contact.email;
+  //       contactUser.sharedUserName = contact.name;
+  //       contactUser.sharedUserSureName = contact.name;
+  //       contactUser.sharedUserTenantName = contact.tenantName;
+  //       contactUser.id = contact.id;
+  //       newsharingArray.push(contactUser);
+  //     })
+  //     shareTranOptionsDto['transactionId'] = this.orderId;
+  //     shareTranOptionsDto['message'] = this.messageBody;
+  //     shareTranOptionsDto['transactionSharing'] = newsharingArray;
+  //     shareTranOptionsDto['subject'] = undefined;
+  //     this.showMainSpinner();
+  //     this._AppTransactionServiceProxy.shareTransactionByMessage(shareTranOptionsDto).subscribe(result => {
+  //       if (result.result) {
+  //         this.notify.success(this.l("TransactionHasBeenSent"));
+  //         this.closeTransPopup();
+  //         this.onShareTransactionByMessage.emit({
+  //           tenantTransactionInfo: result.tenantTransactionInfos,
+  //           appTransactionsForViewDto: this.appTransactionsForViewDto
+  //         });
+  //         this.hideMainSpinner();
+  //       }
+  //     })
+  //   }
+  //   if (this.emailList) {
+  //     shareTranOptionsDto['transactionId'] = this.orderId;
+  //     shareTranOptionsDto['message'] = this.messageBody;
+  //     shareTranOptionsDto['emailAddresses'] = this.emailList.split(/[ ,]+/);
+  //     this.showMainSpinner();
+  //     this._AppTransactionServiceProxy.shareTransactionByEmail(shareTranOptionsDto).subscribe(result => {
+  //       if (result) {
+  //         this.notify.success(this.l("TransactionHasBeenSent"));
+  //         this.closeTransPopup();
+  //       }
+  //       this.hideMainSpinner();
+  //     })
+  //   }
+
+  // }
+
+  shareTransaction() {
+  const shareTranOptionsDto: any = {
+    transactionId: this.orderId,
+    message: this.messageBody,
+    subject: undefined,
+    transactionSharing: []
+  };
+
+  if (this.sharingListForSave?.length > 0) {
+    const newsharingArray = this.sharingListForSave.map((contact) => {
+   
+
+      return {
+        sharedTenantId: contact.tenantId,
+        sharedUserId: contact.userId,
+        sharedUserEMail: contact.email,
+        sharedUserName: contact.userName,
+        sharedUserSureName: contact.name,
+        sharedUserTenantName: contact.tenantName,
+        id: contact.id,
+
+        // Send SSIN values if they exist on the selected contact object
+        contactSSIN: contact.ssin ?? contact.contactSSIN ?? contact.contactSsin ?? null,
+        companySSIN: contact.companySSIN ?? contact.companySsin ?? contact.tenantSSIN ?? contact.accountSSIN ?? null
+      };
+    });
+
+    shareTranOptionsDto.transactionSharing = newsharingArray;
+
+    console.log('shareTranOptionsDto:', shareTranOptionsDto);
+
+    this.showMainSpinner();
+
+    this._AppTransactionServiceProxy
+      .shareTransactionByMessage(shareTranOptionsDto)
+      .subscribe(result => {
+        if (result?.result) {
+          this.notify.success(this.l('TransactionHasBeenSent'));
           this.closeTransPopup();
+
           this.onShareTransactionByMessage.emit({
             tenantTransactionInfo: result.tenantTransactionInfos,
             appTransactionsForViewDto: this.appTransactionsForViewDto
           });
-          this.hideMainSpinner();
         }
-      })
-    }
-    if (this.emailList) {
-      shareTranOptionsDto['transactionId'] = this.orderId;
-      shareTranOptionsDto['message'] = this.messageBody;
-      shareTranOptionsDto['emailAddresses'] = this.emailList.split(/[ ,]+/);
-      this.showMainSpinner();
-      this._AppTransactionServiceProxy.shareTransactionByEmail(shareTranOptionsDto).subscribe(result => {
+
+        this.hideMainSpinner();
+      });
+  }
+
+  if (this.emailList) {
+    const emailShareDto: any = {
+      transactionId: this.orderId,
+      message: this.messageBody,
+      emailAddresses: this.emailList.split(/[ ,]+/)
+    };
+
+    this.showMainSpinner();
+
+    this._AppTransactionServiceProxy
+      .shareTransactionByEmail(emailShareDto)
+      .subscribe(result => {
         if (result) {
-          this.notify.success(this.l("TransactionHasBeenSent"));
+          this.notify.success(this.l('TransactionHasBeenSent'));
           this.closeTransPopup();
         }
-        this.hideMainSpinner();
-      })
-    }
 
+        this.hideMainSpinner();
+      });
   }
+}
   closeTransPopup() {
     this.closeTranScreenEvent.emit();
   }
@@ -235,12 +307,12 @@ export class ShareTransactionTabComponent extends AppComponentBase {
   filterContacts(event: AutoCompleteCompleteEvent) {
     let filtered: any[] = [];
     let query = event.query;
-    this._AppTransactionServiceProxy.getAccountConnectedContacts(query).subscribe(result => {
+    this._AppTransactionServiceProxy.getContactsList(query,this.appTransactionsForViewDto?.id).subscribe(result => {
       this.suggestionsContacts = [];
       for (let i = 0; i < result.length; i++) {
         if (result[i].userImage) {
           result.filter(item => {
-            if (item.id == result[i].id) result[i].isLoading = true;
+            if (item.tenantId == result[i].tenantId) result[i].isLoading = true;
           })
           this.getProfilePictureById(result[i].userImage, result[i], 'suggestionsContacts');
         }

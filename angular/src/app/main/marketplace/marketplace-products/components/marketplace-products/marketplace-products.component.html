@@ -1,229 +1,138 @@
-<div
-    [@routerTransition]
-    style="margin-top: -50px;overflow: hidden;"
-    class="wrapper kt-container web pl-lg-3 p-md-2 pl-0 pr-lg-2 pr-md-4 pr-0"
->
-    <div
-        class=""
-    >
-        <div class="marketplace-products">
+<div [@routerTransition] class="wrapper kt-container web pl-lg-3 p-md-2 pl-0 pr-lg-2 pr-md-4 pr-0 mt-lg-1 mt-md-5 mt-0"
+    [ngClass]="{
+      'addPadding'  : fromMarketAcoount && !isArabic , 'addPt': isArabic , 'addARPadding'  : fromMarketAcoount && isArabic 
+    }">
+    <div>
+        <div class="marketplace-products" [ngClass]="fromMarketAcoount && !isArabic ? 'marketplace-mg':''">
             <div class="row">
-                <div class="col-md-12 mb-4 app-seller">
-                    <app-seller-data *ngIf="isSellerIdExists && isFromSellerRoom "></app-seller-data>
+                <div class="col-md-12 mb-4 app-seller" *ngIf="isSellerIdExists && isFromSellerRoom ">
+                    <app-seller-data></app-seller-data>
                 </div>
                 <div class="col-md-12">
-                    <div
-                        class="d-flex align-items-center main-c "
-                    >
-                        <div class="share">
-                            <p-dropdown
-                                [options]="sharingOptions"
-                                [(ngModel)]="seletedOption"
-                                optionLabel="label"
-                                class="shares"
-                                (onChange)="handleSharingLevelsOptions($event)"
-                            ></p-dropdown>
+                    <div class="d-flex align-items-center main-c flex-wrap">
+                        <div class="share toolbar-group toolbar-group-share">
+                            <p-dropdown [options]="sharingOptions" [(ngModel)]="seletedOption" optionLabel="label"
+                                class="shares" (onChange)="handleSharingLevelsOptions($event)"></p-dropdown>
                         </div>
-                        <div
-                            class="sarch d-flex align-items-center justify-content-center"
-                            style="gap: 7px"
-                        >
-                         
+                        <div class="sarch d-flex align-items-center Ajustify-content-center toolbar-group toolbar-group-search">
+
                             <span class="p-input-icon-right group-srch">
                                 <i class="pi pi-search"></i>
-                                <input
-                                    id="_searchInput"
-                                    type="text"
-                                    placeholder="Search"
-                                    pInputText
-                                    class="w-100 search-in"
-                                    [(ngModel)]="searchInput"
-                                   
-                                    (keyup)="handleProductSearchText()"
-                                />
+                                <input id="_searchInput" type="text" [placeholder]="'Search' | localize" pInputText
+                                    class="w-100 search-in" [(ngModel)]="searchInput"
+                                    (keyup)="handleProductSearchText()" />
                             </span>
-                            <p-dropdown
-                            [options]="currencies"
-                            [(ngModel)]="selectedCurrrency"
-                            optionLabel="code"
-                            class="cur "
-                            (onChange)="handleCurrencyChange($event)"
-                        ></p-dropdown>
-                        <p-dropdown
-                        [options]="sortingData"
-                        [(ngModel)]="selectedSort"
-                        placeholder="Sort by"
-                        optionLabel="label"
-                        class="sortBy"
-                        (onChange)="handleSortingChange($event)"
-                    ></p-dropdown>
-                 
-                    <p-button
-                    icon="pi pi-sliders-h"
-                    [label]="
-                        isFilterHidden
-                            ? 'Show Filters '
-                            : 'Hide Filters'
-                    "
-                    (click)="toggleFilters()"
-                    class="filterBtn d-lg-block d-none"
-                    styleClass="p-button-outlined p-button-secondary"
-                   
-                ></p-button>
-                <p-button
-                icon="pi pi-sliders-h"
-           
-                (click)="toggleFilters()"
-                class="filterBtn d-lg-none d-block"
-                styleClass="p-button-outlined p-button-secondary"
-               
-            ></p-button>
-                    <p-button
-                        icon="pi pi-refresh"
-                        (click)="resetProducts($event)"
-                        styleClass="p-button-outlined p-button-secondary"
-                        class="resBtn"
-                    ></p-button>
+                            <p-dropdown [options]="currencies" [(ngModel)]="selectedCurrrency" optionLabel="code"
+                                (onChange)="handleCurrencyChange($event)">
+                            </p-dropdown>
+                            <p-dropdown [options]="sortingData" [(ngModel)]="selectedSort"
+                                [placeholder]="'SortBy' | localize" optionLabel="label" class="sortBy"
+                                (onChange)="handleSortingChange($event)"></p-dropdown>
+
+                            <p-button icon="pi pi-sliders-h"
+                                [label]="(isFilterHidden ? ('ShowFilters' | localize) : ('HideFilters' | localize))"
+                                (click)="toggleFilters()" class="filterBtn d-lg-block d-none"
+                                styleClass="p-button-outlined p-button-secondary"></p-button>
+                            <p-button icon="pi pi-sliders-h" (click)="toggleFilters()"
+                                class="filterBtn d-lg-none d-block"
+                                styleClass="p-button-outlined p-button-secondary"></p-button>
+                            <p-button icon="pi pi-refresh" (click)="resetProducts($event)"
+                                styleClass="p-button-outlined p-button-secondary" class="resBtn"></p-button>
                         </div>
-                     
+
                     </div>
                 </div>
-                <div *ngIf="!isFilterHidden" class="col-lg-3 col-5 my-3 text-dark pr-0">
-                    <app-product-filters
-                        [isSellerIdExists]="isSellerIdExists"
+                <div *ngIf="!isFilterHidden " class="col-xl-3 col-lg-4 col-md-5 col-12 my-2 text-dark pr-0 product-filters-col">
+                    <app-product-filters [isSellerIdExists]="isSellerIdExists"
                         (handleCatalogSelections)="selectCatalog($event)"
-                        (handledeDratmentsTreeSelections)="
-                            selectDepartment($event)
-                        "
-                        (handleStartPrice)="setPriceFrom($event)"
-                        (handleEndPrice)="setPriceTo($event)"
-                        (handleStockSiwtch)="swtichStock($event)"
-                        (handleStartShipDate)="setStartShipDate($event)"
+                        (handledeDratmentsTreeSelections)="selectDepartment($event)"
+                        (handleStartPrice)="setPriceFrom($event)" (handleEndPrice)="setPriceTo($event)"
+                        (handleStockSiwtch)="swtichStock($event)" (handleStartShipDate)="setStartShipDate($event)"
                         (handleEndShipDate)="setEndtShipDate($event)"
                         (handleSatrtsoldOutDate)="setStartSoldOutDate($event)"
                         (handleEndSoldOutDate)="setEndSoldOutDate($event)"
                         (handleBrandsSelection)="selectBrands($event)"
-                        (clearAll)="clearFiltrs($event)"
-                        #filters
-                    ></app-product-filters>
+                        (handleCategoriesTreeSelections)="selectCategory($event)" (clearAll)="clearFiltrs($event)"
+                        [selectedDepartmentId]="selectedDepartments?.[0]"
+                        [preselectCategoryId]="selectedCategories?.[0]" [selectedBrands]="brands"
+                        #filters></app-product-filters>
+
+
                 </div>
 
-                <div
-                    [ngClass]="!isFilterHidden ? 'col-lg-9 col-7' : 'col-md-12'"
-                    class="my-3"
-                >
+                                <div [ngClass]="[
+                                !isFilterHidden? 'col-xl-9 col-lg-8 col-md-7 col-12' : 'col-md-12'
+                            ]" class="products-content-col">
                     <div class="row">
-                        <div
-                            class="my-2"
-                            [ngClass]="
-                                !isFilterHidden ? 'col-6 col-lg-3 ' : 'col-md-2'
-                            "
-                            *ngFor="let product of items"
-                        >
-                            <app-prodcut-card
-                                [currency]="currency"
-                                [product]="product.appItem"
-                                [productCard]="product"
-                                [sellerSSIN]="sellerSSIN"
-                                [buyerSSIN]="buyerSSIN"
-                                [isSellerIdExists]="isSellerIdExists"
-                                [acceptedAspectRatio]="acceptedAspectRatio"
-                                
-                            ></app-prodcut-card>
+                        <div class="my-2" [ngClass]="
+                                                                !isFilterHidden ? 'col-xl-3 col-lg-6 col-md-6 col-sm-6 col-12' : 'col-xl-2 col-lg-3 col-md-4 col-sm-6 col-12'
+                            " *ngFor="let product of items">
+                            <app-prodcut-card [currency]="currency" [product]="product.appItem" [productCard]="product"
+                                [sellerSSIN]="sellerSSIN" [buyerSSIN]="buyerSSIN" [isSellerIdExists]="isSellerIdExists"
+                                [acceptedAspectRatio]="acceptedAspectRatio" [showMsrP]="showMsrP"></app-prodcut-card>
                         </div>
                     </div>
+
+                    <p *ngIf="items?.length === 0 && (fromMarketAcoount)" class="text-center mx-auto mt-5 pt-5 no-data-placeholder">
+                        <img src="../../../../../../assets/placeholders/fluent_alert.png" class="mr-2" alt="No Data">
+                        <span class="noDataTxt">{{'NoDataFound...' | localize}} </span>
+                    </p>
                 </div>
                 <div class="col-md-12">
                     <div class="">
-                        <p-paginator
-                            (onPageChange)="onPageChange($event)"
-                            [first]="skipCount"
-                            [rows]="maxResultCount"
-                            [totalRecords]="pagesNumber"
-                            [rowsPerPageOptions]="[12, 16,32]"
-                            #p
-                        ></p-paginator>
+                        <p-paginator (onPageChange)="onPageChange($event)" [first]="skipCount" [rows]="maxResultCount"
+                            [totalRecords]="pagesNumber" [rowsPerPageOptions]="[12, 16,32]" #p></p-paginator>
                     </div>
                 </div>
             </div>
+
+
         </div>
     </div>
+
+
+
 </div>
 
 <!-- mobile ui design -->
-<div class="mobile">
-    <app-seller-data *ngIf="isSellerIdExists"></app-seller-data>
+<div class="mobile " [ngClass]="isArabic? 'addMtM':''">
+    <app-seller-data *ngIf="isSellerIdExists && !fromMarketAcoount"></app-seller-data>
     <div class="container-fluid">
         <div class="quickFilters">
-        
-            <span class="p-input-icon-right " style="width: 40%;">
+
+            <span class="p-input-icon-right mobile-search-span">
                 <i class="pi pi-search"></i>
-                <input
-                    type="text"
-                    placeholder="Search"
-                    pInputText
-                    class="w-100"
-                    [(ngModel)]="searchInput"
-                    (keyup)="handleProductSearchText()"
-                />
+                <input type="text" placeholder="Search" pInputText class="w-100" [(ngModel)]="searchInput"
+                    (keyup)="handleProductSearchText()" />
             </span>
-            <button style="width: 60%;"
-            (click)="openFiltersDialog('Shared With Me and Public')"
-            class="filter-btn"
-        >
-            Shared With Me and Public
-        </button>
+            <button (click)="openFiltersDialog('Shared With Me and Public')" class="filter-btn mobile-filter-btn">
+                {{'SharedWithMeAndPublic' | localize}}
+            </button>
         </div>
         <div class="btn-filters">
-            <button
-                (click)="openFiltersDialog('Select Currency')"
-                class="filter-btn w-25"
-            >
-                {{ selectedCurrrency.code }}
+            <button (click)="openFiltersDialog('Select Currency')" class="filter-btn w-25">
+                {{ selectedCurrrency?.code }}
             </button>
-            <button
-            class="filter-btn w-50"
-            (click)="openFiltersDialog('Sort By')"
-        >
-            Sort By
-        </button>
-        <p-button
-        icon="pi pi-sliders-h"
-   
-        (click)="openFiltersDialog('Filter By')"
-        class="filterBtn "
-        styleClass="p-button-outlined p-button-secondary"
-       
-    ></p-button>
-         
-       
-            <p-button
-                icon="pi pi-refresh"
-                (click)="resetProducts($event)"
-                styleClass="p-button-outlined p-button-secondary"
-                class="resBtn"
-            ></p-button>
+            <button class="filter-btn w-50" (click)="openFiltersDialog('Sort By')">
+                {{'SortBy' | localize}}
+            </button>
+            <p-button icon="pi pi-sliders-h" (click)="openFiltersDialog('Filter By')" class="filterBtn "
+                styleClass="p-button-outlined p-button-secondary"></p-button>
+
+
+            <p-button icon="pi pi-refresh" (click)="resetProducts($event)"
+                styleClass="p-button-outlined p-button-secondary" class="resBtn"></p-button>
         </div>
         <!-- list All products -->
         <div class="row">
-            <div class="col-6 col-md-4 my-2" *ngFor="let product of items">
-                <app-prodcut-card
-                    [currency]="currency"
-                    [product]="product.appItem"
-                    [productCard]="product"
-                    [sellerSSIN]="sellerSSIN"
-                    [buyerSSIN]="buyerSSIN"
-                ></app-prodcut-card>
+            <div class="col-sm-6 col-12 my-2" *ngFor="let product of items">
+                <app-prodcut-card [currency]="currency" [product]="product.appItem" [productCard]="product"
+                    [sellerSSIN]="sellerSSIN" [buyerSSIN]="buyerSSIN" [showMsrP]="showMsrP"></app-prodcut-card>
             </div>
             <div class="col-md-12">
                 <div class="">
-                    <p-paginator
-                        (onPageChange)="onPageChange($event)"
-                        [first]="skipCount"
-                        [rows]="maxResultCount"
-                        [totalRecords]="pagesNumber"
-                        [rowsPerPageOptions]="[10, 20, 30]"
-                    ></p-paginator>
+                    <p-paginator (onPageChange)="onPageChange($event)" [first]="skipCount" [rows]="maxResultCount"
+                        [totalRecords]="pagesNumber" [rowsPerPageOptions]="[10, 20, 30]"></p-paginator>
                 </div>
             </div>
         </div>
@@ -231,94 +140,52 @@
 </div>
 
 <!-- mobile filters dialog -->
-<p-dialog
-    [style]="{ width: '40vw' }"
-    [breakpoints]="{ '960px': '75vw', '640px': '97vw' }"
-    [baseZIndex]="10000"
-    [modal]="true"
-    
-    [(visible)]="displayFitlers"
-    [draggable]="false"
-    [closable]="true"
-    position="bottom"
-   
->
+<p-dialog styleClass="mobile-filters-dialog" [breakpoints]="{ '960px': '75vw', '640px': '97vw' }" [baseZIndex]="10000"
+    [modal]="true" [(visible)]="displayFitlers" [draggable]="false" [closable]="true" position="bottom">
     <!-- sharing option filters -->
-    <div
-        class="flex flex-column gap-3"
-        *ngIf="filterType === 'Shared With Me and Public'"
-    >
-        <div
-            *ngFor="let option of sharingOptions"
-            class="field-checkbox d-flex justify-content-between align-items-md-start border-bottom py-3"
-        >
+    <div class="flex flex-column gap-3" *ngIf="filterType === 'Shared With Me and Public'">
+        <div *ngFor="let option of sharingOptions"
+            class="field-checkbox d-flex justify-content-between align-items-md-start border-bottom py-3">
             <label [for]="option.value" class="ml-2">{{ option.label }}</label>
-            <p-radioButton
-                [inputId]="option.value"
-                name="label"
-                class="px-3"
-                [value]="option"
-                [(ngModel)]="seletedOption"
-            ></p-radioButton>
+            <p-radioButton [inputId]="option.value" name="label" class="px-3" [value]="option"
+                [(ngModel)]="seletedOption"></p-radioButton>
         </div>
     </div>
 
     <!-- currency Filters -->
-    <div
-        class="flex flex-column gap-3"
-        style="overflow-y: scroll; height: 200px"
-        *ngIf="filterType === 'Select Currency'"
-    >
-        <div
-            *ngFor="let currency of currencies"
-            class="field-checkbox d-flex justify-content-between align-items-md-start border-bottom py-3"
-        >
-            <label [for]="currency.code" class="ml-2">{{
-                currency.code
-            }}</label>
-            <p-radioButton
-                [inputId]="currency.code"
-                name="code"
-                class="px-3"
-                [value]="currency"
-                [(ngModel)]="selectedCurrrency"
-            ></p-radioButton>
+    <div class="flex flex-column gap-3 currency-list"
+        *ngIf="filterType === 'Select Currency'">
+        <div *ngFor="let currency of currencies"
+            class="field-checkbox d-flex justify-content-between align-items-md-start border-bottom py-3">
+            <label [for]="currency?.code" class="ml-2">{{
+                currency?.code
+                }}</label>
+            <p-radioButton [inputId]="currency?.code" name="code" class="px-3" [value]="currency"
+                [(ngModel)]="selectedCurrrency"></p-radioButton>
         </div>
     </div>
 
     <!-- sort by -->
     <div class="flex flex-column gap-3" *ngIf="filterType === 'Sort By'">
-        <div
-            *ngFor="let sort of sortingData"
-            class="field-checkbox d-flex justify-content-between align-items-md-start border-bottom py-3"
-        >
+        <div *ngFor="let sort of sortingData"
+            class="field-checkbox d-flex justify-content-between align-items-md-start border-bottom py-3">
             <label [for]="sort.value" class="ml-2">{{ sort.label }}</label>
-            <p-radioButton
-                [inputId]="sort.value"
-                name="label"
-                class="px-3"
-                [value]="sort"
-                [(ngModel)]="selectedSort"
-            ></p-radioButton>
+            <p-radioButton [inputId]="sort.value" name="label" class="px-3" [value]="sort"
+                [(ngModel)]="selectedSort"></p-radioButton>
         </div>
     </div>
 
     <div *ngIf="filterType === 'Filter By'">
-        <app-product-filters
-            [isSellerIdExists]="isSellerIdExists"
-            (handleCatalogSelections)="selectCatalog($event)"
-            (handledeDratmentsTreeSelections)="selectDepartment($event)"
-            (handleStartPrice)="setPriceFrom($event)"
-            (handleEndPrice)="setPriceTo($event)"
-            (handleStockSiwtch)="swtichStock($event)"
-            (handleStartShipDate)="setStartShipDate($event)"
-            (handleEndShipDate)="setEndtShipDate($event)"
-            (handleSatrtsoldOutDate)="setStartSoldOutDate($event)"
-            (handleEndSoldOutDate)="setEndSoldOutDate($event)"
+        <app-product-filters [isSellerIdExists]="isSellerIdExists" (handleCatalogSelections)="selectCatalog($event)"
+            (handledeDratmentsTreeSelections)="selectDepartment($event)" (handleStartPrice)="setPriceFrom($event)"
+            (handleEndPrice)="setPriceTo($event)" (handleStockSiwtch)="swtichStock($event)"
+            (handleStartShipDate)="setStartShipDate($event)" (handleEndShipDate)="setEndtShipDate($event)"
+            (handleSatrtsoldOutDate)="setStartSoldOutDate($event)" (handleEndSoldOutDate)="setEndSoldOutDate($event)"
             (handleBrandsSelection)="selectBrands($event)"
-            (clearAll)="clearFiltrs($event)"
-            #filters
-        ></app-product-filters>
+            (handleCategoriesTreeSelections)="selectCategory($event)" (clearAll)="clearFiltrs($event)"
+            [selectedDepartmentId]="selectedDepartments?.[0]"
+            [preselectCategoryId]="selectedCategories?.[0]" [selectedBrands]="brands"
+            #filters></app-product-filters>
     </div>
 
 

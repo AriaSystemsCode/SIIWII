@@ -1,4 +1,4 @@
-﻿using Abp.Application.Services.Dto;
+using Abp.Application.Services.Dto;
 using Abp.Collections.Extensions;
 using Abp.Domain.Repositories;
 using Abp.Domain.Uow;
@@ -32,7 +32,18 @@ using onetouch.Sessions.Dto;
 using Abp.UI;
 using onetouch.Message;
 using Nito.AsyncEx;
-
+using Microsoft.AspNetCore.Authorization;
+using Abp.Authorization;
+using onetouch.AppItems;
+using DocumentFormat.OpenXml.Office2010.Excel;
+using onetouch.AppItemsLists;
+using onetouch.AppMarketplaceContacts;
+using System.Text.Json;
+using DocumentFormat.OpenXml.InkML;
+using Abp.EntityFrameworkCore.Uow;
+using onetouch.EntityFrameworkCore;
+using System.Linq.Expressions;
+using onetouch.AppSiiwiiTransaction.Dtos;
 namespace onetouch.AppMarketplaceItems
 {
     public class AppMarketplaceItemsAppService : onetouchAppServiceBase, IAppMarketplaceItemsAppService
@@ -47,6 +58,7 @@ namespace onetouch.AppMarketplaceItems
         private readonly IRepository<AppMarketplaceItemsListDetails, long> _appMarketplaceItemsListDetail;
         private readonly IRepository<AppMarketplaceItemLists.AppMarketplaceItemLists, long> _appMarketplaceItemList;
         private readonly IRepository<AppMarketplaceItems, long> _appMarketplaceItem;
+        private readonly IRepository<AppEntitiesRelationship,long> _appEntitiesRelationship;
         private readonly Helper _helper;
         private readonly IRepository<SycEntityObjectType, long> _sycEntityObjectTypeRepository;
         private readonly IRepository<AppContact, long> _appContactRepository;
@@ -55,6 +67,12 @@ namespace onetouch.AppMarketplaceItems
         //I48[Start]
         private readonly IMessageAppService _messageAppService;
         //I48[End]
+        //I40[Start]
+        IRepository<AppMarketplaceContacts.AppMarketplaceContact, long> _appMarketplaceContactRepository;
+        //I40[End]
+        //I49[Start]
+        private readonly IRepository<AppContactRelationshipInfo, long> _appContactRelationshipInfoRepository;
+        //I49[End]
         public AppMarketplaceItemsAppService(IRepository<AppMarketplaceItemLists.AppMarketplaceItemLists, long> appMarketplaceItemList,
             IRepository<AppMarketplaceItemsListDetails, long> appMarketplaceItemsListDetail, IRepository<AppMarketplaceItemSelectors, long> appMarketplaceItemsSelector,
             IRepository<AppMarketplaceItems, long> appMarketplaceItem, Helper helper, IRepository<SycEntityObjectType, long> sycEntityObjectTypeRepository,
@@ -63,7 +81,9 @@ namespace onetouch.AppMarketplaceItems
             IRepository<onetouch.AppMarketplaceAccountsPriceLevels.AppMarketplaceAccountsPriceLevels, long> appMarketplaceAccountsPriceLevels,
             IRepository<SycEntityObjectCategory, long> sycEntityObjectCategory, IRepository<AppTransactionDetails, long> appTransactionDetailsRepository,
             IRepository<AppTransactionHeaders, long> appTransactionHeadersRepository,
-        IAppEntitiesAppService appEntitiesAppService, IMessageAppService messageAppService)
+        IAppEntitiesAppService appEntitiesAppService, IMessageAppService messageAppService, IRepository<AppEntitiesRelationship, long> appEntitiesRelationship,
+        IRepository<AppMarketplaceContact, long> appMarketplaceContactRepository,
+        IRepository<AppContactRelationshipInfo, long> appContactRelationshipInfoRepository)
         {
             _messageAppService = messageAppService;
             _appTransactionHeadersRepository = appTransactionHeadersRepository;
@@ -74,20 +94,135 @@ namespace onetouch.AppMarketplaceItems
             _appMarketplaceItemList = appMarketplaceItemList;
             _appMarketplaceItemsListDetail = appMarketplaceItemsListDetail;
             _appMarketplaceItemsSelector = appMarketplaceItemsSelector;
-            _helper= helper;
+            _helper = helper;
             _sycEntityObjectTypeRepository = sycEntityObjectTypeRepository;
             _appContactRepository = appContactRepository;
             _sycCurrencyExchangeRateRepository = sycCurrencyExchangeRateRepository;
             _appConfiguration = appConfigurationAccessor.Configuration;
             _appEntitiesAppService = appEntitiesAppService;
             _appMarketplaceAccountsPriceLevels = appMarketplaceAccountsPriceLevels;
+            _appEntitiesRelationship = appEntitiesRelationship;
+            _appMarketplaceContactRepository = appMarketplaceContactRepository;
+            _appEntitiesRelationship = appEntitiesRelationship;
+            //I49[Start]
+            _appContactRelationshipInfoRepository = appContactRelationshipInfoRepository;
+            //I49[End]
         }
-        public async Task<PagedResultDto<GetAppMarketItemForViewDto>> GetAll(GetAllAppMarketItemsInput input)
+        private decimal ConvertMarketplacePrice(AppMarketplaceItemPrices price, string currencyCode, decimal usdExchangeRate, string sourceCurrencyCode = null)
+        {
+            if (price == null || price.Price <= 0)
+                return 0;
+
+            var targetCurrencyCode = string.IsNullOrEmpty(currencyCode) ? "USD" : currencyCode;
+            // Marketplace MSRP rows can contain the buyer currency after publishing. The
+            // seller tenant currency is the authoritative currency of the base MSRP.
+            var effectiveSourceCurrencyCode = string.IsNullOrEmpty(sourceCurrencyCode) ? price.CurrencyCode : sourceCurrencyCode;
+            if (string.IsNullOrEmpty(effectiveSourceCurrencyCode) || effectiveSourceCurrencyCode == targetCurrencyCode)
+                return price.Price;
+
+            var exchangeRate = effectiveSourceCurrencyCode == "USD"
+                ? usdExchangeRate
+                : _helper.SystemTables.GetExchangeRate(effectiveSourceCurrencyCode, targetCurrencyCode);
+
+            return exchangeRate == 0 ? 0 : price.Price * exchangeRate;
+        }
+
+        private decimal ResolveMarketplacePrice(IEnumerable<AppMarketplaceItemPrices> prices, string code, string currencyCode, decimal usdExchangeRate, string buyerSSIN = null, string sellerCurrencyCode = null, string debugLabel = null)
+        {
+            if (prices == null)
+                return 0;
+
+            var priceList = prices
+                .Where(x => x.Code == code && (buyerSSIN == null ? string.IsNullOrEmpty(x.BuyerSSIN) : x.BuyerSSIN == buyerSSIN))
+                .OrderByDescending(x => x.IsDefault)
+                .ThenByDescending(x => x.Id)
+                .ToList();
+
+            var targetCurrencyCode = string.IsNullOrEmpty(currencyCode) ? "USD" : currencyCode;
+            var sourceCurrencyCode = string.IsNullOrEmpty(sellerCurrencyCode) ? null : sellerCurrencyCode;
+            var price = priceList.FirstOrDefault(x => sourceCurrencyCode != null && x.CurrencyCode == sourceCurrencyCode)
+                ?? priceList.FirstOrDefault(x => x.IsDefault)
+                ?? priceList.FirstOrDefault(x => x.CurrencyCode == targetCurrencyCode)
+                ?? priceList.FirstOrDefault(x => x.CurrencyCode == "USD")
+                ?? priceList.FirstOrDefault();
+
+            var resolvedPrice = ConvertMarketplacePrice(
+                price,
+                currencyCode,
+                usdExchangeRate,
+                string.Equals(code, "MSRP", StringComparison.OrdinalIgnoreCase) ? sourceCurrencyCode : null);
+            if (!string.IsNullOrEmpty(debugLabel) && debugLabel.Contains("DONNA", StringComparison.OrdinalIgnoreCase))
+            {
+                var priceRows = string.Join(" | ", priceList.Select(x => $"Id={x.Id},Code={x.Code},Price={x.Price},Currency={x.CurrencyCode},IsDefault={x.IsDefault},Buyer={x.BuyerSSIN}"));
+                Logger.Warn($"[DONNA-PRICE] Label={debugLabel}; PriceCode={code}; TargetCurrency={targetCurrencyCode}; SellerCurrency={sourceCurrencyCode}; UsdExchangeRate={usdExchangeRate}; SelectedPriceId={price?.Id}; SelectedPrice={price?.Price}; SelectedCurrency={price?.CurrencyCode}; SelectedIsDefault={price?.IsDefault}; ResolvedPrice={resolvedPrice}; Rows=[{priceRows}]");
+            }
+
+            return resolvedPrice;
+        }
+
+        private static void ApplyMinMax(ref decimal minPrice, ref decimal maxPrice, decimal price)
+        {
+            if (price <= 0)
+                return;
+
+            if (minPrice <= 0 || price < minPrice)
+                minPrice = price;
+
+            if (maxPrice <= 0 || price > maxPrice)
+                maxPrice = price;
+        }
+
+        private static void ApplyMinMax(ref decimal? minPrice, ref decimal? maxPrice, decimal price)
+        {
+            if (price <= 0)
+                return;
+
+            if (minPrice == null || minPrice <= 0 || price < minPrice)
+                minPrice = price;
+
+            if (maxPrice == null || maxPrice <= 0 || price > maxPrice)
+                maxPrice = price;
+        }
+        //Iteration#49,1 MMT 09/28/2025 Allow unauthenticated user to view the product marketplace browse page[Start]
+        [AbpAllowAnonymous]
+       public async Task<PagedResultDto<GetAppMarketItemForViewDto>> GetAll(GetAllAppMarketItemsInput input)
        {
 
             var stopwatch = new System.Diagnostics.Stopwatch();
             stopwatch.Start();
-           
+
+            //I50[Start]
+            
+           IQueryable<AppMarketplaceItems> filteredItems = null;
+            if (!string.IsNullOrEmpty(input.FilterCondition))
+            {
+                var x = UnitOfWorkManager.Current.GetDbContext<onetouchDbContext>(null, null);
+                string jsonFilter = input.FilterCondition;
+                    // "[" +
+//"{ \"Field\": \"EntityObjectStatusCode\", \"Operator\": \"eq\", \"Value\": \"ACTIVE\" }," +
+//"{ \"Field\": \"ObjectCode\", \"Operator\": \"eq\", \"Value\": \"LISTING\" }," +
+//"{ \"Field\": \"Code\", \"Operator\": \"eq\", \"Value\": \"00002477-000000000083\"}" +
+//"]";
+               
+                var filterCondition = Helper.ApplyJsonFilter<AppMarketplaceItems>(jsonFilter);//.ToList();
+                if (filterCondition != null)
+                    filteredItems =  x.AppMarketplaceItems.Where(filterCondition).Where(z=>z.ParentId==null && ((input.SharingLevel == SharingLevels.Public && z.SharingLevel == 1) ||
+                  
+                (input.SharingLevel == SharingLevels.PublicAndSharedWithMe && (z.SharingLevel == 1 ||
+                (z.SharingLevel == 2 && z.ItemSharingFkList.Count(c => c.SharedUserId == AbpSession.UserId) > 0))) ||
+                (AbpSession.UserId != null && z.ItemSharingFkList.Count(c => c.SharedUserId == AbpSession.UserId) > 0))).OrderBy(input.Sorting ?? "id").Take(input.MaxResultCount);//.ToListAsync();
+
+
+
+                //var filters = JsonSerializer.Deserialize<dynamic>(input.FilterCondition);
+                //foreach (var f in filters)
+                //{
+                //    filteredAppItems = filteredAppItems.Where(e => EF..Property(e, f.Field) == f.Value);
+                //}
+            }
+            //.WhereIf(!string.IsNullOrEmpty(input.FilterCondition),z=>z.input.FilterCondition)
+            
+            //I50[End]
             #region prepare parameters
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
             {
@@ -111,13 +246,14 @@ namespace onetouch.AppMarketplaceItems
                     if (accountContact != null)
                     {
                         var userObj = accountContact.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 715);
-                        if (userObj!=null)
+                        if (userObj!=null && !string.IsNullOrEmpty(userObj.AttributeValue))
                         userId = long.Parse(userObj.AttributeValue.ToString());
                            
                     }
                 }
 
                 input.Sorting = input.Sorting ?? "id";
+                var itemSorting = input.Sorting;
                 List<long> AppItemListDetails = new List<long>();
                 if (input.AppItemListId != null && input.AppItemListId > 0)
                 {
@@ -130,6 +266,15 @@ namespace onetouch.AppMarketplaceItems
                 if (input.departmentFilters == null)
                     input.departmentFilters = new long[] { };
                 var allCategories = input.departmentFilters.ToList();
+                if (allCategories.Count > 0)
+                {
+                    allCategories = await GetCategoryIdsWithDescendants(allCategories);
+                }
+                //I49[Start]
+                if (input.CategoryFilters == null)
+                    input.CategoryFilters = new long[] { };
+                var categoriesListFilter = input.CategoryFilters.ToList();
+                //I49[End]
                 if (input.Brands == null)
                     input.Brands = new long[] { };
 
@@ -160,7 +305,7 @@ namespace onetouch.AppMarketplaceItems
                 //var currencyTenant = TenantManager.GetTenantCurrency();
                 //var account = await _appContactRepository.GetAll().Include(x => x.CurrencyFk).ThenInclude(x => x.EntityExtraData).FirstOrDefaultAsync(x => x.TenantId ==null && x.IsProfileData==false && x.ParentId == null && x.PartnerId == null && x.AccountId == null);
                  if (input.CurrencyCode != null)
-                 exchangeRate = _helper.SystemTables.GetExchangeRate("USD",input.CurrencyCode);
+                 exchangeRate = _helper.SystemTables.GetExchangeRate("USD", input.CurrencyCode);
 
                 if (input.CurrencyCode=="USD")
                     exchangeRate = 1;
@@ -169,8 +314,7 @@ namespace onetouch.AppMarketplaceItems
                     input.ArrtibuteFilters = new List<ArrtibuteFilter>();
                 var attrs = input.ArrtibuteFilters.Select(r => r.ArrtibuteValueId).ToList();
                 #endregion
-                var filteredAppItems = _appMarketplaceItem.GetAll().AsNoTracking().Include(a => a.ItemPricesFkList.Where(a => a.Code == "MSRP" &&
-                       (a.CurrencyCode == input.CurrencyCode || a.CurrencyCode == "USD" || a.IsDefault == true)))
+                var filteredAppItems = _appMarketplaceItem.GetAll().AsNoTracking().Include(a => a.ItemPricesFkList.Where(a => a.Code == "MSRP"))
                     //  .Join(_sycCurrencyExchangeRateRepository.GetAll(), price => price.CurrencyCode, exch => exch.CurrencyCode, (_price, _exch) => new
                     //   { currExchObj = _exch, priceObj = _price }))
 
@@ -191,9 +335,13 @@ namespace onetouch.AppMarketplaceItems
                         x.EntityExtraData,
                         x.EntityCategories,
                         x.ItemSharingFkList,
-                        x.EntityAttachments,
+                        DefaultAttachmentFile = x.EntityAttachments
+                            .OrderByDescending(a => a.IsDefault)
+                            .Select(a => a.AttachmentFk.Attachment)
+                            .FirstOrDefault(),
                         x.ItemPricesFkList,
                         x.TenantOwner,
+                        x.SSIN,
                         x.ManufacturerCode,
                         defaultMsrp = x.ItemPricesFkList.FirstOrDefault(a => a.Code == "MSRP" && a.IsDefault == true)
                     })
@@ -224,7 +372,12 @@ namespace onetouch.AppMarketplaceItems
                 //e => (e.PublishedListingItemFkList != null && e.PublishedListingItemFkList.Count > 0 && input.PublishStatus == 1) || ((e.PublishedListingItemFkList == null || (e.PublishedListingItemFkList != null && e.PublishedListingItemFkList.Count == 0)) && input.PublishStatus == 2))
                 // .WhereIf(input.ListingStatus > 0, e => (e.ListingItemFkList != null && e.ListingItemFkList.Count > 0 && input.ListingStatus == 2) || ((e.ListingItemFkList == null || (e.ListingItemFkList != null && e.ListingItemFkList.Count == 0)) && input.ListingStatus == 1))
                 //  .WhereIf(input.EntityObjectTypeId > 0, e => e.EntityFk.EntityObjectTypeId == input.EntityObjectTypeId)
-                .WhereIf(input.departmentFilters != null && input.departmentFilters.Count() > 0, e => e.EntityCategories.Where(r => allCategories.Contains(r.EntityObjectCategoryId)).Count() > 0)
+                .WhereIf(input.departmentFilters != null && input.departmentFilters.Count() > 0, e => e.EntityCategories.Where(r => r.EntityObjectCategoryFk.TenantId == null && allCategories.Contains(r.EntityObjectCategoryId)).Count() > 0)
+                //I49[Start]
+                .WhereIf(!string.IsNullOrEmpty(input.ItemSSIN) , e => e.SSIN == input.ItemSSIN)
+                .WhereIf(input.CategoryFilters!= null && input.CategoryFilters.Count() >0 , e => e.EntityCategories.Where(r => r.EntityObjectCategoryFk.TenantId != null && categoriesListFilter.Contains(r.EntityObjectCategoryId)).Count()>0)
+                //I49[End]
+                
                 // .WhereIf(input.ClassificationFilters != null && input.ClassificationFilters.Count() > 0, e => e.EntityFk.EntityClassifications.Where(r => input.ClassificationFilters.Contains(r.EntityObjectClassificationId)).Count() > 0)
                 .WhereIf(!string.IsNullOrWhiteSpace(input.Filter),
                 e => false || e.Name.Contains(input.Filter) || e.Code.Contains(input.Filter) || e.ManufacturerCode.Contains(input.Filter) || e.Description.Contains(input.Filter) ||
@@ -235,6 +388,10 @@ namespace onetouch.AppMarketplaceItems
                 (input.SharingLevel == SharingLevels.PublicAndSharedWithMe && (x.SharingLevel == 1 ||
                 (x.SharingLevel == 2 && x.ItemSharingFkList.Count(c => c.SharedUserId == AbpSession.UserId) > 0))) ||
                 (userId != null && x.ItemSharingFkList.Count(c => c.SharedUserId == userId) > 0) || (input.AccountSSIN == null ? x.TenantOwner == AbpSession.TenantId : false)));
+
+                //I50[Start]
+               // filteredAppItems = filteredAppItems.Where(filterCondition);
+                //I50[End]
                 /*     )
                || ((input.FilterType == ItemsFilterTypesEnum.SharedWithMe)
                      && (x.SharingLevel == 2 || x.SharingLevel == 1)  
@@ -243,79 +400,117 @@ namespace onetouch.AppMarketplaceItems
                        && (((x.SharingLevel == 2 || x.SharingLevel == 1) && x.ItemSharingFkList.Count(c => c.SharedUserId == AbpSession.UserId) > 0 )
                            ||(x.SharingLevel == 1)))));*/
                 var presonEntityObjectTypeId = await _helper.SystemTables.GetEntityObjectTypePersonId();
+                var sellerContactIds = _appContactRepository.GetAll()
+                    .Where(a => a.TenantId != null && a.ParentId == null
+                        && a.PartnerId == null && a.IsProfileData == true && a.EntityFk.EntityObjectTypeId != presonEntityObjectTypeId)
+                    .GroupBy(a => a.TenantId)
+                    .Select(a => a.Min(c => c.Id));
+                var sellerContacts = _appContactRepository.GetAll().Where(a => sellerContactIds.Contains(a.Id));
                 input.Sorting ="AppItem." +input.Sorting;
-               var filteredOrderedAppItems = filteredAppItems;//.OrderBy(input.Sorting ?? "id asc")
-                  //.PageBy(input);
-                var appItems = from o in filteredOrderedAppItems
-                               join  s in   _sycCurrencyExchangeRateRepository.GetAll()
-                               on o.defaultMsrp.CurrencyCode equals s.CurrencyCode into j
-                               join c in  _appContactRepository.GetAll().Where(a=>a.TenantId!= null && a.ParentId == null 
-                               && a.PartnerId == null && a.IsProfileData == true && a.EntityFk.EntityObjectTypeId!= presonEntityObjectTypeId)
-                               on o.TenantOwner equals c.TenantId 
-                               from u in j.DefaultIfEmpty() 
-                               select new GetAppMarketItemForViewDto()
-                               {
-                                   AppItem = new AppItemDto
-                                   {
-                                       ManufacturerCode = o.ManufacturerCode,
-                                       SellerName = c.Name ,
-                                       SSIN = o.Code,
-                                       Code = o.Code,
-                                       Name = o.Name,
-                                       Description = o.Notes,
-                                       Price = (decimal)(input.CurrencyCode == null && o.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.CurrencyCode == "USD").FirstOrDefault() !=null ? o.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.CurrencyCode == "USD").Select(a => a.Price).FirstOrDefault() :
-                                               (o.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.CurrencyCode == input.CurrencyCode).FirstOrDefault() != null ?
-                                               o.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.CurrencyCode == input.CurrencyCode).Select(a => a.Price).FirstOrDefault() :
-                                              (o.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.CurrencyCode == "USD").FirstOrDefault() == null ? //0 :
-                                              (o.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.IsDefault == true && q.CurrencyCode != input.CurrencyCode).FirstOrDefault() != null ?
-                                              ((o.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.IsDefault && q.CurrencyCode != input.CurrencyCode).FirstOrDefault().Price) * (input.CurrencyCode=="USD"? u.ExchangeRate : (1 / u.ExchangeRate) * exchangeRate)) : 0) :
-                                              (o.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.CurrencyCode == "USD").FirstOrDefault() != null?
-                                              (o.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.CurrencyCode == "USD").Select(a => a.Price).FirstOrDefault() * exchangeRate):0)))),
-                                       Id = o.Id,
-                                       ShowItem = (input.MinimumPrice != null ? ((decimal)(input.CurrencyCode == null &&
-                                                   o.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.CurrencyCode == "USD").FirstOrDefault() != null ? o.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.CurrencyCode == "USD").Select(a => a.Price).FirstOrDefault() :
-                                               (o.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.CurrencyCode == input.CurrencyCode).FirstOrDefault() != null ?
-                                               o.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.CurrencyCode == input.CurrencyCode).Select(a => a.Price).FirstOrDefault() :
-                                              (o.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.CurrencyCode == "USD").FirstOrDefault() == null ? //0 :
-                                              (o.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.IsDefault == true && q.CurrencyCode != input.CurrencyCode).FirstOrDefault() != null ?
-                                              ((o.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.IsDefault && q.CurrencyCode != input.CurrencyCode).FirstOrDefault().Price) * (input.CurrencyCode == "USD" ? u.ExchangeRate : (1 / u.ExchangeRate) * exchangeRate)) : 0) :
-                                              (o.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.CurrencyCode == "USD").FirstOrDefault() !=null? (o.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.CurrencyCode == "USD").Select(a => a.Price).FirstOrDefault() * exchangeRate) : 0)))) >= (decimal)input.MinimumPrice) : true) &&
-                                              (input.MaximumPrice != null ? ((decimal)(input.CurrencyCode == null ? o.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.CurrencyCode == "USD").Select(a => a.Price).FirstOrDefault() :
-                                               (o.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.CurrencyCode == input.CurrencyCode).FirstOrDefault() != null ?
-                                               o.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.CurrencyCode == input.CurrencyCode).Select(a => a.Price).FirstOrDefault() :
-                                              (o.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.CurrencyCode == "USD").FirstOrDefault() == null ? //0 :
-                                              (o.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.IsDefault == true && q.CurrencyCode != input.CurrencyCode).FirstOrDefault() != null ?
-                                              ((o.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.IsDefault && q.CurrencyCode != input.CurrencyCode).FirstOrDefault().Price) * (input.CurrencyCode == "USD" ? u.ExchangeRate : (1 / u.ExchangeRate) * exchangeRate)) : 0) :
-                                              (o.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.CurrencyCode == "USD").FirstOrDefault()!=null? (o.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.CurrencyCode == "USD").Select(a => a.Price).FirstOrDefault() * exchangeRate):0)))) <= (decimal)input.MaximumPrice) : true),
+                var rawItemSorting = "Item." + itemSorting;
+                var filteredOrderedAppItems = filteredAppItems;//.OrderBy(input.Sorting ?? "id asc")
+                                                               //List<AppMarketplaceItem> filteredOrderedAppItems = null;
+                                                               //I50[Start]
+                /*if (filteredItems != null)
+                {
+                    // filteredOrderedAppItems = filteredAppItems.Where(z => filteredItems.Contains(z.Id));
+                    filteredOrderedAppItems = filteredAppItems.Join(filteredItems, x => x.Id, z => z.Id, (s, sa) => new { s, sa });
 
-                                       ImageUrl = (o.EntityAttachments.FirstOrDefault(x => x.IsDefault == true) == null ?
-                                        (o.EntityAttachments.FirstOrDefault() == null ? "attachments/" + o.TenantId + "/" + o.EntityAttachments.FirstOrDefault().AttachmentFk.Attachment : "")
-                                        : "attachments/" + (o.TenantId.HasValue ? o.TenantId : -1) + "/" + o.EntityAttachments.FirstOrDefault(x => x.IsDefault == true).AttachmentFk.Attachment) // "attachments/3/6a567354-819d-ddf9-7ebb-76da114e7547.jpg"
-                                   },
-                                   Selected = (input.SelectorKey != null && SelectedItems != null && SelectedItems.Count > 0 && SelectedItems.Contains(o.Id)) ? true : false,
-                                   //146[Start]
-                                   SellerSSIN = c.SSIN,
-                                   //I46[End]
-                               };
-                var orderedItemsFilter = appItems.Where(x => x.AppItem.ShowItem && x.AppItem.Price != null).OrderBy(input.Sorting ?? "AppItem.id asc");
-                var orderedItems = orderedItemsFilter.PageBy(input);
+                }
+                else
+                {
+                    filteredOrderedAppItems = filteredAppItems;//.OrderBy(input.Sorting ?? "id asc")
+                }*/
+                //I50[End]
 
-                //var appItemsList = await appItems.ToListAs ync();
-                var appItemsList = await orderedItems.ToListAsync();
+                //.PageBy(input);
+                var rawAppItemsQuery = filteredItems != null
+                    ? (from o in filteredOrderedAppItems
+                             join i in filteredItems on o.Id equals i.Id
+                             join c in sellerContacts on o.TenantOwner equals c.TenantId
+                             select new
+                             {
+                                 Item = o,
+                                 Selected = (input.SelectorKey != null && SelectedItems != null && SelectedItems.Count > 0 && SelectedItems.Contains(o.Id)) ? true : false,
+                                 SellerSSIN = c.SSIN,
+                                 SellerName = c.Name,
+                                 SellerCurrencyCode = c.CurrencyFk != null ? c.CurrencyFk.Code : c.CurrencyCode
+                             })
+                    : (from o in filteredOrderedAppItems
+                             join c in sellerContacts on o.TenantOwner equals c.TenantId
+                             select new
+                             {
+                                 Item = o,
+                                 Selected = (input.SelectorKey != null && SelectedItems != null && SelectedItems.Count > 0 && SelectedItems.Contains(o.Id)) ? true : false,
+                                 SellerSSIN = c.SSIN,
+                                 SellerName = c.Name,
+                                 SellerCurrencyCode = c.CurrencyFk != null ? c.CurrencyFk.Code : c.CurrencyCode
+                             });
+
+                var hasPriceFilter = input.MinimumPrice != null || input.MaximumPrice != null;
+                var totalCount = hasPriceFilter ? 0 : await rawAppItemsQuery.CountAsync();
+                var rawAppItems = hasPriceFilter
+                    ? await rawAppItemsQuery.ToListAsync()
+                    : await rawAppItemsQuery.OrderBy(rawItemSorting).PageBy(input).ToListAsync();
+
+                var materializedAppItems = rawAppItems.Select(o =>
+                {
+                    var price = ResolveMarketplacePrice(o.Item.ItemPricesFkList, "MSRP", input.CurrencyCode, exchangeRate, null, o.SellerCurrencyCode, $"GetAll;Id={o.Item.Id};Name={o.Item.Name};Manufacturer={o.Item.ManufacturerCode};Seller={o.SellerName}");
+                    var imageUrl = string.IsNullOrEmpty(o.Item.DefaultAttachmentFile)
+                        ? ""
+                        : "attachments/" + (o.Item.TenantId.HasValue ? o.Item.TenantId : -1) + "/" + o.Item.DefaultAttachmentFile;
+
+                    return new GetAppMarketItemForViewDto()
+                    {
+                        AppItem = new AppItemDto
+                        {
+                            ManufacturerCode = o.Item.ManufacturerCode,
+                            SellerName = o.SellerName,
+                            SSIN = o.Item.Code,
+                            Code = o.Item.Code,
+                            Name = o.Item.Name,
+                            Description = o.Item.Notes,
+                            Price = price,
+                            Id = o.Item.Id,
+                            ShowItem = (input.MinimumPrice != null ? price >= (decimal)input.MinimumPrice : true) &&
+                                   (input.MaximumPrice != null ? price <= (decimal)input.MaximumPrice : true),
+
+                            ImageUrl = imageUrl
+                        },
+                        Selected = o.Selected,
+                        //146[Start]
+                        SellerSSIN = o.SellerSSIN,
+                        //I46[End]
+                    };
+                }).ToList();
+
+                var orderedItemsFilter = materializedAppItems
+                    .Where(x => x.AppItem.ShowItem && x.AppItem.Price != null)
+                    .AsQueryable()
+                    .OrderBy(input.Sorting ?? "AppItem.id asc");
+                if (hasPriceFilter)
+                    totalCount = orderedItemsFilter.Count();
+                var appItemsList = hasPriceFilter ? orderedItemsFilter.PageBy(input).ToList() : orderedItemsFilter.ToList();
                 //I48[Start]
+                
                 foreach (var item in appItemsList)
                 {
-                    item.NumberOfReviews = await _messageAppService.GetAllReviewsCount(item.AppItem.Id);
-                    var rating = await _messageAppService.GetOverAllRatings(item.AppItem.Id);
-                    item.AverageRating = rating.OverAllRating;
+                   item.NumberOfReviews = await _messageAppService.GetAllReviewsCount(item.AppItem.Id);
+                   var rating = await _messageAppService.GetOverAllRatings(item.AppItem.Id);
+                   item.AverageRating = rating.OverAllRating;
+                    //I49
+                    //if (!AbpSession.UserId.HasValue)
+                    //{
+                    //    item.AppItem.Price = 0;
+                    //}
+                    //I49
                 }
+                
                 //I48[End]
                 if (input.SelectorOnly != null && input.SelectorOnly == true)
                 {
                     appItemsList = appItemsList.Where(e => e.Selected).ToList();
                 }
-                var totalCount = await orderedItemsFilter.CountAsync(x => x.AppItem.ShowItem);
-
                 stopwatch.Stop();
                 var elapsed_time = stopwatch.ElapsedMilliseconds;
 
@@ -325,39 +520,46 @@ namespace onetouch.AppMarketplaceItems
                 );
             }
         }
+        [AbpAllowAnonymous]
         public async Task<GetAccountImagesOutputDto> GetAccountImages(string accountSSIN)
         {
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
             {
+                string imagesUrl = _appConfiguration[$"Attachment:Path"].Replace(_appConfiguration[$"Attachment:Omitt"], "") + @"/";
                 var attPhotoId = await _helper.SystemTables.GetAttachmentCategoryId("LOGO");
                 var attBannerId = await _helper.SystemTables.GetAttachmentCategoryId("BANNER");
                 accountSSIN = accountSSIN.StartsWith("\"") ? accountSSIN.Substring(1) : accountSSIN;
                 accountSSIN = accountSSIN.EndsWith("\"") ? accountSSIN.Substring(0, accountSSIN.Length - 1) : accountSSIN;
-                var account = await _appContactRepository.GetAll().Include(a => a.EntityFk)
+                /*var account = await _appContactRepository.GetAll().Include(a => a.EntityFk)
                     .ThenInclude(a => a.EntityAttachments.Where(a => a.AttachmentCategoryId == attPhotoId || a.AttachmentCategoryId == attBannerId))
                     .ThenInclude(a=>a.AttachmentFk)
-                    .FirstOrDefaultAsync(a => a.SSIN == accountSSIN && a.TenantId==null);
+                    .FirstOrDefaultAsync(a => a.SSIN == accountSSIN && a.TenantId==null);*/
+                var account = await _appMarketplaceContactRepository.GetAll()
+                    .Include(a => a.EntityAttachments.Where(a => a.AttachmentCategoryId == attPhotoId || a.AttachmentCategoryId == attBannerId))
+                    .ThenInclude(a => a.AttachmentFk)
+                    .FirstOrDefaultAsync(a => a.SSIN == accountSSIN && a.TenantId == null);
                 GetAccountImagesOutputDto returnDto = new GetAccountImagesOutputDto();
                 if (account != null)
                 {
                     returnDto.Name = account.Name;
-                    if (account.EntityFk.EntityAttachments.FirstOrDefault(a => a.AttachmentCategoryId == attPhotoId) != null)
+                    if (account.EntityAttachments.FirstOrDefault(a => a.AttachmentCategoryId == attPhotoId) != null)
                     {
-                        returnDto.LogoImage = string.IsNullOrEmpty(account.EntityFk.EntityAttachments.FirstOrDefault(a => a.AttachmentCategoryId == attPhotoId).AttachmentFk.Attachment) ?
+                        returnDto.LogoImage = string.IsNullOrEmpty(account.EntityAttachments.FirstOrDefault(a => a.AttachmentCategoryId == attPhotoId).AttachmentFk.Attachment) ?
                                                         ""
-                                                        : "attachments/" + (account.EntityFk.TenantId == null ? "-1" : account.EntityFk.TenantId.ToString()) + "/" + account.EntityFk.EntityAttachments.FirstOrDefault(a => a.AttachmentCategoryId == attPhotoId).AttachmentFk.Attachment;
+                                                        : "attachments/" + (account.TenantId == null ? "-1" : account.TenantId.ToString()) + "/" + account.EntityAttachments.FirstOrDefault(a => a.AttachmentCategoryId == attPhotoId).AttachmentFk.Attachment;
                     }
-                    if (account.EntityFk.EntityAttachments.FirstOrDefault(a => a.AttachmentCategoryId == attBannerId) != null)
+                    if (account.EntityAttachments.FirstOrDefault(a => a.AttachmentCategoryId == attBannerId) != null)
                     {
-                        returnDto.BannerImage = string.IsNullOrEmpty(account.EntityFk.EntityAttachments.FirstOrDefault(a => a.AttachmentCategoryId == attBannerId).AttachmentFk.Attachment) ?
+                        returnDto.BannerImage = string.IsNullOrEmpty(account.EntityAttachments.FirstOrDefault(a => a.AttachmentCategoryId == attBannerId).AttachmentFk.Attachment) ?
                                                         ""
-                                                        : "attachments/" + (account.EntityFk.TenantId == null ? "-1" : account.EntityFk.TenantId.ToString()) + "/" + account.EntityFk.EntityAttachments.FirstOrDefault(a => a.AttachmentCategoryId == attBannerId).AttachmentFk.Attachment;
+                                                        : "attachments/" + (account.TenantId == null ? "-1" : account.TenantId.ToString()) + "/" + account.EntityAttachments.FirstOrDefault(a => a.AttachmentCategoryId == attBannerId).AttachmentFk.Attachment;
                     }
                 }
                 return returnDto;
             }
         }
         //xx
+        [AbpAllowAnonymous]
         public async Task<PagedResultDto<LookupLabelDto>> GetAllBrandsWithPaging(GetAllAppEntitiesInput input, string accountSSIN)
         {
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
@@ -408,6 +610,7 @@ namespace onetouch.AppMarketplaceItems
             }
         }
         //xx
+        [AbpAllowAnonymous]
         public async Task<PagedResultDto<GetAllMarketplaceItemListsOutputDto>> GetSharedItemLists(GetAllInputItemList input,string accountSSIN)
         {
 
@@ -452,10 +655,19 @@ namespace onetouch.AppMarketplaceItems
             }
             
         }
+        //Iteration#49,1 MMT 09/28/2025 Allow unauthenticated user to view the product marketplace view page[Start]
+        [AbpAllowAnonymous] 
+        //Iteration#49,1 MMT 09/28/2025 Allow unauthenticated user to view the product marketplace browse page[End]
         public async Task<GetAppMarketplaceItemDetailForViewDto> GetMarketplaceAppItemForView(GetAppMarketplaceItemWithPagedAttributesForViewInput input)
         {
             try
             {
+                //I49[Start]
+                string showStockQty = await _appEntitiesAppService.GetHostSettingValue(1215);
+                string showMSRP = await _appEntitiesAppService.GetHostSettingValue(1214);
+                string showInOutStockFlag = await _appEntitiesAppService.GetHostSettingValue(1216);
+                string showWarningLabelMajorOutStockFlag = await _appEntitiesAppService.GetHostSettingValue(1217);
+                //I49[End]
                 //MMT
                 var stopwatch = new System.Diagnostics.Stopwatch();
                 stopwatch.Start();
@@ -491,19 +703,54 @@ namespace onetouch.AppMarketplaceItems
                     string level = "MSRP";
                     if (input.BuyerAccountSSIN != null && input.SellerAccountSSIN != null)
                     {
-                        var priceLevel = await _appMarketplaceAccountsPriceLevels.GetAll().AsNoTracking().Where(a => a.AccountSSIN == input.SellerAccountSSIN.TrimEnd()
+                        /*var priceLevel = await _appMarketplaceAccountsPriceLevels.GetAll().AsNoTracking().Where(a => a.AccountSSIN == input.SellerAccountSSIN.TrimEnd()
                         && a.ConnectedAccountSSIN == input.BuyerAccountSSIN).FirstOrDefaultAsync();
-                        if (priceLevel != null) { level = priceLevel.PriceLevel; }
-                    }
-                    if (!string.IsNullOrEmpty(input.BuyerAccountSSIN))
-                    {
-                        var buyerAccount = await _appContactRepository.GetAll().FirstOrDefaultAsync(a => a.SSIN == input.BuyerAccountSSIN);
-                        if (buyerAccount != null)
+                        if (priceLevel != null) { level = priceLevel.PriceLevel; }*/
+                        if (input.TransactionId != null)
                         {
-                            level = (buyerAccount.PartnerId == null && !string.IsNullOrEmpty(buyerAccount.PriceLevel) ? buyerAccount.PriceLevel : level);
-
+                            var transContact = await _appTransactionHeadersRepository.GetAll()
+                                .Where(z => z.Id == input.TransactionId).Include(z => z.AppTransactionContacts)
+                                .FirstOrDefaultAsync();
+                            if (transContact != null)
+                            {
+                                var sellerRole = transContact.AppTransactionContacts.Where(z => z.CompanySSIN == input.SellerAccountSSIN).FirstOrDefault();
+                                if (sellerRole != null)
+                                {
+                                    var buyerRole = transContact.AppTransactionContacts.Where(z => z.CompanySSIN == input.BuyerAccountSSIN).FirstOrDefault();
+                                    if (buyerRole!=null)
+                                    {
+                                        var activeRelationshipStatusId = await _helper.SystemTables.GetEntityObjectStatusRelationshipActive();
+                                        var relationshipSellBuy = await _appContactRelationshipInfoRepository.GetAll()
+                                        .Where(z => ((z.RequesterContactSSIN == input.SellerAccountSSIN &&
+                                        z.RecipientContactSSIN == input.BuyerAccountSSIN &&
+                                        z.RequesterMarketplaceRole == sellerRole.ContactRole.ToString() &&
+                                        z.RecipientMarketplaceRole == buyerRole.ContactRole.ToString()) ||
+                                        (z.RecipientContactSSIN == input.SellerAccountSSIN &&
+                                        z.RequesterContactSSIN == input.BuyerAccountSSIN &&
+                                        z.RecipientMarketplaceRole == sellerRole.ContactRole.ToString() &&
+                                        z.RequesterMarketplaceRole == buyerRole.ContactRole.ToString()))
+                                        && z.EntityObjectStatusId == activeRelationshipStatusId
+                                        ).Include(z => z.EntityExtraData).FirstOrDefaultAsync();
+                                        if (relationshipSellBuy != null)
+                                        {
+                                            var priceLevelExtradata = relationshipSellBuy.EntityExtraData.Where(z => z.AttributeId == 908).FirstOrDefault();
+                                            if (priceLevelExtradata != null && !string.IsNullOrEmpty(priceLevelExtradata.AttributeValue))
+                                                level = priceLevelExtradata.AttributeValue;
+                                        }
+                                    }
+                                }
+                            }
                         }
                     }
+                    //if (!string.IsNullOrEmpty(input.BuyerAccountSSIN))
+                    //{
+                    //    var buyerAccount = await _appContactRepository.GetAll().FirstOrDefaultAsync(a => a.SSIN == input.BuyerAccountSSIN);
+                    //    if (buyerAccount != null)
+                    //    {
+                    //        level = (buyerAccount.PartnerId == null && !string.IsNullOrEmpty(buyerAccount.PriceLevel) ? buyerAccount.PriceLevel : level);
+
+                    //    }
+                    //}
                     if (!string.IsNullOrEmpty(input.PriceLevel))
                     {
                         level = input.PriceLevel;
@@ -526,27 +773,51 @@ namespace onetouch.AppMarketplaceItems
                     if (string.IsNullOrEmpty(currencyCode))
                         currencyCode = "USD";
                     //MMY
+
                     decimal exchangeRate = 1;
                     if (input.CurrencyCode != null)
                         exchangeRate = _helper.SystemTables.GetExchangeRate("USD", currencyCode);
 
                     //using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
                     {
-                        var appItem = await _appMarketplaceItem.GetAll()
-                       .Include(x => x.ItemPricesFkList.Where(x => (x.Code == level || x.Code == "MSRP") && (x.CurrencyCode == currencyCode || x.CurrencyCode == "USD" || x.IsDefault)))
-                       .ThenInclude(x => x.CurrencyFk).ThenInclude(x => x.EntityExtraData)
-                       .Include(x => x.ItemSizeScaleHeadersFkList).ThenInclude(x => x.AppItemSizeScalesDetails)
-                       .Include(x => x.EntityAttachments).ThenInclude(x => x.AttachmentFk)
-                       .Include(x => x.EntityExtraData).ThenInclude(x => x.EntityObjectTypeFk)
-                       .Include(x => x.EntityExtraData).ThenInclude(x => x.AttributeValueFk)
-                       .Include(x => x.EntityObjectTypeFk)
-                       //.Include(x => x.ListingItemFkList)
-                       // .Include(x => x.PublishedListingItemFkList)
-                       //.Include(x => x.ItemPricesFkList).ThenInclude(y => y.CurrencyFk)
-                       .AsNoTracking().FirstOrDefaultAsync(x => x.Id == input.ItemId);
+                        //I49[Start]
+                        AppMarketplaceItems appItem = new AppMarketplaceItems();
+                        if (!string.IsNullOrEmpty(input.ItemSSIN))
+                        {
+                            //I49[End]
+                            appItem = await _appMarketplaceItem.GetAll()
+                           .Include(x => x.ItemPricesFkList.Where(x => x.Code == level || x.Code == "MSRP" || x.BuyerSSIN != null))
+                           .ThenInclude(x => x.CurrencyFk).ThenInclude(x => x.EntityExtraData)
+                           .Include(x => x.ItemSizeScaleHeadersFkList).ThenInclude(x => x.AppItemSizeScalesDetails)
+                           .Include(x => x.EntityAttachments).ThenInclude(x => x.AttachmentFk)
+                           .Include(x => x.EntityExtraData).ThenInclude(x => x.EntityObjectTypeFk)
+                           .Include(x => x.EntityExtraData).ThenInclude(x => x.AttributeValueFk)
+                           .Include(x => x.EntityObjectTypeFk)
+                           //.Include(x => x.ListingItemFkList)
+                           // .Include(x => x.PublishedListingItemFkList)
+                           //.Include(x => x.ItemPricesFkList).ThenInclude(y => y.CurrencyFk)
+                           .AsNoTracking().FirstOrDefaultAsync(x => x.SSIN == input.ItemSSIN);
+                            if (appItem != null)
+                                input.ItemId = appItem.Id;
+                        }
+                        else
+                        {
+                          appItem = await _appMarketplaceItem.GetAll()
+                         .Include(x => x.ItemPricesFkList.Where(x => x.Code == level || x.Code == "MSRP" || x.BuyerSSIN != null))
+                         .ThenInclude(x => x.CurrencyFk).ThenInclude(x => x.EntityExtraData)
+                         .Include(x => x.ItemSizeScaleHeadersFkList).ThenInclude(x => x.AppItemSizeScalesDetails)
+                         .Include(x => x.EntityAttachments).ThenInclude(x => x.AttachmentFk)
+                         .Include(x => x.EntityExtraData).ThenInclude(x => x.EntityObjectTypeFk)
+                         .Include(x => x.EntityExtraData).ThenInclude(x => x.AttributeValueFk)
+                         .Include(x => x.EntityObjectTypeFk)
+                         //.Include(x => x.ListingItemFkList)
+                         // .Include(x => x.PublishedListingItemFkList)
+                         //.Include(x => x.ItemPricesFkList).ThenInclude(y => y.CurrencyFk)
+                         .AsNoTracking().FirstOrDefaultAsync(x => x.Id == input.ItemId);
+                        }
 
                         var varAppItems = await _appMarketplaceItem.GetAll()
-                            .Include(x => x.ItemPricesFkList.Where(x => (x.Code == level || x.Code == "MSRP") && (x.CurrencyCode == currencyCode || x.CurrencyCode == "USD" || x.IsDefault)))
+                            .Include(x => x.ItemPricesFkList.Where(x => x.Code == level || x.Code == "MSRP" || x.BuyerSSIN != null))
                         .Include(x => x.EntityAttachments).ThenInclude(x => x.AttachmentFk)
                         .Include(x => x.EntityExtraData).ThenInclude(x => x.EntityObjectTypeFk)
                         .Include(x => x.EntityExtraData).ThenInclude(x => x.AttributeValueFk)
@@ -554,18 +825,35 @@ namespace onetouch.AppMarketplaceItems
                         //.Include(x => x.ListingItemFkList)
                         //.Include(x => x.PublishedListingItemFkList)
                         .Include(x => x.ItemPricesFkList).ThenInclude(y => y.CurrencyFk).ThenInclude(x => x.EntityExtraData)
-                        .AsNoTracking().Where(x => x.ParentId == input.ItemId).ToListAsync();
+                        .AsNoTracking().Where(x => x.ParentId == input.ItemId).OrderBy(z=>z.ManufacturerCode).ToListAsync();
 
                         var output = new GetAppMarketplaceItemDetailForViewDto { AppItem = ObjectMapper.Map<AppMarketplaceItemForViewDto>(appItem) };
+                        var sellerCurrencyCode = await _appContactRepository.GetAll()
+                            .AsNoTracking()
+                            .Where(a => a.TenantId == appItem.TenantOwner && a.IsProfileData && a.ParentId == null && a.PartnerId == null)
+                            .OrderBy(a => a.Id)
+                            .Select(a => a.CurrencyFk != null ? a.CurrencyFk.Code : a.CurrencyCode)
+                            .FirstOrDefaultAsync();
                         //
                         output.AppItem.HasPriceLevel = (!string.IsNullOrEmpty(level) && level != "MSRP") ? true : false;
                         var brandId = appItem.EntityExtraData != null && appItem.EntityExtraData.Count > 0 && appItem.EntityExtraData.FirstOrDefault(s => s.AttributeId == 108) != null ?
                             appItem.EntityExtraData.FirstOrDefault(s => s.AttributeId == 108).AttributeValueId : 0;
                         if (brandId != 0)
                         {
-                            var brandObj = await _appEntityRepository.GetAll().FirstOrDefaultAsync(a => a.Id == brandId);
+                            var brandObj = await _appEntityRepository.GetAll().Include(z=>z.EntityAttachments).ThenInclude(z=>z.AttachmentFk).FirstOrDefaultAsync(a => a.Id == brandId);
                             if (brandObj != null)
+                            {
                                 output.AppItem.Brand = brandObj.Name;
+                                if (brandObj.EntityAttachments != null && brandObj.EntityAttachments.Count > 0)
+                                {
+                                    var firstAttachment = brandObj.EntityAttachments.FirstOrDefault();
+                                    if (firstAttachment != null && !string.IsNullOrEmpty(firstAttachment.AttachmentFk.Name))
+                                    {
+                                        string imagesUrl = _appConfiguration[$"Attachment:Path"].Replace(_appConfiguration[$"Attachment:Omitt"], "") + @"/";
+                                        output.AppItem.BrandAttchment = imagesUrl + appItem.TenantOwner.ToString() + @"/" + firstAttachment.AttachmentFk.Attachment; 
+                                    }
+                                }
+                            }
                         }
                         output.AppItem.MaterialContent = appItem.EntityExtraData != null && appItem.EntityExtraData.Count > 0 && appItem.EntityExtraData.FirstOrDefault(s => s.AttributeId == 662) != null ?
                             appItem.EntityExtraData.FirstOrDefault(s => s.AttributeId == 662).AttributeValue : "";
@@ -616,13 +904,39 @@ namespace onetouch.AppMarketplaceItems
                                             decimal exchangeRateDef = 1;
                                             if (msrpObjDef.CurrencyCode != null)
                                             {
-                                                exchangeRateDef = _helper.SystemTables.GetExchangeRate("USD", msrpObjDef.CurrencyCode);
+                                                exchangeRateDef = _helper.SystemTables.GetExchangeRate(msrpObjDef.CurrencyCode, currencyCode);
                                                 output.AppItem.MinMSRP = msrpObjDef.Price * exchangeRateDef;
                                                 output.AppItem.MaxMSRP = msrpObjDef.Price * exchangeRateDef;
                                             }
                                         }
                                     }
 
+                                }
+                                var resolvedMainMSRP = ResolveMarketplacePrice(appItem.ItemPricesFkList, "MSRP", currencyCode, exchangeRate, null, sellerCurrencyCode, $"DetailMain;Id={appItem.Id};Name={appItem.Name};Manufacturer={appItem.ManufacturerCode}");
+                                if (resolvedMainMSRP > 0)
+                                {
+                                    output.AppItem.MinMSRP = resolvedMainMSRP;
+                                    output.AppItem.MaxMSRP = resolvedMainMSRP;
+                                }
+
+                                if (!string.IsNullOrEmpty(level) && level != "MSRP")
+                                {
+                                    var resolvedMainSpecialPrice = ResolveMarketplacePrice(appItem.ItemPricesFkList, level, currencyCode, exchangeRate, null, sellerCurrencyCode, $"DetailMainLevel;Id={appItem.Id};Name={appItem.Name};Manufacturer={appItem.ManufacturerCode}");
+                                    if (resolvedMainSpecialPrice > 0)
+                                    {
+                                        output.AppItem.MinSpecialPrice = resolvedMainSpecialPrice;
+                                        output.AppItem.MaxSpecialPrice = resolvedMainSpecialPrice;
+                                    }
+                                }
+
+                                if (!string.IsNullOrEmpty(input.BuyerAccountSSIN))
+                                {
+                                    var resolvedMainBuyerPrice = ResolveMarketplacePrice(appItem.ItemPricesFkList, "", currencyCode, exchangeRate, input.BuyerAccountSSIN, sellerCurrencyCode, $"DetailMainBuyer;Id={appItem.Id};Name={appItem.Name};Manufacturer={appItem.ManufacturerCode}");
+                                    if (resolvedMainBuyerPrice > 0)
+                                    {
+                                        output.AppItem.MinSpecialPrice = resolvedMainBuyerPrice;
+                                        output.AppItem.MaxSpecialPrice = resolvedMainBuyerPrice;
+                                    }
                                 }
                                 mainItemMSRP = output.AppItem.MinMSRP;
                                 if (!string.IsNullOrEmpty(level) && level != "MSRP")
@@ -649,7 +963,7 @@ namespace onetouch.AppMarketplaceItems
                                                 decimal exchangeRateDef = 1;
                                                 if (msrpObjDef.CurrencyCode != null)
                                                 {
-                                                    exchangeRateDef = _helper.SystemTables.GetExchangeRate("USD", msrpObjDef.CurrencyCode);
+                                                    exchangeRateDef = _helper.SystemTables.GetExchangeRate(msrpObjDef.CurrencyCode, currencyCode);
                                                     output.AppItem.MinSpecialPrice = msrpObjDef.Price * exchangeRateDef;
                                                     output.AppItem.MaxSpecialPrice = msrpObjDef.Price * exchangeRateDef;
                                                 }
@@ -658,7 +972,45 @@ namespace onetouch.AppMarketplaceItems
 
                                     }
                                 }
+                                //I49[Start]
+                                if (!string.IsNullOrEmpty(input.BuyerAccountSSIN))
+                                {
+                                    var buyerPrice = appItem.ItemPricesFkList.Where(x => x.CurrencyCode == currencyCode &&
+                                    x.BuyerSSIN == input.BuyerAccountSSIN).FirstOrDefault();
+                                    if (buyerPrice != null)
+                                    {
+                                        output.AppItem.MinSpecialPrice = buyerPrice.Price;
+                                        output.AppItem.MaxSpecialPrice = buyerPrice.Price;
+                                    }
+                                    else
+                                    {
+                                        var buyerPriceObjUsd = appItem.ItemPricesFkList.Where(x => x.CurrencyCode == "USD" &&
+                                            x.BuyerSSIN == input.BuyerAccountSSIN).FirstOrDefault();
+                                        if (buyerPriceObjUsd != null)
+                                        {
+                                            output.AppItem.MinSpecialPrice = buyerPriceObjUsd.Price * exchangeRate;
+                                            output.AppItem.MaxSpecialPrice = buyerPriceObjUsd.Price * exchangeRate;
+                                        }
+                                        else
+                                        {
+                                            var buyerObjDef = appItem.ItemPricesFkList.Where(x => x.IsDefault &&
+                                            x.BuyerSSIN == input.BuyerAccountSSIN).FirstOrDefault();
+                                            if (buyerObjDef != null)
+                                            {
+                                                decimal exchangeRateDef = 1;
+                                                if (buyerObjDef.CurrencyCode != null)
+                                                {
+                                                    exchangeRateDef = _helper.SystemTables.GetExchangeRate(buyerObjDef.CurrencyCode, currencyCode);
+                                                    output.AppItem.MinSpecialPrice = buyerObjDef.Price * exchangeRateDef;
+                                                    output.AppItem.MaxSpecialPrice = buyerObjDef.Price * exchangeRateDef;
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                                //I49[End]
                             }
+
                             if (output.AppItem.MinMSRP != null)
                                 mainItemLevelPrice = decimal.Parse(output.AppItem.MinMSRP.ToString());
 
@@ -692,7 +1044,7 @@ namespace onetouch.AppMarketplaceItems
                                                 decimal exchangeRateDef = 1;
                                                 if (msrpObjDef.CurrencyCode != null)
                                                 {
-                                                    exchangeRateDef = _helper.SystemTables.GetExchangeRate("USD", msrpObjDef.CurrencyCode);
+                                                    exchangeRateDef = _helper.SystemTables.GetExchangeRate(msrpObjDef.CurrencyCode, currencyCode);
                                                     itemPrice = msrpObjDef.Price * exchangeRateDef;
                                                     output.AppItem.MaxMSRP = output.AppItem.MaxMSRP > itemPrice ? output.AppItem.MaxMSRP : itemPrice;
                                                     output.AppItem.MinMSRP = output.AppItem.MinMSRP > itemPrice ? itemPrice : output.AppItem.MinMSRP;
@@ -701,6 +1053,12 @@ namespace onetouch.AppMarketplaceItems
                                         }
 
                                     }
+                                    var resolvedVariantMSRP = ResolveMarketplacePrice(prObj.ItemPricesFkList, "MSRP", currencyCode, exchangeRate, null, sellerCurrencyCode, $"DetailVariant;Id={prObj.Id};Name={prObj.Name};Manufacturer={prObj.ManufacturerCode}");
+                                    var minMSRP = output.AppItem.MinMSRP;
+                                    var maxMSRP = output.AppItem.MaxMSRP;
+                                    ApplyMinMax(ref minMSRP, ref maxMSRP, resolvedVariantMSRP);
+                                    output.AppItem.MinMSRP = minMSRP;
+                                    output.AppItem.MaxMSRP = maxMSRP;
                                     if (level != "MSRP")
                                     {
                                         var itemLevelPrice = prObj.ItemPricesFkList.Where(x => x.Code.ToUpper() == level && x.CurrencyCode == currencyCode).Select(x => x.Price).FirstOrDefault();
@@ -726,7 +1084,7 @@ namespace onetouch.AppMarketplaceItems
                                                     decimal exchangeRateDef = 1;
                                                     if (msrpObjDef.CurrencyCode != null)
                                                     {
-                                                        exchangeRateDef = _helper.SystemTables.GetExchangeRate("USD", msrpObjDef.CurrencyCode);
+                                                        exchangeRateDef = _helper.SystemTables.GetExchangeRate(msrpObjDef.CurrencyCode, currencyCode);
                                                         itemPrice = msrpObjDef.Price * exchangeRateDef;
                                                         output.AppItem.MaxSpecialPrice = output.AppItem.MaxSpecialPrice > itemPrice ? output.AppItem.MaxSpecialPrice : itemPrice;
                                                         output.AppItem.MinSpecialPrice = output.AppItem.MinSpecialPrice > itemPrice ? itemPrice : output.AppItem.MinSpecialPrice;
@@ -736,6 +1094,64 @@ namespace onetouch.AppMarketplaceItems
 
                                         }
                                     }
+                                        if (level != "MSRP")
+                                        {
+                                            var resolvedVariantSpecialPrice = ResolveMarketplacePrice(prObj.ItemPricesFkList, level, currencyCode, exchangeRate, null, sellerCurrencyCode, $"DetailVariantLevel;Id={prObj.Id};Name={prObj.Name};Manufacturer={prObj.ManufacturerCode}");
+                                            var minSpecialPrice = output.AppItem.MinSpecialPrice;
+                                            var maxSpecialPrice = output.AppItem.MaxSpecialPrice;
+                                            ApplyMinMax(ref minSpecialPrice, ref maxSpecialPrice, resolvedVariantSpecialPrice);
+                                            output.AppItem.MinSpecialPrice = minSpecialPrice;
+                                            output.AppItem.MaxSpecialPrice = maxSpecialPrice;
+                                        }
+                                    //I49[Start]
+                                    if (!string.IsNullOrEmpty(input.BuyerAccountSSIN))
+                                    {
+                                        var buyerPrice = prObj.ItemPricesFkList.Where(x => x.Code == "" && x.CurrencyCode == currencyCode &&
+                                        x.BuyerSSIN == input.BuyerAccountSSIN).FirstOrDefault();
+                                        if (buyerPrice != null && buyerPrice.Price>0)
+                                        {
+                                            output.AppItem.MinSpecialPrice = output.AppItem.MinSpecialPrice > buyerPrice.Price ? buyerPrice.Price: output.AppItem.MinSpecialPrice;
+                                            output.AppItem.MaxSpecialPrice = output.AppItem.MaxSpecialPrice > buyerPrice.Price? output.AppItem.MaxSpecialPrice : buyerPrice.Price;
+                                        }
+                                        else
+                                        {
+                                            var buyerPriceObjUsd = prObj.ItemPricesFkList.Where(x => x.Code == "" && x.CurrencyCode == "USD" &&
+                                                x.BuyerSSIN == input.BuyerAccountSSIN).FirstOrDefault();
+                                            if (buyerPriceObjUsd != null && buyerPriceObjUsd.Price > 0)
+                                            {
+                                                var pirceValue = buyerPriceObjUsd.Price * exchangeRate;
+                                                output.AppItem.MinSpecialPrice = output.AppItem.MinSpecialPrice > pirceValue ? pirceValue : output.AppItem.MinSpecialPrice;
+                                                output.AppItem.MaxSpecialPrice = output.AppItem.MaxSpecialPrice > pirceValue ? output.AppItem.MaxSpecialPrice : pirceValue;
+                                            }
+                                            else
+                                            {
+                                                var buyerObjDef = prObj.ItemPricesFkList.Where(x => x.Code == "" && x.IsDefault &&
+                                                x.BuyerSSIN == input.BuyerAccountSSIN).FirstOrDefault();
+                                                if (buyerObjDef != null && buyerObjDef.Price>0)
+                                                {
+                                                    decimal exchangeRateDef = 1;
+                                                    if (buyerObjDef.CurrencyCode != null)
+                                                    {
+                                                        exchangeRateDef = _helper.SystemTables.GetExchangeRate(buyerObjDef.CurrencyCode, currencyCode);
+                                                        var pirceValue = buyerObjDef.Price * exchangeRateDef;
+                                                        output.AppItem.MinSpecialPrice = output.AppItem.MinSpecialPrice > pirceValue ? pirceValue : output.AppItem.MinSpecialPrice;
+                                                        output.AppItem.MaxSpecialPrice = output.AppItem.MaxSpecialPrice > pirceValue ? output.AppItem.MaxSpecialPrice : pirceValue;
+                                                        
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                        if (!string.IsNullOrEmpty(input.BuyerAccountSSIN))
+                                        {
+                                            var resolvedVariantBuyerPrice = ResolveMarketplacePrice(prObj.ItemPricesFkList, "", currencyCode, exchangeRate, input.BuyerAccountSSIN, sellerCurrencyCode, $"DetailVariantBuyer;Id={prObj.Id};Name={prObj.Name};Manufacturer={prObj.ManufacturerCode}");
+                                            var minSpecialPrice = output.AppItem.MinSpecialPrice;
+                                            var maxSpecialPrice = output.AppItem.MaxSpecialPrice;
+                                            ApplyMinMax(ref minSpecialPrice, ref maxSpecialPrice, resolvedVariantBuyerPrice);
+                                            output.AppItem.MinSpecialPrice = minSpecialPrice;
+                                            output.AppItem.MaxSpecialPrice = maxSpecialPrice;
+                                        }
+                                    //I49[End]
                                 }
                             }
                             //MMT
@@ -1014,25 +1430,25 @@ namespace onetouch.AppMarketplaceItems
                                                     if (!string.IsNullOrEmpty(level))
                                                     {
                                                         attlook.Price = mainItemLevelPrice == null ? 0 : decimal.Parse(mainItemLevelPrice.ToString());
-                                                        var priceObnj = itemSsin.ItemPricesFkList.FirstOrDefault(x => x.CurrencyCode == currencyCode && x.Code == level);
+                                                        var priceObnj = itemSsin?.ItemPricesFkList.FirstOrDefault(x => x.CurrencyCode == currencyCode && x.Code == level);
                                                         if (priceObnj != null)
                                                             attlook.Price = priceObnj.Price;
                                                         else
                                                         {
-                                                            var msrpObjUsd = itemSsin.ItemPricesFkList.Where(x => x.Code == level && x.CurrencyCode == "USD").FirstOrDefault();
+                                                            var msrpObjUsd = itemSsin?.ItemPricesFkList.Where(x => x.Code == level && x.CurrencyCode == "USD").FirstOrDefault();
                                                             if (msrpObjUsd != null)
                                                             {
                                                                 attlook.Price = msrpObjUsd.Price * exchangeRate;
                                                             }
                                                             else
                                                             {
-                                                                var msrpObjDef = itemSsin.ItemPricesFkList.Where(x => x.Code == level && x.IsDefault).FirstOrDefault();
+                                                                var msrpObjDef = itemSsin?.ItemPricesFkList.Where(x => x.Code == level && x.IsDefault).FirstOrDefault();
                                                                 if (msrpObjDef != null)
                                                                 {
                                                                     decimal exchangeRateDef = 1;
                                                                     if (msrpObjDef.CurrencyCode != null)
                                                                     {
-                                                                        exchangeRateDef = _helper.SystemTables.GetExchangeRate("USD", msrpObjDef.CurrencyCode);
+                                                                        exchangeRateDef = _helper.SystemTables.GetExchangeRate(msrpObjDef.CurrencyCode, currencyCode);
                                                                         attlook.Price = msrpObjDef.Price * exchangeRateDef;
                                                                     }
                                                                 }
@@ -1049,25 +1465,25 @@ namespace onetouch.AppMarketplaceItems
                                                     else
                                                     {
                                                         attlook.Price = mainItemMSRP;
-                                                        var priceObnj = itemSsin.ItemPricesFkList.FirstOrDefault(x => x.CurrencyCode == currencyCode && x.Code == "MSRP");
+                                                        var priceObnj = itemSsin?.ItemPricesFkList.FirstOrDefault(x => x.CurrencyCode == currencyCode && x.Code == "MSRP");
                                                         if (priceObnj != null)
                                                             attlook.Price = priceObnj.Price;
                                                         else
                                                         {
-                                                            var msrpObjUsd = itemSsin.ItemPricesFkList.Where(x => x.Code == "MSRP" && x.CurrencyCode == "USD").FirstOrDefault();
+                                                            var msrpObjUsd = itemSsin?.ItemPricesFkList.Where(x => x.Code == "MSRP" && x.CurrencyCode == "USD").FirstOrDefault();
                                                             if (msrpObjUsd != null)
                                                             {
                                                                 attlook.Price = msrpObjUsd.Price * exchangeRate;
                                                             }
                                                             else
                                                             {
-                                                                var msrpObjDef = itemSsin.ItemPricesFkList.Where(x => x.Code == "MSRP" && x.IsDefault).FirstOrDefault();
+                                                                var msrpObjDef = itemSsin?.ItemPricesFkList.Where(x => x.Code == "MSRP" && x.IsDefault).FirstOrDefault();
                                                                 if (msrpObjDef != null)
                                                                 {
                                                                     decimal exchangeRateDef = 1;
                                                                     if (msrpObjDef.CurrencyCode != null)
                                                                     {
-                                                                        exchangeRateDef = _helper.SystemTables.GetExchangeRate("USD", msrpObjDef.CurrencyCode);
+                                                                        exchangeRateDef = _helper.SystemTables.GetExchangeRate(msrpObjDef.CurrencyCode, currencyCode);
                                                                         attlook.Price = msrpObjDef.Price * exchangeRateDef;
                                                                     }
                                                                 }
@@ -1081,7 +1497,7 @@ namespace onetouch.AppMarketplaceItems
                                                         //        attlook.Price = priceObnj.Price;
                                                         //}
                                                     }
-                                                    attlook.SSIN = itemSsin.SSIN;
+                                                    if (itemSsin != null) attlook.SSIN = itemSsin.SSIN;
                                                     if (prepack != null)
                                                     {
                                                         var ratioSize = prepack.FirstOrDefault(z => z.SizeCode == attlook.Label.ToString());
@@ -1154,7 +1570,7 @@ namespace onetouch.AppMarketplaceItems
                                                                                            ).Any()).ToList()
                                                                                            .Where(a => a.EntityExtraData.Where(w => w.AttributeId == firstAttributeIdLong && (w.AttributeValue == varItem || w.AttributeCode == varItem)).Any()).FirstOrDefault();
                                                     if (itemSsin != null)
-                                                        attlook.SSIN = itemSsin.SSIN;
+                                                        if (itemSsin != null) attlook.SSIN = itemSsin.SSIN;
 
                                                     if (!string.IsNullOrEmpty(level))
                                                     {
@@ -1169,7 +1585,7 @@ namespace onetouch.AppMarketplaceItems
                                                         {
                                                             AppMarketplaceItemPrices? msrpObjUsd = null;
                                                             if (itemSsin != null)
-                                                                msrpObjUsd = itemSsin.ItemPricesFkList.Where(x => x.Code == level && x.CurrencyCode == "USD").FirstOrDefault();
+                                                                msrpObjUsd = itemSsin?.ItemPricesFkList.Where(x => x.Code == level && x.CurrencyCode == "USD").FirstOrDefault();
 
                                                             if (msrpObjUsd != null)
                                                             {
@@ -1179,14 +1595,14 @@ namespace onetouch.AppMarketplaceItems
                                                             {
                                                                 AppMarketplaceItemPrices? msrpObjDef = null;
                                                                 if (itemSsin != null)
-                                                                    msrpObjDef = itemSsin.ItemPricesFkList.Where(x => x.Code == level && x.IsDefault).FirstOrDefault();
+                                                                    msrpObjDef = itemSsin?.ItemPricesFkList.Where(x => x.Code == level && x.IsDefault).FirstOrDefault();
 
                                                                 if (msrpObjDef != null)
                                                                 {
                                                                     decimal exchangeRateDef = 1;
                                                                     if (msrpObjDef.CurrencyCode != null)
                                                                     {
-                                                                        exchangeRateDef = _helper.SystemTables.GetExchangeRate("USD", msrpObjDef.CurrencyCode);
+                                                                        exchangeRateDef = _helper.SystemTables.GetExchangeRate(msrpObjDef.CurrencyCode, currencyCode);
                                                                         attlook.Price = msrpObjDef.Price * exchangeRateDef;
                                                                     }
                                                                 }
@@ -1212,7 +1628,7 @@ namespace onetouch.AppMarketplaceItems
                                                         {
                                                             AppMarketplaceItemPrices? msrpObjUsd = null;
                                                             if (itemSsin != null)
-                                                                msrpObjUsd = itemSsin.ItemPricesFkList.Where(x => x.Code == "MSRP" & x.CurrencyCode == "USD").FirstOrDefault();
+                                                                msrpObjUsd = itemSsin?.ItemPricesFkList.Where(x => x.Code == "MSRP" & x.CurrencyCode == "USD").FirstOrDefault();
                                                             if (msrpObjUsd != null)
                                                             {
                                                                 attlook.Price = msrpObjUsd.Price * exchangeRate;
@@ -1221,13 +1637,13 @@ namespace onetouch.AppMarketplaceItems
                                                             {
                                                                 AppMarketplaceItemPrices? msrpObjDef = null;
                                                                 if (itemSsin != null)
-                                                                    msrpObjDef = itemSsin.ItemPricesFkList.Where(x => x.Code == "MSRP" & x.IsDefault).FirstOrDefault();
+                                                                    msrpObjDef = itemSsin?.ItemPricesFkList.Where(x => x.Code == "MSRP" & x.IsDefault).FirstOrDefault();
                                                                 if (msrpObjDef != null)
                                                                 {
                                                                     decimal exchangeRateDef = 1;
                                                                     if (msrpObjDef.CurrencyCode != null)
                                                                     {
-                                                                        exchangeRateDef = _helper.SystemTables.GetExchangeRate("USD", msrpObjDef.CurrencyCode);
+                                                                        exchangeRateDef = _helper.SystemTables.GetExchangeRate(msrpObjDef.CurrencyCode, currencyCode);
                                                                         attlook.Price = msrpObjDef.Price * exchangeRateDef;
                                                                     }
                                                                 }
@@ -1314,17 +1730,22 @@ namespace onetouch.AppMarketplaceItems
                         }
                         //I46[Start]
                         var presonEntityObjectTypeId = await _helper.SystemTables.GetEntityObjectTypePersonId();
-                        var contactSeller = await _appContactRepository.GetAll().Where(a => a.TenantId != null && a.ParentId == null 
-                               && a.TenantId== appItem.TenantOwner
-                               && a.PartnerId == null && a.IsProfileData == true && a.EntityFk.EntityObjectTypeId != presonEntityObjectTypeId).FirstOrDefaultAsync();
+                        var tenantOwner = TenantManager.GetById(appItem.TenantOwner);
+                        var contactSeller = await _appMarketplaceContactRepository.GetAll().Where(a=> a.ParentId == null
+                               && a.TenantOwner == appItem.TenantOwner && a.Name== tenantOwner.Name
+                               && a.IsProfileData == true).FirstOrDefaultAsync();
+
+                        //var contactSeller = await _appContactRepository.GetAll().Where(a => a.TenantId != null && a.ParentId == null 
+                         //      && a.TenantId== appItem.TenantOwner
+                          //     && a.PartnerId == null && a.IsProfileData == true && a.EntityFk.EntityObjectTypeId != presonEntityObjectTypeId).FirstOrDefaultAsync();
                         if (contactSeller != null)
                         {
-                            var marketplaceSellerAccount =  await _appContactRepository.GetAll().Where(a => a.TenantId == null && a.ParentId == null
-                               && a.PartnerId == contactSeller.Id && a.IsProfileData == false && a.EntityFk.EntityObjectTypeId != presonEntityObjectTypeId).FirstOrDefaultAsync();
-                            if (marketplaceSellerAccount!=null)
-                            {
-                                output.SellerMarketPlaceAccountId = marketplaceSellerAccount.Id;
-                            }
+                            //var marketplaceSellerAccount =  await _appContactRepository.GetAll().Where(a => a.TenantId == null && a.ParentId == null
+                             //  && a.PartnerId == contactSeller.Id && a.IsProfileData == false && a.EntityFk.EntityObjectTypeId != presonEntityObjectTypeId).FirstOrDefaultAsync();
+                            //if (marketplaceSellerAccount!=null)
+                            //{
+                                output.SellerMarketPlaceAccountId = contactSeller.Id;
+                            //}
 
                             output.SellerSSIN = contactSeller.SSIN;
                             output.SellerCompanyName = contactSeller.Name;
@@ -1342,6 +1763,42 @@ namespace onetouch.AppMarketplaceItems
                             }
                         }
                         //I46[End]
+                        //I49[Start] 
+                        if (!AbpSession.UserId.HasValue)
+                        {
+                            output.AppItem.AppItemPriceInfos.RemoveAll(x=>x.Code!="MSRP");
+                            if (showMSRP == "No")
+                            {
+                                output.AppItem.AppItemPriceInfos.RemoveAll(x => x.Code == "MSRP");
+                                output.AppItem.MaxMSRP = 0;
+                                output.AppItem.MinMSRP = 0;
+                            }
+                            //output.AppItem.MinMSRP = 0;
+                            //output.AppItem.MaxMSRP = 0;
+                            output.AppItem.MinSpecialPrice = 0;
+                            output.AppItem.MaxSpecialPrice = 0;
+                            //foreach (var vari in output.AppItem.variations)
+                            //{
+                            //    foreach (var val in vari.selectedValues)
+                            //    {
+                            //        foreach (var inVal in val.EDRestAttributes)
+                            //        {
+                            //            foreach (var ext in inVal.Values)
+                            //            {
+                            //                ext.Price = 0;
+                            //            }
+                                        
+                            //        }
+                            //    }
+                            //}
+                        }
+                        output.ShowMSRP = showMSRP;
+                        output.ShowStockAvailability = showStockQty;
+                        output.ShowInOutStockFlag = showInOutStockFlag;
+                        output.ShowWarningLabelMajorOutStockFlag = showWarningLabelMajorOutStockFlag;
+                        //if (relateditems != null && relateditems.Count > 0)
+                        //{
+
                         //MMT
                         stopwatch.Stop();
                         var elapsed_time = stopwatch.ElapsedMilliseconds;
@@ -1352,6 +1809,102 @@ namespace onetouch.AppMarketplaceItems
             }
             catch { throw new UserFriendlyException("This product has an issue. Please ask the product owner to re-share it."); }
         }
+        //Iteration#49,1 MMT 09/28/2025 Allow unauthenticated user to view the product marketplace view page[Start]
+        [AbpAllowAnonymous]
+        public async Task<PagedResultDto<GetAppMarketItemForViewDto>> GetAppItemRelatedItems(GetAllAppMarketItemsInput input)
+        {
+            using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
+            {
+                List<GetAppMarketItemForViewDto> appItemsList = new List<GetAppMarketItemForViewDto>();
+                var marketplaceItem = await _appMarketplaceItem.GetAll().Where(z => z.SSIN == input.ItemSSIN).FirstOrDefaultAsync();
+                if (marketplaceItem != null)
+                {
+                    decimal exchangeRate = 1;
+                    if (input.CurrencyCode != null)
+                        exchangeRate = _helper.SystemTables.GetExchangeRate("USD", input.CurrencyCode);
+
+                    var relatedList = _appEntitiesRelationship.GetAll()
+                                .Where(z => z.EntityId == marketplaceItem.Id).PageBy(input);//&& z.EntityTypeCode == "LISTING" && z.RelatedEntityTypeCode == "LISTING"
+                    var related = await relatedList.ToListAsync();
+
+                    if (related != null && related.Count > 0)
+                    {
+                        foreach (var mitem in related)
+                        {
+
+                            var marketpaceItem = await _appMarketplaceItem.GetAll().Include(z => z.ItemPricesFkList)
+                                .Include(z => z.EntityAttachments).ThenInclude(z => z.AttachmentFk)
+                                .Where(z => z.Id == mitem.RelatedEntityId &&
+                                (z.SharingLevel == 1 || (z.SharingLevel == 2 && z.ItemSharingFkList.Count(c => c.SharedUserId == AbpSession.UserId) > 0))
+                                ).FirstOrDefaultAsync();
+                            if (marketpaceItem != null)
+                            {
+                                var itemData = await GetAppMarketplaceViewData(marketpaceItem.SSIN, input.CurrencyCode);
+                                if (itemData != null)
+                                    appItemsList.Add(itemData);
+                                //    decimal exchangeRateVal = 1;
+                                //var defMSRPCurrency = marketpaceItem.ItemPricesFkList.Where(a => a.Code == "MSRP" && a.IsDefault == true).FirstOrDefault();
+                                //if (defMSRPCurrency != null)
+                                //{
+                                //    var exchRate = await _sycCurrencyExchangeRateRepository.GetAll()
+                                //        .Where(z => z.CurrencyCode == defMSRPCurrency.CurrencyCode).FirstOrDefaultAsync();
+                                //    if (exchRate != null)
+                                //    {
+                                //        exchangeRateVal = exchRate.ExchangeRate;
+                                //    }
+                                //}
+                                //var itemToAdd = new GetAppMarketItemForViewDto();
+                                //itemToAdd.AppItem = new AppItemDto
+                                //{
+                                //    ManufacturerCode = marketpaceItem.ManufacturerCode,
+                                //    SSIN = marketpaceItem.Code,
+                                //    Code = marketpaceItem.Code,
+                                //    Name = marketpaceItem.Name,
+                                //    Description = marketpaceItem.Notes,
+                                //    Price = (decimal)(input.CurrencyCode == null &&
+                                //    marketpaceItem.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.CurrencyCode == "USD").FirstOrDefault() != null ?
+                                //    marketpaceItem.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.CurrencyCode == "USD").Select(a => a.Price).FirstOrDefault() :
+                                //           (marketpaceItem.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.CurrencyCode == input.CurrencyCode).FirstOrDefault() != null ?
+                                //           marketpaceItem.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.CurrencyCode == input.CurrencyCode).Select(a => a.Price).FirstOrDefault() :
+                                //          (marketpaceItem.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.CurrencyCode == "USD").FirstOrDefault() == null ? //0 :
+                                //          (marketpaceItem.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.IsDefault == true && q.CurrencyCode != input.CurrencyCode).FirstOrDefault() != null ?
+                                //          ((marketpaceItem.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.IsDefault && q.CurrencyCode != input.CurrencyCode).FirstOrDefault().Price) * (input.CurrencyCode == "USD" ? exchangeRateVal : (1 / exchangeRateVal) * exchangeRate)) : 0) :
+                                //          (marketpaceItem.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.CurrencyCode == "USD").FirstOrDefault() != null ?
+                                //          (marketpaceItem.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.CurrencyCode == "USD").Select(a => a.Price).FirstOrDefault() * exchangeRate) : 0)))),
+                                //    Id = marketpaceItem.Id,
+                                //    ImageUrl = (marketpaceItem.EntityAttachments.FirstOrDefault(x => x.IsDefault == true) == null ?
+                                // (marketpaceItem.EntityAttachments.FirstOrDefault() == null ||
+                                // marketpaceItem.EntityAttachments.FirstOrDefault().AttachmentFk == null ? "attachments/" + marketpaceItem.TenantId +
+                                // "/" + marketpaceItem.EntityAttachments.FirstOrDefault().AttachmentFk.Attachment : "")
+                                // : "attachments/" + (marketpaceItem.TenantId.HasValue ? marketpaceItem.TenantId : -1) + "/" +
+                                //marketpaceItem.EntityAttachments.FirstOrDefault(x => x.IsDefault == true).AttachmentFk.Attachment)
+
+                                //};
+                                //itemToAdd.NumberOfReviews = await _messageAppService.GetAllReviewsCount(itemToAdd.AppItem.Id);
+                                //var rating = await _messageAppService.GetOverAllRatings(itemToAdd.AppItem.Id);
+                                //itemToAdd.AverageRating = rating.OverAllRating;
+
+                            }
+                        }
+                    }
+
+                    var totalCount = await _appEntitiesRelationship.GetAll()
+                                .Where(z => z.EntityId == marketplaceItem.Id).CountAsync();
+                    return new PagedResultDto<GetAppMarketItemForViewDto>(
+                    totalCount,
+                         appItemsList
+                     );
+                }
+
+                return new PagedResultDto<GetAppMarketItemForViewDto>(
+                0,
+                 new List<GetAppMarketItemForViewDto>()
+                 );
+            }
+            //I49[End]
+        }
+        [AbpAllowAnonymous]
+        //Iteration#49,1 MMT 09/28/2025 Allow unauthenticated user to view the product marketplace browse page[End]
         public async Task<PagedResultDto<AppEntityCategoryDto>> GetAppItemDepartmentsWithFullNameWithPaging(GetAppItemAttributesWithPagingInput input)
         {
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
@@ -1377,6 +1930,9 @@ namespace onetouch.AppMarketplaceItems
                 return new PagedResultDto<AppEntityCategoryDto>(0, new List<AppEntityCategoryDto>());
             }
         }
+        //Iteration#49,1 MMT 09/28/2025 Allow unauthenticated user to view the product marketplace view page[Start]
+        [AbpAllowAnonymous]
+        //Iteration#49,1 MMT 09/28/2025 Allow unauthenticated user to view the product marketplace browse page[End]
         public async Task<PagedResultDto<string>> GetAppItemCategoriesNamesWithPaging(GetAppItemAttributesWithPagingInput input)
         {
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
@@ -1394,7 +1950,9 @@ namespace onetouch.AppMarketplaceItems
                 return new PagedResultDto<string>(0, new List<string>());
             }
         }
-
+        //Iteration#49,1 MMT 09/28/2025 Allow unauthenticated user to view the product marketplace view page[Start]
+        [AbpAllowAnonymous]
+        //Iteration#49,1 MMT 09/28/2025 Allow unauthenticated user to view the product marketplace browse page[End]
         public async Task<PagedResultDto<string>> GetAppItemClassificationsNamesWithPaging(GetAppItemAttributesWithPagingInput input)
         {
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
@@ -1445,6 +2003,56 @@ namespace onetouch.AppMarketplaceItems
             }
             return returnName;
 
+        }
+
+        private async Task<List<long>> GetCategoryIdsWithDescendants(IReadOnlyCollection<long> categoryIds)
+        {
+            var selectedIds = categoryIds?
+                .Where(id => id > 0)
+                .Distinct()
+                .ToList() ?? new List<long>();
+
+            if (selectedIds.Count == 0)
+            {
+                return selectedIds;
+            }
+
+            var categories = await _sycEntityObjectCategory.GetAll()
+                .AsNoTracking()
+                .Where(category => category.TenantId == null)
+                .Select(category => new
+                {
+                    category.Id,
+                    category.ParentId
+                })
+                .ToListAsync();
+
+            var childrenByParentId = categories
+                .Where(category => category.ParentId.HasValue)
+                .GroupBy(category => category.ParentId.Value)
+                .ToDictionary(group => group.Key, group => group.Select(category => category.Id).ToList());
+
+            var result = new HashSet<long>(selectedIds);
+            var pending = new Queue<long>(selectedIds);
+
+            while (pending.Count > 0)
+            {
+                var parentId = pending.Dequeue();
+                if (!childrenByParentId.TryGetValue(parentId, out var childIds))
+                {
+                    continue;
+                }
+
+                foreach (var childId in childIds)
+                {
+                    if (result.Add(childId))
+                    {
+                        pending.Enqueue(childId);
+                    }
+                }
+            }
+
+            return result.ToList();
         }
         //public async Task AddTransactionDetails(GetAppMarketplaceItemDetailForViewDto input, long transactionId)
         //{
@@ -1698,5 +2306,73 @@ namespace onetouch.AppMarketplaceItems
 
         }
         //T-SII-20240628.0002 ,1 MMT 07/10/2024 Check if the currency has exchange rate[End]
+        //I49[Start]
+        public async Task<GetAppMarketItemForViewDto> GetAppMarketplaceViewData(string ssin, string? currencyCode)
+        {
+            using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
+            {
+                decimal exchangeRate = 1;
+                GetAppMarketItemForViewDto getAppMarketItemForViewDto = new GetAppMarketItemForViewDto();
+                var marketpaceItem = await _appMarketplaceItem.GetAll().Include(z => z.ItemPricesFkList)
+                                    .Include(z => z.EntityAttachments).ThenInclude(z => z.AttachmentFk)
+                                    .Where(z => z.SSIN == ssin &&
+                                     (z.SharingLevel == 1 || (z.SharingLevel == 2 && z.ItemSharingFkList.Count(c => c.SharedUserId == AbpSession.UserId) > 0))
+                                     ).FirstOrDefaultAsync();
+                if (marketpaceItem != null)
+                {
+                    decimal exchangeRateVal = 0;
+                    var defMSRPCurrency = marketpaceItem.ItemPricesFkList.Where(a => a.Code == "MSRP" && a.IsDefault == true).FirstOrDefault();
+                    if (defMSRPCurrency != null)
+                    {
+                        var exchRate = await _sycCurrencyExchangeRateRepository.GetAll()
+                            .Where(z => z.CurrencyCode == defMSRPCurrency.CurrencyCode).FirstOrDefaultAsync();
+                        if (exchRate != null)
+                        {
+                            exchangeRateVal = exchRate.ExchangeRate;
+                        }
+                        else
+                            exchangeRateVal = 1;
+                    }
+                    getAppMarketItemForViewDto.AppItem = new AppItemDto
+                    {
+                        //ManufacturerCode = marketpaceItem.ManufacturerCode,
+                        SSIN = marketpaceItem.Code,
+                        Code = marketpaceItem.Code,
+                        Name = marketpaceItem.Name,
+                        Description = marketpaceItem.Notes,
+                        Price = (decimal)(currencyCode == null &&
+           marketpaceItem.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.CurrencyCode == "USD").FirstOrDefault() != null ?
+           marketpaceItem.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.CurrencyCode == "USD").Select(a => a.Price).FirstOrDefault() :
+                  (marketpaceItem.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.CurrencyCode == currencyCode).FirstOrDefault() != null ?
+                  marketpaceItem.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.CurrencyCode == currencyCode).Select(a => a.Price).FirstOrDefault() :
+                 (marketpaceItem.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.CurrencyCode == "USD").FirstOrDefault() == null ? //0 :
+                 (marketpaceItem.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.IsDefault == true && q.CurrencyCode != currencyCode).FirstOrDefault() != null ?
+                 ((marketpaceItem.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.IsDefault && q.CurrencyCode != currencyCode).FirstOrDefault().Price) * (currencyCode == "USD" ? exchangeRateVal : (1 / (exchangeRateVal == 0 ? 1 : exchangeRateVal)) * exchangeRate)) : 0) :
+                 (marketpaceItem.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.CurrencyCode == "USD").FirstOrDefault() != null ?
+                 (marketpaceItem.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.CurrencyCode == "USD").Select(a => a.Price).FirstOrDefault() * exchangeRate) : 0)))),
+                        Id = marketpaceItem.Id,
+                        ImageUrl = (((marketpaceItem.EntityAttachments != null && (marketpaceItem.EntityAttachments.Count > 0) ? ((marketpaceItem.EntityAttachments.FirstOrDefault(x => x.IsDefault == true) == null ?
+        (marketpaceItem.EntityAttachments.FirstOrDefault() == null ||
+        marketpaceItem.EntityAttachments.FirstOrDefault().AttachmentFk == null ? "attachments/" + (marketpaceItem.TenantId.HasValue ? marketpaceItem.TenantId : -1) +
+        "/" + marketpaceItem.EntityAttachments.FirstOrDefault().AttachmentFk.Attachment : "")
+        : "attachments/" + (marketpaceItem.TenantId.HasValue ? marketpaceItem.TenantId : -1) + "/" +
+       marketpaceItem.EntityAttachments.FirstOrDefault(x => x.IsDefault == true).AttachmentFk.Attachment)) : "")))
+
+                    };
+                    getAppMarketItemForViewDto.NumberOfReviews = await _messageAppService.GetAllReviewsCount(getAppMarketItemForViewDto.AppItem.Id);
+                    var rating = await _messageAppService.GetOverAllRatings(getAppMarketItemForViewDto.AppItem.Id);
+                    getAppMarketItemForViewDto.AverageRating = rating.OverAllRating;
+
+                    var presonEntityObjectTypeId = await _helper.SystemTables.GetEntityObjectTypePersonId();
+                    var contact = await _appContactRepository.GetAll().Where(a => a.TenantId != null && a.ParentId == null
+                                   && a.PartnerId == null && a.IsProfileData == true && a.EntityFk.EntityObjectTypeId != presonEntityObjectTypeId &&
+                                   a.TenantId == marketpaceItem.TenantOwner).FirstOrDefaultAsync();
+                    if (contact != null)
+                        getAppMarketItemForViewDto.AppItem.SellerName = contact.Name;
+                }
+                return getAppMarketItemForViewDto;
+            }
+        }                                                   
+        //I49[End]
     }
 }

@@ -1,25 +1,22 @@
-<form [formGroup]="filterForm" >
+<div class="my-4 calendarRg" *ngIf="filterForm?.get('dateRange')" [formGroup]="filterForm">
+  <h4 class="text-captitalize mb-3">{{ "DateRange" | localize }}</h4>
 
-    <div class="mt-4 pt-4">
-        <h4 class="text-captitalize mb-3">{{"FromDate" | localize}}</h4>
-        <div class="row" >
-            <div>
-                <input type="datetime-local" formControlName="startDate" name="startDate" class="form-control" placeholder="{{ 'Choose Date' | localize }}" />
-            </div>
-        </div>
-    </div>
-    <div class="mt-4 pt-4 pb-4 border-dashed-bottom" >
-        <h4 class="text-captitalize mb-3">{{"ToDate" | localize}}</h4>
-        <div class="row" >
-            <div>
-                <input type="datetime-local" formControlName="endDate" name="endDate" class="form-control" placeholder="{{ 'Choose Date' | localize }}" />
-            </div>
-        </div>
-        <div class="text-danger" *ngIf="dateErrorMessage">
-            {{dateErrorMessage}}
-        </div>
-    </div>
-    
+  <p-calendar
+    formControlName="dateRange"
+    selectionMode="range"
+    [showIcon]="true"
+    [readonlyInput]="true"
+    dateFormat="yy-mm-dd"
+    appendTo="body"
+    class="w-100"
+    [placeholder]="'ChooseDate' | localize"
+    (onSelect)="onDateRangeSelect()"
+    (onClearClick)="onDateRangeClear()"
+  ></p-calendar>
 
-  
-</form>
+  <div class="text-danger mt-2" *ngIf="dateErrorMessage">
+    {{ dateErrorMessage }}
+  </div>
+
+  <div class="my-4 border-bottom d-md-block d-none"></div>
+</div>

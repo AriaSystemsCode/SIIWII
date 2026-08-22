@@ -1,14 +1,34 @@
-<div bsModal #viewEventModal="bs-modal" class="modal fade text-left" tabindex="-1" role="dialog" aria-labelledby="viewEventModal"
-    aria-hidden="true" [config]="{ backdrop: false , ignoreBackdropClick: true }"  style="overflow-y: scroll;">
-    <div class="modal-dialog modal-lg ">
+<p-dialog
+  [(visible)]="visible"
+  [modal]="true"
+  [appendTo]="'body'"
+  [baseZIndex]="10000"
+  [dismissableMask]="false"
+  [draggable]="false"
+  [resizable]="false"
+  [closable]="false"
+  [style]="{ width: '58vw', height: '80vh' }"
+  [contentStyle]="{ padding: '0', margin: '0' }"
+  styleClass="event-full-dialog"
+  style="padding: 0 !important;"
+>
+       <div class="dialog-header p-0">
+    <img
+        src="../../../../assets/accounts/importAccounts/close.svg"
+        class="pointer close-btn"
+        (click)="hide()" />
+</div>
+    <div class="modal-dialog modal-lg m-0">
+       
         <div class="modal-content h-100">
-            <div class="row  ml-3 mr-3 d-md-block d-none">
+            <!-- <div class="row  ml-3 mr-3 d-md-block d-none">
                 <div class="col-11"></div>
                 <div class="col-1 pt-5 text-right">
                     <img src="../../../../assets/accounts/importAccounts/close.svg" class="pointer" (click)="hide()" />
                 </div>
-            </div>
-            <div class="row m-0 pt-4 pb-4 events events-sm d-md-none d-flex flex-row">
+            </div> -->
+      
+            <div class="row m-0 pt-4 pb-4 events events-sm d-md-none d-flex flex-row" *ngIf="hideViewEv">
 
                 <div class="col-1  text-right pt-2">
                     <img src="../../../../assets/events/Icon-ionic-ios-arrow-back.svg" class="pointer"
@@ -33,24 +53,26 @@
 
 
             <div class="row m-3">
-                <div class="w-100" #viewProfileCover style="position: relative; left: 0; top: 0;height: 200px;">
+                <div class="w-100" #viewProfileCover style="position: relative; left: 0; top: 0;height: 200px;border-radius: 12px;">
                     <div class="cover">
-                        <app-image-display [image]="coverPhoto || coverDefaultImage"
+                        <!-- <app-image-display [image]="coverPhoto || coverDefaultImage"
                             [sycAttachmentCategory]="sycAttachmentCategoryBanner"
-                            [staticWidth]="viewProfileCover?.offsetWidth">
-                        </app-image-display>
+                            [staticWidth]="viewProfileCover?.offsetWidth"  >
+                        </app-image-display> -->
+                        <img [src]="coverPhoto  ? coverPhoto :  '../../../assets/placeholders/_default_cover.jpg'" onerror="'assets/common/images/default-profile-picture.png'" alt="" srcset="" style="height: 150px;width: 100%;
+                        object-fit: cover;">
                     </div>
                     <div class="logo">
                         <app-image-display [image]="logoPhoto || logoDefaultImage"
-                            [sycAttachmentCategory]="sycAttachmentCategoryLogo" [staticHeight]="140">
+                            [sycAttachmentCategory]="sycAttachmentCategoryLogo" [staticHeight]="120">
                         </app-image-display>
                     </div>
 
                 </div>
             </div>
 
-            <div class="row m-4">
-                <div class="col-6">
+            <div class="row m-4" *ngIf="isAuthenticated">
+                <div class="col-6" >
                     <button class="btn btn-primary _Btn pointer" [disabled]="!event?.appEvent?.isPublished" [ngClass]="{
                             disabled: !event?.appEvent?.isPublished
                         }" (click)="createPost()">
@@ -141,7 +163,7 @@
                 </div>
             </div>
 
-            <div class="row ml-4 mr-4">
+            <div class="row ml-4 mr-4" [ngClass]="!isAuthenticated ? 'mt-3':''">
                 <div class="col-9">
                     <div class="eventDetails">
                         <h6>{{ event?.appEvent?.name }} <br /></h6>
@@ -229,6 +251,6 @@
             </div> -->
         </div>
     </div>
-</div>
+</p-dialog>
 <!--
 <app-google-map #googleMapModal></app-google-map> -->

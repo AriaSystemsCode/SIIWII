@@ -104,7 +104,7 @@
             // BottomMargin
             // 
             this.BottomMargin.Dpi = 254F;
-            this.BottomMargin.HeightF = 4.72581F;
+            this.BottomMargin.HeightF = 0F;
             this.BottomMargin.Name = "BottomMargin";
             // 
             // Detail
@@ -186,8 +186,9 @@
             // 
             this.xrPictureBox1.Dpi = 254F;
             this.xrPictureBox1.ExpressionBindings.AddRange(new DevExpress.XtraReports.UI.ExpressionBinding[] {
-            new DevExpress.XtraReports.UI.ExpressionBinding("BeforePrint", "ImageUrl", "[Attachment]"),
-            new DevExpress.XtraReports.UI.ExpressionBinding("BeforePrint", "Visible", "[DataSource.CurrentRowIndex] >0 and [DataSource.CurrentRowIndex] <20\n")});
+            new DevExpress.XtraReports.UI.ExpressionBinding("BeforePrint", "Visible", "[DataSource.CurrentRowIndex] >0 and [DataSource.CurrentRowIndex] <20\n"),
+            new DevExpress.XtraReports.UI.ExpressionBinding("BeforePrint", "BackColor", "iif(Contains(upper([Attachment]), \'HTTP\'), \'\',[Attachment])\n"),
+            new DevExpress.XtraReports.UI.ExpressionBinding("BeforePrint", "ImageUrl", "iif(Contains(upper([Attachment]), \'HTTP\'), [Attachment],\'\')\n")});
             this.xrPictureBox1.LocationFloat = new DevExpress.Utils.PointFloat(0F, 0F);
             this.xrPictureBox1.Name = "xrPictureBox1";
             this.xrPictureBox1.SizeF = new System.Drawing.SizeF(63.5F, 39.60748F);
@@ -198,8 +199,8 @@
             this.tableCell25.Borders = DevExpress.XtraPrinting.BorderSide.None;
             this.tableCell25.Dpi = 254F;
             this.tableCell25.ExpressionBindings.AddRange(new DevExpress.XtraReports.UI.ExpressionBinding[] {
-            new DevExpress.XtraReports.UI.ExpressionBinding("BeforePrint", "Text", "iif(len(trim([AttributeValue]))>11 and [DataSource.CurrentRowIndex] > 0, Substrin" +
-                    "g([AttributeValue],0 ,10 )+\'...\',[AttributeValue])")});
+            new DevExpress.XtraReports.UI.ExpressionBinding("BeforePrint", "Text", "iif(len(trim([AttributeValue]))>7 and [DataSource.CurrentRowIndex] > 0, Substring" +
+                    "([AttributeValue],0 ,6 )+\'...\',[AttributeValue])")});
             this.tableCell25.Font = new DevExpress.Drawing.DXFont("Arial", 7F);
             this.tableCell25.Name = "tableCell25";
             this.tableCell25.Padding = new DevExpress.XtraPrinting.PaddingInfo(1, 1, 0, 0, 254F);
@@ -211,7 +212,6 @@
             // 
             // tableCell26
             // 
-            this.tableCell26.CanGrow = false;
             this.tableCell26.Dpi = 254F;
             this.tableCell26.ExpressionBindings.AddRange(new DevExpress.XtraReports.UI.ExpressionBinding[] {
             new DevExpress.XtraReports.UI.ExpressionBinding("BeforePrint", "Text", "[AttributeValue3]")});
@@ -221,17 +221,16 @@
             this.tableCell26.StyleName = "DetailData1";
             this.tableCell26.StylePriority.UseFont = false;
             this.tableCell26.StylePriority.UsePadding = false;
-            this.tableCell26.TextFitMode = DevExpress.XtraReports.UI.TextFitMode.ShrinkOnly;
             this.tableCell26.Weight = 0.060046189376443418D;
-            this.tableCell26.WordWrap = false;
             // 
             // xrTableCell1
             // 
+            this.xrTableCell1.CanGrow = false;
             this.xrTableCell1.Dpi = 254F;
             this.xrTableCell1.ExpressionBindings.AddRange(new DevExpress.XtraReports.UI.ExpressionBinding[] {
-            new DevExpress.XtraReports.UI.ExpressionBinding("BeforePrint", "Text", "Iif(Min(?showNo, [counter])=0,Trim([Total]) ,Iif(Min(?showNo, [counter])=1, Trim(" +
-                    "[Size1]),Trim([Size1] ) ))")});
-            this.xrTableCell1.Font = new DevExpress.Drawing.DXFont("Arial", 7F);
+            new DevExpress.XtraReports.UI.ExpressionBinding("BeforePrint", "Text", "Iif(Min(?showNo, [counter])=0,[Total] ,Iif(Min(?showNo, [counter])=1, [Size1],[Si" +
+                    "ze1] ) )")});
+            this.xrTableCell1.Font = new DevExpress.Drawing.DXFont("Arial", 8F);
             this.xrTableCell1.Name = "xrTableCell1";
             this.xrTableCell1.Padding = new DevExpress.XtraPrinting.PaddingInfo(1, 1, 0, 0, 254F);
             this.xrTableCell1.StyleName = "DetailData1";
@@ -239,16 +238,19 @@
             this.xrTableCell1.StylePriority.UsePadding = false;
             this.xrTableCell1.StylePriority.UseTextAlignment = false;
             this.xrTableCell1.Text = "xrTableCell1";
-            this.xrTableCell1.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleLeft;
+            this.xrTableCell1.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleRight;
+            this.xrTableCell1.TextFitMode = DevExpress.XtraReports.UI.TextFitMode.ShrinkOnly;
             this.xrTableCell1.Weight = 0.039953810623556588D;
+            this.xrTableCell1.WordWrap = false;
             // 
             // tableCell27
             // 
+            this.tableCell27.CanGrow = false;
             this.tableCell27.Dpi = 254F;
             this.tableCell27.ExpressionBindings.AddRange(new DevExpress.XtraReports.UI.ExpressionBinding[] {
-            new DevExpress.XtraReports.UI.ExpressionBinding("BeforePrint", "Visible", "Min(?showNo, [counter])>0"),
-            new DevExpress.XtraReports.UI.ExpressionBinding("BeforePrint", "Text", "Iif(Min(?showNo, [counter])=1,Trim([Total]) ,Iif(Min(?showNo, [counter])=2, Trim(" +
-                    "[Size2]),Trim([Size2] ) ))\n")});
+            new DevExpress.XtraReports.UI.ExpressionBinding("BeforePrint", "Text", "Iif(Min(?showNo, [counter])=1,[Total] ,Iif(Min(?showNo, [counter])=2, [Size2],[Si" +
+                    "ze2] ) )\n"),
+            new DevExpress.XtraReports.UI.ExpressionBinding("BeforePrint", "Visible", "Min(?showNo, [counter])>0")});
             this.tableCell27.Font = new DevExpress.Drawing.DXFont("Arial", 7F);
             this.tableCell27.Name = "tableCell27";
             this.tableCell27.Padding = new DevExpress.XtraPrinting.PaddingInfo(1, 1, 0, 0, 254F);
@@ -256,118 +258,127 @@
             this.tableCell27.StylePriority.UseFont = false;
             this.tableCell27.StylePriority.UsePadding = false;
             this.tableCell27.StylePriority.UseTextAlignment = false;
-            this.tableCell27.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleJustify;
+            this.tableCell27.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleRight;
+            this.tableCell27.TextFitMode = DevExpress.XtraReports.UI.TextFitMode.ShrinkOnly;
             this.tableCell27.Weight = 0.05D;
+            this.tableCell27.WordWrap = false;
             // 
             // tableCell28
             // 
+            this.tableCell28.CanGrow = false;
             this.tableCell28.Dpi = 254F;
             this.tableCell28.ExpressionBindings.AddRange(new DevExpress.XtraReports.UI.ExpressionBinding[] {
-            new DevExpress.XtraReports.UI.ExpressionBinding("BeforePrint", "Visible", "Min(?showNo, [counter])>1"),
-            new DevExpress.XtraReports.UI.ExpressionBinding("BeforePrint", "Text", "Iif(Min(?showNo, [counter])=2,Trim([Total]) ,Iif(Min(?showNo, [counter])=3, Trim(" +
-                    "[Size3]), Trim([Size3])))\n\n")});
+            new DevExpress.XtraReports.UI.ExpressionBinding("BeforePrint", "Text", "Iif(Min(?showNo, [counter])=2,[Total] ,Iif(Min(?showNo, [counter])=3, [Size3],[Si" +
+                    "ze3] ) )\n\n"),
+            new DevExpress.XtraReports.UI.ExpressionBinding("BeforePrint", "Visible", "Min(?showNo, [counter])>1")});
             this.tableCell28.Font = new DevExpress.Drawing.DXFont("Arial", 7F);
             this.tableCell28.Name = "tableCell28";
             this.tableCell28.Padding = new DevExpress.XtraPrinting.PaddingInfo(1, 1, 0, 0, 254F);
             this.tableCell28.StyleName = "DetailData1";
             this.tableCell28.StylePriority.UseFont = false;
             this.tableCell28.StylePriority.UsePadding = false;
-            this.tableCell28.StylePriority.UseTextAlignment = false;
-            this.tableCell28.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleJustify;
+            this.tableCell28.TextFitMode = DevExpress.XtraReports.UI.TextFitMode.ShrinkOnly;
             this.tableCell28.Weight = 0.05D;
+            this.tableCell28.WordWrap = false;
             // 
             // tableCell29
             // 
+            this.tableCell29.CanGrow = false;
             this.tableCell29.Dpi = 254F;
             this.tableCell29.ExpressionBindings.AddRange(new DevExpress.XtraReports.UI.ExpressionBinding[] {
-            new DevExpress.XtraReports.UI.ExpressionBinding("BeforePrint", "Visible", "Min(?showNo, [counter])>2"),
-            new DevExpress.XtraReports.UI.ExpressionBinding("BeforePrint", "Text", "Iif(Min(?showNo, [counter])=3,Trim([Total]) ,Iif(Min(?showNo, [counter])=4, Trim(" +
-                    "[Size4]),Trim([Size4] ) ))\n\n")});
+            new DevExpress.XtraReports.UI.ExpressionBinding("BeforePrint", "Text", "Iif(Min(?showNo, [counter])=3,[Total] ,Iif(Min(?showNo, [counter])=4, [Size4],[Si" +
+                    "ze4] ) )\n\n"),
+            new DevExpress.XtraReports.UI.ExpressionBinding("BeforePrint", "Visible", "Min(?showNo, [counter])>2")});
             this.tableCell29.Font = new DevExpress.Drawing.DXFont("Arial", 7F);
             this.tableCell29.Name = "tableCell29";
             this.tableCell29.Padding = new DevExpress.XtraPrinting.PaddingInfo(1, 1, 0, 0, 254F);
             this.tableCell29.StyleName = "DetailData1";
             this.tableCell29.StylePriority.UseFont = false;
             this.tableCell29.StylePriority.UsePadding = false;
-            this.tableCell29.StylePriority.UseTextAlignment = false;
-            this.tableCell29.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleJustify;
+            this.tableCell29.TextFitMode = DevExpress.XtraReports.UI.TextFitMode.ShrinkOnly;
             this.tableCell29.Weight = 0.05D;
+            this.tableCell29.WordWrap = false;
             // 
             // tableCell30
             // 
+            this.tableCell30.CanGrow = false;
             this.tableCell30.Dpi = 254F;
             this.tableCell30.ExpressionBindings.AddRange(new DevExpress.XtraReports.UI.ExpressionBinding[] {
-            new DevExpress.XtraReports.UI.ExpressionBinding("BeforePrint", "Visible", "Min(?showNo, [counter])>3"),
-            new DevExpress.XtraReports.UI.ExpressionBinding("BeforePrint", "Text", "Iif(Min(?showNo, [counter])=4,Trim([Total]) ,Iif(Min(?showNo, [counter])=5, Trim(" +
-                    "[Size5]),Trim([Size5] ) ))\n\n")});
+            new DevExpress.XtraReports.UI.ExpressionBinding("BeforePrint", "Text", "Iif(Min(?showNo, [counter])=4,[Total] ,Iif(Min(?showNo, [counter])=5, [Size5],[Si" +
+                    "ze5] ) )\n\n"),
+            new DevExpress.XtraReports.UI.ExpressionBinding("BeforePrint", "Visible", "Min(?showNo, [counter])>3")});
             this.tableCell30.Font = new DevExpress.Drawing.DXFont("Arial", 7F);
             this.tableCell30.Name = "tableCell30";
             this.tableCell30.Padding = new DevExpress.XtraPrinting.PaddingInfo(1, 1, 0, 0, 254F);
             this.tableCell30.StyleName = "DetailData1";
             this.tableCell30.StylePriority.UseFont = false;
             this.tableCell30.StylePriority.UsePadding = false;
-            this.tableCell30.StylePriority.UseTextAlignment = false;
-            this.tableCell30.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleJustify;
+            this.tableCell30.TextFitMode = DevExpress.XtraReports.UI.TextFitMode.ShrinkOnly;
             this.tableCell30.Weight = 0.05D;
+            this.tableCell30.WordWrap = false;
             // 
             // tableCell31
             // 
+            this.tableCell31.CanGrow = false;
             this.tableCell31.Dpi = 254F;
             this.tableCell31.ExpressionBindings.AddRange(new DevExpress.XtraReports.UI.ExpressionBinding[] {
-            new DevExpress.XtraReports.UI.ExpressionBinding("BeforePrint", "Visible", "Min(?showNo, [counter])>4"),
-            new DevExpress.XtraReports.UI.ExpressionBinding("BeforePrint", "Text", "Iif(Min(?showNo, [counter])=5,Trim([Total]) ,Iif(Min(?showNo, [counter])=6, Trim(" +
-                    "[Size6]),Trim([Size6] ) ))")});
+            new DevExpress.XtraReports.UI.ExpressionBinding("BeforePrint", "Text", "Iif(Min(?showNo, [counter])=5,[Total] ,Iif(Min(?showNo, [counter])=6, [Size6],[Si" +
+                    "ze6] ) )"),
+            new DevExpress.XtraReports.UI.ExpressionBinding("BeforePrint", "Visible", "Min(?showNo, [counter])>4")});
             this.tableCell31.Font = new DevExpress.Drawing.DXFont("Arial", 7F);
             this.tableCell31.Name = "tableCell31";
             this.tableCell31.Padding = new DevExpress.XtraPrinting.PaddingInfo(1, 1, 0, 0, 254F);
             this.tableCell31.StyleName = "DetailData1";
             this.tableCell31.StylePriority.UseFont = false;
             this.tableCell31.StylePriority.UsePadding = false;
-            this.tableCell31.StylePriority.UseTextAlignment = false;
-            this.tableCell31.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleJustify;
+            this.tableCell31.TextFitMode = DevExpress.XtraReports.UI.TextFitMode.ShrinkOnly;
             this.tableCell31.Weight = 0.05D;
+            this.tableCell31.WordWrap = false;
             // 
             // tableCell32
             // 
+            this.tableCell32.CanGrow = false;
             this.tableCell32.Dpi = 254F;
             this.tableCell32.ExpressionBindings.AddRange(new DevExpress.XtraReports.UI.ExpressionBinding[] {
-            new DevExpress.XtraReports.UI.ExpressionBinding("BeforePrint", "Visible", "Min(?showNo, [counter])>5"),
-            new DevExpress.XtraReports.UI.ExpressionBinding("BeforePrint", "Text", "Iif(Min(?showNo, [counter])=6,Trim([Total]) ,Iif(Min(?showNo, [counter])=7, Trim(" +
-                    "[Size7]),Trim([Size7] ) ))")});
+            new DevExpress.XtraReports.UI.ExpressionBinding("BeforePrint", "Text", "Iif(Min(?showNo, [counter])=6,[Total] ,Iif(Min(?showNo, [counter])=7, [Size7],[Si" +
+                    "ze7] ) )"),
+            new DevExpress.XtraReports.UI.ExpressionBinding("BeforePrint", "Visible", "Min(?showNo, [counter])>5")});
             this.tableCell32.Font = new DevExpress.Drawing.DXFont("Arial", 7F);
             this.tableCell32.Name = "tableCell32";
             this.tableCell32.Padding = new DevExpress.XtraPrinting.PaddingInfo(1, 1, 0, 0, 254F);
             this.tableCell32.StyleName = "DetailData1";
             this.tableCell32.StylePriority.UseFont = false;
             this.tableCell32.StylePriority.UsePadding = false;
-            this.tableCell32.StylePriority.UseTextAlignment = false;
-            this.tableCell32.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleJustify;
+            this.tableCell32.TextFitMode = DevExpress.XtraReports.UI.TextFitMode.ShrinkOnly;
             this.tableCell32.Weight = 0.05D;
+            this.tableCell32.WordWrap = false;
             // 
             // tableCell33
             // 
+            this.tableCell33.CanGrow = false;
             this.tableCell33.Dpi = 254F;
             this.tableCell33.ExpressionBindings.AddRange(new DevExpress.XtraReports.UI.ExpressionBinding[] {
-            new DevExpress.XtraReports.UI.ExpressionBinding("BeforePrint", "Visible", "Min(?showNo, [counter])>6"),
-            new DevExpress.XtraReports.UI.ExpressionBinding("BeforePrint", "Text", "Iif(Min(?showNo, [counter])=7,Trim([Total]) ,Iif(Min(?showNo, [counter])=8, Trim(" +
-                    "[Size8]),Trim([Size8] ) ))")});
+            new DevExpress.XtraReports.UI.ExpressionBinding("BeforePrint", "Text", "Iif(Min(?showNo, [counter])=7,[Total] ,Iif(Min(?showNo, [counter])=8, [Size8],[Si" +
+                    "ze8] ) )"),
+            new DevExpress.XtraReports.UI.ExpressionBinding("BeforePrint", "Visible", "Min(?showNo, [counter])>6")});
             this.tableCell33.Font = new DevExpress.Drawing.DXFont("Arial", 7F);
             this.tableCell33.Name = "tableCell33";
             this.tableCell33.Padding = new DevExpress.XtraPrinting.PaddingInfo(1, 1, 0, 0, 254F);
             this.tableCell33.StyleName = "DetailData1";
             this.tableCell33.StylePriority.UseFont = false;
             this.tableCell33.StylePriority.UsePadding = false;
-            this.tableCell33.StylePriority.UseTextAlignment = false;
-            this.tableCell33.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleJustify;
+            this.tableCell33.TextFitMode = DevExpress.XtraReports.UI.TextFitMode.ShrinkOnly;
             this.tableCell33.Weight = 0.05D;
+            this.tableCell33.WordWrap = false;
             // 
             // tableCell34
             // 
+            this.tableCell34.CanGrow = false;
             this.tableCell34.Dpi = 254F;
             this.tableCell34.ExpressionBindings.AddRange(new DevExpress.XtraReports.UI.ExpressionBinding[] {
-            new DevExpress.XtraReports.UI.ExpressionBinding("BeforePrint", "Visible", "Min(?showNo, [counter])>7"),
-            new DevExpress.XtraReports.UI.ExpressionBinding("BeforePrint", "Text", "Iif(Min(?showNo, [counter])=8,Trim([Total]) ,Iif(Min(?showNo, [counter])=9, Trim(" +
-                    "[Size9]),Trim([Size9] ) ))")});
+            new DevExpress.XtraReports.UI.ExpressionBinding("BeforePrint", "Text", "Iif(Min(?showNo, [counter])=8,[Total] ,Iif(Min(?showNo, [counter])=9, [Size9],[Si" +
+                    "ze9] ) )"),
+            new DevExpress.XtraReports.UI.ExpressionBinding("BeforePrint", "Visible", "Min(?showNo, [counter])>7")});
             this.tableCell34.Font = new DevExpress.Drawing.DXFont("Arial", 7F);
             this.tableCell34.Name = "tableCell34";
             this.tableCell34.Padding = new DevExpress.XtraPrinting.PaddingInfo(1, 1, 0, 0, 254F);
@@ -375,8 +386,10 @@
             this.tableCell34.StylePriority.UseFont = false;
             this.tableCell34.StylePriority.UsePadding = false;
             this.tableCell34.StylePriority.UseTextAlignment = false;
-            this.tableCell34.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleJustify;
+            this.tableCell34.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleCenter;
+            this.tableCell34.TextFitMode = DevExpress.XtraReports.UI.TextFitMode.ShrinkOnly;
             this.tableCell34.Weight = 0.05D;
+            this.tableCell34.WordWrap = false;
             // 
             // sqlDataSource1
             // 
@@ -507,7 +520,7 @@
             this.Dpi = 254F;
             this.Font = new DevExpress.Drawing.DXFont("Arial", 9.75F);
             this.Landscape = true;
-            this.Margins = new DevExpress.Drawing.DXMargins(0F, 0F, 3F, 4.72581F);
+            this.Margins = new DevExpress.Drawing.DXMargins(0F, 0F, 3F, 0F);
             this.PageHeight = 2159;
             this.PageWidth = 1349;
             this.PaperKind = System.Drawing.Printing.PaperKind.Custom;

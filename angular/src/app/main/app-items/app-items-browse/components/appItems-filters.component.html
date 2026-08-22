@@ -1,8 +1,4 @@
-<div class="wrapper-filters border bg-white rounded w-100 p-3" style="
-    border-radius: 5px !important;
-    background-color: #FFFFFF !important;
-    border-color: white !important;
-">
+<div class="wrapper-filters border bg-white rounded w-100 p-3">
 
 <form [formGroup]="filterForm" >
 
@@ -25,7 +21,7 @@
             #SizeScaleFilter
             [filterMetaData]="sizeScaleFilterMetaData"
             [formContol]="filterForm.controls.appItemSizeScale"
-            [title]="'Size Scale' | localize"
+            [title]="'SizeScale' | localize"
             (onLoadData)="getSizeScaleList(SizeScaleFilter)"
         >
         </app-tree-multi-selection-filter>
@@ -89,7 +85,7 @@
             #publishStatusFilter
             [filterMetaData]="publishStatusFilterMetaData"
             [formContol]="filterForm.controls.publishStatus"
-            [title]="'Sharing Status'"
+            [title]="'SharingStatus' | localize"
             (onLoadData)="getPublishOptionsList(publishStatusFilter)"
         >
         </app-single-selection-filter>

@@ -24,7 +24,7 @@
     <PackageReference Include="Abp.EntityFrameworkCore.EFPlus" Version="8.0.0" />
     <PackageReference Include="AuthorizeNet" Version="2.0.3" />
     <PackageReference Include="Bytescout.Spreadsheet" Version="4.2.5.1975" />
-    <PackageReference Include="ClosedXML" Version="0.105.0" />
+    <PackageReference Include="ClosedXML" Version="0.105.1" />
     <PackageReference Include="EPPlus" Version="6.1.1" />
     <PackageReference Include="ExcelDataReader" Version="3.6.0" />
     <PackageReference Include="ExcelDataReader.DataSet" Version="3.6.0" />

@@ -1,30 +1,84 @@
-<!-- Iteration-8 -->
 
 <div bsModal #BrowseFolder="bs-modal" class="modal  fade" tabindex="-1" role="dialog" aria-labelledby="BrowseFolder"
     aria-hidden="true">
+    
 
-    <div class="modal-dialog modal-lg">
+    <div class="modal-dialog modal-lg mb-0">
         <div class="modal-content">
+            <div class="modal-header-custom">
+                <h5 class="modal-title font-weight-bold">Import {{ImportTypes[importType] }} Information</h5>
+
+                <div>
+                    <img src="../../../../assets/accounts/importAccounts/close.svg" class="pointer" (click)="hide()" />
+                </div>
+              </div>
+
+                  <div *ngIf="importType==ImportTypes.Items">
+                    <label class="option-tab">
+                      <input type="checkbox" [(ngModel)]="imData" (change)="onOptionChange()" class="mr-2"/>
+                      <span>Product Data</span>
+                    </label>
+                  
+                    <label class="option-tab">
+                      <input type="checkbox" [(ngModel)]="imImages" (change)="onOptionChange()" class="mr-2"/>
+                      <span> Product Images</span>
+                    </label>
+                  </div>
+
 
             <div class="uploadfilecontainer m-3">
                 <label for="_input">
-                    <img src="../../../../assets/accounts/importAccounts/file-cloud.svg" /><br /><br />
+                    <img src="../../../../assets/accounts/importAccounts/Vector.png" /><br /><br />
 
-                    <input type="file" id="_input" (change)="fileChangeEvent($event)" name="fileList" webkitdirectory
-                        multiple />
+                    <ng-container *ngIf="importType!==ImportTypes.price">
+                        <input #fileInputRef type="file" id="_input" (change)="fileChangeEvent($event)" name="fileList" webkitdirectory
+                            multiple  [disabled]="importType==ImportTypes.Items && !isAnyOptionSelected" class="upload-input"/>
+                    </ng-container>
 
+                    <ng-container *ngIf="importType==ImportTypes.price">
+                        <input #fileInputRef type="file" id="_input" (change)="fileChangeEvent($event)" name="fileList"
+                            accept=".csv,text/csv" class="upload-input"/>
+                    </ng-container>
+
+                        
                     <h5>{{"Dropyourfolderhereorclickheretoupload" | localize}} </h5>
-                    <span *ngIf="hasImages">{{"Pleasemakesuretheimagessize5MB, Files supported :xsls,images" | localize}}</span>
+                    <h5> {{"FilesformatsSupportedareXLSX,JPGandPNG" | localize}}</h5>
+                    <span *ngIf="hasImages">{{"Pleasemakesuretheimagessize5MB" | localize}}</span>
+                    <p class="aspect-ratio-warning">*Image Aspect-Ratio is {{aspectRatioNumbers}} </p>
                 </label>
             </div>
+            
+
+
+
+            <div class="video-info-box mb-3" *ngIf="importType==ImportTypes.Items">
+                <img src="../../../../assets/accounts/importAccounts/VideoTutr.png" alt="Video" class="video-icon" />
+              
+                <div class="video-content">
+                  <div class="video-text">
+                    <h5 class="video-title">
+                      How to Import {{ImportTypes[importType]}} | Variation and Color images File?...
+                    </h5>
+                    <p class="video-description">
+                      Watch a tutorial video for how to organize and rename your file
+                    </p>
+                  </div>
+              
+                    <button type="button" class="browse-btn" (click)="openVideoModal(true)">
+                    <span>Watch Video</span>
+                  </button>
+                </div>
+              </div>
+              
+
         </div>
     </div>
 
 
-    <div class="modal-lg m-auto  Download  pt-4 pb-4">
+    <div class="modal-lg m-auto Download pt-4 pb-4" *ngIf="importType!==ImportTypes.price" [class.download-disabled]="templateLoading">
         <div class="row align-items-baseline mb-4" *ngIf="importType==ImportTypes.Items">
             <div class="col-2 ml-4">
-                <h6><span class="text-danger">*</span>{{ 'ProductType' | localize}}</h6>
+                <h6><span class="required-asterisk">*</span>{{ 'ProductType' | localize}}</h6>
             </div>
             <div class="col-7 pl-0">
                 <div class="wide-drop-down">
@@ -34,10 +88,11 @@
                 </div>
             </div>
             <div>
-                <a class="text-primary text-underline" (click)="openSelectAppItemTypeModal()">
-                    {{ itemType ? ('Change'|localize) : ('Select'|localize) }}
-                    {{ 'the product type' | localize}}
-                </a>
+                <button class="select-btn" (click)="openSelectAppItemTypeModal()">
+                    <span>{{ itemType ? ('Change'|localize) : ('Select'|localize) }}
+                        {{ 'the product type' | localize}}</span>
+                  </button>
+
             </div>
         </div>
         <div class="row">
@@ -47,14 +102,17 @@
             <div class="col-6">
                 <h4>{{"Downloadthetemplatefile" | localize}} </h4>
                 <!-- <span> {{"Templatelastupdate" | localize}} {{templateDate}} {{"version"| localize}}  {{templateVersion}}</span> -->
-                <span> {{"TemplateVersion"| localize}} {{templateVersion}}</span>
+                <span *ngIf="templateLoading">Preparing template...</span>
+                <span *ngIf="!templateLoading"> {{"TemplateVersion"| localize}} {{templateVersion}}</span>
             </div>
             <div class="col-5 pr-4 text-right">
-                <button class="btn btn-primary  Download-Btn" (click)="downloadTemplate()"
-                    [disabled]="importType==ImportTypes.Items && !itemType" [ngClass]="{
-                    disabled: importType==ImportTypes.Items && !itemType
-                }">{{"Download"| localize}}
-                </button>
+                <button class="browse-btn" [disabled]="templateLoading || !templateUrl || (importType==ImportTypes.Items && !itemType)" [ngClass]="{
+                    disabled: templateLoading || !templateUrl || (importType==ImportTypes.Items && !itemType)
+                }"  (click)="downloadTemplate()">
+                    <span>{{ templateLoading ? 'Preparing...' : ("Download"| localize) }}</span>
+                  </button>
+
+
             </div>
         </div>
     </div>
@@ -63,4 +121,24 @@
 </div>
 
 
-<!-- Iteration-8 -->
+<!-- Confirmation Modal -->
+<div class="upload-modal" *ngIf="showUploadModal">
+    <div class="modal-header">
+      <img class="modal-icon pr-2" src="../../../../assets/accounts/importAccounts/fluent_alert-on.png"/>
+      <span class="modal-title pt-2">Are you sure you want to upload this {{ importType === ImportTypes.price ? 'file' : 'folder' }}?</span>
+      <span class="modal-close" (click)="cancelUpload()">✕</span>
+    </div>
+  
+    <div class="folder-info">
+      <img src="../../../../assets/accounts/importAccounts/solar_folder-bold.png" class="folder-icon" />
+      <div class="folder-details w-100">
+        <div class="folder-name">{{ folderName }}</div>
+        <div class="folder-meta">{{ totalFiles }} files &nbsp;&nbsp; {{ totalSizeMB }} MB</div>
+      </div>
+    </div>
+  
+    <div class="modal-actions">
+      <button class="browse-btn" (click)="confirmUpload()">Upload</button>
+      <button class="cancleUpload-btn ml-3" (click)="cancelUpload()">Cancel</button>
+    </div>
+  </div>

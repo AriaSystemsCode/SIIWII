@@ -1,0 +1,44 @@
+::ng-deep .removeScroll {
+    .filter-group {
+        max-height: 100% !important;
+        overflow-y: auto !important;
+    }
+    
+}
+::ng-deep {
+
+
+// /* width/height */
+// ::-webkit-scrollbar {
+//     width: 10px;        /* vertical scrollbar width */
+//     height: 10px;       /* horizontal scrollbar height */
+//   }
+  
+  /* track (background) */
+  ::-webkit-scrollbar-track {
+    background: #f0f2f5;
+  }
+  
+  /* thumb (draggable part) */
+  ::-webkit-scrollbar-thumb {
+    background: #b8c0cc;
+    border-radius: 8px;
+    border: 2px solid #f0f2f5; /* creates a "gap" look */
+  }
+  
+  /* hover/active states */
+  ::-webkit-scrollbar-thumb:hover {
+    background: #98a2b3;
+  }
+  ::-webkit-scrollbar-thumb:active {
+    background: #7c8796;
+  }
+}
+
+.text-captitalize{
+      font-weight: 600;
+    font-size: 16px;
+    line-height: 24px;
+    text-transform: capitalize;
+    color: #1B101B;
+}

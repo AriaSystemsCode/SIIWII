@@ -1,176 +1,280 @@
-// .container {
-//     width: 876px;
-//     height: auto;
-//     background: #ffffff;
-//     box-shadow: 0px 3px 16px #e1e1ef41;
-//     border-radius: 6px;
-// }
-// .container {
-//     width: 764px;
-//     height: auto;
-//     background: #ffffff;
-//     box-shadow: 0px 3px 16px #e1e1ef41;
-//     border-radius: 6px;
-// }
-
-.container{
+.container {
     max-width: 100% !important;
     margin-left: 0px !important;
     margin-right: 0px !important;
-}
-
-.PositionRight{
+  }
+  
+  .PositionRight {
     position: absolute;
     right: 0px;
-}
-.logo {
+  }
+  
+  .logo {
     width: 45px;
-}
-
-a{
-    color: #700066 !important;
-}
-
-.three-dots:after {
+  }
+  
+  a {
+    color: #4A0D4A !important;
+  }
+  
+  .three-dots:after {
     cursor: pointer;
-    color: white;
-    content: "\2807";
+    color: #777777;
+    content: "⠇";
     font-size: 20px;
     padding: 0 5px;
-}
-#dropdownMenuButton{
-    background-color: #700066 !important;
-}
-
-.dropdown-menu{
+  }
+  
+  #dropdownMenuButton {
+    background-color: transparent !important;
+  }
+  
+  .dropdown-menu {
     left: -140px !important;
-}
-.dropdown-toggle {
-    background: #e1f0ff 0% 0% no-repeat padding-box;
-    border-radius: 3px;
-    color: white;
-}
-
-.dropdown-toggle::after {
+  }
+  
+  .dropdown-toggle {
+    border: none;
+  }
+  
+  .dropdown-toggle::after {
     display: none;
-}
-
-.dropdown-toggle:focus {
-    outline: none;
-    background: #3599ff 0% 0% no-repeat padding-box;
-    .three-dots:after {
-        color: #ffffff;
-        content: "\2026";
-    }
-}
-
-._video {
+  }
+  
+  ._video {
     max-width: 700px;
     height: 494px;
-}
-
-.img-wrap {
-    max-width: 100%;
-    max-height: 100%;
-}
-.attachmentImage {
-    // max-height: 150px;
-    display: block;
-    box-shadow: 0px 3px 16px #e1e1ef41;
-    border-radius: 6px;
-    padding: 2px;
-    width: 100%;
-    height: 100%;
-}
-
-.cover {
-    object-fit: cover;
-}
-
-.descriptionContainer {
+  }
+  
+  /* Description */
+  .descriptionContainer {
     word-wrap: break-word;
     white-space: pre-line;
-}
-
-.description {
+  }
+  
+  .description {
     width: 90%;
     color: #464e5f;
     line-height: 2;
-}
-
-.linkUrl {
-    z-index: 2;
-}
-
-.cursor-text {
+  }
+  
+  .cursor-text {
     cursor: text;
+  }
+  
+  /* ===========================
+    GRID
+     =========================== */
+  
+  .media-wrap {
+    max-width: 700px;
+    margin: 0 auto;
+  }
+  
+  .fb-grid {
+    display: grid;
+    gap: 6px;
+    border-radius: 10px;
+    overflow: hidden;
+    width: 100%;
+    // aspect-ratio: 4 / 3;
+    max-height: 560px;
+  }
+  
+  .cell {
+    position: relative;
+    overflow: hidden;
+    background: #f3f3f3;
+  }
+  
+  .fb-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  
+  /* +N overlay */
+  .more-overlay {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    font-size: 28px;
+    font-weight: 700;
+    color: #fff;
+    background: rgba(0, 0, 0, 0.45);
+  }
+  
+  /* 1 image */
+  .fb-grid.count-1 {
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr;
+  }
+  
+  /* 2 images */
+
+.fb-grid.count-2 {
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr;
+  }
+  
+  /* Make each cell keep a nice proportion */
+  .fb-grid.count-2 .cell {
+    aspect-ratio: 3 / 4;   /* portrait-friendly like your screenshot */
+  }
+  
+  /* Keep image filling the cell cleanly */
+  .fb-grid.count-2 .fb-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;   /* fills nicely without pixelation */
+  }
+  
+  /*  3 images: 1 left + 2 right (LEFT = RIGHT width) */
+  .fb-grid.count-3 {
+    grid-template-columns: 1fr 1fr; /* equal */
+    grid-template-rows: 1fr 1fr;
+  
+    .i1 {
+      grid-column: 1;
+      grid-row: 1 / 3;
+    }
+  
+    .i2 {
+      grid-column: 2;
+      grid-row: 1;
+    }
+  
+    .i3 {
+      grid-column: 2;
+      grid-row: 2;
+    }
+  }
+  
+  /*  4 images: 1 left + 3 right (LEFT = RIGHT width) */
+  .fb-grid.count-4 {
+    grid-template-columns: 1fr 1fr; /* equal */
+    grid-template-rows: 1fr 1fr 1fr;
+  
+    .i1 {
+      grid-column: 1;
+      grid-row: 1 / 4;
+    }
+  
+    .i2 {
+      grid-column: 2;
+      grid-row: 1;
+    }
+  
+    .i3 {
+      grid-column: 2;
+      grid-row: 2;
+    }
+  
+    .i4 {
+      grid-column: 2;
+      grid-row: 3;
+    }
+  }
+  
+  /*  5 images: 2 left + 3 right (LEFT BLOCK = RIGHT BLOCK) */
+
+.fb-grid.count-5 {
+    grid-template-columns: 1fr 1fr; /* equal left & right width */
+    grid-template-rows: repeat(6, 1fr); /* 6 equal rows total */
+  
+    /* left column: 2 images, each = 3 rows (same height) */
+    .i1 { grid-column: 1; grid-row: 1 / 4; }
+    .i2 { grid-column: 1; grid-row: 4 / 7; }
+  
+    /* right column: 3 images, each = 2 rows (same height) */
+    .i3 { grid-column: 2; grid-row: 1 / 3; }
+    .i4 { grid-column: 2; grid-row: 3 / 5; }
+    .i5 { grid-column: 2; grid-row: 5 / 7; }
+  }
+  
+  /* ===== Tablet ===== */
+  @media (max-width: 991px) {
+    .fb-grid {
+    //   aspect-ratio: 3 / 4;
+      max-height: 640px;
+      gap: 5px;
+    }
+  }
+  
+  /* ===== Mobile ===== */
+  @media (max-width: 576px) {
+    .fb-grid {
+      // aspect-ratio: 3 / 4;
+      max-height: 620px;
+      gap: 4px;
+    }
+  }
+
+ /* EVENT special layout (matches screenshot) */
+.event-wrap {
+  position: relative;
+  width: 100%;
+  max-width: 700px;
+  // height: 220px;         
+  border-radius: 10px;
+  // overflow: hidden;
+  background: #f3f3f3;    
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  // padding: 18px 24px;   
+  margin-bottom: 70px;
+}
+
+.event-cover {
+  width: 100%;
+  height: 200px;
+  // object-fit: cover;    
+  display: block;
+}
+
+/*  small image on the left-middle */
+.event-logo {
+  position: absolute;
+  left: 28px;
+  top: 100%;
+  transform: translateY(-50%);  
+  width: 130px;              
+  height: 135px;
+  object-fit: cover;
+  background: #fff;
+  border-radius: 4px;    
+  box-shadow: none;         
+}
+
+/* RTL support (moves it to right-middle) */
+:host-context([dir="rtl"]) .event-logo {
+  left: auto;
+  right: 28px;
 }
 
 .viewContainer {
-    position: relative;
-    // width: 873px !important;
-   // left: -11px;
-    top: 2px;
-    height: 75px;
-    border: 1px solid #e4e4e4;
-    box-shadow: 5px 10px #e4e4e4;
+  position: relative;
+  // width: 873px !important;
+ // left: -11px;
+  top: 2px;
+  height: 75px;
+  border: 1px solid #e4e4e4;
+  box-shadow: 5px 10px #e4e4e4;
 }
+
 ._Btn {
-    width: 114px;
-    height: 37px;
-    border-radius: 20px;
-    background-color: transparent !important;
-    color: black !important;
-    border: 1px solid #e4e4e4 !important;
+  width: 114px;
+  height: 37px;
+  border-radius: 20px;
+  background-color: transparent !important;
+  color: black !important;
+  border: 1px solid #e4e4e4 !important;
 }
 
 ._Btn:hover {
-    background-color: #700066 !important ;
-    color: white !important;
+  background-color: #700066 !important ;
+  color: white !important;
 }
-
-.evetCover {
-    position: relative;
-    top: 0;
-    left: 0;
-    height: 200px;
-    object-fit: contain;
-}
-
-.eventLogo{
-    position: absolute;
-    top: 80px;
-    left: 30px;
-    width: 130px;
-    height: 135px;
-    object-fit: contain;
-}
-/* 
-
-@media only screen and (max-width:575px)  {
-    .container
-{
-    max-width: 570px !important;
-
-}
-}
-
-
-@media only screen and (max-width:560px)  {
-    .container
-{
-    max-width: 540px !important;
-
-}
-}
- 
-
-@media only screen and (max-width:529px)  {
-    .container
-{
-    max-width: 440px !important; 
-
-}
-}
- 
- */

@@ -22,6 +22,8 @@ export class CreateOrEditCategoryDynamicModalComponent extends AppComponentBase 
     parentCategory : CreateOrEditSycEntityObjectCategoryDto
     @ViewChild('categoryForm',{ static: true }) categoryForm : NgForm
     entityObjectType:string ="CATEGORY"
+    currentLang: string
+    isArabic: boolean
     constructor(
         injector: Injector,
         public currentModalRef: BsModalRef,
@@ -32,6 +34,8 @@ export class CreateOrEditCategoryDynamicModalComponent extends AppComponentBase 
     }
 
     ngOnInit(): void {
+        this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
+        this.currentLang == 'ar' || this.currentLang == 'ar-EG'  ? this.isArabic = true : this.isArabic = false
         if(!this.category) {
             this.category = new CreateOrEditSycEntityObjectCategoryDto()
         }
@@ -41,7 +45,7 @@ export class CreateOrEditCategoryDynamicModalComponent extends AppComponentBase 
     }
 
     close(){
-        this.currentModalRef.setClass('right-modal slide-right-out')
+       this.isArabic ? this.currentModalRef.setClass('left-modal slide-left-out') : this.currentModalRef.setClass('right-modal slide-right-out')
         this.changesApplied = false
         this.currentModalRef.hide()
         this.categoryForm.reset()

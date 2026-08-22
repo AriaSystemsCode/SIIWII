@@ -1,0 +1,10 @@
+<!-- <button (click)="openAriaNewTab()" class="ariaBtn">+</button> -->
+<iframe
+  [src]="erpUrl"
+  width="100%"
+  height="700"
+  style="border:none"
+  referrerpolicy="no-referrer"
+  allow="clipboard-read; clipboard-write; fullscreen"
+  (load)="onIframeLoad()"
+></iframe>

@@ -1,0 +1,58 @@
+.kt-portlet {
+    margin-top: 0px !important;
+}
+.wrapper {
+
+
+background: #FFFFFF;
+border: 1px solid #EEEEEE;
+box-shadow: 2px 2px 10px rgba(22, 22, 22, 0.1);
+border-radius: 10px;
+
+}
+::ng-deep {
+    .p-treetable .p-treetable-scrollable-body {
+        min-height: auto !important;
+    }
+}
+.left-modal {
+  .modal-dialog {
+    margin-left: 0;
+    margin-right: auto;
+    height: 100%;
+  }
+}
+
+.right-modal {
+  .modal-dialog {
+    margin-right: 0;
+    margin-left: auto;
+    height: 100%;
+  }
+}
+
+.slide-right-in {
+  animation: slideRightIn .3s ease;
+}
+
+.slide-left-in {
+  animation: slideLeftIn .3s ease;
+}
+
+@keyframes slideRightIn {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideLeftIn {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}

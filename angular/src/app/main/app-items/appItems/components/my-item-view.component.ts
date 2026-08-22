@@ -27,6 +27,7 @@ export class MyItemViewComponent
         appItemForViewDto: new AppItemForViewDto(),
         publish: false,
     };
+    tenantOwner
     public constructor(
         private _activatedRoute: ActivatedRoute,
         private _appItemsServiceProxy: AppItemsServiceProxy,
@@ -62,6 +63,10 @@ export class MyItemViewComponent
                 undefined,
                 undefined,
                 undefined,
+                undefined,
+                this.maxResultCount,
+                undefined, //item ssin
+                undefined,
                 this.skipCount,
                 this.maxResultCount
             )
@@ -72,7 +77,7 @@ export class MyItemViewComponent
             )
             .subscribe((result) => {
                 this._appItemViewInput.appItemForViewDto = result.appItem;
-
+                this.tenantOwner = result?.tenantOwner
                 if (this._appItemViewInput.appItemForViewDto.itemType == 0)
                     //My-Product
                     this._appItemViewInput.header = this.l(

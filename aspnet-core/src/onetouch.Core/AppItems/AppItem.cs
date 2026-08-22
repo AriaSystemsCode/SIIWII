@@ -30,6 +30,7 @@ namespace onetouch.AppItems
 
         [Column(TypeName = "decimal(15, 3)")]
         public virtual decimal Price { get; set; }
+        public virtual decimal TaxRate { get; set; }
         public virtual long StockAvailability { get; set; }
         public virtual long? ParentId { get; set; }
 

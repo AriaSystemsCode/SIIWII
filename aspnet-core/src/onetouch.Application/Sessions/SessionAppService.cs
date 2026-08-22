@@ -99,7 +99,7 @@ namespace onetouch.Sessions
                     if(contact!=null)
                     output.User.MemberId = contact.Id;
                 }
-                var contactAccount = _appContactRepository.GetAll().FirstOrDefault(x => x.TenantId == AbpSession.TenantId  && x.ParentId==null && x.PartnerId ==null && x.IsProfileData==true);//&& x.AccountId == null
+                var contactAccount = _appContactRepository.GetAll().FirstOrDefault(x => x.TenantId == AbpSession.TenantId  && x.ParentId==null && x.PartnerId ==null && x.IsProfileData== true);//&& x.AccountId == null
                 if (contactAccount != null)
                 output.User.AccountId = contactAccount.Id;
                 if (AbpSession.TenantId != null)

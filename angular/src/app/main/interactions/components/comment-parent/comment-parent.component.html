@@ -1,4 +1,4 @@
-<div [ngClass]="[!active ? 'd-none ' : 'pt-4 ', cartStyle?' cart-cont':'',showRegularComment?'large-height':'' ,parentId ? 'addParSec': 'parSec' ]"
+<div [ngClass]="[!active ? 'd-none ' : '', active && !fromOverview ? 'pt-4':'',cartStyle?' cart-cont':'',showRegularComment?'large-height':'' ,parentId || fromOverview ? 'addParSec': 'parSec' ]"
     *ngIf="!addReplyScreen">
 
 
@@ -27,13 +27,13 @@
     </div>
 </div>
 
-<div *ngIf="!addReplyScreen" class="pb-3">
+<div *ngIf="!addReplyScreen"  [ngClass]="fromOverview?'':'pb-3'">
     <app-add-comment [hidden]="!showRegularComment" *ngIf="addNewThread||!addNewThread&&commentType!=='MESSAGE'"
         [cartStyle]="cartStyle" (saveDone)="newCommentAddedHandler($event)" [relatedEntityId]="entityId"
         #AddCommentComponent>
     </app-add-comment>
 
-    <SendMessageModal [entityId]="entityId" [parentId]="parentId" [toName]="toName"
+    <SendMessageModal [entityId]="entityId" [parentId]="parentId"   [toUser]="toUser"
         *ngIf="(!showRegularComment&&addNewThread||!addNewThread&&commentType=='MESSAGE'&&showDirectMessageComp) "
         #SendMessageModal [modalView]="false" (modalSave)="saveNewDirectMsg()" (refresh)="refreshAfterSave($event)">
     </SendMessageModal>

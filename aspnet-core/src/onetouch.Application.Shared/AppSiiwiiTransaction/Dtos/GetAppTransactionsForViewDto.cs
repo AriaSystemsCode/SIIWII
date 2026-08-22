@@ -17,16 +17,25 @@ using System.Xml.Linq;
 
 namespace onetouch.AppSiiwiiTransaction.Dtos
 {
+    public class ChargesDto
+    {
+        public string Name { get; set; }
+        public Boolean IsEditable { get; set; }
+        public decimal ChargeAmount { get; set; }
+        public long TransactionDetailID { get; set; }
+
+    }
     public class GetAppTransactionsForViewDto : CreateOrEditAppTransactionsDto
     {
+        public virtual List<ChargesDto> Charges { set; get; }
         public virtual bool LastRecord { set; get; } = false;
         public virtual bool FirstRecord { set; get; } = false;
-       // public virtual DateTime EnteredDate { set; get; }
+        // public virtual DateTime EnteredDate { set; get; }
         public long CreatorUserId { set; get; }
         public byte[] OrderConfirmationFile { set; get; }
-        public virtual List<ContactInformationOutputDto> SharedWithUsers{set; get;}
+        public virtual List<ContactInformationOutputDto> SharedWithUsers { set; get; }
         public virtual bool IsOwnedByMe { set; get; }
-        public virtual string? CreatorTenantName{ set; get; }
+        public virtual string? CreatorTenantName { set; get; }
         //MMT - Performance[Start]
         public virtual bool IsOrderInformationValid { set; get; }
         public virtual bool IsBuyerContactInformationValid { set; get; }
@@ -50,13 +59,13 @@ namespace onetouch.AppSiiwiiTransaction.Dtos
         //P-SII-20241216.009,1 MMT 01/14/2025 Transaction creation date is incorrect[End]
         //I46[Start] 
         public List<ExtraDataAttrDto> ExtraDataAttributes { get; set; }
-       // public List<ExtraDataAttrDto> Additional { get; set; }
+        // public List<ExtraDataAttrDto> Additional { get; set; }
         //I46[End]
     }
 
     //xx
     public enum TransactionPosition
-    {   
+    {
         Current,
         Previous,
         Next
@@ -72,15 +81,15 @@ namespace onetouch.AppSiiwiiTransaction.Dtos
 
         public DateTime CreateDate { set; get; }
         public List<LookupLabelDto> Colors { set; get; }
-        public List<LookupLabelDto> Sizes { set; get; } 
+        public List<LookupLabelDto> Sizes { set; get; }
         public List<DetailView> DetailsView { set; get; }
 
     }
 
     public class DataView
-    {   
+    {
         public string code { get; set; }
-        public  string ManufacturerCode { set; get; }
+        public string ManufacturerCode { set; get; }
         public string name { get; set; }
         public double Qty { get; set; }
         public decimal Price { get; set; }
@@ -104,15 +113,16 @@ namespace onetouch.AppSiiwiiTransaction.Dtos
     }
 
 
-    public class DetailView {
+    public class DetailView
+    {
         public List<DetailView> Children { set; get; }
-        public DataView Data {get; set;}
+        public DataView Data { get; set; }
     }
 
     public class GetAllAppTransactionsForViewDto : GetAppTransactionsForViewDto
     {
         public DateTime CreationTime { get; set; }
-        public string EntityObjectStatusCode { get; set;}
+        public string EntityObjectStatusCode { get; set; }
         public string SellerCode { get; set; }
         public string BuyerCode { get; set; }
         public decimal PaymentDiscount { set; get; }
@@ -127,7 +137,7 @@ namespace onetouch.AppSiiwiiTransaction.Dtos
     {
         public long ShoppingCartId { get; set; }
         public string SellerLogo { get; set; }
-        public string BuyerLogo { get; set;}
+        public string BuyerLogo { get; set; }
 
         public string SellerSSIN { get; set; }
         public string BuyerSSIN { get; set; }
@@ -135,7 +145,7 @@ namespace onetouch.AppSiiwiiTransaction.Dtos
         public long SellerId { get; set; }
         public long BuyerId { get; set; }
 
-        public double Qty  { get; set; }
+        public double Qty { get; set; }
         public decimal Amount { get; set; }
 
         public ValidateTransaction ValidateOrder { get; set; }
@@ -152,7 +162,7 @@ namespace onetouch.AppSiiwiiTransaction.Dtos
         FoundInAnotherTransaction,
         NotFound,
         FoundShoppingCartForTemp,
-        NotFoundShoppingCartForTemp 
+        NotFoundShoppingCartForTemp
     }
     public class AccountBranchDto : EntityDto<long>
     {
@@ -174,18 +184,19 @@ namespace onetouch.AppSiiwiiTransaction.Dtos
         ARContact,
         ShipToContact,
         ShipFromContact,
-        Creator
+        Creator,
+        BuyingOffice
     }
     public class ContactAddressDto : AppAddressDto
-    { 
+    {
         public bool IsSelected { get; set; }
     }
     public class ContactInformationOutputDto
     {
-       public long Id { set; get; }
-       public string Email { set; get; }
-       public string Name { set; get; } 
-       public long UserId{ set; get; }
+        public long Id { set; get; }
+        public string Email { set; get; }
+        public string Name { set; get; }
+        public long UserId { set; get; }
         public Guid? UserImage { set; get; }
         public string UserName { set; get; }
         public int TenantId { set; get; }
@@ -203,12 +214,13 @@ namespace onetouch.AppSiiwiiTransaction.Dtos
         public IList<TransactionSharingDto> TransactionSharing { get; set; }
 
     }
-    public class ShareTransactionByMessageResultDto {
+    public class ShareTransactionByMessageResultDto
+    {
         public bool Result { get; set; }
         public List<TenantTransactionInfo> TenantTransactionInfos { set; get; }
     }
     public class TenantTransactionInfo
-    { 
+    {
         public long TenantId { set; get; }
         public long TransactionId { set; get; }
         public string Code { set; get; }
@@ -239,6 +251,8 @@ namespace onetouch.AppSiiwiiTransaction.Dtos
         public virtual string SharedUserSureName { get; set; }
 
         public virtual string SharedUserTenantName { get; set; }
+        public virtual string ContactSSIN { get; set; }
+        public virtual string CompanySSIN { get; set; }
 
     }
     public class GetAppTransactionAttributesInput : PagedAndSortedResultRequestDto
@@ -269,8 +283,17 @@ namespace onetouch.AppSiiwiiTransaction.Dtos
     //MMT-OC
     public class TenantContactRole
     {
-        public string ContactRole { set; get; }  
+        public string ContactRole { set; get; }
         public string ContactName { set; get; }
     }
     //MMT-OC
+    //I49-ChReq[Start]
+    public class ContactInfoDto
+    { 
+        public string ContactSSIN { set; get; }
+        public string CompanySSIN { set; get; }
+        public string UserName { set; get; }
+        public long TenantId { set; get; }
+    }
+    //I49-ChReq[End]
 }

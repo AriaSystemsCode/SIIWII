@@ -1,5 +1,5 @@
 import { IAjaxResponse, TokenService } from 'abp-ng2-module';
-import { Component, Injector, OnInit } from '@angular/core';
+import { Component, Injector, OnInit, QueryList, ViewChildren } from '@angular/core';
 import { AppConsts } from '@shared/AppConsts';
 import { appModuleAnimation } from '@shared/animations/routerTransition';
 import { AppComponentBase } from '@shared/common/app-component-base';
@@ -9,7 +9,55 @@ import { finalize } from 'rxjs/operators';
 
 @Component({
     templateUrl: './tenant-settings.component.html',
-    animations: [appModuleAnimation()]
+    animations: [appModuleAnimation()],
+      styles: [`
+    .body-sec {
+      background-color: #fff;
+      border-radius: 6px;
+      min-height: 100vh;
+      padding:17px;
+    }
+
+    @media (min-width: 1024px) {
+      .addMT {
+        margin-top: 140px;
+      }
+    }
+
+    @media (max-width: 540px) {
+      .addMTMob {
+        margin-top: 75px;
+      }
+    }
+
+    .alignStart{
+    text-align: start !important ;
+    }
+
+
+    .w-150  {
+    width : 150px ;
+    }
+
+     .wPX100  {
+    width : 100px;
+    }
+
+
+     .w-250  {
+    width : 250px ;
+    }
+
+       .w-130  {
+    width : 130px ;
+    }
+
+      .btn-primary {
+        background-color: #4A0D4A !important;
+        color: #fff !important;
+        border: 1px solid #4A0D4A !important;
+    }
+  `]
 })
 export class TenantSettingsComponent extends AppComponentBase implements OnInit {
 
@@ -31,6 +79,9 @@ export class TenantSettingsComponent extends AppComponentBase implements OnInit 
 
     defaultTimezoneScope: SettingScopes = SettingScopes.Tenant;
 
+      currentLang: string = 'en';
+    isArabic: boolean = false;
+
     constructor(
         injector: Injector,
         private _tenantSettingsService: TenantSettingsServiceProxy,
@@ -40,6 +91,8 @@ export class TenantSettingsComponent extends AppComponentBase implements OnInit 
     }
 
     ngOnInit(): void {
+             this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
+        this.currentLang == 'ar' || this.currentLang == 'ar-EG'  ? this.isArabic = true : this.isArabic = false
         this.testEmailAddress = this.appSession.user.emailAddress;
         this.getSettings();
         this.initUploaders();

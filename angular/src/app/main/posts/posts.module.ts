@@ -48,7 +48,8 @@ import { AdsSidebarComponent } from '../../../shared/components/ads-sidebar/ads-
         CarouselModule,
         eventsModule,
         InteractionsModule,
-        RouterModule
+        RouterModule,
+        
     ],
     exports: [
         PostCardComponent,
@@ -60,7 +61,9 @@ import { AdsSidebarComponent } from '../../../shared/components/ads-sidebar/ads-
         TrendingPostsComponent,
         TopPeopleComponent,
         TopCompanyComponent,
-        AdsSidebarComponent
+        AdsSidebarComponent,
+        
+        
     ],
 })
 export class PostsModule {}

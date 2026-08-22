@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
 import { NavigationEnd, Router, RouterModule, Routes } from '@angular/router';
+import { AppRouteGuard } from '@app/shared/common/auth/auth-route-guard';
 import { AppUiCustomizationService } from '@shared/common/ui/app-ui-customization.service';
 
 const routes: Routes = [
@@ -8,8 +9,17 @@ const routes: Routes = [
         loadChildren: () => import('account/account.module').then(m => m.AccountModule), //Lazy load account module
         data: { preload: true }
     },
-    { path: '', redirectTo: '/app/main/dashboard', pathMatch: 'full' },
-    { path: '**', redirectTo: '/app/main/dashboard' }
+
+    { path: '', redirectTo: '/app', pathMatch: 'full' },    
+    { path: '**', redirectTo: '/app' }
+  
+
+//   { path: '', redirectTo: '/app/main/marketplace', pathMatch: 'full' },
+//   { path: '**', redirectTo: '/app/main/marketplace' }
+
+
+// { path: '', redirectTo: '/app/main/dashboard', pathMatch: 'full' },
+// { path: '**', redirectTo: '/app/main/dashboard' }
 ];
 
 @NgModule({
@@ -88,4 +98,6 @@ export class RootRoutingModule {
     getSetting(key: string): string {
         return abp.setting.get(key);
     }
+
+    
 }

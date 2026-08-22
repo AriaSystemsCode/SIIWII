@@ -21,9 +21,6 @@ import { ViewPostComponent } from "../../../posts/Components/view-post.component
 import * as moment from 'moment';
 import { appModuleAnimation } from '@shared/animations/routerTransition';
 import { CreateorEditPostComponent } from '@app/main/posts/Components/createor-edit-post.component';
-import { FileUploaderCustom } from '@shared/components/import-steps/models/FileUploaderCustom.model';
-import { AppConsts } from '@shared/AppConsts';
-import { FileUploaderOptions } from 'ng2-file-upload';
 import { Observable } from 'rxjs';
 import { DateFormValidations } from '@shared/utils/validation/date-form-validation.directive';
 import Swal from "sweetalert2/dist/sweetalert2.js";
@@ -80,6 +77,12 @@ export class NewsBrowseComponent extends AppComponentBase {
     get startDateCtrl () { return this.filterForm.get('startDate') }
     get endDateCtrl () { return this.filterForm.get('endDate') }
     totalCount:number
+    filterVisible:boolean  = true
+
+    currentLang: string = 'en';
+    isArabic: boolean = false;
+  isAuthenticated: boolean = false;
+
     constructor(
         injector: Injector,
         private _appEventsServiceProxy: AppEventsServiceProxy,
@@ -93,13 +96,17 @@ export class NewsBrowseComponent extends AppComponentBase {
         super(injector);
     }
 
-    initFilterForm(){
+    initFilterForm() {
         this.filterForm = this._fb.group({
-            search :[],
-            filterType:[],
-            sorting:[],
-        })
-    }
+          search: [],
+          filterType: [],
+          sorting: [],
+          dateRange: [null],
+
+          startDate: [undefined],
+          endDate: [undefined],
+        });
+      }
 
         onshowViewPost($event) {
         this.viewPostModal.show($event);
@@ -151,18 +158,18 @@ export class NewsBrowseComponent extends AppComponentBase {
             const timeZoneControl = this._fb.control(undefined)
             this.filterForm.addControl("timeZone",timeZoneControl)
         }
-        if(flags.startDate){
-            const StartDateControl = this._fb.control(undefined)
-            this.filterForm.addControl("startDate",StartDateControl)
-        }
+        // if(flags.startDate){
+        //     const StartDateControl = this._fb.control(undefined)
+        //     this.filterForm.addControl("startDate",StartDateControl)
+        // }
         if(flags.startTime){
             const StartTimeControl = this._fb.control(undefined)
             this.filterForm.addControl("startTime",StartTimeControl)
         }
-        if(flags.endDate){
-            const EndtDateControl = this._fb.control(undefined)
-            this.filterForm.addControl("endDate",EndtDateControl)
-        }
+        // if(flags.endDate){
+        //     const EndtDateControl = this._fb.control(undefined)
+        //     this.filterForm.addControl("endDate",EndtDateControl)
+        // }
         if(flags.endTime){
             const EndTimeControl = this._fb.control(undefined)
             this.filterForm.addControl("endTime",EndTimeControl)
@@ -186,10 +193,22 @@ export class NewsBrowseComponent extends AppComponentBase {
         // if(flags.startDate && flags.endDate){
         //     // this.filterForm.setAsyncValidators()
         // }
+        if (flags.startDate && !this.filterForm.get('startDate')) {
+            this.filterForm.addControl('startDate', this._fb.control(undefined));
+          }
+          if (flags.endDate && !this.filterForm.get('endDate')) {
+            this.filterForm.addControl('endDate', this._fb.control(undefined));
+          }
     }
 
     ngOnInit(): void {
+        this.isAuthenticated = !!this.appSession?.user;
+        this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
+        this.currentLang == 'ar' || this.currentLang == 'ar-EG'  ? this.isArabic = true : this.isArabic = false
+        if(this.isAuthenticated){
         this.getProfilePicture();
+
+        }
         this.getUserPreferenceForListView();
         this.initFilterForm()
         this.userName =
@@ -225,6 +244,7 @@ export class NewsBrowseComponent extends AppComponentBase {
         this.subscribeToFiltersChangeAndApplyFilteration();
         this.defineSortingOptions();
         this.fillFormFilters()
+        // this.bindDateRangeToStartEnd();
         this.setMainPageFilter(this.defaultMainFilter)
         this.setDefaultSorting(this.sortingOptions[0].value)
     }
@@ -312,7 +332,7 @@ export class NewsBrowseComponent extends AppComponentBase {
     getEvents(event?: LazyLoadEvent) {
         if ( isNaN(this.defaultMainFilter) ) return
         if (this.primengTableHelper.shouldResetPaging(event)) {
-            this.paginator.totalRecords = 10;
+            this.paginator.totalRecords = 12;
             this.paginator.changePage(0);
             return;
         }
@@ -320,50 +340,6 @@ export class NewsBrowseComponent extends AppComponentBase {
         this.primengTableHelper.showLoadingIndicator();
         this.showMainSpinner()
         this.loading = true
-     /*   const subs = this._appEventsServiceProxy
-        .getAll(
-            filters?.filterType?.value,
-            filters?.search || undefined,
-            typeof filters?.isOnline == 'boolean'? filters?.isOnline : undefined,
-            undefined,
-            undefined,
-            undefined,
-            undefined,
-            undefined,
-            filters?.timeZone || undefined,
-            undefined,
-            filters?.startDate ? moment(filters.startDate,false) : undefined,
-            filters?.endDate ? moment(filters.endDate,false) : undefined,
-            undefined,
-            undefined,
-            filters?.startTime|| undefined,
-            undefined,
-            filters?.endTime|| undefined,
-            undefined,
-            undefined,
-            undefined,
-            undefined,
-            filters?.city || undefined,
-            filters?.state || undefined,
-            filters?.postalCode || undefined,
-            filters?.sorting.value ,
-            this.primengTableHelper.getSkipCount(this.paginator, event) || 0,
-            this.primengTableHelper.getMaxResultCount(this.paginator, event)
-        )
-        .pipe(
-            finalize(() => {
-                if (!this.active) this.active = true
-                this.loading = false
-                this.hideMainSpinner()
-                this.primengTableHelper.hideLoadingIndicator();
-            })
-        )
-        .subscribe((result) => {
-            this.items  = result.items
-            this.primengTableHelper.totalRecordsCount = result.totalCount;
-            this.primengTableHelper.records = result.items;
-        });
-        this.subscriptions.push(subs) */
 
         const subs = this._postService  .getAll(
             filters?.search || undefined,
@@ -375,6 +351,8 @@ export class NewsBrowseComponent extends AppComponentBase {
             undefined,
             undefined,
             0,
+            undefined, 
+            undefined, 
             filters?.sorting.value,
             this.primengTableHelper.getSkipCount(this.paginator, event) || 0,
             this.primengTableHelper.getMaxResultCount(this.paginator, event)
@@ -598,13 +576,6 @@ export class NewsBrowseComponent extends AppComponentBase {
                 this.onshowCreateOrEdit(getAppPostForViewDto);
             });
     }
-    /*onshowCreateOrEdit($event) {
-        this.createOrEditModal.show(
-            $event,
-            this.typeFile,
-            this.relatedEntityId
-        );
-    }*/
 
     onTypeFile($event) {
         this.typeFile = $event;
@@ -645,4 +616,27 @@ export class NewsBrowseComponent extends AppComponentBase {
         this.fromViewEvent=false;
         this.relatedEntityId=0;
     }
+
+      filtersDialogVisible = false;
+
+openFiltersDialog() {
+  this.filtersDialogVisible = true;
 }
+
+closeFiltersDialog() {
+  this.filtersDialogVisible = false;
+}
+toggleFilter(): void {
+    this.filterVisible = !this.filterVisible;
+
+}
+
+get videosGridClass(): string {
+    if (this.singleItemPerRowMode) return 'v-list';
+
+    return this.filterVisible ? 'v-grid-with-filter' : 'v-grid-no-filter';
+  }
+
+
+}
+

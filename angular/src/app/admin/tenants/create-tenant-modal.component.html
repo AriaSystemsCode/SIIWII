@@ -19,9 +19,9 @@
                 <div class="modal-body">
 
                     <div class="form-group">
-                        <label for="TenancyName">{{"TenancyName" | localize}} *</label>
+                        <label for="TenancyName">{{'WorkspaceName'  | localize}} *</label>
                         <input id="TenancyName" #tenancyNameInput="ngModel" class="form-control" type="text"
-                            [ngClass]="{'edited':tenant.tenancyName}" name="tenancyName"
+                            [ngClass]="{'edited':tenant.tenancyName}" name="tenancyName"        
                             [(ngModel)]="tenant.tenancyName" #tenancyName="ngModel" required maxlength="64"
                             pattern="^[a-zA-Z][a-zA-Z0-9_-]{1,}$">
                         <validation-messages [formCtrl]="tenancyNameInput"></validation-messages>
@@ -32,11 +32,49 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="Name">{{"TenantName" | localize}} *</label>
-                        <input id="Name" #nameInput="ngModel" type="text" name="Name" class="form-control"
+                        <label for="Name">{{'AccountName' | localize}} *</label>
+                        <input id="Name" #nameInput="ngModel" type="text" name="Name" class="form-control"    
                             [ngClass]="{'edited':tenant.name}" [(ngModel)]="tenant.name" required maxlength="128">
                         <validation-messages [formCtrl]="nameInput"></validation-messages>
                     </div>
+
+                    <div class="row">
+                        <div class="form-group col-5 col-lg-6 col-md-6 col-sm-6 pr-2">
+                            <label for="Name">{{'FirstName' | localize}} *</label>
+                            <input
+                                #firstNameInput="ngModel"
+                                class="form-control"
+                                type="text"
+                            
+                                [(ngModel)]="tenant.firstName"
+                                name="adminFirstName"
+                                required
+                            />
+                            <span class="form-text text-danger">
+                                <validation-messages
+                                    [formCtrl]="firstNameInput"
+                                ></validation-messages>
+                            </span>
+                        </div>
+                        <div class="form-group col-5 col-lg-6 col-md-6 col-sm-6">
+                            <label for="Name">{{'LastName'  | localize}} *</label>
+
+                            <input
+                                #lastNameInput="ngModel"
+                                class="form-control"
+                                type="text"
+                             
+                                [(ngModel)]="tenant.lastName"
+                                name="adminLastName"
+                                required
+                            />
+                            <span class="form-text text-danger">
+                                <validation-messages
+                                    [formCtrl]="lastNameInput"
+                                ></validation-messages>
+                            </span>
+                        </div>
+                       </div>
 
                     <div class="kt-checkbox-list">
                         <label class="kt-checkbox">

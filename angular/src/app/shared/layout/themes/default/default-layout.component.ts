@@ -5,7 +5,7 @@ import { UrlHelper } from '@shared/helpers/UrlHelper';
 import { DOCUMENT } from '@angular/common';
 import { OffcanvasOptions } from '@metronic/app/core/_base/layout/directives/offcanvas.directive';
 import { AppConsts } from '@shared/AppConsts';
-import { AccountsServiceProxy} from '@shared/service-proxies/service-proxies';
+import { AccountsServiceProxy, LanguageServiceProxy} from '@shared/service-proxies/service-proxies';
 import { ActivatedRoute, NavigationEnd, NavigationStart, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { filter } from 'rxjs/operators';
@@ -19,7 +19,7 @@ import { AppMenu } from '../../nav/app-menu';
     animations: [appModuleAnimation()],
 })
 export class DefaultLayoutComponent extends ThemesLayoutBaseComponent implements OnInit {
-    defaultLogo = AppConsts.appBaseUrl + '/assets/common/images/Ellipse 5.svg';
+    defaultLogo = AppConsts.appBaseUrl + '/assets/common/images/default-profile-picture.png';
     displayMarketPlace : boolean
     menuCanvasOptions: OffcanvasOptions = {
         baseClass: 'kt-aside',
@@ -42,29 +42,45 @@ export class DefaultLayoutComponent extends ThemesLayoutBaseComponent implements
     openSub = false
     openAdSub= false
     tenantLogo:any;
+    currentLang:string
+    isArabic:boolean 
+
+  
+    isAuthenticated = this.appSession?.user
+    hideTopbar: boolean = false;
+
     constructor(
         injector: Injector,
         @Inject(DOCUMENT) private document: Document,
         private _accountsServiceProxy: AccountsServiceProxy,
         private _router:Router,
         private _appNavigationService: AppNavigationService,
+
     ) {
         super(injector);
         this.subscribeToMarketPlace()
     }
 
     ngOnInit() {
+        this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
+        this.currentLang == 'ar' || this.currentLang == 'ar-EG'  ? this.isArabic = true : this.isArabic = false
         this.installationMode = UrlHelper.isInstallUrl(location.href);
         this.getSidebarInfo();
         this.menu = this._appNavigationService.getMenu();
-   
+
         this.currentRouteUrl = this._router.url.split(/[?#]/)[0];
-
+        this.updateTopbarVisibility(this.currentRouteUrl);
+      
+    
         this._router.events
-            .pipe(filter(event => event instanceof NavigationEnd))
-            .subscribe(event => this.currentRouteUrl = this._router.url.split(/[?#]/)[0]);
-    }
-
+          .pipe(filter(event => event instanceof NavigationEnd))
+          .subscribe(() => {
+            this.currentRouteUrl = this._router.url.split(/[?#]/)[0];
+            this.updateTopbarVisibility(this.currentRouteUrl);
+         
+          });
+      }
+      
     
       toggleSidebar() {
         this.isMinimized = !this.isMinimized;
@@ -116,4 +132,37 @@ export class DefaultLayoutComponent extends ThemesLayoutBaseComponent implements
     onOpenSideBar($event:boolean){
         this.openSideBar=$event
     }
+
+    private readonly ACCOUNT_ROUTES = [
+        'login',
+        'register',
+        'register-tenant',
+        'register-tenant-result',
+        'forgot-password',
+        'reset-password',
+        'email-activation',
+        'confirm-email',
+        'send-code',
+        'verify-code',
+        'buy',
+        'extend',
+        'upgrade',
+        'select-edition',
+        'paypal-purchase',
+        'stripe-purchase',
+        'stripe-payment-result',
+        'stripe-cancel-payment',
+        'payment-completed',
+        'session-locked',
+      ];
+      
+      private updateTopbarVisibility(path: string): void {
+        const cleanPath = path.split(/[?#]/)[0]; // remove query + hash
+      
+        this.hideTopbar = this.ACCOUNT_ROUTES.some(route =>
+          cleanPath === `/app/account/${route}` ||
+          cleanPath === `/app/main/account/${route}`
+        );
+      }
+      
 }

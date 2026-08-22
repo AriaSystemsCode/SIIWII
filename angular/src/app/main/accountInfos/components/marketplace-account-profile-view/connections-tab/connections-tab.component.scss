@@ -1,0 +1,60 @@
+.inputAll {
+    height: 20px !important;
+}
+
+.separator {
+    color: rgba(238, 238, 238, 1);
+    display: inline-block;
+    height: 24px;
+    margin: 0 4px;
+}
+
+.btPurble {
+    padding: 10px 16px;
+    height: 44px;
+    background: #4A0D4A;
+    border-radius: 6px;
+    color: #fff;
+
+}
+
+.btn-outline-secondary {
+
+    padding: 10px;
+    color: #9E9E9E;
+    height: 44px;
+
+}
+
+.kt-portlet {
+    margin-top: -15px !important;
+}
+
+.kt-container {
+    padding: 0 !important;
+}
+
+.list-toolbar-data-summary {
+    color: #9E9E9E;
+    font-weight: 600;
+    font-size: 14px;
+}
+.col-md-6 {
+    max-width: 98% !important;
+}
+
+.tab-wrapper {
+    position: relative;
+    min-height: 250px;
+  }
+  
+  .tab-loading-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #EEE;
+    z-index: 10;
+  }
+  

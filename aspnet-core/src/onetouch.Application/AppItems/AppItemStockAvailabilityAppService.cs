@@ -27,12 +27,16 @@ using Abp.Domain.Repositories;
 using AutoMapper.Internal.Mappers;
 using Newtonsoft.Json;
 using onetouch.Notifications;
+using onetouch.Authorization.Roles;
+using onetouch.Authorization.Users;
 
 namespace onetouch.AppItems
 {
     [AbpAuthorize(AppPermissions.Pages_AppItems)]
     public class AppItemStockAvailabilityAppService : onetouchAppServiceBase, IAppItemStockAvailabilityAppService, IExcelImporter<AppItemStockAvailabilityExcelResultsDTO>
     {
+        private readonly UserManager _userManager;
+        private readonly RoleManager _roleManager;
         private readonly IConfigurationRoot _appConfiguration;
         private readonly Helper _helper;
         //private readonly IAppItemRepository _appItemRepository;
@@ -41,8 +45,11 @@ namespace onetouch.AppItems
         private readonly IAppNotifier _appNotifier;
         public AppItemStockAvailabilityAppService(IAppConfigurationAccessor appConfigurationAccessor,
             IRepository<AppItem, long> appItemRepository, Helper helper,IAppItemsAppService appItemsAppService,
-             IAppNotifier appNotifier)
+             IAppNotifier appNotifier,
+             RoleManager roleManager, UserManager userManager)
         {
+            _userManager = userManager;
+            _roleManager = roleManager;
             _appNotifier = appNotifier;
             _appConfiguration = appConfigurationAccessor.Configuration;
             _helper = helper;
@@ -250,7 +257,7 @@ namespace onetouch.AppItems
                 if (parentCodeColumn == null)
                     throw new UserFriendlyException("Parent Code column is missing.");
 
-                var availableQtyColumn = ds.Tables["Update Available Inventory"].Columns["AvailableQty"];
+                var availableQtyColumn = ds.Tables["Update Available Inventory"].Columns["StockAvailable"];
                 if (availableQtyColumn == null)
                     throw new UserFriendlyException("Available Qty column is missing.");
 
@@ -512,6 +519,9 @@ namespace onetouch.AppItems
             var timeStamp = DateTime.Now;
             List<ImportItemReturnDto> returnList = new List<ImportItemReturnDto>();
             List<AppItem> modifiedItems = new List<AppItem>();
+            //I46[Start]
+            List<AppItem> modifiedParentItems = new List<AppItem>();
+            //I46[End]
             var parentCodes = itemExcelDtoList.Select(z => z.ParentCode).Distinct().ToList();
             foreach (var parent in parentCodes)
             {
@@ -624,29 +634,62 @@ namespace onetouch.AppItems
                 }
 
                 #endregion code, name validation 
-
+               
                 if (!string.IsNullOrEmpty(returnDto.ErrorMessage))
                     returnList.Add(returnDto);
                 else
                 {
-                    var appItem = await _appItemRepository.GetAll().Where(z => z.Code.Replace(" ", string.Empty) == itemExcelDto.Code.Replace(" ", string.Empty)).FirstOrDefaultAsync();
+                    var appItem = await _appItemRepository.GetAll().Include(z=>z.ParentFk).Where(z => z.Code.Replace(" ", string.Empty) == itemExcelDto.Code.Replace(" ", string.Empty)).FirstOrDefaultAsync();
                     if (appItem != null)
                     {
                         appItem.StockAvailability = long.Parse(itemExcelDto.StockAvailable);
                         appItem.TimeStamp = timeStamp;
                         modifiedItemsList.Add(appItem);
+                        //I46[Start]
+                        if (appItem.ParentFk != null)
+                        {
+                            var parentAddedBefore = modifiedParentItems.Where(z => z.Code == appItem.ParentFk.Code).FirstOrDefault();
+                            if (parentAddedBefore == null)
+                                modifiedParentItems.Add(appItem.ParentFk);
+                        }
+                        //I46[End]
                     }
                 }
             }
+            
             if (modifiedItemsList.Count > 0)
             {
                 var x = UnitOfWorkManager.Current.GetDbContext<onetouchDbContext>(null, null);
                 x.AppItems.UpdateRange(modifiedItemsList);
                 await x.SaveChangesAsync();
+                //I46
+                if (modifiedParentItems.Count > 0)
+                {
+                    foreach (var parent in modifiedParentItems)
+                    {
+                        parent.StockAvailability = await _appItemRepository.GetAll().Where(z => z.ParentId == parent.Id).SumAsync(a => a.StockAvailability);
+                    }
+                    x.AppItems.UpdateRange(modifiedParentItems);
+                    await x.SaveChangesAsync();
+                }
+                //I46
                 //mmt
                 var myTenantObject = await TenantManager.GetByIdAsync(int.Parse(AbpSession.TenantId.ToString()));
                 string tenancyName = myTenantObject.TenancyName;
-                var adminUser = await UserManager.FindByNameAsync("admin@" + tenancyName);
+                //var adminUser = await UserManager.FindByNameAsync("admin@" + tenancyName);
+                var adminRole = await _roleManager.Roles
+                       .FirstOrDefaultAsync(r => r.TenantId == int.Parse(AbpSession.TenantId.ToString()) && r.Name == StaticRoleNames.Tenants.Admin);
+
+                Authorization.Users.User adminUser = null;
+                if (adminRole != null)
+                {
+                    var adminRoleId = adminRole.Id;
+
+                    adminUser = await _userManager.Users
+                        .Where(u => u.TenantId == int.Parse(AbpSession.TenantId.ToString()))
+                        .Where(u => u.Roles.Any(r => r.RoleId == adminRoleId))
+                        .FirstOrDefaultAsync();
+                }
                 if (adminUser != null)
                 {
                     await _appNotifier.SendMessageAsync(new Abp.UserIdentifier(AbpSession.TenantId, adminUser.Id),
@@ -671,7 +714,20 @@ namespace onetouch.AppItems
                 {
                     var myTenantObject = await TenantManager.GetByIdAsync(int.Parse(AbpSession.TenantId.ToString()));
                     string tenancyName = myTenantObject.TenancyName;
-                    var adminUser = await UserManager.FindByNameAsync("admin@" + tenancyName);
+                    //var adminUser = await UserManager.FindByNameAsync("admin@" + tenancyName);
+                    var adminRole = await _roleManager.Roles
+                      .FirstOrDefaultAsync(r => r.TenantId == int.Parse(AbpSession.TenantId.ToString()) && r.Name == StaticRoleNames.Tenants.Admin);
+
+                    Authorization.Users.User adminUser = null;
+                    if (adminRole != null)
+                    {
+                        var adminRoleId = adminRole.Id;
+
+                        adminUser = await _userManager.Users
+                            .Where(u => u.TenantId == int.Parse(AbpSession.TenantId.ToString()))
+                            .Where(u => u.Roles.Any(r => r.RoleId == adminRoleId))
+                            .FirstOrDefaultAsync();
+                    }
                     if (adminUser != null)
                     {
                         await _appNotifier.SendMessageAsync(new Abp.UserIdentifier(AbpSession.TenantId, adminUser.Id),
@@ -695,7 +751,7 @@ namespace onetouch.AppItems
             mappingExpression.ForMember(dest => dest.Id, act => act.MapFrom(src => 0));
             mappingExpression.ForMember(dest => dest.ParentCode, act => act.MapFrom(src => src["ParentCode"].ToString().TrimEnd()));
             mappingExpression.ForMember(dest => dest.Code, act => act.MapFrom(src => src["Code"].ToString().TrimEnd()));
-            mappingExpression.ForMember(dest => dest.StockAvailable, act => act.MapFrom(src => src["AvailableQty"].ToString().TrimEnd()));
+            mappingExpression.ForMember(dest => dest.StockAvailable, act => act.MapFrom(src => src["StockAvailable"].ToString().TrimEnd()));
 
           
 

@@ -9,3 +9,15 @@
     font-size: 8px;
     border-radius: 50%;
 }
+
+.modal-close-btn {
+    position: absolute;
+    right: 0;
+    top: 8px;
+}
+
+@media (max-width: 768px) {
+    .modal-content-wrapper .modal-body {
+        max-height: 70vh;
+    }
+}

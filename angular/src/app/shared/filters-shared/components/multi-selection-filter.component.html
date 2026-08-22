@@ -1,38 +1,52 @@
-<ng-container *ngIf="filterMetaData?.displayedList?.length">
-    <div class="align-items-center d-flex justify-content-between mb-2 pr-2" >
-        <h4 class="text-captitalize">{{ title }}</h4>
-        <span (click)="triggerListCollapse()" *ngIf="filterMetaData?.collapsedDisplayedListCount < filterMetaData?.listTotalCount">
-            <i
-                class="fas fa-2x text-primary"
-                [ngClass]="
-                collapseListDataCollapseButton ? 'fa-angle-up' : 'fa-angle-down'
-                "
-            ></i>
-        </span>
+<!-- multi-selection-filter.component.html -->
+<ng-container *ngIf="filterMetaData?.displayedList?.length !== undefined">
+    <div class="align-items-center d-flex justify-content-between mb-2 pr-2">
+      <h4 class="text-captitalize">{{ title }}</h4>
+  
+      <span (click)="triggerListCollapse()"
+            *ngIf="filterMetaData?.collapsedDisplayedListCount < filterMetaData?.listTotalCount">
+        <i class="fas fa-2x"
+           [ngClass]="collapseListDataCollapseButton ? 'fa-angle-up' : 'fa-angle-down'"></i>
+      </span>
     </div>
-
-    <div class="d-flex flex-column kt-checkbox-list d-flex filter-group thin-scroll" >
-        <label
-            class="kt-checkbox kt-checkbox--dark mr-4"
-            *ngFor="let item of filterMetaData.displayedList"
-        >
-            <p-checkbox
-                (onChange)="onSelectionChangeHandler($event)"
-                [value]="item.value"
-                [label]="item.label"
-                [(ngModel)]="selections"
-                [name]="title"
-            ></p-checkbox>
-        </label>
-    </div>
-
-    <div>
-        <button
-            class="btn btn-font-hover-brand ml-3"
-            (click)="showMoreListData()"
-            *ngIf="collapseListDataCollapseButton && showMoreListDataButton"
-        >
-            {{ 'showmore' | localize }} ...
+  
+    <!-- Search box -->
+    <div class="input-group mb-2" *ngIf="showSearchBox">
+      <input
+        type="text"
+        class="form-control"
+        [placeholder]="'Search' | localize"
+        [formControl]="searchCtrl"
+        (keydown.escape)="clearSearch()"
+        aria-label="Filter list by text"
+      />
+      <div class="input-group-append" *ngIf="searchCtrl.value">
+        <button class="btn btn-outline-secondary" type="button" (click)="clearSearch()" aria-label="Clear search">
+          <i class="fas fa-times"></i>
         </button>
+      </div>
     </div>
-</ng-container>
+  
+    <div class="d-flex flex-column kt-checkbox-list d-flex filter-group thin-scroll">
+      <label class="kt-checkbox kt-checkbox--dark formLbl"
+             *ngFor="let item of filterMetaData.displayedList">
+        <p-checkbox
+          (onChange)="onSelectionChangeHandler($event)"
+          [value]="item.value"
+          [label]="item.label"
+          [(ngModel)]="selections"
+          [name]="title"
+        ></p-checkbox>
+      </label>
+    </div>
+  
+    <div>
+      <button
+        class="btn btn-font-hover-brand ml-3"
+        (click)="showMoreListData()"
+        *ngIf="collapseListDataCollapseButton && showMoreListDataButton">
+        {{ 'showmore' | localize }} ...
+      </button>
+    </div>
+  </ng-container>
+  

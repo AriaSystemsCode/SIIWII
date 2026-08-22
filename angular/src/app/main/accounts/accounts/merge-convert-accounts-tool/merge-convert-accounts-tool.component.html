@@ -58,13 +58,7 @@
                 <div class="row mb-4">
                     <div class="col-6 row" *ngIf="!appSession.tenant">
                         <h5 class="col-3">{{'SourceTenant' | localize}}</h5>
-                        <!--   <select class="form-control col-6" [(ngModel)]="sourceTenant" [disabled]="disableSourceTenant"
-                            (change)="onChangeSourceTenant($event.target.value)">
-                            <option disabled selected="selected" value></option>
-                            <option #sourceTenantCombobox [disabled]="disableSourceTenant"
-                                *ngFor="let sTenant of sourceTenants" [value]="sTenant.id">{{sTenant.displayName}}
-                            </option>
-                        </select> -->
+
                         <p-autoComplete [style]="{ width: '100%' }" [inputStyle]="{ width: '100%' }"
                             [disabled]="disableSourceTenant" [ngStyle]="{
                             'background-color': disableSourceTenant ? '#e2e5ec' : 'white'
@@ -82,14 +76,7 @@
                     </div>
                     <div class="col-6 row" *ngIf="appSession.tenant">
                         <h5 class="col-3">{{'SourceAccount' | localize}}<span class="text-danger">*</span></h5>
-                        <!--  <select class="form-control col-6" [(ngModel)]="createAccountsInputDto.sourceAccountId"
-                            [disabled]="disableSourceAccount" (change)="onChangeSourceAccount($event.target.value)">
-                            <option disabled selected="selected" value></option>
-                            <option #sourceAccountCombobox [disabled]="disableSourceAccount"
-                                *ngFor="let sAccount of sourceAccounts" [value]="sAccount.id">
-                                {{sAccount.displayName|localize}}
-                            </option>
-                        </select> -->
+
                         <p-autoComplete [style]="{ width: '100%' }" [inputStyle]="{ width: '100%' }"
                             [disabled]="disableSourceAccount" [ngStyle]="{
                         'background-color': disableSourceAccount ? '#e2e5ec' : 'white'
@@ -110,14 +97,7 @@
                     <div class="col-6 row">
                         <h5 class="col-3 pl-0">{{'DestinationAccount' | localize}}<span class="text-danger">*</span>
                         </h5>
-                        <!-- <select class="form-control col-6" [(ngModel)]="destinationAccount"
-                            [disabled]="disableDestinationAccount"
-                            (change)="onChangeDestinationAccount($event.target.value)">
-                            <option disabled selected="selected" value></option>
-                            <option #destinationAccountCombobox [disabled]="disableDestinationAccount"
-                                *ngFor="let dAccount of destinationAccounts" [value]="dAccount.id">
-                                {{dAccount.displayName|localize}}</option>
-                        </select> -->
+
                         <p-autoComplete [style]="{ width: '100%' }" [inputStyle]="{ width: '100%' }"
                             [disabled]="disableDestinationAccount" [ngStyle]="{
                         'background-color': disableDestinationAccount ? '#e2e5ec' : 'white'
@@ -138,14 +118,7 @@
                 <div class="row mb-4">
                     <div class="col-6 row" *ngIf="!appSession.tenant">
                         <h5 class="col-3">{{'SourceAccount' | localize}}<span class="text-danger">*</span></h5>
-                        <!-- <select class="form-control col-6" [(ngModel)]="createAccountsInputDto.sourceAccountId"
-                            [disabled]="disableSourceAccount" (change)="onChangeSourceAccount($event.target.value)">
-                            <option disabled selected="selected" value></option>
-                            <option #sourceAccountCombobox [disabled]="disableSourceAccount"
-                                *ngFor="let sAccount of sourceAccounts" [value]="sAccount.id">
-                                {{sAccount.displayName|localize}}
-                            </option>
-                        </select> -->
+
                         <p-autoComplete [style]="{ width: '100%' }" [inputStyle]="{ width: '100%' }"
                             [disabled]="disableSourceAccount" [ngStyle]="{
                     'background-color': disableSourceAccount ? '#e2e5ec' : 'white'

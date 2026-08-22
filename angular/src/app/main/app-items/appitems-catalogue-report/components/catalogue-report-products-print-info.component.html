@@ -1,204 +1,131 @@
 <form class="h-100" #printInfoForm="ngForm" novalidate (ngSubmit)="printAndFinish(printInfoForm)" autocomplete="off">
-    
-    <div class="d-flex flex-column justify-content-between thin-scroll _scroll wizard-wrapper">
-        <div class="d-flex flex-column justify-content-between " >
+
+    <div class="d-flex flex-column justify-content-between thin-scroll _scroll wizard-wrapper parSec">
+        <div class="d-flex flex-column justify-content-between ">
             <div class="row justify-content-between">
-                <div class="align-items-center col-6 d-flex" style="gap:5px;">
-                    <input type="radio" id="EmailLinesheet" name="EmailorPrint" value="true"  (change)="onEmailLinesheetChange($event.target.value)" [checked]="printInfoParam.EmailLinesheet"
-                        >
-                    <label for="EmailLinesheet" class="font-weight-bolder text-black mb-0">{{"EmailLinesheet" | localize}}</label>
+                <div class="align-items-center col-6 d-flex print-option-item">
+                    <input type="radio" id="EmailLinesheet" name="EmailorPrint" value="true"
+                        (change)="onEmailLinesheetChange($event.target.value)"
+                        [checked]="printInfoParam.EmailLinesheet">
+                    <label for="EmailLinesheet" [ngClass]="printInfoParam.EmailLinesheet ? 'selected':'notS'"
+                        class=" mb-0">{{"EmailLinesheet" | localize}}</label>
                 </div>
-                <div class="align-items-center col-6 d-flex" style="gap:5px;">
-                    <input type="radio" id="PrintLinesheet" name="EmailorPrint" value="true" (change)="onPrintLinesheetChange($event.target.value)" [checked]="printInfoParam.PrintLinesheet">
-                    <label for="PrintLinesheet" class="font-weight-bolder text-black mb-0">{{"PrintLinesheet"| localize}}</label>
+                <div class="align-items-center col-6 d-flex print-option-item">
+                    <input type="radio" id="PrintLinesheet" name="EmailorPrint" value="true"
+                        (change)="onPrintLinesheetChange($event.target.value)"
+                        [checked]="printInfoParam.PrintLinesheet">
+                    <label for="PrintLinesheet" class=" mb-0"
+                        [ngClass]="printInfoParam.PrintLinesheet ? 'selected':'notS'">{{"PrintLinesheet"|
+                        localize}}</label>
                 </div>
             </div>
         </div>
-        <div  class="col-12 p-3 thin-scroll" *ngIf="printInfoParam.EmailLinesheet" >
+        <div class="col-12 p-3 thin-scroll" *ngIf="printInfoParam.EmailLinesheet">
             <div class="row align-items-start">
                 <div class="col-md-1">
                     <div class="InputText">
-                        <span class="text-input-label"
-                            >{{ "To" | localize }}:</span
-                        >
+                        <span class="text-input-label">{{ "To" | localize }}:</span>
                     </div>
                 </div>
-                <div
-                    [ngClass]="
+                <div [ngClass]="
                         'col-md-' +
                         (9 + (displayCC ? 1 : 0) + (displayBCC ? 1 : 0))
-                    "
-                >
-                    <p-autoComplete
-                        [style]="{ width: '100%' }"
-                        [inputStyle]="{ width: '100%' }"
-                        class="
-                            InputText
-                            email-autocomplete
-                            sendMessageInputs
-                        "
-                        [(ngModel)]="printInfoParam.toUsers"
-                        [forceSelection]="true"
-                        [suggestions]="filteredUsers"
-                        (completeMethod)="filterUsers($event)"
-                        [minLength]="1"
-                        field="name"
-                        name="MultiSelectInputTo"
-                        id="MultiSelectInputTo"
-                        [required]="true"
-                        [multiple]="true"
-                    >
+                    ">
+                    <p-autoComplete #toEmailAuto [(ngModel)]="printInfoParam.toUsers" [forceSelection]="false"
+                        [suggestions]="filteredUsers" (completeMethod)="filterUsers($event)"
+                        (keydown.enter)="addPersonalEmail($event, 'to', toEmailAuto)"
+                        (keydown)="handleEmailSeparator($event, 'to', toEmailAuto)" field="name"
+                        name="MultiSelectInputTo" [multiple]="true">
                     </p-autoComplete>
                 </div>
-                <div
-                    [ngClass]="{
+                <div [ngClass]="{
                         'col-md-2': !displayCC && !displayBCC,
                         'col-md-1':
                             (!displayCC && displayBCC) ||
                             (displayCC && !displayBCC),
                         'd-none': displayCC && displayBCC
-                    }"
-                >
+                    }">
                     <div>
-                        <a
-                            href="javascript:;"
-                            (click)="showCC()"
-                            *ngIf="!displayCC"
-                            ><span class="text-input-label">{{
+                        <a href="javascript:;" (click)="showCC()" *ngIf="!displayCC"><span
+                                [ngClass]="displayCC ? 'text-input-label':'defInp'" class="">{{
                                 "CC" | localize
-                            }}</span></a
-                        >
-                        <a
-                            href="javascript:;"
-                            (click)="showBCC()"
-                            *ngIf="!displayBCC"
-                            ><span class="text-input-label">
-                                {{ "BCC" | localize }}</span
-                            ></a
-                        >
+                                }}</span></a>
+                        <a href="javascript:;" (click)="showBCC()" *ngIf="!displayBCC"><span class=""
+                                [ngClass]="displayBCC ? 'text-input-label':'defInp'">
+                                {{ "BCC" | localize }}</span></a>
                     </div>
                 </div>
             </div>
             <div class="row align-items-start" *ngIf="displayCC">
                 <div class="col-md-1">
-                    <div
-                        class="InputText"
-                        *ngIf="displayCC"
-                        style="padding-top: 0px !important"
-                    >
-                        <span class="text-input-label"
-                            >{{ "CC" | localize }}:</span
-                        >
+                    <div class="InputText input-text-no-top" *ngIf="displayCC">
+                        <span class="text-input-label">{{ "CC" | localize }}:</span>
                     </div>
                 </div>
                 <div class="col-md-11 pt-2">
-                    <p-autoComplete
-                        [style]="{ width: '100%' }"
-                        [inputStyle]="{
-                            width: '100%'
-                        }"
-                        ngClass="p-autocomplete"
-                        *ngIf="displayCC"
-                        class="
-                            InputText
-                            email-autocomplete
-                            sendMessageInputs
-                        "
-                        [(ngModel)]="printInfoParam.ccUsers"
-                        [suggestions]="filteredUsers"
-                        (completeMethod)="filterUsers($event)"
-                        [minLength]="1"
-                        field="name"
-                        name="MultiSelectInputCC"
-                        id="MultiSelectInputCC"
-                        [multiple]="true"
-                    >
+                    <p-autoComplete #ccEmailAuto [style]="{ width: '100%' }" [inputStyle]="{ width: '100%' }"
+                        ngClass="p-autocomplete" *ngIf="displayCC"
+                        class="InputText email-autocomplete sendMessageInputs w-100"
+                        [(ngModel)]="printInfoParam.ccUsers" [suggestions]="filteredUsers"
+                        (completeMethod)="filterUsers($event)" [minLength]="1" field="name" name="MultiSelectInputCC"
+                        id="MultiSelectInputCC" [multiple]="true" [forceSelection]="false"
+                        (keydown.enter)="addPersonalEmail($event, 'cc', ccEmailAuto)"
+                        (keydown)="handleEmailSeparator($event, 'cc', ccEmailAuto)">
                     </p-autoComplete>
                 </div>
             </div>
             <div class="row align-items-start" *ngIf="displayBCC">
                 <div class="col-md-1">
-                    <div
-                        class="InputText"
-                        *ngIf="displayBCC"
-                        style="padding-top: 0px !important"
-                    >
-                        <span class="text-input-label"
-                            >{{ "BCC" | localize }}:</span
-                        >
+                    <div class="InputText input-text-no-top" *ngIf="displayBCC">
+                        <span class="text-input-label">{{ "BCC" | localize }}:</span>
                     </div>
                 </div>
                 <div class="col-md-11 pt-2">
-                    <p-autoComplete
-                        [style]="{ width: '100%' }"
-                        [inputStyle]="{ width: '100%' }"
-                        *ngIf="displayBCC"
-                        class="
-                            InputText
-                            email-autocomplete
-                            sendMessageInputs
-                        "
-                        [(ngModel)]="printInfoParam.bccUsers"
-                        [suggestions]="filteredUsers"
-                        (completeMethod)="filterUsers($event)"
-                        [minLength]="1"
-                        field="name"
-                        name="MultiSelectInputBCC"
-                        id="MultiSelectInputBCC"
-                        [multiple]="true"
-                    >
+                    <p-autoComplete #bccEmailAuto [(ngModel)]="printInfoParam.bccUsers" [forceSelection]="false"
+                        [suggestions]="filteredUsers" (completeMethod)="filterUsers($event)"
+                        (keydown.enter)="addPersonalEmail($event, 'bcc', bccEmailAuto)"
+                        (keydown)="handleEmailSeparator($event, 'bcc', bccEmailAuto)" field="name"
+                        name="MultiSelectInputBCC" [multiple]="true">
                     </p-autoComplete>
                 </div>
             </div>
             <div class="form-group group-input subject-label mb-0">
-                <div
-                    class="InputText"
-                    style="padding-top: 4px !important; display: flex"
-                >
-                    <span
-                        class="text-input-label subject-label pr-4 mb-0"
-                        >{{ "subject" | localize }}:</span
-                    >
-                    <input
-                        class="form-control Input bg-white ml-4 w-100"
-                        style="padding: 6px"
-                        placeholder=""
-                        type="Text"
-                        [(ngModel)]="printInfoParam.subject"
-                        name="subject"
-                        required
-                    />
+                <div class="InputText d-md-flex subject-row">
+                    <span class="text-input-label subject-label pr-4 mb-0">{{ "subject" | localize }}:</span>
+                    <input class="form-control Input bg-white ml-4 w-100 subject-input" placeholder="" type="Text"
+                        [(ngModel)]="printInfoParam.subject" name="subject" required />
                 </div>
             </div>
             <div class="form-group editor-text mb-0">
-                <textarea
-                class="col-11"
-                    [(ngModel)]="printInfoParam.body"
-                    name="HtmlEditorInput"
-                    style="height: 180px ; margin-left: 10%  "
-                >
+                <textarea class="col-11 p-3 ml-lg-5 email-body-input" [(ngModel)]="printInfoParam.body"
+                    name="HtmlEditorInput" placeholder="Write Somthing ....">
                 </textarea>
             </div>
         </div>
-        <div class="d-flex flex-row justify-content-between pr-5 w-100" >
-            <button class="btn btn-primary" type="button" (click)="previousStep()">
+        <div class="d-flex flex-row justify-content-between pr-5 w-100">
+            <button class="btn btnPrev" type="button" (click)="previousStep()">
                 <i class="fa-arrow-left fas ml-3"></i>
                 {{ "Previous" | localize }}
             </button>
-            <button class="btn btn-primary" type="submit" *ngIf="printInfoParam.PrintLinesheet">
-            <span>{{ "PrintAndFinish" | localize  }}</span>  
-                <i class="fa-arrow-right fas ml-3"></i>
-            </button> 
-            <button
-                class="btn btn-primary" 
-                type="submit" 
-                *ngIf="printInfoParam.EmailLinesheet" 
-                [disabled]="printInfoParam?.toUsers?.length == 0 || printInfoParam?.subject == ''"
-            >
-                <span>{{ "sendemail" | localize  }}</span>  
-
+            <button class="btn btnCont" type="submit" *ngIf="printInfoParam.PrintLinesheet">
+                <span>{{ "PrintAndFinish" | localize }}</span>
                 <i class="fa-arrow-right fas ml-3"></i>
             </button>
+            <!-- <button class="btn btnCont" type="submit" *ngIf="printInfoParam.EmailLinesheet"
+                [disabled]="printInfoParam?.toUsers?.length == 0 || printInfoParam?.subject == ''">
+                <span>{{ "sendemail" | localize }}</span>
+
+                <i class="fa-arrow-right fas ml-3"></i>
+            </button> -->
+            <button class="btn btnCont" type="submit" *ngIf="printInfoParam.EmailLinesheet" [disabled]="
+        !printInfoParam.toUsers ||
+        !printInfoParam?.subject?.trim() ||
+        !printInfoParam?.body?.trim()
+    ">
+                <span>{{ 'sendemail' | localize }}</span>
+                <i class="fa-arrow-right fas ml-3"></i>
+            </button>
+
         </div>
     </div>
-</form> 
+</form>

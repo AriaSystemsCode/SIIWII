@@ -1,0 +1,231 @@
+@import "../../../../../../assets/styles/base/variables";
+
+
+.fa-bars:before {
+  color: white !important;
+}
+
+.flaticon2-reload:before {
+  color: #4a0d4a !important;
+}
+
+.ResetData_btn i {
+  background-color: #FFFFFF !important;
+  border: 1px solid #EEEEEEEE !important;
+  color: #4A0D4A !important;
+  padding: 10px;
+  border-radius: 6px;
+}
+
+.sortByDd {
+  border: 1px solid #d9d9d9;
+  padding: 10px 30px !important;
+  border-radius: 10px;
+}
+
+.filters_container {
+  border: 1px solid #eeee;
+  border-radius: 12px;
+}
+
+
+.list-toolbar-dropdown {
+  font-weight: 700 !important;
+}
+
+/* Default styles for the filters - visible on larger screens */
+.left-aside-filters {
+  display: block;
+}
+
+/* Mobile screens - Hide filters by default */
+@media (max-width: 767px) {
+  .left-aside-filters {
+    position: fixed;
+    bottom: 0;
+    left: 15px;
+    right: 0;
+    top: 20%;
+    background-color: white;
+    z-index: 9999;
+    transform: translateY(100%);
+    transition: transform 0.3s ease-in-out;
+  }
+
+  /* When the overlay is active, show it */
+  .left-aside-filters.active {
+    transform: translateY(0);
+  }
+
+  /* Optional: Add a background overlay when the filter is open */
+  .overlay {
+    display: block;
+    position: fixed;
+    top: 0;
+    left: 0px;
+    right: 0px;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 9998;
+  }
+}
+
+.filter-sm {
+  padding-top: 15px;
+  border-top-left-radius: 12px;
+  border-top-right-radius: 12px;
+  overflow-y: scroll !important;
+}
+
+
+@media (max-width: 576px) {
+
+
+  .marginMob {
+    margin-top: 25px;
+  }
+}
+
+
+input[type="radio"] {
+  display: none;
+}
+
+label {
+  display: inline-block;
+  padding: 10px;
+  margin: 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+  color: rgba(158, 158, 158, 1);
+}
+
+label:hover {
+  background-color: rgba(74, 13, 74, 0.1);
+  transform: scale(1.05);
+}
+
+input[type="radio"]:checked+label {
+  background-color: rgba(74, 13, 74, 1);
+  color: white;
+  border-radius: 6px;
+}
+
+
+.filterBtn {
+  color: #1B101B;
+  border-radius: 6px !important;
+  border: 1px solid #EBEBEB !important;
+  background: #FFF !important;
+  box-shadow: 1px 1px 6px 0px rgba(22, 22, 22, 0.05) !important;
+  color: #1B101B !important;
+height: 40px; 
+
+}
+
+
+.ToggleView {
+  padding: 10px;
+  background-color: #4A0D4A !important;
+  color: white !important;
+  border-radius: 6px;
+}
+
+.SendMail {
+  background-color: #4A0D4A !important;
+  border-radius: 6px;
+  color: white !important;
+  font-size: 14px;
+}
+
+.transparent-button {
+  background-color: #FFFFFF !important;
+  border: 1px solid #EEEEEEEE !important;
+  color: #4A0D4A !important;
+  padding: 10px;
+  border-radius: 6px;
+  // margin-left: 5px;
+  // margin-right: 5px;
+}
+
+::ng-deep {
+  @media (max-width: 1024px) {
+    .kt-subheader--enabled .kt-content {
+      padding-top: 30px;
+    }
+
+    .kt-container {
+      padding: 0 !important;
+    }
+  }
+}
+
+
+
+
+.list-toolbar-data-summary {
+  color: #9E9E9E;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+@media (min-width: 1024px) {}
+
+::ng-deep {
+
+  @media (max-width: 1024px) {
+    .kt-portlet {
+      margin-top: 0px !important;
+    }
+  }
+
+
+}
+
+::ng-deep .accountsEnt {
+  @media only screen and (min-width: 575px) and (max-width: 1024px) {
+    .modal-dialog {
+      width: 100% !important;
+      right: 10% !important;
+    }
+  }
+
+  @media only screen and (max-width: 575px) {
+    .modal-dialog {
+      width: 97% !important;
+      right: 0% !important;
+    }
+  }
+}
+
+.bodySec {
+  padding: 14px;
+  background: #FFFFFF;
+  border: 1px solid #EEEEEE;
+  box-shadow: 4px 4px 10px rgba(22, 22, 22, 0.15);
+  border-radius: 20px;
+
+}
+
+.fa-file-import {
+  color: #4A0D4A;
+}
+
+.btns-actions{
+  height: 40px;
+}
+
+.w-16{
+  width: 16px;
+}
+.text-grey{
+color: #777777 !important
+}
+
+.gap-4{
+gap: 4px;}
+
+.alarmInfo{
+  width: 20px;
+}

@@ -1,0 +1,65 @@
+<div class="mp-event" *ngIf="block">
+    <div class="mp-event__media ml-2">
+      <img
+        [src]="posterUrl"
+        alt="event"
+        (error)="onImgErr($event)"
+    
+      />
+    </div>
+  
+    <div class="mp-event__body">
+      <div class="mp-event__title" [pTooltip]="block?.name" tooltipPosition="bottom"   [tooltipEvent]="isSmallScreen ? 'focus' : 'hover'" [autoHide]="true" [showDelay]="100" [hideDelay]="100"
+                [tabindex]="isSmallScreen ? 0 : null">
+        {{ block?.name | textSubstring : 15}}
+      </div>
+  
+      <div class="mp-event__row">
+        <div class="mp-ico"><svg width="17" height="17" viewBox="0 0 17 17" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M7.64932 15.3286H1.98091C1.53842 15.3286 1.11405 15.1528 0.801165 14.8399C0.488278 14.527 0.3125 14.1027 0.3125 13.6602V3.64973C0.3125 3.20724 0.488278 2.78287 0.801165 2.46999C1.11405 2.1571 1.53842 1.98132 1.98091 1.98132H11.9913C12.4338 1.98132 12.8582 2.1571 13.1711 2.46999C13.484 2.78287 13.6597 3.20724 13.6597 3.64973V6.98654M12.8255 9.48915V12.826H16.1624" stroke="#4A0D4A" stroke-width="0.625652" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M10.3229 0.312866V3.64968M3.64931 0.312866V3.64968M0.3125 6.98649H13.6597M9.48873 12.8259C9.48873 13.7109 9.84029 14.5596 10.4661 15.1854C11.0918 15.8112 11.9406 16.1627 12.8255 16.1627C13.7105 16.1627 14.5593 15.8112 15.185 15.1854C15.8108 14.5596 16.1624 13.7109 16.1624 12.8259C16.1624 11.9409 15.8108 11.0922 15.185 10.4664C14.5593 9.84065 13.7105 9.4891 12.8255 9.4891C11.9406 9.4891 11.0918 9.84065 10.4661 10.4664C9.84029 11.0922 9.48873 11.9409 9.48873 12.8259Z" stroke="#4A0D4A" stroke-width="0.625652" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            </div>
+        <div class="mp-text">
+          <div class="mp-label">{{'StartDate' | localize}}:</div>
+          <div class="mp-value">
+            {{ block?.fromDate?.toString() | date:'dd MMM, yyyy' }}
+            <span class="mp-muted" *ngIf="block?.fromTime">
+              , {{ block?.fromTime?.toString() | date:'h:mm a' }}
+            </span>
+          </div>
+        </div>
+      </div>
+  
+      <div class="mp-event__row">
+        <div class="mp-ico"><svg width="17" height="17" viewBox="0 0 17 17" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M7.64931 15.3284H1.98091C1.53842 15.3284 1.11405 15.1527 0.801165 14.8398C0.488278 14.5269 0.3125 14.1025 0.3125 13.66V3.64961C0.3125 3.20712 0.488278 2.78275 0.801165 2.46987C1.11405 2.15698 1.53842 1.9812 1.98091 1.9812H11.9913C12.4338 1.9812 12.8582 2.15698 13.1711 2.46987C13.484 2.78275 13.6597 3.20712 13.6597 3.64961V6.98642M12.8255 9.48903V12.8258H16.1624" stroke="#F6851D" stroke-width="0.625652" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M10.3229 0.312866V3.64968M3.64931 0.312866V3.64968M0.3125 6.98649H13.6597M9.48873 12.8259C9.48873 13.7109 9.84029 14.5596 10.4661 15.1854C11.0918 15.8112 11.9406 16.1627 12.8255 16.1627C13.7105 16.1627 14.5593 15.8112 15.185 15.1854C15.8108 14.5596 16.1624 13.7109 16.1624 12.8259C16.1624 11.9409 15.8108 11.0922 15.185 10.4664C14.5593 9.84065 13.7105 9.4891 12.8255 9.4891C11.9406 9.4891 11.0918 9.84065 10.4661 10.4664C9.84029 11.0922 9.48873 11.9409 9.48873 12.8259Z" stroke="#F6851D" stroke-width="0.625652" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            </div>
+        <div class="mp-text">
+          <div class="mp-label">{{'EndDate' | localize}}:</div>
+          <div class="mp-value">
+            {{ block?.toDate?.toString() | date:'dd MMM, yyyy' }}
+            <span class="mp-muted" *ngIf="block?.toTime">
+              , {{ block?.toTime?.toString() | date:'h:mm a' }}
+            </span>
+          </div>
+        </div>
+      </div>
+  
+
+      <button class="mp-btn" type="button" (click)="openEventDetails(block?.id)">
+        {{'Details' | localize }}
+      </button>
+    </div>
+  </div>
+  
+  <!-- fallback if event is missing -->
+  <div class="mp-event mp-event--empty" *ngIf="!block">
+    No event data found in this block.
+  </div>
+
+
+
+

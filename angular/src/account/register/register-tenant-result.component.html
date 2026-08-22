@@ -1,28 +1,46 @@
-<div class="kt-login__form" [@routerTransition]>
-    <h4>{{"SuccessfullyRegistered" | localize}}</h4>
+<div class="kt-login__form Login_container shadow borderDesign" [@routerTransition] style="border: 1px solid #EEEEEE    ;
+border-radius: 20px;
+max-width: 90% !important;
+margin-top: 0px !important;
+padding: 50px 20px;     border-left: 20px solid #4A0D4A;">
+    <h4 class="text-left alarmInfo_title CreatedSuccessfullyLabel font-weight-bold text-black"> 
+        <img src="../../assets/img/input_icons/true.png" class="alarmInfo mr-2"> {{"Your Account Created Successfully" | localize}}</h4>
+    <div class="mt-5">
+        <label class="AccountCredentials font-weight-bold text-black mb-3"> {{"Account Credentials" | localize}} :</label>
 
-    <ul>
-        <li><span class="text-muted">{{"WorkspaceName" | localize}}:</span> {{model.tenancyName}}</li>
-        <li><span class="text-muted">{{"Account Type" | localize}}:</span> {{model.accountType}}</li>
-        <li><span class="text-muted">{{"AccountName" | localize}}:</span> {{model.name}}</li>
-        <li><span class="text-muted">{{"FirstName" | localize}}:</span> {{model.firstName}}</li>
-        <li><span class="text-muted">{{"LastName" | localize}}:</span> {{model.lastName}}</li>
-        <li><span class="text-muted">{{"UserName" | localize}}:</span> {{model.userName}}@{{model.tenancyName}}</li>
-        <li><span class="text-muted">{{"EmailAddress" | localize}}:</span> {{model.emailAddress}}</li>
-    </ul>
+        <ul class="row">
+            <li class="col-4 pl-0"><span class="confirmLabel font-weight-bold text-black pr-2">{{"FirstName" | localize}}:</span><label style="color:#595959">{{model.firstName}} </label></li>
+            <li class="col-6 pl-0"><span class="confirmLabel font-weight-bold text-black pr-2">{{"UserName" | localize}}:</span><label style="color:#595959">{{model.userName}}@{{model.tenancyName}} </label></li>
+            <li class="col-4 pl-0"><span class="confirmLabel font-weight-bold text-black pr-2">{{"LastName" | localize}}:</span><label style="color:#595959"> {{model.lastName}} </label></li>
+            <li class="col-6 pl-0"><span class="confirmLabe font-weight-bold text-black pr-2 l">{{"EmailAddress" | localize}}:</span> <label style="color:#595959">{{model.emailAddress}} </label></li>
+            <!-- <li class="w-100"><span class="confirmLabel"> {{model.accountType?.split(' ')[0]}} {{ "WorkspaceName" |     localize}}:</span> {{model.tenancyName}}</li> -->
+            <!-- <li class="w-60"><span class="confirmLabel">{{"AccountName" | localize}}:</span> {{model.name}}</li> -->
+            <!-- <li class="w-60"><span class="confirmLabel">{{"Account Type" | localize}}:</span> {{model.accountType}}</li> -->
+        </ul>
+    </div>
+</div>
+<div class="kt-login__form Login_container shadow" style="border: 1px solid #EEEEEE    ;
+border-radius: 20px;
+max-width: 90% !important;
+margin-top: 0px !important;
+padding: 50px 20px;">
+    <div class="MB20">
+        <h4 class="text-left alarmInfo_title CreatedSuccessfullyLabel font-weight-bold text-black"> 
+            <img src="../../assets/img/input_icons/alarm.png" class="alarmInfo mr-2"> {{"Confirmation Mail" | localize}}</h4>
+    </div>
+    <!-- <div *ngIf="model.isEmailConfirmationRequired" class="">
+        {{"ConfirmationMailSentPleaseClickLinkInTheEmail1" | localize:model.emailAddress}}
+    </div> -->
+    <div *ngIf="model.isEmailConfirmationRequired" class="">
+        *{{"Confirmation Mail Sent Please Click Link In  The Email" | localize}}
+    </div>
 
-    <div>
-        <div *ngIf="model.isEmailConfirmationRequired" class="alert alert-warning" role="alert">
-            {{"ConfirmationMailSentPleaseClickLinkInTheEmail" | localize:model.emailAddress}}
-        </div>
+    <div *ngIf="!model.isActive" class="">
+        {{"YourAccountIsWaitingToBeActivatedByAdmin" | localize}}
+    </div>
 
-        <div *ngIf="!model.isActive" class="alert alert-primary" role="alert">
-            {{"YourAccountIsWaitingToBeActivatedByAdmin" | localize}}
-        </div>
-
-        <div *ngIf="tenantUrl" class="alert alert-secondary" role="alert">
-            {{"TenantRegistrationLoginInfo" | localize}}<br />
-            <a href="{{tenantUrl}}">{{tenantUrl}}</a>
-        </div>
+    <div *ngIf="tenantUrl" class="mt-5">
+        <label class="ClickToLog font-weight-bold text-black mr-3">{{"TenantRegistrationLoginInfo" | localize}} :</label>
+        <a href="{{tenantUrl}}" class=" font-weight-bold pt-1">{{tenantUrl}}</a>
     </div>
 </div>

@@ -20,18 +20,23 @@ using PayPalCheckoutSdk.Orders;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 using Abp.Runtime.Session;
 using onetouch.Configuration;
- 
+using System.IO;
+using System.Threading.Tasks;
+using Abp.Domain.Entities;
+using System.Collections.Generic;
+using Abp.Threading;
+
 
 namespace onetouch.Migrations.Seed.Host
 {
     public class HostRoleAndUserCreator
     {
         private readonly onetouchDbContext _context;
-         
-        public HostRoleAndUserCreator(onetouchDbContext context )
+
+        public HostRoleAndUserCreator(onetouchDbContext context)
         {
             _context = context;
-           
+
         }
 
         public void Create()
@@ -40,12 +45,229 @@ namespace onetouch.Migrations.Seed.Host
             CreateHostObjectEntityTypes();
             CreateHostCodeStructures();
             CreateHostFileExt();
-            CreateHostSystemData();
+            //CreateHostSystemData();
+            
             CreateHostObjectEntityStatus();
             CreateHostReportSystemData();
             //MMT-Iteration37[Start]
             //CreateMessagesCategories();
             //MMT-Iteration37[End]
+            SeedExtraAttributes();
+            AsyncHelper.RunSync(() => CreateHostSystemData());
+
+        }
+
+        private async Task AddMissingTextsAsync<T>(
+    IQueryable<T> query,
+    string keyPrefix,
+    List<ApplicationLanguage> languages,
+    HashSet<string> existingKeys)
+    where T : class, IEntity<long>
+        {
+            var items = await query.IgnoreQueryFilters().ToListAsync();
+
+            if (!items.Any())
+                return;
+
+            foreach (var item in items)
+            {
+                var id = item.Id;
+                var name = item.GetType().GetProperty("Name")?.GetValue(item)?.ToString();
+
+                if (string.IsNullOrWhiteSpace(name))
+                    continue;
+
+                var baseKey = (keyPrefix + id + "-" + name).Trim().ToUpper();
+
+                foreach (var lang in languages)
+                {
+                    var compositeKey = baseKey + "_" + lang.Name;
+
+                    if (existingKeys.Contains(compositeKey))
+                        continue;
+
+                    _context.LanguageTexts.Add(new ApplicationLanguageText
+                    {
+                        Key = baseKey,
+                        Source = "onetouch",
+                        Value = name,
+                        LanguageName = lang.Name,
+                        TenantId = item.GetType().GetProperty("TenantId")?.GetValue(item) as int?
+                    });
+
+                    existingKeys.Add(compositeKey); // prevent duplicates in same run
+                }
+            }
+        }
+        private async Task CreateHostSystemData()
+        {
+            // ✅ Restrict supported languages
+            var languagesList = await _context.Languages
+                .IgnoreQueryFilters()
+                //.Where(l => l.Name == "en" || l.Name == "ar")
+                .ToListAsync();
+
+            if (!languagesList.Any())
+                return;
+
+            // ✅ Load existing keys once (FAST lookup)
+            var existingKeys = _context.LanguageTexts
+                .IgnoreQueryFilters()
+                .Select(x => x.Key + "_" + x.LanguageName)
+                .ToHashSet();
+
+            await AddMissingTextsAsync(
+                _context.SycEntityObjectTypes,
+                "SYCENTITYOBJECTTYPES-NAME-",
+                languagesList,
+                existingKeys
+            );
+
+            await AddMissingTextsAsync(
+                _context.SycEntityObjectClassifications,
+                "SYCENTITYOBJECTCLASSIFICATIONS-NAME-",
+                languagesList,
+                existingKeys
+            );
+
+            await AddMissingTextsAsync(
+                _context.SycEntityObjectCategories,
+                "SYCENTITYOBJECTCATEGORIES-NAME-",
+                languagesList,
+                existingKeys
+            );
+
+            await _context.SaveChangesAsync();
+        }
+        public void SeedExtraAttributes()
+        {
+            var assetsPath = Path.Combine(Directory.GetCurrentDirectory(), "Assets");
+
+            if (!Directory.Exists(assetsPath))
+                return;
+
+            // 1. Read all XML files and extract ObjectCode and ParentCode
+            var xmlFiles = Directory.GetFiles(assetsPath, "*.xml")
+                .Select(file =>
+                {
+                    var fileInfo = new FileInfo(file);
+
+                    string name = Path.GetFileNameWithoutExtension(file);
+
+                    // Split by double underscore "__"
+                    string objectCode = null;
+                    string parentCode = null;
+                    string code = null;
+                    string remainder = null;
+
+                    var parts = name.Split(new string[] { "_" }, StringSplitOptions.None);
+
+                    if (parts.Length == 4)
+                    {
+                        objectCode = string.IsNullOrWhiteSpace(parts[0]) ? null : parts[0].ToUpper();
+                        parentCode = string.IsNullOrWhiteSpace(parts[1]) ? null : parts[1].ToUpper();
+                        code = string.IsNullOrWhiteSpace(parts[2]) ? null : parts[2].ToUpper();
+                        remainder = parts[3];
+                    }
+                    else
+                    {
+                        return null; // invalid file
+                    }
+
+                    // Extract ParentCode (everything before the last underscore)
+                    //int lastUnderscore = remainder.LastIndexOf('_');
+                    //if (lastUnderscore < 0) return null;
+
+                    //string parentCode = remainder.Substring(0, lastUnderscore).ToUpper();
+
+                    // Determine the effective file time
+                    DateTime? fileTime = TryParseDateTimeFromFileName(name);
+
+                    return new
+                    {
+                        ObjectCode = objectCode,
+                        ParentCode = parentCode,
+                        Code = code,
+                        Path = file,
+                        FileTime = fileTime
+                    };
+                })
+                .Where(x => x != null)
+                // 2. Group by ObjectCode + ParentCode
+                .GroupBy(x => new { x.ObjectCode, x.ParentCode, x.Code })
+                // 3. Pick the file with the latest FileTime in each group
+                .ToDictionary(
+                    g => g.Key,
+                    g => g.OrderByDescending(x => x.FileTime).First()
+                );
+
+            if (!xmlFiles.Any()) return;
+
+            // 2. Load matching DB records
+            var items = _context.SycEntityObjectTypes.ToList();
+
+            // 3. Update ExtraAttributes
+            foreach (var item in items)
+            {
+                var key = new
+                {
+                    ObjectCode = item.ObjectCode == null ? null : item.ObjectCode.ToUpper(),
+                    ParentCode = item.ParentCode == null ? null : item.ParentCode.ToUpper(),
+                    Code = (item.Code ?? "").ToUpper()
+                };
+
+                if (xmlFiles.TryGetValue(key, out var file))
+                {
+                    string xml = File.ReadAllText(file.Path);
+
+                    if (!string.IsNullOrWhiteSpace(xml))
+                    {
+                        // Compare file time with DB record update time
+                        DateTime dbUpdateTime = item.LastModificationTime ?? item.CreationTime;
+
+                        if (file.FileTime > dbUpdateTime || string.IsNullOrEmpty(item.ExtraAttributes))
+                        {
+                            item.ExtraAttributes = xml;
+                            item.LastModificationTime = file.FileTime;
+
+                        }
+                    }
+                }
+            }
+
+            _context.SaveChanges();
+        }
+
+
+        // Custom parser for filenames like "HOST-2021-05-05 064208.6066667"
+        private DateTime? TryParseDateTimeFromFileName(string fileName)
+        {
+            var parts = fileName.Split('_');
+            if (parts.Length < 2)
+                return null;
+
+            string dateTimeStr = string.Join("_", parts.Skip(3)); // "2021-05-05 064208.6066667"
+
+            // Split date and time
+            var dtParts = dateTimeStr.Split(' ');
+            if (dtParts.Length != 2)
+                return null;
+
+            string datePart = dtParts[0]; // "2021-05-05"
+            string timePart = dtParts[1]; // "064208.6066667"
+
+            // Parse as "yyyy-MM-ddHHmmss.fffffff"
+            if (DateTime.TryParseExact(
+                datePart + timePart,
+                "yyyy-MM-ddHHmmss.fffffff",
+                System.Globalization.CultureInfo.InvariantCulture,
+                System.Globalization.DateTimeStyles.None,
+                out DateTime result))
+            {
+                return result;
+            }
+
+            return null;
         }
 
         private void CreateHostRoleAndUsers()
@@ -285,6 +507,36 @@ namespace onetouch.Migrations.Seed.Host
                 _context.SydObjects.Add(sydObjects_Transaction);
                 _context.SaveChanges();
             }
+            //MMT40[Start]
+            var sydObjects_MarketplaceRelationship = _context.SydObjects.IgnoreQueryFilters().FirstOrDefault(
+        r => r.Code == "MARKETPLACECONTACTRELATIONSHIP");
+            if (sydObjects_MarketplaceRelationship == null && ObjectTypeCodeEntity != null && ObjectTypeCodeEntity.Id > 0)
+            {
+                sydObjects_MarketplaceRelationship = new SystemObjects.SydObject
+                {
+                    Code = "MARKETPLACECONTACTRELATIONSHIP",
+                    Name = "Marketplace Contact Relationship",
+                    ObjectTypeCode = ObjectTypeCodeEntity.Code,
+                    ObjectTypeId = ObjectTypeCodeEntity.Id
+                };
+                _context.SydObjects.Add(sydObjects_MarketplaceRelationship);
+                _context.SaveChanges();
+            }
+            //     var sydObjects_Address = _context.SydObjects.IgnoreQueryFilters().FirstOrDefault(
+            //r => r.Code == "ADDRESS");
+            //     if (sydObjects_Address == null && ObjectTypeCodeEntity != null && ObjectTypeCodeEntity.Id > 0)
+            //     {
+            //         sydObjects_Address = new SystemObjects.SydObject
+            //         {
+            //             Code = "ADDRESS",
+            //             Name = "Address",
+            //             ObjectTypeCode = ObjectTypeCodeEntity.Code,
+            //             ObjectTypeId = ObjectTypeCodeEntity.Id
+            //         };
+            //         _context.SydObjects.Add(sydObjects_Address);
+            //         _context.SaveChanges();
+            //     }
+            //MMT40[End]
             //STANDARDFEATURE,STANDARDSUBSCRIPTIONPLAN,TENANTACTIVITYLOG
             var sydObjects_StandardFeature = _context.SydObjects.IgnoreQueryFilters().FirstOrDefault(
        r => r.Code == "STANDARDFEATURE");
@@ -332,9 +584,12 @@ namespace onetouch.Migrations.Seed.Host
             #endregion Add missing SydObjects
 
             #region Add missing sycEntityObjectTypes
-            var parents = "LOOKUP,ITEM,ITEM,ITEM,LISTING,CATEGORY,DEPARTMENT,CLASSIFICATION,CONTACT,CONTACT,CONTACT,CONTACT,CONTACT,CONTACT,CONTACT,SCALE,TRANSACTION,TRANSACTION,LOOKUP,STANDARDFEATURE,STANDARDSUBSCRIPTIONPLAN,TENANTACTIVITYLOG,LOOKUP,TRANSACTION,MESSAGE-DATA,MESSAGE-DATA,MESSAGE-DATA,MESSAGE-DATA".ToUpper().Split(',');
-            var codes = "BACKGROUND,PRODUCTVARIATION,PRODUCT,LISTINGVARIATION,LISTING,CATEGORY,DEPARTMENT,CLASSIFICATION,TenantBranch,TenantAddress,TenantContact,ManualAccount,ManualAccountBranch,ManualAccountAddress,ManualAccountContact,SIZESCALE,SALESORDER,PURCHASEORDER,SHIPVIA,STANDARDFEATURE,STANDARDSUBSCRIPTIONPLAN,TENANTACTIVITYLOG,UOM,ARINVOICE,MESSAGE,COMMENT,REVIEW,QUESTION".ToUpper().Split(',');
-            var names = "Background,Product Variation,Product,Listing Variation,Listing,Category,Department,Classification,Tenant Branch,Tenant Address,Tenant Contact,Manual Account,Manual Account Branch,Manual Account Address,Manual Account Contact,Size Scale,Sales Order,Purchase Order,Ship Via,Standard Feature,Standard Subscription Plan,Tenant Activity Log,Unit Of Measurement,AR Invoice,Message,Comment,Review,Question".Split(',');
+            var parents = "ITEM,CONTACT,CONTACT,LOOKUP,LOOKUP,LOOKUP,ITEM,ITEM,ITEM,LISTING,CATEGORY,DEPARTMENT,CLASSIFICATION,CONTACT,CONTACT,CONTACT,CONTACT,SCALE,TRANSACTION,TRANSACTION,LOOKUP,STANDARDFEATURE,STANDARDSUBSCRIPTIONPLAN,TENANTACTIVITYLOG,LOOKUP,TRANSACTION,MESSAGE-DATA,MESSAGE-DATA,MESSAGE-DATA,MESSAGE-DATA,LOOKUP,LOOKUP,LOOKUP,LOOKUP,MARKETPLACECONTACTRELATIONSHIP,MARKETPLACECONTACTRELATIONSHIP,MARKETPLACECONTACTRELATIONSHIP,MARKETPLACECONTACTRELATIONSHIP,MARKETPLACECONTACTRELATIONSHIP,MARKETPLACECONTACTRELATIONSHIP,MARKETPLACECONTACTRELATIONSHIP,MARKETPLACECONTACTRELATIONSHIP,LOOKUP,MARKETPLACECONTACTRELATIONSHIP,MARKETPLACECONTACTRELATIONSHIP,MARKETPLACECONTACTRELATIONSHIP,MARKETPLACECONTACTRELATIONSHIP,MARKETPLACECONTACTRELATIONSHIP,MARKETPLACECONTACTRELATIONSHIP,MARKETPLACECONTACTRELATIONSHIP,MARKETPLACECONTACTRELATIONSHIP,MARKETPLACECONTACTRELATIONSHIP,MARKETPLACECONTACTRELATIONSHIP,MARKETPLACECONTACTRELATIONSHIP,MARKETPLACECONTACTRELATIONSHIP,MARKETPLACECONTACTRELATIONSHIP".ToUpper().Split(',');
+            var codes = "CHARGES,HOST,TENANT,TRANSACTIONCHARGES,CHARGETYPES,BACKGROUND,PRODUCTVARIATION,PRODUCT,LISTINGVARIATION,LISTING,CATEGORY,DEPARTMENT,CLASSIFICATION,BRANCH,BUSINESS,GROUP,PERSONAL,SIZESCALE,SALESORDER,PURCHASEORDER,SHIPVIA,STANDARDFEATURE,STANDARDSUBSCRIPTIONPLAN,TENANTACTIVITYLOG,UOM,ARINVOICE,MESSAGE,COMMENT,REVIEW,QUESTION,MARKETPLACESECTIONTYPE,MARKETPLACESECTION,MARKETPLACEBLOCKTYPE,MARKETPLACESECTIONBLOCK,P00B,P00G,P00P,B00P,B00G,B00B,G00P,G00B,MARKETPLACECONTACTRELATIONSHIP,S00B,S0SR,S0BO,B00S,B0SR,B0BO,SR0S,SR0B,SRBO,BO0S,BO0B,BOSR,G00G".ToUpper().Split(',');
+            var names = "CHARGES,HOST,TENANT,Transaction Charges,Charge Types,Background,Product Variation,Product,Listing Variation,Listing,Category,Department,Classification,Branch,BUSINESS,Group,Personal,Size Scale,Sales Order,Purchase Order,Ship Via,Standard Feature,Standard Subscription Plan,Tenant Activity Log,Unit Of Measurement,AR Invoice,Message,Comment,Review,Question,Marketplace Section Type,Marketplace Section,Marketplace Block Type,Marketplace Section Block,Person follow Business,Person join Group,Person follow Person,Business hire Person,Business join Group,Business follow Business,Group invite Person,Group invite Business,Marketplace Contact Relationship,Sell to this Buyer,Connect to this Sales agent,Sell to this Buying Office,Buy from this Seller,Buy from this Sales agent,Connect to this Buying agent,Sell on behalf of this Seller,Sell to this Buyer,Connect to this Buying agent,Buy from this Seller,Buy on behalf this Buyer,Connect to this Sales agent,Group follow Group".Split(',');
+            //var parents = "LOOKUP,ITEM,ITEM,ITEM,LISTING,CATEGORY,DEPARTMENT,CLASSIFICATION,CONTACT,CONTACT,CONTACT,CONTACT,SCALE,TRANSACTION,TRANSACTION,LOOKUP,STANDARDFEATURE,STANDARDSUBSCRIPTIONPLAN,TENANTACTIVITYLOG,LOOKUP,TRANSACTION,MESSAGE-DATA,MESSAGE-DATA,MESSAGE-DATA,MESSAGE-DATA,MARKETPLACECONTACTRELATIONSHIP,MARKETPLACECONTACTRELATIONSHIP,MARKETPLACECONTACTRELATIONSHIP,MARKETPLACECONTACTRELATIONSHIP,MARKETPLACECONTACTRELATIONSHIP,MARKETPLACECONTACTRELATIONSHIP,MARKETPLACECONTACTRELATIONSHIP,MARKETPLACECONTACTRELATIONSHIP,LOOKUP".ToUpper().Split(',');
+            //var codes = "BACKGROUND,PRODUCTVARIATION,PRODUCT,LISTINGVARIATION,LISTING,CATEGORY,DEPARTMENT,CLASSIFICATION,BRANCH,BUSINESS,GROUP,PERSONAL,SIZESCALE,SALESORDER,PURCHASEORDER,SHIPVIA,STANDARDFEATURE,STANDARDSUBSCRIPTIONPLAN,TENANTACTIVITYLOG,UOM,ARINVOICE,MESSAGE,COMMENT,REVIEW,QUESTION,PTB,PTG,PTP,BTP,BTG,BTB,GTP,GTB,MARKETPLACECONTACTRELATIONSHIP".ToUpper().Split(',');
+            //var names = "Background,Product Variation,Product,Listing Variation,Listing,Category,Department,Classification,Branch,BUSINESS,Group,Personal,Size Scale,Sales Order,Purchase Order,Ship Via,Standard Feature,Standard Subscription Plan,Tenant Activity Log,Unit Of Measurement,AR Invoice,Message,Comment,Review,Question,Person relation with Business,Person relation with Group,Person relation with Person,Business relation with Person,Business relation with Group,Business relation with Business,Group relation with Person,Group relation with Business,Marketplace Contact Relationship".Split(',');
 
             for (int i = 0; i < codes.Length; i++)
             {
@@ -528,7 +783,75 @@ namespace onetouch.Migrations.Seed.Host
                 }
             }
             //MMT-EntityLog[End]
+            //I49-[Start]
+            ObjectCode = "LOOKUP";
+            codes = "ACTIVE,INACTIVE".ToUpper().Split(',');
+            names = "Active,Inactive".Split(',');
+            for (int i = 0; i < codes.Length; i++)
+            {
+                var sydObjects = _context.SydObjects.IgnoreQueryFilters().FirstOrDefault(
+                    r => r.Code == ObjectCode);
+                if (sydObjects != null && sydObjects.Id > 0)
+                {
+                    var SycEntityObjectStatuses = _context.SycEntityObjectStatuses.IgnoreQueryFilters().FirstOrDefault(
+                        r => r.TenantId == null && r.Code == codes[i] && r.ObjectId == sydObjects.Id);
 
+                    if (sydObjects != null && sydObjects.Id > 0 &&
+                        SycEntityObjectStatuses == null)
+                    {
+                        SycEntityObjectStatuses = new SystemObjects.SycEntityObjectStatus()
+                        {
+                            Code = codes[i],
+                            Name = names[i],
+                            ObjectId = sydObjects.Id,
+                            ObjectCode = sydObjects.Code,
+                            IsDefault = codes[i] == "ACTIVE" ? true : false
+                        };
+                        _context.SycEntityObjectStatuses.Add(SycEntityObjectStatuses);
+                        _context.SaveChanges();
+                    }
+
+                }
+            }
+
+            //MMT-EntityLog[End]
+            //MMT40[Start]
+            ObjectCode = "MARKETPLACECONTACTRELATIONSHIP";
+            codes = "ACTIVE,INACTIVE,PENDING".ToUpper().Split(',');
+            names = "Active,InActive,Pending".Split(',');
+            for (int i = 0; i < codes.Length; i++)
+            {
+                var sydObjects = _context.SydObjects.IgnoreQueryFilters().FirstOrDefault(
+                    r => r.Code == ObjectCode);
+                if (sydObjects != null && sydObjects.Id > 0)
+                {
+                    var SycEntityObjectStatuses = _context.SycEntityObjectStatuses.IgnoreQueryFilters().FirstOrDefault(
+                        r => r.TenantId == null && r.Code == codes[i] && r.ObjectId == sydObjects.Id);
+
+                    if (sydObjects != null && sydObjects.Id > 0 &&
+                        SycEntityObjectStatuses == null)
+                    {
+                        SycEntityObjectStatuses = new SystemObjects.SycEntityObjectStatus()
+                        {
+                            Code = codes[i],
+                            Name = names[i],
+                            ObjectId = sydObjects.Id,
+                            ObjectCode = sydObjects.Code,
+                            IsDefault = codes[i] == "ACTIVE" ? true : false
+
+                        };
+                        _context.SycEntityObjectStatuses.Add(SycEntityObjectStatuses);
+                        _context.SaveChanges();
+                    }
+                }
+            }
+            //MMT40[End]
+
+
+
+
+
+            //I49-[End]
         }
 
         private void CreateHostCodeStructures()
@@ -560,7 +883,7 @@ namespace onetouch.Migrations.Seed.Host
                     //_context.SycEntityObjectTypes.Update(sycEntityObjectType);
                     _context.SaveChanges();
                     bool isAutoGenerated = false;
-                    if ("CATEGORY|DEPARTMENT|CLASSIFICATION|POST|TENANTCONTACT|MANUALACCOUNT|MANUALACCOUNTCONTACT|MANUALACCOUNTBRANCH|".Trim().ToUpper().Contains(sycEntityObjectType.Code.Trim().ToUpper() + "|"))
+                    if ("CATEGORY|DEPARTMENT|CLASSIFICATION|POST|PERSONAL|BRANCH|BUSINESS|MARKETPLACECONTACTRELATIONSHIP|".Trim().ToUpper().Contains(sycEntityObjectType.Code.Trim().ToUpper() + "|"))
                     { isAutoGenerated = true; }
                     bool isVisible = true;
                     if ("CATEGORY|DEPARTMENT|CLASSIFICATION|".Trim().ToUpper().Contains(sycEntityObjectType.Code.Trim().ToUpper() + "|"))
@@ -597,13 +920,13 @@ namespace onetouch.Migrations.Seed.Host
         {
 
             #region Add missing SycAttachmentCategories
-            var type = "1,1,1,1,1,1,0,0,1,0,0,0,1,1,1".ToUpper().Split(',');
-            var maxLength = "5,5,5,5,5,5,NULL,NULL,5,NULL,NULL,NULL,5,5,5".ToUpper().Split(',');
-            var aspectRatio = "1.29,0.772,1:1,200:49,127:100,127:100,NULL,NULL,200:49,NULL,NULL,NULL,200:49,6:5,3:1".ToUpper().Split(',');
-            var entityObjectType = "BACKGROUND,BACKGROUND,PARTNER,PARTNER,PARTNER,PERSON,PRODUCT,MESSAGE,PERSON,PARTNER,NULL,NULL,NULL,NULL,NULL".ToUpper().Split(',');
-            var parent = "NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,IMAGE".ToUpper().Split(',');
-            var codes = "LETTER-LANDSCAPE,LETTER-PORTRAIT,LOGO,BANNER,IMAGE,PHOTO,IMAGE,FILE,COVER-PHOTO,VIDEO,FILE,DEFAULT-IMAGE,COVER,CTASLIDER,AUTOSLIDERQ".ToUpper().Split(',');
-            var names = "Letter Landscape,Letter Portrait,Logo,Banner,Image,Photo,Image,File,Cover Photo,Video,File,Default-image,Cover,CTASlider, AutoSlider".Split(',');
+            var type = "4,1,1,1,1,1,1,0,0,1,0,0,0,1,1,1".ToUpper().Split(',');
+            var maxLength = "5,5,5,5,5,5,5,NULL,NULL,5,NULL,NULL,NULL,5,5,5".ToUpper().Split(',');
+            var aspectRatio = "4:7,1.29,0.772,1:1,200:49,127:100,127:100,NULL,NULL,200:49,NULL,NULL,NULL,200:49,6:5,3:1".ToUpper().Split(',');
+            var entityObjectType = "PRODUCT,BACKGROUND,BACKGROUND,PARTNER,PARTNER,PARTNER,PERSON,PRODUCT,MESSAGE,PERSON,PARTNER,NULL,NULL,NULL,NULL,NULL".ToUpper().Split(',');
+            var parent = "NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,IMAGE".ToUpper().Split(',');
+            var codes = "IMPORT,LETTER-LANDSCAPE,LETTER-PORTRAIT,LOGO,BANNER,IMAGE,PHOTO,IMAGE,FILE,COVER-PHOTO,VIDEO,FILE,DEFAULT-IMAGE,COVER,CTASLIDER,AUTOSLIDERQ".ToUpper().Split(',');
+            var names = "IMpoer Image,Letter Landscape,Letter Portrait,Logo,Banner,Image,Photo,Image,File,Cover Photo,Video,File,Default-image,Cover,CTASlider, AutoSlider".Split(',');
 
             for (int i = 0; i < codes.Length; i++)
             {
@@ -647,9 +970,9 @@ namespace onetouch.Migrations.Seed.Host
 
 
             #region Add missing SycAttachmentCategories
-            var extType = "1,1,1,1".ToUpper().Split(',');
-            var extension = "png,jpg,jpeg,webp".ToUpper().Split(',');
-            var extNames = "PNG,JPG,JPEG,WEBP".Split(',');
+            var extType = "1,1,1,1,1,1,1,1".ToUpper().Split(',');
+            var extension = "png,jpg,jpeg,webp,pdf,mp4,mwv,avi".ToUpper().Split(',');
+            var extNames = "PNG,JPG,JPEG,WEBP,PDF,MP4,WMV,AVI".Split(',');
 
             for (int i = 0; i < extNames.Length; i++)
             {
@@ -675,45 +998,122 @@ namespace onetouch.Migrations.Seed.Host
 
         }
 
-        private void CreateHostSystemData()
-        {
-            #region Add missing SycEntityObjectTypes
-            var keyList = _context.LanguageTexts.Select(e => e.Key).ToList();
+        //private void CreateHostSystemData()
+        //{
+        //    #region Add missing SycEntityObjectTypes
+        //    var keyList = _context.LanguageTexts.Where(z=>z.Key.Contains("SYCENTITYOBJECTTYPES-NAME-")).Select(e => e.Key).ToList();
 
-            var sycEntityObjectTypes = _context.SycEntityObjectTypes.IgnoreQueryFilters().Where(e => !keyList.Contains(("SYCENTITYOBJECTTYPES-NAME-" + e.Id.ToString() + "-" + e.Name).Trim().ToUpper())).ToList();
-            if (sycEntityObjectTypes == null || sycEntityObjectTypes.Count > 0)
-            {
-                var languagesList = _context.Languages.IgnoreQueryFilters().ToList();
-                if (languagesList != null)
-                {
-                    foreach (var sycEntityObjectType in sycEntityObjectTypes)
-                    {
+        //    var sycEntityObjectTypes = _context.SycEntityObjectTypes.IgnoreQueryFilters().Where(e => !keyList.Contains(("SYCENTITYOBJECTTYPES-NAME-" + e.Id.ToString() + "-" + e.Name).Trim().ToUpper())).ToList();
+        //    if (sycEntityObjectTypes == null || sycEntityObjectTypes.Count > 0)
+        //    {
+        //        var languagesList = _context.Languages.IgnoreQueryFilters().ToList();
+        //        if (languagesList != null)
+        //        {
+        //            foreach (var sycEntityObjectType in sycEntityObjectTypes)
+        //            {
 
-                        foreach (var lang in languagesList)
-                        {
-                            var sycEntityObjectTypeExist = _context.LanguageTexts.FirstOrDefaultAsync(x => x.Key == ("SYCENTITYOBJECTTYPES-NAME-" + sycEntityObjectType.Id.ToString() + "-" + sycEntityObjectType.Name).Trim().ToUpper() && x.LanguageName == lang.Name).Result;
-                            if (sycEntityObjectTypeExist == null ||
-                                (sycEntityObjectTypeExist != null && sycEntityObjectTypeExist.Id == 0))
-                            {
-                                ApplicationLanguageText entity = new ApplicationLanguageText();
+        //                foreach (var lang in languagesList)
+        //                {
+        //                    var sycEntityObjectTypeExist = _context.LanguageTexts.FirstOrDefaultAsync(x => x.Key == ("SYCENTITYOBJECTTYPES-NAME-" + sycEntityObjectType.Id.ToString() + "-" + sycEntityObjectType.Name).Trim().ToUpper() && x.LanguageName == lang.Name).Result;
+        //                    if (sycEntityObjectTypeExist == null ||
+        //                        (sycEntityObjectTypeExist != null && sycEntityObjectTypeExist.Id == 0))
+        //                    {
+        //                        ApplicationLanguageText entity = new ApplicationLanguageText();
 
-                                entity.Key = ("SYCENTITYOBJECTTYPES-NAME-" + sycEntityObjectType.Id.ToString() + "-" + sycEntityObjectType.Name).Trim().ToUpper();
-                                entity.Source = "onetouch";
-                                entity.Value = sycEntityObjectType.Name;
-                                entity.LanguageName = lang.Name;
-                                entity.TenantId = sycEntityObjectType.TenantId;
-                                _context.LanguageTexts.Add(entity);
+        //                        entity.Key = ("SYCENTITYOBJECTTYPES-NAME-" + sycEntityObjectType.Id.ToString() + "-" + sycEntityObjectType.Name).Trim().ToUpper();
+        //                        entity.Source = "onetouch";
+        //                        entity.Value = sycEntityObjectType.Name;
+        //                        entity.LanguageName = lang.Name;
+        //                        entity.TenantId = sycEntityObjectType.TenantId;
+        //                        _context.LanguageTexts.Add(entity);
 
-                            }
-                        }
+        //                    }
+        //                }
 
-                    }
-                }
-                _context.SaveChanges();
-            }
-            #endregion SycEntityObjectTypes
+        //            }
+        //        }
+        //        _context.SaveChanges();
+        //    }
+        //    #endregion SycEntityObjectTypes
+        //    #region Add SycEntityObjectClassifications
+        //    keyList = _context.LanguageTexts.Where(z => z.Key.Contains("SYCENTITYOBJECTCLASSIFICATIONS-NAME-")).Select(e => e.Key).ToList();
+        //    var sycEntityObjectClassifications = _context.SycEntityObjectClassifications.IgnoreQueryFilters()
+        //        .Where(e => !keyList.Contains(("SYCENTITYOBJECTCLASSIFICATIONS-NAME-" + e.Id.ToString() + "-" + e.Name).Trim().ToUpper())).ToList();
+        //    if (sycEntityObjectClassifications == null || sycEntityObjectClassifications.Count > 0)
+        //    {
+        //        bool newRecordAdded = false;
+        //        var languagesList = _context.Languages.IgnoreQueryFilters().ToList();
+        //        if (languagesList != null)
+        //        {
+        //            foreach (var sycEntityObjectClassification in sycEntityObjectClassifications)
+        //            {
 
-        }
+        //                foreach (var lang in languagesList)
+        //                {
+        //                    var sycEntityObjectTypeExist = _context.LanguageTexts.IgnoreQueryFilters()
+        //                        .Where(x => x.Key == ("SYCENTITYOBJECTCLASSIFICATIONS-NAME-" + sycEntityObjectClassification.Id.ToString() + "-" + sycEntityObjectClassification.Name).Trim().ToUpper() && x.LanguageName == lang.Name)
+        //                        .FirstOrDefaultAsync().Result;
+        //                    if (sycEntityObjectTypeExist == null ||
+        //                        (sycEntityObjectTypeExist != null && sycEntityObjectTypeExist.Id == 0))
+        //                    {
+        //                        newRecordAdded = true;
+        //                        ApplicationLanguageText entity = new ApplicationLanguageText();
+
+        //                        entity.Key = ("SYCENTITYOBJECTCLASSIFICATIONS-NAME-" + sycEntityObjectClassification.Id.ToString() + "-" + sycEntityObjectClassification.Name).Trim().ToUpper();
+        //                        entity.Source = "onetouch";
+        //                        entity.Value = sycEntityObjectClassification.Name;
+        //                        entity.LanguageName = lang.Name;
+        //                        entity.TenantId = sycEntityObjectClassification.TenantId;
+        //                        _context.LanguageTexts.Add(entity);
+
+        //                    }
+        //                }
+
+        //            }
+        //        }
+        //        if (newRecordAdded ==true)
+        //        _context.SaveChanges();
+        //    }
+        //    #endregion
+        //    #region Add SycEntityObjectCategories
+        //    keyList = _context.LanguageTexts.Where(z => z.Key.Contains("SYCENTITYOBJECTCATEGORIES-NAME-")).Select(e => e.Key).ToList();
+        //    var sycEntityObjectCategories = _context.SycEntityObjectCategories.IgnoreQueryFilters()
+        //        .Where(e => !keyList.Contains(("SYCENTITYOBJECTCATEGORIES-NAME-" + e.Id.ToString() + "-" + e.Name).Trim().ToUpper())).ToList();
+        //    if (sycEntityObjectCategories == null || sycEntityObjectCategories.Count > 0)
+        //    {
+        //        bool newRecordAdded = false;
+        //        var languagesList = _context.Languages.IgnoreQueryFilters().ToList();
+        //        if (languagesList != null)
+        //        {
+        //            foreach (var sycEntityObjectCategory in sycEntityObjectCategories)
+        //            {
+
+        //                foreach (var lang in languagesList)
+        //                {
+        //                    var sycEntityObjectTypeExist = _context.LanguageTexts.IgnoreQueryFilters()
+        //                        .Where(x => x.Key == ("SYCENTITYOBJECTCATEGORIES-NAME-" + sycEntityObjectCategory.Id.ToString() + "-" + sycEntityObjectCategory.Name).Trim().ToUpper() && x.LanguageName == lang.Name).FirstOrDefaultAsync().Result;
+        //                    if (sycEntityObjectTypeExist == null ||
+        //                        (sycEntityObjectTypeExist != null && sycEntityObjectTypeExist.Id == 0))
+        //                    {
+        //                        ApplicationLanguageText entity = new ApplicationLanguageText();
+        //                        newRecordAdded = true;
+        //                        entity.Key = ("SYCENTITYOBJECTCATEGORIES-NAME-" + sycEntityObjectCategory.Id.ToString() + "-" + sycEntityObjectCategory.Name).Trim().ToUpper();
+        //                        entity.Source = "onetouch";
+        //                        entity.Value = sycEntityObjectCategory.Name;
+        //                        entity.LanguageName = lang.Name;
+        //                        entity.TenantId = sycEntityObjectCategory.TenantId;
+        //                        _context.LanguageTexts.Add(entity);
+
+        //                    }
+        //                }
+
+        //            }
+        //        }
+        //        if(newRecordAdded ==true)
+        //        _context.SaveChanges();
+        //    }
+        //    #endregion
+        //}
 
         private void CreateHostReportSystemData()
         {
@@ -737,7 +1137,7 @@ namespace onetouch.Migrations.Seed.Host
 
             //    _context.SaveChanges();
             //}
-          
+
 
             var sycReports = _context.SycReports.IgnoreQueryFilters().Where(e => e.Name == "ProductsCatalogTemplate8").ToList();
             if (sycReports == null || sycReports.Count < 1)
@@ -830,7 +1230,7 @@ namespace onetouch.Migrations.Seed.Host
             }
 
             var sycReports123 = _context.SycReports.IgnoreQueryFilters().Where(e => e.Name == "ProductsCatalogTemplate12").ToList();
-            if (sycReports123== null || sycReports123.Count < 1)
+            if (sycReports123 == null || sycReports123.Count < 1)
             {
                 SycReport sycReport = new SycReport();
                 sycReport.Name = "ProductsCatalogTemplate12";
@@ -870,7 +1270,7 @@ namespace onetouch.Migrations.Seed.Host
         //MMT-Iteration37[Start]
         private void CreateMessagesCategories()
         {
-            var messageObject =  _context.SydObjects.Where(z => z.Code == "MESSAGE" && z.IsDeleted == false).FirstOrDefault();
+            var messageObject = _context.SydObjects.Where(z => z.Code == "MESSAGE" && z.IsDeleted == false).FirstOrDefault();
             if (messageObject != null)
             {
                 var primaryObject = _context.SycEntityObjectCategories.Where(z => z.Code == "PRIMARY-MESSAGE" && z.ObjectId == messageObject.Id).FirstOrDefault();

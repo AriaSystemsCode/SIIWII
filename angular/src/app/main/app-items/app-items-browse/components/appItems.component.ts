@@ -41,6 +41,7 @@ import { MultiSelectionInfo } from "../models/multi-selection-info.model";
 import { ImportStepInfo } from "@shared/components/import-steps/models/ImportStepInfo";
 import { ImportStepsEnum } from "@shared/components/import-steps/models/ImportStepsEnum";
 import { MainImportService } from "@shared/components/import-steps/services/mainImport.service";
+import Swal from "sweetalert2";
 
 @Component({
     selector: "app-app-items",
@@ -91,7 +92,6 @@ export class AppItemsComponent extends AppComponentBase {
     get searchCtrl () { return this.filterForm.get('search') }
     get sortingCtrl () { return this.filterForm.get('sorting') }
     get extraAttributesCtrl () { return this.filterForm.get('extraAttributes') }
-    totalCount:number;
     @ViewChild("ImportProductsModal", { static: true })
     ImportProductsModal: MainImportComponent;
 
@@ -111,6 +111,12 @@ sycAttachmentCategoryLogo :SycAttachmentCategoryDto
     sycAttachmentCategoryBanner :SycAttachmentCategoryDto
     sycAttachmentCategoryImage :SycAttachmentCategoryDto
     acceptedAspectRatio:number=0;
+
+    @Input('fromCta') fromCta :boolean = false
+showOverlay :boolean=false
+
+    currentLang:string
+    isArabic:boolean = true
     constructor(
         injector: Injector,
         private _importService: MainImportService,
@@ -181,6 +187,8 @@ sycAttachmentCategoryLogo :SycAttachmentCategoryDto
     }
 
     ngOnInit(): void {
+                    this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
+        this.currentLang == 'ar' || this.currentLang == 'ar-EG'  ? this.isArabic = true : this.isArabic = false
         this.entityHistoryEnabled = this.setIsEntityHistoryEnabled();
         this.getUserPreferenceForListView();
         this.initFilterForm()
@@ -482,6 +490,7 @@ sycAttachmentCategoryLogo :SycAttachmentCategoryDto
 
     bulkShareItems(){
         this.showMainSpinner()
+        let _result=0;
         this._appItemsServiceProxy
         .shareSelectedProducts(this.filterBody.selectorKey)
         .pipe(
@@ -489,14 +498,38 @@ sycAttachmentCategoryLogo :SycAttachmentCategoryDto
                 this.hideMainSpinner();
             }))
         .subscribe((result) => {
-            debugger
-            this.notify.success(this.l(result+" Item shared"));
+           _result = result;
+            if (_result === 0) {
+                this.notify.success(this.l(_result + " Item shared"));
+                this.reloadPage();
+                return;
+            }
+
+            Swal.fire({
+                title: "",
+                text: _result?.toString() + " of " + this.multiSelectionInfo?.totalCount?.toString() + " products will be shared to the marketplace",
+                icon: "info",
+                confirmButtonText: "OK",
+                customClass: {
+                    popup: "popup-class",
+                    icon: "icon-class",
+                    content: "content-class",
+                    actions: "actions-class",
+                    confirmButton: "confirm-button-class",
+                },
+            }).then((swalResult) => {
+                if (swalResult.isConfirmed) {
+                    this.notify.success(this.l(_result + " Item shared"));
+                }
+            });
+
             this.reloadPage();
             
         });
     }
     bulkSyncItems(){
         this.showMainSpinner()
+        let _result=0;
         this._appItemsServiceProxy
         .syncSelectedProduct(this.filterBody.selectorKey)
         .pipe(
@@ -504,8 +537,31 @@ sycAttachmentCategoryLogo :SycAttachmentCategoryDto
                 this.hideMainSpinner();
             }))
         .subscribe((result) => {
-            debugger
-            this.notify.success(this.l(result+" Item synced"));
+            _result = result;
+            if (_result === 0) {
+                this.notify.success(this.l(_result + " Item synced"));
+                this.reloadPage();
+                return;
+            }
+
+            Swal.fire({
+                title: "",
+                text: _result?.toString() + " of " + this.multiSelectionInfo?.totalCount?.toString() + " products will be synced",
+                icon: "info",
+                confirmButtonText: "OK",
+                customClass: {
+                    popup: "popup-class",
+                    icon: "icon-class",
+                    content: "content-class",
+                    actions: "actions-class",
+                    confirmButton: "confirm-button-class",
+                },
+            }).then((swalResult) => {
+                if (swalResult.isConfirmed) {
+                    this.notify.success(this.l(_result + " Item synced"));
+                }
+            });
+
             this.reloadPage();
         });
     }
@@ -528,8 +584,7 @@ sycAttachmentCategoryLogo :SycAttachmentCategoryDto
         let serviceUtilites=itemsImport;
         let importStepsInfo:ImportStepInfo[];
         importStepsInfo= this._importService.getOriginalImportSteps();
-
-        this.ImportProductsModal.show(ImportTypes.Items,importService,serviceUtilites,["IMAGE"],true,importStepsInfo);
+        this.ImportProductsModal.show(ImportTypes.Items,importService,serviceUtilites,["IMPORT"],true,importStepsInfo);
     }
 
     showImportAvailableInventory(){
@@ -557,6 +612,14 @@ sycAttachmentCategoryLogo :SycAttachmentCategoryDto
         this.ImportProductsModal.show(ImportTypes.Qty,importService,serviceUtilites,null,false,importStepsInfo);
     }
 
+    showImportCustomprices(){
+        let importService=AppItemsServiceProxy;
+        let serviceUtilites=itemsImport;
+        let importStepsInfo:ImportStepInfo[];
+        importStepsInfo= this._importService.getOriginalImportSteps();
+        this.ImportProductsModal.show(ImportTypes.price,importService,serviceUtilites,["IMAGE"],false,importStepsInfo);
+    }
+
     selectAll(){
         this.eventTriggered.emit({ event:AppItemBrowseEvents.SelectAll})
     }
@@ -570,11 +633,14 @@ sycAttachmentCategoryLogo :SycAttachmentCategoryDto
         this.eventTriggered.emit({ event:AppItemBrowseEvents.CancelSelection })
     }
     applySelection(){
-        debugger
+        
         this.eventTriggered.emit({ event:AppItemBrowseEvents.ApplySelection })
     }
     onFinishImport($event) {
         if ($event)
             this.reloadPage();
+    }
+    toggleFilterOverlay(){
+        this.showOverlay = !this.showOverlay
     }
 }

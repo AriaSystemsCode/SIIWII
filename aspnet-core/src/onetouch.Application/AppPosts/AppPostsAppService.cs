@@ -112,6 +112,9 @@ namespace onetouch.AppPosts
                         .WhereIf(!string.IsNullOrEmpty(input.ToCreationDateFilter.ToString())
                         , x => x.CreationTime <= input.ToCreationDateFilter )
                         //Iteration#29,1 MMT News Digest changes[End]
+                        //Iteration#I40 - X527[Start]
+                        .WhereIf(input.TenantId!=null, z=>z.TenantId==input.TenantId)
+                        //Iteration#I40 - X527[End]
                         .WhereIf(!string.IsNullOrWhiteSpace(input.CodeFilter), e => e.Code == input.CodeFilter)
                         .WhereIf(!string.IsNullOrWhiteSpace(input.DescriptionFilter), e => e.Description == input.DescriptionFilter)
                         .WhereIf(!string.IsNullOrWhiteSpace(input.AppContactNameFilter), e => e.AppContactFk != null && e.AppContactFk.Name == input.AppContactNameFilter)
@@ -160,9 +163,18 @@ namespace onetouch.AppPosts
                     }
                     else
                     {
-                        pagedAndFilteredAppPosts = filteredAppPosts
-                        .OrderBy(input.Sorting ?? "id desc")
-                        .PageBy(input);
+                        if (input.TenantId != null)
+                        {
+                            pagedAndFilteredAppPosts = filteredAppPosts
+                            .OrderBy("CreationTime desc")
+                            .PageBy(input);
+                        }
+                        else
+                        {
+                            pagedAndFilteredAppPosts = filteredAppPosts
+                            .OrderBy(input.Sorting ?? "id desc")
+                            .PageBy(input);
+                        }
                     }
                 }
                 else
@@ -171,6 +183,12 @@ namespace onetouch.AppPosts
                     .OrderBy(input.Sorting ?? "id desc")
                     .PageBy(input);
                 }
+                //X527
+                if (input.NoOfPostToReturn != null && input.NoOfPostToReturn != 0)
+                {
+                    pagedAndFilteredAppPosts = pagedAndFilteredAppPosts.Take(int.Parse(input.NoOfPostToReturn.ToString()));
+                }
+                //X527
                 //Iteration#29,1 MMT News Digest changes[Start]
                 var appPosts = from o in pagedAndFilteredAppPosts
                                join o1 in _lookup_appContactRepository.GetAll() on o.AppContactId equals o1.Id into j1
@@ -215,14 +233,31 @@ namespace onetouch.AppPosts
                         o.AppPost.AccountId = currPublishContact.Id;
                         o.AppPost.AccountName = currPublishContact.Name;
                     }
-                    o.AppPost.UserName = UserManager.Users.FirstOrDefault(x => x.Id == o.AppPost.CreatorUserId && x.TenantId == o.AppPost.TenantId).FullName;
+                    var userObj = UserManager.Users.FirstOrDefault(x => x.Id == o.AppPost.CreatorUserId && x.TenantId == o.AppPost.TenantId);
+                    if (userObj != null)
+                    {
+                        o.AppPost.UserName = userObj.FullName;
+                        var profilePictureId = userObj.ProfilePictureId;
+                        if (profilePictureId != null)
+                        { o.AppPost.ProfilePictureId = (Guid)profilePictureId; }
+                    }
                     if (o.AppPost.AccountName == null) {
-                        o.AppPost.AccountName = o.AppPost.TenantId == null ? "" : TenantManager.GetById((int)o.AppPost.TenantId).Name;
+                        o.AppPost.AccountName = "";
+                        if (o.AppPost.TenantId != null)
+                        {
+                            try
+                            {
+                                var tenantObj = TenantManager.GetById((int)o.AppPost.TenantId);
+                                if (tenantObj != null)
+                                    o.AppPost.AccountName = tenantObj.Name;
+                            }
+                            catch { }
+                        }
                     }
                     //o.AppPost.ProfilePictureId = Guid.Parse("7AE60C74-2523-EBAF-BDD5-39FE1E7099B0");
-                    var profilePictureId = UserManager.Users.FirstOrDefault(x => x.Id == o.AppPost.CreatorUserId && x.TenantId == o.AppPost.TenantId).ProfilePictureId;
-                    if (profilePictureId != null)
-                    { o.AppPost.ProfilePictureId = (Guid)profilePictureId; }
+                    //var profilePictureId = UserManager.Users.FirstOrDefault(x => x.Id == o.AppPost.CreatorUserId && x.TenantId == o.AppPost.TenantId).ProfilePictureId;
+                    //if (profilePictureId != null)
+                    //{ o.AppPost.ProfilePictureId = (Guid)profilePictureId; }
                     //string tenant = imagesUrl + o.AppPost.TenantId == null ? "-1" : o.AppPost.TenantId.ToString() + @"/";
                     //o.AttachmentsURLs = o.AttachmentsURLs.Select(r => tenant + r).ToList();
 

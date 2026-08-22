@@ -20,10 +20,17 @@ export class CatalogueReportCoverPageStepComponent extends AppComponentBase  {
   
   selectedAccount: GetAccountForDropdownDto
   // accounts : string[] = []
+          currentLang:string
+      isArabic:boolean = true
   constructor(
     private injector: Injector
   ) {
     super(injector)
+  }
+
+  ngOnInit(){
+        this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
+            this.currentLang == 'ar' || this.currentLang == 'ar-EG'  ? this.isArabic = true : this.isArabic = false
   }
   continueToNextStep() {
     this.continue.emit(true);

@@ -2362,6 +2362,8 @@ namespace onetouch.Migrations
 
                     b.HasIndex("ObjectId");
 
+                    b.HasIndex("TenantOwner");
+
                     b.ToTable("AppEntities", t =>
                         {
                             t.HasTrigger("AppEntities_Trigger");
@@ -2446,6 +2448,9 @@ namespace onetouch.Migrations
                         .HasColumnType("bigint");
 
                     b.Property<bool>("IsDefault")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsPublic")
                         .HasColumnType("bit");
 
                     b.HasKey("Id");
@@ -3185,6 +3190,9 @@ namespace onetouch.Migrations
                     b.Property<long?>("SycIdentifierId")
                         .HasColumnType("bigint");
 
+                    b.Property<decimal>("TaxRate")
+                        .HasColumnType("decimal(18,2)");
+
                     b.Property<int?>("TenantId")
                         .HasColumnType("int");
 
@@ -3237,6 +3245,9 @@ namespace onetouch.Migrations
                     b.Property<long>("AppItemId")
                         .HasColumnType("bigint");
 
+                    b.Property<string>("BuyerSSIN")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Code")
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
@@ -3273,6 +3284,9 @@ namespace onetouch.Migrations
 
                     b.Property<decimal>("Price")
                         .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("SellerSSIN")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int?>("TenantId")
                         .HasColumnType("int");
@@ -3769,6 +3783,135 @@ namespace onetouch.Migrations
                         });
                 });
 
+            modelBuilder.Entity("onetouch.AppMarketplaceContacts.AppMarketplaceAddress", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<long>("AccountId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("AddressLine1")
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
+
+                    b.Property<string>("AddressLine2")
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
+
+                    b.Property<string>("City")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("Code")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("CountryCode")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<long>("CountryId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("CreationTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long?>("CreatorUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long?>("DeleterUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime?>("DeletionTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("LastModificationTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long?>("LastModifierUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("Name")
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
+
+                    b.Property<string>("PostalCode")
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<string>("State")
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<int?>("TenantId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("TimeStamp")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CountryId");
+
+                    b.ToTable("AppMarketplaceAddresses", t =>
+                        {
+                            t.HasTrigger("AppMarketplaceAddresses_Trigger");
+                        });
+                });
+
+            modelBuilder.Entity("onetouch.AppMarketplaceContacts.AppMarketplaceContactAddress", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("AddressCode")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<long>("AddressId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("AddressTypeCode")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<long>("AddressTypeId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("ContactCode")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<long>("ContactId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("TimeStamp")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AddressId");
+
+                    b.HasIndex("AddressTypeId");
+
+                    b.HasIndex("ContactId");
+
+                    b.ToTable("AppMarketplaceContactAddresses", t =>
+                        {
+                            t.HasTrigger("AppMarketplaceContactAddresses_Trigger");
+                        });
+                });
+
             modelBuilder.Entity("onetouch.AppMarketplaceItemLists.AppMarketplaceItemsListDetails", b =>
                 {
                     b.Property<long>("Id")
@@ -3824,6 +3967,9 @@ namespace onetouch.Migrations
 
                     b.Property<long>("AppMarketplaceItemId")
                         .HasColumnType("bigint");
+
+                    b.Property<string>("BuyerSSIN")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Code")
                         .HasMaxLength(50)
@@ -4529,6 +4675,9 @@ namespace onetouch.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<long?>("LastModifierUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long?>("RelationId")
                         .HasColumnType("bigint");
 
                     b.Property<long>("TransactionId")
@@ -7244,6 +7393,9 @@ namespace onetouch.Migrations
                     b.Property<Guid?>("ProfilePictureId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<int>("RelatedTenantId")
+                        .HasColumnType("int");
+
                     b.Property<bool>("ShouldChangePasswordOnNextLogin")
                         .HasColumnType("bit");
 
@@ -7269,6 +7421,197 @@ namespace onetouch.Migrations
                         });
 
                     b.HasDiscriminator().HasValue("User");
+                });
+
+            modelBuilder.Entity("onetouch.AppContacts.AppContactRelationshipInfo", b =>
+                {
+                    b.HasBaseType("onetouch.AppEntities.AppEntity");
+
+                    b.Property<bool>("ConsiderAsTeamMember")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("RecipientContactName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("RecipientContactSSIN")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("RecipientContactTypeCode")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<long>("RecipientContactTypeId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("RecipientMarketplaceRole")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("RelationshipCreationDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("RelationshipEndDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("RelationshipStartDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("RequesterContactName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("RequesterContactSSIN")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("RequesterContactTypeCode")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<long>("RequesterContactTypeId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("RequesterMarketplaceRole")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("SharingLevel")
+                        .HasColumnType("int");
+
+                    b.ToTable("AppContactRelationshipInfo", t =>
+                        {
+                            t.HasTrigger("AppContactRelationshipInfo_Trigger");
+                        });
+                });
+
+            modelBuilder.Entity("onetouch.AppMarketplaceContacts.AppMarketplaceContact", b =>
+                {
+                    b.HasBaseType("onetouch.AppEntities.AppEntity");
+
+                    b.Property<long?>("AccountId")
+                        .HasMaxLength(50)
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("AccountType")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<long>("AccountTypeId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long?>("AppMarketplaceContactId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("CurrencyCode")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<long?>("CurrencyId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("EMailAddress")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<bool>("IsProfileData")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("LanguageCode")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<long?>("LanguageId")
+                        .HasMaxLength(50)
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("ParentCode")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<long?>("ParentId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("Phone1CountryKey")
+                        .HasMaxLength(10)
+                        .HasColumnType("nvarchar(10)");
+
+                    b.Property<string>("Phone1Ext")
+                        .HasMaxLength(10)
+                        .HasColumnType("nvarchar(10)");
+
+                    b.Property<string>("Phone1Number")
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<long?>("Phone1TypeId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("Phone1TypeName")
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
+
+                    b.Property<string>("Phone2CountryKey")
+                        .HasMaxLength(10)
+                        .HasColumnType("nvarchar(10)");
+
+                    b.Property<string>("Phone2Ext")
+                        .HasMaxLength(10)
+                        .HasColumnType("nvarchar(10)");
+
+                    b.Property<string>("Phone2Number")
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<long?>("Phone2TypeId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("Phone2TypeName")
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
+
+                    b.Property<string>("Phone3CountryKey")
+                        .HasMaxLength(10)
+                        .HasColumnType("nvarchar(10)");
+
+                    b.Property<string>("Phone3Ext")
+                        .HasMaxLength(10)
+                        .HasColumnType("nvarchar(10)");
+
+                    b.Property<string>("Phone3Number")
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<long?>("Phone3TypeId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("Phone3TypeName")
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
+
+                    b.Property<int>("SharingLevel")
+                        .HasColumnType("int");
+
+                    b.Property<string>("TradeName")
+                        .IsRequired()
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
+
+                    b.Property<string>("Website")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.HasIndex("AppMarketplaceContactId");
+
+                    b.HasIndex("CurrencyId");
+
+                    b.HasIndex("LanguageId");
+
+                    b.HasIndex("ParentId");
+
+                    b.HasIndex("Phone1TypeId");
+
+                    b.HasIndex("Phone2TypeId");
+
+                    b.HasIndex("Phone3TypeId");
+
+                    b.ToTable("AppMarketplaceContacts", t =>
+                        {
+                            t.HasTrigger("AppMarketplaceContacts_Trigger");
+                        });
                 });
 
             modelBuilder.Entity("onetouch.AppMarketplaceItemLists.AppMarketplaceItemLists", b =>
@@ -7309,6 +7652,9 @@ namespace onetouch.Migrations
 
                     b.Property<long>("StockAvailability")
                         .HasColumnType("bigint");
+
+                    b.Property<decimal>("TaxRate")
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("Variations")
                         .HasColumnType("nvarchar(max)");
@@ -8289,11 +8635,19 @@ namespace onetouch.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("onetouch.MultiTenancy.Tenant", "TenantOwnerFk")
+                        .WithMany()
+                        .HasForeignKey("TenantOwner")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("EntityObjectStatusFk");
 
                     b.Navigation("EntityObjectTypeFk");
 
                     b.Navigation("ObjectFk");
+
+                    b.Navigation("TenantOwnerFk");
                 });
 
             modelBuilder.Entity("onetouch.AppEntities.AppEntityAddress", b =>
@@ -8440,6 +8794,8 @@ namespace onetouch.Migrations
                     b.Navigation("EntityObjectStatusFk");
 
                     b.Navigation("EntityObjectTypeFk");
+
+                    b.Navigation("ObjectFk");
                 });
 
             modelBuilder.Entity("onetouch.AppEntities.AppEntityRating", b =>
@@ -8736,6 +9092,44 @@ namespace onetouch.Migrations
                     b.Navigation("ItemFK");
 
                     b.Navigation("ItemsListFK");
+                });
+
+            modelBuilder.Entity("onetouch.AppMarketplaceContacts.AppMarketplaceAddress", b =>
+                {
+                    b.HasOne("onetouch.AppEntities.AppEntity", "CountryFk")
+                        .WithMany()
+                        .HasForeignKey("CountryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("CountryFk");
+                });
+
+            modelBuilder.Entity("onetouch.AppMarketplaceContacts.AppMarketplaceContactAddress", b =>
+                {
+                    b.HasOne("onetouch.AppMarketplaceContacts.AppMarketplaceAddress", "AddressFk")
+                        .WithMany()
+                        .HasForeignKey("AddressId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("onetouch.AppEntities.AppEntity", "AddressTypeFk")
+                        .WithMany()
+                        .HasForeignKey("AddressTypeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("onetouch.AppMarketplaceContacts.AppMarketplaceContact", "ContactFk")
+                        .WithMany("ContactAddresses")
+                        .HasForeignKey("ContactId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("AddressFk");
+
+                    b.Navigation("AddressTypeFk");
+
+                    b.Navigation("ContactFk");
                 });
 
             modelBuilder.Entity("onetouch.AppMarketplaceItemLists.AppMarketplaceItemsListDetails", b =>
@@ -9359,6 +9753,64 @@ namespace onetouch.Migrations
                     b.Navigation("LastModifierUser");
                 });
 
+            modelBuilder.Entity("onetouch.AppContacts.AppContactRelationshipInfo", b =>
+                {
+                    b.HasOne("onetouch.AppEntities.AppEntity", null)
+                        .WithOne()
+                        .HasForeignKey("onetouch.AppContacts.AppContactRelationshipInfo", "Id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("onetouch.AppMarketplaceContacts.AppMarketplaceContact", b =>
+                {
+                    b.HasOne("onetouch.AppMarketplaceContacts.AppMarketplaceContact", null)
+                        .WithMany("PartnerFkList")
+                        .HasForeignKey("AppMarketplaceContactId");
+
+                    b.HasOne("onetouch.AppEntities.AppEntity", "CurrencyFk")
+                        .WithMany()
+                        .HasForeignKey("CurrencyId");
+
+                    b.HasOne("onetouch.AppEntities.AppEntity", null)
+                        .WithOne()
+                        .HasForeignKey("onetouch.AppMarketplaceContacts.AppMarketplaceContact", "Id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("onetouch.AppEntities.AppEntity", "LanguageFk")
+                        .WithMany()
+                        .HasForeignKey("LanguageId");
+
+                    b.HasOne("onetouch.AppMarketplaceContacts.AppMarketplaceContact", "ParentFk")
+                        .WithMany("ParentFkList")
+                        .HasForeignKey("ParentId");
+
+                    b.HasOne("onetouch.AppEntities.AppEntity", "Phone1TypeFk")
+                        .WithMany()
+                        .HasForeignKey("Phone1TypeId");
+
+                    b.HasOne("onetouch.AppEntities.AppEntity", "Phone2TypeFk")
+                        .WithMany()
+                        .HasForeignKey("Phone2TypeId");
+
+                    b.HasOne("onetouch.AppEntities.AppEntity", "Phone3TypeFk")
+                        .WithMany()
+                        .HasForeignKey("Phone3TypeId");
+
+                    b.Navigation("CurrencyFk");
+
+                    b.Navigation("LanguageFk");
+
+                    b.Navigation("ParentFk");
+
+                    b.Navigation("Phone1TypeFk");
+
+                    b.Navigation("Phone2TypeFk");
+
+                    b.Navigation("Phone3TypeFk");
+                });
+
             modelBuilder.Entity("onetouch.AppMarketplaceItemLists.AppMarketplaceItemLists", b =>
                 {
                     b.HasOne("onetouch.AppEntities.AppEntity", null)
@@ -9712,6 +10164,15 @@ namespace onetouch.Migrations
                     b.Navigation("OrganizationUnits");
 
                     b.Navigation("Tokens");
+                });
+
+            modelBuilder.Entity("onetouch.AppMarketplaceContacts.AppMarketplaceContact", b =>
+                {
+                    b.Navigation("ContactAddresses");
+
+                    b.Navigation("ParentFkList");
+
+                    b.Navigation("PartnerFkList");
                 });
 
             modelBuilder.Entity("onetouch.AppMarketplaceItemLists.AppMarketplaceItemLists", b =>

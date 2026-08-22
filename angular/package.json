@@ -1,16 +1,16 @@
 {
   "name": "siwii",
   "uniqueName": "SIWII",
-  "version": "8.7.54",
+  "version": "8.7.61",
   "license": "MIT",
   "angular-cli": {},
   "scripts": {
     "ng": "ng",
     "publish": "gulp build && ng build --configuration production",
     "prepublish": "npm --no-git-tag-version version patch",
-    "start": "gulp buildDev && ng serve --host 0.0.0.0 --port 4203",
-    "start-dev": "ng serve --host 0.0.0.0 --port 4203",
-    "hmr": "gulp buildDev && ng serve --host 0.0.0.0 --port 4203--hmr",
+    "start": "gulp buildDev && ng serve --host 0.0.0.0 --port 4200",
+    "start-dev": "ng serve --host 0.0.0.0 --port 4200",
+    "hmr": "gulp buildDev && ng serve --host 0.0.0.0 --port 4200 --hmr",
     "test": "gulp buildDev && ng test",
     "pree2e": "webdriver-manager update --standalone false --gecko false",
     "e2e": "gulp buildDev && protractor",
@@ -30,6 +30,7 @@
     "@angular/platform-browser-dynamic": "^15.2.2",
     "@angular/platform-server": "^15.2.2",
     "@angular/router": "^15.2.2",
+    "@babel/runtime": "^7.20.13",
     "@devexpress/analytics-core": "^22.2.4",
     "@fullcalendar/core": "^6.1.4",
     "@googlemaps/js-api-loader": "^1.14.3",
@@ -53,6 +54,7 @@
     "devexpress-reporting-angular": "^22.2.4",
     "devextreme": "^22.2.4",
     "famfamfam-flags": "^1.0.0",
+    "fast-uri": "^3.1.0",
     "file-saver": "^2.0.2",
     "google-libphonenumber": "^3.2.10",
     "google-maps": "^4.3.3",
@@ -76,6 +78,7 @@
     "ngx-spinner": "^15.0.1",
     "ngx-treeview": "^10.0.2",
     "object-path": "^0.11.4",
+    "pdfjs-dist": "^5.7.284",
     "primeicons": "^6.0.1",
     "primeng": "^15.2.0",
     "push.js": "^1.0.12",
@@ -91,7 +94,7 @@
     "zone.js": "^0.13.0"
   },
   "devDependencies": {
-    "@angular-devkit/build-angular": "^15.0.5",
+    "@angular-devkit/build-angular": "^15.2.11",
     "@angular/cli": "^16.1.0",
     "@angular/compiler-cli": "^15.2.2",
     "@angularclass/hmr": "^3.0.0",
@@ -123,7 +126,8 @@
     "protractor": "^3.3.0",
     "ts-node": "^10.9.1",
     "tslint": "~6.1.0",
-    "typescript": "4.9.5"
+    "typescript": "4.9.5",
+    "webpack": "^5.106.2"
   },
   "resolutions": {
     "webpack": "^5.0.0"

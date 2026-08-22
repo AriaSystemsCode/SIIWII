@@ -2,8 +2,9 @@ import { Component, ElementRef, Injector, Input, OnInit, ViewChild } from '@angu
 import { finalize } from 'rxjs';
 import { AppComponentBase } from '@shared/common/app-component-base';
 import { FileUploaderCustom } from '@shared/components/import-steps/models/FileUploaderCustom.model';
-import { AppEntityAttachmentDto, CreateMessageInput, MesasgeObjectType, MessageServiceProxy, SycAttachmentCategoryDto } from '@shared/service-proxies/service-proxies';
-import { ImageUploadComponentOutput } from '@app/shared/common/image-upload/image-upload.component';
+import { AppEntityAttachmentDto, CreateMessageInput, MesasgeObjectType, MessageServiceProxy } from '@shared/service-proxies/service-proxies';
+import { UpdateLogoService } from '@shared/utils/update-logo.service';
+
 
 @Component({
   selector: 'app-questions',
@@ -40,8 +41,11 @@ export class QuestionsComponent extends AppComponentBase implements OnInit {
     '👍', '👎', '👏', '🙌', '🙏', '🤝', '💪', '👀', '👋', '🤙'
   ];
   onlyMsg:boolean = false
-
-  constructor(injector: Injector, private messageServiceProxy: MessageServiceProxy
+  isAuthenticated = this.appSession?.user
+  currentLang:string
+  isArabic:boolean
+  profilePicture
+  constructor(injector: Injector, private messageServiceProxy: MessageServiceProxy, private updateLogoService: UpdateLogoService,
 
   ) {
     super(injector);
@@ -49,6 +53,11 @@ export class QuestionsComponent extends AppComponentBase implements OnInit {
   }
 
   ngOnInit() {
+     this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
+        this.currentLang == 'ar' || this.currentLang == 'ar-EG'  ? this.isArabic = true : this.isArabic = false
+          if(this.isAuthenticated){
+      this.getProfilePicture()
+    }
     this.getAllQuestions()
   }
 
@@ -69,37 +78,8 @@ export class QuestionsComponent extends AppComponentBase implements OnInit {
 
 
 
-
-  isUserReviewedEntityBefore() {
-    // this.showMainSpinner()
-    // const subs = this.messageServiceProxy
-    //   .isUserReviewedEntityBefore(
-    //     this.entityID
-
-    //   )
-    //   .pipe(
-    //     finalize(() => {
-    //       this.hideMainSpinner()
-    //     })
-    //   )
-    //   .subscribe((result) => {
-    //     if (result) {
-    //       this.SuccessMsg = true
-
-    //     } else {
-          this.postQuestion()
-    //     }
-    //   });
-
-    // this.subscriptions.push(subs);
-  }
-
-
-
   getAllQuestions() {
  
-
-
     this.showMainSpinner();
     const subs = this.messageServiceProxy
       .getAllQuestions (
@@ -295,4 +275,12 @@ export class QuestionsComponent extends AppComponentBase implements OnInit {
     }, 1000); // ⏱ 2-second delay (2000 milliseconds)
 
   }
+
+        getProfilePicture(): void {
+        this.updateLogoService.profilePictureUpdated$.subscribe((res) => {
+            this.profilePicture = res;
+        });
+
+    }
+
 }

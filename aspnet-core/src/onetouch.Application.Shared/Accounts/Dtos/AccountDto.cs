@@ -1,6 +1,9 @@
 ﻿using Abp.Application.Services.Dto;
 using onetouch.AccountInfos.Dtos;
+using onetouch.AppItems.Dtos;
 using onetouch.Common;
+using onetouch.SystemObjects.Dtos;
+using System;
 using System.Collections.Generic;
 
 namespace onetouch.Accounts.Dtos
@@ -8,8 +11,9 @@ namespace onetouch.Accounts.Dtos
     public class AccountDto : EntityDto<long>
     {
 		public string Name { get; set; }
-
-		public string Description { get; set; }
+        public bool ShowSync { get; set; }
+        public int TenantId { get; set; }
+        public string Description { get; set; }
 
 		public int Connections { get; set; }
 
@@ -71,6 +75,11 @@ namespace onetouch.Accounts.Dtos
         public virtual long? ShipViaId { set; get; }
         public virtual long? PaymentTermsId { set; get; }
         public virtual string Code { set; get; }
+        public virtual long? CurrencyId { set; get; }
+        public virtual string CurrencyCode { set; get; }
+        public virtual string CurrencyName { set; get; }
+        //I49[Start]
+        public virtual string MarketplaceAccountRole{ get; set; }
         //I46[End]
     }
 }

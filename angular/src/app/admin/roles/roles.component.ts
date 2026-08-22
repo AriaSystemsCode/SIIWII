@@ -10,7 +10,58 @@ import { finalize } from 'rxjs/operators';
 import { PermissionTreeModalComponent } from '../shared/permission-tree-modal.component';
 @Component({
     templateUrl: './roles.component.html',
-    animations: [appModuleAnimation()]
+    animations: [appModuleAnimation()],
+      styles: [`
+    .body-sec {
+      background-color: #fff;
+      border-radius: 6px;
+      min-height: 100vh;
+      padding: 17px;
+    }
+
+    @media (min-width: 1024px) {
+      .addMT {
+        margin-top: 140px;
+      }
+    }
+
+    @media (max-width: 540px) {
+      .addMTMob {
+        margin-top: 75px;
+      }
+    }
+
+    .alignStart{
+    text-align: start !important ;
+    }
+
+
+    .w-150  {
+    width : 150px ;
+    }
+
+     .wPX100  {
+    width : 100px;
+    }
+
+
+     .w-250  {
+    width : 250px ;
+    }
+
+       .w-130  {
+    width : 130px ;
+    }
+
+      .btn-primary {
+        background-color: #4A0D4A !important;
+        color: #fff !important;
+        border: 1px solid #4A0D4A !important;
+    }
+        .h-100vh {
+      min-height: 100vh;
+        }
+  `]
 })
 export class RolesComponent extends AppComponentBase implements OnInit {
 
@@ -22,6 +73,8 @@ export class RolesComponent extends AppComponentBase implements OnInit {
     _entityTypeFullName = 'onetouch.Authorization.Roles.Role';
     entityHistoryEnabled = false;
 
+            currentLang: string = 'en';
+    isArabic: boolean = false;
     constructor(
         injector: Injector,
         private _roleService: RoleServiceProxy
@@ -30,6 +83,8 @@ export class RolesComponent extends AppComponentBase implements OnInit {
     }
 
     ngOnInit(): void {
+             this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
+        this.currentLang == 'ar' || this.currentLang == 'ar-EG'  ? this.isArabic = true : this.isArabic = false
         this.setIsEntityHistoryEnabled();
     }
 

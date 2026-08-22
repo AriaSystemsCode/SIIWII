@@ -15,6 +15,7 @@ namespace onetouch.AppEntities.Dtos
 
         public string ExtraDataFilter { get; set; }
 
+        public bool IncludeExtraDataFilter { get; set; } = false;
 
         public string SycEntityObjectTypeNameFilter { get; set; }
 

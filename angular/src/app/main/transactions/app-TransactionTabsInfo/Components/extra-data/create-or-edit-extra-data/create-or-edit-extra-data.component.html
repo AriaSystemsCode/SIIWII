@@ -5,7 +5,7 @@
       <div class="header p-2 my-2 d-flex justify-content-between">
 
         <app-dynamicInputs [extraAttributeObject]="extraAttributeObject" [entityObjectTypeId]="114"
-          [entityType]="'Transaction'" [appTransactionsForViewDto]="appTransactionsForViewDto"
+          [entityType]="'Transaction'" [dynamicInputsForViewDto]="appTransactionsForViewDto"
           (extraDataCleared)="onExtraAttributeCleared($event)" (extraDataChanged)="onExtraAttributesChanged($event)">
 
         </app-dynamicInputs>
@@ -36,16 +36,16 @@
 
 
   <div class="container-fluid pt-1 mb-3 " [ngClass]="createOrEditExtraData ?  'd-block' : 'd-none'">
-    <div class="header p-2 my-2 d-flex  justify-content-end pr-3">
+    <div class="header p-2 m-2 d-flex  justify-content-end gap-5">
       <button class="continuebtn text-center btn float-right" (click)="saveExtra()" *ngIf="!showSaveBtn">
         {{l("Continue")}}
       </button>
       <button *ngIf="showSaveBtn" (click)="cancel();" class="cancelbtn text-center btn ">
-        Cancel
+       {{l("Cancel")}}
 
       </button>
       <button *ngIf="showSaveBtn" (click)="save();" class="previewbtn text-center btn ">
-        Save
+     {{l("Save")}}
 
       </button>
     </div>

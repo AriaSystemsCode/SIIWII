@@ -19,7 +19,7 @@
         </div>
         <!-- display top people name with link to the contact page -->
         <div class="single-item-body col" [ngClass]="true ? '' : 'd-flex flex-row'">
-          <div class="text-blue text-underline">
+          <div class="text-blue">
 
             <a *ngIf="item?.accountId>0" href="javascript:;"
               [routerLink]="[ '/app/main/marketplace/contacts/view',item?.accountId ]">{{item?.userName}}</a>

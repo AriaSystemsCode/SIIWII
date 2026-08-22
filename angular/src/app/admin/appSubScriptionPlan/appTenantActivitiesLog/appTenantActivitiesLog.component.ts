@@ -1,12 +1,7 @@
-﻿import {AppConsts} from '@shared/AppConsts';
-import { Component, Injector, ViewEncapsulation, ViewChild } from '@angular/core';
-import { ActivatedRoute , Router} from '@angular/router';
-import { AppTenantActivitiesLogServiceProxy, AppTenantActivityLogDto  } from '@shared/service-proxies/service-proxies';
-import { AbpSessionService, NotifyService } from 'abp-ng2-module';
+﻿import { Component, Injector, ViewEncapsulation, ViewChild, Input } from '@angular/core';
+import { Router } from '@angular/router';
+import { AppTenantActivitiesLogServiceProxy, AppTenantActivityLogDto } from '@shared/service-proxies/service-proxies';
 import { AppComponentBase } from '@shared/common/app-component-base';
-import { TokenAuthServiceProxy } from '@shared/service-proxies/service-proxies';
-
-
 import { appModuleAnimation } from '@shared/animations/routerTransition';
 import { Table } from 'primeng/table';
 import { Paginator } from 'primeng/paginator';
@@ -20,103 +15,94 @@ import { DateType } from 'devextreme/ui/date_box';
 
 
 @Component({
-    selector:'app-tenantactivitieslog',
+    selector: 'app-tenantactivitieslog',
     templateUrl: './appTenantActivitiesLog.component.html',
     encapsulation: ViewEncapsulation.None,
     animations: [appModuleAnimation()], 
     styles: [`
         .searchBtn {
     background: #4A0D4A !important;
-    margin-top: 3px !important;color:#595959;
+    margin-top: 0px !important;color:#595959;
 }
     `]
 })
 export class AppTenantActivitiesLogComponent extends AppComponentBase {
-    
-    
+
+
     @ViewChild('entityTypeHistoryModal', { static: true }) entityTypeHistoryModal: EntityTypeHistoryModalComponent;
-       
-    
     @ViewChild('dataTable', { static: true }) dataTable: Table;
     @ViewChild('paginator', { static: true }) paginator: Paginator;
-
+@Input('fromBilling') fromBilling: boolean = false
     advancedFiltersAreShown = false;
     filterText = '';
-    //maxTenantIdFilter : number;
-		maxTenantIdFilterEmpty : number;
-		//minTenantIdFilter : number;
-		minTenantIdFilterEmpty : number;
+    maxTenantIdFilterEmpty: number;
+    minTenantIdFilterEmpty: number;
     tenantNameFilter = '';
-    maxUserIdFilter : number;
-		maxUserIdFilterEmpty : number;
-		minUserIdFilter : number;
-		minUserIdFilterEmpty : number;
+    maxUserIdFilter: number;
+    maxUserIdFilterEmpty: number;
+    minUserIdFilter: number;
+    minUserIdFilterEmpty: number;
     activityTypeFilter = '';
-    maxAppSubscriptionPlanHeaderIdFilter : number;
-		maxAppSubscriptionPlanHeaderIdFilterEmpty : number;
-		minAppSubscriptionPlanHeaderIdFilter : number;
-		minAppSubscriptionPlanHeaderIdFilterEmpty : number;
+    maxAppSubscriptionPlanHeaderIdFilter: number;
+    maxAppSubscriptionPlanHeaderIdFilterEmpty: number;
+    minAppSubscriptionPlanHeaderIdFilter: number;
+    minAppSubscriptionPlanHeaderIdFilterEmpty: number;
     appSubscriptionPlanCodeFilter = '';
-    maxActivityDateTimeFilter : moment.Moment;
-		minActivityDateTimeFilter : moment.Moment;
+    maxActivityDateTimeFilter: moment.Moment;
+    minActivityDateTimeFilter: moment.Moment;
     userNameFilter = '';
     featureCodeFilter = '';
     featureNameFilter = '';
     billableFilter = -1;
     invoicedFilter = -1;
     referenceFilter = '';
-    maxQtyFilter : number;
-		maxQtyFilterEmpty : number;
-		minQtyFilter : number;
-		minQtyFilterEmpty : number;
-    maxConsumedQtyFilter : number;
-		maxConsumedQtyFilterEmpty : number;
-		minConsumedQtyFilter : number;
-		minConsumedQtyFilterEmpty : number;
-    maxRemainingQtyFilter : number;
-		maxRemainingQtyFilterEmpty : number;
-		minRemainingQtyFilter : number;
-		minRemainingQtyFilterEmpty : number;
-    maxPriceFilter : number;
-		maxPriceFilterEmpty : number;
-		minPriceFilter : number;
-		minPriceFilterEmpty : number;
-    maxAmountFilter : number;
-		maxAmountFilterEmpty : number;
-		minAmountFilter : number;
-		minAmountFilterEmpty : number;
-    maxInvoiceDateFilter : moment.Moment;
-		minInvoiceDateFilter : moment.Moment;
+    maxQtyFilter: number;
+    maxQtyFilterEmpty: number;
+    minQtyFilter: number;
+    minQtyFilterEmpty: number;
+    maxConsumedQtyFilter: number;
+    maxConsumedQtyFilterEmpty: number;
+    minConsumedQtyFilter: number;
+    minConsumedQtyFilterEmpty: number;
+    maxRemainingQtyFilter: number;
+    maxRemainingQtyFilterEmpty: number;
+    minRemainingQtyFilter: number;
+    minRemainingQtyFilterEmpty: number;
+    maxPriceFilter: number;
+    maxPriceFilterEmpty: number;
+    minPriceFilter: number;
+    minPriceFilterEmpty: number;
+    maxAmountFilter: number;
+    maxAmountFilterEmpty: number;
+    minAmountFilter: number;
+    minAmountFilterEmpty: number;
+    maxInvoiceDateFilter: moment.Moment;
+    minInvoiceDateFilter: moment.Moment;
     invoiceNumberFilter = '';
     creditOrUsageFilter = '';
     monthFilter = '';
     yearFilter = '';
-   // isHostLogged : boolean;
 
     _entityTypeFullName = 'onetouch.AppSubScriptionPlan.AppTenantActivityLog';
     entityHistoryEnabled = false;
     appSession: AppSessionService;
-    isHostLogged = (this.appSession.tenant == undefined ? true:this.appSession.tenant.id == null);
-    
-    maxTenantIdFilter =(this.appSession.tenant == undefined ? null:this.appSession.tenant.id);
-    minTenantIdFilter =(this.appSession.tenant == undefined ? null:this.appSession.tenant.id);
-    
+    isHostLogged = (this.appSession.tenant == undefined ? true : this.appSession.tenant.id == null);
+
+    maxTenantIdFilter = (this.appSession.tenant == undefined ? null : this.appSession.tenant.id);
+    minTenantIdFilter = (this.appSession.tenant == undefined ? null : this.appSession.tenant.id);
+
     constructor(
         injector: Injector,
-        //private _abpSessionService: AbpSessionService,
         private _appTenantActivitiesLogServiceProxy: AppTenantActivitiesLogServiceProxy,
-        private _notifyService: NotifyService,
-        private _tokenAuth: TokenAuthServiceProxy,
-        private _activatedRoute: ActivatedRoute,
         private _fileDownloadService: FileDownloadService,
-			private _router: Router
+        private _router: Router
     ) {
         super(injector);
     }
 
     ngOnInit(): void {
         this.entityHistoryEnabled = this.setIsEntityHistoryEnabled();
-        
+
     }
 
     private setIsEntityHistoryEnabled(): boolean {
@@ -136,14 +122,14 @@ export class AppTenantActivitiesLogComponent extends AppComponentBase {
 
         this._appTenantActivitiesLogServiceProxy.getAll(
             this.filterText,
-            this.maxTenantIdFilter == null ? this.maxTenantIdFilterEmpty: this.maxTenantIdFilter,
-            this.minTenantIdFilter == null ? this.minTenantIdFilterEmpty: this.minTenantIdFilter,
+            this.maxTenantIdFilter == null ? this.maxTenantIdFilterEmpty : this.maxTenantIdFilter,
+            this.minTenantIdFilter == null ? this.minTenantIdFilterEmpty : this.minTenantIdFilter,
             this.tenantNameFilter,
-            this.maxUserIdFilter == null ? this.maxUserIdFilterEmpty: this.maxUserIdFilter,
-            this.minUserIdFilter == null ? this.minUserIdFilterEmpty: this.minUserIdFilter,
+            this.maxUserIdFilter == null ? this.maxUserIdFilterEmpty : this.maxUserIdFilter,
+            this.minUserIdFilter == null ? this.minUserIdFilterEmpty : this.minUserIdFilter,
             this.activityTypeFilter,
-            this.maxAppSubscriptionPlanHeaderIdFilter == null ? this.maxAppSubscriptionPlanHeaderIdFilterEmpty: this.maxAppSubscriptionPlanHeaderIdFilter,
-            this.minAppSubscriptionPlanHeaderIdFilter == null ? this.minAppSubscriptionPlanHeaderIdFilterEmpty: this.minAppSubscriptionPlanHeaderIdFilter,
+            this.maxAppSubscriptionPlanHeaderIdFilter == null ? this.maxAppSubscriptionPlanHeaderIdFilterEmpty : this.maxAppSubscriptionPlanHeaderIdFilter,
+            this.minAppSubscriptionPlanHeaderIdFilter == null ? this.minAppSubscriptionPlanHeaderIdFilterEmpty : this.minAppSubscriptionPlanHeaderIdFilter,
             this.appSubscriptionPlanCodeFilter,
             this.maxActivityDateTimeFilter === undefined ? this.maxActivityDateTimeFilter : moment(this.maxActivityDateTimeFilter).endOf('day'),
             this.minActivityDateTimeFilter === undefined ? this.minActivityDateTimeFilter : moment(this.minActivityDateTimeFilter).startOf('day'),
@@ -153,16 +139,16 @@ export class AppTenantActivitiesLogComponent extends AppComponentBase {
             this.billableFilter,
             this.invoicedFilter,
             this.referenceFilter,
-            this.maxQtyFilter == null ? this.maxQtyFilterEmpty: this.maxQtyFilter,
-            this.minQtyFilter == null ? this.minQtyFilterEmpty: this.minQtyFilter,
-            this.maxConsumedQtyFilter == null ? this.maxConsumedQtyFilterEmpty: this.maxConsumedQtyFilter,
-            this.minConsumedQtyFilter == null ? this.minConsumedQtyFilterEmpty: this.minConsumedQtyFilter,
-            this.maxRemainingQtyFilter == null ? this.maxRemainingQtyFilterEmpty: this.maxRemainingQtyFilter,
-            this.minRemainingQtyFilter == null ? this.minRemainingQtyFilterEmpty: this.minRemainingQtyFilter,
-            this.maxPriceFilter == null ? this.maxPriceFilterEmpty: this.maxPriceFilter,
-            this.minPriceFilter == null ? this.minPriceFilterEmpty: this.minPriceFilter,
-            this.maxAmountFilter == null ? this.maxAmountFilterEmpty: this.maxAmountFilter,
-            this.minAmountFilter == null ? this.minAmountFilterEmpty: this.minAmountFilter,
+            this.maxQtyFilter == null ? this.maxQtyFilterEmpty : this.maxQtyFilter,
+            this.minQtyFilter == null ? this.minQtyFilterEmpty : this.minQtyFilter,
+            this.maxConsumedQtyFilter == null ? this.maxConsumedQtyFilterEmpty : this.maxConsumedQtyFilter,
+            this.minConsumedQtyFilter == null ? this.minConsumedQtyFilterEmpty : this.minConsumedQtyFilter,
+            this.maxRemainingQtyFilter == null ? this.maxRemainingQtyFilterEmpty : this.maxRemainingQtyFilter,
+            this.minRemainingQtyFilter == null ? this.minRemainingQtyFilterEmpty : this.minRemainingQtyFilter,
+            this.maxPriceFilter == null ? this.maxPriceFilterEmpty : this.maxPriceFilter,
+            this.minPriceFilter == null ? this.minPriceFilterEmpty : this.minPriceFilter,
+            this.maxAmountFilter == null ? this.maxAmountFilterEmpty : this.maxAmountFilter,
+            this.minAmountFilter == null ? this.minAmountFilterEmpty : this.minAmountFilter,
             this.maxInvoiceDateFilter === undefined ? this.maxInvoiceDateFilter : moment(this.maxInvoiceDateFilter).endOf('day'),
             this.minInvoiceDateFilter === undefined ? this.minInvoiceDateFilter : moment(this.minInvoiceDateFilter).startOf('day'),
             this.invoiceNumberFilter,
@@ -187,7 +173,7 @@ export class AppTenantActivitiesLogComponent extends AppComponentBase {
     }
 
     createAppTenantActivityLog(): void {
-        this._router.navigate(['/app/admin/appSubScriptionPlan/appTenantActivitiesLog/createOrEdit']);        
+        this._router.navigate(['/app/admin/appSubScriptionPlan/appTenantActivitiesLog/createOrEdit']);
     }
 
 
@@ -217,15 +203,15 @@ export class AppTenantActivitiesLogComponent extends AppComponentBase {
 
     exportToExcel(): void {
         this._appTenantActivitiesLogServiceProxy.getAppTenantActivitiesLogToExcel(
-        this.filterText,
-            this.maxTenantIdFilter == null ? this.maxTenantIdFilterEmpty: this.maxTenantIdFilter,
-            this.minTenantIdFilter == null ? this.minTenantIdFilterEmpty: this.minTenantIdFilter,
+            this.filterText,
+            this.maxTenantIdFilter == null ? this.maxTenantIdFilterEmpty : this.maxTenantIdFilter,
+            this.minTenantIdFilter == null ? this.minTenantIdFilterEmpty : this.minTenantIdFilter,
             this.tenantNameFilter,
-            this.maxUserIdFilter == null ? this.maxUserIdFilterEmpty: this.maxUserIdFilter,
-            this.minUserIdFilter == null ? this.minUserIdFilterEmpty: this.minUserIdFilter,
+            this.maxUserIdFilter == null ? this.maxUserIdFilterEmpty : this.maxUserIdFilter,
+            this.minUserIdFilter == null ? this.minUserIdFilterEmpty : this.minUserIdFilter,
             this.activityTypeFilter,
-            this.maxAppSubscriptionPlanHeaderIdFilter == null ? this.maxAppSubscriptionPlanHeaderIdFilterEmpty: this.maxAppSubscriptionPlanHeaderIdFilter,
-            this.minAppSubscriptionPlanHeaderIdFilter == null ? this.minAppSubscriptionPlanHeaderIdFilterEmpty: this.minAppSubscriptionPlanHeaderIdFilter,
+            this.maxAppSubscriptionPlanHeaderIdFilter == null ? this.maxAppSubscriptionPlanHeaderIdFilterEmpty : this.maxAppSubscriptionPlanHeaderIdFilter,
+            this.minAppSubscriptionPlanHeaderIdFilter == null ? this.minAppSubscriptionPlanHeaderIdFilterEmpty : this.minAppSubscriptionPlanHeaderIdFilter,
             this.appSubscriptionPlanCodeFilter,
             this.maxActivityDateTimeFilter === undefined ? this.maxActivityDateTimeFilter : moment(this.maxActivityDateTimeFilter).endOf('day'),
             this.minActivityDateTimeFilter === undefined ? this.minActivityDateTimeFilter : moment(this.minActivityDateTimeFilter).startOf('day'),
@@ -235,16 +221,16 @@ export class AppTenantActivitiesLogComponent extends AppComponentBase {
             this.billableFilter,
             this.invoicedFilter,
             this.referenceFilter,
-            this.maxQtyFilter == null ? this.maxQtyFilterEmpty: this.maxQtyFilter,
-            this.minQtyFilter == null ? this.minQtyFilterEmpty: this.minQtyFilter,
-            this.maxConsumedQtyFilter == null ? this.maxConsumedQtyFilterEmpty: this.maxConsumedQtyFilter,
-            this.minConsumedQtyFilter == null ? this.minConsumedQtyFilterEmpty: this.minConsumedQtyFilter,
-            this.maxRemainingQtyFilter == null ? this.maxRemainingQtyFilterEmpty: this.maxRemainingQtyFilter,
-            this.minRemainingQtyFilter == null ? this.minRemainingQtyFilterEmpty: this.minRemainingQtyFilter,
-            this.maxPriceFilter == null ? this.maxPriceFilterEmpty: this.maxPriceFilter,
-            this.minPriceFilter == null ? this.minPriceFilterEmpty: this.minPriceFilter,
-            this.maxAmountFilter == null ? this.maxAmountFilterEmpty: this.maxAmountFilter,
-            this.minAmountFilter == null ? this.minAmountFilterEmpty: this.minAmountFilter,
+            this.maxQtyFilter == null ? this.maxQtyFilterEmpty : this.maxQtyFilter,
+            this.minQtyFilter == null ? this.minQtyFilterEmpty : this.minQtyFilter,
+            this.maxConsumedQtyFilter == null ? this.maxConsumedQtyFilterEmpty : this.maxConsumedQtyFilter,
+            this.minConsumedQtyFilter == null ? this.minConsumedQtyFilterEmpty : this.minConsumedQtyFilter,
+            this.maxRemainingQtyFilter == null ? this.maxRemainingQtyFilterEmpty : this.maxRemainingQtyFilter,
+            this.minRemainingQtyFilter == null ? this.minRemainingQtyFilterEmpty : this.minRemainingQtyFilter,
+            this.maxPriceFilter == null ? this.maxPriceFilterEmpty : this.maxPriceFilter,
+            this.minPriceFilter == null ? this.minPriceFilterEmpty : this.minPriceFilter,
+            this.maxAmountFilter == null ? this.maxAmountFilterEmpty : this.maxAmountFilter,
+            this.minAmountFilter == null ? this.minAmountFilterEmpty : this.minAmountFilter,
             this.maxInvoiceDateFilter === undefined ? this.maxInvoiceDateFilter : moment(this.maxInvoiceDateFilter).endOf('day'),
             this.minInvoiceDateFilter === undefined ? this.minInvoiceDateFilter : moment(this.minInvoiceDateFilter).startOf('day'),
             this.invoiceNumberFilter,
@@ -252,15 +238,15 @@ export class AppTenantActivitiesLogComponent extends AppComponentBase {
             this.monthFilter,
             this.yearFilter,
         )
-        .subscribe(result => {
-            this._fileDownloadService.downloadTempFile(result);
-         });
+            .subscribe(result => {
+                this._fileDownloadService.downloadTempFile(result);
+            });
     }
     formatDate(input: string )
     {
         return moment(input).format('MM/DD/YYYY HH:mm:ss');
     }
-    
+
     
     
     

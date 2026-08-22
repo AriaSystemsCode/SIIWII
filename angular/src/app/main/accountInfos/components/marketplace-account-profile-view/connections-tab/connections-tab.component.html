@@ -1,0 +1,204 @@
+<form [formGroup]="filterForm">
+
+    <div class="tab-wrapper position-relative">
+
+        <div
+          class="tab-loading-overlay"
+          *ngIf="loading"
+        >
+          <div class="spinner-border" role="status">
+            <span class="sr-only">{{'LoadWithThreeDot' | localize}}...</span>
+          </div>
+        </div>
+
+    <div [@routerTransition]  class="">
+        <div class="kt-content kt-grid__item kt-grid__item--fluid kt-grid kt-grid--hor  marginMob"
+            [ngClass]="fromOverview ? 'p-0':''">
+            <div [class]="containerClass + ' kt-grid__item kt-grid__item--fluid'" [ngClass]="fromOverview ? 'p-0':''">
+                <div class="kt-portlet kt-portlet--mobile">
+                    <div class="kt-portlet__body" [ngClass]="fromOverview ? 'p-0':''">
+                        <div class="row " >
+                            <div *ngIf="accounts?.length > 0 && accountsTypes?.length > 0 && !fromOverview" class="d-flex align-items-center flex-wrap">
+                                <!-- All Button -->
+                                <button
+                                  type="button" *ngIf="marketPlaceData?.connectionCount >0"
+                                  class="btn btn-sm mx-1"
+                                  [ngClass]="{ 'btPurble': connectionTypeId === 0, 'btn-outline-secondary': connectionTypeId !== 0 }"
+                                  (click)="setConnectionType(0)">
+                                  {{'All' | localize}}
+                                </button>
+                                <!-- <span class="separator" *ngIf="accountsTypes.length > 0">|</span> -->
+                              
+                                <!-- Account Type Buttons -->
+                                <ng-container *ngFor="let accountsType of accountsTypes; let i = index">
+                  
+                                    <button *ngIf="(marketPlaceData?.availableBusinessConnections && accountsType.code?.toUpperCase() === 'BUSINESS') ||  (marketPlaceData?.availablePeopleConnections && accountsType.code?.toUpperCase() === 'PERSONAL') || (marketPlaceData?.availableGroupConnections && accountsType.code?.toUpperCase() === 'GROUP')"
+                                      type="button"
+                                      class="btn btn-sm mx-1"
+                                      [ngClass]="{ 
+                                        'btPurble': connectionTypeId === accountsType.value, 
+                                        'btn-outline-secondary': connectionTypeId !== accountsType.value 
+                                      }"
+                                      (click)="setConnectionType(accountsType.value)">
+                                      {{
+                                        accountsType.code?.toUpperCase() === 'BUSINESS' ? 'Businesses' :
+                                        accountsType.code?.toUpperCase() === 'GROUP' ? 'Groups' :
+                                        accountsType.code?.toUpperCase() === 'PERSONAL' ? 'People' :
+                                        accountsType.code
+                                      }}
+                                    </button>
+                              
+                                    <span
+                                      class="separator"
+                                      *ngIf="i < accountsTypes.length - 1 ">|</span>
+                                 
+                                </ng-container>
+                              </div>
+                              
+
+
+                            <div class="col-12" [ngClass]="fromOverview ? 'p-0':''">
+                                <div *ngIf="!fromOverview&&accounts?.length>0"
+                                    class="d-flex justify-content-between align-items-center my-2">
+                                    <div class="  list-toolbar-data-summary " *ngIf="active">
+                                        {{
+                                        paginator.getPage() *
+                                        primengTableHelper.defaultRecordsCountPerPage
+                                        }}-{{
+                                        paginator.getPage() *
+                                        primengTableHelper.defaultRecordsCountPerPage +
+                                        accounts.length
+                                        }}
+                                        {{ "over" | localize }}
+                                        {{
+                                        primengTableHelper.totalRecordsCount
+                                        }}
+                                        {{ "ResultsOf" | localize }} "{{'Connections' |
+                                        localize
+                                        }}"
+                                    </div>
+                                    <div>
+                                        <div class="btn-group dropdown list-toolbar-dropdown" dropdown>
+                                            <button class="dropdown-toggle btn btn-sm   p-0 sortByDd" dropdownToggle>
+                                                <span class="list-toolbar-dropdown-sort-label">
+                                                    {{ "SortBy" | localize }}
+                                                </span>
+                                                <span class="list-toolbar-dropdown-sort-selectedItem">
+                                                    {{
+                                                    sortingCtrl?.value
+                                                    ?.label
+                                                    ? ": " +
+                                                    (sortingCtrl
+                                                    ?.value?.label
+                                                    | localize)
+                                                    : ""
+                                                    }}
+                                                </span>
+                                            </button>
+                                            <ul class="dropdown-menu actions-dropdown-menu" *dropdownMenu>
+                                                <li *ngFor="
+                                                        let sortOption of sortingOptions
+                                                    " class="list-toolbar-dropdown-item">
+                                                    <a href="javascript:;" (click)="
+                                                            sortingCtrl.setValue(
+                                                                sortOption
+                                                            );getConnections()
+                                                        ">
+                                                        <span>
+                                                            <i [ngClass]="{
+                                                                    'visibility-hidden':
+                                                                        sortOption?.value !=
+                                                                        sortingCtrl
+                                                                            ?.value
+                                                                            ?.value
+                                                                }"
+                                                                class="flaticon2-check-mark text-success mr-2 icon-sm list-toolbar-dropdown-item-icon"></i>
+                                                            <span class="list-toolbar-dropdown-item-value">
+                                                                {{
+                                                                sortOption.label
+                                                                | localize
+                                                                }}
+                                                            </span>
+                                                        </span>
+                                                    </a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col d-flex flex-column justify-content-between">
+
+                                    <div class="row " [ngClass]="fromOverview ? 'p-0 mx-1':' '">
+                                        <div *ngFor="
+                                                let account of accounts;
+                                                index as i;
+                                                let last = last
+                                            " class="col-12 px-0" [ngClass]="{
+                                                'col-md-12 single-item-per-row-layout':
+                                                    singleItemPerRowMode || fromOverview,
+                                                'col-md-6 ': !singleItemPerRowMode && !fromOverview,
+                                                ' pb-5':
+                                                    singleItemPerRowMode && !last,
+                                                    'mt-3':fromOverview,
+                                                    'mb-3' :!fromOverview
+                                            }">
+                                            <app-connections-card [account]="account"
+                                                [singleItemPerRowMode]="singleItemPerRowMode" [isHost]="isHost"
+                                                (_createRelation)="createRelation($event)" (deleteMe)="
+                                                askToConfirmDelete(
+                                                    $event,
+                                                    account.account,
+                                                    i
+                                                )
+                                            
+                                            " (disconnectMe)="
+                                                disconnect($event)
+                                            " [fromOverview]="fromOverview"></app-connections-card>
+                                        </div>
+                                        <div class="  mt-5 p-5 text-center w-100"
+                                            *ngIf="showData && accounts.length == 0 && !loading">
+                                            <img src="../../assets/placeholders/fluent_alert.png" class="mr-2" alt=""
+                                                srcset="">
+                                            {{ "NoDataFound" | localize }}
+                                        </div>
+
+                                        <div class="  mt-5 p-5 text-center w-100"
+                                            *ngIf="!showData&& accounts.length == 0 && !loading">
+                                            <img src="../../../../../assets/placeholders/Vector.png" class="mr-2" alt=""
+                                                srcset="">
+                                            {{ noDataMessage }}
+                                        </div>
+
+                                    </div>
+                                    <div [ngClass]="fromOverview || accounts?.length==0 ? 'd-none':''"
+                                        class="primeng-paging-container custom-paginator">
+                                        <p-paginator [rows]="
+                                                primengTableHelper.defaultRecordsCountPerPage
+                                            " #paginator (onPageChange)="getConnections($event)" [totalRecords]="
+                                                primengTableHelper.totalRecordsCount
+                                            " [rowsPerPageOptions]="
+                                                primengTableHelper.predefinedRecordsCountPerPage
+                                            ">
+                                        </p-paginator>
+
+                                        <div class="total-records-count text-right mr-3">
+                                            {{
+                                            l(
+                                            "TotalRecordsCount",
+                                            primengTableHelper.totalRecordsCount
+                                            )
+                                            }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    </div>
+</form>

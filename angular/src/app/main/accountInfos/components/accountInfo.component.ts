@@ -386,6 +386,7 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
         this.getCurrencies();
         this.getCurrenciesDto();
         this.getPhoneTypes();
+        //i49-get all price level from API 
        this.allPriceLevel= this.getPriceLevel();
       this.getShipVia();
       this.getPaymentTerms();

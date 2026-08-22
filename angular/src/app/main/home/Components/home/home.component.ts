@@ -1,15 +1,18 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, Injector, OnInit, ViewChild } from '@angular/core';
 import { ViewEventComponent } from '@app/main/AppEvent/Components/view-event.component';
 import { PostListComponent } from '@app/main/posts/Components/post-list.component';
 import { ViewPostComponent } from '@app/main/posts/Components/view-post.component';
-import { AppEventDto, AppPostsServiceProxy, PostType } from '@shared/service-proxies/service-proxies';
-
+import { Router } from '@node_modules/@angular/router';
+import { AppConsts } from '@shared/AppConsts';
+import { AppComponentBase } from '@shared/common/app-component-base';
+import { AppEntitiesServiceProxy, AppEventDto, AppPostsServiceProxy, PostType } from '@shared/service-proxies/service-proxies';
+import Swal from 'sweetalert2';
 @Component({
     selector: 'app-home',
     templateUrl: './home.component.html',
     styleUrls: ['./home.component.scss']
 })
-export class HomeComponent implements OnInit {
+export class HomeComponent extends AppComponentBase implements OnInit {
     @ViewChild("viewEventModal", { static: true })
     viewEventModal: ViewEventComponent;
     @ViewChild("apppostlistcomponent", { static: true })
@@ -17,9 +20,21 @@ export class HomeComponent implements OnInit {
     // refrence to post popup in post componenet
     @ViewChild("viewPostModal", { static: true })
     viewPostModal: ViewPostComponent;
-    constructor(private _postService:AppPostsServiceProxy) { }
+    currentLang: string;
+    isArabic: boolean = false;
+
+        defaultLogo = AppConsts.appBaseUrl + '/assets/common/images/logo.png';
+        defaultUrl:string
+    constructor(    injector: Injector,private _postService:AppPostsServiceProxy, private router: Router,
+                    private _appEntitiesServiceProxy: AppEntitiesServiceProxy) {
+           super(injector);
+        // workaround to prevent tenant from seeing the dashboard
+        this.redirectTo();    
+     }
 
     ngOnInit(): void {
+        this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName');
+        this.isArabic = this.currentLang === 'ar' || this.currentLang === 'ar-EG';
     }
 
     onViewEventModal($event: number) {
@@ -29,7 +44,7 @@ export class HomeComponent implements OnInit {
 
         // reterive the post by postId
         this._postService
-          .getAll("", "", "",undefined,undefined,undefined,  "", "", postid, "", 0, 1)
+          .getAll("", "", "",undefined,undefined,undefined,  "", "", postid,  undefined,  undefined, "", 0, 1)
           .subscribe((res) => {
             if (res.items.length > 0) {
               if (res.items[0].type == PostType.TEXT)
@@ -99,4 +114,35 @@ export class HomeComponent implements OnInit {
         return linkUrl;
     }
 
+
+      async redirectTo() {
+            console.log(this.defaultUrl,'defau')
+
+            if (this.appSession.tenantId && !this.appSession.user.accountId)
+                await this.askForCompleteProfile();
+        }
+    
+        async askForCompleteProfile() {
+      
+                Swal.fire({
+                    title: "",
+                    text: "Please Complete Your Profile Information",
+                    icon: "warning",
+                    showCancelButton: true,
+                    cancelButtonText: "Later",
+                    confirmButtonText: "Proceed",
+                    allowOutsideClick: false,
+                    customClass: {
+                        popup: 'popup-class',
+                        icon: 'icon-class',
+                        content: 'content-class',
+                        actions: 'actions-class',
+                        confirmButton: 'confirm-button-class2'
+                    }
+            }).then((result) => {
+                if (result.isConfirmed)
+                this.router.navigate(['/app/main/account'])
+            });
+        }
+ 
 }

@@ -1,0 +1,36 @@
+@import '../../../../../assets/styles/base/_variables';
+.kt-portlet {
+    margin-top: 0!important;
+}
+
+.sortByDd{
+    border: 1px solid #d9d9d9;
+    padding: 6px 25px !important;
+    border-radius: 6px;
+}
+
+.list-toolbar-btn {
+    background-color: #4A0D4A;
+    color: #fff !important;
+}
+.list-toolbar-dropdown-filter-selectedItem {
+    font-weight: 700 !important;
+    color: #1B101B;
+}
+
+.list-toolbar-data-summary {
+    color: #9E9E9E;
+    font-weight: 600;
+    font-size: 14px;
+}
+input {
+border: 1px solid #D9D9D9;
+background-color: #fff !important;
+border-radius: 10px;
+
+}
+::ng-deep {
+    .form-control:focus {
+        border: 1px solid #D9D9D9 !important;
+    }
+}

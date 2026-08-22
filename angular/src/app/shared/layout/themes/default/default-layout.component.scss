@@ -8,9 +8,7 @@
     @extend %transition-all-3ms;
 }
 
-// .kt-header--fixed.kt-subheader--fixed.kt-subheader--enabled .kt-wrapper {
-//     padding-top: 65px!important;
-// }
+
 
 .btn-grey {
     padding: 7px;
@@ -21,9 +19,7 @@
 
 
 ::ng-deep {
-  .flaticon-app:before {
-    // content: "" !important;
-}
+
     .kt-header--fixed.kt-subheader--fixed.kt-subheader--enabled .kt-wrapper {
         padding-top: 0 !important;
     }
@@ -39,14 +35,20 @@
           
 
         }
+        .addMGtop {
+          margin-top: 80px !important;
+        }
     }
 
     @media only screen and (max-width: 575px) {
         .rout-c {
-            padding-left: 20px !important;
-            padding-right: 20px !important;
+            padding-left: 10px !important;
+            padding-right: 10px !important;
             overflow-x: hidden;
             padding-top: 70px;
+        }
+        .addMGtop {
+          margin-top: 70px !important;
         }
     }
     @media only screen and (min-width: 575px) and (max-width: 1024px) {
@@ -54,11 +56,21 @@
     padding-left: 85px !important;
     padding-right: 0px !important;
     overflow-x: hidden;
-// margin-top: 80px !important;
+
     padding-top: 50px;
-    // margin-top: 40px !important;
-    //     padding-top: 60px;
+
  }
+ .rout-c-ar {
+  padding-right: 85px !important;
+  padding-left: 0px !important;
+  overflow-x: hidden !important;
+
+  padding-top: 50px;
+ }
+ 
+ .addMGtop {
+  margin-top: 50px !important;
+}
 }
 .spLeng {
   height: 65vh !important;
@@ -69,19 +81,18 @@
     }
     width: 250px;
     transition: width 0.3s;
-    // border-radius: 0px 20px 20px 0px;
+
         background: #FFF;
     z-index: 9999 !important;
     position: fixed;
     box-shadow: 4px 4px 10px 0px rgba(22, 22, 22, 0.10);
     ul li {
         padding: 10px 12px;
-        // width: 60px;
+
         margin-left: 10px !important;
         margin-right: 10px;
         white-space: nowrap;
-        // text-align: center;
-        // margin-bottom: 10px;
+
         cursor: pointer;
       }
 
@@ -92,13 +103,20 @@
   .mlIcon {
     margin-left: 3.5rem;
   }
+
+  .sidebar.ar-index{
+    z-index: 999 !important;
+}
+.sidebar.index{
+    z-index: 9999 !important;
+}
+
   .sidebar.minimized {
     width: 76px;
-    border-top-left-radius: 20px;
+    // border-top-left-radius: 20px;
         background: #FFF;
-    z-index: 9999 !important;
     position: fixed;
-    border-top-left-radius: 20px;
+    // border-top-left-radius: 20px;
     text-align: center;
     box-shadow: 4px 4px 10px 0px rgba(22, 22, 22, 0.10);
     @media only screen and (max-width: 576px) {
@@ -116,7 +134,7 @@ display: none;
         margin-left: auto !important;
         margin-right: auto;
         text-align: center;
-        // margin-bottom: 10px;
+      
         
       }
 }
@@ -186,6 +204,21 @@ margin-bottom: 30px;
 
   }
 
+  .rtl-arr {
+    position: sticky;
+    right: 60px;
+    top: 70px;
+    transform: rotate(180deg);
+
+  }
+  .rtl-arr-left {
+    position: absolute;
+    right: 205px;
+    top: 70px;
+    transform: rotate(180deg);
+
+  }
+
   
   .sidebar ul li i {
     // margin-right: 10px;
@@ -223,4 +256,8 @@ margin-bottom: 30px;
 ::-webkit-scrollbar-track {
     background-color: #D9D9D9 !important; /* Set the color of the track (the non-draggable part) */
     
+}
+
+.overflow-y-hidden {
+  overflow-x: hidden !important;
 }

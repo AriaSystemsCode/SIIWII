@@ -29,6 +29,7 @@ export class HeaderNotificationsComponent extends AppComponentBase implements On
     notifications: IFormattedUserNotification[] = [];
     unreadNotificationCount = 0;
     dropdownMenudisplay: boolean = false;
+    isAuthenticated = this.appSession?.user
 
     constructor(
         injector: Injector,
@@ -45,7 +46,10 @@ export class HeaderNotificationsComponent extends AppComponentBase implements On
     }
 
     ngOnInit(): void {
+        if(this.isAuthenticated) {
         this.loadNotifications();
+
+        }
         this.registerToEvents();
     }
 
@@ -53,8 +57,8 @@ export class HeaderNotificationsComponent extends AppComponentBase implements On
         if (UrlHelper.isInstallUrl(location.href)) {
             return;
         }
-
-        this._notificationService.getUserNotifications(undefined, undefined, undefined, 3, 0).subscribe(result => {
+        const timeZoneValue=  Intl.DateTimeFormat().resolvedOptions().timeZone ;
+        this._notificationService.getUserNotifications(undefined, undefined, undefined,timeZoneValue, 3, 0).subscribe(result => {
             this.unreadNotificationCount = result.unreadCount;
             this.notifications = [];
             _.forEach(result.items, (item: UserNotification) => {
@@ -132,7 +136,7 @@ export class HeaderNotificationsComponent extends AppComponentBase implements On
     showPost(notification) {
         this.showMainSpinner();
         this._postService
-            .getAll("", "", "", undefined, undefined, undefined, "", "", notification.entityId, "", 0, 1)
+            .getAll("", "", "", undefined, undefined, undefined, "", "", notification.entityId,undefined,undefined, "", 0, 1)
             .subscribe((res) => {
                 if (res.items.length > 0) {
                     this.hideMainSpinner();

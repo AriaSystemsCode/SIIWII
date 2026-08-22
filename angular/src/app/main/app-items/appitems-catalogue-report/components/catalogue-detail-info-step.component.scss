@@ -1,7 +1,15 @@
 @import '../../../../../assets/styles/base/variables';
 input:focus
 {
-    border: 1px solid black !important;
+    border: 1px solid #D5D4DC !important;
+}
+
+.special-price-switch-wrap {
+  gap: 20px;
+}
+
+.details-sort-dropdown-wrap {
+  width: 90%;
 }
 
 .bgImg {
@@ -21,16 +29,133 @@ input:focus
   }
 
   .image-wrapper {
-    border: 1px solid $grey-1;
-    width: 200px;
-    height: 276px;
-    background-color: white;
-    margin-right: 2rem;
-    border-radius: 6px;
+ 
+width: 300px;
+height: 360px;
+
+
+background: rgba(248, 248, 248, 0.972549);
+border: 1px solid rgba(238, 238, 238, 0.933333);
+box-shadow: 4px 4px 10px rgba(22, 22, 22, 0.15);
+border-radius: 12px;
+
     img {
         max-height: 100%;
         max-width: 100%;
     }
 
 
+}
+
+.btnCont {
+
+// padding: 11px 32px;
+
+width: 140px;
+height: 46px;
+
+background: #4A0D4A;
+/* Elevation 2 */
+box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.25);
+border-radius: 12px;
+color: #fff;
+
+}
+
+.btnPrev {
+
+// padding: 11px 32px;
+
+width: 136px;
+height: 46px;
+color: #4A0D4A;
+border: 1px solid rgba(238, 238, 238, 0.933333);
+filter: drop-shadow(2px 2px 10px rgba(22, 22, 22, 0.1));
+border-radius: 12px;
+
+
+}
+
+
+::ng-deep {
+  .p-accordion .p-accordion-header .p-accordion-header-link {
+   
+    padding: 12px !important;
+    border: 1px solid #EEEEEEEE !important;
+    // color: #333333;
+    background: #fff !important;
+    font-weight: 700;
+    border-radius: 6px;
+    transition: background-color 0.2s, box-shadow 0.2s;
+
+    .form-control{
+      border: 1px solid #E5E5E4 !important;
+    }
+}
+
+
+.kt-checkbox > input:checked ~ span {
+
+  background: #4A0D4A !important;
+}
+}
+
+h6 {
+
+
+  color: #1B101B;
+  font-weight: 600;
+  font-size: 18px;
+}
+
+.hint {
+  color: #9E9E9E;
+  font-weight: 500;
+  font-size: 14px;
+}
+
+
+.coverTxt {
+  color: #9E9E9E;
+  font-weight: 700;
+  font-size: 16px;
+}
+
+.grpTxt {
+  color: #9E9E9E;
+  font-weight: 600;
+  font-size: 16px;
+}
+
+.sortTxt {
+  color: #A49FB1;
+  font-weight: 700;
+  font-size: 16px;
+}
+.bgTxt {
+  color: #A49FB1;
+  font-weight: 700;
+  font-size: 16px;
+}
+
+.titlsSty {
+  color: #1B101B;
+  font-weight: 700;
+  font-size: 16px;
+  line-height: 24px;
+}
+
+@media (max-width: 992px) {
+  .special-price-switch-wrap {
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .details-sort-dropdown-wrap {
+    width: 100%;
+  }
+
+  .w-75 {
+    width: 100% !important;
+  }
 }

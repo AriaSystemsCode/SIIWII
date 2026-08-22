@@ -1,5 +1,6 @@
 <div>
     <app-create-post-entry
+    *ngIf="!accountDataForView?.accountType "
         #createPostEntry
         [profilePicture]="profilePicture"
         (typeFile)="onTypeFile($event)"
@@ -18,6 +19,7 @@
                 (_editPost)="onshowCreateOrEdit($event)"
                 (_viewEvent)="onshowViewEventFromPost($event)"
                 (videoClicked)="playOrpauseVideo($event, post.attachmentsURLs[0])"
+                [fromMarketplaceProfile]="fromMarketplaceProfile"
             >
             </app-post-card>
             <div *ngIf="(i%5==0) && (i!=0)" class="d-sm-sidebars d-none">
@@ -37,6 +39,12 @@
             </div>
         </div>
     </div>
+     <div class="  mt-5 p-5 text-center w-100"
+    *ngIf="postsToShow?.length == 0">
+    <img src="../../assets/placeholders/fluent_alert.png" class="mr-2" alt="" srcset="">
+    {{ "NoDataFound" | localize }}
+</div> 
+     
     <app-createor-edit-post
         #createOrEditModal
         [profilePicture]="profilePicture"

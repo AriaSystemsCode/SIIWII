@@ -171,7 +171,7 @@
 .aria-input-text,.aria-select{
     height: 40px !important;
     background-color: #F3F6F9 !important;
-    border: none;
+    // border: none;
     border-radius: 5px;
  }
 
@@ -318,4 +318,45 @@
 }
 .kt-portlet {
     margin-top: 0 !important;
+}
+
+.btn-save {
+    background-color: #4A0D4A;
+    color: #fff;
+}
+
+
+
+#PhoneExt  {
+    width: 110px;
+}
+label {
+    color: #1B101B;
+    font-weight: 600;
+}
+.form-control {
+
+background: #FFFFFF !important;
+border: 1px solid #E5E5E5;
+border-radius: 8px;
+color:  #595959 !important;
+font-weight: 600 !important;
+
+
+
+}
+
+.text-change {
+    color: #4A0D4A !important;
+}
+
+.isPublic {
+    color: #1B101B;
+    font-weight: 700;
+}
+
+::ng-deep {
+    .p-inputswitch.p-inputswitch-checked .p-inputswitch-slider {
+        background: #2DC74F !important;
+    }
 }

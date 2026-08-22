@@ -24,5 +24,8 @@ namespace onetouch.Authorization.Users.Dto
         //Mariam
         public string Code { get; set; }
         //Mariam
+        //I40[Start]
+        public long? ContactId {set; get;}
+        //I40[End]
     }
 }

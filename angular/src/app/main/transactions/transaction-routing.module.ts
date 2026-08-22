@@ -4,12 +4,12 @@ import { AppTransactionsBrowseComponent } from './appTransactions/appTransBrowse
 
 
 
+
 const routes: Routes = [
 
 
       { path: 'appTransactions/MyTransactions', component: AppTransactionsBrowseComponent, },
-
-  
+      
 ];
 
 

@@ -1,15 +1,15 @@
 <div
-class="btn-group dropdown"
+class="btn-group dropdown  justify-content-end m-2"
 dropdown
 container="body"
 placement="bottom right"
 *ngIf="!actionsMenuFlags?.allIsHidden"
 >
     <button
-        class="dropdown-toggle btn btn-sm btn-action"
+        class="btn btn-sm detailBtn"
         dropdownToggle
         type="button"
-    ></button>
+    >{{'Details' | localize}}</button>
     <ul
         class="dropdown-menu dropdown-action-btn dropdown-menu-right"
         *dropdownMenu

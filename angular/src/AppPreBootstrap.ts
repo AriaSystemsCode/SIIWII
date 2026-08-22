@@ -23,13 +23,13 @@ export class AppPreBootstrap {
 
             const queryStringObj = UrlHelper.getQueryParameters();
 
-            if (queryStringObj.redirect && queryStringObj.redirect === 'TenantRegistration') {
+            if (queryStringObj.redirect === 'TenantRegistration') {
                 if (queryStringObj.forceNewRegistration) {
-                    new AppAuthService().logout();
+                  AppPreBootstrap.logoutHard('/app/main/account/login'); 
                 }
-
                 location.href = AppConsts.appBaseUrl + '/account/select-edition';
-            } else if (queryStringObj.impersonationToken) {
+                return;
+              } else if (queryStringObj.impersonationToken) {
                 if (queryStringObj.userDelegationId) {
                     AppPreBootstrap.delegatedImpersonatedAuthenticate(queryStringObj.userDelegationId, queryStringObj.impersonationToken, queryStringObj.tenantId, () => { AppPreBootstrap.getUserConfiguration(callback); });
                 } else {
@@ -221,4 +221,43 @@ export class AppPreBootstrap {
 
         DynamicResourcesHelper.loadResources(callback);
     }
+
+
+    
+    private static logoutHard(redirectTo?: string): void {
+        const tenantCookieName = abp.multiTenancy.tenantIdCookieName;
+        const tenantId = abp.multiTenancy.getTenantIdCookie();
+      
+        const customHeaders: Record<string, string> = {
+          [tenantCookieName]: tenantId != null ? String(tenantId) : '',
+          Authorization: 'Bearer ' + (abp.auth.getToken() || '')
+        };
+      
+        XmlHttpRequestHelper.ajax(
+          'GET',
+          AppConsts.remoteServiceBaseUrl + '/api/TokenAuth/LogOut',
+          customHeaders,
+          null,
+          () => {
+            try { abp.auth.clearToken(); } catch {}
+            try { abp.auth.clearRefreshToken(); } catch {}
+            try { localStorage.clear(); } catch {}
+            try { sessionStorage.clear(); } catch {}
+      
+            try {
+              abp.utils.setCookieValue(
+                AppConsts.authorization.encrptedAuthTokenName,
+                '',
+                new Date(0),
+                abp.appPath
+              );
+            } catch {}
+      
+        
+            const target = (redirectTo || '/app/main/account/login').trim();
+            location.replace(target);
+          }
+        );
+      }
+      
 }

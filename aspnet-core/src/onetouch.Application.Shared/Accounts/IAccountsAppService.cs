@@ -14,6 +14,9 @@ namespace onetouch.Accounts
     public interface IAccountsAppService : IApplicationService 
     {
         Task<PagedResultDto<GetAccountForViewDto>> GetAll(GetAllAccountsInput input);
+        Task<bool> GetSettingValue(string settingName, string ssin);
+
+        Task<PagedResultDto<GetAccountForViewDto>> GetAllMyConnections(GetAllAccountsInput input);
 
         Task<GetAccountForViewDto> GetAccountForView(long id, int resultCount);
 
@@ -35,13 +38,20 @@ namespace onetouch.Accounts
 		Task DeleteContact(EntityDto input);
 		Task<ContactDto> CreateOrEditContact(ContactDto input);
 		Task<ContactForEditDto> GetContactForView(long input);
-		//Mariam[End]
-		Task<PagedResultDto<LookupAccountOrTenantDto>> GetTenantsWithManualAccounts(GetTenantsWithManualAccounts input);
+        
+        
+        //Mariam[End]
+        Task<PagedResultDto<LookupAccountOrTenantDto>> GetTenantsWithManualAccounts(GetTenantsWithManualAccounts input);
 		Task<PagedResultDto<LookupAccountOrTenantDto>> GetAccountByType(GetAccountsForDropdownInputDto input);
 		Task<long> CreateOrUpdateAccountFromSourceAccount(CreateAccountsInputDto input);
+		//I40[Start]
+		Task<CreateOrEditAccountInfoDto> GetAppContactForView(long input);
+        Task<ContactDto> CreateOrUpdateContact(CreateOrEditAccountInfoDto accountDto);
+        //I40[End]
+    
 		Task<AppAddressDto> CreateOrEditAddress(AppAddressDto input);
 		//I45
-		Task Connect(long id, int? tenantId = null);
+		Task ConnectContactsProfiles(long id, int? tenantId = null,bool? sync = false);
         Task<BranchDto> CreateOrEditBranch(BranchDto input);
 		//I45
 		//I46[Start]

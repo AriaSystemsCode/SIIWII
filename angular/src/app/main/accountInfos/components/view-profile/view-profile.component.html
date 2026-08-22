@@ -1,0 +1,598 @@
+<div [@routerTransition] class="">
+    <div *ngIf="accountData" class="view-profile-wrapper">
+        <div>
+            <div class="kt-content kt-grid__item kt-grid__item--fluid kt-grid kt-grid--hor pb-0">
+                <div *ngIf="personalAccount" class="kt-subheader kt-grid__item" style="height: 80px !important;">
+                    <div class="containerClass d-flex justify-content-between w-100 px-4">
+                        <div class="kt-subheader__main">
+                            <h2 class="text-black">
+                                <span>{{l("MyAccount")}}</span>
+                            </h2>
+                            <span class="kt-subheader__separator kt-subheader__separator--v"></span>
+
+                        </div>
+
+                        <div class="d-flex ">
+
+
+                            <button class="btn mb-3 mt-4 editAccount_butn Save_editPersonal caneclBtn mr-3"
+                                [class.hide]="editInfo" (click)="cancelPerAcc()">
+                                {{ "Cancel" | localize }}
+                            </button>
+                            <button class="btn mb-3 mt-4 editAccount_butn Save_editPersonal text-white"
+                                type="submit"
+                                [class.hide]="editInfo"
+                                [disabled]="hasInvalidEmailOrPhone"
+                                (click)="editPersonal=true; editAccount()">
+                        {{ "Save" | localize }}
+                        </button>
+
+                        </div>
+                    </div>
+                </div>
+                <div [class]="containerClass + ' kt-grid__item kt-grid__item--fluid'" class="mb-4">
+                    <div class="kt-portlet kt-portlet--mobile">
+                        <div class="kt-portlet__body p-0 bg-white">
+                            <div class="row" *ngIf="!(personalAccount && Editting)">
+                                <div class="col-md-12">
+                                    <div #viewProfileCover
+                                        class="view-profile-cover d-flex justify-content-center align-items-center position-relative"
+                                        style="border-radius: 12px;">
+                                        <app-image-display
+                                            [image]="coverPhoto ?coverPhoto  :'../../assets/placeholders/_logo-placeholder.png'"
+                                            [sycAttachmentCategory]="sycAttachmentCategoryBanner"
+                                            [staticWidth]="viewProfileCover?.offsetWidth">
+                                        </app-image-display>
+                                        <div class="mr-3 "     [ngClass]="isArabic ? 'view-profile-action-buttons-ar':'view-profile-action-buttons-en'"
+                                        *ngIf="!viewMode&&isNotManualLevel()">
+                                        <button class="btn editAccount_butn" (click)="editAccount()"
+                                            [disabled]="Editting">
+                                            <img src="../../assets/img/input_icons/edit.png" class="">
+                                            {{ "Edit" | localize }}
+                                        </button>
+                                        <button class="btn transparent-button" (click)="UnShareAccount()"
+                                            *ngIf="isPublished&&connectionCount==0&&isNotManualLevel()"
+                                            [class.hide]="hidUshare">
+                                            <img src="../../assets/img/input_icons/privateAccount.png" class="">
+                                            {{ "Private" | localize }}
+                                        </button>
+                                        <button class="btn transparent-button" (click)="UnShareAccount()"
+                                            *ngIf="isPublished&&connectionCount!=0&&isNotManualLevel()"
+                                            [class.hide]="hidUshare">
+                                            <img src="../../assets/img/input_icons/hideAccount.png" class="">
+                                            {{ "Hide" | localize }}
+                                        </button>
+                                        <button class="btn transparent-button alaa" (click)="UnShareAccount()"
+                                            *ngIf="isNotManualLevel()" [ngClass]="{'hide':showPrivate}">
+                                            <img src="../../assets/img/input_icons/privateAccount.png" class="">
+                                            {{ "Private" | localize }}
+                                        </button>
+                                        <button class="btn transparent-button alaa" (click)="UnShareAccount()"
+                                            *ngIf="isNotManualLevel()" [class.hide]="showHide">
+                                            <img src="../../assets/img/input_icons/hideAccount.png">
+                                            {{ "Hide" | localize }}
+                                        </button>
+
+
+                                        <button pButton pRipple label="Share"
+                                            class="share btn transparent-button alaa" icon="pi pi-share-alt"
+                                            (click)="openShareAccountsModal()"
+                                            *ngIf="!isPublished&&isNotManualLevel()"
+                                            [class.hide]="hideshowShare"></button>
+
+                                        <button pButton pRipple label="Share"
+                                            class="share btn transparent-button lol" icon="pi pi-share-alt"
+                                            *ngIf="isNotManualLevel()" (click)="openShareAccountsModal()"
+                                            [ngClass]="{'hide':showShare}"></button>
+
+                                        <button pButton pRipple label="Sync" *ngIf="isNotManualLevel()"
+                                            class="sync btn" icon="pi pi-sync" (click)="syncAccount()"
+                                            [loading]="btnLoader" [disabled]="isSync == false"></button>
+
+
+                                    </div>
+
+
+                                        <div class="d-flex"
+                                            [ngClass]="isArabic ? 'view-profile-action-buttons-ar':'view-profile-action-buttons-en'"
+                                            *ngIf="((accountData.isConnected && showEditConnected && !isRecordOwner && accountData?.accountTypeId !=21) ||  accountData.isManual) ">
+                                            <button class="btn mb-3 mt-4 w-100 btn-save"
+                                                (click)="this.showEditConnected =false;editAccount()">
+                                                {{ "Edit" | localize }}
+                                            </button>
+
+                                                 <button class="btn mb-3 mt-4 w-100 btn-danger mx-2" *ngIf="accountData.isManual"
+                                                (click)="deleteAccount()">
+                                                {{ "Delete" | localize }}
+                                            </button>
+                                        </div>
+                                        <div class="d-flex "
+                                            [ngClass]="isArabic ? 'view-profile-action-buttons-ar':'view-profile-action-buttons-en'"
+                                            *ngIf="accountData.isConnected && !showEditConnected &&isNotManualLevel()">
+                                            <button class="btn mb-3 mt-4 w-100 btn-save"
+                                                [disabled]="priceLevel==accountData.priceLevel"
+                                                (click)="editConnnectedAccount()">
+                                                {{ "Save" | localize }}
+                                            </button>
+                                            <button class="btn mb-3 mt-4 w-100 btn-danger"
+                                                (click)="showEditConnected =true; priceLevel=accountData.priceLevel">
+                                                {{ "Undo" | localize }}
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+
+                            <div class="row" *ngIf="!(Editting && personalAccount)">
+                                <div class="col-md-2 ml-5">
+                                    <div class="dev-logo">
+                                        <img [src]="companyLogo ? companyLogo  :'../../../../assets/common/images/default-profile-picture.png'" alt="" srcset="" [ngClass]="isArabic ? 'dev-logo-ar' : 'logo-profile'" style="height: 120px;width: 120px;">
+                                        <!-- <app-image-display
+                                            [image]="companyLogo ? companyLogo  :'../../../../assets/common/images/default-profile-picture.png'"
+                                            [sycAttachmentCategory]="sycAttachmentCategoryLogo"
+                                             [classList]="isArabic ? 'dev-logo-ar' : 'logo-profile'" [staticHeight]="120">
+                                        </app-image-display> -->
+                                    </div>
+                                </div>
+                                <div class="col title-cover px-4">
+                                    <h5 class="account-name">{{accountData?.name}}
+
+                                    </h5>
+                                    <p style="font-size: 12px;">{{contactData?.jobTitle}}</p>
+                                    <div *ngIf="!personalAccount">
+                                        <textarea class="thin-scroll w-100 mt-2 txtSty" readonly="">{{accountData?.description}}
+                                        </textarea>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group row mt-2" *ngIf='personalAccount && Editting'>
+                                <label for="colFormLabelSm"
+                                    class="col-sm-2 col-form-label col-form-label-sm label-form">{{l("AccountLogo")}}
+                                </label>
+                                <app-image-upload [sycAttachmentCategory]="sycAttachmentCategoryLogo"
+                                 
+                                    [image]="companyLogo" [staticWidth]="170" [showGuidelines]="true"
+                                    (imageBrowseDone)="imageBrowseDone($event, sycAttachmentCategoryLogo, -1)"
+                                    (removeImage)="removeImage($event,sycAttachmentCategoryLogo,-1)">
+                                </app-image-upload>
+                            </div>
+
+                            <div class="form-group row " *ngIf='personalAccount && Editting'>
+                                <label
+                                    class="col-sm-2 col-form-label col-form-label-sm label-form">{{l("AccountCover")}}
+                                </label>
+                                <app-image-upload [sycAttachmentCategory]="sycAttachmentCategoryBanner"
+                                  
+                                    [image]="coverPhoto" [staticHeight]="120" [showGuidelines]="true"
+                                    (imageBrowseDone)="imageBrowseDone($event, sycAttachmentCategoryBanner, -2)"
+                                    (removeImage)="removeImage($event,sycAttachmentCategoryBanner,-2)">
+                                </app-image-upload>
+
+                            </div>
+
+                            
+                            <hr class="header" *ngIf="!personalAccount">
+                            <div class="row mx-1" *ngIf="!personalAccount">
+                                <div class="col-md-12">
+                                    <div class="address mb-3"
+                                        *ngIf="accountData?.addressLine1 || accountData?.city || accountData?.state || accountData?.zipCode || accountData?.countryName">
+                                        <img class="icon-address" src="assets/accounts/Address.svg">
+
+                                        <p class="title-account mb-0" *ngIf="accountData">
+                                            <span>
+                                                {{"Headquarters" | localize}}:
+                                            </span>
+                                            <span *ngIf="accountData && accountData.addressLine1">
+                                                {{ accountData.addressLine1 + ', '}}
+                                            </span>
+                                            <span *ngIf="accountData && accountData.addressLine2">
+                                                {{ accountData.addressLine2 + ', '}}
+                                            </span>
+                                            <span *ngIf="accountData && accountData.city">
+                                                {{ accountData.city + ', '}}
+                                            </span>
+                                            <span *ngIf="accountData && accountData.state">
+                                                {{ accountData.state + ', ' }}
+                                            </span>
+                                            <span *ngIf="accountData && accountData.zipCode">
+                                                {{accountData.zipCode }}{{accountData.countryName ? ', ' : '' }}
+                                            </span>
+                                            <span *ngIf="accountData && accountData.countryName">
+                                                {{ accountData.countryName }} .
+                                            </span>
+                                        </p>
+                                    </div>
+                                    <div class="mail mb-3 mx-2" *ngIf="accountData?.website">
+                                        <img class="icon-web" src="assets/accounts/website.svg">
+
+                                        <p class="title-account mb-0">{{accountData?.website}}</p>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <div [class]="containerClass + ' kt-grid__item kt-grid__item--fluid'" *ngIf="!personalAccount"
+            [ngClass]="imageObject.length > 0 ? 'addHight':'addMg'">
+            <div class="kt-portlet kt-portlet--mobile kt-slider" style="border-radius: 4px;">
+                <div class="kt-portlet__body p-0 bg-white"
+                    *ngIf="!imageObject || imageObject.length > 0;else noImagesAdded">
+
+                    <div class="row p-59-15">
+                        <div class="col-md-12">
+                            <ng-image-slider #nav [images]="imageObject" [infinite]="false" [autoSlide]="1"
+                                [imageSize]="{width: 381, height: 300}" slideImage="1"></ng-image-slider>
+                        </div>
+
+                    </div>
+                </div>
+                <ng-template #noImagesAdded>
+                    <div class="kt-portlet__body p-0 ">
+                        <div class="row">
+                            <div class="col-md-12 pb-3 pt-5 text-center">
+                                <p>{{"Noimagestodisplay" | localize}}</p>
+                            </div>
+                        </div>
+                    </div>
+                </ng-template>
+            </div>
+        </div>
+        <div [class]="containerClass + ' kt-grid__item kt-grid__item--fluid'" *ngIf="!personalAccount">
+            <div class="kt-portlet kt-portlet--mobile">
+                <div class="kt-portlet kt-portlet--mobile">
+                <div class="kt-portlet__body account-info-grid-wrapper">
+  <div class="account-info-grid py-2">
+
+    <div class="account-info-item" *ngIf="accountData?.accountType">
+      <p class="title-dev-slider">{{ "AccountType" | localize }}</p>
+      <div class="account-type">
+        <p class="title-tag">{{ accountData.accountType }}</p>
+      </div>
+    </div>
+
+    <div class="account-info-item" *ngIf="accountData?.ssin">
+      <p class="title-dev-slider">{{ "AccountSSIN" | localize }}</p>
+      <div class="account-type">
+        <p class="title-tag">{{ accountData.ssin }}</p>
+      </div>
+    </div>
+
+    <div class="account-info-item" *ngIf="accountData?.code">
+      <p class="title-dev-slider">{{ "AccountCode" | localize }}</p>
+      <div class="account-type">
+        <p class="title-tag">{{ accountData.code }}</p>
+      </div>
+    </div>
+
+    <div
+      class="account-info-item"
+      *ngIf="
+        (accountData?.priceLevel && !accountData?.isConnected) ||
+        (accountData?.isConnected && !showEditConnected) ||
+        (accountData?.isConnected && accountData?.priceLevel && showEditConnected)
+      "
+    >
+      <p class="title-dev-slider">{{ "PriceLevel" | localize }}</p>
+      <div class="account-type" *ngIf="accountData?.priceLevel">
+        <p class="title-tag">{{ accountData.priceLevel }}</p>
+      </div>
+    </div>
+
+    <div class="account-info-item" *ngIf="accountData?.currencyName">
+      <p class="title-dev-slider">{{ "Currency" | localize }}</p>
+      <div class="account-type">
+        <p class="title-tag">{{ accountData.currencyName }}</p>
+      </div>
+    </div>
+
+    <div class="account-info-item account-info-item-full" *ngIf="marketplaceRolesList?.length">
+      <p class="title-dev-slider">{{ "MarketplaceRole" | localize }}</p>
+      <div class="role-chip-wrapper">
+        <span *ngFor="let role of marketplaceRolesList" class="role-chip">
+          {{ role }}
+        </span>
+      </div>
+    </div>
+
+    <div class="account-info-item" *ngIf="accountData?.shipViaName">
+      <p class="title-dev-slider">{{ "ShipVia" | localize }}</p>
+      <div class="account-type">
+        <p class="title-tag">{{ accountData.shipViaName }}</p>
+      </div>
+    </div>
+
+    <div class="account-info-item" *ngIf="accountData?.paymentTermsName">
+      <p class="title-dev-slider">{{ "PaymentTerms" | localize }}</p>
+      <div class="account-type">
+        <p class="title-tag">{{ accountData.paymentTermsName }}</p>
+      </div>
+    </div>
+
+  </div>
+</div>
+                </div>
+            </div>
+        </div>
+        <div *ngIf="!personalAccount" [class]="
+            containerClass + ' kt-grid__item kt-grid__item--fluid mt-5'
+        ">
+            <div class="p-4 seeMoreContainer">
+                <div class="row pl-3">
+                    <div>
+                        <h6 class="header emailColor">{{ "Departments" | localize }}:</h6>
+                    </div>
+                </div>
+                <div class="row details pt-4" [ngClass]="{ 'thin-scroll': scrollDepartment }" [ngStyle]="{
+                    'overflow-y': scrollDepartment ? 'scroll' : 'hidden',
+                    height: scrollDepartment
+                        ? maxContainerHeight + 'px'
+                        : 'auto'
+                }" *ngIf="accountData?.classfications?.length > 0;else noDepartment">
+                    <div class="col-md-12 pb-3 pt-2">
+                        <div class="seeMoreData" *ngFor="let department of accountData?.categories; index as i  ">
+                            <p class="title-tag">{{ department }}</p>
+                        </div>
+                    </div>
+                    <button *ngIf="showLessDepartment" (click)="showDepartment()" class="btn btn-dark ml-5">
+                        {{ "Showless" | localize }}
+                    </button>
+                    <button *ngIf="showMoreDepartment" (click)="showDepartment()" class="btn btn-dark ml-5">
+                        {{ "showmore" | localize }}
+                    </button>
+                </div>
+                <ng-template #noDepartment>
+                    <div class="col-md-12 pb-3 pt-2 text-center">
+                        <p>
+                            {{ "NoDepartmentstodisplay" | localize }}
+                        </p>
+                    </div>
+                </ng-template>
+            </div>
+        </div>
+        <div *ngIf="!personalAccount" [class]="
+                containerClass + ' kt-grid__item kt-grid__item--fluid mt-5'
+            ">
+            <div class="p-4 seeMoreContainer">
+                <div class="row pl-3">
+                    <div>
+                        <h6 class="header emailColor">
+                            {{ "BusinessClassifications" | localize }}:
+                        </h6>
+                    </div>
+                </div>
+                <div class="row details pt-4" [ngClass]="{ 'thin-scroll': scrollClassification }" [ngStyle]="{
+                        'overflow-y': scrollClassification
+                            ? 'scroll'
+                            : 'hidden',
+                        height: scrollClassification
+                            ? maxContainerHeight + 'px'
+                            : 'auto'
+                    }" *ngIf="accountData?.classfications?.length > 0;  else noClassification">
+                    <div class="col-md-12 pb-3 pt-2">
+                        <div class="seeMoreData" *ngFor="let classification of accountData?.classfications;index as i">
+                            <p class="title-tag">{{ classification }}</p>
+                        </div>
+                    </div>
+                    <button *ngIf="showLessClassification" (click)="showClassification()" class="btn btn-dark ml-5">
+                        {{ "Showless" | localize }}
+                    </button>
+                    <button *ngIf="showMoreClassification" (click)="showClassification()" class="btn btn-dark ml-5">
+                        {{ "showmore" | localize }}
+                    </button>
+                </div>
+                <ng-template #noClassification>
+                    <div class="col-md-12 pb-3 pt-2 text-center">
+                        <p>
+                            {{
+                            "NoBusinessclassificationstodisplay" | localize
+                            }}
+                        </p>
+                    </div>
+                </ng-template>
+            </div>
+        </div>
+
+
+
+        <div *ngIf="personalAccount">
+            <div [class]="containerClass + ' kt-grid__item kt-grid__item--fluid'">
+                <div class="kt-portlet kt-portlet--mobile profileInfo_container">
+                    <div class="kt-portlet__body p-0 pb-3">
+                        <div class="pb-5  pr-4 pt-3 pl-3 row">
+                            <div class="col-md-12 d-flex align-items-baseline pt-2 pb-2 pl-3 pb-3">
+                                <p class="text-black font-weight-bold mb-2 title-dev-slider text-left">{{"Overview"
+                                    | localize}}</p>
+                            </div>
+
+
+                            <div class="col-md-12 align-items-baseline pt-2 pb-2 pl-3">
+                                <h6 class=" font-weight-bold mr-3" [ngClass]="Editting ? 'addWidth':''"><img
+                                        src="../../assets/img/input_icons/user.png" class=""> {{ ( "FirstName" |
+                                    localize ) + " :"}}</h6>
+
+                                <p *ngIf="!editFirstNameValue" class="text-left" style="color: #595959;"
+                                    [ngClass]="{'hide':NoteditInfo}">{{contactData?.firstName}}</p>
+                                <p *ngIf="editFirstNameValue" class="text-left" style="color: #595959;"
+                                    [ngClass]="{'hide':NoteditInfo}">{{editFirstNameValue}}</p>
+                                <input style="color: #595959 !important;" type="text"
+                                    class="form-control form-control-sm aria-input-text" name="firstName"
+                                    #firstNameInput="ngModel" required name="firstName" minlength="2"
+                                    [(ngModel)]="editFirstNameValue" [placeholder]="'Please Enter Name' | localize "
+                                    required [class.hide]="editInfo">
+                                <validation-messages *ngIf="NoteditInfo"
+                                    [formCtrl]="firstNameInput"></validation-messages>
+
+                            </div>
+                            <hr class="header">
+                            <div class="col-md-12 align-items-baseline pt-2 pb-2 pl-3">
+                                <h6 class="text-right font-weight-bold mr-3 "><img
+                                        src="../../assets/img/input_icons/user.png" class=""> {{ ( "LastName" |
+                                    localize ) + " :" }}</h6>
+
+                                <p *ngIf="!editLastNameValue" class="text-left" style="color: #595959;"
+                                    [ngClass]="{'hide':NoteditInfo}">{{contactData?.lastName}}</p>
+                                <p *ngIf="editLastNameValue" class="text-left" style="color: #595959;"
+                                    [ngClass]="{'hide':NoteditInfo}">{{editLastNameValue}}</p>
+                                <input style="color: #595959 !important;" type="text"
+                                    class="form-control form-control-sm aria-input-text" name="lastName"
+                                    #lastNameInput="ngModel" required name="lastName" minlength="2"
+                                    [(ngModel)]="editLastNameValue" [placeholder]="'Please Enter last Name' | localize "
+                                    required [class.hide]="editInfo">
+                                <validation-messages *ngIf="NoteditInfo"
+                                    [formCtrl]="lastNameInput"></validation-messages>
+
+
+                            </div>
+                            <hr class="header">
+
+
+                          <div class="col-md-12 align-items-baseline pt-2 pb-2 pl-3 d-flex">
+  <h6 class="text-right font-weight-bold mr-3">
+    <img src="../../assets/img/input_icons/user.png" class="">
+   
+    {{ l("MarketplaceRole") }}
+  </h6>
+
+  <!-- View mode -->
+  <div *ngIf="!Editting" class="d-flex flex-wrap gap-2">
+    <span *ngFor="let role of marketplaceRolesList" class="role-chip">
+      {{ role }}
+    </span>
+
+    <span *ngIf="!marketplaceRolesList?.length">-</span>
+  </div>
+
+  <!-- Edit mode -->
+  <div class="col-sm-8" *ngIf="Editting">
+    <p-multiSelect
+      [options]="roles"
+      [(ngModel)]="selectedRoles"
+      [ngModelOptions]="{ standalone: true }"
+      optionLabel="name"
+      optionValue="name"
+      placeholder="Select Roles"
+      [maxSelectedLabels]="3"
+      class="w-100 md:w-80"
+      display="chip">
+    </p-multiSelect>
+  </div>
+</div>
+                            <hr class="header">
+
+                            <div class="col-md-12  align-items-baseline pt-2 pb-2 pl-3">
+                                <h6 class=" font-weight-bold mr-3 " [ngClass]="Editting ? 'addWidth':''"> <img
+                                        src="../../assets/img/input_icons/outline-work.png" class=""> {{ (
+                                    "JobTitle" | localize ) + " :" }}</h6>
+
+                                <p *ngIf="!editJobTitleValue" class="text-left" style="color: #595959;"
+                                    [ngClass]="{'hide':NoteditInfo}">{{contactData?.jobTitle}}</p>
+                                <p *ngIf="editJobTitleValue" class="text-left" style="color: #595959;"
+                                    [ngClass]="{'hide':NoteditInfo}">{{editJobTitleValue}}</p>
+                                <input style="color: #595959 !important;" type="text"
+                                    class="form-control form-control-sm aria-input-text" name="jobTitle"
+                                    #jobTitleInput="ngModel" required name="jobTitle" [(ngModel)]="editJobTitleValue"
+                                    [placeholder]="'Please Enter job Title' | localize " required
+                                    [class.hide]="editInfo">
+                                <validation-messages *ngIf="NoteditInfo"
+                                    [formCtrl]="jobTitleInput"></validation-messages>
+
+                            </div>
+                            <hr class="header">
+                            <div class="col-md-12  align-items-baseline pt-2 pb-2  pl-3 d-flex">
+                                <h6 class="font-weight-bold mx-3  " [ngClass]="Editting ? 'addWidth':''"><img
+                                        src="../../assets/img/input_icons/letter.png" class="">{{ ( "Email" |
+                                    localize ) + " :" }}</h6>
+
+                                <p *ngIf="!editEMailAddressValue" class="text-left" style="color: #595959;"
+                                    [ngClass]="{'hide':NoteditInfo}">{{accountData?.eMailAddress}}</p>
+                                <p *ngIf="editEMailAddressValue" class="text-left" style="color: #595959;"
+                                    [ngClass]="{'hide':NoteditInfo}">{{editEMailAddressValue}}</p>
+                                <input style="color: #595959 !important;" type="text"
+                                    class="form-control form-control-sm aria-input-text" name="eMailAddress"
+                                    #eMailAddressInput="ngModel" required name="eMailAddress"
+                                    [(ngModel)]="editEMailAddressValue" [pattern]="emailPattern"
+                                    [placeholder]="'Please Enter eMail Address' | localize " required
+                                    [class.hide]="editInfo">
+
+                                <div *ngIf="editEMailAddressValue != '' && eMailAddressInput.errors &&(eMailAddressInput.touched || eMailAddressInput.dirty) && NoteditInfo"
+                                    class="text-danger">
+                                    <small>
+                                        Invalid Email
+                                    </small>
+                                </div>
+                                <div class="d-flex align-items-center ml-3" *ngIf="contactData && Editting">
+                                    <span class="mr-3 isPublic">{{ "IsPublic" | localize }}</span>
+                                    <p-inputSwitch name="emailAddressIsPublic"
+                                        [(ngModel)]="contactData.emailAddressIsPublic"></p-inputSwitch>
+                                </div>
+
+
+
+                            </div>
+                            <hr class="header">
+                            <div class="col-md-12  align-items-baseline pt-2 pb-2 pl-3 d-flex">
+                                <h6 class="text-right font-weight-bold mx-3 "> <img
+                                        src="../../assets/img/input_icons/language.png"> {{
+                                    ( "Language" |
+                                    localize ) + " :" }}</h6>
+
+
+                                <p *ngIf="!editLanguageNameValue" class="text-left" style="color: #595959;"
+                                    [ngClass]="{'hide':NoteditInfo}">{{contactData?.languageName}}</p>
+
+
+                                <p-dropdown *ngIf="Editting" [options]="allLanguages"
+                                    styleClass="form-control aria-select" [filter]="false" name="languageId"
+                                    [(ngModel)]="contactData.languageId"
+                                    [placeholder]="'PleaseSelect' | localize"></p-dropdown>
+
+                            </div>
+
+                            <hr class="header">
+                            <div class="col-md-12  align-items-baseline pt-2 pb-2 pl-3 d-flex">
+                                <h6 class=" font-weight-bold mr-3 " [ngClass]="Editting ? 'addWidth':''">
+                                    <img src="../../assets/img/input_icons/phone.png" class="">
+                                    {{ ( "Phone" |
+                                    localize ) + " :" }}
+                                </h6>
+
+                                <p *ngIf="!editPhoneNumberValue" class="text-left" style="color: #595959;"
+                                    [ngClass]="{'hide':NoteditInfo}">{{contactData?.phone1Number}}</p>
+                                <p *ngIf="editPhoneNumberValue" class="text-left" style="color: #595959;"
+                                    [ngClass]="{'hide':NoteditInfo}">{{editPhoneNumberValue}}</p>
+                                <input style="color: #595959 !important;" type="text"
+                                    class="form-control form-control-sm aria-input-text" name="phoneNumber"
+                                    #phoneNumberInput="ngModel" required name="phoneNumber"
+                                    [(ngModel)]="editPhoneNumberValue" [pattern]="phonePattern"
+                                    [placeholder]="'Please Enter phone Number' | localize " required
+                                    [class.hide]="editInfo">
+
+                                <div *ngIf="editPhoneNumberValue && phoneNumberInput.errors &&(phoneNumberInput.touched || phoneNumberInput.dirty)  && NoteditInfo"
+                                    class="text-danger">
+                                    <small>
+                                        Invalid Phone
+                                    </small>
+                                </div>
+
+                                <div class="d-flex align-items-center ml-3" *ngIf="contactData && Editting">
+                                    <span class="mr-3 isPublic">{{ "IsPublic" | localize }}</span>
+                                    <p-inputSwitch name="phoneNumberIsPublic"
+                                        [(ngModel)]="contactData.phone1IsPublic"></p-inputSwitch>
+                                </div>
+                            </div>
+
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>

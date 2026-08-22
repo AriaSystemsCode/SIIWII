@@ -1,0 +1,474 @@
+<!-- =========================
+CARDS VIEW MODE
+========================= -->
+<div *ngIf="cardsViewMode" class="market-card shadowContainer" [ngClass]="isAuthenticated ? 'market-card-h':''">
+
+  <div class="market-card__image" [ngStyle]="{
+    'background-image':
+      account?.account?.logoUrl
+        ? 'url(' + attachmentBaseUrl + '/' + account?.account?.logoUrl + ')'
+        : '../../assets/common/images/default-profile-picture.png'
+  }" (click)="clickCardHandler()">
+    <div class="type-overlay-badge" [ngClass]="isArabic ? 'arIcon':'enIcon'" *ngIf="!FromLandingPage"
+      [pTooltip]="(account?.account?.accountType | localize) + ('Account' | localize)" tooltipPosition="bottom"
+      [tooltipEvent]="isSmallScreen ? 'focus' : 'hover'" [autoHide]="true" [showDelay]="100" [hideDelay]="100"
+      [tabindex]="isSmallScreen ? 0 : null">
+      <i [ngClass]="getAccountTypeIcon(account?.account?.accountType)"></i>
+    </div>
+
+    <i *ngIf="!account?.account?.logoUrl" class="fa-image fas text-black-50"></i>
+  </div>
+
+  <div class="market-card__body">
+    <h3 class="market-card__title" (click)="clickCardHandler()">
+      {{ account?.account?.name | textSubstring : 16 }}  <i *ngIf="account?.account?.isManual" class="pi pi-user-edit ml-2"  [pTooltip]="'ManualAccount' | localize" tooltipPosition="bottom"
+            [tooltipEvent]="isSmallScreen ? 'focus' : 'hover'" [autoHide]="true" [showDelay]="100" [hideDelay]="100"
+            [tabindex]="isSmallScreen ? 0 : null"></i>
+    </h3>
+
+    <div class="d-flex jw-100">
+
+      <div class="market-card__followers w-50">
+        <img src="../../assets/accounts/followers-icon.png" alt="followers" class="market-card__followers-icon"
+          onerror="this.style.display='none'" />
+        <i class="fas fa-users useIc" [pTooltip]="'Connections' | localize" tooltipPosition="bottom"
+          [tooltipEvent]="isSmallScreen ? 'focus' : 'hover'" [autoHide]="true" [showDelay]="100" [hideDelay]="100"
+          [tabindex]="isSmallScreen ? 0 : null"></i>
+        <span class="mx-2">{{account?.account?.connections}} </span>
+
+      </div>
+
+      <div *ngIf="account?.account?.countryName" class="d-flex align-items-center w-50">
+        <i class="fas fa-map-marker-alt meta-ico mr-1" [pTooltip]="'Country' | localize" tooltipPosition="bottom"
+          [tooltipEvent]="isSmallScreen ? 'focus' : 'hover'" [autoHide]="true" [showDelay]="100" [hideDelay]="100"
+          [tabindex]="isSmallScreen ? 0 : null"></i>
+
+        <span class=" " style="white-space: nowrap;color: #1b101b;" [pTooltip]="account?.account?.countryName" tooltipPosition="bottom"
+          [tooltipEvent]="isSmallScreen ? 'focus' : 'hover'" [autoHide]="true" [showDelay]="100" [hideDelay]="100"
+          [tabindex]="isSmallScreen ? 0 : null">
+          {{ account?.account?.countryName | textSubstring : 10 }}
+        </span>
+      </div>
+    </div>
+
+    <div class="market-card__actions mt-3">
+      <div class="w-100 d-flex align-items-center justify-content-center" *ngIf="isAuthenticated">
+
+        <!-- Existing relations -->
+        <ng-container *ngIf="account?.connectionsInfo?.length > 0">
+          <div class="d-flex align-items-center">
+            <!-- first relation chip -->
+            <button type="button" class="relation-chip mr-1" style="white-space: nowrap;" [pTooltip]="getFormattedConnectionName(account.connectionsInfo[0]?.connectedLabel)" tooltipPosition="bottom"
+          [tooltipEvent]="isSmallScreen ? 'focus' : 'hover'" [autoHide]="true" [showDelay]="100" [hideDelay]="100"
+          [tabindex]="isSmallScreen ? 0 : null">
+              <span>{{ getFormattedConnectionName(account.connectionsInfo[0]?.connectedLabel) | textSubstring : 15 }}</span>
+              <i class="pi pi-times ml-1 removI"
+                (click)="removeRelation(account, account.connectionsInfo[0]); $event.stopPropagation()">
+              </i>
+            </button>
+
+            <!-- visibility icon only when one relation and not fromMarketplace -->
+            <img
+              *ngIf="account?.connectionsInfo?.length === 1 && !fromMarketplace"
+              style="width: 22px; cursor: pointer;"
+              class="mx-1"
+              [src]="account?.connectionsInfo[0]?.visibility === 'Public'
+                ? '../../assets/accounts/views.png'
+                : '../../assets/accounts/hidden.png'"
+              (click)="makeRelationPrivatePublic(account.connectionsInfo[0], account.connectionsInfo[0]?.visibility !== 'Public')"
+            />
+
+            <!-- more count -->
+            <button *ngIf="account.connectionsInfo.length > 1" type="button" class="relation-chip mr-2"
+              (click)="openRelationsDialog(account)">
+              +{{ account.connectionsInfo.length - 1 }}
+            </button>
+          </div>
+        </ng-container>
+
+        <!-- Available connections menu when both current + available exist -->
+        <div *ngIf="account?.availableConnections?.length > 0 && account?.connectionsInfo?.length > 0"
+          class="relation-more-menu position-relative" dropdown container="body">
+
+          <button type="button" class="dots-btn" dropdownToggle>
+            <img src="assets/accounts/CONNECT.png" alt="" srcset="">
+          </button>
+
+          <ul *dropdownMenu class="dropdown-menu relation-dropdown" role="menu"
+            [ngClass]="isArabic ? 'dropdown-menu-ar' : 'dropdown-menu-en'">
+
+            <li role="menuitem" *ngFor="let option of account.availableConnections" class="relation-item">
+
+              <button class="dropdown-item relation-btn" type="button" (click)="!isCreatingRelation && createRelation(option)">
+
+                <div class="d-flex align-items-center justify-content-between w-100">
+                  <div class="d-flex align-items-center">
+                    <img class="relation-icon mr-2" [src]="getConnectionIcon(option?.connectionName)" alt="" />
+                    <span class="relation-label">
+                      {{ option?.connectionName }}
+                    </span>
+                  </div>
+                </div>
+
+              </button>
+            </li>
+          </ul>
+        </div>
+
+        <!-- No current relations, only available ones -->
+        <div *ngIf="(!account?.connectionsInfo?.length) && account?.availableConnections?.length > 0" class="w-100">
+          <ng-container *ngIf="account?.availableConnections as options">
+            <div class="relationWrap w-100 text-center position-relative" dropdown container="body">
+              <button type="button" class="relation_button market-follow-btn w-100" dropdownToggle style="font-size: 12px;">
+                <img class="pb-1" style="width: 13px;" [src]="getConnectionIcon(options[0]?.connectionName)" alt="" />
+                <span class="ml-1" [title]="options[0]?.connectionName" (click)="!isCreatingRelation && createRelation(options[0])">
+                  {{ options[0]?.connectionName | textSubstring : 18 }}
+                </span>
+
+                <i *ngIf="options.length > 1" class="fas fa-angle-down ml-2" style="color: #fff !important;"></i>
+              </button>
+
+              <ng-container *ngIf="options.length > 0">
+                <ul *dropdownMenu class="dropdown-menu" role="menu">
+                  <li role="menuitem" *ngFor="let option of options | slice:1" class="py-2">
+                    <button class="dropdown-item" type="button" (click)="!isCreatingRelation && createRelation(option)">
+                      {{ option?.connectionName }}
+                    </button>
+                  </li>
+                </ul>
+              </ng-container>
+            </div>
+          </ng-container>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- =========================
+NOT CARDS VIEW MODE
+========================= -->
+<div *ngIf="!cardsViewMode"
+  class="single-item memberCard_container shadowContainer single-card-mode p-3 extra-padding-bottom">
+  <div class="align-items-center bg-secondary d-flex fa-3x justify-content-around single-item-photo siglCd" [ngStyle]="{
+    'background-image':
+      account.account.logoUrl
+        ? 'url(' + attachmentBaseUrl + '/' + account?.account?.logoUrl + ')'
+        : '',
+    'height': '100px'
+  }" (click)="clickCardHandler()">
+    <div class="type-overlay-badge" [ngClass]="isArabic ? 'arIcon':'enIcon'" *ngIf="account?.account?.accountType"
+      [pTooltip]="account?.account?.accountType | localize" tooltipPosition="bottom"
+      [tooltipEvent]="isSmallScreen ? 'focus' : 'hover'" [autoHide]="true" [showDelay]="100" [hideDelay]="100"
+      [tabindex]="isSmallScreen ? 0 : null">
+      <i [ngClass]="getAccountTypeIcon(account?.account?.accountType)"></i>
+    </div>
+
+    <i *ngIf="!account.account.logoUrl" class="fa-image fas text-black-50"></i>
+  </div>
+
+  <div class="single-item-body pr-0 w-100">
+    <div>
+      <div class="col-md-12 px-0">
+        <div class="d-flex justify-content-between">
+          <h3 class="card-name my-1 m-0"
+            [pTooltip]="account?.account?.name?.length > 25 ? account?.account?.name : null" tooltipPosition="bottom"
+            [tooltipEvent]="isSmallScreen ? 'focus' : 'hover'" [autoHide]="true" [showDelay]="100" [hideDelay]="100"
+            [tabindex]="isSmallScreen ? 0 : null">
+            {{account?.account?.name | textSubstring : 25 }}  
+          </h3>      <img *ngIf="account?.account?.isManual && !fromMarketplace"   [pTooltip]="'ManualAccount' | localize" tooltipPosition="bottom"
+            [tooltipEvent]="isSmallScreen ? 'focus' : 'hover'" [autoHide]="true" [showDelay]="100" [hideDelay]="100"
+            [tabindex]="isSmallScreen ? 0 : null" style="width: 18px;"
+                  src="../../assets/accounts/manual-i.svg" /> 
+                   <img *ngIf="!account?.account?.isManual && !fromMarketplace"   [pTooltip]="'ConnectedAccount' | localize" tooltipPosition="bottom"
+            [tooltipEvent]="isSmallScreen ? 'focus' : 'hover'" [autoHide]="true" [showDelay]="100" [hideDelay]="100"
+            [tabindex]="isSmallScreen ? 0 : null" style="width: 25px;"
+                  src="../../assets/accounts/connected-i.svg" /> 
+               
+        </div>
+
+        <div class="info-container d-flex flex-column">
+          <!-- Categories Section -->
+          <div *ngIf="!cardsViewMode && account.account.categories.length !=0"
+            class="d-flex align-items-center flex-nowrap categories-wrap" style="white-space: nowrap;">
+
+            <p class="m-0 product-name mr-1 section-mini-label">
+              <i class="fas fa-solid fa-layer-group  mr-1" [pTooltip]="'Categories' | localize" tooltipPosition="bottom"
+                [tooltipEvent]="isSmallScreen ? 'focus' : 'hover'" [autoHide]="true" [showDelay]="100" [hideDelay]="100"
+                [tabindex]="isSmallScreen ? 0 : null"></i>
+            </p>
+
+            <span class="d-flex flex-nowrap align-items-center">
+
+              <span *ngFor="let category of account.account.categories | slice:0:(isSmallScreen ? 2 : 3)"
+                class="singleCat" [pTooltip]="category" tooltipPosition="bottom"
+                [tooltipEvent]="isSmallScreen ? 'focus' : 'hover'" [autoHide]="true" [showDelay]="100" [hideDelay]="100"
+                [tabindex]="isSmallScreen ? 0 : null">
+                {{ category?.length > 8 ? (category | slice:0:8) + '..' : category }}
+              </span>
+
+              <span *ngIf="account.account.categories.length > (isSmallScreen ? 2 : 3)"
+                class="singleCat more-cat more-cat-wrap">
+                +{{ account.account.categories.length - (isSmallScreen ? 2 : 3) }}
+
+                <div class="more-cat-tooltip">
+                  <div class="more-cat-tooltip-list">
+                    <div class="more-cat-tooltip-item"
+                      *ngFor="let category of account.account.categories | slice:(isSmallScreen ? 2 : 3)">
+                      {{ category }}
+                    </div>
+                  </div>
+                </div>
+              </span>
+
+            </span>
+          </div>
+
+          <!-- Classifications Section -->
+          <div *ngIf="!cardsViewMode && account.account.classfications.length != 0"
+            class="d-flex align-items-center flex-nowrap classifications-wrap mt-1" style="white-space: nowrap;">
+
+            <p class="m-0 product-name mr-1 section-mini-label">
+              <i class="fas fa-sitemap  mr-1" [pTooltip]="'Classifications' | localize" tooltipPosition="bottom"
+                [tooltipEvent]="isSmallScreen ? 'focus' : 'hover'" [autoHide]="true" [showDelay]="100" [hideDelay]="100"
+                [tabindex]="isSmallScreen ? 0 : null"></i>
+            </p>
+
+            <span class="d-flex flex-nowrap align-items-center" *ngIf="account.account.classfications.length > 0">
+
+              <span *ngFor="let class of account.account.classfications | slice:0:(isSmallScreen ? 1 : 2)"
+                class="singleCat" [pTooltip]="class" tooltipPosition="bottom"
+                [tooltipEvent]="isSmallScreen ? 'focus' : 'hover'" [autoHide]="true" [showDelay]="100" [hideDelay]="100"
+                [tabindex]="isSmallScreen ? 0 : null">
+                {{ class?.length > 11 ? (class | slice:0:11) + '..' : class }}
+              </span>
+
+              <span *ngIf="account.account.classfications.length > (isSmallScreen ? 1 : 2)"
+                class="singleCat more-class-wrap">
+                +{{ account.account.classfications.length - (isSmallScreen ? 1 : 2) }}
+
+                <div class="more-class-tooltip">
+                  <div class="more-class-list">
+                    <div class="more-class-item"
+                      *ngFor="let class of account.account.classfications | slice:(isSmallScreen ? 1 : 2)">
+                      {{ class }}
+                    </div>
+                  </div>
+                </div>
+              </span>
+
+            </span>
+
+            <span *ngIf="account.account.classfications.length === 0" class="mt-2">
+              {{ "NotSpecified" | localize }}
+            </span>
+          </div>
+        </div>
+
+        <div class=" align-items-center "
+          [ngClass]="account.account.categories.length ==0 && account.account.classfications.length == 0 ? 'mt-5 pt-2' : account.account.categories.length !=0 && account.account.classfications.length != 0  ? 'mt-1' : 'mt-4 pt-2'">
+
+          <div>
+            <div class="btn-group dropdown" dropdown container="body" *ngIf="false">
+              <button class="dropdown-toggle btn btn-sm btn-action" dropdownToggle></button>
+              <ul class="dropdown-menu actions-dropdown-menu" *dropdownMenu>
+                <li>
+                  <a href="javascript:;" *ngIf="isManual === false" (click)="viewProfile()">
+                    {{l('ViewProfile')}}
+                  </a>
+                </li>
+                <li>
+                  <a *ngIf="isManual===true" (click)="edit()">{{'Edit' | localize}}</a>
+                </li>
+                <li>
+                  <a href="javascript:;" *ngIf="isManual === true" (click)="deleteAccount()">
+                    {{ 'Delete' | localize }}
+                  </a>
+                </li>
+              </ul>
+            </div>
+
+            <div class="card-actions">
+  
+
+              <div style="width: 100%;" class="d-lg-flex d-none justify-content-between" *ngIf="isAuthenticated">
+                <div *ngIf="account?.connectionsInfo?.length > 0" class="d-flex align-items-center ">
+                  <button type="button" class="relation-chip mr-1" style="white-space: nowrap;" [pTooltip]="getFormattedConnectionName(account.connectionsInfo[0]?.connectedLabel)" tooltipPosition="bottom"
+          [tooltipEvent]="isSmallScreen ? 'focus' : 'hover'" [autoHide]="true" [showDelay]="100" [hideDelay]="100"
+          [tabindex]="isSmallScreen ? 0 : null">
+                     <img
+                    *ngIf="account?.connectionsInfo?.length === 1 && !fromMarketplace"
+                    style="width: 15px; cursor: pointer;"
+                    class="mx-1"
+                    [src]="account?.connectionsInfo[0]?.visibility === 'Public'
+                      ? '../../assets/accounts/views.png'
+                      : '../../assets/accounts/hidden.png'"
+                    (click)="makeRelationPrivatePublic(account.connectionsInfo[0], account.connectionsInfo[0]?.visibility !== 'Public')"
+                  /> <span>{{ getFormattedConnectionName(account.connectionsInfo[0]?.connectedLabel) | textSubstring : 15 }}</span>
+                    <i class="pi pi-times ml-1 removI"
+                      (click)="removeRelation(account, account.connectionsInfo[0]); $event.stopPropagation()">
+                    </i>
+                  </button>
+
+                  <!-- visibility icon only when one relation and not fromMarketplace -->
+                
+
+                  <button *ngIf="account.connectionsInfo.length > 1" type="button" class="relation-chip mr-1"
+                    (click)="openRelationsDialog(account)">
+                    +{{ account.connectionsInfo.length - 1 }}
+                  </button>
+                </div>
+
+                <div *ngIf="account?.connectionsInfo == null || account?.connectionsInfo?.length == 0"></div>
+
+                <div *ngIf="account?.availableConnections?.length > 0">
+                  <ng-container *ngIf="account?.availableConnections as options">
+                    <div class="relationWrap " style="text-align: end;" dropdown container="body">
+                      <button type="button" class="relation_button" dropdownToggle>
+                        <img class="pb-1" style="width: 12px;" (click)="!isCreatingRelation && createRelation(options[0])"
+                          [src]="getConnectionIcon(options[0]?.connectionName)" alt="" />
+                        <span (click)="!isCreatingRelation && createRelation(options[0])" class="ml-1" [title]="options[0]?.connectionName"
+                          style="font-size: 11px;">
+                          {{ options[0]?.connectionName | textSubstring : 15 }}
+                        </span>
+
+                        <i *ngIf="options.length > 1" class="fas fa-md ml-2 fa-angle-down"
+                          style="color: #fff !important;"></i>
+                      </button>
+
+                      <ng-container *ngIf="options.length > 1">
+                        <ul *dropdownMenu class="dropdown-menu" role="menu">
+                          <li role="menuitem" *ngFor="let option of options | slice:1" class="py-2">
+                            <button class="dropdown-item" type="button" (click)="!isCreatingRelation && createRelation(option)">
+                              {{ option?.connectionName }}
+                            </button>
+                          </li>
+                        </ul>
+                      </ng-container>
+                    </div>
+                  </ng-container>
+                </div>
+              </div>
+
+              <div class="d-lg-none d-flex">
+                <!-- Existing relations -->
+                <ng-container *ngIf="account?.connectionsInfo?.length > 0">
+                  <div class="d-flex align-items-center">
+                    <button type="button" class="relation-chip mr-1" style="white-space: nowrap;" [pTooltip]="getFormattedConnectionName(account.connectionsInfo[0]?.connectedLabel)" tooltipPosition="bottom"
+          [tooltipEvent]="isSmallScreen ? 'focus' : 'hover'" [autoHide]="true" [showDelay]="100" [hideDelay]="100"
+          [tabindex]="isSmallScreen ? 0 : null"> 
+                      <span>{{ getFormattedConnectionName(account.connectionsInfo[0]?.connectedLabel) | textSubstring : 15 }}</span>
+                      <i class="pi pi-times ml-1 removI"
+                        (click)="removeRelation(account, account.connectionsInfo[0]); $event.stopPropagation()">
+                      </i>
+                    </button>
+
+                    <!-- visibility icon only when one relation and not fromMarketplace -->
+                    <img
+                      *ngIf="account?.connectionsInfo?.length === 1 && !fromMarketplace"
+                      style="width: 22px; cursor: pointer;"
+                      class="mx-1"
+                      [src]="account?.connectionsInfo[0]?.visibility === 'Public'
+                        ? '../../assets/accounts/views.png'
+                        : '../../assets/accounts/hidden.png'"
+                      (click)="makeRelationPrivatePublic(account.connectionsInfo[0], account.connectionsInfo[0]?.visibility !== 'Public')"
+                    />
+
+                    <button *ngIf="account.connectionsInfo.length > 1" type="button" class="relation-chip mr-2"
+                      (click)="openRelationsDialog(account)">
+                      +{{ account.connectionsInfo.length - 1 }}
+                    </button>
+                  </div>
+                </ng-container>
+
+                <!-- Available connections menu when both current + available exist -->
+                <div *ngIf="account?.availableConnections?.length > 0 && account?.connectionsInfo?.length > 0"
+                  class="relation-more-menu position-relative" dropdown container="body">
+
+                  <button type="button" class="dots-btn" dropdownToggle>
+                    <img src="assets/accounts/CONNECT.png" alt="" srcset="">
+                  </button>
+
+                  <ul *dropdownMenu class="dropdown-menu relation-dropdown" role="menu"
+                    [ngClass]="isArabic ? 'dropdown-menu-ar' : 'dropdown-menu-en'">
+
+                    <li role="menuitem" *ngFor="let option of account.availableConnections" class="relation-item">
+                      <button class="dropdown-item relation-btn" type="button" (click)="!isCreatingRelation && createRelation(option)">
+                        <div class="d-flex align-items-center justify-content-between w-100">
+                          <div class="d-flex align-items-center">
+                            <img class="relation-icon mr-2" [src]="getConnectionIcon(option?.connectionName)" alt="" />
+                            <span class="relation-label">
+                              {{ option?.connectionName }}
+                            </span>
+                          </div>
+                        </div>
+                      </button>
+                    </li>
+                  </ul>
+                </div>
+
+                <!-- No current relations, only available ones -->
+                <div *ngIf="(!account?.connectionsInfo?.length) && account?.availableConnections?.length > 0" class="w-100">
+                  <ng-container *ngIf="account?.availableConnections as options">
+                    <div class="relationWrap w-100 text-center" dropdown container="body">
+                      <button type="button" class="relation_button market-follow-btn " dropdownToggle style="font-size: 12px;">
+                        <img class="pb-1" style="width: 13px;" [src]="getConnectionIcon(options[0]?.connectionName)" alt="" />
+                        <span class="ml-1" [title]="options[0]?.connectionName">
+                          {{ options[0]?.connectionName | textSubstring : 18 }}
+                        </span>
+
+                        <i *ngIf="options.length > 1" class="fas fa-angle-down ml-2" style="color: #fff !important;"></i>
+                      </button>
+
+                      <ng-container *ngIf="options.length > 0">
+                        <ul *dropdownMenu class="dropdown-menu" role="menu">
+                          <li role="menuitem" *ngFor="let option of options | slice:1" class="py-2">
+                            <button class="dropdown-item" type="button" (click)="!isCreatingRelation && createRelation(option)">
+                              {{ option?.connectionName }}
+                            </button>
+                          </li>
+                        </ul>
+                      </ng-container>
+                    </div>
+                  </ng-container>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<p-dialog [(visible)]="showRelationsDialog" [modal]="true" [closable]="true" [draggable]="false" [resizable]="false"
+  [dismissableMask]="true" [style]="{ width: '420px' }" header="Relations">
+
+  <div *ngIf="selectedAccountForRelations?.connectionsInfo?.length > 0" class="d-flex flex-column">
+    <div *ngFor="let relation of selectedAccountForRelations.connectionsInfo; let i = index"
+      class="d-flex align-items-center justify-content-between relation-popup-item mb-2">
+
+      <div class="d-flex align-items-center">
+        <button type="button" class="relation-chip mr-2" style="white-space: nowrap;">
+          <span>{{ getFormattedConnectionName(relation.connectedLabel) }}</span>
+          <i class="pi pi-times ml-1 removI" (click)="removeRelationFromDialog(selectedAccountForRelations, relation, i)">
+          </i>
+        </button>
+
+        <!-- visibility icon in dialog only when more than one relation and not fromMarketplace -->
+        <img
+          *ngIf="selectedAccountForRelations?.connectionsInfo?.length > 1 && !fromMarketplace"
+          style="width: 22px; cursor: pointer;"
+          [src]="relation?.visibility === 'Public'
+            ? '../../assets/accounts/views.png'
+            : '../../assets/accounts/hidden.png'"
+          (click)="makeRelationPrivatePublic(relation, relation?.visibility !== 'Public')"
+        />
+      </div>
+    </div>
+  </div>
+
+</p-dialog>

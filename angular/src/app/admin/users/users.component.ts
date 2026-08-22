@@ -66,6 +66,9 @@ export class UsersComponent extends AppComponentBase implements OnInit,AfterView
     onlyLockedUsers = false;
     isHost:boolean;
 
+        currentLang: string = 'en';
+    isArabic: boolean = false;
+
     constructor(
         injector: Injector,
         public _impersonationService: ImpersonationService,
@@ -83,6 +86,8 @@ export class UsersComponent extends AppComponentBase implements OnInit,AfterView
     }
 
     ngOnInit() {
+                   this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
+        this.currentLang == 'ar' || this.currentLang == 'ar-EG'  ? this.isArabic = true : this.isArabic = false
            this.isHost = !this.appSession.tenantId;
     }
 
@@ -269,5 +274,18 @@ export class UsersComponent extends AppComponentBase implements OnInit,AfterView
                     this.mailbody
                 );
             });
+    }
+    disconnectUserFromTeamMember(user: UserListDto){
+
+        this._userServiceProxy
+        .disconnectUserFromTeamMember(user.id)
+        .subscribe((result) => {
+            if(result){
+                user.memberId=0;
+                this.notify.success("User "+ user.userName  +" is disconnected")
+                this.getUsers()
+            }
+        });
+
     }
 }

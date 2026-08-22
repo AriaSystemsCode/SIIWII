@@ -27,6 +27,8 @@ import { TreeModule } from 'primeng/tree';
 import { DropdownModule } from 'primeng/dropdown';
 import { MultiSelectModule } from 'primeng/multiselect';
 import { FileUploadModule } from 'ng2-file-upload';
+import { videoTutorialComponent } from './components/videoTutorial.component';
+
 
 @NgModule({
     declarations: [
@@ -37,7 +39,8 @@ import { FileUploadModule } from 'ng2-file-upload';
         autoCropComponent,
         imageCroppingComponent,
         importConfirmationComponent,
-        successfullyImportComponent
+        successfullyImportComponent,
+        videoTutorialComponent
     ],
     imports: [
         CommonModule,
@@ -70,7 +73,8 @@ import { FileUploadModule } from 'ng2-file-upload';
         autoCropComponent,
         imageCroppingComponent,
         importConfirmationComponent,
-        successfullyImportComponent
+        successfullyImportComponent,
+        videoTutorialComponent
     ]
 })
 export class BulkImportModule { }

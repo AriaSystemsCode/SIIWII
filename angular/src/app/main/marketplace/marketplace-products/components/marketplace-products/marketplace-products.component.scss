@@ -39,6 +39,48 @@
     gap: 12px;
 }
 
+.sarch {
+    gap: 7px;
+}
+
+.no-data-placeholder {
+    margin-top: 150px !important;
+}
+
+.mobile-search-span {
+    width: 40%;
+}
+
+.mobile-filter-btn {
+    width: 60%;
+}
+
+.currency-list {
+    overflow-y: scroll;
+    height: 200px;
+}
+
+::ng-deep .mobile-filters-dialog {
+    width: 40vw;
+}
+
+.toolbar-group {
+    min-width: 0;
+}
+
+.toolbar-group-search {
+    flex: 1 1 auto;
+}
+
+.toolbar-group-search .group-srch {
+    width: 100%;
+    min-width: 220px;
+}
+
+.products-content-col {
+    min-width: 0;
+}
+
 .cur {
     width: 97px;
 }
@@ -66,11 +108,30 @@
 
     }
 
+    .toolbar-group-share {
+        flex: 1 1 240px;
+        margin-right: 0;
+    }
+
+    .toolbar-group-search {
+        flex: 1 1 100%;
+        justify-content: flex-start !important;
+        flex-wrap: wrap;
+    }
+
+    .sarch {
+        width: 100%;
+    }
+
+    .product-filters-col {
+        padding-right: 12px !important;
+    }
+
 }
 
 @media only screen and (min-width: 576px) {
     .app-seller {
-        margin-top: 70px;
+        // margin-top: 70px;
     }
 
 
@@ -80,6 +141,9 @@
 }
 
 ::ng-deep {
+    .p-paginator .p-dropdown {
+        height: auto !important;
+    }
     .filterBtn .p-button.p-button-secondary.p-button-outlined {
         height: 46px;
         white-space: nowrap;
@@ -92,7 +156,7 @@
 
     .web {
         .sortBy {
-            width: 32%;
+            width: 36%;
         }
 
         .filterBtn {
@@ -234,15 +298,29 @@
         .quickFilters {
             display: flex;
             justify-content: flex-start;
+            align-items: stretch;
+            flex-wrap: wrap;
             gap: 10px;
             margin: 10px 0px;
+        }
+
+        .quickFilters .p-input-icon-right,
+        .quickFilters .filter-btn {
+            width: 100% !important;
         }
 
         .btn-filters {
             display: flex;
             justify-content: flex-start;
+            flex-wrap: wrap;
             gap: 10px;
             margin-bottom: 10px;
+        }
+
+        .btn-filters .filter-btn,
+        .btn-filters .filterBtn,
+        .btn-filters .resBtn {
+            width: calc(50% - 5px) !important;
         }
 
         .filter-btn {
@@ -257,6 +335,27 @@
             flex-wrap: wrap;
             gap: 8px;
         }
+    }
+}
+
+@media only screen and (max-width: 767px) {
+    .web .main-c {
+        align-items: stretch !important;
+    }
+
+    .web .sarch {
+        justify-content: flex-start !important;
+    }
+
+    .web .group-srch {
+        width: 100%;
+    }
+
+    .web .sortBy,
+    .web .p-dropdown,
+    .web .filterBtn,
+    .web .resBtn {
+        width: 100%;
     }
 }
 
@@ -326,3 +425,48 @@
     width: 100%;
     margin-top: 10px;
 }
+
+  
+
+  .addPadding {
+    padding-right: 80px;
+  }
+  @media only screen and (min-width: 1024px) {
+  .addARPadding{
+    padding-left: 50px !important;
+  }
+}
+  @media only screen and (min-width: 1400px) {
+  .addMargin {
+    margin-right: 40px;
+  }
+}
+
+.marketplace-mg {
+    margin-right: 70px !important;
+}
+
+@media only screen and (min-width: 900px) {
+.addPt {
+    margin-top: 100px !important;
+}
+
+}
+@media only screen and (min-width: 575px) and (max-width: 900px)  {
+    .addPt {
+        margin-top: 15px !important;
+    }
+    
+    }
+
+@media only screen and (max-width: 520px) {
+    .addMtM {
+        margin-top: 60px !important;
+    }
+    }
+
+
+
+    .addngTop {
+        margin-top: -50px;
+    }

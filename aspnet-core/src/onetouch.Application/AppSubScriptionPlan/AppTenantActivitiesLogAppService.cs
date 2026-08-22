@@ -46,7 +46,7 @@ namespace onetouch.AppSubScriptionPlan
         {
 
             var filteredAppTenantActivitiesLog = _appTenantActivityLogRepository.GetAll()
-                        .WhereIf(!string.IsNullOrWhiteSpace(input.Filter), e => false || e.TenantName.ToUpper().Contains(input.Filter.ToUpper()) || e.ActivityType.ToUpper().Contains(input.Filter.ToUpper()) || e.AppSubscriptionPlanCode.ToUpper().Contains(input.Filter.ToUpper()) || e.UserName.ToUpper().Contains(input.Filter.ToUpper()) || e.FeatureCode.ToUpper().Contains(input.Filter) || e.FeatureName.ToUpper().Contains(input.Filter.ToUpper()) || e.Reference.ToUpper().Contains(input.Filter.ToUpper()) || e.InvoiceNumber.ToUpper().Contains(input.Filter.ToUpper()) || e.CreditOrUsage.Contains(input.Filter) || e.Month.Contains(input.Filter) || e.Year.Contains(input.Filter))
+                        .WhereIf(!string.IsNullOrWhiteSpace(input.Filter), e => false || e.TenantName.ToUpper().Contains(input.Filter.ToUpper()) || e.ActivityType.ToUpper().Contains(input.Filter.ToUpper()) || e.AppSubscriptionPlanCode.ToUpper().Contains(input.Filter.ToUpper()) || e.UserName.ToUpper().Contains(input.Filter.ToUpper()) || e.FeatureCode.ToUpper().Contains(input.Filter.ToUpper()) || e.FeatureName.ToUpper().Contains(input.Filter.ToUpper()) || e.Reference.ToUpper().Contains(input.Filter.ToUpper()) || e.InvoiceNumber.ToUpper().Contains(input.Filter.ToUpper()) || e.CreditOrUsage.Contains(input.Filter) || e.Month.Contains(input.Filter) || e.Year.Contains(input.Filter))
                         .WhereIf(input.MinTenantIdFilter != null, e => e.TenantId >= input.MinTenantIdFilter)
                         .WhereIf(input.MaxTenantIdFilter != null, e => e.TenantId <= input.MaxTenantIdFilter)
                         .WhereIf(!string.IsNullOrWhiteSpace(input.TenantNameFilter), e => e.TenantName.ToUpper().Contains(input.TenantNameFilter.ToUpper()))
@@ -301,7 +301,8 @@ namespace onetouch.AppSubScriptionPlan
             */
             // var appTenantActivityLogListDtos = await query.ToListAsync();
 
-            return _appTenantActivitiesLogExcelExporter.ExportToFile(appTenantActivityLogListDtos.Items.ToList());
+            //return _appTenantActivitiesLogExcelExporter.ExportToFile(appTenantActivityLogListDtos.Items.ToList());
+            return await _appTenantActivitiesLogExcelExporter.ExportAppTenantActivitiesLogToExcel(appTenantActivityLogListDtos.Items.ToList());
         }
         public async Task<bool> IsFeatureAvailable(string featureCode)
         {
@@ -542,7 +543,7 @@ namespace onetouch.AppSubScriptionPlan
                     AppTenantActivitiesLog obj = new AppTenantActivitiesLog();
                     obj.TenantId = AbpSession.TenantId;
                     var tenant = TenantManager.GetById(int.Parse(AbpSession.TenantId.ToString()));
-                    obj.TenantName = tenant.Name;
+                    obj.TenantName = tenant.Name.Length > 30? tenant.Name.Substring(0, 30):tenant.Name;
                     obj.UserId = long.Parse(AbpSession.UserId.ToString());
                     var user = UserManager.GetUserById(long.Parse(AbpSession.UserId.ToString()));
                     obj.UserName = user.UserName;
@@ -582,7 +583,7 @@ namespace onetouch.AppSubScriptionPlan
                     AppTenantActivitiesLog obj = new AppTenantActivitiesLog();
                     obj.TenantId = AbpSession.TenantId;
                     var tenant = TenantManager.GetById(int.Parse(AbpSession.TenantId.ToString()));
-                    obj.TenantName = tenant.Name;
+                    obj.TenantName = tenant.Name.Length> 30? tenant.Name.Substring(0,30):tenant.Name;
                     obj.UserId = long.Parse(AbpSession.UserId.ToString());
                     var user = UserManager.GetUserById(long.Parse(AbpSession.UserId.ToString()));
                     obj.UserName = user.UserName;

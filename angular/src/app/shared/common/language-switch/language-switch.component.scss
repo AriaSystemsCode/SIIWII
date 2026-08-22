@@ -16,3 +16,31 @@
 .header__topbar-item i{
     display:flex;
 }
+
+
+.dropdown-menu {
+    position: absolute;
+    z-index: 1080;
+    max-height: 80vh;    
+    overflow: auto;
+    overscroll-behavior: contain;
+  }
+  
+  /* LTR (English) */
+  .dropdown-menu-en {
+    right: 0 !important;
+    left: auto !important;
+    width: 320px;
+    text-align: right;     
+    background-color: #fff;
+  }
+  
+  /* RTL (Arabic) */
+  .dropdown-menu-ar {
+    left: 0 !important;
+    right: auto !important;
+    width: 320px;
+    text-align: right;
+    background-color: #fff;
+  }
+  

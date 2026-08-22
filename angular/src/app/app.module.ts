@@ -219,6 +219,7 @@ import { OverALLRatingReviewsModule } from "./main/overallRating-reviews/overall
         SharedDynamicInputsModule,
         NotesModule,
         TransactionModule,
+
         OverALLRatingReviewsModule
     ],
 

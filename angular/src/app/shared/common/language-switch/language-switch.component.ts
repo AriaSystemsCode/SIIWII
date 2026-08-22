@@ -17,7 +17,7 @@ export class LanguageSwitchComponent
 {
     currentLanguage: abp.localization.ILanguageInfo;
     languages: abp.localization.ILanguageInfo[] = [];
-
+    isArabic:boolean 
     constructor(
         injector: Injector,
         private _profileServiceProxy: ProfileServiceProxy
@@ -31,6 +31,9 @@ export class LanguageSwitchComponent
             (l) => (<any>l).isDisabled === false
         );
         this.currentLanguage = abp.localization.currentLanguage;
+        this.currentLanguage.displayName == "العربية" ? this.isArabic = true : this.isArabic = false
+    
+   
     }
 
     changeLanguage(language: abp.localization.ILanguageInfo) {

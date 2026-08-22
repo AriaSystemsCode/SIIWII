@@ -54,11 +54,15 @@ using onetouch.SycCurrencyExchangeRates;
 using onetouch.AppMarketplaceAccountsPriceLevels;
 using onetouch.AppMarketplaceTransactions;
 using onetouch.AppMarketplaceMessages;
+using onetouch.AppMarketplaceContacts;
 
 namespace onetouch.EntityFrameworkCore
 {
     public class onetouchDbContext : AbpZeroDbContext<Tenant, Role, User, onetouchDbContext>, IAbpPersistedGrantDbContext
     {
+        //I40[Start]
+        public virtual DbSet<AppContactRelationshipInfo> AppContactRelationshipInfo { get; set; }
+        //I40[End]
         public virtual DbSet<ValidationRule> ValidationRules { get; set; }
 
         public virtual DbSet<AppTenantInvoice> AppTenantInvoices { get; set; }
@@ -66,7 +70,10 @@ namespace onetouch.EntityFrameworkCore
         public virtual DbSet<AppTenantActivitiesLog> AppTenantActivitiesLog { get; set; }
 
         public virtual DbSet<AppEntityLog> AppEntityLog { get; set; }
-         public virtual DbSet<AppEntityRating> AppEntityRatings { get; set; }
+        public virtual DbSet<AppMarketplaceContact> AppMarketplaceContacts { get; set; }
+        public virtual DbSet<AppMarketplaceAddress> AppMarketplaceAddresses { get; set; }
+        public virtual DbSet<AppMarketplaceContactAddress> AppMarketplaceContactAddress { get; set; }
+        public virtual DbSet<AppEntityRating> AppEntityRatings { get; set; }
 
         public virtual DbSet<AppTenantSubscriptionPlan> AppTenantSubscriptionPlans { get; set; }
 
@@ -384,6 +391,11 @@ namespace onetouch.EntityFrameworkCore
                        .HasOne(x => x.ParentFk)
                        .WithMany(x => x.ParentFkList)
                        .HasForeignKey(x => x.ParentId);
+
+            modelBuilder.Entity<AppMarketplaceContact>()
+         .HasOne(x => x.ParentFk)
+         .WithMany(x => x.ParentFkList)
+         .HasForeignKey(x => x.ParentId);
 
             modelBuilder.Entity<AppEntityExtraData>()
                .HasOne(x => x.EntityFk)

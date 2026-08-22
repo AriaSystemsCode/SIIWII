@@ -11,7 +11,7 @@
     }
     .title-cover{
         padding-top: 20px;
-        padding-right: 20px;
+        // padding-right: 20px;
         position: relative;
         p{
             font-weight: 600;
@@ -107,8 +107,9 @@
 
     .view-profile-action-buttons {
         position: absolute;
-        right: 20px;
-        bottom: -25px;
+    right: 20px;
+    bottom: -50px;
+    z-index: 2;
     }
 
 

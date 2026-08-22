@@ -1,8 +1,6 @@
 <div [@routerTransition]>
     <div class="kt-content  kt-grid__item kt-grid__item--fluid kt-grid kt-grid--hor">
-        <div class="kt-subheader kt-grid__item" style="
-        width: 94%;
-    ">
+        <div class="kt-subheader kt-grid__item"  [ngClass]="isArabic ? 'addMTMob':'mt-lg-0 mt-md-4 '">
             <div [class]="containerClass">
                 <div class="kt-subheader__main">
                     <h3 class="kt-subheader__title">
@@ -16,9 +14,9 @@
                 <div class="kt-subheader__toolbar">
                     <div class="kt-subheader__wrapper">
                         <button  (click)="showSendMail()" *ngIf="!isHost"
-                            class="btn btn-primary"><i class="fa fa-plus"></i> {{"InviteNewUser" | localize}}</button>
+                            class="btn btn-primary"><i class="fa fa-plus"></i> {{"InviteUser" | localize}}</button>
                         <div class="btn-group" dropdown>
-                            <button dropdownToggle type="button" class="btn btn-outline-success dropdown-toggle"
+                            <button dropdownToggle type="button" class="btn btn-outline-success dropdown-toggle px-2"
                                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 <i class="far fa-file-excel"></i> {{"ExcelOperations" | localize}}
                             </button>
@@ -47,13 +45,13 @@
                         </div>
 
                         <button (click)="createUser()" *ngIf="'Pages.Administration.Users.Create' | permission"
-                            class="btn btn-primary"><i class="fa fa-plus"></i> {{"CreateNewUser" | localize}}</button>
+                            class="btn btn-primary"><i class="fa fa-plus"></i> {{"CreateUser" | localize}}</button>
                     </div>
                 </div>
             </div>
         </div>
         <div [class]="containerClass + ' kt-grid__item kt-grid__item--fluid'">
-            <div class="kt-portlet kt-portlet--mobile">
+            <div  [ngClass]="isArabic ? 'addMT body-sec':'body-sec mt-lg-5'">
                 <div class="kt-portlet__body">
                     <form class="kt-form" autocomplete="new-password">
                         <div>
@@ -128,37 +126,37 @@
                                 [resizableColumns]="primengTableHelper.resizableColumns">
                                 <ng-template pTemplate="header">
                                     <tr>
-                                        <th style="width: 130px"
+                                        <th class="w-130" [ngClass]="isArabic ? 'alignStart':''"
                                             [hidden]="!(['Pages.Administration.Users.Impersonation', 'Pages.Administration.Users.Edit', 'Pages.Administration.Users.ChangePermissions', 'Pages.Administration.Users.Delete'] | permissionAny)">
                                             {{'Actions' | localize}}</th>
-                                        <th style="width: 150px" pSortableColumn="username">
+                                        <th class="w-150" [ngClass]="isArabic ? 'alignStart':''" pSortableColumn="username">
                                             {{'UserName' | localize}}
                                             <p-sortIcon field="username"></p-sortIcon>
                                         </th>
-                                        <th style="width: 150px" pSortableColumn="name">
+                                        <th class="w-150" [ngClass]="isArabic ? 'alignStart':''" pSortableColumn="name">
                                             {{'Name' | localize}}
                                             <p-sortIcon field="name"></p-sortIcon>
                                         </th>
-                                        <th style="width: 150px" pSortableColumn="surname">
+                                        <th class="w-150" [ngClass]="isArabic ? 'alignStart':''" pSortableColumn="surname">
                                             {{'Surname' | localize}}
                                             <p-sortIcon field="surname"></p-sortIcon>
                                         </th>
-                                        <th style="width: 150px">
+                                        <th class="w-150" [ngClass]="isArabic ? 'alignStart':''">
                                             {{'Roles' | localize}}
                                         </th>
-                                        <th style="width: 250px" pSortableColumn="emailAddress">
+                                        <th class="w-250" [ngClass]="isArabic ? 'alignStart':''" pSortableColumn="emailAddress">
                                             {{'EmailAddress' | localize}}
                                             <p-sortIcon field="emailAddress"></p-sortIcon>
                                         </th>
-                                        <th style="width: 200px" pSortableColumn="isEmailConfirmed">
+                                        <th class="w-200" [ngClass]="isArabic ? 'alignStart':''" pSortableColumn="isEmailConfirmed">
                                             {{'EmailConfirm' | localize}}
                                             <p-sortIcon field="isEmailConfirmed"></p-sortIcon>
                                         </th>
-                                        <th style="width: 100px" pSortableColumn="isActive">
+                                        <th class="wPX100" [ngClass]="isArabic ? 'alignStart':''" pSortableColumn="isActive">
                                             {{'Active' | localize}}
                                             <p-sortIcon field="isActive"></p-sortIcon>
                                         </th>
-                                        <th style="width: 200px" pSortableColumn="creationTime">
+                                        <th class="w-200" [ngClass]="isArabic ? 'alignStart':''" pSortableColumn="creationTime">
                                             {{'CreationTime' | localize}}
                                             <p-sortIcon field="creationTime"></p-sortIcon>
                                         </th>
@@ -166,7 +164,7 @@
                                 </ng-template>
                                 <ng-template pTemplate="body" let-record="$implicit">
                                     <tr>
-                                        <td style="width: 130px"
+                                        <td class="w-130" [ngClass]="isArabic ? 'alignStart':''"
                                             [hidden]="!(['Pages.Administration.Users.Impersonation', 'Pages.Administration.Users.Edit', 'Pages.Administration.Users.ChangePermissions', 'Pages.Administration.Users.Delete'] | permissionAny)">
                                             <div class="btn-group dropdown" dropdown container="body">
                                                 <button dropdownToggle class="dropdown-toggle btn btn-sm btn-primary">
@@ -204,48 +202,52 @@
                                                             *ngIf="'Pages.Administration.Users.Delete' | permission"
                                                             (click)="deleteUser(record)">{{'Delete' | localize}}</a>
                                                     </li>
-                                                    <li *ngIf="appSession.tenantId">
+                                                    <li *ngIf="record.memberId != 0">
                                                         <a href="javascript:;"
                                                             (click)="ViewProfile(record)">{{'ViewProfile' | localize}}</a>
+                                                    </li>
+                                                    <li *ngIf="record.memberId != 0">
+                                                        <a href="javascript:;"
+                                                            (click)="disconnectUserFromTeamMember(record)">{{'Disconnect' | localize}}</a>
                                                     </li>
                                                 </ul>
                                             </div>
                                         </td>
-                                        <td style="width: 150px">
+                                        <td class="w-150" [ngClass]="isArabic ? 'alignStart':''">
                                             <span class="p-column-title"> {{'UserName' | localize}}</span>
                                             {{record.userName}}
                                         </td>
-                                        <td style="width: 150px">
+                                        <td class="w-150" [ngClass]="isArabic ? 'alignStart':''">
                                             <span class="p-column-title"> {{'Name' | localize}}</span>
                                             {{record.name}}
                                         </td>
-                                        <td style="width: 150px">
+                                        <td class="w-150" [ngClass]="isArabic ? 'alignStart':''">
                                             <span class="p-column-title"> {{'Surname' | localize}}</span>
                                             {{record.surname}}
                                         </td>
-                                        <td style="width: 150px">
+                                        <td class="w-150" [ngClass]="isArabic ? 'alignStart':''">
                                             <span class="p-column-title"> {{'Roles' | localize}}</span>
                                             {{getRolesAsString(record.roles)}}
                                         </td>
-                                        <td style="width: 250px">
+                                        <td class="w-250" [ngClass]="isArabic ? 'alignStart':''">
                                             <span class="p-column-title"> {{'EmailAddress' | localize}}</span>
                                             {{record.emailAddress}}
                                         </td>
-                                        <td style="width: 200px">
+                                        <td class="w-200" [ngClass]="isArabic ? 'alignStart':''">
                                             <span class="p-column-title"> {{'EmailConfirm' | localize}}</span>
                                             <span class="kt-badge kt-badge--success kt-badge--inline"
                                                 *ngIf="record.isEmailConfirmed">{{'Yes' | localize}}</span>
                                             <span class="kt-badge kt-badge--dark kt-badge--inline"
                                                 *ngIf="!record.isEmailConfirmed">{{'No' | localize}}</span>
                                         </td>
-                                        <td style="width: 100px">
+                                        <td class="wPX100" [ngClass]="isArabic ? 'alignStart':''">
                                             <span class="p-column-title"> {{'Active' | localize}}</span>
                                             <span class="kt-badge kt-badge--success kt-badge--inline"
                                                 *ngIf="record.isActive">{{'Yes' | localize}}</span>
                                             <span class="kt-badge kt-badge--dark kt-badge--inline"
                                                 *ngIf="!record.isActive">{{'No' | localize}}</span>
                                         </td>
-                                        <td style="width: 200px">
+                                        <td class="w-200" [ngClass]="isArabic ? 'alignStart':''">
                                             <span class="p-column-title"> {{'CreationTime' | localize}}</span>
                                             {{record.creationTime | momentFormat:'L'}}
                                         </td>

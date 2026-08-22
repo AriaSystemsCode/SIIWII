@@ -45,7 +45,45 @@ namespace onetouch.AppItems.Dtos
         public bool IsVariation { get; set; }
         public bool IsAdvancedSearch { get; set; }
         public bool AllowAddNew { get; set; }
-        
+        public VisibleWhen? VisibleWhen { get; set; }
+        [XmlElement("RelatedWhen")]
+        public RelatedWhen? RelatedWhen { get; set; }
+        public DataSource? DataSource { get; set; }
+
+    }
+    [Serializable]
+    public class DataSource
+    {
+        public string Service { get; set; }
+        public string Api { get; set; }
+        public string Parameter { get; set; }
+    }
+
+    [Serializable]
+    public class VisibleWhen
+    {
+        public string ExtraAttributeId { get; set; }
+        public string OperatorValue { get; set; }
+        public string Value { get; set; }
+
+    }
+
+    [Serializable]
+    public class RelatedWhen
+    {
+        [XmlElement("Relation")]
+        public List<Relation> Relation { get; set; }
+    }
+
+    [Serializable]
+    public class Relation
+    {
+        [XmlElement("TargetName")]
+        public string TargetName { get; set; }
+        [XmlElement("SourceField")]
+        public string SourceField { get; set; }
+        [XmlElement("TargetField")]
+        public string TargetField { get; set; }
     }
 
 }

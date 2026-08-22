@@ -71,7 +71,8 @@ export class AppTransactionsBrowseComponent extends AppComponentBase implements 
     isAmountReset :boolean
     isReset :boolean
     isTypeReset :boolean
-
+  currentLang: string
+  isArabic: boolean
 
     constructor(
         injector: Injector,
@@ -82,9 +83,12 @@ export class AppTransactionsBrowseComponent extends AppComponentBase implements 
         private cdr: ChangeDetectorRef
     ) {
         super(injector);
+        this.tenantRoleService.loadRoles();
 
     }
     ngOnInit(): void {
+            this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
+    this.currentLang == 'ar' || this.currentLang == 'ar-EG' ? this.isArabic = true : this.isArabic = false
         setTimeout(() => {
             this.showHeader = true;
             this.cdr.detectChanges();
@@ -245,26 +249,25 @@ export class AppTransactionsBrowseComponent extends AppComponentBase implements 
         this.mainFilterCtrl.setValue(selectedfilter);
     }
     createNewSalesOrder() {
-        this.roles = [
-            { name: "I'm a Seller", code: 1 },
-            {
-                name: "I'm an Independent Sales Rep.",
-                code: 3,
-            },
-        ];
-        this.getOderNumber("SO", "Sales Order");
+        if (!this.tenantRoleService.canCreateSO()) {
+            this.showNoCreatePermissionAlert();
+            return;
+        }
+        else {
+            this.roles = this.tenantRoleService.soRolesOptions;
+            this.getOderNumber("SO", "Sales Order");
+        }
     }
 
     createNewPurchaseOrder() {
-        this.roles = [
-            { name: "I'm a Buyer", code: 2 },
-            {
-                name: "I'm an Independent buying office.",
-                code: 3,
-            },
-        ];
-        this.getOderNumber("PO", "Purchase Order");
-
+        if (!this.tenantRoleService.canCreatePO()) {
+            this.showNoCreatePermissionAlert();
+            return;
+        }
+        else {
+            this.roles = this.tenantRoleService.poRolesOptions;
+            this.getOderNumber("PO", "Purchase Order");
+        }
     }
 
     getOderNumber(tranType: string, tranName: string) {

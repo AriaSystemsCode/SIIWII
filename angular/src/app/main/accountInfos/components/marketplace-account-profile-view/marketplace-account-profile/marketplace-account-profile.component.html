@@ -1,0 +1,350 @@
+<div class="container-s mb-lg-5 pb-lg-5" [ngClass]="isArabic ?'addMg':''">
+  <section>
+    <div class="position-relative">
+      <img class=" p-0 w-100 cover-img" [src]="attachmentBaseUrl + '/' + accountDataForView?.coverUrl"
+        onerror="this.src='../../assets/placeholders/_logo-placeholder.png'" />
+      <img class=" p-0 " [src]="attachmentBaseUrl + '/' + accountDataForView?.logoUrl"
+        onerror="this.src='../../assets/placeholders/_logo-placeholder.png'" [ngClass]="isArabic ? 'acc-img-ar':'acc-img'" />
+    </div>
+    <div class="bottom-sec">
+      <div class=" mt-2 position-relative"   [ngStyle]="{
+        'margin-left' : !isArabic ? '190px'  : '','margin-right' : isArabic ? '190px'  : '',
+    }"  [ngClass]="isArabic ? 'info-sec-ar':'info-sec'"  >
+        <div class="d-flex justify-content-between align-items-center">
+          <h4>{{accountDataForView?.name}}</h4>
+
+    <div
+  *ngIf="isAuthenticated"
+  class="d-md-flex d-none align-items-center "
+  style="gap: 4px;"
+>
+  <!-- No current connections -->
+  <ng-container *ngIf="!marketPlaceData?.connectionsInfo?.length">
+    <div *ngIf="marketPlaceData?.availableConnections?.length > 0" dropdown class="position-relative">
+      <button type="button" class="relation_button" dropdownToggle  >
+          <img src="assets/accounts/CONNECT.png" alt="" srcset="">
+        <span (click)="createRelation(marketPlaceData?.availableConnections[0])"> {{ marketPlaceData?.availableConnections[0].connectionName }}</span>
+        <i class="fas fa-angle-down ml-2" style="color: #fff !important;"></i>
+      </button>
+
+      <ul *dropdownMenu class="dropdown-menu" role="menu">
+        <li
+          role="menuitem"
+          *ngFor="let option of marketPlaceData?.availableConnections | slice:1"
+          class="py-2"
+        >
+          <button class="dropdown-item" type="button" (click)="createRelation(option)">
+            {{ option?.connectionName }}
+          </button>
+        </li>
+      </ul>
+    </div>
+  </ng-container>
+
+  <!-- Existing connections -->
+  <ng-container *ngIf="marketPlaceData?.connectionsInfo?.length > 0">
+    <!-- First connection only -->
+    <button type="button" class="relation-chip mr-1" style="white-space: nowrap;">
+      <span>
+        {{ getFormattedConnectionName(marketPlaceData?.connectionsInfo[0]?.connectedLabel) }}
+      </span>
+      <i
+        class="pi pi-times ml-1 removI"
+        (click)="disconnect(marketPlaceData?.connectionsInfo[0])"
+      ></i>
+    </button>
+
+    <!-- More count -->
+    <button
+      *ngIf="marketPlaceData?.connectionsInfo?.length > 1"
+      type="button"
+      class="relation-chip more-chip"
+      (click)="openConnectionsDialog()"
+    >
+      +{{ marketPlaceData?.connectionsInfo?.length - 1 }}
+    </button>
+
+    <!-- Add available connections -->
+    <div *ngIf="marketPlaceData?.availableConnections?.length > 0" dropdown class="position-relative">
+      <button type="button" class="relation-add-btn dots-btn" dropdownToggle>
+          <img src="assets/accounts/CONNECT.png" alt="" srcset="">
+      </button>
+
+      <ul *dropdownMenu class="dropdown-menu" role="menu">
+        <li
+          role="menuitem"
+          *ngFor="let option of marketPlaceData?.availableConnections"
+          class="py-2"
+        >
+          <button class="dropdown-item" type="button" (click)="createRelation(option)">
+            {{ option?.connectionName }}
+          </button>
+        </li>
+      </ul>
+    </div>
+  </ng-container>
+</div>
+        </div>
+        <div class="d-flex justify-content-between">
+          <div class="d-md-flex d-none gap-3 justify-content-start align-items-center"
+            style="gap: 5px;white-space: nowrap;">
+            <div *ngIf="marketPlaceData?.contact?.jobTitle != null" class="d-flex align-items-center "><svg class="mr-2"
+                width="24" height="25" viewBox="0 0 24 25" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path
+                  d="M4 19.5V8.5H20V11.79C20.72 12.01 21.4 12.33 22 12.76V8.5C22 7.39 21.11 6.5 20 6.5H16V4.5C16 3.39 15.11 2.5 14 2.5H10C8.89 2.5 8 3.39 8 4.5V6.5H4C2.89 6.5 2.01 7.39 2.01 8.5L2 19.5C2 20.61 2.89 21.5 4 21.5H11.68C11.38 20.88 11.18 20.21 11.08 19.5H4ZM10 4.5H14V6.5H10V4.5Z"
+                  fill="#777777" />
+                <path
+                  d="M18 13.5C15.24 13.5 13 15.74 13 18.5C13 21.26 15.24 23.5 18 23.5C20.76 23.5 23 21.26 23 18.5C23 15.74 20.76 13.5 18 13.5ZM19.65 20.85L17.5 18.7V15.5H18.5V18.29L20.35 20.14L19.65 20.85Z"
+                  fill="#777777" />
+              </svg>
+              <h6 class="m-0 accType">{{marketPlaceData?.contact?.jobTitle}}</h6>
+            </div>
+            <p *ngIf="marketPlaceData?.contact?.jobTitle != null" class="m-0">|</p>
+            <p class="m-0 white-space-nowrap accType">{{'AccountType' | localize}} : <span>{{accountDataForView?.accountType}}</span>
+            </p>
+            <p class="m-0">|</p>
+
+            <p class="m-0"><svg width="24" height="25" viewBox="0 0 24 25" fill="none"
+                xmlns="http://www.w3.org/2000/svg">
+                <path
+                  d="M20.1429 18.7751C20.7321 19.0501 21.2634 19.3876 21.7366 19.7876C22.2098 20.1876 22.6116 20.6334 22.942 21.1251C23.2723 21.6167 23.5312 22.15 23.7188 22.725C23.9062 23.3 24 23.8917 24 24.5H22.2857C22.2857 23.8417 22.1518 23.2209 21.8839 22.6375C21.6161 22.0542 21.25 21.5459 20.7857 21.1126C20.3214 20.6792 19.7723 20.3334 19.1384 20.0751C18.5045 19.8167 17.8393 19.6917 17.1429 19.7001C16.4286 19.7001 15.7634 19.8251 15.1473 20.0751C14.5312 20.3251 13.9866 20.6667 13.5134 21.1001C13.0402 21.5334 12.6696 22.0459 12.4018 22.6375C12.1339 23.2292 12 23.85 12 24.5H10.2857C10.2857 23.8917 10.375 23.3 10.5536 22.725C10.7321 22.15 10.9911 21.6167 11.3304 21.1251C11.6696 20.6334 12.0759 20.1876 12.5491 19.7876C13.0223 19.3876 13.5536 19.0501 14.1429 18.7751C13.4732 18.3251 12.9509 17.7626 12.5759 17.0876C12.2009 16.4126 12.0089 15.6835 12 14.9002C12 14.2418 11.8661 13.621 11.5982 13.0377C11.3304 12.4544 10.9643 11.946 10.5 11.5127C10.0357 11.0794 9.48661 10.7336 8.85268 10.4752C8.21875 10.2169 7.55357 10.0919 6.85714 10.1002C6.14286 10.1002 5.47768 10.2252 4.86161 10.4752C4.24554 10.7252 3.70089 11.0669 3.22768 11.5002C2.75446 11.9335 2.38393 12.446 2.11607 13.0377C1.84821 13.6293 1.71429 14.2502 1.71429 14.9002H0C0 14.2918 0.0892857 13.7002 0.267857 13.1252C0.446429 12.5502 0.705357 12.0169 1.04464 11.5252C1.38393 11.0336 1.79018 10.5877 2.26339 10.1877C2.73661 9.78774 3.26786 9.45024 3.85714 9.17525C3.1875 8.72526 2.66518 8.16277 2.29018 7.48778C1.91518 6.81279 1.72321 6.08363 1.71429 5.30031C1.71429 4.64199 1.84821 4.02117 2.11607 3.43784C2.38393 2.85452 2.75 2.34619 3.21429 1.91287C3.67857 1.47954 4.22321 1.13371 4.84821 0.875385C5.47321 0.617055 6.14286 0.492057 6.85714 0.500391C7.5625 0.500391 8.22768 0.625389 8.85268 0.875385C9.47768 1.12538 10.0223 1.46704 10.4866 1.90037C10.9509 2.33369 11.3214 2.84619 11.5982 3.43784C11.875 4.0295 12.0089 4.65032 12 5.30031C12 6.08363 11.8125 6.81279 11.4375 7.48778C11.0625 8.16277 10.5357 8.72526 9.85714 9.17525C10.5357 9.49191 11.1429 9.90024 11.6786 10.4002C12.2143 10.9002 12.6518 11.4669 12.9911 12.1002C13.4732 11.4752 14.0759 10.9877 14.7991 10.6377C15.5223 10.2877 16.3036 10.1086 17.1429 10.1002C17.8482 10.1002 18.5134 10.2252 19.1384 10.4752C19.7634 10.7252 20.308 11.0669 20.7723 11.5002C21.2366 11.9335 21.6071 12.446 21.8839 13.0377C22.1607 13.6293 22.2946 14.2502 22.2857 14.9002C22.2857 15.6835 22.0982 16.4126 21.7232 17.0876C21.3482 17.7626 20.8214 18.3251 20.1429 18.7751ZM6.85714 8.50026C7.33036 8.50026 7.77232 8.41693 8.18304 8.25026C8.59375 8.0836 8.95982 7.85444 9.28125 7.56278C9.60268 7.27111 9.84821 6.93362 10.0179 6.55029C10.1875 6.16697 10.2768 5.75031 10.2857 5.30031C10.2857 4.85865 10.1964 4.44616 10.0179 4.06283C9.83929 3.67951 9.59375 3.33784 9.28125 3.03785C8.96875 2.73785 8.60714 2.50869 8.19643 2.35036C7.78571 2.19203 7.33929 2.1087 6.85714 2.10036C6.38393 2.10036 5.94196 2.1837 5.53125 2.35036C5.12054 2.51702 4.75446 2.74619 4.43304 3.03785C4.11161 3.32951 3.86607 3.66701 3.69643 4.05033C3.52679 4.43366 3.4375 4.85032 3.42857 5.30031C3.42857 5.74197 3.51786 6.15447 3.69643 6.53779C3.875 6.92112 4.12054 7.26278 4.43304 7.56278C4.74554 7.86277 5.10714 8.09193 5.51786 8.25026C5.92857 8.4086 6.375 8.49193 6.85714 8.50026ZM17.1429 18.1001C17.6161 18.1001 18.058 18.0168 18.4688 17.8501C18.8795 17.6834 19.2455 17.4543 19.567 17.1626C19.8884 16.871 20.1339 16.5335 20.3036 16.1501C20.4732 15.7668 20.5625 15.3501 20.5714 14.9002C20.5714 14.4585 20.4821 14.046 20.3036 13.6627C20.125 13.2793 19.8795 12.9377 19.567 12.6377C19.2545 12.3377 18.8929 12.1085 18.4821 11.9502C18.0714 11.7919 17.625 11.7085 17.1429 11.7002C16.6696 11.7002 16.2277 11.7835 15.817 11.9502C15.4062 12.1169 15.0402 12.346 14.7188 12.6377C14.3973 12.9294 14.1518 13.2668 13.9821 13.6502C13.8125 14.0335 13.7232 14.4502 13.7143 14.9002C13.7143 15.3418 13.8036 15.7543 13.9821 16.1376C14.1607 16.521 14.4062 16.8626 14.7188 17.1626C15.0312 17.4626 15.3929 17.6918 15.8036 17.8501C16.2143 18.0084 16.6607 18.0918 17.1429 18.1001ZM18.8571 3.70034H13.7143V2.10036H20.5714V8.50026H18.8571V3.70034Z"
+                  fill="#4A0D4A" />
+              </svg> {{marketPlaceData?.connectionCount}} {{'Connections' | localize}}
+            </p>
+          </div>
+
+  
+
+        </div>
+      </div>
+
+      <div class="d-md-none d-flex gap-3 justify-content-start align-items-center pl-2"
+        style="gap: 5px;white-space: nowrap;font-size: 10px;margin-top: 25px;color: #1B101B;">
+        <div class="d-flex align-items-center white-space-nowrap"><svg class="mr-2" width="16" height="16"
+            viewBox="0 0 24 25" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path
+              d="M4 19.5V8.5H20V11.79C20.72 12.01 21.4 12.33 22 12.76V8.5C22 7.39 21.11 6.5 20 6.5H16V4.5C16 3.39 15.11 2.5 14 2.5H10C8.89 2.5 8 3.39 8 4.5V6.5H4C2.89 6.5 2.01 7.39 2.01 8.5L2 19.5C2 20.61 2.89 21.5 4 21.5H11.68C11.38 20.88 11.18 20.21 11.08 19.5H4ZM10 4.5H14V6.5H10V4.5Z"
+              fill="#777777" />
+            <path
+              d="M18 13.5C15.24 13.5 13 15.74 13 18.5C13 21.26 15.24 23.5 18 23.5C20.76 23.5 23 21.26 23 18.5C23 15.74 20.76 13.5 18 13.5ZM19.65 20.85L17.5 18.7V15.5H18.5V18.29L20.35 20.14L19.65 20.85Z"
+              fill="#777777" />
+          </svg>
+          <h6 class="m-0">{{marketPlaceData?.contact?.jobTitle}}</h6>
+        </div>
+        <p class="m-0">|</p>
+        <h6 class="m-0 white-space-nowrap accTyp">{{'AccountType ' | localize}}: <span>{{accountDataForView?.accountType}}</span></h6>
+        <p class="m-0">|</p>
+
+        <p class="m-0"><svg width="16" height="16" viewBox="0 0 24 25" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path
+              d="M20.1429 18.7751C20.7321 19.0501 21.2634 19.3876 21.7366 19.7876C22.2098 20.1876 22.6116 20.6334 22.942 21.1251C23.2723 21.6167 23.5312 22.15 23.7188 22.725C23.9062 23.3 24 23.8917 24 24.5H22.2857C22.2857 23.8417 22.1518 23.2209 21.8839 22.6375C21.6161 22.0542 21.25 21.5459 20.7857 21.1126C20.3214 20.6792 19.7723 20.3334 19.1384 20.0751C18.5045 19.8167 17.8393 19.6917 17.1429 19.7001C16.4286 19.7001 15.7634 19.8251 15.1473 20.0751C14.5312 20.3251 13.9866 20.6667 13.5134 21.1001C13.0402 21.5334 12.6696 22.0459 12.4018 22.6375C12.1339 23.2292 12 23.85 12 24.5H10.2857C10.2857 23.8917 10.375 23.3 10.5536 22.725C10.7321 22.15 10.9911 21.6167 11.3304 21.1251C11.6696 20.6334 12.0759 20.1876 12.5491 19.7876C13.0223 19.3876 13.5536 19.0501 14.1429 18.7751C13.4732 18.3251 12.9509 17.7626 12.5759 17.0876C12.2009 16.4126 12.0089 15.6835 12 14.9002C12 14.2418 11.8661 13.621 11.5982 13.0377C11.3304 12.4544 10.9643 11.946 10.5 11.5127C10.0357 11.0794 9.48661 10.7336 8.85268 10.4752C8.21875 10.2169 7.55357 10.0919 6.85714 10.1002C6.14286 10.1002 5.47768 10.2252 4.86161 10.4752C4.24554 10.7252 3.70089 11.0669 3.22768 11.5002C2.75446 11.9335 2.38393 12.446 2.11607 13.0377C1.84821 13.6293 1.71429 14.2502 1.71429 14.9002H0C0 14.2918 0.0892857 13.7002 0.267857 13.1252C0.446429 12.5502 0.705357 12.0169 1.04464 11.5252C1.38393 11.0336 1.79018 10.5877 2.26339 10.1877C2.73661 9.78774 3.26786 9.45024 3.85714 9.17525C3.1875 8.72526 2.66518 8.16277 2.29018 7.48778C1.91518 6.81279 1.72321 6.08363 1.71429 5.30031C1.71429 4.64199 1.84821 4.02117 2.11607 3.43784C2.38393 2.85452 2.75 2.34619 3.21429 1.91287C3.67857 1.47954 4.22321 1.13371 4.84821 0.875385C5.47321 0.617055 6.14286 0.492057 6.85714 0.500391C7.5625 0.500391 8.22768 0.625389 8.85268 0.875385C9.47768 1.12538 10.0223 1.46704 10.4866 1.90037C10.9509 2.33369 11.3214 2.84619 11.5982 3.43784C11.875 4.0295 12.0089 4.65032 12 5.30031C12 6.08363 11.8125 6.81279 11.4375 7.48778C11.0625 8.16277 10.5357 8.72526 9.85714 9.17525C10.5357 9.49191 11.1429 9.90024 11.6786 10.4002C12.2143 10.9002 12.6518 11.4669 12.9911 12.1002C13.4732 11.4752 14.0759 10.9877 14.7991 10.6377C15.5223 10.2877 16.3036 10.1086 17.1429 10.1002C17.8482 10.1002 18.5134 10.2252 19.1384 10.4752C19.7634 10.7252 20.308 11.0669 20.7723 11.5002C21.2366 11.9335 21.6071 12.446 21.8839 13.0377C22.1607 13.6293 22.2946 14.2502 22.2857 14.9002C22.2857 15.6835 22.0982 16.4126 21.7232 17.0876C21.3482 17.7626 20.8214 18.3251 20.1429 18.7751ZM6.85714 8.50026C7.33036 8.50026 7.77232 8.41693 8.18304 8.25026C8.59375 8.0836 8.95982 7.85444 9.28125 7.56278C9.60268 7.27111 9.84821 6.93362 10.0179 6.55029C10.1875 6.16697 10.2768 5.75031 10.2857 5.30031C10.2857 4.85865 10.1964 4.44616 10.0179 4.06283C9.83929 3.67951 9.59375 3.33784 9.28125 3.03785C8.96875 2.73785 8.60714 2.50869 8.19643 2.35036C7.78571 2.19203 7.33929 2.1087 6.85714 2.10036C6.38393 2.10036 5.94196 2.1837 5.53125 2.35036C5.12054 2.51702 4.75446 2.74619 4.43304 3.03785C4.11161 3.32951 3.86607 3.66701 3.69643 4.05033C3.52679 4.43366 3.4375 4.85032 3.42857 5.30031C3.42857 5.74197 3.51786 6.15447 3.69643 6.53779C3.875 6.92112 4.12054 7.26278 4.43304 7.56278C4.74554 7.86277 5.10714 8.09193 5.51786 8.25026C5.92857 8.4086 6.375 8.49193 6.85714 8.50026ZM17.1429 18.1001C17.6161 18.1001 18.058 18.0168 18.4688 17.8501C18.8795 17.6834 19.2455 17.4543 19.567 17.1626C19.8884 16.871 20.1339 16.5335 20.3036 16.1501C20.4732 15.7668 20.5625 15.3501 20.5714 14.9002C20.5714 14.4585 20.4821 14.046 20.3036 13.6627C20.125 13.2793 19.8795 12.9377 19.567 12.6377C19.2545 12.3377 18.8929 12.1085 18.4821 11.9502C18.0714 11.7919 17.625 11.7085 17.1429 11.7002C16.6696 11.7002 16.2277 11.7835 15.817 11.9502C15.4062 12.1169 15.0402 12.346 14.7188 12.6377C14.3973 12.9294 14.1518 13.2668 13.9821 13.6502C13.8125 14.0335 13.7232 14.4502 13.7143 14.9002C13.7143 15.3418 13.8036 15.7543 13.9821 16.1376C14.1607 16.521 14.4062 16.8626 14.7188 17.1626C15.0312 17.4626 15.3929 17.6918 15.8036 17.8501C16.2143 18.0084 16.6607 18.0918 17.1429 18.1001ZM18.8571 3.70034H13.7143V2.10036H20.5714V8.50026H18.8571V3.70034Z"
+              fill="#4A0D4A" />
+          </svg> <span class="connections">{{marketPlaceData?.connectionCount}} {{'Connections' | localize}}</span>
+        </p>
+      </div>
+
+       <div
+  *ngIf="isAuthenticated"
+  class="d-md-none d-flex align-items-center m-2"
+  style="width: 100%;"
+>
+  <!-- Case 1: No current connections, only available connections -->
+  <ng-container
+    *ngIf="!marketPlaceData?.connectionsInfo?.length && marketPlaceData?.availableConnections?.length > 0"
+  >
+    <div class="w-100 d-flex justify-content-center">
+      <div dropdown class="w-100 position-relative"          >
+        <button
+          type="button"
+          class="relation_button w-100 d-flex align-items-center justify-content-center"
+          dropdownToggle
+        >
+            <img src="assets/accounts/CONNECT.png" alt="" srcset="">
+          <span>{{ marketPlaceData?.availableConnections[0]?.connectionName }}</span>
+          <i
+            *ngIf="marketPlaceData?.availableConnections?.length > 1"
+            class="fas fa-angle-down ml-2"
+            style="color: #fff !important;"
+          ></i>
+        </button>
+
+        <ul
+          *dropdownMenu
+          class="dropdown-menu w-100"
+          role="menu"
+ container="body"
+       
+        >
+        
+          <li
+            role="menuitem"
+            *ngFor="let option of marketPlaceData?.availableConnections | slice:1"
+            class="py-2"
+          >
+            <button class="dropdown-item" type="button" (click)="createRelation(option)">
+              {{ option?.connectionName }}
+            </button>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </ng-container>
+
+  <!-- Case 2: Only current connections, no available -->
+  <ng-container
+    *ngIf="marketPlaceData?.connectionsInfo?.length > 0 && !marketPlaceData?.availableConnections?.length"
+  >
+    <div class="w-100 d-flex justify-content-center">
+      <div class="d-flex align-items-center justify-content-center w-100" style="gap: 6px;">
+        <button
+          type="button"
+          class="relation-chip"
+          style="white-space: nowrap; max-width: calc(100% - 70px);"
+        >
+          <span>
+            {{ getFormattedConnectionName(marketPlaceData?.connectionsInfo[0]?.connectedLabel) }}
+          </span>
+          <i
+            class="pi pi-times ml-1 removI"
+            (click)="disconnect(marketPlaceData?.connectionsInfo[0])"
+          ></i>
+        </button>
+
+        <button
+          *ngIf="marketPlaceData?.connectionsInfo?.length > 1"
+          type="button"
+          class="relation-chip more-chip"
+          (click)="openConnectionsDialog()"
+        >
+          +{{ marketPlaceData?.connectionsInfo?.length - 1 }}
+        </button>
+      </div>
+    </div>
+  </ng-container>
+
+  <!-- Case 3: Both current connections and available connections -->
+  <ng-container
+    *ngIf="marketPlaceData?.connectionsInfo?.length > 0 && marketPlaceData?.availableConnections?.length > 0"
+  >
+    <div class="w-100 d-flex align-items-center justify-content-between position-relative" style="gap: 8px;">
+      <!-- Left: current connection info -->
+      <div class="d-flex align-items-center" style="min-width: 0; gap: 6px;">
+        <button
+          type="button"
+          class="relation-chip"
+          style="white-space: nowrap; max-width: 140px; ; text-overflow: ellipsis;"
+        >
+          <span>
+            {{ getFormattedConnectionName(marketPlaceData?.connectionsInfo[0]?.connectedLabel) |  textSubstring : 18 }}
+          </span>
+          <i
+            class="pi pi-times ml-1 removI"
+            (click)="disconnect(marketPlaceData?.connectionsInfo[0])"
+          ></i>
+        </button>
+
+        <button
+          *ngIf="marketPlaceData?.connectionsInfo?.length > 1"
+          type="button"
+          class="relation-chip more-chip"
+          (click)="openConnectionsDialog()"
+        >
+          +{{ marketPlaceData?.connectionsInfo?.length - 1 }}
+        </button>
+      </div>
+
+      <!-- Right: first available connection + dropdown for rest -->
+      <div dropdown class="d-flex align-items-center" style="min-width: 0;top: 0;" >
+        <button
+          type="button"
+          class="relation_button d-flex align-items-center"
+          dropdownToggle
+          (click)="marketPlaceData?.availableConnections?.length === 1 ? createRelation(marketPlaceData?.availableConnections[0]) : null"
+        >
+          <span>{{ marketPlaceData?.availableConnections[0]?.connectionName }}</span>
+          <i
+            *ngIf="marketPlaceData?.availableConnections?.length > 1"
+            class="fas fa-angle-down ml-2"
+            style="color: #fff !important;"
+          ></i>
+        </button>
+<ng-container *ngIf="marketPlaceData?.availableConnections?.length > 1">
+  <ul *dropdownMenu class="dropdown-menu" role="menu" >
+    <li
+      role="menuitem"
+      *ngFor="let option of marketPlaceData?.availableConnections | slice:1"
+      class="py-2"
+    >
+      <button class="dropdown-item" type="button" (click)="createRelation(option)">
+        {{ option?.connectionName }}
+      </button>
+    </li>
+  </ul>
+</ng-container>
+      </div>
+    </div>
+  </ng-container>
+</div>
+    </div>
+  </section>
+
+  <div class="card marketplaceAccountProfile">
+    <p-tabView styleClass="tabview-custom" [(activeIndex)]="activeTabIndex" *ngIf="accountDataForView"   (activeIndexChange)="onActiveIndexChange($event)">
+      <p-tabPanel [header]="'Overview' | localize">
+        <app-overview-tab [accountDataForView]="accountDataForView" [marketPlaceData]="marketPlaceData" 
+          (activeTabIndexBtn)="navigateToTab($event)"></app-overview-tab>
+      </p-tabPanel>
+      <p-tabPanel *ngIf="accountDataForView?.accountType == 'BUSINESS'" [header]="'Products' | localize" >
+        <app-marketplace-products [fromMarketAcoount]="true" 
+          [accountDataForView]="accountDataForView" [marketplaceAccCurrency]="accountDataForView.currencyName"></app-marketplace-products>
+      </p-tabPanel>
+
+      <p-tabPanel [header]="'Connections' | localize" *ngIf="accountDataForView">
+        <app-connections-tab [loginTenaneSsin]="loginTenaneSsin" [accountDataForView]="accountDataForView" [marketPlaceData]="marketPlaceData" [isActive]="(activeTabIndex == 2 && accountDataForView?.accountType == 'BUSINESS') || (activeTabIndex == 1 && accountDataForView?.accountType != 'BUSINESS')"
+          ></app-connections-tab>
+      </p-tabPanel>
+
+
+
+      <p-tabPanel [header]="'Posts' | localize" *ngIf="accountDataForView">
+        <app-posts-tab [accountDataForView]="accountDataForView"></app-posts-tab>
+      </p-tabPanel>
+
+
+      <p-tabPanel [header]="'Events' | localize">
+        <app-events-tab [accountDataForView]="accountDataForView"></app-events-tab>
+      </p-tabPanel>
+
+
+      <p-tabPanel [header]="'Media' | localize">
+
+        <app-media-tab [accountDataForView]="accountDataForView"     [isActive]="(activeTabIndex == 5 && accountDataForView?.accountType == 'BUSINESS') || (activeTabIndex == 4 && accountDataForView?.accountType != 'BUSINESS')"></app-media-tab>
+      </p-tabPanel>
+
+    </p-tabView>
+  </div>
+</div>
+
+
+
+<p-dialog
+  header="{{ 'Connections' | localize }}"
+  [(visible)]="showConnectionsDialog"
+  [modal]="true"
+  [style]="{ width: '450px' }"
+  [draggable]="false"
+  [resizable]="false"
+>
+  <div *ngIf="marketPlaceData?.connectionsInfo?.length > 0">
+    <div
+      *ngFor="let relation of marketPlaceData?.connectionsInfo"
+      class="d-flex justify-content-between align-items-center mb-2 relation-dialog-item"
+    >
+      <span>{{ getFormattedConnectionName(relation.connectedLabel) }}</span>
+      <i
+        class="pi pi-times removI"
+        (click)="disconnect(relation)"
+      ></i>
+    </div>
+  </div>
+</p-dialog>

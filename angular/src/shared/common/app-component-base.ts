@@ -9,7 +9,7 @@ import {
     IAjaxResponse,
     TokenService,
 } from "abp-ng2-module";
-import { Injector, TemplateRef } from "@angular/core";
+import { Injector,TemplateRef } from "@angular/core";
 import { AppConsts } from "@shared/AppConsts";
 import { AppUrlService } from "@shared/common/nav/app-url.service";
 import { AppSessionService } from "@shared/common/session/app-session.service";
@@ -22,6 +22,7 @@ import {
     SycAttachmentCategoriesServiceProxy,
     SycAttachmentCategoryDto,
     UiCustomizationSettingsDto,
+    AppTransactionServiceProxy,
 } from "@shared/service-proxies/service-proxies";
 import { NgxSpinnerService } from "ngx-spinner";
 import { NgxSpinnerTextService } from "@app/shared/ngx-spinner-text.service";
@@ -31,6 +32,7 @@ import { BsModalService, ModalOptions } from "ngx-bootstrap/modal";
 import { ImageViewerComponent } from "@app/shared/common/image-viewer/image-viewer.component";
 import {
     BehaviorSubject,
+    firstValueFrom,
     fromEvent,
     Observable,
     of,
@@ -44,12 +46,14 @@ import {
     NavigationStart,
     Event as NavigationEvent,
 } from "@angular/router";
-import { debounceTime, filter, takeUntil } from "rxjs/operators";
+import { debounceTime, filter, finalize, map, shareReplay, takeUntil } from "rxjs/operators";
 import { Location } from "@angular/common";
 import { FileUploaderCustom } from "@shared/components/import-steps/models/FileUploaderCustom.model";
-import { SweetAlertOptions } from "sweetalert2";
+import Swal, { SweetAlertOptions } from "sweetalert2";
 import { ajax } from "rxjs/ajax";
 import { ToastService } from "./toast/toast.service";
+import { HttpClient } from "@node_modules/@angular/common/http";
+import { TenantRoleService } from "./services/TenantRoleService";
 
 export abstract class AppComponentBase {
     patterns = Patterns;
@@ -91,8 +95,13 @@ export abstract class AppComponentBase {
     tenantDefaultCurrency: CurrencyInfoDto
     _sycAttachmentCategoriesServiceProxy: SycAttachmentCategoriesServiceProxy
     public transactionReportTemplateName:"OrderConfirmationForm1";
+    currentLang: string
+    isArabic: boolean
+    appTransaction:AppTransactionServiceProxy
+    tenantRoleService: TenantRoleService;
 
-    constructor(injector: Injector, private _location?: Location) {
+
+    constructor(injector: Injector , private _location?: Location) {
         this.localization = injector.get(LocalizationService);
         this.permission = injector.get(PermissionCheckerService);
         this.feature = injector.get(FeatureCheckerService);
@@ -113,8 +122,11 @@ export abstract class AppComponentBase {
         this.onDestroyHandler();
         this.setAppItemsFilterBody();
         this.transactionReportTemplateName="OrderConfirmationForm1";
-    }
-
+        this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
+        this.currentLang == 'ar' || this.currentLang == 'ar-EG'  ? this.isArabic = true : this.isArabic = false
+        this.appTransaction = injector.get(AppTransactionServiceProxy);
+        this.tenantRoleService = injector.get(TenantRoleService);
+    } 
 
     setAppItemsFilterBody() {
         this.appItemsFilterBody.categoryFilters = undefined
@@ -342,31 +354,48 @@ export abstract class AppComponentBase {
         this.bsModalService.show(ImageViewerComponent, config);
     }
     openImageCropper(
-        event,
+        event: any,
         aspectRatio?: number,
-        noOptions?: boolean
+        noOptions?: boolean,
+        resizeToWidth?: number      
     ): { onCropDone: Observable<any>; data: ImageCropperComponent } {
-        if (event.target.files.length === 0) return; // there are no files selected
+    
+        if (event.target.files.length === 0) return; 
+    
         let config: ModalOptions = new ModalOptions();
-        // data to be shared to the modal
+
         config.initialState = {
             title: "Edit image:",
             originalFileChangeEvent: event,
         };
-        if (noOptions != undefined)
-            config.initialState["noOptions"] = noOptions; // open modal with crop only without any other functionalities
-        if (!isNaN(aspectRatio))
+    
+        if (noOptions != undefined) {
+            config.initialState["noOptions"] = noOptions; 
+        }
+    
+        if (!isNaN(aspectRatio)) {
             config.initialState["aspectRatio"] = aspectRatio;
-        config.class = "right-modal";
+        }
+    
+    
+        if (resizeToWidth && resizeToWidth > 0) {
+            config.initialState["resizeToWidth"] = resizeToWidth;
+        }
+    
+           !this.isArabic ?  config.class = "right-modal slide-right-in" : config.class = "left-modal slide-left-in ngLeft"
+    
+        this.isArabic ?  config.class = "left-modal":config.class = "right-modal";
         let mgCropperModalRef = this.bsModalService.show(
             ImageCropperComponent,
             config
         );
+    
         return {
             onCropDone: this.bsModalService.onHide,
             data: mgCropperModalRef.content,
         };
     }
+    
     guid(): string {
         function s4() {
             return Math.floor((1 + Math.random()) * 0x10000)
@@ -476,6 +505,7 @@ export abstract class AppComponentBase {
     }
 
     confirmDiscardChanges(): boolean {
+        if (!this.formTouched) return true;
         return window.confirm(
             this.l("YouAreAboutToLoseAllTheChangesYouHaveDone,AreYouSure?")
         );
@@ -596,4 +626,63 @@ export abstract class AppComponentBase {
         return transactionRole;
 
     }
+
+    isImageFile(fileName: string): boolean {
+        if (!fileName) return false;
+        const ext = fileName.split('.').pop()?.toLowerCase();
+        const imageExtensions = [
+          'jpg', 'jpeg', 'png', 'gif', 'bmp', 'tiff', 'tif', 'webp',
+          'svg', 'ico', 'heic', 'heif', 'avif', 'jfif'
+        ];
+        return imageExtensions.includes(ext);
+      }
+      
+      isVideoFile(fileName: string): boolean {
+        if (!fileName) return false;
+        const ext = fileName.split('.').pop()?.toLowerCase();
+        const videoExtensions = [
+          'mp4', 'm4v', 'mov', 'avi', 'mkv', 'wmv', 'flv', 'webm',
+          'mpeg', 'mpg', '3gp', '3g2', 'f4v', 'ts', 'm2ts', 'vob'
+        ];
+        return videoExtensions.includes(ext);
+      }
+      
+      isPdfFile(fileName: string): boolean {
+        if (!fileName) return false;
+        const ext = fileName.split('.').pop()?.toLowerCase();
+        return ext === 'pdf';
+      }
+      
+
+
+    showNoCreatePermissionAlert() {
+        Swal.fire({
+            title: '',
+            html:
+                "You cannot create a transaction of this type. Please check the marketplace role assigned to your account.",
+            showCancelButton: false,
+            confirmButtonText: "ok",
+            allowOutsideClick: false,
+            allowEscapeKey: false,
+            backdrop: true,
+             customClass: {
+                        popup: "popup-class",
+                        icon: "icon-class",
+                        content: "content-class",
+                        actions: "actions-class",
+                        confirmButton: "confirm-button-class2",
+                    },
+        })
+    }
+
+   getRelationshipRoles(tenantId: number | undefined, accountSSIN: string) {
+  return this.appTransaction.getTenantAccountRelationships(tenantId, accountSSIN).pipe(
+    map((res: any) => {
+      let relationshipRoles = res || [];
+      return relationshipRoles;
+    })
+  );
 }
+
+
+}  

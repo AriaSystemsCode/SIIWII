@@ -37,6 +37,7 @@ import { TreeviewModule } from 'ngx-treeview';
 import { TreeModule } from 'primeng/tree';
 import { CommentsModule } from '../comments/comments.module';
 import { TabViewModule } from 'primeng/tabview';
+import { SideBarModule } from '@app/admin/sideBarComponents/sideBar.module';
 
 NgxBootstrapDatePickerConfigService.registerNgxBootstrapDatePickerLocales();
 @NgModule({
@@ -78,7 +79,8 @@ NgxBootstrapDatePickerConfigService.registerNgxBootstrapDatePickerLocales();
     BsDropdownModule.forRoot(),
     PopoverModule.forRoot(),
     SelectAddressModule,
-    TabViewModule 
+    TabViewModule ,
+    SideBarModule
   ],
   exports:[MessagesComponent,
     //SendMessageModalComponent,

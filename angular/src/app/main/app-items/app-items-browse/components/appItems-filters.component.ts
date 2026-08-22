@@ -12,6 +12,7 @@ import { forEach } from 'lodash';
 @Component({
   selector: 'app-items-filters',
   templateUrl: './appItems-filters.component.html',
+    styleUrls: ['./appItems-filters.component.scss'],
 })
 export class AppItemsFiltersComponent extends AppComponentBase implements OnInit, OnChanges {
     @Input() filterForm : FormGroup
@@ -38,6 +39,7 @@ export class AppItemsFiltersComponent extends AppComponentBase implements OnInit
     get mainFilterCtrl(){ return this.filterForm.get('filterType') }
 
     sortBy : string = 'name'
+    categoryResultCountPageSize: number = 200
     extraAttributesMetaData : ExtraAttrFilter[] = []
 
     constructor(
@@ -117,7 +119,7 @@ export class AppItemsFiltersComponent extends AppComponentBase implements OnInit
             undefined,
             undefined,
             undefined,
-            undefined,
+            undefined,false,
             extraAttrFilter.code,
             undefined,
             undefined,
@@ -256,15 +258,17 @@ export class AppItemsFiltersComponent extends AppComponentBase implements OnInit
             false,
             undefined,
             undefined,
+            false,
+            undefined,
             this.sortBy,
             this.categoriesFilterMetaData.listSkipCount,
-            this.categoriesFilterMetaData.listMaxResultCount,
+            this.categoryResultCountPageSize,
         )
         .pipe(
             finalize(()=>this.loading = false)
         )
         .subscribe((res)=>{
-            componentRef.onListLoadCallback(res);
+            componentRef.onListLoadCallback(this.prepareProductCategoryResult(res));
         })
         this.subscriptions.push(subs)
     }
@@ -312,15 +316,17 @@ export class AppItemsFiltersComponent extends AppComponentBase implements OnInit
             true,
             undefined,
             undefined,
+            false,
+            undefined,
             this.sortBy,
             this.departmentsFilterMetaData.listSkipCount,
-            this.departmentsFilterMetaData.listMaxResultCount,
+            this.categoryResultCountPageSize,
         )
         .pipe(
             finalize(()=>this.loading = false)
         )
         .subscribe((res)=>{
-            componentRef.onListLoadCallback(res);
+            componentRef.onListLoadCallback(this.prepareProductCategoryResult(res));
         })
         this.subscriptions.push(subs)
     }
@@ -342,6 +348,8 @@ export class AppItemsFiltersComponent extends AppComponentBase implements OnInit
                 true,
                 undefined,
                 undefined,
+                false,
+                undefined,
                 this.sortBy,
                 0,
                 node.totalChildrenCount,
@@ -351,10 +359,54 @@ export class AppItemsFiltersComponent extends AppComponentBase implements OnInit
             )
             .subscribe((res)=>{
                 if(!node.children) node.children = []
-                node.children.push(...res.items)
+                node.children.push(...this.filterProductCategoryNodes(res.items))
             })
             this.subscriptions.push(subs)
         }
+    }
+
+    private prepareProductCategoryResult(result: { items: TreeNodeOfGetSycEntityObjectCategoryForViewDto[], totalCount: number }) {
+        const items = this.filterProductCategoryNodes(result?.items || []);
+
+        return {
+            ...result,
+            items,
+            totalCount: items.length,
+        };
+    }
+
+    private filterProductCategoryNodes(nodes: TreeNodeOfGetSycEntityObjectCategoryForViewDto[]): TreeNodeOfGetSycEntityObjectCategoryForViewDto[] {
+        const filteredNodes = (nodes || [])
+            .map((node) => this.setProductCategoryDisplayLabel(node));
+
+        return Array.from(
+            filteredNodes.reduce((items, node) => {
+                const categoryId = this.getProductCategoryId(node);
+                if (categoryId !== undefined && !items.has(categoryId)) {
+                    items.set(categoryId, node);
+                }
+
+                return items;
+            }, new Map<number, TreeNodeOfGetSycEntityObjectCategoryForViewDto>()).values()
+        );
+    }
+
+    private setProductCategoryDisplayLabel(node: TreeNodeOfGetSycEntityObjectCategoryForViewDto): TreeNodeOfGetSycEntityObjectCategoryForViewDto {
+        if (node.children?.length) {
+            node.children = this.filterProductCategoryNodes(node.children);
+        }
+
+        node.label = this.getProductCategoryBaseLabel(node);
+
+        return node;
+    }
+
+    private getProductCategoryBaseLabel(node: TreeNodeOfGetSycEntityObjectCategoryForViewDto): string {
+        return (node?.label || '').replace(/\s\(\d+\)$/, '');
+    }
+
+    private getProductCategoryId(node: TreeNodeOfGetSycEntityObjectCategoryForViewDto): number | undefined {
+        return node?.data?.sycEntityObjectCategory?.id;
     }
 
 

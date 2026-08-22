@@ -1,0 +1,149 @@
+<div class="mp-acc-card" [class.rtl]="isArabic" [class.compact]="compact">
+
+  <!-- Left column -->
+  <div class="mp-acc-left">
+    <div class="mp-acc-media" (click)="openDetails()">
+      <img class="mp-acc-img" [src]="logoUrl" (error)="onImgErr($event)" alt="account" />
+    </div>
+  </div>
+
+  <!-- Right column -->
+  <div class="mp-acc-body mt-2">
+    <div class="mp-acc-title-row">
+      <h4 class="mp-acc-title" (click)="openDetails()">
+        {{ account?.account?.name }}
+      </h4>
+    </div>
+
+    <div class="mp-acc-meta">
+
+      <!-- Connections -->
+      <div class="meta-item" [pTooltip]="'Connections' | localize" tooltipPosition="bottom"
+        [tooltipEvent]="isSmallScreen ? 'focus' : 'hover'" [autoHide]="true" [showDelay]="100" [hideDelay]="100"
+        [tabindex]="isSmallScreen ? 0 : null">
+        <i class="fas fa-users meta-ico"></i>
+        <span class="meta-value">{{ account?.connectionCount || 0 }}</span>
+      </div>
+
+      <!-- Country -->
+      <div class="meta-item" *ngIf="account?.account?.countryName" [pTooltip]="'Country' | localize"
+        tooltipPosition="bottom" [tooltipEvent]="isSmallScreen ? 'focus' : 'hover'" [autoHide]="true" [showDelay]="100"
+        [hideDelay]="100" [tabindex]="isSmallScreen ? 0 : null">
+        <i class="fas fa-map-marker-alt meta-ico"></i>
+        <span class="meta-value">{{ account?.account?.countryName }}</span>
+      </div>
+
+
+    </div>
+
+    <div class="mp-acc-actions">
+
+
+      <div class="w-100 d-flex align-items-center justify-content-center" *ngIf="isAuthenticated">
+
+        <!-- Existing relations -->
+        <ng-container *ngIf="account?.connectionsInfo?.length > 0">
+          <!-- first relation chip -->
+          <button type="button" class="relation-chip mr-1" style="white-space: nowrap;">
+            <span>{{ getFormattedConnectionName(account.connectionsInfo[0]?.connectedLabel) | textSubstring : 10
+              }}</span>
+            <i class="pi pi-times ml-1 removI"
+              (click)="disconnect(account.connectionsInfo[0]); $event.stopPropagation()">
+            </i>
+          </button>
+
+          <!-- more count -->
+          <button *ngIf="account.connectionsInfo.length > 1" type="button" class="relation-chip mr-2"
+            (click)="openRelationsDialog(account)">
+            +{{ account.connectionsInfo.length - 1 }}
+          </button>
+        </ng-container>
+
+        <!-- Available connections menu when both current + available exist -->
+        <div *ngIf="account?.availableConnections?.length > 0 && account?.connectionsInfo?.length > 0"
+          class="relation-more-menu position-relative" dropdown container="body">
+
+          <button type="button" class="dots-btn" dropdownToggle>
+
+            <img src="assets/accounts/CONNECT.png" alt="" srcset="">
+          </button>
+
+          <ul *dropdownMenu class="dropdown-menu relation-dropdown" role="menu"
+            [ngClass]="isArabic ? 'dropdown-menu-ar' : 'dropdown-menu-en'">
+
+            <li role="menuitem" *ngFor="let option of account.availableConnections" class="relation-item">
+
+              <button class="dropdown-item relation-btn" type="button" (click)="createRelation(option)">
+
+                <div class="d-flex align-items-center justify-content-between w-100">
+
+                  <!-- Left: Icon + Label -->
+                  <div class="d-flex align-items-center">
+                    <img class="relation-icon mr-2" [src]="getConnectionIcon(option?.connectionName)" alt="" />
+
+                    <span class="relation-label">
+                      {{ option?.connectionName }}
+                    </span>
+                  </div>
+
+                </div>
+
+              </button>
+            </li>
+          </ul>
+        </div>
+
+        <!-- No current relations, only available ones -->
+        <div *ngIf="(!account?.connectionsInfo?.length) && account?.availableConnections?.length > 0" class="w-100">
+          <ng-container *ngIf="account?.availableConnections as options">
+            <div class="relationWrap w-100 text-center" dropdown container="body">
+
+              <!-- MAIN BUTTON (FIRST ITEM) -->
+              <button type="button" class="relation_button market-follow-btn" dropdownToggle style="font-size: 12px;">
+                <img class="pb-1" style="width: 13px;" [src]="getConnectionIcon(options[0]?.connectionName)" alt="" />
+
+                <span class="ml-1" [title]="options[0]?.connectionName"  (click)="createRelation(options[0])">
+                  {{ options[0]?.connectionName | textSubstring : 10 }}
+                </span>
+
+                <i *ngIf="options.length > 1" class="fas fa-angle-down ml-2" style="color: #fff !important;"></i>
+              </button>
+
+              <!-- DROPDOWN (WITHOUT FIRST ITEM) -->
+              <ng-container *ngIf="options.length > 1">
+                <ul *dropdownMenu class="dropdown-menu" role="menu">
+                  <li role="menuitem" *ngFor="let option of options | slice:1" class="py-2">
+                    <button class="dropdown-item" type="button" (click)="createRelation(option)">
+                      {{ option?.connectionName }}
+                    </button>
+                  </li>
+                </ul>
+              </ng-container>
+
+            </div>
+          </ng-container>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+</div>
+
+
+<p-dialog [(visible)]="showRelationsDialog" [modal]="true" [closable]="true" [draggable]="false" [resizable]="false"
+  [dismissableMask]="true" [style]="{ width: '420px' }" header="Relations">
+
+  <div *ngIf="selectedAccountForRelations?.connectionsInfo?.length > 0" class="d-flex flex-column">
+    <div *ngFor="let relation of selectedAccountForRelations.connectionsInfo; let i = index"
+      class="d-flex align-items-center justify-content-between relation-popup-item mb-2">
+
+      <button type="button" class="relation-chip" style="white-space: nowrap;">
+        <span>{{ getFormattedConnectionName(relation.connectedLabel) }}</span>
+        <i class="pi pi-times ml-1 removI" (click)="removeRelationFromDialog(selectedAccountForRelations, relation, i)">
+        </i>
+      </button>
+    </div>
+  </div>
+
+</p-dialog>

@@ -1,21 +1,24 @@
-<h4>Reviews</h4>
-<hr>
+<h4 *ngIf="!fromOverview">{{'Reviews' | localize}}</h4>
+<hr *ngIf="!fromOverview">
 <div *ngIf="totalCount > 0" class="review-summary mb-3">
   <h5 class="font-weight-bold">
-    {{ reviews.length }} over {{ totalCount }} {{ 'Results Of' | localize }} "{{ 'Customers Reviews' | localize }}"
+    {{ reviews.length }} {{'over' | localize}} {{ totalCount }} {{ 'ResultsOf' | localize }} "{{ 'CustomersReviews' | localize }}"
   </h5>
 </div>
 
-<div *ngIf="!isUserReviewdBefore" class="addReview mb-4 pb-2">
+<div *ngIf="!isPublished && isAuthenticated" class="addReview mb-4 pb-2">
     <div class="topSec w-100 d-flex align-items-start position-relative">
-      <img style="height: 30px;" src="assets/common/images/default-profile-picture.png" class="rounded-circle logo" />
-     <div class="reviewSection">
-      <textarea class="form-control  border-0" placeholder="Add your review" [(ngModel)]="reviewText"
+      <img style="height: 30px;"  [src]="     profilePicture
+                            ? profilePicture
+                            : 'assets/common/images/default-profile-picture.png'
+                    " class="rounded-circle logo" />
+     <div class="reviewSection mb-2">
+      <textarea class="form-control  border-0" [placeholder]="'AddYourReview' | localize" [(ngModel)]="reviewText"
         style="height: auto; min-height: 100px; resize: none; overflow: hidden;border: none !important;max-width: 85%;overflow: auto;"
         (input)="adjustTextareaHeight($event)"></textarea>
   
   
-      <div class="rating" style="position: absolute; right: 10px;top: 10px;">
+      <div class="rating"  [ngClass]="isArabic ? 'starsAr':'starsEn'">
         <ng-container *ngFor="let star of [1, 2, 3, 4, 5]; let i = index">
           <i class="fa" [ngClass]="{
                 'fa-star': i + 1 <= selectedRating,
@@ -34,13 +37,7 @@
         <input type="file" accept="image/*" (change)="onImageSelected($event)" hidden #imageInput   (click)="selectedMedia?.length >= 1 ? stop(): ''"/>
         <img src="assets/placeholders/imageAttach.png" class="mr-2 iconImg" alt="Image Attach"
           (click)="selectedMedia?.length >= 1 ? stop(): imageInput.click()" />
-          <!-- <app-image-upload
-          [sycAttachmentCategory]="sycAttachmentCategoryImage"
-          [image]="testImage"
-          [fromReview]="true" 
-          (imageBrowseDone)="onImageSelected($event, null)"
-          (removeImage)="onImageRemoved(null)">
-        </app-image-upload> -->
+
 
   
         <!-- Video Input -->
@@ -61,7 +58,7 @@
       </div>
   
   
-      <button class="btnPost" (click)="isUserReviewedEntityBefore()" [disabled]="!reviewText?.trim() || selectedRating < 1">Post</button>
+      <button class="btnPost" (click)="isUserReviewedEntityBefore()" [disabled]="!reviewText?.trim() || selectedRating < 1">{{'Post' | localize}}</button>
     </div>
   
   
@@ -78,15 +75,15 @@
         <button *ngIf="media.url " class="remove-media" (click)="removeMedia(i)">x</button>
       </div>
     </div>
-    <p *ngIf="onlyMsg" class="text-danger">Only one img or one video</p>
+    <p *ngIf="onlyMsg" class="text-danger">{{'OnlyOneImgOneVideo' | localize}}</p>
 
   </div>
   
   
-  <p *ngIf="reviews?.length == 0" class="text-center">
+  <p *ngIf="reviews?.length == 0" class="text-center my-5">
     <img src="../../assets/placeholders/fluent_alert.png" class="mr-2" alt="" srcset="">
   
-    <span class="noDataTxt">There is no data to show ...</span>
+    <span class="noDataTxt">{{'NoDataFound...' | localize}}</span>
   </p>
   
   
@@ -105,9 +102,9 @@
               <a class="pt-2 title">
                 {{review?.messages?.senderCompanyName}}
               </a>
-              <p class="txtby mb-0">by {{review?.messages?.senderName}}</p>
+              <p class="txtby mb-0">{{'By' | localize}} {{review?.messages?.senderName}}</p>
             </div>
-            <div class="mx-3  align-items-center d-md-flex d-none">
+            <div class="mx-3  align-items-center d-lg-flex d-none">
               <svg *ngIf="review?.isUserVerifiedPurchaser || review?.isAccountAdmin || review?.isProfileOwner" width="16"
                 height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path fill-rule="evenodd" clip-rule="evenodd"
@@ -121,12 +118,11 @@
                   fill="#E42B2B" />
               </svg>
               <p class="mb-0 mx-2" style="color: #2DC74F;white-space: nowrap;">
-                <span class="verfiedtxt" *ngIf="review?.isUserVerifiedPurchaser">Verified Purchaser</span>
-                <span class="verfiedtxt" *ngIf="review?.isAccountAdmin">Account Admin</span>
-                <span class="verfiedtxt" *ngIf="review?.isProfileOwner">Profile Owner</span>
+                <span class="verfiedtxt" *ngIf="review?.isUserVerifiedPurchaser">{{'VerifiedPurchaser' | localize}}</span>
+                <span class="verfiedtxt" *ngIf="review?.isAccountAdmin">{{'AccountAdmin' | localize}}</span>
+                <span class="verfiedtxt" *ngIf="review?.isProfileOwner">{{'ProfileOwner' | localize}}</span>
                 <span class="notverfiedtxt"
-                  *ngIf="!review?.isUserVerifiedPurchaser &&  !review?.isAccountAdmin && !review?.isProfileOwner">Not
-                  Verified Purchaser</span>
+                  *ngIf="!review?.isUserVerifiedPurchaser &&  !review?.isAccountAdmin && !review?.isProfileOwner">{{'NotVerifiedPurchaser' | localize}}</span>
               </p>
             </div>
           </div>
@@ -151,7 +147,7 @@
   
   
         </div>
-        <div class="mx-3  align-items-center d-md-none d-flex">
+        <div class="mx-3  align-items-center d-lg-none d-flex">
           <svg *ngIf="review?.isUserVerifiedPurchaser || review?.isAccountAdmin || review?.isProfileOwner" width="16"
             height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path fill-rule="evenodd" clip-rule="evenodd"
@@ -165,12 +161,11 @@
               fill="#E42B2B" />
           </svg>
           <p class="mb-0 mx-2" style="color: #2DC74F;white-space: nowrap;">
-            <span class="verfiedtxt" *ngIf="review?.isUserVerifiedPurchaser">Verified Purchaser</span>
-            <span class="verfiedtxt" *ngIf="review?.isAccountAdmin">Account Admin</span>
-            <span class="verfiedtxt" *ngIf="review?.isProfileOwner">Profile Owner</span>
+            <span class="verfiedtxt" *ngIf="review?.isUserVerifiedPurchaser">{{'VerifiedPurchaser' | localize}}</span>
+            <span class="verfiedtxt" *ngIf="review?.isAccountAdmin">{{'AccountAdmin' | localize}}</span>
+            <span class="verfiedtxt" *ngIf="review?.isProfileOwner">{{'ProfileOwner' | localize}}</span>
             <span class="notverfiedtxt"
-              *ngIf="!review?.isUserVerifiedPurchaser &&  !review?.isAccountAdmin && !review?.isProfileOwner">Not Verified
-              Purchaser</span>
+              *ngIf="!review?.isUserVerifiedPurchaser &&  !review?.isAccountAdmin && !review?.isProfileOwner">{{'NotVerifiedPurchaser' | localize}}</span>
           </p>
         </div>
         <div class="d-flex mb-3 align-items-center">
@@ -180,7 +175,7 @@
             <span class="stars-container  " style="color: #D4D4D4;">★★★★★</span>
             <span [style]="
                     'width :' + review?.rating/5 * 100 + '%'
-                " class="stars-container  fill-s position-absolute top-0 left-0 inline-block ">★★★★★</span>
+                " class="stars-container   inline-block " [ngClass]="isArabic ? ' fill-s-ar':' fill-s'">★★★★★</span>
           </div>
         </div>
       </div>
@@ -190,7 +185,7 @@
           {{ review.isExpanded || (review?.messages?.body?.length || 0) <= 900 ? review?.messages?.body :
             (review?.messages?.body | slice:0:900) + '...' }} <a *ngIf="(review?.messages?.body?.length || 0) > 900"
             (click)="toggleExpand(review)" class="expand-toggle">
-            {{ review.isExpanded ? 'Show less' : 'Read more' }}
+            {{ review.isExpanded ? 'Showless' : 'ReadMore' }}
             </a>
         </p>
   
@@ -213,8 +208,7 @@
       </div>
     </div>
   
-    <button *ngIf="reviews?.length < totalCount" (click)="loadMoreReviews()" class="viewAllBtn mb-2">View all
-      review</button>
+    <button *ngIf="reviews?.length < totalCount" (click)="loadMoreReviews()" class="viewAllBtn mb-2">{{'ViewAllReviews' | localize}}</button>
   </div>
   
   
@@ -230,10 +224,10 @@
     </div>
     <div class=" con-body">
       <p class="mb-3 text-center">
-        <span class="msg-text ml-2 ">Only one review is allowed!</span>
+        <span class="msg-text ml-2 ">{{alreadyReviewdMsg}}</span>
       </p>
     </div>
     <div class="d-flex justify-content-center btns mb-3">
-      <button (click)="SuccessMsg = false;resetForm()" label="Ok" class="p-button-text">Ok</button>
+      <button (click)="SuccessMsg = false;resetForm()" label="Ok" class="p-button-text">{{'Ok' | localize}}</button>
     </div>
   </p-dialog>

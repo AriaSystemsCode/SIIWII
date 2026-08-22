@@ -121,21 +121,33 @@ namespace onetouch.Web.Services
 
                 var dir = Path.Combine(ReportDirectory, tenantId.ToString());
                 Directory.CreateDirectory(dir);
-                if (Directory.EnumerateFiles(dir).Select(Path.GetFileNameWithoutExtension).Contains(reportName))
+
+                var tenantReportPath = Path.Combine(dir, reportName + FileExtension);
+                var defaultReportPath = Path.Combine(ReportDirectory, reportName + FileExtension);
+
+                // Seed a new tenant with the default report layout on first use.
+                // Existing tenant-specific layouts are never overwritten.
+                if (!File.Exists(tenantReportPath) && File.Exists(defaultReportPath))
                 {
-                    //report = File.ReadAllBytes(Path.Combine(dir, reportName + FileExtension));
-                    byte[] reportBytes = File.ReadAllBytes(Path.Combine(dir, reportName + FileExtension));
+                    try
+                    {
+                        File.Copy(defaultReportPath, tenantReportPath, overwrite: false);
+                    }
+                    catch (IOException) when (File.Exists(tenantReportPath))
+                    {
+                        // Another concurrent request seeded the tenant first.
+                    }
+                }
+
+                if (File.Exists(tenantReportPath))
+                {
+                    byte[] reportBytes = File.ReadAllBytes(tenantReportPath);
                     using (MemoryStream ms = new MemoryStream(reportBytes))
                         report = XtraReport.FromStream(ms);
                 }
-                if (ReportsFactory.Reports.ContainsKey(reportName))
+                if (report == null && ReportsFactory.Reports.ContainsKey(reportName))
                 {
-                    using (MemoryStream ms = new MemoryStream())
-                    {
-                        ReportsFactory.Reports[reportName]().SaveLayoutToXml(ms);
-                        //report = ms.ToArray();
-                        report = ReportsFactory.Reports[reportName]();
-                    }
+                    report = ReportsFactory.Reports[reportName]();
                 }
 
                 if (report != null)
@@ -148,28 +160,58 @@ namespace onetouch.Web.Services
                     string subject = "";
                     string fileName = reportName + ".pdf";
                     string transactionId = "";
-                    
+
                     bool saveToPdf = true;
                     string orderConfirmationRole = "";
                     foreach (string parameterName in parameters.AllKeys)
                     {
                         try
-                        { 
+                        {
 
                             if (report.Parameters.ToDynamicList<DevExpress.XtraReports.Parameters.Parameter>().Find(x => x.Name == parameterName) != null
                                 
+                                || (parameterName.ToUpper() == "ATTACHMENTBASEURL" &&
+                                report.Parameters.ToDynamicList<DevExpress.XtraReports.Parameters.Parameter>().Find(x => x.Name == "attachmentBaseUrl") != null &&
+                                report.Parameters.ToDynamicList<DevExpress.XtraReports.Parameters.Parameter>().Find(x => x.Name == "attachmentClientUrl") != null
+                                )
                                 || (parameterName.ToUpper() == "ORDERCONFIRMATIONROLE" &&
                                 report.Parameters.ToDynamicList<DevExpress.XtraReports.Parameters.Parameter>().Find(x => x.Name == "roleType") != null)
                                 || (parameterName.ToUpper() == "LANGUAGENAME" &&
                                 report.Parameters.ToDynamicList<DevExpress.XtraReports.Parameters.Parameter>().Find(x => x.Name.ToUpper() == "MUSERCOUNTRY") != null)
-                                
+
                                 )
                             {
                                 switch (parameterName.ToUpper())
                                 {
+                                    case "ATTACHMENTBASEURL":
+                                        var reportParameters = report.Parameters
+                                            .ToDynamicList<DevExpress.XtraReports.Parameters.Parameter>();
+                                        var attachmentClientUrlParameter = reportParameters.Find(x =>
+                                            string.Equals(x.Name, "attachmentClientUrl", StringComparison.OrdinalIgnoreCase));
+                                        var attachmentBaseUrlParameter = reportParameters.Find(x =>
+                                            string.Equals(x.Name, "attachmentBaseUrl", StringComparison.OrdinalIgnoreCase));
+
+                                        if (attachmentClientUrlParameter != null)
+                                        {
+                                            var attachmentPath = _appConfiguration["Attachment:Path"] ?? string.Empty;
+                                            var attachmentPathPartToOmit = _appConfiguration["Attachment:Omitt"];
+                                            if (!string.IsNullOrEmpty(attachmentPathPartToOmit))
+                                            {
+                                                attachmentPath = attachmentPath.Replace(attachmentPathPartToOmit, string.Empty);
+                                            }
+
+                                            attachmentClientUrlParameter.Value = attachmentPath.Replace(@"\", @"/");
+                                        }
+
+                                        if (attachmentBaseUrlParameter != null)
+                                        {
+                                            attachmentBaseUrlParameter.Value = parameters.Get("attachmentBaseUrl");
+                                        }
+                                        break;
+
                                     case "ORDERCONFIRMATIONROLE":
-                                      report.Parameters["roleType"].Value = Convert.ChangeType(
-                                      parameters.Get("orderConfirmationRole"), report.Parameters["roleType"].Type);
+                                        report.Parameters["roleType"].Value = Convert.ChangeType(
+                                        parameters.Get("orderConfirmationRole"), report.Parameters["roleType"].Type);
 
                                         break;
                                     case "LANGUAGENAME":
@@ -247,7 +289,7 @@ namespace onetouch.Web.Services
                         }
                         //Iteration45[Start]
                         var transactionHeader = _appTransactionHeadersRepository.GetAll().Where(z => z.Id == long.Parse(transactionId)).FirstOrDefault();
-                        if (transactionHeader!=null)
+                        if (transactionHeader != null)
                         {
                             transactionHeader.OrderConfirmationTimeStamp = DateTime.UtcNow;
                             _appTransactionHeadersRepository.Update(transactionHeader);
@@ -263,11 +305,23 @@ namespace onetouch.Web.Services
                         {
                             using (var stream = new MemoryStream())
                             {
-                                //report.ExportToPdf(stream);
+                                report.ExportToPdf(stream);
                                 stream.Position = 0;
-                                //var attachment = new Attachment(stream, System.Net.Mime.MediaTypeNames.Application.Pdf);
-                                var attachment = new Attachment(stream, "LineSheet.pdf");
-                                _userEmailer.SendEmailAsync(userId, (int)tenantId, subject, to, cc, bcc, body, attachment);
+                                using (var attachment = new Attachment(
+                                    stream,
+                                    "LineSheet.pdf",
+                                    System.Net.Mime.MediaTypeNames.Application.Pdf))
+                                {
+                                    _userEmailer.SendEmailAsync(
+                                        userId,
+                                        (int)tenantId,
+                                        subject,
+                                        to,
+                                        cc,
+                                        bcc,
+                                        body,
+                                        attachment).GetAwaiter().GetResult();
+                                }
                             }
                         }
                     }
@@ -357,6 +411,7 @@ namespace onetouch.Web.Services
             var dir = Path.Combine(ReportDirectory, tenantId.ToString());
             if (!IsWithinReportsFolder(reportName, dir))
                 throw new DevExpress.XtraReports.Web.ClientControls.FaultException("Invalid report name.");
+            Directory.CreateDirectory(dir);
             report.SaveLayoutToXml(Path.Combine(dir, reportName + FileExtension));
         }
 

@@ -1,0 +1,80 @@
+<footer class="flex-rw p-4 d-none d-md-block " [style.backgroundColor]="bgCol">
+  <div class="row">
+    <ng-container *ngFor="let s of sectionsFlat; trackBy: trackBySection">
+      <ng-container [ngSwitch]="s.type">
+
+        <div *ngSwitchCase="'PF'" class="col-12 col-md-4 mb-4">
+          <app-footer-page-link [sectionId]="s.sectionId" [sectionData]="s.inputs">
+          </app-footer-page-link>
+        </div>
+
+      </ng-container>
+    </ng-container>
+  </div>
+
+  <section class="footer-bottom-section flex-rw">
+    <div class="footer-bottom-wrapper pt-5"  [ngClass]="isArabic ? 'ar-mg':'en-mg'">
+
+      <div class="pb-4"><a href='#'>
+          <img [src]=" attachmentBaseUrl + '/' +tenantLogo " style="width: 50px;" />
+        </a></div>
+
+      <i class="fa fa-copyright" role="copyright"></i>
+      <span class="footer-bottom-rights"> 2026 {{tenantName}} Security Your Privacy Terms</span>
+    </div>
+    <div class="footer-bottom-wrapper pt-5">
+      <ng-container *ngFor="let s of sectionsFlat; trackBy: trackBySection">
+        <div class="col-12 mb-4">
+          <ng-container [ngSwitch]="s.type">
+            <app-footer-social-media *ngSwitchCase="'SM'" [sectionId]="s.sectionId"
+              [sectionData]="s.inputs"></app-footer-social-media>
+          </ng-container>
+        </div>
+      </ng-container>
+    </div>
+  </section>
+
+</footer>
+
+
+<footer class="flex-rw p-4 d-block d-md-none mb-5 footerMb" [style.backgroundColor]="bgCol">
+  <div class="row">
+
+    <!-- Page Links (PF) -->
+    <ng-container *ngFor="let s of sectionsFlat; trackBy: trackBySection">
+      <div class="col-12 mb-4" *ngIf="s.type === 'PF'">
+        <app-footer-page-link
+          [sectionId]="s.sectionId"
+          [sectionData]="s.inputs">
+        </app-footer-page-link>
+      </div>
+    </ng-container>
+
+    <!-- Social Media (SM) -->
+    <ng-container *ngFor="let s of sectionsFlat; trackBy: trackBySection">
+      <div class="col-12 mb-4" *ngIf="s.type === 'SM'">
+        <app-footer-social-media
+          [sectionId]="s.sectionId"
+          [sectionData]="s.inputs">
+        </app-footer-social-media>
+      </div>
+    </ng-container>
+
+  </div>
+
+  <!-- Footer bottom -->
+  <div class="footer-bottom-wrapper pt-4 text-center">
+    <img
+      [src]="attachmentBaseUrl + '/' + tenantLogo"
+      style="width: 45px;"
+      class="mb-2"
+    />
+
+    <div>
+      <i class="fa fa-copyright"></i>
+      <span class="footer-bottom-rights">
+        2026 {{ tenantName }} Security Your Privacy Terms
+      </span>
+    </div>
+  </div>
+</footer>

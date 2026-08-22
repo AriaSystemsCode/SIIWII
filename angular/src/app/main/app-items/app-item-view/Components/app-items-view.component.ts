@@ -19,6 +19,7 @@ import {
     AppEntityAttachmentDto,
     AppItemAttributePriceDto,
     AppItemForViewDto,
+    AppItemLookupDto,
     AppItemPriceInfo,
     AppItemSizesScaleInfo,
     AppItemsListsServiceProxy,
@@ -46,6 +47,8 @@ import { AppitemListPublishService } from "../../app-items-list/services/appitem
 import { AppItemViewInput } from "../models/app-item-view-input";
 import { EventEmitter } from "stream";
 import { finalize } from "rxjs";
+import { DomSanitizer } from "@node_modules/@angular/platform-browser";
+import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf';
 
 @Component({
     selector: "app-app-items-view",
@@ -74,6 +77,7 @@ export class AppItemsViewComponent
 
     @Input() productId: number = 0;
     @Input() appItemViewInput: AppItemViewInput;
+    @Input() tenantOwner
     appItemForViewDto: AppItemForViewDto;
     actionsMenuFlags: AppItemsBrowseComponentActionsMenuFlags =
         new AppItemsBrowseComponentActionsMenuFlags();
@@ -126,6 +130,18 @@ export class AppItemsViewComponent
     scrollClassification: boolean = false;
     maxClassificationCnt: number;
 
+    //RelatedItems
+    showMoreRelatedItems: boolean = false;
+    showLessRelatedItems: boolean = false;
+    totalRelatedItems: number;
+    noOfRelatedItemsToShowInitially: number;
+    maxRelatedItemsCount: number;
+    skipRelatedItemsCount: number;
+    relatedItemsToLoad: number;
+    initRelatedItems: AppItemLookupDto[] = [];
+    scrollRelatedItems: boolean = false;
+    maxRelatedItemsCnt: number;
+
     //Recommended
     initRecommended: ExtraDataAttrDto[] = [];
     showLessRecommended: boolean = false;
@@ -170,6 +186,17 @@ export class AppItemsViewComponent
 
     acceptedAspectRatio;
     languageSettingName  =AppConsts.languageSettingName;
+    pdfCache: { [key: string]: string } = {};
+
+    activeAttachments: AppEntityAttachmentDto[] = [];
+currentIndex = 0;
+
+pdfThumbMap: Record<number, string | null> = {};
+pdfThumbLoadingMap: Record<number, boolean> = {};
+private pdfThumbByPath: Record<string, string> = {};
+
+showImagePreview = false;
+previewImageUrl = '';
 
     public constructor(
         private _router: Router,
@@ -179,10 +206,11 @@ export class AppItemsViewComponent
         injector: Injector,
         _location: Location,
         public _publishAppItemListingService: PublishAppItemListingService,
-        private datePipe: DatePipe
+        private datePipe: DatePipe,
+        private sanitizer: DomSanitizer
     ) {
         super(injector, _location);
-
+        (pdfjsLib as any).GlobalWorkerOptions.workerSrc = '/assets/pdfjs/pdf.worker.min.js';
         this.getAspectatio();
     }
 
@@ -204,7 +232,7 @@ export class AppItemsViewComponent
     appSizeRatio: AppItemSizesScaleInfo;
     ngOnChanges(changes: SimpleChanges) {
         if (this.appItemViewInput) {
-            debugger
+            
             this.appItemForViewDto = this.appItemViewInput.appItemForViewDto;
             this.appItemForViewDto?.minPrice % 1 ==0?this.appItemForViewDto.minPrice=parseFloat(Math.round(this.appItemForViewDto.minPrice * 100 / 100).toFixed(2)):null; 
             this.getTimezoneOffset();
@@ -226,12 +254,19 @@ export class AppItemsViewComponent
         this.initClassificationVariables(true);
         this.initRecommendedVariables(true);
         this.initAdditionalVariables(true);
-        if (this.appItemForViewDto?.variations.length == 0)
+        if (this.appItemForViewDto?.variations.length == 0){
             this.centerImage = this.appItemForViewDto.entityAttachments[0];
+
+            this.setActiveAttachments(this.appItemForViewDto.entityAttachments);
+
+        }
+        
         else
             this.showImagesOfVaritaionSelectedValues(
                 this.appItemForViewDto.variations[0].selectedValues[0]
             );
+      
+              
         this.initPricingNeededData();
         this.selectedValuesName =
             this.appItemForViewDto?.variations[0]?.selectedValues[0]?.value;
@@ -266,12 +301,17 @@ export class AppItemsViewComponent
         this.initClassificationVariables(true);
         this.initRecommendedVariables(true);
         this.initAdditionalVariables(true);
-        if (this.appItemForViewDto?.variations.length == 0)
+        if (this.appItemForViewDto?.variations.length == 0) {
             this.centerImage = this.appItemForViewDto.entityAttachments[0];
+            this.setActiveAttachments(this.appItemForViewDto.entityAttachments);
+
+        }
         else
             this.showImagesOfVaritaionSelectedValues(
                 this.appItemForViewDto.variations[0].selectedValues[0]
             );
+         
+              
         this.initPricingNeededData();
         this.selectedValuesName =
             this.appItemForViewDto?.variations[0]?.selectedValues[0]?.value;
@@ -294,7 +334,7 @@ export class AppItemsViewComponent
     }
 
     setVaraitionExtraDataValues(secondAttributeindex: number) {
-        debugger
+        
         if (
             !this.appItemForViewDto.variations[0].selectedValues[
                 this.varitaionSelectedIndex
@@ -318,7 +358,7 @@ export class AppItemsViewComponent
                     undefined
                 )
                 .subscribe((res) => {
-                    debugger
+                    
                     this.appItemForViewDto.variations[0].selectedValues[
                         this.varitaionSelectedIndex
                     ].edRestAttributes[secondAttributeindex].values = res.items;
@@ -327,44 +367,179 @@ export class AppItemsViewComponent
     }
 
     showImageAtCenter(img) {
+        img.isImageFile =false;
+        img.isPdfFile =false;
+        img.isVideoFile =false;
+
+        if(this.isPdfFile(img.fileName)){
+            img.isPdfFile =true;
+          this.loadPdfFromUrl(img);
+        }
+
+         else if(this.isVideoFile(img.fileName))
+            img.isVideoFile =true;
+
+            else 
+            img.isImageFile =true;
+
         this.centerImage = img;
     }
+
+   
+    loadPdfFromUrl(img) {
+       let  pdfPath: string =  img.url;
+       let fullUrl= this.attachmentBaseUrl + '/'+pdfPath;
+        if (this.pdfCache[pdfPath]) {
+          const pdfViewer = document.getElementById('pdfViewer') as HTMLIFrameElement;
+          pdfViewer.src = this.pdfCache[pdfPath];
+          img.loadingError = false;
+          return;
+        }
+        img.loadingError = true;
+        this.showMainSpinner();
+       const subs = this._appItemsServiceProxy.getFile64FromUrl(fullUrl)
+          .pipe(finalize(() => this.hideMainSpinner()))
+          .subscribe(
+            async (res) => {
+              try {
+                const base64 = res.includes(',') ? res.split(',')[1] : res;
+                const byteCharacters = atob(base64);
+                const byteNumbers = new Array(byteCharacters.length);
+                for (let i = 0; i < byteCharacters.length; i++) {
+                  byteNumbers[i] = byteCharacters.charCodeAt(i);
+                }
+                const byteArray = new Uint8Array(byteNumbers);
+                const blob = new Blob([byteArray], { type: 'application/pdf' });
+                const pdfUrl = URL.createObjectURL(blob);
+                this.pdfCache[pdfPath] = pdfUrl;
+      
+                const pdfViewer = document.getElementById('pdfViewer') as HTMLIFrameElement;
+                pdfViewer.src = pdfUrl;
+                img.loadingError = false;
+              } catch (error) {
+                console.error('Error processing PDF:', error);
+                img.loadingError = true;
+              }
+            },
+            (error) => {
+              console.error('Error loading PDF:', error);
+              img.loadingError = true;
+            }
+          );
+      }
+      
+    // showImagesOfVaritaionSelectedValues(img: any) {
+    //     this.varitaionSelectedIndex =
+    //         this.appItemForViewDto.variations[0].selectedValues.indexOf(img);
+    //     /* this.showProductAttachment = false; */
+    //     this.centerImage = null;
+    //     if (
+    //         !this.appItemForViewDto.variations[0].selectedValues[
+    //             this.varitaionSelectedIndex
+    //         ].entityAttachments ||
+    //         this.appItemForViewDto.variations[0].selectedValues[
+    //             this.varitaionSelectedIndex
+    //         ].entityAttachments.length == 0
+    //     ) {
+    //         // get attachment
+    //         this._appItemsServiceProxy
+    //             .getFirstAttributeAttachments(
+    //                 this.productId,
+    //                 this.appItemForViewDto.variations[0].extraAttributeId,
+    //                 this.appItemForViewDto.variations[0].selectedValues[
+    //                     this.varitaionSelectedIndex
+    //                 ].value
+    //             )
+    //             .subscribe((res) => {
+    //                 this.appItemForViewDto.variations[0].selectedValues[
+    //                     this.varitaionSelectedIndex
+    //                 ].entityAttachments = res;
+
+    //                 this.setVariationsRelatedValues();
+    //                 this.setActiveAttachments(
+    //                     this.appItemForViewDto.variations[0].selectedValues[this.varitaionSelectedIndex].entityAttachments
+    //                   );
+                      
+    //             });
+    //     } else this.setVariationsRelatedValues();
+    // }
+
     showImagesOfVaritaionSelectedValues(img: any) {
         this.varitaionSelectedIndex =
-            this.appItemForViewDto.variations[0].selectedValues.indexOf(img);
-        /* this.showProductAttachment = false; */
-        this.centerImage = null;
-        if (
-            !this.appItemForViewDto.variations[0].selectedValues[
-                this.varitaionSelectedIndex
-            ].entityAttachments ||
-            this.appItemForViewDto.variations[0].selectedValues[
-                this.varitaionSelectedIndex
-            ].entityAttachments.length == 0
-        ) {
-            // get attachment
-            this._appItemsServiceProxy
-                .getFirstAttributeAttachments(
-                    this.productId,
-                    this.appItemForViewDto.variations[0].extraAttributeId,
-                    this.appItemForViewDto.variations[0].selectedValues[
-                        this.varitaionSelectedIndex
-                    ].value
-                )
-                .subscribe((res) => {
-                    this.appItemForViewDto.variations[0].selectedValues[
-                        this.varitaionSelectedIndex
-                    ].entityAttachments = res;
+          this.appItemForViewDto.variations[0].selectedValues.indexOf(img);
+      
+        const selected =
+          this.appItemForViewDto.variations[0].selectedValues[this.varitaionSelectedIndex];
+      
+        // const afterSet = () => {
+       
 
-                    this.setVariationsRelatedValues();
-                });
-        } else this.setVariationsRelatedValues();
-    }
+        //     if(selected.entityAttachments?.length){
+        //         this.setActiveAttachments(this.appItemForViewDto?.entityAttachments);
+
+        //     }else {
+        //   this.setActiveAttachments(selected.entityAttachments);
+
+        //     }
+      
+         
+        // //   this.centerImage = this.activeAttachments?.[this.currentIndex] ?? null;
+      
+      
+        //   if (this.centerImage) {
+        //     this.centerImage.isPdfFile = this.kindOf(this.centerImage) === 'pdf';
+        //     this.centerImage.isVideoFile = this.kindOf(this.centerImage) === 'video';
+        //     this.centerImage.isImageFile = this.kindOf(this.centerImage) === 'image';
+        //   }
+      
+        //   this.selectedValuesName = selected.value;
+        //   this.filterPricing();
+        // };
+      
+        const afterSet = () => {
+            const colorAttachments = selected.entityAttachments ?? [];
+            const fallback = this.appItemForViewDto?.entityAttachments ?? [];
+          
+            const listToShow = colorAttachments.length ? colorAttachments : fallback;
+          
+            this.setActiveAttachments(listToShow);
+          
+            this.selectedValuesName = selected.value;
+            this.filterPricing();
+          };
+          
+        if (!selected.entityAttachments || selected.entityAttachments.length === 0) {
+          this._appItemsServiceProxy
+            .getFirstAttributeAttachments(
+              this.productId,
+              this.appItemForViewDto.variations[0].extraAttributeId,
+              selected.value
+            )
+            .subscribe((res) => {
+              selected.entityAttachments = res ?? [];
+              afterSet(); 
+            });
+        } else {
+          afterSet();
+        }
+      }
+      
     setVariationsRelatedValues() {
+        let img= this.appItemForViewDto.variations[0].selectedValues[
+            this.varitaionSelectedIndex
+        ].entityAttachments[0] ;
+
         this.centerImage =
-            this.appItemForViewDto.variations[0].selectedValues[
-                this.varitaionSelectedIndex
-            ].entityAttachments[0];
+          img ?  img :  this.appItemForViewDto.entityAttachments.find(x=>x.isDefault);
+
+            if(this.isPdfFile( this.centerImage?.fileName))
+                this.centerImage.isPdfFile =true;
+    
+             else if(this.isVideoFile( this.centerImage?.fileName))
+                this.centerImage.isVideoFile =true;
+    
+                else 
+                this.centerImage.isImageFile =true;
 
         this.selectedValuesName =
             this.appItemForViewDto.variations[0].selectedValues[
@@ -586,6 +761,77 @@ export class AppItemsViewComponent
         }
     }
 
+
+    //Related items
+    initRelatedItemsVariables(firstInit: boolean) {
+       if (firstInit)
+           this.initRelatedItems = this.appItemForViewDto.relatedAppItems.items;
+       else
+           this.appItemForViewDto.relatedAppItems.items =this.initRelatedItems;
+        this.noOfRelatedItemsToShowInitially = 10;
+        this.maxRelatedItemsCount = 10;
+        this.scrollRelatedItems = false;
+        this.maxRelatedItemsCnt = 40;
+        this.relatedItemsToLoad = 20;
+        this.totalRelatedItems =
+            this.appItemForViewDto.relatedAppItems.totalCount;
+        if (this.noOfRelatedItemsToShowInitially < this.totalRelatedItems)
+            this.showMoreRelatedItems= true;
+        else this.showMoreRelatedItems = false;
+        this.showLessRelatedItems = false;
+    }
+
+    showRelatedItems() {
+        if (this.noOfRelatedItemsToShowInitially < this.totalRelatedItems) {
+            this.maxRelatedItemsCount = this.relatedItemsToLoad;
+            this.skipRelatedItemsCount =
+                this.noOfRelatedItemsToShowInitially;
+            this.noOfRelatedItemsToShowInitially += this.relatedItemsToLoad;
+
+        
+                this._appItemsServiceProxy
+                .getAppItemRelatedProductsWithPaging(
+                   undefined,
+                   undefined,
+                   undefined,
+                   undefined,
+                   undefined,
+                   undefined,
+                   undefined,
+                   undefined,
+                    undefined,
+                    this.appItemForViewDto.entityId,
+                    undefined,
+                    undefined,
+                    undefined,
+                    undefined,
+                    this.skipClassificationCount,
+                    this.maxClassificationCount
+                )
+                .subscribe((res) => {
+                    if (
+                        this.noOfRelatedItemsToShowInitially >=
+                        this.totalRelatedItems
+                    ) {
+                        this.showMoreRelatedItems = false;
+                        this.showLessRelatedItems = true;
+                    }
+
+                    this.appItemForViewDto.relatedAppItems.items =
+                        this.appItemForViewDto.relatedAppItems.items.concat(
+                            res.items
+                        );
+                    if (
+                        this.appItemForViewDto.relatedAppItems.items
+                            .length >= this.maxRelatedItemsCnt
+                    )
+                        this.scrollRelatedItems= true;
+                });
+        } else {
+            this.initRelatedItemsVariables(false);
+        }
+    }
+
     //Recommended
     initRecommendedVariables(firstInit: boolean) {
         if (firstInit)
@@ -744,7 +990,16 @@ export class AppItemsViewComponent
         this.appItemViewInput.publish = true;
     }
     handleFailedImage($event) {
-        $event.target.src = this.defaultLogo;
+        let fileName =  $event.target.src?.split('/').pop();
+         if(this.isPdfFile(fileName))
+            $event.target.src ="/assets/Items/pdf-Icon.png" ; 
+
+         else if(this.isVideoFile(fileName))
+            $event.target.src ="/assets/Items/video-Icon.png" ; 
+
+            else 
+            $event.target.src = this.defaultLogo;
+
     }
     addingToList: boolean = false;
     addToListHandler($event) {
@@ -846,7 +1101,9 @@ export class AppItemsViewComponent
                 isHostRecord: undefined,
                 stockAvailability: undefined,
                 hexaCode:undefined,
-                image:undefined
+                image:undefined,
+                status:undefined,
+                entityObjectStatusId:undefined
             });
             if (currency.symbol) currency.label += ` ${currency.symbol}`;
             if (currency && !alreadyAdded) {
@@ -875,7 +1132,23 @@ export class AppItemsViewComponent
         console.log(">> listing");
         const listingId: number = this.productId;
         const alreadyPublished: boolean = true;
+        const currentSharingStatus = this._publishAppItemListingService.productId === this.productId &&
+            this._publishAppItemListingService.sharingStatus !== undefined &&
+            this._publishAppItemListingService.sharingStatus !== null
+                ? this._publishAppItemListingService.sharingStatus
+                : this.appItemForViewDto.sharingLevel;
+
+        this._publishAppItemListingService.subscribersNumber =
+            this.appItemForViewDto.numberOfSubscribers;
+        this._publishAppItemListingService.sharingStatus = currentSharingStatus;
+        this._publishAppItemListingService.itemSharing =
+            this.appItemForViewDto.itemSharing;
+        this._publishAppItemListingService.productId = this.productId;
+        this._publishAppItemListingService.screen = 1;
+
         const successCallBack = () => {
+            this.appItemForViewDto.sharingLevel = this._publishAppItemListingService.sharingStatus;
+            this.appItemForViewDto.itemSharing = this._publishAppItemListingService.itemSharing;
             this.notify.success(this.l("PublishedSuccessfully"));
             // this.eventTriggered.emit({
             //     event: AppItemBrowseEvents.PublishListing,
@@ -889,14 +1162,6 @@ export class AppItemsViewComponent
             successCallBack,
             optinalData
         );
-        this._publishAppItemListingService.subscribersNumber =
-            this.appItemForViewDto.numberOfSubscribers;
-            this._publishAppItemListingService.sharingLevel =
-            this.appItemForViewDto.sharingLevel;
-            this._publishAppItemListingService.itemSharing =
-            this.appItemForViewDto.itemSharing;
-        this._publishAppItemListingService.productId = this.productId;
-        this._publishAppItemListingService.screen = 1
     }
     btnLoader: boolean = false;
     syncProduct() {
@@ -930,6 +1195,10 @@ export class AppItemsViewComponent
                 undefined,
                 undefined,
                 undefined,
+                undefined,
+                10,
+                undefined, //item ssin
+                undefined,
                 0,
                 10
             )
@@ -949,4 +1218,143 @@ export class AppItemsViewComponent
     getTimezoneOffset() {
         this.timezoneOffset = new Date().getTimezoneOffset();
     }
+
+    private setActiveAttachments(list: AppEntityAttachmentDto[] | null | undefined) {
+        this.activeAttachments = (list ?? []).filter(x => !!x?.url);
+
+        // if (!this.activeAttachments.length) {
+        //   this.currentIndex = 0;
+        //   this.centerImage = null;
+        //   return;
+        // }
+      
+        const imgIndex = this.activeAttachments.findIndex(x => this.kindOf(x) === 'image');
+        this.currentIndex = imgIndex >= 0 ? imgIndex : 0;
+      
+        this.preloadVisiblePdfThumbs();
+        this.preparePdfThumbIfNeeded(this.currentIndex);
+      }
+      
+      
+    getUrl(a: any): string {
+        const url = (a?.url ?? '').trim();
+        if (!url) return '';
+        if (/^https?:\/\//i.test(url)) return url;
+        return `${this.attachmentBaseUrl.replace(/\/$/,'')}/${url.replace(/^\//,'')}`;
+      }
+      
+   
+      
+      kindOf(a: any): any {
+        const mime = (a?.mimeType ?? '').toLowerCase();
+        const url = (a?.url ?? '').toLowerCase();
+        const file = (a?.fileName ?? '').toLowerCase();
+      
+        if (mime.startsWith('image/')) return 'image';
+        if (mime.startsWith('video/')) return 'video';
+        if (mime === 'application/pdf') return 'pdf';
+      
+        const target = url || file;
+        if (/\.(jpe?g|png|webp|gif|svg)$/.test(target)) return 'image';
+        if (/\.(mp4|webm|ogg)$/.test(target)) return 'video';
+        if (/\.pdf$/.test(target)) return 'pdf';
+      
+        return 'other';
+      }
+      
+      setMain(i: number) {
+        this.currentIndex = i;
+        this.preparePdfThumbIfNeeded(i);
+      }
+      private async buildPdfThumbFromBlob(blob: Blob, targetWidth = 520): Promise<string> {
+        const ab = await blob.arrayBuffer();
+        const loadingTask = (pdfjsLib as any).getDocument({ data: new Uint8Array(ab) });
+        const pdf = await loadingTask.promise;
+        const page1 = await pdf.getPage(1);
+      
+        const viewport1 = page1.getViewport({ scale: 1 });
+        const scale = targetWidth / viewport1.width;
+        const viewport = page1.getViewport({ scale });
+      
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d')!;
+        canvas.width = Math.floor(viewport.width);
+        canvas.height = Math.floor(viewport.height);
+      
+        await page1.render({ canvasContext: ctx, viewport }).promise;
+      
+        page1.cleanup?.();
+        pdf.destroy?.();
+      
+        return canvas.toDataURL('image/png');
+      }
+      
+      private async preparePdfThumbIfNeeded(index: number) {
+        const item = this.activeAttachments?.[index];
+        if (!item || this.kindOf(item) !== 'pdf') {
+          this.pdfThumbMap[index] = null;
+          this.pdfThumbLoadingMap[index] = false;
+          return;
+        }
+      
+        const path = (item.url ?? item.fileName ?? '').trim();
+        if (!path) return;
+      
+        if (this.pdfThumbByPath[path]) {
+          this.pdfThumbMap[index] = this.pdfThumbByPath[path];
+          this.pdfThumbLoadingMap[index] = false;
+          return;
+        }
+      
+        this.pdfThumbLoadingMap[index] = true;
+      
+        try {
+          const fullUrl = this.getUrl(item);
+          const res = await this._appItemsServiceProxy.getFile64FromUrl(fullUrl).toPromise();
+      
+          const base64 = (res && typeof res === 'string' && res.includes(',')) ? res.split(',')[1] : res;
+          const byteChars = atob(base64);
+          const byteNumbers = new Array(byteChars.length);
+          for (let i = 0; i < byteChars.length; i++) byteNumbers[i] = byteChars.charCodeAt(i);
+      
+          const blob = new Blob([new Uint8Array(byteNumbers)], { type: 'application/pdf' });
+          const thumb = await this.buildPdfThumbFromBlob(blob, 520);
+      
+          this.pdfThumbByPath[path] = thumb;
+          this.pdfThumbMap[index] = thumb;
+        } catch {
+          this.pdfThumbMap[index] = null;
+        } finally {
+          this.pdfThumbLoadingMap[index] = false;
+        }
+      }
+      
+      private preloadVisiblePdfThumbs() {
+        const visible = Math.min(this.activeAttachments.length, 7);
+        for (let i = 0; i < visible; i++) {
+          if (this.kindOf(this.activeAttachments[i]) === 'pdf') {
+            this.preparePdfThumbIfNeeded(i);
+          }
+        }
+      }
+      openNewTab(item: any) {
+        window.open(this.getUrl(item), '_blank', 'noopener');
+      }
+      openImagePreview(url: string) {
+        if (!url) return;
+        this.previewImageUrl = url;
+        this.showImagePreview = true;
+      }
+      onThumbError(ev: any, item: any) {
+        const kind = this.kindOf(item);
+        if (kind === 'pdf') ev.target.src = '/assets/Items/pdf-Icon.png';
+        else if (kind === 'video') ev.target.src = '/assets/Items/video-Icon.png';
+        else ev.target.src = this.defaultLogo;
+      }
+      
+      onMainError(ev: any) {
+        ev.target.src = this.defaultLogo;
+      }
+                              
+      
 }

@@ -1,0 +1,156 @@
+<div bsModal
+     #contactUsModal="bs-modal"
+     class="modal fade"
+     tabindex="-1"
+     role="dialog"
+     aria-labelledby="contactUsModal"
+     aria-hidden="true"
+     [config]="{backdrop: 'static'}">
+
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+
+      <form *ngIf="active"
+            #contactForm="ngForm"
+            novalidate
+            (ngSubmit)="save()"
+            autocomplete="off">
+
+        <div class="modal-header border-0 pb-0">
+          <h4 class="modal-title font-weight-bold">
+            {{'ContactUs' | localize}}
+          </h4>
+          <button type="button"
+                  class="close"
+                  aria-label="Close"
+                  (click)="close()"
+                  [disabled]="saving">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+
+        <div class="modal-body">
+
+          <div class="row">
+            <!-- Subject -->
+            <div class="col-md-4 mb-3">
+              <label class="font-weight-bold">{{'Subject' | localize}} * : </label>
+              <input type="text"
+              class="form-control form-control-sm"
+              name="subject"
+              value="Registration request"
+              disabled
+              [(ngModel)]="model.subject"
+              required
+              minlength="2"
+              maxlength="100" />
+  
+            </div>
+
+            <!-- First Name -->
+            <div class="col-md-4 mb-3">
+              <label class="font-weight-bold">{{'FirstName' | localize}}* : </label>
+              <input type="text"
+                     class="form-control form-control-sm"
+                     name="firstName"
+                     [(ngModel)]="model.firstName"
+                     required
+                     minlength="2"
+                     maxlength="100" />
+              <small class="text-danger"
+                     *ngIf="contactForm.submitted && !contactForm.controls.firstName?.valid">
+                     {{'FirstName' | localize}} {{'Required' | localize}}
+              </small>
+            </div>
+
+            <!-- Last Name -->
+            <div class="col-md-4 mb-3">
+              <label class="font-weight-bold">{{'LastName' | localize}}* : </label>
+              <input type="text"
+                     class="form-control form-control-sm"
+                     name="lastName"
+                     [(ngModel)]="model.lastName"
+                     required
+                     minlength="2"
+                     maxlength="100" />
+              <small class="text-danger"
+                     *ngIf="contactForm.submitted && !contactForm.controls.lastName?.valid">
+                     {{'LastName' | localize}}   {{'Required' | localize}}
+              </small>
+            </div>
+          </div>
+
+          <div class="row">
+            <!-- Email -->
+            <div class="col-md-6 mb-3">
+              <label class="font-weight-bold">{{'EMailAddress' | localize}}* : </label>
+              <input type="email"
+                     class="form-control form-control-sm"
+                     name="email"
+                     [(ngModel)]="model.email"
+                     required  [pattern]="emailPattern"
+                     #emailInput="ngModel"
+                     maxlength="150" />
+              <small class="text-danger"
+                     *ngIf="emailInput.touched && emailInput.invalid">
+               {{'PleaseEnterAValidEmail' | localize}}
+              </small>
+            </div>
+
+            <!-- Telephone -->
+            <div class="col-md-6 mb-3">
+              <label class="font-weight-bold">{{'Telephone' | localize}}:</label>
+              <input type="text"
+                     class="form-control form-control-sm"
+                     name="telephone"
+                     [(ngModel)]="model.telephone"
+                     pattern="^[0-9+()\- ]*$"
+                     #phoneInput="ngModel"
+                     maxlength="20" />
+              <small class="text-danger"
+                     *ngIf="phoneInput.invalid && phoneInput?.touched">
+                     {{'PleaseEnterPhoneNumber' | localize}}
+              </small>
+            </div>
+          </div>
+
+          <!-- Message -->
+          <div class="form-group">
+            <label class="font-weight-bold">{{'Message' | localize}} * : </label>
+            <textarea class="form-control"
+                      rows="4"
+                      name="message"
+                      [(ngModel)]="model.message"
+                      required
+                      minlength="5"
+                      maxlength="2000"></textarea>
+            <small class="text-danger"
+                   *ngIf="contactForm.submitted && !contactForm.controls.message?.valid">
+              Message is required
+            </small>
+          </div>
+
+        </div>
+
+        <div class="modal-footer border-0">
+          <button type="button"
+                  class="btn btn-light"
+                  (click)="close()"
+                  [disabled]="saving">
+            {{'Cancel' | localize}}
+          </button>
+
+      <button
+  type="submit"
+  class="btn text-white bgPurple"
+  [disabled]="saving || !contactForm.form.valid || !isContactUsFound"
+  [buttonBusy]="saving"
+  [busyText]="l('SavingWithThreeDot')">
+  {{ 'Submit' | localize }}
+</button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+</div>

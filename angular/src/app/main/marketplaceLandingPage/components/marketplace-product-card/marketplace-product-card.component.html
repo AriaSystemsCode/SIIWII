@@ -1,0 +1,43 @@
+<div class="product-card-horizontal" (click)="onView()">
+    <div class="product-image-wrapper">
+      <img
+        class="product-image"
+        [src]="imageSrc"
+        (error)="onImgErr($event)"
+        alt="Product Image"
+      />
+    </div>
+  
+    <div class="product-info py-3">
+      <div class="top-row">
+        <span class="code">{{ appItem?.manufacturerCode }}</span>
+  
+        <span class="price" *ngIf="showMsrP">
+          {{ msrpLabel }}:
+          {{ appItem?.price | currency: currencyCode:true }}
+        </span>
+      </div>
+  
+      <div class="name">
+        {{ appItem?.name }}
+      </div>
+  
+      <div class="seller">
+        {{'SoldBy' | localize}}
+        <span class="seller-name">{{ appItem?.sellerName }}</span>
+      </div>
+  
+      <div class="bottom-row">
+        <div class="star-rating">
+          <div class="stars-outer">
+            ★★★★★
+            <div class="stars-inner" [style.width]="ratingWidth">★★★★★</div>
+          </div>
+        </div>
+  
+        <span class="rateNum">
+          ({{ marketDto?.numberOfReviews }}) {{'Reviews' | localize}}
+        </span>
+      </div>
+    </div>
+  </div>

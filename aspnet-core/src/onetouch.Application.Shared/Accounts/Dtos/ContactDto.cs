@@ -12,6 +12,9 @@ namespace onetouch.Accounts.Dtos
     public class ContactDto : EntityDto<long>
 	{
 		public string Code { get; set; }
+        //public string Relation { get; set; }
+         
+        public string EntityObjectType { get; set; }
 
 		public string Name { get; set; }
 		

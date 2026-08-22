@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
-import { MembersListComponent } from '@app/main/members-list/components/members-list.component';
+import { MembersListComponent } from '@app/main/members-list/components/members-list/members-list.component';
 import { MemberFilterTypeEnum } from '@shared/service-proxies/service-proxies';
 import { SelectItem } from 'primeng/api';
 

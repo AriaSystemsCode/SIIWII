@@ -3,16 +3,26 @@
         <div class="modal-content">
             <form *ngIf="active" #userForm="ngForm" novalidate (ngSubmit)="save()">
                 <div class="modal-header">
-                    <h4 class="modal-title">
-                        <span *ngIf="user.id">{{"EditUser" | localize}}: {{user.userName}}</span>
-                        <span *ngIf="!user.id">{{"CreateNewUser" | localize}}</span>
-                    </h4>
+                    <h4 class="modal-title" *ngIf="!fromTeamMember">
+                        {{ user.id ? ('EditUser' | localize) + ': ' + user.userName : ('CreateNewUser' | localize) }}
+                      </h4>
+                      
+                      <tabset *ngIf="fromTeamMember">
+                        <tab class="text-black" [heading]="user.id ? ('Edit User Info' | localize) : ('Create New User' | localize)" (selectTab)="showSelectUser = false">
+                        </tab>
+
+                        <tab class="text-black" [heading]="'Select User' | localize"  (selectTab)="showSelectUser = true">
+                        </tab>                        
+                      </tabset>
+                      
+
                     <button type="button" class="close" (click)="close()" [attr.aria-label]="l('Close')" [disabled]="saving">
                         <span aria-hidden="true">&times;</span>
                     </button>
-                </div>
-                <div class="modal-body">
-                    <tabset>
+                </div> 
+                <div class="modal-body thin-scroll"  style="max-height: 600px;
+    overflow: hidden auto;">
+                    <tabset *ngIf="!showSelectUser">
                         <tab heading="{{'UserInformations' | localize}}">
                             <div class="row">
                                 <div class="col-sm-3 text-center mb-5 mt-5">
@@ -21,7 +31,8 @@
                                 <div class="col-sm-9">
                                     <div class="form-group">
                                         <label for="Name">{{"Name" | localize}} *</label>
-                                        <input id="Name" #nameInput="ngModel" class="form-control" type="text" name="Name" [(ngModel)]="user.name" required maxlength="64">
+                                        <!-- <input id="Name" #nameInput="ngModel" class="form-control" type="text" name="Name" [(ngModel)]="user.name" required maxlength="64"  [disabled]="fromTeamMember"> -->
+                                        <input id="Name" #nameInput="ngModel" class="form-control" type="text" name="Name" [(ngModel)]="user.name" required maxlength="64" >
                                         <validation-messages [formCtrl]="nameInput"></validation-messages>
                                     </div>
 
@@ -154,10 +165,65 @@
                             <organization-unit-tree [cascadeSelectEnabled]="false" #organizationUnitTree></organization-unit-tree>
                         </tab>
                     </tabset>
+
+                    <div *ngIf="showSelectUser">
+                        <div class="link-user-container">
+                                <!-- Search Input -->
+
+                                <div class="row align-items-center mb-4">
+                                    <div class="col-xl-12">
+                                        <div class="form-group m-form__group align-items-center">
+                                            <div class="input-group">
+                                                <input [(ngModel)]="userSearchQuery" name="userSearchQuery" autoFocus
+                                                    class="form-control m-input" [placeholder]="l('SearchWithThreeDot')"
+                                                    type="text"  (keyup)="filterUsers(userSearchQuery)">
+                                                <span class="input-group-btn">
+                                                    <button style="background-color: #4A0D4A !important;
+                                                    border: 1px solid #4A0D4A !important;" 
+                                                    (click)="filterUsers(userSearchQuery)" class="btn btn-primary" type="submit"><i
+                                                            class="flaticon-search-1"
+                                                            [attr.aria-label]="l('Search')"></i></button>
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- User List -->
+                                <div class="table-wrapper">
+                                    <table class="user-table" *ngIf="filteredUsers?.length > 0; else noUsers">
+                                      <thead>
+                                        <tr>
+                                          <th class="select-col">Select</th>
+                                          <th class="name-col">Name</th>
+                                        </tr>
+                                      </thead>
+                                  
+                                      <tbody>
+                                        <tr *ngFor="let user of filteredUsers; index as i"
+                                            (click)="linkToUser(user, i)">
+                                          <td class="select-col">
+                                            <button class="btn  btn-sm" style="border-color: #4A0D4A !important;">
+                                              <i class="flaticon-user" style="color: #4A0D4A !important;"></i>
+                                            </button>
+                                          </td>
+                                          <td class="name-col">{{ user.userName }}</td>
+                                        </tr>
+                                      </tbody>
+                                    </table>
+                                  
+                                    <ng-template #noUsers>
+                                      <div class="no-users">No users found</div>
+                                    </ng-template>
+                                  </div>
+
+                                  
+                        </div>
+                    </div>
                 </div>
-                <div class="modal-footer">
+                <div class="modal-footer"  *ngIf="!showSelectUser">
                     <button [disabled]="saving" type="button" class="btn btn-default" (click)="close()">{{"Cancel" | localize}}</button>
-                    <button type="submit" class="btn btn-primary" [disabled]="!userForm.form.valid" [buttonBusy]="saving" [busyText]="l('SavingWithThreeDot')"><i class="fa fa-save"></i> <span>{{"Save" | localize}}</span></button>
+                    <button type="submit" class="btn bgPurple" [disabled]="!userForm.form.valid" [buttonBusy]="saving" [busyText]="l('SavingWithThreeDot')"><i class="fa fa-save"></i> <span>{{"Save" | localize}}</span></button>
                 </div>
             </form>
         </div>

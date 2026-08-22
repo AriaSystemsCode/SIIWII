@@ -1,4 +1,4 @@
-<div class="card w-100" (click)="viewProduct(product.id)"  #itemCard>
+<div class="cardDiv w-100" (click)="viewProduct(product.id)"  #itemCard>
     <img
         class="img w-100"
         [src]="attachmentBaseUrl + '/' + product?.imageUrl"
@@ -9,43 +9,39 @@
 
     <div class="card-body">
         <div class="d-flex justify-content-between">
-            <div class="ssin  font-weight-bold text-black">
+            <div class="ssin  font-weight-bold prdTxt">
                 {{ product?.manufacturerCode }}
             </div>
-            <div class="d-flex name-price">
-                <!-- <h5 class="seller">Sold By {{ product?.code }}</h5>  -->
-                <!-- <p class="price">MSRP :{{ product?.price  | currency:currency:true}}</p> -->
-                <p class="price">{{ languageSettingName!='en-GB' ? "MSRP"  :  "RRP"  }}: {{ product?.price  | currency:currency:true}}</p>
+            <div class="d-flex name-price" *ngIf="showMsrP">
+            
+                <p class="price" >{{ (languageSettingName!='en-GB' ? 'MSRP' : 'RRP') | localize }}:   {{ displayPrice | currency: currencyCode : 'symbol' : '1.2-2' }}</p>
             </div>
         </div>
-        <!-- <h5 class="seller" *ngIf="!isSellerIdExists">Sold By {{ product?.sellerName }}</h5>  -->
-       
+
         <p class="card-text desc fw-bold" [title]="product?.name">
-            {{ product?.name  | textSubstring: 20 }}
+            {{ product?.name  | textSubstring: 14 }}
         </p>
 
         <div class="d-flex name-price">
-            <!-- <h5 class="seller">Sold By {{ product?.code }}</h5>  -->
-             <h5 class="seller" *ngIf="!isSellerIdExists">Sold By {{ product?.sellerName }}</h5> 
-            <!-- <h5 class="price">{{ languageSettingName!='en-GB' ? "MSRP"  :  "RRP"  }}: {{ product?.price  | currency:currency:true}}</h5> -->
+    
+             <h5 class="seller" *ngIf="!isSellerIdExists">{{'SoldBy' | localize}} {{ product?.sellerName }}</h5> 
+   
         </div>
 
                <div class="d-flex mb-3 justify-content-between align-items-center">
-            <!-- Dynamic Rating Stars -->
+        
             <div class="star-rating">
-              <!-- Outer gray stars -->
+   
               <div class="stars-outer">
                 ★★★★★
-                <!-- Inner gold stars with dynamic width -->
-                <div class="stars-inner" [style.width]="(productCard?.averageRating / 5) * 100 + '%'">
+             
+                <div [ngClass]=" isArabic ? 'stars-inner-ar' :  'stars-inner'" [style.width]="(productCard?.averageRating / 5) * 100 + '%'">
                   ★★★★★
                 </div>
               </div>
             </div>
-            <span class="mr-2 mt-2 rateNum">({{productCard?.numberOfReviews }}) reviews</span>
+            <span class="rateNum">({{productCard?.numberOfReviews }}) {{'Reviews' | localize}}</span>
 
           </div>
     </div>
 </div>
-
-<!-- src="../../../../../assets/placeholders/appitem-placeholder.png" -->

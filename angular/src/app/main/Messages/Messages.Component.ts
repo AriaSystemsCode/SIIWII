@@ -13,8 +13,6 @@ import {
 import { appModuleAnimation } from "@shared/animations/routerTransition";
 import { AppComponentBase } from "@shared/common/app-component-base";
 import { FileDownloadService } from "@shared/download/fileDownload.service";
-
-import { SendMessageModalComponent } from "./SendMessage-Modal.Component";
 import {
     SycEntityObjectClassificationsServiceProxy,
     MessageServiceProxy,
@@ -28,6 +26,7 @@ import { DomSanitizer } from "@angular/platform-browser";
 import { MessageReadService } from "@shared/utils/message-read.service";
 import { finalize } from "rxjs/operators";
 import { AddCommentComponent } from "../comments/components/add-comment/add-comment.component";
+
 @Component({
     templateUrl: "./Messages.component.html",
     styleUrls: ["./Messages.component.scss"],
@@ -39,17 +38,15 @@ export class MessagesComponent extends AppComponentBase implements OnInit {
     @ViewChild("container", { static: true }) container;
     @ViewChild("messageEl") containerdetails: ElementRef;
     @ViewChild('AddCommentComponent',{static:false}) addCommentComponent :AddCommentComponent
-
-    @ViewChild("SendMessageModal", { static: true })
+@ViewChild('SendMessageModal')SendMessageModal: any;
     longmsgId: any = false;
-    sendMessageModal: SendMessageModalComponent;
     displayDeleteMessage: boolean = false;
     messageTypeIndex: number = 0;
     messageType: string = "";
     lablesList: TreeNodeOfGetSycEntityObjectClassificationForViewDto[] = null;
     filter: string = "";
     messages: MessagesDto[] = [];
-    messagesDetails: GetMessagesForViewDto[] = null;
+    messagesDetails: GetMessagesForViewDto[] = [];
     selectedMessage: number = 0;
     selectedMessageIndx:number=0;
     filterText: string = "";
@@ -75,6 +72,14 @@ export class MessagesComponent extends AppComponentBase implements OnInit {
     messageCategoryFilter: string = "MESSAGE";
     showAllMessages: boolean = false;
     maxVisibleMessages: number = 2;
+
+    replyingToMessage: MessagesDto;
+selectedMessageAfterRefresh: number | null = null;
+
+  currentLang:string
+  isArabic:boolean
+
+  selectedEntityObjectTypeCode: string | null = null;
     constructor(
         injector: Injector,
         private _downloadService: FileDownloadService,
@@ -88,6 +93,8 @@ export class MessagesComponent extends AppComponentBase implements OnInit {
     }
 
     ngOnInit(): void {
+            this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
+        this.currentLang == 'ar' || this.currentLang == 'ar-EG'  ? this.isArabic = true : this.isArabic = false
         this.messages = [];
         this.highlightFirstMsg = true;
         this.displayMessageDetails = false;
@@ -100,17 +107,10 @@ export class MessagesComponent extends AppComponentBase implements OnInit {
             .subscribe((result) => {
                 this.lablesList = result;
             });
-        // this.scrollToBottom();
+
     }
-    /*  ngAfterViewChecked() {
-        this.scrollToBottom();
-    }
-    scrollToBottom(): void {
-        try {
-            this.containerdetails.nativeElement.scrollTop =
-                this.containerdetails.nativeElement.scrollHeight;
-        } catch (err) {}
-    } */
+
+
         expandedMessageId: number | null = null;
         maxChars = 410; // Max characters before truncation
         maxLines = 3;   // Max rows before truncation
@@ -154,7 +154,13 @@ export class MessagesComponent extends AppComponentBase implements OnInit {
         }
     newCommentAddedHandler(event){
       //  this.selectMessage(this.messagesDetails[0].messages);
-        this.getMesssage();
+        // this.getMesssage();
+
+         if (!event) {
+        return;
+    }
+
+    this.refreshSelectedMessage();
     }
     selectMessagetype(messagetypeIndex: number, messagetype: string): void {
         this.filterText = "";
@@ -164,7 +170,7 @@ export class MessagesComponent extends AppComponentBase implements OnInit {
         this.skipCount = 0;
         this.maxResultCount = 5;
         this.noOfItemsToShowInitially = 5;
-        this.messagesDetails = null;
+        this.messagesDetails = [];
         this.selectedMessage = 0;
         this.selectedMessageIndx=0;
         this.getMesssage();
@@ -187,11 +193,13 @@ export class MessagesComponent extends AppComponentBase implements OnInit {
                 this.skipCount,
                 this.maxResultCount
             )
-            .pipe(finalize(() => {  this.hideMainSpinner(); }))
+            .pipe(finalize(() => {  this.hideMainSpinner();
+             
+             }))
             .subscribe((result) => {
                 if (search == true) {
                     this.messages = [];
-                    this.messagesDetails = null;
+                    this.messagesDetails = [];
                     for (var i = 0; i < result.items.length; i++) {
                         const message = result.items[i].messages;
                         this.messages.push(message);
@@ -249,16 +257,17 @@ export class MessagesComponent extends AppComponentBase implements OnInit {
                     this.totalCount = result.totalCount;
 
                     // this.totalUnread = result.totalUnread
-                    this._MessageServiceProxy.getUnreadCounts('MESSAGE').subscribe((result) => {
+                    this._MessageServiceProxy.getUnreadCounts('MESSAGE')?.subscribe((result) => {
                         this.totalPrimaryUnread = result;
                     });
 
-                    this._MessageServiceProxy.getUnreadCounts('THREAD').subscribe((result) => {
+                    this._MessageServiceProxy.getUnreadCounts('THREAD')?.subscribe((result) => {
                         this.totalUpdatesUnread = result;
                     });
                     this._MessageServiceProxy.getUnreadCounts('MENTION').subscribe((result) => {
-                        this.totalMentionUnRead = result;
+                        this.totalMentionUnRead = result ?? 0; // If result is null/undefined, use 0
                     });
+                    
                     this.itemsToShow = this.messages.slice(
                         0,
                         this.noOfItemsToShowInitially
@@ -266,43 +275,86 @@ export class MessagesComponent extends AppComponentBase implements OnInit {
                     this.isFullListDisplayed = false;
                 }
 
-                if ((window.innerWidth > 767) && (this.messages.length > 0))
-                    this.selectMessage(this.messages[0]);
+                // if ((window.innerWidth > 767) && (this.messages.length > 0))
+                //     this.selectMessage(this.messages[0]);
+
+                if (window.innerWidth > 767 && this.messages.length > 0) {
+    if (this.selectedMessageAfterRefresh) {
+        const selectedMsg = this.messages.find(
+            x => x.id === this.selectedMessageAfterRefresh
+        );
+
+        if (selectedMsg) {
+            this.selectMessage(selectedMsg);
+        } else {
+            this.selectMessage(this.messages[0]);
+        }
+
+        this.selectedMessageAfterRefresh = null;
+    } else if (!this.selectedMessage) {
+        this.selectMessage(this.messages[0]);
+    }
+}
             });
     }
     showSideBar: boolean = false;
-    showHideSideBarTitle: string = !this.showSideBar ? "Show details" : "Hide details";
+    showHideSideBarTitle: string = !this.showSideBar ? this.l( "Show details") : this.l("Hide details") ;
     onShowSideBar(showSideBar: boolean) {
         this.showSideBar = showSideBar;
-        this.showHideSideBarTitle = !this.showSideBar ? "Show details" : "Hide details";
+        this.showHideSideBarTitle = !this.showSideBar ?  this.l( "Show details") :  this.l("Hide details") ;
     }
 
-    getPrimaryMessage(event) {
-        this.clearActiveTab();
-        event.target.closest('button').classList.add('active-tab');
-        this.messageCategoryFilter = "MESSAGE";
-        this.messages = [];
-        this.messagesDetails = null;
-        this.getMesssage();
-    }
 
+getPrimaryMessage(event) {
+    this.clearActiveTab();
+    event.target.closest('button').classList.add('active-tab');
+
+    this.messageCategoryFilter = "MESSAGE";
+
+    this.messages = [];
+    this.messagesDetails = [];
+
+    this.skipCount = 0;
+    this.maxResultCount = 5;
+    this.noOfItemsToShowInitially = 5;
+    this.isFullListDisplayed = false;
+
+    this.getMesssage();
+}
     
+    // getUpdatesMessage(event, messageType) {
+    //     this.showMainSpinner();
+    //     this.clearActiveTab();
+    //     event.target.closest('button').classList.add('active-tab');
+    //     this.messageCategoryFilter = messageType;
+    //     this.messages = [];
+    //     this.messagesDetails = [];
+    //     this.getMesssage();
+    // }
     getUpdatesMessage(event, messageType) {
-        this.showMainSpinner();
-        this.clearActiveTab();
-        event.target.closest('button').classList.add('active-tab');
-        this.messageCategoryFilter = messageType;
-        this.messages = [];
-        this.messagesDetails = null;
-        this.getMesssage();
-    }
-    
+    this.showMainSpinner();
+
+    this.clearActiveTab();
+    event.target.closest('button').classList.add('active-tab');
+
+    this.messageCategoryFilter = messageType;
+
+    this.messages = [];
+    this.messagesDetails = [];
+
+    this.skipCount = 0;
+    this.maxResultCount = 5;
+    this.noOfItemsToShowInitially = 5;
+    this.isFullListDisplayed = false;
+
+    this.getMesssage();
+}
     getMentionsMessage(event) {
         this.clearActiveTab();
         event.target.closest('button').classList.add('active-tab');
         this.messageCategoryFilter = "MENTION";
         this.messages = [];
-        this.messagesDetails = null;
+        this.messagesDetails = [];
         this.getMesssage();
     }
     clearActiveTab() {
@@ -354,21 +406,26 @@ export class MessagesComponent extends AppComponentBase implements OnInit {
     focusAddComment(){
     if(this.addCommentComponent){
         this.addCommentComponent.focusCommentTextArea()
-        this.messagesDetails[0].messages.parentId=this.messagesDetails[0].messages.threadId
+        this.messagesDetails[0].messages.parentId=this.messagesDetails[0]?.messages?.threadId
         this.messagesDetails[0].messages.mesasgeObjectType=1;
 
-        this.addCommentComponent.show(this.messagesDetails[0].messages) 
+        this.addCommentComponent.show(this.messagesDetails[0]?.messages) 
     }
         
     }
+
+ 
+      
     selectMessage(message: MessagesDto): void {
+          this.selectedEntityObjectTypeCode =
+        message?.entityObjectTypeCode?.toUpperCase() || null;
         this.showMainSpinner();
         this.showSideBar=false;
-        this.showHideSideBarTitle = !this.showSideBar ? "Show Data" : "Hide Data";
+        this.showHideSideBarTitle = !this.showSideBar ? this.l("ShowData")  : this.l("HideData") ;
         this.highlightFirstMsg = false;
         this.selectedMessage = message.id;
         this.selectedMessageIndx=this.messages.findIndex(x=>x.id==message.id);
-
+       
         this._MessageServiceProxy
             .getMessagesForView(message.id)
             .pipe(finalize(() => { this.displayMessageDetails = true; this.hideMainSpinner(); }))
@@ -376,7 +433,7 @@ export class MessagesComponent extends AppComponentBase implements OnInit {
                 this.messagesDetails = result;
                 // set message Subject [Start]
                 for (let i = 0; i < this.messagesDetails.length; i++) {
-                    let msgSubject = this.messagesDetails[i].messages.subject;
+                    let msgSubject = this.messagesDetails[i]?.messages?.subject;
                     if((this.messageCategoryFilter=='THREAD' || this.messageCategoryFilter=='MENTION') &&(message.entityObjectTypeCode=="COMMENT"))
                      msgSubject="Comment by "+ message.senderName+ " on "+ message.relatedEntityObjectTypeCode +" '" +
                     (message.relatedEntityObjectTypeCode=="transaction"? message.relatedEntityObjectTypeDescription : message.relatedEntityObjectTypeDescription.substring(0,30))
@@ -387,7 +444,7 @@ export class MessagesComponent extends AppComponentBase implements OnInit {
 
 // set message Subject [End]
                 
-                if(this.messageCategoryFilter=='MENTION'){
+                if(this.messageCategoryFilter=='MENTION' || this.messageCategoryFilter=='THREAD'){
                     setTimeout(()=>{
                         this.focusAddComment();
 
@@ -467,15 +524,7 @@ export class MessagesComponent extends AppComponentBase implements OnInit {
             this.notify.info(this.l("MessageAddedToTrash"));
             this.selectMessagetype(this.messageTypeIndex, this.messageType);
         });
-        // this._MessageServiceProxy
-        //     .delete(id)
-        //     .subscribe((result) => {
-        //         //this.Messages = [];
-        //         //this.MessagesDetails=null;
-        //         this.notify.info(this.l('MessageAddedToTrash'));
-        //         //this.GetMesssage();
-        //         this.Select(this.MessageTypeIndex, this.MessageType);
-        //     });
+
     }
     //xxxx
     HardDeleteMessage(id) {
@@ -530,5 +579,106 @@ export class MessagesComponent extends AppComponentBase implements OnInit {
     isActive(message: MessagesDto, index: number): boolean {
         if (this.highlightFirstMsg && index == 0) return true;
         else return this.selectedMessage === message.id;
+    }
+
+    refreshData(event) {
+    if (event) {
+        this.selectedMessageAfterRefresh = this.selectedMessage;
+
+        this.messages = [];
+        this.messagesDetails = [];
+        this.getMesssage();
+    }
+}
+
+onReplyMessage(event: MouseEvent): void {
+    event.stopPropagation();
+
+    const msg = this.messagesDetails?.[0]?.messages;
+    if (!msg || !this.SendMessageModal) return;
+
+    this.selectedMessageAfterRefresh = msg.id;
+
+    this.SendMessageModal.show(
+        msg.id,
+        msg.threadId,
+        false,
+        msg.mesasgeObjectType
+    );
+}
+
+isImageFile(fileName: string): boolean {
+    return /\.(jpg|jpeg|png|svg|gif|webp)$/i.test(fileName || '');
+}
+
+isPdfFile(fileName: string): boolean {
+    return /\.pdf$/i.test(fileName || '');
+}
+
+isExcelFile(fileName: string): boolean {
+    return /\.(xls|xlsx|csv)$/i.test(fileName || '');
+}
+
+isWordFile(fileName: string): boolean {
+    return /\.(doc|docx)$/i.test(fileName || '');
+}
+
+isPowerPointFile(fileName: string): boolean {
+    return /\.(ppt|pptx)$/i.test(fileName || '');
+}
+
+isOtherFile(fileName: string): boolean {
+    return !this.isImageFile(fileName)
+        && !this.isPdfFile(fileName)
+        && !this.isExcelFile(fileName)
+        && !this.isWordFile(fileName)
+        && !this.isPowerPointFile(fileName);
+}
+downloadAttachment(item: any): void {
+  const fileUrl = `${this.attachmentBaseUrl}/${item.url}`;
+
+  const link = document.createElement('a');
+  link.href = fileUrl;
+  link.download = item.displayName || item.fileName;
+  link.target = '_blank';
+
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+}
+
+refreshSelectedMessage(): void {
+    const selectedId =
+        this.selectedMessage ||
+        this.messagesDetails?.[0]?.messages?.id;
+
+    if (!selectedId) {
+        this.getMesssage(true);
+        return;
+    }
+
+    const selectedMessage =
+        this.messages.find(x => x.id === selectedId) ||
+        this.messagesDetails?.[0]?.messages;
+
+    if (!selectedMessage) {
+        this.getMesssage(true);
+        return;
+    }
+
+    this.selectMessage(selectedMessage);
+}
+
+get selectedThreadIsComment(): boolean {
+    return this.selectedEntityObjectTypeCode === 'COMMENT';
+}
+
+get selectedThreadIsMessage(): boolean {
+    return this.selectedEntityObjectTypeCode !== 'COMMENT';
+}
+    ngOnDestroy() {
+      
+            localStorage.removeItem("messageView");
+      
     }
 }

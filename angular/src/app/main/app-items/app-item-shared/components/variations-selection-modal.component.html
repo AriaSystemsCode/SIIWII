@@ -8,21 +8,20 @@
     aria-hidden="true"
 > 
     <div
-        class="modal-dialog right-modal"
-        [ngClass]="active ? 'slide-right-in' : 'slide-right-out'"
+        class="modal-dialog"
+         [ngClass]="(active ? 'slide-right-in' : 'slide-right-out') + ' ' + (isArabic ? 'left-modal' : 'right-modal')"
         role="document"
     >
         <div class="modal-content">
             <div class="modal-content-wrapper">
                 <div class="modal-header flex-column text-left">
                     <h3 class="modal-title">
-                        <span> {{ l("Select / UnSelect Variations") }}</span>
+                        <span> {{ l("SelectVariationsTitle") }}</span>
                     </h3>
-                    <p>{{l('Select or remove the variation you want to appear on your list')}}</p>
+                    <p>{{l('SelectVariationsHint')}}</p>
                     <button
-                        style="position: absolute; right: 0; top: 8px"
                         type="button"
-                        class="close"
+                        class="close modal-close-btn"
                         (click)="close()"
                         aria-label="Close"
                     >

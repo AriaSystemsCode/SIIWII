@@ -1,72 +1,147 @@
-<div class="wrapper" *ngIf="productImages">
-    <div
-        class="d-flex align-items-start justify-content-center"
-        style="gap: 10px"
-    >
-        <!-- hide images and show slider -->
-        <div
-            *ngIf="productImages?.length <= 7"
-            class="slides d-flex align-items-lg-start justify-content-around flex-column"
-        >
-            <div
-                *ngFor="let image of productImages; let i = index"
-                class="mb-1"
-            >
-                <img
-                    (click)="setMainImage(i)"
-                    [src]="attachmentBaseUrl + '/' + image.url"
-                    alt="images slides"
-                    class="imageSlides"
-                    onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'"
-                    [ngClass]="
-                        i === currentIndex ? 'border border-primary ' : ''
-                    "
-                />
-            </div>
+<div class="wrapper" *ngIf="productImages?.length">
+  <div class="d-flex align-items-start justify-content-center" style="gap: 10px">
+    <!-- Thumbs (<=7 stack; >7 slider) -->
+    <div *ngIf="productImages.length <= 7"
+      class="slides d-flex align-items-lg-start justify-content-around flex-column">
+      <div *ngFor="let a of productImages; let i = index" class="mb-1">
+        <!-- IMAGE thumb -->
+        <img *ngIf="kindOf(a) === 'image'" (click)="setMainImage(i)" [src]="getUrl(a)" alt="thumb" class="imageSlides"
+          onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'"
+          [ngClass]="i === currentIndex ? 'border border-primary ' : ''" />
+
+        <!-- VIDEO thumb (muted preview) -->
+        <video *ngIf="kindOf(a) === 'video'" (click)="setMainImage(i)" class="imageSlides" style="height: 70px;" muted
+          playsinline preload="metadata" [ngClass]="i === currentIndex ? 'border border-primary ' : ''">
+          <source [src]="getUrl(a)" />
+        </video>
+
+
+        <!-- PDF thumb (thumbnail if ready, else icon) -->
+        <div *ngIf="kindOf(a) === 'pdf'" (click)="setMainImage(i)"
+          class="imageSlides d-flex align-items-center justify-content-center bg-light position-relative overflow-hidden"
+          [ngClass]="i === currentIndex ? 'border border-primary ' : ''" style="height:70px;width:50px;cursor:pointer;">
+
+          <!-- loading spinner -->
+          <div *ngIf="pdfThumbLoadingMap[i]" class="w-100 h-100 d-flex align-items-center justify-content-center">
+            <i class="fa fa-spinner fa-spin"></i>
+          </div>
+
+          <!-- thumbnail -->
+          <img *ngIf="!pdfThumbLoadingMap[i] && pdfThumbMap[i]" [src]="pdfThumbMap[i]"
+            style="width:100%;height:100%;object-fit:cover;" />
+
+          <!-- fallback icon -->
+          <div *ngIf="!pdfThumbLoadingMap[i] && !pdfThumbMap[i]" class="w-100 h-100"
+            style="background:url('assets/Items/pdf-Icon.png');background-position:center;background-size:contain;background-repeat:no-repeat;">
+          </div>
         </div>
 
-        <div *ngIf="productImages?.length > 7">
-            <div class="slider-container">
-                <div
-                    class="slider"
-                    [style.transform]="'translateY(' + translateY + 'px)'"
-                >
-                    <img
-                        class="imageSlides mb-2"
-                        *ngFor="let image of productImages; let i = index"
-                        [src]="attachmentBaseUrl + '/' + image.url"
-                        alt="Image {{ i }}"
-                        (click)="setMainImage(i)"
-                        onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'"
-                        [ngClass]="
-                            i === currentIndex ? 'border border-primary ' : ''
-                        "
-                    />
-                </div>
-            </div>
-            <!-- <button (click)="slideToPreviousImage()">&#8593; Previous</button> -->
-            <button (click)="slideToNextImage()" class="indicator-btns">
-                <i class="fa fa-chevron-down"></i>
-            </button>
-        </div>
 
-        <div class="main-image">
-            <img
-                *ngIf="!colorView"
-                [src]="
-                    attachmentBaseUrl + '/' + productImages[currentIndex].url
-                "
-                alt="images slides"
-                class="main"
-                onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'"
-            />
-            <img
-                *ngIf="colorView"
-                [src]="attachmentBaseUrl + '/' + colorAttachmentForMainIamge"
-                alt="images slides"
-                class="main"
-                onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'"
-            />
+        <!-- OTHER -->
+        <div *ngIf="kindOf(a) === 'other'" (click)="setMainImage(i)"
+          class="imageSlides d-flex align-items-center justify-content-center bg-light"
+          [ngClass]="i === currentIndex ? 'border border-primary ' : ''" style="height:60px;width:60px;cursor:pointer;">
+          <i class="fa fa-file-o" aria-hidden="true"></i>
         </div>
+      </div>
     </div>
+
+    <div *ngIf="productImages.length > 7">
+      <div class="slider-container">
+        <div class="slider" [style.transform]="'translateY(' + translateY + 'px)'">
+          <ng-container *ngFor="let a of productImages; let i = index">
+            <!-- IMAGE thumb -->
+            <img *ngIf="kindOf(a) === 'image'" class="imageSlides mb-2" [src]="getUrl(a)" alt="thumb"
+              (click)="setMainImage(i)" onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'"
+              [ngClass]="i === currentIndex ? 'border border-primary ' : ''" />
+            <!-- VIDEO thumb -->
+            <video *ngIf="kindOf(a) === 'video'" class="imageSlides mb-2" muted playsinline preload="metadata"
+              (click)="setMainImage(i)" [ngClass]="i === currentIndex ? 'border border-primary ' : ''">
+              <source [src]="getUrl(a)" />
+            </video>
+            <!-- PDF thumb -->
+            <div *ngIf="kindOf(a) === 'pdf'"
+              class="imageSlides mb-2 d-flex align-items-center justify-content-center bg-light"
+              (click)="setMainImage(i)" [ngClass]="i === currentIndex ? 'border border-primary ' : ''"
+              style="height:60px;width:60px;cursor:pointer;">
+              <i class="fa fa-file-pdf-o"></i>
+            </div>
+            <!-- OTHER -->
+            <div *ngIf="kindOf(a) === 'other'"
+              class="imageSlides mb-2 d-flex align-items-center justify-content-center bg-light"
+              (click)="setMainImage(i)" [ngClass]="i === currentIndex ? 'border border-primary ' : ''"
+              style="height:60px;width:60px;cursor:pointer;">
+              <i class="fa fa-file-o"></i>
+            </div>
+          </ng-container>
+        </div>
+      </div>
+
+      <button (click)="slideToNextImage()" class="indicator-btns">
+        <i class="fa fa-chevron-down"></i>
+      </button>
+    </div>
+
+    <!-- Main viewer -->
+    <div class="main-image">
+
+
+      <!-- MAIN IMAGE -->
+      <img *ngIf="kindOf(productImages[currentIndex]) === 'image' && !colorView"
+        [src]="getUrl(productImages[currentIndex])" class="main" style="cursor: zoom-in;"
+        (click)="openImagePreview(getUrl(productImages[currentIndex]))"
+        onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'" />
+
+      <img *ngIf="kindOf(productImages[currentIndex]) === 'image' && colorView"
+        [src]="attachmentBaseUrl + '/' + colorAttachmentForMainIamge" class="main" style="cursor: zoom-in;"
+        (click)="openImagePreview(attachmentBaseUrl + '/' + colorAttachmentForMainIamge)"
+        onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'" />
+      <!-- VIDEO -->
+      <video *ngIf="kindOf(productImages[currentIndex]) === 'video'" class="main" controls playsinline
+        style="min-height: 40vh !important;">
+        <source [src]="getUrl(productImages[currentIndex])" />
+        Your browser does not support the video tag.
+      </video>
+
+
+
+
+      <!-- MAIN PDF (thumbnail image + click opens PDF) -->
+      <ng-container *ngIf="kindOf(productImages[currentIndex]) === 'pdf'">
+
+        <!--  Loading -->
+        <div *ngIf="pdfThumbLoading" class="d-flex align-items-center justify-content-center"
+          style="min-width: 200px;height: 150px;">
+          <i class="fa fa-spinner fa-spin fa-2x text-primary"></i>
+          <span class="mx-3">Loading preview...</span>
+        </div>
+
+        <!-- 🖼 Thumbnail -->
+        <img *ngIf="!pdfThumbLoading && pdfThumbMap[currentIndex]" class="w-100 imageContainer main"
+          [src]="pdfThumbMap[currentIndex]" style="cursor:pointer; object-fit:contain;"
+          (click)="openNewTab(productImages[currentIndex])" />
+
+
+        <div *ngIf="!pdfThumbLoading && loadingError" class="p-2 text-danger">
+          Unable to generate PDF preview.
+          <a [href]="getUrl(productImages[currentIndex])" target="_blank" rel="noopener">
+            Open in new tab
+          </a>
+        </div>
+
+      </ng-container>
+
+      <p-dialog [(visible)]="showImagePreview" [modal]="true" [closable]="true" [dismissableMask]="true"
+        [draggable]="false" [resizable]="false" [style]="{width: '70vw', maxWidth: '900px'}"
+        [contentStyle]="{padding: '0'}">
+
+        <div class="d-flex align-items-center justify-content-center p-3">
+          <img [src]="previewImageUrl" style="max-width: 100%; max-height: 70vh; object-fit: contain;"
+            onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'" />
+        </div>
+
+      </p-dialog>
+
+    </div>
+  </div>
 </div>

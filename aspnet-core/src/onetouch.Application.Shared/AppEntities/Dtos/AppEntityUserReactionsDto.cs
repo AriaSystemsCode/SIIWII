@@ -14,7 +14,7 @@ namespace onetouch.AppEntities.Dtos
 		public string UserImage { get; set; }
 		public string JobTitle { get; set; }
 		public string AccountName { get; set; }
-		public Guid ProfilePictureId { get; set; }
+		public Guid? ProfilePictureId { get; set; }
 		public string ProfilePictureUrl { get; set; }
 		//MMT, Iteration#22 changes[Start]
 		public string FirstName { get; set; }

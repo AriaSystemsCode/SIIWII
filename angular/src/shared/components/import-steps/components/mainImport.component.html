@@ -2,12 +2,27 @@
 <BrowseFolderModal
     #BrowseModal
     (UploadedFolder)="onUploadedFolder($event)"
+    (_openVideoModal)="onOpenVideoModal($event)"
+    (_totalFiles)="settotalFiles($event)"
+    (_totalSizeMB)="settotalSizeMB($event)"
+   (_folderName)="setfolderName($event)"
+   (_imData)="setImData($event)"
+   (_imImages)="setImImages($event)"
+   (_hasImages)="setHasImages($event)"
 ></BrowseFolderModal>
 <app-progress
     #ProgressModal
     [progress]="progress"
     [progressHeader]="progressHeader"
     [ProgressDetail]="ProgressDetail"
+    [_totalFiles]="_totalFiles"
+    [_totalSizeMB]="_totalSizeMB"
+    [_folderName]="_folderName"
+    [_folder_details]="folder_details"
+    [_remainingFiles]="remainingFiles"
+    [_uploadedFilesCount]="uploadedFilesCount"
+    [_estimatedRemainingTime]="estimatedRemainingTime"
+    (close)="askToClose($event)"
 ></app-progress>
 <uploadStatusModal
     #StatusModal
@@ -17,8 +32,19 @@
     (close)="askToClose($event)"
     (totalFailedRecords)="ontotalFailedRecords($event)"
     (totalPassedRecords)="ontotalPassedRecords($event)"
+    [imagesList]="imagesList"
+    (searchItemCode)="onsSearchItemCode($event)"
+    (selectSugItemCode)="onSelectSugItemCode($event)"
+    [updatedRecordData]="updatedRecordData"
+    [imData]="imData"
+    [imImages]="imImages"
+    (updatedRecords)="onUpdatedRecords($event)"
+    (loadMoreRecords)="onLoadMoreValidateExcelRecords($event)"
+    [_resetRecords]="_resetRecords"
+    (_validateRecord)="onValidateRecord($event)"
+    (_resetRecordsCompleted)="onResetRecordsCompleted()"
 ></uploadStatusModal>
-<autoCropModal
+<!-- <autoCropModal
     #AutoCropModal
     [imagesList]="imagesList"
     [imagePassed]="imagePassed"
@@ -28,10 +54,14 @@
     (finalImages)="onfinalImages($event)"
     (finishCropping)="onfinishCropping($event)"
     (close)="askToClose($event)"
-></autoCropModal>
+></autoCropModal> -->
 <imageCroppingModal
     #imageCroppingModal
     [finishCropping]="finishCropping"
+    [imagesList]="imagesList"
+    [imagePassed]="imagePassed"
+    [imageFailed]="imageFailed"
+    [failedImagesIndex]="failedImagesIndex"
     [finalImages]="finalImages"
     (goNext)="goNext()"
     [OnChange]="OnChange"
@@ -51,10 +81,17 @@
     (repreateHandler)="onrepreateHandler($event)"
     (goPrevious)="importConfirmationGoBack()"
     (goNext)="goNext()"
+    (_updateLookups)="onUpdateLookups($event)"
 ></importConfirmationModal>
 <successfullyImportModal
     #successfullyImportModal
     (onDownloadLogFile)="onDownloadLogFile($event)"
     (finishImport)="onFinishImport($event)"
 ></successfullyImportModal>
+
+<videoTutorialModal
+    #videoModal
+    (goPrevious)="videoTutorialGoBack()"
+    (close)="askToClose($event)"
+><videoTutorialModal/>
 <!-- Iteration-8 -->

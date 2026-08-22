@@ -12,6 +12,11 @@ import { DashboardComponent } from "./dashboard/dashboard.component";
                 // component: MainComponent,
 
                 children: [
+                    {
+                        path: "account/login",
+                        redirectTo: "/account/login",
+                        pathMatch: "full",
+                      },
                     { path: 'appSubScriptionPlan/appSubscriptionPlanHeaders', component: AppSubscriptionPlanHeadersComponent, data: { permission: 'Pages.AppSubscriptionPlanHeaders' }  },
                     { path: 'systemObjects/sycAttachmentTypes', component: SycAttachmentTypesComponent, data: { permission: 'Pages.SycAttachmentTypes' }  },
                     //Iteration13
@@ -89,9 +94,9 @@ import { DashboardComponent } from "./dashboard/dashboard.component";
                                 path: "",
                                 loadChildren: () =>
                                     import(
-                                        "./SycLandingPageSettings/SycLandingPageSettings.module"
+                                        "./marketplaceLandingPage/landingPage.module"
                                     ).then(
-                                        (m) => m.SycLandingPageSettingsModule
+                                        (m) => m.LandingPageModule
                                     ),
                                 data: {
                                     preload: true,
@@ -128,7 +133,7 @@ import { DashboardComponent } from "./dashboard/dashboard.component";
                                     ).then((m) => m.MarketplaceProductsModule),
                                 data: {
                                     preload: true,
-                                    permission: "Pages.Marketplace.Products",
+                                    // permission: "Pages.Marketplace.Products",
                                 },
                             },
                             {
@@ -161,18 +166,7 @@ import { DashboardComponent } from "./dashboard/dashboard.component";
                     },
 
                     
-                    // { path: 'systemObjects/sycAttachmentCategories', component: SycAttachmentCategoriesComponent, data: { permission: 'Pages.SycAttachmentCategories' }  },
-                    // { path: 'myaccount', component: AccountInfoComponent, data: { permission: 'Pages.AccountInfo' }  },
-                    // { path: 'accounts', component: AccountsComponent, data: { permission: 'Pages.AccountInfo' }  },
-                    // { path: 'accounts/viewProfile/:id', component: ViewProfileComponent, data: { permission: 'Pages.AccountInfo' }  },
-                    // { path: 'systemObjects/suiIcons', component: SuiIconsComponent, data: { permission: 'Pages.SuiIcons' }  },
-                    // { path: 'lookups', component: AppEntitiesComponent, data: { permission: 'Pages.AppEntities' } },
-                    // { path: 'systemObjects/sycEntityObjectClassifications', component: SycEntityObjectClassificationsComponent, data: { permission: 'Pages.SycEntityObjectClassifications' }  },
-                    // { path: 'systemObjects/sycEntityObjectStatuses', component: SycEntityObjectStatusesComponent, data: { permission: 'Pages.SycEntityObjectStatuses' }  },
-                    // { path: 'systemObjects/sycEntityObjectCategories', component: SycEntityObjectCategoriesComponent, data: { permission: 'Pages.SycEntityObjectCategories' }  },
-                    // { path: 'systemObjects/sycEntityObjectTypes', component: SycEntityObjectTypesComponent, data: { permission: 'Pages.SycEntityObjectTypes' }  },
-                    // { path: 'systemObjects/sydObjects', component: SydObjectsComponent, data: { permission: 'Pages.SydObjects' }  },
-                    // { path: 'systemObjects/sysObjectTypes', component: SysObjectTypesComponent, data: { permission: 'Pages.SysObjectTypes' }  },
+                 
                     {
                         path: "dashboard",
                         component: DashboardComponent,
@@ -181,6 +175,7 @@ import { DashboardComponent } from "./dashboard/dashboard.component";
                     //Esraa [Start]
                     // { path: 'Messages', component: MessagesComponent },
                     //Esraa [End]
+                    // { path: "", redirectTo: "marketplace/products", pathMatch: "full" },
                     { path: "", redirectTo: "dashboard", pathMatch: "full" },
                     {
                         path: "dev-express-demo",
@@ -207,7 +202,7 @@ import { DashboardComponent } from "./dashboard/dashboard.component";
                         },
                     },
                     // { path: '**', redirectTo: '/app/main/dashboard'}
-                    { path: "**", redirectTo: "dashboard" },
+                    { path: "**", redirectTo: "marketplace/products" },
                 ],
             },
         ]),

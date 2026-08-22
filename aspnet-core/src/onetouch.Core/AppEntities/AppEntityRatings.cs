@@ -30,7 +30,7 @@ namespace onetouch.AppEntities
         public SycEntityObjectType EntityObjectTypeFk { get; set; }
         public virtual string EntityObjectTypeCode { set; get; }
 
-        public virtual string ObjectCode { set; get; }
+        public virtual string ObjectCode{ set; get; }
         public virtual long ObjectId { get; set; }
 
         [ForeignKey("ObjectId")]

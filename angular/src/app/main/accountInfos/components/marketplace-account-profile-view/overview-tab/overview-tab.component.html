@@ -1,0 +1,378 @@
+<div class="d-flex flex-lg-row flex-md-row flex-column" style="gap: 5px;">
+  <div class="col-lg-3 col-md-5 co-12 p-0">
+    <div class="sec-data mb-2 p-3">
+      <h4 class="mb-0">{{'ProfileInformation' | localize}}</h4>
+      <hr class="hr">
+
+      <div class="sidebar-item-data">
+        <div class="d-flex row-item row-item-main-data">
+          <div class=" row-item-title emailColor"><svg width="24" height="25" viewBox="0 0 24 25" fill="none"
+              xmlns="http://www.w3.org/2000/svg">
+              <path
+                d="M21.5 18.5L14.8571 12.5M9.14286 12.5L2.50003 18.5M2 7.5L10.1649 13.2154C10.8261 13.6783 11.1567 13.9097 11.5163 13.9993C11.8339 14.0785 12.1661 14.0785 12.4837 13.9993C12.8433 13.9097 13.1739 13.6783 13.8351 13.2154L22 7.5M6.8 20.5H17.2C18.8802 20.5 19.7202 20.5 20.362 20.173C20.9265 19.8854 21.3854 19.4265 21.673 18.862C22 18.2202 22 17.3802 22 15.7V9.3C22 7.61984 22 6.77976 21.673 6.13803C21.3854 5.57354 20.9265 5.1146 20.362 4.82698C19.7202 4.5 18.8802 4.5 17.2 4.5H6.8C5.11984 4.5 4.27976 4.5 3.63803 4.82698C3.07354 5.1146 2.6146 5.57354 2.32698 6.13803C2 6.77976 2 7.61984 2 9.3V15.7C2 17.3802 2 18.2202 2.32698 18.862C2.6146 19.4265 3.07354 19.8854 3.63803 20.173C4.27976 20.5 5.11984 20.5 6.8 20.5Z"
+                stroke="#777777" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+            {{'Email' | localize}} : </div>
+          <div class="row-item-desc ml-2">
+            <span style="    word-break: break-word;"> {{ accountDataForView?.eMailAddress || '-' }} </span>
+          </div>
+        </div>
+        <div class="d-flex row-item row-item-main-data d-flex">
+          <div class=" row-item-title emailColor"><svg width="24" height="25" viewBox="0 0 24 25" fill="none"
+              xmlns="http://www.w3.org/2000/svg">
+              <path
+                d="M5 4.5H9L11 9.5L8.5 11C9.57096 13.1715 11.3285 14.929 13.5 16L15 13.5L20 15.5V19.5C20 20.0304 19.7893 20.5391 19.4142 20.9142C19.0391 21.2893 18.5304 21.5 18 21.5C14.0993 21.263 10.4202 19.6065 7.65683 16.8432C4.8935 14.0798 3.23705 10.4007 3 6.5C3 5.96957 3.21071 5.46086 3.58579 5.08579C3.96086 4.71071 4.46957 4.5 5 4.5Z"
+                stroke="#777777" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+            {{'Phone'| localize}} : </div>
+          <div class="ml-2 row-item-desc ">
+            <span> {{ accountDataForView?.phone1Number || '-' }}</span>
+          </div>
+        </div>
+        <div class="d-flex row-item row-item-main-data d-flex">
+          <div class=" row-item-title emailColor"><svg width="24" height="25" viewBox="0 0 24 25" fill="none"
+              xmlns="http://www.w3.org/2000/svg">
+              <path fill-rule="evenodd" clip-rule="evenodd"
+                d="M14 7.5C13.7348 7.5 13.4804 7.60536 13.2929 7.79289C13.1054 7.98043 13 8.23478 13 8.5V16.5C13 16.7652 13.1054 17.0196 13.2929 17.2071C13.4804 17.3946 13.7348 17.5 14 17.5H18C18.2652 17.5 18.5196 17.3946 18.7071 17.2071C18.8946 17.0196 19 16.7652 19 16.5V8.5C19 8.23478 18.8946 7.98043 18.7071 7.79289C18.5196 7.60536 18.2652 7.5 18 7.5H14ZM17 9.5H15V15.5H17V9.5Z"
+                fill="#777777" />
+              <path
+                d="M6 7.5C5.73478 7.5 5.48043 7.60536 5.29289 7.79289C5.10536 7.98043 5 8.23478 5 8.5C5 8.76522 5.10536 9.01957 5.29289 9.20711C5.48043 9.39464 5.73478 9.5 6 9.5H10C10.2652 9.5 10.5196 9.39464 10.7071 9.20711C10.8946 9.01957 11 8.76522 11 8.5C11 8.23478 10.8946 7.98043 10.7071 7.79289C10.5196 7.60536 10.2652 7.5 10 7.5H6ZM6 11.5C5.73478 11.5 5.48043 11.6054 5.29289 11.7929C5.10536 11.9804 5 12.2348 5 12.5C5 12.7652 5.10536 13.0196 5.29289 13.2071C5.48043 13.3946 5.73478 13.5 6 13.5H10C10.2652 13.5 10.5196 13.3946 10.7071 13.2071C10.8946 13.0196 11 12.7652 11 12.5C11 12.2348 10.8946 11.9804 10.7071 11.7929C10.5196 11.6054 10.2652 11.5 10 11.5H6ZM5 16.5C5 16.2348 5.10536 15.9804 5.29289 15.7929C5.48043 15.6054 5.73478 15.5 6 15.5H10C10.2652 15.5 10.5196 15.6054 10.7071 15.7929C10.8946 15.9804 11 16.2348 11 16.5C11 16.7652 10.8946 17.0196 10.7071 17.2071C10.5196 17.3946 10.2652 17.5 10 17.5H6C5.73478 17.5 5.48043 17.3946 5.29289 17.2071C5.10536 17.0196 5 16.7652 5 16.5Z"
+                fill="#777777" />
+              <path fill-rule="evenodd" clip-rule="evenodd"
+                d="M4 3.5C3.20435 3.5 2.44129 3.81607 1.87868 4.37868C1.31607 4.94129 1 5.70435 1 6.5V18.5C1 19.2956 1.31607 20.0587 1.87868 20.6213C2.44129 21.1839 3.20435 21.5 4 21.5H20C20.7956 21.5 21.5587 21.1839 22.1213 20.6213C22.6839 20.0587 23 19.2956 23 18.5V6.5C23 5.70435 22.6839 4.94129 22.1213 4.37868C21.5587 3.81607 20.7956 3.5 20 3.5H4ZM20 5.5H4C3.73478 5.5 3.48043 5.60536 3.29289 5.79289C3.10536 5.98043 3 6.23478 3 6.5V18.5C3 18.7652 3.10536 19.0196 3.29289 19.2071C3.48043 19.3946 3.73478 19.5 4 19.5H20C20.2652 19.5 20.5196 19.3946 20.7071 19.2071C20.8946 19.0196 21 18.7652 21 18.5V6.5C21 6.23478 20.8946 5.98043 20.7071 5.79289C20.5196 5.60536 20.2652 5.5 20 5.5Z"
+                fill="#777777" />
+            </svg>
+            {{'Website' | localize}} : </div>
+          <div class="ml-2 row-item-desc">
+            <span style="    word-break: break-word;"> {{ accountDataForView?.website || '-' }} </span>
+          </div>
+        </div>
+
+        <div *ngIf="accountDataForView?.accountType == 'BUSINESS' || accountDataForView?.accountType == 'GROUP'"
+          class="row row-item row-item-main-data d-flex align-items-center mb-2">
+          <div class="col-4 row-item-title emailColor">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path
+                d="M5.84304 4.56789C7.47598 2.93495 9.69072 2.01758 12 2.01758C14.3094 2.01758 16.5241 2.93495 18.157 4.56789C19.79 6.20083 20.7074 8.41557 20.7074 10.7249C20.7074 13.0342 19.79 15.249 18.157 16.8819L16.97 18.0559C16.0954 18.9139 14.96 20.0179 13.564 21.3679C13.1445 21.7736 12.5837 22.0004 12 22.0004C11.4164 22.0004 10.8556 21.7736 10.436 21.3679L6.94505 17.9719C6.50571 17.5412 6.13838 17.1779 5.84304 16.8819C5.03446 16.0734 4.39305 15.1135 3.95544 14.0571C3.51784 13.0006 3.2926 11.8684 3.2926 10.7249C3.2926 9.58142 3.51784 8.44914 3.95544 7.39272C4.39305 6.3363 5.03446 5.37642 5.84304 4.56789ZM17.096 5.62789C16.4267 4.95861 15.6321 4.42772 14.7576 4.06553C13.883 3.70334 12.9457 3.51695 11.9992 3.517C11.0526 3.51704 10.1154 3.70353 9.24088 4.0658C8.36639 4.42807 7.57183 4.95904 6.90254 5.62839C6.23326 6.29774 5.70237 7.09236 5.34018 7.96688C4.978 8.8414 4.79161 9.77869 4.79165 10.7252C4.7917 11.6718 4.97818 12.6091 5.34046 13.4836C5.70273 14.358 6.2337 15.1526 6.90304 15.8219L8.39104 17.2899C9.20971 18.0906 10.239 19.0906 11.479 20.2899C11.6189 20.4249 11.8057 20.5004 12 20.5004C12.1944 20.5004 12.3812 20.4249 12.521 20.2899L15.916 16.9899C16.386 16.5292 16.7794 16.1399 17.096 15.8219C18.4475 14.4703 19.2068 12.6372 19.2068 10.7259C19.2068 8.81453 18.4475 6.98146 17.096 5.62989M12 7.99889C12.3943 7.99889 12.7846 8.07654 13.1489 8.2274C13.5131 8.37827 13.844 8.5994 14.1228 8.87816C14.4015 9.15692 14.6227 9.48786 14.7735 9.85208C14.9244 10.2163 15.002 10.6067 15.002 11.0009C15.002 11.3951 14.9244 11.7855 14.7735 12.1497C14.6227 12.5139 14.4015 12.8449 14.1228 13.1236C13.844 13.4024 13.5131 13.6235 13.1489 13.7744C12.7846 13.9252 12.3943 14.0029 12 14.0029C11.2135 13.9885 10.464 13.666 9.91282 13.1047C9.36164 12.5433 9.05283 11.7881 9.05283 11.0014C9.05283 10.2147 9.36164 9.45944 9.91282 8.89812C10.464 8.33679 11.2135 8.01425 12 7.99989M12 9.49989C11.6017 9.49989 11.2196 9.65814 10.938 9.93982C10.6563 10.2215 10.498 10.6035 10.498 11.0019C10.498 11.4002 10.6563 11.7823 10.938 12.064C11.2196 12.3456 11.6017 12.5039 12 12.5039C12.3916 12.4938 12.7636 12.3312 13.037 12.0507C13.3103 11.7702 13.4633 11.394 13.4633 11.0024C13.4633 10.6107 13.3103 10.2346 13.037 9.95411C12.7636 9.67362 12.3916 9.511 12 9.50089"
+                fill="#777777" />
+            </svg>
+
+            {{'Headquarters' | localize}} :
+          </div>
+          <div class="col-8 row-item-desc">
+            <p class="title-account mb-0 ml-2">
+              <span class="ml-5" *ngIf="accountDataForView?.addressLine1" style="white-space: nowrap;">
+                {{ (accountDataForView.addressLine1 | slice:0:20) + ', ' }}
+              </span>
+            </p>
+          </div>
+          
+          <div class="ml-5">
+            <!-- Remainder of line1 BEFORE line2 -->
+            <span *ngIf="accountDataForView?.addressLine1?.length > 20" class="row-item-desc">
+              {{ (accountDataForView.addressLine1 | slice:20) + ', ' }}
+            </span>
+          
+            <span *ngIf="accountDataForView?.addressLine2" class="row-item-desc">
+              {{ accountDataForView.addressLine2 + ', ' }}
+            </span>
+            <span *ngIf="accountDataForView?.city" class="row-item-desc">
+              {{ accountDataForView.city + ', ' }}
+            </span>
+            <span *ngIf="accountDataForView?.state" class="row-item-desc">
+              {{ accountDataForView.state + ', ' }}
+            </span>
+            <span *ngIf="accountDataForView?.zipCode" class="row-item-desc">
+              {{ accountDataForView.zipCode }}{{ accountDataForView?.countryName ? ', ' : '' }}
+            </span>
+            <span *ngIf="accountDataForView?.countryName" class="row-item-desc">
+              {{ accountDataForView.countryName }} .
+            </span>
+          </div>
+          
+        </div>
+        <div *ngIf="accountDataForView?.accountType == 'BUSINESS'" class="mb-3">
+          <div class="row-item-title">
+            <svg width="24" height="25" viewBox="0 0 24 25" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path
+                d="M3 12.5V8.1C3 7.54 3 7.26 3.109 7.046C3.20487 6.85785 3.35785 6.70487 3.546 6.609C3.76 6.5 4.04 6.5 4.6 6.5H6M21 12.5V8.1C21 7.54 21 7.26 20.891 7.046C20.7951 6.85785 20.6422 6.70487 20.454 6.609C20.24 6.5 19.96 6.5 19.4 6.5H18"
+                stroke="#777777" stroke-width="2" />
+              <path d="M5 4.5L8 6.5L5 8.5V4.5ZM19 4.5L16 6.5L19 8.5V4.5Z" fill="#777777" />
+              <path
+                d="M15 16.1C15 15.54 15 15.26 15.109 15.046C15.2049 14.8578 15.3578 14.7049 15.546 14.609C15.76 14.5 16.04 14.5 16.6 14.5H17L18 15.5H19.4C19.96 15.5 20.24 15.5 20.454 15.609C20.6422 15.7049 20.7951 15.8578 20.891 16.046C21 16.26 21 16.54 21 17.1V18.9C21 19.46 21 19.74 20.891 19.954C20.7951 20.1422 20.6422 20.2951 20.454 20.391C20.24 20.5 19.96 20.5 19.4 20.5H16.6C16.04 20.5 15.76 20.5 15.546 20.391C15.3578 20.2951 15.2049 20.1422 15.109 19.954C15 19.74 15 19.46 15 18.9V16.1ZM3 16.1C3 15.54 3 15.26 3.109 15.046C3.20487 14.8578 3.35785 14.7049 3.546 14.609C3.76 14.5 4.04 14.5 4.6 14.5H5L6 15.5H7.4C7.96 15.5 8.24 15.5 8.454 15.609C8.64215 15.7049 8.79513 15.8578 8.891 16.046C9 16.26 9 16.54 9 17.1V18.9C9 19.46 9 19.74 8.891 19.954C8.79513 20.1422 8.64215 20.2951 8.454 20.391C8.24 20.5 7.96 20.5 7.4 20.5H4.6C4.04 20.5 3.76 20.5 3.546 20.391C3.35785 20.2951 3.20487 20.1422 3.109 19.954C3 19.74 3 19.46 3 18.9V16.1ZM9 5.1C9 4.54 9 4.26 9.109 4.046C9.20487 3.85785 9.35785 3.70487 9.546 3.609C9.76 3.5 10.04 3.5 10.6 3.5H11L12 4.5H13.4C13.96 4.5 14.24 4.5 14.454 4.609C14.6422 4.70487 14.7951 4.85785 14.891 5.046C15 5.26 15 5.54 15 6.1V7.9C15 8.46 15 8.74 14.891 8.954C14.7951 9.14215 14.6422 9.29513 14.454 9.391C14.24 9.5 13.96 9.5 13.4 9.5H10.6C10.04 9.5 9.76 9.5 9.546 9.391C9.35785 9.29513 9.20487 9.14215 9.109 8.954C9 8.74 9 8.46 9 7.9V5.1Z"
+                stroke="#777777" stroke-width="2" stroke-linejoin="round" />
+            </svg>
+
+
+            {{'BussinessClassification' | localize}} :
+          </div>
+          <div class="d-flex py-1 flex-wrap">
+            <div *ngFor="let class of accountDataForView?.classfications">
+              <span class="Classification mr-2 mb-2"> {{class}} </span>
+
+            </div>
+          </div>
+        </div>
+
+
+        <div *ngIf="accountDataForView?.accountType == 'BUSINESS'" class="mb-3">
+          <div class="row-item-title">
+            <svg width="24" height="25" viewBox="0 0 24 25" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path
+                d="M11.25 15.5C11.6642 15.5 12 15.1642 12 14.75C12 14.3358 11.6642 14 11.25 14C10.8358 14 10.5 14.3358 10.5 14.75C10.5 15.1642 10.8358 15.5 11.25 15.5Z"
+                fill="#777777" />
+              <path
+                d="M20.775 7.47535L15.525 2.22534C15.4593 2.15174 15.3782 2.09345 15.2875 2.05458C15.1968 2.0157 15.0986 1.99719 15 2.00034H7.5C7.10254 2.00153 6.7217 2.15995 6.44065 2.441C6.1596 2.72204 6.00119 3.10289 6 3.50034V11.0003H4.5C4.10218 11.0003 3.72064 11.1584 3.43934 11.4397C3.15804 11.721 3 12.1025 3 12.5003V17.0003C3 17.3982 3.15804 17.7797 3.43934 18.061C3.72064 18.3423 4.10218 18.5003 4.5 18.5003H6V21.5003C6.00119 21.8978 6.1596 22.2786 6.44065 22.5597C6.7217 22.8407 7.10254 22.9992 7.5 23.0003H19.5C19.8975 22.9992 20.2783 22.8407 20.5593 22.5597C20.8404 22.2786 20.9988 21.8978 21 21.5003V8.00034C21.0026 7.90178 20.9839 7.80381 20.9451 7.71318C20.9062 7.62254 20.8482 7.54141 20.775 7.47535ZM15 3.80034L19.2 8.00034H15V3.80034ZM4.5 12.5003H11.6978L14.25 14.7503L11.7052 17.0003H4.5V12.5003ZM19.5 21.5003H7.5V18.5003H11.7067C12.0689 18.5 12.4186 18.3687 12.6915 18.1306L15.2295 15.8873C15.3923 15.7469 15.523 15.5732 15.6128 15.3779C15.7026 15.1827 15.7495 14.9704 15.7502 14.7554C15.7509 14.5405 15.7054 14.3279 15.6169 14.132C15.5284 13.9362 15.3988 13.7616 15.237 13.6201L12.684 11.3633C12.4123 11.1296 12.0659 11.0008 11.7075 11.0003H7.5V3.50034H13.5V8.00034C13.5012 8.3978 13.6596 8.77865 13.9407 9.05969C14.2217 9.34074 14.6025 9.49916 15 9.50034H19.5V21.5003Z"
+                fill="#777777" />
+            </svg>
+
+
+
+        {{'Departments' | localize}} :
+          </div>
+          <div class="d-flex py-1 flex-wrap">
+            <div *ngFor="let category of accountDataForView?.categories">
+              <span class="Classification mr-2 mb-2"> {{category}} </span>
+
+            </div>
+          </div>
+        </div>
+
+        <div class="">
+          <div class="row-item-title"><svg width="24" height="25" viewBox="0 0 24 25" fill="none"
+              xmlns="http://www.w3.org/2000/svg">
+              <g clip-path="url(#clip0_540_3196)">
+                <path
+                  d="M16 3.5C16.7652 3.49996 17.5015 3.79233 18.0583 4.31728C18.615 4.84224 18.9501 5.56011 18.995 6.324L19 6.5V16.5H19.75C20.397 16.5 20.93 16.992 20.994 17.622L21 17.75V19.5C21 20.2652 20.7077 21.0015 20.1827 21.5583C19.6578 22.115 18.9399 22.4501 18.176 22.495L18 22.5H8C7.23479 22.5 6.49849 22.2077 5.94174 21.6827C5.38499 21.1578 5.04989 20.4399 5.005 19.676L5 19.5V9.5H3.25C2.94054 9.50014 2.64203 9.38549 2.41223 9.17823C2.18244 8.97097 2.03769 8.68583 2.006 8.378L2 8.25V6.5C1.99996 5.73479 2.29233 4.99849 2.81728 4.44174C3.34224 3.88499 4.06011 3.54989 4.824 3.505L5 3.5H16ZM16 5.5H7V19.5C7 19.7652 7.10536 20.0196 7.29289 20.2071C7.48043 20.3946 7.73478 20.5 8 20.5C8.26522 20.5 8.51957 20.3946 8.70711 20.2071C8.89464 20.0196 9 19.7652 9 19.5V17.75C9 17.06 9.56 16.5 10.25 16.5H17V6.5C17 6.23478 16.8946 5.98043 16.7071 5.79289C16.5196 5.60536 16.2652 5.5 16 5.5ZM19 18.5H11V19.5C11 19.85 10.94 20.187 10.83 20.5H18C18.2652 20.5 18.5196 20.3946 18.7071 20.2071C18.8946 20.0196 19 19.7652 19 19.5V18.5ZM12 12.5C12.2652 12.5 12.5196 12.6054 12.7071 12.7929C12.8946 12.9804 13 13.2348 13 13.5C13 13.7652 12.8946 14.0196 12.7071 14.2071C12.5196 14.3946 12.2652 14.5 12 14.5H10C9.73478 14.5 9.48043 14.3946 9.29289 14.2071C9.10536 14.0196 9 13.7652 9 13.5C9 13.2348 9.10536 12.9804 9.29289 12.7929C9.48043 12.6054 9.73478 12.5 10 12.5H12ZM14 8.5C14.2652 8.5 14.5196 8.60536 14.7071 8.79289C14.8946 8.98043 15 9.23478 15 9.5C15 9.76522 14.8946 10.0196 14.7071 10.2071C14.5196 10.3946 14.2652 10.5 14 10.5H10C9.73478 10.5 9.48043 10.3946 9.29289 10.2071C9.10536 10.0196 9 9.76522 9 9.5C9 9.23478 9.10536 8.98043 9.29289 8.79289C9.48043 8.60536 9.73478 8.5 10 8.5H14ZM5 5.5C4.75507 5.50003 4.51866 5.58996 4.33563 5.75272C4.15259 5.91547 4.03566 6.13975 4.007 6.383L4 6.5V7.5H5V5.5Z"
+                  fill="#777777" />
+              </g>
+              <defs>
+                <clipPath id="clip0_540_3196">
+                  <rect width="24" height="24" fill="white" transform="translate(0 0.5)" />
+                </clipPath>
+              </defs>
+            </svg>
+
+            {{'About' | localize}}</div>
+          <div class="">
+            <span> {{accountDataForView?.description || '-'}} </span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="sec-data mb-2 p-2">
+      <div class="d-flex justify-content-between align-items-center">
+        <h4 class="mt-1 mb-0">{{'OverallRating' | localize}}</h4>
+        <button class="all-btn d-flex">
+          <p class="m-auto" (click)=" goReviews() ">{{'Seeall' | localize}}</p>
+        </button>
+
+      </div>
+      <hr class="hr">
+      <app-overallRating [overRating]="overRating"  [fromOverview]="true" ></app-overallRating>
+    </div>
+
+    <div class="sec-data mb-2 p-2">
+      <div class="d-flex justify-content-between align-items-center">
+        <h4 class="mt-1 mb-0">{{'Media' | localize}}</h4>
+        <button
+          (click)="accountDataForView?.accountType == 'BUSINESS'?  activeTabIndexBtn.emit(5) : activeTabIndexBtn.emit(4) "
+          class="all-btn d-flex">
+          <p class="m-auto">{{'Seeall' | localize}}</p>
+        </button>
+
+      </div>
+      <hr class="hr">
+
+      <div class="tab-wrapper position-relative">
+
+        <div
+          class="tab-loading-overlay"
+          *ngIf="isLoading"
+        >
+          <div class="spinner-border" role="status">
+            <span class="sr-only">{{'LoadWithThreeDot' | localize}}</span>
+          </div>
+        </div>
+        <ng-container *ngFor="let item of mediaItems; let i = index">
+
+            <ng-container *ngIf="item?.attachmentCategoryId !== 5; ">
+              <img onerror="this.src='../../assets/placeholders/appitem-placeholder.png'"     (click)="openModal(i)"
+                [src]="attachmentBaseUrl + '/' + item?.url" alt="Selected Media" class="w-100 media-img col-4"
+             loading="lazy" />
+            </ng-container>
+        
+            <!-- <ng-template #videoTemplate>
+              <video [src]="attachmentBaseUrl + '/' + item?.url" controls class="w-100 media-img col-4"     (click)="openModal(i)"
+         ></video>
+            
+            </ng-template> -->
+
+          <div *ngIf="i === 5 " class="more-overlay">
+
+            <span>+{{ totalImgs - 5 }}</span>
+          </div>
+        </ng-container>
+      </div>
+
+
+
+      <p *ngIf="mediaItems?.length ==0" class="text-center">
+        <img src="../../assets/placeholders/fluent_alert.png" class="mr-2" alt="" srcset="">
+        <span class="noDataTxt">{{'NoDataFound...' | localize}} </span>
+      </p>
+    </div>
+    <p-dialog *ngIf="mediaItems?.length > 0" [(visible)]="isModalOpen" [modal]="true" [style]="{ width: '656px' }"
+      [breakpoints]="{ '960px': '75vw', '640px': '97vw' }" [dismissableMask]="true" header="Media"
+      (onHide)="closeModal()">
+      <div class="modal-content d-flex justify-content-center align-items-center">
+        <ng-container *ngIf="mediaItems?.[selectedIndex]?.attachmentCategoryId !== 8; else videoTemplate">
+          <img onerror="this.src='../../assets/placeholders/appitem-placeholder.png'"
+            [src]="attachmentBaseUrl + '/' + mediaItems?.[selectedIndex]?.url" alt="Selected Media" class="modal-image"
+             loading="lazy" />
+        </ng-container>
+    
+        <ng-template #videoTemplate>
+          <video [src]="attachmentBaseUrl + '/' + mediaItems?.[selectedIndex]?.url" controls class="modal-video"
+          style="max-width: 100%; max-height: 70vh; border-radius: 8px;"></video>
+        
+        </ng-template>
+
+        <!-- Navigation Buttons -->
+         <div *ngIf="!isArabic">
+
+
+           <button *ngIf="mediaItems?.length > 0 && selectedIndex > 0" class="nav-button prev"
+      (click)="prevMedia()">   {{  '\u276E' }}
+</button>
+    <button *ngIf="mediaItems?.length > 0 && selectedIndex < mediaItems.length - 1" class="nav-button next"
+      (click)="nextMedia()">  {{  '\u276F'  }}
+</button>
+         </div>
+
+
+         <div *ngIf="isArabic">
+               <button *ngIf="mediaItems?.length > 0 && selectedIndex > 0" class="nav-button next"
+      (click)="prevMedia()">  {{ '\u276E' }}
+</button>
+   <button *ngIf="mediaItems?.length > 0 && selectedIndex < mediaItems.length - 1"  class="nav-button prev"
+      (click)="nextMedia()">   {{  '\u276F'  }}
+</button>
+         </div>
+      </div>
+    </p-dialog>
+
+    <div class="sec-data mb-2 ">
+      <div class="d-flex justify-content-between align-items-center p-2">
+        <h4 class="mt-1 mb-0">{{'RecentEvents' | localize}}</h4>
+        <button
+          (click)="accountDataForView?.accountType == 'BUSINESS'?  activeTabIndexBtn.emit(4) : activeTabIndexBtn.emit(3) "
+          class="all-btn d-flex">
+          <p class="m-auto">{{'Seeall' | localize}}</p>
+        </button>
+
+      </div>
+      <hr class="hr">
+
+      <div class="addSecMg">
+        <app-events-tab [accountDataForView]="accountDataForView"
+          [fromOverviewMarketPlaceProfile]="true"></app-events-tab>
+      </div>
+
+
+    </div>
+
+
+    <div class="sec-data mb-2 p-2">
+      <div class="d-flex justify-content-between align-items-center">
+        <h4 class="mt-1 mb-0">{{'Connections' | localize}}</h4>
+        <button
+          (click)="accountDataForView?.accountType == 'BUSINESS'?  activeTabIndexBtn.emit(2) : activeTabIndexBtn.emit(1) "
+          class="all-btn d-flex">
+          <p class="m-auto">{{'Seeall' | localize}}</p>
+        </button>
+
+      </div>
+      <hr class="hr">
+      <div *ngIf="accountDataForView"  class="addSecMg">
+        <app-connections-tab [fromOverview]="true" [accountDataForView]="accountDataForView"
+        ></app-connections-tab>
+      </div>
+
+
+    </div>
+  </div>
+  <div class="col-lg-9 col-md-7 col-12 p-0 ">
+    <div class="mb-2 right-sec p-2" *ngIf="accountDataForView?.accountType == 'BUSINESS'">
+      <div class="d-flex justify-content-between">
+        <h4 class="">{{'Products' | localize}}</h4>
+        <button (click)="activeTabIndexBtn.emit(1) " class="all-btn d-flex">
+          <p class="m-auto">{{'Seeall' | localize}}</p>
+        </button>
+
+      </div>
+      <hr class="hr">
+      <div class="d-flex justify-content-between">
+        <h4 class="" style="font-size: 14px;">{{'ForFullViewingOf' | localize}} {{ "''"+ accountDataForView?.name + "''"}}</h4>
+        <button   (click)="goSvR($event)" class="vist-btn d-flex">
+          <p class="m-auto">{{'VisitVirtualShowroom' | localize}}</p>
+        </button>
+
+      </div>
+ 
+        <div class="row" *ngIf="items?.length > 0 ">
+          <div
+              class="my-2 col-6 col-lg-3 "
+            
+              *ngFor="let product of items"
+          >
+              <app-prodcut-card
+                  [currency]="accountDataForView.currencyName"
+                  [product]="product.appItem"
+                  [productCard]="product"
+                 
+                  
+              ></app-prodcut-card>
+          </div>
+      </div>
+        <!-- Show when there are no items -->
+        <p *ngIf="items?.length === 0 " class="text-center mx-auto mt-5 py-5">
+          <img src="../../../../../../assets/placeholders/fluent_alert.png" class="mr-2" alt="No Data">
+          <span class="noDataTxt">{{'NoDataFound...' | localize}}</span>
+        </p>
+    </div>
+
+
+
+    <div class="mb-2 right-sec p-2">
+      <div class="d-flex justify-content-between">
+        <h4 class="">{{'RecentPosts' | localize}}</h4>
+        <button
+          (click)="accountDataForView?.accountType == 'BUSINESS'?  activeTabIndexBtn.emit(3) : activeTabIndexBtn.emit(2) "
+          class="all-btn d-flex">
+          <p class="m-auto">{{'Seeall' | localize}}</p>
+        </button>
+
+      </div>
+      <hr class="hr">
+
+
+      <app-posts-tab [fromOverviewTab]=true [accountDataForView]="accountDataForView"></app-posts-tab>
+    </div>
+    <div class="mb-2 right-sec p-2" #reviewsSection>
+      <div class="d-flex justify-content-between">
+        <h4 class="">{{'Reviews' | localize}}</h4>
+        <button class="all-btn d-flex">
+          <p class="m-auto">{{'Seeall' | localize}}</p>
+        </button>
+
+      </div>
+      <hr class="hr">
+      <app-all-reviews-list [fromOverview]="true" [isPublished]="marketPlaceData?.isPublished" [entityID]="accountDataForView?.entityId" [alreadyReviewdMsg]="accountReviewMsg" (refreshRating)="handleRefreshRating($event)"></app-all-reviews-list>
+     
+    </div>
+
+  </div>
+</div>

@@ -1,0 +1,207 @@
+/* ========================================
+   CTA CONTAINER
+======================================== */
+
+.ctaContainer {
+    padding: 15px;
+    margin: 30px;
+  }
+  
+  .ctaParentSection {
+    top: -80px;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+  }
+  
+  /* ========================================
+     CARD
+  ======================================== */
+  
+  .ctaChildection {
+    height: 245px;
+    background-color: #eeeeee;
+    border: 1px solid #e4e4e4;
+    border-radius: 12px;
+    padding: 16px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    // transition: all .25s ease;
+    overflow: hidden;
+    cursor: pointer;
+  }
+  
+  .ctaChildection:hover {
+    // background: #f6f6f6;
+    // transform: translateY(-3px);
+  }
+  
+  /* clickable area */
+  .ctaLink {
+    text-decoration: none;
+    color: black;
+    display: block;
+    height: 100%;
+  }
+  
+  /* ========================================
+     TITLE
+  ======================================== */
+  
+  .ctaTitle {
+    font-weight: 800;
+    font-size: 26px;
+    margin: 0 0 12px 0;
+  }
+  
+  /* ========================================
+     BODY LAYOUT (IMAGE LEFT - TEXT RIGHT)
+  ======================================== */
+  
+  .ctaBody {
+    display: flex;
+    align-items: flex-start;
+    gap: 18px;
+  }
+  
+  /* image column */
+  .ctaImgWrap {
+    flex: 0 0 120px;
+    height: 120px;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+  }
+  
+  .ctaImgWrap ::ng-deep img {
+    width: 110px;
+    height: 110px;
+    // object-fit: contain;
+  }
+  
+  /* ========================================
+     DESCRIPTION
+  ======================================== */
+  
+  .ctaDesc {
+    margin: 0;
+    font-size: 20px;
+    line-height: 1.4;
+    font-weight: 500;
+    color: #000;
+  
+    /* clamp text so card height stays equal */
+    display: -webkit-box;
+    -webkit-line-clamp: 6;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  
+  /* ========================================
+     CAROUSEL FIXES
+  ======================================== */
+  
+  /* prevent carousel cutting shadows */
+  :host ::ng-deep .p-carousel-item {
+    padding: 8px;
+  }
+  
+  :host ::ng-deep .p-carousel-content {
+    overflow: visible;
+  }
+  
+  /* arrows */
+  :host ::ng-deep .p-carousel-prev,
+  :host ::ng-deep .p-carousel-next {
+    background: white;
+    border-radius: 50%;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    width: 42px;
+    height: 42px;
+  }
+  
+  /* ========================================
+     RESPONSIVE
+  ======================================== */
+  
+  /* tablet */
+  @media (max-width: 992px) {
+  
+    .ctaTitle {
+      font-size: 24px;
+    }
+  
+    .ctaDesc {
+      font-size: 18px;
+      -webkit-line-clamp: 7;
+    }
+  
+    .ctaImgWrap {
+      flex: 0 0 100px;
+    }
+  }
+  
+  /* mobile */
+  @media (max-width: 540px) {
+  
+    .ctaChildection {
+      height: auto;
+      padding: 18px;
+    }
+  
+
+  
+    .ctaImgWrap {
+    //   flex: none;
+      height: auto;
+    }
+  
+    .ctaImgWrap ::ng-deep img {
+      width: 110px;
+      height: 110px;
+    }
+  
+    .ctaTitle {
+      font-size: 22px;
+      margin-bottom: 10px;
+    }
+  
+    .ctaDesc {
+      font-size: 18px;
+      -webkit-line-clamp: unset;
+    }
+  }
+  
+  /* very small phones */
+  @media (max-width: 380px) {
+    .ctaTitle { font-size: 20px; }
+    .ctaDesc { font-size: 16px; }
+  }
+
+
+  
+
+.section-content {
+  // min-height: 260px;
+}
+
+.section-loading {
+  min-height: 260px;
+  width: 100%;
+}
+
+.purple-spinner {
+  color: #4a0d4a;
+  width: 2.5rem;
+  height: 2.5rem;
+}
+
+.section-empty,
+.section-error {
+  min-height: 180px;
+  color: #777;
+  margin-top: 100px;
+}
+
+.section-error {
+  color: #d9534f;
+}

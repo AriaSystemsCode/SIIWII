@@ -32,6 +32,7 @@ using GraphQL.Server.Ui.Playground;
 using HealthChecks.UI.Client;
 using IdentityServer4.Configuration;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using onetouch.Configure;
@@ -62,10 +63,67 @@ using Microsoft.AspNetCore.Http.Features;
 using DevExpress.AspNetCore.Reporting.QueryBuilder;
 using Microsoft.AspNetCore.SignalR;
 using onetouch.Build;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.AspNetCore.Http;
+using System.Threading.Tasks;
+using Abp.MultiTenancy;
+using Microsoft.AspNetCore.Http;
+
 using k8s.KubeConfigModels;
 
 namespace onetouch.Web.Startup
 {
+    public interface ITenantResolveContributorContext
+    {
+        int? TenantId { get; set; }
+        string TenantIdOrName { get; set; }
+
+        // HttpContext is available when running in ASP.NET Core
+        Microsoft.AspNetCore.Http.HttpContext HttpContext { get; }
+    }
+
+    //public interface ITenantResolveContributor
+    //{
+    //    string Name { get; }
+
+    //    void Resolve(ITenantResolveContributorContext context);
+    //}
+
+
+    public class OriginTenantResolveContributor : ITenantResolveContributor
+    {
+        public string Name => "OriginTenant";
+
+        public void Resolve(ITenantResolveContributorContext context)
+        {
+            var httpContext = context.HttpContext;
+            if (httpContext == null)
+            {
+                return;
+            }
+
+            var origin = httpContext.Request.Headers["Origin"].ToString();
+            if (string.IsNullOrWhiteSpace(origin))
+            {
+                return;
+            }
+
+            if (origin.Contains("url1.com"))
+            {
+                context.TenantId = 1;  // tenant must exist in AbpTenants
+            }
+            else if (origin.Contains("url2.com"))
+            {
+                context.TenantId = 2;
+            }
+        }
+
+        public int? ResolveTenantId()
+        {
+            return 0;
+        }
+    }
+
     public class CustomServiceProviderIsService : IServiceProviderIsService
     {
         public bool IsService(Type serviceType)
@@ -73,6 +131,34 @@ namespace onetouch.Web.Startup
             return true; // Allow all types to be resolved
         }
     }
+
+    public class OriginLoggingMiddleware
+    {
+        private readonly RequestDelegate _next;
+
+        public OriginLoggingMiddleware(RequestDelegate next)
+        {
+            _next = next;
+        }
+
+        public async Task Invoke(HttpContext context)
+        {
+            // Read Origin header
+            var origin = context.Request.Headers["Origin"].FirstOrDefault();
+
+            if (!string.IsNullOrEmpty(origin))
+            {
+                // Example: log it, or attach to HttpContext.Items
+                Console.WriteLine($"[OriginMiddleware] Request Origin: {origin}");
+
+                // Store in HttpContext for later use
+                context.Items["XXXRequestOrigin"] = origin;
+            }
+
+            await _next(context);
+        }
+    }
+
 
     public class Startup
     {
@@ -141,12 +227,10 @@ namespace onetouch.Web.Startup
             catch (Exception ex) { }
 
         }
-
         private void ConfigureSwagger(IServiceCollection services)
         {
             services.AddSwaggerGen();
         }
-
         public IServiceProvider ConfigureServices(IServiceCollection services)
         {
             ////DevExpress config
@@ -172,15 +256,8 @@ namespace onetouch.Web.Startup
             services.AddSingleton<IWebDocumentViewerExceptionHandler, CustomWebDocumentViewerExceptionHandler>();
             services.AddTransient<onetouch.Web.Host.Controllers.CustomQueryBuilderController>();
 
-
-            // Register missing service
- 
             services.AddSingleton<IServiceProviderIsService, CustomServiceProviderIsService>();
-             
-
-            // Other necessary configurations
             ConfigureSwagger(services);
-
 
 
             services.Configure<FormOptions>(x =>
@@ -340,6 +417,13 @@ namespace onetouch.Web.Startup
             x.Database.Migrate();
             x.Database.CloseConnection();*/
             //Initializes ABP framework.
+
+            // our custom middleware BEFORE cors & ABP
+            app.UseMiddleware<OriginLoggingMiddleware>();
+
+            // built-in CORS check
+            app.UseCors("AllowOrigin");
+
             app.UseAbp(options =>
             {
                 options.UseAbpRequestLocalization = false; //used below: UseAbpRequestLocalization
@@ -355,6 +439,7 @@ namespace onetouch.Web.Startup
                 app.UseExceptionHandler("/Error");
             }
 
+            ConfigureAttachmentStaticFiles(app);
             app.UseStaticFiles();
             app.UseRouting();
 
@@ -496,6 +581,95 @@ namespace onetouch.Web.Startup
             // Log exceptions here. For instance:
             System.Diagnostics.Debug.WriteLine("[{0}]: Exception occured. Message: '{1}'. Exception Details:\r\n{2}",
                 DateTime.Now, message, ex);
+        }
+
+        private void ConfigureAttachmentStaticFiles(IApplicationBuilder app)
+        {
+            ConfigureAttachmentStaticFiles(
+                app,
+                _appConfiguration["Attachment:Path"],
+                _appConfiguration["Attachment:RequestPath"] ?? "/attachments");
+
+            ConfigureAttachmentStaticFiles(
+                app,
+                _appConfiguration["Attachment:PathTemp"],
+                _appConfiguration["Attachment:TempRequestPath"] ?? "/tempattachments");
+        }
+
+        private static void ConfigureAttachmentStaticFiles(
+            IApplicationBuilder app,
+            string physicalPath,
+            string requestPath)
+        {
+            physicalPath = physicalPath?.Trim().Trim('"');
+            requestPath = requestPath?.Trim();
+
+            if (string.IsNullOrWhiteSpace(physicalPath))
+            {
+                Console.WriteLine(
+                    $"[AttachmentStaticFiles] Mapping for '{requestPath}' was skipped because the physical path is empty.");
+                return;
+            }
+
+            if (!Path.IsPathRooted(physicalPath))
+            {
+                Console.WriteLine(
+                    $"[AttachmentStaticFiles] Mapping for '{requestPath}' was skipped because " +
+                    $"'{physicalPath}' is a relative legacy path. The default wwwroot provider will be used.");
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(requestPath))
+            {
+                throw new InvalidOperationException(
+                    $"A request path is required for attachment storage '{physicalPath}'.");
+            }
+
+            if (!requestPath.StartsWith("/", StringComparison.Ordinal))
+            {
+                requestPath = "/" + requestPath;
+            }
+
+            // A temporarily unavailable network share must not prevent the API from
+            // starting. The route is enabled after connectivity is restored and the
+            // application pool is recycled.
+            if (!Directory.Exists(physicalPath))
+            {
+                Console.Error.WriteLine(
+                    $"[AttachmentStaticFiles] Attachment directory '{physicalPath}' is unavailable. " +
+                    $"Static-file mapping for '{requestPath}' was skipped.");
+                return;
+            }
+
+            try
+            {
+                var fileProvider = new PhysicalFileProvider(physicalPath);
+
+                app.UseStaticFiles(new StaticFileOptions
+                {
+                    FileProvider = fileProvider,
+                    RequestPath = requestPath,
+                    OnPrepareResponse = context =>
+                    {
+                        context.Context.Response.Headers["X-Siiwii-Attachment-Provider"] = "Configured";
+                    }
+                });
+
+                Console.WriteLine(
+                    $"[AttachmentStaticFiles] Mapped '{requestPath}' to '{physicalPath}'.");
+            }
+            catch (IOException ex)
+            {
+                Console.Error.WriteLine(
+                    $"[AttachmentStaticFiles] Attachment directory '{physicalPath}' could not be mapped to " +
+                    $"'{requestPath}': {ex.Message}");
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                Console.Error.WriteLine(
+                    $"[AttachmentStaticFiles] Access to attachment directory '{physicalPath}' was denied while " +
+                    $"mapping '{requestPath}': {ex.Message}");
+            }
         }
 
 

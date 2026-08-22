@@ -19,10 +19,9 @@ namespace onetouch.AppContacts
     [Audited]
     public class AppContact : FullAuditedEntity<long> , IMayHaveTenant
     {
-			public int? TenantId { get; set; }
-			
+		public int? TenantId { get; set; }
 
-		[Required]
+        [Required]
 		[StringLength(AppContactConsts.MaxNameLength, MinimumLength = AppContactConsts.MinNameLength)]
 		public virtual string Name { get; set; }
 
@@ -32,8 +31,9 @@ namespace onetouch.AppContacts
 
 		[StringLength(AppContactConsts.MaxCodeLength, MinimumLength = AppContactConsts.MinCodeLength)]
 		public virtual string Code { get; set; }
-		
-		public virtual long? LanguageId { get; set; }
+        //public virtual string Relation { get; set; }
+
+        public virtual long? LanguageId { get; set; }
 
 		[StringLength(AppContactConsts.MaxCodeLength, MinimumLength = AppContactConsts.MinCodeLength)]
 		public virtual string LanguageCode { get; set; }

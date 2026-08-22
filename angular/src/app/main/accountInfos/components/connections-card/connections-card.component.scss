@@ -1,0 +1,114 @@
+.domain-text {
+  position: relative;
+  display: inline-block;
+  color: rgba(74, 13, 74, 1);
+  border: 1px solid rgba(238, 238, 238, 0.93);
+  border-radius: 6px;
+  padding: 5px;
+}
+
+.domain-text:hover::after {
+  content: attr(title);
+  position: absolute;
+  bottom: 100%;
+  left: 0;
+  background-color: #333;
+  color: #fff;
+  padding: 5px 10px;
+  border-radius: 5px;
+  white-space: nowrap;
+  z-index: 10;
+  font-size: 12px;
+}
+
+.categoryName{
+  background-color: #F8F8F8F8 !important;
+                                padding: 5px;
+                                border: 1px solid #E6E6E6;
+                                border-radius: 4px;
+                                margin-right: 5px;
+}
+
+.product-name{
+  font-weight: 600; 
+  font-size: 14px; 
+  min-width: 150px;
+}
+
+.classificationaName{
+  background-color: #F8F8F8F8 !important;
+                                padding: 5px;
+                                border: 1px solid #E6E6E6;
+                                border-radius: 4px;
+                                margin-right: 5px;
+}
+.zipCode{
+  font-weight: 600; 
+  font-size: 14px; 
+  color: black; 
+  min-width: 115px;
+}
+.relation_Status_button{
+  white-space: nowrap;
+  // position: absolute;
+  // right: 5px;
+  cursor: auto;
+  // bottom: 5px !important;
+  padding: 8px !important;
+    img {
+      width: 15px;
+    }
+}
+
+.relation_button {
+  white-space: nowrap;
+  position: absolute;
+  bottom: 5px;
+    img {
+      width: 20px;
+    }
+}
+
+.relation-en {
+  right: 5px;
+
+}
+
+.relation-ar {
+  left: 4px;
+
+}
+.accountType_label {
+  min-width: 115px;
+}
+.spanGreyColor {
+  color: rgba(158, 158, 158, 1);
+  font-size: 10px;
+}
+
+.fsS {
+  font-size: 1rem !important;
+}
+
+::ng-deep {
+  .dropdown-menu {
+    right: 0 !important;
+    left: auto !important;
+  }
+}
+
+.accTpye {
+  white-space: nowrap !important;
+}
+
+.market-follow {
+      border-radius: 8px !important;
+    background: #5A0B5E !important;
+    color: #fff !important;
+    border: 0 !important;
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    // font-weight: 700;
+  padding: 6px;
+}

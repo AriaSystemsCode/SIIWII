@@ -1,3 +1,11 @@
+.wrapper {
+    margin-top: -50px;
+}
+
+::ng-deep .product-confirm-dialog {
+    width: 25vw;
+}
+
 .type {
 
     padding: 6px 16px;
@@ -45,7 +53,7 @@
 }
 
 td {
-    color: black !important;
+    // color: black !important;
     font-weight: bold;
     vertical-align: initial !important
 }
@@ -115,6 +123,7 @@ td {
 
 .slider {
     display: flex;
+    gap: 5px;
     flex-direction: row;
     transition: transform 0.5s;
     background-color: transparent !important;
@@ -490,6 +499,7 @@ h6 {
     font-size: 14px;
     font-style: normal;
     font-weight: 600;
+    white-space: nowrap;
 }
 
 .searchBtn {
@@ -864,6 +874,7 @@ h6 {
     padding: 8px 12px !important;
     color: #fff !important;
 }
+
 .pBtnCancel {
     color: #4A0D4A !important;
     border: 1px solid #eee !important;
@@ -878,7 +889,7 @@ p-dialog {
 }
 
 .rateTxt {
-    color:#1B101B;
+    color: #1B101B;
     font-weight: 700;
 }
 
@@ -886,4 +897,295 @@ p-dialog {
     margin-left: 5px;
     color: #9E9E9E;
     font-weight: 500;
+}
+
+
+
+@media only screen and (min-width: 900px) {
+    .addPt {
+        margin-top: 50px !important;
+    }
+}
+
+
+@media only screen and (max-width: 520px) {
+    .addMtM {
+        margin-top: 60px !important;
+    }
+}
+
+.editPcAr {
+    position: absolute;
+    left: -8px;
+    z-index: 99;
+}
+
+.editPcEn {
+    position: absolute;
+    right: -8px;
+    z-index: 99;
+}
+
+::ng-deep {
+    .p-tabview .p-tabview-panels {
+        background: transparent !important;
+    }
+
+}
+
+
+.product-info-row {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 10px;
+}
+
+.product-info-label {
+    width: 30%;
+    font-weight: 600;
+}
+
+.product-info-value {
+    width: 70%;
+}
+
+.department-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.department-chip {
+    padding: 6px 12px;
+background: #F8F8F8;
+border: 1px solid #CECECE;
+border-radius: 6px;
+color: #1B101B;
+font-weight: 600;
+
+}
+
+
+.parent-slider-mobile,
+.parent-slider-desktop {
+    min-height: 120px;
+}
+
+.text-decoration-none {
+
+    height: 44px;
+    border-radius: 8px;
+    border: 2px solid #4A0D4A;
+}
+
+.btn-save {
+    background-color: #4A0D4A !important;
+    padding-left: 9px;
+    border-radius: 0px;
+}
+
+
+.fa-2x {
+    color: #777777;
+
+}
+
+.fs-11 {
+    font-size: 11px;
+}
+
+.fs-12 {
+    font-size: 12px;
+}
+
+.fs-14 {
+    font-size: 14px;
+}
+
+.fs-16 {
+    font-size: 16px;
+}
+
+.fs-18 {
+    font-size: 18px;
+}
+
+.priceMsg {
+    font-size: 24px;
+    color: #1B101B;
+    font-weight: 700;
+}
+
+.productNameP {
+    color: #1B101B;
+    font-size: 16px;
+    font-weight: 500;
+    margin-top: 8px;
+
+}
+
+.space-nowrap {
+    white-space: nowrap;
+}
+
+.proNameMd {
+    color: #1B101B;
+    font-size: 16px;
+    font-weight: 500;
+    margin-top: 4px;
+  
+}
+
+.poniter {
+    cursor: pointer;
+}
+
+.hrStyle {
+
+    border-top: 4px solid rgba(0, 0, 0, 0.1) !important;
+    border-radius: 13px;
+}
+
+.relatedSec {
+    height: 150px;
+    border-radius: 8px;
+    background: #f5f5f5;
+}
+
+.codeLg {
+    font-size: 20px;
+    margin-right: 10px;
+}
+
+.specialBtn {
+    z-index: 99;
+    height: 43px;
+    top: 4px;
+}
+
+.brandImg {
+    width: 60px;
+    height: 60px
+}
+
+.editInput {
+
+    height: 44px;
+    border-radius: 8px;
+    border: 2px solid #4A0D4A;
+}
+
+.editbtnDiv {
+
+    z-index: 99999;
+    height: 43px;
+
+    top: 4px;
+}
+
+.border-none {
+    border: 0 !important;
+}
+
+.divsStyle {
+
+
+background: #FFFFFF;
+border: 1px solid #EEEEEE;
+border-radius: 12px;
+margin-bottom: 12px;
+
+}
+
+.innerHtmlColor {
+font-style: normal;
+font-weight: 600;
+font-size: 14px;
+line-height: 21px;
+color: #9E9E9E;
+
+
+}
+
+@media only screen and (max-width: 1200px) {
+    .showRoomLink {
+        max-width: 100%;
+        padding: 10px 14px !important;
+        white-space: nowrap;
+    }
+
+    .details-sec {
+        padding: 0 12px 12px;
+    }
+}
+
+@media only screen and (max-width: 991px) {
+    .summaryTab {
+        margin-top: 16px;
+        padding-right: 0;
+    }
+
+    .priceMsg {
+        font-size: 20px;
+    }
+
+    .proNameMd,
+    .productNameP {
+        font-size: 14px;
+    }
+
+    .codeLg {
+        font-size: 16px;
+    }
+}
+
+@media only screen and (max-width: 767px) {
+    .divsStyle {
+        margin: 0 0 12px;
+        border-radius: 10px;
+    }
+
+    .department-chip {
+        font-size: 12px;
+        padding: 4px 8px;
+    }
+
+    .priceMsg {
+        font-size: 18px;
+    }
+
+    .showRoomLink {
+        width: 100%;
+        max-height: none;
+    }
+}
+
+.col-md-8 {
+font-weight: 500;
+font-size: 14px;
+line-height: 21px;
+color: #9E9E9E;
+
+
+}
+
+.summary-color-img {
+        width: 25px;
+    border-radius: 4px;
+    height: 30px;
+}
+
+.summary-color-code {
+    color: #1B101B;
+    font-weight: 600;
+}
+
+.summary-color-name {
+    color: #595959;
+    font-weight: 500;
+
+}
+
+.raduis-6 {
+    border-radius: 6px;
 }

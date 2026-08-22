@@ -8,7 +8,7 @@
             </div>
             <form #noteForm="ngForm" method="post" novalidate (ngSubmit)="saveNote(noteVal.value)">
 
-        <textarea (focus)="addCurrentDate()" placeholder="Type Your Notes Here" required #noteVal ngModel name="note"
+        <textarea (focus)="addCurrentDate()" [placeholder]="'TypeYourNotesHere' | localize" required #noteVal ngModel name="note"
            [disabled]="disabledModeOn" 
            class="form-control note-control w-100 mb-2 p-0" [value]="savedNoteData">
            {{savedNoteData}}</textarea>
@@ -17,7 +17,7 @@
             [buttonBusy]="saving"
             [busyText]="emptyText"
             [disabled]="!noteForm.form.valid"
-            type="submit">Save</button>
+            type="submit">{{'Save' | localize}}</button>
         </div>
     </form>
         </div>

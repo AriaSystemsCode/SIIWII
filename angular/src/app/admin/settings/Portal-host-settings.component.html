@@ -1,0 +1,75 @@
+<div [@routerTransition]>
+    <div class="kt-content  kt-grid__item kt-grid__item--fluid kt-grid kt-grid--hor">
+        <div class="kt-subheader kt-grid__item">
+            <div [class]="containerClass">
+                <div class="kt-subheader__main">
+                    <h3 class="kt-subheader__title">
+                        <span>{{"Settings" | localize}}</span>
+                    </h3>
+                    <span class="kt-subheader__separator kt-subheader__separator--v"></span>
+                    <span class="kt-subheader__desc">
+                        {{"SettingsHeaderInfo" | localize}}
+                    </span>
+                </div>
+                <div class="kt-subheader__toolbar">
+                    <div class="kt-subheader__wrapper">
+                        <button class="btn saveBtn" (click)="saveAll()">
+                            {{"SaveAll" | localize}}</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div [class]="containerClass + ' kt-grid__item kt-grid__item--fluid'">
+            <div class="kt-portlet">
+                <div class="kt-portlet__body">
+                    <div class="row">
+                        <!-- Sidebar -->
+                        <div class="col-lg-3 col-md-5 col-12   leftSec">
+                            <ul class="list-group mt-2">
+                                <li
+                                  *ngFor="let usage of usageList"
+                                  class="list-group-item"
+                                  [class.active]="usage === selectedUsage"
+                                  (click)="scrollToUsage(usage)">
+                                  {{ usage }}
+                                </li>
+                              </ul>
+                              
+                        </div>
+                      
+                        <!-- Right Panel -->
+                        <div class="col-lg-9 col-md-7 col-12">
+
+                            <p-accordion [multiple]="true" [(activeIndex)]="activeAccordionIndexes">
+                                <p-accordionTab
+                                  *ngFor="let usage of usageList; let i = index"
+                                  [header]="usage "
+                                  [attr.id]="'usage_' + usage" (click)="onActiveIndexChange(usage)">
+                                  
+                                  <app-dynamicInputs
+                                    #appdynamicInputs
+                                  [extraAttributeObject]="{ value: { filteredExtraAttributes: groupedByUsage[usage], extraAttributes: allAttributes } }"
+                                    [entityObjectTypeId]="entityObjectTypeHostId"
+                                    [entityType]="'Settings'"
+                                    [dynamicInputsForViewDto]="dynamicInputsForViewDto"
+                                    (extraDataCleared)="onExtraAttributeCleared($event)" (extraDataChanged)="onExtraAttributesChanged($event)"
+                                    [fromSetting]="true">
+                                  </app-dynamicInputs>
+                              
+                                </p-accordionTab> 
+                              </p-accordion>
+                              
+                              
+                                
+
+
+                        
+                          </div>
+                          
+                      </div>
+                      
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -37,10 +37,21 @@ export class RegisterTenantComponent extends AppComponentBase implements OnInit,
     recaptchaSiteKey: string = AppConsts.recaptchaSiteKey;
 
     saving = false;
-    domainPattern = Patterns.domainName
-   accountType;
+    domainPattern = Patterns.workspaceName
+    accountType;
+
    accountTypeLabel:string="";
-   accountTypes:SelectItem[] = [];
+   relatedTenantId;
+lastName:string="";
+firstName:string=";"
+ //  accountTypes:SelectItem[] = [];
+ currentLang:string
+ isArabic:boolean 
+
+ showPassword = false;
+showPasswordRepeat = false;
+
+
     constructor(
         injector: Injector,
         private _tenantRegistrationService: TenantRegistrationServiceProxy,
@@ -54,6 +65,8 @@ export class RegisterTenantComponent extends AppComponentBase implements OnInit,
     }
 
     ngOnInit() {
+        this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
+        this.currentLang == 'ar' || this.currentLang == 'ar-EG'  ? this.isArabic = true : this.isArabic = false
         this.model.inviterTenantId = this._activatedRoute.snapshot.queryParams['tenantid'];
         if (!this.model.inviterTenantId  || this.model.inviterTenantId.toString().toUpperCase()=="NULL") {
             this.model.inviterTenantId = 0;
@@ -79,6 +92,18 @@ export class RegisterTenantComponent extends AppComponentBase implements OnInit,
         this._profileService.getPasswordComplexitySetting().subscribe(result => {
             this.passwordComplexitySetting = result.setting;
         });
+
+        this.accountType=this._activatedRoute.snapshot.queryParams['accountType'];
+        this.accountTypeLabel=this._activatedRoute.snapshot.queryParams['accountTypeLabel'];
+        this.relatedTenantId=this._activatedRoute.snapshot.queryParams['relatedTenantId'];
+        this.lastName=atob(this._activatedRoute.snapshot.queryParams['lastName']);
+        this.firstName=atob(this._activatedRoute.snapshot.queryParams['firstName']);
+        if(this.lastName.length>0){
+            this.model.lastName=this.lastName;
+        }
+        if(this.firstName.length>0){
+            this.model.firstName=this.firstName;
+        }
     }
 
     ngAfterViewInit() {
@@ -89,23 +114,10 @@ export class RegisterTenantComponent extends AppComponentBase implements OnInit,
                 });
         }
 
-     this.getAccountTypes();
+
     }
 
-    getAccountTypes(){
-       /* this.accountTypes.push({ label :'Personal' ,value:1});
-        this.accountTypes.push({ label :'Business' ,value:2});
-        this.accountTypes.push({ label :'Group' ,value: 3});*/
 
-        this._tenantRegistrationService.getEditionsForSelect()
-    .subscribe((result) => {
-        for (let i = 0; i < result.editionsWithFeatures.length; i++) {
-            const accountTypeLabel = result.editionsWithFeatures[i].edition.displayName;
-            const accountTypeValue = result.editionsWithFeatures[i].edition.id;
-            this.accountTypes.push({ label :accountTypeLabel ,value:accountTypeValue});
-    }
-    }); 
-    } 
     get useCaptcha(): boolean {
         return this.setting.getBoolean('App.TenantManagement.UseCaptchaOnRegistration');
     }
@@ -115,12 +127,16 @@ export class RegisterTenantComponent extends AppComponentBase implements OnInit,
         let recaptchaCallback = (token: string) => {
             this.saving = true;
             this.model.captchaResponse = token;
-       this.model.editionId =Number(this.accountType);
+ 
+      this.model.editionId= Number(this.accountType) ? Number(this.accountType) :  this.model.editionId;
        this.model.accountTypeId=this.accountType;
        this.model.accountType = this.accountTypeLabel;
+       this.model.relatedTenantId = this.relatedTenantId;
+       if( this.model.editionId == 5 ){
+        this.model.name = this.model.firstName +' ' + this.model.lastName
 
-
-         
+       }
+       
             this._tenantRegistrationService.registerTenant(this.model)
                 .pipe(finalize(() => { this.saving = false; }))
                 .subscribe((result: RegisterTenantOutput) => {
@@ -151,14 +167,22 @@ export class RegisterTenantComponent extends AppComponentBase implements OnInit,
         }
     }
 
-    changeAccountType($event){
-        debugger ;
-         let indx= this.accountTypes.findIndex(x=>x.value == $event.value );
+    // changeAccountType($event){
+    //     debugger ;
+    //      let indx= this.accountTypes.findIndex(x=>x.value == $event.value );
 
-         if(indx>=0)
-         this.accountTypeLabel= this.accountTypes[indx].label.toString().toUpperCase();
-         else
-         this.accountTypeLabel='';
+    //      if(indx>=0)
+    //      this.accountTypeLabel= this.accountTypes[indx].label.toString().toUpperCase();
+    //      else
+    //      this.accountTypeLabel='';
 
-    }
+    // }
+
+    togglePassword(): void {
+    this.showPassword = !this.showPassword;
+}
+
+togglePasswordRepeat(): void {
+    this.showPasswordRepeat = !this.showPasswordRepeat;
+}
 }

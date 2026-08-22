@@ -1,4 +1,4 @@
-<div class="container-fluid">
+<div class="container-fluid home-layout" [class.rtl-layout]="isArabic">
     <div class="row justify-content-center">
         <div class="left-sidebar thin-scroll pr-1">
             <app-trending-posts (viewPost)="showPost($event)"></app-trending-posts>

@@ -6,8 +6,8 @@
     width: 50%;
     margin: 5% auto;
      */
-background: transparent linear-gradient(180deg, #509AF700 0%, #509AF714 100%) 0% 0% no-repeat padding-box;
-border: 1px dashed #509AF7;
+// background: transparent linear-gradient(180deg, #509AF700 0%, #509AF714 100%) 0% 0% no-repeat padding-box;
+border: 1px dashed #E7E7E7;
 opacity: 1;
 position: relative;
 text-align: center;
@@ -28,15 +28,22 @@ padding: 85px;
 
 .Download{
     background: #FFFFFF 0% 0% no-repeat padding-box;
-    box-shadow: 0px 3px 6px #00000029;
-    border: 1px solid #ECF0F3;
-    border-radius: 6px;
     opacity: 1;
     }
 
+.Download.download-disabled {
+    opacity: 0.65;
+}
+
+.Download.download-disabled input,
+.Download.download-disabled .select-btn,
+.Download.download-disabled .browse-btn {
+    cursor: wait !important;
+}
+
 .Download-Btn
 {
-background: #509AF7 0% 0% no-repeat padding-box;
+background: #4A0D4A 0% 0% no-repeat padding-box;
 border-radius: 6px;
 opacity: 1;
 cursor: pointer;
@@ -52,7 +59,7 @@ font: normal normal 600 14px/21px Poppins;
 
 .Download span{
 font: normal normal normal 13px/20px Poppins;
-    color: #464E5F;
+   // color: #464E5F;
 }
 .disabled
 {
@@ -60,3 +67,403 @@ font: normal normal normal 13px/20px Poppins;
   cursor: not-allowed;
 }
 //<!-- Iteration-8 -->
+
+.upload-input:disabled {
+    cursor: not-allowed !important;
+    pointer-events: auto; 
+  }
+
+  .option-tabs {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+  
+  .option-tab {
+    flex: 1;
+    text-align: center;
+    padding: 12px;
+    background-color: #fff;
+    color: #000;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  
+  .option-tab.selected {
+    background-color: #633a9b;
+    color: #fff;
+    border-color: #633a9b;
+  }
+  
+  .option-tab input[type="checkbox"]:checked::after {
+    color: #C1C1C1; 
+  }
+
+  .video-info-box {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 16px;
+    border: 1px solid #ddd;
+    max-width: 100%;
+    justify-content: space-between;
+  }
+  
+  .video-icon {
+    width: 88px;
+    height: 64px;
+    flex-shrink: 0;
+  }
+  
+  .video-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex: 1;
+    gap: 16px;
+  }
+  
+  .video-text {
+    flex: 1;
+  }
+  
+  .video-title {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 600;
+    color: #333;
+  }
+  
+  .video-description {
+    margin: 6px 0 0 0;
+    font-size: 14px;
+    color: #666;
+  }
+  
+  .browse-btn{
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    background-color: #4A0D4A;
+    color: white;
+    font-weight: 500;
+    font-size: 14px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    white-space: nowrap;
+  }
+  
+  .browse-btn:hover {
+    background-color: #4A0D4A;
+  }
+  
+  .browse-btn img {
+    width: 18px;
+    height: 18px;
+  }
+  
+  .select-btn{
+    display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 4px;
+        background-color: white;
+        color: #4A0D4A !important;
+        font-weight: 500;
+        font-size: 14px;
+        border: 1px solid #EEEEEEEE;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: background-color 0.2s ease;
+        white-space: nowrap;
+  }
+
+
+  .select-btn span{
+    color: #4A0D4A;
+  }
+
+  .browse-btn:disabled {
+    cursor: not-allowed !important;
+    pointer-events: auto; 
+    color: white !important;
+  }
+
+
+  .modal-header-custom {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 24px;
+    border-bottom: 4px solid #EEEEEEEE;
+    background-color: #fff;
+  }
+  
+  .modal-title {
+    margin: 0;
+    font-weight: 700;
+    color: #333;
+  }
+  
+  .close-icon-btn {
+    background: #f5f5f5;
+    border: none;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    padding: 6px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s ease;
+  }
+  
+  .close-icon-btn:hover {
+    background-color: #e0e0e0;
+  }
+  
+  .close-icon-btn img {
+    width: 14px;
+    height: 14px;
+  }
+  
+
+
+
+  .upload-modal {
+    width: 626px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+    font-family: 'Segoe UI', sans-serif;
+    padding: 20px;
+    position: fixed;
+    top: 20%;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1050;
+  }
+  
+  .modal-header {
+    font-weight: 600;
+    margin-bottom: 20px;
+  }
+  
+  .modal-icon {
+    font-size: 22px;
+    margin-right: 10px;
+    color: #f79e1b;
+  }
+  
+  .modal-title {
+    flex-grow: 1;
+  }
+  
+  .modal-close {
+    font-size: 18px;
+    cursor: pointer;
+  }
+  
+  .folder-info {
+    display: flex;
+    align-items: center;
+    background: #f7f7f7;
+    padding: 12px;
+    border-radius: 6px;
+    margin-bottom: 25px;
+  }
+  
+  .folder-icon {
+    width: 36px;
+    height: 36px;
+    margin-right: 12px;
+  }
+  
+  .folder-details .folder-name {
+    font-weight: 600;
+    font-size: 16px;
+  }
+  .folder-details {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .folder-name {
+    font-weight: bold;
+  }
+  
+  .folder-meta {
+    text-align: right;
+    margin-left: auto;
+    font-size: 14px;
+    color: #6c757d;
+  }
+  
+  .folder-details .folder-meta {
+    color: #595959;
+    font-size: 14px;
+  }
+  
+  .modal-actions {
+    text-align: right;
+  }
+  
+  .btn {
+    padding: 8px 18px;
+    border-radius: 6px;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    margin-left: 10px;
+  }
+  
+  .btn-primary {
+    background: #4b0150;
+    color: white;
+  }
+  
+  .btn-secondary {
+    background: white;
+    border: 1px solid #ccc;
+    color: #444;
+  }
+  
+
+  
+  .cancleUpload-btn{
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    color: #4A0D4A;
+    background-color: white;
+    font-weight: 500;
+    font-size: 14px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    white-space: nowrap;
+    border: 1px solid #EEEEEEEE;
+  }
+
+.required-asterisk {
+  color: #F6851D;
+}
+
+.aspect-ratio-warning {
+  color: #F6851D !important;
+}
+
+@media (max-width: 1024px) {
+  .uploadfilecontainer {
+    padding: 56px;
+  }
+
+  .video-info-box {
+    flex-wrap: wrap;
+  }
+}
+
+@media (max-width: 768px) {
+  .uploadfilecontainer {
+    padding: 36px 20px;
+  }
+
+  .video-content {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .video-icon {
+    width: 72px;
+    height: 52px;
+  }
+
+  .browse-btn,
+  .select-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .Download .row > [class*='col-'] {
+    flex: 0 0 100%;
+    max-width: 100%;
+    margin-bottom: 0.75rem;
+    text-align: left !important;
+  }
+
+  .Download .row > .col-2,
+  .Download .row > .col-1 {
+    margin-left: 0 !important;
+  }
+
+  .modal-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    justify-content: flex-start;
+  }
+
+  .modal-actions .browse-btn,
+  .modal-actions .cancleUpload-btn {
+    width: 100%;
+    margin-left: 0 !important;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 576px) {
+  .modal-dialog {
+    width: 96%;
+    margin: 0.5rem auto;
+  }
+
+  .uploadfilecontainer {
+    padding: 24px 14px;
+  }
+
+  .modal-header-custom {
+    padding: 14px 12px;
+  }
+
+  .video-title {
+    font-size: 14px;
+  }
+
+  .video-description {
+    font-size: 12px;
+  }
+
+  .upload-modal {
+    width: 94%;
+    left: 3%;
+    transform: none;
+    top: 10%;
+    padding: 14px;
+  }
+
+  .folder-info {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .folder-details {
+    width: 100%;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.25rem;
+  }
+
+  .folder-meta {
+    margin-left: 0;
+    text-align: left;
+  }
+}

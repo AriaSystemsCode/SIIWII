@@ -44,7 +44,7 @@
 
 <div *ngIf="hasDuplication">
 <div class="row pl-5 pt-4">
-    <h6><span style="color:#FF0000">*</span>{{"ChoosetheDuplicatedrecordsoption" | localize}}</h6> 
+    <h6><span class="required-asterisk">*</span>{{"ChoosetheDuplicatedrecordsoption" | localize}}</h6> 
 </div>
 
 
@@ -58,12 +58,28 @@
 </div>
 </div>
 
+<div *ngIf="importType==ImportTypes.Items">
+<div class="pl-5 pt-4 pb-3 border-bottom"></div>
+<div class="row pl-5 pt-4" >
+    <h6><span class="required-asterisk">*</span>{{"Choose the updating lookup option :" | localize}}</h6> 
+</div>
 
-<div class="row pl-5 pt-4 pb-4">
+<div class="row">
+    <div class="pl-5 " >
+        <label class="radio radio-accent radio-primary mr-5 mt-3">
+            <input type="checkbox" name="updateLookups" id="updateLookups" [(ngModel)]="updateLookups"/>
+            {{"Update Color Lookups images" | localize}}
+        </label>
+    </div>
+</div>
+</div>
+
+
+<div class="row pl-5 pt-4 pb-4 justify-content-end text-right">
     <button class="btn btn-secondary  _Btn mr-2 pointer" (click)="goPreviousStep()">
         {{"Previous" | localize}}   
     </button>
-    <button class="btn btn-primary _Btn pointer" (click)="import()">{{"Import" | localize}} </button>
+    <button class="btn btn-primary importBtn pointer" (click)="import()">{{"Import" | localize}} </button>
 </div>
 
 

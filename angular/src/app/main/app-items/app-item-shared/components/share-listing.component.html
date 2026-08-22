@@ -1,7 +1,7 @@
 
 
 <div >
-    <div class="modal-header" style="display: block;background-color: #ffffff !important;">
+    <div class="modal-header share-modal-header">
         <div class="d-flex align-items-start">
             <div class="mr-2 pb-3 pl-3 pr-3 pt-3 rounded-circle text-primary share-icon">
                 <i class="fas fa-exchange-alt"></i>
@@ -14,7 +14,7 @@
             </div>
         </div>
 
-        <button style="position: absolute;right: 8px;top: 8px;" type="button" class="close" (click)="close()"
+        <button type="button" class="close share-modal-close-btn" (click)="close()"
         aria-label="Close" [disabled]="saving">
         <span aria-hidden="true">&times;</span>
         </button>
@@ -22,11 +22,11 @@
     <div class="modal-body">
         <div class="form-group">
             <div class="d-flex">
-                <label class="ml-1 mr-5" for="public">
-                    <input type="radio" id="public" name="publicity" (click)="hideCloseButtonText()" [(ngModel)]="publishItemOptions.sharingLevel" [value]="1"> {{"Public" | localize}}
+                <label class="ml-1 mr-5 d-inline-flex align-items-center" for="public">
+                    <input class="mr-2" type="radio" id="public" name="publicity" (click)="hideCloseButtonText()" [(ngModel)]="publishItemOptions.sharingLevel" [value]="1"> {{"Public" | localize}}
                 </label>
-                <label  for="private">
-                    <input type="radio" id="private"  name="publicity" (click)="showCloseButtonText()" [(ngModel)]="publishItemOptions.sharingLevel" [value]="2"> Restricted
+                <label  for="private" class="d-inline-flex align-items-center">
+                    <input class="mr-2" type="radio" id="private"  name="publicity" (click)="showCloseButtonText()" [(ngModel)]="publishItemOptions.sharingLevel" [value]="2"> Restricted
                 </label>
             </div>
         </div>
@@ -39,7 +39,7 @@
             <a (click)="addEmail(querySearchElem)">
                 <i class="fa-2x fa-plus-circle fas text-black-50" ></i>
             </a>
-            <div [appClickOutside]="true" [anotherElemSkip]="querySearchElem"  class="bg-white flex-column pb-2 pl-3 pr-3 pt-2 shadow thin-scroll user-search-result w-100">
+            <div  [ngClass]="{ 'bg-white shadow': filteredUsers && filteredUsers?.length>0}"   [appClickOutside]="true" [anotherElemSkip]="querySearchElem"  class=" flex-column pb-2 pl-3 pr-3 pt-2  thin-scroll user-search-result w-100">
                 <div class="d-flex mb-3 mt-3 user-item bg-hover-light" *ngFor="let user of filteredUsers;index as i" (click)="addSharingItem(user,i)">
                     <img class="mr-3 rounded-circle" height="30px" src="../../../../../assets/icons/user-icon.jpg" alt="user-icon.jpg">
                     <div>
@@ -74,13 +74,16 @@
         </div>
 
     </div>
-    <div  class="subscribers" *ngIf="PublishAppItemListingService.sharingStatus !== 0" >You have {{PublishAppItemListingService.subscribersNumber}} Subscribers to this Product </div>
+
+    <div class="subscribers" *ngIf="PublishAppItemListingService.sharingStatus !== 0">
+  {{ "SubscribersToProduct" | localize: PublishAppItemListingService.subscribersNumber }}
+</div>
     <div class="modal-footer">
         <button type="button"  class="btn btn-outline-primary" [disabled]="!showCloseText && _notify && publishItemOptions.itemSharing.length === 0||publishItemOptions.sharingLevel === 2&&publishItemOptions.itemSharing.length==0" (click)="publishListing()" [buttonBusy]="saving" [busyText]="l('SavingWithThreeDot')">
             <!-- <span *ngIf="!_notify">{{"ShareAndPublish" | localize}}</span> -->
             <!-- <span *ngIf="_notify">{{"NotifyAndPublish" | localize}}</span> -->
             <span *ngIf="PublishAppItemListingService.sharingStatus === 0  ||  PublishAppItemListingService.sharingStatus === 3">Share</span>
-            <span *ngIf="(PublishAppItemListingService.sharingStatus === 1 || PublishAppItemListingService.sharingStatus === 2) && PublishAppItemListingService.subscribersNumber ===0  ">Make Private</span>
+            <span *ngIf="(PublishAppItemListingService.sharingStatus === 1 || PublishAppItemListingService.sharingStatus === 2) && PublishAppItemListingService.subscribersNumber ===0  ">Make a Private</span>
             <span *ngIf="(PublishAppItemListingService.sharingStatus === 3) && PublishAppItemListingService.subscribersNumber !==0 ">Hide</span>
             <span  *ngIf=" PublishAppItemListingService.sharingStatus === 4" > Unhide </span>
         </button>

@@ -36,8 +36,7 @@ export class ViewBillingInfoComponent   extends AppComponentBase{
   showEditMode() {
     this.createOrEditBillingInfo = true;
     this.onshowSaveBtn.emit(true);
-    this.showBillingEditMode
-    .emit(true);
+    this.showBillingEditMode.emit(true);
   }
   isContactFormValid_1(value) {
     if (this.activeTab == this.transactionCartoccordionTabs.BillingInfo) 
@@ -48,4 +47,6 @@ export class ViewBillingInfoComponent   extends AppComponentBase{
     if (this.activeTab == this.transactionCartoccordionTabs.BillingInfo) 
       this.isContactsValid_2.emit(value)
   }
+
+  
 }

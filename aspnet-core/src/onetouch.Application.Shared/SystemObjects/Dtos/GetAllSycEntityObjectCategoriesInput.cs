@@ -26,6 +26,9 @@ namespace onetouch.SystemObjects.Dtos
 
         public long EntityId { get; set;  }
         public List<long> ExcludeIds { get; set; }
-
+        public bool IncludeResultCount { get; set; }
+        //I50[Start]
+        public virtual string FilterCondition { set; get; }
+        //I50[End]
     }
 }

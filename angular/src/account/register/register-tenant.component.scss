@@ -36,10 +36,81 @@
 }
 
 .backBtn{
-    background-color: $bold-color;
-    color: white;
+    color: #4A0D4A !important;
+    font-weight: 500;
+    border-radius: 3px;
+    width: 120px;
+    height: 40px !important;
 }
 
 .submitBtn{
-    background-color: $light-color !important;
+    // background-color: $light-color !important;
+    color: white;
+    background-color: #4A0D4A !important;
+    height: 40px !important;
+    width: 120px;
+}
+.edition_label{
+    font-size: 16px;
+    font-weight: 500;
+    color: #9E9E9E;
+    margin-top: 16px;
+}
+.Personal_Info {
+    font-size: 24px;
+    font-weight: 700;
+    color: #1B101B;
+    width: 100%;
+    margin-bottom: 20px;
+}
+.form-control{
+    border: 1px solid #e2e5ec !important;
+}
+.Login_container{
+    border: 1px solid #EEEEEE    ;
+    border-radius: 20px;
+    max-width: 90% !important;
+    margin-top: 0px !important;
+    padding: 50px 20px;
+
+}
+
+
+input{
+    background-color: white !important;
+}
+
+.titleLog {
+    color: #1B101B;
+    font-weight: 700;
+    font-size: 24px;
+}
+.user_p_relative {
+    position: relative;
+}
+.user_icon {
+    position: absolute;
+    right: 12px;
+    top: 15px;
+}
+
+
+.ar-user_icon {
+    position: absolute;
+    left: 12px;
+    top: 15px;
+}
+
+::ng-deep .Login_container {
+    text-align: justify !important;
+}
+
+
+.password-toggle-icon {
+    cursor: pointer;
+    z-index: 5;
+}
+
+.w-28 {
+    width: 28px;
 }

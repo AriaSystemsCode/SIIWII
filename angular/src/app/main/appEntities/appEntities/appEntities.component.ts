@@ -19,6 +19,9 @@ import * as _ from 'lodash';
 import * as moment from 'moment';
 import { CreateOrEditAppEntityDynamicModalComponent } from '@app/app-entity-dynamic-modal/create-or-edit-app-entity-dynamic-modal/create-or-edit-app-entity-dynamic-modal.component';
 // import { CreateOrEditAppEntityDynamicModalComponent } from '@app/app-entity-dynamic-modal/create-or-edit-app-entity-dynamic-modal/create-or-edit-app-entity-dynamic-modal.component';
+
+import { finalize } from 'rxjs/operators';
+import { BsDropdownDirective } from 'ngx-bootstrap/dropdown';
 export interface AccordionTabItem {
     id: number,
     label: string,
@@ -27,7 +30,7 @@ export interface AccordionTabItem {
 }
 @Component({
     templateUrl:'./appEntities.component.html',
-    styleUrls: ['./appEntities.component.css'],
+    styleUrls: ['./appEntities.component.scss'],
     encapsulation: ViewEncapsulation.None,
     animations: [appModuleAnimation()],
     // providers: [MessageService]
@@ -59,6 +62,8 @@ export class AppEntitiesComponent extends AppComponentBase {
     items = [];
     _entityTypeFullName = 'onetouch.AppEntities.AppEntity';
     entityHistoryEnabled = false;
+ currentLang: string;
+isArabic: boolean = false;
 
     constructor(
         injector: Injector,
@@ -75,7 +80,8 @@ export class AppEntitiesComponent extends AppComponentBase {
 
     ngOnInit(): void {
         this.entityHistoryEnabled = this.setIsEntityHistoryEnabled();
-
+this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName');
+        this.isArabic = this.currentLang === 'ar' || this.currentLang === 'ar-EG';
         // this.items1 = [
         //     {label: 'Home', icon: 'pi pi-fw pi-home'},
         //     {label: 'Calendar', icon: 'pi pi-fw pi-calendar'},
@@ -151,19 +157,20 @@ export class AppEntitiesComponent extends AppComponentBase {
         this.paginator.rows=event.rows;
         this.maxResultCount  = this.primengTableHelper.getMaxResultCount(this.paginator, event)
         this.skipCount  = ( event?.page || 0 ) * this.maxResultCount
-        this._appEntitiesServiceProxy.getAll(
-            this.filterText,
-            this.nameFilter,
-            this.codeFilter,
-            this.descriptionFilter,
-            this.extraDataFilter,
-            this.sycEntityObjectTypeNameFilter,
-            this.sycEntityObjectStatusNameFilter,
-            this.sydObjectNameFilter,
-            +this.currTab.id,
-            this.primengTableHelper.getSorting(this.dataTable),
-            this.skipCount,
-            this.maxResultCount
+            this._appEntitiesServiceProxy.getAll(
+                this.filterText,
+                this.nameFilter,
+                this.codeFilter,
+                this.descriptionFilter,
+                this.extraDataFilter,
+                true,
+                this.sycEntityObjectTypeNameFilter,
+                this.sycEntityObjectStatusNameFilter,
+                this.sydObjectNameFilter,
+                +this.currTab.id,
+                this.primengTableHelper.getSorting(this.dataTable),
+                this.skipCount,
+                this.maxResultCount
         ).subscribe(result => {
             this.primengTableHelper.totalRecordsCount = result.totalCount;
             this.primengTableHelper.records = result.items;
@@ -180,10 +187,16 @@ export class AppEntitiesComponent extends AppComponentBase {
         this.getAppEntities($event)
     }
 
-    createOrEditAppEntity(event,id?:number): void {
+    createOrEditAppEntity(event,id?:number, dropdown?: BsDropdownDirective): void {
         event.preventDefault();
         event.stopPropagation();
-        this.openCreateOrEditModal(id)
+        this.openCreateOrEditModal(id, dropdown)
+    }
+
+    closeActionsDropdown(dropdown?: BsDropdownDirective): void {
+        if (dropdown?.isOpen) {
+            dropdown.hide();
+        }
     }
 
     showHistory(appEntity: AppEntityDto): void {
@@ -193,7 +206,8 @@ export class AppEntitiesComponent extends AppComponentBase {
             entityTypeDescription: ''
         });
     }
-    deleteEntity(appEntity: AppEntityDto) {
+    deleteEntity(appEntity: AppEntityDto, dropdown?: BsDropdownDirective) {
+        this.closeActionsDropdown(dropdown);
         this.displayDeleteEntity = true;
         this.recordEntity = appEntity
     }
@@ -206,7 +220,8 @@ export class AppEntitiesComponent extends AppComponentBase {
             this.displayDeleteEntity = false;
         }
     }
-    deleteAppEntity(appEntity: AppEntityDto): void {
+    deleteAppEntity(appEntity: AppEntityDto, dropdown?: BsDropdownDirective): void {
+        this.closeActionsDropdown(dropdown);
         this._appEntitiesServiceProxy.delete(appEntity.id)
         .subscribe(() => {
             this.reloadPage();
@@ -228,21 +243,24 @@ export class AppEntitiesComponent extends AppComponentBase {
     }
 
     exportToExcel(): void {
+        this.showMainSpinner();
         this._appEntitiesServiceProxy.getAppEntitiesToExcel(
             this.filterText,
             this.nameFilter,
             this.codeFilter,
             this.descriptionFilter,
             this.extraDataFilter,
-            this.sycEntityObjectTypeNameFilter,
+          this.sycEntityObjectTypeNameFilter && this.sycEntityObjectTypeNameFilter!= '' ? this.sycEntityObjectTypeNameFilter :   this.currTab.label,
             this.sycEntityObjectStatusNameFilter,
             this.sydObjectNameFilter,
         )
+        .pipe(finalize(() => this.hideMainSpinner()))
             .subscribe(result => {
                 this._fileDownloadService.downloadTempFile(result);
             });
     }
-    openCreateOrEditModal(id?:number) : void {
+    openCreateOrEditModal(id?:number, dropdown?: BsDropdownDirective) : void {
+        this.closeActionsDropdown(dropdown);
 
         const appEntity : AppEntityDto = new AppEntityDto()
         if(id) {
@@ -257,7 +275,8 @@ export class AppEntitiesComponent extends AppComponentBase {
         // this.active = false
     }
 
-    setAsDefault (_item): void {
+        setAsDefault (_item, dropdown?: BsDropdownDirective): void {
+            this.closeActionsDropdown(dropdown);
       let recordEntity = _item.appEntity
                  this.showMainSpinner();
                      this._appEntitiesServiceProxy.setAsDefault(recordEntity.id,recordEntity.entityObjectTypeId)

@@ -2,6 +2,7 @@ import { Component, Injector, Input, OnInit, ViewChild } from '@angular/core';
 import { AppComponentBase } from '@shared/common/app-component-base';
 import { AppEntitiesServiceProxy, AppEntityDto, CreateOrEditAppEntityDto, LookupLabelDto } from '@shared/service-proxies/service-proxies';
 import { BsModalRef, BsModalService, ModalOptions } from 'ngx-bootstrap/modal';
+import { BsDropdownDirective } from 'ngx-bootstrap/dropdown';
 import { Observable, Subject, Subscription } from 'rxjs';
 import { debounceTime, distinctUntilChanged, finalize } from 'rxjs/operators';
 import { CreateOrEditAppEntityDynamicModalComponent } from '../create-or-edit-app-entity-dynamic-modal/create-or-edit-app-entity-dynamic-modal.component';
@@ -33,6 +34,8 @@ export class AppEntityListDynamicModalComponent extends AppComponentBase impleme
     searchQuery:string
     searchSubj:Subject<string>=new Subject<string>()
     nonLookupValues:LookupLabelDto[];
+    currentLang: string
+    isArabic: boolean
     constructor(
         injector: Injector,
         public currentModalRef: BsModalRef,
@@ -42,6 +45,8 @@ export class AppEntityListDynamicModalComponent extends AppComponentBase impleme
     }
 
     ngOnInit(): void {
+        this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
+        this.currentLang == 'ar' || this.currentLang == 'ar-EG'  ? this.isArabic = true : this.isArabic = false
         this.getAllEntityValuesList()
         this.searchSubj
         .pipe(
@@ -61,14 +66,14 @@ export class AppEntityListDynamicModalComponent extends AppComponentBase impleme
             this.searchQuery,
             undefined,
             undefined,
-            undefined,
+            undefined,false,
             this.entityObjectType.code,
             undefined,
             undefined,
             undefined,
             this.sortBy,
             this.skipCount,
-            this.maxResultCount,
+            this.maxResultCount
         )
         .pipe(
             finalize(()=>{
@@ -116,7 +121,9 @@ export class AppEntityListDynamicModalComponent extends AppComponentBase impleme
         else
         return false;
     }
-    openCreateOrEditModal(entityLookup?:LookupLabelDto) : void {
+    openCreateOrEditModal(entityLookup?:LookupLabelDto, dropdown?: BsDropdownDirective) : void {
+
+        this.closeActionsDropdown(dropdown)
 
         let appEntity : AppEntityDto = new AppEntityDto()
         if(entityLookup){
@@ -149,6 +156,13 @@ export class AppEntityListDynamicModalComponent extends AppComponentBase impleme
     onCanceledHandler(){
         this.active = true
     }
+
+    closeActionsDropdown(dropdown?: BsDropdownDirective): void {
+        if (dropdown?.isOpen) {
+            dropdown.hide();
+        }
+    }
+
     onCreateOrEditDoneHandler(){
         this.resetList()
     }
@@ -159,12 +173,18 @@ export class AppEntityListDynamicModalComponent extends AppComponentBase impleme
     }
 
     close(){
-        this.currentModalRef.setClass('right-modal slide-right-out')
+        this.currentModalRef.setClass(
+            this.isArabic
+                ? 'left-modal slide-left-out ngLeft'
+                : 'right-modal slide-right-out'
+        )
         this.selectionDone = false
         this.currentModalRef.hide()
     }
 
-    deleteSycEntityObject(_item,index:number): void {
+    deleteSycEntityObject(_item,index:number, dropdown?: BsDropdownDirective): void {
+        this.closeActionsDropdown(dropdown)
+
         var isConfirmed: Observable<boolean>;
         isConfirmed   = this.askToConfirm("","AreYouSure");
     

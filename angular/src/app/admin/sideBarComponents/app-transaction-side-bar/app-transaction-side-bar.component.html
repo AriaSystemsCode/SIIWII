@@ -2,7 +2,7 @@
     <div class="row pr-3">
         <div class="d-flex  flex-row w-100">
             <h4 class="purpleColor font-weight-bold col-11  pb-4 mb-4" style="border-bottom: 2px solid #e7e8ef;color: black !important;">
-                {{"Related Data"}} </h4>
+                {{"Related Data" | localize}} </h4>
             <div (click)="onhideSideBar()" class="pointer w-100 ml-2"><svg xmlns="http://www.w3.org/2000/svg" width="15" height="14"
                     viewBox="0 0 15 14" fill="none">
                     <g clip-path="url(#clip0_662_76)">
@@ -18,20 +18,37 @@
                 </svg></div>
         </div>
 
-        <h4 class="purpleColor font-weight-bold col-12" style="color: black !important;"> {{"Order Summary"}} </h4>
+        <h4 class="purpleColor font-weight-bold col-12" style="color: black !important;"> {{"OrderSummary" | localize}} </h4>
         <div class="row summarySection w-100 p-2 mx-2 mt-3 purpleColor">
             <div class="row w-100">
-                <div class="col-6 font-weight-bold " style="color: black !important;">{{"TotalAmount"}}</div>
+                <div class="col-6 font-weight-bold " style="color: black !important;">{{"TotalAmount" | localize}}</div>
                 <div class="font-weight-bold col-6" style="color: #9E9E9E !important;"> {{currencySymbol}} {{shoppingCartDetails?.totalAmount ?
                     shoppingCartDetails?.totalAmount : '0.00' }}</div>
             </div>
             <div class="row w-100 mt-4 mb-4">
-                <div class="col-6 font-weight-bold " style="color: black !important;">{{"TotalQuantity"}}</div>
+                <div class="col-6 font-weight-bold " style="color: black !important;">{{"TotalQuantity" | localize}}</div>
                 <div class="font-weight-bold col-6" style="color: #9E9E9E !important;">{{shoppingCartDetails?.totalQty ?
                     shoppingCartDetails?.totalQty : 0 }}</div>
             </div>
 
         </div>
+
+
+      <div class="col-12 mt-4 px-2">
+    <button
+        type="button"
+        class="btn view-transaction-btn w-100 d-flex align-items-center justify-content-center"
+        (click)="openTransaction()">
+
+        <i class="fa fa-eye mr-2"></i>
+        <span>{{ 'ViewTransaction' | localize }}</span>
+    </button>
+</div>
     </div>
 
 </div>
+
+
+
+<app-transaction-information #shoppingCartModal
+  ></app-transaction-information>

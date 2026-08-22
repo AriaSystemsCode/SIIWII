@@ -14,6 +14,7 @@ export class CommentComponent implements OnChanges {
     isLongContent: boolean = false;
     displayedContent: string = '';
     charLimit: number = 30; // Adjust the limit as needed
+
     constructor(private _postService:AppPostsServiceProxy) { }
     ngOnChanges(changes: SimpleChanges,): void {
         this.getProfilePictureById(this.comment.messages.profilePictureId);

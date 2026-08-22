@@ -25,6 +25,10 @@ using Abp.Domain.Uow;
 using Microsoft.Extensions.Configuration;
 using onetouch.Configuration;
 using onetouch.AppEventGuests.Dtos;
+using Abp.EntityFrameworkCore.Uow;
+using onetouch.AppMarketplaceContacts;
+using onetouch.EntityFrameworkCore;
+using OfficeOpenXml.Drawing.Slicer.Style;
 
 namespace onetouch.AppEvents
 {
@@ -71,6 +75,22 @@ namespace onetouch.AppEvents
         {
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
             {
+                //I50[Start]
+                IQueryable<AppEvent> filteredEvents = null;
+                if (!string.IsNullOrEmpty(input.FilterCondition))
+                {
+                    var contxt = UnitOfWorkManager.Current.GetDbContext<onetouchDbContext>(null, null);
+                    string jsonFilter = input.FilterCondition;
+
+                    var filterCondition = Helper.ApplyJsonFilter<AppEvent>(jsonFilter);//.ToList();
+                    if (filterCondition != null)
+                        filteredEvents = contxt.AppEvents.Where(filterCondition)
+                            .OrderBy(input.Sorting ?? "UTCFromDateTime asc")
+                            .Take(input.MaxResultCount);//.ToListAsync();
+
+                }
+                //I50[End]
+
                 if (input.FilterType == null) input.FilterType = EventsFilterTypesEnum.AllEvents;
                 string imagesUrl = _appConfiguration[$"Attachment:Path"].Replace(_appConfiguration[$"Attachment:Omitt"], "") + @"/";
                 
@@ -98,22 +118,41 @@ namespace onetouch.AppEvents
                             .WhereIf(input.MaxToTimeFilter.HasValue, e => e.ToTime <= input.MaxToTimeFilter)
                             .WhereIf(!string.IsNullOrWhiteSpace(input.TimeZoneFilter), e => e.TimeZone == input.TimeZoneFilter)
                             .WhereIf(input.PrivacyFilter.HasValue, e => input.PrivacyFilter == e.Privacy)
+                             //Iteration#I40 - X527[Start]
+                            .WhereIf(input.TenantId != null, z => z.TenantId == input.TenantId)
+                            //Iteration#I40 - X527[End]
                             .WhereIf(input.GuestCanInviteFriendsFilter.HasValue, e => input.GuestCanInviteFriendsFilter == e.GuestCanInviteFriends)
                             .WhereIf(!string.IsNullOrWhiteSpace(input.AppEntityNameFilter), e => e.EntityFk != null && e.EntityFk.Name.ToUpper().TrimEnd().Contains(input.AppEntityNameFilter.ToUpper().TrimEnd()))
                             .WhereIf(!string.IsNullOrWhiteSpace(input.CityFilter), e => e.EntityFk.EntityAddresses != null && e.EntityFk.EntityAddresses.Count > 0 && e.EntityFk.EntityAddresses.FirstOrDefault().AddressFk.City.ToUpper().TrimEnd().Contains(input.CityFilter.ToUpper().TrimEnd()))
                             .WhereIf(!string.IsNullOrWhiteSpace(input.StateFilter), e => e.EntityFk.EntityAddresses != null && e.EntityFk.EntityAddresses.Count > 0 && e.EntityFk.EntityAddresses.FirstOrDefault().AddressFk.State.ToUpper().TrimEnd().Contains(input.StateFilter.ToUpper().TrimEnd()))
                             .WhereIf(!string.IsNullOrWhiteSpace(input.PostalFilter), e => e.EntityFk.EntityAddresses != null && e.EntityFk.EntityAddresses.Count > 0 && e.EntityFk.EntityAddresses.FirstOrDefault().AddressFk.PostalCode.ToUpper().TrimEnd().Contains(input.PostalFilter.ToUpper().TrimEnd()))
+                            .WhereIf(input.CountryCodeFilter !=null && input.CountryCodeFilter.Length > 0, e => e.EntityFk.EntityAddresses != null && e.EntityFk.EntityAddresses.Count > 0 && input.CountryCodeFilter.Contains(e.EntityFk.EntityAddresses.FirstOrDefault().AddressFk.CountryCode))
+                            .WhereIf(input.CountryIDFilter != null && input.CountryIDFilter.Length > 0, e => e.EntityFk.EntityAddresses != null && e.EntityFk.EntityAddresses.Count > 0 && input.CountryIDFilter.Contains(e.EntityFk.EntityAddresses.FirstOrDefault().AddressFk.CountryId))
                             .Where(e => ( input.FilterType == EventsFilterTypesEnum.MyEvents && e.TenantId == AbpSession.TenantId) || 
                                         ( input.FilterType == EventsFilterTypesEnum.AllEvents || input.FilterType == EventsFilterTypesEnum.UpcommingEvents || input.FilterType == EventsFilterTypesEnum.PriorEvents ) );
 
-                var pagedAndFilteredAppEvents = filteredAppEvents
-                    .OrderBy(input.Sorting ?? "UTCFromDateTime asc")
+               
+               var pagedAndFilteredAppEvents = filteredAppEvents
+                        .OrderBy(input.Sorting ?? "UTCFromDateTime asc")
+                        .PageBy(input);
+                
+                //I40[Start]
+                if (input.TenantId != null)
+                {
+                    pagedAndFilteredAppEvents = filteredAppEvents
+                    .OrderBy(input.Sorting ?? "UTCFromDateTime desc")
                     .PageBy(input);
-
-                var appEvents = from o in pagedAndFilteredAppEvents
-                                select new
-                                {
-                                    res = new GetAppEventForViewDto()
+                }
+                //I40[end]
+                IQueryable<GetAppEventForViewDto> appEvents = null;
+                if (filteredEvents!=null)
+                {
+                    appEvents = from o in pagedAndFilteredAppEvents
+                                join o1 in filteredEvents on o.Id equals o1.Id
+                                //select new
+                                //{
+                                // res = new GetAppEventForViewDto()
+                                    select new GetAppEventForViewDto()
                                     {
                                         //   AppEvent = ObjectMapper.Map<AppEventDto>(o)
 
@@ -124,6 +163,7 @@ namespace onetouch.AppEvents
                                             IsPublished = o.IsPublished,
                                             UserId = (long)o.CreatorUserId,
                                             UserName = UserManager.Users.FirstOrDefault(x => x.Id == o.CreatorUserId && x.TenantId == o.TenantId).FullName,
+                                            ProfilePictureId = (Guid)UserManager.Users.FirstOrDefault(x => x.Id == o.CreatorUserId && x.TenantId == o.TenantId).ProfilePictureId,
                                             Attachments = input.IncludeAttachments == true ? ObjectMapper.Map<List<AppEntityAttachmentDto>>(o.EntityFk.EntityAttachments) : null,
                                             Status = o.EntityFk.EntityObjectStatusFk.Name,
                                             BanarURL = imagesUrl + (o.TenantId == null ? "-1" : o.TenantId.ToString()) + @"/" + o.EntityFk.EntityAttachments.Where(e => e.AttachmentCategoryId == BannerAttachmentCategoryId).FirstOrDefault().AttachmentFk.Attachment,
@@ -150,13 +190,66 @@ namespace onetouch.AppEvents
                                             Id = o.Id,
                                             Address = o.EntityFk.EntityAddresses.Count > 0 ? ObjectMapper.Map<AppEntityAddressDto>(o.EntityFk.EntityAddresses.FirstOrDefault()) : null,
                                         }
-                                    }
+                                   // }
                                 };
+                }
+                else
+                {
+                    appEvents = from o in pagedAndFilteredAppEvents
+                                    //select new
+                                    //{
+                                    //res = new GetAppEventForViewDto()
+                                         select new GetAppEventForViewDto()
+                                         {
+                                            //   AppEvent = ObjectMapper.Map<AppEventDto>(o)
 
+                                            AppEvent = new AppEventDto
+                                            {
+                                                EntityId = o.EntityId,
+                                                IsOnLine = o.IsOnLine,
+                                                IsPublished = o.IsPublished,
+                                                UserId = (long)o.CreatorUserId,
+                                                UserName = UserManager.Users.FirstOrDefault(x => x.Id == o.CreatorUserId && x.TenantId == o.TenantId).FullName,
+                                                ProfilePictureId = (Guid)UserManager.Users.FirstOrDefault(x => x.Id == o.CreatorUserId && x.TenantId == o.TenantId).ProfilePictureId,
+                                                Attachments = input.IncludeAttachments == true ? ObjectMapper.Map<List<AppEntityAttachmentDto>>(o.EntityFk.EntityAttachments) : null,
+                                                Status = o.EntityFk.EntityObjectStatusFk.Name,
+                                                BanarURL = imagesUrl + (o.TenantId == null ? "-1" : o.TenantId.ToString()) + @"/" + o.EntityFk.EntityAttachments.Where(e => e.AttachmentCategoryId == BannerAttachmentCategoryId).FirstOrDefault().AttachmentFk.Attachment,
+                                                LogoURL = imagesUrl + (o.TenantId == null ? "-1" : o.TenantId.ToString()) + @"/" + o.EntityFk.EntityAttachments.Where(e => e.AttachmentCategoryId == LogoAttachmentCategoryId).FirstOrDefault().AttachmentFk.Attachment,
+                                                Address1 = o.EntityFk.EntityAddresses.FirstOrDefault().AddressFk.AddressLine1,
+                                                Address2 = o.EntityFk.EntityAddresses.FirstOrDefault().AddressFk.AddressLine2,
+                                                City = o.EntityFk.EntityAddresses.FirstOrDefault().AddressFk.City,
+                                                State = o.EntityFk.EntityAddresses.FirstOrDefault().AddressFk.State,
+                                                Postal = o.EntityFk.EntityAddresses.FirstOrDefault().AddressFk.PostalCode,
+                                                Country = o.EntityFk.EntityAddresses.FirstOrDefault().AddressFk.CountryFk.Name,
+                                                GuestsCount = o.AppEventGuests.Where(r => r.UserResponce == (int)ResponceType.GOING).Count(),
+                                                FromDate = o.FromDate,
+                                                ToDate = o.ToDate,
+                                                FromTime = o.FromTime,
+                                                ToTime = o.ToTime,
+                                                UTCFromDateTime = o.UTCFromDateTime,
+                                                UTCToDateTime = o.UTCToDateTime,
+                                                GuestCanInviteFriends = o.GuestCanInviteFriends,
+                                                Name = o.Name,
+                                                Code = o.Code,
+                                                Description = o.Description,
+                                                TimeZone = o.TimeZone,
+                                                RegistrationLink = o.RegistrationLink,
+                                                Id = o.Id,
+                                                Address = o.EntityFk.EntityAddresses.Count > 0 ? ObjectMapper.Map<AppEntityAddressDto>(o.EntityFk.EntityAddresses.FirstOrDefault()) : null,
+                                            }
+                                       // }
+                                    };
+                }
+                //X527
+                if (input.NoOfEventsToReturn != null && input.NoOfEventsToReturn!=0)
+                {
+                    filteredAppEvents = filteredAppEvents.Take(int.Parse(input.NoOfEventsToReturn.ToString()));
+                }
+                //X527
                 var totalCount = await filteredAppEvents.CountAsync();
 
-                var results = await appEvents.Select(r => r.res).ToListAsync();
-
+                //var results = await appEvents.Select(r => r.res).ToListAsync();
+                var results = await appEvents.ToListAsync();
                 return new PagedResultDto<GetAppEventForViewDto>(
                     totalCount,
                     results
@@ -178,7 +271,7 @@ namespace onetouch.AppEvents
             }
             return appEventDto;
         }
-
+         [AbpAllowAnonymous]
         public async Task<GetAppEventForViewDto> GetAppEventForView(long id,long entityId, string timeZone)
         {
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
@@ -193,11 +286,11 @@ namespace onetouch.AppEvents
                 }
                 if (appEvent != null && appEvent.AppEvent != null && appEvent.AppEvent.UTCFromDateTime != null)
                 {
-                    appEvent.currentFromDateTime = _helper.GetDatetimeValueFromUTC(appEvent.AppEvent.UTCFromDateTime, timeZone);
+                    appEvent.currentFromDateTime = appEvent.AppEvent.UTCFromDateTime;
                 }
                 if (appEvent != null && appEvent.AppEvent != null && appEvent.AppEvent.UTCToDateTime != null)
                 {
-                    appEvent.currentToDateTime = _helper.GetDatetimeValueFromUTC(appEvent.AppEvent.UTCToDateTime, timeZone);
+                    appEvent.currentToDateTime = appEvent.AppEvent.UTCToDateTime;
                 }
 
                 return appEvent;
@@ -219,19 +312,19 @@ namespace onetouch.AppEvents
         [AbpAuthorize(AppPermissions.Pages_AppEvents_Create)]
         protected virtual async Task<long> DoCreateOrEdit(CreateOrEditAppEventDto input)
         {
+            Logger.Info($"EventsAppService DoCreateOrEdit Input: Id={input.Id}, EntityId={input.EntityId}, Code={input.Code}, Name={input.Name}, FromTime={input.FromTime}, ToTime={input.ToTime}");
             AppEvent appEvent;
 
-            if (input.FromHour > 0 && input.FromMinute > 0)
-            { //input.FromDate = new DateTime(input.FromDate.Year, input.FromDate.Month, input.FromDate.Day, input.FromHour, input.FromMinute,0);
-                input.FromTime = new DateTime(input.FromTime.Year, input.FromTime.Month, input.FromTime.Day, input.FromHour, input.FromMinute, 0);
-            
+            if (input.FromHour > 0 || input.FromMinute > 0)
+            { 
+                input.FromTime = new DateTime(input.FromTime.Year, input.FromTime.Month, input.FromTime.Day, input.FromHour, input.FromMinute, 0, DateTimeKind.Unspecified);
             }
 
-            if (input.ToHour > 0 && input.ToMinute > 0)
-            { //input.ToDate = new DateTime(input.ToDate.Year, input.ToDate.Month, input.ToDate.Day, input.ToHour, input.ToMinute, 0);
-                input.ToTime = new DateTime(input.ToTime.Year, input.ToTime.Month, input.ToTime.Day, input.ToHour, input.ToMinute, 0);
+            if (input.ToHour > 0 || input.ToMinute > 0)
+            { 
+                input.ToTime = new DateTime(input.ToTime.Year, input.ToTime.Month, input.ToTime.Day, input.ToHour, input.ToMinute, 0, DateTimeKind.Unspecified);
             }
-
+            Logger.Info($"EventsAppService DoCreateOrEdit Converted Times after calculation: UTCFromDateTime={input.FromTime}, UTCToDateTime={input.ToTime}");
             if (input.Id == 0)
             {
 
@@ -297,9 +390,22 @@ namespace onetouch.AppEvents
             #endregion save entity
 
 
-            appEvent.UTCFromDateTime = _helper.GetUTCDatetimeValueFromDateAndTime(appEvent.FromDate, appEvent.FromTime, appEvent.TimeZone);
-            appEvent.UTCToDateTime = _helper.GetUTCDatetimeValueFromDateAndTime(appEvent.ToDate, appEvent.ToTime, appEvent.TimeZone);
+            //appEvent.UTCFromDateTime = _helper.GetUTCDatetimeValueFromDateAndTime(appEvent.FromDate, appEvent.FromTime, appEvent.TimeZone);
+            //appEvent.UTCToDateTime = _helper.GetUTCDatetimeValueFromDateAndTime(appEvent.ToDate, appEvent.ToTime, appEvent.TimeZone);
+            Logger.Info($"EventsAppService DoCreateOrEdit Converted Times: UTCFromDateTime={appEvent.UTCFromDateTime}, UTCToDateTime={appEvent.UTCToDateTime}");
+            appEvent.UTCFromDateTime = DateTime.SpecifyKind(input.FromTime, DateTimeKind.Unspecified);
+            appEvent.UTCToDateTime = DateTime.SpecifyKind(input.ToTime, DateTimeKind.Unspecified);
             
+            appEvent.FromTime = DateTime.SpecifyKind(input.FromTime, DateTimeKind.Unspecified);
+            appEvent.ToTime = DateTime.SpecifyKind(input.ToTime, DateTimeKind.Unspecified);
+
+            appEvent.FromDate = DateTime.SpecifyKind(input.FromDate, DateTimeKind.Unspecified);
+            appEvent.ToDate = DateTime.SpecifyKind(input.ToDate, DateTimeKind.Unspecified);
+
+            Logger.Info($"EventsAppService DoCreateOrEdit Converted Times: UTCFromDateTime={appEvent.UTCFromDateTime}, UTCToDateTime={appEvent.UTCToDateTime}");
+
+
+
             if (input.Id == 0)
             { await _appEventRepository.InsertAsync(appEvent); }
             else { await _appEventRepository.UpdateAsync(appEvent); }

@@ -1,0 +1,56 @@
+<div class="section-content position-relative">
+
+  <!-- Loader -->
+  <div
+    *ngIf="loading"
+    class="section-loading d-flex justify-content-center align-items-center">
+
+    <div class="spinner-border purple-spinner" role="status">
+      <span class="sr-only">
+        {{ 'Loading' | localize }}
+      </span>
+    </div>
+
+  </div>
+<p-carousel
+    *ngIf="!loading && blocksSorted.length > 0"
+    [value]="blocksSorted"
+    [numVisible]="1"
+    [numScroll]="1"
+    [circular]="false"
+    [autoplayInterval]="interval"
+    [showIndicators]="false"
+    styleClass="landing-slider"
+>
+    <ng-template pTemplate="item" let-slide>
+
+        <div class="slide-item">
+
+            <div class="slide-content position-relative">
+
+                <a
+                    *ngIf="slide?.buttonText"
+                    class="txtBtn text-white"
+                    (click)="onSlideClick(slide, $event)"
+                >
+                    {{ slide?.buttonText }}
+                </a>
+
+                <div
+                    class="slide-image cursor-pointer"
+                    (click)="onSlideClick(slide, $event)"
+                >
+                    <app-image-display
+                        [image]="getSlideImage(slide)"
+                        [sycAttachmentCategory]="sycAttachmentCategoryAutoSlider"
+                    >
+                    </app-image-display>
+                </div>
+
+            </div>
+
+        </div>
+
+    </ng-template>
+</p-carousel>
+

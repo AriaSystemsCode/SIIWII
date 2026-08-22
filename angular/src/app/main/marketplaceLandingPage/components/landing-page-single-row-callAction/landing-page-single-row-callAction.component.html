@@ -1,0 +1,112 @@
+<div class="section-content position-relative">
+
+  <!-- Loader -->
+  <div
+    *ngIf="loading"
+    class="section-loading d-flex justify-content-center align-items-center">
+
+    <div class="spinner-border purple-spinner" role="status">
+      <span class="sr-only">
+        {{ 'Loading' | localize }}
+      </span>
+    </div>
+
+  </div>
+<p-carousel *ngIf="!loading && blocksSorted.length > 0"
+  [value]="blocksSorted"
+  [numVisible]="blockTypeIsSingleOrMixed != 'Single Type Blocks' ? numVisible : numVisibleSingle"
+  [numScroll]="1"
+  [circular]="false"
+  [showIndicators]="false"
+  [showNavigators]="blocksSorted?.length > (blockTypeIsSingleOrMixed != 'Single Type Blocks' ? numVisible : numVisibleSingle)"
+  [responsiveOptions]="blockTypeIsSingleOrMixed != 'Single Type Blocks' ? responsiveOptions : responsiveOptionsSingle"
+  [ngClass]="{
+    'few-items-carousel': blocksSorted?.length < (blockTypeIsSingleOrMixed != 'Single Type Blocks' ? numVisible : numVisibleSingle)
+  }"
+  class="p-4 m-2 rounded">
+  <ng-template pTemplate="item" let-item>
+
+    <div class="carousel-card" [ngClass]="blockTypeIsSingleOrMixed !='Single Type Blocks' ? 'carousel-card-mixed' : ''">
+        <div class="block-type-badge one-style-badge" [ngClass]="isArabic ? 'arPos':'enPos'" >
+    <i [ngClass]="getBlockTypeIcon(item)"  [pTooltip]="getBlockTypeLabel(item) | localize" tooltipPosition="bottom"   [tooltipEvent]="isSmallScreen ? 'focus' : 'hover'" [autoHide]="true" [showDelay]="100" [hideDelay]="100"
+                [tabindex]="isSmallScreen ? 0 : null"></i>
+    <!-- <span>{{ getBlockTypeLabel(item) }}</span> -->
+  </div>
+      <div class="carousel-card-body" [ngClass]="blockTypeIsSingleOrMixed !='Single Type Blocks' ? '' : 'maxW'"
+        [ngSwitch]="item?.blockType?.toUpperCase()">
+
+        <!-- PRODUCT -->
+        <div *ngSwitchCase="'PRODUCT'">
+          <app-marketplace-product-card *ngIf="blockTypeIsSingleOrMixed =='Mixed Types Blocks'" [item]="item"
+            [attachmentBaseUrl]="attachmentBaseUrl" [languageSettingName]="languageSettingName"
+            (view)="viewProduct($event)" (imgError)="onImgErr($event)"></app-marketplace-product-card>
+
+          <app-prodcut-card *ngIf="blockTypeIsSingleOrMixed !='Mixed Types Blocks' || blockTypeIsSingleOrMixed ==null "
+            [product]="item.getAppMarketItemForViewDto.appItem" [productCard]="item.getAppMarketItemForViewDto"
+            [acceptedAspectRatio]="acceptedAspectRatio"></app-prodcut-card>
+        </div>
+
+        <!-- BRAND -->
+
+        <img *ngSwitchCase="'BRAND'" class="card-media" [src]="item?.image ?  attachmentBaseUrl + '/' + item?.image: attachmentBaseUrl + '/' + item?.getAppEntityForViewDto?.appEntity?.entityAttachments[0]?.url 
+           " title="Brand {{item?.getSycEntityObjectCategoryForViewDto?.sycEntityObjectCategory?.name}}" alt="Brand" (click)="goToBrand(item)"
+          (error)="onImgErr($event)" />
+
+
+        <!-- CATEGORY -->
+        <img *ngSwitchCase="'CATEGORY'" class="card-media" [src]="item?.image
+            ? attachmentBaseUrl + '/' + item?.image
+            : '../../../../assets/placeholders/_logo-placeholder.png'" alt="category" (click)="goToCategory(item?.getSycEntityObjectCategoryForViewDto?.sycEntityObjectCategory?.id)"
+          (error)="onImgErr($event)" />
+        <!-- ATTACHMENT -->
+        <ng-container *ngSwitchCase="'ATTACHMENT'">
+          <!-- Prefer an image attachment if available -->
+          <img *ngIf="getAttachmentImage(item) as imgSrc" class="card-media" [src]="imgSrc"
+            [alt]="item?.name || 'Attachment'" (click)="onAttachmentClick(item)" (error)="onImgErr($event)" />
+
+          <!-- If no image but there is a PDF, show PDF icon -->
+          <img *ngIf="!getAttachmentImage(item) && hasPdfAttachment(item)" class="card-media pdf-icon"
+            src="assets/Items/pdf-Icon.png" alt="PDF" (click)="onAttachmentClick(item)" />
+
+          <!-- Fallback: generic link if neither image nor pdf is detected -->
+          <a *ngIf="!getAttachmentImage(item) && !hasPdfAttachment(item)" class="card-media other-file"
+            [href]="getAttachmentClickUrl(item)" target="_blank" rel="noopener">
+            Open file
+          </a>
+        </ng-container>
+
+
+        <!-- EVENT -->
+        <div *ngSwitchCase="'EVENT'">
+     
+          <app-marketplace-event-card *ngIf="blockTypeIsSingleOrMixed =='Mixed Types Blocks'"
+            [block]="item?.getAppEventForViewDto?.appEvent" (details)="openEventDetails($event)"></app-marketplace-event-card>
+          <app-events-browse-card *ngIf="blockTypeIsSingleOrMixed !='Mixed Types Blocks' || blockTypeIsSingleOrMixed ==null"
+            [item]="item?.getAppEventForViewDto" [singleItemPerRowMode]="false" [fromMarketPlaceProfile]="false"
+            [fromOverviewMarketPlaceProfile]="false"  [FromLandingPage]="true"  [actionsMenuFlags]="actionsMenuFlags" [fromLandingPage]="true"
+                        [statusesFlags]="statusesFlags"
+        ></app-events-browse-card>
+  
+        </div>
+
+        <!-- ACCOUNT -->
+        <div *ngSwitchCase="'CONTACT'">
+          <app-marketplace-account-card *ngIf="blockTypeIsSingleOrMixed =='Mixed Types Blocks' "
+            [account]="item?.getAccountForViewDto" [compact]="true"
+            [showConnectButton]="true" [loginTenaneSsin]="loginTenaneSsin"></app-marketplace-account-card>
+
+          <app-account-card *ngIf="blockTypeIsSingleOrMixed !='Mixed Types Blocks' || blockTypeIsSingleOrMixed ==null"
+            [account]="item?.getAccountForViewDto" [FromLandingPage]="true" [fromMarketplace]="true" [cardsViewMode]="true" (disconnectMe)="
+                                                    disconnect(item?.getAccountForViewDto)" 
+                                                (_createRelation)="createRelation(item?.getAccountForViewDto,$event)"></app-account-card>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+</p-carousel>
+
+
+  <app-view-event [hideViewEv]="false"
+  #viewEventModal
+
+></app-view-event>

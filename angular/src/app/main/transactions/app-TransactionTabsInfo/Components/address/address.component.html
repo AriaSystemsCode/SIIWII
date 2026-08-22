@@ -1,4 +1,4 @@
-<div class="selected-addr-comp mb-3" style="padding: 0 20px;" *ngIf="isCreateOredit">
+<div class="selected-addr-comp mb-3 py-0 px-3" *ngIf="isCreateOredit">
     <div class="selected-add-edit row">
         <div class="col-md-12 mb-3" *ngIf="showAddressType">
             <label class="label mt-2 mb-2">{{l("AddressType")}}</label>
@@ -13,9 +13,9 @@
         </div>
         <div class="col-md-12 mb-3">
             <label class="label mt-2 mb-2 mr-4">{{l("Address")}}</label>
-            <textarea class="form-control   d-inline-block ml-md-4 textAr" style="min-height: 80px;"
-                readonly>{{selectedAddress?.addressLine1 ? selectedAddress?.addressLine1+' ,' : ''}}{{selectedAddress?.addressLine2 ? selectedAddress?.addressLine2+' ,' : ''}}{{ selectedAddress?.city ? selectedAddress?.city+' ,' : ''}}{{selectedAddress?.state ? selectedAddress?.state+' ,' : ''}}{{ selectedAddress?.countryName ? selectedAddress?.countryName : selectedAddress?.countryCode ? selectedAddress?.countryCode  +' ,' : ''}}{{selectedAddress?.postalCode ? selectedAddress?.postalCode : ''}}</textarea>
-            <div class="pull-right">
+            <textarea class="form-control d-inline-block ml-md-4 textAr" readonly [value]="selectedAddressText">
+</textarea>
+            <div [ngClass]="isArabic? 'pull-left': 'pull-right'">
                 <button *ngIf="canChange" class="savebtn text-center btn float-right mt-2" (click)="showAddressList()">
                     {{l("Change")}}
                     <i class="fas fa-edit ml-1 mr-1"></i>
@@ -34,7 +34,7 @@
             <label class="label mt-2 mb-2 selected-add ml-4" *ngIf="!selectedAddressDetails">-</label>
         </div>
         <div class="col-md-12">
-            <label class="label mt-2 mb-2 mr-4" style="margin-left: 10px;">{{l("Address")}} :</label>
+            <label class="label mt-2 mb-2 mr-4">{{l("Address")}} :</label>
             <label class="label mt-2 mb-2 selected-add ml-4" *ngIf="selectedAddressDetails">
                 {{selectedAddressDetails?.addressLine1+' ,'}}{{selectedAddressDetails?.addressLine2+'
                 ,'}}{{selectedAddressDetails?.city+' ,'}}{{selectedAddressDetails?.state+'
@@ -56,8 +56,8 @@
         <hr>
         <div class="filter-add-comp col-12 mb-1 d-flex">
             <div class="w-100">
-                <input class="filter-adress-list form-control w-100" placeholder="Lookin in addresses .." #filterVal
-                    (keyup)="filterAddressList(filterVal.value)" type="text" />
+                <input class="filter-adress-list form-control w-100" [placeholder]="'LookinInAddresses' | localize"
+                    #filterVal (keyup)="filterAddressList(filterVal.value)" type="text" />
                 <i class="fa fa-search search-input-icon" aria-hidden="true"></i>
             </div>
             <div class="d-flex justify-content-end" *ngIf="showAddBtn && showEditDelBtn && fromSalesRep">
@@ -67,41 +67,24 @@
             </div>
         </div>
         <ul class="address-warper-cont">
-            <li *ngFor="let address of savedAddressesList" class="address-warper mt-3 mb-3 pt-1 pb-1">
+            <li *ngFor="let address of savedAddressesList; let i = index" class="address-warper mt-3 mb-3 pt-1 pb-1">
                 <div class="d-flex align-items-center">
-                    <input *ngIf="selectedAddress" class="form-control" type="radio"
-                        (change)="selectAddress(address.id)" [checked]="address.id==selectedAddress.id"
-                        name="selectedAdd" [id]="address.id" />
-                    <input *ngIf="!selectedAddress" class="form-control" type="radio"
-                        (change)="selectAddress(address.id)" name="selectedAdd" [id]="address.id" />
-                    <label> {{ address?.addressLine1 ? address?.addressLine1+' ,' : ''}}{{ address?.addressLine2 ?
-                        address?.addressLine2+' ,' : ''}}{{address?.city ? address?.city+' ,' : ''}}{{ address?.state ?
-                        address?.state+' ,' : ''}}{{ address?.countryName ? address?.countryName +',' :
-                        address?.countryCode ? address?.countryCode +' ,' : ''}}{{address?.postalCode ?
-                        address?.postalCode : ''}}</label>
-                </div>
-                <div class="p mt-2 d-flex" *ngIf="showAddBtn && showEditDelBtn && fromSalesRep">
-                    <button (click)="editAddress(address.id)" class="acBtn">
-                        <img class="mx-1" style="height: 20px;" src="../../../../../assets/icons/edit-icon.png">
+                    <input class="form-control" type="radio" (change)="selectAddressByIndex(i)"
+                        [checked]="selectedAddressIndex === i" name="selectedAdd" [id]="'selectedAdd_' + i" />
 
-
-
-
-                        <p>{{l("Edit")}}</p>
-                    </button>
-                    <button
-                        (click)="(appTransactionsForViewDto?.buyerCompanySSIN == '' || appTransactionsForViewDto?.buyerCompanySSIN == null) && ((currentTab == 4 && shipInfoIndex == 2) ||  (currentTab == 5 && billingIndexInfo == 1))  ? deleteTempAddress(address.id):  deleteAddress(address.id)"
-                        class="acBtn">
-                        <img class="mx-1" style="height: 20px;" src="../../../../../assets/icons/fluent_delete.png">
-
-
-                        <p class="delText">{{l("Delete")}}</p>
-                    </button>
-
+                    <label>
+                        {{ address?.addressLine1 ? address?.addressLine1+' ,' : ''}}
+                        {{ address?.addressLine2 ? address?.addressLine2+' ,' : ''}}
+                        {{ address?.city ? address?.city+' ,' : ''}}
+                        {{ address?.state ? address?.state+' ,' : ''}}
+                        {{ address?.countryName ? address?.countryName +',' : address?.countryCode ?
+                        address?.countryCode +' ,' : ''}}
+                        {{ address?.postalCode ? address?.postalCode : ''}}
+                    </label>
                 </div>
             </li>
         </ul>
-        <label class="noAddressMsg" *ngIf="savedAddressesList.length==0"> No Addresses found</label>
+        <label class="noAddressMsg" *ngIf="savedAddressesList.length==0">{{'NoAddressesFound' | localize}}</label>
 
     </div>
 </div>
@@ -120,42 +103,44 @@
             <div class="row">
                 <div class="col-12">
                     <label class="label mt-2 mb-2">{{l("Code")}} *</label>
-                    <input type="text" placeholder="Adress Code..." class="form-control w-100" name="addressCode"
-                        [(ngModel)]="addressCode" #Code="ngModel" required maxlength="6" minlength="1" />
+                    <input type="text" [placeholder]="('Code' | localize) + '...'" class="form-control w-100"
+                        name="addressCode" [(ngModel)]="addressCode" #Code="ngModel" required maxlength="6"
+                        minlength="1" />
 
                 </div>
                 <div class="col-12">
                     <label class="label mt-2 mb-2">{{l("Name")}} *</label>
-                    <input type="text" placeholder="Adress Name..." class="form-control w-100" name="name"
+                    <input type="text" [placeholder]=" 'AddressName' | localize" class="form-control w-100" name="name"
                         [(ngModel)]="name" #Name="ngModel" required />
 
                 </div>
                 <div class="col-12">
                     <label class="label mt-2 mb-2">{{l("AddressLineOne")}} *</label>
-                    <input type="text" placeholder="Adress Line 1..." class="form-control w-100" name="address1"
+                    <input type="text" [placeholder]="'Address1' | localize" class="form-control w-100" name="address1"
                         [(ngModel)]="address1" #addressOne="ngModel" required />
                 </div>
                 <div class="col-12">
                     <label class="label mt-2 mb-2">{{l("AddressLineTow")}}</label>
-                    <input type="text" placeholder="Adress Line 2..." class="form-control w-100" name="address2"
+                    <input type="text" [placeholder]="'Address2' | localize" class="form-control w-100" name="address2"
                         [(ngModel)]="address2" #addressTwo="ngModel" />
                 </div>
                 <div class="col-12">
                     <label class="label mt-2 mb-2">{{l("City")}} *</label>
-                    <input type="text" placeholder="City..." class="form-control w-100" name="cityAddress"
-                        [(ngModel)]="city" #cityAddress="ngModel" required/>
+                    <input type="text" [placeholder]="('City' | localize) + '...'" class="form-control w-100"
+                        name="cityAddress" [(ngModel)]="city" #cityAddress="ngModel" required />
                 </div>
                 <div class="col-12">
                     <label class="label mt-2 mb-2">{{l("State")}} *</label>
-                    <input type="text" placeholder="State..." class="form-control w-100" name="State"
-                        [(ngModel)]="state" #AddState="ngModel" required />
+                    <input type="text" [placeholder]="('State' | localize) + '...'" class="form-control w-100"
+                        name="State" [(ngModel)]="state" #AddState="ngModel" required />
 
 
                 </div>
                 <div class="col-md-6">
                     <label class="label mt-2 mb-2">{{l("PostalCode")}} * </label>
-                    <input type="text" placeholder="Postal Code 1..." class="form-control w-100" name="postalCode"
-                        [(ngModel)]="postalCode" #postal_Code="ngModel" required pattern="^[a-zA-Z0-9- ]+$" maxlength="20" />
+                    <input type="text" [placeholder]="('PostalCode' | localize) + '...'" class="form-control w-100"
+                        name="postalCode" [(ngModel)]="postalCode" #postal_Code="ngModel" required
+                        pattern="^[a-zA-Z0-9- ]+$" maxlength="20" />
                 </div>
                 <div class="col-md-6" *ngIf="countries.length>0">
                     <label class="label mt-2 mb-2">{{l("Country")}} </label>

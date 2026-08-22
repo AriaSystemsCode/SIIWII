@@ -5,6 +5,7 @@ import { accountModuleAnimation } from "@shared/animations/routerTransition";
 import { AppComponentBase } from "@shared/common/app-component-base";
 import {
     AccountServiceProxy,
+    AppEntitiesServiceProxy,
     IsTenantAvailableInput,
     IsTenantAvailableOutput,
     SessionServiceProxy,
@@ -27,6 +28,11 @@ export class LoginComponent extends AppComponentBase implements OnInit {
     isMultiTenancyEnabled: boolean = this.multiTenancy.isEnabled;
     recaptchaSiteKey: string = AppConsts.recaptchaSiteKey;
     oldUserName:string;
+    currentLang:string
+    isArabic:boolean 
+    
+
+    isHost:boolean
     constructor(
         injector: Injector,
         public loginService: LoginService,
@@ -35,7 +41,8 @@ export class LoginComponent extends AppComponentBase implements OnInit {
         private _sessionAppService: SessionServiceProxy,
         private _reCaptchaV3Service: ReCaptchaV3Service,
         private _tenantAppService: TenantServiceProxy,
-        private _accountService: AccountServiceProxy
+        private _accountService: AccountServiceProxy,
+        private _appEntitiesServiceProxy: AppEntitiesServiceProxy
     ) {
         super(injector);
     }
@@ -61,7 +68,8 @@ export class LoginComponent extends AppComponentBase implements OnInit {
     }
 
     ngOnInit(): void {
-
+        this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
+        this.currentLang == 'ar' || this.currentLang == 'ar-EG'  ? this.isArabic = true : this.isArabic = false
         if (
             this._sessionService.userId > 0 &&
             UrlHelper.getReturnUrl() &&
@@ -70,7 +78,6 @@ export class LoginComponent extends AppComponentBase implements OnInit {
             this._sessionAppService
                 .updateUserSignInToken()
                 .subscribe((result: UpdateUserSignInTokenOutput) => {
-
                     const initialReturnUrl = UrlHelper.getReturnUrl();
                     const returnUrl =
                         initialReturnUrl +
@@ -93,22 +100,28 @@ export class LoginComponent extends AppComponentBase implements OnInit {
     }
 
     login(): void {
-        const recaptchaCallback = (token: string) => {
+
+        let recaptchaCallback = (token: string) => {
             this.showMainSpinner();
+
             this.submitting = true;
-    
-            setTimeout(() => {
-                this.loginService.authenticate(
-                    () => {
-                        this.submitting = false;
-                        this.hideMainSpinner();
-                    },
-                    null,
-                    token
-                );
-            }, 2000); // 2 seconds delay
+
+            // decide the default page BEFORE calling authenticate
+            this.chooseDefaultPage((redirectUrl: string) => {
+                // keep your 2s delay if you like the UX
+                setTimeout(() => {
+                    this.loginService.authenticate(
+                        () => {
+                            this.submitting = false;
+                            this.hideMainSpinner();
+                        },
+                        redirectUrl, 
+                        token
+                    );
+                }, 2000);
+            });
         };
-     
+
         if (this.useCaptcha) {
             this._reCaptchaV3Service.execute(
                 this.recaptchaSiteKey,
@@ -121,7 +134,6 @@ export class LoginComponent extends AppComponentBase implements OnInit {
             recaptchaCallback(null);
         }
     }
-    
 
     externalLogin(provider: ExternalLoginProvider) {
         this.loginService.externalAuthenticate(provider);
@@ -132,23 +144,19 @@ export class LoginComponent extends AppComponentBase implements OnInit {
     }
 
     getTenantIdbyUserName() {
-
         var username =
             this.loginService.authenticateModel.userNameOrEmailAddress;
-        if (username && username!=this.oldUserName) {
+        if (username && username != this.oldUserName) {
             this._tenantAppService
                 .getTenantIdByUserName(username)
                 .subscribe((result) => {
-
                     this.changeTenant(result?.tenancyName);
                 });
         }
-        this.oldUserName=username;
+        this.oldUserName = username;
     }
 
-    changeTenant(tenancyName){
-
-
+    changeTenant(tenancyName: string) {
         if (!tenancyName) {
             abp.multiTenancy.setTenantIdCookie(undefined);
             return;
@@ -166,9 +174,41 @@ export class LoginComponent extends AppComponentBase implements OnInit {
                     case TenantAvailabilityState.InActive:
                         this.message.warn(this.l('TenantIsNotActive', tenancyName));
                         break;
-                    case TenantAvailabilityState.NotFound: //NotFound
+                    case TenantAvailabilityState.NotFound:
                         this.message.warn(this.l('ThereIsNoTenantDefinedWithName{0}', tenancyName));
                 }
             });
     }
+
+ 
+    chooseDefaultPage(callback: (url: string) => void): void {
+      
+        const tenantIdCookie = abp.multiTenancy.getTenantIdCookie(); 
+        const isHost = tenantIdCookie === null || tenantIdCookie === undefined;
+      
+        if (isHost) {
+          callback('/app/admin/hostDashboard');
+          return; 
+        }
+   
+        this._appEntitiesServiceProxy.getHostSettingValue(1203, null).subscribe({
+          next: (res2) => {
+            const url = (res2 === 'Marketplace')
+              ? '/app/main/marketplace'
+              : '/app/main/Home';
+      
+            callback(url);
+          },
+          error: (err) => {
+            console.error('Failed to load host setting 1203', err);
+            callback('/app/main/Home'); 
+          }
+        });
+      }
+      
+         showPassword = false;
+    
+    togglePassword(): void {
+    this.showPassword = !this.showPassword;
+}
 }

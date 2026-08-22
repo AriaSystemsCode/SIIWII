@@ -54,7 +54,7 @@ export class CreateOrEditExtraDataComponent extends AppComponentBase implements 
 
   ngOnInit(): void {
     if (this.appTransactionsForViewDto) {
-      this.oldappTransactionsForViewDto = JSON.parse(JSON.stringify(this.appTransactionsForViewDto)); // ✅ add this
+      this.oldappTransactionsForViewDto = JSON.parse(JSON.stringify(this.appTransactionsForViewDto)); 
 
     }
     this.mapDataToForm();
@@ -133,7 +133,7 @@ export class CreateOrEditExtraDataComponent extends AppComponentBase implements 
       }
     });
 
-    // ✅ Step 2: No filter — keep all values
+    //  Step 2: No filter — keep all values
     const cleanIncomingData = incomingData;
 
     // Step 3: Remove old entries for incoming attributeIds

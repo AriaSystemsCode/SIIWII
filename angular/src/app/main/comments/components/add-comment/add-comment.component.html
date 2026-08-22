@@ -12,8 +12,8 @@
                 />
             </div>
             <div class="w-80 pt-1">
-                <div class="d-flex flex-column">
-                    <div>
+                <div class="d-flex ">
+                    <div class="w-100">
                         <div
                             class="w-100"
                             id="commentBody"
@@ -65,7 +65,7 @@
                                 [buttonBusy]="saving"
                                 [busyText]="l('SavingWithThreeDot')"
                                 class="btn btn-primary" style="background-color: #F88011 !important;
-                                border: #F88011 !important;">
+                                border: #F88011 !important;white-space: nowrap;">
                                     {{ "Send" | localize }}
                             </button>
                             </ng-container>

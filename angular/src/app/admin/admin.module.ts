@@ -185,12 +185,20 @@ import { WebhookEventDetailComponent } from "./webhook-subscription/webhook-even
 import { AppBsModalModule } from "@shared/common/appBsModal/app-bs-modal.module";
 import { CdkStepperModule } from "@angular/cdk/stepper";
 import { StepperComponent } from "./appAdvertisements/stepper/stepper.component";
-import { EmailingTemplateServiceProxy } from "@shared/service-proxies/service-proxies";
+import { AccountsServiceProxy, AppItemsServiceProxy, EmailingTemplateServiceProxy, MarketplaceAccountsServiceProxy } from "@shared/service-proxies/service-proxies";
 import { MenuModule } from "primeng/menu";
 import { DialogModule } from "primeng/dialog";
 import { CheckboxModule } from "primeng/checkbox";
+import { SharedDynamicInputsModule } from '@shared/shared-module';
+import { AccordionModule } from "primeng/accordion";
+import { PortalTenantSettingsComponent } from './settings/Portal-tenant-settings.component';
+import { PortalHostSettingsComponent } from './settings/Portal-host-settings.component';
+import { DynamicApiDispatcherService } from '@shared/dynamicApiDispatcherService ';
 
 
+import { TreeSelectModule } from 'primeng/treeselect';
+import { AriaIframeComponent } from './AriaOnSiwii/aria-frame.component';
+import { AriaEnUsSiwiiComponent } from './Aria-EN-US-Siwii/Aria-EN-US-Siwii.component';
 const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
     // suppressScrollX: true
 };
@@ -232,7 +240,8 @@ const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
         DropdownModule,
         ReactiveFormsModule,
         CheckboxModule,
-
+        SharedDynamicInputsModule,
+        AccordionModule
     ],
     declarations: [
 		ValidationRulesComponent,
@@ -323,6 +332,7 @@ const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
         AuditLogsComponent,
         AuditLogDetailModalComponent,
         HostSettingsComponent,
+        PortalHostSettingsComponent,
         InstallComponent,
         MaintenanceComponent,
         EditionsComponent,
@@ -344,6 +354,7 @@ const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
         OrganizationUnitRolesComponent,
         CreateOrEditUnitModalComponent,
         TenantSettingsComponent,
+        PortalTenantSettingsComponent,
         HostDashboardComponent,
         EditionComboComponent,
         InvoiceComponent,
@@ -375,10 +386,16 @@ const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
         WebhookSubscriptionDetailComponent,
         WebhookEventDetailComponent,
         StepperComponent,
+        AriaIframeComponent,
+        AriaEnUsSiwiiComponent
 
     ],
-    exports: [AddMemberModalComponent, AddRoleModalComponent],
+    exports: [AddMemberModalComponent, AddRoleModalComponent,CreateOrEditUserModalComponent],
     providers: [
+          DynamicApiDispatcherService,
+            AccountsServiceProxy,
+            AppItemsServiceProxy,
+            MarketplaceAccountsServiceProxy ,
         ImpersonationService,
         TreeDragDropService,
         {

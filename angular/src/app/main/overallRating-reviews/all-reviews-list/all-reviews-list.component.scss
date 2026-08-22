@@ -13,6 +13,15 @@
     height: 32px;
   }
   
+  .fill-s-ar {
+  
+    position: absolute !important;
+    right: 0;
+    overflow: hidden !important;
+    color: #F6851D;
+    height: 32px;
+  }
+  
   
   
   .star {
@@ -71,14 +80,7 @@
     line-height: 1;
   }
   
-  .stars-inner {
-    position: absolute;
-    top: 0;
-    left: 0;
-    white-space: nowrap;
-    color: #F6851D;
-    overflow: hidden;
-  }
+
   
   .rating-value {
     font-size: 1rem;
@@ -453,6 +455,8 @@
     padding: 10px;
     z-index: 1000;
   }
+
+  
   
   .emoji-grid {
     display: grid;
@@ -515,4 +519,12 @@
   .expand-toggle {
     color: #4A0D4A !important;
     font-weight: 600;
+  }
+
+  .starsAr {
+    position: absolute; left: 10px;top: 10px;
+  }
+
+  .starsEn {
+    position: absolute; right: 10px;top: 10px;
   }

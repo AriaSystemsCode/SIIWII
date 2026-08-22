@@ -27,7 +27,7 @@ export class SelectClassificationDynamicModalComponent extends AppComponentBase 
     active: boolean = false;
     loading: boolean;
     entityObjectName: string = "Product"
-    entityObjectDisplayName: string = "Product Classifications"
+    entityObjectDisplayName: string = "ProductClassifications"
     isHiddenToCreateOrEdit: boolean = false
     maxResultCount: number = 10
     skipCount: number = 0
@@ -40,6 +40,8 @@ export class SelectClassificationDynamicModalComponent extends AppComponentBase 
     searchQuery: string
     searchSubj: Subject<string> = new Subject<string>()
 
+    currentLang: string
+    isArabic: boolean
     constructor(
         injector: Injector,
         public currentModalRef: BsModalRef,
@@ -50,6 +52,8 @@ export class SelectClassificationDynamicModalComponent extends AppComponentBase 
     }
 
     ngOnInit(): void {
+        this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
+        this.currentLang == 'ar' || this.currentLang == 'ar-EG'  ? this.isArabic = true : this.isArabic = false
         this.getClassificationsList()
         this.searchSubj
             .pipe(
@@ -75,10 +79,10 @@ export class SelectClassificationDynamicModalComponent extends AppComponentBase 
         config.initialState = {
             title: "Edit Classification",
         };
-        config.class = "right-modal slide-right-in";
+        this.isArabic ?  config.class = "left-modal slide-left-in ngLeft" :  config.class = "right-modal slide-right-in";
         config.backdrop = true;
         config.ignoreBackdropClick = true;
-        this.currentModalRef.setClass("right-modal slide-right-out");
+        this.isArabic ?  this.currentModalRef.setClass("left-modal slide-left-out") :  this.currentModalRef.setClass("right-modal slide-right-out");
 
         let initialModalData: Partial<CreateOrEditClassificationDynamicModalComponent> =
             {};
@@ -111,7 +115,7 @@ export class SelectClassificationDynamicModalComponent extends AppComponentBase 
     }
 
     onCreateOrEditDoneHandler() {
-        this.currentModalRef.setClass('right-modal slide-right-in')
+       this.isArabic ? this.currentModalRef.setClass('left-modal slide-left-in ngLeft') :  this.currentModalRef.setClass('right-modal slide-right-in')
         let data = this.createOrEditModalRef.content
         setTimeout(() => {
             this.isHiddenToCreateOrEdit = false
@@ -135,7 +139,7 @@ export class SelectClassificationDynamicModalComponent extends AppComponentBase 
         }
     }
     close() {
-        this.currentModalRef.setClass('right-modal slide-right-out')
+        this.isArabic ?  this.currentModalRef.setClass('left-modal slide-left-out') :  this.currentModalRef.setClass('right-modal slide-right-out')
         this.selectionDone = false
         this.currentModalRef.hide()
     }
@@ -217,7 +221,21 @@ export class SelectClassificationDynamicModalComponent extends AppComponentBase 
 
                 let currentLoadedItemsAfterExludingSelections: TreeNodeOfGetSycEntityObjectClassificationForViewDto[] = []
                 this.totalCount = result.totalCount;
-                const isLastPage = this.skipCount + this.maxResultCount > this.totalCount
+                // number of items excluded from current page - savedIds
+                const excludedFromCurrentPage = this.savedIds?.length
+                    ? result.items.filter(i =>
+                        this.savedIds.includes(i.data.sycEntityObjectClassification.id)
+                    ).length
+                    : 0;
+
+                // total visible items after exclusion
+                const effectiveTotal = this.totalCount - excludedFromCurrentPage;
+
+                // correct last page check based on visible items
+                // const isLastPage = this.skipCount + this.maxResultCount > this.totalCount
+                const isLastPage =
+                    this.skipCount + this.maxResultCount >= effectiveTotal;
+
 
                 //check selection of the newly added elements
                 if (this.savedIds?.length) {
@@ -232,9 +250,9 @@ export class SelectClassificationDynamicModalComponent extends AppComponentBase 
                 }
 
                 this.lastSelectedRecords = this.selectedRecords
-                if (isFirstPage && !this.searchQuery) {
+          /*       if (isFirstPage && !this.searchQuery) {
                     this.selectedRecords = []
-                }
+                } */
                 currentLoadedItemsAfterExludingSelections.map((record) => {
 
                     const cachedItem: TreeNodeOfGetSycEntityObjectClassificationForViewDto = this.loadedChildrenRecords.filter((selectedRecord: TreeNodeOfGetSycEntityObjectClassificationForViewDto) => {

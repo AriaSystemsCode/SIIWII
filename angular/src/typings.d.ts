@@ -29,3 +29,4 @@ declare namespace abp {
  */
 
 declare module 'rtl-detect';
+declare module 'pdfjs-dist/legacy/build/pdf';

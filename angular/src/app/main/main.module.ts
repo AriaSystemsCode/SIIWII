@@ -40,9 +40,7 @@ import { DropdownModule } from "primeng/dropdown";
 import { Ng2TelInputModule } from "ng2-tel-input";
 import { NgImageSliderModule } from "ng-image-slider";
 import { TreeviewModule } from "ngx-treeview";
-import { eventsModule } from "./AppEvent/events.module";;
-import { SycLandingPageSettingsModule} from './SycLandingPageSettings/SycLandingPageSettings.module'
-;
+import { eventsModule } from "./AppEvent/events.module";
 import { AppSubscriptionPlanHeadersComponent } from "./appSubScriptionPlan/appSubscriptionPlanHeaders/appSubscriptionPlanHeaders.component";
 import { ViewAppSubscriptionPlanHeaderModalComponent } from "./appSubScriptionPlan/appSubscriptionPlanHeaders/view-appSubscriptionPlanHeader-modal.component";
 import { CreateOrEditAppSubscriptionPlanHeaderModalComponent } from "./appSubScriptionPlan/appSubscriptionPlanHeaders/create-or-edit-appSubscriptionPlanHeader-modal.component";
@@ -58,6 +56,7 @@ import { CreateOrEditAppTenantSubscriptionPlanComponent } from '@app/admin/appSu
 import { ViewAppTenantSubscriptionPlanComponent } from '@app/admin/appSubScriptionPlan/appTenantSubscriptionPlans/view-appTenantSubscriptionPlan.component';
 import { AppTenantActivitiesLogComponent } from "@app/admin/appSubScriptionPlan/appTenantActivitiesLog/appTenantActivitiesLog.component";
 import { AppSubscriptionPlanDetailAppFeatureLookupTableModalComponent } from "@app/admin/appSubScriptionPlan/appSubscriptionPlanDetails/appSubscriptionPlanDetail-appFeature-lookup-table-modal.component";
+import { LandingPageModule } from "./marketplaceLandingPage/landingPage.module";
 
 NgxBootstrapDatePickerConfigService.registerNgxBootstrapDatePickerLocales();
 
@@ -95,7 +94,7 @@ NgxBootstrapDatePickerConfigService.registerNgxBootstrapDatePickerLocales();
         BsDatepickerModule.forRoot(),
         BsDropdownModule.forRoot(),
         PopoverModule.forRoot(),
-        SycLandingPageSettingsModule,
+        LandingPageModule,
     ],
     declarations: [
         SycEntityObjectTypeSycIdentifierDefinitionLookupTableModalComponent,

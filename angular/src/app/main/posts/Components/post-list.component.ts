@@ -1,5 +1,4 @@
-import { formatDate } from "@angular/common";
-import { Injector, OnDestroy } from "@angular/core";
+import { Injector, Input, OnChanges, OnDestroy, SimpleChanges } from "@angular/core";
 import { ViewChild } from "@angular/core";
 import { Component, OnInit, AfterViewInit } from "@angular/core";
 import { FileUploaderCustom } from "@shared/components/import-steps/models/FileUploaderCustom.model";
@@ -9,13 +8,12 @@ import { ProgressComponent } from "@app/shared/common/progress/progress.componen
 import { AppConsts } from "@shared/AppConsts";
 import { AppComponentBase } from "@shared/common/app-component-base";
 import {
+    AccountDto,
     AppEntitiesServiceProxy,
     AppEntityAttachmentDto,
-    AppEventDto,
     AppPostDto,
     AppPostsServiceProxy,
     AttachmentsCategories,
-    CreateOrEditAppEventDto,
     CreateOrEditAppPostDto,
     GetAppPostForViewDto,
     PostType,
@@ -37,22 +35,18 @@ import { ViewPostComponent } from "./view-post.component";
 })
 export class PostListComponent
     extends AppComponentBase
-    implements OnInit, AfterViewInit, OnDestroy
+    implements OnInit, AfterViewInit, OnChanges,OnDestroy
 {
-    @ViewChild("createOrEditModal", { static: true })
-    createOrEditModal: CreateorEditPostComponent;
-    @ViewChild("createPostEntry", { static: true })
-    createPostEntry: CreatePostEntryComponent;
-    @ViewChild("viewPostModal", { static: true })
-    viewPostModal: ViewPostComponent;
-    @ViewChild("createOrEditEventModal", { static: true })
-    createOrEditEventModal: CreateOrEditEventComponent;
+    @ViewChild("createOrEditModal", { static: true }) createOrEditModal: CreateorEditPostComponent;
+    @ViewChild("createPostEntry", { static: true }) createPostEntry: CreatePostEntryComponent;
+    @ViewChild("viewPostModal", { static: true }) viewPostModal: ViewPostComponent;
+    @ViewChild("createOrEditEventModal", { static: true }) createOrEditEventModal: CreateOrEditEventComponent;
+    @ViewChild("viewEventModal", { static: true }) viewEventModal: ViewEventComponent;
+    @ViewChild("ProgressModal", { static: true }) ProgressModal: ProgressComponent;
 
-    /* /////////////////////////////////////////////////////// */
-    @ViewChild("viewEventModal", { static: true })
-    viewEventModal: ViewEventComponent;
-    /* /////////////////////////////////////////////////////// */
-
+    @Input() fromMarketplaceProfile: boolean = false;
+    @Input() fromOverviewTab: boolean = false;
+    @Input() accountDataForView :AccountDto;
     profilePicture: String;
     userName: String;
     typeFile: PostType;
@@ -61,7 +55,6 @@ export class PostListComponent
     filter: string = "";
     codeFilter: string = "";
     descriptionFilter: string = "";
-    typeFilter: string = "";
     contactNameFilter: string = "";
     entityNameFilter: string = "";
     skipCount: number = 0;
@@ -73,14 +66,14 @@ export class PostListComponent
     isFullListDisplayed: boolean = false;
     posts: GetAppPostForViewDto[] = [];
     bodyElement;
-    createOrEditAppPostDto: CreateOrEditAppPostDto =
-        new CreateOrEditAppPostDto();
+    createOrEditAppPostDto: CreateOrEditAppPostDto = new CreateOrEditAppPostDto();
     AttachmentInfoDto: AppEntityAttachmentDto[] = [];
     relatedEntityId: number = 0;
     fromViewEvent: boolean = false;
     progress: number = 0;
-    @ViewChild("ProgressModal", { static: true })
-    ProgressModal: ProgressComponent;
+
+
+    isAuthenticated:any
 
     public constructor(
         private _profileService: ProfileServiceProxy,
@@ -93,10 +86,16 @@ export class PostListComponent
     }
 
     ngOnInit(): void {
+           this.isAuthenticated = !!this.appSession?.user;
+           if(this.isAuthenticated){
         this.getProfilePicture();
+           }
         this.userName =
             this.appSession.user.name + " " + this.appSession.user.surname;
-        this.refreshData();
+            if(!this.fromMarketplaceProfile && !this.fromOverviewTab){
+                this.refreshData();
+
+            }
 
         const subs = this.userClickService.clickSubject$.subscribe((res) => {
             if (res == "Home") {
@@ -117,6 +116,11 @@ export class PostListComponent
             this.bodyElement[0].scrollTop = 0;
             this.bodyElement[0].classList.add("thin-scroll");
         }
+    }
+    ngOnChanges(changes: SimpleChanges) {
+    if (changes['accountDataForView']) {
+        this.refreshData();
+      }
     }
 
     ngOnDestroy() {
@@ -209,7 +213,6 @@ export class PostListComponent
                     new AppEntityAttachmentDto();
                 _attachmentInfoDto.guid = guid;
                 _attachmentInfoDto.fileName = this.attachmets[i].name;
-                // AttachmentInfoDto.attachmentCategoryId = 4;
                 if (this.attachmets[i].type.includes("image"))
                     _attachmentInfoDto.attachmentCategoryEnum =
                         AttachmentsCategories.IMAGE;
@@ -315,7 +318,7 @@ export class PostListComponent
                 undefined,
                 this.contactNameFilter,
                 this.entityNameFilter,
-                0,
+                0,this.accountDataForView?.tenantId ? this.accountDataForView?.tenantId : undefined,undefined,
                 "",
                 this.skipCount,
                 this.maxResultCount
@@ -333,12 +336,12 @@ export class PostListComponent
 
                 this.postsToShow = this.posts.slice(
                     0,
-                    this.noOfItemsToShowInitially
+                   this.fromOverviewTab ? 3 :  this.noOfItemsToShowInitially
                 );
 
                 if (
                     this.bodyElement &&
-                    this.noOfItemsToShowInitially == 5 &&
+                    (this.fromOverviewTab ? 3 :  this.noOfItemsToShowInitially == 5) &&
                     this.skipCount == 0
                 ) {
                     this.bodyElement[0].scrollTop = 0;
@@ -363,7 +366,9 @@ export class PostListComponent
             this.maxResultCount = this.itemsToLoad;
             this.skipCount = this.noOfItemsToShowInitially;
             this.noOfItemsToShowInitially += this.itemsToLoad;
+            if(!this.fromOverviewTab){           
             this.getAllPosts();
+            }
         } else {
             this.isFullListDisplayed = true;
         }
@@ -469,10 +474,7 @@ export class PostListComponent
         this.relatedEntityId = 0;
     }
 
-    /* /////////////////////////////////////////////////////// */
-
     showPost(postid: number) {
-        // reterive the post by postId
         this._postService
             .getAll(
                 "",
@@ -483,7 +485,7 @@ export class PostListComponent
                 undefined,
                 "",
                 "",
-                postid,
+                postid,undefined,undefined,
                 "",
                 0,
                 1
@@ -507,50 +509,12 @@ export class PostListComponent
 
     GetLinkUrl(textToCheck: string): string {
         let linkUrl = null;
-        let hasLink = false;
 
         if (textToCheck) {
-            /* var expression =
-                /(https?:\/\/)?[\w\-~]+(\.[\w\-~]+)+(\/[\w\-~@:%]*)*(#[\w\-]*)?(\?[^\s]*)?/gi; */
             var expression =
                 /(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/gi;
             var regex = new RegExp(expression);
-            var match;
-            var splitText = [];
-            var startIndex = 0;
-            // while ((match = regex.exec(textToCheck)) != null) {
-            //     splitText.push({
-            //         text: textToCheck.substr(
-            //             startIndex,
-            //             match.index - startIndex
-            //         ),
-            //         type: "text",
-            //     });
 
-            //     var cleanedLink = textToCheck.substr(
-            //         match.index,
-            //         match[0].length
-            //     );
-            //     splitText.push({ text: cleanedLink, type: "link" });
-
-            //     startIndex = match.index + match[0].length;
-            // }
-            // if (startIndex < textToCheck.length)
-            //     splitText.push({
-            //         text: textToCheck.substr(startIndex),
-            //         type: "text",
-            //     });
-            // var indx = splitText.findIndex((x) => x.type == "link");
-
-            // if (indx >= 0) {
-            //     var video_id = splitText[indx].text.includes("v=")
-            //         ? splitText[indx].text.split("v=")[1].split("&")[0]
-            //         : null;
-            //     linkUrl = video_id
-            //         ? "//www.youtube.com/embed/" + video_id
-            //         : splitText[indx].text;
-            //     hasLink = true;
-            // }
             const matchedUrls = textToCheck.match(regex);
             if (matchedUrls != null && matchedUrls?.length > 0)
                 linkUrl = matchedUrls[matchedUrls.length - 1];
@@ -562,13 +526,11 @@ export class PostListComponent
     currentPlayingVideo: HTMLVideoElement;
 
     playOrpauseVideo(video, post) {
-        console.log(">>", video.url, video.value);
 
         // play the first video that is chosen by the user
         if (this.currentPlayingVideo === undefined) {
             this.currentPlayingVideo = video.value;
             this.currentPlayingVideo.play();
-            console.log("play first");
         } else {
             // if the user plays a new video, pause the last
             // one and play the new one
@@ -576,19 +538,8 @@ export class PostListComponent
                 this.currentPlayingVideo.pause();
                 this.currentPlayingVideo = video.value;
                 this.currentPlayingVideo.play();
-                console.log("pause the other");
             }
         }
 
-        // // Set the current video URL
-        // this.currentVideo = videoUrl;
-
-        // // Stop the other videos by resetting the current video in the child components
-        // for (let video of this.postsToShow) {
-        //     console.log(">>", video.attachmentsURLs[0] , videoUrl);
-        //     if (video.attachmentsURLs[0] !== videoUrl) {
-        //         video.isCurrentVideo = false;
-        //     }
-        // }
     }
 }

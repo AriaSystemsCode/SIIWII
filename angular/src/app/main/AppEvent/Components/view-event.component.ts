@@ -2,6 +2,7 @@ import {
     Component,
     EventEmitter,
     Injector,
+    Input,
     OnInit,
     Output,
     ViewChild,
@@ -31,6 +32,8 @@ export class ViewEventComponent extends AppComponentBase implements OnInit {
     /* @ViewChild("googleMapModal", { static: true })
     googleMapModal: GoogleMapComponent; */
     @Output() createPostEvent = new EventEmitter<AppEventDto>();
+
+     @Input('hideViewEv') hideViewEv: boolean 
     event: GetAppEventForViewDto = new GetAppEventForViewDto();
     eventAddress: string = "";
     eventId: number;
@@ -47,6 +50,11 @@ export class ViewEventComponent extends AppComponentBase implements OnInit {
     logoPhoto : string
     coverPhoto : string
     // displayStatus:boolean=false;
+
+    currentLang: string
+    isArabic: boolean
+    isAuthenticated: boolean = false;
+visible = false;
     public constructor(
         private _appEventsServiceProxy: AppEventsServiceProxy,
         private _appEventGuestsAppService: AppEventGuestsServiceProxy,
@@ -56,6 +64,10 @@ export class ViewEventComponent extends AppComponentBase implements OnInit {
     }
 
     ngOnInit(){
+        this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
+        this.currentLang == 'ar' || this.currentLang == 'ar-EG'  ? this.isArabic = true : this.isArabic = false
+        this.isAuthenticated = !!this.appSession?.user;
+  
         this.getAllAttachmentCategories()
     }
 
@@ -64,7 +76,8 @@ export class ViewEventComponent extends AppComponentBase implements OnInit {
     }
 
     showModal() {
-        this.modal.show();
+          this.visible = true;
+        // this.modal.show();
     }
     show(idFilter: number, entityIdFilter: number ) {
         this.eventId = idFilter;
@@ -102,8 +115,10 @@ export class ViewEventComponent extends AppComponentBase implements OnInit {
         this.subscriptions.push(subs);
     }
     hide() {
-        this.showResponse=false;
-        this.modal.hide();
+        // this.showResponse=false;
+        // this.modal.hide();
+          this.showResponse = false;
+  this.visible = false;
     }
 
     getAddressDetails() {

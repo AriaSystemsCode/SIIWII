@@ -13,7 +13,7 @@
           <Rows>
             <Item1 Ref="7" ControlType="XRTableRow" Name="tableRow1" Weight="1">
               <Cells>
-                <Item1 Ref="8" ControlType="XRTableCell" Name="tableCell1" Weight="0.257137216421274" Text="code" StyleName="DetailCaption1" Borders="None">
+                <Item1 Ref="8" ControlType="XRTableCell" Name="tableCell1" Weight="0.257137216421474" Text="code" StyleName="DetailCaption1" Borders="None">
                   <StylePriority Ref="9" UseBorders="false" />
                 </Item1>
                 <Item2 Ref="10" ControlType="XRTableCell" Name="tableCell2" Weight="0.5733766552626028" Text="name for default" StyleName="DetailCaption1" />

@@ -1,0 +1,256 @@
+<div class="single-item  row   memberCard_container shadowContainer"
+    [ngClass]="singleItemPerRowMode || fromOverview ?'p-0 no-padding-bottom mx-1' :'p-4 extra-padding-bottom mr-md-4'">
+    <div class="align-items-center bg-secondary d-flex fa-3x justify-content-around mr-1 single-item-photo" [ngStyle]="{
+        'background-image':
+        account.account.logoUrl ?
+        'url(' + attachmentBaseUrl + '/' + account?.account?.logoUrl+ ')'  :
+        '' , 
+    'height': singleItemPerRowMode ? 'auto'  :  '100px', 
+    'width':  singleItemPerRowMode  ? '200px' : '100px',
+    'border-top-right-radius': fromOverview && !isArabic  ? '0px' : '',
+    'border-top-left-radius': fromOverview && isArabic  ? '0px' : '',
+    'border-bottom-right-radius': fromOverview && !isArabic  ? '0px' : '',
+    'border-bottom-left-radius': fromOverview && isArabic  ? '0px' : '',
+}" (click)="clickCardHandler()">
+        <i *ngIf="!account.account.logoUrl" class="fa-image fas text-black-50"></i>
+    </div>
+    <div class="single-item-body col pr-0" [ngClass]="{singleItemPerRowMode : 'd-flex flex-row'}"
+        [ngStyle]="{
+        'padding-left': fromOverview ? '0px' : ''
+      }">
+        <div>
+            <div [ngClass]="singleItemPerRowMode?'col-md-9' : 'col-md-12'" class=""
+                [ngClass]="fromOverview ? 'p-1' :'p-0'">
+                <h3 *ngIf="!fromOverview" (click)="clickCardHandler()" class="card-name mt-1" [ngClass]="singleItemPerRowMode?'mb-2' : 'm-0'">
+                    {{account?.account?.name}}</h3>
+                    <h6 *ngIf="fromOverview" (click)="clickCardHandler()" class="card-name mt-1" [ngClass]="singleItemPerRowMode?'mb-2' : 'm-0'">
+                        {{account?.account?.name}}</h6>
+                <div class="info-container d-flex flex-column">
+                    <!-- Categories Section -->
+                    <div *ngIf="singleItemPerRowMode && account.account.categories"
+                        class="d-flex align-items-center mb-1">
+                        <p class="text-dark m-0 product-name">
+                            <b>{{"Categories" | localize}}</b> :
+                        </p>
+                        <span class="d-flex flex-wrap align-items-center">
+                            <span *ngFor="let category of account.account.categories" class="mt-2 categoryName">
+                                {{ category }}
+                            </span>
+                            <span *ngIf="account.account.categories.length === 0" class="mt-2">
+                                {{ "NotSpecified" | localize }}
+                            </span>
+                        </span>
+                    </div>
+
+                    <!-- Classifications Section -->
+                    <div *ngIf="singleItemPerRowMode && account.account.classfications"
+                        class="d-flex align-items-start">
+                        <p class="text-dark m-0 product-name">
+                            <b>{{ "Classifications" | localize }}</b> :
+                        </p>
+                        <span class="d-flex flex-wrap align-items-center">
+                            <span *ngFor="let class of account.account.classfications" class="mt-2 classificationaName">
+                                {{ class }}
+                            </span>
+                            <span *ngIf="account.account.classfications.length === 0" class="mt-2">
+                                {{ "NotSpecified" | localize }}
+                            </span>
+                        </span>
+                    </div>
+                </div>
+
+
+
+                <div [ngClass]="singleItemPerRowMode?'pt-0 pt-3' : ''" class="accTpye">
+                   
+                       <i class="fas fa-tag meta-ico"    [pTooltip]="'AccountType' | localize" tooltipPosition="bottom"></i>
+                    <span class="accountType_value  mt-2 mx-1" [ngClass]="fromOverview ? 'p-2' :''">
+                        {{ account.account.accountType || ('NotSpecified' | localize) }}
+                    </span>
+                </div>
+
+
+                    <div [ngClass]="singleItemPerRowMode?'pt-0' : 'pt-3'" class="mb-1" *ngIf="account.account?.website">
+                        <img src="../../../../../assets/accounts/Ceo.png" />
+                        <span class="spanGreyColor">
+                            <b class="accountType_label pt-4" [ngStyle]="{
+                              'color': singleItemPerRowMode ? 'black' : '#595959'
+                            }" style="min-width: 115px;">
+                                {{ "Ceo" | localize }}:
+                            </b>
+                            <div class="domain-text ml-2" [title]="account?.account?.website"> {{
+                                account?.account?.website | textSubstring : 30 }} </div>
+                        </span>
+                    </div>
+          
+
+
+                <div>
+                    <div [ngClass]="singleItemPerRowMode?'pt-0' : 'pt-1'" class="" [ngStyle]="{
+                    'font-size': fromOverview ? '11px' : ''
+                  }">
+                        <img src="../../../../../assets/accounts/followers.png"    [pTooltip]="'Connections' | localize" tooltipPosition="bottom" [ngStyle]="{
+                    'width': fromOverview ? '15px' : ''
+                  }" />
+                        <span class="spanGreyColor" >
+                            {{ account?.connectionCount ? account?.connectionCount : '0' }} 
+                        </span>
+                    </div>
+
+                    <div [ngClass]="singleItemPerRowMode?'pt-0' : 'pt-3'" class=""
+                        *ngIf="account.account?.description">
+                        <img src="../../../../../assets/accounts/about.png" />
+                        <span class="spanGreyColor">
+                            <b class="accountType_label pt-4" [ngStyle]="{
+                            'color': singleItemPerRowMode ? 'black' : '#595959'
+                          }" style="min-width: 115px;">
+                                {{ "About" | localize }} :
+                            </b>
+                            <div> {{ account?.account?.description | textSubstring : 40 }} </div>
+                        </span>
+                    </div>
+                </div>
+
+
+
+                <div *ngIf="singleItemPerRowMode" class="d-flex align-items-center mb-1">
+                    <!-- Zipcode -->
+                    <b class="zipCode">
+                        {{ "Zipcode" | localize }}:
+                    </b>
+                    <span class="pl-2">
+                        {{ account.account.zipCode ? account.account.zipCode : ("NotSpecified" | localize) }}
+                    </span>
+                </div>
+
+
+            </div>
+
+            <div>
+                <div class="btn-group dropdown" dropdown *ngIf="false">
+                    <button class="dropdown-toggle btn btn-sm btn-action" dropdownToggle>
+                    </button>
+                    <ul class="dropdown-menu actions-dropdown-menu" *dropdownMenu>
+                        <li>
+                            <a href="javascript:;"
+                                *ngIf="isManual === false                                                                                                                                                                                                      "
+                                (click)="viewProfile()">{{l('ViewProfile')}}</a>
+                        </li>
+
+                        <li>
+                            <a *ngIf="isManual===true" (click)="edit()">{{'Edit' | localize}}</a>
+                        </li>
+                        <li>
+                            <a href="javascript:;" *ngIf="isManual === true" (click)="deleteAccount()">{{ 'Delete' |
+                                localize }}</a>
+                        </li>
+
+                    </ul>
+                </div>
+                <div class="d-flex justify-content-end mr-2" style="white-space: nowrap;">
+                
+
+                         <div class="" *ngIf="isAuthenticated">
+                      <!-- Existing relations -->
+        <ng-container *ngIf="account?.connectionsInfo?.length > 0">
+          <!-- first relation chip -->
+          <button type="button" class="relation-chip mr-1" style="white-space: nowrap;">
+            <span>{{ getFormattedConnectionName(account.connectionsInfo[0]?.connectedLabel) | textSubstring : 8 }}</span>
+            <i class="pi pi-times ml-1 removI"
+              (click)="disconnect(account, account.connectionsInfo[0]); $event.stopPropagation()">
+            </i>
+          </button>
+
+          <!-- more count -->
+          <button *ngIf="account.connectionsInfo.length > 1" type="button" class="relation-chip mr-2"
+            (click)="openRelationsDialog(account)">
+            +{{ account.connectionsInfo.length - 1 }}
+          </button>
+        </ng-container>
+
+        <!-- Available connections menu when both current + available exist -->
+        <div *ngIf="account?.availableConnections?.length > 0 && account?.connectionsInfo?.length > 0"
+          class="relation-more-menu position-relative" dropdown container="body">
+
+          <button type="button" class="dots-btn" dropdownToggle>
+            <!-- <i class="fas fa-ellipsis-v"></i> -->
+            <img src="assets/accounts/CONNECT.png" alt="" srcset="">
+          </button>
+
+          <ul *dropdownMenu class="dropdown-menu relation-dropdown" role="menu"
+            [ngClass]="isArabic ? 'dropdown-menu-ar' : 'dropdown-menu-en'">
+
+            <li role="menuitem" *ngFor="let option of account.availableConnections " class="relation-item">
+
+              <button class="dropdown-item relation-btn" type="button" (click)="createRelation(option)">
+
+                <div class="d-flex align-items-center justify-content-between w-100">
+
+                  <!-- Left: Icon + Label -->
+                  <div class="d-flex align-items-center">
+                    <img class="relation-icon mr-2" [src]="getConnectionIcon(option?.connectionName)" alt="" />
+
+                    <span class="relation-label">
+                      {{ option?.connectionName }}
+                    </span>
+                  </div>
+
+                </div>
+
+              </button>
+            </li>
+          </ul>
+        </div>
+
+        <!-- No current relations, only available ones -->
+        <div *ngIf="(!account?.connectionsInfo?.length) && account?.availableConnections?.length > 0" class="w-100">
+          <ng-container *ngIf="account?.availableConnections as options">
+            <div class="relationWrap w-100 text-center position-relative" dropdown container="body">
+              <button type="button" class=" market-follow" dropdownToggle style="font-size: 12px;" >
+                <img class="pb-1" style="width: 13px;" [src]="getConnectionIcon(options[0]?.connectionName)" alt="" />
+                <span class="ml-1" [title]="options[0]?.connectionName"  (click)="createRelation(options[0])">
+                  {{ options[0]?.connectionName | textSubstring : 10 }}
+                </span>
+
+                <i *ngIf="options.length > 1" class="fas fa-angle-down ml-2" style="color: #fff !important;"></i>
+              </button>
+
+              <ng-container *ngIf="options.length > 0">
+                <ul *dropdownMenu class="dropdown-menu" role="menu">
+                  <li role="menuitem" *ngFor="let option of options | slice:1" class="py-2">
+                    <button class="dropdown-item" type="button" (click)="createRelation(option)">
+                      {{ option?.connectionName }}
+                    </button>
+                  </li>
+                </ul>
+              </ng-container>
+            </div>
+          </ng-container>
+        </div>
+              </div>
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+
+
+<p-dialog [(visible)]="showRelationsDialog" [modal]="true" [closable]="true" [draggable]="false" [resizable]="false"
+  [dismissableMask]="true" [style]="{ width: '420px' }" header="Relations">
+
+  <div *ngIf="selectedAccountForRelations?.connectionsInfo?.length > 0" class="d-flex flex-column">
+    <div *ngFor="let relation of selectedAccountForRelations.connectionsInfo; let i = index"
+      class="d-flex align-items-center justify-content-between relation-popup-item mb-2">
+
+      <button type="button" class="relation-chip" style="white-space: nowrap;">
+        <span>{{ getFormattedConnectionName(relation.connectedLabel) }}</span>
+        <i class="pi pi-times ml-1 removI" (click)="removeRelationFromDialog(selectedAccountForRelations, relation, i)">
+        </i>
+      </button>
+    </div>
+  </div>
+
+</p-dialog>

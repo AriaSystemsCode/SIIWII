@@ -67,7 +67,7 @@ namespace onetouch.MultiTenancy
                 input.SendActivationEmail,
                 input.SubscriptionEndDateUtc?.ToUniversalTime(),
                 input.IsInTrialPeriod,
-                AppUrlService.CreateEmailActivationUrlFormat(input.TenancyName),input.InviterTenantId, input.FirstName,input.LastName
+                AppUrlService.CreateEmailActivationUrlFormat(input.TenancyName),input.InviterTenantId, input.FirstName,input.LastName,input.AdminName
             );
         }
 

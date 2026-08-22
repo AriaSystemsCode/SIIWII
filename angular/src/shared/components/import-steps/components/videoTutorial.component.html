@@ -1,0 +1,37 @@
+
+<div bsModal #videoTutorial="bs-modal" class="modal  fade" tabindex="-1" role="dialog" aria-labelledby="videoTutorial"
+    aria-hidden="true">
+    <div class="modal-dialog modal-lg mb-0">
+        <div class="modal-content">
+            <div class="modal-header-custom">
+                <h5 class="modal-title font-weight-bold">How to Import Product | Variation and Color images File Tutorial Video </h5>
+
+                <div>
+                    <img src="../../../../assets/accounts/importAccounts/close.svg" class="pointer" (click)="askToClose()" />
+                </div>
+              </div>
+
+              <div class="p-4">
+                <video class="video"
+                controls
+                [attr.src]="
+                    attachmentBaseUrl +
+                        '/' +
+                        videoTutorialUrl                "
+            ></video>
+              </div>
+
+              
+              <div class="row pl-5 pt-4 pb-4">
+                <button class="btn btn-secondary  _Btn mr-2 pointer" (click)="goPreviousStep()">
+                    {{"Previous" | localize}}   
+                </button>
+            </div>
+             
+
+        </div>
+    </div>
+
+
+
+</div>

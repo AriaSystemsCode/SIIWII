@@ -68,6 +68,11 @@
 
 }
 
+.enterByTxt {
+    color: #888;
+               
+                font-size: 14px;
+}
 .groupForm {
     display: flex;
     align-items: center;
@@ -333,6 +338,17 @@
     }
 }
 
+.dates-ar {
+    img {
+        width: 24px;
+        height: 24px;
+        position: absolute;
+        left: 21px !important;
+        bottom: 12px !important;
+
+    }
+}
+
 ::ng-deep {
     .p-dialog {
         border-radius: 20px;
@@ -421,4 +437,22 @@
             width: 84% !important;
         }
     }
+}
+
+.white-space-nowrap{
+    white-space: nowrap;
+}
+.pointer{
+    cursor: pointer;
+}
+.w-95{
+    width: 95% !important;
+}
+
+.bg-grey{
+    background-color: #777;
+}
+
+.gap-5 {
+    gap: 5px;
 }

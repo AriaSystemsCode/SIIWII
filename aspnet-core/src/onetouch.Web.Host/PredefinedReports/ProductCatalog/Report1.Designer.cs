@@ -86,7 +86,7 @@
             this.xrLabel4.Multiline = true;
             this.xrLabel4.Name = "xrLabel4";
             this.xrLabel4.Padding = new DevExpress.XtraPrinting.PaddingInfo(5, 5, 0, 0, 254F);
-            this.xrLabel4.SizeF = new System.Drawing.SizeF(275F, 58.42031F);
+            this.xrLabel4.SizeF = new System.Drawing.SizeF(275F, 58.42501F);
             this.xrLabel4.Text = "xrLabel3";
             // 
             // xrLabel2

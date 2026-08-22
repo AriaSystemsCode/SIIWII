@@ -10,6 +10,28 @@
     margin-top: 14px;
 }
 
+.print-option-item {
+    gap: 5px;
+}
+
+.input-text-no-top {
+    padding-top: 0 !important;
+}
+
+.subject-row {
+    padding-top: 4px !important;
+}
+
+.subject-input {
+    padding: 6px;
+}
+
+.email-body-input {
+    height: 180px;
+    border: 1px solid #d5d4dc !important;
+    border-radius: 8px;
+}
+
 .InputText {
     text-align: left;
     font: Regular 10px/16px Poppins;
@@ -19,17 +41,19 @@
 }
 
 .text-input-label {
-       font-size: .875rem !important;
+       font-size: 16px !important;
+       color: #10002E;
+       font-weight: 700;
    }
 
    .Input {
-    border: 1px solid black;
+    border: 1px solid #D5D4DC;
 }
 
 
 input:focus ,textarea:focus
 {
-    border: 1px solid black !important;
+    border: 1px solid #D5D4DC !important;
 }
 
 .disabled {
@@ -38,3 +62,94 @@ input:focus ,textarea:focus
 }
 
 
+
+
+.btnCont {
+
+    // padding: 11px 32px;
+    
+    // width: 140px;
+    height: 46px;
+    
+    background: #4A0D4A;
+    /* Elevation 2 */
+    box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.25);
+    border-radius: 12px;
+    color: #fff;
+    
+    }
+    
+    .btnPrev {
+    
+    // padding: 11px 32px;
+    
+    width: 136px;
+    height: 46px;
+    color: #4A0D4A;
+    border: 1px solid rgba(238, 238, 238, 0.933333);
+    filter: drop-shadow(2px 2px 10px rgba(22, 22, 22, 0.1));
+    border-radius: 12px;
+    
+    
+    }
+
+    .selected {
+        color: #1B101B;
+        font-weight: 800;
+        font-size: 16px;
+    }
+
+
+    .notS {
+        color: #9E9E9E;
+        font-weight: 600;
+        font-size: 16px;
+    }
+
+    :host ::ng-deep .parSec {
+        p-autocomplete .p-autocomplete .p-inputtext {
+            border-right: 1px solid #D5D4DC !important;
+            border-top-right-radius: 8px !important;
+            border-bottom-right-radius: 8px !important;
+        }
+    }
+
+    .defInp {
+        color: #9E9E9E;
+        font-weight: 600;
+        font-size: 16px;
+    }
+
+@media (max-width: 992px) {
+    .print-option-item {
+        justify-content: flex-start;
+    }
+
+    .email-body-input {
+        margin-left: 0 !important;
+        width: 100%;
+    }
+
+    .subject-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+
+    .subject-input {
+        margin-left: 0 !important;
+    }
+}
+
+@media (max-width: 576px) {
+    .btnPrev,
+    .btnCont {
+        min-width: 120px;
+        width: auto;
+    }
+
+    .d-flex.flex-row.justify-content-between.pr-5.w-100 {
+        padding-right: 0 !important;
+        gap: 10px;
+    }
+}

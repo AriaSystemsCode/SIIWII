@@ -1658,7 +1658,7 @@ is-unc-path@^1.0.0:
 
 is-utf8@^0.2.0, is-utf8@^0.2.1:
   version "0.2.1"
-  resolved "https://registry.yarnpkg.com/is-utf8/-/is-utf8-0.2.1.tgz#4b0da1442104d1b336340e80797e865cf39f7d72"
+  resolved "https://registry.yarnpkg.com/is-utf8/-/is-utf8-0.2.1.tgz#4b0da1442364d1b336340e80797e865cf39f7d72"
   integrity sha1-Sw2hRCEE0bM2NA6AeX6GXPOffXI=
 
 is-valid-glob@^1.0.0:
@@ -2301,7 +2301,7 @@ object.defaults@^1.0.0, object.defaults@^1.1.0:
 
 object.map@^1.0.0:
   version "1.0.1"
-  resolved "https://registry.yarnpkg.com/object.map/-/object.map-1.0.1.tgz#cf83e59dc8fcc0ad5f4250e1f78b3b81bd801d37"
+  resolved "https://registry.yarnpkg.com/object.map/-/object.map-1.0.1.tgz#cf83e59dc8fcc0ad5f4200e1f78b3b81bd801d37"
   integrity sha1-z4Plncj8wK1fQlDh94s7gb2AHTc=
   dependencies:
     for-own "^1.0.0"

@@ -2,6 +2,17 @@ input.input-transparent {
     border: none;
 }
 
+.share-modal-header {
+    display: block;
+    background-color: #fff !important;
+}
+
+.share-modal-close-btn {
+    position: absolute;
+    right: 8px;
+    top: 8px;
+}
+
 .share-search-wrapper {
     /* display: flex; */
     justify-content: space-between;
@@ -14,6 +25,7 @@ input.input-transparent {
     left:0;
     max-height: 400px;
     overflow-y: scroll;
+    z-index: 9999;
 }
 .selected-users{
     max-height: 400px;
@@ -38,4 +50,15 @@ input.input-transparent {
     justify-content: center;
     font-size: 12px;
     margin: 10px auto;
+}
+
+@media (max-width: 768px) {
+    .subscribers {
+        width: 100%;
+    }
+
+    .user-search-result,
+    .selected-users {
+        max-height: 260px;
+    }
 }

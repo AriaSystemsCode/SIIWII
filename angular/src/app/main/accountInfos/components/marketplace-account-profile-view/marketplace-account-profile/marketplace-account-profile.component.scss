@@ -1,0 +1,410 @@
+.container-s {
+    align-items: center;
+    padding: 10px;
+    gap: 10px;
+    background: #FFFFFF;
+    border: 1px solid #EEEEEE;
+    box-shadow: 4px 4px 10px rgba(22, 22, 22, 0.15);
+    border-radius: 20px;
+}
+
+::ng-deep {
+    @media(min-width:567px) {
+        .p-tabview .p-tabview-nav li .p-tabview-nav-link {
+            margin-right: 80px !important;
+        }
+    }
+}
+
+@media(min-width:567px) {
+    .cover-img {
+        height: 250px;
+        width: 100%;
+        border-top-left-radius: 10px;
+        border-top-right-radius: 10px;
+        object-fit: cover;
+        object-position: center;
+    }
+
+    .acc-img {
+        position: absolute;
+        width: 164px;
+        height: 164px;
+        top: 150px;
+        left: 14px;
+        gap: 0px;
+        opacity: 0px;
+        border-radius: 50%;
+        border: 2px solid white;
+    }
+
+    .acc-img-ar {
+        position: absolute;
+        width: 164px;
+        height: 164px;
+        top: 150px;
+        right: 14px;
+        gap: 0px;
+        opacity: 0px;
+        border-radius: 50%;
+        border: 2px solid white;
+    }
+
+    .info-sec {
+        margin-left: 185px !important;
+        margin-top: 10px;
+    }
+    .info-sec-ar {
+        margin-right: 185px !important;
+        margin-top: 10px;
+    }
+    
+}
+
+@media(min-width:992px) {
+
+    .container-s {
+        margin-left: 45px !important;
+        margin-right: 45px !important;
+        margin-bottom: 10px;
+    }
+}
+ @media only screen and (min-width: 575px) and (max-width:992px){
+
+
+    .container-s {
+        margin-left: 10px !important;
+        margin-right: 10px !important;
+        margin-bottom: 10px;
+        margin-top: 30px;
+    }
+}
+
+@media(max-width:567px) {
+
+    .container-s {
+        margin-left: 0px;
+        margin-right: 0px;
+        margin-top: 20px;
+    }
+
+    .cover-img {
+        height: 136px;
+        width: 100%;
+        border-top-left-radius: 10px;
+        border-top-right-radius: 10px;
+        object-fit: cover;
+        object-position: center;
+    }
+
+    .acc-img {
+        position: absolute;
+        width: 100px;
+        height: 100px;
+        top: 85px;
+        left: 14px;
+        gap: 0px;
+        opacity: 0px;
+        border-radius: 50%;
+        border: 2px solid white;
+
+    }
+    .acc-img-ar {
+        position: absolute;
+        width: 100px;
+        height: 100px;
+        top: 85px;
+        right: 14px;
+        gap: 0px;
+        opacity: 0px;
+        border-radius: 50%;
+        border: 2px solid white;
+
+    }
+
+    .info-sec {
+        margin-left: 124px !important;
+        margin-top: 10px;
+    }
+
+    .info-sec-ar {
+        margin-right: 124px !important;
+        margin-top: 10px;
+    }
+}
+
+.bottom-sec {
+    // height: 100px;
+    padding-right: 10px;
+    background: #FFFFFF;
+    border: 1px solid #EEEEEE;
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+    margin-bottom: 10px;
+}
+
+.connect-btn {
+
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    padding: 8px;
+    height: 44px;
+    background: #FFFFFF;
+    border: 1px solid rgba(238, 238, 238, 0.933333) !important;
+    box-shadow: 2px 2px 6px rgba(22, 22, 22, 0.05);
+    border-radius: 6px;
+
+}
+
+h4 {
+    color: #1B101B;
+}
+
+::ng-deep {
+    .p-tabview-nav {
+        padding: 5px !important;
+
+        .p-tabview-panels {
+            padding: 0 !important;
+            border: none !important;
+        }
+    }
+
+    .p-tabview .p-tabview-nav li .p-tabview-nav-link {
+
+        background-color: #FFFFFF !important;
+        border: none !important;
+        box-shadow: none !important;
+
+    }
+
+    .p-tabview .p-tabview-nav li.p-highlight .p-tabview-nav-link {
+        background-color: #4A0D4A !important;
+        box-shadow: none !important;
+    }
+
+    .tabview-custom {
+        .p-tabview-panels {
+            border: none !important;
+            padding: 5px !important;
+        }
+
+        .p-tabview-nav {
+            li .p-tabview-nav-link {
+                background-color: white !important;
+                border: none !important;
+                color: #9E9E9E !important;
+                font-weight: 400 !important;
+            }
+
+            li.p-highlight .p-tabview-nav-link {
+                background-color: #4A0D4A !important;
+                border: none !important;
+                border-radius: 6px !important;
+                color: #FFFFFF !important;
+                font-weight: 700 !important;
+
+            }
+
+        }
+
+        @media(min-width:1024px) {
+            .p-tabview .p-tabview-nav li {
+                margin-right: 30px;
+
+            }
+        }
+
+    }
+
+}
+
+@media(max-width:770px) {
+
+    .accType {
+        font-size: 11px;
+    }
+}
+
+@media(min-width:770px) {
+
+    .accType {
+        font-size: 14px;
+    }
+}
+
+.accType {
+
+    font-weight: 700;
+    line-height: 21px;
+    text-transform: capitalize;
+    color: #1B101B;
+}
+
+.connections {
+
+    font-weight: 600;
+    line-height: 24px;
+    text-transform: capitalize;
+    color: #9E9E9E;
+
+}
+
+
+
+.relation_button {
+    background-color: #4a0d4a;
+    color: white;
+    border-radius: 6px;
+    padding: 5px 10px;
+}
+
+
+::ng-deep {
+    .dropdown-item.active, .dropdown-item:active{
+        background-color: #4a0d4a !important;
+        color: white !important;
+        padding: 5px 10px !important;
+    }
+    @media only screen and (max-width: 567px) {
+        .p-tabview .p-tabview-nav li .p-tabview-nav-link {
+            width: 95px !important;
+        }
+    .p-tabview .p-tabview-nav li.p-highlight .p-tabview-nav-link {
+        height: 35px !important;
+        font-size: 13px !important;
+    }
+    .p-tabview-title {
+        margin-top: 9px !important;
+    }
+    .p-tabview .p-tabview-nav {
+        border:  none !important;
+    }
+    .p-tabview-nav-content {
+        border-bottom: 1px solid #EEEEEE !important;
+    }
+    
+}
+}
+@media (min-width: 992px) {
+.addMg {
+    margin-top: 120px;
+}
+}
+
+@media (max-width: 570px) {
+    .addMg {
+        margin-top: 90px;
+    }
+    }
+.dropEn {
+    right: 5px;
+}
+.dropAr {
+    left: 5px;
+}
+.dropCnEn {
+    right: 0px;
+
+}
+
+.dropCnAr {
+    left: 0px;
+
+}
+
+.accTyp {
+    font-size: 10px;
+}
+
+
+.relation-chip {
+  border: 1px solid #d8d3df;
+  background: #f4f1f8;
+  color: #2f2940;
+  border-radius: 4px;
+ padding: 3px 5px;
+  font-size: 12px;
+  height: 27px;
+ 
+}
+
+.relation-dropdown-wrap {
+  min-width: 220px;
+}
+
+
+.removI {
+  font-size: 8px !important;
+}
+
+.dots-btn {
+  border: none;
+  background:#4A0D4A;
+  padding: 2px 8px;
+  cursor: pointer;
+  font-size: 16px;
+  border-radius: 6px;
+}
+
+.relation-more-menu {
+  display: inline-flex;
+  align-items: center;
+  border:  1px solid #f3f3f3;
+}
+
+.relation-popup-item {
+  border-bottom: 1px solid #f3f3f3;
+  padding-bottom: 8px;
+}
+
+.relation-popup-item:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.relation-dropdown {
+  min-width: 220px;
+  padding: 6px 0;
+  border-radius: 10px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
+  border: none;
+}
+
+.relation-item {
+  padding: 0;
+}
+
+.relation-btn {
+  padding: 10px 14px;
+  transition: all 0.2s ease;
+  border-radius: 6px;
+}
+
+.relation-btn:hover {
+  background-color: #f5f9ff;
+}
+
+.relation-icon {
+  width: 16px;
+  height: 16px;
+}
+
+.relation-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: #333;
+}
+
+.relation-arrow {
+  font-size: 11px;
+  color: #999;
+  transition: transform 0.2s ease;
+}
+
+.relation-btn:hover .relation-arrow {
+  transform: translateX(3px);
+  color: #157af8;
+}

@@ -2,7 +2,6 @@
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Abp.Authorization;
 using Abp.Runtime.Security;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
@@ -99,18 +98,32 @@ namespace onetouch.Web.Startup
         private static Task SetToken(MessageReceivedContext context, bool allowAnonymous)
         {
             var qsAuthToken = context.HttpContext.Request.Query["enc_auth_token"].FirstOrDefault();
-            if (qsAuthToken == null)
+            if (string.IsNullOrWhiteSpace(qsAuthToken) ||
+                string.Equals(qsAuthToken, "null", StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(qsAuthToken, "undefined", StringComparison.OrdinalIgnoreCase))
             {
                 if (!allowAnonymous)
                 {
-                    throw new AbpAuthorizationException("SignalR auth token is missing.");
+                    context.Fail("Authentication token is missing.");
                 }
 
                 return Task.CompletedTask;
             }
 
-            //Set auth token from cookie
-            context.Token = SimpleStringCipher.Instance.Decrypt(qsAuthToken, AppConsts.DefaultPassPhrase);
+            try
+            {
+                // Set auth token from cookie.
+                context.Token = SimpleStringCipher.Instance.Decrypt(qsAuthToken, AppConsts.DefaultPassPhrase);
+            }
+            catch (System.Security.Cryptography.CryptographicException)
+            {
+                context.Fail("Authentication token is invalid.");
+            }
+            catch (FormatException)
+            {
+                context.Fail("Authentication token is invalid.");
+            }
+
             return Task.CompletedTask;
         }
     }

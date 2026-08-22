@@ -2,8 +2,8 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 import { MembersListSharedRoutingModule } from './members-list-shared-routing.module';
-import { MembersListComponent } from './components/members-list.component';
-import { MembersListCardComponent } from './components/members-list-card.component';
+import { MembersListComponent } from './components/members-list/members-list.component';
+import { MembersListCardComponent } from './components/members-list-card/members-list-card.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { AppCommonModule } from '@app/shared/common/app-common.module';
 import { UtilsModule } from '@shared/utils/utils.module';

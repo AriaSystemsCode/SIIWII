@@ -1,0 +1,64 @@
+<div class="contacts d-flex flex-column mt-lg-2 mt-md-5 mt-2">
+  <ng-container *ngFor="let s of sectionsFlat; ">
+    <ng-container [ngSwitch]="s.type">
+
+      <!-- auto slider with call to action-->
+      <div *ngSwitchCase="'ASSB'">
+     
+        <app-slider-with-callToAction class="" [sectionId]="s.sectionId">
+        </app-slider-with-callToAction>
+      </div>
+
+
+      <!-- carusal slider multi blocks-->
+       <div *ngSwitchCase="'CSMP'" class="mt-4">
+      <app-carusal-with-callToAction  [sectionId]="s.sectionId" [sectionData]="s.inputs">
+      </app-carusal-with-callToAction>
+    </div>
+      <!-- auto slider without call to action-->
+      <div *ngSwitchCase="'ASMB'">
+
+
+        <app-slider-without-callToAction class=" d-block" [sectionId]="s.sectionId">
+        </app-slider-without-callToAction>
+      </div>
+
+
+
+      <!--single row Call to Action  (can be brands or products)-->
+      <div *ngSwitchCase="'SRCTA'" class="rounded addMg">
+        <h4 class="px-2"  [style.text-align]="
+        s?.inputs?.titleAlignment === 'Center'
+          ? 'center'
+          : (s?.inputs?.titleAlignment === 'Right' ? 'right' : 'left')
+      ">{{ s.inputs?.title }}</h4>
+        <app-single-row-callAction [sectionId]="s.sectionId" [blockTypeIsSingleOrMixed]="s.blockTypeIsSingleOrMixed" [loginTenaneSsin]="loginTenaneSsin"></app-single-row-callAction>
+      </div>
+
+
+
+      <!--multi row Call to Action  (can be brands or products)-->
+      <div *ngSwitchCase="'MRCTA'" class=" rounded addMg" >
+        <h4  class="px-2" [style.text-align]=" 
+        s?.inputs?.titleAlignment === 'Center'
+          ? 'center'
+          : (s?.inputs?.titleAlignment === 'Right' ? 'right' : 'left')
+      " class="mx-2 mt-4 mb-2 ">{{ s.inputs?.title }}</h4>
+        <app-multi-row-callAction [sectionId]="s.sectionId" [blockTypeIsSingleOrMixed]="s.blockTypeIsSingleOrMixed" [loginTenaneSsin]="loginTenaneSsin"></app-multi-row-callAction>
+      </div>
+
+
+
+    </ng-container>
+  </ng-container>
+</div>
+
+<app-landing-page-footer></app-landing-page-footer>
+
+
+
+
+  <app-view-event
+  #viewEventModal
+
+></app-view-event>

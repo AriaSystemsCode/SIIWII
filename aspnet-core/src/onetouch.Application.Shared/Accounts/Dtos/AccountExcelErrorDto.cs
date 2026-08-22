@@ -93,14 +93,13 @@ namespace onetouch.Accounts.Dtos
         Account,
         Branch,
         Contact,
+        Vendor
     }
     public enum AccountExcelAccountType
     {
-        Seller,
-        Buyer,
-        Both,
-    }
-    //public enum AccountExcelRecordRepeateHandler
+        Business,
+        Personal,
+    }   //public enum AccountExcelRecordRepeateHandler
     //{
     //    [Display(Name = "Ignore duplicated records")]
     //    IgnoreDuplicatedRecords = 0,

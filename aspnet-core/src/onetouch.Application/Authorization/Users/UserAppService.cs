@@ -38,6 +38,12 @@ using onetouch.AppContacts;
 using onetouch.AppContacts.Dtos;
 using onetouch.Accounts;
 using onetouch.AccountInfos.Dtos;
+using onetouch.SystemObjects;
+using onetouch.AppItems.Dtos;
+using System.Linq.Expressions;
+using Twilio.Rest.Messaging.V1.Service;
+using AuthorizeNet.Api.Contracts.V1;
+using AutoMapper.Internal.Mappers;
 
 namespace onetouch.Authorization.Users
 {
@@ -72,6 +78,9 @@ namespace onetouch.Authorization.Users
         private readonly IRepository<AppEntity, long> _appEntityRepository;
         private readonly IRepository<AppContact, long> _appContactRepository;
         //Mariam 
+        //I40,MMT [Start]
+        private readonly ISycEntityObjectTypesAppService _sycEntityObjectTypesAppService;
+        //I40,MMT [End]
         public UserAppService( 
             RoleManager roleManager,
             IUserEmailer userEmailer,
@@ -92,8 +101,12 @@ namespace onetouch.Authorization.Users
             IRepository<OrganizationUnitRole, long> organizationUnitRoleRepository, Helper helper, 
             AppEntitiesAppService appEntitiesAppService,   IRepository<AppEntityExtraData, long> appEntityExtraDataRepository,
             AccountsAppService appAccountsAppService, IRepository<AppEntity, long> appEntityRepository,
-            IRepository<AppContact, long> appContactRepository)
+            IRepository<AppContact, long> appContactRepository,
+            ISycEntityObjectTypesAppService sycEntityObjectTypesAppService)
         {
+            //I40,MMT [Start]
+            _sycEntityObjectTypesAppService = sycEntityObjectTypesAppService;
+            //I40,MMT [End]
             _roleManager = roleManager;
             _userEmailer = userEmailer;
             _userListExcelExporter = userListExcelExporter;
@@ -148,8 +161,11 @@ namespace onetouch.Authorization.Users
 
         public List<UserDto> GetAllUsersNames(string searchTerm)
         {
+
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
             {
+                if (searchTerm == null)
+                    searchTerm = "";
                 var UserList = from o in UserManager.Users.Where(x => x.TenantId != null)
                                join o1 in TenantManager.Tenants on o.TenantId equals o1.Id into j1
 
@@ -168,7 +184,26 @@ namespace onetouch.Authorization.Users
 
             }
         }
-
+        //P-SII-20251124.0004 - Contact - Disconnect user from Team member within Users screen MMT 11/25/2025[Start]
+        public async Task<bool> DisconnectUserFromTeamMember(long input)
+        {
+            bool returnValue = false;
+            if (input != 0)
+            {
+              var relatedContactExtraData = await _appEntityExtraDataRepository.GetAll()
+                 .Where(z=> z.EntityFk.TenantId== AbpSession.TenantId &&
+                                z.AttributeId == 715 && z.AttributeValue== input.ToString()).FirstOrDefaultAsync();
+                if (relatedContactExtraData != null)
+                {
+                    relatedContactExtraData.AttributeValue = "";
+                    await _appEntityExtraDataRepository.UpdateAsync(relatedContactExtraData);
+                    await CurrentUnitOfWork.SaveChangesAsync();
+                    returnValue = true;
+                }
+            }
+            return returnValue;
+        }
+        //P-SII-20251124.0004 - Contact - Disconnect user from Team member within Users screen MMT 11/25/2025[End]
         public async Task<FileDto> GetUsersToExcel(GetUsersToExcelInput input)
         {
             var query = GetUsersFilteredQuery(input);
@@ -324,7 +359,8 @@ namespace onetouch.Authorization.Users
 
             var user = await UserManager.GetUserByIdAsync(input.Id);
             //Mariam[Start]
-            await DeleteUserContact(user);
+            // stop contact deletion
+            //await DeleteUserContact(user);
             //Mariam[End]
             CheckErrors(await UserManager.DeleteAsync(user));
            
@@ -337,10 +373,12 @@ namespace onetouch.Authorization.Users
             if (contactEntityExtraData != null)
             {
                 var contact = _appContactRepository.GetAll().FirstOrDefault(x => x.TenantId == AbpSession.TenantId && x.EntityId == contactEntityExtraData.EntityId);
-              
-                EntityDto contactObj = new EntityDto();
-                contactObj.Id = int.Parse(contact.Id.ToString());
-                await _appAccountsAppService.DeleteContact(contactObj);
+                if (contact != null)
+                {
+                    EntityDto contactObj = new EntityDto();
+                    contactObj.Id = int.Parse(contact.Id.ToString());
+                    await _appAccountsAppService.DeleteContact(contactObj);
+                }
             }
             
         }
@@ -402,46 +440,158 @@ namespace onetouch.Authorization.Users
                 );
             }
             //Mariam[Start]
-            
-            var contactEntityExtraData = _appEntityExtraDataRepository.GetAll().FirstOrDefault(x =>x.EntityFk.TenantId== AbpSession.TenantId &&  x.AttributeId == 715 && x.AttributeValue == input.User.Id.ToString());
-            if (contactEntityExtraData != null)
-            {
+            string createContactSetting = await _appEntitiesAppService.GetHostSettingValue(1212);
 
-                var contact = _appContactRepository.GetAll().FirstOrDefault(x => x.TenantId == AbpSession.TenantId && x.EntityId == contactEntityExtraData.EntityId);
-                if (contact != null)
-                {
-                    ContactForEditDto contactView = await _appAccountsAppService.GetContactForView(contact.Id);
-                    ContactDto contactDto = contactView.Contact;//ObjectMapper.Map<ContactDto>(contact);
-                    contactDto.FirstName = input.User.Name;
-                    contactDto.LastName = input.User.Surname;
-                    contactDto.EMailAddress = input.User.EmailAddress;
-                    contactDto.UserId = user.Id;
-                    contactDto.Name = input.User.Name + " " + input.User.Surname;
-                    contactDto.UserName = input.User.UserName;
-                    contactDto.TradeName = "";
-                    contactDto.Code = input.Code;
-                    ContactDto savedContactDto = await _appAccountsAppService.CreateOrEditContact(contactDto);
-                }
-            }
-            //MMT, 09/07/2022 T-SII-20220803.0003 Newly registered user does not have related Team member[Start]
-            else
+            if (createContactSetting.ToLower() == "Manualcontactpersons".ToLower())
             {
-                var account = _appContactRepository.GetAll().FirstOrDefault(x => x.TenantId == AbpSession.TenantId && x.IsProfileData && x.ParentId == null && x.PartnerId == null && x.AccountId == null);
-                if (account != null)
+                var contactEntityExtraData = _appEntityExtraDataRepository.GetAll().FirstOrDefault(x => x.EntityFk.TenantId == AbpSession.TenantId && x.AttributeId == 715 && x.AttributeValue == input.User.Id.ToString());
+                if (contactEntityExtraData != null)
                 {
-     
-                        ContactDto contactDto = new ContactDto();
-                        contactDto.AccountId = account.Id;
-                        contactDto.FirstName = input.User.Name;
-                        contactDto.LastName = input.User.Surname;
-                        contactDto.EMailAddress = input.User.EmailAddress;
-                        contactDto.UserId = input.User.Id;
-                        contactDto.Name = input.User.Name + " " + user.Surname;
-                        contactDto.UserName = input.User.UserName;
-                        contactDto.TradeName = "";
-                        contactDto.ParentId = account.Id;
-                        contactDto.Code = input.Code;
-                        ContactDto savedContactDto = await _appAccountsAppService.CreateOrEditContact(contactDto);
+
+                    var contact = _appContactRepository.GetAll().FirstOrDefault(x => x.TenantId == AbpSession.TenantId && x.EntityId == contactEntityExtraData.EntityId);
+                    if (contact != null)
+                    {
+                        ContactForEditDto contactView = await _appAccountsAppService.GetContactForView(contact.Id);
+                        //I40[Start]
+                        //ContactDto contactDto = contactView.Contact;//ObjectMapper.Map<ContactDto>(contact);
+                        //contactDto.FirstName = input.User.Name;
+                        //contactDto.LastName = input.User.Surname;
+                        //contactDto.EMailAddress = input.User.EmailAddress;
+                        //contactDto.UserId = user.Id;
+                        //contactDto.Name = input.User.Name + " " + input.User.Surname;
+                        //contactDto.UserName = input.User.UserName;
+                        //contactDto.TradeName = "";
+                        //contactDto.Code = input.Code;
+                        //ContactDto savedContactDto = await _appAccountsAppService.CreateOrEditContact(contactDto);
+                        CreateOrEditAccountInfoDto accountDto = new CreateOrEditAccountInfoDto();
+                        accountDto.Id = contact.Id;
+                        accountDto.Code = input.Code;
+                        accountDto.Name = input.User.Name + " " + input.User.Surname;
+                        accountDto.TradeName = "";
+                        accountDto.EMailAddress = input.User.EmailAddress;
+                        accountDto.ReturnId = true;
+                        accountDto.AccountLevel = AccountLevelEnum.Manual;
+                        accountDto.EntityExtraData = new List<AppEntityExtraDataDto>();
+                        var entityObjectType = await _sycEntityObjectTypesAppService.GetAllWithExtraAttributesByCode("PERSONAL");
+                        if (entityObjectType != null && entityObjectType.Count > 0)
+                        {
+                            var entityTypeObj = entityObjectType.FirstOrDefault();
+                            if (entityTypeObj != null && entityTypeObj.ExtraAttributes != null && entityTypeObj.ExtraAttributes.ExtraAttributes.Count > 0)
+                            {
+                                foreach (var exr in entityTypeObj.ExtraAttributes.ExtraAttributes)
+                                {
+                                    AppEntityExtraDataDto extraDto = new AppEntityExtraDataDto();
+                                    extraDto = ObjectMapper.Map<AppEntityExtraDataDto>(exr);
+                                    if (exr.Code == "FIRST-NAME")
+                                    {
+                                        extraDto.AttributeValue = input.User.Name;
+                                    }
+                                    if (exr.Code == "LAST-NAME")
+                                    {
+                                        extraDto.AttributeValue = input.User.Surname;
+                                    }
+                                    if (exr.Code == "USER-NAME")
+                                    {
+                                        extraDto.AttributeValue = input.User.UserName;
+                                    }
+                                    if (exr.Code == "USER-ID")
+                                    {
+                                        extraDto.AttributeValue = user.Id.ToString();
+                                    }
+                                    if (exr.Code == "USER-NAME-IS-PUBLIC")
+                                    {
+                                        extraDto.AttributeValue = "True";
+                                    }
+                                    if (exr.Code == "EMAIL-ADDRESS-IS-PUBLIC")
+                                    {
+                                        extraDto.AttributeValue = "True";
+                                    }
+                                    if (exr.Code == "EMAIL-ADDRESS-IS-PUBLIC")
+                                    {
+                                        extraDto.AttributeValue = "True";
+                                    }
+                                    accountDto.EntityExtraData.Add(extraDto);
+                                }
+                            }
+                        }
+                        ContactDto savedContactDto = await _appAccountsAppService.CreateOrUpdateContact(accountDto);
+                        //I40[End]
+                    }
+
+                }
+                //MMT, 09/07/2022 T-SII-20220803.0003 Newly registered user does not have related Team member[Start]
+                else
+                {
+                    var account = _appContactRepository.GetAll().FirstOrDefault(x => x.TenantId == AbpSession.TenantId && x.IsProfileData && x.ParentId == null && x.PartnerId == null && x.AccountId == null);
+                    if (account != null)
+                    {
+                        //I40[Start]  
+                        //ContactDto contactDto = new ContactDto();
+                        //contactDto.AccountId = account.Id;
+                        //contactDto.FirstName = input.User.Name;
+                        //contactDto.LastName = input.User.Surname;
+                        //contactDto.EMailAddress = input.User.EmailAddress;
+                        //contactDto.UserId = input.User.Id;
+                        //contactDto.Name = input.User.Name + " " + user.Surname;
+                        //contactDto.UserName = input.User.UserName;
+                        //contactDto.TradeName = "";
+                        //contactDto.ParentId = account.Id;
+                        //contactDto.Code = input.Code;
+                        //ContactDto savedContactDto = await _appAccountsAppService.CreateOrEditContact(contactDto);
+                        CreateOrEditAccountInfoDto accountDto = new CreateOrEditAccountInfoDto();
+                        accountDto.Id = 0;
+                        accountDto.Code = input.Code;
+                        accountDto.Name = input.User.Name + " " + input.User.Surname;
+                        accountDto.TradeName = "";
+                        accountDto.EMailAddress = input.User.EmailAddress;
+                        accountDto.ReturnId = true;
+                        accountDto.AccountLevel = AccountLevelEnum.Manual;
+                        accountDto.EntityExtraData = new List<AppEntityExtraDataDto>();
+                        var entityObjectType = await _sycEntityObjectTypesAppService.GetAllWithExtraAttributesByCode("PERSONAL");
+                        if (entityObjectType != null && entityObjectType.Count > 0)
+                        {
+                            var entityTypeObj = entityObjectType.FirstOrDefault();
+                            if (entityTypeObj != null && entityTypeObj.ExtraAttributes != null && entityTypeObj.ExtraAttributes.ExtraAttributes.Count > 0)
+                            {
+                                foreach (var exr in entityTypeObj.ExtraAttributes.ExtraAttributes)
+                                {
+                                    AppEntityExtraDataDto extraDto = new AppEntityExtraDataDto();
+                                    extraDto = ObjectMapper.Map<AppEntityExtraDataDto>(exr);
+                                    if (exr.Code == "FIRST-NAME")
+                                    {
+                                        extraDto.AttributeValue = input.User.Name;
+                                    }
+                                    if (exr.Code == "LAST-NAME")
+                                    {
+                                        extraDto.AttributeValue = input.User.Surname;
+                                    }
+                                    if (exr.Code == "USER-ID")
+                                    {
+                                        extraDto.AttributeValue = user.Id.ToString();
+                                    }
+                                    if (exr.Code == "USER-NAME")
+                                    {
+                                        extraDto.AttributeValue = input.User.UserName;
+                                    }
+                                    if (exr.Code == "USER-NAME-IS-PUBLIC")
+                                    {
+                                        extraDto.AttributeValue = "True";
+                                    }
+                                    if (exr.Code == "EMAIL-ADDRESS-IS-PUBLIC")
+                                    {
+                                        extraDto.AttributeValue = "True";
+                                    }
+                                    if (exr.Code == "EMAIL-ADDRESS-IS-PUBLIC")
+                                    {
+                                        extraDto.AttributeValue = "True";
+                                    }
+                                    accountDto.EntityExtraData.Add(extraDto);
+                                }
+                            }
+                        }
+                        ContactDto savedContactDto = await _appAccountsAppService.CreateOrUpdateContact(accountDto);
+                        //I40[End]
+                    }
                 }
             }
             //MMT, 09/07/2022 T-SII-20220803.0003 Newly registered user does not have related Team member[End]
@@ -499,23 +649,110 @@ namespace onetouch.Authorization.Users
             CheckErrors(await UserManager.CreateAsync(user));
 
             //Update Entity/Contact table[Start-Mariam] 
-            if(AbpSession.TenantId != null && AbpSession.TenantId != 0 )
+            string createContactSetting = await _appEntitiesAppService.GetHostSettingValue(1212); 
+            
+            if (createContactSetting.ToLower() == "Manualcontactpersons".ToLower() && AbpSession.TenantId != null && AbpSession.TenantId != 0 )
             {
-                var account = _appContactRepository.GetAll().FirstOrDefault(x => x.TenantId == AbpSession.TenantId && x.IsProfileData && x.ParentId == null && x.PartnerId == null && x.AccountId == null);
-                if (account != null)
+                if (input.ContactId!=null && input.ContactId!=0)
                 {
-                    ContactDto contactDto = new ContactDto();
-                    contactDto.AccountId = account.Id;
-                    contactDto.FirstName = input.User.Name;
-                    contactDto.LastName = input.User.Surname;
-                    contactDto.EMailAddress = input.User.EmailAddress;
-                    contactDto.UserId = user.Id;
-                    contactDto.Name = input.User.Name + " " + input.User.Surname;
-                    contactDto.UserName = input.User.UserName;
-                    contactDto.TradeName = "";
-                    contactDto.ParentId = account.Id;
-                    contactDto.Code = input.Code ;
-                    ContactDto savedContactDto = await _appAccountsAppService.CreateOrEditContact(contactDto);
+                    var contact = _appContactRepository.GetAll()
+                        .Include(x=>x.EntityFk).ThenInclude(z=>z.EntityExtraData)
+                        .Include(x => x.EntityFk).ThenInclude(x => x.EntityCategories).ThenInclude(x => x.EntityObjectCategoryFk)
+                        .Include(x => x.EntityFk).ThenInclude(x => x.EntityClassifications).ThenInclude(x => x.EntityObjectClassificationFk)
+                        .Include(x => x.EntityFk).ThenInclude(x => x.EntityAttachments).ThenInclude(x => x.AttachmentFk)
+                        .Include(z=> z.AppContactAddresses).ThenInclude(z=>z.AddressFk)
+                        .FirstOrDefault(x => x.TenantId == AbpSession.TenantId && 
+                    x.Id == input.ContactId);
+                    if (contact != null)
+                    {
+                        CreateOrEditAccountInfoDto accountDto = new CreateOrEditAccountInfoDto();
+                        accountDto = ObjectMapper.Map<CreateOrEditAccountInfoDto>(contact);
+                        var userIdExtraData = accountDto.EntityExtraData.Where(z => z.AttributeId == 715).FirstOrDefault();
+                        if (userIdExtraData != null)
+                        {
+                            userIdExtraData.AttributeValue = user.Id.ToString();
+                        }
+                        var userNameExtraData = accountDto.EntityExtraData.Where(z => z.AttributeId == 703).FirstOrDefault();
+                        if (userNameExtraData != null)
+                        {
+                            userNameExtraData.AttributeValue = input.User.UserName;
+                        }
+                        ContactDto savedContactDto = await _appAccountsAppService.CreateOrUpdateContact(accountDto);
+                    }
+                }
+                else
+                { 
+                var account = _appContactRepository.GetAll().FirstOrDefault(x => x.TenantId == AbpSession.TenantId && x.IsProfileData && x.ParentId == null && x.PartnerId == null && x.AccountId == null);
+                if (account != null) // Stop creating contact
+                    {
+                        //I40 {Start}
+                        //ContactDto contactDto = new ContactDto();
+                        //contactDto.AccountId = account.Id;
+                        //contactDto.FirstName = input.User.Name;
+                        //contactDto.LastName = input.User.Surname;
+                        //contactDto.EMailAddress = input.User.EmailAddress;
+                        //contactDto.UserId = user.Id;
+                        //contactDto.Name = input.User.Name + " " + input.User.Surname;
+                        //contactDto.UserName = input.User.UserName;
+                        //contactDto.TradeName = "";
+                        //contactDto.ParentId = account.Id;
+                        //contactDto.Code = input.Code ;
+                        //ContactDto savedContactDto = await _appAccountsAppService.CreateOrEditContact(contactDto);
+
+                        CreateOrEditAccountInfoDto accountDto = new CreateOrEditAccountInfoDto();
+                        accountDto.Id = 0;
+                        accountDto.Code = input.Code;
+                        accountDto.Name = input.User.Name + " " + input.User.Surname;
+                        accountDto.TradeName = "";
+                        accountDto.EMailAddress = input.User.EmailAddress;
+                        accountDto.ReturnId = true;
+                        accountDto.AccountLevel = AccountLevelEnum.Manual;
+                        accountDto.EntityExtraData = new List<AppEntityExtraDataDto>();
+                        var entityObjectType = await _sycEntityObjectTypesAppService.GetAllWithExtraAttributesByCode("PERSONAL");
+                        if (entityObjectType != null && entityObjectType.Count > 0)
+                        {
+                            var entityTypeObj = entityObjectType.FirstOrDefault();
+                            if (entityTypeObj != null && entityTypeObj.ExtraAttributes != null && entityTypeObj.ExtraAttributes.ExtraAttributes.Count > 0)
+                            {
+                                foreach (var exr in entityTypeObj.ExtraAttributes.ExtraAttributes)
+                                {
+                                    AppEntityExtraDataDto extraDto = new AppEntityExtraDataDto();
+                                    extraDto = ObjectMapper.Map<AppEntityExtraDataDto>(exr);
+                                    if (exr.Code == "FIRST-NAME")
+                                    {
+                                        extraDto.AttributeValue = input.User.Name;
+                                    }
+                                    if (exr.Code == "LAST-NAME")
+                                    {
+                                        extraDto.AttributeValue = input.User.Surname;
+                                    }
+                                    if (exr.Code == "USER-ID")
+                                    {
+                                        extraDto.AttributeValue = user.Id.ToString();
+                                    }
+                                    if (exr.Code == "USER-NAME")
+                                    {
+                                        extraDto.AttributeValue = input.User.UserName;
+                                    }
+                                    if (exr.Code == "USER-NAME-IS-PUBLIC")
+                                    {
+                                        extraDto.AttributeValue = "True";
+                                    }
+                                    if (exr.Code == "EMAIL-ADDRESS-IS-PUBLIC")
+                                    {
+                                        extraDto.AttributeValue = "True";
+                                    }
+                                    if (exr.Code == "EMAIL-ADDRESS-IS-PUBLIC")
+                                    {
+                                        extraDto.AttributeValue = "True";
+                                    }
+                                    accountDto.EntityExtraData.Add(extraDto);
+                                }
+                            }
+                        }
+                        ContactDto savedContactDto = await _appAccountsAppService.CreateOrUpdateContact(accountDto);
+                    }
+                    //I40 {End}
                 }
             }
             
@@ -562,7 +799,7 @@ namespace onetouch.Authorization.Users
                 var rolesOfUser = userRoles.Where(userRole => userRole.UserId == user.Id).ToList();
                 user.Roles = ObjectMapper.Map<List<UserListRoleDto>>(rolesOfUser);
                 //Mariam[start]
-                var contactEntityExtraData = _appEntityExtraDataRepository.GetAll().FirstOrDefault(x => x.AttributeId == 715 && x.AttributeValue == user.Id.ToString());
+                var contactEntityExtraData = _appEntityExtraDataRepository.GetAll().FirstOrDefault(x => x.EntityFk.TenantId == AbpSession.TenantId && x.AttributeId == 715 && x.AttributeValue == user.Id.ToString());
                 if (contactEntityExtraData != null)
                 {
                     var contact = _appContactRepository.GetAll().FirstOrDefault(x => x.TenantId == AbpSession.TenantId && x.EntityId == contactEntityExtraData.EntityId);

@@ -4,16 +4,7 @@
     font-size: 28px;
   }
   
-  .fill-s {
-  
-    position: absolute !important;
-    left: 0;
-    overflow: hidden !important;
-    color: #F6851D;
-    height: 32px;
-  }
-  
-  
+
   
   .star {
     color: #F6851D !important;
@@ -208,7 +199,7 @@
     min-height: 60px;
     height: 100%;
     border-bottom: 1px solid #EEEEEEEE;
-  
+      padding-bottom: 10px;
   
   }
   
@@ -254,6 +245,11 @@
   .bottomSec {
     position: absolute;
     right: 10px;
+    top: 10px;
+  }
+  .bottomSecAr {
+    position: absolute;
+    left: 10px;
     top: 10px;
   }
   .bottomSec .iconImg {

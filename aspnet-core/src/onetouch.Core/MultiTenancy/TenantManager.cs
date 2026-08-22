@@ -104,7 +104,7 @@ namespace onetouch.MultiTenancy
             bool sendActivationEmail,
             DateTime? subscriptionEndDate,
             bool isInTrialPeriod,
-            string emailActivationLink, int? inviterTenantId, string firstName,string lastName)
+            string emailActivationLink, int? inviterTenantId, string firstName,string lastName, string adminName, int relatedTenantId = 0)
         {
             int newTenantId;
             long newAdminId;
@@ -159,7 +159,7 @@ namespace onetouch.MultiTenancy
                     //var adminUser = User.CreateTenantAdminUser(tenant.Id, adminEmailAddress);
                     //MMT,1 Add Admin user first name and last name in the Tenant regsitration page[Start]
                     //var adminUser = User.CreateTenantAdminUser(tenant.Id, adminEmailAddress, tenancyName);
-                    var adminUser = User.CreateTenantAdminUser(tenant.Id, adminEmailAddress,tenancyName,firstName, lastName);
+                    var adminUser = User.CreateTenantAdminUser(tenant.Id, adminEmailAddress,tenancyName,firstName, lastName, adminName, relatedTenantId);
                     //MMT,1 Add Admin user first name and last name in the Tenant regsitration page[End]
                     //Mariam[End]
                     adminUser.ShouldChangePasswordOnNextLogin = shouldChangePasswordOnNextLogin;

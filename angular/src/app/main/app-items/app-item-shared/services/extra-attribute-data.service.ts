@@ -40,6 +40,7 @@ export class ExtraAttributeDataService extends AppComponentBase {
 
     getFilteredAttributesByUsage(extraAttributes:ExtraAttribute[],usageType?:EExtraAttributeUsage,loadLookupAsync:boolean = true) : FilteredExtraAttribute[] {
         const  _extraAttributes:FilteredExtraAttribute[] = []
+        
         extraAttributes.forEach(async (extraAttr : ExtraAttribute)=>{
             if( usageType === undefined || extraAttr.usage == usageType ){
                 let _extraAttr = new FilteredExtraAttribute(
@@ -58,10 +59,12 @@ export class ExtraAttributeDataService extends AppComponentBase {
                     }
                 }
                 else {
+                      
                     const defaultValue = _extraAttr.defaultValue
                     if(defaultValue) {
                         if(_extraAttr.dataType === 'boolean') {
-                            _extraAttr.selectedValues = Boolean(defaultValue)
+                            //_extraAttr.selectedValues = Boolean(defaultValue)
+                            _extraAttr.selectedValues = defaultValue
                         } else {
                             _extraAttr.selectedValues = defaultValue
                         }
@@ -99,7 +102,7 @@ export class ExtraAttributeDataService extends AppComponentBase {
             undefined,
             undefined,
             undefined,
-            undefined,
+            undefined,false,
             code,
             undefined,
             undefined,

@@ -19,7 +19,9 @@ namespace onetouch.AppSiiwiiTransaction
     [Audited]
     public class AppTransactionContacts : FullAuditedEntity<long>
     {
-      public virtual long TransactionId { set; get; }
+        public virtual long TransactionId { set; get; }
+        public virtual long? RelationId { set; get; }
+
         [StringLength(AppTransactionConst.MaxSSINLength, MinimumLength = AppTransactionConst.MinSSINLength)]
         public virtual string  ContactSSIN { set; get; }
         [StringLength(AppTransactionConst.MaxSellerNameLength, MinimumLength = AppTransactionConst.MinSellerNameLength)]

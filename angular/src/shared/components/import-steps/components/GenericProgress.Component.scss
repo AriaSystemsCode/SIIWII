@@ -15,4 +15,26 @@
     border-radius: 6px;
     opacity: 1;
 }
+
+@media (max-width: 768px) {
+    .modal-dialog {
+        width: 96%;
+        margin: 0.5rem auto;
+    }
+
+    .modal-content {
+        padding-left: 0.75rem !important;
+        padding-right: 0.75rem !important;
+    }
+}
+
+@media (max-width: 576px) {
+    .modal-dialog {
+        width: 98%;
+    }
+
+    .progress {
+        height: 8px;
+    }
+}
 // <!-- Iteration-8 -->
