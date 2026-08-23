@@ -531,7 +531,15 @@ button.btn.btn-outline-secondary.button-border.ng-tns-c374-7 {
 .aria-input-text,
 .aria-select {
    height: 47px !important;
-   background-color: #FFFFFF !important;
+       margin: 0 !important;
+    background-color: #ffffff !important;
+    border: 1px solid #d9d9d9;
+    border-radius: 8px;
+    padding-left: 15px;
+    padding-right: 15px;
+    color: #595959;
+    font-size: 14px;
+
 }
 
 .aria-select-modal {
@@ -1295,4 +1303,919 @@ border-radius: 6px;
 
 .gap-12 {
    gap: 12px;
+}
+
+
+/* ==========================================================
+   UNIFIED ACCOUNT/PERSONAL FORM UI
+   Create / Edit / View
+   ========================================================== */
+/* ==========================================================
+   PERSONAL / ACCOUNT FORM - UNIFIED UI
+   ========================================================== */
+
+.account-field-row,
+.personal-field-row {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    min-height: 64px;
+    margin: 0 0 14px;
+}
+
+
+/* ==========================================================
+   LABEL
+   ========================================================== */
+
+.account-field-label,
+.personal-field-label {
+    flex: 0 0 16.666667%;
+    max-width: 16.666667%;
+
+    padding-right: 15px;
+    margin: 0;
+
+    color: #595959;
+    font-size: 14px;
+    font-weight: 400;
+
+    text-align: right;
+}
+
+
+/* ==========================================================
+   FIELD CONTAINER
+   ========================================================== */
+
+.account-field-control,
+.personal-field-control,
+.personal-field-value {
+    flex: 0 0 66.666667%;
+    max-width: 66.666667%;
+    min-width: 0;
+}
+
+.personal-field-value {
+    color: #595959;
+    font-size: 14px;
+    word-break: break-word;
+}
+
+
+/* ==========================================================
+   INPUTS
+   ========================================================== */
+
+.account-field-control input.form-control,
+.personal-field-control input.form-control,
+.account-field-control textarea.form-control,
+.personal-field-control textarea.form-control {
+
+    display: block !important;
+
+    width: 100% !important;
+    max-width: 100% !important;
+
+    min-height: 47px;
+
+    margin: 0 !important;
+
+    background-color: #ffffff !important;
+
+    border: 1px solid #d9d9d9;
+    border-radius: 8px;
+
+    padding-left: 15px;
+    padding-right: 15px;
+
+    color: #595959;
+    font-size: 14px;
+}
+
+
+/* remove old global input sizing inside profile */
+
+.account-field-row input,
+.personal-field-row input {
+
+    width: 100% !important;
+
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+
+    display: block !important;
+}
+
+
+/* ==========================================================
+   PLACEHOLDER
+   ========================================================== */
+
+.account-field-control input::placeholder,
+.personal-field-control input::placeholder {
+
+    color: #84818a;
+
+    opacity: 1;
+}
+
+
+/* ==========================================================
+   FOCUS
+   ========================================================== */
+
+.account-field-control input:focus,
+.personal-field-control input:focus,
+.account-field-control textarea:focus,
+.personal-field-control textarea:focus {
+
+    outline: none !important;
+
+    box-shadow: none !important;
+
+    border-color: #a8a8a8;
+}
+
+
+/* ==========================================================
+   PRIME NG DROPDOWN
+   ========================================================== */
+
+::ng-deep
+.account-field-control
+.p-dropdown,
+
+::ng-deep
+.personal-field-control
+.p-dropdown {
+
+    width: 100% !important;
+
+    min-height: 53px !important;
+
+    background: #ffffff !important;
+
+    border: 1px solid #d9d9d9 !important;
+
+    border-radius: 8px !important;
+}
+
+
+::ng-deep
+.account-field-control
+.p-dropdown-label,
+
+::ng-deep
+.personal-field-control
+.p-dropdown-label {
+
+    min-height: 51px;
+
+    display: flex;
+
+    align-items: center;
+
+    padding-left: 15px !important;
+
+    color: #595959;
+}
+
+
+::ng-deep
+.account-field-control
+.p-dropdown-trigger,
+
+::ng-deep
+.personal-field-control
+.p-dropdown-trigger {
+
+    width: 45px;
+}
+
+
+/* ==========================================================
+   PRIME NG MULTI SELECT - MARKETPLACE ROLE
+   ========================================================== */
+
+::ng-deep
+.account-field-control
+.p-multiselect,
+
+::ng-deep
+.personal-field-control
+.p-multiselect {
+
+    width: 100% !important;
+
+    min-height: 53px !important;
+
+    background: #ffffff !important;
+
+    border: 1px solid #d9d9d9 !important;
+
+    border-radius: 8px !important;
+}
+
+
+::ng-deep
+.account-field-control
+.p-multiselect-label-container,
+
+::ng-deep
+.personal-field-control
+.p-multiselect-label-container {
+
+    min-height: 51px;
+
+    display: flex;
+
+    align-items: center;
+}
+
+
+::ng-deep
+.account-field-control
+.p-multiselect-label,
+
+::ng-deep
+.personal-field-control
+.p-multiselect-label {
+
+    display: flex;
+
+    align-items: center;
+
+    flex-wrap: wrap;
+
+    min-height: 51px;
+
+    padding-left: 15px !important;
+
+    margin: 0 !important;
+}
+
+
+::ng-deep
+.account-field-control
+.p-multiselect-trigger,
+
+::ng-deep
+.personal-field-control
+.p-multiselect-trigger {
+
+    width: 45px;
+}
+
+
+/* ==========================================================
+   EMAIL / PHONE + IS PUBLIC
+   ========================================================== */
+
+/*
+   Important:
+   Input keeps the SAME width as
+   First Name / Last Name / Language / Marketplace Role.
+   Switch is positioned after the input.
+*/
+
+.account-field-with-switch,
+.personal-field-with-switch {
+
+    display: block !important;
+
+    position: relative;
+}
+
+
+.account-field-input,
+.personal-field-input {
+
+    width: 100%;
+
+    min-width: 0;
+}
+
+
+.account-public-switch,
+.personal-public-switch {
+
+    position: absolute;
+
+    left: calc(100% + 18px);
+
+    top: 50%;
+
+    transform: translateY(-50%);
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 8px;
+
+    min-width: 120px;
+
+    white-space: nowrap;
+}
+
+
+.account-public-switch .isPublic,
+.personal-public-switch .isPublic {
+
+    margin: 0;
+
+    color: #1b101b;
+
+    font-size: 13px;
+
+    font-weight: 700;
+
+    white-space: nowrap;
+}
+
+
+/* ==========================================================
+   INPUT SWITCH
+   ========================================================== */
+
+::ng-deep
+.account-public-switch
+.p-inputswitch,
+
+::ng-deep
+.personal-public-switch
+.p-inputswitch {
+
+    margin: 0;
+}
+
+
+::ng-deep
+.account-public-switch
+.p-inputswitch
+.p-inputswitch-slider,
+
+::ng-deep
+.personal-public-switch
+.p-inputswitch
+.p-inputswitch-slider {
+
+    margin: 0;
+}
+
+
+/* ==========================================================
+   SSIN
+   ========================================================== */
+
+.account-field-control
+input[readonly],
+
+.personal-field-control
+input[readonly] {
+
+    background-color: #ffffff !important;
+
+    cursor: default;
+}
+
+
+/* ==========================================================
+   IMAGE ROWS
+   ========================================================== */
+
+.account-image-row,
+.personal-image-row {
+
+    align-items: flex-start;
+}
+
+
+.personal-profile-logo {
+
+    width: 120px;
+
+    height: 120px;
+
+    object-fit: contain;
+
+    border: 1px solid #6259ce;
+
+    border-radius: 6px;
+
+    background-color: #ffffff;
+}
+
+
+.personal-cover-preview {
+
+    width: 100%;
+
+    max-width: 620px;
+
+    overflow: hidden;
+
+    border-radius: 8px;
+}
+
+
+/* ==========================================================
+   PERSONAL TITLE
+   ========================================================== */
+
+.personal-profile-title {
+
+    color: #1b101b;
+
+    font-size: 16px;
+
+    font-weight: 700;
+}
+
+
+/* ==========================================================
+   MARKETPLACE ROLE CHIPS
+   ========================================================== */
+
+.role-chip-wrapper {
+
+    display: flex;
+
+    flex-wrap: wrap;
+
+    align-items: center;
+
+    gap: 8px;
+}
+
+
+.role-chip {
+
+    display: inline-flex;
+
+    align-items: center;
+
+    margin: 0 !important;
+
+    padding: 8px 14px;
+
+    background: #ecf0f3;
+
+    color: #464e5f;
+
+    border-radius: 6px;
+
+    font-size: 13px;
+
+    font-weight: 500;
+}
+
+
+/* ==========================================================
+   VALIDATION
+   ========================================================== */
+
+.account-field-control
+validation-messages,
+
+.personal-field-control
+validation-messages {
+
+    display: block;
+
+    width: 100%;
+}
+
+
+.account-field-control small,
+.personal-field-control small {
+
+    display: block;
+
+    margin-top: 5px;
+}
+
+
+/* ==========================================================
+   FIX BOOTSTRAP COLUMN PADDING
+   ========================================================== */
+
+.account-field-row
+.account-field-control,
+
+.personal-field-row
+.personal-field-control {
+
+    padding-left: 15px;
+
+    padding-right: 15px;
+}
+
+
+/* ==========================================================
+   PROFILE INPUT HEIGHT CONSISTENCY
+   ========================================================== */
+
+.account-field-row
+.aria-input-text,
+
+.personal-field-row
+.aria-input-text,
+
+.account-field-row
+.aria-select,
+
+.personal-field-row
+.aria-select {
+
+   height: 47px !important;
+
+}
+
+
+/* ==========================================================
+   PERSONAL PROFILE FORM
+   ========================================================== */
+
+.personal-profile-form {
+
+    width: 100%;
+}
+
+
+/* ==========================================================
+   VIEW PROFILE
+   ========================================================== */
+
+.personal-profile-section
+.personal-field-row {
+
+    margin-bottom: 14px;
+}
+
+
+.personal-profile-section
+.personal-field-value {
+
+    min-height: 47px;
+
+    display: flex;
+
+    align-items: center;
+}
+
+
+/* ==========================================================
+   RESPONSIVE - TABLET
+   ========================================================== */
+
+@media (max-width: 1100px) {
+
+    .account-field-label,
+    .personal-field-label {
+
+        flex: 0 0 22%;
+
+        max-width: 22%;
+    }
+
+
+    .account-field-control,
+    .personal-field-control,
+    .personal-field-value {
+
+        flex: 0 0 63%;
+
+        max-width: 63%;
+    }
+
+
+    .account-public-switch,
+    .personal-public-switch {
+
+        min-width: 110px;
+
+        left: calc(100% + 12px);
+    }
+}
+
+
+/* ==========================================================
+   RESPONSIVE - MOBILE
+   ========================================================== */
+
+@media (max-width: 767px) {
+
+    .account-field-row,
+    .personal-field-row {
+
+        display: block;
+
+        width: 100%;
+
+        min-height: auto;
+
+        margin-bottom: 20px;
+    }
+
+
+    .account-field-label,
+    .personal-field-label {
+
+        display: block;
+
+        width: 100%;
+
+        max-width: 100%;
+
+        flex: 0 0 100%;
+
+        padding: 0;
+
+        margin-bottom: 7px;
+
+        text-align: left;
+    }
+
+
+    .account-field-control,
+    .personal-field-control,
+    .personal-field-value {
+
+        display: block;
+
+        width: 100%;
+
+        max-width: 100%;
+
+        flex: 0 0 100%;
+
+        padding-left: 0;
+
+        padding-right: 0;
+    }
+
+
+    .account-field-with-switch,
+    .personal-field-with-switch {
+
+        display: block !important;
+    }
+
+
+    .account-public-switch,
+    .personal-public-switch {
+
+        position: static;
+
+        left: auto;
+
+        top: auto;
+
+        transform: none;
+
+        margin-top: 10px;
+
+        justify-content: flex-start;
+    }
+
+
+    .personal-profile-section
+    .personal-field-value {
+
+        min-height: auto;
+    }
+}
+
+
+/* ==========================================================
+   RTL
+   ========================================================== */
+
+:host-context([dir='rtl'])
+.account-field-label,
+
+:host-context([dir='rtl'])
+.personal-field-label {
+
+    padding-right: 0;
+
+    padding-left: 15px;
+
+    text-align: left;
+}
+
+
+:host-context([dir='rtl'])
+.account-public-switch,
+
+:host-context([dir='rtl'])
+.personal-public-switch {
+
+    left: auto;
+
+    right: calc(100% + 18px);
+}
+
+
+:host-context([dir='rtl'])
+.role-chip-wrapper {
+
+    direction: rtl;
+}
+
+
+@media (max-width: 767px) {
+
+    :host-context([dir='rtl'])
+    .account-field-label,
+
+    :host-context([dir='rtl'])
+    .personal-field-label {
+
+        text-align: right;
+
+        padding-left: 0;
+    }
+
+
+    :host-context([dir='rtl'])
+    .account-public-switch,
+
+    :host-context([dir='rtl'])
+    .personal-public-switch {
+
+        right: auto;
+    }
+}
+
+.form-group label {
+  color: #1B101B;
+    font-size: 15px;
+    text-align: start;
+    /* display: inline-block; */
+    font-weight: 600 !important;
+}
+
+/* =====================================================
+   ALIGN ONLY ACCOUNT INFORMATION FIELDS
+   ===================================================== */
+
+.account-field-row {
+    display: flex !important;
+    align-items: flex-start !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    margin-bottom: 18px !important;
+}
+
+
+/* ================= LABEL ================= */
+
+.account-field-row .account-field-label,
+.account-field-row > .label-form {
+    flex: 0 0 180px !important;
+
+   //  width: 180px !important;
+   //  min-width: 180px !important;
+   //  max-width: 180px !important;
+
+    padding-left: 0 !important;
+    padding-right: 20px !important;
+    padding-top: 10px !important;
+
+    margin: 0 !important;
+
+    text-align: start !important;
+
+    font-size: 13px !important;
+    line-height: 20px !important;
+}
+
+
+/* ================= CONTROL ================= */
+
+.account-field-row .account-field-control,
+.account-field-row > .col-sm-8 {
+    flex: 0 0 520px !important;
+
+    width: 520px !important;
+    max-width: 520px !important;
+
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+
+    margin-left: 0 !important;
+}
+
+
+/* ================= INPUT ================= */
+
+.account-field-row input.form-control,
+.account-field-row textarea.form-control,
+.account-field-row .aria-input-text {
+    width: 100% !important;
+    max-width: 100% !important;
+
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+height: 47px !important;
+    box-sizing: border-box;
+}
+
+
+/* ================= DROPDOWN ================= */
+
+::ng-deep .account-field-row p-dropdown {
+    display: block;
+    width: 100% !important;
+}
+
+::ng-deep .account-field-row .p-dropdown {
+    width: 100% !important;
+}
+
+
+/* ================= MULTI SELECT ================= */
+
+::ng-deep .account-field-row p-multiselect {
+    display: block;
+    width: 100% !important;
+}
+
+::ng-deep .account-field-row .p-multiselect {
+    width: 100% !important;
+}
+
+
+/* =====================================================
+   EMAIL / PHONE + IS PUBLIC SWITCH
+   ===================================================== */
+
+.account-field-with-switch {
+    display: flex !important;
+    align-items: center !important;
+
+    width: 520px !important;
+    max-width: 520px !important;
+
+    gap: 15px;
+}
+
+.account-field-input {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.account-field-input input {
+    width: 100% !important;
+    margin: 0 !important;
+}
+
+.account-public-switch {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    flex: 0 0 auto;
+    white-space: nowrap;
+}
+
+.account-public-switch .isPublic {
+    margin: 0 !important;
+}
+
+
+/* ================= MOBILE ================= */
+
+@media (max-width: 767px) {
+
+    .account-field-row {
+        display: block !important;
+    }
+
+    .account-field-row .account-field-label,
+    .account-field-row > .label-form {
+        width: 100% !important;
+        min-width: 100% !important;
+        max-width: 100% !important;
+
+        text-align: left !important;
+
+        padding: 0 !important;
+        margin-bottom: 6px !important;
+    }
+
+    .account-field-row .account-field-control,
+    .account-field-row > .col-sm-8 {
+        width: 100% !important;
+        max-width: 100% !important;
+        flex: 0 0 100% !important;
+    }
+
+    .account-field-with-switch {
+        width: 100% !important;
+        max-width: 100% !important;
+    }
 }
