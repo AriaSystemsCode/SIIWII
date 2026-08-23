@@ -2409,7 +2409,7 @@ namespace onetouch.Accounts
                                     }
                                 }
                                 createOrEditAccountInfoDto.UseDTOTenant = true;
-                                createOrEditAccountInfoDto.TenantId = tenantId;
+                                createOrEditAccountInfoDto.TenantId = originalContact.TenantOwner;
                                 createOrEditAccountInfoDto.Id = existed.Id;
 
                                 //createOrEditAccountInfoDto.PartnerId = ori
