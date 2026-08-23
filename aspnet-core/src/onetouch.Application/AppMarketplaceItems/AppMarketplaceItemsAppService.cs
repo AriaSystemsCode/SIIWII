@@ -493,11 +493,16 @@ namespace onetouch.AppMarketplaceItems
                 var appItemsList = hasPriceFilter ? orderedItemsFilter.PageBy(input).ToList() : orderedItemsFilter.ToList();
                 //I48[Start]
                 
+                var reviewSummaries = await _messageAppService.GetMarketplaceItemReviewSummaries(
+                    appItemsList.Select(item => item.AppItem.Id).ToList());
+                var reviewSummariesByItem = reviewSummaries.ToDictionary(summary => summary.EntityId);
                 foreach (var item in appItemsList)
                 {
-                   item.NumberOfReviews = await _messageAppService.GetAllReviewsCount(item.AppItem.Id);
-                   var rating = await _messageAppService.GetOverAllRatings(item.AppItem.Id);
-                   item.AverageRating = rating.OverAllRating;
+                    if (reviewSummariesByItem.TryGetValue(item.AppItem.Id, out var summary))
+                    {
+                        item.NumberOfReviews = summary.NumberOfReviews;
+                        item.AverageRating = summary.AverageRating;
+                    }
                     //I49
                     //if (!AbpSession.UserId.HasValue)
                     //{

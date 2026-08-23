@@ -7779,9 +7779,6 @@ namespace onetouch.AppItems
                 appItem.EntityFk.TenantOwner = appItem.TenantOwner;
                 await GenerateImportedParentSsin(appItem);
 
-                if (appItem.ParentFkList != null && appItem.ParentFkList.Any())
-                    importedParentsWithVariations.Add(appItem);
-
                 if (!string.IsNullOrEmpty(excelDto.SizeScaleName))
                 {
                     sizeRatioHeadersByName.TryGetValue(excelDto.SizeRatioName ?? string.Empty, out var ratioHeader);
@@ -8572,6 +8569,12 @@ namespace onetouch.AppItems
                 }
                 if (appItem.SycIdentifierId == null)
                     appItem.SycIdentifierId = defIdentfier;
+
+                // Register the parent only after imported variations have been added.
+                // New parents start with an empty ParentFkList, so checking earlier
+                // prevented their variation SSIN generation job from being queued.
+                if (appItem.ParentFkList != null && appItem.ParentFkList.Any())
+                    importedParentsWithVariations.Add(appItem);
 
                 await SaveImportedItemLean(appItem);
             }
