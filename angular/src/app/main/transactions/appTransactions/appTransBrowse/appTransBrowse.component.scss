@@ -271,3 +271,38 @@
 :host ::ng-deep .spreadsheet-container .e-sheet {
     height: 100% !important;
 }
+
+.spreadsheet-filter-summary {
+    padding: 12px 16px;
+    background: #f8f9fa;
+    border: 1px solid #e7e7e7;
+    border-radius: 6px;
+}
+
+.spreadsheet-filter-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.spreadsheet-filter-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+
+    background: #ecf0f3;
+    border-radius: 6px;
+
+    padding: 7px 12px;
+
+    font-size: 13px;
+    color: #464e5f;
+}
+
+.spreadsheet-filter-chip .filter-label {
+    font-weight: 600;
+}
+
+.spreadsheet-filter-chip .filter-value {
+    font-weight: 400;
+}

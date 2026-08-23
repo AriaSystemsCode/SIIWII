@@ -1418,89 +1418,323 @@
 <p-dialog
     [(visible)]="showSpreadsheetDialog"
     [modal]="true"
-    [draggable]="false"
-    [resizable]="false"
-    [closable]="true"
-    [maximizable]="true"
-    [style]="{
+    header="Transaction Spreadsheet"
+    appendTo="body"
+       [style]="{
         width: '85vw',
-        height: '92vh',
+        height: '85vh',
         margin: '20px'
     }"
       [contentStyle]="{
         padding: '0',
         height: 'calc(95vh - 58px)',
-        overflow: 'hidden',
         display: 'flex',
         flexDirection: 'column'
     }"
-    header="Transaction Spreadsheet"
-    appendTo="body"
     (onHide)="closeSpreadsheet()">
 
     <div class="spreadsheet-page">
 
-        <!-- Custom actions -->
+        <!-- ===================================== -->
+        <!-- ACTIONS -->
+        <!-- ===================================== -->
+
         <div
-            class="spreadsheet-actions d-flex flex-wrap align-items-center p-3">
+            class="spreadsheet-actions
+                   d-flex
+                   flex-wrap
+                   align-items-center
+                   p-3">
+
+            <button
+                type="button"
+                class="btn btn-primary mr-2"
+                (click)="saveSpreadsheetLocal()">
+
+                <i class="fa fa-save mr-1"></i>
+
+                Save Spreadsheet
+            </button>
 
 
+            <button
+                type="button"
+                class="btn btn-info mr-2"
+                (click)="openPivotAnalysis()">
+
+                <i class="fa fa-chart-bar mr-1"></i>
+
+                Pivot Analysis
+            </button>
 
 
-<button
-    type="button"
-    class="btn btn-primary mr-2"
-    (click)="saveSpreadsheetLocal()">
+            <button
+                type="button"
+                class="btn btn-outline-primary mr-2"
+                (click)="
+                    exportSpreadsheet($event);
+                    $event.preventDefault()
+                ">
 
-    <i class="fa fa-save mr-1"></i>
+                Export Excel
+            </button>
 
-    Save Spreadsheet
 
-</button>
-            
+            <button
+                type="button"
+                class="btn btn-danger"
+                (click)="
+                    exportPdf($event);
+                    $event.preventDefault()
+                ">
 
-       <button
-    type="button"
-    class="btn btn-outline-primary"
-    (click)="exportSpreadsheet($event); $event.preventDefault();">
-    Export Excel
-</button>
+                PDF
+            </button>
 
-<button
-    type="button"
-    class="btn btn-danger"
-    (click)="exportPdf($event); $event.preventDefault();">
-    PDF
-</button>
 
             <span class="ml-auto text-muted">
-                {{ spreadsheetRows.length }} transaction(s)
+
+                {{
+                    spreadsheetRows.length
+                }}
+                transaction(s)
+
             </span>
+
         </div>
 
-        <!-- Recreate spreadsheet each time dialog opens -->
-     <ejs-spreadsheet
-    *ngIf="showSpreadsheetDialog"
-    #spreadsheet
-    height="100%"
-    width="100%"
-    [sheets]="sheets"
-    [allowChart]="true"
-    [allowInsert]="true"
-    [allowDelete]="true"
-    [allowEditing]="true"
-    [allowResizing]="true"
-    [allowSorting]="true"
-    [allowFiltering]="true"
-    [allowOpen]="true"
-    [allowSave]="true"
-    [openUrl]="spreadsheetOpenUrl"
-    [saveUrl]="spreadsheetSaveUrl"
-    [enableContextMenu]="true"
-    [showRibbon]="true"
-    [showFormulaBar]="true"
-    [showSheetTabs]="true"
-    (created)="onSpreadsheetCreated()">
-</ejs-spreadsheet>
+
+        <!-- ===================================== -->
+        <!-- APPLIED FILTERS -->
+        <!-- ===================================== -->
+
+        <div
+            class="spreadsheet-filter-summary
+                   mx-3
+                   mb-3"
+            *ngIf="
+                getAppliedSpreadsheetFilters()
+                    .length > 0
+            ">
+
+            <div
+                class="
+                    d-flex
+                    align-items-center
+                    justify-content-between
+                    mb-2
+                ">
+
+                <h6
+                    class="
+                        mb-0
+                        font-weight-bold
+                    ">
+
+                    Applied Filters
+
+                </h6>
+
+
+                <span
+                    class="
+                        text-muted
+                        small
+                    ">
+
+                    {{
+                        getAppliedSpreadsheetFilters()
+                            .length
+                    }}
+                    filter(s)
+
+                </span>
+
+            </div>
+
+
+            <div
+                class="
+                    spreadsheet-filter-chips
+                ">
+
+                <div
+                    class="
+                        spreadsheet-filter-chip
+                    "
+                    *ngFor="
+                        let filter of
+                        getAppliedSpreadsheetFilters()
+                    ">
+
+                    <span
+                        class="filter-label">
+
+                        {{ filter.label }}:
+
+                    </span>
+
+
+                    <span
+                        class="filter-value">
+
+                        {{ filter.value }}
+
+                    </span>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- ===================================== -->
+        <!-- SPREADSHEET -->
+        <!-- ===================================== -->
+
+        <ejs-spreadsheet
+            *ngIf="showSpreadsheetDialog"
+            #spreadsheet
+            height="100%"
+            width="100%"
+            [sheets]="sheets"
+            [allowChart]="true"
+            [allowInsert]="true"
+            [allowDelete]="true"
+            [allowEditing]="true"
+            [allowResizing]="true"
+            [allowSorting]="true"
+            [allowFiltering]="true"
+            [allowOpen]="true"
+            [allowSave]="true"
+            [openUrl]="spreadsheetOpenUrl"
+            [saveUrl]="spreadsheetSaveUrl"
+            [enableContextMenu]="true"
+            [showRibbon]="true"
+            [showFormulaBar]="true"
+            [showSheetTabs]="true"
+            (created)="onSpreadsheetCreated()">
+
+        </ejs-spreadsheet>
+
     </div>
+
+</p-dialog>
+
+
+<p-dialog
+    header="Pivot Analysis"
+    [(visible)]="showPivotDialog"
+    [modal]="true"
+     [style]="{
+        width: '85vw',
+        height: '85vh',
+        margin: '20px'
+    }"
+      [contentStyle]="{
+        padding: '0',
+        height: 'calc(95vh - 58px)',
+        display: 'flex',
+        flexDirection: 'column'
+    }"
+    [draggable]="false"
+    [resizable]="false"
+    appendTo="body">
+
+    <!-- ===================================== -->
+    <!-- PIVOT TOOLBAR -->
+    <!-- ===================================== -->
+
+    <div
+        class="d-flex align-items-center
+               justify-content-between
+               mb-3">
+
+        <div>
+
+            <strong class="mr-3">
+                Pivot Analysis
+            </strong>
+
+            <span class="text-muted">
+                Drag fields to Rows,
+                Columns, Values or Filters.
+            </span>
+
+        </div>
+<div class="d-flex align-items-center mb-3">
+
+    <label class="mb-0 mr-2">
+        Analysis:
+    </label>
+
+    <p-dropdown
+        [options]="pivotReportOptions"
+        [(ngModel)]="selectedPivotReport"
+        optionLabel="label"
+        optionValue="value"
+        appendTo="body"
+        [style]="{ width: '280px' }"
+        (onChange)="changePivotReport()">
+    </p-dropdown>
+
+    <label class="mb-0 ml-4 mr-2">
+        Chart Type:
+    </label>
+
+    <p-dropdown
+        [options]="pivotChartTypes"
+        [(ngModel)]="selectedPivotChartType"
+        optionLabel="label"
+        optionValue="value"
+        appendTo="body"
+        [style]="{ width: '160px' }"
+        (onChange)="changePivotChartType()">
+    </p-dropdown>
+
+
+    <button
+    type="button"
+    class="btn btn-primary"
+    (click)="savePivotToDashboard()">
+
+    <i class="fa fa-chart-bar mr-1"></i>
+
+    Save to Dashboard
+
+</button>
+
+</div>
+
+    </div>
+
+
+    <!-- ===================================== -->
+    <!-- PIVOT -->
+    <!-- ===================================== -->
+
+<ejs-pivotview
+    *ngIf="showPivotDialog"
+    #pivotView
+
+    width="100%"
+    height="650"
+   (enginePopulated)="onPivotEnginePopulated()"
+    [dataSourceSettings]="pivotDataSourceSettings"
+
+    [showFieldList]="true"
+
+    [showGroupingBar]="true"
+
+    [groupingBarSettings]="pivotGroupingBarSettings"
+
+    [displayOption]="pivotDisplayOption"
+
+    [chartSettings]="pivotChartSettings"
+
+    [aggregateTypes]="pivotAggregateTypes">
+
+</ejs-pivotview>
+
 </p-dialog>
