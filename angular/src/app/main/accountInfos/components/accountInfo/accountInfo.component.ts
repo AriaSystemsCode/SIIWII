@@ -749,16 +749,88 @@ getAccountTypes(): void {
         this.accountTypeResolved = true;
     }
 }
-    resetFormData() {
-        this.touched = false
-        this.accountInfoTemp = new CreateOrEditAccountInfoDto()
-        this.accountInfoForm.resetForm()
-        this.setProfileData(this.getForEditResult)
-        this.accountInfoForm.form.patchValue(this.accountInfoTemp.toJSON())
-        this.companyLogo = this.accountDataForView?.logoUrl ? `${this.attachmentBaseUrl}/${this.accountDataForView?.logoUrl}` : undefined;
-        this.coverPhoto = this.accountDataForView?.coverUrl ? `${this.attachmentBaseUrl}/${this.accountDataForView?.coverUrl}` : undefined;
-        this.changeTab(!this.accountInfoTemp?.id && !this.accountId ? this.accountInfoPageTabsEnum.ProfileCreateOrEdit : this.accountInfoPageTabsEnum.ProfileView)
+    // resetFormData() {
+    //     this.touched = false
+    //     this.accountInfoTemp = new CreateOrEditAccountInfoDto()
+    //     this.accountInfoForm.resetForm()
+    //     this.setProfileData(this.getForEditResult)
+    //     this.accountInfoForm.form.patchValue(this.accountInfoTemp.toJSON())
+    //     this.companyLogo = this.accountDataForView?.logoUrl ? `${this.attachmentBaseUrl}/${this.accountDataForView?.logoUrl}` : undefined;
+    //     this.coverPhoto = this.accountDataForView?.coverUrl ? `${this.attachmentBaseUrl}/${this.accountDataForView?.coverUrl}` : undefined;
+    //     this.changeTab(!this.accountInfoTemp?.id && !this.accountId ? this.accountInfoPageTabsEnum.ProfileCreateOrEdit : this.accountInfoPageTabsEnum.ProfileView)
+    // }
+
+    resetFormData(): void {
+
+    // =====================================================
+    // CREATE MANUAL ACCOUNT
+    // Cancel → return to My Account
+    // =====================================================
+    if (this.isManualAccountCreate) {
+
+        this.touched = false;
+
+        this.accountInfoForm?.resetForm();
+
+        this._router.navigate(
+            ['/app/main/accounts']);
+
+        return;
     }
+
+
+    // =====================================================
+    // EDIT MANUAL / BUSINESS / EXTERNAL
+    // Cancel → restore data and return to View
+    // =====================================================
+
+    this.touched = false;
+
+    this.accountInfoTemp =
+        new CreateOrEditAccountInfoDto();
+
+    this.accountInfoForm?.resetForm();
+
+    this.setProfileData(
+        this.getForEditResult
+    );
+
+    this.accountInfoForm?.form.patchValue(
+        this.accountInfoTemp.toJSON()
+    );
+
+    this.companyLogo =
+        this.accountDataForView?.logoUrl
+            ? `${this.attachmentBaseUrl}/${this.accountDataForView.logoUrl}`
+            : undefined;
+
+    this.coverPhoto =
+        this.accountDataForView?.coverUrl
+            ? `${this.attachmentBaseUrl}/${this.accountDataForView.coverUrl}`
+            : undefined;
+
+
+    // Existing account → back to View
+    if (
+        this.accountInfoTemp?.id ||
+        this.accountId
+    ) {
+
+        this.changeTab(
+            this.accountInfoPageTabsEnum
+                .ProfileView
+        );
+
+        return;
+    }
+
+
+    // Other create modes keep existing behavior
+    this.changeTab(
+        this.accountInfoPageTabsEnum
+            .ProfileCreateOrEdit
+    );
+}
 
     async getAccountDataForView() {
 
