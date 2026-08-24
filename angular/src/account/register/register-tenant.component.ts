@@ -114,20 +114,10 @@ showPasswordRepeat = false;
                 });
         }
 
-   //  this.getAccountTypes();
+
     }
 
-    // getAccountTypes(){
 
-    //     this._tenantRegistrationService.getEditionsForSelect()
-    // .subscribe((result) => {
-    //     for (let i = 0; i < result.editionsWithFeatures.length; i++) {
-    //         const accountTypeLabel = result.editionsWithFeatures[i].edition.displayName;
-    //         const accountTypeValue = result.editionsWithFeatures[i].edition.id;
-    //         this.accountTypes.push({ label :accountTypeLabel ,value:accountTypeValue});
-    // }
-    // }); 
-    // } 
     get useCaptcha(): boolean {
         return this.setting.getBoolean('App.TenantManagement.UseCaptchaOnRegistration');
     }
@@ -137,15 +127,16 @@ showPasswordRepeat = false;
         let recaptchaCallback = (token: string) => {
             this.saving = true;
             this.model.captchaResponse = token;
-       //this.model.editionId =Number(this.accountType);
+ 
       this.model.editionId= Number(this.accountType) ? Number(this.accountType) :  this.model.editionId;
        this.model.accountTypeId=this.accountType;
        this.model.accountType = this.accountTypeLabel;
        this.model.relatedTenantId = this.relatedTenantId;
-//this.model.firstName=this.firstName;
-//this.model.lastName=this.lastName;
+       if( this.model.editionId == 5 ){
+        this.model.name = this.model.firstName +' ' + this.model.lastName
 
-         
+       }
+       
             this._tenantRegistrationService.registerTenant(this.model)
                 .pipe(finalize(() => { this.saving = false; }))
                 .subscribe((result: RegisterTenantOutput) => {

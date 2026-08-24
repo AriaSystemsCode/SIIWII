@@ -422,7 +422,7 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit, 
 
     }
 
-    handleBuyerCompanySearch(event: any) {
+       handleBuyerCompanySearch(event: any) {
         const filter = typeof event === 'string' ? event : (event?.filter ?? '');
         const type =
             this.role?.trim().toLowerCase() === "i'm an independent buying office."

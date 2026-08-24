@@ -87,12 +87,16 @@ using System.Diagnostics;
 using DocumentFormat.OpenXml.Office2010.ExcelAc;
 using onetouch.MultiTenancy;
 using Org.BouncyCastle.Crypto.Agreement.JPake;
+using onetouch.Authorization.Roles;
+using onetouch.Authorization.Users;
 
 namespace onetouch.AppItems
 {
     [AbpAuthorize(AppPermissions.Pages_AppItems)]
     public partial class AppItemsAppService : onetouchAppServiceBase, IAppItemsAppService, IAppItemsAppImportService, IExcelImporter<AppItemExcelResultsDTO>
     {
+        private readonly UserManager _userManager;
+        private readonly RoleManager _roleManager;
         //i46[Start]
         public static IUnitOfWorkManager _unitOfWorkManagerValid;
         //I46[End]
@@ -173,9 +177,12 @@ namespace onetouch.AppItems
              IRepository<AppEntitiesRelationship, long> appEntitiesRelationship,
              IBackgroundJobManager backgroundJobManager,
              IAbpStartupConfiguration abpStartupConfiguration,
-             IRepository<AppContact, long> appContactRepository
+             IRepository<AppContact, long> appContactRepository,
+             RoleManager roleManager, UserManager userManager
             )
         {
+            _userManager = userManager;
+            _roleManager = roleManager;
             _backgroundJobManager = backgroundJobManager;
             _abpStartupConfiguration = abpStartupConfiguration;
             _appEntitiesRelationship = appEntitiesRelationship;
@@ -1467,10 +1474,10 @@ namespace onetouch.AppItems
                 exceptList = query0.Select(e => e.Id).ToList();
             }
             var query = _appItemRepository.GetAll().Include(e => e.EntityFk).ThenInclude(e => e.EntityAttachments)
-                .Where(e => (e.EntityId != input.EntityId) && !exceptList.Contains(e.EntityId) && (e.ParentId == 0 || e.ParentId == null) && (e.IsDeleted == null || e.IsDeleted==false))
-                .WhereIf( !string.IsNullOrEmpty(input.Filter), e=> e.Name.Contains(input.Filter) || e.Code.Contains(input.Filter))
+                .Where(e => (e.EntityId != input.EntityId) && !exceptList.Contains(e.EntityId) && (e.ParentId == 0 || e.ParentId == null) && (e.IsDeleted == null || e.IsDeleted == false))
+                .WhereIf(!string.IsNullOrEmpty(input.Filter), e => e.Name.Contains(input.Filter) || e.Code.Contains(input.Filter))
                 .Include(e => e.EntityFk.EntityAttachments).ThenInclude(e => e.AttachmentFk);
-                    
+
             var totalCount = await query.CountAsync();
 
             var entityRelated = await query
@@ -1482,12 +1489,17 @@ namespace onetouch.AppItems
                     label = e.Code,
                     Data = new GetSycEntityObjectCategoryForViewDto
                     {
-                        SycEntityObjectCategoryName="",
-                        SydObjectName="ITEM",
-                            
-                        SycEntityObjectCategory = new SycEntityObjectCategoryDto { Code = e.Code, Name = e.Name, ObjectId = e.EntityId, Id = e.EntityId,
-                        AppItemImageUrl = (e.EntityFk.EntityAttachments != null && e.EntityFk.EntityAttachments.Count() > 0) ? imagesUrl + (e.TenantId.HasValue ? e.TenantId.ToString() : "-1") + @"/" + e.EntityFk.EntityAttachments[0].AttachmentFk.Attachment : "",
-                        AppItemImageName = (e.EntityFk.EntityAttachments != null && e.EntityFk.EntityAttachments.Count() > 0) ? e.EntityFk.EntityAttachments[0].AttachmentFk.Name : ""
+                        SycEntityObjectCategoryName = "",
+                        SydObjectName = "ITEM",
+
+                        SycEntityObjectCategory = new SycEntityObjectCategoryDto
+                        {
+                            Code = e.Code,
+                            Name = e.Name,
+                            ObjectId = e.EntityId,
+                            Id = e.EntityId,
+                            AppItemImageUrl = (e.EntityFk.EntityAttachments != null && e.EntityFk.EntityAttachments.Count() > 0) ? imagesUrl + (e.TenantId.HasValue ? e.TenantId.ToString() : "-1") + @"/" + e.EntityFk.EntityAttachments[0].AttachmentFk.Attachment : "",
+                            AppItemImageName = (e.EntityFk.EntityAttachments != null && e.EntityFk.EntityAttachments.Count() > 0) ? e.EntityFk.EntityAttachments[0].AttachmentFk.Name : ""
 
                         }
                     },
@@ -1498,18 +1510,18 @@ namespace onetouch.AppItems
                 totalCount,
                 entityRelated
             );
-            
+
 
         }
 
         public async Task<PagedResultDto<AppItemLookupDto>> GetAppItemRelatedProductsWithPaging(GetAllSycEntityObjectCategoriesInput input)
-        {   
+        {
 
             if (input.EntityId != 0)
             {
                 string imagesUrl = _appConfiguration[$"Attachment:Path"].Replace(_appConfiguration[$"Attachment:Omitt"], "") + @"/";
-               
-                
+
+
                 var query = _appEntitiesRelationship.GetAll()
                     .Where(e => (e.EntityId == input.EntityId || e.RelatedEntityId == input.EntityId)
                     )
@@ -1527,13 +1539,14 @@ namespace onetouch.AppItems
 
                 var totalCount = await query.CountAsync();
 
-                var sel = from entity in query join item in _appItemRepository.GetAll()
+                var sel = from entity in query
+                          join item in _appItemRepository.GetAll()
                           on entity.Id equals item.EntityId into j1
                           from j2 in j1.DefaultIfEmpty()
-                          select new 
+                          select new
                           {
                               Id = entity.Id,
-                              Code= j2.Code,
+                              Code = j2.Code,
                               Name = j2.Name,
                               EntityFk = entity.EntityFk,
                               TenantId = entity.TenantId,
@@ -1541,15 +1554,16 @@ namespace onetouch.AppItems
                           };
 
                 var entityRelated = await sel
-                    .OrderBy(!string.IsNullOrEmpty(input.Sorting)? input.Sorting: "Id asc")
+                    .OrderBy(!string.IsNullOrEmpty(input.Sorting) ? input.Sorting : "Id asc")
                     .PageBy(input)
                     .Select(e => new AppItemLookupDto
-                    {           AppItemCode = e.Code,
-                                AppItemName = e.Name,
-                                AppItemId = e.Id,
-                                Id = e.Id,
-                                AppItemImageUrl = (e.EntityAttachments != null && e.EntityAttachments.Count() > 0)? imagesUrl + (e.TenantId.HasValue ? e.TenantId.ToString() : "-1") + @"/" + e.EntityAttachments[0].AttachmentFk.Attachment:"",
-                                AppItemImageName = (e.EntityAttachments!= null  && e.EntityAttachments.Count() > 0) ? e.EntityAttachments[0].AttachmentFk.Name: ""
+                    {
+                        AppItemCode = e.Code,
+                        AppItemName = e.Name,
+                        AppItemId = e.Id,
+                        Id = e.Id,
+                        AppItemImageUrl = (e.EntityAttachments != null && e.EntityAttachments.Count() > 0) ? imagesUrl + (e.TenantId.HasValue ? e.TenantId.ToString() : "-1") + @"/" + e.EntityAttachments[0].AttachmentFk.Attachment : "",
+                        AppItemImageName = (e.EntityAttachments != null && e.EntityAttachments.Count() > 0) ? e.EntityAttachments[0].AttachmentFk.Name : ""
 
                     })
                     .ToListAsync();
@@ -2120,8 +2134,8 @@ namespace onetouch.AppItems
             // Rebuild the related-items list after applying add/remove deltas.
             #region Iteration49 handle the related items
             if (input.Id == 0 || input.entityRelatedItems == null)
-            { input.entityRelatedItems = new List<AppEntityCategoryDto>() ; }
-            
+            { input.entityRelatedItems = new List<AppEntityCategoryDto>(); }
+
             if (input.entityRelatedItemsRemoved != null && input.entityRelatedItemsRemoved.Count > 0)
             {
                 List<long> tempIds = input.entityRelatedItemsRemoved.Select(r => r.EntityObjectCategoryId).ToList();
@@ -2132,7 +2146,7 @@ namespace onetouch.AppItems
             { ((List<AppEntityCategoryDto>)input.entityRelatedItems).AddRange(input.entityRelatedItemAdded); }
 
             entity.RelatedEntitiesIds = new List<long>();
-            entity.RelatedEntitiesIds = input.entityRelatedItems.Select(e=> e.EntityObjectCategoryId).ToList();
+            entity.RelatedEntitiesIds = input.entityRelatedItems.Select(e => e.EntityObjectCategoryId).ToList();
 
             #endregion Iteration49 handle the related items
             var savedEntity = await _appEntitiesAppService.SaveEntity(entity);
@@ -2340,9 +2354,9 @@ namespace onetouch.AppItems
                     else
                     {
                         existingVariationItemsById.TryGetValue((long)child.Id, out appItemChild);
-                        if (appItemChild == null) 
+                        if (appItemChild == null)
                             appItemChild = await _appItemRepository.FirstOrDefaultAsync((long)child.Id);
-                        
+
                         if (appItemChild != null)
                         {
                             var existingChildEntityId = appItemChild.EntityId;
@@ -2633,7 +2647,7 @@ namespace onetouch.AppItems
                             itemPriceObj.AppItemCode = appItemChild.Code;
                             if (appItemChild.Id != 0)
                                 itemPriceObj.AppItemId = appItemChild.Id;
-                                
+
                             if (itemPriceObj.TenantId == null)
                                 itemPriceObj.TenantId = AbpSession.TenantId;
                             if (itemPriceObj.CurrencyCode == currency)
@@ -3739,7 +3753,8 @@ namespace onetouch.AppItems
                                 {
                                     rela.RelatedEntityId = appMarketplaceItem.Id;
                                     rela.RelatedEntityCode = appMarketplaceItem.Code;
-                                }else
+                                }
+                                else
                                 {
                                     rela.RelatedEntityId = 0;
                                 }
@@ -5082,11 +5097,11 @@ namespace onetouch.AppItems
 
                     itemExcelResultsDTO.ExcelLogDTO = new ExcelLogDto();
 
-                itemExcelResultsDTO.ExcelLogDTO.ExcelLogPath = itemExcelResultsDTO.FilePath.Replace(_appConfiguration[$"Attachment:Omitt"].ToString(), "");
-                itemExcelResultsDTO.ExcelLogDTO.ExcelLogPath = itemExcelResultsDTO.ExcelLogDTO.ExcelLogPath.ToLower();
-                itemExcelResultsDTO.ExcelLogDTO.ExcelLogFileName = _appConfiguration[$"ItemTemplates:ItemExcelLogFileName"];
-                #endregion
-                ////I46 test
+                    itemExcelResultsDTO.ExcelLogDTO.ExcelLogPath = itemExcelResultsDTO.FilePath.Replace(_appConfiguration[$"Attachment:Omitt"].ToString(), "");
+                    itemExcelResultsDTO.ExcelLogDTO.ExcelLogPath = itemExcelResultsDTO.ExcelLogDTO.ExcelLogPath.ToLower();
+                    itemExcelResultsDTO.ExcelLogDTO.ExcelLogFileName = _appConfiguration[$"ItemTemplates:ItemExcelLogFileName"];
+                    #endregion
+                    ////I46 test
 
 
                 }
@@ -6106,7 +6121,20 @@ namespace onetouch.AppItems
                 await SaveFromExcel(saveExcelinput);
                 var myTenantObject = await TenantManager.GetByIdAsync(int.Parse(AbpSession.TenantId.ToString()));
                 string tenancyName = myTenantObject.TenancyName;
-                var adminUser = await UserManager.FindByNameAsync("admin@" + tenancyName);
+                //var adminUser = await UserManager.FindByNameAsync("admin@" + tenancyName);
+                var adminRole = await _roleManager.Roles
+                        .FirstOrDefaultAsync(r => r.TenantId == int.Parse(AbpSession.TenantId.ToString()) && r.Name == StaticRoleNames.Tenants.Admin);
+
+                Authorization.Users.User adminUser = null;
+                if (adminRole != null)
+                {
+                    var adminRoleId = adminRole.Id;
+
+                    adminUser = await _userManager.Users
+                        .Where(u => u.TenantId == int.Parse(AbpSession.TenantId.ToString()))
+                        .Where(u => u.Roles.Any(r => r.RoleId == adminRoleId))
+                        .FirstOrDefaultAsync();
+                }
                 if (adminUser != null)
                 {
                     await _appNotifier.SendMessageAsync(new Abp.UserIdentifier(AbpSession.TenantId, adminUser.Id),
@@ -6129,7 +6157,20 @@ namespace onetouch.AppItems
                 {
                     var myTenantObject = await TenantManager.GetByIdAsync(int.Parse(AbpSession.TenantId.ToString()));
                     string tenancyName = myTenantObject.TenancyName;
-                    var adminUser = await UserManager.FindByNameAsync("admin@" + tenancyName);
+                    //var adminUser = await UserManager.FindByNameAsync("admin@" + tenancyName);
+                    var adminRole = await _roleManager.Roles
+                       .FirstOrDefaultAsync(r => r.TenantId == int.Parse(AbpSession.TenantId.ToString()) && r.Name == StaticRoleNames.Tenants.Admin);
+
+                    Authorization.Users.User adminUser = null;
+                    if (adminRole != null)
+                    {
+                        var adminRoleId = adminRole.Id;
+
+                        adminUser = await _userManager.Users
+                            .Where(u => u.TenantId == int.Parse(AbpSession.TenantId.ToString()))
+                            .Where(u => u.Roles.Any(r => r.RoleId == adminRoleId))
+                            .FirstOrDefaultAsync();
+                    }
                     if (adminUser != null)
                     {
                         await _appNotifier.SendMessageAsync(new Abp.UserIdentifier(AbpSession.TenantId, adminUser.Id),
@@ -8796,7 +8837,7 @@ namespace onetouch.AppItems
                 var entityObjectTypeCodeCache = new Dictionary<long, string>();
                 var extraAttributeDataCache = new Dictionary<string, IList<AppEntityExtraDataDto>>();
                 ItemExtraAttributes productExtraAttributes = null;
-                
+
                 var productEntityObjectType = await _SycEntityObjectTypesAppService.GetSycEntityObjectTypeForView(int.Parse(productTypeId.ToString()));
                 if (productEntityObjectType != null && !string.IsNullOrEmpty(productEntityObjectType.SycEntityObjectType.ExtraAttributes))
                 {

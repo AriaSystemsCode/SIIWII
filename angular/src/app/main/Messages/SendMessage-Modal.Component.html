@@ -163,7 +163,12 @@
                                     class="icon-file" /></i>
                         </label>
 
-                        <input id="file-input" type="file" (change)="handleInputChangeAttachment($event)" multiple />
+                     <input
+    id="file-input"
+    type="file"
+    multiple
+    accept=".jpg,.jpeg,.png,.gif,.webp,.svg,.pdf,.xls,.xlsx,.csv,.doc,.docx,.ppt,.pptx"
+    (change)="handleInputChangeAttachment($event)" />
                     </div>
 
                     <button type="button" [class.disabled]="toUsers.length == 0 ||  subject.trim() === ''"
@@ -337,8 +342,12 @@
                                         class="icon-file" /></i>
                             </label>
 
-                            <input id="file-input" type="file" (change)="handleInputChangeAttachment($event)"
-                                multiple />
+                       <input
+    id="file-input"
+    type="file"
+    multiple
+    accept=".jpg,.jpeg,.png,.gif,.webp,.svg,.pdf,.xls,.xlsx,.csv,.doc,.docx,.ppt,.pptx"
+    (change)="handleInputChangeAttachment($event)" />
                         </div>
 
                         <button type="button" [class.disabled]="toUsers.length == 0 || subject == ''"
@@ -501,7 +510,12 @@
                         class="icon-file" /></i>
             </label>
 
-            <input id="file-input" type="file" (change)="handleInputChangeAttachment($event)" multiple />
+   <input
+    id="file-input"
+    type="file"
+    multiple
+    accept=".jpg,.jpeg,.png,.gif,.webp,.svg,.pdf,.xls,.xlsx,.csv,.doc,.docx,.ppt,.pptx"
+    (change)="handleInputChangeAttachment($event)" />
         </div>
 
         <button type="button" [class.disabled]="toUsers.length == 0 || htmlEditorInput == ''"

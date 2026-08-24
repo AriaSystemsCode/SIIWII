@@ -384,6 +384,7 @@ export abstract class AppComponentBase {
     
            !this.isArabic ?  config.class = "right-modal slide-right-in" : config.class = "left-modal slide-left-in ngLeft"
     
+        this.isArabic ?  config.class = "left-modal":config.class = "right-modal";
         let mgCropperModalRef = this.bsModalService.show(
             ImageCropperComponent,
             config

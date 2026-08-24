@@ -68,7 +68,7 @@ namespace onetouch.AppMarketplaceItems
         private readonly IMessageAppService _messageAppService;
         //I48[End]
         //I40[Start]
-        IRepository<AppMarketplaceContact, long> _appMarketplaceContactRepository;
+        IRepository<AppMarketplaceContacts.AppMarketplaceContact, long> _appMarketplaceContactRepository;
         //I40[End]
         //I49[Start]
         private readonly IRepository<AppContactRelationshipInfo, long> _appContactRelationshipInfoRepository;
@@ -101,6 +101,7 @@ namespace onetouch.AppMarketplaceItems
             _appConfiguration = appConfigurationAccessor.Configuration;
             _appEntitiesAppService = appEntitiesAppService;
             _appMarketplaceAccountsPriceLevels = appMarketplaceAccountsPriceLevels;
+            _appEntitiesRelationship = appEntitiesRelationship;
             _appMarketplaceContactRepository = appMarketplaceContactRepository;
             _appEntitiesRelationship = appEntitiesRelationship;
             //I49[Start]
@@ -660,7 +661,7 @@ namespace onetouch.AppMarketplaceItems
             
         }
         //Iteration#49,1 MMT 09/28/2025 Allow unauthenticated user to view the product marketplace view page[Start]
-        [AbpAllowAnonymous]
+        [AbpAllowAnonymous] 
         //Iteration#49,1 MMT 09/28/2025 Allow unauthenticated user to view the product marketplace browse page[End]
         public async Task<GetAppMarketplaceItemDetailForViewDto> GetMarketplaceAppItemForView(GetAppMarketplaceItemWithPagedAttributesForViewInput input)
         {
@@ -723,16 +724,17 @@ namespace onetouch.AppMarketplaceItems
                                     var buyerRole = transContact.AppTransactionContacts.Where(z => z.CompanySSIN == input.BuyerAccountSSIN).FirstOrDefault();
                                     if (buyerRole!=null)
                                     {
-
+                                        var activeRelationshipStatusId = await _helper.SystemTables.GetEntityObjectStatusRelationshipActive();
                                         var relationshipSellBuy = await _appContactRelationshipInfoRepository.GetAll()
-                                        .Where(z => (z.RequesterContactSSIN == input.SellerAccountSSIN &&
+                                        .Where(z => ((z.RequesterContactSSIN == input.SellerAccountSSIN &&
                                         z.RecipientContactSSIN == input.BuyerAccountSSIN &&
                                         z.RequesterMarketplaceRole == sellerRole.ContactRole.ToString() &&
                                         z.RecipientMarketplaceRole == buyerRole.ContactRole.ToString()) ||
                                         (z.RecipientContactSSIN == input.SellerAccountSSIN &&
                                         z.RequesterContactSSIN == input.BuyerAccountSSIN &&
                                         z.RecipientMarketplaceRole == sellerRole.ContactRole.ToString() &&
-                                        z.RequesterMarketplaceRole == buyerRole.ContactRole.ToString())
+                                        z.RequesterMarketplaceRole == buyerRole.ContactRole.ToString()))
+                                        && z.EntityObjectStatusId == activeRelationshipStatusId
                                         ).Include(z => z.EntityExtraData).FirstOrDefaultAsync();
                                         if (relationshipSellBuy != null)
                                         {
@@ -2350,7 +2352,7 @@ namespace onetouch.AppMarketplaceItems
                   marketpaceItem.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.CurrencyCode == currencyCode).Select(a => a.Price).FirstOrDefault() :
                  (marketpaceItem.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.CurrencyCode == "USD").FirstOrDefault() == null ? //0 :
                  (marketpaceItem.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.IsDefault == true && q.CurrencyCode != currencyCode).FirstOrDefault() != null ?
-                 ((marketpaceItem.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.IsDefault && q.CurrencyCode != currencyCode).FirstOrDefault().Price) * (currencyCode == "USD" ? exchangeRateVal : (1 / exchangeRateVal) * exchangeRate)) : 0) :
+                 ((marketpaceItem.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.IsDefault && q.CurrencyCode != currencyCode).FirstOrDefault().Price) * (currencyCode == "USD" ? exchangeRateVal : (1 / (exchangeRateVal == 0 ? 1 : exchangeRateVal)) * exchangeRate)) : 0) :
                  (marketpaceItem.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.CurrencyCode == "USD").FirstOrDefault() != null ?
                  (marketpaceItem.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.CurrencyCode == "USD").Select(a => a.Price).FirstOrDefault() * exchangeRate) : 0)))),
                         Id = marketpaceItem.Id,

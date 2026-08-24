@@ -42,7 +42,8 @@ export class SizeScaleComponent extends AppComponentBase implements OnChanges, O
   cellSelectionFormInput:FormInputs<string,LookupLabelDto[]> // any to be changed
   appSizeScalesDetails;
   sizeScaleName:string="";
-
+  currentLang:string
+  isArabic:boolean
   constructor(
     private _extraAttributeDataService:ExtraAttributeDataService,
     private _appSizeScaleServiceProxy:AppSizeScaleServiceProxy,
@@ -51,6 +52,8 @@ export class SizeScaleComponent extends AppComponentBase implements OnChanges, O
     super(injector);
   }
   ngOnInit(){
+    this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
+    this.currentLang == 'ar' || this.currentLang == 'ar-EG'  ? this.isArabic = true : this.isArabic = false
     if(this.oldAppSizeScaleDto){
       this.cellSelectionFormInput = new FormInputs<string,LookupLabelDto[]>({ 
         type: FormInputType.Checkbox,

@@ -8,8 +8,8 @@
                             <p style="color: #1B101B;
                             font-size: 20px;
                             font-weight: 700;
-                            margin: 0;">{{l("OrganizationAddress")}}</p>
-                            <p style="    font-size: 12px;
+                            margin: 0;">{{ accountData?.accountTypeId != 21 ? l("OrganizationAddress") : l("Address")}}</p>
+                            <p *ngIf="accountData?.accountTypeId != 21 " style="    font-size: 12px;
                             color: #595959;" class="mb-0">{{l("UseOrganizationAddressToAddressAndSubAddress")}}</p>
                         </div>
                         <div class="col-md-3" *ngIf="!viewMode && accountLevel == 0">
@@ -44,7 +44,7 @@
                     <ng-template pTemplate="body" let-rowNode let-rowData="rowData" let-i="rowIndex">
                         <tr [ttRow]="rowNode">
                             <td style="width:150px" class="td-tree">
-                                <p-treeTableToggler [rowNode]="rowNode" class="branch-name"></p-treeTableToggler>
+                                <p-treeTableToggler *ngIf="accountData?.accountTypeId != 21" [rowNode]="rowNode" class="branch-name"></p-treeTableToggler>
                                 {{rowData.branch.name}}
                             </td>
                             <td style="width:150px" class="td-tree">
@@ -61,7 +61,7 @@
                                     </button>
                                     <ul class="dropdown-menu" style="left: -40px;" [ngClass]="dropdownActionmenuhover"
                                         *dropdownMenu>
-                                        <li *ngIf="!viewMode">
+                                        <li *ngIf="!viewMode && accountData?.accountTypeId != 21 ">
                                             <a href="javascript:;"
                                                 (click)="createBranch(rowNode)">{{l('AddSubBranch')}}</a>
                                         </li>
@@ -69,10 +69,11 @@
                                             <a href="javascript:;" (click)="editBranch(rowNode)">{{l('Edit')}}</a>
                                         </li>
                                         <li>
-                                            <a href="javascript:;" (click)="showBranchDetails(rowNode)">{{l('Branch
-                                                Details')}}</a>
+                                            <a href="javascript:;" (click)="showBranchDetails(rowNode)">{{ accountData?.accountTypeId != 21  ? l('Branch
+                                                Details') :l('Address
+                                                Details') }}</a>
                                         </li>
-                                        <li *ngIf="!viewMode">
+                                        <li *ngIf="!viewMode && accountData?.accountTypeId != 21">
                                             <a href="javascript:;"
                                                 (click)="askToConfirmDelete(rowData.branch,rowNode.parent)">{{l('Delete')}}</a>
                                         </li>

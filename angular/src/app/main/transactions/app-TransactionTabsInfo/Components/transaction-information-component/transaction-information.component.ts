@@ -11,7 +11,7 @@ import { TreeNode } from 'primeng/api';
 import { Router } from '@angular/router';
 import { TransactionCartMode } from "../../../enums/TransactionCartMode";
 import { UserClickService } from '@shared/utils/user-click.service';
-import { finalize } from 'rxjs';
+import { filter, finalize, Observable, switchMap, take, timeout, timer } from 'rxjs';
 import { CommentParentComponent } from '@app/main/interactions/components/comment-parent/comment-parent.component';
 import { ProductCatalogueReportParams } from '@app/main/app-items/appitems-catalogue-report/models/product-Catalogue-Report-Params';
 import { ReportViewerComponent } from '@app/main/dev-express-demo/reportviewer/report-viewer.component';
@@ -1287,36 +1287,115 @@ loadCommentsList() {
 
     }
   }
+// private addCacheBuster(url: string): string {
+//   const separator = url.includes('?') ? '&' : '?';
+//   return `${url}${separator}v=${Date.now()}`;
+// }
+private preparePrintUrl(url: string): string {
+  // convert \ to /
+  const cleanUrl = url.replace(/\\/g, '/');
 
-  printTransaction() {
+  // force latest file (avoid cached old PDF)
+  const separator = cleanUrl.includes('?') ? '&' : '?';
 
-    this._AppTransactionServiceProxy.isOrderConfirmationNeedsReprint(this.orderId)
-      .subscribe((res) => {
-        if (res == true) {
+  return `${cleanUrl}${separator}v=${Date.now()}`;
+}
 
-          this.showMainSpinner()
-          this.onGeneratOrderReport(true, undefined, true, false, true)
+async printTransaction(): Promise<void> {
+  const printWindow = window.open('', '_blank');
 
-
-        } else {
-          this._AppTransactionServiceProxy.getTransactionOrderConfirmationUrl(this.orderId)
-            .pipe(
-              finalize(() => {
-
-              })
-            )
-            .subscribe((res) => {
-              var page = window.open(res);
-              page.print();
-            }
-
-            );
-
-        }
-      });
-
+  if (!printWindow) {
+    console.error('Popup blocked.');
+    return;
   }
 
+  printWindow.document.write('<p>Preparing print preview...</p>');
+  printWindow.document.close();
+
+  this.showMainSpinner();
+
+  // start generate report
+  this.onGeneratOrderReport(true, undefined, true, false, false);
+
+  // wait for backend generation
+  setTimeout(() => {
+
+    this._AppTransactionServiceProxy
+      .getTransactionOrderConfirmationUrl(this.orderId)
+      .pipe(finalize(() => this.hideMainSpinner()))
+      .subscribe((url: string) => {
+
+        if (!url || !url.trim()) {
+          printWindow.document.body.innerHTML =
+            '<p>Print file is not ready. Please try again.</p>';
+          return;
+        }
+
+        // open fresh updated PDF
+        printWindow.location.href = this.preparePrintUrl(url);
+
+      });
+
+  }, 11000); // wait 10 sec for generation
+}
+// generateOrderReportPromise(): Promise<void> {
+//   return new Promise((resolve, reject) => {
+//     this.reportUrl = '';
+
+//     this.printInfoParam = new ProductCatalogueReportParams();
+//     this.printInfoParam.reportTemplateName = this.transactionReportTemplateName;
+//     this.printInfoParam.TransactionId = this.orderId.toString();
+//     this.printInfoParam.saveToPDF = true;
+//     this.printInfoParam.tenantId = this.appSession?.tenantId;
+//     this.printInfoParam.userId = this.appSession?.userId;
+
+//     this._AppTransactionServiceProxy
+//       .getTenantRoleInTransaction(this.orderId, this.appTransactionsForViewDto.tenantId)
+//       .subscribe({
+//         next: (res) => {
+//           this.printInfoParam.orderConfirmationRole = res.contactRole;
+//           this.printInfoParam.contactName = res.contactName;
+
+//           this.reportUrl = this.printInfoParam.getReportUrl();
+//           this.createReportViewer();
+
+//           resolve();
+//         },
+//         error: reject
+//       });
+//   });
+// }
+// waitForOrderConfirmationUrlPromise(): Promise<string> {
+//   return new Promise((resolve, reject) => {
+//     let attempts = 0;
+//     const maxAttempts = 12;
+
+//     const interval = setInterval(() => {
+//       attempts++;
+
+//       this._AppTransactionServiceProxy
+//         .getTransactionOrderConfirmationUrl(this.orderId)
+//         .subscribe({
+//           next: (url: string) => {
+//             if (url && url.trim() !== '') {
+//               clearInterval(interval);
+//               resolve(url);
+//               return;
+//             }
+
+//             if (attempts >= maxAttempts) {
+//               clearInterval(interval);
+//               reject('Timeout waiting for report URL');
+//             }
+//           },
+//           error: (err) => {
+//             clearInterval(interval);
+//             reject(err);
+//           }
+//         });
+//     }, 3000);
+//   });
+// }
   onShareTransaction() {
     this.onshare = true;
   }
@@ -1829,6 +1908,7 @@ loadCommentsList() {
     this.appTransactionsForViewDto.completeDate = moment.utc(moment(completeDate).format('YYYY-MM-DD'));
   }
 
+  
 
 
   automaticShare() {

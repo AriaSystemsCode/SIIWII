@@ -5,6 +5,12 @@
     width: 200px;
 }
 
+::ng-deep {
+    .ngLeft {
+        margin-left: 0 !important;
+        margin-top: 0 !important;
+    }
+  }
 .input-label-black {
     color: #000;
 }

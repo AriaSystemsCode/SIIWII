@@ -107,9 +107,16 @@ a.btn {
 .actions-menu {
     position: absolute;
     top: 3px;
+
     border: 1px solid white;
     border-radius: 5px;
    background-color: white;
+}
+.en-menu {
+    right: 3px !important;
+}
+.ar-menu {
+    left:  3px !important;
 }
 
 

@@ -14,6 +14,7 @@ namespace onetouch.AppItemsLists
         Task<PagedResultDto<GetAppItemsListForViewDto>> GetAll(GetAllAppItemsListsInput input);
 
         //Task<GetAppItemsListForViewDto> GetAppItemsListForView(long id);
+        Task<long> GetMainItemListID(long sharedItemListId);
         Task<List<AppItemsListItemVariationDto>> GetItemsListVariations(long ItemId, long ItemsListId);
 
         Task<GetAppItemsListForEditOutput> GetAppItemsListForEdit(EntityDto<long> input);

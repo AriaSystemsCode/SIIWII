@@ -290,6 +290,22 @@
     align-items: center;
     gap: 10px;
     margin-bottom: 4px;
+  }
+.ngLeft {
+    margin-left: 0 !important;
+    margin-top: 0 !important;
+}
+.ngRight {
+    margin-right: 0 !important;
+    margin-top: 0 !important;
+}
+.closeIcon-ar {
+    left: 0;
+    width: 60px !important;
+}
+
+.closeIcon-en {
+    right: 0;
 }
 
 .modal-footer-btn {

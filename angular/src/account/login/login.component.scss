@@ -130,6 +130,12 @@ input.form-control.m-input {
     text-align: justify !important;
 }
 
+@media only screen and (min-width:1023px)  {
+    .maxWd {
+        width: 80%;
+    }
+ 
+ }
 
 
 .password-toggle-icon {

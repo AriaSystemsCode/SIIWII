@@ -78,6 +78,8 @@ selectedMessageAfterRefresh: number | null = null;
 
   currentLang:string
   isArabic:boolean
+
+  selectedEntityObjectTypeCode: string | null = null;
     constructor(
         injector: Injector,
         private _downloadService: FileDownloadService,
@@ -153,6 +155,12 @@ selectedMessageAfterRefresh: number | null = null;
     newCommentAddedHandler(event){
       //  this.selectMessage(this.messagesDetails[0].messages);
         // this.getMesssage();
+
+         if (!event) {
+        return;
+    }
+
+    this.refreshSelectedMessage();
     }
     selectMessagetype(messagetypeIndex: number, messagetype: string): void {
         this.filterText = "";
@@ -409,6 +417,8 @@ getPrimaryMessage(event) {
  
       
     selectMessage(message: MessagesDto): void {
+          this.selectedEntityObjectTypeCode =
+        message?.entityObjectTypeCode?.toUpperCase() || null;
         this.showMainSpinner();
         this.showSideBar=false;
         this.showHideSideBarTitle = !this.showSideBar ? this.l("ShowData")  : this.l("HideData") ;
@@ -571,7 +581,6 @@ getPrimaryMessage(event) {
         else return this.selectedMessage === message.id;
     }
 
-
     refreshData(event) {
     if (event) {
         this.selectedMessageAfterRefresh = this.selectedMessage;
@@ -596,6 +605,76 @@ onReplyMessage(event: MouseEvent): void {
         false,
         msg.mesasgeObjectType
     );
+}
+
+isImageFile(fileName: string): boolean {
+    return /\.(jpg|jpeg|png|svg|gif|webp)$/i.test(fileName || '');
+}
+
+isPdfFile(fileName: string): boolean {
+    return /\.pdf$/i.test(fileName || '');
+}
+
+isExcelFile(fileName: string): boolean {
+    return /\.(xls|xlsx|csv)$/i.test(fileName || '');
+}
+
+isWordFile(fileName: string): boolean {
+    return /\.(doc|docx)$/i.test(fileName || '');
+}
+
+isPowerPointFile(fileName: string): boolean {
+    return /\.(ppt|pptx)$/i.test(fileName || '');
+}
+
+isOtherFile(fileName: string): boolean {
+    return !this.isImageFile(fileName)
+        && !this.isPdfFile(fileName)
+        && !this.isExcelFile(fileName)
+        && !this.isWordFile(fileName)
+        && !this.isPowerPointFile(fileName);
+}
+downloadAttachment(item: any): void {
+  const fileUrl = `${this.attachmentBaseUrl}/${item.url}`;
+
+  const link = document.createElement('a');
+  link.href = fileUrl;
+  link.download = item.displayName || item.fileName;
+  link.target = '_blank';
+
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+}
+
+refreshSelectedMessage(): void {
+    const selectedId =
+        this.selectedMessage ||
+        this.messagesDetails?.[0]?.messages?.id;
+
+    if (!selectedId) {
+        this.getMesssage(true);
+        return;
+    }
+
+    const selectedMessage =
+        this.messages.find(x => x.id === selectedId) ||
+        this.messagesDetails?.[0]?.messages;
+
+    if (!selectedMessage) {
+        this.getMesssage(true);
+        return;
+    }
+
+    this.selectMessage(selectedMessage);
+}
+
+get selectedThreadIsComment(): boolean {
+    return this.selectedEntityObjectTypeCode === 'COMMENT';
+}
+
+get selectedThreadIsMessage(): boolean {
+    return this.selectedEntityObjectTypeCode !== 'COMMENT';
 }
     ngOnDestroy() {
       

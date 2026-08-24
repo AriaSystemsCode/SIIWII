@@ -85,13 +85,13 @@ namespace onetouch.AppItems.Dtos
 
     public class RecordTypeValidationAttribute : ValidationAttribute
     {
-        private static readonly string[] allowedValues = new[] { "Item", "Item Variant", "Image", "Color" };
+        private static readonly string[] allowedValues = new[] { "Item", "Item Variant", "Image", "Color", "Price" };
 
         protected override ValidationResult IsValid(object value, ValidationContext validationContext)
         {
             if (value == null || !allowedValues.Contains(value.ToString()))
             {
-                return new ValidationResult("Record Type must be Item, Item Variant, or Image.");
+                return new ValidationResult("Record Type must be Item, Item Variant, Price, or Image.");
             }
 
             return ValidationResult.Success;

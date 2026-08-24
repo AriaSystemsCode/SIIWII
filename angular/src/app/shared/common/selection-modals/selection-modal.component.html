@@ -2,7 +2,8 @@
     <div
         bsModal
         #bsModal="bs-modal"
-        class="modal fade"
+        class=" fade"
+        [ngClass]="isArabic ? 'modal-rtl':'modal-ltr'"
         tabindex="-1"
         role="dialog"
         aria-labelledby="selectListModal"
@@ -19,7 +20,7 @@
                         <h4 class="modal-title" >
                             <p class="desc-menu-item">{{l(title)}}   {{l("values")}} </p>
                         </h4>
-                        <button style="position: absolute;right: 0;top: 8px;" type="button" class="close" (click)="cancel()" aria-label="Close">
+                        <button style="position: absolute;top: 8px;" type="button" [ngClass]="isArabic ? 'closeIcon-ar':'closeIcon-en'" class="close" (click)="cancel()" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>

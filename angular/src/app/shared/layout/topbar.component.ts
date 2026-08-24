@@ -87,9 +87,16 @@ export class TopBarComponent extends ThemesLayoutBaseComponent implements OnInit
     transactionType: string = "";
     @ViewChild("shoppingCartModal", { static: true }) shoppingCartModal: TransactionInformationComponent;
     currencySymbol: string = "";
-    visible:boolean =false;
-    displaneSel :boolean =false;
-    displaneBuy :boolean =false;
+    visible: boolean = false;
+    displaneSel: boolean = false;
+    displaneBuy: boolean = false;
+    
+   
+
+    private profilePicSub: any;
+    
+   
+    
    
     searchInput:string
     bgCol?: string;
@@ -286,11 +293,14 @@ export class TopBarComponent extends ThemesLayoutBaseComponent implements OnInit
     }
 
     getProfilePicture(): void {
-        this.updateLogoService.profilePictureUpdated$.subscribe((res) => {
-            this.profilePicture = res;
-        });
-
-    }
+        if (this.profilePicSub) return;
+      
+        this.profilePicSub = this.updateLogoService.profilePictureUpdated$
+          .subscribe((res) => {
+            this.profilePicture = res || (AppConsts.appBaseUrl + "/assets/common/images/default-profile-picture.png");
+          });
+      }
+      
 
     getRecentlyLinkedUsers(): void {
         this._userLinkServiceProxy
@@ -578,6 +588,12 @@ export class TopBarComponent extends ThemesLayoutBaseComponent implements OnInit
       onImgErr(evt: Event) {
         (evt.target as HTMLImageElement).src = '/assets/placeholders/_logo-placeholder.png';
       }
+    ngOnDestroy(): void {
+        if (this.profilePicSub) {
+          this.profilePicSub.unsubscribe();
+        }
+      }
+      
 }
 
 

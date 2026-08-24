@@ -7,6 +7,7 @@ import {
     EventEmitter,
     OnInit,
     SimpleChanges,
+    ChangeDetectorRef,
 } from "@angular/core";
 import {
     AppEntitiesServiceProxy,
@@ -69,11 +70,12 @@ export class SendMessageModalComponent
   currentLang:string
   isArabic:boolean
 
+@Input() toUser: NameValueOfString;
     constructor(
         injector: Injector,
         private _MessageServiceProxy: MessageServiceProxy,
         private _appEntitiesServiceProxy: AppEntitiesServiceProxy,
-
+    private cdr: ChangeDetectorRef,
     ) {
         super(injector);
     }
@@ -81,10 +83,13 @@ export class SendMessageModalComponent
     ngOnInit(): void {
        this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
         this.currentLang == 'ar' || this.currentLang == 'ar-EG'  ? this.isArabic = true : this.isArabic = false
+     
         this.filterUsersFilterByEntity('')
     }
     ngOnChanges(changes: SimpleChanges): void {
-      
+       if (changes['toUser']?.currentValue) {
+    this.setToUser(changes['toUser'].currentValue);
+  }
     }
   
     mesasgeObjectType: MesasgeObjectType = MesasgeObjectType.Message
@@ -295,109 +300,284 @@ export class SendMessageModalComponent
         this.displayBCC = true;
     }
 
-    handleInputChangeAttachment(e) {
-        if (e.target.files.length === 0) return;
-        for (let i = 0; i < e.target.files.length; i++) {
-        var file = e.dataTransfer ? e.dataTransfer.files[i] : e.target.files[i];
-        this.attachments.push(e.target.files[i]);  
-    }
+    // handleInputChangeAttachment(e) {
+    //     if (e.target.files.length === 0) return;
+    //     for (let i = 0; i < e.target.files.length; i++) {
+    //     var file = e.dataTransfer ? e.dataTransfer.files[i] : e.target.files[i];
+    //     this.attachments.push(e.target.files[i]);  
+    // }
+    handleInputChangeAttachment(event: any): void {
+    const files: FileList = event?.target?.files;
+
+    if (!files || files.length === 0) return;
+
+    Array.from(files).forEach((file: File) => {
+        this.attachments.push(file);
+    });
+
+    event.target.value = '';
+
 }
 
 
-    onUploadAttachmets(){
-            var uploadUrl = "/Attachment/UploadFiles";
-            this.attachmentsUploader = this.createCustomUploader(uploadUrl);
+    // onUploadAttachmets(){
+    //         var uploadUrl = "/Attachment/UploadFiles";
+    //         this.attachmentsUploader = this.createCustomUploader(uploadUrl);
     
-            this.attachmentsUploader.addToQueue(this.attachments);
-            this.attachmentsUploader.onBuildItemForm = (
-                fileItem: any,
-                form: any
-            ) => {
+    //         this.attachmentsUploader.addToQueue(this.attachments);
+    //         this.attachmentsUploader.onBuildItemForm = (
+    //             fileItem: any,
+    //             form: any
+    //         ) => {
              
-                for (let i = 0; i < this.attachments.length; i++) {
-                    var guid = this.guid();
-                    let att: AppEntityAttachmentDto = new AppEntityAttachmentDto();
-                    att.fileName = this.attachments[i].name;
-                    att.attachmentCategoryId = 4;
-                    att.guid = guid;
-                    if (
-                        this.messages.entityAttachments == null ||
-                        this.messages.entityAttachments == undefined
-                    ) {
-                        this.messages.entityAttachments = [];
-                    }
-                    this.messages.entityAttachments.push(att);
+    //             for (let i = 0; i < this.attachments.length; i++) {
+    //                 var guid = this.guid();
+    //                 let att: AppEntityAttachmentDto = new AppEntityAttachmentDto();
+    //                 att.fileName = this.attachments[i].name;
+    //                 att.attachmentCategoryId = 4;
+    //                 att.guid = guid;
+    //                 if (
+    //                     this.messages.entityAttachments == null ||
+    //                     this.messages.entityAttachments == undefined
+    //                 ) {
+    //                     this.messages.entityAttachments = [];
+    //                 }
+    //                 this.messages.entityAttachments.push(att);
 
-                    if (this.attachments.length > 1) form.append("guid" + i, guid);
-                    else form.append("guid", guid);
-                }
-            };
+    //                 if (this.attachments.length > 1) form.append("guid" + i, guid);
+    //                 else form.append("guid", guid);
+    //             }
+    //         };
     
-            this.attachmentsUploader.onErrorItem = (item, response, status) => {
-                this.notify.error(this.l("UploadFailed"));
-            };
+    //         this.attachmentsUploader.onErrorItem = (item, response, status) => {
+    //             this.notify.error(this.l("UploadFailed"));
+    //         };
 
-            this.attachmentsUploader.uploadAllFiles();
+    //         this.attachmentsUploader.uploadAllFiles();
+    // }
+private onUploadAttachmets(): Promise<void> {
+    return new Promise((resolve, reject) => {
+        if (!this.attachments?.length) {
+            resolve();
+            return;
+        }
+
+        this.attachmentsUploader =
+            this.createCustomUploader('/Attachment/UploadFiles');
+
+        this.messages.entityAttachments = [];
+
+        const guids = this.attachments.map((file: File) => {
+            const guid = this.guid();
+
+            const attachment = new AppEntityAttachmentDto();
+            attachment.fileName = file.name;
+            attachment.attachmentCategoryId = 4;
+            attachment.guid = guid;
+
+            this.messages.entityAttachments.push(attachment);
+
+            return guid;
+        });
+
+        let completed = false;
+
+        this.attachmentsUploader.onBuildItemForm = (
+            fileItem: any,
+            form: FormData
+        ) => {
+            guids.forEach((guid, index) => {
+                form.append(
+                    guids.length > 1 ? `guid${index}` : 'guid',
+                    guid
+                );
+            });
+        };
+
+        this.attachmentsUploader.onSuccessItem = (
+            item,
+            response,
+            status
+        ) => {
+            if (completed) {
+                return;
+            }
+
+            completed = true;
+
+            console.log('All attachments uploaded', {
+                response,
+                status
+            });
+
+            resolve();
+        };
+
+        this.attachmentsUploader.onErrorItem = (
+            item,
+            response,
+            status
+        ) => {
+            if (completed) {
+                return;
+            }
+
+            completed = true;
+            this.messages.entityAttachments = [];
+
+            this.notify.error(this.l('UploadFailed'));
+
+            reject(
+                new Error(
+                    `Upload failed. Status: ${status}, Response: ${response}`
+                )
+            );
+        };
+
+        this.attachmentsUploader.addToQueue(this.attachments);
+        this.attachmentsUploader.uploadAllFiles();
+    });
+}
+
+
+    // sendMessage(): void {
+    //     this.showMainSpinner();
+    //     if(this.attachments?.length>0)
+    //       this.onUploadAttachmets();
+    //     let ToList = "";
+    //     let CCList = "";
+    //     let BCCList = "";
+
+    //     for (var i = 0; i < this.toUsers.length; i++) {
+    //         if (i != this.toUsers.length - 1)
+    //             ToList += this.toUsers[i].value + ",";
+    //         else ToList += this.toUsers[i].value;
+    //     }
+
+    //     for (var i = 0; i < this.ccUsers.length; i++) {
+    //         if (i != this.ccUsers.length - 1)
+    //             CCList += this.ccUsers[i].value + ",";
+    //         else CCList += this.ccUsers[i].value;
+    //     }
+
+    //     for (var i = 0; i < this.bccUsers.length; i++) {
+    //         if (i != this.bccUsers.length - 1)
+    //             BCCList += this.bccUsers[i].value + ",";
+    //         else BCCList += this.bccUsers[i].value;
+    //     }
+
+    //     this.messages.to = ToList;
+    //     this.messages.cc = CCList;
+    //     this.messages.bcc = BCCList;
+    //     this.messages.subject = this.subject;
+    //     this.messages.bodyFormat = this.htmlEditorInput;
+    //     this.messages.parentId = this.replyMessageId;
+    //     this.messages.threadId = !this.modalView?this.entityId:this.threadId;
+    //     this.messages.relatedEntityId =!this.modalView?this.entityId: undefined;
+    //     this.messages.mesasgeObjectType = MesasgeObjectType.Message
+    //     this.saving = true;
+    //     this._MessageServiceProxy
+    //         .createMessage(this.messages)
+    //         .pipe(finalize(() => {this.saving = false ; this.hideMainSpinner();this.refresh.emit(true)}))
+    //         .subscribe(() => {
+    //             this.notify.info(this.l("SendSuccessfully"));
+    //             if(this.SendMessageModal)this.SendMessageModal.hide();
+    //             this.active = false;
+    //             this.displayBCC = false;
+    //             this.displayCC = false;
+    //             this.messages.entityAttachments = [];
+    //             this.modalSave.emit(this.messages);
+    //             this.subject="";
+    //             this.htmlEditorInput='';
+    //             this.toUsers=[];
+    //             this.ccUsers=[];
+    //             this.bccUsers=[];
+    //             this.messages=new CreateMessageInput();
+    //             this.attachments=[];
+    //         });
+    // }
+
+    // get Users
+   
+   
+    async sendMessage(): Promise<void> {
+    if (this.saving) {
+        return;
     }
-  
-    sendMessage(): void {
-        this.showMainSpinner();
-        if(this.attachments?.length>0)
-          this.onUploadAttachmets();
-        let ToList = "";
-        let CCList = "";
-        let BCCList = "";
 
-        for (var i = 0; i < this.toUsers.length; i++) {
-            if (i != this.toUsers.length - 1)
-                ToList += this.toUsers[i].value + ",";
-            else ToList += this.toUsers[i].value;
-        }
+    this.saving = true;
+    this.showMainSpinner();
 
-        for (var i = 0; i < this.ccUsers.length; i++) {
-            if (i != this.ccUsers.length - 1)
-                CCList += this.ccUsers[i].value + ",";
-            else CCList += this.ccUsers[i].value;
-        }
+    try {
+        // Wait until every attachment finishes uploading
+        await this.onUploadAttachmets();
 
-        for (var i = 0; i < this.bccUsers.length; i++) {
-            if (i != this.bccUsers.length - 1)
-                BCCList += this.bccUsers[i].value + ",";
-            else BCCList += this.bccUsers[i].value;
-        }
+        const toList = this.toUsers
+            .map(user => user.value)
+            .join(',');
 
-        this.messages.to = ToList;
-        this.messages.cc = CCList;
-        this.messages.bcc = BCCList;
+        const ccList = this.ccUsers
+            .map(user => user.value)
+            .join(',');
+
+        const bccList = this.bccUsers
+            .map(user => user.value)
+            .join(',');
+
+        this.messages.to = toList;
+        this.messages.cc = ccList;
+        this.messages.bcc = bccList;
         this.messages.subject = this.subject;
         this.messages.bodyFormat = this.htmlEditorInput;
         this.messages.parentId = this.replyMessageId;
-        this.messages.threadId = !this.modalView?this.entityId:this.threadId;
-        this.messages.relatedEntityId =!this.modalView?this.entityId: undefined;
-        this.messages.mesasgeObjectType = MesasgeObjectType.Message
-        this.saving = true;
-        this._MessageServiceProxy
-            .createMessage(this.messages)
-            .pipe(finalize(() => {this.saving = false ; this.hideMainSpinner();this.refresh.emit(true)}))
-            .subscribe(() => {
-                this.notify.info(this.l("SendSuccessfully"));
-                if(this.SendMessageModal)this.SendMessageModal.hide();
-                this.active = false;
-                this.displayBCC = false;
-                this.displayCC = false;
-                this.messages.entityAttachments = [];
-                this.modalSave.emit(this.messages);
-                this.subject="";
-                this.htmlEditorInput='';
-                this.toUsers=[];
-                this.ccUsers=[];
-                this.bccUsers=[];
-                this.messages=new CreateMessageInput();
-                this.attachments=[];
-            });
-    }
+        this.messages.threadId = !this.modalView
+            ? this.entityId
+            : this.threadId;
+        this.messages.relatedEntityId = !this.modalView
+            ? this.entityId
+            : undefined;
+        this.messages.mesasgeObjectType = MesasgeObjectType.Message;
 
-    // get Users
+        await this._MessageServiceProxy
+            .createMessage(this.messages)
+            .toPromise();
+
+        this.notify.info(this.l('SendSuccessfully'));
+
+        if (this.SendMessageModal) {
+            this.SendMessageModal.hide();
+        }
+
+        this.modalSave.emit(this.messages);
+        this.refresh.emit(true);
+
+        this.resetMessageForm();
+    } catch (error) {
+        console.error('Send message failed:', error);
+
+        // uploadAttachments already shows UploadFailed
+        // Add a message error here only when needed.
+    } finally {
+        this.saving = false;
+        this.hideMainSpinner();
+    }
+}
+
+private resetMessageForm(): void {
+    this.active = false;
+    this.displayBCC = false;
+    this.displayCC = false;
+
+    this.subject = '';
+    this.htmlEditorInput = '';
+
+    this.toUsers = [];
+    this.ccUsers = [];
+    this.bccUsers = [];
+    this.attachments = [];
+
+    this.messages = new CreateMessageInput();
+}
     filterUsers(event): void {
         this._MessageServiceProxy
             .getAllUsers(event.query)
@@ -425,40 +605,106 @@ export class SendMessageModalComponent
     }
     
                // get Users related to entity
-               filterUsersFilterByEntity(event): void {
-                this._appEntitiesServiceProxy
-                    .getContactsToMention(this.entityId, event.query)
-                    .subscribe((users) => {
-                        this.filteredUsers = [];
-                        for (let i = 0; i < users.length; i++) {
-                            if (users[i]?.users?.value.toString() !== this.appSession.userId.toString()) {
-                                users[i].users = {
-                                    name: users[i].name + '@' + users[i].tenantName,
-                                    value: users[i].userId.toString()
-                                };
-                                this.filteredUsers.push(users[i].users);
-                            }
-                        }
+            //    filterUsersFilterByEntity(event): void {
+            //     this._appEntitiesServiceProxy
+            //         .getContactsToMention(this.entityId, event.query)
+            //         .subscribe((users) => {
+            //             this.filteredUsers = [];
+            //             for (let i = 0; i < users.length; i++) {
+            //                 if (users[i]?.users?.value.toString() !== this.appSession.userId.toString()) {
+            //                     users[i].users = {
+            //                         name: users[i].name + '@' + users[i].tenantName,
+            //                         value: users[i].userId.toString()
+            //                     };
+            //                     this.filteredUsers.push(users[i].users);
+            //                 }
+            //             }
             
-                        // Normalize names in toNameArray to match filteredUsers
-                        const toNameArray: string[] = this.toName
-                            .split(',')
-                            .map((name) => name.trim().replace(/\./g, ' ')); // Replace dots with spaces
+            //             // Normalize names in toNameArray to match filteredUsers
+            //             const toNameArray: string[] = this.toName
+            //                 .split(',')
+            //                 .map((name) => name.trim().replace(/\./g, ' ')); // Replace dots with spaces
             
-                        // // Set default selected users
-                        if(this.parentId){
-                            this.toUsers = this.filteredUsers.filter((user) =>
-                                toNameArray.some((name) => user.name.startsWith(name)) // Match name before '@'
+            //             // // Set default selected users
+            //             if(this.parentId){
+            //                 this.toUsers = this.filteredUsers.filter((user) =>
+            //                     toNameArray.some((name) => user.name.startsWith(name)) // Match name before '@'
 
-                            );
-                            this._MessageServiceProxy
-                            .getMessagesForView(this.parentId)
-                            .subscribe((result) => {
+            //                 );
+
+
+            //                 this._MessageServiceProxy
+            //                 .getMessagesForView(this.parentId)
+            //                 .subscribe((result) => {
                            
-                                this.subject = result[0].messages.subject;
-                            });
-                        }
+            //                     this.subject = result[0].messages.subject;
+            //                 });
+            //             }
                    
-                    });
-            }
+         
+            //         });
+            // }
+
+
+filterUsersFilterByEntity(event: any): void {
+  const query = typeof event === 'string' ? event : (event?.query || '');
+
+  this._appEntitiesServiceProxy
+    .getContactsToMention(this.entityId, query)
+    .subscribe((users) => {
+      this.filteredUsers = [];
+
+      for (let i = 0; i < users.length; i++) {
+        if (users[i]?.userId?.toString() !== this.appSession.userId.toString()) {
+          const user = new NameValueOfString();
+          user.name = users[i].name + '@' + users[i].tenantName;
+          user.value = users[i].userId.toString();
+
+          this.filteredUsers.push(user);
+        }
+      }
+
+      if (this.parentId && this.toUser?.value) {
+        const selectedSender = this.filteredUsers.find(
+          x => x.value === this.toUser.value.toString()
+        );
+
+        this.toUsers = selectedSender
+          ? [selectedSender]
+          : [this.toUser];
+      }
+
+      if (this.parentId) {
+        this._MessageServiceProxy
+          .getMessagesForView(this.parentId)
+          .subscribe((result) => {
+            this.subject = result?.[0]?.messages?.subject || '';
+          });
+      }
+
+      this.cdr.detectChanges();
+    });
+}
+    setToUser(user: any): void {
+  if (!user?.name || !user?.value) return;
+
+  const selectedUser = new NameValueOfString();
+  selectedUser.name = user.name;
+  selectedUser.value = user.value.toString();
+
+  this.toUsers = [selectedUser];
+
+  const exists = this.filteredUsers?.some(
+    x => x.value === selectedUser.value
+  );
+
+  if (!exists) {
+    this.filteredUsers = [
+      selectedUser,
+      ...(this.filteredUsers || [])
+    ];
+  }
+
+  this.cdr.detectChanges();
+}
 }
