@@ -253,6 +253,7 @@ spreadsheetSaveUrl =
         chartSeries: {
             type: 'Column'
         },
+            height: '280',
         title: 'Pivot Chart',
         enableMultipleAxis: false
     };
@@ -812,14 +813,9 @@ private createDynamicPivotFieldMapping(
         };
     });
 }
-pivotGroupingBarSettings: any = {
+pivotGroupingBarSettings = {
     showFieldsPanel: true,
-
-    // IMPORTANT:
-    // show grouping bar only above Pivot Table,
-    // not again above Pivot Chart
     displayMode: 'Table',
-
     allowDragAndDrop: true,
     showFilterIcon: true,
     showSortIcon: true,
@@ -1258,6 +1254,7 @@ private showTransactionsBySeller(): void {
 
         this.pivotChartSettings = {
             ...this.pivotChartSettings,
+              height: '280',
             chartSeries: {
                 ...(this.pivotChartSettings?.chartSeries ?? {}),
                 type: this.selectedPivotChartType
@@ -1310,6 +1307,9 @@ private showTransactionsBySeller(): void {
     private setPivotChartTitle(title: string): void {
         this.pivotChartSettings = {
             ...this.pivotChartSettings,
+
+        height: '280',
+
             title
         };
 
@@ -2155,7 +2155,7 @@ onSpreadsheetCreated(): void {
         `Transactions!K2:L${lastRow}`
     );
 
-    this.prepareChartDataSheet();
+    // this.prepareChartDataSheet();
 
     this.spreadsheet.activeSheetIndex = 0;
 
@@ -2168,89 +2168,89 @@ onSpreadsheetCreated(): void {
     });
 }
 
-private prepareChartDataSheet(): void {
-    if (!this.spreadsheet) {
-        return;
-    }
+// private prepareChartDataSheet(): void {
+//     if (!this.spreadsheet) {
+//         return;
+//     }
 
-    // Headers
-    this.spreadsheet.updateCell(
-        {
-            value: 'Transaction',
-            style: {
-                fontWeight: 'bold',
-                textAlign: 'center'
-            }
-        },
-        'Sheet1!A1'
-    );
+//     // Headers
+//     this.spreadsheet.updateCell(
+//         {
+//             value: 'Transaction',
+//             style: {
+//                 fontWeight: 'bold',
+//                 textAlign: 'center'
+//             }
+//         },
+//         'Sheet1!A1'
+//     );
 
-    this.spreadsheet.updateCell(
-        {
-            value: 'Quantity',
-            style: {
-                fontWeight: 'bold',
-                textAlign: 'center'
-            }
-        },
-        'Sheet1!B1'
-    );
+//     this.spreadsheet.updateCell(
+//         {
+//             value: 'Quantity',
+//             style: {
+//                 fontWeight: 'bold',
+//                 textAlign: 'center'
+//             }
+//         },
+//         'Sheet1!B1'
+//     );
 
-    this.spreadsheet.updateCell(
-        {
-            value: 'Amount',
-            style: {
-                fontWeight: 'bold',
-                textAlign: 'center'
-            }
-        },
-        'Sheet1!C1'
-    );
+//     this.spreadsheet.updateCell(
+//         {
+//             value: 'Amount',
+//             style: {
+//                 fontWeight: 'bold',
+//                 textAlign: 'center'
+//             }
+//         },
+//         'Sheet1!C1'
+//     );
 
-    this.spreadsheetRows.forEach((row, index) => {
-        const excelRow = index + 2;
+//     this.spreadsheetRows.forEach((row, index) => {
+//         const excelRow = index + 2;
 
-        // Make sure TransactionNumber exists and is text.
-        const transactionNumber =
-            row.TransactionNumber != null &&
-            row.TransactionNumber !== ''
-                ? String(row.TransactionNumber)
-                : `Transaction ${index + 1}`;
+//         // Make sure TransactionNumber exists and is text.
+//         const transactionNumber =
+//             row.TransactionNumber != null &&
+//             row.TransactionNumber !== ''
+//                 ? String(row.TransactionNumber)
+//                 : `Transaction ${index + 1}`;
 
-        this.spreadsheet?.updateCell(
-            {
-                value: transactionNumber
-            },
-            `Sheet1!A${excelRow}`
-        );
+//         this.spreadsheet?.updateCell(
+//             {
+//                 value: transactionNumber
+//             },
+//             `Sheet1!A${excelRow}`
+//         );
 
-        this.spreadsheet?.updateCell(
-            {
-                value: String(
-                    Number(row.Quantity ?? 0)
-                )
-            },
-            `Sheet1!B${excelRow}`
-        );
+//         this.spreadsheet?.updateCell(
+//             {
+//                 value: String(
+//                     Number(row.Quantity ?? 0)
+//                 )
+//             },
+//             `Sheet1!B${excelRow}`
+//         );
 
-        this.spreadsheet?.updateCell(
-            {
-                value: String(
-                    Number(row.Amount ?? 0)
-                )
-            },
-            `Sheet1!C${excelRow}`
-        );
-    });
+//         this.spreadsheet?.updateCell(
+//             {
+//                 value: String(
+//                     Number(row.Amount ?? 0)
+//                 )
+//             },
+//             `Sheet1!C${excelRow}`
+//         );
+//     });
 
-    const lastRow =
-        this.spreadsheetRows.length + 1;
+//     const lastRow =
+//         this.spreadsheetRows.length + 1;
 
-    this.spreadsheet.numberFormat(
-        '0.00',
-        `Sheet1!B2:C${lastRow}`
-    );
-}
+//     this.spreadsheet.numberFormat(
+//         '0.00',
+//         `Sheet1!B2:C${lastRow}`
+//     );
+// }
 
 
     closeSpreadsheet(): void {
@@ -3181,6 +3181,55 @@ private formatSpreadsheetFilterDate(
     return date.toLocaleDateString();
 }
 
+
+
+
+pivotFieldSearch = '';
+
+get pivotFields(): any[] {
+
+    const fields =
+        this.pivotDataSourceSettings
+            ?.fieldMapping ?? [];
+
+    const search =
+        this.pivotFieldSearch
+            .trim()
+            .toLowerCase();
+
+    if (!search) {
+        return fields;
+    }
+
+    return fields.filter(
+        (field: any) =>
+            String(
+                field.caption ??
+                field.name ??
+                ''
+            )
+                .toLowerCase()
+                .includes(search)
+    );
+}
+
+
+get pivotDimensionFields(): any[] {
+
+    return this.pivotFields.filter(
+        field =>
+            field.dataType !== 'number'
+    );
+}
+
+
+get pivotMeasureFields(): any[] {
+
+    return this.pivotFields.filter(
+        field =>
+            field.dataType === 'number'
+    );
+}
 
 }
 

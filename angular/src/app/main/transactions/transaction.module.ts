@@ -67,7 +67,10 @@ import { ViewBuyerSellerContactInfoComponent } from './app-TransactionTabsInfo/C
 import { CreateOrEditSalesRepInfoComponent } from './app-TransactionTabsInfo/Components/salesRep-info/create-or-edit-salesRep-info/create-or-edit-sales-rep-info.component';
 import { ViewSalesRepInfoComponent } from './app-TransactionTabsInfo/Components/salesRep-info/view-salesRep-info/view-sales-rep-info.component';
 import { SpreadsheetAllModule } from '@syncfusion/ej2-angular-spreadsheet';
-
+import {
+    PivotViewAllModule,
+    PivotFieldListAllModule
+} from '@syncfusion/ej2-angular-pivotview';
 
 @NgModule({
     declarations: [
@@ -147,7 +150,10 @@ import { SpreadsheetAllModule } from '@syncfusion/ej2-angular-spreadsheet';
         SharedDynamicInputsModule,
         InteractionsModule,
         NotesModule,
-        SpreadsheetAllModule
+        SpreadsheetAllModule,
+            PivotViewAllModule,
+    PivotFieldListAllModule
+        
 
     ],
     exports: [

@@ -1,4 +1,4 @@
-<div [@routerTransition]>
+<!-- <div [@routerTransition]>
     <div class="kt-content  kt-grid__item kt-grid__item--fluid kt-grid kt-grid--hor">
         <div class="kt-subheader kt-grid__item" [ngClass]="isArabic ? 'addMTMob':''">
             <div [class]="containerClass">
@@ -23,7 +23,7 @@
             <div  [ngClass]="isArabic ? 'addMT body-sec':'body-sec mt-lg-5'">
                 <div class="kt-portlet__body">
                     <div class="row">
-                        <!-- Sidebar -->
+              
                         <div class="col-lg-3 col-md-5 col-12   leftSec">
                             <ul class="list-group mt-2">
                                 <li
@@ -37,7 +37,7 @@
                               
                         </div>
                       
-                        <!-- Right Panel -->
+                
                         <div class="col-lg-9 col-md-7 col-12">
 
                             <p-accordion [multiple]="true" [(activeIndex)]="activeAccordionIndexes">
@@ -72,4 +72,228 @@
             </div>
         </div>
     </div>
+</div> -->
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="dashboard-page">
+
+    <tabset
+        #dashboardTabs
+        [justified]="true"
+        [ngClass]="{
+            'nav-hidden':
+                !moreThanOnePage()
+        }">
+
+
+        <tab
+            *ngFor="
+                let page of
+                (userDashboard?.pages || []);
+
+                let i = index
+            "
+            [heading]="page.name"
+            (selectTab)="
+                selectPageTab(
+                    page.id
+                )
+            ">
+
+
+            <!-- ====================================== -->
+            <!-- GRIDSTER -->
+            <!-- ====================================== -->
+
+            <gridster
+
+                class="dashboard-grid"
+
+                [options]="options[i]"
+
+                [ngClass]="{
+                    'no-tab':
+                        !moreThanOnePage()
+                }">
+
+
+                <!-- ================================= -->
+                <!-- WIDGET -->
+                <!-- ================================= -->
+
+                <gridster-item
+
+                    *ngFor="
+                        let widget of
+                        page.widgets
+                    "
+
+                    [item]="
+                        widget.gridInformation
+                    ">
+
+
+                    <div
+                        class="dashboard-widget">
+
+
+                        <!-- ========================= -->
+                        <!-- HEADER -->
+                        <!-- ========================= -->
+
+                        <div
+                            class="
+                                dashboard-widget-header
+                                dashboard-widget-drag-handle
+                            ">
+
+
+                            <div
+                                class="
+                                    dashboard-widget-title
+                                ">
+
+                                {{ widget.name }}
+
+                            </div>
+
+
+                            <div
+                                class="
+                                    dashboard-widget-actions
+                                ">
+
+
+                                <span
+                                    class="
+                                        dashboard-widget-type
+                                    ">
+
+                                    {{
+                                        widget.chart?.type
+                                    }}
+
+                                </span>
+
+
+                                <button
+
+                                    type="button"
+
+                                    class="
+                                        dashboard-widget-remove
+                                    "
+
+                                    title="Remove"
+
+                                    (mousedown)="
+                                        $event.stopPropagation()
+                                    "
+
+                                    (click)="
+                                        $event.stopPropagation();
+                                        removeWidget(
+                                            page,
+                                            widget
+                                        )
+                                    ">
+
+                                    <i
+                                        class="
+                                            fa
+                                            fa-times
+                                        ">
+                                    </i>
+
+                                </button>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- ========================= -->
+                        <!-- CHART BODY -->
+                        <!-- ========================= -->
+
+                        <div
+                            class="
+                                dashboard-widget-body
+                            ">
+
+
+                          <ejs-pivotview
+    *ngIf="widget.widgetType === 'PivotChart'"
+
+    [id]="'pivotDashboardChart_' + widget.id"
+
+    width="100%"
+    height="320"
+
+    [dataSourceSettings]="widget.dataSourceSettings"
+
+    [displayOption]="pivotChartOnlyDisplay"
+
+    [chartSettings]="widget.chartSettings"
+
+    [showGroupingBar]="false"
+
+    [showFieldList]="false"
+
+    (created)="onPivotChartCreated(widget.id)">
+
+</ejs-pivotview>
+
+                        </div>
+
+                    </div>
+
+                </gridster-item>
+
+            </gridster>
+
+        </tab>
+
+    </tabset>
+
 </div>

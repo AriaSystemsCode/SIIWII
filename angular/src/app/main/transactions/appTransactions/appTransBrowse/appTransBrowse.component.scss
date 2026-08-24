@@ -306,3 +306,716 @@
 .spreadsheet-filter-chip .filter-value {
     font-weight: 400;
 }
+
+
+/* =========================================================
+   PIVOT DIALOG
+   ========================================================= */
+
+:host ::ng-deep
+.pivot-analysis-dialog {
+
+    .p-dialog {
+        border-radius: 14px !important;
+        overflow: hidden;
+    }
+
+    .p-dialog-header {
+        padding: 16px 22px !important;
+        border-bottom: 1px solid #eeeeee;
+        background: #ffffff;
+    }
+
+    .p-dialog-title {
+        color: #1b101b;
+        font-size: 16px;
+        font-weight: 700;
+    }
+
+    .p-dialog-content {
+        padding: 0 !important;
+        overflow: hidden !important;
+        background: #f8f9fb;
+    }
+}
+
+
+/* =========================================================
+   PAGE
+   ========================================================= */
+
+.pivot-page {
+    width: 100%;
+    height: 100%;
+
+    display: flex;
+    flex-direction: column;
+
+    min-height: 0;
+}
+
+
+/* =========================================================
+   TOOLBAR
+   ========================================================= */
+
+.pivot-toolbar {
+
+    flex: 0 0 auto;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 20px;
+
+    padding: 16px 22px;
+
+    background: #ffffff;
+
+    border-bottom:
+        1px solid #eeeeee;
+}
+
+
+.pivot-toolbar-left {
+
+    display: flex;
+    flex-direction: column;
+
+    gap: 4px;
+}
+
+
+.pivot-title {
+
+    color: #1b101b;
+
+    font-size: 17px;
+
+    font-weight: 700;
+}
+
+
+.pivot-subtitle {
+
+    color: #8a8390;
+
+    font-size: 13px;
+}
+
+
+.pivot-toolbar-right {
+
+    display: flex;
+
+    align-items: flex-end;
+
+    gap: 12px;
+
+    flex-wrap: wrap;
+}
+
+
+.pivot-control {
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 5px;
+
+    label {
+
+        margin: 0;
+
+        color: #625b68;
+
+        font-size: 12px;
+
+        font-weight: 600;
+    }
+}
+
+
+/* =========================================================
+   PRIME DROPDOWN
+   ========================================================= */
+
+:host ::ng-deep
+.pivot-analysis-dialog
+.p-dropdown {
+
+    min-height: 42px;
+
+    border:
+        1px solid #dedbe2
+        !important;
+
+    border-radius:
+        8px !important;
+}
+
+
+:host ::ng-deep
+.pivot-analysis-dialog
+.p-dropdown:not(.p-disabled):hover {
+
+    border-color:
+        #4a0d4a !important;
+}
+
+
+/* =========================================================
+   SAVE BUTTON
+   ========================================================= */
+
+.pivot-save-btn {
+
+    min-height: 42px;
+
+    padding:
+        0 18px;
+
+    border:
+        none !important;
+
+    border-radius:
+        8px !important;
+
+    background:
+        #4a0d4a !important;
+
+    color:
+        #ffffff !important;
+
+    font-size:
+        13px;
+
+    font-weight:
+        600;
+
+    box-shadow:
+        0 2px 6px
+        rgba(
+            74,
+            13,
+            74,
+            0.18
+        );
+
+    &:hover {
+
+        background:
+            #641564
+            !important;
+    }
+}
+
+
+/* =========================================================
+   HELP
+   ========================================================= */
+
+.pivot-help {
+
+    flex: 0 0 auto;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 8px;
+
+    padding:
+        9px 22px;
+
+    background:
+        #faf7fb;
+
+    border-bottom:
+        1px solid #eee7ef;
+
+    color:
+        #6e6270;
+
+    font-size:
+        12px;
+
+    i {
+
+        color:
+            #4a0d4a;
+    }
+}
+
+
+/* =========================================================
+   BUILDER
+   ========================================================= */
+
+.pivot-builder {
+
+    flex: 1 1 auto;
+
+    min-height: 0;
+
+    display: flex;
+
+    flex-direction: column;
+
+    padding:
+        14px 18px 18px;
+
+    overflow: hidden;
+
+    background:
+        #f8f9fb;
+}
+
+
+.pivot-builder-header {
+
+    flex: 0 0 auto;
+
+    display: flex;
+
+    justify-content: space-between;
+
+    margin-bottom:
+        10px;
+}
+
+
+.pivot-builder-title {
+
+    color:
+        #1b101b;
+
+    font-size:
+        14px;
+
+    font-weight:
+        700;
+}
+
+
+.pivot-builder-description {
+
+    margin-top:
+        3px;
+
+    color:
+        #918a94;
+
+    font-size:
+        12px;
+}
+
+
+/* =========================================================
+   SYNCFUSION WRAPPER
+   ========================================================= */
+
+.pivot-native-builder {
+
+    flex: 1 1 auto;
+
+    min-height: 0;
+
+    overflow: auto;
+
+    background:
+        #ffffff;
+
+    border:
+        1px solid #ebe8ed;
+
+    border-radius:
+        10px;
+
+    box-shadow:
+        0 2px 8px
+        rgba(
+            0,
+            0,
+            0,
+            0.04
+        );
+}
+
+
+/* =========================================================
+   AVAILABLE FIELDS
+   ========================================================= */
+
+:host ::ng-deep
+.pivot-native-builder
+.e-group-all-fields {
+
+    display:
+        flex !important;
+
+    align-items:
+        center !important;
+
+    flex-wrap:
+        wrap !important;
+
+    gap:
+        8px !important;
+
+    padding:
+        14px !important;
+
+    margin:
+        0 !important;
+
+    background:
+        #fbfafc !important;
+
+    border-bottom:
+        1px solid #eeeeee
+        !important;
+}
+
+
+/* Native draggable fields */
+
+:host ::ng-deep
+.pivot-native-builder
+.e-group-all-fields
+.e-pivot-button {
+
+    margin:
+        0 !important;
+
+    min-height:
+        36px;
+
+    padding:
+        0 12px !important;
+
+    background:
+        #ffffff !important;
+
+    border:
+        1px solid #ddd8df
+        !important;
+
+    border-radius:
+        7px !important;
+
+    color:
+        #3e3541 !important;
+
+    font-size:
+        12px !important;
+
+    font-weight:
+        600 !important;
+
+    cursor:
+        grab !important;
+
+    box-shadow:
+        0 1px 3px
+        rgba(
+            0,
+            0,
+            0,
+            0.05
+        ) !important;
+}
+
+
+:host ::ng-deep
+.pivot-native-builder
+.e-group-all-fields
+.e-pivot-button:hover {
+
+    color:
+        #4a0d4a !important;
+
+    border-color:
+        #4a0d4a !important;
+
+    background:
+        #faf6fa !important;
+}
+
+
+/* =========================================================
+   DROP AREAS
+   ========================================================= */
+
+:host ::ng-deep
+.pivot-native-builder
+.e-group-row,
+
+:host ::ng-deep
+.pivot-native-builder
+.e-group-column,
+
+:host ::ng-deep
+.pivot-native-builder
+.e-group-values,
+
+:host ::ng-deep
+.pivot-native-builder
+.e-group-filters {
+
+    min-height:
+        48px !important;
+
+    padding:
+        7px 10px !important;
+
+    background:
+        #ffffff !important;
+
+    border:
+        1px dashed #d6ced8
+        !important;
+}
+
+
+:host ::ng-deep
+.pivot-native-builder
+.e-group-row:hover,
+
+:host ::ng-deep
+.pivot-native-builder
+.e-group-column:hover,
+
+:host ::ng-deep
+.pivot-native-builder
+.e-group-values:hover,
+
+:host ::ng-deep
+.pivot-native-builder
+.e-group-filters:hover {
+
+    background:
+        #fcf9fc !important;
+
+    border-color:
+        #4a0d4a !important;
+}
+
+
+/* =========================================================
+   SELECTED FIELD
+   ========================================================= */
+
+:host ::ng-deep
+.pivot-native-builder
+.e-group-row
+.e-pivot-button,
+
+:host ::ng-deep
+.pivot-native-builder
+.e-group-column
+.e-pivot-button,
+
+:host ::ng-deep
+.pivot-native-builder
+.e-group-values
+.e-pivot-button,
+
+:host ::ng-deep
+.pivot-native-builder
+.e-group-filters
+.e-pivot-button {
+
+    background:
+        #f4edf4
+        !important;
+
+    border:
+        1px solid #dbc9db
+        !important;
+
+    color:
+        #4a0d4a
+        !important;
+
+    border-radius:
+        6px !important;
+
+    font-weight:
+        600 !important;
+}
+
+
+/* =========================================================
+   GRID
+   ========================================================= */
+
+:host ::ng-deep
+.pivot-native-builder
+.e-grid
+.e-headercell {
+
+    background:
+        #f7f5f8
+        !important;
+
+    color:
+        #312832
+        !important;
+
+    font-weight:
+        700 !important;
+}
+
+
+:host ::ng-deep
+.pivot-native-builder
+.e-grid
+.e-rowcell {
+
+    color:
+        #4f4852
+        !important;
+}
+
+
+/* =========================================================
+   CHART
+   ========================================================= */
+
+// :host ::ng-deep
+// .pivot-native-builder
+// .e-pivotchart {
+
+//     margin-top:
+//         12px !important;
+
+//     padding:
+//         10px !important;
+
+//     background:
+//         #ffffff;
+// }
+
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media
+(max-width: 1050px) {
+
+    .pivot-toolbar {
+
+        align-items:
+            flex-start;
+
+        flex-direction:
+            column;
+    }
+
+    .pivot-toolbar-right {
+
+        width:
+            100%;
+    }
+}
+
+
+@media
+(max-width: 700px) {
+
+    .pivot-toolbar-right {
+
+        flex-direction:
+            column;
+
+        align-items:
+            stretch;
+    }
+
+    .pivot-control {
+
+        width:
+            100%;
+    }
+
+    .pivot-save-btn {
+
+        width:
+            100%;
+    }
+}
+
+::ng-deep{
+    .e-group-all-fields{
+        display: flex !important;
+        gap: 5px !important;
+        flex-wrap: wrap !important;
+    }
+
+    .e-grid .e-icons:not(.e-btn-icon) {
+   
+    display: none !important;
+}
+
+
+
+}
+
+
+
+// :host ::ng-deep
+// .pivot-native-builder
+// .e-pivotchart {
+//     height: 300px !important;
+//     max-height: 300px !important;
+//     min-height: 300px !important;
+
+//     overflow: hidden !important;
+// }
+
+// :host ::ng-deep
+// .pivot-native-builder
+// .e-pivotchart
+// .e-chart {
+//     height: 300px !important;
+//     max-height: 300px !important;
+//     min-height: 300px !important;
+// }
+
+// :host ::ng-deep
+// .pivot-native-builder
+// .e-pivotchart
+// .e-chart
+// svg {
+//     height: 300px !important;
+//     max-height: 300px !important;
+// }
+
+:host ::ng-deep
+.pivot-native-builder .e-pivotchart {
+    height: 280px !important;
+    max-height: 280px !important;
+    min-height: 280px !important;
+    overflow: hidden !important;
+}
+
+:host ::ng-deep
+.pivot-native-builder .e-pivotchart .e-chart {
+    height: 280px !important;
+    max-height: 280px !important;
+}
+
+:host ::ng-deep
+.pivot-native-builder .e-pivotchart svg {
+    height: 280px !important;
+    max-height: 280px !important;
+}
+
+:host ::ng-deep
+.pivot-native-builder .e-pivotview {
+    height: auto !important;
+}

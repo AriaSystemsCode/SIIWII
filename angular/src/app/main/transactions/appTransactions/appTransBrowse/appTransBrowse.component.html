@@ -1468,7 +1468,7 @@
             </button>
 
 
-            <button
+            <!-- <button
                 type="button"
                 class="btn btn-outline-primary mr-2"
                 (click)="
@@ -1489,7 +1489,7 @@
                 ">
 
                 PDF
-            </button>
+            </button> -->
 
 
             <span class="ml-auto text-muted">
@@ -1622,12 +1622,12 @@
 
 </p-dialog>
 
-
 <p-dialog
     header="Pivot Analysis"
     [(visible)]="showPivotDialog"
     [modal]="true"
-     [style]="{
+    styleClass="pivot-analysis-dialog"
+        [style]="{
         width: '85vw',
         height: '85vh',
         margin: '20px'
@@ -1642,99 +1642,177 @@
     [resizable]="false"
     appendTo="body">
 
-    <!-- ===================================== -->
-    <!-- PIVOT TOOLBAR -->
-    <!-- ===================================== -->
+    <div class="pivot-page">
 
-    <div
-        class="d-flex align-items-center
-               justify-content-between
-               mb-3">
+        <!-- ========================================= -->
+        <!-- HEADER / TOOLBAR -->
+        <!-- ========================================= -->
 
-        <div>
+        <div class="pivot-toolbar">
 
-            <strong class="mr-3">
-                Pivot Analysis
-            </strong>
+            <div class="pivot-toolbar-left">
 
-            <span class="text-muted">
-                Drag fields to Rows,
-                Columns, Values or Filters.
+                <div class="pivot-title">
+                    Pivot Analysis
+                </div>
+
+                <div class="pivot-subtitle">
+                    Build an analysis from your spreadsheet data.
+                </div>
+
+            </div>
+
+
+            <div class="pivot-toolbar-right">
+
+                <!-- Analysis preset -->
+                <!-- <div class="pivot-control">
+
+                    <label>
+                        Analysis
+                    </label>
+
+                    <p-dropdown
+                        [options]="pivotReportOptions"
+                        [(ngModel)]="selectedPivotReport"
+                        optionLabel="label"
+                        optionValue="value"
+                        appendTo="body"
+                        [style]="{
+                            width: '230px'
+                        }"
+                        (onChange)="changePivotReport()">
+                    </p-dropdown>
+
+                </div> -->
+
+
+                <!-- Chart Type -->
+                <div class="pivot-control">
+
+                    <label>
+                        Chart Type
+                    </label>
+
+                    <p-dropdown
+                        [options]="pivotChartTypes"
+                        [(ngModel)]="selectedPivotChartType"
+                        optionLabel="label"
+                        optionValue="value"
+                        appendTo="body"
+                        [style]="{
+                            width: '150px'
+                        }"
+                        (onChange)="changePivotChartType()">
+                    </p-dropdown>
+
+                </div>
+
+
+                <!-- Save -->
+                <button
+                    type="button"
+                    class="btn pivot-save-btn"
+                    (click)="savePivotToDashboard()">
+
+                    <i class="fa fa-chart-bar mr-2"></i>
+
+                    Save to Dashboard
+
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <!-- ========================================= -->
+        <!-- HELP -->
+        <!-- ========================================= -->
+
+        <div class="pivot-help">
+
+            <i class="fa fa-info-circle"></i>
+
+            <span>
+                Drag fields into Rows, Columns, Values or Filters
+                to build your analysis.
             </span>
 
         </div>
-<div class="d-flex align-items-center mb-3">
-
-    <label class="mb-0 mr-2">
-        Analysis:
-    </label>
-
-    <p-dropdown
-        [options]="pivotReportOptions"
-        [(ngModel)]="selectedPivotReport"
-        optionLabel="label"
-        optionValue="value"
-        appendTo="body"
-        [style]="{ width: '280px' }"
-        (onChange)="changePivotReport()">
-    </p-dropdown>
-
-    <label class="mb-0 ml-4 mr-2">
-        Chart Type:
-    </label>
-
-    <p-dropdown
-        [options]="pivotChartTypes"
-        [(ngModel)]="selectedPivotChartType"
-        optionLabel="label"
-        optionValue="value"
-        appendTo="body"
-        [style]="{ width: '160px' }"
-        (onChange)="changePivotChartType()">
-    </p-dropdown>
 
 
-    <button
-    type="button"
-    class="btn btn-primary"
-    (click)="savePivotToDashboard()">
+        <!-- ========================================= -->
+        <!-- BUILDER -->
+        <!-- ========================================= -->
 
-    <i class="fa fa-chart-bar mr-1"></i>
+        <div class="pivot-builder">
 
-    Save to Dashboard
+            <div class="pivot-builder-header">
 
-</button>
+                <div>
 
-</div>
+                    <div class="pivot-builder-title">
+                        Fields & Pivot Configuration
+                    </div>
+
+                    <div class="pivot-builder-description">
+                        Drag any spreadsheet column into the required area.
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- IMPORTANT:
+                 Syncfusion native grouping bar stays enabled.
+                 This keeps drag/drop working.
+            -->
+
+            <div class="pivot-native-builder">
+
+                <ejs-pivotview
+                    *ngIf="showPivotDialog"
+                    #pivotView
+
+                    width="100%"
+                    height="auto"
+
+                    [dataSourceSettings]="
+                        pivotDataSourceSettings
+                    "
+
+                    [showFieldList]="false"
+
+                    [showGroupingBar]="true"
+
+                    [groupingBarSettings]="
+                        pivotGroupingBarSettings
+                    "
+
+                    [displayOption]="
+                        pivotDisplayOption
+                    "
+
+                    [chartSettings]="
+                        pivotChartSettings
+                    "
+
+                    [aggregateTypes]="
+                        pivotAggregateTypes
+                    "
+
+                    (enginePopulated)="
+                        onPivotEnginePopulated()
+                    ">
+
+                </ejs-pivotview>
+
+            </div>
+
+        </div>
 
     </div>
-
-
-    <!-- ===================================== -->
-    <!-- PIVOT -->
-    <!-- ===================================== -->
-
-<ejs-pivotview
-    *ngIf="showPivotDialog"
-    #pivotView
-
-    width="100%"
-    height="650"
-   (enginePopulated)="onPivotEnginePopulated()"
-    [dataSourceSettings]="pivotDataSourceSettings"
-
-    [showFieldList]="true"
-
-    [showGroupingBar]="true"
-
-    [groupingBarSettings]="pivotGroupingBarSettings"
-
-    [displayOption]="pivotDisplayOption"
-
-    [chartSettings]="pivotChartSettings"
-
-    [aggregateTypes]="pivotAggregateTypes">
-
-</ejs-pivotview>
 
 </p-dialog>
