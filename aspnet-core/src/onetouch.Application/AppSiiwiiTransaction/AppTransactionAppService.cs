@@ -7968,8 +7968,9 @@ namespace onetouch.AppSiiwiiTransaction
                     var accountOrg = await _appContactRepository.GetAll().Include(z => z.AppContactAddresses).ThenInclude(z => z.AddressFk)
                         //.Include(z=>z.ParentFkList).ThenInclude(z=>z.AppContactAddresses).ThenInclude(z=>z.AddressFk)
                         .Where(z => z.SSIN == accountSSIN && z.TenantId == AbpSession.TenantId).FirstOrDefaultAsync();
-
-                    if (accountOrg != null && accountOrg.PartnerId == null)
+                    var marketplaceRec = await _appMarketplaceContactRepository.GetAll()
+                        .Where(z => z.SSIN == accountSSIN && z.SharingLevel == 4).FirstOrDefaultAsync();
+                    if (accountOrg != null && marketplaceRec!=null)// accountOrg.PartnerId == null)
                     {
                         CreateOrEditAccountInfoDto accountInput = ObjectMapper.Map<CreateOrEditAccountInfoDto>(accountOrg);
                         if (accountInput.ContactAddresses != null && accountInput.ContactAddresses.Count > 0)
@@ -7989,7 +7990,7 @@ namespace onetouch.AppSiiwiiTransaction
                             string sequance = await _sycIdentifierDefinitionsAppService.GetNextEntityCode("BUSINESS", tenantId);
                             accountInput.Code = "M" + sequance;//tenantObj.TenancyName.Trim() 
                         }
-                        if (accountOrg.PartnerId == null)
+                        //if (accountOrg.PartnerId == null)
                         {
                             var partnerEntityObjectTypeId = accountInput.AccountTypeId;
                             var partnerEntityObjectTypeCode = accountInput.AccountType;
@@ -8173,7 +8174,7 @@ namespace onetouch.AppSiiwiiTransaction
                         //.Include(z=>z.ParentFkList).ThenInclude(z=>z.AppContactAddresses).ThenInclude(z=>z.AddressFk)
                         .Where(z => z.SSIN == accountSSIN && z.TenantId == null && z.SharingLevel == 1).FirstOrDefaultAsync();
                     //share
-                    if (accountOrg != null)// && accountOrg.PartnerId != null)
+                    if (accountOrgin != null)// && accountOrg.PartnerId != null)
                     {
                         // long? otherTenantId = null;
                         //accountOrg.EntityFk.TenantOwner 
