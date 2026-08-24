@@ -401,7 +401,7 @@ namespace onetouch.Accounts
             {
                 try
                 {
-                    var currentTenantAccount = _appContactRepository.GetAll().Include(e => e.EntityFk).ThenInclude(z => z.EntityExtraData)
+                    var currentTenantAccount = _appContactRepository.GetAll().AsNoTracking().Include(e => e.EntityFk).ThenInclude(z => z.EntityExtraData)
                           .FirstOrDefault(e => e.TenantId == AbpSession.TenantId && e.IsProfileData && e.ParentId == null);
                     if (currentTenantAccount == null)
                         return new PagedResultDto<GetAccountForViewDto>();
@@ -435,8 +435,8 @@ namespace onetouch.Accounts
                              //    //&& (_appContactRepository.GetAll().Count(c => c.TenantId == null && c.Id == x.PartnerId) > 0))
                              .WhereIf(input.FilterType == 2 && input.FilterType != 6,
                              (x=>x.TenantId == AbpSession.TenantId && x.ParentId == null && !x.IsProfileData &&
-                                _appMarketplaceContactRepository.GetAll().Any(z => z.SSIN == x.SSIN) && //&& z.SharingLevel == 1
-                                _appContactRelationshipInfoRepository.GetAll().Any(
+                                _appMarketplaceContactRepository.GetAll().AsNoTracking().Any(z => z.SSIN == x.SSIN) && //&& z.SharingLevel == 1
+                                _appContactRelationshipInfoRepository.GetAll().AsNoTracking().Any(
                                     z => ((z.RecipientContactSSIN == x.SSIN && z.RequesterContactSSIN == currentTenantAccount.SSIN)
                                     || (z.RequesterContactSSIN == x.SSIN && z.RecipientContactSSIN == currentTenantAccount.SSIN)) &&
                                     z.EntityObjectStatusId == activeRelationshipStatusId
@@ -447,9 +447,9 @@ namespace onetouch.Accounts
 
                             .WhereIf(input.FilterType >= 3 && input.FilterType != 6,
                               x => (x.TenantId == AbpSession.TenantId && !x.IsProfileData && x.ParentId == null &&
-                                _appMarketplaceContactRepository.GetAll().Any(z => z.SSIN == x.SSIN && z.TenantOwner == x.TenantId) 
+                                _appMarketplaceContactRepository.GetAll().AsNoTracking().Any(z => z.SSIN == x.SSIN && z.TenantOwner == x.TenantId) 
                                 && //&& z.SharingLevel == 1
-                                _appContactRelationshipInfoRepository.GetAll().Any(
+                                _appContactRelationshipInfoRepository.GetAll().AsNoTracking().Any(
                                     z => ((z.RecipientContactSSIN == x.SSIN && z.RequesterContactSSIN == currentTenantAccount.SSIN)) &&
                                     z.EntityObjectStatusId == activeRelationshipStatusId
                                     )))
@@ -459,17 +459,17 @@ namespace onetouch.Accounts
 
                              .WhereIf(input.FilterType == 6,
                                 x => (x.TenantId == AbpSession.TenantId && !x.IsProfileData && x.ParentId == null &&
-                                _appMarketplaceContactRepository.GetAll().Any(z => z.SSIN == x.SSIN && z.TenantOwner == x.TenantId) 
+                                _appMarketplaceContactRepository.GetAll().AsNoTracking().Any(z => z.SSIN == x.SSIN && z.TenantOwner == x.TenantId) 
                                 && //&& z.SharingLevel == 1
-                                _appContactRelationshipInfoRepository.GetAll().Any(
+                                _appContactRelationshipInfoRepository.GetAll().AsNoTracking().Any(
                                     z => ((z.RecipientContactSSIN == x.SSIN && z.RequesterContactSSIN == currentTenantAccount.SSIN)) &&
                                     z.EntityObjectStatusId == activeRelationshipStatusId
                                     ) 
                                 )//x.PartnerId == null) //&& z.SharingLevel == 1
                                 ||
                                 (x.TenantId == AbpSession.TenantId && x.ParentId == null && !x.IsProfileData &&
-                                _appMarketplaceContactRepository.GetAll().Any(z => z.SSIN == x.SSIN)  && //&& z.SharingLevel == 1
-                                _appContactRelationshipInfoRepository.GetAll().Any(
+                                _appMarketplaceContactRepository.GetAll().AsNoTracking().Any(z => z.SSIN == x.SSIN)  && //&& z.SharingLevel == 1
+                                _appContactRelationshipInfoRepository.GetAll().AsNoTracking().Any(
                                     z => ((z.RecipientContactSSIN == x.SSIN && z.RequesterContactSSIN == currentTenantAccount .SSIN)
                                     || (z.RequesterContactSSIN == x.SSIN && z.RecipientContactSSIN == currentTenantAccount .SSIN)) &&
                                     z.EntityObjectStatusId == activeRelationshipStatusId
@@ -480,32 +480,32 @@ namespace onetouch.Accounts
                             .WhereIf(!string.IsNullOrEmpty(input.Name),
                                 x => x.Name.Contains(input.Name) || x.TradeName.Contains(input.Name))
                             .WhereIf(input.Status != null && input.Status.Count(x => x == 1) > 0,
-                                x => _appContactRepository.GetAll().Count(c => c.TenantId == AbpSession.TenantId && c.PartnerId == x.Id) > 0)
+                                x => _appContactRepository.GetAll().AsNoTracking().Count(c => c.TenantId == AbpSession.TenantId && c.PartnerId == x.Id) > 0)
 
                             .WhereIf(input.Status != null && input.Status.Count(x => x == 2) > 0,
-                                x => (_appContactRepository.GetAll().Count(c => c.TenantId == AbpSession.TenantId && c.PartnerId == x.Id) == 0)
+                                x => (_appContactRepository.GetAll().AsNoTracking().Count(c => c.TenantId == AbpSession.TenantId && c.PartnerId == x.Id) == 0)
                                 )
                             .WhereIf(input.Classifications != null && input.Classifications.Count(x => x > 0) > 0,
-                                x => _appEntityRepository.GetAll().Include(ec => ec.EntityClassifications).FirstOrDefault(e => e.Id == x.EntityId).EntityClassifications.Any(a => input.Classifications.Contains(a.EntityObjectClassificationId)))
+                                x => _appEntityRepository.GetAll().AsNoTracking().Include(ec => ec.EntityClassifications).FirstOrDefault(e => e.Id == x.EntityId).EntityClassifications.Any(a => input.Classifications.Contains(a.EntityObjectClassificationId)))
                             .WhereIf(input.Categories != null && input.Categories.Count(x => x > 0) > 0,
-                                x => _appEntityRepository.GetAll().Include(ec => ec.EntityCategories).FirstOrDefault(e => e.Id == x.EntityId).EntityCategories.Any(a => input.Categories.Contains(a.EntityObjectCategoryId)))
+                                x => _appEntityRepository.GetAll().AsNoTracking().Include(ec => ec.EntityCategories).FirstOrDefault(e => e.Id == x.EntityId).EntityCategories.Any(a => input.Categories.Contains(a.EntityObjectCategoryId)))
 
                             .WhereIf(!string.IsNullOrEmpty(input.City),
-                                x => _appContactRepository.GetAll().Include(ca => ca.AppContactAddresses).ThenInclude(e => e.AddressFk).Count(c => c.Id == x.Id && c.AppContactAddresses.Any(a => a.AddressFk.City.Contains(input.City))) > 0)
+                                x => _appContactRepository.GetAll().AsNoTracking().Include(ca => ca.AppContactAddresses).ThenInclude(e => e.AddressFk).Count(c => c.Id == x.Id && c.AppContactAddresses.Any(a => a.AddressFk.City.Contains(input.City))) > 0)
                             .WhereIf(!string.IsNullOrEmpty(input.Address),
-                                x => _appContactRepository.GetAll().Include(ca => ca.AppContactAddresses).ThenInclude(e => e.AddressFk).Count(c => c.Id == x.Id && c.AppContactAddresses.Any(a => a.AddressFk.AddressLine1.Contains(input.Address) || a.AddressFk.AddressLine2.Contains(input.Address))) > 0)
+                                x => _appContactRepository.GetAll().AsNoTracking().Include(ca => ca.AppContactAddresses).ThenInclude(e => e.AddressFk).Count(c => c.Id == x.Id && c.AppContactAddresses.Any(a => a.AddressFk.AddressLine1.Contains(input.Address) || a.AddressFk.AddressLine2.Contains(input.Address))) > 0)
                             .WhereIf(!string.IsNullOrEmpty(input.State),
-                                x => _appContactRepository.GetAll().Include(ca => ca.AppContactAddresses).ThenInclude(e => e.AddressFk).Count(c => c.Id == x.Id && c.AppContactAddresses.Any(a => a.AddressFk.State.Contains(input.State))) > 0)
+                                x => _appContactRepository.GetAll().AsNoTracking().Include(ca => ca.AppContactAddresses).ThenInclude(e => e.AddressFk).Count(c => c.Id == x.Id && c.AppContactAddresses.Any(a => a.AddressFk.State.Contains(input.State))) > 0)
                             .WhereIf(!string.IsNullOrEmpty(input.Postal),
-                                x => _appContactRepository.GetAll().Include(ca => ca.AppContactAddresses).ThenInclude(e => e.AddressFk).Count(c => c.Id == x.Id && c.AppContactAddresses.Any(a => a.AddressFk.PostalCode.Contains(input.Postal))) > 0)
+                                x => _appContactRepository.GetAll().AsNoTracking().Include(ca => ca.AppContactAddresses).ThenInclude(e => e.AddressFk).Count(c => c.Id == x.Id && c.AppContactAddresses.Any(a => a.AddressFk.PostalCode.Contains(input.Postal))) > 0)
                             .WhereIf(input.Countries != null && input.Countries.Count(x => x > 0) > 0,
-                                x => _appContactRepository.GetAll().Include(ca => ca.AppContactAddresses).ThenInclude(e => e.AddressFk).Count(c => c.Id == x.Id && c.AppContactAddresses.Any(a => input.Countries.Contains(a.AddressFk.CountryId))) > 0)
+                                x => _appContactRepository.GetAll().AsNoTracking().Include(ca => ca.AppContactAddresses).ThenInclude(e => e.AddressFk).Count(c => c.Id == x.Id && c.AppContactAddresses.Any(a => input.Countries.Contains(a.AddressFk.CountryId))) > 0)
 
                             .WhereIf(input.Languages != null && input.Languages.Count(x => x > 0) > 0,
-                                x => _appContactRepository.GetAll().Count(c => c.Id == x.Id && c.LanguageId != null && input.Languages.Contains((long)c.LanguageId)) > 0)
+                                x => _appContactRepository.GetAll().AsNoTracking().Count(c => c.Id == x.Id && c.LanguageId != null && input.Languages.Contains((long)c.LanguageId)) > 0)
 
                             .WhereIf(input.Curruncies != null && input.Curruncies.Count(x => x > 0) > 0,
-                                x => _appContactRepository.GetAll().Count(c => c.Id == x.Id && c.CurrencyId != null && input.Curruncies.Contains((long)c.CurrencyId)) > 0)
+                                x => _appContactRepository.GetAll().AsNoTracking().Count(c => c.Id == x.Id && c.CurrencyId != null && input.Curruncies.Contains((long)c.CurrencyId)) > 0)
                             .WhereIf(!string.IsNullOrEmpty(input.SSIN), x => x.SSIN == input.SSIN)
                             .WhereIf(input.AccountTypeId != null && input.AccountTypeId > 0, x => x.EntityFk.EntityObjectTypeId == input.AccountTypeId)
                             .WhereIf(input.AccountType != null && !string.IsNullOrEmpty(input.AccountType), x => x.EntityFk.EntityObjectTypeCode == input.AccountType)
@@ -547,7 +547,8 @@ namespace onetouch.Accounts
 
 
                     var _accountsJ = from acc in pagedAndFilteredAccounts join
-                                    market in _appMarketplaceContactRepository.GetAll().AsNoTracking().Where(z => z.SharingLevel == 1)
+                                    market in _appMarketplaceContactRepository
+                                    .GetAll().AsNoTracking().Where(z => z.SharingLevel == 1)
                                     on acc.SSIN equals market.SSIN into j
                                     from j1 in j.DefaultIfEmpty()
                                      select new
@@ -575,10 +576,20 @@ namespace onetouch.Accounts
                                             ZipCode = o.account.AppContactAddresses.FirstOrDefault().AddressFk.PostalCode,
                                             AddressLine1 = o.account.AppContactAddresses.FirstOrDefault().AddressFk.AddressLine1,
                                             CountryName = o.account.AppContactAddresses.FirstOrDefault().AddressFk.CountryFk.Name,
-                                            Status = input.FilterType != 1 ? o.marketplace!=null || (o.account.TenantId != null && o.account.ParentId == null &&o.marketplace==null) :
-                                            (_appContactRepository.GetAll().Count(x => x.TenantId == AbpSession.TenantId && o.marketplace!=null) > 0 || (o.account.TenantId != null && o.account.ParentId == null && o.marketplace==null)),
+                                            Status = input.FilterType != 1 ? o.marketplace!=null ||
+                                            (o.account.TenantId != null && o.account.ParentId == null
+                                            &&o.marketplace==null) :
+                                            (_appContactRepository.GetAll()
+                                            .AsNoTracking()
+                                            .Count(x => x.TenantId == AbpSession.TenantId && 
+                                            o.marketplace!=null && x.SSIN== o.marketplace.SSIN) > 0
+                                            || (o.account.TenantId != null &&
+                                            o.account.ParentId == null && o.marketplace==null)),
                                             Id = o.account.Id,
-                                            IsManual = o.account.TenantId == AbpSession.TenantId && o.account.ParentId == null && _appMarketplaceContactRepository.GetAll().Count(z => z.SSIN == o.account.SSIN && z.SharingLevel == 1) == 0,
+                                            IsManual = o.account.TenantId == AbpSession.TenantId && 
+                                            o.account.ParentId == null && 
+                                            _appMarketplaceContactRepository.GetAll().AsNoTracking()
+                                            .Count(z => z.SSIN == o.account.SSIN && z.SharingLevel == 1) == 0,
                                             LogoUrl = string.IsNullOrEmpty(o.account.EntityFk.EntityAttachments.FirstOrDefault().AttachmentFk.Attachment) ?
                                              ""
                                              : "attachments/" + (o.account.EntityFk.TenantId == null ? "-1" : o.account.EntityFk.TenantId.ToString()) + "/" + o.account.EntityFk.EntityAttachments.FirstOrDefault(x => x.AttachmentCategoryId == logoCategory).AttachmentFk.Attachment,
