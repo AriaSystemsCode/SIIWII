@@ -89,7 +89,7 @@
                                     </div>
                                 </div>
                                 <div class="row row-item row-item-main-data"
-                                    *ngIf="accountInfoTemp?.accountTypeId != 21">
+                                    *ngIf="accountDataForView?.accountTypeId != 21">
                                     <div class="col-md-4 row-item-title emailColor">
                                         {{l("Website")}}</div>
                                     <div class="col-md-8 row-item-desc text-right">
@@ -432,21 +432,26 @@
                         </div>
                     </div>
                     <div class="col rendered-content">
-                   <div
+                 <div
     class="tab1"
     *ngIf="
         accountTypeResolved &&
-        currentAccountTypeId != null &&
-        !isPersonalAccount &&
+        (
+            isManualAccountCreate ||
+            isExternalAccountCreate ||
+            (
+                currentAccountTypeId != null &&
+                !isPersonalAccount
+            )
+        ) &&
         currentTab ===
             accountInfoPageTabsEnum.ProfileCreateOrEdit
-    "
->
+    ">
                             <div [class]="containerClass + ' kt-grid__item kt-grid__item--fluid'">
 
                                 <div class=" m-portlet--full-height bg-white p-4">
 
-                                    <div class="kt-portlet__body" *ngIf="accountInfoTemp?.accountTypeId">
+                                    <div class="kt-portlet__body">
                                         <div class="row">
                                             <div class="offset-md-2 col-md-9">
                                                 <p class="title-blue">{{ accountInfoTemp?.accountTypeId != 21 ? l("CompanyInformation") : l("ProfileInformation") }}</p>
