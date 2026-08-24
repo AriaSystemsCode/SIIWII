@@ -1,0 +1,164 @@
+<div class="field-manager-page">
+    <div class="field-manager-layout">
+        <aside class="field-manager-sidebar">
+            <button type="button" class="field-panel-option" [class.active]="activePanel === 'all'"
+                (click)="selectPanel('all')">
+                {{ 'AllFields' | localize }}
+            </button>
+            <button type="button" class="field-panel-option" [class.active]="activePanel === 'entity'"
+                (click)="selectPanel('entity')">
+                {{ 'ByEntity' | localize }}
+            </button>
+
+            <div class="field-entity-tree" *ngIf="activePanel === 'entity'">
+                <ng-template #entityNodes let-nodes>
+                    <div class="field-entity-node" *ngFor="let node of nodes">
+                        <button type="button" class="field-entity-node-button"
+                            [class.selected]="selectedEntityId === node.id" (click)="toggleEntity(node, $event)">
+                            <i *ngIf="node.children?.length" class="fa"
+                                [class.fa-chevron-right]="!isEntityExpanded(node)"
+                                [class.fa-chevron-down]="isEntityExpanded(node)"></i>
+                            <span>{{ node.name }}</span>
+                        </button>
+                        <div class="field-entity-children" *ngIf="node.children?.length && isEntityExpanded(node)">
+                            <ng-container *ngTemplateOutlet="entityNodes; context: { $implicit: node.children }"></ng-container>
+                        </div>
+                    </div>
+                </ng-template>
+                <ng-container *ngTemplateOutlet="entityNodes; context: { $implicit: entityTree }"></ng-container>
+            </div>
+        </aside>
+
+        <main class="field-manager-main">
+    <div class="field-manager-header">
+        <div class="field-manager-breadcrumb">
+            <ng-container *ngFor="let pathNode of breadcrumbPath; let last = last">
+                <span *ngIf="!last" class="field-manager-breadcrumb-node">{{ pathNode.name | localize }} <b>&gt;&gt;</b></span>
+                <span *ngIf="last">{{ pathNode.name | localize }}</span>
+            </ng-container>
+        </div>
+        <div class="field-manager-actions" *ngIf="activePanel === 'entity' && selectedEntityId !== null">
+            <button type="button" class="btn bgPurpleM add-existing-btn" (click)="addFromExisting()">
+                {{ 'AddFromExisting' | localize }} 
+            </button>
+            <button type="button" class="btn bgPurpleM create-field-btn" (click)="create()">
+                {{ 'CreateNewField' | localize }}
+            </button>
+        </div>
+    </div>
+
+    <div class="field-manager-toolbar">
+        <div class="field-manager-search">
+            <i class="fa fa-search"></i>
+            <input [(ngModel)]="filterText" [placeholder]="'SearchFields' | localize" type="text" />
+        </div>
+        <label class="group-filter-btn">
+            <i class="flaticon-layers mt-2"></i>
+            <select [(ngModel)]="groupBy" [attr.aria-label]="'GroupBy' | localize" class="ml-0">
+                <option *ngFor="let group of groupOptions" [value]="group.value">
+                    {{ group.label | localize }}
+                </option>
+            </select>
+        </label>
+        <label class="only-extra-data-filter" *ngIf="activePanel === 'all'">
+            <input type="checkbox" [(ngModel)]="onlyExtraData" />
+            <span></span>
+            {{ 'OnlyExtraData' | localize }}
+        </label>
+    </div>
+
+    <div class="field-manager-table-wrapper" *ngIf="activePanel === 'all' || selectedEntityId !== null">
+        <p-table #dataTable [value]="groupedItems" [paginator]="true" [rows]="10"
+            [rowsPerPageOptions]="[10, 25, 50]" [scrollable]="false"
+            responsiveLayout="stack" breakpoint="960px" styleClass="field-manager-table"
+            [rowGroupMode]="groupBy === 'none' ? null : 'subheader'" groupRowsBy="groupValue"
+            [tableStyle]="{'min-width': '1080px'}">
+                                <ng-template pTemplate="groupheader" let-item>
+                                    <tr class="field-group-row">
+                                        <td colspan="10">{{ groupLabel | localize }}: <strong>{{ item.groupValue }}</strong></td>
+                                    </tr>
+                                </ng-template>
+                                <ng-template pTemplate="header">
+                                    <tr>
+                                        <th pSortableColumn="code" class="purpleColor field-code-column">
+                                            {{ 'FieldCode' | localize }}
+                                            <p-sortIcon field="code"></p-sortIcon>
+                                        </th>
+                                        <th pSortableColumn="name" class="purpleColor field-name-column">
+                                            {{ 'FieldName' | localize }}
+                                            <p-sortIcon field="name"></p-sortIcon>
+                                        </th>
+                                        <th pSortableColumn="type" class="purpleColor field-type-column">
+                                            {{ 'FieldType' | localize }}
+                                            <p-sortIcon field="type"></p-sortIcon>
+                                        </th>
+                                        <th pSortableColumn="tables" class="purpleColor field-table-column">
+                                            {{ 'Tables' | localize }}
+                                            <p-sortIcon field="tables"></p-sortIcon>
+                                        </th>
+                                        <th pSortableColumn="status" class="purpleColor field-status-column">
+                                            {{ 'Status' | localize }}
+                                            <p-sortIcon field="status"></p-sortIcon>
+                                        </th>
+                                        <th pSortableColumn="revision" class="purpleColor field-revision-column">
+                                            {{ 'Revision' | localize }}
+                                            <p-sortIcon field="revision"></p-sortIcon>
+                                        </th>
+                                        <th pSortableColumn="fieldLevel" class="purpleColor field-level-column">
+                                            {{ 'FieldLevel' | localize }}
+                                            <p-sortIcon field="fieldLevel"></p-sortIcon>
+                                        </th>
+                                        <th pSortableColumn="trackingNumber" class="purpleColor field-tracking-column">
+                                            {{ 'TrackingNumber' | localize }}
+                                            <p-sortIcon field="trackingNumber"></p-sortIcon>
+                                        </th>
+                                        <th pSortableColumn="extraData" class="purpleColor field-extra-data-column">
+                                            {{ 'ExtraData' | localize }}
+                                            <p-sortIcon field="extraData"></p-sortIcon>
+                                        </th>
+                                        <th class="purpleColor text-right">{{ 'Actions' | localize }}</th>
+                                    </tr>
+                                </ng-template>
+                                <ng-template pTemplate="body" let-item>
+                                    <tr>
+                                        <td>{{ item.code }}</td>
+                                        <td>{{ item.name }}</td>
+                                        <td>{{ item.type }}</td>
+                                        <td>{{ item.tables }}</td>
+                                        <td>{{ item.status }}</td>
+                                        <td>{{ item.revision | number: '2.0-0' }}</td>
+                                        <td>{{ item.fieldLevel }}</td>
+                                        <td>{{ item.trackingNumber }}</td>
+                                        <td>{{ item.extraData ? 'true' : 'false' }}</td>
+                                        <td class="text-right field-actions">
+                                            <button type="button" class="field-action-menu" [title]="'Actions' | localize"
+                                                (click)="toggleActions(item, $event)">
+                                                <span></span><span></span><span></span>
+                                            </button>
+                                            <div class="field-action-links" [class.d-block]="activeActionId === item.id">
+                                                <button type="button" (click)="view(item)">{{ 'View' | localize }}</button>
+                                                <button type="button" (click)="createNewRevision(item)">{{ 'CreateNewRevision' | localize }}</button>
+                                                <button type="button" (click)="delete(item)">{{ 'Delete' | localize }}</button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </ng-template>
+                                <ng-template pTemplate="emptymessage">
+                                    <tr>
+                                        <td colspan="10" class="text-center text-muted">{{ 'NoData' | localize }}</td>
+                                    </tr>
+                                </ng-template>
+        </p-table>
+    </div>
+
+    <div class="field-manager-empty-selection" *ngIf="activePanel === 'entity' && selectedEntityId === null">
+        {{ 'SelectEntityToViewFields' | localize }}
+    </div>
+
+    <app-create-or-edit-field-manager #createOrEditFieldManagerModal
+        (saved)="onCreateOrEditDone()"></app-create-or-edit-field-manager>
+    <app-view-field-manager #viewFieldManagerModal
+        (createNewRevisionRequested)="createNewRevisionFromView($event)"></app-view-field-manager>
+        </main>
+    </div>
+</div>

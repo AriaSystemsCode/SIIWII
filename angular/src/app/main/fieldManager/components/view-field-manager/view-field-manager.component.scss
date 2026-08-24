@@ -1,0 +1,212 @@
+:host {
+    display: block;
+}
+
+.modal-dialog {
+    max-width: 720px;
+}
+
+.modal-content {
+    border: 0;
+    border-radius: 8px;
+    box-shadow: 0 8px 30px rgba(27, 16, 27, .18);
+}
+
+.modal-header {
+    border-bottom: 1px solid #eee;
+}
+
+.modal-title {
+    color: #1b101b;
+    font-weight: 700;
+}
+
+.modal-header {
+    min-height: 34px;
+    padding: 5px 10px;
+    justify-content: center;
+}
+
+.modal-header .modal-title {
+    color: #555;
+    font-size: 14px;
+}
+
+.modal-header .close {
+    position: absolute;
+    right: 8px;
+    top: 4px;
+    width: 22px;
+    height: 22px;
+    padding: 0;
+    border: 1px solid #555;
+    border-radius: 3px;
+    color: #555;
+    opacity: 1;
+    font-size: 18px;
+    line-height: 18px;
+}
+
+.modal-body {
+    padding: 8px 10px 0;
+}
+
+.field-manager-modal-title-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 2px;
+}
+
+.field-manager-modal-title-row h4 {
+    margin: 0;
+    color: #202124;
+    font-size: 18px;
+    font-weight: 700;
+}
+
+.field-manager-modal-actions {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.sync-button {
+    border: 0;
+    background: transparent;
+    color: #555;
+    font-size: 12px;
+}
+
+.sync-button i {
+    color: #c127f2;
+    margin-right: 6px;
+}
+
+.edit-field-button {
+    min-width: 125px;
+    height: 30px;
+    padding: 3px 15px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.field-manager-info-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 7px;
+    padding: 2px 0 12px;
+}
+
+.field-manager-info-grid > div {
+    display: grid;
+    grid-template-columns: 72px minmax(0, 1fr);
+    gap: 7px;
+    align-items: start;
+    color: #444;
+    font-size: 12px;
+}
+
+.field-manager-info-grid span {
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.field-manager-info-grid span b {
+    color: #e03a3a;
+    margin-left: 2px;
+}
+
+.field-manager-info-grid strong {
+    overflow-wrap: anywhere;
+    color: #a4a7ad;
+    font-weight: 600;
+}
+
+.field-manager-section {
+    padding: 10px 0 8px;
+    border-top: 2px dashed #777;
+}
+
+.field-manager-section h5 {
+    margin: 0 0 10px;
+    color: #478bd2;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.field-manager-info-grid.compact {
+    grid-template-columns: 1fr 1fr;
+    gap: 9px 30px;
+    padding-bottom: 2px;
+}
+
+.field-manager-info-grid.compact > div {
+    grid-template-columns: 68px minmax(0, 1fr);
+}
+
+.extra-attributes {
+    padding-bottom: 2px;
+}
+
+.kt-portlet {
+    margin-top: 0 !important;
+}
+
+.kt-portlet__head-title {
+    color: #1b101b;
+    font-weight: 700;
+}
+
+.field-manager-details {
+    max-width: 900px;
+}
+
+.field-manager-details dt {
+    color: #4a0d4a;
+    font-weight: 700;
+}
+
+.field-manager-details dd {
+    color: #6f6f6f;
+    font-weight: 600;
+}
+
+.kt-portlet__foot {
+    border-top: 1px solid #eee;
+    padding: 1.25rem 2rem;
+}
+
+.modal-footer {
+    padding: 8px 10px;
+    border-top: 1px solid #eee;
+}
+
+.btn-primary {
+    border-radius: 8px;
+    background: #4a0d4a;
+    border-color: #4a0d4a;
+}
+
+.btn-primary:hover,
+.btn-primary:focus {
+    background: #641264;
+    border-color: #641264;
+}
+
+.btn-secondary {
+    border-radius: 8px;
+}
+
+@media (max-width: 575.98px) {
+    .field-manager-modal-title-row {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .field-manager-info-grid.compact {
+        grid-template-columns: 1fr;
+    }
+}

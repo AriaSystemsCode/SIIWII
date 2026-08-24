@@ -77,6 +77,10 @@ export class AppNavigationService {
                 new AppMenuItem('Lookups', 'Pages.AppEntities', 'flaticon-more', '/app/main/lookups'),
             );
         // }
+
+         adminMenu.items.push(
+            new AppMenuItem('FieldManager', '', 'flaticon-tool-1', '/app/main/fieldManager'),
+            ); 
   
         adminMenu.items.push(
             new AppMenuItem('BillingLog', '', 'flaticon-interface-8', '', [], [

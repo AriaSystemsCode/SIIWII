@@ -31128,6 +31128,65 @@ export class AppUpdateItemSSINServiceProxy {
     }
 
     /**
+     * @param tenantId (optional) 
+     * @param currentTenant (optional) 
+     * @return Success
+     */
+    fixSSINMissingVariations(tenantId: number | null | undefined, currentTenant: boolean | undefined): Observable<FixSSINMissingVariationsResultDto> {
+        let url_ = this.baseUrl + "/api/services/app/AppUpdateItemSSIN/FixSSINMissingVariations?";
+        if (tenantId !== undefined && tenantId !== null)
+            url_ += "tenantId=" + encodeURIComponent("" + tenantId) + "&";
+        if (currentTenant === null)
+            throw new Error("The parameter 'currentTenant' cannot be null.");
+        else if (currentTenant !== undefined)
+            url_ += "currentTenant=" + encodeURIComponent("" + currentTenant) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processFixSSINMissingVariations(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processFixSSINMissingVariations(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<FixSSINMissingVariationsResultDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<FixSSINMissingVariationsResultDto>;
+        }));
+    }
+
+    protected processFixSSINMissingVariations(response: HttpResponseBase): Observable<FixSSINMissingVariationsResultDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = FixSSINMissingVariationsResultDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
      * @return Success
      */
     updateSSIN(): Observable<void> {
@@ -37629,6 +37688,67 @@ export class MessageServiceProxy {
             let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
                 result200 = resultData200 !== undefined ? resultData200 : <any>null;
     
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param entityIds (optional) 
+     * @return Success
+     */
+    getMarketplaceItemReviewSummaries(entityIds: number[] | null | undefined): Observable<MarketplaceItemReviewSummaryDto[]> {
+        let url_ = this.baseUrl + "/api/services/app/Message/GetMarketplaceItemReviewSummaries?";
+        if (entityIds !== undefined && entityIds !== null)
+            entityIds && entityIds.forEach(item => { url_ += "entityIds=" + encodeURIComponent("" + item) + "&"; });
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetMarketplaceItemReviewSummaries(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetMarketplaceItemReviewSummaries(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<MarketplaceItemReviewSummaryDto[]>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<MarketplaceItemReviewSummaryDto[]>;
+        }));
+    }
+
+    protected processGetMarketplaceItemReviewSummaries(response: HttpResponseBase): Observable<MarketplaceItemReviewSummaryDto[]> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            if (Array.isArray(resultData200)) {
+                result200 = [] as any;
+                for (let item of resultData200)
+                    result200!.push(MarketplaceItemReviewSummaryDto.fromJS(item));
+            }
+            else {
+                result200 = <any>null;
+            }
             return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
@@ -96104,6 +96224,66 @@ export interface IGetAppTransactionForEditOutput {
     [key: string]: any;
 }
 
+export class FixSSINMissingVariationsResultDto implements IFixSSINMissingVariationsResultDto {
+    targetTenantCount!: number;
+    affectedParentCount!: number;
+    missingVariationCount!: number;
+    enqueuedJobCount!: number;
+
+    [key: string]: any;
+
+    constructor(data?: IFixSSINMissingVariationsResultDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.targetTenantCount = _data["targetTenantCount"];
+            this.affectedParentCount = _data["affectedParentCount"];
+            this.missingVariationCount = _data["missingVariationCount"];
+            this.enqueuedJobCount = _data["enqueuedJobCount"];
+        }
+    }
+
+    static fromJS(data: any): FixSSINMissingVariationsResultDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new FixSSINMissingVariationsResultDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["targetTenantCount"] = this.targetTenantCount;
+        data["affectedParentCount"] = this.affectedParentCount;
+        data["missingVariationCount"] = this.missingVariationCount;
+        data["enqueuedJobCount"] = this.enqueuedJobCount;
+        return data;
+    }
+}
+
+export interface IFixSSINMissingVariationsResultDto {
+    targetTenantCount: number;
+    affectedParentCount: number;
+    missingVariationCount: number;
+    enqueuedJobCount: number;
+
+    [key: string]: any;
+}
+
 export class AppItemSharing implements IAppItemSharing {
     itemId!: number | undefined;
     itemFk!: AppItem;
@@ -104518,6 +104698,62 @@ export interface ICreateMessageInput {
     entityAttachments: AppEntityAttachmentDto[] | undefined;
     messageCategory: string | undefined;
     mentionedUsers: MentionedUserInfo[] | undefined;
+
+    [key: string]: any;
+}
+
+export class MarketplaceItemReviewSummaryDto implements IMarketplaceItemReviewSummaryDto {
+    entityId!: number;
+    numberOfReviews!: number;
+    averageRating!: number;
+
+    [key: string]: any;
+
+    constructor(data?: IMarketplaceItemReviewSummaryDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.entityId = _data["entityId"];
+            this.numberOfReviews = _data["numberOfReviews"];
+            this.averageRating = _data["averageRating"];
+        }
+    }
+
+    static fromJS(data: any): MarketplaceItemReviewSummaryDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new MarketplaceItemReviewSummaryDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["entityId"] = this.entityId;
+        data["numberOfReviews"] = this.numberOfReviews;
+        data["averageRating"] = this.averageRating;
+        return data;
+    }
+}
+
+export interface IMarketplaceItemReviewSummaryDto {
+    entityId: number;
+    numberOfReviews: number;
+    averageRating: number;
 
     [key: string]: any;
 }

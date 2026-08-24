@@ -1,0 +1,60 @@
+<div bsModal #fieldManagerViewModal="bs-modal" class="modal fade" tabindex="-1" role="dialog"
+    aria-labelledby="fieldManagerViewModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+        <div class="modal-content" *ngIf="hasItem">
+            <div class="modal-header">
+                <h5 class="modal-title" id="fieldManagerViewModalLabel">{{ 'ViewFieldModal' | localize }}</h5>
+                <button type="button" class="close" [attr.aria-label]="'Close' | localize" (click)="close()">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="field-manager-modal-title-row">
+                    <h4>{{ 'FieldInformation' | localize }}</h4>
+                    <div class="field-manager-modal-actions">
+                        <button type="button" class="sync-button" (click)="sync()">
+                            <i class="flaticon-refresh"></i> {{ 'Sync' | localize }}
+                        </button>
+                        <button type="button" class="btn bgPurpleM edit-field-button" (click)="createNewRevision()">
+                            {{ 'CreateNewRevision' | localize }}
+                        </button>
+                    </div>
+                </div>
+
+                <div class="field-manager-info-grid">
+                    <div><span>{{ 'FieldCode' | localize }}<b>*</b></span><strong>{{ item.code }}</strong></div>
+                    <div><span>{{ 'FieldName' | localize }}</span><strong>{{ item.name }}</strong></div>
+                    <div><span>{{ 'Description' | localize }}</span><strong>{{ item.description }}</strong></div>
+                    <div><span>{{ 'FieldType' | localize }}<b>*</b></span><strong>{{ item.type }}</strong></div>
+                    <div><span>{{ 'FieldLevel' | localize }}<b>*</b></span><strong>{{ item.fieldLevel }}</strong></div>
+                    <div><span>{{ 'Status' | localize }}<b>*</b></span><strong>{{ item.status }}</strong></div>
+                    <div><span>{{ 'TrackingNumber' | localize }} #</span><strong>{{ item.trackingNumber }}</strong></div>
+                </div>
+
+                <section class="field-manager-section">
+                    <h5>{{ 'AdvancedInformation' | localize }}</h5>
+                    <div class="field-manager-info-grid compact">
+                        <div><span>{{ 'AllowNull' | localize }}</span><strong>{{ item.allowNull ? ('Yes' | localize) : ('No' | localize) }}</strong></div>
+                        <div><span>{{ 'Length' | localize }}</span><strong>{{ item.length || '-' }}</strong></div>
+                        <div><span>{{ 'DefaultValue' | localize }}</span><strong>{{ item.defaultValue || '-' }}</strong></div>
+                        <div><span>{{ 'Required' | localize }}</span><strong>{{ item.required ? ('Yes' | localize) : ('No' | localize) }}</strong></div>
+                    </div>
+                </section>
+
+                <section class="field-manager-section extra-attributes">
+                    <h5>{{ 'ExtraAttributes' | localize }}</h5>
+                    <div class="field-manager-info-grid compact">
+                        <div><span>{{ 'Visible' | localize }}</span><strong>{{ item.visible ? ('Yes' | localize) : ('No' | localize) }}</strong></div>
+                        <div><span>{{ 'Editable' | localize }}</span><strong>{{ item.editable ? ('Yes' | localize) : ('No' | localize) }}</strong></div>
+                        <div><span>{{ 'ExtraData' | localize }}</span><strong>{{ item.extraData ? 'true' : 'false' }}</strong></div>
+                    </div>
+                </section>
+            </div>
+            <div class="modal-footer d-flex justify-content-end">
+                <button type="button" class="btn btn-secondary mr-2" (click)="close()">
+                    {{ 'Close' | localize }}
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

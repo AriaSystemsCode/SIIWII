@@ -1,0 +1,172 @@
+<div bsModal #fieldManagerModal="bs-modal" class="modal fade" tabindex="-1" role="dialog"
+    aria-labelledby="fieldManagerModalLabel" aria-hidden="true" [config]="{backdrop: 'static'}">
+    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="fieldManagerModalLabel">
+                    {{ (isRevision ? 'CreateNewRevision' : 'CreateNew') | localize }} {{ 'Field' | localize }} {{ 'Modal' | localize }}
+                </h5>
+                <button type="button" class="close" [attr.aria-label]="'Close' | localize" (click)="close()">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form class="kt-form" #fieldForm="ngForm" (ngSubmit)="save()">
+                    <h4 class="field-section-title">{{ 'FieldInformation' | localize }}</h4>
+                    <div class="field-form-grid">
+                        <div class="form-group">
+                            <label for="fieldCode">{{ 'FieldCode' | localize }}<b>*</b></label>
+                            <input id="fieldCode" name="code" type="text" class="form-control"
+                                [(ngModel)]="item.code" required />
+                        </div>
+                        <div class="form-group">
+                            <label for="fieldName">{{ 'FieldName' | localize }}<b>*</b></label>
+                            <input id="fieldName" name="name" type="text" class="form-control"
+                                [(ngModel)]="item.name" required />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="fieldDescription">{{ 'Description' | localize }}</label>
+                        <textarea id="fieldDescription" name="description" class="form-control field-description"
+                            [(ngModel)]="item.description"></textarea>
+                    </div>
+                    <div class="field-form-grid">
+                        <div class="form-group">
+                            <label for="fieldType">{{ 'FieldType' | localize }}<b>*</b></label>
+                            <select id="fieldType" name="type" class="form-control" [(ngModel)]="item.type">
+                                <option value="String - Textbox">{{ 'StringTextbox' | localize }}</option>
+                                <option value="Boolean - Checkbox">{{ 'BooleanCheckbox' | localize }}</option>
+                                <option value="Integer - Numeric input">{{ 'IntegerNumericInput' | localize }}</option>
+                                <option value="Date - Date picker">{{ 'DateDatePicker' | localize }}</option>
+                                <option value="List - Dropdown">{{ 'ListDropdown' | localize }}</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="fieldLevel">{{ 'FieldLevel' | localize }}<b>*</b></label>
+                            <select id="fieldLevel" name="fieldLevel" class="form-control" [(ngModel)]="item.fieldLevel">
+                                <option value="System">{{ 'System' | localize }}</option>
+                                <option value="Application">{{ 'Application' | localize }}</option>
+                                <option value="Tenant">{{ 'Tenant' | localize }}</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="fieldStatus">{{ 'Status' | localize }}<b>*</b></label>
+                        <select id="fieldStatus" name="status" class="form-control" [(ngModel)]="item.status">
+                            <option value="Proposed - Default">{{ 'ProposedDefault' | localize }}</option>
+                            <option value="Active">{{ 'Active' | localize }}</option>
+                            <option value="Discontinued">{{ 'Discontinued' | localize }}</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="trackingNumber">{{ 'TrackingNumber' | localize }} #</label>
+                        <input id="trackingNumber" name="trackingNumber" type="text" class="form-control"
+                            [(ngModel)]="item.trackingNumber" [placeholder]="'EnterTrackingNumber' | localize" />
+                    </div>
+
+                    <section class="field-form-section">
+                        <h4 class="field-section-title">{{ 'AdvancedInformation' | localize }}</h4>
+                        <div class="field-form-grid">
+                            <div class="form-group">
+                                <label for="allowNull">{{ 'AllowNull' | localize }}</label>
+                                <select id="allowNull" name="allowNull" class="form-control" [(ngModel)]="item.allowNull">
+                                    <option [ngValue]="true">{{ 'Yes' | localize }}</option>
+                                    <option [ngValue]="false">{{ 'No' | localize }}</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="fieldLength">{{ 'Length' | localize }}</label>
+                                <input id="fieldLength" name="length" type="number" class="form-control"
+                                    [(ngModel)]="item.length" min="0" />
+                            </div>
+                        </div>
+                        <div class="field-form-grid">
+                            <div class="form-group">
+                                <label for="allowMultiSelect">{{ 'AllowMultiSelect' | localize }}</label>
+                                <select id="allowMultiSelect" name="allowMultiSelect" class="form-control" [(ngModel)]="item.allowMultiSelect">
+                                    <option [ngValue]="true">{{ 'Yes' | localize }}</option>
+                                    <option [ngValue]="false">{{ 'No' | localize }}</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="decimals">{{ 'Decimals' | localize }}</label>
+                                <input id="decimals" name="decimals" type="number" class="form-control"
+                                    [(ngModel)]="item.decimals" min="0" />
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="defaultValue">{{ 'DefaultValue' | localize }}</label>
+                            <input id="defaultValue" name="defaultValue" type="text" class="form-control"
+                                [(ngModel)]="item.defaultValue" />
+                        </div>
+                        <div class="form-group">
+                            <label for="dateFormat">{{ 'DateFormat' | localize }}</label>
+                            <select id="dateFormat" name="dateFormat" class="form-control" [(ngModel)]="item.dateFormat">
+                                <option value="mm/dd/yyyy">mm/dd/yyyy</option>
+                                <option value="dd/mm/yyyy">dd/mm/yyyy</option>
+                                <option value="yyyy/mm/dd">yyyy/mm/dd</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="fieldRequired">{{ 'Required' | localize }}</label>
+                            <select id="fieldRequired" name="required" class="form-control" [(ngModel)]="item.required">
+                                <option [ngValue]="true">{{ 'Yes' | localize }}</option>
+                                <option [ngValue]="false">{{ 'No' | localize }}</option>
+                            </select>
+                        </div>
+                        <div class="dropdown-options-header">
+                            <label>{{ 'DropdownOptions' | localize }}</label>
+                            <button type="button" class="btn btn-outline-primary btn-sm" (click)="addOption()">
+                                <i class="fa fa-plus"></i> {{ 'AddOption' | localize }}
+                            </button>
+                        </div>
+                        <div class="dropdown-option-row" *ngFor="let option of dropdownOptions; let i = index">
+                            <input type="text" class="form-control" [name]="'dropdownOptionName' + i"
+                                [placeholder]="'Option' | localize" [(ngModel)]="option.option" />
+                            <input type="text" class="form-control option-value" [name]="'dropdownOptionValue' + i"
+                                [placeholder]="'Value' | localize" [(ngModel)]="option.value" />
+                            <button type="button" class="btn btn-link text-danger" (click)="removeOption(i)">
+                                <i class="fa fa-times"></i>
+                            </button>
+                        </div>
+                    </section>
+
+                    <section class="field-form-section extra-attributes-form">
+                        <h4 class="field-section-title">{{ 'ExtraAttributes' | localize }}</h4>
+                        <div class="field-form-grid">
+                            <div class="form-group">
+                                <label for="visible">{{ 'Visible' | localize }}</label>
+                                <select id="visible" name="visible" class="form-control" [(ngModel)]="item.visible">
+                                    <option [ngValue]="true">{{ 'Yes' | localize }}</option>
+                                    <option [ngValue]="false">{{ 'No' | localize }}</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="editable">{{ 'Editable' | localize }}</label>
+                                <select id="editable" name="editable" class="form-control" [(ngModel)]="item.editable">
+                                    <option [ngValue]="true">{{ 'Yes' | localize }}</option>
+                                    <option [ngValue]="false">{{ 'No' | localize }}</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="extraData">{{ 'ExtraData' | localize }}</label>
+                                <select id="extraData" name="extraData" class="form-control" [(ngModel)]="item.extraData">
+                                    <option [ngValue]="true">{{ 'True' | localize }}</option>
+                                    <option [ngValue]="false">{{ 'False' | localize }}</option>
+                                </select>
+                            </div>
+                        </div>
+                    </section>
+                    <div class="d-flex justify-content-end pt-4">
+                        <button type="button" class="btn btn-secondary mr-2" (click)="close()">
+                            {{ 'Cancel' | localize }}
+                        </button>
+                        <button type="submit" class="btn btn-primary" [disabled]="fieldForm.invalid">
+                            {{ (isRevision ? 'CreateNewRevision' : 'Create') | localize }} {{ 'Field' | localize }}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
