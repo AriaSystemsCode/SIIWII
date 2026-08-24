@@ -5147,6 +5147,62 @@ export class AccountsServiceProxy {
     }
 
     /**
+     * @param body (optional) 
+     * @return Success
+     */
+    _SaveFromExcel(body: AccountExcelResultsDTO | undefined): Observable<ExcelLogDto> {
+        let url_ = this.baseUrl + "/api/services/app/Accounts/_SaveFromExcel";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json-patch+json",
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.process_SaveFromExcel(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.process_SaveFromExcel(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<ExcelLogDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<ExcelLogDto>;
+        }));
+    }
+
+    protected process_SaveFromExcel(response: HttpResponseBase): Observable<ExcelLogDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = ExcelLogDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
      * @param typeId (optional) 
      * @return Success
      */
@@ -15812,16 +15868,11 @@ export class AppItemsServiceProxy {
     }
 
     /**
-     * @param index (optional) 
      * @param body (optional) 
      * @return Success
      */
-    validateImportItemData(index: number | undefined, body: ImportItemInputDto | undefined): Observable<ImportItemReturnDto[]> {
-        let url_ = this.baseUrl + "/api/services/app/AppItems/ValidateImportItemData?";
-        if (index === null)
-            throw new Error("The parameter 'index' cannot be null.");
-        else if (index !== undefined)
-            url_ += "index=" + encodeURIComponent("" + index) + "&";
+    validateImportItemData(body: ImportItemInputDto | undefined): Observable<ImportItemReturnDto[]> {
+        let url_ = this.baseUrl + "/api/services/app/AppItems/ValidateImportItemData";
         url_ = url_.replace(/[?&]$/, "");
 
         const content_ = JSON.stringify(body);
@@ -67912,6 +67963,8 @@ export class ConnectionInfo implements IConnectionInfo {
     connectedLabel!: string | undefined;
     visibility!: string | undefined;
     relationshipCode!: string | undefined;
+    requestorRole!: string | undefined;
+    recipientRole!: string | undefined;
 
     [key: string]: any;
 
@@ -67937,6 +67990,8 @@ export class ConnectionInfo implements IConnectionInfo {
             this.connectedLabel = _data["connectedLabel"];
             this.visibility = _data["visibility"];
             this.relationshipCode = _data["relationshipCode"];
+            this.requestorRole = _data["requestorRole"];
+            this.recipientRole = _data["recipientRole"];
         }
     }
 
@@ -67960,6 +68015,8 @@ export class ConnectionInfo implements IConnectionInfo {
         data["connectedLabel"] = this.connectedLabel;
         data["visibility"] = this.visibility;
         data["relationshipCode"] = this.relationshipCode;
+        data["requestorRole"] = this.requestorRole;
+        data["recipientRole"] = this.recipientRole;
         return data;
     }
 }
@@ -67972,6 +68029,8 @@ export interface IConnectionInfo {
     connectedLabel: string | undefined;
     visibility: string | undefined;
     relationshipCode: string | undefined;
+    requestorRole: string | undefined;
+    recipientRole: string | undefined;
 
     [key: string]: any;
 }
@@ -104075,6 +104134,8 @@ export class GetMarketplaceAccountForViewDto implements IGetMarketplaceAccountFo
     disConnectLabel!: string | undefined;
     availableConnections!: ConnectionType[] | undefined;
     connectionsInfo!: ConnectionInfo[] | undefined;
+    isProfileData!: boolean;
+    connectedAccountId!: number | undefined;
 
     [key: string]: any;
 
@@ -104110,6 +104171,8 @@ export class GetMarketplaceAccountForViewDto implements IGetMarketplaceAccountFo
                 for (let item of _data["connectionsInfo"])
                     this.connectionsInfo!.push(ConnectionInfo.fromJS(item));
             }
+            this.isProfileData = _data["isProfileData"];
+            this.connectedAccountId = _data["connectedAccountId"];
         }
     }
 
@@ -104143,6 +104206,8 @@ export class GetMarketplaceAccountForViewDto implements IGetMarketplaceAccountFo
             for (let item of this.connectionsInfo)
                 data["connectionsInfo"].push(item.toJSON());
         }
+        data["isProfileData"] = this.isProfileData;
+        data["connectedAccountId"] = this.connectedAccountId;
         return data;
     }
 }
@@ -104157,6 +104222,8 @@ export interface IGetMarketplaceAccountForViewDto {
     disConnectLabel: string | undefined;
     availableConnections: ConnectionType[] | undefined;
     connectionsInfo: ConnectionInfo[] | undefined;
+    isProfileData: boolean;
+    connectedAccountId: number | undefined;
 
     [key: string]: any;
 }
