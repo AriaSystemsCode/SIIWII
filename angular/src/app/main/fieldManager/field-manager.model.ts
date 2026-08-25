@@ -35,4 +35,5 @@ export interface FieldManagerItem {
     extraData: boolean;
     required: boolean;
     active: boolean;
+    canSync: boolean;
 }

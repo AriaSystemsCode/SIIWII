@@ -30,7 +30,8 @@ export class FieldManagerService {
             dropdownOptions: [],
             extraData: false,
             required: true,
-            active: true
+            active: true,
+            canSync: true
         },
         {
             id: 2,
@@ -56,7 +57,8 @@ export class FieldManagerService {
             dropdownOptions: [],
             extraData: false,
             required: false,
-            active: true
+            active: true,
+            canSync: false
         },
         {
             id: 3,
@@ -85,7 +87,98 @@ export class FieldManagerService {
             ],
             extraData: true,
             required: false,
-            active: true
+            active: true,
+            canSync: true
+        },
+        {
+            id: 4,
+            code: 'F004',
+            name: 'CompleteDate',
+            description: 'The date when the transaction is completed',
+            type: 'Date - Date picker',
+            createdUser: 'Esraa',
+            entityId: 3,
+            tables: 'Sales Order',
+            status: 'Proposed',
+            revision: 0,
+            fieldLevel: 'Application',
+            trackingNumber: 'Iteration X600',
+            allowNull: true,
+            length: 0,
+            allowMultiSelect: false,
+            decimals: 0,
+            dateFormat: 'mm/dd/yyyy',
+            defaultValue: '',
+            visible: true,
+            editable: true,
+            dropdownOptions: [
+                { option: 'Option 1', value: '01' },
+                { option: 'Option 2', value: '02' }
+            ],
+            extraData: true,
+            required: false,
+            active: true,
+            canSync: true
+        },
+        {
+            id: 5,
+            code: 'F005',
+            name: 'CompleteDate',
+            description: 'The date when the transaction is completed',
+            type: 'Date - Date picker',
+            createdUser: 'Esraa',
+            entityId: 3,
+            tables: 'Sales Order',
+            status: 'Proposed',
+            revision: 0,
+            fieldLevel: 'Application',
+            trackingNumber: 'Iteration X600',
+            allowNull: true,
+            length: 0,
+            allowMultiSelect: false,
+            decimals: 0,
+            dateFormat: 'mm/dd/yyyy',
+            defaultValue: '',
+            visible: true,
+            editable: true,
+            dropdownOptions: [
+                { option: 'Option 1', value: '01' },
+                { option: 'Option 2', value: '02' }
+            ],
+            extraData: true,
+            required: false,
+            active: true,
+            canSync: false
+        },
+        {
+            id: 6,
+            code: 'F006',
+            name: 'CompleteDate',
+            description: 'The date when the transaction is completed',
+            type: 'Date - Date picker',
+            createdUser: 'Esraa',
+            entityId: 3,
+            tables: 'Sales Order',
+            status: 'Proposed',
+            revision: 0,
+            fieldLevel: 'Application',
+            trackingNumber: 'Iteration X600',
+            allowNull: true,
+            length: 0,
+            allowMultiSelect: false,
+            decimals: 0,
+            dateFormat: 'mm/dd/yyyy',
+            defaultValue: '',
+            visible: true,
+            editable: true,
+            dropdownOptions: [
+                { option: 'Option 1', value: '01' },
+                { option: 'Option 2', value: '02' }
+            ],
+            extraData: false,
+            required: false,
+            active: true,
+            canSync: true
         }
     ];
 

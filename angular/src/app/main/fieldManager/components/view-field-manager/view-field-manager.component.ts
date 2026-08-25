@@ -37,7 +37,8 @@ export class ViewFieldManagerComponent extends AppComponentBase implements OnIni
         dropdownOptions: [],
         extraData: false,
         required: false,
-        active: false
+        active: false,
+        canSync: false
     };
     hasItem = false;
     active = false;
@@ -68,6 +69,10 @@ export class ViewFieldManagerComponent extends AppComponentBase implements OnIni
     }
 
     sync(): void {
+        if (!this.item.canSync) {
+            return;
+        }
+
         this.notify.info(this.l('FieldManager') + ' ' + this.l('Synchronized'));
     }
 

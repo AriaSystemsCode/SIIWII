@@ -22,6 +22,7 @@
 }
 
 .modal-header {
+    position: relative;
     min-height: 34px;
     padding: 5px 10px;
     justify-content: center;
@@ -34,13 +35,13 @@
 
 .modal-header .close {
     position: absolute;
-    right: 8px;
-    top: 4px;
+    right: 5%;
+    top: 40%;
     width: 22px;
     height: 22px;
     padding: 0;
-    border: 1px solid #555;
-    border-radius: 3px;
+    // border: 1px solid #555;
+    // border-radius: 3px;
     color: #555;
     opacity: 1;
     font-size: 18px;
@@ -49,6 +50,8 @@
 
 .modal-body {
     padding: 8px 10px 0;
+    max-height: 70vh;
+    overflow-y: auto;
 }
 
 .field-manager-modal-title-row {
@@ -67,11 +70,15 @@
 
 .field-manager-modal-actions {
     display: flex;
-    align-items: center;
-    gap: 14px;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 6px;
+    min-width: 150px;
 }
 
 .sync-button {
+    display: flex;
+    align-items: center;
     border: 0;
     background: transparent;
     color: #555;
@@ -83,13 +90,39 @@
     margin-right: 6px;
 }
 
+.sync-button:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.sync-button:disabled i {
+    color: #999;
+}
+
+.sync-line {
+    flex: 1;
+    height: 0;
+    margin-left: 6px;
+    border-top: 1px dashed #999;
+}
+
 .edit-field-button {
-    min-width: 125px;
+    width: 100%;
     height: 30px;
     padding: 3px 15px;
     border-radius: 8px;
     font-size: 12px;
     font-weight: 700;
+    background: #4a0d4a !important;
+    border-color: #4a0d4a !important;
+    color: #fff !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+}
+
+.edit-field-button:hover,
+.edit-field-button:focus {
+    background: #641264 !important;
+    border-color: #641264 !important;
 }
 
 .field-manager-info-grid {
@@ -99,9 +132,9 @@
     padding: 2px 0 12px;
 }
 
-.field-manager-info-grid > div {
+.field-manager-info-grid>div {
     display: grid;
-    grid-template-columns: 72px minmax(0, 1fr);
+    grid-template-columns: minmax(72px, max-content) minmax(0, 1fr);
     gap: 7px;
     align-items: start;
     color: #444;
@@ -122,6 +155,7 @@
     overflow-wrap: anywhere;
     color: #a4a7ad;
     font-weight: 600;
+    padding: 0px 10px;
 }
 
 .field-manager-section {
@@ -137,13 +171,13 @@
 }
 
 .field-manager-info-grid.compact {
-    grid-template-columns: 1fr 1fr;
-    gap: 9px 30px;
+    grid-template-columns: 1fr;
+    gap: 7px;
     padding-bottom: 2px;
 }
 
-.field-manager-info-grid.compact > div {
-    grid-template-columns: 68px minmax(0, 1fr);
+.field-manager-info-grid.compact>div {
+    grid-template-columns: minmax(72px, max-content) minmax(0, 1fr);
 }
 
 .extra-attributes {
@@ -206,7 +240,7 @@
         gap: 8px;
     }
 
-    .field-manager-info-grid.compact {
-        grid-template-columns: 1fr;
+    .field-manager-modal-actions {
+        align-items: flex-start;
     }
 }

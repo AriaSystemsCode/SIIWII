@@ -3079,6 +3079,7 @@ Please select one of the available linesheet templates
 		<text name="CreatedUser">Created User</text>
 
 		<text name="SharedWithYou">is shared with you</text>
+		<text name="AreYouSureYouWantToDeleteThisField?">Are you sure you want to delete this field?</text>
 
 		
   </texts>  

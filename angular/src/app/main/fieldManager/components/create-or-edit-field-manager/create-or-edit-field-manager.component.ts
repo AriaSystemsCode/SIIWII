@@ -13,6 +13,7 @@ import { FieldManagerService } from '../../field-manager.service';
 export class CreateOrEditFieldManagerComponent extends AppComponentBase implements OnInit {
     @ViewChild('fieldManagerModal', { static: true }) modal!: ModalDirective;
     @Output() saved = new EventEmitter<void>();
+    @Output() closed = new EventEmitter<void>();
     item: FieldManagerItem = this.createEmptyItem();
     isEdit = false;
     isRevision = false;
@@ -82,6 +83,7 @@ export class CreateOrEditFieldManagerComponent extends AppComponentBase implemen
     close(): void {
         this.active = false;
         this.modal.hide();
+        this.closed.emit();
     }
 
     addOption(): void {
@@ -117,7 +119,8 @@ export class CreateOrEditFieldManagerComponent extends AppComponentBase implemen
             dropdownOptions: [],
             extraData: false,
             required: false,
-            active: true
+            active: true,
+            canSync: true
         };
     }
 }

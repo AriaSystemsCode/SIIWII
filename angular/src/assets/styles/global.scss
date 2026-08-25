@@ -974,3 +974,26 @@ input[type='password']::-webkit-contacts-auto-fill-button {
   visibility: hidden !important;
   pointer-events: none !important;
 }
+
+
+.field-manager-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    box-sizing: border-box;
+    position: relative;
+}
+
+.field-manager-icon::before {
+    content: "";
+    width: 28px;
+    height: 28px;
+    display: block;
+    background-image: url('/assets/icons/field-manager.svg');
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+}

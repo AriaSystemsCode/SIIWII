@@ -76,10 +76,12 @@ export class AppNavigationService {
             );
         // }
 
-         adminMenu.items.push(
-            new AppMenuItem('FieldManager', '', 'flaticon-tool-1', '/app/main/fieldManager'),
-            ); 
-  
+       
+
+        adminMenu.items.push(
+            new AppMenuItem('FieldManager', '', 'field-manager-icon', '/app/main/fieldManager'),
+        );
+
         adminMenu.items.push(
             new AppMenuItem('BillingLog', '', 'flaticon-interface-8', '', [], [
                 new AppMenuItem('AppTenantPlans', 'Pages.Administration.AppTenantPlans', 'flaticon-more', '/app/admin/appTenantPlans/appTenantPlans'),
@@ -126,7 +128,7 @@ export class AppNavigationService {
     }
     
 
-    checkChildMenuItemPermission(menuItem): boolean {
+    checkChildMenuItemPermission(menuItem: AppMenuItem): boolean {
 
         for (let i = 0; i < menuItem.items.length; i++) {
             let subMenuItem = menuItem.items[i];

@@ -156,7 +156,7 @@
     </div>
 
     <app-create-or-edit-field-manager #createOrEditFieldManagerModal
-        (saved)="onCreateOrEditDone()"></app-create-or-edit-field-manager>
+        (saved)="onCreateOrEditDone()" (closed)="onCreateOrEditClosed()"></app-create-or-edit-field-manager>
     <app-view-field-manager #viewFieldManagerModal
         (createNewRevisionRequested)="createNewRevisionFromView($event)"></app-view-field-manager>
         </main>

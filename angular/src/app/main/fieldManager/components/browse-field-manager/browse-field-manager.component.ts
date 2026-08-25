@@ -5,6 +5,7 @@ import { ViewFieldManagerComponent } from '../view-field-manager/view-field-mana
 import { AppComponentBase } from '@shared/common/app-component-base';
 import { FieldManagerEntityNode, FieldManagerItem } from '../../field-manager.model';
 import { FieldManagerService } from '../../field-manager.service';
+import { Observable } from '@node_modules/rxjs/dist/types';
 
 @Component({
     selector: 'app-browse-field-manager',
@@ -20,13 +21,14 @@ export class BrowseFieldManagerComponent extends AppComponentBase implements OnI
     groupBy = 'none';
     activeActionId: number | null = null;
     activePanel: 'all' | 'entity' = 'all';
+    private returnToViewId: number | null = null;
     entityTree: FieldManagerEntityNode[] = [];
     expandedEntityIds: number[] = [];
     selectedEntityId: number | null = null;
     selectedEntityPath: FieldManagerEntityNode[] = [];
 
     readonly groupOptions = [
-    //  { label: 'No group', value: 'none' },
+        //  { label: 'No group', value: 'none' },
         { label: 'Group', value: 'none' },
         { label: 'Field Type', value: 'type' },
         { label: 'Created User', value: 'createdUser' },
@@ -47,9 +49,9 @@ export class BrowseFieldManagerComponent extends AppComponentBase implements OnI
     }
 
     get displayedItems(): FieldManagerItem[] {
-        if (this.activePanel === 'entity' && this.selectedEntityId !== null) {
-            return this.items.filter(item => item.entityId === this.selectedEntityId);
-        }
+        debugger
+        if (this.activePanel === 'entity' && this.selectedEntityId !== null)
+            return this.items.filter(item => item.entityId === this.selectedEntityId && item.extraData === true);
 
         return this.items;
     }
@@ -183,17 +185,21 @@ export class BrowseFieldManagerComponent extends AppComponentBase implements OnI
 
     delete(item: FieldManagerItem): void {
         this.activeActionId = null;
-        this.message.confirm(
-            this.l('AreYouSure'),
-            this.l('AreYouSure'),
-            isConfirmed => {
-                if (isConfirmed) {
-                    this.fieldManagerService.delete(item.id);
-                    this.loadItems();
-                    this.notify.success(this.l('SuccessfullyDeleted'));
-                }
-            }
+        var isConfirmed: Observable<boolean>;
+        isConfirmed = this.askToConfirm(
+            "AreYouSureYouWantToDeleteThisField?",
+            "Confirm"
         );
+
+        isConfirmed.subscribe((res) => {
+            if (res) {
+                //i51- call delete
+                this.fieldManagerService.delete(item.id);
+                this.loadItems();
+                this.notify.success(this.l('SuccessfullyDeleted'));
+
+            }
+        });
     }
 
     onCreateOrEditDone(): void {
@@ -202,8 +208,22 @@ export class BrowseFieldManagerComponent extends AppComponentBase implements OnI
 
     createNewRevisionFromView(id: number): void {
         this.activeActionId = null;
+        this.returnToViewId = id;
         this.viewFieldManagerModal.close();
         this.createOrEditFieldManagerModal.show(id);
+    }
+
+    onCreateOrEditClosed(): void {
+        if (this.returnToViewId === null) {
+            return;
+        }
+
+        const id = this.returnToViewId;
+        this.returnToViewId = null;
+        const item = this.fieldManagerService.getById(id);
+        if (item) {
+            this.viewFieldManagerModal.show(item);
+        }
     }
 
     @HostListener('document:click')

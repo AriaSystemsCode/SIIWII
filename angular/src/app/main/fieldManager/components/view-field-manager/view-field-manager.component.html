@@ -12,7 +12,7 @@
                 <div class="field-manager-modal-title-row">
                     <h4>{{ 'FieldInformation' | localize }}</h4>
                     <div class="field-manager-modal-actions">
-                        <button type="button" class="sync-button" (click)="sync()">
+                        <button type="button" class="sync-button" [disabled]="!item.canSync" (click)="sync()">
                             <i class="flaticon-refresh"></i> {{ 'Sync' | localize }}
                         </button>
                         <button type="button" class="btn bgPurpleM edit-field-button" (click)="createNewRevision()">
@@ -21,7 +21,10 @@
                     </div>
                 </div>
 
+
                 <div class="field-manager-info-grid">
+                    <section class="field-manager-section border-0">
+                     <h5>{{ 'StandaredInformation' | localize }}</h5>
                     <div><span>{{ 'FieldCode' | localize }}<b>*</b></span><strong>{{ item.code }}</strong></div>
                     <div><span>{{ 'FieldName' | localize }}</span><strong>{{ item.name }}</strong></div>
                     <div><span>{{ 'Description' | localize }}</span><strong>{{ item.description }}</strong></div>
@@ -29,6 +32,7 @@
                     <div><span>{{ 'FieldLevel' | localize }}<b>*</b></span><strong>{{ item.fieldLevel }}</strong></div>
                     <div><span>{{ 'Status' | localize }}<b>*</b></span><strong>{{ item.status }}</strong></div>
                     <div><span>{{ 'TrackingNumber' | localize }} #</span><strong>{{ item.trackingNumber }}</strong></div>
+                    </section>
                 </div>
 
                 <section class="field-manager-section">
