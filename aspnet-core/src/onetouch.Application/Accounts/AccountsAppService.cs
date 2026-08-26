@@ -435,7 +435,7 @@ namespace onetouch.Accounts
                              //    //&& (_appContactRepository.GetAll().Count(c => c.TenantId == null && c.Id == x.PartnerId) > 0))
                              .WhereIf(input.FilterType == 2 && input.FilterType != 6,
                              (x=>x.TenantId == AbpSession.TenantId && x.ParentId == null && !x.IsProfileData &&
-                                _appMarketplaceContactRepository.GetAll().Any(z => z.SSIN == x.SSIN) && //&& z.SharingLevel == 1
+                                _appMarketplaceContactRepository.GetAll().Any(z => z.SSIN == x.SSIN && z.SharingLevel == 1) && //
                                 _appContactRelationshipInfoRepository.GetAll().Any(
                                     z => ((z.RecipientContactSSIN == x.SSIN && z.RequesterContactSSIN == currentTenantAccount.SSIN)
                                     || (z.RequesterContactSSIN == x.SSIN && z.RecipientContactSSIN == currentTenantAccount.SSIN)) &&
@@ -576,9 +576,13 @@ namespace onetouch.Accounts
                                             AddressLine1 = o.account.AppContactAddresses.FirstOrDefault().AddressFk.AddressLine1,
                                             CountryName = o.account.AppContactAddresses.FirstOrDefault().AddressFk.CountryFk.Name,
                                             Status = input.FilterType != 1 ? o.marketplace!=null || (o.account.TenantId != null && o.account.ParentId == null &&o.marketplace==null) :
-                                            (_appContactRepository.GetAll().Count(x => x.TenantId == AbpSession.TenantId && o.marketplace!=null) > 0 || (o.account.TenantId != null && o.account.ParentId == null && o.marketplace==null)),
+                                            ( (o.account.TenantId != null && o.account.ParentId == null && o.marketplace==null)), //_appContactRepository.GetAll().Count(x => x.TenantId == AbpSession.TenantId && o.marketplace!=null) > 0 ||
                                             Id = o.account.Id,
-                                            IsManual = o.account.TenantId == AbpSession.TenantId && o.account.ParentId == null && _appMarketplaceContactRepository.GetAll().Count(z => z.SSIN == o.account.SSIN && z.SharingLevel == 1) == 0,
+                                            IsManual = o.account.TenantId == AbpSession.TenantId &&
+                                            o.account.ParentId == null &&
+                                            //_appMarketplaceContactRepository.GetAll()
+                                            //.Count(z => z.SSIN == o.account.SSIN && z.SharingLevel == 1) == 0
+                                            o.marketplace == null,
                                             LogoUrl = string.IsNullOrEmpty(o.account.EntityFk.EntityAttachments.FirstOrDefault().AttachmentFk.Attachment) ?
                                              ""
                                              : "attachments/" + (o.account.EntityFk.TenantId == null ? "-1" : o.account.EntityFk.TenantId.ToString()) + "/" + o.account.EntityFk.EntityAttachments.FirstOrDefault(x => x.AttachmentCategoryId == logoCategory).AttachmentFk.Attachment,

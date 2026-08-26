@@ -8081,13 +8081,13 @@ namespace onetouch.AppSiiwiiTransaction
                                     if (account!=null && account.AccountInfo!=null && accountObj.ParentFk!=null)
                                     branch = await _appContactRepository.GetAll().Where(z =>
                                     z.AccountId == long.Parse(account.AccountInfo.Id.ToString())
-                                    && z.Name == accountObj.ParentFk.Name 
+                                    //&& z.Name == accountObj.ParentFk.Name 
                                     && z.EntityFk.EntityObjectTypeId != presonEntityObjectTypeId).FirstOrDefaultAsync();
 
                                     CreateOrEditAccountInfoDto contactDto = ObjectMapper.Map<CreateOrEditAccountInfoDto>(accountObj);
                                     contactDto.AccountId = long.Parse(account.AccountInfo.Id.ToString());
                                     contactDto.TenantId = int.Parse(tenantId.ToString());
-                                    contactDto.ParentId = branch !=null? branch.Id: null;
+                                    contactDto.ParentId = (branch !=null? branch.Id: (accountObj.ParentId!=null?long.Parse(account.AccountInfo.Id.ToString()):null));
                                     contactDto.Id = 0;
                                     contactDto.UseDTOTenant = true;
                                     if (contactDto.EntityAttachments != null)
