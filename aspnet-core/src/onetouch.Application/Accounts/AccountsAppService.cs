@@ -3956,39 +3956,64 @@ namespace onetouch.Accounts
             //I40[End]
             // await CreateAdminContact();
             //I40
-            if (input.AccountLevel != AccountLevelEnum.Profile)
+            if (input.AccountLevel != AccountLevelEnum.Profile && (
+                input.AccountType !="PERSONAL"))
             {
-                if (input.ParentId == null && (input.Id == 0 || input.Id == null)
-                    && ((input.TenantId == null || input.TenantId == 0 || input.TenantId == AbpSession.TenantId) && (input.TenantOwner == null || input.TenantOwner == 0 || input.TenantOwner == AbpSession.TenantId)))
+                var marketplaceAcc = await _appMarketplaceContactRepository.GetAll()
+                    .Where(z => z.SSIN == contact.SSIN && z.SharingLevel == 1).FirstOrDefaultAsync();
+                if (marketplaceAcc == null)
                 {
-                    var publishedAcc = await _appMarketplaceContactRepository.GetAll().Where(z => z.SSIN == contact.SSIN).FirstOrDefaultAsync();
-                    if (publishedAcc == null)
+                    if (input.ParentId == null && (input.Id == 0 || input.Id == null))
+                      //  && ((input.TenantId == null || input.TenantId == 0 ||
+                       // input.TenantId == AbpSession.TenantId) &&
+                        //(input.TenantOwner == null || input.TenantOwner == 0 ||
+                        //input.TenantOwner == AbpSession.TenantId)))
                     {
-                        var tenant = input.TenantId == null ? AbpSession.TenantId : input.TenantId;
-                        await PublishManualAccount(contact.SSIN, long.Parse(tenant.ToString()));
-                        var contactFortCurrTenant = await _appContactRepository.GetAll()
-                            .Where(z => z.IsProfileData == true && z.PartnerId == null && z.ParentId == null).FirstOrDefaultAsync();
-                        if (contactFortCurrTenant != null)
+                        var publishedAcc = await _appMarketplaceContactRepository.GetAll().Where(z => z.SSIN == contact.SSIN).FirstOrDefaultAsync();
+                        if (publishedAcc == null)
                         {
-                            var returnVal =
-                             await _iCreateMarketplaceAccount.CreateOrEditMarketplaceContactRelationship(contactFortCurrTenant.SSIN,
-                              contact.SSIN,
-                              false, false, input.RelationshipId, null);
+                            var tenant = input.TenantId == null ? AbpSession.TenantId : input.TenantId;
+                            await PublishManualAccount(contact.SSIN, long.Parse(tenant.ToString()));
+                            string tenantAccountSSIN = "";
+                            if (tenant == AbpSession.TenantId)
+                            {
+                                var contactFortCurrTenant = await _appContactRepository.GetAll()
+                                  .Where(z => z.IsProfileData == true && z.PartnerId == null && z.ParentId == null && z.TenantId==AbpSession.TenantId).FirstOrDefaultAsync();
+                                if (contactFortCurrTenant != null)
+                                    tenantAccountSSIN = contactFortCurrTenant.SSIN;
+                            }
+                            else {
+                                //var tenantAccount = await _appMarketplaceContactRepository
+                                //   .GetAll().Where(z => z.IsProfileData == true && z.ParentId == null &&
+                                //  z.TenantOwner == tenant).FirstOrDefaultAsync();
+                                var tenantAccount = await _appContactRepository.GetAll()
+                                .Where(z => z.IsProfileData == true && z.PartnerId == null && z.ParentId == null && z.TenantId == tenant).FirstOrDefaultAsync();
+                                if (tenantAccount!=null)
+                                    tenantAccountSSIN = tenantAccount.SSIN;
+                            }
+                            if (!string.IsNullOrEmpty(tenantAccountSSIN))
+                            {
+                                var returnVal =
+                                 await _iCreateMarketplaceAccount.CreateOrEditMarketplaceContactRelationship(tenantAccountSSIN,
+                                  contact.SSIN,
+                                  false, false, input.RelationshipId, null);
+                            }
+                            await _iCreateMarketplaceAccount.HideAccount(contact.SSIN);
                         }
-                        await _iCreateMarketplaceAccount.HideAccount(contact.SSIN);
                     }
-                }
-                else
-                {
-                    if (input.ParentId == null && (input.Id != 0 && input.Id != null && !contact.IsProfileData)
-                        && (((input.TenantId == null || input.TenantId == 0 || input.TenantId == AbpSession.TenantId) && input.TenantOwner == AbpSession.TenantId) ||
-                        input.TenantOwner == 0 || input.TenantOwner == null))
+                    else
                     {
-                        var tenant = input.TenantId == null ? AbpSession.TenantId : input.TenantId;
-                        await PublishManualAccount(contact.SSIN, long.Parse(tenant.ToString()));
-                        await _iCreateMarketplaceAccount.HideAccount(contact.SSIN);
-                    }
+                        if (input.ParentId == null && (input.Id != 0 && input.Id != null && 
+                            !contact.IsProfileData))
+                        //    && (((input.TenantId == null || input.TenantId == 0 || input.TenantId == AbpSession.TenantId) && input.TenantOwner == AbpSession.TenantId) ||
+                          //  input.TenantOwner == 0 || input.TenantOwner == null))
+                        {
+                            var tenant = input.TenantId == null ? AbpSession.TenantId : input.TenantId;
+                            await PublishManualAccount(contact.SSIN, long.Parse(tenant.ToString()));
+                            await _iCreateMarketplaceAccount.HideAccount(contact.SSIN);
+                        }
 
+                    }
                 }
             }
             //I40
@@ -7842,8 +7867,8 @@ namespace onetouch.Accounts
                 if (contact != null)
                 {
                     account = _appContactRepository.GetAll()
-                        .WhereIf(accountDto.AccountId != null, z => z.TenantId == AbpSession.TenantId && z.Id == accountDto.AccountId)
-                        .WhereIf(accountDto.AccountId == null, x => x.TenantId == AbpSession.TenantId && x.IsProfileData && x.ParentId == null && x.PartnerId == null && x.AccountId == null)
+                        .WhereIf(accountDto.AccountId != null, z => z.TenantId == accountDto.TenantId && z.Id == accountDto.AccountId)
+                        .WhereIf(accountDto.AccountId == null, x => x.TenantId == accountDto.TenantId && x.IsProfileData && x.ParentId == null && x.PartnerId == null && x.AccountId == null)
                         .FirstOrDefault();
                     if (account != null)
                     {
@@ -7893,14 +7918,15 @@ namespace onetouch.Accounts
                 //ContactDto contactDtoObj = new ContactDto();
                 ObjectMapper.Map(contact, returnObject);
                 //Publish Contact if the related Account is published
-                if (accountDto.TenantId == AbpSession.TenantId && account != null && (accountDto.TenantOwner == null || accountDto.TenantOwner == 0 || accountDto.TenantOwner == AbpSession.TenantId))//input.UserId != null && input.UserId != 0)
+                //accountDto.TenantId == AbpSession.TenantId && 
+                if (account != null && (accountDto.TenantOwner == null || accountDto.TenantOwner == 0 || accountDto.TenantOwner == accountDto.TenantId ))//input.UserId != null && input.UserId != 0)
                 {
                     using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
                     {
                         var publishContactAccount = await _appMarketplaceContactRepository.GetAll().AsNoTracking()
                             //.Include(x => x.ContactAddresses)
                             .FirstOrDefaultAsync(x => x.SSIN == account.SSIN);
-                        if (publishContactAccount != null && publishContactAccount.TenantOwner == AbpSession.TenantId)
+                        if (publishContactAccount != null && publishContactAccount.TenantOwner == accountDto.TenantId)
                         {
                             //await PublishMember(contact.Id);
                             await _iCreateMarketplaceAccount.PublishMember(contact.Id, publishContactAccount.Id, presonEntityObjectTypeId, null, publishContactAccount.Id);

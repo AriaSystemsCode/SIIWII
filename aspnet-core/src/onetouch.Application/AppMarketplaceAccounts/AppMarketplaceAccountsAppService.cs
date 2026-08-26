@@ -2288,15 +2288,17 @@ namespace onetouch.AppMarketplaceAccounts
         public async Task<bool> PublishMember(long contactId, long parentId, long personEntityObjectTypeId, long? mainAccountID, long newAccountID)
         {
             var input = await _appContactRepository.GetAll().AsNoTracking()
-                .FirstOrDefaultAsync(x => x.TenantId == AbpSession.TenantId
+                .FirstOrDefaultAsync(x => //x.TenantId == AbpSession.TenantId
                                        // && x.AccountId == mainAccountID
-                                        && x.Id == contactId );//&& x.IsProfileData == true
+                                        //&& 
+                                        x.Id == contactId );//&& x.IsProfileData == true
             var foundEntity = await _appEntityRepository.GetAll().AsNoTracking()
                                 .Include(x => x.EntityAttachments).ThenInclude(x => x.AttachmentFk)
                                 .Include(x => x.EntityExtraData)
                                 .AsNoTracking()
-                                .FirstOrDefaultAsync(x => x.TenantId == AbpSession.TenantId
-                                && x.Id == input.EntityId);
+                                .FirstOrDefaultAsync(x =>// x.TenantId == AbpSession.TenantId
+                                //&&
+                                x.Id == input.EntityId);
 
             AppMarketplaceContact appMarketplaceContact = new AppMarketplaceContact();
             ObjectMapper.Map(input, appMarketplaceContact);
