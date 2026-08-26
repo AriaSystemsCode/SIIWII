@@ -50,9 +50,11 @@
 
 
         <div class="row mt-5 ml-0 PR2L10">
-            <label  *ngIf="!accountTypeLabel?.includes('PERSONAL')" class="Personal_Info co-lg-12"> {{  model.editionId != 5 ? "AdminInformation" : "Personal Information"  | localize}} </label>
-            <div class="form-group col-12 col-lg-6 col-md-6 col-sm-6 pr-2">
-                <label class="sub_titleLog m-0 p-0" style="color: #9E9E9E;"> {{"FirstName" | localize}} <span class="StarInfo"  style="color: #F6851D;">*</span></label>
+            <label *ngIf="!accountTypeLabel?.includes('PERSONAL')" class="Personal_Info co-lg-12"> {{"Admin Information"
+                | localize}} </label>
+            <div class="form-group col-5 col-lg-6 col-md-6 col-sm-6 pr-2">
+                <label class="sub_titleLog m-0 p-0" style="color: #9E9E9E;"> {{"FirstName" | localize}} <span
+                        class="StarInfo" style="color: #F6851D;">*</span></label>
                 <div class="user_p_relative">
                     <img src="../../assets/img/input_icons/user.png" class=" icon-width SmallUser_icon"
                         [ngClass]="isArabic ? 'ar-user_icon':'user_icon'">
