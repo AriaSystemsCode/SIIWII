@@ -587,7 +587,7 @@ this.editedPersonalData.entityExtraData = this.accountData.entityExtraData;
 
             // Notes / About
     this.editNotesValue =
-        this.accountData?.notes ??
+        this.contactData?.notes ??
         '';
 
     this.contactData.emailAddressIsPublic =
