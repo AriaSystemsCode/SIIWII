@@ -371,8 +371,11 @@ namespace onetouch.AppMarketplaceAccounts
                          //   .FirstOrDefault(e => e.TenantId == AbpSession.TenantId && e.IsProfileData && e.ParentId == null);
                         currentTenantAccount = currentTenantAccountObject != null ? currentTenantAccountObject.EntityFk.EntityObjectTypeCode : null;
                     }
-                    var accountsList = await _accounts.ToListAsync();
-
+                //var accountsList = await _accounts.ToListAsync();
+                var accountsListDup = await _accounts.ToListAsync();
+                var accountsList = accountsListDup.GroupBy(x => x.Account.Id)
+                    .Select(g => g.FirstOrDefault()).ToList();
+                 
                 if (AbpSession.TenantId != null)
                 {
                     var relationShipLookups = await _appEntityRepository.GetAll().AsNoTracking().Include(z => z.EntityExtraData)
