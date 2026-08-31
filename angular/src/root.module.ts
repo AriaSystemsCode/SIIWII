@@ -48,12 +48,6 @@ export function appInitializerFactory(
             AppConsts.appBaseHref = getBaseHref(platformLocation);
             let appBaseUrl = getDocumentOrigin() + AppConsts.appBaseHref;
 
-            const failInitialization = (error: Error) => {
-                spinnerService.hide();
-                alert('The server is unavailable. Please wait a moment and reload the page.');
-                reject(error);
-            };
-
             AppPreBootstrap.run(appBaseUrl, () => {
 
                 handleLogoutRequest(injector.get(AppAuthService));
@@ -76,7 +70,7 @@ export function appInitializerFactory(
                     });
                 }
 
-            }, resolve, failInitialization);
+            }, resolve, reject);
         });
     };
 }
