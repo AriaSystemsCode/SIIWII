@@ -187,8 +187,8 @@ export class BrowseFieldManagerComponent extends AppComponentBase implements OnI
         this.activeActionId = null;
         var isConfirmed: Observable<boolean>;
         isConfirmed = this.askToConfirm(
-            "AreYouSureYouWantToDeleteThisField?",
-            "Confirm"
+            this.l("AreYouSureYouWantToDeleteThisField?"), 
+            this.l("Confirm")
         );
 
         isConfirmed.subscribe((res) => {

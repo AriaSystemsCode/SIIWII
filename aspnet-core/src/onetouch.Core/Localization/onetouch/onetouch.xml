@@ -3077,10 +3077,7 @@ Please select one of the available linesheet templates
 		<text name="GroupBy">Group By</text>
 		<text name="NoGroup">No group</text>
 		<text name="CreatedUser">Created User</text>
-
 		<text name="SharedWithYou">is shared with you</text>
-		<text name="AreYouSureYouWantToDeleteThisField?">Are you sure you want to delete this field?</text>
-
-		
+		<text name="AreYouSureYouWantToDeleteThisField?">Are you sure you want to delete this field? </text>
   </texts>  
 </localizationDictionary>
