@@ -52,6 +52,7 @@ using System.Threading.Tasks;
 using Twilio.TwiML.Fax;
 using static Microsoft.ApplicationInsights.MetricDimensionNames.TelemetryContext;
 using static NPOI.HSSF.Util.HSSFColor;
+using Microsoft.AspNetCore.Identity;
 
 namespace onetouch.Message
 {
@@ -80,6 +81,7 @@ namespace onetouch.Message
         //I49[Start]
         private readonly IEmailSender _emailSender;
         //I49[End]
+        private readonly UserManager _userManager;
         public MessageAppService(IRepository<AppMessage, long> messagesRepository,
             IRepository<AppMessage, long> lookup_MessagesRepository,
             IRepository<AppEntity, long> appEntityRepository,
@@ -93,9 +95,10 @@ namespace onetouch.Message
             IRepository<AppEntityRating, long> appEntityRatingRepository, RoleManager roleManager,
             IRepository<AppEntitiesRelationship, long> appEntitiesRelationshipRepository,
             IRepository<AppContact, long> appContactRepository,
-            IEmailSender emailSender
+            IEmailSender emailSender,UserManager userManager
             )
         {
+            _userManager = userManager;
             _roleManager = roleManager;
             _appEntityExtraDataRepository = appEntityExtraDataRepository;
             _appEntityRatingRepository = appEntityRatingRepository;
@@ -842,8 +845,20 @@ namespace onetouch.Message
                             var tenant = await TenantManager.GetByIdAsync(wntityObj.TenantOwner);
                             if (tenant != null)
                             {
-                                string userName = "admin@" + tenant.TenancyName;
-                                var adminUser = await UserManager.FindByNameAsync(userName);
+                                //string userName = "admin@" + tenant.TenancyName;
+                                //var adminUser = await UserManager.FindByNameAsync(userName);
+                                var adminRole = await _roleManager.Roles
+.FirstOrDefaultAsync(r => r.TenantId == tenant.Id && r.Name == StaticRoleNames.Tenants.Admin);
+                                Authorization.Users.User adminUser = null;
+                                if (adminRole != null)
+                                {
+                                    var adminRoleId = adminRole.Id;
+
+                                    adminUser = await _userManager.Users
+                                        .Where(u => u.TenantId == tenant.Id)
+                                        .Where(u => u.Roles.Any(r => r.RoleId == adminRoleId))
+                                        .FirstOrDefaultAsync();
+                                }
                                 if (adminUser != null)
                                     input.To = adminUser.Id.ToString();
                                 //input.To
@@ -895,8 +910,20 @@ namespace onetouch.Message
                             var tenant = await TenantManager.GetByIdAsync(wntityObj.TenantOwner);
                             if (tenant != null)
                             {
-                                string userName = "admin@" + tenant.TenancyName;
-                                var adminUser = await UserManager.FindByNameAsync(userName);
+                                //string userName = "admin@" + tenant.TenancyName;
+                                //var adminUser = await UserManager.FindByNameAsync(userName);
+                                var adminRole = await _roleManager.Roles
+.FirstOrDefaultAsync(r => r.TenantId == tenant.Id && r.Name == StaticRoleNames.Tenants.Admin);
+                                Authorization.Users.User adminUser = null;
+                                if (adminRole != null)
+                                {
+                                    var adminRoleId = adminRole.Id;
+
+                                    adminUser = await _userManager.Users
+                                        .Where(u => u.TenantId == tenant.Id)
+                                        .Where(u => u.Roles.Any(r => r.RoleId == adminRoleId))
+                                        .FirstOrDefaultAsync();
+                                }
                                 if (adminUser != null)
                                     input.To = adminUser.Id.ToString();
                                 //input.To
