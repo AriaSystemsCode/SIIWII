@@ -2501,7 +2501,8 @@ namespace onetouch.Accounts
                         /// _appAttachmentRepository.RemoveRange(rangeToRemove);
                         //  _appEntityAttachmentRepository.RemoveRange(existed.EntityFk.EntityAttachments);
                         // };
-                        if (originalContact.EntityObjectTypeId != presonEntityObjectTypeId)
+                        //if (originalContact.EntityObjectTypeId != presonEntityObjectTypeId &&
+                          //  originalContact.TenantOwner != AbpSession.TenantId)
                         {
                             if (existed.AppContactAddresses != null)
                             {
@@ -2510,7 +2511,17 @@ namespace onetouch.Accounts
                                 await CurrentUnitOfWork.SaveChangesAsync();
                             }
                             CreateOrEditAccountInfoDto createOrEditAccountInfoDtoObj = new CreateOrEditAccountInfoDto();
-                            createOrEditAccountInfoDtoObj = ObjectMapper.Map<CreateOrEditAccountInfoDto>(originalContact);//(originalContact);
+                            try
+                            {
+                                createOrEditAccountInfoDtoObj = ObjectMapper.Map<CreateOrEditAccountInfoDto>(originalContact);
+                            }
+                            catch (Exception ex)
+                            {
+                                string exc = ex.Message;
+                            }
+                            
+                            
+                            //(originalContact);
                                                                                                                           //createOrEditAccountInfoDto.Code = existed.Code;
 
                             createOrEditAccountInfoDtoObj.EntityExtraData = ObjectMapper.Map<List<AppEntityExtraDataDto>>(originalContact.EntityExtraData);

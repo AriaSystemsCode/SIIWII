@@ -1305,10 +1305,13 @@ namespace onetouch.AppMarketplaceAccounts
         {
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
             {
+                long newId = 0;
                 var mainAccountID = input.Id;
                 var personEntityObjectTypeId = await _helper.SystemTables.GetEntityObjectTypePersonId();
                 var FoundPublishContact = await _appMarketplaceContactRepository.GetAll()
-                                                  .AsNoTracking().Include(x => x.ContactAddresses).ThenInclude(e => e.AddressFk)
+                                                  .Include(x => x.ContactAddresses).ThenInclude(e => e.AddressFk)
+                                                  .Include(z=>z.EntityExtraData)
+                                                  .Include(z=>z.EntityAttachments).ThenInclude(z=>z.AttachmentFk)
                                                   .FirstOrDefaultAsync(x => x.TenantId == null
                                                   && x.IsProfileData == true
                                                   && x.TenantOwner == input.TenantId
@@ -1337,41 +1340,62 @@ namespace onetouch.AppMarketplaceAccounts
                 }
                 if (sync)
                 {
+
                     // if profile already published-and sync - delete old records
                     if (FoundPublishContact != null)
                     {
+                        newId = FoundPublishContact.Id;
                         // first delete related persons
                         // Collect the related persons
-                        var personsInfoDelete = _appMarketplaceContactRepository.GetAll().
+                        if (FoundPublishContact.EntityObjectTypeId != personEntityObjectTypeId)
+                        {
+                            var personsInfoDelete = _appMarketplaceContactRepository.GetAll().
                             Include(e => e.EntityExtraData)
-                            .Include(e => e.EntityAttachments).ThenInclude(z=>z.AttachmentFk)
+                            .Include(e => e.EntityAttachments).ThenInclude(z => z.AttachmentFk)
                         .Where(x => x.IsProfileData
                                && x.SSIN == FoundPublishContact.SSIN
                                && x.TenantId == null
                                && x.EntityObjectTypeId == personEntityObjectTypeId).ToList();
 
-                        // delete related Persons
-                        // delete extra data of related persons
-                        foreach (var psrsonObj in personsInfoDelete)
-                        {
-                            //DeleteBehavior extra data
-                            if (psrsonObj.EntityExtraData.Count() > 0)
+                            // delete related Persons
+                            // delete extra data of related persons
+                            foreach (var psrsonObj in personsInfoDelete)
                             {
-                                _appEntityExtraDataRepository.RemoveRange(psrsonObj.EntityExtraData);
+                                //DeleteBehavior extra data
+                                if (psrsonObj.EntityExtraData.Count() > 0)
+                                {
+                                    _appEntityExtraDataRepository.RemoveRange(psrsonObj.EntityExtraData);
+                                }
+
+                                // Delete related persons attachments
+                                if (psrsonObj.EntityAttachments.Count() > 0)
+                                {  // DeleteBehavior attachments then entity attachments
+                                    var rangeToRemove = psrsonObj.EntityAttachments.Select(e => e.AttachmentFk).ToList();
+                                    _appAttachmentsRepository.RemoveRange(rangeToRemove);
+                                    _appEntityAttachmentsRepository.RemoveRange(psrsonObj.EntityAttachments);
+                                };
+                                // delete related person
+
+                                _appEntityRepository.Delete(e => e.Id == psrsonObj.Id);
+                                _appMarketplaceContactRepository.Delete(e => e.Id == psrsonObj.Id);
+                            }
+                        }
+                        else //Personal account case
+                        {
+                            if (FoundPublishContact.EntityExtraData!= null && FoundPublishContact.EntityExtraData.Count() > 0)
+                            {
+                                _appEntityExtraDataRepository.Delete(z=>z.EntityId== FoundPublishContact.Id);
                             }
 
                             // Delete related persons attachments
-                            if (psrsonObj.EntityAttachments.Count() > 0)
+                            if (FoundPublishContact.EntityAttachments.Count() > 0)
                             {  // DeleteBehavior attachments then entity attachments
-                                var rangeToRemove = psrsonObj.EntityAttachments.Select(e => e.AttachmentFk).ToList();
+                                var rangeToRemove = FoundPublishContact.EntityAttachments.Select(e => e.AttachmentFk).ToList();
                                 _appAttachmentsRepository.RemoveRange(rangeToRemove);
-                                _appEntityAttachmentsRepository.RemoveRange(psrsonObj.EntityAttachments);
+                                _appEntityAttachmentsRepository.RemoveRange(FoundPublishContact.EntityAttachments);
                             };
-                            // delete related person
-                            _appEntityRepository.Delete(e => e.Id == psrsonObj.Id);
-                            _appMarketplaceContactRepository.Delete(e => e.Id == psrsonObj.Id);
                         }
-                        await CurrentUnitOfWork.SaveChangesAsync();
+                        //await CurrentUnitOfWork.SaveChangesAsync();
 
 
                         // 2nd delete related branches
@@ -1648,8 +1672,17 @@ namespace onetouch.AppMarketplaceAccounts
                 }
                 //I40 -MMT  -Account Attachment[End]
 
-                long newId = 0;
+                //long newId = 0;
+                if(newId==0)
                 { newId = await _appMarketplaceContactRepository.InsertAndGetIdAsync(appMarketplaceContact); }
+                else
+                {
+                    var x = UnitOfWorkManager.Current.GetDbContext<onetouchDbContext>(null, null);
+                    x.ChangeTracker.Clear();
+                    appMarketplaceContact.Id = newId;
+                    await _appMarketplaceContactRepository.UpdateAsync(appMarketplaceContact);
+
+                }
                 await CurrentUnitOfWork.SaveChangesAsync();
 
 
