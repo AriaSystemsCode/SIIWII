@@ -126,7 +126,7 @@ namespace onetouch.Accounts
         private readonly ISycAttachmentCategoriesAppService _sSycAttachmentCategoriesAppService;
         private readonly Helper _helper;
         private readonly UserManager _userManager;
-        private readonly RoleManager _roleManager;
+       private readonly RoleManager _roleManager;
         private readonly SycIdentifierDefinitionsAppService _iAppSycIdentifierDefinitionsService;
         //T-SII-20221013.0006,1 MMT 11/02/2022 Notify the destination tenant that another tenant connected to him[Start]
         private readonly IAppNotifier _appNotifier;
@@ -148,6 +148,7 @@ namespace onetouch.Accounts
         private readonly IRepository<SycEntityObjectType, long> _sycEntityObjectTypeRepository;
         //private readonly IRepository<onetouch.AppMarketplaceItems.AppMarketplaceItem, long> _appMarketplaceItemRepository;
         //I40[End]
+      
         private readonly IRepository<ValidationRule> _validationRuleRepo;
         private readonly ICreateMarketplaceAccount _iCreateMarketplaceAccount;
         private readonly IEmailingTemplateAppService _emailingTemplateAppService;
@@ -2026,23 +2027,20 @@ namespace onetouch.Accounts
                 contact.AccountInfo.EntityExtraData = new List<AppEntityExtraDataDto>();
                 if (tenant != null)
                 {
-                    
+
                     //var adminUser = await _userManager.FindByNameAsync("admin@" + tenant.TenancyName);
                     var adminRole = await _roleManager.Roles
-                    .FirstOrDefaultAsync(r => r.TenantId == AbpSession.TenantId && r.Name == StaticRoleNames.Tenants.Admin);
-
-                    if (adminRole == null)
+.FirstOrDefaultAsync(r => r.TenantId == tenant.Id && r.Name == StaticRoleNames.Tenants.Admin);
+                    Authorization.Users.User adminUser = null;
+                    if (adminRole != null)
                     {
-                        return null;
+                        var adminRoleId = adminRole.Id;
+
+                        adminUser = await _userManager.Users
+                            .Where(u => u.TenantId == tenant.Id)
+                            .Where(u => u.Roles.Any(r => r.RoleId == adminRoleId))
+                            .FirstOrDefaultAsync();
                     }
-
-                    var adminRoleId = adminRole.Id;
-
-                    var adminUser = await _userManager.Users
-                        .Where(u => u.TenantId == AbpSession.TenantId)
-                        .Where(u => u.Roles.Any(r => r.RoleId == adminRoleId))
-                        .FirstOrDefaultAsync();
-
                     if (adminUser != null && adminUser.Id != 0)
                     {
                         firstName = adminUser.Name;
@@ -2632,8 +2630,8 @@ namespace onetouch.Accounts
                         /// _appAttachmentRepository.RemoveRange(rangeToRemove);
                         //  _appEntityAttachmentRepository.RemoveRange(existed.EntityFk.EntityAttachments);
                         // };
-                        if (originalContact.EntityObjectTypeId != presonEntityObjectTypeId &&
-                            originalContact.TenantOwner != AbpSession.TenantId)
+                        //if (originalContact.EntityObjectTypeId != presonEntityObjectTypeId &&
+                          //  originalContact.TenantOwner != AbpSession.TenantId)
                         {
                             if (existed.AppContactAddresses != null)
                             {
@@ -2642,7 +2640,17 @@ namespace onetouch.Accounts
                                 await CurrentUnitOfWork.SaveChangesAsync();
                             }
                             CreateOrEditAccountInfoDto createOrEditAccountInfoDtoObj = new CreateOrEditAccountInfoDto();
-                            createOrEditAccountInfoDtoObj = ObjectMapper.Map<CreateOrEditAccountInfoDto>(originalContact);//(originalContact);
+                            try
+                            {
+                                createOrEditAccountInfoDtoObj = ObjectMapper.Map<CreateOrEditAccountInfoDto>(originalContact);
+                            }
+                            catch (Exception ex)
+                            {
+                                string exc = ex.Message;
+                            }
+                            
+                            
+                            //(originalContact);
                                                                                                                           //createOrEditAccountInfoDto.Code = existed.Code;
 
                             createOrEditAccountInfoDtoObj.EntityExtraData = ObjectMapper.Map<List<AppEntityExtraDataDto>>(originalContact.EntityExtraData);
@@ -2804,7 +2812,7 @@ namespace onetouch.Accounts
                     {
                         var tenantObject = await TenantManager.GetByIdAsync(int.Parse(originalContact.TenantOwner.ToString()));
                         if (tenantObject != null)
-                        {
+                        { 
                             string tenancyName = tenantObject.TenancyName;
                             //var adminUser = await _userManager.FindByNameAsync("admin@" + tenancyName);
                             var adminRole = await _roleManager.Roles
@@ -4154,6 +4162,7 @@ namespace onetouch.Accounts
                 var tenantObj = TenantManager.GetById(int.Parse(AbpSession.TenantId.ToString()));
                 if (tenantObj != null)
                 {
+
 
                     //var adminUser = await _userManager.FindByNameAsync("admin@" + tenantObj.TenancyName);
                     var adminRole = await _roleManager.Roles

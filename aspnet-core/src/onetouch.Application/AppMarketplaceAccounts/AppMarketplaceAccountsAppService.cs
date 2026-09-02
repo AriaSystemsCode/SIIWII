@@ -1724,6 +1724,8 @@ namespace onetouch.AppMarketplaceAccounts
                 else
                 {
                     appMarketplaceContact.Id = newId;
+                    var x = UnitOfWorkManager.Current.GetDbContext<onetouchDbContext>();
+                    x.ChangeTracker.Clear();
                     await _appMarketplaceContactRepository.UpdateAsync(appMarketplaceContact);
 
                 }
