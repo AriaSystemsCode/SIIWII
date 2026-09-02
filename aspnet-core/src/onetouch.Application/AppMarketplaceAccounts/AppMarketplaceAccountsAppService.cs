@@ -372,7 +372,7 @@ namespace onetouch.AppMarketplaceAccounts
                         currentTenantAccount = currentTenantAccountObject != null ? currentTenantAccountObject.EntityFk.EntityObjectTypeCode : null;
                     }
                 //var accountsList = await _accounts.ToListAsync();
-                var accountsListDup = await _accounts.ToListAsync();
+                var accountsListDup = await _accounts.ToListAsync(); //Mario
                 var accountsList = accountsListDup.GroupBy(x => x.Account.Id)
                     .Select(g => g.FirstOrDefault()).ToList();
                  
@@ -391,6 +391,8 @@ namespace onetouch.AppMarketplaceAccounts
 
                     foreach (var account in accountsList)
                     {
+                        if (currentTenantAccountObject.SSIN == account.Account.SSIN)
+                            continue;
                         //I50[Start]
                         var relationshipsQuery = _appContactRelationshipInfoRepository
                             .GetAll().AsNoTracking()
