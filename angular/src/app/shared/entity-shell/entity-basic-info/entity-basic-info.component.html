@@ -97,8 +97,7 @@
                 )
           " [disabled]="
             saving ||
-            uploading ||
-            !isBasicInfoValid
+            uploading 
           " (click)="saveClicked()">
 
           {{ 'Save' | localize }}
@@ -188,7 +187,7 @@
         <!-- ADDITIONAL IMAGES -->
         <!-- ================================= -->
 
-        <div class="additional-images-section">
+        <div *ngIf="showAdditionalImages" class="additional-images-section">
 
 
 

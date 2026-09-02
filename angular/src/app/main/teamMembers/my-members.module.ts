@@ -22,6 +22,7 @@ import { AccordionModule } from 'primeng/accordion';
     declarations: [
         CreateOrEditMemberComponent,
         ViewMemberProfileComponent,
+      
     ],
     imports: [
         CommonModule,

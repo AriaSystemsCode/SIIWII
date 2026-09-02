@@ -5,7 +5,9 @@
     <div class="basic-info-form">
 
       <!-- Trade name -->
-      <div class="basic-info-row">
+      <div class="basic-info-row" *ngIf="
+      roleEntityObjectTypeId !== 21
+    ">
         <label class="field-label">
           {{ 'TradeName' | localize }}:
         </label>
@@ -49,7 +51,9 @@
       </div>
 
       <!-- Currency -->
-      <div class="basic-info-row">
+      <div class="basic-info-row" *ngIf="
+      roleEntityObjectTypeId !== 21
+    ">
         <label class="field-label">
           {{ 'Currency' | localize }}:
         </label>
@@ -71,7 +75,7 @@
           {{ 'Phone' | localize }}:
         </label>
 
-        <p-dropdown styleClass="phone-type-dropdown" [options]="allPhoneTypes" [(ngModel)]="account.phone1TypeId"
+        <p-dropdown styleClass="phone-type-dropdown my-sm-1" [options]="allPhoneTypes" [(ngModel)]="account.phone1TypeId"
           name="phone1TypeId" optionLabel="label" optionValue="value" placeholder="{{ 'Type' | localize }}"
           [disabled]="!canEditField('phone1TypeId')" appendTo="body">
         </p-dropdown>
@@ -89,7 +93,7 @@
           {{ 'Phone' | localize }}:
         </label>
 
-        <p-dropdown styleClass="phone-type-dropdown" [options]="allPhoneTypes" [(ngModel)]="account.phone2TypeId"
+        <p-dropdown styleClass="phone-type-dropdown my-sm-1" [options]="allPhoneTypes" [(ngModel)]="account.phone2TypeId"
           name="phone2TypeId" optionLabel="label" optionValue="value" placeholder="{{ 'Type' | localize }}"
           [disabled]="!canEditField('phone2TypeId')" appendTo="body">
         </p-dropdown>
@@ -107,7 +111,7 @@
           {{ 'Phone' | localize }}:
         </label>
 
-        <p-dropdown styleClass="phone-type-dropdown" [options]="allPhoneTypes" [(ngModel)]="account.phone3TypeId"
+        <p-dropdown styleClass="phone-type-dropdown my-sm-1" [options]="allPhoneTypes" [(ngModel)]="account.phone3TypeId"
           name="phone3TypeId" optionLabel="label" optionValue="value" placeholder="{{ 'Type' | localize }}"
           [disabled]="!canEditField('phone3TypeId')" appendTo="body">
         </p-dropdown>
@@ -123,14 +127,14 @@
 
   </p-accordionTab>
 
-  <p-accordionTab header="{{
+  <p-accordionTab *ngIf="
+      roleEntityObjectTypeId !== 21
+    " header="{{
     'BusinessInformation'
       | localize
   }}">
 
-    <div *ngIf="
-      roleEntityObjectTypeId !== 21
-    ">
+    <div>
 
       <!-- ========================== -->
       <!-- DEPARTMENTS -->
@@ -180,7 +184,7 @@
 
               <div class="business-item-content">
 
-           
+
 
                 <span>
                   {{
@@ -289,7 +293,7 @@
 
               <div class="business-item-content">
 
-           
+
 
                 <span>
                   {{
@@ -349,7 +353,10 @@
     </div>
 
   </p-accordionTab>
-  <p-accordionTab header="{{ 'Roles' | localize }}">
+  <p-accordionTab  [header]="
+    (roleEntityObjectTypeId !== 21 ? 'Roles' : 'Overview')
+    | localize
+  ">
 
     <div *ngIf="isLoadingRoles" class="text-center py-3">
       <i class="fa fa-spinner fa-spin"></i>
@@ -372,62 +379,43 @@
 
 
 
-<p-accordionTab
-  header="{{ 'Relationship' | localize }}">
+  <p-accordionTab header="{{ 'Relationship' | localize }}" *ngIf="!isContact">
 
-  <div
-    *ngIf="connectionsInfo?.length"
-    class="relationship-section">
+    <div *ngIf="connectionsInfo?.length" class="relationship-section">
 
-    <div
-      *ngIf="connectionsInfo.length > 1"
-      class="relationship-selector mb-3">
+      <div *ngIf="connectionsInfo.length > 1" class="relationship-selector mb-3">
 
-      <label>
-        {{ 'Relationship' | localize }}:
-      </label>
+        <label>
+          {{ 'Relationship' | localize }}:
+        </label>
 
-      <p-dropdown
-        [options]="connectionsInfo"
-        [(ngModel)]="selectedRelationId"
-        optionLabel="connectedLabel"
-        optionValue="relationEntityId"
-        [disabled]="isLoadingRelationship"
-        appendTo="body"
-        (onChange)="
+        <p-dropdown [options]="connectionsInfo" [(ngModel)]="selectedRelationId" optionLabel="connectedLabel"
+          optionValue="relationEntityId" [disabled]="isLoadingRelationship" appendTo="body" (onChange)="
           onRelationshipOptionChange(
             $event.value
           )
         ">
-      </p-dropdown>
+        </p-dropdown>
 
-    </div>
-
-
-    <div
-      *ngIf="isLoadingRelationship"
-      class="text-center py-3">
-
-      <i class="fa fa-spinner fa-spin"></i>
-
-    </div>
+      </div>
 
 
-    <ng-container
-      *ngIf="!isLoadingRelationship">
+      <div *ngIf="isLoadingRelationship" class="text-center py-3">
 
-      <div
-  *ngFor="let usage of usageList"
-  class="relationship-usage-block">
+        <i class="fa fa-spinner fa-spin"></i>
 
-  <h5 class="usage-block">
-    {{ usage | localize }}
-  </h5>
+      </div>
 
-  <app-dynamicInputs
-    #relationshipDynamicInput
 
-    [extraAttributeObject]="{
+      <ng-container *ngIf="!isLoadingRelationship">
+
+        <div *ngFor="let usage of usageList" class="relationship-usage-block">
+
+          <h5 class="usage-block">
+            {{ usage | localize }}
+          </h5>
+
+          <app-dynamicInputs #relationshipDynamicInput [extraAttributeObject]="{
       value: {
         filteredExtraAttributes:
           groupedByUsage[usage],
@@ -435,45 +423,31 @@
         extraAttributes:
           allRelationshipAttributes
       }
-    }"
-
-    [entityObjectTypeId]="
+    }" [entityObjectTypeId]="
       relationshipEntityObjectTypeId
-    "
-
-    [entityType]="
+    " [entityType]="
       'MARKETPLACECONTACTRELATIONSHIP'
-    "
-
-    [dynamicInputsForViewDto]="
+    " [dynamicInputsForViewDto]="
       relationshipDynamicInputsForViewDto
-    "
-
-    [fromSetting]="true"
-
-    [canChange]="
+    " [fromSetting]="true" [canChange]="
       canEditSection('relationship')
-    "
-
-    (extraDataCleared)="
+    " (extraDataCleared)="
       onRelationshipExtraDataCleared(
         $event
       )
-    "
-
-    (extraDataChanged)="
+    " (extraDataChanged)="
       onRelationshipExtraDataChanged(
         $event
       )
     ">
-  </app-dynamicInputs>
+          </app-dynamicInputs>
 
-</div>
+        </div>
 
-    </ng-container>
+      </ng-container>
 
-  </div>
+    </div>
 
-</p-accordionTab>
+  </p-accordionTab>
 
 </p-accordion>

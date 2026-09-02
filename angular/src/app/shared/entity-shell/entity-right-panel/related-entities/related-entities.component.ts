@@ -90,10 +90,6 @@ shoppingCartModal:
     }
   ];
 
-
-  /*
-   * Header Transactions
-   */
   headerTransactions: any[] = [];
 
   headerTotalRecords = 0;
@@ -129,21 +125,8 @@ loading = false;
 
 
   ngOnInit(): void {
-    console.log(this.entityData,'entityData')
-
-    /*
-     * Default:
-     * Header Transaction
-     */
     this.loadHeaderTransactions();
   }
-
-
-  /*
-   * ====================================
-   * DROPDOWN CHANGE
-   * ====================================
-   */
 
   onViewChange(
     view:
@@ -171,13 +154,6 @@ loading = false;
     });
   }
 
-
-  /*
-   * ====================================
-   * HEADER TRANSACTIONS
-   * ====================================
-   */
-
 loadHeaderTransactions(event?: any): void {
 
   if (!this.entityData?.account?.name) {
@@ -188,170 +164,65 @@ loadHeaderTransactions(event?: any): void {
     return;
   }
 
-  const accountName =
-    this.entityData.account.name.trim();
-
-  /*
-   * Current paginator values
-   *
-   * Page 1:
-   * first = 0
-   * rows = 10
-   *
-   * Page 2:
-   * first = 10
-   * rows = 10
-   */
-  const first =
-    event?.first ?? 0;
-
-  const rows =
-    event?.rows ?? this.headerRows;
-
+  const accountName =   this.entityData.account.name.trim();
+  const first = event?.first ?? 0;
+  const rows =   event?.rows ?? this.headerRows;
   this.headerRows = rows;
-
-  /*
-   * Because we have TWO APIs, we need enough
-   * records from each API to create the
-   * requested combined page.
-   */
-  const requiredCount =
-    first + rows;
-
+  const requiredCount = first + rows;
   this.headerLoading = true;
-
-
-  /*
-   * ========================================
-   * PURCHASE ORDERS
-   * Account is SELLER
-   * ========================================
-   */
-
   const purchaseOrders$ =
     this._appTransactionServiceProxy.getAll(
-
       false,
       0,
       undefined,
-
-      // Search
-      undefined,
-
-      // Code
-      undefined,
-
-      undefined,
-
-      // Transaction type
-      undefined,
-
-      // Dates
       undefined,
       undefined,
       undefined,
       undefined,
-
-      // Seller name
+      undefined,
+      undefined,
+      undefined,
+      undefined,
       accountName,
-
       undefined,
-
-      // Buyer name
       undefined,
-
       undefined,
-
-      // Status
       undefined,
-
       false,
-
       undefined,
       undefined,
-
-      // Reference
       undefined,
-
-      // Sorting
       undefined,
-
-      // Skip
       0,
-
-      // Max result count
       requiredCount
     );
-
-
-  /*
-   * ========================================
-   * SALES ORDERS
-   * Account is BUYER
-   * ========================================
-   */
 
   const salesOrders$ =
     this._appTransactionServiceProxy.getAll(
-
       false,
       0,
       undefined,
-
-      // Search
-      undefined,
-
-      // Code
-      undefined,
-
-      undefined,
-
-      // Transaction type
-      undefined,
-
-      // Dates
       undefined,
       undefined,
       undefined,
       undefined,
-
-      // Seller name
       undefined,
-
       undefined,
-
-      // Buyer name
+      undefined,
+      undefined,
+      undefined,
+      undefined,
       accountName,
-
       undefined,
-
-      // Status
       undefined,
-
       false,
-
       undefined,
       undefined,
-
-      // Reference
       undefined,
-
-      // Sorting
       undefined,
-
-      // Skip
       0,
-
-      // Max result count
       requiredCount
     );
-
-
-  /*
-   * ========================================
-   * EXECUTE BOTH CALLS
-   * ========================================
-   */
 
   forkJoin({
 
@@ -373,67 +244,19 @@ loadHeaderTransactions(event?: any): void {
 
     )
     .subscribe({
-
       next: result => {
 
-        /*
-         * ====================================
-         * RESULTS
-         * ====================================
-         */
-
-        const purchaseOrders =
-          result.purchaseOrders?.items ?? [];
-
-        const salesOrders =
-          result.salesOrders?.items ?? [];
-
-
-        /*
-         * ====================================
-         * TOTAL RECORDS
-         * ====================================
-         */
-
-        const purchaseTotal =
-          result.purchaseOrders?.totalCount ?? 0;
-
-        const salesTotal =
-          result.salesOrders?.totalCount ?? 0;
-
-
-        this.headerTotalRecords =
-          purchaseTotal +
-          salesTotal;
-
-
-        /*
-         * ====================================
-         * MERGE BOTH RESULTS
-         * ====================================
-         */
+        const purchaseOrders =  result.purchaseOrders?.items ?? [];
+        const salesOrders =   result.salesOrders?.items ?? [];
+        const purchaseTotal =  result.purchaseOrders?.totalCount ?? 0;
+        const salesTotal =  result.salesOrders?.totalCount ?? 0;
+        this.headerTotalRecords =  purchaseTotal + salesTotal;
 
         let allTransactions: any[] = [
-
           ...purchaseOrders,
-
           ...salesOrders
 
         ];
-
-
-        /*
-         * ====================================
-         * SORT BY CREATION DATE
-         * ====================================
-         *
-         * creationTime is Moment,
-         * so DON'T use:
-         *
-         * new Date(creationTime)
-         *
-         * Use valueOf() instead.
-         */
 
         allTransactions =
           allTransactions.sort(
@@ -457,97 +280,18 @@ loadHeaderTransactions(event?: any): void {
           );
 
 
-        /*
-         * ====================================
-         * COMBINED PAGINATION
-         * ====================================
-         *
-         * Example:
-         *
-         * first = 0
-         * rows = 10
-         *
-         * => records 0 - 9
-         *
-         *
-         * first = 10
-         * rows = 10
-         *
-         * => records 10 - 19
-         */
-
         this.headerTransactions =
           allTransactions.slice(
             first,
             first + rows
           );
 
-
-        /*
-         * ====================================
-         * DEBUG
-         * ====================================
-         */
-
-        console.log(
-          'Related Transactions Pagination',
-          {
-            accountName,
-
-            first,
-
-            rows,
-
-            requiredCount,
-
-            purchaseFetched:
-              purchaseOrders.length,
-
-            purchaseTotal,
-
-            salesFetched:
-              salesOrders.length,
-
-            salesTotal,
-
-            combinedFetched:
-              allTransactions.length,
-
-            totalRecords:
-              this.headerTotalRecords,
-
-            displayedRecords:
-              this.headerTransactions.length
-          }
-        );
-
       },
-
-
-      error: error => {
-
-        console.error(
-          'Failed to load related transactions',
-          error
-        );
-
-        this.notify.error(
-          this.l(
-            'FailedToLoadData'
-          )
-        );
-
-      }
 
     });
 
 }
 
-  /*
-   * ====================================
-   * DETAILS TRANSACTIONS
-   * ====================================
-   */
 
   loadTransactionDetails(
     event?: any
@@ -591,41 +335,15 @@ loadHeaderTransactions(event?: any): void {
 
     this._appTransactionServiceProxy
       .getllTransactionVariationsDetail(
-
-        /*
-         * variationCodeFilter
-         */
-        undefined,
-
-        /*
-         * Transaction type
-         */
-        undefined,
-
-        /*
-         * Search
-         */
-        undefined,
-
-        /*
-         * Transaction number
-         */
-        undefined,
-
-        /*
-         * Price range
-         */
         undefined,
         undefined,
-
-        /*
-         * Amount range
-         */
         undefined,
         undefined,
-
+        undefined,
+        undefined,
+        undefined,
+        undefined,
         sorting,
-
         skipCount,
         rows
       )
@@ -648,29 +366,9 @@ loadHeaderTransactions(event?: any): void {
             result?.totalCount ?? 0;
         },
 
-        error: error => {
-
-          console.error(
-            'Failed to load transaction details',
-            error
-          );
-
-          this.notify.error(
-            this.l(
-              'FailedToLoadData'
-            )
-          );
-        }
-
       });
   }
 
-
-  /*
-   * ====================================
-   * SORT
-   * ====================================
-   */
 
   onHeaderSort(): void {
 
@@ -707,13 +405,6 @@ loadHeaderTransactions(event?: any): void {
     return;
   }
 
-
-  /*
-   * Same behavior as the old browse:
-   *
-   * DRAFT -> create/edit
-   * otherwise -> view
-   */
   if (
     record.entityObjectStatusCode ===
     'DRAFT'

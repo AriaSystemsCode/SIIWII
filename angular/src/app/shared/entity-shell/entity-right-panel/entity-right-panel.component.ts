@@ -7,20 +7,15 @@ import { Component, Input } from '@angular/core';
 })
 export class EntityRightPanelComponent {
 
-   activeTab: 'audit' | 'messages' | 'related' = 'audit';
+  activeTab: 'audit' | 'messages' | 'related' = 'audit';
 
-   @Input()entityData:any
-   @Input() collapsed = false;
+  @Input() entityData: any
+  @Input() collapsed = false;
+  @Input() entityId: number;
+  @Input() creatorUserId: number;
+  @Input() parentId?: number;
 
-   @Input()entityId: number;
-
-@Input()
-creatorUserId: number;
-
-@Input()
-parentId?: number;
-
-togglePanel(): void {
-  this.collapsed = !this.collapsed;
-}
+  togglePanel(): void {
+    this.collapsed = !this.collapsed;
+  }
 }

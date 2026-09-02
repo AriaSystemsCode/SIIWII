@@ -1,324 +1,424 @@
-<!-- <div class="shell-container">
+<div
+  class="shell-container"
+  [class.compact-shell]="isCompactScreen"
+>
 
+  <!-- BACKDROP -->
   <div
-    class="left-panel-container"
-    [class.collapsed]="
-      leftPanelCollapsed
-    ">
-
-    <app-entity-left-side-panel
-  [sections]="leftPanelSections"
-  [collapsed]="leftPanelCollapsed"
-
-  (toggle)="
-    leftPanelCollapsed =
+    *ngIf="
+      isCompactScreen &&
       !leftPanelCollapsed
-  "
-
-  (itemSelect)="
-    entityItemSelect.emit($event)
-  "
-
-  (add)="
-    entityItemAdd.emit($event)
-  ">
-</app-entity-left-side-panel>
-
+    "
+    class="mobile-left-backdrop"
+    (click)="closeLeftPanel()">
   </div>
 
-  <div class="right-shell-container">
 
-    <app-entity-header
-      [title]="title"
-      [breadcrumbItems]="
-        breadcrumbItems
-      "
-      [mode]="mode"
-      (close)="close.emit()"
-      (minimize)="
-        minimize.emit()
-      "
-    >
-    </app-entity-header>
-
- <app-entity-basic-info
-  [entity]="entity"
-  [entityData]="entityData"
-  [mode]="mode"
-
-  [entityTypes]="entityTypes"
-  [statuses]="statuses"
-  [fields]="basicInfoFields"
-
-  [logoPath]="logoPath"
-  [coverPath]="coverPath"
-  [attachmentsPath]="attachmentsPath"
-
-  [logoAttachmentCategory]="logoAttachmentCategory"
-  [bannerAttachmentCategory]="bannerAttachmentCategory"
-  [imageAttachmentCategory]="imageAttachmentCategory"
-
-  [saving]="saving"
-  [uploading]="uploading"
-
-  (entityChange)="entityChange.emit($event)"
-  (logoChange)="logoChange.emit($event)"
-  (backgroundChange)="backgroundChange.emit($event)"
-  (imageChange)="imageChange.emit($event)"
-  (attachmentRemove)="attachmentRemove.emit($event)"
-
-  (edit)="edit.emit()"
-  (save)="save.emit()"
-  (cancel)="cancel.emit()">
-</app-entity-basic-info>
-
-<div class="content-row m-3">
-
-    <div
-        class="main-content-container"
-        [class.expanded]="rightPanelCollapsed">
-
-        <ng-content
-            select="[entity-main-content]">
-        </ng-content>
-
-    </div>
-
-    <div
-        class="right-panel-wrapper"
-        [class.collapsed]="rightPanelCollapsed">
-
-        <button
-            class="panel-toggle-btn"
-            (click)="toggleRightPanel()">
-
-            <i
-                class="fa"
-                [ngClass]="
-                    rightPanelCollapsed
-                        ? 'fa-chevron-left'
-                        : 'fa-chevron-right'
-                ">
-            </i>
-
-        </button>
-
-        <app-entity-right-panel
-            *ngIf="!rightPanelCollapsed">
-        </app-entity-right-panel>
-
-    </div>
-
-</div>
-  </div>
-
-</div> -->
-<div class="shell-container">
-
-  <!-- ===================================================== -->
   <!-- LEFT PANEL -->
-  <!-- ===================================================== -->
-
   <div
     class="left-panel-container"
-    [class.collapsed]="leftPanelCollapsed">
+    [class.collapsed]="leftPanelCollapsed"
+    [class.compact-left-panel]="isCompactScreen"
+    [class.open]="
+      isCompactScreen &&
+      !leftPanelCollapsed
+    "
+  >
+
+    <div
+      *ngIf="isCompactScreen"
+      class="compact-left-header"
+    >
+      <span class="compact-left-title">
+        Entity level
+      </span>
+
+      <button
+        type="button"
+        class="compact-left-close"
+        (click)="closeLeftPanel()"
+      >
+    <i class="fa fa-angle-double-left"></i>
+      </button>
+    </div>
+
 
     <app-entity-left-side-panel
       [sections]="leftPanelSections"
-      [collapsed]="leftPanelCollapsed"
-
-      (toggle)="
-        leftPanelCollapsed =
-          !leftPanelCollapsed
+      [collapsed]="
+        isCompactScreen
+          ? false
+          : leftPanelCollapsed
       "
-
-      (itemSelect)="
-        selectEntityNode($event)
-      "
-
-      (add)="
-        onEntityItemAdd($event)
-      ">
+      (toggle)="toggleLeftPanel()"
+      (itemSelect)="selectEntityNode($event)"
+      (add)="onEntityItemAdd($event)">
     </app-entity-left-side-panel>
 
   </div>
 
-  <!-- ===================================================== -->
-  <!-- RIGHT SHELL -->
-  <!-- ===================================================== -->
 
+  <!-- RIGHT SHELL -->
   <div class="right-shell-container">
 
-    <!-- Header -->
+
+    <!-- =============================================== -->
+    <!-- HEADER -->
+    <!-- =============================================== -->
+
     <app-entity-header
       [title]="currentTitle"
       [breadcrumbItems]="currentBreadcrumbItems"
       [mode]="displayedMode"
-
       (close)="close.emit()"
       (minimize)="minimize.emit()">
     </app-entity-header>
 
-    <!-- =================================================== -->
-    <!-- ACCOUNT / BRANCH BASIC INFO -->
-    <!-- =================================================== -->
 
-    <app-entity-basic-info
-      [entity]="displayedEntity"
-      [entityData]="displayedEntityData"
-      [mode]="displayedMode"
 
-      [entityTypes]="entityTypes"
-      [statuses]="statuses"
-      [fields]="displayedBasicInfoFields"
+    <!-- =============================================== -->
+    <!-- EVERYTHING BELOW HEADER -->
+    <!-- =============================================== -->
 
-      [showMedia]="displayedShowMedia"
+    <div class="shell-body">
 
-      [namePath]="displayedNamePath"
-      [accountTypePath]="displayedAccountTypePath"
-      [requireAccountType]="displayedRequireAccountType"
 
-      [logoPath]="logoPath"
-      [coverPath]="coverPath"
-      [imagesPath]="imagesPath"
-      [attachmentsPath]="attachmentsPath"
+      <!-- MOBILE LEFT TRIGGER -->
 
-      [logoAttachmentCategory]="logoAttachmentCategory"
-      [bannerAttachmentCategory]="bannerAttachmentCategory"
-      [imageAttachmentCategory]="imageAttachmentCategory"
+      <button
+        *ngIf="
+          isCompactScreen &&
+          leftPanelCollapsed && mobileSection === 'main'
+        "
+        type="button"
+        class="mobile-left-trigger"
+        title="Browse"
+        (click)="openLeftPanel()"
+      >
+        <i class="fa fa-sitemap"></i>
+      </button>
 
-      [saving]="displayedSaving"
-      [uploading]="
-        dynamicEntityActive
-          ? false
-          : uploading
-      "
 
-      (entityChange)="
-        onCurrentEntityChange($event)
-      "
 
-      (logoChange)="
-        onRootLogoChange($event)
-      "
-
-      (backgroundChange)="
-        onRootBackgroundChange($event)
-      "
-
-      (imageChange)="
-        onRootImageChange($event)
-      "
-
-      (attachmentRemove)="
-        onRootAttachmentRemove($event)
-      "
-
-      (edit)="editCurrentEntity()"
-      (save)="saveCurrentEntity()"
-      (cancel)="cancelCurrentEntity()">
-    </app-entity-basic-info>
-
-    <!-- =================================================== -->
-    <!-- CONTENT -->
-    <!-- =================================================== -->
-
-    <div class="content-row m-3">
+      <!-- ============================================= -->
+      <!-- MOBILE RIGHT ICON COLUMN -->
+      <!-- ============================================= -->
 
       <div
-        class="main-content-container"
-        [class.expanded]="rightPanelCollapsed">
+        *ngIf="isCompactScreen"
+        class="mobile-right-rail"
+      >
 
-        <!-- Account projected content -->
-        <div
-          class="root-entity-content"
-          [hidden]="dynamicEntityActive">
-
-          <ng-content
-            select="[entity-main-content]">
-          </ng-content>
-
-        </div>
-
-        <!-- Dynamic entity loading -->
-        <div
-          *ngIf="
-            dynamicEntityActive &&
-            displayedLoading
-          "
-          class="text-center py-5">
-
-          <i class="fa fa-spinner fa-spin"></i>
-
-        </div>
-
-        <!--
-          This host must always exist.
-
-          When the branch is selected,
-          BranchGenericComponent is created here.
-        -->
-        <div
-          class="dynamic-entity-content"
-          [hidden]="!dynamicEntityActive">
-
-          <ng-template #entityComponentHost>
-          </ng-template>
-
-        </div>
-
-      </div>
-
-      <!-- ================================================= -->
-      <!-- RIGHT PANEL -->
-      <!-- ================================================= -->
-
-      <div
-        class="right-panel-wrapper"
-        [class.collapsed]="rightPanelCollapsed">
+        <!-- Details -->
 
         <button
           type="button"
-          class="panel-toggle-btn"
-          (click)="toggleRightPanel()">
-
-          <i
-            class="fa"
-            [ngClass]="
-              rightPanelCollapsed
-                ? 'fa-chevron-left'
-                : 'fa-chevron-right'
-            ">
-          </i>
-
+          class="mobile-rail-btn"
+          [class.active]="
+            mobileSection === 'main'
+          "
+          title="Details"
+          (click)="showMobileMain()"
+        >
+          <i class="fa fa-info-circle"></i>
         </button>
 
-        <!-- <app-entity-right-panel
-          *ngIf="!rightPanelCollapsed">
-        </app-entity-right-panel> -->
-        <app-entity-right-panel
-  *ngIf="!rightPanelCollapsed"
 
-   [entityData]="displayedEntityData"
+        <!-- Related -->
 
-  [entityId]="
-    displayedEntity?.entityId ??
-    displayedEntity?.id
-  "
+        <button
+          type="button"
+          class="mobile-rail-btn"
+          [class.active]="
+            mobileSection === 'right'
+          "
+          title="Related"
+          (click)="showMobileRightPanel()"
+        >
+          <i class="fa fa-list-alt"></i>
+        </button>
 
-  [creatorUserId]="
-    displayedEntity?.creatorUserId
-  "
 
-  [parentId]="
-    displayedEntity?.parentId
-  ">
-</app-entity-right-panel>
+        <!-- Notes -->
+
+        <button
+          type="button"
+          class="mobile-rail-btn"
+          [class.active]="
+            mobileSection === 'notes'
+          "
+          title="Notes"
+          (click)="showMobileNotes()"
+        >
+          <i class="fa fa-sticky-note"></i>
+        </button>
 
       </div>
 
+
+
+      <!-- ============================================= -->
+      <!-- DETAILS -->
+      <!-- ============================================= -->
+
+      <div
+        class="main-section"
+        [hidden]="
+          isCompactScreen &&
+          mobileSection !== 'main'
+        "
+      >
+
+        <app-entity-basic-info
+          *ngIf="showBasicInfo"
+
+          [entity]="displayedEntity"
+          [entityData]="displayedEntityData"
+          [mode]="displayedMode"
+
+          [entityTypes]="entityTypes"
+          [statuses]="statuses"
+          [fields]="displayedBasicInfoFields"
+
+          [showMedia]="displayedShowMedia"
+
+          [logoPath]="logoPath"
+          [coverPath]="coverPath"
+          [imagesPath]="imagesPath"
+          [attachmentsPath]="attachmentsPath"
+
+          [logoAttachmentCategory]="
+            logoAttachmentCategory
+          "
+
+          [bannerAttachmentCategory]="
+            bannerAttachmentCategory
+          "
+
+          [imageAttachmentCategory]="
+            imageAttachmentCategory
+          "
+
+          [showAdditionalImages]="
+            displayedShowAdditionalImages
+          "
+
+          [saving]="displayedSaving"
+
+          [uploading]="
+            dynamicEntityActive
+              ? false
+              : uploading
+          "
+
+          (entityChange)="
+            onCurrentEntityChange($event)
+          "
+
+          (logoChange)="
+            onRootLogoChange($event)
+          "
+
+          (backgroundChange)="
+            onRootBackgroundChange($event)
+          "
+
+          (imageChange)="
+            onRootImageChange($event)
+          "
+
+          (attachmentRemove)="
+            onRootAttachmentRemove($event)
+          "
+
+          (edit)="editCurrentEntity()"
+          (save)="saveCurrentEntity()"
+          (cancel)="cancelCurrentEntity()">
+        </app-entity-basic-info>
+
+
+
+        <!-- MAIN CONTENT -->
+
+        <div class="content-row m-3">
+
+          <div
+            class="main-content-container"
+            [class.expanded]="
+              rightPanelCollapsed
+            "
+          >
+
+            <!-- ROOT ACCOUNT -->
+
+            <div
+              class="root-entity-content"
+              [hidden]="dynamicEntityActive"
+            >
+              <ng-content
+                select="[entity-main-content]">
+              </ng-content>
+            </div>
+
+
+            <!-- LOADING -->
+
+            <div
+              *ngIf="
+                dynamicEntityActive &&
+                displayedLoading
+              "
+              class="text-center py-5"
+            >
+              <i class="fa fa-spinner fa-spin"></i>
+            </div>
+
+
+            <!-- DYNAMIC ENTITY -->
+
+            <div
+              class="dynamic-entity-content"
+              [hidden]="!dynamicEntityActive"
+            >
+              <ng-template
+                #entityComponentHost>
+              </ng-template>
+            </div>
+
+          </div>
+
+
+
+          <!-- =========================================== -->
+          <!-- DESKTOP RIGHT PANEL -->
+          <!-- =========================================== -->
+
+          <div
+            *ngIf="!isCompactScreen"
+            class="right-panel-wrapper"
+            [class.collapsed]="
+              rightPanelCollapsed
+            "
+          >
+
+            <button
+              type="button"
+              class="panel-toggle-btn"
+              (click)="toggleRightPanel()"
+            >
+              <i
+                class="fa"
+                [ngClass]="
+                  rightPanelCollapsed
+                    ? 'fa-chevron-left'
+                    : 'fa-chevron-right'
+                ">
+              </i>
+            </button>
+
+
+            <app-entity-right-panel
+              *ngIf="!rightPanelCollapsed"
+
+              [entityData]="displayedEntityData"
+
+              [entityId]="
+                displayedEntity?.entityId ??
+                displayedEntity?.id
+              "
+
+              [creatorUserId]="
+                displayedEntity?.creatorUserId
+              "
+
+              [parentId]="
+                displayedEntity?.parentId
+              ">
+            </app-entity-right-panel>
+
+
+            <div
+              *ngIf="!rightPanelCollapsed"
+              class="mt-3"
+            >
+              <app-notes
+                [entityId]="
+                  displayedEntity?.entityId ??
+                  displayedEntity?.id
+                ">
+              </app-notes>
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+
+      <!-- ============================================= -->
+      <!-- MOBILE RELATED -->
+      <!-- ============================================= -->
+
+      <div
+        *ngIf="
+          isCompactScreen &&
+          mobileSection === 'right'
+        "
+        class="compact-panel-content"
+      >
+
+        <app-entity-right-panel
+
+          [entityData]="displayedEntityData"
+
+          [entityId]="
+            displayedEntity?.entityId ??
+            displayedEntity?.id
+          "
+
+          [creatorUserId]="
+            displayedEntity?.creatorUserId
+          "
+
+          [parentId]="
+            displayedEntity?.parentId
+          ">
+        </app-entity-right-panel>
+
+      </div>
+
+
+
+      <!-- ============================================= -->
+      <!-- MOBILE NOTES -->
+      <!-- ============================================= -->
+
+      <div
+        *ngIf="
+          isCompactScreen &&
+          mobileSection === 'notes'
+        "
+        class="compact-panel-content"
+      >
+
+        <app-notes
+          [entityId]="
+            displayedEntity?.entityId ??
+            displayedEntity?.id
+          ">
+        </app-notes>
+
+      </div>
+
+
     </div>
+    <!-- END shell-body -->
+
 
   </div>
+  <!-- END right-shell-container -->
+
 
 </div>

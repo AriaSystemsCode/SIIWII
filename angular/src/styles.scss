@@ -643,3 +643,27 @@ body .p-dialog .p-dialog-content {
   padding: 0 !important;
 
 }
+
+
+
+
+/* =====================================================
+   Generic Entity Dialog
+   ===================================================== */
+
+.p-dialog.generic-entity-position {
+  margin-left: 85px !important;
+}
+
+
+/* =====================================================
+   Mobile only
+   ===================================================== */
+
+@media screen and (max-width: 567px) {
+
+  .p-dialog.generic-entity-position {
+    margin-left: 0 !important;
+  }
+
+}

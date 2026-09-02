@@ -55,6 +55,7 @@ canChange = true;
     calendar.overlayVisible = true;
   }
   ngOnChanges() {
+        this.initializeStaticOptions();
     this.fillSelectedValuesFromDto();
         this.onAnyInputChange();
 
@@ -527,6 +528,7 @@ fillSelectedValuesFromDto(): void {
 
 
   ngOnInit(): void {
+        this.initializeStaticOptions();
     this.fillSelectedValuesFromDto();
     this.onAnyInputChange();
   }
@@ -778,5 +780,54 @@ getMultiSelectOptions(
       value
     }));
 }
+private initializeStaticOptions(): void {
 
+    const attributes =
+        this.extraAttributeObject?.value
+            ?.filteredExtraAttributes ?? [];
+
+    attributes.forEach((attr: any) => {
+
+        const dataType =
+            String(attr.dataType || '')
+                .toUpperCase();
+
+        /*
+         * Static dropdown / multiselect
+         */
+        if (
+            (
+                dataType === 'DROPDOWNLIST' ||
+                dataType === 'MULTISELECTDROPDOWNLIST'
+            ) &&
+            attr.validEntries
+        ) {
+
+            attr.paginationSetting ??= {
+                skipCount: 0,
+                maxResultCount: 100,
+                totalCount: 0,
+                list: []
+            };
+
+            const options =
+                attr.validEntries
+                    .split('|')
+                    .map((value: string) =>
+                        value.trim()
+                    )
+                    .filter(Boolean)
+                    .map((value: string) => ({
+                        label: value,
+                        value: value
+                    }));
+
+            attr.paginationSetting.list =
+                options;
+
+            attr.paginationSetting.totalCount =
+                options.length;
+        }
+    });
+}
 }

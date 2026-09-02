@@ -124,10 +124,10 @@
 
 .toggle-btn {
   position: absolute;
-  top: 90px;
-  right: -15px;
-  width: 34px;
-  height: 28px;
+top: 53px;
+    right: -30px;
+    width: 28px;
+    height: 23px;
   z-index: 20;
   border: 1px solid #d8d8e8;
   background: #fff;
@@ -138,4 +138,15 @@
   p-tree .p-treenode-content.p-treenode-selectable ,.p-tree {
     background-color: inherit !important;
   }
+
+  .p-tree .p-tree-container .p-treenode .p-treenode-content .p-treenode-icon {
+    color: #4A0D4A !important;
+        border-radius: 100%;
+    border: 2px solid #4A0D4A ;
+    padding: 5px 10px;
+    /* margin: 5px; */
+    width: 35px;
+    height: 35px;
+  }
 }
+

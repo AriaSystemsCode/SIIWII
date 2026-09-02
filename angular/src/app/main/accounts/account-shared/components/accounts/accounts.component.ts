@@ -903,15 +903,6 @@ private loadAccountForEdit(
           );
       },
       error: error => {
-        console.error(
-          'Failed to load account:',
-          error
-        );
-
-        this.notify.error(
-          this.l('FailedToLoadAccount')
-        );
-
         this.showGenericEntityModal = false;
       }
     });
@@ -1016,77 +1007,6 @@ onAccountChanged(data: any): void {
     [];
 }
 
-// saveAccount(): void {
-//   if (
-//     this.saving ||
-//     this.uploadingImages
-//   ) {
-//     return;
-//   }
-
-//   this.prepareDtoBeforeSave();
-
-//   if (!this.validateAccount()) {
-//     return;
-//   }
-
-//   this.saving = true;
-//   console.log(this.accountData,'dataaaaa')
-
-// //   this._accountsServiceProxy
-// //     .createOrEditAccount(
-// //       this.accountDto
-// //     )
-// //     .pipe(
-// //       finalize(() => {
-// //         this.saving = false;
-// //       })
-// //     )
-// //     .subscribe({
-// //       next: result => {
-// //         this.notify.success(
-// //           this.l('SavedSuccessfully')
-// //         );
-
-// //         const savedAccount =
-// //           result?.accountInfo ??
-// //           result?.account ??
-// //           result;
-
-// //         if (savedAccount) {
-// //           this.accountDto =
-// //             CreateOrEditAccountInfoDto.fromJS(
-// //               savedAccount
-// //             );
-
-// //           this.initializeDtoArrays();
-// //           this.buildAccountData();
-
-// //           this.accountId =
-// //             this.accountDto.id ??
-// //             this.accountDto.accountId ??
-// //             this.accountId;
-
-// //           this.originalAccountDto =
-// //             this.cloneValue(
-// //               this.accountDto.toJSON()
-// //             );
-// //         }
-
-// //         this.entityMode = 'view';
-// //       },
-// //       error: error => {
-// //         console.error(
-// //           'Failed to save account:',
-// //           error
-// //         );
-
-// //         this.notify.error(
-// //           this.l('SaveFailed')
-// //         );
-// //       }
-// //     });
-// }
 saveAccount(): void {
   if (
     this.saving ||
@@ -1120,10 +1040,6 @@ saveAccount(): void {
         this.saveAccountDto();
       },
       error: error => {
-        console.error(
-          'Attachment upload failed:',
-          error
-        );
 
         this.saving = false;
 
@@ -1183,16 +1099,7 @@ private saveAccountDto(): void {
 
         this.reloadPage();
       },
-      error: error => {
-        console.error(
-          'Account save failed:',
-          error
-        );
-
-        this.notify.error(
-          this.l('SaveFailed')
-        );
-      }
+   
     });
 }
 
@@ -1218,29 +1125,12 @@ private setManualAccCode(): void {
 
         this.accountDto.code =
           `M${code}`;
-
-        /*
-         * accountData.account and accountDto
-         * should be the same reference,
-         * but assign it to ensure UI refresh.
-         */
         this.accountData = {
           ...this.accountData,
           account: this.accountDto
         };
       },
-      error: error => {
-        console.error(
-          'Failed to generate account code:',
-          error
-        );
-
-        this.notify.error(
-          this.l(
-            'FailedToGenerateAccountCode'
-          )
-        );
-      }
+    
     });
 }
 
@@ -1502,12 +1392,6 @@ private applyUploadedAttachments(
     const categoryId =
       result.attachment
         .attachmentCategoryId;
-
-    /*
-     * Logo and banner:
-     * replace existing attachment
-     * of the same category.
-     */
     if (
       result.attachmentType ===
         'LOGO' ||
@@ -1527,11 +1411,7 @@ private applyUploadedAttachments(
           );
     }
 
-    /*
-     * Additional image:
-     * replace a specific existing slot,
-     * when editing.
-     */
+
     if (
       result.attachmentType ===
         'IMAGE' &&
@@ -1618,10 +1498,7 @@ private prepareDtoBeforeSave(): void {
             item.attributeValue.join('-');
         }
 
-        /*
-         * Backend requires Int64,
-         * so entityid cannot be null.
-         */
+
         if (
           item.entityid === null ||
           item.entityid === undefined
@@ -1747,29 +1624,8 @@ private loadAttachmentCategories(): void {
             item => item.code === 'IMAGE'
           );
 
-        if (
-          !this.logoAttachmentCategory ||
-          !this.bannerAttachmentCategory ||
-          !this.imageAttachmentCategory
-        ) {
-          console.warn(
-            'Some attachment categories were not returned:',
-            categories
-          );
-        }
       },
-      error: error => {
-        console.error(
-          'Failed to load attachment categories:',
-          error
-        );
-
-        this.notify.error(
-          this.l(
-            'FailedToLoadAttachmentCategories'
-          )
-        );
-      }
+    
     });
 }
 

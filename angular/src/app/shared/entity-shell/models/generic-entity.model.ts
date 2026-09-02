@@ -56,8 +56,8 @@ export interface EntityBasicInfoField {
   label: string;
 
   type:
-    | 'text'
-    | 'dropdown';
+  | 'text'
+  | 'dropdown';
 
   valuePath: string;
 
@@ -102,7 +102,7 @@ export interface EntityImageUploadEvent {
   previewUrl: string | null;
 
   attachmentType:
-    EntityAttachmentType;
+  EntityAttachmentType;
 
   index?: number;
 
@@ -111,7 +111,7 @@ export interface EntityImageUploadEvent {
 
 export interface EntityImageRemoveEvent {
   attachmentType:
-    EntityAttachmentType;
+  EntityAttachmentType;
 
   index?: number;
 
@@ -132,7 +132,7 @@ export interface PendingUpload {
   categoryId: number;
 
   attachmentType:
-    EntityAttachmentType;
+  EntityAttachmentType;
 
   index?: number;
 }
@@ -165,16 +165,7 @@ export interface GenericSelectedEntity {
 
 export interface GenericEntityNode {
   id: number | string;
-
   label: string;
-
-  /*
-   * Examples:
-   * ACCOUNT
-   * BRANCH
-   * ADDRESS
-   * CONTACT
-   */
   entityType: string;
 
   icon?: string;
@@ -185,30 +176,10 @@ export interface GenericEntityNode {
 
   expanded?: boolean;
 
-  /*
-   * Initial entity information that may already
-   * exist in the tree response.
-   */
   data?: any;
 
-  /*
-   * Additional values needed by the entity editor.
-   *
-   * Example:
-   * {
-   *   accountId: 106428,
-   *   tenantId: 2490
-   * }
-   */
   context?: any;
 
-  /*
-   * Component responsible for displaying and
-   * managing this entity.
-   *
-   * Optional because section nodes may not have
-   * an editor component.
-   */
   component?: Type<any>;
 
   children?: GenericEntityNode[];
@@ -222,73 +193,31 @@ export interface GenericEntityEditor {
   /*
    * Selected node from the left panel.
    */
-  node: GenericEntityNode;
+  showAdditionalImages?: boolean;
 
-  /*
-   * Current component mode.
-   */
+  node: GenericEntityNode;
   mode: EntityMode;
 
-  /*
-   * Main entity object.
-   *
-   * Examples:
-   * Account DTO
-   * Branch DTO
-   * Address DTO
-   */
   entity: any;
-
-  /*
-   * Wrapper used by the generic basic-info component.
-   *
-   * Examples:
-   * {
-   *   account: accountDto
-   * }
-   *
-   * {
-   *   branch: branchDto
-   * }
-   */
   entityData: any;
 
-  /*
-   * Fields displayed by app-entity-basic-info.
-   */
-  basicInfoFields:
-    EntityBasicInfoField[];
+  basicInfoFields:  EntityBasicInfoField[];
 
-  /*
-   * Account can show logo, banner and images.
-   * Branch/address can set this to false.
-   */
   showMedia: boolean;
 
   loading: boolean;
   saving: boolean;
-
-  /*
-   * Emits when the entity object changes.
-   */
   entityChange:
-    EventEmitter<any>;
+  EventEmitter<any>;
 
-  /*
-   * Emits after a successful save.
-   */
+
   saved:
-    EventEmitter<any>;
+  EventEmitter<any>;
 
-  /*
-   * Emits after cancelling edit/create mode.
-   */
+
   cancelled:
-    EventEmitter<void>;
+  EventEmitter<void>;
 
-  /*
-   * Load entity details using its own API.
-   */
   loadEntity(): void;
 
   /*
@@ -305,6 +234,20 @@ export interface GenericEntityEditor {
    * Restore the backup and return to view mode.
    */
   cancelEntity(): void;
+
+
+
+  onLogoChange?(
+    event: any
+  ): void;
+
+  onBackgroundChange?(
+    event: any
+  ): void;
+
+  onAttachmentRemove?(
+    event: any
+  ): void;
 }
 
 /* =========================================================
@@ -329,10 +272,10 @@ export interface GenericEntityChangedEvent {
 
 export interface BranchAddressSection {
   code:
-    | 'BILLING'
-    | 'SHIPPING'
-    | 'DISTRIBUTION'
-    | 'MAILING';
+  | 'BILLING'
+  | 'SHIPPING'
+  | 'DISTRIBUTION'
+  | 'MAILING';
 
   label: string;
 

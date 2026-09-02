@@ -12,11 +12,7 @@ import { PopoverModule } from "ngx-bootstrap/popover";
 import { TabsModule } from "ngx-bootstrap/tabs";
 import { TooltipModule } from "ngx-bootstrap/tooltip";
 import { BsDropdownModule } from "ngx-bootstrap/dropdown";
-import {
-    BsDatepickerConfig,
-    BsDaterangepickerConfig,
-    BsLocaleService,
-} from "ngx-bootstrap/datepicker";
+
 import { BsDatepickerModule } from "ngx-bootstrap/datepicker";
 import { AutoCompleteModule } from "primeng/autocomplete";
 import { EditorModule } from "primeng/editor";
@@ -32,7 +28,7 @@ import { NgxChartsModule } from "@swimlane/ngx-charts";
 import { CountoModule } from "angular2-counto";
 import { TextMaskModule } from "angular2-text-mask";
 import { ImageCropperModule } from "ngx-image-cropper";
-import { NgxBootstrapDatePickerConfigService } from "assets/ngx-bootstrap/ngx-bootstrap-datepicker-config.service";
+
 import { DropdownModule } from "primeng/dropdown";
 
 // Metronic
@@ -67,6 +63,7 @@ import { RelatedEntitiesComponent } from './entity-right-panel/related-entities/
 import { EntityMessagesComponent } from './entity-right-panel/entity-messages/entity-messages.component';
 import { InteractionsModule } from '@app/main/interactions/interactions.module';
 import { TransactionModule } from '@app/main/transactions/transaction.module';
+import { NotesModule } from '@app/admin/shared/notes/notes.module';
 
 
 
@@ -125,7 +122,8 @@ import { TransactionModule } from '@app/main/transactions/transaction.module';
                TabViewModule,
                SharedDynamicInputsModule,
                InteractionsModule,
-               TransactionModule
+               TransactionModule,
+               NotesModule
 
     ],
     declarations: [

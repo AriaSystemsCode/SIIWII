@@ -6,23 +6,23 @@
   [resizable]="false"
   [closable]="false"
   [showHeader]="false"
- [style]="{
+
+  [style]="{
     width: maximized ? '100vw' : width,
     height: maximized ? '100vh' : height,
-    'margin-left': '85px',
     'overflow-x': 'hidden',
-    padding: '0 !important' 
+    padding: '0'
   }"
- [contentStyle]="{
-    'padding': '0',
-    'height': '100%',
+
+  [contentStyle]="{
+    padding: '0',
+    height: '100%',
     'overflow-x': 'hidden'
   }"
-  class="generic-entity-modal"
-  styleClass="generic-entity-modal p-0"
-  [style.padding.!important]="'0px'"
-  (onHide)="onDialogHide()">
 
+  styleClass="generic-entity-modal generic-entity-position"
+
+  (onHide)="onDialogHide()"
+>
   <ng-content></ng-content>
-
 </p-dialog>

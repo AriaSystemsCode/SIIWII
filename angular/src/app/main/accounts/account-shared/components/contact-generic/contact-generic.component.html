@@ -1,0 +1,28 @@
+<div
+    *ngIf="loading"
+    class="p-4 text-center">
+
+    <i
+        class="fa fa-spinner fa-spin">
+    </i>
+
+    {{ 'Loading' | localize }}
+
+</div>
+
+
+<div
+    *ngIf="
+        !loading &&
+        entity
+    "
+    class="contact-generic-content">
+
+<app-account-sections
+    [accountId]="entity?.id"
+    [mode]="mode"
+    [entityData]="entityData"
+    [isContact]="true">
+</app-account-sections>
+
+</div>

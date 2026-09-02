@@ -1,19 +1,6 @@
-import {
-  Component,
-  EventEmitter,
-  Input,
-  OnChanges,
-  OnDestroy,
-  Output,
-  SimpleChanges
-} from '@angular/core';
-
+import { Component, EventEmitter, Input, OnChanges, OnDestroy, Output, SimpleChanges} from '@angular/core';
 import { AppConsts } from '@shared/AppConsts';
-
-import {
-  SycAttachmentCategoryDto
-} from '@shared/service-proxies/service-proxies';
-
+import { SycAttachmentCategoryDto} from '@shared/service-proxies/service-proxies';
 import {
   EntityBasicInfoField,
   EntityImageRemoveEvent,
@@ -32,308 +19,188 @@ import {
 export class EntityBasicInfoComponent
   implements OnChanges, OnDestroy {
 
- 
-  @Input()
-fieldPermissions:
-  Record<string, boolean> = {};
+
+  @Input() fieldPermissions: Record<string, boolean> = {};
   @Input() entityData: any;
-
   @Input() entity: any;
+  @Input()  mode: EntityMode = 'view';
 
-  @Input()
-  mode: EntityMode = 'view';
-@Input()
-requireAccountType = true;
+  @Input()  showMedia = true;
+  @Input() fields: EntityBasicInfoField[] = [];
+  @Input() entityTypes: any[] = [];
+  @Input() statuses: any[] = [];
 
-  @Input()
-showMedia = true;
-  /*
-   * Generic fields rendered at the top.
-   */
-  @Input()
-  fields: EntityBasicInfoField[] = [];
 
-  @Input()
-  entityTypes: any[] = [];
+  @Input()  logoAttachmentCategory: SycAttachmentCategoryDto;
+  @Input()  bannerAttachmentCategory: SycAttachmentCategoryDto;
+  @Input() imageAttachmentCategory:  SycAttachmentCategoryDto;
 
-  @Input()
-  statuses: any[] = [];
 
-  /*
-   * Attachment categories are loaded once
-   * in the parent and passed to this component.
-   */
-  @Input()
-  logoAttachmentCategory:
-    SycAttachmentCategoryDto;
+  @Input() attachmentsPath =  'account.entityAttachments';
+  @Input()  logoPath =  'account.logoUrl';
+  @Input()   coverPath =  'account.coverUrl';
 
-  @Input()
-  bannerAttachmentCategory:
-    SycAttachmentCategoryDto;
+  @Input()  saving = false;
+  @Input()  uploading = false;
 
-  @Input()
-  imageAttachmentCategory:
-    SycAttachmentCategoryDto;
+  @Input()  bannerWidth = 1050;
+  @Input() bannerHeight = 180;
+  @Input()  logoWidth = 100;
+  @Input() logoHeight = 100;
+  @Input()  additionalImageWidth = 150;
+  @Input()  additionalImageHeight = 150;
+  @Input() showAdditionalImages = true;
 
-  /*
-   * Generic paths.
-   */
-  @Input()
-  attachmentsPath =
-    'account.entityAttachments';
+  @Output()  entityChange =  new EventEmitter<any>();
+  @Output()  logoChange = new EventEmitter<EntityImageUploadEvent>();
+  @Output()  backgroundChange =  new EventEmitter<EntityImageUploadEvent>();
+  @Output()  imageChange =  new EventEmitter<EntityImageUploadEvent>();
+  @Output()  attachmentRemove =  new EventEmitter<EntityImageRemoveEvent>();
 
-  @Input()
-  logoPath =
-    'account.logoUrl';
-
-  @Input()
-  coverPath =
-    'account.coverUrl';
-
-  /*
-   * Paths used for Basic Info validation.
-   */
-  @Input()
-  namePath =
-    'account.name';
-
-  @Input()
-  accountTypePath =
-    'account.accountTypeId';
-
-  /*
-   * Loading states controlled by parent.
-   */
-  @Input()
-  saving = false;
-
-  @Input()
-  uploading = false;
-
-  /*
-   * Upload box dimensions.
-   */
-  @Input()
-  bannerWidth = 1050;
-
-  @Input()
-  bannerHeight = 180;
-
-  @Input()
-  logoWidth = 100;
-
-  @Input()
-  logoHeight = 100;
-
-  @Input()
-  additionalImageWidth = 105;
-
-  @Input()
-  additionalImageHeight = 105;
-
-  /*
-   * Output when normal fields change.
-   */
-  @Output()
-  entityChange =
-    new EventEmitter<any>();
-
-  /*
-   * Upload events.
-   */
-  @Output()
-  logoChange =
-    new EventEmitter<EntityImageUploadEvent>();
-
-  @Output()
-  backgroundChange =
-    new EventEmitter<EntityImageUploadEvent>();
-
-  @Output()
-  imageChange =
-    new EventEmitter<EntityImageUploadEvent>();
-
-  @Output()
-  attachmentRemove =
-    new EventEmitter<EntityImageRemoveEvent>();
-
-  /*
-   * Action events.
-   */
-  @Output()
-  edit =
-    new EventEmitter<void>();
-
-  @Output()
-  save =
-    new EventEmitter<void>();
-
-  @Output()
-  cancel =
-    new EventEmitter<void>();
+  @Output()  edit = new EventEmitter<void>();
+  @Output()  save =   new EventEmitter<void>();
+  @Output()  cancel =  new EventEmitter<void>();
 
   readonly additionalImagesCount = 4;
 
   logoPreviewUrl: string | null = null;
-
   coverPreviewUrl: string | null = null;
-
   logoFile: File | null = null;
-
   coverFile: File | null = null;
-
   logoExistingAttachment: any = null;
-
   bannerExistingAttachment: any = null;
 
-  additionalImageSlots:
-    EntityImageSlot[] =
-      this.createEmptyImageSlots();
+  additionalImageSlots:  EntityImageSlot[] =  this.createEmptyImageSlots();
+  attachmentBaseUrl =  AppConsts.attachmentBaseUrl;
+  logoUploaderVisible = true;
+  @Input() imagesPath = 'account.imagesUrls';
 
-  attachmentBaseUrl =
-    AppConsts.attachmentBaseUrl;
+ngOnChanges(
+  changes: SimpleChanges
+): void {
 
-    logoUploaderVisible = true;
-
-
-    @Input()
-imagesPath = 'account.imagesUrls';
-
-  ngOnChanges(
-    changes: SimpleChanges
-  ): void {
-
-    const shouldInitialize =
-       changes.entityData ||
-  changes.attachmentsPath ||
-  changes.logoPath ||
-  changes.coverPath ||
-  changes.imagesPath ||
-  changes.logoAttachmentCategory ||
-  changes.bannerAttachmentCategory ||
-  changes.imageAttachmentCategory;
-
-    if (shouldInitialize) {
-      this.initializeExistingImages();
-    }
+  if (changes.entityData) {
+    this.resetMediaState();
   }
 
-  /**
-   * Reads a value from entityData using
-   * a path such as account.name.
-   */
-  getValue(
-    path: string
-  ): any {
+  const shouldInitialize =
+    changes.entityData ||
+    changes.attachmentsPath ||
+    changes.logoPath ||
+    changes.coverPath ||
+    changes.imagesPath ||
+    changes.logoAttachmentCategory ||
+    changes.bannerAttachmentCategory ||
+    changes.imageAttachmentCategory;
 
-    if (
-      !path ||
-      !this.entityData
-    ) {
-      return null;
-    }
-
-    return path
-      .split('.')
-      .reduce(
-        (
-          currentObject,
-          propertyName
-        ) => {
-          return currentObject?.[
-            propertyName
-          ];
-        },
-        this.entityData
-      );
+  if (shouldInitialize) {
+    this.initializeExistingImages();
   }
+}
 
-  /**
-   * Changes a value using a generic path.
-   */
-  setValue(
-    path: string,
-    value: any
-  ): void {
+private resetMediaState(): void {
 
-    if (
-      !path ||
-      !this.entityData ||
-      this.mode === 'view'
-    ) {
-      return;
-    }
 
-    const properties =
-      path.split('.');
-
-    const lastProperty =
-      properties.pop();
-
-    if (!lastProperty) {
-      return;
-    }
-
-    const targetObject =
-      properties.reduce(
-        (
-          currentObject,
-          propertyName
-        ) => {
-
-          if (
-            currentObject[
-              propertyName
-            ] === null ||
-            currentObject[
-              propertyName
-            ] === undefined
-          ) {
-            currentObject[
-              propertyName
-            ] = {};
-          }
-
-          return currentObject[
-            propertyName
-          ];
-        },
-        this.entityData
-      );
-
-    targetObject[
-      lastProperty
-    ] = value;
-
-    this.entityChange.emit(
-      this.entityData
+  if (
+    this.logoPreviewUrl?.startsWith(
+      'blob:'
+    )
+  ) {
+    URL.revokeObjectURL(
+      this.logoPreviewUrl
     );
   }
 
+  if (
+    this.coverPreviewUrl?.startsWith(
+      'blob:'
+    )
+  ) {
+    URL.revokeObjectURL(
+      this.coverPreviewUrl
+    );
+  }
 
-  /**
-   * View mode -> Edit mode.
-   */
+  this.additionalImageSlots
+    ?.forEach(slot => {
+
+      if (
+        slot?.previewUrl?.startsWith(
+          'blob:'
+        )
+      ) {
+        URL.revokeObjectURL(
+          slot.previewUrl
+        );
+      }
+    });
+
+  this.logoPreviewUrl = null;
+  this.coverPreviewUrl = null;
+
+  this.logoFile = null;
+  this.coverFile = null;
+
+  this.logoExistingAttachment = null;
+  this.bannerExistingAttachment = null;
+
+  this.additionalImageSlots =
+    this.createEmptyImageSlots();
+}
+
+getValue(path: string): any {
+    if (!path || !this.entityData) {
+        return null;
+    }
+
+    let value = this.entityData;
+
+    for (const key of path.split('.')) {
+        value = value?.[key];
+    }
+
+    return value;
+}
+
+setValue(path: string, value: any): void {
+    if (!path || !this.entityData || this.mode === 'view') {
+        return;
+    }
+
+    const keys = path.split('.');
+    const lastKey = keys.pop();
+
+    if (!lastKey) {
+        return;
+    }
+
+    let target = this.entityData;
+
+    for (const key of keys) {
+        if (target[key] == null) {
+            target[key] = {};
+        }
+
+        target = target[key];
+    }
+
+    target[lastKey] = value;
+
+    this.entityChange.emit(this.entityData);
+}
   editClicked(): void {
-    if (
-      this.saving ||
-      this.uploading
-    ) {
+    if (  this.saving ||  this.uploading  ) {
       return;
     }
 
     this.edit.emit();
   }
 
-  /**
-   * Save button.
-   */
   saveClicked(): void {
     if (
       this.mode === 'view' ||
       this.saving ||
-      this.uploading ||
-      !this.isBasicInfoValid
+      this.uploading
     ) {
       return;
     }
@@ -341,77 +208,44 @@ imagesPath = 'account.imagesUrls';
     this.save.emit();
   }
 
-  /**
-   * Cancel button.
-   */
   cancelClicked(): void {
-    if (
-      this.saving ||
-      this.uploading
-    ) {
+    if ( this.saving || this.uploading) {
       return;
     }
-
     this.cancel.emit();
   }
 
-  /**
-   * Logo upload after crop is complete.
-   */
-onLogoBrowseDone(
-  event: ImageUploadComponentOutput
-): void {
 
-  if (!event?.file) {
-    return;
-  }
-
-  this.logoFile = event.file;
-
-  const previewUrl =
-    event.image ||
-    URL.createObjectURL(
-      event.file
-    );
-
-  /*
-   * Recreate app-image-upload so it reads
-   * the new [image] input.
-   */
-  this.logoUploaderVisible = false;
-
-  this.logoPreviewUrl =
-    previewUrl;
-
-  setTimeout(() => {
-    this.logoUploaderVisible = true;
-  });
-
-  this.logoChange.emit({
-    file: event.file,
-    previewUrl,
-    attachmentType: 'LOGO',
-    existingAttachment:
-      this.logoExistingAttachment
-  });
-}
-  /**
-   * Banner upload after crop is complete.
-   */
-  onBannerBrowseDone(
-    event:
-      ImageUploadComponentOutput
-  ): void {
+  onLogoBrowseDone(event: ImageUploadComponentOutput): void {
 
     if (!event?.file) {
       return;
     }
 
-    this.coverFile =
-      event.file;
+    this.logoFile = event.file;
 
-    this.coverPreviewUrl =
-      event.image;
+    const previewUrl =  event.image ||  URL.createObjectURL(event.file);
+
+
+    this.logoUploaderVisible = false;
+    this.logoPreviewUrl = previewUrl;
+
+    setTimeout(() => {
+      this.logoUploaderVisible = true;
+    });
+
+    this.logoChange.emit({
+      file: event.file,
+      previewUrl,
+      attachmentType: 'LOGO',
+      existingAttachment:
+        this.logoExistingAttachment
+    });
+  }
+
+  onBannerBrowseDone(event:ImageUploadComponentOutput): void {
+    this.coverFile =  event.file;
+    this.coverPreviewUrl =  event.image;
 
     this.backgroundChange.emit({
       file: event.file,
@@ -422,9 +256,6 @@ onLogoBrowseDone(
     });
   }
 
-  /**
-   * Additional image upload after crop.
-   */
   onAdditionalImageBrowseDone(
     event:
       ImageUploadComponentOutput,
@@ -435,34 +266,24 @@ onLogoBrowseDone(
       !event?.file ||
       index < 0 ||
       index >=
-        this.additionalImagesCount
+      this.additionalImagesCount
     ) {
       return;
     }
 
     const currentSlot =
       this.additionalImageSlots[
-        index
+      index
       ];
 
     this.additionalImageSlots[
       index
     ] = {
-      previewUrl:
-        event.image,
-      file:
-        event.file,
-      attachment:
-        currentSlot
-          ?.attachment ??
-        null
+      previewUrl: event.image,
+      file:  event.file,
+      attachment:  currentSlot?.attachment ??  null
     };
 
-    /*
-     * Create a new array reference
-     * to ensure Angular updates
-     * the child input.
-     */
     this.additionalImageSlots = [
       ...this.additionalImageSlots
     ];
@@ -477,22 +298,14 @@ onLogoBrowseDone(
     });
   }
 
-  /**
-   * Remove logo.
-   */
   removeLogo(): void {
-    const existingAttachment =
-      this.logoExistingAttachment;
+    const existingAttachment =  this.logoExistingAttachment;
 
     this.logoPreviewUrl = null;
     this.logoFile = null;
-    this.logoExistingAttachment =
-      null;
+    this.logoExistingAttachment = null;
 
-    this.setPathWithoutEmit(
-      this.logoPath,
-      null
-    );
+    this.setPathWithoutEmit(this.logoPath,null);
 
     this.attachmentRemove.emit({
       attachmentType: 'LOGO',
@@ -505,18 +318,13 @@ onLogoBrowseDone(
    * Remove cover/banner.
    */
   removeBanner(): void {
-    const existingAttachment =
-      this.bannerExistingAttachment;
+    const existingAttachment =  this.bannerExistingAttachment;
 
     this.coverPreviewUrl = null;
     this.coverFile = null;
-    this.bannerExistingAttachment =
-      null;
+    this.bannerExistingAttachment = null;
 
-    this.setPathWithoutEmit(
-      this.coverPath,
-      null
-    );
+    this.setPathWithoutEmit( this.coverPath,null);
 
     this.attachmentRemove.emit({
       attachmentType: 'BANNER',
@@ -525,9 +333,6 @@ onLogoBrowseDone(
     });
   }
 
-  /**
-   * Remove one of the four images.
-   */
   removeAdditionalImage(
     index: number
   ): void {
@@ -535,27 +340,19 @@ onLogoBrowseDone(
     if (
       index < 0 ||
       index >=
-        this.additionalImagesCount
+      this.additionalImagesCount
     ) {
       return;
     }
 
-    const slot =
-      this.additionalImageSlots[
-        index
-      ];
-
-    this.additionalImageSlots[
-      index
-    ] = {
+    const slot =  this.additionalImageSlots[index];
+    this.additionalImageSlots[index] = {
       previewUrl: null,
       file: null,
       attachment: null
     };
 
-    this.additionalImageSlots = [
-      ...this.additionalImageSlots
-    ];
+    this.additionalImageSlots = [...this.additionalImageSlots];
 
     this.attachmentRemove.emit({
       attachmentType: 'IMAGE',
@@ -565,41 +362,31 @@ onLogoBrowseDone(
     });
   }
 
-  /**
-   * Loads existing logo, banner and images
-   * when entering view/edit mode.
-   */
-  private initializeExistingImages():
-    void {
+  private initializeExistingImages(): void {
 
-    const attachments =
-      this.getAttachments();
+    const attachments =  this.getAttachments();
 
-    /*
-     * Do not overwrite a newly selected
-     * local file while the user is editing.
-     */
-if (
-  !this.logoFile &&
-  !this.logoPreviewUrl
-) {
-  this.logoExistingAttachment =
-    this.findAttachmentByCategory(
-      attachments,
-      this.logoAttachmentCategory?.id
-    );
+    if (
+      !this.logoFile &&
+      !this.logoPreviewUrl
+    ) {
+      this.logoExistingAttachment =
+        this.findAttachmentByCategory(
+          attachments,
+          this.logoAttachmentCategory?.id
+        );
 
-  this.logoPreviewUrl =
-    this.getAttachmentUrl(
-      this.logoExistingAttachment
-    ) ||
-    this.getDirectImagePath(
-      this.logoPath
-    );
-}
+      this.logoPreviewUrl =
+        this.getAttachmentUrl(
+          this.logoExistingAttachment
+        ) ||
+        this.getDirectImagePath(
+          this.logoPath
+        );
+    }
 
-    if (  !this.coverFile &&
-  !this.coverPreviewUrl) {
+    if (!this.coverFile &&
+      !this.coverPreviewUrl) {
       this.bannerExistingAttachment =
         this.findAttachmentByCategory(
           attachments,
@@ -616,86 +403,79 @@ if (
         );
     }
 
-   const existingAttachmentImages =
-  attachments
-    .filter(
-      attachment =>
-        this.isCategoryMatch(
-          attachment,
-          this.imageAttachmentCategory?.id
-        )
-    )
-    .slice(
-      0,
-      this.additionalImagesCount
-    );
-
-const directImagePaths =
-  this.getValue(
-    this.imagesPath
-  );
-
-const directImages: string[] =
-  Array.isArray(directImagePaths)
-    ? directImagePaths
-    : [];
-
-const newSlots =
-  this.createEmptyImageSlots();
-
-for (
-  let index = 0;
-  index < this.additionalImagesCount;
-  index++
-) {
-  const currentSlot =
-    this.additionalImageSlots[index];
-
-  // Preserve newly selected local file.
-  if (currentSlot?.file) {
-    newSlots[index] =
-      currentSlot;
-
-    continue;
-  }
-
-  const attachment =
-    existingAttachmentImages[index];
-
-  const directPath =
-    directImages[index];
-
-  newSlots[index] = {
-    previewUrl:
-      this.getAttachmentUrl(
-        attachment
-      ) ||
-      (
-        directPath
-          ? this.buildAttachmentUrl(
-              directPath
+    const existingAttachmentImages =
+      attachments
+        .filter(
+          attachment =>
+            this.isCategoryMatch(
+              attachment,
+              this.imageAttachmentCategory?.id
             )
-          : null
-      ),
+        )
+        .slice(
+          0,
+          this.additionalImagesCount
+        );
 
-    file: null,
+    const directImagePaths =
+      this.getValue(
+        this.imagesPath
+      );
 
-    attachment:
-      attachment ?? null
-  };
-}
+    const directImages: string[] =
+      Array.isArray(directImagePaths)
+        ? directImagePaths
+        : [];
 
-this.additionalImageSlots =
-  newSlots;
+    const newSlots =
+      this.createEmptyImageSlots();
+
+    for (
+      let index = 0;
+      index < this.additionalImagesCount;
+      index++
+    ) {
+      const currentSlot =
+        this.additionalImageSlots[index];
+
+      // Preserve newly selected local file.
+      if (currentSlot?.file) {
+        newSlots[index] =
+          currentSlot;
+
+        continue;
+      }
+
+      const attachment = existingAttachmentImages[index];
+      const directPath =  directImages[index];
+
+      newSlots[index] = {
+        previewUrl:
+          this.getAttachmentUrl(
+            attachment
+          ) ||
+          (
+            directPath
+              ? this.buildAttachmentUrl(
+                directPath
+              )
+              : null
+          ),
+
+        file: null,
+
+        attachment:
+          attachment ?? null
+      };
+    }
+
+    this.additionalImageSlots =   newSlots;
   }
 
   private getAttachments():
     any[] {
 
-    const attachments =
-      this.getValue(
-        this.attachmentsPath
-      );
+    const attachments = this.getValue( this.attachmentsPath);
 
     return Array.isArray(
       attachments
@@ -756,299 +536,144 @@ this.additionalImageSlots =
 
     return path
       ? this.buildAttachmentUrl(
-          path
-        )
+        path
+      )
       : null;
   }
 
-  private getDirectImagePath(
-    path: string
-  ): string | null {
-
-    const value =
-      this.getValue(path);
-
-    if (!value) {
-      return null;
-    }
-
-    return this.buildAttachmentUrl(
-      value
-    );
+  private getDirectImagePath(path: string): string | null {
+    const value = this.getValue(path);
+    return this.buildAttachmentUrl(value);
   }
+private buildAttachmentUrl(path: string): string {
+    const baseUrl = this.attachmentBaseUrl?.replace(/\/$/, '') || '';
+    const cleanPath = path.replace(/^\//, '');
 
-  private buildAttachmentUrl(
-    path: string
-  ): string {
+    return baseUrl ? `${baseUrl}/${cleanPath}`  : cleanPath;
+}
 
-    if (!path) {
-      return '';
-    }
-
-    if (
-      path.startsWith(
-        'http://'
-      ) ||
-      path.startsWith(
-        'https://'
-      ) ||
-      path.startsWith(
-        'data:'
-      ) ||
-      path.startsWith(
-        'blob:'
-      )
-    ) {
-      return path;
-    }
-
-    const baseUrl =
-      this.attachmentBaseUrl
-        ?.replace(
-          /\/$/,
-          ''
-        ) || '';
-
-    const cleanPath =
-      path.replace(
-        /^\//,
-        ''
-      );
-
-    return baseUrl
-      ? `${baseUrl}/${cleanPath}`
-      : cleanPath;
-  }
-
-  private createEmptyImageSlots():
-    EntityImageSlot[] {
-
+private createEmptyImageSlots(): EntityImageSlot[] {
     return Array.from(
-      {
-        length:
-          this.additionalImagesCount
-      },
-      () => ({
-        previewUrl: null,
-        file: null,
-        attachment: null
-      })
+        { length: this.additionalImagesCount },
+        () => ({
+            previewUrl: null,
+            file: null,
+            attachment: null
+        })
     );
-  }
+}
 
-  /**
-   * Sets a value without emitting another
-   * field-change event.
-   */
-  private setPathWithoutEmit(
-    path: string,
-    value: any
-  ): void {
-
-    if (
-      !path ||
-      !this.entityData
-    ) {
-      return;
+private setPathWithoutEmit(path: string, value: any): void {
+    if (!path || !this.entityData) {
+        return;
     }
 
-    const properties =
-      path.split('.');
+    const keys = path.split('.');
+    const lastKey = keys.pop();
 
-    const lastProperty =
-      properties.pop();
-
-    if (!lastProperty) {
-      return;
+    if (!lastKey) {
+        return;
     }
 
-    const targetObject =
-      properties.reduce(
-        (
-          currentObject,
-          propertyName
-        ) => {
+    let target = this.entityData;
 
-          if (
-            currentObject[
-              propertyName
-            ] === null ||
-            currentObject[
-              propertyName
-            ] === undefined
-          ) {
-            currentObject[
-              propertyName
-            ] = {};
-          }
+    for (const key of keys) {
+        if (target[key] == null) {
+            target[key] = {};
+        }
 
-          return currentObject[
-            propertyName
-          ];
-        },
-        this.entityData
-      );
+        target = target[key];
+    }
 
-    targetObject[
-      lastProperty
-    ] = value;
-  }
+    target[lastKey] = value;
+}
 
-  /**
-   * Clears local upload state when closing
-   * or destroying the modal.
-   */
   clearLocalImages(): void {
     this.logoFile = null;
     this.coverFile = null;
-
     this.logoPreviewUrl = null;
     this.coverPreviewUrl = null;
-
-    this.logoExistingAttachment =
-      null;
-
-    this.bannerExistingAttachment =
-      null;
-
-    this.additionalImageSlots =
-      this.createEmptyImageSlots();
+    this.logoExistingAttachment = null;
+    this.bannerExistingAttachment = null;
+    this.additionalImageSlots =  this.createEmptyImageSlots();
   }
 
   getVisibleAdditionalImages():
-  EntityImageSlot[] {
+    EntityImageSlot[] {
 
-  if (this.mode === 'view') {
-    return this.additionalImageSlots.filter(
-      slot => !!slot.previewUrl
-    );
+    if (this.mode === 'view') {
+      return this.additionalImageSlots.filter(
+        slot => !!slot.previewUrl
+      );
+    }
+
+    return this.additionalImageSlots;
   }
 
-  return this.additionalImageSlots;
-}
+  isFieldVisible(field: EntityBasicInfoField): boolean {
 
-isFieldVisible(
-  field: EntityBasicInfoField
-): boolean {
+    if (this.mode === 'create' && field.hiddenInCreate
+    ) {
+      return false;
+    }
 
-  if (
-    this.mode === 'create' &&
-    field.hiddenInCreate
-  ) {
-    return false;
+    if (this.mode === 'edit' &&  field.hiddenInEdit
+    ) {
+      return false;
+    }
+
+    if (this.mode === 'view' && field.hiddenInView
+    ) {
+      return false;
+    }
+
+    return true;
   }
 
-  if (
-    this.mode === 'edit' &&
-    field.hiddenInEdit
-  ) {
-    return false;
-  }
-
-  if (
-    this.mode === 'view' &&
-    field.hiddenInView
-  ) {
-    return false;
-  }
-
-  return true;
-}
-
-
-
-get account(): any {
-  return this.entityData?.account ?? {};
-}
-
-get isManualAccount(): boolean {
-  return this.account?.isManual === true;
-}
-
-get isConnectedAccount(): boolean {
-  return this.account?.isConnected === true;
-}
 
 isFieldDisabled(
-  field: EntityBasicInfoField
+    field: EntityBasicInfoField
 ): boolean {
 
-  if (this.mode === 'view') {
+    if (this.mode === 'view') {
+        return true;
+    }
+
+    if (field.readonly) {
+        return true;
+    }
+
+    if (
+        field.key in this.fieldPermissions &&
+        this.fieldPermissions[field.key] === false
+    ) {
+        return true;
+    }
+
+    if (this.mode === 'create') {
+        return field.key === 'ssin';
+    }
+
+    if (this.mode === 'edit') {
+        return (
+            field.key === 'code' ||
+            field.key === 'ssin'
+        );
+    }
+
     return true;
-  }
+}
 
-  if (field.readonly) {
-    return true;
-  }
+  get canEditImages(): boolean {
+    if (this.mode === 'create') {
+      return true;
+    }
 
-  if (
-    field.key in this.fieldPermissions &&
-    this.fieldPermissions[field.key] === false
-  ) {
-    return true;
-  }
-
-  // Create: Code editable, SSIN remains readonly.
-  if (this.mode === 'create') {
-    return field.key === 'ssin';
-  }
-
-  // Connected account: no basic fields editable.
-  if (
-    this.mode === 'edit' &&
-    this.isConnectedAccount
-  ) {
-    return true;
-  }
-
-  // Manual account: everything except Code and SSIN.
-  if (
-    this.mode === 'edit' &&
-    this.isManualAccount
-  ) {
     return (
-      field.key === 'code' ||
-      field.key === 'ssin'
+      this.mode === 'edit' 
     );
   }
 
-  return true;
-}
-
-get canEditImages(): boolean {
-  if (this.mode === 'create') {
-    return true;
-  }
-
-  return (
-    this.mode === 'edit' &&
-    this.isManualAccount &&
-    !this.isConnectedAccount
-  );
-}
-
-get isBasicInfoValid(): boolean {
-  const name =
-    this.getValue(this.namePath);
-
-  if (
-    typeof name !== 'string' ||
-    !name.trim()
-  ) {
-    return false;
-  }
-
-  if (!this.requireAccountType) {
-    return true;
-  }
-
-  const accountTypeId =
-    this.getValue(
-      this.accountTypePath
-    );
-
-  return !!accountTypeId;
-}
   ngOnDestroy(): void {
     this.clearLocalImages();
   }
