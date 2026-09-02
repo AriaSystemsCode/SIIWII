@@ -756,7 +756,7 @@ namespace onetouch.AppMarketplaceItems
 
                     //    }
                     //}
-                    if (!string.IsNullOrEmpty(input.PriceLevel))
+                    if (!string.IsNullOrEmpty(input.PriceLevel) && input.PriceLevel.ToLower()!= "undefined")
                     {
                         level = input.PriceLevel;
                     }
