@@ -456,7 +456,14 @@ this.bsConfig = {
     selectAddress() {
         this.selectAddressModal.show(undefined, this.accountId);
     }
-    addressSelected(address: AppAddressDto) {
+    addressSelected(selection: AppAddressDto | { address: AppAddressDto; wasUpdated: boolean }) {
+        const address = selection instanceof AppAddressDto
+            ? selection
+            : selection.address;
+
+        if (!address) {
+            return;
+        }
         this.eventAddress = "";
         if(this.event?.address?.id){
             this.event.address = new AppEntityAddressDto();
