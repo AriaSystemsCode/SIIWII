@@ -743,7 +743,7 @@
                                                     <div class="flex-grow-1 mr-1 account-page">
 
                                                         <p-dropdown *ngIf="accountLevel == accountLevelEnum.Manual"
-                                                            (onChange)="changeTouchState()"
+                                                           (onChange)="onAccountTypeChange($event)"
                                                             #manualAccountTypeInput="ngModel"
                                                             placeholder="{{ 'Account Type' | localize }} *"
                                                             [options]="accountTypes"
