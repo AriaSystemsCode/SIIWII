@@ -116,6 +116,7 @@ import { TransactionModule } from "./main/transactions/transaction.module";
 import { NotesModule } from "./admin/shared/notes/notes.module";
 import { OverALLRatingReviewsModule } from "./main/overallRating-reviews/overallRating-reviews.module";
 import { EntityShellModule } from "./shared/entity-shell/entity-shell.module";
+import { ViewHostModule } from "./main/global-entity-view-host/global-entity-view-host.module";
 
 @NgModule({
     declarations: [
@@ -223,7 +224,8 @@ import { EntityShellModule } from "./shared/entity-shell/entity-shell.module";
         TransactionModule,
 
         OverALLRatingReviewsModule,
-        EntityShellModule
+        EntityShellModule,
+        ViewHostModule
     ],
 
     providers: [

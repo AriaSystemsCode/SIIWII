@@ -32,22 +32,14 @@ export class GlobalEntityViewHostComponent
 
 
   @ViewChild('accountEntity')
-  accountEntity:
-    AccountEntityComponent;
+  accountEntity:  AccountEntityComponent;
 
-
-  private maximizeSubscription:
-    Subscription;
-
-
-  private activeItem:
-    MinimizedEntityItem | null =
-    null;
+  private maximizeSubscription: Subscription;
+  private activeItem:  MinimizedEntityItem | null =  null;
 
 
   constructor(
-    private entityWindowManager:
-      EntityWindowManagerService
+    private entityWindowManager: EntityWindowManagerService
   ) {}
 
 
@@ -76,8 +68,6 @@ export class GlobalEntityViewHostComponent
       return;
     }
 
-
-
     if (
       this.activeItem &&
       this.activeItem.key !== item.key
@@ -93,84 +83,42 @@ export class GlobalEntityViewHostComponent
 
       case 'Account':
 
-        this.openAccount(
-          item
-        );
-
+        this.openAccount(item);
         break;
-
-
       case 'Contact':
-
         break;
-
-
       case 'Branch':
-
         break;
     }
   }
 
 
-  private openAccount(
-    item: MinimizedEntityItem
-  ): void {
-
-    const accountId =
-      Number(
-        item.entityId
-      );
-
-
-    if (
-      !accountId ||
-      !this.accountEntity
-    ) {
+  private openAccount(item: MinimizedEntityItem): void {
+    const accountId = Number(item.entityId);
+    if (!accountId || !this.accountEntity) {
       return;
     }
-
-
-    this.activeItem =
-      item;
-
-    this.entityWindowManager
-      .remove(
-        item.key
-      );
-
-    this.accountEntity
-      .view(
-        accountId
-      );
+    this.activeItem =  item;
+    this.entityWindowManager.remove(item.key);
+    this.accountEntity.view(accountId);
   }
 
 
-  private minimizeCurrentEntity():
-    void {
-
-    if (
-      !this.activeItem
-    ) {
+  private minimizeCurrentEntity():void {
+    if (!this.activeItem) {
       return;
     }
-
-
     switch (
       this.activeItem.entityType
     ) {
 
       case 'Account':
-
-        this.accountEntity
-          ?.minimizeAccount();
-
+        this.accountEntity?.minimizeAccount();
         break;
-
 
       case 'Contact':
 
         break;
-
 
       case 'Branch':
 
@@ -179,27 +127,15 @@ export class GlobalEntityViewHostComponent
   }
 
 
-  onAccountMinimized(
-    accountId: number
-  ): void {
-
-
-    this.activeItem =
-      null;
+  onAccountMinimized(accountId: number): void {
+    this.activeItem = null;
   }
 
-
-  onAccountClosed():
-    void {
-
-    this.activeItem =
-      null;
+  onAccountClosed(): void {
+    this.activeItem =null;
   }
-
 
   ngOnDestroy(): void {
-
-    this.maximizeSubscription
-      ?.unsubscribe();
+    this.maximizeSubscription?.unsubscribe();
   }
 }
