@@ -118,7 +118,7 @@
   > .image-upload-container {
   width: 100% !important;
   max-width: 100%;
-  border-radius: 4px;
+  border-radius: 12px;
   overflow: hidden;
 }
 
@@ -126,7 +126,7 @@
   .cover-upload-wrapper
   .uploadfilecontainer {
   width: 100%;
-  border: 1px solid #bcbcbc;
+  border: 1px dashed #bcbcbc;
   background-color: #fafafa;
 }
 
@@ -134,7 +134,7 @@
 ::ng-deep
   .logo-upload-wrapper
   .image-upload-container {
-  border-radius: 4px;
+  border-radius: 12px;
   overflow: hidden;
 }
 
@@ -376,4 +376,14 @@
 
   .model {
     z-index: 9999999999999999999999 !important;
+  }
+
+
+  .deleteBtn {
+    border: 1px solid #d36f75;
+      color: #d36f75;;
+
+    i {
+      color: #d36f75;;
+    }
   }

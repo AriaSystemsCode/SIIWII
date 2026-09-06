@@ -366,8 +366,16 @@
 
               <div class="kt-grid__item kt-grid__item--fluid kt-grid kt-grid--hor " [ngClass]="{'rout-c':!hideTopbar && !isArabic && isAuthenticated,'rout-c-ar':!hideTopbar && isArabic && isAuthenticated , 'addMGtop':!isAuthenticated}">
 
-                  <router-outlet></router-outlet>
+             <router-outlet>
+</router-outlet>
+
+
               </div>
+          <app-global-entity-view-host>
+</app-global-entity-view-host>
+
+<app-minimized-entity-tray>
+</app-minimized-entity-tray>
               <footer-bar></footer-bar>
           </div>
       </div>

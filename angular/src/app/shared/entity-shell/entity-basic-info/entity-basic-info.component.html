@@ -56,6 +56,13 @@
     <div class="basic-info-actions">
 
       <!-- View mode -->
+            <button *ngIf="mode === 'view'  && canDetele" type="button" class="btn deleteBtn  entity-action-button"  (click)="deleteClicked()">
+
+        <i class="fa fa-trash mr-1"></i>
+
+        {{ 'Delete' | localize }}
+
+      </button>
       <button *ngIf="mode === 'view'" type="button" class="btn bgPurple entity-action-button" [disabled]="
           saving ||
           uploading
@@ -66,6 +73,8 @@
         {{ 'Edit' | localize }}
 
       </button>
+
+    
 
       <!-- Create/Edit mode -->
       <ng-container *ngIf="
@@ -139,7 +148,7 @@
           <app-image-upload *ngIf="
         canEditImages &&
         bannerAttachmentCategory
-      " [sycAttachmentCategory]="bannerAttachmentCategory" [attachmentTypeCode]="'BANNER'" [staticWidth]="bannerWidth"
+      " [sycAttachmentCategory]="bannerAttachmentCategory" [attachmentTypeCode]="'BANNER'" [staticWidth]="1193"
             [staticHeight]="bannerHeight" [showGuidelines]="false" [image]="coverPreviewUrl" [isDisabled]="
     !canEditImages ||
     saving ||

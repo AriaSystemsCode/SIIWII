@@ -42,6 +42,7 @@ export class EntityBasicInfoComponent
 
   @Input()  saving = false;
   @Input()  uploading = false;
+  @Input()  canDetele = false;
 
   @Input()  bannerWidth = 1050;
   @Input() bannerHeight = 180;
@@ -58,6 +59,7 @@ export class EntityBasicInfoComponent
   @Output()  attachmentRemove =  new EventEmitter<EntityImageRemoveEvent>();
 
   @Output()  edit = new EventEmitter<void>();
+  @Output()  delete = new EventEmitter<void>();
   @Output()  save =   new EventEmitter<void>();
   @Output()  cancel =  new EventEmitter<void>();
 
@@ -195,6 +197,12 @@ setValue(path: string, value: any): void {
 
     this.edit.emit();
   }
+    deleteClicked
+(): void {
+
+    this.delete.emit();
+  }
+
 
   saveClicked(): void {
     if (

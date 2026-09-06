@@ -1,0 +1,75 @@
+<div
+  *ngIf="(items$ | async) as items"
+  class="minimized-tray"
+  [class.visible]="items.length > 0">
+
+  <div
+    *ngIf="items.length > 0"
+    class="minimized-items">
+
+    <div
+      *ngFor="let item of items"
+      class="minimized-item"
+      (click)="maximize(item)">
+
+      <div class="entity-info">
+
+           <button
+          type="button"
+          class="tray-action-btn maximize-btn"
+          title="Maximize"
+          (click)="
+            $event.stopPropagation();
+            maximize(item)
+          ">
+
+          <i class="fa fa-window-maximize"></i>
+
+        </button>
+
+        <div class="entity-text">
+          <span class="entity-title">
+            {{ item.title }}
+          </span>
+
+      
+        </div>
+
+      </div>
+
+      <div class="entity-actions">
+
+  
+
+        <button
+          type="button"
+          class="tray-action-btn close-btn"
+          title="Close"
+          (click)="close($event, item)">
+
+          <i class="fa fa-times"></i>
+
+        </button>
+
+      </div>
+
+    </div>
+
+
+    <div class="tray-divider"></div>
+
+
+    <button
+      type="button"
+      class="close-all-btn"
+      (click)="closeAll()">
+
+      <i class="fa fa-times mr-2"></i>
+
+      <span>Close all</span>
+
+    </button>
+
+  </div>
+
+</div>

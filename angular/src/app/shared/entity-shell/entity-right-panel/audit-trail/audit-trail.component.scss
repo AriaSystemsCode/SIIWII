@@ -1,0 +1,160 @@
+:host {
+  display: block;
+
+  width: 100%;
+}
+
+
+.audit-trail {
+  width: 100%;
+
+  padding: 6px 12px 10px;
+
+  background: #ffffff;
+}
+
+
+/* ============================================================
+   ITEM
+   ============================================================ */
+
+.audit-item {
+  position: relative;
+
+  padding:
+    8px
+    0
+    8px
+    13px;
+}
+
+
+.audit-item-content {
+  display: flex;
+
+  align-items: flex-start;
+
+  justify-content: space-between;
+
+  gap: 12px;
+}
+
+
+/* ============================================================
+   DOT
+   ============================================================ */
+
+.audit-dot {
+  position: absolute;
+
+  left: 1px;
+  top: 15px;
+
+  width: 4px;
+  height: 4px;
+
+  border-radius: 50%;
+
+  background: #c7c1c9;
+}
+
+
+/* ============================================================
+   INFORMATION
+   ============================================================ */
+
+.audit-info {
+  min-width: 0;
+
+  flex: 1;
+}
+
+
+.audit-action {
+  display: flex;
+
+  align-items: center;
+
+  gap: 4px;
+
+  color: #aaa4ac;
+
+  font-size: 12px;
+
+  line-height: 1.3;
+}
+
+
+.audit-user {
+  font-weight: 500;
+}
+
+.audit-text {
+    gap: 4px;
+}
+.audit-entity {
+  margin-top: 2px;
+
+  color: #c0bbc2;
+
+  font-size: 12px;
+
+  line-height: 1.3;
+
+  overflow: hidden;
+
+  white-space: nowrap;
+
+  text-overflow: ellipsis;
+}
+
+
+/* ============================================================
+   DATE
+   ============================================================ */
+
+.audit-date {
+  flex-shrink: 0;
+
+  padding-top: 1px;
+
+  color: #bbb5bd;
+
+  font-size: 11px;
+
+  line-height: 1.3;
+
+  white-space: nowrap;
+}
+
+
+.show-more-btn {
+        border: none;
+    background: transparent;
+    color: #4A0D4A;
+    font-weight: 600;
+}
+/* ============================================================
+   LOADING / EMPTY
+   ============================================================ */
+
+.audit-state {
+  min-height: 100px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  gap: 7px;
+
+  color: #aaa4ac;
+
+  font-size: 12px;
+}
+
+
+.audit-empty {
+  color: #bbb5bd;
+}

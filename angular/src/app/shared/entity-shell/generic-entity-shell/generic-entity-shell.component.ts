@@ -43,6 +43,8 @@ export class GenericEntityShellComponent
   @Input() imageAttachmentCategory: SycAttachmentCategoryDto;
 
   @Input()  saving = false;
+  @Input()  canDetele = false;
+  
   @Input()  uploading = false;
   @Input() loading = false;
   @Input() showMedia = true;
@@ -67,6 +69,7 @@ export class GenericEntityShellComponent
   @Output()  imageChange =   new EventEmitter<any>();
   @Output()  attachmentRemove =   new EventEmitter<any>();
   @Output()  edit =   new EventEmitter<void>();
+  @Output()  delete =   new EventEmitter<void>();
   @Output()  save =  new EventEmitter<void>();
   @Output()  cancel =   new EventEmitter<void>();
   @Output()  close =   new EventEmitter<void>();
@@ -375,6 +378,15 @@ private renderSelectedEntity(): void {
     this.rightPanelCollapsed = true;
 
     this.currentEditor.editEntity?.();
+  }
+
+
+   deleteCurrentEntity(): void {
+    if (!this.dynamicEntityActive) {
+      this.delete.emit();
+      return;
+    }
+
   }
 
   saveCurrentEntity(): void {

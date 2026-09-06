@@ -38,6 +38,7 @@ import { MenuItem } from "primeng/api";
 import { DatePipe } from "@angular/common";
 import { TransactionInformationComponent } from "@app/main/transactions/app-TransactionTabsInfo/Components/transaction-information-component/transaction-information.component";
 import Swal from "sweetalert2";
+import { EntityWindowManagerService } from "../entity-shell/services/entity-window-manager.service";
 
 
 @Component({
@@ -120,6 +121,8 @@ export class TopBarComponent extends ThemesLayoutBaseComponent implements OnInit
         private _AppTransactionServiceProxy: AppTransactionServiceProxy,
         private _AppEntitiesServiceProxy: AppEntitiesServiceProxy   ,
         private _accountsServiceProxy: AccountsServiceProxy,
+          private entityWindowManager:
+    EntityWindowManagerService
     ) {
         super(injector);
         this.showMainSpinner();
@@ -328,6 +331,7 @@ export class TopBarComponent extends ThemesLayoutBaseComponent implements OnInit
     }
 
     logout(): void {
+          this.entityWindowManager.clearOnLogout();
         this._authService.logout();
     }
 

@@ -30,6 +30,7 @@ import { EntityShellModule } from '@app/shared/entity-shell/entity-shell.module'
 import { AccordionModule } from "primeng/accordion";
 import { SharedDynamicInputsModule } from '@shared/shared-module';
 import { ContactGenericComponent } from './components/contact-generic/contact-generic.component';
+import { AccountEntityComponent } from './components/account-entity/account-entity.component';
 
 
 @NgModule({
@@ -38,7 +39,8 @@ import { ContactGenericComponent } from './components/contact-generic/contact-ge
         AccountsListFiltersComponent,
         AccountCardComponent,
         AccountSectionsComponent,
-        ContactGenericComponent
+        ContactGenericComponent,
+        AccountEntityComponent
     ],
     imports: [
         CommonModule,
@@ -78,7 +80,8 @@ import { ContactGenericComponent } from './components/contact-generic/contact-ge
         AccountsComponent,
         AccountsListFiltersComponent,
         AccountCardComponent,
-        AccountSectionsComponent
+        AccountSectionsComponent,
+        AccountEntityComponent
     ]
 })
 export class AccountSharedModule { }

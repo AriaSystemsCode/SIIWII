@@ -64,6 +64,7 @@ import { EntityMessagesComponent } from './entity-right-panel/entity-messages/en
 import { InteractionsModule } from '@app/main/interactions/interactions.module';
 import { TransactionModule } from '@app/main/transactions/transaction.module';
 import { NotesModule } from '@app/admin/shared/notes/notes.module';
+import { MinimizedEntityTrayComponent } from './minimized-entity-tray/minimized-entity-tray.component';
 
 
 
@@ -137,6 +138,7 @@ import { NotesModule } from '@app/admin/shared/notes/notes.module';
         AuditTrailComponent,
         RelatedEntitiesComponent,
         EntityMessagesComponent,
+        MinimizedEntityTrayComponent,
 
     ],
     exports: [
@@ -150,6 +152,7 @@ import { NotesModule } from '@app/admin/shared/notes/notes.module';
           AuditTrailComponent,
         RelatedEntitiesComponent,
         EntityMessagesComponent,
+        MinimizedEntityTrayComponent
 
 
     ],

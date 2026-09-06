@@ -379,7 +379,7 @@
 
 
 
-  <p-accordionTab header="{{ 'Relationship' | localize }}" *ngIf="!isContact">
+  <p-accordionTab header="{{ 'Relationship' | localize }}" *ngIf="!isContact && mode !== 'create'">
 
     <div *ngIf="connectionsInfo?.length" class="relationship-section">
 

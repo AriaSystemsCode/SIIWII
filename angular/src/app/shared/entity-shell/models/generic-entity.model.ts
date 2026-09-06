@@ -287,3 +287,45 @@ export interface BranchAddressSection {
 
   newAddress: any;
 }
+
+
+
+
+export interface MinimizedEntityWindow {
+
+  key: string;
+
+  entityType: string;
+
+  entityId:
+    number | string;
+
+  title: string;
+
+  mode:
+    'view' |
+    'edit' |
+    'create';
+
+  entity: any;
+
+  entityData: any;
+
+  minimizedAt: number;
+}
+
+// minimized-entity.model.ts
+
+export interface MinimizedEntityItem {
+  key: string;
+  entityType: 'Account' | 'Contact' | 'Branch' | string;
+
+  entityId: number | string;
+
+  title: string;
+
+  // optional lightweight reference/object
+  entity?: any;
+
+  minimizedAt: number;
+}

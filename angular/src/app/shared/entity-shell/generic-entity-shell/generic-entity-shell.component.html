@@ -176,6 +176,7 @@
           [entityData]="displayedEntityData"
           [mode]="displayedMode"
 
+          [canDetele]="canDetele"
           [entityTypes]="entityTypes"
           [statuses]="statuses"
           [fields]="displayedBasicInfoFields"
@@ -230,7 +231,7 @@
           (attachmentRemove)="
             onRootAttachmentRemove($event)
           "
-
+(delete)="deleteCurrentEntity()"
           (edit)="editCurrentEntity()"
           (save)="saveCurrentEntity()"
           (cancel)="cancelCurrentEntity()">
