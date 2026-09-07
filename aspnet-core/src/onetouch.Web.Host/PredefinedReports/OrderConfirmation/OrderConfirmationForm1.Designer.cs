@@ -129,6 +129,9 @@ namespace onetouch.Web.PredefinedReports.OrderConfirmation {
             this.userId = reportInitializer.GetParameter("userId");
             this.roleType = reportInitializer.GetParameter("roleType");
             this.saveToPDF = reportInitializer.GetParameter("saveToPDF");
+            this.contactName = reportInitializer.GetParameter("contactName");
+            this.contactEmail = reportInitializer.GetParameter("contactEmail");
+            this.contactPhoneNumber = reportInitializer.GetParameter("contactPhoneNumber");
 
             // Data Sources
             this.sqlDataSource1 = reportInitializer.GetDataSource<DevExpress.DataAccess.Sql.SqlDataSource>("sqlDataSource1");
@@ -250,5 +253,8 @@ namespace onetouch.Web.PredefinedReports.OrderConfirmation {
         private DevExpress.XtraReports.Parameters.Parameter userId;
         private DevExpress.XtraReports.Parameters.Parameter roleType;
         private DevExpress.XtraReports.Parameters.Parameter saveToPDF;
+        private DevExpress.XtraReports.Parameters.Parameter contactName;
+        private DevExpress.XtraReports.Parameters.Parameter contactEmail;
+        private DevExpress.XtraReports.Parameters.Parameter contactPhoneNumber;
     }
 }
