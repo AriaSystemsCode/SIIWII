@@ -1,5 +1,5 @@
 ﻿import { Component, Injector, ViewEncapsulation, OnInit, Input, ViewChild, ChangeDetectorRef, } from '@angular/core';
-import { CurrencyInfoDto, AccountsServiceProxy, CreateOrEditAccountInfoDto, AppEntitiesServiceProxy, LookupLabelDto, AppEntityClassificationDto, AppEntityCategoryDto, SycAttachmentCategoriesServiceProxy, SycAttachmentCategorySycAttachmentCategoryLookupTableDto, GetSycAttachmentCategoryForViewDto, AppEntityAttachmentDto, BranchDto, AppContactAddressDto, TreeNodeOfGetSycEntityObjectCategoryForViewDto, TreeNodeOfGetSycEntityObjectClassificationForViewDto, AccountLevelEnum, GetAccountInfoForEditOutput, GetAccountForViewDto, AccountDto, SessionServiceProxy, ContactDto, MemberFilterTypeEnum, SycEntityObjectClassificationDto, SycIdentifierDefinitionsServiceProxy, SycAttachmentCategoryDto, MarketplaceAccountsServiceProxy, AppEntityExtraDataDto, ConnectionInfo, AppTransactionServiceProxy } from '@shared/service-proxies/service-proxies';
+import { CurrencyInfoDto, AccountsServiceProxy, CreateOrEditAccountInfoDto, AppEntitiesServiceProxy, LookupLabelDto, AppEntityClassificationDto, AppEntityCategoryDto, SycAttachmentCategoriesServiceProxy, SycAttachmentCategorySycAttachmentCategoryLookupTableDto, GetSycAttachmentCategoryForViewDto, AppEntityAttachmentDto, BranchDto, AppContactAddressDto, TreeNodeOfGetSycEntityObjectCategoryForViewDto, TreeNodeOfGetSycEntityObjectClassificationForViewDto, AccountLevelEnum, GetAccountInfoForEditOutput, GetAccountForViewDto, AccountDto, SessionServiceProxy, ContactDto, MemberFilterTypeEnum, SycEntityObjectClassificationDto, SycIdentifierDefinitionsServiceProxy, SycAttachmentCategoryDto, MarketplaceAccountsServiceProxy, AppEntityExtraDataDto, ConnectionInfo, AppTransactionServiceProxy, SycEntityObjectTypesServiceProxy } from '@shared/service-proxies/service-proxies';
 import { AppComponentBase } from '@shared/common/app-component-base';
 import { appModuleAnimation } from '@shared/animations/routerTransition';
 import { ActivatedRoute } from '@angular/router';
@@ -168,7 +168,8 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit {
         private _activatedRoute: ActivatedRoute,
         private _sycIdentifierDefinitionsServiceProxy: SycIdentifierDefinitionsServiceProxy,
         private _marketplaceAccountsServiceProxy: MarketplaceAccountsServiceProxy,
-        private AppTransactionServiceProxy: AppTransactionServiceProxy
+        private AppTransactionServiceProxy: AppTransactionServiceProxy,
+           private _sycEntityObjectTypesServiceProxy: SycEntityObjectTypesServiceProxy,
 
 
 
@@ -184,20 +185,14 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit {
 
 
   async ngOnInit() {
-
-    this.roles = [
-        { name: 'Buyer' },
-        { name: 'Seller' },
-        { name: 'Sales Rep' },
-        { name: 'Buying Office' },
-    ];
+  
 
     if (this.accountLevel == null) {
         this.accountLevel =
             AccountLevelEnum.Profile;
     }
 
-    // IMPORTANT
+
     this.getAllForAccountInfo();
 
     await this.handleComponentMode();
@@ -342,12 +337,6 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit {
                 case this.accountInfoPageTabsEnum[
                     AccountInfoPageTabs.ProfileCreateOrEdit
                 ]:
-
-                    /*
-                     * IMPORTANT:
-                     * Manual / Connected / External accounts
-                     * must use GetAccountForEdit.
-                     */
                     if (
                         this.accountDataForView?.isManual === true ||
                         this.accountDataForView?.isConnected === true ||
@@ -355,15 +344,13 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit {
                         this.isExternalAccountEdit
                     ) {
                         this.getAccountDataForEdit();
+                         
                         break;
                     }
 
-                    /*
-                     * Only real My Account
-                     * uses GetMyAccountForEdit.
-                     */
                     if (this.isMyAccount) {
                         this.getMyAccountDataForEdit();
+                        
                     }
 
                     break;
@@ -522,14 +509,7 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit {
         }
 
     }
-    catch (error) {
 
-        console.error(
-            'Error loading account profile:',
-            error
-        );
-
-    }
     finally {
 
         // Allow correct UI to render
@@ -545,9 +525,6 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit {
 }
 
     loadInitData() {
-        // if (this.accountInfoTemp)
-        //     this.accountInfoTemp.currencyId = this.tenantDefaultCurrency.value;
-
         this.getLanguages();
         this.getCurrencies();
         this.getPhoneTypes();
@@ -571,26 +548,6 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit {
             });
     }
 
-    // getAccountTypes() {
-    //     this._AppEntitiesServiceProxy.getAllAccountTypesForTableDropdown()
-    //         .subscribe(result => {
-    //             const list = result ?? [];
-
-    //             // const business = list.find(x => x.label === 'Business'); // x is scoped here
-    //             // this.accountTypes = business ? [business] : [];
-
-    //             this.accountTypes = list.filter(x =>
-    //                 x?.code === 'BUSINESS' || x?.code === 'PERSONAL'
-    //             );
-
-
-
-    //         });
-    //     // pick the id field your DTO actually uses:
-    //     this.accountInfoTemp.accountTypeId = 19;
-    //     this.accountInfoTemp.accountType = 'Business';
-
-    // }
 getAccountTypes(): void {
 
     this._AppEntitiesServiceProxy
@@ -607,12 +564,6 @@ getAccountTypes(): void {
                         x?.code === 'PERSONAL'
                 );
 
-            /*
-             * Don't overwrite account type here.
-             *
-             * GetMyAccountForEdit decides whether
-             * My Account is Personal or Business.
-             */
         });
 }
 
@@ -631,6 +582,7 @@ getAccountTypes(): void {
                 this.getForEditResult = res
                 this.setProfileData(res)
                 this.setSelectedMarketplaceRoles();
+                 this.getExtrAttributes()
 
             })
     }
@@ -661,7 +613,7 @@ getAccountTypes(): void {
 
         // This now sets accountTypeId = 21 immediately
         this.setProfileData(result);
-
+ this.getExtrAttributes()
         this.setSelectedMarketplaceRoles();
 
 
@@ -742,23 +694,9 @@ getAccountTypes(): void {
 
     } finally {
 
-        /*
-         * ONLY allow template rendering
-         * after type has been resolved.
-         */
         this.accountTypeResolved = true;
     }
 }
-    // resetFormData() {
-    //     this.touched = false
-    //     this.accountInfoTemp = new CreateOrEditAccountInfoDto()
-    //     this.accountInfoForm.resetForm()
-    //     this.setProfileData(this.getForEditResult)
-    //     this.accountInfoForm.form.patchValue(this.accountInfoTemp.toJSON())
-    //     this.companyLogo = this.accountDataForView?.logoUrl ? `${this.attachmentBaseUrl}/${this.accountDataForView?.logoUrl}` : undefined;
-    //     this.coverPhoto = this.accountDataForView?.coverUrl ? `${this.attachmentBaseUrl}/${this.accountDataForView?.coverUrl}` : undefined;
-    //     this.changeTab(!this.accountInfoTemp?.id && !this.accountId ? this.accountInfoPageTabsEnum.ProfileCreateOrEdit : this.accountInfoPageTabsEnum.ProfileView)
-    // }
 
     resetFormData(): void {
 
@@ -1433,9 +1371,6 @@ getAccountTypes(): void {
             return;
         }
 
-        /*
-         * Real profile only.
-         */
         this.saveMyAccount();
     }
     private ensureAttribute(attrId: number): void {
@@ -2338,17 +2273,29 @@ getAccountTypes(): void {
         ];
     }
 
-    setSelectedMarketplaceRoles(): void {
-        const marketplaceRole = this.accountInfoTemp?.entityExtraData?.find(
-            x => x.attributeCode === 'MARKETPLACE-ROLE'
-        );
+  setSelectedMarketplaceRoles(): void {
+    const marketplaceRole =
+        this.accountInfoTemp
+            ?.entityExtraData
+            ?.find(
+                x =>
+                    x.attributeCode ===
+                    'MARKETPLACE-ROLE'
+            );
 
-        this.selectedRoles = marketplaceRole?.attributeValue
-            ? marketplaceRole.attributeValue.split('-').filter(x => x)
+    this.selectedRoles =
+        marketplaceRole?.attributeValue
+            ? marketplaceRole
+                .attributeValue
+                .split('-')
+                .map(role => role.trim())
+                .filter(Boolean)
             : [];
 
-        this.previousSelectedRoles = [...this.selectedRoles];
-    }
+    this.previousSelectedRoles = [
+        ...this.selectedRoles
+    ];
+}
 
 
     loginTenaneSsin: string;
@@ -2806,5 +2753,144 @@ get currentAccountTypeId(): number | null {
 
 get isPersonalAccount(): boolean {
     return this.currentAccountTypeId === 21;
+}
+
+
+currentAccountType(): string | null {
+
+    return (
+        this.accountDataForView?.accountType ??
+        this.accountInfoTemp?.accountType ??
+        null
+    );
+}
+
+
+///////////////////
+
+getExtrAttributes(): void {
+    const accountType =
+        this.accountInfoTemp?.accountType;
+
+    if (!accountType) {
+        this.roles = [];
+        return;
+    }
+
+    this._sycEntityObjectTypesServiceProxy
+        .getAllWithExtraAttributesByCode(
+            accountType,
+            ''
+        )
+        .subscribe(result => {
+
+            const accountTypeData =
+                result?.[0];
+
+            const marketplaceRoleAttribute =
+                accountTypeData
+                    ?.extraAttributes
+                    ?.extraAttributes
+                    ?.find(
+                        x =>
+                            x.code ===
+                            'MARKETPLACE-ROLE'
+                    );
+
+            if (!marketplaceRoleAttribute) {
+                this.roles = [];
+
+                if (!this.accountInfoTemp?.id) {
+                    this.selectedRoles = [];
+                }
+
+                return;
+            }
+
+            // =========================================
+            // Marketplace Role Options
+            // =========================================
+
+            this.roles =
+                (
+                    marketplaceRoleAttribute
+                        .validEntries || ''
+                )
+                    .split('|')
+                    .map(role => role.trim())
+                    .filter(Boolean)
+                    .map(role => ({
+                        name: role
+                    }));
+
+
+            // =========================================
+            // EDIT
+            // Keep roles already saved on account
+            // =========================================
+
+            if (this.accountInfoTemp?.id) {
+
+                this.setSelectedMarketplaceRoles();
+
+                return;
+            }
+
+
+            // =========================================
+            // CREATE
+            // Select API default roles
+            // =========================================
+
+            this.selectedRoles =
+                (
+                    marketplaceRoleAttribute
+                        .defaultValue || ''
+                )
+                    .split('|')
+                    .map(role => role.trim())
+                    .filter(Boolean);
+
+
+            this.previousSelectedRoles = [
+                ...this.selectedRoles
+            ];
+
+            this.updateMarketplaceRolesExtraData();
+        });
+}
+
+onAccountTypeChange(event: any): void {
+    const accountTypeId = event?.value;
+
+    this.accountInfoTemp.accountTypeId =
+        accountTypeId;
+
+    switch (accountTypeId) {
+        case 19:
+            this.accountInfoTemp.accountType =
+                'BUSINESS';
+            break;
+
+        case 21:
+            this.accountInfoTemp.accountType =
+                'PERSONAL';
+            break;
+
+        default:
+            this.accountInfoTemp.accountType =
+                '';
+            break;
+    }
+
+    if (
+        !this.accountInfoTemp.accountType
+    ) {
+        this.roles = [];
+        this.selectedRoles = [];
+        return;
+    }
+
+    this.getExtrAttributes();
 }
 }

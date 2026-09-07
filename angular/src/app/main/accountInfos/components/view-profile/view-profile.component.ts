@@ -1,5 +1,5 @@
 import { Component, ViewChild, Injector, Input, OnInit, OnChanges, SimpleChanges, Output, EventEmitter } from '@angular/core';
-import { AccountDto, AccountLevelEnum, AccountsServiceProxy, AppEntitiesServiceProxy, AppEntityAttachmentDto, AppEntityExtraDataDto, LookupLabelDto, SycAttachmentCategoryDto } from '@shared/service-proxies/service-proxies';
+import { AccountDto, AccountLevelEnum, AccountsServiceProxy, AppEntitiesServiceProxy, AppEntityAttachmentDto, AppEntityExtraDataDto, LookupLabelDto, SycAttachmentCategoryDto, SycEntityObjectTypesServiceProxy } from '@shared/service-proxies/service-proxies';
 import { AppComponentBase } from '@shared/common/app-component-base';
 import { NgImageSliderComponent } from 'ng-image-slider';
 import { AppConsts } from '@shared/AppConsts';
@@ -111,9 +111,9 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
     // NEW: keep originals so Cancel can revert
     private _originalLogoUrl?: string;
     private _originalCoverUrl?: string;
-  roles:any
-            selectedRoles!: any[];
-
+roles: any[] = [];
+selectedRoles: string[] = [];
+previousSelectedRoles: string[] = [];
 
             @Input() createMode = false;
 
@@ -131,25 +131,15 @@ cancelEdit =
         injector: Injector,
         private _appEntitiesServiceProxy: AppEntitiesServiceProxy,
         private _AccountsServiceProxy: AccountsServiceProxy,
+        private _sycEntityObjectTypesServiceProxy: SycEntityObjectTypesServiceProxy,
         private _tokenService: TokenService,
     ) {
         super(injector)
     }
 
-    // ngOnChanges(changes: SimpleChanges) {
-    //     if (this.accountData) {
-    //         this.handleAccountData()
-    //         this.initDepartmentVariables(true);
-    //         this.initClassificationVariables(true);
-    //         // this.getContactSync();
-    //         this.getLanguages()
-    //         this.setSelectedMarketplaceRoles();
-    //         this.isRecordOwner = this.accountData?.id == this.appSession.user?.accountId ? true : false
-    //     }
 
-    // }
 
-    ngOnChanges(
+ngOnChanges(
     changes: SimpleChanges
 ): void {
 
@@ -172,10 +162,14 @@ cancelEdit =
 
         this.getLanguages();
 
-        this.setSelectedMarketplaceRoles();
+
+        // Load available Marketplace Roles
+        // based on account type
+        this.getExtrAttributes();
+
 
         this.isRecordOwner =
-            this.accountData?.id ==
+            this.accountData?.id ===
             this.appSession.user?.accountId;
     }
 
@@ -206,24 +200,28 @@ cancelEdit =
             false;
     }
 }
-    ngOnInit() {
-                this.roles = [
-            { name: 'Buyer' },
-            { name: 'Seller' },
-            { name: 'Sales Rep' },
-            { name: 'Buying Office' },
-         
-        ];
-        this.getAllForAccountInfo()
-        this.allPriceLevel = this.getPriceLevel();
-        this.allPriceLevel.push({ label: 'MSRP', value: 'MSRP' });
+   ngOnInit(): void {
+    this.getAllForAccountInfo();
 
-        this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
-        this.currentLang == 'ar' || this.currentLang == 'ar-EG'  ? this.isArabic = true : this.isArabic = false
-        this.initUploaders();
+    this.allPriceLevel =
+        this.getPriceLevel();
 
-    }
+    this.allPriceLevel.push({
+        label: 'MSRP',
+        value: 'MSRP'
+    });
 
+    this.currentLang =
+        abp.utils.getCookieValue(
+            'Abp.Localization.CultureName'
+        );
+
+    this.isArabic =
+        this.currentLang === 'ar' ||
+        this.currentLang === 'ar-EG';
+
+    this.initUploaders();
+}
     prevImageClick() {
         this.slider.prev();
     }
@@ -886,13 +884,26 @@ private getBooleanExtraDataValue(
 
 
 get marketplaceRolesList(): string[] {
-  const roleItem = this.entityExtraData?.find(
-    x => x.attributeId === 610
-  );
 
-  return roleItem?.attributeValue
-    ? roleItem.attributeValue.split('-').filter(Boolean)
-    : [];
+    const extraData =
+        this.accountData?.entityExtraData ||
+        this.entityExtraData ||
+        [];
+
+    const roleItem =
+        extraData.find(
+            x =>
+                x.attributeId === 610 ||
+                x.attributeCode ===
+                'MARKETPLACE-ROLE'
+        );
+
+    return roleItem?.attributeValue
+        ? roleItem.attributeValue
+            .split('-')
+            .map(x => x.trim())
+            .filter(Boolean)
+        : [];
 }
 
 
@@ -994,13 +1005,32 @@ updateMarketplaceRolesExtraData(): void {
 
 
 setSelectedMarketplaceRoles(): void {
-  const marketplaceRole = this.entityExtraData?.find(
-    x => x.attributeId === 610
-  );
 
-  this.selectedRoles = marketplaceRole?.attributeValue
-    ? marketplaceRole.attributeValue.split('-').filter(Boolean)
-    : [];
+    const extraData =
+        this.accountData?.entityExtraData ||
+        this.entityExtraData ||
+        [];
+
+    const marketplaceRole =
+        extraData.find(
+            x =>
+                x.attributeId === 610 ||
+                x.attributeCode ===
+                'MARKETPLACE-ROLE'
+        );
+
+    this.selectedRoles =
+        marketplaceRole?.attributeValue
+            ? marketplaceRole
+                .attributeValue
+                .split('-')
+                .map(x => x.trim())
+                .filter(Boolean)
+            : [];
+
+    this.previousSelectedRoles = [
+        ...this.selectedRoles
+    ];
 }
 
 
@@ -1160,5 +1190,84 @@ private ensurePersonalModels(): void {
     } else {
         this.contactData.entityAttachments ??= [];
     }
+}
+
+getExtrAttributes(): void {
+
+    const accountType =
+        this.accountData?.accountType;
+
+    if (!accountType) {
+        this.roles = [];
+        return;
+    }
+
+    this._sycEntityObjectTypesServiceProxy
+        .getAllWithExtraAttributesByCode(
+            accountType,
+            ''
+        )
+        .subscribe(result => {
+
+            const marketplaceRoleAttribute =
+                result?.[0]
+                    ?.extraAttributes
+                    ?.extraAttributes
+                    ?.find(
+                        x =>
+                            x.code ===
+                            'MARKETPLACE-ROLE'
+                    );
+
+            if (!marketplaceRoleAttribute) {
+                this.roles = [];
+
+                if (this.createMode) {
+                    this.selectedRoles = [];
+                }
+
+                return;
+            }
+
+
+            // Available roles
+            this.roles =
+                (
+                    marketplaceRoleAttribute
+                        .validEntries || ''
+                )
+                    .split('|')
+                    .map(x => x.trim())
+                    .filter(Boolean)
+                    .map(x => ({
+                        name: x
+                    }));
+
+
+            // CREATE
+            if (this.createMode) {
+
+                this.selectedRoles =
+                    (
+                        marketplaceRoleAttribute
+                            .defaultValue || ''
+                    )
+                        .split('|')
+                        .map(x => x.trim())
+                        .filter(Boolean);
+
+                this.previousSelectedRoles = [
+                    ...this.selectedRoles
+                ];
+
+                this.updateMarketplaceRolesExtraData();
+
+                return;
+            }
+
+
+            // EDIT
+            this.setSelectedMarketplaceRoles();
+        });
 }
 }
