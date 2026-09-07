@@ -95371,6 +95371,8 @@ export interface IShareTransactionByMessageResultDto {
 export class TenantContactRole implements ITenantContactRole {
     contactRole!: string | undefined;
     contactName!: string | undefined;
+    contactEmail!: string | undefined;
+    contactPhoneNumber!: string | undefined;
 
     [key: string]: any;
 
@@ -95391,6 +95393,8 @@ export class TenantContactRole implements ITenantContactRole {
             }
             this.contactRole = _data["contactRole"];
             this.contactName = _data["contactName"];
+            this.contactEmail = _data["contactEmail"];
+            this.contactPhoneNumber = _data["contactPhoneNumber"];
         }
     }
 
@@ -95409,6 +95413,8 @@ export class TenantContactRole implements ITenantContactRole {
         }
         data["contactRole"] = this.contactRole;
         data["contactName"] = this.contactName;
+        data["contactEmail"] = this.contactEmail;
+        data["contactPhoneNumber"] = this.contactPhoneNumber;
         return data;
     }
 }
@@ -95416,6 +95422,8 @@ export class TenantContactRole implements ITenantContactRole {
 export interface ITenantContactRole {
     contactRole: string | undefined;
     contactName: string | undefined;
+    contactEmail: string | undefined;
+    contactPhoneNumber: string | undefined;
 
     [key: string]: any;
 }

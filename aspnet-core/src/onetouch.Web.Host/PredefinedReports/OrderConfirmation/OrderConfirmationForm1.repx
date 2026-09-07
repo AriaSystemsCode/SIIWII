@@ -13,6 +13,9 @@
     <Item7 Ref="11" Description="userId" ValueInfo="0" Name="userId" Type="#Ref-3" />
     <Item8 Ref="12" Description="roleType" ValueInfo="Seller" Name="roleType" />
     <Item9 Ref="14" Description="saveToPDF" ValueInfo="False" Name="saveToPDF" Type="#Ref-13" />
+    <Item10 Ref="278" Description="contactName" Name="contactName" />
+    <Item11 Ref="279" Description="contactEmail" Name="contactEmail" />
+    <Item12 Ref="280" Description="contactPhoneNumber" Name="contactPhoneNumber" />
   </Parameters>
   <CalculatedFields>
     <Item1 Ref="15" Name="calculatedField1" DataMember="AppTransactionHeaders.AppTransactionHeadersAppTransactionDetails" />
@@ -48,35 +51,35 @@
             </Item1>
             <Item2 Ref="31" ControlType="XRLabel" Name="label21" Multiline="true" Text="xrLabel1" TextAlignment="TopLeft" SizeF="559.14624,31.0167236" LocationFloat="94.87778,41.9520264" Dpi="254" Font="Arial, 8pt" Padding="5,5,0,0,254">
               <ExpressionBindings>
-                <Item1 Ref="32" EventName="BeforePrint" PropertyName="Text" Expression="[AppTransactionHeadersseller_address].[Name]" />
+                <Item1 Ref="32" EventName="BeforePrint" PropertyName="Text" Expression="iif(?roleType='Independent Buying Office', [AppTransactionHeadersbuyer_address].[Name], [AppTransactionHeadersseller_address].[Name])" />
                 <Item2 Ref="33" EventName="BeforePrint" PropertyName="Visible" Expression="?roleType='Independent Sales Rep' or ?roleType='Independent Buying Office'&#xA;" />
               </ExpressionBindings>
               <StylePriority Ref="34" UseFont="false" UseTextAlignment="false" />
             </Item2>
             <Item3 Ref="35" ControlType="XRLabel" Name="label26" Multiline="true" Text="xrLabel1" TextAlignment="TopLeft" SizeF="559.14624,31.0167236" LocationFloat="93.87778,149.455048" Dpi="254" Font="Arial, 8pt" Padding="5,5,0,0,254">
               <ExpressionBindings>
-                <Item1 Ref="36" EventName="BeforePrint" PropertyName="Text" Expression="[AppTransactionHeadersseller_address].[City]+', '+[AppTransactionHeadersseller_address].[State]+','+[AppTransactionHeadersseller_address].[PostalCode]" />
+                <Item1 Ref="36" EventName="BeforePrint" PropertyName="Text" Expression="iif(?roleType='Independent Buying Office', [AppTransactionHeadersbuyer_address].[City]+', '+[AppTransactionHeadersbuyer_address].[State]+','+[AppTransactionHeadersbuyer_address].[PostalCode], [AppTransactionHeadersseller_address].[City]+', '+[AppTransactionHeadersseller_address].[State]+','+[AppTransactionHeadersseller_address].[PostalCode])" />
                 <Item2 Ref="37" EventName="BeforePrint" PropertyName="Visible" Expression="?roleType='Independent Sales Rep' or ?roleType='Independent Buying Office'&#xA;" />
               </ExpressionBindings>
               <StylePriority Ref="38" UseFont="false" UseTextAlignment="false" />
             </Item3>
             <Item4 Ref="39" ControlType="XRLabel" Name="label31" Multiline="true" Text="xrLabel1" TextAlignment="TopLeft" SizeF="559.14624,31.0167542" LocationFloat="94.87778,184.855011" Dpi="254" Font="Arial, 8pt" Padding="5,5,0,0,254">
               <ExpressionBindings>
-                <Item1 Ref="40" EventName="BeforePrint" PropertyName="Text" Expression="[AppTransactionHeadersseller_address].[CountryCode]" />
+                <Item1 Ref="40" EventName="BeforePrint" PropertyName="Text" Expression="iif(?roleType='Independent Buying Office', [AppTransactionHeadersbuyer_address].[CountryCode], [AppTransactionHeadersseller_address].[CountryCode])" />
                 <Item2 Ref="41" EventName="BeforePrint" PropertyName="Visible" Expression="?roleType='Independent Sales Rep' or ?roleType='Independent Buying Office'&#xA;" />
               </ExpressionBindings>
               <StylePriority Ref="42" UseFont="false" UseTextAlignment="false" />
             </Item4>
             <Item5 Ref="43" ControlType="XRLabel" Name="label41" Multiline="true" Text="xrLabel1" TextAlignment="TopLeft" SizeF="559.14624,31.0166626" LocationFloat="94.87778,114.207977" Dpi="254" Font="Arial, 8pt" Padding="5,5,0,0,254">
               <ExpressionBindings>
-                <Item1 Ref="44" EventName="BeforePrint" PropertyName="Text" Expression="[AppTransactionHeadersseller_address].[AddressLine2]" />
+                <Item1 Ref="44" EventName="BeforePrint" PropertyName="Text" Expression="iif(?roleType='Independent Buying Office', [AppTransactionHeadersbuyer_address].[AddressLine2], [AppTransactionHeadersseller_address].[AddressLine2])" />
                 <Item2 Ref="45" EventName="BeforePrint" PropertyName="Visible" Expression="?roleType='Independent Sales Rep' or ?roleType='Independent Buying Office'&#xA;" />
               </ExpressionBindings>
               <StylePriority Ref="46" UseFont="false" UseTextAlignment="false" />
             </Item5>
             <Item6 Ref="47" ControlType="XRLabel" Name="label42" Multiline="true" Text="xrLabel1" TextAlignment="TopLeft" SizeF="559.14624,31.0167236" LocationFloat="94.87778,76.8080139" Dpi="254" Font="Arial, 8pt" Padding="5,5,0,0,254">
               <ExpressionBindings>
-                <Item1 Ref="48" EventName="BeforePrint" PropertyName="Text" Expression="[AppTransactionHeadersseller_address].[AddressLine1]" />
+                <Item1 Ref="48" EventName="BeforePrint" PropertyName="Text" Expression="iif(?roleType='Independent Buying Office', [AppTransactionHeadersbuyer_address].[AddressLine1], [AppTransactionHeadersseller_address].[AddressLine1])" />
                 <Item2 Ref="49" EventName="BeforePrint" PropertyName="Visible" Expression="?roleType='Independent Sales Rep' or ?roleType='Independent Buying Office'&#xA;" />
               </ExpressionBindings>
               <StylePriority Ref="50" UseFont="false" UseTextAlignment="false" />
@@ -168,25 +171,25 @@
         </Item5>
         <Item6 Ref="92" ControlType="XRLabel" Name="label15" Multiline="true" Text="xrLabel1" TextAlignment="TopLeft" SizeF="356.8568,57.0970459" LocationFloat="1199.45386,302.7207" Dpi="254" Font="Arial, 8pt, style=Bold" Padding="5,5,0,0,254">
           <ExpressionBindings>
-            <Item1 Ref="93" EventName="BeforePrint" PropertyName="Text" Expression="'Phone: '+[AppTransactionHeadersCreator_address].[ContactPhoneNumber]" />
+            <Item1 Ref="93" EventName="BeforePrint" PropertyName="Text" Expression="'Phone: '+iif(IsNullOrEmpty(?contactPhoneNumber), [AppTransactionHeadersCreator_address].[ContactPhoneNumber], ?contactPhoneNumber)" />
           </ExpressionBindings>
           <StylePriority Ref="94" UseFont="false" UseTextAlignment="false" />
         </Item6>
         <Item7 Ref="95" ControlType="XRLabel" Name="label14" Multiline="true" Text="xrLabel1" TextAlignment="TopLeft" SizeF="520.898438,57.0970459" LocationFloat="601.8922,302.7207" Dpi="254" Font="Arial, 8pt, style=Bold" Padding="5,5,0,0,254">
           <ExpressionBindings>
-            <Item1 Ref="96" EventName="BeforePrint" PropertyName="Text" Expression="'Email: '+[AppTransactionHeadersCreator_address].[ContactEmail]" />
+            <Item1 Ref="96" EventName="BeforePrint" PropertyName="Text" Expression="'Email: '+iif(IsNullOrEmpty(?contactEmail), [AppTransactionHeadersCreator_address].[ContactEmail], ?contactEmail)" />
           </ExpressionBindings>
           <StylePriority Ref="97" UseFont="false" UseTextAlignment="false" />
         </Item7>
         <Item8 Ref="98" ControlType="XRLabel" Name="label13" Multiline="true" Text="xrLabel1" TextAlignment="TopLeft" SizeF="392.66922,57.0970459" LocationFloat="22.5208721,302.7207" Dpi="254" Font="Arial, 8pt, style=Bold" Padding="5,5,0,0,254">
           <ExpressionBindings>
-            <Item1 Ref="99" EventName="BeforePrint" PropertyName="Text" Expression="'Contact: '+  [AppTransactionHeadersCreator_address].[ContactName]" />
+            <Item1 Ref="99" EventName="BeforePrint" PropertyName="Text" Expression="'Contact: '+iif(IsNullOrEmpty(?contactName), [AppTransactionHeadersCreator_address].[ContactName], ?contactName)" />
           </ExpressionBindings>
           <StylePriority Ref="100" UseFont="false" UseTextAlignment="false" />
         </Item8>
         <Item9 Ref="101" ControlType="XRLabel" Name="label12" Multiline="true" Text="xrLabel1" TextAlignment="TopLeft" SizeF="338.3359,38.5762329" LocationFloat="18.520853,238.379562" Dpi="254" Font="Arial, 8pt" Padding="5,5,0,0,254">
           <ExpressionBindings>
-            <Item1 Ref="102" EventName="BeforePrint" PropertyName="Text" Expression="'Role: '+  iif([TenantOwner]=?tenantId,Trim(Substring([EnteredUserByRole],6 )),[AppTransactionHeadersCreator_address].[ContactRole])" />
+            <Item1 Ref="102" EventName="BeforePrint" PropertyName="Text" Expression="'Role: '+?roleType" />
           </ExpressionBindings>
           <StylePriority Ref="103" UseFont="false" UseTextAlignment="false" />
         </Item9>

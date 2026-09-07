@@ -1345,8 +1345,10 @@ loadCommentsList() {
 
         // Asynchronous handling for setting orderConfirmationRole
         this._AppTransactionServiceProxy.getTenantRoleInTransaction(this.orderId, this.appTransactionsForViewDto.tenantId).subscribe((res) => {
-          this.printInfoParam.orderConfirmationRole = res.contactRole ? res.contactRole : 'buyer';
-          this.printInfoParam.contactName = res.contactName ? res.contactName : 'Savty';
+          this.printInfoParam.orderConfirmationRole = res.contactRole ? this.getTransactionRole(res.contactRole) : 'Buyer';
+          this.printInfoParam.contactName = res.contactName ?? '';
+          this.printInfoParam.contactEmail = res.contactEmail ?? '';
+          this.printInfoParam.contactPhoneNumber = res.contactPhoneNumber ?? '';
 
 
 
@@ -1397,8 +1399,10 @@ loadCommentsList() {
           const printInfoParam = new ProductCatalogueReportParams();
 
           // Set fetched data
-          printInfoParam.orderConfirmationRole = res.contactRole;
+          printInfoParam.orderConfirmationRole = this.getTransactionRole(res.contactRole);
           printInfoParam.contactName = res.contactName;
+          printInfoParam.contactEmail = res.contactEmail;
+          printInfoParam.contactPhoneNumber = res.contactPhoneNumber;
           printInfoParam.reportTemplateName = this.transactionReportTemplateName;
           printInfoParam.saveToPDF = true;
           printInfoParam.userId = this.appSession?.userId;
