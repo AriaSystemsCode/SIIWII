@@ -39,4 +39,12 @@ export class ReportViewerComponent extends AppComponentBase implements AfterView
             this.parametersSubmitted.emit()
         })
     }
+
+    onExport(event: any): void {
+        const antiForgeryToken = abp.utils.getCookieValue('XSRF-TOKEN');
+
+        if (antiForgeryToken) {
+            event.args.FormData['__RequestVerificationToken'] = antiForgeryToken;
+        }
+    }
 }
