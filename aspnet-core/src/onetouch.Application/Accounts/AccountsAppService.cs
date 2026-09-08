@@ -311,14 +311,26 @@ namespace onetouch.Accounts
                     //    x.ItemSharingFkList.Count(c => c.SharedUserId == AbpSession.UserId)>0))>0)))
                     //   .OrderByDescending(z=>z.EntityFk.LastModificationTime != null ? z.EntityFk.LastModificationTime: z.EntityFk.CreationTime)
                     //   ;
-                    var entitiesList = dbContext.AppEntities.Where(z => (((z.ObjectId == postObjectId &&
-     dbContext.AppEntitiesRelationships.Any(x => x.EntityId == z.Id && x.RelatedEntityTypeCode == "EVENT") == false
+                    var entitiesList = dbContext.AppEntities.Where(z => (((z.ObjectId == postObjectId
+     //               &&
+     //dbContext.AppEntitiesRelationships.Any(x => x.EntityId == z.Id && x.RelatedEntityTypeCode == "EVENT") == false
      ) || z.ObjectId == eventObjectId) && z.TenantId == account.TenantOwner)
      || (z.ObjectId == contactObjectId && z.TenantId == null && z.TenantOwner == account.TenantOwner &&
+     z.EntityObjectTypeCode !="BRANCH"  &&
      dbContext.AppMarketplaceContacts.Any(x => x.SSIN == z.SSIN && x.SharingLevel == 1)) ||
-     (z.ObjectId == itemListObjectId && z.TenantId == null && z.TenantOwner == account.TenantOwner &&
+     (z.ObjectId == itemListObjectId && z.EntityObjectTypeCode !="SALESORDER"
+     && z.EntityObjectTypeCode !="PURCHASEORDER" && z.TenantId == null && z.TenantOwner == account.TenantOwner &&
      (dbContext.AppMarketplaceItems.Any(x => x.SSIN == z.SSIN && (x.SharingLevel == 1 ||
-     x.ItemSharingFkList.Any(c => c.SharedUserId == AbpSession.UserId))))));
+     x.ItemSharingFkList.Any(c => c.SharedUserId == AbpSession.UserId)))))).
+     Select(z=>new { z.Id,
+         //z.SSIN,
+         z.EntityObjectTypeCode ,
+     z.TenantOwner,
+     z.TenantId,
+     z.ObjectId,
+     //z.LastModificationTime,
+     //z.CreationTime
+     });
 
                     var appEntityAttach = dbContext.AppEntityAttachments
                         .Join(entitiesList
@@ -326,12 +338,12 @@ namespace onetouch.Accounts
  (attach, entity) => new      // Result selector
  {
      Id = attach.Id,
-     EntityId = attach.EntityFk.Id,
-     EntityTenantOwner = attach.EntityFk.TenantOwner,
+    // EntityId = attach.EntityFk.Id,
+     //EntityTenantOwner = attach.EntityFk.TenantOwner,
      EntityTenantId = attach.EntityFk.TenantId,
      EntityObjectId = attach.EntityFk.ObjectId,
-     EntitySSIN = attach.EntityFk.SSIN,
-     EntityLastModificationTime = attach.EntityFk.LastModificationTime != null ? attach.EntityFk.LastModificationTime : attach.EntityFk.CreationTime,//z.EntityFk.LastModificationTime,
+    // EntitySSIN = attach.EntityFk.SSIN,
+     //EntityLastModificationTime = attach.EntityFk.LastModificationTime != null ? attach.EntityFk.LastModificationTime : attach.EntityFk.CreationTime,//z.EntityFk.LastModificationTime,
                                                                                                                                                      //EntityCreationTime = z.EntityFk.CreationTime,
      Name = attach.AttachmentFk.Name,
      Attachment = attach.AttachmentFk.Attachment,
