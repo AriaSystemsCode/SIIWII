@@ -1722,16 +1722,24 @@ namespace onetouch.AppMarketplaceAccounts
                 //I40 -MMT  -Account Attachment[End]
 
                 if (newId == 0)
-                { newId = await _appMarketplaceContactRepository.InsertAndGetIdAsync(appMarketplaceContact); }
+                {
+                    var x = UnitOfWorkManager.Current.GetDbContext<onetouchDbContext>();
+                    x.ChangeTracker.Clear();
+                    var savedMarketplaceContact = await _appMarketplaceContactRepository.InsertAsync(appMarketplaceContact);
+                    await CurrentUnitOfWork.SaveChangesAsync();
+                    if (savedMarketplaceContact != null)
+                        newId = savedMarketplaceContact.Id;
+                        //newId = await _appMarketplaceContactRepository.InsertAndGetIdAsync(appMarketplaceContact); 
+                }
                 else
                 {
                     appMarketplaceContact.Id = newId;
                     var x = UnitOfWorkManager.Current.GetDbContext<onetouchDbContext>();
                     x.ChangeTracker.Clear();
                     await _appMarketplaceContactRepository.UpdateAsync(appMarketplaceContact);
-
+                    await CurrentUnitOfWork.SaveChangesAsync();
                 }
-                await CurrentUnitOfWork.SaveChangesAsync();
+                
 
 
                 //HIA - share Account related branches [Start]

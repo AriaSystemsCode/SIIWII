@@ -11155,13 +11155,14 @@ namespace onetouch.Accounts
                                     var returnVal =
                                         await _iCreateMarketplaceAccount.CreateOrEditMarketplaceContactRelationship(contactFortCurrTenant.SSIN, acc.SSIN, false, false, null, null);
                                 }
-                                await _iCreateMarketplaceAccount.HideAccount(acc.SSIN);
+                               
                             }
                             else
                             {
                                 var returnVal =
                                        await _iCreateMarketplaceAccount.CreateOrEditMarketplaceContactRelationship(contactFortCurrTenant.SSIN, acc.SSIN, false, false, null, null);
                             }
+                            await _iCreateMarketplaceAccount.HideAccount(acc.SSIN);
                         }
                         foreach (var acc in manualAccounts)
                         {
