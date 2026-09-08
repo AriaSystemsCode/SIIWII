@@ -623,11 +623,11 @@ namespace onetouch.Accounts
                         var relationShipLookups = await _appEntityRepository.GetAll().AsNoTracking().Include(z => z.EntityExtraData)
                             .Where(z => z.EntityObjectTypeId == marketplaceRelationshipSycEntityObjId).ToListAsync();
 
-                        var relationshipsListAll = await _appContactRelationshipInfoRepository.GetAll()
+                        /*var relationshipsListAll = await _appContactRelationshipInfoRepository.GetAll()
                             .AsNoTracking().Where(z => (((z.RecipientContactSSIN == currentTenantAccount.SSIN)
                                      || (z.RequesterContactSSIN == currentTenantAccount.SSIN))
                                      && z.EntityObjectStatusId != inActiveRelationshipStatusId)
-                                    ).OrderByDescending(z => z.CreationTime).ToListAsync();
+                                    ).OrderByDescending(z => z.CreationTime).ToListAsync();*/
                         foreach (var account in accountsList)
                         {
                             account.AvailableConnections = new List<ConnectionType>();
@@ -638,10 +638,20 @@ namespace onetouch.Accounts
                             if(account.Account.Id > 0)
                             {
                                 // account.ConnectionName = GetAction(account.Account.AccountType, currentTenantAccount, false);
-                                var relationshipsList = relationshipsListAll
+                                /*var relationshipsList = relationshipsListAll
                                      .Where(z => (((z.RequesterContactSSIN == account.Account.SSIN)
                                      || (z.RecipientContactSSIN == account.Account.SSIN )) && z.EntityObjectStatusId != inActiveRelationshipStatusId)
-                                    ).OrderByDescending(z => z.CreationTime).ToList();
+                                    ).OrderByDescending(z => z.CreationTime).ToList();*/
+
+                                var relationshipsList = await _appContactRelationshipInfoRepository.GetAll()
+                            .AsNoTracking().Where(z => (((z.RecipientContactSSIN == currentTenantAccount.SSIN ||
+                            z.RequesterContactSSIN == account.Account.SSIN)
+                                     || (z.RequesterContactSSIN == currentTenantAccount.SSIN ||
+                                     z.RecipientContactSSIN== account.Account.SSIN))
+                                     && z.EntityObjectStatusId != inActiveRelationshipStatusId)
+                                    ).OrderByDescending(z => z.CreationTime).ToListAsync();
+
+
                                 if (relationshipsList != null && relationshipsList.Count > 0)
                                 {
                                     foreach (var relationship in relationshipsList)
