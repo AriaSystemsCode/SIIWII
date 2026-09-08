@@ -311,34 +311,61 @@ namespace onetouch.Accounts
                     //    x.ItemSharingFkList.Count(c => c.SharedUserId == AbpSession.UserId)>0))>0)))
                     //   .OrderByDescending(z=>z.EntityFk.LastModificationTime != null ? z.EntityFk.LastModificationTime: z.EntityFk.CreationTime)
                     //   ;
-                    var appEntityAttach = dbContext.AppEntityAttachments.AsNoTracking()
-                        .Select(z => new
-                        {
-                            z.Id,
-                            EntityId = z.EntityFk.Id,
-                            EntityTenantOwner = z.EntityFk.TenantOwner,
-                            EntityTenantId = z.EntityFk.TenantId,
-                            EntityObjectId = z.EntityFk.ObjectId,
-                            EntitySSIN = z.EntityFk.SSIN,
-                            EntityLastModificationTime = z.EntityFk.LastModificationTime != null ? z.EntityFk.LastModificationTime : z.EntityFk.CreationTime,//z.EntityFk.LastModificationTime,
-                            //EntityCreationTime = z.EntityFk.CreationTime,
-                            Name = z.AttachmentFk.Name,
-                            Attachment = z.AttachmentFk.Attachment,
-                            z.AttachmentCategoryId
-                        })
-     //.Where(z => //(z.AttachmentCategoryId == catgImage || z.AttachmentCategoryId == catgVideo) &&
-     //  z.EntityFk.TenantId == null && z.EntityFk.TenantOwner == account.OwnerId)
-     //.Where(z => ((z.EntityFk.EntityObjectTypeId != entityObjectTypePOId &&  z.EntityFk.EntityObjectTypeId != entityObjectTypeSoId)
-     //&& z.EntityFk.TenantId == null && z.EntityFk.TenantOwner == account.OwnerId && z.EntityFk.EntityAttachments.Count() > 0) ||
-     .Where(z => (((z.EntityObjectId == postObjectId &&
-     dbContext.AppEntitiesRelationships.AsNoTracking().Count(x => x.EntityId == z.EntityId && x.RelatedEntityTypeCode == "EVENT") == 0
-     ) || z.EntityObjectId == eventObjectId) && z.EntityTenantId == account.TenantOwner)
-     || (z.EntityObjectId == contactObjectId && z.EntityTenantId == null && z.EntityTenantOwner == account.TenantOwner &&
-     dbContext.AppMarketplaceContacts.AsNoTracking().Any(x => x.SSIN == z.EntitySSIN && x.SharingLevel == 1)) ||
-     (z.EntityObjectId == itemListObjectId && z.EntityTenantId == null && z.EntityTenantOwner == account.TenantOwner &&
-     (dbContext.AppMarketplaceItems.AsNoTracking().Any(x => x.SSIN == z.EntitySSIN && (x.SharingLevel == 1 ||
-     x.ItemSharingFkList.Any(c => c.SharedUserId == AbpSession.UserId))))))
-    .OrderByDescending(z => z.EntityLastModificationTime);
+                    var entitiesList = dbContext.AppEntities.Where(z => (((z.ObjectId == postObjectId &&
+     dbContext.AppEntitiesRelationships.Any(x => x.EntityId == z.Id && x.RelatedEntityTypeCode == "EVENT") == false
+     ) || z.ObjectId == eventObjectId) && z.TenantId == account.TenantOwner)
+     || (z.ObjectId == contactObjectId && z.TenantId == null && z.TenantOwner == account.TenantOwner &&
+     dbContext.AppMarketplaceContacts.Any(x => x.SSIN == z.SSIN && x.SharingLevel == 1)) ||
+     (z.ObjectId == itemListObjectId && z.TenantId == null && z.TenantOwner == account.TenantOwner &&
+     (dbContext.AppMarketplaceItems.Any(x => x.SSIN == z.SSIN && (x.SharingLevel == 1 ||
+     x.ItemSharingFkList.Any(c => c.SharedUserId == AbpSession.UserId))))));
+
+                    var appEntityAttach = dbContext.AppEntityAttachments
+                        .Join(entitiesList
+                        , z => z.EntityId, x => x.Id,
+ (attach, entity) => new      // Result selector
+ {
+     Id = attach.Id,
+     EntityId = attach.EntityFk.Id,
+     EntityTenantOwner = attach.EntityFk.TenantOwner,
+     EntityTenantId = attach.EntityFk.TenantId,
+     EntityObjectId = attach.EntityFk.ObjectId,
+     EntitySSIN = attach.EntityFk.SSIN,
+     EntityLastModificationTime = attach.EntityFk.LastModificationTime != null ? attach.EntityFk.LastModificationTime : attach.EntityFk.CreationTime,//z.EntityFk.LastModificationTime,
+                                                                                                                                                     //EntityCreationTime = z.EntityFk.CreationTime,
+     Name = attach.AttachmentFk.Name,
+     Attachment = attach.AttachmentFk.Attachment,
+     AttachmentCategoryId = attach.AttachmentCategoryId
+ }
+                        );
+                        //.AsNoTracking()
+                        //.Select(z => new
+    //                    {
+    //                        z.Id,
+    //                        EntityId = z.EntityFk.Id,
+    //                        EntityTenantOwner = z.EntityFk.TenantOwner,
+    //                        EntityTenantId = z.EntityFk.TenantId,
+    //                        EntityObjectId = z.EntityFk.ObjectId,
+    //                        EntitySSIN = z.EntityFk.SSIN,
+    //                        EntityLastModificationTime = z.EntityFk.LastModificationTime != null ? z.EntityFk.LastModificationTime : z.EntityFk.CreationTime,//z.EntityFk.LastModificationTime,
+    //                        //EntityCreationTime = z.EntityFk.CreationTime,
+    //                        Name = z.AttachmentFk.Name,
+    //                        Attachment = z.AttachmentFk.Attachment,
+    //                        z.AttachmentCategoryId
+    //                    })
+    // //.Where(z => //(z.AttachmentCategoryId == catgImage || z.AttachmentCategoryId == catgVideo) &&
+    // //  z.EntityFk.TenantId == null && z.EntityFk.TenantOwner == account.OwnerId)
+    // //.Where(z => ((z.EntityFk.EntityObjectTypeId != entityObjectTypePOId &&  z.EntityFk.EntityObjectTypeId != entityObjectTypeSoId)
+    // //&& z.EntityFk.TenantId == null && z.EntityFk.TenantOwner == account.OwnerId && z.EntityFk.EntityAttachments.Count() > 0) ||
+    // .Where(z => (((z.EntityObjectId == postObjectId &&
+    // dbContext.AppEntitiesRelationships.Any(x => x.EntityId == z.EntityId && x.RelatedEntityTypeCode == "EVENT") == false
+    // ) || z.EntityObjectId == eventObjectId) && z.EntityTenantId == account.TenantOwner)
+    // || (z.EntityObjectId == contactObjectId && z.EntityTenantId == null && z.EntityTenantOwner == account.TenantOwner &&
+    // dbContext.AppMarketplaceContacts.Any(x => x.SSIN == z.EntitySSIN && x.SharingLevel == 1)) ||
+    // (z.EntityObjectId == itemListObjectId && z.EntityTenantId == null && z.EntityTenantOwner == account.TenantOwner &&
+    // (dbContext.AppMarketplaceItems.Any(x => x.SSIN == z.EntitySSIN && (x.SharingLevel == 1 ||
+    // x.ItemSharingFkList.Any(c => c.SharedUserId == AbpSession.UserId))))))
+    //.OrderByDescending(z => z.EntityLastModificationTime);
                     //.Include(z => z.EntityFk)
                     //.Include(z => z.AttachmentFk);
                     //    .Where(z => z.Id == _appEntityAttachmentRepository.GetAll().Include(z=>z.AttachmentFk).Where(r => r.AttachmentFk.Name == z.AttachmentFk.Name)
@@ -358,7 +385,7 @@ namespace onetouch.Accounts
                                        AttachmentCategoryId = t.AttachmentCategoryId,
                                        Id = t.Id,
                                    };
-                    var entities1 = entities.Where(z => z.Id == entities.Where(r => r.DisplayName == z.DisplayName)
+                   var entities1 = entities.Where(z => z.Id == entities.Where(r => r.DisplayName == z.DisplayName)
                     .Select(a => a.Id).FirstOrDefault());
                     /*var entities = from t in appEntityAttach
                                  join e in appEntities on t.EntityId equals e.Id into j
@@ -371,11 +398,11 @@ namespace onetouch.Accounts
                                      Id = t.Id,
 
                                  };*/
-
+                    totalCount = await entities1.CountAsync();
                     var pagedAndFilteredAccounts = entities1.PageBy(input);//.OrderBy("Id desc")
                     retrunResult = await pagedAndFilteredAccounts.ToListAsync();
 
-                    totalCount = await entities1.CountAsync();
+                    
 
 
 
