@@ -330,8 +330,8 @@ namespace onetouch.Accounts
      //  z.EntityFk.TenantId == null && z.EntityFk.TenantOwner == account.OwnerId)
      //.Where(z => ((z.EntityFk.EntityObjectTypeId != entityObjectTypePOId &&  z.EntityFk.EntityObjectTypeId != entityObjectTypeSoId)
      //&& z.EntityFk.TenantId == null && z.EntityFk.TenantOwner == account.OwnerId && z.EntityFk.EntityAttachments.Count() > 0) ||
-     .Where(z => (((z.EntityObjectId == postObjectId &&
-     dbContext.AppEntitiesRelationships.AsNoTracking().Count(x => x.EntityId == z.EntityId && x.RelatedEntityTypeCode == "EVENT") == 0
+     .Where(z => (((z.EntityObjectId == postObjectId //&&
+     //dbContext.AppEntitiesRelationships.AsNoTracking().Count(x => x.EntityId == z.EntityId && x.RelatedEntityTypeCode == "EVENT") == 0
      ) || z.EntityObjectId == eventObjectId) && z.EntityTenantId == account.TenantOwner)
      || (z.EntityObjectId == contactObjectId && z.EntityTenantId == null && z.EntityTenantOwner == account.TenantOwner &&
      dbContext.AppMarketplaceContacts.AsNoTracking().Any(x => x.SSIN == z.EntitySSIN && x.SharingLevel == 1)) ||
