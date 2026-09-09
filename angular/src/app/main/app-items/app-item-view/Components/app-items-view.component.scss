@@ -551,6 +551,26 @@
     margin-top: 160px !important;
 }
 
+:host-context([dir='rtl']) {
+    /* Keep the main details grid inside its parent in RTL. */
+    .extraDatacontainer > .row.details {
+        margin-right: 0;
+        margin-left: 0;
+    }
+
+    /* Mirror the extra start spacing on the second column for Arabic. */
+    .extraDatacontainer > .row.details > .col-6.pl-5 {
+        padding-right: 3rem !important;
+        padding-left: 0.75rem !important;
+    }
+
+    /* Prevent variation strip from being shifted outside the details row. */
+    .variation-center-row {
+        left: 0;
+        transform: none;
+    }
+}
+
 @media (max-width: 1024px) {
     .details {
         font-size: 14px;
@@ -568,6 +588,11 @@
     .extraDatacontainer > .details > .col-6:last-child {
         padding-left: 1.25rem !important;
     }
+
+    :host-context([dir='rtl']) .extraDatacontainer > .details > .col-6:last-child {
+        padding-right: 1.25rem !important;
+        padding-left: 0.75rem !important;
+    }
 }
 
 @media (max-width: 992px) {
@@ -579,6 +604,11 @@
     .extraDatacontainer > .details > .col-6:last-child {
         padding-left: 0.75rem !important;
         margin-top: 1rem;
+    }
+
+    :host-context([dir='rtl']) .extraDatacontainer > .details > .col-6:last-child {
+        padding-right: 0.75rem !important;
+        padding-left: 0.75rem !important;
     }
 
     .variation-center-row {
@@ -680,6 +710,10 @@
 
     .extraDatacontainer > .details > .col-6:last-child {
         padding-left: 0 !important;
+    }
+
+    :host-context([dir='rtl']) .extraDatacontainer > .details > .col-6:last-child {
+        padding-right: 0 !important;
     }
 
     .share-sync .share,
