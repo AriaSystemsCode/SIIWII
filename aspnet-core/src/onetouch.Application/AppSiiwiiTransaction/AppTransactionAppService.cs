@@ -7335,11 +7335,20 @@ namespace onetouch.AppSiiwiiTransaction
                           ContactName = o.ContactName,
                           ContactRole = o.ContactRole
                       };*/
-                    var joined = transactionContacts.Join(contacts, Z => Z.ContactSSIN, web => web.SSIN,
+                    var accountTransactionContacts = transactionContacts
+                        .Where(z => z.CompanySSIN == myAccount.SSIN)
+                        .ToList();
+                    var contactsForRoleLookup = accountTransactionContacts.Count > 0
+                        ? accountTransactionContacts
+                        : transactionContacts;
+
+                    var joined = contactsForRoleLookup.Join(contacts, Z => Z.ContactSSIN, web => web.SSIN,
                                 (Z, web) => new TenantContactRole
                                 {
                                     ContactName = Z.ContactName,
-                                    ContactRole = Z.ContactRole
+                                    ContactRole = Z.ContactRole,
+                                    ContactEmail = Z.ContactEmail,
+                                    ContactPhoneNumber = Z.ContactPhoneNumber
                                 });
 
                     //join b in  on a.ContactSSIN equals b.SSIN into j
@@ -7354,6 +7363,7 @@ namespace onetouch.AppSiiwiiTransaction
                         foreach (var cont in contList)
                         {
                             if (cont.ContactRole == ContactRoleEnum.Buyer.ToString() || cont.ContactRole == ContactRoleEnum.Seller.ToString() ||
+                                cont.ContactRole == ContactRoleEnum.BuyingOffice.ToString() ||
                                 cont.ContactRole == ContactRoleEnum.SalesRep1.ToString() || cont.ContactRole == ContactRoleEnum.SalesRep2.ToString())
                             {
                                 returnObj = cont;
@@ -7371,6 +7381,7 @@ namespace onetouch.AppSiiwiiTransaction
                             cont.CompanySSIN == myAccount.SSIN &&
                             (cont.ContactRole == ContactRoleEnum.Buyer.ToString() ||
                              cont.ContactRole == ContactRoleEnum.Seller.ToString() ||
+                             cont.ContactRole == ContactRoleEnum.BuyingOffice.ToString() ||
                              cont.ContactRole == ContactRoleEnum.SalesRep1.ToString() ||
                              cont.ContactRole == ContactRoleEnum.SalesRep2.ToString()));
 
@@ -7378,6 +7389,8 @@ namespace onetouch.AppSiiwiiTransaction
                         {
                             returnObj.ContactRole = accountContact.ContactRole;
                             returnObj.ContactName = accountContact.ContactName ?? myAccount.Name;
+                            returnObj.ContactEmail = accountContact.ContactEmail;
+                            returnObj.ContactPhoneNumber = accountContact.ContactPhoneNumber;
                         }
                     }
                 }
