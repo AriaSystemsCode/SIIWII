@@ -24,6 +24,7 @@ export class ViewFieldManagerComponent extends AppComponentBase implements OnIni
         tables: '',
         status: '',
         revision: 0,
+            revisionSequence: '00',
         fieldLevel: '',
         trackingNumber: '',
         allowNull: false,

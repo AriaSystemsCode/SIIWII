@@ -10,6 +10,8 @@
     border: 0;
     border-radius: 8px;
     box-shadow: 0 8px 30px rgba(27, 16, 27, .18);
+    max-height: 680px;
+    overflow-y: scroll;
 }
 
 .modal-header {
@@ -22,7 +24,7 @@
 }
 
 .modal-header {
-    min-height: 28px;
+  //  min-height: 28px;
     padding: 4px 8px;
     justify-content: center;
 }
@@ -48,7 +50,7 @@
 
 .field-section-title {
     margin: 0 0 8px;
-    color: #478bd2;
+    color: #4a0d4a;
     font-size: 12px;
     font-weight: 700;
 }
@@ -94,7 +96,7 @@ textarea.form-control.field-description {
 .field-form-section {
     margin: 14px -9px 0;
     padding: 10px 9px 3px;
-    border-top: 2px dashed #777;
+    //border-top: 2px dashed #777;
 }
 
 .dropdown-options-header {
@@ -169,6 +171,11 @@ textarea.form-control.field-description {
     box-shadow: 0 0 0 0.1rem rgba(74, 13, 74, 0.15);
 }
 
+select.form-control option:hover {
+    background: #4a0d4a;
+    color: #fff;
+}
+
 .checkbox {
     display: inline-flex;
     align-items: center;
@@ -191,6 +198,12 @@ textarea.form-control.field-description {
     border-top: 0;
 }
 
+
+.btn-primary{
+    background-color: #4a0d4a !important;
+    border-color: #4a0d4a !important;
+}
+
 .btn-primary:hover,
 .btn-primary:focus {
     background: #641264;
@@ -200,3 +213,9 @@ textarea.form-control.field-description {
 .btn-secondary {
     border-radius: 8px;
 }
+ .dropdown-options-header .btn-outline-primary:hover {
+        background-color: #4a0d4a;
+        border-color: #4a0d4a;
+        color: #fff;
+    }
+

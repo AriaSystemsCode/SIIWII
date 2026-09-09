@@ -161,7 +161,10 @@ export class BrowseFieldManagerComponent extends AppComponentBase implements OnI
     }
 
     create(): void {
-        this.createOrEditFieldManagerModal.show();
+        const selectedTable = this.selectedEntityPath.length
+            ? this.selectedEntityPath[this.selectedEntityPath.length - 1].name
+            : undefined;
+        this.createOrEditFieldManagerModal.show(undefined, false, selectedTable, this.selectedEntityId);
     }
 
     addFromExisting(): void {

@@ -11,12 +11,13 @@ export class FieldManagerService {
             code: 'F001',
             name: 'ContactSSIN',
             description: 'Internal code used by SIIWII platform to Identify the contact',
-            type: 'String -Textbox',
+            type: 'String - Textbox',
             createdUser: 'System User',
             entityId: 2,
             tables: 'Purchase Order',
             status: 'Active',
             revision: 0,
+            revisionSequence: '01',
             fieldLevel: 'Application',
             trackingNumber: 'Iteration_40',
             allowNull: false,
@@ -38,12 +39,13 @@ export class FieldManagerService {
             code: 'F002',
             name: 'ItemSSIN',
             description: 'Internal code used by SIIWII platform to Identify the item',
-            type: 'String -Textbox',
+            type: 'String - Textbox',
             createdUser: 'System User',
             entityId: 2,
             tables: 'Purchase Order',
             status: 'Active',
             revision: 0,
+            revisionSequence: '02',
             fieldLevel: 'Application',
             trackingNumber: 'Iteration_41',
             allowNull: false,
@@ -71,6 +73,7 @@ export class FieldManagerService {
             tables: 'Purchase Order',
             status: 'Proposed',
             revision: 0,
+            revisionSequence: '03',
             fieldLevel: 'Application',
             trackingNumber: 'Iteration X600',
             allowNull: true,
@@ -101,6 +104,7 @@ export class FieldManagerService {
             tables: 'Sales Order',
             status: 'Proposed',
             revision: 0,
+            revisionSequence: '04',
             fieldLevel: 'Application',
             trackingNumber: 'Iteration X600',
             allowNull: true,
@@ -131,6 +135,7 @@ export class FieldManagerService {
             tables: 'Sales Order',
             status: 'Proposed',
             revision: 0,
+            revisionSequence: '05',
             fieldLevel: 'Application',
             trackingNumber: 'Iteration X600',
             allowNull: true,
@@ -161,6 +166,7 @@ export class FieldManagerService {
             tables: 'Sales Order',
             status: 'Proposed',
             revision: 0,
+            revisionSequence: '06',
             fieldLevel: 'Application',
             trackingNumber: 'Iteration X600',
             allowNull: true,
@@ -186,6 +192,7 @@ export class FieldManagerService {
         return [...this.items];
     }
 
+    //i51-Get Field
     getById(id: number): FieldManagerItem | undefined {
         return this.items.find(item => item.id === id);
     }
@@ -257,6 +264,7 @@ export class FieldManagerService {
     }
 
     save(item: FieldManagerItem): FieldManagerItem {
+        item = { ...item, extraData: true };
         if (item.id) {
             const index = this.items.findIndex(existing => existing.id === item.id);
             if (index !== -1) {

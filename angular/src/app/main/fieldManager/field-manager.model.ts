@@ -21,6 +21,7 @@ export interface FieldManagerItem {
     tables: string;
     status: string;
     revision: number;
+    revisionSequence: string;
     fieldLevel: string;
     trackingNumber: string;
     allowNull: boolean;
