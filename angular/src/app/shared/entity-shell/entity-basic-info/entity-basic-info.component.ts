@@ -549,15 +549,64 @@ setValue(path: string, value: any): void {
       : null;
   }
 
-  private getDirectImagePath(path: string): string | null {
-    const value = this.getValue(path);
-    return this.buildAttachmentUrl(value);
-  }
-private buildAttachmentUrl(path: string): string {
-    const baseUrl = this.attachmentBaseUrl?.replace(/\/$/, '') || '';
-    const cleanPath = path.replace(/^\//, '');
+ private getDirectImagePath(
+    path: string
+): string | null {
 
-    return baseUrl ? `${baseUrl}/${cleanPath}`  : cleanPath;
+    if (!path) {
+        return null;
+    }
+
+    const value = this.getValue(path);
+
+    if (
+        !value ||
+        typeof value !== 'string'
+    ) {
+        return null;
+    }
+
+    return this.buildAttachmentUrl(value);
+}
+
+
+private buildAttachmentUrl(
+    path: string | null | undefined
+): string | null {
+
+    if (
+        !path ||
+        typeof path !== 'string'
+    ) {
+        return null;
+    }
+
+    const trimmedPath = path.trim();
+
+    if (!trimmedPath) {
+        return null;
+    }
+
+ 
+    if (
+        trimmedPath.startsWith('http://') ||
+        trimmedPath.startsWith('https://') ||
+        trimmedPath.startsWith('blob:') ||
+        trimmedPath.startsWith('data:')
+    ) {
+        return trimmedPath;
+    }
+
+    const baseUrl =
+        this.attachmentBaseUrl
+            ?.replace(/\/$/, '') || '';
+
+    const cleanPath =
+        trimmedPath.replace(/^\/+/, '');
+
+    return baseUrl
+        ? `${baseUrl}/${cleanPath}`
+        : cleanPath;
 }
 
 private createEmptyImageSlots(): EntityImageSlot[] {

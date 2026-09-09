@@ -63,6 +63,7 @@ export class GenericEntityShellComponent
 
 
   @Input()  initialNode:  GenericEntityNode | null = null;
+  entityBreadcrumbPath: any[] = [];
   @Output()  entityChange =  new EventEmitter<any>();
   @Output() logoChange =   new EventEmitter<any>();
   @Output()  backgroundChange =  new EventEmitter<any>();
@@ -77,6 +78,7 @@ export class GenericEntityShellComponent
   @Output()  maximize =    new EventEmitter<void>();
   @Output()  entityItemSelect =  new EventEmitter<GenericEntityNode>();
   @Output()  entityItemAdd =  new EventEmitter<string>();
+  @Output() breadcrumbBrowse =  new EventEmitter<void>();
 
   @Output() dynamicEntitySaved = new EventEmitter<{
       node: GenericEntityNode;
@@ -151,8 +153,6 @@ readonly compactBreakpoint = 1024;
     }
   }
 
-
-
 selectEntityNode(
   node: GenericEntityNode
 ): void {
@@ -165,7 +165,6 @@ selectEntityNode(
   const nodeKey =
     `${entityType}-${node.id}`;
 
-
   if (
     this.selectingNode ||
     (
@@ -173,38 +172,25 @@ selectEntityNode(
       this.selectedNodeKey === nodeKey
     )
   ) {
-
-    if (this.isCompactScreen) {
-      this.leftPanelCollapsed = true;
-      this.mobileSection = 'main';
-    }
-
     return;
   }
 
+  // update breadcrumb only after valid selection
+  this.entityBreadcrumbPath =
+    this.getBreadcrumbPath(node);
 
-  /*
-   * Root Account
-   */
   if (entityType === 'ACCOUNT') {
 
     this.showRootEntity();
 
     this.entityItemSelect.emit(node);
 
-    if (this.isCompactScreen) {
-      this.leftPanelCollapsed = true;
-      this.mobileSection = 'main';
-    }
-
     return;
   }
-
 
   if (!node.component) {
     return;
   }
-
 
   this.selectingNode = true;
 
@@ -221,43 +207,37 @@ selectEntityNode(
 
     this.selectedNodeKey = nodeKey;
 
-
-    /*
-     * Desktop only
-     */
-    if (!this.isCompactScreen) {
-
-      this.rightPanelCollapsed =
-        this.currentMode === 'create' 
-    }
-
-
-    /*
-     * Tablet/mobile
-     */
-    if (this.isCompactScreen) {
-      this.leftPanelCollapsed = true;
-      this.mobileSection = 'main';
-    }
-
-
     this.renderSelectedEntity();
+
     this.entityItemSelect.emit(node);
 
   } finally {
-
     this.selectingNode = false;
   }
 }
 
-  showRootEntity(): void {
-    this.dynamicEntityActive = false;
-    this.currentNode = null;
-    this.currentEditor = null;
-    this.currentMode = this.mode;
-    this.selectedNodeKey = '';
-    this.setDefaultRightPanelState();
-  }
+showRootEntity(): void {
+
+  this.entityComponentHost?.clear();
+
+  this.entityBreadcrumbPath = [];
+
+  this.dynamicEntityActive = false;
+
+  this.currentNode = null;
+
+  this.currentEditor = null;
+
+  this.currentMode = this.mode;
+
+  this.selectedNodeKey = '';
+
+  this.mobileSection = 'main';
+
+  this.setDefaultRightPanelState();
+
+  this.cdr.detectChanges();
+}
 
   onEntityItemAdd(sectionKey: string): void {
     this.entityItemAdd.emit(sectionKey);
@@ -507,21 +487,35 @@ private renderSelectedEntity(): void {
     return `${modeLabel} ${this.currentEditor?.entity?.name ??   this.currentNode.label ??    ''  }`;
   }
 
-  get currentBreadcrumbItems():any[] {
+get currentBreadcrumbItems(): any[] {
 
-    if (!this.dynamicEntityActive || !this.currentNode) {
-      return this.breadcrumbItems;
-    }
+  const dynamicPath =
+    this.entityBreadcrumbPath.filter(
+      dynamicItem =>
+        !this.breadcrumbItems.some(
+          baseItem =>
+            baseItem.entityType &&
+            dynamicItem.entityType &&
+            baseItem.entityType.toUpperCase() ===
+              dynamicItem.entityType.toUpperCase() &&
+            String(baseItem.entityId) ===
+              String(dynamicItem.entityId)
+        )
+    );
 
-    return [...(this.breadcrumbItems ?? []),
-      {
-        label:
-          this.currentEditor?.entity?.name ??
-          this.currentNode.label
-      }
-    ];
-  }
+  const items = [
+    ...this.breadcrumbItems,
+    ...dynamicPath
+  ];
 
+  return items.map(
+    (item, index) => ({
+      ...item,
+      active:
+        index === items.length - 1
+    })
+  );
+}
   private setDefaultRightPanelState(): void {
     const activeMode =  this.dynamicEntityActive  ? this.currentMode : this.mode;
     this.rightPanelCollapsed =  activeMode === 'create' || activeMode === 'edit';
@@ -604,46 +598,183 @@ onWindowResize(): void {
 }
 
 private checkResponsiveLayout(): void {
+  const wasCompact = this.isCompactScreen;
+  this.isCompactScreen =  window.innerWidth <=   this.compactBreakpoint;
 
-  const wasCompact =
-    this.isCompactScreen;
-
-  this.isCompactScreen =
-    window.innerWidth <=
-    this.compactBreakpoint;
-
-  /*
-   * Enter tablet/mobile
-   */
-  if (
-    this.isCompactScreen &&
-    !wasCompact
-  ) {
-
+  if (this.isCompactScreen && !wasCompact) {
     this.leftPanelCollapsed = true;
-
     this.mobileSection = 'main';
-
     return;
   }
-
   if (this.isCompactScreen) {
     return;
   }
 
-  /*
-   * Return to desktop
-   */
-  if (
-    !this.isCompactScreen &&
-    wasCompact
+  if (!this.isCompactScreen && wasCompact
   ) {
-
     this.leftPanelCollapsed = false;
-
     this.mobileSection = 'main';
-
     this.setDefaultRightPanelState();
   }
 }
+
+private getBreadcrumbPath(
+  target: GenericEntityNode,
+  nodes: GenericEntityNode[] =
+    this.leftPanelSections.reduce(
+      (all, section) => [
+        ...all,
+        ...(section.items || [])
+      ],
+      [] as GenericEntityNode[]
+    )
+): any[] {
+
+  for (const node of nodes) {
+
+    if (
+      String(node.id) === String(target.id) &&
+      String(node.entityType).toUpperCase() ===
+        String(target.entityType).toUpperCase()
+    ) {
+      return [{
+        label: node.label,
+        entityType: node.entityType,
+        entityId: node.id,
+        node: node
+      }];
+    }
+
+    const children = this.getBreadcrumbPath(
+      target,
+      node.children || []
+    );
+
+    if (children.length) {
+      return [
+        {
+          label: node.label,
+          entityType: node.entityType,
+          entityId: node.id,
+          node: node
+        },
+        ...children
+      ];
+    }
+  }
+
+  return [];
 }
+
+onBreadcrumbItemClick(
+  item: any
+): void {
+
+  if (!item || item.active) {
+    return;
+  }
+
+  // =========================================
+  // MY CONNECTIONS
+  // =========================================
+
+  if (item.isBrowsePage) {
+
+    this.breadcrumbBrowse.emit();
+
+    return;
+  }
+
+
+  // =========================================
+  // ACCOUNT / PROFILE
+  // =========================================
+
+  if (
+    String(item.entityType || '')
+      .toUpperCase() === 'ACCOUNT'
+  ) {
+
+    this.showRootEntity();
+
+    return;
+  }
+
+
+  // =========================================
+  // BRANCH / CONTACT / SUB BRANCH / ETC.
+  // =========================================
+
+  const node =
+    this.findEntityNode(
+      item.entityType,
+      item.entityId
+    );
+
+  if (!node) {
+
+    console.warn(
+      'Breadcrumb entity not found:',
+      item
+    );
+
+    return;
+  }
+
+
+  // EXACT SAME FUNCTION USED BY LEFT PANEL
+  this.selectEntityNode(node);
+}
+
+private findEntityNode(
+  entityType: string,
+  entityId: number | string,
+  nodes?: GenericEntityNode[]
+): GenericEntityNode | null {
+
+  const searchNodes =
+    nodes ??
+    this.leftPanelSections.reduce(
+      (all, section) => [
+        ...all,
+        ...(section.items || [])
+      ],
+      [] as GenericEntityNode[]
+    );
+
+  for (const node of searchNodes) {
+
+    const sameType =
+      String(node.entityType || '')
+        .toUpperCase() ===
+      String(entityType || '')
+        .toUpperCase();
+
+    const sameId =
+      String(node.id) ===
+      String(entityId);
+
+    if (sameType && sameId) {
+      return node;
+    }
+
+    if (node.children?.length) {
+
+      const found =
+        this.findEntityNode(
+          entityType,
+          entityId,
+          node.children
+        );
+
+      if (found) {
+        return found;
+      }
+    }
+  }
+
+  return null;
+}
+
+}
+

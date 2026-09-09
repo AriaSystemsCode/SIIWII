@@ -2,7 +2,7 @@
 
   <div class="header-left">
     <app-entity-breadcrumb
-      [items]="breadcrumbItems">
+      [items]="breadcrumbItems"   (itemClick)="breadcrumbItemClick.emit($event)">
     </app-entity-breadcrumb>
   </div>
 

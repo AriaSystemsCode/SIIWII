@@ -1,0 +1,79 @@
+:host {
+  display: block;
+  width: auto;
+  min-width: 0;
+}
+
+.entity-breadcrumb {
+  display: flex;
+  align-items: center;
+
+  width: auto;
+  min-width: 0;
+
+  gap: 4px;
+
+  position: relative;
+
+  pointer-events: auto;
+}
+
+
+.entity-breadcrumb-btn {
+  position: static !important;
+
+  display: inline-flex !important;
+  align-items: center;
+
+  flex: 0 0 auto !important;
+
+  width: auto !important;
+  min-width: 0 !important;
+  height: auto !important;
+
+  margin: 0 !important;
+  padding: 4px 6px !important;
+
+  border: 0 !important;
+  background: transparent !important;
+
+  color: #777;
+
+  font: inherit;
+
+  cursor: pointer;
+
+  pointer-events: auto !important;
+
+  white-space: nowrap;
+}
+
+
+.entity-breadcrumb-btn:hover {
+  color: #5b185e;
+  background: rgba(
+    91,
+    24,
+    94,
+    0.07
+  ) !important;
+}
+
+
+.entity-breadcrumb-btn.current {
+  color: #29212e;
+  font-weight: 600;
+}
+
+
+.entity-breadcrumb-divider {
+  position: static;
+
+  display: inline-block;
+
+  flex: 0 0 auto;
+
+  color: #bbb;
+
+  pointer-events: none;
+}

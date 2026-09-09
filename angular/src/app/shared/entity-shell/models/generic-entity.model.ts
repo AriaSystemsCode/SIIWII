@@ -329,3 +329,18 @@ export interface MinimizedEntityItem {
 
   minimizedAt: number;
 }
+
+export interface EntityBreadcrumbItem {
+  label: string;
+
+  // Optional navigation
+  route?: string;
+  queryParams?: any;
+
+  // Optional entity information
+  entityType?: string;
+  entityId?: number | string;
+
+  // Current active breadcrumb
+  active?: boolean;
+}

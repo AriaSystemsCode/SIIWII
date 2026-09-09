@@ -88,7 +88,6 @@ export class AccountsComponent
     isAuthenticated: boolean = false;
     loginTenaneSsin:string
 
-    entityObjectType = 'BUSINESS';
     constructor(
         injector: Injector,
         private _accountsServiceProxy: AccountsServiceProxy,
@@ -188,9 +187,7 @@ export class AccountsComponent
         ];
     }
 
-    accountTypeChanges() {
-        this.getAccounts();
-    }
+
     resetList() {
         this.filterForm.reset();
         this.setMainPageFilter(this.defaultMainFilter);

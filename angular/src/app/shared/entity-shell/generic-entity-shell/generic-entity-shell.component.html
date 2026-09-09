@@ -67,12 +67,13 @@
     <!-- =============================================== -->
 
     <app-entity-header
-      [title]="currentTitle"
-      [breadcrumbItems]="currentBreadcrumbItems"
-      [mode]="displayedMode"
-      (close)="close.emit()"
-      (minimize)="minimize.emit()">
-    </app-entity-header>
+  [title]="currentTitle"
+  [breadcrumbItems]="currentBreadcrumbItems"
+  [mode]="displayedMode"
+  (breadcrumbItemClick)="onBreadcrumbItemClick($event)"
+  (close)="close.emit()"
+  (minimize)="minimize.emit()">
+</app-entity-header>
 
 
 

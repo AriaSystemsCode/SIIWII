@@ -62,6 +62,7 @@ import {
   AccountSectionsComponent
 } from '../account-sections/account-sections.component';
 import { AppConsts } from '@shared/AppConsts';
+import { Router } from '@angular/router';
 
 
 export type AccountEntityMode =
@@ -233,7 +234,8 @@ export class AccountEntityComponent
     private _accountsServiceProxy: AccountsServiceProxy,
     private _tokenService: TokenService,
     private _sycIdentifierDefinitionsServiceProxy: SycIdentifierDefinitionsServiceProxy,
-    private entityWindowManager: EntityWindowManagerService
+    private entityWindowManager: EntityWindowManagerService,
+      private router: Router
   ) {
 
     super(injector);
@@ -346,28 +348,27 @@ export class AccountEntityComponent
   }
 
 
-  get breadcrumbItems():
-    any[] {
+ get breadcrumbItems(): any[] {
 
-    const name =
-      this.accountData
-        ?.account
-        ?.name;
+  const account =
+    this.accountData?.account;
 
-
-    if (!name) {
-      return [];
-    }
-
-
-    return [
-      {
-        label: name
-      }
-    ];
+  if (!account?.name) {
+    return [];
   }
 
-
+  return [
+    {
+      label: this.l('MyConnections'),
+      isBrowsePage: true
+    },
+    {
+      label: account.name,
+      entityType: 'ACCOUNT',
+      entityId: account.id
+    }
+  ];
+}
   private loadAccountForView(accountId: number): void {
     this.isLoadingAccount = true;
     this.showMainSpinner();
@@ -2674,4 +2675,13 @@ private saveAccountDto(): void {
       )
     );
   }
+
+  onBreadcrumbBrowse(): void {
+
+  this.close();
+   this.router.navigate([
+    '/app/main/accounts'
+  ]);
+
+}
 }

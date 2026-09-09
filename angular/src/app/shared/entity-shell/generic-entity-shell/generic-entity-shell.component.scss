@@ -1,164 +1,294 @@
-.shell-container {
-  display: flex;
-  height: 100%;
-  width: 100%;
-  // overflow: hidden;
+/* =========================================================
+   GENERIC ENTITY SHELL
+========================================================= */
+
+:host {
+  display: block;
+
   position: relative;
+
+  width: 100%;
+  height: 100%;
+
+  min-width: 0;
+  min-height: 0;
 }
 
+
+/* =========================================================
+   SHELL CONTAINER
+========================================================= */
+
+.shell-container {
+  position: relative;
+
+  display: flex;
+
+  width: 100%;
+  height: 100%;
+
+  min-width: 0;
+  min-height: 0;
+}
+
+
+/* =========================================================
+   LEFT PANEL - DESKTOP
+========================================================= */
+
 .left-panel-container {
+  position: relative;
+
+  z-index: 10;
+
   width: 280px;
   height: 100%;
-  flex-shrink: 0;
-  transition: width 0.25s ease;
-  position: relative;
+
+  flex: 0 0 280px;
+
+  background: #ffffff;
+
+  transition:
+    width 0.25s ease,
+    flex-basis 0.25s ease;
+
+  pointer-events: auto;
 }
+
 
 .left-panel-container.collapsed {
   width: 0;
-}
-
-.right-shell-container {
-  flex: 1;
-  min-width: 0;
-
-  height: 100%;
-
-  display: flex;
-  flex-direction: column;
-
-  position: relative;
+  flex-basis: 0;
 
   overflow: hidden;
 }
 
+
+/* =========================================================
+   RIGHT SHELL
+========================================================= */
+
+.right-shell-container {
+  position: relative;
+
+  z-index: 1;
+
+  flex: 1;
+
+  display: flex;
+  flex-direction: column;
+
+  min-width: 0;
+  min-height: 0;
+
+  width: 100%;
+  height: 100%;
+
+  /*
+   * IMPORTANT:
+   * Do not use overflow:auto here.
+   * shell-body owns scrolling.
+   */
+  overflow: hidden;
+}
+
+
+/* =========================================================
+   ENTITY HEADER HOST
+
+   IMPORTANT:
+   Header must remain above shell-body.
+========================================================= */
+
+app-entity-header {
+  position: relative !important;
+
+  z-index: 1000 !important;
+
+  display: block;
+
+  width: 100%;
+
+  flex: 0 0 auto;
+
+  pointer-events: auto !important;
+}
+
+
+/* =========================================================
+   SHELL BODY
+========================================================= */
+
 .shell-body {
   position: relative;
 
-  flex: 1;
+  z-index: 1;
+
+  flex: 1 1 auto;
 
   min-width: 0;
   min-height: 0;
 
   overflow: auto;
-}
 
-
-.content-row{
-    display:flex;
-    height:100%;
-}
-
-.main-content-container{
-    flex:1;
-    transition:all .25s ease;
-    overflow:auto;
-}
-
-.right-panel-wrapper{
-    position:relative;
-    width:420px;
-    transition:width .25s ease;
-    border-left:1px solid #ececec;
-    background:#fff;
-}
-
-.right-panel-wrapper.collapsed{
-    width:22px;
-    overflow:hidden;
-}
-
-.panel-toggle-btn{
-    position:absolute;
-    left:-12px;
-    top:40px;
-
-    width:24px;
-    height:60px;
-
-    border-radius:12px;
-    border:1px solid #ddd;
-
-    background:#fff;
-
-    display:flex;
-    align-items:center;
-    justify-content:center;
-
-    cursor:pointer;
-
-    z-index:100;
-}
-
-.panel-toggle-btn:hover{
-    background:#f5f5f5;
+  pointer-events: auto;
 }
 
 
 /* =========================================================
-   DEFAULT DESKTOP
-   ========================================================= */
+   MAIN SECTION
+========================================================= */
 
-.shell-container {
-  display: flex;
+.main-section {
+  position: relative;
+
   width: 100%;
-  height: 100%;
-  position: relative;
-}
-
-.left-panel-container {
-  width: 280px;
-  flex: 0 0 280px;
-  height: 100%;
-  position: relative;
-  transition: width 0.25s ease;
-  background: #fff;
-}
-
-.left-panel-container.collapsed {
-  width: 0;
-  flex-basis: 0;
-  // overflow: hidden;
-}
-
-.right-shell-container {
-  flex: 1;
   min-width: 0;
-  position: relative;
+
+  min-height: 100%;
 }
+
+
+/* =========================================================
+   CONTENT ROW
+========================================================= */
 
 .content-row {
+  position: relative;
+
   display: flex;
+
+  width: auto;
   height: 100%;
+
+  min-width: 0;
 }
 
+
+/* =========================================================
+   MAIN CONTENT
+========================================================= */
+
 .main-content-container {
-  flex: 1;
+  position: relative;
+
+  flex: 1 1 auto;
+
   min-width: 0;
+  min-height: 0;
+
   overflow: auto;
+
+  transition: all 0.25s ease;
 }
+
+
+.main-content-container.expanded {
+  flex: 1 1 auto;
+}
+
+
+/* =========================================================
+   ROOT ENTITY CONTENT
+========================================================= */
+
+.root-entity-content {
+  position: relative;
+
+  width: 100%;
+
+  min-width: 0;
+}
+
+
+/* =========================================================
+   DYNAMIC ENTITY CONTENT
+========================================================= */
+
+.dynamic-entity-content {
+  position: relative;
+
+  width: 100%;
+
+  min-width: 0;
+}
+
+
+/* =========================================================
+   RIGHT PANEL - DESKTOP
+========================================================= */
 
 .right-panel-wrapper {
   position: relative;
+
+  z-index: 2;
+
   width: 420px;
+
   flex: 0 0 420px;
+
+  background: #ffffff;
+
   border-left: 1px solid #ececec;
-  background: #fff;
+
   transition:
     width 0.25s ease,
     flex-basis 0.25s ease;
 }
 
+
 .right-panel-wrapper.collapsed {
   width: 22px;
+
   flex-basis: 22px;
-  // overflow: hidden;
+
+  overflow: visible;
 }
 
 
 /* =========================================================
-   COMPACT CONTROLS HIDDEN ON DESKTOP
-   ========================================================= */
+   RIGHT PANEL TOGGLE
+========================================================= */
+
+.panel-toggle-btn {
+  position: absolute;
+
+  left: -12px;
+  top: 40px;
+
+  z-index: 100;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 24px;
+  height: 60px;
+
+  border: 1px solid #dddddd;
+
+  border-radius: 12px;
+
+  background: #ffffff;
+
+  cursor: pointer;
+
+  pointer-events: auto;
+
+  transition:
+    background-color 0.2s ease;
+}
+
+
+.panel-toggle-btn:hover {
+  background: #f5f5f5;
+}
+
+
+/* =========================================================
+   MOBILE COMPONENTS
+   HIDDEN ON DESKTOP
+========================================================= */
 
 .mobile-left-trigger,
 .mobile-right-rail,
@@ -169,328 +299,52 @@
 
 
 /* =========================================================
-   TABLET / MOBILE
-   ========================================================= */
-
-@media (max-width: 1024px) {
-
-  .shell-container {
-    display: block;
-    // overflow: hidden;
-  }
-
-  .right-shell-container {
-    width: 100%;
-    height: 100%;
-    position: relative;
-
-    /*
-     * leave room for right icon rail
-     */
-    padding-right: 54px;
-  }
-
-
-  /* =======================================================
-     LEFT SINGLE ICON
-     ======================================================= */
-
-  .mobile-left-trigger {
-          display: flex;
-        position: absolute;
-        left: 15px;
-        top: 50px;
-        width: 28px;
-        height: 33px;
-        border: none;
-        border-left: 0;
-        border-radius: 0 12px 12px 0;
-        background: transparent;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        z-index: 1000;
-       
-  }
-
-  .mobile-left-trigger i {
-    font-size: 18px;
-  }
-
-
-  /* =======================================================
-     RIGHT VERTICAL ICON RAIL
-     ======================================================= */
-
-  .mobile-right-rail {
-    display: flex;
-
-    position: absolute;
-
-    right: 0;
-    top: 0;
-    bottom: 0;
-
-    width: 54px;
-
-    flex-direction: column;
-    align-items: center;
-
-    padding-top: 20px;
-
-    border-left:
-      1px solid #e7e7e7;
-
-    background: #fff;
-
-    z-index: 40;
-  }
-
-  .mobile-rail-btn {
-    width: 54px;
-    height: 58px;
-
-    border: 0;
-    background: transparent;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    cursor: pointer;
-
-    position: relative;
-
-    transition:
-      background 0.2s ease;
-  }
-
-  .mobile-rail-btn i {
-    font-size: 19px;
-  }
-
-  .mobile-rail-btn:hover {
-    background: #f7f7f7;
-  }
-
-  .mobile-rail-btn.active {
-    background: #f5f5f5;
-  }
-
-  .mobile-rail-btn.active::before {
-    content: '';
-
-    position: absolute;
-
-    left: 0;
-    top: 8px;
-    bottom: 8px;
-
-    width: 3px;
-
-    border-radius:
-      0 3px 3px 0;
-
-    background:
-      currentColor;
-  }
-
-
-  /* =======================================================
-     LEFT PANEL AS OVERLAY DRAWER
-     ======================================================= */
-
-  .left-panel-container,
-  .left-panel-container.collapsed {
-
-    position: fixed;
-
-    left: 0;
-    top: 0;
-    bottom: 0;
-
-    width: min(288px, 88vw);
-    height: 100vh;
-
-    flex: none;
-
-    transform:
-      translateX(-105%);
-
-    // visibility: hidden;
-    opacity: 0;
-
-    overflow-y: auto;
-
-    background: #fff;
-
-    z-index: 1100;
-
-    box-shadow:
-      5px 0 20px
-      rgba(0, 0, 0, 0.16);
-
-    transition:
-      transform 0.25s ease,
-      opacity 0.2s ease,
-      visibility 0.25s ease;
-  }
-
-  .left-panel-container.open {
-
-    transform:
-      translateX(0);
-
-    visibility: visible;
-    opacity: 1;
-  }
-
-
-  /* =======================================================
-     LEFT DRAWER HEADER
-     ======================================================= */
-
-  .compact-left-header {
-    display: flex;
-
-    position: sticky;
-    top: 0;
-
-    height: 52px;
-
-    padding:
-      0 14px;
-
-    align-items: center;
-    justify-content: space-between;
-
-    background: #fff;
-
-    border-bottom:
-      1px solid #e8e8e8;
-
-    z-index: 5;
-
-    font-weight: 600;
-  }
-
-  .compact-left-close {
-    width: 34px;
-    height: 34px;
-
-    border: 0;
-
-    border-radius: 50%;
-
-    background: #f5f5f5;
-
-    cursor: pointer;
-  }
-
-
-  /* =======================================================
-     DRAWER BACKDROP
-     ======================================================= */
-
-  .mobile-left-backdrop {
-    display: block;
-
-    position: fixed;
-
-    inset: 0;
-
-    background:
-      rgba(0, 0, 0, 0.32);
-
-    z-index: 1090;
-  }
-
-
-  /* =======================================================
-     COMPACT CONTENT
-     ======================================================= */
-
-  .main-section {
-    width: 100%;
-    height: 100%;
-  }
-
-  .content-row {
-    display: block;
-    height: auto;
-
-    margin:
-      10px !important;
-  }
-
-  .main-content-container {
-    width: 100%;
-    overflow: visible;
-  }
-
-  .compact-panel-content {
-    width: 100%;
-    padding: 12px 16px;
-    overflow-y: auto;
-  }
-
-  /*
-   * Desktop side panel not shown in compact mode.
-   */
-  .right-panel-wrapper {
-    display: none;
-  }
-}
-
-
-
-.mobile-right-rail {
-  background: #ffffff;
-  border-left: 1px solid #eeeaf4;
-}
+   MOBILE RIGHT RAIL BUTTON
+========================================================= */
 
 .mobile-rail-btn {
-  width: 54px;
-  height: 58px;
-
-  border: 0;
-  background: transparent;
-
-  color: #7c7585;
+  position: relative;
 
   display: flex;
   align-items: center;
   justify-content: center;
 
-  cursor: pointer;
+  width: 54px;
+  height: 58px;
 
-  position: relative;
+  border: 0;
+
+  background: transparent;
+
+  color: #7c7585;
+
+  cursor: pointer;
 
   transition:
     background-color 0.2s ease,
     color 0.2s ease;
 }
 
+
 .mobile-rail-btn i {
   font-size: 20px;
 }
 
 
-/* Hover */
 .mobile-rail-btn:hover {
   color: #5b0a5b;
+
   background: #faf6fb;
 }
 
 
-/* Active */
 .mobile-rail-btn.active {
   color: #5b0a5b;
+
   background: #f5edf7;
 }
 
 
-/* Purple active indicator */
 .mobile-rail-btn.active::before {
   content: '';
 
@@ -504,18 +358,18 @@
 
   background: #5b0a5b;
 
-  border-radius: 0 4px 4px 0;
+  border-radius:
+    0 4px 4px 0;
 }
 
 
-/* Optional icon circle */
 .mobile-rail-btn.active i {
-  width: 34px;
-  height: 34px;
-
   display: flex;
   align-items: center;
   justify-content: center;
+
+  width: 34px;
+  height: 34px;
 
   background: #eadced;
 
@@ -523,46 +377,81 @@
 }
 
 
+/* =========================================================
+   COMPACT / TABLET / MOBILE
+========================================================= */
+
 @media (max-width: 1024px) {
 
+  /* =======================================================
+     SHELL
+  ======================================================= */
+
   .shell-container {
-    display: block;
     position: relative;
+
+    display: block;
+
     width: 100%;
     height: 100%;
+
+    min-width: 0;
+    min-height: 0;
   }
 
 
-  /* =====================================================
-     SHELL
-     ===================================================== */
-
   .right-shell-container {
-    width: 100%;
-    height: 100%;
+    position: relative;
 
     display: flex;
     flex-direction: column;
 
-    position: relative;
+    width: 100%;
+    height: 100%;
+
+    min-width: 0;
+    min-height: 0;
 
     padding-right: 0;
+
+    overflow: hidden;
   }
 
 
   /*
-   * This area starts AFTER header.
+   * Keep header above all normal content.
    */
+  app-entity-header {
+    position: relative !important;
+
+    z-index: 1000 !important;
+
+    display: block;
+
+    width: 100%;
+
+    flex: 0 0 auto;
+
+    pointer-events: auto !important;
+  }
+
+
+  /* =======================================================
+     SHELL BODY
+  ======================================================= */
+
   .shell-body {
     position: relative;
 
-    flex: 1;
+    z-index: 1;
 
-    min-height: 0;
+    flex: 1 1 auto;
+
     min-width: 0;
+    min-height: 0;
 
     /*
-     * Reserve space for right icons.
+     * Space for right mobile rail.
      */
     padding-right: 54px;
 
@@ -570,26 +459,70 @@
   }
 
 
-  /* =====================================================
-     LEFT OPEN BUTTON
-     ===================================================== */
+  /* =======================================================
+     MAIN SECTION
+  ======================================================= */
+
+  .main-section {
+    position: relative;
+
+    width: 100%;
+
+    min-width: 0;
+    min-height: 100%;
+  }
+
+
+  /* =======================================================
+     CONTENT
+  ======================================================= */
+
+  .content-row {
+    position: relative;
+
+    display: block;
+
+    width: auto;
+    height: auto;
+
+    min-width: 0;
+
+    margin: 10px !important;
+  }
+
+
+  .main-content-container {
+    position: relative;
+
+    width: 100%;
+
+    min-width: 0;
+
+    overflow: visible;
+  }
+
+
+  /* =======================================================
+     MOBILE LEFT OPEN BUTTON
+  ======================================================= */
 
   .mobile-left-trigger {
-    display: flex;
-
     position: absolute;
 
-    /*
-     * relative to shell-body,
-     * therefore under header
-     */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
     left: 8px;
     top: 12px;
+
+    z-index: 100;
 
     width: 36px;
     height: 36px;
 
-    border: 1px solid #eeeaf4;
+    border:
+      1px solid #eeeaf4;
 
     border-radius: 8px;
 
@@ -597,12 +530,9 @@
 
     color: #5b0a5b;
 
-    align-items: center;
-    justify-content: center;
-
     cursor: pointer;
 
-    z-index: 100;
+    pointer-events: auto;
 
     box-shadow:
       0 2px 8px
@@ -620,27 +550,24 @@
   }
 
 
-  /* =====================================================
-     RIGHT VERTICAL ICON COLUMN
-     ===================================================== */
+  /* =======================================================
+     MOBILE RIGHT RAIL
+  ======================================================= */
 
   .mobile-right-rail {
-    display: flex;
-
-    /*
-     * IMPORTANT:
-     * shell-body is position:relative
-     */
     position: absolute;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 
     top: 0;
     right: 0;
     bottom: 0;
 
-    width: 54px;
+    z-index: 50;
 
-    flex-direction: column;
-    align-items: center;
+    width: 54px;
 
     padding-top: 10px;
 
@@ -649,16 +576,20 @@
     border-left:
       1px solid #eeeaf4;
 
-    z-index: 50;
-
     box-shadow:
       -2px 0 8px
       rgba(0, 0, 0, 0.025);
+
+    pointer-events: auto;
   }
 
 
   .mobile-rail-btn {
     position: relative;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
 
     width: 54px;
     height: 58px;
@@ -671,81 +602,26 @@
 
     color: #7c7585;
 
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
     cursor: pointer;
 
-    transition:
-      color 0.2s ease,
-      background-color 0.2s ease;
+    pointer-events: auto;
   }
 
 
-  .mobile-rail-btn i {
-    font-size: 20px;
-  }
-
-
-  .mobile-rail-btn:hover {
-    color: #5b0a5b;
-    background: #faf6fb;
-  }
-
-
-  .mobile-rail-btn.active {
-    color: #5b0a5b;
-    background: #f5edf7;
-  }
-
-
-  /*
-   * Active vertical purple indicator
-   */
-  .mobile-rail-btn.active::before {
-    content: '';
-
-    position: absolute;
-
-    left: 0;
-    top: 7px;
-    bottom: 7px;
-
-    width: 3px;
-
-    background: #5b0a5b;
-
-    border-radius:
-      0 4px 4px 0;
-  }
-
-
-  .mobile-rail-btn.active i {
-    width: 34px;
-    height: 34px;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    background: #eadced;
-
-    border-radius: 9px;
-  }
-
-
-  /* =====================================================
-     LEFT DRAWER
-     ===================================================== */
+  /* =======================================================
+     LEFT PANEL DRAWER
+  ======================================================= */
 
   .left-panel-container,
   .left-panel-container.collapsed {
+
     position: fixed;
 
     top: 0;
     bottom: 0;
     left: 0;
+
+    z-index: 1100;
 
     width: min(288px, 88vw);
     height: 100vh;
@@ -756,13 +632,14 @@
       translateX(-105%);
 
     opacity: 0;
+
     visibility: hidden;
 
     overflow-y: auto;
 
     background: #ffffff;
 
-    z-index: 1100;
+    pointer-events: none;
 
     box-shadow:
       5px 0 20px
@@ -780,42 +657,49 @@
       translateX(0);
 
     opacity: 1;
+
     visibility: visible;
+
+    pointer-events: auto;
   }
 
 
-  /* =====================================================
-     DRAWER HEADER
-     ===================================================== */
+  /* =======================================================
+     LEFT DRAWER HEADER
+  ======================================================= */
 
   .compact-left-header {
-    display: flex;
-
     position: sticky;
+
     top: 0;
+
+    z-index: 5;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 
     height: 52px;
 
     padding:
       0 14px;
 
-    align-items: center;
-    justify-content: space-between;
-
     background: #ffffff;
 
     border-bottom:
       1px solid #eeeaf4;
 
-    z-index: 5;
+    color: #29212e;
 
     font-weight: 600;
-
-    color: #29212e;
   }
 
 
   .compact-left-close {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
     width: 34px;
     height: 34px;
 
@@ -827,64 +711,42 @@
 
     color: #5b0a5b;
 
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
     cursor: pointer;
+
+    pointer-events: auto;
   }
 
 
-  /* =====================================================
-     BACKDROP
-     ===================================================== */
+  /* =======================================================
+     LEFT DRAWER BACKDROP
+  ======================================================= */
 
   .mobile-left-backdrop {
-    display: block;
-
     position: fixed;
 
     inset: 0;
 
+    z-index: 1090;
+
+    display: block;
+
     background:
       rgba(22, 15, 25, 0.34);
 
-    z-index: 1090;
+    pointer-events: auto;
   }
 
 
-  /* =====================================================
-     MAIN CONTENT
-     ===================================================== */
+  /* =======================================================
+     COMPACT PANEL CONTENT
+  ======================================================= */
 
-  .main-section {
-    width: 100%;
-    min-height: 100%;
-  }
+  .compact-panel-content {
+    position: relative;
 
-
-  .content-row {
-    display: block;
-
-    height: auto;
-
-    margin:
-      10px !important;
-  }
-
-
-  .main-content-container {
     width: 100%;
 
     min-width: 0;
-
-    overflow: visible;
-  }
-
-
-  .compact-panel-content {
-    width: 100%;
-
     min-height: 100%;
 
     padding:
@@ -894,10 +756,10 @@
   }
 
 
-  /*
-   * Desktop panel isn't used
-   * in compact mode.
-   */
+  /* =======================================================
+     DESKTOP RIGHT PANEL HIDDEN
+  ======================================================= */
+
   .right-panel-wrapper {
     display: none;
   }

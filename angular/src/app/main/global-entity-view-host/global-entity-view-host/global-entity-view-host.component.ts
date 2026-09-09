@@ -85,10 +85,10 @@ export class GlobalEntityViewHostComponent
 
         this.openAccount(item);
         break;
-      case 'Contact':
-        break;
-      case 'Branch':
-        break;
+      // case 'Contact':
+      //   break;
+      // case 'Branch':
+      //   break;
     }
   }
 

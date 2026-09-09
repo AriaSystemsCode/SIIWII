@@ -1,4 +1,31 @@
-<span *ngFor="let item of items; let last = last">
-  <span>{{ item.label }}</span>
-  <span *ngIf="!last"> / </span>
-</span>
+<div class="entity-breadcrumb">
+
+  <ng-container
+    *ngFor="
+      let item of items;
+      let last = last
+    ">
+
+    <button
+      type="button"
+      class="entity-breadcrumb-btn"
+      [class.current]="last"
+
+      (pointerup)="onItemClick(item)"
+
+      (keyup.enter)="onItemClick(item)"
+      (keyup.space)="onItemClick(item)">
+
+      {{ item.label }}
+
+    </button>
+
+    <span
+      *ngIf="!last"
+      class="entity-breadcrumb-divider">
+      /
+    </span>
+
+  </ng-container>
+
+</div>

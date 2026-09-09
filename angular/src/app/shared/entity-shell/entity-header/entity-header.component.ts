@@ -15,4 +15,5 @@ export class EntityHeaderComponent {
   @Output() close = new EventEmitter<void>();
   @Output() minimize = new EventEmitter<void>();
   @Output() maximize = new EventEmitter<void>();
+  @Output() breadcrumbItemClick = new EventEmitter<any>();
 }
