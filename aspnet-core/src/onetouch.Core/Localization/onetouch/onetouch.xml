@@ -3029,6 +3029,9 @@ Please select one of the available linesheet templates
 		<text name="ProductId">Product Id</text>
 		<text name="Accountuploadstatus">Account upload status</text>
 		<text name="SharedWithYou">is shared with you</text>
+		<text name="Transaction Number">Transaction Number</text>
+		<text name="Price Range">Price Range</text>
+		<text name="Amount Range">Amount Range</text>
 
 		
   </texts>  

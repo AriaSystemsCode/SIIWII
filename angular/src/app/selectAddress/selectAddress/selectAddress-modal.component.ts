@@ -17,10 +17,16 @@ export class SelectAddressModalComponent extends AppComponentBase {
 
     @ViewChild('selectAddressModal', { static: true }) modal: ModalDirective;
 
-    @Output() addressSelected: EventEmitter<any> = new EventEmitter<any>();
+    // @Output() addressSelected: EventEmitter<any> = new EventEmitter<any>();
     @Output() addNewAddress: EventEmitter<any> = new EventEmitter<any>();
     @Output() editAddress: EventEmitter<any> = new EventEmitter<any>();
     @Output() addressSelectionCanceled: EventEmitter<any> = new EventEmitter<any>();
+    @Output()
+addressSelected =
+    new EventEmitter<{
+        address: AppAddressDto;
+        wasUpdated: boolean;
+    }>();
 
     addresses: AppAddressDto[];
     filteredAddresses: AppAddressDto[];
@@ -41,6 +47,8 @@ export class SelectAddressModalComponent extends AppComponentBase {
 
         currentLang:string
     isArabic:boolean = true
+
+    updatedAddressIds: number[] = [];
     constructor(
         injector: Injector,
         private _accountsServiceProxy: AccountsServiceProxy,
@@ -97,14 +105,37 @@ export class SelectAddressModalComponent extends AppComponentBase {
     }
 
 
-    selectAddress(): void {
-        if (this.selectedAddress != undefined) {
-            this.addressSelected.emit(this.selectedAddress);
-            this.spinnerService.hide();
-        }
-        this.close()
-        this.spinnerService.hide();
+    // selectAddress(): void {
+    //     if (this.selectedAddress != undefined) {
+    //         this.addressSelected.emit(this.selectedAddress);
+    //         this.spinnerService.hide();
+    //     }
+    //     this.close()
+    //     this.spinnerService.hide();
+    // }
+
+   selectAddress(): void {
+
+    if (!this.selectedAddress) {
+        return;
     }
+
+    const wasUpdated =
+        this.updatedAddressIds.includes(
+            this.selectedAddress.id
+        );
+
+    this.addressSelected.emit({
+        address:
+            this.selectedAddress,
+
+        wasUpdated
+    });
+
+    this.close();
+
+    this.spinnerService.hide();
+}
 
     addNew(): void {
         this.addNewAddress.emit();
@@ -135,25 +166,96 @@ export class SelectAddressModalComponent extends AppComponentBase {
         this.addresses.push(x);
     }
 
-    addressUpdated(address: AppAddressDto) {
+    // addressUpdated(address: AppAddressDto) {
 
-        this.active = true;
-        this.modal.show();
+    //     this.active = true;
+    //     this.modal.show();
 
-        let x = this.addresses.find(x => x.id == address.id)
+    //     let x = this.addresses.find(x => x.id == address.id)
 
-        x.id = address.id;
-        x.code = address.code;
-        x.name = address.name;
-        x.addressLine1 = address.addressLine1;
-        x.addressLine2 = address.addressLine2;
-        x.city = address.city;
-        x.state = address.state;
-        x.postalCode = address.postalCode;
-        x.countryId = address.countryId;
-        x.countryIdName = address.countryIdName;
+    //     x.id = address.id;
+    //     x.code = address.code;
+    //     x.name = address.name;
+    //     x.addressLine1 = address.addressLine1;
+    //     x.addressLine2 = address.addressLine2;
+    //     x.city = address.city;
+    //     x.state = address.state;
+    //     x.postalCode = address.postalCode;
+    //     x.countryId = address.countryId;
+    //     x.countryIdName = address.countryIdName;
 
+    // }
+addressUpdated(
+    address: AppAddressDto
+): void {
+
+    this.active = true;
+    this.modal.show();
+
+    this.addresses =
+        this.addresses || [];
+
+    const index =
+        this.addresses.findIndex(
+            x =>
+                Number(x.id) ===
+                Number(address.id)
+        );
+
+    if (index >= 0) {
+
+        this.addresses[index] =
+            Object.assign(
+                new AppAddressDto(),
+                address
+            );
+
+    } else {
+
+        this.addresses.push(
+            Object.assign(
+                new AppAddressDto(),
+                address
+            )
+        );
     }
+
+    this.filteredAddresses = [
+        ...this.addresses
+    ];
+
+    // Mark it so Select knows
+    // this address was just updated.
+    if (
+        !this.updatedAddressIds.includes(
+            address.id
+        )
+    ) {
+        this.updatedAddressIds.push(
+            address.id
+        );
+    }
+
+    // Keep selectedAddress in sync
+    if (
+        Number(
+            this.selectedAddress?.id
+        ) ===
+        Number(
+            address.id
+        )
+    ) {
+
+        this.selectedAddress =
+            Object.assign(
+                new AppAddressDto(),
+                address
+            );
+
+        this.selectedAddressId =
+            address.id;
+    }
+}
 
     checkAddresUsageCount(address: AppAddressDto, branchId: number) {
         return new Promise((resolve, reject) => {

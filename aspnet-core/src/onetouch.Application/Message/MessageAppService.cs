@@ -52,6 +52,7 @@ using System.Threading.Tasks;
 using Twilio.TwiML.Fax;
 using static Microsoft.ApplicationInsights.MetricDimensionNames.TelemetryContext;
 using static NPOI.HSSF.Util.HSSFColor;
+using Microsoft.AspNetCore.Identity;
 
 namespace onetouch.Message
 {
@@ -72,6 +73,7 @@ namespace onetouch.Message
         private readonly IRepository<AppPost, long> _appPostRepo;
         private readonly IRepository<AppEntityExtraData, long> _appEntityExtraDataRepository;
         private readonly IRepository<AppEntityRating, long> _appEntityRatingRepository;
+        private readonly IRepository<AppEntitiesRelationship, long> _appEntitiesRelationshipRepository;
         private readonly IConfigurationRoot _appConfiguration;
         private readonly RoleManager _roleManager;
         private readonly IRepository<AppContact, long> _appContactRepository;
@@ -79,6 +81,7 @@ namespace onetouch.Message
         //I49[Start]
         private readonly IEmailSender _emailSender;
         //I49[End]
+        private readonly UserManager _userManager;
         public MessageAppService(IRepository<AppMessage, long> messagesRepository,
             IRepository<AppMessage, long> lookup_MessagesRepository,
             IRepository<AppEntity, long> appEntityRepository,
@@ -90,13 +93,16 @@ namespace onetouch.Message
             IRepository<AppMarketplaceMessage, long> appMarketplaceMessagesRepository, IRepository<AppPost, long> appPostRepo,
             IRepository<AppEntityExtraData, long> appEntityExtraDataRepository,
             IRepository<AppEntityRating, long> appEntityRatingRepository, RoleManager roleManager,
+            IRepository<AppEntitiesRelationship, long> appEntitiesRelationshipRepository,
             IRepository<AppContact, long> appContactRepository,
-            IEmailSender emailSender
+            IEmailSender emailSender,UserManager userManager
             )
         {
+            _userManager = userManager;
             _roleManager = roleManager;
             _appEntityExtraDataRepository = appEntityExtraDataRepository;
             _appEntityRatingRepository = appEntityRatingRepository;
+            _appEntitiesRelationshipRepository = appEntitiesRelationshipRepository;
             _appConfiguration = appConfigurationAccessor.Configuration;
             _appMarketplaceTransactionHeaders = appMarketplaceTransactionHeaders;
             _appContactRepository = appContactRepository;
@@ -893,8 +899,20 @@ namespace onetouch.Message
                             var tenant = await TenantManager.GetByIdAsync(wntityObj.TenantOwner);
                             if (tenant != null)
                             {
-                                string userName = "admin@" + tenant.TenancyName;
-                                var adminUser = await UserManager.FindByNameAsync(userName);
+                                //string userName = "admin@" + tenant.TenancyName;
+                                //var adminUser = await UserManager.FindByNameAsync(userName);
+                                var adminRole = await _roleManager.Roles
+.FirstOrDefaultAsync(r => r.TenantId == tenant.Id && r.Name == StaticRoleNames.Tenants.Admin);
+                                Authorization.Users.User adminUser = null;
+                                if (adminRole != null)
+                                {
+                                    var adminRoleId = adminRole.Id;
+
+                                    adminUser = await _userManager.Users
+                                        .Where(u => u.TenantId == tenant.Id)
+                                        .Where(u => u.Roles.Any(r => r.RoleId == adminRoleId))
+                                        .FirstOrDefaultAsync();
+                                }
                                 if (adminUser != null)
                                     input.To = adminUser.Id.ToString();
                                 //input.To
@@ -946,8 +964,20 @@ namespace onetouch.Message
                             var tenant = await TenantManager.GetByIdAsync(wntityObj.TenantOwner);
                             if (tenant != null)
                             {
-                                string userName = "admin@" + tenant.TenancyName;
-                                var adminUser = await UserManager.FindByNameAsync(userName);
+                                //string userName = "admin@" + tenant.TenancyName;
+                                //var adminUser = await UserManager.FindByNameAsync(userName);
+                                var adminRole = await _roleManager.Roles
+.FirstOrDefaultAsync(r => r.TenantId == tenant.Id && r.Name == StaticRoleNames.Tenants.Admin);
+                                Authorization.Users.User adminUser = null;
+                                if (adminRole != null)
+                                {
+                                    var adminRoleId = adminRole.Id;
+
+                                    adminUser = await _userManager.Users
+                                        .Where(u => u.TenantId == tenant.Id)
+                                        .Where(u => u.Roles.Any(r => r.RoleId == adminRoleId))
+                                        .FirstOrDefaultAsync();
+                                }
                                 if (adminUser != null)
                                     input.To = adminUser.Id.ToString();
                                 //input.To
@@ -1762,6 +1792,60 @@ namespace onetouch.Message
                             && e.EntityFk.EntityObjectTypeId== reviewType);
                 returnCount = await filteredMessages.CountAsync();
                 return returnCount;
+            }
+        }
+
+        [AbpAllowAnonymous]
+        public async Task<List<MarketplaceItemReviewSummaryDto>> GetMarketplaceItemReviewSummaries(List<long> entityIds)
+        {
+            var itemIds = entityIds?.Distinct().ToList() ?? new List<long>();
+            if (itemIds.Count == 0)
+                return new List<MarketplaceItemReviewSummaryDto>();
+
+            var reviewType = await _helper.SystemTables.GetEntityObjectTypeReview();
+            using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
+            {
+                var reviewEntityIds = _AppMarketplaceMessagesRepository.GetAll()
+                    .Where(message => message.ParentId == null &&
+                                      message.OriginalMessageId == message.Id &&
+                                      message.EntityFk.EntityObjectTypeId == reviewType)
+                    .Select(message => message.EntityId);
+
+                var directReviewCounts = await _appEntitiesRelationshipRepository.GetAll()
+                    .Where(relationship => itemIds.Contains(relationship.RelatedEntityId) &&
+                                           reviewEntityIds.Contains(relationship.EntityId))
+                    .GroupBy(relationship => relationship.RelatedEntityId)
+                    .Select(group => new { EntityId = group.Key, Count = group.Count() })
+                    .ToListAsync();
+
+                var inverseReviewCounts = await _appEntitiesRelationshipRepository.GetAll()
+                    .Where(relationship => itemIds.Contains(relationship.EntityId) &&
+                                           reviewEntityIds.Contains(relationship.RelatedEntityId))
+                    .GroupBy(relationship => relationship.EntityId)
+                    .Select(group => new { EntityId = group.Key, Count = group.Count() })
+                    .ToListAsync();
+
+                var reviewCounts = directReviewCounts.Concat(inverseReviewCounts)
+                    .GroupBy(entry => entry.EntityId)
+                    .ToDictionary(group => group.Key, group => group.Sum(entry => entry.Count));
+
+                var ratings = await _appEntityRatingRepository.GetAll()
+                    .Where(rating => itemIds.Contains(rating.EntityId))
+                    .GroupBy(rating => rating.EntityId)
+                    .Select(group => new
+                    {
+                        EntityId = group.Key,
+                        AverageRating = group.Average(rating => (decimal)rating.Rating)
+                    })
+                    .ToListAsync();
+                var ratingsByEntity = ratings.ToDictionary(entry => entry.EntityId, entry => entry.AverageRating);
+
+                return itemIds.Select(entityId => new MarketplaceItemReviewSummaryDto
+                {
+                    EntityId = entityId,
+                    NumberOfReviews = reviewCounts.TryGetValue(entityId, out var count) ? count : 0,
+                    AverageRating = ratingsByEntity.TryGetValue(entityId, out var average) ? average : 0
+                }).ToList();
             }
         }
         //I48[End]

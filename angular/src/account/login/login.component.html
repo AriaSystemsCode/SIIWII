@@ -2,7 +2,7 @@
     <div class="kt-login__title">
         <h3 class="m-0 text-left title_KeyColor">
             {{ 'AccountLogin' | localize }}
-            
+
         </h3>
     </div>
 
@@ -11,24 +11,65 @@
         <div class="form-group MB20">
             <label class="sub_titleLog"> {{'UserName'| localize}} <span class="StarInfo">*</span></label>
             <div class="user_p_relative">
-            <img src="../../assets/img/input_icons/user.png" class=" icon-width" [ngClass]="isArabic ? 'ar-user_icon':'user_icon'">
-            <input #userNameOrEmailAddressInput="ngModel"
-                [(ngModel)]="loginService.authenticateModel.userNameOrEmailAddress" autoFocus
-                class="form-control m-input MT0" type="text" autocomplete="new-password"
-                placeholder="{{'UserName@DomainName' | localize}}" name="userNameOrEmailAddress"
-                (focusout)="getTenantIdbyUserName()" required /></div>
+                <img src="../../assets/img/input_icons/user.png" class=" icon-width"
+                    [ngClass]="isArabic ? 'ar-user_icon':'user_icon'">
+                <input #userNameOrEmailAddressInput="ngModel"
+                    [(ngModel)]="loginService.authenticateModel.userNameOrEmailAddress" autoFocus
+                    class="form-control m-input MT0" type="text" autocomplete="new-password"
+                    placeholder="{{'UserName@DomainName' | localize}}" name="userNameOrEmailAddress"
+                    (focusout)="getTenantIdbyUserName()" required />
+            </div>
             <validation-messages [formCtrl]="userNameOrEmailAddressInput"
                 *ngIf="!userNameOrEmailAddressInput.touched"></validation-messages>
         </div>
 
         <div class="form-group MB20">
-            <label class="sub_titleLog"> {{'Password' | localize}} <span class="StarInfo">*</span></label>
+
+            <label class="sub_titleLog">
+                {{ 'Password' | localize }}
+
+                <span class="StarInfo">
+                    *
+                </span>
+            </label>
+
             <div class="user_p_relative">
-            <img src="../../assets/img/input_icons/lock.png" class="icon-width" [ngClass]="isArabic ? 'ar-user_icon':'user_icon'">
-            <input #passwordInput="ngModel" [(ngModel)]="loginService.authenticateModel.password"
-                class="form-control m-input MT0" type="password" autocomplete="new-password"
-                placeholder="{{'EnterYourPassword' | localize}} *" name="password" required maxlength="32" /></div>
-            <validation-messages [formCtrl]="passwordInput" *ngIf="!passwordInput.touched"></validation-messages>
+
+                <img [src]="
+                showPassword
+                    ? '../../assets/img/input_icons/unlock.png'
+                    : '../../assets/img/input_icons/lock.png'
+            " class="
+                icon-width
+                password-toggle-icon
+            " [ngClass]="{
+                'ar-user_icon': isArabic,
+                'user_icon': !isArabic,
+                'w-28': showPassword
+            }" (click)="togglePassword()" alt="Toggle password visibility" />
+
+                <input #passwordInput="ngModel" [(ngModel)]="
+                loginService
+                    .authenticateModel
+                    .password
+            " class="
+                form-control
+                m-input
+                MT0
+            " [type]="
+                showPassword
+                    ? 'text'
+                    : 'password'
+            " autocomplete="new-password" placeholder="{{
+                'EnterYourPassword'
+                    | localize
+            }} *" name="password" required maxlength="32" />
+
+            </div>
+
+            <validation-messages [formCtrl]="passwordInput" *ngIf="!passwordInput.touched">
+            </validation-messages>
+
         </div>
         <div class="row">
             <div class="form-group mt-4 col-sm-6 PL10">
@@ -57,7 +98,7 @@
         <div class="kt-divider">
             <span class="kt-divider_P1"></span>
             <span class="W600" style="color: #595959;"> {{'Or' | localize}} {{"LoginWith" | localize}}</span>
-            <span class="kt-divider_P2" ></span>
+            <span class="kt-divider_P2"></span>
         </div>
     </div>
 

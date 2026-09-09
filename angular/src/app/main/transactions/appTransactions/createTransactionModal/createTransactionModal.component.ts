@@ -422,11 +422,12 @@ export class CreateTransactionModal extends AppComponentBase implements OnInit, 
 
     }
 
-    handleBuyerCompanySearch(event: any) {
+       handleBuyerCompanySearch(event: any) {
         const filter = typeof event === 'string' ? event : (event?.filter ?? '');
-        const type = this.role == "I'm an Independent buying office."
-            ? 'SO'
-            : this.formType?.toUpperCase();
+        const type =
+            this.role?.trim().toLowerCase() === "i'm an independent buying office."
+                ? 'SO'
+                : this.formType?.toUpperCase();
 
         const key = `${filter}|${type}|${this.role}`;
 
@@ -1330,26 +1331,79 @@ if (currencyDto) {
         this.buyerCompanyRelationId = "";
     }
 
-    private getTransactionCurrencyCode(): string {
-        if (this.formType?.toUpperCase() === 'SO') {
-            // Sales Order -> Buyer currency
-            return this.currencyCode || this.appSession.tenant.currencyInfoDto?.code || 'USD';
-        }
+    // private getTransactionCurrencyCode(): string {
+    //     if (this.formType?.toUpperCase() === 'SO') {
+    //         // Sales Order -> Buyer currency
+    //         return this.currencyCode || this.appSession.tenant.currencyInfoDto?.code || 'USD';
+    //     }
 
-        if (this.formType?.toUpperCase() === 'PO' && this.isBuyer) {
-            // Purchase Order -> Buyer currency
-            this.appSession.tenant.currencyInfoDto?.code || 'USD';
-        }
+    //     if (this.formType?.toUpperCase() === 'PO' && this.isBuyer) {
+    //         // Purchase Order -> Buyer currency
+    //         this.appSession.tenant.currencyInfoDto?.code || 'USD';
+    //     }
 
-        if (this.formType?.toUpperCase() === 'PO') {
-            // Purchase Order -> Buyer currency
-            this.appSession.tenant.currencyInfoDto?.code || 'USD';
-        }
+    //     if (this.formType?.toUpperCase() === 'PO') {
+    //         // Purchase Order -> Buyer currency
+    //         this.appSession.tenant.currencyInfoDto?.code || 'USD';
+    //     }
 
-        return this.appSession.tenant.currencyInfoDto?.code || 'USD';
+    //     return this.appSession.tenant.currencyInfoDto?.code || 'USD';
+    // }
+
+private getTransactionCurrencyCode(): string {
+
+    const transactionType =
+        this.formType?.toUpperCase();
+
+    // =====================================================
+    // BUYER CURRENCY
+    // =====================================================
+    const selectedBuyerCurrencyCode =
+        typeof this.currencyCode === 'string'
+            ? this.currencyCode
+            : this.currencyCode?.code;
+
+    // =====================================================
+    // SELLER CURRENCY
+    // =====================================================
+    const selectedSellerCurrencyCode =
+        typeof this.sellerCurrencyCode === 'string'
+            ? this.sellerCurrencyCode
+            : this.sellerCurrencyCode?.code;
+
+    // =====================================================
+    // SALES ORDER
+    // Buyer currency
+    // =====================================================
+    if (transactionType === 'SO') {
+
+        return (
+            selectedBuyerCurrencyCode ||
+            this.appSession.tenant.currencyInfoDto?.code ||
+            'USD'
+        );
     }
 
+    // =====================================================
+    // PURCHASE ORDER
+    // ALWAYS BUYER CURRENCY
+    // =====================================================
+    if (transactionType === 'PO') {
 
+        return (
+            selectedBuyerCurrencyCode ||
+            this.appSession.tenant.currencyInfoDto?.code ||
+            'USD'
+        );
+    }
+
+    return (
+        selectedBuyerCurrencyCode ||
+        selectedSellerCurrencyCode ||
+        this.appSession.tenant.currencyInfoDto?.code ||
+        'USD'
+    );
+}
 
     private updateSellerSSIN(value: string): void {
 

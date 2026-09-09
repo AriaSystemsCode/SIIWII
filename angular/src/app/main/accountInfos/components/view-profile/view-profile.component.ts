@@ -1,5 +1,5 @@
 import { Component, ViewChild, Injector, Input, OnInit, OnChanges, SimpleChanges, Output, EventEmitter } from '@angular/core';
-import { AccountDto, AccountLevelEnum, AccountsServiceProxy, AppEntitiesServiceProxy, AppEntityAttachmentDto, AppEntityExtraDataDto, LookupLabelDto, SycAttachmentCategoryDto } from '@shared/service-proxies/service-proxies';
+import { AccountDto, AccountLevelEnum, AccountsServiceProxy, AppEntitiesServiceProxy, AppEntityAttachmentDto, AppEntityExtraDataDto, LookupLabelDto, SycAttachmentCategoryDto, SycEntityObjectTypesServiceProxy } from '@shared/service-proxies/service-proxies';
 import { AppComponentBase } from '@shared/common/app-component-base';
 import { NgImageSliderComponent } from 'ng-image-slider';
 import { AppConsts } from '@shared/AppConsts';
@@ -85,6 +85,8 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
     editEMailAddressValue: string = '';
     editLanguageNameValue: string = '';
     editPhoneNumberValue: string = '';
+
+    editNotesValue: string = '';
     Editting: boolean = false;
     editPersonal: boolean = false;
     showPrivate = true;
@@ -109,48 +111,117 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
     // NEW: keep originals so Cancel can revert
     private _originalLogoUrl?: string;
     private _originalCoverUrl?: string;
-  roles:any
-            selectedRoles!: any[];
+roles: any[] = [];
+selectedRoles: string[] = [];
+previousSelectedRoles: string[] = [];
+
+            @Input() createMode = false;
+
+@Input() startInEditMode = false;
+
+@Output()
+cancelEdit =
+    new EventEmitter<void>();
+
+
+    private personalModeInitialized =
+    false;
 
     constructor(
         injector: Injector,
         private _appEntitiesServiceProxy: AppEntitiesServiceProxy,
         private _AccountsServiceProxy: AccountsServiceProxy,
+        private _sycEntityObjectTypesServiceProxy: SycEntityObjectTypesServiceProxy,
         private _tokenService: TokenService,
     ) {
         super(injector)
     }
 
-    ngOnChanges(changes: SimpleChanges) {
-        if (this.accountData) {
-            this.handleAccountData()
-            this.initDepartmentVariables(true);
-            this.initClassificationVariables(true);
-            // this.getContactSync();
-            this.getLanguages()
-            this.setSelectedMarketplaceRoles();
-            this.isRecordOwner = this.accountData?.id == this.appSession.user?.accountId ? true : false
+
+
+ngOnChanges(
+    changes: SimpleChanges
+): void {
+
+    if (this.accountData) {
+
+        this.ensurePersonalModels();
+
+        this.handleAccountData();
+
+        if (!this.personalAccount) {
+
+            this.initDepartmentVariables(
+                true
+            );
+
+            this.initClassificationVariables(
+                true
+            );
         }
 
-    }
-    ngOnInit() {
-                this.roles = [
-            { name: 'Buyer' },
-            { name: 'Seller' },
-            { name: 'Sales Rep' },
-            { name: 'Buying Office' },
-         
-        ];
-        this.getAllForAccountInfo()
-        this.allPriceLevel = this.getPriceLevel();
-        this.allPriceLevel.push({ label: 'MSRP', value: 'MSRP' });
+        this.getLanguages();
 
-        this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
-        this.currentLang == 'ar' || this.currentLang == 'ar-EG'  ? this.isArabic = true : this.isArabic = false
-        this.initUploaders();
 
+        // Load available Marketplace Roles
+        // based on account type
+        this.getExtrAttributes();
+
+
+        this.isRecordOwner =
+            this.accountData?.id ===
+            this.appSession.user?.accountId;
     }
 
+
+    if (
+        this.personalAccount &&
+        this.startInEditMode &&
+        !this.personalModeInitialized
+    ) {
+
+        this.enterPersonalEditMode();
+
+        this.personalModeInitialized =
+            true;
+    }
+
+
+    if (
+        this.personalAccount &&
+        !this.startInEditMode
+    ) {
+
+        this.Editting = false;
+        this.editInfo = true;
+        this.NoteditInfo = false;
+
+        this.personalModeInitialized =
+            false;
+    }
+}
+   ngOnInit(): void {
+    this.getAllForAccountInfo();
+
+    this.allPriceLevel =
+        this.getPriceLevel();
+
+    this.allPriceLevel.push({
+        label: 'MSRP',
+        value: 'MSRP'
+    });
+
+    this.currentLang =
+        abp.utils.getCookieValue(
+            'Abp.Localization.CultureName'
+        );
+
+    this.isArabic =
+        this.currentLang === 'ar' ||
+        this.currentLang === 'ar-EG';
+
+    this.initUploaders();
+}
     prevImageClick() {
         this.slider.prev();
     }
@@ -207,6 +278,8 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
             this.editedPersonalData.languageName = this.allLanguages.find(l => l.value == this.contactData.languageId)?.label;
             this.editedPersonalData.phone1Number = this.editPhoneNumberValue;
             this.editedPersonalData.jobTitle = this.editJobTitleValue;
+
+
             this.editedPersonalData.emailAddressIsPublic = this.contactData?.emailAddressIsPublic;
             this.editedPersonalData.phone1IsPublic = this.contactData?.phone1IsPublic;
             this.contactData.entityAttachments = this.mergeAttachmentsForSave(
@@ -219,6 +292,7 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
 
 
             this.contactData.languageName = this.editedPersonalData.languageName;
+                        this.contactData.notes =this.editNotesValue;
            this.updateMarketplaceRolesExtraData();
 this.editedPersonalData.entityExtraData = this.accountData.entityExtraData;
             this.editedContactData.emit(this.contactData)
@@ -475,30 +549,169 @@ this.editedPersonalData.entityExtraData = this.accountData.entityExtraData;
         });
     }
 
-    setPersonalData() {
-        this.editFirstNameValue = this.contactData?.firstName;
-        this.editLastNameValue = this.contactData?.lastName;
-        this.editJobTitleValue = this.contactData?.jobTitle;
-        this.editEMailAddressValue = this.accountData.eMailAddress;
-        this.editPhoneNumberValue = this.accountData.phone1Number;
+    // setPersonalData() {
+    //     this.editFirstNameValue = this.contactData?.firstName;
+    //     this.editLastNameValue = this.contactData?.lastName;
+    //     this.editJobTitleValue = this.contactData?.jobTitle;
+    //     this.editEMailAddressValue = this.accountData.eMailAddress;
+    //     this.editPhoneNumberValue = this.accountData.phone1Number;
+    // }
+
+
+    setPersonalData(): void {
+
+    this.editFirstNameValue =
+        this.contactData?.firstName ??
+        this.getExtraDataValue(701) ??
+        '';
+
+    this.editLastNameValue =
+        this.contactData?.lastName ??
+        this.getExtraDataValue(702) ??
+        '';
+
+    this.editJobTitleValue =
+        this.contactData?.jobTitle ??
+        this.getExtraDataValue(706) ??
+        '';
+
+    this.editEMailAddressValue =
+        this.accountData?.eMailAddress ??
+        '';
+
+    this.editPhoneNumberValue =
+        this.accountData?.phone1Number ??
+        '';
+
+            // Notes / About
+    this.editNotesValue =
+        this.contactData?.notes ??
+        '';
+
+    this.contactData.emailAddressIsPublic =
+        this.contactData
+            ?.emailAddressIsPublic ??
+        this.getBooleanExtraDataValue(
+            709
+        );
+
+    this.contactData.phone1IsPublic =
+        this.contactData
+            ?.phone1IsPublic ??
+        this.getBooleanExtraDataValue(
+            710
+        );
+}
+
+private getExtraDataValue(
+    attrId: number
+): any {
+
+    return (
+        this.accountData
+            ?.entityExtraData
+            ?.find(
+                x =>
+                    x.attributeId ===
+                    attrId
+            )
+            ?.attributeValue
+        ??
+        this.entityExtraData
+            ?.find(
+                x =>
+                    x.attributeId ===
+                    attrId
+            )
+            ?.attributeValue
+    );
+}
+
+private getBooleanExtraDataValue(
+    attrId: number
+): boolean {
+
+    const value =
+        this.getExtraDataValue(
+            attrId
+        );
+
+    return (
+        value === true ||
+        value === 'true'
+    );
+}
+
+    // cancelPerAcc() {
+
+    //     this.editInfo = true;
+    //     this.NoteditInfo = false;
+    //     this.Editting = false
+
+    //     this.companyLogo = this._originalLogoUrl ?? this.companyLogo;
+    //     this.coverPhoto = this._originalCoverUrl ?? this.coverPhoto;
+
+
+    //     this.accountData.entityAttachments =
+    //         (this.accountData.entityAttachments || []).filter(a => !(a.index === -1 || a.index === -2));
+
+    //     this.setPersonalData()
+
+    // }
+
+    cancelPerAcc(): void {
+
+    /*
+     * CREATE
+     */
+    if (this.createMode) {
+
+        this.setPersonalData();
+
+        return;
     }
 
-    cancelPerAcc() {
 
-        this.editInfo = true;
-        this.NoteditInfo = false;
-        this.Editting = false
+    /*
+     * EDIT existing
+     */
 
-        this.companyLogo = this._originalLogoUrl ?? this.companyLogo;
-        this.coverPhoto = this._originalCoverUrl ?? this.coverPhoto;
+    this.editInfo = true;
+
+    this.NoteditInfo = false;
+
+    this.Editting = false;
+
+    this.editPersonal = false;
 
 
-        this.accountData.entityAttachments =
-            (this.accountData.entityAttachments || []).filter(a => !(a.index === -1 || a.index === -2));
+    this.companyLogo =
+        this._originalLogoUrl ??
+        this.companyLogo;
 
-        this.setPersonalData()
+    this.coverPhoto =
+        this._originalCoverUrl ??
+        this.coverPhoto;
 
-    }
+
+    this.accountData.entityAttachments =
+        (
+            this.accountData
+                .entityAttachments ||
+            []
+        ).filter(
+            a =>
+                !(
+                    a.index === -1 ||
+                    a.index === -2
+                )
+        );
+
+
+    this.setPersonalData();
+
+    this.cancelEdit.emit();
+}
     initUploaders(): void {
         this.uploader = this.createUploader(
             '/Attachment/UploadFiles',
@@ -671,58 +884,390 @@ this.editedPersonalData.entityExtraData = this.accountData.entityExtraData;
 
 
 get marketplaceRolesList(): string[] {
-  const roleItem = this.entityExtraData?.find(
-    x => x.attributeId === 610
-  );
 
-  return roleItem?.attributeValue
-    ? roleItem.attributeValue.split('-').filter(Boolean)
-    : [];
+    const extraData =
+        this.accountData?.entityExtraData ||
+        this.entityExtraData ||
+        [];
+
+    const roleItem =
+        extraData.find(
+            x =>
+                x.attributeId === 610 ||
+                x.attributeCode ===
+                'MARKETPLACE-ROLE'
+        );
+
+    return roleItem?.attributeValue
+        ? roleItem.attributeValue
+            .split('-')
+            .map(x => x.trim())
+            .filter(Boolean)
+        : [];
 }
 
 
+
+// buildMarketplaceRolesExtraData(): AppEntityExtraDataDto[] {
+//   if (!this.selectedRoles?.length) return [];
+
+//   const dto = new AppEntityExtraDataDto();
+
+//   dto.entityId = this.accountData?.entityId;
+//   dto.attributeId = 610;
+//   dto.attributeCode = '';
+//   dto.attributeValue = [...new Set(this.selectedRoles)].join('-');
+//   dto.attributeValueId = null;
+//   dto.attributeValueFkName = null;
+//   dto.attributeValueFkCode = null;
+//   dto.id = 0;
+
+//   return [dto];
+// }
 
 buildMarketplaceRolesExtraData(): AppEntityExtraDataDto[] {
-  if (!this.selectedRoles?.length) return [];
 
-  const dto = new AppEntityExtraDataDto();
+    if (!this.selectedRoles?.length) {
+        return [];
+    }
 
-  dto.entityId = this.accountData?.entityId;
-  dto.attributeId = 610;
-  dto.attributeCode = '';
-  dto.attributeValue = [...new Set(this.selectedRoles)].join('-');
-  dto.attributeValueId = null;
-  dto.attributeValueFkName = null;
-  dto.attributeValueFkCode = null;
-  dto.id = 0;
+    const dto =
+        new AppEntityExtraDataDto();
 
-  return [dto];
+    dto.entityId =
+        this.accountData?.entityId ??
+        this.accountData?.id ??
+        0;
+
+    dto.entityObjectTypeId = 610;
+
+    dto.entityObjectTypeCode =
+        'PROD-RAWM-TRIM-POMP';
+
+    dto.entityObjectTypeName =
+        'Marketplace Role';
+
+    dto.attributeId = 610;
+
+    dto.attributeCode =
+        'MARKETPLACE-ROLE';
+
+    dto.attributeValue =
+        [...new Set(this.selectedRoles)]
+            .filter(Boolean)
+            .join('-');
+
+    dto.attributeValueId = null;
+    dto.attributeValueFkName = null;
+    dto.attributeValueFkCode = null;
+
+    dto.id = 0;
+
+    return [dto];
 }
 
+// updateMarketplaceRolesExtraData(): void {
+//   if (!this.accountData) return;
+
+//   const existingExtraData = this.accountData.entityExtraData || this.entityExtraData || [];
+
+//   const updated = [
+//     ...existingExtraData.filter(x => x.attributeId !== 610),
+//     ...this.buildMarketplaceRolesExtraData()
+//   ];
+
+
+//   this.accountData.entityExtraData = updated;
+//   this.entityExtraData = updated;
+// }
+
 updateMarketplaceRolesExtraData(): void {
-  if (!this.accountData) return;
 
-  const existingExtraData = this.accountData.entityExtraData || this.entityExtraData || [];
+    if (!this.accountData) {
+        return;
+    }
 
-  const updated = [
-    ...existingExtraData.filter(x => x.attributeId !== 610),
-    ...this.buildMarketplaceRolesExtraData()
-  ];
+    const existing =
+        this.accountData.entityExtraData ||
+        this.entityExtraData ||
+        [];
 
+    this.accountData.entityExtraData = [
+        ...existing.filter(
+            x => x.attributeId !== 610
+        ),
+        ...this.buildMarketplaceRolesExtraData()
+    ];
 
-  this.accountData.entityExtraData = updated;
-  this.entityExtraData = updated;
+    this.entityExtraData =
+        this.accountData.entityExtraData;
 }
 
 
 setSelectedMarketplaceRoles(): void {
-  const marketplaceRole = this.entityExtraData?.find(
-    x => x.attributeId === 610
-  );
 
-  this.selectedRoles = marketplaceRole?.attributeValue
-    ? marketplaceRole.attributeValue.split('-').filter(Boolean)
-    : [];
+    const extraData =
+        this.accountData?.entityExtraData ||
+        this.entityExtraData ||
+        [];
+
+    const marketplaceRole =
+        extraData.find(
+            x =>
+                x.attributeId === 610 ||
+                x.attributeCode ===
+                'MARKETPLACE-ROLE'
+        );
+
+    this.selectedRoles =
+        marketplaceRole?.attributeValue
+            ? marketplaceRole
+                .attributeValue
+                .split('-')
+                .map(x => x.trim())
+                .filter(Boolean)
+            : [];
+
+    this.previousSelectedRoles = [
+        ...this.selectedRoles
+    ];
 }
 
+
+private enterPersonalEditMode(): void {
+
+    this.ensurePersonalModels();
+
+    this.Editting = true;
+
+    this.editInfo = false;
+
+    this.NoteditInfo = true;
+
+    this.editPersonal = false;
+
+    this.setPersonalData();
+}
+
+
+private savePersonalProfile(): void {
+
+    this.ensurePersonalModels();
+
+
+    const editedAccount: any = {
+        ...this.accountData
+    };
+
+
+    editedAccount.firstName =
+        this.editFirstNameValue;
+
+    editedAccount.lastName =
+        this.editLastNameValue;
+
+    editedAccount.jobTitle =
+        this.editJobTitleValue;
+
+    editedAccount.eMailAddress =
+        this.editEMailAddressValue;
+
+    editedAccount.phone1Number =
+        this.editPhoneNumberValue;
+
+
+    editedAccount.languageId =
+        this.contactData
+            ?.languageId;
+
+    editedAccount.languageName =
+        this.allLanguages?.find(
+            l =>
+                l.value ==
+                this.contactData
+                    ?.languageId
+        )?.label;
+
+
+    editedAccount.emailAddressIsPublic =
+        !!this.contactData
+            ?.emailAddressIsPublic;
+
+    editedAccount.phone1IsPublic =
+        !!this.contactData
+            ?.phone1IsPublic;
+
+
+    /*
+     * Keep Account DTO fields synchronized
+     */
+    this.accountData.eMailAddress =
+        this.editEMailAddressValue;
+
+    this.accountData.phone1Number =
+        this.editPhoneNumberValue;
+
+    this.accountData.languageId =
+        this.contactData
+            ?.languageId;
+
+
+    /*
+     * Contact fields
+     */
+    this.contactData.firstName =
+        this.editFirstNameValue;
+
+    this.contactData.lastName =
+        this.editLastNameValue;
+
+    this.contactData.jobTitle =
+        this.editJobTitleValue;
+
+
+    /*
+     * Images
+     */
+    this.contactData.entityAttachments =
+        this.mergeAttachmentsForSave(
+            this.contactData
+                ?.entityAttachments ||
+                [],
+
+            this.accountData
+                ?.entityAttachments ||
+                [],
+
+            this.sycAttachmentCategoryLogo
+                ?.id,
+
+            this.sycAttachmentCategoryBanner
+                ?.id,
+
+            this._removed
+        );
+
+
+    /*
+     * Marketplace role
+     */
+    this.updateMarketplaceRolesExtraData();
+
+    editedAccount.entityExtraData =
+        this.accountData
+            .entityExtraData;
+
+
+    this.editedContactData.emit(
+        this.contactData
+    );
+
+    this.editedData.emit(
+        editedAccount
+    );
+}
+
+private ensurePersonalModels(): void {
+
+    if (!this.accountData) {
+        this.accountData = {} as any;
+    }
+
+    this.accountData.entityExtraData ??= [];
+    this.accountData.entityAttachments ??= [];
+
+    if (!this.contactData) {
+        this.contactData = {
+            firstName: '',
+            lastName: '',
+            jobTitle: '',
+            languageId: null,
+            languageName: '',
+            emailAddressIsPublic: true,
+            phone1IsPublic: true,
+            entityAttachments: []
+        } as any;
+    } else {
+        this.contactData.entityAttachments ??= [];
+    }
+}
+
+getExtrAttributes(): void {
+
+    const accountType =
+        this.accountData?.accountType;
+
+    if (!accountType) {
+        this.roles = [];
+        return;
+    }
+
+    this._sycEntityObjectTypesServiceProxy
+        .getAllWithExtraAttributesByCode(
+            accountType,
+            ''
+        )
+        .subscribe(result => {
+
+            const marketplaceRoleAttribute =
+                result?.[0]
+                    ?.extraAttributes
+                    ?.extraAttributes
+                    ?.find(
+                        x =>
+                            x.code ===
+                            'MARKETPLACE-ROLE'
+                    );
+
+            if (!marketplaceRoleAttribute) {
+                this.roles = [];
+
+                if (this.createMode) {
+                    this.selectedRoles = [];
+                }
+
+                return;
+            }
+
+
+            // Available roles
+            this.roles =
+                (
+                    marketplaceRoleAttribute
+                        .validEntries || ''
+                )
+                    .split('|')
+                    .map(x => x.trim())
+                    .filter(Boolean)
+                    .map(x => ({
+                        name: x
+                    }));
+
+
+            // CREATE
+            if (this.createMode) {
+
+                this.selectedRoles =
+                    (
+                        marketplaceRoleAttribute
+                            .defaultValue || ''
+                    )
+                        .split('|')
+                        .map(x => x.trim())
+                        .filter(Boolean);
+
+                this.previousSelectedRoles = [
+                    ...this.selectedRoles
+                ];
+
+                this.updateMarketplaceRolesExtraData();
+
+                return;
+            }
+
+
+            // EDIT
+            this.setSelectedMarketplaceRoles();
+        });
+}
 }

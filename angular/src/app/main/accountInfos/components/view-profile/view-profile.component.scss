@@ -129,7 +129,6 @@
 }
 
 .productDetailContainer {
-
     height: auto;
     background: #ffffff;
     border: 1px solid #dadada;
@@ -190,8 +189,7 @@
 .seeMoreData {
     background-color: #f4f4f4;
     display: inline-block;
-    margin: 0 0 20px 0;
-    margin-left: 20px;
+    margin: 0 0 20px 20px;
     padding: 11px 33px 11px 34px;
     text-align: center;
     position: relative;
@@ -218,10 +216,6 @@
     border-right: 0.3em solid transparent;
     border-bottom: 0;
     border-left: 0.3em solid transparent;
-    -ms-transform: rotate(-18deg);
-    /* IE 9 */
-    -webkit-transform: rotate(-180deg);
-    /* Chrome, Safari, Opera */
     transform: rotate(-180deg);
 }
 
@@ -238,15 +232,14 @@
     color: #3699ff !important;
 }
 
-
 .sync {
-    border-color: #F88011 !important;
-    color: #F88011 !important;
+    border-color: #f88011 !important;
+    color: #f88011 !important;
     border-radius: 6px;
 }
 
 .editAccount_butn {
-    background-color: #4A0D4A !important;
+    background-color: #4a0d4a !important;
     border: none;
     border-radius: 6px;
     color: white;
@@ -256,16 +249,21 @@
     display: none !important;
 }
 
-
 .Save_editPersonal {
     margin: auto;
 }
 
+/*
+IMPORTANT:
+Removed the old global:
+input {
+  width: 60%;
+  margin: 0 15px;
+}
+because it breaks all alignment.
+*/
 input {
     background-color: transparent !important;
-    width: 60%;
-    display: inline-block;
-    margin: 0px 15px;
 }
 
 .main-inner {
@@ -284,9 +282,7 @@ input {
 
 .addHight {
     height: 375px;
-
 }
-
 
 ::ng-deep {
     .ng-image-slider .ng-image-slider-container .main .main-inner .img-div {
@@ -304,28 +300,25 @@ input {
     }
 }
 
-
-
 .btn-save {
-    background-color: #4A0D4A;
+    background-color: #4a0d4a;
     color: #fff;
 }
 
 .isPublic {
-    color: #1B101B;
+    color: #1b101b;
     font-weight: 700;
-    white-space: nowrap
+    white-space: nowrap;
 }
 
 .account-name {
-    color: #1B101B;
+    color: #1b101b;
     font-weight: 700;
 }
 
 .addWidth {
-    width: 135px;
+    width: 220px !important;
 }
-
 
 .view-profile-action-buttons-en {
     position: absolute;
@@ -347,15 +340,13 @@ small {
 
 .caneclBtn {
     background-color: white !important;
-    color: #4A0D4A !important;
-    border: 1px solid #EEEEEEEE;
+    color: #4a0d4a !important;
+    border: 1px solid #eeeeee;
     height: 38px;
     border-radius: 6px;
 }
 
-
 .txtSty {
-
     min-height: 80px;
     border: 0;
     outline: 0;
@@ -364,112 +355,772 @@ small {
     font-size: 14px;
 }
 
-
 .role-chip {
-  background: #ECF0F3;
-color: #464E5F;
-    padding: 10px 25px;
+    background: #ecf0f3;
+    color: #464e5f;
+    padding: 8px 16px;
     border-radius: 6px;
     font-size: 13px;
     font-weight: 500;
-    margin-left: 25px;
-}
-
-
-
-
-.account-info-grid-wrapper {
-  padding: 0 1rem !important;
-}
-
-.account-info-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 18px 24px;
-}
-
-.account-info-item {
-  min-width: 0;
-}
-
-.account-info-item-full {
-  grid-column: 1 / -1;
-}
-
-.title-dev-slider {
-  text-align: left;
-  margin-bottom: 8px;
-  word-break: break-word;
-}
-
-.title-tag {
-  margin-bottom: 0;
-  word-break: break-word;
+    margin: 0 !important;
 }
 
 .role-chip-wrapper {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
 }
 
-/* Tablet */
-@media (max-width: 1024px) {
-  .account-info-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
+.account-info-grid-wrapper {
+    padding: 0 1rem !important;
 }
 
-/* Mobile */
-@media (max-width: 768px) {
-  .account-info-grid-wrapper {
-    padding: 0 0.75rem !important;
-  }
-
-  .account-info-grid {
-    grid-template-columns: 1fr;
-    gap: 14px;
-  }
-
-  .title-dev-slider {
-    text-align: left;
-  }
+.account-info-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px 24px;
 }
 
-/* Arabic */
+.account-info-item {
+    min-width: 0;
+}
+
+.account-info-item-full {
+    grid-column: 1 / -1;
+}
+
+.title-dev-slider {
+    text-align: justify !important;
+    margin-bottom: 8px;
+    word-break: break-word;
+}
+
+.title-tag {
+    margin-bottom: 0;
+    word-break: break-word;
+}
+
 .rtl-layout .account-info-grid-wrapper {
-  direction: rtl;
+    direction: rtl;
 }
 
 .rtl-layout .title-dev-slider,
 .rtl-layout .title-tag {
-  text-align: right;
-}
-.title-dev-slider {
-    text-align: justify  !important;
+    text-align: right;
 }
 
 ::ng-deep {
-
-
-.dev-logo-ar {
-    position: absolute !important;
-    right: 35px !important;
-    top: -30px !important;
-        border: 1px solid #6259CE;
-    border-radius: 4px !important;
+    .dev-logo-ar {
+        position: absolute !important;
+        right: 35px !important;
+        top: -30px !important;
+        border: 1px solid #6259ce;
+        border-radius: 4px !important;
+    }
 }
 
-}
-
-
-.view-profile-wrapper .account-type, .view-profile-wrapper .address, .view-profile-wrapper .mail {
-        background-color: #ECF0F3;
+.view-profile-wrapper .account-type,
+.view-profile-wrapper .address,
+.view-profile-wrapper .mail {
+    background-color: #ecf0f3;
     display: inline-block;
-
     text-align: center;
     position: relative;
     border-radius: 5px;
     padding: 10px;
-    margin: 0px;
+    margin: 0;
+}
+
+
+/* =========================================================
+   PERSONAL PROFILE ALIGNMENT
+   ========================================================= */
+
+.profileInfo_container {
+    width: 100%;
+}
+
+.profileInfo_container .kt-portlet__body {
+    width: 100%;
+}
+
+.profileInfo_container .kt-portlet__body > .row {
+    width: 100%;
+    margin: 0;
+}
+
+
+/* -----------------------------------------
+   COMMON PERSONAL FIELD ROW
+   ----------------------------------------- */
+
+.profileInfo_container
+.kt-portlet__body
+> .row
+> .col-md-12:not(:first-child) {
+    display: grid !important;
+
+    grid-template-columns:
+        180px
+        minmax(0, 520px)
+        minmax(120px, auto);
+
+    column-gap: 20px;
+
+    align-items: center !important;
+
+    width: 100%;
+
+    min-height: 64px;
+
+    padding-top: 10px !important;
+    padding-bottom: 10px !important;
+
+    padding-left: 15px !important;
+    padding-right: 15px !important;
+}
+
+
+/* -----------------------------------------
+   LABELS
+   ----------------------------------------- */
+
+.profileInfo_container h6 {
+    width: 220px !important;
+    min-width: 220px !important;
+    max-width: 220px !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    display: flex;
+    align-items: center;
+
+    gap: 10px;
+
+    color: #1b101b;
+
+    font-size: 14px;
+    font-weight: 600;
+
+    line-height: 20px;
+
+    text-align: left !important;
+
+    white-space: normal;
+}
+
+
+/* force all old mx/mr bootstrap spacing away */
+.profileInfo_container h6.mx-3,
+.profileInfo_container h6.mr-3 {
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+}
+
+
+.profileInfo_container h6 img {
+    width: 20px;
+
+    height: 20px;
+
+    min-width: 20px;
+
+    max-width: 20px;
+
+    object-fit: contain;
+
+    margin: 0 !important;
+}
+
+
+/* -----------------------------------------
+   INPUTS
+   ----------------------------------------- */
+
+.profileInfo_container input.form-control,
+.profileInfo_container input.aria-input-text {
+    width: 100% !important;
+
+    max-width: 520px !important;
+
+    min-width: 0;
+
+    height: 42px;
+
+    display: block !important;
+
+    margin: 0 !important;
+
+    padding: 8px 12px;
+
+    color: #595959 !important;
+
+    background-color: #ffffff !important;
+
+    border: 1px solid #e2e5ec;
+
+    border-radius: 6px;
+
+    box-sizing: border-box;
+}
+
+
+.profileInfo_container input.form-control:focus,
+.profileInfo_container input.aria-input-text:focus {
+    border-color: #a7a7a7;
+
+    outline: none;
+
+    box-shadow: none;
+}
+
+
+/* -----------------------------------------
+   VIEW MODE VALUE
+   ----------------------------------------- */
+
+.profileInfo_container p.text-left {
+    width: 100%;
+
+    max-width: 520px;
+
+    min-height: 42px;
+
+    display: flex;
+
+    align-items: center;
+
+    margin: 0 !important;
+
+    color: #595959;
+
+    line-height: 20px;
+}
+
+
+/* -----------------------------------------
+   MARKETPLACE ROLE
+   ----------------------------------------- */
+
+.profileInfo_container .col-sm-8 {
+    width: 100%;
+
+    max-width: 520px;
+
+    min-width: 0;
+
+    padding: 0 !important;
+
+    margin: 0 !important;
+
+    flex: none;
+}
+
+
+.profileInfo_container p-multiselect,
+.profileInfo_container p-multiSelect {
+    width: 100%;
+
+    max-width: 520px;
+
+    display: block;
+}
+
+
+::ng-deep
+.profileInfo_container
+.p-multiselect {
+    width: 100% !important;
+
+    max-width: 520px;
+
+    min-height: 42px !important;
+
+    border: 1px solid #e2e5ec !important;
+
+    border-radius: 6px !important;
+}
+
+
+::ng-deep
+.profileInfo_container
+.p-multiselect-label-container {
+    min-height: 40px;
+
+    display: flex;
+
+    align-items: center;
+}
+
+
+::ng-deep
+.profileInfo_container
+.p-multiselect-label {
+    min-height: 40px;
+
+    display: flex;
+
+    align-items: center;
+
+    flex-wrap: wrap;
+
+    padding: 6px 12px !important;
+}
+
+
+.profileInfo_container .d-flex.flex-wrap {
+    width: 100%;
+
+    max-width: 520px;
+
+    display: flex !important;
+
+    align-items: center;
+
+    flex-wrap: wrap;
+
+    gap: 8px;
+}
+
+
+/* -----------------------------------------
+   LANGUAGE DROPDOWN
+   ----------------------------------------- */
+
+.profileInfo_container p-dropdown {
+    width: 100%;
+
+    max-width: 520px;
+
+    display: block;
+}
+
+
+::ng-deep
+.profileInfo_container
+p-dropdown
+.p-dropdown {
+    width: 100% !important;
+
+    max-width: 520px !important;
+
+    min-height: 42px !important;
+
+    border: 1px solid #e2e5ec !important;
+
+    border-radius: 6px !important;
+
+    background: #ffffff !important;
+}
+
+
+::ng-deep
+.profileInfo_container
+.p-dropdown-label {
+    min-height: 40px;
+
+    display: flex;
+
+    align-items: center;
+
+    padding: 6px 12px !important;
+}
+
+
+::ng-deep
+.profileInfo_container
+.p-dropdown-trigger {
+    width: 42px;
+}
+
+
+/* -----------------------------------------
+   EMAIL / PHONE WITH PUBLIC SWITCH
+   ----------------------------------------- */
+
+.profileInfo_container
+.d-flex.align-items-center.ml-3 {
+    margin-left: 0 !important;
+
+    display: flex !important;
+
+    align-items: center;
+
+    gap: 10px;
+
+    white-space: nowrap;
+}
+
+
+.profileInfo_container
+.d-flex.align-items-center.ml-3
+.isPublic {
+    margin: 0 !important;
+
+    white-space: nowrap;
+
+    color: #1b101b;
+
+    font-size: 13px;
+
+    font-weight: 600;
+}
+
+
+/* -----------------------------------------
+   PRIME INPUT SWITCH
+   ----------------------------------------- */
+
+::ng-deep
+.profileInfo_container
+.p-inputswitch {
+    margin: 0;
+}
+
+
+/* -----------------------------------------
+   VALIDATION
+   ----------------------------------------- */
+
+.profileInfo_container
+validation-messages {
+    display: block;
+
+    width: 100%;
+
+    max-width: 520px;
+
+    grid-column: 2;
+
+    margin-top: 5px;
+}
+
+
+.profileInfo_container .text-danger {
+    grid-column: 2;
+
+    width: 100%;
+
+    max-width: 520px;
+
+    margin-top: 5px;
+}
+
+
+/* -----------------------------------------
+   HR
+   ----------------------------------------- */
+
+.profileInfo_container hr.header {
+    width: 100%;
+
+    margin: 0 !important;
+
+    border: 0;
+
+    border-top: 1px solid #eeeeee;
+}
+
+
+/* -----------------------------------------
+   OVERVIEW
+   ----------------------------------------- */
+
+.profileInfo_container .title-dev-slider {
+    width: auto !important;
+
+    min-width: 0 !important;
+
+    max-width: none !important;
+
+    margin: 0 !important;
+
+    text-align: left !important;
+}
+
+
+/* -----------------------------------------
+   IMAGE EDIT FIELDS
+   ----------------------------------------- */
+
+.view-profile-wrapper
+.form-group.row
+app-image-upload {
+    display: block;
+}
+
+
+/* -----------------------------------------
+   LOGO / COVER EDIT LABELS
+   ----------------------------------------- */
+
+.view-profile-wrapper
+.form-group.row
+label.label-form {
+    min-width: 220px;
+
+    width: 220px;
+
+    margin: 0;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: flex-end;
+
+    padding-right: 20px;
+
+    color: #595959;
+}
+
+
+/* =========================================================
+   TABLET
+   ========================================================= */
+
+@media (max-width: 1100px) {
+
+    .profileInfo_container
+    .kt-portlet__body
+    > .row
+    > .col-md-12:not(:first-child) {
+        grid-template-columns:
+            180px
+            minmax(0, 1fr)
+            auto;
+
+        column-gap: 16px;
+    }
+
+
+    .profileInfo_container h6,
+    .profileInfo_container .addWidth {
+        width: 180px !important;
+
+        min-width: 180px !important;
+
+        max-width: 180px !important;
+    }
+
+
+    .profileInfo_container input.form-control,
+    .profileInfo_container input.aria-input-text,
+    .profileInfo_container p-dropdown,
+    .profileInfo_container p-multiselect,
+    .profileInfo_container p-multiSelect,
+    .profileInfo_container .col-sm-8,
+    .profileInfo_container p.text-left {
+        max-width: 100% !important;
+    }
+
+
+    ::ng-deep
+    .profileInfo_container
+    .p-dropdown,
+
+    ::ng-deep
+    .profileInfo_container
+    .p-multiselect {
+        max-width: 100% !important;
+    }
+}
+
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 768px) {
+
+    .account-info-grid-wrapper {
+        padding: 0 0.75rem !important;
+    }
+
+
+    .account-info-grid {
+        grid-template-columns: 1fr;
+        gap: 14px;
+    }
+
+
+    .profileInfo_container
+    .kt-portlet__body
+    > .row {
+        padding-left: 12px !important;
+
+        padding-right: 12px !important;
+    }
+
+
+    .profileInfo_container
+    .kt-portlet__body
+    > .row
+    > .col-md-12:not(:first-child) {
+        display: flex !important;
+
+        flex-direction: column;
+
+        align-items: stretch !important;
+
+        width: 100%;
+
+        min-height: auto;
+
+        padding-left: 0 !important;
+
+        padding-right: 0 !important;
+
+        gap: 8px;
+    }
+
+
+    .profileInfo_container h6,
+    .profileInfo_container .addWidth {
+        width: 100% !important;
+
+        min-width: 0 !important;
+
+        max-width: none !important;
+
+        margin-bottom: 4px !important;
+    }
+
+
+    .profileInfo_container input.form-control,
+    .profileInfo_container input.aria-input-text,
+    .profileInfo_container p-dropdown,
+    .profileInfo_container p-multiselect,
+    .profileInfo_container p-multiSelect,
+    .profileInfo_container .col-sm-8,
+    .profileInfo_container p.text-left {
+        width: 100% !important;
+
+        max-width: none !important;
+    }
+
+
+    ::ng-deep
+    .profileInfo_container
+    .p-dropdown,
+
+    ::ng-deep
+    .profileInfo_container
+    .p-multiselect {
+        width: 100% !important;
+
+        max-width: none !important;
+    }
+
+
+    .profileInfo_container
+    .d-flex.align-items-center.ml-3 {
+        margin-top: 8px;
+
+        justify-content: flex-start;
+    }
+
+
+    .view-profile-wrapper
+    .form-group.row
+    label.label-form {
+        width: 100%;
+
+        min-width: 0;
+
+        max-width: none;
+
+        justify-content: flex-start;
+
+        padding-right: 0;
+
+        margin-bottom: 8px;
+    }
+}
+
+
+/* =========================================================
+   RTL
+   ========================================================= */
+
+.rtl-layout
+.profileInfo_container {
+    direction: rtl;
+}
+
+
+.rtl-layout
+.profileInfo_container h6 {
+    text-align: right !important;
+}
+
+
+.rtl-layout
+.profileInfo_container .title-dev-slider {
+    text-align: right !important;
+}
+
+
+.rtl-layout
+.profileInfo_container
+.d-flex.align-items-center.ml-3 {
+    margin-left: 0 !important;
+
+    margin-right: 0 !important;
+}
+
+
+.rtl-layout
+.view-profile-wrapper
+.form-group.row
+label.label-form {
+    justify-content: flex-start;
+
+    padding-right: 0;
+
+    padding-left: 20px;
+}
+
+.d-hide {
+    display:none !important;
+}
+.profileInfo_container input.form-control.d-hide,
+.profileInfo_container input.aria-input-text.d-hide {
+    display: none !important;
+}
+
+.personal-notes-row {
+    align-items: flex-start !important;
+}
+
+.personal-notes-row h6 {
+    padding-top: 8px;
+    flex-shrink: 0;
+}
+
+.personal-notes-textarea {
+    width: 60% !important;
+    min-height: 100px;
+    resize: vertical;
+
+    font-size: 14px;
+    line-height: 20px;
+
+    border: 1px solid #e2e5ec;
+    border-radius: 6px;
+
+    padding: 10px 12px;
+
+    background-color: transparent !important;
+}
+
+.personal-notes-view {
+    margin: 0;
+    padding-top: 7px;
+
+    white-space: pre-wrap;
+    word-break: break-word;
+
+    max-width: 70%;
 }
