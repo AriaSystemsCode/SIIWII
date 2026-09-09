@@ -108,7 +108,13 @@ export class AdvancedPricingComponent extends AppComponentBase implements OnChan
       }
      // const matrixCellIndex : number = this.rows[currencyRowIndex].rowValues.findIndex(cell=>cell.label == item.code)
     let languageSettingName  =AppConsts.languageSettingName;
-     const matrixCellIndex : number = this.rows[currencyRowIndex].rowValues.findIndex(cell=>cell.label ==(languageSettingName!='en-GB'?  item.code : 'RRP' ))
+     const matrixCellIndex : number = this.rows[currencyRowIndex].rowValues.findIndex(cell =>
+       cell.label == (languageSettingName != 'en-GB'
+         ? item.code
+         : item.code !== 'MSRP' 
+           ? item.code
+           :'RRP' )
+     )
      if(matrixCellIndex > -1) this.rows[currencyRowIndex].rowValues[matrixCellIndex].value = item.price
     })
   }
