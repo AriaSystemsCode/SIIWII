@@ -1212,7 +1212,10 @@ namespace onetouch.AppMarketplaceItems
                             //string variations = "COLOR|SZIE;101|105;RED|WHITE|BLACK;2688e3fa-df0e-0e4f-d2d4-a8d5b8959c08.jpg||2688e3fa-df0e-0e4f-d2d4-a8d5b8959c08.jpg;3X|4X";
                             string variations = appItem.Variations;
                             output.AppItem.variations = new List<MarketplaceExtraDataAttrDto>();
-                            if (!string.IsNullOrEmpty(variations))
+                            // Build marketplace variations from the child items. Imported products can
+                            // legitimately have child COLOR/SIZE data while the legacy Variations string
+                            // is null until the item is edited and saved.
+                            if (!string.IsNullOrEmpty(variations) || varAppItems.Any())
                             {
                                 //MMT
                                 string firstAttributeId = "";
@@ -1282,7 +1285,9 @@ namespace onetouch.AppMarketplaceItems
                                 }
 
 
-                                List<string> variationsLists = variations.Split(';').ToList();
+                                List<string> variationsLists = string.IsNullOrEmpty(variations)
+                                    ? new List<string>()
+                                    : variations.Split(';').ToList();
 
                                 if (variationsLists != null)
                                 {
@@ -1558,7 +1563,8 @@ namespace onetouch.AppMarketplaceItems
                                                                                            .Where(a => (a.AttributeValue == attlook.Label.ToString() || a.AttributeCode == attlook.Label.ToString()) &&
                                                                                            a.AttributeId == long.Parse(secondAttId)
                                                                                            ).Any()).ToList().Where(x => x.EntityExtraData
-                                                                                       .Where(a => a.AttributeId == firstAttributeIdLong & a.AttributeValue == varItem).Any()).ToList();
+                                                                                       .Where(a => a.AttributeId == firstAttributeIdLong &&
+                                                                                       (a.AttributeValue == varItem || a.AttributeCode == varItem)).Any()).ToList();
                                                     var itemVarSum = codeItems.Where(x =>
                                                     x.EntityExtraData.Where(a => a.AttributeId == firstAttributeIdLong &
                                                     (a.AttributeValue == varItem || a.AttributeCode == varItem)).Any()).Sum(a => a.StockAvailability);

@@ -8667,6 +8667,58 @@ namespace onetouch.AppItems
                         appItem.ParentFkList.Add(appChildItem);
 
                 }
+
+                // Keep the lean import consistent with DoCreateOrEdit. The marketplace
+                // sharing/view paths still consume this serialized variation summary.
+                if (attributteNames.Count > 0)
+                {
+                    var defaultAttributeName = attributteNames.FirstOrDefault(r => r.EndsWith(",1"));
+                    if (defaultAttributeName != null)
+                    {
+                        attributteNames.Remove(defaultAttributeName);
+                        attributteNames.Insert(0, defaultAttributeName);
+                    }
+
+                    var defaultAttributeId = attributteIDs.FirstOrDefault(r => r.EndsWith(",1"));
+                    if (defaultAttributeId != null)
+                    {
+                        attributteIDs.Remove(defaultAttributeId);
+                        attributteIDs.Insert(0, defaultAttributeId);
+                    }
+
+                    var distinctFirstAttributeValues = firstAttributteValues.Distinct().ToList();
+                    var distinctFirstAttributeImages = distinctFirstAttributeValues
+                        .Select(value =>
+                        {
+                            var valueIndex = firstAttributteValues.FindIndex(x => x == value);
+                            return valueIndex >= 0 && valueIndex < firstAttributteImageDefaults.Count
+                                ? firstAttributteImageDefaults[valueIndex]
+                                : string.Empty;
+                        })
+                        .ToList();
+
+                    var variation = string.Join("|", attributteNames) + ";" +
+                                    string.Join("|", attributteIDs) + ";" +
+                                    string.Join("|", distinctFirstAttributeValues) + ";" +
+                                    string.Join("|", distinctFirstAttributeImages) + ";";
+
+                    var restLists = restAttributteValues.SelectMany(r => r).ToList();
+                    foreach (var attributeIdWithFlag in attributteIDs.Where(x => !x.EndsWith(",1")))
+                    {
+                        var attributeId = attributeIdWithFlag.Split(',')[0];
+                        var attributeValues = restLists
+                            .Where(r => r.Id.ToString() == attributeId)
+                            .Select(r => r.Value + ",0")
+                            .Distinct()
+                            .ToList();
+
+                        if (attributeValues.Count > 0)
+                            variation += string.Join("|", attributeValues) + ";";
+                    }
+
+                    appItem.Variations = variation;
+                }
+
                 if (appItem.SycIdentifierId == null)
                     appItem.SycIdentifierId = defIdentfier;
 

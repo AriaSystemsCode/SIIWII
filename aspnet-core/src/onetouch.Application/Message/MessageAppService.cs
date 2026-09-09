@@ -1825,6 +1825,8 @@ namespace onetouch.Message
                 //}
                 ////MMT
                 filteredMessages = _AppMarketplaceMessagesRepository.GetAll()
+                                   .AsNoTracking()
+                                   .AsSplitQuery()
                                    //.Include(x => x.EntityFk).ThenInclude(x => x.EntityClassifications)
                                    //.Include(x => x.EntityFk).ThenInclude(x => x.EntityObjectStatusFk)
                                    .Include(x => x.ParentFKList).ThenInclude(x => x.EntityFk)
@@ -1838,8 +1840,8 @@ namespace onetouch.Message
                             //Iteration37-MMT[End]
 
                             .WhereIf(input.MainComponentEntitlyId != null && input.MainComponentEntitlyId != 0,
-                                e => e.EntityFk.EntitiesRelationships.Where(ee => ee.RelatedEntityId == (long)input.MainComponentEntitlyId).Count() > 0 ||
-                                     e.EntityFk.RelatedEntitiesRelationships.Where(ee => ee.EntityId == (long)input.MainComponentEntitlyId).Count() > 0)
+                                e => e.EntityFk.EntitiesRelationships.Any(ee => ee.RelatedEntityId == (long)input.MainComponentEntitlyId) ||
+                                     e.EntityFk.RelatedEntitiesRelationships.Any(ee => ee.EntityId == (long)input.MainComponentEntitlyId))
 
                             .WhereIf(input.ParentId == null || input.ParentId == 0, e => e.ParentId == null)
                             .WhereIf(input.ParentId != null && input.ParentId >= 0, e => e.ParentId == input.ParentId)
@@ -2290,14 +2292,16 @@ namespace onetouch.Message
             {
                 
                 filteredMessages = _AppMarketplaceMessagesRepository.GetAll()
+                                   .AsNoTracking()
+                                   .AsSplitQuery()
                                    .Include(x => x.ParentFKList).ThenInclude(x => x.EntityFk)
                                    .Include(x => x.ParentFKList).ThenInclude(z => z.ParentFKList).Include(x => x.EntityFk)
                                    .Include(x => x.EntityFk).ThenInclude(x => x.EntitiesRelationships)
                                    .Include(x => x.EntityFk).ThenInclude(x => x.RelatedEntitiesRelationships)
                                    .Include(x => x.EntityFk).ThenInclude(x => x.EntityAttachments).ThenInclude(x => x.AttachmentFk)
                             .WhereIf(input.MainComponentEntitlyId != null && input.MainComponentEntitlyId != 0,
-                                e => e.EntityFk.EntitiesRelationships.Where(ee => ee.RelatedEntityId == (long)input.MainComponentEntitlyId).Count() > 0 ||
-                                     e.EntityFk.RelatedEntitiesRelationships.Where(ee => ee.EntityId == (long)input.MainComponentEntitlyId).Count() > 0)
+                                e => e.EntityFk.EntitiesRelationships.Any(ee => ee.RelatedEntityId == (long)input.MainComponentEntitlyId) ||
+                                     e.EntityFk.RelatedEntitiesRelationships.Any(ee => ee.EntityId == (long)input.MainComponentEntitlyId))
 
                             .WhereIf(input.ParentId == null || input.ParentId == 0, e => e.ParentId == null)
                             .WhereIf(input.ParentId != null && input.ParentId >= 0, e => e.ParentId == input.ParentId)
