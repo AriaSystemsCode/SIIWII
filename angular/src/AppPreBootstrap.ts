@@ -31,14 +31,14 @@ export class AppPreBootstrap {
                 return;
               } else if (queryStringObj.impersonationToken) {
                 if (queryStringObj.userDelegationId) {
-                    AppPreBootstrap.delegatedImpersonatedAuthenticate(queryStringObj.userDelegationId, queryStringObj.impersonationToken, queryStringObj.tenantId, () => { AppPreBootstrap.getUserConfiguration(callback); });
+                    AppPreBootstrap.delegatedImpersonatedAuthenticate(queryStringObj.userDelegationId, queryStringObj.impersonationToken, queryStringObj.tenantId, () => { AppPreBootstrap.getUserConfiguration(callback, reject); });
                 } else {
-                    AppPreBootstrap.impersonatedAuthenticate(queryStringObj.impersonationToken, queryStringObj.tenantId, () => { AppPreBootstrap.getUserConfiguration(callback); });
+                    AppPreBootstrap.impersonatedAuthenticate(queryStringObj.impersonationToken, queryStringObj.tenantId, () => { AppPreBootstrap.getUserConfiguration(callback, reject); });
                 }
             } else if (queryStringObj.switchAccountToken) {
-                AppPreBootstrap.linkedAccountAuthenticate(queryStringObj.switchAccountToken, queryStringObj.tenantId, () => { AppPreBootstrap.getUserConfiguration(callback); });
+                AppPreBootstrap.linkedAccountAuthenticate(queryStringObj.switchAccountToken, queryStringObj.tenantId, () => { AppPreBootstrap.getUserConfiguration(callback, reject); });
             } else {
-                AppPreBootstrap.getUserConfiguration(callback);
+                AppPreBootstrap.getUserConfiguration(callback, reject);
             }
         });
     }
@@ -163,7 +163,7 @@ export class AppPreBootstrap {
         );
     }
 
-    private static getUserConfiguration(callback: () => void): any {
+    private static getUserConfiguration(callback: () => void, error: (failure: Error) => void): any {
         const token = abp.auth.getToken();
 
         let requestHeaders = AppPreBootstrap.getRequetHeadersWithDefaultValues();
@@ -187,7 +187,7 @@ export class AppPreBootstrap {
             AppConsts.subscriptionExpireNootifyDayCount = parseInt(abp.setting.get('App.TenantManagement.SubscriptionExpireNotifyDayCount'));
 
             DynamicResourcesHelper.loadResources(callback);
-        });
+        }, error);
     }
 
     private static configureMoment() {

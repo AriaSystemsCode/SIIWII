@@ -88,7 +88,7 @@ namespace onetouch.Web.Startup
             {
                 var _appConfigurationMaster = _configurationAccessor.Configuration;
                 string AriaMasterConnection = _appConfigurationMaster["ConnectionStrings:AriaMaster"]?.ToString();
-                if (string.IsNullOrEmpty(AriaMasterConnection))
+                if(string.IsNullOrEmpty(AriaMasterConnection))
                 {
                     // use connection string from config if available, otherwise fallback to hardcoded one
                     AriaMasterConnection = "Server=WEBAPP-DEV\\SIIWII; Database=Aria.MASTER;TrustServerCertificate=True;User ID=sa;Password=Siiwii@2024;";
@@ -97,7 +97,7 @@ namespace onetouch.Web.Startup
                 using (var conn = new SqlConnection(AriaMasterConnection))
                 {
                     conn.Open();
-
+                     
                     using (var cmd = new SqlCommand("SELECT TOP 1 * FROM Clients WHERE Url = @Url", conn))
                     {
                         cmd.Parameters.AddWithValue("@Url", origin);
@@ -111,7 +111,7 @@ namespace onetouch.Web.Startup
                                 var path = reader["Path"]?.ToString();   // <-- Path column
                                 var pathTemp = reader["TempPath"]?.ToString();   // <-- Path Temp column
                                 var omitt = reader["Omitt"]?.ToString();   // <-- Omitt column
-
+                               
 
                                 if (!string.IsNullOrEmpty(connectionString))
                                 {
@@ -124,29 +124,6 @@ namespace onetouch.Web.Startup
                                     ConfigureXtraReportConnectionStrings();
 
 
-                                    try
-                                    {
-                                        string isSeeded = reader["IsSeeded"]?.ToString();   // <-- IsSeeded column
-                                        if (!string.IsNullOrEmpty(isSeeded) &&
-                                            isSeeded.Equals("False", StringComparison.OrdinalIgnoreCase))
-                                        {
-                                            // Run seeding on a ThreadPool thread (no SynchronizationContext).
-                                            // This prevents async-over-sync deadlocks (.ToListAsync().Result etc.)
-                                            // that occur when seeding is called from within an ASP.NET HTTP request,
-                                            // which has a captured SynchronizationContext on the current thread.
-                                            // At startup there is no SynchronizationContext so seeding works fine;
-                                            // during an HTTP request the context is present and causes a hang.
-                                            Task.Run(() => EnsureDatabaseSeeded(connectionString, origin, AriaMasterConnection))
-                                                .GetAwaiter().GetResult();
-                                        }
-                                    }
-                                    catch (Exception ex)
-                                    {
-                                        // Log the exception or handle it as needed
-                                        Console.WriteLine($"Error during database seeding: {ex.Message}");
-                                        // Optionally, you can rethrow the exception or return a default connection string
-                                        //throw;
-                                    }
 
                                     return connectionString;
                                 }
@@ -164,60 +141,6 @@ namespace onetouch.Web.Startup
         }
 
 
-        private void EnsureDatabaseSeeded(string connectionString, string origin, string AriaMasterConnection)
-        {
-            // Open an explicit SqlConnection and pass it to DbContextOptionsBuilder.
-            // This prevents ABP's IConnectionStringResolver from being re-invoked during
-            // seeding (which would fail because there is no valid HTTP context at this point).
-            // Use Microsoft.Data.SqlClient (same provider as EF Core's SQL Server) so the
-            // connection string keywords (TrustServerCertificate, Encrypt, etc.) are handled
-            // identically. The legacy System.Data.SqlClient package fails with "Instance failure"
-            // when the connection string contains keywords or TLS settings it doesn't support.
-            using (var sqlConn = new Microsoft.Data.SqlClient.SqlConnection(connectionString))
-            {
-                sqlConn.Open();
-
-                var optionsBuilder = new DbContextOptionsBuilder<onetouchDbContext>();
-                // Pass the already-open Microsoft.Data.SqlClient connection so EF Core
-                // binds to it directly and never calls back into ABP's resolver.
-                optionsBuilder.UseSqlServer(sqlConn);
-
-                using (var context = new onetouchDbContext(optionsBuilder.Options))
-                {
-                    // Run migrations to ensure all tables exist in the client database
-                    // context.Database.Migrate();
-
-                    SeedHelper.SeedHostDb(context);
-
-                    // Log DB name and seed datetime to Logs.txt (same file used by the app logger)
-                    var seedDbName = new Microsoft.Data.SqlClient.SqlConnectionStringBuilder(connectionString).InitialCatalog;
-                    var seedLogDir = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "App_Data", "Logs");
-                    var seedLogPath = System.IO.Path.Combine(seedLogDir, "LogsSeeding.txt");
-                    try
-                    {
-                        System.IO.Directory.CreateDirectory(seedLogDir); // no-op if already exists
-                        var seedLogEntry = $"[{DateTime.UtcNow:yyyy-MM-dd HH:mm:ss} UTC] Database seeded: {seedDbName}{Environment.NewLine}";
-                        System.IO.File.AppendAllText(seedLogPath, seedLogEntry);
-                    }
-                    catch (Exception logEx)
-                    {
-                        // Last-resort: write the logging failure to Console so it appears in the process output
-                        Console.WriteLine($"[{DateTime.UtcNow:yyyy-MM-dd HH:mm:ss} UTC] WARNING: Could not write seed log to '{seedLogPath}': {logEx.Message}");
-                    }
-
-                    // Update IsSeeded flag in Aria.MASTER
-                    using (var conn = new System.Data.SqlClient.SqlConnection(AriaMasterConnection))
-                    {
-                        conn.Open();
-                        using (var cmd = new System.Data.SqlClient.SqlCommand("UPDATE Clients SET IsSeeded = 'True' WHERE Url = @Url", conn))
-                        {
-                            cmd.Parameters.AddWithValue("@Url", origin);
-                            cmd.ExecuteNonQuery();
-                        }
-                    }
-                }
-            }
-        }
 
 
     }
@@ -240,7 +163,7 @@ namespace onetouch.Web.Startup
 
         public override void PreInitialize()
         {
-            Configuration.Modules.AbpWebCommon().MultiTenancy.DomainFormat = _appConfiguration["App:ServerRootAddress"] ?? "https://localhost:44300/";
+            Configuration.Modules.AbpWebCommon().MultiTenancy.DomainFormat = _appConfiguration["App:ServerRootAddress"] ?? "https://localhost:44337/";
             Configuration.Modules.AspNetZero().LicenseCode = _appConfiguration["AbpZeroLicenseCode"];
 
 

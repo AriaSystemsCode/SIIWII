@@ -858,7 +858,10 @@ namespace onetouch.Migrations.Seed.Host
         {
 
             #region get all sycEntityObjectTypes
-            var sycEntityObjectTypes = _context.SycEntityObjectTypes.IgnoreQueryFilters().Where(e => e.SycIdentifierDefinitionId == null || e.SycIdentifierDefinitionId < 1).ToListAsync().Result;
+            // Seeding is currently invoked through a synchronous connection resolver.
+            // Do not block a worker on an async EF continuation here; under load that
+            // starves the thread pool while tenant requests wait on ABP's cache lock.
+            var sycEntityObjectTypes = _context.SycEntityObjectTypes.IgnoreQueryFilters().Where(e => e.SycIdentifierDefinitionId == null || e.SycIdentifierDefinitionId < 1).ToList();
             foreach (var sycEntityObjectType in sycEntityObjectTypes)
             {
                 #region add code identifier 

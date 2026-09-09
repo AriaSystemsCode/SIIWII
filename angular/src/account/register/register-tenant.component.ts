@@ -47,6 +47,11 @@ firstName:string=";"
  //  accountTypes:SelectItem[] = [];
  currentLang:string
  isArabic:boolean 
+
+ showPassword = false;
+showPasswordRepeat = false;
+
+
     constructor(
         injector: Injector,
         private _tenantRegistrationService: TenantRegistrationServiceProxy,
@@ -172,4 +177,12 @@ firstName:string=";"
     //      this.accountTypeLabel='';
 
     // }
+
+    togglePassword(): void {
+    this.showPassword = !this.showPassword;
+}
+
+togglePasswordRepeat(): void {
+    this.showPasswordRepeat = !this.showPasswordRepeat;
+}
 }

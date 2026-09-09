@@ -371,8 +371,11 @@ namespace onetouch.AppMarketplaceAccounts
                          //   .FirstOrDefault(e => e.TenantId == AbpSession.TenantId && e.IsProfileData && e.ParentId == null);
                         currentTenantAccount = currentTenantAccountObject != null ? currentTenantAccountObject.EntityFk.EntityObjectTypeCode : null;
                     }
-                    var accountsList = await _accounts.ToListAsync();
-
+                //var accountsList = await _accounts.ToListAsync();
+                var accountsListDup = await _accounts.ToListAsync(); //Mario
+                var accountsList = accountsListDup.GroupBy(x => x.Account.Id)
+                    .Select(g => g.FirstOrDefault()).ToList();
+                 
                 if (AbpSession.TenantId != null)
                 {
                     var relationShipLookups = await _appEntityRepository.GetAll().AsNoTracking().Include(z => z.EntityExtraData)
@@ -388,6 +391,8 @@ namespace onetouch.AppMarketplaceAccounts
 
                     foreach (var account in accountsList)
                     {
+                        if (currentTenantAccountObject.SSIN == account.Account.SSIN)
+                            continue;
                         //I50[Start]
                         var relationshipsQuery = _appContactRelationshipInfoRepository
                             .GetAll().AsNoTracking()
@@ -1370,6 +1375,7 @@ namespace onetouch.AppMarketplaceAccounts
         {
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
             {
+                long newId = 0;
                 var mainAccountID = input.Id;
                 var personEntityObjectTypeId = await _helper.SystemTables.GetEntityObjectTypePersonId();
                 var FoundPublishContact = await _appMarketplaceContactRepository.GetAll()
@@ -1472,8 +1478,10 @@ namespace onetouch.AppMarketplaceAccounts
                                 _appMarketplaceContactRepository.Delete(e => e.Id == contactAddress.Id);
                             }
                         }
-                        _appEntityRepository.Delete(e => e.Id == FoundPublishContact.Id);
-                        _appMarketplaceContactRepository.Delete(e => e.Id == FoundPublishContact.Id);
+
+                        //_appEntityRepository.Delete(e => e.Id == FoundPublishContact.Id);
+                        //_appMarketplaceContactRepository.Delete(e => e.Id == FoundPublishContact.Id);
+                        newId = FoundPublishContact.Id;
                         await CurrentUnitOfWork.SaveChangesAsync();
 
                         // ****delete accounts published at appcontact table
@@ -1713,9 +1721,25 @@ namespace onetouch.AppMarketplaceAccounts
                 }
                 //I40 -MMT  -Account Attachment[End]
 
-                long newId = 0;
-                { newId = await _appMarketplaceContactRepository.InsertAndGetIdAsync(appMarketplaceContact); }
-                await CurrentUnitOfWork.SaveChangesAsync();
+                if (newId == 0)
+                {
+                    var x = UnitOfWorkManager.Current.GetDbContext<onetouchDbContext>();
+                    x.ChangeTracker.Clear();
+                    var savedMarketplaceContact = await _appMarketplaceContactRepository.InsertAsync(appMarketplaceContact);
+                    await CurrentUnitOfWork.SaveChangesAsync();
+                    if (savedMarketplaceContact != null)
+                        newId = savedMarketplaceContact.Id;
+                        //newId = await _appMarketplaceContactRepository.InsertAndGetIdAsync(appMarketplaceContact); 
+                }
+                else
+                {
+                    appMarketplaceContact.Id = newId;
+                    var x = UnitOfWorkManager.Current.GetDbContext<onetouchDbContext>();
+                    x.ChangeTracker.Clear();
+                    await _appMarketplaceContactRepository.UpdateAsync(appMarketplaceContact);
+                    await CurrentUnitOfWork.SaveChangesAsync();
+                }
+                
 
 
                 //HIA - share Account related branches [Start]
@@ -1887,7 +1911,8 @@ namespace onetouch.AppMarketplaceAccounts
                             var responseType = relationshipCodeLookup.EntityExtraData.Where(z => z.AttributeId == 607).FirstOrDefault();
                             var requestorType = relationshipCodeLookup.EntityExtraData.Where(z => z.AttributeId == 606).FirstOrDefault();
                             if (recipientType.Code.ToUpper() == "PERSONAL" &&
-                                requesterType.Code.ToUpper() == "BUSINESS")
+                                (requesterType.Code.ToUpper() == "BUSINESS" ||
+                                requesterType.Code.ToUpper() == "GROUP"))
                             {
                                 if (requestorType != null && requestorType.AttributeValue.TrimEnd().ToLower() == requesterType.Code.ToLower())
                                 {
@@ -2278,15 +2303,17 @@ namespace onetouch.AppMarketplaceAccounts
         public async Task<bool> PublishMember(long contactId, long parentId, long personEntityObjectTypeId, long? mainAccountID, long newAccountID)
         {
             var input = await _appContactRepository.GetAll().AsNoTracking()
-                .FirstOrDefaultAsync(x => x.TenantId == AbpSession.TenantId
+                .FirstOrDefaultAsync(x => //x.TenantId == AbpSession.TenantId
                                        // && x.AccountId == mainAccountID
-                                        && x.Id == contactId );//&& x.IsProfileData == true
+                                        //&& 
+                                        x.Id == contactId );//&& x.IsProfileData == true
             var foundEntity = await _appEntityRepository.GetAll().AsNoTracking()
                                 .Include(x => x.EntityAttachments).ThenInclude(x => x.AttachmentFk)
                                 .Include(x => x.EntityExtraData)
                                 .AsNoTracking()
-                                .FirstOrDefaultAsync(x => x.TenantId == AbpSession.TenantId
-                                && x.Id == input.EntityId);
+                                .FirstOrDefaultAsync(x =>// x.TenantId == AbpSession.TenantId
+                                //&&
+                                x.Id == input.EntityId);
 
             AppMarketplaceContact appMarketplaceContact = new AppMarketplaceContact();
             ObjectMapper.Map(input, appMarketplaceContact);

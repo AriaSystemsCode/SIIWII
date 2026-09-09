@@ -61,7 +61,7 @@ CARDS VIEW MODE
             <button type="button" class="relation-chip mr-1" style="white-space: nowrap;" [pTooltip]="getFormattedConnectionName(account.connectionsInfo[0]?.connectedLabel)" tooltipPosition="bottom"
           [tooltipEvent]="isSmallScreen ? 'focus' : 'hover'" [autoHide]="true" [showDelay]="100" [hideDelay]="100"
           [tabindex]="isSmallScreen ? 0 : null">
-              <span>{{ getFormattedConnectionName(account.connectionsInfo[0]?.connectedLabel) | textSubstring : 20 }}</span>
+              <span>{{ getFormattedConnectionName(account.connectionsInfo[0]?.connectedLabel) | textSubstring : 15 }}</span>
               <i class="pi pi-times ml-1 removI"
                 (click)="removeRelation(account, account.connectionsInfo[0]); $event.stopPropagation()">
               </i>
@@ -122,7 +122,7 @@ CARDS VIEW MODE
               <button type="button" class="relation_button market-follow-btn w-100" dropdownToggle style="font-size: 12px;">
                 <img class="pb-1" style="width: 13px;" [src]="getConnectionIcon(options[0]?.connectionName)" alt="" />
                 <span class="ml-1" [title]="options[0]?.connectionName" (click)="!isCreatingRelation && createRelation(options[0])">
-                  {{ options[0]?.connectionName | textSubstring : 22 }}
+                  {{ options[0]?.connectionName | textSubstring : 18 }}
                 </span>
 
                 <i *ngIf="options.length > 1" class="fas fa-angle-down ml-2" style="color: #fff !important;"></i>
@@ -293,7 +293,7 @@ NOT CARDS VIEW MODE
   
 
               <div style="width: 100%;" class="d-lg-flex d-none justify-content-between" *ngIf="isAuthenticated">
-                <div *ngIf="account?.connectionsInfo?.length > 0" class="d-flex align-items-center flex-wrap">
+                <div *ngIf="account?.connectionsInfo?.length > 0" class="d-flex align-items-center ">
                   <button type="button" class="relation-chip mr-1" style="white-space: nowrap;" [pTooltip]="getFormattedConnectionName(account.connectionsInfo[0]?.connectedLabel)" tooltipPosition="bottom"
           [tooltipEvent]="isSmallScreen ? 'focus' : 'hover'" [autoHide]="true" [showDelay]="100" [hideDelay]="100"
           [tabindex]="isSmallScreen ? 0 : null">
@@ -305,7 +305,7 @@ NOT CARDS VIEW MODE
                       ? '../../assets/accounts/views.png'
                       : '../../assets/accounts/hidden.png'"
                     (click)="makeRelationPrivatePublic(account.connectionsInfo[0], account.connectionsInfo[0]?.visibility !== 'Public')"
-                  /> <span>{{ getFormattedConnectionName(account.connectionsInfo[0]?.connectedLabel) | textSubstring : 20 }}</span>
+                  /> <span>{{ getFormattedConnectionName(account.connectionsInfo[0]?.connectedLabel) | textSubstring : 15 }}</span>
                     <i class="pi pi-times ml-1 removI"
                       (click)="removeRelation(account, account.connectionsInfo[0]); $event.stopPropagation()">
                     </i>
@@ -330,7 +330,7 @@ NOT CARDS VIEW MODE
                           [src]="getConnectionIcon(options[0]?.connectionName)" alt="" />
                         <span (click)="!isCreatingRelation && createRelation(options[0])" class="ml-1" [title]="options[0]?.connectionName"
                           style="font-size: 11px;">
-                          {{ options[0]?.connectionName | textSubstring : 20 }}
+                          {{ options[0]?.connectionName | textSubstring : 15 }}
                         </span>
 
                         <i *ngIf="options.length > 1" class="fas fa-md ml-2 fa-angle-down"
@@ -354,11 +354,11 @@ NOT CARDS VIEW MODE
               <div class="d-lg-none d-flex">
                 <!-- Existing relations -->
                 <ng-container *ngIf="account?.connectionsInfo?.length > 0">
-                  <div class="d-flex align-items-center flex-wrap">
+                  <div class="d-flex align-items-center">
                     <button type="button" class="relation-chip mr-1" style="white-space: nowrap;" [pTooltip]="getFormattedConnectionName(account.connectionsInfo[0]?.connectedLabel)" tooltipPosition="bottom"
           [tooltipEvent]="isSmallScreen ? 'focus' : 'hover'" [autoHide]="true" [showDelay]="100" [hideDelay]="100"
           [tabindex]="isSmallScreen ? 0 : null"> 
-                      <span>{{ getFormattedConnectionName(account.connectionsInfo[0]?.connectedLabel) | textSubstring : 20 }}</span>
+                      <span>{{ getFormattedConnectionName(account.connectionsInfo[0]?.connectedLabel) | textSubstring : 15 }}</span>
                       <i class="pi pi-times ml-1 removI"
                         (click)="removeRelation(account, account.connectionsInfo[0]); $event.stopPropagation()">
                       </i>

@@ -1407,6 +1407,12 @@ async printTransaction(): Promise<void> {
       this.reportUrl = "";
       if (printInfoParam) {
         this.printInfoParam = printInfoParam;
+        this.reportUrl = this.printInfoParam.getReportUrl();
+        this.createReportViewer();
+
+        if (refreshData) {
+          this.getShoppingCartData();
+        }
       } else {
         this.printInfoParam = new ProductCatalogueReportParams();
         this.printInfoParam.reportTemplateName = this.transactionReportTemplateName;

@@ -7,8 +7,7 @@ import {
     LookupLabelDto,
     AppEntitiesServiceProxy,
     AppContactAddressDto,
-    AppAddressDto,
-    AccountDto
+    AppAddressDto
 } from '@shared/service-proxies/service-proxies';
 import { AppComponentBase } from '@shared/common/app-component-base';
 
@@ -25,8 +24,9 @@ export class CreateOrEditBranchModalComponent extends AppComponentBase {
     @Input() directShippingAddressDef: LookupLabelDto
     @Input() distributionCenterAddressDef: LookupLabelDto
     @Input() mailingAddressDef: LookupLabelDto
-   @Input('accountData') accountData: AccountDto
-   
+    @Input() accountData: any
+
+    
     @Output() branchAdded: EventEmitter<any> = new EventEmitter<any>();
     @Output() branchUpdated: EventEmitter<any> = new EventEmitter<any>();
     @Output() selectAddress: EventEmitter<any> = new EventEmitter<any>();
@@ -56,19 +56,25 @@ export class CreateOrEditBranchModalComponent extends AppComponentBase {
     };
     branchCode: string = "";
 
-    phonePattern = '^[0-9+()\\-\\s]*$'; 
+    phonePattern = '^[0-9+()\\-\\s]*$';
+    currentLang: string
+    isArabic: boolean = true
 
 
-// Dialog state
-showApplyAddressDialog = false;
+  
+private originalPhoneTypes: LookupLabelDto[] = [];
 
-// Keep what user selected until he decides
-private pendingSelectedAddress: any = null;
-private pendingAddressSlot: number = 0; // 1..4
-private isNewBranch = false;
+private isBusinessAccount = false;
+private isGroupAccount = false;
 
-    currentLang:string
-    isArabic:boolean = true
+private readonly USD_CURRENCY_ID = 438;
+private readonly ENGLISH_LANGUAGE_ID = 43;
+
+private readonly excludedBusinessPhoneCodes = [
+    'HOME',
+    'HOME-FAX',
+    'MOBILE'
+];
     constructor(
         injector: Injector,
         private _AccountsServiceProxy: AccountsServiceProxy,
@@ -90,98 +96,297 @@ private isNewBranch = false;
         this.currentLang == 'ar' || this.currentLang == 'ar-EG' ? this.isArabic = true : this.isArabic = false
     }
 
-    addressSelected(address) {
-        this.active = true;
-        this.modal.show();
-      
-        const isPersonal = this.accountData?.accountTypeId == 21;
-      
-        if (!isPersonal) {
-          // normal behavior: only selected slot
-          const slotRef = this.getSlotRef(this.currSelectAddress);
-          this.fillContactAddress(slotRef, address);
-          return;
-        }
-      
-        // personal: open dialog
-        this.pendingSelectedAddress = address;
-        this.pendingAddressSlot = this.currSelectAddress;
-        this.showApplyAddressDialog = true;
-      }
-      
-      
+addressSelected(
+    address: AppAddressDto
+): void {
 
-    show(accountId?: number, branchId?: number, parentId?: number): void {
-        this.isNewBranch = !branchId; 
-        this.address1 = this.clearAddress();
-        this.address2 = this.clearAddress();
-        this.address3 = this.clearAddress();
-        this.address4 = this.clearAddress();
-        this.showMainSpinner();
+    if (!address) {
+        return;
+    }
 
-        if (!branchId) {
-            this.branch = new BranchDto();
-            this.branch.accountId = accountId
-            this.branch.phone1TypeId = null;
-            this.branch.phone2TypeId = null;
-            this.branch.phone3TypeId = null;
-            this.accountInfoLoded = true;
-            // this.setDefaultPhoneTypes();
-            this.branch.id = branchId;
-            this.branch.parentId = parentId;
-            this.active = true;
-            this.modal.show();
-            this.hideMainSpinner();
-        } else {
-            this._AccountsServiceProxy.getBranchForEdit(branchId).subscribe(result => {
-                this.branch = result;
-                var subCode = this.branch.code.indexOf("-");
-                // if (subCode >= 0)
-                //     this.branchCode = this.branch.code.substring(subCode + 1, this.branch.code.length);
-                // else
-                this.branchCode = this.branch.code
+    let target:
+        AppContactAddressDto;
 
-                if (this.branch.parentId) this.branch.accountId = accountId
-                let x1 = this.branch.contactAddresses.find(x => x.addressTypeId == this.billingAddressDef.value)
-                if (x1 != undefined) {
+    switch (
+        this.currSelectAddress
+    ) {
+
+        case 1:
+            target =
+                this.address1;
+            break;
+
+        case 2:
+            target =
+                this.address2;
+            break;
+
+        case 3:
+            target =
+                this.address3;
+            break;
+
+        case 4:
+            target =
+                this.address4;
+            break;
+
+        default:
+            return;
+    }
+
+    this.copyAddress(
+        target,
+        address
+    );
+
+    this.active = true;
+    this.modal.show();
+}
+    // show(accountId?: number, branchId?: number, parentId?: number): void {
+    //     this.address1 = this.clearAddress();
+    //     this.address2 = this.clearAddress();
+    //     this.address3 = this.clearAddress();
+    //     this.address4 = this.clearAddress();
+    //     this.showMainSpinner();
+
+    //     if (!branchId) {
+    //         this.branch = new BranchDto();
+    //         this.branch.accountId = accountId
+    //         this.accountInfoLoded = true;
+    //         this.setDefaultPhoneTypes();
+    //         this.branch.id = branchId;
+    //         this.branch.parentId = parentId;
+    //         this.active = true;
+    //         this.modal.show();
+    //         this.hideMainSpinner();
+    //     } else {
+    //         this._AccountsServiceProxy.getBranchForEdit(branchId).subscribe(result => {
+    //             this.branch = result;
+    //             var subCode = this.branch.code.indexOf("-");
+    //             // if (subCode >= 0)
+    //             //     this.branchCode = this.branch.code.substring(subCode + 1, this.branch.code.length);
+    //             // else
+    //             this.branchCode = this.branch.code
+
+    //             if (this.branch.parentId) this.branch.accountId = accountId
+    //             let x1 = this.branch.contactAddresses.find(x => x.addressTypeId == this.billingAddressDef.value)
+    //             if (x1 != undefined) {
+    //                 this.address1 = x1;
+
+    //             }
+
+    //             let x2 = this.branch.contactAddresses.find(x => x.addressTypeId == this.directShippingAddressDef.value)
+    //             if (x2 != undefined) this.address2 = x2;
+
+    //             let x3 = this.branch.contactAddresses.find(x => x.addressTypeId == this.distributionCenterAddressDef.value)
+    //             if (x3 != undefined) this.address3 = x3;
+
+    //             let x4 = this.branch.contactAddresses.find(x => x.addressTypeId == this.mailingAddressDef.value)
+    //             if (x4 != undefined) this.address4 = x4;
+
+    //             this.accountInfoLoded = true;
+    //             this.setDefaultPhoneTypes();
+    //             this.hideMainSpinner();
+    //             this.active = true;
+    //             this.modal.show();
+    //         });
+    //     }
+
+    //     this._AppEntitiesServiceProxy.getAllPhoneTypeForTableDropdown().subscribe(result => {
+    //         this.allPhoneTypes = result;
+    //         this.phoneTypesLoaded = true;
+    //         this.setDefaultPhoneTypes();
+
+    //     });
+    //     this._AppEntitiesServiceProxy.getAllLanguageForTableDropdown().subscribe(result => {
+    //         this.allLanguages = result;
+    //     });
+    //     this._AppEntitiesServiceProxy.getAllCurrencyForTableDropdown().subscribe(result => {
+    //         this.allCurrencies = result;
+    //     });
+
+
+
+    // }
+
+    show(
+    accountId?: number,
+    branchId?: number,
+    parentId?: number
+): void {
+
+    this.address1 =
+        this.clearAddress();
+
+    this.address2 =
+        this.clearAddress();
+
+    this.address3 =
+        this.clearAddress();
+
+    this.address4 =
+        this.clearAddress();
+
+    this.showMainSpinner();
+
+    const isNewBranch =
+        !branchId;
+
+    // Load account type/defaults
+    this.loadAccountDefaults(
+        accountId,
+        isNewBranch
+    );
+
+    // Load dropdown data
+    this.loadBranchLookups();
+
+   if (isNewBranch) {
+
+    this.branch = new BranchDto();
+
+    this.branch.accountId = accountId;
+    this.branch.id = branchId;
+    this.branch.parentId = parentId;
+
+    // Default currency = USD
+    this.branch.currencyId =
+        this.USD_CURRENCY_ID;
+
+    // Default language = English
+    this.branch.languageId =
+        this.ENGLISH_LANGUAGE_ID;
+
+    // Default website from account
+    // User can edit it afterwards
+    this.branch.website =
+        this.accountData?.account?.website ??
+        this.accountData?.website ??
+        null;
+
+    this.accountInfoLoded = true;
+
+    this.setDefaultPhoneTypes();
+
+    this.active = true;
+    this.modal.show();
+
+    this.hideMainSpinner();
+
+    return;
+}
+
+    // Edit
+    this._AccountsServiceProxy
+        .getBranchForEdit(
+            branchId
+        )
+        .subscribe(result => {
+
+            this.branch =
+                result;
+
+            this.branchCode =
+                this.branch?.code || '';
+
+            if (
+                this.branch.parentId
+            ) {
+                this.branch.accountId =
+                    accountId;
+            }
+
+            const addresses =
+                this.branch
+                    ?.contactAddresses ||
+                [];
+
+            if (
+                this.billingAddressDef
+                    ?.value != null
+            ) {
+
+                const x1 =
+                    addresses.find(
+                        x =>
+                            x.addressTypeId ===
+                            this.billingAddressDef
+                                .value
+                    );
+
+                if (x1) {
                     this.address1 = x1;
-
                 }
+            }
 
-                let x2 = this.branch.contactAddresses.find(x => x.addressTypeId == this.directShippingAddressDef.value)
-                if (x2 != undefined) this.address2 = x2;
+            if (
+                this.directShippingAddressDef
+                    ?.value != null
+            ) {
 
-                let x3 = this.branch.contactAddresses.find(x => x.addressTypeId == this.distributionCenterAddressDef.value)
-                if (x3 != undefined) this.address3 = x3;
+                const x2 =
+                    addresses.find(
+                        x =>
+                            x.addressTypeId ===
+                            this.directShippingAddressDef
+                                .value
+                    );
 
-                let x4 = this.branch.contactAddresses.find(x => x.addressTypeId == this.mailingAddressDef.value)
-                if (x4 != undefined) this.address4 = x4;
+                if (x2) {
+                    this.address2 = x2;
+                }
+            }
 
-                this.accountInfoLoded = true;
-                // this.setDefaultPhoneTypes();
-                this.hideMainSpinner();
-                this.active = true;
-                this.modal.show();
-            });
-        }
+            if (
+                this.distributionCenterAddressDef
+                    ?.value != null
+            ) {
 
-        this._AppEntitiesServiceProxy.getAllPhoneTypeForTableDropdown().subscribe(result => {
-            // this.allPhoneTypes = result;
-            this.allPhoneTypes = this.filterPhoneTypesForAccount(result);
-            this.phoneTypesLoaded = true;
+                const x3 =
+                    addresses.find(
+                        x =>
+                            x.addressTypeId ===
+                            this.distributionCenterAddressDef
+                                .value
+                    );
+
+                if (x3) {
+                    this.address3 = x3;
+                }
+            }
+
+            if (
+                this.mailingAddressDef
+                    ?.value != null
+            ) {
+
+                const x4 =
+                    addresses.find(
+                        x =>
+                            x.addressTypeId ===
+                            this.mailingAddressDef
+                                .value
+                    );
+
+                if (x4) {
+                    this.address4 = x4;
+                }
+            }
+
+            this.accountInfoLoded =
+                true;
+
             this.setDefaultPhoneTypes();
 
-        });
-        this._AppEntitiesServiceProxy.getAllLanguageForTableDropdown().subscribe(result => {
-            this.allLanguages = result;
-        });
-        this._AppEntitiesServiceProxy.getAllCurrencyForTableDropdown().subscribe(result => {
-            this.allCurrencies = result;
-        });
+            this.hideMainSpinner();
 
+            this.active =
+                true;
 
-
-    }
+            this.modal.show();
+        });
+}
 
     selectAddressClick(addressNumber) {
         this.currSelectAddress = addressNumber;
@@ -254,7 +459,74 @@ private isNewBranch = false;
     //     }
     // }
 
-    // Add inside the component (private helpers)
+setDefaultPhoneTypes(): void {
+
+    if (
+        !this.accountInfoLoded ||
+        !this.phoneTypesLoaded ||
+        !this.allPhoneTypes?.length
+    ) {
+        return;
+    }
+
+    // Don't overwrite edit values
+    if (
+        this.branch.phone1TypeId &&
+        this.branch.phone1TypeId > 0
+    ) {
+        return;
+    }
+
+    const findByCode = (
+        ...codes: string[]
+    ) => {
+
+        return this.allPhoneTypes
+            .find(item => {
+
+                const code =
+                    item?.code
+                        ?.trim()
+                        .toUpperCase();
+
+                return codes.includes(
+                    code
+                );
+            });
+    };
+
+    const phone1 =
+        findByCode(
+            'BUSINE',
+            'MAIN',
+            'WORK'
+        ) ||
+        this.allPhoneTypes[0];
+
+    const phone2 =
+        findByCode(
+            'WORK',
+            'WORK2',
+            'CELLP'
+        ) ||
+        this.allPhoneTypes[1];
+
+    const phone3 =
+        findByCode(
+            'WORK-FAX',
+            'OTHER'
+        ) ||
+        this.allPhoneTypes[2];
+
+    this.branch.phone1TypeId =
+        phone1?.value;
+
+    this.branch.phone2TypeId =
+        phone2?.value;
+
+    this.branch.phone3TypeId =
+        phone3?.value;
+}
     private toAppAddressDto(src: any, tenantId: number): AppAddressDto {
         return Object.assign(new AppAddressDto(), {
             id: src.addressId,
@@ -320,108 +592,256 @@ private isNewBranch = false;
         this.branchCode = code;
     }
 
+    private loadAccountDefaults(
+    accountId: number,
+    isNewBranch: boolean
+): void {
 
-    private fillContactAddress(target: AppContactAddressDto, address: any): void {
-        target.addressId = address.id;
-        target.code = address.code;
-        target.name = address.name;
-        target.addressLine1 = address.addressLine1;
-        target.addressLine2 = address.addressLine2;
-        target.city = address.city;
-        target.state = address.state;
-        target.postalCode = address.postalCode;
-        target.countryId = address.countryId;
-        target.countryIdName = address.countryIdName;
-      }
-      
-      private getSlotRef(slot: number): AppContactAddressDto {
-        switch (slot) {
-          case 1: return this.address1;
-          case 2: return this.address2;
-          case 3: return this.address3;
-          case 4: return this.address4;
-          default: return this.address1;
-        }
-      }
-      
-      private applyAddressToAllSlots(address: any): void {
-        this.fillContactAddress(this.address1, address);
-        this.fillContactAddress(this.address2, address);
-        this.fillContactAddress(this.address3, address);
-        this.fillContactAddress(this.address4, address);
-      }
-      applySelectedAddressOnly(): void {
-        if (!this.pendingSelectedAddress) return;
-      
-        const slotRef = this.getSlotRef(this.pendingAddressSlot);
-        this.fillContactAddress(slotRef, this.pendingSelectedAddress);
-      
-        this.resetApplyDialog();
-      }
-      
-      applySelectedAddressToAll(): void {
-        if (!this.pendingSelectedAddress) return;
-      
-        this.applyAddressToAllSlots(this.pendingSelectedAddress);
-      
-        this.resetApplyDialog();
-      }
-      
-      cancelApplyDialog(): void {
-    
-        this.resetApplyDialog();
-      }
-      
-      private resetApplyDialog(): void {
-        this.showApplyAddressDialog = false;
-        this.pendingSelectedAddress = null;
-        this.pendingAddressSlot = 0;
-      }
-      
-      private filterPhoneTypesForAccount(types: LookupLabelDto[]): LookupLabelDto[] {
-        const isPersonal = this.accountData?.accountTypeId == 21;
-        if (!isPersonal) return types || [];
-      
-        return (types || []).filter(t => (t?.code || '').toUpperCase() !== 'BUSINE');
-      }
-      
-      
-      private getTypeIdByCode(code: string): number | null {
-        const target = (code || '').toUpperCase();
-        const found = (this.allPhoneTypes || []).find(x => ((x as any).code || '').toUpperCase() === target);
-        return found?.value ?? null;
-      }
-      
-      setDefaultPhoneTypes(): void {
-        if (!this.phoneTypesLoaded) return;
-      
-        const isPersonal = this.accountData?.accountTypeId === 21;
-        if (!isPersonal) {
-      
-          if (!this.branch.phone1TypeId) this.branch.phone1TypeId = this.allPhoneTypes?.[0]?.value ?? null;
-          if (!this.branch.phone2TypeId) this.branch.phone2TypeId = this.allPhoneTypes?.[1]?.value ?? null;
-          if (!this.branch.phone3TypeId) this.branch.phone3TypeId = this.allPhoneTypes?.[2]?.value ?? null;
-          return;
-        }
-      
-   
-        const mobileId = this.getTypeIdByCode('MOBILE'); // 817
-        const homeId   = this.getTypeIdByCode('HOME');   // 815
-        const cell2Id  = this.getTypeIdByCode('CELLP');  // 534384
-      
-    
-        if (this.isNewBranch) {
-          this.branch.phone1TypeId = mobileId;
-          this.branch.phone2TypeId = homeId;
-          this.branch.phone3TypeId = cell2Id;
-          return;
-        }
-  
-        if (!this.branch.phone1TypeId) this.branch.phone1TypeId = mobileId;
-        if (!this.branch.phone2TypeId) this.branch.phone2TypeId = homeId;
-        if (!this.branch.phone3TypeId) this.branch.phone3TypeId = cell2Id;
-      }
-      
-      
-      
+    if (!accountId) {
+        return;
+    }
+
+    this._AccountsServiceProxy
+        .getAccountForView(
+            accountId,
+            5
+        )
+        .subscribe(result => {
+
+            const account =
+                result?.account;
+
+            if (!account) {
+                return;
+            }
+
+            const accountType =
+                (account.accountType || '')
+                    .trim()
+                    .toUpperCase();
+
+            this.isBusinessAccount =
+                accountType === 'BUSINESS';
+
+            this.isGroupAccount =
+                accountType === 'GROUP';
+
+            // Apply phone-type filtering
+            this.filterPhoneTypesByAccountType();
+
+            // Defaults only for create
+            if (!isNewBranch) {
+                return;
+            }
+
+            // Default USD - user can still change
+            if (!this.branch.currencyId) {
+                this.branch.currencyId =
+                    this.USD_CURRENCY_ID;
+            }
+
+            // Default English - user can still change
+            if (!this.branch.languageId) {
+                this.branch.languageId =
+                    this.ENGLISH_LANGUAGE_ID;
+            }
+
+          
+        });
+}
+
+private filterPhoneTypesByAccountType():
+    void {
+
+    if (!this.originalPhoneTypes?.length) {
+        return;
+    }
+
+    const shouldFilter =
+        this.isBusinessAccount ||
+        this.isGroupAccount;
+
+    if (!shouldFilter) {
+
+        this.allPhoneTypes = [
+            ...this.originalPhoneTypes
+        ];
+
+        return;
+    }
+
+    this.allPhoneTypes =
+        this.originalPhoneTypes
+            .filter(item => {
+
+                const code =
+                    item?.code
+                        ?.trim()
+                        .toUpperCase();
+
+                return !this
+                    .excludedBusinessPhoneCodes
+                    .includes(code);
+            });
+}
+
+private loadBranchLookups(): void {
+
+    // Phone Types
+    this._AppEntitiesServiceProxy
+        .getAllPhoneTypeForTableDropdown()
+        .subscribe(result => {
+
+            this.originalPhoneTypes = [
+                ...(result || [])
+            ];
+
+            this.filterPhoneTypesByAccountType();
+
+            this.phoneTypesLoaded =
+                true;
+
+            this.setDefaultPhoneTypes();
+        });
+
+
+    // Languages
+    this._AppEntitiesServiceProxy
+        .getAllLanguageForTableDropdown()
+        .subscribe(result => {
+
+            this.allLanguages =
+                result || [];
+
+            // Create only
+            if (!this.branch?.id) {
+
+                const english =
+                    this.allLanguages.find(
+                        x =>
+                            x.value ===
+                                this.ENGLISH_LANGUAGE_ID ||
+                            x.code
+                                ?.trim()
+                                .toLowerCase() ===
+                                'eng'
+                    );
+
+                if (
+                    english &&
+                    !this.branch.languageId
+                ) {
+                    this.branch.languageId =
+                        english.value;
+                }
+            }
+        });
+
+
+    // Currencies
+    this._AppEntitiesServiceProxy
+        .getAllCurrencyForTableDropdown()
+        .subscribe(result => {
+
+            this.allCurrencies =
+                result || [];
+
+            // Create only
+            if (!this.branch?.id) {
+
+                const usd =
+                    this.allCurrencies.find(
+                        x =>
+                            x.value ===
+                                this.USD_CURRENCY_ID ||
+                            x.code
+                                ?.trim()
+                                .toUpperCase() ===
+                                'USD'
+                    );
+
+                if (
+                    usd &&
+                    !this.branch.currencyId
+                ) {
+                    this.branch.currencyId =
+                        usd.value;
+                }
+            }
+        });
+}
+
+
+applyAddressToAllTypes(
+    address: AppAddressDto
+): void {
+
+    if (!address) {
+        return;
+    }
+
+    this.copyAddress(
+        this.address1,
+        address
+    );
+
+    this.copyAddress(
+        this.address2,
+        address
+    );
+
+    this.copyAddress(
+        this.address3,
+        address
+    );
+
+    this.copyAddress(
+        this.address4,
+        address
+    );
+}
+
+private copyAddress(
+    target: AppContactAddressDto,
+    source: AppAddressDto
+): void {
+
+    if (!target || !source) {
+        return;
+    }
+
+    target.addressId =
+        source.id;
+
+    target.code =
+        source.code;
+
+    target.name =
+        source.name;
+
+    target.addressLine1 =
+        source.addressLine1;
+
+    target.addressLine2 =
+        source.addressLine2;
+
+    target.city =
+        source.city;
+
+    target.state =
+        source.state;
+
+    target.postalCode =
+        source.postalCode;
+
+    target.countryId =
+        source.countryId;
+
+    target.countryIdName =
+        source.countryIdName;
+
+    target.countryCode =
+        source.countryCode;
+}
+
 }

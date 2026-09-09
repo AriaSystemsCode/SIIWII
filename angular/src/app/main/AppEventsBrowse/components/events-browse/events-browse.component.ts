@@ -18,6 +18,11 @@ import { SelectItem, LazyLoadEvent } from 'primeng/api';
 import { Paginator } from 'primeng/paginator';
 import { Table } from 'primeng/table';
 import { BreakpointObserver } from '@angular/cdk/layout';
+
+import {
+    ActivatedRoute,
+    Router
+} from '@angular/router';
 @Component({
   selector: 'app-events-browse',
   templateUrl: './events-browse.component.html',
@@ -72,9 +77,11 @@ export class EventsBrowseComponent extends AppComponentBase  implements OnInit,O
     
     currentLang: string = 'en';
     isArabic: boolean = false;
-    filterVisible :boolean=true
+    filterVisible :boolean=false
 
   isAuthenticated: boolean = false;
+
+  private restoringFiltersFromUrl = false;
 
     constructor(
         injector: Injector,
@@ -84,7 +91,9 @@ export class EventsBrowseComponent extends AppComponentBase  implements OnInit,O
         private _entitiesService: AppEntitiesServiceProxy,
         private _profileService : ProfileServiceProxy,
         private _fb : FormBuilder,
-        private breakpointObserver: BreakpointObserver
+        private breakpointObserver: BreakpointObserver,
+           private router: Router,
+    private route: ActivatedRoute
     ) {
         super(injector);
     }
@@ -187,133 +196,835 @@ export class EventsBrowseComponent extends AppComponentBase  implements OnInit,O
         this.mainFilterCtrl.setValue(selectedfilter)
     }
 
-    show(inputs:EventsBrowseInputs){
-        this.defaultMainFilter   =  inputs.defaultMainFilter
-        this.canView  =  inputs.canView
-        this.canAdd  =  inputs.canAdd
-        this.pageMainFilters  =  inputs.pageMainFilters
-        this.filtersFlags  =  inputs.filtersFlags
-        this.statusesFlags  =  inputs.statusesFlags
-        this.actionsMenuFlags  =  inputs.actionsMenuFlags
-        this.title = inputs.title
-        this.showMainFiltersOptions = inputs.showMainFiltersOptions
-        this.subscribeToFiltersChangeAndApplyFilteration();
-        this.defineSortingOptions();
-        this.fillFormFilters()
-        this.bindDateRangeToStartEnd();
-        this.bindDateRangeToStartEndForForm(this.filterForm);
 
-        this.setMainPageFilter(this.defaultMainFilter)
-        this.setDefaultSorting(this.sortingOptions[0].value)
+    show(inputs: EventsBrowseInputs): void {
+
+    this.defaultMainFilter =
+        inputs.defaultMainFilter;
+
+    this.canView =
+        inputs.canView;
+
+    this.canAdd =
+        inputs.canAdd;
+
+    this.pageMainFilters =
+        inputs.pageMainFilters;
+
+    this.filtersFlags =
+        inputs.filtersFlags;
+
+    this.statusesFlags =
+        inputs.statusesFlags;
+
+    this.actionsMenuFlags =
+        inputs.actionsMenuFlags;
+
+    this.title =
+        inputs.title;
+
+    this.showMainFiltersOptions =
+        inputs.showMainFiltersOptions;
+
+    this.defineSortingOptions();
+
+    // Add dynamic controls first
+    this.fillFormFilters();
+
+    this.bindDateRangeToStartEnd();
+    this.bindDateRangeToStartEndForForm(
+        this.filterForm
+    );
+    this.setDefaultFilters();
+
+    this.loadFiltersFromUrl();
+
+    this.subscribeToFiltersChangeAndApplyFilteration();
+
+    this.getFreshData();
+}
+private setDefaultFilters(): void {
+
+    const selectedFilter =
+        this.pageMainFilters?.find(
+            x =>
+                x.value ===
+                this.defaultMainFilter
+        );
+
+    if (selectedFilter) {
+        this.mainFilterCtrl?.setValue(
+            selectedFilter,
+            {
+                emitEvent: false
+            }
+        );
     }
 
-    setDefaultSorting(sorting:string){
-        this.sortingCtrl.setValue(sorting)
+    if (
+        this.sortingOptions?.length
+    ) {
+        this.sortingCtrl?.setValue(
+            this.sortingOptions[0],
+            {
+                emitEvent: false
+            }
+        );
     }
+}
+
+setDefaultSorting(
+    sorting: SelectItem
+): void {
+
+    this.sortingCtrl?.setValue(
+        sorting
+    );
+}
+
+private loadFiltersFromUrl(): void {
+
+    const params =
+        this.route.snapshot.queryParamMap;
+
+    const hasUrlFilters =
+        params.keys.length > 0;
+
+    if (!hasUrlFilters) {
+        return;
+    }
+
+    this.restoringFiltersFromUrl =
+        true;
+
+    try {
+
+        const filterType =
+            params.get('filterType');
+
+        const search =
+            params.get('search');
+
+        const sorting =
+            params.get('sorting');
+
+        const isOnline =
+            params.get('isOnline');
+
+        const countries =
+            this.parseNumberArray(
+                params.get('countries')
+            );
+
+        const city =
+            params.get('city');
+
+        const state =
+            params.get('state');
+
+        const postalCode =
+            params.get('postalCode');
+
+        const fromDate =
+            params.get('fromDate');
+
+        const toDate =
+            params.get('toDate');
+
+   
+        if (filterType !== null) {
+
+            const selectedFilter =
+                this.pageMainFilters
+                    ?.find(
+                        x =>
+                            Number(x.value) ===
+                            Number(filterType)
+                    );
+
+            if (selectedFilter) {
+
+                this.mainFilterCtrl
+                    ?.setValue(
+                        selectedFilter,
+                        {
+                            emitEvent: false
+                        }
+                    );
+            }
+        }
+
+        if (sorting) {
+
+            const selectedSorting =
+                this.sortingOptions
+                    ?.find(
+                        x =>
+                            x.value ===
+                            sorting
+                    );
+
+            if (selectedSorting) {
+
+                this.sortingCtrl
+                    ?.setValue(
+                        selectedSorting,
+                        {
+                            emitEvent: false
+                        }
+                    );
+            }
+        }
+
+        /*
+         * Other controls
+         */
+        const patch: any = {};
+
+        if (
+            this.filterForm.get(
+                'search'
+            )
+        ) {
+            patch.search =
+                search || undefined;
+        }
+
+        if (
+            this.filterForm.get(
+                'isOnline'
+            )
+        ) {
+
+            patch.isOnline =
+                isOnline === null
+                    ? undefined
+                    : isOnline === 'true';
+        }
+
+        if (
+            this.filterForm.get(
+                'countries'
+            )
+        ) {
+            patch.countries =
+                countries;
+        }
+
+        if (
+            this.filterForm.get(
+                'city'
+            )
+        ) {
+            patch.city =
+                city || undefined;
+        }
+
+        if (
+            this.filterForm.get(
+                'state'
+            )
+        ) {
+            patch.state =
+                state || undefined;
+        }
+
+        if (
+            this.filterForm.get(
+                'postalCode'
+            )
+        ) {
+            patch.postalCode =
+                postalCode || undefined;
+        }
+
+        /*
+         * Dates
+         */
+        const startDate =
+            fromDate
+                ? new Date(
+                    fromDate + 'T00:00:00'
+                )
+                : undefined;
+
+        const endDate =
+            toDate
+                ? new Date(
+                    toDate + 'T00:00:00'
+                )
+                : undefined;
+
+        if (
+            this.filterForm.get(
+                'startDate'
+            )
+        ) {
+            patch.startDate =
+                startDate
+                    ? moment(startDate).format(
+                        moment.HTML5_FMT
+                            .DATETIME_LOCAL
+                    )
+                    : undefined;
+        }
+
+        if (
+            this.filterForm.get(
+                'endDate'
+            )
+        ) {
+            patch.endDate =
+                endDate
+                    ? moment(endDate).format(
+                        moment.HTML5_FMT
+                            .DATETIME_LOCAL
+                    )
+                    : undefined;
+        }
+
+        if (
+            this.filterForm.get(
+                'dateRange'
+            )
+        ) {
+            patch.dateRange = [
+                startDate,
+                endDate
+            ];
+        }
+
+        this.filterForm.patchValue(
+            patch,
+            {
+                emitEvent: false
+            }
+        );
+
+    } finally {
+
+        this.restoringFiltersFromUrl =
+            false;
+    }
+}
+private parseNumberArray(
+    value: string | null
+): number[] {
+
+    if (!value) {
+        return [];
+    }
+
+    return value
+        .split(',')
+        .map(
+            x => Number(x)
+        )
+        .filter(
+            x => !isNaN(x)
+        );
+}
+
+private updateFiltersInUrl(
+    filters: any
+): void {
+
+    if (
+        this.restoringFiltersFromUrl
+    ) {
+        return;
+    }
+
+    const dateRange =
+        filters?.dateRange;
+
+    const fromDate =
+        dateRange?.[0]
+            ? moment(
+                dateRange[0]
+            ).format(
+                'YYYY-MM-DD'
+            )
+            : null;
+
+    const toDate =
+        dateRange?.[1]
+            ? moment(
+                dateRange[1]
+            ).format(
+                'YYYY-MM-DD'
+            )
+            : null;
+
+    const queryParams: any = {
+
+        filterType:
+            filters
+                ?.filterType
+                ?.value ??
+            null,
+
+        search:
+            filters?.search ||
+            null,
+
+        sorting:
+            filters
+                ?.sorting
+                ?.value ??
+            null,
+
+        isOnline:
+            typeof filters?.isOnline ===
+                'boolean'
+                ? filters.isOnline
+                : null,
+
+        countries:
+            Array.isArray(
+                filters?.countries
+            ) &&
+            filters.countries.length
+                ? filters.countries
+                    .join(',')
+                : null,
+
+        city:
+            filters?.city ||
+            null,
+
+        state:
+            filters?.state ||
+            null,
+
+        postalCode:
+            filters?.postalCode ||
+            null,
+
+        fromDate,
+
+        toDate
+    };
+
+    this.router.navigate(
+        [],
+        {
+            relativeTo:
+                this.route,
+
+            queryParams,
+
+            queryParamsHandling:
+                'merge',
+
+            replaceUrl:
+                true
+        }
+    );
+}
     yesterday = moment({second:0,millisecond:0,hours:0}).subtract(1, 'days')
     today = moment({second:0,millisecond:0,hours:0})
     dateErrorMessage:string
     isConfirming:boolean = false
-    subscribeToFiltersChangeAndApplyFilteration() {
-        this.filterForm.valueChanges
-            .pipe(
-                tap((value) => {
-                    if (value) {
-                        const currentFilterType: number = value.filterType?.value;
-                        const startDate : Date = value.startDate ? new Date(value.startDate) : undefined;
-                        const startDateAsMoment : moment.Moment = startDate ? moment({ day:startDate.getDate(), month:startDate.getMonth(), year:startDate.getFullYear(), second:0, millisecond:0, hour:0 }) : undefined
-                        const endDate : Date = value.endDate ? new Date(value.endDate) : undefined;
-                        const endDateAsMoment : moment.Moment = endDate ? moment({ day:endDate.getDate(), month:endDate.getMonth(), year:endDate.getFullYear(), second:0, millisecond:0, hour:0 }) : undefined
-                        const lastFilterType = this.lastFilterType
-                        if (this.lastFilterType !== currentFilterType) {
-                            this.items = [];
-                            this.loading = true
-                            this.lastFilterType = currentFilterType;
-                            const rangeCtrl = this.filterForm.get('dateRange');
-                            
-                        if (currentFilterType == EventsFilterTypesEnum.UpcommingEvents) {
-                            rangeCtrl?.patchValue([this.today.toDate(), undefined], { emitEvent: true });
-                        }
-                        else if (currentFilterType == EventsFilterTypesEnum.PriorEvents) {
-                            rangeCtrl?.patchValue([undefined, this.yesterday.toDate()], { emitEvent: true });
-                        }
-                            else {
-                                if( lastFilterType == EventsFilterTypesEnum.UpcommingEvents && startDate && this.today.isSame(startDateAsMoment) ) this.startDateCtrl.patchValue( undefined)
-                                else if( lastFilterType == EventsFilterTypesEnum.PriorEvents && endDate && this.yesterday.isSame(endDateAsMoment) ) this.endDateCtrl.patchValue( undefined)
-                            }
+   subscribeToFiltersChangeAndApplyFilteration() {
+
+    this.filterForm.valueChanges
+        .pipe(
+
+            tap((value) => {
+
+                if (value) {
+
+                    const currentFilterType: number =
+                        value.filterType?.value;
+
+                    const startDate: Date =
+                        value.startDate
+                            ? new Date(
+                                value.startDate
+                            )
+                            : undefined;
+
+                    const startDateAsMoment:
+                        moment.Moment =
+                        startDate
+                            ? moment({
+                                day:
+                                    startDate
+                                        .getDate(),
+
+                                month:
+                                    startDate
+                                        .getMonth(),
+
+                                year:
+                                    startDate
+                                        .getFullYear(),
+
+                                second: 0,
+                                millisecond: 0,
+                                hour: 0
+                            })
+                            : undefined;
+
+                    const endDate: Date =
+                        value.endDate
+                            ? new Date(
+                                value.endDate
+                            )
+                            : undefined;
+
+                    const endDateAsMoment:
+                        moment.Moment =
+                        endDate
+                            ? moment({
+                                day:
+                                    endDate
+                                        .getDate(),
+
+                                month:
+                                    endDate
+                                        .getMonth(),
+
+                                year:
+                                    endDate
+                                        .getFullYear(),
+
+                                second: 0,
+                                millisecond: 0,
+                                hour: 0
+                            })
+                            : undefined;
+
+                    const lastFilterType =
+                        this.lastFilterType;
+
+                    if (
+                        this.lastFilterType !==
+                        currentFilterType
+                    ) {
+
+                        this.items = [];
+
+                        this.loading = true;
+
+                        this.lastFilterType =
+                            currentFilterType;
+
+                        const rangeCtrl =
+                            this.filterForm
+                                .get(
+                                    'dateRange'
+                                );
+
+                        if (
+                            currentFilterType ==
+                            EventsFilterTypesEnum
+                                .UpcommingEvents
+                        ) {
+
+                            rangeCtrl
+                                ?.patchValue(
+                                    [
+                                        this.today
+                                            .toDate(),
+                                        undefined
+                                    ],
+                                    {
+                                        emitEvent:
+                                            true
+                                    }
+                                );
+
+                        } else if (
+                            currentFilterType ==
+                            EventsFilterTypesEnum
+                                .PriorEvents
+                        ) {
+
+                            rangeCtrl
+                                ?.patchValue(
+                                    [
+                                        undefined,
+                                        this.yesterday
+                                            .toDate()
+                                    ],
+                                    {
+                                        emitEvent:
+                                            true
+                                    }
+                                );
+
                         } else {
-                            if(currentFilterType == EventsFilterTypesEnum.UpcommingEvents) {
-                                if(startDate && this.today.isAfter(startDateAsMoment)) {
-                                    this.isConfirming = true
-                                    this.askToConfirm(
-                                        this.l("fromDateUpcomingEventsErroMessage"),
-                                        this.l("Warning"),
-                                        {
-                                            allowEscapeKey:false,
-                                            allowOutsideClick:false
-                                        })
-                                    .subscribe(isConfirmed=>{
-                                        this.isConfirming = false
-                                        if(isConfirmed) {
-                                            this.setMainPageFilter(EventsFilterTypesEnum.AllEvents)
-                                        } else {
-                                            this.filterForm.patchValue({
-                                                startDate:this.today.format(moment.HTML5_FMT.DATETIME_LOCAL) 
-                                            })
-                                        }
-                                    })
-                                }
-                            }
-                            else if(currentFilterType == EventsFilterTypesEnum.PriorEvents){
-                                if(endDate && this.yesterday.isBefore(endDateAsMoment)) {
-                                    this.isConfirming = true
-                                    this.askToConfirm(
-                                        this.l("toDatePriorEventsErroMessage"),
-                                        this.l("Warning"),
-                                        {
-                                            allowEscapeKey:false,
-                                            allowOutsideClick:false
-                                        })
-                                    .subscribe(isConfirmed=>{
-                                        this.isConfirming = false
-                                        if(isConfirmed) {
-                                            this.setMainPageFilter(EventsFilterTypesEnum.AllEvents)
-                                        } else {
-                                            this.filterForm.patchValue({
-                                                startDate:this.yesterday.format(moment.HTML5_FMT.DATETIME_LOCAL) 
-                                            })
-                                        }
-                                    })
-                                } 
+
+                            if (
+                                lastFilterType ==
+                                    EventsFilterTypesEnum
+                                        .UpcommingEvents &&
+                                startDate &&
+                                this.today.isSame(
+                                    startDateAsMoment
+                                )
+                            ) {
+
+                                this.startDateCtrl
+                                    ?.patchValue(
+                                        undefined
+                                    );
+
+                            } else if (
+                                lastFilterType ==
+                                    EventsFilterTypesEnum
+                                        .PriorEvents &&
+                                endDate &&
+                                this.yesterday
+                                    .isSame(
+                                        endDateAsMoment
+                                    )
+                            ) {
+
+                                this.endDateCtrl
+                                    ?.patchValue(
+                                        undefined
+                                    );
                             }
                         }
 
-                        if(startDateAsMoment && endDateAsMoment && startDateAsMoment.isAfter(endDateAsMoment) ) {
-                            this.dateErrorMessage = this.l("InvalidDateRangeError")
-                        } else {
-                            this.dateErrorMessage = ''
+                    } else {
+
+                        if (
+                            currentFilterType ==
+                            EventsFilterTypesEnum
+                                .UpcommingEvents
+                        ) {
+
+                            if (
+                                startDate &&
+                                this.today.isAfter(
+                                    startDateAsMoment
+                                )
+                            ) {
+
+                                this.isConfirming =
+                                    true;
+
+                                this.askToConfirm(
+                                    this.l(
+                                        'fromDateUpcomingEventsErroMessage'
+                                    ),
+                                    this.l(
+                                        'Warning'
+                                    ),
+                                    {
+                                        allowEscapeKey:
+                                            false,
+
+                                        allowOutsideClick:
+                                            false
+                                    }
+                                )
+                                    .subscribe(
+                                        isConfirmed => {
+
+                                            this.isConfirming =
+                                                false;
+
+                                            if (
+                                                isConfirmed
+                                            ) {
+
+                                                this.setMainPageFilter(
+                                                    EventsFilterTypesEnum
+                                                        .AllEvents
+                                                );
+
+                                            } else {
+
+                                                this.filterForm
+                                                    .patchValue(
+                                                        {
+                                                            startDate:
+                                                                this.today
+                                                                    .format(
+                                                                        moment
+                                                                            .HTML5_FMT
+                                                                            .DATETIME_LOCAL
+                                                                    )
+                                                        }
+                                                    );
+                                            }
+                                        }
+                                    );
+                            }
+
+                        } else if (
+                            currentFilterType ==
+                            EventsFilterTypesEnum
+                                .PriorEvents
+                        ) {
+
+                            if (
+                                endDate &&
+                                this.yesterday
+                                    .isBefore(
+                                        endDateAsMoment
+                                    )
+                            ) {
+
+                                this.isConfirming =
+                                    true;
+
+                                this.askToConfirm(
+                                    this.l(
+                                        'toDatePriorEventsErroMessage'
+                                    ),
+                                    this.l(
+                                        'Warning'
+                                    ),
+                                    {
+                                        allowEscapeKey:
+                                            false,
+
+                                        allowOutsideClick:
+                                            false
+                                    }
+                                )
+                                    .subscribe(
+                                        isConfirmed => {
+
+                                            this.isConfirming =
+                                                false;
+
+                                            if (
+                                                isConfirmed
+                                            ) {
+
+                                                this.setMainPageFilter(
+                                                    EventsFilterTypesEnum
+                                                        .AllEvents
+                                                );
+
+                                            } else {
+
+                                                this.filterForm
+                                                    .patchValue(
+                                                        {
+                                                            startDate:
+                                                                this.yesterday
+                                                                    .format(
+                                                                        moment
+                                                                            .HTML5_FMT
+                                                                            .DATETIME_LOCAL
+                                                                    )
+                                                        }
+                                                    );
+                                            }
+                                        }
+                                    );
+                            }
                         }
                     }
-                }),
-                debounceTime(1500)
-            )
-            .subscribe((value) => {
-                if (value) {
-                    if(this.isConfirming || this.dateErrorMessage) return
-                    this.getFreshData();
-                }
-            });
 
-    }
+                    if (
+                        startDateAsMoment &&
+                        endDateAsMoment &&
+                        startDateAsMoment.isAfter(
+                            endDateAsMoment
+                        )
+                    ) {
+
+                        this.dateErrorMessage =
+                            this.l(
+                                'InvalidDateRangeError'
+                            );
+
+                    } else {
+
+                        this.dateErrorMessage =
+                            '';
+                    }
+                }
+            }),
+
+            debounceTime(700)
+        )
+        .subscribe((value) => {
+
+            if (!value) {
+                return;
+            }
+
+            if (
+                this.isConfirming ||
+                this.dateErrorMessage
+            ) {
+                return;
+            }
+
+            // THIS WAS MISSING
+            this.updateFiltersInUrl(
+                value
+            );
+
+            this.getFreshData();
+        });
+}
     resetPagination() {
         this.items = [];
         this.skipCount = 0;
         this.noOfItemsToShowInitially = this.maxResultCount;
     }
-    getFreshData() {
-        this.resetPagination();
-        this.getEvents();
+    // getFreshData() {
+    //     this.resetPagination();
+    //     this.getEvents();
+    // }
+
+    getFreshData(): void {
+
+    /**
+     * Clear current records while loading
+     * a completely new filtered result.
+     */
+    this.items = [];
+
+    /**
+     * Reset custom paging variables.
+     */
+    this.skipCount = 0;
+
+    this.noOfItemsToShowInitially =
+        this.maxResultCount;
+
+    /**
+     * Reset PrimeNG paginator visually
+     * to first page.
+     *
+     * Important:
+     * don't call changePage(0) here because
+     * it can trigger onPageChange/getEvents
+     * and cause a duplicate API request.
+     */
+    if (this.paginator) {
+
+        this.paginator.first = 0;
+
+        this.paginator.rows =
+            this.paginator.rows || 12;
     }
+
+    /**
+     * Call first page explicitly.
+     *
+     * Your paginator is configured with
+     * 12 rows initially.
+     */
+    this.getEvents({
+        first: 0,
+        rows:
+            this.paginator?.rows ||
+            12
+    });
+}
 
     showMore() {
         this.getEvents();
@@ -409,12 +1120,80 @@ export class EventsBrowseComponent extends AppComponentBase  implements OnInit,O
     handleSearchInput($event ){
         this.searchCtrl.setValue($event.target.value)
     }
-    resetList() {
-        this.filterForm.reset()
-        this.setMainPageFilter(this.defaultMainFilter)
-        this.setDefaultSorting(this.sortingOptions[0].value)
+    // resetList() {
+    //     this.filterForm.reset()
+    //     this.setMainPageFilter(this.defaultMainFilter)
+    //     this.setDefaultSorting(this.sortingOptions[0].value)
+    // }
+
+    resetList(): void {
+
+    this.filterForm.reset(
+        {},
+        {
+            emitEvent: false
+        }
+    );
+
+    const selectedFilter =
+        this.pageMainFilters
+            ?.find(
+                x =>
+                    x.value ===
+                    this.defaultMainFilter
+            );
+
+    if (selectedFilter) {
+        this.mainFilterCtrl
+            ?.setValue(
+                selectedFilter,
+                {
+                    emitEvent: false
+                }
+            );
     }
 
+    if (
+        this.sortingOptions?.length
+    ) {
+        this.sortingCtrl
+            ?.setValue(
+                this.sortingOptions[0],
+                {
+                    emitEvent: false
+                }
+            );
+    }
+
+    this.router.navigate(
+        [],
+        {
+            relativeTo:
+                this.route,
+
+            queryParams: {
+                filterType: null,
+                search: null,
+                sorting: null,
+                isOnline: null,
+                countries: null,
+                city: null,
+                state: null,
+                postalCode: null,
+                fromDate: null,
+                toDate: null
+            },
+
+            queryParamsHandling:
+                'merge',
+
+            replaceUrl:
+                true
+        }
+    );
+
+    this.getFreshData();
+}
     exportToExcel(): void {
         this._appEventsServiceProxy
             .getAppEventsToExcel(

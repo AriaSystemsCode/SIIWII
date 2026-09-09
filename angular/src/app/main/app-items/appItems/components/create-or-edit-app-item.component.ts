@@ -2057,15 +2057,22 @@ export class CreateOrEditAppItemComponent
             this.notify.error("Available Qty should be >=0");
     }
     checkAndAddDefaultPriceObject() {
-        if (
-            !this.appItem.appItemPriceInfos ||
-            !this.appItem.appItemPriceInfos.length
-        ) {
-            this.appItem.appItemPriceInfos = [
-                this._pricingHelperService.getDefaultPricingInstance(),
-            ];
+        if (!this.appItem.appItemPriceInfos) {
+            this.appItem.appItemPriceInfos = [];
         }
-        this.checkDefaultCurrencyMSRPPriceIndex();
+
+        this.defaultCurrencyMSRPPriceIndex =
+            this._pricingHelperService.getDefaultPricingIndex(
+                this.appItem.appItemPriceInfos
+            );
+
+        if (this.defaultCurrencyMSRPPriceIndex < 0) {
+            this.appItem.appItemPriceInfos.push(
+                this._pricingHelperService.getDefaultPricingInstance()
+            );
+            this.defaultCurrencyMSRPPriceIndex =
+                this.appItem.appItemPriceInfos.length - 1;
+        }
     }
     showAdvancedPricingModal() {
         this.showAdvancedPricing = true;
