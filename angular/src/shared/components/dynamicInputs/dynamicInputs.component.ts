@@ -89,7 +89,7 @@ export class dynamicInputs extends AppComponentBase implements OnInit, OnChanges
 attr.selectedValues = formattedValue;
 
   
-        // ✅ Handle Datetime
+        //  Handle Datetime
       if (attr.dataType === 'Datetime') {
         const dateValue = new Date(formattedValue);
 
@@ -104,14 +104,14 @@ attr.selectedValues = formattedValue;
         }
       }
 
-        // ✅ Handle String input
+        //  Handle String input
       if (attr.dataType === 'string' && !attr.isLookup) {
         if (!formattedValue || formattedValue === null || formattedValue === undefined || formattedValue.toString().trim() === '') {
           formattedValue = '';
         }
       }
 
-    // ✅ Handle Numeric / Boolean / Color
+    //  Handle Numeric / Boolean / Color
       if (['Numeric', 'boolean', 'Boolean', 'bit', 'color'].includes(attr.dataType)) {
         if (formattedValue === null || formattedValue === undefined || formattedValue === '') {
           formattedValue = '';
@@ -221,16 +221,40 @@ handleRelatedWhen(attr: any, finalValue: any, updatedDataMap: Map<number, any>) 
 }
 
 
-  reset(extraAttr: any) {
-    if (extraAttr.acceptMultipleValues) {
-      extraAttr.selectedValues = [];
-    } else {
-      extraAttr.selectedValues = '';
-    }
+  // reset(extraAttr: any) {
+  //   if (extraAttr.acceptMultipleValues) {
+  //     extraAttr.selectedValues = [];
+  //   } else {
+  //     extraAttr.selectedValues = '';
+  //   }
 
-    this.onAnyInputChange();
+  //   this.onAnyInputChange();
+  // }
+reset(extraAttr: any): void {
+  if (!extraAttr) {
+    return;
   }
 
+  const isBoolean =
+    extraAttr.dataType?.toString().toLowerCase() === 'boolean' ||
+    extraAttr.dataType?.toString().toLowerCase() === 'bit';
+
+  if (
+    isBoolean &&
+    !extraAttr.validEntries?.trim()
+  ) {
+   
+    extraAttr.selectedValues =
+      this.normalizeBooleanValue(
+        extraAttr.defaultValue
+      );
+  } else {
+
+    extraAttr.selectedValues =  extraAttr.defaultValue;
+  }
+
+  this.onAnyInputChange();
+}
 
 
   themes = [];
@@ -254,60 +278,87 @@ handleRelatedWhen(attr: any, finalValue: any, updatedDataMap: Map<number, any>) 
 
 
 
-  fillSelectedValuesFromDto() {
-    if (!this.extraAttributeObject?.value?.extraAttributes || !this.dynamicInputsForViewDto?.extraDataAttributes) {
-      return;
-    }
-
-    const dtoData = this.dynamicInputsForViewDto.extraDataAttributes;
-
-    const allAttributes = [
-      ...(this.extraAttributeObject.value.extraAttributes || []),
-      ...(this.extraAttributeObject.value.filteredExtraAttributes || [])
-    ];
-
-    for (const attr of allAttributes) {
-
-      const matchedDto = dtoData.find(d => d.extraAttributeId === attr.attributeId);
-
-      if (matchedDto && matchedDto.selectedValues?.length) {
-        const dtoValue = matchedDto.selectedValues[matchedDto.selectedValues.length - 1].value;
-
-        if (attr.isLookup) {
-          const matchedOption = attr.paginationSetting?.list?.find(opt => {
-            return opt.label === dtoValue || opt.value === dtoValue;
-          });
-
-          if (matchedOption) {
-            attr.selectedValues = matchedOption.value;
-          } else {
-            const manualOption = {
-              value: dtoValue,
-              label: dtoValue,
-              code: null,
-              isHostRecord: false,
-              stockAvailability: null,
-              image: null,
-              hexaCode: null
-            };
-            attr.paginationSetting.list.push(manualOption);
-            attr.selectedValues = manualOption.value;
-          }
-        } else if (attr.dataType === 'Datetime' && typeof dtoValue === 'string') {
-          attr.selectedValues = new Date(dtoValue);
-        } else {
-          attr.selectedValues = dtoValue;
-        }
-        this.originalValuesMap.set(attr.attributeId, attr.selectedValues);
-      }
-      //     else {
-      //         if ((attr.dataType === 'boolean' || attr.dataType === 'bit') && (attr.selectedValues == null || attr.selectedValues === '')) {
-      //   attr.selectedValues = this.defaultBooleanValue;
-      // }
-      //     }
-    }
-
+ fillSelectedValuesFromDto() {
+  if (!this.extraAttributeObject?.value?.extraAttributes || !this.dynamicInputsForViewDto?.extraDataAttributes) {
+    return;
   }
+
+  const dtoData = this.dynamicInputsForViewDto.extraDataAttributes;
+
+  const allAttributes = [
+    ...(this.extraAttributeObject.value.extraAttributes || []),
+    ...(this.extraAttributeObject.value.filteredExtraAttributes || [])
+  ];
+
+  for (const attr of allAttributes) {
+    const matchedDto = dtoData.find(
+      d => d.extraAttributeId === attr.attributeId
+    );
+
+    if (matchedDto && matchedDto.selectedValues?.length) {
+      let dtoValue =  matchedDto.selectedValues[matchedDto.selectedValues.length - 1].value;
+      if ((attr.dataType?.toLowerCase() === 'boolean' || attr.dataType?.toLowerCase() === 'bit') && !attr.validEntries?.trim()) {
+        dtoValue =  this.normalizeBooleanValue(dtoValue);
+      }
+      if (attr.isLookup) {
+        const matchedOption =  attr.paginationSetting?.list?.find(
+            opt => opt.label === dtoValue || opt.value === dtoValue
+          );
+
+        if (matchedOption) {
+          attr.selectedValues = matchedOption.value;
+
+        } else {
+
+          const manualOption = {
+            value: dtoValue,
+            label: dtoValue,
+            code: null,
+            isHostRecord: false,
+            stockAvailability: null,
+            image: null,
+            hexaCode: null
+          };
+
+          if (attr.paginationSetting?.list) {
+            attr.paginationSetting.list.push(manualOption);
+          }
+
+          attr.selectedValues =  manualOption.value;
+        }
+
+      } else if (attr.dataType === 'Datetime' && typeof dtoValue === 'string') {
+        attr.selectedValues =  new Date(dtoValue);
+      } else {
+        attr.selectedValues = dtoValue;
+      }
+
+      this.originalValuesMap.set(
+        attr.attributeId,
+        attr.selectedValues
+      );
+    }
+
+
+    else {
+
+      if (
+        (attr.dataType?.toLowerCase() === 'boolean' ||  attr.dataType?.toLowerCase() === 'bit') && !attr.validEntries?.trim()
+      ) {
+
+        attr.selectedValues =   this.normalizeBooleanValue(attr.defaultValue);
+
+      } else {
+        attr.selectedValues = attr.defaultValue;
+      }
+
+      this.originalValuesMap.set(
+        attr.attributeId,
+        attr.selectedValues
+      );
+    }
+  }
+}
 
 
   clearExtraAttr(attr: any) {
@@ -590,6 +641,27 @@ handleRelatedWhen(attr: any, finalValue: any, updatedDataMap: Map<number, any>) 
 
   return parentAttr.selectedValues?.toString().toLowerCase() ===
          extraAttr.visibleWhen.value?.toString().toLowerCase();
+}
+
+
+private normalizeBooleanValue(value: any): string {
+  const normalized = value?.toString().trim().toLowerCase();
+
+  if (
+    normalized === 'yes' ||
+    normalized === 'true' 
+  ) {
+    return 'true';
+  }
+
+  if (
+    normalized === 'no' ||
+    normalized === 'false' 
+  ) {
+    return 'false';
+  }
+
+  return value;
 }
 
 
