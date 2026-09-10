@@ -162,19 +162,61 @@ selectedMessageAfterRefresh: number | null = null;
 
     this.refreshSelectedMessage();
     }
-    selectMessagetype(messagetypeIndex: number, messagetype: string): void {
-        this.filterText = "";
-        this.messageTypeIndex = messagetypeIndex;
-        this.messageType = messagetype;
-        this.messages = [];
-        this.skipCount = 0;
-        this.maxResultCount = 5;
-        this.noOfItemsToShowInitially = 5;
-        this.messagesDetails = [];
-        this.selectedMessage = 0;
-        this.selectedMessageIndx=0;
-        this.getMesssage();
+   selectMessagetype(
+    messagetypeIndex: number,
+    messagetype: string
+): void {
+
+    this.filterText = "";
+    this.messageTypeIndex =  messagetypeIndex;
+    this.messageType =  messagetype;
+
+    if (messagetypeIndex === 1) {
+        this.messageCategoryFilter = "MESSAGE";
+
+    } else {
+        this.messageCategoryFilter =   null;
     }
+    this.messages = [];
+    this.itemsToShow = [];
+    this.messagesDetails = [];
+
+    this.skipCount = 0;
+    this.maxResultCount = 5;
+    this.noOfItemsToShowInitially = 5;
+
+    this.totalCount = 0;
+    this.isFullListDisplayed = false;
+
+    this.selectedMessage = 0;
+    this.selectedMessageIndx = 0;
+
+    this.selectedMessageAfterRefresh =  null;
+
+    this.displayMessageDetails = false;
+
+    this.highlightFirstMsg = true;
+
+    if (messagetypeIndex === 1) {
+
+        setTimeout(() => {
+
+            this.clearActiveTab();
+
+            const firstTab =
+                document.getElementById(
+                    "firstTabBtn"
+                );
+
+            firstTab?.classList.add(
+                "active-tab"
+            );
+
+        });
+    }
+
+    this.getMesssage(true);
+}
 
     getMesssage(search?: boolean): void {
         if (this.messageTypeIndex != 1)
@@ -305,21 +347,37 @@ selectedMessageAfterRefresh: number | null = null;
     }
 
 
-getPrimaryMessage(event) {
-    this.clearActiveTab();
-    event.target.closest('button').classList.add('active-tab');
+getPrimaryMessage(event): void {
 
-    this.messageCategoryFilter = "MESSAGE";
+    this.clearActiveTab();
+
+    event.target
+        .closest('button')
+        ?.classList
+        .add('active-tab');
+
+    this.messageCategoryFilter =   "MESSAGE";
 
     this.messages = [];
+    this.itemsToShow = [];
     this.messagesDetails = [];
 
     this.skipCount = 0;
     this.maxResultCount = 5;
     this.noOfItemsToShowInitially = 5;
+
+    this.totalCount = 0;
     this.isFullListDisplayed = false;
 
-    this.getMesssage();
+    this.selectedMessage = 0;
+    this.selectedMessageIndx = 0;
+
+    this.selectedMessageAfterRefresh =   null;
+    this.displayMessageDetails = false;
+
+    this.highlightFirstMsg = true;
+
+    this.getMesssage(true);
 }
     
     // getUpdatesMessage(event, messageType) {
@@ -331,23 +389,42 @@ getPrimaryMessage(event) {
     //     this.messagesDetails = [];
     //     this.getMesssage();
     // }
-    getUpdatesMessage(event, messageType) {
+   getUpdatesMessage(
+    event,
+    messageType: string
+): void {
+
     this.showMainSpinner();
 
     this.clearActiveTab();
-    event.target.closest('button').classList.add('active-tab');
 
-    this.messageCategoryFilter = messageType;
+    event.target
+        .closest('button')
+        ?.classList
+        .add('active-tab');
+
+    this.messageCategoryFilter =     messageType;
 
     this.messages = [];
+    this.itemsToShow = [];
     this.messagesDetails = [];
 
     this.skipCount = 0;
     this.maxResultCount = 5;
     this.noOfItemsToShowInitially = 5;
+
+    this.totalCount = 0;
     this.isFullListDisplayed = false;
 
-    this.getMesssage();
+    this.selectedMessage = 0;
+    this.selectedMessageIndx = 0;
+
+    this.selectedMessageAfterRefresh =    null;
+    this.displayMessageDetails = false;
+
+    this.highlightFirstMsg = true;
+
+    this.getMesssage(true);
 }
     getMentionsMessage(event) {
         this.clearActiveTab();
