@@ -418,8 +418,7 @@ namespace onetouch.Accounts
                             .Include(e => e.AppContactAddresses.Take(1)).ThenInclude(a => a.AddressFk).ThenInclude(a => a.CountryFk)
                             .Include(en => en.EntityFk).ThenInclude(encl => encl.EntityClassifications.Take(5))
                             .Include(en => en.EntityFk).ThenInclude(enca => enca.EntityCategories.Take(5))
-                            .Include(en => en.EntityFk)
-                            .ThenInclude(ena => ena.EntityAttachments.Where(x => x.AttachmentCategoryId == logoCategory)).ThenInclude(x => x.AttachmentFk)
+                            .Include(en => en.EntityFk).ThenInclude(ena => ena.EntityAttachments.Where(x => x.AttachmentCategoryId == logoCategory)).ThenInclude(x => x.AttachmentFk)
                             /*.WhereIf(currPublishContact != null,
                                 x => (x.PartnerId != currPublishContact.Id))*///not current profile
 
