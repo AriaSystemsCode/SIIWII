@@ -549,8 +549,10 @@ export class MarketplaceProductsComponent
         this.getAllProducts();
     }
     resetProducts($event) {
+       if (this.filters) {
         this.filters.resetFilters();
-        (this.seletedOption = { label: "Public And Shared With Me", value: 2 }),
+    }
+        (this.seletedOption = { label: this.l("Public And Shared With Me"), value: 2 }),
             (this.selectedCurrrency =
                 localStorage.getItem("currencyCode") == "undefined" || JSON.parse(localStorage.getItem("currencyCode")) === null
                     ? this.tenantDefaultCurrency
