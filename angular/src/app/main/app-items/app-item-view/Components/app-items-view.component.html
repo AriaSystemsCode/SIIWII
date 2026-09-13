@@ -940,6 +940,11 @@
                         &nbsp;
                         {{ appItemForViewDto?.manufacturerCode }}
                     </div>
+                     <div *ngIf="appItemForViewDto?.ssin" class="row">
+                       <h5>{{ "SSIN" | localize }} :</h5>
+                        &nbsp;
+                        {{ appItemForViewDto?.ssin }}
+                    </div>
                 </div>
             </div>
         </div>
