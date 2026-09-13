@@ -3895,10 +3895,17 @@ namespace onetouch.Accounts
             var partnerEntityObjectTypeId = input.AccountTypeId;
             var partnerEntityObjectTypeCode = input.AccountType;
             if (partnerEntityObjectTypeId == null || input.AccountTypeId < 1)
-            {
-                var partnerEntityObjectType = await _helper.SystemTables.GetEntityObjectTypeParetner();
-                partnerEntityObjectTypeId = partnerEntityObjectType.Id;
-                partnerEntityObjectTypeCode = partnerEntityObjectType.Code;
+            {   if (input.ContactRecordType == "B")
+                {
+                    var partnerEntityObjectType = await _helper.SystemTables.GetEntityObjectTypeBranch();
+                    partnerEntityObjectTypeId = partnerEntityObjectType.Id;
+                    partnerEntityObjectTypeCode = partnerEntityObjectType.Code;
+                }
+                else {
+                    var partnerEntityObjectType = await _helper.SystemTables.GetEntityObjectTypeParetner();
+                    partnerEntityObjectTypeId = partnerEntityObjectType.Id;
+                    partnerEntityObjectTypeCode = partnerEntityObjectType.Code;
+                }
             }
 
 
@@ -3906,6 +3913,7 @@ namespace onetouch.Accounts
             ObjectMapper.Map(input, entity);
             entity.Id = 0;
             entity.ObjectId = contactObjectId;
+
             entity.EntityObjectTypeId = partnerEntityObjectTypeId;
             entity.EntityObjectTypeCode = partnerEntityObjectTypeCode;
             entity.Name = input.Name;
