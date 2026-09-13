@@ -215,6 +215,8 @@ namespace onetouch.AppItems.Dtos
 
     public class AppItemForViewDto : GetAppItemDto
     {
+        public string SSIN { get; set; }
+
         public DateOnly ShipDate { get; set; }
         public DateOnly SoldOutDate { get; set; }
         public String MaterialContent { get; set; }
