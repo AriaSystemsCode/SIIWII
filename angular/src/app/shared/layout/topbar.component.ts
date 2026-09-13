@@ -484,52 +484,138 @@ export class TopBarComponent extends ThemesLayoutBaseComponent implements OnInit
             });
 
     }
+CreateBusiness_GroupAccount(
+    accout_type: string,
+    account_name: string
+): void {
 
-    CreateBusiness_GroupAccount(accout_type: string, account_name: string): void {
+    const type = accout_type;
 
-        let type = accout_type;
-        let accountname = account_name;
-        let email = this.appSession.user.emailAddress;
-        let url = this.appUrlService.appRootUrl;
-        let tenantName = this.appSession.tenant.name;
-        //let tenantName =this.appSession.tenancyName;
-        let firstName = btoa(this.appSession.user.name);
-        let lastName = btoa(this.appSession.user.surname);
-        let relatedTenantId = this.appSession.tenantId;
-        const htmlTitle: string = `<div class="font-weight-bold"><p class="text-left alarmInfo_title"> <img src="../../assets/img/input_icons/alarm.png" class="alarmInfo mr-2"/> A registration Email has been Sent to ` + email + ` </p> </div> `;
-        const htmlContent: string = `<p class="pleaseClick" style="color: #9E9E9E;">*Please Click on the register link in the email in order to create the new  Business | group account. </p> `;
-        var tenantId;
-        if (this.appSession?.tenantId)
-            tenantId = this.appSession?.tenantId?.toString();
-        else tenantId = null;
-        let link = url + "/account/select-edition?editionId=1&subscriptionStartType=1&accountTypeLabel=" + type + "&accountType=" + type + "&firstName=" + firstName + "&lastName=" + lastName + "&relatedTenantId=" + relatedTenantId;
-        Swal.fire({
-            title: htmlTitle,
-            html: htmlContent,
-            showCancelButton: false,
-            //cancelButtonText: this.l("No"),
-            confirmButtonText: "okay",
-            allowOutsideClick: false,
-            allowEscapeKey: false,
-            backdrop: true,
-            customClass: {
-                popup: 'popup_container popup_container_CreateBusiness_GroupAccount',
-                content: 'popup_content',
-                actions: 'popup_actions',
-                confirmButton: 'popp_confirm-button',
+    const accountName =
+        account_name === 'Business'
+            ? this.l('Business')
+            : this.l('Group');
 
-            },
-        }).then((result) => {
-            if (result.isConfirmed) {
+    const email =
+        this.appSession.user.emailAddress;
 
-                this._accountsServiceProxy.sendRegistrationEmail(email, tenantId, type, link, tenantName).subscribe(
-                    response => {
-                        console.log('Email sent successfully', response);
-                    })
-            }
-        })
+    const url =
+        this.appUrlService.appRootUrl;
+
+    const tenantName =
+        this.appSession.tenant.name;
+
+    const firstName =
+        btoa(this.appSession.user.name);
+
+    const lastName =
+        btoa(this.appSession.user.surname);
+
+    const relatedTenantId =
+        this.appSession.tenantId;
+
+    let tenantId: any = null;
+
+    if (this.appSession?.tenantId) {
+        tenantId =
+            this.appSession.tenantId.toString();
     }
 
+    const link =
+        url +
+        "/account/select-edition" +
+        "?editionId=1" +
+        "&subscriptionStartType=1" +
+        "&accountTypeLabel=" + type +
+        "&accountType=" + type +
+        "&firstName=" + firstName +
+        "&lastName=" + lastName +
+        "&relatedTenantId=" + relatedTenantId;
+
+
+    // Custom title + message
+    const htmlContent = `
+        <div class="font-weight-bold">
+            <p class="text-left alarmInfo_title">
+
+                <img
+                    src="../../assets/img/input_icons/alarm.png"
+                    class="alarmInfo mr-2"
+                />
+
+                ${this.l('RegistrationEmailSentTo')}
+                ${email}
+
+            </p>
+        </div>
+
+        <p
+            class="pleaseClick"
+            style="color: #9E9E9E;"
+        >
+            *${this.l(
+                'PleaseClickRegisterLinkToCreateAccount',
+                accountName
+            )}
+        </p>
+    `;
+
+
+    Swal.fire({
+
+        // title + message are here because
+        // the title contains custom HTML/image
+        html: htmlContent,
+
+        showCancelButton: false,
+
+        confirmButtonText:
+            this.l('Okay'),
+
+        allowOutsideClick: false,
+
+        allowEscapeKey: false,
+
+        backdrop: true,
+
+        customClass: {
+            popup:
+                'popup_container popup_container_CreateBusiness_GroupAccount',
+
+            content:
+                'popup_content',
+
+            actions:
+                'popup_actions',
+
+            confirmButton:
+                'popp_confirm-button'
+        }
+
+    }).then((result) => {
+
+        if (result.isConfirmed) {
+
+            this._accountsServiceProxy
+                .sendRegistrationEmail(
+                    email,
+                    tenantId,
+                    type,
+                    link,
+                    tenantName
+                )
+                .subscribe(
+                    response => {
+
+                        console.log(
+                            'Email sent successfully',
+                            response
+                        );
+                    }
+                );
+        }
+    });
+}
     onSearch(ev?: Event): void {
         ev?.preventDefault(); //  stop native form submit
         const q = (this.searchInput ?? '').trim();

@@ -3032,6 +3032,8 @@ Please select one of the available linesheet templates
 		<text name="Transaction Number">Transaction Number</text>
 		<text name="Price Range">Price Range</text>
 		<text name="Amount Range">Amount Range</text>
+		<text name="PleaseClickRegisterLinkToCreateAccount">Please Click on the register link in the email in order to create the new {0} account.</text>
+		<text name="RegistrationEmailSentTo">A registration Email has been Sent to</text>
 
 		
   </texts>  
