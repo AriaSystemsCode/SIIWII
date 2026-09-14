@@ -391,7 +391,9 @@ namespace onetouch.AppMarketplaceAccounts
 
                     foreach (var account in accountsList)
                     {
-                        if (currentTenantAccountObject.SSIN == account.Account.SSIN)
+                        if (account==null || account.Account==null || account.Account.SSIN==null)
+                            continue;
+                        if (currentTenantAccountObject!= null && currentTenantAccountObject.SSIN == account.Account.SSIN)
                             continue;
                         //I50[Start]
                         var relationshipsQuery = _appContactRelationshipInfoRepository
