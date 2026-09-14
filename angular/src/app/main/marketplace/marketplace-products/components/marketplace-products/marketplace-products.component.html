@@ -37,7 +37,8 @@
                                 class="filterBtn d-lg-none d-block"
                                 styleClass="p-button-outlined p-button-secondary"></p-button>
                             <p-button icon="pi pi-refresh" (click)="resetProducts($event)"
-                                styleClass="p-button-outlined p-button-secondary" class="resBtn"></p-button>
+                                styleClass="p-button-outlined p-button-secondary" class="resBtn"  [pTooltip]="'Reset' | localize"
+                                            tooltipPosition="top"></p-button>
                         </div>
 
                     </div>
@@ -120,7 +121,7 @@
                 styleClass="p-button-outlined p-button-secondary"></p-button>
 
 
-            <p-button icon="pi pi-refresh" (click)="resetProducts($event)"
+            <p-button icon="pi pi-refresh" (click)="resetProducts($event)" [pTooltip]="'Reset' | localize" tooltipPosition="top"
                 styleClass="p-button-outlined p-button-secondary" class="resBtn"></p-button>
         </div>
         <!-- list All products -->
