@@ -159,6 +159,9 @@
         (saved)="onCreateOrEditDone()" (closed)="onCreateOrEditClosed()"></app-create-or-edit-field-manager>
     <app-view-field-manager #viewFieldManagerModal
         (createNewRevisionRequested)="createNewRevisionFromView($event)"></app-view-field-manager>
+    <app-existing-fields-modal #existingFieldsModal [items]="items" [entityId]="selectedEntityId"
+        [tableName]="selectedEntityPath.length ? selectedEntityPath[selectedEntityPath.length - 1].name : ''"
+        (added)="onExistingFieldsAdded($event)"></app-existing-fields-modal>
         </main>
     </div>
 </div>

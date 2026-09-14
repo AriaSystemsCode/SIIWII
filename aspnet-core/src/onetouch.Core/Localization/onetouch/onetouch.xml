@@ -2478,6 +2478,7 @@
 		<text name="SaveAsDraft">Save As Draft</text>
 		<text name="SavedAsDraft">Saved as draft</text>
 		<text name="AreYouSureYouWantToDiscardChanges">Are you sure you want to discard changes?</text>
+		<text name="CancelAndLoseAllProgress">Do you want to cancel and lose all your progress?</text>
 		<text name="AllChangesAreDiscarded">All changes are discarded</text>
 		<text name="AreYouSure,YouWantToSaveAsDraft?">Are you sure, you want to save as draft?</text>
 		<text name="DoYouWantToSaveTheCurrentProductListAsDraft?">Do you want to save the current product list as draft?</text>
@@ -3032,6 +3033,8 @@ Please select one of the available linesheet templates
 		<text name="AppTransactionHeader">App Transaction Header</text>
 		<text name="PurchaseOrder">Purchase Order</text>
 		<text name="AddFromExisting">Add From Existing</text> 
+		<text name="AddExistingFieldsTo">Add existing fields to</text>
+		<text name="FieldsSelected">fields selected</text>
 		<text name="CreateNewField">Create New Field</text>
 		<text name="SearchFields">Search fields...</text>
 		<text name="OnlyExtraData">Only Extra Data</text>
@@ -3081,5 +3084,8 @@ Please select one of the available linesheet templates
 		<text name="AreYouSureYouWantToDeleteThisField?">Are you sure you want to delete this field? </text>
 		<text name="FieldInfo">Field Info</text>
 		<text name="FieldHistoryLog">Field History Log</text>
+		<text name="AddSelected">Add Selected</text>
+		<text name="AddExistingFieldsTo">Add existing fields to</text>
+		<text name="FieldsSelected">fields selected</text>
   </texts>  
 </localizationDictionary>

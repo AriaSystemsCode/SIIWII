@@ -4,7 +4,7 @@ import { FieldManagerEntityNode, FieldManagerItem } from './field-manager.model'
 @Injectable()
 export class FieldManagerService {
     /////i51-Instead of BE Integration
-    private nextId = 3;
+    private nextId = 7;
     private items: FieldManagerItem[] = [
         {
             id: 1,
@@ -276,6 +276,17 @@ export class FieldManagerService {
         const savedItem = { ...item, id: this.nextId++ };
         this.items.push(savedItem);
         return savedItem;
+    }
+
+    addExisting(item: FieldManagerItem, entityId: number, tableName: string): FieldManagerItem {
+        return this.save({
+            ...item,
+            id: 0,
+            entityId,
+            tables: tableName,
+            revision: 0,
+            revisionSequence: '00'
+        });
     }
 
     delete(id: number): void {

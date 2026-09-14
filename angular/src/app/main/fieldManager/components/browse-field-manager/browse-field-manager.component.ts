@@ -2,6 +2,7 @@ import { Component, HostListener, Injector, OnInit, ViewChild } from '@angular/c
 import { Router } from '@angular/router';
 import { CreateOrEditFieldManagerComponent } from '../create-or-edit-field-manager/create-or-edit-field-manager.component';
 import { ViewFieldManagerComponent } from '../view-field-manager/view-field-manager.component';
+import { ExistingFieldsModalComponent } from '../existing-fields-modal/existing-fields-modal.component';
 import { AppComponentBase } from '@shared/common/app-component-base';
 import { FieldManagerEntityNode, FieldManagerItem } from '../../field-manager.model';
 import { FieldManagerService } from '../../field-manager.service';
@@ -15,6 +16,7 @@ import { Observable } from '@node_modules/rxjs/dist/types';
 export class BrowseFieldManagerComponent extends AppComponentBase implements OnInit {
     @ViewChild('createOrEditFieldManagerModal', { static: true }) createOrEditFieldManagerModal!: CreateOrEditFieldManagerComponent;
     @ViewChild('viewFieldManagerModal', { static: true }) viewFieldManagerModal!: ViewFieldManagerComponent;
+    @ViewChild('existingFieldsModal', { static: true }) existingFieldsModal!: ExistingFieldsModalComponent;
     items: FieldManagerItem[] = [];
     filterText = '';
     onlyExtraData = false;
@@ -168,7 +170,14 @@ export class BrowseFieldManagerComponent extends AppComponentBase implements OnI
     }
 
     addFromExisting(): void {
-        this.createOrEditFieldManagerModal.show(undefined, true);
+        this.existingFieldsModal.show();
+    }
+
+    onExistingFieldsAdded(count: number): void {
+        this.loadItems();
+        if (count) {
+            this.notify.success(this.l('FieldsAddedSuccessfully'));
+        }
     }
 
     toggleActions(item: FieldManagerItem, event: MouseEvent): void {
