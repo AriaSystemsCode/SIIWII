@@ -3087,5 +3087,7 @@ Please select one of the available linesheet templates
 		<text name="AddSelected">Add Selected</text>
 		<text name="AddExistingFieldsTo">Add existing fields to</text>
 		<text name="FieldsSelected">fields selected</text>
+		<text name="StandardInformation">Standard Information</text>
+		<text name="WithoutExtraData">Without Extra Data</text>
   </texts>  
 </localizationDictionary>

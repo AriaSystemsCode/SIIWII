@@ -19,8 +19,9 @@ export class BrowseFieldManagerComponent extends AppComponentBase implements OnI
     @ViewChild('existingFieldsModal', { static: true }) existingFieldsModal!: ExistingFieldsModalComponent;
     items: FieldManagerItem[] = [];
     filterText = '';
-    onlyExtraData = false;
+    extraDataFilter: 'all' | 'only' | 'without' = 'all';
     groupBy = 'none';
+    expandedGroups: { [groupValue: string]: boolean } = {};
     activeActionId: number | null = null;
     activePanel: 'all' | 'entity' = 'all';
     private returnToViewId: number | null = null;
@@ -31,7 +32,7 @@ export class BrowseFieldManagerComponent extends AppComponentBase implements OnI
 
     readonly groupOptions = [
         //  { label: 'No group', value: 'none' },
-        { label: 'Group', value: 'none' },
+        { label: 'No Group', value: 'none' },
         { label: 'Field Type', value: 'type' },
         { label: 'Created User', value: 'createdUser' },
         { label: 'Field Level', value: 'fieldLevel' }
@@ -61,7 +62,11 @@ export class BrowseFieldManagerComponent extends AppComponentBase implements OnI
     get filteredItems(): FieldManagerItem[] {
         const filter = this.filterText.trim().toLowerCase();
         return this.displayedItems.filter(item => {
-            if (this.onlyExtraData && !item.extraData) {
+            if (this.extraDataFilter === 'only' && !item.extraData) {
+                return false;
+            }
+
+            if (this.extraDataFilter === 'without' && item.extraData) {
                 return false;
             }
 
@@ -147,6 +152,15 @@ export class BrowseFieldManagerComponent extends AppComponentBase implements OnI
     get groupLabel(): string {
         const option = this.groupOptions.find(group => group.value === this.groupBy);
         return option ? option.label : 'No group';
+    }
+
+    isGroupExpanded(groupValue: string): boolean {
+        return this.expandedGroups[groupValue] !== false;
+    }
+
+    toggleGroup(groupValue: string, event: MouseEvent): void {
+        event.stopPropagation();
+        this.expandedGroups[groupValue] = !this.isGroupExpanded(groupValue);
     }
 
     private getGroupValue(item: FieldManagerItem): string {

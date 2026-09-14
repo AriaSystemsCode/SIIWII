@@ -23,15 +23,30 @@
 
 
                 <div class="field-manager-info-grid">
+                    <!-- <section class="field-manager-section border-0">
+                        <h5>{{ 'StandaredInformation' | localize }}</h5>
+                        <div><span>{{ 'FieldCode' | localize }}<b>*</b></span><strong>{{ item.code }}</strong></div>
+                        <div><span>{{ 'FieldName' | localize }}</span><strong>{{ item.name }}</strong></div>
+                        <div><span>{{ 'Description' | localize }}</span><strong>{{ item.description }}</strong></div>
+                        <div><span>{{ 'FieldLevel' | localize }}<b>*</b></span><strong>{{ item.fieldLevel }}</strong></div>
+                        <div><span>{{ 'Status' | localize }}<b>*</b></span><strong>{{ item.status }}</strong></div>
+                        <div><span>{{ 'TrackingNumber' | localize }} #</span><strong>{{ item.trackingNumber }}</strong></div>
+                        <div><span>{{ 'FieldType' | localize }}<b>*</b></span><strong>{{ item.type }}</strong></div>
+                    </section> -->
                     <section class="field-manager-section border-0">
-                     <h5>{{ 'StandaredInformation' | localize }}</h5>
-                    <div><span>{{ 'FieldCode' | localize }}<b>*</b></span><strong>{{ item.code }}</strong></div>
-                    <div><span>{{ 'FieldName' | localize }}</span><strong>{{ item.name }}</strong></div>
-                    <div><span>{{ 'Description' | localize }}</span><strong>{{ item.description }}</strong></div>
-                    <div><span>{{ 'FieldType' | localize }}<b>*</b></span><strong>{{ item.type }}</strong></div>
-                    <div><span>{{ 'FieldLevel' | localize }}<b>*</b></span><strong>{{ item.fieldLevel }}</strong></div>
-                    <div><span>{{ 'Status' | localize }}<b>*</b></span><strong>{{ item.status }}</strong></div>
-                    <div><span>{{ 'TrackingNumber' | localize }} #</span><strong>{{ item.trackingNumber }}</strong></div>
+                        <div class="standard-information-header">
+                            <h5>{{ 'StandaredInformation' | localize }}</h5>
+                            <span class="font-weight-bold current-revision">
+                                Current revision : {{ item.revisionSequence || '00' }}
+                            </span>
+                        </div>
+                        <div><span>{{ 'FieldCode' | localize }}</span><strong>{{ item.code }}</strong></div>
+                        <div><span>{{ 'FieldName' | localize }}</span><strong>{{ item.name }}</strong></div>
+                        <div><span>{{ 'Description' | localize }}</span><strong>{{ item.description }}</strong></div>
+                        <div><span>{{ 'FieldLevel' | localize }}</span><strong>{{ item.fieldLevel }}</strong></div>
+                        <div><span>{{ 'Status' | localize }}</span><strong>{{ item.status }}</strong></div>
+                        <div><span>{{ 'Tracking' | localize }} #</span><strong>{{ item.trackingNumber }}</strong></div>
+                        <div><span>{{ 'FieldType' | localize }}</span><strong>{{ item.type }}</strong></div>
                     </section>
                 </div>
 

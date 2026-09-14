@@ -38,15 +38,22 @@
                     <div class="field-form-grid">
                         <div class="form-group">
                             <label for="fieldCode">{{ 'FieldCode' | localize }}<b>*</b></label>
+                            <app-codes *ngIf="!isEdit" [objectType]="entityObjectType" [editMode]=false
+                                classes="bg-white" [code]="fieldCode"
+                                placeHolder="{{ 'fieldCode' | localize }}" (getCodeValue)="getCodeValue($event)" [maxlength]="12">
+                            </app-codes>
+                            <input *ngIf="!isEdit" id="generatedFieldCode" name="generatedCode" type="text"
+                                class="form-control mt-2" [ngModel]="item.code" readonly
+                                style="cursor: not-allowed; background-color: #e9ecef !important;" required />
                             <input id="fieldCode" name="code" type="text" class="form-control"
-                                [(ngModel)]="item.code" [readonly]="isEdit"
-                                [style.cursor]="isEdit ? 'not-allowed' : 'auto'"
-                                [style.background-color]="isEdit ? '#e9ecef  !important' : null" required />
+                                *ngIf="isEdit" [(ngModel)]="item.code" [readonly]="true"
+                                [style.cursor]="'not-allowed'"
+                                [style.background-color]="'#e9ecef !important'" required />
                         </div>
                         <div class="form-group">
                             <label for="fieldName">{{ 'FieldName' | localize }}<b>*</b></label>
                             <input id="fieldName" name="name" type="text" class="form-control"
-                                [(ngModel)]="item.name" [readonly]="isEdit"
+                                [ngModel]="item.name" (ngModelChange)="item.name = $event; generateCode()" [readonly]="isEdit"
                                 [style.cursor]="isEdit ? 'not-allowed' : 'auto'"
                                 [style.background-color]="isEdit ? '#e9ecef !important' : null" required />
                         </div>
@@ -59,7 +66,7 @@
                     <div class="field-form-grid">
                         <div class="form-group">
                             <label for="fieldType">{{ 'FieldType' | localize }}<b>*</b></label>
-                            <select id="fieldType" name="type" class="form-control" [(ngModel)]="item.type" #fieldType="ngModel" [disabled]="isEdit"
+                            <select id="fieldType" name="type" class="form-control" [ngModel]="item.type" (ngModelChange)="item.type = $event; generateCode()" #fieldType="ngModel" [disabled]="isEdit"
                                 [style.cursor]="isEdit ? 'not-allowed' : 'auto'"
                                 [style.background-color]="isEdit ? '#e9ecef  !important' : null" required>
                                 <option value="String - Textbox">{{ 'StringTextbox' | localize }}</option>
@@ -73,7 +80,7 @@
                             <label for="fieldLevel">{{ 'FieldLevel' | localize }}<b>*</b></label>
                             <select id="fieldLevel" name="fieldLevel" class="form-control"
                                 [ngModel]="isHost ? item.fieldLevel : (isEdit && item.fieldLevel !== 'Tenant' ? item.fieldLevel : 'Tenant')"
-                                (ngModelChange)="item.fieldLevel = $event" [disabled]="isEdit"
+                                (ngModelChange)="item.fieldLevel = $event; generateCode()" [disabled]="isEdit"
                                 [style.cursor]="isEdit ? 'not-allowed' : 'auto'"
                                 [style.background-color]="isEdit ? '#e9ecef  !important' : null">
                                 <option *ngIf="isHost" value="System">{{ 'System' | localize }}</option>

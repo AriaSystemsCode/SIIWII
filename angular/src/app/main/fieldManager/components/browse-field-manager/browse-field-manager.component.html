@@ -60,10 +60,13 @@
                 </option>
             </select>
         </label>
-        <label class="only-extra-data-filter" *ngIf="activePanel === 'all'">
-            <input type="checkbox" [(ngModel)]="onlyExtraData" />
-            <span></span>
-            {{ 'OnlyExtraData' | localize }}
+        <label class="extra-data-filter" *ngIf="activePanel === 'all'">
+            <i class="flaticon-layers"></i>
+            <select [(ngModel)]="extraDataFilter" [attr.aria-label]="'ExtraData' | localize">
+                <option value="all">{{ 'All' | localize }}</option>
+                <option value="only">{{ 'OnlyExtraData' | localize }}</option>
+                <option value="without">{{ 'WithoutExtraData' | localize }}</option>
+            </select>
         </label>
     </div>
 
@@ -72,10 +75,19 @@
             [rowsPerPageOptions]="[10, 25, 50]" [scrollable]="false"
             responsiveLayout="stack" breakpoint="960px" styleClass="field-manager-table"
             [rowGroupMode]="groupBy === 'none' ? null : 'subheader'" groupRowsBy="groupValue"
+            [sortField]="groupBy === 'none' ? null : 'groupValue'" sortMode="single"
             [tableStyle]="{'min-width': '1080px'}">
                                 <ng-template pTemplate="groupheader" let-item>
-                                    <tr class="field-group-row">
-                                        <td colspan="10">{{ groupLabel | localize }}: <strong>{{ item.groupValue }}</strong></td>
+                                    <tr *ngIf="groupBy !== 'none'" class="field-group-row">
+                                        <td colspan="10">
+                                            <button type="button" class="field-group-toggle"
+                                                (click)="toggleGroup(item.groupValue, $event)"
+                                                [attr.aria-label]="isGroupExpanded(item.groupValue) ? 'Collapse group' : 'Expand group'">
+                                                <i class="fa" [class.fa-chevron-down]="isGroupExpanded(item.groupValue)"
+                                                    [class.fa-chevron-right]="!isGroupExpanded(item.groupValue)"></i>
+                                            </button>
+                                            <strong> {{ item.groupValue }}</strong>
+                                        </td>
                                     </tr>
                                 </ng-template>
                                 <ng-template pTemplate="header">
@@ -120,7 +132,7 @@
                                     </tr>
                                 </ng-template>
                                 <ng-template pTemplate="body" let-item>
-                                    <tr>
+                                    <tr *ngIf="isGroupExpanded(item.groupValue)">
                                         <td>{{ item.code }}</td>
                                         <td>{{ item.name }}</td>
                                         <td>{{ item.type }}</td>
@@ -135,10 +147,13 @@
                                                 (click)="toggleActions(item, $event)">
                                                 <span></span><span></span><span></span>
                                             </button>
-                                            <div class="field-action-links" [class.d-block]="activeActionId === item.id">
-                                                <button type="button" (click)="view(item)">{{ 'View' | localize }}</button>
-                                                <button type="button" (click)="createNewRevision(item)">{{ 'CreateNewRevision' | localize }}</button>
-                                                <button type="button" (click)="delete(item)">{{ 'Delete' | localize }}</button>
+                                            <div class="field-action-links" [class.d-block]="activeActionId === item.id"
+                                                style="padding: 8px;">
+                                                <button type="button" style="display: block; width: 100%; padding: 8px 25px;"
+                                                    (click)="view(item)">{{ 'View' | localize }}</button>
+                                                <!-- <button type="button" (click)="createNewRevision(item)">{{ 'CreateNewRevision' | localize }}</button> -->
+                                                <button type="button" style="display: block; width: 100%; padding: 8px 25px;"
+                                                    (click)="delete(item)">{{ 'Delete' | localize }}</button>
                                             </div>
                                         </td>
                                     </tr>

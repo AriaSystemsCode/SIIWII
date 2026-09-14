@@ -22,6 +22,10 @@ export class CreateOrEditFieldManagerComponent extends AppComponentBase implemen
     activeTab: 'field-info' | 'field-history-log' = 'field-info';
     dropdownOptions: { option: string, value: string }[] = [];
     isHost :boolean=false;
+    fieldCode = '';
+    //i51 will get from BE 
+    entityObjectType = 'FIELD';
+    fieldCodeSeq = '1234';
     private initialFormState = '';
 
     constructor(
@@ -61,6 +65,10 @@ export class CreateOrEditFieldManagerComponent extends AppComponentBase implemen
         } else {
             this.item = this.createEmptyItem();
             this.dropdownOptions = [];
+            this.fieldCode = '';
+            if (!this.isHost) {
+                this.item.fieldLevel = 'Tenant';
+            }
             if (tableName) {
                 this.item.tables = tableName;
             }
@@ -70,6 +78,7 @@ export class CreateOrEditFieldManagerComponent extends AppComponentBase implemen
             if (fromExisting) {
                 this.item.status = 'Proposed';
             }
+            this.generateCode();
         }
         this.active = true;
         this.initialFormState = this.getFormState();
@@ -82,6 +91,7 @@ export class CreateOrEditFieldManagerComponent extends AppComponentBase implemen
     }
 
     save(): void {
+        this.generateCode();
         this.item.dropdownOptions = this.dropdownOptions
             .filter(option => option.option.trim().length > 0 || option.value.trim().length > 0)
             .map(option => ({
@@ -147,6 +157,20 @@ export class CreateOrEditFieldManagerComponent extends AppComponentBase implemen
 
     removeOption(index: number): void {
         this.dropdownOptions.splice(index, 1);
+    }
+
+    getCodeValue(code: string): void {
+        this.fieldCode = code;
+        this.fieldCodeSeq = code;
+        this.generateCode();
+    }
+
+    generateCode(): void {
+        if (this.isEdit) {
+            return;
+        }
+
+        this.item.code = `${this.item.type.substring(0, 2)}${this.item.fieldLevel.substring(0, 1)}${this.item.name.substring(0, 4)}${this.fieldCodeSeq}`;
     }
 
     private createEmptyItem(): FieldManagerItem {
