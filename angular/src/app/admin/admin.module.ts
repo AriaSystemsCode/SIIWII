@@ -194,7 +194,13 @@ import { AccordionModule } from "primeng/accordion";
 import { PortalTenantSettingsComponent } from './settings/Portal-tenant-settings.component';
 import { PortalHostSettingsComponent } from './settings/Portal-host-settings.component';
 import { DynamicApiDispatcherService } from '@shared/dynamicApiDispatcherService ';
+import {
+    PivotViewModule
+} from '@syncfusion/ej2-angular-pivotview';
 
+import {
+    GridsterModule
+} from 'angular-gridster2';
 
 const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
     // suppressScrollX: true
@@ -238,7 +244,12 @@ const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
         ReactiveFormsModule,
         CheckboxModule,
         SharedDynamicInputsModule,
-        AccordionModule
+        AccordionModule,
+                // Gridster
+        GridsterModule,
+
+        // Syncfusion Pivot
+        PivotViewModule
     ],
     declarations: [
 		ValidationRulesComponent,

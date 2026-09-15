@@ -166,12 +166,16 @@ import { DashboardComponent } from "./dashboard/dashboard.component";
                     },
 
                     
-                 
-                    {
-                        path: "dashboard",
-                        component: DashboardComponent,
-                        data: { permission: "Pages.Tenant.Dashboard" },
+                      {
+                        path: 'dashboards',
+                        loadChildren: () => import('./dashboard/dashboard.module').then(m => m.DashboardModule),
+                        data: { preload: true }
                     },
+                    // {
+                    //     path: "dashboard",
+                    //     component: DashboardComponent,
+                    //     data: { permission: "Pages.Tenant.Dashboard" },
+                    // },
                     //Esraa [Start]
                     // { path: 'Messages', component: MessagesComponent },
                     //Esraa [End]

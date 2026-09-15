@@ -1456,17 +1456,44 @@
                 Save Spreadsheet
             </button>
 
+<button
+    type="button"
+    class="btn btn-info mr-2"
+    (click)="openPivotAnalysis()">
 
-            <button
-                type="button"
-                class="btn btn-info mr-2"
-                (click)="openPivotAnalysis()">
+    <i class="fa fa-chart-bar mr-1"></i>
 
-                <i class="fa fa-chart-bar mr-1"></i>
+    New Pivot Table
+</button>
 
-                Pivot Analysis
-            </button>
 
+<button
+    *ngIf="hasSavedPivotForActiveSheet"
+    type="button"
+    class="btn btn-outline-info mr-2"
+    (click)="viewSavedPivotForCurrentSheet()">
+
+    <i class="fa fa-eye mr-1"></i>
+
+    View Pivot Table
+</button>
+<button
+    type="button"
+    class="btn btn-primary"
+    [disabled]="refreshingSpreadsheet"
+    (click)="refreshSpreadsheetData()">
+
+    <i
+        class="fa"
+        [ngClass]="
+            refreshingSpreadsheet
+                ? 'fa-spinner fa-spin'
+                : 'fa-refresh'
+        ">
+    </i>
+
+    {{ refreshingSpreadsheet ? 'Refreshing...' : 'Refresh' }}
+</button>
 
             <!-- <button
                 type="button"
@@ -1608,12 +1635,16 @@
             [allowFiltering]="true"
             [allowOpen]="true"
             [allowSave]="true"
+            [allowScrolling]="true"
+            [scrollSettings]="spreadsheetScrollSettings"
+            [showAggregate]="spreadsheetShowAggregate"
             [openUrl]="spreadsheetOpenUrl"
             [saveUrl]="spreadsheetSaveUrl"
             [enableContextMenu]="true"
             [showRibbon]="true"
             [showFormulaBar]="true"
             [showSheetTabs]="true"
+            (beforeSave)="beforeSpreadsheetSave($event)"
             (created)="onSpreadsheetCreated()">
 
         </ejs-spreadsheet>
@@ -1710,6 +1741,18 @@
 
 
                 <!-- Save -->
+
+
+
+                <button
+    type="button"
+    class="btn btn-primary mr-2"
+    (click)="saveCurrentSheetAnalysis()">
+
+    <i class="fa fa-save mr-2"></i>
+
+    Save Pivot
+</button>
                 <button
                     type="button"
                     class="btn pivot-save-btn"

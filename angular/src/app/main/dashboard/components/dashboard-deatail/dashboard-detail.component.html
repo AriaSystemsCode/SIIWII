@@ -1,0 +1,470 @@
+<p-toast></p-toast>
+<p-confirmDialog></p-confirmDialog>
+
+<div class="dashboard-detail-page container-fluid px-0">
+
+  <!--  bar -->
+  <div class="dash-topbar shadow-sm">
+    <div class="d-flex align-items-center justify-content-between">
+
+      <!-- Left: title + meta -->
+      <div class="d-flex align-items-center gap-3 min-w-0">
+        <div class="dash-icon">
+          <i class="pi pi-chart-bar"></i>
+        </div>
+
+        <div class="min-w-0">
+          <div class="d-flex align-items-center gap-2 min-w-0">
+            <h2 class="dash-title text-truncate m-0" [title]="dashboard.title">
+              {{ dashboard.title }}
+            </h2>
+
+
+            <span *ngIf="hasUnsavedChanges && mode === 'edit'" class="dirty-dot" pTooltip="Unsaved changes"></span>
+          </div>
+
+          <div class="dash-meta text-muted">
+            <span class="mr-3">
+              Updated: <b>{{ dashboard.updatedAt | date:'dd/MM/yyyy, HH:mm' }}</b>
+            </span>
+
+            <span>
+              Last viewed:
+              <b *ngIf="dashboard.lastViewedAt; else notViewed">
+                {{ dashboard.lastViewedAt | date:'dd/MM/yyyy, HH:mm' }}
+              </b>
+              <ng-template #notViewed>—</ng-template>
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: actions -->
+    
+    </div>
+
+    <!-- Owner + sharing strip -->
+    <div class="dash-people d-flex align-items-center justify-content-between mt-3">
+      <!-- Owner -->
+      <div class="d-flex align-items-center gap-2">
+        <span class="text-muted">Owner</span>
+        <div class="d-flex align-items-center owner-chip">
+          <img class="avatar avatar-sm" [src]="dashboard.owner.avatarUrl || defaultAvatar"
+            (error)="onAvatarErr($event)" />
+          <span class="ml-2">{{ dashboard.owner.displayName }}</span>
+        </div>
+      </div>
+
+      <!-- Sharing quick avatars -->
+      <div class="d-flex align-items-center gap-2">
+        <span class="text-muted">Sharing</span>
+
+        <div class="avatar-stack" pTooltip="Open Share" [class.clickable]="canShare">
+          <ng-container *ngFor="let s of dashboard.shares | slice:0:3; let i = index">
+            <img class="avatar avatar-sm stacked" [style.zIndex]="10 - i" [src]="s.user.avatarUrl || defaultAvatar"
+              (error)="onAvatarErr($event)" [alt]="s.user.displayName" />
+          </ng-container>
+
+          <div *ngIf="dashboard.shares?.length > 3" class="avatar avatar-sm stacked more">
+            +{{ dashboard.shares.length - 3 }}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="dash-people d-flex justify-content-between align-items-center gap-2">
+
+      <!-- Refresh All (View+) -->
+  
+
+
+
+      <!-- View/Edit toggle -->
+      <div>
+        <!-- <button pButton type="button" icon="pi pi-pencil" label="Edit" class="editBtn" (click)="enterEditMode()"
+          [disabled]="!canEdit"></button> -->
+
+
+          <div class="edit-mode-row d-flex align-items-center" >
+            <p-inputSwitch
+              [ngModel]="mode === 'edit'"
+              (onChange)="enterEditMode()"
+              [disabled]="!canEdit"
+              styleClass="edit-switch"
+            ></p-inputSwitch>
+          
+            <span class="edit-mode-text mx-2">Edit mode</span>
+          </div>
+      </div>
+
+      <div class="d-flex gap-2 align-items-center">
+        <button pButton type="button" class="refreshBtn" icon="pi pi-refresh"  [loading]="refreshing"
+        (click)="refreshAll()" [disabled]="!canView"></button>
+        <!-- <button *ngIf="mode === 'edit'" pButton type="button" icon="pi pi-check" label="Save" class="editBtn" (click)="saveDashboard()"
+          [disabled]="!canEdit"></button> -->
+        <button  type="button" label="widget" icon="pi pi-plus" class="editBtn"
+          (click)="openWidgetPicker()">+ Card
+        </button>
+        <p-menu #menu [popup]="true" [model]="actionsMenuItems"></p-menu>
+        <button pButton type="button" icon="pi pi-ellipsis-h" class="p-button-rounded p-button-text"
+          (click)="menu.toggle($event)" aria-label="More actions"></button>
+   
+      </div>
+
+
+  </div>
+
+
+</div>
+
+
+
+
+  <!--  Content area -->
+
+<div class="dashboard-page">
+
+    <tabset
+        #dashboardTabs
+        [justified]="true"
+        [ngClass]="{
+            'nav-hidden':
+                !moreThanOnePage()
+        }">
+
+
+        <tab
+            *ngFor="
+                let page of
+                (userDashboard?.pages || []);
+
+                let i = index
+            "
+            [heading]="page.name"
+            (selectTab)="
+                selectPageTab(
+                    page.id
+                )
+            ">
+
+
+            <!-- ====================================== -->
+            <!-- GRIDSTER -->
+            <!-- ====================================== -->
+
+            <gridster
+
+                class="dashboard-grid"
+
+                [options]="options[i]"
+
+                [ngClass]="{
+                    'no-tab':
+                        !moreThanOnePage()
+                }">
+
+
+                <!-- ================================= -->
+                <!-- WIDGET -->
+                <!-- ================================= -->
+
+                <gridster-item
+
+                    *ngFor="
+                        let widget of
+                        page.widgets
+                    "
+
+                    [item]="
+                        widget.gridInformation
+                    ">
+
+
+                    <div
+                        class="dashboard-widget">
+
+
+                        <!-- ========================= -->
+                        <!-- HEADER -->
+                        <!-- ========================= -->
+
+                        <div
+                            class="
+                                dashboard-widget-header
+                                dashboard-widget-drag-handle
+                            ">
+
+
+                            <div
+                                class="
+                                    dashboard-widget-title
+                                ">
+
+                                {{ widget.name }}
+
+                            </div>
+
+
+                            <div
+                                class="
+                                    dashboard-widget-actions
+                                ">
+
+
+                                <span
+                                    class="
+                                        dashboard-widget-type
+                                    ">
+
+                                    {{
+                                        widget.chart?.type
+                                    }}
+
+                                </span>
+
+
+       <button pButton type="button" class="refreshBtn" icon="pi pi-refresh"  [disabled]="widget.refreshing"
+    (mousedown)="$event.stopPropagation()"
+    (click)="
+        $event.stopPropagation();
+        refreshDashboardWidget(widget)
+    "></button>
+
+                                <button
+
+                                    type="button"
+
+                                    class="
+                                        dashboard-widget-remove
+                                    "
+
+                                    title="Remove"
+
+                                    (mousedown)="
+                                        $event.stopPropagation()
+                                    "
+
+                                    (click)="
+                                        $event.stopPropagation();
+                                        removeWidget(
+                                            page,
+                                            widget
+                                        )
+                                    ">
+
+                                    <i
+                                        class="
+                                            fa
+                                            fa-times
+                                        ">
+                                    </i>
+
+                                </button>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- ========================= -->
+                        <!-- CHART BODY -->
+                        <!-- ========================= -->
+
+                        <div
+                            class="
+                                dashboard-widget-body
+                            ">
+
+
+                 <div
+    *ngIf="widget.loading"
+    class="dashboard-widget-loading">
+
+    Loading...
+
+</div>
+
+
+<ejs-pivotview
+    *ngIf="
+        widget.widgetType === 'PivotChart' &&
+        widget.loaded
+    "
+    [id]="
+        'pivotDashboardChart_' +
+        widget.id
+    "
+    width="100%"
+    height="100%"
+    [dataSourceSettings]="widget.dataSourceSettings"
+    [displayOption]="pivotChartOnlyDisplay"
+    [chartSettings]="widget.chartSettings"
+    [showGroupingBar]="false"
+    [showFieldList]="false"
+    (created)="onPivotChartCreated(widget.id)">
+</ejs-pivotview>
+
+                        </div>
+
+                    </div>
+
+                </gridster-item>
+
+            </gridster>
+
+        </tab>
+
+    </tabset>
+
+</div>
+<p-dialog
+
+    [(visible)]="
+        showChartDetailsDialog
+    "
+
+    [header]="
+        selectedChartTitle
+    "
+
+    [modal]="true"
+
+    [style]="{
+        width: '80vw'
+    }"
+
+    [contentStyle]="{
+        'max-height': '70vh',
+        overflow: 'auto'
+    }"
+
+    appendTo="body">
+
+
+    <div class="mb-3">
+
+        <strong>
+            {{
+                selectedChartDetails.length
+            }}
+        </strong>
+
+        transaction(s)
+
+    </div>
+
+
+    <p-table
+
+        [value]="
+            selectedChartDetails
+        "
+
+        [paginator]="true"
+
+        [rows]="10"
+
+        [rowsPerPageOptions]="[
+            10,
+            25,
+            50
+        ]"
+
+        responsiveLayout="scroll">
+
+
+        <ng-template
+            pTemplate="header">
+
+            <tr>
+
+                <th>
+                    Transaction
+                </th>
+
+                <th>
+                    Type
+                </th>
+
+                <th>
+                    Seller
+                </th>
+
+                <th>
+                    Buyer
+                </th>
+
+                <th>
+                    Status
+                </th>
+
+                <th>
+                    Quantity
+                </th>
+
+                <th>
+                    Amount
+                </th>
+
+            </tr>
+
+        </ng-template>
+
+
+        <ng-template
+            pTemplate="body"
+            let-record>
+
+            <tr>
+
+                <td>
+                    {{
+                        record.TransactionNumber
+                    }}
+                </td>
+
+                <td>
+                    {{
+                        record.TransactionType
+                    }}
+                </td>
+
+                <td>
+                    {{
+                        record.Seller
+                    }}
+                </td>
+
+                <td>
+                    {{
+                        record.Buyer
+                    }}
+                </td>
+
+                <td>
+                    {{
+                        record.Status
+                    }}
+                </td>
+
+                <td>
+                    {{
+                        record.Quantity
+                            | number
+                    }}
+                </td>
+
+                <td>
+                    {{
+                        record.Amount
+                            | number:'1.2-2'
+                    }}
+                </td>
+
+            </tr>
+
+        </ng-template>
+
+    </p-table>
+
+</p-dialog>
