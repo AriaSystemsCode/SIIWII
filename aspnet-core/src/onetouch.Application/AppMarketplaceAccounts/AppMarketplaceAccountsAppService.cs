@@ -1099,6 +1099,7 @@ namespace onetouch.AppMarketplaceAccounts
                             output.AvaliableConnectionName = "";
                         }
                         //else
+                        if (currentTenantAccount != null && currentTenantAccountSSIN != account.SSIN)
                         {
                             //account.ConnectionName = account.ConnectionName == "Follow" ? GetAction(account.Account.AccountType) : "";
                             //output.AvaliableConnectionName = GetAction(output.Account.AccountType, currentTenantAccount, true);
