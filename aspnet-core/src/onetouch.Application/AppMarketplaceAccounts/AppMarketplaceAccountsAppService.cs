@@ -1239,9 +1239,9 @@ namespace onetouch.AppMarketplaceAccounts
                 var relationshipQ1 = from b in _appMarketplaceContactRepository.GetAll().AsNoTracking().Where(z => z.SSIN != account.SSIN && z.IsDeleted == false && z.SharingLevel == 1)
                                     from a in relationshipsQuery1
                                     where (b.SSIN == a.RequesterContactSSIN || b.SSIN == a.RecipientContactSSIN)
-                                    select new { obj = b };
+                                    select new { obj = b.SSIN };
 
-                var relationshipsConut = await relationshipQ1.CountAsync();
+                var relationshipsConut = await relationshipQ1.Distinct().CountAsync();
 
                 output.ConnectionCount = relationshipsConut;
                 //I40[End]
