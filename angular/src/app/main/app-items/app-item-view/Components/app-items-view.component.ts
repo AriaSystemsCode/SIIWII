@@ -1059,7 +1059,7 @@ previewImageUrl = '';
             this._appItemsServiceProxy
                 .getAppItemPrice(
                     this.productId,
-                    this.level,
+                    this.level =='RRP' ? 'MSRP' : this.level,
                     currentCurrency.code,
                     attributeId,
                     this.selectedValuesName
