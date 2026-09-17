@@ -76,7 +76,7 @@ namespace onetouch.Authorization.Users
         {
             if (user.EmailConfirmationCode.IsNullOrEmpty())
             {
-                throw new Exception("EmailConfirmationCode should be set in order to send email activation link.");
+                throw new Exception(L("EmailConfirmationCodeException"));
             }
 
             link = link.Replace("{userId}", user.Id.ToString());
@@ -91,14 +91,14 @@ namespace onetouch.Authorization.Users
 
             var tenancyName = GetTenantNameOrNull(user.TenantId);
             // var emailTemplate = GetTitleAndSubTitle(user.TenantId, L("EmailActivation_Title"), L("EmailActivation_SubTitle"));
-            var emailTemplate = GetTitleAndSubTitle(user.TenantId, "Please confirm your Email to start using Siiwii", "");
+            var emailTemplate = GetTitleAndSubTitle(user.TenantId, L("PleaseConfirmYourEmail"), "");
 
             var mailMessage = new StringBuilder();
             //Mariam[Start]
-            mailMessage.AppendLine("<b>" + "Hello " + user.Name);
-            mailMessage.AppendLine("<br><br>" + "Welcome to Siiwii");
-            mailMessage.AppendLine("<br><br>" + "Are you ready to be part of the Siiwii community and start connecting? You're only one step away.");
-            mailMessage.AppendLine("<br><br>" + "We just want to make sure we have the right Email. Please confirm your Email address by clicking the button below." + " <br>");
+            mailMessage.AppendLine("<b>" + L("Hello")+" "+ user.Name);
+            mailMessage.AppendLine("<br><br>" +L("WelcomeToSIIWII"));
+            mailMessage.AppendLine("<br><br>" + L("AreYouReady"));
+            mailMessage.AppendLine("<br><br>" + L("RightEmail") + " <br>");
             //Mariam[End]
             //mailMessage.AppendLine("<b>" + L("NameSurname") + "</b>: " + user.Name + " " + user.Surname + "<br />");
 
@@ -124,19 +124,19 @@ namespace onetouch.Authorization.Users
             mailMessage.AppendLine("<br />");
             //T-SII-20230308.0002,1 MMT 03/14/2023 -Can the "Email verification" message and also the "invited user" email messages be changed to the text in the document attached?[Start]
             //mailMessage.AppendLine("<span style=\"font-size: 9pt;\">" + L("EmailMessage_CopyTheLinkBelowToYourBrowser") + "</span><br />");
-            mailMessage.AppendLine("<span style=\"font-size: 9pt;\">" + "If the button above doesn't work, click the link below" + "</span><br />");
+            mailMessage.AppendLine("<span style=\"font-size: 9pt;\">" + L("ButtonDoesNotWork") + "</span><br />");
             //T-SII-20230308.0002,1 MMT 03/14/2023 -Can the "Email verification" message and also the "invited user" email messages be changed to the text in the document attached?[End]
             mailMessage.AppendLine("<span style=\"font-size: 8pt;\">" + link + "</span>");
 
             // mailMessage.AppendLine("<br>"+"This link will verify your email address, and then you’ll officially be a part of the SIIWII Portal community."+"<br><br>");
-            mailMessage.AppendLine("<br>" + "Here are your account credentials:" + "<br>");
+            mailMessage.AppendLine("<br>" + L("AccountCredentials") + "<br>");
 
             //mailMessage.AppendLine("<b>" + L("NameSurname") + "</b>: " + user.Name + " " + user.Surname + "<br />");
-            mailMessage.AppendLine("<b>" + "Name" + "</b>: " + user.Name + " " + user.Surname + "<br />");
+            mailMessage.AppendLine("<b>" + L("Name") + "</b>: " + user.Name + " " + user.Surname + "<br />");
             if (!tenancyName.IsNullOrEmpty())
             {
                 // mailMessage.AppendLine("<b>" + L("TenancyName") + "</b>: " + tenancyName + "<br />");
-                mailMessage.AppendLine("<b>" + "Customer Name" + "</b>: " + tenancyName + "<br />");
+                mailMessage.AppendLine("<b>" + L("CustomerName")+ "</b>: " + tenancyName + "<br />");
             }
 
             mailMessage.AppendLine("<b>" + L("UserName") + "</b>: " + user.UserName + "<br />");
@@ -145,10 +145,10 @@ namespace onetouch.Authorization.Users
             {
                 mailMessage.AppendLine("<b>" + L("Password") + "</b>: " + plainPassword + "<br />");
             }
-            mailMessage.AppendLine("<br><br>" + "See you there!" + "<br><br>" + "The SIIWII team");
+            mailMessage.AppendLine("<br><br>" + L("SeeYouThere") + "<br><br>" + L("SiiwiiTeam"));
 
             //await ReplaceBodyAndSend(user.EmailAddress, L("EmailActivation_Subject"), emailTemplate, mailMessage);
-            await ReplaceBodyAndSend(user.EmailAddress, "Please confirm your Email to start using Siiwii", emailTemplate, mailMessage);
+            await ReplaceBodyAndSend(user.EmailAddress, L("PleaseConfirmYourEmail"), emailTemplate, mailMessage);
 
         }
         public virtual async Task _SendEmailActivationLinkAsync(User user, string link, string plainPassword = null)
@@ -234,23 +234,23 @@ namespace onetouch.Authorization.Users
         {
             if (user.PasswordResetCode.IsNullOrEmpty())
             {
-                throw new Exception("PasswordResetCode should be set in order to send password reset link.");
+                throw new Exception(L("PasswordCodeException"));
             }
 
             var tenancyName = GetTenancyNameOrNull(user.TenantId);
             var emailTemplate = GetTitleAndSubTitle(user.TenantId, L("PasswordResetEmail_Title"), L("PasswordResetEmail_SubTitle"));
             var mailMessage = new StringBuilder();
             //Mariam[Start]
-            mailMessage.AppendLine("<b>" + "Hello " + user.Name + ",");
-            mailMessage.AppendLine("<br><br>" + "This email is sent to you to reset and re-create your password." + "<br><br>");
+            mailMessage.AppendLine("<b>" +L("Hello")+ " " + user.Name + ",");
+            mailMessage.AppendLine("<br><br>" + L("ResetPassword") + "<br><br>");
 
             //Mariam[End]
            // mailMessage.AppendLine("<b>" + L("NameSurname") + "</b>: " + user.Name + " " + user.Surname + "<br />");
-            mailMessage.AppendLine("<b>" + "Name" + "</b>: " + user.Name + " " + user.Surname + "<br />");
+            mailMessage.AppendLine("<b>" + L("Name") + "</b>: " + user.Name + " " + user.Surname + "<br />");
             if (!tenancyName.IsNullOrEmpty())
             {
                 //  mailMessage.AppendLine("<b>" + L("TenancyName") + "</b>: " + tenancyName + "<br />");
-                mailMessage.AppendLine("<b>" + "Customer Name" + "</b>: " + tenancyName + "<br />");
+                mailMessage.AppendLine("<b>" + L("CustomerName") + "</b>: " + tenancyName + "<br />");
             }
 
             mailMessage.AppendLine("<b>" + L("UserName") + "</b>: " + user.UserName + "<br />");

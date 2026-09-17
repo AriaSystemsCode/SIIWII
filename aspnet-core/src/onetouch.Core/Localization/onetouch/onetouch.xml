@@ -3034,7 +3034,18 @@ Please select one of the available linesheet templates
 		<text name="Amount Range">Amount Range</text>
 		<text name="PleaseClickRegisterLinkToCreateAccount">Please Click on the register link in the email in order to create the new {0} account.</text>
 		<text name="RegistrationEmailSentTo">A registration Email has been Sent to</text>
-
-		
+        <text name="Hello">Hello</text>
+		<text name="WelcomeToSIIWII">Welcome to Siiwii</text>
+	    <text name="AreYouReady">Are you ready to be part of the Siiwii community and start connecting? You're only one step away.</text>
+	    <text name="RightEmail">We just want to make sure we have the right Email. Please confirm your Email address by clicking the button below.</text>
+	    <text name="ButtonDoesNotWork">If the button above doesn't work, click the link below</text>
+	    <text name="AccountCredentials">Here are your account credentials:</text>
+	    <text name="CustomerName">Customer Name</text>
+	    <text name="SeeYouThere">"See you there!"</text>
+	    <text name="SiiwiiTeam">The SIIWII team</text>
+	    <text name="PleaseConfirmYourEmail">Please confirm your Email to start using Siiwii</text>
+	    <text name="EmailConfirmationCodeException">EmailConfirmationCode should be set in order to send email activation link.</text>
+	    <text name="PasswordCodeException">PasswordResetCode should be set in order to send password reset link.</text>
+	    <text name="ResetPassword">This email is sent to you to reset and re-create your password.</text>
   </texts>  
 </localizationDictionary>

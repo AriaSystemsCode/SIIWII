@@ -259,7 +259,7 @@ namespace onetouch.Accounts
         {
             var localizedString = L("RegistrationLink");
             //link = "https://app.testing.siiwii.net/account/register-tenant?editionId=1&subscriptionStartType=2";
-            var template = _emailingTemplateAppService.GetEmailTemplate("InvitePartnerByType", new List<string>() { tenantName, link, localizedString }, "en");
+            var template = _emailingTemplateAppService.GetEmailTemplate("InvitePartnerByType", new List<string>() { tenantName, link, localizedString }, System.Globalization.CultureInfo.CurrentUICulture.ToString());
             await SendMessage(new SendMailDto() { To = email, Subject = template.MessageSubject, Body = template.MessageBody, IsBodyHtml = true });
         }
 
