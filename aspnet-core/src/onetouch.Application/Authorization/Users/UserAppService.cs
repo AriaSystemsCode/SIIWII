@@ -677,6 +677,7 @@ namespace onetouch.Authorization.Users
                         {
                             userNameExtraData.AttributeValue = input.User.UserName;
                         }
+                        accountDto.TenantOwner = AbpSession.TenantId;
                         ContactDto savedContactDto = await _appAccountsAppService.CreateOrUpdateContact(accountDto);
                     }
                 }
@@ -750,6 +751,7 @@ namespace onetouch.Authorization.Users
                                 }
                             }
                         }
+                        accountDto.TenantOwner = AbpSession.TenantId;
                         ContactDto savedContactDto = await _appAccountsAppService.CreateOrUpdateContact(accountDto);
                     }
                     //I40 {End}
