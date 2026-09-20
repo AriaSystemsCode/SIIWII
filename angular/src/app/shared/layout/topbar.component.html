@@ -18,7 +18,7 @@
         class="navbar-brand pt-0"
         [routerLink]="defaultHomeUrl"
         routerLinkActive="header-link-active"
-        (click)="userClick('Home')"
+   
         [ngClass]="isAuthenticated? 'ml-3':''"
       >
         <img
@@ -410,8 +410,8 @@
             <!-- Left links -->
             <ul class="navbar-nav bottom-navbar ms-auto my-2 mb-lg-0">
                 <li class="nav-item pt-2">
-                    <a class="navbar-brand pt-0 "  [routerLink]="['/app/main/Home']"
-                        routerLinkActive="header-link-active" (click)="userClick('Home')">
+                    <a class="navbar-brand pt-0 "     [routerLink]="defaultHomeUrl"
+                        routerLinkActive="header-link-active">
                         <img src="../../../assets/landingPage/Home_Footer_Btn.svg" class="navbar-brand _navbar-brand" />
                     </a>
                 </li>
