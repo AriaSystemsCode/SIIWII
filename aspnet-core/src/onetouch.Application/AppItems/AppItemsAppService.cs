@@ -5039,6 +5039,14 @@ namespace onetouch.AppItems
                     }
                     #endregion if parent failed then children are failed
 
+                    // Preserve the duplicate choice when an existing-code warning is
+                    // attached to an image/data row instead of the parent row.
+                    itemExcelResultsDTO.HasDuplication = itemExcelResultsDTO.HasDuplication ||
+                        itemExcelResultsDTO.ExcelRecords.Any(record =>
+                            (record.FieldsErrors?.Any(error =>
+                                error?.IndexOf("already exists", StringComparison.OrdinalIgnoreCase) >= 0) ?? false) ||
+                            record.ErrorMessage?.IndexOf("already exists", StringComparison.OrdinalIgnoreCase) >= 0);
+
                     itemExcelResultsDTO.TotalPassedRecords = itemExcelResultsDTO.ExcelRecords.Where(r => r.Status == ExcelRecordStatus.Passed.ToString() || r.Status == ExcelRecordStatus.Warning.ToString()).Count();
                     itemExcelResultsDTO.TotalFailedRecords = itemExcelResultsDTO.ExcelRecords.Where(r => r.Status == ExcelRecordStatus.Failed.ToString()).Count();
                     #endregion Excel validateion rules only.
@@ -7056,13 +7064,6 @@ namespace onetouch.AppItems
                                 IsDefault = excelDto.ExcelDto.ImageIsDefault,
                                 Attributes = "101=" + excelDto.ExcelDto.Code.Split('-')[1]
                             });
-                            thirdItemCopy.ExcelDto.Images.Add(new AppItemImage
-                            {
-                                ImageFileName = Path.GetFileName(excelDto.ExcelDto.ImagePreview),
-                                ImageGuid = Path.GetFileNameWithoutExtension(excelDto.image),
-                                IsDefault = excelDto.ExcelDto.ImageIsDefault,
-                                Attributes = "101=" + excelDto.ExcelDto.Code.Split('-')[1]
-                            });
                             thirdItemCopy.ExcelDto.Actions = "";
                             childNo += 1;
                             thirdItemCopy.ExcelDto.D1Pos = childNo.ToString();
@@ -7125,6 +7126,41 @@ namespace onetouch.AppItems
             && r.Actions != "5" && r.Actions != "6" && r.Actions != "7"
             && r.Actions != "8" && r.Actions != "9" && r.Actions != "10"
             && r.RecordType != "Image" && r.RecordType != "Color")).ToList();
+
+            // Image rows are appended after the original Excel validation. Action 5
+            // turns such a row into a new parent item, but its Id is still zero even
+            // when the selected code already exists. Resolve those generated parents
+            // here so Ignore/Replace/CreateACopy follows the same duplicate path as a
+            // normal item row.
+            var unresolvedGeneratedParentCodes = result
+                .Where(row => row.Id == 0 &&
+                    string.Equals(row.RecordType, "Item", StringComparison.OrdinalIgnoreCase) &&
+                    !string.IsNullOrWhiteSpace(row.Code) && row.Code != "-")
+                .Select(row => NormalizeImportCode(row.Code))
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .ToList();
+
+            if (unresolvedGeneratedParentCodes.Count > 0)
+            {
+                var existingGeneratedParents = await _appItemRepository.GetAll()
+                    .AsNoTracking()
+                    .Where(item => item.TenantId == AbpSession.TenantId &&
+                        item.ItemType == 0 && item.Code != null &&
+                        unresolvedGeneratedParentCodes.Contains(item.Code.Replace(" ", string.Empty).Trim()))
+                    .Select(item => new { item.Id, item.Code })
+                    .ToListAsync();
+
+                var existingGeneratedParentsByCode = existingGeneratedParents
+                    .GroupBy(item => NormalizeImportCode(item.Code), StringComparer.OrdinalIgnoreCase)
+                    .ToDictionary(group => group.Key, group => group.First().Id, StringComparer.OrdinalIgnoreCase);
+
+                foreach (var generatedParent in result.Where(row => row.Id == 0 &&
+                             string.Equals(row.RecordType, "Item", StringComparison.OrdinalIgnoreCase)))
+                {
+                    if (existingGeneratedParentsByCode.TryGetValue(NormalizeImportCode(generatedParent.Code), out var existingId))
+                        generatedParent.Id = existingId;
+                }
+            }
 
             if (result.Count <= 0)
             {
@@ -7456,6 +7492,32 @@ namespace onetouch.AppItems
             {
                 if (importedItem.Id == 0)
                 {
+                    // Multiple generated image/action rows can resolve to the
+                    // same new item code. Do not enqueue a second AppEntity;
+                    // merge its attachments into the already pending item.
+                    var pendingDuplicate = appItemList.FirstOrDefault(item =>
+                        item.EntityFk != null &&
+                        importedItem.EntityFk != null &&
+                        item.EntityFk.TenantId == importedItem.EntityFk.TenantId &&
+                        string.Equals(item.EntityFk.EntityObjectTypeCode, importedItem.EntityFk.EntityObjectTypeCode, StringComparison.OrdinalIgnoreCase) &&
+                        string.Equals(item.EntityFk.Code, importedItem.EntityFk.Code, StringComparison.OrdinalIgnoreCase));
+
+                    if (pendingDuplicate != null)
+                    {
+                        pendingDuplicate.EntityFk.EntityAttachments ??= new List<AppEntityAttachment>();
+                        foreach (var attachment in importedItem.EntityFk.EntityAttachments ?? new List<AppEntityAttachment>())
+                        {
+                            if (!pendingDuplicate.EntityFk.EntityAttachments.Any(existing =>
+                                    existing.AttachmentFk != null && attachment.AttachmentFk != null &&
+                                    string.Equals(existing.AttachmentFk.Attachment, attachment.AttachmentFk.Attachment, StringComparison.OrdinalIgnoreCase)))
+                            {
+                                pendingDuplicate.EntityFk.EntityAttachments.Add(attachment);
+                            }
+                        }
+
+                        return;
+                    }
+
                     appItemList.Add(importedItem);
                 }
                 else
@@ -7946,18 +8008,25 @@ namespace onetouch.AppItems
                         {
                             foreach (var sz in sizes)
                             {
+                                int.TryParse(sz.D1Pos, out var d1Position);
+                                int.TryParse(sz.D2Pos, out var d2Position);
+                                int.TryParse(sz.D3Pos, out var d3Position);
+                                var normalizedD1Position = d1Position > 0 ? (d1Position - 1).ToString() : null;
+                                var normalizedD2Position = d2Position > 0 ? (d2Position - 1).ToString() : null;
+                                var normalizedD3Position = d3Position > 0 ? (d3Position - 1).ToString() : null;
+
                                 var exist = appSizeScalesDetailDtoList.FirstOrDefault(z => z.SizeCode == sz.SizeCode &&
-                                   z.D1Position == (sz.D1Pos == null || sz.D1Pos == "0" ? null : (int.Parse(sz.D1Pos.ToString()) - 1).ToString()) &&
-                                   z.D2Position == (sz.D2Pos == null || sz.D2Pos == "0" ? null : (int.Parse(sz.D2Pos.ToString()) - 1).ToString()) &&
-                                   z.D3Position == (sz.D3Pos == null || sz.D3Pos == "0" ? null : (int.Parse(sz.D3Pos.ToString()) - 1).ToString()));
+                                   z.D1Position == normalizedD1Position &&
+                                   z.D2Position == normalizedD2Position &&
+                                   z.D3Position == normalizedD3Position);
                                 if (exist == null)
                                     appSizeScalesDetailDtoList.Add(new AppSizeScalesDetailDto
                                     {
-                                        SizeCode = sz.SizeCode.TrimEnd(),
-                                        D3Position = int.Parse(sz.D3Pos.ToString()) > 0 ? (int.Parse(sz.D3Pos.ToString()) - 1).ToString() : null,
+                                        SizeCode = sz.SizeCode?.TrimEnd(),
+                                        D3Position = normalizedD3Position,
                                         SizeId = null,
-                                        D1Position = int.Parse(sz.D1Pos.ToString()) > 0 ? (int.Parse(sz.D1Pos.ToString()) - 1).ToString() : null,
-                                        D2Position = int.Parse(sz.D2Pos.ToString()) > 0 ? (int.Parse(sz.D2Pos.ToString()) - 1).ToString() : null,
+                                        D1Position = normalizedD1Position,
+                                        D2Position = normalizedD2Position,
                                         SizeRatio = 0
                                     });
                             }
@@ -8106,10 +8175,23 @@ namespace onetouch.AppItems
                                     arraySizeRatio = arrayRatio.Split('-');
                                 }
                                 List<AppSizeScalesDetailDto> appSizeScalesRatioDetailDtoList = new List<AppSizeScalesDetailDto>();
-                                if (!string.IsNullOrEmpty(excelDto.SizeRatioName) && !string.IsNullOrEmpty(excelDto.SizeRatioValue.Split('|')[0]) && !string.IsNullOrEmpty(excelDto.SizeRatioValue.Split('|')[1]))
+                                var sizeRatioParts = excelDto.SizeRatioValue?.Split('|') ?? System.Array.Empty<string>();
+                                if (!string.IsNullOrEmpty(excelDto.SizeRatioName) &&
+                                    sizeRatioParts.Length >= 2 &&
+                                    !string.IsNullOrEmpty(sizeRatioParts[0]) &&
+                                    !string.IsNullOrEmpty(sizeRatioParts[1]))
                                 {
-                                    var sizesList = excelDto.SizeRatioValue.Split('|')[0].Split('~').ToList();
-                                    var sizesRatios = excelDto.SizeRatioValue.Split('|')[1].Split('-').ToList();
+                                    var sizesList = sizeRatioParts[0].Split('~').ToList();
+                                    var sizesRatios = sizeRatioParts[1].Split('-').ToList();
+                                    var sizeRatiosByCode = sizesList
+                                        .Select((sizeCode, index) => new
+                                        {
+                                            SizeCode = sizeCode?.Trim(),
+                                            Ratio = index < sizesRatios.Count ? sizesRatios[index] : null
+                                        })
+                                        .Where(entry => !string.IsNullOrWhiteSpace(entry.SizeCode))
+                                        .GroupBy(entry => entry.SizeCode, StringComparer.OrdinalIgnoreCase)
+                                        .ToDictionary(group => group.Key, group => group.First().Ratio, StringComparer.OrdinalIgnoreCase);
                                     var sizesRatio = (sizeChildren ?? new List<AppItemExcelDto>())
                                         .Select(a => new { a.SizeCode, a.D1Pos, a.D2Pos, a.D3Pos })
                                         .Distinct()
@@ -8118,17 +8200,24 @@ namespace onetouch.AppItems
                                     {
                                         foreach (var sz in sizesRatio)
                                         {
-                                            var posinArr = sizesList.IndexOf(sz.SizeCode);
-                                            if (posinArr >= 0)
+                                            if (!string.IsNullOrWhiteSpace(sz.SizeCode) &&
+                                                sizeRatiosByCode.TryGetValue(sz.SizeCode.Trim(), out var ratioValue))
                                             {
+                                                int.TryParse(sz.D1Pos, out var d1Position);
+                                                int.TryParse(sz.D2Pos, out var d2Position);
+                                                int.TryParse(sz.D3Pos, out var d3Position);
+                                                var sizeRatio = int.TryParse(ratioValue, out var parsedSizeRatio)
+                                                        ? parsedSizeRatio
+                                                        : 0;
+
                                                 appSizeScalesRatioDetailDtoList.Add(new AppSizeScalesDetailDto
                                                 {
-                                                    SizeCode = sz.SizeCode.TrimEnd(),
-                                                    D3Position = int.Parse(sz.D3Pos.ToString()) > 0 ? (int.Parse(sz.D3Pos.ToString()) - 1).ToString() : "0",
+                                                    SizeCode = sz.SizeCode?.TrimEnd(),
+                                                    D3Position = d3Position > 0 ? (d3Position - 1).ToString() : "0",
                                                     SizeId = null,
-                                                    D1Position = int.Parse(sz.D1Pos.ToString()) > 0 ? (int.Parse(sz.D1Pos.ToString()) - 1).ToString() : "0",
-                                                    D2Position = int.Parse(sz.D2Pos.ToString()) > 0 ? (int.Parse(sz.D2Pos.ToString()) - 1).ToString() : "0",
-                                                    SizeRatio = int.Parse(sizesRatios[posinArr])
+                                                    D1Position = d1Position > 0 ? (d1Position - 1).ToString() : "0",
+                                                    D2Position = d2Position > 0 ? (d2Position - 1).ToString() : "0",
+                                                    SizeRatio = sizeRatio
                                                 });
                                             }
                                         }
@@ -8192,7 +8281,11 @@ namespace onetouch.AppItems
                                 appItemSizeScalesHeaderRatio.AppItemSizeScalesDetails.ForEach(a => a.Id = 0);
                                 appItemSizeScalesHeaderRatio.AppItemSizeScalesDetails.ForEach(a => a.TenantId = AbpSession.TenantId);
                                 appItemSizeScalesHeaderRatio.AppItemSizeScalesDetails.ForEach(a => a.DimensionName = sizescale.Dimesion1Name);
-                                appItemSizeScalesHeaderRatio.AppItemSizeScalesDetails.ForEach(a => a.SizeScaleId = appItemSizeScalesHeaderRatio.Id);
+                                appItemSizeScalesHeaderRatio.AppItemSizeScalesDetails.ForEach(a =>
+                                {
+                                    a.SizeScaleId = appItemSizeScalesHeaderRatio.Id;
+                                    a.SizeScaleFK = appItemSizeScalesHeaderRatio;
+                                });
                                 if (appItem.Id != 0 && itemScaleData != null && itemScaleData.Count > 0)
                                 {
 
