@@ -2579,8 +2579,8 @@ namespace onetouch.Accounts
                             }
                         }
                         else {
-                            //MMT2026[start]
-                            if (originalPublishContactFortCurrTenant.EntityObjectTypeId != presonEntityObjectTypeId
+                                //MMT2026[start]
+                                if (originalPublishContactFortCurrTenant.EntityObjectTypeId != presonEntityObjectTypeId
                                 && tenantId != AbpSession.TenantId)
                             {
                                 CreateOrEditAccountInfoDto createOrEditAccountInfoDto = new CreateOrEditAccountInfoDto();
@@ -2800,7 +2800,7 @@ namespace onetouch.Accounts
                     }
                     else
                     {
-
+                        
                         //Delete Image -Extra Data - Addresses
                         //if (existed.EntityFk.EntityExtraData.Count() > 0)
                         // {
@@ -2813,7 +2813,7 @@ namespace onetouch.Accounts
                         //  _appEntityAttachmentRepository.RemoveRange(existed.EntityFk.EntityAttachments);
                         // };
                         //if (originalContact.EntityObjectTypeId != presonEntityObjectTypeId &&
-                          //  originalContact.TenantOwner != AbpSession.TenantId)
+                        //  originalContact.TenantOwner != AbpSession.TenantId)
                         {
                             if (existed.AppContactAddresses != null)
                             {
@@ -2860,6 +2860,16 @@ namespace onetouch.Accounts
                             createOrEditAccountInfoDtoObj.TimeStamp = originalContact.TimeStamp;
                             createOrEditAccountInfoDtoObj.ContactAddresses = null;
                             //I40[End]
+                            //
+                            if (existed.EntityFk.EntityAttachments != null &&
+                                existed.EntityFk.EntityAttachments.Count > 0)
+                            {
+                                foreach (var att in existed.EntityFk.EntityAttachments)
+                                {
+                                    await _appEntityAttachmentRepository.DeleteAsync(att);
+                                }
+                                await CurrentUnitOfWork.SaveChangesAsync();
+                            }
                             if (originalContact.EntityAttachments != null && originalContact.EntityAttachments.Count > 0)
                             {
                                 foreach (var parentAttachObj in originalContact.EntityAttachments)
@@ -2867,7 +2877,18 @@ namespace onetouch.Accounts
                                     MoveFile(parentAttachObj.AttachmentFk.Attachment, -1, existed.TenantId);
                                 }
                             }
+
                             createOrEditAccountInfoDtoObj.EntityAttachments = ObjectMapper.Map<List<AppEntityAttachmentDto>>(originalContact.EntityAttachments);
+                            if (createOrEditAccountInfoDtoObj.EntityAttachments != null &&
+                                createOrEditAccountInfoDtoObj.EntityAttachments.Count>0)
+                            {
+                                foreach (var att in createOrEditAccountInfoDtoObj.EntityAttachments)
+                                {
+                                    att.Id = 0;
+                                }
+                                await CurrentUnitOfWork.SaveChangesAsync();
+                            }
+
                             if (createOrEditAccountInfoDtoObj.EntityExtraData != null)
                             {
                                 foreach (var parentExtrData in createOrEditAccountInfoDtoObj.EntityExtraData)
@@ -2979,13 +3000,13 @@ namespace onetouch.Accounts
                     //MMT33-3
 
                     //Connect Current Account branches with the other account
-                      if (originalPublishContactFortCurrTenant.EntityObjectTypeId != presonEntityObjectTypeId && sync == false)
+                      if (originalPublishContactFortCurrTenant.EntityObjectTypeId != presonEntityObjectTypeId)// && sync == false)
                         //&& originalPublishContactFortCurrTenant.TenantOwner != AbpSession.TenantId
                        // )
                         await ConnectBranches(originalPublishContactFortCurrTenant.Id, id);
 
-                    if (originalContact.EntityObjectTypeId != presonEntityObjectTypeId && sync == false &&
-                        originalContact.TenantOwner != AbpSession.TenantId)
+                    if (originalContact.EntityObjectTypeId != presonEntityObjectTypeId )//&& sync == false &&
+                        //originalContact.TenantOwner != AbpSession.TenantId)
                         await ConnectBranches(id, originalPublishContactFortCurrTenant.Id);
 
                     //Mariam[End]
@@ -3300,7 +3321,8 @@ namespace onetouch.Accounts
                 using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
                 {
                     //var dbContxt = CurrentUnitOfWork.GetDbContext<onetouchDbContext>();
-                    var connectedBranchContactQ = _appContactRepository.GetAll().IgnoreQueryFilters()
+                    var connectedBranchContactQ = _appContactRepository.GetAll()
+                        .Include(z=>z.AppContactAddresses).ThenInclude(z=>z.AddressFk).IgnoreQueryFilters()
                     .Where(x => x.TenantId == connectTenant && x.IsDeleted == false
                     && x.SSIN.ToLower().Trim() == branchesPublishedParentContact.SSIN.ToLower().Trim());
 
@@ -3314,7 +3336,7 @@ namespace onetouch.Accounts
                     // var connectedParentContact = await _appContactRepository.GetAll().FirstOrDefaultAsync(x => x.TenantId == connectTenant &&
                     //x.SSIN== branchesPublishedParentContact.SSIN);
 
-                    if (connectedBranchContact == null)
+                    if (connectedBranchContact == null && connectMainAccountContact!=null)
                     {
                         BranchDto contactDto = ObjectMapper.Map<BranchDto>(branchesPublishedParentContact);
                         contactDto.AccountId = long.Parse(connectMainAccountContact.Id.ToString());
@@ -3351,7 +3373,7 @@ namespace onetouch.Accounts
                                     {
                                         ObjectMapper.Map(savedAddress, address);
                                         address.Id = 0;
-                                        address.AccountId = long.Parse(savedContactDto.AccountId.ToString());
+                                        address.AccountId = long.Parse(connectMainAccountContact.Id.ToString());
                                         address.TenantId = contactDto.TenantId;
                                         address = await _appAddressRepository.InsertAsync(address);
                                         await CurrentUnitOfWork.SaveChangesAsync();
@@ -3373,7 +3395,7 @@ namespace onetouch.Accounts
                                         AddressTypeIdName = contactAddress.AddressTypeCode,
                                         Code = address.Code,
                                         AddressId = address.Id,
-                                        AccountId = long.Parse(savedContactDto.AccountId.ToString()),
+                                        AccountId = long.Parse(connectMainAccountContact.Id.ToString()),
                                         ContactId = contactDto.Id
                                     });
                                     // 
@@ -3457,7 +3479,65 @@ namespace onetouch.Accounts
                             connectedBranchContact.ParentId = parentContact.Id;
                             await _appContactRepository.UpdateAsync(connectedBranchContact);
                         }
+                        if (connectedBranchContact.AppContactAddresses != null && connectedBranchContact.AppContactAddresses.Count > 0)
+                        {
+                            foreach (var conAdd in connectedBranchContact.AppContactAddresses)
+                            {
+                                await _appContactAddressRepository.DeleteAsync(conAdd);
+                                await _appAddressRepository.DeleteAsync(conAdd.AddressFk);
+                            }
+                            await CurrentUnitOfWork.SaveChangesAsync();
+                        }
+                        var addressesIds = branchesPublishedParentContact.ContactAddresses.Select(x => x.AddressCode).Distinct().ToArray();
+
+                        var addresses = _appAddressRepository.GetAll().Where(x => addressesIds.Contains(x.Code)).ToList();
+                        //Copy Addresses[Start]
+                        if (branchesParentContact.ContactAddresses != null && branchesParentContact.ContactAddresses.Count > 0)
+                        {
+                            foreach (var contactAddress in branchesParentContact.ContactAddresses)
+                            {
+                                var savedAddress = await _appAddressRepository.FirstOrDefaultAsync(x => x.Code == contactAddress.AddressCode && x.TenantId== branchesParentContact.TenantOwner);
+                                AppAddress address = new AppAddress();
+                                if (savedAddress != null)
+                                {
+                                    var addressCon = await _appAddressRepository.GetAll().FirstOrDefaultAsync(z => z.Code == savedAddress.Code && z.TenantId == connectedBranchContact.TenantId);
+                                    if (addressCon == null)
+                                    {
+                                        ObjectMapper.Map(savedAddress, address);
+                                        address.Id = 0;
+                                        address.AccountId = long.Parse(connectMainAccountContact.Id.ToString());
+                                        address.TenantId = connectedBranchContact.TenantId;
+                                        address = await _appAddressRepository.InsertAsync(address);
+                                        await CurrentUnitOfWork.SaveChangesAsync();
+                                    }
+                                    else
+                                    {
+                                        address = addressCon;
+                                    }
+                                    AppContactAddress newContactAddress = new AppContactAddress();
+                                    newContactAddress.Id = 0;
+                                    newContactAddress.AddressId = address.Id;
+                                    newContactAddress.ContactId = connectedBranchContact.Id;
+                                    newContactAddress.AddressTypeId = contactAddress.AddressTypeId;
+                                    
+                                    var connectedBranchContactAdd = new AppContactAddress
+                                    {
+                                        AddressTypeId = contactAddress.AddressTypeId,
+                                        //AddressTypeIdName = contactAddress.AddressTypeCode,
+                                        //Code = address.Code,
+                                        AddressId = address.Id,
+                                        //AccountId = long.Parse(connectedBranchContact.AccountId.ToString()),
+                                        ContactId = connectedBranchContact.Id
+                                    };
+                                    // 
+                                    // contactDto.ContactAddresses.Add(new AppContactAddressDto { Code = address.Code, AddressId = address.Id, AccountId = contactDto.Id, ContactId = contactDto.Id });
+                                    await _appContactAddressRepository.InsertAsync(connectedBranchContactAdd);
+                                    await CurrentUnitOfWork.SaveChangesAsync();
+                                }
+                            }
+                        }
                     }
+                    
                 }
                 var branchObjectTypeId = await _helper.SystemTables.GetEntityObjectTypeBranchId();
                 var branchInfo = _appMarketplaceContactRepository.GetAll().Where(x => x.TenantId == null &&
