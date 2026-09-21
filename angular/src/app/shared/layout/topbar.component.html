@@ -18,7 +18,7 @@
         class="navbar-brand pt-0"
         [routerLink]="defaultHomeUrl"
         routerLinkActive="header-link-active"
-        (click)="userClick('Home')"
+   
         [ngClass]="isAuthenticated? 'ml-3':''"
       >
         <img
@@ -42,7 +42,7 @@
         <!-- test nav -->
 
         <!-- Search form -->
-        <form class="input-group pt-3 input-group-form d-lg-block d-none">
+        <form class="input-group pt-3 input-group-form d-lg-block d-none mx-5">
             <div class="position-relative search-bar w-75" [ngClass]="!isHost && !isAuthenticated && !isArabic ? 'addMl' : !isHost && !isAuthenticated && isArabic ? 'addMR': ''"
 
             >
@@ -410,8 +410,8 @@
             <!-- Left links -->
             <ul class="navbar-nav bottom-navbar ms-auto my-2 mb-lg-0">
                 <li class="nav-item pt-2">
-                    <a class="navbar-brand pt-0 "  [routerLink]="['/app/main/Home']"
-                        routerLinkActive="header-link-active" (click)="userClick('Home')">
+                    <a class="navbar-brand pt-0 "     [routerLink]="defaultHomeUrl"
+                        routerLinkActive="header-link-active">
                         <img src="../../../assets/landingPage/Home_Footer_Btn.svg" class="navbar-brand _navbar-brand" />
                     </a>
                 </li>
