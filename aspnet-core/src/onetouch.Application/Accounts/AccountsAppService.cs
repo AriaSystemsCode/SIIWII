@@ -2453,14 +2453,21 @@ namespace onetouch.Accounts
                         x.ParentId== null &&
                         x.SSIN== currentTenantAccount.SSIN);
                
-                originalContact = await _appMarketplaceContactRepository.GetAll().AsNoTracking()
-                        .Include(x => x.ContactAddresses).ThenInclude(x => x.AddressFk).AsNoTracking()
-                        .Include(x => x.EntityCategories)
+                originalContact = await _appMarketplaceContactRepository.GetAll()//.AsNoTracking()
+                        .Include(x => x.ContactAddresses).ThenInclude(x => x.AddressFk)//.AsNoTracking()
+                      //  .Include(x => x.EntityCategories)
                         .Include(x => x.EntityExtraData)
-                        .Include(x => x.EntityClassifications)
+                       // .Include(x => x.EntityClassifications)
                         .Include(x => x.EntityAttachments).ThenInclude(x => x.AttachmentFk)
                 //.Include(x => x.EntityExtraData).Include(z => z.ContactAddresses).ThenInclude(z => z.AddressFk)
-                .FirstOrDefaultAsync(x => x.SharingLevel == 1 && x.Id == id);
+                .Where(x => x.SharingLevel == 1 && x.Id == id).FirstOrDefaultAsync();
+                if (originalContact != null)
+                {
+                    originalContact.EntityCategories = await _appEntityCategoryRepository
+                        .GetAll().Where(z => z.EntityId == originalContact.Id).ToListAsync();
+                    originalContact.EntityClassifications = await _appEntityClassficationRepository
+                        .GetAll().Where(z => z.EntityId == originalContact.Id).ToListAsync();
+                }
                 GetAccountInfoForEditOutput saveAccountDest = null;
 
                 if (originalPublishContactFortCurrTenant == null)
@@ -3012,7 +3019,7 @@ namespace onetouch.Accounts
 
                     //Mariam[End]
                     //T-SII-20221013.0006,1 MMT 11/02/2022 Notify the destination tenant that another tenant connected to him[Start]
-                    if (originalContact != null && originalContact.TenantOwner != null )//&& sync == false)
+                    if (originalContact != null && originalContact.TenantOwner != null && sync == false)
                     {
                         var tenantObject = await TenantManager.GetByIdAsync(int.Parse(originalContact.TenantOwner.ToString()));
                         if (tenantObject != null)
@@ -4819,7 +4826,8 @@ namespace onetouch.Accounts
                             {
                                 //Start
                                 var FoundPublishContact = await _appMarketplaceContactRepository.GetAll()
-                                                  .AsNoTracking().Include(x => x.ContactAddresses).ThenInclude(e => e.AddressFk)
+                                                  .AsNoTracking()
+                                                  //.Include(x => x.ContactAddresses).ThenInclude(e => e.AddressFk)
                                                   .FirstOrDefaultAsync(x => x.TenantId == null
                                                   && x.IsProfileData == true
                                                   && x.TenantOwner == AbpSession.TenantId
