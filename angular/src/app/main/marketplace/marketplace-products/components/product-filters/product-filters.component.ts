@@ -28,10 +28,10 @@ import { finalize } from "rxjs";
 export class ProductFiltersComponent extends AppComponentBase implements OnInit, OnDestroy {
   private readonly departmentsPageSize = 9999;
   isExpanded: boolean = true;
-  productList: GetAllMarketplaceItemListsOutputDto[];
+  productList: GetAllMarketplaceItemListsOutputDto[] =[];
   selectedList: boolean = false;
   catalogId: number;
-  files: TreeNodeOfGetSycEntityObjectCategoryForViewDto[];
+  files: TreeNodeOfGetSycEntityObjectCategoryForViewDto[] =[];
   loading: boolean;
   selectedFile: any[] = [];
   selectedCatFile: any[] = [];
