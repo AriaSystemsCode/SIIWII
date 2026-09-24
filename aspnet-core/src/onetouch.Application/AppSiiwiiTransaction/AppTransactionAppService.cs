@@ -2563,7 +2563,8 @@ namespace onetouch.AppSiiwiiTransaction
                                      PhoneTypeName = !string.IsNullOrEmpty(z.Phone1Number) ? z.Phone1TypeName :
                                                     (!string.IsNullOrEmpty(z.Phone2Number) ? z.Phone2TypeName :
                                                     (!string.IsNullOrEmpty(z.Phone3Number) ? z.Phone3TypeName : null))
-                                 }).ToListAsync();
+                                 }).GroupBy(x => x.AccountSSIN)
+                    .Select(g => g.FirstOrDefault()).ToListAsync();
 
             return new PagedResultDto<GetAccountInformationOutputDto>(results.Count, results);
         }
