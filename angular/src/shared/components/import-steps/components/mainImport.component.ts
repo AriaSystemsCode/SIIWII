@@ -759,7 +759,16 @@ export class MainImportComponent
                 break;
 
             case ImportStepsEnum.importConfirmationModalStep:
-                this.importConfirmationModal.show(this.importType, this.uploadingResult.hasDuplication, this.hasImages);
+                const hasDuplicateWarning = this.uploadingResult?.hasDuplication === true ||
+                    this.uploadingResult?.HasDuplication === true ||
+                    (this.uploadingResult?.excelRecords || []).some(record => {
+                        const messages = [
+                            ...(record?.fieldsErrors || []),
+                            record?.errorMessage || ''
+                        ].join(' ');
+                        return messages.toLowerCase().includes('already exists');
+                    });
+                this.importConfirmationModal.show(this.importType, hasDuplicateWarning, this.hasImages);
                 break;
 
             case ImportStepsEnum.successfullyImportModalStep:

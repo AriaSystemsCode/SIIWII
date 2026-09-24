@@ -19,8 +19,8 @@ namespace onetouch.Web.PredefinedReports.ProductCatalog
         {
             tableCell25.ExpressionBindings.Clear();
             tableCell25.ExpressionBindings.Add(
-                new ExpressionBinding("BeforePrint", "Text", "Trim([AttributeValue])"));
-            tableCell25.Font = new DevExpress.Drawing.DXFont("Arial", 9F);
+                new ExpressionBinding("BeforePrint", "Text", "Replace(Trim([AttributeValue]), '\"', '')"));
+            tableCell25.Font = new DevExpress.Drawing.DXFont("Arial", 12F);
             tableCell25.Padding = new DevExpress.XtraPrinting.PaddingInfo(5, 0, 0, 0, 254F);
             tableCell25.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleLeft;
             tableCell25.TextFitMode = TextFitMode.ShrinkOnly;
@@ -51,10 +51,14 @@ namespace onetouch.Web.PredefinedReports.ProductCatalog
                 : sizeCount <= 8 ? 10F
                 : 9F;
 
-            tableCell26.Font = new DevExpress.Drawing.DXFont("Arial", fontSize);
+            // Keep St. Ship readable independently of the number of size columns.
+            tableCell26.Font = new DevExpress.Drawing.DXFont("Arial", 10F);
             tableCell26.Padding = new DevExpress.XtraPrinting.PaddingInfo(0, 0, 0, 0, 254F);
             tableCell26.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleCenter;
-            tableCell26.TextFitMode = TextFitMode.ShrinkOnly;
+            // Do not shrink the single-line St. Ship header to fit its column.
+            tableCell26.TextFitMode = TextFitMode.None;
+            tableCell26.CanGrow = false;
+            tableCell26.Multiline = false;
             tableCell26.WordWrap = false;
 
             XRTableCell[] sizeCells =
@@ -78,6 +82,12 @@ namespace onetouch.Web.PredefinedReports.ProductCatalog
                 sizeCell.TextFitMode = TextFitMode.ShrinkOnly;
                 sizeCell.WordWrap = false;
             }
+
+            // The More size header must not be clipped by the size-cell fit mode.
+            tableCell33.TextFitMode = TextFitMode.None;
+            tableCell34.Font = new DevExpress.Drawing.DXFont("Arial", 12F);
+            tableCell34.Padding = new DevExpress.XtraPrinting.PaddingInfo(0, 6, 0, 0, 254F);
+            tableCell34.TextFitMode = TextFitMode.None;
         }
     }
 }
