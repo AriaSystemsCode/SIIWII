@@ -418,8 +418,7 @@ namespace onetouch.Accounts
                             .Include(e => e.AppContactAddresses.Take(1)).ThenInclude(a => a.AddressFk).ThenInclude(a => a.CountryFk)
                             .Include(en => en.EntityFk).ThenInclude(encl => encl.EntityClassifications.Take(5))
                             .Include(en => en.EntityFk).ThenInclude(enca => enca.EntityCategories.Take(5))
-                            .Include(en => en.EntityFk)
-                            .ThenInclude(ena => ena.EntityAttachments.Where(x => x.AttachmentCategoryId == logoCategory)).ThenInclude(x => x.AttachmentFk)
+                            .Include(en => en.EntityFk).ThenInclude(ena => ena.EntityAttachments.Where(x => x.AttachmentCategoryId == logoCategory)).ThenInclude(x => x.AttachmentFk)
                             /*.WhereIf(currPublishContact != null,
                                 x => (x.PartnerId != currPublishContact.Id))*///not current profile
 
@@ -3896,10 +3895,17 @@ namespace onetouch.Accounts
             var partnerEntityObjectTypeId = input.AccountTypeId;
             var partnerEntityObjectTypeCode = input.AccountType;
             if (partnerEntityObjectTypeId == null || input.AccountTypeId < 1)
-            {
-                var partnerEntityObjectType = await _helper.SystemTables.GetEntityObjectTypeParetner();
-                partnerEntityObjectTypeId = partnerEntityObjectType.Id;
-                partnerEntityObjectTypeCode = partnerEntityObjectType.Code;
+            {   if (input.ContactRecordType == "B")
+                {
+                    var partnerEntityObjectType = await _helper.SystemTables.GetEntityObjectTypeBranch();
+                    partnerEntityObjectTypeId = partnerEntityObjectType.Id;
+                    partnerEntityObjectTypeCode = partnerEntityObjectType.Code;
+                }
+                else {
+                    var partnerEntityObjectType = await _helper.SystemTables.GetEntityObjectTypeParetner();
+                    partnerEntityObjectTypeId = partnerEntityObjectType.Id;
+                    partnerEntityObjectTypeCode = partnerEntityObjectType.Code;
+                }
             }
 
 
@@ -3907,6 +3913,7 @@ namespace onetouch.Accounts
             ObjectMapper.Map(input, entity);
             entity.Id = 0;
             entity.ObjectId = contactObjectId;
+
             entity.EntityObjectTypeId = partnerEntityObjectTypeId;
             entity.EntityObjectTypeCode = partnerEntityObjectTypeCode;
             entity.Name = input.Name;

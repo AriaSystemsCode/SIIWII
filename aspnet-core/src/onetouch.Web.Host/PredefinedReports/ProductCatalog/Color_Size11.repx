@@ -19,39 +19,39 @@
       <HierarchyPrintOptions Ref="17" Indent="50.8" />
       <Scripts Ref="18" OnBeforePrint="Detail_BeforePrint_1" />
       <Controls>
-        <Item1 Ref="19" ControlType="XRLabel" Name="xrLabel1" Multiline="true" Text="xrLabel1" TextAlignment="MiddleCenter" SizeF="95,80" LocationFloat="0,1.335144E-05" Dpi="254" Font="Arial, 6pt" Padding="5,5,0,0,254">
+        <Item1 Ref="19" ControlType="XRLabel" Name="xrLabel1" Multiline="true" Text="xrLabel1" TextAlignment="MiddleCenter" SizeF="100.413124,84.23249" LocationFloat="0,1.335144E-05" Dpi="254" Font="Arial, 6pt" Padding="5,5,0,0,254">
           <ExpressionBindings>
             <Item1 Ref="20" EventName="BeforePrint" PropertyName="Text" Expression="[Attachment]" />
             <Item2 Ref="21" EventName="BeforePrint" PropertyName="Visible" Expression="[DataSource.CurrentRowIndex] =0&#xA;" />
           </ExpressionBindings>
           <StylePriority Ref="22" UseFont="false" UseTextAlignment="false" />
         </Item1>
-        <Item2 Ref="23" ControlType="XRPictureBox" Name="xrPictureBox1" Sizing="ZoomImage" SizeF="95,80" LocationFloat="0,0" Dpi="254">
+        <Item2 Ref="23" ControlType="XRPictureBox" Name="xrPictureBox1" Sizing="ZoomImage" SizeF="100.413124,84.23249" LocationFloat="0,0" Dpi="254">
           <ExpressionBindings>
             <Item1 Ref="24" EventName="BeforePrint" PropertyName="Visible" Expression="[DataSource.CurrentRowIndex] &gt;0 and [DataSource.CurrentRowIndex] &lt;20&#xA;" />
             <Item2 Ref="25" EventName="BeforePrint" PropertyName="BackColor" Expression="iif(Contains(upper([Attachment]), 'HTTP'), '',[Attachment])&#xA;" />
             <Item3 Ref="26" EventName="BeforePrint" PropertyName="ImageUrl" Expression="iif(Contains(upper([Attachment]), 'HTTP'), [Attachment], '')&#xA;" />
           </ExpressionBindings>
         </Item2>
-        <Item3 Ref="27" ControlType="XRTable" Name="table2" SizeF="979.105652,84.23249" LocationFloat="100.413124,0" Dpi="254" OddStyleName="DetailData3_Odd">
+        <Item3 Ref="27" ControlType="XRTable" Name="table2" SizeF="1050,84.23249" LocationFloat="100.413124,0" Dpi="254" OddStyleName="DetailData3_Odd">
           <Rows>
             <Item1 Ref="28" ControlType="XRTableRow" Name="tableRow2" Weight="11.683999633789062" Dpi="254">
               <Cells>
-                <Item1 Ref="29" ControlType="XRTableCell" Name="tableCell25" Weight="0.063755476833314922" Dpi="254" StyleName="DetailData1" Font="Arial, 9pt" Padding="1,1,0,0,254" Borders="None">
+                <Item1 Ref="29" ControlType="XRTableCell" Name="tableCell25" Weight="0.14" Dpi="254" StyleName="DetailData1" Font="Arial, 12pt" Padding="1,1,0,0,254" Borders="None">
                   <ExpressionBindings>
-                    <Item1 Ref="30" EventName="BeforePrint" PropertyName="Text" Expression="iif(len(trim([AttributeCode]))&gt;7 and [DataSource.CurrentRowIndex] &gt;0&#xA;,Substring([AttributeCode],0 ,6 )+'...',[AttributeCode])&#xA;" />
+                    <Item1 Ref="30" EventName="BeforePrint" PropertyName="Text" Expression="Replace(Trim([AttributeCode]), '&quot;', '')" />
                     <Item2 Ref="31" EventName="BeforePrint" PropertyName="Font.Bold" Expression="[DataSource.CurrentRowIndex] == 0" />
                   </ExpressionBindings>
                   <StylePriority Ref="32" UseFont="false" UsePadding="false" UseBorders="false" />
                 </Item1>
-                <Item2 Ref="33" ControlType="XRTableCell" Name="tableCell26" Weight="0.13901440398110415" Dpi="254" StyleName="DetailData1" Font="Arial, 9pt" Padding="1,1,0,0,254">
+                <Item2 Ref="33" ControlType="XRTableCell" Name="tableCell26" Weight="0.13" Dpi="254" StyleName="DetailData1" Font="Arial, 10pt" Padding="1,1,0,0,254" Multiline="false" WordWrap="false" TextFitMode="None">
                   <ExpressionBindings>
-                    <Item1 Ref="34" EventName="BeforePrint" PropertyName="Text" Expression="[AttributeValue]&#xA;" />
+                    <Item1 Ref="34" EventName="BeforePrint" PropertyName="Text" Expression="Iif([DataSource.CurrentRowIndex] == 0, 'St. Ship', FormatString('{0:MM/dd/yyyy}', Today()))" />
                     <Item2 Ref="35" EventName="BeforePrint" PropertyName="Font.Bold" Expression="[DataSource.CurrentRowIndex] == 0&#xA;" />
                   </ExpressionBindings>
                   <StylePriority Ref="36" UseFont="false" UsePadding="false" />
                 </Item2>
-                <Item3 Ref="37" ControlType="XRTableCell" Name="tableCell34" Weight="0.059310470403890744" CanGrow="false" WordWrap="false" Dpi="254" StyleName="DetailData1" Font="Arial, 9pt" Padding="1,1,0,0,254">
+                <Item3 Ref="37" ControlType="XRTableCell" Name="tableCell34" Weight="0.1" CanGrow="false" WordWrap="false" TextFitMode="None" Dpi="254" StyleName="DetailData1" Font="Arial, 12pt" Padding="1,6,0,0,254">
                   <ExpressionBindings>
                     <Item1 Ref="38" EventName="BeforePrint" PropertyName="Text" Expression="[Total]" />
                     <Item2 Ref="39" EventName="BeforePrint" PropertyName="Font.Bold" Expression="[DataSource.CurrentRowIndex] == 0&#xA;" />
