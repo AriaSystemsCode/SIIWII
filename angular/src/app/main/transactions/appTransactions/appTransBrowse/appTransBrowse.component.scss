@@ -1019,3 +1019,16 @@
 .pivot-native-builder .e-pivotview {
     height: auto !important;
 }
+
+.spreadsheet-loading-status {
+    padding: 8px 14px;
+    background: #f8f9fa;
+    border-bottom: 1px solid #e5e5e5;
+    font-size: 13px;
+    position: relative;
+    z-index: 10;
+}
+
+.spreadsheet-loading-status .progress {
+    width: 100%;
+}

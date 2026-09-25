@@ -201,14 +201,6 @@ spreadsheetSaveUrl =
     // SPREADSHEET PERFORMANCE
     // =====================================================
 
-    /**
-     * Syncfusion virtual scrolling is enabled by default, but we keep the
-     * configuration explicit so it is not accidentally disabled later.
-     *
-     * Bind this in HTML:
-     * [allowScrolling]="true"
-     * [scrollSettings]="spreadsheetScrollSettings"
-     */
     readonly spreadsheetScrollSettings: any = {
         enableVirtualization: true,
         isFinite: false
@@ -230,6 +222,9 @@ spreadsheetSaveUrl =
 
     spreadsheetLoadingProgress = 0;
     spreadsheetLoadingMessage = '';
+    spreadsheetStillLoading = false;
+    spreadsheetLoadedCount = 0;
+    spreadsheetTotalCount = 0;
 
     /**
      * Keep formulas/styles/charts because they are part of the user's saved
@@ -246,6 +241,58 @@ spreadsheetSaveUrl =
     };
 
     private previousSpreadsheetCalculationMode: any = null;
+
+    // =====================================================
+    // ODOO-STYLE ADD DATA SOURCE
+    // =====================================================
+    showSpreadsheetDataPanel = false;
+    addDataStep: 1 | 2 = 1;
+    selectedAddDataEntityKey: string | null = null;
+    addDataDefinition: SpreadsheetEntityDefinition | null = null;
+    selectedAddDataColumns: string[] = [];
+    addDataFilters: Record<string, any> = {};
+    addingSpreadsheetData = false;
+
+    readonly spreadsheetEntityDefinitions: SpreadsheetEntityDefinition[] = [
+        { sourceKey: 'TRANSACTIONS', displayName: 'Transactions', icon: 'fa fa-exchange-alt',
+          columns: [
+            { key:'TransactionNumber', label:'Transaction Number', type:'string', defaultSelected:true },
+            { key:'TransactionType', label:'Transaction Type', type:'string', defaultSelected:true },
+            { key:'Seller', label:'Seller', type:'string', defaultSelected:true },
+            { key:'Buyer', label:'Buyer', type:'string', defaultSelected:true },
+            { key:'Status', label:'Status', type:'string', defaultSelected:true },
+            { key:'CreatedDate', label:'Created Date', type:'date', defaultSelected:true },
+            { key:'CompleteDate', label:'Complete Date', type:'date' },
+            { key:'Reference', label:'Reference', type:'string' },
+            { key:'Creator', label:'Creator', type:'string' },
+            { key:'Currency', label:'Currency', type:'string' },
+            { key:'Quantity', label:'Quantity', type:'number', defaultSelected:true },
+            { key:'Amount', label:'Amount', type:'number', defaultSelected:true }
+          ],
+          filters: [
+            { key:'search', label:'Search', type:'string' },
+            { key:'codeFilter', label:'Transaction Number', type:'string' },
+            { key:'sellerNameFilter', label:'Seller', type:'string' },
+            { key:'buyerNameFilter', label:'Buyer', type:'string' },
+            { key:'statusFilter', label:'Status', type:'statusLookup' },
+            { key:'minCreateDateFilter', label:'Created From', type:'date' },
+            { key:'maxCreateDateFilter', label:'Created To', type:'date' },
+            { key:'referenceNumberFilter', label:'Reference', type:'string' }
+          ] },
+        { sourceKey:'ITEMS', displayName:'Items', icon:'fa fa-box',
+          columns: [
+            { key:'Code', label:'Code', type:'string', defaultSelected:true },
+            { key:'Name', label:'Name', type:'string', defaultSelected:true },
+            { key:'Brand', label:'Brand', type:'string', defaultSelected:true },
+            { key:'AvailableQuantity', label:'Available Quantity', type:'number', defaultSelected:true },
+            { key:'Price', label:'Price', type:'number', defaultSelected:true }
+          ],
+          filters: [
+            { key:'search', label:'Search', type:'string' },
+            { key:'brandId', label:'Brand', type:'number' },
+            { key:'onlyAvailableStock', label:'Available Stock Only', type:'boolean' }
+          ] }
+    ];
 
     // =====================================================
     // PIVOT / ANALYSIS STATE
@@ -323,8 +370,23 @@ spreadsheetSaveUrl =
 
 
 currentSpreadsheetFilters: any = null;
+    // Legacy/current active-sheet source. Kept for backward compatibility.
     currentSpreadsheetSource: SpreadsheetDataSource | null = null;
 
+    // NEW: every Spreadsheet tab owns its own source + filters.
+    // This metadata is stored OUTSIDE Syncfusion workbookJson.
+    sheetDataSources: SpreadsheetSheetDataSource[] = [];
+
+    // Watches Syncfusion's active sheet because EJ2 20.4.x does not reliably
+    // emit a usable Angular event when the user clicks a sheet tab.
+    private spreadsheetSheetWatcher: any = null;
+    private lastSpreadsheetActiveSheetIndex = -1;
+
+    showSpreadsheetDestinationDialog = false;
+    pendingSpreadsheetOpenMode: 'SelectedRecords' | 'AllRecords' = 'SelectedRecords';
+    pendingSpreadsheetDestination: 'new' | 'existing' = 'new';
+    pendingExistingSpreadsheetId: number | null = null;
+    private progressiveTargetSheetName = 'Transactions';
 
     sheetAnalyses: SavedSheetAnalysis[] = [];
     currentPivotSheetName: string | null = null;
@@ -366,6 +428,274 @@ currentSpreadsheetFilters: any = null;
         this.initFilterForm();
         this.loadSavedSpreadsheets();
     }
+
+    // =====================================================
+    // ODOO-STYLE: ENTITY -> COLUMNS -> FILTERS -> NEW TAB
+    // =====================================================
+    openAddSpreadsheetData(): void {
+        this.addDataStep = 1;
+        this.selectedAddDataEntityKey = null;
+        this.addDataDefinition = null;
+        this.selectedAddDataColumns = [];
+        this.addDataFilters = {};
+        this.showSpreadsheetDataPanel = true;
+        this.cdr.detectChanges();
+    }
+
+    closeSpreadsheetDataPanel(): void {
+        this.showSpreadsheetDataPanel = false;
+    }
+
+    onSpreadsheetEntityDropdownChange(sourceKey: string | null): void {
+        if (!sourceKey) {
+            this.selectedAddDataEntityKey = null;
+            this.addDataDefinition = null;
+            this.selectedAddDataColumns = [];
+            this.addDataFilters = {};
+            this.addDataStep = 1;
+            return;
+        }
+
+        this.selectSpreadsheetEntity(sourceKey);
+    }
+
+    private spreadsheetDataSourceClickHandler: ((event: Event) => void) | null = null;
+
+    private bindSpreadsheetDataSourceRibbonClick(): void {
+        this.unbindSpreadsheetDataSourceRibbonClick();
+
+        this.spreadsheetDataSourceClickHandler = (event: Event) => {
+            const target = event.target as HTMLElement | null;
+            if (!target) return;
+
+            const button = target.closest(
+                '#siiwii_spreadsheet_data_source, [id*="siiwii_spreadsheet_data_source"]'
+            ) as HTMLElement | null;
+
+            if (!button) return;
+
+            event.preventDefault();
+            event.stopPropagation();
+            this.openAddSpreadsheetData();
+        };
+
+        document.addEventListener('click', this.spreadsheetDataSourceClickHandler, true);
+    }
+
+    private unbindSpreadsheetDataSourceRibbonClick(): void {
+        if (!this.spreadsheetDataSourceClickHandler) return;
+
+        document.removeEventListener('click', this.spreadsheetDataSourceClickHandler, true);
+        this.spreadsheetDataSourceClickHandler = null;
+    }
+
+    /**
+     * Adds Siiwii's Data Source command to Syncfusion's native Insert ribbon.
+     * Syncfusion 20.4.x exposes addToolbarItems at runtime even when typings
+     * differ between patch versions, therefore the call is intentionally `any`.
+     */
+    private addSpreadsheetDataSourceRibbonCommand(): void {
+        if (!this.spreadsheet) {
+            return;
+        }
+
+        const spreadsheet: any = this.spreadsheet as any;
+
+        if (typeof spreadsheet.addToolbarItems !== 'function') {
+            console.warn('[Spreadsheet] addToolbarItems is not available in this Syncfusion build.');
+            return;
+        }
+
+        try {
+            spreadsheet.addToolbarItems(
+                'Insert',
+                [
+                    {
+                        id: 'siiwii_spreadsheet_data_source',
+                        type: 'Button',
+                        text: 'siiwii list',
+                        tooltipText: 'Insert Siiwii data source',
+                        prefixIcon: 'e-icons e-database',
+                        click: () => this.openAddSpreadsheetData()
+                    }
+                ],
+                0
+            );
+        } catch (error) {
+            console.warn('[Spreadsheet] Unable to add Data Source ribbon command:', error);
+        }
+    }
+
+    onSpreadsheetRibbonClick(args: any): void {
+        const itemId =
+            args?.item?.id ??
+            args?.originalEvent?.target?.id ??
+            args?.target?.id ??
+            '';
+
+        if (String(itemId).includes('siiwii_spreadsheet_data_source')) {
+            this.openAddSpreadsheetData();
+        }
+    }
+
+    selectSpreadsheetEntity(sourceKey: string): void {
+        const definition = this.spreadsheetEntityDefinitions.find(x => x.sourceKey === sourceKey);
+        if (!definition) return;
+        this.selectedAddDataEntityKey = sourceKey; this.addDataDefinition = definition;
+        this.selectedAddDataColumns = definition.columns.filter(x => x.defaultSelected).map(x => x.key);
+        this.addDataFilters = {}; this.addDataStep = 2;
+    }
+
+    backToSpreadsheetEntitySelection(): void {
+        this.addDataStep = 1; this.selectedAddDataEntityKey = null;
+        this.addDataDefinition = null; this.selectedAddDataColumns = []; this.addDataFilters = {};
+    }
+
+    isAddDataColumnSelected(key: string): boolean { return this.selectedAddDataColumns.includes(key); }
+
+    toggleAddDataColumnEvent(key: string, event: any): void {
+        this.toggleAddDataColumn(key, !!event?.target?.checked);
+    }
+
+    toggleAddDataColumn(key: string, checked: boolean): void {
+        if (checked) {
+            if (!this.selectedAddDataColumns.includes(key)) this.selectedAddDataColumns = [...this.selectedAddDataColumns, key];
+        } else this.selectedAddDataColumns = this.selectedAddDataColumns.filter(x => x !== key);
+    }
+
+    selectAllAddDataColumns(): void { this.selectedAddDataColumns = this.addDataDefinition?.columns.map(x => x.key) ?? []; }
+    clearAddDataColumns(): void { this.selectedAddDataColumns = []; }
+
+    private getUniqueSpreadsheetSheetName(baseName: string): string {
+        const names = new Set((this.spreadsheet?.sheets ?? []).map((x:any) => String(x?.name ?? '').trim()));
+        let name = baseName, i = 2; while (names.has(name)) name = `${baseName} (${i++})`; return name;
+    }
+
+    private buildSelectedTransactionSpreadsheetRows(records: any[]): any[] {
+        const selected = new Set(this.selectedAddDataColumns);
+        return records.map(record => {
+            const fullRow:any = this.mapTransactionToSpreadsheetRow(record); const row:any = {};
+            (this.addDataDefinition?.columns ?? []).forEach(column => {
+                if (selected.has(column.key)) row[column.label] = fullRow[column.key];
+            });
+            return row;
+        });
+    }
+
+    async insertConfiguredDataAsNewTab(): Promise<void> {
+    if (!this.spreadsheet || !this.addDataDefinition) {
+        return;
+    }
+
+    if (!this.selectedAddDataColumns.length) {
+        this.notify.warn('Please select at least one column.');
+        return;
+    }
+
+    const sourceKey = this.addDataDefinition.sourceKey;
+
+    if (sourceKey !== 'TRANSACTIONS') {
+        this.notify.warn(
+            `${this.addDataDefinition.displayName} data source is not connected yet.`
+        );
+        return;
+    }
+
+    this.addingSpreadsheetData = true;
+
+    try {
+        const filters: SpreadsheetFilters = {
+            ...(this.addDataFilters as SpreadsheetFilters),
+            statusFilter:
+                this.addDataFilters.statusFilter == null ||
+                Number(this.addDataFilters.statusFilter) === 0
+                    ? undefined
+                    : Number(this.addDataFilters.statusFilter)
+        };
+
+        const records =
+            await this.loadSpreadsheetTransactionsInBatches(filters);
+
+        const rows =
+            this.buildSelectedTransactionSpreadsheetRows(records);
+
+        const sheetName =
+            this.getUniqueSpreadsheetSheetName(
+                this.addDataDefinition.displayName
+            );
+
+        const newSheet: any = {
+            name: sheetName,
+            ranges: [{
+                dataSource: rows,
+                startCell: 'A1',
+                showFieldAsHeader: true
+            }]
+        };
+
+        (this.spreadsheet as any).insertSheet([newSheet]);
+
+        // EJ2 20.4.x needs time to finish creating the SheetModel.
+        // Do not force dataBind() here; charts use the same overlay/workbook model.
+        await this.yieldToBrowser();
+        await this.yieldToBrowser();
+
+        const spreadsheetSheets: any[] =
+            (this.spreadsheet as any).sheets ?? [];
+
+        const insertedSheetIndex =
+            spreadsheetSheets.findIndex(
+                (sheet: any) => sheet?.name === sheetName
+            );
+
+        if (insertedSheetIndex < 0) {
+            throw new Error(
+                `Inserted sheet "${sheetName}" was not found.`
+            );
+        }
+
+        const insertedSheet =
+            spreadsheetSheets[insertedSheetIndex];
+
+        this.upsertSheetDataSource({
+            sheetId: insertedSheet?.id,
+            sheetName,
+            source: {
+                type: this.addDataDefinition.displayName,
+                sourceKey,
+                mode: 'AllRecords',
+                columns: [...this.selectedAddDataColumns],
+                filters: { ...filters }
+            }
+        });
+
+        (this.spreadsheet as any).activeSheetIndex =
+            insertedSheetIndex;
+
+        await this.yieldToBrowser();
+        await this.yieldToBrowser();
+
+        this.syncActiveSheetSourceToUi();
+        this.showSpreadsheetDataPanel = false;
+        this.refreshSpreadsheetLayout();
+
+        this.notify.success(
+            `${sheetName} added successfully.`
+        );
+    } catch (error) {
+        console.error(
+            '[Spreadsheet Add Data] failed:',
+            error
+        );
+
+        this.notify.error(
+            'Unable to add the data source to the Spreadsheet.'
+        );
+    } finally {
+        this.addingSpreadsheetData = false;
+        this.cdr.detectChanges();
+    }
+}
 
 async openPivotAnalysis(
     savedAnalysis?: SavedSheetAnalysis
@@ -821,54 +1151,8 @@ private createDynamicPivotFieldMapping(
         };
     });
 }
-pivotGroupingBarSettings = {
-    showFieldsPanel: true,
-    displayMode: 'Table',
-    allowDragAndDrop: true,
-    showFilterIcon: true,
-    showSortIcon: true,
-    showRemoveIcon: true,
-    showValueTypeIcon: true
-};
 
-    changePivotReport(): void {
-        this.applyPivotReport(this.selectedPivotReport);
-    }
 
-    private applyPivotReport(report: string): void {
-        switch (report) {
-            case 'transactionsByBuyer':
-                this.showTransactionsByBuyer();
-                break;
-
-            case 'salesOrderCount':
-                this.showOrderTypeCount('sales');
-                break;
-
-            case 'purchaseOrderCount':
-                this.showOrderTypeCount('purchase');
-                break;
-
-            case 'salesOrdersBySeller':
-                this.showOrdersBySeller('sales');
-                break;
-
-            case 'purchaseOrdersBySeller':
-                this.showOrdersBySeller('purchase');
-                break;
-
-            case 'salesOrdersPerWeekCurrentMonth':
-                this.showSalesOrdersPerWeekCurrentMonth();
-                break;
-
-            case 'transactionsBySeller':
-            default:
-                this.showTransactionsBySeller();
-                break;
-        }
-
-        this.refreshPivot();
-    }
 private clonePivotSetting(
     value: any
 ): any {
@@ -879,10 +1163,10 @@ private clonePivotSetting(
         )
     );
 }
-savePivotToDashboard(): void {
+async savePivotToDashboard(): Promise<void> {
 
-    if (!this.pivotView) {
-        this.notify.warn('Pivot analysis is not ready.');
+    if (!this.pivotView || !this.spreadsheet) {
+        this.notify.warn('Pivot analysis or Spreadsheet is not ready.');
         return;
     }
 
@@ -891,395 +1175,594 @@ savePivotToDashboard(): void {
         return;
     }
 
-    const sheetName =
+    const sourceSheetName =
         this.currentPivotSheetName ||
-        this.spreadsheet?.getActiveSheet()?.name;
+        this.spreadsheet.getActiveSheet()?.name;
 
-    if (!sheetName) {
+    if (!sourceSheetName) {
         this.notify.warn('Spreadsheet sheet is not available.');
         return;
     }
 
-    const settings = this.pivotView.dataSourceSettings;
+    // Keep the reusable Pivot definition in sheetAnalyses.
+    this.saveCurrentSheetAnalysis();
 
-    // One saved analysis currently exists per Spreadsheet sheet.
-    // Its dashboardWidgetId is the stable link to the dashboard card.
-    const analysisIndex = this.sheetAnalyses.findIndex(
-        item => item.sheetName === sheetName
-    );
+    try {
+        const pivotMatrix = this.getPivotResultMatrix();
 
-    const existingAnalysis =
-        analysisIndex >= 0
-            ? this.sheetAnalyses[analysisIndex]
-            : null;
+        if (!pivotMatrix.length || !pivotMatrix[0]?.length) {
+            this.notify.warn('Pivot result does not contain chartable data.');
+            return;
+        }
 
-    const existingWidgets: any[] = JSON.parse(
-        localStorage.getItem('dashboardPivotWidgets') || '[]'
-    );
-
-    let dashboardWidgetId =
-        existingAnalysis?.dashboardWidgetId ?? null;
-
-    // Backward compatibility for widgets saved before dashboardWidgetId
-    // was stored inside sheetAnalyses.
-    if (!dashboardWidgetId) {
-        const oldWidget = existingWidgets.find(
-            (item: any) =>
-                Number(item.sourceSpreadsheetId) ===
-                    Number(this.currentSavedSpreadsheetId) &&
-                (item.sourceSheetName ?? item.dataSourceType ?? 'Transactions') ===
-                    sheetName
+        const lastRow = pivotMatrix.length;
+        const lastColumn = pivotMatrix.reduce(
+            (max: number, row: any[]) => Math.max(max, row?.length ?? 0),
+            0
         );
 
-        if (oldWidget) {
-            dashboardWidgetId = oldWidget.id;
+        if (lastRow < 2 || lastColumn < 2) {
+            this.notify.warn('Pivot result needs at least two columns/rows for a chart.');
+            return;
+        }
+
+        // PivotView and Spreadsheet are separate EJ2 controls. A PivotView chart
+        // cannot be Ctrl+C/Ctrl+X directly into Spreadsheet. Convert the current
+        // Pivot result into Spreadsheet cells ON Dashboard, then create a native
+        // Spreadsheet chart from that LOCAL Dashboard range.
+        //
+        // Keeping the source range on Dashboard avoids the EJ2 20.4.x
+        // cross-sheet SpreadsheetChart.processChartRange()/undefined.rows crash.
+        const dashboardRange = await this.writePivotResultToDashboard(
+            sourceSheetName,
+            pivotMatrix
+        );
+
+        await this.insertNativeChartOnDashboard({
+            type: this.mapPivotChartTypeToSpreadsheet(this.selectedPivotChartType),
+            range: dashboardRange,
+            title: this.pivotChartSettings?.title || `${sourceSheetName} Pivot Chart`
+        });
+
+        // It is now a REAL Spreadsheet chart. The user can select it on Dashboard
+        // and use Ctrl+C / Ctrl+X / Ctrl+V like any other Spreadsheet chart.
+        this.saveSpreadsheetLocal();
+        this.notify.success(
+            'Pivot chart copied to Dashboard. You can now move or copy it normally.'
+        );
+
+    } catch (error) {
+        console.error('Copy Pivot chart to Dashboard failed:', error);
+        this.notify.error('Unable to copy Pivot chart to Dashboard.');
+    }
+}
+
+/**
+ * Writes the current Pivot result into a reserved area of the Dashboard sheet
+ * and returns a LOCAL Spreadsheet range (for example AZ1:BH20).
+ *
+ * We intentionally do not use a _Pivot_* helper sheet here. Syncfusion 20.4.x
+ * can crash when insertChart() processes a range from another sheet.
+ */
+private async writePivotResultToDashboard(
+    sourceSheetName: string,
+    matrix: any[][]
+): Promise<string> {
+    if (!this.spreadsheet) {
+        throw new Error('Spreadsheet is not ready.');
+    }
+
+    this.ensureDashboardSheet();
+
+    const dashboard = await this.waitForSpreadsheetSheet('Dashboard');
+    if (!dashboard) {
+        throw new Error('Dashboard sheet could not be created.');
+    }
+
+    await this.activateSpreadsheetSheet('Dashboard');
+
+    const spreadsheet: any = this.spreadsheet as any;
+
+    // Reserve blocks far to the right so Pivot source cells do not interfere
+    // with the visible dashboard/chart area. Each saved Pivot gets its own block.
+    const analysisIndex = Math.max(
+        0,
+        this.sheetAnalyses.findIndex(
+            item => String(item?.sheetName ?? '') === String(sourceSheetName)
+        )
+    );
+
+    const startColumnNumber = 52 + (analysisIndex * 20); // AZ, BT, ...
+    const maxColumns = matrix.reduce(
+        (max: number, row: any[]) => Math.max(max, row?.length ?? 0),
+        0
+    );
+
+    const startColumn = this.getSpreadsheetColumnName(startColumnNumber);
+    const endColumn = this.getSpreadsheetColumnName(
+        startColumnNumber + Math.max(maxColumns, 1) - 1
+    );
+
+    // Clear only this Pivot's reserved Dashboard block before rewriting it.
+    const clearLastRow = Math.max(
+        matrix.length + 20,
+        Number(dashboard?.usedRange?.rowIndex ?? 0) + 1
+    );
+
+    if (typeof spreadsheet.clear === 'function') {
+        try {
+            spreadsheet.clear({
+                type: 'Clear All',
+                range: `${startColumn}1:${endColumn}${clearLastRow}`
+            });
+        } catch (error) {
+            console.warn('[Pivot Dashboard] unable to clear old helper cells', error);
         }
     }
 
-    const isUpdate = !!dashboardWidgetId;
+    matrix.forEach((row: any[], rowIndex: number) => {
+        (row ?? []).forEach((value: any, colIndex: number) => {
+            const cellColumn = this.getSpreadsheetColumnName(
+                startColumnNumber + colIndex
+            );
 
-    if (!dashboardWidgetId) {
-        dashboardWidgetId = Date.now();
+            spreadsheet.updateCell(
+                { value },
+                `${cellColumn}${rowIndex + 1}`
+            );
+        });
+    });
+
+    await this.yieldToBrowser();
+    await this.yieldToBrowser();
+
+    const readyDashboard = await this.waitForSpreadsheetSheet('Dashboard');
+    if (!readyDashboard?.rows?.length) {
+        throw new Error('Dashboard Pivot source cells were not created.');
     }
 
-    const now = new Date().toISOString();
+    const range = `${startColumn}1:${endColumn}${matrix.length}`;
 
-    const pivot = {
-        rows: this.serializePivotFields(settings?.rows),
-        columns: this.serializePivotFields(settings?.columns),
-        values: this.serializePivotFields(settings?.values),
-        filters: this.serializePivotFields(settings?.filters),
-        filterSettings: this.serializePivotFilters(
-            settings?.filterSettings
-        ),
-        sortSettings: this.serializePivotSortSettings(
-            settings?.sortSettings
-        )
-    };
+    console.log('[Pivot Dashboard] local chart source created', {
+        sourceSheetName,
+        range
+    });
 
-    const chart = {
-        type: this.selectedPivotChartType,
-        title:
-            this.pivotChartSettings?.title ||
-            `${sheetName} Pivot Chart`,
-        enableMultipleAxis:
-            this.pivotChartSettings?.enableMultipleAxis ?? false
-    };
-
-    // Keep the same dashboardWidgetId in the Spreadsheet analysis.
-    const updatedAnalysis: SavedSheetAnalysis = {
-        ...(existingAnalysis ?? {}),
-        sheetName,
-        dashboardWidgetId,
-        pivot,
-        chart
-    };
-
-    if (analysisIndex >= 0) {
-        this.sheetAnalyses[analysisIndex] = updatedAnalysis;
-    } else {
-        this.sheetAnalyses.push(updatedAnalysis);
-    }
-
-    const widgetIndex = existingWidgets.findIndex(
-        (item: any) =>
-            Number(item.id) === Number(dashboardWidgetId)
-    );
-
-    const previousWidget =
-        widgetIndex >= 0
-            ? existingWidgets[widgetIndex]
-            : null;
-
-    const widget = {
-        ...(previousWidget ?? {}),
-
-        id: dashboardWidgetId,
-        name: chart.title || 'Pivot Analysis',
-        widgetType: 'PivotChart',
-        dataSourceType: 'Transactions',
-        sourceSpreadsheetId: this.currentSavedSpreadsheetId,
-        sourceSheetName: sheetName,
-        pivot,
-        chart,
-
-        // Preserve original creation date/layout when editing.
-        createdDate:
-            previousWidget?.createdDate ?? now,
-        updatedDate: now
-    };
-
-    try {
-        JSON.stringify(widget);
-    } catch (error) {
-        console.error(
-            'Dashboard widget serialization failed:',
-            error
-        );
-        this.notify.error('Unable to save dashboard chart.');
-        return;
-    }
-
-    if (widgetIndex >= 0) {
-        // UPDATE existing dashboard card.
-        existingWidgets[widgetIndex] = widget;
-    } else {
-        // CREATE only when this analysis has never been added.
-        existingWidgets.push(widget);
-    }
-
-    localStorage.setItem(
-        'dashboardPivotWidgets',
-        JSON.stringify(existingWidgets)
-    );
-
-    // Persist dashboardWidgetId + latest Pivot/Chart config in the
-    // saved Spreadsheet immediately. This is important so reopening
-    // the Spreadsheet still knows which dashboard card to update.
-    this.persistSheetAnalysesToSavedSpreadsheet();
-
-    console.log(
-        isUpdate || widgetIndex >= 0
-            ? 'Dashboard widget updated:'
-            : 'Dashboard widget created:',
-        widget
-    );
-
-    this.notify.success(
-        isUpdate || widgetIndex >= 0
-            ? 'Dashboard chart updated successfully.'
-            : 'Chart saved to dashboard successfully.'
-    );
+    return range;
 }
 
-private persistSheetAnalysesToSavedSpreadsheet(): void {
-
-    if (!this.currentSavedSpreadsheetId) {
+/**
+ * EJ2 Spreadsheet 20.4.x can leave a null top-level SheetModel after a
+ * dynamic insert/open sequence. The chart overlay mouse-up handler calls
+ * getActiveSheet(), whose sheets setter then crashes on null.hasOwnProperty().
+ *
+ * Repair ONLY the top-level sheet collection, and only outside a mouse drag.
+ * Do not touch row/cell arrays here.
+ */
+private repairLiveSpreadsheetSheets(): void {
+    if (!this.spreadsheet) {
         return;
     }
 
-    const spreadsheets: SavedSpreadsheet[] = JSON.parse(
-        localStorage.getItem('savedSpreadsheets') || '[]'
+    const spreadsheet: any = this.spreadsheet as any;
+    const currentSheets: any[] = Array.isArray(spreadsheet.sheets)
+        ? spreadsheet.sheets
+        : [];
+
+    const validSheets = currentSheets.filter(
+        (sheet: any) =>
+            !!sheet &&
+            typeof sheet === 'object' &&
+            Object.keys(sheet).length > 0
     );
 
-    const index = spreadsheets.findIndex(
-        item =>
-            Number(item.id) ===
-            Number(this.currentSavedSpreadsheetId)
+    if (validSheets.length === currentSheets.length) {
+        return;
+    }
+
+    const activeSheetName = spreadsheet.getActiveSheet?.()?.name;
+
+    console.warn('[Spreadsheet] repairing invalid live sheet entries', {
+        before: currentSheets.length,
+        after: validSheets.length
+    });
+
+    // Assign a clean collection once. Never do this while an overlay is being
+    // dragged/resized; callers invoke it only during sheet/chart setup.
+    spreadsheet.sheets = validSheets;
+
+    let nextIndex = activeSheetName
+        ? validSheets.findIndex(
+            (sheet: any) => String(sheet?.name ?? '') === String(activeSheetName)
+        )
+        : Number(spreadsheet.activeSheetIndex ?? 0);
+
+    if (nextIndex < 0 || nextIndex >= validSheets.length) {
+        nextIndex = 0;
+    }
+
+    spreadsheet.activeSheetIndex = nextIndex;
+}
+
+private ensureDashboardSheet(): void {
+    if (!this.spreadsheet) {
+        return;
+    }
+
+    const spreadsheet: any = this.spreadsheet as any;
+
+    // Repair any invalid sheet left by an earlier EJ2 insert/open operation
+    // before chart overlays start using getActiveSheet().
+    this.repairLiveSpreadsheetSheets();
+    const existingIndex = (spreadsheet.sheets ?? []).findIndex(
+        (sheet: any) => sheet?.name === 'Dashboard'
+    );
+
+    if (existingIndex >= 0) {
+        return;
+    }
+
+    // insertSheet supports an insertion index at runtime in EJ2 Spreadsheet.
+    // Dashboard is presentation-only, therefore DO NOT add sheetDataSources metadata.
+    try {
+        spreadsheet.insertSheet([{ name: 'Dashboard', rows: [], columns: [] }], 0);
+    } catch {
+        // Fallback for older 20.4.x patches whose wrapper ignores the index.
+        spreadsheet.insertSheet([{ name: 'Dashboard', rows: [], columns: [] }]);
+    }
+
+    // insertSheet is synchronous at API level but EJ2 completes parts of its
+    // workbook model on the next turn. Repair only after that work finishes.
+    setTimeout(() => {
+        this.repairLiveSpreadsheetSheets();
+    }, 0);
+}
+
+private async insertNativeChartOnDashboard(chart: any): Promise<void> {
+    if (!this.spreadsheet) {
+        throw new Error('Spreadsheet is not ready.');
+    }
+
+    const spreadsheet: any = this.spreadsheet as any;
+
+    this.ensureDashboardSheet();
+
+    let dashboardSheet = await this.waitForSpreadsheetSheet('Dashboard');
+
+    if (!dashboardSheet) {
+        throw new Error('Dashboard sheet could not be created.');
+    }
+
+    // Critical for EJ2 20.4.x chart drag/resize. A null top-level sheet may not
+    // fail while rendering, but it crashes Overlay.overlayMouseUpHandler later.
+    this.repairLiveSpreadsheetSheets();
+    await this.yieldToBrowser();
+    dashboardSheet = await this.waitForSpreadsheetSheet('Dashboard');
+
+    if (!dashboardSheet) {
+        throw new Error('Dashboard sheet is not available after sheet repair.');
+    }
+
+    const range = String(chart?.range ?? '').trim();
+
+    if (!range) {
+        throw new Error('Chart source range is empty.');
+    }
+
+    // Validate every sheet explicitly referenced by the chart range BEFORE
+    // Syncfusion SpreadsheetChart.processChartRange() is allowed to run.
+    const referencedSheetNames = this.getChartReferencedSheetNames(range);
+
+    for (const sourceSheetName of referencedSheetNames) {
+        const sourceSheet = await this.waitForSpreadsheetSheet(sourceSheetName);
+
+        if (!sourceSheet) {
+            throw new Error(
+                `Chart source sheet "${sourceSheetName}" is not available.`
+            );
+        }
+
+        if (!Array.isArray(sourceSheet.rows) || !sourceSheet.rows.length) {
+            throw new Error(
+                `Chart source sheet "${sourceSheetName}" does not contain rows yet.`
+            );
+        }
+    }
+
+    await this.activateSpreadsheetSheet('Dashboard');
+
+    // Give EJ2 20.4.x additional paint turns after the sheet switch. Chart
+    // creation is overlay-based and can otherwise read the previous sheet model.
+    await this.yieldToBrowser();
+    await this.yieldToBrowser();
+
+    const activeSheet = spreadsheet.getActiveSheet?.();
+
+    if (!activeSheet || activeSheet.name !== 'Dashboard') {
+        throw new Error('Dashboard sheet is not active.');
+    }
+
+    const model: any = {
+        type: chart.type || 'Column',
+        theme: chart.theme || 'Material',
+        isSeriesInRows: chart.isSeriesInRows ?? false,
+        range,
+        height: chart.height || 290,
+        width: chart.width || 480,
+        top: chart.top ?? 20,
+        left: chart.left ?? 20
+    };
+
+    if (chart.title) {
+        model.title = chart.title;
+    }
+
+    if (typeof spreadsheet.insertChart !== 'function') {
+        throw new Error(
+            'insertChart is not available in this Syncfusion Spreadsheet build.'
+        );
+    }
+
+    console.log('[Dashboard Chart] inserting', {
+        activeSheet: activeSheet.name,
+        range: model.range,
+        sourceSheets: referencedSheetNames
+    });
+
+    spreadsheet.insertChart([model]);
+
+    await this.yieldToBrowser();
+    await this.yieldToBrowser();
+
+    this.refreshSpreadsheetLayout();
+}
+
+private getChartReferencedSheetNames(range: string): string[] {
+    const result = new Set<string>();
+    const value = String(range ?? '').trim();
+
+    if (!value) {
+        return [];
+    }
+
+    // IMPORTANT for EJ2 20.4.x:
+    // Native chart JSON can store a range like:
+    //   Transactions (2)!A1:A12 H1:H12
+    // The old regex treated the space as a separator and returned only "(2)".
+    // Read the complete text before ! instead.
+    const bangIndex = value.indexOf('!');
+
+    if (bangIndex >= 0) {
+        let sheetName = value.substring(0, bangIndex).trim();
+
+        if (sheetName.startsWith("'") && sheetName.endsWith("'")) {
+            sheetName = sheetName.substring(1, sheetName.length - 1);
+        }
+
+        sheetName = sheetName.replace(/''/g, "'").trim();
+
+        if (sheetName) {
+            result.add(sheetName);
+        }
+    }
+
+    return Array.from(result);
+}
+
+private quoteSheetName(sheetName: string): string {
+    return /[\s'!]/.test(sheetName)
+        ? `'${sheetName.replace(/'/g, "''")}'`
+        : sheetName;
+}
+
+private getPivotHelperSheetName(sourceSheetName: string): string {
+    const safe = sourceSheetName.replace(/[\\/?*\[\]:]/g, '_');
+    return (`_Pivot_${safe}`).substring(0, 31);
+}
+
+private getPivotResultMatrix(): any[][] {
+    const pivot: any = this.pivotView as any;
+    const values: any[][] =
+        pivot?.pivotValues ??
+        pivot?.engineModule?.pivotValues ??
+        [];
+
+    return (values ?? [])
+        .map((row: any[]) =>
+            (row ?? []).map((cell: any) => {
+                if (cell == null) {
+                    return '';
+                }
+
+                if (typeof cell !== 'object') {
+                    return cell;
+                }
+
+                if (cell.value !== undefined && cell.value !== null && cell.value !== '') {
+                    return cell.value;
+                }
+
+                return cell.formattedText ?? cell.actualText ?? '';
+            })
+        )
+        .filter((row: any[]) => row.some(value => value !== '' && value != null));
+}
+
+private async waitForSpreadsheetSheet(
+    sheetName: string,
+    attempts = 30
+): Promise<any> {
+    if (!this.spreadsheet) {
+        return null;
+    }
+
+    const spreadsheet: any = this.spreadsheet as any;
+
+    for (let i = 0; i < attempts; i++) {
+        const sheet = (spreadsheet.sheets ?? []).find(
+            (item: any) => item?.name === sheetName
+        );
+
+        if (sheet) {
+            return sheet;
+        }
+
+        await this.yieldToBrowser();
+    }
+
+    return null;
+}
+
+private async activateSpreadsheetSheet(
+    sheetName: string
+): Promise<number> {
+    if (!this.spreadsheet) {
+        throw new Error('Spreadsheet is not ready.');
+    }
+
+    const spreadsheet: any = this.spreadsheet as any;
+
+    // Keep getActiveSheet()/overlay handlers away from null top-level sheets.
+    this.repairLiveSpreadsheetSheets();
+
+    const index = (spreadsheet.sheets ?? []).findIndex(
+        (item: any) => item?.name === sheetName
     );
 
     if (index < 0) {
-        return;
+        throw new Error(`Spreadsheet sheet "${sheetName}" was not found.`);
     }
 
-    spreadsheets[index] = {
-        ...spreadsheets[index],
-        updatedDate: new Date().toISOString(),
-        sheetAnalyses: JSON.parse(
-            JSON.stringify(this.sheetAnalyses)
-        )
-    };
+    spreadsheet.activeSheetIndex = index;
+    await this.yieldToBrowser();
+    await this.yieldToBrowser();
 
-    localStorage.setItem(
-        'savedSpreadsheets',
-        JSON.stringify(spreadsheets)
-    );
-
-    this.savedSpreadsheets = spreadsheets;
+    return index;
 }
 
-private showTransactionsBySeller(): void {
+private buildSpreadsheetRowsFromMatrix(matrix: any[][]): any[] {
+    return (matrix ?? []).map((row: any[]) => ({
+        cells: (row ?? []).map((value: any) => ({ value }))
+    }));
+}
 
-    this.pivotDataSourceSettings = {
+private async upsertPivotHelperSheet(
+    sheetName: string,
+    matrix: any[][]
+): Promise<void> {
+    if (!this.spreadsheet) {
+        throw new Error('Spreadsheet is not ready.');
+    }
 
-        ...this.getBasePivotSettings(),
+    if (!matrix?.length || !matrix.some(row => row?.length)) {
+        throw new Error('Pivot helper data is empty.');
+    }
 
-        rows: [
-            {
-                name: 'Seller',
-                caption: 'Seller'
-            }
-        ],
-
-        columns: [
-            {
-                name: 'TransactionType',
-                caption: 'Transaction Type'
-            }
-        ],
-
-        values: [
-            {
-                name: 'TransactionCount',
-                caption: 'Transaction Count',
-                type: 'Sum'
-            }
-        ],
-
-        filters: [],
-
-        filterSettings: []
-    };
-
-    this.setPivotChartTitle(
-        'Sales and Purchase Orders by Seller'
+    const spreadsheet: any = this.spreadsheet as any;
+    let index = (spreadsheet.sheets ?? []).findIndex(
+        (sheet: any) => sheet?.name === sheetName
     );
 
-    this.refreshPivot();
+    // IMPORTANT for EJ2 20.4.x:
+    // Create the sheet WITH rows already present. Do not insert an empty sheet
+    // and immediately ask SpreadsheetChart to read a range from it.
+    if (index < 0) {
+        const rows = this.buildSpreadsheetRowsFromMatrix(matrix);
+
+        spreadsheet.insertSheet([{
+            name: sheetName,
+            rows,
+            columns: []
+        }]);
+
+        const createdSheet = await this.waitForSpreadsheetSheet(sheetName);
+
+        if (!createdSheet) {
+            throw new Error(`Pivot helper sheet "${sheetName}" was not created.`);
+        }
+
+        index = (spreadsheet.sheets ?? []).findIndex(
+            (sheet: any) => sheet?.name === sheetName
+        );
+    }
+
+    if (index < 0) {
+        throw new Error(`Pivot helper sheet "${sheetName}" was not found.`);
+    }
+
+    await this.activateSpreadsheetSheet(sheetName);
+
+    const helperSheet: any = spreadsheet.sheets[index];
+    const oldLastRow = Number(helperSheet?.usedRange?.rowIndex ?? 0) + 1;
+    const oldLastCol = Number(helperSheet?.usedRange?.colIndex ?? 0) + 1;
+
+    if (oldLastRow > 0 && oldLastCol > 0 && typeof spreadsheet.clear === 'function') {
+        const oldRange =
+            `A1:${this.getSpreadsheetColumnName(oldLastCol)}${oldLastRow}`;
+
+        try {
+            spreadsheet.clear({
+                type: 'Clear All',
+                range: oldRange
+            });
+        } catch (error) {
+            console.warn('Unable to clear old Pivot helper range.', error);
+        }
+    }
+
+    // Write while the helper sheet is ACTIVE. This is important in 20.4.x.
+    matrix.forEach((row: any[], rowIndex: number) => {
+        (row ?? []).forEach((value: any, colIndex: number) => {
+            spreadsheet.updateCell(
+                { value },
+                `${this.getSpreadsheetColumnName(colIndex + 1)}${rowIndex + 1}`
+            );
+        });
+    });
+
+    await this.yieldToBrowser();
+    await this.yieldToBrowser();
+
+    const readySheet = await this.waitForSpreadsheetSheet(sheetName);
+
+    if (!readySheet || !Array.isArray(readySheet.rows) || !readySheet.rows.length) {
+        throw new Error(`Pivot helper sheet "${sheetName}" has no rows.`);
+    }
 }
-    private showTransactionsByBuyer(): void {
-        this.pivotDataSourceSettings = {
-            ...this.getBasePivotSettings(),
-            rows: [{ name: 'Buyer', caption: 'Buyer' }],
-            columns: [],
-            values: [{
-                name: 'TransactionNumber',
-                caption: 'Transaction Count',
-                type: 'Count'
-            }],
-            filters: [],
-            filterSettings: []
-        };
 
-        this.setPivotChartTitle('Transactions by Buyer');
+private getSpreadsheetColumnName(columnNumber: number): string {
+    let n = Math.max(1, Number(columnNumber) || 1);
+    let result = '';
+
+    while (n > 0) {
+        const remainder = (n - 1) % 26;
+        result = String.fromCharCode(65 + remainder) + result;
+        n = Math.floor((n - 1) / 26);
     }
 
-    private showOrderTypeCount(
-        kind: 'sales' | 'purchase'
-    ): void {
-        const orderType = this.getOrderTypeLabel(kind);
+    return result;
+}
 
-        if (!orderType) {
-            this.notify.warn('No matching transaction type found.');
-            return;
-        }
+private mapPivotChartTypeToSpreadsheet(type: string): string {
+    const map: Record<string, string> = {
+        Column: 'Column',
+        Bar: 'Bar',
+        Line: 'Line',
+        Area: 'Area',
+        Pie: 'Pie',
+        Doughnut: 'Doughnut',
+        Scatter: 'Scatter',
+        Spline: 'Line',
+        SplineArea: 'Area',
+        StackingColumn: 'StackingColumn',
+        StackingBar: 'StackingBar',
+        StackingArea: 'StackingArea'
+    };
 
-        this.pivotDataSourceSettings = {
-            ...this.getBasePivotSettings(),
-            rows: [{
-                name: 'TransactionType',
-                caption: 'Transaction Type'
-            }],
-            columns: [],
-            values: [{
-                name: 'TransactionNumber',
-                caption: kind === 'sales'
-                    ? 'Sales Order Count'
-                    : 'Purchase Order Count',
-                type: 'Count'
-            }],
-            filters: [],
-            filterSettings: [{
-                name: 'TransactionType',
-                type: 'Include',
-                items: [orderType]
-            }]
-        };
+    return map[type] ?? 'Column';
+}
 
-        this.setPivotChartTitle(
-            kind === 'sales'
-                ? 'Sales Orders Count'
-                : 'Purchase Orders Count'
-        );
-    }
 
-    private showOrdersBySeller(
-        kind: 'sales' | 'purchase'
-    ): void {
-        const orderType = this.getOrderTypeLabel(kind);
-
-        if (!orderType) {
-            this.notify.warn('No matching transaction type found.');
-            return;
-        }
-
-        this.pivotDataSourceSettings = {
-            ...this.getBasePivotSettings(),
-            rows: [{ name: 'Seller', caption: 'Seller' }],
-            columns: [],
-            values: [{
-                name: 'TransactionNumber',
-                caption: kind === 'sales'
-                    ? 'Sales Orders'
-                    : 'Purchase Orders',
-                type: 'Count'
-            }],
-            filters: [],
-            filterSettings: [{
-                name: 'TransactionType',
-                type: 'Include',
-                items: [orderType]
-            }]
-        };
-
-        this.setPivotChartTitle(
-            kind === 'sales'
-                ? 'Sales Orders by Seller'
-                : 'Purchase Orders by Seller'
-        );
-    }
-
-    private showSalesOrdersPerWeekCurrentMonth(): void {
-        const salesOrderType = this.getOrderTypeLabel('sales');
-
-        if (!salesOrderType) {
-            this.notify.warn('No Sales Order data found.');
-            return;
-        }
-
-        const now = new Date();
-        const currentMonth = String(now.getMonth() + 1);
-        const currentYear = String(now.getFullYear());
-
-        const hasCurrentMonthData = (this.pivotData as any[])
-            .some(item =>
-                item.TransactionType === salesOrderType &&
-                item.CreatedMonth === currentMonth &&
-                item.CreatedYear === currentYear
-            );
-
-        if (!hasCurrentMonthData) {
-            this.notify.warn(
-                'The selected spreadsheet has no Sales Orders for the current month.'
-            );
-        }
-
-        this.pivotDataSourceSettings = {
-            ...this.getBasePivotSettings(),
-            rows: [{
-                name: 'WeekOfMonth',
-                caption: 'Week'
-            }],
-            columns: [],
-            values: [{
-                name: 'TransactionNumber',
-                caption: 'Sales Orders',
-                type: 'Count'
-            }],
-            filters: [],
-            filterSettings: [
-                {
-                    name: 'TransactionType',
-                    type: 'Include',
-                    items: [salesOrderType]
-                },
-                {
-                    name: 'CreatedMonth',
-                    type: 'Include',
-                    items: [currentMonth]
-                },
-                {
-                    name: 'CreatedYear',
-                    type: 'Include',
-                    items: [currentYear]
-                }
-            ]
-        };
-
-        this.setPivotChartTitle(
-            'Sales Orders per Week - Current Month'
-        );
-    }
 
     changePivotChartType(): void {
         if (!this.selectedPivotChartType) {
@@ -1304,28 +1787,7 @@ private showTransactionsBySeller(): void {
         }
     }
 
- private getBasePivotSettings(): any {
 
-    return {
-
-        dataSource:
-            this.pivotData,
-
-        enableSorting:
-            true,
-
-        allowLabelFilter:
-            true,
-
-        allowValueFilter:
-            true,
-
-        fieldMapping:
-            this.createDynamicPivotFieldMapping(
-                this.pivotData
-            )
-    };
-}
     private refreshPivot(): void {
         if (!this.pivotView) {
             return;
@@ -1338,101 +1800,7 @@ private showTransactionsBySeller(): void {
         }
     }
 
-    private setPivotChartTitle(title: string): void {
-        this.pivotChartSettings = {
-            ...this.pivotChartSettings,
-
-        height: '280',
-
-            title
-        };
-
-        if (this.pivotView) {
-            this.pivotView.chartSettings = this.pivotChartSettings;
-        }
-    }
-
-    private getOrderTypeLabel(
-        kind: 'sales' | 'purchase'
-    ): string | null {
-        const values = Array.from(
-            new Set(
-                (this.pivotData as any[])
-                    .map(item =>
-                        String(item.TransactionType ?? '').trim()
-                    )
-                    .filter(Boolean)
-            )
-        );
-
-        const localizedExpected = kind === 'sales'
-            ? String(this.l('SalesOrder') ?? '').trim()
-            : String(this.l('PurchaseOrder') ?? '').trim();
-
-        const exactLocalized = values.find(
-            value => value === localizedExpected
-        );
-
-        if (exactLocalized) {
-            return exactLocalized;
-        }
-
-        const token = kind === 'sales'
-            ? 'sales'
-            : 'purchase';
-
-        return values.find(value =>
-            value.toLowerCase().includes(token)
-        ) ?? null;
-    }
-
-    private parsePivotDate(value: any): Date | null {
-        if (!value) {
-            return null;
-        }
-
-        if (value instanceof Date) {
-            return Number.isNaN(value.getTime())
-                ? null
-                : value;
-        }
-
-        const text = String(value).trim();
-
-        const slashMatch = text.match(
-            /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/
-        );
-
-        if (slashMatch) {
-            const month = Number(slashMatch[1]);
-            const day = Number(slashMatch[2]);
-            const year = Number(slashMatch[3]);
-
-            const date = new Date(
-                year,
-                month - 1,
-                day
-            );
-
-            return Number.isNaN(date.getTime())
-                ? null
-                : date;
-        }
-
-        const date = new Date(text);
-
-        return Number.isNaN(date.getTime())
-            ? null
-            : date;
-    }
-
-    private getWeekOfMonth(date: Date): string {
-        const week = Math.ceil(
-            date.getDate() / 7
-        );
-
-        return `Week ${week}`;
-    }
+ 
 
     // =====================================================
     // FILTER FORM
@@ -2056,30 +2424,77 @@ private showTransactionsBySeller(): void {
     // =====================================================
 openSelectedInSpreadsheet(): void {
     if (!this.selectedTransactions?.length) {
-        this.notify.warn(
-            'Select at least one transaction.'
-        );
+        this.notify.warn('Select at least one transaction.');
         return;
     }
 
-    const filters =
-        this.getCurrentSpreadsheetFilters();
+    this.pendingSpreadsheetOpenMode = 'SelectedRecords';
+    this.pendingSpreadsheetDestination = 'new';
+    this.pendingExistingSpreadsheetId = null;
+    this.showSpreadsheetDestinationDialog = true;
+}
 
-    const selectedIds =
-        this.selectedTransactions
+openAllInSpreadsheet(): void {
+    if (!Number(this.primengTableHelper.totalRecordsCount ?? 0)) {
+        this.notify.warn('No transactions found.');
+        return;
+    }
+
+    this.pendingSpreadsheetOpenMode = 'AllRecords';
+    this.pendingSpreadsheetDestination = 'new';
+    this.pendingExistingSpreadsheetId = null;
+    this.showSpreadsheetDestinationDialog = true;
+}
+
+async confirmSpreadsheetDestination(): Promise<void> {
+    let existingSpreadsheet: SavedSpreadsheet | undefined;
+
+    if (this.pendingSpreadsheetDestination === 'existing') {
+        existingSpreadsheet = this.savedSpreadsheets.find(
+            item => Number(item.id) === Number(this.pendingExistingSpreadsheetId)
+        );
+
+        if (!existingSpreadsheet) {
+            this.notify.warn('Choose an existing Spreadsheet.');
+            return;
+        }
+    }
+
+    this.showSpreadsheetDestinationDialog = false;
+
+    if (this.pendingSpreadsheetOpenMode === 'SelectedRecords') {
+        const filters = this.getCurrentSpreadsheetFilters();
+        const selectedIds = this.selectedTransactions
             .map(record => Number(record?.id))
             .filter(id => Number.isFinite(id) && id > 0);
 
-    this.openRecordsInSpreadsheet(
-        this.selectedTransactions,
-        {
+        const source: SpreadsheetDataSource = {
             type: 'Transactions',
+            sourceKey: 'TRANSACTIONS',
             mode: 'SelectedRecords',
             selectedIds,
             filters
+        };
+
+        if (existingSpreadsheet) {
+            await this.addRecordsAsNewTabToSavedSpreadsheet(
+                existingSpreadsheet,
+                this.selectedTransactions,
+                source
+            );
+        } else {
+            this.openRecordsInSpreadsheet(this.selectedTransactions, source);
         }
+        return;
+    }
+
+    await this.executeOpenAllInSpreadsheet(
+        this.pendingSpreadsheetDestination,
+        existingSpreadsheet
     );
 }
+
+
 
     private mapTransactionToSpreadsheetRow(
         record: any
@@ -2162,6 +2577,10 @@ onSpreadsheetCreated(): void {
     const spreadsheet: any =
         this.spreadsheet as any;
 
+    // Add Siiwii command inside Syncfusion's native Insert ribbon.
+    this.addSpreadsheetDataSourceRibbonCommand();
+    this.bindSpreadsheetDataSourceRibbonClick();
+
     /*
      * These are also exposed as template bindings. Setting them here keeps
      * the optimization active even if an older template is used.
@@ -2178,7 +2597,18 @@ onSpreadsheetCreated(): void {
         };
     }
 
-    this.spreadsheet.freezePanes(1, 0);
+    // Capture Syncfusion sheet ids so metadata survives sheet renames.
+    this.syncSheetDataSourceIdentity();
+
+    // Start watching tab changes BEFORE the early return used while reopening
+    // a saved workbook. This is what keeps the Applied Filters UI in sync.
+    this.startSpreadsheetSheetWatcher();
+
+    setTimeout(() => {
+        this.syncActiveSheetSourceToUi();
+    }, 0);
+
+    // this.spreadsheet.freezePanes(1, 0);
 
     if (this.isOpeningSavedSpreadsheet) {
         return;
@@ -2201,11 +2631,15 @@ onSpreadsheetCreated(): void {
         'Transactions!A1:L1'
     );
 
-    this.spreadsheet.activeSheetIndex = 0;
-
-    this.spreadsheet.selectRange(
-        'Transactions!A1'
+    const transactionsIndex = this.spreadsheet.sheets.findIndex(
+        (sheet: any) => sheet?.name === 'Transactions'
     );
+
+    if (transactionsIndex >= 0) {
+        this.spreadsheet.activeSheetIndex = transactionsIndex;
+    }
+
+    this.spreadsheet.selectRange('Transactions!A1');
 
     /*
      * Resize once after creation, never once per row/batch.
@@ -2217,78 +2651,24 @@ onSpreadsheetCreated(): void {
 
 
     closeSpreadsheet(): void {
+        this.stopSpreadsheetSheetWatcher();
+        this.unbindSpreadsheetDataSourceRibbonClick();
+        this.showSpreadsheetDataPanel = false;
         this.showSpreadsheetDialog = false;
     }
 
 
 
 
-    // =====================================================
-    // EXPORT
-    // =====================================================
-
-exportSpreadsheet(event?: Event): void {
-    event?.preventDefault();
-    event?.stopPropagation();
-
-    if (!this.spreadsheet) {
-        this.notify.warn('Spreadsheet is not ready.');
-        return;
-    }
-
-    this.spreadsheet.save({
-        fileName: 'SelectedTransactions.xlsx',
-        saveType: 'Xlsx'
-    });
-}
+  
 
 
 
-exportPdf(event?: Event): void {
-    event?.preventDefault();
-    event?.stopPropagation();
-
-    if (!this.spreadsheet) {
-        this.notify.warn('Spreadsheet is not ready.');
-        return;
-    }
-
-    this.spreadsheet.save({
-        fileName: 'Transactions.pdf',
-        saveType: 'Pdf'
-    });
-}
     // =====================================================
     // EXCEL ADDRESS HELPERS
     // =====================================================
 
-    private getColumnIndex(
-        cellAddress: string
-    ): number {
-        const letters =
-            cellAddress
-                .match(/[A-Z]+/i)?.[0]
-                ?.toUpperCase();
 
-        if (!letters) {
-            return 0;
-        }
-
-        return (
-            letters
-                .split('')
-                .reduce(
-                    (
-                        result,
-                        letter
-                    ) =>
-                        result * 26 +
-                        letter.charCodeAt(0) -
-                        64,
-                    0
-                ) - 1
-        );
-    }
 
     private getColumnName(
         index: number
@@ -2313,13 +2693,17 @@ exportPdf(event?: Event): void {
         return name;
     }
 
-async openAllInSpreadsheet(): Promise<void> {
+private async executeOpenAllInSpreadsheet(
+    destination: 'new' | 'existing',
+    existingSpreadsheet?: SavedSpreadsheet
+): Promise<void> {
 
     const filters =
         this.getCurrentSpreadsheetFilters();
 
     const source: SpreadsheetDataSource = {
         type: 'Transactions',
+        sourceKey: 'TRANSACTIONS',
         mode: 'AllRecords',
         filters
     };
@@ -2351,10 +2735,18 @@ async openAllInSpreadsheet(): Promise<void> {
         totalCount > 0 &&
         currentRecords.length === totalCount
     ) {
-        this.openRecordsInSpreadsheet(
-            [...currentRecords],
-            source
-        );
+        if (destination === 'existing' && existingSpreadsheet) {
+            await this.addRecordsAsNewTabToSavedSpreadsheet(
+                existingSpreadsheet,
+                [...currentRecords],
+                source
+            );
+        } else {
+            this.openRecordsInSpreadsheet(
+                [...currentRecords],
+                source
+            );
+        }
 
         return;
     }
@@ -2371,9 +2763,13 @@ async openAllInSpreadsheet(): Promise<void> {
     // request 4: Skip=30 Take=10  -> APPEND remaining
     // =====================================================
 
+    this.spreadsheetStillLoading = true;
+    this.spreadsheetLoadedCount = 0;
+    this.spreadsheetTotalCount = totalCount;
     this.spreadsheetLoadingProgress = 0;
-    this.spreadsheetLoadingMessage =
-        'Loading transactions...';
+    this.spreadsheetLoadingMessage = totalCount > 0
+        ? `Loading data... 0 of ${totalCount.toLocaleString()} loaded`
+        : 'Loading data...';
 
     let skipCount = 0;
     let batchNumber = 0;
@@ -2435,24 +2831,46 @@ async openAllInSpreadsheet(): Promise<void> {
             // =================================================
             if (!spreadsheetOpened) {
 
-                this.openRecordsInSpreadsheet(
-                    items,
-                    source
-                );
+                let targetSheetName = 'Transactions';
+
+                if (destination === 'existing' && existingSpreadsheet) {
+                    targetSheetName = await this.addRecordsAsNewTabToSavedSpreadsheet(
+                        existingSpreadsheet,
+                        items,
+                        source,
+                        false
+                    );
+                } else {
+                    this.openRecordsInSpreadsheet(
+                        items,
+                        source
+                    );
+                }
+
+                this.progressiveTargetSheetName = targetSheetName;
 
                 displayedRecordCount =
                     items.length;
 
                 spreadsheetOpened = true;
 
-                this.spreadsheetLoadingMessage =
-                    `Loading transactions... ` +
-                    `${displayedRecordCount.toLocaleString()} displayed`;
+                const effectiveTotalCount =
+                    totalCount || Number(result?.totalCount ?? 0);
+
+                this.spreadsheetTotalCount = effectiveTotalCount;
+                this.spreadsheetLoadedCount = displayedRecordCount;
 
                 this.updateOpenAllProgress(
                     displayedRecordCount,
-                    totalCount || Number(result?.totalCount ?? 0)
+                    effectiveTotalCount
                 );
+
+                this.spreadsheetLoadingMessage =
+                    effectiveTotalCount > 0
+                        ? `Loading more data... ${displayedRecordCount.toLocaleString()} of ${effectiveTotalCount.toLocaleString()} loaded`
+                        : `Loading more data... ${displayedRecordCount.toLocaleString()} loaded`;
+
+                this.cdr.detectChanges();
 
                 /*
                  * Angular must render the dialog and create
@@ -2476,7 +2894,7 @@ async openAllInSpreadsheet(): Promise<void> {
                     );
 
                 this.appendSpreadsheetRefreshBatch(
-                    'Transactions',
+                    this.progressiveTargetSheetName || 'Transactions',
                     batchRows,
                     displayedRecordCount
                 );
@@ -2492,14 +2910,23 @@ async openAllInSpreadsheet(): Promise<void> {
                 displayedRecordCount +=
                     batchRows.length;
 
-                this.spreadsheetLoadingMessage =
-                    `Loading transactions... ` +
-                    `${displayedRecordCount.toLocaleString()} displayed`;
+                const effectiveTotalCount =
+                    totalCount || Number(result?.totalCount ?? 0);
+
+                this.spreadsheetTotalCount = effectiveTotalCount;
+                this.spreadsheetLoadedCount = displayedRecordCount;
 
                 this.updateOpenAllProgress(
                     displayedRecordCount,
-                    totalCount || Number(result?.totalCount ?? 0)
+                    effectiveTotalCount
                 );
+
+                this.spreadsheetLoadingMessage =
+                    effectiveTotalCount > 0
+                        ? `Loading more data... ${displayedRecordCount.toLocaleString()} of ${effectiveTotalCount.toLocaleString()} loaded`
+                        : `Loading more data... ${displayedRecordCount.toLocaleString()} loaded`;
+
+                this.cdr.detectChanges();
 
                 /*
                  * Let Syncfusion paint these 10 rows before
@@ -2535,10 +2962,14 @@ async openAllInSpreadsheet(): Promise<void> {
 
         if (spreadsheetOpened) {
 
+            this.spreadsheetStillLoading = false;
+            this.spreadsheetLoadedCount = displayedRecordCount;
             this.spreadsheetLoadingProgress = 100;
 
             this.spreadsheetLoadingMessage =
                 `${displayedRecordCount.toLocaleString()} transactions loaded`;
+
+            this.cdr.detectChanges();
 
             console.log(
                 '[Spreadsheet Open All] finished',
@@ -2546,6 +2977,10 @@ async openAllInSpreadsheet(): Promise<void> {
                     displayedRecordCount
                 }
             );
+
+            if (destination === 'existing' && existingSpreadsheet) {
+                this.saveSpreadsheetLocal();
+            }
 
             /*
              * One final browser turn so the last batch is painted.
@@ -2580,10 +3015,16 @@ async openAllInSpreadsheet(): Promise<void> {
          * Do not use the page-level blocking spinner here.
          * The Spreadsheet must stay visible while batches arrive.
          */
+        this.spreadsheetStillLoading = false;
+        this.cdr.detectChanges();
+
         setTimeout(() => {
             this.spreadsheetLoadingProgress = 0;
             this.spreadsheetLoadingMessage = '';
-        }, 300);
+            this.spreadsheetLoadedCount = 0;
+            this.spreadsheetTotalCount = 0;
+            this.cdr.detectChanges();
+        }, 1500);
     }
 }
 
@@ -2657,6 +3098,87 @@ private async waitForSpreadsheetReady(): Promise<void> {
     );
 }
 
+private async addRecordsAsNewTabToSavedSpreadsheet(
+    saved: SavedSpreadsheet,
+    records: any[],
+    source: SpreadsheetDataSource,
+    persistImmediately = true
+): Promise<string> {
+    // Open the chosen saved workbook first. Its existing tabs/data stay unchanged.
+    this.openSavedSpreadsheet(saved);
+    await new Promise<void>(resolve => setTimeout(resolve, 900));
+    await this.waitForSpreadsheetReady();
+
+    if (!this.spreadsheet) {
+        throw new Error('Spreadsheet is not ready.');
+    }
+
+    const baseName = source.type || 'Data';
+    const existingNames = new Set(
+        (this.spreadsheet.sheets ?? []).map((sheet: any) => String(sheet?.name ?? ''))
+    );
+
+    let sheetName = baseName;
+    let suffix = 2;
+    while (existingNames.has(sheetName)) {
+        sheetName = `${baseName} (${suffix++})`;
+    }
+
+    const rows = records.map(record =>
+        this.mapTransactionToSpreadsheetRow(record)
+    );
+
+    // Keep the active/new tab record counter in sync with the data being inserted.
+    this.spreadsheetRows = [...rows];
+
+    // Do not freeze the row while Syncfusion is dynamically inserting the
+    // sheet. In EJ2 20.4.x this can temporarily render the header twice.
+    const newSheet: any = {
+        name: sheetName,
+        ranges: [{
+            dataSource: rows,
+            startCell: 'A1',
+            showFieldAsHeader: true
+        }]
+    };
+
+    (this.spreadsheet as any).insertSheet([newSheet]);
+
+    // Give Syncfusion two paint turns to finish creating the new sheet.
+    await this.yieldToBrowser();
+    await this.yieldToBrowser();
+
+    const inserted: any = this.spreadsheet.sheets.find(
+        (sheet: any) => sheet?.name === sheetName
+    );
+
+    this.upsertSheetDataSource({
+        sheetId: inserted?.id,
+        sheetName,
+        source: this.cloneSpreadsheetDataSource(source)
+    });
+
+    const index = this.spreadsheet.sheets.findIndex(
+        (sheet: any) => sheet?.name === sheetName
+    );
+
+    if (index >= 0) {
+        (this.spreadsheet as any).activeSheetIndex = index;
+        // Do not force dataBind() after insertSheet(); it can invalidate chart overlays.
+        await this.yieldToBrowser();
+        await this.yieldToBrowser();
+    }
+
+    // The filter/source UI must always represent the ACTIVE tab.
+    this.syncActiveSheetSourceToUi();
+
+    if (persistImmediately) {
+        this.saveSpreadsheetLocal();
+    }
+
+    return sheetName;
+}
+
 private openRecordsInSpreadsheet(
     records: any[],
     source: SpreadsheetDataSource
@@ -2701,6 +3223,11 @@ private openRecordsInSpreadsheet(
         ...(source.filters ?? {})
     };
 
+    // A newly-created transaction workbook starts with one source tab.
+    this.sheetDataSources = [{
+        sheetName: 'Transactions',
+        source: this.cloneSpreadsheetDataSource(source)
+    }];
 
     this.spreadsheetRows =
         records.map(record =>
@@ -2718,8 +3245,147 @@ private openRecordsInSpreadsheet(
         true;
 }
 
+onSpreadsheetActiveSheetChanged(): void {
+
+    setTimeout(() => {
+        this.syncActiveSheetSourceToUi();
+    }, 0);
+}
+
+private startSpreadsheetSheetWatcher(): void {
+
+    this.stopSpreadsheetSheetWatcher();
+
+    if (!this.spreadsheet) {
+        return;
+    }
+
+    this.lastSpreadsheetActiveSheetIndex =
+        Number(
+            (this.spreadsheet as any)
+                .activeSheetIndex ?? 0
+        );
+
+    this.spreadsheetSheetWatcher =
+        setInterval(() => {
+
+            if (!this.spreadsheet) {
+                return;
+            }
+
+            const activeSheetIndex =
+                Number(
+                    (this.spreadsheet as any)
+                        .activeSheetIndex ?? 0
+                );
+
+            if (
+                activeSheetIndex ===
+                this.lastSpreadsheetActiveSheetIndex
+            ) {
+                return;
+            }
+
+            this.lastSpreadsheetActiveSheetIndex =
+                activeSheetIndex;
+
+            console.log(
+                '[Spreadsheet] TAB SWITCHED:',
+                this.spreadsheet.getActiveSheet()?.name
+            );
+
+            this.syncActiveSheetSourceToUi();
+
+        }, 100);
+}
+
+private stopSpreadsheetSheetWatcher(): void {
+
+    if (!this.spreadsheetSheetWatcher) {
+        return;
+    }
+
+    clearInterval(
+        this.spreadsheetSheetWatcher
+    );
+
+    this.spreadsheetSheetWatcher = null;
+}
+
+private syncActiveSheetSourceToUi(): void {
+
+    if (!this.spreadsheet) {
+        return;
+    }
+
+    const activeSheet: any =
+        this.spreadsheet.getActiveSheet();
+
+    if (!activeSheet?.name) {
+        return;
+    }
+
+    const activeSheetName =
+        String(activeSheet.name).trim();
+
+    console.log(
+        '[Spreadsheet] Active tab:',
+        activeSheetName
+    );
+
+    console.log(
+        '[Spreadsheet] sheetDataSources:',
+        this.sheetDataSources
+    );
+
+    // IMPORTANT:
+    // Match by sheet NAME.
+    // Do not use sheetId here after openFromJson().
+    const metadata =
+        this.sheetDataSources.find(
+            item =>
+                String(item.sheetName).trim() ===
+                activeSheetName
+        );
+
+    console.log(
+        '[Spreadsheet] matched metadata:',
+        metadata
+    );
+
+    // VERY IMPORTANT:
+    // Always clear previous tab UI state first.
+    this.currentSpreadsheetSource = null;
+    this.currentSpreadsheetFilters = {};
+
+    if (metadata?.source) {
+
+        this.currentSpreadsheetSource =
+            this.cloneSpreadsheetDataSource(
+                metadata.source
+            );
+
+        this.currentSpreadsheetFilters = {
+            ...(metadata.source.filters ?? {})
+        };
+    }
+
+    console.log(
+        '[Spreadsheet] filters displayed:',
+        this.currentSpreadsheetFilters
+    );
+
+    this.cdr.detectChanges();
+}
+
 private buildTransactionSpreadsheetSheets(): SheetModel[] {
     return [
+        // Presentation-only sheet. It intentionally has no sheetDataSources entry.
+        {
+            name: 'Dashboard',
+            rows: [],
+            columns: []
+        },
         {
             name: 'Transactions',
             ranges: [
@@ -2750,6 +3416,422 @@ private buildTransactionSpreadsheetSheets(): SheetModel[] {
     ];
 }
 
+// =====================================================
+// PER-SHEET DATA SOURCE / FILTER METADATA
+// =====================================================
+private cloneSpreadsheetDataSource(
+    source: SpreadsheetDataSource
+): SpreadsheetDataSource {
+    return {
+        ...source,
+        selectedIds: source.selectedIds
+            ? [...source.selectedIds]
+            : undefined,
+        columns: source.columns ? [...source.columns] : undefined,
+        filters: {
+            ...(source.filters ?? {})
+        }
+    };
+}
+
+private cloneSheetDataSources(
+    items: SpreadsheetSheetDataSource[]
+): SpreadsheetSheetDataSource[] {
+    return (items ?? []).map(item => ({
+        sheetId: item.sheetId,
+        sheetName: item.sheetName,
+        source: this.cloneSpreadsheetDataSource(item.source)
+    }));
+}
+
+private getSheetDataSourceByName(
+    sheetName: string
+): SpreadsheetDataSource | null {
+    const item = this.sheetDataSources.find(
+        x => x.sheetName === sheetName
+    );
+
+    return item
+        ? this.cloneSpreadsheetDataSource(item.source)
+        : null;
+}
+
+private getActiveSheetDataSource(
+    savedSpreadsheet?: SavedSpreadsheet | null
+): SpreadsheetDataSource | null {
+    if (!this.spreadsheet) {
+        return this.currentSpreadsheetSource
+            ? this.cloneSpreadsheetDataSource(
+                this.currentSpreadsheetSource
+            )
+            : null;
+    }
+
+    const activeSheet: any =
+        this.spreadsheet.getActiveSheet();
+
+    if (!activeSheet) {
+        return null;
+    }
+
+    const savedSources =
+        savedSpreadsheet?.sheetDataSources?.length
+            ? savedSpreadsheet.sheetDataSources
+            : this.sheetDataSources;
+
+    const byId = activeSheet.id != null
+        ? savedSources.find(
+            item => item.sheetId === activeSheet.id
+        )
+        : undefined;
+
+    const byName = savedSources.find(
+        item => item.sheetName === activeSheet.name
+    );
+
+    const source = byId?.source ?? byName?.source;
+
+    // No workbook-level source exists anymore. Every data tab must resolve
+    // its source/filter from sheetDataSources. currentSpreadsheetSource is
+    // runtime UI state only and is not persisted on SavedSpreadsheet.
+    if (!source && activeSheet.name === 'Transactions') {
+        return this.currentSpreadsheetSource
+            ? this.cloneSpreadsheetDataSource(
+                this.currentSpreadsheetSource
+            )
+            : null;
+    }
+
+    return source
+        ? this.cloneSpreadsheetDataSource(source)
+        : null;
+}
+
+/**
+ * Call this whenever data is loaded into a Spreadsheet tab.
+ * The source/filter belongs to THAT tab only.
+ *
+ * Example from another entity later:
+ * registerActiveSheetDataSource({
+ *   type: 'Items',
+ *   sourceKey: 'ITEMS',
+ *   mode: 'AllRecords',
+ *   filters: itemFilters
+ * });
+ */
+registerActiveSheetDataSource(
+    source: SpreadsheetDataSource
+): void {
+    if (!this.spreadsheet) {
+        return;
+    }
+
+    const sheet: any =
+        this.spreadsheet.getActiveSheet();
+
+    if (!sheet?.name) {
+        return;
+    }
+
+    const existingIndex =
+        this.sheetDataSources.findIndex(
+            item =>
+                (sheet.id != null &&
+                    item.sheetId === sheet.id) ||
+                item.sheetName === sheet.name
+        );
+
+    const metadata: SpreadsheetSheetDataSource = {
+        sheetId: sheet.id,
+        sheetName: sheet.name,
+        source: this.cloneSpreadsheetDataSource(source)
+    };
+
+    if (existingIndex >= 0) {
+        this.sheetDataSources[existingIndex] = metadata;
+    } else {
+        this.sheetDataSources.push(metadata);
+    }
+
+    this.currentSpreadsheetSource =
+        this.cloneSpreadsheetDataSource(source);
+
+    this.currentSpreadsheetFilters = {
+        ...(source.filters ?? {})
+    };
+}
+
+private upsertSheetDataSource(
+    metadata: SpreadsheetSheetDataSource
+): void {
+    const normalizedName = String(metadata.sheetName ?? '').trim();
+
+    if (!normalizedName || normalizedName === 'Dashboard') {
+        return;
+    }
+
+    // Name is the stable key in our wrapper metadata. Syncfusion sheet ids can
+    // change after openFromJson()/insertSheet() in EJ2 20.4.x.
+    const existingIndex = this.sheetDataSources.findIndex(
+        item => String(item.sheetName ?? '').trim() === normalizedName
+    );
+
+    const cleanMetadata: SpreadsheetSheetDataSource = {
+        sheetId: metadata.sheetId,
+        sheetName: normalizedName,
+        source: this.cloneSpreadsheetDataSource(metadata.source)
+    };
+
+    if (existingIndex >= 0) {
+        this.sheetDataSources[existingIndex] = cleanMetadata;
+    } else {
+        this.sheetDataSources.push(cleanMetadata);
+    }
+
+    console.log('[Spreadsheet] source metadata upserted:', {
+        sheetName: normalizedName,
+        count: this.sheetDataSources.length,
+        sheetDataSources: this.sheetDataSources
+    });
+}
+
+/**
+ * Sync ids/names before save. This also keeps metadata correct when the
+ * user renames a Spreadsheet tab.
+ */
+private syncSheetDataSourceIdentity(): void {
+    if (!this.spreadsheet?.sheets?.length) {
+        return;
+    }
+
+    this.sheetDataSources.forEach(item => {
+        // Match by name FIRST. Sheet ids are not reliable after openFromJson()
+        // and dynamic insertions in EJ2 20.4.x.
+        const byName: any = this.spreadsheet!.sheets.find(
+            (x: any) =>
+                String(x?.name ?? '').trim() ===
+                String(item.sheetName ?? '').trim()
+        );
+
+        const byId: any = !byName && item.sheetId != null
+            ? this.spreadsheet!.sheets.find(
+                (x: any) => x?.id === item.sheetId
+            )
+            : null;
+
+        const sheet = byName ?? byId;
+
+        if (sheet) {
+            item.sheetId = sheet.id;
+            item.sheetName = sheet.name;
+        }
+    });
+
+    // Initial Transactions sheet is created before Syncfusion gives us id.
+    if (
+        this.currentSpreadsheetSource &&
+        !this.sheetDataSources.length
+    ) {
+        const sheet: any =
+            this.spreadsheet.sheets.find(
+                (x: any) => x?.name === 'Transactions'
+            );
+
+        if (sheet) {
+            this.sheetDataSources.push({
+                sheetId: sheet.id,
+                sheetName: sheet.name,
+                source: this.cloneSpreadsheetDataSource(
+                    this.currentSpreadsheetSource
+                )
+            });
+        }
+    }
+}
+
+
+private reconcileDashboardChartsBeforeSave(workbookJson: any): any {
+    if (!this.spreadsheet || !workbookJson) {
+        return workbookJson;
+    }
+
+    const spreadsheet: any = this.spreadsheet as any;
+    const activeSheet: any = spreadsheet.getActiveSheet?.();
+
+    // A manual Ctrl+X/Ctrl+V move is reconciled only while Dashboard is active.
+    // This prevents normal charts on data sheets from being moved accidentally.
+    if (String(activeSheet?.name ?? '').trim() !== 'Dashboard') {
+        return workbookJson;
+    }
+
+    const clean = JSON.parse(JSON.stringify(workbookJson));
+    const workbook = clean?.jsonObject?.Workbook ?? clean?.Workbook;
+
+    if (!workbook || !Array.isArray(workbook.sheets)) {
+        return clean;
+    }
+
+    const dashboard = workbook.sheets.find(
+        (sheet: any) => String(sheet?.name ?? '').trim() === 'Dashboard'
+    );
+
+    if (!dashboard) {
+        return clean;
+    }
+
+    // Collect one canonical serialized model for every chart id.
+    const chartById = new Map<string, any>();
+
+    workbook.sheets.forEach((sheet: any) => {
+        (sheet?.rows ?? []).forEach((row: any) => {
+            (row?.cells ?? []).forEach((cell: any) => {
+                if (!Array.isArray(cell?.chart)) {
+                    return;
+                }
+
+                cell.chart.forEach((chart: any) => {
+                    const id = String(chart?.id ?? '').trim();
+                    if (id && !chartById.has(id)) {
+                        chartById.set(id, JSON.parse(JSON.stringify(chart)));
+                    }
+                });
+            });
+        });
+    });
+
+    if (!chartById.size) {
+        return clean;
+    }
+
+    const spreadsheetElement: HTMLElement | null =
+        (spreadsheet.element as HTMLElement) ?? null;
+
+    const movedCharts: any[] = [];
+
+    chartById.forEach((chart: any, chartId: string) => {
+        const element = document.getElementById(chartId) as HTMLElement | null;
+
+        if (!element) {
+            return;
+        }
+
+        // Make sure this chart belongs to this Spreadsheet instance.
+        if (spreadsheetElement && !spreadsheetElement.contains(element)) {
+            return;
+        }
+
+        const style = window.getComputedStyle(element);
+        const rect = element.getBoundingClientRect();
+        const visible =
+            style.display !== 'none' &&
+            style.visibility !== 'hidden' &&
+            rect.width > 0 &&
+            rect.height > 0;
+
+        if (!visible) {
+            return;
+        }
+
+        const dashboardChart = JSON.parse(JSON.stringify(chart));
+
+        // Preserve the original source range. Only the chart OWNER changes.
+        dashboardChart.top = this.readChartPixelValue(
+            element.style.top,
+            chart.top ?? 20
+        );
+        dashboardChart.left = this.readChartPixelValue(
+            element.style.left,
+            chart.left ?? 20
+        );
+        dashboardChart.width = Math.round(rect.width || chart.width || 480);
+        dashboardChart.height = Math.round(rect.height || chart.height || 290);
+
+        movedCharts.push(dashboardChart);
+    });
+
+    if (!movedCharts.length) {
+        return clean;
+    }
+
+    const movedIds = new Set(
+        movedCharts
+            .map(chart => String(chart?.id ?? '').trim())
+            .filter(Boolean)
+    );
+
+    // Remove ALL stale/duplicate copies from every serialized sheet first.
+    workbook.sheets.forEach((sheet: any) => {
+        (sheet?.rows ?? []).forEach((row: any) => {
+            (row?.cells ?? []).forEach((cell: any) => {
+                if (!Array.isArray(cell?.chart)) {
+                    return;
+                }
+
+                cell.chart = cell.chart.filter(
+                    (chart: any) => !movedIds.has(String(chart?.id ?? '').trim())
+                );
+
+                if (!cell.chart.length) {
+                    delete cell.chart;
+                }
+            });
+        });
+    });
+
+    // Store Dashboard charts in a real Dashboard cell so save/reopen owns them.
+    dashboard.rows = Array.isArray(dashboard.rows) ? dashboard.rows : [];
+    dashboard.rows[0] = dashboard.rows[0] ?? {};
+    dashboard.rows[0].cells = Array.isArray(dashboard.rows[0].cells)
+        ? dashboard.rows[0].cells
+        : [];
+    dashboard.rows[0].cells[0] = dashboard.rows[0].cells[0] ?? {};
+
+    const existingDashboardCharts = Array.isArray(
+        dashboard.rows[0].cells[0].chart
+    )
+        ? dashboard.rows[0].cells[0].chart
+        : [];
+
+    const existingIds = new Set(
+        existingDashboardCharts
+            .map((chart: any) => String(chart?.id ?? '').trim())
+            .filter(Boolean)
+    );
+
+    movedCharts.forEach(chart => {
+        const id = String(chart?.id ?? '').trim();
+        if (!id || !existingIds.has(id)) {
+            existingDashboardCharts.push(chart);
+            if (id) {
+                existingIds.add(id);
+            }
+        }
+    });
+
+    dashboard.rows[0].cells[0].chart = existingDashboardCharts;
+    dashboard.usedRange = dashboard.usedRange ?? {};
+    dashboard.usedRange.rowIndex = Math.max(
+        Number(dashboard.usedRange.rowIndex ?? 0),
+        0
+    );
+    dashboard.usedRange.colIndex = Math.max(
+        Number(dashboard.usedRange.colIndex ?? 0),
+        0
+    );
+
+    console.log('[Spreadsheet] Dashboard charts reconciled before save:', {
+        movedChartIds: Array.from(movedIds),
+        count: movedCharts.length
+    });
+
+    return clean;
+}
+
+private readChartPixelValue(value: string, fallback: number): number {
+    const parsed = Number.parseFloat(String(value ?? '').replace('px', ''));
+    return Number.isFinite(parsed) ? parsed : Number(fallback ?? 0);
+}
+
 saveSpreadsheetLocal(): void {
 
     if (!this.spreadsheet) {
@@ -2759,36 +3841,24 @@ saveSpreadsheetLocal(): void {
         return;
     }
 
-    if (!this.currentSpreadsheetSource) {
-        this.notify.warn(
-            'Spreadsheet source is not available.'
-        );
-        return;
-    }
+    // Keep per-tab metadata separate from Syncfusion workbookJson.
+    // Do not add custom properties inside jsonObject.Workbook.
+    this.syncSheetDataSourceIdentity();
 
-    // IMPORTANT: preserve the source used to CREATE the spreadsheet.
-    // Do not recalculate Selected/All mode from the current page state here.
-    const dataSource: SpreadsheetDataSource = {
-        type: 'Transactions',
-        mode: this.currentSpreadsheetSource.mode,
-        selectedIds:
-            this.currentSpreadsheetSource.mode ===
-                'SelectedRecords'
-                ? [
-                    ...(this.currentSpreadsheetSource
-                        .selectedIds ?? [])
-                ]
-                : undefined,
-        filters: {
-            ...(this.currentSpreadsheetSource.filters ?? {})
-        }
-    };
+    const sheetDataSources =
+        this.cloneSheetDataSources(this.sheetDataSources);
 
     (this.spreadsheet as any)
         .saveAsJson(
             this.spreadsheetJsonSerializationOptions
         )
         .then((workbook: any) => {
+
+            // EJ2 20.4.x can visually paste a chart onto Dashboard without
+            // moving the chart model to that sheet. Reconcile the serialized
+            // workbook with the chart overlays that are actually visible on
+            // Dashboard before persisting it.
+            workbook = this.reconcileDashboardChartsBeforeSave(workbook);
 
             const existing: SavedSpreadsheet[] =
                 JSON.parse(
@@ -2825,7 +3895,7 @@ saveSpreadsheetLocal(): void {
     workbookJson:
         workbook,
 
-    dataSource,
+    sheetDataSources,
 
     // NEW
     sheetAnalyses:
@@ -2879,7 +3949,7 @@ saveSpreadsheetLocal(): void {
     workbookJson:
         workbook,
 
-    dataSource,
+    sheetDataSources,
 
     sheetAnalyses:
         JSON.parse(
@@ -2961,22 +4031,22 @@ openSavedSpreadsheet(saved: SavedSpreadsheet): void {
 
     this.currentSavedSpreadsheetId = saved.id;
 
-    // Restore the SAME source definition that was used
-    // when this spreadsheet was originally created.
-    this.currentSpreadsheetSource = saved.dataSource
-        ? {
-            ...saved.dataSource,
-            selectedIds: saved.dataSource.selectedIds
-                ? [...saved.dataSource.selectedIds]
-                : undefined,
-            filters: {
-                ...(saved.dataSource.filters ?? {})
-            }
-        }
+    // Per-sheet source/filter metadata is the only persisted source of truth.
+    this.sheetDataSources = saved.sheetDataSources?.length
+        ? this.cloneSheetDataSources(saved.sheetDataSources)
+        : [];
+
+    const initialSource =
+        this.getSheetDataSourceByName('Transactions') ??
+        this.sheetDataSources[0]?.source ??
+        null;
+
+    this.currentSpreadsheetSource = initialSource
+        ? this.cloneSpreadsheetDataSource(initialSource)
         : null;
 
     this.currentSpreadsheetFilters = {
-        ...(saved.dataSource?.filters ?? {})
+        ...(initialSource?.filters ?? {})
     };
 
     this.sheetAnalyses = JSON.parse(
@@ -3022,7 +4092,12 @@ openSavedSpreadsheet(saved: SavedSpreadsheet): void {
 
             setTimeout(() => {
 
+                this.ensureDashboardSheet();
                 this.spreadsheet?.resize();
+
+                // Restore the source/filter UI for the tab that Syncfusion
+                // actually reopened as active.
+                this.syncActiveSheetSourceToUi();
 
                 this.isOpeningSavedSpreadsheet =
                     false;
@@ -3052,56 +4127,7 @@ openSavedSpreadsheet(saved: SavedSpreadsheet): void {
     }, 300);
 }
 
-private openSavedWorkbookJson(
-    saved: SavedSpreadsheet
-): void {
 
-    this.isOpeningSavedSpreadsheet = true;
-    this.spreadsheetRows = [];
-    this.sheets = [];
-    this.showSpreadsheetDialog = true;
-
-    setTimeout(() => {
-
-        if (!this.spreadsheet) {
-            this.isOpeningSavedSpreadsheet = false;
-            return;
-        }
-
-        try {
-            (this.spreadsheet as any).openFromJson(
-                {
-                    file:
-                        saved.workbookJson.jsonObject
-                },
-                this.spreadsheetJsonSerializationOptions
-            );
-
-            setTimeout(() => {
-                this.spreadsheet?.resize();
-                this.isOpeningSavedSpreadsheet = false;
-
-                this.notify.success(
-                    saved.name +
-                    ' opened successfully.'
-                );
-            }, 500);
-
-        } catch (error) {
-            this.isOpeningSavedSpreadsheet = false;
-
-            console.error(
-                'Open spreadsheet error:',
-                error
-            );
-
-            this.notify.error(
-                'Failed to open spreadsheet.'
-            );
-        }
-
-    }, 300);
-}
 
 private serializePivotFields(
     fields: any[]
@@ -3248,25 +4274,7 @@ private getCurrentSpreadsheetFilters(): SpreadsheetFilters {
     };
 }
 
-private openRefreshedSavedSpreadsheet(
-    saved: SavedSpreadsheet,
-    records: any[]
-): void {
 
-    this.spreadsheetRows =
-        records.map(record =>
-            this.mapTransactionToSpreadsheetRow(
-                record
-            )
-        );
-
-    this.sheets =
-        this.buildTransactionSpreadsheetSheets();
-
-    this.showSpreadsheetDialog = true;
-
-    saved.recordCount = records.length;
-}
 
 getAppliedSpreadsheetFilters(): {
     label: string;
@@ -3612,13 +4620,35 @@ saveCurrentSheetAnalysis(): void {
 }
 
 
+private refreshSpreadsheetLayout(): void {
+    if (!this.spreadsheet) {
+        return;
+    }
+
+    setTimeout(() => {
+        if (!this.spreadsheet) {
+            return;
+        }
+
+        try {
+            this.spreadsheet.resize();
+        } catch (error) {
+            console.error(
+                'Spreadsheet resize failed:',
+                error
+            );
+        }
+    }, 100);
+}
+
 private sanitizeWorkbookJson(workbookJson: any): any {
     if (!workbookJson) {
         return workbookJson;
     }
 
-    // Clone so we don't modify saved object directly
-    const cleanJson = JSON.parse(JSON.stringify(workbookJson));
+    const cleanJson = JSON.parse(
+        JSON.stringify(workbookJson)
+    );
 
     const workbook =
         cleanJson?.jsonObject?.Workbook ??
@@ -3630,49 +4660,100 @@ private sanitizeWorkbookJson(workbookJson: any): any {
 
     if (!Array.isArray(workbook.sheets)) {
         workbook.sheets = [];
-        return cleanJson;
     }
 
-    workbook.sheets = workbook.sheets.map((sheet: any) => {
+    // IMPORTANT:
+    // Top-level sheets must NEVER contain null/undefined.
+    workbook.sheets = workbook.sheets
+        .filter(
+            (sheet: any) =>
+                sheet &&
+                typeof sheet === 'object' &&
+                Object.keys(sheet).length > 0
+        )
+        .map((sheet: any) => {
 
-        if (!sheet) {
-            return {};
-        }
+            // Preserve indexes inside columns/rows/cells.
+            // Sparse positions must become {}, not be removed.
+            if (Array.isArray(sheet.columns)) {
+                sheet.columns = sheet.columns.map(
+                    (column: any) => column ?? {}
+                );
+            }
 
-        // Fix null columns
-        if (Array.isArray(sheet.columns)) {
-            sheet.columns = sheet.columns.map((column: any) => {
-                return column ?? {};
-            });
-        }
+            if (Array.isArray(sheet.rows)) {
+                sheet.rows = sheet.rows.map(
+                    (row: any) => {
 
-        // Fix null rows and cells
-        if (Array.isArray(sheet.rows)) {
-            sheet.rows = sheet.rows.map((row: any) => {
+                        if (!row) {
+                            return {};
+                        }
 
-                if (!row) {
-                    return {};
-                }
+                        if (Array.isArray(row.cells)) {
+                            row.cells = row.cells.map(
+                                (cell: any) =>
+                                    cell ?? {}
+                            );
+                        }
 
-                if (Array.isArray(row.cells)) {
-                    row.cells = row.cells.map((cell: any) => {
-                        return cell ?? {};
-                    });
-                }
+                        return row;
+                    }
+                );
+            }
 
-                return row;
-            });
-        }
+            if (Array.isArray(sheet.ranges)) {
+                sheet.ranges =
+                    sheet.ranges.filter(
+                        (range: any) =>
+                            range &&
+                            typeof range === 'object'
+                    );
+            }
 
-        // Fix ranges
-        if (Array.isArray(sheet.ranges)) {
-            sheet.ranges = sheet.ranges.map((range: any) => {
-                return range ?? {};
-            });
-        }
+            if (Array.isArray(sheet.charts)) {
+                sheet.charts =
+                    sheet.charts.filter(
+                        (chart: any) =>
+                            chart &&
+                            typeof chart === 'object'
+                    );
+            }
 
-        return sheet;
-    });
+            if (Array.isArray(sheet.images)) {
+                sheet.images =
+                    sheet.images.filter(
+                        (image: any) =>
+                            image &&
+                            typeof image === 'object'
+                    );
+            }
+
+            return sheet;
+        });
+
+    if (!workbook.sheets.length) {
+        workbook.sheets = [
+            {
+                name: 'Sheet1',
+                rows: [],
+                columns: []
+            }
+        ];
+    }
+
+    let activeSheetIndex =
+        Number(workbook.activeSheetIndex ?? 0);
+
+    if (
+        !Number.isFinite(activeSheetIndex) ||
+        activeSheetIndex < 0 ||
+        activeSheetIndex >= workbook.sheets.length
+    ) {
+        activeSheetIndex = 0;
+    }
+
+    workbook.activeSheetIndex =
+        activeSheetIndex;
 
     return cleanJson;
 }
@@ -3694,10 +4775,20 @@ async refreshSpreadsheetData(): Promise<void> {
     const savedSpreadsheet =
         this.getCurrentSavedSpreadsheet();
 
+    const activeSheet =
+        this.spreadsheet.getActiveSheet();
+
+    const activeSheetName =
+        activeSheet?.name;
+
+    if (!activeSheetName) {
+        this.notify.warn('Active Spreadsheet tab is not available.');
+        return;
+    }
+
+    // Refresh ONLY from the source/filter belonging to the active tab.
     const source =
-        this.currentSpreadsheetSource ??
-        savedSpreadsheet?.dataSource ??
-        null;
+        this.getActiveSheetDataSource(savedSpreadsheet);
 
     if (!source) {
         this.notify.warn(
@@ -3768,7 +4859,8 @@ async refreshSpreadsheetData(): Promise<void> {
 
             const result: any =
                 await firstValueFrom(
-                    this.getTransactionsForSpreadsheetRefresh(
+                    this.getSpreadsheetSourcePage(
+                        source,
                         refreshFilters,
                         skipCount,
                         this.spreadsheetBatchSize
@@ -3795,7 +4887,7 @@ async refreshSpreadsheetData(): Promise<void> {
              */
             if (!sheetCleared) {
                 this.clearSpreadsheetSourceRowsForRefresh(
-                    'Transactions'
+                    activeSheetName
                 );
                 sheetCleared = true;
 
@@ -3875,11 +4967,7 @@ async refreshSpreadsheetData(): Promise<void> {
                 `Loading latest transactions... ` +
                 `${displayedRecordCount.toLocaleString()} displayed`;
 
-            /*
-             * IMPORTANT FOR PROGRESSIVE DISPLAY:
-             * give Syncfusion/browser one render turn after every 10 rows.
-             * Batch 1 becomes visible before batch 2 request continues.
-             */
+   
             await this.yieldToBrowser();
 
             // Always page 0 -> 10 -> 20 -> 30 ...
@@ -4068,6 +5156,31 @@ private appendSpreadsheetRefreshBatch(
 // =====================================================
 // GET LATEST RECORDS USING SAVED SOURCE FILTERS
 // =====================================================
+private getSpreadsheetSourcePage(
+    source: SpreadsheetDataSource,
+    filters: SpreadsheetFilters | Record<string, any>,
+    skipCount: number,
+    maxResultCount: number
+): any {
+    const sourceKey =
+        source.sourceKey ?? source.type;
+
+    switch (sourceKey) {
+        case 'TRANSACTIONS':
+        case 'Transactions':
+            return this.getTransactionsForSpreadsheetRefresh(
+                filters as SpreadsheetFilters,
+                skipCount,
+                maxResultCount
+            );
+
+        default:
+            throw new Error(
+                `Unsupported Spreadsheet source: ${sourceKey}`
+            );
+    }
+}
+
 private getTransactionsForSpreadsheetRefresh(
     filters: SpreadsheetFilters,
     skipCount = 0,
@@ -4289,64 +5402,6 @@ private yieldToBrowser(): Promise<void> {
 }
 
 
-// =====================================================
-// BULK UPDATE: TEMPORARILY USE MANUAL CALCULATION
-// =====================================================
-
-private beginSpreadsheetBulkUpdate(): void {
-
-    const spreadsheet: any =
-        this.spreadsheet as any;
-
-    if (!spreadsheet) {
-        return;
-    }
-
-    /*
-     * Older Syncfusion builds may not expose calculationMode.
-     * In that case we simply keep the existing behavior.
-     */
-    if (!('calculationMode' in spreadsheet)) {
-        return;
-    }
-
-    this.previousSpreadsheetCalculationMode =
-        spreadsheet.calculationMode ??
-        'Automatic';
-
-    spreadsheet.calculationMode =
-        'Manual';
-}
-
-private endSpreadsheetBulkUpdate(): void {
-
-    const spreadsheet: any =
-        this.spreadsheet as any;
-
-    if (!spreadsheet) {
-        return;
-    }
-
-    if (!('calculationMode' in spreadsheet)) {
-        return;
-    }
-
-    spreadsheet.calculationMode =
-        this.previousSpreadsheetCalculationMode ??
-        'Automatic';
-
-    this.previousSpreadsheetCalculationMode =
-        null;
-
-    /*
-     * One bind after the entire bulk update instead of rebinding for every
-     * row/range.
-     */
-    if (typeof spreadsheet.dataBind === 'function') {
-        spreadsheet.dataBind();
-    }
-}
-
 
 // =====================================================
 // LARGE FILE SAVE
@@ -4380,155 +5435,6 @@ private getCurrentSavedSpreadsheet():
             item.id ===
             this.currentSavedSpreadsheetId
     ) ?? null;
-}
-
-
-// =====================================================
-// UPDATE ALL SPREADSHEET SHEETS USED BY ANALYSIS
-// =====================================================
-
-private updateSpreadsheetAnalysisSheets(
-    rows: TransactionSpreadsheetRow[]
-): void {
-
-    if (!this.spreadsheet) {
-        return;
-    }
-
-    /*
-     * IMPORTANT:
-     * Refresh only the raw source sheet here.
-     *
-     * The old implementation also cleared every sheet referenced by
-     * sheetAnalyses. Those sheets may contain user formulas, custom columns,
-     * manual edits, styles, or Pivot preparation data, so treating them as
-     * raw transaction sheets can remove or replace valid older/user data.
-     *
-     * Pivot refresh is handled separately after the source sheet has been
-     * updated.
-     */
-    this.updateOneSpreadsheetSheet(
-        'Transactions',
-        rows
-    );
-}
-
-// =====================================================
-// UPDATE ONE SHEET WITHOUT DESTROYING HEADERS/FORMATTING
-// =====================================================
-
-private updateOneSpreadsheetSheet(
-    sheetName: string,
-    rows: TransactionSpreadsheetRow[]
-): void {
-
-    if (!this.spreadsheet) {
-        return;
-    }
-
-    const sheetIndex =
-        this.spreadsheet.sheets.findIndex(
-            (sheet: any) =>
-                sheet?.name === sheetName
-        );
-
-    if (sheetIndex < 0) {
-        return;
-    }
-
-    const sheet: any =
-        this.spreadsheet.sheets[
-            sheetIndex
-        ];
-
-    /*
-     * Read the sheet's CURRENT headers.
-     *
-     * Example:
-     * Transactions       -> 12 headers
-     * Transactions (2)   -> maybe only 6 headers
-     *
-     * We preserve that structure.
-     */
-    const headers =
-        this.getSheetHeaders(sheet);
-
-    if (!headers.length) {
-
-        console.warn(
-            'Refresh skipped - no headers:',
-            sheetName
-        );
-
-        return;
-    }
-
-    const oldLastRowIndex =
-        sheet?.usedRange?.rowIndex ?? 0;
-
-    const lastHeaderColumnIndex =
-        headers.length - 1;
-
-    const lastColumnName =
-        this.getColumnName(
-            lastHeaderColumnIndex
-        );
-
-    /*
-     * Clear OLD data only.
-     * Row 1 = headers, so start from row 2.
-     */
-    if (oldLastRowIndex >= 1) {
-
-        this.spreadsheet.clear({
-            range:
-                `${sheetName}!A2:` +
-                `${lastColumnName}` +
-                `${oldLastRowIndex + 1}`,
-            type: 'Clear Contents'
-        } as any);
-    }
-
-    if (!rows.length) {
-        return;
-    }
-
-    /*
-     * Project latest transaction objects to the
-     * exact headers of this sheet.
-     *
-     * This protects duplicated sheets that contain
-     * only a subset of the original 12 columns.
-     */
-    const projectedRows =
-        rows.map(row => {
-
-            const projected: any = {};
-
-            headers.forEach(
-                header => {
-
-                    projected[header] =
-                        (row as any)[header] ?? '';
-                }
-            );
-
-            return projected;
-        });
-
- this.spreadsheet.updateRange(
-    {
-        dataSource: projectedRows,
-        startCell: 'A2',
-        showFieldAsHeader: false
-    } as any,
-    sheetIndex
-);
-
-    console.log(
-        `Spreadsheet sheet refreshed: ${sheetName}`,
-        projectedRows.length
-    );
 }
 
 
@@ -4769,8 +5675,12 @@ private persistRefreshedSpreadsheet(
                 return;
             }
 
+            // Strip obsolete top-level dataSource if this was an older save.
+            const { dataSource: _legacyDataSource, ...existingWithoutLegacySource } =
+                existing[index] as any;
+
             existing[index] = {
-                ...existing[index],
+                ...existingWithoutLegacySource,
 
                 updatedDate:
                     new Date().toISOString(),
@@ -4780,28 +5690,11 @@ private persistRefreshedSpreadsheet(
                 workbookJson:
                     workbook,
 
-                dataSource:
-                    this.currentSpreadsheetSource
-                        ? {
-                            ...this.currentSpreadsheetSource,
-
-                            selectedIds:
-                                this.currentSpreadsheetSource
-                                    .selectedIds
-                                    ? [
-                                        ...this.currentSpreadsheetSource
-                                            .selectedIds
-                                    ]
-                                    : undefined,
-
-                            filters: {
-                                ...(
-                                    this.currentSpreadsheetSource
-                                        .filters ?? {}
-                                )
-                            }
-                        }
-                        : existing[index].dataSource,
+                // Source/filter metadata for every tab.
+                sheetDataSources:
+                    this.cloneSheetDataSources(
+                        this.sheetDataSources
+                    ),
 
                 sheetAnalyses:
                     JSON.parse(
@@ -4835,6 +5728,10 @@ private persistRefreshedSpreadsheet(
 
 }
 
+interface SpreadsheetEntityColumnDefinition { key:string; label:string; type:'string'|'number'|'date'|'boolean'; defaultSelected?:boolean; }
+interface SpreadsheetEntityFilterDefinition { key:string; label:string; type:'string'|'number'|'date'|'boolean'|'statusLookup'; }
+interface SpreadsheetEntityDefinition { sourceKey:string; displayName:string; icon?:string; columns:SpreadsheetEntityColumnDefinition[]; filters:SpreadsheetEntityFilterDefinition[]; }
+
 interface SpreadsheetFilters {
     search?: string;
     codeFilter?: string;
@@ -4855,10 +5752,22 @@ interface SpreadsheetFilters {
 }
 
 interface SpreadsheetDataSource {
-    type: 'Transactions';
+    // Keep this extensible because another tab may later come from
+    // Items, Contacts, Accounts, etc.
+    type: string;
+    sourceKey?: string;
     mode: 'SelectedRecords' | 'AllRecords';
     selectedIds?: number[];
-    filters?: SpreadsheetFilters;
+    columns?: string[];
+    filters?: SpreadsheetFilters | Record<string, any>;
+}
+
+interface SpreadsheetSheetDataSource {
+    // Syncfusion sheet id is preferred when available because the user
+    // can rename a tab. sheetName is kept for readability/fallback.
+    sheetId?: number;
+    sheetName: string;
+    source: SpreadsheetDataSource;
 }
 
 interface SavedSpreadsheet {
@@ -4868,9 +5777,12 @@ interface SavedSpreadsheet {
     updatedDate?: string;
     recordCount: number;
     workbookJson: any;
-    dataSource?: SpreadsheetDataSource;
 
-     sheetAnalyses?: SavedSheetAnalysis[];
+    // One source/filter definition per Spreadsheet tab.
+    // This is wrapper metadata, NOT a property added to Syncfusion Workbook.
+    sheetDataSources?: SpreadsheetSheetDataSource[];
+
+    sheetAnalyses?: SavedSheetAnalysis[];
 }
 
 

@@ -34,7 +34,7 @@ import { GridsterModule } from 'angular-gridster2';
 import { CalendarModule } from 'primeng/calendar';
 import { TabViewModule } from 'primeng/tabview';
 import { OverlayPanelModule } from 'primeng/overlaypanel';
-
+import { SpreadsheetAllModule } from '@syncfusion/ej2-angular-spreadsheet';
 import {
     PivotViewModule
 } from '@syncfusion/ej2-angular-pivotview';
@@ -84,7 +84,8 @@ import {
                 CalendarModule,
                 TabViewModule,
                 OverlayPanelModule,
-                PivotViewModule
+                PivotViewModule,
+                SpreadsheetAllModule
          
     ],
     providers: [

@@ -928,31 +928,66 @@ gridster-item
 }
 
 
-:host ::ng-deep
-.dashboard-widget-body
-.e-pivotview {
-
-    width: 100% !important;
-
-    border: 0 !important;
+/* Dashboard Spreadsheet presentation layer */
+.dashboard-view-container {
+    height: calc(100vh - 145px);
+    min-height: 500px;
+    position: relative;
+    overflow: hidden;
+    background: #fff;
 }
 
-
-:host ::ng-deep
-.dashboard-widget-body
-.e-pivotchart {
-
-    width: 100% !important;
-
-    max-width: 100% !important;
-
-    overflow: hidden !important;
+.dashboard-sheet-viewer {
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+    overflow: auto;
+    background: #fff;
 }
 
+.dashboard-sheet-viewer ejs-spreadsheet {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
 
-:host ::ng-deep
-.dashboard-widget-body
-.e-chart {
+.dashboard-state {
+    height: 100%;
+    min-height: 400px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    font-size: 14px;
+}
 
-    width: 100% !important;
+.dashboard-state .pi-spinner {
+    font-size: 22px;
+}
+
+.dashboard-error {
+    color: #dc3545;
+}
+
+/*
+ * Hide any Spreadsheet chrome that Syncfusion 20.4.x may still
+ * render briefly while openFromJson() is being applied.
+ */
+:host ::ng-deep .dashboard-sheet-viewer .e-ribbon,
+:host ::ng-deep .dashboard-sheet-viewer .e-formula-bar-panel,
+:host ::ng-deep .dashboard-sheet-viewer .e-sheet-tab-panel {
+    display: none !important;
+}
+
+/* Dashboard should look like a canvas, not Excel. */
+:host ::ng-deep .dashboard-sheet-viewer .e-header-panel,
+:host ::ng-deep .dashboard-sheet-viewer .e-column-header,
+:host ::ng-deep .dashboard-sheet-viewer .e-row-header {
+    display: none !important;
+    
+}
+:host ::ng-deep .dashboard-sheet-viewer {
+.e-spreadsheet .e-sheet-panel:not(.e-rtl) .e-cell {
+  border: none !important;
+ }
 }

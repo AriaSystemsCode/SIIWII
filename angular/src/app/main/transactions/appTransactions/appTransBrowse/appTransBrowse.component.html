@@ -1412,6 +1412,91 @@
 </app-transaction-information>
 
 <!-- ===================================================== -->
+<!-- CHOOSE SPREADSHEET DESTINATION -->
+<!-- ===================================================== -->
+<p-dialog
+    header="Open in Spreadsheet"
+    [(visible)]="showSpreadsheetDestinationDialog"
+    [modal]="true"
+    appendTo="body"
+    [closable]="true"
+    [style]="{ width: '480px' }">
+
+    <div class="p-3">
+        <p class="mb-3">
+            Where do you want to add the
+            {{ pendingSpreadsheetOpenMode === 'SelectedRecords' ? 'selected' : 'filtered' }}
+            data?
+        </p>
+
+        <label class="d-flex align-items-center border rounded p-3 mb-2" style="cursor:pointer">
+            <input
+                type="radio"
+                name="spreadsheetDestination"
+                value="new"
+                [(ngModel)]="pendingSpreadsheetDestination"
+                class="mr-2" />
+            <span>
+                <strong>New Spreadsheet</strong>
+                <small class="d-block text-muted">Create a new workbook with this data.</small>
+            </span>
+        </label>
+
+        <label class="d-flex align-items-center border rounded p-3 mb-3" style="cursor:pointer">
+            <input
+                type="radio"
+                name="spreadsheetDestination"
+                value="existing"
+                [(ngModel)]="pendingSpreadsheetDestination"
+                class="mr-2" />
+            <span>
+                <strong>Existing Spreadsheet</strong>
+                <small class="d-block text-muted">Add the data as a new tab in a saved workbook.</small>
+            </span>
+        </label>
+
+        <div *ngIf="pendingSpreadsheetDestination === 'existing'" class="form-group mb-0">
+            <label class="font-weight-bold">Choose Spreadsheet</label>
+            <select
+                class="form-control"
+                [(ngModel)]="pendingExistingSpreadsheetId">
+                <option [ngValue]="null">Select Spreadsheet...</option>
+                <option
+                    *ngFor="let item of savedSpreadsheets"
+                    [ngValue]="item.id">
+                    {{ item.name }}
+                </option>
+            </select>
+
+            <small *ngIf="savedSpreadsheets.length === 0" class="text-muted d-block mt-2">
+                No saved Spreadsheets are available.
+            </small>
+        </div>
+    </div>
+
+    <ng-template pTemplate="footer">
+        <button
+            type="button"
+            class="btn btn-light mr-2"
+            (click)="showSpreadsheetDestinationDialog = false">
+            Cancel
+        </button>
+
+        <button
+            type="button"
+            class="btn btn-primary"
+            [disabled]="
+                pendingSpreadsheetDestination === 'existing' &&
+                !pendingExistingSpreadsheetId
+            "
+            (click)="confirmSpreadsheetDestination()">
+            Continue
+        </button>
+    </ng-template>
+</p-dialog>
+
+
+<!-- ===================================================== -->
 <!-- SPREADSHEET DIALOG -->
 <!-- ===================================================== -->
 
@@ -1446,6 +1531,7 @@
                    align-items-center
                    p-3">
 
+
             <button
                 type="button"
                 class="btn btn-primary mr-2"
@@ -1477,6 +1563,8 @@
 
     View Pivot Table
 </button>
+
+
 <button
     type="button"
     class="btn btn-primary"
@@ -1495,28 +1583,7 @@
     {{ refreshingSpreadsheet ? 'Refreshing...' : 'Refresh' }}
 </button>
 
-            <!-- <button
-                type="button"
-                class="btn btn-outline-primary mr-2"
-                (click)="
-                    exportSpreadsheet($event);
-                    $event.preventDefault()
-                ">
-
-                Export Excel
-            </button>
-
-
-            <button
-                type="button"
-                class="btn btn-danger"
-                (click)="
-                    exportPdf($event);
-                    $event.preventDefault()
-                ">
-
-                PDF
-            </button> -->
+          
 
 
             <span class="ml-auto text-muted">
@@ -1617,8 +1684,66 @@
 
 
         <!-- ===================================== -->
+        <!-- PROGRESSIVE DATA LOADING INDICATOR -->
+        <!-- ===================================== -->
+
+        <div
+            *ngIf="spreadsheetLoadingMessage"
+            class="mx-3 mb-2 p-2 border rounded bg-light">
+
+            <div
+                class="d-flex justify-content-between align-items-center mb-1">
+
+                <span class="small">
+                    <i
+                        *ngIf="spreadsheetStillLoading"
+                        class="fa fa-spinner fa-spin mr-2">
+                    </i>
+
+                    <i
+                        *ngIf="!spreadsheetStillLoading && spreadsheetLoadingProgress === 100"
+                        class="fa fa-check-circle text-success mr-2">
+                    </i>
+
+                    {{ spreadsheetLoadingMessage }}
+                </span>
+
+                <strong
+                    *ngIf="spreadsheetStillLoading && spreadsheetTotalCount > 0"
+                    class="small ml-3">
+                    {{ spreadsheetLoadingProgress }}%
+                </strong>
+            </div>
+
+            <div
+                *ngIf="spreadsheetStillLoading && spreadsheetTotalCount > 0"
+                class="progress"
+                style="height: 5px;">
+
+                <div
+                    class="progress-bar progress-bar-striped progress-bar-animated"
+                    role="progressbar"
+                    [style.width.%]="spreadsheetLoadingProgress"
+                    [attr.aria-valuenow]="spreadsheetLoadingProgress"
+                    aria-valuemin="0"
+                    aria-valuemax="100">
+                </div>
+            </div>
+
+        </div>
+
+        <!-- ===================================== -->
         <!-- SPREADSHEET -->
         <!-- ===================================== -->
+<div
+    class="spreadsheet-workspace"
+    style="display:flex; flex:1 1 auto; min-height:0; width:100%; overflow:hidden;">
+
+    <!-- Syncfusion Spreadsheet -->
+    <div
+        class="spreadsheet-canvas"
+        [style.width]="showSpreadsheetDataPanel ? 'calc(100% - 340px)' : '100%'"
+        style="min-width:0; height:100%; transition:width .15s ease;">
 
         <ejs-spreadsheet
             *ngIf="showSpreadsheetDialog"
@@ -1640,14 +1765,199 @@
             [showAggregate]="spreadsheetShowAggregate"
             [openUrl]="spreadsheetOpenUrl"
             [saveUrl]="spreadsheetSaveUrl"
+                [enableClipboard]="true"
+    [enableKeyboardShortcut]="true"
             [enableContextMenu]="true"
             [showRibbon]="true"
             [showFormulaBar]="true"
             [showSheetTabs]="true"
-            (beforeSave)="beforeSpreadsheetSave($event)"
-            (created)="onSpreadsheetCreated()">
-
+            (created)="onSpreadsheetCreated()"
+            (ribbonClick)="onSpreadsheetRibbonClick($event)"
+            (beforeSave)="beforeSpreadsheetSave($event)">
         </ejs-spreadsheet>
+    </div>
+
+    <!-- ================================================= -->
+    <!-- SIIWII DATA SOURCE DESIGNER - ODOO STYLE SIDEBAR -->
+    <!-- Open from Syncfusion: Insert -> Data Source        -->
+    <!-- ================================================= -->
+    <aside
+        *ngIf="showSpreadsheetDataPanel"
+        class="data-source-panel"
+        style="width:340px; min-width:340px; height:100%; background:#fff; border-left:1px solid #ddd; overflow-y:auto; box-shadow:-3px 0 10px rgba(0,0,0,.06);">
+
+        <div
+            class="d-flex align-items-center justify-content-between px-3 py-3 border-bottom"
+            style="position:sticky; top:0; background:#fff; z-index:3;">
+            <div>
+                <div class="font-weight-bold" style="font-size:16px;">New Siiwii List</div>
+                <small class="text-muted">Insert application data into a new tab</small>
+            </div>
+
+            <button
+                type="button"
+                class="btn btn-link text-muted p-1"
+                title="Close"
+                (click)="closeSpreadsheetDataPanel()">
+                <i class="fa fa-times"></i>
+            </button>
+        </div>
+
+        <div class="p-3">
+            <!-- ENTITY -->
+            <div class="form-group mb-4">
+                <label class="font-weight-bold mb-2">Entity</label>
+
+                <p-dropdown
+                    [options]="spreadsheetEntityDefinitions"
+                    [(ngModel)]="selectedAddDataEntityKey"
+                    optionLabel="displayName"
+                    optionValue="sourceKey"
+                    placeholder="Choose entity..."
+                    appendTo="body"
+                    [style]="{ width: '100%' }"
+                    (onChange)="onSpreadsheetEntityDropdownChange($event.value)">
+                </p-dropdown>
+            </div>
+
+            <ng-container *ngIf="addDataDefinition">
+                <!-- COLUMNS -->
+                <div class="mb-4">
+                    <div class="d-flex align-items-center justify-content-between mb-2">
+                        <label class="font-weight-bold mb-0">Columns</label>
+
+                        <div>
+                            <button
+                                type="button"
+                                class="btn btn-link btn-sm p-0 mr-2"
+                                (click)="selectAllAddDataColumns()">
+                                All
+                            </button>
+                            <button
+                                type="button"
+                                class="btn btn-link btn-sm p-0"
+                                (click)="clearAddDataColumns()">
+                                Clear
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="border rounded" style="max-height:280px; overflow-y:auto;">
+                        <label
+                            *ngFor="let column of addDataDefinition.columns"
+                            class="d-flex align-items-center px-3 py-2 mb-0 border-bottom"
+                            style="cursor:pointer; min-height:42px;">
+
+                            <input
+                                type="checkbox"
+                                class="mr-2"
+                                [checked]="isAddDataColumnSelected(column.key)"
+                                (change)="toggleAddDataColumnEvent(column.key, $event)" />
+
+                            <span>{{ column.label }}</span>
+
+                            <small class="text-muted ml-auto">{{ column.type }}</small>
+                        </label>
+                    </div>
+
+                    <small class="text-muted d-block mt-1">
+                        {{ selectedAddDataColumns.length }} column(s) selected
+                    </small>
+                </div>
+
+                <!-- FILTERS -->
+                <div class="mb-4">
+                    <label class="font-weight-bold mb-2">Filters</label>
+
+                    <div *ngFor="let filter of addDataDefinition.filters" class="form-group mb-3">
+                        <label class="small mb-1">{{ filter.label }}</label>
+
+                        <input
+                            *ngIf="filter.type === 'string'"
+                            type="text"
+                            class="form-control"
+                            [(ngModel)]="addDataFilters[filter.key]"
+                            [placeholder]="filter.label" />
+
+                        <input
+                            *ngIf="filter.type === 'number'"
+                            type="number"
+                            class="form-control"
+                            [(ngModel)]="addDataFilters[filter.key]"
+                            [placeholder]="filter.label" />
+
+                        <input
+                            *ngIf="filter.type === 'date'"
+                            type="text"
+                            class="form-control"
+                            bsDatepicker
+                            [(ngModel)]="addDataFilters[filter.key]"
+                            [placeholder]="filter.label" />
+
+                        <p-dropdown
+                            *ngIf="filter.type === 'statusLookup'"
+                            [options]="filterStatus"
+                            [(ngModel)]="addDataFilters[filter.key]"
+                            optionLabel="label"
+                            optionValue="value"
+                            placeholder="Any"
+                            [showClear]="true"
+                            appendTo="body"
+                            [style]="{ width: '100%' }">
+                        </p-dropdown>
+
+                        <div
+                            *ngIf="filter.type === 'boolean'"
+                            class="custom-control custom-switch">
+                            <input
+                                type="checkbox"
+                                class="custom-control-input"
+                                [id]="'spreadsheet-filter-' + filter.key"
+                                [(ngModel)]="addDataFilters[filter.key]" />
+                            <label
+                                class="custom-control-label"
+                                [for]="'spreadsheet-filter-' + filter.key">
+                                Yes
+                            </label>
+                        </div>
+                    </div>
+
+                    <div
+                        *ngIf="!addDataDefinition.filters?.length"
+                        class="text-muted small">
+                        No filters available for this entity.
+                    </div>
+                </div>
+
+                <div
+                    *ngIf="addDataDefinition.sourceKey === 'ITEMS'"
+                    class="alert alert-info py-2 small">
+                    Items UI metadata is ready. Connect the Items service proxy to load real Item rows.
+                </div>
+
+                <!-- INSERT -->
+                <button
+                    type="button"
+                    class="btn btn-primary btn-block"
+                    [disabled]="addingSpreadsheetData || selectedAddDataColumns.length === 0"
+                    (click)="insertConfiguredDataAsNewTab()">
+                    <i
+                        class="fa mr-1"
+                        [ngClass]="addingSpreadsheetData ? 'fa-spinner fa-spin' : 'fa-plus'">
+                    </i>
+                    {{ addingSpreadsheetData ? 'Loading...' : 'Insert as New Tab' }}
+                </button>
+            </ng-container>
+
+            <div
+                *ngIf="!addDataDefinition"
+                class="text-center text-muted py-5">
+                <i class="fa fa-database fa-2x mb-3 d-block"></i>
+                Choose an entity to configure its columns and filters.
+            </div>
+        </div>
+    </aside>
+</div>
 
     </div>
 
@@ -1696,26 +2006,7 @@
 
             <div class="pivot-toolbar-right">
 
-                <!-- Analysis preset -->
-                <!-- <div class="pivot-control">
-
-                    <label>
-                        Analysis
-                    </label>
-
-                    <p-dropdown
-                        [options]="pivotReportOptions"
-                        [(ngModel)]="selectedPivotReport"
-                        optionLabel="label"
-                        optionValue="value"
-                        appendTo="body"
-                        [style]="{
-                            width: '230px'
-                        }"
-                        (onChange)="changePivotReport()">
-                    </p-dropdown>
-
-                </div> -->
+            
 
 
                 <!-- Chart Type -->
@@ -1760,7 +2051,7 @@
 
                     <i class="fa fa-chart-bar mr-2"></i>
 
-                    Save to Dashboard
+                    Copy Pivot Chart to Dashboard
 
                 </button>
 
@@ -1830,9 +2121,7 @@
 
                     [showGroupingBar]="true"
 
-                    [groupingBarSettings]="
-                        pivotGroupingBarSettings
-                    "
+              
 
                     [displayOption]="
                         pivotDisplayOption
