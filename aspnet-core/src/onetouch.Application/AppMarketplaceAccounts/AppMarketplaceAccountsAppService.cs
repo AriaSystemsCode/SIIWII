@@ -1061,8 +1061,9 @@ namespace onetouch.AppMarketplaceAccounts
                             var relationshipsList = await _appContactRelationshipInfoRepository.GetAll()
                                 .AsNoTracking()
                                     .Where(z => ((z.RecipientContactSSIN == currentTenantAccount.SSIN && z.RequesterContactSSIN == accountConnection.SSIN)
-                                    || (z.RecipientContactSSIN == accountConnection.SSIN && z.RequesterContactSSIN == currentTenantAccount.SSIN))
-                                   ).OrderByDescending(z => z.CreationTime).ToListAsync();
+                                    || (z.RecipientContactSSIN == accountConnection.SSIN 
+                                    && z.RequesterContactSSIN == currentTenantAccount.SSIN))
+                                   && z.EntityObjectStatusId == activeRelationshipStatusId).OrderByDescending(z => z.CreationTime).ToListAsync();
                             if (relationshipsList != null && relationshipsList.Count>0)
                             {
                                 output.ConnectionsInfo = new List<ConnectionInfo>();
@@ -1907,7 +1908,7 @@ namespace onetouch.AppMarketplaceAccounts
                     {
                         var marketplaceRelationshipSycEntityObjId = await _helper.SystemTables.GetEntityObjectTypeMarketplaceRelationship();
                         var relationShipLookups = await _appEntityRepository.GetAll().Include(z => z.EntityExtraData)
-                            .Where(z => z.EntityObjectTypeId == marketplaceRelationshipSycEntityObjId).ToListAsync();
+                            .Where(z => z.EntityObjectTypeId == marketplaceRelationshipSycEntityObjId).OrderBy(z=>z.Code).ToListAsync();
 
                         foreach (var relationshipCodeLookup in relationShipLookups)
                         {
