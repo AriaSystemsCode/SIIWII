@@ -199,6 +199,11 @@ export class BrowseFieldManagerComponent extends AppComponentBase implements OnI
         this.activeActionId = this.activeActionId === item.id ? null : item.id;
     }
 
+    /* closeToolbarDropdown(event: KeyboardEvent): void {
+        this.toolbarDropdownOpen = false;
+        (event.target as HTMLElement).blur();
+    }
+ */
     createNewRevision(item: FieldManagerItem): void {
         this.activeActionId = null;
         this.createOrEditFieldManagerModal.show(item.id);

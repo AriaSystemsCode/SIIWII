@@ -47,7 +47,7 @@
         </div>
     </div>
 
-    <div class="field-manager-toolbar">
+    <div class="field-manager-toolbar mb-5 pb-5">
         <div class="field-manager-search">
             <i class="fa fa-search"></i>
             <input [(ngModel)]="filterText" [placeholder]="'SearchFields' | localize" type="text" />
@@ -63,20 +63,20 @@
         <label class="extra-data-filter" *ngIf="activePanel === 'all'">
             <i class="flaticon-layers"></i>
             <select [(ngModel)]="extraDataFilter" [attr.aria-label]="'ExtraData' | localize">
-                <option value="all">{{ 'All' | localize }}</option>
-                <option value="only">{{ 'OnlyExtraData' | localize }}</option>
-                <option value="without">{{ 'WithoutExtraData' | localize }}</option>
+                <option value="all">All Fields</option>
+                <option value="without">Standard Fields</option>
+                <option value="only">Extra Data Fields</option>
             </select>
         </label>
     </div>
 
     <div class="field-manager-table-wrapper" *ngIf="activePanel === 'all' || selectedEntityId !== null">
         <p-table #dataTable [value]="groupedItems" [paginator]="true" [rows]="10"
-            [rowsPerPageOptions]="[10, 25, 50]" [scrollable]="false"
-            responsiveLayout="stack" breakpoint="960px" styleClass="field-manager-table"
+            [rowsPerPageOptions]="[10, 25, 50]" [scrollable]="true" scrollHeight="400px"
+            styleClass="field-manager-table"
             [rowGroupMode]="groupBy === 'none' ? null : 'subheader'" groupRowsBy="groupValue"
             [sortField]="groupBy === 'none' ? null : 'groupValue'" sortMode="single"
-            [tableStyle]="{'min-width': '1080px'}">
+            [tableStyle]="{'width': '100%'}">
                                 <ng-template pTemplate="groupheader" let-item>
                                     <tr *ngIf="groupBy !== 'none'" class="field-group-row">
                                         <td colspan="10">

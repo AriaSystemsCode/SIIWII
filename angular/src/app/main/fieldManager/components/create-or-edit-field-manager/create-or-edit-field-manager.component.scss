@@ -3,15 +3,18 @@
 }
 
 .modal-dialog {
-    max-width: 520px;
+    width: calc(100% - 2rem);
+    max-width: 1100px;
 }
 
 .modal-content {
     border: 0;
     border-radius: 8px;
     box-shadow: 0 8px 30px rgba(27, 16, 27, .18);
-    max-height: 680px;
-    overflow-y: scroll;
+    max-height: 78vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
 }
 
 .modal-header {
@@ -45,7 +48,10 @@
 }
 
 .modal-body {
-    padding: 7px 9px 0;
+    padding: 18px 28px;
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
 }
 
 .field-section-title {
@@ -171,6 +177,38 @@ textarea.form-control.field-description {
     box-shadow: 0 0 0 0.1rem rgba(74, 13, 74, 0.15);
 }
 
+.field-extra-data-choice {
+    margin: 12px 0 16px;
+    padding: 12px 14px;
+    border: 1px solid #e8e1eb;
+    border-radius: 8px;
+    background: #faf7fb;
+}
+
+.field-extra-data-checkbox {
+    display: flex !important;
+    align-items: center;
+    gap: 9px;
+    margin: 0 !important;
+    color: #4a0d4a !important;
+    font-size: 14px !important;
+    cursor: pointer;
+}
+
+.field-extra-data-checkbox input {
+    width: 16px;
+    height: 16px;
+    margin: 0;
+    accent-color: #4a0d4a;
+}
+
+.field-extra-data-choice small {
+    display: block;
+    margin: 5px 0 0 25px;
+    color: #777b82;
+    font-size: 12px;
+}
+
 select.form-control option:hover {
     background: #4a0d4a;
     color: #fff;
@@ -212,6 +250,28 @@ select.form-control option:hover {
 
 .btn-secondary {
     border-radius: 8px;
+}
+
+@media (min-width: 992px) {
+    .modal-dialog {
+        max-width: min(920px, calc(100vw - 4rem));
+    }
+
+    .modal-content {
+        height: min(78vh, 820px);
+        max-height: none;
+    }
+}
+
+@media (max-width: 575.98px) {
+    .modal-dialog {
+        width: calc(100% - 1rem);
+        margin: 0.5rem auto;
+    }
+
+    .modal-body {
+        padding: 12px;
+    }
 }
  .dropdown-options-header .btn-outline-primary:hover {
         background-color: #4a0d4a;

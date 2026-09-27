@@ -188,6 +188,34 @@ export class FieldManagerService {
         }
     ];
 
+    constructor() {
+        // Temporary mock rows make it possible to verify the table's vertical scrolling.
+        const template = this.items[2];
+        const testRows = Array.from({ length: 80 }, (_, index) => {
+            const id = this.nextId + index;
+            return {
+                ...template,
+                id,
+                code: `TEST${('000' + id).slice(-3)}`,
+                name: `ScrollTestField${id}`,
+                description: `Temporary scroll test field ${id}`,
+                type: index % 2 === 0 ? 'Date - Date picker' : 'String - Textbox',
+                createdUser: index % 2 === 0 ? 'Esraa' : 'System User',
+                entityId: 3,
+                tables: 'Sales Order',
+                status: index % 2 === 0 ? 'Proposed' : 'Active',
+                revisionSequence: ('00' + id).slice(-2),
+                fieldLevel: index % 2 === 0 ? 'Application' : 'System',
+                trackingNumber: `Scroll test ${id}`,
+                extraData: index % 3 !== 0,
+                dropdownOptions: template.dropdownOptions.map(option => ({ ...option }))
+            };
+        });
+
+        this.items.push(...testRows);
+        this.nextId += testRows.length;
+    }
+
     getAll(): FieldManagerItem[] {
         return [...this.items];
     }
@@ -264,7 +292,7 @@ export class FieldManagerService {
     }
 
     save(item: FieldManagerItem): FieldManagerItem {
-        item = { ...item, extraData: true };
+        item = { ...item };
         if (item.id) {
             const index = this.items.findIndex(existing => existing.id === item.id);
             if (index !== -1) {
@@ -285,7 +313,8 @@ export class FieldManagerService {
             entityId,
             tables: tableName,
             revision: 0,
-            revisionSequence: '00'
+            revisionSequence: '00',
+            extraData: false
         });
     }
 

@@ -1,4 +1,4 @@
-<div bsModal #fieldManagerViewModal="bs-modal" class="modal fade" tabindex="-1" role="dialog"
+<div bsModal #fieldManagerViewModal="bs-modal" [config]="{ backdrop: 'static' }" class="modal fade" tabindex="-1" role="dialog"
     aria-labelledby="fieldManagerViewModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
         <div class="modal-content" *ngIf="hasItem">
@@ -24,7 +24,7 @@
 
                 <div class="field-manager-info-grid">
                     <!-- <section class="field-manager-section border-0">
-                        <h5>{{ 'StandaredInformation' | localize }}</h5>
+                        <h5>{{ 'StandardInformation' | localize }}</h5>
                         <div><span>{{ 'FieldCode' | localize }}<b>*</b></span><strong>{{ item.code }}</strong></div>
                         <div><span>{{ 'FieldName' | localize }}</span><strong>{{ item.name }}</strong></div>
                         <div><span>{{ 'Description' | localize }}</span><strong>{{ item.description }}</strong></div>
@@ -35,7 +35,7 @@
                     </section> -->
                     <section class="field-manager-section border-0">
                         <div class="standard-information-header">
-                            <h5>{{ 'StandaredInformation' | localize }}</h5>
+                            <h5 style="text-wrap: nowrap;">{{ 'StandardInformation' | localize }}</h5>
                             <span class="font-weight-bold current-revision">
                                 Current revision : {{ item.revisionSequence || '00' }}
                             </span>
