@@ -2,7 +2,7 @@
 class="btn-group dropdown"
 dropdown
 container="body"
-placement="bottom right"
+[placement]="isArabic ? 'bottom left' : 'bottom right'"
 *ngIf="!actionsMenuFlags?.allIsHidden"
 >
     <button
@@ -11,7 +11,8 @@ placement="bottom right"
         type="button"
     ></button>
     <ul
-        class="dropdown-menu dropdown-action-btn dropdown-menu-right"
+        class="dropdown-menu dropdown-action-btn"
+        [class.dropdown-menu-right]="!isArabic"
         *dropdownMenu
     >
         <li  *ngIf="actionsMenuFlags?.edit && appItemType == AppItemTypeEnum?.product" >
