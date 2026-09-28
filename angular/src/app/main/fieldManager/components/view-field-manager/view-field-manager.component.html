@@ -1,79 +1,162 @@
 <div bsModal #fieldManagerViewModal="bs-modal" [config]="{ backdrop: 'static' }" class="modal fade" tabindex="-1" role="dialog"
     aria-labelledby="fieldManagerViewModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
-        <div class="modal-content" *ngIf="hasItem">
-            <div class="modal-header">
-                <h5 class="modal-title" id="fieldManagerViewModalLabel">{{ 'ViewFieldModal' | localize }}</h5>
-                <button type="button" class="close" [attr.aria-label]="'Close' | localize" (click)="close()">
-                    <span aria-hidden="true">&times;</span>
-                </button>
+    <div class="modal-dialog modal-xl modal-dialog-centered revision-dialog" role="document">
+        <div class="modal-content revision-workspace" *ngIf="hasItem">
+            <div class="modal-header revision-modal-header">
+                <div>
+                    <span class="eyebrow">FIELD MANAGER</span>
+                    <h5 class="modal-title" id="fieldManagerViewModalLabel">{{ viewState === 'draft' ? ('Editinganewrevision' | localize)  : viewState === 'history' ?  ('RevisionHistory' | localize) : ('FieldDetailedView' | localize) }}</h5>
+                </div>
+                <button type="button" class="close" aria-label="Close" (click)="close()"><span aria-hidden="true">&times;</span></button>
             </div>
-            <div class="modal-body">
-                <div class="field-manager-modal-title-row">
-                    <h4>{{ 'FieldInformation' | localize }}</h4>
-                    <div class="field-manager-modal-actions">
-                        <button type="button" class="sync-button" [disabled]="!item.canSync" (click)="sync()">
-                            <i class="flaticon-refresh"></i> {{ 'Sync' | localize }}
+
+            <div class="modal-body revision-modal-body">
+                <div [class.revision-toolbar]="viewState !== 'draft'">
+                    <button *ngIf="viewState === 'history'" type="button" class="back-link" (click)="backToFieldDetails()">
+                        <i class="fa fa-arrow-left"></i><span>Back to Field Details</span>
+                    </button>
+                    <button *ngIf="viewState === 'details' && isViewingHistoryRevision" type="button" class="back-link" (click)="backToHistory()">
+                        <i class="fa fa-arrow-left"></i><span>Back to Revision History</span>
+                    </button>
+                    <!-- <div *ngIf="viewState === 'draft'" class="draft-context">Editing a new revision</div> -->
+
+                    <div class="revision-toolbar-actions">
+                        <button *ngIf="viewState === 'details' && !isViewingHistoryRevision" type="button"
+                            class="btn  history-action" (click)="goToHistory()">
+                            <i class="fa fa-history"></i> Go to Revision History
                         </button>
-                        <button type="button" class="btn bgPurpleM edit-field-button" (click)="createNewRevision()">
-                            {{ 'CreateNewRevision' | localize }}
+                           <button *ngIf="viewState === 'details'" type="button"
+                            class="btn  revision-primary" (click)="createNewRevision()">
+                            <i class="fa fa-plus"></i> Create New Revision
                         </button>
+                      <!--   <button *ngIf="viewState === 'draft'" type="button" class="btn btn-primary revision-primary" (click)="saveRevision()"
+                            [disabled]="!item.code.trim() || !item.name.trim()">
+                            <i class="fa fa-check"></i> Save Revision
+                        </button> -->
                     </div>
                 </div>
 
+                <ng-container *ngIf="viewState === 'history'">
+                    <div class="page-heading">
+                       <!--  <div>
+                            <span class="eyebrow">FIELD VERSION CONTROL</span>
+                            <h2>Revision History</h2>
+                            <p>Review previous versions of this field.</p>
+                        </div> -->
+                        <span class="history-field-name">{{ item.name }} <small>{{ item.code }}</small></span>
+                    </div>
+                    <div class="revision-table-card">
+                        <div class="revision-table-scroll">
+                            <table class="revision-table">
+                                <thead>
+                                    <tr><th>Revision</th><th>Created By</th><th>Created On</th><th>Status</th><th class="actions-column">Actions</th></tr>
+                                </thead>
+                                <tbody>
+                                    <tr *ngFor="let revision of revisions">
+                                        <td class="revision-number">Revision #{{ revision.revisionSequence }}</td>
+                                        <td>{{ revision.createdBy }}</td>
+                                        <td>{{ revision.createdOn | date:'MM/dd/yyyy h:mm a' }}</td>
+                                        <td><span class="status-badge" [class.badge-current]="revision.status === 'Current'"
+                                            [class.badge-previous]="revision.status === 'Previous'">{{ revision.status }}</span></td>
+                                        <td class="actions-column"><button type="button" class="details-button" (click)="openRevision(revision)">Details <i class="fa fa-arrow-right"></i></button></td>
+                                    </tr>
+                                    <tr *ngIf="!revisions.length"><td colspan="5" class="empty-history">No revisions available.</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </ng-container>
 
-                <div class="field-manager-info-grid">
-                    <!-- <section class="field-manager-section border-0">
-                        <h5>{{ 'StandardInformation' | localize }}</h5>
-                        <div><span>{{ 'FieldCode' | localize }}<b>*</b></span><strong>{{ item.code }}</strong></div>
-                        <div><span>{{ 'FieldName' | localize }}</span><strong>{{ item.name }}</strong></div>
-                        <div><span>{{ 'Description' | localize }}</span><strong>{{ item.description }}</strong></div>
-                        <div><span>{{ 'FieldLevel' | localize }}<b>*</b></span><strong>{{ item.fieldLevel }}</strong></div>
-                        <div><span>{{ 'Status' | localize }}<b>*</b></span><strong>{{ item.status }}</strong></div>
-                        <div><span>{{ 'TrackingNumber' | localize }} #</span><strong>{{ item.trackingNumber }}</strong></div>
-                        <div><span>{{ 'FieldType' | localize }}<b>*</b></span><strong>{{ item.type }}</strong></div>
-                    </section> -->
-                    <section class="field-manager-section border-0">
-                        <div class="standard-information-header">
-                            <h5 style="text-wrap: nowrap;">{{ 'StandardInformation' | localize }}</h5>
-                            <span class="font-weight-bold current-revision">
-                                Current revision : {{ item.revisionSequence || '00' }}
+                <ng-container *ngIf="viewState === 'details'">
+                    <div class="page-heading detail-heading">
+                        <div>
+                            <h2>Field Information</h2>
+                            <!-- <p>{{ selectedRevision?.status === 'Previous' ? 'Read-only historical revision' : 'Current field configuration' }}</p> -->
+                        </div>
+                        <div class="revision-identity">
+                            <span class="revision-number">Revision #{{ revisionLabel }}</span>
+                            <span class="status-badge" [class.badge-current]="selectedRevision?.status !== 'Previous'"
+                                [class.badge-previous]="selectedRevision?.status === 'Previous'">
+                                <i class="fa fa-1x" [class.fa-check]="selectedRevision.status === 'Current'"></i> {{ selectedRevision?.status === 'Previous' ? 'Previous' : 'Current' }}
                             </span>
                         </div>
-                        <div><span>{{ 'FieldCode' | localize }}</span><strong>{{ item.code }}</strong></div>
-                        <div><span>{{ 'FieldName' | localize }}</span><strong>{{ item.name }}</strong></div>
-                        <div><span>{{ 'Description' | localize }}</span><strong>{{ item.description }}</strong></div>
-                        <div><span>{{ 'FieldLevel' | localize }}</span><strong>{{ item.fieldLevel }}</strong></div>
-                        <div><span>{{ 'Status' | localize }}</span><strong>{{ item.status }}</strong></div>
-                        <div><span>{{ 'Tracking' | localize }} #</span><strong>{{ item.trackingNumber }}</strong></div>
-                        <div><span>{{ 'FieldType' | localize }}</span><strong>{{ item.type }}</strong></div>
+                    </div>
+
+                    <section class="field-card">
+                        <div class="card-section-heading"><div><h3>{{ 'StandardInformation' | localize }}</h3></div>
+                            <span class="readonly-note" *ngIf="selectedRevision?.status === 'Previous'"><i class="fa fa-lock"></i> Read only</span></div>
+                        <div class="detail-grid">
+                            <div class="detail-item"><span>Field Code</span><strong>{{ item.code || '—' }}</strong></div>
+                            <div class="detail-item"><span>Field Name</span><strong>{{ item.name || '—' }}</strong></div>
+                            <div class="detail-item detail-wide"><span>Description</span><strong>{{ item.description || '—' }}</strong></div>
+                            <div class="detail-item"><span>Field Type</span><strong>{{ item.type || '—' }}</strong></div>
+                            <div class="detail-item"><span>Field Level</span><strong>{{ item.fieldLevel || '—' }}</strong></div>
+                            <div class="detail-item"><span>Status</span><strong>{{ item.status || '—' }}</strong></div>
+                            <div class="detail-item"><span>Tracking #</span><strong>{{ item.trackingNumber || '—' }}</strong></div>
+                        </div>
                     </section>
-                </div>
 
-                <section class="field-manager-section">
-                    <h5>{{ 'AdvancedInformation' | localize }}</h5>
-                    <div class="field-manager-info-grid compact">
-                        <div><span>{{ 'AllowNull' | localize }}</span><strong>{{ item.allowNull ? ('Yes' | localize) : ('No' | localize) }}</strong></div>
-                        <div><span>{{ 'Length' | localize }}</span><strong>{{ item.length || '-' }}</strong></div>
-                        <div><span>{{ 'DefaultValue' | localize }}</span><strong>{{ item.defaultValue || '-' }}</strong></div>
-                        <div><span>{{ 'Required' | localize }}</span><strong>{{ item.required ? ('Yes' | localize) : ('No' | localize) }}</strong></div>
-                    </div>
-                </section>
+                    <section class="field-card advanced-card">
+                        <div class="card-section-heading"><div><h3>Advanced Information</h3></div></div>
+                        <div class="detail-grid advanced-grid">
+                            <div class="detail-item"><span>Allow Null</span><strong>{{ item.allowNull ? 'Yes' : 'No' }}</strong></div>
+                            <div class="detail-item"><span>Length</span><strong>{{ item.length || '—' }}</strong></div>
+                            <div class="detail-item"><span>Allow Multi Select</span><strong>{{ item.allowMultiSelect ? 'Yes' : 'No' }}</strong></div>
+                            <div class="detail-item"><span>Decimals</span><strong>{{ item.decimals }}</strong></div>
+                            <div class="detail-item"><span>Default Value</span><strong>{{ item.defaultValue || '—' }}</strong></div>
+                            <div class="detail-item"><span>Date Format</span><strong>{{ item.dateFormat || '—' }}</strong></div>
+                        </div>
+                    </section>
+                </ng-container>
 
-                <section class="field-manager-section extra-attributes">
-                    <h5>{{ 'ExtraAttributes' | localize }}</h5>
-                    <div class="field-manager-info-grid compact">
-                        <div><span>{{ 'Visible' | localize }}</span><strong>{{ item.visible ? ('Yes' | localize) : ('No' | localize) }}</strong></div>
-                        <div><span>{{ 'Editable' | localize }}</span><strong>{{ item.editable ? ('Yes' | localize) : ('No' | localize) }}</strong></div>
-                        <div><span>{{ 'ExtraData' | localize }}</span><strong>{{ item.extraData ? 'true' : 'false' }}</strong></div>
+                <ng-container *ngIf="viewState === 'draft'">
+                    <div class="page-heading draft-heading">
+                        <div>
+                            <!-- <span class="eyebrow">FIELD DETAILS</span> -->
+                            <h2>Field Information</h2>
+                            <!-- <p>Update the copied values, then save your new revision.</p> -->
+                        </div>
+                        <div class="revision-identity"><span class="revision-number">Revision #{{ revisionLabel }}</span><span class="status-badge badge-draft">Draft</span></div>
                     </div>
-                </section>
+                    <!-- <div class="revision-info-banner"><i class="fa fa-info-circle"></i><span>New Revision #{{ revisionLabel }} created from Revision #{{ selectedRevision?.revisionSequence }}. You can edit the field values before saving.</span></div> -->
+                    <form #revisionForm="ngForm" class="revision-edit-form">
+                        <section class="field-card">
+                            <div class="card-section-heading"><div>
+                                <!-- <span class="section-icon"><i class="fa fa-list-alt"></i></span> -->
+                                <h3>{{ 'StandardInformation' | localize }}</h3></div>
+                            <!-- <span class="editable-note"><i class="fa fa-pencil"></i> Editable draft</span> -->
+                        </div>
+                            <div class="edit-grid">
+                                <label class="form-field">Field Code<input class="form-control" name="code" [(ngModel)]="item.code" required /></label>
+                                <label class="form-field">Field Name<input class="form-control" name="name" [(ngModel)]="item.name" required /></label>
+                                <label class="form-field form-field-wide">Description<textarea class="form-control" name="description" rows="3" [(ngModel)]="item.description"></textarea></label>
+                                <label class="form-field">Field Type<select class="form-control" name="type" [(ngModel)]="item.type"><option value="String - Textbox">Text</option><option value="Boolean - Checkbox">Boolean</option><option value="Integer - Numeric input">Number</option><option value="Date - Date picker">Date</option><option value="List - Dropdown">Dropdown</option></select></label>
+                                <label class="form-field">Field Level<select class="form-control" name="fieldLevel" [(ngModel)]="item.fieldLevel"><option value="System">System</option><option value="Application">Application</option><option value="Tenant">Tenant</option></select></label>
+                                <label class="form-field">Status<select class="form-control" name="status" [(ngModel)]="item.status"><option value="Proposed">Proposed</option><option value="Active">Active</option><option value="Discontinued">Discontinued</option></select></label>
+                                <label class="form-field">Tracking #<input class="form-control" name="trackingNumber" [(ngModel)]="item.trackingNumber" /></label>
+                            </div>
+                        </section>
+                        <section class="field-card advanced-card">
+                            <div class="card-section-heading"><div>
+                                <!-- <span class="section-icon"><i class="fa fa-sliders"></i></span> -->
+                                <h3>Advanced Information</h3></div></div>
+                            <div class="edit-grid">
+                                <label class="form-field">Allow Null<select class="form-control" name="allowNull" [(ngModel)]="item.allowNull"><option [ngValue]="true">Yes</option><option [ngValue]="false">No</option></select></label>
+                                <label class="form-field">Length<input class="form-control" type="number" min="0" name="length" [(ngModel)]="item.length" /></label>
+                                <label class="form-field">Allow Multi Select<select class="form-control" name="allowMultiSelect" [(ngModel)]="item.allowMultiSelect"><option [ngValue]="true">Yes</option><option [ngValue]="false">No</option></select></label>
+                                <label class="form-field">Decimals<input class="form-control" type="number" min="0" name="decimals" [(ngModel)]="item.decimals" /></label>
+                                <label class="form-field">Default Value<input class="form-control" name="defaultValue" [(ngModel)]="item.defaultValue" /></label>
+                                <label class="form-field">Date Format<select class="form-control" name="dateFormat" [(ngModel)]="item.dateFormat"><option value="mm/dd/yyyy">mm/dd/yyyy</option><option value="dd/mm/yyyy">dd/mm/yyyy</option><option value="yyyy/mm/dd">yyyy/mm/dd</option></select></label>
+                            </div>
+                        </section>
+                    </form>
+                    <div class="draft-footer"><button type="button" class="btn btn-light cancel-button" (click)="cancelDraft()">Cancel</button><button type="button" class="btn revision-primary" (click)="saveRevision()" [disabled]="revisionForm.invalid"><i class="fa fa-check"></i> Save Revision</button></div>
+                </ng-container>
             </div>
-            <div class="modal-footer d-flex justify-content-end">
-                <button type="button" class="btn btn-secondary mr-2" (click)="close()">
-                    {{ 'Close' | localize }}
-                </button>
-            </div>
+            <!-- <div class="modal-footer revision-modal-footer" *ngIf="viewState !== 'draft'">
+                <span class="footer-hint" *ngIf="viewState === 'history'">Select a revision to view its field details.</span>
+                <button type="button" class="btn btn-light cancel-button" (click)="close()">Close</button>
+            </div> -->
         </div>
     </div>
 </div>

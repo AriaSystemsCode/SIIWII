@@ -129,6 +129,10 @@
     gap: 15px;
 }
 
+.add-existing-btn{
+    background-color: #f88011 !important;
+}
+
 .add-existing-btn,
 .create-field-btn {
     min-width: 160px;
@@ -273,7 +277,7 @@
 
 .bgPurpleM {
     border-radius: 10px;
-    background: #4a0d4a !important;
+    background: #4a0d4a ;
     color: #fff !important;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
 }
@@ -410,7 +414,7 @@
         border: 0;
         font-weight: 600;
         text-align: left;
-        white-space: normal;
+        white-space: nowrap;
         overflow-wrap: anywhere;
     }
 
@@ -586,7 +590,7 @@
     }
 
     .field-manager-breadcrumb {
-        white-space: normal;
+        white-space:  nowrap;
     }
 
     .field-manager-actions {

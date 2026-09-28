@@ -3087,5 +3087,8 @@ Please select one of the available linesheet templates
 		<text name="AddSelected">Add Selected</text>
 		<text name="StandardInformation">Standard Information</text>
 		<text name="WithoutExtraData">Without Extra Data</text>
+		<text name="FieldDetailedView">Field Detailed View</text>
+		<text name="Editinganewrevision">Editing a new revision</text>
+		<text name="RevisionHistory">Revision History</text> 
   </texts>  
 </localizationDictionary>

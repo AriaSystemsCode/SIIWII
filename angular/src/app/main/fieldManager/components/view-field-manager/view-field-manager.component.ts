@@ -1,8 +1,8 @@
 import { Component, EventEmitter, Injector, OnInit, Output, ViewChild } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { AppComponentBase } from '@shared/common/app-component-base';
 import { FieldManagerItem } from '../../field-manager.model';
-import { FieldManagerService } from '../../field-manager.service';
+import { FieldManagerRevision, FieldManagerService } from '../../field-manager.service';
 import { ModalDirective } from 'ngx-bootstrap/modal';
 
 @Component({
@@ -12,7 +12,7 @@ import { ModalDirective } from 'ngx-bootstrap/modal';
 })
 export class ViewFieldManagerComponent extends AppComponentBase implements OnInit {
     @ViewChild('fieldManagerViewModal', { static: true }) modal!: ModalDirective;
-    @Output() createNewRevisionRequested = new EventEmitter<number>();
+    @Output() revisionSaved = new EventEmitter<void>();
     item: FieldManagerItem = {
         id: 0,
         code: '',
@@ -41,13 +41,17 @@ export class ViewFieldManagerComponent extends AppComponentBase implements OnIni
         active: false,
         canSync: false
     };
+    revisions: FieldManagerRevision[] = [];
+    selectedRevision: FieldManagerRevision | null = null;
+    viewState: 'details' | 'history' | 'draft' = 'details';
     hasItem = false;
     active = false;
+    isViewingHistoryRevision = false;
+    private sourceItemId = 0;
 
     constructor(
         injector: Injector,
         private activatedRoute: ActivatedRoute,
-        private router: Router,
         private fieldManagerService: FieldManagerService
     ) {
         super(injector);
@@ -57,40 +61,112 @@ export class ViewFieldManagerComponent extends AppComponentBase implements OnIni
         const id = Number(this.activatedRoute.snapshot.paramMap.get('id'));
         const item = this.fieldManagerService.getById(id);
         if (item) {
-            this.item = item;
-            this.hasItem = true;
+            this.setItem(item);
         }
     }
 
     show(item: FieldManagerItem): void {
-        this.item = { ...item };
-        this.hasItem = true;
+        this.setItem(item);
         this.active = true;
         this.modal.show();
     }
 
-    sync(): void {
-        if (!this.item.canSync) {
-            return;
+    goToHistory(): void {
+        this.revisions = this.fieldManagerService.getRevisionHistory(this.item);
+        this.selectedRevision = null;
+        this.viewState = 'history';
+    }
+
+    backToFieldDetails(): void {
+        const current = this.fieldManagerService.getById(this.sourceItemId);
+        if (current) {
+            this.item = this.copyItem(current);
         }
-
-        this.notify.info(this.l('FieldManager') + ' ' + this.l('Synchronized'));
+        this.selectedRevision = null;
+        this.viewState = 'details';
+        this.isViewingHistoryRevision = false;
     }
 
-    backToList(): void {
-        this.router.navigate(['/app/main/fieldManager']);
+    openRevision(revision: FieldManagerRevision): void {
+        this.selectedRevision = revision;
+        this.item = this.copyItem(revision.item);
+        this.viewState = 'details';
+        this.isViewingHistoryRevision = true;
     }
 
-    close(): void {
-        this.active = false;
-        this.modal.hide();
+    backToHistory(): void {
+        this.viewState = 'history';
     }
 
     createNewRevision(): void {
-        if (!this.hasItem) {
+        const source = this.copyItem(this.item);
+        const latestRevision = this.revisions.reduce((latest, revision) => {
+            return Math.max(latest, parseInt(revision.revisionSequence, 10) || 0);
+        }, parseInt(source.revisionSequence, 10) || 0);
+        const nextRevision = latestRevision + 1;
+        source.revisionSequence = ('00' + nextRevision).slice(-2);
+        source.revision = nextRevision;
+        this.item = source;
+        this.viewState = 'draft';
+    }
+
+    saveRevision(): void {
+        if (!this.item.code.trim() || !this.item.name.trim()) {
             return;
         }
 
-        this.createNewRevisionRequested.emit(this.item.id);
+        const saved = this.fieldManagerService.saveRevision(this.sourceItemId, this.item, this.item.revisionSequence);
+        this.revisions = this.fieldManagerService.getRevisionHistory(saved);
+        this.selectedRevision = this.revisions.find(revision => revision.status === 'Current') || null;
+        this.item = this.selectedRevision
+            ? this.copyItem(this.selectedRevision.item)
+            : this.copyItem(saved);
+        this.viewState = 'details';
+        this.isViewingHistoryRevision = false;
+        this.revisionSaved.emit();
+        this.notify.success('Revision saved successfully.');
+    }
+
+    cancelDraft(): void {
+        if (this.selectedRevision) {
+            this.item = this.copyItem(this.selectedRevision.item);
+        }
+        this.viewState = 'details';
+    }
+
+    get revisionLabel(): string {
+        return ('00' + (this.item.revisionSequence || '00')).slice(-2);
+    }
+
+    private setItem(item: FieldManagerItem): void {
+        this.sourceItemId = item.id;
+        this.item = this.copyItem(item);
+        this.revisions = this.fieldManagerService.getRevisionHistory(item);
+        this.selectedRevision = this.revisions.find(revision => revision.status === 'Current') || null;
+        this.viewState = 'details';
+        this.isViewingHistoryRevision = false;
+        this.hasItem = true;
+    }
+
+    private copyItem(item: FieldManagerItem): FieldManagerItem {
+        return {
+            ...item,
+            dropdownOptions: (item.dropdownOptions || []).map(option => ({ ...option }))
+        };
+    }
+
+    close(): void {
+        if (this.viewState === 'draft') {
+            this.cancelDraft();
+            return;
+        }
+
+        if (this.viewState === 'history') {
+            this.backToFieldDetails();
+            return;
+        }
+
+        this.active = false;
+        this.modal.hide();
     }
 }

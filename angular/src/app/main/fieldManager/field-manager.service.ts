@@ -1,10 +1,19 @@
 import { Injectable } from '@angular/core';
 import { FieldManagerEntityNode, FieldManagerItem } from './field-manager.model';
 
+export interface FieldManagerRevision {
+    item: FieldManagerItem;
+    revisionSequence: string;
+    createdBy: string;
+    createdOn: Date;
+    status: 'Current' | 'Previous';
+}
+
 @Injectable()
 export class FieldManagerService {
     /////i51-Instead of BE Integration
     private nextId = 7;
+    private revisions: { [itemId: number]: FieldManagerRevision[] } = {};
     private items: FieldManagerItem[] = [
         {
             id: 1,
@@ -223,6 +232,72 @@ export class FieldManagerService {
     //i51-Get Field
     getById(id: number): FieldManagerItem | undefined {
         return this.items.find(item => item.id === id);
+    }
+
+    getRevisionHistory(item: FieldManagerItem): FieldManagerRevision[] {
+        if (!this.revisions[item.id]) {
+            const currentNumber = Math.max(0, parseInt(item.revisionSequence, 10) || 0);
+            const firstNumber = Math.max(0, currentNumber - 5);
+            const revisions: FieldManagerRevision[] = [];
+            for (let number = firstNumber; number <= currentNumber; number++) {
+                const snapshot = this.copyItem(item);
+                snapshot.revisionSequence = ('00' + number).slice(-2);
+                revisions.push({
+                    item: snapshot,
+                    revisionSequence: snapshot.revisionSequence,
+                    createdBy: number === currentNumber ? (item.createdUser || 'System User') : this.revisionAuthor(number),
+                    createdOn: new Date(Date.now() - (currentNumber - number) * 86400000),
+                    status: number === currentNumber ? 'Current' : 'Previous'
+                });
+            }
+            this.revisions[item.id] = revisions;
+        }
+
+        return this.revisions[item.id]
+            .map(revision => ({ ...revision, item: this.copyItem(revision.item) }))
+            .sort((first, second) => parseInt(second.revisionSequence, 10) - parseInt(first.revisionSequence, 10));
+    }
+
+    saveRevision(itemId: number, source: FieldManagerItem, revisionSequence: string): FieldManagerItem {
+        const history = this.getRevisionHistory(source);
+        history.forEach(revision => revision.status = 'Previous');
+        const saved = this.copyItem({
+            ...source,
+            id: itemId,
+            revision: parseInt(revisionSequence, 10) || 0,
+            revisionSequence
+        });
+        const newRevision: FieldManagerRevision = {
+            item: saved,
+            revisionSequence,
+            createdBy: source.createdUser || 'Current User',
+            createdOn: new Date(),
+            status: 'Current'
+        };
+        const existingIndex = history.findIndex(revision => revision.revisionSequence === revisionSequence);
+        if (existingIndex >= 0) {
+            history.splice(existingIndex, 1);
+        }
+        history.push(newRevision);
+        this.revisions[itemId] = history;
+
+        const itemIndex = this.items.findIndex(existing => existing.id === itemId);
+        if (itemIndex >= 0) {
+            this.items[itemIndex] = this.copyItem(saved);
+        }
+        return this.copyItem(saved);
+    }
+
+    private copyItem(item: FieldManagerItem): FieldManagerItem {
+        return {
+            ...item,
+            dropdownOptions: (item.dropdownOptions || []).map(option => ({ ...option }))
+        };
+    }
+
+    private revisionAuthor(number: number): string {
+        const authors = ['Tom Carter', 'Lisa Green', 'Mike Brown', 'Sarah Lee', 'Adam Johns'];
+        return authors[(number - 1) % authors.length];
     }
 
     getEntityTree(): FieldManagerEntityNode[] {

@@ -24,7 +24,6 @@ export class BrowseFieldManagerComponent extends AppComponentBase implements OnI
     expandedGroups: { [groupValue: string]: boolean } = {};
     activeActionId: number | null = null;
     activePanel: 'all' | 'entity' = 'all';
-    private returnToViewId: number | null = null;
     entityTree: FieldManagerEntityNode[] = [];
     expandedEntityIds: number[] = [];
     selectedEntityId: number | null = null;
@@ -237,24 +236,8 @@ export class BrowseFieldManagerComponent extends AppComponentBase implements OnI
         this.loadItems();
     }
 
-    createNewRevisionFromView(id: number): void {
-        this.activeActionId = null;
-        this.returnToViewId = id;
-        this.viewFieldManagerModal.close();
-        this.createOrEditFieldManagerModal.show(id);
-    }
-
     onCreateOrEditClosed(): void {
-        if (this.returnToViewId === null) {
-            return;
-        }
-
-        const id = this.returnToViewId;
-        this.returnToViewId = null;
-        const item = this.fieldManagerService.getById(id);
-        if (item) {
-            this.viewFieldManagerModal.show(item);
-        }
+        // The view modal manages its own revision workflow.
     }
 
     @HostListener('document:click')
