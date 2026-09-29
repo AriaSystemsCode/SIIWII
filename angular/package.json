@@ -1,7 +1,7 @@
 {
   "name": "siwii",
   "uniqueName": "SIWII",
-  "version": "8.7.61",
+  "version": "8.7.64",
   "license": "MIT",
   "angular-cli": {},
   "scripts": {
@@ -38,7 +38,8 @@
     "@ng-select/ng-select": "^11.0.0",
     "@schematics/angular": "^16.1.0",
     "@swimlane/ngx-charts": "^20.1.2",
-    "@syncfusion/ej2-angular-spreadsheet": "^20.4.38",
+    "@syncfusion/ej2-angular-pivotview": "^34.2.9",
+    "@syncfusion/ej2-angular-spreadsheet": "^34.2.9",
     "@types/file-saver": "^2.0.1",
     "abp-ng2-module": "^8.0.0",
     "abp-web-resources": "^5.2.0",

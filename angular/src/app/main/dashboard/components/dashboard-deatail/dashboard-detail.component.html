@@ -149,26 +149,6 @@
             "
             class="dashboard-sheet-viewer">
 
-
-            <!--
-                IMPORTANT:
-
-                dashboardSheets contains the ORIGINAL
-                workbook sheet objects.
-
-                We DO NOT:
-                - recreate charts
-                - call openFromJson()
-                - modify Dashboard rows/cells/charts
-                - remove source sheets
-
-                Dashboard is selected using
-                dashboardActiveSheetIndex.
-
-                Source sheets stay internally available
-                because Dashboard charts may reference them.
-            -->
-
             <ejs-spreadsheet
 
                 #dashboardSpreadsheet
@@ -202,9 +182,49 @@
 
                 [showFormulaBar]="false"
 
-                [showSheetTabs]="false">
+                [showSheetTabs]="false"
+
+                (created)="onDashboardCreated()">
 
             </ejs-spreadsheet>
+
+            <!--
+                One Angular refresh button per saved Dashboard widget.
+                Buttons are positioned over the native Syncfusion chart by TS,
+                using the chart's saved top/left/width.
+            -->
+            <ng-container *ngFor="let widget of dashboardWidgets; trackBy: trackDashboardWidget">
+
+                <button
+                    *ngIf="widgetPosition(widget) as position"
+                    type="button"
+                    class="dashboard-widget-refresh-btn"
+                    [style.left.px]="position.left"
+                    [style.top.px]="position.top"
+                    [disabled]="
+                        refreshing ||
+                        refreshingWidgetId === widget.id
+                    "
+                    [title]="
+                        'Refresh ' +
+                        (widget.chartTitle || 'chart') +
+                        ' from ' +
+                        widget.sourceSheetName
+                    "
+                    (click)="refreshDashboardWidget(widget, $event)">
+
+                    <i
+                        class="pi"
+                        [ngClass]="
+                            refreshingWidgetId === widget.id
+                                ? 'pi-spin pi-spinner'
+                                : 'pi-refresh'
+                        ">
+                    </i>
+
+                </button>
+
+            </ng-container>
 
         </div>
 

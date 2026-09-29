@@ -391,6 +391,9 @@ currentSpreadsheetFilters: any = null;
     sheetAnalyses: SavedSheetAnalysis[] = [];
     currentPivotSheetName: string | null = null;
 
+    // Siiwii metadata: Dashboard chart -> original source tab.
+    dashboardWidgets: DashboardWidgetMetadata[] = [];
+
 
     constructor(
         injector: Injector,
@@ -432,18 +435,31 @@ currentSpreadsheetFilters: any = null;
     // =====================================================
     // ODOO-STYLE: ENTITY -> COLUMNS -> FILTERS -> NEW TAB
     // =====================================================
+
     openAddSpreadsheetData(): void {
+        console.log('[Spreadsheet] openAddSpreadsheetData()');
+
         this.addDataStep = 1;
         this.selectedAddDataEntityKey = null;
         this.addDataDefinition = null;
         this.selectedAddDataColumns = [];
         this.addDataFilters = {};
         this.showSpreadsheetDataPanel = true;
+
         this.cdr.detectChanges();
+
+        setTimeout(() => {
+            this.spreadsheet?.resize();
+        }, 0);
     }
 
     closeSpreadsheetDataPanel(): void {
         this.showSpreadsheetDataPanel = false;
+        this.cdr.detectChanges();
+
+        setTimeout(() => {
+            this.spreadsheet?.resize();
+        }, 0);
     }
 
     onSpreadsheetEntityDropdownChange(sourceKey: string | null): void {
@@ -459,50 +475,26 @@ currentSpreadsheetFilters: any = null;
         this.selectSpreadsheetEntity(sourceKey);
     }
 
-    private spreadsheetDataSourceClickHandler: ((event: Event) => void) | null = null;
-
-    private bindSpreadsheetDataSourceRibbonClick(): void {
-        this.unbindSpreadsheetDataSourceRibbonClick();
-
-        this.spreadsheetDataSourceClickHandler = (event: Event) => {
-            const target = event.target as HTMLElement | null;
-            if (!target) return;
-
-            const button = target.closest(
-                '#siiwii_spreadsheet_data_source, [id*="siiwii_spreadsheet_data_source"]'
-            ) as HTMLElement | null;
-
-            if (!button) return;
-
-            event.preventDefault();
-            event.stopPropagation();
-            this.openAddSpreadsheetData();
-        };
-
-        document.addEventListener('click', this.spreadsheetDataSourceClickHandler, true);
-    }
-
-    private unbindSpreadsheetDataSourceRibbonClick(): void {
-        if (!this.spreadsheetDataSourceClickHandler) return;
-
-        document.removeEventListener('click', this.spreadsheetDataSourceClickHandler, true);
-        this.spreadsheetDataSourceClickHandler = null;
-    }
-
     /**
-     * Adds Siiwii's Data Source command to Syncfusion's native Insert ribbon.
-     * Syncfusion 20.4.x exposes addToolbarItems at runtime even when typings
-     * differ between patch versions, therefore the call is intentionally `any`.
+     * Adds Siiwii List to Syncfusion's Insert ribbon.
+     *
+     * IMPORTANT:
+     * We intentionally do NOT use a document-level click listener.
+     * The toolbar item's own click callback opens the Angular panel.
+     * ribbonClick is kept as a second supported path.
      */
     private addSpreadsheetDataSourceRibbonCommand(): void {
         if (!this.spreadsheet) {
+            console.warn('[Spreadsheet] Spreadsheet instance is not ready.');
             return;
         }
 
         const spreadsheet: any = this.spreadsheet as any;
 
         if (typeof spreadsheet.addToolbarItems !== 'function') {
-            console.warn('[Spreadsheet] addToolbarItems is not available in this Syncfusion build.');
+            console.warn(
+                '[Spreadsheet] addToolbarItems() is not available in this Syncfusion build.'
+            );
             return;
         }
 
@@ -513,58 +505,154 @@ currentSpreadsheetFilters: any = null;
                     {
                         id: 'siiwii_spreadsheet_data_source',
                         type: 'Button',
-                        text: 'siiwii list',
+                        text: 'Siiwii List',
                         tooltipText: 'Insert Siiwii data source',
                         prefixIcon: 'e-icons e-database',
-                        click: () => this.openAddSpreadsheetData()
+
+                        // Main click path for dynamically-added toolbar item.
+                        click: () => {
+                            console.log(
+                                '[Spreadsheet] Siiwii List toolbar callback fired.'
+                            );
+                            this.openAddSpreadsheetData();
+                        }
                     }
                 ],
                 0
             );
+
+            console.log(
+                '[Spreadsheet] Siiwii List command added to Insert ribbon.'
+            );
         } catch (error) {
-            console.warn('[Spreadsheet] Unable to add Data Source ribbon command:', error);
+            console.error(
+                '[Spreadsheet] Unable to add Siiwii List command:',
+                error
+            );
         }
     }
 
     onSpreadsheetRibbonClick(args: any): void {
         const itemId =
             args?.item?.id ??
+            args?.item?.properties?.id ??
             args?.originalEvent?.target?.id ??
             args?.target?.id ??
             '';
 
-        if (String(itemId).includes('siiwii_spreadsheet_data_source')) {
-            this.openAddSpreadsheetData();
+        const itemText =
+            args?.item?.text ??
+            args?.item?.properties?.text ??
+            args?.originalEvent?.target?.textContent ??
+            args?.target?.textContent ??
+            '';
+
+        const normalizedId =
+            String(itemId).trim().toLowerCase();
+
+        const normalizedText =
+            String(itemText).trim().toLowerCase();
+
+        const isSiiwiiList =
+            normalizedId.includes(
+                'siiwii_spreadsheet_data_source'
+            ) ||
+            normalizedText.includes(
+                'siiwii list'
+            );
+
+        if (!isSiiwiiList) {
+            return;
         }
+
+        console.log(
+            '[Spreadsheet] Siiwii List ribbonClick fired.',
+            args
+        );
+
+        this.openAddSpreadsheetData();
     }
 
     selectSpreadsheetEntity(sourceKey: string): void {
-        const definition = this.spreadsheetEntityDefinitions.find(x => x.sourceKey === sourceKey);
-        if (!definition) return;
-        this.selectedAddDataEntityKey = sourceKey; this.addDataDefinition = definition;
-        this.selectedAddDataColumns = definition.columns.filter(x => x.defaultSelected).map(x => x.key);
-        this.addDataFilters = {}; this.addDataStep = 2;
+        const definition =
+            this.spreadsheetEntityDefinitions.find(
+                x => x.sourceKey === sourceKey
+            );
+
+        if (!definition) {
+            console.warn(
+                '[Spreadsheet] Unknown Siiwii entity:',
+                sourceKey
+            );
+            return;
+        }
+
+        this.selectedAddDataEntityKey = sourceKey;
+        this.addDataDefinition = definition;
+
+        this.selectedAddDataColumns =
+            definition.columns
+                .filter(x => x.defaultSelected)
+                .map(x => x.key);
+
+        this.addDataFilters = {};
+        this.addDataStep = 2;
+
+        this.cdr.detectChanges();
     }
 
     backToSpreadsheetEntitySelection(): void {
-        this.addDataStep = 1; this.selectedAddDataEntityKey = null;
-        this.addDataDefinition = null; this.selectedAddDataColumns = []; this.addDataFilters = {};
+        this.addDataStep = 1;
+        this.selectedAddDataEntityKey = null;
+        this.addDataDefinition = null;
+        this.selectedAddDataColumns = [];
+        this.addDataFilters = {};
+
+        this.cdr.detectChanges();
     }
 
-    isAddDataColumnSelected(key: string): boolean { return this.selectedAddDataColumns.includes(key); }
+    isAddDataColumnSelected(key: string): boolean {
+        return this.selectedAddDataColumns.includes(key);
+    }
 
     toggleAddDataColumnEvent(key: string, event: any): void {
-        this.toggleAddDataColumn(key, !!event?.target?.checked);
+        this.toggleAddDataColumn(
+            key,
+            !!event?.target?.checked
+        );
     }
 
-    toggleAddDataColumn(key: string, checked: boolean): void {
+    toggleAddDataColumn(
+        key: string,
+        checked: boolean
+    ): void {
         if (checked) {
-            if (!this.selectedAddDataColumns.includes(key)) this.selectedAddDataColumns = [...this.selectedAddDataColumns, key];
-        } else this.selectedAddDataColumns = this.selectedAddDataColumns.filter(x => x !== key);
+            if (!this.selectedAddDataColumns.includes(key)) {
+                this.selectedAddDataColumns = [
+                    ...this.selectedAddDataColumns,
+                    key
+                ];
+            }
+
+            return;
+        }
+
+        this.selectedAddDataColumns =
+            this.selectedAddDataColumns.filter(
+                x => x !== key
+            );
     }
 
-    selectAllAddDataColumns(): void { this.selectedAddDataColumns = this.addDataDefinition?.columns.map(x => x.key) ?? []; }
-    clearAddDataColumns(): void { this.selectedAddDataColumns = []; }
+    selectAllAddDataColumns(): void {
+        this.selectedAddDataColumns =
+            this.addDataDefinition?.columns.map(
+                x => x.key
+            ) ?? [];
+    }
+
+    clearAddDataColumns(): void {
+        this.selectedAddDataColumns = [];
+    }
 
     private getUniqueSpreadsheetSheetName(baseName: string): string {
         const names = new Set((this.spreadsheet?.sheets ?? []).map((x:any) => String(x?.name ?? '').trim()));
@@ -1218,11 +1306,17 @@ async savePivotToDashboard(): Promise<void> {
             pivotMatrix
         );
 
-        await this.insertNativeChartOnDashboard({
+        const insertedChart = await this.insertNativeChartOnDashboard({
             type: this.mapPivotChartTypeToSpreadsheet(this.selectedPivotChartType),
             range: dashboardRange,
             title: this.pivotChartSettings?.title || `${sourceSheetName} Pivot Chart`
         });
+
+        this.registerPivotDashboardWidget(
+            sourceSheetName,
+            dashboardRange,
+            insertedChart
+        );
 
         // It is now a REAL Spreadsheet chart. The user can select it on Dashboard
         // and use Ctrl+C / Ctrl+X / Ctrl+V like any other Spreadsheet chart.
@@ -1418,7 +1512,7 @@ private ensureDashboardSheet(): void {
     }, 0);
 }
 
-private async insertNativeChartOnDashboard(chart: any): Promise<void> {
+private async insertNativeChartOnDashboard(chart: any): Promise<any> {
     if (!this.spreadsheet) {
         throw new Error('Spreadsheet is not ready.');
     }
@@ -1514,7 +1608,334 @@ private async insertNativeChartOnDashboard(chart: any): Promise<void> {
     await this.yieldToBrowser();
     await this.yieldToBrowser();
 
+    const insertedChart =
+        this.findDashboardChartByRangeAndTitle(range, model.title) ?? model;
+
     this.refreshSpreadsheetLayout();
+    return insertedChart;
+}
+
+
+private findDashboardChartByRangeAndTitle(range: string, title?: string): any | null {
+    const dashboard: any = (this.spreadsheet as any)?.sheets?.find(
+        (sheet: any) => String(sheet?.name ?? '').trim() === 'Dashboard'
+    );
+    if (!dashboard) return null;
+    let rangeMatch: any | null = null;
+    for (const row of dashboard.rows ?? []) {
+        for (const cell of row?.cells ?? []) {
+            for (const chart of cell?.chart ?? []) {
+                if (String(chart?.range ?? '').trim() !== String(range ?? '').trim()) continue;
+                if (title && String(chart?.title ?? '').trim() === String(title).trim()) return chart;
+                rangeMatch = chart;
+            }
+        }
+    }
+    return rangeMatch;
+}
+
+private getSpreadsheetSheetIdentity(sheetName: string): { sheetId?: number; sheetName: string } {
+    const sheet: any = (this.spreadsheet as any)?.sheets?.find(
+        (item: any) => String(item?.name ?? '').trim() === String(sheetName ?? '').trim()
+    );
+    const sourceMetadata = this.sheetDataSources.find(
+        item => item.sheetId != null && sheet?.id != null && Number(item.sheetId) === Number(sheet.id)
+    ) ?? this.sheetDataSources.find(
+        item => String(item?.sheetName ?? '').trim() === String(sheetName ?? '').trim()
+    );
+    return {
+        sheetId: sourceMetadata?.sheetId ?? sheet?.id,
+        sheetName: String(sheet?.name ?? sheetName ?? '').trim()
+    };
+}
+
+private registerPivotDashboardWidget(sourceSheetName: string, dashboardRange: string, insertedChart: any): void {
+    const source = this.getSpreadsheetSheetIdentity(sourceSheetName);
+    const analysis = this.sheetAnalyses.find(
+        item => String(item?.sheetName ?? '').trim() === String(sourceSheetName ?? '').trim()
+    );
+    if (!analysis) return;
+    if (analysis.id == null) analysis.id = Date.now();
+
+    const chartId = String(insertedChart?.id ?? '').trim() || undefined;
+    const existing = this.dashboardWidgets.find(
+        w => w.sourceType === 'PIVOT' && w.analysisId === analysis.id
+    );
+    const widgetId = existing?.id ?? analysis.dashboardWidgetId ?? Date.now();
+    const widget: DashboardWidgetMetadata = {
+        id: widgetId,
+        dashboardSheetName: 'Dashboard',
+        chartId,
+        chartTitle: String(insertedChart?.title ?? analysis.chart?.title ?? `${sourceSheetName} Pivot Chart`),
+        chartType: String(insertedChart?.type ?? this.mapPivotChartTypeToSpreadsheet(analysis.chart?.type)),
+        sourceType: 'PIVOT',
+        sourceSheetId: source.sheetId,
+        sourceSheetName: source.sheetName,
+        analysisId: analysis.id,
+        dashboardDataRange: dashboardRange
+    };
+    const i = this.dashboardWidgets.findIndex(x => x.id === widgetId);
+    if (i >= 0) this.dashboardWidgets[i] = widget; else this.dashboardWidgets.push(widget);
+    analysis.dashboardWidgetId = widgetId;
+    analysis.dashboardChartId = chartId;
+    analysis.dashboardDataRange = dashboardRange;
+    analysis.sourceSheetId = source.sheetId;
+}
+
+private getSerializedWorkbook(workbookJson: any): any {
+    return workbookJson?.jsonObject?.Workbook ?? workbookJson?.Workbook ?? workbookJson;
+}
+
+private getChartsFromSerializedSheet(sheet: any): any[] {
+    const charts: any[] = [];
+    for (const row of sheet?.rows ?? []) {
+        for (const cell of row?.cells ?? []) {
+            if (Array.isArray(cell?.chart)) charts.push(...cell.chart);
+        }
+    }
+    if (Array.isArray(sheet?.charts)) charts.push(...sheet.charts);
+    return charts;
+}
+
+private rebuildDashboardWidgetMetadata(workbookJson: any): void {
+    const workbook = this.getSerializedWorkbook(workbookJson);
+    const sheets: any[] = Array.isArray(workbook?.sheets)
+        ? workbook.sheets
+        : [];
+
+    const dashboard = sheets.find(
+        (sheet: any) =>
+            String(sheet?.name ?? '').trim() === 'Dashboard'
+    );
+
+    if (!dashboard) {
+        this.dashboardWidgets = [];
+        return;
+    }
+
+    const dashboardCharts =
+        this.getChartsFromSerializedSheet(dashboard);
+
+    const rebuiltPivotWidgets: DashboardWidgetMetadata[] = [];
+    const matchedPivotCharts = new Set<any>();
+
+    // ---------------------------------------------------------
+    // 1. Rebuild PIVOT widgets from sheetAnalyses.
+    //
+    // Do NOT depend on dashboardWidgets already containing the
+    // Pivot widget. A Pivot Spreadsheet chart normally points to
+    // a LOCAL Dashboard helper range (Dashboard!AZ1:BB15, etc.),
+    // so its original source sheet cannot be derived from
+    // chart.range alone.
+    //
+    // sheetAnalyses is the authoritative relationship:
+    // source sheet -> Pivot definition -> Dashboard widget/chart.
+    // ---------------------------------------------------------
+    for (const analysis of this.sheetAnalyses ?? []) {
+        if (!analysis?.chart) {
+            continue;
+        }
+
+        const sourceSheetName =
+            String(analysis?.sheetName ?? '').trim();
+
+        if (!sourceSheetName) {
+            continue;
+        }
+
+        if (analysis.id == null) {
+            analysis.id = Date.now() + rebuiltPivotWidgets.length;
+        }
+
+        const source =
+            this.getSpreadsheetSheetIdentity(sourceSheetName);
+
+        const savedWidget = this.dashboardWidgets.find(
+            widget =>
+                widget.sourceType === 'PIVOT' &&
+                (
+                    (analysis.dashboardWidgetId != null &&
+                        Number(widget.id) ===
+                        Number(analysis.dashboardWidgetId)) ||
+                    (widget.analysisId != null &&
+                        Number(widget.analysisId) ===
+                        Number(analysis.id))
+                )
+        );
+
+        const expectedChartId =
+            String(
+                analysis?.dashboardChartId ??
+                savedWidget?.chartId ??
+                ''
+            ).trim();
+
+        const expectedRange =
+            String(
+                analysis?.dashboardDataRange ??
+                savedWidget?.dashboardDataRange ??
+                ''
+            ).trim();
+
+        const expectedTitle =
+            String(
+                analysis?.chart?.title ??
+                savedWidget?.chartTitle ??
+                `${sourceSheetName} Pivot Chart`
+            ).trim();
+
+        // Match strongest identifiers first. Title is only the
+        // fallback for old saved spreadsheets that did not yet
+        // persist dashboardChartId/dashboardDataRange.
+        let nativeChart = dashboardCharts.find(
+            chart =>
+                !matchedPivotCharts.has(chart) &&
+                expectedChartId &&
+                String(chart?.id ?? '').trim() === expectedChartId
+        );
+
+        if (!nativeChart && expectedRange) {
+            nativeChart = dashboardCharts.find(
+                chart =>
+                    !matchedPivotCharts.has(chart) &&
+                    String(chart?.range ?? '').trim() === expectedRange
+            );
+        }
+
+        if (!nativeChart && expectedTitle) {
+            nativeChart = dashboardCharts.find(
+                chart =>
+                    !matchedPivotCharts.has(chart) &&
+                    String(chart?.title ?? '').trim() === expectedTitle
+            );
+        }
+
+        if (!nativeChart) {
+            // Analysis exists, but there is no corresponding chart
+            // currently on Dashboard. Do not create stale metadata.
+            continue;
+        }
+
+        matchedPivotCharts.add(nativeChart);
+
+        const chartId =
+            String(nativeChart?.id ?? '').trim() || undefined;
+
+        const dashboardDataRange =
+            String(nativeChart?.range ?? expectedRange).trim();
+
+        const widgetId =
+            savedWidget?.id ??
+            analysis.dashboardWidgetId ??
+            Date.now() + rebuiltPivotWidgets.length;
+
+        const pivotWidget: DashboardWidgetMetadata = {
+            id: widgetId,
+            dashboardSheetName: 'Dashboard',
+            chartId,
+            chartTitle: String(
+                nativeChart?.title ?? expectedTitle
+            ),
+            chartType: String(
+                nativeChart?.type ??
+                this.mapPivotChartTypeToSpreadsheet(
+                    analysis?.chart?.type
+                )
+            ),
+            sourceType: 'PIVOT',
+            sourceSheetId: source.sheetId,
+            sourceSheetName: source.sheetName,
+            analysisId: analysis.id,
+            dashboardDataRange
+        };
+
+        rebuiltPivotWidgets.push(pivotWidget);
+
+        // Backfill the analysis so the next save has stable,
+        // explicit Dashboard linkage.
+        analysis.dashboardWidgetId = widgetId;
+        analysis.dashboardChartId = chartId;
+        analysis.dashboardDataRange = dashboardDataRange;
+        analysis.sourceSheetId = source.sheetId;
+    }
+
+    // ---------------------------------------------------------
+    // 2. Rebuild DIRECT widgets from the remaining Dashboard
+    //    native charts.
+    // ---------------------------------------------------------
+    const directWidgets: DashboardWidgetMetadata[] = [];
+
+    for (const chart of dashboardCharts) {
+        if (matchedPivotCharts.has(chart)) {
+            continue;
+        }
+
+        const chartId =
+            String(chart?.id ?? '').trim() || undefined;
+
+        const chartRange =
+            String(chart?.range ?? '').trim();
+
+        const sourceSheetName =
+            this.getChartReferencedSheetNames(chartRange)
+                .find(name => name !== 'Dashboard');
+
+        // A Dashboard-local helper range without a matching
+        // sheetAnalysis is not safe to classify as DIRECT.
+        if (!sourceSheetName) {
+            continue;
+        }
+
+        const source =
+            this.getSpreadsheetSheetIdentity(sourceSheetName);
+
+        const previous = this.dashboardWidgets.find(
+            widget =>
+                widget.sourceType === 'DIRECT' &&
+                (
+                    (chartId && widget.chartId === chartId) ||
+                    (
+                        widget.sourceSheetName === source.sheetName &&
+                        widget.sourceRange === chartRange
+                    )
+                )
+        );
+
+        directWidgets.push({
+            id:
+                previous?.id ??
+                Date.now() +
+                    rebuiltPivotWidgets.length +
+                    directWidgets.length,
+            dashboardSheetName: 'Dashboard',
+            chartId,
+            chartTitle: String(chart?.title ?? ''),
+            chartType: String(chart?.type ?? 'Column'),
+            sourceType: 'DIRECT',
+            sourceSheetId: source.sheetId,
+            sourceSheetName: source.sheetName,
+            sourceRange: chartRange
+        });
+    }
+
+    this.dashboardWidgets = [
+        ...rebuiltPivotWidgets,
+        ...directWidgets
+    ];
+}
+
+get activeDashboardWidgetCount(): number {
+    if (!this.spreadsheet) return 0;
+    const sheet: any = this.spreadsheet.getActiveSheet?.();
+    return this.getDashboardWidgetsForSheet(sheet).length;
+}
+
+private getDashboardWidgetsForSheet(sheet: any): DashboardWidgetMetadata[] {
+    if (!sheet) return [];
+    return this.dashboardWidgets.filter(w =>
+        (w.sourceSheetId != null && sheet.id != null && Number(w.sourceSheetId) === Number(sheet.id)) ||
+        String(w.sourceSheetName ?? '') === String(sheet.name ?? '')
+    );
 }
 
 private getChartReferencedSheetNames(range: string): string[] {
@@ -2577,9 +2998,13 @@ onSpreadsheetCreated(): void {
     const spreadsheet: any =
         this.spreadsheet as any;
 
-    // Add Siiwii command inside Syncfusion's native Insert ribbon.
+    // Sheet tabs must always remain visible.
+    if ('showSheetTabs' in spreadsheet) {
+        spreadsheet.showSheetTabs = true;
+    }
+
+    // Add Siiwii List inside Syncfusion's native Insert ribbon.
     this.addSpreadsheetDataSourceRibbonCommand();
-    this.bindSpreadsheetDataSourceRibbonClick();
 
     /*
      * These are also exposed as template bindings. Setting them here keeps
@@ -2600,16 +3025,17 @@ onSpreadsheetCreated(): void {
     // Capture Syncfusion sheet ids so metadata survives sheet renames.
     this.syncSheetDataSourceIdentity();
 
-    // Start watching tab changes BEFORE the early return used while reopening
-    // a saved workbook. This is what keeps the Applied Filters UI in sync.
+    // Keep Applied Filters/source metadata synced when sheet tabs change.
     this.startSpreadsheetSheetWatcher();
 
     setTimeout(() => {
         this.syncActiveSheetSourceToUi();
+
+        // Important when Spreadsheet is rendered inside PrimeNG dialog.
+        this.spreadsheet?.resize();
     }, 0);
 
-    // this.spreadsheet.freezePanes(1, 0);
-
+    // When opening saved JSON, formatting/data already comes from workbook JSON.
     if (this.isOpeningSavedSpreadsheet) {
         return;
     }
@@ -2619,8 +3045,7 @@ onSpreadsheetCreated(): void {
     }
 
     /*
-     * Format only the header. Do not format A1:L50000, which would create a
-     * large amount of cell/style work.
+     * Format only the header. Do not format A1:L50000.
      */
     this.spreadsheet.cellFormat(
         {
@@ -2631,19 +3056,21 @@ onSpreadsheetCreated(): void {
         'Transactions!A1:L1'
     );
 
-    const transactionsIndex = this.spreadsheet.sheets.findIndex(
-        (sheet: any) => sheet?.name === 'Transactions'
-    );
+    const transactionsIndex =
+        this.spreadsheet.sheets.findIndex(
+            (sheet: any) =>
+                sheet?.name === 'Transactions'
+        );
 
     if (transactionsIndex >= 0) {
-        this.spreadsheet.activeSheetIndex = transactionsIndex;
+        this.spreadsheet.activeSheetIndex =
+            transactionsIndex;
     }
 
-    this.spreadsheet.selectRange('Transactions!A1');
+    this.spreadsheet.selectRange(
+        'Transactions!A1'
+    );
 
-    /*
-     * Resize once after creation, never once per row/batch.
-     */
     setTimeout(() => {
         this.spreadsheet?.resize();
     });
@@ -2652,7 +3079,6 @@ onSpreadsheetCreated(): void {
 
     closeSpreadsheet(): void {
         this.stopSpreadsheetSheetWatcher();
-        this.unbindSpreadsheetDataSourceRibbonClick();
         this.showSpreadsheetDataPanel = false;
         this.showSpreadsheetDialog = false;
     }
@@ -3202,6 +3628,7 @@ private openRecordsInSpreadsheet(
 
     // NEW
     this.sheetAnalyses = [];
+    this.dashboardWidgets = [];
 
 
     this.currentSpreadsheetSource = {
@@ -3859,6 +4286,7 @@ saveSpreadsheetLocal(): void {
             // workbook with the chart overlays that are actually visible on
             // Dashboard before persisting it.
             workbook = this.reconcileDashboardChartsBeforeSave(workbook);
+            this.rebuildDashboardWidgetMetadata(workbook);
 
             const existing: SavedSpreadsheet[] =
                 JSON.parse(
@@ -3902,6 +4330,13 @@ saveSpreadsheetLocal(): void {
         JSON.parse(
             JSON.stringify(
                 this.sheetAnalyses
+            )
+        ),
+
+    dashboardWidgets:
+        JSON.parse(
+            JSON.stringify(
+                this.dashboardWidgets
             )
         )
 };
@@ -3955,6 +4390,13 @@ saveSpreadsheetLocal(): void {
         JSON.parse(
             JSON.stringify(
                 this.sheetAnalyses
+            )
+        ),
+
+    dashboardWidgets:
+        JSON.parse(
+            JSON.stringify(
+                this.dashboardWidgets
             )
         )
 };
@@ -4053,6 +4495,10 @@ openSavedSpreadsheet(saved: SavedSpreadsheet): void {
         JSON.stringify(
             saved.sheetAnalyses ?? []
         )
+    );
+
+    this.dashboardWidgets = JSON.parse(
+        JSON.stringify(saved.dashboardWidgets ?? [])
     );
 
     this.isOpeningSavedSpreadsheet = true;
@@ -4559,11 +5005,16 @@ saveCurrentSheetAnalysis(): void {
             item => item.sheetName === sheetName
         );
 
+    const sourceIdentity = this.getSpreadsheetSheetIdentity(sheetName);
+
     const analysis: SavedSheetAnalysis = {
         ...(existingAnalysis ?? {}),
+        id: existingAnalysis?.id ?? Date.now(),
         sheetName,
-        dashboardWidgetId:
-            existingAnalysis?.dashboardWidgetId,
+        sourceSheetId: sourceIdentity.sheetId,
+        dashboardWidgetId: existingAnalysis?.dashboardWidgetId,
+        dashboardChartId: existingAnalysis?.dashboardChartId,
+        dashboardDataRange: existingAnalysis?.dashboardDataRange,
 
         pivot: {
             rows: this.serializePivotFields(
@@ -4781,6 +5232,9 @@ async refreshSpreadsheetData(): Promise<void> {
     const activeSheetName =
         activeSheet?.name;
 
+    const affectedDashboardWidgets =
+        this.getDashboardWidgetsForSheet(activeSheet);
+
     if (!activeSheetName) {
         this.notify.warn('Active Spreadsheet tab is not available.');
         return;
@@ -4989,6 +5443,14 @@ async refreshSpreadsheetData(): Promise<void> {
          */
         await this.yieldToBrowser();
         await this.refreshCurrentPivotAfterSpreadsheetRefresh();
+
+        // DIRECT native charts remain bound to their source range, so Syncfusion
+        // redraws them from the refreshed cells. PIVOT widgets are identified by
+        // explicit metadata and can be selectively rebuilt without touching others.
+        if (affectedDashboardWidgets.length) {
+            console.log('[Spreadsheet Refresh] affected Dashboard widgets:', affectedDashboardWidgets);
+            this.refreshSpreadsheetLayout();
+        }
 
         this.persistRefreshedSpreadsheet(
             displayedRecordCount
@@ -5656,6 +6118,9 @@ private persistRefreshedSpreadsheet(
         )
         .then((workbook: any) => {
 
+            workbook = this.reconcileDashboardChartsBeforeSave(workbook);
+            this.rebuildDashboardWidgetMetadata(workbook);
+
             const existing:
                 SavedSpreadsheet[] =
                 JSON.parse(
@@ -5700,6 +6165,13 @@ private persistRefreshedSpreadsheet(
                     JSON.parse(
                         JSON.stringify(
                             this.sheetAnalyses
+                        )
+                    ),
+
+                dashboardWidgets:
+                    JSON.parse(
+                        JSON.stringify(
+                            this.dashboardWidgets
                         )
                     )
             };
@@ -5783,13 +6255,30 @@ interface SavedSpreadsheet {
     sheetDataSources?: SpreadsheetSheetDataSource[];
 
     sheetAnalyses?: SavedSheetAnalysis[];
+    dashboardWidgets?: DashboardWidgetMetadata[];
 }
 
+interface DashboardWidgetMetadata {
+    id: number;
+    dashboardSheetName: string;
+    chartId?: string;
+    chartTitle?: string;
+    chartType?: string;
+    sourceType: 'DIRECT' | 'PIVOT';
+    sourceSheetId?: number;
+    sourceSheetName: string;
+    sourceRange?: string;
+    analysisId?: number;
+    dashboardDataRange?: string;
+}
 
 interface SavedSheetAnalysis {
     id?: number;
     sheetName: string;
+    sourceSheetId?: number;
     dashboardWidgetId?: number;
+    dashboardChartId?: string;
+    dashboardDataRange?: string;
 
     pivot: {
         rows: any[];

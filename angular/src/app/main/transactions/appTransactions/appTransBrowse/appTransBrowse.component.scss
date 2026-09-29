@@ -226,12 +226,131 @@
 
 
 :host ::ng-deep
-.transaction-spreadsheet-dialog
-.p-dialog-content {
+.transaction-spreadsheet-dialog {
+
+    .p-dialog {
+        display: flex;
+        flex-direction: column;
+        max-height: 85vh;
+    }
+
+    .p-dialog-header {
+        flex: 0 0 auto;
+    }
+
+    .p-dialog-content {
+        flex: 1 1 auto;
+        min-height: 0;
+
+        display: flex;
+        flex-direction: column;
+
+        padding: 0 !important;
+        // overflow: hidden !important;
+    }
+}
+
+
+/* =========================================
+   Spreadsheet page
+   ========================================= */
+
+.spreadsheet-page {
     display: flex;
     flex-direction: column;
-    overflow: hidden !important;
+
+    flex: 1 1 auto;
+
+    min-height: 0;
+    width: 100%;
 }
+
+
+/* =========================================
+   Actions
+   ========================================= */
+
+.spreadsheet-actions {
+    flex: 0 0 auto;
+
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+
+    gap: 8px;
+
+    padding: 10px 15px;
+
+    border-bottom: 1px solid #ddd;
+}
+
+
+/* =========================================
+   Filters
+   ========================================= */
+
+.spreadsheet-filter-summary {
+    // flex: 0 0 auto;
+
+    padding: 12px 16px;
+
+    background: #f8f9fa;
+
+    border: 1px solid #e7e7e7;
+    border-radius: 6px;
+}
+
+
+/* =========================================
+   Spreadsheet workspace
+   ========================================= */
+
+.spreadsheet-workspace {
+    flex: 1 1 0;
+
+    display: flex;
+
+    min-height: 0;
+    width: 100%;
+
+    // overflow: hidden;
+}
+
+
+/* =========================================
+   Spreadsheet canvas
+   ========================================= */
+
+.spreadsheet-canvas {
+    flex: 1 1 auto;
+
+    min-width: 0;
+    min-height: 0;
+
+    height: 100%;
+
+    // overflow: hidden;
+
+    transition: width .15s ease;
+}
+
+
+/* =========================================
+   Syncfusion
+   ========================================= */
+
+:host ::ng-deep
+.spreadsheet-canvas > ejs-spreadsheet {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+
+/* IMPORTANT:
+   Do NOT add height:100% to .e-sheet
+   Do NOT hide .e-sheet-tab-panel
+*/
 
 .spreadsheet-page {
     display: flex;
@@ -256,7 +375,7 @@
     flex: 1 1 auto;
     min-height: 0;
     width: 100%;
-    overflow: hidden;
+    // overflow: hidden;
 }
 
 .spreadsheet-record-count {
@@ -264,13 +383,7 @@
     color: #777;
 }
 
-:host ::ng-deep .spreadsheet-container .e-spreadsheet {
-    height: 100% !important;
-}
 
-:host ::ng-deep .spreadsheet-container .e-sheet {
-    height: 100% !important;
-}
 
 .spreadsheet-filter-summary {
     padding: 12px 16px;
@@ -317,7 +430,7 @@
 
     .p-dialog {
         border-radius: 14px !important;
-        overflow: hidden;
+        // overflow: hidden;
     }
 
     .p-dialog-header {
@@ -334,7 +447,7 @@
 
     .p-dialog-content {
         padding: 0 !important;
-        overflow: hidden !important;
+        // overflow: hidden !important;
         background: #f8f9fb;
     }
 }
@@ -567,7 +680,7 @@
     padding:
         14px 18px 18px;
 
-    overflow: hidden;
+    // overflow: hidden;
 
     background:
         #f8f9fb;
@@ -881,24 +994,6 @@
 }
 
 
-/* =========================================================
-   CHART
-   ========================================================= */
-
-// :host ::ng-deep
-// .pivot-native-builder
-// .e-pivotchart {
-
-//     margin-top:
-//         12px !important;
-
-//     padding:
-//         10px !important;
-
-//     background:
-//         #ffffff;
-// }
-
 
 /* =========================================================
    RESPONSIVE
@@ -960,6 +1055,9 @@
    
     display: none !important;
 }
+body .p-dialog .p-dialog-content {
+    padding: 0 !important;
+}
 
 
 
@@ -967,58 +1065,6 @@
 
 
 
-// :host ::ng-deep
-// .pivot-native-builder
-// .e-pivotchart {
-//     height: 300px !important;
-//     max-height: 300px !important;
-//     min-height: 300px !important;
-
-//     overflow: hidden !important;
-// }
-
-// :host ::ng-deep
-// .pivot-native-builder
-// .e-pivotchart
-// .e-chart {
-//     height: 300px !important;
-//     max-height: 300px !important;
-//     min-height: 300px !important;
-// }
-
-// :host ::ng-deep
-// .pivot-native-builder
-// .e-pivotchart
-// .e-chart
-// svg {
-//     height: 300px !important;
-//     max-height: 300px !important;
-// }
-
-:host ::ng-deep
-.pivot-native-builder .e-pivotchart {
-    height: 280px !important;
-    max-height: 280px !important;
-    min-height: 280px !important;
-    overflow: hidden !important;
-}
-
-:host ::ng-deep
-.pivot-native-builder .e-pivotchart .e-chart {
-    height: 280px !important;
-    max-height: 280px !important;
-}
-
-:host ::ng-deep
-.pivot-native-builder .e-pivotchart svg {
-    height: 280px !important;
-    max-height: 280px !important;
-}
-
-:host ::ng-deep
-.pivot-native-builder .e-pivotview {
-    height: auto !important;
-}
 
 .spreadsheet-loading-status {
     padding: 8px 14px;

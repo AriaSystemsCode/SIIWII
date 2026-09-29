@@ -1505,17 +1505,21 @@
     [modal]="true"
     header="Transaction Spreadsheet"
     appendTo="body"
-       [style]="{
+
+    [style]="{
         width: '85vw',
-        height: '85vh',
-        margin: '20px'
+        height: '85vh'
     }"
-      [contentStyle]="{
+
+    [contentStyle]="{
         padding: '0',
-        height: 'calc(95vh - 58px)',
+        overflow: 'hidden',
         display: 'flex',
         flexDirection: 'column'
     }"
+
+    styleClass="transaction-spreadsheet-dialog"
+
     (onHide)="closeSpreadsheet()">
 
     <div class="spreadsheet-page">
@@ -1583,8 +1587,13 @@
     {{ refreshingSpreadsheet ? 'Refreshing...' : 'Refresh' }}
 </button>
 
-          
-
+<span *ngIf="activeDashboardWidgetCount > 0"
+      class="badge badge-light ml-2"
+      title="Dashboard charts linked to the active tab">
+    <i class="fa fa-link mr-1"></i>
+    {{ activeDashboardWidgetCount }}
+    Dashboard chart{{ activeDashboardWidgetCount === 1 ? '' : 's' }}
+</span>
 
             <span class="ml-auto text-muted">
 
@@ -1603,9 +1612,9 @@
         <!-- ===================================== -->
 
         <div
-            class="spreadsheet-filter-summary
-                   mx-3
-                   mb-3"
+            class="spreadsheet-filter-summary d-flex
+                   mx-3 mb-2
+                  "
             *ngIf="
                 getAppliedSpreadsheetFilters()
                     .length > 0
@@ -1616,10 +1625,10 @@
                     d-flex
                     align-items-center
                     justify-content-between
-                    mb-2
+                   
                 ">
 
-                <h6
+                <span
                     class="
                         mb-0
                         font-weight-bold
@@ -1627,7 +1636,7 @@
 
                     Applied Filters
 
-                </h6>
+                </span>:
 
 
                 <span
@@ -1735,22 +1744,25 @@
         <!-- ===================================== -->
         <!-- SPREADSHEET -->
         <!-- ===================================== -->
-<div
-    class="spreadsheet-workspace"
-    style="display:flex; flex:1 1 auto; min-height:0; width:100%; overflow:hidden;">
+<div class="spreadsheet-workspace">
 
-    <!-- Syncfusion Spreadsheet -->
     <div
         class="spreadsheet-canvas"
-        [style.width]="showSpreadsheetDataPanel ? 'calc(100% - 340px)' : '100%'"
-        style="min-width:0; height:100%; transition:width .15s ease;">
+        [style.width]="
+            showSpreadsheetDataPanel
+                ? 'calc(100% - 340px)'
+                : '100%'
+        ">
 
         <ejs-spreadsheet
             *ngIf="showSpreadsheetDialog"
             #spreadsheet
-            height="100%"
+
+            height="520px"
             width="100%"
+
             [sheets]="sheets"
+
             [allowChart]="true"
             [allowInsert]="true"
             [allowDelete]="true"
@@ -1758,40 +1770,62 @@
             [allowResizing]="true"
             [allowSorting]="true"
             [allowFiltering]="true"
+
             [allowOpen]="true"
             [allowSave]="true"
             [allowScrolling]="true"
+
             [scrollSettings]="spreadsheetScrollSettings"
             [showAggregate]="spreadsheetShowAggregate"
+
             [openUrl]="spreadsheetOpenUrl"
             [saveUrl]="spreadsheetSaveUrl"
-                [enableClipboard]="true"
-    [enableKeyboardShortcut]="true"
+
+            [enableClipboard]="true"
+            [enableKeyboardShortcut]="true"
             [enableContextMenu]="true"
+
             [showRibbon]="true"
             [showFormulaBar]="true"
             [showSheetTabs]="true"
+
             (created)="onSpreadsheetCreated()"
             (ribbonClick)="onSpreadsheetRibbonClick($event)"
             (beforeSave)="beforeSpreadsheetSave($event)">
         </ejs-spreadsheet>
+
     </div>
 
+
     <!-- ================================================= -->
-    <!-- SIIWII DATA SOURCE DESIGNER - ODOO STYLE SIDEBAR -->
-    <!-- Open from Syncfusion: Insert -> Data Source        -->
+    <!-- SIIWII LIST CUSTOM PANEL                           -->
+    <!-- Opened from Syncfusion Insert -> Siiwii List      -->
     <!-- ================================================= -->
     <aside
         *ngIf="showSpreadsheetDataPanel"
         class="data-source-panel"
-        style="width:340px; min-width:340px; height:100%; background:#fff; border-left:1px solid #ddd; overflow-y:auto; box-shadow:-3px 0 10px rgba(0,0,0,.06);">
+        style="
+            width: 340px;
+            min-width: 340px;
+            height: 520px;
+            background: #fff;
+            border-left: 1px solid #ddd;
+            overflow-y: auto;
+            box-shadow: -3px 0 10px rgba(0,0,0,.06);
+        ">
 
         <div
             class="d-flex align-items-center justify-content-between px-3 py-3 border-bottom"
-            style="position:sticky; top:0; background:#fff; z-index:3;">
+            style="position: sticky; top: 0; background: #fff; z-index: 3;">
+
             <div>
-                <div class="font-weight-bold" style="font-size:16px;">New Siiwii List</div>
-                <small class="text-muted">Insert application data into a new tab</small>
+                <div class="font-weight-bold" style="font-size: 16px;">
+                    New Siiwii List
+                </div>
+
+                <small class="text-muted">
+                    Insert application data into a new sheet
+                </small>
             </div>
 
             <button
@@ -1804,96 +1838,111 @@
         </div>
 
         <div class="p-3">
-            <!-- ENTITY -->
-            <div class="form-group mb-4">
-                <label class="font-weight-bold mb-2">Entity</label>
 
-                <p-dropdown
-                    [options]="spreadsheetEntityDefinitions"
-                    [(ngModel)]="selectedAddDataEntityKey"
-                    optionLabel="displayName"
-                    optionValue="sourceKey"
-                    placeholder="Choose entity..."
-                    appendTo="body"
-                    [style]="{ width: '100%' }"
-                    (onChange)="onSpreadsheetEntityDropdownChange($event.value)">
-                </p-dropdown>
-            </div>
+            <!-- STEP 1: ENTITY -->
+            <ng-container *ngIf="addDataStep === 1">
 
-            <ng-container *ngIf="addDataDefinition">
-                <!-- COLUMNS -->
-                <div class="mb-4">
-                    <div class="d-flex align-items-center justify-content-between mb-2">
-                        <label class="font-weight-bold mb-0">Columns</label>
+                <div class="form-group mb-3">
+                    <label class="font-weight-bold mb-2">
+                        Entity
+                    </label>
 
-                        <div>
-                            <button
-                                type="button"
-                                class="btn btn-link btn-sm p-0 mr-2"
-                                (click)="selectAllAddDataColumns()">
-                                All
-                            </button>
-                            <button
-                                type="button"
-                                class="btn btn-link btn-sm p-0"
-                                (click)="clearAddDataColumns()">
-                                Clear
-                            </button>
-                        </div>
+                    <p-dropdown
+                        [options]="spreadsheetEntityDefinitions"
+                        [(ngModel)]="selectedAddDataEntityKey"
+                        optionLabel="displayName"
+                        optionValue="sourceKey"
+                        placeholder="Select entity"
+                        [showClear]="true"
+                        appendTo="body"
+                        styleClass="w-100"
+                        (onChange)="onSpreadsheetEntityDropdownChange($event.value)">
+                    </p-dropdown>
+                </div>
+
+                <div class="text-muted small">
+                    Select the Siiwii entity you want to insert into the workbook.
+                </div>
+
+            </ng-container>
+
+            <!-- STEP 2: COLUMNS + FILTERS -->
+            <ng-container *ngIf="addDataStep === 2 && addDataDefinition">
+
+                <button
+                    type="button"
+                    class="btn btn-link p-0 mb-3"
+                    (click)="backToSpreadsheetEntitySelection()">
+                    <i class="fa fa-arrow-left mr-1"></i>
+                    Change entity
+                </button>
+
+                <div class="mb-3">
+                    <div class="font-weight-bold">
+                        {{ addDataDefinition.displayName }}
                     </div>
 
-                    <div class="border rounded" style="max-height:280px; overflow-y:auto;">
-                        <label
-                            *ngFor="let column of addDataDefinition.columns"
-                            class="d-flex align-items-center px-3 py-2 mb-0 border-bottom"
-                            style="cursor:pointer; min-height:42px;">
-
-                            <input
-                                type="checkbox"
-                                class="mr-2"
-                                [checked]="isAddDataColumnSelected(column.key)"
-                                (change)="toggleAddDataColumnEvent(column.key, $event)" />
-
-                            <span>{{ column.label }}</span>
-
-                            <small class="text-muted ml-auto">{{ column.type }}</small>
-                        </label>
-                    </div>
-
-                    <small class="text-muted d-block mt-1">
-                        {{ selectedAddDataColumns.length }} column(s) selected
+                    <small class="text-muted">
+                        Choose columns and optional filters.
                     </small>
                 </div>
 
-                <!-- FILTERS -->
-                <div class="mb-4">
-                    <label class="font-weight-bold mb-2">Filters</label>
+                <!-- Columns -->
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <label class="font-weight-bold mb-0">
+                        Columns
+                    </label>
 
-                    <div *ngFor="let filter of addDataDefinition.filters" class="form-group mb-3">
-                        <label class="small mb-1">{{ filter.label }}</label>
+                    <div>
+                        <button
+                            type="button"
+                            class="btn btn-link btn-sm p-0 mr-2"
+                            (click)="selectAllAddDataColumns()">
+                            Select all
+                        </button>
+
+                        <button
+                            type="button"
+                            class="btn btn-link btn-sm p-0"
+                            (click)="clearAddDataColumns()">
+                            Clear
+                        </button>
+                    </div>
+                </div>
+
+                <div class="border rounded p-2 mb-4">
+                    <label
+                        *ngFor="let column of addDataDefinition.columns"
+                        class="d-flex align-items-center mb-2"
+                        style="cursor: pointer;">
 
                         <input
-                            *ngIf="filter.type === 'string'"
-                            type="text"
-                            class="form-control"
-                            [(ngModel)]="addDataFilters[filter.key]"
-                            [placeholder]="filter.label" />
+                            type="checkbox"
+                            class="mr-2"
+                            [checked]="isAddDataColumnSelected(column.key)"
+                            (change)="toggleAddDataColumnEvent(column.key, $event)" />
 
-                        <input
-                            *ngIf="filter.type === 'number'"
-                            type="number"
-                            class="form-control"
-                            [(ngModel)]="addDataFilters[filter.key]"
-                            [placeholder]="filter.label" />
+                        <span>
+                            {{ column.label }}
+                        </span>
+                    </label>
+                </div>
 
-                        <input
-                            *ngIf="filter.type === 'date'"
-                            type="text"
-                            class="form-control"
-                            bsDatepicker
-                            [(ngModel)]="addDataFilters[filter.key]"
-                            [placeholder]="filter.label" />
+                <!-- Filters -->
+                <div *ngIf="addDataDefinition.filters?.length">
+                    <label class="font-weight-bold mb-2">
+                        Filters
+                    </label>
 
+                    <div
+                        *ngFor="let filter of addDataDefinition.filters"
+                        class="form-group">
+
+                        <label class="small mb-1">
+                            {{ filter.label }}
+                        </label>
+
+                        <!-- Status lookup -->
                         <p-dropdown
                             *ngIf="filter.type === 'statusLookup'"
                             [options]="filterStatus"
@@ -1903,62 +1952,92 @@
                             placeholder="Any"
                             [showClear]="true"
                             appendTo="body"
-                            [style]="{ width: '100%' }">
+                            styleClass="w-100">
                         </p-dropdown>
 
+                        <!-- Boolean -->
                         <div
                             *ngIf="filter.type === 'boolean'"
-                            class="custom-control custom-switch">
+                            class="form-check">
+
                             <input
                                 type="checkbox"
-                                class="custom-control-input"
-                                [id]="'spreadsheet-filter-' + filter.key"
+                                class="form-check-input"
+                                [id]="'siiwii-filter-' + filter.key"
                                 [(ngModel)]="addDataFilters[filter.key]" />
+
                             <label
-                                class="custom-control-label"
-                                [for]="'spreadsheet-filter-' + filter.key">
-                                Yes
+                                class="form-check-label"
+                                [for]="'siiwii-filter-' + filter.key">
+                                {{ filter.label }}
                             </label>
                         </div>
-                    </div>
 
-                    <div
-                        *ngIf="!addDataDefinition.filters?.length"
-                        class="text-muted small">
-                        No filters available for this entity.
+                        <!-- Date -->
+                        <input
+                            *ngIf="filter.type === 'date'"
+                            type="date"
+                            class="form-control"
+                            [(ngModel)]="addDataFilters[filter.key]" />
+
+                        <!-- Number -->
+                        <input
+                            *ngIf="filter.type === 'number'"
+                            type="number"
+                            class="form-control"
+                            [(ngModel)]="addDataFilters[filter.key]" />
+
+                        <!-- Text -->
+                        <input
+                            *ngIf="
+                                filter.type !== 'statusLookup' &&
+                                filter.type !== 'boolean' &&
+                                filter.type !== 'date' &&
+                                filter.type !== 'number'
+                            "
+                            type="text"
+                            class="form-control"
+                            [(ngModel)]="addDataFilters[filter.key]"
+                            [placeholder]="filter.label" />
+
                     </div>
                 </div>
 
-                <div
-                    *ngIf="addDataDefinition.sourceKey === 'ITEMS'"
-                    class="alert alert-info py-2 small">
-                    Items UI metadata is ready. Connect the Items service proxy to load real Item rows.
+                <div class="border-top pt-3 mt-3">
+                    <button
+                        type="button"
+                        class="btn btn-primary btn-block"
+                        [disabled]="
+                            addingSpreadsheetData ||
+                            selectedAddDataColumns.length === 0
+                        "
+                        (click)="insertConfiguredDataAsNewTab()">
+
+                        <i
+                            *ngIf="addingSpreadsheetData"
+                            class="fa fa-spinner fa-spin mr-2">
+                        </i>
+
+                        <i
+                            *ngIf="!addingSpreadsheetData"
+                            class="fa fa-plus mr-2">
+                        </i>
+
+                        {{
+                            addingSpreadsheetData
+                                ? 'Adding...'
+                                : 'Add as New Sheet'
+                        }}
+                    </button>
                 </div>
 
-                <!-- INSERT -->
-                <button
-                    type="button"
-                    class="btn btn-primary btn-block"
-                    [disabled]="addingSpreadsheetData || selectedAddDataColumns.length === 0"
-                    (click)="insertConfiguredDataAsNewTab()">
-                    <i
-                        class="fa mr-1"
-                        [ngClass]="addingSpreadsheetData ? 'fa-spinner fa-spin' : 'fa-plus'">
-                    </i>
-                    {{ addingSpreadsheetData ? 'Loading...' : 'Insert as New Tab' }}
-                </button>
             </ng-container>
 
-            <div
-                *ngIf="!addDataDefinition"
-                class="text-center text-muted py-5">
-                <i class="fa fa-database fa-2x mb-3 d-block"></i>
-                Choose an entity to configure its columns and filters.
-            </div>
         </div>
-    </aside>
-</div>
 
+    </aside>
+
+</div>
     </div>
 
 </p-dialog>
