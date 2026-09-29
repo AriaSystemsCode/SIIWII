@@ -464,7 +464,38 @@ a.nav-link.active {
 }
 
 .photo-selector-col {
+  width: min(360px, 100%);
+  max-width: 100%;
+  min-width: 0;
   border-radius: 10px;
+}
+
+:host ::ng-deep .attachment-option-dropdown {
+  width: 100%;
+  max-width: 100%;
+}
+
+:host ::ng-deep .attachment-option-dropdown .p-dropdown-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+:host ::ng-deep .attachment-option-panel .p-dropdown-item {
+  overflow: hidden;
+}
+
+:host ::ng-deep .attachment-option-panel .attachment-option-label {
+  display: block;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+:host ::ng-deep .attachment-option-panel-rtl {
+  direction: rtl;
+  text-align: right;
 }
 
 .upload-dropzone {
