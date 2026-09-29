@@ -7434,7 +7434,7 @@ namespace onetouch.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("RecipientContactSSIN")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("RecipientContactTypeCode")
                         .HasColumnType("nvarchar(max)");
@@ -7458,7 +7458,7 @@ namespace onetouch.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("RequesterContactSSIN")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("RequesterContactTypeCode")
                         .HasColumnType("nvarchar(max)");
@@ -7471,6 +7471,10 @@ namespace onetouch.Migrations
 
                     b.Property<int>("SharingLevel")
                         .HasColumnType("int");
+
+                    b.HasIndex("RecipientContactSSIN");
+
+                    b.HasIndex("RequesterContactSSIN");
 
                     b.ToTable("AppContactRelationshipInfo", t =>
                         {

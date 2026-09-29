@@ -81736,6 +81736,7 @@ export interface IExtraAttribute {
 }
 
 export class AppItemForViewDto implements IAppItemForViewDto {
+    ssin!: string | undefined;
     shipDate!: string;
     soldOutDate!: string;
     materialContent!: string | undefined;
@@ -81811,6 +81812,7 @@ export class AppItemForViewDto implements IAppItemForViewDto {
                 if (_data.hasOwnProperty(property))
                     this[property] = _data[property];
             }
+            this.ssin = _data["ssin"];
             this.shipDate = _data["shipDate"];
             this.soldOutDate = _data["soldOutDate"];
             this.materialContent = _data["materialContent"];
@@ -81964,6 +81966,7 @@ export class AppItemForViewDto implements IAppItemForViewDto {
             if (this.hasOwnProperty(property))
                 data[property] = this[property];
         }
+        data["ssin"] = this.ssin;
         data["shipDate"] = this.shipDate;
         data["soldOutDate"] = this.soldOutDate;
         data["materialContent"] = this.materialContent;
@@ -82106,6 +82109,7 @@ export class AppItemForViewDto implements IAppItemForViewDto {
 }
 
 export interface IAppItemForViewDto {
+    ssin: string | undefined;
     shipDate: string;
     soldOutDate: string;
     materialContent: string | undefined;
@@ -95652,6 +95656,8 @@ export interface IShareTransactionByMessageResultDto {
 export class TenantContactRole implements ITenantContactRole {
     contactRole!: string | undefined;
     contactName!: string | undefined;
+    contactEmail!: string | undefined;
+    contactPhoneNumber!: string | undefined;
 
     [key: string]: any;
 
@@ -95672,6 +95678,8 @@ export class TenantContactRole implements ITenantContactRole {
             }
             this.contactRole = _data["contactRole"];
             this.contactName = _data["contactName"];
+            this.contactEmail = _data["contactEmail"];
+            this.contactPhoneNumber = _data["contactPhoneNumber"];
         }
     }
 
@@ -95690,6 +95698,8 @@ export class TenantContactRole implements ITenantContactRole {
         }
         data["contactRole"] = this.contactRole;
         data["contactName"] = this.contactName;
+        data["contactEmail"] = this.contactEmail;
+        data["contactPhoneNumber"] = this.contactPhoneNumber;
         return data;
     }
 }
@@ -95697,6 +95707,8 @@ export class TenantContactRole implements ITenantContactRole {
 export interface ITenantContactRole {
     contactRole: string | undefined;
     contactName: string | undefined;
+    contactEmail: string | undefined;
+    contactPhoneNumber: string | undefined;
 
     [key: string]: any;
 }

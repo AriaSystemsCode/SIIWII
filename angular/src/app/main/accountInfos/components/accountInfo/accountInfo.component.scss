@@ -1875,7 +1875,7 @@ validation-messages {
     .account-field-label,
     .personal-field-label {
 
-        flex: 0 0 22%;
+      //   flex: 0 0 22%;
 
         max-width: 22%;
     }
@@ -2075,7 +2075,7 @@ validation-messages {
 
 .account-field-row .account-field-label,
 .account-field-row > .label-form {
-    flex: 0 0 180px !important;
+   //  flex: 0 0 180px !important;
 
    //  width: 180px !important;
    //  min-width: 180px !important;

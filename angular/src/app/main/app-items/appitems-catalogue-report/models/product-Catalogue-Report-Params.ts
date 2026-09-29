@@ -64,6 +64,8 @@ export class ProductCatalogueReportParams implements ProductCatalogueReportParam
     TransactionId: string="";
     orderConfirmationRole: string="";
     contactName: string="";
+    contactEmail: string="";
+    contactPhoneNumber: string="";
     saveToPDF:boolean= false;
     onlyInStockColors:boolean=false;
     mimimumInStockQty:number=0;
@@ -142,8 +144,10 @@ export class ProductCatalogueReportParams implements ProductCatalogueReportParam
        url += "&DetailPageShowCategory=" + this.DetailPageShowCategory
        url += "&ColorPageShowCategory=" + this.ColorPageShowCategory
        url += "&TransactionId=" + this.TransactionId
-       url += "&orderConfirmationRole=" + this.orderConfirmationRole
-       url += "&contactName=" + this.contactName
+       url += "&orderConfirmationRole=" + encodeURIComponent(this.orderConfirmationRole)
+       url += "&contactName=" + encodeURIComponent(this.contactName)
+       url += "&contactEmail=" + encodeURIComponent(this.contactEmail)
+       url += "&contactPhoneNumber=" + encodeURIComponent(this.contactPhoneNumber)
        url += "&saveToPDF=" + this.saveToPDF
        url += "&onlyInStockColors=" + this.onlyInStockColors
        url += "&mimimumInStockQty=" + this.mimimumInStockQty

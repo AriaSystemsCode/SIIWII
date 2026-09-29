@@ -2,7 +2,7 @@
     <div class="container-fluid orderInfoForm thin-scroll">
         <div class="row mb-3">
             <h6 class="col-6 mt-4  mb-3"><span class="headertxt previewTitle white-space-nowrap"> {{'EnteredBy' |
-                    localize}} : <span class="enterByTxt">{{fullName}}</span></span></h6>
+                    localize}} : <span class="enterByTxt">{{appTransactionsForViewDto?.appTransactionContacts[6].contactName}}</span></span></h6>
             <div class="col-6" *ngIf="!createOrEditorderInfo &&  !showSaveBtn &&  canChange">
                 <button (click)="showEditMode()" class="previewbtn text-center btn float-right">
                     <img src="../../../../../assets/shoppingCart/edit.png" class="imgIcon" />

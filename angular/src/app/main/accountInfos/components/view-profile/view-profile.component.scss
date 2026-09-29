@@ -620,26 +620,53 @@ small {
 
 .profileInfo_container p-multiselect,
 .profileInfo_container p-multiSelect {
-    width: 100%;
+    // width: 100%;
 
-    max-width: 520px;
+    // max-width: 520px;
 
-    display: block;
+    // display: block;
+      width: 100% !important;
+    max-width: 520px !important;
+
+    min-height: 46px !important;
+    height: auto !important;
+
+    border: 1px solid #e2e5ec !important;
+    border-radius: 6px !important;
+
+    background: #fff !important;
+
+    display: flex !important;
+    align-items: stretch !important;
 }
 
 
 ::ng-deep
 .profileInfo_container
 .p-multiselect {
-    width: 100% !important;
+    // width: 100% !important;
 
-    max-width: 520px;
+    // max-width: 520px;
 
-    min-height: 42px !important;
+    // min-height: 42px !important;
+
+    // border: 1px solid #e2e5ec !important;
+
+    // border-radius: 6px !important;
+
+      width: 100% !important;
+    max-width: 520px !important;
+
+    min-height: 46px !important;
+    height: auto !important;
 
     border: 1px solid #e2e5ec !important;
-
     border-radius: 6px !important;
+
+    background: #fff !important;
+
+    display: flex !important;
+    align-items: stretch !important;
 }
 
 

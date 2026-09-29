@@ -1245,6 +1245,7 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
     'Color Code',
     'Color Name',
     'SIZE Code', 'SIZE Name', 'Size Scale Name', 'Scale Sizes Order',
+    'Size Ratio Name',
     'Size Ratio Value',
     'Start Ship Date',
     'Dimension 1 sizes',

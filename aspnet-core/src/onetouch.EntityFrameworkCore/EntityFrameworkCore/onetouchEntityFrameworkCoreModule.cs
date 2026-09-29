@@ -57,37 +57,7 @@ namespace onetouch.EntityFrameworkCore
             IocManager.RegisterAssemblyByConvention(typeof(onetouchEntityFrameworkCoreModule).GetAssembly());
         }
 
-        public override void PostInitialize()
-        {
-            var configurationAccessor = IocManager.Resolve<IAppConfigurationAccessor>();
-
-            try
-            {
-                string AriaMasterConnection = configurationAccessor.Configuration["ConnectionStrings:AriaMaster"]?.ToString();
-                if (!string.IsNullOrEmpty(AriaMasterConnection))
-                {
-                    using (var conn = new Microsoft.Data.SqlClient.SqlConnection(AriaMasterConnection))
-                    {
-                        conn.Open();
-                        using (var cmd = new Microsoft.Data.SqlClient.SqlCommand("UPDATE Clients SET IsSeeded = 'False'", conn))
-                        {
-                            cmd.ExecuteNonQuery();
-                        }
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error resetting IsSeeded on startup: {ex.Message}");
-            }
-
-            using (var scope = IocManager.CreateScope())
-            {
-                if (!SkipDbSeed && scope.Resolve<DatabaseCheckHelper>().Exist(configurationAccessor.Configuration["ConnectionStrings:Default"]))
-                {
-                    SeedHelper.SeedHostDb(IocManager);
-                }
-            }
-        }
+        // Database seed data is managed by onetouch.Seeder during deployment.
+        // Web startup and pool recycling must not mutate client databases.
     }
 }

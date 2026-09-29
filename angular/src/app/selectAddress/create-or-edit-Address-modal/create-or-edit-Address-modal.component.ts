@@ -32,7 +32,7 @@ export class CreateOrEditAddressModalComponent extends AppComponentBase {
 
     address: AppAddressDto = new AppAddressDto();
 
-    allCountries: LookupLabelDto[];
+    allCountries: LookupLabelDto[] = [];
     branchId: number
     entityObjectType: string = "ADDRESS";
     addressCode: string = "";
@@ -59,6 +59,9 @@ async show(
     accountId?: number
 ): Promise<void> {
 
+    const effectiveAccountId =
+        accountId ?? this.appSession?.user?.accountId;
+
     this.branchId =
         branch?.node?.data?.branch?.id;
 
@@ -70,7 +73,7 @@ async show(
         new AppAddressDto();
 
     this.address.accountId =
-        accountId;
+        effectiveAccountId;
 
     this.address.name =
         this.accountData?.account?.name ??
@@ -138,7 +141,7 @@ async show(
 
         this._accountsServiceProxy
             .getAccountForView(
-                this.appSession?.user?.accountId,
+                effectiveAccountId,
                 5
             )
             .subscribe(result => {
@@ -179,7 +182,7 @@ async show(
         this.address.code = tenancyName + "-" + this.addressCode;
       
         //  Assign country name if applicable
-        const selectedCountry = this.allCountries.find(c => c.value === this.address.countryId);
+        const selectedCountry = this.allCountries?.find(c => c.value === this.address.countryId);
         this.address.countryIdName = selectedCountry?.label ?? null;
       
         let addNew = this.address.id == null || this.address.id == undefined || this.address.id == 0;
