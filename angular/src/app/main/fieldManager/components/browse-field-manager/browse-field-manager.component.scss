@@ -401,11 +401,6 @@
         overflow: visible !important;
     }
 
-    .p-datatable-tbody > tr:has(.field-action-links.d-block),
-    .p-datatable-tbody > tr:has(.field-action-links.d-block) > td {
-        z-index: 1000;
-    }
-
     .p-datatable-thead > tr > th {
         height: 48px;
         padding: 10px 12px;
@@ -472,13 +467,12 @@
 
 ::ng-deep .field-manager-table .p-datatable-scrollable-header {
     position: relative;
-    z-index: 6;
+    z-index: 2;
 }
 
 ::ng-deep .field-manager-table .p-datatable-scrollable-body {
     max-height: min(62vh, 400px);
     overflow-y: auto !important;
-    overflow-x: hidden !important;
 }
 
 .field-code-column { width: 7%; }
@@ -526,13 +520,9 @@
 }
 
 .field-action-links {
-    position: absolute;
-    right: 35px;
-    top: 44px;
+    position: fixed;
     z-index: 2147483647;
-    display: none;
-    width: auto;
-    min-width: max-content;
+    width: 160px;
     padding: 5px 0;
     border: 1px solid #eee;
     border-radius: 4px;
@@ -541,15 +531,10 @@
     white-space: nowrap;
 }
 
-.field-action-links.d-block {
-    display: block;
-}
-
 .field-action-links button {
     display: block;
-    width: auto;
-    min-width: 100%;
-    padding: 5px 12px;
+    width: 100%;
+    padding: 8px 16px;
     border: 0;
     background: #fff;
     color: #555;

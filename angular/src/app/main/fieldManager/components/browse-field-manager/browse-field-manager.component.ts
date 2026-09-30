@@ -23,6 +23,8 @@ export class BrowseFieldManagerComponent extends AppComponentBase implements OnI
     groupBy = 'none';
     expandedGroups: { [groupValue: string]: boolean } = {};
     activeActionId: number | null = null;
+    activeActionItem: FieldManagerItem | null = null;
+    actionMenuPosition = { top: 0, left: 0 };
     activePanel: 'all' | 'entity' = 'all';
     entityTree: FieldManagerEntityNode[] = [];
     expandedEntityIds: number[] = [];
@@ -88,7 +90,7 @@ export class BrowseFieldManagerComponent extends AppComponentBase implements OnI
         this.selectedEntityId = null;
         this.selectedEntityPath = [];
         this.expandedEntityIds = [];
-        this.activeActionId = null;
+        this.closeActions();
     }
 
     toggleEntity(node: FieldManagerEntityNode, event: MouseEvent): void {
@@ -195,7 +197,32 @@ export class BrowseFieldManagerComponent extends AppComponentBase implements OnI
 
     toggleActions(item: FieldManagerItem, event: MouseEvent): void {
         event.stopPropagation();
-        this.activeActionId = this.activeActionId === item.id ? null : item.id;
+        if (this.activeActionId === item.id) {
+            this.closeActions();
+            return;
+        }
+
+        const trigger = event.currentTarget as HTMLElement;
+        const triggerBounds = trigger.getBoundingClientRect();
+        const scrollBody = trigger.closest('.p-datatable-scrollable-body');
+        const scrollBounds = scrollBody && scrollBody.getBoundingClientRect();
+        const menuWidth = 160;
+        const menuHeight = 96;
+        const availableBelow = Math.min(
+            window.innerHeight,
+            scrollBounds ? scrollBounds.bottom : window.innerHeight
+        ) - triggerBounds.bottom;
+        const openAbove = availableBelow < menuHeight + 8;
+        const top = openAbove
+            ? triggerBounds.top - menuHeight - 4
+            : triggerBounds.bottom + 4;
+
+        this.actionMenuPosition = {
+            top: Math.max(8, Math.min(top, window.innerHeight - menuHeight - 8)),
+            left: Math.max(8, Math.min(triggerBounds.right - menuWidth, window.innerWidth - menuWidth - 8))
+        };
+        this.activeActionItem = item;
+        this.activeActionId = item.id;
     }
 
     /* closeToolbarDropdown(event: KeyboardEvent): void {
@@ -204,17 +231,17 @@ export class BrowseFieldManagerComponent extends AppComponentBase implements OnI
     }
  */
     createNewRevision(item: FieldManagerItem): void {
-        this.activeActionId = null;
+        this.closeActions();
         this.createOrEditFieldManagerModal.show(item.id);
     }
 
     view(item: FieldManagerItem): void {
-        this.activeActionId = null;
+        this.closeActions();
         this.viewFieldManagerModal.show(item);
     }
 
     delete(item: FieldManagerItem): void {
-        this.activeActionId = null;
+        this.closeActions();
         var isConfirmed: Observable<boolean>;
         isConfirmed = this.askToConfirm(
             this.l("AreYouSureYouWantToDeleteThisField?"), 
@@ -243,6 +270,7 @@ export class BrowseFieldManagerComponent extends AppComponentBase implements OnI
     @HostListener('document:click')
     closeActions(): void {
         this.activeActionId = null;
+        this.activeActionItem = null;
     }
 
     private loadItems(): void {
