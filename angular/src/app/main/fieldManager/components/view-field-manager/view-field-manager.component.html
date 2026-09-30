@@ -21,11 +21,15 @@
                     <!-- <div *ngIf="viewState === 'draft'" class="draft-context">Editing a new revision</div> -->
 
                     <div class="revision-toolbar-actions">
+                        <button *ngIf="viewState === 'details' && isViewingHistoryRevision && selectedRevision?.status === 'Previous'"
+                            type="button" class="btn history-action" (click)="restoreRevision()">
+                            <i class="fa fa-undo"></i> Restore Revision
+                        </button>
                         <button *ngIf="viewState === 'details' && !isViewingHistoryRevision" type="button"
                             class="btn  history-action" (click)="goToHistory()">
-                            <i class="fa fa-history"></i> Go to Revision History
+                            <i class="fa fa-history"></i> Revision Log
                         </button>
-                           <button *ngIf="viewState === 'details'" type="button"
+                           <button *ngIf="viewState === 'details' && !isViewingHistoryRevision" type="button"
                             class="btn  revision-primary" (click)="createNewRevision()">
                             <i class="fa fa-plus"></i> Create New Revision
                         </button>
@@ -37,14 +41,14 @@
                 </div>
 
                 <ng-container *ngIf="viewState === 'history'">
-                    <div class="page-heading">
-                       <!--  <div>
+                     <!-- <div class="page-heading">
+                       <div>
                             <span class="eyebrow">FIELD VERSION CONTROL</span>
                             <h2>Revision History</h2>
                             <p>Review previous versions of this field.</p>
-                        </div> -->
+                        </div> 
                         <span class="history-field-name">{{ item.name }} <small>{{ item.code }}</small></span>
-                    </div>
+                    </div>-->
                     <div class="revision-table-card">
                         <div class="revision-table-scroll">
                             <table class="revision-table">
@@ -77,7 +81,7 @@
                             <span class="revision-number">Revision #{{ revisionLabel }}</span>
                             <span class="status-badge" [class.badge-current]="selectedRevision?.status !== 'Previous'"
                                 [class.badge-previous]="selectedRevision?.status === 'Previous'">
-                                <i class="fa fa-1x" [class.fa-check]="selectedRevision.status === 'Current'"></i> {{ selectedRevision?.status === 'Previous' ? 'Previous' : 'Current' }}
+                                <i class="fa fa-1x" [class.fa-check]="selectedRevision?.status === 'Current'"></i> {{ selectedRevision?.status === 'Previous' ? 'Previous' : 'Current' }}
                             </span>
                         </div>
                     </div>
