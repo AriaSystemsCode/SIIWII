@@ -147,14 +147,6 @@
                                                 (click)="toggleActions(item, $event)">
                                                 <span></span><span></span><span></span>
                                             </button>
-                                            <div class="field-action-links" [class.d-block]="activeActionId === item.id"
-                                                style="padding: 8px;">
-                                                <button type="button" style="display: block; width: 100%; padding: 8px 25px;"
-                                                    (click)="view(item)">{{ 'View' | localize }}</button>
-                                                <!-- <button type="button" (click)="createNewRevision(item)">{{ 'CreateNewRevision' | localize }}</button> -->
-                                                <button type="button" style="display: block; width: 100%; padding: 8px 25px;"
-                                                    (click)="delete(item)">{{ 'Delete' | localize }}</button>
-                                            </div>
                                         </td>
                                     </tr>
                                 </ng-template>
@@ -164,6 +156,14 @@
                                     </tr>
                                 </ng-template>
         </p-table>
+    </div>
+
+    <div *ngIf="activeActionItem as actionItem" class="field-action-links"
+        [ngStyle]="{ top: actionMenuPosition.top + 'px', left: actionMenuPosition.left + 'px' }"
+        (click)="$event.stopPropagation()">
+        <button type="button" (click)="view(actionItem)">{{ 'View' | localize }}</button>
+        <!-- <button type="button" (click)="createNewRevision(actionItem)">{{ 'CreateNewRevision' | localize }}</button> -->
+        <button type="button" (click)="delete(actionItem)">{{ 'Delete' | localize }}</button>
     </div>
 
     <div class="field-manager-empty-selection" *ngIf="activePanel === 'entity' && selectedEntityId === null">

@@ -48,6 +48,7 @@ export class ViewFieldManagerComponent extends AppComponentBase implements OnIni
     active = false;
     isViewingHistoryRevision = false;
     private sourceItemId = 0;
+    private currentItem: FieldManagerItem | null = null;
 
     constructor(
         injector: Injector,
@@ -78,11 +79,15 @@ export class ViewFieldManagerComponent extends AppComponentBase implements OnIni
     }
 
     backToFieldDetails(): void {
-        const current = this.fieldManagerService.getById(this.sourceItemId);
+        const current = this.currentItem || this.fieldManagerService.getById(this.sourceItemId);
+        const currentRevision = this.revisions.find(revision => revision.status === 'Current') || null;
         if (current) {
             this.item = this.copyItem(current);
+        } else if (currentRevision) {
+            this.item = this.copyItem(currentRevision.item);
         }
-        this.selectedRevision = null;
+        this.currentItem = this.copyItem(this.item);
+        this.selectedRevision = currentRevision;
         this.viewState = 'details';
         this.isViewingHistoryRevision = false;
     }
@@ -91,7 +96,7 @@ export class ViewFieldManagerComponent extends AppComponentBase implements OnIni
         this.selectedRevision = revision;
         this.item = this.copyItem(revision.item);
         this.viewState = 'details';
-        this.isViewingHistoryRevision = true;
+        this.isViewingHistoryRevision = revision.status === 'Previous';
     }
 
     backToHistory(): void {
@@ -110,6 +115,35 @@ export class ViewFieldManagerComponent extends AppComponentBase implements OnIni
         this.viewState = 'draft';
     }
 
+    restoreRevision(): void {
+        if (!this.selectedRevision || this.selectedRevision.status !== 'Previous') {
+            return;
+        }
+
+        const restoredItem = this.copyItem(this.selectedRevision.item);
+        this.askToConfirm(
+            'A new revision will be created and overwrite current revision.',
+            'Create New Revision',
+            {
+                confirmButtonText: this.l('Yes'),
+                cancelButtonText: this.l('No')
+            }
+        ).subscribe(confirmed => {
+            if (!confirmed) {
+                return;
+            }
+
+            const latestRevision = this.revisions.reduce((latest, revision) => {
+                return Math.max(latest, parseInt(revision.revisionSequence, 10) || 0);
+            }, parseInt(restoredItem.revisionSequence, 10) || 0);
+            const nextRevision = latestRevision + 1;
+            restoredItem.revisionSequence = ('00' + nextRevision).slice(-2);
+            restoredItem.revision = nextRevision;
+            this.item = restoredItem;
+            this.saveRevision();
+        });
+    }
+
     saveRevision(): void {
         if (!this.item.code.trim() || !this.item.name.trim()) {
             return;
@@ -121,6 +155,7 @@ export class ViewFieldManagerComponent extends AppComponentBase implements OnIni
         this.item = this.selectedRevision
             ? this.copyItem(this.selectedRevision.item)
             : this.copyItem(saved);
+        this.currentItem = this.copyItem(this.item);
         this.viewState = 'details';
         this.isViewingHistoryRevision = false;
         this.revisionSaved.emit();
@@ -141,6 +176,7 @@ export class ViewFieldManagerComponent extends AppComponentBase implements OnIni
     private setItem(item: FieldManagerItem): void {
         this.sourceItemId = item.id;
         this.item = this.copyItem(item);
+        this.currentItem = this.copyItem(item);
         this.revisions = this.fieldManagerService.getRevisionHistory(item);
         this.selectedRevision = this.revisions.find(revision => revision.status === 'Current') || null;
         this.viewState = 'details';
