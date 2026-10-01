@@ -34,6 +34,19 @@
 @import "./components/p-multi-select.scss";
 @import "./components/p-dialog";
 
+
+@import '@syncfusion/ej2-base/styles/material.css';
+@import '@syncfusion/ej2-buttons/styles/material.css';
+@import '@syncfusion/ej2-dropdowns/styles/material.css';
+@import '@syncfusion/ej2-grids/styles/material.css';
+@import '@syncfusion/ej2-inputs/styles/material.css';
+@import '@syncfusion/ej2-lists/styles/material.css';
+@import '@syncfusion/ej2-navigations/styles/material.css';
+@import '@syncfusion/ej2-popups/styles/material.css';
+@import '@syncfusion/ej2-splitbuttons/styles/material.css';
+@import '@syncfusion/ej2-pivotview/styles/material.css';
+
+
 .hint {
     font-size: 0.8rem;
     color: $grey-5;
@@ -961,3 +974,14 @@ body p-paginator .p-paginator .p-paginator-element, body p-paginator .p-paginato
     color: #4A0D4A !important;
 }
 
+
+
+.kt-header {
+        background-color: transparent !important;
+    
+    }
+
+
+    .btn.btn-link:focus, .btn.btn-link:hover, .btn.btn-link.active, a.btn.btn-label:focus, a.btn.btn-label:hover, a.btn.btn-label.active, button.btn.btn-label:focus, button.btn.btn-label:hover, button.btn.btn-label.active, input.btn.btn-label:focus, input.btn.btn-label:hover, input.btn.btn-label.active{
+        background-color:  #f7f2f6 !important;
+    }

@@ -1,0 +1,330 @@
+<div class="create-or-edit-spreadsheet-page">
+
+    <!-- ================= HEADER ================= -->
+    <div class="d-flex align-items-center justify-content-between px-3 pt-3 pb-2">
+        <div class="mx-3 d-flex align-items-center">
+            <h3 class="mb-0">{{ 'Spreadsheet' | localize }}</h3>
+
+            <small *ngIf="dashboardId" class="text-muted mx-2">
+                {{ 'Dashboard' | localize }} #{{ dashboardId }}
+            </small>
+
+            <!-- Applied filters / information -->
+            <ng-container *ngIf="getAppliedFilters() as appliedFilters">
+                <div class="d-flex align-items-center flex-wrap gap-4">
+                    <span class="spreadsheet-filter-bar">
+                        <i class="fa fa-chart-bar mr-1"></i>
+                        {{ dashboardChartCount }}
+                        {{ (dashboardChartCount === 1 ? 'DashboardChart' : 'DashboardCharts') | localize }}
+                    </span>
+
+                    <span class="spreadsheet-filter-bar">
+                        <i class="fa fa-list mr-1"></i>
+                        {{ spreadsheetRows.length }}
+                        {{ 'Transactions' | localize }}
+                    </span>
+
+                    <span class="spreadsheet-filter-bar">
+                        <i class="fa fa-filter mr-1"></i>
+                        {{ 'AppliedFilters' | localize }}: {{ appliedFilters.length }}
+                    </span>
+                </div>
+
+                <div *ngIf="appliedFilters.length" class="px-3 py-2">
+                    <span *ngFor="let filter of appliedFilters" class="badge badge-light mr-2 mb-1">
+                        {{ filter.label }}: {{ filter.value }}
+                    </span>
+                </div>
+            </ng-container>
+        </div>
+
+        <div class="d-flex align-items-center">
+            <button type="button" class="btn btn-primary mr-2" (click)="saveSpreadsheet()">
+                <i class="fa fa-save mr-2"></i>
+                {{ 'Save' | localize }}
+            </button>
+
+            <button type="button" class="btn btn-light" [disabled]="isRefreshing" (click)="refreshData()">
+                <i class="fa fa-sync-alt" [class.fa-spin]="isRefreshing"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- ================= PROGRESS ================= -->
+    <div *ngIf="isLoading" class="px-3 py-2">
+        <div class="d-flex justify-content-between align-items-center mb-1">
+            <span>
+                <i class="fa fa-spinner fa-spin mr-2"></i>
+                {{ loadingMessage }}
+            </span>
+            <strong>{{ loadingProgress }}%</strong>
+        </div>
+
+        <p-progressBar [value]="loadingProgress" [showValue]="false"></p-progressBar>
+    </div>
+
+    <!-- ================= MAIN WORKSPACE ================= -->
+    <div class="d-flex spreadsheet-workspace">
+
+        <!-- SPREADSHEET -->
+        <div class="spreadsheet-editor flex-grow-1 position-relative" (click)="onSheetClick($event)">
+            <ejs-spreadsheet
+                #spreadsheet
+                width="100%"
+                height="calc(100vh - 220px)"
+                [sheets]="sheets"
+                [scrollSettings]="scrollSettings"
+                [showAggregate]="showAggregate"
+                [showSheetTabs]="true"
+                (created)="onCreated()"
+                (ribbonClick)="onRibbonClick($event)">
+            </ejs-spreadsheet>
+
+            <!-- PIVOT -->
+            <div *ngIf="showPivot" class="pivot-sheet-overlay">
+                <div class="d-flex align-items-center justify-content-between px-3 py-2 border-bottom bg-white">
+                    <div>
+                        <h5 class="mb-1">{{ currentPivotSheetName }}</h5>
+                        <small class="text-muted">
+                            {{ 'Source' | localize }}: {{ pivotSourceSheetName }}
+                        </small>
+                    </div>
+
+                    <div class="d-flex align-items-center">
+                        <button type="button" class="btn btn-light mr-2" (click)="closePivot()">
+                            <i class="fa fa-arrow-left mr-2"></i>
+                            {{ 'SourceSheet' | localize }}
+                        </button>
+
+                        <!-- <button type="button" class="btn btn-primary mr-2" (click)="savePivot()">
+                            <i class="fa fa-save mr-2"></i>
+                            {{ 'SavePivot' | localize }}
+                        </button> -->
+
+                        <button type="button" class="btn btn-success" (click)="copyPivotToDashboard()">
+                            <i class="fa fa-chart-bar mr-2"></i>
+                            {{ 'CopyPivotChartToDashboard' | localize }}
+                        </button>
+                    </div>
+                </div>
+
+                <div class="pivot-analysis-layout bg-white" style="height: calc(100vh - 360px);">
+                    <!-- Table / chart -->
+                    <div class="flex-grow-1" style="min-width: 0; height: 100%; overflow: hidden;">
+                        <ejs-pivotview
+                            #pivotView
+                            id="SiiwiiPivotView"
+                            width="100%"
+                            height="100%"
+                            [dataSourceSettings]="pivotDataSourceSettings"
+                            [showFieldList]="false"
+                            [showToolbar]="true"
+                            [toolbar]="pivotToolbar"
+                            [showGroupingBar]="true"
+                            [allowCalculatedField]="true"
+                            [showTooltip]="true"
+                            [displayOption]="pivotDisplayOption"
+                            [chartSettings]="pivotChartSettings"
+                            (enginePopulated)="onPivotViewReady()">
+                        </ejs-pivotview>
+                    </div>
+
+                    <!-- Fixed field list -->
+                    <div class="border-left bg-white" style="width: 420px; min-width: 420px; height: 100%; overflow: auto;">
+                        <div class="px-3 py-2 border-bottom font-weight-bold">
+                            {{ 'FieldsAndPivotConfiguration' | localize }}
+                        </div>
+
+                        <ejs-pivotfieldlist
+                            #pivotFieldList
+                            id="SiiwiiPivotFieldList"
+                            width="100%"
+                            renderMode="Fixed"
+                            [dataSourceSettings]="pivotDataSourceSettings"
+                            [allowCalculatedField]="true"
+                            (enginePopulated)="onFieldListReady()">
+                        </ejs-pivotfieldlist>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= ADD DATA PANEL ================= -->
+        <div *ngIf="showDataPanel" class="spreadsheet-side-panel">
+            <div class="d-flex justify-content-between align-items-start border-bottom p-3">
+                <div>
+                    <h5 class="mb-1">{{ 'NewSiiwiiList' | localize }}</h5>
+                    <small class="text-muted">{{ 'InsertApplicationDataIntoNewSheet' | localize }}</small>
+                </div>
+
+                <button type="button" class="btn btn-sm btn-light" (click)="closeDataPanel()">
+                    <i class="fa fa-times"></i>
+                </button>
+            </div>
+
+            <!-- Step 1: select entity -->
+            <div *ngIf="addDataStep === 1" class="p-3">
+                <div class="form-group">
+                    <label class="font-weight-bold">{{ 'Entity' | localize }}</label>
+                    <small class="d-block text-muted mb-3">{{ 'SelectSiiwiiEntityToInsert' | localize }}</small>
+
+                    <div
+                        *ngFor="let entity of entities"
+                        class="card mb-2"
+                        style="cursor: pointer;"
+                        (click)="selectEntity(entity.sourceKey)">
+                        <div class="card-body d-flex align-items-center">
+                            <i [class]="entity.icon" class="mr-3"></i>
+                            <span>{{ entity.displayName }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 2: columns and filters -->
+            <div *ngIf="addDataStep === 2 && selectedEntity" class="p-3">
+                <button type="button" class="btn btn-link px-0 mb-2" (click)="backToEntityList()">
+                    <i class="fa fa-arrow-left mr-2"></i>
+                    {{ 'ChangeEntity' | localize }}
+                </button>
+
+                <h5>{{ selectedEntity.displayName }}</h5>
+                <p class="text-muted">{{ 'ChooseColumnsAndOptionalFilters' | localize }}</p>
+
+                <!-- Columns -->
+                <div class="mb-4">
+                    <div class="d-flex align-items-center justify-content-between mb-2">
+                        <strong>{{ 'Columns' | localize }}</strong>
+
+                        <div>
+                            <button type="button" class="btn btn-sm btn-link" (click)="selectAllColumns()">
+                                {{ 'SelectAll' | localize }}
+                            </button>
+                            <button type="button" class="btn btn-sm btn-link" (click)="clearColumns()">
+                                {{ 'Clear' | localize }}
+                            </button>
+                        </div>
+                    </div>
+
+                    <div *ngFor="let column of selectedEntity.columns" class="form-check mb-2">
+                        <input
+                            type="checkbox"
+                            class="form-check-input"
+                            [id]="'column-' + column.key"
+                            [checked]="isColumnSelected(column.key)"
+                            (change)="onColumnToggle(column.key, $event)" />
+
+                        <label class="form-check-label" [for]="'column-' + column.key">
+                            {{ column.label }}
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Filters -->
+                <div *ngIf="selectedEntity.filters?.length" class="mb-4">
+                    <strong class="d-block mb-3">{{ 'Filters' | localize }}</strong>
+
+                    <div *ngFor="let filter of selectedEntity.filters" class="form-group">
+                        <label>{{ filter.label }}</label>
+
+                        <input *ngIf="filter.type === 'string'" type="text" class="form-control"
+                               [(ngModel)]="filters[filter.key]" />
+
+                        <input *ngIf="filter.type === 'number'" type="number" class="form-control"
+                               [(ngModel)]="filters[filter.key]" />
+
+                        <input *ngIf="filter.type === 'date'" type="date" class="form-control"
+                               [(ngModel)]="filters[filter.key]" />
+
+                        <p-dropdown
+                            *ngIf="filter.type === 'select'"
+                            [options]="filter.options || []"
+                            [(ngModel)]="filters[filter.key]"
+                            optionLabel="label"
+                            optionValue="value"
+                            appendTo="body"
+                            [style]="{ width: '100%' }">
+                        </p-dropdown>
+                    </div>
+                </div>
+
+                <!-- Add -->
+                <button
+                    type="button"
+                    class="btn btn-primary btn-block"
+                    [disabled]="isAddingData || !selectedColumns.length"
+                    (click)="addDataAsNewSheet()">
+                    <i *ngIf="isAddingData" class="fa fa-spinner fa-spin mr-2"></i>
+                    <i *ngIf="!isAddingData" class="fa fa-plus mr-2"></i>
+                    {{ (isAddingData ? 'Adding' : 'AddAsNewSheet') | localize }}
+                </button>
+            </div>
+        </div>
+
+        <!-- ================= CHART PANEL ================= -->
+        <div *ngIf="showChartPanel" class="spreadsheet-side-panel">
+            <div class="d-flex justify-content-between align-items-start border-bottom p-3">
+                <div class="d-flex align-items-center">
+                    <div class="chart-panel-icon mr-2">
+                        <i class="fa fa-chart-bar"></i>
+                    </div>
+
+                    <div>
+                        <h5 class="mb-1">{{ 'Chart' | localize }}</h5>
+                        <small class="text-muted">{{ 'ConfigureChartData' | localize }}</small>
+                    </div>
+                </div>
+
+                <button type="button" class="btn btn-sm btn-light" (click)="showChartPanel = false">
+                    <i class="fa fa-times"></i>
+                </button>
+            </div>
+
+            <div class="p-3">
+                <div class="form-group">
+                    <label class="font-weight-bold">{{ 'DataRange' | localize }}</label>
+                    <input type="text" class="form-control" [(ngModel)]="chartRange"
+                           placeholder="'Transactions'!A1:H40" />
+                </div>
+
+                <div class="form-group">
+                    <label class="font-weight-bold">{{ 'CategoryAxis' | localize }}</label>
+                    <small class="d-block text-muted mb-2">{{ 'CategoryAxisRangeHint' | localize }}</small>
+                    <input type="text" class="form-control" [(ngModel)]="chartCategoryRange"
+                           placeholder="'Transactions'!A1:A40" />
+                </div>
+
+                <div class="mt-4">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <strong>{{ 'DataSeries' | localize }}</strong>
+
+                        <button type="button" class="btn btn-sm btn-light" (click)="addChartSeries()">
+                            <i class="fa fa-plus"></i>
+                        </button>
+                    </div>
+
+                    <div *ngIf="!chartSeriesRanges.length" class="text-muted py-3">
+                        {{ 'NoDataSeries' | localize }}
+                    </div>
+
+                    <div *ngFor="let series of chartSeriesRanges; let i = index" class="d-flex align-items-center mb-2">
+                        <input type="text" class="form-control mr-2" [(ngModel)]="series.range" />
+
+                        <button type="button" class="btn btn-sm btn-light" (click)="removeChartSeries(i)">
+                            <i class="fa fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <button
+                    type="button"
+                    class="btn btn-primary btn-block mt-4"
+                    [disabled]="applyingChartRange"
+                    (click)="applyChartSeries()">
+                    <i *ngIf="applyingChartRange" class="fa fa-spinner fa-spin mr-2"></i>
+                    {{ (applyingChartRange ? 'Applying' : 'ApplyChartData') | localize }}
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

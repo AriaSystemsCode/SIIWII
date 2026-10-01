@@ -36,15 +36,18 @@ import { TabViewModule } from 'primeng/tabview';
 import { OverlayPanelModule } from 'primeng/overlaypanel';
 import { SpreadsheetAllModule } from '@syncfusion/ej2-angular-spreadsheet';
 import {
-    PivotViewModule
+    PivotViewModule , PivotFieldListModule
 } from '@syncfusion/ej2-angular-pivotview';
-
+import { CreateOrEditSpreadsheetComponent } from './components/create-or-edit-spreadsheet/create-or-edit-spreadsheet.component';
+import { ProgressBarModule } from 'primeng/progressbar';
+import { AppDashboardServiceProxy } from '@shared/service-proxies/service-proxies';
 
 
 @NgModule({
     declarations: [
         DashboardBrowseComponent,
         DashboardDetailComponent,
+        CreateOrEditSpreadsheetComponent,
    
     ],
     imports: [
@@ -85,10 +88,13 @@ import {
                 TabViewModule,
                 OverlayPanelModule,
                 PivotViewModule,
-                SpreadsheetAllModule
+                SpreadsheetAllModule ,
+                ProgressBarModule ,
+                PivotFieldListModule
          
     ],
     providers: [
+          AppDashboardServiceProxy,
         { provide: BsDatepickerConfig, useFactory: NgxBootstrapDatePickerConfigService.getDatepickerConfig },
         { provide: BsDaterangepickerConfig, useFactory: NgxBootstrapDatePickerConfigService.getDaterangepickerConfig },
         { provide: BsLocaleService, useFactory: NgxBootstrapDatePickerConfigService.getDatepickerLocale },
