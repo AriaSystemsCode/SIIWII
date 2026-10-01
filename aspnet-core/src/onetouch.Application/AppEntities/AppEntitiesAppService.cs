@@ -2726,7 +2726,7 @@ namespace onetouch.AppEntities
             }
 
         }
-        private async Task<UserInformationDto> GetUserInformation(long userId)
+        public async Task<UserInformationDto> GetUserInformation(long userId)
         {
             var attPhotoId = await _helper.SystemTables.GetAttachmentCategoryId("LOGO");
             var contactEntityExtraData = _appEntityExtraDataRepository.GetAll().FirstOrDefault(x => x.AttributeId == 715 && x.AttributeValue == userId.ToString());

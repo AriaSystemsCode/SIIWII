@@ -3016,8 +3016,8 @@ Please select one of the available linesheet templates
 		<text name="Landscape">Landscape</text>
 		<text name="ProductId">Product Id</text>
 		<text name="Accountuploadstatus">Account upload status</text>
+		<text name="DeleteDashboardbyOwner">You are not the owner of this dashboard,so you cannot delete it.</text>
 
 
-		
-  </texts>  
+	</texts>  
 </localizationDictionary>

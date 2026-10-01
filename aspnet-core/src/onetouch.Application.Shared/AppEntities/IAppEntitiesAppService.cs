@@ -100,6 +100,7 @@ namespace onetouch.AppEntities
 		//I49[Start]
 		Task<string> GetHostSettingValue(long settingId, string type="");
 		Task<string> GetTenantSettingValue(long settingId, string type="");
+		Task<UserInformationDto> GetUserInformation(long userId);
 		//I49[End]
     }
 }

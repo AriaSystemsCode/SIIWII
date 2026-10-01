@@ -969,5 +969,17 @@ namespace onetouch.Helpers
             return obj.Id;
         }
         //I50[End]
+        //I52[Start]
+        public async Task<long> GetEntityObjectTypeDashboard()
+        {
+            var obj = await _sycEntityObjectType.FirstOrDefaultAsync(x => x.Code == "DASHBOARD");
+            return obj.Id;
+        }
+        public async Task<long> GetObjectDashboardId()
+        {
+            var obj = await _sydObjectRepository.FirstOrDefaultAsync(x => x.Code == "DASHBOARD");
+            return obj.Id;
+        }
+        //I52[End]
     }
 }
