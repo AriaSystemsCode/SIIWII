@@ -22,6 +22,7 @@ namespace onetouch.AppDashboards.Dtos
         public virtual string SpreadsheetFilePath { get; set;}
         public virtual bool IsEditable { set; get; }
         public virtual bool IsTheOwner { set; get; }
+        public virtual int SharingLevel { get; set; }
     }
     public class GetAllDashboardsInput : PagedAndSortedResultRequestDto
     {
@@ -41,6 +42,26 @@ namespace onetouch.AppDashboards.Dtos
         public virtual string Description{ get; set; }
 
     }
+    public class SharingUserInfo: onetouch.AppEntities.Dtos.UserInformationDto
+    { 
+        public virtual bool CanEdit { set; get; }
+        public virtual bool IsOwner { set; get; }
+        public virtual long UserId { get; set; }
+        public virtual bool CanView { set; get; }
 
+    }
+    public class ShareDashboardInfo
+    { 
+        public virtual long DashboardId { get; set; }
+        public virtual int SharingLevel { get; set; }
+        public virtual bool CanEdit{ get; set; }
+        public virtual List<ShareWithUser> UsersList{ get; set; }
 
+    }
+    public class ShareWithUser
+    { 
+        public virtual long UserId { get;set; }
+        public virtual bool CanEdit { get; set; }
+        
+    }
 }
