@@ -156,3 +156,21 @@ sourceSheetName?: string;
         enableMultipleAxis?: boolean;
     };
 }
+
+
+
+
+
+export type ShareAccess = 'View' | 'Edit';
+
+export interface DashboardSharedUser {
+    id?: number;
+    name: string;
+    access: ShareAccess;
+}
+
+export type DashboardShareMode =
+    'all' |
+    'specific' |
+    'confirm' |
+    'private';

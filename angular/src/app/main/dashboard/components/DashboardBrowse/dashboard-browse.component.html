@@ -230,7 +230,7 @@
 
                     <!-- Sharing -->
                     <li>
-                      <button type="button" class="dropdown-item" (click)="openSharing(row)">
+                      <button type="button" class="dropdown-item" (click)="openShareDashboard(row)">
                         <i class="fas fa-share-alt mr-2"></i>
 
                         {{ 'Sharing' | localize }}
@@ -377,3 +377,23 @@
 
   </div>
 </div>
+
+
+
+<app-dashboard-share
+    [(visible)]="showShareModal"
+
+    [dashboardName]="selectedDashboard?.title"
+
+    [ownerName]="
+        selectedDashboard?.creatorUserName
+    "
+
+    [users]="sharedUsers"
+
+    [mode]="shareMode"
+
+    [allUsersAccess]="sharedUsers"
+
+    (save)="onDashboardShareSave($event)">
+</app-dashboard-share>

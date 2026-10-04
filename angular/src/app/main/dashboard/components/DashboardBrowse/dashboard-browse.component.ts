@@ -4,10 +4,10 @@ import { AppComponentBase } from '@shared/common/app-component-base';
 import { PrimengTableHelper } from '@shared/helpers/PrimengTableHelper';
 import { Paginator } from 'primeng/paginator';
 import { Table } from 'primeng/table';
-import { SavedSpreadsheet } from '../../models/dashboard.model';
 import { AppDashboardServiceProxy, GetDashboardForViewDto, UserInformationDto } from '@shared/service-proxies/service-proxies';
 import { finalize } from 'rxjs/operators';
 import { AppConsts } from '@shared/AppConsts';
+import { DashboardSharedUser, DashboardShareMode } from '../../models/dashboard.model';
 @Component({
     selector: 'app-dashboard-browse.component',
     templateUrl: './dashboard-browse.component.html',
@@ -97,7 +97,6 @@ export class DashboardBrowseComponent
     }
 
     openDashboard(row: any): void {
-        // this.appDashboardsAppService.updateViewDate(row.id).subscribe(result => { });
         this.router.navigate(['/app/main/dashboards/dashboard-details', row.id]);
     }
 
@@ -181,9 +180,62 @@ export class DashboardBrowseComponent
     }
 
 
-    openSharing(row: any): void {
+   showShareModal = false;
 
+selectedDashboard: any = null;
+
+shareMode: DashboardShareMode = 'all';
+
+sharedUsers: DashboardSharedUser[] = [];
+
+openShareDashboard(row: any): void {
+
+    this.selectedDashboard = row;
+
+    this.sharedUsers =
+        (row?.sharedWithUsers ?? []).map(
+            (user: any) => ({
+                id: user.id,
+                name:
+                    user.name ??
+                    user.userName ??
+                    user.emailAddress,
+                access:
+                    user.access === 'Edit'
+                        ? 'Edit'
+                        : 'View'
+            })
+        );
+
+    this.shareMode =
+        this.sharedUsers.length
+            ? 'specific'
+            : 'all';
+
+    // Opens DashboardShareComponent dialog
+    this.showShareModal = true;
+}
+onDashboardShareSave(
+    event: {
+        mode: DashboardShareMode;
+        users: DashboardSharedUser[];
     }
+): void {
+
+    console.log(
+        'Share mode:',
+        event.mode
+    );
+
+    console.log(
+        'Shared users:',
+        event.users
+    );
+
+    // Call your BE sharing API here.
+
+    this.showShareModal = false;
+}
 
     showShare(event: MouseEvent, row: any): void {
         this.shareUsers = row?.sharedWithUsers ?? [];

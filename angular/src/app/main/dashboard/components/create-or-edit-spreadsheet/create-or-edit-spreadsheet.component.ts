@@ -78,35 +78,42 @@ export class CreateOrEditSpreadsheetComponent extends AppComponentBase implement
     // =====================================================
 
     dashboardId: number | null = null;
-    // spreadsheetId: number | null = null;
 
-    // ---- Spreadsheet ----
-    spreadsheetRows: any[] = [];
+    // Spreadsheet
     sheets: SheetModel[] = [];
-    isOpeningSavedSpreadsheet = false;
-    isRefreshing = false;
-
-
     readonly scrollSettings: any = { enableVirtualization: true, isFinite: false };
     readonly showAggregate = false;
 
-    /** Keep small while testing. Increase after verification. */
+    /** Rows loaded per API call. Keep small while testing. */
     private readonly batchSize = 10;
     private readonly saveOptions: any = { ignoreImage: true, ignoreNote: true };
 
-    // ---- Loading bar ----
+    // Loading bar
     isLoading = false;
     loadingProgress = 0;
     loadingMessage = '';
+    isRefreshing = false;
 
-    // ---- "Add data" panel ----
+    // Metadata saved with the workbook
+    sheetSources: SpreadsheetSheetDataSource[] = [];
+    analyses: SavedSheetAnalysis[] = [];
+    widgets: DashboardWidgetMetadata[] = [];
+
+    // Metadata of the active tab (shown in the header)
+    currentSource: SpreadsheetDataSource | null = null;
+    currentFilters: any = null;
+
+    private sheetWatcher: any = null;
+    private lastSheetIndex = -1;
+    private dashboardPromise: Promise<any> | null = null;
+
+    // "Add data" panel
     showDataPanel = false;
-    addDataStep: 1 | 2 = 1;
-    selectedEntityKey: string | null = null;
+    step: 1 | 2 = 1;
     selectedEntity: SpreadsheetEntityDefinition | null = null;
     selectedColumns: string[] = [];
-    filters: Record<string, any> = {};
-    isAddingData = false;
+    filterValues: Record<string, any> = {};
+    isAdding = false;
 
     readonly entities: SpreadsheetEntityDefinition[] = [
         {
@@ -157,22 +164,22 @@ export class CreateOrEditSpreadsheetComponent extends AppComponentBase implement
         }
     ];
 
-    // ---- Pivot ----
+    // Pivot
     showPivot = false;
-    pivotData: IDataSet[] = [];
-    currentPivotSheetName: string | null = null;
-    pivotSourceSheetName: string | null = null;
+    pivotSheet: string | null = null;      // name of the Pivot tab
+    sourceSheet: string | null = null;     // name of the data tab the Pivot reads
     private isCreatingPivot = false;
+    private chartSyncTimer: any = null;
 
-    pivotDisplayOption = { view: 'Both', primary: 'Table' } as DisplayOption;
+    pivotDisplay = { view: 'Both', primary: 'Table' } as DisplayOption;
     pivotToolbar: any[] = ['Grid', 'Chart'];
-    pivotChartSettings: any = {
+    pivotChart: any = {
         chartSeries: { type: 'Column' },
         height: '280',
         title: 'Pivot Chart',
         enableMultipleAxis: false
     };
-    pivotDataSourceSettings: any = {
+    pivotSettings: any = {
         dataSource: [],
         rows: [],
         columns: [],
@@ -183,38 +190,27 @@ export class CreateOrEditSpreadsheetComponent extends AppComponentBase implement
         allowValueFilter: true
     };
 
-    // ---- Per-sheet metadata ----
-    currentSpreadsheetSource: SpreadsheetDataSource | null = null;
-    currentSpreadsheetFilters: any = null;
-    sheetDataSources: SpreadsheetSheetDataSource[] = [];
-    sheetAnalyses: SavedSheetAnalysis[] = [];
-    dashboardWidgets: DashboardWidgetMetadata[] = [];
-
-    private sheetWatcher: any = null;
-    private lastActiveSheetIndex = -1;
-    private dashboardSheetPromise: Promise<any> | null = null;
-
-    // ---- Chart panel ----
+    // Chart panel
     showChartPanel = false;
     selectedChart: any = null;
-    selectedChartSheetName: string | null = null;
+    chartSheet: string | null = null;
     chartRange = '';
-    chartCategoryRange = '';
-    chartSeriesRanges: Array<{ range: string }> = [];
-    applyingChartRange = false;
+    categoryRange = '';
+    seriesRanges: Array<{ range: string }> = [];
+    isApplyingChart = false;
 
     constructor(
         injector: Injector,
         private route: ActivatedRoute,
-        private _appTransactionServiceProxy: AppTransactionServiceProxy,
-         public appDashboardsAppService: AppDashboardServiceProxy,
+        private transactionService: AppTransactionServiceProxy,
+        private dashboardService: AppDashboardServiceProxy,
         private cdr: ChangeDetectorRef
     ) {
         super(injector);
     }
 
     // =====================================================
-    // SMALL SHORTCUTS
+    // SMALL HELPERS
     // =====================================================
 
     /** Untyped access to Syncfusion APIs missing from the typings. */
@@ -226,37 +222,69 @@ export class CreateOrEditSpreadsheetComponent extends AppComponentBase implement
         return this.grid?.sheets ?? [];
     }
 
+    private get activeSheet(): any {
+        return this.grid?.getActiveSheet?.();
+    }
+
+    private get activeSheetName(): string {
+        return text(this.activeSheet?.name);
+    }
+
     private findSheet(name: string): any {
         return this.allSheets.find((s: any) => s?.name === name);
     }
 
-    private resizeLater(): void {
-        setTimeout(() => this.spreadsheet?.resize(), 0);
+    private isDashboard(sheet: any): boolean {
+        return text(sheet?.name).trim().toLowerCase() === DASHBOARD_SHEET.toLowerCase();
     }
 
-    private refreshLayout(): void {
+    private resizeLater(delay = 0): void {
         setTimeout(() => {
             try {
                 this.spreadsheet?.resize();
             } catch (error) {
                 console.error('Spreadsheet resize failed:', error);
             }
-        }, 100);
+        }, delay);
     }
 
-    /** StatusId = 0 means "no status filter" on this screen. */
+    /** Syncfusion finishes sheet/chart work on the next browser turns. */
+    private async settle(): Promise<void> {
+        await yieldToBrowser();
+        await yieldToBrowser();
+    }
+
+    /** Lets Angular + Syncfusion + the browser paint before the next batch. */
+    private async paint(): Promise<void> {
+        this.cdr.detectChanges();
+        await new Promise<void>(resolve => setTimeout(resolve, 0));
+        await new Promise<void>(resolve => requestAnimationFrame(() => resolve()));
+        await new Promise<void>(resolve => requestAnimationFrame(() => resolve()));
+    }
+
+    /** StatusId = 0 means "no status filter". */
     private cleanStatus(value: any): number | undefined {
         return value == null || Number(value) === 0 ? undefined : Number(value);
     }
 
-    // private readPositiveNumber(value: any): number | null {
-    //     const n = Number(value);
-    //     return Number.isFinite(n) && n > 0 ? n : null;
-    // }
-
     private quoteSheetName(sheetName: string): string {
         const name = text(sheetName);
         return /[\s()'!]/.test(name) ? `'${name.replace(/'/g, "''")}'` : name;
+    }
+
+    /** "Dashboard!AZ1:BA15" -> "AZ1:BA15" */
+    private removeSheetFromRange(range: string): string {
+        const value = text(range);
+        return value.substring(value.lastIndexOf('!') + 1);
+    }
+
+    private formatDate(value: any): string {
+        if (!value) {
+            return '';
+        }
+
+        const date = new Date(value);
+        return Number.isNaN(date.getTime()) ? String(value) : date.toLocaleDateString();
     }
 
     private showLoading(message: string): void {
@@ -282,227 +310,126 @@ export class CreateOrEditSpreadsheetComponent extends AppComponentBase implement
     // =====================================================
 
     ngOnInit(): void {
-
-         this.route.paramMap.subscribe(params => {
-          const idParam = params.get('id');        
-       
- this.dashboardId = idParam ? Number(idParam) : null;
-       
+        this.route.paramMap.subscribe(params => {
+            const id = params.get('id');
+            this.dashboardId = id ? Number(id) : null;
         });
-
-
-    
     }
 
     ngOnDestroy(): void {
         this.stopSheetWatcher();
     }
 
-  onCreated(): void {
-    if (!this.spreadsheet) {
-        return;
+    onCreated(): void {
+        if (!this.spreadsheet) {
+            return;
+        }
+
+        this.addRibbonButtons();
+        this.startSheetWatcher();
+        this.loadDashboard();
     }
 
-    const grid = this.grid;
+    // =====================================================
+    // LOAD DASHBOARD SPREADSHEET
+    // =====================================================
 
-    if ('showSheetTabs' in grid) {
-        grid.showSheetTabs = true;
-    }
+    private loadDashboard(): void {
+        if (!this.dashboardId || !this.spreadsheet) {
+            return;
+        }
 
-    this.addRibbonButtons();
-
-    if ('showAggregate' in grid) {
-        grid.showAggregate = false;
-    }
-
-    if ('scrollSettings' in grid) {
-        grid.scrollSettings = {
-            ...(grid.scrollSettings ?? {}),
-            enableVirtualization: true,
-            isFinite: false
-        };
-    }
-
-    this.startSheetWatcher();
-
-    void this.loadDashboardSpreadsheet();
-}
-
-
-private loadDashboardSpreadsheet(): void {
-    if (!this.dashboardId || !this.spreadsheet) {
-        return;
-    }
-
-    this.isOpeningSavedSpreadsheet = true;
-
-    this.appDashboardsAppService
-        .getDashboardForView(this.dashboardId)
-        .subscribe({
+        this.dashboardService.getDashboardForView(this.dashboardId).subscribe({
             next: async (result: any) => {
                 try {
-                    const dashboard = result?.dashboard ?? result;
-                    const savedSpreadsheet = dashboard?.spreadsheet;
+                    const saved = (result?.dashboard ?? result)?.spreadsheet;
 
-                    if (savedSpreadsheet) {
-                        await this.openDashboardSpreadsheet(savedSpreadsheet);
+                    if (saved) {
+                        await this.openWorkbook(saved);
                     } else {
-                        await this.createEmptyDashboardSpreadsheet();
+                        await this.createEmptyWorkbook();
                     }
                 } catch (error) {
-                    console.error(
-                        '[Spreadsheet] Failed to initialize dashboard spreadsheet:',
-                        error
-                    );
-
+                    console.error('[Spreadsheet] Failed to initialize dashboard spreadsheet:', error);
                     this.notify.error('Unable to open Spreadsheet.');
                 } finally {
-                    this.isOpeningSavedSpreadsheet = false;
                     this.cdr.detectChanges();
                 }
             },
-
             error: (error: any) => {
-                console.error(
-                    '[Spreadsheet] Failed to load dashboard:',
-                    error
-                );
-
-                this.isOpeningSavedSpreadsheet = false;
+                console.error('[Spreadsheet] Failed to load dashboard:', error);
                 this.notify.error('Unable to load Dashboard.');
             }
         });
-}
-
-private async openDashboardSpreadsheet(saved: any): Promise<void> {
-    if (!this.spreadsheet) {
-        return;
     }
 
-    let savedValue: any = saved;
+    private async openWorkbook(saved: any): Promise<void> {
+        if (!this.spreadsheet) {
+            return;
+        }
 
-    if (typeof savedValue === 'string') {
-        savedValue = JSON.parse(savedValue);
+        const data = typeof saved === 'string' ? JSON.parse(saved) : saved;
+
+        this.sheetSources = this.cloneSheetSources(data?.sheetDataSources ?? []);
+        this.analyses = clone(data?.sheetAnalyses ?? []);
+        this.widgets = clone(data?.dashboardWidgets ?? []);
+
+        const first =
+            this.sheetSources.find(x => x.sheetName === TRANSACTIONS_SHEET)?.source ??
+            this.sheetSources[0]?.source ??
+            null;
+
+        this.currentSource = first ? this.cloneSource(first) : null;
+        this.currentFilters = { ...(first?.filters ?? {}) };
+
+        const workbook = this.cleanWorkbookJson(data?.workbookJson ?? data);
+
+        this.grid.openFromJson({ file: workbook?.jsonObject ?? workbook }, this.saveOptions);
+
+        await new Promise(resolve => setTimeout(resolve, 500));
+
+        await this.ensureDashboard();
+        await this.moveDashboardFirst();
+
+        this.syncSheetIdentity();
+        this.syncSheetToUi();
+        this.spreadsheet?.resize();
     }
 
-    this.sheetDataSources = savedValue?.sheetDataSources?.length
-        ? this.cloneSheetSources(savedValue.sheetDataSources)
-        : [];
-    this.sheetAnalyses = clone(savedValue?.sheetAnalyses ?? []);
-    this.dashboardWidgets = clone(savedValue?.dashboardWidgets ?? []);
+    /** New dashboard spreadsheet: starts with the Dashboard sheet only. */
+    private async createEmptyWorkbook(): Promise<void> {
+        if (!this.spreadsheet) {
+            return;
+        }
 
-    const initialSource =
-        this.getSourceByName(TRANSACTIONS_SHEET) ??
-        this.sheetDataSources[0]?.source ??
-        null;
+        this.sheetSources = [];
+        this.analyses = [];
+        this.widgets = [];
+        this.currentSource = null;
+        this.currentFilters = null;
 
-    this.currentSpreadsheetSource = initialSource
-        ? this.cloneSource(initialSource)
-        : null;
+        // Create Dashboard FIRST so Syncfusion is never left with zero sheets.
+        await this.ensureDashboard();
+        await this.moveDashboardFirst();
 
-    this.currentSpreadsheetFilters = {
-        ...(initialSource?.filters ?? {})
-    };
+        for (let i = this.allSheets.length - 1; i >= 0; i--) {
+            const sheet = this.allSheets[i];
 
-    const cleanWorkbook = this.cleanWorkbookJson(
-        savedValue?.workbookJson ?? savedValue
-    );
-
-    const jsonObject =
-        cleanWorkbook?.jsonObject ??
-        cleanWorkbook;
-
-    this.grid.openFromJson(
-        { file: jsonObject },
-        this.saveOptions
-    );
-
-    await new Promise(resolve => setTimeout(resolve, 500));
-
-    await this.ensureDashboardSheet();
-    await this.moveDashboardToFirst();
-
-    this.syncSheetIdentity();
-    this.syncActiveSheetToUi();
-    this.spreadsheet.resize();
-}
-
-private async createEmptyDashboardSpreadsheet(): Promise<void> {
-    if (!this.spreadsheet) {
-        return;
-    }
-
-    this.sheetDataSources = [];
-    this.sheetAnalyses = [];
-    this.dashboardWidgets = [];
-    this.currentSpreadsheetSource = null;
-    this.currentSpreadsheetFilters = null;
-
-    // Create/reuse Dashboard FIRST so Syncfusion is never left with zero sheets.
-    await this.ensureDashboardSheet();
-    await this.moveDashboardToFirst();
-
-    // New dashboard spreadsheet starts with Dashboard only.
-    for (let i = this.allSheets.length - 1; i >= 0; i--) {
-        const name = text(this.allSheets[i]?.name);
-
-        if (name && name.toLowerCase() !== DASHBOARD_SHEET.toLowerCase()) {
-            try {
-                this.grid.deleteSheet(i);
-            } catch (error) {
-                console.warn('[Spreadsheet] Unable to remove initial sheet:', name, error);
+            if (text(sheet?.name) && !this.isDashboard(sheet)) {
+                try {
+                    this.grid.deleteSheet(i);
+                } catch (error) {
+                    console.warn('[Spreadsheet] Unable to remove initial sheet:', sheet?.name, error);
+                }
             }
         }
-    }
 
-    await yieldToBrowser();
-    await this.moveDashboardToFirst();
-    await this.activateSheet(DASHBOARD_SHEET);
-
-    this.syncSheetIdentity();
-    this.refreshLayout();
-}
-
-private async moveDashboardToFirst(): Promise<void> {
-    if (!this.spreadsheet) {
-        return;
-    }
-
-    const dashboardIndex = this.allSheets.findIndex(
-        (sheet: any) =>
-            text(sheet?.name).trim().toLowerCase() ===
-            DASHBOARD_SHEET.toLowerCase()
-    );
-
-    if (dashboardIndex <= 0) {
-        return;
-    }
-
-    if (typeof this.grid.moveSheet === 'function') {
-        this.grid.moveSheet(0, [dashboardIndex]);
         await yieldToBrowser();
-    }
-}
+        await this.moveDashboardFirst();
+        await this.activateSheet(DASHBOARD_SHEET);
 
-
-    close(): void {
-        this.stopSheetWatcher();
-        this.showDataPanel = false;
-        this.closeChartPanel();
-    }
-
-    onActiveSheetChanged(): void {
-        setTimeout(() => {
-            this.syncActiveSheetToUi();
-            void this.syncPivotForActiveSheet();
-        }, 0);
-    }
-
-    /** Syncfusion recommendation for large Save-As. Needs (beforeSave)="onBeforeSave($event)". */
-    onBeforeSave(args: any): void {
-        if (args) {
-            args.isFullPost = false;
-        }
+        this.syncSheetIdentity();
+        this.resizeLater(100);
     }
 
     // =====================================================
@@ -527,17 +454,17 @@ private async moveDashboardToFirst(): Promise<void> {
         }
 
         this.selectedChart = chart;
-        this.selectedChartSheetName = text(this.grid.getActiveSheet?.()?.name) || null;
+        this.chartSheet = this.activeSheetName || null;
         this.chartRange = text(chart.siiwiiOriginalRange ?? chart.range);
 
         // Restore the independent category/series ranges set by this panel.
         if (chart.siiwiiCategoryRange && Array.isArray(chart.siiwiiSeriesRanges)) {
-            this.chartCategoryRange = text(chart.siiwiiCategoryRange);
-            this.chartSeriesRanges = chart.siiwiiSeriesRanges
+            this.categoryRange = text(chart.siiwiiCategoryRange);
+            this.seriesRanges = chart.siiwiiSeriesRanges
                 .map((range: any) => ({ range: text(range) }))
                 .filter((item: any) => !!item.range);
         } else {
-            this.loadSeriesFromRange();
+            this.splitRangeToSeries();
         }
 
         this.showDataPanel = false;
@@ -547,106 +474,111 @@ private async moveDashboardToFirst(): Promise<void> {
     closeChartPanel(): void {
         this.showChartPanel = false;
         this.selectedChart = null;
-        this.selectedChartSheetName = null;
+        this.chartSheet = null;
         this.chartRange = '';
-        this.chartCategoryRange = '';
-        this.chartSeriesRanges = [];
-        this.applyingChartRange = false;
+        this.categoryRange = '';
+        this.seriesRanges = [];
+        this.isApplyingChart = false;
         this.cdr.detectChanges();
         this.resizeLater();
     }
 
-    addChartSeries(): void {
-        this.chartSeriesRanges = [...this.chartSeriesRanges, { range: '' }];
+    addSeries(): void {
+        this.seriesRanges = [...this.seriesRanges, { range: '' }];
     }
 
-    removeChartSeries(index: number): void {
-        this.chartSeriesRanges = this.chartSeriesRanges.filter((_series, i) => i !== index);
+    removeSeries(index: number): void {
+        this.seriesRanges = this.seriesRanges.filter((_series, i) => i !== index);
     }
 
     /** Applies independent category + series ranges (they do not need to be adjacent). */
-    async applyChartSeries(): Promise<void> {
-        if (!this.selectedChart || !this.selectedChartSheetName) {
+    async applyChart(): Promise<void> {
+        if (!this.selectedChart || !this.chartSheet) {
             return;
         }
 
-        const categoryRange = text(this.chartCategoryRange);
-        const seriesRanges = this.chartSeriesRanges.map(s => text(s.range)).filter(Boolean);
+        const categoryText = text(this.categoryRange);
+        const seriesTexts = this.seriesRanges.map(s => text(s.range)).filter(Boolean);
+        const parsed = this.parseChartInputs(categoryText, seriesTexts);
 
-        if (!categoryRange) {
-            this.notify.warn('Choose a Category / X Axis range.');
+        if (!parsed) {
             return;
         }
 
-        if (!seriesRanges.length) {
-            this.notify.warn('Choose at least one data series.');
-            return;
-        }
-
-        const category = this.parseRange(categoryRange);
-        const series = seriesRanges.map(range => this.parseRange(range));
-
-        if (!category || series.some(item => !item)) {
-            this.notify.warn('One or more chart ranges are invalid.');
-            return;
-        }
-
-        const validSeries = series.filter((item): item is ParsedRange => !!item);
-        const allRanges = [category, ...validSeries];
-
-        if (allRanges.some(r => r.startColumnIndex !== r.endColumnIndex)) {
-            this.notify.warn('Category and each data series must contain one column only.');
-            return;
-        }
-
-        const rowCount = category.endRow - category.startRow + 1;
-
-        if (allRanges.some(r => r.endRow - r.startRow + 1 !== rowCount)) {
-            this.notify.warn('Category and all data series must contain the same number of rows.');
-            return;
-        }
-
-        for (const item of allRanges) {
-            if (!this.findSheet(item.sheetName)) {
-                this.notify.warn(`Sheet "${item.sheetName}" was not found.`);
-                return;
-            }
-        }
-
-        const ownerSheet = this.selectedChartSheetName;
+        const ownerSheet = this.chartSheet;
         const chartId = text(this.selectedChart.id);
 
-        await this.updateChart(async () => {
-            const helperRange = await this.buildHelperRange(ownerSheet, chartId, category, validSeries);
+        this.isApplyingChart = true;
+
+        try {
+            const helperRange = await this.buildHelperRange(ownerSheet, chartId, parsed.category, parsed.series);
 
             await this.replaceChart(ownerSheet, {
                 range: helperRange,
                 // Keep the user's real configuration so the panel can restore it.
                 siiwiiOriginalRange: text(this.chartRange),
-                siiwiiCategoryRange: categoryRange,
-                siiwiiSeriesRanges: [...seriesRanges]
+                siiwiiCategoryRange: categoryText,
+                siiwiiSeriesRanges: [...seriesTexts]
             });
 
             // Show the user's ranges, not the hidden helper range.
-            this.chartCategoryRange = categoryRange;
-            this.chartSeriesRanges = seriesRanges.map(range => ({ range }));
-        });
-    }
+            this.categoryRange = categoryText;
+            this.seriesRanges = seriesTexts.map(range => ({ range }));
 
-    /** Shared wrapper: busy flag, error handling, success message. */
-    private async updateChart(work: () => Promise<void>): Promise<void> {
-        this.applyingChartRange = true;
-
-        try {
-            await work();
             this.notify.success('Chart data updated.');
         } catch (error) {
             console.error('[Chart Panel] unable to update chart data:', error);
             this.notify.error('Unable to update chart data.');
         } finally {
-            this.applyingChartRange = false;
+            this.isApplyingChart = false;
             this.cdr.detectChanges();
         }
+    }
+
+    /** Validates the panel input. Warns the user and returns null when invalid. */
+    private parseChartInputs(
+        categoryText: string,
+        seriesTexts: string[]
+    ): { category: ParsedRange; series: ParsedRange[] } | null {
+        const warn = (message: string): null => {
+            this.notify.warn(message);
+            return null;
+        };
+
+        if (!categoryText) {
+            return warn('Choose a Category / X Axis range.');
+        }
+
+        if (!seriesTexts.length) {
+            return warn('Choose at least one data series.');
+        }
+
+        const category = this.parseRange(categoryText);
+        const series = seriesTexts.map(r => this.parseRange(r)).filter((r): r is ParsedRange => !!r);
+
+        if (!category || series.length !== seriesTexts.length) {
+            return warn('One or more chart ranges are invalid.');
+        }
+
+        const all = [category, ...series];
+
+        if (all.some(r => r.startColumnIndex !== r.endColumnIndex)) {
+            return warn('Category and each data series must contain one column only.');
+        }
+
+        const rowCount = category.endRow - category.startRow + 1;
+
+        if (all.some(r => r.endRow - r.startRow + 1 !== rowCount)) {
+            return warn('Category and all data series must contain the same number of rows.');
+        }
+
+        const missing = all.find(r => !this.findSheet(r.sheetName));
+
+        if (missing) {
+            return warn(`Sheet "${missing.sheetName}" was not found.`);
+        }
+
+        return { category, series };
     }
 
     /** Deletes the selected chart and inserts it again with changed properties. */
@@ -664,8 +596,7 @@ private async moveDashboardToFirst(): Promise<void> {
         const updatedChart: any = { ...oldChart, ...changes };
 
         this.grid.insertChart([updatedChart]);
-        await yieldToBrowser();
-        await yieldToBrowser();
+        await this.settle();
 
         this.selectedChart = this.findChart(chartId) ?? updatedChart;
 
@@ -673,33 +604,30 @@ private async moveDashboardToFirst(): Promise<void> {
             this.grid.selectChart(chartId);
         }
 
-        this.refreshLayout();
+        this.resizeLater(100);
     }
 
-    private loadSeriesFromRange(): void {
+    /** First column of chartRange = category, every other column = one series. */
+    private splitRangeToSeries(): void {
         const parsed = this.parseRange(this.chartRange);
 
         if (!parsed) {
-            this.chartCategoryRange = '';
-            this.chartSeriesRanges = [];
+            this.categoryRange = '';
+            this.seriesRanges = [];
             return;
         }
 
         const sheet = this.quoteSheetName(parsed.sheetName);
         const first = parsed.startColumn;
 
-        this.chartCategoryRange = `${sheet}!${first}${parsed.startRow}:${first}${parsed.endRow}`;
-
-        const series: Array<{ range: string }> = [];
+        this.categoryRange = `${sheet}!${first}${parsed.startRow}:${first}${parsed.endRow}`;
+        this.seriesRanges = [];
 
         for (let i = parsed.startColumnIndex + 1; i <= parsed.endColumnIndex; i++) {
             const column = toColumnName(i + 1);
-            series.push({ range: `${sheet}!${column}${parsed.startRow}:${column}${parsed.endRow}` });
+            this.seriesRanges.push({ range: `${sheet}!${column}${parsed.startRow}:${column}${parsed.endRow}` });
         }
-
-        this.chartSeriesRanges = series;
     }
-
 
     /**
      * Copies category + series columns into a far-right helper block of the
@@ -715,7 +643,7 @@ private async moveDashboardToFirst(): Promise<void> {
 
         const sources = [category, ...series];
         const rowCount = category.endRow - category.startRow + 1;
-        const startColumnNumber = 200 + this.getHelperSlot(chartId) * 30; // 1-based
+        const startColumnNumber = 200 + this.helperSlot(chartId) * 30; // 1-based
 
         if (sources.length > 30) {
             throw new Error('A chart can use at most 29 data series in this editor.');
@@ -733,8 +661,7 @@ private async moveDashboardToFirst(): Promise<void> {
             }
         });
 
-        await yieldToBrowser();
-        await yieldToBrowser();
+        await this.settle();
 
         const startColumn = toColumnName(startColumnNumber);
         const endColumn = toColumnName(startColumnNumber + sources.length - 1);
@@ -743,7 +670,7 @@ private async moveDashboardToFirst(): Promise<void> {
     }
 
     /** Same chart id always gets the same helper block (0-19). */
-    private getHelperSlot(chartId: string): number {
+    private helperSlot(chartId: string): number {
         const value = text(chartId) || 'chart';
         let hash = 0;
 
@@ -779,8 +706,8 @@ private async moveDashboardToFirst(): Promise<void> {
         const endColumn = match[3].toUpperCase();
         const startRow = Number(match[2]);
         const endRow = Number(match[4]);
-        const startColumnIndex = this.columnNameToIndex(startColumn);
-        const endColumnIndex = this.columnNameToIndex(endColumn);
+        const startColumnIndex = this.columnIndex(startColumn);
+        const endColumnIndex = this.columnIndex(endColumn);
 
         if (startColumnIndex < 0 || endColumnIndex < startColumnIndex || startRow < 1 || endRow < startRow) {
             return null;
@@ -790,7 +717,7 @@ private async moveDashboardToFirst(): Promise<void> {
     }
 
     /** "A" -> 0, "B" -> 1, "AA" -> 26. Returns -1 if invalid. */
-    private columnNameToIndex(columnName: string): number {
+    private columnIndex(columnName: string): number {
         const name = text(columnName).toUpperCase();
 
         if (!/^[A-Z]+$/.test(name)) {
@@ -815,19 +742,11 @@ private async moveDashboardToFirst(): Promise<void> {
             return direct;
         }
 
-        const activeSheet = this.grid.getActiveSheet?.();
-
-        for (const row of activeSheet?.rows ?? []) {
-            for (const cell of row?.cells ?? []) {
-                for (const chart of cell?.chart ?? []) {
-                    if (!wanted.length || wanted.includes(text(chart?.id))) {
-                        return chart;
-                    }
-                }
-            }
-        }
-
-        return null;
+        return (
+            this.getSheetCharts(this.activeSheet).find(
+                chart => !wanted.length || wanted.includes(text(chart?.id))
+            ) ?? null
+        );
     }
 
     // =====================================================
@@ -836,10 +755,6 @@ private async moveDashboardToFirst(): Promise<void> {
 
     /** Adds "Siiwii List" and "Pivot Table" buttons to the Insert ribbon tab. */
     private addRibbonButtons(): void {
-        if (!this.spreadsheet) {
-            return;
-        }
-
         if (typeof this.grid.addToolbarItems !== 'function') {
             console.warn('[Spreadsheet] addToolbarItems() is not available in this Syncfusion build.');
             return;
@@ -876,10 +791,7 @@ private async moveDashboardToFirst(): Promise<void> {
     /** Second supported path for the ribbon buttons. */
     onRibbonClick(args: any): void {
         const id = text(
-            args?.item?.id ??
-            args?.item?.properties?.id ??
-            args?.originalEvent?.target?.id ??
-            args?.target?.id
+            args?.item?.id ?? args?.item?.properties?.id ?? args?.originalEvent?.target?.id ?? args?.target?.id
         ).toLowerCase();
 
         const label = text(
@@ -896,12 +808,9 @@ private async moveDashboardToFirst(): Promise<void> {
         }
     }
 
+    /** Opens the saved Pivot of this sheet, or creates a new one. */
     private openPivotFromRibbon(): void {
-        if (this.hasSavedPivotForActiveSheet) {
-            void this.viewSavedPivot();
-        } else {
-            void this.openPivot();
-        }
+        void this.openPivot(this.findAnalysis(this.activeSheetName) ?? undefined);
     }
 
     // =====================================================
@@ -922,14 +831,6 @@ private async moveDashboardToFirst(): Promise<void> {
         this.resizeLater();
     }
 
-    onEntityDropdownChange(sourceKey: string | null): void {
-        if (sourceKey) {
-            this.selectEntity(sourceKey);
-        } else {
-            this.resetSelection();
-        }
-    }
-
     selectEntity(sourceKey: string): void {
         const entity = this.entities.find(x => x.sourceKey === sourceKey);
 
@@ -938,44 +839,35 @@ private async moveDashboardToFirst(): Promise<void> {
             return;
         }
 
-        this.selectedEntityKey = sourceKey;
         this.selectedEntity = entity;
         this.selectedColumns = entity.columns.filter(x => x.defaultSelected).map(x => x.key);
-        this.filters = {};
-        this.addDataStep = 2;
+        this.filterValues = {};
+        this.step = 2;
         this.cdr.detectChanges();
     }
 
-    backToEntityList(): void {
+    backToEntities(): void {
         this.resetSelection();
         this.cdr.detectChanges();
     }
 
     private resetSelection(): void {
-        this.addDataStep = 1;
-        this.selectedEntityKey = null;
+        this.step = 1;
         this.selectedEntity = null;
         this.selectedColumns = [];
-        this.filters = {};
+        this.filterValues = {};
     }
 
     isColumnSelected(key: string): boolean {
         return this.selectedColumns.includes(key);
     }
 
-    onColumnToggle(key: string, event: any): void {
-        this.toggleColumn(key, !!event?.target?.checked);
-    }
+    toggleColumn(key: string, event: any): void {
+        const checked = !!event?.target?.checked;
 
-    toggleColumn(key: string, checked: boolean): void {
-        if (checked) {
-            if (!this.selectedColumns.includes(key)) {
-                this.selectedColumns = [...this.selectedColumns, key];
-            }
-            return;
-        }
-
-        this.selectedColumns = this.selectedColumns.filter(x => x !== key);
+        this.selectedColumns = checked
+            ? this.selectedColumns.includes(key) ? this.selectedColumns : [...this.selectedColumns, key]
+            : this.selectedColumns.filter(x => x !== key);
     }
 
     selectAllColumns(): void {
@@ -998,349 +890,144 @@ private async moveDashboardToFirst(): Promise<void> {
         return name;
     }
 
-    /** Converts API records into rows that only contain the selected columns. */
+    /** API records -> rows that only contain the selected columns (keyed by column label). */
     private buildRows(records: any[]): any[] {
-        const selected = new Set(this.selectedColumns);
-        const columns = (this.selectedEntity?.columns ?? []).filter(c => selected.has(c.key));
+        const columns = (this.selectedEntity?.columns ?? []).filter(c => this.selectedColumns.includes(c.key));
 
         return records.map(record => {
-            const transaction: any = this.mapTransactionToRow(record);
+            const transaction = this.toRow(record);
             const row: any = {};
 
-            columns.forEach(column => {
-                row[column.label] = transaction[column.key];
-            });
+            columns.forEach(column => (row[column.label] = transaction[column.key]));
 
             return row;
         });
     }
 
- async addDataAsNewSheet(): Promise<void> {
-    const entity = this.selectedEntity;
+    /** Loads the data page by page; each page is painted before the next request. */
+    async addSheet(): Promise<void> {
+        const entity = this.selectedEntity;
 
-    if (!this.spreadsheet || !entity) {
-        return;
-    }
-
-    if (!this.selectedColumns.length) {
-        this.notify.warn('Please select at least one column.');
-        return;
-    }
-
-    const filters: SpreadsheetFilters = {
-        ...(this.filters as SpreadsheetFilters),
-        statusFilter: this.cleanStatus(this.filters.statusFilter)
-    };
-
-    const sheetName = this.getUniqueSheetName(entity.displayName);
-
-    const columns = entity.columns.filter(column =>
-        this.selectedColumns.includes(column.key)
-    );
-
- this.isAddingData = true;
-
-this.isLoading = true;
-this.loadingProgress = 0;
-this.loadingMessage = 'Loading records...';
-
-this.cdr.detectChanges();
-
-    let skip = 0;
-    let loaded = 0;
-    let total = 0;
-    let sheetCreated = false;
-
-    try {
-
-        while (true) {
-
-            // =====================================================
-            // 1. LOAD NEXT 10
-            // =====================================================
-
-            const result: any = await firstValueFrom(
-                this.getTransactions(
-                    filters,
-                    skip,
-                    this.batchSize
-                )
-            );
-
-            const items: any[] = result?.items ?? [];
-
-            total = Number(
-                result?.totalCount ?? total ?? 0
-            );
-
-            if (!items.length) {
-                break;
-            }
-
-            const rows = this.buildRows(items);
-
-            // =====================================================
-            // 2. FIRST 10
-            // =====================================================
-
-            if (!sheetCreated) {
-
-                this.grid.insertSheet(
-                    [{
-                        name: sheetName,
-                        ranges: [{
-                            dataSource: rows,
-                            startCell: 'A1',
-                            showFieldAsHeader: true
-                        }]
-                    }],
-                    this.allSheets.length
-                );
-
-                const createdSheet =
-                    await this.waitForSheet(sheetName);
-
-                if (!createdSheet) {
-                    throw new Error(
-                        `Unable to create sheet "${sheetName}".`
-                    );
-                }
-
-                await this.activateSheet(sheetName);
-
-                sheetCreated = true;
-
-                loaded += items.length;
-
-                this.loadingProgress =
-                    total > 0
-                        ? Math.round((loaded / total) * 100)
-                        : 0;
-
-                this.loadingMessage =
-                    `Loaded ${loaded.toLocaleString()} of ` +
-                    `${total.toLocaleString()} records`;
-
-                this.cdr.detectChanges();
-
-                // IMPORTANT:
-                // allow Syncfusion + browser to finish displaying
-                // the first 10 before requesting the next page.
-                await this.paintSpreadsheet();
-
-            } else {
-
-                // =================================================
-                // 3. NEXT 10
-                // =================================================
-
-                // Make sure Transactions/data sheet is STILL active.
-                const activeSheet =
-                    this.grid.getActiveSheet?.();
-
-                if (activeSheet?.name !== sheetName) {
-                    await this.activateSheet(sheetName);
-                }
-
-                /*
-                 * loaded = 10
-                 *
-                 * Header = row 1
-                 * first batch = rows 2-11
-                 * second batch starts row 12
-                 */
-                const startRow = loaded + 2;
-
-                for (
-                    let rowIndex = 0;
-                    rowIndex < rows.length;
-                    rowIndex++
-                ) {
-
-                    const row = rows[rowIndex];
-
-                    const spreadsheetRow =
-                        startRow + rowIndex;
-
-                    for (
-                        let colIndex = 0;
-                        colIndex < columns.length;
-                        colIndex++
-                    ) {
-
-                        const column =
-                            columns[colIndex];
-
-                        const columnName =
-                            toColumnName(colIndex + 1);
-
-                        /*
-                         * IMPORTANT
-                         *
-                         * Do NOT use:
-                         *
-                         * 'Transactions'!A12
-                         *
-                         * The correct sheet is already active.
-                         */
-                        const address =
-                            `${columnName}${spreadsheetRow}`;
-
-                        this.grid.updateCell(
-                            {
-                                value: row[column.label]
-                            },
-                            address
-                        );
-                    }
-                }
-
-                loaded += items.length;
-
-                this.loadingProgress =
-                    total > 0
-                        ? Math.round((loaded / total) * 100)
-                        : 0;
-
-                this.loadingMessage =
-                    `Loaded ${loaded.toLocaleString()} of ` +
-                    `${total.toLocaleString()} records`;
-
-                this.cdr.detectChanges();
-
-                // Let this batch actually become visible.
-                await this.paintSpreadsheet();
-            }
-
-            // =====================================================
-            // 4. ONLY AFTER PAINT → LOAD NEXT 10
-            // =====================================================
-
-            skip += this.batchSize;
-
-            if (
-                items.length < this.batchSize ||
-                (total > 0 && loaded >= total)
-            ) {
-                break;
-            }
-        }
-
-        // =========================================================
-        // NO DATA
-        // =========================================================
-
-        if (!sheetCreated) {
-            this.notify.info(
-                'No records found for the selected filters.'
-            );
-
+        if (!this.spreadsheet || !entity) {
             return;
         }
 
-        // =========================================================
-        // SAVE SOURCE METADATA
-        // =========================================================
-
-        const sheetIndex =
-            this.allSheets.findIndex(
-                (sheet: any) =>
-                    sheet?.name === sheetName
-            );
-
-        if (sheetIndex < 0) {
-            throw new Error(
-                `Sheet "${sheetName}" was not found.`
-            );
+        if (!this.selectedColumns.length) {
+            this.notify.warn('Please select at least one column.');
+            return;
         }
 
-        this.upsertSheetSource({
-            sheetId:
-                this.allSheets[sheetIndex]?.id,
+        const filters: SpreadsheetFilters = {
+            ...(this.filterValues as SpreadsheetFilters),
+            statusFilter: this.cleanStatus(this.filterValues.statusFilter)
+        };
 
-            sheetName,
+        const sheetName = this.getUniqueSheetName(entity.displayName);
+        const columns = entity.columns.filter(c => this.selectedColumns.includes(c.key));
 
-            source: {
-                type: entity.displayName,
-                sourceKey: entity.sourceKey,
-                mode: 'AllRecords',
-                columns: [...this.selectedColumns],
-                filters: { ...filters }
+        this.isAdding = true;
+        this.showLoading('Loading records...');
+        this.cdr.detectChanges();
+
+        let skip = 0;
+        let loaded = 0;
+        let total = 0;
+        let created = false;
+
+        try {
+            while (true) {
+                const result: any = await firstValueFrom(this.getTransactions(filters, skip, this.batchSize));
+                const items: any[] = result?.items ?? [];
+
+                total = Number(result?.totalCount ?? total ?? 0);
+
+                if (!items.length) {
+                    break;
+                }
+
+                const rows = this.buildRows(items);
+
+                if (!created) {
+                    // First page: create the sheet with its header.
+                    this.grid.insertSheet(
+                        [{ name: sheetName, ranges: [{ dataSource: rows, startCell: 'A1', showFieldAsHeader: true }] }],
+                        this.allSheets.length
+                    );
+
+                    if (!(await this.waitForSheet(sheetName))) {
+                        throw new Error(`Unable to create sheet "${sheetName}".`);
+                    }
+
+                    await this.activateSheet(sheetName);
+                    created = true;
+                } else {
+                    // Next pages: write under the rows already shown (row 1 = header).
+                    if (this.activeSheetName !== sheetName) {
+                        await this.activateSheet(sheetName);
+                    }
+
+                    rows.forEach((row, r) =>
+                        columns.forEach((column, c) =>
+                            this.grid.updateCell(
+                                { value: row[column.label] },
+                                `${toColumnName(c + 1)}${loaded + 2 + r}`
+                            )
+                        )
+                    );
+                }
+
+                loaded += items.length;
+                this.setProgress(loaded, total);
+                this.loadingMessage = `Loaded ${loaded.toLocaleString()} of ${total.toLocaleString()} records`;
+
+                // Show this page BEFORE requesting the next one.
+                await this.paint();
+
+                skip += this.batchSize;
+
+                if (items.length < this.batchSize || (total > 0 && loaded >= total)) {
+                    break;
+                }
             }
-        });
 
-        this.currentSpreadsheetSource = {
-            type: entity.displayName,
-            sourceKey: entity.sourceKey,
-            mode: 'AllRecords',
-            columns: [...this.selectedColumns],
-            filters: { ...filters }
-        };
+            if (!created) {
+                this.notify.info('No records found for the selected filters.');
+                return;
+            }
 
-        this.currentSpreadsheetFilters = {
-            ...filters
-        };
+            const sheet = this.findSheet(sheetName);
 
-        this.showDataPanel = false;
+            if (!sheet) {
+                throw new Error(`Sheet "${sheetName}" was not found.`);
+            }
 
-        this.syncActiveSheetToUi();
+            this.upsertSheetSource({
+                sheetId: sheet.id,
+                sheetName,
+                source: {
+                    type: entity.displayName,
+                    sourceKey: entity.sourceKey,
+                    mode: 'AllRecords',
+                    columns: [...this.selectedColumns],
+                    filters: { ...filters }
+                }
+            });
 
-        this.loadingProgress = 100;
-
-        this.loadingMessage =
-            `${loaded.toLocaleString()} records loaded.`;
-
-        this.cdr.detectChanges();
-
-        this.notify.success(
-            `${loaded.toLocaleString()} records added to ${sheetName}.`
-        );
-
-    } catch (error) {
-
-        console.error(
-            '[Spreadsheet Add Data] failed:',
-            error
-        );
-
-        this.notify.error(
-            'Unable to add the data source to the Spreadsheet.'
-        );
-
-    } finally {
-
-        this.isAddingData = false;
-
-        this.hideLoading();
-
-        this.cdr.detectChanges();
+            this.showDataPanel = false;
+            this.syncSheetToUi();
+            this.notify.success(`${loaded.toLocaleString()} records added to ${sheetName}.`);
+        } catch (error) {
+            console.error('[Spreadsheet Add Data] failed:', error);
+            this.notify.error('Unable to add the data source to the Spreadsheet.');
+        } finally {
+            this.isAdding = false;
+            this.hideLoading();
+            this.cdr.detectChanges();
+        }
     }
-}
-
-
-private async paintSpreadsheet(): Promise<void> {
-
-    // Let Angular apply the current state.
-    this.cdr.detectChanges();
-
-    // Let Syncfusion finish its current DOM work.
-    await new Promise<void>(resolve => {
-        setTimeout(() => resolve(), 0);
-    });
-
-    // Frame 1: DOM changes are committed.
-    await new Promise<void>(resolve => {
-        requestAnimationFrame(() => resolve());
-    });
-
-    // Frame 2: browser paints the Spreadsheet.
-    await new Promise<void>(resolve => {
-        requestAnimationFrame(() => resolve());
-    });
-}
 
     // =====================================================
-    // PIVOT: OPEN / CLOSE / BUILD DATA
+    // PIVOT: OPEN / CLOSE / BIND
     // =====================================================
 
     async openPivot(savedAnalysis?: SavedSheetAnalysis): Promise<void> {
@@ -1351,15 +1038,13 @@ private async paintSpreadsheet(): Promise<void> {
         this.isCreatingPivot = true;
 
         try {
-            const activeSheet: any = this.spreadsheet.getActiveSheet();
-
-            if (!activeSheet?.name) {
+            if (!this.activeSheetName) {
                 this.notify.warn('No active spreadsheet found.');
                 return;
             }
 
             // 1. Which sheet is the source and which is the pivot sheet?
-            const target = this.resolvePivotTarget(text(activeSheet.name), savedAnalysis);
+            const target = this.resolvePivotTarget(this.activeSheetName, savedAnalysis);
 
             if (!target) {
                 return;
@@ -1374,10 +1059,9 @@ private async paintSpreadsheet(): Promise<void> {
                 return;
             }
 
-            this.pivotData = records;
             const fieldMapping = this.buildFieldMapping(records);
 
-            // 3. Create the pivot tab (new pivot) or verify it exists (saved pivot).
+            // 3. New pivot: create its tab. Saved pivot: its tab must exist.
             let analysis: any = savedAnalysis;
 
             if (!analysis) {
@@ -1388,10 +1072,20 @@ private async paintSpreadsheet(): Promise<void> {
                 return;
             }
 
-            // 4. Settings, current pivot, active tab.
-            this.pivotDataSourceSettings = this.buildPivotSettings(analysis?.pivot, records, fieldMapping);
-            this.currentPivotSheetName = pivotSheetName;
-            this.pivotSourceSheetName = sourceSheetName;
+            // 4. Settings + current pivot + active tab.
+            this.pivotSettings = this.buildPivotSettings(analysis?.pivot, records, fieldMapping);
+            this.pivotChart = {
+                ...this.pivotChart,
+                chartSeries: {
+                    ...(this.pivotChart?.chartSeries ?? {}),
+                    type: analysis?.chart?.type ?? 'Column'
+                },
+                title: analysis?.chart?.title ?? 'Pivot Chart',
+                enableMultipleAxis: analysis?.chart?.enableMultipleAxis ?? false
+            };
+
+            this.pivotSheet = pivotSheetName;
+            this.sourceSheet = sourceSheetName;
 
             await this.activateSheet(pivotSheetName);
 
@@ -1408,19 +1102,10 @@ private async paintSpreadsheet(): Promise<void> {
 
             this.showPivot = true;
             this.cdr.detectChanges();
-            await yieldToBrowser();
-            await yieldToBrowser();
+            await this.settle();
 
             // 6. Force Syncfusion to bind.
             this.bindPivotView(records);
-
-            console.log('[Pivot] READY', {
-                sourceSheetName,
-                pivotSheetName,
-                records: records.length,
-                fields: Object.keys(records[0] ?? {}),
-                pivotView: !!this.pivotView
-            });
         } catch (error) {
             console.error('[Pivot] Failed:', error);
             this.notify.error('Failed to create Pivot Table.');
@@ -1430,10 +1115,10 @@ private async paintSpreadsheet(): Promise<void> {
     }
 
     async closePivot(): Promise<void> {
-        const sourceSheetName = this.pivotSourceSheetName;
+        const sourceSheetName = this.sourceSheet;
 
-        // Keep latest Pivot configuration in memory before destroying the view.
-        this.updatePivotAnalysis();
+        // Keep the latest Pivot configuration in memory before destroying the view.
+        this.updateAnalysis();
 
         this.showPivot = false;
         this.cdr.detectChanges();
@@ -1442,14 +1127,14 @@ private async paintSpreadsheet(): Promise<void> {
             await this.activateSheet(sourceSheetName);
         }
 
-        this.currentPivotSheetName = null;
-        this.pivotSourceSheetName = null;
+        this.pivotSheet = null;
+        this.sourceSheet = null;
         this.resizeLater();
     }
 
     /** Returns { sourceSheetName, pivotSheetName } or null (after warning the user). */
     private resolvePivotTarget(
-        activeSheetName: string,
+        activeName: string,
         saved?: SavedSheetAnalysis
     ): { sourceSheetName: string; pivotSheetName: string } | null {
         if (saved) {
@@ -1457,9 +1142,7 @@ private async paintSpreadsheet(): Promise<void> {
             let sourceSheetName = text(analysis.sourceSheetName);
 
             if (!sourceSheetName && analysis.sourceSheetId != null) {
-                sourceSheetName = text(
-                    this.allSheets.find((sheet: any) => sheet?.id === analysis.sourceSheetId)?.name
-                );
+                sourceSheetName = text(this.allSheets.find((s: any) => s?.id === analysis.sourceSheetId)?.name);
             }
 
             if (!sourceSheetName) {
@@ -1471,47 +1154,39 @@ private async paintSpreadsheet(): Promise<void> {
             return { sourceSheetName, pivotSheetName: text(analysis.sheetName) };
         }
 
-        if (activeSheetName === DASHBOARD_SHEET || activeSheetName.startsWith('Pivot - ')) {
+        if (activeName === DASHBOARD_SHEET || activeName.startsWith('Pivot - ')) {
             this.notify.warn('Create the Pivot Table from a data sheet.');
             return null;
         }
 
         return {
-            sourceSheetName: activeSheetName,
-            pivotSheetName: this.getUniqueSheetName(`Pivot - ${activeSheetName}`)
+            sourceSheetName: activeName,
+            pivotSheetName: this.getUniqueSheetName(`Pivot - ${activeName}`)
         };
     }
 
     /** Reads the whole source sheet and converts it into pivot records. */
     private async readPivotRecords(sourceSheetName: string): Promise<IDataSet[] | null> {
-        const sourceSheet = this.findSheet(sourceSheetName);
+        const sheet = this.findSheet(sourceSheetName);
 
-        if (!sourceSheet) {
+        if (!sheet) {
             this.notify.warn(`Source sheet "${sourceSheetName}" was not found.`);
             return null;
         }
 
-        const lastRowIndex = sourceSheet.usedRange?.rowIndex ?? 0;
-        const lastColIndex = sourceSheet.usedRange?.colIndex ?? 0;
+        const lastRow = sheet.usedRange?.rowIndex ?? 0;
+        const lastCol = sheet.usedRange?.colIndex ?? 0;
 
-        console.log('[Pivot] source sheet:', sourceSheetName);
-        console.log('[Pivot] used range:', sourceSheet.usedRange);
-
-        if (lastRowIndex < 1 || lastColIndex < 0) {
+        if (lastRow < 1 || lastCol < 0) {
             this.notify.warn('The source sheet does not contain records.');
             return null;
         }
 
         const range =
-            `${this.quoteSheetName(sourceSheetName)}!A1:` +
-            `${toColumnName(lastColIndex + 1)}${lastRowIndex + 1}`;
-
-        console.log('[Pivot] reading:', range);
+            `${this.quoteSheetName(sourceSheetName)}!A1:${toColumnName(lastCol + 1)}${lastRow + 1}`;
 
         const data = await this.spreadsheet!.getData(range);
-        const records = this.sheetDataToRecords(data, lastRowIndex, lastColIndex) as IDataSet[];
-
-        console.log('[Pivot] records:', records);
+        const records = this.sheetDataToRecords(data, lastRow, lastCol) as IDataSet[];
 
         if (!records.length) {
             this.notify.warn('No records were found in the source sheet.');
@@ -1528,14 +1203,7 @@ private async paintSpreadsheet(): Promise<void> {
             sheetName: pivotSheetName,
             sourceSheetName,
             sourceSheetId: this.getSheetIdentity(sourceSheetName).sheetId,
-            pivot: {
-                rows: [],
-                columns: [],
-                values: [],
-                filters: [],
-                filterSettings: [],
-                sortSettings: []
-            },
+            pivot: { rows: [], columns: [], values: [], filters: [], filterSettings: [], sortSettings: [] },
             chart: {
                 type: 'Column',
                 title: `${sourceSheetName} Pivot Chart`,
@@ -1543,7 +1211,7 @@ private async paintSpreadsheet(): Promise<void> {
             }
         };
 
-        this.sheetAnalyses.push(analysis as SavedSheetAnalysis);
+        this.analyses.push(analysis as SavedSheetAnalysis);
 
         this.grid.insertSheet([{ name: pivotSheetName, rowCount: 100, colCount: 20 }], this.allSheets.length);
 
@@ -1579,17 +1247,15 @@ private async paintSpreadsheet(): Promise<void> {
             return;
         }
 
-        const settings = { ...this.pivotDataSourceSettings, dataSource: [...records] };
+        const settings = { ...this.pivotSettings, dataSource: [...records] };
 
         this.pivotView.dataSourceSettings = settings;
-
-        // Excel-like controls: the field list is a separate fixed component.
-        this.pivotView.showFieldList = false;
+        this.pivotView.showFieldList = false; // field list is a separate fixed component
         this.pivotView.showGroupingBar = true;
         this.pivotView.showToolbar = true;
         this.pivotView.toolbar = this.pivotToolbar as any;
         this.pivotView.displayOption = { view: 'Both', primary: 'Table' } as DisplayOption;
-        this.pivotView.chartSettings = this.pivotChartSettings;
+        this.pivotView.chartSettings = this.pivotChart;
         this.pivotView.dataBind?.();
 
         if (this.pivotFieldList) {
@@ -1599,38 +1265,30 @@ private async paintSpreadsheet(): Promise<void> {
         }
 
         this.pivotView.refresh?.();
-
-        console.log('[Pivot] bound records:', records.length);
-        console.log('[Pivot] available fields:', Object.keys(records[0] ?? {}));
     }
 
     /** Opens/closes the pivot view when the user switches sheet tabs. */
     private async syncPivotForActiveSheet(): Promise<void> {
-        if (this.isCreatingPivot) {
+        if (this.isCreatingPivot || !this.activeSheetName) {
             return;
         }
 
-        const activeSheetName = text(this.spreadsheet?.getActiveSheet()?.name);
-
-        if (!activeSheetName) {
-            return;
-        }
-
-        const analysis = this.sheetAnalyses.find(item => text(item?.sheetName) === activeSheetName);
+        const name = this.activeSheetName;
+        const analysis = this.findAnalysis(name);
 
         if (!analysis) {
             if (this.showPivot) {
-                // User switched away from a Pivot tab: keep the latest Pivot state in memory.
-                this.updatePivotAnalysis();
+                // User left a Pivot tab: keep its latest state in memory.
+                this.updateAnalysis();
                 this.showPivot = false;
-                this.currentPivotSheetName = null;
-                this.pivotSourceSheetName = null;
+                this.pivotSheet = null;
+                this.sourceSheet = null;
                 this.cdr.detectChanges();
             }
             return;
         }
 
-        if (this.showPivot && this.currentPivotSheetName === activeSheetName) {
+        if (this.showPivot && this.pivotSheet === name) {
             return;
         }
 
@@ -1638,14 +1296,14 @@ private async paintSpreadsheet(): Promise<void> {
     }
 
     /** First row = headers, remaining non-empty rows = records. */
-    private sheetDataToRecords(data: any, lastRowIndex: number, lastColIndex: number): any[] {
+    private sheetDataToRecords(data: any, lastRow: number, lastCol: number): any[] {
         const readCell = (address: string) => (data.get ? data.get(address) : data[address]);
         const rows: any[][] = [];
 
-        for (let r = 0; r <= lastRowIndex; r++) {
+        for (let r = 0; r <= lastRow; r++) {
             const row: any[] = [];
 
-            for (let c = 0; c <= lastColIndex; c++) {
+            for (let c = 0; c <= lastCol; c++) {
                 row.push(readCell(`${toColumnName(c + 1)}${r + 1}`)?.value ?? '');
             }
 
@@ -1663,9 +1321,7 @@ private async paintSpreadsheet(): Promise<void> {
             .filter(row => row.some(v => v !== '' && v !== null && v !== undefined))
             .map(row => {
                 const record: any = {};
-                headers.forEach((header, i) => {
-                    record[header] = this.normalizeValue(row[i], header);
-                });
+                headers.forEach((header, i) => (record[header] = this.normalizeValue(row[i], header)));
                 return record;
             });
     }
@@ -1691,7 +1347,6 @@ private async paintSpreadsheet(): Promise<void> {
         }
 
         const numeric = Number(str);
-
         return Number.isNaN(numeric) ? str : numeric;
     }
 
@@ -1725,7 +1380,7 @@ private async paintSpreadsheet(): Promise<void> {
         }
     }
 
-    onPivotViewReady(): void {
+    onPivotReady(): void {
         if (this.pivotFieldList && this.pivotView) {
             this.pivotFieldList.update(this.pivotView);
         }
@@ -1736,14 +1391,9 @@ private async paintSpreadsheet(): Promise<void> {
     /** Makes sure TransactionNumber is always counted (not summed). */
     private forceTransactionCount(): void {
         const settings = this.pivotView?.dataSourceSettings;
-
-        if (!settings?.values?.length) {
-            return;
-        }
-
         let changed = false;
 
-        settings.values.forEach((field: any) => {
+        (settings?.values ?? []).forEach((field: any) => {
             if (normalizeKey(field.name) === 'transactionnumber' && field.type !== 'Count') {
                 field.type = 'Count';
                 field.caption = 'Transaction Count';
@@ -1761,11 +1411,11 @@ private async paintSpreadsheet(): Promise<void> {
             return;
         }
 
-        this.pivotView.dataSourceSettings = this.pivotDataSourceSettings;
+        this.pivotView.dataSourceSettings = this.pivotSettings;
         this.pivotView.dataBind?.();
 
         if (this.pivotFieldList) {
-            this.pivotFieldList.dataSourceSettings = this.pivotDataSourceSettings as any;
+            this.pivotFieldList.dataSourceSettings = this.pivotSettings as any;
             this.pivotFieldList.dataBind?.();
             this.pivotFieldList.update?.(this.pivotView);
         }
@@ -1797,56 +1447,36 @@ private async paintSpreadsheet(): Promise<void> {
     }
 
     // =====================================================
-    // SAVED PIVOT (per sheet)
+    // PIVOT ANALYSIS (saved with the workbook)
     // =====================================================
 
-    get hasSavedPivotForActiveSheet(): boolean {
-        try {
-            return !!this.findActiveAnalysis();
-        } catch {
-            return false;
-        }
+    private findAnalysis(sheetName: string): SavedSheetAnalysis | null {
+        const name = text(sheetName);
+        return name ? this.analyses.find(a => text(a.sheetName) === name) ?? null : null;
     }
 
-    private findActiveAnalysis(): SavedSheetAnalysis | null {
-        const name = this.spreadsheet?.getActiveSheet()?.name;
-        return name ? this.sheetAnalyses.find(item => item.sheetName === name) ?? null : null;
+    /** The opened Pivot's analysis, otherwise the active sheet's. */
+    private getCurrentAnalysis(): SavedSheetAnalysis | null {
+        return this.findAnalysis(text(this.pivotSheet)) ?? this.findAnalysis(this.activeSheetName);
     }
 
-    async viewSavedPivot(): Promise<void> {
-        const analysis = this.findActiveAnalysis();
-
-        if (!analysis) {
-            this.notify.info('This sheet does not have a saved Pivot Table.');
-            return;
-        }
-
-        await this.openPivot(analysis);
-    }
-
-    /** Copies the live PivotView state into sheetAnalyses. It does NOT save the spreadsheet. */
-    private updatePivotAnalysis(): void {
-        if (!this.pivotView) {
-            return;
-        }
-
-        const analysis = this.getCurrentPivotAnalysis();
+    /** Copies the live PivotView state into the analysis. Does NOT save the spreadsheet. */
+    private updateAnalysis(): void {
+        const analysis: any = this.pivotView ? this.getCurrentAnalysis() : null;
 
         if (!analysis) {
             return;
         }
 
-        const pivotSheetName = text(analysis.sheetName);
-        const sourceSheetName = text(this.pivotSourceSheetName || analysis.sourceSheetName);
+        const sourceName = text(this.sourceSheet || analysis.sourceSheetName);
 
-        if (!pivotSheetName || !sourceSheetName) {
+        if (!text(analysis.sheetName) || !sourceName) {
             return;
         }
 
         const settings = this.pivotView.dataSourceSettings;
-        const source = this.getSheetIdentity(sourceSheetName);
+        const source = this.getSheetIdentity(sourceName);
 
-        analysis.sheetName = pivotSheetName;
         analysis.sourceSheetName = source.sheetName;
         analysis.sourceSheetId = source.sheetId;
         analysis.pivot = {
@@ -1855,20 +1485,24 @@ private async paintSpreadsheet(): Promise<void> {
             values: this.serializeFields(settings?.values),
             filters: this.serializeFields(settings?.filters),
             filterSettings: this.serializeFilters(settings?.filterSettings),
-            sortSettings: this.serializeSortSettings(settings?.sortSettings)
+            sortSettings: this.serializeSort(settings?.sortSettings)
         };
-
         analysis.chart = {
             ...analysis.chart,
-            type: this.pivotView?.chartSettings?.chartSeries?.type
-                ?? this.pivotChartSettings?.chartSeries?.type
-                ?? analysis.chart?.type
-                ?? 'Column',
+            type: this.getPivotChartType(),
             title: analysis.chart?.title ?? `${source.sheetName} Pivot Chart`,
-            enableMultipleAxis: this.pivotView?.chartSettings?.enableMultipleAxis
-                ?? analysis.chart?.enableMultipleAxis
-                ?? false
+            enableMultipleAxis:
+                this.pivotView?.chartSettings?.enableMultipleAxis ?? analysis.chart?.enableMultipleAxis ?? false
         };
+    }
+
+    private getPivotChartType(): string {
+        return text(
+            this.pivotView?.chart?.series?.[0]?.type ??
+            this.pivotView?.chartSettings?.chartSeries?.type ??
+            this.pivotChart?.chartSeries?.type ??
+            'Column'
+        );
     }
 
     private serializeFields(fields: any[]): any[] {
@@ -1896,13 +1530,115 @@ private async paintSpreadsheet(): Promise<void> {
         }));
     }
 
-    private serializeSortSettings(settings: any[]): any[] {
+    private serializeSort(settings: any[]): any[] {
         return (settings ?? []).map(s => ({ name: s.name, order: s.order }));
+    }
+
+    /** User changed the chart type in the Pivot: keep metadata + Dashboard chart in sync. */
+    onPivotChartChanged(args: any): void {
+        const type = text(
+            args?.series?.[0]?.type ??
+            this.pivotView?.chart?.series?.[0]?.type ??
+            this.pivotView?.chartSettings?.chartSeries?.type
+        );
+
+        if (!type) {
+            return;
+        }
+
+        this.pivotChart = {
+            ...this.pivotChart,
+            chartSeries: { ...(this.pivotChart?.chartSeries ?? {}), type }
+        };
+
+        const analysis: any = this.getCurrentAnalysis();
+
+        if (analysis) {
+            analysis.chart = {
+                ...analysis.chart,
+                type,
+                title: analysis.chart?.title ?? `${analysis.sourceSheetName} Pivot Chart`
+            };
+        }
+
+        // Debounce: Syncfusion may fire this several times while rebuilding the chart.
+        clearTimeout(this.chartSyncTimer);
+        this.chartSyncTimer = setTimeout(() => void this.syncChartTypeToDashboard(type), 100);
+    }
+
+    /** Replaces the Pivot's Dashboard chart when its type changed. */
+    private async syncChartTypeToDashboard(pivotType: string): Promise<void> {
+        const analysis: any = this.getCurrentAnalysis();
+
+        if (!this.spreadsheet || !analysis || (!analysis.dashboardChartId && !analysis.dashboardDataRange)) {
+            return;
+        }
+
+        const range = this.removeSheetFromRange(analysis.dashboardDataRange);
+        const existing = range ? this.findPivotDashboardChart(analysis, range) : null;
+
+        if (!existing) {
+            return;
+        }
+
+        const newType = this.toSheetChartType(pivotType);
+        const oldId = text(existing.id);
+
+        if (text(existing.type) === newType || !oldId || typeof this.grid.deleteChart !== 'function') {
+            return;
+        }
+
+        // Chart APIs work on the active sheet, so go to Dashboard and come back.
+        const previousSheet = this.activeSheetName;
+
+        await this.activateSheet(DASHBOARD_SHEET);
+
+        this.grid.deleteChart(oldId);
+        await this.settle();
+
+        const inserted = await this.insertDashboardChart({
+            range,
+            type: newType,
+            theme: existing.theme ?? 'Material',
+            title: existing.title ?? `${analysis.sheetName} Chart`,
+            height: existing.height ?? 320,
+            width: existing.width ?? 520,
+            top: existing.top ?? 30,
+            left: existing.left ?? 30,
+            isSeriesInRows: existing.isSeriesInRows ?? false
+        });
+
+        // Replacing the chart creates a new native chart id.
+        const newId = text(inserted?.id);
+
+        analysis.dashboardChartId = newId || analysis.dashboardChartId;
+
+        const widget = this.widgets.find(
+            w => w.sourceType === 'PIVOT' && (w.analysisId === analysis.id || w.id === analysis.dashboardWidgetId)
+        );
+
+        if (widget) {
+            widget.chartId = newId || widget.chartId;
+            widget.chartType = newType;
+        }
+
+        if (previousSheet && previousSheet !== DASHBOARD_SHEET) {
+            await this.activateSheet(previousSheet);
+        }
+
+        this.resizeLater(100);
     }
 
     // =====================================================
     // PIVOT -> DASHBOARD
     // =====================================================
+
+    /** True when this Pivot already has a chart on the Dashboard. */
+    get isPivotOnDashboard(): boolean {
+        const analysis = this.getCurrentAnalysis();
+
+        return !!(analysis && (analysis.dashboardWidgetId || analysis.dashboardChartId || analysis.dashboardDataRange));
+    }
 
     async copyPivotToDashboard(): Promise<void> {
         if (!this.pivotView || !this.spreadsheet) {
@@ -1910,32 +1646,27 @@ private async paintSpreadsheet(): Promise<void> {
             return;
         }
 
-        const pivotSheetName = text(this.currentPivotSheetName);
+        const pivotName = text(this.pivotSheet);
 
-        if (!pivotSheetName) {
+        if (!pivotName) {
             this.notify.warn('Pivot sheet is not available.');
             return;
         }
 
-        const analysis = this.sheetAnalyses.find(
-            item => text(item.sheetName) === pivotSheetName
-        );
+        const analysis = this.findAnalysis(pivotName);
 
         if (!analysis) {
             this.notify.warn('Pivot analysis is not available.');
             return;
         }
 
-        const sourceSheetName = text(this.pivotSourceSheetName || analysis.sourceSheetName);
-
-        if (!sourceSheetName) {
+        if (!text(this.sourceSheet || analysis.sourceSheetName)) {
             this.notify.warn('Pivot source sheet is not available.');
             return;
         }
 
         try {
-            // Keep the latest Pivot configuration in memory.
-            this.updatePivotAnalysis();
+            this.updateAnalysis();
 
             const matrix = this.getPivotResultMatrix();
 
@@ -1944,53 +1675,33 @@ private async paintSpreadsheet(): Promise<void> {
                 return;
             }
 
-            const maxColumns = matrix.reduce(
-                (max, row) => Math.max(max, row?.length ?? 0),
-                0
-            );
+            const maxColumns = matrix.reduce((max, row) => Math.max(max, row?.length ?? 0), 0);
 
             if (matrix.length < 2 || maxColumns < 2) {
                 this.notify.warn('Pivot result needs at least two columns/rows for a chart.');
                 return;
             }
 
-            // Reuse the ONE Dashboard sheet and the same reserved helper range.
-            const dashboardRange = await this.writePivotResultToDashboard(
-                pivotSheetName,
-                matrix
-            );
+            // Data goes into a reserved block of the ONE Dashboard sheet.
+            const dashboardRange = await this.writePivotData(pivotName, matrix);
 
-            const pivotSeriesType =
-                this.pivotView?.chartSettings?.chartSeries?.type ??
-                this.pivotChartSettings?.chartSeries?.type ??
-                analysis.chart?.type ??
-                'Column';
+            // First copy inserts the chart. Next copies replace only THIS Pivot's chart.
+            const result = await this.upsertPivotChart(analysis, {
+                range: dashboardRange,
+                type: this.toSheetChartType(this.getPivotChartType()),
+                theme: 'Material',
+                title: `${pivotName} Chart`,
+                height: 320,
+                width: 520,
+                top: 30,
+                left: 30,
+                isSeriesInRows: false
+            });
 
-            // First copy => insert. Next copies of the SAME Pivot => update/replace
-            // only that Pivot chart. Direct Dashboard charts are never touched.
-            const result = await this.upsertPivotChartOnDashboard(
-                analysis,
-                {
-                    range: dashboardRange,
-                    type: this.mapPivotChartType(pivotSeriesType),
-                    theme: 'Material',
-                    title: `${pivotSheetName} Chart`,
-                    height: 320,
-                    width: 520,
-                    top: 30,
-                    left: 30,
-                    isSeriesInRows: false
-                }
-            );
-
-            this.registerPivotWidget(
-                pivotSheetName,
-                dashboardRange,
-                result.chart
-            );
+            this.registerWidget(pivotName, dashboardRange, result.chart);
 
             await this.activateSheet(DASHBOARD_SHEET);
-            this.refreshLayout();
+            this.resizeLater(100);
 
             this.notify.success(
                 result.updated
@@ -2004,15 +1715,11 @@ private async paintSpreadsheet(): Promise<void> {
     }
 
     /**
-     * Writes the pivot result into a reserved block of the Dashboard sheet
-     * and returns a LOCAL range (e.g. AZ1:BH20). Each saved pivot gets its own block.
+     * Writes the pivot result into a reserved block of the Dashboard sheet and
+     * returns a LOCAL range (e.g. AZ1:BH20). Each Pivot gets its own block.
      */
-    private async writePivotResultToDashboard(sourceSheetName: string, matrix: any[][]): Promise<string> {
-        if (!this.spreadsheet) {
-            throw new Error('Spreadsheet is not ready.');
-        }
-
-        const dashboard = await this.ensureDashboardSheet();
+    private async writePivotData(pivotName: string, matrix: any[][]): Promise<string> {
+        const dashboard = await this.ensureDashboard();
 
         if (!dashboard) {
             throw new Error('Dashboard sheet could not be created.');
@@ -2020,17 +1727,13 @@ private async paintSpreadsheet(): Promise<void> {
 
         await this.activateSheet(DASHBOARD_SHEET);
 
-        const analysisIndex = Math.max(
-            0,
-            this.sheetAnalyses.findIndex(item => text(item?.sheetName) === text(sourceSheetName))
-        );
-
-        const startColumnNumber = 52 + analysisIndex * 20; // AZ, BT, ...
+        const index = Math.max(0, this.analyses.findIndex(a => text(a?.sheetName) === text(pivotName)));
+        const startColumnNumber = 52 + index * 20; // AZ, BT, ...
         const maxColumns = matrix.reduce((max, row) => Math.max(max, row?.length ?? 0), 0);
         const startColumn = toColumnName(startColumnNumber);
         const endColumn = toColumnName(startColumnNumber + Math.max(maxColumns, 1) - 1);
 
-        // Clear only this pivot's reserved block before rewriting it.
+        // Clear only this Pivot's block before rewriting it.
         const clearLastRow = Math.max(matrix.length + 20, Number(dashboard?.usedRange?.rowIndex ?? 0) + 1);
 
         if (typeof this.grid.clear === 'function') {
@@ -2047,35 +1750,40 @@ private async paintSpreadsheet(): Promise<void> {
             )
         );
 
-        await yieldToBrowser();
-        await yieldToBrowser();
+        await this.settle();
 
-        const ready = await this.waitForSheet(DASHBOARD_SHEET);
-
-        if (!ready?.rows?.length) {
+        if (!(await this.waitForSheet(DASHBOARD_SHEET))?.rows?.length) {
             throw new Error('Dashboard Pivot source cells were not created.');
         }
 
         return `${startColumn}1:${endColumn}${matrix.length}`;
     }
 
-    private async upsertPivotChartOnDashboard(
+    private async upsertPivotChart(
         analysis: SavedSheetAnalysis,
         chart: any
     ): Promise<{ chart: any; updated: boolean }> {
-        await this.ensureDashboardSheet();
+        await this.ensureDashboard();
         await this.activateSheet(DASHBOARD_SHEET);
 
-        const existing = this.findExistingPivotDashboardChart(analysis, chart.range);
+        const existing = this.findPivotDashboardChart(analysis, chart.range);
 
         if (!existing) {
-            return {
-                chart: await this.insertChartOnDashboard(chart),
-                updated: false
-            };
+            return { chart: await this.insertDashboardChart(chart), updated: false };
         }
 
-        // Preserve the user's Dashboard layout when refreshing the Pivot chart.
+        const chartId = text(existing.id);
+
+        // Cannot identify the old chart safely: never create a duplicate.
+        // The helper data is already refreshed, so the old chart still shows it.
+        if (!chartId || typeof this.grid.deleteChart !== 'function') {
+            return { chart: existing, updated: true };
+        }
+
+        // Delete ONLY this Pivot's chart, and keep the user's Dashboard layout.
+        this.grid.deleteChart(chartId);
+        await this.settle();
+
         const nextChart = {
             ...chart,
             top: existing.top ?? chart.top,
@@ -2084,76 +1792,42 @@ private async paintSpreadsheet(): Promise<void> {
             height: existing.height ?? chart.height
         };
 
-        const chartId = text(existing.id);
-
-        if (!chartId || typeof this.grid.deleteChart !== 'function') {
-            // Do not create a duplicate if we cannot safely identify the old chart.
-            // The helper data has already been refreshed, so the existing chart
-            // continues to point at the same Dashboard range.
-            return { chart: existing, updated: true };
-        }
-
-        // Delete ONLY this Pivot's chart. Never clear/delete other Dashboard charts.
-        this.grid.deleteChart(chartId);
-        await yieldToBrowser();
-        await yieldToBrowser();
-
-        return {
-            chart: await this.insertChartOnDashboard(nextChart),
-            updated: true
-        };
+        return { chart: await this.insertDashboardChart(nextChart), updated: true };
     }
 
-    private findExistingPivotDashboardChart(
-        analysis: SavedSheetAnalysis,
-        dashboardRange: string
-    ): any | null {
-        const dashboard = this.findSheet(DASHBOARD_SHEET);
-
-        if (!dashboard) {
-            return null;
-        }
-
-        const charts = this.getChartsFromSavedSheet(dashboard);
+    /** Finds a Pivot's Dashboard chart: by chart id, then range, then title. */
+    private matchPivotChart(analysis: SavedSheetAnalysis, charts: any[], fallbackRange = ''): any | null {
         const expectedId = text(analysis.dashboardChartId);
-        const expectedRange = this.removeSheetFromRange(
-            text(analysis.dashboardDataRange || dashboardRange)
+        const expectedRange = this.removeSheetFromRange(analysis.dashboardDataRange || fallbackRange);
+        const titles = [
+            text(analysis.chart?.title),
+            `${text(analysis.sheetName)} Chart`,
+            `${text(analysis.sourceSheetName)} Pivot Chart`
+        ].filter(Boolean);
+
+        return (
+            (expectedId && charts.find(c => text(c?.id) === expectedId)) ||
+            (expectedRange && charts.find(c => this.removeSheetFromRange(c?.range) === expectedRange)) ||
+            charts.find(c => titles.includes(text(c?.title))) ||
+            null
         );
-        const pivotTitle = `${text(analysis.sheetName)} Chart`;
-
-        // 1. Stable saved chart id.
-        if (expectedId) {
-            const byId = charts.find(chart => text(chart?.id) === expectedId);
-            if (byId) {
-                return byId;
-            }
-        }
-
-        // 2. Stable reserved Dashboard helper range.
-        if (expectedRange) {
-            const byRange = charts.find(
-                chart => this.removeSheetFromRange(text(chart?.range)) === expectedRange
-            );
-            if (byRange) {
-                return byRange;
-            }
-        }
-
-        // 3. Title fallback for old saved workbooks.
-        return charts.find(chart => text(chart?.title) === pivotTitle) ?? null;
     }
 
-    private async insertChartOnDashboard(chart: any): Promise<any> {
+    private findPivotDashboardChart(analysis: SavedSheetAnalysis, dashboardRange: string): any | null {
+        const charts = this.getSheetCharts(this.findSheet(DASHBOARD_SHEET));
+        return this.matchPivotChart(analysis, charts, dashboardRange);
+    }
+
+    private async insertDashboardChart(chart: any): Promise<any> {
         if (!this.spreadsheet) {
             throw new Error('Spreadsheet is not ready.');
         }
 
-        if (!(await this.ensureDashboardSheet())) {
+        if (!(await this.ensureDashboard())) {
             throw new Error('Dashboard sheet could not be created.');
         }
 
-        // Critical for EJ2 20.4.x chart drag/resize: a null top-level sheet
-        // crashes Overlay.overlayMouseUpHandler later.
+        // EJ2 20.4.x: a null top-level sheet crashes chart drag/resize later.
         this.repairSheets();
         await yieldToBrowser();
 
@@ -2169,24 +1843,21 @@ private async paintSpreadsheet(): Promise<void> {
 
         // Validate referenced sheets BEFORE the chart range is processed.
         for (const name of getChartReferencedSheetNames(range)) {
-            const sourceSheet = await this.waitForSheet(name);
+            const sheet = await this.waitForSheet(name);
 
-            if (!sourceSheet) {
+            if (!sheet) {
                 throw new Error(`Chart source sheet "${name}" is not available.`);
             }
 
-            if (!Array.isArray(sourceSheet.rows) || !sourceSheet.rows.length) {
+            if (!Array.isArray(sheet.rows) || !sheet.rows.length) {
                 throw new Error(`Chart source sheet "${name}" does not contain rows yet.`);
             }
         }
 
         await this.activateSheet(DASHBOARD_SHEET);
+        await this.settle(); // chart creation is overlay-based
 
-        // Extra paint turns: chart creation is overlay-based.
-        await yieldToBrowser();
-        await yieldToBrowser();
-
-        if (this.grid.getActiveSheet?.()?.name !== DASHBOARD_SHEET) {
+        if (this.activeSheetName !== DASHBOARD_SHEET) {
             throw new Error('Dashboard sheet is not active.');
         }
 
@@ -2210,62 +1881,36 @@ private async paintSpreadsheet(): Promise<void> {
         }
 
         this.grid.insertChart([model]);
+        await this.settle();
 
-        await yieldToBrowser();
-        await yieldToBrowser();
+        const inserted = this.findDashboardChart(range, model.title) ?? model;
 
-        const insertedChart = this.findDashboardChart(range, model.title) ?? model;
+        this.resizeLater(100);
 
-        this.refreshLayout();
-
-        return insertedChart;
+        return inserted;
     }
 
+    /** A Dashboard chart with this range (the one with this title wins). */
     private findDashboardChart(range: string, title?: string): any | null {
-        const dashboard = this.allSheets.find((s: any) => text(s?.name) === DASHBOARD_SHEET);
+        const matches = this.getSheetCharts(this.findSheet(DASHBOARD_SHEET)).filter(
+            c => text(c?.range) === text(range)
+        );
 
-        if (!dashboard) {
-            return null;
-        }
-
-        let rangeMatch: any | null = null;
-
-        for (const row of dashboard.rows ?? []) {
-            for (const cell of row?.cells ?? []) {
-                for (const chart of cell?.chart ?? []) {
-                    if (text(chart?.range) !== text(range)) {
-                        continue;
-                    }
-
-                    if (title && text(chart?.title) === text(title)) {
-                        return chart;
-                    }
-
-                    rangeMatch = chart;
-                }
-            }
-        }
-
-        return rangeMatch;
+        return matches.find(c => title && text(c?.title) === text(title)) ?? matches[matches.length - 1] ?? null;
     }
 
-    private mapPivotChartType(type: string): string {
+    private toSheetChartType(type: string): string {
         const map: Record<string, string> = {
-            Column: 'Column',
-            Bar: 'Bar',
-            Line: 'Line',
-            Area: 'Area',
-            Pie: 'Pie',
-            Doughnut: 'Doughnut',
-            Scatter: 'Scatter',
             Spline: 'Line',
-            SplineArea: 'Area',
-            StackingColumn: 'StackingColumn',
-            StackingBar: 'StackingBar',
-            StackingArea: 'StackingArea'
+            SplineArea: 'Area'
         };
 
-        return map[type] ?? 'Column';
+        const known = [
+            'Column', 'Bar', 'Line', 'Area', 'Pie', 'Doughnut', 'Scatter',
+            'StackingColumn', 'StackingBar', 'StackingArea'
+        ];
+
+        return map[type] ?? (known.includes(type) ? type : 'Column');
     }
 
     // =====================================================
@@ -2285,7 +1930,7 @@ private async paintSpreadsheet(): Promise<void> {
             return;
         }
 
-        const activeName = this.grid.getActiveSheet?.()?.name;
+        const activeName = this.activeSheetName;
 
         console.warn('[Spreadsheet] repairing invalid live sheet entries', {
             before: current.length,
@@ -2294,73 +1939,70 @@ private async paintSpreadsheet(): Promise<void> {
 
         this.grid.sheets = valid;
 
-        let nextIndex = activeName
-            ? valid.findIndex(s => text(s?.name) === text(activeName))
+        let next = activeName
+            ? valid.findIndex(s => text(s?.name) === activeName)
             : Number(this.grid.activeSheetIndex ?? 0);
 
-        if (nextIndex < 0 || nextIndex >= valid.length) {
-            nextIndex = 0;
+        if (next < 0 || next >= valid.length) {
+            next = 0;
         }
 
-        this.grid.activeSheetIndex = nextIndex;
+        this.grid.activeSheetIndex = next;
     }
 
-    private async ensureDashboardSheet(): Promise<any> {
+    /** Returns the ONE Dashboard sheet, creating it when missing. */
+    private async ensureDashboard(): Promise<any> {
         if (!this.spreadsheet) {
             return null;
         }
 
         this.repairSheets();
 
-        // Reuse an existing Dashboard. Compare case-insensitively so we never
-        // create Dashboard (2) because of a naming/casing mismatch.
-        const existing = this.allSheets.find(
-            (sheet: any) => text(sheet?.name).trim().toLowerCase() === DASHBOARD_SHEET.toLowerCase()
-        );
+        // Case-insensitive, so a casing mismatch never creates "Dashboard (2)".
+        const existing = this.allSheets.find(s => this.isDashboard(s));
 
         if (existing) {
             return existing;
         }
 
-        // Multiple async chart operations can ask for Dashboard at the same time.
-        // Share one creation promise so only ONE Dashboard is inserted.
-        if (this.dashboardSheetPromise) {
-            return this.dashboardSheetPromise;
+        // Parallel chart operations share ONE creation promise.
+        if (!this.dashboardPromise) {
+            this.dashboardPromise = this.createDashboardSheet();
         }
-
-        this.dashboardSheetPromise = (async () => {
-            // Check again inside the lock.
-            const secondCheck = this.allSheets.find(
-                (sheet: any) => text(sheet?.name).trim().toLowerCase() === DASHBOARD_SHEET.toLowerCase()
-            );
-
-            if (secondCheck) {
-                return secondCheck;
-            }
-
-            const model = [{ name: DASHBOARD_SHEET, rows: [], columns: [] }];
-
-            try {
-                this.grid.insertSheet(model, 0);
-            } catch {
-                // Older Syncfusion patches may ignore the index overload.
-                this.grid.insertSheet(model);
-            }
-
-            await yieldToBrowser();
-            await yieldToBrowser();
-            this.repairSheets();
-
-            return await this.waitForSheet(DASHBOARD_SHEET);
-        })();
 
         try {
-            return await this.dashboardSheetPromise;
+            return await this.dashboardPromise;
         } finally {
-            this.dashboardSheetPromise = null;
+            this.dashboardPromise = null;
+        }
+    }
+
+    private async createDashboardSheet(): Promise<any> {
+        const model = [{ name: DASHBOARD_SHEET, rows: [], columns: [] }];
+
+        try {
+            this.grid.insertSheet(model, 0);
+        } catch {
+            // Older Syncfusion patches ignore the index overload.
+            this.grid.insertSheet(model);
         }
 
-        
+        await this.settle();
+        this.repairSheets();
+
+        return this.waitForSheet(DASHBOARD_SHEET);
+    }
+
+    /** Dashboard is always the first (left-most) tab. */
+    private async moveDashboardFirst(): Promise<void> {
+        const index = this.allSheets.findIndex(s => this.isDashboard(s));
+
+        if (index <= 0 || typeof this.grid.moveSheet !== 'function') {
+            return;
+        }
+
+        this.grid.moveSheet(0, [index]);
+        await yieldToBrowser();
     }
 
     private async waitForSheet(sheetName: string, attempts = 30): Promise<any> {
@@ -2395,9 +2037,7 @@ private async paintSpreadsheet(): Promise<void> {
         }
 
         this.grid.activeSheetIndex = index;
-
-        await yieldToBrowser();
-        await yieldToBrowser();
+        await this.settle();
 
         return index;
     }
@@ -2406,20 +2046,12 @@ private async paintSpreadsheet(): Promise<void> {
     // DASHBOARD WIDGET METADATA
     // =====================================================
 
-    get dashboardChartCount(): number {
-        if (!this.spreadsheet) {
-            return 0;
-        }
-
-        return this.getWidgetsForSheet(this.grid.getActiveSheet?.()).length;
-    }
-
     private getWidgetsForSheet(sheet: any): DashboardWidgetMetadata[] {
         if (!sheet) {
             return [];
         }
 
-        return this.dashboardWidgets.filter(
+        return this.widgets.filter(
             w =>
                 (w.sourceSheetId != null && sheet.id != null && Number(w.sourceSheetId) === Number(sheet.id)) ||
                 String(w.sourceSheetName ?? '') === String(sheet.name ?? '')
@@ -2430,9 +2062,9 @@ private async paintSpreadsheet(): Promise<void> {
         const sheet = this.allSheets.find((s: any) => text(s?.name) === text(sheetName));
 
         const metadata =
-            this.sheetDataSources.find(
-                item => item.sheetId != null && sheet?.id != null && Number(item.sheetId) === Number(sheet.id)
-            ) ?? this.sheetDataSources.find(item => text(item?.sheetName) === text(sheetName));
+            this.sheetSources.find(
+                i => i.sheetId != null && sheet?.id != null && Number(i.sheetId) === Number(sheet.id)
+            ) ?? this.sheetSources.find(i => text(i?.sheetName) === text(sheetName));
 
         return {
             sheetId: metadata?.sheetId ?? sheet?.id,
@@ -2440,88 +2072,8 @@ private async paintSpreadsheet(): Promise<void> {
         };
     }
 
-    private registerPivotWidget(
-        pivotSheetName: string,
-        dashboardRange: string,
-        insertedChart: any
-    ): void {
-        const analysis = this.sheetAnalyses.find(
-            item => text(item?.sheetName) === text(pivotSheetName)
-        );
-
-        if (!analysis) {
-            console.warn('[Dashboard] Pivot analysis not found:', pivotSheetName);
-            return;
-        }
-
-        if (analysis.id == null) {
-            analysis.id = Date.now();
-        }
-
-        // The widget source is the REAL data sheet, not the Pivot tab.
-        const sourceSheetName = text(analysis.sourceSheetName);
-
-        if (!sourceSheetName) {
-            console.warn('[Dashboard] Pivot source sheet missing:', analysis);
-            return;
-        }
-
-        const source = this.getSheetIdentity(sourceSheetName);
-        const chartId = text(insertedChart?.id) || undefined;
-
-        const existing = this.dashboardWidgets.find(
-            w =>
-                w.sourceType === 'PIVOT' &&
-                (
-                    (analysis.id != null && w.analysisId === analysis.id) ||
-                    (analysis.dashboardWidgetId != null && w.id === analysis.dashboardWidgetId)
-                )
-        );
-
-        const widgetId = existing?.id ?? analysis.dashboardWidgetId ?? Date.now();
-
-        const widget: DashboardWidgetMetadata = {
-            id: widgetId,
-            dashboardSheetName: DASHBOARD_SHEET,
-            chartId,
-            chartTitle: text(
-                insertedChart?.title ??
-                analysis.chart?.title ??
-                `${pivotSheetName} Chart`
-            ),
-            chartType: String(
-                insertedChart?.type ??
-                this.mapPivotChartType(analysis.chart?.type)
-            ),
-            sourceType: 'PIVOT',
-            sourceSheetId: source.sheetId,
-            sourceSheetName: source.sheetName,
-            analysisId: analysis.id,
-            dashboardDataRange: this.removeSheetFromRange(dashboardRange)
-        };
-
-        const index = this.dashboardWidgets.findIndex(
-            item => item.id === widgetId
-        );
-
-        if (index >= 0) {
-            this.dashboardWidgets[index] = widget;
-        } else {
-            this.dashboardWidgets.push(widget);
-        }
-
-        analysis.dashboardWidgetId = widgetId;
-        analysis.dashboardChartId = chartId;
-        analysis.dashboardDataRange = this.removeSheetFromRange(dashboardRange);
-        analysis.sourceSheetId = source.sheetId;
-        analysis.sourceSheetName = source.sheetName;
-    }
-
-    private getWorkbook(workbookJson: any): any {
-        return workbookJson?.jsonObject?.Workbook ?? workbookJson?.Workbook ?? workbookJson;
-    }
-
-    private getChartsFromSavedSheet(sheet: any): any[] {
+    /** All charts stored in a sheet model (live or saved). */
+    private getSheetCharts(sheet: any): any[] {
         const charts: any[] = [];
 
         for (const row of sheet?.rows ?? []) {
@@ -2539,312 +2091,172 @@ private async paintSpreadsheet(): Promise<void> {
         return charts;
     }
 
-    private rebuildWidgetMetadata(workbookJson: any): void {
-        const workbook = this.getWorkbook(workbookJson);
+    /** Creates/updates the widget record of a Pivot chart that was copied to the Dashboard. */
+    private registerWidget(pivotName: string, dashboardRange: string, chart: any): void {
+        const analysis: any = this.findAnalysis(pivotName);
+
+        if (!analysis) {
+            console.warn('[Dashboard] Pivot analysis not found:', pivotName);
+            return;
+        }
+
+        if (analysis.id == null) {
+            analysis.id = Date.now();
+        }
+
+        // The widget source is the REAL data sheet, not the Pivot tab.
+        const sourceName = text(analysis.sourceSheetName);
+
+        if (!sourceName) {
+            console.warn('[Dashboard] Pivot source sheet missing:', analysis);
+            return;
+        }
+
+        const source = this.getSheetIdentity(sourceName);
+        const chartId = text(chart?.id) || undefined;
+        const range = this.removeSheetFromRange(dashboardRange);
+
+        const existing = this.widgets.find(
+            w =>
+                w.sourceType === 'PIVOT' &&
+                (w.analysisId === analysis.id ||
+                    (analysis.dashboardWidgetId != null && w.id === analysis.dashboardWidgetId))
+        );
+
+        const widgetId = existing?.id ?? analysis.dashboardWidgetId ?? Date.now();
+
+        const widget: DashboardWidgetMetadata = {
+            id: widgetId,
+            dashboardSheetName: DASHBOARD_SHEET,
+            chartId,
+            chartTitle: text(chart?.title ?? analysis.chart?.title ?? `${pivotName} Chart`),
+            chartType: String(chart?.type ?? this.toSheetChartType(analysis.chart?.type)),
+            sourceType: 'PIVOT',
+            sourceSheetId: source.sheetId,
+            sourceSheetName: source.sheetName,
+            analysisId: analysis.id,
+            dashboardDataRange: range
+        };
+
+        const index = this.widgets.findIndex(w => w.id === widgetId);
+
+        if (index >= 0) {
+            this.widgets[index] = widget;
+        } else {
+            this.widgets.push(widget);
+        }
+
+        Object.assign(analysis, {
+            dashboardWidgetId: widgetId,
+            dashboardChartId: chartId,
+            dashboardDataRange: range,
+            sourceSheetId: source.sheetId,
+            sourceSheetName: source.sheetName
+        });
+    }
+
+    /** Rebuilds widget records from the charts that are really on the saved Dashboard. */
+    private rebuildWidgets(workbookJson: any): void {
+        const workbook = workbookJson?.jsonObject?.Workbook ?? workbookJson?.Workbook ?? workbookJson;
         const sheets: any[] = Array.isArray(workbook?.sheets) ? workbook.sheets : [];
         const dashboard = sheets.find(s => text(s?.name) === DASHBOARD_SHEET);
 
         if (!dashboard) {
-            this.dashboardWidgets = [];
+            this.widgets = [];
             return;
         }
 
-        const charts = this.getChartsFromSavedSheet(dashboard);
-        const matchedPivotCharts = new Set<any>();
+        const charts = this.getSheetCharts(dashboard);
+        const matched = new Set<any>();
 
-        const pivotWidgets = this.rebuildPivotWidgets(charts, matchedPivotCharts);
-        const directWidgets = this.rebuildDirectWidgets(charts, matchedPivotCharts, pivotWidgets.length);
+        const pivotWidgets = this.rebuildPivotWidgets(charts, matched);
+        const directWidgets = this.rebuildDirectWidgets(charts, matched, pivotWidgets.length);
 
-        this.dashboardWidgets = [...pivotWidgets, ...directWidgets];
+        this.widgets = [...pivotWidgets, ...directWidgets];
     }
 
     /**
-     * PIVOT widgets are rebuilt from sheetAnalyses (source sheet -> pivot
-     * definition -> Dashboard chart), because a pivot chart points to a LOCAL
-     * Dashboard range, so its source can't be derived from chart.range alone.
+     * PIVOT widgets come from the analyses (source sheet -> pivot -> Dashboard chart),
+     * because a pivot chart points to a LOCAL Dashboard range, so its source sheet
+     * can't be derived from chart.range alone.
      */
- private rebuildPivotWidgets(
-    charts: any[],
-    matched: Set<any>
-): DashboardWidgetMetadata[] {
+    private rebuildPivotWidgets(charts: any[], matched: Set<any>): DashboardWidgetMetadata[] {
+        const widgets: DashboardWidgetMetadata[] = [];
 
-    const widgets: DashboardWidgetMetadata[] = [];
+        for (const analysis of this.analyses as any[]) {
+            const pivotName = text(analysis.sheetName);
+            const sourceName = text(analysis.sourceSheetName);
 
-    for (const analysis of this.sheetAnalyses ?? []) {
+            if (!analysis.chart || !pivotName || !sourceName) {
+                continue;
+            }
 
-        const pivotSheetName =
-            text(analysis.sheetName);
+            if (analysis.id == null) {
+                analysis.id = Date.now() + widgets.length;
+            }
 
-        const sourceSheetName =
-            text(analysis.sourceSheetName);
+            const chart = this.matchPivotChart(analysis, charts.filter(c => !matched.has(c)));
 
-        if (
-            !analysis.chart ||
-            !pivotSheetName ||
-            !sourceSheetName
-        ) {
-            continue;
+            // Analysis exists but its chart is not on the Dashboard: no stale widget.
+            if (!chart) {
+                console.warn('[Dashboard] Pivot chart not found:', pivotName);
+                continue;
+            }
+
+            matched.add(chart);
+
+            const source = this.getSheetIdentity(sourceName);
+            const chartId = text(chart.id) || text(analysis.dashboardChartId) || undefined;
+            const range = this.removeSheetFromRange(chart.range) || text(analysis.dashboardDataRange);
+            const widgetId = analysis.dashboardWidgetId ?? Date.now() + widgets.length;
+
+            widgets.push({
+                id: widgetId,
+                dashboardSheetName: DASHBOARD_SHEET,
+                chartId,
+                chartTitle: text(chart.title) || text(analysis.chart?.title),
+                chartType: String(chart.type ?? this.toSheetChartType(analysis.chart?.type)),
+                sourceType: 'PIVOT',
+                sourceSheetId: source.sheetId,
+                sourceSheetName: source.sheetName,
+                analysisId: analysis.id,
+                dashboardDataRange: range
+            });
+
+            // Backfill so the next save has stable, explicit links.
+            Object.assign(analysis, {
+                dashboardWidgetId: widgetId,
+                dashboardChartId: chartId,
+                dashboardDataRange: range,
+                sourceSheetId: source.sheetId,
+                sourceSheetName: source.sheetName
+            });
         }
 
-        if (analysis.id == null) {
-            analysis.id =
-                Date.now() + widgets.length;
-        }
-
-        const source =
-            this.getSheetIdentity(
-                sourceSheetName
-            );
-
-        const expectedChartId =
-            text(analysis.dashboardChartId);
-
-        const expectedRange =
-            text(analysis.dashboardDataRange);
-
-        const expectedDashboardRange =
-            expectedRange
-                ? `${DASHBOARD_SHEET}!${expectedRange}`
-                : '';
-
-        const candidates =
-            charts.filter(
-                chart => !matched.has(chart)
-            );
-
-        // 1. Try chart ID
-        let nativeChart =
-            expectedChartId
-                ? candidates.find(
-                    chart =>
-                        text(chart?.id) ===
-                        expectedChartId
-                )
-                : null;
-
-        // 2. Try Dashboard range.
-        // Syncfusion returns "Dashboard!AZ1:BA15"
-        // while we store "AZ1:BA15".
-        if (!nativeChart && expectedRange) {
-
-            nativeChart =
-                candidates.find(chart => {
-
-                    const chartRange =
-                        text(chart?.range);
-
-                    return (
-                        chartRange === expectedRange ||
-                        chartRange === expectedDashboardRange ||
-                        this.removeSheetFromRange(
-                            chartRange
-                        ) === expectedRange
-                    );
-                });
-        }
-
-        // 3. Title is only fallback.
-        if (!nativeChart) {
-
-            const possibleTitles = [
-                text(analysis.chart?.title),
-                `${pivotSheetName} Chart`,
-                `${sourceSheetName} Pivot Chart`
-            ].filter(Boolean);
-
-            nativeChart =
-                candidates.find(
-                    chart =>
-                        possibleTitles.includes(
-                            text(chart?.title)
-                        )
-                );
-        }
-
-        if (!nativeChart) {
-
-            console.warn(
-                '[Dashboard] Pivot chart not found',
-                {
-                    pivotSheetName,
-                    sourceSheetName,
-                    expectedChartId,
-                    expectedRange,
-                    expectedDashboardRange,
-                    dashboardCharts:
-                        candidates.map(chart => ({
-                            id: chart?.id,
-                            range: chart?.range,
-                            title: chart?.title
-                        }))
-                }
-            );
-
-            continue;
-        }
-
-        matched.add(nativeChart);
-
-        const chartId =
-            text(nativeChart?.id) ||
-            expectedChartId ||
-            undefined;
-
-        const dashboardDataRange =
-            this.removeSheetFromRange(
-                text(nativeChart?.range)
-            ) ||
-            expectedRange;
-
-        const widgetId =
-            analysis.dashboardWidgetId ??
-            Date.now() + widgets.length;
-
-        const widget: DashboardWidgetMetadata = {
-
-            id: widgetId,
-
-            dashboardSheetName:
-                DASHBOARD_SHEET,
-
-            chartId,
-
-            chartTitle:
-                text(nativeChart?.title) ||
-                text(analysis.chart?.title),
-
-            chartType:
-                String(
-                    nativeChart?.type ??
-                    this.mapPivotChartType(
-                        analysis.chart?.type
-                    )
-                ),
-
-            sourceType: 'PIVOT',
-
-            sourceSheetId:
-                source.sheetId,
-
-            sourceSheetName:
-                source.sheetName,
-
-            analysisId:
-                analysis.id,
-
-            dashboardDataRange
-        };
-
-        widgets.push(widget);
-
-        analysis.dashboardWidgetId =
-            widget.id;
-
-        analysis.dashboardChartId =
-            chartId;
-
-        analysis.dashboardDataRange =
-            dashboardDataRange;
-
-        analysis.sourceSheetId =
-            source.sheetId;
-
-        analysis.sourceSheetName =
-            source.sheetName;
+        return widgets;
     }
 
-    return widgets;
-}
-
-
-private getCurrentPivotAnalysis():
-    SavedSheetAnalysis | null {
-
-    // First use currently opened Pivot.
-    if (this.currentPivotSheetName) {
-
-        const current =
-            this.sheetAnalyses.find(
-                analysis =>
-                    text(analysis.sheetName) ===
-                    text(this.currentPivotSheetName)
-            );
-
-        if (current) {
-            return current;
-        }
-    }
-
-    // Otherwise check active sheet.
-    const activeSheetName =
-        text(
-            this.grid
-                ?.getActiveSheet?.()
-                ?.name
-        );
-
-    if (activeSheetName) {
-
-        const active =
-            this.sheetAnalyses.find(
-                analysis =>
-                    text(analysis.sheetName) ===
-                    activeSheetName
-            );
-
-        if (active) {
-            return active;
-        }
-    }
-
-    return null;
-}
-
-private removeSheetFromRange(
-    range: string
-): string {
-
-    const value = text(range);
-
-    if (!value) {
-        return '';
-    }
-
-    const separatorIndex =
-        value.lastIndexOf('!');
-
-    return separatorIndex >= 0
-        ? value.substring(separatorIndex + 1)
-        : value;
-}
-    /** DIRECT widgets: remaining Dashboard charts bound to another sheet's range. */
-    private rebuildDirectWidgets(
-        charts: any[],
-        matchedPivotCharts: Set<any>,
-        pivotCount: number
-    ): DashboardWidgetMetadata[] {
+    /** DIRECT widgets: remaining Dashboard charts that read another sheet's range. */
+    private rebuildDirectWidgets(charts: any[], matched: Set<any>, pivotCount: number): DashboardWidgetMetadata[] {
         const widgets: DashboardWidgetMetadata[] = [];
 
         for (const chart of charts) {
-            if (matchedPivotCharts.has(chart)) {
+            if (matched.has(chart)) {
                 continue;
             }
 
             const chartId = text(chart?.id) || undefined;
             const chartRange = text(chart?.range);
-
-            const sourceSheetName = getChartReferencedSheetNames(chartRange).find(
-                name => name !== DASHBOARD_SHEET
-            );
+            const sourceName = getChartReferencedSheetNames(chartRange).find(name => name !== DASHBOARD_SHEET);
 
             // A Dashboard-local range with no matching analysis is not DIRECT.
-            if (!sourceSheetName) {
+            if (!sourceName) {
                 continue;
             }
 
-            const source = this.getSheetIdentity(sourceSheetName);
+            const source = this.getSheetIdentity(sourceName);
 
-            const previous = this.dashboardWidgets.find(
+            const previous = this.widgets.find(
                 w =>
                     w.sourceType === 'DIRECT' &&
                     ((chartId && w.chartId === chartId) ||
@@ -2888,60 +2300,21 @@ private removeSheetFromRange(
         }));
     }
 
-    private getSourceByName(sheetName: string): SpreadsheetDataSource | null {
-        const item = this.sheetDataSources.find(x => x.sheetName === sheetName);
-        return item ? this.cloneSource(item.source) : null;
-    }
-
+    /** Source/filter metadata of the active tab (used by Refresh). */
     private getActiveSheetSource(): SpreadsheetDataSource | null {
-        if (!this.spreadsheet) {
-            return this.currentSpreadsheetSource ? this.cloneSource(this.currentSpreadsheetSource) : null;
-        }
+        const sheet = this.activeSheet;
 
-        const activeSheet: any = this.spreadsheet.getActiveSheet();
-
-        if (!activeSheet) {
+        if (!sheet) {
             return null;
         }
 
-        const byId = activeSheet.id != null
-            ? this.sheetDataSources.find(item => item.sheetId === activeSheet.id)
-            : undefined;
-        const byName = this.sheetDataSources.find(item => item.sheetName === activeSheet.name);
-        const source = byId?.source ?? byName?.source;
+        const byId = sheet.id != null ? this.sheetSources.find(i => i.sheetId === sheet.id) : undefined;
+        const byName = this.sheetSources.find(i => i.sheetName === sheet.name);
 
-        if (!source && activeSheet.name === TRANSACTIONS_SHEET) {
-            return this.currentSpreadsheetSource ? this.cloneSource(this.currentSpreadsheetSource) : null;
-        }
+        const source =
+            (byId ?? byName)?.source ?? (sheet.name === TRANSACTIONS_SHEET ? this.currentSource : null);
 
         return source ? this.cloneSource(source) : null;
-    }
-
-    registerActiveSheetSource(source: SpreadsheetDataSource): void {
-        const sheet: any = this.spreadsheet?.getActiveSheet();
-
-        if (!sheet?.name) {
-            return;
-        }
-
-        const metadata: SpreadsheetSheetDataSource = {
-            sheetId: sheet.id,
-            sheetName: sheet.name,
-            source: this.cloneSource(source)
-        };
-
-        const index = this.sheetDataSources.findIndex(
-            item => (sheet.id != null && item.sheetId === sheet.id) || item.sheetName === sheet.name
-        );
-
-        if (index >= 0) {
-            this.sheetDataSources[index] = metadata;
-        } else {
-            this.sheetDataSources.push(metadata);
-        }
-
-        this.currentSpreadsheetSource = this.cloneSource(source);
-        this.currentSpreadsheetFilters = { ...(source.filters ?? {}) };
     }
 
     private upsertSheetSource(metadata: SpreadsheetSheetDataSource): void {
@@ -2958,22 +2331,18 @@ private removeSheetFromRange(
             source: this.cloneSource(metadata.source)
         };
 
-        const index = this.sheetDataSources.findIndex(item => text(item.sheetName) === name);
+        const index = this.sheetSources.findIndex(i => text(i.sheetName) === name);
 
         if (index >= 0) {
-            this.sheetDataSources[index] = clean;
+            this.sheetSources[index] = clean;
         } else {
-            this.sheetDataSources.push(clean);
+            this.sheetSources.push(clean);
         }
     }
 
     /** Syncs ids/names before save (also handles renamed tabs). */
     private syncSheetIdentity(): void {
-        if (!this.allSheets.length) {
-            return;
-        }
-
-        this.sheetDataSources.forEach(item => {
+        this.sheetSources.forEach(item => {
             // Name first: ids are unreliable after openFromJson()/dynamic inserts.
             const sheet =
                 this.allSheets.find((x: any) => text(x?.name) === text(item.sheetName)) ??
@@ -2984,19 +2353,6 @@ private removeSheetFromRange(
                 item.sheetName = sheet.name;
             }
         });
-
-        // The initial Transactions sheet exists before Syncfusion gives it an id.
-        if (this.currentSpreadsheetSource && !this.sheetDataSources.length) {
-            const sheet = this.findSheet(TRANSACTIONS_SHEET);
-
-            if (sheet) {
-                this.sheetDataSources.push({
-                    sheetId: sheet.id,
-                    sheetName: sheet.name,
-                    source: this.cloneSource(this.currentSpreadsheetSource)
-                });
-            }
-        }
     }
 
     // ---- Active-tab watcher ----
@@ -3008,72 +2364,89 @@ private removeSheetFromRange(
             return;
         }
 
-        this.lastActiveSheetIndex = Number(this.grid.activeSheetIndex ?? 0);
+        this.lastSheetIndex = Number(this.grid.activeSheetIndex ?? 0);
 
         this.sheetWatcher = setInterval(() => {
             if (!this.spreadsheet) {
                 return;
             }
 
+            // Dashboard is fixed as the first tab: move it back if the user dragged it.
+            void this.moveDashboardFirst();
+
             const index = Number(this.grid.activeSheetIndex ?? 0);
 
-            // Dashboard is fixed as the first/left-most tab. If Syncfusion allows
-            // a drag/reorder, move it back immediately.
-            const dashboardIndex = this.allSheets.findIndex(
-                (sheet: any) => text(sheet?.name).trim().toLowerCase() === DASHBOARD_SHEET.toLowerCase()
-            );
-
-            if (dashboardIndex > 0) {
-                void this.moveDashboardToFirst();
-            }
-
-            if (index === this.lastActiveSheetIndex) {
+            if (index === this.lastSheetIndex) {
                 return;
             }
 
-            this.lastActiveSheetIndex = index;
-            this.syncActiveSheetToUi();
+            this.lastSheetIndex = index;
+            this.syncSheetToUi();
             void this.syncPivotForActiveSheet();
         }, 100);
     }
 
     private stopSheetWatcher(): void {
-        if (!this.sheetWatcher) {
-            return;
+        if (this.sheetWatcher) {
+            clearInterval(this.sheetWatcher);
+            this.sheetWatcher = null;
         }
-
-        clearInterval(this.sheetWatcher);
-        this.sheetWatcher = null;
     }
 
-    private syncActiveSheetToUi(): void {
-        const activeSheet: any = this.spreadsheet?.getActiveSheet();
+    /** Shows the source/filters of the active tab in the header. */
+    private syncSheetToUi(): void {
+        const name = this.activeSheetName;
 
-        if (!activeSheet?.name) {
+        if (!name) {
             return;
         }
 
-        // Match by sheet NAME (ids are unreliable after openFromJson()).
-        const metadata = this.sheetDataSources.find(item => text(item.sheetName) === text(activeSheet.name));
+        // Match by NAME (ids are unreliable after openFromJson()).
+        const source = this.sheetSources.find(i => text(i.sheetName) === name)?.source;
 
-        // Always replace the previous tab's UI state.
-        this.currentSpreadsheetSource = metadata?.source ? this.cloneSource(metadata.source) : null;
-        this.currentSpreadsheetFilters = { ...(metadata?.source?.filters ?? {}) };
+        // Always replace the previous tab's state.
+        this.currentSource = source ? this.cloneSource(source) : null;
+        this.currentFilters = { ...(source?.filters ?? {}) };
 
         this.cdr.detectChanges();
     }
 
-    // ---- Applied filters (header badges) ----
+    // =====================================================
+    // HEADER INFO (bound in the template)
+    // =====================================================
 
-    getAppliedFilters(): { label: string; value: string }[] {
-        const filters = this.currentSpreadsheetFilters;
+    get chartCount(): number {
+        return this.getWidgetsForSheet(this.activeSheet).length;
+    }
+
+    /** Data rows of the active sheet (usedRange is zero-based, row 0 = header). */
+    get recordCount(): number {
+        return Math.max(Number(this.activeSheet?.usedRange?.rowIndex ?? 0), 0);
+    }
+
+    get sourceName(): string {
+        const name = this.activeSheetName;
+        const source = name ? this.sheetSources.find(i => i.sheetName === name)?.source : null;
+
+        return text(source?.sourceKey ?? source?.type);
+    }
+
+    /** Hidden on the Dashboard and on Pivot tabs. */
+    get showInfoBar(): boolean {
+        const name = this.activeSheetName;
+
+        return !!name && name !== DASHBOARD_SHEET && !this.analyses.some(a => text(a.sheetName) === name);
+    }
+
+    get appliedFilters(): { label: string; value: string }[] {
+        const filters = this.currentFilters;
 
         if (!filters) {
             return [];
         }
 
         const asIs = (v: any) => String(v);
-        const asDate = (v: any) => this.formatFilterDate(v);
+        const asDate = (v: any) => this.formatDate(v);
 
         const definitions: [string, string, (v: any) => string][] = [
             ['search', 'Search', asIs],
@@ -3100,103 +2473,65 @@ private removeSheetFromRange(
         return result;
     }
 
-    private formatFilterDate(value: any): string {
-        if (!value) {
-            return '';
+    // =====================================================
+    // SAVE
+    // =====================================================
+
+    saveSpreadsheet(): void {
+        if (!this.spreadsheet) {
+            this.notify.warn('Spreadsheet is not ready.');
+            return;
         }
 
-        const date = new Date(value);
-        return isNaN(date.getTime()) ? String(value) : date.toLocaleDateString();
+        const dashboardId = this.dashboardId;
+
+        if (!dashboardId) {
+            this.notify.error('Dashboard id is missing.');
+            return;
+        }
+
+        this.updateAnalysis();
+        this.syncSheetIdentity();
+
+        const sheetDataSources = this.cloneSheetSources(this.sheetSources);
+
+        this.showLoading('Saving Spreadsheet...');
+
+        this.grid
+            .saveAsJson(this.saveOptions)
+            .then((rawWorkbook: any) => {
+                const workbook = this.reconcileDashboardCharts(rawWorkbook);
+                this.rebuildWidgets(workbook);
+
+                // Keys below are the saved format: do not rename them.
+                const spreadsheet = {
+                    workbookJson: workbook,
+                    sheetDataSources,
+                    sheetAnalyses: clone(this.analyses),
+                    dashboardWidgets: clone(this.widgets),
+                    updatedDate: new Date().toISOString(),
+                    recordCount: this.countRecords(workbook)
+                };
+
+                // The generated proxy already does JSON.stringify(body).
+                return firstValueFrom(this.dashboardService.saveSpreadSheetJson(dashboardId, spreadsheet));
+            })
+            .then(() => {
+                this.notify.success('Spreadsheet saved successfully.');
+                this.dashboardService.updateViewDate(dashboardId).subscribe();
+            })
+            .catch((error: any) => {
+                console.error('[Spreadsheet] SaveSpreadSheetJson failed:', error);
+                this.notify.error('Failed to save Spreadsheet.');
+            })
+            .finally(() => {
+                this.hideLoading();
+                this.cdr.detectChanges();
+            });
     }
 
-    // =====================================================
-    // SAVE / OPEN
-    // =====================================================
-
-    private prepareWorkbookForSave(workbook: any): any {
-        const prepared = this.reconcileDashboardCharts(workbook);
-        this.rebuildWidgetMetadata(prepared);
-        return prepared;
-    }
-
-saveSpreadsheet(): void {
-    if (!this.spreadsheet) {
-        this.notify.warn('Spreadsheet is not ready.');
-        return;
-    }
-
-    if (!this.dashboardId) {
-        this.notify.error('Dashboard id is missing.');
-        return;
-    }
-
-    if (this.pivotView && this.currentPivotSheetName) {
-        this.updatePivotAnalysis();
-    }
-
-    this.syncSheetIdentity();
-
-    const sheetDataSources =
-        this.cloneSheetSources(this.sheetDataSources);
-
-    this.showLoading('Saving Spreadsheet...');
-
-    this.grid
-        .saveAsJson(this.saveOptions)
-        .then((rawWorkbook: any) => {
-
-            const workbook =
-                this.prepareWorkbookForSave(rawWorkbook);
-
-            const spreadsheet = {
-                workbookJson: workbook,
-
-                sheetDataSources,
-
-                sheetAnalyses:
-                    clone(this.sheetAnalyses),
-
-                dashboardWidgets:
-                    clone(this.dashboardWidgets),
-
-                updatedDate:
-                    new Date().toISOString(),
-
-                recordCount:
-                    this.getRecordCount(workbook)
-            };
-
-            // IMPORTANT:
-            // generated proxy already JSON.stringify(body)
-            return firstValueFrom(
-                this.appDashboardsAppService.saveSpreadSheetJson(
-                    this.dashboardId,
-                    spreadsheet
-                )
-            );
-        })
-        .then(() => {
-            this.notify.success(
-                'Spreadsheet saved successfully.'
-            );
-        })
-        .catch((error: any) => {
-            console.error(
-                '[Spreadsheet] SaveSpreadSheetJson failed:',
-                error
-            );
-
-            this.notify.error(
-                'Failed to save Spreadsheet.'
-            );
-        })
-        .finally(() => {
-            this.hideLoading();
-            this.cdr.detectChanges();
-        });
-}
-
-    private getRecordCount(workbook: any): number {
+    /** Rows of the Transactions sheet, minus the header. */
+    private countRecords(workbook: any): number {
         const sheet = workbook?.jsonObject?.Workbook?.sheets?.find((s: any) => s.name === TRANSACTIONS_SHEET);
         return sheet?.rows?.length ? Math.max(sheet.rows.length - 1, 0) : 0;
     }
@@ -3267,22 +2602,13 @@ saveSpreadsheet(): void {
      * Only the chart OWNER changes; the source range is preserved.
      */
     private reconcileDashboardCharts(workbookJson: any): any {
-        if (!this.spreadsheet || !workbookJson) {
-            return workbookJson;
-        }
-
-        if (text(this.grid.getActiveSheet?.()?.name) !== DASHBOARD_SHEET) {
+        if (!this.spreadsheet || !workbookJson || this.activeSheetName !== DASHBOARD_SHEET) {
             return workbookJson;
         }
 
         const cleaned = clone(workbookJson);
         const workbook = cleaned?.jsonObject?.Workbook ?? cleaned?.Workbook;
-
-        if (!workbook || !Array.isArray(workbook.sheets)) {
-            return cleaned;
-        }
-
-        const dashboard = workbook.sheets.find((s: any) => text(s?.name) === DASHBOARD_SHEET);
+        const dashboard = (workbook?.sheets ?? []).find((s: any) => text(s?.name) === DASHBOARD_SHEET);
 
         if (!dashboard) {
             return cleaned;
@@ -3297,11 +2623,7 @@ saveSpreadsheet(): void {
         const chartById = new Map<string, any>();
 
         forEachCell(cell => {
-            if (!Array.isArray(cell?.chart)) {
-                return;
-            }
-
-            cell.chart.forEach((chart: any) => {
+            (Array.isArray(cell?.chart) ? cell.chart : []).forEach((chart: any) => {
                 const id = text(chart?.id);
 
                 if (id && !chartById.has(id)) {
@@ -3310,11 +2632,7 @@ saveSpreadsheet(): void {
             });
         });
 
-        if (!chartById.size) {
-            return cleaned;
-        }
-
-        // Find charts that are really visible on screen, with their current position/size.
+        // Charts that are really visible on screen, with their current position/size.
         const spreadsheetElement: HTMLElement | null = (this.grid.element as HTMLElement) ?? null;
         const movedCharts: any[] = [];
 
@@ -3363,7 +2681,7 @@ saveSpreadsheet(): void {
             }
         });
 
-        // Store charts in a real Dashboard cell so save/reopen owns them.
+        // Store the charts in a real Dashboard cell so save/reopen owns them.
         dashboard.rows = Array.isArray(dashboard.rows) ? dashboard.rows : [];
         dashboard.rows[0] = dashboard.rows[0] ?? {};
         dashboard.rows[0].cells = Array.isArray(dashboard.rows[0].cells) ? dashboard.rows[0].cells : [];
@@ -3396,10 +2714,10 @@ saveSpreadsheet(): void {
     }
 
     // =====================================================
-    // TRANSACTIONS: MAPPING + PAGED LOADING
+    // TRANSACTIONS API
     // =====================================================
 
-    private mapTransactionToRow(record: any): any {
+    private toRow(record: any): any {
         return {
             TransactionNumber: record.code ?? '',
             TransactionType:
@@ -3417,35 +2735,23 @@ saveSpreadsheet(): void {
         };
     }
 
-    private formatDate(value: any): string {
-        if (!value) {
-            return '';
-        }
-
-        const date = new Date(value);
-        return Number.isNaN(date.getTime()) ? String(value) : date.toLocaleDateString();
-    }
-
     private getDataPage(
         source: SpreadsheetDataSource,
-        filters: SpreadsheetFilters | Record<string, any>,
-        skipCount: number,
-        maxResultCount: number
+        filters: SpreadsheetFilters,
+        skip: number,
+        take: number
     ): any {
-        const sourceKey = source.sourceKey ?? source.type;
+        const key = source.sourceKey ?? source.type;
 
-        switch (sourceKey) {
-            case 'TRANSACTIONS':
-            case 'Transactions':
-                return this.getTransactions(filters as SpreadsheetFilters, skipCount, maxResultCount);
-
-            default:
-                throw new Error(`Unsupported Spreadsheet source: ${sourceKey}`);
+        if (key === 'TRANSACTIONS' || key === 'Transactions') {
+            return this.getTransactions(filters, skip, take);
         }
+
+        throw new Error(`Unsupported Spreadsheet source: ${key}`);
     }
 
-    private getTransactions(filters: SpreadsheetFilters, skipCount = 0, maxResultCount = this.batchSize) {
-        return this._appTransactionServiceProxy.getAll(
+    private getTransactions(filters: SpreadsheetFilters, skip = 0, take = this.batchSize) {
+        return this.transactionService.getAll(
             false,
             0,
             undefined,
@@ -3478,8 +2784,8 @@ saveSpreadsheet(): void {
 
             text(filters.sorting) || undefined, // stable sorting for paged loads
 
-            skipCount,
-            maxResultCount
+            skip,
+            take
         );
     }
 
@@ -3492,11 +2798,11 @@ saveSpreadsheet(): void {
             return;
         }
 
-        const activeSheet = this.spreadsheet.getActiveSheet();
-        const activeSheetName = activeSheet?.name;
-        const affectedWidgets = this.getWidgetsForSheet(activeSheet);
+        const sheet = this.activeSheet;
+        const sheetName = text(sheet?.name);
+        const affectedWidgets = this.getWidgetsForSheet(sheet);
 
-        if (!activeSheetName) {
+        if (!sheetName) {
             this.notify.warn('Active Spreadsheet tab is not available.');
             return;
         }
@@ -3510,7 +2816,7 @@ saveSpreadsheet(): void {
         }
 
         // StatusId = 0 must not be sent: the backend treats it as a real id.
-        const refreshFilters: SpreadsheetFilters = {
+        const filters: SpreadsheetFilters = {
             ...(source.filters ?? {}),
             statusFilter: this.cleanStatus(source.filters?.statusFilter)
         };
@@ -3523,24 +2829,21 @@ saveSpreadsheet(): void {
         this.isRefreshing = true;
         this.showLoading('Loading latest transactions...');
 
-        let skipCount = 0;
-        let displayedCount = 0;
-        let sourceCount = 0;
-        let sheetCleared = false;
+        let skip = 0;
+        let displayed = 0;
+        let received = 0;
+        let cleared = false;
 
         try {
             while (true) {
-                const result: any = await firstValueFrom(
-                    this.getDataPage(source, refreshFilters, skipCount, this.batchSize)
-                );
-
+                const result: any = await firstValueFrom(this.getDataPage(source, filters, skip, this.batchSize));
                 const items: any[] = result?.items ?? [];
 
                 // Clear old rows only after the first API call succeeds, so an
                 // HTTP error never wipes the user's existing sheet.
-                if (!sheetCleared) {
-                    this.clearOldRows(activeSheetName);
-                    sheetCleared = true;
+                if (!cleared) {
+                    this.clearOldRows(sheetName);
+                    cleared = true;
                     await yieldToBrowser();
                 }
 
@@ -3548,28 +2851,23 @@ saveSpreadsheet(): void {
                     break;
                 }
 
-                sourceCount += items.length;
+                received += items.length;
 
-                // SelectedRecords: the API still pages the whole query, so filter
-                // each batch but keep paging by the ORIGINAL page size.
-                const batchItems = selectedIds ? items.filter(r => selectedIds.has(Number(r?.id))) : items;
+                // SelectedRecords: the API pages the whole query, so filter each
+                // batch but keep paging by the ORIGINAL page size.
+                const batch = selectedIds ? items.filter(r => selectedIds.has(Number(r?.id))) : items;
 
-                if (batchItems.length) {
-                    this.appendRefreshBatch(
-                        activeSheetName,
-                        batchItems.map(r => this.mapTransactionToRow(r)),
-                        displayedCount
-                    );
-
-                    displayedCount += batchItems.length;
+                if (batch.length) {
+                    this.appendBatch(sheetName, batch.map(r => this.toRow(r)), displayed);
+                    displayed += batch.length;
                 }
 
-                this.setProgress(sourceCount, Number(result?.totalCount ?? 0));
-                this.loadingMessage = `Loading latest transactions... ${displayedCount.toLocaleString()} displayed`;
+                this.setProgress(received, Number(result?.totalCount ?? 0));
+                this.loadingMessage = `Loading latest transactions... ${displayed.toLocaleString()} displayed`;
 
                 await yieldToBrowser();
 
-                skipCount += this.batchSize;
+                skip += this.batchSize;
 
                 // Short page = final page.
                 if (items.length < this.batchSize) {
@@ -3579,15 +2877,13 @@ saveSpreadsheet(): void {
 
             // Rebuild the pivot only ONCE, after all batches are displayed.
             await yieldToBrowser();
-            await this.refreshPivotAfterDataRefresh();
+            await this.refreshPivotData();
 
             if (affectedWidgets.length) {
-                this.refreshLayout();
+                this.resizeLater(100);
             }
 
-            this.notify.success(
-                `Spreadsheet refreshed successfully. ${displayedCount.toLocaleString()} records loaded.`
-            );
+            this.notify.success(`Spreadsheet refreshed successfully. ${displayed.toLocaleString()} records loaded.`);
         } catch (error) {
             console.error('Spreadsheet refresh failed:', error);
             this.notify.error('Unable to refresh spreadsheet data.');
@@ -3600,33 +2896,24 @@ saveSpreadsheet(): void {
     /** Clears old data rows (keeps the header) once before the progressive refresh. */
     private clearOldRows(sheetName: string): void {
         const sheet = this.findSheet(sheetName);
-
-        if (!sheet) {
-            return;
-        }
-
         const headers = this.getSheetHeaders(sheet);
-        const oldLastRowIndex = sheet?.usedRange?.rowIndex ?? 0;
+        const lastRow = sheet?.usedRange?.rowIndex ?? 0;
 
-        if (!headers.length || oldLastRowIndex < 1) {
+        if (!sheet || !headers.length || lastRow < 1) {
             return;
         }
 
         this.spreadsheet!.clear({
-            range: `${sheetName}!A2:${toColumnName(headers.length)}${oldLastRowIndex + 1}`,
+            range: `${sheetName}!A2:${toColumnName(headers.length)}${lastRow + 1}`,
             type: 'Clear Contents'
         } as any);
     }
 
-    /** Appends ONE API batch. displayStartIndex is zero-based for DATA rows. */
-    private appendRefreshBatch(sheetName: string, rows: any[], displayStartIndex: number): void {
-        if (!this.spreadsheet || !rows?.length) {
-            return;
-        }
-
+    /** Appends ONE API batch. displayedBefore = data rows already shown. */
+    private appendBatch(sheetName: string, rows: any[], displayedBefore: number): void {
         const sheetIndex = this.allSheets.findIndex((s: any) => s?.name === sheetName);
 
-        if (sheetIndex < 0) {
+        if (!this.spreadsheet || !rows?.length || sheetIndex < 0) {
             return;
         }
 
@@ -3642,19 +2929,15 @@ saveSpreadsheet(): void {
             (this.entities[0]?.columns ?? []).map(c => [c.label, c.key] as [string, string])
         );
 
-        const projectedRows = rows.map(row => {
-            const projected: any = {};
-
-            headers.forEach(header => {
-                projected[header] = (row as any)[labelToKey.get(header) ?? header] ?? '';
-            });
-
-            return projected;
+        const projected = rows.map(row => {
+            const item: any = {};
+            headers.forEach(header => (item[header] = row[labelToKey.get(header) ?? header] ?? ''));
+            return item;
         });
 
         // Row 1 = header, first data batch starts at row 2.
         this.spreadsheet.updateRange(
-            { dataSource: projectedRows, startCell: `A${displayStartIndex + 2}`, showFieldAsHeader: false } as any,
+            { dataSource: projected, startCell: `A${displayedBefore + 2}`, showFieldAsHeader: false } as any,
             sheetIndex
         );
     }
@@ -3664,73 +2947,58 @@ saveSpreadsheet(): void {
      * the right can widen usedRange and create fake pivot fields.
      */
     private getSheetHeaders(sheet: any): string[] {
-        const headerCells = sheet?.rows?.[0]?.cells ?? [];
         const headers: string[] = [];
 
-        for (const cell of headerCells) {
+        for (const cell of sheet?.rows?.[0]?.cells ?? []) {
             const value = text(cell?.value);
 
-            if (!value) {
-                // Stop at the first empty header AFTER the data headers.
-                if (headers.length > 0) {
-                    break;
-                }
-
-                continue;
+            if (value) {
+                headers.push(value);
+            } else if (headers.length > 0) {
+                break; // first empty header AFTER the data headers
             }
-
-            headers.push(value);
         }
 
         return headers;
     }
 
     /** Re-reads the pivot source sheet; keeps rows/columns/values/filters/chart. */
-    private async refreshPivotAfterDataRefresh(): Promise<void> {
-        if (!this.pivotView || !this.currentPivotSheetName) {
+    private async refreshPivotData(): Promise<void> {
+        if (!this.pivotView || !this.pivotSheet || !this.sourceSheet) {
             return;
         }
 
-        const sourceSheetName = this.pivotSourceSheetName;
-
-        if (!sourceSheetName) {
-            return;
-        }
-
-        const sheet = this.findSheet(sourceSheetName);
+        const sheet = this.findSheet(this.sourceSheet);
 
         if (!sheet) {
             return;
         }
 
-        const lastRowIndex = sheet.usedRange?.rowIndex ?? 0;
+        const lastRow = sheet.usedRange?.rowIndex ?? 0;
         const headers = this.getSheetHeaders(sheet);
 
-        if (lastRowIndex < 1 || !headers.length) {
-            this.pivotData = [];
-            this.pivotDataSourceSettings = { ...this.pivotDataSourceSettings, dataSource: [] };
+        if (lastRow < 1 || !headers.length) {
+            this.pivotSettings = { ...this.pivotSettings, dataSource: [] };
             this.refreshPivot();
             return;
         }
 
-        const lastColumnIndex = headers.length - 1;
-        const range = `${sheet.name}!A1:${toColumnName(lastColumnIndex + 1)}${lastRowIndex + 1}`;
+        const lastCol = headers.length - 1;
+        const range = `${sheet.name}!A1:${toColumnName(lastCol + 1)}${lastRow + 1}`;
 
         try {
             const data = await this.spreadsheet!.getData(range);
-            const refreshed = this.sheetDataToRecords(data, lastRowIndex, lastColumnIndex) as IDataSet[];
-
-            this.pivotData = refreshed;
+            const records = this.sheetDataToRecords(data, lastRow, lastCol) as IDataSet[];
 
             // Replace ONLY the source data + dynamic field mapping.
-            this.pivotDataSourceSettings = {
-                ...this.pivotDataSourceSettings,
-                dataSource: refreshed,
-                fieldMapping: this.buildFieldMapping(refreshed)
+            this.pivotSettings = {
+                ...this.pivotSettings,
+                dataSource: records,
+                fieldMapping: this.buildFieldMapping(records)
             };
 
-            this.pivotView.dataSourceSettings = this.pivotDataSourceSettings;
-            this.pivotView.chartSettings = this.pivotChartSettings;
+            this.pivotView.dataSourceSettings = this.pivotSettings;
+            this.pivotView.chartSettings = this.pivotChart;
             this.pivotView.dataBind?.();
             this.pivotView.refresh?.();
         } catch (error) {

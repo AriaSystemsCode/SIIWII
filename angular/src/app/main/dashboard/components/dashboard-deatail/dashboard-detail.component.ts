@@ -56,13 +56,8 @@ export class DashboardDetailComponent
     dashboardLoadError = '';
 
     dashboardId = 1;
-
-
     sourceSpreadsheetId: number | null = null;
-
     dashboard: any
-
-
     actionsMenuItems: MenuItem[] = [];
 
     constructor(
@@ -125,9 +120,14 @@ export class DashboardDetailComponent
 
                         const saved = this.dashboard?.spreadsheet;
 
-                        if (!saved) {
+                        // if (!saved) {
+                        //     throw new Error(
+                        //         'This Dashboard does not have a saved Spreadsheet.'
+                        //     );
+                        // }
+                           if (!saved) {
                             throw new Error(
-                                'This Dashboard does not have a saved Spreadsheet.'
+                                ''
                             );
                         }
 
@@ -276,19 +276,16 @@ export class DashboardDetailComponent
             }
         );
 
-        this.dashboardActiveSheetIndex =
-            dashboardIndex;
+        this.dashboardActiveSheetIndex =  dashboardIndex;
 
-        this.dashboardSpreadsheet.activeSheetIndex =
-            dashboardIndex;
+        this.dashboardSpreadsheet.activeSheetIndex =   dashboardIndex;
 
         setTimeout(() => {
             if (!this.dashboardSpreadsheet) {
                 return;
             }
 
-            this.dashboardSpreadsheet.activeSheetIndex =
-                dashboardIndex;
+            this.dashboardSpreadsheet.activeSheetIndex =   dashboardIndex;
 
             this.dashboardSpreadsheet.refresh();
         }, 0);
@@ -299,38 +296,18 @@ export class DashboardDetailComponent
     // FIND DASHBOARD SHEET
     // =====================================================
 
-    private findDashboardSheetIndex(
-        sheets: any[]
-    ): number {
-
-
-        if (
-            !Array.isArray(sheets)
-        ) {
-
+    private findDashboardSheetIndex(sheets: any[]): number {
+        if (!Array.isArray(sheets)) {
             return -1;
-
         }
-
-
         return sheets.findIndex(
-
             (sheet: any) =>
-
-                String(
-                    sheet?.name ?? ''
-                )
-                    .trim()
-                    .toLowerCase() ===
-
-                this.dashboardSheetName
-                    .trim()
-                    .toLowerCase()
+                String(sheet?.name ?? '').trim().toLowerCase() ===
+                this.dashboardSheetName.trim().toLowerCase()
 
         );
 
     }
-
 
     refreshDashboard(): void {
 

@@ -1,0 +1,458 @@
+<p-dialog
+    [(visible)]="visible"
+    [modal]="true"
+    [draggable]="false"
+    [resizable]="false"
+    [closable]="true"
+    [dismissableMask]="true"
+    [style]="{ width: '475px' }"
+    styleClass="dashboard-share-dialog"
+    appendTo="body"
+    (onHide)="closeDialog()">
+
+    <!-- ======================= -->
+    <!-- Header -->
+    <!-- ======================= -->
+
+    <ng-template pTemplate="header">
+
+        <div class="share-dialog-header">
+
+            <h4>
+                {{ 'SharingOptions' | localize }}
+            </h4>
+
+            <span class="dashboard-name">
+                {{ dashboardName }}
+            </span>
+
+        </div>
+
+    </ng-template>
+
+
+    <!-- ======================= -->
+    <!-- ALL / SPECIFIC -->
+    <!-- ======================= -->
+
+    <ng-container
+        *ngIf="
+            mode === 'all' ||
+            mode === 'specific'
+        ">
+
+        <!-- Tabs -->
+
+        <div class="share-tabs">
+
+            <button
+                type="button"
+                [class.active]="mode === 'all'"
+                (click)="selectAll()">
+
+                {{ 'AllUsers' | localize }}
+
+            </button>
+
+            <button
+                type="button"
+                [class.active]="mode === 'specific'"
+                (click)="selectSpecific()">
+
+                {{ 'SpecificUsers' | localize }}
+
+            </button>
+
+        </div>
+
+
+        <!-- ======================= -->
+        <!-- ALL USERS -->
+        <!-- ======================= -->
+
+        <div
+            *ngIf="mode === 'all'"
+            class="share-content">
+
+            <div class="all-users-card">
+
+                <div class="all-users-info">
+
+                    <div class="share-icon">
+
+                        <i class="fas fa-users"></i>
+
+                    </div>
+
+                    <div>
+
+                        <div class="all-users-title">
+                            {{ 'AllUsers' | localize }}
+                        </div>
+
+                        <div class="all-users-description">
+                            Everyone who has access to
+                            Siiwii can access this dashboard.
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- ALL USERS PERMISSION -->
+
+                <select
+                    class="permission-select"
+                    [ngModel]="allUsersAccess"
+                    (ngModelChange)="
+                        changeAllUsersAccess($event)
+                    ">
+
+                    <option value="View">
+                        {{ 'View' | localize }}
+                    </option>
+
+                    <option value="Edit">
+                        {{ 'Edit' | localize }}
+                    </option>
+
+                </select>
+
+            </div>
+
+        </div>
+
+
+        <!-- ======================= -->
+        <!-- SPECIFIC USERS -->
+        <!-- ======================= -->
+
+        <div
+            *ngIf="mode === 'specific'"
+            class="share-content">
+
+            <!-- Search / Add -->
+
+            <label class="share-label">
+                {{ 'ShareWith' | localize }}
+            </label>
+
+            <div class="add-user">
+
+                <i class="fas fa-search"></i>
+
+                <input
+                    type="text"
+                    [(ngModel)]="newUserName"
+                    placeholder="{{
+                        'SearchUsersByName'
+                            | localize
+                    }}"
+                    (keyup.enter)="addUser()" />
+
+            </div>
+
+
+            <div class="shared-title">
+                {{ 'SharedWith' | localize }}
+            </div>
+
+
+            <div class="user-list">
+
+                <!-- ======================= -->
+                <!-- OWNER -->
+                <!-- Always first -->
+                <!-- ======================= -->
+
+                <div class="user-row owner-row">
+
+                    <div class="user-info">
+
+                        <div
+                            class="avatar owner-avatar">
+
+                            {{ getOwnerInitials() }}
+
+                        </div>
+
+                        <div class="user-details">
+
+                            <span class="user-name">
+
+                                {{ ownerName }}
+
+                                <span class="you-label">
+                                    ({{ 'You' | localize }})
+                                </span>
+
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="owner-label">
+
+                        {{ 'Owner' | localize }}
+
+                    </div>
+
+                </div>
+
+
+                <!-- ======================= -->
+                <!-- SHARED USERS -->
+                <!-- ======================= -->
+
+                <div
+                    *ngFor="
+                        let user of users;
+                        let i = index
+                    "
+                    class="user-row">
+
+                    <div class="user-info">
+
+                        <div class="avatar">
+
+                            {{
+                                getUserInitials(
+                                    user.name
+                                )
+                            }}
+
+                        </div>
+
+
+                        <span class="user-name">
+
+                            {{ user.name }}
+
+                        </span>
+
+                    </div>
+
+
+                    <div class="user-actions">
+
+                        <!-- Permission -->
+
+                        <select
+                            class="permission-select"
+                            [ngModel]="user.access"
+                            (ngModelChange)="
+                                changeAccess(
+                                    i,
+                                    $event
+                                )
+                            ">
+
+                            <option value="View">
+
+                                {{
+                                    'View'
+                                        | localize
+                                }}
+
+                            </option>
+
+                            <option value="Edit">
+
+                                {{
+                                    'Edit'
+                                        | localize
+                                }}
+
+                            </option>
+
+                        </select>
+
+
+                        <!-- Remove -->
+
+                        <button
+                            type="button"
+                            class="remove-user"
+                            [title]="
+                                'Remove'
+                                    | localize
+                            "
+                            (click)="
+                                removeUser(i)
+                            ">
+
+                            <i
+                                class="fas fa-times">
+                            </i>
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- ======================= -->
+        <!-- Footer -->
+        <!-- ======================= -->
+
+        <div class="share-footer">
+
+            <button
+                type="button"
+                class="make-private"
+                (click)="
+                    requestMakePrivate()
+                ">
+
+                <i
+                    class="fas fa-lock mr-1">
+                </i>
+
+                {{
+                    'MakePrivate'
+                        | localize
+                }}
+
+            </button>
+
+
+            <button
+                type="button"
+                class="btn btn-primary"
+                (click)="done()">
+
+                {{ 'Done' | localize }}
+
+            </button>
+
+        </div>
+
+    </ng-container>
+
+
+    <!-- ======================= -->
+    <!-- CONFIRM PRIVATE -->
+    <!-- ======================= -->
+
+    <ng-container
+        *ngIf="mode === 'confirm'">
+
+        <div class="confirm-content">
+
+            <div class="confirm-icon danger">
+
+                <i
+                    class="fas fa-user-slash">
+                </i>
+
+            </div>
+
+            <h4>
+                Make this dashboard private?
+            </h4>
+
+            <p>
+                Everyone currently shared with
+                will lose access.
+            </p>
+
+            <p class="secondary-text">
+                You can share it again later.
+            </p>
+
+        </div>
+
+
+        <div class="confirm-actions">
+
+            <button
+                type="button"
+                class="btn btn-light"
+                (click)="
+                    cancelMakePrivate()
+                ">
+
+                Go back
+
+            </button>
+
+            <button
+                type="button"
+                class="btn btn-danger"
+                (click)="
+                    confirmMakePrivate()
+                ">
+
+                Remove access
+
+            </button>
+
+        </div>
+
+    </ng-container>
+
+
+    <!-- ======================= -->
+    <!-- PRIVATE -->
+    <!-- ======================= -->
+
+    <ng-container
+        *ngIf="mode === 'private'">
+
+        <div class="private-content">
+
+            <div class="private-icon">
+
+                <i class="fas fa-lock"></i>
+
+            </div>
+
+            <h4>
+                This dashboard is private
+            </h4>
+
+            <p>
+                Only you can see it right now.
+            </p>
+
+
+            <button
+                type="button"
+                class="btn btn-light mt-3"
+                (click)="shareAgain()">
+
+                Share dashboard
+
+            </button>
+
+        </div>
+
+
+        <div
+            class="
+                share-footer
+                justify-content-end
+            ">
+
+            <button
+                type="button"
+                class="btn btn-primary"
+                (click)="done()">
+
+                {{ 'Done' | localize }}
+
+            </button>
+
+        </div>
+
+    </ng-container>
+
+</p-dialog>

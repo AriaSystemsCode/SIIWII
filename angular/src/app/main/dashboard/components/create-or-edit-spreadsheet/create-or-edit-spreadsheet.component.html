@@ -9,32 +9,34 @@
                 {{ 'Dashboard' | localize }} #{{ dashboardId }}
             </small>
 
-            <!-- Applied filters / information -->
-            <ng-container *ngIf="getAppliedFilters() as appliedFilters">
-                <div class="d-flex align-items-center flex-wrap gap-4">
-                    <span class="spreadsheet-filter-bar">
-                        <i class="fa fa-chart-bar mr-1"></i>
-                        {{ dashboardChartCount }}
-                        {{ (dashboardChartCount === 1 ? 'DashboardChart' : 'DashboardCharts') | localize }}
-                    </span>
+            <!-- Info bar: only on data sheets (hidden on Dashboard and Pivot tabs) -->
+            <ng-container *ngIf="showInfoBar">
+                <ng-container *ngIf="appliedFilters as applied">
+                    <div class="d-flex align-items-center flex-wrap gap-4">
+                        <span class="spreadsheet-filter-bar">
+                            <i class="fa fa-chart-bar mr-1"></i>
+                            {{ chartCount }}
+                            {{ (chartCount === 1 ? 'DashboardChart' : 'DashboardCharts') | localize }}
+                        </span>
 
-                    <span class="spreadsheet-filter-bar">
-                        <i class="fa fa-list mr-1"></i>
-                        {{ spreadsheetRows.length }}
-                        {{ 'Transactions' | localize }}
-                    </span>
+                        <span class="spreadsheet-filter-bar">
+                            <i class="fa fa-list mr-1"></i>
+                            {{ recordCount }}
+                            {{ sourceName | localize }}
+                        </span>
 
-                    <span class="spreadsheet-filter-bar">
-                        <i class="fa fa-filter mr-1"></i>
-                        {{ 'AppliedFilters' | localize }}: {{ appliedFilters.length }}
-                    </span>
-                </div>
+                        <span class="spreadsheet-filter-bar">
+                            <i class="fa fa-filter mr-1"></i>
+                            {{ 'AppliedFilters' | localize }}: {{ applied.length }}
+                        </span>
+                    </div>
 
-                <div *ngIf="appliedFilters.length" class="px-3 py-2">
-                    <span *ngFor="let filter of appliedFilters" class="badge badge-light mr-2 mb-1">
-                        {{ filter.label }}: {{ filter.value }}
-                    </span>
-                </div>
+                    <div *ngIf="applied.length" class="px-3 py-2">
+                        <span *ngFor="let filter of applied" class="badge badge-light mr-2 mb-1">
+                            {{ filter.label }}: {{ filter.value }}
+                        </span>
+                    </div>
+                </ng-container>
             </ng-container>
         </div>
 
@@ -84,10 +86,8 @@
             <div *ngIf="showPivot" class="pivot-sheet-overlay">
                 <div class="d-flex align-items-center justify-content-between px-3 py-2 border-bottom bg-white">
                     <div>
-                        <h5 class="mb-1">{{ currentPivotSheetName }}</h5>
-                        <small class="text-muted">
-                            {{ 'Source' | localize }}: {{ pivotSourceSheetName }}
-                        </small>
+                        <h5 class="mb-1">{{ pivotSheet }}</h5>
+                        <small class="text-muted">{{ 'Source' | localize }}: {{ sourceSheet }}</small>
                     </div>
 
                     <div class="d-flex align-items-center">
@@ -96,12 +96,8 @@
                             {{ 'SourceSheet' | localize }}
                         </button>
 
-                        <!-- <button type="button" class="btn btn-primary mr-2" (click)="savePivot()">
-                            <i class="fa fa-save mr-2"></i>
-                            {{ 'SavePivot' | localize }}
-                        </button> -->
-
-                        <button type="button" class="btn btn-success" (click)="copyPivotToDashboard()">
+                        <button *ngIf="!isPivotOnDashboard" type="button" class="btn btn-success"
+                            (click)="copyPivotToDashboard()">
                             <i class="fa fa-chart-bar mr-2"></i>
                             {{ 'CopyPivotChartToDashboard' | localize }}
                         </button>
@@ -116,16 +112,17 @@
                             id="SiiwiiPivotView"
                             width="100%"
                             height="100%"
-                            [dataSourceSettings]="pivotDataSourceSettings"
+                            [dataSourceSettings]="pivotSettings"
                             [showFieldList]="false"
                             [showToolbar]="true"
                             [toolbar]="pivotToolbar"
                             [showGroupingBar]="true"
                             [allowCalculatedField]="true"
                             [showTooltip]="true"
-                            [displayOption]="pivotDisplayOption"
-                            [chartSettings]="pivotChartSettings"
-                            (enginePopulated)="onPivotViewReady()">
+                            [displayOption]="pivotDisplay"
+                            [chartSettings]="pivotChart"
+                            (enginePopulated)="onPivotReady()"
+                            (chartSeriesCreated)="onPivotChartChanged($event)">
                         </ejs-pivotview>
                     </div>
 
@@ -140,7 +137,7 @@
                             id="SiiwiiPivotFieldList"
                             width="100%"
                             renderMode="Fixed"
-                            [dataSourceSettings]="pivotDataSourceSettings"
+                            [dataSourceSettings]="pivotSettings"
                             [allowCalculatedField]="true"
                             (enginePopulated)="onFieldListReady()">
                         </ejs-pivotfieldlist>
@@ -162,16 +159,13 @@
                 </button>
             </div>
 
-            <!-- Step 1: select entity -->
-            <div *ngIf="addDataStep === 1" class="p-3">
+            <!-- Step 1: choose entity -->
+            <div *ngIf="step === 1" class="p-3">
                 <div class="form-group">
                     <label class="font-weight-bold">{{ 'Entity' | localize }}</label>
                     <small class="d-block text-muted mb-3">{{ 'SelectSiiwiiEntityToInsert' | localize }}</small>
 
-                    <div
-                        *ngFor="let entity of entities"
-                        class="card mb-2"
-                        style="cursor: pointer;"
+                    <div *ngFor="let entity of entities" class="card mb-2" style="cursor: pointer;"
                         (click)="selectEntity(entity.sourceKey)">
                         <div class="card-body d-flex align-items-center">
                             <i [class]="entity.icon" class="mr-3"></i>
@@ -181,9 +175,9 @@
                 </div>
             </div>
 
-            <!-- Step 2: columns and filters -->
-            <div *ngIf="addDataStep === 2 && selectedEntity" class="p-3">
-                <button type="button" class="btn btn-link px-0 mb-2" (click)="backToEntityList()">
+            <!-- Step 2: choose columns and filters -->
+            <div *ngIf="step === 2 && selectedEntity" class="p-3">
+                <button type="button" class="btn btn-link px-0 mb-2" (click)="backToEntities()">
                     <i class="fa fa-arrow-left mr-2"></i>
                     {{ 'ChangeEntity' | localize }}
                 </button>
@@ -207,16 +201,10 @@
                     </div>
 
                     <div *ngFor="let column of selectedEntity.columns" class="form-check mb-2">
-                        <input
-                            type="checkbox"
-                            class="form-check-input"
-                            [id]="'column-' + column.key"
-                            [checked]="isColumnSelected(column.key)"
-                            (change)="onColumnToggle(column.key, $event)" />
+                        <input type="checkbox" class="form-check-input" [id]="'column-' + column.key"
+                            [checked]="isColumnSelected(column.key)" (change)="toggleColumn(column.key, $event)" />
 
-                        <label class="form-check-label" [for]="'column-' + column.key">
-                            {{ column.label }}
-                        </label>
+                        <label class="form-check-label" [for]="'column-' + column.key">{{ column.label }}</label>
                     </div>
                 </div>
 
@@ -228,35 +216,26 @@
                         <label>{{ filter.label }}</label>
 
                         <input *ngIf="filter.type === 'string'" type="text" class="form-control"
-                               [(ngModel)]="filters[filter.key]" />
+                            [(ngModel)]="filterValues[filter.key]" />
 
                         <input *ngIf="filter.type === 'number'" type="number" class="form-control"
-                               [(ngModel)]="filters[filter.key]" />
+                            [(ngModel)]="filterValues[filter.key]" />
 
                         <input *ngIf="filter.type === 'date'" type="date" class="form-control"
-                               [(ngModel)]="filters[filter.key]" />
+                            [(ngModel)]="filterValues[filter.key]" />
 
-                        <p-dropdown
-                            *ngIf="filter.type === 'select'"
-                            [options]="filter.options || []"
-                            [(ngModel)]="filters[filter.key]"
-                            optionLabel="label"
-                            optionValue="value"
-                            appendTo="body"
-                            [style]="{ width: '100%' }">
+                        <p-dropdown *ngIf="filter.type === 'select'" [options]="filter.options || []"
+                            [(ngModel)]="filterValues[filter.key]" optionLabel="label" optionValue="value"
+                            appendTo="body" [style]="{ width: '100%' }">
                         </p-dropdown>
                     </div>
                 </div>
 
-                <!-- Add -->
-                <button
-                    type="button"
-                    class="btn btn-primary btn-block"
-                    [disabled]="isAddingData || !selectedColumns.length"
-                    (click)="addDataAsNewSheet()">
-                    <i *ngIf="isAddingData" class="fa fa-spinner fa-spin mr-2"></i>
-                    <i *ngIf="!isAddingData" class="fa fa-plus mr-2"></i>
-                    {{ (isAddingData ? 'Adding' : 'AddAsNewSheet') | localize }}
+                <button type="button" class="btn btn-primary btn-block"
+                    [disabled]="isAdding || !selectedColumns.length" (click)="addSheet()">
+                    <i *ngIf="isAdding" class="fa fa-spinner fa-spin mr-2"></i>
+                    <i *ngIf="!isAdding" class="fa fa-plus mr-2"></i>
+                    {{ (isAdding ? 'Adding' : 'AddAsNewSheet') | localize }}
                 </button>
             </div>
         </div>
@@ -284,45 +263,42 @@
                 <div class="form-group">
                     <label class="font-weight-bold">{{ 'DataRange' | localize }}</label>
                     <input type="text" class="form-control" [(ngModel)]="chartRange"
-                           placeholder="'Transactions'!A1:H40" />
+                        placeholder="'Transactions'!A1:H40" />
                 </div>
 
                 <div class="form-group">
                     <label class="font-weight-bold">{{ 'CategoryAxis' | localize }}</label>
                     <small class="d-block text-muted mb-2">{{ 'CategoryAxisRangeHint' | localize }}</small>
-                    <input type="text" class="form-control" [(ngModel)]="chartCategoryRange"
-                           placeholder="'Transactions'!A1:A40" />
+                    <input type="text" class="form-control" [(ngModel)]="categoryRange"
+                        placeholder="'Transactions'!A1:A40" />
                 </div>
 
                 <div class="mt-4">
                     <div class="d-flex justify-content-between align-items-center mb-2">
                         <strong>{{ 'DataSeries' | localize }}</strong>
 
-                        <button type="button" class="btn btn-sm btn-light" (click)="addChartSeries()">
+                        <button type="button" class="btn btn-sm btn-light" (click)="addSeries()">
                             <i class="fa fa-plus"></i>
                         </button>
                     </div>
 
-                    <div *ngIf="!chartSeriesRanges.length" class="text-muted py-3">
+                    <div *ngIf="!seriesRanges.length" class="text-muted py-3">
                         {{ 'NoDataSeries' | localize }}
                     </div>
 
-                    <div *ngFor="let series of chartSeriesRanges; let i = index" class="d-flex align-items-center mb-2">
+                    <div *ngFor="let series of seriesRanges; let i = index" class="d-flex align-items-center mb-2">
                         <input type="text" class="form-control mr-2" [(ngModel)]="series.range" />
 
-                        <button type="button" class="btn btn-sm btn-light" (click)="removeChartSeries(i)">
+                        <button type="button" class="btn btn-sm btn-light" (click)="removeSeries(i)">
                             <i class="fa fa-trash"></i>
                         </button>
                     </div>
                 </div>
 
-                <button
-                    type="button"
-                    class="btn btn-primary btn-block mt-4"
-                    [disabled]="applyingChartRange"
-                    (click)="applyChartSeries()">
-                    <i *ngIf="applyingChartRange" class="fa fa-spinner fa-spin mr-2"></i>
-                    {{ (applyingChartRange ? 'Applying' : 'ApplyChartData') | localize }}
+                <button type="button" class="btn btn-primary btn-block mt-4" [disabled]="isApplyingChart"
+                    (click)="applyChart()">
+                    <i *ngIf="isApplyingChart" class="fa fa-spinner fa-spin mr-2"></i>
+                    {{ (isApplyingChart ? 'Applying' : 'ApplyChartData') | localize }}
                 </button>
             </div>
         </div>
