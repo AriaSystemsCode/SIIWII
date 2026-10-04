@@ -7,13 +7,17 @@ using Abp.Domain.Uow;
 using Abp.Linq.Extensions;
 using DocumentFormat.OpenXml.Bibliography;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using NPOI.HPSF;
 using onetouch.AccountInfos.Dtos;
 using onetouch.Accounts.Dtos;
 using onetouch.AppDashboards.Dtos;
 using onetouch.AppEntities;
 using onetouch.AppEntities.Dtos;
 using onetouch.Authorization.Users;
+using onetouch.Configuration;
 using onetouch.DashboardCustomization;
 using onetouch.Helpers;
 using onetouch.SycIdentifierDefinitions;
@@ -30,7 +34,7 @@ namespace onetouch.AppDashboards
     public class AppDashboardAppService : onetouchAppServiceBase, IAppDashboardAppService
     {
         private readonly IRepository<AppEntity, long> _appEntityRepository;
-        //private readonly IRepository<AbpUser<User>, long> _appUserRepository;
+        private readonly IConfigurationRoot _appConfiguration;
         private readonly IRepository<AppEntitySharings, long> _appEntitySharingRepository;
         private readonly Helper _helper;
         private readonly IAppEntitiesAppService _appEntitiesAppService;
@@ -38,14 +42,14 @@ namespace onetouch.AppDashboards
         public AppDashboardAppService(IRepository<AppEntity, long> appEntityRepository,
             Helper helper, IRepository<AppEntitySharings, long> appEntitySharingRepository,
             IAppEntitiesAppService appEntitiesAppService,
-            //IRepository<AbpUser<User>, long> appUserRepository,
+            IAppConfigurationAccessor appConfigurationAccessor,
             SycIdentifierDefinitionsAppService iAppSycIdentifierDefinitionsService)
         {
             _appEntityRepository = appEntityRepository;
             _helper = helper;
             _appEntitySharingRepository = appEntitySharingRepository;
             _appEntitiesAppService = appEntitiesAppService;
-            //_appUserRepository = appUserRepository;
+            _appConfiguration = appConfigurationAccessor.Configuration;
             _iAppSycIdentifierDefinitionsService = iAppSycIdentifierDefinitionsService;
         }
         public async Task<PagedResultDto<GetDashboardForViewDto>> GetAll(GetAllDashboardsInput input)
@@ -225,32 +229,49 @@ namespace onetouch.AppDashboards
             }
             return true;
         }
-        //public async Task SaveSpreadSheetJson(long dashboardId, JObject spreadSheet)
-        //{
+        public async Task SaveSpreadSheetJson(long dashboardId, JObject spreadSheet)
+        {
 
-        //    var dashboardObjectTypeId = await _helper.SystemTables.GetEntityObjectTypeDashboard();
-        //    var dashboardObj = await _appEntityRepository.GetAll()
-        //           .Where(z => z.EntityObjectTypeId == dashboardObjectTypeId
-        //             && z.Id == dashboard).FirstOrDefaultAsync();
-        //    if (dashboardObj != null) 
-        //    {
-        //        var folderPath = Path.Combine(
-        //   AppDomain.CurrentDomain.BaseDirectory,
-        //   "App_Data",
-        //   "JsonFiles");
+            var dashboardObjectTypeId = await _helper.SystemTables.GetEntityObjectTypeDashboard();
+            var dashboardObj = await _appEntityRepository.GetAll()
+                   .Where(z => z.EntityObjectTypeId == dashboardObjectTypeId
+                     && z.Id == dashboardId).FirstOrDefaultAsync();
+            if (dashboardObj != null)
+            {
+                var fileCategory =  await _helper.SystemTables.GetAttachmentCategoryId("FILE");
+                var fileName = dashboardId.ToString()+".json";
+                var filePath = _appConfiguration[$"Attachment:PathTemp"] + @"\"
++ AbpSession.TenantId.ToString() + @"\" + fileName;
+                var json = spreadSheet.ToString(Formatting.Indented);
 
-        //        Directory.CreateDirectory(folderPath);
+                await System.IO.File.WriteAllTextAsync(
+                    filePath,
+                    json);
 
-        //        var filePath = Path.Combine(
-        //            folderPath,
-        //            "dashboard.json");
+                AppEntityDto dashboardEntity = new AppEntityDto();
+                dashboardEntity = ObjectMapper.Map<AppEntityDto>(dashboardObj);
+                dashboardEntity.EntityAttachments = new List<AppEntityAttachmentDto>();
+                dashboardEntity.EntityAttachments.Add(new AppEntityAttachmentDto { 
+                    FileName= fileName,
+                    guid= new Guid().ToString(),
+                    DisplayName= fileName,
+                    Url= filePath,
+                    AttachmentCategoryId= fileCategory
+                });
+                _appEntitiesAppService.SaveEntity(dashboardEntity);
+                //     var folderPath = Path.Combine(
+                //AppDomain.CurrentDomain.BaseDirectory,
+                //"App_Data",
+                //"JsonFiles");
 
-        //        var json = data.ToString(Formatting.Indented);
+                //     Directory.CreateDirectory(folderPath);
 
-        //        await File.WriteAllTextAsync(
-        //            filePath,
-        //            json);
-        //    }
-        //}
+                //var filePath = Path.Combine(
+                //    folderPath,
+                //    "dashboard.json");
+
+               
+            }
+        }
     }
 }
