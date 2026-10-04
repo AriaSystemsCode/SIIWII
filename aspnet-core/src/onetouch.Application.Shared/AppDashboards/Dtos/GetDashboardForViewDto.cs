@@ -1,4 +1,5 @@
 ﻿using Abp.Application.Services.Dto;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,15 +13,26 @@ namespace onetouch.AppDashboards.Dtos
     {
         public virtual long Id { get; set; }
         public virtual string Title { get; set; }
-        public virtual string CreatorName { get; set; }
+        public virtual string CreatorUserName { get; set; }
+        public virtual long CreatorUserId { get; set; }
         public virtual DateTime? LastModificationDate { get; set; }
         public virtual DateTime? LastViewDate { get; set; }
         public virtual List<onetouch.AppEntities.Dtos.UserInformationDto> SharedWithUsers { get; set; }
+        public virtual JObject Spreadsheet { get; set; }
+        public virtual string SpreadsheetFilePath { get; set;}
+        public virtual bool IsEditable { set; get; }
+        public virtual bool IsTheOwner { set; get; }
     }
     public class GetAllDashboardsInput : PagedAndSortedResultRequestDto
     {
         public string Filter { get; set; }
-        public int SharingLevel { get; set; } = 0;
+        public DashboardFilterType SharingLevel { get; set; } = 0;
+    }
+    public enum DashboardFilterType
+    {
+        All,
+        MyDashboards,
+        SharedWithMe 
     }
     public class CreateOrEditDashboard
     {

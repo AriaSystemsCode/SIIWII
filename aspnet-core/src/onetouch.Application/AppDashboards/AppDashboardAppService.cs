@@ -28,6 +28,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static Microsoft.ApplicationInsights.MetricDimensionNames.TelemetryContext;
 
 namespace onetouch.AppDashboards
 {
@@ -55,14 +56,20 @@ namespace onetouch.AppDashboards
         public async Task<PagedResultDto<GetDashboardForViewDto>> GetAll(GetAllDashboardsInput input)
         {
             var dashboardObjectTypeId = await _helper.SystemTables.GetEntityObjectTypeDashboard();
-
+            var fileCategory = await _helper.SystemTables.GetAttachmentCategoryId("FILE");
             var filteredDashboard = _appEntityRepository.GetAll()
+                .Include(x=>x.EntityAttachments).ThenInclude(x=>x.AttachmentFk)
                 .WhereIf(!string.IsNullOrEmpty(input.Filter), a =>
                 a.Name.ToUpper().Contains(input.Filter.ToUpper()))
                 .Where(s => s.EntityObjectTypeId == dashboardObjectTypeId &&
-                s.TenantId == AbpSession.TenantId &&
-                (s.CreatorUserId == AbpSession.UserId ||
+                s.TenantId == AbpSession.TenantId)
+                .WhereIf(input.SharingLevel== DashboardFilterType.All, s=>s.CreatorUserId == AbpSession.UserId ||
                 _appEntitySharingRepository.GetAll().Count(z => z.EntityId == s.Id && z.SharedUserId == null) > 0 ||
+                _appEntitySharingRepository.GetAll()
+                .Count(z => z.EntityId == s.Id && z.SharedUserId == AbpSession.UserId) > 0)
+                .WhereIf(input.SharingLevel == DashboardFilterType.MyDashboards, s => s.CreatorUserId == AbpSession.UserId)
+                .WhereIf(input.SharingLevel == DashboardFilterType.SharedWithMe, s => s.CreatorUserId != AbpSession.UserId &&
+                (_appEntitySharingRepository.GetAll().Count(z => z.EntityId == s.Id && z.SharedUserId == null) > 0 ||
                 _appEntitySharingRepository.GetAll()
                 .Count(z => z.EntityId == s.Id && z.SharedUserId == AbpSession.UserId) > 0));
 
@@ -72,11 +79,19 @@ namespace onetouch.AppDashboards
             var _dashboards = from o in pagedAndFilteredDashboards
                               select new GetDashboardForViewDto
                               {
+                                  CreatorUserId = long.Parse(o.CreatorUserId.ToString()),
                                   Id = o.Id,
                                   Title = o.Name,
                                   LastModificationDate = o.LastModificationTime != null ?
                                   DateTime.Parse(o.LastModificationTime.ToString()) :
-                                  null
+                                  null,
+                                  SpreadsheetFilePath =o.EntityAttachments
+                                  .FirstOrDefault(z=>z.AttachmentCategoryId== fileCategory)!=null?
+                                  _appConfiguration[$"Attachment:Path"] + @"\"
++ AbpSession.TenantId.ToString() + @"\" + o.EntityAttachments
+                                  .FirstOrDefault(z => z.AttachmentCategoryId == fileCategory).AttachmentFk.Attachment:"",
+                                  IsTheOwner = o.CreatorUserId == AbpSession.UserId,
+                                  
                               };
 
             var dashboardsList = await _dashboards.ToListAsync();
@@ -89,6 +104,17 @@ namespace onetouch.AppDashboards
 
                 foreach (var dashboard in dashboardsList)
                 {
+                    var userCreator = await UserManager.GetUserByIdAsync(dashboard.CreatorUserId);
+                    if (userCreator != null)
+                        dashboard.CreatorUserName = userCreator.FullName;
+
+                    if (!string.IsNullOrEmpty(dashboard.SpreadsheetFilePath) &&
+                        System.IO.File.Exists(dashboard.SpreadsheetFilePath))
+                    {
+                        var json = await System.IO.File.ReadAllTextAsync(dashboard.SpreadsheetFilePath);
+
+                        dashboard.Spreadsheet= JObject.Parse(json);
+                    }
                     var sharing  = await _appEntitySharingRepository.GetAll()
                 .Where(z => z.EntityId == dashboard.Id &&
                 z.SharedUserId == AbpSession.UserId).FirstOrDefaultAsync();
@@ -103,17 +129,33 @@ namespace onetouch.AppDashboards
                         if (entitySharingList.Count == 1 &&
                             entitySharingList.FirstOrDefault().SharedUserId == null)
                         {
+                            if (entitySharingList.FirstOrDefault().CanEdit == true)
+                            {
+                                dashboard.IsEditable = true;
+                            }
                             foreach (var user in users)
                             {
+                                if (user.Id== AbpSession.UserId)
+                                {
+                                    continue;
+                                }
                                 dashboard.SharedWithUsers.
                                          Add(await _appEntitiesAppService.GetUserInformation(user.Id));
-
+                                
                             }
                         }
                         else
                         {
                             foreach (var user in entitySharingList)
                             {
+                                if (user.SharedUserId == AbpSession.UserId)
+                                {
+                                    if (user.CanEdit == true) { 
+                                        dashboard.IsEditable = true;
+                                        continue;
+                                    }
+                                }
+
                                 if (user.SharedUserId != null)
                                 {
                                     dashboard.SharedWithUsers.
@@ -253,22 +295,13 @@ namespace onetouch.AppDashboards
                 dashboardEntity.EntityAttachments = new List<AppEntityAttachmentDto>();
                 dashboardEntity.EntityAttachments.Add(new AppEntityAttachmentDto { 
                     FileName= fileName,
-                    guid= new Guid().ToString(),
+                    guid= null,
                     DisplayName= fileName,
                     Url= filePath,
                     AttachmentCategoryId= fileCategory
                 });
-                _appEntitiesAppService.SaveEntity(dashboardEntity);
-                //     var folderPath = Path.Combine(
-                //AppDomain.CurrentDomain.BaseDirectory,
-                //"App_Data",
-                //"JsonFiles");
-
-                //     Directory.CreateDirectory(folderPath);
-
-                //var filePath = Path.Combine(
-                //    folderPath,
-                //    "dashboard.json");
+                await _appEntitiesAppService.SaveEntity(dashboardEntity);
+                
 
                
             }
