@@ -1,10 +1,14 @@
 import {
+  ChangeDetectorRef,
     Component,
     EventEmitter,
+    Injector,
     Input,
     Output
 } from '@angular/core';
 import { DashboardSharedUser, DashboardShareMode, ShareAccess } from '../../models/dashboard.model';
+import { AppComponentBase } from '@shared/common/app-component-base';
+import { AppDashboardServiceProxy } from '@shared/service-proxies/service-proxies';
 
 
 @Component({
@@ -12,7 +16,7 @@ import { DashboardSharedUser, DashboardShareMode, ShareAccess } from '../../mode
     templateUrl: './dashboard-share.component.html',
     styleUrls: ['./dashboard-share.component.scss']
 })
-export class DashboardShareComponent {
+export class DashboardShareComponent extends AppComponentBase  {
 
     @Input() visible = false;
 
@@ -39,6 +43,15 @@ export class DashboardShareComponent {
     }>();
 
     newUserName = '';
+
+
+      constructor(
+            injector: Injector,
+            private dashboardService: AppDashboardServiceProxy,
+            private cdr: ChangeDetectorRef
+        ) {
+            super(injector);
+        }
 
     closeDialog(): void {
         this.visible = false;
@@ -200,4 +213,26 @@ export class DashboardShareComponent {
             parts[parts.length - 1].charAt(0)
         ).toUpperCase();
     }
+
+    get shareStatusText(): string {
+
+    if (this.mode === 'private') {
+        return this.l('Private');
+    }
+
+    if (this.mode === 'all') {
+        return this.l('SharedWithEveryone');
+    }
+
+    if (this.mode === 'specific') {
+
+        const count = this.users?.length ?? 0;
+
+        return count === 1
+            ? `Shared with 1 user`
+            : `Shared with ${count} users`;
+    }
+
+    return '';
+}
 }

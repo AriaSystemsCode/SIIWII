@@ -14,22 +14,46 @@
     <!-- Header -->
     <!-- ======================= -->
 
-    <ng-template pTemplate="header">
+   <ng-template pTemplate="header">
 
-        <div class="share-dialog-header">
+    <div class="share-dialog-header w-100">
 
-            <h4>
+        <div class="d-flex align-items-center justify-content-between">
+
+            <h4 class="mb-0">
                 {{ 'SharingOptions' | localize }}
             </h4>
 
-            <span class="dashboard-name">
-                {{ dashboardName }}
+            <!-- Share status -->
+            <span
+                class="share-status"
+                [ngClass]="{
+                    'share-status-private': mode === 'private',
+                    'share-status-all': mode === 'all',
+                    'share-status-specific': mode === 'specific'
+                }">
+
+                <i
+                    class="fas mr-1"
+                    [ngClass]="{
+                        'fa-lock': mode === 'private',
+                        'fa-users': mode === 'all' || mode === 'specific'
+                    }">
+                </i>
+
+                {{ shareStatusText }}
+
             </span>
 
         </div>
 
-    </ng-template>
+        <span class="dashboard-name">
+            {{ dashboardName }}
+        </span>
 
+    </div>
+
+</ng-template>
 
     <!-- ======================= -->
     <!-- ALL / SPECIFIC -->
