@@ -8,6 +8,7 @@ using Abp.Linq.Extensions;
 using DocumentFormat.OpenXml.Bibliography;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Identity.Client;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using NPOI.HPSF;
@@ -130,6 +131,7 @@ namespace onetouch.AppDashboards
                         if (entitySharingList.Count == 1 &&
                             entitySharingList.FirstOrDefault().SharedUserId == null)
                         {
+                            dashboard.SharingLevel = 1;
                             if (entitySharingList.FirstOrDefault().CanEdit == true)
                             {
                                 dashboard.IsEditable = true;
@@ -147,6 +149,7 @@ namespace onetouch.AppDashboards
                         }
                         else
                         {
+                            dashboard.SharingLevel = 2;
                             foreach (var user in entitySharingList)
                             {
                                 if (user.SharedUserId == AbpSession.UserId)
@@ -239,6 +242,7 @@ namespace onetouch.AppDashboards
                         if (entitySharingList.Count == 1 &&
                             entitySharingList.FirstOrDefault().SharedUserId == null)
                         {
+                            dashboard.SharingLevel = 1;
                             if (entitySharingList.FirstOrDefault().CanEdit == true)
                             {
                                 dashboard.IsEditable = true;
@@ -256,6 +260,7 @@ namespace onetouch.AppDashboards
                         }
                         else
                         {
+                            dashboard.SharingLevel = 2;
                             foreach (var user in entitySharingList)
                             {
                                 if (user.SharedUserId == AbpSession.UserId)
@@ -377,6 +382,69 @@ namespace onetouch.AppDashboards
                 }
             }
             return true;
+        }
+        public async Task<List<SharingUserInfo>> GetTenantAllUser(long dashboardId)
+        {
+            List<SharingUserInfo> returnList = new List<SharingUserInfo>();
+            var dashboardObjectTypeId = await _helper.SystemTables.GetEntityObjectTypeDashboard();
+            var dashboardObj = await _appEntityRepository.GetAll()
+                   .Where(z => z.EntityObjectTypeId == dashboardObjectTypeId
+                     && z.Id == dashboardId).FirstOrDefaultAsync();
+            if (dashboardObj != null)
+            {
+                var sharingList = await _appEntitySharingRepository.GetAll()
+                .Where(z => z.EntityId == dashboardObj.Id &&
+                z.SharedTenantId==AbpSession.TenantId).ToListAsync();
+                
+                var users = await UserManager.Users.Where(x => x.TenantId == AbpSession.TenantId).ToListAsync();
+                foreach (var user in users)
+                {
+
+                    SharingUserInfo userToSharWith = new SharingUserInfo();
+                    userToSharWith.UserId = user.Id ;
+                    UserInformationDto userToSharWithInfo = await _appEntitiesAppService.GetUserInformation(user.Id) ;
+
+                    if (userToSharWithInfo != null)
+                    {
+                        userToSharWith.UserImage = userToSharWithInfo.UserImage;
+                        userToSharWith.JobTitle = userToSharWithInfo.JobTitle;
+                        userToSharWith.AccountName = userToSharWithInfo.AccountName;
+                        userToSharWith.AccountId = userToSharWithInfo.AccountId;
+                        userToSharWith.UserName = userToSharWithInfo.UserName;
+                    }
+    
+                    if (user.Id== dashboardObj.CreatorUserId)
+                    {
+                        userToSharWith.IsOwner = true;
+                    }
+                    if (sharingList != null && sharingList.Count() > 0)
+                    {
+                        if (sharingList.Count() == 1 &&
+                            sharingList.FirstOrDefault(a=>a.SharedUserId==null)!=null)
+                        {
+                            var sharedWithAll = sharingList.FirstOrDefault(a => a.SharedUserId == null);
+                            if (sharedWithAll != null) 
+                            {
+                                userToSharWith.CanView = true;
+                                userToSharWith.CanEdit= sharedWithAll.CanEdit;
+
+                            }
+
+                        }
+                        else {
+                            var sharing = sharingList.Where(z => z.SharedUserId == user.Id).FirstOrDefault();
+                            if (sharing != null)
+                            {
+                                userToSharWith.CanView = true;
+                                userToSharWith.CanEdit = sharing.CanEdit ;
+                            }
+                        }
+                    }
+                    returnList.Add(userToSharWith);
+                }
+
+            }
+            return returnList;
         }
         public async Task SaveSpreadSheetJson(long dashboardId, JObject spreadSheet)
         {
