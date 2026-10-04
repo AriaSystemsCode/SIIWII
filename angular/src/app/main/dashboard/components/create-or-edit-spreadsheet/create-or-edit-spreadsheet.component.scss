@@ -1,0 +1,1458 @@
+:host {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+/* =========================================================
+   COLORS
+   ========================================================= */
+
+$primary: #5b176d;
+$primary-dark: #481056;
+$primary-light: #f5eef8;
+$primary-border: #ddcce4;
+
+$text: #252a3a;
+$text-secondary: #656b7c;
+$text-muted: #9296a5;
+
+$border: #e5e7ee;
+$border-light: #eef0f4;
+
+$page-bg: #f7f8fb;
+$panel-bg: #f8f9fc;
+$white: #ffffff;
+
+$danger: #d94a4a;
+$danger-bg: #fff0f0;
+
+
+/* =========================================================
+   PAGE
+   ========================================================= */
+
+.create-or-edit-spreadsheet-page {
+    width: 100%;
+    height: calc(100vh - 70px);
+    min-height: 0;
+
+    margin-top: -45px;
+
+    display: flex;
+    flex-direction: column;
+
+    background: $page-bg;
+
+    overflow: hidden;
+}
+
+
+/* =========================================================
+   TOP HEADER
+   ========================================================= */
+
+.create-or-edit-spreadsheet-page > .d-flex:first-child {
+    min-height: 70px;
+
+    flex-shrink: 0;
+
+    background: $white;
+    border-bottom: 1px solid $border;
+
+    box-shadow: 0 1px 3px rgba(20, 24, 40, 0.025);
+}
+
+.create-or-edit-spreadsheet-page h3 {
+    margin: 0;
+
+    color: $text;
+
+    font-size: 26px;
+    font-weight: 600;
+
+    letter-spacing: -0.5px;
+}
+
+.create-or-edit-spreadsheet-page h3 + small {
+    margin-left: 10px !important;
+
+    color: $text-secondary !important;
+
+    font-size: 12px;
+    font-weight: 400;
+}
+
+
+/* =========================================================
+   HEADER BUTTONS
+   ========================================================= */
+
+.create-or-edit-spreadsheet-page > .d-flex:first-child .btn {
+    height: 38px;
+    min-height: 38px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 6px;
+
+    padding: 0 14px;
+
+    font-size: 13px;
+    font-weight: 500;
+
+    transition:
+        background 0.15s ease,
+        border-color 0.15s ease,
+        box-shadow 0.15s ease,
+        transform 0.1s ease;
+}
+
+.create-or-edit-spreadsheet-page > .d-flex:first-child .btn-primary {
+    min-width: 98px;
+
+    background: $primary !important;
+    border-color: $primary !important;
+    color: $white;
+
+    box-shadow: 0 2px 5px rgba(91, 23, 109, 0.12);
+
+    &:hover:not(:disabled) {
+        background: $primary-dark !important;
+        border-color: $primary-dark !important;
+    }
+
+    &:active:not(:disabled) {
+        transform: translateY(1px);
+    }
+}
+
+.create-or-edit-spreadsheet-page > .d-flex:first-child .btn-light {
+    width: 40px;
+
+    padding: 0;
+
+    background: $white;
+    border: 1px solid $border;
+
+    color: #4d5363;
+
+    &:hover:not(:disabled) {
+        background: #f5f6f9;
+        border-color: #d5d8e0;
+        color: $primary;
+    }
+}
+
+.create-or-edit-spreadsheet-page .btn:disabled {
+    cursor: not-allowed;
+    opacity: 0.55;
+}
+
+
+/* =========================================================
+   INFORMATION BAR
+   ========================================================= */
+
+.create-or-edit-spreadsheet-page
+    > ng-container
+    > .d-flex.border-top.border-bottom,
+.create-or-edit-spreadsheet-page
+    > .d-flex.border-top.border-bottom {
+    min-height: 40px;
+
+    flex-shrink: 0;
+
+    background: #fbfbfd;
+
+    border-top: 0 !important;
+    border-bottom: 1px solid $border !important;
+
+    color: $text-secondary;
+
+    font-size: 12px;
+}
+
+.create-or-edit-spreadsheet-page
+    > ng-container
+    > .d-flex.border-top.border-bottom span {
+    display: inline-flex;
+    align-items: center;
+
+    gap: 4px;
+}
+
+.create-or-edit-spreadsheet-page
+    > ng-container
+    > .d-flex.border-top.border-bottom i {
+    color: #737990;
+
+    font-size: 12px;
+}
+
+
+/* =========================================================
+   FILTER BADGES
+   ========================================================= */
+
+.create-or-edit-spreadsheet-page .badge {
+    padding: 5px 9px;
+
+    border: 1px solid $primary-border;
+    border-radius: 20px;
+
+    background: $primary-light;
+
+    color: $primary;
+
+    font-size: 11px;
+    font-weight: 500;
+}
+
+
+/* =========================================================
+   PROGRESS
+   ========================================================= */
+
+.create-or-edit-spreadsheet-page p-progressbar {
+    display: block;
+    width: 100%;
+}
+
+:host ::ng-deep .create-or-edit-spreadsheet-page .p-progressbar {
+    height: 5px;
+
+    border: 0;
+    border-radius: 3px;
+
+    background: #ebecef;
+}
+
+:host ::ng-deep .create-or-edit-spreadsheet-page .p-progressbar-value {
+    background: $primary;
+}
+
+
+/* =========================================================
+   WORKSPACE
+   ========================================================= */
+
+.spreadsheet-workspace {
+    position: relative;
+
+    display: flex;
+    align-items: stretch;
+
+    width: 100%;
+
+    flex: 1;
+    min-height: 0;
+
+    overflow: hidden;
+
+    background: $white;
+}
+
+
+/* =========================================================
+   SPREADSHEET
+   ========================================================= */
+
+.spreadsheet-editor {
+    position: relative;
+
+    flex: 1 1 auto;
+
+    width: auto;
+    min-width: 0;
+    min-height: 0;
+
+    overflow: hidden;
+
+    background: $white;
+}
+
+:host ::ng-deep .spreadsheet-editor ejs-spreadsheet {
+    display: block;
+
+    width: 100%;
+    height: 100%;
+}
+
+:host ::ng-deep .spreadsheet-editor .e-spreadsheet {
+    width: 100% !important;
+    height: 100% !important;
+
+    border-left: 0;
+    border-right: 0;
+}
+
+
+/* =========================================================
+   SYNCFUSION RIBBON
+   ========================================================= */
+
+:host ::ng-deep .spreadsheet-editor .e-ribbon {
+    border-color: $border;
+}
+
+:host ::ng-deep .spreadsheet-editor .e-ribbon .e-tab-header {
+    background: $white;
+}
+
+:host ::ng-deep .spreadsheet-editor .e-ribbon .e-toolbar {
+    background: $white;
+}
+
+:host ::ng-deep .spreadsheet-editor .e-ribbon .e-tab-wrap {
+    color: #424758;
+}
+
+:host ::ng-deep .spreadsheet-editor .e-ribbon .e-tab-wrap:hover {
+    color: $primary;
+}
+
+
+/* =========================================================
+   SHEET TABS
+   ========================================================= */
+
+:host ::ng-deep .spreadsheet-editor .e-sheet-tab-panel {
+    border-top: 1px solid $border;
+
+    background: #fbfbfd;
+}
+
+:host ::ng-deep
+    .spreadsheet-editor
+    .e-sheet-tab-panel
+    .e-tab
+    .e-tab-header
+    .e-toolbar-item.e-active
+    .e-tab-wrap {
+    color: $primary;
+}
+
+
+/* =========================================================
+   COMMON SIDE PANEL
+   ========================================================= */
+
+.spreadsheet-side-panel {
+    position: relative;
+
+    flex: 0 0 390px;
+
+    width: 390px;
+    min-width: 390px;
+    max-width: 390px;
+
+    height: 100%;
+    min-height: 0;
+
+    display: flex;
+    flex-direction: column;
+
+    overflow-y: auto;
+    overflow-x: hidden;
+
+    overscroll-behavior: contain;
+
+    background: $panel-bg;
+
+    border-left: 1px solid $border;
+
+    box-shadow: -5px 0 18px rgba(20, 24, 40, 0.045);
+
+    z-index: 4;
+}
+
+
+/* =========================================================
+   SIDE PANEL HEADER
+   ========================================================= */
+
+.spreadsheet-side-panel > .border-bottom {
+    position: sticky;
+    top: 0;
+
+    z-index: 10;
+
+    min-height: 72px;
+
+    padding: 16px 18px !important;
+
+    background: $white;
+
+    border-bottom: 1px solid $border !important;
+}
+
+.spreadsheet-side-panel h5 {
+    margin: 0 0 3px;
+
+    color: $text;
+
+    font-size: 17px;
+    font-weight: 600;
+}
+
+.spreadsheet-side-panel small {
+    color: $text-muted !important;
+
+    font-size: 11px;
+    line-height: 1.4;
+}
+
+
+/* =========================================================
+   SIDE PANEL CLOSE BUTTON
+   ========================================================= */
+
+.spreadsheet-side-panel
+    > .border-bottom
+    > .btn-light {
+    width: 32px;
+    height: 32px;
+    min-height: 32px;
+
+    padding: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border: 0;
+    border-radius: 7px;
+
+    background: transparent;
+
+    color: #74798a;
+
+    &:hover {
+        background: #f0f1f5;
+        color: $text;
+    }
+}
+
+
+/* =========================================================
+   SIDE PANEL CONTENT
+   ========================================================= */
+
+.spreadsheet-side-panel > .p-3 {
+    padding: 18px !important;
+}
+
+.spreadsheet-side-panel .form-group {
+    margin-bottom: 22px;
+}
+
+.spreadsheet-side-panel label,
+.spreadsheet-side-panel strong {
+    color: #343849;
+
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.spreadsheet-side-panel label {
+    margin-bottom: 7px;
+}
+
+
+/* =========================================================
+   SIDE PANEL INPUTS
+   ========================================================= */
+
+.spreadsheet-side-panel .form-control {
+    width: 100%;
+    min-height: 42px;
+
+    padding: 8px 12px;
+
+    border: 1px solid #dfe2ea;
+    border-radius: 7px;
+
+    background: $white;
+
+    color: #424757;
+
+    font-size: 12px;
+
+    box-shadow: none;
+
+    transition:
+        border-color 0.15s ease,
+        box-shadow 0.15s ease;
+}
+
+.spreadsheet-side-panel .form-control:hover {
+    border-color: #c7cad5;
+}
+
+.spreadsheet-side-panel .form-control:focus {
+    outline: none;
+
+    border-color: #8b5798;
+
+    box-shadow: 0 0 0 3px rgba(91, 23, 109, 0.07);
+}
+
+.spreadsheet-side-panel .form-control::placeholder {
+    color: #a2a6b3;
+}
+
+
+/* =========================================================
+   SIDE PANEL PRIMENG DROPDOWN
+   ========================================================= */
+
+:host ::ng-deep .spreadsheet-side-panel .p-dropdown {
+    width: 100%;
+
+    min-height: 42px;
+
+    border: 1px solid #dfe2ea;
+    border-radius: 7px;
+
+    box-shadow: none;
+}
+
+:host ::ng-deep .spreadsheet-side-panel .p-dropdown:not(.p-disabled):hover {
+    border-color: #c7cad5;
+}
+
+:host ::ng-deep
+    .spreadsheet-side-panel
+    .p-dropdown:not(.p-disabled).p-focus {
+    border-color: #8b5798;
+
+    box-shadow: 0 0 0 3px rgba(91, 23, 109, 0.07);
+}
+
+
+/* =========================================================
+   ADD DATA ENTITY CARDS
+   ========================================================= */
+
+.spreadsheet-side-panel .card {
+    border: 1px solid $border;
+    border-radius: 8px;
+
+    background: $white;
+
+    box-shadow: none;
+
+    transition:
+        border-color 0.15s ease,
+        background 0.15s ease,
+        transform 0.15s ease,
+        box-shadow 0.15s ease;
+
+    &:hover {
+        border-color: $primary-border;
+
+        background: #fdfbfe;
+
+        box-shadow: 0 3px 10px rgba(91, 23, 109, 0.06);
+
+        transform: translateY(-1px);
+    }
+}
+
+.spreadsheet-side-panel .card-body {
+    padding: 13px 14px;
+}
+
+.spreadsheet-side-panel .card-body > i {
+    width: 32px;
+    height: 32px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 7px;
+
+    background: $primary-light;
+
+    color: $primary;
+}
+
+.spreadsheet-side-panel .card-body span {
+    color: $text;
+
+    font-size: 13px;
+    font-weight: 500;
+}
+
+
+/* =========================================================
+   COLUMN CHECKBOXES
+   ========================================================= */
+
+.spreadsheet-side-panel .form-check {
+    min-height: 32px;
+
+    display: flex;
+    align-items: center;
+
+    padding: 4px 6px 4px 26px;
+
+    border-radius: 5px;
+
+    &:hover {
+        background: #f1f2f6;
+    }
+}
+
+.spreadsheet-side-panel input[type='checkbox'] {
+    width: 15px;
+    height: 15px;
+
+    cursor: pointer;
+
+    accent-color: $primary;
+}
+
+.spreadsheet-side-panel .form-check-label {
+    margin: 0;
+
+    color: #474c5c;
+
+    font-size: 12px;
+    font-weight: 400;
+
+    cursor: pointer;
+}
+
+
+/* =========================================================
+   LINK BUTTONS
+   ========================================================= */
+
+.spreadsheet-side-panel .btn-link {
+    min-height: auto;
+
+    padding: 4px 7px;
+
+    border-radius: 5px;
+
+    color: $primary;
+
+    font-size: 11px;
+    font-weight: 500;
+
+    text-decoration: none;
+
+    &:hover {
+        background: $primary-light !important;
+
+        color: $primary-dark;
+
+        text-decoration: none;
+    }
+}
+
+
+/* =========================================================
+   ADD DATA PRIMARY BUTTON
+   ========================================================= */
+
+.spreadsheet-side-panel .btn-primary.btn-block {
+    min-height: 42px;
+
+    border: 0 !important;
+    border-radius: 7px;
+
+    background: $primary !important;
+
+    color: $white;
+
+    font-size: 13px;
+    font-weight: 600;
+
+    box-shadow: 0 2px 5px rgba(91, 23, 109, 0.1);
+
+    &:hover:not(:disabled) {
+        background: $primary-dark !important;
+    }
+}
+
+
+/* =========================================================
+   CHART PANEL
+   ========================================================= */
+
+/*
+   Current HTML does not have a unique class on the chart panel,
+   so these styles target the last side panel in the workspace.
+*/
+
+.spreadsheet-workspace > .spreadsheet-side-panel:last-child {
+    background: $panel-bg;
+}
+
+
+/* Chart headings */
+
+.spreadsheet-workspace
+    > .spreadsheet-side-panel:last-child
+    .form-group {
+    padding: 14px;
+
+    border: 1px solid $border-light;
+    border-radius: 9px;
+
+    background: $white;
+
+    box-shadow: 0 2px 7px rgba(20, 24, 40, 0.025);
+}
+
+.spreadsheet-workspace
+    > .spreadsheet-side-panel:last-child
+    .form-group
+    label {
+    display: block;
+
+    margin-bottom: 9px;
+
+    color: $text;
+
+    font-size: 13px;
+}
+
+
+/* Category helper */
+
+.spreadsheet-workspace
+    > .spreadsheet-side-panel:last-child
+    .form-group
+    small {
+    margin-top: -4px;
+    margin-bottom: 9px !important;
+
+    color: $text-muted !important;
+
+    font-size: 10px;
+}
+
+
+/* =========================================================
+   CHART DATA SERIES
+   ========================================================= */
+
+.spreadsheet-workspace
+    > .spreadsheet-side-panel:last-child
+    .mt-4 {
+    margin-top: 14px !important;
+
+    padding: 14px;
+
+    border: 1px solid $border-light;
+    border-radius: 9px;
+
+    background: $white;
+
+    box-shadow: 0 2px 7px rgba(20, 24, 40, 0.025);
+}
+
+.spreadsheet-workspace
+    > .spreadsheet-side-panel:last-child
+    .mt-4
+    > .d-flex:first-child {
+    margin-bottom: 12px !important;
+}
+
+.spreadsheet-workspace
+    > .spreadsheet-side-panel:last-child
+    .mt-4
+    > .d-flex:first-child
+    strong {
+    color: $text;
+
+    font-size: 13px;
+}
+
+
+/* ADD SERIES */
+
+.spreadsheet-workspace
+    > .spreadsheet-side-panel:last-child
+    .mt-4
+    > .d-flex:first-child
+    .btn-light {
+    width: 31px;
+    height: 31px;
+
+    padding: 0;
+
+    border: 1px solid $primary-border;
+    border-radius: 6px;
+
+    background: $white;
+
+    color: $primary;
+
+    &:hover {
+        background: $primary-light;
+    }
+}
+
+
+/* =========================================================
+   SERIES ROW
+   ========================================================= */
+
+.spreadsheet-workspace
+    > .spreadsheet-side-panel:last-child
+    .mt-4
+    > .d-flex.align-items-center {
+    gap: 7px;
+
+    margin-bottom: 8px !important;
+}
+
+.spreadsheet-workspace
+    > .spreadsheet-side-panel:last-child
+    .mt-4
+    > .d-flex.align-items-center
+    .form-control {
+    margin-right: 0 !important;
+}
+
+
+/* DELETE SERIES */
+
+.spreadsheet-workspace
+    > .spreadsheet-side-panel:last-child
+    .mt-4
+    > .d-flex.align-items-center
+    .btn-light {
+    width: 34px;
+    height: 38px;
+    min-width: 34px;
+
+    padding: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border: 0;
+    border-radius: 6px;
+
+    background: transparent;
+
+    color: #969aaa;
+
+    &:hover {
+        background: $danger-bg;
+        color: $danger;
+    }
+}
+
+
+/* =========================================================
+   EMPTY SERIES
+   ========================================================= */
+
+.spreadsheet-workspace
+    > .spreadsheet-side-panel:last-child
+    .mt-4
+    > .text-muted {
+    margin: 8px 0;
+
+    padding: 16px !important;
+
+    text-align: center;
+
+    border: 1px dashed #d8dbe4;
+    border-radius: 7px;
+
+    background: #fafbfc;
+
+    color: $text-muted !important;
+
+    font-size: 11px;
+}
+
+
+/* =========================================================
+   APPLY CHART BUTTON
+   ========================================================= */
+
+.spreadsheet-workspace
+    > .spreadsheet-side-panel:last-child
+    .btn-primary.btn-block.mt-4 {
+    position: sticky;
+    bottom: 0;
+
+    z-index: 5;
+
+    width: 100%;
+    height: 43px;
+
+    margin-top: 18px !important;
+
+    border: 0 !important;
+    border-radius: 7px;
+
+    background: $primary !important;
+
+    color: $white;
+
+    font-size: 13px;
+    font-weight: 600;
+
+    box-shadow:
+        0 4px 10px rgba(91, 23, 109, 0.15);
+
+    &:hover:not(:disabled) {
+        background: $primary-dark !important;
+    }
+}
+
+
+/* =========================================================
+   SIDE PANEL SCROLLBAR
+   ========================================================= */
+
+.spreadsheet-side-panel::-webkit-scrollbar {
+    width: 6px;
+}
+
+.spreadsheet-side-panel::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.spreadsheet-side-panel::-webkit-scrollbar-thumb {
+    background: #d1d4dc;
+
+    border-radius: 10px;
+}
+
+.spreadsheet-side-panel::-webkit-scrollbar-thumb:hover {
+    background: #b7bbc5;
+}
+
+
+/* =========================================================
+   PIVOT OVERLAY
+   ========================================================= */
+
+.pivot-sheet-overlay {
+    position: absolute;
+
+    inset: 0 0 40px;
+
+    z-index: 20;
+
+    display: flex;
+    flex-direction: column;
+
+    min-height: 0;
+
+    overflow: hidden;
+
+    background: $white;
+}
+
+
+/* =========================================================
+   PIVOT HEADER
+   ========================================================= */
+
+.pivot-sheet-overlay > .border-bottom {
+    flex-shrink: 0;
+
+    background: $white !important;
+
+    border-color: $border !important;
+}
+
+.pivot-sheet-overlay h5 {
+    color: $text;
+
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.pivot-sheet-overlay small {
+    color: $text-muted !important;
+
+    font-size: 11px;
+}
+
+
+/* =========================================================
+   PIVOT BUTTONS
+   ========================================================= */
+
+.pivot-sheet-overlay .btn {
+    min-height: 35px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 6px;
+
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.pivot-sheet-overlay .btn-primary {
+    background: $primary !important;
+    border-color: $primary !important;
+}
+
+.pivot-sheet-overlay .btn-success {
+    background: $white;
+
+    border: 1px solid $primary !important;
+
+    color: $primary;
+
+    &:hover {
+        background: $primary-light;
+    }
+}
+
+
+/* =========================================================
+   PIVOT LAYOUT
+   ========================================================= */
+
+.pivot-analysis-layout {
+    display: flex;
+
+    flex: 1;
+
+    min-height: 0;
+
+    overflow: hidden;
+
+    background: $white;
+}
+
+.pivot-analysis-layout > div:first-child {
+    flex: 1;
+
+    min-width: 0;
+    min-height: 0;
+}
+
+.pivot-analysis-layout > div:last-child {
+    background: $panel-bg !important;
+
+    border-left: 1px solid $border !important;
+}
+
+
+/* =========================================================
+   PIVOT FIELD LIST HEADER
+   ========================================================= */
+
+.pivot-analysis-layout
+    > div:last-child
+    > .border-bottom {
+    min-height: 45px;
+
+    display: flex;
+    align-items: center;
+
+    padding: 0 14px !important;
+
+    background: $white;
+
+    border-bottom: 1px solid $border !important;
+
+    color: $text;
+
+    font-size: 13px;
+    font-weight: 600;
+}
+
+
+/* =========================================================
+   SYNCFUSION PIVOT
+   ========================================================= */
+
+:host ::ng-deep .pivot-analysis-layout .e-pivotview {
+    width: 100% !important;
+    height: 100% !important;
+}
+
+:host ::ng-deep .pivot-analysis-layout .e-grouping-bar {
+    border-bottom: 1px solid $border;
+
+    background: #fafbfc;
+}
+
+:host ::ng-deep .pivot-analysis-layout .e-group-row,
+:host ::ng-deep .pivot-analysis-layout .e-group-column,
+:host ::ng-deep .pivot-analysis-layout .e-group-value,
+:host ::ng-deep .pivot-analysis-layout .e-group-filter {
+    min-height: 40px;
+}
+
+
+/* =========================================================
+   FIELD LIST
+   ========================================================= */
+
+:host ::ng-deep #SiiwiiPivotFieldList {
+    background: $panel-bg;
+}
+
+:host ::ng-deep #SiiwiiPivotFieldList .e-pivotfieldlist {
+    border: 0;
+}
+
+:host ::ng-deep #SiiwiiPivotFieldList .e-field-list-tree {
+    background: $white;
+}
+
+
+/* =========================================================
+   GLOBAL PRIMARY BUTTON
+   Scoped to this component
+   ========================================================= */
+
+.create-or-edit-spreadsheet-page .btn-primary {
+    background-color: $primary !important;
+    border-color: $primary !important;
+}
+
+
+/* =========================================================
+   RESPONSIVE - 1200
+   ========================================================= */
+
+@media (max-width: 1200px) {
+
+    .spreadsheet-side-panel {
+        flex-basis: 350px;
+
+        width: 350px;
+        min-width: 350px;
+        max-width: 350px;
+    }
+}
+
+
+/* =========================================================
+   RESPONSIVE - TABLET
+   ========================================================= */
+
+@media (max-width: 992px) {
+
+    .create-or-edit-spreadsheet-page {
+        height: auto;
+        min-height: calc(100vh - 70px);
+
+        overflow: visible;
+    }
+
+    .spreadsheet-workspace {
+        display: block;
+
+        min-height: calc(100vh - 220px);
+
+        overflow: visible;
+    }
+
+    .spreadsheet-editor {
+        width: 100%;
+        height: calc(100vh - 220px);
+    }
+
+    .spreadsheet-side-panel {
+        width: 100%;
+        min-width: 100%;
+        max-width: 100%;
+
+        height: auto;
+        max-height: none;
+
+        border-top: 1px solid $border;
+        border-left: 0;
+
+        box-shadow: none;
+    }
+
+    .pivot-analysis-layout {
+        flex-direction: column;
+
+        overflow: auto;
+    }
+
+    .pivot-analysis-layout > div:first-child {
+        min-height: 460px;
+    }
+
+    .pivot-analysis-layout > div:last-child {
+        width: 100% !important;
+        min-width: 0 !important;
+
+        height: auto !important;
+
+        border-top: 1px solid $border;
+        border-left: 0 !important;
+    }
+}
+
+
+/* =========================================================
+   RESPONSIVE - MOBILE
+   ========================================================= */
+
+@media (max-width: 576px) {
+
+    .create-or-edit-spreadsheet-page h3 {
+        font-size: 20px;
+    }
+
+    .create-or-edit-spreadsheet-page
+        > .d-flex:first-child {
+        align-items: flex-start !important;
+
+        flex-direction: column;
+
+        gap: 10px;
+
+        padding-top: 12px !important;
+        padding-bottom: 12px !important;
+    }
+
+    .create-or-edit-spreadsheet-page
+        > .d-flex:first-child
+        > div:last-child {
+        width: 100%;
+
+        justify-content: flex-end;
+    }
+
+    .spreadsheet-editor {
+        height: calc(100vh - 280px);
+    }
+
+    .spreadsheet-side-panel {
+        padding-bottom: 20px;
+    }
+}
+
+
+/* =========================================================
+   SPREADSHEET INFO BAR
+   ========================================================= */
+
+.spreadsheet-info-bar {
+    min-height: 40px;
+    padding: 0 18px;
+
+    display: flex;
+    align-items: center;
+    gap: 24px;
+
+    flex-shrink: 0;
+
+    background: #fbfbfd;
+    border-bottom: 1px solid #e5e7ee;
+
+    color: #656b7c;
+    font-size: 12px;
+}
+
+
+/* =========================================================
+   INFO ITEM
+   ========================================================= */
+
+.spreadsheet-info-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+
+    min-height: 28px;
+
+    color: #656b7c;
+
+    white-space: nowrap;
+
+    i {
+        width: 15px;
+
+        color: #858a9b;
+
+        font-size: 12px;
+        text-align: center;
+    }
+
+    .info-value {
+        color: #343849;
+
+        font-weight: 600;
+    }
+}
+
+
+/* =========================================================
+   FILTER COUNT
+   ========================================================= */
+
+.spreadsheet-info-item .info-count {
+    min-width: 20px;
+    height: 20px;
+
+    padding: 0 6px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 10px;
+
+    background: #eceef3;
+
+    color: #666c7c;
+
+    font-size: 10px;
+    font-weight: 600;
+}
+
+
+/* Filter active */
+
+.spreadsheet-info-item.has-filters {
+    color: #5b176d;
+
+    i {
+        color: #5b176d;
+    }
+
+    .info-count {
+        background: #f3eaf6;
+        color: #5b176d;
+    }
+}
+
+
+/* =========================================================
+   DASHBOARD ASSOCIATION
+   ========================================================= */
+
+.dashboard-info-item {
+    color: #5b176d;
+
+    i {
+        color: #5b176d;
+    }
+
+    .info-value {
+        color: #5b176d;
+    }
+}
+
+
+/* =========================================================
+   FILTER CHIPS BAR
+   ========================================================= */
+
+.spreadsheet-filter-bar {
+    padding: 7px 18px;
+
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 6px;
+
+    border-radius: 6px;
+    flex-shrink: 0;
+    background: #fbfbfd;
+    /* background: #ffffff; */
+    color: #656b7c;
+    border: 1px solid #e8eaf0
+}
+
+
+/* =========================================================
+   FILTER CHIP
+   ========================================================= */
+
+.spreadsheet-filter-chip {
+    min-height: 25px;
+
+    padding: 3px 9px;
+
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+
+    border: 1px solid #ddcce4;
+    border-radius: 13px;
+
+    background: #f7f1f9;
+
+    font-size: 11px;
+}
+
+.filter-label {
+    color: #777c8d;
+}
+
+.filter-value {
+    color: #5b176d;
+
+    font-weight: 600;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 768px) {
+
+    .spreadsheet-info-bar {
+        gap: 14px;
+
+        padding-left: 12px;
+        padding-right: 12px;
+
+        overflow-x: auto;
+    }
+
+    .spreadsheet-filter-bar {
+        padding-left: 12px;
+        padding-right: 12px;
+    }
+}
+
+.gap-4 {
+gap: 4px;
+}
+
+
+.chart-panel-icon {
+    width: 34px;
+    height: 34px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    flex-shrink: 0;
+
+    border-radius: 8px;
+
+    background: #f3eaf6;
+    color: #5b176d;
+
+    i {
+        font-size: 14px;
+    }
+}
