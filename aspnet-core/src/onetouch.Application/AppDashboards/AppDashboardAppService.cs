@@ -26,6 +26,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Linq.Dynamic.Core;
 using System.Text;
 using System.Threading.Tasks;
 using static Microsoft.ApplicationInsights.MetricDimensionNames.TelemetryContext;
@@ -175,6 +176,112 @@ namespace onetouch.AppDashboards
                     );
 
             return x;
+        }
+        public async Task<GetDashboardForViewDto> GetDashboardForView(long input)
+        {
+            GetDashboardForViewDto dashboard = new GetDashboardForViewDto();
+            var dashboardObjectTypeId = await _helper.SystemTables.GetEntityObjectTypeDashboard();
+            var fileCategory = await _helper.SystemTables.GetAttachmentCategoryId("FILE");
+            var filteredDashboard = _appEntityRepository.GetAll()
+                .Include(x => x.EntityAttachments).ThenInclude(x => x.AttachmentFk)
+               .Where(s => s.EntityObjectTypeId == dashboardObjectTypeId &&
+                s.TenantId == AbpSession.TenantId && s.Id == input);
+                
+            
+            var _dashboard = from o in filteredDashboard
+                              select new GetDashboardForViewDto
+                              {
+                                  CreatorUserId = long.Parse(o.CreatorUserId.ToString()),
+                                  Id = o.Id,
+                                  Title = o.Name,
+                                  LastModificationDate = o.LastModificationTime != null ?
+                                  DateTime.Parse(o.LastModificationTime.ToString()) :
+                                  null,
+                                  SpreadsheetFilePath = o.EntityAttachments
+                                  .FirstOrDefault(z => z.AttachmentCategoryId == fileCategory) != null ?
+                                  _appConfiguration[$"Attachment:Path"] + @"\"
++ AbpSession.TenantId.ToString() + @"\" + o.EntityAttachments
+                                  .FirstOrDefault(z => z.AttachmentCategoryId == fileCategory).AttachmentFk.Attachment : "",
+                                  IsTheOwner = o.CreatorUserId == AbpSession.UserId,
+
+                              };
+
+            dashboard = await _dashboard.FirstOrDefaultAsync();
+            if (dashboard != null)
+            {
+
+                var users = await UserManager.Users.Where(x => x.TenantId == AbpSession.TenantId).ToListAsync();
+                
+                //foreach (var dashboard in dashboardsList)
+                {
+                    var userCreator = await UserManager.GetUserByIdAsync(dashboard.CreatorUserId);
+                    if (userCreator != null)
+                        dashboard.CreatorUserName = userCreator.FullName;
+
+                    if (!string.IsNullOrEmpty(dashboard.SpreadsheetFilePath) &&
+                        System.IO.File.Exists(dashboard.SpreadsheetFilePath))
+                    {
+                        var json = await System.IO.File.ReadAllTextAsync(dashboard.SpreadsheetFilePath);
+
+                        dashboard.Spreadsheet = JObject.Parse(json);
+                    }
+                    var sharing = await _appEntitySharingRepository.GetAll()
+                .Where(z => z.EntityId == dashboard.Id &&
+                z.SharedUserId == AbpSession.UserId).FirstOrDefaultAsync();
+                    if (sharing != null)
+                        dashboard.LastViewDate = sharing.LastViewDate;
+
+                    var entitySharingList = await _appEntitySharingRepository.GetAll()
+                        .Where(z => z.EntityId == dashboard.Id).ToListAsync();
+                    if (entitySharingList != null && entitySharingList.Count > 0)
+                    {
+                        dashboard.SharedWithUsers = new List<onetouch.AppEntities.Dtos.UserInformationDto>();
+                        if (entitySharingList.Count == 1 &&
+                            entitySharingList.FirstOrDefault().SharedUserId == null)
+                        {
+                            if (entitySharingList.FirstOrDefault().CanEdit == true)
+                            {
+                                dashboard.IsEditable = true;
+                            }
+                            foreach (var user in users)
+                            {
+                                if (user.Id == AbpSession.UserId)
+                                {
+                                    continue;
+                                }
+                                dashboard.SharedWithUsers.
+                                         Add(await _appEntitiesAppService.GetUserInformation(user.Id));
+
+                            }
+                        }
+                        else
+                        {
+                            foreach (var user in entitySharingList)
+                            {
+                                if (user.SharedUserId == AbpSession.UserId)
+                                {
+                                    if (user.CanEdit == true)
+                                    {
+                                        dashboard.IsEditable = true;
+                                        continue;
+                                    }
+                                }
+
+                                if (user.SharedUserId != null)
+                                {
+                                    dashboard.SharedWithUsers.
+                                        Add(await _appEntitiesAppService.GetUserInformation(long.Parse(user.SharedUserId.ToString())));
+                                }
+                            }
+                        }
+                    }
+
+                }
+            }
+
+
+
+            return dashboard;
         }
         public async Task<bool> CreateOrEdit(CreateOrEditDashboard input)
         {
