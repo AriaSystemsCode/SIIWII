@@ -1,16 +1,11 @@
 import { Component, Injector, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
-
 import { AppComponentBase } from '@shared/common/app-component-base';
 import { PrimengTableHelper } from '@shared/helpers/PrimengTableHelper';
-
 import { Paginator } from 'primeng/paginator';
 import { Table } from 'primeng/table';
-
-import * as moment from 'moment-timezone';
 import { SavedSpreadsheet } from '../../models/dashboard.model';
-import { AppDashboardServiceProxy, CreateOrEditDashboard, GetDashboardForViewDto, UserInformationDto } from '@shared/service-proxies/service-proxies';
-
+import { AppDashboardServiceProxy, GetDashboardForViewDto, UserInformationDto } from '@shared/service-proxies/service-proxies';
 import { finalize } from 'rxjs/operators';
 import { AppConsts } from '@shared/AppConsts';
 @Component({
@@ -41,10 +36,7 @@ export class DashboardBrowseComponent
     editingDashboardName = '';
 
     creatingNewDashboard = false;
-
     newDashboardName = '';
-
-
     dashboardFilterOptions = [
         {
             label: 'AllDashboards',
@@ -70,8 +62,8 @@ export class DashboardBrowseComponent
 
 
     attachmentBaseUrl: string = AppConsts.attachmentBaseUrl
-
     isSmallScreen = false;
+
     constructor(
         injector: Injector,
         private router: Router,
@@ -110,16 +102,12 @@ export class DashboardBrowseComponent
     }
 
 
-    openSpreadsheet(item: SavedSpreadsheet): void {
+    openSpreadsheet(row: any): void {
         this.router.navigate(
             [
-                '/app/main/dashboards/dashboard-edit', item.id
+                '/app/main/dashboards/dashboard-edit', row.id
             ],
-            {
-                queryParams: {
-                    spreadsheetId: item.id
-                }
-            }
+          
         );
     }
     createNew(): void {
@@ -203,7 +191,6 @@ export class DashboardBrowseComponent
     }
 
     hideShare(): void {
-
         if (this.sharePanel) {
             this.sharePanel.hide();
         }
@@ -231,26 +218,6 @@ export class DashboardBrowseComponent
                     });
 
             }
-        );
-    }
-
-    // =========================================================
-    // Permissions
-    // =========================================================
-
-    isDashboardOwner(
-        row: any
-    ): boolean {
-        return row?.isOwner === true;
-    }
-
-    canEditSpreadsheet(
-        row: any
-    ): boolean {
-
-        return (
-            row?.isOwner === true ||
-            row?.canEdit === true
         );
     }
 

@@ -6482,19 +6482,18 @@ export class AppDashboardServiceProxy {
 
     /**
      * @param filter (optional) 
-     * @param sharingLevel (optional) 
      * @param sorting (optional) 
      * @param skipCount (optional) 
      * @param maxResultCount (optional) 
      * @return Success
      */
-    getAll(filter: string | null | undefined, sharingLevel: number | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<PagedResultDtoOfGetDashboardForViewDto> {
+    getAll(filter: string | null | undefined, sharingLevel: DashboardFilterType, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<PagedResultDtoOfGetDashboardForViewDto> {
         let url_ = this.baseUrl + "/api/services/app/AppDashboard/GetAll?";
         if (filter !== undefined && filter !== null)
             url_ += "Filter=" + encodeURIComponent("" + filter) + "&";
-        if (sharingLevel === null)
-            throw new Error("The parameter 'sharingLevel' cannot be null.");
-        else if (sharingLevel !== undefined)
+        if (sharingLevel === undefined || sharingLevel === null)
+            throw new Error("The parameter 'sharingLevel' must be defined and cannot be null.");
+        else
             url_ += "SharingLevel=" + encodeURIComponent("" + sharingLevel) + "&";
         if (sorting !== undefined && sorting !== null)
             url_ += "Sorting=" + encodeURIComponent("" + sorting) + "&";
@@ -6542,6 +6541,62 @@ export class AppDashboardServiceProxy {
             let result200: any = null;
             let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
             result200 = PagedResultDtoOfGetDashboardForViewDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param input (optional) 
+     * @return Success
+     */
+    getDashboardForView(input: number | undefined): Observable<GetDashboardForViewDto> {
+        let url_ = this.baseUrl + "/api/services/app/AppDashboard/GetDashboardForView?";
+        if (input === null)
+            throw new Error("The parameter 'input' cannot be null.");
+        else if (input !== undefined)
+            url_ += "input=" + encodeURIComponent("" + input) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetDashboardForView(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetDashboardForView(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<GetDashboardForViewDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<GetDashboardForViewDto>;
+        }));
+    }
+
+    protected processGetDashboardForView(response: HttpResponseBase): Observable<GetDashboardForViewDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = GetDashboardForViewDto.fromJS(resultData200);
             return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
@@ -6709,6 +6764,63 @@ export class AppDashboardServiceProxy {
                 result200 = resultData200 !== undefined ? resultData200 : <any>null;
     
             return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param dashboardId (optional) 
+     * @param body (optional) 
+     * @return Success
+     */
+    saveSpreadSheetJson(dashboardId: number | undefined, body: any | null | undefined): Observable<void> {
+        let url_ = this.baseUrl + "/api/services/app/AppDashboard/SaveSpreadSheetJson?";
+        if (dashboardId === null)
+            throw new Error("The parameter 'dashboardId' cannot be null.");
+        else if (dashboardId !== undefined)
+            url_ += "dashboardId=" + encodeURIComponent("" + dashboardId) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json-patch+json",
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processSaveSpreadSheetJson(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processSaveSpreadSheetJson(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<void>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<void>;
+        }));
+    }
+
+    protected processSaveSpreadSheetJson(response: HttpResponseBase): Observable<void> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return _observableOf(null as any);
             }));
         } else if (status !== 200 && status !== 204) {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
@@ -76318,6 +76430,12 @@ export interface ISelectItemDto {
     [key: string]: any;
 }
 
+export enum DashboardFilterType {
+    All = 0,
+    MyDashboards = 1,
+    SharedWithMe = 2,
+}
+
 export class UserInformationDto implements IUserInformationDto {
     userImage!: string | undefined;
     jobTitle!: string | undefined;
@@ -76389,10 +76507,15 @@ export interface IUserInformationDto {
 export class GetDashboardForViewDto implements IGetDashboardForViewDto {
     id!: number;
     title!: string | undefined;
-    creatorName!: string | undefined;
+    creatorUserName!: string | undefined;
+    creatorUserId!: number;
     lastModificationDate!: moment.Moment | undefined;
     lastViewDate!: moment.Moment | undefined;
     sharedWithUsers!: UserInformationDto[] | undefined;
+    spreadsheet!: any | undefined;
+    spreadsheetFilePath!: string | undefined;
+    isEditable!: boolean;
+    isTheOwner!: boolean;
 
     [key: string]: any;
 
@@ -76413,7 +76536,8 @@ export class GetDashboardForViewDto implements IGetDashboardForViewDto {
             }
             this.id = _data["id"];
             this.title = _data["title"];
-            this.creatorName = _data["creatorName"];
+            this.creatorUserName = _data["creatorUserName"];
+            this.creatorUserId = _data["creatorUserId"];
             this.lastModificationDate = _data["lastModificationDate"] ? moment(_data["lastModificationDate"].toString()) : <any>undefined;
             this.lastViewDate = _data["lastViewDate"] ? moment(_data["lastViewDate"].toString()) : <any>undefined;
             if (Array.isArray(_data["sharedWithUsers"])) {
@@ -76421,6 +76545,10 @@ export class GetDashboardForViewDto implements IGetDashboardForViewDto {
                 for (let item of _data["sharedWithUsers"])
                     this.sharedWithUsers!.push(UserInformationDto.fromJS(item));
             }
+            this.spreadsheet = _data["spreadsheet"];
+            this.spreadsheetFilePath = _data["spreadsheetFilePath"];
+            this.isEditable = _data["isEditable"];
+            this.isTheOwner = _data["isTheOwner"];
         }
     }
 
@@ -76439,7 +76567,8 @@ export class GetDashboardForViewDto implements IGetDashboardForViewDto {
         }
         data["id"] = this.id;
         data["title"] = this.title;
-        data["creatorName"] = this.creatorName;
+        data["creatorUserName"] = this.creatorUserName;
+        data["creatorUserId"] = this.creatorUserId;
         data["lastModificationDate"] = this.lastModificationDate ? this.lastModificationDate.toISOString() : <any>undefined;
         data["lastViewDate"] = this.lastViewDate ? this.lastViewDate.toISOString() : <any>undefined;
         if (Array.isArray(this.sharedWithUsers)) {
@@ -76447,6 +76576,10 @@ export class GetDashboardForViewDto implements IGetDashboardForViewDto {
             for (let item of this.sharedWithUsers)
                 data["sharedWithUsers"].push(item.toJSON());
         }
+        data["spreadsheet"] = this.spreadsheet;
+        data["spreadsheetFilePath"] = this.spreadsheetFilePath;
+        data["isEditable"] = this.isEditable;
+        data["isTheOwner"] = this.isTheOwner;
         return data;
     }
 }
@@ -76454,10 +76587,15 @@ export class GetDashboardForViewDto implements IGetDashboardForViewDto {
 export interface IGetDashboardForViewDto {
     id: number;
     title: string | undefined;
-    creatorName: string | undefined;
+    creatorUserName: string | undefined;
+    creatorUserId: number;
     lastModificationDate: moment.Moment | undefined;
     lastViewDate: moment.Moment | undefined;
     sharedWithUsers: UserInformationDto[] | undefined;
+    spreadsheet: any | undefined;
+    spreadsheetFilePath: string | undefined;
+    isEditable: boolean;
+    isTheOwner: boolean;
 
     [key: string]: any;
 }

@@ -5,16 +5,8 @@
     <div class="page-header d-flex align-items-center justify-content-between mb-3">
 
       <!-- Left: Dashboard Filter -->
-      <div
-        class="d-flex align-items-center"
-        dropdown
-        container="body"
-      >
-        <button
-          class="dropdown-toggle btn btn-sm p-0 d-flex align-items-center"
-          dropdownToggle
-          type="button"
-        >
+      <div class="d-flex align-items-center" dropdown container="body">
+        <button class="dropdown-toggle btn btn-sm p-0 d-flex align-items-center" dropdownToggle type="button">
           <h2 class="page-title m-0 mr-2">
             {{ selectedDashboardFilter.label | localize }}
           </h2>
@@ -22,11 +14,7 @@
 
         <ul *dropdownMenu class="dropdown-menu dashboard-filter-menu">
           <li *ngFor="let opt of dashboardFilterOptions">
-            <button
-              class="dropdown-item dashboard-filter-item"
-              type="button"
-              (click)="selectFilter(opt)"
-            >
+            <button class="dropdown-item dashboard-filter-item" type="button" (click)="selectFilter(opt)">
               {{ opt.label | localize }}
             </button>
           </li>
@@ -38,24 +26,14 @@
         <span class="p-input-icon-left search-box">
           <i class="pi pi-search"></i>
 
-          <input
-            #globalSearch
-            type="text"
-            class="searchIn"
-            pInputText
-            [placeholder]="'Search' | localize"
-            (input)="onGlobalSearch($event)"
-          />
+          <input #globalSearch type="text" class="searchIn" pInputText [placeholder]="'Search' | localize"
+            (input)="onGlobalSearch($event)" />
         </span>
       </div>
 
       <!-- Right: Create -->
       <div>
-        <button
-          class="btn create-btn"
-          type="button"
-          (click)="createNew()"
-        >
+        <button class="btn create-btn" type="button" (click)="createNew()">
           {{ 'CreateNew' | localize }}
 
           <i class="fas fa-plus ml-2"></i>
@@ -68,15 +46,9 @@
     <div class="shadow-sm main-card">
       <div class="card-body p-0">
 
-        <p-table
-          #dataTable
-          [value]="primengTableHelper.records"
-          [lazy]="false"
-          [paginator]="false"
-          [rows]="primengTableHelper.defaultRecordsCountPerPage"
-          [totalRecords]="primengTableHelper.totalRecordsCount"
-          styleClass="p-datatable-sm dashboards-table"
-        >
+        <p-table #dataTable [value]="primengTableHelper.records" [lazy]="false" [paginator]="false"
+          [rows]="primengTableHelper.defaultRecordsCountPerPage" [totalRecords]="primengTableHelper.totalRecordsCount"
+          styleClass="p-datatable-sm dashboards-table">
 
           <!-- ================= HEADER ================= -->
 
@@ -107,7 +79,7 @@
                 {{ 'Sharing' | localize }}
               </th>
 
-              <th >
+              <th>
                 {{ 'Actions' | localize }}
               </th>
 
@@ -124,49 +96,27 @@
               <td>
 
                 <!-- Normal Mode -->
-                <a
-                  *ngIf="editingDashboardId !== row.id"
-                  class="dash-link"
-                  href="javascript:;"
-                  (click)="openDashboard(row)"
-                >
+                <a *ngIf="editingDashboardId !== row.id" class="dash-link" href="javascript:;"
+                  (click)="openDashboard(row)">
                   {{ row?.title }}
                 </a>
 
                 <!-- Rename Mode -->
-                <div
-                  *ngIf="editingDashboardId === row.id"
-                  class="dashboard-name-edit d-flex align-items-center"
-                >
+                <div *ngIf="editingDashboardId === row.id" class="dashboard-name-edit d-flex align-items-center">
 
-                  <input
-                    type="text"
-                    class="form-control "
-                    [(ngModel)]="editingDashboardName"
-                    [placeholder]="'DashboardName' | localize"
-                    (keyup.enter)="saveRename(row)"
-                    (keyup.escape)="cancelRename()"
-                  />
+                  <input type="text" class="form-control " [(ngModel)]="editingDashboardName"
+                    [placeholder]="'DashboardName' | localize" (keyup.enter)="saveRename(row)"
+                    (keyup.escape)="cancelRename()" />
 
                   <!-- Save -->
-                  <button
-                    type="button"
-                    class="btn btn-sm btn-link text-success ml-1"
-                    [title]="'Save' | localize"
-                      [disabled]="!editingDashboardName?.trim()"
-
-                    (click)="saveRename(row)"
-                  >
+                  <button type="button" class="btn btn-sm btn-link text-success ml-1" [title]="'Save' | localize"
+                    [disabled]="!editingDashboardName?.trim()" (click)="saveRename(row)">
                     <i class="fas fa-check"></i>
                   </button>
 
                   <!-- Cancel -->
-                  <button
-                    type="button"
-                    class="btn btn-sm btn-link text-muted"
-                    [title]="'Cancel' | localize"
-                    (click)="cancelRename()"
-                  >
+                  <button type="button" class="btn btn-sm btn-link text-muted" [title]="'Cancel' | localize"
+                    (click)="cancelRename()">
                     <i class="fas fa-times"></i>
                   </button>
 
@@ -179,7 +129,7 @@
                 <div class="owner-cell d-flex align-items-center">
 
                   <span class="owner-name ml-2">
-                    {{ row?.creatorName }}
+                    {{ row?.creatorUserName }}
                   </span>
 
                 </div>
@@ -189,22 +139,14 @@
               <td>
 
                 <!-- Owner / Editor -->
-                <a
-                
-                  class="text-unerline"
-                  href="javascript:;"
-                  (click)="openSpreadsheet(row)"
-                >
+                <a *ngIf="row?.isEditable" class="text-unerline" href="javascript:;" (click)="openSpreadsheet(row)">
                   {{ 'EditSpreadsheet' | localize }}
                 </a>
 
                 <!-- Viewer -->
-                <!-- <span
-                  *ngIf="!canEditSpreadsheet(row)"
-                  class="text-muted"
-                >
+                <span *ngIf="!row?.isEditable" class="text-muted">
                   {{ 'EditSpreadsheet' | localize }}
-                </span> -->
+                </span>
 
               </td>
 
@@ -212,7 +154,7 @@
               <td>
 
                 <span *ngIf="row?.lastViewDate; else notViewed">
-                  {{ row?.lastViewDate | momentFormat:'L' }}    {{ row?.lastViewDate | momentFormat:'h:mm a' }}
+                  {{ row?.lastViewDate | momentFormat:'L' }} {{ row?.lastViewDate | momentFormat:'h:mm a' }}
                 </span>
 
                 <ng-template #notViewed>
@@ -223,7 +165,8 @@
 
               <!-- Last Updated -->
               <td>
-                {{ row?.lastModificationDate | momentFormat:'L' }}  {{ row?.lastModificationDate | momentFormat:'h:mm a' }}
+                {{ row?.lastModificationDate | momentFormat:'L' }} {{ row?.lastModificationDate | momentFormat:'h:mm a'
+                }}
               </td>
 
               <!-- Sharing -->
@@ -231,42 +174,26 @@
 
                 <div class="sharing-wrap d-flex align-items-center">
 
-                  <div
-                    class="avatar-stack"
-                
-                  >
+                  <div class="avatar-stack">
 
                     <!-- First 3 users -->
-                    <ng-container
-                      *ngFor="
+                    <ng-container *ngFor="
                         let u of row?.sharedWithUsers | slice:0:3;
                         let i = index
-                      "
-                    >
-                        <!-- [src]="getProfilePicture(u?.accountId)" -->
+                      ">
+                      <!-- [src]="getProfilePicture(u?.accountId)" -->
 
-                      <img
-                        class="avatar avatar-sm stacked"
-                        [style.zIndex]="10 - i"
-                        [src]="attachmentBaseUrl + u?.userImage"
-
-                        (error)="onAvatarErr($event)"
-                        [alt]="u?.userName"
-                         [pTooltip]="u?.userName" tooltipPosition="bottom"
-      [tooltipEvent]="isSmallScreen ? 'focus' : 'hover'" [autoHide]="true" [showDelay]="100" [hideDelay]="100"
-      [tabindex]="isSmallScreen ? 0 : null"
-                        
-                      />
+                      <img class="avatar avatar-sm stacked" [style.zIndex]="10 - i"
+                        [src]="attachmentBaseUrl + u?.userImage" (error)="onAvatarErr($event)" [alt]="u?.userName"
+                        [pTooltip]="u?.userName" tooltipPosition="bottom"
+                        [tooltipEvent]="isSmallScreen ? 'focus' : 'hover'" [autoHide]="true" [showDelay]="100"
+                        [hideDelay]="100" [tabindex]="isSmallScreen ? 0 : null" />
 
                     </ng-container>
 
                     <!-- More -->
-                    <div
-                      *ngIf="row?.sharedWithUsers?.length > 3"
-                      class="avatar avatar-sm stacked more"
-                          (mouseenter)="showShare($event, row)"
-                    (mouseleave)="hideShare()"
-                    >
+                    <div *ngIf="row?.sharedWithUsers?.length > 3" class="avatar avatar-sm stacked more"
+                      (mouseenter)="showShare($event, row)" (mouseleave)="hideShare()">
                       +{{ row?.sharedWithUsers?.length - 3 }}
                     </div>
 
@@ -280,37 +207,21 @@
               <td class="text-center">
 
                 <!-- Owner Only -->
-                     <!-- *ngIf="isDashboardOwner(row)" -->
-                <div
-              
-                  class="dashboard-actions"
-                  dropdown
-                  container="body"
-                >
+
+                <div *ngIf="row?.isTheOwner" class="dashboard-actions" dropdown container="body">
 
                   <!-- 3 Dots -->
-                  <button
-                    type="button"
-                    class="btn btn-sm action-menu-btn"
-                    dropdownToggle
-                    [title]="'Actions' | localize"
-                  >
+                  <button type="button" class="btn btn-sm action-menu-btn" dropdownToggle
+                    [title]="'Actions' | localize">
                     <i class="fas fa-ellipsis-v"></i>
                   </button>
 
                   <!-- Dropdown -->
-                  <ul
-                    *dropdownMenu
-                    class="dropdown-menu dropdown-menu-right"
-                  >
+                  <ul *dropdownMenu class="dropdown-menu dropdown-menu-right">
 
                     <!-- Rename -->
                     <li>
-                      <button
-                        type="button"
-                        class="dropdown-item"
-                        (click)="startRename(row)"
-                      >
+                      <button type="button" class="dropdown-item" (click)="startRename(row)">
                         <i class="fas fa-pen mr-2"></i>
 
                         {{ 'Rename' | localize }}
@@ -319,11 +230,7 @@
 
                     <!-- Sharing -->
                     <li>
-                      <button
-                        type="button"
-                        class="dropdown-item"
-                        (click)="openSharing(row)"
-                      >
+                      <button type="button" class="dropdown-item" (click)="openSharing(row)">
                         <i class="fas fa-share-alt mr-2"></i>
 
                         {{ 'Sharing' | localize }}
@@ -334,11 +241,7 @@
 
                     <!-- Delete -->
                     <li>
-                      <button
-                        type="button"
-                        class="dropdown-item text-danger"
-                        (click)="deleteDashboard(row)"
-                      >
+                      <button type="button" class="dropdown-item text-danger" (click)="deleteDashboard(row)">
                         <i class="fas fa-trash-alt mr-2"></i>
 
                         {{ 'Delete' | localize }}
@@ -366,34 +269,19 @@
 
                 <div class="dashboard-name-edit d-flex align-items-center">
 
-                  <input
-                    type="text"
-                    class="form-control form-control-sm"
-                    [(ngModel)]="newDashboardName"
-                    [placeholder]="'DashboardName' | localize"
-                    (keyup.enter)="saveNewDashboard()"
-                    (keyup.escape)="cancelCreate()"
-                    autofocus
-                  />
+                  <input type="text" class="form-control form-control-sm" [(ngModel)]="newDashboardName"
+                    [placeholder]="'DashboardName' | localize" (keyup.enter)="saveNewDashboard()"
+                    (keyup.escape)="cancelCreate()" autofocus />
 
                   <!-- Save -->
-                  <button
-                    type="button"
-                    class="btn btn-sm btn-link text-success ml-1"
-                    [title]="'Save' | localize"
-                    (click)="saveNewDashboard()"
-                      [disabled]="!newDashboardName?.trim()"
-                  >
+                  <button type="button" class="btn btn-sm btn-link text-success ml-1" [title]="'Save' | localize"
+                    (click)="saveNewDashboard()" [disabled]="!newDashboardName?.trim()">
                     <i class="fas fa-check"></i>
                   </button>
 
                   <!-- Cancel -->
-                  <button
-                    type="button"
-                    class="btn btn-sm btn-link text-muted"
-                    [title]="'Cancel' | localize"
-                    (click)="cancelCreate()"
-                  >
+                  <button type="button" class="btn btn-sm btn-link text-muted" [title]="'Cancel' | localize"
+                    (click)="cancelCreate()">
                     <i class="fas fa-times"></i>
                   </button>
 
@@ -412,10 +300,7 @@
           <ng-template pTemplate="emptymessage">
 
             <tr>
-              <td
-                colspan="7"
-                class="p-4 text-center text-muted"
-              >
+              <td colspan="7" class="p-4 text-center text-muted">
                 {{ 'NoDashboardsFound' | localize }}
               </td>
             </tr>
@@ -426,11 +311,7 @@
 
         <!-- ================= SHARING HOVER ================= -->
 
-        <p-overlayPanel
-          #sharePanel
-          [showCloseIcon]="false"
-          styleClass="share-panel"
-        >
+        <p-overlayPanel #sharePanel [showCloseIcon]="false" styleClass="share-panel">
 
           <div class="share-panel-title mb-2">
             {{ 'SharedWith' | localize }}
@@ -438,19 +319,10 @@
 
           <div *ngIf="shareUsers?.length; else emptyShare">
 
-            <div
-              class="share-user d-flex align-items-center"
-              *ngFor="let u of shareUsers"
-            >
+            <div class="share-user d-flex align-items-center" *ngFor="let u of shareUsers">
 
-              <img
-                class="avatar avatar-sm"
-               [src]="attachmentBaseUrl + u?.userImage"
-
-                        (error)="onAvatarErr($event)"
-                        [alt]="u?.userName"
-                [alt]="'User' | localize"
-              />
+              <img class="avatar avatar-sm" [src]="attachmentBaseUrl + u?.userImage" (error)="onAvatarErr($event)"
+                [alt]="u?.userName" [alt]="'User' | localize" />
 
               <span class="ml-2">
                 {{ u?.userName || '—' }}
@@ -482,21 +354,18 @@
 
         <div class="primeng-paging-container custom-paginator">
 
-          <p-paginator
-            #paginator
-            [rows]="primengTableHelper.defaultRecordsCountPerPage"
+          <p-paginator #paginator [rows]="primengTableHelper.defaultRecordsCountPerPage"
             [totalRecords]="primengTableHelper.totalRecordsCount"
             [rowsPerPageOptions]="primengTableHelper.predefinedRecordsCountPerPage"
-            (onPageChange)="onPageChange($event)"
-          >
+            (onPageChange)="onPageChange($event)">
           </p-paginator>
 
           <div class="total-records-count text-right mr-3">
             {{
-              l(
-                'TotalRecordsCount',
-                primengTableHelper.totalRecordsCount
-              )
+            l(
+            'TotalRecordsCount',
+            primengTableHelper.totalRecordsCount
+            )
             }}
           </div>
 

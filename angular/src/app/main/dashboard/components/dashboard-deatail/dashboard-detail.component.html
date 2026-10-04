@@ -18,9 +18,7 @@
 
                 <div class="min-w-0">
 
-                    <h2
-                        class="dash-title text-truncate m-0"
-                        [title]="dashboard.title">
+                    <h2 class="dash-title text-truncate m-0" [title]="dashboard.title">
 
                         {{ dashboard.title }}
 
@@ -32,18 +30,11 @@
                             Updated:
                             <b>
                                 {{
-                                    dashboard.updatedAt
-                                        | date:'dd/MM/yyyy, HH:mm'
-                                }}
+                                 dashboard?.lastViewDate | momentFormat:'L' }}
                             </b>
                         </span>
 
-                        <span *ngIf="sourceSpreadsheetId">
-                            Spreadsheet:
-                            <b>
-                                #{{ sourceSpreadsheetId }}
-                            </b>
-                        </span>
+
 
                     </div>
 
@@ -55,35 +46,20 @@
             <!-- Actions -->
             <div class="d-flex align-items-center gap-2">
 
-                <button
-                    pButton
-                    type="button"
-                    icon="pi pi-refresh"
-                    class="refreshBtn"
-                    pTooltip="Refresh dashboard"
-                    [loading]="refreshing"
-                    [disabled]="
+                <button pButton type="button" icon="pi pi-refresh" class="refreshBtn" pTooltip="Refresh dashboard"
+                    [loading]="refreshing" [disabled]="
                         loading ||
                         !dashboardWorkbookReady
-                    "
-                    (click)="refreshDashboard()">
+                    " (click)="refreshDashboard()">
                 </button>
 
 
-                <p-menu
-                    #menu
-                    [popup]="true"
-                    [model]="actionsMenuItems">
+                <p-menu #menu [popup]="true" [model]="actionsMenuItems">
                 </p-menu>
 
 
-                <button
-                    pButton
-                    type="button"
-                    icon="pi pi-ellipsis-h"
-                    class="p-button-rounded p-button-text"
-                    (click)="menu.toggle($event)"
-                    aria-label="More actions">
+                <button pButton type="button" icon="pi pi-ellipsis-h" class="p-button-rounded p-button-text"
+                    (click)="menu.toggle($event)" aria-label="More actions">
                 </button>
 
             </div>
@@ -104,9 +80,7 @@
         <!-- LOADING -->
         <!-- ========================================= -->
 
-        <div
-            *ngIf="loading"
-            class="dashboard-state">
+        <div *ngIf="loading" class="dashboard-state">
 
             <i class="pi pi-spin pi-spinner"></i>
 
@@ -121,12 +95,10 @@
         <!-- ERROR -->
         <!-- ========================================= -->
 
-        <div
-            *ngIf="
+        <div *ngIf="
                 !loading &&
                 dashboardLoadError
-            "
-            class="dashboard-state dashboard-error">
+            " class="dashboard-state dashboard-error">
 
             <i class="pi pi-exclamation-triangle"></i>
 
@@ -141,90 +113,21 @@
         <!-- DASHBOARD SPREADSHEET VIEWER -->
         <!-- ========================================= -->
 
-        <div
-            *ngIf="
+        <div *ngIf="
                 !loading &&
                 !dashboardLoadError &&
                 dashboardWorkbookReady
-            "
-            class="dashboard-sheet-viewer">
+            " class="dashboard-sheet-viewer">
 
-            <ejs-spreadsheet
-
-                #dashboardSpreadsheet
-
-                width="100%"
-                height="100%"
-
-                [sheets]="dashboardSheets"
-
+            <ejs-spreadsheet #dashboardSpreadsheet width="100%" height="100%" [sheets]="dashboardSheets"
                 [activeSheetIndex]="
                     dashboardActiveSheetIndex
-                "
-
-                [allowChart]="true"
-
-                [allowEditing]="false"
-                [allowInsert]="false"
-                [allowDelete]="false"
-
-                [allowSorting]="false"
-                [allowFiltering]="false"
-
-                [allowOpen]="false"
-                [allowSave]="false"
-
-                [enableContextMenu]="false"
-
-                [enableKeyboardShortcut]="false"
-
-                [showRibbon]="false"
-
-                [showFormulaBar]="false"
-
-                [showSheetTabs]="false"
-
-                (created)="onDashboardCreated()">
+                " [allowChart]="true" [allowEditing]="false" [allowInsert]="false" [allowDelete]="false"
+                [allowSorting]="false" [allowFiltering]="false" [allowOpen]="false" [allowSave]="false"
+                [enableContextMenu]="false" [enableKeyboardShortcut]="false" [showRibbon]="false"
+                [showFormulaBar]="false" [showSheetTabs]="false" (created)="onDashboardCreated()">
 
             </ejs-spreadsheet>
-
-            <!--
-                One Angular refresh button per saved Dashboard widget.
-                Buttons are positioned over the native Syncfusion chart by TS,
-                using the chart's saved top/left/width.
-            -->
-            <ng-container *ngFor="let widget of dashboardWidgets; trackBy: trackDashboardWidget">
-
-                <button
-                    *ngIf="widgetPosition(widget) as position"
-                    type="button"
-                    class="dashboard-widget-refresh-btn"
-                    [style.left.px]="position.left"
-                    [style.top.px]="position.top"
-                    [disabled]="
-                        refreshing ||
-                        refreshingWidgetId === widget.id
-                    "
-                    [title]="
-                        'Refresh ' +
-                        (widget.chartTitle || 'chart') +
-                        ' from ' +
-                        widget.sourceSheetName
-                    "
-                    (click)="refreshDashboardWidget(widget, $event)">
-
-                    <i
-                        class="pi"
-                        [ngClass]="
-                            refreshingWidgetId === widget.id
-                                ? 'pi-spin pi-spinner'
-                                : 'pi-refresh'
-                        ">
-                    </i>
-
-                </button>
-
-            </ng-container>
 
         </div>
 
