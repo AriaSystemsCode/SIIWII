@@ -50,5 +50,18 @@ namespace onetouch.AppDashboards.Dtos
         public virtual bool CanView { set; get; }
 
     }
+    public class ShareDashboardInfo
+    { 
+        public virtual long DashboardId { get; set; }
+        public virtual int SharingLevel { get; set; }
+        public virtual bool CanEdit{ get; set; }
+        public virtual List<ShareWithUser> UsersList{ get; set; }
 
+    }
+    public class ShareWithUser
+    { 
+        public virtual long UserId { get;set; }
+        public virtual bool CanEdit { get; set; }
+        
+    }
 }

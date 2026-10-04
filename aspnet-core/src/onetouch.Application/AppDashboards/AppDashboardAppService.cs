@@ -446,6 +446,57 @@ namespace onetouch.AppDashboards
             }
             return returnList;
         }
+        public async Task ShareDashboard(ShareDashboardInfo ShareDashboardInfo)
+        {
+            var dashboardObjectTypeId = await _helper.SystemTables.GetEntityObjectTypeDashboard();
+            var dashboardObj = await _appEntityRepository.GetAll()
+                   .Where(z => z.EntityObjectTypeId == dashboardObjectTypeId
+                     && z.Id == ShareDashboardInfo.DashboardId).FirstOrDefaultAsync();
+            if (dashboardObj != null)
+            {
+                if (ShareDashboardInfo.SharingLevel == 1)
+                {
+                    var sharingPublic = await _appEntitySharingRepository.GetAll()
+                    .Where(z => z.EntityId == dashboardObj.Id &&
+                    z.SharedTenantId == AbpSession.TenantId &&
+                    z.SharedUserId==null).FirstOrDefaultAsync();
+                    if (sharingPublic != null &&
+                        sharingPublic.CanEdit != ShareDashboardInfo.CanEdit)
+                    {
+                        sharingPublic.CanEdit = ShareDashboardInfo.CanEdit;
+                        await _appEntitySharingRepository.UpdateAsync(sharingPublic);
+                        await CurrentUnitOfWork.SaveChangesAsync();
+                        var allUsersRecords = await _appEntitySharingRepository.GetAll()
+                    .Where(z => z.EntityId == dashboardObj.Id &&
+                    z.SharedTenantId == AbpSession.TenantId &&
+                    z.SharedUserId != null && 
+                    z.CanEdit!= ShareDashboardInfo.CanEdit).ToListAsync();
+                        if (allUsersRecords != null)
+                        {
+                            foreach (var user in allUsersRecords) {
+                                user.CanEdit = ShareDashboardInfo.CanEdit;
+                                await _appEntitySharingRepository.UpdateAsync(user);
+                            }
+                            await CurrentUnitOfWork.SaveChangesAsync();
+                        }
+                    }
+                    else
+                    {
+                        await _appEntitySharingRepository
+                            .DeleteAsync(z=>z.EntityId== dashboardObj.Id && z.SharedUserId!=null);
+                        await CurrentUnitOfWork.SaveChangesAsync();
+                        sharingPublic = new AppEntitySharings();
+                        sharingPublic.EntityId = dashboardObj.Id;
+                        sharingPublic.CanEdit = ShareDashboardInfo.CanEdit;
+                        sharingPublic.SharedTenantId = AbpSession.TenantId;
+                        sharingPublic.SharedUserId = null;
+                        await _appEntitySharingRepository.InsertAsync(sharingPublic);
+                        await CurrentUnitOfWork.SaveChangesAsync();
+                    }
+                }
+            }
+
+        }
         public async Task SaveSpreadSheetJson(long dashboardId, JObject spreadSheet)
         {
 
