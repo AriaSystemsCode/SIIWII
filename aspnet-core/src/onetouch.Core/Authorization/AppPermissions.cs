@@ -6,6 +6,13 @@
     /// </summary>
     public static class AppPermissions
     {
+        public const string Pages_Administration_FieldManager = "Pages.Administration.FieldManager";
+        public const string Pages_Administration_FieldManager_Create = "Pages.Administration.FieldManager.Create";
+        public const string Pages_Administration_FieldManager_Edit = "Pages.Administration.FieldManager.Edit";
+        public const string Pages_Administration_FieldManager_Delete = "Pages.Administration.FieldManager.Delete";
+        public const string Pages_Administration_FieldManager_Duplicate = "Pages.Administration.FieldManager.Duplicate";
+        public const string Pages_Administration_FieldManager_RestoreRevision = "Pages.Administration.FieldManager.RestoreRevision";
+        public const string Pages_Administration_FieldManager_AddExistingField = "Pages.Administration.FieldManager.AddExistingField";
         public const string Pages_Administration_ValidationRules = "Pages.Administration.ValidationRules";
         public const string Pages_Administration_ValidationRules_Create = "Pages.Administration.ValidationRules.Create";
         public const string Pages_Administration_ValidationRules_Edit = "Pages.Administration.ValidationRules.Edit";

@@ -14,7 +14,7 @@
                 <ng-template #entityNodes let-nodes>
                     <div class="field-entity-node" *ngFor="let node of nodes">
                         <button type="button" class="field-entity-node-button"
-                            [class.selected]="selectedEntityId === node.id" (click)="toggleEntity(node, $event)">
+                            [class.selected]="selectedEntityKey === node.key" (click)="toggleEntity(node, $event)">
                             <i *ngIf="node.children?.length" class="fa"
                                 [class.fa-chevron-right]="!isEntityExpanded(node)"
                                 [class.fa-chevron-down]="isEntityExpanded(node)"></i>
@@ -38,10 +38,10 @@
             </ng-container>
         </div>
         <div class="field-manager-actions" *ngIf="activePanel === 'entity' && selectedEntityId !== null">
-            <button type="button" class="btn bgPurpleM add-existing-btn" (click)="addFromExisting()">
+            <button *ngIf="permissions.canAddExistingField" type="button" class="btn bgPurpleM add-existing-btn" (click)="addFromExisting()">
                 {{ 'AddFromExisting' | localize }} 
             </button>
-            <button type="button" class="btn bgPurpleM create-field-btn" (click)="create()">
+            <button *ngIf="permissions.canCreateField" type="button" class="btn bgPurpleM create-field-btn" (click)="create()">
                 {{ 'CreateNewField' | localize }}
             </button>
         </div>
@@ -162,8 +162,10 @@
         [ngStyle]="{ top: actionMenuPosition.top + 'px', left: actionMenuPosition.left + 'px' }"
         (click)="$event.stopPropagation()">
         <button type="button" (click)="view(actionItem)">{{ 'View' | localize }}</button>
-        <!-- <button type="button" (click)="createNewRevision(actionItem)">{{ 'CreateNewRevision' | localize }}</button> -->
-        <button type="button" (click)="delete(actionItem)">{{ 'Delete' | localize }}</button>
+        <button *ngIf="permissions.canEditField && actionItem.canEdit" type="button" (click)="edit(actionItem)">{{ 'Edit' | localize }}</button>
+        <button *ngIf="permissions.canDuplicateField" type="button" (click)="duplicate(actionItem)">{{ 'DuplicateField' | localize }}</button>
+        <button *ngIf="permissions.canEditField && actionItem.canHide" type="button" (click)="hide(actionItem)">{{ 'Hide' | localize }}</button>
+        <button *ngIf="actionItem.canDelete" type="button" (click)="delete(actionItem)">{{ 'Delete' | localize }}</button>
     </div>
 
     <div class="field-manager-empty-selection" *ngIf="activePanel === 'entity' && selectedEntityId === null">
@@ -172,9 +174,9 @@
 
     <app-create-or-edit-field-manager #createOrEditFieldManagerModal
         (saved)="onCreateOrEditDone()" (closed)="onCreateOrEditClosed()"></app-create-or-edit-field-manager>
-    <app-view-field-manager #viewFieldManagerModal
-        (revisionSaved)="onCreateOrEditDone()"></app-view-field-manager>
+    <app-view-field-manager #viewFieldManagerModal></app-view-field-manager>
     <app-existing-fields-modal #existingFieldsModal [items]="items" [entityId]="selectedEntityId"
+        [objectTypeId]="selectedNode?.nodeType === 'ObjectType' ? selectedNode?.id : null"
         [tableName]="selectedEntityPath.length ? selectedEntityPath[selectedEntityPath.length - 1].name : ''"
         (added)="onExistingFieldsAdded($event)"></app-existing-fields-modal>
         </main>

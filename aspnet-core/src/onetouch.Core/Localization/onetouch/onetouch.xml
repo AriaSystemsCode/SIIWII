@@ -3036,6 +3036,11 @@ Please select one of the available linesheet templates
 		<text name="AddExistingFieldsTo">Add existing fields to</text>
 		<text name="FieldsSelected">fields selected</text>
 		<text name="CreateNewField">Create New Field</text>
+		<text name="EditField">Edit Field</text>
+		<text name="DeleteField">Delete Field</text>
+		<text name="DuplicateField">Duplicate Field</text>
+		<text name="RestoreFieldRevision">Restore Field Revision</text>
+		<text name="AddExistingField">Add Existing Field</text>
 		<text name="SearchFields">Search fields...</text>
 		<text name="OnlyExtraData">Only Extra Data</text>
 		<text name="FieldCode">Field Code</text>

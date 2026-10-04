@@ -55,11 +55,15 @@ using onetouch.AppMarketplaceAccountsPriceLevels;
 using onetouch.AppMarketplaceTransactions;
 using onetouch.AppMarketplaceMessages;
 using onetouch.AppMarketplaceContacts;
+using onetouch.AppFields;
 
 namespace onetouch.EntityFrameworkCore
 {
     public class onetouchDbContext : AbpZeroDbContext<Tenant, Role, User, onetouchDbContext>, IAbpPersistedGrantDbContext
     {
+        public virtual DbSet<AppField> APPFields { get; set; }
+        public virtual DbSet<AppFieldHistory> AppFieldsHistory { get; set; }
+        public virtual DbSet<AppTableField> AppTableFields { get; set; }
         //I40[Start]
         public virtual DbSet<AppContactRelationshipInfo> AppContactRelationshipInfo { get; set; }
         //I40[End]
@@ -252,6 +256,48 @@ namespace onetouch.EntityFrameworkCore
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<AppField>(field =>
+            {
+                field.HasOne<SydObject>().WithMany().HasForeignKey(x => x.SycObjectId)
+                    .OnDelete(DeleteBehavior.Restrict);
+                field.HasOne<SydObject>().WithMany().HasForeignKey(x => x.EntitySycObjectId)
+                    .OnDelete(DeleteBehavior.Restrict);
+                field.HasOne<SycEntityObjectType>().WithMany().HasForeignKey(x => x.FieldTypeId)
+                    .OnDelete(DeleteBehavior.Restrict);
+                field.HasOne<SycEntityObjectType>().WithMany().HasForeignKey(x => x.WidgetTypeId)
+                    .OnDelete(DeleteBehavior.Restrict);
+                field.HasOne<AppField>().WithMany().HasForeignKey(x => x.SourceFieldId)
+                    .OnDelete(DeleteBehavior.Restrict);
+                field.Property(x => x.FieldLevelCode).HasDefaultValue("Application");
+                field.Property(x => x.FieldStatusCode).HasDefaultValue("Proposed");
+                field.Property(x => x.CurrentRevisionNo).HasDefaultValue("00");
+                field.HasIndex(x => new { x.TenantId, x.FieldCode }).IsUnique()
+                    .HasFilter("[IsDeleted] = 0");
+                field.HasIndex(x => new { x.TenantId, x.SycObjectId });
+                field.HasIndex(x => new { x.TenantId, x.SourceFieldId });
+                field.HasIndex(x => x.FieldTypeId);
+            });
+            modelBuilder.Entity<AppFieldHistory>(history =>
+            {
+                history.HasOne<AppField>().WithMany().HasForeignKey(x => x.AppFieldId)
+                    .OnDelete(DeleteBehavior.Restrict);
+                history.HasIndex(x => new { x.AppFieldId, x.RevisionNo }).IsUnique();
+                history.HasIndex(x => x.TenantId);
+            });
+            modelBuilder.Entity<AppTableField>(assignment =>
+            {
+                assignment.HasOne<AppField>().WithMany().HasForeignKey(x => x.AppFieldId)
+                    .OnDelete(DeleteBehavior.Restrict);
+                assignment.HasOne<SydObject>().WithMany().HasForeignKey(x => x.SycObjectId)
+                    .OnDelete(DeleteBehavior.Restrict);
+                assignment.HasOne<SycEntityObjectType>().WithMany().HasForeignKey(x => x.SycEntityObjectTypeId)
+                    .OnDelete(DeleteBehavior.Restrict);
+                assignment.HasIndex(x => new { x.TenantId, x.SycObjectId, x.SycEntityObjectTypeId });
+                assignment.HasIndex(x => x.AppFieldId);
+                assignment.HasIndex(x => new { x.TenantId, x.AppFieldId, x.SycObjectId, x.SycEntityObjectTypeId })
+                    .IsUnique().HasFilter(null);
+            });
 
             modelBuilder.Entity<AppItemSelector>(a =>
             {

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using onetouch.EntityFrameworkCore;
 
@@ -11,9 +12,11 @@ using onetouch.EntityFrameworkCore;
 namespace onetouch.Migrations
 {
     [DbContext(typeof(onetouchDbContext))]
-    partial class onetouchDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260930185118_AddAppFieldsFieldManager")]
+    partial class AddAppFieldsFieldManager
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -3281,26 +3284,6 @@ namespace onetouch.Migrations
                         });
                 });
 
-            modelBuilder.Entity("onetouch.AppFields.AppTableField", b =>
-                {
-                    b.Property<long>("Id").ValueGeneratedOnAdd().HasColumnType("bigint");
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
-                    b.Property<long>("AppFieldId").HasColumnType("bigint");
-                    b.Property<DateTime>("CreationTime").HasColumnType("datetime2");
-                    b.Property<long?>("CreatorUserId").HasColumnType("bigint");
-                    b.Property<long>("SycObjectId").HasColumnType("bigint");
-                    b.Property<long?>("SycEntityObjectTypeId").HasColumnType("bigint");
-                    b.Property<int?>("TenantId").HasColumnType("int");
-                    b.HasKey("Id");
-                    b.HasIndex("AppFieldId");
-                    b.HasIndex("SycObjectId");
-                    b.HasIndex("SycEntityObjectTypeId");
-                    b.HasIndex("TenantId", "SycObjectId", "SycEntityObjectTypeId");
-                    b.HasIndex("TenantId", "AppFieldId", "SycObjectId", "SycEntityObjectTypeId")
-                        .IsUnique();
-                    b.ToTable("AppTableFields");
-                });
-
             modelBuilder.Entity("onetouch.AppItemSelectors.AppItemSelector", b =>
                 {
                     b.Property<long>("Id")
@@ -3347,16 +3330,6 @@ namespace onetouch.Migrations
                         {
                             t.HasTrigger("AppItemSelectors_Trigger");
                         });
-                });
-
-            modelBuilder.Entity("onetouch.AppFields.AppTableField", b =>
-                {
-                    b.HasOne("onetouch.AppFields.AppField", null).WithMany()
-                        .HasForeignKey("AppFieldId").OnDelete(DeleteBehavior.Restrict).IsRequired();
-                    b.HasOne("onetouch.SystemObjects.SydObject", null).WithMany()
-                        .HasForeignKey("SycObjectId").OnDelete(DeleteBehavior.Restrict).IsRequired();
-                    b.HasOne("onetouch.SystemObjects.SycEntityObjectType", null).WithMany()
-                        .HasForeignKey("SycEntityObjectTypeId").OnDelete(DeleteBehavior.Restrict);
                 });
 
             modelBuilder.Entity("onetouch.AppItems.AppItem", b =>

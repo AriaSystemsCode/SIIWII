@@ -3,6 +3,7 @@ import { ModalDirective } from 'ngx-bootstrap/modal';
 import { AppComponentBase } from '@shared/common/app-component-base';
 import { FieldManagerItem } from '../../field-manager.model';
 import { FieldManagerService } from '../../field-manager.service';
+import { forkJoin } from 'rxjs';
 
 @Component({
     selector: 'app-existing-fields-modal',
@@ -14,10 +15,12 @@ export class ExistingFieldsModalComponent extends AppComponentBase {
     @Input() items: FieldManagerItem[] = [];
     @Input() entityId: number | null = null;
     @Input() tableName = '';
+    @Input() objectTypeId: number | null = null;
     @Output() added = new EventEmitter<number>();
 
     search = '';
     selectedFieldIds: number[] = [];
+    allFields: FieldManagerItem[] = [];
 
     constructor(
         injector: Injector,
@@ -28,12 +31,10 @@ export class ExistingFieldsModalComponent extends AppComponentBase {
 
     get availableFields(): FieldManagerItem[] {
         const search = this.search.trim().toLowerCase();
-        const currentTableCodes = new Set(this.items
-            .filter(item => item.entityId === this.entityId)
-            .map(item => item.code));
+        const currentTableCodes = new Set(this.items.map(item => item.code));
 
-        return this.items.filter(item => {
-            if (item.entityId === this.entityId || currentTableCodes.has(item.code)) {
+        return this.allFields.filter(item => {
+            if (currentTableCodes.has(item.code)) {
                 return false;
             }
 
@@ -51,6 +52,10 @@ export class ExistingFieldsModalComponent extends AppComponentBase {
     show(): void {
         this.search = '';
         this.selectedFieldIds = [];
+        this.fieldManagerService.getFieldsForNode(null).subscribe({
+            next: fields => this.allFields = fields,
+            error: () => this.notify.error('Could not load existing fields.')
+        });
         this.modal.show();
     }
 
@@ -82,10 +87,17 @@ export class ExistingFieldsModalComponent extends AppComponentBase {
             return;
         }
 
-        const selectedFields = this.items.filter(item => this.isSelected(item.id));
-        selectedFields.forEach(item => this.fieldManagerService.addExisting(item, this.entityId!, this.tableName));
-        this.added.emit(selectedFields.length);
-        this.hideAndReset();
+        const selectedFields = this.allFields.filter(item => this.isSelected(item.id));
+        if (!selectedFields.length) return;
+        forkJoin(selectedFields.map(item => this.fieldManagerService.assignExistingField(
+            item.id, this.entityId!, this.objectTypeId
+        ))).subscribe({
+            next: () => {
+                this.added.emit(selectedFields.length);
+                this.hideAndReset();
+            },
+            error: () => this.notify.error('Could not assign one or more fields.')
+        });
     }
 
     private hideAndReset(): void {

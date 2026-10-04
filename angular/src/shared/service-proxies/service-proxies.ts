@@ -12678,6 +12678,677 @@ export class AppFeaturesServiceProxy {
 }
 
 @Injectable()
+export class AppFieldManagerServiceProxy {
+    private http: HttpClient;
+    private baseUrl: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+    constructor(@Inject(HttpClient) http: HttpClient, @Optional() @Inject(API_BASE_URL) baseUrl?: string) {
+        this.http = http;
+        this.baseUrl = baseUrl !== undefined && baseUrl !== null ? baseUrl : "";
+    }
+
+    /**
+     * @return Success
+     */
+    getPagePermissions(): Observable<FieldManagerPermissionDto> {
+        let url_ = this.baseUrl + "/api/services/app/AppFieldManager/GetPagePermissions";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetPagePermissions(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetPagePermissions(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<FieldManagerPermissionDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<FieldManagerPermissionDto>;
+        }));
+    }
+
+    protected processGetPagePermissions(response: HttpResponseBase): Observable<FieldManagerPermissionDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = FieldManagerPermissionDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @return Success
+     */
+    getObjectTypeTree(): Observable<ObjectTypeTreeNodeDto[]> {
+        let url_ = this.baseUrl + "/api/services/app/AppFieldManager/GetObjectTypeTree";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetObjectTypeTree(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetObjectTypeTree(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<ObjectTypeTreeNodeDto[]>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<ObjectTypeTreeNodeDto[]>;
+        }));
+    }
+
+    protected processGetObjectTypeTree(response: HttpResponseBase): Observable<ObjectTypeTreeNodeDto[]> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            if (Array.isArray(resultData200)) {
+                result200 = [] as any;
+                for (let item of resultData200)
+                    result200!.push(ObjectTypeTreeNodeDto.fromJS(item));
+            }
+            else {
+                result200 = <any>null;
+            }
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @return Success
+     */
+    getFieldCreateOrEditMetadata(): Observable<FieldCreateOrEditMetadataDto> {
+        let url_ = this.baseUrl + "/api/services/app/AppFieldManager/GetFieldCreateOrEditMetadata";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetFieldCreateOrEditMetadata(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetFieldCreateOrEditMetadata(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<FieldCreateOrEditMetadataDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<FieldCreateOrEditMetadataDto>;
+        }));
+    }
+
+    protected processGetFieldCreateOrEditMetadata(response: HttpResponseBase): Observable<FieldCreateOrEditMetadataDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = FieldCreateOrEditMetadataDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return Success
+     */
+    previewFieldCode(body: PreviewFieldCodeInput | undefined): Observable<FieldCodePreviewDto> {
+        let url_ = this.baseUrl + "/api/services/app/AppFieldManager/PreviewFieldCode";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json-patch+json",
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processPreviewFieldCode(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processPreviewFieldCode(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<FieldCodePreviewDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<FieldCodePreviewDto>;
+        }));
+    }
+
+    protected processPreviewFieldCode(response: HttpResponseBase): Observable<FieldCodePreviewDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = FieldCodePreviewDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param selectedObjectId (optional) 
+     * @param selectedObjectTypeId (optional) 
+     * @param allFields (optional) 
+     * @param searchText (optional) 
+     * @param fieldTypeId (optional) 
+     * @param fieldStatusId (optional) 
+     * @param fieldLevelId (optional) 
+     * @param fieldStatusCode (optional) 
+     * @param fieldLevelCode (optional) 
+     * @param trackingNo (optional) 
+     * @param isStandard (optional) 
+     * @param createdByUserId (optional) 
+     * @param createdFrom (optional) 
+     * @param createdTo (optional) 
+     * @param groupBy (optional) 
+     * @param sorting (optional) 
+     * @param skipCount (optional) 
+     * @param maxResultCount (optional) 
+     * @return Success
+     */
+    getFields(selectedObjectId: number | null | undefined, selectedObjectTypeId: number | null | undefined, allFields: boolean | undefined, searchText: string | null | undefined, fieldTypeId: number | null | undefined, fieldStatusId: number | null | undefined, fieldLevelId: number | null | undefined, fieldStatusCode: string | null | undefined, fieldLevelCode: string | null | undefined, trackingNo: string | null | undefined, isStandard: boolean | null | undefined, createdByUserId: number | null | undefined, createdFrom: moment.Moment | null | undefined, createdTo: moment.Moment | null | undefined, groupBy: string | null | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<PagedResultDtoOfAppFieldListDto> {
+        let url_ = this.baseUrl + "/api/services/app/AppFieldManager/GetFields?";
+        if (selectedObjectId !== undefined && selectedObjectId !== null)
+            url_ += "SelectedObjectId=" + encodeURIComponent("" + selectedObjectId) + "&";
+        if (selectedObjectTypeId !== undefined && selectedObjectTypeId !== null)
+            url_ += "SelectedObjectTypeId=" + encodeURIComponent("" + selectedObjectTypeId) + "&";
+        if (allFields === null)
+            throw new Error("The parameter 'allFields' cannot be null.");
+        else if (allFields !== undefined)
+            url_ += "AllFields=" + encodeURIComponent("" + allFields) + "&";
+        if (searchText !== undefined && searchText !== null)
+            url_ += "SearchText=" + encodeURIComponent("" + searchText) + "&";
+        if (fieldTypeId !== undefined && fieldTypeId !== null)
+            url_ += "FieldTypeId=" + encodeURIComponent("" + fieldTypeId) + "&";
+        if (fieldStatusId !== undefined && fieldStatusId !== null)
+            url_ += "FieldStatusId=" + encodeURIComponent("" + fieldStatusId) + "&";
+        if (fieldLevelId !== undefined && fieldLevelId !== null)
+            url_ += "FieldLevelId=" + encodeURIComponent("" + fieldLevelId) + "&";
+        if (fieldStatusCode !== undefined && fieldStatusCode !== null)
+            url_ += "FieldStatusCode=" + encodeURIComponent("" + fieldStatusCode) + "&";
+        if (fieldLevelCode !== undefined && fieldLevelCode !== null)
+            url_ += "FieldLevelCode=" + encodeURIComponent("" + fieldLevelCode) + "&";
+        if (trackingNo !== undefined && trackingNo !== null)
+            url_ += "TrackingNo=" + encodeURIComponent("" + trackingNo) + "&";
+        if (isStandard !== undefined && isStandard !== null)
+            url_ += "IsStandard=" + encodeURIComponent("" + isStandard) + "&";
+        if (createdByUserId !== undefined && createdByUserId !== null)
+            url_ += "CreatedByUserId=" + encodeURIComponent("" + createdByUserId) + "&";
+        if (createdFrom !== undefined && createdFrom !== null)
+            url_ += "CreatedFrom=" + encodeURIComponent(createdFrom ? "" + createdFrom.toISOString() : "") + "&";
+        if (createdTo !== undefined && createdTo !== null)
+            url_ += "CreatedTo=" + encodeURIComponent(createdTo ? "" + createdTo.toISOString() : "") + "&";
+        if (groupBy !== undefined && groupBy !== null)
+            url_ += "GroupBy=" + encodeURIComponent("" + groupBy) + "&";
+        if (sorting !== undefined && sorting !== null)
+            url_ += "Sorting=" + encodeURIComponent("" + sorting) + "&";
+        if (skipCount === null)
+            throw new Error("The parameter 'skipCount' cannot be null.");
+        else if (skipCount !== undefined)
+            url_ += "SkipCount=" + encodeURIComponent("" + skipCount) + "&";
+        if (maxResultCount === null)
+            throw new Error("The parameter 'maxResultCount' cannot be null.");
+        else if (maxResultCount !== undefined)
+            url_ += "MaxResultCount=" + encodeURIComponent("" + maxResultCount) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetFields(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetFields(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<PagedResultDtoOfAppFieldListDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<PagedResultDtoOfAppFieldListDto>;
+        }));
+    }
+
+    protected processGetFields(response: HttpResponseBase): Observable<PagedResultDtoOfAppFieldListDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = PagedResultDtoOfAppFieldListDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return Success
+     */
+    assignExistingField(body: AssignExistingFieldInput | undefined): Observable<FieldActionResultDto> {
+        let url_ = this.baseUrl + "/api/services/app/AppFieldManager/AssignExistingField";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json-patch+json",
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processAssignExistingField(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processAssignExistingField(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<FieldActionResultDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<FieldActionResultDto>;
+        }));
+    }
+
+    protected processAssignExistingField(response: HttpResponseBase): Observable<FieldActionResultDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = FieldActionResultDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param id (optional) 
+     * @return Success
+     */
+    getFieldForEdit(id: number | undefined): Observable<GetFieldForEditOutput> {
+        let url_ = this.baseUrl + "/api/services/app/AppFieldManager/GetFieldForEdit?";
+        if (id === null)
+            throw new Error("The parameter 'id' cannot be null.");
+        else if (id !== undefined)
+            url_ += "id=" + encodeURIComponent("" + id) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetFieldForEdit(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetFieldForEdit(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<GetFieldForEditOutput>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<GetFieldForEditOutput>;
+        }));
+    }
+
+    protected processGetFieldForEdit(response: HttpResponseBase): Observable<GetFieldForEditOutput> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = GetFieldForEditOutput.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return Success
+     */
+    createOrEditField(body: CreateOrEditFieldInput | undefined): Observable<AppFieldDto> {
+        let url_ = this.baseUrl + "/api/services/app/AppFieldManager/CreateOrEditField";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json-patch+json",
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processCreateOrEditField(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processCreateOrEditField(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<AppFieldDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<AppFieldDto>;
+        }));
+    }
+
+    protected processCreateOrEditField(response: HttpResponseBase): Observable<AppFieldDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = AppFieldDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param id (optional) 
+     * @return Success
+     */
+    deleteField(id: number | undefined): Observable<FieldActionResultDto> {
+        let url_ = this.baseUrl + "/api/services/app/AppFieldManager/DeleteField?";
+        if (id === null)
+            throw new Error("The parameter 'id' cannot be null.");
+        else if (id !== undefined)
+            url_ += "Id=" + encodeURIComponent("" + id) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("delete", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processDeleteField(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processDeleteField(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<FieldActionResultDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<FieldActionResultDto>;
+        }));
+    }
+
+    protected processDeleteField(response: HttpResponseBase): Observable<FieldActionResultDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = FieldActionResultDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return Success
+     */
+    duplicateField(body: EntityDtoOfInt64 | undefined): Observable<AppFieldDto> {
+        let url_ = this.baseUrl + "/api/services/app/AppFieldManager/DuplicateField";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json-patch+json",
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processDuplicateField(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processDuplicateField(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<AppFieldDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<AppFieldDto>;
+        }));
+    }
+
+    protected processDuplicateField(response: HttpResponseBase): Observable<AppFieldDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = AppFieldDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return Success
+     */
+    hideField(body: EntityDtoOfInt64 | undefined): Observable<void> {
+        let url_ = this.baseUrl + "/api/services/app/AppFieldManager/HideField";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json-patch+json",
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processHideField(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processHideField(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<void>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<void>;
+        }));
+    }
+
+    protected processHideField(response: HttpResponseBase): Observable<void> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return _observableOf(null as any);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+}
+
+@Injectable()
 export class AppItemsServiceProxy {
     private http: HttpClient;
     private baseUrl: string;
@@ -80027,6 +80698,1262 @@ export interface ISycEntityObjectStatusLookupTableDto {
     [key: string]: any;
 }
 
+export class FieldManagerPermissionDto implements IFieldManagerPermissionDto {
+    canViewPage!: boolean;
+    canCreateField!: boolean;
+    canEditField!: boolean;
+    canDeleteField!: boolean;
+    canDuplicateField!: boolean;
+    canRestoreRevision!: boolean;
+    canAddExistingField!: boolean;
+    isHost!: boolean;
+    isTenant!: boolean;
+
+    [key: string]: any;
+
+    constructor(data?: IFieldManagerPermissionDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.canViewPage = _data["canViewPage"];
+            this.canCreateField = _data["canCreateField"];
+            this.canEditField = _data["canEditField"];
+            this.canDeleteField = _data["canDeleteField"];
+            this.canDuplicateField = _data["canDuplicateField"];
+            this.canRestoreRevision = _data["canRestoreRevision"];
+            this.canAddExistingField = _data["canAddExistingField"];
+            this.isHost = _data["isHost"];
+            this.isTenant = _data["isTenant"];
+        }
+    }
+
+    static fromJS(data: any): FieldManagerPermissionDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new FieldManagerPermissionDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["canViewPage"] = this.canViewPage;
+        data["canCreateField"] = this.canCreateField;
+        data["canEditField"] = this.canEditField;
+        data["canDeleteField"] = this.canDeleteField;
+        data["canDuplicateField"] = this.canDuplicateField;
+        data["canRestoreRevision"] = this.canRestoreRevision;
+        data["canAddExistingField"] = this.canAddExistingField;
+        data["isHost"] = this.isHost;
+        data["isTenant"] = this.isTenant;
+        return data;
+    }
+}
+
+export interface IFieldManagerPermissionDto {
+    canViewPage: boolean;
+    canCreateField: boolean;
+    canEditField: boolean;
+    canDeleteField: boolean;
+    canDuplicateField: boolean;
+    canRestoreRevision: boolean;
+    canAddExistingField: boolean;
+    isHost: boolean;
+    isTenant: boolean;
+
+    [key: string]: any;
+}
+
+export class ObjectTypeTreeNodeDto implements IObjectTypeTreeNodeDto {
+    id!: number;
+    parentId!: number | undefined;
+    key!: string | undefined;
+    parentKey!: string | undefined;
+    code!: string | undefined;
+    name!: string | undefined;
+    nodeType!: string | undefined;
+    sycObjectId!: number;
+    children!: ObjectTypeTreeNodeDto[] | undefined;
+
+    [key: string]: any;
+
+    constructor(data?: IObjectTypeTreeNodeDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.id = _data["id"];
+            this.parentId = _data["parentId"];
+            this.key = _data["key"];
+            this.parentKey = _data["parentKey"];
+            this.code = _data["code"];
+            this.name = _data["name"];
+            this.nodeType = _data["nodeType"];
+            this.sycObjectId = _data["sycObjectId"];
+            if (Array.isArray(_data["children"])) {
+                this.children = [] as any;
+                for (let item of _data["children"])
+                    this.children!.push(ObjectTypeTreeNodeDto.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): ObjectTypeTreeNodeDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new ObjectTypeTreeNodeDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["id"] = this.id;
+        data["parentId"] = this.parentId;
+        data["key"] = this.key;
+        data["parentKey"] = this.parentKey;
+        data["code"] = this.code;
+        data["name"] = this.name;
+        data["nodeType"] = this.nodeType;
+        data["sycObjectId"] = this.sycObjectId;
+        if (Array.isArray(this.children)) {
+            data["children"] = [];
+            for (let item of this.children)
+                data["children"].push(item.toJSON());
+        }
+        return data;
+    }
+}
+
+export interface IObjectTypeTreeNodeDto {
+    id: number;
+    parentId: number | undefined;
+    key: string | undefined;
+    parentKey: string | undefined;
+    code: string | undefined;
+    name: string | undefined;
+    nodeType: string | undefined;
+    sycObjectId: number;
+    children: ObjectTypeTreeNodeDto[] | undefined;
+
+    [key: string]: any;
+}
+
+export class FieldLookupDto implements IFieldLookupDto {
+    id!: number | undefined;
+    code!: string | undefined;
+    name!: string | undefined;
+
+    [key: string]: any;
+
+    constructor(data?: IFieldLookupDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.id = _data["id"];
+            this.code = _data["code"];
+            this.name = _data["name"];
+        }
+    }
+
+    static fromJS(data: any): FieldLookupDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new FieldLookupDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["id"] = this.id;
+        data["code"] = this.code;
+        data["name"] = this.name;
+        return data;
+    }
+}
+
+export interface IFieldLookupDto {
+    id: number | undefined;
+    code: string | undefined;
+    name: string | undefined;
+
+    [key: string]: any;
+}
+
+export class FieldCreateOrEditMetadataDto implements IFieldCreateOrEditMetadataDto {
+    fieldTypes!: FieldLookupDto[] | undefined;
+    widgetTypes!: FieldLookupDto[] | undefined;
+    fieldLevels!: FieldLookupDto[] | undefined;
+    fieldStatuses!: FieldLookupDto[] | undefined;
+    entities!: FieldLookupDto[] | undefined;
+
+    [key: string]: any;
+
+    constructor(data?: IFieldCreateOrEditMetadataDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            if (Array.isArray(_data["fieldTypes"])) {
+                this.fieldTypes = [] as any;
+                for (let item of _data["fieldTypes"])
+                    this.fieldTypes!.push(FieldLookupDto.fromJS(item));
+            }
+            if (Array.isArray(_data["widgetTypes"])) {
+                this.widgetTypes = [] as any;
+                for (let item of _data["widgetTypes"])
+                    this.widgetTypes!.push(FieldLookupDto.fromJS(item));
+            }
+            if (Array.isArray(_data["fieldLevels"])) {
+                this.fieldLevels = [] as any;
+                for (let item of _data["fieldLevels"])
+                    this.fieldLevels!.push(FieldLookupDto.fromJS(item));
+            }
+            if (Array.isArray(_data["fieldStatuses"])) {
+                this.fieldStatuses = [] as any;
+                for (let item of _data["fieldStatuses"])
+                    this.fieldStatuses!.push(FieldLookupDto.fromJS(item));
+            }
+            if (Array.isArray(_data["entities"])) {
+                this.entities = [] as any;
+                for (let item of _data["entities"])
+                    this.entities!.push(FieldLookupDto.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): FieldCreateOrEditMetadataDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new FieldCreateOrEditMetadataDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        if (Array.isArray(this.fieldTypes)) {
+            data["fieldTypes"] = [];
+            for (let item of this.fieldTypes)
+                data["fieldTypes"].push(item.toJSON());
+        }
+        if (Array.isArray(this.widgetTypes)) {
+            data["widgetTypes"] = [];
+            for (let item of this.widgetTypes)
+                data["widgetTypes"].push(item.toJSON());
+        }
+        if (Array.isArray(this.fieldLevels)) {
+            data["fieldLevels"] = [];
+            for (let item of this.fieldLevels)
+                data["fieldLevels"].push(item.toJSON());
+        }
+        if (Array.isArray(this.fieldStatuses)) {
+            data["fieldStatuses"] = [];
+            for (let item of this.fieldStatuses)
+                data["fieldStatuses"].push(item.toJSON());
+        }
+        if (Array.isArray(this.entities)) {
+            data["entities"] = [];
+            for (let item of this.entities)
+                data["entities"].push(item.toJSON());
+        }
+        return data;
+    }
+}
+
+export interface IFieldCreateOrEditMetadataDto {
+    fieldTypes: FieldLookupDto[] | undefined;
+    widgetTypes: FieldLookupDto[] | undefined;
+    fieldLevels: FieldLookupDto[] | undefined;
+    fieldStatuses: FieldLookupDto[] | undefined;
+    entities: FieldLookupDto[] | undefined;
+
+    [key: string]: any;
+}
+
+export class PreviewFieldCodeInput implements IPreviewFieldCodeInput {
+    fieldTypeId!: number;
+    fieldName!: string;
+    fieldLevelCode!: string | undefined;
+
+    [key: string]: any;
+
+    constructor(data?: IPreviewFieldCodeInput) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.fieldTypeId = _data["fieldTypeId"];
+            this.fieldName = _data["fieldName"];
+            this.fieldLevelCode = _data["fieldLevelCode"];
+        }
+    }
+
+    static fromJS(data: any): PreviewFieldCodeInput {
+        data = typeof data === 'object' ? data : {};
+        let result = new PreviewFieldCodeInput();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["fieldTypeId"] = this.fieldTypeId;
+        data["fieldName"] = this.fieldName;
+        data["fieldLevelCode"] = this.fieldLevelCode;
+        return data;
+    }
+}
+
+export interface IPreviewFieldCodeInput {
+    fieldTypeId: number;
+    fieldName: string;
+    fieldLevelCode: string | undefined;
+
+    [key: string]: any;
+}
+
+export class FieldCodePreviewDto implements IFieldCodePreviewDto {
+    fieldCode!: string | undefined;
+
+    [key: string]: any;
+
+    constructor(data?: IFieldCodePreviewDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.fieldCode = _data["fieldCode"];
+        }
+    }
+
+    static fromJS(data: any): FieldCodePreviewDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new FieldCodePreviewDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["fieldCode"] = this.fieldCode;
+        return data;
+    }
+}
+
+export interface IFieldCodePreviewDto {
+    fieldCode: string | undefined;
+
+    [key: string]: any;
+}
+
+export class AppFieldListDto implements IAppFieldListDto {
+    id!: number;
+    fieldCode!: string | undefined;
+    fieldName!: string | undefined;
+    description!: string | undefined;
+    fieldTypeName!: string | undefined;
+    widgetTypeName!: string | undefined;
+    fieldLevelName!: string | undefined;
+    statusName!: string | undefined;
+    revisionNo!: string | undefined;
+    trackingNo!: string | undefined;
+    standardOrCustom!: string | undefined;
+    isStandard!: boolean;
+    isCustom!: boolean;
+    isExtraField!: boolean;
+    isHidden!: boolean;
+    canEdit!: boolean;
+    canDelete!: boolean;
+    canHide!: boolean;
+    sycObjectId!: number;
+    entitySycObjectId!: number | undefined;
+    creatorUserId!: number | undefined;
+    creationTime!: moment.Moment;
+    tables!: string[] | undefined;
+
+    [key: string]: any;
+
+    constructor(data?: IAppFieldListDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.id = _data["id"];
+            this.fieldCode = _data["fieldCode"];
+            this.fieldName = _data["fieldName"];
+            this.description = _data["description"];
+            this.fieldTypeName = _data["fieldTypeName"];
+            this.widgetTypeName = _data["widgetTypeName"];
+            this.fieldLevelName = _data["fieldLevelName"];
+            this.statusName = _data["statusName"];
+            this.revisionNo = _data["revisionNo"];
+            this.trackingNo = _data["trackingNo"];
+            this.standardOrCustom = _data["standardOrCustom"];
+            this.isStandard = _data["isStandard"];
+            this.isCustom = _data["isCustom"];
+            this.isExtraField = _data["isExtraField"];
+            this.isHidden = _data["isHidden"];
+            this.canEdit = _data["canEdit"];
+            this.canDelete = _data["canDelete"];
+            this.canHide = _data["canHide"];
+            this.sycObjectId = _data["sycObjectId"];
+            this.entitySycObjectId = _data["entitySycObjectId"];
+            this.creatorUserId = _data["creatorUserId"];
+            this.creationTime = _data["creationTime"] ? moment(_data["creationTime"].toString()) : <any>undefined;
+            if (Array.isArray(_data["tables"])) {
+                this.tables = [] as any;
+                for (let item of _data["tables"])
+                    this.tables!.push(item);
+            }
+        }
+    }
+
+    static fromJS(data: any): AppFieldListDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new AppFieldListDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["id"] = this.id;
+        data["fieldCode"] = this.fieldCode;
+        data["fieldName"] = this.fieldName;
+        data["description"] = this.description;
+        data["fieldTypeName"] = this.fieldTypeName;
+        data["widgetTypeName"] = this.widgetTypeName;
+        data["fieldLevelName"] = this.fieldLevelName;
+        data["statusName"] = this.statusName;
+        data["revisionNo"] = this.revisionNo;
+        data["trackingNo"] = this.trackingNo;
+        data["standardOrCustom"] = this.standardOrCustom;
+        data["isStandard"] = this.isStandard;
+        data["isCustom"] = this.isCustom;
+        data["isExtraField"] = this.isExtraField;
+        data["isHidden"] = this.isHidden;
+        data["canEdit"] = this.canEdit;
+        data["canDelete"] = this.canDelete;
+        data["canHide"] = this.canHide;
+        data["sycObjectId"] = this.sycObjectId;
+        data["entitySycObjectId"] = this.entitySycObjectId;
+        data["creatorUserId"] = this.creatorUserId;
+        data["creationTime"] = this.creationTime ? this.creationTime.toISOString() : <any>undefined;
+        if (Array.isArray(this.tables)) {
+            data["tables"] = [];
+            for (let item of this.tables)
+                data["tables"].push(item);
+        }
+        return data;
+    }
+}
+
+export interface IAppFieldListDto {
+    id: number;
+    fieldCode: string | undefined;
+    fieldName: string | undefined;
+    description: string | undefined;
+    fieldTypeName: string | undefined;
+    widgetTypeName: string | undefined;
+    fieldLevelName: string | undefined;
+    statusName: string | undefined;
+    revisionNo: string | undefined;
+    trackingNo: string | undefined;
+    standardOrCustom: string | undefined;
+    isStandard: boolean;
+    isCustom: boolean;
+    isExtraField: boolean;
+    isHidden: boolean;
+    canEdit: boolean;
+    canDelete: boolean;
+    canHide: boolean;
+    sycObjectId: number;
+    entitySycObjectId: number | undefined;
+    creatorUserId: number | undefined;
+    creationTime: moment.Moment;
+    tables: string[] | undefined;
+
+    [key: string]: any;
+}
+
+export class PagedResultDtoOfAppFieldListDto implements IPagedResultDtoOfAppFieldListDto {
+    totalCount!: number;
+    items!: AppFieldListDto[] | undefined;
+
+    [key: string]: any;
+
+    constructor(data?: IPagedResultDtoOfAppFieldListDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.totalCount = _data["totalCount"];
+            if (Array.isArray(_data["items"])) {
+                this.items = [] as any;
+                for (let item of _data["items"])
+                    this.items!.push(AppFieldListDto.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): PagedResultDtoOfAppFieldListDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new PagedResultDtoOfAppFieldListDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["totalCount"] = this.totalCount;
+        if (Array.isArray(this.items)) {
+            data["items"] = [];
+            for (let item of this.items)
+                data["items"].push(item.toJSON());
+        }
+        return data;
+    }
+}
+
+export interface IPagedResultDtoOfAppFieldListDto {
+    totalCount: number;
+    items: AppFieldListDto[] | undefined;
+
+    [key: string]: any;
+}
+
+export class AssignExistingFieldInput implements IAssignExistingFieldInput {
+    appFieldId!: number;
+    sycObjectId!: number;
+    sycEntityObjectTypeId!: number | undefined;
+
+    [key: string]: any;
+
+    constructor(data?: IAssignExistingFieldInput) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.appFieldId = _data["appFieldId"];
+            this.sycObjectId = _data["sycObjectId"];
+            this.sycEntityObjectTypeId = _data["sycEntityObjectTypeId"];
+        }
+    }
+
+    static fromJS(data: any): AssignExistingFieldInput {
+        data = typeof data === 'object' ? data : {};
+        let result = new AssignExistingFieldInput();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["appFieldId"] = this.appFieldId;
+        data["sycObjectId"] = this.sycObjectId;
+        data["sycEntityObjectTypeId"] = this.sycEntityObjectTypeId;
+        return data;
+    }
+}
+
+export interface IAssignExistingFieldInput {
+    appFieldId: number;
+    sycObjectId: number;
+    sycEntityObjectTypeId: number | undefined;
+
+    [key: string]: any;
+}
+
+export class FieldActionResultDto implements IFieldActionResultDto {
+    success!: boolean;
+    message!: string | undefined;
+
+    [key: string]: any;
+
+    constructor(data?: IFieldActionResultDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.success = _data["success"];
+            this.message = _data["message"];
+        }
+    }
+
+    static fromJS(data: any): FieldActionResultDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new FieldActionResultDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["success"] = this.success;
+        data["message"] = this.message;
+        return data;
+    }
+}
+
+export interface IFieldActionResultDto {
+    success: boolean;
+    message: string | undefined;
+
+    [key: string]: any;
+}
+
+export class AppFieldDto implements IAppFieldDto {
+    tenantId!: number | undefined;
+    sourceFieldId!: number | undefined;
+    currentRevisionNo!: string | undefined;
+    isStandard!: boolean;
+    isCustom!: boolean;
+    isHidden!: boolean;
+    creationTime!: moment.Moment;
+    creatorUserId!: number | undefined;
+    lastModificationTime!: moment.Moment | undefined;
+    lastModifierUserId!: number | undefined;
+    isDeleted!: boolean;
+    deleterUserId!: number | undefined;
+    deletionTime!: moment.Moment | undefined;
+    id!: number | undefined;
+    sycObjectId!: number;
+    entitySycObjectId!: number | undefined;
+    selectedObjectTypeId!: number | undefined;
+    fieldTypeId!: number;
+    widgetTypeId!: number | undefined;
+    fieldLevelId!: number | undefined;
+    fieldStatusId!: number | undefined;
+    fieldCode!: string | undefined;
+    fieldName!: string;
+    description!: string | undefined;
+    fieldLevelCode!: string | undefined;
+    fieldStatusCode!: string | undefined;
+    trackingNo!: string | undefined;
+    isExtraField!: boolean;
+    allowNull!: boolean;
+    length!: number | undefined;
+    decimals!: number | undefined;
+    defaultValue!: string | undefined;
+    dateFormat!: string | undefined;
+    timeFormat!: string | undefined;
+    allowMultiSelect!: boolean;
+    required!: boolean;
+    visible!: boolean;
+    editable!: boolean;
+    extraAttributes!: string | undefined;
+
+    [key: string]: any;
+
+    constructor(data?: IAppFieldDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.tenantId = _data["tenantId"];
+            this.sourceFieldId = _data["sourceFieldId"];
+            this.currentRevisionNo = _data["currentRevisionNo"];
+            this.isStandard = _data["isStandard"];
+            this.isCustom = _data["isCustom"];
+            this.isHidden = _data["isHidden"];
+            this.creationTime = _data["creationTime"] ? moment(_data["creationTime"].toString()) : <any>undefined;
+            this.creatorUserId = _data["creatorUserId"];
+            this.lastModificationTime = _data["lastModificationTime"] ? moment(_data["lastModificationTime"].toString()) : <any>undefined;
+            this.lastModifierUserId = _data["lastModifierUserId"];
+            this.isDeleted = _data["isDeleted"];
+            this.deleterUserId = _data["deleterUserId"];
+            this.deletionTime = _data["deletionTime"] ? moment(_data["deletionTime"].toString()) : <any>undefined;
+            this.id = _data["id"];
+            this.sycObjectId = _data["sycObjectId"];
+            this.entitySycObjectId = _data["entitySycObjectId"];
+            this.selectedObjectTypeId = _data["selectedObjectTypeId"];
+            this.fieldTypeId = _data["fieldTypeId"];
+            this.widgetTypeId = _data["widgetTypeId"];
+            this.fieldLevelId = _data["fieldLevelId"];
+            this.fieldStatusId = _data["fieldStatusId"];
+            this.fieldCode = _data["fieldCode"];
+            this.fieldName = _data["fieldName"];
+            this.description = _data["description"];
+            this.fieldLevelCode = _data["fieldLevelCode"];
+            this.fieldStatusCode = _data["fieldStatusCode"];
+            this.trackingNo = _data["trackingNo"];
+            this.isExtraField = _data["isExtraField"];
+            this.allowNull = _data["allowNull"];
+            this.length = _data["length"];
+            this.decimals = _data["decimals"];
+            this.defaultValue = _data["defaultValue"];
+            this.dateFormat = _data["dateFormat"];
+            this.timeFormat = _data["timeFormat"];
+            this.allowMultiSelect = _data["allowMultiSelect"];
+            this.required = _data["required"];
+            this.visible = _data["visible"];
+            this.editable = _data["editable"];
+            this.extraAttributes = _data["extraAttributes"];
+        }
+    }
+
+    static fromJS(data: any): AppFieldDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new AppFieldDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["tenantId"] = this.tenantId;
+        data["sourceFieldId"] = this.sourceFieldId;
+        data["currentRevisionNo"] = this.currentRevisionNo;
+        data["isStandard"] = this.isStandard;
+        data["isCustom"] = this.isCustom;
+        data["isHidden"] = this.isHidden;
+        data["creationTime"] = this.creationTime ? this.creationTime.toISOString() : <any>undefined;
+        data["creatorUserId"] = this.creatorUserId;
+        data["lastModificationTime"] = this.lastModificationTime ? this.lastModificationTime.toISOString() : <any>undefined;
+        data["lastModifierUserId"] = this.lastModifierUserId;
+        data["isDeleted"] = this.isDeleted;
+        data["deleterUserId"] = this.deleterUserId;
+        data["deletionTime"] = this.deletionTime ? this.deletionTime.toISOString() : <any>undefined;
+        data["id"] = this.id;
+        data["sycObjectId"] = this.sycObjectId;
+        data["entitySycObjectId"] = this.entitySycObjectId;
+        data["selectedObjectTypeId"] = this.selectedObjectTypeId;
+        data["fieldTypeId"] = this.fieldTypeId;
+        data["widgetTypeId"] = this.widgetTypeId;
+        data["fieldLevelId"] = this.fieldLevelId;
+        data["fieldStatusId"] = this.fieldStatusId;
+        data["fieldCode"] = this.fieldCode;
+        data["fieldName"] = this.fieldName;
+        data["description"] = this.description;
+        data["fieldLevelCode"] = this.fieldLevelCode;
+        data["fieldStatusCode"] = this.fieldStatusCode;
+        data["trackingNo"] = this.trackingNo;
+        data["isExtraField"] = this.isExtraField;
+        data["allowNull"] = this.allowNull;
+        data["length"] = this.length;
+        data["decimals"] = this.decimals;
+        data["defaultValue"] = this.defaultValue;
+        data["dateFormat"] = this.dateFormat;
+        data["timeFormat"] = this.timeFormat;
+        data["allowMultiSelect"] = this.allowMultiSelect;
+        data["required"] = this.required;
+        data["visible"] = this.visible;
+        data["editable"] = this.editable;
+        data["extraAttributes"] = this.extraAttributes;
+        return data;
+    }
+}
+
+export interface IAppFieldDto {
+    tenantId: number | undefined;
+    sourceFieldId: number | undefined;
+    currentRevisionNo: string | undefined;
+    isStandard: boolean;
+    isCustom: boolean;
+    isHidden: boolean;
+    creationTime: moment.Moment;
+    creatorUserId: number | undefined;
+    lastModificationTime: moment.Moment | undefined;
+    lastModifierUserId: number | undefined;
+    isDeleted: boolean;
+    deleterUserId: number | undefined;
+    deletionTime: moment.Moment | undefined;
+    id: number | undefined;
+    sycObjectId: number;
+    entitySycObjectId: number | undefined;
+    selectedObjectTypeId: number | undefined;
+    fieldTypeId: number;
+    widgetTypeId: number | undefined;
+    fieldLevelId: number | undefined;
+    fieldStatusId: number | undefined;
+    fieldCode: string | undefined;
+    fieldName: string;
+    description: string | undefined;
+    fieldLevelCode: string | undefined;
+    fieldStatusCode: string | undefined;
+    trackingNo: string | undefined;
+    isExtraField: boolean;
+    allowNull: boolean;
+    length: number | undefined;
+    decimals: number | undefined;
+    defaultValue: string | undefined;
+    dateFormat: string | undefined;
+    timeFormat: string | undefined;
+    allowMultiSelect: boolean;
+    required: boolean;
+    visible: boolean;
+    editable: boolean;
+    extraAttributes: string | undefined;
+
+    [key: string]: any;
+}
+
+export class FieldEditPermissionDto implements IFieldEditPermissionDto {
+    canEditCoreInfo!: boolean;
+    canEditAttributes!: boolean;
+    canDelete!: boolean;
+    canHide!: boolean;
+    isTenantCustomCopyRequired!: boolean;
+
+    [key: string]: any;
+
+    constructor(data?: IFieldEditPermissionDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.canEditCoreInfo = _data["canEditCoreInfo"];
+            this.canEditAttributes = _data["canEditAttributes"];
+            this.canDelete = _data["canDelete"];
+            this.canHide = _data["canHide"];
+            this.isTenantCustomCopyRequired = _data["isTenantCustomCopyRequired"];
+        }
+    }
+
+    static fromJS(data: any): FieldEditPermissionDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new FieldEditPermissionDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["canEditCoreInfo"] = this.canEditCoreInfo;
+        data["canEditAttributes"] = this.canEditAttributes;
+        data["canDelete"] = this.canDelete;
+        data["canHide"] = this.canHide;
+        data["isTenantCustomCopyRequired"] = this.isTenantCustomCopyRequired;
+        return data;
+    }
+}
+
+export interface IFieldEditPermissionDto {
+    canEditCoreInfo: boolean;
+    canEditAttributes: boolean;
+    canDelete: boolean;
+    canHide: boolean;
+    isTenantCustomCopyRequired: boolean;
+
+    [key: string]: any;
+}
+
+export class GetFieldForEditOutput implements IGetFieldForEditOutput {
+    field!: AppFieldDto;
+    permissions!: FieldEditPermissionDto;
+
+    [key: string]: any;
+
+    constructor(data?: IGetFieldForEditOutput) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.field = _data["field"] ? AppFieldDto.fromJS(_data["field"]) : <any>undefined;
+            this.permissions = _data["permissions"] ? FieldEditPermissionDto.fromJS(_data["permissions"]) : <any>undefined;
+        }
+    }
+
+    static fromJS(data: any): GetFieldForEditOutput {
+        data = typeof data === 'object' ? data : {};
+        let result = new GetFieldForEditOutput();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["field"] = this.field ? this.field.toJSON() : <any>undefined;
+        data["permissions"] = this.permissions ? this.permissions.toJSON() : <any>undefined;
+        return data;
+    }
+}
+
+export interface IGetFieldForEditOutput {
+    field: AppFieldDto;
+    permissions: FieldEditPermissionDto;
+
+    [key: string]: any;
+}
+
+export class CreateOrEditFieldInput implements ICreateOrEditFieldInput {
+    id!: number | undefined;
+    sycObjectId!: number;
+    entitySycObjectId!: number | undefined;
+    selectedObjectTypeId!: number | undefined;
+    fieldTypeId!: number;
+    widgetTypeId!: number | undefined;
+    fieldLevelId!: number | undefined;
+    fieldStatusId!: number | undefined;
+    fieldCode!: string | undefined;
+    fieldName!: string;
+    description!: string | undefined;
+    fieldLevelCode!: string | undefined;
+    fieldStatusCode!: string | undefined;
+    trackingNo!: string | undefined;
+    isExtraField!: boolean;
+    allowNull!: boolean;
+    length!: number | undefined;
+    decimals!: number | undefined;
+    defaultValue!: string | undefined;
+    dateFormat!: string | undefined;
+    timeFormat!: string | undefined;
+    allowMultiSelect!: boolean;
+    required!: boolean;
+    visible!: boolean;
+    editable!: boolean;
+    extraAttributes!: string | undefined;
+
+    [key: string]: any;
+
+    constructor(data?: ICreateOrEditFieldInput) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.id = _data["id"];
+            this.sycObjectId = _data["sycObjectId"];
+            this.entitySycObjectId = _data["entitySycObjectId"];
+            this.selectedObjectTypeId = _data["selectedObjectTypeId"];
+            this.fieldTypeId = _data["fieldTypeId"];
+            this.widgetTypeId = _data["widgetTypeId"];
+            this.fieldLevelId = _data["fieldLevelId"];
+            this.fieldStatusId = _data["fieldStatusId"];
+            this.fieldCode = _data["fieldCode"];
+            this.fieldName = _data["fieldName"];
+            this.description = _data["description"];
+            this.fieldLevelCode = _data["fieldLevelCode"];
+            this.fieldStatusCode = _data["fieldStatusCode"];
+            this.trackingNo = _data["trackingNo"];
+            this.isExtraField = _data["isExtraField"];
+            this.allowNull = _data["allowNull"];
+            this.length = _data["length"];
+            this.decimals = _data["decimals"];
+            this.defaultValue = _data["defaultValue"];
+            this.dateFormat = _data["dateFormat"];
+            this.timeFormat = _data["timeFormat"];
+            this.allowMultiSelect = _data["allowMultiSelect"];
+            this.required = _data["required"];
+            this.visible = _data["visible"];
+            this.editable = _data["editable"];
+            this.extraAttributes = _data["extraAttributes"];
+        }
+    }
+
+    static fromJS(data: any): CreateOrEditFieldInput {
+        data = typeof data === 'object' ? data : {};
+        let result = new CreateOrEditFieldInput();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["id"] = this.id;
+        data["sycObjectId"] = this.sycObjectId;
+        data["entitySycObjectId"] = this.entitySycObjectId;
+        data["selectedObjectTypeId"] = this.selectedObjectTypeId;
+        data["fieldTypeId"] = this.fieldTypeId;
+        data["widgetTypeId"] = this.widgetTypeId;
+        data["fieldLevelId"] = this.fieldLevelId;
+        data["fieldStatusId"] = this.fieldStatusId;
+        data["fieldCode"] = this.fieldCode;
+        data["fieldName"] = this.fieldName;
+        data["description"] = this.description;
+        data["fieldLevelCode"] = this.fieldLevelCode;
+        data["fieldStatusCode"] = this.fieldStatusCode;
+        data["trackingNo"] = this.trackingNo;
+        data["isExtraField"] = this.isExtraField;
+        data["allowNull"] = this.allowNull;
+        data["length"] = this.length;
+        data["decimals"] = this.decimals;
+        data["defaultValue"] = this.defaultValue;
+        data["dateFormat"] = this.dateFormat;
+        data["timeFormat"] = this.timeFormat;
+        data["allowMultiSelect"] = this.allowMultiSelect;
+        data["required"] = this.required;
+        data["visible"] = this.visible;
+        data["editable"] = this.editable;
+        data["extraAttributes"] = this.extraAttributes;
+        return data;
+    }
+}
+
+export interface ICreateOrEditFieldInput {
+    id: number | undefined;
+    sycObjectId: number;
+    entitySycObjectId: number | undefined;
+    selectedObjectTypeId: number | undefined;
+    fieldTypeId: number;
+    widgetTypeId: number | undefined;
+    fieldLevelId: number | undefined;
+    fieldStatusId: number | undefined;
+    fieldCode: string | undefined;
+    fieldName: string;
+    description: string | undefined;
+    fieldLevelCode: string | undefined;
+    fieldStatusCode: string | undefined;
+    trackingNo: string | undefined;
+    isExtraField: boolean;
+    allowNull: boolean;
+    length: number | undefined;
+    decimals: number | undefined;
+    defaultValue: string | undefined;
+    dateFormat: string | undefined;
+    timeFormat: string | undefined;
+    allowMultiSelect: boolean;
+    required: boolean;
+    visible: boolean;
+    editable: boolean;
+    extraAttributes: string | undefined;
+
+    [key: string]: any;
+}
+
+export class EntityDtoOfInt64 implements IEntityDtoOfInt64 {
+    id!: number;
+
+    [key: string]: any;
+
+    constructor(data?: IEntityDtoOfInt64) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.id = _data["id"];
+        }
+    }
+
+    static fromJS(data: any): EntityDtoOfInt64 {
+        data = typeof data === 'object' ? data : {};
+        let result = new EntityDtoOfInt64();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["id"] = this.id;
+        return data;
+    }
+}
+
+export interface IEntityDtoOfInt64 {
+    id: number;
+
+    [key: string]: any;
+}
+
 export enum ItemsFilterTypesEnum {
     MyItems = 0,
     MyListing = 1,
@@ -83351,54 +85278,6 @@ export interface ISharingItemOptions {
     sharingLevel: number;
     message: string | undefined;
     itemSharing: ItemSharingDto[] | undefined;
-
-    [key: string]: any;
-}
-
-export class EntityDtoOfInt64 implements IEntityDtoOfInt64 {
-    id!: number;
-
-    [key: string]: any;
-
-    constructor(data?: IEntityDtoOfInt64) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            for (var property in _data) {
-                if (_data.hasOwnProperty(property))
-                    this[property] = _data[property];
-            }
-            this.id = _data["id"];
-        }
-    }
-
-    static fromJS(data: any): EntityDtoOfInt64 {
-        data = typeof data === 'object' ? data : {};
-        let result = new EntityDtoOfInt64();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        for (var property in this) {
-            if (this.hasOwnProperty(property))
-                data[property] = this[property];
-        }
-        data["id"] = this.id;
-        return data;
-    }
-}
-
-export interface IEntityDtoOfInt64 {
-    id: number;
 
     [key: string]: any;
 }

@@ -1,399 +1,218 @@
 import { Injectable } from '@angular/core';
+import { forkJoin, Observable, of } from 'rxjs';
+import { map, switchMap } from 'rxjs/operators';
+import {
+    AppFieldDto,
+    AppFieldListDto,
+    AppFieldManagerServiceProxy,
+    AssignExistingFieldInput,
+    CreateOrEditFieldInput,
+    EntityDtoOfInt64,
+    ObjectTypeTreeNodeDto,
+    PreviewFieldCodeInput
+} from '@shared/service-proxies/service-proxies';
 import { FieldManagerEntityNode, FieldManagerItem } from './field-manager.model';
 
-export interface FieldManagerRevision {
-    item: FieldManagerItem;
-    revisionSequence: string;
-    createdBy: string;
-    createdOn: Date;
-    status: 'Current' | 'Previous';
+export interface FieldManagerLookup {
+    id: number;
+    code: string;
+    name: string;
+}
+
+export interface FieldManagerMetadata {
+    fieldTypes: FieldManagerLookup[];
+    widgetTypes: FieldManagerLookup[];
+}
+
+export interface FieldManagerPermissions {
+    canViewPage: boolean;
+    canCreateField: boolean;
+    canEditField: boolean;
+    canDeleteField: boolean;
+    canDuplicateField: boolean;
+    canAddExistingField: boolean;
 }
 
 @Injectable()
 export class FieldManagerService {
-    /////i51-Instead of BE Integration
-    private nextId = 7;
-    private revisions: { [itemId: number]: FieldManagerRevision[] } = {};
-    private items: FieldManagerItem[] = [
-        {
-            id: 1,
-            code: 'F001',
-            name: 'ContactSSIN',
-            description: 'Internal code used by SIIWII platform to Identify the contact',
-            type: 'String - Textbox',
-            createdUser: 'System User',
-            entityId: 2,
-            tables: 'Purchase Order',
-            status: 'Active',
-            revision: 0,
-            revisionSequence: '01',
-            fieldLevel: 'Application',
-            trackingNumber: 'Iteration_40',
-            allowNull: false,
-            length: 12,
-            allowMultiSelect: false,
-            decimals: 0,
-            dateFormat: 'mm/dd/yyyy',
-            defaultValue: '',
-            visible: true,
-            editable: false,
-            dropdownOptions: [],
-            extraData: false,
-            required: true,
-            active: true,
-            canSync: true
-        },
-        {
-            id: 2,
-            code: 'F002',
-            name: 'ItemSSIN',
-            description: 'Internal code used by SIIWII platform to Identify the item',
-            type: 'String - Textbox',
-            createdUser: 'System User',
-            entityId: 2,
-            tables: 'Purchase Order',
-            status: 'Active',
-            revision: 0,
-            revisionSequence: '02',
-            fieldLevel: 'Application',
-            trackingNumber: 'Iteration_41',
-            allowNull: false,
-            length: 12,
-            allowMultiSelect: false,
-            decimals: 0,
-            dateFormat: 'mm/dd/yyyy',
-            defaultValue: '',
-            visible: true,
-            editable: false,
-            dropdownOptions: [],
-            extraData: false,
-            required: false,
-            active: true,
-            canSync: false
-        },
-        {
-            id: 3,
-            code: 'F003',
-            name: 'CompleteDate',
-            description: 'The date when the transaction is completed',
-            type: 'Date - Date picker',
-            createdUser: 'Esraa',
-            entityId: 2,
-            tables: 'Purchase Order',
-            status: 'Proposed',
-            revision: 0,
-            revisionSequence: '03',
-            fieldLevel: 'Application',
-            trackingNumber: 'Iteration X600',
-            allowNull: true,
-            length: 0,
-            allowMultiSelect: false,
-            decimals: 0,
-            dateFormat: 'mm/dd/yyyy',
-            defaultValue: '',
-            visible: true,
-            editable: true,
-            dropdownOptions: [
-                { option: 'Option 1', value: '01' },
-                { option: 'Option 2', value: '02' }
-            ],
-            extraData: true,
-            required: false,
-            active: true,
-            canSync: true
-        },
-        {
-            id: 4,
-            code: 'F004',
-            name: 'CompleteDate',
-            description: 'The date when the transaction is completed',
-            type: 'Date - Date picker',
-            createdUser: 'Esraa',
-            entityId: 3,
-            tables: 'Sales Order',
-            status: 'Proposed',
-            revision: 0,
-            revisionSequence: '04',
-            fieldLevel: 'Application',
-            trackingNumber: 'Iteration X600',
-            allowNull: true,
-            length: 0,
-            allowMultiSelect: false,
-            decimals: 0,
-            dateFormat: 'mm/dd/yyyy',
-            defaultValue: '',
-            visible: true,
-            editable: true,
-            dropdownOptions: [
-                { option: 'Option 1', value: '01' },
-                { option: 'Option 2', value: '02' }
-            ],
-            extraData: true,
-            required: false,
-            active: true,
-            canSync: true
-        },
-        {
-            id: 5,
-            code: 'F005',
-            name: 'CompleteDate',
-            description: 'The date when the transaction is completed',
-            type: 'Date - Date picker',
-            createdUser: 'Esraa',
-            entityId: 3,
-            tables: 'Sales Order',
-            status: 'Proposed',
-            revision: 0,
-            revisionSequence: '05',
-            fieldLevel: 'Application',
-            trackingNumber: 'Iteration X600',
-            allowNull: true,
-            length: 0,
-            allowMultiSelect: false,
-            decimals: 0,
-            dateFormat: 'mm/dd/yyyy',
-            defaultValue: '',
-            visible: true,
-            editable: true,
-            dropdownOptions: [
-                { option: 'Option 1', value: '01' },
-                { option: 'Option 2', value: '02' }
-            ],
-            extraData: true,
-            required: false,
-            active: true,
-            canSync: false
-        },
-        {
-            id: 6,
-            code: 'F006',
-            name: 'CompleteDate',
-            description: 'The date when the transaction is completed',
-            type: 'Date - Date picker',
-            createdUser: 'Esraa',
-            entityId: 3,
-            tables: 'Sales Order',
-            status: 'Proposed',
-            revision: 0,
-            revisionSequence: '06',
-            fieldLevel: 'Application',
-            trackingNumber: 'Iteration X600',
-            allowNull: true,
-            length: 0,
-            allowMultiSelect: false,
-            decimals: 0,
-            dateFormat: 'mm/dd/yyyy',
-            defaultValue: '',
-            visible: true,
-            editable: true,
-            dropdownOptions: [
-                { option: 'Option 1', value: '01' },
-                { option: 'Option 2', value: '02' }
-            ],
-            extraData: false,
-            required: false,
-            active: true,
-            canSync: true
-        }
-    ];
+    private readonly pageSize = 1000;
 
-    constructor() {
-        // Temporary mock rows make it possible to verify the table's vertical scrolling.
-        const template = this.items[2];
-        const testRows = Array.from({ length: 80 }, (_, index) => {
-            const id = this.nextId + index;
-            return {
-                ...template,
-                id,
-                code: `TEST${('000' + id).slice(-3)}`,
-                name: `ScrollTestField${id}`,
-                description: `Temporary scroll test field ${id}`,
-                type: index % 2 === 0 ? 'Date - Date picker' : 'String - Textbox',
-                createdUser: index % 2 === 0 ? 'Esraa' : 'System User',
-                entityId: 3,
-                tables: 'Sales Order',
-                status: index % 2 === 0 ? 'Proposed' : 'Active',
-                revisionSequence: ('00' + id).slice(-2),
-                fieldLevel: index % 2 === 0 ? 'Application' : 'System',
-                trackingNumber: `Scroll test ${id}`,
-                extraData: index % 3 !== 0,
-                dropdownOptions: template.dropdownOptions.map(option => ({ ...option }))
-            };
+    constructor(private appFieldManagerProxy: AppFieldManagerServiceProxy) { }
+
+    getEntityTree(): Observable<FieldManagerEntityNode[]> {
+        const toNode = (node: ObjectTypeTreeNodeDto): FieldManagerEntityNode => ({
+            id: node.id,
+            key: node.key || '',
+            name: node.name || '',
+            code: node.code || '',
+            nodeType: node.nodeType as FieldManagerEntityNode['nodeType'],
+            sycObjectId: node.sycObjectId,
+            children: (node.children || []).map(toNode)
         });
-
-        this.items.push(...testRows);
-        this.nextId += testRows.length;
+        return this.appFieldManagerProxy.getObjectTypeTree()
+            .pipe(map(nodes => (nodes || []).map(toNode)));
     }
 
-    getAll(): FieldManagerItem[] {
-        return [...this.items];
+    getPagePermissions(): Observable<FieldManagerPermissions> {
+        return this.appFieldManagerProxy.getPagePermissions();
     }
 
-    //i51-Get Field
-    getById(id: number): FieldManagerItem | undefined {
-        return this.items.find(item => item.id === id);
+    getFieldsForNode(node: FieldManagerEntityNode | null): Observable<FieldManagerItem[]> {
+        return this.getFieldPage(node, 0)
+            .pipe(map(fields => fields.filter(field => !field.isHidden).map(field => this.toListItem(field))));
     }
 
-    getRevisionHistory(item: FieldManagerItem): FieldManagerRevision[] {
-        if (!this.revisions[item.id]) {
-            const currentNumber = Math.max(0, parseInt(item.revisionSequence, 10) || 0);
-            const firstNumber = Math.max(0, currentNumber - 5);
-            const revisions: FieldManagerRevision[] = [];
-            for (let number = firstNumber; number <= currentNumber; number++) {
-                const snapshot = this.copyItem(item);
-                snapshot.revisionSequence = ('00' + number).slice(-2);
-                revisions.push({
-                    item: snapshot,
-                    revisionSequence: snapshot.revisionSequence,
-                    createdBy: number === currentNumber ? (item.createdUser || 'System User') : this.revisionAuthor(number),
-                    createdOn: new Date(Date.now() - (currentNumber - number) * 86400000),
-                    status: number === currentNumber ? 'Current' : 'Previous'
-                });
-            }
-            this.revisions[item.id] = revisions;
-        }
-
-        return this.revisions[item.id]
-            .map(revision => ({ ...revision, item: this.copyItem(revision.item) }))
-            .sort((first, second) => parseInt(second.revisionSequence, 10) - parseInt(first.revisionSequence, 10));
+    private getFieldPage(node: FieldManagerEntityNode | null, skipCount: number): Observable<AppFieldListDto[]> {
+        const selectedObjectTypeId = node?.nodeType === 'ObjectType' ? node.id : undefined;
+        const selectedObjectId = node && node.nodeType !== 'ObjectType' ? node.sycObjectId : undefined;
+        return this.appFieldManagerProxy.getFields(
+            selectedObjectId, selectedObjectTypeId, true,
+            undefined, undefined, undefined, undefined, undefined, undefined, undefined,
+            undefined, undefined, undefined, undefined, undefined, undefined,
+            skipCount, this.pageSize
+        ).pipe(switchMap(response => {
+            const items = response.items || [];
+            const nextSkipCount = skipCount + items.length;
+            return items.length && nextSkipCount < response.totalCount
+                ? this.getFieldPage(node, nextSkipCount).pipe(map(next => [...items, ...next]))
+                : of(items);
+        }));
     }
 
-    saveRevision(itemId: number, source: FieldManagerItem, revisionSequence: string): FieldManagerItem {
-        const history = this.getRevisionHistory(source);
-        history.forEach(revision => revision.status = 'Previous');
-        const saved = this.copyItem({
-            ...source,
-            id: itemId,
-            revision: parseInt(revisionSequence, 10) || 0,
-            revisionSequence
-        });
-        const newRevision: FieldManagerRevision = {
-            item: saved,
-            revisionSequence,
-            createdBy: source.createdUser || 'Current User',
-            createdOn: new Date(),
-            status: 'Current'
-        };
-        const existingIndex = history.findIndex(revision => revision.revisionSequence === revisionSequence);
-        if (existingIndex >= 0) {
-            history.splice(existingIndex, 1);
-        }
-        history.push(newRevision);
-        this.revisions[itemId] = history;
-
-        const itemIndex = this.items.findIndex(existing => existing.id === itemId);
-        if (itemIndex >= 0) {
-            this.items[itemIndex] = this.copyItem(saved);
-        }
-        return this.copyItem(saved);
-    }
-
-    private copyItem(item: FieldManagerItem): FieldManagerItem {
+    private toListItem(field: AppFieldListDto): FieldManagerItem {
+        const revisionSequence = field.revisionNo || '00';
         return {
-            ...item,
-            dropdownOptions: (item.dropdownOptions || []).map(option => ({ ...option }))
+            serverManaged: true,
+            canEdit: field.canEdit,
+            canDelete: field.canDelete,
+            canHide: field.canHide,
+            id: field.id,
+            code: field.fieldCode || '',
+            name: field.fieldName || '',
+            description: field.description || '',
+            type: (field.fieldTypeName || '').replace('--', ' - '),
+            createdUser: field.creatorUserId == null ? '' : String(field.creatorUserId),
+            entityId: field.sycObjectId,
+            tables: (field.tables || []).join(', '),
+            status: field.statusName || '',
+            revision: Number(revisionSequence) || 0,
+            revisionSequence,
+            fieldLevel: field.fieldLevelName || '',
+            trackingNumber: field.trackingNo || '',
+            extraData: field.isExtraField,
+            active: field.statusName === 'Active'
         };
     }
 
-    private revisionAuthor(number: number): string {
-        const authors = ['Tom Carter', 'Lisa Green', 'Mike Brown', 'Sarah Lee', 'Adam Johns'];
-        return authors[(number - 1) % authors.length];
+    getFieldMetadata(): Observable<FieldManagerMetadata> {
+        return this.appFieldManagerProxy.getFieldCreateOrEditMetadata()
+            .pipe(map(response => {
+                const toLookup = (values: typeof response.fieldTypes): FieldManagerLookup[] =>
+                    (values || []).filter(value => value.id != null).map(value => ({
+                        id: value.id!,
+                        code: value.code || '',
+                        name: value.name || ''
+                    }));
+                return {
+                    fieldTypes: toLookup(response.fieldTypes),
+                    widgetTypes: toLookup(response.widgetTypes)
+                };
+            }));
     }
 
-    getEntityTree(): FieldManagerEntityNode[] {
-        return [
-            {
-                id: 1,
-                name: 'Transactions',
-                children: [
-                    {
-                        id: 7,
-                        name: 'AppTransactionHeader',
-                        children: [
-                            { id: 2, name: 'Purchase Order' },
-                            { id: 3, name: 'Sales Order' }
-                        ]
-                    },
-                    { id: 8, name: 'AppTransactionDetail' },
-                    { id: 9, name: 'AppTransactionContacts' }
-                ]
-            },
-            {
-                id: 4,
-                name: 'Contacts',
-                children: [
-                    {
-                        id: 10,
-                        name: 'AppContacts',
-                        children: [
-                            { id: 5, name: 'Business' },
-                            { id: 6, name: 'Personal' },
-                            { id: 11, name: 'Group' }
-                        ]
-                    }
-                ]
-            },
-            { id: 12, name: 'Marketplace Contacts' },
-            {
-                id: 13,
-                name: 'Items',
-                children: [
-                    {
-                        id: 14,
-                        name: 'AppItems',
-                        children: [
-                            {
-                                id: 15,
-                                name: 'Products',
-                                children: [
-                                    { id: 16, name: 'Dresses' }
-                                ]
-                            }
-                        ]
-                    }
-                ]
-            },
-            { id: 17, name: 'Marketplace Items' },
-            { id: 18, name: 'Messages' },
-            { id: 19, name: 'Posts' },
-            { id: 20, name: 'Events' },
-            { id: 21, name: 'Linesheet' },
-            { id: 22, name: 'Subscription plans' }
-        ];
+    getFieldForEdit(id: number): Observable<AppFieldDto> {
+        return this.appFieldManagerProxy.getFieldForEdit(id).pipe(map(response => {
+            if (!response.field) throw new Error('Field details were not returned.');
+            return response.field;
+        }));
     }
 
-    getByEntity(entityId: number): FieldManagerItem[] {
-        return this.items.filter(item => item.entityId === entityId);
+    getFieldDetails(item: FieldManagerItem): Observable<FieldManagerItem> {
+        return forkJoin({ field: this.getFieldForEdit(item.id), metadata: this.getFieldMetadata() }).pipe(
+            map(({ field, metadata }) => this.toDetailedItem(field, item, metadata))
+        );
     }
 
-    save(item: FieldManagerItem): FieldManagerItem {
-        item = { ...item };
-        if (item.id) {
-            const index = this.items.findIndex(existing => existing.id === item.id);
-            if (index !== -1) {
-                this.items[index] = { ...item };
-                return this.items[index];
-            }
-        }
-
-        const savedItem = { ...item, id: this.nextId++ };
-        this.items.push(savedItem);
-        return savedItem;
+    getFieldDetailsById(id: number): Observable<FieldManagerItem> {
+        return forkJoin({ field: this.getFieldForEdit(id), metadata: this.getFieldMetadata() }).pipe(
+            map(({ field, metadata }) => this.toDetailedItem(field, {
+                id: field.id || id,
+                code: field.fieldCode || '',
+                name: field.fieldName || '',
+                description: field.description || '',
+                type: (metadata.fieldTypes.find(type => type.id === field.fieldTypeId)?.name || '').replace('--', ' - '),
+                createdUser: field.creatorUserId == null ? '' : String(field.creatorUserId),
+                entityId: field.sycObjectId,
+                tables: '',
+                status: field.fieldStatusCode || '',
+                revision: Number(field.currentRevisionNo) || 0,
+                revisionSequence: field.currentRevisionNo || '00',
+                fieldLevel: field.fieldLevelCode || '',
+                trackingNumber: field.trackingNo || '',
+                extraData: field.isExtraField,
+                active: field.fieldStatusCode === 'Active'
+            }, metadata))
+        );
     }
 
-    addExisting(item: FieldManagerItem, entityId: number, tableName: string): FieldManagerItem {
-        return this.save({
-            ...item,
-            id: 0,
-            entityId,
-            tables: tableName,
-            revision: 0,
-            revisionSequence: '00',
-            extraData: false
-        });
+    private toDetailedItem(field: AppFieldDto, item: FieldManagerItem, metadata: FieldManagerMetadata): FieldManagerItem {
+        let attributes: { dropdownOptions?: { option: string; value: string }[] } = {};
+        try { attributes = JSON.parse(field.extraAttributes || '{}'); } catch (_) { attributes = {}; }
+        if (!attributes || typeof attributes !== 'object') attributes = {};
+        return {
+                ...item,
+                widgetTypeId: field.widgetTypeId,
+                widgetName: metadata.widgetTypes.find(widget => widget.id === field.widgetTypeId)?.name || '',
+                code: field.fieldCode || '',
+                name: field.fieldName || '',
+                description: field.description || '',
+                entityId: field.sycObjectId,
+                status: field.fieldStatusCode || '',
+                revisionSequence: field.currentRevisionNo || '00',
+                revision: Number(field.currentRevisionNo) || 0,
+                fieldLevel: field.fieldLevelCode || '',
+                trackingNumber: field.trackingNo || '',
+                extraData: field.isExtraField,
+                allowNull: field.allowNull,
+                length: field.length,
+                decimals: field.decimals,
+                defaultValue: field.defaultValue,
+                dateFormat: field.dateFormat,
+                timeFormat: field.timeFormat,
+                allowMultiSelect: field.allowMultiSelect,
+                required: field.required,
+                visible: field.visible,
+                editable: field.editable,
+                dropdownOptions: Array.isArray(attributes.dropdownOptions) ? attributes.dropdownOptions : [],
+                active: field.fieldStatusCode === 'Active'
+        };
     }
 
-    delete(id: number): void {
-        this.items = this.items.filter(item => item.id !== id);
+    previewFieldCode(fieldTypeId: number, fieldName: string, fieldLevelCode: string): Observable<string> {
+        return this.appFieldManagerProxy.previewFieldCode(
+            new PreviewFieldCodeInput({ fieldTypeId, fieldName, fieldLevelCode })
+        ).pipe(map(response => response.fieldCode || ''));
+    }
+
+    createField(input: CreateOrEditFieldInput): Observable<AppFieldDto> {
+        return this.appFieldManagerProxy.createOrEditField(input);
+    }
+
+    assignExistingField(appFieldId: number, sycObjectId: number, sycEntityObjectTypeId: number | null): Observable<any> {
+        return this.appFieldManagerProxy.assignExistingField(new AssignExistingFieldInput({
+            appFieldId, sycObjectId, sycEntityObjectTypeId: sycEntityObjectTypeId ?? undefined
+        }));
+    }
+
+    deleteServerField(id: number): Observable<any> {
+        return this.appFieldManagerProxy.deleteField(id);
+    }
+
+    duplicateField(id: number): Observable<AppFieldDto> {
+        return this.appFieldManagerProxy.duplicateField(new EntityDtoOfInt64({ id }));
+    }
+
+    hideField(id: number): Observable<void> {
+        return this.appFieldManagerProxy.hideField(new EntityDtoOfInt64({ id }));
     }
 }

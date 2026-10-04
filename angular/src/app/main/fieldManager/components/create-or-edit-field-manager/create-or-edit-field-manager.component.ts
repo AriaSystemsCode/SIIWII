@@ -3,8 +3,10 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { ModalDirective } from 'ngx-bootstrap/modal';
 import { AppComponentBase } from '@shared/common/app-component-base';
 import { FieldManagerItem } from '../../field-manager.model';
-import { FieldManagerService } from '../../field-manager.service';
+import { FieldManagerLookup, FieldManagerService } from '../../field-manager.service';
 import Swal from 'sweetalert2';
+import { of } from 'rxjs';
+import { AppFieldDto, CreateOrEditFieldInput } from '@shared/service-proxies/service-proxies';
 
 @Component({
     selector: 'app-create-or-edit-field-manager',
@@ -17,16 +19,19 @@ export class CreateOrEditFieldManagerComponent extends AppComponentBase implemen
     @Output() closed = new EventEmitter<void>();
     item: FieldManagerItem = this.createEmptyItem();
     isEdit = false;
-    isRevision = false;
     active = false;
-    activeTab: 'field-info' | 'field-history-log' = 'field-info';
+    activeTab: 'field-info' = 'field-info';
     dropdownOptions: { option: string, value: string }[] = [];
     isHost :boolean=false;
-    fieldCode = '';
-    //i51 will get from BE 
-    entityObjectType = 'FIELD';
-    fieldCodeSeq = '1234';
+    fieldTypes: FieldManagerLookup[] = [];
+    widgetTypes: FieldManagerLookup[] = [];
+    selectedObjectTypeId: number | null = null;
+    entityParentId: number | null = null;
+    private codePreviewRequest = 0;
+    private previewTimer: ReturnType<typeof setTimeout> | null = null;
     private initialFormState = '';
+    private loadedField: AppFieldDto | null = null;
+    private extraAttributes: { [key: string]: any } = {};
 
     constructor(
         injector: Injector,
@@ -38,34 +43,34 @@ export class CreateOrEditFieldManagerComponent extends AppComponentBase implemen
     }
 
     ngOnInit(): void {
+        this.fieldManagerService.getFieldMetadata().subscribe({
+            next: metadata => {
+                this.fieldTypes = metadata.fieldTypes;
+                this.widgetTypes = metadata.widgetTypes;
+            },
+            error: () => this.notify.error('Could not load field types.')
+        });
         const id = Number(this.activatedRoute.snapshot.paramMap.get('id'));
         this.isHost = !this.appSession.tenantId;
         if (!id) {
             return;
         }
-
-        const item = this.fieldManagerService.getById(id);
-        if (item) {
-            this.item = { ...item };
-            this.isEdit = true;
-            this.isRevision = true;
-        }
+        this.loadField(id);
     }
 
-    show(id?: number, fromExisting = false, tableName?: string, entityId?: number | null): void {
+    show(id?: number, fromExisting = false, tableName?: string, entityId?: number | null,
+        objectTypeId?: number | null, entityParentId?: number | null): void {
         this.activeTab = 'field-info';
         this.isEdit = !!id;
-        this.isRevision = !!id;
+        this.selectedObjectTypeId = objectTypeId || null;
+        this.entityParentId = entityParentId || null;
         if (id) {
-            const item = this.fieldManagerService.getById(id);
-            if (item) {
-                this.item = { ...item };
-                this.dropdownOptions = (item.dropdownOptions || []).map(option => ({ ...option }));
-            }
+            this.loadField(id);
         } else {
+            this.loadedField = null;
+            this.extraAttributes = {};
             this.item = this.createEmptyItem();
             this.dropdownOptions = [];
-            this.fieldCode = '';
             if (!this.isHost) {
                 this.item.fieldLevel = 'Tenant';
             }
@@ -85,24 +90,74 @@ export class CreateOrEditFieldManagerComponent extends AppComponentBase implemen
         this.modal.show();
     }
 
-    selectTab(tab: 'field-info' | 'field-history-log', event: Event): void {
+    selectTab(tab: 'field-info', event: Event): void {
         event.preventDefault();
         this.activeTab = tab;
     }
 
     save(): void {
-        this.generateCode();
         this.item.dropdownOptions = this.dropdownOptions
             .filter(option => option.option.trim().length > 0 || option.value.trim().length > 0)
             .map(option => ({
                 option: option.option.trim(),
                 value: option.value.trim()
             }));
-        this.fieldManagerService.save(this.item);
-        this.notify.success(this.l('SavedSuccessfully'));
-        this.saved.emit();
-        this.initialFormState = this.getFormState();
-        this.close();
+        const fieldType = this.selectedFieldType;
+        if (!fieldType || !this.item.name.trim()) {
+            this.notify.error('Select a field type and enter a field name.');
+            return;
+        }
+        if (!this.item.entityId) {
+            this.notify.error('Select an entity or data object for the field.');
+            return;
+        }
+        const input = new CreateOrEditFieldInput();
+        Object.assign(input, {
+            id: this.isEdit ? this.item.id : undefined,
+            sycObjectId: this.item.entityId,
+            entitySycObjectId: this.entityParentId ?? undefined,
+            selectedObjectTypeId: this.isEdit ? undefined : this.selectedObjectTypeId ?? undefined,
+            fieldTypeId: fieldType.id,
+            widgetTypeId: this.item.widgetTypeId ?? undefined,
+            fieldLevelId: this.loadedField?.fieldLevelId,
+            fieldStatusId: this.loadedField?.fieldStatusId,
+            fieldName: this.item.name.trim(),
+            description: this.item.description,
+            fieldLevelCode: this.item.fieldLevel,
+            fieldStatusCode: this.item.status,
+            trackingNo: this.item.trackingNumber,
+            isExtraField: this.item.extraData,
+            allowNull: this.item.allowNull,
+            length: (this.item.length || 0) > 0 ? this.item.length : undefined,
+            decimals: this.item.decimals,
+            defaultValue: this.item.defaultValue,
+            dateFormat: this.item.dateFormat,
+            timeFormat: this.item.timeFormat,
+            allowMultiSelect: this.item.allowMultiSelect,
+            required: this.item.required,
+            visible: this.item.visible,
+            editable: this.item.editable,
+            extraAttributes: JSON.stringify({ ...this.extraAttributes, dropdownOptions: this.item.dropdownOptions })
+        });
+        const codeSource = this.isEdit
+            ? of(this.item.code)
+            : this.fieldManagerService.previewFieldCode(fieldType.id, input.fieldName, input.fieldLevelCode);
+        codeSource
+            .subscribe({
+                next: code => {
+                    input.fieldCode = code;
+                    this.fieldManagerService.createField(input).subscribe({
+                    next: () => {
+                        this.notify.success(this.l('SavedSuccessfully'));
+                        this.saved.emit();
+                        this.initialFormState = this.getFormState();
+                        this.close();
+                    },
+                    error: () => this.notify.error('Could not save the field.')
+                    });
+                },
+                error: () => this.notify.error('Could not generate the field code.')
+            });
     }
 
     backToList(): void {
@@ -159,18 +214,94 @@ export class CreateOrEditFieldManagerComponent extends AppComponentBase implemen
         this.dropdownOptions.splice(index, 1);
     }
 
-    getCodeValue(code: string): void {
-        this.fieldCode = code;
-        this.fieldCodeSeq = code;
-        this.generateCode();
-    }
-
     generateCode(): void {
         if (this.isEdit) {
             return;
         }
+        const fieldType = this.selectedFieldType;
+        const request = ++this.codePreviewRequest;
+        if (!fieldType || !this.item.name.trim()) {
+            this.item.code = '';
+            return;
+        }
+        if (this.previewTimer) clearTimeout(this.previewTimer);
+        const name = this.item.name.trim();
+        const level = this.item.fieldLevel;
+        this.previewTimer = setTimeout(() => {
+            this.fieldManagerService.previewFieldCode(fieldType.id, name, level)
+                .subscribe({ next: code => { if (request === this.codePreviewRequest) this.item.code = code; } });
+        }, 250);
+    }
 
-        this.item.code = `${this.item.type.substring(0, 2)}${this.item.fieldLevel.substring(0, 1)}${this.item.name.substring(0, 4)}${this.fieldCodeSeq}`;
+    get selectedFieldType(): FieldManagerLookup | undefined {
+        return this.fieldTypes.find(type => type.name.replace('--', ' - ') === this.item.type);
+    }
+
+    get availableWidgets(): FieldManagerLookup[] {
+        const typeCode = this.selectedFieldType?.code;
+        return typeCode ? this.widgetTypes.filter(widget => widget.code.startsWith(typeCode + '-')) : [];
+    }
+
+    onFieldTypeChanged(typeName: string): void {
+        this.item.type = typeName;
+        if (!this.availableWidgets.some(widget => widget.id === this.item.widgetTypeId)) {
+            this.item.widgetTypeId = undefined;
+        }
+        this.generateCode();
+    }
+
+    private loadField(id: number): void {
+        this.fieldManagerService.getFieldForEdit(id).subscribe({
+            next: field => {
+                this.loadedField = field;
+                this.extraAttributes = {};
+                try { this.extraAttributes = JSON.parse(field.extraAttributes || '{}'); } catch (_) { this.extraAttributes = {}; }
+                if (!this.extraAttributes || typeof this.extraAttributes !== 'object' || Array.isArray(this.extraAttributes)) {
+                    this.extraAttributes = {};
+                }
+                this.item = {
+                    ...this.createEmptyItem(),
+                    id: field.id,
+                    code: field.fieldCode,
+                    name: field.fieldName,
+                    description: field.description || '',
+                    entityId: field.sycObjectId,
+                    status: field.fieldStatusCode,
+                    fieldLevel: field.fieldLevelCode,
+                    trackingNumber: field.trackingNo || '',
+                    extraData: field.isExtraField,
+                    widgetTypeId: field.widgetTypeId,
+                    allowNull: field.allowNull,
+                    length: field.length || 0,
+                    decimals: field.decimals || 0,
+                    defaultValue: field.defaultValue || '',
+                    dateFormat: field.dateFormat || '',
+                    timeFormat: field.timeFormat || '',
+                    allowMultiSelect: field.allowMultiSelect,
+                    required: field.required,
+                    visible: field.visible,
+                    editable: field.editable,
+                    dropdownOptions: Array.isArray(this.extraAttributes.dropdownOptions) ? this.extraAttributes.dropdownOptions : []
+                };
+                this.entityParentId = field.entitySycObjectId || null;
+                this.dropdownOptions = [...(this.item.dropdownOptions || [])];
+                const setType = () => {
+                    const type = this.fieldTypes.find(type => type.id === field.fieldTypeId);
+                    if (type) this.item.type = type.name.replace('--', ' - ');
+                };
+                if (this.fieldTypes.length) setType();
+                else this.fieldManagerService.getFieldMetadata().subscribe({
+                    next: metadata => {
+                        this.fieldTypes = metadata.fieldTypes;
+                        this.widgetTypes = metadata.widgetTypes;
+                        setType();
+                    }
+                });
+                this.isEdit = true;
+                this.initialFormState = this.getFormState();
+            },
+            error: () => this.notify.error('Could not load the field.')
+        });
     }
 
     private createEmptyItem(): FieldManagerItem {
@@ -181,14 +312,14 @@ export class CreateOrEditFieldManagerComponent extends AppComponentBase implemen
             description: '',
             type: '',
             createdUser: '',
-            entityId: 2,
+            entityId: 0,
             tables: '',
             status: 'Proposed',
             revision: 0,
             revisionSequence: '00',
             fieldLevel: 'Application',
             trackingNumber: '',
-            allowNull: true,
+            allowNull: false,
             length: 0,
             allowMultiSelect: false,
             decimals: 0,
@@ -199,8 +330,7 @@ export class CreateOrEditFieldManagerComponent extends AppComponentBase implemen
             dropdownOptions: [],
             extraData: false,
             required: false,
-            active: true,
-            canSync: true
+            active: true
         };
     }
 }

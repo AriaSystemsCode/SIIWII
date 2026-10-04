@@ -4,7 +4,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title font-weight-bold" id="fieldManagerModalLabel">
-                    {{ (isRevision ? 'CreateNewRevision' : 'CreateNew') | localize }} {{ 'Field' | localize }} {{ 'Modal' | localize }}
+                    {{ (isEdit ? 'Edit' : 'CreateNew') | localize }} {{ 'Field' | localize }}
                 </h5>
                 <button type="button" class="close m-3" [attr.aria-label]="'Close' | localize" (click)="close()">
                     <span aria-hidden="true">&times;</span>
@@ -17,12 +17,6 @@
                             <a class="nav-link" [class.active]="activeTab === 'field-info'" id="field-info-tab" href="" (click)="selectTab('field-info', $event)"
                                 role="tab" aria-controls="field-info" [attr.aria-selected]="activeTab === 'field-info'" style="color: #4a0d4a;">
                                 {{ 'FieldInfo' | localize }}
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" [class.active]="activeTab === 'field-history-log'" id="field-history-log-tab" href="" (click)="selectTab('field-history-log', $event)"
-                                role="tab" aria-controls="field-history-log" [attr.aria-selected]="activeTab === 'field-history-log'" style="color: #4a0d4a;">
-                                {{ 'FieldHistoryLog' | localize }}
                             </a>
                         </li>
                     </ul>
@@ -38,10 +32,6 @@
                     <div class="field-form-grid">
                         <div class="form-group">
                             <label for="fieldCode">{{ 'FieldCode' | localize }}<b>*</b></label>
-                            <app-codes *ngIf="!isEdit" [objectType]="entityObjectType" [editMode]=false
-                                classes="bg-white" [code]="fieldCode"
-                                placeHolder="{{ 'fieldCode' | localize }}" (getCodeValue)="getCodeValue($event)" [maxlength]="12">
-                            </app-codes>
                             <input *ngIf="!isEdit" id="generatedFieldCode" name="generatedCode" type="text"
                                 class="form-control mt-2" [ngModel]="item.code" readonly
                                 style="cursor: not-allowed; background-color: #e9ecef !important;" required />
@@ -66,14 +56,17 @@
                     <div class="field-form-grid">
                         <div class="form-group">
                             <label for="fieldType">{{ 'FieldType' | localize }}<b>*</b></label>
-                            <select id="fieldType" name="type" class="form-control" [ngModel]="item.type" (ngModelChange)="item.type = $event; generateCode()" #fieldType="ngModel" [disabled]="isEdit"
+                            <select id="fieldType" name="type" class="form-control" [ngModel]="item.type" (ngModelChange)="onFieldTypeChanged($event)" #fieldType="ngModel" [disabled]="isEdit"
                                 [style.cursor]="isEdit ? 'not-allowed' : 'auto'"
                                 [style.background-color]="isEdit ? '#e9ecef  !important' : null" required>
-                                <option value="String - Textbox">{{ 'StringTextbox' | localize }}</option>
-                                <option value="Boolean - Checkbox">{{ 'BooleanCheckbox' | localize }}</option>
-                                <option value="Integer - Numeric input">{{ 'IntegerNumericInput' | localize }}</option>
-                                <option value="Date - Date picker">{{ 'DateDatePicker' | localize }}</option>
-                                <option value="List - Dropdown">{{ 'ListDropdown' | localize }}</option>
+                                <option *ngFor="let type of fieldTypes" [value]="type.name.replace('--', ' - ')">{{ type.name.replace('--', ' - ') }}</option>
+                            </select>
+                        </div>
+                        <div class="form-group" *ngIf="availableWidgets.length">
+                            <label for="fieldWidget">Widget</label>
+                            <select id="fieldWidget" name="widgetTypeId" class="form-control" [(ngModel)]="item.widgetTypeId">
+                                <option [ngValue]="undefined">Default</option>
+                                <option *ngFor="let widget of availableWidgets" [ngValue]="widget.id">{{ widget.name }}</option>
                             </select>
                         </div>
                         <div class="form-group">
@@ -142,6 +135,10 @@
                                     <option value="dd/mm/yyyy">dd/mm/yyyy</option>
                                     <option value="yyyy/mm/dd">yyyy/mm/dd</option>
                                 </select>
+                            </div>
+                            <div class="form-group" *ngIf="item.type === 'Date - Date picker'">
+                                <label for="timeFormat">Time Format</label>
+                                <input id="timeFormat" name="timeFormat" type="text" class="form-control" [(ngModel)]="item.timeFormat" />
                             </div>
                             <div class="form-group" *ngIf="item.type === 'List - Dropdown'">
                                 <label for="allowMultiSelect">{{ 'AllowMultiSelect' | localize }}</label>
@@ -224,13 +221,10 @@
                             {{ 'Cancel' | localize }}
                         </button>
                         <button type="submit" class="btn btn-primary createbtn" [disabled]="fieldForm.invalid">
-                            {{ (isRevision ? 'CreateNewRevision' : 'Create') | localize }} {{ 'Field' | localize }}
+                            {{ (isEdit ? 'Save' : 'Create') | localize }} {{ 'Field' | localize }}
                         </button>
                     </div>
                 </form>
-                    </div>
-                    <div class="tab-pane fade" [class.show]="activeTab === 'field-history-log'" [class.active]="activeTab === 'field-history-log'" id="field-history-log" role="tabpanel" aria-labelledby="field-history-log-tab">
-                        cccc
                     </div>
                 </div>
             </div>

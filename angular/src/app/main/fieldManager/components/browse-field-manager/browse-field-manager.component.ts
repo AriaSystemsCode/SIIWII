@@ -5,8 +5,8 @@ import { ViewFieldManagerComponent } from '../view-field-manager/view-field-mana
 import { ExistingFieldsModalComponent } from '../existing-fields-modal/existing-fields-modal.component';
 import { AppComponentBase } from '@shared/common/app-component-base';
 import { FieldManagerEntityNode, FieldManagerItem } from '../../field-manager.model';
-import { FieldManagerService } from '../../field-manager.service';
-import { Observable } from '@node_modules/rxjs/dist/types';
+import { FieldManagerPermissions, FieldManagerService } from '../../field-manager.service';
+import { Observable } from 'rxjs';
 
 @Component({
     selector: 'app-browse-field-manager',
@@ -27,8 +27,19 @@ export class BrowseFieldManagerComponent extends AppComponentBase implements OnI
     actionMenuPosition = { top: 0, left: 0 };
     activePanel: 'all' | 'entity' = 'all';
     entityTree: FieldManagerEntityNode[] = [];
-    expandedEntityIds: number[] = [];
+    expandedEntityIds: string[] = [];
     selectedEntityId: number | null = null;
+    selectedEntityKey: string | null = null;
+    selectedNode: FieldManagerEntityNode | null = null;
+    permissions: FieldManagerPermissions = {
+        canViewPage: false,
+        canCreateField: false,
+        canEditField: false,
+        canDeleteField: false,
+        canDuplicateField: false,
+        canAddExistingField: false
+    };
+    private fieldsRequest = 0;
     selectedEntityPath: FieldManagerEntityNode[] = [];
 
     readonly groupOptions = [
@@ -48,15 +59,18 @@ export class BrowseFieldManagerComponent extends AppComponentBase implements OnI
     }
 
     ngOnInit(): void {
+        this.fieldManagerService.getPagePermissions().subscribe({
+            next: permissions => this.permissions = permissions,
+            error: () => this.notify.error('Could not load field manager permissions.')
+        });
         this.loadItems();
-        this.entityTree = this.fieldManagerService.getEntityTree();
+        this.fieldManagerService.getEntityTree().subscribe({
+            next: tree => this.entityTree = tree,
+            error: () => this.notify.error('Could not load the field manager tree.')
+        });
     }
 
     get displayedItems(): FieldManagerItem[] {
-        debugger
-        if (this.activePanel === 'entity' && this.selectedEntityId !== null)
-            return this.items.filter(item => item.entityId === this.selectedEntityId && item.extraData === true);
-
         return this.items;
     }
 
@@ -88,46 +102,49 @@ export class BrowseFieldManagerComponent extends AppComponentBase implements OnI
     selectPanel(panel: 'all' | 'entity'): void {
         this.activePanel = panel;
         this.selectedEntityId = null;
+        this.selectedEntityKey = null;
+        this.selectedNode = null;
         this.selectedEntityPath = [];
         this.expandedEntityIds = [];
         this.closeActions();
+        this.loadItems();
     }
 
     toggleEntity(node: FieldManagerEntityNode, event: MouseEvent): void {
         event.stopPropagation();
-        this.selectedEntityPath = this.findEntityPath(node.id, this.entityTree);
+        this.selectedEntityPath = this.findEntityPath(node.key, this.entityTree);
+        this.selectedEntityId = node.sycObjectId;
+        this.selectedEntityKey = node.key;
+        this.selectedNode = node;
         if (node.children && node.children.length) {
-            this.selectedEntityId = null;
-            this.expandedEntityIds = this.expandedEntityIds.indexOf(node.id) !== -1
-                ? this.expandedEntityIds.filter(id => id !== node.id)
-                : [...this.expandedEntityIds, node.id];
-            return;
+            this.expandedEntityIds = this.expandedEntityIds.indexOf(node.key) !== -1
+                ? this.expandedEntityIds.filter(id => id !== node.key)
+                : [...this.expandedEntityIds, node.key];
         }
-
-        this.selectedEntityId = node.id;
+        this.loadItems();
     }
 
     isEntityExpanded(node: FieldManagerEntityNode): boolean {
-        return this.expandedEntityIds.indexOf(node.id) !== -1;
+        return this.expandedEntityIds.indexOf(node.key) !== -1;
     }
 
     get breadcrumbPath(): FieldManagerEntityNode[] {
         if (this.activePanel === 'all') {
-            return [{ id: 0, name: 'AllFields' }];
+            return [{ id: 0, key: 'AllFields', code: 'ALL', name: 'AllFields', nodeType: 'Entity', sycObjectId: 0 }];
         }
 
         return this.selectedEntityPath;
     }
 
-    private findEntityPath(id: number, nodes: FieldManagerEntityNode[], parents: FieldManagerEntityNode[] = []): FieldManagerEntityNode[] {
+    private findEntityPath(key: string, nodes: FieldManagerEntityNode[], parents: FieldManagerEntityNode[] = []): FieldManagerEntityNode[] {
         for (const node of nodes) {
             const path = [...parents, node];
-            if (node.id === id) {
+            if (node.key === key) {
                 return path;
             }
 
             if (node.children) {
-                const childPath = this.findEntityPath(id, node.children, path);
+                const childPath = this.findEntityPath(key, node.children, path);
                 if (childPath.length) {
                     return childPath;
                 }
@@ -181,7 +198,10 @@ export class BrowseFieldManagerComponent extends AppComponentBase implements OnI
         const selectedTable = this.selectedEntityPath.length
             ? this.selectedEntityPath[this.selectedEntityPath.length - 1].name
             : undefined;
-        this.createOrEditFieldManagerModal.show(undefined, false, selectedTable, this.selectedEntityId);
+        const rootEntity = this.selectedEntityPath.find(node => node.nodeType === 'Entity');
+        this.createOrEditFieldManagerModal.show(undefined, false, selectedTable, this.selectedEntityId,
+            this.selectedNode?.nodeType === 'ObjectType' ? this.selectedNode.id : null,
+            rootEntity?.sycObjectId || null);
     }
 
     addFromExisting(): void {
@@ -207,7 +227,10 @@ export class BrowseFieldManagerComponent extends AppComponentBase implements OnI
         const scrollBody = trigger.closest('.p-datatable-scrollable-body');
         const scrollBounds = scrollBody && scrollBody.getBoundingClientRect();
         const menuWidth = 160;
-        const menuHeight = 96;
+        const actionCount = 1 + Number(!!item.canEdit && this.permissions.canEditField)
+            + Number(this.permissions.canDuplicateField) + Number(!!item.canHide && this.permissions.canEditField)
+            + Number(!!item.canDelete);
+        const menuHeight = actionCount * 34 + 12;
         const availableBelow = Math.min(
             window.innerHeight,
             scrollBounds ? scrollBounds.bottom : window.innerHeight
@@ -230,9 +253,34 @@ export class BrowseFieldManagerComponent extends AppComponentBase implements OnI
         (event.target as HTMLElement).blur();
     }
  */
-    createNewRevision(item: FieldManagerItem): void {
+    edit(item: FieldManagerItem): void {
         this.closeActions();
         this.createOrEditFieldManagerModal.show(item.id);
+    }
+
+    duplicate(item: FieldManagerItem): void {
+        this.closeActions();
+        this.fieldManagerService.duplicateField(item.id).subscribe({
+            next: () => {
+                this.loadItems();
+                this.notify.success('Field duplicated.');
+            },
+            error: () => this.notify.error('Could not duplicate the field.')
+        });
+    }
+
+    hide(item: FieldManagerItem): void {
+        this.closeActions();
+        this.askToConfirm('Hide this field for your tenant?', this.l('Confirm')).subscribe(confirmed => {
+            if (!confirmed) return;
+            this.fieldManagerService.hideField(item.id).subscribe({
+                next: () => {
+                    this.loadItems();
+                    this.notify.success('Field hidden.');
+                },
+                error: () => this.notify.error('Could not hide the field.')
+            });
+        });
     }
 
     view(item: FieldManagerItem): void {
@@ -251,9 +299,13 @@ export class BrowseFieldManagerComponent extends AppComponentBase implements OnI
         isConfirmed.subscribe((res) => {
             if (res) {
                 //i51- call delete
-                this.fieldManagerService.delete(item.id);
-                this.loadItems();
-                this.notify.success(this.l('SuccessfullyDeleted'));
+                this.fieldManagerService.deleteServerField(item.id).subscribe({
+                    next: () => {
+                        this.loadItems();
+                        this.notify.success(this.l('SuccessfullyDeleted'));
+                    },
+                    error: () => this.notify.error('Could not delete the field.')
+                });
 
             }
         });
@@ -274,6 +326,12 @@ export class BrowseFieldManagerComponent extends AppComponentBase implements OnI
     }
 
     private loadItems(): void {
-        this.items = this.fieldManagerService.getAll();
+        const request = ++this.fieldsRequest;
+        this.items = [];
+        this.fieldManagerService.getFieldsForNode(this.activePanel === 'entity' ? this.selectedNode : null)
+            .subscribe({
+                next: items => { if (request === this.fieldsRequest) this.items = items; },
+                error: () => { if (request === this.fieldsRequest) this.notify.error('Could not load fields.'); }
+            });
     }
 }
