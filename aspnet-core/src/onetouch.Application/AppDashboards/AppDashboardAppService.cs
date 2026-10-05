@@ -4,6 +4,7 @@ using Abp.Authorization.Users;
 //using Abp.Collections.Extensions;
 using Abp.Domain.Repositories;
 using Abp.Domain.Uow;
+using Abp.EntityFrameworkCore.Uow;
 using Abp.Linq.Extensions;
 using DocumentFormat.OpenXml.Bibliography;
 using Microsoft.EntityFrameworkCore;
@@ -17,11 +18,16 @@ using onetouch.Accounts.Dtos;
 using onetouch.AppDashboards.Dtos;
 using onetouch.AppEntities;
 using onetouch.AppEntities.Dtos;
+using onetouch.AppFields;
+using onetouch.AppFields.Dto;
+using onetouch.AppItems.Dtos;
 using onetouch.Authorization.Users;
 using onetouch.Configuration;
 using onetouch.DashboardCustomization;
+using onetouch.EntityFrameworkCore;
 using onetouch.Helpers;
 using onetouch.SycIdentifierDefinitions;
+using onetouch.SystemObjects;
 using Stripe;
 using System;
 using System.Collections.Generic;
@@ -37,23 +43,29 @@ namespace onetouch.AppDashboards
     public class AppDashboardAppService : onetouchAppServiceBase, IAppDashboardAppService
     {
         private readonly IRepository<AppEntity, long> _appEntityRepository;
+        private readonly IRepository<SydObject, long> _sydObjectRepository;
         private readonly IConfigurationRoot _appConfiguration;
         private readonly IRepository<AppEntitySharings, long> _appEntitySharingRepository;
         private readonly Helper _helper;
         private readonly IAppEntitiesAppService _appEntitiesAppService;
         private readonly SycIdentifierDefinitionsAppService _iAppSycIdentifierDefinitionsService;
+        private readonly IAppFieldManagerAppService _iAppFieldManagerAppService;
         public AppDashboardAppService(IRepository<AppEntity, long> appEntityRepository,
             Helper helper, IRepository<AppEntitySharings, long> appEntitySharingRepository,
             IAppEntitiesAppService appEntitiesAppService,
             IAppConfigurationAccessor appConfigurationAccessor,
-            SycIdentifierDefinitionsAppService iAppSycIdentifierDefinitionsService)
+            SycIdentifierDefinitionsAppService iAppSycIdentifierDefinitionsService,
+            IAppFieldManagerAppService iAppFieldManagerAppService,
+            IRepository<SydObject, long> sydObjectRepository)
         {
+            _sydObjectRepository = sydObjectRepository;
             _appEntityRepository = appEntityRepository;
             _helper = helper;
             _appEntitySharingRepository = appEntitySharingRepository;
             _appEntitiesAppService = appEntitiesAppService;
             _appConfiguration = appConfigurationAccessor.Configuration;
             _iAppSycIdentifierDefinitionsService = iAppSycIdentifierDefinitionsService;
+            _iAppFieldManagerAppService = iAppFieldManagerAppService;
         }
         public async Task<PagedResultDto<GetDashboardForViewDto>> GetAll(GetAllDashboardsInput input)
         {
@@ -459,31 +471,48 @@ namespace onetouch.AppDashboards
                     var sharingPublic = await _appEntitySharingRepository.GetAll()
                     .Where(z => z.EntityId == dashboardObj.Id &&
                     z.SharedTenantId == AbpSession.TenantId &&
-                    z.SharedUserId==null).FirstOrDefaultAsync();
-                    if (sharingPublic != null &&
-                        sharingPublic.CanEdit != ShareDashboardInfo.CanEdit)
+                    z.SharedUserId == null).FirstOrDefaultAsync();
+                    if (sharingPublic != null)
                     {
-                        sharingPublic.CanEdit = ShareDashboardInfo.CanEdit;
-                        await _appEntitySharingRepository.UpdateAsync(sharingPublic);
-                        await CurrentUnitOfWork.SaveChangesAsync();
+                        if (sharingPublic.CanEdit != ShareDashboardInfo.CanEdit)
+                        {
+                            sharingPublic.CanEdit = ShareDashboardInfo.CanEdit;
+                            await _appEntitySharingRepository.UpdateAsync(sharingPublic);
+                            await CurrentUnitOfWork.SaveChangesAsync();
+                            var allUsersRecords = await _appEntitySharingRepository.GetAll()
+                        .Where(z => z.EntityId == dashboardObj.Id &&
+                        z.SharedTenantId == AbpSession.TenantId &&
+                        z.SharedUserId != null &&
+                        z.CanEdit != ShareDashboardInfo.CanEdit).ToListAsync();
+                            if (allUsersRecords != null)
+                            {
+                                foreach (var user in allUsersRecords)
+                                {
+                                    user.CanEdit = ShareDashboardInfo.CanEdit;
+                                    await _appEntitySharingRepository.UpdateAsync(user);
+                                }
+                                await CurrentUnitOfWork.SaveChangesAsync();
+                            }
+                        }
+                    }
+                    else
+                    {
+                        //await _appEntitySharingRepository
+                        //   .DeleteAsync(z=>z.EntityId== dashboardObj.Id && z.SharedUserId!=null);
                         var allUsersRecords = await _appEntitySharingRepository.GetAll()
-                    .Where(z => z.EntityId == dashboardObj.Id &&
-                    z.SharedTenantId == AbpSession.TenantId &&
-                    z.SharedUserId != null && 
-                    z.CanEdit!= ShareDashboardInfo.CanEdit).ToListAsync();
+                       .Where(z => z.EntityId == dashboardObj.Id &&
+                       z.SharedTenantId == AbpSession.TenantId &&
+                       z.SharedUserId != null &&
+                       z.CanEdit != ShareDashboardInfo.CanEdit).ToListAsync();
                         if (allUsersRecords != null)
                         {
-                            foreach (var user in allUsersRecords) {
+                            foreach (var user in allUsersRecords)
+                            {
                                 user.CanEdit = ShareDashboardInfo.CanEdit;
                                 await _appEntitySharingRepository.UpdateAsync(user);
                             }
                             await CurrentUnitOfWork.SaveChangesAsync();
                         }
-                    }
-                    else
-                    {
-                        await _appEntitySharingRepository
-                            .DeleteAsync(z=>z.EntityId== dashboardObj.Id && z.SharedUserId!=null);
                         await CurrentUnitOfWork.SaveChangesAsync();
                         sharingPublic = new AppEntitySharings();
                         sharingPublic.EntityId = dashboardObj.Id;
@@ -493,6 +522,40 @@ namespace onetouch.AppDashboards
                         await _appEntitySharingRepository.InsertAsync(sharingPublic);
                         await CurrentUnitOfWork.SaveChangesAsync();
                     }
+                }
+                else
+                {
+                    if (ShareDashboardInfo.UsersList != null && 
+                        ShareDashboardInfo.UsersList.Count > 0)
+                    {
+                        foreach (var user in ShareDashboardInfo.UsersList)
+                        {
+                            var userRecord = await _appEntitySharingRepository.GetAll()
+                       .Where(z => z.EntityId == dashboardObj.Id &&
+                       z.SharedTenantId == AbpSession.TenantId &&
+                       z.SharedUserId == user.UserId).FirstOrDefaultAsync();
+                            if (userRecord != null)
+                            {
+                                if (userRecord.CanEdit != user.CanEdit)
+                                {
+                                    userRecord.CanEdit = user.CanEdit;
+                                    await _appEntitySharingRepository.UpdateAsync(userRecord);
+                                }
+                            }
+                            else
+                            {
+                                AppEntitySharings sharingUser = new AppEntitySharings();
+                                sharingUser.EntityId = dashboardObj.Id;
+                                sharingUser.CanEdit = user.CanEdit;
+                                sharingUser.SharedTenantId = AbpSession.TenantId;
+                                sharingUser.SharedUserId = user.UserId;
+                                await _appEntitySharingRepository.InsertAsync(sharingUser);
+                            }
+                            await CurrentUnitOfWork.SaveChangesAsync();
+
+                        }
+                    }
+
                 }
             }
 
@@ -531,6 +594,74 @@ namespace onetouch.AppDashboards
 
                
             }
+        }
+        public async Task<List<AppEntityExtraDataDto>> GetTableFieldsList(string tableName)
+        {
+            List<AppEntityExtraDataDto> returnList = new List<AppEntityExtraDataDto>();
+            var sydobjct =await _sydObjectRepository.GetAll()
+                .Where(z => z.Name == tableName).FirstOrDefaultAsync();
+            if (sydobjct != null)
+            {
+                var fieldsList = await _iAppFieldManagerAppService.GetFields(new GetFieldsInput { 
+                    SelectedObjectId= sydobjct.Id,AllFields= true
+                    });
+                if (fieldsList != null && fieldsList.TotalCount > 0)
+                {
+                    foreach (var field in fieldsList.Items)
+                    {
+                        AppEntityExtraDataDto fieldData = new AppEntityExtraDataDto();
+                        fieldData.AttributeCode = field.FieldName;
+                        fieldData.AttributeId= field.Id;
+                        returnList.Add(fieldData);
+                    }
+
+                }
+            }
+            return  returnList ;
+        }
+        public async Task<onetouch.AppDashboards.Dtos.DynamicQueryResult> GetAllTableData(onetouch.AppDashboards.Dtos.DynamicQueryInput input)
+        {
+            DynamicQueryAppService dynamicQueryAppService = new DynamicQueryAppService(UnitOfWorkManager.Current.GetDbContext<onetouchDbContext>());
+            var returnResult = await dynamicQueryAppService.Query(input);
+            return returnResult;
+        }
+        public async Task<List<string>> GetTablesList() 
+        {
+            List<string> returnList = new List<string>();
+            var dataTree = await _iAppFieldManagerAppService.GetObjectTypeTree();
+            if (dataTree != null && dataTree.Count() > 0)
+            {
+                foreach (var node in dataTree)
+                {
+                    var dataObjects = FindAllByNodeType(node, "DataObject");
+                    if (dataObjects != null && dataObjects.Count > 0)
+                    {
+                        returnList.AddRange(dataObjects);
+                    }
+                }
+            }
+            return returnList;
+
+        }
+        public static List<string> FindAllByNodeType(
+    ObjectTypeTreeNodeDto obj,
+    string nodeType)
+        {
+            var results = new List<string>();
+
+            if (obj == null)
+                return results;
+
+            if (obj.NodeType == nodeType)
+                results.Add(obj.Name);
+
+            foreach (var child in obj.Children)
+            {
+                results.AddRange(
+                    FindAllByNodeType(child, nodeType));
+            }
+
+            return results;
         }
     }
 }

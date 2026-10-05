@@ -64,4 +64,28 @@ namespace onetouch.AppDashboards.Dtos
         public virtual bool CanEdit { get; set; }
         
     }
+    public class DynamicQueryInput : PagedAndSortedResultRequestDto
+    {
+        public string TableName { get; set; }
+
+        public List<string> Fields { get; set; }
+
+        public List<DynamicCondition> Conditions { get; set; }
+            = new List<DynamicCondition>();
+    }
+
+    public class DynamicCondition
+    {
+        public string Field { get; set; }
+        public string Operator { get; set; }
+        public object Value { get; set; }
+    }
+
+    public class DynamicQueryResult
+    {
+        public int TotalCount { get; set; }
+
+        public List<Dictionary<string, object>> Items { get; set; }
+            = new List<Dictionary<string, object>>();
+    }
 }
