@@ -116,3 +116,22 @@ export type DashboardShareMode =
     'specific' |
     'confirm' |
     'private';
+
+
+
+
+
+
+export interface SpreadsheetDataBatch {
+    entity: SpreadsheetEntityDefinition;
+    selectedColumns: string[];
+    filters: SpreadsheetFilters;
+
+    rows: any[];
+
+    loaded: number;
+    total: number;
+
+    isFirstBatch: boolean;
+    isLastBatch: boolean;
+}

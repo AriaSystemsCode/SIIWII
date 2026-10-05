@@ -26,13 +26,15 @@ import {
     IDataSet
 } from '@syncfusion/ej2-angular-pivotview';
 
-import { AppDashboardServiceProxy,
-    } from '@shared/service-proxies/service-proxies';
+import {
+    AppDashboardServiceProxy,
+} from '@shared/service-proxies/service-proxies';
 import { AppComponentBase } from '@shared/common/app-component-base';
 
 import {
     DashboardWidgetMetadata,
     SavedSheetAnalysis,
+    SpreadsheetDataBatch,
     SpreadsheetDataSource,
     SpreadsheetSheetDataSource
 } from '../../models/dashboard.model';
@@ -50,9 +52,6 @@ import {
     yieldToBrowser
 } from '../../models/spreadsheet.model';
 
-import {
-    SpreadsheetDataBatch
-} from '../spreadsheet-data-panel/spreadsheet-data-panel.component';
 
 
 @Component({
@@ -74,8 +73,6 @@ export class CreateOrEditSpreadsheetComponent extends AppComponentBase implement
     readonly scrollSettings: any = { enableVirtualization: true, isFinite: false };
     readonly showAggregate = false;
 
-    /** Rows loaded per API call. Keep small while testing. */
-    // private readonly batchSize = 10;
     private readonly saveOptions: any = { ignoreImage: false, ignoreNote: false };
 
     // Loading bar
@@ -137,9 +134,9 @@ export class CreateOrEditSpreadsheetComponent extends AppComponentBase implement
     isApplyingChart = false;
 
 
-private newDataSheetName:   string | null = null;
-private newDataSheetLoadedRows = 0;
-private pendingDataBatch:   SpreadsheetDataBatch | null = null;
+    private newDataSheetName: string | null = null;
+    private newDataSheetLoadedRows = 0;
+    private pendingDataBatch: SpreadsheetDataBatch | null = null;
 
     constructor(
         injector: Injector,
@@ -265,9 +262,6 @@ private pendingDataBatch:   SpreadsheetDataBatch | null = null;
         this.loadDashboard();
     }
 
-    // =====================================================
-    // LOAD DASHBOARD SPREADSHEET
-    // =====================================================
 
     private loadDashboard(): void {
         if (!this.dashboardId || !this.spreadsheet) {
@@ -688,7 +682,7 @@ private pendingDataBatch:   SpreadsheetDataBatch | null = null;
     // RIBBON
     // =====================================================
 
-    /** Adds "Siiwii List" and "Pivot Table" buttons to the Insert ribbon tab. */
+    /** Adds " List" and "Pivot Table" buttons to the Insert ribbon tab. */
     private addRibbonButtons(): void {
         if (typeof this.grid.addToolbarItems !== 'function') {
             console.warn('[Spreadsheet] addToolbarItems() is not available in this Syncfusion build.');
@@ -700,18 +694,18 @@ private pendingDataBatch:   SpreadsheetDataBatch | null = null;
                 'Insert',
                 [
                     {
-                        id: 'siiwii_spreadsheet_data_source',
+                        id: 'spreadsheet_data_source',
                         type: 'Button',
-                        text: 'Siiwii List',
-                        tooltipText: 'Insert Siiwii data source',
-                        prefixIcon: 'e-icons e-database',
+                        text: 'List',
+                        tooltipText: 'Insert data source',
+                        prefixIcon: 'e-icons e-list',
                         click: () => this.openDataPanel()
                     },
                     {
-                        id: 'siiwii_spreadsheet_pivot',
+                        id: 'spreadsheet_pivot',
                         type: 'Button',
                         text: 'Pivot Table',
-                        tooltipText: 'Create or view Pivot Table for the active sheet',
+                        tooltipText: 'Create Pivot Table for the active sheet',
                         prefixIcon: 'e-icons e-table',
                         click: () => this.openPivotFromRibbon()
                     }
@@ -736,9 +730,9 @@ private pendingDataBatch:   SpreadsheetDataBatch | null = null;
             args?.target?.textContent
         ).toLowerCase();
 
-        if (id.includes('siiwii_spreadsheet_data_source') || label.includes('siiwii list')) {
+        if (id.includes('spreadsheet_data_source') || label.includes('list')) {
             this.openDataPanel();
-        } else if (id.includes('siiwii_spreadsheet_pivot') || label.includes('pivot table')) {
+        } else if (id.includes('spreadsheet_pivot') || label.includes('pivot table')) {
             this.openPivotFromRibbon();
         }
     }
@@ -752,81 +746,108 @@ private pendingDataBatch:   SpreadsheetDataBatch | null = null;
     // ADD DATA PANEL
     // =====================================================
 
-openDataPanel(): void {
+    openDataPanel(): void {
 
-    this.closeChartPanel();
+        this.closeChartPanel();
 
-    this.showDataPanel = true;
+        this.showDataPanel = true;
 
-    this.cdr.detectChanges();
+        this.cdr.detectChanges();
 
-    this.resizeLater();
-}
-
-closeDataPanel(): void {
-
-    this.showDataPanel = false;
-
-    this.cdr.detectChanges();
-
-    this.resizeLater();
-}
-
-async onDataBatchLoaded(
-    batch: SpreadsheetDataBatch
-): Promise<void> {
-
-    if (!this.spreadsheet) {
-        return;
+        this.resizeLater();
     }
 
-    try {
+    closeDataPanel(): void {
 
-        this.pendingDataBatch = batch;
+        this.showDataPanel = false;
+
+        this.cdr.detectChanges();
+
+        this.resizeLater();
+    }
+
+    async onDataBatchLoaded(
+        batch: SpreadsheetDataBatch
+    ): Promise<void> {
+
+        if (!this.spreadsheet) {
+            return;
+        }
+
+        try {
+
+            this.pendingDataBatch = batch;
 
 
-        // ==========================================
-        // FIRST BATCH
-        // ==========================================
+            // ==========================================
+            // FIRST BATCH
+            // ==========================================
 
-        if (batch.isFirstBatch) {
+            if (batch.isFirstBatch) {
 
-            this.showLoading(
-                `Loading ${batch.entity.displayName}...`
-            );
-
-            this.newDataSheetName =
-                this.getUniqueSheetName(
-                    batch.entity.displayName
+                this.showLoading(
+                    `Loading ${batch.entity.displayName}...`
                 );
 
-            this.newDataSheetLoadedRows = 0;
+                this.newDataSheetName =
+                    this.getUniqueSheetName(
+                        batch.entity.displayName
+                    );
+
+                this.newDataSheetLoadedRows = 0;
 
 
-            // Create EMPTY sheet
-            this.grid.insertSheet(
-                [
-                    {
-                        name:
-                            this.newDataSheetName
-                    }
-                ],
-                this.allSheets.length
-            );
+                // Create EMPTY sheet
+                this.grid.insertSheet(
+                    [
+                        {
+                            name:
+                                this.newDataSheetName
+                        }
+                    ],
+                    this.allSheets.length
+                );
 
 
-            const ready =
-                await this.waitForSheet(
+                const ready =
+                    await this.waitForSheet(
+                        this.newDataSheetName
+                    );
+
+
+                if (!ready) {
+
+                    throw new Error(
+                        `Unable to create sheet "${this.newDataSheetName}".`
+                    );
+                }
+
+
+                await this.activateSheet(
                     this.newDataSheetName
                 );
 
 
-            if (!ready) {
-
-                throw new Error(
-                    `Unable to create sheet "${this.newDataSheetName}".`
-                );
+                await this.paint();
             }
+
+
+            if (!this.newDataSheetName) {
+                return;
+            }
+
+
+            // ==========================================
+            // SELECTED COLUMNS
+            // ==========================================
+
+            const columns =
+                batch.entity.columns.filter(
+                    column =>
+                        batch.selectedColumns.includes(
+                            column.key
+                        )
+                );
 
 
             await this.activateSheet(
@@ -834,72 +855,11 @@ async onDataBatchLoaded(
             );
 
 
-            await this.paint();
-        }
+            // ==========================================
+            // HEADERS
+            // ==========================================
 
-
-        if (!this.newDataSheetName) {
-            return;
-        }
-
-
-        // ==========================================
-        // SELECTED COLUMNS
-        // ==========================================
-
-        const columns =
-            batch.entity.columns.filter(
-                column =>
-                    batch.selectedColumns.includes(
-                        column.key
-                    )
-            );
-
-
-        await this.activateSheet(
-            this.newDataSheetName
-        );
-
-
-        // ==========================================
-        // HEADERS
-        // ==========================================
-
-        if (batch.isFirstBatch) {
-
-            columns.forEach(
-                (column, columnIndex) => {
-
-                    const address =
-                        `${toColumnName(
-                            columnIndex + 1
-                        )}1`;
-
-
-                    this.grid.updateCell(
-                        {
-                            value:
-                                column.label
-                        },
-                        address
-                    );
-                }
-            );
-        }
-
-
-        // ==========================================
-        // CURRENT BATCH
-        // ==========================================
-
-        batch.rows.forEach(
-            (row, rowIndex) => {
-
-                const spreadsheetRow =
-                    this.newDataSheetLoadedRows +
-                    rowIndex +
-                    2;
-
+            if (batch.isFirstBatch) {
 
                 columns.forEach(
                     (column, columnIndex) => {
@@ -907,117 +867,151 @@ async onDataBatchLoaded(
                         const address =
                             `${toColumnName(
                                 columnIndex + 1
-                            )}${spreadsheetRow}`;
+                            )}1`;
 
 
                         this.grid.updateCell(
                             {
                                 value:
-                                    row[
-                                        column.label
-                                    ]
+                                    column.label
                             },
                             address
                         );
                     }
                 );
             }
-        );
 
 
-        // Current batch is now written.
-        this.newDataSheetLoadedRows +=
-            batch.rows.length;
+            // ==========================================
+            // CURRENT BATCH
+            // ==========================================
+
+            batch.rows.forEach(
+                (row, rowIndex) => {
+
+                    const spreadsheetRow =
+                        this.newDataSheetLoadedRows +
+                        rowIndex +
+                        2;
 
 
-        // ==========================================
-        // PROGRESS
-        // ==========================================
+                    columns.forEach(
+                        (column, columnIndex) => {
 
-        this.setProgress(
-            batch.loaded,
-            batch.total
-        );
-
-
-        this.loadingMessage =
-            batch.total > 0
-                ? `Loaded ${batch.loaded.toLocaleString()} of ${batch.total.toLocaleString()} records`
-                : `Loaded ${batch.loaded.toLocaleString()} records`;
+                            const address =
+                                `${toColumnName(
+                                    columnIndex + 1
+                                )}${spreadsheetRow}`;
 
 
-        // Make current records visible.
-        await this.paint();
+                            this.grid.updateCell(
+                                {
+                                    value:
+                                        row[
+                                        column.label
+                                        ]
+                                },
+                                address
+                            );
+                        }
+                    );
+                }
+            );
 
 
-        // ==========================================
-        // LAST BATCH
-        // ==========================================
+            // Current batch is now written.
+            this.newDataSheetLoadedRows +=
+                batch.rows.length;
 
-        if (batch.isLastBatch) {
 
-            await this.finishDataLoading(
-                batch
+            // ==========================================
+            // PROGRESS
+            // ==========================================
+
+            this.setProgress(
+                batch.loaded,
+                batch.total
+            );
+
+
+            this.loadingMessage =
+                batch.total > 0
+                    ? `Loaded ${batch.loaded.toLocaleString()} of ${batch.total.toLocaleString()} records`
+                    : `Loaded ${batch.loaded.toLocaleString()} records`;
+
+
+            // Make current records visible.
+            await this.paint();
+
+
+            // ==========================================
+            // LAST BATCH
+            // ==========================================
+
+            if (batch.isLastBatch) {
+
+                await this.finishDataLoading(
+                    batch
+                );
+            }
+
+        } catch (error) {
+
+            this.onDataLoadingFailed(
+                error
+            );
+        }
+    }
+    private async finishDataLoading(batch: SpreadsheetDataBatch): Promise<void> {
+        const sheetName = this.newDataSheetName;
+        if (!sheetName) {
+            return;
+        }
+
+        const sheet = this.findSheet(sheetName);
+        if (!sheet) {
+            throw new Error(
+                `Sheet "${sheetName}" was not found.`
             );
         }
 
-    } catch (error) {
+        this.upsertSheetSource({
+            sheetId: sheet.id,
+            sheetName,
+            source: {
+                type: batch.entity.displayName,
+                sourceKey: batch.entity.sourceKey,
+                mode: 'AllRecords',
+                columns: [...batch.selectedColumns],
+                filters: { ...batch.filters }
+            }
+        });
 
-        this.onDataLoadingFailed(
-            error
+        this.loadingProgress = 100;
+        this.loadingMessage = `Loaded ${batch.loaded.toLocaleString()} records`;
+        this.syncSheetIdentity();
+        this.syncSheetToUi();
+        this.notify.success(
+            `${batch.loaded.toLocaleString()} records added to ${sheetName}.`
+        );
+        this.showDataPanel = false;
+        await this.paint();
+        // Clear AFTER Spreadsheet has finished.
+        this.newDataSheetName = null;
+        this.newDataSheetLoadedRows = 0;
+        this.pendingDataBatch = null;
+        this.resizeLater();
+        setTimeout(
+            () => {
+
+                this.hideLoading();
+
+                this.cdr.detectChanges();
+
+            },
+            250
         );
     }
-}
-private async finishDataLoading(batch: SpreadsheetDataBatch): Promise<void> {
-    const sheetName = this.newDataSheetName;
-    if (!sheetName) {
-        return;
-    }
-
-    const sheet = this.findSheet(sheetName);
-    if (!sheet) {
-        throw new Error(
-            `Sheet "${sheetName}" was not found.`
-        );
-    }
-
-    this.upsertSheetSource({
-        sheetId:  sheet.id,
-        sheetName,
-        source: {
-            type:   batch.entity.displayName,
-            sourceKey:  batch.entity.sourceKey,
-            mode:  'AllRecords',
-            columns: [...batch.selectedColumns],
-            filters: {...batch.filters}
-        }
-    });
-
-    this.loadingProgress = 100;
-    this.loadingMessage = `Loaded ${batch.loaded.toLocaleString()} records`;
-    this.syncSheetIdentity();
-    this.syncSheetToUi();
-    this.notify.success(
-        `${batch.loaded.toLocaleString()} records added to ${sheetName}.`
-    );
-    this.showDataPanel = false;
-    await this.paint();
-    // Clear AFTER Spreadsheet has finished.
-    this.newDataSheetName = null;
-    this.newDataSheetLoadedRows = 0;
-    this.pendingDataBatch = null;
-    this.resizeLater();
-    setTimeout(
-        () => {
-
-            this.hideLoading();
-
-            this.cdr.detectChanges();
-
-        },
-        250
-    );
-}
 
     private getUniqueSheetName(baseName: string): string {
         const names = new Set(this.allSheets.map((s: any) => text(s?.name)));
@@ -1032,33 +1026,33 @@ private async finishDataLoading(batch: SpreadsheetDataBatch): Promise<void> {
     }
 
 
-onDataLoadingFailed(
-    error: any
-): void {
+    onDataLoadingFailed(
+        error: any
+    ): void {
 
-    console.error(
-        '[Spreadsheet] data loading failed:',
-        error
-    );
-
-
-    this.hideLoading();
+        console.error(
+            '[Spreadsheet] data loading failed:',
+            error
+        );
 
 
-    this.newDataSheetName = null;
-
-    this.newDataSheetLoadedRows = 0;
-
-    this.pendingDataBatch = null;
+        this.hideLoading();
 
 
-    this.notify.error(
-        'Unable to load Spreadsheet data.'
-    );
+        this.newDataSheetName = null;
+
+        this.newDataSheetLoadedRows = 0;
+
+        this.pendingDataBatch = null;
 
 
-    this.cdr.detectChanges();
-}
+        this.notify.error(
+            'Unable to load Spreadsheet data.'
+        );
+
+
+        this.cdr.detectChanges();
+    }
 
     // =====================================================
     // PIVOT: OPEN / CLOSE / BIND
@@ -2536,7 +2530,6 @@ onDataLoadingFailed(
             })
             .then(() => {
                 this.notify.success('Spreadsheet saved successfully.');
-                this.dashboardService.updateViewDate(dashboardId).subscribe();
             })
             .catch((error: any) => {
                 console.error('[Spreadsheet] SaveSpreadSheetJson failed:', error);

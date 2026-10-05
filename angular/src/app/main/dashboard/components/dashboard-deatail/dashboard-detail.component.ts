@@ -7,22 +7,10 @@ import {
     ViewChild
 } from '@angular/core';
 
-import {
-    ActivatedRoute
-} from '@angular/router';
-
-import {
-    MenuItem,
-    MessageService
-} from 'primeng/api';
-
-import {
-    AppComponentBase
-} from '@shared/common/app-component-base';
-
-import {
-    SpreadsheetComponent
-} from '@syncfusion/ej2-angular-spreadsheet';
+import {ActivatedRoute} from '@angular/router';
+import {MenuItem, MessageService } from 'primeng/api';
+import {AppComponentBase} from '@shared/common/app-component-base';
+import {SpreadsheetComponent} from '@syncfusion/ej2-angular-spreadsheet';
 import { AppDashboardServiceProxy } from '@shared/service-proxies/service-proxies';
 
 @Component({
@@ -64,28 +52,12 @@ export class DashboardDetailComponent
 
 
     ngOnInit(): void {
-
-        const routeId =
-            Number(
-                this.route
-                    .snapshot
-                    .paramMap
-                    .get('id')
-            );
-
-
-        if (
-            Number.isFinite(routeId) &&
-            routeId > 0
-        ) {
-
+        const routeId =Number(this.route.snapshot.paramMap.get('id'));
+        if (Number.isFinite(routeId) && routeId > 0) {
             this.dashboardId = routeId;
-
         }
-
         this.buildActionsMenu();
         this.loadDashboard();
-
     }
 
 
@@ -222,28 +194,15 @@ export class DashboardDetailComponent
         if (!this.dashboardSpreadsheet) {
             return;
         }
-
-        const sheets =
-            this.dashboardSpreadsheet.sheets;
-
-        if (
-            !Array.isArray(sheets) ||
-            !sheets.length
-        ) {
+        const sheets =  this.dashboardSpreadsheet.sheets;
+        if (!Array.isArray(sheets) || !sheets.length) {
             return;
         }
-
-        const dashboardIndex =
-            this.findDashboardSheetIndex(
-                sheets
-            );
-
+        const dashboardIndex = this.findDashboardSheetIndex(sheets);
         if (dashboardIndex < 0) {
             this.dashboardLoadError =
                 `Sheet "${this.dashboardSheetName}" was not found.`;
-
             this.cdr.detectChanges();
-
             return;
         }
 
@@ -276,11 +235,6 @@ export class DashboardDetailComponent
         }, 0);
     }
 
-
-    // =====================================================
-    // FIND DASHBOARD SHEET
-    // =====================================================
-
     private findDashboardSheetIndex(sheets: any[]): number {
         if (!Array.isArray(sheets)) {
             return -1;
@@ -289,7 +243,6 @@ export class DashboardDetailComponent
             (sheet: any) =>
                 String(sheet?.name ?? '').trim().toLowerCase() ===
                 this.dashboardSheetName.trim().toLowerCase()
-
         );
 
     }
@@ -298,28 +251,8 @@ export class DashboardDetailComponent
 
 
     }
-
-
     private getWorkbook(workbookJson: any): any {
-
-
-        return (
-
-            workbookJson
-                ?.jsonObject
-                ?.Workbook
-
-            ??
-
-            workbookJson
-                ?.Workbook
-
-            ??
-
-            null
-
-        );
-
+        return (workbookJson?.jsonObject?.Workbook ?? workbookJson?.Workbook ?? null);
     }
 
     private buildActionsMenu(): void {
@@ -341,7 +274,6 @@ export class DashboardDetailComponent
         ];
 
     }
-
 
     ngOnDestroy(): void {
         this.dashboardSheets = [];

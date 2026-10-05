@@ -5,34 +5,19 @@ import {
     Input,
     Output
 } from '@angular/core';
-
 import { firstValueFrom } from 'rxjs';
-
 import { AppComponentBase } from '@shared/common/app-component-base';
-
 import {
     AppTransactionServiceProxy
 } from '@shared/service-proxies/service-proxies';
 
 import {
+    SpreadsheetDataBatch,
     SpreadsheetEntityDefinition,
     SpreadsheetFilters
 } from '../../models/dashboard.model';
 
 
-export interface SpreadsheetDataBatch {
-    entity: SpreadsheetEntityDefinition;
-    selectedColumns: string[];
-    filters: SpreadsheetFilters;
-
-    rows: any[];
-
-    loaded: number;
-    total: number;
-
-    isFirstBatch: boolean;
-    isLastBatch: boolean;
-}
 
 
 @Component({
@@ -43,41 +28,18 @@ export interface SpreadsheetDataBatch {
 export class SpreadsheetDataPanelComponent
     extends AppComponentBase {
 
-    @Input()
-    visible = false;
+    @Input()  visible = false;
 
-
-    @Output()
-    close = new EventEmitter<void>();
-
-
-    @Output()
-    batchLoaded =
-        new EventEmitter<SpreadsheetDataBatch>();
-
-
-    // @Output()
-    // loadingFinished =
-    //     new EventEmitter<void>();
-
-
-    @Output()
-    loadingFailed =
-        new EventEmitter<any>();
+    @Output() close = new EventEmitter<void>();
+    @Output() batchLoaded =  new EventEmitter<SpreadsheetDataBatch>();
+    @Output()  loadingFailed =  new EventEmitter<any>();
 
 
     readonly batchSize = 10;
-
-
     step: 1 | 2 = 1;
-
-    selectedEntity:
-        SpreadsheetEntityDefinition | null = null;
-
+    selectedEntity:   SpreadsheetEntityDefinition | null = null;
     selectedColumns: string[] = [];
-
     filterValues: Record<string, any> = {};
-
     isAdding = false;
 
 
@@ -563,17 +525,6 @@ export class SpreadsheetDataPanelComponent
                 return;
             }
 
-
-            // this.loadingFinished.emit();
-
-
-            /*
-             * Do NOT call closePanel() here.
-             *
-             * Parent receives loadingFinished,
-             * finishes Spreadsheet metadata/progress,
-             * then closes the panel.
-             */
 
         } catch (error) {
 

@@ -382,18 +382,7 @@
 
 <app-dashboard-share
     [(visible)]="showShareModal"
-
     [dashboardName]="selectedDashboard?.title"
-
-    [ownerName]="
-        selectedDashboard?.creatorUserName
-    "
-
-    [users]="sharedUsers"
-
-    [mode]="shareMode"
-
-    [allUsersAccess]="sharedUsers"
-
-    (save)="onDashboardShareSave($event)">
+     [dashboardId]="selectedDashboard?.id"
+    (saved)="onDashboardShareSaved($event)">
 </app-dashboard-share>

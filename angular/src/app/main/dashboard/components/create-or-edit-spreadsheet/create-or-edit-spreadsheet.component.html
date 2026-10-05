@@ -101,7 +101,7 @@
                 <div class="pivot-analysis-layout bg-white" style="height: calc(100vh - 360px);">
                     <!-- Table / chart -->
                     <div class="flex-grow-1" style="min-width: 0; height: 100%; overflow: hidden;">
-                        <ejs-pivotview #pivotView id="SiiwiiPivotView" width="100%" height="100%"
+                        <ejs-pivotview #pivotView id="PivotView" width="100%" height="100%"
                             [dataSourceSettings]="pivotSettings" [showFieldList]="false" [showToolbar]="true"
                             [toolbar]="pivotToolbar" [showGroupingBar]="true" [allowCalculatedField]="true"
                             [showTooltip]="true" [displayOption]="pivotDisplay" [chartSettings]="pivotChart"
@@ -116,7 +116,7 @@
                             {{ 'FieldsAndPivotConfiguration' | localize }}
                         </div>
 
-                        <ejs-pivotfieldlist #pivotFieldList id="SiiwiiPivotFieldList" width="100%" renderMode="Fixed"
+                        <ejs-pivotfieldlist #pivotFieldList id="PivotFieldList" width="100%" renderMode="Fixed"
                             [dataSourceSettings]="pivotSettings" [allowCalculatedField]="true"
                             (enginePopulated)="onFieldListReady()">
                         </ejs-pivotfieldlist>
@@ -126,101 +126,7 @@
         </div>
 
         <!-- ================= ADD DATA PANEL ================= -->
-        <!-- <div *ngIf="showDataPanel" class="spreadsheet-side-panel">
-            <div class="d-flex justify-content-between align-items-start border-bottom p-3">
-                <div>
-                    <h5 class="mb-1">{{ 'NewSiiwiiList' | localize }}</h5>
-                    <small class="text-muted">{{ 'InsertApplicationDataIntoNewSheet' | localize }}</small>
-                </div>
-
-                <button type="button" class="btn btn-sm btn-light" (click)="closeDataPanel()">
-                    <i class="fa fa-times"></i>
-                </button>
-            </div>
-
-           
-            <div *ngIf="step === 1" class="p-3">
-                <div class="form-group">
-                    <label class="font-weight-bold">{{ 'Entity' | localize }}</label>
-                    <small class="d-block text-muted mb-3">{{ 'SelectSiiwiiEntityToInsert' | localize }}</small>
-
-                    <div *ngFor="let entity of entities" class="card mb-2" style="cursor: pointer;"
-                        (click)="selectEntity(entity.sourceKey)">
-                        <div class="card-body d-flex align-items-center">
-                            <i [class]="entity.icon" class="mr-3"></i>
-                            <span>{{ entity.displayName }}</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-         
-            <div *ngIf="step === 2 && selectedEntity" class="p-3">
-                <button type="button" class="btn btn-link px-0 mb-2" (click)="backToEntities()">
-                    <i class="fa fa-arrow-left mr-2"></i>
-                    {{ 'ChangeEntity' | localize }}
-                </button>
-
-                <h5>{{ selectedEntity.displayName }}</h5>
-                <p class="text-muted">{{ 'ChooseColumnsAndOptionalFilters' | localize }}</p>
-
-          
-                <div class="mb-4">
-                    <div class="d-flex align-items-center justify-content-between mb-2">
-                        <strong>{{ 'Columns' | localize }}</strong>
-
-                        <div>
-                            <button type="button" class="btn btn-sm btn-link" (click)="selectAllColumns()">
-                                {{ 'SelectAll' | localize }}
-                            </button>
-                            <button type="button" class="btn btn-sm btn-link" (click)="clearColumns()">
-                                {{ 'Clear' | localize }}
-                            </button>
-                        </div>
-                    </div>
-
-                    <div *ngFor="let column of selectedEntity.columns" class="form-check mb-2">
-                        <input type="checkbox" class="form-check-input" [id]="'column-' + column.key"
-                            [checked]="isColumnSelected(column.key)" (change)="toggleColumn(column.key, $event)" />
-
-                        <label class="form-check-label" [for]="'column-' + column.key">{{ column.label }}</label>
-                    </div>
-                </div>
-
-             
-                <div *ngIf="selectedEntity.filters?.length" class="mb-4">
-                    <strong class="d-block mb-3">{{ 'Filters' | localize }}</strong>
-
-                    <div *ngFor="let filter of selectedEntity.filters" class="form-group">
-                        <label>{{ filter.label }}</label>
-
-                        <input *ngIf="filter.type === 'string'" type="text" class="form-control"
-                            [(ngModel)]="filterValues[filter.key]" />
-
-                        <input *ngIf="filter.type === 'number'" type="number" class="form-control"
-                            [(ngModel)]="filterValues[filter.key]" />
-
-                        <input *ngIf="filter.type === 'date'" type="date" class="form-control"
-                            [(ngModel)]="filterValues[filter.key]" />
-
-                        <p-dropdown *ngIf="filter.type === 'select'" [options]="filter.options || []"
-                            [(ngModel)]="filterValues[filter.key]" optionLabel="label" optionValue="value"
-                            appendTo="body" [style]="{ width: '100%' }">
-                        </p-dropdown>
-                    </div>
-                </div>
-
-                <button type="button" class="btn btn-primary btn-block"
-                    [disabled]="isAdding || !selectedColumns.length" (click)="addSheet()">
-                    <i *ngIf="isAdding" class="fa fa-spinner fa-spin mr-2"></i>
-                    <i *ngIf="!isAdding" class="fa fa-plus mr-2"></i>
-                    {{ (isAdding ? 'Adding' : 'AddAsNewSheet') | localize }}
-                </button>
-            </div>
-        </div> -->
-
-
-
+     
         <app-spreadsheet-data-panel [visible]="showDataPanel" (close)="closeDataPanel()"
             (batchLoaded)="onDataBatchLoaded($event)" (loadingFailed)="onDataLoadingFailed($event)">
         </app-spreadsheet-data-panel>

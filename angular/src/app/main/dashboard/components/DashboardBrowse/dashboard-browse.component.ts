@@ -64,6 +64,12 @@ export class DashboardBrowseComponent
     attachmentBaseUrl: string = AppConsts.attachmentBaseUrl
     isSmallScreen = false;
 
+
+       showShareModal = false;
+selectedDashboard: any = null;
+shareMode: DashboardShareMode = 'all';
+sharedUsers: DashboardSharedUser[] = [];
+
     constructor(
         injector: Injector,
         private router: Router,
@@ -97,6 +103,7 @@ export class DashboardBrowseComponent
     }
 
     openDashboard(row: any): void {
+        this.appDashboardsAppService.updateViewDate(row.id).subscribe();
         this.router.navigate(['/app/main/dashboards/dashboard-details', row.id]);
     }
 
@@ -180,61 +187,17 @@ export class DashboardBrowseComponent
     }
 
 
-   showShareModal = false;
-
-selectedDashboard: any = null;
-
-shareMode: DashboardShareMode = 'all';
-
-sharedUsers: DashboardSharedUser[] = [];
-
 openShareDashboard(row: any): void {
-
     this.selectedDashboard = row;
-
-    this.sharedUsers =
-        (row?.sharedWithUsers ?? []).map(
-            (user: any) => ({
-                id: user.id,
-                name:
-                    user.name ??
-                    user.userName ??
-                    user.emailAddress,
-                access:
-                    user.access === 'Edit'
-                        ? 'Edit'
-                        : 'View'
-            })
-        );
-
-    this.shareMode =
-        this.sharedUsers.length
-            ? 'specific'
-            : 'all';
-
-    // Opens DashboardShareComponent dialog
+    this.sharedUsers = row?.sharedWithUsers
     this.showShareModal = true;
 }
-onDashboardShareSave(
-    event: {
-        mode: DashboardShareMode;
-        users: DashboardSharedUser[];
+onDashboardShareSaved(event:boolean) {
+    if(event ==true){
+ this.showShareModal = false;
+    this.getDashboards();
     }
-): void {
-
-    console.log(
-        'Share mode:',
-        event.mode
-    );
-
-    console.log(
-        'Shared users:',
-        event.users
-    );
-
-    // Call your BE sharing API here.
-
-    this.showShareModal = false;
+   
 }
 
     showShare(event: MouseEvent, row: any): void {

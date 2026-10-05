@@ -1,14 +1,31 @@
 import {
-  ChangeDetectorRef,
+    ChangeDetectorRef,
     Component,
     EventEmitter,
     Injector,
     Input,
-    Output
+    OnChanges,
+    Output,
+    SimpleChanges
 } from '@angular/core';
-import { DashboardSharedUser, DashboardShareMode, ShareAccess } from '../../models/dashboard.model';
-import { AppComponentBase } from '@shared/common/app-component-base';
-import { AppDashboardServiceProxy } from '@shared/service-proxies/service-proxies';
+
+import {
+    DashboardShareMode,
+    ShareAccess
+} from '../../models/dashboard.model';
+
+import {
+    AppDashboardServiceProxy,
+    SharingUserInfo,
+    ShareDashboardInfo,
+    ShareWithUser
+} from '@shared/service-proxies/service-proxies';
+
+import {
+    AppComponentBase
+} from '@shared/common/app-component-base';
+
+import { finalize } from 'rxjs/operators';
 
 
 @Component({
@@ -16,54 +33,303 @@ import { AppDashboardServiceProxy } from '@shared/service-proxies/service-proxie
     templateUrl: './dashboard-share.component.html',
     styleUrls: ['./dashboard-share.component.scss']
 })
-export class DashboardShareComponent extends AppComponentBase  {
+export class DashboardShareComponent
+    extends AppComponentBase
+    implements OnChanges {
 
     @Input() visible = false;
-
     @Input() dashboardName = '';
+    @Input() dashboardId: number | null = null;
 
-    // Dashboard creator / owner
-    @Input() ownerName = '';
+    @Output() visibleChange = new EventEmitter<boolean>();
+    @Output() saved = new EventEmitter<boolean>();
 
-    // Users explicitly shared with
-    @Input() users: DashboardSharedUser[] = [];
+    originalTenantUsers: SharingUserInfo[] = [];
 
-    @Input() mode: DashboardShareMode = 'all';
+    tenantUsers: SharingUserInfo[] = [];
+    sharedUsers: SharingUserInfo[] = [];
+    selectedSearchUser: SharingUserInfo | null = null;
 
-    // Permission used when sharing with ALL users
-    @Input() allUsersAccess: ShareAccess = 'View';
-
-    @Output() visibleChange =
-        new EventEmitter<boolean>();
-
-    @Output() save = new EventEmitter<{
-        mode: DashboardShareMode;
-        allUsersAccess: ShareAccess;
-        users: DashboardSharedUser[];
-    }>();
-
-    newUserName = '';
+    mode: DashboardShareMode = 'private';
+    private modeBeforeConfirm: DashboardShareMode = 'specific';
+    allUsersAccess: ShareAccess = 'View';
+    isSaving = false;
 
 
-      constructor(
-            injector: Injector,
-            private dashboardService: AppDashboardServiceProxy,
-            private cdr: ChangeDetectorRef
+    readonly permissionOptions: {
+        label: string;
+        value: ShareAccess;
+    }[] = [
+            {
+                label: 'View',
+                value: 'View'
+            },
+            {
+                label: 'Edit',
+                value: 'Edit'
+            }
+        ];
+
+
+    constructor(
+        injector: Injector,
+        private dashboardService: AppDashboardServiceProxy,
+        private cdr: ChangeDetectorRef
+    ) {
+        super(injector);
+    }
+
+
+    ngOnChanges(
+        changes: SimpleChanges
+    ): void {
+
+        if (
+            changes.visible &&
+            this.visible &&
+            this.dashboardId
         ) {
-            super(injector);
+            this.getTenantAllUser();
+        }
+    }
+
+    getTenantAllUser(): void {
+        if (!this.dashboardId) {
+            return;
+        }
+        this.showMainSpinner();
+        this.dashboardService.getTenantAllUser(this.dashboardId)
+            .pipe(
+                finalize(() => {
+                    this.hideMainSpinner();
+                    this.cdr.detectChanges();
+                })
+            )
+            .subscribe({
+                next: result => {
+                    this.originalTenantUsers = this.cloneUsers(result ?? []);
+                    this.tenantUsers = this.cloneUsers(this.originalTenantUsers);
+                    this.selectedSearchUser = null;
+                    this.initializeModeFromBackend();
+                    this.refreshSharedUsers();
+                    this.cdr.detectChanges();
+                },
+
+                error: error => {
+                    console.error(
+                        'Unable to load tenant users',
+                        error
+                    );
+                }
+            });
+    }
+
+    private cloneUsers(
+        users: SharingUserInfo[]
+    ): SharingUserInfo[] {
+
+        return users.map(
+            user =>
+            ({
+                ...user
+            } as SharingUserInfo)
+        );
+    }
+
+    private initializeModeFromBackend(): void {
+        const nonOwners = this.tenantUsers.filter(user => !user.isOwner);
+        const sharedNonOwners = nonOwners.filter(user => user.canView || user.canEdit);
+        if (sharedNonOwners.length === 0) {
+            this.mode = 'private';
+            this.allUsersAccess = 'View';
+
+            return;
+        }
+        if (
+            nonOwners.length > 0 &&
+            sharedNonOwners.length ===
+            nonOwners.length
+        ) {
+
+            this.mode = 'all';
+            this.allUsersAccess =
+                sharedNonOwners.every(
+                    user =>
+                        user.canEdit
+                )
+                    ? 'Edit'
+                    : 'View';
+
+
+            return;
         }
 
-    closeDialog(): void {
-        this.visible = false;
-        this.visibleChange.emit(false);
+        this.mode = 'specific';
+    }
+
+    private refreshSharedUsers(): void {
+
+        this.sharedUsers =
+            this.tenantUsers
+                .filter(
+                    user =>
+                        user.isOwner ||
+                        user.canView ||
+                        user.canEdit
+                )
+                .sort(
+                    (a, b) => {
+                        if (
+                            a.isOwner &&
+                            !b.isOwner
+                        ) {
+                            return -1;
+                        }
+
+
+                        if (
+                            !a.isOwner &&
+                            b.isOwner
+                        ) {
+                            return 1;
+                        }
+
+
+                        return (
+                            a.userName || ''
+                        ).localeCompare(
+                            b.userName || ''
+                        );
+                    }
+                );
+    }
+
+    get availableUsers():
+        SharingUserInfo[] {
+
+        const sharedIds =
+            new Set(
+                this.sharedUsers.map(
+                    user =>
+                        user.userId
+                )
+            );
+
+
+        return this.tenantUsers.filter(
+            user =>
+                !user.isOwner &&
+                !sharedIds.has(
+                    user.userId
+                )
+        );
+    }
+
+
+    // =====================================================
+    // ADD SPECIFIC USER
+    // =====================================================
+
+    onSearchUserSelected(
+        selectedUser:
+            SharingUserInfo
+    ): void {
+
+        if (!selectedUser) {
+            return;
+        }
+
+
+        const user =
+            this.tenantUsers.find(
+                item =>
+                    item.userId ===
+                    selectedUser.userId
+            );
+
+
+        if (!user) {
+            return;
+        }
+
+        user.canView = true;
+        user.canEdit = false;
+        this.refreshSharedUsers();
+        this.selectedSearchUser = null;
+        this.mode = 'specific';
+    }
+
+
+    getUserAccess(
+        user: SharingUserInfo
+    ): ShareAccess {
+
+        return user.canEdit
+            ? 'Edit'
+            : 'View';
+    }
+
+    changeAccess(
+        user: SharingUserInfo,
+        access: ShareAccess
+    ): void {
+
+        if (user.isOwner) {
+            return;
+        }
+
+        const workingUser =
+            this.tenantUsers.find(
+                item => item.userId === user.userId
+            );
+
+        if (!workingUser) {
+            return;
+        }
+
+        if (access === 'Edit') {
+            workingUser.canEdit = true;
+            workingUser.canView = true;
+        } else {
+            workingUser.canEdit = false;
+            workingUser.canView = true;
+        }
+
+        this.refreshSharedUsers();
+    }
+
+    // =====================================================
+    // REMOVE SPECIFIC USER
+    // =====================================================
+
+    removeUser(
+        user: SharingUserInfo
+    ): void {
+
+        if (user.isOwner) {
+            return;
+        }
+
+
+        const workingUser =
+            this.tenantUsers.find(
+                item =>
+                    item.userId ===
+                    user.userId
+            );
+
+
+        if (!workingUser) {
+            return;
+        }
+        workingUser.canView = false;
+        workingUser.canEdit = false;
+        this.refreshSharedUsers();
     }
 
     selectAll(): void {
         this.mode = 'all';
-    }
 
-    selectSpecific(): void {
-        this.mode = 'specific';
     }
 
     changeAllUsersAccess(
@@ -72,167 +338,288 @@ export class DashboardShareComponent extends AppComponentBase  {
         this.allUsersAccess = access;
     }
 
-    addUser(): void {
-
-        const name =
-            this.newUserName?.trim();
-
-        if (!name) {
-            return;
-        }
-
-        const exists =
-            this.users.some(
-                user =>
-                    user.name
-                        ?.trim()
-                        ?.toLowerCase() ===
-                    name.toLowerCase()
-            );
-
-        if (exists) {
-            return;
-        }
-
-        this.users = [
-            ...this.users,
-            {
-                name: name,
-                access: 'View'
-            }
-        ];
-
-        this.newUserName = '';
+    selectSpecific(): void {
+        this.mode = 'specific';
     }
 
-    changeAccess(
-        index: number,
-        access: ShareAccess
-    ): void {
-
-        this.users = this.users.map(
-            (user, i) =>
-                i === index
-                    ? {
-                        ...user,
-                        access: access
-                    }
-                    : user
-        );
-    }
-
-    removeUser(index: number): void {
-
-        this.users = this.users.filter(
-            (_, i) => i !== index
-        );
-    }
 
     requestMakePrivate(): void {
+        this.modeBeforeConfirm = this.mode;
         this.mode = 'confirm';
     }
 
-    cancelMakePrivate(): void {
 
-        this.mode =
-            this.users.length
-                ? 'specific'
-                : 'all';
+    cancelMakePrivate(): void {
+        this.mode = this.modeBeforeConfirm;
     }
+
 
     confirmMakePrivate(): void {
 
-        this.users = [];
+        this.tenantUsers.forEach(
+            user => {
+
+                if (user.isOwner) {
+                    return;
+                }
+                user.canView = false;
+                user.canEdit = false;
+            }
+        );
+
+
+        this.refreshSharedUsers();
+
 
         this.mode = 'private';
-
-        this.emitSave();
     }
+
 
     shareAgain(): void {
-        this.mode = 'all';
+        this.mode = 'specific';
     }
 
-    done(): void {
-        this.emitSave();
+    get sharedUsersCount():
+        number {
+
+        return this.sharedUsers.filter(
+            user =>
+                !user.isOwner &&
+                (
+                    user.canView ||
+                    user.canEdit
+                )
+        ).length;
     }
 
-    private emitSave(): void {
 
-        this.save.emit({
-            mode: this.mode,
-            allUsersAccess: this.allUsersAccess,
-            users: [...this.users]
+
+
+    get shareStatusText(): string {
+        if (this.mode === 'private') {
+            return 'Shared with no one';
+        }
+        if (this.mode === 'all') {
+            return 'Shared with everyone';
+        }
+        if (this.mode === 'confirm') {
+            return this.getStatusFromUsers();
+        }
+        const count = this.sharedUsersCount;
+
+
+        return count === 1 ? 'Shared with 1 user' : `Shared with ${count} users`;
+    }
+
+
+    private getStatusFromUsers():
+        string {
+
+        const tenantCount =
+            this.tenantUsers.filter(
+                user =>
+                    !user.isOwner
+            ).length;
+
+
+        const sharedCount =
+            this.sharedUsersCount;
+
+
+        if (
+            sharedCount === 0
+        ) {
+
+            return 'Shared with no one';
+        }
+
+
+        if (
+            tenantCount > 0 &&
+            tenantCount ===
+            sharedCount
+        ) {
+
+            return 'Shared with everyone';
+        }
+
+
+        return sharedCount === 1
+            ? 'Shared with 1 user'
+            : `Shared with ${sharedCount} users`;
+    }
+
+
+   done(): void {
+    if (!this.dashboardId || this.isSaving) {
+        return;
+    }
+
+    const body = this.buildShareDashboardBody();
+
+    this.isSaving = true;
+    this.showMainSpinner();
+
+    this.dashboardService
+        .shareDashboard(body)
+        .pipe(
+            finalize(() => {
+                this.isSaving = false;
+                this.hideMainSpinner();
+                this.cdr.detectChanges();
+            })
+        )
+        .subscribe({
+            next: () => {
+                this.notify.success(
+                    this.l('SuccessfullySaved')
+                );
+
+                this.saved.emit(true);
+                this.closeAfterSave();
+            },
+            error: error => {
+                console.error(
+                    'Unable to share dashboard',
+                    error
+                );
+            }
         });
+}
 
-        this.closeDialog();
-    }
+    private buildShareDashboardBody(): ShareDashboardInfo {
+        const body = new ShareDashboardInfo();
 
-    getOwnerInitials(): string {
+        body.dashboardId = Number(this.dashboardId);
+        body.sharingLevel = this.getSharingLevel();
+        body.canEdit =
+            this.mode === 'all' &&
+            this.allUsersAccess === 'Edit';
 
-        if (!this.ownerName) {
-            return 'YO';
+        if (this.mode === 'all') {
+            body.usersList = this.buildAllUsersList();
+        } else if (this.mode === 'specific') {
+            body.usersList = this.buildSpecificUsersList();
+        } else {
+            body.usersList = [];
         }
 
-        const parts =
-            this.ownerName
-                .trim()
-                .split(/\s+/);
+        return body;
+    }
+    private buildAllUsersList(): ShareWithUser[] {
+        return this.tenantUsers
+            .filter(user => !user.isOwner)
+            .map(user => {
+                const item = new ShareWithUser();
 
-        if (parts.length === 1) {
-            return parts[0]
-                .substring(0, 2)
-                .toUpperCase();
-        }
+                item.userId = user.userId;
+                item.canEdit =
+                    this.allUsersAccess === 'Edit';
 
-        return (
-            parts[0].charAt(0) +
-            parts[parts.length - 1].charAt(0)
-        ).toUpperCase();
+                return item;
+            });
     }
 
-    getUserInitials(name: string): string {
+
+
+    private getSharingLevel():
+        number {
+
+        switch (
+        this.mode
+        ) {
+
+            case 'all':
+                return 1;
+
+            case 'specific':
+                return 2;
+
+            case 'private':
+            default:
+                return 0;
+        }
+    }
+
+
+    private buildSpecificUsersList(): ShareWithUser[] {
+        return this.tenantUsers
+            .filter(
+                user =>
+                    !user.isOwner &&
+                    (user.canView || user.canEdit)
+            )
+            .map(user => {
+                const item = new ShareWithUser();
+
+                item.userId = user.userId;
+                item.canEdit = !!user.canEdit;
+
+                return item;
+            });
+    }
+
+
+
+    closeDialog(): void {
+        this.tenantUsers =
+            this.cloneUsers(
+                this.originalTenantUsers
+            );
+
+
+        this.refreshSharedUsers();
+
+
+        this.selectedSearchUser = null;
+        this.visible = false;
+
+
+        this.visibleChange.emit(
+            false
+        );
+    }
+
+    private closeAfterSave(): void {
+        this.visible = false;
+        this.visibleChange.emit(false);
+    }
+
+
+
+    getUserInitials(
+        name: string
+    ): string {
 
         if (!name) {
             return '';
         }
+
 
         const parts =
             name
                 .trim()
                 .split(/\s+/);
 
-        if (parts.length === 1) {
+
+        if (
+            parts.length === 1
+        ) {
+
             return parts[0]
-                .substring(0, 2)
+                .substring(
+                    0,
+                    2
+                )
                 .toUpperCase();
         }
 
+
         return (
             parts[0].charAt(0) +
-            parts[parts.length - 1].charAt(0)
+            parts[
+                parts.length - 1
+            ].charAt(0)
         ).toUpperCase();
     }
-
-    get shareStatusText(): string {
-
-    if (this.mode === 'private') {
-        return this.l('Private');
-    }
-
-    if (this.mode === 'all') {
-        return this.l('SharedWithEveryone');
-    }
-
-    if (this.mode === 'specific') {
-
-        const count = this.users?.length ?? 0;
-
-        return count === 1
-            ? `Shared with 1 user`
-            : `Shared with ${count} users`;
-    }
-
-    return '';
-}
 }
