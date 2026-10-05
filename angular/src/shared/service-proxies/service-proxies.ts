@@ -81152,6 +81152,7 @@ export class AppFieldListDto implements IAppFieldListDto {
     sycObjectId!: number;
     entitySycObjectId!: number | undefined;
     creatorUserId!: number | undefined;
+    creatorUserName!: string | undefined;
     creationTime!: moment.Moment;
     tables!: string[] | undefined;
 
@@ -81193,6 +81194,7 @@ export class AppFieldListDto implements IAppFieldListDto {
             this.sycObjectId = _data["sycObjectId"];
             this.entitySycObjectId = _data["entitySycObjectId"];
             this.creatorUserId = _data["creatorUserId"];
+            this.creatorUserName = _data["creatorUserName"];
             this.creationTime = _data["creationTime"] ? moment(_data["creationTime"].toString()) : <any>undefined;
             if (Array.isArray(_data["tables"])) {
                 this.tables = [] as any;
@@ -81236,6 +81238,7 @@ export class AppFieldListDto implements IAppFieldListDto {
         data["sycObjectId"] = this.sycObjectId;
         data["entitySycObjectId"] = this.entitySycObjectId;
         data["creatorUserId"] = this.creatorUserId;
+        data["creatorUserName"] = this.creatorUserName;
         data["creationTime"] = this.creationTime ? this.creationTime.toISOString() : <any>undefined;
         if (Array.isArray(this.tables)) {
             data["tables"] = [];
@@ -81268,6 +81271,7 @@ export interface IAppFieldListDto {
     sycObjectId: number;
     entitySycObjectId: number | undefined;
     creatorUserId: number | undefined;
+    creatorUserName: string | undefined;
     creationTime: moment.Moment;
     tables: string[] | undefined;
 

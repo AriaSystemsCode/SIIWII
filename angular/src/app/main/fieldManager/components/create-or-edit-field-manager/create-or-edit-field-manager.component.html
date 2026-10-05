@@ -22,7 +22,7 @@
                     </ul>
 
                     <span class="font-weight-bold" style="color: #4a0d4a;">
-                        Current revision : {{ isEdit ? (item.revisionSequence || '00') : '00' }}
+                        Current revision : {{ isEdit ? (item.currentRevisionNo || '00') : '00' }}
                     </span>
                 </div>
                 <div class="tab-content">
@@ -33,17 +33,17 @@
                         <div class="form-group">
                             <label for="fieldCode">{{ 'FieldCode' | localize }}<b>*</b></label>
                             <input *ngIf="!isEdit" id="generatedFieldCode" name="generatedCode" type="text"
-                                class="form-control mt-2" [ngModel]="item.code" readonly
+                                class="form-control mt-2" [ngModel]="item.fieldCode" readonly
                                 style="cursor: not-allowed; background-color: #e9ecef !important;" required />
                             <input id="fieldCode" name="code" type="text" class="form-control"
-                                *ngIf="isEdit" [(ngModel)]="item.code" [readonly]="true"
+                                *ngIf="isEdit" [(ngModel)]="item.fieldCode" [readonly]="true"
                                 [style.cursor]="'not-allowed'"
                                 [style.background-color]="'#e9ecef !important'" required />
                         </div>
                         <div class="form-group">
                             <label for="fieldName">{{ 'FieldName' | localize }}<b>*</b></label>
                             <input id="fieldName" name="name" type="text" class="form-control"
-                                [ngModel]="item.name" (ngModelChange)="item.name = $event; generateCode()" [readonly]="isEdit"
+                                [ngModel]="item.fieldName" (ngModelChange)="item.fieldName = $event; generateCode()" [readonly]="isEdit"
                                 [style.cursor]="isEdit ? 'not-allowed' : 'auto'"
                                 [style.background-color]="isEdit ? '#e9ecef !important' : null" required />
                         </div>
@@ -56,10 +56,10 @@
                     <div class="field-form-grid">
                         <div class="form-group">
                             <label for="fieldType">{{ 'FieldType' | localize }}<b>*</b></label>
-                            <select id="fieldType" name="type" class="form-control" [ngModel]="item.type" (ngModelChange)="onFieldTypeChanged($event)" #fieldType="ngModel" [disabled]="isEdit"
+                            <select id="fieldType" name="fieldTypeId" class="form-control" [ngModel]="item.fieldTypeId" (ngModelChange)="onFieldTypeChanged($event)" #fieldType="ngModel" [disabled]="isEdit"
                                 [style.cursor]="isEdit ? 'not-allowed' : 'auto'"
                                 [style.background-color]="isEdit ? '#e9ecef  !important' : null" required>
-                                <option *ngFor="let type of fieldTypes" [value]="type.name.replace('--', ' - ')">{{ type.name.replace('--', ' - ') }}</option>
+                                <option *ngFor="let type of fieldTypes" [ngValue]="type.id || 0">{{ (type.name || '').replace('--', ' - ') }}</option>
                             </select>
                         </div>
                         <div class="form-group" *ngIf="availableWidgets.length">
@@ -72,21 +72,21 @@
                         <div class="form-group">
                             <label for="fieldLevel">{{ 'FieldLevel' | localize }}<b>*</b></label>
                             <select id="fieldLevel" name="fieldLevel" class="form-control"
-                                [ngModel]="isHost ? item.fieldLevel : (isEdit && item.fieldLevel !== 'Tenant' ? item.fieldLevel : 'Tenant')"
-                                (ngModelChange)="item.fieldLevel = $event; generateCode()" [disabled]="isEdit"
+                                [ngModel]="isHost ? item.fieldLevelCode : (isEdit && item.fieldLevelCode !== 'Tenant' ? item.fieldLevelCode : 'Tenant')"
+                                (ngModelChange)="item.fieldLevelCode = $event; generateCode()" [disabled]="isEdit"
                                 [style.cursor]="isEdit ? 'not-allowed' : 'auto'"
                                 [style.background-color]="isEdit ? '#e9ecef  !important' : null">
                                 <option *ngIf="isHost" value="System">{{ 'System' | localize }}</option>
                                 <option *ngIf="isHost" value="Application">{{ 'Application' | localize }}</option>
-                                <option *ngIf="!isHost && isEdit && item.fieldLevel !== 'Tenant'"
-                                    [value]="item.fieldLevel" hidden>{{ item.fieldLevel | localize }}</option>
+                                <option *ngIf="!isHost && isEdit && item.fieldLevelCode !== 'Tenant'"
+                                    [value]="item.fieldLevelCode" hidden>{{ item.fieldLevelCode | localize }}</option>
                                 <option *ngIf="!isHost" value="Tenant">{{ 'Tenant' | localize }}</option>
                             </select>
                         </div>
                     </div>
                     <div class="form-group">
                         <label for="fieldStatus">{{ 'Status' | localize }}<b>*</b></label>
-                        <select id="fieldStatus" name="status" class="form-control" [(ngModel)]="item.status">
+                        <select id="fieldStatus" name="fieldStatusCode" class="form-control" [(ngModel)]="item.fieldStatusCode">
                             <option value="Proposed">{{ 'Proposed' | localize }}</option>
                             <option value="Active">{{ 'Active' | localize }}</option>
                             <option value="Discontinued">{{ 'Discontinued' | localize }}</option>
@@ -95,21 +95,21 @@
                     <div class="form-group">
                         <label for="trackingNumber">{{ 'TrackingNumber' | localize }} #</label>
                         <input id="trackingNumber" name="trackingNumber" type="text" class="form-control"
-                            [(ngModel)]="item.trackingNumber" [placeholder]="'EnterTrackingNumber' | localize" />
+                            [(ngModel)]="item.trackingNo" [placeholder]="'EnterTrackingNumber' | localize" />
                     </div>
                     <div class="form-group field-extra-data-choice">
                         <label class="field-extra-data-checkbox" for="extraData">
-                            <input id="extraData" name="extraData" type="checkbox" [(ngModel)]="item.extraData" />
+                            <input id="extraData" name="isExtraField" type="checkbox" [(ngModel)]="item.isExtraField" />
                             <span>Extra Data Field</span>
                         </label>
                         <small>Leave unchecked to create a standard field.</small>
                     </div>
 
                     <!-- //i51-AdvancedInformation from BE -->
-                    <ng-container *ngIf="item.type">
+                    <ng-container *ngIf="selectedFieldTypeName">
                         <section class="field-form-section">
                             <h4 class="field-section-title">{{ 'AdvancedInformation' | localize }}</h4>
-                            <ng-container *ngIf="item.type === 'String - Textbox' || item.type === 'Integer - Numeric input' || item.type === 'Integer - Currency' || item.type === 'Date - Date picker' || item.type === 'List - Dropdown'">
+                            <ng-container *ngIf="selectedFieldTypeName === 'String - Textbox' || selectedFieldTypeName === 'Integer - Numeric input' || selectedFieldTypeName === 'Integer - Currency' || selectedFieldTypeName === 'Date - Date picker' || selectedFieldTypeName === 'List - Dropdown'">
                                 <div class="field-form-grid">
                             <div class="form-group">
                                 <label for="allowNull">{{ 'AllowNull' | localize }}</label>
@@ -118,17 +118,17 @@
                                     <option [ngValue]="false">{{ 'No' | localize }}</option>
                                 </select>
                             </div>
-                            <div class="form-group" *ngIf="item.type === 'String - Textbox'">
+                            <div class="form-group" *ngIf="selectedFieldTypeName === 'String - Textbox'">
                                 <label for="fieldLength">{{ 'Length' | localize }}</label>
                                 <input id="fieldLength" name="length" type="number" class="form-control"
                                     [(ngModel)]="item.length" min="0" />
                             </div>
-                            <div class="form-group" *ngIf="item.type === 'Integer - Numeric input' || item.type === 'Integer - Currency'">
+                            <div class="form-group" *ngIf="selectedFieldTypeName === 'Integer - Numeric input' || selectedFieldTypeName === 'Integer - Currency'">
                                 <label for="decimals">{{ 'Decimals' | localize }}</label>
                                 <input id="decimals" name="decimals" type="number" class="form-control"
                                     [(ngModel)]="item.decimals" min="0" />
                             </div>
-                            <div class="form-group" *ngIf="item.type === 'Date - Date picker'">
+                            <div class="form-group" *ngIf="selectedFieldTypeName === 'Date - Date picker'">
                                 <label for="dateFormat">{{ 'DateFormat' | localize }}</label>
                                 <select id="dateFormat" name="dateFormat" class="form-control" [(ngModel)]="item.dateFormat">
                                     <option value="mm/dd/yyyy">mm/dd/yyyy</option>
@@ -136,11 +136,11 @@
                                     <option value="yyyy/mm/dd">yyyy/mm/dd</option>
                                 </select>
                             </div>
-                            <div class="form-group" *ngIf="item.type === 'Date - Date picker'">
+                            <div class="form-group" *ngIf="selectedFieldTypeName === 'Date - Date picker'">
                                 <label for="timeFormat">Time Format</label>
                                 <input id="timeFormat" name="timeFormat" type="text" class="form-control" [(ngModel)]="item.timeFormat" />
                             </div>
-                            <div class="form-group" *ngIf="item.type === 'List - Dropdown'">
+                            <div class="form-group" *ngIf="selectedFieldTypeName === 'List - Dropdown'">
                                 <label for="allowMultiSelect">{{ 'AllowMultiSelect' | localize }}</label>
                                 <select id="allowMultiSelect" name="allowMultiSelect" class="form-control" [(ngModel)]="item.allowMultiSelect">
                                     <option [ngValue]="true">{{ 'Yes' | localize }}</option>
@@ -149,39 +149,39 @@
                             </div>
                                 </div>
                             </ng-container>
-                        <div class="form-group" *ngIf="item.type !== 'Boolean - Checkbox'">
+                        <div class="form-group" *ngIf="selectedFieldTypeName !== 'Boolean - Checkbox'">
                             <label for="defaultValue">{{ 'DefaultValue' | localize }}</label>
                             <input id="defaultValue" name="defaultValue" type="text" class="form-control"
                                 [(ngModel)]="item.defaultValue" />
                         </div>
-                        <div class="form-group" *ngIf="item.type === 'Boolean - Checkbox'">
+                        <div class="form-group" *ngIf="selectedFieldTypeName === 'Boolean - Checkbox'">
                             <label for="booleanDefaultValue">{{ 'DefaultValue' | localize }}</label>
                             <select id="booleanDefaultValue" name="booleanDefaultValue" class="form-control" [(ngModel)]="item.defaultValue">
                                 <option value="true">{{ 'True' | localize }}</option>
                                 <option value="false">{{ 'False' | localize }}</option>
                             </select>
                         </div>
-                        <div class="form-group" *ngIf="item.type !== 'List - Dropdown'">
+                        <div class="form-group" *ngIf="selectedFieldTypeName !== 'List - Dropdown'">
                             <label for="fieldRequired">{{ 'Required' | localize }}</label>
                             <select id="fieldRequired" name="required" class="form-control" [(ngModel)]="item.required">
                                 <option [ngValue]="true">{{ 'Yes' | localize }}</option>
                                 <option [ngValue]="false">{{ 'No' | localize }}</option>
                             </select>
                         </div>
-                        <div class="form-group" *ngIf="item.type === 'List - Dropdown'">
+                        <div class="form-group" *ngIf="selectedFieldTypeName === 'List - Dropdown'">
                             <label for="listRequired">{{ 'Required' | localize }}</label>
                             <select id="listRequired" name="listRequired" class="form-control" [(ngModel)]="item.required">
                                 <option [ngValue]="true">{{ 'Yes' | localize }}</option>
                                 <option [ngValue]="false">{{ 'No' | localize }}</option>
                             </select>
                         </div>
-                        <div class="dropdown-options-header" *ngIf="item.type === 'List - Dropdown'">
+                        <div class="dropdown-options-header" *ngIf="selectedFieldTypeName === 'List - Dropdown'">
                             <label>{{ 'DropdownOptions' | localize }}</label>
                             <button type="button" class="btn btn-outline-primary btn-sm " (click)="addOption()">
                                 <i class="fa fa-plus"></i> {{ 'AddOption' | localize }}
                             </button>
                         </div>
-                        <ng-container *ngIf="item.type === 'List - Dropdown'">
+                        <ng-container *ngIf="selectedFieldTypeName === 'List - Dropdown'">
                             <div class="dropdown-option-row" *ngFor="let option of dropdownOptions; let i = index">
                                 <input type="text" class="form-control" [name]="'dropdownOptionName' + i"
                                     [placeholder]="'Option' | localize" [(ngModel)]="option.option" />
