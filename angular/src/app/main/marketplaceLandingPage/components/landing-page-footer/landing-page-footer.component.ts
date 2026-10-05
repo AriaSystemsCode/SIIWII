@@ -109,7 +109,7 @@ export class landingPageFooterComponent extends AppComponentBase implements OnIn
 
     this._appEntitiesServiceProxy.getHostSettingValue(1208, null)
       .subscribe((result) => {
-       this.bgCol = result
+       this.bgCol = result 
 
       });
     this._appEntitiesServiceProxy.getHostSettingValue(1205, null)

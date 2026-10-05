@@ -77,6 +77,14 @@ import { DashboardComponent } from "./dashboard/dashboard.component";
                         data: { preload: true },
                     },
                     {
+                        path: "fieldManager",
+                        loadChildren: () =>
+                            import("./fieldManager/field-manager.module").then(
+                                (m) => m.FieldManagerModule
+                            ),
+                        data: { preload: true },
+                    },
+                    {
                         path: "Messages",
                         loadChildren: () =>
                             import("./Messages/messages.module").then(

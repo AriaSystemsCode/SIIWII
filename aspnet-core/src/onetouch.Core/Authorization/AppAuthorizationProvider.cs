@@ -156,6 +156,14 @@ namespace onetouch.Authorization
 
             var administration = pages.CreateChildPermission(AppPermissions.Pages_Administration, L("Administration"));
 
+            var fieldManager = administration.CreateChildPermission(AppPermissions.Pages_Administration_FieldManager, L("FieldManager"));
+            fieldManager.CreateChildPermission(AppPermissions.Pages_Administration_FieldManager_Create, L("CreateNewField"));
+            fieldManager.CreateChildPermission(AppPermissions.Pages_Administration_FieldManager_Edit, L("EditField"));
+            fieldManager.CreateChildPermission(AppPermissions.Pages_Administration_FieldManager_Delete, L("DeleteField"));
+            fieldManager.CreateChildPermission(AppPermissions.Pages_Administration_FieldManager_Duplicate, L("DuplicateField"));
+            fieldManager.CreateChildPermission(AppPermissions.Pages_Administration_FieldManager_RestoreRevision, L("RestoreFieldRevision"));
+            fieldManager.CreateChildPermission(AppPermissions.Pages_Administration_FieldManager_AddExistingField, L("AddExistingField"));
+
             var validationRules = administration.CreateChildPermission(AppPermissions.Pages_Administration_ValidationRules, L("ValidationRules"), multiTenancySides: MultiTenancySides.Host);
             validationRules.CreateChildPermission(AppPermissions.Pages_Administration_ValidationRules_Create, L("CreateNewValidationRule"), multiTenancySides: MultiTenancySides.Host);
             validationRules.CreateChildPermission(AppPermissions.Pages_Administration_ValidationRules_Edit, L("EditValidationRule"), multiTenancySides: MultiTenancySides.Host);

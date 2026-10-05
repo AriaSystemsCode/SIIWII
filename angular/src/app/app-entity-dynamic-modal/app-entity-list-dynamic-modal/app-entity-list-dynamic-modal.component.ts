@@ -34,6 +34,8 @@ export class AppEntityListDynamicModalComponent extends AppComponentBase impleme
     searchQuery:string
     searchSubj:Subject<string>=new Subject<string>()
     nonLookupValues:LookupLabelDto[];
+    currentLang: string
+    isArabic: boolean
     constructor(
         injector: Injector,
         public currentModalRef: BsModalRef,
@@ -43,6 +45,8 @@ export class AppEntityListDynamicModalComponent extends AppComponentBase impleme
     }
 
     ngOnInit(): void {
+        this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
+        this.currentLang == 'ar' || this.currentLang == 'ar-EG'  ? this.isArabic = true : this.isArabic = false
         this.getAllEntityValuesList()
         this.searchSubj
         .pipe(
@@ -169,7 +173,11 @@ export class AppEntityListDynamicModalComponent extends AppComponentBase impleme
     }
 
     close(){
-        this.currentModalRef.setClass('right-modal slide-right-out')
+        this.currentModalRef.setClass(
+            this.isArabic
+                ? 'left-modal slide-left-out ngLeft'
+                : 'right-modal slide-right-out'
+        )
         this.selectionDone = false
         this.currentModalRef.hide()
     }

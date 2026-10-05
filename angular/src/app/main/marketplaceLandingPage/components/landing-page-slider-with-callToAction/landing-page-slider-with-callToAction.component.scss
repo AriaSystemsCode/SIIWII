@@ -58,3 +58,29 @@
 .section-error {
   color: #d9534f;
 }
+
+.slide-item {
+    width: 100%;
+    max-width: 100%;
+    overflow: hidden;
+    box-sizing: border-box;
+    padding-top: 0.5rem;
+}
+
+.slide-content {
+    width: 100%;
+    max-width: 100%;
+    overflow: hidden;
+}
+
+.slide-image {
+    width: 100%;
+    max-width: 100%;
+    overflow: hidden;
+}
+
+.slide-image app-image-display {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+}

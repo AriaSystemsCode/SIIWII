@@ -7,6 +7,7 @@ using Abp.Domain.Entities;
 using Abp.Auditing;
 using System.Collections.Generic;
 using onetouch.AppEventGuests;
+using Abp.Timing;
 
 namespace onetouch.AppEvents
 {
@@ -19,13 +20,19 @@ namespace onetouch.AppEvents
         public virtual bool IsOnLine { get; set; }
         public virtual bool IsPublished { get; set; }
 
+        [DisableDateTimeNormalization]
         public virtual DateTime FromDate { get; set; }
+        [DisableDateTimeNormalization]
         public virtual DateTime UTCFromDateTime { get; set; }
+        [DisableDateTimeNormalization]
         public virtual DateTime UTCToDateTime { get; set; }
+        [DisableDateTimeNormalization]
         public virtual DateTime ToDate { get; set; }
 
+        [DisableDateTimeNormalization]
         public virtual DateTime FromTime { get; set; }
 
+        [DisableDateTimeNormalization]
         public virtual DateTime ToTime { get; set; }
 
         public virtual bool Privacy { get; set; }

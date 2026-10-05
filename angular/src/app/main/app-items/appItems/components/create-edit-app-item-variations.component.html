@@ -189,7 +189,7 @@
                                                                 {{ "Price" | localize }}
                                                             </div>
                                                             <div class="d-flex justify-content-between align-items-baseline">
-                                                                <div class="col-9">
+                                                                <div class="col-6">
                                                                 <p-dropdown
                                                                     [options]="currencies"
                                                                     [styleClass]="'w-100 aria-select-primeng'"
@@ -201,7 +201,8 @@
                                                                     (ngModelChange)="checkAndAddDefaultPriceObjects()"
                                                                 >
                                                                 </p-dropdown>
-                                                            </div>
+                                                                </div>
+                                                                <div class="col-6">
                                                                 <p-dropdown
                                                                     [options]="levels"
                                                                     [styleClass]="'w-100 aria-select-primeng'"
@@ -213,6 +214,7 @@
                                                                     (ngModelChange)="checkAndAddDefaultPriceObjects()"
                                                                 >
                                                                 </p-dropdown>
+                                                                </div>
                                                             </div>
                                                         </div>
                                                     </th>

@@ -1,5 +1,5 @@
  <!-- <hr *ngIf="!parentId" [ngClass]="{'visibility-hidden': !usersReactionsStats?.reactionsCount && !usersReactionsStats?.commentsCount}"> -->
- <div *ngIf="!parentId && !fromOverview" class="d-flex justify-content-between mt-4" [ngClass]="{'visibility-hidden' : !usersReactionsStats?.reactionsCount && !usersReactionsStats?.commentsCount }">
+<div *ngIf="!parentId && !fromOverview" class="d-flex justify-content-between" [ngClass]="{'visibility-hidden' : !usersReactionsStats?.reactionsCount && !usersReactionsStats?.commentsCount }">
     <app-reactions-stats
         [entityId]="entityId"
         [usersReactionsStats]="usersReactionsStats"
@@ -103,7 +103,10 @@
     [commentType]="commentType"
     [fromOverview]="true"
 
-    [toName]="comment?.messages?.toName"
+[toUser]="{
+  name: comment?.messages?.senderName,
+  value: comment?.messages?.senderId?.toString()
+}"
  
 
 >

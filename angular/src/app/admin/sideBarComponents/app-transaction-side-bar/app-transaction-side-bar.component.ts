@@ -1,4 +1,6 @@
-import { Component, EventEmitter, Injector, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Injector, Input, OnInit, Output, ViewChild } from '@angular/core';
+import { TransactionInformationComponent } from '@app/main/transactions/app-TransactionTabsInfo/Components/transaction-information-component/transaction-information.component';
+import { TransactionCartMode } from '@app/main/transactions/enums/TransactionCartMode';
 import { AppComponentBase } from '@shared/common/app-component-base';
 import { AppEntitiesServiceProxy, AppTransactionServiceProxy, CurrencyInfoDto, GetOrderDetailsForViewDto } from '@shared/service-proxies/service-proxies';
 
@@ -6,7 +8,7 @@ import { AppEntitiesServiceProxy, AppTransactionServiceProxy, CurrencyInfoDto, G
 @Component({
   selector: 'app-transaction-side-bar',
   templateUrl: './app-transaction-side-bar.component.html',
-  styleUrls: ['./app-transaction-side-bar.component.scss']
+  styleUrls: ['./app-transaction-side-bar.component.scss'],
 })
 export class AppTransactionSideBarComponent
   extends AppComponentBase implements OnInit {
@@ -16,6 +18,7 @@ export class AppTransactionSideBarComponent
 
   @Output("hideSideBar") hideSideBar: EventEmitter<boolean> = new EventEmitter<boolean>();
   
+  @ViewChild("shoppingCartModal", { static: true }) shoppingCartModal: TransactionInformationComponent;
   currencySymbol: string = "";
 
 
@@ -51,8 +54,18 @@ export class AppTransactionSideBarComponent
     this.hideSideBar.emit(true);
   }
 
+   openTransaction() {
+           
+        this.shoppingCartModal.show(this.id, true, true, TransactionCartMode.view);
+  
+
+      }
+  
+
+          onHideShoppingCartModal($event) {
+     
+    }
 
 }
 
-
-export class defultSideBar extends AppTransactionSideBarComponent{}
+export const defultSideBar = AppTransactionSideBarComponent;

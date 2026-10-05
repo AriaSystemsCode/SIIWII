@@ -43,6 +43,8 @@ loginTenaneSsin:string
   ngOnInit(): void {
    this.getLoginAccountDataForView()
     localStorage.removeItem("productFilters");
+    localStorage.removeItem("marketplaceAccountsBrowseState");
+    
     this.addLocal()
     this.pages = this.chunk(this.items, 9); // each page has 9 products
     this.loadSections()

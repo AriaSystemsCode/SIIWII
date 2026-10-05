@@ -87,12 +87,16 @@ using System.Diagnostics;
 using DocumentFormat.OpenXml.Office2010.ExcelAc;
 using onetouch.MultiTenancy;
 using Org.BouncyCastle.Crypto.Agreement.JPake;
+using onetouch.Authorization.Roles;
+using onetouch.Authorization.Users;
 
 namespace onetouch.AppItems
 {
     [AbpAuthorize(AppPermissions.Pages_AppItems)]
     public partial class AppItemsAppService : onetouchAppServiceBase, IAppItemsAppService, IAppItemsAppImportService, IExcelImporter<AppItemExcelResultsDTO>
     {
+        private readonly UserManager _userManager;
+        private readonly RoleManager _roleManager;
         //i46[Start]
         public static IUnitOfWorkManager _unitOfWorkManagerValid;
         //I46[End]
@@ -144,6 +148,8 @@ namespace onetouch.AppItems
         private static readonly object ImportEntityHistoryIgnoredTypesLock = new object();
         private static readonly HashSet<Type> ImportEntityHistoryTypesAddedByScope = new HashSet<Type>();
         private static int ImportEntityHistorySuppressionCount;
+        //private readonly RoleManager _roleManager;
+        //private readonly UserManager _userManager;
         public AppItemsAppService(
             IRepository<AppItem, long> appItemRepository,
             IAppItemsExcelExporter appItemsExcelExporter, AppEntitiesAppService appEntitiesAppService, Helper helper, IRepository<AppEntity, long> appEntityRepository, SycEntityObjectTypesAppService sycEntityObjectTypesAppService
@@ -173,9 +179,13 @@ namespace onetouch.AppItems
              IRepository<AppEntitiesRelationship, long> appEntitiesRelationship,
              IBackgroundJobManager backgroundJobManager,
              IAbpStartupConfiguration abpStartupConfiguration,
-             IRepository<AppContact, long> appContactRepository
+             IRepository<AppContact, long> appContactRepository,
+             RoleManager roleManager,
+             UserManager userManager
             )
         {
+            _roleManager = roleManager;
+            _userManager = userManager;
             _backgroundJobManager = backgroundJobManager;
             _abpStartupConfiguration = abpStartupConfiguration;
             _appEntitiesRelationship = appEntitiesRelationship;
@@ -1467,10 +1477,10 @@ namespace onetouch.AppItems
                 exceptList = query0.Select(e => e.Id).ToList();
             }
             var query = _appItemRepository.GetAll().Include(e => e.EntityFk).ThenInclude(e => e.EntityAttachments)
-                .Where(e => (e.EntityId != input.EntityId) && !exceptList.Contains(e.EntityId) && (e.ParentId == 0 || e.ParentId == null) && (e.IsDeleted == null || e.IsDeleted==false))
-                .WhereIf( !string.IsNullOrEmpty(input.Filter), e=> e.Name.Contains(input.Filter) || e.Code.Contains(input.Filter))
+                .Where(e => (e.EntityId != input.EntityId) && !exceptList.Contains(e.EntityId) && (e.ParentId == 0 || e.ParentId == null) && (e.IsDeleted == null || e.IsDeleted == false))
+                .WhereIf(!string.IsNullOrEmpty(input.Filter), e => e.Name.Contains(input.Filter) || e.Code.Contains(input.Filter))
                 .Include(e => e.EntityFk.EntityAttachments).ThenInclude(e => e.AttachmentFk);
-                    
+
             var totalCount = await query.CountAsync();
 
             var entityRelated = await query
@@ -1482,12 +1492,17 @@ namespace onetouch.AppItems
                     label = e.Code,
                     Data = new GetSycEntityObjectCategoryForViewDto
                     {
-                        SycEntityObjectCategoryName="",
-                        SydObjectName="ITEM",
-                            
-                        SycEntityObjectCategory = new SycEntityObjectCategoryDto { Code = e.Code, Name = e.Name, ObjectId = e.EntityId, Id = e.EntityId,
-                        AppItemImageUrl = (e.EntityFk.EntityAttachments != null && e.EntityFk.EntityAttachments.Count() > 0) ? imagesUrl + (e.TenantId.HasValue ? e.TenantId.ToString() : "-1") + @"/" + e.EntityFk.EntityAttachments[0].AttachmentFk.Attachment : "",
-                        AppItemImageName = (e.EntityFk.EntityAttachments != null && e.EntityFk.EntityAttachments.Count() > 0) ? e.EntityFk.EntityAttachments[0].AttachmentFk.Name : ""
+                        SycEntityObjectCategoryName = "",
+                        SydObjectName = "ITEM",
+
+                        SycEntityObjectCategory = new SycEntityObjectCategoryDto
+                        {
+                            Code = e.Code,
+                            Name = e.Name,
+                            ObjectId = e.EntityId,
+                            Id = e.EntityId,
+                            AppItemImageUrl = (e.EntityFk.EntityAttachments != null && e.EntityFk.EntityAttachments.Count() > 0) ? imagesUrl + (e.TenantId.HasValue ? e.TenantId.ToString() : "-1") + @"/" + e.EntityFk.EntityAttachments[0].AttachmentFk.Attachment : "",
+                            AppItemImageName = (e.EntityFk.EntityAttachments != null && e.EntityFk.EntityAttachments.Count() > 0) ? e.EntityFk.EntityAttachments[0].AttachmentFk.Name : ""
 
                         }
                     },
@@ -1498,18 +1513,18 @@ namespace onetouch.AppItems
                 totalCount,
                 entityRelated
             );
-            
+
 
         }
 
         public async Task<PagedResultDto<AppItemLookupDto>> GetAppItemRelatedProductsWithPaging(GetAllSycEntityObjectCategoriesInput input)
-        {   
+        {
 
             if (input.EntityId != 0)
             {
                 string imagesUrl = _appConfiguration[$"Attachment:Path"].Replace(_appConfiguration[$"Attachment:Omitt"], "") + @"/";
-               
-                
+
+
                 var query = _appEntitiesRelationship.GetAll()
                     .Where(e => (e.EntityId == input.EntityId || e.RelatedEntityId == input.EntityId)
                     )
@@ -1527,13 +1542,14 @@ namespace onetouch.AppItems
 
                 var totalCount = await query.CountAsync();
 
-                var sel = from entity in query join item in _appItemRepository.GetAll()
+                var sel = from entity in query
+                          join item in _appItemRepository.GetAll()
                           on entity.Id equals item.EntityId into j1
                           from j2 in j1.DefaultIfEmpty()
-                          select new 
+                          select new
                           {
                               Id = entity.Id,
-                              Code= j2.Code,
+                              Code = j2.Code,
                               Name = j2.Name,
                               EntityFk = entity.EntityFk,
                               TenantId = entity.TenantId,
@@ -1541,15 +1557,16 @@ namespace onetouch.AppItems
                           };
 
                 var entityRelated = await sel
-                    .OrderBy(!string.IsNullOrEmpty(input.Sorting)? input.Sorting: "Id asc")
+                    .OrderBy(!string.IsNullOrEmpty(input.Sorting) ? input.Sorting : "Id asc")
                     .PageBy(input)
                     .Select(e => new AppItemLookupDto
-                    {           AppItemCode = e.Code,
-                                AppItemName = e.Name,
-                                AppItemId = e.Id,
-                                Id = e.Id,
-                                AppItemImageUrl = (e.EntityAttachments != null && e.EntityAttachments.Count() > 0)? imagesUrl + (e.TenantId.HasValue ? e.TenantId.ToString() : "-1") + @"/" + e.EntityAttachments[0].AttachmentFk.Attachment:"",
-                                AppItemImageName = (e.EntityAttachments!= null  && e.EntityAttachments.Count() > 0) ? e.EntityAttachments[0].AttachmentFk.Name: ""
+                    {
+                        AppItemCode = e.Code,
+                        AppItemName = e.Name,
+                        AppItemId = e.Id,
+                        Id = e.Id,
+                        AppItemImageUrl = (e.EntityAttachments != null && e.EntityAttachments.Count() > 0) ? imagesUrl + (e.TenantId.HasValue ? e.TenantId.ToString() : "-1") + @"/" + e.EntityAttachments[0].AttachmentFk.Attachment : "",
+                        AppItemImageName = (e.EntityAttachments != null && e.EntityAttachments.Count() > 0) ? e.EntityAttachments[0].AttachmentFk.Name : ""
 
                     })
                     .ToListAsync();
@@ -2120,8 +2137,8 @@ namespace onetouch.AppItems
             // Rebuild the related-items list after applying add/remove deltas.
             #region Iteration49 handle the related items
             if (input.Id == 0 || input.entityRelatedItems == null)
-            { input.entityRelatedItems = new List<AppEntityCategoryDto>() ; }
-            
+            { input.entityRelatedItems = new List<AppEntityCategoryDto>(); }
+
             if (input.entityRelatedItemsRemoved != null && input.entityRelatedItemsRemoved.Count > 0)
             {
                 List<long> tempIds = input.entityRelatedItemsRemoved.Select(r => r.EntityObjectCategoryId).ToList();
@@ -2132,7 +2149,7 @@ namespace onetouch.AppItems
             { ((List<AppEntityCategoryDto>)input.entityRelatedItems).AddRange(input.entityRelatedItemAdded); }
 
             entity.RelatedEntitiesIds = new List<long>();
-            entity.RelatedEntitiesIds = input.entityRelatedItems.Select(e=> e.EntityObjectCategoryId).ToList();
+            entity.RelatedEntitiesIds = input.entityRelatedItems.Select(e => e.EntityObjectCategoryId).ToList();
 
             #endregion Iteration49 handle the related items
             var savedEntity = await _appEntitiesAppService.SaveEntity(entity);
@@ -2340,9 +2357,9 @@ namespace onetouch.AppItems
                     else
                     {
                         existingVariationItemsById.TryGetValue((long)child.Id, out appItemChild);
-                        if (appItemChild == null) 
+                        if (appItemChild == null)
                             appItemChild = await _appItemRepository.FirstOrDefaultAsync((long)child.Id);
-                        
+
                         if (appItemChild != null)
                         {
                             var existingChildEntityId = appItemChild.EntityId;
@@ -2633,7 +2650,7 @@ namespace onetouch.AppItems
                             itemPriceObj.AppItemCode = appItemChild.Code;
                             if (appItemChild.Id != 0)
                                 itemPriceObj.AppItemId = appItemChild.Id;
-                                
+
                             if (itemPriceObj.TenantId == null)
                                 itemPriceObj.TenantId = AbpSession.TenantId;
                             if (itemPriceObj.CurrencyCode == currency)
@@ -3739,7 +3756,8 @@ namespace onetouch.AppItems
                                 {
                                     rela.RelatedEntityId = appMarketplaceItem.Id;
                                     rela.RelatedEntityCode = appMarketplaceItem.Code;
-                                }else
+                                }
+                                else
                                 {
                                     rela.RelatedEntityId = 0;
                                 }
@@ -5031,6 +5049,14 @@ namespace onetouch.AppItems
                     }
                     #endregion if parent failed then children are failed
 
+                    // Preserve the duplicate choice when an existing-code warning is
+                    // attached to an image/data row instead of the parent row.
+                    itemExcelResultsDTO.HasDuplication = itemExcelResultsDTO.HasDuplication ||
+                        itemExcelResultsDTO.ExcelRecords.Any(record =>
+                            (record.FieldsErrors?.Any(error =>
+                                error?.IndexOf("already exists", StringComparison.OrdinalIgnoreCase) >= 0) ?? false) ||
+                            record.ErrorMessage?.IndexOf("already exists", StringComparison.OrdinalIgnoreCase) >= 0);
+
                     itemExcelResultsDTO.TotalPassedRecords = itemExcelResultsDTO.ExcelRecords.Where(r => r.Status == ExcelRecordStatus.Passed.ToString() || r.Status == ExcelRecordStatus.Warning.ToString()).Count();
                     itemExcelResultsDTO.TotalFailedRecords = itemExcelResultsDTO.ExcelRecords.Where(r => r.Status == ExcelRecordStatus.Failed.ToString()).Count();
                     #endregion Excel validateion rules only.
@@ -5082,11 +5108,11 @@ namespace onetouch.AppItems
 
                     itemExcelResultsDTO.ExcelLogDTO = new ExcelLogDto();
 
-                itemExcelResultsDTO.ExcelLogDTO.ExcelLogPath = itemExcelResultsDTO.FilePath.Replace(_appConfiguration[$"Attachment:Omitt"].ToString(), "");
-                itemExcelResultsDTO.ExcelLogDTO.ExcelLogPath = itemExcelResultsDTO.ExcelLogDTO.ExcelLogPath.ToLower();
-                itemExcelResultsDTO.ExcelLogDTO.ExcelLogFileName = _appConfiguration[$"ItemTemplates:ItemExcelLogFileName"];
-                #endregion
-                ////I46 test
+                    itemExcelResultsDTO.ExcelLogDTO.ExcelLogPath = itemExcelResultsDTO.FilePath.Replace(_appConfiguration[$"Attachment:Omitt"].ToString(), "");
+                    itemExcelResultsDTO.ExcelLogDTO.ExcelLogPath = itemExcelResultsDTO.ExcelLogDTO.ExcelLogPath.ToLower();
+                    itemExcelResultsDTO.ExcelLogDTO.ExcelLogFileName = _appConfiguration[$"ItemTemplates:ItemExcelLogFileName"];
+                    #endregion
+                    ////I46 test
 
 
                 }
@@ -6106,7 +6132,19 @@ namespace onetouch.AppItems
                 await SaveFromExcel(saveExcelinput);
                 var myTenantObject = await TenantManager.GetByIdAsync(int.Parse(AbpSession.TenantId.ToString()));
                 string tenancyName = myTenantObject.TenancyName;
-                var adminUser = await UserManager.FindByNameAsync("admin@" + tenancyName);
+                //var adminUser = await UserManager.FindByNameAsync("admin@" + tenancyName);
+                var adminRole = await _roleManager.Roles
+.FirstOrDefaultAsync(r => r.TenantId == myTenantObject.Id && r.Name == StaticRoleNames.Tenants.Admin);
+                Authorization.Users.User adminUser = null;
+                if (adminRole != null)
+                {
+                    var adminRoleId = adminRole.Id;
+
+                    adminUser = await _userManager.Users
+                        .Where(u => u.TenantId == myTenantObject.Id)
+                        .Where(u => u.Roles.Any(r => r.RoleId == adminRoleId))
+                        .FirstOrDefaultAsync();
+                }
                 if (adminUser != null)
                 {
                     await _appNotifier.SendMessageAsync(new Abp.UserIdentifier(AbpSession.TenantId, adminUser.Id),
@@ -6129,7 +6167,19 @@ namespace onetouch.AppItems
                 {
                     var myTenantObject = await TenantManager.GetByIdAsync(int.Parse(AbpSession.TenantId.ToString()));
                     string tenancyName = myTenantObject.TenancyName;
-                    var adminUser = await UserManager.FindByNameAsync("admin@" + tenancyName);
+                    //var adminUser = await UserManager.FindByNameAsync("admin@" + tenancyName);
+                    var adminRole = await _roleManager.Roles
+.FirstOrDefaultAsync(r => r.TenantId == myTenantObject.Id && r.Name == StaticRoleNames.Tenants.Admin);
+                    Authorization.Users.User adminUser = null;
+                    if (adminRole != null)
+                    {
+                        var adminRoleId = adminRole.Id;
+
+                        adminUser = await _userManager.Users
+                            .Where(u => u.TenantId == myTenantObject.Id)
+                            .Where(u => u.Roles.Any(r => r.RoleId == adminRoleId))
+                            .FirstOrDefaultAsync();
+                    }
                     if (adminUser != null)
                     {
                         await _appNotifier.SendMessageAsync(new Abp.UserIdentifier(AbpSession.TenantId, adminUser.Id),
@@ -6512,125 +6562,207 @@ namespace onetouch.AppItems
         }
 
         //Marima
+        // Item import classification/category resolution:
+        // Match the description first, then fall back to the supplied code. If neither
+        // matches, use the description as name, or the code when the description is blank.
+        // Description-only rows use a generated code. Resolve distinct
+        // keys in batches and reuse IDs so code-only parent rows receive their links.
         public async Task AddClassifications(List<AppItemExcelDto> result)
         {
-            long ObjectId = await _helper.SystemTables.GetObjectItemId();
-            #region add classifications
-            var classificationDescriptions = result
-                .Where(x => !string.IsNullOrWhiteSpace(x.ProductClassificationDescription))
-                .Select(x => x.ProductClassificationDescription.Trim())
-                .Distinct(StringComparer.OrdinalIgnoreCase)
-                .ToList();
-
-            if (classificationDescriptions.Count == 0)
+            var rows = result.Where(row =>
+                !string.IsNullOrWhiteSpace(row.ProductClassificationDescription) ||
+                !string.IsNullOrWhiteSpace(row.ProductClassificationCode)).ToList();
+            if (rows.Count == 0)
                 return;
 
-            PagedResultDto<TreeNode<GetSycEntityObjectClassificationForViewDto>> classesIds =
-                await _sycEntityObjectClassificationsAppService.GetAllWithChildsForProductWithPaging(new GetAllSycEntityObjectClassificationsInput());
+            var objectId = await _helper.SystemTables.GetObjectItemId();
+            var byName = new Dictionary<string, (long Id, string Code)>(StringComparer.OrdinalIgnoreCase);
+            var byCode = new Dictionary<string, (long Id, string Code)>(StringComparer.OrdinalIgnoreCase);
 
-            var classificationsByName = classesIds.Items
-                .Select(r => r.Data?.SycEntityObjectClassification)
-                .Where(x => x != null && !string.IsNullOrEmpty(x.Name))
-                .GroupBy(x => x.Name.Trim(), StringComparer.OrdinalIgnoreCase)
-                .ToDictionary(x => x.Key, x => x.First(), StringComparer.OrdinalIgnoreCase);
-
-            var missingClassificationDescriptions = classificationDescriptions
-                .Where(x => !classificationsByName.ContainsKey(x))
-                .ToList();
-
-            foreach (var classificationDescription in missingClassificationDescriptions)
+            async Task LoadLookups(IEnumerable<string> keys)
             {
-                CreateOrEditSycEntityObjectClassificationDto createOrEditSycEntityObjectClassificationDto = new CreateOrEditSycEntityObjectClassificationDto();
-                string seq = await _iAppSycIdentifierDefinitionsService.GetNextEntityCode("CLASSIFICATION");
-                createOrEditSycEntityObjectClassificationDto.Code = seq;
-                createOrEditSycEntityObjectClassificationDto.Name = classificationDescription;
-                createOrEditSycEntityObjectClassificationDto.ObjectId = ((int)ObjectId);
-                await _sycEntityObjectClassificationsAppService.CreateOrEdit(createOrEditSycEntityObjectClassificationDto);
+                // Query only distinct imported names/codes, including children, without UI paging.
+                var normalizedKeys = keys.Where(key => !string.IsNullOrWhiteSpace(key))
+                    .Select(key => key.Trim().ToUpperInvariant()).Distinct().ToList();
+                const int batchSize = 500;
+                using (CurrentUnitOfWork.DisableFilter(AbpDataFilters.MayHaveTenant))
+                {
+                    for (var offset = 0; offset < normalizedKeys.Count; offset += batchSize)
+                    {
+                        var batch = normalizedKeys.Skip(offset).Take(batchSize).ToList();
+                        var matches = await _sycEntityObjectClassificationRepository.GetAll().AsNoTracking()
+                            .Where(x => x.ObjectId == objectId && (x.TenantId == AbpSession.TenantId || x.TenantId == null))
+                            .Where(x => (x.Name != null && batch.Contains(x.Name.Trim().ToUpper())) ||
+                                        (x.Code != null && batch.Contains(x.Code.Trim().ToUpper())))
+                            .OrderByDescending(x => x.TenantId == AbpSession.TenantId)
+                            .ThenBy(x => x.Id)
+                            .Select(x => new { x.Id, x.Code, x.Name })
+                            .ToListAsync();
+                        foreach (var match in matches)
+                        {
+                            if (!string.IsNullOrWhiteSpace(match.Name) && !byName.ContainsKey(match.Name.Trim()))
+                                byName.Add(match.Name.Trim(), (match.Id, match.Code));
+                            if (!string.IsNullOrWhiteSpace(match.Code) && !byCode.ContainsKey(match.Code.Trim()))
+                                byCode.Add(match.Code.Trim(), (match.Id, match.Code));
+                        }
+                    }
+                }
             }
 
-            if (missingClassificationDescriptions.Count > 0)
+            bool TryResolve(AppItemExcelDto row, out (long Id, string Code) lookup)
+            {
+                lookup = default;
+                return (!string.IsNullOrWhiteSpace(row.ProductClassificationDescription) &&
+                        byName.TryGetValue(row.ProductClassificationDescription.Trim(), out lookup)) ||
+                       (!string.IsNullOrWhiteSpace(row.ProductClassificationCode) &&
+                        byCode.TryGetValue(row.ProductClassificationCode.Trim(), out lookup));
+            }
+
+            await LoadLookups(rows.SelectMany(row => new[]
+                { row.ProductClassificationDescription, row.ProductClassificationCode }));
+
+            var pendingNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            var pendingCodes = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            foreach (var row in rows)
+            {
+                var description = row.ProductClassificationDescription?.Trim();
+                var code = row.ProductClassificationCode?.Trim();
+                if (TryResolve(row, out _) ||
+                    (!string.IsNullOrEmpty(description) && pendingNames.Contains(description)) ||
+                    (!string.IsNullOrEmpty(code) && pendingCodes.Contains(code)))
+                    continue;
+
+                // Preserve the supplied description as the new name; fall back to the code when
+                // no description was supplied. Description-only rows retain generated codes.
+                var name = string.IsNullOrEmpty(description) ? code : description;
+                if (string.IsNullOrEmpty(code))
+                    code = await _iAppSycIdentifierDefinitionsService.GetNextEntityCode("CLASSIFICATION");
+
+                await _sycEntityObjectClassificationsAppService.CreateOrEdit(new CreateOrEditSycEntityObjectClassificationDto
+                {
+                    Code = code,
+                    Name = name,
+                    ObjectId = (int)objectId
+                });
+                pendingNames.Add(name);
+                pendingCodes.Add(code);
+            }
+
+            if (pendingCodes.Count > 0)
             {
                 await CurrentUnitOfWork.SaveChangesAsync();
-                classesIds = await _sycEntityObjectClassificationsAppService.GetAllWithChildsForProductWithPaging(new GetAllSycEntityObjectClassificationsInput());
-                classificationsByName = classesIds.Items
-                    .Select(r => r.Data?.SycEntityObjectClassification)
-                    .Where(x => x != null && !string.IsNullOrEmpty(x.Name))
-                    .GroupBy(x => x.Name.Trim(), StringComparer.OrdinalIgnoreCase)
-                    .ToDictionary(x => x.Key, x => x.First(), StringComparer.OrdinalIgnoreCase);
+                // Creation returns no ID; resolve new entries once per batch, not per product.
+                await LoadLookups(pendingNames.Concat(pendingCodes));
             }
 
-            foreach (AppItemExcelDto src in result)
+            foreach (var row in rows)
             {
-                if (!string.IsNullOrWhiteSpace(src.ProductClassificationDescription) &&
-                    classificationsByName.TryGetValue(src.ProductClassificationDescription.Trim(), out var classification))
-                {
-                    src.ProductClassificationCode = classification.Code;
-                    src.EntityObjectClassificaionID = classification.Id;
-                }
+                if (!TryResolve(row, out var lookup))
+                    throw new UserFriendlyException("Unable to resolve product classification: " +
+                        (row.ProductClassificationCode ?? row.ProductClassificationDescription));
 
+                row.ProductClassificationCode = lookup.Code;
+                row.EntityObjectClassificaionID = lookup.Id;
             }
-            #endregion add classifications
         }
-
 
         public async Task AddCategories(List<AppItemExcelDto> result)
         {
-            long ObjectId = await _helper.SystemTables.GetObjectItemId();
-            #region add classifications
-            var categoryDescriptions = result
-                .Where(x => !string.IsNullOrWhiteSpace(x.ProductCategoryDescription))
-                .Select(x => x.ProductCategoryDescription.Trim())
-                .Distinct(StringComparer.OrdinalIgnoreCase)
-                .ToList();
-
-            if (categoryDescriptions.Count == 0)
+            var rows = result.Where(row =>
+                !string.IsNullOrWhiteSpace(row.ProductCategoryDescription) ||
+                !string.IsNullOrWhiteSpace(row.ProductCategoryCode)).ToList();
+            if (rows.Count == 0)
                 return;
 
-            PagedResultDto<TreeNode<GetSycEntityObjectCategoryForViewDto>> departmentsIds =
-                await _sycEntityObjectCategoriesAppService.GetAllWithChildsForProductWithPaging(new GetAllSycEntityObjectCategoriesInput() { DepartmentFlag = false, Sorting = "name" });
+            var objectId = await _helper.SystemTables.GetObjectItemId();
+            var byName = new Dictionary<string, (long Id, string Code)>(StringComparer.OrdinalIgnoreCase);
+            var byCode = new Dictionary<string, (long Id, string Code)>(StringComparer.OrdinalIgnoreCase);
 
-            var categoriesByName = departmentsIds.Items
-                .Select(r => r.Data?.SycEntityObjectCategory)
-                .Where(x => x != null && !string.IsNullOrEmpty(x.Name))
-                .GroupBy(x => x.Name.Trim(), StringComparer.OrdinalIgnoreCase)
-                .ToDictionary(x => x.Key, x => x.First(), StringComparer.OrdinalIgnoreCase);
-
-            var missingCategoryDescriptions = categoryDescriptions
-                .Where(x => !categoriesByName.ContainsKey(x))
-                .ToList();
-
-            foreach (var categoryDescription in missingCategoryDescriptions)
+            async Task LoadLookups(IEnumerable<string> keys)
             {
-                CreateOrEditSycEntityObjectCategoryDto createOrEditSycEntityObjectCategoryDto = new CreateOrEditSycEntityObjectCategoryDto();
-                createOrEditSycEntityObjectCategoryDto.Name = categoryDescription;
-                createOrEditSycEntityObjectCategoryDto.ObjectId = ((int)ObjectId);
-                string seq = await _iAppSycIdentifierDefinitionsService.GetNextEntityCode("CATEGORY");
-                createOrEditSycEntityObjectCategoryDto.Code = seq;
-                await _sycEntityObjectCategoriesAppService.CreateOrEdit(createOrEditSycEntityObjectCategoryDto);
-            }
-
-            if (missingCategoryDescriptions.Count > 0)
-            {
-                await CurrentUnitOfWork.SaveChangesAsync();
-                departmentsIds = await _sycEntityObjectCategoriesAppService.GetAllWithChildsForProductWithPaging(new GetAllSycEntityObjectCategoriesInput() { DepartmentFlag = false, Sorting = "name" });
-                categoriesByName = departmentsIds.Items
-                    .Select(r => r.Data?.SycEntityObjectCategory)
-                    .Where(x => x != null && !string.IsNullOrEmpty(x.Name))
-                    .GroupBy(x => x.Name.Trim(), StringComparer.OrdinalIgnoreCase)
-                    .ToDictionary(x => x.Key, x => x.First(), StringComparer.OrdinalIgnoreCase);
-            }
-
-            foreach (AppItemExcelDto src in result)
-            {
-                if (!string.IsNullOrWhiteSpace(src.ProductCategoryDescription) &&
-                    categoriesByName.TryGetValue(src.ProductCategoryDescription.Trim(), out var category))
+                // Query only distinct imported names/codes, including children, without UI paging.
+                var normalizedKeys = keys.Where(key => !string.IsNullOrWhiteSpace(key))
+                    .Select(key => key.Trim().ToUpperInvariant()).Distinct().ToList();
+                const int batchSize = 500;
+                using (CurrentUnitOfWork.DisableFilter(AbpDataFilters.MayHaveTenant))
                 {
-                    src.ProductCategoryCode = category.Code;
-                    src.EntityObjectCategoryID = category.Id;
+                    for (var offset = 0; offset < normalizedKeys.Count; offset += batchSize)
+                    {
+                        var batch = normalizedKeys.Skip(offset).Take(batchSize).ToList();
+                        var matches = await _sycEntityObjectCategoryRepository.GetAll().AsNoTracking()
+                            .Where(x => x.ObjectId == objectId && (x.TenantId == AbpSession.TenantId))
+                            .Where(x => (x.Name != null && batch.Contains(x.Name.Trim().ToUpper())) ||
+                                        (x.Code != null && batch.Contains(x.Code.Trim().ToUpper())))
+                            .OrderByDescending(x => x.TenantId == AbpSession.TenantId)
+                            .ThenBy(x => x.Id)
+                            .Select(x => new { x.Id, x.Code, x.Name })
+                            .ToListAsync();
+                        foreach (var match in matches)
+                        {
+                            if (!string.IsNullOrWhiteSpace(match.Name) && !byName.ContainsKey(match.Name.Trim()))
+                                byName.Add(match.Name.Trim(), (match.Id, match.Code));
+                            if (!string.IsNullOrWhiteSpace(match.Code) && !byCode.ContainsKey(match.Code.Trim()))
+                                byCode.Add(match.Code.Trim(), (match.Id, match.Code));
+                        }
+                    }
                 }
             }
-            #endregion add classifications
 
+            bool TryResolve(AppItemExcelDto row, out (long Id, string Code) lookup)
+            {
+                lookup = default;
+                return (!string.IsNullOrWhiteSpace(row.ProductCategoryDescription) &&
+                        byName.TryGetValue(row.ProductCategoryDescription.Trim(), out lookup)) ||
+                       (!string.IsNullOrWhiteSpace(row.ProductCategoryCode) &&
+                        byCode.TryGetValue(row.ProductCategoryCode.Trim(), out lookup));
+            }
+
+            await LoadLookups(rows.SelectMany(row => new[]
+                { row.ProductCategoryDescription, row.ProductCategoryCode }));
+
+            var pendingNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            var pendingCodes = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            foreach (var row in rows)
+            {
+                var description = row.ProductCategoryDescription?.Trim();
+                var code = row.ProductCategoryCode?.Trim();
+                if (TryResolve(row, out _) ||
+                    (!string.IsNullOrEmpty(description) && pendingNames.Contains(description)) ||
+                    (!string.IsNullOrEmpty(code) && pendingCodes.Contains(code)))
+                    continue;
+
+                // Preserve the supplied description as the new name; fall back to the code when
+                // no description was supplied. Description-only rows retain generated codes.
+                var name = string.IsNullOrEmpty(description) ? code : description;
+                if (string.IsNullOrEmpty(code))
+                    code = await _iAppSycIdentifierDefinitionsService.GetNextEntityCode("CATEGORY");
+
+                await _sycEntityObjectCategoriesAppService.CreateOrEdit(new CreateOrEditSycEntityObjectCategoryDto
+                {
+                    Code = code,
+                    Name = name,
+                    ObjectId = (int)objectId
+                });
+                pendingNames.Add(name);
+                pendingCodes.Add(code);
+            }
+
+            if (pendingCodes.Count > 0)
+            {
+                await CurrentUnitOfWork.SaveChangesAsync();
+                // Creation returns no ID; resolve new entries once per batch, not per product.
+                await LoadLookups(pendingNames.Concat(pendingCodes));
+            }
+
+            foreach (var row in rows)
+            {
+                if (!TryResolve(row, out var lookup))
+                    throw new UserFriendlyException("Unable to resolve product category: " +
+                        (row.ProductCategoryCode ?? row.ProductCategoryDescription));
+
+                row.ProductCategoryCode = lookup.Code;
+                row.EntityObjectCategoryID = lookup.Id;
+            }
         }
 
         private async Task<(string ProductTypeCode, List<ExtraAttribute> ExtraAttributes)> GetDefaultImportExtraAttributes()
@@ -6942,13 +7074,6 @@ namespace onetouch.AppItems
                                 IsDefault = excelDto.ExcelDto.ImageIsDefault,
                                 Attributes = "101=" + excelDto.ExcelDto.Code.Split('-')[1]
                             });
-                            thirdItemCopy.ExcelDto.Images.Add(new AppItemImage
-                            {
-                                ImageFileName = Path.GetFileName(excelDto.ExcelDto.ImagePreview),
-                                ImageGuid = Path.GetFileNameWithoutExtension(excelDto.image),
-                                IsDefault = excelDto.ExcelDto.ImageIsDefault,
-                                Attributes = "101=" + excelDto.ExcelDto.Code.Split('-')[1]
-                            });
                             thirdItemCopy.ExcelDto.Actions = "";
                             childNo += 1;
                             thirdItemCopy.ExcelDto.D1Pos = childNo.ToString();
@@ -7012,6 +7137,41 @@ namespace onetouch.AppItems
             && r.Actions != "8" && r.Actions != "9" && r.Actions != "10"
             && r.RecordType != "Image" && r.RecordType != "Color")).ToList();
 
+            // Image rows are appended after the original Excel validation. Action 5
+            // turns such a row into a new parent item, but its Id is still zero even
+            // when the selected code already exists. Resolve those generated parents
+            // here so Ignore/Replace/CreateACopy follows the same duplicate path as a
+            // normal item row.
+            var unresolvedGeneratedParentCodes = result
+                .Where(row => row.Id == 0 &&
+                    string.Equals(row.RecordType, "Item", StringComparison.OrdinalIgnoreCase) &&
+                    !string.IsNullOrWhiteSpace(row.Code) && row.Code != "-")
+                .Select(row => NormalizeImportCode(row.Code))
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .ToList();
+
+            if (unresolvedGeneratedParentCodes.Count > 0)
+            {
+                var existingGeneratedParents = await _appItemRepository.GetAll()
+                    .AsNoTracking()
+                    .Where(item => item.TenantId == AbpSession.TenantId &&
+                        item.ItemType == 0 && item.Code != null &&
+                        unresolvedGeneratedParentCodes.Contains(item.Code.Replace(" ", string.Empty).Trim()))
+                    .Select(item => new { item.Id, item.Code })
+                    .ToListAsync();
+
+                var existingGeneratedParentsByCode = existingGeneratedParents
+                    .GroupBy(item => NormalizeImportCode(item.Code), StringComparer.OrdinalIgnoreCase)
+                    .ToDictionary(group => group.Key, group => group.First().Id, StringComparer.OrdinalIgnoreCase);
+
+                foreach (var generatedParent in result.Where(row => row.Id == 0 &&
+                             string.Equals(row.RecordType, "Item", StringComparison.OrdinalIgnoreCase)))
+                {
+                    if (existingGeneratedParentsByCode.TryGetValue(NormalizeImportCode(generatedParent.Code), out var existingId))
+                        generatedParent.Id = existingId;
+                }
+            }
+
             if (result.Count <= 0)
             {
                 #region send notification to current user
@@ -7059,7 +7219,6 @@ namespace onetouch.AppItems
             string productType = result.Select(x => x.ProductType).FirstOrDefault().ToString();
             var pdtyp = await _SycEntityObjectTypesAppService.GetAllWithExtraAttributesByCode(productType);
             var productTypeId = pdtyp.FirstOrDefault();
-            Dictionary<GetAllEntityObjectTypeOutput, List<LookupLabelDto>> extrattributesLists = new Dictionary<GetAllEntityObjectTypeOutput, List<LookupLabelDto>>();
             long? defIdentfier = null;
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
             {
@@ -7079,28 +7238,67 @@ namespace onetouch.AppItems
                     else { defIdentfier = identifierId; }
                 }
             }
-            var entityObjectExtraAttribute = (await _SycEntityObjectTypesAppService.GetAllWithExtraAttributes(long.Parse(productTypeId.Id.ToString()))).ToList().FirstOrDefault();
-            if (entityObjectExtraAttribute != null && entityObjectExtraAttribute.ExtraAttributes != null &&
-                entityObjectExtraAttribute.ExtraAttributes.ExtraAttributes != null && entityObjectExtraAttribute.ExtraAttributes.ExtraAttributes.Count > 0)
+            // Import needs lookup type metadata and names for the imported colors only.
+            // Do not load UI lookup lists: their image/status/extra-data projections can
+            // scan every lookup entity and caused a 180-second timeout during import.
+            var lookupTypeCodes = (productTypeId.ExtraAttributes?.ExtraAttributes ?? new List<ExtraAttribute>())
+                .Where(attribute => attribute.IsLookup && !string.IsNullOrWhiteSpace(attribute.EntityObjectTypeCode))
+                .Select(attribute => attribute.EntityObjectTypeCode)
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .ToList();
+            var lookupTypes = new List<GetAllEntityObjectTypeOutput>();
+            using (CurrentUnitOfWork.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
             {
-                foreach (var extraAttribute in entityObjectExtraAttribute.ExtraAttributes.ExtraAttributes)
+                foreach (var batch in ChunkList(lookupTypeCodes, 500))
                 {
-                    if (extraAttribute.IsLookup)
-                    {
-                        try
+                    var matches = await _sycEntityObjectTypeRepository.GetAll().AsNoTracking()
+                        .Where(type => batch.Contains(type.Code) &&
+                            (type.TenantId == null || type.TenantId == AbpSession.TenantId))
+                        // Match GetAllWithExtraAttributesByCode's preference for shared definitions.
+                        .OrderBy(type => type.TenantId.HasValue)
+                        .ThenBy(type => type.Id)
+                        .Select(type => new GetAllEntityObjectTypeOutput
                         {
-                            var retrunValues = await _appEntitiesAppService.GetAllEntitiesByTypeCode(extraAttribute.EntityObjectTypeCode);
-                            var retvalues = (await _SycEntityObjectTypesAppService.GetAllWithExtraAttributesByCode(extraAttribute.EntityObjectTypeCode));
-
-                            if (retvalues != null)
-                            {
-                                var retValu = retvalues.FirstOrDefault();
-                                extrattributesLists.Add(retValu, retrunValues);
-                            }
+                            Id = type.Id,
+                            Code = type.Code,
+                            Name = type.Name
+                        })
+                        .ToListAsync();
+                    lookupTypes.AddRange(matches
+                        .GroupBy(type => type.Code, StringComparer.OrdinalIgnoreCase)
+                        .Select(group => group.First()));
+                }
+            }
+            var extraAttributesByName = lookupTypes
+                .Where(type => !string.IsNullOrEmpty(type.Name))
+                .GroupBy(type => type.Name, StringComparer.OrdinalIgnoreCase)
+                .ToDictionary(group => group.Key, group => group.First(), StringComparer.OrdinalIgnoreCase);
+            var colorLookupByCode = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            if (lookupTypes.Any(type => type.Code == "COLOR"))
+            {
+                var importedColorCodes = result
+                    .Where(row => row.ExtraAttributes != null && row.ExtraAttributesValues != null)
+                    .SelectMany(row => row.ExtraAttributes.Zip(row.ExtraAttributesValues,
+                        (attribute, value) => new { attribute.AttributeId, value.Code }))
+                    .Where(value => value.AttributeId == 101 && !string.IsNullOrWhiteSpace(value.Code))
+                    .Select(value => value.Code)
+                    .Distinct(StringComparer.OrdinalIgnoreCase)
+                    .ToList();
+                using (CurrentUnitOfWork.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
+                {
+                    foreach (var batch in ChunkList(importedColorCodes, 500))
+                    {
+                        var colors = await _appEntityRepository.GetAll().AsNoTracking()
+                            .Where(color => color.EntityObjectTypeCode == "COLOR" && batch.Contains(color.Code) &&
+                                (color.TenantId == null || color.TenantId == AbpSession.TenantId))
+                            .OrderBy(color => color.Name)
+                            .Select(color => new { color.Code, color.Name })
+                            .ToListAsync();
+                        foreach (var color in colors)
+                        {
+                            if (!colorLookupByCode.ContainsKey(color.Code))
+                                colorLookupByCode.Add(color.Code, color.Name);
                         }
-                        catch
-                        { }
-
                     }
                 }
             }
@@ -7108,17 +7306,6 @@ namespace onetouch.AppItems
                 .Where(x => !string.IsNullOrEmpty(x.Code))
                 .GroupBy(x => x.Code, StringComparer.OrdinalIgnoreCase)
                 .ToDictionary(x => x.Key, x => x.First(), StringComparer.OrdinalIgnoreCase);
-            var extraAttributesByName = extrattributesLists.Keys
-                .Where(x => x != null && !string.IsNullOrEmpty(x.Name))
-                .GroupBy(x => x.Name, StringComparer.OrdinalIgnoreCase)
-                .ToDictionary(x => x.Key, x => x.First(), StringComparer.OrdinalIgnoreCase);
-            var colorLookupByCode = extrattributesLists
-                .FirstOrDefault(x => x.Key?.Code == "COLOR")
-                .Value?
-                .Where(x => !string.IsNullOrWhiteSpace(x.Code))
-                .GroupBy(x => x.Code, StringComparer.OrdinalIgnoreCase)
-                .ToDictionary(x => x.Key, x => x.First().Label, StringComparer.OrdinalIgnoreCase)
-                ?? new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
             var attachmentsCategoriesByCode = attachmentsCategories
                 .Where(x => !string.IsNullOrWhiteSpace(x.Code))
                 .GroupBy(x => x.Code, StringComparer.OrdinalIgnoreCase)
@@ -7315,6 +7502,32 @@ namespace onetouch.AppItems
             {
                 if (importedItem.Id == 0)
                 {
+                    // Multiple generated image/action rows can resolve to the
+                    // same new item code. Do not enqueue a second AppEntity;
+                    // merge its attachments into the already pending item.
+                    var pendingDuplicate = appItemList.FirstOrDefault(item =>
+                        item.EntityFk != null &&
+                        importedItem.EntityFk != null &&
+                        item.EntityFk.TenantId == importedItem.EntityFk.TenantId &&
+                        string.Equals(item.EntityFk.EntityObjectTypeCode, importedItem.EntityFk.EntityObjectTypeCode, StringComparison.OrdinalIgnoreCase) &&
+                        string.Equals(item.EntityFk.Code, importedItem.EntityFk.Code, StringComparison.OrdinalIgnoreCase));
+
+                    if (pendingDuplicate != null)
+                    {
+                        pendingDuplicate.EntityFk.EntityAttachments ??= new List<AppEntityAttachment>();
+                        foreach (var attachment in importedItem.EntityFk.EntityAttachments ?? new List<AppEntityAttachment>())
+                        {
+                            if (!pendingDuplicate.EntityFk.EntityAttachments.Any(existing =>
+                                    existing.AttachmentFk != null && attachment.AttachmentFk != null &&
+                                    string.Equals(existing.AttachmentFk.Attachment, attachment.AttachmentFk.Attachment, StringComparison.OrdinalIgnoreCase)))
+                            {
+                                pendingDuplicate.EntityFk.EntityAttachments.Add(attachment);
+                            }
+                        }
+
+                        return;
+                    }
+
                     appItemList.Add(importedItem);
                 }
                 else
@@ -7738,9 +7951,6 @@ namespace onetouch.AppItems
                 appItem.EntityFk.TenantOwner = appItem.TenantOwner;
                 await GenerateImportedParentSsin(appItem);
 
-                if (appItem.ParentFkList != null && appItem.ParentFkList.Any())
-                    importedParentsWithVariations.Add(appItem);
-
                 if (!string.IsNullOrEmpty(excelDto.SizeScaleName))
                 {
                     sizeRatioHeadersByName.TryGetValue(excelDto.SizeRatioName ?? string.Empty, out var ratioHeader);
@@ -7808,18 +8018,25 @@ namespace onetouch.AppItems
                         {
                             foreach (var sz in sizes)
                             {
+                                int.TryParse(sz.D1Pos, out var d1Position);
+                                int.TryParse(sz.D2Pos, out var d2Position);
+                                int.TryParse(sz.D3Pos, out var d3Position);
+                                var normalizedD1Position = d1Position > 0 ? (d1Position - 1).ToString() : null;
+                                var normalizedD2Position = d2Position > 0 ? (d2Position - 1).ToString() : null;
+                                var normalizedD3Position = d3Position > 0 ? (d3Position - 1).ToString() : null;
+
                                 var exist = appSizeScalesDetailDtoList.FirstOrDefault(z => z.SizeCode == sz.SizeCode &&
-                                   z.D1Position == (sz.D1Pos == null || sz.D1Pos == "0" ? null : (int.Parse(sz.D1Pos.ToString()) - 1).ToString()) &&
-                                   z.D2Position == (sz.D2Pos == null || sz.D2Pos == "0" ? null : (int.Parse(sz.D2Pos.ToString()) - 1).ToString()) &&
-                                   z.D3Position == (sz.D3Pos == null || sz.D3Pos == "0" ? null : (int.Parse(sz.D3Pos.ToString()) - 1).ToString()));
+                                   z.D1Position == normalizedD1Position &&
+                                   z.D2Position == normalizedD2Position &&
+                                   z.D3Position == normalizedD3Position);
                                 if (exist == null)
                                     appSizeScalesDetailDtoList.Add(new AppSizeScalesDetailDto
                                     {
-                                        SizeCode = sz.SizeCode.TrimEnd(),
-                                        D3Position = int.Parse(sz.D3Pos.ToString()) > 0 ? (int.Parse(sz.D3Pos.ToString()) - 1).ToString() : null,
+                                        SizeCode = sz.SizeCode?.TrimEnd(),
+                                        D3Position = normalizedD3Position,
                                         SizeId = null,
-                                        D1Position = int.Parse(sz.D1Pos.ToString()) > 0 ? (int.Parse(sz.D1Pos.ToString()) - 1).ToString() : null,
-                                        D2Position = int.Parse(sz.D2Pos.ToString()) > 0 ? (int.Parse(sz.D2Pos.ToString()) - 1).ToString() : null,
+                                        D1Position = normalizedD1Position,
+                                        D2Position = normalizedD2Position,
                                         SizeRatio = 0
                                     });
                             }
@@ -7968,10 +8185,23 @@ namespace onetouch.AppItems
                                     arraySizeRatio = arrayRatio.Split('-');
                                 }
                                 List<AppSizeScalesDetailDto> appSizeScalesRatioDetailDtoList = new List<AppSizeScalesDetailDto>();
-                                if (!string.IsNullOrEmpty(excelDto.SizeRatioName) && !string.IsNullOrEmpty(excelDto.SizeRatioValue.Split('|')[0]) && !string.IsNullOrEmpty(excelDto.SizeRatioValue.Split('|')[1]))
+                                var sizeRatioParts = excelDto.SizeRatioValue?.Split('|') ?? System.Array.Empty<string>();
+                                if (!string.IsNullOrEmpty(excelDto.SizeRatioName) &&
+                                    sizeRatioParts.Length >= 2 &&
+                                    !string.IsNullOrEmpty(sizeRatioParts[0]) &&
+                                    !string.IsNullOrEmpty(sizeRatioParts[1]))
                                 {
-                                    var sizesList = excelDto.SizeRatioValue.Split('|')[0].Split('~').ToList();
-                                    var sizesRatios = excelDto.SizeRatioValue.Split('|')[1].Split('-').ToList();
+                                    var sizesList = sizeRatioParts[0].Split('~').ToList();
+                                    var sizesRatios = sizeRatioParts[1].Split('-').ToList();
+                                    var sizeRatiosByCode = sizesList
+                                        .Select((sizeCode, index) => new
+                                        {
+                                            SizeCode = sizeCode?.Trim(),
+                                            Ratio = index < sizesRatios.Count ? sizesRatios[index] : null
+                                        })
+                                        .Where(entry => !string.IsNullOrWhiteSpace(entry.SizeCode))
+                                        .GroupBy(entry => entry.SizeCode, StringComparer.OrdinalIgnoreCase)
+                                        .ToDictionary(group => group.Key, group => group.First().Ratio, StringComparer.OrdinalIgnoreCase);
                                     var sizesRatio = (sizeChildren ?? new List<AppItemExcelDto>())
                                         .Select(a => new { a.SizeCode, a.D1Pos, a.D2Pos, a.D3Pos })
                                         .Distinct()
@@ -7980,17 +8210,24 @@ namespace onetouch.AppItems
                                     {
                                         foreach (var sz in sizesRatio)
                                         {
-                                            var posinArr = sizesList.IndexOf(sz.SizeCode);
-                                            if (posinArr >= 0)
+                                            if (!string.IsNullOrWhiteSpace(sz.SizeCode) &&
+                                                sizeRatiosByCode.TryGetValue(sz.SizeCode.Trim(), out var ratioValue))
                                             {
+                                                int.TryParse(sz.D1Pos, out var d1Position);
+                                                int.TryParse(sz.D2Pos, out var d2Position);
+                                                int.TryParse(sz.D3Pos, out var d3Position);
+                                                var sizeRatio = int.TryParse(ratioValue, out var parsedSizeRatio)
+                                                        ? parsedSizeRatio
+                                                        : 0;
+
                                                 appSizeScalesRatioDetailDtoList.Add(new AppSizeScalesDetailDto
                                                 {
-                                                    SizeCode = sz.SizeCode.TrimEnd(),
-                                                    D3Position = int.Parse(sz.D3Pos.ToString()) > 0 ? (int.Parse(sz.D3Pos.ToString()) - 1).ToString() : "0",
+                                                    SizeCode = sz.SizeCode?.TrimEnd(),
+                                                    D3Position = d3Position > 0 ? (d3Position - 1).ToString() : "0",
                                                     SizeId = null,
-                                                    D1Position = int.Parse(sz.D1Pos.ToString()) > 0 ? (int.Parse(sz.D1Pos.ToString()) - 1).ToString() : "0",
-                                                    D2Position = int.Parse(sz.D2Pos.ToString()) > 0 ? (int.Parse(sz.D2Pos.ToString()) - 1).ToString() : "0",
-                                                    SizeRatio = int.Parse(sizesRatios[posinArr])
+                                                    D1Position = d1Position > 0 ? (d1Position - 1).ToString() : "0",
+                                                    D2Position = d2Position > 0 ? (d2Position - 1).ToString() : "0",
+                                                    SizeRatio = sizeRatio
                                                 });
                                             }
                                         }
@@ -8054,7 +8291,11 @@ namespace onetouch.AppItems
                                 appItemSizeScalesHeaderRatio.AppItemSizeScalesDetails.ForEach(a => a.Id = 0);
                                 appItemSizeScalesHeaderRatio.AppItemSizeScalesDetails.ForEach(a => a.TenantId = AbpSession.TenantId);
                                 appItemSizeScalesHeaderRatio.AppItemSizeScalesDetails.ForEach(a => a.DimensionName = sizescale.Dimesion1Name);
-                                appItemSizeScalesHeaderRatio.AppItemSizeScalesDetails.ForEach(a => a.SizeScaleId = appItemSizeScalesHeaderRatio.Id);
+                                appItemSizeScalesHeaderRatio.AppItemSizeScalesDetails.ForEach(a =>
+                                {
+                                    a.SizeScaleId = appItemSizeScalesHeaderRatio.Id;
+                                    a.SizeScaleFK = appItemSizeScalesHeaderRatio;
+                                });
                                 if (appItem.Id != 0 && itemScaleData != null && itemScaleData.Count > 0)
                                 {
 
@@ -8529,8 +8770,66 @@ namespace onetouch.AppItems
                         appItem.ParentFkList.Add(appChildItem);
 
                 }
+
+                // Keep the lean import consistent with DoCreateOrEdit. The marketplace
+                // sharing/view paths still consume this serialized variation summary.
+                if (attributteNames.Count > 0)
+                {
+                    var defaultAttributeName = attributteNames.FirstOrDefault(r => r.EndsWith(",1"));
+                    if (defaultAttributeName != null)
+                    {
+                        attributteNames.Remove(defaultAttributeName);
+                        attributteNames.Insert(0, defaultAttributeName);
+                    }
+
+                    var defaultAttributeId = attributteIDs.FirstOrDefault(r => r.EndsWith(",1"));
+                    if (defaultAttributeId != null)
+                    {
+                        attributteIDs.Remove(defaultAttributeId);
+                        attributteIDs.Insert(0, defaultAttributeId);
+                    }
+
+                    var distinctFirstAttributeValues = firstAttributteValues.Distinct().ToList();
+                    var distinctFirstAttributeImages = distinctFirstAttributeValues
+                        .Select(value =>
+                        {
+                            var valueIndex = firstAttributteValues.FindIndex(x => x == value);
+                            return valueIndex >= 0 && valueIndex < firstAttributteImageDefaults.Count
+                                ? firstAttributteImageDefaults[valueIndex]
+                                : string.Empty;
+                        })
+                        .ToList();
+
+                    var variation = string.Join("|", attributteNames) + ";" +
+                                    string.Join("|", attributteIDs) + ";" +
+                                    string.Join("|", distinctFirstAttributeValues) + ";" +
+                                    string.Join("|", distinctFirstAttributeImages) + ";";
+
+                    var restLists = restAttributteValues.SelectMany(r => r).ToList();
+                    foreach (var attributeIdWithFlag in attributteIDs.Where(x => !x.EndsWith(",1")))
+                    {
+                        var attributeId = attributeIdWithFlag.Split(',')[0];
+                        var attributeValues = restLists
+                            .Where(r => r.Id.ToString() == attributeId)
+                            .Select(r => r.Value + ",0")
+                            .Distinct()
+                            .ToList();
+
+                        if (attributeValues.Count > 0)
+                            variation += string.Join("|", attributeValues) + ";";
+                    }
+
+                    appItem.Variations = variation;
+                }
+
                 if (appItem.SycIdentifierId == null)
                     appItem.SycIdentifierId = defIdentfier;
+
+                // Register the parent only after imported variations have been added.
+                // New parents start with an empty ParentFkList, so checking earlier
+                // prevented their variation SSIN generation job from being queued.
+                if (appItem.ParentFkList != null && appItem.ParentFkList.Any())
+                    importedParentsWithVariations.Add(appItem);
 
                 await SaveImportedItemLean(appItem);
             }
@@ -8793,7 +9092,7 @@ namespace onetouch.AppItems
                 var entityObjectTypeCodeCache = new Dictionary<long, string>();
                 var extraAttributeDataCache = new Dictionary<string, IList<AppEntityExtraDataDto>>();
                 ItemExtraAttributes productExtraAttributes = null;
-                
+
                 var productEntityObjectType = await _SycEntityObjectTypesAppService.GetSycEntityObjectTypeForView(int.Parse(productTypeId.ToString()));
                 if (productEntityObjectType != null && !string.IsNullOrEmpty(productEntityObjectType.SycEntityObjectType.ExtraAttributes))
                 {

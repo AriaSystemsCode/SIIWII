@@ -1,0 +1,600 @@
+:host {
+    display: block;
+}
+
+.field-manager-page {
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    padding: 10px 0 32px;
+    color: #6f737b;
+    background-color: #fff;
+}
+
+.field-manager-layout {
+    display: flex;
+    flex: 1 0 auto;
+    align-items: stretch;
+    gap: 0;
+    min-height: calc(100vh - 42px);
+}
+
+.field-manager-sidebar {
+    flex: 0 0 195px;
+    min-height: 0;
+    padding: 18px 0;
+    border-right: 1px solid #eee;
+    background-color: #f1f2f7;
+    align-self: stretch;
+}
+
+.field-manager-main {
+    flex: 1 1 auto;
+    min-width: 0;
+    padding: 0 20px 24px;
+}
+
+.field-panel-option {
+    display: block;
+    width: 100%;
+    padding: 11px 16px;
+    border: 0;
+    border-left: 3px solid transparent;
+    background: transparent;
+    color: #555b64;
+    font-size: 15px;
+    font-weight: 600;
+    text-align: left;
+    cursor: pointer;
+}
+
+.field-panel-option.active {
+    border-left-color: #4a0d4a;
+    background: #f1e8f1;
+    color: #4a0d4a;
+}
+
+.field-entity-tree {
+    margin-top: 12px;
+    padding: 0 8px;
+}
+
+.field-entity-node-button {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    padding: 7px 8px;
+    border: 0;
+    background: transparent;
+    color: #555b64;
+    font-size: 13px;
+    text-align: left;
+    cursor: pointer;
+}
+
+.field-entity-node-button i {
+    width: 16px;
+    color: #858990;
+    font-size: 10px;
+}
+
+.field-entity-node-button.selected,
+.field-entity-node-button:hover {
+    border-radius: 4px;
+    background: #f1e8f1;
+    color: #4a0d4a;
+}
+
+.field-entity-children {
+    padding-left: 17px;
+}
+
+.field-manager-empty-selection {
+    padding: 80px 20px;
+    color: #858990;
+    text-align: center;
+    font-size: 14px;
+}
+
+.field-manager-header {
+    min-height: 54px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 20px;
+    border-bottom: 1px solid #eee;
+}
+
+.field-manager-breadcrumb {
+    color: #2f3033;
+    font-size: 16px;
+    line-height: 38px;
+    white-space: nowrap;
+}
+
+.field-manager-breadcrumb span {
+    color: #858990;
+    padding: 0 5px;
+}
+
+.field-manager-breadcrumb-node b {
+    padding-left: 8px;
+    color: #858990;
+    font-weight: 400;
+}
+
+.field-manager-actions {
+    display: flex;
+    gap: 15px;
+}
+
+.add-existing-btn{
+    background-color: #f88011 !important;
+}
+
+.add-existing-btn,
+.create-field-btn {
+    min-width: 160px;
+    height: 38px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.field-manager-toolbar {
+    position: relative;
+    z-index: 3;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 10px 10px;
+    border-bottom: 1px solid #eee;
+    margin-bottom: 6% !important;
+}
+
+.field-manager-search {
+    position: relative;
+    width: 253px;
+}
+
+.field-manager-search i {
+    position: absolute;
+    top: 11px;
+    left: 12px;
+    color: #9a9da3;
+    z-index: 1;
+}
+
+.field-manager-search input {
+    width: 100%;
+    height: 34px;
+    padding: 0 12px 0 32px;
+    border: 1px solid #dddfe3;
+    border-radius: 7px;
+    color: #666a72;
+    outline: none;
+}
+
+.field-manager-search input:focus {
+    border-color: #4a0d4a;
+}
+
+.group-filter-btn {
+    display: inline-flex;
+    height: 34px;
+    padding: 0 13px;
+    border: 1px solid #dddfe3;
+    border-radius: 18px;
+    background: #fff;
+    color: #777b82;
+    font-size: 13px;
+}
+
+.group-filter-btn select {
+    max-width: 110px;
+    margin: 0 5px;
+    padding: 0;
+    border: 0;
+    outline: 0;
+    background: transparent;
+    color: #777b82;
+    font-size: 13px;
+}
+
+.group-filter-btn .flaticon-layers {
+    color: #858990;
+    margin-right: 7px;
+}
+
+.group-filter-btn .fa-chevron-down {
+    margin-left: 8px;
+    font-size: 10px;
+}
+
+.extra-data-filter {
+    display: inline-flex;
+    align-items: center;
+    margin: 0 0 0 auto;
+    height: 34px;
+    padding: 0 13px;
+    border: 1px solid #dddfe3;
+    border-radius: 18px;
+    background: #fff;
+    color: #777b82;
+    font-size: 13px;
+    cursor: pointer;
+}
+
+.extra-data-filter i {
+    color: #858990;
+    margin-right: 7px;
+}
+
+.extra-data-filter select {
+    max-width: 145px;
+    margin: 0 5px;
+    padding: 0;
+    border: 0;
+    outline: 0;
+    background: transparent;
+    color: #777b82;
+    font-size: 13px;
+}
+
+.kt-portlet {
+    margin-top: 0 !important;
+}
+
+.top-sec {
+    border: 1px solid #eee;
+    border-radius: 6px;
+    padding: 16px 20px;
+}
+
+.searchBtn {
+    padding: 5px;
+    text-align: center;
+    border: none;
+    cursor: pointer;
+    background-color: transparent;
+
+    img {
+        position: absolute;
+        left: 16px;
+        z-index: 3;
+        width: 20px;
+        height: 20px;
+        top: 10px;
+    }
+}
+
+.searchBtn:hover {
+    border: none;
+    background-color: transparent;
+}
+
+.bgPurpleM {
+    border-radius: 10px;
+    background: #4a0d4a ;
+    color: #fff !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+}
+
+.toolbar-btn {
+    min-width: 48px;
+    height: 48px;
+}
+
+.h-48 {
+    height: 48px;
+}
+
+.purpleColor {
+    color: #4a0d4a !important;
+}
+
+.field-group-row td {
+    background: #f8f3f8;
+    color: #4a0d4a;
+    font-size: 13px;
+}
+
+.field-group-toggle {
+    width: 24px;
+    height: 24px;
+    margin-right: 6px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: #4a0d4a;
+    cursor: pointer;
+}
+
+.field-group-toggle i {
+    font-size: 11px;
+}
+
+.w-150 {
+    width: 150px;
+}
+
+.w-160 {
+    width: 160px;
+}
+
+.w-190 {
+    width: 190px;
+}
+
+::ng-deep .primeng-datatable-container {
+    overflow-x: auto;
+
+    .p-datatable-table {
+        min-width: 760px;
+    }
+
+    .p-datatable .p-datatable-thead > tr > th {
+        color: #1b101b !important;
+        font-weight: 700;
+        white-space: nowrap;
+        border-bottom: 1px solid #e5e5e5;
+    }
+
+    .p-datatable .p-datatable-tbody > tr {
+        border-bottom: 1px solid #eee;
+        background: #fff;
+        color: #9e9e9e;
+        font-size: 14px;
+        font-weight: 700;
+    }
+
+    .p-datatable .p-sortable-column .p-sortable-column-icon {
+        color: #000 !important;
+    }
+
+    .p-paginator {
+        border-top: 1px solid #eee;
+        color: #6f6f6f;
+    }
+}
+
+.field-manager-table-wrapper {
+    position: relative;
+    z-index: 1;
+    max-width: 100%;
+    margin-top: 8px;
+    border: 1px solid #e6e7ed;
+    border-radius: 10px;
+    background: #fff;
+    box-shadow: 0 4px 16px rgba(39, 31, 53, 0.06);
+}
+
+.field-manager-table-wrapper {
+    transition: margin-top 160ms ease;
+}
+
+.field-manager-toolbar.dropdown-open + .field-manager-table-wrapper {
+    margin-top: 180px;
+}
+
+.field-table-group-title {
+    margin: 18px 0 8px;
+    padding: 9px 12px;
+    border-left: 4px solid #4a0d4a;
+    background: #f7f1f7;
+    color: #4a0d4a;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+::ng-deep .field-manager-table {
+    position: relative;
+    z-index: 1;
+    font-size: 14px;
+
+    .p-datatable-tbody > tr,
+    .p-datatable-tbody > tr > td {
+        position: relative;
+        z-index: 1;
+        overflow: visible !important;
+    }
+
+    .p-datatable-thead > tr > th {
+        height: 48px;
+        padding: 10px 12px;
+        color: white !important;
+        background-color: #4a0d4a !important;
+        border: 0;
+        font-weight: 600;
+        text-align: left;
+        white-space: nowrap;
+        overflow-wrap: anywhere;
+    }
+
+    .p-datatable-thead > tr > th .p-sortable-column-icon {
+        color: white !important;
+    }
+
+    .p-datatable-tbody > tr > td {
+        min-height: 54px;
+        padding: 11px 12px;
+        color: #747982;
+        background-color: #f1f2f7;
+        border: 0;
+        border-bottom: 1px solid #f0f0f0;
+        font-weight: 500;
+        vertical-align: middle;
+    }
+
+    .p-datatable-tbody > tr:hover {
+        background: #fcf9fc;
+    }
+
+    .p-datatable-tbody > tr.field-group-row > td {
+        padding: 9px 12px;
+        background: #f7f1f7;
+        color: #4a0d4a;
+        font-weight: 700;
+    }
+
+    .p-sortable-column .p-sortable-column-icon {
+        color: #a3a6ad !important;
+        width: 12px;
+        height: 12px;
+    }
+
+    .p-datatable-thead > tr > th.p-sortable-column.p-highlight,
+    .p-datatable-thead > tr > th.p-sortable-column.p-highlight:hover {
+        background-color: #4a0d4a !important;
+        color: #fff !important;
+        border: 1px solid #4a0d4a !important;
+        border-color: #4a0d4a !important;
+        box-shadow: inset 0 0 0 1px #4a0d4a;
+    }
+
+    .p-datatable-thead > tr > th.p-sortable-column.p-highlight,
+    .p-datatable-thead > tr > th.p-sortable-column.p-highlight * {
+        color: #fff !important;
+    }
+
+    .p-paginator {
+        border: 0;
+        padding: 14px 0 0;
+    }
+}
+
+::ng-deep .field-manager-table .p-datatable-scrollable-header {
+    position: relative;
+    z-index: 2;
+}
+
+::ng-deep .field-manager-table .p-datatable-scrollable-body {
+    max-height: min(62vh, 400px);
+    overflow-y: auto !important;
+}
+
+.field-code-column { width: 7%; }
+.field-name-column { width: 11%; }
+.field-type-column { width: 12%; }
+.field-table-column { width: 15%; }
+.field-status-column { width: 9%; }
+.field-revision-column { width: 7%; }
+.field-level-column { width: 10%; }
+.field-tracking-column { width: 13%; }
+.field-extra-data-column { width: 8%; }
+
+::ng-deep .field-manager-table .p-datatable-table {
+    width: 100%;
+    table-layout: fixed;
+}
+
+::ng-deep .field-manager-table .p-datatable-thead > tr > th:last-child {
+    width: 8%;
+}
+
+.field-actions {
+    position: relative;
+    width: 8%;
+    z-index: 20;
+    overflow: visible !important;
+}
+
+.field-action-menu {
+    width: 24px;
+    height: 34px;
+    padding: 7px 10px;
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+}
+
+.field-action-menu span {
+    display: block;
+    width: 4px;
+    height: 4px;
+    margin: 3px 0;
+    border-radius: 50%;
+    background: #858990;
+}
+
+.field-action-links {
+    position: fixed;
+    z-index: 2147483647;
+    width: 160px;
+    padding: 5px 0;
+    border: 1px solid #eee;
+    border-radius: 4px;
+    background: #fff;
+    box-shadow: 0 3px 12px rgba(0, 0, 0, .12);
+    white-space: nowrap;
+}
+
+.field-action-links button {
+    display: block;
+    width: 100%;
+    padding: 8px 16px;
+    border: 0;
+    background: #fff;
+    color: #555;
+    text-align: left;
+    font-size: 12px;
+}
+
+.field-action-links button:hover {
+    background: #f7f1f7;
+}
+
+@media (max-width: 767.98px) {
+    .field-manager-page {
+        min-height: 100vh;
+        padding-bottom: 20px;
+    }
+
+    .field-manager-layout {
+        display: block;
+        min-height: 0;
+    }
+
+    .field-manager-sidebar {
+        min-height: 0;
+        border-right: 0;
+        border-bottom: 1px solid #eee;
+    }
+
+    .field-manager-main {
+        padding: 0 12px 20px;
+    }
+
+    .field-manager-header {
+        align-items: stretch;
+        flex-direction: column;
+        gap: 10px;
+        padding-bottom: 12px;
+    }
+
+    .field-manager-breadcrumb {
+        white-space:  nowrap;
+    }
+
+    .field-manager-actions {
+        flex-wrap: wrap;
+    }
+
+    .only-extra-data-filter {
+        margin-left: 0;
+    }
+
+    .top-sec {
+        padding: 12px;
+    }
+
+    .bgPurpleM {
+        width: 150px;
+    }
+
+    ::ng-deep .field-manager-table .p-datatable-scrollable-body {
+        max-height: calc(100vh - 300px);
+    }
+}

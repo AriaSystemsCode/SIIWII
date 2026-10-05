@@ -492,7 +492,7 @@ namespace onetouch.Web.Startup
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapHub<AbpCommonHub>("/signalr");
-                endpoints.MapHub<Hub>("/signalr-chat");
+                endpoints.MapHub<ChatHub>("/signalr-chat");
                 //Hassan ticket [Begin]
                 endpoints.MapHub<BuildHub>("/signalr-build");
                 //Hassan ticket [End]

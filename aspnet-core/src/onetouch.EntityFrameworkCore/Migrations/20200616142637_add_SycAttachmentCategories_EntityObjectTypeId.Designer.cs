@@ -10,7 +10,7 @@ using onetouch.EntityFrameworkCore;
 namespace onetouch.Migrations
 {
     [DbContext(typeof(onetouchDbContext))]
-    [Migration("20200616142637_add_SycAttachmentCategories_EntityObjectTypeId")]
+    [Migration("20200616142007_add_SycAttachmentCategories_EntityObjectTypeId")]
     partial class add_SycAttachmentCategories_EntityObjectTypeId
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

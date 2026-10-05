@@ -206,5 +206,9 @@ export class LoginComponent extends AppComponentBase implements OnInit {
         });
       }
       
-      
+         showPassword = false;
+    
+    togglePassword(): void {
+    this.showPassword = !this.showPassword;
+}
 }

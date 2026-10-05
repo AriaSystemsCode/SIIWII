@@ -544,7 +544,7 @@
                             </div>
                             <div *ngIf="defaultCurrencyMSRPPriceIndex > -1">
                                 <div class="d-flex align-items-baseline ml-5 pl-5">
-                                    <button class="btn mr-5 ml-5 advanced-pricing-btn" type="button"
+                                    <button class="btn mr-5 ml-5 advanced-pricing-btn w-100" type="button"
                                         (click)="showAdvancedPricingModal()">
                                         {{'AdvancedPricing' | localize}}
                                     </button>
@@ -633,12 +633,11 @@
                                         </app-variations-meta-info>
                                     </div>
                                     <div class="text-right">
-                                        <button type="button" class="btn btn-outline-primary edit-variations-btn"
+                                        <button type="button" class="m-2 btn btn-outline-primary edit-variations-btn"
                                             (click)="showCreateOrEditVariationPage()">{{ 'EditVariations' |
                                             localize}}</button>
-                                        <button type="button" class="btn btn-outline-hover-danger "
-                                            *ngIf="listingMode === undefined" (click)="removeAllVariations()"
-                                            class="remove-all-btn">{{
+                                        <button type="button" class="btn remove-all-btn edit-variations-btn"
+                                            *ngIf="listingMode === undefined" (click)="removeAllVariations()">{{
                                             'RemoveAll' | localize}}</button>
                                     </div>
                                 </div>

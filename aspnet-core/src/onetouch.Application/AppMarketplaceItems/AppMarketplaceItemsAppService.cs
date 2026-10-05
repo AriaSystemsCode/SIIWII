@@ -68,7 +68,7 @@ namespace onetouch.AppMarketplaceItems
         private readonly IMessageAppService _messageAppService;
         //I48[End]
         //I40[Start]
-        IRepository<AppMarketplaceContact, long> _appMarketplaceContactRepository;
+        IRepository<AppMarketplaceContacts.AppMarketplaceContact, long> _appMarketplaceContactRepository;
         //I40[End]
         //I49[Start]
         private readonly IRepository<AppContactRelationshipInfo, long> _appContactRelationshipInfoRepository;
@@ -101,6 +101,7 @@ namespace onetouch.AppMarketplaceItems
             _appConfiguration = appConfigurationAccessor.Configuration;
             _appEntitiesAppService = appEntitiesAppService;
             _appMarketplaceAccountsPriceLevels = appMarketplaceAccountsPriceLevels;
+            _appEntitiesRelationship = appEntitiesRelationship;
             _appMarketplaceContactRepository = appMarketplaceContactRepository;
             _appEntitiesRelationship = appEntitiesRelationship;
             //I49[Start]
@@ -492,11 +493,16 @@ namespace onetouch.AppMarketplaceItems
                 var appItemsList = hasPriceFilter ? orderedItemsFilter.PageBy(input).ToList() : orderedItemsFilter.ToList();
                 //I48[Start]
                 
+                var reviewSummaries = await _messageAppService.GetMarketplaceItemReviewSummaries(
+                    appItemsList.Select(item => item.AppItem.Id).ToList());
+                var reviewSummariesByItem = reviewSummaries.ToDictionary(summary => summary.EntityId);
                 foreach (var item in appItemsList)
                 {
-                   item.NumberOfReviews = await _messageAppService.GetAllReviewsCount(item.AppItem.Id);
-                   var rating = await _messageAppService.GetOverAllRatings(item.AppItem.Id);
-                   item.AverageRating = rating.OverAllRating;
+                    if (reviewSummariesByItem.TryGetValue(item.AppItem.Id, out var summary))
+                    {
+                        item.NumberOfReviews = summary.NumberOfReviews;
+                        item.AverageRating = summary.AverageRating;
+                    }
                     //I49
                     //if (!AbpSession.UserId.HasValue)
                     //{
@@ -655,7 +661,7 @@ namespace onetouch.AppMarketplaceItems
             
         }
         //Iteration#49,1 MMT 09/28/2025 Allow unauthenticated user to view the product marketplace view page[Start]
-        [AbpAllowAnonymous]
+        [AbpAllowAnonymous] 
         //Iteration#49,1 MMT 09/28/2025 Allow unauthenticated user to view the product marketplace browse page[End]
         public async Task<GetAppMarketplaceItemDetailForViewDto> GetMarketplaceAppItemForView(GetAppMarketplaceItemWithPagedAttributesForViewInput input)
         {
@@ -718,16 +724,17 @@ namespace onetouch.AppMarketplaceItems
                                     var buyerRole = transContact.AppTransactionContacts.Where(z => z.CompanySSIN == input.BuyerAccountSSIN).FirstOrDefault();
                                     if (buyerRole!=null)
                                     {
-
+                                        var activeRelationshipStatusId = await _helper.SystemTables.GetEntityObjectStatusRelationshipActive();
                                         var relationshipSellBuy = await _appContactRelationshipInfoRepository.GetAll()
-                                        .Where(z => (z.RequesterContactSSIN == input.SellerAccountSSIN &&
+                                        .Where(z => ((z.RequesterContactSSIN == input.SellerAccountSSIN &&
                                         z.RecipientContactSSIN == input.BuyerAccountSSIN &&
                                         z.RequesterMarketplaceRole == sellerRole.ContactRole.ToString() &&
                                         z.RecipientMarketplaceRole == buyerRole.ContactRole.ToString()) ||
                                         (z.RecipientContactSSIN == input.SellerAccountSSIN &&
                                         z.RequesterContactSSIN == input.BuyerAccountSSIN &&
                                         z.RecipientMarketplaceRole == sellerRole.ContactRole.ToString() &&
-                                        z.RequesterMarketplaceRole == buyerRole.ContactRole.ToString())
+                                        z.RequesterMarketplaceRole == buyerRole.ContactRole.ToString()))
+                                        && z.EntityObjectStatusId == activeRelationshipStatusId
                                         ).Include(z => z.EntityExtraData).FirstOrDefaultAsync();
                                         if (relationshipSellBuy != null)
                                         {
@@ -749,7 +756,7 @@ namespace onetouch.AppMarketplaceItems
 
                     //    }
                     //}
-                    if (!string.IsNullOrEmpty(input.PriceLevel))
+                    if (!string.IsNullOrEmpty(input.PriceLevel) && input.PriceLevel.ToLower()!= "undefined")
                     {
                         level = input.PriceLevel;
                     }
@@ -1207,7 +1214,10 @@ namespace onetouch.AppMarketplaceItems
                             //string variations = "COLOR|SZIE;101|105;RED|WHITE|BLACK;2688e3fa-df0e-0e4f-d2d4-a8d5b8959c08.jpg||2688e3fa-df0e-0e4f-d2d4-a8d5b8959c08.jpg;3X|4X";
                             string variations = appItem.Variations;
                             output.AppItem.variations = new List<MarketplaceExtraDataAttrDto>();
-                            if (!string.IsNullOrEmpty(variations))
+                            // Build marketplace variations from the child items. Imported products can
+                            // legitimately have child COLOR/SIZE data while the legacy Variations string
+                            // is null until the item is edited and saved.
+                            if (!string.IsNullOrEmpty(variations) || varAppItems.Any())
                             {
                                 //MMT
                                 string firstAttributeId = "";
@@ -1277,7 +1287,9 @@ namespace onetouch.AppMarketplaceItems
                                 }
 
 
-                                List<string> variationsLists = variations.Split(';').ToList();
+                                List<string> variationsLists = string.IsNullOrEmpty(variations)
+                                    ? new List<string>()
+                                    : variations.Split(';').ToList();
 
                                 if (variationsLists != null)
                                 {
@@ -1553,7 +1565,8 @@ namespace onetouch.AppMarketplaceItems
                                                                                            .Where(a => (a.AttributeValue == attlook.Label.ToString() || a.AttributeCode == attlook.Label.ToString()) &&
                                                                                            a.AttributeId == long.Parse(secondAttId)
                                                                                            ).Any()).ToList().Where(x => x.EntityExtraData
-                                                                                       .Where(a => a.AttributeId == firstAttributeIdLong & a.AttributeValue == varItem).Any()).ToList();
+                                                                                       .Where(a => a.AttributeId == firstAttributeIdLong &&
+                                                                                       (a.AttributeValue == varItem || a.AttributeCode == varItem)).Any()).ToList();
                                                     var itemVarSum = codeItems.Where(x =>
                                                     x.EntityExtraData.Where(a => a.AttributeId == firstAttributeIdLong &
                                                     (a.AttributeValue == varItem || a.AttributeCode == varItem)).Any()).Sum(a => a.StockAvailability);
@@ -2345,7 +2358,7 @@ namespace onetouch.AppMarketplaceItems
                   marketpaceItem.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.CurrencyCode == currencyCode).Select(a => a.Price).FirstOrDefault() :
                  (marketpaceItem.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.CurrencyCode == "USD").FirstOrDefault() == null ? //0 :
                  (marketpaceItem.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.IsDefault == true && q.CurrencyCode != currencyCode).FirstOrDefault() != null ?
-                 ((marketpaceItem.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.IsDefault && q.CurrencyCode != currencyCode).FirstOrDefault().Price) * (currencyCode == "USD" ? exchangeRateVal : (1 / exchangeRateVal) * exchangeRate)) : 0) :
+                 ((marketpaceItem.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.IsDefault && q.CurrencyCode != currencyCode).FirstOrDefault().Price) * (currencyCode == "USD" ? exchangeRateVal : (1 / (exchangeRateVal == 0 ? 1 : exchangeRateVal)) * exchangeRate)) : 0) :
                  (marketpaceItem.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.CurrencyCode == "USD").FirstOrDefault() != null ?
                  (marketpaceItem.ItemPricesFkList.Where(q => q.Code == "MSRP" && q.CurrencyCode == "USD").Select(a => a.Price).FirstOrDefault() * exchangeRate) : 0)))),
                         Id = marketpaceItem.Id,

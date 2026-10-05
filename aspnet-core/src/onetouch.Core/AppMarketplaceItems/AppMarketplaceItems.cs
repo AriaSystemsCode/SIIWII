@@ -20,7 +20,7 @@ namespace onetouch.AppMarketplaceItems
         
         public virtual string Description { get; set; }
         public virtual string Variations { get; set; }
-
+        public virtual decimal TaxRate { get; set; }
         public virtual decimal Price { get; set; }
         public virtual long StockAvailability { get; set; }
         public virtual long? ParentId { get; set; }

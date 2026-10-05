@@ -19,7 +19,7 @@ namespace onetouch.AppMarketplaceItems
         [StringLength(AppItemConsts.MaxCodeLength, MinimumLength = AppItemConsts.MinCodeLength)]
         public virtual string Code { get; set; }
         public virtual decimal Price { get; set; }
-        
+        public virtual string BuyerSSIN { get; set; }
         public virtual long AppMarketplaceItemId { get; set; }
         public virtual string AppMarketplaceItemCode { get; set; }
         public virtual long? CurrencyId { get; set; }
@@ -31,6 +31,6 @@ namespace onetouch.AppMarketplaceItems
         [ForeignKey("AppMarketplaceItemId")]
         public virtual AppMarketplaceItems AppItemFk { get; set; }
         public virtual bool IsDefault { set; get; }
-        public virtual string BuyerSSIN { get; set; }
+        
     }
 }

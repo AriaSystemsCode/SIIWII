@@ -179,6 +179,8 @@ export class BrowseFolderComponent extends AppComponentBase implements OnInit {
 
     const pathParts = file.webkitRelativePath.split('/');
     return pathParts.length > 1 ? pathParts[0] : 'Main Folder';
+
+    name
   }
 
   getTotalSizeInMB(files: FileList): number {

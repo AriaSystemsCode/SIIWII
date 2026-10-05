@@ -3,3 +3,18 @@ export class ImageObject{
     thumbImage:string;
     title:string;
 }
+
+
+
+
+
+export interface AccountsBrowseState {
+    filters: any;
+
+    first: number;
+    page: number;
+    rows: number;
+
+    cardsViewMode: boolean;
+    filterVisiblelg: boolean;
+}

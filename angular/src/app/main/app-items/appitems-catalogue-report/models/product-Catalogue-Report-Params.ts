@@ -64,6 +64,8 @@ export class ProductCatalogueReportParams implements ProductCatalogueReportParam
     TransactionId: string="";
     orderConfirmationRole: string="";
     contactName: string="";
+    contactEmail: string="";
+    contactPhoneNumber: string="";
     saveToPDF:boolean= false;
     onlyInStockColors:boolean=false;
     mimimumInStockQty:number=0;
@@ -106,6 +108,8 @@ export class ProductCatalogueReportParams implements ProductCatalogueReportParam
         else
         bccUsers += this.bccUsers[i].value;
     }
+        // this.itemsListId = 246;
+        // this.tenantId = 2154;
        url += this.reportTemplateName + "?"
        url += 'itemsListId=' + this.itemsListId
        url += '&reportTitle=' + this.reportTitle
@@ -123,7 +127,10 @@ export class ProductCatalogueReportParams implements ProductCatalogueReportParam
        url += '&specialPriceLevel=' + this.specialPriceLevel
        url += '&EmailLinesheet=' + this.EmailLinesheet
        url += '&PrintLinesheet=' + this.PrintLinesheet
-       url += '&selectedKey=' + this.selectedKey
+       if(this.itemsListId && this.itemsListId >0)
+       {url += '&selectedKey=' }
+        else 
+       {url += '&selectedKey=' + this.selectedKey}
        url += '&to=' + toUsers
        url += '&cc=' + ccUsers
        url += '&bcc=' + bccUsers
@@ -137,16 +144,20 @@ export class ProductCatalogueReportParams implements ProductCatalogueReportParam
        url += "&DetailPageShowCategory=" + this.DetailPageShowCategory
        url += "&ColorPageShowCategory=" + this.ColorPageShowCategory
        url += "&TransactionId=" + this.TransactionId
-       url += "&orderConfirmationRole=" + this.orderConfirmationRole
-       url += "&contactName=" + this.contactName
+       url += "&orderConfirmationRole=" + encodeURIComponent(this.orderConfirmationRole)
+       url += "&contactName=" + encodeURIComponent(this.contactName)
+       url += "&contactEmail=" + encodeURIComponent(this.contactEmail)
+       url += "&contactPhoneNumber=" + encodeURIComponent(this.contactPhoneNumber)
        url += "&saveToPDF=" + this.saveToPDF
        url += "&onlyInStockColors=" + this.onlyInStockColors
        url += "&mimimumInStockQty=" + this.mimimumInStockQty
        // url += "&muserCountry="+this.userCountry
+       
        const date = new Date();
        const pad = (v: number) => v.toString().padStart(2, '0');
        const dateStr = `${pad(date.getMonth() + 1)}/${pad(date.getDate())}/${date.getFullYear()}`;
        const timeStr = `${pad(date.getHours())}:${pad(date.getMinutes())}`;
+      
        url += "&PrintDate=" + dateStr;
        url += "&PrintTime=" + timeStr;
        url += "&languageName="+this.languageName

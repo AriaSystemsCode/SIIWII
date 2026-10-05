@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, EventEmitter, Injector, OnInit, Output, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, EventEmitter, Injector, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { AppComponentBase } from '@shared/common/app-component-base';
 import { ModalDirective } from 'ngx-bootstrap/modal';
 import { Subject } from 'rxjs';
@@ -37,6 +37,8 @@ export class SelectionModalComponent<T = any> extends AppComponentBase implement
   title: string
   selectionMode = SelectionMode
   mode:SelectionMode
+  @Input() isArabic = false;
+
   constructor(
     injector: Injector,
   ) {

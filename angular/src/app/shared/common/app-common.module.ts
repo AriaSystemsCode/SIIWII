@@ -69,8 +69,6 @@ import { CheckboxModule } from "primeng/checkbox";
 import { GenericFormModalComponent } from "./generic-forms/generic-form-modal.component";
 import { MatrixGridComponent } from "./matrix-grid/matrix-grid.component";
 import { SelectionModalComponent } from "./selection-modals/selection-modal.component";
-import { AppSideBarComponent } from "./app-side-bar/app-side-bar.component";
-import { AppTransactionSideBarComponent } from "@app/admin/sideBarComponents/app-transaction-side-bar/app-transaction-side-bar.component";
 import { SendMessageModalComponent } from "@app/main/Messages/SendMessage-Modal.Component";
 import { EditorModule } from 'primeng/editor';
 import { AppAddOnsSideBarComponent } from "@app/admin/sideBarComponents/app-add-ons-side-bar/app-add-ons-side-bar.component";
@@ -140,9 +138,8 @@ import { AppAddOnsSideBarComponent } from "@app/admin/sideBarComponents/app-add-
         MatrixGridComponent,
         GenericFormModalComponent,
         SelectionModalComponent,
-        AppSideBarComponent,AppTransactionSideBarComponent,
         SendMessageModalComponent,
-        AppAddOnsSideBarComponent
+        AppAddOnsSideBarComponent,
 
     ],
     exports: [
@@ -164,7 +161,7 @@ import { AppAddOnsSideBarComponent } from "@app/admin/sideBarComponents/app-add-
         ProgressComponent,
         MatrixGridComponent,
         GenericFormModalComponent,
-        SelectionModalComponent,AppSideBarComponent,
+        SelectionModalComponent,
         SendMessageModalComponent
     ],
     providers: [

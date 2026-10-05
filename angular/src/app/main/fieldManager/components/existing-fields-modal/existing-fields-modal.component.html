@@ -1,0 +1,44 @@
+<div bsModal #existingFieldsModal="bs-modal" class="modal fade" tabindex="-1" role="dialog"
+    aria-labelledby="existingFieldsModalLabel" aria-hidden="true" [config]="{backdrop: 'static'}">
+    <div class="modal-dialog modal-dialog-centered existing-fields-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="existingFieldsModalLabel">
+                    {{ 'AddExistingFieldsTo' | localize }} {{ tableName }}
+                </h5>
+                <button type="button" class="close" [attr.aria-label]="'Close' | localize" (click)="close()">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="existing-fields-search">
+                    <i class="fa fa-search"></i>
+                    <input type="text" [(ngModel)]="search" [placeholder]="'SearchFields' | localize" autofocus />
+                </div>
+                <div class="existing-fields-list">
+                    <label class="existing-field-option" *ngFor="let field of availableFields">
+                        <input type="checkbox" [checked]="isSelected(field.id)" (change)="toggleField(field.id)" />
+                        <span class="existing-field-details">
+                            <strong>{{ field.name }}</strong>
+                            <small>{{ field.code }} | {{ field.type }} | {{ field.tables }}</small>
+                        </span>
+                    </label>
+                    <div class="existing-fields-empty" *ngIf="!availableFields.length">
+                        {{ 'NoData' | localize }}
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <span class="selected-fields-count">
+                    {{ selectedFieldIds.length }} {{ 'FieldsSelected' | localize }}
+                </span>
+                <button type="button" class="btn btn-secondary" (click)="close()">
+                    {{ 'Close' | localize }}
+                </button>
+                <button type="button" class="btn bgPurpleM" [disabled]="!selectedFieldIds.length" (click)="addSelected()">
+                    {{ 'AddSelected' | localize }}
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

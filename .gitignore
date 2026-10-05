@@ -6,9 +6,26 @@
 /.gitignore
 /.vs/SIIWII/v17/DocumentLayout.json
 /.gitignore
-/aspnet-core/src/onetouch.Web.Host/Assets/MARKETPLACECONTACTRELATIONSHIP__B-SR_2026-04-01 064208.6066667.xml
-/aspnet-core/src/onetouch.Web.Host/Assets/MARKETPLACECONTACTRELATIONSHIP__B-BO_2026-04-01 064208.6066667.xml
-/aspnet-core/src/onetouch.Web.Host/Assets/MARKETPLACECONTACTRELATIONSHIP__SR-BO_2026-04-01 064208.6066667.xml
-/aspnet-core/src/onetouch.Web.Host/Assets/MARKETPLACECONTACTRELATIONSHIP__SR-B_2026-04-01 064208.6066667.xml
-/aspnet-core/src/onetouch.Web.Host/Assets/MARKETPLACECONTACTRELATIONSHIP__BO-B_2026-04-01 064208.6066667.xml
-/aspnet-core/src/onetouch.Web.Host/Assets/MARKETPLACECONTACTRELATIONSHIP__BO-SR_2026-04-01 064208.6066667.xml
+/angular/src/app/main/SycLandingPageSettings/components/syc-landing-page-settings.component.html
+/angular/src/app/main/SycLandingPageSettings/components/syc-landing-page-settings.component.scss
+/angular/src/app/main/SycLandingPageSettings/components/syc-landing-page-settings.component.ts
+/angular/src/app/main/SycLandingPageSettings/components/syclanding-Adv.component.html
+/angular/src/app/main/SycLandingPageSettings/components/syclanding-Adv.component.scss
+/angular/src/app/main/SycLandingPageSettings/components/syclanding-Adv.component.ts
+/angular/src/app/main/SycLandingPageSettings/components/syclanding-CTA.component.html
+/angular/src/app/main/SycLandingPageSettings/components/syclanding-CTA.component.scss
+/angular/src/app/main/SycLandingPageSettings/components/syclanding-footer.component.html
+/angular/src/app/main/SycLandingPageSettings/components/syclanding-footer.component.scss
+/angular/src/app/main/SycLandingPageSettings/components/syclanding-footer.component.ts
+/angular/src/app/main/SycLandingPageSettings/components/syclanding-Slider.component.html
+/angular/src/app/main/SycLandingPageSettings/components/syclanding-Slider.component.scss
+/angular/src/app/main/SycLandingPageSettings/components/syclanding-Slider.component.ts
+/angular/src/app/main/SycLandingPageSettings/SycLandingPageSettings.module.ts
+/angular/src/app/main/SycLandingPageSettings/SycLandingPageSettingsRoutingModule-routing.module.ts
+/.gitignore
+angular/obj/Debug/netcoreapp3.1/onetouch.AngularUI.AssemblyInfo.cs
+angular/obj/Debug/netcoreapp3.1/onetouch.AngularUI.AssemblyInfoInputs.cache
+angular/obj/Debug/netcoreapp3.1/onetouch.AngularUI.AssemblyInfo.cs
+/aspnet-core/src/onetouch.EntityFrameworkCore/Migrations/20260706064632_addTaxrateToMarketplaceItem.cs
+/aspnet-core/src/onetouch.EntityFrameworkCore/Migrations/20260706064632_addTaxrateToMarketplaceItem.Designer.cs
+/aspnet-core/src/onetouch.EntityFrameworkCore/Migrations/--onetouchDbContextModelSnapshot.cs

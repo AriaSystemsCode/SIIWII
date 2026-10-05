@@ -44,8 +44,16 @@
 
                   <div class="mb-4 mb-md-1 list-toolbar-search">
                     <div class="kt-input-icon kt-input-icon--left">
-                      <input type="text" (input)="handleSearchInput($event)" class="form-control"
-                        [placeholder]="'SearchWithThreeDot' | localize" id="generalSearch" />
+                      <!-- <input type="text" (input)="handleSearchInput($event)" class="form-control"
+                        [placeholder]="'SearchWithThreeDot' | localize" id="generalSearch" /> -->
+
+                        <input
+    type="text"
+    formControlName="search"
+    class="form-control"
+    [placeholder]="'SearchWithThreeDot' | localize"
+    id="generalSearch"
+/>
                       <span class="kt-input-icon__icon kt-input-icon__icon--left">
                         <span><i class="flaticon2-search-1 icon-md"></i></span>
                       </span>

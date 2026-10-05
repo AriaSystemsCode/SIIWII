@@ -285,6 +285,8 @@ namespace onetouch.AppSiiwiiTransaction.Dtos
     {
         public string ContactRole { set; get; }
         public string ContactName { set; get; }
+        public string ContactEmail { set; get; }
+        public string ContactPhoneNumber { set; get; }
     }
     //MMT-OC
     //I49-ChReq[Start]

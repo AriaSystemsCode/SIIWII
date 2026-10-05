@@ -3,6 +3,7 @@ using Abp.Application.Services.Dto;
 using System.ComponentModel.DataAnnotations;
 using onetouch.AppEntities.Dtos;
 using System.Collections.Generic;
+using Abp.Timing;
 
 namespace onetouch.AppEvents.Dtos
 {
@@ -21,12 +22,16 @@ namespace onetouch.AppEvents.Dtos
 
         public virtual string TimeZone { get; set; }
 
+        [DisableDateTimeNormalization]
         public virtual DateTime FromDate { get; set; }
 
+        [DisableDateTimeNormalization]
         public virtual DateTime ToDate { get; set; }
 
+        [DisableDateTimeNormalization]
         public virtual DateTime FromTime { get; set; }
 
+        [DisableDateTimeNormalization]
         public virtual DateTime ToTime { get; set; }
 
         public virtual bool Privacy { get; set; }

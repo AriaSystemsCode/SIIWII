@@ -174,7 +174,11 @@ export class InteractionsComponent extends AppComponentBase implements OnInit, O
             this.commentParentComponent.focusAddComment()
         }else {
             this.triggerCommentsList(true)
-            this.toName.emit(this.comment.messages.toName)
+            // this.toName.emit(this.comment.messages.senderName)
+            this.toName.emit({
+  name: this.comment.messages.senderName,
+  value: this.comment.messages.senderId?.toString()
+} as any);
             if(this.showComments) this.commentParentComponent.focusAddComment()
         }
     

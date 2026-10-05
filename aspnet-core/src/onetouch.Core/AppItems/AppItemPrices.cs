@@ -23,6 +23,8 @@ namespace onetouch.AppItems
        // [Key, Column(Order = 0)]
         public virtual long AppItemId { get; set; }
         public virtual string AppItemCode { get; set; }
+        
+        
         public virtual long? CurrencyId { get; set; }
        // [Key, Column(Order = 2)]
         public virtual string CurrencyCode { get; set; }

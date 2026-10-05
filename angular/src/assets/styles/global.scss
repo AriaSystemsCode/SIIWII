@@ -236,7 +236,7 @@ body {
 
 .slide-md-Section{
     width: 90%;
-    height:238.4pt;
+    // height:238.4pt;
     border: solid 1px #B49BB4;
     background-color: #EFEFEF;
     border-radius: 2px 2px 10px 10px;
@@ -244,7 +244,7 @@ body {
 
 .slide-sm-Section{
     width: 198pt;
-    height: 250pt;
+    // height: 250pt;
     border: solid 1px #B49BB4;
     background-color: #EFEFEF;
     border-radius: 2px 2px 10px 10px;
@@ -267,14 +267,16 @@ body {
     cursor: pointer;
     display: block;
     width: 100%;
-    height: 80%;
+    // height: 80%;
+    height: 300px;
+    object-fit: cover;
 }
 .slide-small-image
 {
     cursor: pointer;
     display: block;
     width: 100%;
-    height: 80%;
+    // height: 80%;
 }
 
 .noRLMargin {
@@ -809,7 +811,7 @@ border: 1px solid #D9D9D9 !important;
 }
 
 .variation-table .p-datatable .p-datatable-thead > tr > th, .variation-table .p-datatable.p-datatable-hoverable-rows .p-datatable-tbody > tr:not(.p-highlight):hover, .variation-table .p-datatable .p-datatable-tbody > tr.p-highlight {
-    padding: 20px !important;
+    padding: 10px !important;
     border: 1px solid #c8c8c8 !important;
     border-radius: 12px !important;
 }
@@ -850,11 +852,6 @@ html{
     border: none !important;
   }
   
-
-  .p-accordion-header-text {
-    color: #1B101B !important;
-    font-weight: 700 !important;
-    padding: 10px;
   .btn-outline-primary{
     border: none !important;
     background-color: #610061 !important;
@@ -898,6 +895,9 @@ background-color:  #4A0D4A !important;
 }
 
 
+searchicon {
+    padding-top: 15%;
+}
 .swal2-styled.swal2-confirm {
     background-color: #4A0D4A !important;
 }
@@ -935,7 +935,6 @@ th.sticky-header {
     padding: 0px;
 }
 
-  }
 
 .border-danger {
     border: 1px solid #C83532 !important;
@@ -985,3 +984,39 @@ body p-paginator .p-paginator .p-paginator-element, body p-paginator .p-paginato
     .btn.btn-link:focus, .btn.btn-link:hover, .btn.btn-link.active, a.btn.btn-label:focus, a.btn.btn-label:hover, a.btn.btn-label.active, button.btn.btn-label:focus, button.btn.btn-label:hover, button.btn.btn-label.active, input.btn.btn-label:focus, input.btn.btn-label:hover, input.btn.btn-label.active{
         background-color:  #f7f2f6 !important;
     }
+.modal .modal-content .modal-header .modal-title {
+    padding: 10px;
+}
+
+
+input[type='password']::-ms-reveal,
+input[type='password']::-ms-clear,
+input[type='password']::-webkit-credentials-auto-fill-button,
+input[type='password']::-webkit-contacts-auto-fill-button {
+  display: none !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+
+.field-manager-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    box-sizing: border-box;
+    position: relative;
+}
+
+.field-manager-icon::before {
+    content: "";
+    width: 28px;
+    height: 28px;
+    display: block;
+    background-image: url('/assets/icons/field-manager.svg');
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+}

@@ -44,7 +44,7 @@ export class MarketplaceProductsComponent
     @Input() accountDataForView: any
     @Input() marketplaceAccCurrency: string
 
-    isFilterHidden: boolean = false;
+    isFilterHidden: boolean = true;
     sellerData: any;
     isSellerIdExists: boolean = false;
     currencies: CurrencyInfoDto[];
@@ -80,9 +80,14 @@ export class MarketplaceProductsComponent
     appItemListId: any;
     selectedDepartments: any;
 
-    isAuthenticate = this.appSession?.user
-    selectedCategories: number[] = [];
-    sellerSSinSetting: string
+    isAuthenticate= this.appSession?.user
+    selectedCategories: number[] = []; 
+
+     
+    brandIdFromUrl: number | null = null;
+    catIdFromUrl: number | null = null;
+    sellerSSinSetting:string
+   
 
 
     constructor(
@@ -425,6 +430,7 @@ export class MarketplaceProductsComponent
 
     }
 
+
     handleSortingChange(data: any) {
         this.getAllProducts();
     }
@@ -543,8 +549,10 @@ export class MarketplaceProductsComponent
         this.getAllProducts();
     }
     resetProducts($event) {
+       if (this.filters) {
         this.filters.resetFilters();
-        (this.seletedOption = { label: "Public And Shared With Me", value: 2 }),
+    }
+        (this.seletedOption = { label: this.l("Public And Shared With Me"), value: 2 }),
             (this.selectedCurrrency =
                 localStorage.getItem("currencyCode") == "undefined" || JSON.parse(localStorage.getItem("currencyCode")) === null
                     ? this.tenantDefaultCurrency

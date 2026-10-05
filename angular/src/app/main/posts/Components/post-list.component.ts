@@ -86,11 +86,10 @@ export class PostListComponent
     }
 
     ngOnInit(): void {
-        this.isAuthenticated = !!this.appSession?.user;
-        if(this.isAuthenticated){
+           this.isAuthenticated = !!this.appSession?.user;
+           if(this.isAuthenticated){
         this.getProfilePicture();
-
-        }
+           }
         this.userName =
             this.appSession.user.name + " " + this.appSession.user.surname;
             if(!this.fromMarketplaceProfile && !this.fromOverviewTab){

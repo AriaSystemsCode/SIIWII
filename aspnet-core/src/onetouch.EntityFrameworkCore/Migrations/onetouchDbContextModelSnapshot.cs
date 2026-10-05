@@ -3070,6 +3070,243 @@ namespace onetouch.Migrations
                         });
                 });
 
+            modelBuilder.Entity("onetouch.AppFields.AppField", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<bool>("AllowMultiSelect")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("AllowNull")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("CreationTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long?>("CreatorUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("CurrentRevisionNo")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(10)
+                        .HasColumnType("nvarchar(10)")
+                        .HasDefaultValue("00");
+
+                    b.Property<string>("DateFormat")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<int?>("Decimals")
+                        .HasColumnType("int");
+
+                    b.Property<string>("DefaultValue")
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)");
+
+                    b.Property<long?>("DeleterUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime?>("DeletionTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)");
+
+                    b.Property<bool>("Editable")
+                        .HasColumnType("bit");
+
+                    b.Property<long?>("EntitySycObjectId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("ExtraAttributes")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FieldCode")
+                        .IsRequired()
+                        .HasMaxLength(11)
+                        .HasColumnType("nvarchar(11)");
+
+                    b.Property<string>("FieldLevelCode")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(32)
+                        .HasColumnType("nvarchar(32)")
+                        .HasDefaultValue("Application");
+
+                    b.Property<long?>("FieldLevelId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("FieldName")
+                        .IsRequired()
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
+
+                    b.Property<string>("FieldStatusCode")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(32)
+                        .HasColumnType("nvarchar(32)")
+                        .HasDefaultValue("Proposed");
+
+                    b.Property<long?>("FieldStatusId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("FieldTypeId")
+                        .HasColumnType("bigint");
+
+                    b.Property<bool>("IsCustom")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsExtraField")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsHidden")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsStandard")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("LastModificationTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long?>("LastModifierUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<int?>("Length")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("Required")
+                        .HasColumnType("bit");
+
+                    b.Property<long?>("SourceFieldId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("SycObjectId")
+                        .HasColumnType("bigint");
+
+                    b.Property<int?>("TenantId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("TimeFormat")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("TrackingNo")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<bool>("Visible")
+                        .HasColumnType("bit");
+
+                    b.Property<long?>("WidgetTypeId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EntitySycObjectId");
+
+                    b.HasIndex("FieldTypeId");
+
+                    b.HasIndex("SourceFieldId");
+
+                    b.HasIndex("SycObjectId");
+
+                    b.HasIndex("WidgetTypeId");
+
+                    b.HasIndex("TenantId", "FieldCode")
+                        .IsUnique()
+                        .HasFilter("[IsDeleted] = 0");
+
+                    b.HasIndex("TenantId", "SourceFieldId");
+
+                    b.HasIndex("TenantId", "SycObjectId");
+
+                    b.ToTable("APPFields", t =>
+                        {
+                            t.HasTrigger("APPFields_Trigger");
+                        });
+                });
+
+            modelBuilder.Entity("onetouch.AppFields.AppFieldHistory", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<long>("AppFieldId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("ChangeType")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<DateTime>("ChangedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long?>("ChangedBy")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("RestoredFromRevisionNo")
+                        .HasMaxLength(10)
+                        .HasColumnType("nvarchar(10)");
+
+                    b.Property<string>("RevisionNo")
+                        .IsRequired()
+                        .HasMaxLength(10)
+                        .HasColumnType("nvarchar(10)");
+
+                    b.Property<string>("SnapshotJson")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("TenantId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TenantId");
+
+                    b.HasIndex("AppFieldId", "RevisionNo")
+                        .IsUnique();
+
+                    b.ToTable("AppFieldsHistory", t =>
+                        {
+                            t.HasTrigger("AppFieldsHistory_Trigger");
+                        });
+                });
+
+            modelBuilder.Entity("onetouch.AppFields.AppTableField", b =>
+                {
+                    b.Property<long>("Id").ValueGeneratedOnAdd().HasColumnType("bigint");
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+                    b.Property<long>("AppFieldId").HasColumnType("bigint");
+                    b.Property<DateTime>("CreationTime").HasColumnType("datetime2");
+                    b.Property<long?>("CreatorUserId").HasColumnType("bigint");
+                    b.Property<long>("SycObjectId").HasColumnType("bigint");
+                    b.Property<long?>("SycEntityObjectTypeId").HasColumnType("bigint");
+                    b.Property<int?>("TenantId").HasColumnType("int");
+                    b.HasKey("Id");
+                    b.HasIndex("AppFieldId");
+                    b.HasIndex("SycObjectId");
+                    b.HasIndex("SycEntityObjectTypeId");
+                    b.HasIndex("TenantId", "SycObjectId", "SycEntityObjectTypeId");
+                    b.HasIndex("TenantId", "AppFieldId", "SycObjectId", "SycEntityObjectTypeId")
+                        .IsUnique();
+                    b.ToTable("AppTableFields");
+                });
+
             modelBuilder.Entity("onetouch.AppItemSelectors.AppItemSelector", b =>
                 {
                     b.Property<long>("Id")
@@ -3116,6 +3353,16 @@ namespace onetouch.Migrations
                         {
                             t.HasTrigger("AppItemSelectors_Trigger");
                         });
+                });
+
+            modelBuilder.Entity("onetouch.AppFields.AppTableField", b =>
+                {
+                    b.HasOne("onetouch.AppFields.AppField", null).WithMany()
+                        .HasForeignKey("AppFieldId").OnDelete(DeleteBehavior.Restrict).IsRequired();
+                    b.HasOne("onetouch.SystemObjects.SydObject", null).WithMany()
+                        .HasForeignKey("SycObjectId").OnDelete(DeleteBehavior.Restrict).IsRequired();
+                    b.HasOne("onetouch.SystemObjects.SycEntityObjectType", null).WithMany()
+                        .HasForeignKey("SycEntityObjectTypeId").OnDelete(DeleteBehavior.Restrict);
                 });
 
             modelBuilder.Entity("onetouch.AppItems.AppItem", b =>
@@ -7440,7 +7687,7 @@ namespace onetouch.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("RecipientContactSSIN")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("RecipientContactTypeCode")
                         .HasColumnType("nvarchar(max)");
@@ -7464,7 +7711,7 @@ namespace onetouch.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("RequesterContactSSIN")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("RequesterContactTypeCode")
                         .HasColumnType("nvarchar(max)");
@@ -7477,6 +7724,10 @@ namespace onetouch.Migrations
 
                     b.Property<int>("SharingLevel")
                         .HasColumnType("int");
+
+                    b.HasIndex("RecipientContactSSIN");
+
+                    b.HasIndex("RequesterContactSSIN");
 
                     b.ToTable("AppContactRelationshipInfo", t =>
                         {
@@ -7658,6 +7909,9 @@ namespace onetouch.Migrations
 
                     b.Property<long>("StockAvailability")
                         .HasColumnType("bigint");
+
+                    b.Property<decimal>("TaxRate")
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("Variations")
                         .HasColumnType("nvarchar(max)");
@@ -8912,6 +9166,45 @@ namespace onetouch.Migrations
                         .HasForeignKey("EntityId");
 
                     b.Navigation("EntityFk");
+                });
+
+            modelBuilder.Entity("onetouch.AppFields.AppField", b =>
+                {
+                    b.HasOne("onetouch.SystemObjects.SydObject", null)
+                        .WithMany()
+                        .HasForeignKey("EntitySycObjectId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("onetouch.SystemObjects.SycEntityObjectType", null)
+                        .WithMany()
+                        .HasForeignKey("FieldTypeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("onetouch.AppFields.AppField", null)
+                        .WithMany()
+                        .HasForeignKey("SourceFieldId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("onetouch.SystemObjects.SydObject", null)
+                        .WithMany()
+                        .HasForeignKey("SycObjectId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("onetouch.SystemObjects.SycEntityObjectType", null)
+                        .WithMany()
+                        .HasForeignKey("WidgetTypeId")
+                        .OnDelete(DeleteBehavior.Restrict);
+                });
+
+            modelBuilder.Entity("onetouch.AppFields.AppFieldHistory", b =>
+                {
+                    b.HasOne("onetouch.AppFields.AppField", null)
+                        .WithMany()
+                        .HasForeignKey("AppFieldId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("onetouch.AppItems.AppItem", b =>

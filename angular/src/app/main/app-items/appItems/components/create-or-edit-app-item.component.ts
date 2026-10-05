@@ -1647,7 +1647,7 @@ export class CreateOrEditAppItemComponent
                     return this.askToPublish();
                 this.goBack("app/main/products");
             });
-    }
+}
     extraSelectedValuesExtraData() {
         const recentlyExtraAttributes: FilteredExtraAttribute<any>[] = [
             ...this.extraAttributes.ADDITIONAL.extraAttributes,
@@ -1890,7 +1890,7 @@ export class CreateOrEditAppItemComponent
     openCreateNewAppEntityModal(extraAttr: FilteredExtraAttribute) {
         this.formTouched = true;
         let config: ModalOptions = new ModalOptions();
-           !this.isArabic ?  config.class = "right-modal slide-right-in" : config.class = "left-modal slide-left-in ngLeft"
+           !this.isArabic ?  config.class = "right-modal slide-right-in" : config.class = "left-modal  slide-left-in ngLeft"
         let modalDefaultData: Partial<AppEntityListDynamicModalComponent> = {
             entityObjectType: {
                 name: extraAttr.name,
@@ -2057,15 +2057,22 @@ export class CreateOrEditAppItemComponent
             this.notify.error("Available Qty should be >=0");
     }
     checkAndAddDefaultPriceObject() {
-        if (
-            !this.appItem.appItemPriceInfos ||
-            !this.appItem.appItemPriceInfos.length
-        ) {
-            this.appItem.appItemPriceInfos = [
-                this._pricingHelperService.getDefaultPricingInstance(),
-            ];
+        if (!this.appItem.appItemPriceInfos) {
+            this.appItem.appItemPriceInfos = [];
         }
-        this.checkDefaultCurrencyMSRPPriceIndex();
+
+        this.defaultCurrencyMSRPPriceIndex =
+            this._pricingHelperService.getDefaultPricingIndex(
+                this.appItem.appItemPriceInfos
+            );
+
+        if (this.defaultCurrencyMSRPPriceIndex < 0) {
+            this.appItem.appItemPriceInfos.push(
+                this._pricingHelperService.getDefaultPricingInstance()
+            );
+            this.defaultCurrencyMSRPPriceIndex =
+                this.appItem.appItemPriceInfos.length - 1;
+        }
     }
     showAdvancedPricingModal() {
         this.showAdvancedPricing = true;

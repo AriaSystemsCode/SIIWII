@@ -1,6 +1,14 @@
 :host {
     height: 100%;
 }
+.closeIcon-ar {
+    left: 0;
+    width: 60px !important;
+}
+
+.closeIcon-en {
+    right: 0;
+}
 
 .modal-content-wrapper {
     position: relative;

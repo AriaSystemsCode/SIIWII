@@ -45,7 +45,7 @@
             <button *ngIf="showSaveBtn" (click)="cancel()" class="cancelbtn text-center btn ">
                   {{l("Cancel")}}
             </button>
-            <button *ngIf="showSaveBtn" [disabled]="!(isContactsValid)" (click)="save()"
+            <button *ngIf="showSaveBtn" [disabled]="!(isContactsValid)" (click)="save()" type="button"
                 class="previewbtn text-center ">
                   {{l("Save")}}
             </button>

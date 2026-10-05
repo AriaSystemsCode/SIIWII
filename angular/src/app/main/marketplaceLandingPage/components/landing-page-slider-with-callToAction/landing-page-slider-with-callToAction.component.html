@@ -12,39 +12,45 @@
     </div>
 
   </div>
-<p-carousel *ngIf="!loading && blocksSorted.length > 0"
-  [value]="blocksSorted"
-  [numVisible]="numVisible"
-  [numScroll]="numScroll"
-  [circular]="false"
-  [autoplayInterval]="interval"
-  [showIndicators]="false"
+<p-carousel
+    *ngIf="!loading && blocksSorted.length > 0"
+    [value]="blocksSorted"
+    [numVisible]="1"
+    [numScroll]="1"
+    [circular]="false"
+    [autoplayInterval]="interval"
+    [showIndicators]="false"
+    styleClass="landing-slider"
 >
-  <ng-template pTemplate="item" let-slide>
-    <div class="pt-2" #imgContainer>
-      <div class="d-block position-relative">
+    <ng-template pTemplate="item" let-slide>
 
-        <!-- optional text button (still shown) -->
-        <a
-          *ngIf="slide?.buttonText"
-          class="txtBtn text-white"
-          (click)="onSlideClick(slide, $event)"
-        >
-          {{ slide?.buttonText }}
-        </a>
+        <div class="slide-item">
 
-        <!-- IMAGE clickable area -->
-        <div class="cursor-pointer" (click)="onSlideClick(slide, $event)">
-          <app-image-display
-            [image]="getSlideImage(slide)"
-            [sycAttachmentCategory]="sycAttachmentCategoryAutoSlider"
-            [staticWidth]="imgContainer.offsetWidth"
-      
-          ></app-image-display>
+            <div class="slide-content position-relative">
+
+                <a
+                    *ngIf="slide?.buttonText"
+                    class="txtBtn text-white"
+                    (click)="onSlideClick(slide, $event)"
+                >
+                    {{ slide?.buttonText }}
+                </a>
+
+                <div
+                    class="slide-image cursor-pointer"
+                    (click)="onSlideClick(slide, $event)"
+                >
+                    <app-image-display
+                        [image]="getSlideImage(slide)"
+                        [sycAttachmentCategory]="sycAttachmentCategoryAutoSlider"
+                    >
+                    </app-image-display>
+                </div>
+
+            </div>
+
         </div>
 
-      </div>
-    </div>
-  </ng-template>
+    </ng-template>
 </p-carousel>
 
