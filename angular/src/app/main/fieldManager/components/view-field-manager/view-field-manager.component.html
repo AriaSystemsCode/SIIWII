@@ -4,45 +4,46 @@
         <div class="modal-content revision-workspace">
             <div class="modal-header revision-modal-header">
                 <div>
-                    <span class="eyebrow">FIELD MANAGER</span>
+                    <span class="eyebrow">{{ 'FieldManager' | localize }}</span>
                     <h5 class="modal-title" id="fieldManagerViewModalLabel">{{ 'FieldDetailedView' | localize }}</h5>
                 </div>
-                <button type="button" class="close" aria-label="Close" (click)="close()"><span aria-hidden="true">&times;</span></button>
+                <button type="button" class="close" [attr.aria-label]="'Close' | localize" (click)="close()"><span aria-hidden="true">&times;</span></button>
             </div>
             <div class="modal-body revision-modal-body" *ngIf="item as field">
                 <div class="page-heading detail-heading">
-                    <h2>Field Information</h2>
+                    <h2>{{ 'FieldInformation' | localize }}</h2>
                     <div class="revision-identity">
-                        <span class="revision-number">Revision #{{ field.revisionSequence }}</span>
-                        <span class="status-badge badge-current">Current</span>
+                        <span class="revision-number">{{ 'Revision' | localize }} #{{ field.revisionSequence }}</span>
+                        <span class="status-badge badge-current">{{ 'Current' | localize }}</span>
                     </div>
                 </div>
                 <section class="field-card">
                     <div class="card-section-heading"><h3>{{ 'StandardInformation' | localize }}</h3></div>
                     <div class="detail-grid">
-                        <div class="detail-item"><span>Field Code</span><strong>{{ field.code || '—' }}</strong></div>
-                        <div class="detail-item"><span>Field Name</span><strong>{{ field.name || '—' }}</strong></div>
-                        <div class="detail-item detail-wide"><span>Description</span><strong>{{ field.description || '—' }}</strong></div>
-                        <div class="detail-item"><span>Field Type</span><strong>{{ field.type || '—' }}</strong></div>
-                        <div class="detail-item"><span>Widget</span><strong>{{ field.widgetName || '—' }}</strong></div>
-                        <div class="detail-item"><span>Field Level</span><strong>{{ field.fieldLevel || '—' }}</strong></div>
-                        <div class="detail-item"><span>Status</span><strong>{{ field.status || '—' }}</strong></div>
-                        <div class="detail-item"><span>Tracking #</span><strong>{{ field.trackingNumber || '—' }}</strong></div>
+                        <div class="detail-item"><span>{{ 'FieldCode' | localize }}</span><strong>{{ field.code || '—' }}</strong></div>
+                        <div class="detail-item"><span>{{ 'FieldName' | localize }}</span><strong>{{ field.name || '—' }}</strong></div>
+                        <div class="detail-item detail-wide"><span>{{ 'Description' | localize }}</span><strong>{{ field.description || '—' }}</strong></div>
+                        <div class="detail-item"><span>{{ 'FieldType' | localize }}</span><strong>{{ field.type || '—' }}</strong></div>
+                        <div class="detail-item"><span>{{ 'Widget' | localize }}</span><strong>{{ field.widgetName || '—' }}</strong></div>
+                        <div class="detail-item"><span>{{ 'FieldLevel' | localize }}</span><strong>{{ field.fieldLevel ? (field.fieldLevel | localize) : '—' }}</strong></div>
+                        <div class="detail-item"><span>{{ 'Status' | localize }}</span><strong>{{ field.status ? (field.status | localize) : '—' }}</strong></div>
+                        <div class="detail-item"><span>{{ 'TrackingNumber' | localize }} #</span><strong>{{ field.trackingNumber || '—' }}</strong></div>
                     </div>
                 </section>
+                                    <!-- //i51-AdvancedInformation from BE -->
                 <section class="field-card advanced-card">
-                    <div class="card-section-heading"><h3>Advanced Information</h3></div>
+                    <div class="card-section-heading"><h3>{{ 'AdvancedInformation' | localize }}</h3></div>
                     <div class="detail-grid advanced-grid">
-                        <div class="detail-item"><span>Allow Null</span><strong>{{ field.allowNull ? 'Yes' : 'No' }}</strong></div>
-                        <div class="detail-item"><span>Length</span><strong>{{ field.length == null ? '—' : field.length }}</strong></div>
-                        <div class="detail-item"><span>Allow Multi Select</span><strong>{{ field.allowMultiSelect ? 'Yes' : 'No' }}</strong></div>
-                        <div class="detail-item"><span>Decimals</span><strong>{{ field.decimals == null ? '—' : field.decimals }}</strong></div>
-                        <div class="detail-item"><span>Default Value</span><strong>{{ field.defaultValue || '—' }}</strong></div>
-                        <div class="detail-item"><span>Date Format</span><strong>{{ field.dateFormat || '—' }}</strong></div>
-                        <div class="detail-item"><span>Time Format</span><strong>{{ field.timeFormat || '—' }}</strong></div>
-                        <div class="detail-item"><span>Required</span><strong>{{ field.required ? 'Yes' : 'No' }}</strong></div>
-                        <div class="detail-item"><span>Visible</span><strong>{{ field.visible ? 'Yes' : 'No' }}</strong></div>
-                        <div class="detail-item"><span>Editable</span><strong>{{ field.editable ? 'Yes' : 'No' }}</strong></div>
+                        <div class="detail-item"><span>{{ 'AllowNull' | localize }}</span><strong>{{ (field.allowNull ? 'Yes' : 'No') | localize }}</strong></div>
+                        <div class="detail-item"><span>{{ 'Length' | localize }}</span><strong>{{ field.length == null ? '—' : field.length }}</strong></div>
+                        <div class="detail-item"><span>{{ 'AllowMultiSelect' | localize }}</span><strong>{{ (field.allowMultiSelect ? 'Yes' : 'No') | localize }}</strong></div>
+                        <div class="detail-item"><span>{{ 'Decimals' | localize }}</span><strong>{{ field.decimals == null ? '—' : field.decimals }}</strong></div>
+                        <div class="detail-item"><span>{{ 'DefaultValue' | localize }}</span><strong>{{ field.defaultValue || '—' }}</strong></div>
+                        <div class="detail-item"><span>{{ 'DateFormat' | localize }}</span><strong>{{ field.dateFormat || '—' }}</strong></div>
+                        <div class="detail-item"><span>{{ 'TimeFormat' | localize }}</span><strong>{{ field.timeFormat || '—' }}</strong></div>
+                        <div class="detail-item"><span>{{ 'Required' | localize }}</span><strong>{{ (field.required ? 'Yes' : 'No') | localize }}</strong></div>
+                        <div class="detail-item"><span>{{ 'Visible' | localize }}</span><strong>{{ (field.visible ? 'Yes' : 'No') | localize }}</strong></div>
+                        <div class="detail-item"><span>{{ 'Editable' | localize }}</span><strong>{{ (field.editable ? 'Yes' : 'No') | localize }}</strong></div>
                     </div>
                 </section>
             </div>

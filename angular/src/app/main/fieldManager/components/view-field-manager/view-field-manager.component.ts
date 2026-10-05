@@ -4,6 +4,7 @@ import { AppComponentBase } from '@shared/common/app-component-base';
 import { ModalDirective } from 'ngx-bootstrap/modal';
 import { FieldManagerItem } from '../../field-manager.model';
 import { FieldManagerService } from '../../field-manager.service';
+import { finalize } from 'rxjs/operators';
 
 @Component({
     selector: 'app-view-field-manager',
@@ -28,22 +29,30 @@ export class ViewFieldManagerComponent extends AppComponentBase implements OnIni
         const id = Number(this.activatedRoute.snapshot.paramMap.get('id'));
         if (id > 0) {
             this.loadDetails(this.fieldManagerService.getFieldDetailsById(id));
-            this.active = true;
-            this.modal.show();
         }
     }
 
     show(item: FieldManagerItem): void {
         this.item = null;
-        this.active = true;
-        this.modal.show();
+        this.active = false;
         this.loadDetails(this.fieldManagerService.getFieldDetails(item));
     }
 
     private loadDetails(details: ReturnType<FieldManagerService['getFieldDetails']>): void {
         const request = ++this.detailsRequest;
-        details.subscribe({
-            next: item => { if (request === this.detailsRequest) this.item = item; },
+        this.showMainSpinner();
+        details.pipe(finalize(() => {
+            if (request === this.detailsRequest) {
+                this.hideMainSpinner();
+            }
+        })).subscribe({
+            next: item => {
+                if (request === this.detailsRequest) {
+                    this.item = item;
+                    this.active = true;
+                    this.modal.show();
+                }
+            },
             error: () => {
                 if (request === this.detailsRequest) {
                     this.notify.error('Could not load field details.');
@@ -55,6 +64,7 @@ export class ViewFieldManagerComponent extends AppComponentBase implements OnIni
 
     close(): void {
         ++this.detailsRequest;
+        this.hideMainSpinner();
         this.active = false;
         this.item = null;
         this.modal.hide();

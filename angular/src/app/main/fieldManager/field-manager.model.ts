@@ -1,4 +1,3 @@
-    /////i51-Instead of BE Integration
 export interface FieldManagerDropdownOption {
     option: string;
     value: string;

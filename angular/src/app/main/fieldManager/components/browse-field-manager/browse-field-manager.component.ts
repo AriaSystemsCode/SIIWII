@@ -6,7 +6,8 @@ import { ExistingFieldsModalComponent } from '../existing-fields-modal/existing-
 import { AppComponentBase } from '@shared/common/app-component-base';
 import { FieldManagerEntityNode, FieldManagerItem } from '../../field-manager.model';
 import { FieldManagerPermissions, FieldManagerService } from '../../field-manager.service';
-import { Observable } from 'rxjs';
+import { forkJoin, Observable, of } from 'rxjs';
+import { catchError, finalize } from 'rxjs/operators';
 
 @Component({
     selector: 'app-browse-field-manager',
@@ -20,14 +21,16 @@ export class BrowseFieldManagerComponent extends AppComponentBase implements OnI
     items: FieldManagerItem[] = [];
     filterText = '';
     extraDataFilter: 'all' | 'only' | 'without' = 'all';
-    groupBy = 'none';
+    groupBy: 'none' | keyof Pick<FieldManagerItem, 'type' | 'createdUser' | 'fieldLevel'> = 'none';
     expandedGroups: { [groupValue: string]: boolean } = {};
     activeActionId: number | null = null;
     activeActionItem: FieldManagerItem | null = null;
     actionMenuPosition = { top: 0, left: 0 };
     activePanel: 'all' | 'entity' = 'all';
     entityTree: FieldManagerEntityNode[] = [];
+    entitySearchText = '';
     expandedEntityIds: string[] = [];
+    private collapsedEntityIds: string[] = [];
     selectedEntityId: number | null = null;
     selectedEntityKey: string | null = null;
     selectedNode: FieldManagerEntityNode | null = null;
@@ -59,14 +62,27 @@ export class BrowseFieldManagerComponent extends AppComponentBase implements OnI
     }
 
     ngOnInit(): void {
-        this.fieldManagerService.getPagePermissions().subscribe({
-            next: permissions => this.permissions = permissions,
-            error: () => this.notify.error('Could not load field manager permissions.')
-        });
-        this.loadItems();
-        this.fieldManagerService.getEntityTree().subscribe({
-            next: tree => this.entityTree = tree,
-            error: () => this.notify.error('Could not load the field manager tree.')
+        const fieldsRequest = ++this.fieldsRequest;
+        this.showMainSpinner();
+        forkJoin({
+            permissions: this.fieldManagerService.getPagePermissions().pipe(catchError(() => {
+                this.notify.error('Could not load field manager permissions.');
+                return of(this.permissions);
+            })),
+            items: this.fieldManagerService.getFieldsForNode(null).pipe(catchError(() => {
+                this.notify.error('Could not load fields.');
+                return of([] as FieldManagerItem[]);
+            })),
+            tree: this.fieldManagerService.getEntityTree().pipe(catchError(() => {
+                this.notify.error('Could not load the field manager tree.');
+                return of([] as FieldManagerEntityNode[]);
+            }))
+        }).pipe(finalize(() => this.hideMainSpinner())).subscribe(result => {
+            this.permissions = result.permissions;
+            if (fieldsRequest === this.fieldsRequest) {
+                this.items = result.items;
+            }
+            this.entityTree = result.tree;
         });
     }
 
@@ -106,6 +122,7 @@ export class BrowseFieldManagerComponent extends AppComponentBase implements OnI
         this.selectedNode = null;
         this.selectedEntityPath = [];
         this.expandedEntityIds = [];
+        this.collapsedEntityIds = [];
         this.closeActions();
         this.loadItems();
     }
@@ -117,15 +134,62 @@ export class BrowseFieldManagerComponent extends AppComponentBase implements OnI
         this.selectedEntityKey = node.key;
         this.selectedNode = node;
         if (node.children && node.children.length) {
-            this.expandedEntityIds = this.expandedEntityIds.indexOf(node.key) !== -1
-                ? this.expandedEntityIds.filter(id => id !== node.key)
-                : [...this.expandedEntityIds, node.key];
+            if (this.isEntityExpanded(node)) {
+                this.expandedEntityIds = this.expandedEntityIds.filter(id => id !== node.key);
+                if (this.entitySearchText.trim() && this.collapsedEntityIds.indexOf(node.key) === -1) {
+                    this.collapsedEntityIds = [...this.collapsedEntityIds, node.key];
+                }
+            } else {
+                this.expandedEntityIds = [...this.expandedEntityIds, node.key];
+                this.collapsedEntityIds = this.collapsedEntityIds.filter(id => id !== node.key);
+            }
         }
         this.loadItems();
     }
 
     isEntityExpanded(node: FieldManagerEntityNode): boolean {
-        return this.expandedEntityIds.indexOf(node.key) !== -1;
+        if (this.entitySearchText.trim() && this.collapsedEntityIds.indexOf(node.key) !== -1) {
+            return false;
+        }
+
+        return this.expandedEntityIds.indexOf(node.key) !== -1 ||
+            (!!this.entitySearchText.trim() && this.getEntityChildren(node).length > 0);
+    }
+
+    onEntitySearchChange(): void {
+        this.collapsedEntityIds = [];
+    }
+
+    get visibleEntityTree(): FieldManagerEntityNode[] {
+        return this.filterEntityNodes(this.entityTree, this.entitySearchText.trim().toLowerCase());
+    }
+
+    getEntityChildren(node: FieldManagerEntityNode): FieldManagerEntityNode[] {
+        const search = this.entitySearchText.trim().toLowerCase();
+        if (!search || node.name.toLowerCase().includes(search)) {
+            return node.children || [];
+        }
+
+        return this.filterEntityNodes(node.children || [], search);
+    }
+
+    private filterEntityNodes(nodes: FieldManagerEntityNode[], search: string): FieldManagerEntityNode[] {
+        if (!search) {
+            return nodes;
+        }
+
+        return nodes.reduce((matches, node) => {
+            if (node.name.toLowerCase().includes(search)) {
+                matches.push(node);
+                return matches;
+            }
+
+            const children = this.filterEntityNodes(node.children || [], search);
+            if (children.length) {
+                matches.push({ ...node, children });
+            }
+            return matches;
+        }, [] as FieldManagerEntityNode[]);
     }
 
     get breadcrumbPath(): FieldManagerEntityNode[] {
@@ -182,16 +246,11 @@ export class BrowseFieldManagerComponent extends AppComponentBase implements OnI
     }
 
     private getGroupValue(item: FieldManagerItem): string {
-        switch (this.groupBy) {
-            case 'type':
-                return item.type || '';
-            case 'createdUser':
-                return item.createdUser || '';
-            case 'fieldLevel':
-                return item.fieldLevel || '';
-            default:
-                return '';
+        if (this.groupBy === 'none') {
+            return '';
         }
+
+        return item[this.groupBy] || '';
     }
 
     create(): void {
@@ -253,7 +312,7 @@ export class BrowseFieldManagerComponent extends AppComponentBase implements OnI
         (event.target as HTMLElement).blur();
     }
  */
-    edit(item: FieldManagerItem): void {
+    CreateNewRevision(item: FieldManagerItem): void {
         this.closeActions();
         this.createOrEditFieldManagerModal.show(item.id);
     }
@@ -298,7 +357,6 @@ export class BrowseFieldManagerComponent extends AppComponentBase implements OnI
 
         isConfirmed.subscribe((res) => {
             if (res) {
-                //i51- call delete
                 this.fieldManagerService.deleteServerField(item.id).subscribe({
                     next: () => {
                         this.loadItems();

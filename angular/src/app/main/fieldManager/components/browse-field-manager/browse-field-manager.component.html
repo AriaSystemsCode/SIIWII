@@ -11,6 +11,11 @@
             </button>
 
             <div class="field-entity-tree" *ngIf="activePanel === 'entity'">
+                <div class="field-entity-search">
+                    <i class="fa fa-search" aria-hidden="true"></i>
+                    <input type="search" [(ngModel)]="entitySearchText" placeholder="Search entities..."
+                        aria-label="Search entities" (ngModelChange)="onEntitySearchChange()" />
+                </div>
                 <ng-template #entityNodes let-nodes>
                     <div class="field-entity-node" *ngFor="let node of nodes">
                         <button type="button" class="field-entity-node-button"
@@ -21,11 +26,15 @@
                             <span>{{ node.name }}</span>
                         </button>
                         <div class="field-entity-children" *ngIf="node.children?.length && isEntityExpanded(node)">
-                            <ng-container *ngTemplateOutlet="entityNodes; context: { $implicit: node.children }"></ng-container>
+                            <ng-container *ngTemplateOutlet="entityNodes; context: { $implicit: getEntityChildren(node) }"></ng-container>
                         </div>
                     </div>
                 </ng-template>
-                <ng-container *ngTemplateOutlet="entityNodes; context: { $implicit: entityTree }"></ng-container>
+                <ng-container *ngIf="visibleEntityTree.length; else noEntitySearchResults"
+                    [ngTemplateOutlet]="entityNodes" [ngTemplateOutletContext]="{ $implicit: visibleEntityTree }"></ng-container>
+                <ng-template #noEntitySearchResults>
+                    <div class="field-entity-search-empty">No entities found</div>
+                </ng-template>
             </div>
         </aside>
 
@@ -162,10 +171,10 @@
         [ngStyle]="{ top: actionMenuPosition.top + 'px', left: actionMenuPosition.left + 'px' }"
         (click)="$event.stopPropagation()">
         <button type="button" (click)="view(actionItem)">{{ 'View' | localize }}</button>
-        <button *ngIf="permissions.canEditField && actionItem.canEdit" type="button" (click)="edit(actionItem)">{{ 'Edit' | localize }}</button>
+        <!-- <button *ngIf="permissions.canEditField && actionItem.canEdit" type="button" (click)="CreateNewRevision(actionItem)">{{ 'CreateNewRevision' | localize }}</button>
         <button *ngIf="permissions.canDuplicateField" type="button" (click)="duplicate(actionItem)">{{ 'DuplicateField' | localize }}</button>
-        <button *ngIf="permissions.canEditField && actionItem.canHide" type="button" (click)="hide(actionItem)">{{ 'Hide' | localize }}</button>
-        <button *ngIf="actionItem.canDelete" type="button" (click)="delete(actionItem)">{{ 'Delete' | localize }}</button>
+        <button *ngIf="permissions.canEditField && actionItem.canHide" type="button" (click)="hide(actionItem)">{{ 'Hide' | localize }}</button>-->
+        <button *ngIf="actionItem.canDelete" type="button" (click)="delete(actionItem)">{{ 'Delete' | localize }}</button> 
     </div>
 
     <div class="field-manager-empty-selection" *ngIf="activePanel === 'entity' && selectedEntityId === null">
