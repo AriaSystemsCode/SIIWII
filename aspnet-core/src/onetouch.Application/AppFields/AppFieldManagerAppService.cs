@@ -14,6 +14,7 @@ using Abp.UI;
 using Microsoft.EntityFrameworkCore;
 using onetouch.AppFields.Dto;
 using onetouch.Authorization;
+using onetouch.Authorization.Users;
 using onetouch.EntityFrameworkCore;
 using onetouch.SystemObjects;
 
@@ -26,19 +27,22 @@ namespace onetouch.AppFields
         private readonly IRepository<AppTableField, long> _tableFields;
         private readonly IRepository<SydObject, long> _objects;
         private readonly IRepository<SycEntityObjectType, long> _objectTypes;
+        private readonly IRepository<User, long> _users;
 
         public AppFieldManagerAppService(
             IRepository<AppField, long> fields,
             IRepository<AppFieldHistory, long> history,
             IRepository<AppTableField, long> tableFields,
             IRepository<SydObject, long> objects,
-            IRepository<SycEntityObjectType, long> objectTypes)
+            IRepository<SycEntityObjectType, long> objectTypes,
+            IRepository<User, long> users)
         {
             _fields = fields;
             _history = history;
             _tableFields = tableFields;
             _objects = objects;
             _objectTypes = objectTypes;
+            _users = users;
         }
 
         [AbpAuthorize]
@@ -267,6 +271,14 @@ namespace onetouch.AppFields
                 var count = await query.CountAsync();
                 var page = await SortFields(query, input.Sorting).Skip(input.SkipCount)
                     .Take(input.MaxResultCount).AsNoTracking().ToListAsync();
+                var creatorIds = page.Where(x => x.CreatorUserId.HasValue)
+                    .Select(x => x.CreatorUserId.Value).Distinct().ToList();
+                var creators = await _users.GetAll()
+                    .Where(x => creatorIds.Contains(x.Id) && (x.TenantId == null || x.TenantId == tenantId))
+                    .Select(x => new { x.Id, x.Name, x.Surname })
+                    .AsNoTracking().ToListAsync();
+                var creatorNames = creators.ToDictionary(x => x.Id,
+                    x => string.Join(" ", new[] { x.Name, x.Surname }.Where(name => !string.IsNullOrWhiteSpace(name))));
                 var typeIds = page.SelectMany(x => new long?[] { x.FieldTypeId, x.WidgetTypeId })
                     .Where(x => x.HasValue).Select(x => x.Value).Distinct().ToList();
                 var typeNames = await _objectTypes.GetAll().Where(x => typeIds.Contains(x.Id))
@@ -307,6 +319,8 @@ namespace onetouch.AppFields
                     SycObjectId = x.SycObjectId,
                     EntitySycObjectId = x.EntitySycObjectId,
                     CreatorUserId = x.CreatorUserId,
+                    CreatorUserName = x.CreatorUserId.HasValue && creatorNames.TryGetValue(x.CreatorUserId.Value, out var creatorName)
+                        ? creatorName : null,
                     CreationTime = x.CreationTime,
                     Tables = pageAssignments.Where(a => a.AppFieldId == x.Id)
                         .Select(a => a.SycEntityObjectTypeId.HasValue && assignmentTypeNames.TryGetValue(a.SycEntityObjectTypeId.Value, out var assignedTypeName)

@@ -113,6 +113,7 @@ namespace onetouch.AppFields.Dto
         public long SycObjectId { get; set; }
         public long? EntitySycObjectId { get; set; }
         public long? CreatorUserId { get; set; }
+        public string CreatorUserName { get; set; }
         public DateTime CreationTime { get; set; }
         public List<string> Tables { get; set; } = new List<string>();
     }
