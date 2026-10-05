@@ -413,8 +413,8 @@ namespace onetouch.AppDashboards
                 {
 
                     SharingUserInfo userToSharWith = new SharingUserInfo();
-                    userToSharWith.UserId = user.Id ;
-                    UserInformationDto userToSharWithInfo = await _appEntitiesAppService.GetUserInformation(user.Id) ;
+                    userToSharWith.UserId = user.Id;
+                    UserInformationDto userToSharWithInfo = await _appEntitiesAppService.GetUserInformation(user.Id);
 
                     if (userToSharWithInfo != null)
                     {
@@ -423,6 +423,10 @@ namespace onetouch.AppDashboards
                         userToSharWith.AccountName = userToSharWithInfo.AccountName;
                         userToSharWith.AccountId = userToSharWithInfo.AccountId;
                         userToSharWith.UserName = userToSharWithInfo.UserName;
+                    }
+                    if (string.IsNullOrEmpty(userToSharWith.UserName))
+                    {
+                        userToSharWith.UserName = user.FullName;
                     }
     
                     if (user.Id== dashboardObj.CreatorUserId)
