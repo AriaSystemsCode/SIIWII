@@ -707,4 +707,66 @@ filterUsersFilterByEntity(event: any): void {
 
   this.cdr.detectChanges();
 }
+
+getAttachmentIcon(file: any): string {
+    const name =
+        (file?.name || '').toLowerCase();
+
+    const type =
+        (file?.type || '').toLowerCase();
+
+    // Image
+    if (type.includes('image')) {
+        return 'assets/message/image.png';
+    }
+
+    // Word
+    if (
+        name.endsWith('.doc') ||
+        name.endsWith('.docx')
+    ) {
+        return 'assets/message/microsoft-word.svg';
+    }
+
+    // PowerPoint
+    if (
+        name.endsWith('.ppt') ||
+        name.endsWith('.pptx')
+    ) {
+        return 'assets/message/microsoft-powerpoint.svg';
+    }
+
+    // Excel
+    if (
+        name.endsWith('.xls') ||
+        name.endsWith('.xlsx') ||
+        name.endsWith('.csv')
+    ) {
+        return 'assets/message/excel.svg';
+    }
+
+    // PDF
+    if (name.endsWith('.pdf')) {
+        return 'assets/message/document.png';
+    }
+
+    // Other files
+    return 'assets/message/document.png';
+}
+
+removeAttachment(index: number): void {
+    if (
+        index < 0 ||
+        index >= this.attachments.length
+    ) {
+        return;
+    }
+
+    this.attachments.splice(index, 1);
+
+    // Force Angular UI refresh.
+    this.attachments = [
+        ...this.attachments
+    ];
+}
 }

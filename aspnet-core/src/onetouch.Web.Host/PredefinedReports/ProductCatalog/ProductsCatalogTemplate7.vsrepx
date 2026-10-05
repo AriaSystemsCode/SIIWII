@@ -99,7 +99,7 @@
         </Item1>
       </Controls>
     </Item5>
-    <Item6 Ref="67" ControlType="DetailBand" Name="Detail" HeightF="1760.44861" Dpi="254">
+    <Item6 Ref="67" ControlType="DetailBand" Name="Detail" HeightF="1820" Dpi="254">
       <HierarchyPrintOptions Ref="68" Indent="50.8" />
       <MultiColumn Ref="69" ColumnCount="4" Layout="AcrossThenDown" Mode="UseColumnCount" />
       <Controls>
@@ -176,7 +176,7 @@
           </Controls>
           <StylePriority Ref="106" UseBackColor="false" UseBorderColor="false" />
         </Item1>
-        <Item2 Ref="107" ControlType="XRSubreport" Name="subreport1" SizeF="612.645752,287.3366" LocationFloat="10.8149414,1349.55493" Dpi="254">
+        <Item2 Ref="107" ControlType="XRSubreport" Name="subreport1" SizeF="612.645752,450" LocationFloat="10.8149414,1349.55493" Dpi="254">
           <Scripts Ref="108" OnBeforePrint="subreport1_BeforePrint" />
         </Item2>
       </Controls>

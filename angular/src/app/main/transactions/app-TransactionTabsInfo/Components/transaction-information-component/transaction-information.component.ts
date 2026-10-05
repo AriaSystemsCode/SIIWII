@@ -1407,6 +1407,12 @@ async printTransaction(): Promise<void> {
       this.reportUrl = "";
       if (printInfoParam) {
         this.printInfoParam = printInfoParam;
+        this.reportUrl = this.printInfoParam.getReportUrl();
+        this.createReportViewer();
+
+        if (refreshData) {
+          this.getShoppingCartData();
+        }
       } else {
         this.printInfoParam = new ProductCatalogueReportParams();
         this.printInfoParam.reportTemplateName = this.transactionReportTemplateName;
@@ -1418,8 +1424,10 @@ async printTransaction(): Promise<void> {
 
         // Asynchronous handling for setting orderConfirmationRole
         this._AppTransactionServiceProxy.getTenantRoleInTransaction(this.orderId, this.appTransactionsForViewDto.tenantId).subscribe((res) => {
-          this.printInfoParam.orderConfirmationRole = res.contactRole ? res.contactRole : 'buyer';
-          this.printInfoParam.contactName = res.contactName ? res.contactName : 'Savty';
+          this.printInfoParam.orderConfirmationRole = res.contactRole ? this.getTransactionRole(res.contactRole) : 'Buyer';
+          this.printInfoParam.contactName = res.contactName ?? '';
+          this.printInfoParam.contactEmail = res.contactEmail ?? '';
+          this.printInfoParam.contactPhoneNumber = res.contactPhoneNumber ?? '';
 
 
 
@@ -1470,8 +1478,10 @@ async printTransaction(): Promise<void> {
           const printInfoParam = new ProductCatalogueReportParams();
 
           // Set fetched data
-          printInfoParam.orderConfirmationRole = res.contactRole;
+          printInfoParam.orderConfirmationRole = this.getTransactionRole(res.contactRole);
           printInfoParam.contactName = res.contactName;
+          printInfoParam.contactEmail = res.contactEmail;
+          printInfoParam.contactPhoneNumber = res.contactPhoneNumber;
           printInfoParam.reportTemplateName = this.transactionReportTemplateName;
           printInfoParam.saveToPDF = true;
           printInfoParam.userId = this.appSession?.userId;

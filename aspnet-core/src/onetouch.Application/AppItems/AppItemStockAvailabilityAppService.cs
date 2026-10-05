@@ -43,13 +43,16 @@ namespace onetouch.AppItems
         private readonly IRepository<AppItem, long> _appItemRepository;
         private readonly IAppItemsAppService _appItemsAppService;
         private readonly IAppNotifier _appNotifier;
+        //private readonly RoleManager _roleManager;
+        //private readonly Authorization.Users.UserManager _userManager;
         public AppItemStockAvailabilityAppService(IAppConfigurationAccessor appConfigurationAccessor,
             IRepository<AppItem, long> appItemRepository, Helper helper,IAppItemsAppService appItemsAppService,
              IAppNotifier appNotifier,
-             RoleManager roleManager, UserManager userManager)
+             RoleManager roleManager,
+             UserManager userManager)
         {
-            _userManager = userManager;
             _roleManager = roleManager;
+            _userManager = userManager;
             _appNotifier = appNotifier;
             _appConfiguration = appConfigurationAccessor.Configuration;
             _helper = helper;
@@ -678,15 +681,14 @@ namespace onetouch.AppItems
                 string tenancyName = myTenantObject.TenancyName;
                 //var adminUser = await UserManager.FindByNameAsync("admin@" + tenancyName);
                 var adminRole = await _roleManager.Roles
-                       .FirstOrDefaultAsync(r => r.TenantId == int.Parse(AbpSession.TenantId.ToString()) && r.Name == StaticRoleNames.Tenants.Admin);
-
+.FirstOrDefaultAsync(r => r.TenantId == myTenantObject.Id && r.Name == StaticRoleNames.Tenants.Admin);
                 Authorization.Users.User adminUser = null;
                 if (adminRole != null)
                 {
                     var adminRoleId = adminRole.Id;
 
                     adminUser = await _userManager.Users
-                        .Where(u => u.TenantId == int.Parse(AbpSession.TenantId.ToString()))
+                        .Where(u => u.TenantId == myTenantObject.Id)
                         .Where(u => u.Roles.Any(r => r.RoleId == adminRoleId))
                         .FirstOrDefaultAsync();
                 }
@@ -716,15 +718,14 @@ namespace onetouch.AppItems
                     string tenancyName = myTenantObject.TenancyName;
                     //var adminUser = await UserManager.FindByNameAsync("admin@" + tenancyName);
                     var adminRole = await _roleManager.Roles
-                      .FirstOrDefaultAsync(r => r.TenantId == int.Parse(AbpSession.TenantId.ToString()) && r.Name == StaticRoleNames.Tenants.Admin);
-
+.FirstOrDefaultAsync(r => r.TenantId == myTenantObject.Id && r.Name == StaticRoleNames.Tenants.Admin);
                     Authorization.Users.User adminUser = null;
                     if (adminRole != null)
                     {
                         var adminRoleId = adminRole.Id;
 
                         adminUser = await _userManager.Users
-                            .Where(u => u.TenantId == int.Parse(AbpSession.TenantId.ToString()))
+                            .Where(u => u.TenantId == myTenantObject.Id)
                             .Where(u => u.Roles.Any(r => r.RoleId == adminRoleId))
                             .FirstOrDefaultAsync();
                     }

@@ -4,6 +4,13 @@ using System.Text;
 
 namespace onetouch.Message.Dto
 {
+    public class MarketplaceItemReviewSummaryDto
+    {
+        public long EntityId { get; set; }
+        public double NumberOfReviews { get; set; }
+        public decimal AverageRating { get; set; }
+    }
+
   public  class GetMessagesForViewDto
     {
         public MessagesDto Messages { get; set; }
