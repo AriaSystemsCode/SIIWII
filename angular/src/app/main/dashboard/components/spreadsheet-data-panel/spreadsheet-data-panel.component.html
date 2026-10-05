@@ -1,0 +1,396 @@
+<div
+    *ngIf="visible"
+    class="spreadsheet-side-panel">
+
+    <!-- Header -->
+    <div
+        class="
+            d-flex
+            justify-content-between
+            align-items-start
+            border-bottom
+            p-3
+        ">
+
+        <div>
+
+            <h5 class="mb-1">
+                {{ 'NewSiiwiiList' | localize }}
+            </h5>
+
+            <small class="text-muted">
+                {{
+                    'InsertApplicationDataIntoNewSheet'
+                        | localize
+                }}
+            </small>
+
+        </div>
+
+        <button
+            type="button"
+            class="btn btn-sm btn-light"
+            (click)="closePanel()">
+
+            <i class="fa fa-times"></i>
+
+        </button>
+
+    </div>
+
+
+    <!-- ================================= -->
+    <!-- STEP 1 - ENTITY -->
+    <!-- ================================= -->
+
+    <div
+        *ngIf="step === 1"
+        class="p-3">
+
+        <div class="form-group">
+
+            <label class="font-weight-bold">
+                {{ 'Entity' | localize }}
+            </label>
+
+            <small
+                class="
+                    d-block
+                    text-muted
+                    mb-3
+                ">
+
+                {{
+                    'SelectSiiwiiEntityToInsert'
+                        | localize
+                }}
+
+            </small>
+
+
+            <div
+                *ngFor="let entity of entities"
+                class="card mb-2 entity-card"
+                (click)="selectEntity(entity)">
+
+                <div
+                    class="
+                        card-body
+                        d-flex
+                        align-items-center
+                    ">
+
+                    <i
+                        [class]="entity.icon"
+                        class="mr-3">
+                    </i>
+
+                    <span>
+                        {{ entity.displayName }}
+                    </span>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ================================= -->
+    <!-- STEP 2 - COLUMNS / FILTERS -->
+    <!-- ================================= -->
+
+    <div
+        *ngIf="
+            step === 2 &&
+            selectedEntity
+        "
+        class="p-3">
+
+        <button
+            type="button"
+            class="btn btn-link px-0 mb-2"
+            (click)="backToEntities()">
+
+            <i class="fa fa-arrow-left mr-2"></i>
+
+            {{ 'ChangeEntity' | localize }}
+
+        </button>
+
+
+        <h5>
+            {{ selectedEntity.displayName }}
+        </h5>
+
+        <p class="text-muted">
+            {{
+                'ChooseColumnsAndOptionalFilters'
+                    | localize
+            }}
+        </p>
+
+
+        <!-- ============================= -->
+        <!-- COLUMNS -->
+        <!-- ============================= -->
+
+        <div class="mb-4">
+
+            <div
+                class="
+                    d-flex
+                    align-items-center
+                    justify-content-between
+                    mb-2
+                ">
+
+                <strong>
+                    {{ 'Columns' | localize }}
+                </strong>
+
+
+                <div>
+
+                    <button
+                        type="button"
+                        class="btn btn-sm btn-link"
+                        (click)="selectAllColumns()">
+
+                        {{ 'SelectAll' | localize }}
+
+                    </button>
+
+                    <button
+                        type="button"
+                        class="btn btn-sm btn-link"
+                        (click)="clearColumns()">
+
+                        {{ 'Clear' | localize }}
+
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <div
+                *ngFor="
+                    let column
+                    of selectedEntity.columns
+                "
+                class="form-check mb-2">
+
+                <input
+                    type="checkbox"
+                    class="form-check-input"
+                    [id]="
+                        'column-' +
+                        selectedEntity.sourceKey +
+                        '-' +
+                        column.key
+                    "
+                    [checked]="
+                        isColumnSelected(
+                            column.key
+                        )
+                    "
+                    (change)="
+                        toggleColumn(
+                            column.key,
+                            $event
+                        )
+                    " />
+
+
+                <label
+                    class="form-check-label"
+                    [for]="
+                        'column-' +
+                        selectedEntity.sourceKey +
+                        '-' +
+                        column.key
+                    ">
+
+                    {{ column.label }}
+
+                </label>
+
+            </div>
+
+        </div>
+
+
+        <!-- ============================= -->
+        <!-- FILTERS -->
+        <!-- ============================= -->
+
+        <div
+            *ngIf="
+                selectedEntity.filters?.length
+            "
+            class="mb-4">
+
+            <strong class="d-block mb-3">
+                {{ 'Filters' | localize }}
+            </strong>
+
+
+            <div
+                *ngFor="
+                    let filter
+                    of selectedEntity.filters
+                "
+                class="form-group">
+
+                <label>
+                    {{ filter.label }}
+                </label>
+
+
+                <!-- STRING -->
+
+                <input
+                    *ngIf="
+                        filter.type === 'string'
+                    "
+                    type="text"
+                    class="form-control"
+                    [(ngModel)]="
+                        filterValues[filter.key]
+                    " />
+
+
+                <!-- NUMBER -->
+
+                <input
+                    *ngIf="
+                        filter.type === 'number'
+                    "
+                    type="number"
+                    class="form-control"
+                    [(ngModel)]="
+                        filterValues[filter.key]
+                    " />
+
+
+                <!-- DATE -->
+
+                <input
+                    *ngIf="
+                        filter.type === 'date'
+                    "
+                    type="date"
+                    class="form-control"
+                    [(ngModel)]="
+                        filterValues[filter.key]
+                    " />
+
+
+                <!-- BOOLEAN -->
+
+                <div
+                    *ngIf="
+                        filter.type === 'boolean'
+                    "
+                    class="form-check">
+
+                    <input
+                        type="checkbox"
+                        class="form-check-input"
+                        [id]="
+                            'filter-' +
+                            filter.key
+                        "
+                        [(ngModel)]="
+                            filterValues[
+                                filter.key
+                            ]
+                        " />
+
+                    <label
+                        class="form-check-label"
+                        [for]="
+                            'filter-' +
+                            filter.key
+                        ">
+
+                        {{ filter.label }}
+
+                    </label>
+
+                </div>
+
+
+                <!-- SELECT -->
+
+                <p-dropdown
+                    *ngIf="
+                        filter.type === 'select'
+                    "
+                    [options]="
+                        filter.options || []
+                    "
+                    [(ngModel)]="
+                        filterValues[
+                            filter.key
+                        ]
+                    "
+                    optionLabel="label"
+                    optionValue="value"
+                    appendTo="body"
+                    [style]="{
+                        width: '100%'
+                    }">
+
+                </p-dropdown>
+
+            </div>
+
+        </div>
+
+
+        <!-- ============================= -->
+        <!-- ADD -->
+        <!-- ============================= -->
+
+        <button
+            type="button"
+            class="btn btn-primary btn-block"
+            [disabled]="
+                isAdding ||
+                !selectedColumns.length
+            "
+            (click)="addSheet()">
+
+            <i
+                *ngIf="isAdding"
+                class="
+                    fa
+                    fa-spinner
+                    fa-spin
+                    mr-2
+                ">
+            </i>
+
+            <i
+                *ngIf="!isAdding"
+                class="fa fa-plus mr-2">
+            </i>
+
+            {{
+                (
+                    isAdding
+                        ? 'Adding'
+                        : 'AddAsNewSheet'
+                ) | localize
+            }}
+
+        </button>
+
+    </div>
+
+</div>

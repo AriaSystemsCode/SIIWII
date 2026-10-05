@@ -1,4 +1,3 @@
-import { SavedSpreadsheet } from "./dashboard.model";
 
 
 export const DASHBOARD_SHEET = 'Dashboard';
@@ -61,14 +60,15 @@ export function readPixelValue(value: string, fallback: number): number {
     return Number.isFinite(parsed) ? parsed : Number(fallback ?? 0);
 }
 
-// ---------------------------------------------------------------------------
-// Local storage for saved spreadsheets
-// ---------------------------------------------------------------------------
 
-export function readSavedSpreadsheets(): SavedSpreadsheet[] {
-    return JSON.parse(localStorage.getItem(SAVED_SPREADSHEETS_KEY) || '[]');
-}
 
-export function writeSavedSpreadsheets(items: SavedSpreadsheet[]): void {
-    localStorage.setItem(SAVED_SPREADSHEETS_KEY, JSON.stringify(items));
+/** A parsed range such as 'Transactions'!A1:A40 */
+export interface ParsedRange {
+    sheetName: string;
+    startColumn: string;
+    endColumn: string;
+    startColumnIndex: number;
+    endColumnIndex: number;
+    startRow: number;
+    endRow: number;
 }

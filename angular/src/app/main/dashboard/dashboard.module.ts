@@ -42,6 +42,7 @@ import { CreateOrEditSpreadsheetComponent } from './components/create-or-edit-sp
 import { ProgressBarModule } from 'primeng/progressbar';
 import { AppDashboardServiceProxy } from '@shared/service-proxies/service-proxies';
 import { DashboardShareComponent } from './components/dashboard-share/dashboard-share.component';
+import { SpreadsheetDataPanelComponent } from './components/spreadsheet-data-panel/spreadsheet-data-panel.component';
 
 
 @NgModule({
@@ -50,6 +51,7 @@ import { DashboardShareComponent } from './components/dashboard-share/dashboard-
         DashboardDetailComponent,
         CreateOrEditSpreadsheetComponent,
         DashboardShareComponent,
+        SpreadsheetDataPanelComponent,
    
     ],
     imports: [

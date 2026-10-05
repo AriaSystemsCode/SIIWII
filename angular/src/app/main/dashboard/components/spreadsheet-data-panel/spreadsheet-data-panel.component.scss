@@ -1,0 +1,367 @@
+
+/* =========================================================
+   COLORS
+   ========================================================= */
+
+$primary: #5b176d;
+$primary-dark: #481056;
+$primary-light: #f5eef8;
+$primary-border: #ddcce4;
+
+$text: #252a3a;
+$text-secondary: #656b7c;
+$text-muted: #9296a5;
+
+$border: #e5e7ee;
+$border-light: #eef0f4;
+
+$page-bg: #f7f8fb;
+$panel-bg: #f8f9fc;
+$white: #ffffff;
+
+$danger: #d94a4a;
+$danger-bg: #fff0f0;
+
+:host {
+    display: block;
+}
+
+.spreadsheet-side-panel {
+    width: 420px;
+    min-width: 420px;
+
+    height: 100%;
+
+    background: #fff;
+
+    border-left: 1px solid #e5e7eb;
+
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.entity-card {
+    cursor: pointer;
+    transition:
+        border-color 0.15s ease,
+        box-shadow 0.15s ease,
+        transform 0.15s ease;
+
+    &:hover {
+        border-color: #d1d5db;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        transform: translateY(-1px);
+    }
+}
+
+
+/* =========================================================
+   SIDE PANEL HEADER
+   ========================================================= */
+
+.spreadsheet-side-panel > .border-bottom {
+    position: sticky;
+    top: 0;
+
+    z-index: 10;
+
+    min-height: 72px;
+
+    padding: 16px 18px !important;
+
+    background: $white;
+
+    border-bottom: 1px solid $border !important;
+}
+
+.spreadsheet-side-panel h5 {
+    margin: 0 0 3px;
+
+    color: $text;
+
+    font-size: 17px;
+    font-weight: 600;
+}
+
+.spreadsheet-side-panel small {
+    color: $text-muted !important;
+
+    font-size: 11px;
+    line-height: 1.4;
+}
+
+
+/* =========================================================
+   SIDE PANEL CLOSE BUTTON
+   ========================================================= */
+
+.spreadsheet-side-panel
+    > .border-bottom
+    > .btn-light {
+    width: 32px;
+    height: 32px;
+    min-height: 32px;
+
+    padding: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border: 0;
+    border-radius: 7px;
+
+    background: transparent;
+
+    color: #74798a;
+
+    &:hover {
+        background: #f0f1f5;
+        color: $text;
+    }
+}
+
+
+/* =========================================================
+   SIDE PANEL CONTENT
+   ========================================================= */
+
+.spreadsheet-side-panel > .p-3 {
+    padding: 18px !important;
+}
+
+.spreadsheet-side-panel .form-group {
+    margin-bottom: 22px;
+}
+
+.spreadsheet-side-panel label,
+.spreadsheet-side-panel strong {
+    color: #343849;
+
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.spreadsheet-side-panel label {
+    margin-bottom: 7px;
+}
+
+
+/* =========================================================
+   SIDE PANEL INPUTS
+   ========================================================= */
+
+.spreadsheet-side-panel .form-control {
+    width: 100%;
+    min-height: 42px;
+
+    padding: 8px 12px;
+
+    border: 1px solid #dfe2ea;
+    border-radius: 7px;
+
+    background: $white;
+
+    color: #424757;
+
+    font-size: 12px;
+
+    box-shadow: none;
+
+    transition:
+        border-color 0.15s ease,
+        box-shadow 0.15s ease;
+}
+
+.spreadsheet-side-panel .form-control:hover {
+    border-color: #c7cad5;
+}
+
+.spreadsheet-side-panel .form-control:focus {
+    outline: none;
+
+    border-color: #8b5798;
+
+    box-shadow: 0 0 0 3px rgba(91, 23, 109, 0.07);
+}
+
+.spreadsheet-side-panel .form-control::placeholder {
+    color: #a2a6b3;
+}
+
+
+/* =========================================================
+   SIDE PANEL PRIMENG DROPDOWN
+   ========================================================= */
+
+:host ::ng-deep .spreadsheet-side-panel .p-dropdown {
+    width: 100%;
+
+    min-height: 42px;
+
+    border: 1px solid #dfe2ea;
+    border-radius: 7px;
+
+    box-shadow: none;
+}
+
+:host ::ng-deep .spreadsheet-side-panel .p-dropdown:not(.p-disabled):hover {
+    border-color: #c7cad5;
+}
+
+:host ::ng-deep
+    .spreadsheet-side-panel
+    .p-dropdown:not(.p-disabled).p-focus {
+    border-color: #8b5798;
+
+    box-shadow: 0 0 0 3px rgba(91, 23, 109, 0.07);
+}
+
+
+/* =========================================================
+   ADD DATA ENTITY CARDS
+   ========================================================= */
+
+.spreadsheet-side-panel .card {
+    border: 1px solid $border;
+    border-radius: 8px;
+
+    background: $white;
+
+    box-shadow: none;
+
+    transition:
+        border-color 0.15s ease,
+        background 0.15s ease,
+        transform 0.15s ease,
+        box-shadow 0.15s ease;
+
+    &:hover {
+        border-color: $primary-border;
+
+        background: #fdfbfe;
+
+        box-shadow: 0 3px 10px rgba(91, 23, 109, 0.06);
+
+        transform: translateY(-1px);
+    }
+}
+
+.spreadsheet-side-panel .card-body {
+    padding: 13px 14px;
+}
+
+.spreadsheet-side-panel .card-body > i {
+    width: 32px;
+    height: 32px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 7px;
+
+    background: $primary-light;
+
+    color: $primary;
+}
+
+.spreadsheet-side-panel .card-body span {
+    color: $text;
+
+    font-size: 13px;
+    font-weight: 500;
+}
+
+
+/* =========================================================
+   COLUMN CHECKBOXES
+   ========================================================= */
+
+.spreadsheet-side-panel .form-check {
+    min-height: 32px;
+
+    display: flex;
+    align-items: center;
+
+    padding: 4px 6px 4px 26px;
+
+    border-radius: 5px;
+
+    &:hover {
+        background: #f1f2f6;
+    }
+}
+
+.spreadsheet-side-panel input[type='checkbox'] {
+    width: 15px;
+    height: 15px;
+
+    cursor: pointer;
+
+    accent-color: $primary;
+}
+
+.spreadsheet-side-panel .form-check-label {
+    margin: 0;
+
+    color: #474c5c;
+
+    font-size: 12px;
+    font-weight: 400;
+
+    cursor: pointer;
+}
+
+
+/* =========================================================
+   LINK BUTTONS
+   ========================================================= */
+
+.spreadsheet-side-panel .btn-link {
+    min-height: auto;
+
+    padding: 4px 7px;
+
+    border-radius: 5px;
+
+    color: $primary;
+
+    font-size: 11px;
+    font-weight: 500;
+
+    text-decoration: none;
+
+    &:hover {
+        background: $primary-light !important;
+
+        color: $primary-dark;
+
+        text-decoration: none;
+    }
+}
+
+
+/* =========================================================
+   ADD DATA PRIMARY BUTTON
+   ========================================================= */
+
+.spreadsheet-side-panel .btn-primary.btn-block {
+    min-height: 42px;
+
+    border: 0 !important;
+    border-radius: 7px;
+
+    background: $primary !important;
+
+    color: $white;
+
+    font-size: 13px;
+    font-weight: 600;
+
+    box-shadow: 0 2px 5px rgba(91, 23, 109, 0.1);
+
+    &:hover:not(:disabled) {
+        background: $primary-dark !important;
+    }
+}

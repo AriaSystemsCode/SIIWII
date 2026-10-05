@@ -27,17 +27,9 @@ import { AppDashboardServiceProxy } from '@shared/service-proxies/service-proxie
 
 @Component({
     selector: 'app-dashboard-detail',
-
-    templateUrl:
-        './dashboard-detail.component.html',
-
-    styleUrls: [
-        './dashboard-detail.component.scss'
-    ],
-
-    providers: [
-        MessageService
-    ]
+    templateUrl:'./dashboard-detail.component.html',
+    styleUrls: ['./dashboard-detail.component.scss'],
+    providers: [MessageService]
 })
 export class DashboardDetailComponent
     extends AppComponentBase
@@ -67,9 +59,7 @@ export class DashboardDetailComponent
         private cdr: ChangeDetectorRef
 
     ) {
-
         super(injector);
-
     }
 
 
@@ -99,7 +89,7 @@ export class DashboardDetailComponent
     }
 
 
-    private loadDashboard(): void {
+     loadDashboard(): void {
         if (!this.dashboardId) {
             return;
         }
@@ -120,11 +110,6 @@ export class DashboardDetailComponent
 
                         const saved = this.dashboard?.spreadsheet;
 
-                        // if (!saved) {
-                        //     throw new Error(
-                        //         'This Dashboard does not have a saved Spreadsheet.'
-                        //     );
-                        // }
                            if (!saved) {
                             throw new Error(
                                 ''

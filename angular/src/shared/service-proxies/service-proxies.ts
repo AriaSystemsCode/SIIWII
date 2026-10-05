@@ -6775,6 +6775,121 @@ export class AppDashboardServiceProxy {
 
     /**
      * @param dashboardId (optional) 
+     * @return Success
+     */
+    getTenantAllUser(dashboardId: number | undefined): Observable<SharingUserInfo[]> {
+        let url_ = this.baseUrl + "/api/services/app/AppDashboard/GetTenantAllUser?";
+        if (dashboardId === null)
+            throw new Error("The parameter 'dashboardId' cannot be null.");
+        else if (dashboardId !== undefined)
+            url_ += "dashboardId=" + encodeURIComponent("" + dashboardId) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetTenantAllUser(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetTenantAllUser(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<SharingUserInfo[]>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<SharingUserInfo[]>;
+        }));
+    }
+
+    protected processGetTenantAllUser(response: HttpResponseBase): Observable<SharingUserInfo[]> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            if (Array.isArray(resultData200)) {
+                result200 = [] as any;
+                for (let item of resultData200)
+                    result200!.push(SharingUserInfo.fromJS(item));
+            }
+            else {
+                result200 = <any>null;
+            }
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return Success
+     */
+    shareDashboard(body: ShareDashboardInfo | undefined): Observable<void> {
+        let url_ = this.baseUrl + "/api/services/app/AppDashboard/ShareDashboard";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json-patch+json",
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processShareDashboard(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processShareDashboard(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<void>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<void>;
+        }));
+    }
+
+    protected processShareDashboard(response: HttpResponseBase): Observable<void> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return _observableOf(null as any);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param dashboardId (optional) 
      * @param body (optional) 
      * @return Success
      */
@@ -76516,6 +76631,7 @@ export class GetDashboardForViewDto implements IGetDashboardForViewDto {
     spreadsheetFilePath!: string | undefined;
     isEditable!: boolean;
     isTheOwner!: boolean;
+    sharingLevel!: number;
 
     [key: string]: any;
 
@@ -76549,6 +76665,7 @@ export class GetDashboardForViewDto implements IGetDashboardForViewDto {
             this.spreadsheetFilePath = _data["spreadsheetFilePath"];
             this.isEditable = _data["isEditable"];
             this.isTheOwner = _data["isTheOwner"];
+            this.sharingLevel = _data["sharingLevel"];
         }
     }
 
@@ -76580,6 +76697,7 @@ export class GetDashboardForViewDto implements IGetDashboardForViewDto {
         data["spreadsheetFilePath"] = this.spreadsheetFilePath;
         data["isEditable"] = this.isEditable;
         data["isTheOwner"] = this.isTheOwner;
+        data["sharingLevel"] = this.sharingLevel;
         return data;
     }
 }
@@ -76596,6 +76714,7 @@ export interface IGetDashboardForViewDto {
     spreadsheetFilePath: string | undefined;
     isEditable: boolean;
     isTheOwner: boolean;
+    sharingLevel: number;
 
     [key: string]: any;
 }
@@ -76712,6 +76831,210 @@ export interface ICreateOrEditDashboard {
     id: number;
     title: string | undefined;
     description: string | undefined;
+
+    [key: string]: any;
+}
+
+export class SharingUserInfo implements ISharingUserInfo {
+    canEdit!: boolean;
+    isOwner!: boolean;
+    userId!: number;
+    canView!: boolean;
+    userImage!: string | undefined;
+    jobTitle!: string | undefined;
+    accountName!: string | undefined;
+    accountId!: number;
+    userName!: string | undefined;
+    id!: number;
+
+    [key: string]: any;
+
+    constructor(data?: ISharingUserInfo) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.canEdit = _data["canEdit"];
+            this.isOwner = _data["isOwner"];
+            this.userId = _data["userId"];
+            this.canView = _data["canView"];
+            this.userImage = _data["userImage"];
+            this.jobTitle = _data["jobTitle"];
+            this.accountName = _data["accountName"];
+            this.accountId = _data["accountId"];
+            this.userName = _data["userName"];
+            this.id = _data["id"];
+        }
+    }
+
+    static fromJS(data: any): SharingUserInfo {
+        data = typeof data === 'object' ? data : {};
+        let result = new SharingUserInfo();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["canEdit"] = this.canEdit;
+        data["isOwner"] = this.isOwner;
+        data["userId"] = this.userId;
+        data["canView"] = this.canView;
+        data["userImage"] = this.userImage;
+        data["jobTitle"] = this.jobTitle;
+        data["accountName"] = this.accountName;
+        data["accountId"] = this.accountId;
+        data["userName"] = this.userName;
+        data["id"] = this.id;
+        return data;
+    }
+}
+
+export interface ISharingUserInfo {
+    canEdit: boolean;
+    isOwner: boolean;
+    userId: number;
+    canView: boolean;
+    userImage: string | undefined;
+    jobTitle: string | undefined;
+    accountName: string | undefined;
+    accountId: number;
+    userName: string | undefined;
+    id: number;
+
+    [key: string]: any;
+}
+
+export class ShareWithUser implements IShareWithUser {
+    userId!: number;
+    canEdit!: boolean;
+
+    [key: string]: any;
+
+    constructor(data?: IShareWithUser) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.userId = _data["userId"];
+            this.canEdit = _data["canEdit"];
+        }
+    }
+
+    static fromJS(data: any): ShareWithUser {
+        data = typeof data === 'object' ? data : {};
+        let result = new ShareWithUser();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["userId"] = this.userId;
+        data["canEdit"] = this.canEdit;
+        return data;
+    }
+}
+
+export interface IShareWithUser {
+    userId: number;
+    canEdit: boolean;
+
+    [key: string]: any;
+}
+
+export class ShareDashboardInfo implements IShareDashboardInfo {
+    dashboardId!: number;
+    sharingLevel!: number;
+    canEdit!: boolean;
+    usersList!: ShareWithUser[] | undefined;
+
+    [key: string]: any;
+
+    constructor(data?: IShareDashboardInfo) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.dashboardId = _data["dashboardId"];
+            this.sharingLevel = _data["sharingLevel"];
+            this.canEdit = _data["canEdit"];
+            if (Array.isArray(_data["usersList"])) {
+                this.usersList = [] as any;
+                for (let item of _data["usersList"])
+                    this.usersList!.push(ShareWithUser.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): ShareDashboardInfo {
+        data = typeof data === 'object' ? data : {};
+        let result = new ShareDashboardInfo();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["dashboardId"] = this.dashboardId;
+        data["sharingLevel"] = this.sharingLevel;
+        data["canEdit"] = this.canEdit;
+        if (Array.isArray(this.usersList)) {
+            data["usersList"] = [];
+            for (let item of this.usersList)
+                data["usersList"].push(item.toJSON());
+        }
+        return data;
+    }
+}
+
+export interface IShareDashboardInfo {
+    dashboardId: number;
+    sharingLevel: number;
+    canEdit: boolean;
+    usersList: ShareWithUser[] | undefined;
 
     [key: string]: any;
 }

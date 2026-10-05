@@ -45,8 +45,9 @@
                 <i class="fa fa-save mr-2"></i>
                 {{ 'Save' | localize }}
             </button>
+            <!-- (click)="refreshData() -->
 
-            <button type="button" class="btn btn-light" [disabled]="isRefreshing" (click)="refreshData()">
+            <button type="button" class="btn btn-light" [disabled]="isRefreshing">
                 <i class="fa fa-sync-alt" [class.fa-spin]="isRefreshing"></i>
             </button>
         </div>
@@ -70,16 +71,9 @@
 
         <!-- SPREADSHEET -->
         <div class="spreadsheet-editor flex-grow-1 position-relative" (click)="onSheetClick($event)">
-            <ejs-spreadsheet
-                #spreadsheet
-                width="100%"
-                height="calc(100vh - 220px)"
-                [sheets]="sheets"
-                [scrollSettings]="scrollSettings"
-                [showAggregate]="showAggregate"
-                [showSheetTabs]="true"
-                (created)="onCreated()"
-                (ribbonClick)="onRibbonClick($event)">
+            <ejs-spreadsheet #spreadsheet width="100%" height="calc(100vh - 220px)" [sheets]="sheets"
+                [scrollSettings]="scrollSettings" [showAggregate]="showAggregate" [showSheetTabs]="true"
+                (created)="onCreated()" (ribbonClick)="onRibbonClick($event)">
             </ejs-spreadsheet>
 
             <!-- PIVOT -->
@@ -107,38 +101,23 @@
                 <div class="pivot-analysis-layout bg-white" style="height: calc(100vh - 360px);">
                     <!-- Table / chart -->
                     <div class="flex-grow-1" style="min-width: 0; height: 100%; overflow: hidden;">
-                        <ejs-pivotview
-                            #pivotView
-                            id="SiiwiiPivotView"
-                            width="100%"
-                            height="100%"
-                            [dataSourceSettings]="pivotSettings"
-                            [showFieldList]="false"
-                            [showToolbar]="true"
-                            [toolbar]="pivotToolbar"
-                            [showGroupingBar]="true"
-                            [allowCalculatedField]="true"
-                            [showTooltip]="true"
-                            [displayOption]="pivotDisplay"
-                            [chartSettings]="pivotChart"
-                            (enginePopulated)="onPivotReady()"
-                            (chartSeriesCreated)="onPivotChartChanged($event)">
+                        <ejs-pivotview #pivotView id="SiiwiiPivotView" width="100%" height="100%"
+                            [dataSourceSettings]="pivotSettings" [showFieldList]="false" [showToolbar]="true"
+                            [toolbar]="pivotToolbar" [showGroupingBar]="true" [allowCalculatedField]="true"
+                            [showTooltip]="true" [displayOption]="pivotDisplay" [chartSettings]="pivotChart"
+                            (enginePopulated)="onPivotReady()" (chartSeriesCreated)="onPivotChartChanged($event)">
                         </ejs-pivotview>
                     </div>
 
                     <!-- Fixed field list -->
-                    <div class="border-left bg-white" style="width: 420px; min-width: 420px; height: 100%; overflow: auto;">
+                    <div class="border-left bg-white"
+                        style="width: 420px; min-width: 420px; height: 100%; overflow: auto;">
                         <div class="px-3 py-2 border-bottom font-weight-bold">
                             {{ 'FieldsAndPivotConfiguration' | localize }}
                         </div>
 
-                        <ejs-pivotfieldlist
-                            #pivotFieldList
-                            id="SiiwiiPivotFieldList"
-                            width="100%"
-                            renderMode="Fixed"
-                            [dataSourceSettings]="pivotSettings"
-                            [allowCalculatedField]="true"
+                        <ejs-pivotfieldlist #pivotFieldList id="SiiwiiPivotFieldList" width="100%" renderMode="Fixed"
+                            [dataSourceSettings]="pivotSettings" [allowCalculatedField]="true"
                             (enginePopulated)="onFieldListReady()">
                         </ejs-pivotfieldlist>
                     </div>
@@ -147,7 +126,7 @@
         </div>
 
         <!-- ================= ADD DATA PANEL ================= -->
-        <div *ngIf="showDataPanel" class="spreadsheet-side-panel">
+        <!-- <div *ngIf="showDataPanel" class="spreadsheet-side-panel">
             <div class="d-flex justify-content-between align-items-start border-bottom p-3">
                 <div>
                     <h5 class="mb-1">{{ 'NewSiiwiiList' | localize }}</h5>
@@ -159,7 +138,7 @@
                 </button>
             </div>
 
-            <!-- Step 1: choose entity -->
+           
             <div *ngIf="step === 1" class="p-3">
                 <div class="form-group">
                     <label class="font-weight-bold">{{ 'Entity' | localize }}</label>
@@ -175,7 +154,7 @@
                 </div>
             </div>
 
-            <!-- Step 2: choose columns and filters -->
+         
             <div *ngIf="step === 2 && selectedEntity" class="p-3">
                 <button type="button" class="btn btn-link px-0 mb-2" (click)="backToEntities()">
                     <i class="fa fa-arrow-left mr-2"></i>
@@ -185,7 +164,7 @@
                 <h5>{{ selectedEntity.displayName }}</h5>
                 <p class="text-muted">{{ 'ChooseColumnsAndOptionalFilters' | localize }}</p>
 
-                <!-- Columns -->
+          
                 <div class="mb-4">
                     <div class="d-flex align-items-center justify-content-between mb-2">
                         <strong>{{ 'Columns' | localize }}</strong>
@@ -208,7 +187,7 @@
                     </div>
                 </div>
 
-                <!-- Filters -->
+             
                 <div *ngIf="selectedEntity.filters?.length" class="mb-4">
                     <strong class="d-block mb-3">{{ 'Filters' | localize }}</strong>
 
@@ -238,7 +217,13 @@
                     {{ (isAdding ? 'Adding' : 'AddAsNewSheet') | localize }}
                 </button>
             </div>
-        </div>
+        </div> -->
+
+
+
+        <app-spreadsheet-data-panel [visible]="showDataPanel" (close)="closeDataPanel()"
+            (batchLoaded)="onDataBatchLoaded($event)" (loadingFailed)="onDataLoadingFailed($event)">
+        </app-spreadsheet-data-panel>
 
         <!-- ================= CHART PANEL ================= -->
         <div *ngIf="showChartPanel" class="spreadsheet-side-panel">
