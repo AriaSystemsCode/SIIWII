@@ -103,6 +103,14 @@ namespace onetouch.Authorization
             accounts.CreateChildPermission(AppPermissions.Pages_Accounts_Member_Delete, L("DeleteMember"));
             accounts.CreateChildPermission(AppPermissions.Pages_Accounts_Publish, L("PublishProfile"));
 
+            //I52[Start]
+            var dashboards = pages.CreateChildPermission(AppPermissions.Pages_Dashboards, L("Dashboards"));
+            dashboards.CreateChildPermission(AppPermissions.Pages_Dashboards_CreateOrEdit, L("EditOrCreateNewDashboard"));
+            //dashboards.CreateChildPermission(AppPermissions.Pages_Dashboards_Edit, L("EditDashboard"));
+            dashboards.CreateChildPermission(AppPermissions.Pages_Dashboards_Delete, L("DeleteDashboard"));
+            dashboards.CreateChildPermission(AppPermissions.Pages_Dashboards_Share, L("ShareDashboard"));
+            //I52[End]
+
             var sycAttachmentCategories = pages.CreateChildPermission(AppPermissions.Pages_SycAttachmentCategories, L("SycAttachmentCategories"), multiTenancySides: MultiTenancySides.Host);
             sycAttachmentCategories.CreateChildPermission(AppPermissions.Pages_SycAttachmentCategories_Create, L("CreateNewSycAttachmentCategory"), multiTenancySides: MultiTenancySides.Host);
             sycAttachmentCategories.CreateChildPermission(AppPermissions.Pages_SycAttachmentCategories_Edit, L("EditSycAttachmentCategory"), multiTenancySides: MultiTenancySides.Host);

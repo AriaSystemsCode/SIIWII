@@ -3101,6 +3101,10 @@ Please select one of the available linesheet templates
 		<text name="WithoutExtraData">Without Extra Data</text>
 		<text name="FieldDetailedView">Field Detailed View</text>
 		<text name="Editinganewrevision">Editing a new revision</text>
-		<text name="RevisionHistory">Revision History</text> 
-  </texts>  
+		<text name="RevisionHistory">Revision History</text>
+		<text name="Dashboards">Dashboards</text>
+		<text name="EditOrCreateNewDashboard">Edit Dashboard or Create New Dashboard</text>
+		<text name="DeleteDashboard">Delete Dashboard</text>
+		<text name="ShareDashboard">Share Dashboard</text>
+	</texts>  
 </localizationDictionary>

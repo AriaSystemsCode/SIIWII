@@ -6,6 +6,12 @@
     /// </summary>
     public static class AppPermissions
     {
+        public const string Pages_Dashboards = "Pages.Dashboards";
+        public const string Pages_Dashboards_CreateOrEdit = "Pages.Dashboards.CreateOrEdit";
+        public const string Pages_Dashboards_Delete = "Pages.Dashboards.Delete";
+        public const string Pages_Dashboards_Share = "Pages.Dashboards.Share";
+
+
         public const string Pages_Administration_FieldManager = "Pages.Administration.FieldManager";
         public const string Pages_Administration_FieldManager_Create = "Pages.Administration.FieldManager.Create";
         public const string Pages_Administration_FieldManager_Edit = "Pages.Administration.FieldManager.Edit";

@@ -1,4 +1,5 @@
 ﻿using Abp.Application.Services.Dto;
+using Abp.Authorization;
 using Abp.Authorization.Users;
 
 //using Abp.Collections.Extensions;
@@ -21,6 +22,7 @@ using onetouch.AppEntities.Dtos;
 using onetouch.AppFields;
 using onetouch.AppFields.Dto;
 using onetouch.AppItems.Dtos;
+using onetouch.Authorization;
 using onetouch.Authorization.Users;
 using onetouch.Configuration;
 using onetouch.DashboardCustomization;
@@ -40,6 +42,8 @@ using static Microsoft.ApplicationInsights.MetricDimensionNames.TelemetryContext
 
 namespace onetouch.AppDashboards
 {
+    
+    [AbpAuthorize(AppPermissions.Pages_Dashboards)]
     public class AppDashboardAppService : onetouchAppServiceBase, IAppDashboardAppService
     {
         private readonly IRepository<AppEntity, long> _appEntityRepository;
@@ -300,6 +304,7 @@ namespace onetouch.AppDashboards
 
             return dashboard;
         }
+        [AbpAuthorize(AppPermissions.Pages_Dashboards_CreateOrEdit)]
         public async Task<bool> CreateOrEdit(CreateOrEditDashboard input)
         {
             if (input.Id == 0)
@@ -374,6 +379,7 @@ namespace onetouch.AppDashboards
             }
             await CurrentUnitOfWork.SaveChangesAsync();
         }
+        [AbpAuthorize(AppPermissions.Pages_Dashboards_Delete)]
         public async Task<bool> DeleteDashboard(long dashboard)
         {
             var dashboardObjectTypeId = await _helper.SystemTables.GetEntityObjectTypeDashboard();
@@ -462,6 +468,7 @@ namespace onetouch.AppDashboards
             }
             return returnList;
         }
+        [AbpAuthorize(AppPermissions.Pages_Dashboards_Share)]
         public async Task ShareDashboard(ShareDashboardInfo ShareDashboardInfo)
         {
             var dashboardObjectTypeId = await _helper.SystemTables.GetEntityObjectTypeDashboard();
