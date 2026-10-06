@@ -6,9 +6,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Abp.Application.Services;
+using Abp.EntityFrameworkCore.Uow;
 using Abp.UI;
+using DocumentFormat.OpenXml.InkML;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Storage;
 using Newtonsoft.Json.Linq;
+using onetouch.AppDashboards.Dtos;
 using onetouch.EntityFrameworkCore;
 
 namespace onetouch.AppDashboards
@@ -72,13 +77,47 @@ namespace onetouch.AppDashboards
             //        "A valid tenant context is required.");
             //}
 
-            where.Add("[TenantId] = @tenantId");
+            // confirm that table has tenantId
+            bool tableHasTenantId = TableHasField(_dbContext, tableName, "TenantId");
+            if (tableHasTenantId == true)
+            {
+                where.Add("[TenantId] = @tenantId");
 
-            parameters.Add(CreateParameter(
-                "@tenantId", AbpSession.TenantId.Value));
+                parameters.Add(CreateParameter(
+                     "@tenantId", input.TenantId));
+            }
+            else {
+                bool tableHasEntityId = TableHasField(_dbContext, tableName, "EntityId");
+                if (tableHasEntityId == true)
+                {
+                    tableName = tableName + " a Inner Join AppEntities b on b.Id = a.EntityId ";
+                    where.Add("[TenantId] = @tenantId");
 
-            // 4. Build parameterized conditions
-            var index = 0;
+                    parameters.Add(CreateParameter(
+                         "@tenantId", input.TenantId));
+                }
+                else {
+                    bool tableHasAppEntityId = TableHasField(_dbContext, tableName, "AppEntityId");
+                    if (tableHasAppEntityId == true)
+                    {
+                        tableName = tableName + " a Inner Join AppEntities b on b.Id = a.AppEntityId ";
+                        where.Add("[TenantId] = @tenantId");
+
+                        parameters.Add(CreateParameter(
+                             "@tenantId", input.TenantId));
+                    }
+                    else {
+                        tableName = tableName + " a Inner Join AppEntities b on b.Id = a.Id ";
+                        where.Add("[TenantId] = @tenantId");
+
+                        parameters.Add(CreateParameter(
+                             "@tenantId", input.TenantId));
+                    }
+                }
+
+            }
+                // 4. Build parameterized conditions
+                var index = 0;
 
             foreach (var condition in
                      input.Conditions ?? new List<onetouch.AppDashboards.Dtos.DynamicCondition>())
@@ -152,12 +191,20 @@ namespace onetouch.AppDashboards
                 parameters.Add(CreateParameter(parameterName, value));
             }
 
+
             // Always AND user filters with the tenant condition.
             var whereSql = " WHERE " + string.Join(" AND ", where);
-
+            var lastUpdateDate = input.LastUpdateDate;
+            if (input.LastUpdateDate != null)
+            {
+                
+                whereSql += string.Format(" AND "+
+                    " (CreationTime >= '{0}' OR " +
+                " LastModificationTime >= '{0}') ",lastUpdateDate);
+            }
             // 5. Count matching records
             var countSql =
-                $"SELECT COUNT_BIG(*) FROM [{tableName}]{whereSql}";
+                $"SELECT COUNT_BIG(*) FROM {tableName} {whereSql}";
 
             var totalCount = await ExecuteCountAsync(
                 countSql, parameters);
@@ -207,7 +254,7 @@ namespace onetouch.AppDashboards
                 ", ", selectedFields.Select(f => $"[{f}]"));
 
             var sql =
-                $"SELECT {selectSql} FROM [{tableName}]" +
+                $"SELECT {selectSql} FROM {tableName}" +
                 $"{whereSql} ORDER BY [{sortField}] {direction}" +
                 " OFFSET @skip ROWS FETCH NEXT @take ROWS ONLY";
 
@@ -249,7 +296,7 @@ namespace onetouch.AppDashboards
 
             await using var command = connection.CreateCommand();
             command.CommandText = sql;
-
+            command.Transaction = _dbContext.Database.CurrentTransaction.GetDbTransaction();
             foreach (var p in parameters)
             {
                 var parameter = command.CreateParameter();
@@ -284,7 +331,7 @@ namespace onetouch.AppDashboards
 
             await using var command = connection.CreateCommand();
             command.CommandText = sql;
-
+            command.Transaction = _dbContext.Database.CurrentTransaction.GetDbTransaction();
             foreach (var p in parameters)
             {
                 var parameter = command.CreateParameter();
@@ -325,6 +372,26 @@ namespace onetouch.AppDashboards
             }
 
             return items;
+        }
+        public bool TableHasField(
+    DbContext dbContext,
+    string tableName,
+    string fieldName)
+        {
+            var entityType = dbContext.Model.GetEntityTypes()
+                .FirstOrDefault(e =>
+                    e.GetTableName() == tableName);
+
+            if (entityType == null)
+                return false;
+
+            var tableIdentifier = StoreObjectIdentifier.Table(
+                entityType.GetTableName(),
+                entityType.GetSchema());
+
+            return entityType.GetProperties()
+                .Any(p =>
+                    p.GetColumnName(tableIdentifier) == fieldName);
         }
     }
 }

@@ -66,12 +66,14 @@ namespace onetouch.AppDashboards.Dtos
     }
     public class DynamicQueryInput : PagedAndSortedResultRequestDto
     {
+        public long TenantId { set; get; }
         public string TableName { get; set; }
 
         public List<string> Fields { get; set; }
 
         public List<DynamicCondition> Conditions { get; set; }
             = new List<DynamicCondition>();
+        public DateTime? LastUpdateDate { get; set; }
     }
 
     public class DynamicCondition
