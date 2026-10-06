@@ -2267,6 +2267,7 @@ namespace onetouch.AppMarketplaceAccounts
                 {
                     contactAddress.Id = 0;
                     contactAddress.AddressFk.Id = 0;
+                    contactAddress.AddressFk.AccountId = newAccountID;
                 }
 
                 long newId = 0;
