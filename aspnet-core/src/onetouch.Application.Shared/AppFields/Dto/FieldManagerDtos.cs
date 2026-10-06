@@ -73,8 +73,23 @@ namespace onetouch.AppFields.Dto
         public long? SycEntityObjectTypeId { get; set; }
     }
 
+    public class SyncFieldSnapshotsInput
+    {
+        [Range(1, long.MaxValue)] public long AppFieldId { get; set; }
+        public long? SycObjectId { get; set; }
+        public long? SycEntityObjectTypeId { get; set; }
+    }
+
+    public class GetAppliedFieldInput
+    {
+        public Guid FieldDefinitionKey { get; set; }
+        [Range(1, long.MaxValue)] public long SycObjectId { get; set; }
+        public long? SycEntityObjectTypeId { get; set; }
+    }
+
     public class AppFieldDto : CreateOrEditFieldInput
     {
+        public Guid FieldDefinitionKey { get; set; }
         public int? TenantId { get; set; }
         public long? SourceFieldId { get; set; }
         public string CurrentRevisionNo { get; set; }
@@ -93,6 +108,7 @@ namespace onetouch.AppFields.Dto
     public class AppFieldListDto
     {
         public long Id { get; set; }
+        public Guid FieldDefinitionKey { get; set; }
         public string FieldCode { get; set; }
         public string FieldName { get; set; }
         public string Description { get; set; }

@@ -231,46 +231,54 @@ namespace onetouch.AppFields
         {
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MayHaveTenant))
             {
-                var query = VisibleFields();
-                if (!input.AllFields) query = query.Where(x => x.IsExtraField);
                 var tenantId = AbpSession.TenantId;
                 var assignments = _tableFields.GetAll().Where(x => x.TenantId == null || x.TenantId == tenantId);
+                List<AppField> page;
+                int count;
+                var suppressedHostKeys = input.SelectedObjectId.HasValue || input.SelectedObjectTypeId.HasValue
+                    ? await GetSuppressedHostKeys(tenantId) : new HashSet<Guid>();
                 if (input.SelectedObjectTypeId.HasValue)
                 {
                     var selectedType = await _objectTypes.GetAll().Where(x => x.Id == input.SelectedObjectTypeId.Value && !x.IsDeleted)
                         .Select(x => new { x.Id, x.ObjectId }).SingleOrDefaultAsync();
                     if (selectedType == null) throw new UserFriendlyException("Select a valid object type.");
-                    var assignedIds = assignments.Where(x => x.SycObjectId == selectedType.ObjectId &&
+                    var rows = await assignments.Where(x => x.SycObjectId == selectedType.ObjectId &&
                         (x.SycEntityObjectTypeId == null || x.SycEntityObjectTypeId == selectedType.Id))
-                        .Select(x => x.AppFieldId);
-                    query = query.Where(x => assignedIds.Contains(x.Id));
+                        .AsNoTracking().ToListAsync();
+                    var filtered = FilterFields(SelectAppliedDefinitions(rows.Where(x =>
+                        !suppressedHostKeys.Contains(x.FieldDefinitionKey)), tenantId).AsQueryable(), input);
+                    count = filtered.Count();
+                    page = SortFields(filtered, input.Sorting).Skip(input.SkipCount).Take(input.MaxResultCount).ToList();
                 }
                 else if (input.SelectedObjectId.HasValue)
                 {
-                    var assignedIds = assignments.Where(x => x.SycObjectId == input.SelectedObjectId.Value &&
-                        x.SycEntityObjectTypeId == null).Select(x => x.AppFieldId);
-                    query = query.Where(x => assignedIds.Contains(x.Id));
+                    var rows = await assignments.Where(x => x.SycObjectId == input.SelectedObjectId.Value &&
+                        x.SycEntityObjectTypeId == null).AsNoTracking().ToListAsync();
+                    var filtered = FilterFields(SelectAppliedDefinitions(rows.Where(x =>
+                        !suppressedHostKeys.Contains(x.FieldDefinitionKey)), tenantId).AsQueryable(), input);
+                    count = filtered.Count();
+                    page = SortFields(filtered, input.Sorting).Skip(input.SkipCount).Take(input.MaxResultCount).ToList();
                 }
-                if (!string.IsNullOrWhiteSpace(input.SearchText))
+                else
                 {
-                    var search = input.SearchText.Trim();
-                    query = query.Where(x => x.FieldCode.Contains(search) || x.FieldName.Contains(search) ||
-                                             x.Description.Contains(search) || x.TrackingNo.Contains(search));
+                    using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.SoftDelete))
+                    {
+                        var usedKeys = assignments.Select(x => x.FieldDefinitionKey);
+                        var query = FilterFields(VisibleFields()
+                            .Where(x => !x.IsDeleted || usedKeys.Contains(x.FieldDefinitionKey)), input);
+                        count = await query.CountAsync();
+                        page = await SortFields(query, input.Sorting).Skip(input.SkipCount)
+                            .Take(input.MaxResultCount).AsNoTracking().ToListAsync();
+                    }
                 }
-                if (input.FieldTypeId.HasValue) query = query.Where(x => x.FieldTypeId == input.FieldTypeId.Value);
-                if (input.FieldStatusId.HasValue) query = query.Where(x => x.FieldStatusId == input.FieldStatusId.Value);
-                if (input.FieldLevelId.HasValue) query = query.Where(x => x.FieldLevelId == input.FieldLevelId.Value);
-                if (!string.IsNullOrWhiteSpace(input.FieldStatusCode)) query = query.Where(x => x.FieldStatusCode == input.FieldStatusCode);
-                if (!string.IsNullOrWhiteSpace(input.FieldLevelCode)) query = query.Where(x => x.FieldLevelCode == input.FieldLevelCode);
-                if (!string.IsNullOrWhiteSpace(input.TrackingNo)) query = query.Where(x => x.TrackingNo == input.TrackingNo);
-                if (input.IsStandard.HasValue) query = query.Where(x => x.IsStandard == input.IsStandard.Value);
-                if (input.CreatedByUserId.HasValue) query = query.Where(x => x.CreatorUserId == input.CreatedByUserId.Value);
-                if (input.CreatedFrom.HasValue) query = query.Where(x => x.CreationTime >= input.CreatedFrom.Value);
-                if (input.CreatedTo.HasValue) query = query.Where(x => x.CreationTime <= input.CreatedTo.Value);
-
-                var count = await query.CountAsync();
-                var page = await SortFields(query, input.Sorting).Skip(input.SkipCount)
-                    .Take(input.MaxResultCount).AsNoTracking().ToListAsync();
+                var pageKeys = page.Select(x => x.FieldDefinitionKey).Distinct().ToList();
+                Dictionary<Guid, bool> archived;
+                using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.SoftDelete))
+                {
+                    var catalog = await _fields.GetAll().Where(x => pageKeys.Contains(x.FieldDefinitionKey))
+                        .Select(x => new { x.FieldDefinitionKey, x.IsDeleted }).AsNoTracking().ToListAsync();
+                    archived = catalog.ToDictionary(x => x.FieldDefinitionKey, x => x.IsDeleted);
+                }
                 var creatorIds = page.Where(x => x.CreatorUserId.HasValue)
                     .Select(x => x.CreatorUserId.Value).Distinct().ToList();
                 var creators = await _users.GetAll()
@@ -283,9 +291,8 @@ namespace onetouch.AppFields
                     .Where(x => x.HasValue).Select(x => x.Value).Distinct().ToList();
                 var typeNames = await _objectTypes.GetAll().Where(x => typeIds.Contains(x.Id))
                     .ToDictionaryAsync(x => x.Id, x => x.Name);
-                var pageIds = page.Select(x => x.Id).ToList();
-                var pageAssignments = await assignments.Where(x => pageIds.Contains(x.AppFieldId))
-                    .Select(x => new { x.AppFieldId, x.SycObjectId, x.SycEntityObjectTypeId })
+                var pageAssignments = await assignments.Where(x => pageKeys.Contains(x.FieldDefinitionKey))
+                    .Select(x => new { x.FieldDefinitionKey, x.SycObjectId, x.SycEntityObjectTypeId })
                     .AsNoTracking().ToListAsync();
                 var objectIds = pageAssignments.Select(x => x.SycObjectId).Distinct().ToList();
                 var objectNames = await _objects.GetAll().Where(x => objectIds.Contains(x.Id))
@@ -299,13 +306,15 @@ namespace onetouch.AppFields
                 var result = page.Select(x => new AppFieldListDto
                 {
                     Id = x.Id,
+                    FieldDefinitionKey = x.FieldDefinitionKey,
                     FieldCode = x.FieldCode,
                     FieldName = x.FieldName,
                     Description = x.Description,
                     FieldTypeName = typeNames.TryGetValue(x.FieldTypeId, out var typeName) ? typeName : null,
                     WidgetTypeName = x.WidgetTypeId.HasValue && typeNames.TryGetValue(x.WidgetTypeId.Value, out var widgetName) ? widgetName : null,
                     FieldLevelName = x.FieldLevelCode,
-                    StatusName = x.FieldStatusCode,
+                    StatusName = !archived.TryGetValue(x.FieldDefinitionKey, out var isArchived) || isArchived
+                        ? "Archived" : x.FieldStatusCode,
                     RevisionNo = x.CurrentRevisionNo,
                     TrackingNo = x.TrackingNo,
                     StandardOrCustom = x.IsStandard ? "Standard" : "Custom",
@@ -313,22 +322,101 @@ namespace onetouch.AppFields
                     IsCustom = x.IsCustom,
                     IsExtraField = x.IsExtraField,
                     IsHidden = x.IsHidden,
-                    CanEdit = canEdit,
-                    CanDelete = canDelete && (!AbpSession.TenantId.HasValue || x.TenantId == AbpSession.TenantId),
-                    CanHide = AbpSession.TenantId.HasValue && x.TenantId == null,
+                    CanEdit = canEdit && archived.TryGetValue(x.FieldDefinitionKey, out var editableArchived) && !editableArchived,
+                    CanDelete = canDelete && archived.TryGetValue(x.FieldDefinitionKey, out var deletableArchived) && !deletableArchived &&
+                        (!AbpSession.TenantId.HasValue || x.TenantId == AbpSession.TenantId),
+                    CanHide = AbpSession.TenantId.HasValue && x.TenantId == null &&
+                        archived.TryGetValue(x.FieldDefinitionKey, out var hideArchived) && !hideArchived,
                     SycObjectId = x.SycObjectId,
                     EntitySycObjectId = x.EntitySycObjectId,
                     CreatorUserId = x.CreatorUserId,
                     CreatorUserName = x.CreatorUserId.HasValue && creatorNames.TryGetValue(x.CreatorUserId.Value, out var creatorName)
                         ? creatorName : null,
                     CreationTime = x.CreationTime,
-                    Tables = pageAssignments.Where(a => a.AppFieldId == x.Id)
+                    Tables = pageAssignments.Where(a => a.FieldDefinitionKey == x.FieldDefinitionKey)
                         .Select(a => a.SycEntityObjectTypeId.HasValue && assignmentTypeNames.TryGetValue(a.SycEntityObjectTypeId.Value, out var assignedTypeName)
                             ? assignedTypeName
                             : objectNames.TryGetValue(a.SycObjectId, out var tableName) ? tableName : null)
                         .Where(name => name != null).Distinct().ToList()
                 }).ToList();
                 return new PagedResultDto<AppFieldListDto>(count, result);
+            }
+        }
+
+        private static IEnumerable<AppField> SelectAppliedDefinitions(IEnumerable<AppTableField> rows, int? tenantId)
+        {
+            return rows.OrderByDescending(x => tenantId.HasValue && x.TenantId == tenantId)
+                .ThenByDescending(x => x.SycEntityObjectTypeId.HasValue)
+                .GroupBy(x => x.FieldDefinitionKey)
+                .Select(group =>
+                {
+                    var assignment = group.First();
+                    var field = JsonSerializer.Deserialize<AppField>(assignment.SnapshotJson);
+                    if (field == null) throw new UserFriendlyException("A table field snapshot is invalid.");
+                    field.FieldDefinitionKey = assignment.FieldDefinitionKey;
+                    field.FieldCode = assignment.FieldCode;
+                    field.CurrentRevisionNo = assignment.AppliedRevisionNo;
+                    return field;
+                });
+        }
+
+        private async Task<HashSet<Guid>> GetSuppressedHostKeys(int? tenantId)
+        {
+            if (!tenantId.HasValue) return new HashSet<Guid>();
+            using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.SoftDelete))
+            {
+                var sourceIds = await _fields.GetAll().Where(x => x.TenantId == tenantId && x.SourceFieldId.HasValue)
+                    .Select(x => x.SourceFieldId.Value).Distinct().ToListAsync();
+                var keys = await _fields.GetAll().Where(x => sourceIds.Contains(x.Id))
+                    .Select(x => x.FieldDefinitionKey).ToListAsync();
+                return new HashSet<Guid>(keys);
+            }
+        }
+
+        private static IQueryable<AppField> FilterFields(IQueryable<AppField> query, GetFieldsInput input)
+        {
+            if (!input.AllFields) query = query.Where(x => x.IsExtraField);
+            if (!string.IsNullOrWhiteSpace(input.SearchText))
+            {
+                var search = input.SearchText.Trim();
+                query = query.Where(x => x.FieldCode.Contains(search) || x.FieldName.Contains(search) ||
+                    (x.Description != null && x.Description.Contains(search)) ||
+                    (x.TrackingNo != null && x.TrackingNo.Contains(search)));
+            }
+            if (input.FieldTypeId.HasValue) query = query.Where(x => x.FieldTypeId == input.FieldTypeId.Value);
+            if (input.FieldStatusId.HasValue) query = query.Where(x => x.FieldStatusId == input.FieldStatusId.Value);
+            if (input.FieldLevelId.HasValue) query = query.Where(x => x.FieldLevelId == input.FieldLevelId.Value);
+            if (!string.IsNullOrWhiteSpace(input.FieldStatusCode)) query = query.Where(x => x.FieldStatusCode == input.FieldStatusCode);
+            if (!string.IsNullOrWhiteSpace(input.FieldLevelCode)) query = query.Where(x => x.FieldLevelCode == input.FieldLevelCode);
+            if (!string.IsNullOrWhiteSpace(input.TrackingNo)) query = query.Where(x => x.TrackingNo == input.TrackingNo);
+            if (input.IsStandard.HasValue) query = query.Where(x => x.IsStandard == input.IsStandard.Value);
+            if (input.CreatedByUserId.HasValue) query = query.Where(x => x.CreatorUserId == input.CreatedByUserId.Value);
+            if (input.CreatedFrom.HasValue) query = query.Where(x => x.CreationTime >= input.CreatedFrom.Value);
+            if (input.CreatedTo.HasValue) query = query.Where(x => x.CreationTime <= input.CreatedTo.Value);
+            return query;
+        }
+
+        [AbpAuthorize(AppPermissions.Pages_Administration_FieldManager)]
+        public async Task<AppFieldDto> GetAppliedField(GetAppliedFieldInput input)
+        {
+            if (input == null || input.FieldDefinitionKey == Guid.Empty)
+                throw new UserFriendlyException("Select a valid applied field.");
+            using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MayHaveTenant))
+            {
+                if (input.SycEntityObjectTypeId.HasValue && !await _objectTypes.GetAll().AnyAsync(x =>
+                    x.Id == input.SycEntityObjectTypeId.Value && x.ObjectId == input.SycObjectId && !x.IsDeleted))
+                    throw new UserFriendlyException("The selected object type does not belong to this object.");
+                var tenantId = AbpSession.TenantId;
+                if ((await GetSuppressedHostKeys(tenantId)).Contains(input.FieldDefinitionKey))
+                    throw new UserFriendlyException("Field was not found.");
+                var rows = await _tableFields.GetAll().Where(x =>
+                    x.FieldDefinitionKey == input.FieldDefinitionKey && x.SycObjectId == input.SycObjectId &&
+                    (x.TenantId == null || x.TenantId == tenantId) &&
+                    (x.SycEntityObjectTypeId == null || x.SycEntityObjectTypeId == input.SycEntityObjectTypeId))
+                    .AsNoTracking().ToListAsync();
+                var field = SelectAppliedDefinitions(rows, tenantId).SingleOrDefault();
+                if (field == null || field.IsHidden) throw new UserFriendlyException("Field was not found.");
+                return ToDto(field);
             }
         }
 
@@ -344,20 +432,16 @@ namespace onetouch.AppFields
 
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MayHaveTenant))
             {
-                var field = await VisibleFields().FirstOrDefaultAsync(x => x.Id == input.AppFieldId && !x.IsHidden);
+                var field = await VisibleFields().FirstOrDefaultAsync(x => x.Id == input.AppFieldId &&
+                    !x.IsHidden && x.FieldStatusCode != "Discontinued");
                 if (field == null) throw new UserFriendlyException("Field was not found.");
-                var exists = await _tableFields.GetAll().AnyAsync(x => x.AppFieldId == field.Id &&
+                var exists = await _tableFields.GetAll().AnyAsync(x => x.FieldDefinitionKey == field.FieldDefinitionKey &&
                     x.SycObjectId == input.SycObjectId &&
                     x.SycEntityObjectTypeId == input.SycEntityObjectTypeId &&
                     (x.TenantId == null || x.TenantId == AbpSession.TenantId));
                 if (exists) return new FieldActionResultDto { Success = true, Message = "Field is already assigned." };
-                await _tableFields.InsertAsync(new AppTableField
-                {
-                    TenantId = AbpSession.TenantId,
-                    AppFieldId = field.Id,
-                    SycObjectId = input.SycObjectId,
-                    SycEntityObjectTypeId = input.SycEntityObjectTypeId
-                });
+                await _tableFields.InsertAsync(CreateTableSnapshot(field, AbpSession.TenantId,
+                    input.SycObjectId, input.SycEntityObjectTypeId));
                 return new FieldActionResultDto { Success = true, Message = "Field assigned." };
             }
         }
@@ -366,10 +450,14 @@ namespace onetouch.AppFields
         public async Task<GetFieldForEditOutput> GetFieldForEdit(long id)
         {
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MayHaveTenant))
+            using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.SoftDelete))
             {
                 var field = await VisibleFields().FirstOrDefaultAsync(x => x.Id == id);
-                if (field == null) throw new UserFriendlyException("Field was not found.");
-                var canEdit = PermissionChecker.IsGranted(AppPermissions.Pages_Administration_FieldManager_Edit);
+                if (field == null || (field.IsDeleted && !await _tableFields.GetAll().AnyAsync(x =>
+                    x.FieldDefinitionKey == field.FieldDefinitionKey &&
+                    (x.TenantId == null || x.TenantId == AbpSession.TenantId))))
+                    throw new UserFriendlyException("Field was not found.");
+                var canEdit = !field.IsDeleted && PermissionChecker.IsGranted(AppPermissions.Pages_Administration_FieldManager_Edit);
                 var own = field.TenantId == AbpSession.TenantId;
                 return new GetFieldForEditOutput
                 {
@@ -378,8 +466,8 @@ namespace onetouch.AppFields
                     {
                         CanEditCoreInfo = canEdit,
                         CanEditAttributes = canEdit,
-                        CanDelete = own && PermissionChecker.IsGranted(AppPermissions.Pages_Administration_FieldManager_Delete),
-                        CanHide = AbpSession.TenantId.HasValue && field.TenantId == null,
+                        CanDelete = !field.IsDeleted && own && PermissionChecker.IsGranted(AppPermissions.Pages_Administration_FieldManager_Delete),
+                        CanHide = !field.IsDeleted && AbpSession.TenantId.HasValue && field.TenantId == null,
                         IsTenantCustomCopyRequired = AbpSession.TenantId.HasValue && field.TenantId == null
                     }
                 };
@@ -413,11 +501,10 @@ namespace onetouch.AppFields
 
                 if (!string.IsNullOrWhiteSpace(input.FieldCode) && input.FieldCode.Trim() != field.FieldCode)
                     throw new UserFriendlyException("Field code cannot be changed after creation.");
+                await ArchiveCurrentRevision(field);
                 Apply(input, field);
                 field.CurrentRevisionNo = NextRevision(field.CurrentRevisionNo);
                 await _fields.UpdateAsync(field);
-                await CurrentUnitOfWork.SaveChangesAsync();
-                await RecordHistory(field, "Edit");
                 return ToDto(field);
             }
         }
@@ -432,6 +519,7 @@ namespace onetouch.AppFields
                 if (field == null) throw new UserFriendlyException("Field was not found.");
                 if (field.TenantId != AbpSession.TenantId)
                     throw new UserFriendlyException("A tenant cannot delete a host field.");
+                await ArchiveCurrentRevision(field);
                 field.CurrentRevisionNo = NextRevision(field.CurrentRevisionNo);
                 await RecordHistory(field, "Delete");
                 await _fields.DeleteAsync(field);
@@ -503,27 +591,79 @@ namespace onetouch.AppFields
             if (sourceFieldId.HasValue || assignmentSourceFieldId.HasValue)
             {
                 var sourceAssignmentId = assignmentSourceFieldId ?? sourceFieldId.Value;
-                var sourceAssignments = await _tableFields.GetAll().Where(x => x.AppFieldId == sourceAssignmentId)
+                var sourceKey = await _fields.GetAll().Where(x => x.Id == sourceAssignmentId)
+                    .Select(x => x.FieldDefinitionKey).SingleAsync();
+                var sourceAssignments = await _tableFields.GetAll().Where(x => x.FieldDefinitionKey == sourceKey &&
+                    (x.TenantId == null || x.TenantId == AbpSession.TenantId))
                     .AsNoTracking().ToListAsync();
-                foreach (var assignment in sourceAssignments)
-                    await _tableFields.InsertAsync(new AppTableField
-                    {
-                        TenantId = AbpSession.TenantId,
-                        AppFieldId = field.Id,
-                        SycObjectId = assignment.SycObjectId,
-                        SycEntityObjectTypeId = assignment.SycEntityObjectTypeId
-                    });
+                foreach (var assignment in sourceAssignments
+                    .OrderByDescending(x => x.TenantId == AbpSession.TenantId)
+                    .GroupBy(x => new { x.SycObjectId, x.SycEntityObjectTypeId })
+                    .Select(group => group.First()))
+                    await _tableFields.InsertAsync(CreateTableSnapshot(field, AbpSession.TenantId,
+                        assignment.SycObjectId, assignment.SycEntityObjectTypeId));
             }
             else
-                await _tableFields.InsertAsync(new AppTableField
-                {
-                    TenantId = AbpSession.TenantId,
-                    AppFieldId = field.Id,
-                    SycObjectId = input.SycObjectId,
-                    SycEntityObjectTypeId = input.SelectedObjectTypeId
-                });
+                await _tableFields.InsertAsync(CreateTableSnapshot(field, AbpSession.TenantId,
+                    input.SycObjectId, input.SelectedObjectTypeId));
             await RecordHistory(field, "Create");
             return ToDto(field);
+        }
+
+        [AbpAuthorize(AppPermissions.Pages_Administration_FieldManager_Edit)]
+        public async Task<FieldActionResultDto> SyncFieldSnapshots(SyncFieldSnapshotsInput input)
+        {
+            if (input == null) throw new UserFriendlyException("Field data is required.");
+            if (input.SycEntityObjectTypeId.HasValue && !input.SycObjectId.HasValue)
+                throw new UserFriendlyException("Select the table for this object type.");
+            using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MayHaveTenant))
+            {
+                var field = await VisibleFields().SingleOrDefaultAsync(x => x.Id == input.AppFieldId && !x.IsHidden);
+                if (field == null) throw new UserFriendlyException("Field was not found.");
+                if (field.TenantId != AbpSession.TenantId)
+                    throw new UserFriendlyException("A tenant cannot sync a host field.");
+
+                var query = _tableFields.GetAll().Where(x => x.FieldDefinitionKey == field.FieldDefinitionKey &&
+                    x.TenantId == AbpSession.TenantId);
+                if (input.SycObjectId.HasValue)
+                    query = query.Where(x => x.SycObjectId == input.SycObjectId.Value &&
+                        x.SycEntityObjectTypeId == input.SycEntityObjectTypeId);
+                var snapshots = await query.ToListAsync();
+                if (snapshots.Count == 0) throw new UserFriendlyException("No table snapshot was found.");
+                var json = JsonSerializer.Serialize(ToDto(field));
+                foreach (var snapshot in snapshots)
+                {
+                    snapshot.FieldCode = field.FieldCode;
+                    snapshot.AppliedRevisionNo = field.CurrentRevisionNo;
+                    snapshot.SnapshotJson = json;
+                    await _tableFields.UpdateAsync(snapshot);
+                }
+                return new FieldActionResultDto { Success = true,
+                    Message = snapshots.Count + " table snapshot(s) synced." };
+            }
+        }
+
+        private static AppTableField CreateTableSnapshot(AppField field, int? tenantId,
+            long sycObjectId, long? sycEntityObjectTypeId)
+        {
+            return new AppTableField
+            {
+                TenantId = tenantId,
+                FieldDefinitionKey = field.FieldDefinitionKey,
+                FieldCode = field.FieldCode,
+                AppliedRevisionNo = field.CurrentRevisionNo,
+                SnapshotJson = JsonSerializer.Serialize(ToDto(field)),
+                SycObjectId = sycObjectId,
+                SycEntityObjectTypeId = sycEntityObjectTypeId
+            };
+        }
+
+        private async Task ArchiveCurrentRevision(AppField field)
+        {
+            // Older releases recorded every new revision immediately. Keep those rows immutable.
+            if (!await _history.GetAll().AnyAsync(x => x.AppFieldId == field.Id &&
+                x.RevisionNo == field.CurrentRevisionNo))
+                await RecordHistory(field, "Edit");
         }
 
         private async Task ValidateFieldInput(CreateOrEditFieldInput input)
@@ -713,7 +853,7 @@ namespace onetouch.AppFields
 
         private static AppFieldDto ToDto(AppField x) => new AppFieldDto
         {
-            Id = x.Id, TenantId = x.TenantId, SourceFieldId = x.SourceFieldId,
+            Id = x.Id, FieldDefinitionKey = x.FieldDefinitionKey, TenantId = x.TenantId, SourceFieldId = x.SourceFieldId,
             SycObjectId = x.SycObjectId, EntitySycObjectId = x.EntitySycObjectId,
             FieldTypeId = x.FieldTypeId, WidgetTypeId = x.WidgetTypeId, FieldLevelId = x.FieldLevelId,
             FieldStatusId = x.FieldStatusId, FieldCode = x.FieldCode, FieldName = x.FieldName,

@@ -259,6 +259,7 @@ namespace onetouch.EntityFrameworkCore
 
             modelBuilder.Entity<AppField>(field =>
             {
+                field.Property(x => x.FieldDefinitionKey).HasDefaultValueSql("newid()");
                 field.HasOne<SydObject>().WithMany().HasForeignKey(x => x.SycObjectId)
                     .OnDelete(DeleteBehavior.Restrict);
                 field.HasOne<SydObject>().WithMany().HasForeignKey(x => x.EntitySycObjectId)
@@ -274,6 +275,7 @@ namespace onetouch.EntityFrameworkCore
                 field.Property(x => x.CurrentRevisionNo).HasDefaultValue("00");
                 field.HasIndex(x => new { x.TenantId, x.FieldCode }).IsUnique()
                     .HasFilter("[IsDeleted] = 0");
+                field.HasIndex(x => x.FieldDefinitionKey).IsUnique();
                 field.HasIndex(x => new { x.TenantId, x.SycObjectId });
                 field.HasIndex(x => new { x.TenantId, x.SourceFieldId });
                 field.HasIndex(x => x.FieldTypeId);
@@ -287,15 +289,13 @@ namespace onetouch.EntityFrameworkCore
             });
             modelBuilder.Entity<AppTableField>(assignment =>
             {
-                assignment.HasOne<AppField>().WithMany().HasForeignKey(x => x.AppFieldId)
-                    .OnDelete(DeleteBehavior.Restrict);
                 assignment.HasOne<SydObject>().WithMany().HasForeignKey(x => x.SycObjectId)
                     .OnDelete(DeleteBehavior.Restrict);
                 assignment.HasOne<SycEntityObjectType>().WithMany().HasForeignKey(x => x.SycEntityObjectTypeId)
                     .OnDelete(DeleteBehavior.Restrict);
                 assignment.HasIndex(x => new { x.TenantId, x.SycObjectId, x.SycEntityObjectTypeId });
-                assignment.HasIndex(x => x.AppFieldId);
-                assignment.HasIndex(x => new { x.TenantId, x.AppFieldId, x.SycObjectId, x.SycEntityObjectTypeId })
+                assignment.HasIndex(x => x.FieldDefinitionKey);
+                assignment.HasIndex(x => new { x.TenantId, x.FieldDefinitionKey, x.SycObjectId, x.SycEntityObjectTypeId })
                     .IsUnique().HasFilter(null);
             });
 

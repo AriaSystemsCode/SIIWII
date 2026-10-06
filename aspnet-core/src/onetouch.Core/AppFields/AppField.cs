@@ -1,3 +1,4 @@
+using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Abp.Domain.Entities;
@@ -9,6 +10,7 @@ namespace onetouch.AppFields
     public class AppField : FullAuditedEntity<long>, IMayHaveTenant
     {
         public int? TenantId { get; set; }
+        public Guid FieldDefinitionKey { get; set; } = Guid.NewGuid();
         public long? SourceFieldId { get; set; }
         public long SycObjectId { get; set; }
         public long? EntitySycObjectId { get; set; }

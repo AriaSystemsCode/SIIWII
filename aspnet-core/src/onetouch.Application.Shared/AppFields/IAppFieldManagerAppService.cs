@@ -14,6 +14,8 @@ namespace onetouch.AppFields
         Task<FieldCodePreviewDto> PreviewFieldCode(PreviewFieldCodeInput input);
         Task<PagedResultDto<AppFieldListDto>> GetFields(GetFieldsInput input);
         Task<FieldActionResultDto> AssignExistingField(AssignExistingFieldInput input);
+        Task<FieldActionResultDto> SyncFieldSnapshots(SyncFieldSnapshotsInput input);
+        Task<AppFieldDto> GetAppliedField(GetAppliedFieldInput input);
         Task<GetFieldForEditOutput> GetFieldForEdit(long id);
         Task<AppFieldDto> CreateOrEditField(CreateOrEditFieldInput input);
         Task<FieldActionResultDto> DeleteField(EntityDto<long> input);

@@ -2,6 +2,9 @@
 
 Base path: `/api/services/app/AppFieldManager`. JSON names below use the camel case returned to Angular. Successful ABP responses place the endpoint payload in `result`.
 
+Database prerequisite: apply `20261006120000_SnapshotAppTableFields` after the earlier `APPFields` and `AppTableFields` migrations and seed scripts. It backfills immutable definition keys and table snapshots, then removes `AppTableFields.AppFieldId` and its foreign key.
+The previous assignment table did not record an applied revision, so migration backfill snapshots the catalog definition as it exists when the migration runs.
+
 ## 1. `GetPagePermissions`
 
 **API description:** Returns the current user's Field Manager permissions and host or tenant context.
@@ -82,7 +85,7 @@ Base path: `/api/services/app/AppFieldManager`. JSON names below use the camel c
 
 ## 5. `GetFields`
 
-**API description:** Returns a paged list of visible fields. Selecting an object type returns fields assigned to that type plus fields assigned to its base data object. Selecting an entity or data object returns its base assignments.
+**API description:** Returns a paged list of fields. All Fields lists catalog definitions and aggregates table usage by immutable `fieldDefinitionKey`; a soft-deleted definition still used by a table appears as `Archived` and is read-only. Selecting an object or object type reads the applied `AppTableFields` snapshots, including inherited base-object fields. Snapshots keep their applied revision when the catalog definition is edited.
 
 **API request:** `GET /GetFields` with query parameters.
 
@@ -113,15 +116,16 @@ Base path: `/api/services/app/AppFieldManager`. JSON names below use the camel c
 | --- | --- |
 | `result.totalCount` | Total number of matching fields before pagination. |
 | `result.items[]` | Fields on the requested page. |
-| `result.items[].id` | `APPFields` record ID. |
+| `result.items[].id` | Original `APPFields` record ID from the definition or applied snapshot. Archived rows are read-only. |
+| `result.items[].fieldDefinitionKey` | Immutable logical key used to read an applied snapshot with `GetAppliedField`. |
 | `result.items[].fieldCode` | Generated field code. |
 | `result.items[].fieldName` | Field name. |
 | `result.items[].description` | Field description. |
 | `result.items[].fieldTypeName` | Display name of the field type. |
 | `result.items[].widgetTypeName` | Display name of the widget type, if assigned. |
 | `result.items[].fieldLevelName` | Field level code shown as a name. |
-| `result.items[].statusName` | Field status code shown as a name. |
-| `result.items[].revisionNo` | Current revision number. |
+| `result.items[].statusName` | Field status; `Archived` when the catalog definition was soft-deleted or removed. |
+| `result.items[].revisionNo` | Current catalog revision in All Fields, or the applied snapshot revision for a selected table. |
 | `result.items[].trackingNo` | Tracking or iteration reference. |
 | `result.items[].standardOrCustom` | `Standard` or `Custom` display text. |
 | `result.items[].isStandard` | Field is host standard data. |
@@ -136,11 +140,11 @@ Base path: `/api/services/app/AppFieldManager`. JSON names below use the camel c
 | `result.items[].creatorUserId` | Creator user ID, if recorded. |
 | `result.items[].creatorUserName` | Creator's full name, if the user record is available. |
 | `result.items[].creationTime` | Creation date/time. |
-| `result.items[].tables[]` | Names of the field's assigned objects or object types. Includes all visible assignments for the field, not only the selected node. |
+| `result.items[].tables[]` | Names of every visible object or object type using this logical field, matched by `fieldDefinitionKey` without a foreign key to `APPFields`. |
 
 ## 6. `AssignExistingField`
 
-**API description:** Assigns an existing visible field to a base object or a specific object type. Repeating an existing assignment succeeds without adding another row.
+**API description:** Copies the current visible, non-discontinued definition into an independent table snapshot for a base object or object type. Repeating an existing assignment succeeds without adding another row.
 
 **API request:** `POST /AssignExistingField` with a JSON body.
 
@@ -213,11 +217,11 @@ Base path: `/api/services/app/AppFieldManager`. JSON names below use the camel c
 | `editable` (boolean, optional; default `true`) | Field can be edited. |
 | `extraAttributes` (string, optional) | JSON-encoded extra configuration. Must contain valid JSON when supplied. |
 
-**API response:** `result` is the saved field. Every attribute is defined in the **AppFieldDto response attributes** table below.
+**API response:** `result` is the saved field. Every attribute is defined in the **AppFieldDto response attributes** table below. Editing archives the previous revision in `AppFieldsHistory`; existing table snapshots keep their applied revision.
 
 ## 9. `DeleteField`
 
-**API description:** Soft-deletes an eligible field and records a revision. A tenant cannot delete a host field.
+**API description:** Soft-deletes an eligible catalog definition and records a revision. Existing table snapshots remain available and read-only. A tenant cannot delete a host field.
 
 **API request:** `DELETE /DeleteField` with a query parameter.
 
@@ -260,6 +264,34 @@ Base path: `/api/services/app/AppFieldManager`. JSON names below use the camel c
 | --- | --- |
 | `result` | `null`; this operation returns no field DTO. |
 
+## 12. `SyncFieldSnapshots`
+
+**API description:** Applies the current `APPFields` revision to the field's existing table snapshots. The field's old snapshots stay unchanged until this endpoint is called. A tenant can sync only its own field and table snapshots.
+
+**API request:** `POST /SyncFieldSnapshots` with a JSON body.
+
+| Request parameter | Description |
+| --- | --- |
+| `appFieldId` (number, required) | ID of the current catalog field definition. |
+| `sycObjectId` (number, optional) | Object whose snapshot should be updated. Omit to update all owned snapshots for the field. |
+| `sycEntityObjectTypeId` (number or `null`, optional) | Type-specific snapshot to update. Requires `sycObjectId`; omit or send `null` for the base-object snapshot. |
+
+**API response:** `result.success` is `true`; `result.message` reports the number of updated table snapshots. A missing assignment produces an error.
+
+## 13. `GetAppliedField`
+
+**API description:** Returns the full definition snapshot applied to an object or object type. The type-specific snapshot takes precedence over a base-object snapshot with the same definition key. This endpoint reads `AppTableFields` and still works after the catalog definition is soft-deleted.
+
+**API request:** `GET /GetAppliedField` with query parameters.
+
+| Request parameter | Description |
+| --- | --- |
+| `fieldDefinitionKey` (GUID, required) | Immutable logical key of the applied field. |
+| `sycObjectId` (number, required) | Object that uses the field. |
+| `sycEntityObjectTypeId` (number or `null`, optional) | Selected object type; includes its base-object snapshot when no type-specific snapshot exists. |
+
+**API response:** `result` is the applied revision of the complete `AppFieldDto` below. It is a read-only snapshot; editing continues through `CreateOrEditField` on the catalog definition.
+
 ## AppFieldDto response attributes
 
 This is the complete `result` field returned by `CreateOrEditField` and `DuplicateField`, and the complete `result.field` returned by `GetFieldForEdit`.
@@ -293,6 +325,7 @@ This is the complete `result` field returned by `CreateOrEditField` and `Duplica
 | `editable` | Whether the field is editable. |
 | `extraAttributes` | JSON-encoded extra configuration, if set. |
 | `tenantId` | Owning tenant ID; `null` for a host field. |
+| `fieldDefinitionKey` | Immutable logical key shared with applied table snapshots; no foreign key is required. |
 | `sourceFieldId` | Host field ID when this is a tenant copy; otherwise `null`. |
 | `currentRevisionNo` | Current revision number. |
 | `isStandard` | Field is host standard data. |
