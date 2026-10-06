@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Injector, Input, Output, ViewChild } from '@angular/core';
 import { ModalDirective } from 'ngx-bootstrap/modal';
 import { AppComponentBase } from '@shared/common/app-component-base';
-import { FieldManagerItem } from '../../field-manager.model';
+import { AppFieldListDto } from '@shared/service-proxies/service-proxies';
 import { FieldManagerService } from '../../field-manager.service';
 import { forkJoin } from 'rxjs';
 
@@ -12,7 +12,7 @@ import { forkJoin } from 'rxjs';
 })
 export class ExistingFieldsModalComponent extends AppComponentBase {
     @ViewChild('existingFieldsModal', { static: true }) modal!: ModalDirective;
-    @Input() items: FieldManagerItem[] = [];
+    @Input() items: AppFieldListDto[] = [];
     @Input() entityId: number | null = null;
     @Input() tableName = '';
     @Input() objectTypeId: number | null = null;
@@ -20,7 +20,7 @@ export class ExistingFieldsModalComponent extends AppComponentBase {
 
     search = '';
     selectedFieldIds: number[] = [];
-    allFields: FieldManagerItem[] = [];
+    allFields: AppFieldListDto[] = [];
 
     constructor(
         injector: Injector,
@@ -29,12 +29,12 @@ export class ExistingFieldsModalComponent extends AppComponentBase {
         super(injector);
     }
 
-    get availableFields(): FieldManagerItem[] {
+    get availableFields(): AppFieldListDto[] {
         const search = this.search.trim().toLowerCase();
-        const currentTableCodes = new Set(this.items.map(item => item.code));
+        const currentTableCodes = new Set(this.items.map(item => item.fieldCode));
 
         return this.allFields.filter(item => {
-            if (currentTableCodes.has(item.code)) {
+            if (currentTableCodes.has(item.fieldCode)) {
                 return false;
             }
 
@@ -42,10 +42,10 @@ export class ExistingFieldsModalComponent extends AppComponentBase {
                 return true;
             }
 
-            return item.name.toLowerCase().includes(search) ||
-                item.code.toLowerCase().includes(search) ||
-                item.type.toLowerCase().includes(search) ||
-                item.tables.toLowerCase().includes(search);
+                return (item.fieldName || '').toLowerCase().includes(search) ||
+                (item.fieldCode || '').toLowerCase().includes(search) ||
+                (item.fieldTypeName || '').toLowerCase().includes(search) ||
+                (item.tables || []).join(', ').toLowerCase().includes(search);
         });
     }
 

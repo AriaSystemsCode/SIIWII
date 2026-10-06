@@ -4,9 +4,12 @@ import { CreateOrEditFieldManagerComponent } from '../create-or-edit-field-manag
 import { ViewFieldManagerComponent } from '../view-field-manager/view-field-manager.component';
 import { ExistingFieldsModalComponent } from '../existing-fields-modal/existing-fields-modal.component';
 import { AppComponentBase } from '@shared/common/app-component-base';
-import { FieldManagerEntityNode, FieldManagerItem } from '../../field-manager.model';
-import { FieldManagerPermissions, FieldManagerService } from '../../field-manager.service';
-import { Observable } from 'rxjs';
+import { FieldManagerService } from '../../field-manager.service';
+import { forkJoin, Observable, of } from 'rxjs';
+import { catchError, finalize } from 'rxjs/operators';
+import { AppFieldListDto, FieldManagerPermissionDto, ObjectTypeTreeNodeDto } from '@shared/service-proxies/service-proxies';
+
+type GroupedFieldRow = Omit<AppFieldListDto, 'init' | 'toJSON'> & { groupValue: string };
 
 @Component({
     selector: 'app-browse-field-manager',
@@ -17,37 +20,42 @@ export class BrowseFieldManagerComponent extends AppComponentBase implements OnI
     @ViewChild('createOrEditFieldManagerModal', { static: true }) createOrEditFieldManagerModal!: CreateOrEditFieldManagerComponent;
     @ViewChild('viewFieldManagerModal', { static: true }) viewFieldManagerModal!: ViewFieldManagerComponent;
     @ViewChild('existingFieldsModal', { static: true }) existingFieldsModal!: ExistingFieldsModalComponent;
-    items: FieldManagerItem[] = [];
+    items: AppFieldListDto[] = [];
     filterText = '';
     extraDataFilter: 'all' | 'only' | 'without' = 'all';
-    groupBy = 'none';
+    groupBy: 'none' | keyof Pick<AppFieldListDto, 'fieldTypeName' | 'creatorUserId' | 'fieldLevelName'> = 'none';
     expandedGroups: { [groupValue: string]: boolean } = {};
     activeActionId: number | null = null;
-    activeActionItem: FieldManagerItem | null = null;
+    activeActionItem: AppFieldListDto | null = null;
     actionMenuPosition = { top: 0, left: 0 };
     activePanel: 'all' | 'entity' = 'all';
-    entityTree: FieldManagerEntityNode[] = [];
+    entityTree: ObjectTypeTreeNodeDto[] = [];
+    entitySearchText = '';
     expandedEntityIds: string[] = [];
+    private collapsedEntityIds: string[] = [];
     selectedEntityId: number | null = null;
     selectedEntityKey: string | null = null;
-    selectedNode: FieldManagerEntityNode | null = null;
-    permissions: FieldManagerPermissions = {
+    selectedNode: ObjectTypeTreeNodeDto | null = null;
+    permissions: FieldManagerPermissionDto = new FieldManagerPermissionDto({
         canViewPage: false,
         canCreateField: false,
         canEditField: false,
         canDeleteField: false,
         canDuplicateField: false,
-        canAddExistingField: false
-    };
+        canRestoreRevision: false,
+        canAddExistingField: false,
+        isHost: false,
+        isTenant: false
+    });
     private fieldsRequest = 0;
-    selectedEntityPath: FieldManagerEntityNode[] = [];
+    selectedEntityPath: ObjectTypeTreeNodeDto[] = [];
 
     readonly groupOptions = [
         //  { label: 'No group', value: 'none' },
         { label: 'No Group', value: 'none' },
-        { label: 'Field Type', value: 'type' },
-        { label: 'Created User', value: 'createdUser' },
-        { label: 'Field Level', value: 'fieldLevel' }
+        { label: 'Field Type', value: 'fieldTypeName' },
+        { label: 'Created User', value: 'creatorUserId' },
+        { label: 'Field Level', value: 'fieldLevelName' }
     ];
 
     constructor(
@@ -59,29 +67,42 @@ export class BrowseFieldManagerComponent extends AppComponentBase implements OnI
     }
 
     ngOnInit(): void {
-        this.fieldManagerService.getPagePermissions().subscribe({
-            next: permissions => this.permissions = permissions,
-            error: () => this.notify.error('Could not load field manager permissions.')
-        });
-        this.loadItems();
-        this.fieldManagerService.getEntityTree().subscribe({
-            next: tree => this.entityTree = tree,
-            error: () => this.notify.error('Could not load the field manager tree.')
+        const fieldsRequest = ++this.fieldsRequest;
+        this.showMainSpinner();
+        forkJoin({
+            permissions: this.fieldManagerService.getPagePermissions().pipe(catchError(() => {
+                this.notify.error('Could not load field manager permissions.');
+                return of(this.permissions);
+            })),
+            items: this.fieldManagerService.getFieldsForNode(null).pipe(catchError(() => {
+                this.notify.error('Could not load fields.');
+                return of([] as AppFieldListDto[]);
+            })),
+            tree: this.fieldManagerService.getEntityTree().pipe(catchError(() => {
+                this.notify.error('Could not load the field manager tree.');
+                return of([] as ObjectTypeTreeNodeDto[]);
+            }))
+        }).pipe(finalize(() => this.hideMainSpinner())).subscribe(result => {
+            this.permissions = result.permissions;
+            if (fieldsRequest === this.fieldsRequest) {
+                this.items = result.items;
+            }
+            this.entityTree = result.tree;
         });
     }
 
-    get displayedItems(): FieldManagerItem[] {
+    get displayedItems(): AppFieldListDto[] {
         return this.items;
     }
 
-    get filteredItems(): FieldManagerItem[] {
+    get filteredItems(): AppFieldListDto[] {
         const filter = this.filterText.trim().toLowerCase();
         return this.displayedItems.filter(item => {
-            if (this.extraDataFilter === 'only' && !item.extraData) {
+            if (this.extraDataFilter === 'only' && !item.isExtraField) {
                 return false;
             }
 
-            if (this.extraDataFilter === 'without' && item.extraData) {
+            if (this.extraDataFilter === 'without' && item.isExtraField) {
                 return false;
             }
 
@@ -89,13 +110,13 @@ export class BrowseFieldManagerComponent extends AppComponentBase implements OnI
                 return true;
             }
 
-            return item.name.toLowerCase().includes(filter) ||
-                item.code.toLowerCase().includes(filter) ||
-                item.type.toLowerCase().includes(filter) ||
-                item.tables.toLowerCase().includes(filter) ||
-                item.status.toLowerCase().includes(filter) ||
-                item.fieldLevel.toLowerCase().includes(filter) ||
-                item.trackingNumber.toLowerCase().includes(filter);
+            return (item.fieldName || '').toLowerCase().includes(filter) ||
+                (item.fieldCode || '').toLowerCase().includes(filter) ||
+                (item.fieldTypeName || '').toLowerCase().includes(filter) ||
+                (item.tables || []).join(', ').toLowerCase().includes(filter) ||
+                (item.statusName || '').toLowerCase().includes(filter) ||
+                (item.fieldLevelName || '').toLowerCase().includes(filter) ||
+                (item.trackingNo || '').toLowerCase().includes(filter);
         });
     }
 
@@ -106,37 +127,88 @@ export class BrowseFieldManagerComponent extends AppComponentBase implements OnI
         this.selectedNode = null;
         this.selectedEntityPath = [];
         this.expandedEntityIds = [];
+        this.collapsedEntityIds = [];
         this.closeActions();
         this.loadItems();
     }
 
-    toggleEntity(node: FieldManagerEntityNode, event: MouseEvent): void {
+    toggleEntity(node: ObjectTypeTreeNodeDto, event: MouseEvent): void {
         event.stopPropagation();
-        this.selectedEntityPath = this.findEntityPath(node.key, this.entityTree);
+        const nodeKey = node.key || '';
+        this.selectedEntityPath = this.findEntityPath(nodeKey, this.entityTree);
         this.selectedEntityId = node.sycObjectId;
-        this.selectedEntityKey = node.key;
+        this.selectedEntityKey = nodeKey;
         this.selectedNode = node;
         if (node.children && node.children.length) {
-            this.expandedEntityIds = this.expandedEntityIds.indexOf(node.key) !== -1
-                ? this.expandedEntityIds.filter(id => id !== node.key)
-                : [...this.expandedEntityIds, node.key];
+            if (this.isEntityExpanded(node)) {
+                this.expandedEntityIds = this.expandedEntityIds.filter(id => id !== nodeKey);
+                if (this.entitySearchText.trim() && this.collapsedEntityIds.indexOf(nodeKey) === -1) {
+                    this.collapsedEntityIds = [...this.collapsedEntityIds, nodeKey];
+                }
+            } else {
+                this.expandedEntityIds = [...this.expandedEntityIds, nodeKey];
+                this.collapsedEntityIds = this.collapsedEntityIds.filter(id => id !== nodeKey);
+            }
         }
         this.loadItems();
     }
 
-    isEntityExpanded(node: FieldManagerEntityNode): boolean {
-        return this.expandedEntityIds.indexOf(node.key) !== -1;
+    isEntityExpanded(node: ObjectTypeTreeNodeDto): boolean {
+        const nodeKey = node.key || '';
+        if (this.entitySearchText.trim() && this.collapsedEntityIds.indexOf(nodeKey) !== -1) {
+            return false;
+        }
+
+        return this.expandedEntityIds.indexOf(nodeKey) !== -1 ||
+            (!!this.entitySearchText.trim() && this.getEntityChildren(node).length > 0);
     }
 
-    get breadcrumbPath(): FieldManagerEntityNode[] {
+    onEntitySearchChange(): void {
+        this.collapsedEntityIds = [];
+    }
+
+    get visibleEntityTree(): ObjectTypeTreeNodeDto[] {
+        return this.filterEntityNodes(this.entityTree, this.entitySearchText.trim().toLowerCase());
+    }
+
+    getEntityChildren(node: ObjectTypeTreeNodeDto): ObjectTypeTreeNodeDto[] {
+        const search = this.entitySearchText.trim().toLowerCase();
+        if (!search || (node.name || '').toLowerCase().includes(search)) {
+            return node.children || [];
+        }
+
+        return this.filterEntityNodes(node.children || [], search);
+    }
+
+    private filterEntityNodes(nodes: ObjectTypeTreeNodeDto[], search: string): ObjectTypeTreeNodeDto[] {
+        if (!search) {
+            return nodes;
+        }
+
+        return nodes.reduce((matches, node) => {
+            if ((node.name || '').toLowerCase().includes(search)) {
+                matches.push(node);
+                return matches;
+            }
+
+            const children = this.filterEntityNodes(node.children || [], search);
+            if (children.length) {
+                matches.push(new ObjectTypeTreeNodeDto({ ...node, children }));
+            }
+            return matches;
+        }, [] as ObjectTypeTreeNodeDto[]);
+    }
+
+    get breadcrumbPath(): ObjectTypeTreeNodeDto[] {
         if (this.activePanel === 'all') {
-            return [{ id: 0, key: 'AllFields', code: 'ALL', name: 'AllFields', nodeType: 'Entity', sycObjectId: 0 }];
+            return [new ObjectTypeTreeNodeDto({ id: 0, parentId: undefined, key: 'AllFields', parentKey: undefined,
+                code: 'ALL', name: 'AllFields', nodeType: 'Entity', sycObjectId: 0, children: undefined })];
         }
 
         return this.selectedEntityPath;
     }
 
-    private findEntityPath(key: string, nodes: FieldManagerEntityNode[], parents: FieldManagerEntityNode[] = []): FieldManagerEntityNode[] {
+    private findEntityPath(key: string, nodes: ObjectTypeTreeNodeDto[], parents: ObjectTypeTreeNodeDto[] = []): ObjectTypeTreeNodeDto[] {
         for (const node of nodes) {
             const path = [...parents, node];
             if (node.key === key) {
@@ -154,7 +226,7 @@ export class BrowseFieldManagerComponent extends AppComponentBase implements OnI
         return [];
     }
 
-    get groupedItems(): Array<FieldManagerItem & { groupValue: string }> {
+    get groupedItems(): GroupedFieldRow[] {
         const items = this.filteredItems.map(item => ({
             ...item,
             groupValue: this.getGroupValue(item)
@@ -181,17 +253,20 @@ export class BrowseFieldManagerComponent extends AppComponentBase implements OnI
         this.expandedGroups[groupValue] = !this.isGroupExpanded(groupValue);
     }
 
-    private getGroupValue(item: FieldManagerItem): string {
-        switch (this.groupBy) {
-            case 'type':
-                return item.type || '';
-            case 'createdUser':
-                return item.createdUser || '';
-            case 'fieldLevel':
-                return item.fieldLevel || '';
-            default:
-                return '';
+    private getGroupValue(item: AppFieldListDto): string {
+        if (this.groupBy === 'none') {
+            return '';
         }
+
+        return String(item[this.groupBy] ?? '');
+    }
+
+    getGroupDisplayValue(item: GroupedFieldRow): string {
+        if (this.groupBy === 'creatorUserId') {
+            return item.creatorUserName || '-';
+        }
+
+        return item.groupValue || '-';
     }
 
     create(): void {
@@ -215,7 +290,7 @@ export class BrowseFieldManagerComponent extends AppComponentBase implements OnI
         }
     }
 
-    toggleActions(item: FieldManagerItem, event: MouseEvent): void {
+    toggleActions(item: AppFieldListDto, event: MouseEvent): void {
         event.stopPropagation();
         if (this.activeActionId === item.id) {
             this.closeActions();
@@ -253,12 +328,12 @@ export class BrowseFieldManagerComponent extends AppComponentBase implements OnI
         (event.target as HTMLElement).blur();
     }
  */
-    edit(item: FieldManagerItem): void {
+    CreateNewRevision(item: AppFieldListDto): void {
         this.closeActions();
         this.createOrEditFieldManagerModal.show(item.id);
     }
 
-    duplicate(item: FieldManagerItem): void {
+    duplicate(item: AppFieldListDto): void {
         this.closeActions();
         this.fieldManagerService.duplicateField(item.id).subscribe({
             next: () => {
@@ -269,7 +344,7 @@ export class BrowseFieldManagerComponent extends AppComponentBase implements OnI
         });
     }
 
-    hide(item: FieldManagerItem): void {
+    hide(item: AppFieldListDto): void {
         this.closeActions();
         this.askToConfirm('Hide this field for your tenant?', this.l('Confirm')).subscribe(confirmed => {
             if (!confirmed) return;
@@ -283,12 +358,12 @@ export class BrowseFieldManagerComponent extends AppComponentBase implements OnI
         });
     }
 
-    view(item: FieldManagerItem): void {
+    view(item: AppFieldListDto): void {
         this.closeActions();
         this.viewFieldManagerModal.show(item);
     }
 
-    delete(item: FieldManagerItem): void {
+    delete(item: AppFieldListDto): void {
         this.closeActions();
         var isConfirmed: Observable<boolean>;
         isConfirmed = this.askToConfirm(
@@ -298,7 +373,6 @@ export class BrowseFieldManagerComponent extends AppComponentBase implements OnI
 
         isConfirmed.subscribe((res) => {
             if (res) {
-                //i51- call delete
                 this.fieldManagerService.deleteServerField(item.id).subscribe({
                     next: () => {
                         this.loadItems();
