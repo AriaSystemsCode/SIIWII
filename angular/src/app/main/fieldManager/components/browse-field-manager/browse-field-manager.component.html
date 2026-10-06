@@ -95,62 +95,62 @@
                                                 <i class="fa" [class.fa-chevron-down]="isGroupExpanded(item.groupValue)"
                                                     [class.fa-chevron-right]="!isGroupExpanded(item.groupValue)"></i>
                                             </button>
-                                            <strong> {{ item.groupValue }}</strong>
+                                            <strong> {{ getGroupDisplayValue(item) }}</strong>
                                         </td>
                                     </tr>
                                 </ng-template>
                                 <ng-template pTemplate="header">
                                     <tr>
-                                        <th pSortableColumn="code" class="purpleColor field-code-column">
+                                        <th pSortableColumn="fieldCode" class="purpleColor field-code-column">
                                             {{ 'FieldCode' | localize }}
-                                            <p-sortIcon field="code"></p-sortIcon>
+                                            <p-sortIcon field="fieldCode"></p-sortIcon>
                                         </th>
-                                        <th pSortableColumn="name" class="purpleColor field-name-column">
+                                        <th pSortableColumn="fieldName" class="purpleColor field-name-column">
                                             {{ 'FieldName' | localize }}
-                                            <p-sortIcon field="name"></p-sortIcon>
+                                            <p-sortIcon field="fieldName"></p-sortIcon>
                                         </th>
-                                        <th pSortableColumn="type" class="purpleColor field-type-column">
+                                        <th pSortableColumn="fieldTypeName" class="purpleColor field-type-column">
                                             {{ 'FieldType' | localize }}
-                                            <p-sortIcon field="type"></p-sortIcon>
+                                            <p-sortIcon field="fieldTypeName"></p-sortIcon>
                                         </th>
                                         <th pSortableColumn="tables" class="purpleColor field-table-column">
                                             {{ 'Tables' | localize }}
                                             <p-sortIcon field="tables"></p-sortIcon>
                                         </th>
-                                        <th pSortableColumn="status" class="purpleColor field-status-column">
+                                        <th pSortableColumn="statusName" class="purpleColor field-status-column">
                                             {{ 'Status' | localize }}
-                                            <p-sortIcon field="status"></p-sortIcon>
+                                            <p-sortIcon field="statusName"></p-sortIcon>
                                         </th>
-                                        <th pSortableColumn="revision" class="purpleColor field-revision-column">
+                                        <th pSortableColumn="revisionNo" class="purpleColor field-revision-column">
                                             {{ 'Revision' | localize }}
-                                            <p-sortIcon field="revision"></p-sortIcon>
+                                            <p-sortIcon field="revisionNo"></p-sortIcon>
                                         </th>
-                                        <th pSortableColumn="fieldLevel" class="purpleColor field-level-column">
+                                        <th pSortableColumn="fieldLevelName" class="purpleColor field-level-column">
                                             {{ 'FieldLevel' | localize }}
-                                            <p-sortIcon field="fieldLevel"></p-sortIcon>
+                                            <p-sortIcon field="fieldLevelName"></p-sortIcon>
                                         </th>
-                                        <th pSortableColumn="trackingNumber" class="purpleColor field-tracking-column">
+                                        <th pSortableColumn="trackingNo" class="purpleColor field-tracking-column">
                                             {{ 'TrackingNumber' | localize }}
-                                            <p-sortIcon field="trackingNumber"></p-sortIcon>
+                                            <p-sortIcon field="trackingNo"></p-sortIcon>
                                         </th>
-                                        <th pSortableColumn="extraData" class="purpleColor field-extra-data-column">
+                                        <th pSortableColumn="isExtraField" class="purpleColor field-extra-data-column">
                                             {{ 'ExtraData' | localize }}
-                                            <p-sortIcon field="extraData"></p-sortIcon>
+                                            <p-sortIcon field="isExtraField"></p-sortIcon>
                                         </th>
                                         <th class="purpleColor text-right">{{ 'Actions' | localize }}</th>
                                     </tr>
                                 </ng-template>
                                 <ng-template pTemplate="body" let-item>
                                     <tr *ngIf="isGroupExpanded(item.groupValue)">
-                                        <td>{{ item.code }}</td>
-                                        <td>{{ item.name }}</td>
-                                        <td>{{ item.type }}</td>
-                                        <td>{{ item.tables }}</td>
-                                        <td>{{ item.status }}</td>
-                                        <td>{{ item.revision | number: '2.0-0' }}</td>
-                                        <td>{{ item.fieldLevel }}</td>
-                                        <td>{{ item.trackingNumber }}</td>
-                                        <td>{{ item.extraData ? 'true' : 'false' }}</td>
+                                        <td>{{ item.fieldCode }}</td>
+                                        <td>{{ item.fieldName }}</td>
+                                        <td>{{ item.fieldTypeName }}</td>
+                                        <td>{{ (item.tables || []).join(', ') }}</td>
+                                        <td>{{ item.statusName }}</td>
+                                        <td>{{ item.revisionNo }}</td>
+                                        <td>{{ item.fieldLevelName }}</td>
+                                        <td>{{ item.trackingNo }}</td>
+                                        <td>{{ item.isExtraField ? 'true' : 'false' }}</td>
                                         <td class="text-right field-actions">
                                             <button type="button" class="field-action-menu" [title]="'Actions' | localize"
                                                 (click)="toggleActions(item, $event)">
@@ -184,10 +184,10 @@
     <app-create-or-edit-field-manager #createOrEditFieldManagerModal
         (saved)="onCreateOrEditDone()" (closed)="onCreateOrEditClosed()"></app-create-or-edit-field-manager>
     <app-view-field-manager #viewFieldManagerModal></app-view-field-manager>
-    <app-existing-fields-modal #existingFieldsModal [items]="items" [entityId]="selectedEntityId"
-        [objectTypeId]="selectedNode?.nodeType === 'ObjectType' ? selectedNode?.id : null"
-        [tableName]="selectedEntityPath.length ? selectedEntityPath[selectedEntityPath.length - 1].name : ''"
-        (added)="onExistingFieldsAdded($event)"></app-existing-fields-modal>
-        </main>
+ <app-existing-fields-modal #existingFieldsModal [items]="items" [entityId]="selectedEntityId"
+             [objectTypeId]="selectedNode?.nodeType === 'ObjectType' ? selectedNode?.id : null"
+     [tableName]="selectedEntityPath.length ? selectedEntityPath[selectedEntityPath.length - 1].name : ''"
+     (added)="onExistingFieldsAdded($event)"></app-existing-fields-modal>
+       </main>
     </div>
 </div>
