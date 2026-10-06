@@ -766,26 +766,23 @@ namespace onetouch.AppItems
                     foreach (var item in output.AppItem.EntityAttachments)
                     { item.Url = imagesUrl + (appItem.TenantId.HasValue ? appItem.TenantId.ToString() : "-1") + @"/" + item.FileName; }
 
-                    if (appItem.ItemPricesFkList.Count != 0)
+                    // UK English item creation stores the displayed RRP price level as "RRP";
+                    // other locales store it as "MSRP". Include both aliases when building
+                    // the item/variation price range so the API does not return its default 0s.
+                    var itemPrices = allItems
+                        .SelectMany(item => item.ItemPricesFkList ?? new List<AppItemPrices>())
+                        .Where(price =>
+                            (string.Equals(price.Code, "MSRP", StringComparison.OrdinalIgnoreCase) ||
+                             string.Equals(price.Code, "RRP", StringComparison.OrdinalIgnoreCase)) &&
+                            string.Equals(price.CurrencyCode, currencyCode, StringComparison.OrdinalIgnoreCase) &&
+                            price.Price != 0)
+                        .Select(price => price.Price)
+                        .ToList();
+
+                    if (itemPrices.Count > 0)
                     {
-                        var msrpObj = appItem.ItemPricesFkList.Where(x => x.Code == "MSRP" & x.CurrencyCode == currencyCode).FirstOrDefault();
-                        if (msrpObj != null)
-                        {
-                            output.AppItem.MaxPrice = msrpObj.Price;  //output.AppItem.Price;
-                            output.AppItem.MinPrice = msrpObj.Price;
-                        }
-                    }
-                    foreach (var prObj in varAppItems)
-                    {
-                        if (prObj.ItemPricesFkList.Count > 0)
-                        {
-                            var itemPrice = prObj.ItemPricesFkList.Where(x => x.Code.ToUpper() == "MSRP" & x.CurrencyCode == currencyCode).Select(x => x.Price).FirstOrDefault();
-                            if (itemPrice != 0)
-                            {
-                                output.AppItem.MaxPrice = output.AppItem.MaxPrice > itemPrice ? output.AppItem.MaxPrice : itemPrice;
-                                output.AppItem.MinPrice = output.AppItem.MinPrice > itemPrice ? itemPrice : output.AppItem.MinPrice;
-                            }
-                        }
+                        output.AppItem.MinPrice = itemPrices.Min();
+                        output.AppItem.MaxPrice = itemPrices.Max();
                     }
                     output.AppItem.ShowSync = false;
                     var marketplaceItem = await _appMarketplaceItem.GetAll().Where(a => a.Code == appItem.SSIN || (a.ManufacturerCode == appItem.Code && a.TenantOwner == appItem.TenantId)).FirstOrDefaultAsync();
