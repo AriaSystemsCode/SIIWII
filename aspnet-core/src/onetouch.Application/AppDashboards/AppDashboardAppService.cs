@@ -330,6 +330,7 @@ namespace onetouch.AppDashboards
             {
                 var dashboardObjectTypeId = await _helper.SystemTables.GetEntityObjectTypeDashboard();
                 var dashboardObj = await _appEntityRepository.GetAll()
+                    .Include(z=>z.EntityAttachments).ThenInclude(z=>z.AttachmentFk)
                     .Where(z => z.EntityObjectTypeId == dashboardObjectTypeId
                       && z.Id == input.Id).FirstOrDefaultAsync();
                 if (dashboardObj != null)
