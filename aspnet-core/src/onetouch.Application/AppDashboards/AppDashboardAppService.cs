@@ -165,21 +165,30 @@ namespace onetouch.AppDashboards
                         }
                         else
                         {
-                            dashboard.SharingLevel = 2;
-                            foreach (var user in entitySharingList)
+                            if (entitySharingList.Count == 1 &&
+                            entitySharingList.FirstOrDefault().SharedUserId == dashboard.CreatorUserId)
                             {
-                                if (user.SharedUserId == AbpSession.UserId)
+                                dashboard.SharingLevel = 4;
+                            }
+                            else
+                            { 
+                                dashboard.SharingLevel = 2;
+                                foreach (var user in entitySharingList)
                                 {
-                                    if (user.CanEdit == true) { 
-                                        dashboard.IsEditable = true;
-                                        continue;
+                                    if (user.SharedUserId == AbpSession.UserId)
+                                    {
+                                        if (user.CanEdit == true)
+                                        {
+                                            dashboard.IsEditable = true;
+                                            continue;
+                                        }
                                     }
-                                }
 
-                                if (user.SharedUserId != null)
-                                {
-                                    dashboard.SharedWithUsers.
-                                        Add(await _appEntitiesAppService.GetUserInformation(long.Parse(user.SharedUserId.ToString())));
+                                    if (user.SharedUserId != null)
+                                    {
+                                        dashboard.SharedWithUsers.
+                                            Add(await _appEntitiesAppService.GetUserInformation(long.Parse(user.SharedUserId.ToString())));
+                                    }
                                 }
                             }
                         }
@@ -276,22 +285,30 @@ namespace onetouch.AppDashboards
                         }
                         else
                         {
-                            dashboard.SharingLevel = 2;
-                            foreach (var user in entitySharingList)
+                            if (entitySharingList.Count == 1 &&
+                           entitySharingList.FirstOrDefault().SharedUserId == dashboard.CreatorUserId)
                             {
-                                if (user.SharedUserId == AbpSession.UserId)
+                                dashboard.SharingLevel = 4;
+                            }
+                            else
+                            {
+                                dashboard.SharingLevel = 2;
+                                foreach (var user in entitySharingList)
                                 {
-                                    if (user.CanEdit == true)
+                                    if (user.SharedUserId == AbpSession.UserId)
                                     {
-                                        dashboard.IsEditable = true;
-                                        continue;
+                                        if (user.CanEdit == true)
+                                        {
+                                            dashboard.IsEditable = true;
+                                            continue;
+                                        }
                                     }
-                                }
 
-                                if (user.SharedUserId != null)
-                                {
-                                    dashboard.SharedWithUsers.
-                                        Add(await _appEntitiesAppService.GetUserInformation(long.Parse(user.SharedUserId.ToString())));
+                                    if (user.SharedUserId != null)
+                                    {
+                                        dashboard.SharedWithUsers.
+                                            Add(await _appEntitiesAppService.GetUserInformation(long.Parse(user.SharedUserId.ToString())));
+                                    }
                                 }
                             }
                         }
@@ -469,6 +486,26 @@ namespace onetouch.AppDashboards
             }
             return returnList;
         }
+        [AbpAuthorize(AppPermissions.Pages_Dashboards_Share)]
+        public async Task MakeDashboardPrivate(long dashboardId)
+        {
+            var dashboardObjectTypeId = await _helper.SystemTables.GetEntityObjectTypeDashboard();
+            var dashboardObj = await _appEntityRepository.GetAll()
+                   .Where(z => z.EntityObjectTypeId == dashboardObjectTypeId
+                     && z.Id == dashboardId).FirstOrDefaultAsync();
+            if (dashboardObj != null)
+            {
+                var sharingRecordsFound = await _appEntitySharingRepository.GetAll()
+                    .Where(z => z.EntityId == dashboardObj.Id &&
+                    z.SharedTenantId == AbpSession.TenantId
+                    && z.SharedUserId != dashboardObj.CreatorUserId).AnyAsync();
+                if (sharingRecordsFound == true)
+                    await _appEntitySharingRepository.DeleteAsync(
+                        z => z.EntityId == dashboardId && z.SharedTenantId == AbpSession.TenantId
+                    && z.SharedUserId != dashboardObj.CreatorUserId);
+            }
+        }
+        
         [AbpAuthorize(AppPermissions.Pages_Dashboards_Share)]
         public async Task ShareDashboard(ShareDashboardInfo ShareDashboardInfo)
         {
