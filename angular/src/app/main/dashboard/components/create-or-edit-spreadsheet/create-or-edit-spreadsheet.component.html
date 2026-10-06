@@ -41,12 +41,12 @@
         </div>
 
         <div class="d-flex align-items-center">
-            <button type="button" class="btn btn-primary mr-2" (click)="saveSpreadsheet()">
+            <button *ngIf="isDirty" type="button" class="btn btn-primary mr-2" (click)="saveSpreadsheet()">
                 <i class="fa fa-save mr-2"></i>
                 {{ 'Save' | localize }}
             </button>
-            <!-- (click)="refreshData() -->
 
+            <!-- Refresh is not wired yet -->
             <button type="button" class="btn btn-light" [disabled]="isRefreshing">
                 <i class="fa fa-sync-alt" [class.fa-spin]="isRefreshing"></i>
             </button>
@@ -90,6 +90,13 @@
                             {{ 'SourceSheet' | localize }}
                         </button>
 
+                        <div class="mr-2" style="width: 170px;">
+                            <p-dropdown [options]="pivotChartTypes" [(ngModel)]="selectedPivotChartType"
+                                optionLabel="label" optionValue="value" appendTo="body"
+                                (onChange)="changePivotChartType($event.value)">
+                            </p-dropdown>
+                        </div>
+
                         <button *ngIf="!isPivotOnDashboard" type="button" class="btn btn-success"
                             (click)="copyPivotToDashboard()">
                             <i class="fa fa-chart-bar mr-2"></i>
@@ -126,7 +133,6 @@
         </div>
 
         <!-- ================= ADD DATA PANEL ================= -->
-     
         <app-spreadsheet-data-panel [visible]="showDataPanel" (close)="closeDataPanel()"
             (batchLoaded)="onDataBatchLoaded($event)" (loadingFailed)="onDataLoadingFailed($event)">
         </app-spreadsheet-data-panel>
@@ -153,7 +159,7 @@
             <div class="p-3">
                 <div class="form-group">
                     <label class="font-weight-bold">{{ 'DataRange' | localize }}</label>
-                    <input type="text" class="form-control" [(ngModel)]="chartRange"
+                    <input type="text" class="form-control" [(ngModel)]="chartRange" disabled
                         placeholder="'Transactions'!A1:H40" />
                 </div>
 

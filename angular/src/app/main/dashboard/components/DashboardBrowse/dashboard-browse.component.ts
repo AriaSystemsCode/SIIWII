@@ -148,10 +148,6 @@ sharedUsers: DashboardSharedUser[] = [];
 
     }
 
-    // =========================================================
-    // Rename Dashboard
-    // =========================================================
-
     startRename(row: any): void {
         this.cancelCreate();
         this.editingDashboardId = row.id;

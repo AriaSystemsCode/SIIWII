@@ -1,34 +1,21 @@
-import {
-    ChangeDetectorRef,
-    Component,
-    Injector,
-    OnDestroy,
-    OnInit,
-    ViewChild
-} from '@angular/core';
-
+import { ChangeDetectorRef, Component, Injector, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
 
-import {
-    SpreadsheetComponent as SyncfusionSpreadsheetComponent,
-    SheetModel
-} from '@syncfusion/ej2-angular-spreadsheet';
+import { SpreadsheetComponent as SyncfusionSpreadsheetComponent, SheetModel } from '@syncfusion/ej2-angular-spreadsheet';
 
 import {
+    CalculatedFieldService,
     DisplayOption,
     FieldListService,
     GroupingBarService,
+    IDataSet,
     PivotChartService,
-    ToolbarService,
     PivotFieldListComponent,
-    CalculatedFieldService,
-    IDataSet
+    ToolbarService
 } from '@syncfusion/ej2-angular-pivotview';
 
-import {
-    AppDashboardServiceProxy,
-} from '@shared/service-proxies/service-proxies';
+import { AppDashboardServiceProxy } from '@shared/service-proxies/service-proxies';
 import { AppComponentBase } from '@shared/common/app-component-base';
 
 import {
@@ -52,8 +39,6 @@ import {
     yieldToBrowser
 } from '../../models/spreadsheet.model';
 
-
-
 @Component({
     selector: 'app-create-or-edit-spreadsheet',
     templateUrl: './create-or-edit-spreadsheet.component.html',
@@ -67,46 +52,47 @@ export class CreateOrEditSpreadsheetComponent extends AppComponentBase implement
     @ViewChild('pivotFieldList') pivotFieldList?: PivotFieldListComponent;
 
     dashboardId: number | null = null;
+    isDirty = false;
 
-    // Spreadsheet
+    // ---- Spreadsheet ----
     sheets: SheetModel[] = [];
     readonly scrollSettings: any = { enableVirtualization: true, isFinite: false };
     readonly showAggregate = false;
-
     private readonly saveOptions: any = { ignoreImage: false, ignoreNote: false };
 
-    // Loading bar
+    // ---- Loading bar ----
     isLoading = false;
     loadingProgress = 0;
     loadingMessage = '';
     isRefreshing = false;
 
-    // Metadata saved with the workbook
+    // ---- Metadata saved with the workbook ----
     sheetSources: SpreadsheetSheetDataSource[] = [];
     analyses: SavedSheetAnalysis[] = [];
     widgets: DashboardWidgetMetadata[] = [];
 
-    // Metadata of the active tab (shown in the header)
-    currentSource: SpreadsheetDataSource | null = null;
+    /** Filters of the active tab (shown in the header). */
     currentFilters: any = null;
 
     private sheetWatcher: any = null;
     private lastSheetIndex = -1;
     private dashboardPromise: Promise<any> | null = null;
 
-    // "Add data" panel
+    // ---- "Add data" panel ----
     showDataPanel = false;
+    private newDataSheetName: string | null = null;
+    private newDataSheetLoadedRows = 0;
 
-    isAdding = false;
-
+    // ---- Pivot ----
     showPivot = false;
-    pivotSheet: string | null = null;      // name of the Pivot tab
-    sourceSheet: string | null = null;     // name of the data tab the Pivot reads
+    pivotSheet: string | null = null;   // name of the Pivot tab
+    sourceSheet: string | null = null;  // name of the data tab the Pivot reads
     private isCreatingPivot = false;
-    private chartSyncTimer: any = null;
+    private isSyncingPivotDashboard = false;
+    private pivotSyncTimer: any = null;
 
+    pivotToolbar: any[] = ['Chart'];
     pivotDisplay = { view: 'Both', primary: 'Table' } as DisplayOption;
-    pivotToolbar: any[] = ['Grid', 'Chart'];
     pivotChart: any = {
         chartSeries: { type: 'Column' },
         height: '280',
@@ -123,8 +109,13 @@ export class CreateOrEditSpreadsheetComponent extends AppComponentBase implement
         allowLabelFilter: true,
         allowValueFilter: true
     };
+    pivotChartTypes = ['Column', 'Bar', 'Area', 'Pie', 'Doughnut', 'Line', 'Scatter'].map(t => ({
+        label: t,
+        value: t
+    }));
+    selectedPivotChartType = 'Column';
 
-    // Chart panel
+    // ---- Chart panel ----
     showChartPanel = false;
     selectedChart: any = null;
     chartSheet: string | null = null;
@@ -132,11 +123,6 @@ export class CreateOrEditSpreadsheetComponent extends AppComponentBase implement
     categoryRange = '';
     seriesRanges: Array<{ range: string }> = [];
     isApplyingChart = false;
-
-
-    private newDataSheetName: string | null = null;
-    private newDataSheetLoadedRows = 0;
-    private pendingDataBatch: SpreadsheetDataBatch | null = null;
 
     constructor(
         injector: Injector,
@@ -200,7 +186,6 @@ export class CreateOrEditSpreadsheetComponent extends AppComponentBase implement
         await new Promise<void>(resolve => requestAnimationFrame(() => resolve()));
     }
 
-
     private quoteSheetName(sheetName: string): string {
         const name = text(sheetName);
         return /[\s()'!]/.test(name) ? `'${name.replace(/'/g, "''")}'` : name;
@@ -239,7 +224,14 @@ export class CreateOrEditSpreadsheetComponent extends AppComponentBase implement
         }
     }
 
+    private markDirty(): void {
+        this.isDirty = true;
+        this.cdr.detectChanges();
+    }
 
+    // =====================================================
+    // LIFECYCLE / LOAD
+    // =====================================================
 
     ngOnInit(): void {
         this.route.paramMap.subscribe(params => {
@@ -250,6 +242,7 @@ export class CreateOrEditSpreadsheetComponent extends AppComponentBase implement
 
     ngOnDestroy(): void {
         this.stopSheetWatcher();
+        clearTimeout(this.pivotSyncTimer);
     }
 
     onCreated(): void {
@@ -261,7 +254,6 @@ export class CreateOrEditSpreadsheetComponent extends AppComponentBase implement
         this.startSheetWatcher();
         this.loadDashboard();
     }
-
 
     private loadDashboard(): void {
         if (!this.dashboardId || !this.spreadsheet) {
@@ -282,6 +274,7 @@ export class CreateOrEditSpreadsheetComponent extends AppComponentBase implement
                     console.error('[Spreadsheet] Failed to initialize dashboard spreadsheet:', error);
                     this.notify.error('Unable to open Spreadsheet.');
                 } finally {
+                    this.isDirty = false;
                     this.cdr.detectChanges();
                 }
             },
@@ -293,10 +286,6 @@ export class CreateOrEditSpreadsheetComponent extends AppComponentBase implement
     }
 
     private async openWorkbook(saved: any): Promise<void> {
-        if (!this.spreadsheet) {
-            return;
-        }
-
         const data = typeof saved === 'string' ? JSON.parse(saved) : saved;
 
         this.sheetSources = this.cloneSheetSources(data?.sheetDataSources ?? []);
@@ -308,7 +297,6 @@ export class CreateOrEditSpreadsheetComponent extends AppComponentBase implement
             this.sheetSources[0]?.source ??
             null;
 
-        this.currentSource = first ? this.cloneSource(first) : null;
         this.currentFilters = { ...(first?.filters ?? {}) };
 
         const workbook = this.cleanWorkbookJson(data?.workbookJson ?? data);
@@ -327,14 +315,9 @@ export class CreateOrEditSpreadsheetComponent extends AppComponentBase implement
 
     /** New dashboard spreadsheet: starts with the Dashboard sheet only. */
     private async createEmptyWorkbook(): Promise<void> {
-        if (!this.spreadsheet) {
-            return;
-        }
-
         this.sheetSources = [];
         this.analyses = [];
         this.widgets = [];
-        this.currentSource = null;
         this.currentFilters = null;
 
         // Create Dashboard FIRST so Syncfusion is never left with zero sheets.
@@ -672,9 +655,8 @@ export class CreateOrEditSpreadsheetComponent extends AppComponentBase implement
         }
 
         return (
-            this.getSheetCharts(this.activeSheet).find(
-                chart => !wanted.length || wanted.includes(text(chart?.id))
-            ) ?? null
+            this.getSheetCharts(this.activeSheet).find(chart => !wanted.length || wanted.includes(text(chart?.id))) ??
+            null
         );
     }
 
@@ -682,7 +664,7 @@ export class CreateOrEditSpreadsheetComponent extends AppComponentBase implement
     // RIBBON
     // =====================================================
 
-    /** Adds " List" and "Pivot Table" buttons to the Insert ribbon tab. */
+    /** Adds "List" and "Pivot Table" buttons to the Insert ribbon tab. */
     private addRibbonButtons(): void {
         if (typeof this.grid.addToolbarItems !== 'function') {
             console.warn('[Spreadsheet] addToolbarItems() is not available in this Syncfusion build.');
@@ -698,7 +680,7 @@ export class CreateOrEditSpreadsheetComponent extends AppComponentBase implement
                         type: 'Button',
                         text: 'List',
                         tooltipText: 'Insert data source',
-                        prefixIcon: 'e-icons e-list',
+                           prefixIcon: 'e-icons e-list-unordered',
                         click: () => this.openDataPanel()
                     },
                     {
@@ -747,232 +729,102 @@ export class CreateOrEditSpreadsheetComponent extends AppComponentBase implement
     // =====================================================
 
     openDataPanel(): void {
-
         this.closeChartPanel();
-
         this.showDataPanel = true;
-
         this.cdr.detectChanges();
-
         this.resizeLater();
     }
 
     closeDataPanel(): void {
-
         this.showDataPanel = false;
-
         this.cdr.detectChanges();
-
         this.resizeLater();
     }
 
-    async onDataBatchLoaded(
-        batch: SpreadsheetDataBatch
-    ): Promise<void> {
-
+    /** Called once per batch: the first batch creates the sheet and headers, the last one finishes. */
+    async onDataBatchLoaded(batch: SpreadsheetDataBatch): Promise<void> {
         if (!this.spreadsheet) {
             return;
         }
 
         try {
-
-            this.pendingDataBatch = batch;
-
-
-            // ==========================================
-            // FIRST BATCH
-            // ==========================================
-
             if (batch.isFirstBatch) {
-
-                this.showLoading(
-                    `Loading ${batch.entity.displayName}...`
-                );
-
-                this.newDataSheetName =
-                    this.getUniqueSheetName(
-                        batch.entity.displayName
-                    );
-
-                this.newDataSheetLoadedRows = 0;
-
-
-                // Create EMPTY sheet
-                this.grid.insertSheet(
-                    [
-                        {
-                            name:
-                                this.newDataSheetName
-                        }
-                    ],
-                    this.allSheets.length
-                );
-
-
-                const ready =
-                    await this.waitForSheet(
-                        this.newDataSheetName
-                    );
-
-
-                if (!ready) {
-
-                    throw new Error(
-                        `Unable to create sheet "${this.newDataSheetName}".`
-                    );
-                }
-
-
-                await this.activateSheet(
-                    this.newDataSheetName
-                );
-
-
-                await this.paint();
+                await this.createDataSheet(batch);
             }
 
+            const sheetName = this.newDataSheetName;
 
-            if (!this.newDataSheetName) {
+            if (!sheetName) {
                 return;
             }
 
+            const columns = batch.entity.columns.filter(column => batch.selectedColumns.includes(column.key));
 
-            // ==========================================
-            // SELECTED COLUMNS
-            // ==========================================
-
-            const columns =
-                batch.entity.columns.filter(
-                    column =>
-                        batch.selectedColumns.includes(
-                            column.key
-                        )
-                );
-
-
-            await this.activateSheet(
-                this.newDataSheetName
-            );
-
-
-            // ==========================================
-            // HEADERS
-            // ==========================================
+            await this.activateSheet(sheetName);
 
             if (batch.isFirstBatch) {
-
-                columns.forEach(
-                    (column, columnIndex) => {
-
-                        const address =
-                            `${toColumnName(
-                                columnIndex + 1
-                            )}1`;
-
-
-                        this.grid.updateCell(
-                            {
-                                value:
-                                    column.label
-                            },
-                            address
-                        );
-                    }
-                );
+                columns.forEach((column, i) => {
+                    this.grid.updateCell({ value: column.label }, `${toColumnName(i + 1)}1`);
+                });
             }
 
+            // Row 1 is the header, so data starts at row 2.
+            batch.rows.forEach((row, rowIndex) => {
+                const sheetRow = this.newDataSheetLoadedRows + rowIndex + 2;
 
-            // ==========================================
-            // CURRENT BATCH
-            // ==========================================
+                columns.forEach((column, i) => {
+                    this.grid.updateCell({ value: row[column.label] }, `${toColumnName(i + 1)}${sheetRow}`);
+                });
+            });
 
-            batch.rows.forEach(
-                (row, rowIndex) => {
+            this.newDataSheetLoadedRows += batch.rows.length;
 
-                    const spreadsheetRow =
-                        this.newDataSheetLoadedRows +
-                        rowIndex +
-                        2;
-
-
-                    columns.forEach(
-                        (column, columnIndex) => {
-
-                            const address =
-                                `${toColumnName(
-                                    columnIndex + 1
-                                )}${spreadsheetRow}`;
-
-
-                            this.grid.updateCell(
-                                {
-                                    value:
-                                        row[
-                                        column.label
-                                        ]
-                                },
-                                address
-                            );
-                        }
-                    );
-                }
-            );
-
-
-            // Current batch is now written.
-            this.newDataSheetLoadedRows +=
-                batch.rows.length;
-
-
-            // ==========================================
-            // PROGRESS
-            // ==========================================
-
-            this.setProgress(
-                batch.loaded,
-                batch.total
-            );
-
-
+            this.setProgress(batch.loaded, batch.total);
             this.loadingMessage =
                 batch.total > 0
                     ? `Loaded ${batch.loaded.toLocaleString()} of ${batch.total.toLocaleString()} records`
                     : `Loaded ${batch.loaded.toLocaleString()} records`;
 
-
-            // Make current records visible.
             await this.paint();
 
-
-            // ==========================================
-            // LAST BATCH
-            // ==========================================
-
             if (batch.isLastBatch) {
-
-                await this.finishDataLoading(
-                    batch
-                );
+                await this.finishDataLoading(batch);
             }
-
         } catch (error) {
-
-            this.onDataLoadingFailed(
-                error
-            );
+            this.onDataLoadingFailed(error);
         }
     }
+
+    /** Creates the EMPTY sheet that will receive the batches. */
+    private async createDataSheet(batch: SpreadsheetDataBatch): Promise<void> {
+        this.showLoading(`Loading ${batch.entity.displayName}...`);
+
+        const name = this.getUniqueSheetName(batch.entity.displayName);
+
+        this.newDataSheetName = name;
+        this.newDataSheetLoadedRows = 0;
+
+        this.grid.insertSheet([{ name }], this.allSheets.length);
+
+        if (!(await this.waitForSheet(name))) {
+            throw new Error(`Unable to create sheet "${name}".`);
+        }
+
+        await this.activateSheet(name);
+        await this.paint();
+    }
+
     private async finishDataLoading(batch: SpreadsheetDataBatch): Promise<void> {
         const sheetName = this.newDataSheetName;
+
         if (!sheetName) {
             return;
         }
 
         const sheet = this.findSheet(sheetName);
+
         if (!sheet) {
-            throw new Error(
-                `Sheet "${sheetName}" was not found.`
-            );
+            throw new Error(`Sheet "${sheetName}" was not found.`);
         }
 
         this.upsertSheetSource({
@@ -991,26 +843,32 @@ export class CreateOrEditSpreadsheetComponent extends AppComponentBase implement
         this.loadingMessage = `Loaded ${batch.loaded.toLocaleString()} records`;
         this.syncSheetIdentity();
         this.syncSheetToUi();
-        this.notify.success(
-            `${batch.loaded.toLocaleString()} records added to ${sheetName}.`
-        );
+        this.notify.success(`${batch.loaded.toLocaleString()} records added to ${sheetName}.`);
         this.showDataPanel = false;
+
         await this.paint();
-        // Clear AFTER Spreadsheet has finished.
+
+        // Clear AFTER the spreadsheet has finished.
+        this.resetDataLoad();
+        this.resizeLater();
+
+        setTimeout(() => {
+            this.hideLoading();
+            this.cdr.detectChanges();
+        }, 250);
+    }
+
+    onDataLoadingFailed(error: any): void {
+        console.error('[Spreadsheet] data loading failed:', error);
+        this.hideLoading();
+        this.resetDataLoad();
+        this.notify.error('Unable to load Spreadsheet data.');
+        this.cdr.detectChanges();
+    }
+
+    private resetDataLoad(): void {
         this.newDataSheetName = null;
         this.newDataSheetLoadedRows = 0;
-        this.pendingDataBatch = null;
-        this.resizeLater();
-        setTimeout(
-            () => {
-
-                this.hideLoading();
-
-                this.cdr.detectChanges();
-
-            },
-            250
-        );
     }
 
     private getUniqueSheetName(baseName: string): string {
@@ -1023,35 +881,6 @@ export class CreateOrEditSpreadsheetComponent extends AppComponentBase implement
         }
 
         return name;
-    }
-
-
-    onDataLoadingFailed(
-        error: any
-    ): void {
-
-        console.error(
-            '[Spreadsheet] data loading failed:',
-            error
-        );
-
-
-        this.hideLoading();
-
-
-        this.newDataSheetName = null;
-
-        this.newDataSheetLoadedRows = 0;
-
-        this.pendingDataBatch = null;
-
-
-        this.notify.error(
-            'Unable to load Spreadsheet data.'
-        );
-
-
-        this.cdr.detectChanges();
     }
 
     // =====================================================
@@ -1100,7 +929,7 @@ export class CreateOrEditSpreadsheetComponent extends AppComponentBase implement
                 return;
             }
 
-            // 4. Settings + current pivot + active tab.
+            // 4. Settings + chart + active tab.
             this.pivotSettings = this.buildPivotSettings(analysis?.pivot, records, fieldMapping);
             this.pivotChart = {
                 ...this.pivotChart,
@@ -1111,6 +940,7 @@ export class CreateOrEditSpreadsheetComponent extends AppComponentBase implement
                 title: analysis?.chart?.title ?? 'Pivot Chart',
                 enableMultipleAxis: analysis?.chart?.enableMultipleAxis ?? false
             };
+            this.selectedPivotChartType = analysis?.chart?.type ?? 'Column';
 
             this.pivotSheet = pivotSheetName;
             this.sourceSheet = sourceSheetName;
@@ -1210,9 +1040,7 @@ export class CreateOrEditSpreadsheetComponent extends AppComponentBase implement
             return null;
         }
 
-        const range =
-            `${this.quoteSheetName(sourceSheetName)}!A1:${toColumnName(lastCol + 1)}${lastRow + 1}`;
-
+        const range = `${this.quoteSheetName(sourceSheetName)}!A1:${toColumnName(lastCol + 1)}${lastRow + 1}`;
         const data = await this.spreadsheet!.getData(range);
         const records = this.sheetDataToRecords(data, lastRow, lastCol) as IDataSet[];
 
@@ -1271,19 +1099,17 @@ export class CreateOrEditSpreadsheetComponent extends AppComponentBase implement
     /** Pushes records + settings into the PivotView and the fixed field list. */
     private bindPivotView(records: IDataSet[]): void {
         if (!this.pivotView) {
-            console.error('[Pivot] PivotView was not created.');
             return;
         }
 
         const settings = { ...this.pivotSettings, dataSource: [...records] };
 
         this.pivotView.dataSourceSettings = settings;
-        this.pivotView.showFieldList = false; // field list is a separate fixed component
+        this.pivotView.showFieldList = false;
         this.pivotView.showGroupingBar = true;
-        this.pivotView.showToolbar = true;
-        this.pivotView.toolbar = this.pivotToolbar as any;
+        this.pivotView.showToolbar = false;
         this.pivotView.displayOption = { view: 'Both', primary: 'Table' } as DisplayOption;
-        this.pivotView.chartSettings = this.pivotChart;
+        this.pivotView.chartSettings = { ...this.pivotChart };
         this.pivotView.dataBind?.();
 
         if (this.pivotFieldList) {
@@ -1295,9 +1121,42 @@ export class CreateOrEditSpreadsheetComponent extends AppComponentBase implement
         this.pivotView.refresh?.();
     }
 
+    changePivotChartType(type: string): void {
+        if (!type || !this.pivotView) {
+            return;
+        }
+
+        this.selectedPivotChartType = type;
+        this.setPivotChartType(type);
+
+        this.pivotView.chartSettings = { ...this.pivotChart };
+        this.pivotView.dataBind?.();
+
+        this.markDirty();
+        this.schedulePivotDashboardSync();
+    }
+
+    /** Stores the chart type in the chart settings and in the saved analysis. */
+    private setPivotChartType(type: string, defaultTitle?: string): void {
+        this.pivotChart = {
+            ...this.pivotChart,
+            chartSeries: { ...(this.pivotChart?.chartSeries ?? {}), type }
+        };
+
+        const analysis: any = this.getCurrentAnalysis();
+
+        if (analysis) {
+            analysis.chart = {
+                ...analysis.chart,
+                type,
+                ...(defaultTitle ? { title: analysis.chart?.title ?? defaultTitle } : {})
+            };
+        }
+    }
+
     /** Opens/closes the pivot view when the user switches sheet tabs. */
     private async syncPivotForActiveSheet(): Promise<void> {
-        if (this.isCreatingPivot || !this.activeSheetName) {
+        if (this.isCreatingPivot || this.isSyncingPivotDashboard || !this.activeSheetName) {
             return;
         }
 
@@ -1306,13 +1165,13 @@ export class CreateOrEditSpreadsheetComponent extends AppComponentBase implement
 
         if (!analysis) {
             if (this.showPivot) {
-                // User left a Pivot tab: keep its latest state in memory.
                 this.updateAnalysis();
                 this.showPivot = false;
                 this.pivotSheet = null;
                 this.sourceSheet = null;
                 this.cdr.detectChanges();
             }
+
             return;
         }
 
@@ -1336,10 +1195,6 @@ export class CreateOrEditSpreadsheetComponent extends AppComponentBase implement
             }
 
             rows.push(row);
-        }
-
-        if (!rows.length) {
-            return [];
         }
 
         const headers = rows[0].map((header, i) => text(header) || `Column${i + 1}`);
@@ -1414,6 +1269,14 @@ export class CreateOrEditSpreadsheetComponent extends AppComponentBase implement
         }
 
         this.forceTransactionCount();
+
+        if (this.isCreatingPivot) {
+            return;
+        }
+
+        this.updateAnalysis();
+        this.markDirty();
+        this.schedulePivotDashboardSync();
     }
 
     /** Makes sure TransactionNumber is always counted (not summed). */
@@ -1431,21 +1294,6 @@ export class CreateOrEditSpreadsheetComponent extends AppComponentBase implement
 
         if (changed) {
             this.pivotView.dataSourceSettings = settings;
-        }
-    }
-
-    private refreshPivot(): void {
-        if (!this.pivotView) {
-            return;
-        }
-
-        this.pivotView.dataSourceSettings = this.pivotSettings;
-        this.pivotView.dataBind?.();
-
-        if (this.pivotFieldList) {
-            this.pivotFieldList.dataSourceSettings = this.pivotSettings as any;
-            this.pivotFieldList.dataBind?.();
-            this.pivotFieldList.update?.(this.pivotView);
         }
     }
 
@@ -1472,6 +1320,30 @@ export class CreateOrEditSpreadsheetComponent extends AppComponentBase implement
                 })
             )
             .filter(row => row.some((v: any) => v !== '' && v != null));
+    }
+
+    /** User changed the chart type inside the Pivot: keep metadata + Dashboard chart in sync. */
+    onPivotChartChanged(args: any): void {
+        const type = text(
+            args?.series?.[0]?.type ??
+            this.pivotView?.chart?.series?.[0]?.type ??
+            this.pivotView?.chartSettings?.chartSeries?.type
+        );
+
+        if (!type) {
+            return;
+        }
+
+        const analysis: any = this.getCurrentAnalysis();
+
+        this.setPivotChartType(type, `${analysis?.sourceSheetName} Pivot Chart`);
+
+        if (this.isCreatingPivot) {
+            return;
+        }
+
+        this.markDirty();
+        this.schedulePivotDashboardSync();
     }
 
     // =====================================================
@@ -1562,101 +1434,6 @@ export class CreateOrEditSpreadsheetComponent extends AppComponentBase implement
         return (settings ?? []).map(s => ({ name: s.name, order: s.order }));
     }
 
-    /** User changed the chart type in the Pivot: keep metadata + Dashboard chart in sync. */
-    onPivotChartChanged(args: any): void {
-        const type = text(
-            args?.series?.[0]?.type ??
-            this.pivotView?.chart?.series?.[0]?.type ??
-            this.pivotView?.chartSettings?.chartSeries?.type
-        );
-
-        if (!type) {
-            return;
-        }
-
-        this.pivotChart = {
-            ...this.pivotChart,
-            chartSeries: { ...(this.pivotChart?.chartSeries ?? {}), type }
-        };
-
-        const analysis: any = this.getCurrentAnalysis();
-
-        if (analysis) {
-            analysis.chart = {
-                ...analysis.chart,
-                type,
-                title: analysis.chart?.title ?? `${analysis.sourceSheetName} Pivot Chart`
-            };
-        }
-
-        // Debounce: Syncfusion may fire this several times while rebuilding the chart.
-        clearTimeout(this.chartSyncTimer);
-        this.chartSyncTimer = setTimeout(() => void this.syncChartTypeToDashboard(type), 100);
-    }
-
-    /** Replaces the Pivot's Dashboard chart when its type changed. */
-    private async syncChartTypeToDashboard(pivotType: string): Promise<void> {
-        const analysis: any = this.getCurrentAnalysis();
-
-        if (!this.spreadsheet || !analysis || (!analysis.dashboardChartId && !analysis.dashboardDataRange)) {
-            return;
-        }
-
-        const range = this.removeSheetFromRange(analysis.dashboardDataRange);
-        const existing = range ? this.findPivotDashboardChart(analysis, range) : null;
-
-        if (!existing) {
-            return;
-        }
-
-        const newType = this.toSheetChartType(pivotType);
-        const oldId = text(existing.id);
-
-        if (text(existing.type) === newType || !oldId || typeof this.grid.deleteChart !== 'function') {
-            return;
-        }
-
-        // Chart APIs work on the active sheet, so go to Dashboard and come back.
-        const previousSheet = this.activeSheetName;
-
-        await this.activateSheet(DASHBOARD_SHEET);
-
-        this.grid.deleteChart(oldId);
-        await this.settle();
-
-        const inserted = await this.insertDashboardChart({
-            range,
-            type: newType,
-            theme: existing.theme ?? 'Material',
-            title: existing.title ?? `${analysis.sheetName} Chart`,
-            height: existing.height ?? 320,
-            width: existing.width ?? 520,
-            top: existing.top ?? 30,
-            left: existing.left ?? 30,
-            isSeriesInRows: existing.isSeriesInRows ?? false
-        });
-
-        // Replacing the chart creates a new native chart id.
-        const newId = text(inserted?.id);
-
-        analysis.dashboardChartId = newId || analysis.dashboardChartId;
-
-        const widget = this.widgets.find(
-            w => w.sourceType === 'PIVOT' && (w.analysisId === analysis.id || w.id === analysis.dashboardWidgetId)
-        );
-
-        if (widget) {
-            widget.chartId = newId || widget.chartId;
-            widget.chartType = newType;
-        }
-
-        if (previousSheet && previousSheet !== DASHBOARD_SHEET) {
-            await this.activateSheet(previousSheet);
-        }
-
-        this.resizeLater(100);
-    }
-
     // =====================================================
     // PIVOT -> DASHBOARD
     // =====================================================
@@ -1710,29 +1487,13 @@ export class CreateOrEditSpreadsheetComponent extends AppComponentBase implement
                 return;
             }
 
-            // Data goes into a reserved block of the ONE Dashboard sheet.
-            const dashboardRange = await this.writePivotData(pivotName, matrix);
-
-            // First copy inserts the chart. Next copies replace only THIS Pivot's chart.
-            const result = await this.upsertPivotChart(analysis, {
-                range: dashboardRange,
-                type: this.toSheetChartType(this.getPivotChartType()),
-                theme: 'Material',
-                title: `${pivotName} Chart`,
-                height: 320,
-                width: 520,
-                top: 30,
-                left: 30,
-                isSeriesInRows: false
-            });
-
-            this.registerWidget(pivotName, dashboardRange, result.chart);
+            const updated = await this.publishPivotChart(analysis, matrix);
 
             await this.activateSheet(DASHBOARD_SHEET);
             this.resizeLater(100);
 
             this.notify.success(
-                result.updated
+                updated
                     ? 'Pivot chart updated on Dashboard. Click Save to persist changes.'
                     : 'Pivot chart added to Dashboard. Click Save to persist changes.'
             );
@@ -1740,6 +1501,75 @@ export class CreateOrEditSpreadsheetComponent extends AppComponentBase implement
             console.error('Copy Pivot chart to Dashboard failed:', error);
             this.notify.error('Unable to copy Pivot chart to Dashboard.');
         }
+    }
+
+    private schedulePivotDashboardSync(): void {
+        if (!this.isPivotOnDashboard) {
+            return;
+        }
+
+        clearTimeout(this.pivotSyncTimer);
+        this.pivotSyncTimer = setTimeout(() => void this.syncPivotToDashboard(), 250);
+    }
+
+    /** Silently refreshes the Pivot's Dashboard chart, then returns to the previous tab. */
+    private async syncPivotToDashboard(): Promise<void> {
+        const analysis = this.getCurrentAnalysis();
+
+        if (!analysis || !this.pivotView || !this.isPivotOnDashboard || this.isSyncingPivotDashboard) {
+            return;
+        }
+
+        const previousSheet = this.activeSheetName;
+
+        this.isSyncingPivotDashboard = true;
+
+        try {
+            this.updateAnalysis();
+
+            const matrix = this.getPivotResultMatrix();
+
+            if (!matrix.length || !matrix[0]?.length) {
+                return;
+            }
+
+            await this.publishPivotChart(analysis, matrix);
+
+            if (previousSheet && this.findSheet(previousSheet)) {
+                await this.activateSheet(previousSheet);
+            }
+
+            this.lastSheetIndex = Number(this.grid.activeSheetIndex ?? 0);
+            this.resizeLater(100);
+        } finally {
+            this.isSyncingPivotDashboard = false;
+        }
+    }
+
+    /**
+     * Writes the pivot result to the Dashboard, inserts/replaces its chart and
+     * registers the widget. Returns true when an existing chart was updated.
+     */
+    private async publishPivotChart(analysis: SavedSheetAnalysis, matrix: any[][]): Promise<boolean> {
+        const pivotName = text(analysis.sheetName);
+        const dashboardRange = await this.writePivotData(pivotName, matrix);
+
+        // First copy inserts the chart. Next copies replace only THIS Pivot's chart.
+        const result = await this.upsertPivotChart(analysis, {
+            range: dashboardRange,
+            type: this.toSheetChartType(this.getPivotChartType()),
+            theme: 'Material',
+            title: `${pivotName} Chart`,
+            height: 320,
+            width: 520,
+            top: 30,
+            left: 30,
+            isSeriesInRows: false
+        });
+
+        this.registerWidget(pivotName, dashboardRange, result.chart);
+
+        return result.updated;
     }
 
     /**
@@ -1928,11 +1758,7 @@ export class CreateOrEditSpreadsheetComponent extends AppComponentBase implement
     }
 
     private toSheetChartType(type: string): string {
-        const map: Record<string, string> = {
-            Spline: 'Line',
-            SplineArea: 'Area'
-        };
-
+        const map: Record<string, string> = { Spline: 'Line', SplineArea: 'Area' };
         const known = [
             'Column', 'Bar', 'Line', 'Area', 'Pie', 'Doughnut', 'Scatter',
             'StackingColumn', 'StackingBar', 'StackingArea'
@@ -2051,7 +1877,7 @@ export class CreateOrEditSpreadsheetComponent extends AppComponentBase implement
         return null;
     }
 
-    private async activateSheet(sheetName: string): Promise<number> {
+    private async activateSheet(sheetName: string): Promise<void> {
         if (!this.spreadsheet) {
             throw new Error('Spreadsheet is not ready.');
         }
@@ -2066,8 +1892,6 @@ export class CreateOrEditSpreadsheetComponent extends AppComponentBase implement
 
         this.grid.activeSheetIndex = index;
         await this.settle();
-
-        return index;
     }
 
     // =====================================================
@@ -2328,7 +2152,6 @@ export class CreateOrEditSpreadsheetComponent extends AppComponentBase implement
         }));
     }
 
-
     private upsertSheetSource(metadata: SpreadsheetSheetDataSource): void {
         const name = text(metadata.sheetName);
 
@@ -2379,11 +2202,10 @@ export class CreateOrEditSpreadsheetComponent extends AppComponentBase implement
         this.lastSheetIndex = Number(this.grid.activeSheetIndex ?? 0);
 
         this.sheetWatcher = setInterval(() => {
-            if (!this.spreadsheet) {
+            if (!this.spreadsheet || this.isSyncingPivotDashboard) {
                 return;
             }
 
-            // Dashboard is fixed as the first tab: move it back if the user dragged it.
             void this.moveDashboardFirst();
 
             const index = Number(this.grid.activeSheetIndex ?? 0);
@@ -2393,6 +2215,7 @@ export class CreateOrEditSpreadsheetComponent extends AppComponentBase implement
             }
 
             this.lastSheetIndex = index;
+
             this.syncSheetToUi();
             void this.syncPivotForActiveSheet();
         }, 100);
@@ -2405,7 +2228,7 @@ export class CreateOrEditSpreadsheetComponent extends AppComponentBase implement
         }
     }
 
-    /** Shows the source/filters of the active tab in the header. */
+    /** Shows the filters of the active tab in the header. */
     private syncSheetToUi(): void {
         const name = this.activeSheetName;
 
@@ -2417,7 +2240,6 @@ export class CreateOrEditSpreadsheetComponent extends AppComponentBase implement
         const source = this.sheetSources.find(i => text(i.sheetName) === name)?.source;
 
         // Always replace the previous tab's state.
-        this.currentSource = source ? this.cloneSource(source) : null;
         this.currentFilters = { ...(source?.filters ?? {}) };
 
         this.cdr.detectChanges();
@@ -2529,7 +2351,9 @@ export class CreateOrEditSpreadsheetComponent extends AppComponentBase implement
                 return firstValueFrom(this.dashboardService.saveSpreadSheetJson(dashboardId, spreadsheet));
             })
             .then(() => {
+                this.isDirty = false;
                 this.notify.success('Spreadsheet saved successfully.');
+                this.cdr.detectChanges();
             })
             .catch((error: any) => {
                 console.error('[Spreadsheet] SaveSpreadSheetJson failed:', error);
@@ -2723,5 +2547,4 @@ export class CreateOrEditSpreadsheetComponent extends AppComponentBase implement
 
         return cleaned;
     }
-
 }
