@@ -134,6 +134,7 @@ Base path: `/api/services/app/AppFieldManager`. JSON names below use the camel c
 | `result.items[].sycObjectId` | Source `SydObject` ID. |
 | `result.items[].entitySycObjectId` | Related entity object's ID, if set. |
 | `result.items[].creatorUserId` | Creator user ID, if recorded. |
+| `result.items[].creatorUserName` | Creator's full name, if the user record is available. |
 | `result.items[].creationTime` | Creation date/time. |
 | `result.items[].tables[]` | Names of the field's assigned objects or object types. Includes all visible assignments for the field, not only the selected node. |
 
