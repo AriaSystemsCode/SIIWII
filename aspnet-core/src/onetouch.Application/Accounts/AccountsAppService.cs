@@ -100,6 +100,7 @@ using Microsoft.EntityFrameworkCore.Internal;
 using DocumentFormat.OpenXml.InkML;
 using onetouch.Authorization.Roles;
 using Abp.Authorization.Users;
+using JetBrains.Annotations;
 //using Microsoft.AspNetCore.Http;
 
 namespace onetouch.Accounts
@@ -3968,7 +3969,14 @@ namespace onetouch.Accounts
             if (string.IsNullOrEmpty(input.Code))
                 input.Code = System.Guid.NewGuid().ToString();
 
-
+            //MMT
+            if (input.AccountType == "PERSONAL")
+            {
+                var firstName = input.EntityExtraData.FirstOrDefault(x => x.AttributeId == 701) == null ? "" : input.EntityExtraData.FirstOrDefault(x => x.AttributeId == 701).AttributeValue;
+                var lastName = input.EntityExtraData.FirstOrDefault(x => x.AttributeId == 702) == null ? "" : input.EntityExtraData.FirstOrDefault(x => x.AttributeId == 702).AttributeValue;
+                input.Name = firstName.TrimEnd() +" "+ lastName;
+            }
+            //MMT
 
             var contactObjectId = await _helper.SystemTables.GetObjectContactId();
 
