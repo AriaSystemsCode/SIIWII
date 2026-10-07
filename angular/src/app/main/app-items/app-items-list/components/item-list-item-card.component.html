@@ -25,7 +25,7 @@
                     }}
                 </p>
                 <p class="text-dark mb-2">
-                <b>{{'Code' | localize}}:</b> 
+                <b>Code:</b> 
                   {{
                     item?.itemCode
                     }}
@@ -33,11 +33,20 @@
                 <div>
                     <p class="text-dark mb-2" *ngIf="item?.appItemsListItemVariations">
                         <ng-container *ngFor="let extraAttr of variationSummary.selectedVariations | keyvalue;let last as last" >
-                        <ng-container *ngIf="extraAttr.key?.toUpperCase()== 'COLOR' ||extraAttr.key?.toUpperCase()== 'SIZE' ||extraAttr.key?.toUpperCase()== 'CLOSURE'">
-                            <b class="extraAttr-label">{{extraAttr?.key | titlecase }}:</b>
-                            {{ extraAttr?.value | arrayToString  }}
-                            <span *ngIf="!last">  |  </span>
-                        </ng-container>
+                    <ng-container
+    *ngIf="
+        extraAttr.key?.toUpperCase() === 'COLOR' ||
+        extraAttr.key?.toUpperCase() === 'SIZE' ||
+        extraAttr.key?.toUpperCase() === 'CLOSURE'
+    ">
+    <b class="extraAttr-label">
+        {{ extraAttr?.key | titlecase | localize }}:
+    </b>
+
+    {{ extraAttr?.value | arrayToString }}
+
+    <span *ngIf="!last"> | </span>
+</ng-container>
                         </ng-container>
                     </p>
                 </div>

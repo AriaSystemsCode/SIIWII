@@ -16,10 +16,10 @@
             <div class="modal-content-wrapper">
                 <div class="modal-header flex-column text-left">
                     <h3 class="modal-title">
-                        <span> {{ l("SelectVariationsTitle") }}</span>
+                        <span class="mx-2"> {{ l("SelectVariationsTitle") }}</span>
                     </h3>
-                    <p>{{l('SelectVariationsHint')}}</p>
-                    <button
+                    <p class="mx-2">{{l('SelectVariationsHint')}}</p>
+                    <button  style="position: absolute;top: 8px; width: 70px;" [ngStyle]="isArabic ? {'left':'0'} : {'right':'0'}"
                         type="button"
                         class="close modal-close-btn"
                         (click)="close()"
