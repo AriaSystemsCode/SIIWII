@@ -1801,6 +1801,7 @@
 		<text name="AddProduct(s)">إضافة منتج/منتجات</text>
 <text name="Draft">مسودة</text>
 <text name="COLOR">اللون</text>
+<text name="Color">اللون</text>
 
     
   </texts>
