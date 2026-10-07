@@ -704,23 +704,26 @@ namespace onetouch.AppDashboards
                
             }
         }
-        public async Task<List<AppEntityExtraDataDto>> GetTableFieldsList(string tableName)
+        public async Task<List<ExtraAttribute>> GetTableFieldsList(string tableName)
         {
-            List<AppEntityExtraDataDto> returnList = new List<AppEntityExtraDataDto>();
+            List<ExtraAttribute> returnList = new List<ExtraAttribute>();
             var sydobjct =await _sydObjectRepository.GetAll()
                 .Where(z => z.Name == tableName).FirstOrDefaultAsync();
             if (sydobjct != null)
             {
                 var fieldsList = await _iAppFieldManagerAppService.GetFields(new GetFieldsInput { 
-                    SelectedObjectId= sydobjct.Id,AllFields= true
+                    SelectedObjectId= sydobjct.Id,AllFields= true,MaxResultCount=1000
                     });
                 if (fieldsList != null && fieldsList.TotalCount > 0)
                 {
                     foreach (var field in fieldsList.Items)
                     {
-                        AppEntityExtraDataDto fieldData = new AppEntityExtraDataDto();
-                        fieldData.AttributeCode = field.FieldName;
+                        ExtraAttribute fieldData = new ExtraAttribute();
+                        fieldData.DataType = field.FieldTypeName;
+                        fieldData.Name = field.FieldName;
+                        fieldData.Code = field.FieldCode; 
                         fieldData.AttributeId= field.Id;
+                        fieldData.Description = field.Description;
                         returnList.Add(fieldData);
                     }
 
