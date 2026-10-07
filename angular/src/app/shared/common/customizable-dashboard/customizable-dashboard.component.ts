@@ -50,7 +50,8 @@ export class CustomizableDashboardComponent extends AppComponentBase implements 
 
   renamePageInput = '';
   addPageInput = '';
-
+      currentLang: string;
+isArabic: boolean = false;
   constructor(injector: Injector,
     private _dashboardViewConfiguration: DashboardViewConfigurationService,
     private _dashboardCustomizationServiceProxy: DashboardCustomizationServiceProxy
@@ -59,6 +60,8 @@ export class CustomizableDashboardComponent extends AppComponentBase implements 
   }
 
   ngOnInit() {
+        this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
+            this.currentLang == 'ar' || this.currentLang == 'ar-EG'  ? this.isArabic = true : this.isArabic = false
     this.loading = true;
     this._dashboardCustomizationServiceProxy.getDashboardDefinition(this.dashboardName, DashboardCustomizationConst.Applications.Angular)
     .subscribe((dashboardDefinitionResult: DashboardOutput) => {
