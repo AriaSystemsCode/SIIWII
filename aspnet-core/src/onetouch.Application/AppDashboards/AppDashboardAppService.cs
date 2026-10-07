@@ -139,60 +139,64 @@ namespace onetouch.AppDashboards
                     if (sharing != null)
                         dashboard.LastViewDate = sharing.LastViewDate;
 
-                    var entitySharingList = await _appEntitySharingRepository.GetAll()
-                        .Where(z => z.EntityId == dashboard.Id).ToListAsync();
-                    if (entitySharingList != null && entitySharingList.Count > 0)
+                    dashboard.SharedWithUsers = new List<onetouch.AppEntities.Dtos.UserInformationDto>();
+                    var entitySharingAll = await _appEntitySharingRepository.GetAll()
+                        .Where(z => z.EntityId == dashboard.Id && z.SharedUserId == null).FirstOrDefaultAsync();
+                    if (entitySharingAll != null)// && entitySharingList.Count > 0)
                     {
-                        dashboard.SharedWithUsers = new List<onetouch.AppEntities.Dtos.UserInformationDto>();
-                        if (entitySharingList.Count == 1 &&
-                            entitySharingList.FirstOrDefault().SharedUserId == null)
+
+                        //if (entitySharingList.Count == 1 &&
+                        //    entitySharingList.FirstOrDefault().SharedUserId == null)
                         {
                             dashboard.SharingLevel = 1;
-                            if (entitySharingList.FirstOrDefault().CanEdit == true)
+                            if (entitySharingAll.CanEdit == true)
                             {
                                 dashboard.IsEditable = true;
                             }
                             foreach (var user in users)
                             {
-                                if (user.Id== AbpSession.UserId)
+                                if (user.Id == AbpSession.UserId)
                                 {
                                     continue;
                                 }
                                 dashboard.SharedWithUsers.
                                          Add(await _appEntitiesAppService.GetUserInformation(user.Id));
-                                
+
                             }
+                        }
+                    }
+                    else
+                    {
+                        var entitySharingList = await _appEntitySharingRepository.GetAll()
+                        .Where(z => z.EntityId == dashboard.Id && z.SharedUserId != null).ToListAsync();
+                        if (entitySharingList.Count == 1 &&
+                        entitySharingList.FirstOrDefault().SharedUserId == dashboard.CreatorUserId)
+                        {
+                            dashboard.SharingLevel = 4;
                         }
                         else
                         {
-                            if (entitySharingList.Count == 1 &&
-                            entitySharingList.FirstOrDefault().SharedUserId == dashboard.CreatorUserId)
+                            dashboard.SharingLevel = 2;
+                            foreach (var user in entitySharingList)
                             {
-                                dashboard.SharingLevel = 4;
-                            }
-                            else
-                            { 
-                                dashboard.SharingLevel = 2;
-                                foreach (var user in entitySharingList)
+                                if (user.SharedUserId == AbpSession.UserId)
                                 {
-                                    if (user.SharedUserId == AbpSession.UserId)
+                                    if (user.CanEdit == true)
                                     {
-                                        if (user.CanEdit == true)
-                                        {
-                                            dashboard.IsEditable = true;
-                                            continue;
-                                        }
+                                        dashboard.IsEditable = true;
+                                        continue;
                                     }
+                                }
 
-                                    if (user.SharedUserId != null)
-                                    {
-                                        dashboard.SharedWithUsers.
-                                            Add(await _appEntitiesAppService.GetUserInformation(long.Parse(user.SharedUserId.ToString())));
-                                    }
+                                if (user.SharedUserId != null)
+                                {
+                                    dashboard.SharedWithUsers.
+                                        Add(await _appEntitiesAppService.GetUserInformation(long.Parse(user.SharedUserId.ToString())));
                                 }
                             }
                         }
                     }
+                    
 
                 }
             }
@@ -259,16 +263,71 @@ namespace onetouch.AppDashboards
                     if (sharing != null)
                         dashboard.LastViewDate = sharing.LastViewDate;
 
-                    var entitySharingList = await _appEntitySharingRepository.GetAll()
-                        .Where(z => z.EntityId == dashboard.Id).ToListAsync();
-                    if (entitySharingList != null && entitySharingList.Count > 0)
+                    //var entitySharingList = await _appEntitySharingRepository.GetAll()
+                    //    .Where(z => z.EntityId == dashboard.Id).ToListAsync();
+                    //if (entitySharingList != null && entitySharingList.Count > 0)
+                    //{
+                    //    dashboard.SharedWithUsers = new List<onetouch.AppEntities.Dtos.UserInformationDto>();
+                    //    if (entitySharingList.Count == 1 &&
+                    //        entitySharingList.FirstOrDefault().SharedUserId == null)
+                    //    {
+                    //        dashboard.SharingLevel = 1;
+                    //        if (entitySharingList.FirstOrDefault().CanEdit == true)
+                    //        {
+                    //            dashboard.IsEditable = true;
+                    //        }
+                    //        foreach (var user in users)
+                    //        {
+                    //            if (user.Id == AbpSession.UserId)
+                    //            {
+                    //                continue;
+                    //            }
+                    //            dashboard.SharedWithUsers.
+                    //                     Add(await _appEntitiesAppService.GetUserInformation(user.Id));
+
+                    //        }
+                    //    }
+                    //    else
+                    //    {
+                    //        if (entitySharingList.Count == 1 &&
+                    //       entitySharingList.FirstOrDefault().SharedUserId == dashboard.CreatorUserId)
+                    //        {
+                    //            dashboard.SharingLevel = 4;
+                    //        }
+                    //        else
+                    //        {
+                    //            dashboard.SharingLevel = 2;
+                    //            foreach (var user in entitySharingList)
+                    //            {
+                    //                if (user.SharedUserId == AbpSession.UserId)
+                    //                {
+                    //                    if (user.CanEdit == true)
+                    //                    {
+                    //                        dashboard.IsEditable = true;
+                    //                        continue;
+                    //                    }
+                    //                }
+
+                    //                if (user.SharedUserId != null)
+                    //                {
+                    //                    dashboard.SharedWithUsers.
+                    //                        Add(await _appEntitiesAppService.GetUserInformation(long.Parse(user.SharedUserId.ToString())));
+                    //                }
+                    //            }
+                    //        }
+                    //    }
+                    //}
+                    dashboard.SharedWithUsers = new List<onetouch.AppEntities.Dtos.UserInformationDto>();
+                    var entitySharingAll = await _appEntitySharingRepository.GetAll()
+                        .Where(z => z.EntityId == dashboard.Id && z.SharedUserId == null).FirstOrDefaultAsync();
+                    if (entitySharingAll != null)// && entitySharingList.Count > 0)
                     {
-                        dashboard.SharedWithUsers = new List<onetouch.AppEntities.Dtos.UserInformationDto>();
-                        if (entitySharingList.Count == 1 &&
-                            entitySharingList.FirstOrDefault().SharedUserId == null)
+
+                        //if (entitySharingList.Count == 1 &&
+                        //    entitySharingList.FirstOrDefault().SharedUserId == null)
                         {
                             dashboard.SharingLevel = 1;
-                            if (entitySharingList.FirstOrDefault().CanEdit == true)
+                            if (entitySharingAll.CanEdit == true)
                             {
                                 dashboard.IsEditable = true;
                             }
@@ -283,37 +342,38 @@ namespace onetouch.AppDashboards
 
                             }
                         }
+                    }
+                    else
+                    {
+                        var entitySharingList = await _appEntitySharingRepository.GetAll()
+                        .Where(z => z.EntityId == dashboard.Id && z.SharedUserId != null).ToListAsync();
+                        if (entitySharingList.Count == 1 &&
+                        entitySharingList.FirstOrDefault().SharedUserId == dashboard.CreatorUserId)
+                        {
+                            dashboard.SharingLevel = 4;
+                        }
                         else
                         {
-                            if (entitySharingList.Count == 1 &&
-                           entitySharingList.FirstOrDefault().SharedUserId == dashboard.CreatorUserId)
+                            dashboard.SharingLevel = 2;
+                            foreach (var user in entitySharingList)
                             {
-                                dashboard.SharingLevel = 4;
-                            }
-                            else
-                            {
-                                dashboard.SharingLevel = 2;
-                                foreach (var user in entitySharingList)
+                                if (user.SharedUserId == AbpSession.UserId)
                                 {
-                                    if (user.SharedUserId == AbpSession.UserId)
+                                    if (user.CanEdit == true)
                                     {
-                                        if (user.CanEdit == true)
-                                        {
-                                            dashboard.IsEditable = true;
-                                            continue;
-                                        }
+                                        dashboard.IsEditable = true;
+                                        continue;
                                     }
+                                }
 
-                                    if (user.SharedUserId != null)
-                                    {
-                                        dashboard.SharedWithUsers.
-                                            Add(await _appEntitiesAppService.GetUserInformation(long.Parse(user.SharedUserId.ToString())));
-                                    }
+                                if (user.SharedUserId != null)
+                                {
+                                    dashboard.SharedWithUsers.
+                                        Add(await _appEntitiesAppService.GetUserInformation(long.Parse(user.SharedUserId.ToString())));
                                 }
                             }
                         }
                     }
-
                 }
             }
 
@@ -459,7 +519,7 @@ namespace onetouch.AppDashboards
                     }
                     if (sharingList != null && sharingList.Count() > 0)
                     {
-                        if (sharingList.Count() == 1 &&
+                        if (//sharingList.Count() == 1 &&
                             sharingList.FirstOrDefault(a=>a.SharedUserId==null)!=null)
                         {
                             var sharedWithAll = sharingList.FirstOrDefault(a => a.SharedUserId == null);
