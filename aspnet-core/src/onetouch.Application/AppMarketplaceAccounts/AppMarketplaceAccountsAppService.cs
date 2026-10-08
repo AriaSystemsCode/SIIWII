@@ -1655,6 +1655,11 @@ namespace onetouch.AppMarketplaceAccounts
                     //appMarketplaceContact.EntityExtraData.Add(appEntityExtraDto);
                 }
                 //I40 -MMT  -Account Attachment[Start]
+                if (newId != 0)
+                {
+                    await _appEntityAttachmentsRepository.DeleteAsync(z => z.EntityId == newId);
+                    await CurrentUnitOfWork.SaveChangesAsync();
+                }
                 appMarketplaceContact.EntityAttachments = new List<AppEntityAttachment>();
                 if (foundContactInfo.EntityFk.EntityAttachments != null)
                 {
