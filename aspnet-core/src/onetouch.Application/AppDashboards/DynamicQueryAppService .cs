@@ -150,10 +150,10 @@ namespace onetouch.AppDashboards
                     throw new UserFriendlyException(
                         "Filter value is required.");
                 }
-
-                var value = condition.Value is JValue jValue
+                object valueJson = condition.Value;
+                var value = valueJson is JValue jValue
                     ? jValue.ToObject<object>()
-                    : condition.Value;
+                    : valueJson;
 
                 var parameterName = $"@p{index++}";
                 string expression;
@@ -203,6 +203,9 @@ namespace onetouch.AppDashboards
                 " LastModificationTime >= '{0}') ",lastUpdateDate);
             }
             // 5. Count matching records
+            if (!tableName.ToUpper().Contains("Inner Join".ToUpper()))
+                tableName += " a";
+
             var countSql =
                 $"SELECT COUNT_BIG(*) FROM {tableName} {whereSql}";
 
@@ -251,7 +254,7 @@ namespace onetouch.AppDashboards
                 : Math.Min(input.MaxResultCount, 500);
 
             var selectSql = string.Join(
-                ", ", selectedFields.Select(f => $"[{f}]"));
+                ", ", selectedFields.Select(f => $"a.[{f}]"));
 
             var sql =
                 $"SELECT {selectSql} FROM {tableName}" +

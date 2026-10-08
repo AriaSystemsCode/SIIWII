@@ -1,4 +1,5 @@
 ﻿using Abp.Application.Services.Dto;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
@@ -80,7 +81,7 @@ namespace onetouch.AppDashboards.Dtos
     {
         public string Field { get; set; }
         public string Operator { get; set; }
-        public object Value { get; set; }
+        public string Value { get; set; }
     }
 
     public class DynamicQueryResult
