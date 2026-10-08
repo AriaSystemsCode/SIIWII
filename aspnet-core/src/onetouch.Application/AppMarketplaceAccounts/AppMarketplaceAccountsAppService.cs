@@ -391,7 +391,9 @@ namespace onetouch.AppMarketplaceAccounts
 
                     foreach (var account in accountsList)
                     {
-                        if (currentTenantAccountObject.SSIN == account.Account.SSIN)
+                        if (account==null || account.Account==null || account.Account.SSIN==null)
+                            continue;
+                        if (currentTenantAccountObject!= null && currentTenantAccountObject.SSIN == account.Account.SSIN)
                             continue;
                         //I50[Start]
                         var relationshipsQuery = _appContactRelationshipInfoRepository
@@ -1059,8 +1061,9 @@ namespace onetouch.AppMarketplaceAccounts
                             var relationshipsList = await _appContactRelationshipInfoRepository.GetAll()
                                 .AsNoTracking()
                                     .Where(z => ((z.RecipientContactSSIN == currentTenantAccount.SSIN && z.RequesterContactSSIN == accountConnection.SSIN)
-                                    || (z.RecipientContactSSIN == accountConnection.SSIN && z.RequesterContactSSIN == currentTenantAccount.SSIN))
-                                   ).OrderByDescending(z => z.CreationTime).ToListAsync();
+                                    || (z.RecipientContactSSIN == accountConnection.SSIN 
+                                    && z.RequesterContactSSIN == currentTenantAccount.SSIN))
+                                   && z.EntityObjectStatusId == activeRelationshipStatusId).OrderByDescending(z => z.CreationTime).ToListAsync();
                             if (relationshipsList != null && relationshipsList.Count>0)
                             {
                                 output.ConnectionsInfo = new List<ConnectionInfo>();
@@ -1099,6 +1102,7 @@ namespace onetouch.AppMarketplaceAccounts
                             output.AvaliableConnectionName = "";
                         }
                         //else
+                        if (currentTenantAccount != null && currentTenantAccountSSIN != account.SSIN)
                         {
                             //account.ConnectionName = account.ConnectionName == "Follow" ? GetAction(account.Account.AccountType) : "";
                             //output.AvaliableConnectionName = GetAction(output.Account.AccountType, currentTenantAccount, true);
@@ -1239,9 +1243,9 @@ namespace onetouch.AppMarketplaceAccounts
                 var relationshipQ1 = from b in _appMarketplaceContactRepository.GetAll().AsNoTracking().Where(z => z.SSIN != account.SSIN && z.IsDeleted == false && z.SharingLevel == 1)
                                     from a in relationshipsQuery1
                                     where (b.SSIN == a.RequesterContactSSIN || b.SSIN == a.RecipientContactSSIN)
-                                    select new { obj = b };
+                                    select new { obj = b.SSIN };
 
-                var relationshipsConut = await relationshipQ1.CountAsync();
+                var relationshipsConut = await relationshipQ1.Distinct().CountAsync();
 
                 output.ConnectionCount = relationshipsConut;
                 //I40[End]
@@ -1381,7 +1385,7 @@ namespace onetouch.AppMarketplaceAccounts
                 var FoundPublishContact = await _appMarketplaceContactRepository.GetAll()
                                                   .AsNoTracking().Include(x => x.ContactAddresses).ThenInclude(e => e.AddressFk)
                                                   .FirstOrDefaultAsync(x => x.TenantId == null
-                                                  && x.IsProfileData == true
+                                                  //&& x.IsProfileData == true
                                                   && x.TenantOwner == input.TenantId
                                                   && (x.SSIN == input.SSIN));
 
@@ -1396,7 +1400,7 @@ namespace onetouch.AppMarketplaceAccounts
                      FoundPublishContact = await _appMarketplaceContactRepository.GetAll()
                                                  .AsNoTracking().Include(x => x.ContactAddresses).ThenInclude(e => e.AddressFk)
                                                  .FirstOrDefaultAsync(x => x.TenantId == null
-                                                 && x.IsProfileData == true
+                                                 //&& x.IsProfileData == true
                                                  && x.TenantOwner == input.TenantId
                                                  && ((x.Name == input.Name && x.EntityObjectTypeId == input.AccountTypeId)));
                     if (FoundPublishContact != null)
@@ -1904,7 +1908,7 @@ namespace onetouch.AppMarketplaceAccounts
                     {
                         var marketplaceRelationshipSycEntityObjId = await _helper.SystemTables.GetEntityObjectTypeMarketplaceRelationship();
                         var relationShipLookups = await _appEntityRepository.GetAll().Include(z => z.EntityExtraData)
-                            .Where(z => z.EntityObjectTypeId == marketplaceRelationshipSycEntityObjId).ToListAsync();
+                            .Where(z => z.EntityObjectTypeId == marketplaceRelationshipSycEntityObjId).OrderBy(z=>z.Code).ToListAsync();
 
                         foreach (var relationshipCodeLookup in relationShipLookups)
                         {
@@ -2264,6 +2268,7 @@ namespace onetouch.AppMarketplaceAccounts
                 {
                     contactAddress.Id = 0;
                     contactAddress.AddressFk.Id = 0;
+                    contactAddress.AddressFk.AccountId = newAccountID;
                 }
 
                 long newId = 0;

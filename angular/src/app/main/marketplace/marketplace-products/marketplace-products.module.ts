@@ -31,6 +31,7 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { AppCommonModule } from "@app/shared/common/app-common.module";
 import { UtilsModule } from "@shared/utils/utils.module";
 import { OverALLRatingReviewsModule } from "@app/main/overallRating-reviews/overallRating-reviews.module";
+import { TooltipModule } from "primeng/tooltip";
 @NgModule({
     declarations: [
         MarketplaceProductsComponent,
@@ -63,7 +64,8 @@ import { OverALLRatingReviewsModule } from "@app/main/overallRating-reviews/over
         TabViewModule,
         ConfirmDialogModule,AppCommonModule,
         UtilsModule,
-        OverALLRatingReviewsModule
+        OverALLRatingReviewsModule,
+        TooltipModule
     ],
     providers:[AppMarketplaceItemsServiceProxy],
     exports:[MarketplaceProductsComponent,ProdcutCardComponent]

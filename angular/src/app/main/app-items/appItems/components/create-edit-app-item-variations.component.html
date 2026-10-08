@@ -652,7 +652,7 @@
                                         </div>
                                     </div>
                                     <div class="col-12 item-photos-body pt-4 pb-5" >
-                                        <div class="col-1 photo-selector-col">
+                                        <div class="photo-selector-col">
                                             <!-- <a
                                             class="mr-4 aria-tag p-2"
                                             *ngFor="let attachmentObj of defaultExtraAttrForAttachments?.selectedValuesAttachments | keyvalue"
@@ -662,12 +662,21 @@
                                                 {{attachmentObj?.value?.lookupData?.label | localize}}
                                             </a> -->
 
-<p-dropdown [options]="defaultExtraAttrForAttachments?.selectedValuesAttachments | keyvalue" 
+<p-dropdown [options]="defaultExtraAttrForAttachments?.selectedValuesAttachments | keyvalue"
             optionLabel="value.lookupData.label"
             optionValue="value"
+            [styleClass]="'attachment-option-dropdown'"
+            [panelStyleClass]="isArabic ? 'attachment-option-panel attachment-option-panel-rtl' : 'attachment-option-panel'"
+            [appendTo]="'body'"
+            [attr.dir]="isArabic ? 'rtl' : 'ltr'"
             (onChange)="onAttachmentOptionChange($event)"
             [(ngModel)]="activeAttachmentOption"
             name="firstAttachSelection">
+    <ng-template let-option pTemplate="item">
+        <span class="attachment-option-label" [title]="option.value?.lookupData?.label">
+            {{ option.value?.lookupData?.label | localize }}
+        </span>
+    </ng-template>
 </p-dropdown>
                                         </div>
                                         <div class="row pt-3 pb-3 pl-3">
