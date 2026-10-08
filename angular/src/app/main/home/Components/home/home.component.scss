@@ -84,3 +84,23 @@
     width: 100%;
   }
 }
+
+
+@media screen and (min-width: 1301px) {
+  .home-layout.rtl-layout {
+    .left-sidebar {
+      left: auto;
+      right: var(--layout-left-side-padding);
+    }
+
+    .right-sidebar {
+      right: auto;
+      left: var(--layout-right-side-padding);
+    }
+
+    .middle-content {
+      margin-left: calc(var(--sidebar-width) + var(--sidebar-gap));
+      margin-right: calc(var(--sidebar-width) + var(--sidebar-gap));
+    }
+  }
+}
