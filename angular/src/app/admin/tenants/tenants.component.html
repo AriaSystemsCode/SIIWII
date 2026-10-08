@@ -21,8 +21,8 @@
                 </div>
             </div>
         </div>
-        <div [class]="containerClass + ' kt-grid__item kt-grid__item--fluid'">
-            <div class="kt-portlet">
+        <div [class]="containerClass + ' kt-grid__item kt-grid__item--fluid'" [style.margin-top]="isArabic ? '85px !important' : null">
+            <div class="kt-portlet" >
                 <div class="kt-portlet__body">
                     <div class="kt-form">
                         <form (submit)="getTenants()" autocomplete="new-password">

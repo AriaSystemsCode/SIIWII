@@ -32,7 +32,8 @@ export class CreateOrEditAppFeatureComponent extends AppComponentBase implements
         { label: this.l('Yearly'), value: this.l('Yearly')}
       ];
 
-
+  currentLang: string;
+isArabic: boolean = false;
 
     constructor(
         injector: Injector,
@@ -46,6 +47,8 @@ export class CreateOrEditAppFeatureComponent extends AppComponentBase implements
     }
 
     ngOnInit(): void {
+               this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
+            this.currentLang == 'ar' || this.currentLang == 'ar-EG'  ? this.isArabic = true : this.isArabic = false
         this.show(this._activatedRoute.snapshot.queryParams['id']);
         this._appFeaturesServiceProxy.getFeatureStatusList()
         .subscribe((res: any) => {

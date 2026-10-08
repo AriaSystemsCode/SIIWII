@@ -52,6 +52,8 @@ export class AppFeaturesComponent extends AppComponentBase {
     _entityTypeFullName = 'onetouch.AppSubScriptionPlan.AppFeature';
     entityHistoryEnabled = false;
 
+       currentLang: string;
+isArabic: boolean = false;
 
 
     constructor(
@@ -67,6 +69,8 @@ export class AppFeaturesComponent extends AppComponentBase {
     }
 
     ngOnInit(): void {
+         this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
+            this.currentLang == 'ar' || this.currentLang == 'ar-EG'  ? this.isArabic = true : this.isArabic = false
         this.entityHistoryEnabled = this.setIsEntityHistoryEnabled();
     }
 

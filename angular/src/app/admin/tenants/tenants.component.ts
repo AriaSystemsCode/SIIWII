@@ -45,6 +45,8 @@ export class TenantsComponent extends AppComponentBase implements OnInit {
         selectedEditionId: number;
     } = <any>{};
 
+        currentLang: string;
+isArabic: boolean = false;
     constructor(
         injector: Injector,
         private _tenantService: TenantServiceProxy,
@@ -54,8 +56,12 @@ export class TenantsComponent extends AppComponentBase implements OnInit {
     ) {
         super(injector);
         this.setFiltersFromRoute();
+           this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
+            this.currentLang == 'ar' || this.currentLang == 'ar-EG'  ? this.isArabic = true : this.isArabic = false
     }
 
+
+    
     setFiltersFromRoute(): void {
         if (this._activatedRoute.snapshot.queryParams['subscriptionEndDateStart'] != null) {
             this.filters.subscriptionEndDateRangeActive = true;
@@ -91,6 +97,7 @@ export class TenantsComponent extends AppComponentBase implements OnInit {
     }
 
     ngOnInit(): void {
+       
         this.filters.filterText = this._activatedRoute.snapshot.queryParams['filterText'] || '';
 
         this.setIsEntityHistoryEnabled();

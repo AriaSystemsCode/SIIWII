@@ -27,6 +27,9 @@ export class CreateOrEditAppTenantSubscriptionPlanComponent extends AppComponent
     @ViewChild('tenantName') tenantName!: ElementRef;
     selectedTenant = 0;
     appSubscriptionPlanHeaderCode='';
+
+     currentLang: string;
+isArabic: boolean = false;
     constructor(
         injector: Injector,
         element: ElementRef,
@@ -38,6 +41,8 @@ export class CreateOrEditAppTenantSubscriptionPlanComponent extends AppComponent
     }
 
     ngOnInit(): void {
+             this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
+            this.currentLang == 'ar' || this.currentLang == 'ar-EG'  ? this.isArabic = true : this.isArabic = false
         this.show(this._activatedRoute.snapshot.queryParams['id']);
         this._appTenantSubscriptionPlansServiceProxy.getTenantsList()
         .subscribe((tenantLst: any) => {
