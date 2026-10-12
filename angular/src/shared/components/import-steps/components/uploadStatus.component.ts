@@ -550,8 +550,46 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
     record.showActions = !record.showActions;
 
     if (record.showActions) {
-      record.dropdownPosition = {};
+      const trigger = event.currentTarget as HTMLElement;
+      requestAnimationFrame(() => this.positionDropdown(record, trigger));
     }
+  }
+
+  private positionDropdown(record: any, trigger: HTMLElement): void {
+    const menu = trigger?.closest('.dropdown')?.querySelector('.fixed-dropdown-menu') as HTMLElement;
+    if (!menu || !trigger.isConnected) return;
+
+    const triggerRect = trigger.getBoundingClientRect();
+    const menuRect = menu.getBoundingClientRect();
+    const containingBlock = trigger.closest('.modal-dialog') as HTMLElement;
+    const containingBlockRect = containingBlock?.getBoundingClientRect();
+    const originLeft = containingBlockRect?.left || 0;
+    const originTop = containingBlockRect?.top || 0;
+    const viewportPadding = 8;
+    const gap = 4;
+    const maxLeft = Math.max(viewportPadding, window.innerWidth - menuRect.width - viewportPadding);
+    const direction = getComputedStyle(trigger).direction;
+    const preferredLeft = direction === 'rtl'
+      ? triggerRect.right - menuRect.width
+      : triggerRect.left;
+    const left = Math.min(Math.max(preferredLeft, viewportPadding), maxLeft);
+
+    const spaceBelow = window.innerHeight - triggerRect.bottom - gap - viewportPadding;
+    const spaceAbove = triggerRect.top - gap - viewportPadding;
+    const fitsBelow = menuRect.height <= spaceBelow;
+    const fitsAbove = menuRect.height <= spaceAbove;
+    const openBelow = fitsBelow || (!fitsAbove && spaceBelow >= spaceAbove);
+    const availableHeight = Math.max(100, openBelow ? spaceBelow : spaceAbove);
+    const top = openBelow
+      ? triggerRect.bottom + gap
+      : Math.max(viewportPadding, triggerRect.top - Math.min(menuRect.height, availableHeight) - gap);
+
+    record.dropdownPosition = {
+      top: top - originTop,
+      left: left - originLeft,
+      maxHeight: Math.min(260, availableHeight)
+    };
+    this.cdr.markForCheck();
   }
 
 

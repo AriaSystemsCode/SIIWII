@@ -715,3 +715,24 @@ html[dir="rtl"] .p-carousel .p-carousel-next .pi {
         margin: 2px 15px !important;
 
 }
+
+/* Keep import dialogs centered in both LTR and RTL layouts. */
+body .modal.show .modal-dialog.modalCenter {
+    position: absolute !important;
+    top: 50% !important;
+    right: auto !important;
+    bottom: auto !important;
+    left: 50% !important;
+    margin: 0 !important;
+    transform: translate(-50%, -50%) !important;
+  //  max-width: calc(100vw - 1rem) !important;
+}
+
+body .modal.show .modal-dialog.modalCenter.upload-modal {
+    width: min(626px, calc(100vw - 1rem)) !important;
+}
+
+body .modal.show .modal-dialog.modalCenter.upload-modal .modal-content.upload-modal {
+    width: 100% !important;
+    max-width: 626px !important;
+}
