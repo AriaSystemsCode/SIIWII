@@ -205,7 +205,7 @@ namespace onetouch.AppDashboards
             // 5. Count matching records
             if (!tableName.ToUpper().Contains("Inner Join".ToUpper()))
                 tableName += " a";
-
+            
             var countSql =
                 $"SELECT COUNT_BIG(*) FROM {tableName} {whereSql}";
 
@@ -252,7 +252,11 @@ namespace onetouch.AppDashboards
             var take = input.MaxResultCount <= 0
                 ? 50
                 : Math.Min(input.MaxResultCount, 500);
-
+            if (selectedFields.FirstOrDefault(z=>z.ToUpper().StartsWith("ID"))
+                ==null)
+            {
+                selectedFields.Add("Id");
+            }
             var selectSql = string.Join(
                 ", ", selectedFields.Select(f => $"a.[{f}]"));
 
