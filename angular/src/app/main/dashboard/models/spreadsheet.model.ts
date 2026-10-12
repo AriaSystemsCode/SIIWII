@@ -1,7 +1,6 @@
 
 
 export const DASHBOARD_SHEET = 'Dashboard';
-export const TRANSACTIONS_SHEET = 'Transactions';
 export const SAVED_SPREADSHEETS_KEY = 'savedSpreadsheets';
 
 /** Safe trimmed string. */

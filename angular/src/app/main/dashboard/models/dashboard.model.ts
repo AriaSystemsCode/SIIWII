@@ -123,15 +123,66 @@ export type DashboardShareMode =
 
 
 export interface SpreadsheetDataBatch {
-    entity: SpreadsheetEntityDefinition;
-    selectedColumns: string[];
-    filters: SpreadsheetFilters;
-
+    table: string;
+    fields: string[];
+    selectedColumns: any[];
+    conditions: any[];
     rows: any[];
-
     loaded: number;
     total: number;
-
     isFirstBatch: boolean;
     isLastBatch: boolean;
 }
+
+
+
+export interface FilterBuilderField {
+    name: string;
+    label: string;
+    dataType: string;
+    options?: Array<{
+        label: string;
+        value: any;
+    }>;
+}
+
+export interface FilterBuilderCondition {
+    field: string;
+    operator: string;
+    value: any;
+}
+
+export interface FilterBuilderRule {
+    field: string;
+    operator: string;
+    value: any;
+}
+
+export interface FilterBuilderField {
+    name: string;
+    label: string;
+    dataType: string;
+    options?: Array<{
+        label: string;
+        value: any;
+    }>;
+    acceptMultipleValues?: boolean;
+}
+
+export interface FilterBuilderCondition {
+    field: string;
+    operator: string;
+    value: any;
+}
+
+export interface FilterBuilderRule extends FilterBuilderCondition {}
+
+export type FilterMatchMode = 'all' | 'any';
+
+
+export interface FilterBuilderRule extends FilterBuilderCondition {
+    datePeriod?: string;
+    dateRange?: Date[];
+}
+
+

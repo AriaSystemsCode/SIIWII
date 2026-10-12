@@ -139,12 +139,12 @@
               <td>
 
                 <!-- Owner / Editor -->
-                <a *ngIf="row?.isEditable" class="text-unerline" href="javascript:;" (click)="openSpreadsheet(row)">
+                <a *ngIf="row?.isEditable || row?.isTheOwner" class="text-unerline" href="javascript:;" (click)="openSpreadsheet(row)">
                   {{ 'EditSpreadsheet' | localize }}
                 </a>
 
                 <!-- Viewer -->
-                <span *ngIf="!row?.isEditable" class="text-muted">
+                <span *ngIf="!row?.isEditable && !row?.isTheOwner" class="text-muted">
                   {{ 'EditSpreadsheet' | localize }}
                 </span>
 

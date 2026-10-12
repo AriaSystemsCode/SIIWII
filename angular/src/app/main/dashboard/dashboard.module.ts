@@ -40,9 +40,10 @@ import {
 } from '@syncfusion/ej2-angular-pivotview';
 import { CreateOrEditSpreadsheetComponent } from './components/create-or-edit-spreadsheet/create-or-edit-spreadsheet.component';
 import { ProgressBarModule } from 'primeng/progressbar';
-import { AppDashboardServiceProxy } from '@shared/service-proxies/service-proxies';
+import { AppDashboardServiceProxy, MarketplaceAccountsServiceProxy } from '@shared/service-proxies/service-proxies';
 import { DashboardShareComponent } from './components/dashboard-share/dashboard-share.component';
 import { SpreadsheetDataPanelComponent } from './components/spreadsheet-data-panel/spreadsheet-data-panel.component';
+import { FilterBuilderComponent } from './components/filter-builder/filter-builder.component';
 
 
 @NgModule({
@@ -52,6 +53,7 @@ import { SpreadsheetDataPanelComponent } from './components/spreadsheet-data-pan
         CreateOrEditSpreadsheetComponent,
         DashboardShareComponent,
         SpreadsheetDataPanelComponent,
+        FilterBuilderComponent,
    
     ],
     imports: [
@@ -94,11 +96,13 @@ import { SpreadsheetDataPanelComponent } from './components/spreadsheet-data-pan
                 PivotViewModule,
                 SpreadsheetAllModule ,
                 ProgressBarModule ,
-                PivotFieldListModule
+                PivotFieldListModule,
+             
          
     ],
     providers: [
           AppDashboardServiceProxy,
+          MarketplaceAccountsServiceProxy,
         { provide: BsDatepickerConfig, useFactory: NgxBootstrapDatePickerConfigService.getDatepickerConfig },
         { provide: BsDaterangepickerConfig, useFactory: NgxBootstrapDatePickerConfigService.getDaterangepickerConfig },
         { provide: BsLocaleService, useFactory: NgxBootstrapDatePickerConfigService.getDatepickerLocale },

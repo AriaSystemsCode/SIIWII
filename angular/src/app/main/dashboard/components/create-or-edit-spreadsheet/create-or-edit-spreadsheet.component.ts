@@ -29,15 +29,18 @@ import {
 import {
     DASHBOARD_SHEET,
     ParsedRange,
-    TRANSACTIONS_SHEET,
     clone,
     getChartReferencedSheetNames,
-    normalizeKey,
     readPixelValue,
     text,
     toColumnName,
     yieldToBrowser
 } from '../../models/spreadsheet.model';
+
+
+import * as moment from 'moment';
+import { Menu } from 'primeng/menu';
+import { MenuItem } from 'primeng/api';
 
 @Component({
     selector: 'app-create-or-edit-spreadsheet',
@@ -53,6 +56,7 @@ export class CreateOrEditSpreadsheetComponent extends AppComponentBase implement
 
     dashboardId: number | null = null;
     isDirty = false;
+    private ignoreSpreadsheetChanges = true;
 
     // ---- Spreadsheet ----
     sheets: SheetModel[] = [];
@@ -65,6 +69,7 @@ export class CreateOrEditSpreadsheetComponent extends AppComponentBase implement
     loadingProgress = 0;
     loadingMessage = '';
     isRefreshing = false;
+    dashboardLastUpdatedDate: any = null;
 
     // ---- Metadata saved with the workbook ----
     sheetSources: SpreadsheetSheetDataSource[] = [];
@@ -123,6 +128,26 @@ export class CreateOrEditSpreadsheetComponent extends AppComponentBase implement
     categoryRange = '';
     seriesRanges: Array<{ range: string }> = [];
     isApplyingChart = false;
+
+    spreadsheetUpdatedDate: string | null = null;
+
+    dashboardTtle:string =''
+
+    @ViewChild('listMenu') listMenu!: Menu;
+
+listMenuItems: MenuItem[] = [
+    {
+        label: 'New List',
+        icon: 'pi pi-plus',
+        command: () => this.openDataPanel()
+    },
+    {
+        label: 'Edit List Data',
+        icon: 'pi pi-pencil',
+        command: () => this.editActiveSheetFilters()
+    }
+];
+
 
     constructor(
         injector: Injector,
@@ -224,7 +249,7 @@ export class CreateOrEditSpreadsheetComponent extends AppComponentBase implement
         }
     }
 
-    private markDirty(): void {
+     markDirty(): void {
         this.isDirty = true;
         this.cdr.detectChanges();
     }
@@ -259,25 +284,32 @@ export class CreateOrEditSpreadsheetComponent extends AppComponentBase implement
         if (!this.dashboardId || !this.spreadsheet) {
             return;
         }
-
+  this.ignoreSpreadsheetChanges = true;
         this.dashboardService.getDashboardForView(this.dashboardId).subscribe({
             next: async (result: any) => {
-                try {
-                    const saved = (result?.dashboard ?? result)?.spreadsheet;
+    try {
+        const dashboard = result?.dashboard ?? result;
 
-                    if (saved) {
-                        await this.openWorkbook(saved);
-                    } else {
-                        await this.createEmptyWorkbook();
-                    }
-                } catch (error) {
-                    console.error('[Spreadsheet] Failed to initialize dashboard spreadsheet:', error);
-                    this.notify.error('Unable to open Spreadsheet.');
-                } finally {
-                    this.isDirty = false;
-                    this.cdr.detectChanges();
-                }
-            },
+        this.dashboardLastUpdatedDate =
+            dashboard?.lastModificationDate ?? null;
+        this.dashboardTtle =
+            dashboard?.title ?? null;
+        const saved = dashboard?.spreadsheet;
+
+        if (saved) {
+            await this.openWorkbook(saved);
+        } else {
+            await this.createEmptyWorkbook();
+        }
+    } catch (error) {
+        console.error('[Spreadsheet] Failed to initialize dashboard spreadsheet:', error);
+        this.notify.error('Unable to open Spreadsheet.');
+    } finally {
+        this.isDirty = false;
+        this.ignoreSpreadsheetChanges = false;
+        this.cdr.detectChanges();
+    }
+},
             error: (error: any) => {
                 console.error('[Spreadsheet] Failed to load dashboard:', error);
                 this.notify.error('Unable to load Dashboard.');
@@ -291,13 +323,10 @@ export class CreateOrEditSpreadsheetComponent extends AppComponentBase implement
         this.sheetSources = this.cloneSheetSources(data?.sheetDataSources ?? []);
         this.analyses = clone(data?.sheetAnalyses ?? []);
         this.widgets = clone(data?.dashboardWidgets ?? []);
+this.spreadsheetUpdatedDate = data?.updatedDate ?? null;
+        this.currentFilters = null;
 
-        const first =
-            this.sheetSources.find(x => x.sheetName === TRANSACTIONS_SHEET)?.source ??
-            this.sheetSources[0]?.source ??
-            null;
 
-        this.currentFilters = { ...(first?.filters ?? {}) };
 
         const workbook = this.cleanWorkbookJson(data?.workbookJson ?? data);
 
@@ -367,12 +396,12 @@ export class CreateOrEditSpreadsheetComponent extends AppComponentBase implement
 
         this.selectedChart = chart;
         this.chartSheet = this.activeSheetName || null;
-        this.chartRange = text(chart.siiwiiOriginalRange ?? chart.range);
+        this.chartRange = text(chart.originalRange ?? chart.range);
 
         // Restore the independent category/series ranges set by this panel.
-        if (chart.siiwiiCategoryRange && Array.isArray(chart.siiwiiSeriesRanges)) {
-            this.categoryRange = text(chart.siiwiiCategoryRange);
-            this.seriesRanges = chart.siiwiiSeriesRanges
+        if (chart.categoryRange && Array.isArray(chart.seriesRanges)) {
+            this.categoryRange = text(chart.categoryRange);
+            this.seriesRanges = chart.seriesRanges
                 .map((range: any) => ({ range: text(range) }))
                 .filter((item: any) => !!item.range);
         } else {
@@ -428,9 +457,9 @@ export class CreateOrEditSpreadsheetComponent extends AppComponentBase implement
             await this.replaceChart(ownerSheet, {
                 range: helperRange,
                 // Keep the user's real configuration so the panel can restore it.
-                siiwiiOriginalRange: text(this.chartRange),
-                siiwiiCategoryRange: categoryText,
-                siiwiiSeriesRanges: [...seriesTexts]
+                originalRange: text(this.chartRange),
+                categoryRange: categoryText,
+                seriesRanges: [...seriesTexts]
             });
 
             // Show the user's ranges, not the hidden helper range.
@@ -675,14 +704,14 @@ export class CreateOrEditSpreadsheetComponent extends AppComponentBase implement
             this.grid.addToolbarItems(
                 'Insert',
                 [
-                    {
-                        id: 'spreadsheet_data_source',
-                        type: 'Button',
-                        text: 'List',
-                        tooltipText: 'Insert data source',
-                           prefixIcon: 'e-icons e-list-unordered',
-                        click: () => this.openDataPanel()
-                    },
+               {
+    id: 'spreadsheet_data_source',
+    type: 'Button',
+    text: 'List',
+    tooltipText: 'Manage list data',
+    prefixIcon: 'e-icons e-list-unordered',
+    click: (args: any) => this.onListRibbonClick(args)
+},
                     {
                         id: 'spreadsheet_pivot',
                         type: 'Button',
@@ -699,26 +728,48 @@ export class CreateOrEditSpreadsheetComponent extends AppComponentBase implement
         }
     }
 
-    /** Second supported path for the ribbon buttons. */
-    onRibbonClick(args: any): void {
-        const id = text(
-            args?.item?.id ?? args?.item?.properties?.id ?? args?.originalEvent?.target?.id ?? args?.target?.id
-        ).toLowerCase();
-
-        const label = text(
-            args?.item?.text ??
-            args?.item?.properties?.text ??
-            args?.originalEvent?.target?.textContent ??
-            args?.target?.textContent
-        ).toLowerCase();
-
-        if (id.includes('spreadsheet_data_source') || label.includes('list')) {
-            this.openDataPanel();
-        } else if (id.includes('spreadsheet_pivot') || label.includes('pivot table')) {
-            this.openPivotFromRibbon();
-        }
+   onListRibbonClick(args: any): void {
+    if (!this.activeSheetSource) {
+        this.openDataPanel();
+        return;
     }
 
+    if (!this.listMenu) {
+        console.error('List menu is not initialized.');
+        return;
+    }
+
+    const event = args?.originalEvent ?? args?.event;
+
+    const target =
+        event?.currentTarget ??
+        event?.target ??
+        document.getElementById('spreadsheet_data_source');
+
+    if (!target) {
+        return;
+    }
+
+    this.listMenu.toggle({
+        currentTarget: target,
+        target,
+        preventDefault: () => {},
+        stopPropagation: () => {}
+    } as unknown as MouseEvent);
+}
+    /** Second supported path for the ribbon buttons. */
+  onRibbonClick(args: any): void {
+    const id = text(
+        args?.item?.id ??
+        args?.item?.properties?.id ??
+        args?.originalEvent?.target?.id ??
+        args?.target?.id
+    ).toLowerCase();
+
+    if (id.includes('spreadsheet_pivot')) {
+        this.openPivotFromRibbon();
+    }
+}
     /** Opens the saved Pivot of this sheet, or creates a new one. */
     private openPivotFromRibbon(): void {
         void this.openPivot(this.findAnalysis(this.activeSheetName) ?? undefined);
@@ -728,135 +779,263 @@ export class CreateOrEditSpreadsheetComponent extends AppComponentBase implement
     // ADD DATA PANEL
     // =====================================================
 
-    openDataPanel(): void {
-        this.closeChartPanel();
-        this.showDataPanel = true;
-        this.cdr.detectChanges();
-        this.resizeLater();
-    }
+ openDataPanel(): void {
+    this.editingSheetName = null;
+    this.closeChartPanel();
+    this.showDataPanel = true;
+    this.cdr.detectChanges();
+    this.resizeLater();
+}
 
-    closeDataPanel(): void {
-        this.showDataPanel = false;
-        this.cdr.detectChanges();
-        this.resizeLater();
-    }
+closeDataPanel(): void {
+    this.showDataPanel = false;
+    this.editingSheetName = null;
+    this.cdr.detectChanges();
+    this.resizeLater();
+}
 
     /** Called once per batch: the first batch creates the sheet and headers, the last one finishes. */
-    async onDataBatchLoaded(batch: SpreadsheetDataBatch): Promise<void> {
-        if (!this.spreadsheet) {
-            return;
-        }
 
-        try {
-            if (batch.isFirstBatch) {
-                await this.createDataSheet(batch);
-            }
+private newDataSheetFields: string[] = [];
+private newDataSheetRowCount = 0;
 
-            const sheetName = this.newDataSheetName;
 
-            if (!sheetName) {
-                return;
-            }
 
-            const columns = batch.entity.columns.filter(column => batch.selectedColumns.includes(column.key));
+async onDataBatchLoaded(
+    batch: SpreadsheetDataBatch
+): Promise<void> {
 
-            await this.activateSheet(sheetName);
-
-            if (batch.isFirstBatch) {
-                columns.forEach((column, i) => {
-                    this.grid.updateCell({ value: column.label }, `${toColumnName(i + 1)}1`);
-                });
-            }
-
-            // Row 1 is the header, so data starts at row 2.
-            batch.rows.forEach((row, rowIndex) => {
-                const sheetRow = this.newDataSheetLoadedRows + rowIndex + 2;
-
-                columns.forEach((column, i) => {
-                    this.grid.updateCell({ value: row[column.label] }, `${toColumnName(i + 1)}${sheetRow}`);
-                });
-            });
-
-            this.newDataSheetLoadedRows += batch.rows.length;
-
-            this.setProgress(batch.loaded, batch.total);
-            this.loadingMessage =
-                batch.total > 0
-                    ? `Loaded ${batch.loaded.toLocaleString()} of ${batch.total.toLocaleString()} records`
-                    : `Loaded ${batch.loaded.toLocaleString()} records`;
-
-            await this.paint();
-
-            if (batch.isLastBatch) {
-                await this.finishDataLoading(batch);
-            }
-        } catch (error) {
-            this.onDataLoadingFailed(error);
-        }
+    if (!this.spreadsheet) {
+        return;
     }
 
-    /** Creates the EMPTY sheet that will receive the batches. */
-    private async createDataSheet(batch: SpreadsheetDataBatch): Promise<void> {
-        this.showLoading(`Loading ${batch.entity.displayName}...`);
-
-        const name = this.getUniqueSheetName(batch.entity.displayName);
-
-        this.newDataSheetName = name;
-        this.newDataSheetLoadedRows = 0;
-
-        this.grid.insertSheet([{ name }], this.allSheets.length);
-
-        if (!(await this.waitForSheet(name))) {
-            throw new Error(`Unable to create sheet "${name}".`);
+    try {
+        if (batch.isFirstBatch) {
+            await this.createDataSheet(batch);
+            this.newDataSheetFields = [];
         }
 
-        await this.activateSheet(name);
-        await this.paint();
-    }
-
-    private async finishDataLoading(batch: SpreadsheetDataBatch): Promise<void> {
         const sheetName = this.newDataSheetName;
 
         if (!sheetName) {
             return;
         }
 
-        const sheet = this.findSheet(sheetName);
+        await this.activateSheet(sheetName);
 
-        if (!sheet) {
-            throw new Error(`Sheet "${sheetName}" was not found.`);
+        const rows: any[] = batch.rows ?? [];
+
+        // =====================================
+        // 1. Read ALL fields from API records
+        // =====================================
+
+        if (!this.newDataSheetFields.length && rows.length) {
+
+            this.newDataSheetFields = Object.keys(rows[0]);
+
+            console.log(
+                '[Spreadsheet] Columns received:',
+                this.newDataSheetFields
+            );
+
+            this.newDataSheetFields.forEach((field, index) => {
+
+                this.grid.updateCell(
+                    { value: field },
+                    `${toColumnName(index + 1)}1`
+                );
+            });
         }
 
-        this.upsertSheetSource({
-            sheetId: sheet.id,
-            sheetName,
-            source: {
-                type: batch.entity.displayName,
-                sourceKey: batch.entity.sourceKey,
-                mode: 'AllRecords',
-                columns: [...batch.selectedColumns],
-                filters: { ...batch.filters }
-            }
-        });
+        // =====================================
+        // 2. Draw records in the spreadsheet
+        // =====================================
 
-        this.loadingProgress = 100;
-        this.loadingMessage = `Loaded ${batch.loaded.toLocaleString()} records`;
-        this.syncSheetIdentity();
-        this.syncSheetToUi();
-        this.notify.success(`${batch.loaded.toLocaleString()} records added to ${sheetName}.`);
-        this.showDataPanel = false;
+        const startRow =
+            this.newDataSheetLoadedRows + 2;
 
-        await this.paint();
+        for (let index = 0; index < rows.length; index++) {
 
-        // Clear AFTER the spreadsheet has finished.
-        this.resetDataLoad();
-        this.resizeLater();
+            const record = rows[index];
+            const excelRow = startRow + index;
 
-        setTimeout(() => {
-            this.hideLoading();
-            this.cdr.detectChanges();
-        }, 250);
+            this.newDataSheetFields.forEach(
+                (field, colIndex) => {
+
+                    const value =
+                        this.getValueIgnoreCase(
+                            record,
+                            field
+                        );
+
+                    this.grid.updateCell(
+                        { value: value ?? '' },
+                        `${toColumnName(colIndex + 1)}${excelRow}`
+                    );
+                }
+            );
+        }
+
+        // =====================================
+        // 3. Update progress
+        // =====================================
+
+        this.newDataSheetLoadedRows += rows.length;
+
+        this.setProgress(
+            batch.loaded,
+            batch.total
+        );
+
+        await this.settle();
+
+        // =====================================
+        // 4. Finish loading
+        // =====================================
+
+        if (batch.isLastBatch) {
+            await this.finishDataLoading(batch);
+        } else {
+            await this.paint();
+        }
+
+    } catch (error) {
+        this.onDataLoadingFailed(error);
     }
+}
+
+
+
+
+
+    /** Creates the EMPTY sheet that will receive the batches. */
+   private async createDataSheet(
+    batch: SpreadsheetDataBatch
+): Promise<void> {
+
+    const tableName =
+        (batch as any).table ||
+        (batch as any).entity;
+
+    if (!tableName) {
+        throw new Error(
+            'Table name is missing.'
+        );
+    }
+
+    this.showLoading(
+        `Loading ${tableName}...`
+    );
+
+    const name =
+        this.getUniqueSheetName(
+            tableName
+        );
+
+    this.newDataSheetName =
+        name;
+
+    this.newDataSheetLoadedRows =
+        0;
+
+    this.grid.insertSheet(
+        [
+            {
+                name
+            }
+        ],
+        this.allSheets.length
+    );
+
+    if (
+        !(await this.waitForSheet(name))
+    ) {
+        throw new Error(
+            `Unable to create sheet "${name}".`
+        );
+    }
+
+    await this.activateSheet(
+        name
+    );
+
+    await this.paint();
+}
+
+
+
+private async finishDataLoading(
+    batch: SpreadsheetDataBatch
+): Promise<void> {
+    const sheetName = this.newDataSheetName;
+    if (!sheetName) return;
+
+    const sheet = this.findSheet(sheetName);
+    if (!sheet) {
+        throw new Error(`Sheet "${sheetName}" was not found.`);
+    }
+
+    const tableName =
+        (batch as any).table ||
+        (batch as any).entity;
+
+    if (!tableName) {
+        throw new Error('Table name is missing.');
+    }
+
+    const fields = [...this.newDataSheetFields];
+    const conditions = (batch as any).conditions ?? [];
+
+    await this.activateSheet(sheetName);
+    await this.settle();
+
+    if (
+        this.newDataSheetLoadedRows > 0 &&
+        !fields.some(f => f.toLowerCase() === 'id')
+    ) {
+        console.warn(
+            `[Spreadsheet] Backend data for "${sheetName}" ` +
+            'does not contain Id. ID-based refresh will not work.'
+        );
+    }
+
+    this.upsertSheetSource({
+        sheetId: sheet.id,
+        sheetName,
+        source: {
+            type: tableName,
+            sourceKey: tableName,
+            mode: 'AllRecords',
+            columns: fields,
+            filters: { conditions }
+        }
+    });
+
+    this.loadingProgress = 100;
+    this.loadingMessage =
+        `Loaded ${batch.loaded.toLocaleString()} records`;
+
+    this.syncSheetIdentity();
+    this.syncSheetToUi();
+    this.markDirty();
+
+    this.notify.success(
+        `${batch.loaded.toLocaleString()} records added to ${sheetName}.`
+    );
+
+    this.showDataPanel = false;
+    await this.paint();
+
+    this.resetDataLoad();
+    this.resizeLater();
+
+    setTimeout(() => {
+        this.hideLoading();
+        this.cdr.detectChanges();
+    }, 250);
+}
+
+
 
     onDataLoadingFailed(error: any): void {
         console.error('[Spreadsheet] data loading failed:', error);
@@ -866,10 +1045,11 @@ export class CreateOrEditSpreadsheetComponent extends AppComponentBase implement
         this.cdr.detectChanges();
     }
 
-    private resetDataLoad(): void {
-        this.newDataSheetName = null;
-        this.newDataSheetLoadedRows = 0;
-    }
+ private resetDataLoad(): void {
+    this.newDataSheetName = null;
+    this.newDataSheetLoadedRows = 0;
+    this.newDataSheetFields = [];
+}
 
     private getUniqueSheetName(baseName: string): string {
         const names = new Set(this.allSheets.map((s: any) => text(s?.name)));
@@ -1023,34 +1203,56 @@ export class CreateOrEditSpreadsheetComponent extends AppComponentBase implement
         };
     }
 
-    /** Reads the whole source sheet and converts it into pivot records. */
-    private async readPivotRecords(sourceSheetName: string): Promise<IDataSet[] | null> {
-        const sheet = this.findSheet(sourceSheetName);
+  /** Reads source sheet data for Pivot, excluding the internal Id column. */
 
-        if (!sheet) {
-            this.notify.warn(`Source sheet "${sourceSheetName}" was not found.`);
-            return null;
-        }
+private async readPivotRecords(
+    sourceSheetName: string
+): Promise<IDataSet[] | null> {
+    const sheet = this.findSheet(sourceSheetName);
 
-        const lastRow = sheet.usedRange?.rowIndex ?? 0;
-        const lastCol = sheet.usedRange?.colIndex ?? 0;
-
-        if (lastRow < 1 || lastCol < 0) {
-            this.notify.warn('The source sheet does not contain records.');
-            return null;
-        }
-
-        const range = `${this.quoteSheetName(sourceSheetName)}!A1:${toColumnName(lastCol + 1)}${lastRow + 1}`;
-        const data = await this.spreadsheet!.getData(range);
-        const records = this.sheetDataToRecords(data, lastRow, lastCol) as IDataSet[];
-
-        if (!records.length) {
-            this.notify.warn('No records were found in the source sheet.');
-            return null;
-        }
-
-        return records;
+    if (!sheet) {
+        this.notify.warn(
+            `Source sheet "${sourceSheetName}" was not found.`
+        );
+        return null;
     }
+
+    const lastRow = sheet.usedRange?.rowIndex ?? 0;
+    const lastCol = sheet.usedRange?.colIndex ?? 0;
+
+    if (lastRow < 1) {
+        this.notify.warn('The source sheet does not contain records.');
+        return null;
+    }
+
+    const range =
+        `${this.quoteSheetName(sourceSheetName)}!A1:` +
+        `${toColumnName(lastCol + 1)}${lastRow + 1}`;
+
+    const data = await this.spreadsheet!.getData(range);
+
+    const records = (
+        this.sheetDataToRecords(data, lastRow, lastCol) as any[]
+    ).map(record => {
+        const result: any = {};
+
+        Object.keys(record).forEach(key => {
+            if (key.toLowerCase() !== 'id') {
+                result[key] = record[key];
+            }
+        });
+
+        return result;
+    });
+
+    if (!records.length) {
+        this.notify.warn('No records were found in the source sheet.');
+        return null;
+    }
+
+    return records as IDataSet[];
+}
+
 
     /** Creates an empty pivot definition + its sheet tab. */
     private async createPivotAnalysis(sourceSheetName: string, pivotSheetName: string): Promise<any> {
@@ -1209,54 +1411,51 @@ export class CreateOrEditSpreadsheetComponent extends AppComponentBase implement
             });
     }
 
-    private normalizeValue(value: any, fieldName?: string): any {
-        if (value === null || value === undefined) {
-            return '';
-        }
-
-        // Identifier fields must stay strings.
-        if (normalizeKey(fieldName) === 'transactionnumber') {
-            return String(value).trim();
-        }
-
-        if (typeof value === 'boolean' || typeof value === 'number') {
-            return value;
-        }
-
-        const str = text(value);
-
-        if (!str) {
-            return '';
-        }
-
-        const numeric = Number(str);
-        return Number.isNaN(numeric) ? str : numeric;
+  private normalizeValue(value: any, fieldName?: string): any {
+    if (value === null || value === undefined) {
+        return '';
     }
 
-    private buildFieldMapping(records: any[]): any[] {
-        if (!records?.length) {
-            return [];
-        }
-
-        return Object.keys(records[0]).map(fieldName => {
-            const values = records
-                .map(r => r[fieldName])
-                .filter(v => v !== '' && v !== null && v !== undefined);
-
-            // TransactionNumber should COUNT, not SUM.
-            const isTransactionNumber = normalizeKey(fieldName) === 'transactionnumber';
-            const isNumeric =
-                !isTransactionNumber && values.length > 0 && values.every(v => typeof v === 'number');
-
-            return {
-                name: fieldName,
-                caption: fieldName,
-                dataType: isNumeric ? 'number' : 'string',
-                type: isTransactionNumber ? 'Count' : undefined
-            };
-        });
+    if (typeof value === 'boolean' || typeof value === 'number') {
+        return value;
     }
 
+    const str = text(value);
+
+    if (!str) {
+        return '';
+    }
+
+    const numeric = Number(str);
+
+    return Number.isNaN(numeric) ? str : numeric;
+}
+
+private buildFieldMapping(records: any[]): any[] {
+    if (!records?.length) {
+        return [];
+    }
+
+    return Object.keys(records[0]).map(fieldName => {
+        const values = records
+            .map(record => record[fieldName])
+            .filter(value =>
+                value !== '' &&
+                value !== null &&
+                value !== undefined
+            );
+
+        const isNumeric =
+            values.length > 0 &&
+            values.every(value => typeof value === 'number');
+
+        return {
+            name: fieldName,
+            caption: fieldName,
+            dataType: isNumeric ? 'number' : 'string'
+        };
+    });
+}
     onFieldListReady(): void {
         if (this.pivotFieldList && this.pivotView) {
             this.pivotFieldList.updateView(this.pivotView);
@@ -1267,35 +1466,14 @@ export class CreateOrEditSpreadsheetComponent extends AppComponentBase implement
         if (this.pivotFieldList && this.pivotView) {
             this.pivotFieldList.update(this.pivotView);
         }
-
-        this.forceTransactionCount();
-
         if (this.isCreatingPivot) {
             return;
         }
-
         this.updateAnalysis();
         this.markDirty();
         this.schedulePivotDashboardSync();
     }
 
-    /** Makes sure TransactionNumber is always counted (not summed). */
-    private forceTransactionCount(): void {
-        const settings = this.pivotView?.dataSourceSettings;
-        let changed = false;
-
-        (settings?.values ?? []).forEach((field: any) => {
-            if (normalizeKey(field.name) === 'transactionnumber' && field.type !== 'Count') {
-                field.type = 'Count';
-                field.caption = 'Transaction Count';
-                changed = true;
-            }
-        });
-
-        if (changed) {
-            this.pivotView.dataSourceSettings = settings;
-        }
-    }
 
     private getPivotResultMatrix(): any[][] {
         const pivot: any = this.pivotView;
@@ -2176,19 +2354,79 @@ export class CreateOrEditSpreadsheetComponent extends AppComponentBase implement
     }
 
     /** Syncs ids/names before save (also handles renamed tabs). */
-    private syncSheetIdentity(): void {
-        this.sheetSources.forEach(item => {
-            // Name first: ids are unreliable after openFromJson()/dynamic inserts.
-            const sheet =
-                this.allSheets.find((x: any) => text(x?.name) === text(item.sheetName)) ??
-                (item.sheetId != null ? this.allSheets.find((x: any) => x?.id === item.sheetId) : null);
+  private syncSheetIdentity(): void {
+    const existingSheets =
+        this.allSheets.filter(
+            (sheet: any) =>
+                !!text(sheet?.name)
+        );
 
-            if (sheet) {
-                item.sheetId = sheet.id;
-                item.sheetName = sheet.name;
-            }
+    const syncedSources: SpreadsheetSheetDataSource[] = [];
+
+    this.sheetSources.forEach(item => {
+        const sheet =
+            existingSheets.find(
+                (x: any) =>
+                    text(x?.name) ===
+                    text(item.sheetName)
+            ) ??
+            (
+                item.sheetId != null
+                    ? existingSheets.find(
+                        (x: any) =>
+                            x?.id === item.sheetId
+                    )
+                    : null
+            );
+
+        if (!sheet) {
+            return;
+        }
+
+        syncedSources.push({
+            sheetId: sheet.id,
+            sheetName: text(sheet.name),
+            source: this.cloneSource(
+                item.source
+            )
         });
-    }
+    });
+
+    this.sheetSources = syncedSources;
+
+    const existingNames =
+        new Set(
+            existingSheets.map(
+                (sheet: any) =>
+                    text(sheet.name)
+            )
+        );
+
+    this.analyses =
+        this.analyses.filter(
+            analysis =>
+                existingNames.has(
+                    text(analysis.sheetName)
+                ) &&
+                existingNames.has(
+                    text(
+                        (analysis as any)
+                            .sourceSheetName
+                    )
+                )
+        );
+
+    this.widgets =
+        this.widgets.filter(
+            widget =>
+                !widget.sourceSheetName ||
+                existingNames.has(
+                    text(
+                        widget.sourceSheetName
+                    )
+                )
+        );
+}
 
     // ---- Active-tab watcher ----
 
@@ -2272,105 +2510,138 @@ export class CreateOrEditSpreadsheetComponent extends AppComponentBase implement
         return !!name && name !== DASHBOARD_SHEET && !this.analyses.some(a => text(a.sheetName) === name);
     }
 
-    get appliedFilters(): { label: string; value: string }[] {
-        const filters = this.currentFilters;
+   get appliedFilters(): { label: string; value: string }[] {
+    const conditions = this.currentFilters?.conditions;
 
-        if (!filters) {
-            return [];
-        }
+    if (!Array.isArray(conditions)) {
+        return [];
+    }
+    
 
-        const asIs = (v: any) => String(v);
-        const asDate = (v: any) => this.formatDate(v);
+    const operatorLabels: Record<string, string> = {
+        eq: '=',
+        neq: '≠',
+        lt: '<',
+        lte: '≤',
+        gt: '>',
+        gte: '≥'
+    };
 
-        const definitions: [string, string, (v: any) => string][] = [
-            ['search', 'Search', asIs],
-            ['sellerNameFilter', 'Seller', asIs],
-            ['buyerNameFilter', 'Buyer', asIs],
-            ['codeFilter', 'Transaction', asIs],
-            ['referenceNumberFilter', 'Reference', asIs],
-            ['minCreateDateFilter', 'Created From', asDate],
-            ['maxCreateDateFilter', 'Created To', asDate],
-            ['minCompleteDateFilter', 'Complete From', asDate],
-            ['maxCompleteDateFilter', 'Complete To', asDate],
-            ['sorting', 'Sorting', asIs]
-        ];
+    return conditions
+        .filter(condition => condition?.field && condition?.operator)
+        .map(condition => ({
+            label: `${condition.field} ${operatorLabels[condition.operator] || condition.operator}`,
+            value: condition.value instanceof Date
+                ? this.formatDate(condition.value)
+                : String(condition.value ?? '')
+        }));
+}
 
-        const result = definitions
-            .filter(([key]) => !!filters[key])
-            .map(([key, label, format]) => ({ label, value: format(filters[key]) }));
+editingSheetName: string | null = null;
 
-        // Status keeps its position after Reference and accepts 0.
-        if (filters.statusFilter !== undefined && filters.statusFilter !== null) {
-            result.splice(5, 0, { label: 'Status', value: String(filters.statusFilter) });
-        }
+get activeSheetSource(): SpreadsheetSheetDataSource | null {
+    const name = this.activeSheetName;
 
-        return result;
+    return this.sheetSources.find(
+        item => item.sheetName === name
+    ) ?? null;
+}
+
+editActiveSheetFilters(): void {
+    const sheetSource = this.activeSheetSource;
+
+    if (!sheetSource) {
+        this.notify.warn('This sheet has no linked data source.');
+        return;
     }
 
-    // =====================================================
-    // SAVE
-    // =====================================================
+    this.editingSheetName = sheetSource.sheetName;
+    this.closeChartPanel();
+    this.showDataPanel = true;
+    this.cdr.detectChanges();
+    this.resizeLater();
+}
 
-    saveSpreadsheet(): void {
-        if (!this.spreadsheet) {
-            this.notify.warn('Spreadsheet is not ready.');
-            return;
-        }
 
-        const dashboardId = this.dashboardId;
 
-        if (!dashboardId) {
-            this.notify.error('Dashboard id is missing.');
-            return;
-        }
-
-        this.updateAnalysis();
-        this.syncSheetIdentity();
-
-        const sheetDataSources = this.cloneSheetSources(this.sheetSources);
-
-        this.showLoading('Saving Spreadsheet...');
-
-        this.grid
-            .saveAsJson(this.saveOptions)
-            .then((rawWorkbook: any) => {
-                const workbook = this.reconcileDashboardCharts(rawWorkbook);
-                this.rebuildWidgets(workbook);
-
-                // Keys below are the saved format: do not rename them.
-                const spreadsheet = {
-                    workbookJson: workbook,
-                    sheetDataSources,
-                    sheetAnalyses: clone(this.analyses),
-                    dashboardWidgets: clone(this.widgets),
-                    updatedDate: new Date().toISOString(),
-                    recordCount: this.countRecords(workbook)
-                };
-
-                // The generated proxy already does JSON.stringify(body).
-                return firstValueFrom(this.dashboardService.saveSpreadSheetJson(dashboardId, spreadsheet));
-            })
-            .then(() => {
-                this.isDirty = false;
-                this.notify.success('Spreadsheet saved successfully.');
-                this.cdr.detectChanges();
-            })
-            .catch((error: any) => {
-                console.error('[Spreadsheet] SaveSpreadSheetJson failed:', error);
-                this.notify.error('Failed to save Spreadsheet.');
-            })
-            .finally(() => {
-                this.hideLoading();
-                this.cdr.detectChanges();
-            });
+saveSpreadsheet(): void {
+    if (!this.spreadsheet) {
+        this.notify.warn('Spreadsheet is not ready.');
+        return;
     }
 
-    /** Rows of the Transactions sheet, minus the header. */
-    private countRecords(workbook: any): number {
-        const sheet = workbook?.jsonObject?.Workbook?.sheets?.find((s: any) => s.name === TRANSACTIONS_SHEET);
-        return sheet?.rows?.length ? Math.max(sheet.rows.length - 1, 0) : 0;
+    const dashboardId = this.dashboardId;
+
+    if (!dashboardId) {
+        this.notify.error('Dashboard id is missing.');
+        return;
     }
 
+    this.updateAnalysis();
+    this.syncSheetIdentity();
+
+    const sheetDataSources = this.cloneSheetSources(this.sheetSources);
+
+    this.showLoading('Saving Spreadsheet...');
+
+    let savedUpdatedDate: any;
+
+    this.grid
+        .saveAsJson(this.saveOptions)
+        .then((rawWorkbook: any) => {
+            const workbook = this.reconcileDashboardCharts(rawWorkbook);
+            this.rebuildWidgets(workbook);
+
+          savedUpdatedDate = moment().format('YYYY-MM-DDTHH:mm:ss.SSS') + '0000';
+
+            const spreadsheet = {
+                workbookJson: workbook,
+                sheetDataSources,
+                sheetAnalyses: clone(this.analyses),
+                dashboardWidgets: clone(this.widgets),
+                updatedDate: savedUpdatedDate,
+                recordCount: this.countRecords(workbook)
+            };
+
+            return firstValueFrom(
+                this.dashboardService.saveSpreadSheetJson(dashboardId, spreadsheet)
+            );
+        })
+        .then(() => {
+            this.dashboardLastUpdatedDate = savedUpdatedDate;
+            this.isDirty = false;
+            this.notify.success('Spreadsheet saved successfully.');
+            this.cdr.detectChanges();
+        })
+        .catch((error: any) => {
+            console.error('[Spreadsheet] SaveSpreadSheetJson failed:', error);
+            this.notify.error('Failed to save Spreadsheet.');
+        })
+        .finally(() => {
+            this.hideLoading();
+            this.cdr.detectChanges();
+        });
+}
+private countRecords(workbook: any): number {
+    const sheets =
+        workbook?.jsonObject?.Workbook?.sheets ??
+        workbook?.Workbook?.sheets ??
+        [];
+
+    const sourceSheetNames = new Set(
+        this.sheetSources.map(source => text(source.sheetName))
+    );
+
+    return sheets
+        .filter((sheet: any) =>
+            sourceSheetNames.has(text(sheet?.name))
+        )
+        .reduce((total: number, sheet: any) => {
+            const rowCount = sheet?.rows?.length ?? 0;
+
+            return total + Math.max(rowCount - 1, 0);
+        }, 0);
+}
     /** Removes null/invalid entries from saved JSON so Syncfusion can reopen it safely. */
     private cleanWorkbookJson(workbookJson: any): any {
         if (!workbookJson) {
@@ -2547,4 +2818,849 @@ export class CreateOrEditSpreadsheetComponent extends AppComponentBase implement
 
         return cleaned;
     }
+
+  async refreshSpreadsheet(): Promise<void> {
+    if (
+        this.isRefreshing ||
+        !this.spreadsheet ||
+        !this.dashboardId
+    ) {
+        return;
+    }
+
+    this.isRefreshing = true;
+    this.showLoading('Refreshing Spreadsheet...');
+
+    const activeSheetBeforeRefresh =
+        this.activeSheetName;
+
+    try {
+        const result: any =
+            await firstValueFrom(
+                this.dashboardService.getDashboardForView(
+                    this.dashboardId
+                )
+            );
+
+        const dashboard =
+            result?.dashboard ?? result;
+
+
+
+//         const lastUpdatedDate = moment('2026-09-02T00:26:41+03:00')
+
+const lastUpdatedDate = this.spreadsheetUpdatedDate
+    ? moment.utc(this.spreadsheetUpdatedDate)
+    : undefined;
+
+if (lastUpdatedDate) {
+    lastUpdatedDate.toISOString = () =>
+        lastUpdatedDate.format('YYYY-MM-DDTHH:mm:ss');
+}
+// const lastUpdatedDate = this.spreadsheetUpdatedDate
+//     ? moment.parseZone(this.spreadsheetUpdatedDate)
+//     : undefined;
+        const sources =
+            this.cloneSheetSources(
+                this.sheetSources
+            );
+
+        let completed = 0;
+
+        for (const sheetSource of sources) {
+            const sheetName =
+                text(sheetSource.sheetName);
+
+            const source =
+                sheetSource.source;
+
+            if (
+                !sheetName ||
+                sheetName === DASHBOARD_SHEET ||
+                !source
+            ) {
+                continue;
+            }
+
+            const tableName =
+                text(
+                    source.sourceKey ??
+                    source.type
+                );
+
+            const fields =
+                source.columns ?? [];
+
+            if (
+                !tableName ||
+                !fields.length
+            ) {
+                continue;
+            }
+
+            this.loadingMessage =
+                `Refreshing ${sheetName}...`;
+
+            await this.refreshSheetChanges(
+                sheetName,
+                tableName,
+                fields,
+                source.filters,
+                lastUpdatedDate
+            );
+
+            completed++;
+
+            this.setProgress(
+                completed,
+                sources.length
+            );
+
+            await this.paint();
+        }
+
+        await this.refreshPivotSheets();
+
+        this.dashboardLastUpdatedDate =
+            dashboard?.lastModificationDate ??
+            this.dashboardLastUpdatedDate;
+
+        if (
+            activeSheetBeforeRefresh &&
+            this.findSheet(activeSheetBeforeRefresh)
+        ) {
+            await this.activateSheet(
+                activeSheetBeforeRefresh
+            );
+        }
+
+        this.syncSheetToUi();
+        this.markDirty();
+
+        this.notify.success(
+            'Spreadsheet refreshed successfully.'
+        );
+
+    } catch (error) {
+        console.error(
+            '[Spreadsheet] refresh failed:',
+            error
+        );
+
+        this.notify.error(
+            'Unable to refresh Spreadsheet.'
+        );
+    } finally {
+        this.isRefreshing = false;
+        this.hideLoading();
+        this.cdr.detectChanges();
+    }
+}
+
+
+private async refreshSheetChanges(
+    sheetName: string,
+    tableName: string,
+    fields: string[],
+    filters: any,
+    lastUpdatedDate: any
+): Promise<void> {
+
+    const sheet = this.findSheet(sheetName);
+
+    if (!sheet) {
+        return;
+    }
+
+    await this.activateSheet(sheetName);
+
+    // ==========================================
+    // 1. Ensure Id is always the first field
+    // ==========================================
+
+    const selectedFields: string[] = Array.from(
+        new Set<string>(
+            (fields ?? [])
+                .filter(
+                    (field: string) =>
+                        !!field &&
+                        field.toLowerCase() !== 'id'
+                )
+        )
+    );
+
+    const requestFields: string[] = [
+        'Id',
+        ...selectedFields
+    ];
+
+    // ==========================================
+    // 2. Prepare pagination and filters
+    // ==========================================
+
+    const batchSize = 10;
+
+    let skipCount = 0;
+    let loaded = 0;
+    let totalCount = 0;
+
+    const conditions =
+        filters?.conditions ?? [];
+
+    // ==========================================
+    // 3. Load changed records in batches
+    // ==========================================
+
+    while (true) {
+
+        const result: any = await firstValueFrom(
+            this.dashboardService.getAllTableData(
+                this.appSession.tenantId,
+                tableName,
+                requestFields, // Always includes Id
+                conditions,
+                lastUpdatedDate ?? undefined,
+                'Id', // Stable pagination
+                skipCount,
+                batchSize
+            )
+        );
+
+        const changes: any[] =
+            result?.items ?? [];
+
+        totalCount = Number(
+            result?.totalCount ?? 0
+        );
+
+        if (!changes.length) {
+            break;
+        }
+
+        // ==========================================
+        // 4. Validate every record has an Id
+        // ==========================================
+
+        const validChanges = changes.map(
+            (record: any, index: number) => {
+
+                const recordId =
+                    this.getValueIgnoreCase(
+                        record,
+                        'Id'
+                    );
+
+                if (
+                    recordId === undefined ||
+                    recordId === null ||
+                    recordId === ''
+                ) {
+                    console.error(
+                        '[Spreadsheet Refresh] Missing Id:',
+                        {
+                            sheetName,
+                            tableName,
+                            batchIndex: index,
+                            record
+                        }
+                    );
+
+                    throw new Error(
+                        `API change record ${skipCount + index + 1} ` +
+                        `has no Id in ${tableName}.`
+                    );
+                }
+
+                return {
+                    ...record,
+                    Id: recordId
+                };
+            }
+        );
+
+        // ==========================================
+        // 5. Update existing rows or append new rows
+        // ==========================================
+
+        await this.applySheetChanges(
+            sheetName,
+            requestFields,
+            validChanges
+        );
+
+        loaded += validChanges.length;
+
+        this.loadingMessage =
+            `Refreshing ${sheetName}: ` +
+            `${loaded.toLocaleString()} of ` +
+            `${totalCount.toLocaleString()} changes`;
+
+        this.setProgress(
+            loaded,
+            totalCount
+        );
+
+        await this.paint();
+
+        // ==========================================
+        // 6. Check if this was the last batch
+        // ==========================================
+
+        if (
+            changes.length < batchSize ||
+            loaded >= totalCount
+        ) {
+            break;
+        }
+
+        skipCount += changes.length;
+    }
+
+    // ==========================================
+    // 7. Keep Id column visible
+    // ==========================================
+
+    // this.grid.hideColumn(
+    //     0,
+    //     0,
+    //     false
+    // );
+
+    await this.settle();
+
+    console.log(
+        '[Spreadsheet Refresh] Completed:',
+        {
+            sheetName,
+            tableName,
+            loaded,
+            totalCount
+        }
+    );
+}
+
+private async applySheetChanges(
+    sheetName: string,
+    fields: string[],
+    changes: any[]
+): Promise<void> {
+
+    const sheet = this.findSheet(sheetName);
+    if (!sheet || !this.spreadsheet) return;
+
+    await this.activateSheet(sheetName);
+
+    // Read actual sheet headers. Do not assume Id is column A.
+    const headerCells = sheet.rows?.[0]?.cells ?? [];
+    const lastCol = Math.max(
+        headerCells.length - 1,
+        Number(sheet.usedRange?.colIndex ?? 0)
+    );
+
+    const currentFields: string[] = [];
+
+    for (let col = 0; col <= lastCol; col++) {
+        currentFields.push(
+            String(headerCells[col]?.value ?? '').trim()
+        );
+    }
+
+    const idColumnIndex = currentFields.findIndex(
+        field => field.toLowerCase() === 'id'
+    );
+
+    if (idColumnIndex === -1) {
+        throw new Error(
+            `Id column not found in sheet "${sheetName}".`
+        );
+    }
+
+    const normalizeId = (value: any): string =>
+        String(value ?? '').trim();
+
+    const normalizeValue = (value: any): string =>
+        value == null ? '' : String(value);
+
+    // Build an ID lookup without deleting existing rows.
+    const idToRow = new Map<string, number>();
+    const duplicateIds = new Set<string>();
+
+    const lastRow = Number(sheet.usedRange?.rowIndex ?? 0);
+
+    for (let rowIndex = 1; rowIndex <= lastRow; rowIndex++) {
+        const id = normalizeId(
+            sheet.rows?.[rowIndex]
+                ?.cells?.[idColumnIndex]?.value
+        );
+
+        if (!id) continue;
+
+        if (idToRow.has(id)) {
+            duplicateIds.add(id);
+            continue;
+        }
+
+        idToRow.set(id, rowIndex);
+    }
+
+    if (duplicateIds.size > 0) {
+        console.warn(
+            `[Spreadsheet Refresh] ${duplicateIds.size} duplicate IDs already exist in "${sheetName}". No rows were deleted.`,
+            [...duplicateIds]
+        );
+    }
+
+    // Deduplicate incoming API changes.
+    const incomingRecords = new Map<string, any>();
+
+    for (const record of changes ?? []) {
+        const id = normalizeId(
+            this.getValueIgnoreCase(record, 'Id')
+        );
+
+        if (!id) {
+            console.warn(
+                '[Spreadsheet Refresh] Skipping record without Id:',
+                record
+            );
+            continue;
+        }
+
+        incomingRecords.set(id, record);
+    }
+
+    let nextRowIndex = lastRow + 1;
+    let addedCount = 0;
+    let modifiedCount = 0;
+    let skippedDeletedCount = 0;
+
+    for (const [id, record] of incomingRecords) {
+
+        // Do not physically delete rows during incremental refresh.
+        // The API response shown does not contain deletion information.
+        if (
+            record?.isDeleted === true ||
+            record?.IsDeleted === true
+        ) {
+            skippedDeletedCount++;
+            continue;
+        }
+
+        const existingRowIndex = idToRow.get(id);
+
+        if (existingRowIndex !== undefined) {
+
+            // Update existing row.
+            let hasChanges = false;
+
+            for (
+                let colIndex = 0;
+                colIndex < currentFields.length;
+                colIndex++
+            ) {
+                const field = currentFields[colIndex];
+
+                if (
+                    !field ||
+                    field.toLowerCase() === 'id'
+                ) {
+                    continue;
+                }
+
+                const newValue = this.getValueIgnoreCase(
+                    record,
+                    field
+                );
+
+                // Do not clear columns absent from the API response.
+                if (newValue === undefined) continue;
+
+                const currentSheet = this.findSheet(sheetName);
+
+                const oldValue =
+                    currentSheet?.rows?.[existingRowIndex]
+                        ?.cells?.[colIndex]?.value;
+
+                if (
+                    normalizeValue(oldValue) ===
+                    normalizeValue(newValue)
+                ) {
+                    continue;
+                }
+
+                const address =
+                    `${toColumnName(colIndex + 1)}` +
+                    `${existingRowIndex + 1}`;
+
+                this.grid.updateCell(
+                    { value: newValue ?? '' },
+                    address
+                );
+
+                this.highlightRefreshCell(
+                    sheetName,
+                    existingRowIndex,
+                    colIndex,
+                    this.editedCellColor
+                );
+
+                hasChanges = true;
+            }
+
+            if (hasChanges) {
+                modifiedCount++;
+            }
+
+        } else {
+
+            // Append new row.
+            const rowIndex = nextRowIndex++;
+
+            for (
+                let colIndex = 0;
+                colIndex < currentFields.length;
+                colIndex++
+            ) {
+                const field = currentFields[colIndex];
+                if (!field) continue;
+
+                const value = this.getValueIgnoreCase(
+                    record,
+                    field
+                );
+
+                // Do not invent values for fields absent from the API.
+                if (value === undefined) continue;
+
+                const address =
+                    `${toColumnName(colIndex + 1)}` +
+                    `${rowIndex + 1}`;
+
+                this.grid.updateCell(
+                    { value: value ?? '' },
+                    address
+                );
+
+                this.highlightRefreshCell(
+                    sheetName,
+                    rowIndex,
+                    colIndex,
+                    this.addedCellColor
+                );
+            }
+
+            idToRow.set(id, rowIndex);
+            addedCount++;
+        }
+    }
+
+    await this.settle();
+
+    console.log('[Spreadsheet Refresh] Result:', {
+        sheetName,
+        added: addedCount,
+        modified: modifiedCount,
+        existingDuplicateIds: duplicateIds.size,
+        skippedDeleted: skippedDeletedCount,
+        totalIncoming: incomingRecords.size
+    });
+
+    if (addedCount > 0 || modifiedCount > 0) {
+        this.markDirty();
+    }
+}
+
+
+private async findRowById(
+    sheetName: string,
+    idColumnIndex: number,
+    recordId: any
+): Promise<number | null> {
+
+    const sheet =
+        this.findSheet(sheetName);
+
+    if (!sheet) {
+        return null;
+    }
+
+    const lastRow =
+        Number(
+            sheet.usedRange?.rowIndex ?? 0
+        );
+
+    if (lastRow < 1) {
+        return null;
+    }
+
+    const column =
+        toColumnName(
+            idColumnIndex + 1
+        );
+
+    const range =
+        `${this.quoteSheetName(sheetName)}!` +
+        `${column}2:${column}${lastRow + 1}`;
+
+    const data =
+        await this.spreadsheet!.getData(
+            range
+        );
+
+    for (
+        let spreadsheetRow = 2;
+        spreadsheetRow <= lastRow + 1;
+        spreadsheetRow++
+    ) {
+        const address =
+            `${column}${spreadsheetRow}`;
+
+        const cell =
+            data.get
+                ? data.get(address)
+                : data[address];
+
+        if (
+            String(cell?.value) ===
+            String(recordId)
+        ) {
+            return spreadsheetRow - 1;
+        }
+    }
+
+    return null;
+}
+
+private updateSheetRow(
+    rowIndex: number,
+    fields: string[],
+    record: any
+): void {
+
+    fields.forEach(
+        (field, columnIndex) => {
+
+            const value =
+                this.getValueIgnoreCase(
+                    record,
+                    field
+                );
+
+            if (value === undefined) {
+                return;
+            }
+
+            this.grid.updateCell(
+                {
+                    value:
+                        value ?? ''
+                },
+                `${toColumnName(
+                    columnIndex + 1
+                )}${rowIndex + 1}`
+            );
+        }
+    );
+}
+
+private getValueIgnoreCase(
+    record: any,
+    field: string
+): any {
+
+    if (!record || !field) {
+        return undefined;
+    }
+
+    if (
+        Object.prototype.hasOwnProperty.call(
+            record,
+            field
+        )
+    ) {
+        return record[field];
+    }
+
+    const key =
+        Object.keys(record).find(
+            x =>
+                x.toLowerCase() ===
+                field.toLowerCase()
+        );
+
+    return key
+        ? record[key]
+        : undefined;
+}
+
+private appendSheetRow(
+    sheet: any,
+    fields: string[],
+    record: any
+): void {
+
+    const rowNumber =
+        Math.max(
+            Number(
+                sheet.usedRange?.rowIndex ?? 0
+            ) + 2,
+            2
+        );
+
+    fields.forEach(
+        (field, columnIndex) => {
+
+            const value =
+                this.getValueIgnoreCase(
+                    record,
+                    field
+                );
+
+            this.grid.updateCell(
+                {
+                    value: value ?? ''
+                },
+                `${toColumnName(
+                    columnIndex + 1
+                )}${rowNumber}`
+            );
+        }
+    );
+}
+
+
+private async refreshPivotSheets(): Promise<void> {
+    for (const analysis of this.analyses) {
+        const sourceSheetName =
+            text(
+                (analysis as any)
+                    .sourceSheetName
+            );
+
+        if (!sourceSheetName) {
+            continue;
+        }
+
+        const records =
+            await this.readPivotRecords(
+                sourceSheetName
+            );
+
+        if (!records) {
+            continue;
+        }
+
+        if (
+            this.showPivot &&
+            this.pivotSheet ===
+                text(analysis.sheetName)
+        ) {
+            this.pivotSettings =
+                this.buildPivotSettings(
+                    (analysis as any).pivot,
+                    records,
+                    this.buildFieldMapping(
+                        records
+                    )
+                );
+
+            this.bindPivotView(
+                records
+            );
+
+            await this.settle();
+
+            if (this.isPivotOnDashboard) {
+                await this.syncPivotToDashboard();
+            }
+        }
+    }
+}
+
+onSpreadsheetActionComplete(args: any): void {
+    if (this.ignoreSpreadsheetChanges) {
+        return;
+    }
+
+    const action =
+        text(
+            args?.action ??
+            args?.requestType ??
+            args?.eventArgs?.requestType
+        ).toLowerCase();
+
+    if (
+        action === 'select' ||
+        action === 'selection' ||
+        action === 'cellselect' ||
+        action === 'gotocell'
+    ) {
+        return;
+    }
+
+    this.markDirty();
+
+    if (
+        action.includes('sheet') ||
+        action.includes('rename') ||
+        action.includes('insert') ||
+        action.includes('delete')
+    ) {
+        setTimeout(() => {
+            this.syncSheetIdentity();
+            this.syncSheetToUi();
+        }, 0);
+    }
+}
+
+private refreshHighlightedCells: Array<{
+    sheetName: string;
+    address: string;
+    originalStyle: any;
+}> = [];
+
+private readonly addedCellColor = '#DCFCE7';
+private readonly editedCellColor = '#FEF3C7';
+
+
+private highlightRefreshCell(
+    sheetName: string,
+    rowIndex: number,
+    columnIndex: number,
+    color: string
+): void {
+
+    const sheet = this.findSheet(sheetName);
+
+    if (!sheet) {
+        return;
+    }
+
+    const address =
+        `${toColumnName(columnIndex + 1)}${rowIndex + 1}`;
+
+    const originalStyle = {
+        ...(sheet.rows?.[rowIndex]?.cells?.[columnIndex]?.style ?? {})
+    };
+
+    // Avoid saving the same cell twice
+    const exists = this.refreshHighlightedCells.some(
+        item =>
+            item.sheetName === sheetName &&
+            item.address === address
+    );
+
+    if (!exists) {
+        this.refreshHighlightedCells.push({
+            sheetName,
+            address,
+            originalStyle
+        });
+    }
+
+    this.grid.cellFormat(
+        { backgroundColor: color },
+        `${this.quoteSheetName(sheetName)}!${address}`
+    );
+}
 }

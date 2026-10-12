@@ -7057,7 +7057,7 @@ export class AppDashboardServiceProxy {
      * @param tableName (optional) 
      * @return Success
      */
-    getTableFieldsList(tableName: string | null | undefined): Observable<AppEntityExtraDataDto[]> {
+    getTableFieldsList(tableName: string | null | undefined): Observable<ExtraAttribute[]> {
         let url_ = this.baseUrl + "/api/services/app/AppDashboard/GetTableFieldsList?";
         if (tableName !== undefined && tableName !== null)
             url_ += "tableName=" + encodeURIComponent("" + tableName) + "&";
@@ -7078,14 +7078,14 @@ export class AppDashboardServiceProxy {
                 try {
                     return this.processGetTableFieldsList(response_ as any);
                 } catch (e) {
-                    return _observableThrow(e) as any as Observable<AppEntityExtraDataDto[]>;
+                    return _observableThrow(e) as any as Observable<ExtraAttribute[]>;
                 }
             } else
-                return _observableThrow(response_) as any as Observable<AppEntityExtraDataDto[]>;
+                return _observableThrow(response_) as any as Observable<ExtraAttribute[]>;
         }));
     }
 
-    protected processGetTableFieldsList(response: HttpResponseBase): Observable<AppEntityExtraDataDto[]> {
+    protected processGetTableFieldsList(response: HttpResponseBase): Observable<ExtraAttribute[]> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -7099,7 +7099,7 @@ export class AppDashboardServiceProxy {
             if (Array.isArray(resultData200)) {
                 result200 = [] as any;
                 for (let item of resultData200)
-                    result200!.push(AppEntityExtraDataDto.fromJS(item));
+                    result200!.push(ExtraAttribute.fromJS(item));
             }
             else {
                 result200 = <any>null;
@@ -7115,16 +7115,22 @@ export class AppDashboardServiceProxy {
     }
 
     /**
+     * @param tenantId (optional) 
      * @param tableName (optional) 
      * @param fields (optional) 
      * @param conditions (optional) 
+     * @param lastUpdateDate (optional) 
      * @param sorting (optional) 
      * @param skipCount (optional) 
      * @param maxResultCount (optional) 
      * @return Success
      */
-    getAllTableData(tableName: string | null | undefined, fields: string[] | null | undefined, conditions: DynamicCondition[] | null | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<DynamicQueryResult> {
+    getAllTableData(tenantId: number | undefined, tableName: string | null | undefined, fields: string[] | null | undefined, conditions: DynamicCondition[] | null | undefined, lastUpdateDate: moment.Moment | null | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<DynamicQueryResult> {
         let url_ = this.baseUrl + "/api/services/app/AppDashboard/GetAllTableData?";
+        if (tenantId === null)
+            throw new Error("The parameter 'tenantId' cannot be null.");
+        else if (tenantId !== undefined)
+            url_ += "TenantId=" + encodeURIComponent("" + tenantId) + "&";
         if (tableName !== undefined && tableName !== null)
             url_ += "TableName=" + encodeURIComponent("" + tableName) + "&";
         if (fields !== undefined && fields !== null)
@@ -7136,6 +7142,8 @@ export class AppDashboardServiceProxy {
         				url_ += "Conditions[" + index + "]." + attr + "=" + encodeURIComponent("" + (item as any)[attr]) + "&";
         			}
             });
+        if (lastUpdateDate !== undefined && lastUpdateDate !== null)
+            url_ += "LastUpdateDate=" + encodeURIComponent(lastUpdateDate ? "" + lastUpdateDate.toISOString() : "") + "&";
         if (sorting !== undefined && sorting !== null)
             url_ += "Sorting=" + encodeURIComponent("" + sorting) + "&";
         if (skipCount === null)
@@ -35540,6 +35548,69 @@ export class DynamicQueryServiceProxy {
             let result200: any = null;
             let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
             result200 = DynamicQueryResult.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param tableName (optional) 
+     * @param fieldName (optional) 
+     * @param body (optional) 
+     * @return Success
+     */
+    tableHasField(tableName: string | null | undefined, fieldName: string | null | undefined, body: DbContext | undefined): Observable<boolean> {
+        let url_ = this.baseUrl + "/api/services/app/DynamicQuery/TableHasField?";
+        if (tableName !== undefined && tableName !== null)
+            url_ += "tableName=" + encodeURIComponent("" + tableName) + "&";
+        if (fieldName !== undefined && fieldName !== null)
+            url_ += "fieldName=" + encodeURIComponent("" + fieldName) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json-patch+json",
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processTableHasField(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processTableHasField(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<boolean>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<boolean>;
+        }));
+    }
+
+    protected processTableHasField(response: HttpResponseBase): Observable<boolean> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+                result200 = resultData200 !== undefined ? resultData200 : <any>null;
+    
             return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
@@ -78292,10 +78363,354 @@ export interface IShareDashboardInfo {
     [key: string]: any;
 }
 
+export class VisibleWhen implements IVisibleWhen {
+    extraAttributeId!: string | undefined;
+    operatorValue!: string | undefined;
+    value!: string | undefined;
+
+    [key: string]: any;
+
+    constructor(data?: IVisibleWhen) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.extraAttributeId = _data["extraAttributeId"];
+            this.operatorValue = _data["operatorValue"];
+            this.value = _data["value"];
+        }
+    }
+
+    static fromJS(data: any): VisibleWhen {
+        data = typeof data === 'object' ? data : {};
+        let result = new VisibleWhen();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["extraAttributeId"] = this.extraAttributeId;
+        data["operatorValue"] = this.operatorValue;
+        data["value"] = this.value;
+        return data;
+    }
+}
+
+export interface IVisibleWhen {
+    extraAttributeId: string | undefined;
+    operatorValue: string | undefined;
+    value: string | undefined;
+
+    [key: string]: any;
+}
+
+export class Relation implements IRelation {
+    targetName!: string | undefined;
+    sourceField!: string | undefined;
+    targetField!: string | undefined;
+
+    [key: string]: any;
+
+    constructor(data?: IRelation) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.targetName = _data["targetName"];
+            this.sourceField = _data["sourceField"];
+            this.targetField = _data["targetField"];
+        }
+    }
+
+    static fromJS(data: any): Relation {
+        data = typeof data === 'object' ? data : {};
+        let result = new Relation();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["targetName"] = this.targetName;
+        data["sourceField"] = this.sourceField;
+        data["targetField"] = this.targetField;
+        return data;
+    }
+}
+
+export interface IRelation {
+    targetName: string | undefined;
+    sourceField: string | undefined;
+    targetField: string | undefined;
+
+    [key: string]: any;
+}
+
+export class RelatedWhen implements IRelatedWhen {
+    relation!: Relation[] | undefined;
+
+    [key: string]: any;
+
+    constructor(data?: IRelatedWhen) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            if (Array.isArray(_data["relation"])) {
+                this.relation = [] as any;
+                for (let item of _data["relation"])
+                    this.relation!.push(Relation.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): RelatedWhen {
+        data = typeof data === 'object' ? data : {};
+        let result = new RelatedWhen();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        if (Array.isArray(this.relation)) {
+            data["relation"] = [];
+            for (let item of this.relation)
+                data["relation"].push(item.toJSON());
+        }
+        return data;
+    }
+}
+
+export interface IRelatedWhen {
+    relation: Relation[] | undefined;
+
+    [key: string]: any;
+}
+
+export class DataSource implements IDataSource {
+    service!: string | undefined;
+    api!: string | undefined;
+    parameter!: string | undefined;
+
+    [key: string]: any;
+
+    constructor(data?: IDataSource) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.service = _data["service"];
+            this.api = _data["api"];
+            this.parameter = _data["parameter"];
+        }
+    }
+
+    static fromJS(data: any): DataSource {
+        data = typeof data === 'object' ? data : {};
+        let result = new DataSource();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["service"] = this.service;
+        data["api"] = this.api;
+        data["parameter"] = this.parameter;
+        return data;
+    }
+}
+
+export interface IDataSource {
+    service: string | undefined;
+    api: string | undefined;
+    parameter: string | undefined;
+
+    [key: string]: any;
+}
+
+export class ExtraAttribute implements IExtraAttribute {
+    attributeId!: number;
+    code!: string | undefined;
+    name!: string | undefined;
+    description!: string | undefined;
+    dataType!: string | undefined;
+    width!: string | undefined;
+    decimals!: number;
+    defaultValue!: string | undefined;
+    usage!: string | undefined;
+    isLookup!: boolean;
+    entityObjectTypeCode!: string | undefined;
+    acceptMultipleValues!: boolean;
+    validEntries!: string | undefined;
+    isVariation!: boolean;
+    isAdvancedSearch!: boolean;
+    allowAddNew!: boolean;
+    visibleWhen!: VisibleWhen;
+    relatedWhen!: RelatedWhen;
+    dataSource!: DataSource;
+
+    [key: string]: any;
+
+    constructor(data?: IExtraAttribute) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.attributeId = _data["attributeId"];
+            this.code = _data["code"];
+            this.name = _data["name"];
+            this.description = _data["description"];
+            this.dataType = _data["dataType"];
+            this.width = _data["width"];
+            this.decimals = _data["decimals"];
+            this.defaultValue = _data["defaultValue"];
+            this.usage = _data["usage"];
+            this.isLookup = _data["isLookup"];
+            this.entityObjectTypeCode = _data["entityObjectTypeCode"];
+            this.acceptMultipleValues = _data["acceptMultipleValues"];
+            this.validEntries = _data["validEntries"];
+            this.isVariation = _data["isVariation"];
+            this.isAdvancedSearch = _data["isAdvancedSearch"];
+            this.allowAddNew = _data["allowAddNew"];
+            this.visibleWhen = _data["visibleWhen"] ? VisibleWhen.fromJS(_data["visibleWhen"]) : <any>undefined;
+            this.relatedWhen = _data["relatedWhen"] ? RelatedWhen.fromJS(_data["relatedWhen"]) : <any>undefined;
+            this.dataSource = _data["dataSource"] ? DataSource.fromJS(_data["dataSource"]) : <any>undefined;
+        }
+    }
+
+    static fromJS(data: any): ExtraAttribute {
+        data = typeof data === 'object' ? data : {};
+        let result = new ExtraAttribute();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["attributeId"] = this.attributeId;
+        data["code"] = this.code;
+        data["name"] = this.name;
+        data["description"] = this.description;
+        data["dataType"] = this.dataType;
+        data["width"] = this.width;
+        data["decimals"] = this.decimals;
+        data["defaultValue"] = this.defaultValue;
+        data["usage"] = this.usage;
+        data["isLookup"] = this.isLookup;
+        data["entityObjectTypeCode"] = this.entityObjectTypeCode;
+        data["acceptMultipleValues"] = this.acceptMultipleValues;
+        data["validEntries"] = this.validEntries;
+        data["isVariation"] = this.isVariation;
+        data["isAdvancedSearch"] = this.isAdvancedSearch;
+        data["allowAddNew"] = this.allowAddNew;
+        data["visibleWhen"] = this.visibleWhen ? this.visibleWhen.toJSON() : <any>undefined;
+        data["relatedWhen"] = this.relatedWhen ? this.relatedWhen.toJSON() : <any>undefined;
+        data["dataSource"] = this.dataSource ? this.dataSource.toJSON() : <any>undefined;
+        return data;
+    }
+}
+
+export interface IExtraAttribute {
+    attributeId: number;
+    code: string | undefined;
+    name: string | undefined;
+    description: string | undefined;
+    dataType: string | undefined;
+    width: string | undefined;
+    decimals: number;
+    defaultValue: string | undefined;
+    usage: string | undefined;
+    isLookup: boolean;
+    entityObjectTypeCode: string | undefined;
+    acceptMultipleValues: boolean;
+    validEntries: string | undefined;
+    isVariation: boolean;
+    isAdvancedSearch: boolean;
+    allowAddNew: boolean;
+    visibleWhen: VisibleWhen;
+    relatedWhen: RelatedWhen;
+    dataSource: DataSource;
+
+    [key: string]: any;
+}
+
 export class DynamicCondition implements IDynamicCondition {
     field!: string | undefined;
     operator!: string | undefined;
-    value!: any | undefined;
+    value!: string | undefined;
 
     [key: string]: any;
 
@@ -78343,7 +78758,7 @@ export class DynamicCondition implements IDynamicCondition {
 export interface IDynamicCondition {
     field: string | undefined;
     operator: string | undefined;
-    value: any | undefined;
+    value: string | undefined;
 
     [key: string]: any;
 }
@@ -84812,350 +85227,6 @@ export enum RecommandedOrAdditional {
     RECOMMENDED = 0,
     ADDITIONAL = 1,
     CHARGES = 2,
-}
-
-export class VisibleWhen implements IVisibleWhen {
-    extraAttributeId!: string | undefined;
-    operatorValue!: string | undefined;
-    value!: string | undefined;
-
-    [key: string]: any;
-
-    constructor(data?: IVisibleWhen) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            for (var property in _data) {
-                if (_data.hasOwnProperty(property))
-                    this[property] = _data[property];
-            }
-            this.extraAttributeId = _data["extraAttributeId"];
-            this.operatorValue = _data["operatorValue"];
-            this.value = _data["value"];
-        }
-    }
-
-    static fromJS(data: any): VisibleWhen {
-        data = typeof data === 'object' ? data : {};
-        let result = new VisibleWhen();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        for (var property in this) {
-            if (this.hasOwnProperty(property))
-                data[property] = this[property];
-        }
-        data["extraAttributeId"] = this.extraAttributeId;
-        data["operatorValue"] = this.operatorValue;
-        data["value"] = this.value;
-        return data;
-    }
-}
-
-export interface IVisibleWhen {
-    extraAttributeId: string | undefined;
-    operatorValue: string | undefined;
-    value: string | undefined;
-
-    [key: string]: any;
-}
-
-export class Relation implements IRelation {
-    targetName!: string | undefined;
-    sourceField!: string | undefined;
-    targetField!: string | undefined;
-
-    [key: string]: any;
-
-    constructor(data?: IRelation) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            for (var property in _data) {
-                if (_data.hasOwnProperty(property))
-                    this[property] = _data[property];
-            }
-            this.targetName = _data["targetName"];
-            this.sourceField = _data["sourceField"];
-            this.targetField = _data["targetField"];
-        }
-    }
-
-    static fromJS(data: any): Relation {
-        data = typeof data === 'object' ? data : {};
-        let result = new Relation();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        for (var property in this) {
-            if (this.hasOwnProperty(property))
-                data[property] = this[property];
-        }
-        data["targetName"] = this.targetName;
-        data["sourceField"] = this.sourceField;
-        data["targetField"] = this.targetField;
-        return data;
-    }
-}
-
-export interface IRelation {
-    targetName: string | undefined;
-    sourceField: string | undefined;
-    targetField: string | undefined;
-
-    [key: string]: any;
-}
-
-export class RelatedWhen implements IRelatedWhen {
-    relation!: Relation[] | undefined;
-
-    [key: string]: any;
-
-    constructor(data?: IRelatedWhen) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            for (var property in _data) {
-                if (_data.hasOwnProperty(property))
-                    this[property] = _data[property];
-            }
-            if (Array.isArray(_data["relation"])) {
-                this.relation = [] as any;
-                for (let item of _data["relation"])
-                    this.relation!.push(Relation.fromJS(item));
-            }
-        }
-    }
-
-    static fromJS(data: any): RelatedWhen {
-        data = typeof data === 'object' ? data : {};
-        let result = new RelatedWhen();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        for (var property in this) {
-            if (this.hasOwnProperty(property))
-                data[property] = this[property];
-        }
-        if (Array.isArray(this.relation)) {
-            data["relation"] = [];
-            for (let item of this.relation)
-                data["relation"].push(item.toJSON());
-        }
-        return data;
-    }
-}
-
-export interface IRelatedWhen {
-    relation: Relation[] | undefined;
-
-    [key: string]: any;
-}
-
-export class DataSource implements IDataSource {
-    service!: string | undefined;
-    api!: string | undefined;
-    parameter!: string | undefined;
-
-    [key: string]: any;
-
-    constructor(data?: IDataSource) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            for (var property in _data) {
-                if (_data.hasOwnProperty(property))
-                    this[property] = _data[property];
-            }
-            this.service = _data["service"];
-            this.api = _data["api"];
-            this.parameter = _data["parameter"];
-        }
-    }
-
-    static fromJS(data: any): DataSource {
-        data = typeof data === 'object' ? data : {};
-        let result = new DataSource();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        for (var property in this) {
-            if (this.hasOwnProperty(property))
-                data[property] = this[property];
-        }
-        data["service"] = this.service;
-        data["api"] = this.api;
-        data["parameter"] = this.parameter;
-        return data;
-    }
-}
-
-export interface IDataSource {
-    service: string | undefined;
-    api: string | undefined;
-    parameter: string | undefined;
-
-    [key: string]: any;
-}
-
-export class ExtraAttribute implements IExtraAttribute {
-    attributeId!: number;
-    code!: string | undefined;
-    name!: string | undefined;
-    description!: string | undefined;
-    dataType!: string | undefined;
-    width!: string | undefined;
-    decimals!: number;
-    defaultValue!: string | undefined;
-    usage!: string | undefined;
-    isLookup!: boolean;
-    entityObjectTypeCode!: string | undefined;
-    acceptMultipleValues!: boolean;
-    validEntries!: string | undefined;
-    isVariation!: boolean;
-    isAdvancedSearch!: boolean;
-    allowAddNew!: boolean;
-    visibleWhen!: VisibleWhen;
-    relatedWhen!: RelatedWhen;
-    dataSource!: DataSource;
-
-    [key: string]: any;
-
-    constructor(data?: IExtraAttribute) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            for (var property in _data) {
-                if (_data.hasOwnProperty(property))
-                    this[property] = _data[property];
-            }
-            this.attributeId = _data["attributeId"];
-            this.code = _data["code"];
-            this.name = _data["name"];
-            this.description = _data["description"];
-            this.dataType = _data["dataType"];
-            this.width = _data["width"];
-            this.decimals = _data["decimals"];
-            this.defaultValue = _data["defaultValue"];
-            this.usage = _data["usage"];
-            this.isLookup = _data["isLookup"];
-            this.entityObjectTypeCode = _data["entityObjectTypeCode"];
-            this.acceptMultipleValues = _data["acceptMultipleValues"];
-            this.validEntries = _data["validEntries"];
-            this.isVariation = _data["isVariation"];
-            this.isAdvancedSearch = _data["isAdvancedSearch"];
-            this.allowAddNew = _data["allowAddNew"];
-            this.visibleWhen = _data["visibleWhen"] ? VisibleWhen.fromJS(_data["visibleWhen"]) : <any>undefined;
-            this.relatedWhen = _data["relatedWhen"] ? RelatedWhen.fromJS(_data["relatedWhen"]) : <any>undefined;
-            this.dataSource = _data["dataSource"] ? DataSource.fromJS(_data["dataSource"]) : <any>undefined;
-        }
-    }
-
-    static fromJS(data: any): ExtraAttribute {
-        data = typeof data === 'object' ? data : {};
-        let result = new ExtraAttribute();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        for (var property in this) {
-            if (this.hasOwnProperty(property))
-                data[property] = this[property];
-        }
-        data["attributeId"] = this.attributeId;
-        data["code"] = this.code;
-        data["name"] = this.name;
-        data["description"] = this.description;
-        data["dataType"] = this.dataType;
-        data["width"] = this.width;
-        data["decimals"] = this.decimals;
-        data["defaultValue"] = this.defaultValue;
-        data["usage"] = this.usage;
-        data["isLookup"] = this.isLookup;
-        data["entityObjectTypeCode"] = this.entityObjectTypeCode;
-        data["acceptMultipleValues"] = this.acceptMultipleValues;
-        data["validEntries"] = this.validEntries;
-        data["isVariation"] = this.isVariation;
-        data["isAdvancedSearch"] = this.isAdvancedSearch;
-        data["allowAddNew"] = this.allowAddNew;
-        data["visibleWhen"] = this.visibleWhen ? this.visibleWhen.toJSON() : <any>undefined;
-        data["relatedWhen"] = this.relatedWhen ? this.relatedWhen.toJSON() : <any>undefined;
-        data["dataSource"] = this.dataSource ? this.dataSource.toJSON() : <any>undefined;
-        return data;
-    }
-}
-
-export interface IExtraAttribute {
-    attributeId: number;
-    code: string | undefined;
-    name: string | undefined;
-    description: string | undefined;
-    dataType: string | undefined;
-    width: string | undefined;
-    decimals: number;
-    defaultValue: string | undefined;
-    usage: string | undefined;
-    isLookup: boolean;
-    entityObjectTypeCode: string | undefined;
-    acceptMultipleValues: boolean;
-    validEntries: string | undefined;
-    isVariation: boolean;
-    isAdvancedSearch: boolean;
-    allowAddNew: boolean;
-    visibleWhen: VisibleWhen;
-    relatedWhen: RelatedWhen;
-    dataSource: DataSource;
-
-    [key: string]: any;
 }
 
 export class AppItemForViewDto implements IAppItemForViewDto {
@@ -103724,9 +103795,11 @@ export interface IStringOutput {
 }
 
 export class DynamicQueryInput implements IDynamicQueryInput {
+    tenantId!: number;
     tableName!: string | undefined;
     fields!: string[] | undefined;
     conditions!: DynamicCondition[] | undefined;
+    lastUpdateDate!: moment.Moment | undefined;
     sorting!: string | undefined;
     skipCount!: number;
     maxResultCount!: number;
@@ -103748,6 +103821,7 @@ export class DynamicQueryInput implements IDynamicQueryInput {
                 if (_data.hasOwnProperty(property))
                     this[property] = _data[property];
             }
+            this.tenantId = _data["tenantId"];
             this.tableName = _data["tableName"];
             if (Array.isArray(_data["fields"])) {
                 this.fields = [] as any;
@@ -103759,6 +103833,7 @@ export class DynamicQueryInput implements IDynamicQueryInput {
                 for (let item of _data["conditions"])
                     this.conditions!.push(DynamicCondition.fromJS(item));
             }
+            this.lastUpdateDate = _data["lastUpdateDate"] ? moment(_data["lastUpdateDate"].toString()) : <any>undefined;
             this.sorting = _data["sorting"];
             this.skipCount = _data["skipCount"];
             this.maxResultCount = _data["maxResultCount"];
@@ -103778,6 +103853,7 @@ export class DynamicQueryInput implements IDynamicQueryInput {
             if (this.hasOwnProperty(property))
                 data[property] = this[property];
         }
+        data["tenantId"] = this.tenantId;
         data["tableName"] = this.tableName;
         if (Array.isArray(this.fields)) {
             data["fields"] = [];
@@ -103789,6 +103865,7 @@ export class DynamicQueryInput implements IDynamicQueryInput {
             for (let item of this.conditions)
                 data["conditions"].push(item.toJSON());
         }
+        data["lastUpdateDate"] = this.lastUpdateDate ? this.lastUpdateDate.toISOString() : <any>undefined;
         data["sorting"] = this.sorting;
         data["skipCount"] = this.skipCount;
         data["maxResultCount"] = this.maxResultCount;
@@ -103797,12 +103874,620 @@ export class DynamicQueryInput implements IDynamicQueryInput {
 }
 
 export interface IDynamicQueryInput {
+    tenantId: number;
     tableName: string | undefined;
     fields: string[] | undefined;
     conditions: DynamicCondition[] | undefined;
+    lastUpdateDate: moment.Moment | undefined;
     sorting: string | undefined;
     skipCount: number;
     maxResultCount: number;
+
+    [key: string]: any;
+}
+
+export class IDbContextTransaction implements IIDbContextTransaction {
+    readonly transactionId!: string;
+    readonly supportsSavepoints!: boolean;
+
+    [key: string]: any;
+
+    constructor(data?: IIDbContextTransaction) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            (<any>this).transactionId = _data["transactionId"];
+            (<any>this).supportsSavepoints = _data["supportsSavepoints"];
+        }
+    }
+
+    static fromJS(data: any): IDbContextTransaction {
+        data = typeof data === 'object' ? data : {};
+        let result = new IDbContextTransaction();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["transactionId"] = this.transactionId;
+        data["supportsSavepoints"] = this.supportsSavepoints;
+        return data;
+    }
+}
+
+export interface IIDbContextTransaction {
+    transactionId: string;
+    supportsSavepoints: boolean;
+
+    [key: string]: any;
+}
+
+export enum AutoTransactionBehavior {
+    WhenNeeded = 0,
+    Always = 1,
+    Never = 2,
+}
+
+export class DatabaseFacade implements IDatabaseFacade {
+    currentTransaction!: IDbContextTransaction;
+    autoTransactionsEnabled!: boolean;
+    autoTransactionBehavior!: AutoTransactionBehavior;
+    autoSavepointsEnabled!: boolean;
+    readonly providerName!: string | undefined;
+
+    [key: string]: any;
+
+    constructor(data?: IDatabaseFacade) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.currentTransaction = _data["currentTransaction"] ? IDbContextTransaction.fromJS(_data["currentTransaction"]) : <any>undefined;
+            this.autoTransactionsEnabled = _data["autoTransactionsEnabled"];
+            this.autoTransactionBehavior = _data["autoTransactionBehavior"];
+            this.autoSavepointsEnabled = _data["autoSavepointsEnabled"];
+            (<any>this).providerName = _data["providerName"];
+        }
+    }
+
+    static fromJS(data: any): DatabaseFacade {
+        data = typeof data === 'object' ? data : {};
+        let result = new DatabaseFacade();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["currentTransaction"] = this.currentTransaction ? this.currentTransaction.toJSON() : <any>undefined;
+        data["autoTransactionsEnabled"] = this.autoTransactionsEnabled;
+        data["autoTransactionBehavior"] = this.autoTransactionBehavior;
+        data["autoSavepointsEnabled"] = this.autoSavepointsEnabled;
+        data["providerName"] = this.providerName;
+        return data;
+    }
+}
+
+export interface IDatabaseFacade {
+    currentTransaction: IDbContextTransaction;
+    autoTransactionsEnabled: boolean;
+    autoTransactionBehavior: AutoTransactionBehavior;
+    autoSavepointsEnabled: boolean;
+    providerName: string | undefined;
+
+    [key: string]: any;
+}
+
+export enum QueryTrackingBehavior {
+    TrackAll = 0,
+    NoTracking = 1,
+    NoTrackingWithIdentityResolution = 2,
+}
+
+export enum CascadeTiming {
+    Immediate = 0,
+    OnSaveChanges = 1,
+    Never = 2,
+}
+
+export class DebugView implements IDebugView {
+    readonly longView!: string | undefined;
+    readonly shortView!: string | undefined;
+
+    [key: string]: any;
+
+    constructor(data?: IDebugView) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            (<any>this).longView = _data["longView"];
+            (<any>this).shortView = _data["shortView"];
+        }
+    }
+
+    static fromJS(data: any): DebugView {
+        data = typeof data === 'object' ? data : {};
+        let result = new DebugView();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["longView"] = this.longView;
+        data["shortView"] = this.shortView;
+        return data;
+    }
+}
+
+export interface IDebugView {
+    longView: string | undefined;
+    shortView: string | undefined;
+
+    [key: string]: any;
+}
+
+export class ChangeTracker implements IChangeTracker {
+    autoDetectChangesEnabled!: boolean;
+    lazyLoadingEnabled!: boolean;
+    queryTrackingBehavior!: QueryTrackingBehavior;
+    deleteOrphansTiming!: CascadeTiming;
+    cascadeDeleteTiming!: CascadeTiming;
+    context!: DbContext;
+    debugView!: DebugView;
+
+    [key: string]: any;
+
+    constructor(data?: IChangeTracker) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.autoDetectChangesEnabled = _data["autoDetectChangesEnabled"];
+            this.lazyLoadingEnabled = _data["lazyLoadingEnabled"];
+            this.queryTrackingBehavior = _data["queryTrackingBehavior"];
+            this.deleteOrphansTiming = _data["deleteOrphansTiming"];
+            this.cascadeDeleteTiming = _data["cascadeDeleteTiming"];
+            this.context = _data["context"] ? DbContext.fromJS(_data["context"]) : <any>undefined;
+            this.debugView = _data["debugView"] ? DebugView.fromJS(_data["debugView"]) : <any>undefined;
+        }
+    }
+
+    static fromJS(data: any): ChangeTracker {
+        data = typeof data === 'object' ? data : {};
+        let result = new ChangeTracker();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["autoDetectChangesEnabled"] = this.autoDetectChangesEnabled;
+        data["lazyLoadingEnabled"] = this.lazyLoadingEnabled;
+        data["queryTrackingBehavior"] = this.queryTrackingBehavior;
+        data["deleteOrphansTiming"] = this.deleteOrphansTiming;
+        data["cascadeDeleteTiming"] = this.cascadeDeleteTiming;
+        data["context"] = this.context ? this.context.toJSON() : <any>undefined;
+        data["debugView"] = this.debugView ? this.debugView.toJSON() : <any>undefined;
+        return data;
+    }
+}
+
+export interface IChangeTracker {
+    autoDetectChangesEnabled: boolean;
+    lazyLoadingEnabled: boolean;
+    queryTrackingBehavior: QueryTrackingBehavior;
+    deleteOrphansTiming: CascadeTiming;
+    cascadeDeleteTiming: CascadeTiming;
+    context: DbContext;
+    debugView: DebugView;
+
+    [key: string]: any;
+}
+
+export class ITypeMappingSource implements IITypeMappingSource {
+
+    [key: string]: any;
+
+    constructor(data?: IITypeMappingSource) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+        }
+    }
+
+    static fromJS(data: any): ITypeMappingSource {
+        data = typeof data === 'object' ? data : {};
+        let result = new ITypeMappingSource();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        return data;
+    }
+}
+
+export interface IITypeMappingSource {
+
+    [key: string]: any;
+}
+
+export class IConstructorBindingFactory implements IIConstructorBindingFactory {
+
+    [key: string]: any;
+
+    constructor(data?: IIConstructorBindingFactory) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+        }
+    }
+
+    static fromJS(data: any): IConstructorBindingFactory {
+        data = typeof data === 'object' ? data : {};
+        let result = new IConstructorBindingFactory();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        return data;
+    }
+}
+
+export interface IIConstructorBindingFactory {
+
+    [key: string]: any;
+}
+
+export class IParameterBindingFactories implements IIParameterBindingFactories {
+
+    [key: string]: any;
+
+    constructor(data?: IIParameterBindingFactories) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+        }
+    }
+
+    static fromJS(data: any): IParameterBindingFactories {
+        data = typeof data === 'object' ? data : {};
+        let result = new IParameterBindingFactories();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        return data;
+    }
+}
+
+export interface IIParameterBindingFactories {
+
+    [key: string]: any;
+}
+
+export class RuntimeModelDependencies implements IRuntimeModelDependencies {
+    typeMappingSource!: ITypeMappingSource;
+    constructorBindingFactory!: IConstructorBindingFactory;
+    parameterBindingFactories!: IParameterBindingFactories;
+
+    [key: string]: any;
+
+    constructor(data?: IRuntimeModelDependencies) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.typeMappingSource = _data["typeMappingSource"] ? ITypeMappingSource.fromJS(_data["typeMappingSource"]) : <any>undefined;
+            this.constructorBindingFactory = _data["constructorBindingFactory"] ? IConstructorBindingFactory.fromJS(_data["constructorBindingFactory"]) : <any>undefined;
+            this.parameterBindingFactories = _data["parameterBindingFactories"] ? IParameterBindingFactories.fromJS(_data["parameterBindingFactories"]) : <any>undefined;
+        }
+    }
+
+    static fromJS(data: any): RuntimeModelDependencies {
+        data = typeof data === 'object' ? data : {};
+        let result = new RuntimeModelDependencies();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["typeMappingSource"] = this.typeMappingSource ? this.typeMappingSource.toJSON() : <any>undefined;
+        data["constructorBindingFactory"] = this.constructorBindingFactory ? this.constructorBindingFactory.toJSON() : <any>undefined;
+        data["parameterBindingFactories"] = this.parameterBindingFactories ? this.parameterBindingFactories.toJSON() : <any>undefined;
+        return data;
+    }
+}
+
+export interface IRuntimeModelDependencies {
+    typeMappingSource: ITypeMappingSource;
+    constructorBindingFactory: IConstructorBindingFactory;
+    parameterBindingFactories: IParameterBindingFactories;
+
+    [key: string]: any;
+}
+
+export class IModel implements IIModel {
+    modelDependencies!: RuntimeModelDependencies;
+
+    [key: string]: any;
+
+    constructor(data?: IIModel) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.modelDependencies = _data["modelDependencies"] ? RuntimeModelDependencies.fromJS(_data["modelDependencies"]) : <any>undefined;
+        }
+    }
+
+    static fromJS(data: any): IModel {
+        data = typeof data === 'object' ? data : {};
+        let result = new IModel();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["modelDependencies"] = this.modelDependencies ? this.modelDependencies.toJSON() : <any>undefined;
+        return data;
+    }
+}
+
+export interface IIModel {
+    modelDependencies: RuntimeModelDependencies;
+
+    [key: string]: any;
+}
+
+export class DbContextId implements IDbContextId {
+    readonly instanceId!: string;
+    lease!: number;
+
+    [key: string]: any;
+
+    constructor(data?: IDbContextId) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            (<any>this).instanceId = _data["instanceId"];
+            this.lease = _data["lease"];
+        }
+    }
+
+    static fromJS(data: any): DbContextId {
+        data = typeof data === 'object' ? data : {};
+        let result = new DbContextId();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["instanceId"] = this.instanceId;
+        data["lease"] = this.lease;
+        return data;
+    }
+}
+
+export interface IDbContextId {
+    instanceId: string;
+    lease: number;
+
+    [key: string]: any;
+}
+
+export class DbContext implements IDbContext {
+    database!: DatabaseFacade;
+    changeTracker!: ChangeTracker;
+    model!: IModel;
+    contextId!: DbContextId;
+
+    [key: string]: any;
+
+    constructor(data?: IDbContext) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.database = _data["database"] ? DatabaseFacade.fromJS(_data["database"]) : <any>undefined;
+            this.changeTracker = _data["changeTracker"] ? ChangeTracker.fromJS(_data["changeTracker"]) : <any>undefined;
+            this.model = _data["model"] ? IModel.fromJS(_data["model"]) : <any>undefined;
+            this.contextId = _data["contextId"] ? DbContextId.fromJS(_data["contextId"]) : <any>undefined;
+        }
+    }
+
+    static fromJS(data: any): DbContext {
+        data = typeof data === 'object' ? data : {};
+        let result = new DbContext();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["database"] = this.database ? this.database.toJSON() : <any>undefined;
+        data["changeTracker"] = this.changeTracker ? this.changeTracker.toJSON() : <any>undefined;
+        data["model"] = this.model ? this.model.toJSON() : <any>undefined;
+        data["contextId"] = this.contextId ? this.contextId.toJSON() : <any>undefined;
+        return data;
+    }
+}
+
+export interface IDbContext {
+    database: DatabaseFacade;
+    changeTracker: ChangeTracker;
+    model: IModel;
+    contextId: DbContextId;
 
     [key: string]: any;
 }

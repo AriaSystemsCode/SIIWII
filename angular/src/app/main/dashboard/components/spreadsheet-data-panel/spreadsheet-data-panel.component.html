@@ -1,8 +1,6 @@
 <div
     *ngIf="visible"
     class="spreadsheet-side-panel">
-
-    <!-- Header -->
     <div
         class="
             d-flex
@@ -11,386 +9,268 @@
             border-bottom
             p-3
         ">
-
         <div>
-
             <h5 class="mb-1">
                 {{ 'NewList' | localize }}
             </h5>
-
             <small class="text-muted">
                 {{
                     'InsertApplicationDataIntoNewSheet'
                         | localize
                 }}
             </small>
-
         </div>
-
         <button
             type="button"
             class="btn btn-sm btn-light"
             (click)="closePanel()">
-
             <i class="fa fa-times"></i>
-
         </button>
-
     </div>
-
-
-    <!-- ================================= -->
-    <!-- STEP 1 - ENTITY -->
-    <!-- ================================= -->
-
     <div
         *ngIf="step === 1"
         class="p-3">
-
         <div class="form-group">
-
             <label class="font-weight-bold">
                 {{ 'Table' | localize }}
             </label>
-
             <small
                 class="
                     d-block
                     text-muted
                     mb-3
                 ">
-
                 {{
                     'SelectTableToInsert'
                         | localize
                 }}
-
             </small>
-
-
             <div
-                *ngFor="let entity of entities"
+                *ngIf="isLoadingTables"
+                class="
+                    d-flex
+                    align-items-center
+                    justify-content-center
+                    py-4
+                    text-muted
+                ">
+                <i class="fa fa-spinner fa-spin mr-2"></i>
+                {{ 'Loading' | localize }}
+            </div>
+            <div
+                *ngFor="let table of tables"
                 class="card mb-2 entity-card"
-                (click)="selectEntity(entity)">
-
+                (click)="selectTable(table)">
                 <div
                     class="
                         card-body
                         d-flex
                         align-items-center
                     ">
-
                     <i
-                        [class]="entity.icon"
+                        [class]="getTableIcon(table)"
                         class="mr-3">
                     </i>
-
                     <span>
-                        {{ entity.displayName }}
+                        {{ table }}
                     </span>
-
                 </div>
-
             </div>
-
         </div>
-
     </div>
-
-
-    <!-- ================================= -->
-    <!-- STEP 2 - COLUMNS / FILTERS -->
-    <!-- ================================= -->
-
     <div
         *ngIf="
             step === 2 &&
-            selectedEntity
+            selectedTable
         "
         class="p-3">
-
         <button
             type="button"
             class="btn btn-link px-0 mb-2"
+            [disabled]="isAdding"
             (click)="backToEntities()">
-
             <i class="fa fa-arrow-left mr-2"></i>
-
             {{ 'ChangeTable' | localize }}
-
         </button>
-
-
-        <h5>
-            {{ selectedEntity.displayName }}
+        <h5 class="mb-1">
+            {{ selectedTable }}
         </h5>
-
-        <p class="text-muted">
+        <p class="text-muted mb-4">
             {{
                 'ChooseColumnsAndOptionalFilters'
                     | localize
             }}
         </p>
-
-
-        <!-- ============================= -->
-        <!-- COLUMNS -->
-        <!-- ============================= -->
-
-        <div class="mb-4">
-
-            <div
-                class="
-                    d-flex
-                    align-items-center
-                    justify-content-between
-                    mb-2
-                ">
-
-                <strong>
-                    {{ 'Columns' | localize }}
-                </strong>
-
-
-                <div>
-
-                    <button
-                        type="button"
-                        class="btn btn-sm btn-link"
-                        (click)="selectAllColumns()">
-
-                        {{ 'SelectAll' | localize }}
-
-                    </button>
-
-                    <button
-                        type="button"
-                        class="btn btn-sm btn-link"
-                        (click)="clearColumns()">
-
-                        {{ 'Clear' | localize }}
-
-                    </button>
-
-                </div>
-
-            </div>
-
-
-            <div
-                *ngFor="
-                    let column
-                    of selectedEntity.columns
-                "
-                class="form-check mb-2">
-
-                <input
-                    type="checkbox"
-                    class="form-check-input"
-                    [id]="
-                        'column-' +
-                        selectedEntity.sourceKey +
-                        '-' +
-                        column.key
-                    "
-                    [checked]="
-                        isColumnSelected(
-                            column.key
-                        )
-                    "
-                    (change)="
-                        toggleColumn(
-                            column.key,
-                            $event
-                        )
-                    " />
-
-
-                <label
-                    class="form-check-label"
-                    [for]="
-                        'column-' +
-                        selectedEntity.sourceKey +
-                        '-' +
-                        column.key
-                    ">
-
-                    {{ column.label }}
-
-                </label>
-
-            </div>
-
-        </div>
-
-
-        <!-- ============================= -->
-        <!-- FILTERS -->
-        <!-- ============================= -->
-
         <div
-            *ngIf="
-                selectedEntity.filters?.length
-            "
-            class="mb-4">
-
-            <strong class="d-block mb-3">
-                {{ 'Filters' | localize }}
-            </strong>
-
-
-            <div
-                *ngFor="
-                    let filter
-                    of selectedEntity.filters
-                "
-                class="form-group">
-
-                <label>
-                    {{ filter.label }}
-                </label>
-
-
-                <!-- STRING -->
-
-                <input
-                    *ngIf="
-                        filter.type === 'string'
-                    "
-                    type="text"
-                    class="form-control"
-                    [(ngModel)]="
-                        filterValues[filter.key]
-                    " />
-
-
-                <!-- NUMBER -->
-
-                <input
-                    *ngIf="
-                        filter.type === 'number'
-                    "
-                    type="number"
-                    class="form-control"
-                    [(ngModel)]="
-                        filterValues[filter.key]
-                    " />
-
-
-                <!-- DATE -->
-
-                <input
-                    *ngIf="
-                        filter.type === 'date'
-                    "
-                    type="date"
-                    class="form-control"
-                    [(ngModel)]="
-                        filterValues[filter.key]
-                    " />
-
-
-                <!-- BOOLEAN -->
-
-                <div
-                    *ngIf="
-                        filter.type === 'boolean'
-                    "
-                    class="form-check">
-
-                    <input
-                        type="checkbox"
-                        class="form-check-input"
-                        [id]="
-                            'filter-' +
-                            filter.key
-                        "
-                        [(ngModel)]="
-                            filterValues[
-                                filter.key
-                            ]
-                        " />
-
-                    <label
-                        class="form-check-label"
-                        [for]="
-                            'filter-' +
-                            filter.key
-                        ">
-
-                        {{ filter.label }}
-
-                    </label>
-
-                </div>
-
-
-                <!-- SELECT -->
-
-                <p-dropdown
-                    *ngIf="
-                        filter.type === 'select'
-                    "
-                    [options]="
-                        filter.options || []
-                    "
-                    [(ngModel)]="
-                        filterValues[
-                            filter.key
-                        ]
-                    "
-                    optionLabel="label"
-                    optionValue="value"
-                    appendTo="body"
-                    [style]="{
-                        width: '100%'
-                    }">
-
-                </p-dropdown>
-
-            </div>
-
+            *ngIf="isLoadingColumns"
+            class="
+                d-flex
+                align-items-center
+                justify-content-center
+                py-4
+                text-muted
+            ">
+            <i class="fa fa-spinner fa-spin mr-2"></i>
+            {{ 'Loading' | localize }}
         </div>
+        <ng-container *ngIf="!isLoadingColumns">
+            <div class="mb-4">
+                <div
+                    class="
+                        d-flex
+                        align-items-center
+                        justify-content-between
+                        mb-2
+                    ">
+                    <strong>
+                        {{ 'Columns' | localize }}
+                    </strong>
+                    <div>
+                        <button
+                            type="button"
+                            class="btn btn-sm btn-link"
+                            [disabled]="isAdding"
+                            (click)="selectAllColumns()">
+                            {{ 'SelectAll' | localize }}
+                        </button>
+                        <button
+                            type="button"
+                            class="btn btn-sm btn-link"
+                            [disabled]="isAdding"
+                            (click)="clearColumns()">
+                            {{ 'Clear' | localize }}
+                        </button>
+                    </div>
+                </div>
+                <div
+                    *ngIf="!tableColumns.length"
+                    class="text-muted py-2">
+                    {{ 'NoColumnsFound' | localize }}
+                </div>
+                <div
+                    *ngFor="
+                        let column of tableColumns;
+                    "
+                    class="
+                        form-check
+                        mb-2
+                        d-flex
+                        align-items-center
+                    ">
+                 <input
+    type="checkbox"
+    class="form-check-input"
+    [id]="'column-' + column.attributeId"
+    [checked]="isColumnSelected(column)"
+    [disabled]="isAdding"
+    (change)="toggleColumn(column, $event)" />
+<label
+    class="form-check-label mx-2"
+    [for]="'column-' + column.attributeId">
+    {{ column.description }}
+</label>
+                </div>
+            </div>
+            <!-- <div *ngIf="filterFields.length" class="mb-4">
+                <strong class="d-block mb-3">{{ 'Filters' | localize }}</strong>
+                <fieldset [disabled]="isAdding" class="border-0 p-0 m-0">
+                    <app-dynamicInputs
+                        [style.pointer-events]="isAdding ? 'none' : null"
+                        [filterMode]="true"
+                        [suppliedFields]="filterFields"
+                        (filterValuesChanged)="onFilterValuesChanged($event)">
+                    </app-dynamicInputs>
+                </fieldset>
+            </div> -->
 
+            <div *ngIf="filterFields.length" class="mb-4">
 
-        <!-- ============================= -->
-        <!-- ADD -->
-        <!-- ============================= -->
+    <div class="d-flex align-items-center justify-content-between mb-2">
+        <strong>{{ 'Filters' | localize }}</strong>
 
-        <button
-            type="button"
-            class="btn btn-primary btn-block"
-            [disabled]="
-                isAdding ||
-                !selectedColumns.length
-            "
-            (click)="addSheet()">
+   <button
+    type="button"
+    class="btn bgPurble btn-sm"
+    [disabled]="isAdding"
+    (click)="openFilterDialog()">
 
-            <i
-                *ngIf="isAdding"
-                class="
-                    fa
-                    fa-spinner
-                    fa-spin
-                    mr-2
-                ">
-            </i>
+    <i
+        class="fa mr-2"
+        [ngClass]="selectedConditions.length ? 'fa-edit' : 'fa-plus'">
+    </i>
 
-            <i
-                *ngIf="!isAdding"
-                class="fa fa-plus mr-2">
-            </i>
-
-            {{
-                (
-                    isAdding
-                        ? 'Adding'
-                        : 'AddAsNewSheet'
-                ) | localize
-            }}
-
-        </button>
-
+    {{
+        (selectedConditions.length ? 'EditFilters' : 'AddFilters')
+        | localize
+    }}
+</button>
     </div>
 
+    <div *ngIf="selectedConditions.length" class="text-muted small">
+        <i class="fa fa-check-circle text-success mr-1"></i>
+        {{ selectedConditions.length }}
+        {{ 'AppliedFilters' | localize }}
+    </div>
+
+</div>
+
+<p-dialog
+    [(visible)]="showFilterDialog"
+    [modal]="true"
+    [draggable]="false"
+    [resizable]="false"
+    [dismissableMask]="false"
+    [closable]="true"
+    [style]="{ width: '900px', maxWidth: '95vw' }"
+    [contentStyle]="{ overflow: 'visible' }"
+    [baseZIndex]="11000"
+    [appendTo]="'body'">
+
+    <ng-template pTemplate="header">
+        <div class="d-flex align-items-center">
+       
+            <span class="font-weight-bold">
+                {{ 'Filters' | localize }}
+            </span>
+        </div>
+    </ng-template>
+
+<app-filter-builder
+    *ngIf="showFilterDialog"
+    [fields]="filterBuilderFields"
+    [conditions]="selectedConditions"
+    [matchMode]="selectedMatchMode"
+    (matchModeChange)="onFilterMatchModeChanged($event)"
+    (apply)="onFiltersApplied($event)"
+    (cancel)="closeFilterDialog()">
+</app-filter-builder>
+
+</p-dialog>
+<button
+    type="button"
+    class="btn btn-primary btn-block"
+    [disabled]="isAdding || !selectedColumns.length"
+    (click)="addSheet()">
+
+    <i
+        *ngIf="isAdding"
+        class="fa fa-spinner fa-spin mr-2">
+    </i>
+
+    <i
+        *ngIf="!isAdding"
+        class="fa mr-2"
+        [ngClass]="isEditMode ? 'fa-check' : 'fa-plus'">
+    </i>
+
+    {{
+        (
+            isAdding
+                ? (isEditMode ? 'Applying' : 'Adding')
+                : (isEditMode ? 'ApplyChanges' : 'AddAsNewSheet')
+        ) | localize
+    }}
+</button>
+        </ng-container>
+    </div>
 </div>

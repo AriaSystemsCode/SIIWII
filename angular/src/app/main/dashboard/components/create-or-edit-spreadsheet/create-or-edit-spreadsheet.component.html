@@ -6,7 +6,7 @@
             <h3 class="mb-0">{{ 'Spreadsheet' | localize }}</h3>
 
             <small *ngIf="dashboardId" class="text-muted mx-2">
-                {{ 'Dashboard' | localize }} #{{ dashboardId }}
+                {{ 'Dashboard' | localize }} #{{ dashboardTtle }}
             </small>
 
             <!-- Info bar: only on data sheets (hidden on Dashboard and Pivot tabs) -->
@@ -25,10 +25,14 @@
                             {{ sourceName | localize }}
                         </span>
 
-                        <span class="spreadsheet-filter-bar">
-                            <i class="fa fa-filter mr-1"></i>
-                            {{ 'AppliedFilters' | localize }}: {{ applied.length }}
-                        </span>
+                   <div class="d-flex align-items-center gap-2">
+    <span class="spreadsheet-filter-bar">
+        <i class="fa fa-filter mr-1"></i>
+        {{ 'AppliedFilters' | localize }}: {{ applied.length }}
+    </span>
+
+
+</div>
                     </div>
 
                     <div *ngIf="applied.length" class="px-3 py-2">
@@ -47,7 +51,7 @@
             </button>
 
             <!-- Refresh is not wired yet -->
-            <button type="button" class="btn btn-light" [disabled]="isRefreshing">
+            <button type="button" class="btn btn-light" (click)="refreshSpreadsheet()" [disabled]="isRefreshing">
                 <i class="fa fa-sync-alt" [class.fa-spin]="isRefreshing"></i>
             </button>
         </div>
@@ -73,7 +77,7 @@
         <div class="spreadsheet-editor flex-grow-1 position-relative" (click)="onSheetClick($event)">
             <ejs-spreadsheet #spreadsheet width="100%" height="calc(100vh - 220px)" [sheets]="sheets"
                 [scrollSettings]="scrollSettings" [showAggregate]="showAggregate" [showSheetTabs]="true"
-                (created)="onCreated()" (ribbonClick)="onRibbonClick($event)">
+                (created)="onCreated()" (ribbonClick)="onRibbonClick($event)" (actionComplete)="onSpreadsheetActionComplete($event)">
             </ejs-spreadsheet>
 
             <!-- PIVOT -->
@@ -129,14 +133,19 @@
                         </ejs-pivotfieldlist>
                     </div>
                 </div>
+
+          
             </div>
         </div>
 
         <!-- ================= ADD DATA PANEL ================= -->
-        <app-spreadsheet-data-panel [visible]="showDataPanel" (close)="closeDataPanel()"
-            (batchLoaded)="onDataBatchLoaded($event)" (loadingFailed)="onDataLoadingFailed($event)">
-        </app-spreadsheet-data-panel>
-
+     <app-spreadsheet-data-panel
+    [visible]="showDataPanel"
+    [editSource]="editingSheetName ? activeSheetSource : null"
+    (close)="closeDataPanel()"
+    (batchLoaded)="onDataBatchLoaded($event)"
+    (loadingFailed)="onDataLoadingFailed($event)">
+</app-spreadsheet-data-panel>
         <!-- ================= CHART PANEL ================= -->
         <div *ngIf="showChartPanel" class="spreadsheet-side-panel">
             <div class="d-flex justify-content-between align-items-start border-bottom p-3">
@@ -201,3 +210,11 @@
         </div>
     </div>
 </div>
+
+
+<p-menu
+    #listMenu
+    [model]="listMenuItems"
+    [popup]="true"
+    appendTo="body">
+</p-menu>

@@ -1,0 +1,247 @@
+
+<div class="filter-builder">
+
+    <div class="filter-content">
+
+        <div class="filter-match-row">
+            <span>{{'Match' | localize}}</span>
+
+            <p-dropdown
+                [options]="matchOptions"
+                [(ngModel)]="matchMode"
+                optionLabel="label"
+                optionValue="value"
+                appendTo="body"
+                styleClass="match-dropdown">
+            </p-dropdown>
+
+            <span>{{'of the following rules' | localize}}:</span>
+        </div>
+
+        <div class="filter-rule-header" *ngIf="rules.length">
+            <span>{{ 'Field' | localize }}</span>
+            <span>{{ 'Operator' | localize }}</span>
+            <span>{{ 'Value' | localize }}</span>
+            <span></span>
+        </div>
+
+        <div
+            class="filter-rule-row"
+            *ngFor="let rule of rules; let i = index">
+
+            <div class="filter-field">
+                <p-dropdown
+                    [options]="fields"
+                    [(ngModel)]="rule.field"
+                    optionLabel="label"
+                    optionValue="name"
+                    [filter]="true"
+                    filterBy="label,name"
+                    [showClear]="true"
+                    placeholder="Select field"
+                    appendTo="body"
+                    styleClass="w-100"
+                    (onChange)="onFieldChange(rule)">
+                </p-dropdown>
+            </div>
+
+            <div class="filter-operator">
+                <p-dropdown
+                    [options]="getOperators(rule)"
+                    [(ngModel)]="rule.operator"
+                    optionLabel="label"
+                    optionValue="value"
+                    appendTo="body"
+                    styleClass="w-100"
+                    (onChange)="onOperatorChange(rule)">
+                </p-dropdown>
+            </div>
+
+            <div class="filter-value">
+
+                <ng-container [ngSwitch]="getType(rule)">
+
+            <ng-container *ngSwitchCase="'date'">
+
+    <ng-container *ngIf="isDatePeriodOperator(rule); else singleDate">
+
+        <div class="date-period-wrapper">
+
+            <p-dropdown
+                [options]="datePeriodOptions"
+                [(ngModel)]="rule.datePeriod"
+                optionLabel="label"
+                optionValue="value"
+                placeholder="Select period"
+                appendTo="body"
+                styleClass="w-100"
+                (onChange)="onDatePeriodChange(rule)">
+            </p-dropdown>
+
+            <p-calendar
+                *ngIf="rule.datePeriod === 'dateRange'"
+                [(ngModel)]="rule.dateRange"
+                selectionMode="range"
+                dateFormat="yy-mm-dd"
+                [showIcon]="true"
+                [readonlyInput]="true"
+                placeholder="Select date range"
+                appendTo="body"
+                styleClass="w-100">
+            </p-calendar>
+
+        </div>
+
+    </ng-container>
+
+    <ng-template #singleDate>
+        <p-calendar
+            [(ngModel)]="rule.value"
+            dateFormat="yy-mm-dd"
+            [showIcon]="true"
+            appendTo="body"
+            styleClass="w-100">
+        </p-calendar>
+    </ng-template>
+
+</ng-container>
+
+                    <p-dropdown
+                        *ngSwitchCase="'boolean'"
+                        [options]="booleanOptions"
+                        [(ngModel)]="rule.value"
+                        optionLabel="label"
+                        optionValue="value"
+                        placeholder="Select value"
+                        appendTo="body"
+                        styleClass="w-100">
+                    </p-dropdown>
+
+                    <ng-container *ngSwitchCase="'number'">
+                        <p-dropdown
+                            *ngIf="hasValidEntries(rule); else numberInput"
+                            [options]="getField(rule)?.options"
+                            [(ngModel)]="rule.value"
+                            optionLabel="label"
+                            optionValue="value"
+                            [filter]="true"
+                            appendTo="body"
+                            styleClass="w-100">
+                        </p-dropdown>
+
+                        <ng-template #numberInput>
+                            <input
+                                type="number"
+                                class="form-control"
+                                [(ngModel)]="rule.value"
+                                placeholder="Enter number" />
+                        </ng-template>
+                    </ng-container>
+
+                    <ng-container *ngSwitchCase="'list'">
+                        <p-dropdown
+                            *ngIf="hasValidEntries(rule); else listInput"
+                            [options]="getField(rule)?.options"
+                            [(ngModel)]="rule.value"
+                            optionLabel="label"
+                            optionValue="value"
+                            [filter]="true"
+                            placeholder="Select value"
+                            appendTo="body"
+                            styleClass="w-100">
+                        </p-dropdown>
+
+                        <ng-template #listInput>
+                            <input
+                                type="text"
+                                class="form-control"
+                                [(ngModel)]="rule.value"
+                                placeholder="Enter value" />
+                        </ng-template>
+                    </ng-container>
+
+                    <ng-container *ngSwitchDefault>
+                        <p-dropdown
+                            *ngIf="hasValidEntries(rule); else textInput"
+                            [options]="getField(rule)?.options"
+                            [(ngModel)]="rule.value"
+                            optionLabel="label"
+                            optionValue="value"
+                            [filter]="true"
+                            placeholder="Select value"
+                            appendTo="body"
+                            styleClass="w-100">
+                        </p-dropdown>
+
+                        <ng-template #textInput>
+                            <input
+                                type="text"
+                                class="form-control"
+                                [(ngModel)]="rule.value"
+                                placeholder="Enter value" />
+                        </ng-template>
+                    </ng-container>
+
+                </ng-container>
+
+            </div>
+
+            <div class="filter-actions">
+
+                <!-- <button
+                    type="button"
+                    class="filter-icon-btn add-btn"
+                    (click)="addRuleAfter(i)"
+                    title="Add rule">
+                    <i class="fa fa-plus"></i>
+                </button> -->
+
+                <button
+                    type="button"
+                    class="filter-icon-btn delete-btn"
+                    (click)="removeRule(i)"
+                    title="Delete rule">
+                    <i class="fa fa-trash"></i>
+                </button>
+
+            </div>
+
+        </div>
+
+        <button
+            type="button"
+            class="new-rule-btn"
+            (click)="addRule()">
+            <i class="fa fa-plus mr-2"></i>
+            {{'New Rule' | localize}}
+        </button>
+
+    </div>
+
+    <div class="filter-footer">
+
+        <button
+            type="button"
+            class="btn btn-light"
+            (click)="close()">
+            {{'Discard' | localize}}
+        </button>
+
+        <button
+            type="button"
+            class="btn btn-outline-secondary"
+            (click)="clearFilters()">
+            {{'ClearAll' | localize}}
+        </button>
+
+        <button
+            type="button"
+            class="btn btn-primary"
+            [disabled]="!canApply"
+            (click)="applyFilters()">
+            {{'Confirm' | localize}}
+        </button>
+
+    </div>
+
+</div>
