@@ -84,14 +84,16 @@
             selectedTable
         "
         class="p-3">
-        <button
-            type="button"
-            class="btn btn-link px-0 mb-2"
-            [disabled]="isAdding"
-            (click)="backToEntities()">
-            <i class="fa fa-arrow-left mr-2"></i>
-            {{ 'ChangeTable' | localize }}
-        </button>
+       <button
+    *ngIf="!isEditMode"
+    type="button"
+    class="btn btn-link px-0 mb-2"
+    [disabled]="isAdding"
+    (click)="backToEntities()">
+
+    <i class="fa fa-arrow-left mr-2"></i>
+    {{ 'ChangeTable' | localize }}
+</button>
         <h5 class="mb-1">
             {{ selectedTable }}
         </h5>
