@@ -188,7 +188,7 @@ namespace onetouch.AppEntities
             var pagedAndFilteredAppEntities = filteredAppEntities
                 .OrderBy(input.Sorting ?? "id asc")
                 .PageBy(input);
-
+            
             var appEntities = from o in pagedAndFilteredAppEntities
                               join o1 in _lookup_sycEntityObjectTypeRepository.GetAll() on o.EntityObjectTypeId equals o1.Id into j1
                               from s1 in j1.DefaultIfEmpty()
@@ -212,7 +212,8 @@ namespace onetouch.AppEntities
                                       EntityExtraData = (input.IncludeExtraDataFilter && o.EntityExtraData!=null)
                                                         ?ObjectMapper.Map<List<AppEntityExtraDataDto>>(o.EntityExtraData): null,
                                       Id = o.Id,
-                                      IsHostRecord = o.TenantId == null
+                                      IsHostRecord = o.TenantId == null,
+                                      TenantId=o.TenantId
                                       
                                   },
                                   
@@ -223,10 +224,21 @@ namespace onetouch.AppEntities
                               };
 
             var totalCount = await filteredAppEntities.CountAsync();
-
+            var entitiesList = await appEntities.ToListAsync();
+            if (AbpSession.TenantId != null)
+            {
+                
+                var defTenantValue = entitiesList.Any(z => z.AppEntity.TenantId == AbpSession.TenantId && z.AppEntity.IsDefault == true);
+                if (defTenantValue)
+                {
+                    var hostdefValue = entitiesList.FirstOrDefault(z => z.AppEntity.TenantId == null && z.AppEntity.IsDefault == true);
+                    if (hostdefValue != null)
+                        hostdefValue.AppEntity.IsDefault = false;
+                }
+            }
             return new PagedResultDto<GetAppEntityForViewDto>(
                 totalCount,
-                await appEntities.ToListAsync()
+                entitiesList
             );
         }
 
