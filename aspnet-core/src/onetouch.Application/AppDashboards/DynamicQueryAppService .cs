@@ -193,7 +193,17 @@ namespace onetouch.AppDashboards
 
 
             // Always AND user filters with the tenant condition.
-            var whereSql = " WHERE " + string.Join(" AND ", where);
+            var whereSql = ""; 
+            if (input.ApplyAnyOfConditions == true)
+            {
+                whereSql = " WHERE (" + string.Join(" OR ", where.Where(z=>z!= "[TenantId] = @tenantId").ToList())+")"
+                    + (where.Where(z => z == "[TenantId] = @tenantId").FirstOrDefault()!=null ?
+                    " AND [TenantId] = @tenantId"  :"") ;
+            }
+            else
+            {
+                whereSql = " WHERE " + string.Join(" AND ", where);
+            }
             var lastUpdateDate = input.LastUpdateDate;
             if (input.LastUpdateDate != null)
             {

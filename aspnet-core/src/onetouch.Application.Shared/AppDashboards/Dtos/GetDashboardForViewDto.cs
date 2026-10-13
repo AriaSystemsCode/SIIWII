@@ -75,6 +75,7 @@ namespace onetouch.AppDashboards.Dtos
         public List<DynamicCondition> Conditions { get; set; }
             = new List<DynamicCondition>();
         public DateTime? LastUpdateDate { get; set; }
+        public bool ApplyAnyOfConditions { get; set; } = false;
     }
 
     public class DynamicCondition

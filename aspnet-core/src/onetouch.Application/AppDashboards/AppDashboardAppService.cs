@@ -737,10 +737,10 @@ namespace onetouch.AppDashboards
             //if (input.TableName.ToUpper() == "APPTRANSACTIONHEADERS")
             //{
             //    input.Conditions = new List<DynamicCondition>();
-            //    input.Conditions.Add(new DynamicCondition { Field="PriceLevel",Operator="eq",Value="A" });
-            //    //input.Conditions.Add(new DynamicCondition { Field = "PriceLevel", Operator = "eq", Value = "A" });
+            //    input.Conditions.Add(new DynamicCondition { Field = "PriceLevel", Operator = "eq", Value = "A" });
+            //    input.Conditions.Add(new DynamicCondition { Field = "reference", Operator = "neq", Value = "" });
             //}
-           
+
             DynamicQueryAppService dynamicQueryAppService = new DynamicQueryAppService(UnitOfWorkManager.Current.GetDbContext<onetouchDbContext>());
             var returnResult = await dynamicQueryAppService.Query(input);
             return returnResult;
