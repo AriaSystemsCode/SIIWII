@@ -83,6 +83,7 @@ namespace onetouch.AppDashboards.Dtos
         public string Field { get; set; }
         public string Operator { get; set; }
         public string Value { get; set; }
+        public string Value2 { get; set; }
     }
 
     public class DynamicQueryResult

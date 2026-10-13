@@ -155,11 +155,17 @@ namespace onetouch.AppDashboards
                     ? jValue.ToObject<object>()
                     : valueJson;
 
+                object valueJson2 = condition.Value2;
+                var value2 = valueJson2 is JValue jValue2
+                    ? jValue2.ToObject<object>()
+                    : valueJson2;
+
+
                 var parameterName = $"@p{index++}";
                 string expression;
 
                 switch (op)
-                {
+                {             
                     case "eq":
                         expression = $"{field} = {parameterName}";
                         break;
@@ -178,9 +184,25 @@ namespace onetouch.AppDashboards
                     case "lte":
                         expression = $"{field} <= {parameterName}";
                         break;
+                    case "startwith":
+                        expression = $"{field} LIKE {parameterName}";
+                        value = "" + value + "%";
+                        break;
                     case "contains":
                         expression = $"{field} LIKE {parameterName}";
                         value = "%" + value + "%";
+                        break;
+                    case "doesnotcontain":
+                        expression = $"{field} Not LIKE {parameterName}";
+                        value = "%" + value + "%";
+                        break;
+                    case "between":
+
+                        var parameterName2 = $"@p{index++}";
+                        expression = $"{field} Between {parameterName} AND {parameterName2}";
+                        value = "" + value +"";
+                        value2 = "" + value2 + "";
+                        parameters.Add(CreateParameter(parameterName2, value2));
                         break;
                     default:
                         throw new UserFriendlyException(
@@ -189,6 +211,8 @@ namespace onetouch.AppDashboards
 
                 where.Add(expression);
                 parameters.Add(CreateParameter(parameterName, value));
+
+                
             }
 
 
@@ -209,8 +233,8 @@ namespace onetouch.AppDashboards
             {
                 
                 whereSql += string.Format(" AND "+
-                    " (CreationTime >= '{0}' OR " +
-                " LastModificationTime >= '{0}') ",lastUpdateDate);
+                    " ([CreationTime] >= '{0}' OR " +
+                " [LastModificationTime] >= '{0}') ",lastUpdateDate);
             }
             // 5. Count matching records
             if (!tableName.ToUpper().Contains("Inner Join".ToUpper()))
