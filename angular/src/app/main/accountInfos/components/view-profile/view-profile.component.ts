@@ -601,6 +601,9 @@ this.editedPersonalData.entityExtraData = this.accountData.entityExtraData;
         this.getBooleanExtraDataValue(
             710
         );
+
+
+        this.setSelectedMarketplaceRoles();
 }
 
 private getExtraDataValue(
@@ -661,9 +664,6 @@ private getBooleanExtraDataValue(
 
     cancelPerAcc(): void {
 
-    /*
-     * CREATE
-     */
     if (this.createMode) {
 
         this.setPersonalData();
@@ -671,10 +671,6 @@ private getBooleanExtraDataValue(
         return;
     }
 
-
-    /*
-     * EDIT existing
-     */
 
     this.editInfo = true;
 
@@ -884,28 +880,24 @@ private getBooleanExtraDataValue(
 
 
 get marketplaceRolesList(): string[] {
+    const accountExtraData = this.accountData?.entityExtraData;
 
-    const extraData =
-        this.accountData?.entityExtraData ||
-        this.entityExtraData ||
-        [];
+    const extraData = accountExtraData?.length
+        ? accountExtraData
+        : this.entityExtraData || [];
 
-    const roleItem =
-        extraData.find(
-            x =>
-                x.attributeId === 610 ||
-                x.attributeCode ===
+    const roleItem = extraData.find(
+        x =>
+            Number(x.attributeId) === 610 ||
+            String(x.attributeCode || '').trim().toUpperCase() ===
                 'MARKETPLACE-ROLE'
-        );
+    );
 
-    return roleItem?.attributeValue
-        ? roleItem.attributeValue
-            .split('-')
-            .map(x => x.trim())
-            .filter(Boolean)
-        : [];
+    return String(roleItem?.attributeValue || '')
+        .split('-')
+        .map(role => role.trim())
+        .filter(Boolean);
 }
-
 
 
 // buildMarketplaceRolesExtraData(): AppEntityExtraDataDto[] {
@@ -1005,34 +997,24 @@ updateMarketplaceRolesExtraData(): void {
 
 
 setSelectedMarketplaceRoles(): void {
-
-    const extraData =
-        this.accountData?.entityExtraData ||
-        this.entityExtraData ||
-        [];
+    const isMarketplaceRole = (item: any): boolean =>
+        Number(item.attributeId) === 610 ||
+        String(item.attributeCode || '').trim().toUpperCase() ===
+            'MARKETPLACE-ROLE';
 
     const marketplaceRole =
-        extraData.find(
-            x =>
-                x.attributeId === 610 ||
-                x.attributeCode ===
-                'MARKETPLACE-ROLE'
-        );
+        this.accountData?.entityExtraData?.find(isMarketplaceRole) ??
+        this.entityExtraData?.find(isMarketplaceRole);
 
-    this.selectedRoles =
-        marketplaceRole?.attributeValue
-            ? marketplaceRole
-                .attributeValue
-                .split('-')
-                .map(x => x.trim())
-                .filter(Boolean)
-            : [];
+    this.selectedRoles = String(
+        marketplaceRole?.attributeValue ?? ''
+    )
+        .split('-')
+        .map(role => role.trim())
+        .filter(Boolean);
 
-    this.previousSelectedRoles = [
-        ...this.selectedRoles
-    ];
+    this.previousSelectedRoles = [...this.selectedRoles];
 }
-
 
 private enterPersonalEditMode(): void {
 
