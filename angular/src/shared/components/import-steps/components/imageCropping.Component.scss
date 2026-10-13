@@ -1,13 +1,25 @@
-.modalCenter{
-    margin: 0 !important;
-    top: 50% !important;
-    /* position: absolute !important; */
-    left: 50% !important;
-    transform: translate(-50%,-50%) !important;
+.modal.show,
+.modal.in {
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  overflow-y: auto;
+}
+
+.modal-dialog.modalCenter {
+  max-height: calc(100vh - 48px);
+  max-height: calc(100dvh - 48px);
+  margin: 24px auto !important;
+  top: auto !important;
+  left: auto !important;
+  transform: none !important;
 }
 .modal-content
 {
     width: 1020px;
+  max-height: calc(100vh - 48px);
+  max-height: calc(100dvh - 48px);
+  overflow-y: auto;
 }
 ._Btn
 {
