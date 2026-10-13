@@ -12,16 +12,13 @@ import { firstValueFrom } from 'rxjs';
 import { AppComponentBase } from '@shared/common/app-component-base';
 import {
     AppDashboardServiceProxy,
-    AppEntityExtraDataDto,
     DynamicCondition,
-    DynamicQueryResult,
     ExtraAttribute
 } from '@shared/service-proxies/service-proxies';
 import {
     FilterBuilderCondition,
     FilterBuilderField,
     SpreadsheetDataBatch,
-    SpreadsheetFilters,
     SpreadsheetSheetDataSource
 } from '../../models/dashboard.model';
 @Component({
@@ -52,7 +49,7 @@ export class SpreadsheetDataPanelComponent
     @Input() conditionFactory: ((filter: any) => DynamicCondition) | null = null;
 
 
-isEditMode = false;
+    isEditMode = false;
 
     onFilterValuesChanged(values: any[]): void {
         this.activeFilterValues = values;
@@ -77,11 +74,11 @@ isEditMode = false;
         AppTransactionHeaders: 'fa fa-exchange-alt'
     };
 
-     filterBuilderFields: FilterBuilderField[] = [];
+    filterBuilderFields: FilterBuilderField[] = [];
 
-selectedConditions: FilterBuilderCondition[] = [];
-showFilterDialog = false;
-selectedMatchMode: 'all' | 'any' = 'all';
+    selectedConditions: FilterBuilderCondition[] = [];
+    showFilterDialog = false;
+    selectedMatchMode: 'all' | 'any' = 'all';
     constructor(
         injector: Injector,
         private appDashboardService:
@@ -90,86 +87,86 @@ selectedMatchMode: 'all' | 'any' = 'all';
     ) {
         super(injector);
     }
-   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['visible'] && this.visible) {
-        if (this.editSource) {
-            void this.loadEditSource();
-        } else {
-            this.isEditMode = false;
-            this.getTablesList()
-            this.reset();
+    ngOnChanges(changes: SimpleChanges): void {
+        if (changes['visible'] && this.visible) {
+            if (this.editSource) {
+                void this.loadEditSource();
+            } else {
+                this.isEditMode = false;
+                this.getTablesList()
+                this.reset();
+            }
         }
     }
-}
 
-private async loadEditSource(): Promise<void> {
-    if (!this.editSource?.source) {
-        return;
+    private async loadEditSource(): Promise<void> {
+        if (!this.editSource?.source) {
+            return;
+        }
+
+        const source = this.editSource.source;
+
+        this.isEditMode = true;
+        this.showFilterDialog = false;
+        this.selectedTable = source.sourceKey || source.type;
+
+        const savedColumns: string[] = [...(source.columns ?? [])];
+
+        const filters = source.filters as {
+            conditions?: FilterBuilderCondition[];
+        } | null;
+
+        const savedConditions: FilterBuilderCondition[] =
+            (filters?.conditions ?? []).map(condition => ({
+                field: condition.field,
+                operator: condition.operator,
+                value: condition.value
+            }));
+
+        this.selectedColumns = [];
+        this.selectedConditions = [];
+        this.tableColumns = [];
+        this.filterBuilderFields = [];
+
+        try {
+            await this.loadEditTableFields(this.selectedTable);
+
+            this.selectedColumns = this.tableColumns.filter(column =>
+                savedColumns.includes(column.name)
+            );
+
+            this.selectedConditions = savedConditions;
+            this.selectedMatchMode = 'all';
+            this.step = 2;
+
+            this.cdr.detectChanges();
+        } catch (error) {
+            console.error('Failed to load existing list data:', error);
+            this.loadingFailed.emit(error);
+        }
     }
+    private async loadEditTableFields(tableName: string): Promise<void> {
+        this.isLoadingColumns = true;
 
-    const source = this.editSource.source;
+        try {
+            const result: ExtraAttribute[] = await firstValueFrom(
+                this.appDashboardService.getTableFieldsList(tableName)
+            );
 
-    this.isEditMode = true;
-    this.showFilterDialog = false;
-    this.selectedTable = source.sourceKey || source.type;
+            this.tableColumns = result ?? [];
+            this.filterFields = [...this.tableColumns];
 
-    const savedColumns: string[] = [...(source.columns ?? [])];
-
-    const filters = source.filters as {
-        conditions?: FilterBuilderCondition[];
-    } | null;
-
-    const savedConditions: FilterBuilderCondition[] =
-        (filters?.conditions ?? []).map(condition => ({
-            field: condition.field,
-            operator: condition.operator,
-            value: condition.value
-        }));
-
-    this.selectedColumns = [];
-    this.selectedConditions = [];
-    this.tableColumns = [];
-    this.filterBuilderFields = [];
-
-    try {
-        await this.loadEditTableFields(this.selectedTable);
-
-        this.selectedColumns = this.tableColumns.filter(column =>
-            savedColumns.includes(column.name)
-        );
-
-        this.selectedConditions = savedConditions;
-        this.selectedMatchMode = 'all';
-        this.step = 2;
-
-        this.cdr.detectChanges();
-    } catch (error) {
-        console.error('Failed to load existing list data:', error);
-        this.loadingFailed.emit(error);
+            this.filterBuilderFields = this.tableColumns.map(field => ({
+                name: field.name,
+                label: field.description || field.name,
+                dataType: field.dataType || 'String--Textbox',
+                options: this.mapValidEntries(field.validEntries),
+                acceptMultipleValues: field.acceptMultipleValues === true
+            }));
+        } finally {
+            this.isLoadingColumns = false;
+        }
     }
-}
-private async loadEditTableFields(tableName: string): Promise<void> {
-    this.isLoadingColumns = true;
-
-    try {
-        const result: ExtraAttribute[] = await firstValueFrom(
-            this.appDashboardService.getTableFieldsList(tableName)
-        );
-
-        this.tableColumns = result ?? [];
-        this.filterFields = [...this.tableColumns];
-
-        this.filterBuilderFields = this.tableColumns.map(field => ({
-            name: field.name,
-            label: field.description || field.name,
-            dataType: field.dataType || 'String--Textbox',
-            options: this.mapValidEntries(field.validEntries),
-            acceptMultipleValues: field.acceptMultipleValues === true
-        }));
-    } finally {
-        this.isLoadingColumns = false;
-    }
-}
     getTablesList(): void {
         this.isLoadingTables = true;
         this.appDashboardService
@@ -211,17 +208,17 @@ private async loadEditTableFields(tableName: string): Promise<void> {
                 next: (
                     result: ExtraAttribute[]
                 ) => {
-                   this.tableColumns = result ?? [];
-this.selectedColumns = [...this.tableColumns];
-this.filterFields = [...this.tableColumns];
+                    this.tableColumns = result ?? [];
+                    this.selectedColumns = [...this.tableColumns];
+                    this.filterFields = [...this.tableColumns];
 
-this.filterBuilderFields = this.filterFields.map((field: any) => ({
-    name: field.name,
-    label: field.description || field.name,
-    dataType: field.dataType || 'String--Textbox',
-    options: this.mapValidEntries(field.validEntries),
-    acceptMultipleValues: field.acceptMultipleValues === true
-}));
+                    this.filterBuilderFields = this.filterFields.map((field: any) => ({
+                        name: field.name,
+                        label: field.description || field.name,
+                        dataType: field.dataType || 'String--Textbox',
+                        options: this.mapValidEntries(field.validEntries),
+                        acceptMultipleValues: field.acceptMultipleValues === true
+                    }));
                     this.isLoadingColumns = false;
                     this.cdr.detectChanges();
                 },
@@ -237,66 +234,67 @@ this.filterBuilderFields = this.filterFields.map((field: any) => ({
             });
     }
     private mapValidEntries(entries: any): Array<{ label: string; value: any }> {
-    if (!entries) {
-        return [];
-    }
-
-    let values = entries;
-
-    if (typeof values === 'string') {
-        try {
-            values = JSON.parse(values);
-        } catch {
-            values = values.split(',').map((value: string) => value.trim());
+        if (!entries) {
+            return [];
         }
-    }
 
-    if (!Array.isArray(values)) {
-        return [];
-    }
+        let values = entries;
 
-    return values.map((item: any) => {
-        if (typeof item !== 'object' || item === null) {
+        if (typeof values === 'string') {
+            try {
+                values = JSON.parse(values);
+            } catch {
+                values = values.split(',').map((value: string) => value.trim());
+            }
+        }
+
+        if (!Array.isArray(values)) {
+            return [];
+        }
+
+        return values.map((item: any) => {
+            if (typeof item !== 'object' || item === null) {
+                return {
+                    label: String(item),
+                    value: item
+                };
+            }
+
             return {
-                label: String(item),
-                value: item
+                label: String(
+                    item.label ??
+                    item.description ??
+                    item.name ??
+                    item.text ??
+                    item.value ??
+                    item.code ??
+                    item.id
+                ),
+                value:
+                    item.value ??
+                    item.code ??
+                    item.id ??
+                    item.name
             };
-        }
-
-        return {
-            label: String(
-                item.label ??
-                item.description ??
-                item.name ??
-                item.text ??
-                item.value ??
-                item.code ??
-                item.id
-            ),
-            value:
-                item.value ??
-                item.code ??
-                item.id ??
-                item.name
-        };
-    });
-}
-    backToEntities(): void {
-        if (this.isAdding) {
-            return;
-        }
-        this.step = 1;
-        this.selectedTable = '';
-        this.tableColumns = [];
-        this.selectedColumns = [];
-        this.filterValues = {};
-        this.filters = [];
-        this.filterFields = [];
-        this.activeFilterValues = [];
+        });
     }
-   getColumnKey(column: ExtraAttribute): string {
-    return column?.name ?? '';
+   backToEntities(): void {
+    if (this.isAdding || this.isEditMode) {
+        return;
+    }
+
+    this.step = 1;
+    this.selectedTable = '';
+    this.tableColumns = [];
+    this.selectedColumns = [];
+    this.filterValues = {};
+    this.filters = [];
+    this.filterFields = [];
+    this.activeFilterValues = [];
 }
+    getColumnKey(column: ExtraAttribute): string {
+        return column?.name ?? '';
+    }
     getColumnLabel(
         column: ExtraAttribute
     ): string {
@@ -350,167 +348,167 @@ this.filterBuilderFields = this.filterFields.map((field: any) => ({
 
 
 
-private gatherConditions(): DynamicCondition[] {
-    return this.selectedConditions.map(condition => {
-        const dto = new DynamicCondition();
+    private gatherConditions(): DynamicCondition[] {
+        return this.selectedConditions.map(condition => {
+            const dto = new DynamicCondition();
 
-        dto.field = condition.field;
-        dto.operator = condition.operator;
-        dto.value = this.formatConditionValue(condition.value);
+            dto.field = condition.field;
+            dto.operator = condition.operator;
+            dto.value = this.formatConditionValue(condition.value);
 
-        return dto;
-    });
-}
-
-/** Dates -> "yyyy-MM-dd", everything else -> string (matches the API format). */
-private formatConditionValue(value: any): string {
-    if (value instanceof Date) {
-        const y = value.getFullYear();
-        const m = String(value.getMonth() + 1).padStart(2, '0');
-        const d = String(value.getDate()).padStart(2, '0');
-        return `${y}-${m}-${d}`;
+            return dto;
+        });
     }
 
-    return String(value);
-}
+    /** Dates -> "yyyy-MM-dd", everything else -> string (matches the API format). */
+    private formatConditionValue(value: any): string {
+        if (value instanceof Date) {
+            const y = value.getFullYear();
+            const m = String(value.getMonth() + 1).padStart(2, '0');
+            const d = String(value.getDate()).padStart(2, '0');
+            return `${y}-${m}-${d}`;
+        }
 
-
-async addSheet(): Promise<void> {
-
-    if (
-        !this.selectedTable ||
-        !this.selectedColumns.length ||
-        this.isAdding
-    ) {
-        return;
+        return String(value);
     }
 
-    const tenantId = this.appSession?.tenantId;
 
-    const selectedFields: string[] = this.selectedColumns
-        .map(column => column.name)
-        .filter((field): field is string => !!field);
+    async addSheet(): Promise<void> {
 
-    const requestFields: string[] = [...selectedFields];
+        if (
+            !this.selectedTable ||
+            !this.selectedColumns.length ||
+            this.isAdding
+        ) {
+            return;
+        }
 
-    if (!requestFields.some(field => field.toLowerCase() === 'id')) {
-        requestFields.push('Id');
-    }
+        const tenantId = this.appSession?.tenantId;
 
-    const conditions = this.gatherConditions();
+        const selectedFields: string[] = this.selectedColumns
+            .map(column => column.name)
+            .filter((field): field is string => !!field);
 
-    let skip = 0;
-    let loaded = 0;
-    let firstBatch = true;
+        const requestFields: string[] = [...selectedFields];
 
-    this.isAdding = true;
+        if (!requestFields.some(field => field.toLowerCase() === 'id')) {
+            requestFields.push('Id');
+        }
 
-    try {
+        const conditions = this.gatherConditions();
 
-        while (true) {
+        let skip = 0;
+        let loaded = 0;
+        let firstBatch = true;
 
-            const result: any = await firstValueFrom(
-                this.appDashboardService.getAllTableData(
-                    tenantId,
-                    this.selectedTable,
-                    requestFields,
-                    conditions,
-                    undefined,
-                    undefined,
-                    skip,
-                    this.batchSize
-                )
+        this.isAdding = true;
+
+        try {
+
+            while (true) {
+
+                const result: any = await firstValueFrom(
+                    this.appDashboardService.getAllTableData(
+                        tenantId,
+                        this.selectedTable,
+                        requestFields,
+                        conditions,
+                        undefined,
+                        undefined,
+                        skip,
+                        this.batchSize
+                    )
+                );
+
+                const records: any[] = result?.items ?? [];
+                const total = Number(result?.totalCount ?? 0);
+
+                if (!records.length) {
+                    break;
+                }
+
+                const rows = this.buildRows(records);
+
+                if (firstBatch) {
+                    console.log(
+                        '[Spreadsheet] Backend columns:',
+                        Object.keys(records[0] ?? {})
+                    );
+
+                    console.log(
+                        '[Spreadsheet] Emitted columns:',
+                        Object.keys(rows[0] ?? {})
+                    );
+                }
+
+                loaded += records.length;
+
+                const isLastBatch =
+                    records.length < this.batchSize ||
+                    (total > 0 && loaded >= total);
+
+                this.batchLoaded.emit({
+                    table: this.selectedTable,
+                    fields: [...selectedFields],
+                    selectedColumns: [...this.selectedColumns],
+                    conditions: [...conditions],
+                    rows,
+                    loaded,
+                    total,
+                    isFirstBatch: firstBatch,
+                    isLastBatch
+                } as SpreadsheetDataBatch);
+
+                await this.waitForPaint();
+
+                firstBatch = false;
+                skip += records.length;
+
+                if (isLastBatch) {
+                    break;
+                }
+            }
+
+            if (loaded === 0) {
+                this.notify.info('No records found.');
+            }
+
+        } catch (error) {
+            console.error(
+                '[Spreadsheet Data Panel] load failed:',
+                error
             );
 
-            const records: any[] = result?.items ?? [];
-            const total = Number(result?.totalCount ?? 0);
+            this.loadingFailed.emit(error);
 
-            if (!records.length) {
-                break;
-            }
-
-            const rows = this.buildRows(records);
-
-            if (firstBatch) {
-                console.log(
-                    '[Spreadsheet] Backend columns:',
-                    Object.keys(records[0] ?? {})
-                );
-
-                console.log(
-                    '[Spreadsheet] Emitted columns:',
-                    Object.keys(rows[0] ?? {})
-                );
-            }
-
-            loaded += records.length;
-
-            const isLastBatch =
-                records.length < this.batchSize ||
-                (total > 0 && loaded >= total);
-
-            this.batchLoaded.emit({
-                table: this.selectedTable,
-                fields: [...selectedFields],
-                selectedColumns: [...this.selectedColumns],
-                conditions: [...conditions],
-                rows,
-                loaded,
-                total,
-                isFirstBatch: firstBatch,
-                isLastBatch
-            } as SpreadsheetDataBatch);
-
-            await this.waitForPaint();
-
-            firstBatch = false;
-            skip += records.length;
-
-            if (isLastBatch) {
-                break;
-            }
+        } finally {
+            this.isAdding = false;
+            this.cdr.detectChanges();
         }
-
-        if (loaded === 0) {
-            this.notify.info('No records found.');
-        }
-
-    } catch (error) {
-        console.error(
-            '[Spreadsheet Data Panel] load failed:',
-            error
-        );
-
-        this.loadingFailed.emit(error);
-
-    } finally {
-        this.isAdding = false;
-        this.cdr.detectChanges();
     }
-}
 
 
-   private buildRows(records: { [key: string]: any }[]): any[] {
-    return records.map(record => {
-        const row: any = {};
+    private buildRows(records: { [key: string]: any }[]): any[] {
+        return records.map(record => {
+            const row: any = {};
 
-        // Always include Id as the first column.
-        row['Id'] = this.getRecordValue(record, 'Id');
+            // Always include Id as the first column.
+            row['Id'] = this.getRecordValue(record, 'Id');
 
-        // Include the selected fields after Id.
-        this.selectedColumns.forEach(column => {
-            const field = this.getColumnKey(column);
+            // Include the selected fields after Id.
+            this.selectedColumns.forEach(column => {
+                const field = this.getColumnKey(column);
 
-            if (!field || field.toLowerCase() === 'id') {
-                return;
-            }
+                if (!field || field.toLowerCase() === 'id') {
+                    return;
+                }
 
-            row[field] = this.getRecordValue(record, field);
+                row[field] = this.getRecordValue(record, field);
+            });
+
+            return row;
         });
-
-        return row;
-    });
-}
+    }
     private getRecordValue(
         record: any,
         key: string
@@ -647,26 +645,26 @@ async addSheet(): Promise<void> {
 
 
     openFilterDialog(): void {
-    if (this.isAdding) {
-        return;
+        if (this.isAdding) {
+            return;
+        }
+
+        this.showFilterDialog = true;
     }
 
-    this.showFilterDialog = true;
-}
+    closeFilterDialog(): void {
+        this.showFilterDialog = false;
+    }
 
-closeFilterDialog(): void {
-    this.showFilterDialog = false;
-}
+    onFiltersApplied(conditions: FilterBuilderCondition[]): void {
+        this.selectedConditions = conditions;
+        this.showFilterDialog = false;
+    }
 
-onFiltersApplied(conditions: FilterBuilderCondition[]): void {
-    this.selectedConditions = conditions;
-    this.showFilterDialog = false;
-}
-   
 
-onFilterMatchModeChanged(mode: 'all' | 'any'): void {
-    this.selectedMatchMode = mode;
-}
+    onFilterMatchModeChanged(mode: 'all' | 'any'): void {
+        this.selectedMatchMode = mode;
+    }
     reset(): void {
         this.step = 1;
         this.selectedTable = '';
@@ -678,10 +676,10 @@ onFilterMatchModeChanged(mode: 'all' | 'any'): void {
         this.activeFilterValues = [];
         this.isLoadingColumns = false;
         this.selectedConditions = [];
-this.filterBuilderFields = [];
-this.selectedMatchMode = 'all';
-this.showFilterDialog = false;
-this.isEditMode = false;
+        this.filterBuilderFields = [];
+        this.selectedMatchMode = 'all';
+        this.showFilterDialog = false;
+        this.isEditMode = false;
     }
 
 

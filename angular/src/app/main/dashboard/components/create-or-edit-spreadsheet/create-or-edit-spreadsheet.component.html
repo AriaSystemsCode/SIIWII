@@ -141,7 +141,7 @@
         <!-- ================= ADD DATA PANEL ================= -->
      <app-spreadsheet-data-panel
     [visible]="showDataPanel"
-    [editSource]="editingSheetName ? activeSheetSource : null"
+    [editSource]="editingSheetSource"
     (close)="closeDataPanel()"
     (batchLoaded)="onDataBatchLoaded($event)"
     (loadingFailed)="onDataLoadingFailed($event)">
