@@ -14,7 +14,7 @@ namespace onetouch.AppFields.Dto
 
     public class FieldCodePreviewDto
     {
-        public string FieldCode { get; set; }
+        public string Sequence { get; set; }
     }
 
     public class CreateOrEditFieldInput
@@ -71,6 +71,26 @@ namespace onetouch.AppFields.Dto
         [Range(1, long.MaxValue)] public long AppFieldId { get; set; }
         [Range(1, long.MaxValue)] public long SycObjectId { get; set; }
         public long? SycEntityObjectTypeId { get; set; }
+    }
+
+    public class GetUnlinkedFieldsInput : PagedAndSortedResultRequestDto
+    {
+        [Range(1, long.MaxValue)] public long TableId { get; set; }
+        public long? SycEntityObjectTypeId { get; set; }
+        public string SearchText { get; set; }
+    }
+
+    public class LinkExistingFieldsInput
+    {
+        [Range(1, long.MaxValue)] public long TableId { get; set; }
+        public long? SycEntityObjectTypeId { get; set; }
+        [Required, MinLength(1)] public List<long> AppFieldIds { get; set; }
+    }
+
+    public class LinkExistingFieldsResultDto
+    {
+        public int LinkedCount { get; set; }
+        public int AlreadyLinkedCount { get; set; }
     }
 
     public class SyncFieldSnapshotsInput
@@ -147,6 +167,19 @@ namespace onetouch.AppFields.Dto
     {
         public AppFieldDto Field { get; set; }
         public FieldEditPermissionDto Permissions { get; set; }
+    }
+
+    public class AppFieldHistoryDto
+    {
+        public long Id { get; set; }
+        public long AppFieldId { get; set; }
+        public Guid FieldDefinitionKey { get; set; }
+        public string RevisionNo { get; set; }
+        public string ChangeType { get; set; }
+        public AppFieldDto Field { get; set; }
+        public DateTime ChangedAt { get; set; }
+        public long? ChangedBy { get; set; }
+        public string RestoredFromRevisionNo { get; set; }
     }
 
     public class FieldManagerPermissionDto

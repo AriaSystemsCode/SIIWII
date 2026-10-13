@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Abp.Domain.Entities;
@@ -6,7 +7,7 @@ using Abp.Domain.Entities.Auditing;
 
 namespace onetouch.AppFields
 {
-    [Table("APPFields")]
+    [Table("AppFields")]
     public class AppField : FullAuditedEntity<long>, IMayHaveTenant
     {
         public int? TenantId { get; set; }
@@ -65,7 +66,16 @@ namespace onetouch.AppFields
         public bool Visible { get; set; }
         public bool Editable { get; set; }
 
-        // Type-specific attributes (for example dropdown options) are JSON.
-        public string ExtraAttributes { get; set; }
+        public long? SourceAttributeId { get; set; }
+        [StringLength(100)] public string SourceDataType { get; set; }
+        public long? SourceEntityObjectTypeId { get; set; }
+        [StringLength(100)] public string EntityObjectTypeCode { get; set; }
+        [StringLength(500)] public string Usage { get; set; }
+        public bool? IsLookup { get; set; }
+        public bool? IsVariation { get; set; }
+        public bool? IsAdvancedSearch { get; set; }
+        public bool? AcceptMultipleValues { get; set; }
+        public bool? AllowAddNew { get; set; }
+        public ICollection<AppFieldDropdownOption> DropdownOptions { get; set; } = new List<AppFieldDropdownOption>();
     }
 }

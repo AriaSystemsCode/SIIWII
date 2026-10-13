@@ -2,7 +2,11 @@
 
 Base path: `/api/services/app/AppFieldManager`. JSON names below use the camel case returned to Angular. Successful ABP responses place the endpoint payload in `result`.
 
-Database prerequisite: apply `20261006120000_SnapshotAppTableFields` after the earlier `APPFields` and `AppTableFields` migrations and seed scripts. It backfills immutable definition keys and table snapshots, then removes `AppTableFields.AppFieldId` and its foreign key.
+The existing `/api/services/app/SycEntityObjectTypes/GetAllWithExtraAttributes` endpoint also accepts an optional `source` enum query parameter. `source=0` (`Xml`, the default) preserves its original `SycEntityObjectTypes.ExtraAttributes` XML behavior. `source=1` (`AppFields`) returns only `IsExtraField` definitions from the selected type's effective `AppTableFields` snapshots, including base-object assignments reached through `SydObjects.BaseEntityId`. The response keeps the existing `extraAttributes.extraAttributes[]` shape. Callers that omit `source` continue receiving XML attributes. No FE proxy change is required for existing calls; regenerate NSwag before passing the new parameter through the generated proxy.
+
+Field Manager now stores the settings carried by its `extraAttributes` API property in typed columns on `AppFields`, `AppFieldsHistory`, and `AppTableFields`. Dropdown choices are child rows in `AppFieldDropdownOptions`, `AppFieldHistoryDropdownOptions`, and `AppTableFieldDropdownOptions`. The request and response JSON property remains for the existing FE; migration `20261012130000_NormalizeFieldExtraAttributes` moves existing values and drops the three database `ExtraAttributes` columns. The `source=0` XML metadata on `SycEntityObjectTypes` is unaffected.
+
+Database prerequisite: apply the Field Manager migrations through `20261012120000_TypedAppTableFields`. The earlier snapshot migration removes `AppTableFields.AppFieldId` and its foreign key; the new migration moves the copied definition into typed `AppTableFields` columns and removes `SnapshotJson`. The catalog table was renamed from `APPFields` to `AppFields` without changing its rows.
 The previous assignment table did not record an applied revision, so migration backfill snapshots the catalog definition as it exists when the migration runs.
 
 ## 1. `GetPagePermissions`
@@ -67,7 +71,7 @@ The previous assignment table did not record an applied revision, so migration b
 
 ## 4. `PreviewFieldCode`
 
-**API description:** Calculates the code to display before save. The 11-character code is two field-type characters, one field-level character (`S`, `A`, or `T`), four characters from the field name, and a four-digit sequence per field type. This preview does not reserve the sequence; the save endpoint recalculates it.
+**API description:** Returns only the next four-digit sequence for the selected field type. The 11-character code saved by `CreateOrEditField` is two field-type characters, one field-level character (`S`, `A`, or `T`), four characters from the field name, and this sequence. The preview does not reserve the sequence; the save endpoint recalculates it.
 
 **API request:** `POST /PreviewFieldCode` with a JSON body.
 
@@ -81,18 +85,18 @@ The previous assignment table did not record an applied revision, so migration b
 
 | Response attribute | Description |
 | --- | --- |
-| `result.fieldCode` | Calculated 11-character field code for display. |
+| `result.sequence` | Proposed four-digit sequence, such as `0001`, for this field type. |
 
 ## 5. `GetFields`
 
-**API description:** Returns a paged list of fields. All Fields lists catalog definitions and aggregates table usage by immutable `fieldDefinitionKey`; a soft-deleted definition still used by a table appears as `Archived` and is read-only. Selecting an object or object type reads the applied `AppTableFields` snapshots, including inherited base-object fields. Snapshots keep their applied revision when the catalog definition is edited.
+**API description:** Returns a paged list of fields. All Fields lists catalog definitions and aggregates direct and inherited table usage by immutable `fieldDefinitionKey`; a soft-deleted definition still used by a table appears as `Archived` and is read-only. Selecting an object or object type reads its applied `AppTableFields` snapshots plus base-object snapshots reached through `SydObjects.BaseEntityId`. Base fields remain assigned only to the base object. A selected object's own snapshot takes precedence when the same logical field is assigned at both levels. Snapshots keep their applied revision when the catalog definition is edited.
 
 **API request:** `GET /GetFields` with query parameters.
 
 | Request parameter | Description |
 | --- | --- |
-| `selectedObjectId` (number, optional) | `SydObject` ID from a tree entity or data-object node. Filters to fields assigned directly to that object. |
-| `selectedObjectTypeId` (number, optional) | `SycEntityObjectType` ID from a tree object-type node. Takes precedence over `selectedObjectId`; includes base-object assignments. |
+| `selectedObjectId` (number, optional) | `SydObject` ID from a tree entity or data-object node. Includes fields assigned to that object and its `BaseEntityId` chain. |
+| `selectedObjectTypeId` (number, optional) | `SycEntityObjectType` ID from a tree object-type node. Takes precedence over `selectedObjectId`; includes its object's fields and inherited base-entity fields. |
 | `allFields` (boolean, optional; default `true`) | `true` returns all matching fields; `false` returns only extra fields. |
 | `searchText` (string, optional) | Searches field code, name, description, and tracking number. |
 | `fieldTypeId` (number, optional) | Filter by field type ID. |
@@ -116,7 +120,7 @@ The previous assignment table did not record an applied revision, so migration b
 | --- | --- |
 | `result.totalCount` | Total number of matching fields before pagination. |
 | `result.items[]` | Fields on the requested page. |
-| `result.items[].id` | Original `APPFields` record ID from the definition or applied snapshot. Archived rows are read-only. |
+| `result.items[].id` | Original `AppFields` record ID from the definition or applied snapshot. Archived rows are read-only. |
 | `result.items[].fieldDefinitionKey` | Immutable logical key used to read an applied snapshot with `GetAppliedField`. |
 | `result.items[].fieldCode` | Generated field code. |
 | `result.items[].fieldName` | Field name. |
@@ -140,11 +144,11 @@ The previous assignment table did not record an applied revision, so migration b
 | `result.items[].creatorUserId` | Creator user ID, if recorded. |
 | `result.items[].creatorUserName` | Creator's full name, if the user record is available. |
 | `result.items[].creationTime` | Creation date/time. |
-| `result.items[].tables[]` | Names of every visible object or object type using this logical field, matched by `fieldDefinitionKey` without a foreign key to `APPFields`. |
+| `result.items[].tables[]` | Names of every visible object or object type using this logical field, matched by `fieldDefinitionKey` without a foreign key to `AppFields`. |
 
 ## 6. `AssignExistingField`
 
-**API description:** Copies the current visible, non-discontinued definition into an independent table snapshot for a base object or object type. Repeating an existing assignment succeeds without adding another row.
+**API description:** Copies the current visible, non-discontinued definition into an independent table snapshot for a base object or object type. A field already available from the object's `BaseEntityId` chain is treated as assigned; no duplicate row is added.
 
 **API request:** `POST /AssignExistingField` with a JSON body.
 
@@ -161,6 +165,42 @@ The previous assignment table did not record an applied revision, so migration b
 | `result.success` | `true` when the assignment exists after the call. |
 | `result.message` | `Field assigned.` or `Field is already assigned.` |
 
+### `GetUnlinkedFields`
+
+**API description:** Lists visible, active field definitions in `AppFields` that are not yet applied to a data table. Fields inherited from the table's `BaseEntityId` chain are treated as linked, as are base-table fields for an object-type node. Requires the Add Existing Field permission.
+
+**API request:** `GET /GetUnlinkedFields?tableId=45&sycEntityObjectTypeId=123&skipCount=0&maxResultCount=10`. Omit `sycEntityObjectTypeId` for the base table.
+
+| Request parameter | Description |
+| --- | --- |
+| `tableId` (number, required) | `SydObjects.Id` of a `DATA` object, such as AppTransactionHeaders. |
+| `sycEntityObjectTypeId` (number or `null`, optional) | Object-type ID for Sales/Purchase or another subtype; must belong to `tableId`. |
+| `searchText` (string, optional) | Searches field code, name, and description. |
+| `skipCount` (number, optional) | Number of matching fields to skip. |
+| `maxResultCount` (number, optional) | Page size; defaults to 10. |
+| `sorting` (string, optional) | Uses the same field sort names as `GetFields`. |
+
+**API response:** `result.totalCount` is the number of available definitions; `result.items[]` contains the complete `AppFieldDto` attributes documented below. Soft-deleted, hidden, discontinued, and already linked fields are excluded.
+
+### `LinkExistingFields`
+
+**API description:** Adds several current `AppFields` definitions to one data table in a single transaction. Each new `AppTableFields` row keeps its own field snapshot. Fields already applied to the selected node, including fields inherited through `BaseEntityId`, are skipped. An invalid or unavailable field rejects the entire request. Requires the Add Existing Field permission.
+
+**API request:** `POST /LinkExistingFields` with a JSON body, for example `{ "tableId": 45, "sycEntityObjectTypeId": 123, "appFieldIds": [10, 11] }`.
+
+| Request parameter | Description |
+| --- | --- |
+| `tableId` (number, required) | `SydObjects.Id` of the target `DATA` object. |
+| `sycEntityObjectTypeId` (number or `null`, optional) | Target subtype ID; omit or send `null` for the base table. |
+| `appFieldIds` (number array, required) | Positive `AppFields.Id` values to link; duplicates are counted once. |
+
+**API response:**
+
+| Response attribute | Description |
+| --- | --- |
+| `result.linkedCount` | Number of new `AppTableFields` snapshots created. |
+| `result.alreadyLinkedCount` | Number of distinct requested fields already applied to this node. |
+
 ## 7. `GetFieldForEdit`
 
 **API description:** Returns one visible field and the actions permitted for that field. Tenant editing of a host field requires a tenant copy on save.
@@ -169,7 +209,7 @@ The previous assignment table did not record an applied revision, so migration b
 
 | Request parameter | Description |
 | --- | --- |
-| `id` (number, required) | `APPFields` record ID. |
+| `id` (number, required) | `AppFields` record ID. |
 
 **API response:**
 
@@ -190,7 +230,7 @@ The previous assignment table did not record an applied revision, so migration b
 
 | Request parameter | Description |
 | --- | --- |
-| `id` (number or `null`, optional) | Existing `APPFields` ID to edit; omit or send `null` to create. |
+| `id` (number or `null`, optional) | Existing `AppFields` ID to edit; omit or send `null` to create. |
 | `sycObjectId` (number, required) | Source `SydObject` ID. Cannot change on edit. |
 | `entitySycObjectId` (number or `null`, optional) | Related entity `SydObject` ID. |
 | `selectedObjectTypeId` (number or `null`, optional) | On create, assign the field to this object type; must belong to `sycObjectId`. Omit for base-object assignment. Not used to change assignment on edit. |
@@ -266,7 +306,7 @@ The previous assignment table did not record an applied revision, so migration b
 
 ## 12. `SyncFieldSnapshots`
 
-**API description:** Applies the current `APPFields` revision to the field's existing table snapshots. The field's old snapshots stay unchanged until this endpoint is called. A tenant can sync only its own field and table snapshots.
+**API description:** Applies the current `AppFields` revision to the field's existing table snapshots. The field's old snapshots stay unchanged until this endpoint is called. A tenant can sync only its own field and table snapshots.
 
 **API request:** `POST /SyncFieldSnapshots` with a JSON body.
 
@@ -280,7 +320,7 @@ The previous assignment table did not record an applied revision, so migration b
 
 ## 13. `GetAppliedField`
 
-**API description:** Returns the full definition snapshot applied to an object or object type. The type-specific snapshot takes precedence over a base-object snapshot with the same definition key. This endpoint reads `AppTableFields` and still works after the catalog definition is soft-deleted.
+**API description:** Returns the full definition snapshot applied to an object or object type, including snapshots inherited through `SydObjects.BaseEntityId`. The selected object's snapshot takes precedence over an inherited one with the same definition key; within the same object, the type-specific snapshot takes precedence. This endpoint reads `AppTableFields` and still works after the catalog definition is soft-deleted.
 
 **API request:** `GET /GetAppliedField` with query parameters.
 
@@ -288,9 +328,33 @@ The previous assignment table did not record an applied revision, so migration b
 | --- | --- |
 | `fieldDefinitionKey` (GUID, required) | Immutable logical key of the applied field. |
 | `sycObjectId` (number, required) | Object that uses the field. |
-| `sycEntityObjectTypeId` (number or `null`, optional) | Selected object type; includes its base-object snapshot when no type-specific snapshot exists. |
+| `sycEntityObjectTypeId` (number or `null`, optional) | Selected object type; includes its object's and base-entity snapshots when no type-specific snapshot exists. |
 
 **API response:** `result` is the applied revision of the complete `AppFieldDto` below. It is a read-only snapshot; editing continues through `CreateOrEditField` on the catalog definition.
+
+## 14. `GetFieldHistory`
+
+**API description:** Returns the saved `AppFieldsHistory` rows for one visible field, newest first. It also works for a soft-deleted field that still has table assignments. The current revision is returned only if it has been saved to history; the current definition remains available through `GetFieldForEdit`.
+
+**API request:** `GET /GetFieldHistory?appFieldId=123`.
+
+| Request parameter | Description |
+| --- | --- |
+| `appFieldId` (number, required) | `AppFields.Id` of the field whose revision history is requested. |
+
+**API response:** `result` is an array; it is empty when the visible field has no saved history rows.
+
+| Response attribute | Description |
+| --- | --- |
+| `result[].id` | `AppFieldsHistory.Id` of the history row. |
+| `result[].appFieldId` | `AppFields.Id` associated with the revision. |
+| `result[].fieldDefinitionKey` | Stable logical field key shared by all revisions and table snapshots. |
+| `result[].revisionNo` | Revision number captured in this history row. |
+| `result[].changeType` | Recorded action, such as `Create`, `Edit`, or `Delete`. |
+| `result[].field` | Typed field definition captured for this revision. Its attributes match the `AppFieldDto` response documented below; `field.id` is the original `AppFields.Id`. |
+| `result[].changedAt` | UTC time when the history row was recorded. |
+| `result[].changedBy` | User ID that recorded the change, when available. |
+| `result[].restoredFromRevisionNo` | Source revision when a revision was restored, if applicable. |
 
 ## AppFieldDto response attributes
 
@@ -298,7 +362,7 @@ This is the complete `result` field returned by `CreateOrEditField` and `Duplica
 
 | Response attribute | Description |
 | --- | --- |
-| `id` | `APPFields` record ID. |
+| `id` | `AppFields` record ID. |
 | `sycObjectId` | Source `SydObject` ID. |
 | `entitySycObjectId` | Related entity object's ID, if set. |
 | `selectedObjectTypeId` | Currently `null` in this DTO; assignments are stored separately and this response does not populate it. |

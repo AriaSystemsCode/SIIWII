@@ -1,6 +1,7 @@
 -- Iteration 51: field assignments and order-header tree placement.
 -- Run after 20260930185118_AddAppFieldsFieldManager / Create_APPFields_and_History.sql.
 SET XACT_ABORT ON;
+BEGIN TRY
 BEGIN TRANSACTION;
 
 IF OBJECT_ID(N'dbo.APPFields', N'U') IS NULL
@@ -40,8 +41,42 @@ FROM dbo.APPFields AS f
 WHERE f.IsDeleted = 0
   AND NOT EXISTS (SELECT 1 FROM dbo.AppTableFields AS a WHERE a.AppFieldId = f.Id);
 
-DECLARE @headerId bigint = (SELECT Id FROM dbo.SydObjects WHERE Code = N'TRANSACTION-HEADER-DATA' AND IsDeleted = 0);
-DECLARE @transactionId bigint = (SELECT Id FROM dbo.SydObjects WHERE Code = N'TRANSACTION' AND IsDeleted = 0);
+IF (SELECT COUNT(*) FROM dbo.SysObjectTypes WHERE Code = N'ENTITY' AND IsDeleted = 0) <> 1
+    OR (SELECT COUNT(*) FROM dbo.SysObjectTypes WHERE Code = N'DATA' AND IsDeleted = 0) <> 1
+    THROW 51053, 'Expected one active ENTITY and DATA object type.', 1;
+DECLARE @entityTypeId bigint = (SELECT Id FROM dbo.SysObjectTypes WHERE Code = N'ENTITY' AND IsDeleted = 0);
+DECLARE @dataTypeId bigint = (SELECT Id FROM dbo.SysObjectTypes WHERE Code = N'DATA' AND IsDeleted = 0);
+IF EXISTS (SELECT 1 FROM dbo.SydObjects
+    WHERE (Code = N'TRANSACTION' OR Name = N'Transaction')
+      AND NOT (Code = N'TRANSACTION' AND ObjectTypeId = @entityTypeId
+          AND ObjectTypeCode = N'ENTITY' AND ParentId IS NULL
+          AND ParentCode IS NULL AND IsDeleted = 0))
+    THROW 51054, 'A conflicting Transaction object exists.', 1;
+IF NOT EXISTS (SELECT 1 FROM dbo.SydObjects WHERE Code = N'TRANSACTION' AND IsDeleted = 0)
+    INSERT dbo.SydObjects (CreationTime, IsDeleted, Name, Code, ObjectTypeCode, ObjectTypeId)
+    VALUES (SYSUTCDATETIME(), 0, N'Transaction', N'TRANSACTION', N'ENTITY', @entityTypeId);
+IF (SELECT COUNT(*) FROM dbo.SydObjects WHERE Code = N'TRANSACTION' AND IsDeleted = 0) <> 1
+    THROW 51054, 'Expected one Transaction object.', 1;
+DECLARE @transactionId bigint = (SELECT Id FROM dbo.SydObjects
+    WHERE Code = N'TRANSACTION' AND IsDeleted = 0);
+IF EXISTS (SELECT 1 FROM dbo.SydObjects
+    WHERE (Code = N'TRANSACTION-HEADER-DATA' OR Name = N'AppTransactionHeaders')
+      AND NOT (Code = N'TRANSACTION-HEADER-DATA' AND Name = N'AppTransactionHeaders'
+          AND ObjectTypeId = @dataTypeId AND ObjectTypeCode = N'DATA'
+          AND ParentId = @transactionId AND ParentCode = N'TRANSACTION'
+          AND IsDeleted = 0))
+    THROW 51055, 'A conflicting AppTransactionHeaders object exists.', 1;
+IF NOT EXISTS (SELECT 1 FROM dbo.SydObjects
+    WHERE Code = N'TRANSACTION-HEADER-DATA' AND IsDeleted = 0)
+    INSERT dbo.SydObjects
+        (CreationTime, IsDeleted, Name, Code, ParentId, ParentCode, ObjectTypeCode, ObjectTypeId)
+    VALUES (SYSUTCDATETIME(), 0, N'AppTransactionHeaders', N'TRANSACTION-HEADER-DATA',
+            @transactionId, N'TRANSACTION', N'DATA', @dataTypeId);
+IF (SELECT COUNT(*) FROM dbo.SydObjects
+    WHERE Code = N'TRANSACTION-HEADER-DATA' AND IsDeleted = 0) <> 1
+    THROW 51055, 'Expected one AppTransactionHeaders object.', 1;
+DECLARE @headerId bigint = (SELECT Id FROM dbo.SydObjects
+    WHERE Code = N'TRANSACTION-HEADER-DATA' AND IsDeleted = 0);
 IF @headerId IS NULL OR @transactionId IS NULL
     THROW 51051, 'Transaction metadata is missing.', 1;
 IF EXISTS (SELECT 1 FROM dbo.SycEntityObjectTypes
@@ -60,3 +95,8 @@ IF OBJECT_ID(N'dbo.__EFMigrationsHistory', N'U') IS NOT NULL
     VALUES (N'20261002120000_AddAppTableFields', N'7.0.1');
 
 COMMIT TRANSACTION;
+END TRY
+BEGIN CATCH
+    IF XACT_STATE() <> 0 ROLLBACK TRANSACTION;
+    THROW;
+END CATCH;

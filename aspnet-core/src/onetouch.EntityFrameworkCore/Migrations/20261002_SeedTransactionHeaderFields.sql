@@ -1,24 +1,174 @@
--- Iteration 51 sample fields. Source: Google Sheet "data sample" rows 16-57.
--- Run after 20261002_FieldManagerTreeAndAssignments.sql.
--- Rerunnable: existing host fields are checked and kept; missing assignments are inserted.
+-- Iteration 51 reviewed transaction-header fields: 37 shared, 5 sales-only.
+-- Run after the Field Manager migrations through NormalizeFieldExtraAttributes.
+-- Creates missing Transaction, BaseEntity, AppEntity, header, and Field metadata.
+-- Rerunnable: existing definitions and applied snapshots are preserved.
 SET XACT_ABORT ON;
+BEGIN TRY
 BEGIN TRANSACTION;
 
-IF OBJECT_ID(N'dbo.APPFields', N'U') IS NULL OR OBJECT_ID(N'dbo.AppTableFields', N'U') IS NULL
+IF OBJECT_ID(N'dbo.AppFields', N'U') IS NULL OR OBJECT_ID(N'dbo.AppTableFields', N'U') IS NULL
+    OR OBJECT_ID(N'dbo.AppFieldsHistory', N'U') IS NULL
     THROW 51060, 'Apply the Field Manager table migrations first.', 1;
-DECLARE @headerId bigint = (SELECT Id FROM dbo.SydObjects WHERE Code = N'TRANSACTION-HEADER-DATA' AND IsDeleted = 0);
-DECLARE @entityId bigint = (SELECT Id FROM dbo.SydObjects WHERE Code = N'TRANSACTION' AND IsDeleted = 0);
-DECLARE @salesId bigint = (SELECT Id FROM dbo.SycEntityObjectTypes WHERE Code = N'SALESORDER' AND ObjectId = @headerId AND IsDeleted = 0);
-DECLARE @salesAliasId bigint = (SELECT Id FROM dbo.SycEntityObjectTypes WHERE Code = N'SALESORDERHEADER' AND ObjectId = @headerId AND IsDeleted = 0);
-IF @headerId IS NULL OR @entityId IS NULL OR @salesId IS NULL
-    THROW 51061, 'Transaction field metadata is missing.', 1;
-IF NOT EXISTS (SELECT 1 FROM dbo.SycEntityObjectTypes WHERE Code = N'PURCHASEORDER' AND ObjectId = @headerId AND IsDeleted = 0)
-    THROW 51062, 'Purchase Order header metadata is missing.', 1;
+IF COL_LENGTH(N'dbo.AppFields', N'ExtraAttributes') IS NOT NULL
+    OR COL_LENGTH(N'dbo.AppFields', N'SourceAttributeId') IS NULL
+    OR COL_LENGTH(N'dbo.AppFieldsHistory', N'SnapshotJson') IS NOT NULL
+    OR COL_LENGTH(N'dbo.AppTableFields', N'SnapshotJson') IS NOT NULL
+    OR COL_LENGTH(N'dbo.AppTableFields', N'SourceAppFieldId') IS NULL
+    THROW 51067, 'Apply the current typed Field Manager migrations first.', 1;
+IF COL_LENGTH(N'dbo.SydObjects', N'BaseEntityId') IS NULL
+    THROW 51072, 'Apply the SydObjects BaseEntityId migration first.', 1;
+IF (SELECT COUNT(*) FROM dbo.SysObjectTypes WHERE Code = N'ENTITY' AND IsDeleted = 0) <> 1
+    OR (SELECT COUNT(*) FROM dbo.SysObjectTypes WHERE Code = N'DATA' AND IsDeleted = 0) <> 1
+    THROW 51073, 'Expected one active ENTITY and DATA object type.', 1;
+DECLARE @entityTypeId bigint = (SELECT Id FROM dbo.SysObjectTypes WHERE Code = N'ENTITY' AND IsDeleted = 0);
+DECLARE @dataTypeId bigint = (SELECT Id FROM dbo.SysObjectTypes WHERE Code = N'DATA' AND IsDeleted = 0);
+DECLARE @entityId bigint;
+DECLARE @headerId bigint;
+DECLARE @baseEntityId bigint;
+DECLARE @appEntityId bigint;
+DECLARE @fieldObjectId bigint;
+DECLARE @fieldRootId bigint;
+DECLARE @salesId bigint;
+DECLARE @salesAliasId bigint;
+
+IF EXISTS (SELECT 1 FROM dbo.SydObjects
+    WHERE (Code = N'TRANSACTION' OR Name = N'Transaction')
+      AND NOT (Code = N'TRANSACTION' AND ObjectTypeId = @entityTypeId
+        AND ObjectTypeCode = N'ENTITY' AND ParentId IS NULL
+        AND ParentCode IS NULL AND IsDeleted = 0))
+    THROW 51061, 'A conflicting Transaction object exists.', 1;
+IF NOT EXISTS (SELECT 1 FROM dbo.SydObjects WHERE Code = N'TRANSACTION' AND IsDeleted = 0)
+    INSERT dbo.SydObjects (CreationTime, IsDeleted, Name, Code, ObjectTypeCode, ObjectTypeId)
+    VALUES (SYSUTCDATETIME(), 0, N'Transaction', N'TRANSACTION', N'ENTITY', @entityTypeId);
+IF (SELECT COUNT(*) FROM dbo.SydObjects WHERE Code = N'TRANSACTION' AND IsDeleted = 0) <> 1
+    THROW 51061, 'Expected one Transaction object.', 1;
+SELECT @entityId = Id FROM dbo.SydObjects WHERE Code = N'TRANSACTION' AND IsDeleted = 0;
+
+IF EXISTS (SELECT 1 FROM dbo.SydObjects
+    WHERE (Code = N'BASEENTITY' OR Name = N'BaseEntity')
+      AND NOT (Code = N'BASEENTITY' AND Name = N'BaseEntity'
+        AND ObjectTypeId = @entityTypeId AND ObjectTypeCode = N'ENTITY'
+        AND ParentId IS NULL AND ParentCode IS NULL AND IsDeleted = 0))
+    THROW 51074, 'A conflicting BaseEntity object exists.', 1;
+IF NOT EXISTS (SELECT 1 FROM dbo.SydObjects WHERE Code = N'BASEENTITY' AND IsDeleted = 0)
+    INSERT dbo.SydObjects (CreationTime, IsDeleted, Name, Code, ObjectTypeCode, ObjectTypeId)
+    VALUES (SYSUTCDATETIME(), 0, N'BaseEntity', N'BASEENTITY', N'ENTITY', @entityTypeId);
+IF (SELECT COUNT(*) FROM dbo.SydObjects WHERE Code = N'BASEENTITY' AND IsDeleted = 0) <> 1
+    THROW 51074, 'Expected one BaseEntity object.', 1;
+SELECT @baseEntityId = Id FROM dbo.SydObjects WHERE Code = N'BASEENTITY' AND IsDeleted = 0;
+
+IF EXISTS (SELECT 1 FROM dbo.SydObjects
+    WHERE (Code = N'APPENTITY-DATA' OR Name = N'AppEntity')
+      AND NOT (Code = N'APPENTITY-DATA' AND Name = N'AppEntity'
+        AND ObjectTypeId = @dataTypeId AND ObjectTypeCode = N'DATA'
+        AND ParentId = @baseEntityId AND ParentCode = N'BASEENTITY' AND IsDeleted = 0))
+    THROW 51075, 'A conflicting AppEntity object exists.', 1;
+IF NOT EXISTS (SELECT 1 FROM dbo.SydObjects WHERE Code = N'APPENTITY-DATA' AND IsDeleted = 0)
+    INSERT dbo.SydObjects
+        (CreationTime, IsDeleted, Name, Code, ParentId, ParentCode, ObjectTypeCode, ObjectTypeId)
+    VALUES (SYSUTCDATETIME(), 0, N'AppEntity', N'APPENTITY-DATA',
+            @baseEntityId, N'BASEENTITY', N'DATA', @dataTypeId);
+IF (SELECT COUNT(*) FROM dbo.SydObjects WHERE Code = N'APPENTITY-DATA' AND IsDeleted = 0) <> 1
+    THROW 51075, 'Expected one AppEntity object.', 1;
+SELECT @appEntityId = Id FROM dbo.SydObjects WHERE Code = N'APPENTITY-DATA' AND IsDeleted = 0;
+
+IF EXISTS (SELECT 1 FROM dbo.SydObjects
+    WHERE (Code = N'TRANSACTION-HEADER-DATA' OR Name = N'AppTransactionHeaders')
+      AND NOT (Code = N'TRANSACTION-HEADER-DATA' AND Name = N'AppTransactionHeaders'
+        AND ObjectTypeId = @dataTypeId AND ObjectTypeCode = N'DATA'
+        AND ParentId = @entityId AND ParentCode = N'TRANSACTION' AND IsDeleted = 0))
+    THROW 51076, 'A conflicting AppTransactionHeaders object exists.', 1;
+IF NOT EXISTS (SELECT 1 FROM dbo.SydObjects WHERE Code = N'TRANSACTION-HEADER-DATA' AND IsDeleted = 0)
+    INSERT dbo.SydObjects
+        (CreationTime, IsDeleted, Name, Code, ParentId, ParentCode,
+         ObjectTypeCode, ObjectTypeId, BaseEntityId)
+    VALUES (SYSUTCDATETIME(), 0, N'AppTransactionHeaders', N'TRANSACTION-HEADER-DATA',
+            @entityId, N'TRANSACTION', N'DATA', @dataTypeId, @appEntityId);
+IF (SELECT COUNT(*) FROM dbo.SydObjects WHERE Code = N'TRANSACTION-HEADER-DATA' AND IsDeleted = 0) <> 1
+    THROW 51076, 'Expected one AppTransactionHeaders object.', 1;
+SELECT @headerId = Id FROM dbo.SydObjects WHERE Code = N'TRANSACTION-HEADER-DATA' AND IsDeleted = 0;
+IF EXISTS (SELECT 1 FROM dbo.SydObjects
+    WHERE Id = @headerId AND BaseEntityId IS NOT NULL AND BaseEntityId <> @appEntityId)
+    THROW 51077, 'AppTransactionHeaders has a different base entity.', 1;
+UPDATE dbo.SydObjects SET BaseEntityId = @appEntityId
+WHERE Id = @headerId AND BaseEntityId IS NULL;
+
+IF EXISTS (SELECT 1 FROM dbo.SydObjects
+    WHERE (Code = N'FIELD' OR Name = N'Field')
+      AND NOT (Code = N'FIELD' AND Name = N'Field'
+        AND ObjectTypeId = @entityTypeId AND ObjectTypeCode = N'ENTITY'
+        AND ParentId IS NULL AND ParentCode IS NULL AND IsDeleted = 0))
+    THROW 51078, 'A conflicting Field object exists.', 1;
+IF NOT EXISTS (SELECT 1 FROM dbo.SydObjects WHERE Code = N'FIELD' AND IsDeleted = 0)
+    INSERT dbo.SydObjects (CreationTime, IsDeleted, Name, Code, ObjectTypeCode, ObjectTypeId)
+    VALUES (SYSUTCDATETIME(), 0, N'Field', N'FIELD', N'ENTITY', @entityTypeId);
+IF (SELECT COUNT(*) FROM dbo.SydObjects WHERE Code = N'FIELD' AND IsDeleted = 0) <> 1
+    THROW 51078, 'Expected one Field object.', 1;
+SELECT @fieldObjectId = Id FROM dbo.SydObjects WHERE Code = N'FIELD' AND IsDeleted = 0;
+IF EXISTS (SELECT 1 FROM dbo.SycEntityObjectTypes
+    WHERE Code = N'FIELD' AND (ObjectId <> @fieldObjectId OR ParentId IS NOT NULL OR IsDeleted <> 0))
+    THROW 51079, 'A conflicting Field type root exists.', 1;
+IF NOT EXISTS (SELECT 1 FROM dbo.SycEntityObjectTypes
+    WHERE ObjectId = @fieldObjectId AND Code = N'FIELD' AND ParentId IS NULL AND IsDeleted = 0)
+    INSERT dbo.SycEntityObjectTypes
+        (CreationTime, IsDeleted, Code, Name, ObjectId, ObjectCode, TenantId, IsDefault)
+    VALUES (SYSUTCDATETIME(), 0, N'FIELD', N'Field', @fieldObjectId, N'FIELD', NULL, 0);
+IF (SELECT COUNT(*) FROM dbo.SycEntityObjectTypes
+    WHERE ObjectId = @fieldObjectId AND Code = N'FIELD' AND ParentId IS NULL AND IsDeleted = 0) <> 1
+    THROW 51079, 'Expected one Field type root.', 1;
+SELECT @fieldRootId = Id FROM dbo.SycEntityObjectTypes
+WHERE ObjectId = @fieldObjectId AND Code = N'FIELD' AND ParentId IS NULL AND IsDeleted = 0;
+
+DECLARE @requiredTypes table (Code nvarchar(50) PRIMARY KEY, Name nvarchar(250) NOT NULL);
+INSERT @requiredTypes (Code, Name) VALUES
+    (N'ST', N'String--Textbox'), (N'IN', N'Integer--Numeric input'),
+    (N'IC', N'Integer--Currency'), (N'DP', N'Date--Date picker'),
+    (N'LD', N'List--Dropdown'), (N'BOOLEAN', N'Boolean--Checkbox');
+IF EXISTS (SELECT 1 FROM @requiredTypes s JOIN dbo.SycEntityObjectTypes t
+    ON t.Code = s.Code OR t.Name = s.Name
+    WHERE NOT (t.Code = s.Code AND t.Name = s.Name AND t.ObjectId = @fieldObjectId
+        AND t.ObjectCode = N'FIELD' AND t.ParentId = @fieldRootId
+        AND t.ParentCode = N'FIELD' AND t.TenantId IS NULL AND t.IsDeleted = 0))
+    THROW 51080, 'A conflicting Field data type exists.', 1;
+INSERT dbo.SycEntityObjectTypes
+    (CreationTime, IsDeleted, Code, Name, ObjectId, ObjectCode, ParentId, ParentCode, TenantId, IsDefault)
+SELECT SYSUTCDATETIME(), 0, s.Code, s.Name, @fieldObjectId, N'FIELD',
+       @fieldRootId, N'FIELD', NULL, 0
+FROM @requiredTypes s
+WHERE NOT EXISTS (SELECT 1 FROM dbo.SycEntityObjectTypes t
+    WHERE t.ObjectId = @fieldObjectId AND t.ParentId = @fieldRootId
+      AND t.Code = s.Code AND t.IsDeleted = 0);
+
+IF EXISTS (SELECT 1 FROM dbo.SycEntityObjectTypes
+    WHERE Code IN (N'SALESORDER', N'PURCHASEORDER') AND IsDeleted = 0
+      AND (ObjectId <> @headerId OR ObjectCode <> N'TRANSACTION-HEADER-DATA'))
+    THROW 51081, 'An order type is assigned to a different object.', 1;
+IF NOT EXISTS (SELECT 1 FROM dbo.SycEntityObjectTypes
+    WHERE Code = N'SALESORDER' AND ObjectId = @headerId AND IsDeleted = 0)
+    INSERT dbo.SycEntityObjectTypes
+        (CreationTime, IsDeleted, Code, Name, ObjectId, ObjectCode, TenantId, IsDefault)
+    VALUES (SYSUTCDATETIME(), 0, N'SALESORDER', N'Sales Order',
+            @headerId, N'TRANSACTION-HEADER-DATA', NULL, 0);
+IF NOT EXISTS (SELECT 1 FROM dbo.SycEntityObjectTypes
+    WHERE Code = N'PURCHASEORDER' AND ObjectId = @headerId AND IsDeleted = 0)
+    INSERT dbo.SycEntityObjectTypes
+        (CreationTime, IsDeleted, Code, Name, ObjectId, ObjectCode, TenantId, IsDefault)
+    VALUES (SYSUTCDATETIME(), 0, N'PURCHASEORDER', N'Purchase Order',
+            @headerId, N'TRANSACTION-HEADER-DATA', NULL, 0);
+IF (SELECT COUNT(*) FROM dbo.SycEntityObjectTypes
+    WHERE Code = N'SALESORDER' AND ObjectId = @headerId AND IsDeleted = 0) <> 1
+    OR (SELECT COUNT(*) FROM dbo.SycEntityObjectTypes
+        WHERE Code = N'PURCHASEORDER' AND ObjectId = @headerId AND IsDeleted = 0) <> 1
+    THROW 51082, 'Expected one Sales and Purchase Order header type.', 1;
+SELECT @salesId = Id FROM dbo.SycEntityObjectTypes
+WHERE Code = N'SALESORDER' AND ObjectId = @headerId AND IsDeleted = 0;
+SELECT @salesAliasId = Id FROM dbo.SycEntityObjectTypes
+WHERE Code = N'SALESORDERHEADER' AND ObjectId = @headerId AND IsDeleted = 0;
 
 CREATE TABLE #SeedFields
 (
-    FieldCode nvarchar(11) COLLATE DATABASE_DEFAULT NOT NULL PRIMARY KEY,
-    FieldName nvarchar(250) COLLATE DATABASE_DEFAULT NOT NULL,
+    FieldCode nvarchar(11) COLLATE DATABASE_DEFAULT NOT NULL,
+    FieldName nvarchar(250) COLLATE DATABASE_DEFAULT NOT NULL PRIMARY KEY,
     Description nvarchar(2000) COLLATE DATABASE_DEFAULT NULL,
     FieldTypeId bigint NOT NULL,
     FieldLevelCode nvarchar(32) COLLATE DATABASE_DEFAULT NOT NULL,
@@ -39,14 +189,14 @@ CREATE TABLE #SeedFields
     Required bit NOT NULL,
     Visible bit NOT NULL,
     Editable bit NOT NULL,
-    ExtraAttributes nvarchar(max) COLLATE DATABASE_DEFAULT NULL,
+    LegacyMetadataJson nvarchar(max) COLLATE DATABASE_DEFAULT NULL,
     AssignmentKind tinyint NOT NULL -- 0 = header shared, 1 = sales-only
 );
 INSERT #SeedFields
 (FieldCode, FieldName, Description, FieldTypeId, FieldLevelCode, FieldStatusCode,
  TrackingNo, CurrentRevisionNo, IsStandard, IsCustom, IsExtraField, IsHidden, AllowNull,
  [Length], Decimals, DefaultValue, DateFormat, TimeFormat, AllowMultiSelect, Required,
- Visible, Editable, ExtraAttributes, AssignmentKind)
+ Visible, Editable, LegacyMetadataJson, AssignmentKind)
 VALUES
     (N'INSID__0001', N'Id', N'AppTransactionHeaders primary key', 829, N'System', N'Proposed', NULL, N'00', 1, 0, 0, 0, 0, NULL, 0, NULL, NULL, NULL, 0, 1, 0, 0, NULL, 0),
     (N'STSENTE0001', N'EnteredUserByRole', N'Role of user who entered the transaction', 831, N'System', N'Proposed', NULL, N'00', 1, 0, 0, 0, 1, 50, NULL, NULL, NULL, NULL, 0, 0, 1, 1, NULL, 0),
@@ -95,73 +245,185 @@ IF (SELECT COUNT(*) FROM #SeedFields) <> 42 OR
    (SELECT COUNT(*) FROM #SeedFields WHERE AssignmentKind = 0) <> 37 OR
    (SELECT COUNT(*) FROM #SeedFields WHERE AssignmentKind = 1) <> 5
     THROW 51063, 'Unexpected sample field counts.', 1;
-IF EXISTS (SELECT 1 FROM #SeedFields AS s LEFT JOIN dbo.SycEntityObjectTypes AS t ON t.Id=s.FieldTypeId
-           WHERE t.Id IS NULL OR t.ObjectId <> (SELECT Id FROM dbo.SydObjects WHERE Code=N'FIELD' AND IsDeleted=0))
-    THROW 51064, 'A sample field type is missing or invalid.', 1;
+-- The numeric IDs in the reviewed source rows are staging values only. Resolve
+-- each field type from metadata in the target database before persisting it.
+IF EXISTS (SELECT 1 FROM #SeedFields s OUTER APPLY
+    (SELECT COUNT(*) AS Cnt FROM dbo.SycEntityObjectTypes t
+     WHERE t.ObjectId = @fieldObjectId AND t.ParentId = @fieldRootId AND t.IsDeleted = 0
+       AND t.Code = CASE LEFT(s.FieldCode, 2)
+           WHEN N'BO' THEN N'BOOLEAN' ELSE LEFT(s.FieldCode, 2) END) matches
+    WHERE matches.Cnt <> 1)
+    THROW 51064, 'A field type is missing or duplicated.', 1;
+UPDATE s SET FieldTypeId = t.Id
+FROM #SeedFields s
+JOIN dbo.SycEntityObjectTypes t ON t.ObjectId = @fieldObjectId
+    AND t.ParentId = @fieldRootId AND t.IsDeleted = 0
+    AND t.Code = CASE LEFT(s.FieldCode, 2)
+        WHEN N'BO' THEN N'BOOLEAN' ELSE LEFT(s.FieldCode, 2) END;
+IF EXISTS (SELECT 1 FROM #SeedFields s JOIN dbo.AppFields f
+    ON f.SycObjectId = @headerId AND f.FieldName = s.FieldName
+       AND f.TenantId IS NULL AND f.IsDeleted = 0
+    GROUP BY s.FieldName HAVING COUNT(*) > 1)
+    THROW 51069, 'More than one active header definition has the same field name.', 1;
+
+-- Preserve codes already assigned to this header, including codes allocated on
+-- an earlier run. A new field gets the next sequence when its sample code is taken.
+UPDATE s SET FieldCode = f.FieldCode
+FROM #SeedFields s
+JOIN dbo.AppFields f ON f.SycObjectId = @headerId AND f.FieldName = s.FieldName
+    AND f.TenantId IS NULL AND f.IsDeleted = 0;
+;WITH Collisions AS
+(
+    SELECT s.FieldName, s.FieldTypeId,
+        ROW_NUMBER() OVER (PARTITION BY s.FieldTypeId ORDER BY s.FieldName) AS Ordinal
+    FROM #SeedFields s
+    WHERE NOT EXISTS (SELECT 1 FROM dbo.AppFields own
+        WHERE own.SycObjectId = @headerId AND own.FieldName = s.FieldName
+          AND own.TenantId IS NULL AND own.IsDeleted = 0)
+      AND EXISTS (SELECT 1 FROM dbo.AppFields used
+        WHERE used.FieldCode = s.FieldCode AND used.TenantId IS NULL AND used.IsDeleted = 0)
+), SequenceBase AS
+(
+    SELECT t.FieldTypeId,
+        COALESCE(MAX(TRY_CONVERT(int, RIGHT(t.FieldCode, 4))), 0) AS LastSequence
+    FROM (
+        SELECT FieldTypeId, FieldCode FROM dbo.AppFields
+            WHERE TenantId IS NULL AND IsDeleted = 0 AND LEN(FieldCode) = 11
+        UNION ALL
+        SELECT FieldTypeId, FieldCode FROM #SeedFields WHERE LEN(FieldCode) = 11
+    ) t
+    GROUP BY t.FieldTypeId
+)
+SELECT c.FieldName, b.LastSequence + c.Ordinal AS NextSequence
+INTO #CodeCollisions
+FROM Collisions c JOIN SequenceBase b ON b.FieldTypeId = c.FieldTypeId;
+IF EXISTS (SELECT 1 FROM #CodeCollisions WHERE NextSequence > 9999)
+    THROW 51070, 'A field type has exhausted its four-digit code sequence.', 1;
+UPDATE s SET FieldCode = LEFT(s.FieldCode, 7)
+    + RIGHT(N'0000' + CONVERT(nvarchar(10), c.NextSequence), 4)
+FROM #SeedFields s JOIN #CodeCollisions c ON c.FieldName = s.FieldName;
+IF EXISTS (SELECT FieldCode FROM #SeedFields GROUP BY FieldCode HAVING COUNT(*) > 1)
+    THROW 51071, 'The reviewed header fields resolve to duplicate codes.', 1;
+IF EXISTS (SELECT 1 FROM #SeedFields
+    WHERE IsExtraField = 1 AND (ISJSON(LegacyMetadataJson) <> 1
+        OR TRY_CONVERT(bigint, JSON_VALUE(LegacyMetadataJson, '$.sourceAttributeId')) IS NULL))
+    THROW 51068, 'An order approval field has invalid source metadata.', 1;
 IF EXISTS (
-    SELECT 1 FROM #SeedFields AS s JOIN dbo.APPFields AS f ON f.TenantId IS NULL AND f.IsDeleted=0 AND f.FieldCode=s.FieldCode
+    SELECT 1 FROM #SeedFields AS s JOIN dbo.AppFields AS f ON f.TenantId IS NULL AND f.IsDeleted=0 AND f.FieldCode=s.FieldCode
     WHERE f.FieldName<>s.FieldName OR f.FieldTypeId<>s.FieldTypeId OR f.SycObjectId<>@headerId
 )
     THROW 51065, 'An existing field code conflicts with the sample.', 1;
 IF EXISTS (
-    SELECT 1 FROM #SeedFields AS s JOIN dbo.APPFields AS f ON f.TenantId IS NULL AND f.IsDeleted=0 AND f.FieldName=s.FieldName
+    SELECT 1 FROM #SeedFields AS s JOIN dbo.AppFields AS f ON f.TenantId IS NULL AND f.IsDeleted=0 AND f.FieldName=s.FieldName
     WHERE f.FieldCode<>s.FieldCode AND f.SycObjectId=@headerId
 )
     THROW 51066, 'An existing field name has a different code.', 1;
 
-INSERT dbo.APPFields
+INSERT dbo.AppFields
 (TenantId, SourceFieldId, SycObjectId, EntitySycObjectId, FieldCode, FieldName,
  Description, FieldTypeId, WidgetTypeId, FieldLevelId, FieldStatusId, FieldLevelCode,
  FieldStatusCode, TrackingNo, CurrentRevisionNo, IsStandard, IsCustom, IsExtraField,
  IsHidden, AllowNull, [Length], Decimals, DefaultValue, DateFormat, TimeFormat,
- AllowMultiSelect, Required, Visible, Editable, ExtraAttributes, CreationTime,
- CreatorUserId, LastModificationTime, LastModifierUserId, IsDeleted, DeleterUserId, DeletionTime)
+ AllowMultiSelect, Required, Visible, Editable, SourceAttributeId, SourceDataType,
+ SourceEntityObjectTypeId, EntityObjectTypeCode, Usage, IsLookup, IsVariation,
+ IsAdvancedSearch, AcceptMultipleValues, AllowAddNew, CreationTime, CreatorUserId,
+ LastModificationTime, LastModifierUserId, IsDeleted, DeleterUserId, DeletionTime)
 SELECT NULL, NULL, @headerId, @entityId, s.FieldCode, s.FieldName,
  s.Description, s.FieldTypeId, NULL, NULL, NULL, s.FieldLevelCode,
  s.FieldStatusCode, s.TrackingNo, s.CurrentRevisionNo, s.IsStandard, s.IsCustom, s.IsExtraField,
  s.IsHidden, s.AllowNull, s.[Length], s.Decimals, s.DefaultValue, s.DateFormat, s.TimeFormat,
- s.AllowMultiSelect, s.Required, s.Visible, s.Editable, s.ExtraAttributes, SYSUTCDATETIME(),
- NULL, NULL, NULL, 0, NULL, NULL
+ s.AllowMultiSelect, s.Required, s.Visible, s.Editable,
+ TRY_CONVERT(bigint, JSON_VALUE(s.LegacyMetadataJson, '$.sourceAttributeId')),
+ JSON_VALUE(s.LegacyMetadataJson, '$.sourceDataType'),
+ CASE WHEN s.IsExtraField = 1 THEN @salesId ELSE NULL END,
+ JSON_VALUE(s.LegacyMetadataJson, '$.entityObjectTypeCode'),
+ JSON_VALUE(s.LegacyMetadataJson, '$.usage'),
+ CASE WHEN JSON_VALUE(s.LegacyMetadataJson, '$.isLookup') = N'true' THEN 1
+      WHEN s.IsExtraField = 1 THEN 0 ELSE NULL END,
+ CASE WHEN s.IsExtraField = 1 THEN 0 ELSE NULL END,
+ CASE WHEN JSON_VALUE(s.LegacyMetadataJson, '$.isAdvancedSearch') = N'true' THEN 1
+      WHEN s.IsExtraField = 1 THEN 0 ELSE NULL END,
+ CASE WHEN s.IsExtraField = 1 THEN 0 ELSE NULL END,
+ CASE WHEN JSON_VALUE(s.LegacyMetadataJson, '$.allowAddNew') = N'true' THEN 1
+      WHEN s.IsExtraField = 1 THEN 0 ELSE NULL END,
+ SYSUTCDATETIME(), NULL, NULL, NULL, 0, NULL, NULL
 FROM #SeedFields AS s
-WHERE NOT EXISTS (SELECT 1 FROM dbo.APPFields AS f WHERE f.TenantId IS NULL AND f.IsDeleted=0 AND f.FieldCode=s.FieldCode);
+WHERE NOT EXISTS (SELECT 1 FROM dbo.AppFields AS f
+                  WHERE f.TenantId IS NULL AND f.IsDeleted=0 AND f.FieldCode=s.FieldCode);
 
--- Shared header assignments are inherited by either order subtype.
-INSERT dbo.AppTableFields(TenantId, AppFieldId, SycObjectId, SycEntityObjectTypeId, CreationTime, CreatorUserId)
-SELECT NULL, f.Id, @headerId, NULL, SYSUTCDATETIME(), NULL
-FROM #SeedFields AS s JOIN dbo.APPFields AS f ON f.FieldCode=s.FieldCode AND f.TenantId IS NULL AND f.IsDeleted=0
-WHERE s.AssignmentKind=0
-  AND NOT EXISTS (SELECT 1 FROM dbo.AppTableFields AS a WHERE a.AppFieldId=f.Id AND a.TenantId IS NULL
-                  AND a.SycObjectId=@headerId AND a.SycEntityObjectTypeId IS NULL);
-
--- The five order approval attributes belong only to Sales Order Header.
-INSERT dbo.AppTableFields(TenantId, AppFieldId, SycObjectId, SycEntityObjectTypeId, CreationTime, CreatorUserId)
-SELECT NULL, f.Id, @headerId, @salesId, SYSUTCDATETIME(), NULL
-FROM #SeedFields AS s JOIN dbo.APPFields AS f ON f.FieldCode=s.FieldCode AND f.TenantId IS NULL AND f.IsDeleted=0
-WHERE s.AssignmentKind=1
-  AND NOT EXISTS (SELECT 1 FROM dbo.AppTableFields AS a WHERE a.AppFieldId=f.Id AND a.TenantId IS NULL
-                  AND a.SycObjectId=@headerId AND a.SycEntityObjectTypeId=@salesId);
-
--- The old header alias is still visible on some running versions of the tree API.
+-- Shared rows are inherited by Sales and Purchase Order; only five are sales-only.
+CREATE TABLE #SeedAssignments (FieldCode nvarchar(11) COLLATE DATABASE_DEFAULT NOT NULL,
+    SycEntityObjectTypeId bigint NULL);
+INSERT #SeedAssignments (FieldCode, SycEntityObjectTypeId)
+SELECT FieldCode, NULL FROM #SeedFields WHERE AssignmentKind = 0;
+INSERT #SeedAssignments (FieldCode, SycEntityObjectTypeId)
+SELECT FieldCode, @salesId FROM #SeedFields WHERE AssignmentKind = 1;
 IF @salesAliasId IS NOT NULL
-    INSERT dbo.AppTableFields(TenantId, AppFieldId, SycObjectId, SycEntityObjectTypeId, CreationTime, CreatorUserId)
-    SELECT NULL, f.Id, @headerId, @salesAliasId, SYSUTCDATETIME(), NULL
-    FROM #SeedFields AS s JOIN dbo.APPFields AS f ON f.FieldCode=s.FieldCode AND f.TenantId IS NULL AND f.IsDeleted=0
-    WHERE s.AssignmentKind=1
-      AND NOT EXISTS (SELECT 1 FROM dbo.AppTableFields AS a WHERE a.AppFieldId=f.Id AND a.TenantId IS NULL
-                      AND a.SycObjectId=@headerId AND a.SycEntityObjectTypeId=@salesAliasId);
+    INSERT #SeedAssignments (FieldCode, SycEntityObjectTypeId)
+    SELECT FieldCode, @salesAliasId FROM #SeedFields WHERE AssignmentKind = 1;
 
-INSERT dbo.AppFieldsHistory(TenantId, AppFieldId, RevisionNo, ChangeType, SnapshotJson, ChangedAt, ChangedBy, RestoredFromRevisionNo)
-SELECT NULL, f.Id, f.CurrentRevisionNo, N'Create',
-       (SELECT f.Id, f.SycObjectId, f.EntitySycObjectId, f.FieldCode, f.FieldName, f.Description,
-               f.FieldTypeId, f.WidgetTypeId, f.FieldLevelCode, f.FieldStatusCode, f.TrackingNo,
-               f.IsExtraField, f.AllowNull, f.[Length], f.Decimals, f.DefaultValue,
-               f.DateFormat, f.TimeFormat, f.AllowMultiSelect, f.Required, f.Visible,
-               f.Editable, f.ExtraAttributes FOR JSON PATH, WITHOUT_ARRAY_WRAPPER),
-       SYSUTCDATETIME(), NULL, NULL
-FROM #SeedFields AS s JOIN dbo.APPFields AS f ON f.FieldCode=s.FieldCode AND f.TenantId IS NULL AND f.IsDeleted=0
-WHERE NOT EXISTS (SELECT 1 FROM dbo.AppFieldsHistory AS h WHERE h.AppFieldId=f.Id AND h.RevisionNo=f.CurrentRevisionNo);
+INSERT dbo.AppTableFields
+    (TenantId, FieldDefinitionKey, FieldCode, AppliedRevisionNo, SycObjectId,
+     SycEntityObjectTypeId, SourceAppFieldId, FieldTenantId, SourceFieldId,
+     DefinitionSycObjectId, EntitySycObjectId, FieldName, Description,
+     FieldTypeId, WidgetTypeId, FieldLevelId, FieldStatusId, FieldLevelCode,
+     FieldStatusCode, TrackingNo, IsStandard, IsCustom, IsExtraField, IsHidden,
+     AllowNull, [Length], Decimals, DefaultValue, DateFormat, TimeFormat,
+     AllowMultiSelect, Required, Visible, Editable, SourceAttributeId,
+     SourceDataType, SourceEntityObjectTypeId, EntityObjectTypeCode, Usage,
+     IsLookup, IsVariation, IsAdvancedSearch, AcceptMultipleValues, AllowAddNew,
+     FieldCreationTime, FieldCreatorUserId, FieldLastModificationTime,
+     FieldLastModifierUserId, FieldIsDeleted, FieldDeleterUserId,
+     FieldDeletionTime, CreationTime, CreatorUserId)
+SELECT f.TenantId, f.FieldDefinitionKey, f.FieldCode, f.CurrentRevisionNo,
+       @headerId, target.SycEntityObjectTypeId, f.Id, f.TenantId,
+       f.SourceFieldId, f.SycObjectId, f.EntitySycObjectId, f.FieldName,
+       f.Description, f.FieldTypeId, f.WidgetTypeId, f.FieldLevelId,
+       f.FieldStatusId, f.FieldLevelCode, f.FieldStatusCode, f.TrackingNo,
+       f.IsStandard, f.IsCustom, f.IsExtraField, f.IsHidden, f.AllowNull,
+       f.[Length], f.Decimals, f.DefaultValue, f.DateFormat, f.TimeFormat,
+       f.AllowMultiSelect, f.Required, f.Visible, f.Editable,
+       f.SourceAttributeId, f.SourceDataType, f.SourceEntityObjectTypeId,
+       f.EntityObjectTypeCode, f.Usage, f.IsLookup, f.IsVariation,
+       f.IsAdvancedSearch, f.AcceptMultipleValues, f.AllowAddNew,
+       f.CreationTime, f.CreatorUserId, f.LastModificationTime,
+       f.LastModifierUserId, f.IsDeleted, f.DeleterUserId, f.DeletionTime,
+       SYSUTCDATETIME(), NULL
+FROM #SeedAssignments target
+JOIN dbo.AppFields f ON f.FieldCode = target.FieldCode
+    AND f.TenantId IS NULL AND f.SycObjectId = @headerId AND f.IsDeleted = 0
+WHERE NOT EXISTS (SELECT 1 FROM dbo.AppTableFields a
+    WHERE a.TenantId IS NULL AND a.FieldDefinitionKey = f.FieldDefinitionKey
+      AND a.SycObjectId = @headerId
+      AND ((a.SycEntityObjectTypeId IS NULL AND target.SycEntityObjectTypeId IS NULL)
+        OR a.SycEntityObjectTypeId = target.SycEntityObjectTypeId));
 
-SELECT (SELECT COUNT(*) FROM dbo.APPFields WHERE TenantId IS NULL AND IsDeleted=0 AND SycObjectId=@headerId) AS HeaderFieldDefinitions,
+DECLARE @historyColumns nvarchar(max);
+DECLARE @historyValues nvarchar(max);
+DECLARE @historySql nvarchar(max);
+SELECT @historyColumns = STRING_AGG(CAST(QUOTENAME(c.name) AS nvarchar(max)), N',')
+        WITHIN GROUP (ORDER BY c.column_id),
+       @historyValues = STRING_AGG(CAST(N'f.' + QUOTENAME(c.name) AS nvarchar(max)), N',')
+        WITHIN GROUP (ORDER BY c.column_id)
+FROM sys.columns c
+JOIN sys.columns h ON h.object_id = OBJECT_ID(N'dbo.AppFieldsHistory') AND h.name = c.name
+WHERE c.object_id = OBJECT_ID(N'dbo.AppFields') AND c.name <> N'Id';
+SET @historySql = N'INSERT dbo.AppFieldsHistory
+    (AppFieldId, RevisionNo, ChangeType, ChangedAt, ' + @historyColumns + N')
+SELECT f.Id, f.CurrentRevisionNo, N''Create'', SYSUTCDATETIME(), ' + @historyValues + N'
+FROM dbo.AppFields f
+JOIN #SeedFields s ON s.FieldCode = f.FieldCode
+WHERE f.SycObjectId = @objectId AND f.TenantId IS NULL AND f.IsDeleted = 0
+  AND NOT EXISTS (SELECT 1 FROM dbo.AppFieldsHistory h
+      WHERE h.AppFieldId = f.Id AND h.RevisionNo = f.CurrentRevisionNo);';
+EXEC sys.sp_executesql @historySql, N'@objectId bigint', @objectId = @headerId;
+
+SELECT (SELECT COUNT(*) FROM dbo.AppFields WHERE TenantId IS NULL AND IsDeleted=0 AND SycObjectId=@headerId) AS HeaderFieldDefinitions,
        (SELECT COUNT(*) FROM dbo.AppTableFields WHERE TenantId IS NULL AND SycObjectId=@headerId AND SycEntityObjectTypeId IS NULL) AS SharedHeaderAssignments,
        (SELECT COUNT(*) FROM dbo.AppTableFields WHERE TenantId IS NULL AND SycObjectId=@headerId AND SycEntityObjectTypeId=@salesId) AS SalesSpecificAssignments;
 COMMIT TRANSACTION;
+END TRY
+BEGIN CATCH
+    IF XACT_STATE() <> 0 ROLLBACK TRANSACTION;
+    THROW;
+END CATCH;
