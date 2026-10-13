@@ -5,7 +5,7 @@
             <div class="modal-header revision-modal-header">
                 <div>
                     <span class="eyebrow">FIELD MANAGER</span>
-                    <h5 class="modal-title" id="fieldManagerViewModalLabel">{{ viewState === 'draft' ? ('Editinganewrevision' | localize)  : viewState === 'history' ?  ('RevisionHistory' | localize) : ('FieldDetailedView' | localize) }}</h5>
+                    <h5 class="modal-title" id="fieldManagerViewModalLabel">{{ viewState === 'draft' ? ('CreateNewRevision' | localize)  : viewState === 'history' ?  ('RevisionHistory' | localize) : ('FieldDetailedView' | localize) }}</h5>
                 </div>
                 <button type="button" class="close" aria-label="Close" (click)="close()"><span aria-hidden="true">&times;</span></button>
             </div>
@@ -32,7 +32,7 @@
                         </button>
                            <button *ngIf="viewState === 'details' && !isViewingHistoryRevision" type="button"
                             class="btn  revision-primary" (click)="createNewRevision()">
-                            <i class="fa fa-plus"></i> Create New Revision
+                            <i class="fa fa-plus"></i>{{ 'CreateNewRevision' | localize }}
                         </button>
                       <!--   <button *ngIf="viewState === 'draft'" type="button" class="btn btn-primary revision-primary" (click)="saveRevision()"
                             [disabled]="!item.fieldCode?.trim() || !item.fieldName.trim()">
@@ -92,10 +92,10 @@
                             <div class="detail-item"><span>Field Code</span><strong>{{ item.fieldCode || '—' }}</strong></div>
                             <div class="detail-item"><span>Field Name</span><strong>{{ item.fieldName || '—' }}</strong></div>
                             <div class="detail-item detail-wide"><span>Description</span><strong>{{ item.description || '—' }}</strong></div>
-                            <div class="detail-item"><span>Field Type</span><strong>{{ fieldTypeName(item.fieldTypeId) || '—' }}</strong></div>
                             <div class="detail-item"><span>Field Level</span><strong>{{ item.fieldLevelCode || '—' }}</strong></div>
                             <div class="detail-item"><span>Status</span><strong>{{ item.fieldStatusCode || '—' }}</strong></div>
                             <div class="detail-item"><span>Tracking #</span><strong>{{ item.trackingNo || '—' }}</strong></div>
+                            <div class="detail-item"><span>Field Type</span><strong>{{ fieldTypeName(item.fieldTypeId) || '—' }}</strong></div>
                         </div>
                     </section>
 
@@ -133,10 +133,10 @@
                                 <label class="form-field">Field Code<input class="form-control" name="code" [(ngModel)]="item.fieldCode" required /></label>
                                 <label class="form-field">Field Name<input class="form-control" name="name" [(ngModel)]="item.fieldName" required /></label>
                                 <label class="form-field form-field-wide">Description<textarea class="form-control" name="description" rows="3" [(ngModel)]="item.description"></textarea></label>
-                                <label class="form-field">Field Type<select class="form-control" name="fieldTypeId" [(ngModel)]="item.fieldTypeId"><option *ngFor="let type of fieldTypes" [ngValue]="type.id">{{ type.name }}</option></select></label>
                                 <label class="form-field">Field Level<select class="form-control" name="fieldLevelCode" [(ngModel)]="item.fieldLevelCode"><option value="System">System</option><option value="Application">Application</option><option value="Tenant">Tenant</option></select></label>
                                 <label class="form-field">Status<select class="form-control" name="fieldStatusCode" [(ngModel)]="item.fieldStatusCode"><option value="Proposed">Proposed</option><option value="Active">Active</option><option value="Discontinued">Discontinued</option></select></label>
                                 <label class="form-field">Tracking #<input class="form-control" name="trackingNo" [(ngModel)]="item.trackingNo" /></label>
+                                <label class="form-field">Field Type<select class="form-control" name="fieldTypeId" [(ngModel)]="item.fieldTypeId"><option *ngFor="let type of fieldTypes" [ngValue]="type.id">{{ type.name }}</option></select></label>
                             </div>
                         </section>
                         <section class="field-card advanced-card">

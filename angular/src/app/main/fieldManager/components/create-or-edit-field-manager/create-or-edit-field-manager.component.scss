@@ -90,8 +90,31 @@
     padding: 3px 7px;
     border: 1px solid #aeb2b8;
     border-radius: 3px;
-    color: #777b82;
+    color: #777b82 !important;
     font-size: 11px;
+}
+
+.form-control.field-value-control {
+    color: #212529 !important;
+    -webkit-text-fill-color: #212529 !important;
+}
+
+.form-control.field-value-control::placeholder {
+    color: #6c757d;
+    opacity: 1;
+}
+
+.form-control.field-value-control:disabled,
+.form-control.field-value-control[readonly] {
+    color: #343a40 !important;
+    background-color: #e9ecef;
+    opacity: 1;
+    -webkit-text-fill-color: #343a40 !important;
+}
+
+select.form-control.field-value-control option {
+    color: #212529;
+    background-color: #fff;
 }
 
 textarea.form-control.field-description {
@@ -166,11 +189,7 @@ textarea.form-control.field-description {
     }
 }
 
-.form-control {
-    min-height: 40px;
-    border: 1px solid #e5e5e5;
-    border-radius: 6px;
-}
+
 
 .form-control:focus {
     border-color: #4a0d4a;

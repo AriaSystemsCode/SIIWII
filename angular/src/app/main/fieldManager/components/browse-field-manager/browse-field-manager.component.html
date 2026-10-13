@@ -48,7 +48,7 @@
         </div>
         <div class="field-manager-actions" *ngIf="activePanel === 'entity' && selectedEntityId !== null">
             <button *ngIf="permissions.canAddExistingField" type="button" class="btn bgPurpleM add-existing-btn" (click)="addFromExisting()">
-                {{ 'AddFromExisting' | localize }} 
+                {{ 'AddfromExistingField(s)' | localize }} 
             </button>
             <button *ngIf="permissions.canCreateField" type="button" class="btn bgPurpleM create-field-btn" (click)="create()">
                 {{ 'CreateNewField' | localize }}

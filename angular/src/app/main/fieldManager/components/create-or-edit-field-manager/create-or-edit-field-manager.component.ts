@@ -210,21 +210,26 @@ export class CreateOrEditFieldManagerComponent extends AppComponentBase implemen
     }
 
     generateCode(): void {
-        if (this.isEdit) {
+        debugger;
+        if (this.isEdit)
             return;
-        }
-        const fieldType = this.selectedFieldType;
+
         const request = ++this.codePreviewRequest;
-        if (!fieldType || !this.item.fieldName.trim()) {
-            this.item.fieldCode = '';
+        if (this.previewTimer) clearTimeout(this.previewTimer);
+        const name = this.item?.fieldName?.trim();
+        const level = this.item?.fieldLevelCode || '';
+        const fieldTypeId = this.selectedFieldType?.id;
+        if (!name || !level || fieldTypeId == null) {
             return;
         }
-        if (this.previewTimer) clearTimeout(this.previewTimer);
-        const name = this.item.fieldName.trim();
-        const level = this.item.fieldLevelCode || '';
+
         this.previewTimer = setTimeout(() => {
-            this.fieldManagerService.previewFieldCode(fieldType.id!, name, level)
-                .subscribe({ next: code => { if (request === this.codePreviewRequest) this.item.fieldCode = code; } });
+        //i51-set only fieldCodeSeq
+            this.fieldManagerService.previewFieldCode(fieldTypeId, name, level)
+                .subscribe({ next: code => { if (request === this.codePreviewRequest)
+                // this.item.code ? 
+         this.item.fieldCode = `${this.selectedFieldType?.code?.substring(0, 2)}${level?.substring(0, 1)}${name?.substring(0, 4)}${code}`;
+         } });
         }, 250);
     }
 
