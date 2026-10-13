@@ -53,9 +53,7 @@ export class DashboardBrowseComponent
     ];
 
     selectedDashboardFilter = this.dashboardFilterOptions[0];
-
     profilePicture: string = '';
-
     profilePictureMap: {
         [key: string]: string
     } = {};
@@ -63,12 +61,10 @@ export class DashboardBrowseComponent
 
     attachmentBaseUrl: string = AppConsts.attachmentBaseUrl
     isSmallScreen = false;
-
-
-       showShareModal = false;
-selectedDashboard: any = null;
-shareMode: DashboardShareMode = 'all';
-sharedUsers: DashboardSharedUser[] = [];
+    showShareModal = false;
+    selectedDashboard: any = null;
+    shareMode: DashboardShareMode = 'all';
+    sharedUsers: DashboardSharedUser[] = [];
 
     constructor(
         injector: Injector,
@@ -113,7 +109,7 @@ sharedUsers: DashboardSharedUser[] = [];
             [
                 '/app/main/dashboards/dashboard-edit', row.id
             ],
-          
+
         );
     }
     createNew(): void {
@@ -183,18 +179,18 @@ sharedUsers: DashboardSharedUser[] = [];
     }
 
 
-openShareDashboard(row: any): void {
-    this.selectedDashboard = row;
-    this.sharedUsers = row?.sharedWithUsers
-    this.showShareModal = true;
-}
-onDashboardShareSaved(event:boolean) {
-    if(event ==true){
- this.showShareModal = false;
-    this.getDashboards();
+    openShareDashboard(row: any): void {
+        this.selectedDashboard = row;
+        this.sharedUsers = row?.sharedWithUsers
+        this.showShareModal = true;
     }
-   
-}
+    onDashboardShareSaved(event: boolean) {
+        if (event == true) {
+            this.showShareModal = false;
+            this.getDashboards();
+        }
+
+    }
 
     showShare(event: MouseEvent, row: any): void {
         this.shareUsers = row?.sharedWithUsers ?? [];

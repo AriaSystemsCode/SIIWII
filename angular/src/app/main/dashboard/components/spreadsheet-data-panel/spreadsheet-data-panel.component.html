@@ -1,8 +1,5 @@
-<div
-    *ngIf="visible"
-    class="spreadsheet-side-panel">
-    <div
-        class="
+<div *ngIf="visible" class="spreadsheet-side-panel">
+    <div class="
             d-flex
             justify-content-between
             align-items-start
@@ -15,39 +12,31 @@
             </h5>
             <small class="text-muted">
                 {{
-                    'InsertApplicationDataIntoNewSheet'
-                        | localize
+                'InsertApplicationDataIntoNewSheet'
+                | localize
                 }}
             </small>
         </div>
-        <button
-            type="button"
-            class="btn btn-sm btn-light"
-            (click)="closePanel()">
+        <button type="button" class="btn btn-sm btn-light" (click)="closePanel()">
             <i class="fa fa-times"></i>
         </button>
     </div>
-    <div
-        *ngIf="step === 1"
-        class="p-3">
+    <div *ngIf="step === 1" class="p-3">
         <div class="form-group">
             <label class="font-weight-bold">
                 {{ 'Table' | localize }}
             </label>
-            <small
-                class="
+            <small class="
                     d-block
                     text-muted
                     mb-3
                 ">
                 {{
-                    'SelectTableToInsert'
-                        | localize
+                'SelectTableToInsert'
+                | localize
                 }}
             </small>
-            <div
-                *ngIf="isLoadingTables"
-                class="
+            <div *ngIf="isLoadingTables" class="
                     d-flex
                     align-items-center
                     justify-content-center
@@ -57,19 +46,13 @@
                 <i class="fa fa-spinner fa-spin mr-2"></i>
                 {{ 'Loading' | localize }}
             </div>
-            <div
-                *ngFor="let table of tables"
-                class="card mb-2 entity-card"
-                (click)="selectTable(table)">
-                <div
-                    class="
+            <div *ngFor="let table of tables" class="card mb-2 entity-card" (click)="selectTable(table)">
+                <div class="
                         card-body
                         d-flex
                         align-items-center
                     ">
-                    <i
-                        [class]="getTableIcon(table)"
-                        class="mr-3">
+                    <i [class]="getTableIcon(table)" class="mr-3">
                     </i>
                     <span>
                         {{ table }}
@@ -78,34 +61,26 @@
             </div>
         </div>
     </div>
-    <div
-        *ngIf="
+    <div *ngIf="
             step === 2 &&
             selectedTable
-        "
-        class="p-3">
-       <button
-    *ngIf="!isEditMode"
-    type="button"
-    class="btn btn-link px-0 mb-2"
-    [disabled]="isAdding"
-    (click)="backToEntities()">
+        " class="p-3">
+        <button *ngIf="!isEditMode" type="button" class="btn btn-link px-0 mb-2" [disabled]="isAdding"
+            (click)="backToEntities()">
 
-    <i class="fa fa-arrow-left mr-2"></i>
-    {{ 'ChangeTable' | localize }}
-</button>
+            <i class="fa fa-arrow-left mr-2"></i>
+            {{ 'ChangeTable' | localize }}
+        </button>
         <h5 class="mb-1">
             {{ selectedTable }}
         </h5>
         <p class="text-muted mb-4">
             {{
-                'ChooseColumnsAndOptionalFilters'
-                    | localize
+            'ChooseColumnsAndOptionalFilters'
+            | localize
             }}
         </p>
-        <div
-            *ngIf="isLoadingColumns"
-            class="
+        <div *ngIf="isLoadingColumns" class="
                 d-flex
                 align-items-center
                 justify-content-center
@@ -117,8 +92,7 @@
         </div>
         <ng-container *ngIf="!isLoadingColumns">
             <div class="mb-4">
-                <div
-                    class="
+                <div class="
                         d-flex
                         align-items-center
                         justify-content-between
@@ -128,151 +102,100 @@
                         {{ 'Columns' | localize }}
                     </strong>
                     <div>
-                        <button
-                            type="button"
-                            class="btn btn-sm btn-link"
-                            [disabled]="isAdding"
+                        <button type="button" class="btn btn-sm btn-link" [disabled]="isAdding"
                             (click)="selectAllColumns()">
                             {{ 'SelectAll' | localize }}
                         </button>
-                        <button
-                            type="button"
-                            class="btn btn-sm btn-link"
-                            [disabled]="isAdding"
+                        <button type="button" class="btn btn-sm btn-link" [disabled]="isAdding"
                             (click)="clearColumns()">
                             {{ 'Clear' | localize }}
                         </button>
                     </div>
                 </div>
-                <div
-                    *ngIf="!tableColumns.length"
-                    class="text-muted py-2">
+                <div *ngIf="!tableColumns.length" class="text-muted py-2">
                     {{ 'NoColumnsFound' | localize }}
                 </div>
-                <div
-                    *ngFor="
+                <div *ngFor="
                         let column of tableColumns;
-                    "
-                    class="
+                    " class="
                         form-check
                         mb-2
                         d-flex
                         align-items-center
                     ">
-                 <input
-    type="checkbox"
-    class="form-check-input"
-    [id]="'column-' + column.attributeId"
-    [checked]="isColumnSelected(column)"
-    [disabled]="isAdding"
-    (change)="toggleColumn(column, $event)" />
-<label
-    class="form-check-label mx-2"
-    [for]="'column-' + column.attributeId">
-    {{ column.description }}
-</label>
+                    <input type="checkbox" class="form-check-input" [id]="'column-' + column.attributeId"
+                        [checked]="isColumnSelected(column)" [disabled]="isAdding"
+                        (change)="toggleColumn(column, $event)" />
+                    <label class="form-check-label mx-2" [for]="'column-' + column.attributeId">
+                        {{ column.description }}
+                    </label>
                 </div>
             </div>
-            <!-- <div *ngIf="filterFields.length" class="mb-4">
-                <strong class="d-block mb-3">{{ 'Filters' | localize }}</strong>
-                <fieldset [disabled]="isAdding" class="border-0 p-0 m-0">
-                    <app-dynamicInputs
-                        [style.pointer-events]="isAdding ? 'none' : null"
-                        [filterMode]="true"
-                        [suppliedFields]="filterFields"
-                        (filterValuesChanged)="onFilterValuesChanged($event)">
-                    </app-dynamicInputs>
-                </fieldset>
-            </div> -->
+
 
             <div *ngIf="filterFields.length" class="mb-4">
 
-    <div class="d-flex align-items-center justify-content-between mb-2">
-        <strong>{{ 'Filters' | localize }}</strong>
+                <div class="d-flex align-items-center justify-content-between mb-2">
+                    <strong>{{ 'Filters' | localize }}</strong>
 
-   <button
-    type="button"
-    class="btn bgPurble btn-sm"
-    [disabled]="isAdding"
-    (click)="openFilterDialog()">
+                    <button type="button" class="btn btn-addF  btn-sm" [disabled]="isAdding"
+                        (click)="openFilterDialog()">
 
-    <i
-        class="fa mr-2"
-        [ngClass]="selectedConditions.length ? 'fa-edit' : 'fa-plus'">
-    </i>
+                        <i class="fa mr-2" [ngClass]="selectedConditions.length ? 'fa-edit' : 'fa-plus'">
+                        </i>
 
-    {{
-        (selectedConditions.length ? 'EditFilters' : 'AddFilters')
-        | localize
-    }}
-</button>
-    </div>
+                        {{
+                        (selectedConditions.length ? 'EditFilters' : 'AddFilters')
+                        | localize
+                        }}
+                    </button>
+                </div>
 
-    <div *ngIf="selectedConditions.length" class="text-muted small">
-        <i class="fa fa-check-circle text-success mr-1"></i>
-        {{ selectedConditions.length }}
-        {{ 'AppliedFilters' | localize }}
-    </div>
+                <div *ngIf="selectedConditions.length" class="text-muted small">
+                    <i class="fa fa-check-circle text-success mr-1"></i>
+                    {{ selectedConditions.length }}
+                    {{ 'AppliedFilters' | localize }}
+                </div>
 
-</div>
+            </div>
 
-<p-dialog
-    [(visible)]="showFilterDialog"
-    [modal]="true"
-    [draggable]="false"
-    [resizable]="false"
-    [dismissableMask]="false"
-    [closable]="true"
-    [style]="{ width: '900px', maxWidth: '95vw' }"
-    [contentStyle]="{ overflow: 'visible' }"
-    [baseZIndex]="11000"
-    [appendTo]="'body'">
+            <p-dialog [(visible)]="showFilterDialog" [modal]="true" [draggable]="false" [resizable]="false"
+                [dismissableMask]="false" [closable]="true" [style]="{ width: '900px', maxWidth: '95vw' }"
+                [contentStyle]="{ overflow: 'visible' }" [baseZIndex]="11000" [appendTo]="'body'">
 
-    <ng-template pTemplate="header">
-        <div class="d-flex align-items-center">
-       
-            <span class="font-weight-bold">
-                {{ 'Filters' | localize }}
-            </span>
-        </div>
-    </ng-template>
+                <ng-template pTemplate="header">
+                    <div class="d-flex align-items-center">
 
-<app-filter-builder
-    *ngIf="showFilterDialog"
-    [fields]="filterBuilderFields"
-    [conditions]="selectedConditions"
-    [matchMode]="selectedMatchMode"
-    (matchModeChange)="onFilterMatchModeChanged($event)"
-    (apply)="onFiltersApplied($event)"
-    (cancel)="closeFilterDialog()">
-</app-filter-builder>
+                        <span class="font-weight-bold">
+                            {{ 'Filters' | localize }}
+                        </span>
+                    </div>
+                </ng-template>
 
-</p-dialog>
-<button
-    type="button"
-    class="btn btn-primary btn-block"
-    [disabled]="isAdding || !selectedColumns.length"
-    (click)="addSheet()">
+                <app-filter-builder *ngIf="showFilterDialog" [fields]="filterBuilderFields"
+                    [conditions]="selectedConditions" [matchMode]="selectedMatchMode"
+                    (matchModeChange)="onFilterMatchModeChanged($event)" (apply)="onFiltersApplied($event)"
+                    (cancel)="closeFilterDialog()">
+                </app-filter-builder>
 
-    <i
-        *ngIf="isAdding"
-        class="fa fa-spinner fa-spin mr-2">
-    </i>
+            </p-dialog>
+            <button type="button" class="btn btn-primary btn-block" [disabled]="isAdding || !selectedColumns.length"
+                (click)="addSheet()">
 
-    <i
-        *ngIf="!isAdding"
-        class="fa mr-2"
-        [ngClass]="isEditMode ? 'fa-check' : 'fa-plus'">
-    </i>
+                <i *ngIf="isAdding" class="fa fa-spinner fa-spin mr-2">
+                </i>
 
-    {{
-        (
-            isAdding
+                <i *ngIf="!isAdding" class="fa mr-2" [ngClass]="isEditMode ? 'fa-check' : 'fa-plus'">
+                </i>
+
+                {{
+                (
+                isAdding
                 ? (isEditMode ? 'Applying' : 'Adding')
                 : (isEditMode ? 'ApplyChanges' : 'AddAsNewSheet')
-        ) | localize
-    }}
-</button>
+                ) | localize
+                }}
+            </button>
         </ng-container>
     </div>
 </div>

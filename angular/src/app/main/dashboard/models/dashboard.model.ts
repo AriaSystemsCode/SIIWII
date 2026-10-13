@@ -186,3 +186,5 @@ export interface FilterBuilderRule extends FilterBuilderCondition {
 }
 
 
+export type ChartAggregation =
+    'None' | 'Sum' | 'Count' | 'Average' | 'Min' | 'Max';

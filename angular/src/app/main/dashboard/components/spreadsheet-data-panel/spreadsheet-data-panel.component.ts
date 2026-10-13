@@ -209,7 +209,7 @@ export class SpreadsheetDataPanelComponent
                     result: ExtraAttribute[]
                 ) => {
                     this.tableColumns = result ?? [];
-                    this.selectedColumns = [...this.tableColumns];
+                    // this.selectedColumns = [...this.tableColumns];
                     this.filterFields = [...this.tableColumns];
 
                     this.filterBuilderFields = this.filterFields.map((field: any) => ({
@@ -414,6 +414,7 @@ export class SpreadsheetDataPanelComponent
                         requestFields,
                         conditions,
                         undefined,
+                        false,
                         undefined,
                         skip,
                         this.batchSize

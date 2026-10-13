@@ -458,9 +458,9 @@ $danger-bg: #fff0f0;
 
         .p-dropdown-label {
             padding: 7px 10px;
-            color: $primary;
-            font-size: 13px;
-            font-weight: 600;
+            color: $primary !important;
+            font-size: 13px !important;
+            font-weight: 600 !important;
         }
 
         .p-dropdown-trigger {
