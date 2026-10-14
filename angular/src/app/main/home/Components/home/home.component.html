@@ -5,7 +5,7 @@
             <app-top-people></app-top-people>
             <app-top-company></app-top-company>
         </div>
-        <div class="middle-content">
+        <div class="middle-content" [ngClass]="isArabic ? 'mt-5 pt-5': ''">
             <app-post-list #apppostlistcomponent></app-post-list>
         </div>
         <div class="right-sidebar thin-scroll pr-1 pl-5">
