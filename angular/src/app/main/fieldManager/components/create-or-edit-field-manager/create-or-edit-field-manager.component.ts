@@ -134,6 +134,8 @@ export class CreateOrEditFieldManagerComponent extends AppComponentBase implemen
             editable: this.item.editable,
             extraAttributes: JSON.stringify({ ...this.extraAttributes, dropdownOptions: this.dropdownOptions })
         });
+
+        //i51-BE-FE-Generate field code !! 
         const codeSource = this.isEdit
             ? of(this.item.fieldCode || '')
             : this.fieldManagerService.previewFieldCode(fieldType.id!, fieldName, input.fieldLevelCode || '');
@@ -141,6 +143,9 @@ export class CreateOrEditFieldManagerComponent extends AppComponentBase implemen
             .subscribe({
                 next: code => {
                     input.fieldCode = code;
+                    //i51-BE-Define the expected behavior when two users attempt to create a new revision at the same time. If one user saves a revision number that has already been used by another user, the system should notify the second user and ask whether they want to continue with a different revision number or cancel the operation.
+                   
+                   //i51-BE-Validate the allowed entries. Please refer to the thread shared by Sam for further clarification: [Link].
                     this.fieldManagerService.createField(input).subscribe({
                     next: () => {
                         this.notify.success(this.l('SavedSuccessfully') ?? 'Saved successfully');
@@ -210,21 +215,27 @@ export class CreateOrEditFieldManagerComponent extends AppComponentBase implemen
     }
 
     generateCode(): void {
-        if (this.isEdit) {
+        debugger;
+           //i51-BE-FE-Generate field code !! 
+        if (this.isEdit)
             return;
-        }
-        const fieldType = this.selectedFieldType;
+
         const request = ++this.codePreviewRequest;
-        if (!fieldType || !this.item.fieldName.trim()) {
-            this.item.fieldCode = '';
+        if (this.previewTimer) clearTimeout(this.previewTimer);
+        const name = this.item?.fieldName?.trim();
+        const level = this.item?.fieldLevelCode || '';
+        const fieldTypeId = this.selectedFieldType?.id;
+        if (!name || !level || fieldTypeId == null) {
             return;
         }
-        if (this.previewTimer) clearTimeout(this.previewTimer);
-        const name = this.item.fieldName.trim();
-        const level = this.item.fieldLevelCode || '';
+
         this.previewTimer = setTimeout(() => {
-            this.fieldManagerService.previewFieldCode(fieldType.id!, name, level)
-                .subscribe({ next: code => { if (request === this.codePreviewRequest) this.item.fieldCode = code; } });
+        //i51-BE-FE-set only fieldCodeSeq
+            this.fieldManagerService.previewFieldCode(fieldTypeId, name, level)
+                .subscribe({ next: code => { if (request === this.codePreviewRequest)
+                // this.item.code ? 
+         this.item.fieldCode = `${this.selectedFieldType?.code?.substring(0, 2)}${level?.substring(0, 1)}${name?.substring(0, 4)}${code}`;
+         } });
         }, 250);
     }
 

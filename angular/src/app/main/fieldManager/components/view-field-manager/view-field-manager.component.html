@@ -5,7 +5,7 @@
             <div class="modal-header revision-modal-header">
                 <div>
                     <span class="eyebrow">FIELD MANAGER</span>
-                    <h5 class="modal-title" id="fieldManagerViewModalLabel">{{ viewState === 'draft' ? ('Editinganewrevision' | localize)  : viewState === 'history' ?  ('RevisionHistory' | localize) : ('FieldDetailedView' | localize) }}</h5>
+                    <h5 class="modal-title" id="fieldManagerViewModalLabel">{{ viewState === 'draft' ? ('CreateNewRevision' | localize)  : viewState === 'history' ?  ('RevisionHistory' | localize) : ('FieldDetailedView' | localize) }}</h5>
                 </div>
                 <button type="button" class="close" aria-label="Close" (click)="close()"><span aria-hidden="true">&times;</span></button>
             </div>
@@ -22,8 +22,7 @@
 
                     <div class="revision-toolbar-actions">
                         <button *ngIf="viewState === 'details' && isViewingHistoryRevision"
-                            type="button" class="btn history-action" (click)="restoreRevision()" disabled
-                            title="Revision restore is not available from the backend">
+                            type="button" class="btn history-action" (click)="restoreRevision()">
                             <i class="fa fa-undo"></i> Restore Revision
                         </button>
                         <button *ngIf="viewState === 'details' && !isViewingHistoryRevision" type="button"
@@ -32,7 +31,7 @@
                         </button>
                            <button *ngIf="viewState === 'details' && !isViewingHistoryRevision" type="button"
                             class="btn  revision-primary" (click)="createNewRevision()">
-                            <i class="fa fa-plus"></i> Create New Revision
+                            <i class="fa fa-plus"></i>{{ 'CreateNewRevision' | localize }}
                         </button>
                       <!--   <button *ngIf="viewState === 'draft'" type="button" class="btn btn-primary revision-primary" (click)="saveRevision()"
                             [disabled]="!item.fieldCode?.trim() || !item.fieldName.trim()">
@@ -59,8 +58,10 @@
                                 <tbody>
                                     <tr *ngFor="let revision of revisions">
                                         <td class="revision-number">Revision #{{ revision.currentRevisionNo || '00' }}</td>
-                                        <td>{{ revision.creatorUserId || '-' }}</td>
+                                        <!-- //i51-BE-FE-display the creator’s name instead of their ID -->
+                                        <td>{{ revision.creatorUserName || '-' }}</td>
                                         <td>{{ revision.creationTime | date:'MM/dd/yyyy h:mm a' }}</td>
+                                       <!-- //i51-BE-FE- Clarify which status values should be displayed in the History Log table (e.g., Previous, Current, etc.). -->
                                         <td><span class="status-badge badge-current">Current</span></td>
                                         <td class="actions-column"><button type="button" class="details-button" (click)="openRevision(revision)">Details <i class="fa fa-arrow-right"></i></button></td>
                                     </tr>
@@ -92,10 +93,10 @@
                             <div class="detail-item"><span>Field Code</span><strong>{{ item.fieldCode || '—' }}</strong></div>
                             <div class="detail-item"><span>Field Name</span><strong>{{ item.fieldName || '—' }}</strong></div>
                             <div class="detail-item detail-wide"><span>Description</span><strong>{{ item.description || '—' }}</strong></div>
-                            <div class="detail-item"><span>Field Type</span><strong>{{ fieldTypeName(item.fieldTypeId) || '—' }}</strong></div>
                             <div class="detail-item"><span>Field Level</span><strong>{{ item.fieldLevelCode || '—' }}</strong></div>
                             <div class="detail-item"><span>Status</span><strong>{{ item.fieldStatusCode || '—' }}</strong></div>
                             <div class="detail-item"><span>Tracking #</span><strong>{{ item.trackingNo || '—' }}</strong></div>
+                            <div class="detail-item"><span>Field Type</span><strong>{{ fieldTypeName(item.fieldTypeId) || '—' }}</strong></div>
                         </div>
                     </section>
 
@@ -121,7 +122,6 @@
                         </div>
                         <div class="revision-identity"><span class="revision-number">Revision #{{ revisionLabel }}</span><span class="status-badge badge-draft">Draft</span></div>
                     </div>
-                    <!-- <div class="revision-info-banner"><i class="fa fa-info-circle"></i><span>New Revision #{{ revisionLabel }} created from Revision #{{ selectedRevision?.revisionSequence }}. You can edit the field values before saving.</span></div> -->
                     <form #revisionForm="ngForm" class="revision-edit-form">
                         <section class="field-card">
                             <div class="card-section-heading"><div>
@@ -133,15 +133,16 @@
                                 <label class="form-field">Field Code<input class="form-control" name="code" [(ngModel)]="item.fieldCode" required /></label>
                                 <label class="form-field">Field Name<input class="form-control" name="name" [(ngModel)]="item.fieldName" required /></label>
                                 <label class="form-field form-field-wide">Description<textarea class="form-control" name="description" rows="3" [(ngModel)]="item.description"></textarea></label>
-                                <label class="form-field">Field Type<select class="form-control" name="fieldTypeId" [(ngModel)]="item.fieldTypeId"><option *ngFor="let type of fieldTypes" [ngValue]="type.id">{{ type.name }}</option></select></label>
                                 <label class="form-field">Field Level<select class="form-control" name="fieldLevelCode" [(ngModel)]="item.fieldLevelCode"><option value="System">System</option><option value="Application">Application</option><option value="Tenant">Tenant</option></select></label>
                                 <label class="form-field">Status<select class="form-control" name="fieldStatusCode" [(ngModel)]="item.fieldStatusCode"><option value="Proposed">Proposed</option><option value="Active">Active</option><option value="Discontinued">Discontinued</option></select></label>
                                 <label class="form-field">Tracking #<input class="form-control" name="trackingNo" [(ngModel)]="item.trackingNo" /></label>
+                                <label class="form-field">Field Type<select class="form-control" name="fieldTypeId" [(ngModel)]="item.fieldTypeId"><option *ngFor="let type of fieldTypes" [ngValue]="type.id">{{ type.name }}</option></select></label>
                             </div>
                         </section>
                         <section class="field-card advanced-card">
                             <div class="card-section-heading"><div>
-                                <!-- <span class="section-icon"><i class="fa fa-sliders"></i></span> -->
+                                <!-- <span class="section-icon"><i class="fa fa-sliders"></i></span> --> 
+                                 <!-- //i51-BE-FE-Handle Extra Data in the View and Create/Edit/view modals  -->
                                 <h3>Advanced Information</h3></div></div>
                             <div class="edit-grid">
                                 <label class="form-field">Allow Null<select class="form-control" name="allowNull" [(ngModel)]="item.allowNull"><option [ngValue]="true">Yes</option><option [ngValue]="false">No</option></select></label>
