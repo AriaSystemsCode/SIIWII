@@ -64,6 +64,6 @@ namespace onetouch.AppFields
         public bool Editable { get; set; }
 
         // Type-specific attributes (for example dropdown options) are JSON.
-        public string ExtraAttributes { get; set; }
+       // public string ExtraAttributes { get; set; }
     }
 }

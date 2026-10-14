@@ -238,13 +238,13 @@ namespace onetouch.AppFields
                     if (selectedType == null) throw new UserFriendlyException("Select a valid object type.");
                     var assignedIds = assignments.Where(x => x.SycObjectId == selectedType.ObjectId &&
                         (x.SycEntityObjectTypeId == null || x.SycEntityObjectTypeId == selectedType.Id))
-                        .Select(x => x.AppFieldId);
+                        .Select(x => x.Id);
                     query = query.Where(x => assignedIds.Contains(x.Id));
                 }
                 else if (input.SelectedObjectId.HasValue)
                 {
                     var assignedIds = assignments.Where(x => x.SycObjectId == input.SelectedObjectId.Value &&
-                        x.SycEntityObjectTypeId == null).Select(x => x.AppFieldId);
+                        x.SycEntityObjectTypeId == null).Select(x => x.Id);
                     query = query.Where(x => assignedIds.Contains(x.Id));
                 }
                 if (!string.IsNullOrWhiteSpace(input.SearchText))
@@ -272,8 +272,8 @@ namespace onetouch.AppFields
                 var typeNames = await _objectTypes.GetAll().Where(x => typeIds.Contains(x.Id))
                     .ToDictionaryAsync(x => x.Id, x => x.Name);
                 var pageIds = page.Select(x => x.Id).ToList();
-                var pageAssignments = await assignments.Where(x => pageIds.Contains(x.AppFieldId))
-                    .Select(x => new { x.AppFieldId, x.SycObjectId, x.SycEntityObjectTypeId })
+                var pageAssignments = await assignments.Where(x => pageIds.Contains(x.Id))
+                    .Select(x => new { x.Id, x.SycObjectId, x.SycEntityObjectTypeId })
                     .AsNoTracking().ToListAsync();
                 var objectIds = pageAssignments.Select(x => x.SycObjectId).Distinct().ToList();
                 var objectNames = await _objects.GetAll().Where(x => objectIds.Contains(x.Id))
@@ -308,7 +308,7 @@ namespace onetouch.AppFields
                     EntitySycObjectId = x.EntitySycObjectId,
                     CreatorUserId = x.CreatorUserId,
                     CreationTime = x.CreationTime,
-                    Tables = pageAssignments.Where(a => a.AppFieldId == x.Id)
+                    Tables = pageAssignments.Where(a => a.Id == x.Id)
                         .Select(a => a.SycEntityObjectTypeId.HasValue && assignmentTypeNames.TryGetValue(a.SycEntityObjectTypeId.Value, out var assignedTypeName)
                             ? assignedTypeName
                             : objectNames.TryGetValue(a.SycObjectId, out var tableName) ? tableName : null)
@@ -562,7 +562,7 @@ namespace onetouch.AppFields
             field.Required = input.Required;
             field.Visible = input.Visible;
             field.Editable = input.Editable;
-            field.ExtraAttributes = input.ExtraAttributes;
+            //field.ExtraAttributes = input.ExtraAttributes;
         }
 
         private async Task RecordHistory(AppField field, string changeType)
@@ -694,7 +694,7 @@ namespace onetouch.AppFields
             TrackingNo = x.TrackingNo, IsExtraField = x.IsExtraField, AllowNull = x.AllowNull,
             Length = x.Length, Decimals = x.Decimals, DefaultValue = x.DefaultValue,
             DateFormat = x.DateFormat, TimeFormat = x.TimeFormat, AllowMultiSelect = x.AllowMultiSelect,
-            Required = x.Required, Visible = x.Visible, Editable = x.Editable, ExtraAttributes = x.ExtraAttributes
+            Required = x.Required, Visible = x.Visible, Editable = x.Editable, //ExtraAttributes = x.ExtraAttributes
         };
 
         private static AppFieldDto ToDto(AppField x) => new AppFieldDto
@@ -708,7 +708,7 @@ namespace onetouch.AppFields
             IsStandard = x.IsStandard, IsCustom = x.IsCustom, IsExtraField = x.IsExtraField, IsHidden = x.IsHidden,
             AllowNull = x.AllowNull, Length = x.Length, Decimals = x.Decimals, DefaultValue = x.DefaultValue,
             DateFormat = x.DateFormat, TimeFormat = x.TimeFormat, AllowMultiSelect = x.AllowMultiSelect,
-            Required = x.Required, Visible = x.Visible, Editable = x.Editable, ExtraAttributes = x.ExtraAttributes,
+            Required = x.Required, Visible = x.Visible, Editable = x.Editable,// ExtraAttributes = x.ExtraAttributes,
             CreationTime = x.CreationTime, CreatorUserId = x.CreatorUserId,
             LastModificationTime = x.LastModificationTime, LastModifierUserId = x.LastModifierUserId,
             IsDeleted = x.IsDeleted, DeleterUserId = x.DeleterUserId, DeletionTime = x.DeletionTime
