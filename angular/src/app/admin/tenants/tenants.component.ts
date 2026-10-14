@@ -45,8 +45,7 @@ export class TenantsComponent extends AppComponentBase implements OnInit {
         selectedEditionId: number;
     } = <any>{};
 
-        currentLang: string;
-isArabic: boolean = false;
+
     constructor(
         injector: Injector,
         private _tenantService: TenantServiceProxy,
@@ -56,8 +55,6 @@ isArabic: boolean = false;
     ) {
         super(injector);
         this.setFiltersFromRoute();
-           this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
-            this.currentLang == 'ar' || this.currentLang == 'ar-EG'  ? this.isArabic = true : this.isArabic = false
     }
 
 

@@ -974,3 +974,9 @@ input[type='password']::-webkit-contacts-auto-fill-button {
   visibility: hidden !important;
   pointer-events: none !important;
 }
+
+@media (min-width: 1025px) {
+    html[dir="rtl"] .mt-ar{
+        margin-top: 85px !important;
+    }
+}
