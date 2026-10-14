@@ -12,22 +12,18 @@
 
             <div class="d-flex align-items-center gap-3 min-w-0">
 
-                <div class="dash-icon">
+                <!-- <div class="dash-icon">
                     <i class="pi pi-chart-bar"></i>
-                </div>
+                </div> -->
 
                 <div class="min-w-0">
 
-                    <h2 class="dash-title text-truncate m-0">
-
-                        {{ dashboard?.title }}
-
-                    </h2>
+             
 
                     <div class="dash-meta text-muted mt-1">
 
                         <span class="mr-3">
-                            Updated:
+                           Last Updated:
                             <b>
                                 {{
                                  dashboard?.lastViewDate | momentFormat:'L' }}
@@ -41,10 +37,14 @@
                 </div>
 
             </div>
+       <h2 class="dash-title text-truncate m-0">
 
+                        {{ dashboard?.title }}
+
+                    </h2>
 
             <!-- Actions -->
-            <div class="d-flex align-items-center gap-2">
+            <!-- <div class="d-flex align-items-center gap-2">
 
                 <button pButton type="button" icon="pi pi-refresh" class="refreshBtn" pTooltip="Refresh dashboard"
                     [loading]="refreshing" [disabled]="
@@ -62,7 +62,35 @@
                     (click)="menu.toggle($event)" aria-label="More actions">
                 </button>
 
-            </div>
+            </div> -->
+
+
+               <div class="dashboard-actions d-flex align-items-center gap-2">
+
+   <button
+    pButton
+    type="button"
+    icon="pi pi-refresh"
+    class="p-button-outlined p-button-secondary"
+    pTooltip="Refresh Dashboard"
+    [loading]="refreshing"
+    [disabled]="loading || refreshing || exportingPdf"
+    (click)="refreshDashboard()">
+</button>
+
+    <button
+        pButton
+        type="button"
+        icon="pi pi-file-pdf"
+        [label]="'Export to PDF'"
+        class="p-button-danger"
+       
+        [loading]="exportingPdf"
+        [disabled]="loading || refreshing || !dashboardWorkbookReady"
+        (click)="exportDashboardPdf()">
+    </button>
+
+</div>
 
         </div>
 

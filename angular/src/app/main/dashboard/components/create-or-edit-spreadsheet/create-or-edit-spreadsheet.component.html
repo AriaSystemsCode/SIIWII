@@ -6,11 +6,11 @@
             <h3 class="mb-0">{{ 'Spreadsheet' | localize }}</h3>
 
             <small *ngIf="dashboardId" class="text-muted mx-2">
-                {{ 'Dashboard' | localize }} #{{ dashboardTtle }}
+                #{{ dashboardTtle }}
             </small>
 
             <!-- Info bar: only on data sheets (hidden on Dashboard and Pivot tabs) -->
-            <ng-container *ngIf="showInfoBar">
+            <!-- <ng-container *ngIf="showInfoBar">
                 <ng-container *ngIf="appliedFilters as applied">
                     <div class="d-flex align-items-center flex-wrap gap-4">
                         <span class="spreadsheet-filter-bar">
@@ -41,12 +41,12 @@
                         </span>
                     </div>
                 </ng-container>
-            </ng-container>
+            </ng-container> -->
         </div>
 
         <div class="d-flex align-items-center">
             <button *ngIf="isDirty" type="button" class="btn btn-primary mr-2" (click)="saveSpreadsheet()">
-                <i class="fa fa-save mr-2"></i>
+                <!-- <i class="fa fa-save mr-2"></i> -->
                 {{ 'Save' | localize }}
             </button>
 
@@ -75,16 +75,16 @@
 
         <!-- SPREADSHEET -->
         <div class="spreadsheet-editor flex-grow-1 position-relative" (click)="onSheetClick($event)">
-            <ejs-spreadsheet #spreadsheet width="100%" height="calc(100vh - 220px)" [sheets]="sheets"
+            <ejs-spreadsheet #spreadsheet width="100%"   height="100%" [sheets]="sheets"
                 [scrollSettings]="scrollSettings" [showAggregate]="showAggregate" [showSheetTabs]="true"
-                (created)="onCreated()" (ribbonClick)="onRibbonClick($event)" (actionComplete)="onSpreadsheetActionComplete($event)">
+                (created)="onCreated()" (ribbonClick)="onRibbonClick($event)" (ribbonSelect)="onSpreadsheetRibbonSelect()" (actionComplete)="onSpreadsheetActionComplete($event)">
             </ejs-spreadsheet>
 
             <!-- PIVOT -->
             <div *ngIf="showPivot" class="pivot-sheet-overlay">
                 <div class="d-flex align-items-center justify-content-between px-3 py-2 border-bottom bg-white">
                     <div>
-                        <h5 class="mb-1">{{ pivotSheet }}</h5>
+                        <h5 class="mb-1 mx-2">{{ pivotSheet }}</h5>
                         <small class="text-muted">{{ 'Source' | localize }}: {{ sourceSheet }}</small>
                     </div>
 
@@ -109,7 +109,7 @@
                     </div>
                 </div>
 
-                <div class="pivot-analysis-layout bg-white" style="height: calc(100vh - 360px);">
+                <div class="pivot-analysis-layout bg-white" >
                     <!-- Table / chart -->
                     <div class="flex-grow-1" style="min-width: 0; height: 100%; overflow: hidden;">
                         <ejs-pivotview #pivotView id="PivotView" width="100%" height="100%"
@@ -121,8 +121,7 @@
                     </div>
 
                     <!-- Fixed field list -->
-                    <div class="border-left bg-white"
-                        style="width: 420px; min-width: 420px; height: 100%; overflow: auto;">
+                    <div class="pivot-fields-container border-left bg-white">
                         <div class="px-3 py-2 border-bottom font-weight-bold">
                             {{ 'FieldsAndPivotConfiguration' | localize }}
                         </div>
@@ -137,9 +136,14 @@
           
             </div>
         </div>
-
+<div
+    *ngIf="showDataPanel || showChartPanel"
+    class="spreadsheet-panel-backdrop"
+    (click)="closeResponsivePanel()">
+</div>
         <!-- ================= ADD DATA PANEL ================= -->
      <app-spreadsheet-data-panel
+       [class.panel-open]="showDataPanel"
     [visible]="showDataPanel"
     [editSource]="editingSheetSource"
     (close)="closeDataPanel()"
@@ -285,9 +289,9 @@
 </div>
 
 
-<p-menu
+<!-- <p-menu
     #listMenu
     [model]="listMenuItems"
     [popup]="true"
     appendTo="body">
-</p-menu>
+</p-menu> -->

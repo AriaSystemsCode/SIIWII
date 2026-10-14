@@ -22,44 +22,59 @@
         </button>
     </div>
     <div *ngIf="step === 1" class="p-3">
+
         <div class="form-group">
+
             <label class="font-weight-bold">
                 {{ 'Table' | localize }}
             </label>
-            <small class="
-                    d-block
-                    text-muted
-                    mb-3
-                ">
-                {{
-                'SelectTableToInsert'
-                | localize
-                }}
+
+            <small class="d-block text-muted mb-3">
+                {{ 'SelectTableToInsert' | localize }}
             </small>
-            <div *ngIf="isLoadingTables" class="
-                    d-flex
-                    align-items-center
-                    justify-content-center
-                    py-4
-                    text-muted
-                ">
+
+            <div *ngIf="isLoadingTables" class="d-flex align-items-center justify-content-center py-4 text-muted">
+
                 <i class="fa fa-spinner fa-spin mr-2"></i>
                 {{ 'Loading' | localize }}
+
             </div>
-            <div *ngFor="let table of tables" class="card mb-2 entity-card" (click)="selectTable(table)">
-                <div class="
-                        card-body
-                        d-flex
-                        align-items-center
-                    ">
-                    <i [class]="getTableIcon(table)" class="mr-3">
-                    </i>
-                    <span>
+
+            <!-- TABLE SELECTION -->
+            <div *ngFor="let table of tables" class="card mb-2 entity-card"
+                [class.entity-card-selected]="selectedTableForNext === table" (click)="chooseTable(table)">
+
+                <div class="card-body d-flex align-items-center">
+
+                    <i [class]="getTableIcon(table)" class="mr-3"></i>
+
+                    <span class="flex-grow-1">
                         {{ table }}
                     </span>
+
+                    <i *ngIf="selectedTableForNext === table" class="fa fa-check-circle selected-check">
+                    </i>
+
                 </div>
+
             </div>
+
         </div>
+
+        <!-- NEXT BUTTON AT END OF STEP 1 -->
+        <div class="d-flex justify-content-end mt-4 pt-3 border-top">
+
+            <button type="button" class="btn btn-primary next-btn" [disabled]="!selectedTableForNext || isLoadingTables"
+                (click)="goToColumnsStep()">
+
+                {{ 'Next' | localize }}
+
+                <i class="fa fa-arrow-right ml-2"></i>
+
+            </button>
+
+        </div>
+
     </div>
     <div *ngIf="
             step === 2 &&
@@ -132,13 +147,12 @@
                 </div>
             </div>
 
-
             <div *ngIf="filterFields.length" class="mb-4">
 
-                <div class="d-flex align-items-center justify-content-between mb-2">
+                <div class="d-flex align-items-center justify-content-between mb-3">
                     <strong>{{ 'Filters' | localize }}</strong>
 
-                    <button type="button" class="btn btn-addF  btn-sm" [disabled]="isAdding"
+                    <button type="button" class="btn btn-addF btn-sm" [disabled]="isAdding"
                         (click)="openFilterDialog()">
 
                         <i class="fa mr-2" [ngClass]="selectedConditions.length ? 'fa-edit' : 'fa-plus'">
@@ -151,34 +165,86 @@
                     </button>
                 </div>
 
-                <div *ngIf="selectedConditions.length" class="text-muted small">
-                    <i class="fa fa-check-circle text-success mr-1"></i>
-                    {{ selectedConditions.length }}
-                    {{ 'AppliedFilters' | localize }}
+                <!-- READ-ONLY FILTER SUMMARY -->
+                <div *ngIf="selectedConditions.length" class="filter-preview">
+
+                    <div class="filter-preview-title">
+                        {{ 'Match' | localize }}
+
+                        <span class="filter-match-value">
+                            {{ selectedMatchMode }}
+                        </span>
+
+                        {{ 'of the following conditions' | localize }}:
+                    </div>
+
+                    <div class="filter-preview-rules">
+
+                        <div *ngFor="let condition of selectedConditions" class="filter-preview-rule">
+
+                            <strong>
+                                {{ getConditionFieldLabel(condition.field) }}
+                            </strong>
+
+                            <em>
+                                {{ getConditionOperatorLabel(condition.operator) }}
+                            </em>
+
+                            <span class="filter-preview-value">
+                                {{ getConditionValueLabel(condition) }}
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                </div>
+                <!-- EMPTY STATE -->
+                <div *ngIf="!selectedConditions.length" class="filter-empty-state">
+
+                    <i class="fa fa-filter mr-2"></i>
+                    {{ 'NoFiltersApplied' | localize }}
+
                 </div>
 
             </div>
 
-            <p-dialog [(visible)]="showFilterDialog" [modal]="true" [draggable]="false" [resizable]="false"
-                [dismissableMask]="false" [closable]="true" [style]="{ width: '900px', maxWidth: '95vw' }"
-                [contentStyle]="{ overflow: 'visible' }" [baseZIndex]="11000" [appendTo]="'body'">
+      <p-dialog
+    [(visible)]="showFilterDialog"
+    [modal]="true"
+    [draggable]="false"
+    [resizable]="false"
+    [dismissableMask]="false"
+    [closable]="true"
+    [style]="{ width: '900px', maxWidth: 'calc(100vw - 24px)' }"
+    [breakpoints]="{
+        '992px': '90vw',
+        '576px': 'calc(100vw - 16px)'
+    }"
+    [contentStyle]="{
+        padding: '0',
+        overflow: 'hidden'
+    }"
+    [baseZIndex]="11000"
+    [appendTo]="'body'">
 
-                <ng-template pTemplate="header">
-                    <div class="d-flex align-items-center">
+    <ng-template pTemplate="header">
+        <span class="font-weight-bold">
+            {{ 'Filters' | localize }}
+        </span>
+    </ng-template>
 
-                        <span class="font-weight-bold">
-                            {{ 'Filters' | localize }}
-                        </span>
-                    </div>
-                </ng-template>
+    <app-filter-builder
+        *ngIf="showFilterDialog"
+        [fields]="filterBuilderFields"
+        [conditions]="selectedConditions"
+        [matchMode]="selectedMatchMode"
+        (matchModeChange)="onFilterMatchModeChanged($event)"
+        (apply)="onFiltersApplied($event)"
+        (cancel)="closeFilterDialog()">
+    </app-filter-builder>
 
-                <app-filter-builder *ngIf="showFilterDialog" [fields]="filterBuilderFields"
-                    [conditions]="selectedConditions" [matchMode]="selectedMatchMode"
-                    (matchModeChange)="onFilterMatchModeChanged($event)" (apply)="onFiltersApplied($event)"
-                    (cancel)="closeFilterDialog()">
-                </app-filter-builder>
-
-            </p-dialog>
+</p-dialog>
             <button type="button" class="btn btn-primary btn-block" [disabled]="isAdding || !selectedColumns.length"
                 (click)="addSheet()">
 

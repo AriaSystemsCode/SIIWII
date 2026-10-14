@@ -7120,12 +7120,13 @@ export class AppDashboardServiceProxy {
      * @param fields (optional) 
      * @param conditions (optional) 
      * @param lastUpdateDate (optional) 
+     * @param applyAnyOfConditions (optional) 
      * @param sorting (optional) 
      * @param skipCount (optional) 
      * @param maxResultCount (optional) 
      * @return Success
      */
-    getAllTableData(tenantId: number | undefined, tableName: string | null | undefined, fields: string[] | null | undefined, conditions: DynamicCondition[] | null | undefined, lastUpdateDate: moment.Moment | null | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<DynamicQueryResult> {
+    getAllTableData(tenantId: number | undefined, tableName: string | null | undefined, fields: string[] | null | undefined, conditions: DynamicCondition[] | null | undefined, lastUpdateDate: moment.Moment | null | undefined, applyAnyOfConditions: boolean | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<DynamicQueryResult> {
         let url_ = this.baseUrl + "/api/services/app/AppDashboard/GetAllTableData?";
         if (tenantId === null)
             throw new Error("The parameter 'tenantId' cannot be null.");
@@ -7144,6 +7145,10 @@ export class AppDashboardServiceProxy {
             });
         if (lastUpdateDate !== undefined && lastUpdateDate !== null)
             url_ += "LastUpdateDate=" + encodeURIComponent(lastUpdateDate ? "" + lastUpdateDate.toISOString() : "") + "&";
+        if (applyAnyOfConditions === null)
+            throw new Error("The parameter 'applyAnyOfConditions' cannot be null.");
+        else if (applyAnyOfConditions !== undefined)
+            url_ += "ApplyAnyOfConditions=" + encodeURIComponent("" + applyAnyOfConditions) + "&";
         if (sorting !== undefined && sorting !== null)
             url_ += "Sorting=" + encodeURIComponent("" + sorting) + "&";
         if (skipCount === null)
@@ -78711,6 +78716,7 @@ export class DynamicCondition implements IDynamicCondition {
     field!: string | undefined;
     operator!: string | undefined;
     value!: string | undefined;
+    value2!: string | undefined;
 
     [key: string]: any;
 
@@ -78732,6 +78738,7 @@ export class DynamicCondition implements IDynamicCondition {
             this.field = _data["field"];
             this.operator = _data["operator"];
             this.value = _data["value"];
+            this.value2 = _data["value2"];
         }
     }
 
@@ -78751,6 +78758,7 @@ export class DynamicCondition implements IDynamicCondition {
         data["field"] = this.field;
         data["operator"] = this.operator;
         data["value"] = this.value;
+        data["value2"] = this.value2;
         return data;
     }
 }
@@ -78759,6 +78767,7 @@ export interface IDynamicCondition {
     field: string | undefined;
     operator: string | undefined;
     value: string | undefined;
+    value2: string | undefined;
 
     [key: string]: any;
 }
@@ -103800,6 +103809,7 @@ export class DynamicQueryInput implements IDynamicQueryInput {
     fields!: string[] | undefined;
     conditions!: DynamicCondition[] | undefined;
     lastUpdateDate!: moment.Moment | undefined;
+    applyAnyOfConditions!: boolean;
     sorting!: string | undefined;
     skipCount!: number;
     maxResultCount!: number;
@@ -103834,6 +103844,7 @@ export class DynamicQueryInput implements IDynamicQueryInput {
                     this.conditions!.push(DynamicCondition.fromJS(item));
             }
             this.lastUpdateDate = _data["lastUpdateDate"] ? moment(_data["lastUpdateDate"].toString()) : <any>undefined;
+            this.applyAnyOfConditions = _data["applyAnyOfConditions"];
             this.sorting = _data["sorting"];
             this.skipCount = _data["skipCount"];
             this.maxResultCount = _data["maxResultCount"];
@@ -103866,6 +103877,7 @@ export class DynamicQueryInput implements IDynamicQueryInput {
                 data["conditions"].push(item.toJSON());
         }
         data["lastUpdateDate"] = this.lastUpdateDate ? this.lastUpdateDate.toISOString() : <any>undefined;
+        data["applyAnyOfConditions"] = this.applyAnyOfConditions;
         data["sorting"] = this.sorting;
         data["skipCount"] = this.skipCount;
         data["maxResultCount"] = this.maxResultCount;
@@ -103879,6 +103891,7 @@ export interface IDynamicQueryInput {
     fields: string[] | undefined;
     conditions: DynamicCondition[] | undefined;
     lastUpdateDate: moment.Moment | undefined;
+    applyAnyOfConditions: boolean;
     sorting: string | undefined;
     skipCount: number;
     maxResultCount: number;

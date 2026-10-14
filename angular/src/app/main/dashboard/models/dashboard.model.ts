@@ -37,7 +37,7 @@ export interface SpreadsheetFilters {
 export interface SpreadsheetDataSource {
     type: string;
     sourceKey?: string;
-    mode: 'SelectedRecords' | 'AllRecords';
+    mode: 'any' | 'all';
     selectedIds?: number[];
     columns?: string[];
     filters?: SpreadsheetFilters | Record<string, any>;

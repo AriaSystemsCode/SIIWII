@@ -134,32 +134,36 @@ export class CreateOrEditSpreadsheetComponent extends AppComponentBase implement
 
     dashboardTtle: string = ''
 
-    @ViewChild('listMenu') listMenu!: Menu;
+    // @ViewChild('listMenu') listMenu!: Menu;
 
-    listMenuItems: MenuItem[] = [
-        {
-            label: 'New List',
-            icon: 'pi pi-plus',
-            command: () => this.openDataPanel()
-        },
-        {
-            label: 'Edit List Data',
-            icon: 'pi pi-pencil',
-            command: () => this.editActiveSheetFilters()
-        }
-    ];
+    // listMenuItems: MenuItem[] = [
+    //     {
+    //         label: 'New Data Source',
+    //         icon: 'pi pi-plus',
+    //         command: () => this.openDataPanel()
+    //     },
+    //     {
+    //         label: 'See List Properties',
+    //         icon: 'pi pi-pencil',
+    //         command: () => this.editActiveSheetFilters()
+    //     }
+    // ];
 
 
     chartAggregation: ChartAggregation = 'None';
 
-chartAggregationOptions = [
-    { label: 'No Aggregation', value: 'None' },
-    { label: 'Sum', value: 'Sum' },
-    { label: 'Count', value: 'Count' },
-    { label: 'Average', value: 'Average' },
-    { label: 'Minimum', value: 'Min' },
-    { label: 'Maximum', value: 'Max' }
-];
+    chartAggregationOptions = [
+        { label: 'No Aggregation', value: 'None' },
+        { label: 'Sum', value: 'Sum' },
+        { label: 'Count', value: 'Count' },
+        { label: 'Average', value: 'Average' },
+        { label: 'Minimum', value: 'Min' },
+        { label: 'Maximum', value: 'Max' }
+    ];
+
+
+    private listRibbonObserver: MutationObserver | null = null;
+    private lastListRibbonLabel = '';
 
     constructor(
         injector: Injector,
@@ -211,37 +215,37 @@ chartAggregationOptions = [
 
 
     private aggregateChartValues(
-    values: number[],
-    method: ChartAggregation,
-    recordCount: number
-): number {
+        values: number[],
+        method: ChartAggregation,
+        recordCount: number
+    ): number {
 
-    if (method === 'Count') {
-        return recordCount;
+        if (method === 'Count') {
+            return recordCount;
+        }
+
+        if (!values.length) {
+            return 0;
+        }
+
+        switch (method) {
+            case 'Sum':
+                return values.reduce((a, b) => a + b, 0);
+
+            case 'Average':
+                return values.reduce((a, b) => a + b, 0)
+                    / values.length;
+
+            case 'Min':
+                return Math.min(...values);
+
+            case 'Max':
+                return Math.max(...values);
+
+            default:
+                return values[0];
+        }
     }
-
-    if (!values.length) {
-        return 0;
-    }
-
-    switch (method) {
-        case 'Sum':
-            return values.reduce((a, b) => a + b, 0);
-
-        case 'Average':
-            return values.reduce((a, b) => a + b, 0)
-                / values.length;
-
-        case 'Min':
-            return Math.min(...values);
-
-        case 'Max':
-            return Math.max(...values);
-
-        default:
-            return values[0];
-    }
-}
     /** Syncfusion finishes sheet/chart work on the next browser turns. */
     private async settle(): Promise<void> {
         await yieldToBrowser();
@@ -312,19 +316,18 @@ chartAggregationOptions = [
 
     ngOnDestroy(): void {
         this.stopSheetWatcher();
+        this.stopListRibbonObserver();
         clearTimeout(this.pivotSyncTimer);
     }
-
     onCreated(): void {
-        if (!this.spreadsheet) {
-            return;
-        }
+        if (!this.spreadsheet) return;
 
         this.addRibbonButtons();
-        this.startSheetWatcher();
+
+        this.startListRibbonObserver();
+
         this.loadDashboard();
     }
-
     private loadDashboard(): void {
         if (!this.dashboardId || !this.spreadsheet) {
             return;
@@ -352,7 +355,20 @@ chartAggregationOptions = [
                 } finally {
                     this.isDirty = false;
                     this.ignoreSpreadsheetChanges = false;
-                    this.cdr.detectChanges();
+
+                    // Workbook and sheetSources are now restored.
+                    this.syncSheetIdentity();
+                    this.syncSheetToUi();
+
+                    // Start watching only after loading.
+                    this.startSheetWatcher();
+
+                    // Force the initial ribbon state.
+                    setTimeout(() => {
+                        this.syncSheetToUi();
+                        this.updateListRibbonButton();
+                        this.cdr.detectChanges();
+                    }, 200);
                 }
             },
             error: (error: any) => {
@@ -363,19 +379,27 @@ chartAggregationOptions = [
     }
 
     private async openWorkbook(saved: any): Promise<void> {
-        const data = typeof saved === 'string' ? JSON.parse(saved) : saved;
+        const data = typeof saved === 'string'
+            ? JSON.parse(saved)
+            : saved;
 
-        this.sheetSources = this.cloneSheetSources(data?.sheetDataSources ?? []);
+        this.sheetSources = this.cloneSheetSources(
+            data?.sheetDataSources ?? []
+        );
+
         this.analyses = clone(data?.sheetAnalyses ?? []);
         this.widgets = clone(data?.dashboardWidgets ?? []);
         this.spreadsheetUpdatedDate = data?.updatedDate ?? null;
         this.currentFilters = null;
 
+        const workbook = this.cleanWorkbookJson(
+            data?.workbookJson ?? data
+        );
 
-
-        const workbook = this.cleanWorkbookJson(data?.workbookJson ?? data);
-
-        this.grid.openFromJson({ file: workbook?.jsonObject ?? workbook }, this.saveOptions);
+        this.grid.openFromJson(
+            { file: workbook?.jsonObject ?? workbook },
+            this.saveOptions
+        );
 
         await new Promise(resolve => setTimeout(resolve, 500));
 
@@ -384,6 +408,16 @@ chartAggregationOptions = [
 
         this.syncSheetIdentity();
         this.syncSheetToUi();
+
+        // Detect the initially active sheet after loading.
+        this.lastSheetIndex = Number(
+            this.grid.activeSheetIndex ?? 0
+        );
+
+        setTimeout(() => {
+            this.updateListRibbonButton();
+        }, 0);
+
         this.spreadsheet?.resize();
     }
 
@@ -415,6 +449,7 @@ chartAggregationOptions = [
         await this.activateSheet(DASHBOARD_SHEET);
 
         this.syncSheetIdentity();
+        this.updateListRibbonButton();
         this.resizeLater(100);
     }
 
@@ -422,127 +457,127 @@ chartAggregationOptions = [
     // CHART PANEL
     // =====================================================
 
-onSheetClick(event: MouseEvent): void {
-    const target = event.target as HTMLElement | null;
+    onSheetClick(event: MouseEvent): void {
+        const target = event.target as HTMLElement | null;
 
-    if (!target || !this.spreadsheet) {
-        return;
-    }
+        if (!target || !this.spreadsheet) {
+            return;
+        }
 
-    // 1. Detect whether the user clicked a chart.
-    const overlay = target.closest(
-        '.e-datavisualization-chart'
-    ) as HTMLElement | null;
+        // 1. Detect whether the user clicked a chart.
+        const overlay = target.closest(
+            '.e-datavisualization-chart'
+        ) as HTMLElement | null;
 
-    if (!overlay) {
-        return;
-    }
+        if (!overlay) {
+            return;
+        }
 
-    // 2. Get possible chart IDs from the rendered elements.
-    const innerChart = overlay.querySelector(
-        '.e-control'
-    ) as HTMLElement | null;
+        // 2. Get possible chart IDs from the rendered elements.
+        const innerChart = overlay.querySelector(
+            '.e-control'
+        ) as HTMLElement | null;
 
-    const chartId = text(innerChart?.id);
-    const overlayId = text(overlay.id);
+        const chartId = text(innerChart?.id);
+        const overlayId = text(overlay.id);
 
-    // 3. Find the corresponding workbook chart model.
-    const chart = this.findChart(chartId, overlayId);
+        // 3. Find the corresponding workbook chart model.
+        const chart = this.findChart(chartId, overlayId);
 
-    if (!chart) {
-        console.warn(
-            '[Chart Panel] Chart not found in workbook:',
-            {
-                chartId,
-                overlayId,
-                activeSheet: this.activeSheetName,
-                availableCharts: this.allSheets.map(sheet => ({
-                    sheetName: sheet.name,
-                    charts: this.getSheetCharts(sheet).map(
-                        (item: any) => ({
-                            id: item.id,
-                            range: item.range
-                        })
+        if (!chart) {
+            console.warn(
+                '[Chart Panel] Chart not found in workbook:',
+                {
+                    chartId,
+                    overlayId,
+                    activeSheet: this.activeSheetName,
+                    availableCharts: this.allSheets.map(sheet => ({
+                        sheetName: sheet.name,
+                        charts: this.getSheetCharts(sheet).map(
+                            (item: any) => ({
+                                id: item.id,
+                                range: item.range
+                            })
+                        )
+                    }))
+                }
+            );
+
+            this.notify.warn(
+                'Unable to find the selected chart in the workbook.'
+            );
+
+            return;
+        }
+
+        // 4. Find the sheet that owns the chart.
+        const ownerSheet = this.allSheets.find(sheet =>
+            this.getSheetCharts(sheet).some(
+                (item: any) =>
+                    item === chart ||
+                    text(item?.id) === text(chart?.id)
+            )
+        );
+
+        const ownerSheetName =
+            text(ownerSheet?.name) || this.activeSheetName;
+
+        // 5. Store the actual chart model.
+        this.selectedChart = chart;
+        this.chartSheet = ownerSheetName;
+
+        // 6. Restore saved aggregation.
+        this.chartAggregation =
+            (chart.aggregation as ChartAggregation) || 'None';
+
+        // 7. Restore original chart data range.
+        this.chartRange = text(
+            chart.originalRange ?? chart.range
+        );
+
+        // 8. Restore category and data-series ranges.
+        if (
+            chart.categoryRange &&
+            Array.isArray(chart.seriesRanges) &&
+            chart.seriesRanges.length
+        ) {
+            this.categoryRange = text(chart.categoryRange);
+
+            this.seriesRanges = chart.seriesRanges
+                .map((range: any) => ({
+                    range: text(
+                        typeof range === 'string'
+                            ? range
+                            : range?.range
                     )
                 }))
-            }
-        );
+                .filter((item: any) => !!item.range);
 
-        this.notify.warn(
-            'Unable to find the selected chart in the workbook.'
-        );
+        } else {
+            // For newly inserted charts, derive the ranges
+            // from the original selected chart range.
+            this.splitRangeToSeries();
+        }
 
-        return;
+        // 9. Show the chart configuration panel.
+        this.showDataPanel = false;
+        this.showChartPanel = true;
+
+        this.cdr.detectChanges();
+        this.resizeLater(100);
+
+        console.log('[Chart Panel] Selected chart:', {
+            domId: chartId,
+            overlayId,
+            modelId: chart.id,
+            ownerSheet: ownerSheetName,
+            range: chart.range,
+            originalRange: this.chartRange,
+            categoryRange: this.categoryRange,
+            seriesRanges: this.seriesRanges,
+            aggregation: this.chartAggregation
+        });
     }
-
-    // 4. Find the sheet that owns the chart.
-    const ownerSheet = this.allSheets.find(sheet =>
-        this.getSheetCharts(sheet).some(
-            (item: any) =>
-                item === chart ||
-                text(item?.id) === text(chart?.id)
-        )
-    );
-
-    const ownerSheetName =
-        text(ownerSheet?.name) || this.activeSheetName;
-
-    // 5. Store the actual chart model.
-    this.selectedChart = chart;
-    this.chartSheet = ownerSheetName;
-
-    // 6. Restore saved aggregation.
-    this.chartAggregation =
-        (chart.aggregation as ChartAggregation) || 'None';
-
-    // 7. Restore original chart data range.
-    this.chartRange = text(
-        chart.originalRange ?? chart.range
-    );
-
-    // 8. Restore category and data-series ranges.
-    if (
-        chart.categoryRange &&
-        Array.isArray(chart.seriesRanges) &&
-        chart.seriesRanges.length
-    ) {
-        this.categoryRange = text(chart.categoryRange);
-
-        this.seriesRanges = chart.seriesRanges
-            .map((range: any) => ({
-                range: text(
-                    typeof range === 'string'
-                        ? range
-                        : range?.range
-                )
-            }))
-            .filter((item: any) => !!item.range);
-
-    } else {
-        // For newly inserted charts, derive the ranges
-        // from the original selected chart range.
-        this.splitRangeToSeries();
-    }
-
-    // 9. Show the chart configuration panel.
-    this.showDataPanel = false;
-    this.showChartPanel = true;
-
-    this.cdr.detectChanges();
-    this.resizeLater(100);
-
-    console.log('[Chart Panel] Selected chart:', {
-        domId: chartId,
-        overlayId,
-        modelId: chart.id,
-        ownerSheet: ownerSheetName,
-        range: chart.range,
-        originalRange: this.chartRange,
-        categoryRange: this.categoryRange,
-        seriesRanges: this.seriesRanges,
-        aggregation: this.chartAggregation
-    });
-}
 
     closeChartPanel(): void {
         this.showChartPanel = false;
@@ -586,13 +621,13 @@ onSheetClick(event: MouseEvent): void {
         try {
             const helperRange = await this.buildHelperRange(ownerSheet, chartId, parsed.category, parsed.series);
 
-          await this.replaceChart(ownerSheet, {
-    range: helperRange,
-    originalRange: text(this.chartRange),
-    categoryRange: categoryText,
-    seriesRanges: [...seriesTexts],
-    aggregation: this.chartAggregation
-});
+            await this.replaceChart(ownerSheet, {
+                range: helperRange,
+                originalRange: text(this.chartRange),
+                categoryRange: categoryText,
+                seriesRanges: [...seriesTexts],
+                aggregation: this.chartAggregation
+            });
 
             // Show the user's ranges, not the hidden helper range.
             this.categoryRange = categoryText;
@@ -655,152 +690,152 @@ onSheetClick(event: MouseEvent): void {
     }
 
     /** Deletes the selected chart and inserts it again with changed properties. */
-private async replaceChart(
-    ownerSheetName: string,
-    changes: any
-): Promise<void> {
+    private async replaceChart(
+        ownerSheetName: string,
+        changes: any
+    ): Promise<void> {
 
-    const oldChart = this.selectedChart;
+        const oldChart = this.selectedChart;
 
-    if (!oldChart) {
-        throw new Error('No chart selected.');
-    }
+        if (!oldChart) {
+            throw new Error('No chart selected.');
+        }
 
-    const chartId = text(oldChart.id);
+        const chartId = text(oldChart.id);
 
-    if (!chartId) {
-        throw new Error('Selected chart has no ID.');
-    }
+        if (!chartId) {
+            throw new Error('Selected chart has no ID.');
+        }
 
-    const ownerSheet = this.findSheet(ownerSheetName);
+        const ownerSheet = this.findSheet(ownerSheetName);
 
-    if (!ownerSheet) {
-        throw new Error(`Sheet "${ownerSheetName}" not found.`);
-    }
+        if (!ownerSheet) {
+            throw new Error(`Sheet "${ownerSheetName}" not found.`);
+        }
 
-    if (
-        typeof this.grid.deleteChart !== 'function' ||
-        typeof this.grid.insertChart !== 'function'
-    ) {
-        throw new Error(
-            'Syncfusion chart delete/insert APIs are unavailable.'
+        if (
+            typeof this.grid.deleteChart !== 'function' ||
+            typeof this.grid.insertChart !== 'function'
+        ) {
+            throw new Error(
+                'Syncfusion chart delete/insert APIs are unavailable.'
+            );
+        }
+
+        // Search all workbook sheets, not only the active one.
+        const workbookCharts = this.allSheets.reduce(
+            (result: any[], sheet: any) => {
+                return result.concat(this.getSheetCharts(sheet));
+            },
+            []
         );
-    }
 
-    // Search all workbook sheets, not only the active one.
-    const workbookCharts = this.allSheets.reduce(
-        (result: any[], sheet: any) => {
-            return result.concat(this.getSheetCharts(sheet));
-        },
-        []
-    );
+        const allCharts = [
+            ...workbookCharts,
+            ...(this.grid.chartColl ?? [])
+        ];
 
-    const allCharts = [
-        ...workbookCharts,
-        ...(this.grid.chartColl ?? [])
-    ];
+        const model = allCharts.find(
+            (chart: any) =>
+                chart === oldChart ||
+                text(chart?.id) === chartId
+        );
 
-    const model = allCharts.find(
-        (chart: any) =>
-            chart === oldChart ||
-            text(chart?.id) === chartId
-    );
+        if (!model) {
+            console.error('[Chart Panel] Missing chart model', {
+                selectedId: chartId,
+                availableIds: allCharts.map(c => c?.id),
+                selectedChart: oldChart
+            });
 
-    if (!model) {
-        console.error('[Chart Panel] Missing chart model', {
-            selectedId: chartId,
-            availableIds: allCharts.map(c => c?.id),
-            selectedChart: oldChart
+            throw new Error(
+                `Chart "${chartId}" is not registered in the workbook. ` +
+                'Recreate this chart from the Insert ribbon.'
+            );
+        }
+
+        // Preserve original chart appearance and location.
+        const replacement: any = {
+            type: model.type || 'Column',
+            theme: model.theme || 'Material',
+            range: changes.range,
+            isSeriesInRows: model.isSeriesInRows ?? false,
+            top: model.top ?? 20,
+            left: model.left ?? 20,
+            width: model.width ?? 480,
+            height: model.height ?? 290
+        };
+
+        if (model.title) {
+            replacement.title = model.title;
+        }
+
+        if (!replacement.range) {
+            throw new Error('New chart range is empty.');
+        }
+
+        await this.activateSheet(ownerSheetName);
+        await this.settle();
+
+        // Delete through the Spreadsheet API.
+        this.grid.deleteChart(chartId);
+
+        await this.settle();
+
+        // Ensure the old model is gone before inserting.
+        const stillExists = this.allSheets.some(sheet =>
+            this.getSheetCharts(sheet).some(
+                (chart: any) => text(chart?.id) === chartId
+            )
+        );
+
+        if (stillExists) {
+            throw new Error(
+                `Syncfusion did not remove chart "${chartId}". ` +
+                'A replacement was not inserted to avoid duplicates.'
+            );
+        }
+
+        // Insert with the aggregated helper range.
+        this.grid.insertChart([replacement]);
+
+        await this.settle();
+
+        // Find the new chart model.
+        const updatedSheet = this.findSheet(ownerSheetName);
+
+        const newChart = this.getSheetCharts(updatedSheet)
+            .find((chart: any) =>
+                text(chart?.range) === text(changes.range)
+            );
+
+        if (!newChart) {
+            throw new Error(
+                'Replacement chart was not found after insertion.'
+            );
+        }
+
+        // Save custom panel settings on the new model.
+        Object.assign(newChart, {
+            originalRange: changes.originalRange,
+            categoryRange: changes.categoryRange,
+            seriesRanges: changes.seriesRanges,
+            aggregation: changes.aggregation
         });
 
-        throw new Error(
-            `Chart "${chartId}" is not registered in the workbook. ` +
-            'Recreate this chart from the Insert ribbon.'
-        );
+        this.selectedChart = newChart;
+        this.chartSheet = ownerSheetName;
+
+        this.markDirty();
+        this.resizeLater(100);
+
+        console.log('[Chart Panel] Chart replaced', {
+            oldId: chartId,
+            newId: newChart.id,
+            range: newChart.range,
+            aggregation: newChart.aggregation
+        });
     }
-
-    // Preserve original chart appearance and location.
-    const replacement: any = {
-        type: model.type || 'Column',
-        theme: model.theme || 'Material',
-        range: changes.range,
-        isSeriesInRows: model.isSeriesInRows ?? false,
-        top: model.top ?? 20,
-        left: model.left ?? 20,
-        width: model.width ?? 480,
-        height: model.height ?? 290
-    };
-
-    if (model.title) {
-        replacement.title = model.title;
-    }
-
-    if (!replacement.range) {
-        throw new Error('New chart range is empty.');
-    }
-
-    await this.activateSheet(ownerSheetName);
-    await this.settle();
-
-    // Delete through the Spreadsheet API.
-    this.grid.deleteChart(chartId);
-
-    await this.settle();
-
-    // Ensure the old model is gone before inserting.
-    const stillExists = this.allSheets.some(sheet =>
-        this.getSheetCharts(sheet).some(
-            (chart: any) => text(chart?.id) === chartId
-        )
-    );
-
-    if (stillExists) {
-        throw new Error(
-            `Syncfusion did not remove chart "${chartId}". ` +
-            'A replacement was not inserted to avoid duplicates.'
-        );
-    }
-
-    // Insert with the aggregated helper range.
-    this.grid.insertChart([replacement]);
-
-    await this.settle();
-
-    // Find the new chart model.
-    const updatedSheet = this.findSheet(ownerSheetName);
-
-    const newChart = this.getSheetCharts(updatedSheet)
-        .find((chart: any) =>
-            text(chart?.range) === text(changes.range)
-        );
-
-    if (!newChart) {
-        throw new Error(
-            'Replacement chart was not found after insertion.'
-        );
-    }
-
-    // Save custom panel settings on the new model.
-    Object.assign(newChart, {
-        originalRange: changes.originalRange,
-        categoryRange: changes.categoryRange,
-        seriesRanges: changes.seriesRanges,
-        aggregation: changes.aggregation
-    });
-
-    this.selectedChart = newChart;
-    this.chartSheet = ownerSheetName;
-
-    this.markDirty();
-    this.resizeLater(100);
-
-    console.log('[Chart Panel] Chart replaced', {
-        oldId: chartId,
-        newId: newChart.id,
-        range: newChart.range,
-        aggregation: newChart.aggregation
-    });
-}
 
     /** First column of chartRange = category, every other column = one series. */
     private splitRangeToSeries(): void {
@@ -828,210 +863,210 @@ private async replaceChart(
      * Copies category + series columns into a far-right helper block of the
      * chart's sheet (using formulas) so Syncfusion can chart non-adjacent ranges.
      */
-  private async buildHelperRange(
-    ownerSheetName: string,
-    chartId: string,
-    category: ParsedRange,
-    series: ParsedRange[]
-): Promise<string> {
+    private async buildHelperRange(
+        ownerSheetName: string,
+        chartId: string,
+        category: ParsedRange,
+        series: ParsedRange[]
+    ): Promise<string> {
 
-    await this.activateSheet(ownerSheetName);
+        await this.activateSheet(ownerSheetName);
 
-    const sources = [category, ...series];
+        const sources = [category, ...series];
 
-    if (sources.length > 30) {
-        throw new Error(
-            'A chart can use at most 29 data series.'
-        );
-    }
-
-    const startColumnNumber =
-        200 + this.helperSlot(chartId) * 30;
-
-    const readValue = (
-        source: ParsedRange,
-        rowIndex: number
-    ): any => {
-
-        const sheet = this.findSheet(source.sheetName);
-
-        return sheet
-            ?.rows?.[rowIndex - 1]
-            ?.cells?.[source.startColumnIndex]
-            ?.value ?? '';
-    };
-
-    const getHeader = (source: ParsedRange): string => {
-        const header = readValue(source, 1);
-        return String(header || source.startColumn);
-    };
-
-    const rowCount =
-        category.endRow - category.startRow + 1;
-
-    const groups = new Map<
-        string,
-        {
-            label: string;
-            values: number[][];
-            counts: number[];
-        }
-    >();
-
-    for (let r = 0; r < rowCount; r++) {
-
-        const sourceRow = category.startRow + r;
-
-        const label = String(
-            readValue(category, sourceRow) ?? ''
-        ).trim();
-
-        if (!label) {
-            continue;
+        if (sources.length > 30) {
+            throw new Error(
+                'A chart can use at most 29 data series.'
+            );
         }
 
-        const key = label;
+        const startColumnNumber =
+            200 + this.helperSlot(chartId) * 30;
 
-        if (!groups.has(key)) {
-            groups.set(key, {
-                label,
-                values: series.map(() => []),
-                counts: series.map(() => 0)
-            });
-        }
+        const readValue = (
+            source: ParsedRange,
+            rowIndex: number
+        ): any => {
 
-        const group = groups.get(key)!;
+            const sheet = this.findSheet(source.sheetName);
 
-        series.forEach((source, index) => {
+            return sheet
+                ?.rows?.[rowIndex - 1]
+                ?.cells?.[source.startColumnIndex]
+                ?.value ?? '';
+        };
 
-            const raw = readValue(source, sourceRow);
+        const getHeader = (source: ParsedRange): string => {
+            const header = readValue(source, 1);
+            return String(header || source.startColumn);
+        };
 
-            // Count all matching records, including zero values.
-            group.counts[index]++;
+        const rowCount =
+            category.endRow - category.startRow + 1;
 
-            if (
-                raw === null ||
-                raw === undefined ||
-                String(raw).trim() === ''
-            ) {
-                return;
+        const groups = new Map<
+            string,
+            {
+                label: string;
+                values: number[][];
+                counts: number[];
             }
+        >();
 
-            const numeric = Number(raw);
-
-            if (Number.isFinite(numeric)) {
-                group.values[index].push(numeric);
-            }
-        });
-    }
-
-    const resultRows: any[][] = [];
-
-    if (this.chartAggregation === 'None') {
-
-        // Preserve one chart point per source record.
         for (let r = 0; r < rowCount; r++) {
 
             const sourceRow = category.startRow + r;
 
-            resultRows.push([
-                readValue(category, sourceRow),
-                ...series.map(source =>
-                    readValue(source, sourceRow)
-                )
-            ]);
+            const label = String(
+                readValue(category, sourceRow) ?? ''
+            ).trim();
+
+            if (!label) {
+                continue;
+            }
+
+            const key = label;
+
+            if (!groups.has(key)) {
+                groups.set(key, {
+                    label,
+                    values: series.map(() => []),
+                    counts: series.map(() => 0)
+                });
+            }
+
+            const group = groups.get(key)!;
+
+            series.forEach((source, index) => {
+
+                const raw = readValue(source, sourceRow);
+
+                // Count all matching records, including zero values.
+                group.counts[index]++;
+
+                if (
+                    raw === null ||
+                    raw === undefined ||
+                    String(raw).trim() === ''
+                ) {
+                    return;
+                }
+
+                const numeric = Number(raw);
+
+                if (Number.isFinite(numeric)) {
+                    group.values[index].push(numeric);
+                }
+            });
         }
 
-    } else {
+        const resultRows: any[][] = [];
 
-        groups.forEach(group => {
+        if (this.chartAggregation === 'None') {
 
-            resultRows.push([
-                group.label,
-                ...series.map((_source, index) =>
-                    this.aggregateChartValues(
-                        group.values[index],
-                        this.chartAggregation,
-                        group.counts[index]
+            // Preserve one chart point per source record.
+            for (let r = 0; r < rowCount; r++) {
+
+                const sourceRow = category.startRow + r;
+
+                resultRows.push([
+                    readValue(category, sourceRow),
+                    ...series.map(source =>
+                        readValue(source, sourceRow)
                     )
-                )
-            ]);
+                ]);
+            }
+
+        } else {
+
+            groups.forEach(group => {
+
+                resultRows.push([
+                    group.label,
+                    ...series.map((_source, index) =>
+                        this.aggregateChartValues(
+                            group.values[index],
+                            this.chartAggregation,
+                            group.counts[index]
+                        )
+                    )
+                ]);
+            });
+        }
+
+        const headers = [
+            getHeader(category),
+            ...series.map(source => {
+
+                const header = getHeader(source);
+
+                return this.chartAggregation === 'None'
+                    ? header
+                    : `${this.chartAggregation} of ${header}`;
+            })
+        ];
+
+        // Clear old helper data to prevent stale chart points
+        // when aggregation produces fewer rows.
+        const helperStart =
+            toColumnName(startColumnNumber);
+
+        const helperEnd =
+            toColumnName(
+                startColumnNumber + sources.length - 1
+            );
+
+        const ownerSheet = this.findSheet(ownerSheetName);
+
+        const previousLastRow = Math.max(
+            resultRows.length + 1,
+            Number(ownerSheet?.usedRange?.rowIndex ?? 0) + 1
+        );
+
+        this.grid.clear({
+            type: 'Clear Contents',
+            range:
+                `${helperStart}1:` +
+                `${helperEnd}${previousLastRow}`
         });
-    }
 
-    const headers = [
-        getHeader(category),
-        ...series.map(source => {
-
-            const header = getHeader(source);
-
-            return this.chartAggregation === 'None'
-                ? header
-                : `${this.chartAggregation} of ${header}`;
-        })
-    ];
-
-    // Clear old helper data to prevent stale chart points
-    // when aggregation produces fewer rows.
-    const helperStart =
-        toColumnName(startColumnNumber);
-
-    const helperEnd =
-        toColumnName(
-            startColumnNumber + sources.length - 1
-        );
-
-    const ownerSheet = this.findSheet(ownerSheetName);
-
-    const previousLastRow = Math.max(
-        resultRows.length + 1,
-        Number(ownerSheet?.usedRange?.rowIndex ?? 0) + 1
-    );
-
-    this.grid.clear({
-        type: 'Clear Contents',
-        range:
-            `${helperStart}1:` +
-            `${helperEnd}${previousLastRow}`
-    });
-
-    // Write column headers.
-    headers.forEach((header, index) => {
-
-        const column =
-            toColumnName(startColumnNumber + index);
-
-        this.grid.updateCell(
-            { value: header },
-            `${column}1`
-        );
-    });
-
-    // Write aggregated records.
-    resultRows.forEach((row, rowIndex) => {
-
-        row.forEach((value, columnIndex) => {
+        // Write column headers.
+        headers.forEach((header, index) => {
 
             const column =
-                toColumnName(
-                    startColumnNumber + columnIndex
-                );
+                toColumnName(startColumnNumber + index);
 
             this.grid.updateCell(
-                { value: value ?? '' },
-                `${column}${rowIndex + 2}`
+                { value: header },
+                `${column}1`
             );
         });
-    });
 
-    await this.settle();
+        // Write aggregated records.
+        resultRows.forEach((row, rowIndex) => {
 
-    return (
-        `${this.quoteSheetName(ownerSheetName)}!` +
-        `${helperStart}1:` +
-        `${helperEnd}${resultRows.length + 1}`
-    );
-}
+            row.forEach((value, columnIndex) => {
+
+                const column =
+                    toColumnName(
+                        startColumnNumber + columnIndex
+                    );
+
+                this.grid.updateCell(
+                    { value: value ?? '' },
+                    `${column}${rowIndex + 2}`
+                );
+            });
+        });
+
+        await this.settle();
+
+        return (
+            `${this.quoteSheetName(ownerSheetName)}!` +
+            `${helperStart}1:` +
+            `${helperEnd}${resultRows.length + 1}`
+        );
+    }
 
     /** Same chart id always gets the same helper block (0-19). */
     private helperSlot(chartId: string): number {
@@ -1097,20 +1132,20 @@ private async replaceChart(
         return value - 1;
     }
 
-private findChart(...ids: string[]): any | null {
-    const wanted = ids.map(id => text(id)).filter(Boolean);
+    private findChart(...ids: string[]): any | null {
+        const wanted = ids.map(id => text(id)).filter(Boolean);
 
-    const charts: any[] = [
-        ...(this.grid?.chartColl ?? []),
-        ...this.allSheets.flatMap(sheet =>
-            this.getSheetCharts(sheet)
-        )
-    ];
+        const charts: any[] = [
+            ...(this.grid?.chartColl ?? []),
+            ...this.allSheets.flatMap(sheet =>
+                this.getSheetCharts(sheet)
+            )
+        ];
 
-    return charts.find(chart =>
-        wanted.includes(text(chart?.id))
-    ) ?? null;
-}
+        return charts.find(chart =>
+            wanted.includes(text(chart?.id))
+        ) ?? null;
+    }
 
     // =====================================================
     // RIBBON
@@ -1130,10 +1165,10 @@ private findChart(...ids: string[]): any | null {
                     {
                         id: 'spreadsheet_data_source',
                         type: 'Button',
-                        text: 'List',
-                        tooltipText: 'Manage list data',
+                        text: 'Insert New',
+                        tooltipText: 'Manage Data Source',
                         prefixIcon: 'e-icons e-list-unordered',
-                        click: (args: any) => this.onListRibbonClick(args)
+                        click: () => this.onListRibbonClick()
                     },
                     {
                         id: 'spreadsheet_pivot',
@@ -1150,35 +1185,101 @@ private findChart(...ids: string[]): any | null {
             console.error('[Spreadsheet] Unable to add Insert ribbon commands:', error);
         }
     }
+    onSpreadsheetRibbonSelect(): void {
+        setTimeout(() => {
+            this.updateListRibbonButton();
+        }, 0);
+    }
+    private updateListRibbonButton(): void {
+        if (!this.spreadsheet) return;
 
-    onListRibbonClick(args: any): void {
-        if (!this.activeSheetSource) {
+        const sheetName = String(
+            this.grid?.sheets?.[this.grid?.activeSheetIndex ?? 0]?.name ??
+            this.activeSheetName ??
+            ''
+        ).trim().toLowerCase();
+
+        const hasSource = this.sheetSources.some(item =>
+            String(item.sheetName ?? '').trim().toLowerCase() === sheetName
+        );
+
+        const label = hasSource
+            ? 'See List Properties'
+            : 'Insert New';
+
+        this.lastListRibbonLabel = label;
+
+        const root = this.grid.element as HTMLElement;
+
+        const button = root?.querySelector(
+            '#spreadsheet_data_source'
+        ) as HTMLElement | null;
+
+        if (!button) return;
+
+        const textElement = button.querySelector(
+            '.e-tbar-btn-text, .e-btn-text'
+        ) as HTMLElement | null;
+
+        if (textElement && textElement.textContent !== label) {
+            textElement.textContent = label;
+        }
+
+        if (button.getAttribute('title') !== label) {
+            button.setAttribute('title', label);
+        }
+
+        if (button.getAttribute('aria-label') !== label) {
+            button.setAttribute('aria-label', label);
+        }
+    }
+
+    private startListRibbonObserver(): void {
+        this.stopListRibbonObserver();
+
+        const root = this.grid?.element as HTMLElement;
+
+        if (!root) return;
+
+        this.listRibbonObserver = new MutationObserver(() => {
+            const button = root.querySelector(
+                '#spreadsheet_data_source'
+            ) as HTMLElement | null;
+
+            if (!button) return;
+
+            const textElement = button.querySelector(
+                '.e-tbar-btn-text, .e-btn-text'
+            ) as HTMLElement | null;
+
+            if (
+                textElement &&
+                textElement.textContent !== this.lastListRibbonLabel
+            ) {
+                this.updateListRibbonButton();
+            }
+        });
+
+        this.listRibbonObserver.observe(root, {
+            childList: true,
+            subtree: true
+        });
+
+        this.updateListRibbonButton();
+    }
+
+    private stopListRibbonObserver(): void {
+        this.listRibbonObserver?.disconnect();
+        this.listRibbonObserver = null;
+    }
+    onListRibbonClick(): void {
+        if (!this.spreadsheet) return;
+
+        if (this.activeSheetSource) {
+            this.editActiveSheetFilters();
+        } else {
             this.openDataPanel();
-            return;
         }
-
-        if (!this.listMenu) {
-            console.error('List menu is not initialized.');
-            return;
-        }
-
-        const event = args?.originalEvent ?? args?.event;
-
-        const target =
-            event?.currentTarget ??
-            event?.target ??
-            document.getElementById('spreadsheet_data_source');
-
-        if (!target) {
-            return;
-        }
-
-        this.listMenu.toggle({
-            currentTarget: target,
-            target,
-            preventDefault: () => { },
-            stopPropagation: () => { }
-        } as unknown as MouseEvent);
     }
     /** Second supported path for the ribbon buttons. */
     onRibbonClick(args: any): void {
@@ -1224,6 +1325,7 @@ private findChart(...ids: string[]): any | null {
 
 
 
+
     async onDataBatchLoaded(
         batch: SpreadsheetDataBatch
     ): Promise<void> {
@@ -1233,39 +1335,58 @@ private findChart(...ids: string[]): any | null {
         }
 
         try {
-           if (batch.isFirstBatch) {
-    this.newDataSheetFields = [];
-    this.newDataSheetLoadedRows = 0;
 
-    if (this.editingSheetName) {
-        // Edit the existing sheet.
-        this.newDataSheetName = this.editingSheetName;
+            // =====================================
+            // 1. FIRST BATCH
+            // =====================================
 
-        const sheet = this.findSheet(this.editingSheetName);
+            if (batch.isFirstBatch) {
 
-        if (!sheet) {
-            throw new Error(
-                `Sheet "${this.editingSheetName}" not found.`
-            );
-        }
+                this.newDataSheetFields = [];
+                this.newDataSheetLoadedRows = 0;
 
-        await this.activateSheet(this.editingSheetName);
+                if (this.editingSheetName) {
 
-        // Clear old data before writing the updated columns/records.
-        const lastRow = Number(sheet.usedRange?.rowIndex ?? 0);
-        const lastCol = Number(sheet.usedRange?.colIndex ?? 0);
+                    // Edit existing sheet
+                    this.newDataSheetName = this.editingSheetName;
 
-        this.grid.clear({
-            type: 'Clear Contents',
-            range: `A1:${toColumnName(lastCol + 1)}${lastRow + 1}`
-        });
+                    const sheet = this.findSheet(
+                        this.editingSheetName
+                    );
 
-        await this.settle();
-    } else {
-        // New List: create a new sheet.
-        await this.createDataSheet(batch);
-    }
-}
+                    if (!sheet) {
+                        throw new Error(
+                            `Sheet "${this.editingSheetName}" not found.`
+                        );
+                    }
+
+                    await this.activateSheet(
+                        this.editingSheetName
+                    );
+
+                    // Clear old data
+                    const lastRow = Number(
+                        sheet.usedRange?.rowIndex ?? 0
+                    );
+
+                    const lastCol = Number(
+                        sheet.usedRange?.colIndex ?? 0
+                    );
+
+                    this.grid.clear({
+                        type: 'Clear Contents',
+                        range:
+                            `A1:${toColumnName(lastCol + 1)}${lastRow + 1}`
+                    });
+
+                    await this.settle();
+
+                } else {
+
+                    // Create new data sheet
+                    await this.createDataSheet(batch);
+                }
+            }
 
             const sheetName = this.newDataSheetName;
 
@@ -1278,35 +1399,45 @@ private findChart(...ids: string[]): any | null {
             const rows: any[] = batch.rows ?? [];
 
             // =====================================
-            // 1. Read ALL fields from API records
+            // 2. READ API COLUMNS
             // =====================================
 
-            if (!this.newDataSheetFields.length && rows.length) {
+            if (
+                !this.newDataSheetFields.length &&
+                rows.length
+            ) {
 
-                this.newDataSheetFields = Object.keys(rows[0]);
+                this.newDataSheetFields =
+                    Object.keys(rows[0]);
 
                 console.log(
                     '[Spreadsheet] Columns received:',
                     this.newDataSheetFields
                 );
 
-                this.newDataSheetFields.forEach((field, index) => {
+                this.newDataSheetFields.forEach(
+                    (field, index) => {
 
-                    this.grid.updateCell(
-                        { value: field },
-                        `${toColumnName(index + 1)}1`
-                    );
-                });
+                        this.grid.updateCell(
+                            { value: field },
+                            `${toColumnName(index + 1)}1`
+                        );
+                    }
+                );
             }
 
             // =====================================
-            // 2. Draw records in the spreadsheet
+            // 3. INSERT RECORDS
             // =====================================
 
             const startRow =
                 this.newDataSheetLoadedRows + 2;
 
-            for (let index = 0; index < rows.length; index++) {
+            for (
+                let index = 0;
+                index < rows.length;
+                index++
+            ) {
 
                 const record = rows[index];
                 const excelRow = startRow + index;
@@ -1321,7 +1452,9 @@ private findChart(...ids: string[]): any | null {
                             );
 
                         this.grid.updateCell(
-                            { value: value ?? '' },
+                            {
+                                value: value ?? ''
+                            },
                             `${toColumnName(colIndex + 1)}${excelRow}`
                         );
                     }
@@ -1329,7 +1462,7 @@ private findChart(...ids: string[]): any | null {
             }
 
             // =====================================
-            // 3. Update progress
+            // 4. UPDATE PROGRESS
             // =====================================
 
             this.newDataSheetLoadedRows += rows.length;
@@ -1342,16 +1475,27 @@ private findChart(...ids: string[]): any | null {
             await this.settle();
 
             // =====================================
-            // 4. Finish loading
+            // 5. FINISH LOADING
             // =====================================
 
             if (batch.isLastBatch) {
+
+                // finishDataLoading saves source
+                // metadata, including matchMode.
                 await this.finishDataLoading(batch);
+
             } else {
+
                 await this.paint();
             }
 
         } catch (error) {
+
+            console.error(
+                '[Spreadsheet] Batch loading failed:',
+                error
+            );
+
             this.onDataLoadingFailed(error);
         }
     }
@@ -1416,15 +1560,21 @@ private findChart(...ids: string[]): any | null {
 
 
 
+
     private async finishDataLoading(
         batch: SpreadsheetDataBatch
     ): Promise<void> {
+
         const sheetName = this.newDataSheetName;
+
         if (!sheetName) return;
 
         const sheet = this.findSheet(sheetName);
+
         if (!sheet) {
-            throw new Error(`Sheet "${sheetName}" was not found.`);
+            throw new Error(
+                `Sheet "${sheetName}" was not found.`
+            );
         }
 
         const tableName =
@@ -1436,14 +1586,24 @@ private findChart(...ids: string[]): any | null {
         }
 
         const fields = [...this.newDataSheetFields];
-        const conditions = (batch as any).conditions ?? [];
+
+        const conditions =
+            (batch as any).conditions ?? [];
+
+        // Restore and save All / Any match mode
+        const matchMode: 'all' | 'any' =
+            (batch as any).matchMode === 'any'
+                ? 'any'
+                : 'all';
 
         await this.activateSheet(sheetName);
         await this.settle();
 
         if (
             this.newDataSheetLoadedRows > 0 &&
-            !fields.some(f => f.toLowerCase() === 'id')
+            !fields.some(
+                f => f.toLowerCase() === 'id'
+            )
         ) {
             console.warn(
                 `[Spreadsheet] Backend data for "${sheetName}" ` +
@@ -1451,24 +1611,38 @@ private findChart(...ids: string[]): any | null {
             );
         }
 
+        // =====================================
+        // SAVE SOURCE METADATA
+        // =====================================
+
         this.upsertSheetSource({
             sheetId: sheet.id,
             sheetName,
             source: {
                 type: tableName,
                 sourceKey: tableName,
-                mode: 'AllRecords',
+                mode: matchMode,
                 columns: fields,
-                filters: { conditions }
+
+                filters: {
+                    conditions,
+                    matchMode
+                }
             }
         });
 
+        // =====================================
+        // COMPLETE LOADING
+        // =====================================
+
         this.loadingProgress = 100;
+
         this.loadingMessage =
             `Loaded ${batch.loaded.toLocaleString()} records`;
 
         this.syncSheetIdentity();
         this.syncSheetToUi();
+
         this.markDirty();
 
         this.notify.success(
@@ -1476,6 +1650,7 @@ private findChart(...ids: string[]): any | null {
         );
 
         this.showDataPanel = false;
+
         await this.paint();
 
         this.resetDataLoad();
@@ -1486,6 +1661,7 @@ private findChart(...ids: string[]): any | null {
             this.cdr.detectChanges();
         }, 250);
     }
+
 
 
 
@@ -2885,32 +3061,43 @@ private findChart(...ids: string[]): any | null {
     private startSheetWatcher(): void {
         this.stopSheetWatcher();
 
-        if (!this.spreadsheet) {
-            return;
-        }
+        if (!this.spreadsheet) return;
 
-        this.lastSheetIndex = Number(this.grid.activeSheetIndex ?? 0);
+        let previousSheetName = '';
+        let previousHasSource: boolean | null = null;
 
-        this.sheetWatcher = setInterval(() => {
+        const checkActiveSheet = () => {
             if (!this.spreadsheet || this.isSyncingPivotDashboard) {
                 return;
             }
 
-            void this.moveDashboardFirst();
+            const sheetName = this.activeSheetName;
+            const hasSource = !!this.activeSheetSource;
 
-            const index = Number(this.grid.activeSheetIndex ?? 0);
+            if (
+                sheetName !== previousSheetName ||
+                hasSource !== previousHasSource
+            ) {
+                previousSheetName = sheetName;
+                previousHasSource = hasSource;
 
-            if (index === this.lastSheetIndex) {
-                return;
+                this.lastSheetIndex = Number(
+                    this.grid.activeSheetIndex ?? 0
+                );
+
+                this.syncSheetToUi();
+
+                void this.syncPivotForActiveSheet();
             }
 
-            this.lastSheetIndex = index;
+            // Also synchronize on initial load and after ribbon rendering.
+            this.updateListRibbonButton();
+        };
 
-            this.syncSheetToUi();
-            void this.syncPivotForActiveSheet();
-        }, 100);
+        checkActiveSheet();
+
+        this.sheetWatcher = setInterval(checkActiveSheet, 100);
     }
-
     private stopSheetWatcher(): void {
         if (this.sheetWatcher) {
             clearInterval(this.sheetWatcher);
@@ -2922,15 +3109,15 @@ private findChart(...ids: string[]): any | null {
     private syncSheetToUi(): void {
         const name = this.activeSheetName;
 
-        if (!name) {
-            return;
-        }
+        const sheetSource = this.sheetSources.find(
+            item => item.sheetName === name
+        );
 
-        // Match by NAME (ids are unreliable after openFromJson()).
-        const source = this.sheetSources.find(i => text(i.sheetName) === name)?.source;
+        this.currentFilters = sheetSource
+            ? { ...(sheetSource.source?.filters ?? {}) }
+            : null;
 
-        // Always replace the previous tab's state.
-        this.currentFilters = { ...(source?.filters ?? {}) };
+        this.updateListRibbonButton();
 
         this.cdr.detectChanges();
     }
@@ -3271,501 +3458,501 @@ private findChart(...ids: string[]): any | null {
         return cleaned;
     }
 
-  
-async refreshSpreadsheet(): Promise<void> {
-    if (
-        this.isRefreshing ||
-        !this.spreadsheet ||
-        !this.dashboardId
-    ) {
-        return;
-    }
 
-    this.isRefreshing = true;
-    this.showLoading('Refreshing Spreadsheet...');
-
-    const activeSheetBeforeRefresh = this.activeSheetName;
-
-    try {
-        // ============================================
-        // 1. Get dashboard information
-        // ============================================
-        const result: any = await firstValueFrom(
-            this.dashboardService.getDashboardForView(
-                this.dashboardId
-            )
-        );
-
-        const dashboard = result?.dashboard ?? result;
-
-        // ============================================
-        // 2. Prepare incremental refresh date
-        // ============================================
-        const lastUpdatedDate = this.spreadsheetUpdatedDate
-            ? moment.utc(this.spreadsheetUpdatedDate)
-            : undefined;
-
-        if (lastUpdatedDate) {
-            lastUpdatedDate.toISOString = () =>
-                lastUpdatedDate.format('YYYY-MM-DDTHH:mm:ss');
+    async refreshSpreadsheet(): Promise<void> {
+        if (
+            this.isRefreshing ||
+            !this.spreadsheet ||
+            !this.dashboardId
+        ) {
+            return;
         }
 
-        // ============================================
-        // 3. Get saved sheet data sources
-        // ============================================
-        const sources = this.cloneSheetSources(
-            this.sheetSources
-        );
+        this.isRefreshing = true;
+        this.showLoading('Refreshing Spreadsheet...');
 
-        const validSources = sources.filter(sheetSource => {
-            const sheetName = text(sheetSource.sheetName);
-            const source = sheetSource.source;
+        const activeSheetBeforeRefresh = this.activeSheetName;
 
-            return (
-                !!sheetName &&
-                sheetName !== DASHBOARD_SHEET &&
-                !!source &&
-                !!text(source.sourceKey ?? source.type) &&
-                !!source.columns?.length
-            );
-        });
-
-        let completed = 0;
-
-        // ============================================
-        // 4. Refresh source sheets from backend
-        // ============================================
-        for (const sheetSource of validSources) {
-            const sheetName = text(sheetSource.sheetName);
-            const source = sheetSource.source;
-
-            const tableName = text(
-                source.sourceKey ?? source.type
+        try {
+            // ============================================
+            // 1. Get dashboard information
+            // ============================================
+            const result: any = await firstValueFrom(
+                this.dashboardService.getDashboardForView(
+                    this.dashboardId
+                )
             );
 
-            const fields = source.columns ?? [];
+            const dashboard = result?.dashboard ?? result;
 
-            this.loadingMessage =
-                `Refreshing ${sheetName}...`;
+            // ============================================
+            // 2. Prepare incremental refresh date
+            // ============================================
+            const lastUpdatedDate = this.spreadsheetUpdatedDate
+                ? moment.utc(this.spreadsheetUpdatedDate)
+                : undefined;
 
-            console.log('[Refresh] Updating source sheet:', {
-                sheetName,
-                tableName,
-                fields
+            if (lastUpdatedDate) {
+                lastUpdatedDate.toISOString = () =>
+                    lastUpdatedDate.format('YYYY-MM-DDTHH:mm:ss');
+            }
+
+            // ============================================
+            // 3. Get saved sheet data sources
+            // ============================================
+            const sources = this.cloneSheetSources(
+                this.sheetSources
+            );
+
+            const validSources = sources.filter(sheetSource => {
+                const sheetName = text(sheetSource.sheetName);
+                const source = sheetSource.source;
+
+                return (
+                    !!sheetName &&
+                    sheetName !== DASHBOARD_SHEET &&
+                    !!source &&
+                    !!text(source.sourceKey ?? source.type) &&
+                    !!source.columns?.length
+                );
             });
 
-            await this.refreshSheetChanges(
-                sheetName,
-                tableName,
-                fields,
-                source.filters,
-                lastUpdatedDate
-            );
+            let completed = 0;
 
-            completed++;
+            // ============================================
+            // 4. Refresh source sheets from backend
+            // ============================================
+            for (const sheetSource of validSources) {
+                const sheetName = text(sheetSource.sheetName);
+                const source = sheetSource.source;
 
-            this.setProgress(
-                completed,
-                validSources.length
-            );
+                const tableName = text(
+                    source.sourceKey ?? source.type
+                );
 
-            await this.paint();
-        }
+                const fields = source.columns ?? [];
 
-        // Make sure new records are written before
-        // recalculating charts and pivots.
-        await this.settle();
+                this.loadingMessage =
+                    `Refreshing ${sheetName}...`;
 
-        // ============================================
-        // 5. Refresh Dashboard direct charts
-        // ============================================
-        this.loadingMessage =
-            'Recalculating Dashboard charts...';
+                console.log('[Refresh] Updating source sheet:', {
+                    sheetName,
+                    tableName,
+                    fields
+                });
 
-        await this.refreshDashboardDirectCharts();
+                await this.refreshSheetChanges(
+                    sheetName,
+                    tableName,
+                    fields,
+                    source.filters,
+                    lastUpdatedDate
+                );
 
-        await this.settle();
+                completed++;
 
-        // ============================================
-        // 6. Refresh saved Pivot analyses
-        // ============================================
-        this.loadingMessage =
-            'Recalculating Pivot charts...';
+                this.setProgress(
+                    completed,
+                    validSources.length
+                );
 
-        await this.refreshPivotSheets();
+                await this.paint();
+            }
 
-        await this.settle();
+            // Make sure new records are written before
+            // recalculating charts and pivots.
+            await this.settle();
 
-        // ============================================
-        // 7. Refresh direct charts with saved
-        //    aggregation configuration
-        // ============================================
-        this.loadingMessage =
-            'Updating Spreadsheet charts...';
+            // ============================================
+            // 5. Refresh Dashboard direct charts
+            // ============================================
+            this.loadingMessage =
+                'Recalculating Dashboard charts...';
 
-        await this.refreshDirectCharts();
+            await this.refreshDashboardDirectCharts();
 
-        await this.settle();
+            await this.settle();
 
-        // ============================================
-        // 8. Restore original active sheet
-        // ============================================
-        if (
-            activeSheetBeforeRefresh &&
-            this.findSheet(activeSheetBeforeRefresh)
-        ) {
-            await this.activateSheet(
-                activeSheetBeforeRefresh
-            );
-        }
+            // ============================================
+            // 6. Refresh saved Pivot analyses
+            // ============================================
+            this.loadingMessage =
+                'Recalculating Pivot charts...';
 
-        // ============================================
-        // 9. Update dashboard information
-        // ============================================
-        this.dashboardLastUpdatedDate =
-            dashboard?.lastModificationDate ??
-            this.dashboardLastUpdatedDate;
+            await this.refreshPivotSheets();
 
-        this.syncSheetToUi();
+            await this.settle();
 
-        this.markDirty();
+            // ============================================
+            // 7. Refresh direct charts with saved
+            //    aggregation configuration
+            // ============================================
+            this.loadingMessage =
+                'Updating Spreadsheet charts...';
 
-        // ============================================
-        // 10. Final rendering
-        // ============================================
-        await this.paint();
+            await this.refreshDirectCharts();
 
-        this.resizeLater(100);
+            await this.settle();
 
-        console.log(
-            '[Refresh] Spreadsheet and chart data refreshed.'
-        );
-
-        this.notify.success(
-            'Spreadsheet refreshed successfully.'
-        );
-
-    } catch (error) {
-        console.error(
-            '[Spreadsheet] Refresh failed:',
-            error
-        );
-
-        this.notify.error(
-            'Unable to refresh Spreadsheet.'
-        );
-
-    } finally {
-        // Restore the active sheet even if a step fails.
-        try {
+            // ============================================
+            // 8. Restore original active sheet
+            // ============================================
             if (
                 activeSheetBeforeRefresh &&
-                this.findSheet(activeSheetBeforeRefresh) &&
-                this.activeSheetName !== activeSheetBeforeRefresh
+                this.findSheet(activeSheetBeforeRefresh)
             ) {
                 await this.activateSheet(
                     activeSheetBeforeRefresh
                 );
             }
-        } catch (restoreError) {
-            console.warn(
-                '[Refresh] Unable to restore active sheet:',
-                restoreError
-            );
-        }
 
-        this.isRefreshing = false;
-        this.hideLoading();
-        this.cdr.detectChanges();
+            // ============================================
+            // 9. Update dashboard information
+            // ============================================
+            this.dashboardLastUpdatedDate =
+                dashboard?.lastModificationDate ??
+                this.dashboardLastUpdatedDate;
+
+            this.syncSheetToUi();
+
+            this.markDirty();
+
+            // ============================================
+            // 10. Final rendering
+            // ============================================
+            await this.paint();
+
+            this.resizeLater(100);
+
+            console.log(
+                '[Refresh] Spreadsheet and chart data refreshed.'
+            );
+
+            this.notify.success(
+                'Spreadsheet refreshed successfully.'
+            );
+
+        } catch (error) {
+            console.error(
+                '[Spreadsheet] Refresh failed:',
+                error
+            );
+
+            this.notify.error(
+                'Unable to refresh Spreadsheet.'
+            );
+
+        } finally {
+            // Restore the active sheet even if a step fails.
+            try {
+                if (
+                    activeSheetBeforeRefresh &&
+                    this.findSheet(activeSheetBeforeRefresh) &&
+                    this.activeSheetName !== activeSheetBeforeRefresh
+                ) {
+                    await this.activateSheet(
+                        activeSheetBeforeRefresh
+                    );
+                }
+            } catch (restoreError) {
+                console.warn(
+                    '[Refresh] Unable to restore active sheet:',
+                    restoreError
+                );
+            }
+
+            this.isRefreshing = false;
+            this.hideLoading();
+            this.cdr.detectChanges();
+        }
     }
-}
 
 
     private async refreshDirectCharts(): Promise<void> {
-    const previousSheet = this.activeSheetName;
+        const previousSheet = this.activeSheetName;
 
-    try {
-        for (const sheet of this.allSheets) {
-            const sheetName = text(sheet?.name);
+        try {
+            for (const sheet of this.allSheets) {
+                const sheetName = text(sheet?.name);
 
-            if (!sheetName) {
-                continue;
-            }
+                if (!sheetName) {
+                    continue;
+                }
 
-            const charts = this.getSheetCharts(sheet);
+                const charts = this.getSheetCharts(sheet);
 
-            for (const chart of charts) {
-                const categoryRange = text(chart?.categoryRange);
+                for (const chart of charts) {
+                    const categoryRange = text(chart?.categoryRange);
 
-                const seriesRanges: string[] =
-                    (chart?.seriesRanges ?? [])
-                        .map((item: any) =>
-                            text(
-                                typeof item === 'string'
-                                    ? item
-                                    : item?.range
+                    const seriesRanges: string[] =
+                        (chart?.seriesRanges ?? [])
+                            .map((item: any) =>
+                                text(
+                                    typeof item === 'string'
+                                        ? item
+                                        : item?.range
+                                )
                             )
-                        )
-                        .filter(Boolean);
+                            .filter(Boolean);
 
-                // Only charts with saved custom aggregation
-                // require rebuilding their helper ranges.
-                if (
-                    !categoryRange ||
-                    !seriesRanges.length
-                ) {
-                    continue;
-                }
-
-                const parsed = this.parseChartInputs(
-                    categoryRange,
-                    seriesRanges
-                );
-
-                if (!parsed) {
-                    console.warn(
-                        '[Refresh] Invalid chart ranges:',
-                        chart?.id
-                    );
-                    continue;
-                }
-
-                const chartId = text(chart?.id);
-
-                if (!chartId) {
-                    console.warn(
-                        '[Refresh] Chart has no ID:',
-                        sheetName,
-                        chart
-                    );
-                    continue;
-                }
-
-                const previousAggregation =
-                    this.chartAggregation;
-
-                try {
-                    this.chartAggregation =
-                        (chart.aggregation as ChartAggregation)
-                        || 'None';
-
-                    const updatedRange =
-                        await this.buildHelperRange(
-                            sheetName,
-                            chartId,
-                            parsed.category,
-                            parsed.series
-                        );
-
-                    // Do not delete/reinsert the chart.
-                    // Preserve its position, size and ID.
-                    const oldRange = text(chart.range);
-
-                    if (oldRange !== updatedRange) {
-                        console.warn(
-                            '[Refresh] Chart helper range changed:',
-                            {
-                                chartId,
-                                oldRange,
-                                updatedRange
-                            }
-                        );
-
-                        // Updating chart.range alone may not
-                        // update Syncfusion's rendered chart.
-                        // A chart-binding update is required here.
+                    // Only charts with saved custom aggregation
+                    // require rebuilding their helper ranges.
+                    if (
+                        !categoryRange ||
+                        !seriesRanges.length
+                    ) {
                         continue;
                     }
 
-                    console.log(
-                        '[Refresh] Chart helper recalculated:',
-                        chartId
+                    const parsed = this.parseChartInputs(
+                        categoryRange,
+                        seriesRanges
                     );
 
-                } finally {
-                    this.chartAggregation =
-                        previousAggregation;
+                    if (!parsed) {
+                        console.warn(
+                            '[Refresh] Invalid chart ranges:',
+                            chart?.id
+                        );
+                        continue;
+                    }
+
+                    const chartId = text(chart?.id);
+
+                    if (!chartId) {
+                        console.warn(
+                            '[Refresh] Chart has no ID:',
+                            sheetName,
+                            chart
+                        );
+                        continue;
+                    }
+
+                    const previousAggregation =
+                        this.chartAggregation;
+
+                    try {
+                        this.chartAggregation =
+                            (chart.aggregation as ChartAggregation)
+                            || 'None';
+
+                        const updatedRange =
+                            await this.buildHelperRange(
+                                sheetName,
+                                chartId,
+                                parsed.category,
+                                parsed.series
+                            );
+
+                        // Do not delete/reinsert the chart.
+                        // Preserve its position, size and ID.
+                        const oldRange = text(chart.range);
+
+                        if (oldRange !== updatedRange) {
+                            console.warn(
+                                '[Refresh] Chart helper range changed:',
+                                {
+                                    chartId,
+                                    oldRange,
+                                    updatedRange
+                                }
+                            );
+
+                            // Updating chart.range alone may not
+                            // update Syncfusion's rendered chart.
+                            // A chart-binding update is required here.
+                            continue;
+                        }
+
+                        console.log(
+                            '[Refresh] Chart helper recalculated:',
+                            chartId
+                        );
+
+                    } finally {
+                        this.chartAggregation =
+                            previousAggregation;
+                    }
                 }
             }
-        }
 
-    } finally {
-        if (
-            previousSheet &&
-            this.findSheet(previousSheet)
-        ) {
-            await this.activateSheet(previousSheet);
+        } finally {
+            if (
+                previousSheet &&
+                this.findSheet(previousSheet)
+            ) {
+                await this.activateSheet(previousSheet);
+            }
         }
     }
-}
 
-private async refreshDashboardDirectCharts(): Promise<void> {
-    const previousSheet = this.activeSheetName;
+    private async refreshDashboardDirectCharts(): Promise<void> {
+        const previousSheet = this.activeSheetName;
 
-    try {
-        const directWidgets = this.widgets.filter(
-            (widget: any) =>
-                String(widget.sourceType).toUpperCase() === 'DIRECT'
-        );
+        try {
+            const directWidgets = this.widgets.filter(
+                (widget: any) =>
+                    String(widget.sourceType).toUpperCase() === 'DIRECT'
+            );
 
-        for (const widget of directWidgets) {
-            const sourceName = text(widget.sourceSheetName);
-            const sourceSheet = this.findSheet(sourceName);
+            for (const widget of directWidgets) {
+                const sourceName = text(widget.sourceSheetName);
+                const sourceSheet = this.findSheet(sourceName);
 
-            if (!sourceSheet) {
-                console.warn('[Chart Refresh] Source missing:', sourceName);
-                continue;
-            }
-
-            const chartRange = text(widget.sourceRange);
-            const parsed = this.parseRange(chartRange);
-
-            if (!parsed) {
-                console.warn('[Chart Refresh] Invalid range:', chartRange);
-                continue;
-            }
-
-            // This repair handles the saved Sum of TotalQuantity chart.
-            // Do not infer aggregation for unrelated charts.
-            const headers = sourceSheet.rows?.[0]?.cells ?? [];
-
-            const findColumn = (field: string): number =>
-                headers.findIndex(
-                    (cell: any) =>
-                        String(cell?.value ?? '')
-                            .trim()
-                            .toLowerCase() === field.toLowerCase()
-                );
-
-            const categoryColumn = findColumn('SellerCompanyName');
-            const valueColumn = findColumn('TotalQuantity');
-
-            if (categoryColumn < 0 || valueColumn < 0) {
-                console.warn(
-                    '[Chart Refresh] Required fields missing:',
-                    sourceName
-                );
-                continue;
-            }
-
-            // Confirm that the helper block is actually the expected
-            // Sum of TotalQuantity chart before changing its values.
-            const helperHeader = String(
-                sourceSheet.rows?.[parsed.startRow - 1]
-                    ?.cells?.[parsed.startColumnIndex + 1]
-                    ?.value ?? ''
-            ).trim();
-
-            if (helperHeader !== 'Sum of TotalQuantity') {
-                console.warn(
-                    '[Chart Refresh] Skipping unsupported chart:',
-                    chartRange,
-                    helperHeader
-                );
-                continue;
-            }
-
-            // Recalculate using all current source records.
-            const totals = new Map<string, number>();
-
-            const rows = sourceSheet.rows ?? [];
-
-            for (let rowIndex = 1; rowIndex < rows.length; rowIndex++) {
-                const cells = rows[rowIndex]?.cells;
-
-                if (!cells) continue;
-
-                const category = String(
-                    cells[categoryColumn]?.value ?? ''
-                ).trim();
-
-                if (!category) continue;
-
-                const rawValue = cells[valueColumn]?.value;
-                const quantity = Number(rawValue);
-
-                if (!Number.isFinite(quantity)) continue;
-
-                // Avoid treating a helper row as a source record.
-                const recordId = cells[findColumn('Id')]?.value;
-                if (recordId === undefined || recordId === null || recordId === '') {
+                if (!sourceSheet) {
+                    console.warn('[Chart Refresh] Source missing:', sourceName);
                     continue;
                 }
 
-                totals.set(
-                    category,
-                    (totals.get(category) ?? 0) + quantity
-                );
-            }
+                const chartRange = text(widget.sourceRange);
+                const parsed = this.parseRange(chartRange);
 
-            await this.activateSheet(sourceName);
+                if (!parsed) {
+                    console.warn('[Chart Refresh] Invalid range:', chartRange);
+                    continue;
+                }
 
-            // Update the existing chart's helper cells.
-            // The saved chart currently has a fixed three-row range.
-            const capacity = parsed.endRow - parsed.startRow;
+                // This repair handles the saved Sum of TotalQuantity chart.
+                // Do not infer aggregation for unrelated charts.
+                const headers = sourceSheet.rows?.[0]?.cells ?? [];
 
-            if (totals.size > capacity) {
-                console.warn(
-                    '[Chart Refresh] More categories than chart capacity:',
-                    {
-                        range: chartRange,
-                        categories: totals.size,
-                        capacity
-                    }
-                );
+                const findColumn = (field: string): number =>
+                    headers.findIndex(
+                        (cell: any) =>
+                            String(cell?.value ?? '')
+                                .trim()
+                                .toLowerCase() === field.toLowerCase()
+                    );
 
-                // Existing categories can still be updated, but
-                // new categories require expanding the chart range.
-            }
+                const categoryColumn = findColumn('SellerCompanyName');
+                const valueColumn = findColumn('TotalQuantity');
 
-            const helperCategoryCol = parsed.startColumnIndex;
-            const helperValueCol = helperCategoryCol + 1;
+                if (categoryColumn < 0 || valueColumn < 0) {
+                    console.warn(
+                        '[Chart Refresh] Required fields missing:',
+                        sourceName
+                    );
+                    continue;
+                }
 
-            const updated: any[] = [];
-
-            // Update existing categories in their current positions.
-            // This preserves the chart's category ordering.
-            for (
-                let rowIndex = parsed.startRow;
-                rowIndex <= parsed.endRow;
-                rowIndex++
-            ) {
-                const category = String(
-                    sourceSheet.rows?.[rowIndex - 1]
-                        ?.cells?.[helperCategoryCol]?.value ?? ''
+                // Confirm that the helper block is actually the expected
+                // Sum of TotalQuantity chart before changing its values.
+                const helperHeader = String(
+                    sourceSheet.rows?.[parsed.startRow - 1]
+                        ?.cells?.[parsed.startColumnIndex + 1]
+                        ?.value ?? ''
                 ).trim();
 
-                if (!category) continue;
+                if (helperHeader !== 'Sum of TotalQuantity') {
+                    console.warn(
+                        '[Chart Refresh] Skipping unsupported chart:',
+                        chartRange,
+                        helperHeader
+                    );
+                    continue;
+                }
 
-                const total = totals.get(category);
+                // Recalculate using all current source records.
+                const totals = new Map<string, number>();
 
-                if (total === undefined) continue;
+                const rows = sourceSheet.rows ?? [];
 
-                const address =
-                    `${toColumnName(helperValueCol + 1)}${rowIndex}`;
+                for (let rowIndex = 1; rowIndex < rows.length; rowIndex++) {
+                    const cells = rows[rowIndex]?.cells;
 
-                this.grid.updateCell(
-                    { value: total },
-                    `${this.quoteSheetName(sourceName)}!${address}`
-                );
+                    if (!cells) continue;
 
-                updated.push({ category, total });
+                    const category = String(
+                        cells[categoryColumn]?.value ?? ''
+                    ).trim();
+
+                    if (!category) continue;
+
+                    const rawValue = cells[valueColumn]?.value;
+                    const quantity = Number(rawValue);
+
+                    if (!Number.isFinite(quantity)) continue;
+
+                    // Avoid treating a helper row as a source record.
+                    const recordId = cells[findColumn('Id')]?.value;
+                    if (recordId === undefined || recordId === null || recordId === '') {
+                        continue;
+                    }
+
+                    totals.set(
+                        category,
+                        (totals.get(category) ?? 0) + quantity
+                    );
+                }
+
+                await this.activateSheet(sourceName);
+
+                // Update the existing chart's helper cells.
+                // The saved chart currently has a fixed three-row range.
+                const capacity = parsed.endRow - parsed.startRow;
+
+                if (totals.size > capacity) {
+                    console.warn(
+                        '[Chart Refresh] More categories than chart capacity:',
+                        {
+                            range: chartRange,
+                            categories: totals.size,
+                            capacity
+                        }
+                    );
+
+                    // Existing categories can still be updated, but
+                    // new categories require expanding the chart range.
+                }
+
+                const helperCategoryCol = parsed.startColumnIndex;
+                const helperValueCol = helperCategoryCol + 1;
+
+                const updated: any[] = [];
+
+                // Update existing categories in their current positions.
+                // This preserves the chart's category ordering.
+                for (
+                    let rowIndex = parsed.startRow;
+                    rowIndex <= parsed.endRow;
+                    rowIndex++
+                ) {
+                    const category = String(
+                        sourceSheet.rows?.[rowIndex - 1]
+                            ?.cells?.[helperCategoryCol]?.value ?? ''
+                    ).trim();
+
+                    if (!category) continue;
+
+                    const total = totals.get(category);
+
+                    if (total === undefined) continue;
+
+                    const address =
+                        `${toColumnName(helperValueCol + 1)}${rowIndex}`;
+
+                    this.grid.updateCell(
+                        { value: total },
+                        `${this.quoteSheetName(sourceName)}!${address}`
+                    );
+
+                    updated.push({ category, total });
+                }
+
+                await this.settle();
+
+                console.log('[Chart Refresh] Helper values updated:', {
+                    sourceSheet: sourceName,
+                    chartRange,
+                    updated
+                });
             }
-
-            await this.settle();
-
-            console.log('[Chart Refresh] Helper values updated:', {
-                sourceSheet: sourceName,
-                chartRange,
-                updated
-            });
-        }
-    } finally {
-        if (previousSheet && this.findSheet(previousSheet)) {
-            await this.activateSheet(previousSheet);
+        } finally {
+            if (previousSheet && this.findSheet(previousSheet)) {
+                await this.activateSheet(previousSheet);
+            }
         }
     }
-}
 
     private async refreshSheetChanges(
         sheetName: string,
@@ -4339,12 +4526,23 @@ private async refreshDashboardDirectCharts(): Promise<void> {
 
 
     get editingSheetSource(): SpreadsheetSheetDataSource | null {
-    if (!this.editingSheetName) {
-        return null;
+        if (!this.editingSheetName) {
+            return null;
+        }
+
+        return this.sheetSources.find(
+            source => source.sheetName === this.editingSheetName
+        ) ?? null;
     }
 
-    return this.sheetSources.find(
-        source => source.sheetName === this.editingSheetName
-    ) ?? null;
+
+    closeResponsivePanel(): void {
+    if (this.showDataPanel) {
+        this.closeDataPanel();
+    }
+
+    if (this.showChartPanel) {
+        this.closeChartPanel();
+    }
 }
 }

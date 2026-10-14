@@ -112,9 +112,10 @@ export class SpreadsheetDataPanelComponent
 
         const savedColumns: string[] = [...(source.columns ?? [])];
 
-        const filters = source.filters as {
-            conditions?: FilterBuilderCondition[];
-        } | null;
+       const filters = source.filters as {
+    conditions?: FilterBuilderCondition[];
+    matchMode?: 'all' | 'any';
+} | null;
 
         const savedConditions: FilterBuilderCondition[] =
             (filters?.conditions ?? []).map(condition => ({
@@ -136,8 +137,10 @@ export class SpreadsheetDataPanelComponent
             );
 
             this.selectedConditions = savedConditions;
-            this.selectedMatchMode = 'all';
-            this.step = 2;
+this.selectedMatchMode =
+    source.mode === 'any' ? 'any' : 'all';
+
+this.step = 2;
 
             this.cdr.detectChanges();
         } catch (error) {
@@ -347,6 +350,57 @@ export class SpreadsheetDataPanelComponent
     }
 
 
+    getConditionFieldLabel(fieldName: string): string {
+    const field = this.filterBuilderFields.find(
+        f => f.name === fieldName
+    );
+
+    return field?.label || fieldName;
+}
+
+getConditionOperatorLabel(operator: string): string {
+    const operators: Record<string, string> = {
+        eq: '=',
+        neq: '≠',
+        gt: '>',
+        gte: '>=',
+        lt: '<',
+        lte: '<=',
+        contains: 'contains',
+        notcontains: 'does not contain',
+        startswith: 'starts with',
+        endswith: 'ends with',
+        in: 'is in',
+        notin: 'is not in'
+    };
+
+    return operators[operator] || operator;
+}
+
+getConditionValueLabel(condition: FilterBuilderCondition): string {
+    const value = condition.value;
+
+    if (value === null || value === undefined || value === '') {
+        return '""';
+    }
+
+    const field = this.filterBuilderFields.find(
+        f => f.name === condition.field
+    );
+
+    const option = field?.options?.find(
+        o => String(o.value) === String(value)
+    );
+
+    if (option) return option.label;
+
+    if (typeof value === 'boolean') {
+        return value ? 'Yes' : 'No';
+    }
+
+    return String(value);
+}
+
 
     private gatherConditions(): DynamicCondition[] {
         return this.selectedConditions.map(condition => {
@@ -414,7 +468,7 @@ export class SpreadsheetDataPanelComponent
                         requestFields,
                         conditions,
                         undefined,
-                        false,
+                      this.selectedMatchMode == 'all'?  false : true,
                         undefined,
                         skip,
                         this.batchSize
@@ -448,17 +502,20 @@ export class SpreadsheetDataPanelComponent
                     records.length < this.batchSize ||
                     (total > 0 && loaded >= total);
 
-                this.batchLoaded.emit({
-                    table: this.selectedTable,
-                    fields: [...selectedFields],
-                    selectedColumns: [...this.selectedColumns],
-                    conditions: [...conditions],
-                    rows,
-                    loaded,
-                    total,
-                    isFirstBatch: firstBatch,
-                    isLastBatch
-                } as SpreadsheetDataBatch);
+               this.batchLoaded.emit({
+    table: this.selectedTable,
+    fields: [...selectedFields],
+    selectedColumns: [...this.selectedColumns],
+    conditions: [...conditions],
+    matchMode: this.selectedMatchMode,
+    rows,
+    loaded,
+    total,
+    isFirstBatch: firstBatch,
+    isLastBatch
+} as SpreadsheetDataBatch & {
+    matchMode: 'all' | 'any';
+});
 
                 await this.waitForPaint();
 
@@ -684,6 +741,17 @@ export class SpreadsheetDataPanelComponent
     }
 
 
+selectedTableForNext: string | null = null;
 
+chooseTable(table: string): void {
+    this.selectedTableForNext = table;
+}
+
+goToColumnsStep(): void {
+    if (!this.selectedTableForNext) return;
+
+    // Existing function loads columns and moves to step 2
+    this.selectTable(this.selectedTableForNext);
+}
 
 }

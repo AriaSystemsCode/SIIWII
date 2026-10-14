@@ -15,7 +15,7 @@
                 styleClass="match-dropdown">
             </p-dropdown>
 
-            <span>{{'of the following rules' | localize}}:</span>
+            <span>{{'of the following conditions' | localize}}:</span>
         </div>
 
         <div class="filter-rule-header" *ngIf="rules.length">
@@ -29,7 +29,7 @@
             class="filter-rule-row"
             *ngFor="let rule of rules; let i = index">
 
-            <div class="filter-field">
+            <div class="filter-field" [attr.data-label]="'Field' | localize">
                 <p-dropdown
                     [options]="fields"
                     [(ngModel)]="rule.field"
@@ -45,7 +45,7 @@
                 </p-dropdown>
             </div>
 
-            <div class="filter-operator">
+            <div class="filter-operator" [attr.data-label]="'Operator' | localize">
                 <p-dropdown
                     [options]="getOperators(rule)"
                     [(ngModel)]="rule.operator"
@@ -57,7 +57,7 @@
                 </p-dropdown>
             </div>
 
-            <div class="filter-value">
+            <div class="filter-value" [attr.data-label]="'Value' | localize">
 
                 <ng-container [ngSwitch]="getType(rule)">
 

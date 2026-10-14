@@ -6,8 +6,8 @@
   .dash-topbar {
     background: #fff;
     padding: 18px 22px;
-    border-bottom: 1px solid rgba(0,0,0,.06);
-    border-radius: 12px;
+    // border-bottom: 1px solid rgba(0,0,0,.06);
+    // border-radius: 12px;
   }
   
   .gap-2 { gap: 10px; }
@@ -282,4 +282,34 @@ gridster-item
 .e-spreadsheet .e-sheet-panel:not(.e-rtl) .e-cell {
   border: none !important;
  }
+}
+
+.dashboard-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
+
+    .refreshBtn {
+        width: 40px;
+        height: 40px;
+    }
+
+    ::ng-deep .p-button {
+        border-radius: 8px;
+        font-size: 13px;
+        font-weight: 500;
+    }
+
+    ::ng-deep .p-button .p-button-icon {
+        font-size: 14px;
+    }
+}
+
+.dashboard-sheet-viewer {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    background: #fff;
+    overflow: hidden;
 }
