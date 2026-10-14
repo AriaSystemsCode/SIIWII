@@ -47,7 +47,7 @@ IF EXISTS (SELECT 1 FROM dbo.SydObjects
     WHERE (Code = N'FIELD' OR Name = N'Field')
       AND NOT (Code = N'FIELD' AND Name = N'Field'
           AND ObjectTypeId = @entityTypeId AND ObjectTypeCode = N'ENTITY'
-          AND ParentId IS NULL AND ParentCode IS NULL AND IsDeleted = 0))
+          AND ParentId IS NULL AND NULLIF(LTRIM(RTRIM(ParentCode)), N'') IS NULL AND IsDeleted = 0))
     THROW 51113, 'A conflicting Field object exists.', 1;
 IF NOT EXISTS (SELECT 1 FROM dbo.SydObjects WHERE Code = N'FIELD' AND IsDeleted = 0)
     INSERT dbo.SydObjects (CreationTime, IsDeleted, Name, Code, ObjectTypeCode, ObjectTypeId)

@@ -36,7 +36,7 @@ IF EXISTS (SELECT 1 FROM dbo.SydObjects
     WHERE (Code = N'BASEENTITY' OR Name = N'BaseEntity')
       AND NOT (Code = N'BASEENTITY' AND Name = N'BaseEntity'
         AND ObjectTypeId = @entityTypeId AND ObjectTypeCode = N'ENTITY'
-        AND ParentId IS NULL AND ParentCode IS NULL AND IsDeleted = 0))
+        AND ParentId IS NULL AND NULLIF(LTRIM(RTRIM(ParentCode)), N'') IS NULL AND IsDeleted = 0))
     THROW 51111, 'A conflicting BaseEntity object exists.', 1;
 IF NOT EXISTS (SELECT 1 FROM dbo.SydObjects WHERE Code = N'BASEENTITY' AND IsDeleted = 0)
     INSERT dbo.SydObjects (CreationTime, IsDeleted, Name, Code, ObjectTypeCode, ObjectTypeId)
@@ -74,7 +74,7 @@ IF EXISTS (SELECT 1 FROM dbo.SydObjects
     WHERE (Code = N'FIELD' OR Name = N'Field')
       AND NOT (Code = N'FIELD' AND Name = N'Field'
           AND ObjectTypeId = @entityTypeId AND ObjectTypeCode = N'ENTITY'
-          AND ParentId IS NULL AND ParentCode IS NULL AND IsDeleted = 0))
+          AND ParentId IS NULL AND NULLIF(LTRIM(RTRIM(ParentCode)), N'') IS NULL AND IsDeleted = 0))
     THROW 51113, 'A conflicting Field object exists.', 1;
 IF NOT EXISTS (SELECT 1 FROM dbo.SydObjects WHERE Code = N'FIELD' AND IsDeleted = 0)
     INSERT dbo.SydObjects (CreationTime, IsDeleted, Name, Code, ObjectTypeCode, ObjectTypeId)
@@ -292,3 +292,5 @@ SELECT (SELECT COUNT(*) FROM dbo.AppFields f JOIN dbo.SydObjects o ON o.Id=f.Syc
         WHERE o.Code=N'APPENTITY-DATA' AND f.TenantId IS NULL AND f.IsDeleted=0) AS FieldDefinitions,
        (SELECT COUNT(*) FROM dbo.AppTableFields a JOIN dbo.SydObjects o ON o.Id=a.SycObjectId
         WHERE o.Code=N'APPENTITY-DATA' AND a.TenantId IS NULL AND a.SycEntityObjectTypeId IS NULL) AS TableAssignments;
+DROP TABLE #MissingAppEntityFields;
+DROP TABLE #SeedAppEntityFields;

@@ -70,7 +70,7 @@ BEGIN TRY
         WHERE (Code = N'SALESORDERDETAIL' OR Name = N'Sales Order Detail')
           AND NOT (Code = N'SALESORDERDETAIL' AND Name = N'Sales Order Detail'
             AND ObjectId = @detailId AND ObjectCode = N'TRANSACTION-DETAIL-DATA'
-            AND ParentId IS NULL AND ParentCode IS NULL AND TenantId IS NULL
+            AND ParentId IS NULL AND NULLIF(LTRIM(RTRIM(ParentCode)), N'') IS NULL AND TenantId IS NULL
             AND IsDeleted = 0))
         THROW 51206, 'A conflicting Sales Order Detail type exists.', 1;
     IF NOT EXISTS (SELECT 1 FROM dbo.SycEntityObjectTypes
@@ -290,6 +290,8 @@ BEGIN TRY
         (SELECT COUNT(*) FROM dbo.AppTableFields
          WHERE SycObjectId = @detailId AND TenantId IS NULL
            AND SycEntityObjectTypeId IS NULL) AS SharedDetailAssignments;
+    DROP TABLE #PendingCodes;
+    DROP TABLE #SeedFields;
     COMMIT TRANSACTION;
 END TRY
 BEGIN CATCH

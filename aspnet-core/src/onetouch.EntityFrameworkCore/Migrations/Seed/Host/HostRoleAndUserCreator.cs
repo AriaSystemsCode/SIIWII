@@ -54,7 +54,48 @@ namespace onetouch.Migrations.Seed.Host
             //MMT-Iteration37[End]
             SeedExtraAttributes();
             AsyncHelper.RunSync(() => CreateHostSystemData());
+            CreateHostFieldManagerData();
 
+        }
+
+        private void CreateHostFieldManagerData()
+        {
+            var scriptNames = new[]
+            {
+                "20261012_SeedAppEntityFields.sql",
+                "20261002_SeedTransactionHeaderFields.sql",
+                "20261013_SeedTransactionDetailFields.sql"
+            };
+
+            var previousTimeout = _context.Database.GetCommandTimeout();
+            try
+            {
+                if (!previousTimeout.HasValue)
+                    _context.Database.SetCommandTimeout(180);
+
+                var ownsTransaction = _context.Database.CurrentTransaction == null;
+                using (var transaction = ownsTransaction ? _context.Database.BeginTransaction() : null)
+                {
+                    foreach (var scriptName in scriptNames)
+                    {
+                        var resourceName = "onetouch.Migrations.Seed." + scriptName;
+                        using (var stream = typeof(HostRoleAndUserCreator).Assembly.GetManifestResourceStream(resourceName))
+                        {
+                            if (stream == null)
+                                throw new InvalidOperationException("Missing Field Manager seed resource: " + resourceName);
+
+                            using (var reader = new StreamReader(stream))
+                                _context.Database.ExecuteSqlRaw(reader.ReadToEnd());
+                        }
+                    }
+
+                    transaction?.Commit();
+                }
+            }
+            finally
+            {
+                _context.Database.SetCommandTimeout(previousTimeout);
+            }
         }
 
         private async Task AddMissingTextsAsync<T>(

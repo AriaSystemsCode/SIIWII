@@ -44,4 +44,9 @@
     <ProjectReference Include="..\onetouch.Application.Shared\onetouch.Application.Shared.csproj" />
     <ProjectReference Include="..\onetouch.Core\onetouch.Core.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Migrations\20261012_SeedAppEntityFields.sql" LogicalName="onetouch.Migrations.Seed.20261012_SeedAppEntityFields.sql" />
+    <EmbeddedResource Include="Migrations\20261002_SeedTransactionHeaderFields.sql" LogicalName="onetouch.Migrations.Seed.20261002_SeedTransactionHeaderFields.sql" />
+    <EmbeddedResource Include="Migrations\20261013_SeedTransactionDetailFields.sql" LogicalName="onetouch.Migrations.Seed.20261013_SeedTransactionDetailFields.sql" />
+  </ItemGroup>
 </Project>

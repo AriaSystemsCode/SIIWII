@@ -35,7 +35,7 @@ IF EXISTS (SELECT 1 FROM dbo.SydObjects
     WHERE (Code = N'TRANSACTION' OR Name = N'Transaction')
       AND NOT (Code = N'TRANSACTION' AND ObjectTypeId = @entityTypeId
         AND ObjectTypeCode = N'ENTITY' AND ParentId IS NULL
-        AND ParentCode IS NULL AND IsDeleted = 0))
+        AND NULLIF(LTRIM(RTRIM(ParentCode)), N'') IS NULL AND IsDeleted = 0))
     THROW 51061, 'A conflicting Transaction object exists.', 1;
 IF NOT EXISTS (SELECT 1 FROM dbo.SydObjects WHERE Code = N'TRANSACTION' AND IsDeleted = 0)
     INSERT dbo.SydObjects (CreationTime, IsDeleted, Name, Code, ObjectTypeCode, ObjectTypeId)
@@ -48,7 +48,7 @@ IF EXISTS (SELECT 1 FROM dbo.SydObjects
     WHERE (Code = N'BASEENTITY' OR Name = N'BaseEntity')
       AND NOT (Code = N'BASEENTITY' AND Name = N'BaseEntity'
         AND ObjectTypeId = @entityTypeId AND ObjectTypeCode = N'ENTITY'
-        AND ParentId IS NULL AND ParentCode IS NULL AND IsDeleted = 0))
+        AND ParentId IS NULL AND NULLIF(LTRIM(RTRIM(ParentCode)), N'') IS NULL AND IsDeleted = 0))
     THROW 51074, 'A conflicting BaseEntity object exists.', 1;
 IF NOT EXISTS (SELECT 1 FROM dbo.SydObjects WHERE Code = N'BASEENTITY' AND IsDeleted = 0)
     INSERT dbo.SydObjects (CreationTime, IsDeleted, Name, Code, ObjectTypeCode, ObjectTypeId)
@@ -97,7 +97,7 @@ IF EXISTS (SELECT 1 FROM dbo.SydObjects
     WHERE (Code = N'FIELD' OR Name = N'Field')
       AND NOT (Code = N'FIELD' AND Name = N'Field'
         AND ObjectTypeId = @entityTypeId AND ObjectTypeCode = N'ENTITY'
-        AND ParentId IS NULL AND ParentCode IS NULL AND IsDeleted = 0))
+        AND ParentId IS NULL AND NULLIF(LTRIM(RTRIM(ParentCode)), N'') IS NULL AND IsDeleted = 0))
     THROW 51078, 'A conflicting Field object exists.', 1;
 IF NOT EXISTS (SELECT 1 FROM dbo.SydObjects WHERE Code = N'FIELD' AND IsDeleted = 0)
     INSERT dbo.SydObjects (CreationTime, IsDeleted, Name, Code, ObjectTypeCode, ObjectTypeId)
@@ -421,6 +421,9 @@ EXEC sys.sp_executesql @historySql, N'@objectId bigint', @objectId = @headerId;
 SELECT (SELECT COUNT(*) FROM dbo.AppFields WHERE TenantId IS NULL AND IsDeleted=0 AND SycObjectId=@headerId) AS HeaderFieldDefinitions,
        (SELECT COUNT(*) FROM dbo.AppTableFields WHERE TenantId IS NULL AND SycObjectId=@headerId AND SycEntityObjectTypeId IS NULL) AS SharedHeaderAssignments,
        (SELECT COUNT(*) FROM dbo.AppTableFields WHERE TenantId IS NULL AND SycObjectId=@headerId AND SycEntityObjectTypeId=@salesId) AS SalesSpecificAssignments;
+DROP TABLE #SeedAssignments;
+DROP TABLE #CodeCollisions;
+DROP TABLE #SeedFields;
 COMMIT TRANSACTION;
 END TRY
 BEGIN CATCH

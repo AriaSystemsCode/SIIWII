@@ -1,18 +1,25 @@
 # Deployment database seeding
 
-The web process no longer seeds databases during startup or connection resolution.
+The web process does not seed databases during startup or connection resolution.
 Publish and run this console application from the SAME release as the backend.
 It reuses the existing seed helper; translation generation is not changed.
 
 ## Release contract
 
 `SeedRelease.RequiredVersion` in `Program.cs` is the version-controlled required
-seed snapshot (initial version 1). Increment it whenever the existing cumulative
-seed routines or their assets change. It is not an arbitrary command-line value.
+seed snapshot (version 2 adds Field Manager catalog data). Increment it whenever
+the cumulative seed routines or their assets change. It is not an arbitrary
+command-line value.
 Each database records successful snapshots in `dbo.__OneTouchSeedHistory`.
 This is a cumulative snapshot runner, not an ordered migration engine: a database
 at version 1 moving to 3 executes release 3's complete existing seed helper once.
 Future non-cumulative data transformations require explicit ordered steps instead.
+
+Version 2 runs the idempotent AppEntity, transaction header, and transaction
+detail Field Manager scripts after schema migrations. A database whose AppFields
+rows were cleared after the older one-time EF migration will be refilled when
+this seeder applies version 2. The existing Migrator and installer also call the
+same host seed method directly.
 
 Existing `Clients.IsSeeded` values are ignored and left untouched. Do not mark old
 databases version 1 merely because that flag is True: run the new seed baseline.

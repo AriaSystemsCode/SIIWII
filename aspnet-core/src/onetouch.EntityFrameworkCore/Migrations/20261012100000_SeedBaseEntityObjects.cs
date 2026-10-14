@@ -31,7 +31,7 @@ IF EXISTS (SELECT 1 FROM dbo.SydObjects
     WHERE (Code = N'TRANSACTION' OR Name = N'Transaction')
       AND NOT (Code = N'TRANSACTION' AND ObjectTypeCode = N'ENTITY'
           AND ObjectTypeId = @entityTypeId AND ParentId IS NULL
-          AND ParentCode IS NULL AND IsDeleted = 0))
+          AND NULLIF(LTRIM(RTRIM(ParentCode)), N'') IS NULL AND IsDeleted = 0))
     THROW 51100, 'A conflicting Transaction object exists.', 1;
 IF NOT EXISTS (SELECT 1 FROM dbo.SydObjects WHERE Code = N'TRANSACTION' AND IsDeleted = 0)
     INSERT dbo.SydObjects (CreationTime, IsDeleted, Name, Code, ObjectTypeCode, ObjectTypeId)
@@ -66,7 +66,7 @@ IF EXISTS (SELECT 1 FROM dbo.SydObjects
     WHERE (Code = N'BASEENTITY' OR Name = N'BaseEntity')
       AND NOT (Code = N'BASEENTITY' AND Name = N'BaseEntity'
           AND ObjectTypeCode = N'ENTITY' AND ObjectTypeId = @entityTypeId
-          AND ParentId IS NULL AND ParentCode IS NULL AND IsDeleted = 0))
+          AND ParentId IS NULL AND NULLIF(LTRIM(RTRIM(ParentCode)), N'') IS NULL AND IsDeleted = 0))
     THROW 51094, 'A conflicting BaseEntity object exists.', 1;
 IF (SELECT COUNT(*) FROM dbo.SydObjects
     WHERE Code = N'BASEENTITY' AND Name = N'BaseEntity' AND IsDeleted = 0) > 1

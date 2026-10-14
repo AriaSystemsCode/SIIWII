@@ -159,9 +159,9 @@ public static class Program
 
 public static class SeedRelease
 {
-    // Increment only when the cumulative seed snapshot changes. Never change through CLI.
-    // This is seed data versioning, not EF schema migration versioning.
-    public const int RequiredVersion = 1;
+    // Increment only when the cumulative seed snapshot changes. Version 2 adds
+    // the Field Manager catalog scripts. This is not an EF schema version.
+    public const int RequiredVersion = 2;
 }
 
 public sealed record Target(string Label, string ConnectionString, string Identity)
