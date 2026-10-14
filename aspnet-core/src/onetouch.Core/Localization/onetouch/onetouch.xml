@@ -3099,6 +3099,5 @@ Please select one of the available linesheet templates
 		<text name="Editinganewrevision">Editing a new revision</text>
 		<text name="RevisionHistory">Revision History</text> 
 		<text name="AddfromExistingField(s)"> Add from Existing Field(s) </text>
-		<text name="CreateNewRevision">Create New Revision </text>
   </texts>  
 </localizationDictionary>

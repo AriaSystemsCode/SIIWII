@@ -112,6 +112,19 @@
     -webkit-text-fill-color: #343a40 !important;
 }
 
+.field-manager-edit-mode .form-control.field-value-control,
+.field-manager-edit-mode .form-control.field-value-control:disabled,
+.field-manager-edit-mode .form-control.field-value-control[readonly] {
+    color: #111827 !important;
+    -webkit-text-fill-color: #111827 !important;
+}
+
+.field-manager-edit-mode .form-control.field-value-control:disabled,
+.field-manager-edit-mode .form-control.field-value-control[readonly] {
+    background-color: #f1f3f5 !important;
+    opacity: 1 !important;
+}
+
 select.form-control.field-value-control option {
     color: #212529;
     background-color: #fff;

@@ -36,6 +36,7 @@ export class FieldManagerService {
     private getFieldPage(node: ObjectTypeTreeNodeDto | null, skipCount: number): Observable<AppFieldListDto[]> {
         const selectedObjectTypeId = node?.nodeType === 'ObjectType' ? node.id : undefined;
         const selectedObjectId = node && node.nodeType !== 'ObjectType' ? node.sycObjectId : undefined;
+        //i51-BE-Implement Add to Existing, including entityObject and entityObjectType.
         return this.appFieldManagerProxy.getFields(
             selectedObjectId, selectedObjectTypeId, true,
             undefined, undefined, undefined, undefined, undefined, undefined, undefined,
@@ -51,6 +52,7 @@ export class FieldManagerService {
     }
 
     getFieldMetadata(): Observable<FieldCreateOrEditMetadataDto> {
+        //i51-BE-Get the data of Field Type dropdown inside create or edit modal 
         return this.appFieldManagerProxy.getFieldCreateOrEditMetadata();
     }
 
@@ -72,6 +74,7 @@ export class FieldManagerService {
     }
 
     assignExistingField(appFieldId: number, sycObjectId: number, sycEntityObjectTypeId: number | null): Observable<any> {
+      //i51-BE-Implement saving Add to Existing, including the array of fields, entityObject, and entityObjectType.
         return this.appFieldManagerProxy.assignExistingField(new AssignExistingFieldInput({
             appFieldId, sycObjectId, sycEntityObjectTypeId: sycEntityObjectTypeId ?? undefined
         }));

@@ -6,6 +6,7 @@ import { finalize } from 'rxjs/operators';
 import { AppComponentBase } from '@shared/common/app-component-base';
 import { AppFieldDto, CreateOrEditFieldInput, FieldLookupDto } from '@shared/service-proxies/service-proxies';
 import { FieldManagerService } from '../../field-manager.service';
+import Swal from 'sweetalert2';
 
 @Component({
     selector: 'app-view-field-manager',
@@ -83,9 +84,30 @@ export class ViewFieldManagerComponent extends AppComponentBase implements OnIni
         this.viewState = 'draft';
     }
 
+  // ...existing code...
     restoreRevision(): void {
-        // Restore requires a backend revision-restore endpoint, which is not available yet.
+        //i51-BE-FE-restore has a different end point !!
+        if (!this.item) return;
+
+        const itemToRestore = this.copyItem(this.item);
+//i51-FE-A new revision will be created and will become current revision.
+        Swal.fire({
+            title: '',
+            text: 'A new revision will be created and will become current revision.',
+            icon: 'info',
+            showCancelButton: true,
+            confirmButtonText: 'OK',
+            cancelButtonText: 'Cancel',
+            allowOutsideClick: false,
+            allowEscapeKey: false
+        }).then(result => {8
+            if (result.isConfirmed) {
+                this.item = this.copyItem(itemToRestore);
+                this.saveRevision();
+            }
+        });
     }
+// ...existing code...
 
     saveRevision(): void {
         if (!this.item || !this.item.fieldName.trim() || !this.item.id) return;

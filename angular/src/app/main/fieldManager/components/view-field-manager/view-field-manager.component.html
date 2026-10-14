@@ -22,8 +22,7 @@
 
                     <div class="revision-toolbar-actions">
                         <button *ngIf="viewState === 'details' && isViewingHistoryRevision"
-                            type="button" class="btn history-action" (click)="restoreRevision()" disabled
-                            title="Revision restore is not available from the backend">
+                            type="button" class="btn history-action" (click)="restoreRevision()">
                             <i class="fa fa-undo"></i> Restore Revision
                         </button>
                         <button *ngIf="viewState === 'details' && !isViewingHistoryRevision" type="button"
@@ -59,8 +58,10 @@
                                 <tbody>
                                     <tr *ngFor="let revision of revisions">
                                         <td class="revision-number">Revision #{{ revision.currentRevisionNo || '00' }}</td>
-                                        <td>{{ revision.creatorUserId || '-' }}</td>
+                                        <!-- //i51-BE-FE-display the creator’s name instead of their ID -->
+                                        <td>{{ revision.creatorUserName || '-' }}</td>
                                         <td>{{ revision.creationTime | date:'MM/dd/yyyy h:mm a' }}</td>
+                                       <!-- //i51-BE-FE- Clarify which status values should be displayed in the History Log table (e.g., Previous, Current, etc.). -->
                                         <td><span class="status-badge badge-current">Current</span></td>
                                         <td class="actions-column"><button type="button" class="details-button" (click)="openRevision(revision)">Details <i class="fa fa-arrow-right"></i></button></td>
                                     </tr>
@@ -121,7 +122,6 @@
                         </div>
                         <div class="revision-identity"><span class="revision-number">Revision #{{ revisionLabel }}</span><span class="status-badge badge-draft">Draft</span></div>
                     </div>
-                    <!-- <div class="revision-info-banner"><i class="fa fa-info-circle"></i><span>New Revision #{{ revisionLabel }} created from Revision #{{ selectedRevision?.revisionSequence }}. You can edit the field values before saving.</span></div> -->
                     <form #revisionForm="ngForm" class="revision-edit-form">
                         <section class="field-card">
                             <div class="card-section-heading"><div>
@@ -141,7 +141,8 @@
                         </section>
                         <section class="field-card advanced-card">
                             <div class="card-section-heading"><div>
-                                <!-- <span class="section-icon"><i class="fa fa-sliders"></i></span> -->
+                                <!-- <span class="section-icon"><i class="fa fa-sliders"></i></span> --> 
+                                 <!-- //i51-BE-FE-Handle Extra Data in the View and Create/Edit/view modals  -->
                                 <h3>Advanced Information</h3></div></div>
                             <div class="edit-grid">
                                 <label class="form-field">Allow Null<select class="form-control" name="allowNull" [(ngModel)]="item.allowNull"><option [ngValue]="true">Yes</option><option [ngValue]="false">No</option></select></label>
