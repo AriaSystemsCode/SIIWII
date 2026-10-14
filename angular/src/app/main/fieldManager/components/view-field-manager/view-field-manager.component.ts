@@ -100,7 +100,7 @@ export class ViewFieldManagerComponent extends AppComponentBase implements OnIni
             cancelButtonText: 'Cancel',
             allowOutsideClick: false,
             allowEscapeKey: false
-        }).then(result => {8
+        }).then(result => {
             if (result.isConfirmed) {
                 this.item = this.copyItem(itemToRestore);
                 this.saveRevision();
