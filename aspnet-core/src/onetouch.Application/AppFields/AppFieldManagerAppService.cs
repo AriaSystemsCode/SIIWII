@@ -450,7 +450,7 @@ namespace onetouch.AppFields
                     .AsNoTracking().ToListAsync();
                 var field = SelectAppliedDefinitions(rows, tenantId, objectIds).SingleOrDefault();
                 if (field == null || field.IsHidden) throw new UserFriendlyException("Field was not found.");
-                return ToDto(field);
+                return await ToDtoForResponse(field);
             }
         }
 
@@ -582,7 +582,7 @@ namespace onetouch.AppFields
                 var own = field.TenantId == AbpSession.TenantId;
                 return new GetFieldForEditOutput
                 {
-                    Field = ToDto(field),
+                    Field = await ToDtoForResponse(field),
                     Permissions = new FieldEditPermissionDto
                     {
                         CanEditCoreInfo = canEdit,
@@ -606,18 +606,28 @@ namespace onetouch.AppFields
                     .OrderByDescending(x => x.ChangedAt)
                     .ThenByDescending(x => x.Id)
                     .AsNoTracking().ToListAsync();
-                return revisions.Select(x => new AppFieldHistoryDto
+                var userNames = await GetUserNames(revisions.SelectMany(x => new[] { x.CreatorUserId, x.ChangedBy }), field.TenantId);
+                return revisions.Select(x =>
+                {
+                    var revisionField = ToDto(x);
+                    revisionField.CreatorUserName = revisionField.CreatorUserId.HasValue &&
+                        userNames.TryGetValue(revisionField.CreatorUserId.Value, out var creatorName)
+                        ? creatorName : null;
+                    return new AppFieldHistoryDto
                     {
                         Id = x.Id,
                         AppFieldId = x.AppFieldId,
                         FieldDefinitionKey = x.FieldDefinitionKey,
                         RevisionNo = x.RevisionNo,
                         ChangeType = x.ChangeType,
-                        Field = ToDto(x),
+                        Field = revisionField,
                         ChangedAt = x.ChangedAt,
                         ChangedBy = x.ChangedBy,
+                        ChangedByName = x.ChangedBy.HasValue && userNames.TryGetValue(x.ChangedBy.Value, out var changedByName)
+                            ? changedByName : null,
                         RestoredFromRevisionNo = x.RestoredFromRevisionNo
-                    }).ToList();
+                    };
+                }).ToList();
             }
         }
 
@@ -652,7 +662,7 @@ namespace onetouch.AppFields
                 Apply(input, field);
                 field.CurrentRevisionNo = NextRevision(field.CurrentRevisionNo);
                 await _fields.UpdateAsync(field);
-                return ToDto(field);
+                return await ToDtoForResponse(field);
             }
         }
 
@@ -754,7 +764,7 @@ namespace onetouch.AppFields
                 await _tableFields.InsertAsync(CreateTableSnapshot(field, AbpSession.TenantId,
                     input.SycObjectId, input.SelectedObjectTypeId));
             await RecordHistory(field, "Create");
-            return ToDto(field);
+            return await ToDtoForResponse(field);
         }
 
         [AbpAuthorize(AppPermissions.Pages_Administration_FieldManager_Edit)]
@@ -1025,6 +1035,36 @@ namespace onetouch.AppFields
                 case "trackingno desc": return query.OrderByDescending(x => x.TrackingNo);
                 case "creationtime asc": return query.OrderBy(x => x.CreationTime);
                 default: return query.OrderByDescending(x => x.CreationTime).ThenByDescending(x => x.Id);
+            }
+        }
+
+        private async Task<AppFieldDto> ToDtoForResponse(AppField field)
+        {
+            var dto = ToDto(field);
+            dto.NextRevisionNo = AbpSession.TenantId.HasValue && !field.TenantId.HasValue
+                ? "00" : NextRevision(field.CurrentRevisionNo);
+            if (dto.CreatorUserId.HasValue)
+            {
+                var names = await GetUserNames(new[] { dto.CreatorUserId }, dto.TenantId);
+                dto.CreatorUserName = names.TryGetValue(dto.CreatorUserId.Value, out var name) ? name : null;
+            }
+            return dto;
+        }
+
+        private async Task<Dictionary<long, string>> GetUserNames(IEnumerable<long?> userIds, int? tenantId)
+        {
+            var ids = userIds.Where(id => id.HasValue).Select(id => id.Value).Distinct().ToList();
+            if (ids.Count == 0)
+                return new Dictionary<long, string>();
+
+            using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.SoftDelete))
+            {
+                var users = await _users.GetAll()
+                    .Where(x => ids.Contains(x.Id) && (x.TenantId == null || x.TenantId == tenantId))
+                    .Select(x => new { x.Id, x.Name, x.Surname })
+                    .AsNoTracking().ToListAsync();
+                return users.ToDictionary(x => x.Id, x =>
+                    string.Join(" ", new[] { x.Name, x.Surname }.Where(name => !string.IsNullOrWhiteSpace(name))));
             }
         }
 

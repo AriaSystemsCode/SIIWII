@@ -113,11 +113,13 @@ namespace onetouch.AppFields.Dto
         public int? TenantId { get; set; }
         public long? SourceFieldId { get; set; }
         public string CurrentRevisionNo { get; set; }
+        public string NextRevisionNo { get; set; }
         public bool IsStandard { get; set; }
         public bool IsCustom { get; set; }
         public bool IsHidden { get; set; }
         public DateTime CreationTime { get; set; }
         public long? CreatorUserId { get; set; }
+        public string CreatorUserName { get; set; }
         public DateTime? LastModificationTime { get; set; }
         public long? LastModifierUserId { get; set; }
         public bool IsDeleted { get; set; }
@@ -179,6 +181,7 @@ namespace onetouch.AppFields.Dto
         public AppFieldDto Field { get; set; }
         public DateTime ChangedAt { get; set; }
         public long? ChangedBy { get; set; }
+        public string ChangedByName { get; set; }
         public string RestoredFromRevisionNo { get; set; }
     }
 

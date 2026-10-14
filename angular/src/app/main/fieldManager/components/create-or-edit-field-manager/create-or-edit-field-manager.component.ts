@@ -63,6 +63,7 @@ export class CreateOrEditFieldManagerComponent extends AppComponentBase implemen
         this.selectedObjectTypeId = objectTypeId || null;
         this.entityParentId = entityParentId || null;
         if (id) {
+            this.item = this.createEmptyItem();
             this.loadField(id);
         } else {
             this.extraAttributes = {};
@@ -147,8 +148,11 @@ export class CreateOrEditFieldManagerComponent extends AppComponentBase implemen
                    
                    //i51-BE-Validate the allowed entries. Please refer to the thread shared by Sam for further clarification: [Link].
                     this.fieldManagerService.createField(input).subscribe({
-                    next: () => {
-                        this.notify.success(this.l('SavedSuccessfully') ?? 'Saved successfully');
+                    next: savedField => {
+                        const revision = this.isEdit ? savedField.currentRevisionNo : undefined;
+                        this.notify.success(revision
+                            ? `Revision #${revision} saved successfully.`
+                            : (this.l('SavedSuccessfully') ?? 'Saved successfully'));
                         this.saved.emit();
                         this.initialFormState = this.getFormState();
                         this.close();

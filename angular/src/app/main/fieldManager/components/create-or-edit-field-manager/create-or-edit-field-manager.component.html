@@ -13,8 +13,7 @@
             <div class="modal-body">
                 <div class="modal-current-revision mb-4 d-flex justify-content-end">
                     <span class="font-weight-bold" style="color: #4a0d4a;">
-                       <!-- //i51-BE-FE- Display the new revision number in the Edit modal ! -->
-                        Current revision : {{ isEdit ? (item.currentRevisionNo || '00') : '00' }}
+                        {{ isEdit ? 'New revision' : 'Current revision' }} : {{ isEdit ? (item.nextRevisionNo || '—') : '00' }}
                     </span>
                 </div>
                 <div class="tab-content">
