@@ -48,5 +48,6 @@
     <EmbeddedResource Include="Migrations\20261012_SeedAppEntityFields.sql" LogicalName="onetouch.Migrations.Seed.20261012_SeedAppEntityFields.sql" />
     <EmbeddedResource Include="Migrations\20261002_SeedTransactionHeaderFields.sql" LogicalName="onetouch.Migrations.Seed.20261002_SeedTransactionHeaderFields.sql" />
     <EmbeddedResource Include="Migrations\20261013_SeedTransactionDetailFields.sql" LogicalName="onetouch.Migrations.Seed.20261013_SeedTransactionDetailFields.sql" />
+    <EmbeddedResource Include="Migrations\20261014_SeedStringTextboxSettings.sql" LogicalName="onetouch.Migrations.Seed.20261014_SeedStringTextboxSettings.sql" />
   </ItemGroup>
 </Project>

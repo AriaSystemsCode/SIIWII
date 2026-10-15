@@ -20,6 +20,7 @@ namespace onetouch.AppFields
         Task<AppFieldDto> GetAppliedField(GetAppliedFieldInput input);
         Task<GetFieldForEditOutput> GetFieldForEdit(long id);
         Task<List<AppFieldHistoryDto>> GetFieldHistory(long appFieldId);
+        Task<AppFieldDto> RestoreFieldRevision(RestoreFieldRevisionInput input);
         Task<AppFieldDto> CreateOrEditField(CreateOrEditFieldInput input);
         Task<FieldActionResultDto> DeleteField(EntityDto<long> input);
         Task<AppFieldDto> DuplicateField(EntityDto<long> input);

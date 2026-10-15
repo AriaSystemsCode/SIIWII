@@ -216,14 +216,7 @@ namespace onetouch.AppFields
         {
             if (input == null) throw new UserFriendlyException("Field data is required.");
             await ValidateFieldType(input.FieldTypeId);
-            var field = new AppField
-            {
-                FieldTypeId = input.FieldTypeId,
-                FieldName = input.FieldName?.Trim(),
-                FieldLevelCode = ResolveFieldLevelCode(input.FieldLevelCode)
-            };
-            var fieldCode = await NextFieldCode(field, acquireLock: false);
-            return new FieldCodePreviewDto { Sequence = fieldCode.Substring(7, 4) };
+            return new FieldCodePreviewDto { Sequence = await NextFieldSequence(input.FieldTypeId, acquireLock: false) };
         }
 
         [AbpAuthorize(AppPermissions.Pages_Administration_FieldManager)]
@@ -633,6 +626,41 @@ namespace onetouch.AppFields
 
         [AbpAuthorize(AppPermissions.Pages_Administration_FieldManager)]
         [UnitOfWork(IsolationLevel.Serializable)]
+        public async Task<AppFieldDto> RestoreFieldRevision(RestoreFieldRevisionInput input)
+        {
+            if (input == null || input.AppFieldId <= 0 || input.HistoryId <= 0 ||
+                string.IsNullOrWhiteSpace(input.ExpectedCurrentRevisionNo))
+                throw new UserFriendlyException("Select a field revision to restore.");
+            await RequirePermission(AppPermissions.Pages_Administration_FieldManager_RestoreRevision);
+
+            using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MayHaveTenant))
+            {
+                var field = await VisibleFields().Include(x => x.DropdownOptions)
+                    .SingleOrDefaultAsync(x => x.Id == input.AppFieldId && !x.IsDeleted && !x.IsHidden);
+                if (field == null) throw new UserFriendlyException("Field was not found.");
+                if (field.TenantId != AbpSession.TenantId)
+                    throw new UserFriendlyException("A tenant cannot restore a host field.");
+                if (field.CurrentRevisionNo != input.ExpectedCurrentRevisionNo)
+                    throw new UserFriendlyException("The field changed. Refresh its history before restoring.");
+
+                var revision = await _history.GetAll().Include(x => x.DropdownOptions)
+                    .SingleOrDefaultAsync(x => x.Id == input.HistoryId && x.AppFieldId == field.Id &&
+                        x.TenantId == field.TenantId && x.FieldDefinitionKey == field.FieldDefinitionKey);
+                if (revision == null) throw new UserFriendlyException("Field revision was not found.");
+                if (revision.FieldCode != field.FieldCode || revision.SycObjectId != field.SycObjectId)
+                    throw new UserFriendlyException("The selected revision does not match this field.");
+
+                await ArchiveCurrentRevision(field);
+                ApplyHistoryRevision(revision, field);
+                field.CurrentRevisionNo = NextRevision(field.CurrentRevisionNo);
+                await _fields.UpdateAsync(field);
+                await RecordHistory(field, "Restore", revision.RevisionNo);
+                return await ToDtoForResponse(field);
+            }
+        }
+
+        [AbpAuthorize(AppPermissions.Pages_Administration_FieldManager)]
+        [UnitOfWork(IsolationLevel.Serializable)]
         public async Task<AppFieldDto> CreateOrEditField(CreateOrEditFieldInput input)
         {
             if (input == null) throw new UserFriendlyException("Field data is required.");
@@ -867,7 +895,48 @@ namespace onetouch.AppFields
             FieldExtraAttributesCodec.Apply(FieldExtraAttributesCodec.Parse(input.ExtraAttributes), field);
         }
 
-        private async Task RecordHistory(AppField field, string changeType)
+        private static void ApplyHistoryRevision(AppFieldHistory revision, AppField field)
+        {
+            field.EntitySycObjectId = revision.EntitySycObjectId;
+            field.FieldName = revision.FieldName;
+            field.Description = revision.Description;
+            field.FieldTypeId = revision.FieldTypeId;
+            field.WidgetTypeId = revision.WidgetTypeId;
+            field.FieldLevelId = revision.FieldLevelId;
+            field.FieldStatusId = revision.FieldStatusId;
+            field.FieldLevelCode = revision.FieldLevelCode;
+            field.FieldStatusCode = revision.FieldStatusCode;
+            field.TrackingNo = revision.TrackingNo;
+            field.IsExtraField = revision.IsExtraField;
+            field.AllowNull = revision.AllowNull;
+            field.Length = revision.Length;
+            field.Decimals = revision.Decimals;
+            field.DefaultValue = revision.DefaultValue;
+            field.DateFormat = revision.DateFormat;
+            field.TimeFormat = revision.TimeFormat;
+            field.AllowMultiSelect = revision.AllowMultiSelect;
+            field.Required = revision.Required;
+            field.Visible = revision.Visible;
+            field.Editable = revision.Editable;
+            field.SourceAttributeId = revision.SourceAttributeId;
+            field.SourceDataType = revision.SourceDataType;
+            field.SourceEntityObjectTypeId = revision.SourceEntityObjectTypeId;
+            field.EntityObjectTypeCode = revision.EntityObjectTypeCode;
+            field.Usage = revision.Usage;
+            field.IsLookup = revision.IsLookup;
+            field.IsVariation = revision.IsVariation;
+            field.IsAdvancedSearch = revision.IsAdvancedSearch;
+            field.AcceptMultipleValues = revision.AcceptMultipleValues;
+            field.AllowAddNew = revision.AllowAddNew;
+            field.DropdownOptions.Clear();
+            foreach (var option in revision.DropdownOptions.OrderBy(x => x.SortOrder))
+                field.DropdownOptions.Add(new AppFieldDropdownOption
+                {
+                    SortOrder = option.SortOrder, Option = option.Option, Value = option.Value
+                });
+        }
+
+        private async Task RecordHistory(AppField field, string changeType, string restoredFromRevisionNo = null)
         {
             await _history.InsertAsync(new AppFieldHistory
             {
@@ -875,6 +944,7 @@ namespace onetouch.AppFields
                 AppFieldId = field.Id,
                 RevisionNo = field.CurrentRevisionNo,
                 ChangeType = changeType,
+                RestoredFromRevisionNo = restoredFromRevisionNo,
                 FieldDefinitionKey = field.FieldDefinitionKey,
                 SourceFieldId = field.SourceFieldId,
                 SycObjectId = field.SycObjectId,
@@ -976,11 +1046,17 @@ namespace onetouch.AppFields
                 .ToUpperInvariant().PadRight(4, '_');
             if (name == "____") throw new UserFriendlyException("Field name needs letters or digits.");
 
+            var sequence = await NextFieldSequence(field.FieldTypeId, acquireLock);
+            return typeCode + levelCode + name + sequence;
+        }
+
+        private async Task<string> NextFieldSequence(long fieldTypeId, bool acquireLock)
+        {
             if (acquireLock)
             {
                 var context = CurrentUnitOfWork.GetDbContext<onetouchDbContext>();
                 // Keep the lock resource stable while old and new app versions may run together.
-                var lockName = "APPFields:FieldType:" + field.FieldTypeId.ToString(CultureInfo.InvariantCulture);
+                var lockName = "APPFields:FieldType:" + fieldTypeId.ToString(CultureInfo.InvariantCulture);
                 await context.Database.ExecuteSqlInterpolatedAsync(
                     $"DECLARE @result int; EXEC @result = sp_getapplock @Resource = {lockName}, @LockMode = 'Exclusive', @LockOwner = 'Transaction'; IF @result < 0 THROW 51000, 'Unable to allocate a field code.', 1;");
             }
@@ -988,7 +1064,7 @@ namespace onetouch.AppFields
             var lastSequence = 0;
             using (CurrentUnitOfWork.DisableFilter(AbpDataFilters.MayHaveTenant, AbpDataFilters.SoftDelete))
             {
-                var existingCodes = await _fields.GetAll().Where(x => x.FieldTypeId == field.FieldTypeId)
+                var existingCodes = await _fields.GetAll().Where(x => x.FieldTypeId == fieldTypeId)
                     .Select(x => x.FieldCode).ToListAsync();
                 foreach (var code in existingCodes)
                 {
@@ -1002,7 +1078,7 @@ namespace onetouch.AppFields
             if (lastSequence >= 9999)
                 throw new UserFriendlyException("The field type has used all four-digit code sequences.");
 
-            return typeCode + levelCode + name + (lastSequence + 1).ToString("D4", CultureInfo.InvariantCulture);
+            return (lastSequence + 1).ToString("D4", CultureInfo.InvariantCulture);
         }
 
         private static string NextRevision(string current)

@@ -64,7 +64,8 @@ namespace onetouch.Migrations.Seed.Host
             {
                 "20261012_SeedAppEntityFields.sql",
                 "20261002_SeedTransactionHeaderFields.sql",
-                "20261013_SeedTransactionDetailFields.sql"
+                "20261013_SeedTransactionDetailFields.sql",
+                "20261014_SeedStringTextboxSettings.sql"
             };
 
             var previousTimeout = _context.Database.GetCommandTimeout();

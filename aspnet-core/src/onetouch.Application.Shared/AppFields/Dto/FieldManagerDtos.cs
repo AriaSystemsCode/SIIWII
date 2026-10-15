@@ -8,8 +8,6 @@ namespace onetouch.AppFields.Dto
     public class PreviewFieldCodeInput
     {
         [Range(1, long.MaxValue)] public long FieldTypeId { get; set; }
-        [Required, StringLength(250)] public string FieldName { get; set; }
-        [StringLength(32)] public string FieldLevelCode { get; set; }
     }
 
     public class FieldCodePreviewDto
@@ -183,6 +181,13 @@ namespace onetouch.AppFields.Dto
         public long? ChangedBy { get; set; }
         public string ChangedByName { get; set; }
         public string RestoredFromRevisionNo { get; set; }
+    }
+
+    public class RestoreFieldRevisionInput
+    {
+        [Range(1, long.MaxValue)] public long AppFieldId { get; set; }
+        [Range(1, long.MaxValue)] public long HistoryId { get; set; }
+        [Required, StringLength(10)] public string ExpectedCurrentRevisionNo { get; set; }
     }
 
     public class FieldManagerPermissionDto
