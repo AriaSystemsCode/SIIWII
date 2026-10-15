@@ -51,7 +51,7 @@
       </div>
 
       <!-- Actions -->
-      <div *ngIf="post.canEdit || isHost" class="text-right PositionRight pr-4">
+      <div *ngIf="post.canEdit || isHost" class=" pr-4" [ngClass]="isArabic ? 'PositionLeft':'PositionRight'">
         <div class="dropdown" dropdown>
           <button
             class="btn btn-secondary dropdown-toggle p-0"
