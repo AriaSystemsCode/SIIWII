@@ -39,7 +39,7 @@
                 </div>
             
     
-    <div [class]="containerClass + ' kt-grid__item kt-grid__item--fluid'" class="px-0"  class="mt-ar">
+    <div [class]="containerClass + ' kt-grid__item kt-grid__item--fluid'" class="px-0"  [ngClass]="fromBilling ?'': 'mt-ar-log'">
         <div class="kt-portlet kt-portlet--mobile " [ngClass]="fromBilling ? 'mt-0':''">
             <div class="kt-portlet__body">
                 <form class="kt-form" autocomplete="off">
