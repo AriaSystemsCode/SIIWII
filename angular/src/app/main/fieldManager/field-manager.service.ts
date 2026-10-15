@@ -3,13 +3,15 @@ import { Observable, of } from 'rxjs';
 import { map, switchMap } from 'rxjs/operators';
 import {
     AppFieldDto,
+    AppFieldHistoryDto,
     AppFieldListDto,
     AppFieldManagerServiceProxy,
-    AssignExistingFieldInput,
     FieldCreateOrEditMetadataDto,
     FieldManagerPermissionDto,
     CreateOrEditFieldInput,
     EntityDtoOfInt64,
+    LinkExistingFieldsInput,
+    LinkExistingFieldsResultDto,
     ObjectTypeTreeNodeDto,
     PreviewFieldCodeInput
 } from '@shared/service-proxies/service-proxies';
@@ -33,10 +35,30 @@ export class FieldManagerService {
             .pipe(map(fields => fields.filter(field => !field.isHidden)));
     }
 
+    getUnlinkedFields(tableId: number, sycEntityObjectTypeId: number | null): Observable<AppFieldDto[]> {
+        return this.getUnlinkedFieldPage(tableId, sycEntityObjectTypeId ?? undefined, 0);
+    }
+
+    private getUnlinkedFieldPage(
+        tableId: number,
+        sycEntityObjectTypeId: number | undefined,
+        skipCount: number
+    ): Observable<AppFieldDto[]> {
+        return this.appFieldManagerProxy.getUnlinkedFields(
+            tableId, sycEntityObjectTypeId, undefined, undefined, skipCount, this.pageSize
+        ).pipe(switchMap(response => {
+            const items = response.items || [];
+            const nextSkipCount = skipCount + items.length;
+            return items.length && nextSkipCount < response.totalCount
+                ? this.getUnlinkedFieldPage(tableId, sycEntityObjectTypeId, nextSkipCount)
+                    .pipe(map(next => [...items, ...next]))
+                : of(items);
+        }));
+    }
+
     private getFieldPage(node: ObjectTypeTreeNodeDto | null, skipCount: number): Observable<AppFieldListDto[]> {
         const selectedObjectTypeId = node?.nodeType === 'ObjectType' ? node.id : undefined;
         const selectedObjectId = node && node.nodeType !== 'ObjectType' ? node.sycObjectId : undefined;
-        //i51_ BE-FE on case of get existing fields GetUnlinkedFields (entityObject , entityObjectType)
         return this.appFieldManagerProxy.getFields(
             selectedObjectId, selectedObjectTypeId, true,
             undefined, undefined, undefined, undefined, undefined, undefined, undefined,
@@ -67,6 +89,10 @@ export class FieldManagerService {
         }));
     }
 
+    getFieldHistory(appFieldId: number): Observable<AppFieldHistoryDto[]> {
+        return this.appFieldManagerProxy.getFieldHistory(appFieldId);
+    }
+
     previewFieldCode(fieldTypeId: number, fieldName: string, fieldLevelCode: string): Observable<string> {
         return this.appFieldManagerProxy.previewFieldCode(
             new PreviewFieldCodeInput({ fieldTypeId, fieldName, fieldLevelCode })
@@ -77,10 +103,11 @@ export class FieldManagerService {
         return this.appFieldManagerProxy.createOrEditField(input);
     }
 
-    assignExistingField(appFieldId: number, sycObjectId: number, sycEntityObjectTypeId: number | null): Observable<any> {
-      //i51_BE_FE LinkExistingFields  (entityObject, and entityObjectType,array)
-        return this.appFieldManagerProxy.assignExistingField(new AssignExistingFieldInput({
-            appFieldId, sycObjectId, sycEntityObjectTypeId: sycEntityObjectTypeId ?? undefined
+    linkExistingFields(tableId: number, sycEntityObjectTypeId: number | null, appFieldIds: number[]): Observable<LinkExistingFieldsResultDto> {
+        return this.appFieldManagerProxy.linkExistingFields(new LinkExistingFieldsInput({
+            tableId,
+            sycEntityObjectTypeId: sycEntityObjectTypeId ?? undefined,
+            appFieldIds
         }));
     }
 

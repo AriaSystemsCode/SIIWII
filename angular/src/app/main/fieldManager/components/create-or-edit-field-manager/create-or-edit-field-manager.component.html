@@ -23,7 +23,6 @@
                     <div class="field-form-grid">
                         <div class="form-group">
                             <label for="fieldCode">{{ 'FieldCode' | localize }}<b>*</b></label>
-                            <!-- //i51_BE-FE- Read only in edit modal !! -->
                             <input *ngIf="!isEdit" id="generatedFieldCode" name="generatedCode" type="text"
                                 class="form-control field-value-control mt-2" [ngModel]="item.fieldCode" readonly
                                 style="cursor: not-allowed;" required />
@@ -32,6 +31,7 @@
                                 [style.cursor]="'not-allowed'" required />
                         </div>
                         <!-- //i51_FE-color of data inputs in edit modal -->
+                           <!-- //i51_FE-review read only data inputs in edit modal -->
                         <div class="form-group">
                             <label for="fieldName">{{ 'FieldName' | localize }}<b>*</b></label>
                             <input id="fieldName" name="name" type="text" class="form-control field-value-control"

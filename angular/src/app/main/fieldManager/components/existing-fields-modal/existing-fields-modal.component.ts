@@ -1,9 +1,8 @@
 import { Component, EventEmitter, Injector, Input, Output, ViewChild } from '@angular/core';
 import { ModalDirective } from 'ngx-bootstrap/modal';
 import { AppComponentBase } from '@shared/common/app-component-base';
-import { AppFieldListDto } from '@shared/service-proxies/service-proxies';
+import { AppFieldDto, AppFieldListDto } from '@shared/service-proxies/service-proxies';
 import { FieldManagerService } from '../../field-manager.service';
-import { forkJoin } from 'rxjs';
 
 @Component({
     selector: 'app-existing-fields-modal',
@@ -20,7 +19,7 @@ export class ExistingFieldsModalComponent extends AppComponentBase {
 
     search = '';
     selectedFieldIds: number[] = [];
-    allFields: AppFieldListDto[] = [];
+    allFields: AppFieldDto[] = [];
 
     constructor(
         injector: Injector,
@@ -29,11 +28,15 @@ export class ExistingFieldsModalComponent extends AppComponentBase {
         super(injector);
     }
 
-    get availableFields(): AppFieldListDto[] {
+    get availableFields(): AppFieldDto[] {
         const search = this.search.trim().toLowerCase();
         const currentTableCodes = new Set(this.items.map(item => item.fieldCode));
 
         return this.allFields.filter(item => {
+            if (item.id === undefined) {
+                return false;
+            }
+
             if (currentTableCodes.has(item.fieldCode)) {
                 return false;
             }
@@ -44,15 +47,19 @@ export class ExistingFieldsModalComponent extends AppComponentBase {
 
                 return (item.fieldName || '').toLowerCase().includes(search) ||
                 (item.fieldCode || '').toLowerCase().includes(search) ||
-                (item.fieldTypeName || '').toLowerCase().includes(search) ||
-                (item.tables || []).join(', ').toLowerCase().includes(search);
+                String(item.fieldTypeId).includes(search);
         });
     }
 
     show(): void {
         this.search = '';
         this.selectedFieldIds = [];
-        this.fieldManagerService.getFieldsForNode(null).subscribe({
+        if (this.entityId === null) {
+            this.notify.error('Select an entity or table first.');
+            return;
+        }
+
+        this.fieldManagerService.getUnlinkedFields(this.entityId, this.objectTypeId).subscribe({
             next: fields => this.allFields = fields,
             error: () => this.notify.error('Could not load existing fields.')
         });
@@ -87,13 +94,15 @@ export class ExistingFieldsModalComponent extends AppComponentBase {
             return;
         }
 
-        const selectedFields = this.allFields.filter(item => this.isSelected(item.id));
+        const selectedFields = this.allFields.filter(item => item.id !== undefined && this.isSelected(item.id));
         if (!selectedFields.length) return;
-        forkJoin(selectedFields.map(item => this.fieldManagerService.assignExistingField(
-            item.id, this.entityId!, this.objectTypeId
-        ))).subscribe({
-            next: () => {
-                this.added.emit(selectedFields.length);
+        this.fieldManagerService.linkExistingFields(
+            this.entityId,
+            this.objectTypeId,
+            selectedFields.map(item => item.id!)
+        ).subscribe({
+            next: result => {
+                this.added.emit(result.linkedCount || 0);
                 this.hideAndReset();
             },
             error: () => this.notify.error('Could not assign one or more fields.')

@@ -21,7 +21,7 @@
                     <!-- <div *ngIf="viewState === 'draft'" class="draft-context">Editing a new revision</div> -->
 
                     <div class="revision-toolbar-actions">
-                        <button *ngIf="viewState === 'details' && isViewingHistoryRevision"
+                        <button *ngIf="viewState === 'details' && isViewingHistoryRevision && canRestoreRevision"
                             type="button" class="btn history-action" (click)="restoreRevision()">
                             <i class="fa fa-undo"></i> Restore Revision
                         </button>
@@ -53,16 +53,15 @@
                         <div class="revision-table-scroll">
                             <table class="revision-table">
                                 <thead>
-                                    <tr><th>Revision</th><th>Created By</th><th>Created On</th><th>Status</th><th class="actions-column">Actions</th></tr>
+                                    <tr><th>Revision</th><th>Created By</th><th>Created On</th><th class="actions-column">Actions</th></tr>
+                                        <!-- <th>Status</th> -->
                                 </thead>
                                 <tbody>
                                     <tr *ngFor="let revision of revisions">
-                                        <td class="revision-number">Revision #{{ revision.currentRevisionNo || '00' }}</td>
-                                        <!-- //i51_BE-FE-display the creator’s name instead of their ID -->
-                                        <td>{{ revision.creatorUserName || '-' }}</td>
-                                        <td>{{ revision.creationTime | date:'MM/dd/yyyy h:mm a' }}</td>
-                                       <!-- //i51_BE-FE- Clarify which status values should be displayed in the History Log table (e.g., Previous, Current, etc.). -->
-                                        <td><span class="status-badge badge-current">Current</span></td>
+                                        <td class="revision-number">Revision #{{ revision.revisionNo || revision.field?.currentRevisionNo || '00' }}</td>
+                                        <td>{{ revision.changedByName || '-' }}</td>
+                                        <td>{{ revision.changedAt | date:'MM/dd/yyyy h:mm a' }}</td>
+                                        <!-- <td><span class="status-badge badge-current">{{ revision.changeType || 'Revision' }}</span></td> -->
                                         <td class="actions-column"><button type="button" class="details-button" (click)="openRevision(revision)">Details <i class="fa fa-arrow-right"></i></button></td>
                                     </tr>
                                     <tr *ngIf="!revisions.length"><td colspan="5" class="empty-history">No revisions available.</td></tr>
@@ -142,11 +141,12 @@
                         <section class="field-card advanced-card">
                             <div class="card-section-heading"><div>
                                 <!-- <span class="section-icon"><i class="fa fa-sliders"></i></span> --> 
-                                <!-- //i51_BE-FE-Handle Extra Data in the View and Create/Edit/view modals  
-                                                                  
-                                                                 //i51_BE-FE-send parm for getAllWithExtraAttributes
-                                -//i51_BE-FE-getAppEntityForEdit??
-                                -//i51_BE-FE-saving ???  -->
+                                <!-- 
+                                     //i51_BE-FE-Handle Extra Data in the View and Create/Edit/view modals  
+                                     //i51_BE-FE-send parm for getAllWithExtraAttributes
+                                     //i51_BE-FE-getAppEntityForEdit??
+                                     //i51_BE-FE-saving ???  
+                                     -->
                                 <h3>Advanced Information</h3></div></div>
                             <div class="edit-grid">
                                 <label class="form-field">Allow Null<select class="form-control" name="allowNull" [(ngModel)]="item.allowNull"><option [ngValue]="true">Yes</option><option [ngValue]="false">No</option></select></label>
