@@ -136,7 +136,8 @@ export class CreateOrEditFieldManagerComponent extends AppComponentBase implemen
             extraAttributes: JSON.stringify({ ...this.extraAttributes, dropdownOptions: this.dropdownOptions })
         });
 
-        //i51-BE-FE-Generate field code !! 
+        //i51_BE-FE-Generate field code !! 
+        //i51_BE-FE- fieldType.id! default first one 
         const codeSource = this.isEdit
             ? of(this.item.fieldCode || '')
             : this.fieldManagerService.previewFieldCode(fieldType.id!, fieldName, input.fieldLevelCode || '');
@@ -147,7 +148,8 @@ export class CreateOrEditFieldManagerComponent extends AppComponentBase implemen
                     //i51-BE-Define the expected behavior when two users attempt to create a new revision at the same time. If one user saves a revision number that has already been used by another user, the system should notify the second user and ask whether they want to continue with a different revision number or cancel the operation.
                    
                    //i51-BE-Validate the allowed entries. Please refer to the thread shared by Sam for further clarification: [Link].
-                    this.fieldManagerService.createField(input).subscribe({
+                      //i51_BE- CreateOrEditField
+                   this.fieldManagerService.createField(input).subscribe({
                     next: savedField => {
                         const revision = this.isEdit ? savedField.currentRevisionNo : undefined;
                         this.notify.success(revision
@@ -220,7 +222,7 @@ export class CreateOrEditFieldManagerComponent extends AppComponentBase implemen
 
     generateCode(): void {
         debugger;
-           //i51-BE-FE-Generate field code !! 
+           //i51_BE-FE-Generate field code !! 
         if (this.isEdit)
             return;
 
@@ -234,7 +236,7 @@ export class CreateOrEditFieldManagerComponent extends AppComponentBase implemen
         }
 
         this.previewTimer = setTimeout(() => {
-        //i51-BE-FE-set only fieldCodeSeq
+        //i51_BE-FE-set only fieldCodeSeq
             this.fieldManagerService.previewFieldCode(fieldTypeId, name, level)
                 .subscribe({ next: code => { if (request === this.codePreviewRequest)
                 // this.item.code ? 

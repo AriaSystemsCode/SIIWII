@@ -53,7 +53,7 @@ export class ViewFieldManagerComponent extends AppComponentBase implements OnIni
     }
 
     goToHistory(): void {
-        // No revision-history endpoint is currently exposed; show the current BE revision only.
+        //i51_BE-FE  GetFieldHistory appFieldId => AppFieldHistoryDto list
         this.revisions = this.item ? [this.item] : [];
         this.selectedRevision = this.item;
         this.viewState = 'history';
@@ -86,11 +86,11 @@ export class ViewFieldManagerComponent extends AppComponentBase implements OnIni
 
   // ...existing code...
     restoreRevision(): void {
-        //i51-BE-FE-restore has a different end point !!
+        //i51_BE-FE RestoreFieldRevision
         if (!this.item) return;
 
         const itemToRestore = this.copyItem(this.item);
-//i51-FE-A new revision will be created and will become current revision.
+//i51_FE-A new revision will be created and will become current revision.
         Swal.fire({
             title: '',
             text: 'A new revision will be created and will become current revision.',
@@ -142,6 +142,7 @@ export class ViewFieldManagerComponent extends AppComponentBase implements OnIni
         });
 
         this.showMainSpinner();
+        //I51_BE-FE CreateOrEditField
         this.fieldManagerService.createField(input).pipe(finalize(() => this.hideMainSpinner())).subscribe({
             next: savedField => {
                 this.item = savedField;
