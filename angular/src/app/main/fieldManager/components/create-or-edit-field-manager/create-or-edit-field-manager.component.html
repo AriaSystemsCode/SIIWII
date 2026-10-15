@@ -23,7 +23,6 @@
                     <div class="field-form-grid">
                         <div class="form-group">
                             <label for="fieldCode">{{ 'FieldCode' | localize }}<b>*</b></label>
-                            <!-- //i51-BE-FE- Read only in edit modal !! -->
                             <input *ngIf="!isEdit" id="generatedFieldCode" name="generatedCode" type="text"
                                 class="form-control field-value-control mt-2" [ngModel]="item.fieldCode" readonly
                                 style="cursor: not-allowed;" required />
@@ -31,7 +30,8 @@
                                 *ngIf="isEdit" [(ngModel)]="item.fieldCode" [readonly]="true"
                                 [style.cursor]="'not-allowed'" required />
                         </div>
-                        <!-- //i51-FE-color of data inputs in edit modal -->
+                        <!-- //i51_FE-color of data inputs in edit modal -->
+                           <!-- //i51_FE-review read only data inputs in edit modal -->
                         <div class="form-group">
                             <label for="fieldName">{{ 'FieldName' | localize }}<b>*</b></label>
                             <input id="fieldName" name="name" type="text" class="form-control field-value-control"
@@ -99,7 +99,7 @@
                         <small>Leave unchecked to create a standard field.</small>
                     </div>
 
-                  <!-- //i51-BE-FE-Handle Extra Data in the View and Create/Edit/view modals  -->
+                  <!-- //i51_BE-FE-Handle Extra Data in the View and Create/Edit/view modals  -->
                     <ng-container *ngIf="selectedFieldTypeName">
                         <section class="field-form-section">
                             <h4 class="field-section-title">{{ 'AdvancedInformation' | localize }}</h4>
@@ -190,7 +190,7 @@
                     </ng-container>
 
 
-                    <!-- //i51-BE-FE-ExtraAttributes from BE -->
+                    <!-- //i51_BE-FE-ExtraAttributes from BE -->
                     <section class="field-form-section extra-attributes-form">
                         <h4 class="field-section-title">{{ 'ExtraAttributes' | localize }}</h4>
                         <div class="field-form-grid">

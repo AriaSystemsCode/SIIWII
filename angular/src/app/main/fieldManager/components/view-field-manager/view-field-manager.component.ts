@@ -4,7 +4,7 @@ import { ModalDirective } from 'ngx-bootstrap/modal';
 import { forkJoin } from 'rxjs';
 import { finalize } from 'rxjs/operators';
 import { AppComponentBase } from '@shared/common/app-component-base';
-import { AppFieldDto, CreateOrEditFieldInput, FieldLookupDto } from '@shared/service-proxies/service-proxies';
+import { AppFieldDto, AppFieldHistoryDto, CreateOrEditFieldInput, FieldLookupDto } from '@shared/service-proxies/service-proxies';
 import { FieldManagerService } from '../../field-manager.service';
 import Swal from 'sweetalert2';
 
@@ -17,15 +17,17 @@ export class ViewFieldManagerComponent extends AppComponentBase implements OnIni
     @ViewChild('fieldManagerViewModal', { static: true }) modal!: ModalDirective;
     @Output() revisionSaved = new EventEmitter<void>();
     item: AppFieldDto | null = null;
-    revisions: AppFieldDto[] = [];
+    revisions: AppFieldHistoryDto[] = [];
     selectedRevision: AppFieldDto | null = null;
     fieldTypes: FieldLookupDto[] = [];
     widgetTypes: FieldLookupDto[] = [];
     viewState: 'details' | 'history' | 'draft' = 'details';
     active = false;
     isViewingHistoryRevision = false;
+    canRestoreRevision = false;
     private currentItem: AppFieldDto | null = null;
     private detailsRequest = 0;
+    private historyRequest = 0;
 
     constructor(
         injector: Injector,
@@ -53,24 +55,44 @@ export class ViewFieldManagerComponent extends AppComponentBase implements OnIni
     }
 
     goToHistory(): void {
-        // No revision-history endpoint is currently exposed; show the current BE revision only.
-        this.revisions = this.item ? [this.item] : [];
+        if (!this.item || this.item.id === undefined) return;
+
+        const request = ++this.historyRequest;
         this.selectedRevision = this.item;
         this.viewState = 'history';
+        this.revisions = [];
+        this.showMainSpinner();
+        this.fieldManagerService.getFieldHistory(this.item.id).pipe(finalize(() => {
+            if (request === this.historyRequest) this.hideMainSpinner();
+        })).subscribe({
+            next: revisions => {
+                if (request === this.historyRequest) this.revisions = revisions || [];
+            },
+            error: () => {
+                if (request === this.historyRequest) this.notify.error('Could not load field revision history.');
+            }
+        });
     }
 
     backToFieldDetails(): void {
+        ++this.historyRequest;
+        this.hideMainSpinner();
         if (this.currentItem) this.item = this.copyItem(this.currentItem);
         this.selectedRevision = this.currentItem;
         this.viewState = 'details';
         this.isViewingHistoryRevision = false;
+        this.canRestoreRevision = false;
     }
 
-    openRevision(revision: AppFieldDto): void {
-        this.item = this.copyItem(revision);
-        this.selectedRevision = revision;
+    openRevision(revision: AppFieldHistoryDto): void {
+        if (!revision.field) return;
+        this.item = this.copyItem(revision.field);
+        this.selectedRevision = revision.field;
         this.viewState = 'details';
-        this.isViewingHistoryRevision = false;
+        this.isViewingHistoryRevision = true;
+        const revisionNo = this.normalizeRevisionNo(revision.revisionNo || revision.field.currentRevisionNo);
+        const currentRevisionNo = this.normalizeRevisionNo(this.currentItem?.currentRevisionNo);
+        this.canRestoreRevision = !!revisionNo && !!currentRevisionNo && revisionNo !== currentRevisionNo;
     }
 
     backToHistory(): void {
@@ -86,11 +108,9 @@ export class ViewFieldManagerComponent extends AppComponentBase implements OnIni
 
   // ...existing code...
     restoreRevision(): void {
-        //i51-BE-FE-restore has a different end point !!
         if (!this.item) return;
 
         const itemToRestore = this.copyItem(this.item);
-//i51-FE-A new revision will be created and will become current revision.
         Swal.fire({
             title: '',
             text: 'A new revision will be created and will become current revision.',
@@ -147,9 +167,10 @@ export class ViewFieldManagerComponent extends AppComponentBase implements OnIni
                 this.item = savedField;
                 this.currentItem = this.copyItem(savedField);
                 this.selectedRevision = savedField;
-                this.revisions = [savedField];
+                this.revisions = [];
                 this.viewState = 'details';
                 this.isViewingHistoryRevision = false;
+                this.canRestoreRevision = false;
                 this.revisionSaved.emit();
                 this.notify.success('Revision saved successfully.');
             },
@@ -175,12 +196,13 @@ export class ViewFieldManagerComponent extends AppComponentBase implements OnIni
                 if (request !== this.detailsRequest) return;
                 this.item = result.field;
                 this.currentItem = this.copyItem(result.field);
-                this.revisions = [result.field];
+                this.revisions = [];
                 this.selectedRevision = result.field;
                 this.fieldTypes = result.metadata.fieldTypes || [];
                 this.widgetTypes = result.metadata.widgetTypes || [];
                 this.viewState = 'details';
                 this.isViewingHistoryRevision = false;
+                this.canRestoreRevision = false;
                 this.active = true;
                 this.modal.show();
             },
@@ -197,6 +219,12 @@ export class ViewFieldManagerComponent extends AppComponentBase implements OnIni
         return AppFieldDto.fromJS(item.toJSON());
     }
 
+    private normalizeRevisionNo(revisionNo?: string): string | null {
+        const normalized = revisionNo?.trim();
+        if (!normalized) return null;
+        return /^\d+$/.test(normalized) ? String(Number(normalized)) : normalized.toLowerCase();
+    }
+
     close(): void {
         if (this.viewState === 'draft') {
             this.cancelDraft();
@@ -207,6 +235,7 @@ export class ViewFieldManagerComponent extends AppComponentBase implements OnIni
             return;
         }
         ++this.detailsRequest;
+        ++this.historyRequest;
         this.hideMainSpinner();
         this.active = false;
         this.item = null;

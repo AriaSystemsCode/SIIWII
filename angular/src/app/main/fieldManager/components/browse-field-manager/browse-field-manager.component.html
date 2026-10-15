@@ -81,8 +81,7 @@
 
     <div class="field-manager-table-wrapper" *ngIf="activePanel === 'all' || selectedEntityId !== null">
         <p-table #dataTable [value]="groupedItems" [paginator]="true" [rows]="10"
-            [rowsPerPageOptions]="[10, 25, 50]" [scrollable]="true" scrollHeight="400px"
-            frozenHeader="true"
+            [rowsPerPageOptions]="[10, 25, 50]"
             styleClass="field-manager-table"
             [rowGroupMode]="groupBy === 'none' ? null : 'subheader'" groupRowsBy="groupValue"
             [sortField]="groupBy === 'none' ? null : 'groupValue'" sortMode="single"
@@ -100,7 +99,6 @@
                                         </td>
                                     </tr>
                                 </ng-template>
-                                <!-- //i51-FE-Ensure that table headers remain fixed while scrolling through the table. -->
                                 <ng-template pTemplate="header">
                                     <tr>
                                         <th pSortableColumn="fieldCode" class="purpleColor field-code-column">
@@ -135,7 +133,6 @@
                                             {{ 'TrackingNumber' | localize }}
                                             <p-sortIcon field="trackingNo"></p-sortIcon>
                                         </th>
-                                        <!-- //i51-BE-Enable Extra Data (Extra Data = true) for specific Purchase Orders (POs). -->
                                         <th pSortableColumn="isExtraField" class="purpleColor field-extra-data-column">
                                             {{ 'ExtraData' | localize }}
                                             <p-sortIcon field="isExtraField"></p-sortIcon>
@@ -177,7 +174,6 @@
         <!-- <button *ngIf="permissions.canEditField && actionItem.canEdit" type="button" (click)="CreateNewRevision(actionItem)">{{ 'CreateNewRevision' | localize }}</button>
         <button *ngIf="permissions.canDuplicateField" type="button" (click)="duplicate(actionItem)">{{ 'DuplicateField' | localize }}</button>
         <button *ngIf="permissions.canEditField && actionItem.canHide" type="button" (click)="hide(actionItem)">{{ 'Hide' | localize }}</button>-->
-        //i51-canDelete !!
         <button *ngIf="actionItem.canDelete" type="button" (click)="delete(actionItem)">{{ 'Delete' | localize }}</button> 
     </div>
 

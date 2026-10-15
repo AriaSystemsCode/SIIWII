@@ -407,6 +407,7 @@
     border-radius: 10px;
     background: #fff;
     box-shadow: 0 4px 16px rgba(39, 31, 53, 0.06);
+    overflow: hidden;
 }
 
 .field-manager-table-wrapper {
@@ -504,21 +505,21 @@
     }
 }
 
-::ng-deep .field-manager-table .p-datatable-scrollable-header {
-    position: relative;
-    z-index: 2;
-}
-
-::ng-deep .field-manager-table .p-datatable-scrollable-body {
+::ng-deep .field-manager-table .p-datatable-wrapper {
     max-height: min(62vh, 400px);
-    overflow-x: auto !important;
-    overflow-y: auto !important;
+    overflow: auto !important;
 }
 
 ::ng-deep .field-manager-table .p-datatable-table {
     width: max-content !important;
     min-width: 100%;
     table-layout: auto;
+}
+
+::ng-deep .field-manager-table .p-datatable-thead > tr > th {
+    position: sticky;
+    top: 0;
+    z-index: 3;
 }
 
 .field-actions {
@@ -623,7 +624,7 @@
         width: 150px;
     }
 
-    ::ng-deep .field-manager-table .p-datatable-scrollable-body {
+    ::ng-deep .field-manager-table .p-datatable-wrapper {
         max-height: calc(100vh - 300px);
     }
 }
