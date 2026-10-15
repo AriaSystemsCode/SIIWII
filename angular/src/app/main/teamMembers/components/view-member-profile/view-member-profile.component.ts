@@ -1,5 +1,5 @@
 import { Component, ViewChild, Injector, Output, EventEmitter, OnInit, Input, ViewEncapsulation } from '@angular/core';
-import { AccountsServiceProxy, SycAttachmentCategoryDto, CreateOrEditAccountInfoDto, TreeNodeOfBranchForViewDto, BranchForViewDto, UserEditDto,  UserServiceProxy, UserListDto, AppEntityExtraDataDto } from '@shared/service-proxies/service-proxies';
+import { AccountsServiceProxy, SycAttachmentCategoryDto, CreateOrEditAccountInfoDto, TreeNodeOfBranchForViewDto, BranchForViewDto, UserEditDto,  UserServiceProxy, UserListDto, AppEntityExtraDataDto, SycEntityObjectTypesServiceProxy } from '@shared/service-proxies/service-proxies';
 import { AppComponentBase } from '@shared/common/app-component-base';
 import { NgImageSliderComponent } from 'ng-image-slider';
 import { AppConsts } from '@shared/AppConsts';
@@ -65,7 +65,8 @@ export class ViewMemberProfileComponent extends AppComponentBase implements OnIn
   memberIslink: boolean = false;
   showUserList: boolean = false;
 
-  constructor(injector: Injector, private _AccountsServiceProxy: AccountsServiceProxy,  private _userService: UserServiceProxy,private route: ActivatedRoute,private  UpdateLogoService:UpdateLogoService) {
+  constructor(injector: Injector, private _AccountsServiceProxy: AccountsServiceProxy,  private _userService: UserServiceProxy,private route: ActivatedRoute,private  UpdateLogoService:UpdateLogoService ,private _sycEntityObjectTypesServiceProxy:
+    SycEntityObjectTypesServiceProxy) {
     super(injector);
     this.accountInfoTemp = new CreateOrEditAccountInfoDto();
 
@@ -121,10 +122,12 @@ export class ViewMemberProfileComponent extends AppComponentBase implements OnIn
       this.NoteditInfo = true;
   
     
-      this.editjobTitleValue = this.getStringValue(706);
+    //   this.editjobTitleValue = this.getStringValue(706);
   
-      this.editBranchValue = this.buildBranchDisplay(this.memberData);
-    this.oldEditBranchValue = this.editBranchValue;
+    //   this.editBranchValue = this.buildBranchDisplay(this.memberData);
+    // this.oldEditBranchValue = this.editBranchValue;
+
+    this.prepareRelationInputs();
     } else {
       const memberId: number = this.memberData?.id;
       if (isNaN(memberId)) return;
@@ -171,6 +174,9 @@ export class ViewMemberProfileComponent extends AppComponentBase implements OnIn
       )
       .subscribe(result => {
         this.memberData = result;
+        this.relationChanges.clear();
+this.relationAttributeObject = null;
+this.loadRelationAttributes();
         this.memberData.accountId = this.memberData.accountId; // keeps current behavior
   
 
@@ -296,30 +302,82 @@ export class ViewMemberProfileComponent extends AppComponentBase implements OnIn
   editjobTitleValue: string = '';
   editBranchValue: string = '';
   oldEditBranchValue: string = "";
-  Save_editMember() {
+  // Save_editMember() {
 
-    const attr = this.memberData?.entityExtraData?.find(attr => attr.attributeId === 706);
-    if (attr) {
-      attr.attributeValue = this.editjobTitleValue
+  //   const attr = this.memberData?.entityExtraData?.find(attr => attr.attributeId === 706);
+  //   if (attr) {
+  //     attr.attributeValue = this.editjobTitleValue
+  //   }
+  //   this.newEditMemberInfo = this.memberData;
+  //   this.newEditMemberInfo.branchName = this.editBranchValue;
+  //   this.newEditMemberInfo.parentId = this.selectedBranchid;
+
+  //   this.editInfo = true;
+  //   this.NoteditInfo = false;
+  //   this._AccountsServiceProxy.createOrUpdateContact(this.newEditMemberInfo)
+  //     .pipe(finalize(() => {
+  //       this.hideMainSpinner();
+  //       this.Editting = false;
+  //       this.refresh(true);
+  //     }))
+  //     .subscribe(result => {
+  //       this.notify.success(this.l('SuccessfullySaved'));
+  //     });
+
+
+  // }
+
+  Save_editMember(): void {
+    const payload = CreateOrEditAccountInfoDto.fromJS(
+        this.memberData.toJSON()
+    );
+
+    const changes = Array.from(this.relationChanges.values());
+    const changedIds = new Set(
+        changes.map(change => Number(change.attributeId))
+    );
+
+    payload.entityExtraData = [
+        ...(payload.entityExtraData || []).filter(
+            item => !changedIds.has(Number(item.attributeId))
+        ),
+        ...changes.map(change => {
+            const dto = new AppEntityExtraDataDto();
+
+            dto.attributeId = Number(change.attributeId);
+            dto.entityObjectTypeId = this.relationEntityObjectTypeId;
+            dto.attributeValue =
+                change.value == null ? '' : String(change.value);
+
+            return dto;
+        })
+    ];
+
+    // Preserve the existing branch assignment contract.
+    const branchChange = this.relationChanges.get(718);
+
+    if (branchChange) {
+        payload.parentId =
+            branchChange.value === '' || branchChange.value == null
+                ? null
+                : Number(branchChange.value);
     }
-    this.newEditMemberInfo = this.memberData;
-    this.newEditMemberInfo.branchName = this.editBranchValue;
-    this.newEditMemberInfo.parentId = this.selectedBranchid;
 
-    this.editInfo = true;
-    this.NoteditInfo = false;
-    this._AccountsServiceProxy.createOrUpdateContact(this.newEditMemberInfo)
-      .pipe(finalize(() => {
-        this.hideMainSpinner();
-        this.Editting = false;
-        this.refresh(true);
-      }))
-      .subscribe(result => {
-        this.notify.success(this.l('SuccessfullySaved'));
-      });
+    this.showMainSpinner();
 
+    this._AccountsServiceProxy
+        .createOrUpdateContact(payload)
+        .pipe(finalize(() => this.hideMainSpinner()))
+        .subscribe(() => {
+            this.relationChanges.clear();
+            this.editInfo = true;
+            this.NoteditInfo = false;
+            this.Editting = false;
 
-  }
+            this.notify.success(this.l('SuccessfullySaved'));
+            this.refresh(true);
+        });
+}
 
   selectBranch() {
     if (!this.memberData?.accountId) return; // silent no-op (no warning)
@@ -366,21 +424,29 @@ export class ViewMemberProfileComponent extends AppComponentBase implements OnIn
   branchSelectionCanceled() {
     this.selectBranchModal.close();
   }
-  cancel() {
-    this.editjobTitleValue = this.memberData?.contact?.jobTitle;
-    this.editBranchValue =
-      (this.memberData?.branchName ? (this.memberData?.branchName + ' ' + " - ") : '') +
-      (this.memberData?.addressLine1 ? (this.memberData?.addressLine1 + ', ') : '') +
-      (this.memberData?.addressLine2 ? this.memberData?.addressLine2 + ', ' : '') +
-      (this.memberData?.city ? (this.memberData?.city + ', ') : '') +
-      (this.memberData?.state ? (this.memberData?.state + ', ') : '') +
-      (this.memberData?.zipCode ? (this.memberData?.zipCode + ', ') : '') +
-      (this.memberData?.countryName ? (this.memberData?.countryName) : '');
+  // cancel() {
+  //   this.editjobTitleValue = this.memberData?.contact?.jobTitle;
+  //   this.editBranchValue =
+  //     (this.memberData?.branchName ? (this.memberData?.branchName + ' ' + " - ") : '') +
+  //     (this.memberData?.addressLine1 ? (this.memberData?.addressLine1 + ', ') : '') +
+  //     (this.memberData?.addressLine2 ? this.memberData?.addressLine2 + ', ' : '') +
+  //     (this.memberData?.city ? (this.memberData?.city + ', ') : '') +
+  //     (this.memberData?.state ? (this.memberData?.state + ', ') : '') +
+  //     (this.memberData?.zipCode ? (this.memberData?.zipCode + ', ') : '') +
+  //     (this.memberData?.countryName ? (this.memberData?.countryName) : '');
 
-    this.oldEditBranchValue = this.editBranchValue;
-  }
+  //   this.oldEditBranchValue = this.editBranchValue;
+  // }
 
+cancel(): void {
+    this.relationChanges.clear();
+    this.relationAttributeObject = null;
+    this.relationInputsDto = null;
 
+    this.editInfo = true;
+    this.NoteditInfo = false;
+    this.Editting = false;
+}
 
   getUserIdValue(): string | null {
 
@@ -544,5 +610,110 @@ export class ViewMemberProfileComponent extends AppComponentBase implements OnIn
       : '';
   }
   
+
+  /////////////////////// relation settings
+
+  relationAttributes: any[] = [];
+relationAttributeObject: any;
+relationEntityObjectTypeId: number;
+relationInputsDto: any;
+
+private relationChanges = new Map<number, any>();
+private readonly relationAttributeIds = [706, 707, 718];
+
+loadRelationAttributes(): void {
+    // B00P = Business hire Person, from your metadata response.
+    this.relationAttributeObject = null;
+    this.relationAttributes = [];
+
+    this._sycEntityObjectTypesServiceProxy
+        .getAllWithExtraAttributesByCode(
+            'B00P',
+            'MARKETPLACECONTACTRELATIONSHIP'
+        )
+        .subscribe(result => {
+            const definition = result?.find(x => x.code === 'B00P');
+
+            this.relationEntityObjectTypeId = definition?.id;
+
+            this.relationAttributes = (
+                definition?.extraAttributes?.extraAttributes || []
+            )
+                .filter(attr =>
+                    this.relationAttributeIds.includes(
+                        Number(attr.attributeId)
+                    )
+                )
+                .map(attr => ({
+                    ...attr,
+                    paginationSetting: {
+                        skipCount: 0,
+                        maxResultCount: 10,
+                        totalCount: 0,
+                        list: []
+                    }
+                }));
+        });
+}
+
+private prepareRelationInputs(): void {
+    this.relationChanges.clear();
+
+    const attributes = this.relationAttributes.map(attr => ({
+        ...attr,
+        paginationSetting: {
+            ...attr.paginationSetting,
+            list: [...(attr.paginationSetting?.list || [])]
+        }
+    }));
+
+    // A separate copy prevents edits from changing the view data.
+    this.relationInputsDto = {
+        extraDataAttributes: attributes.map(attr => {
+            const value = Number(attr.attributeId) === 718
+                ? (
+                    this.getStringValue(718) ||
+                    this.memberData?.parentId ||
+                    ''
+                )
+                : this.getStringValue(Number(attr.attributeId));
+
+            return {
+                extraAttributeId: Number(attr.attributeId),
+                selectedValues:
+                    value !== '' && value != null
+                        ? [{ value }]
+                        : []
+            };
+        })
+    };
+
+    this.relationAttributeObject = {
+        value: {
+            filteredExtraAttributes: attributes,
+            extraAttributes: attributes
+        }
+    };
+}
+
+onRelationSettingsChanged(changes: any[]): void {
+    for (const change of changes || []) {
+        const attributeId = Number(change.attributeId);
+
+        if (this.relationAttributeIds.includes(attributeId)) {
+            this.relationChanges.set(attributeId, {
+                ...change,
+                attributeId
+            });
+        }
+    }
+}
+
+onRelationSettingCleared(attributeId: number): void {
+    this.relationChanges.set(Number(attributeId), {
+        attributeId: Number(attributeId),
+        value: ''
+    });
+}
   
 }

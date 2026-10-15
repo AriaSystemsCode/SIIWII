@@ -576,24 +576,44 @@ reset(extraAttr: any): void {
     const apiMethod = extraAttr.dataSource.api;
     const resultField = extraAttr.dataSource.parameter;
 
-    this.dynamicApi.dispatch(serviceName, apiMethod, {
-      skipCount: skipCount,
-      maxResultCount: maxResultCount
-    }).subscribe(result => {
-      const dropdownItems = result.items.map(item => ({
-        label: this.getByPath(item, resultField.trim()),
-        value: item.account.id
-      }));
+  this.dynamicApi.dispatch(serviceName, apiMethod, {
+    skipCount,
+    maxResultCount
+}).subscribe({
+    next: (result: any) => {
+        if (!result || !Array.isArray(result.items)) {
+            console.error('Invalid dynamic API response:', {
+                serviceName,
+                apiMethod,
+                result
+            });
 
-      const existing = this.extraAttrOptions.get(extraAttr.id)?.items || [];
-      const combinedItems = skipCount > 0 ? [...existing, ...dropdownItems] : dropdownItems;
+            const data = this.extraAttrOptions.get(extraAttr.id);
+            if (data) {
+                data.isLoading = false;
+            }
 
-      this.extraAttrOptions.set(extraAttr.id, {
-        items: combinedItems,
-        totalCount: result.totalCount,
-        isLoading: false
-      });
-    });
+            return;
+        }
+
+        const dropdownItems = result.items.map(item => ({
+            label: this.getByPath(item, resultField.trim()),
+            value: item.account?.id
+        }));
+
+        const existing =
+            this.extraAttrOptions.get(extraAttr.id)?.items || [];
+
+        this.extraAttrOptions.set(extraAttr.id, {
+            items: skipCount > 0
+                ? [...existing, ...dropdownItems]
+                : dropdownItems,
+            totalCount: result.totalCount ?? dropdownItems.length,
+            isLoading: false
+        });
+    },
+  
+});
   }
 }
 
